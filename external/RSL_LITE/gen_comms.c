@@ -11,14 +11,14 @@
 static int parent_type;
 
 int
-gen_halos ( char * dirname )
+gen_halos ( char * dirname , char * incname , node_t * halos )
 {
   node_t * p, * q ;
   node_t * dimd ;
   char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[4096], tmp2[4096], tmp3[4096] ;
-  char commuse[4096] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
   int maxstenwidth, stenwidth ;
   FILE * fp ;
   char * t1, * t2 ;
@@ -35,10 +35,15 @@ gen_halos ( char * dirname )
 
   if ( dirname == NULL ) return(1) ;
 
-  for ( p = Halos ; p != NULL ; p = p->next )
+  for ( p = halos ; p != NULL ; p = p->next )
   {
-    strcpy( commname, p->name ) ;
-    make_upper_case(commname) ;
+    if ( incname == NULL ) {
+      strcpy( commname, p->name ) ;
+      make_upper_case(commname) ;
+    } 
+    else {
+      strcpy( commname, incname ) ;
+    }
     if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s.inc",dirname,commname) ; }
     else                       { sprintf(fname,"%s.inc",commname) ; }
     if ((fp = fopen( fname , "w" )) == NULL ) 
@@ -101,7 +106,6 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
           else
           {
             if ( q->node_kind & FOURD ) {
-
               if ( n4d < MAX_4DARRAYS ) {
                 strcpy( name_4d[n4d], q->name ) ;
               } else { 
@@ -111,19 +115,18 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
                 exit(5) ;
               }
               n4d++ ;
-
             }
             else
             {
               if        ( ! strcmp( q->type->name, "real") ) {
-                if         ( q->ndims == 3 )      n3dR++ ;
-	        else    if ( q->ndims == 2 )      n2dR++ ;
+                if         ( q->ndims == 3 )      { n3dR++ ; }
+	        else    if ( q->ndims == 2 )      { n2dR++ ; }
 	      } else if ( ! strcmp( q->type->name, "integer") ) {
-                if         ( q->ndims == 3 )      n3dI++ ;
-	        else    if ( q->ndims == 2 )      n2dI++ ;
+                if         ( q->ndims == 3 )      { n3dI++ ; }
+	        else    if ( q->ndims == 2 )      { n2dI++ ; }
 	      } else if ( ! strcmp( q->type->name, "doubleprecision") ) {
-                if         ( q->ndims == 3 )      n3dD++ ;
-	        else    if ( q->ndims == 2 )      n2dD++ ;
+                if         ( q->ndims == 3 )      { n3dD++ ; }
+	        else    if ( q->ndims == 2 )      { n2dD++ ; }
 	      }
 	    }
 	  }
@@ -137,7 +140,7 @@ fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
 #if 0
 fprintf(fp,"CALL wrf_debug(3,'calling RSL_LITE_INIT_EXCH %d for Y %s')\n",maxstenwidth,fname) ;
 #endif
-    fprintf(fp,"CALL RSL_LITE_INIT_EXCH ( %d , &\n",maxstenwidth) ;
+    fprintf(fp,"CALL RSL_LITE_INIT_EXCH ( local_communicator, %d, &\n",maxstenwidth) ;
     if ( n4d > 0 ) {
       fprintf(fp,  "     %d  &\n", n3dR ) ;
       for ( i = 0 ; i < n4d ; i++ ) {
@@ -154,23 +157,14 @@ fprintf(fp,"CALL wrf_debug(3,'calling RSL_LITE_INIT_EXCH %d for Y %s')\n",maxste
     fprintf(fp,"      ips, ipe, jps, jpe, kps, kpe    )\n") ;
 
 /* generate packs prior to stencil exchange in Y */
-    gen_packs( fp, p, maxstenwidth, 0, 0 ) ;
+    gen_packs( fp, p, maxstenwidth, 0, 0, "RSL_LITE_PACK", "local_communicator" ) ;
 /* generate stencil exchange in Y */
-#if 0
-fprintf(fp,"CALL wrf_debug('calling RSL_LITE_EXCH_Y')\n") ;
-#endif
     fprintf(fp,"   CALL RSL_LITE_EXCH_Y ( local_communicator , mytask, ntasks, ntasks_x, ntasks_y )\n") ;
-#if 0
-fprintf(fp,"CALL wrf_debug('back from RSL_LITE_EXCH_Y')\n") ;
-#endif
 /* generate unpacks after stencil exchange in Y */
-    gen_packs( fp, p, maxstenwidth, 0, 1 ) ;
+    gen_packs( fp, p, maxstenwidth, 0, 1 , "RSL_LITE_PACK", "local_communicator" ) ;
 
 /* generate the stencil init statement for X transfer */
-#if 0
-fprintf(fp,"CALL wrf_debug(3,'calling RSL_LITE_INIT_EXCH %d for X %s')\n",maxstenwidth,fname) ;
-#endif
-    fprintf(fp,"CALL RSL_LITE_INIT_EXCH ( %d , &\n",maxstenwidth) ;
+    fprintf(fp,"CALL RSL_LITE_INIT_EXCH ( local_communicator, %d , &\n",maxstenwidth) ;
     fprintf(fp,"     %d, %d, RWORDSIZE, &\n", n3dR, n2dR ) ;
     fprintf(fp,"     %d, %d, IWORDSIZE, &\n", n3dI, n2dI ) ;
     fprintf(fp,"     %d, %d, DWORDSIZE, &\n", n3dD, n2dD ) ;
@@ -178,35 +172,24 @@ fprintf(fp,"CALL wrf_debug(3,'calling RSL_LITE_INIT_EXCH %d for X %s')\n",maxste
     fprintf(fp,"      mytask, ntasks, ntasks_x, ntasks_y,   &\n" ) ;
     fprintf(fp,"      ips, ipe, jps, jpe, kps, kpe    )\n") ;
 /* generate packs prior to stencil exchange in X */
-    gen_packs( fp, p, maxstenwidth, 1, 0 ) ;
+    gen_packs( fp, p, maxstenwidth, 1, 0, "RSL_LITE_PACK", "local_communicator" ) ;
 /* generate stencil exchange in X */
-#if 0
-fprintf(fp,"CALL wrf_debug('calling RSL_LITE_EXCH_X')\n") ;
-#endif
     fprintf(fp,"   CALL RSL_LITE_EXCH_X ( local_communicator , mytask, ntasks, ntasks_x, ntasks_y )\n") ;
-#if 0
-fprintf(fp,"CALL wrf_debug('back from RSL_LITE_EXCH_X')\n") ;
-#endif
 /* generate unpacks after stencil exchange in X */
-    gen_packs( fp, p, maxstenwidth, 1, 1 ) ;
-
-#if 0
-fprintf(fp,"CALL wrf_debug(2,'back from %s')\n",fname) ;
-#endif
+    gen_packs( fp, p, maxstenwidth, 1, 1, "RSL_LITE_PACK", "local_communicator" ) ;
 
     close_the_file(fp) ;
   }
   return(0) ;
 }
 
-gen_packs ( FILE *fp , node_t *p, int shw, int xy /* 0=y,1=x */ , int pu /* 0=pack,1=unpack */ )   
+gen_packs ( FILE *fp , node_t *p, int shw, int xy /* 0=y,1=x */ , int pu /* 0=pack,1=unpack */, char * packname, char * commname )   
 {
   node_t * q ;
   node_t * dimd ;
-  char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[4096], tmp2[4096], tmp3[4096] ;
-  char commuse[4096] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
   int maxstenwidth, stenwidth ;
   char * t1, * t2 , *wordsize ;
   char * pos1 , * pos2 ;
@@ -220,12 +203,12 @@ gen_packs ( FILE *fp , node_t *p, int shw, int xy /* 0=y,1=x */ , int pu /* 0=pa
     {
       strcpy( tmp2 , t1 ) ;
       if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
-       { fprintf(stderr,"unparseable description for halo %s\n", commname ) ; continue ; }
+       { fprintf(stderr,"unparseable description for halo %s\n", p->name ) ; continue ; }
       t2 = strtok_rentr(NULL,",", &pos2) ;
       while ( t2 != NULL )
       {
         if ((q = get_entry_r( t2, commuse, Domain.fields )) == NULL )
-          { fprintf(stderr,"WARNING 1 : %s in halo spec %s (%s) is not defined in registry.\n",t2,commname, commuse) ; }
+          { fprintf(stderr,"WARNING 1 : %s in halo spec %s (%s) is not defined in registry.\n",t2,p->name, commuse) ; }
         else
         {
           if      (  strcmp( q->type->name, "real") && strcmp( q->type->name, "integer") && strcmp( q->type->name, "doubleprecision") ) { ; }
@@ -241,33 +224,15 @@ gen_packs ( FILE *fp , node_t *p, int shw, int xy /* 0=y,1=x */ , int pu /* 0=pa
               zdex = get_index_for_coord( q , COORD_Z ) ;
               if ( zdex >=1 && zdex <= 3 )
               {
-                for ( member = q->members ; member != NULL ; member = member->next )
-                {
-                  if ( strcmp( member->name, "-" ) )
-                  {
-                    set_mem_order( member, memord , NAMELEN) ;
-
-#if 0
-fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,'call RSL_LITE_PACK P_%s %s shw=%d ws=%s xy=%d pu=%d m=%s')\n",member->name,member->name,t2,shw,wordsize,xy,pu,memord) ;
-fprintf(fp,"if ( P_%s .GT. 1 )write(wrf_err_message,*)' d ',ids, ide, jds, jde, kds, kde\n",member->name ) ;
-fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,wrf_err_message)\n",member->name) ;
-fprintf(fp,"if ( P_%s .GT. 1 )write(wrf_err_message,*)' m ',ims, ime, jms, jme, kms, kme\n",member->name ) ;
-fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,wrf_err_message)\n",member->name) ;
-fprintf(fp,"if ( P_%s .GT. 1 )write(wrf_err_message,*)' p ',ips, ipe, jps, jpe, kps, kpe\n",member->name ) ;
-fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,wrf_err_message)\n",member->name) ;
-#endif
-
-fprintf(fp,"if ( P_%s .GT. 1 ) CALL RSL_LITE_PACK ( %s ( grid%%sm31,grid%%sm32,grid%%sm33,P_%s), %d, %s, %d, %d, '%s', &\n",
-                       member->name, t2 , member->name, shw, wordsize, xy, pu, memord ) ;
-                    fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
-                    fprintf(fp,"ids, ide, jds, jde, kds, kde,             &\n") ;
-                    fprintf(fp,"ims, ime, jms, jme, kms, kme,             &\n") ;
-                    fprintf(fp,"ips, ipe, jps, jpe, kps, kpe              )\n") ;
-#if 0
-fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,'back from RSL_LITE_PACK')\n",member->name) ;
-#endif
-                  }
-                }
+                set_mem_order( q->members, memord , NAMELEN) ;
+fprintf(fp,"DO itrace = PARAM_FIRST_SCALAR, num_%s\n",q->name ) ;
+fprintf(fp," CALL %s ( %s,%s ( grid%%sm31,grid%%sm32,grid%%sm33,itrace), %d, %s, %d, %d, '%s', %d, &\n",
+                       packname, commname, t2 , shw, wordsize, xy, pu, memord, q->stag_x?1:0 ) ;
+fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
+fprintf(fp,"ids, ide, jds, jde, kds, kde,             &\n") ;
+fprintf(fp,"ims, ime, jms, jme, kms, kme,             &\n") ;
+fprintf(fp,"ips, ipe, jps, jpe, kps, kpe              )\n") ;
+fprintf(fp,"ENDDO\n") ;
               }
               else
               {
@@ -278,7 +243,7 @@ fprintf(fp,"if ( P_%s .GT. 1 )CALL wrf_debug(3,'back from RSL_LITE_PACK')\n",mem
             {
               set_mem_order( q, memord , NAMELEN) ;
 #if 0
-fprintf(fp,"CALL wrf_debug(3,'call RSL_LITE_PACK %s shw=%d ws=%s xy=%d pu=%d m=%s')\n",t2,shw,wordsize,xy,pu,memord) ;
+fprintf(fp,"CALL wrf_debug(3,'call %s %s shw=%d ws=%s xy=%d pu=%d m=%s')\n",packname,t2,shw,wordsize,xy,pu,memord) ;
 fprintf(fp,"write(wrf_err_message,*)' d ',ids, ide, jds, jde, kds, kde\n" ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 fprintf(fp,"write(wrf_err_message,*)' m ',ims, ime, jms, jme, kms, kme\n" ) ;
@@ -303,7 +268,7 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 fprintf(fp,"write(wrf_err_message,*)' p ',ips, ipe, jps, jpe, kps, kpe\n" ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 #endif
-                    fprintf(fp,"CALL RSL_LITE_PACK ( %s, %d, %s, %d, %d, '%s', &\n", t2, shw, wordsize, xy, pu, memord ) ;
+                    fprintf(fp,"CALL %s ( %s, %s, %d, %s, %d, %d, '%s', %d, &\n", packname, commname, t2, shw, wordsize, xy, pu, memord, q->stag_x?1:0 ) ;
                     fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
                     fprintf(fp,"ids, ide, jds, jde, kds, kde,             &\n") ;
                     fprintf(fp,"ims, ime, jms, jme, kms, kme,             &\n") ;
@@ -326,7 +291,7 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 fprintf(fp,"write(wrf_err_message,*)' p ',ips, ipe, jps, jpe, %s, %s\n",s,e ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 #endif
-                    fprintf(fp,"CALL RSL_LITE_PACK ( %s, %d, %s, %d, %d, '%s', &\n", t2, shw, wordsize, xy, pu, memord ) ;
+                    fprintf(fp,"CALL %s ( %s, %s, %d, %s, %d, %d, '%s', %d, &\n", packname, commname, t2, shw, wordsize, xy, pu, memord, q->stag_x?1:0 ) ;
                     fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
                     fprintf(fp,"ids, ide, jds, jde, %s, %s,             &\n",s,e) ;
                     fprintf(fp,"ims, ime, jms, jme, %s, %s,             &\n",s,e) ;
@@ -342,7 +307,7 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 fprintf(fp,"write(wrf_err_message,*)' p ',ips, ipe, jps, jpe, %d, %d\n",dimd->coord_start,dimd->coord_end ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 #endif
-                    fprintf(fp,"CALL RSL_LITE_PACK ( %s, %d, %s, %d, %d, '%s', &\n", t2, shw, wordsize, xy, pu, memord ) ;
+                    fprintf(fp,"CALL %s ( %s, %s, %d, %s, %d, %d, '%s', %d, &\n", packname, commname, t2, shw, wordsize, xy, pu, memord, q->stag_x?1:0 ) ;
                     fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
                     fprintf(fp,"ids, ide, jds, jde, %d, %d,             &\n",dimd->coord_start,dimd->coord_end) ;
                     fprintf(fp,"ims, ime, jms, jme, %d, %d,             &\n",dimd->coord_start,dimd->coord_end) ;
@@ -358,16 +323,16 @@ fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 fprintf(fp,"write(wrf_err_message,*)' p ',ips, ipe, jps, jpe, 1, 1\n" ) ;
 fprintf(fp,"CALL wrf_debug(3,wrf_err_message)\n") ;
 #endif
-                fprintf(fp,"CALL RSL_LITE_PACK ( %s, %d, %s, %d, %d, '%s', &\n", t2, shw, wordsize, xy, pu, memord ) ;
+                fprintf(fp,"CALL %s ( %s, %s, %d, %s, %d, %d, '%s', %d, &\n", packname, commname, t2, shw, wordsize, xy, pu, memord, q->stag_x?1:0 ) ;
                 fprintf(fp,"mytask, ntasks, ntasks_x, ntasks_y,       &\n") ;
                 fprintf(fp,"ids, ide, jds, jde, 1  , 1  ,             &\n") ;
                 fprintf(fp,"ims, ime, jms, jme, 1  , 1  ,             &\n") ;
                 fprintf(fp,"ips, ipe, jps, jpe, 1  , 1                )\n") ;
               } else {
-                fprintf(stderr,"Registry WARNING: %s is not 2 or 3 dimensional\n",t2) ;
+                fprintf(stderr,"Registry WARNING: %s is neither 2 nor 3 dimensional\n",t2) ;
               }
 #if 0
-fprintf(fp,"CALL wrf_debug(3,'back from RSL_LITE_PACK')\n") ;
+fprintf(fp,"CALL wrf_debug(3,'back from %s')\n", packname) ;
 #endif
             }
           }
@@ -380,20 +345,31 @@ fprintf(fp,"CALL wrf_debug(3,'back from RSL_LITE_PACK')\n") ;
 }
 
 int
-gen_periods ( char * dirname )
+gen_periods ( char * dirname , node_t * periods )
 {
   node_t * p, * q ;
+  node_t * dimd ;
   char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[4096], tmp2[4096], commuse[4096] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
   int maxperwidth, perwidth ;
   FILE * fp ;
   char * t1, * t2 ;
   char * pos1 , * pos2 ;
+  char indices[NAMELEN], post[NAMELEN] ;
+  int zdex ;
+  int n2dR, n3dR ;
+  int n2dI, n3dI ;
+  int n2dD, n3dD ;
+  int n4d ;
+  int i ;
+#define MAX_4DARRAYS 1000
+  char name_4d[MAX_4DARRAYS][NAMELEN] ;
 
   if ( dirname == NULL ) return(1) ;
 
-  for ( p = Periods ; p != NULL ; p = p->next )
+  for ( p = periods ; p != NULL ; p = p->next )
   {
     strcpy( commname, p->name ) ;
     make_upper_case(commname) ;
@@ -404,6 +380,386 @@ gen_periods ( char * dirname )
       fprintf(stderr,"WARNING: gen_periods in registry cannot open %s for writing\n",fname ) ;
       continue ; 
     }
+    /* get maximum period width */
+    maxperwidth = 0 ;
+    strcpy( tmp, p->comm_define ) ;
+    t1 = strtok_rentr( tmp , ";" , &pos1 ) ;
+    while ( t1 != NULL )
+    {
+      strcpy( tmp2 , t1 ) ;
+      if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
+       { fprintf(stderr,"unparseable description for period %s\n", commname ) ; exit(1) ; }
+      perwidth = atoi (t2) ;
+      if ( perwidth > maxperwidth ) maxperwidth = perwidth ;
+      t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
+    }
+    print_warning(fp,fname) ;
+
+fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
+
+/* count up the number of 2d and 3d real arrays and their types */
+    n2dR = 0 ; n3dR = 0 ;
+    n2dI = 0 ; n3dI = 0 ;
+    n2dD = 0 ; n3dD = 0 ;
+    n4d = 0 ;
+    strcpy( tmp, p->comm_define ) ;
+    strcpy( commuse, p->use ) ;
+    t1 = strtok_rentr( tmp , ";" , &pos1 ) ;
+    for ( i = 0 ; i < MAX_4DARRAYS ; i++ ) strcpy(name_4d[i],"") ;  /* truncate all of these */
+    while ( t1 != NULL )
+    {
+      strcpy( tmp2 , t1 ) ;
+      if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
+       { fprintf(stderr,"unparseable description for period %s\n", commname ) ; continue ; }
+      t2 = strtok_rentr(NULL,",", &pos2) ;
+      while ( t2 != NULL )
+      {
+        if ((q = get_entry_r( t2, commuse, Domain.fields )) == NULL )
+          { fprintf(stderr,"WARNING 1 : %s in peridod spec %s (%s) is not defined in registry.\n",t2,commname, commuse) ; }
+        else
+        {
+          if      (  strcmp( q->type->name, "real") && strcmp( q->type->name, "integer") && strcmp( q->type->name, "doubleprecision") )
+            { fprintf(stderr,"WARNING: only type 'real', 'doubleprecision', or 'integer' can be part of period exchange. %s in %s is %s\n",t2,commname,q->type->name) ; }
+          else if ( q->boundary_array )
+            { fprintf(stderr,"WARNING: boundary array %s cannot be member of period spec %s.\n",t2,commname) ; }
+          else
+          {
+            if ( q->node_kind & FOURD ) {
+              if ( n4d < MAX_4DARRAYS ) {
+                strcpy( name_4d[n4d], q->name ) ;
+              } else { 
+                fprintf(stderr,"REGISTRY ERROR: too many 4d arrays (> %d).\n", MAX_4DARRAYS ) ;
+                fprintf(stderr,"That seems like a lot, but if you are sure, increase MAX_4DARRAYS\n" ) ;
+                fprintf(stderr,"in external/RSL_LITE/gen_comms.c and recompile\n") ;
+                exit(5) ;
+              }
+              n4d++ ;
+            }
+            else
+            {
+              if        ( ! strcmp( q->type->name, "real") ) {
+                if         ( q->ndims == 3 )      { n3dR++ ; }
+	        else    if ( q->ndims == 2 )      { n2dR++ ; }
+	      } else if ( ! strcmp( q->type->name, "integer") ) {
+                if         ( q->ndims == 3 )      { n3dI++ ; }
+	        else    if ( q->ndims == 2 )      { n2dI++ ; }
+	      } else if ( ! strcmp( q->type->name, "doubleprecision") ) {
+                if         ( q->ndims == 3 )      { n3dD++ ; }
+	        else    if ( q->ndims == 2 )      { n2dD++ ; }
+	      }
+	    }
+	  }
+	}
+        t2 = strtok_rentr( NULL , "," , &pos2 ) ;
+      }
+      t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
+    }
+
+    fprintf(fp,"IF ( config_flags%%periodic_x ) THEN\n") ;
+
+/* generate the stencil init statement for X transfer */
+    fprintf(fp,"CALL RSL_LITE_INIT_PERIOD ( local_communicator_periodic, %d , &\n",maxperwidth) ;
+
+    if ( n4d > 0 ) {
+      fprintf(fp,  "     %d  &\n", n3dR ) ;
+      for ( i = 0 ; i < n4d ; i++ ) {
+        fprintf(fp,"   + num_%s   &\n", name_4d[i] ) ;
+      }
+      fprintf(fp,"     , %d, RWORDSIZE, &\n", n2dR ) ;
+    } else {
+      fprintf(fp,"     %d, %d, RWORDSIZE, &\n", n3dR, n2dR ) ;
+    }
+
+    fprintf(fp,"     %d, %d, IWORDSIZE, &\n", n3dI, n2dI ) ;
+    fprintf(fp,"     %d, %d, DWORDSIZE, &\n", n3dD, n2dD ) ;
+    fprintf(fp,"      0,  0, LWORDSIZE, &\n" ) ;
+    fprintf(fp,"      mytask, ntasks, ntasks_x, ntasks_y,   &\n" ) ;
+    fprintf(fp,"      ips, ipe, jps, jpe, kps, kpe    )\n") ;
+/* generate packs prior to stencil exchange in X */
+    gen_packs( fp, p, maxperwidth, 1, 0, "RSL_LITE_PACK_PERIOD_X", "local_communicator_periodic" ) ;
+/* generate stencil exchange in X */
+    fprintf(fp,"   CALL RSL_LITE_EXCH_PERIOD_X ( local_communicator_periodic , mytask, ntasks, ntasks_x, ntasks_y )\n") ;
+/* generate unpacks after stencil exchange in X */
+    gen_packs( fp, p, maxperwidth, 1, 1, "RSL_LITE_PACK_PERIOD_X", "local_communicator_periodic" ) ;
+
+    fprintf(fp,"END IF\n") ;
+
+    close_the_file(fp) ;
+  }
+  return(0) ;
+}
+
+int
+gen_swaps ( char * dirname , node_t * swaps )
+{
+  node_t * p, * q ;
+  node_t * dimd ;
+  char commname[NAMELEN] ;
+  char fname[NAMELEN] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
+  FILE * fp ;
+  char * t1, * t2 ;
+  char * pos1 , * pos2 ;
+  char indices[NAMELEN], post[NAMELEN] ;
+  int zdex ;
+  int n2dR, n3dR ;
+  int n2dI, n3dI ;
+  int n2dD, n3dD ;
+  int n4d ;
+  int i, xy ;
+#define MAX_4DARRAYS 1000
+  char name_4d[MAX_4DARRAYS][NAMELEN] ;
+
+  if ( dirname == NULL ) return(1) ;
+
+  for ( p = swaps ; p != NULL ; p = p->next )
+  {
+    strcpy( commname, p->name ) ;
+    make_upper_case(commname) ;
+    if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s.inc",dirname,commname) ; }
+    else                       { sprintf(fname,"%s.inc",commname) ; }
+    if ((fp = fopen( fname , "w" )) == NULL ) 
+    {
+      fprintf(stderr,"WARNING: gen_swaps in registry cannot open %s for writing\n",fname ) ;
+      continue ; 
+    }
+    print_warning(fp,fname) ;
+
+  for ( xy = 0 ; xy < 2 ; xy++ ) {
+
+fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
+
+/* count up the number of 2d and 3d real arrays and their types */
+    n2dR = 0 ; n3dR = 0 ;
+    n2dI = 0 ; n3dI = 0 ;
+    n2dD = 0 ; n3dD = 0 ;
+    n4d = 0 ;
+    strcpy( tmp, p->comm_define ) ;
+    strcpy( commuse, p->use ) ;
+    t1 = strtok_rentr( tmp , ";" , &pos1 ) ;
+    for ( i = 0 ; i < MAX_4DARRAYS ; i++ ) strcpy(name_4d[i],"") ;  /* truncate all of these */
+    while ( t1 != NULL )
+    {
+      strcpy( tmp2 , t1 ) ;
+      if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
+       { fprintf(stderr,"unparseable description for period %s\n", commname ) ; continue ; }
+      t2 = strtok_rentr(NULL,",", &pos2) ;
+      while ( t2 != NULL )
+      {
+        if ((q = get_entry_r( t2, commuse, Domain.fields )) == NULL )
+          { fprintf(stderr,"WARNING 1 : %s in swap spec %s (%s) is not defined in registry.\n",t2,commname, commuse) ; }
+        else
+        {
+          if      (  strcmp( q->type->name, "real") && strcmp( q->type->name, "integer") && strcmp( q->type->name, "doubleprecision") )
+            { fprintf(stderr,"WARNING: only type 'real', 'doubleprecision', or 'integer' can be part of swaps exchange. %s in %s is %s\n",t2,commname,q->type->name) ; }
+          else if ( q->boundary_array )
+            { fprintf(stderr,"WARNING: boundary array %s cannot be member of swaps spec %s.\n",t2,commname) ; }
+          else
+          {
+            if ( q->node_kind & FOURD ) {
+              if ( n4d < MAX_4DARRAYS ) {
+                strcpy( name_4d[n4d], q->name ) ;
+              } else { 
+                fprintf(stderr,"REGISTRY ERROR: too many 4d arrays (> %d).\n", MAX_4DARRAYS ) ;
+                fprintf(stderr,"That seems like a lot, but if you are sure, increase MAX_4DARRAYS\n" ) ;
+                fprintf(stderr,"in external/RSL_LITE/gen_comms.c and recompile\n") ;
+                exit(5) ;
+              }
+              n4d++ ;
+            }
+            else
+            {
+              if        ( ! strcmp( q->type->name, "real") ) {
+                if         ( q->ndims == 3 )      { n3dR++ ; }
+	        else    if ( q->ndims == 2 )      { n2dR++ ; }
+	      } else if ( ! strcmp( q->type->name, "integer") ) {
+                if         ( q->ndims == 3 )      { n3dI++ ; }
+	        else    if ( q->ndims == 2 )      { n2dI++ ; }
+	      } else if ( ! strcmp( q->type->name, "doubleprecision") ) {
+                if         ( q->ndims == 3 )      { n3dD++ ; }
+	        else    if ( q->ndims == 2 )      { n2dD++ ; }
+	      }
+	    }
+	  }
+	}
+        t2 = strtok_rentr( NULL , "," , &pos2 ) ;
+      }
+      t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
+    }
+
+    fprintf(fp,"IF ( config_flags%%swap_%c ) THEN\n",(xy==1)?'x':'y') ;
+
+/* generate the init statement for X swap */
+    fprintf(fp,"CALL RSL_LITE_INIT_SWAP ( local_communicator, %d , &\n", xy ) ;
+    if ( n4d > 0 ) {
+      fprintf(fp,  "     %d  &\n", n3dR ) ;
+      for ( i = 0 ; i < n4d ; i++ ) {
+        fprintf(fp,"   + num_%s   &\n", name_4d[i] ) ;
+      }
+      fprintf(fp,"     , %d, RWORDSIZE, &\n", n2dR ) ;
+    } else {
+      fprintf(fp,"     %d, %d, RWORDSIZE, &\n", n3dR, n2dR ) ;
+    }
+    fprintf(fp,"     %d, %d, IWORDSIZE, &\n", n3dI, n2dI ) ;
+    fprintf(fp,"     %d, %d, DWORDSIZE, &\n", n3dD, n2dD ) ;
+    fprintf(fp,"      0,  0, LWORDSIZE, &\n" ) ;
+    fprintf(fp,"      mytask, ntasks, ntasks_x, ntasks_y,   &\n" ) ;
+    fprintf(fp,"      ids, ide, jds, jde, kds, kde,   &\n") ;
+    fprintf(fp,"      ips, ipe, jps, jpe, kps, kpe    )\n") ;
+/* generate packs prior to stencil exchange  */
+    gen_packs( fp, p, 1, xy, 0, "RSL_LITE_PACK_SWAP", "local_communicator" ) ;
+/* generate stencil exchange in X */
+    fprintf(fp,"   CALL RSL_LITE_SWAP ( local_communicator , mytask, ntasks, ntasks_x, ntasks_y )\n") ;
+/* generate unpacks after stencil exchange  */
+    gen_packs( fp, p, 1, xy, 1, "RSL_LITE_PACK_SWAP", "local_communicator" ) ;
+
+    fprintf(fp,"END IF\n") ;
+
+  }
+    close_the_file(fp) ;
+  }
+  return(0) ;
+}
+
+int
+gen_cycles ( char * dirname , node_t * cycles )
+{
+  node_t * p, * q ;
+  node_t * dimd ;
+  char commname[NAMELEN] ;
+  char fname[NAMELEN] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
+  FILE * fp ;
+  char * t1, * t2 ;
+  char * pos1 , * pos2 ;
+  char indices[NAMELEN], post[NAMELEN] ;
+  int zdex ;
+  int n2dR, n3dR ;
+  int n2dI, n3dI ;
+  int n2dD, n3dD ;
+  int n4d ;
+  int i, xy, inout ;
+#define MAX_4DARRAYS 1000
+  char name_4d[MAX_4DARRAYS][NAMELEN] ;
+
+  if ( dirname == NULL ) return(1) ;
+
+  for ( p = cycles ; p != NULL ; p = p->next )
+  {
+    strcpy( commname, p->name ) ;
+    make_upper_case(commname) ;
+    if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s.inc",dirname,commname) ; }
+    else                       { sprintf(fname,"%s.inc",commname) ; }
+    if ((fp = fopen( fname , "w" )) == NULL ) 
+    {
+      fprintf(stderr,"WARNING: gen_cycles in registry cannot open %s for writing\n",fname ) ;
+      continue ; 
+    }
+
+    /* get inout */
+    inout = 0 ;
+    strcpy( tmp, p->comm_define ) ;
+    t1 = strtok_rentr( tmp , ";" , &pos1 ) ;
+    strcpy( tmp2 , t1 ) ;
+    if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
+       { fprintf(stderr,"unparseable description for cycle %s\n", commname ) ; exit(1) ; }
+    inout = atoi (t2) ;
+
+    print_warning(fp,fname) ;
+
+  for ( xy = 0 ; xy < 2 ; xy++ ) {
+
+fprintf(fp,"CALL wrf_debug(2,'calling %s')\n",fname) ;
+
+/* count up the number of 2d and 3d real arrays and their types */
+    n2dR = 0 ; n3dR = 0 ;
+    n2dI = 0 ; n3dI = 0 ;
+    n2dD = 0 ; n3dD = 0 ;
+    n4d = 0 ;
+    strcpy( tmp, p->comm_define ) ;
+    strcpy( commuse, p->use ) ;
+    t1 = strtok_rentr( tmp , ";" , &pos1 ) ;
+    for ( i = 0 ; i < MAX_4DARRAYS ; i++ ) strcpy(name_4d[i],"") ;  /* truncate all of these */
+    while ( t1 != NULL )
+    {
+      strcpy( tmp2 , t1 ) ;
+      if (( t2 = strtok_rentr( tmp2 , ":" , &pos2 )) == NULL )
+       { fprintf(stderr,"unparseable description for period %s\n", commname ) ; continue ; }
+      t2 = strtok_rentr(NULL,",", &pos2) ;
+      while ( t2 != NULL )
+      {
+        if ((q = get_entry_r( t2, commuse, Domain.fields )) == NULL )
+          { fprintf(stderr,"WARNING 1 : %s in swap spec %s (%s) is not defined in registry.\n",t2,commname, commuse) ; }
+        else
+        {
+          if      (  strcmp( q->type->name, "real") && strcmp( q->type->name, "integer") && strcmp( q->type->name, "doubleprecision") )
+            { fprintf(stderr,"WARNING: only type 'real', 'doubleprecision', or 'integer' can be part of cycles exchange. %s in %s is %s\n",t2,commname,q->type->name) ; }
+          else if ( q->boundary_array )
+            { fprintf(stderr,"WARNING: boundary array %s cannot be member of cycles spec %s.\n",t2,commname) ; }
+          else
+          {
+            if ( q->node_kind & FOURD ) {
+              if ( n4d < MAX_4DARRAYS ) {
+                strcpy( name_4d[n4d], q->name ) ;
+              } else { 
+                fprintf(stderr,"REGISTRY ERROR: too many 4d arrays (> %d).\n", MAX_4DARRAYS ) ;
+                fprintf(stderr,"That seems like a lot, but if you are sure, increase MAX_4DARRAYS\n" ) ;
+                fprintf(stderr,"in external/RSL_LITE/gen_comms.c and recompile\n") ;
+                exit(5) ;
+              }
+              n4d++ ;
+            }
+            else
+            {
+              if        ( ! strcmp( q->type->name, "real") ) {
+                if         ( q->ndims == 3 )      { n3dR++ ; }
+	        else    if ( q->ndims == 2 )      { n2dR++ ; }
+	      } else if ( ! strcmp( q->type->name, "integer") ) {
+                if         ( q->ndims == 3 )      { n3dI++ ; }
+	        else    if ( q->ndims == 2 )      { n2dI++ ; }
+	      } else if ( ! strcmp( q->type->name, "doubleprecision") ) {
+                if         ( q->ndims == 3 )      { n3dD++ ; }
+	        else    if ( q->ndims == 2 )      { n2dD++ ; }
+	      }
+	    }
+	  }
+	}
+        t2 = strtok_rentr( NULL , "," , &pos2 ) ;
+      }
+      t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
+    }
+
+    fprintf(fp,"IF ( config_flags%%cycle_%c ) THEN\n",(xy==1)?'x':'y') ;
+
+/* generate the init statement for X swap */
+    fprintf(fp,"CALL RSL_LITE_INIT_CYCLE ( local_communicator, %d , %d, &\n", xy, inout ) ;
+    if ( n4d > 0 ) {
+      fprintf(fp,  "     %d  &\n", n3dR ) ;
+      for ( i = 0 ; i < n4d ; i++ ) {
+        fprintf(fp,"   + num_%s   &\n", name_4d[i] ) ;
+      }
+      fprintf(fp,"     , %d, RWORDSIZE, &\n", n2dR ) ;
+    } else {
+      fprintf(fp,"     %d, %d, RWORDSIZE, &\n", n3dR, n2dR ) ;
+    }
+    fprintf(fp,"     %d, %d, IWORDSIZE, &\n", n3dI, n2dI ) ;
+    fprintf(fp,"     %d, %d, DWORDSIZE, &\n", n3dD, n2dD ) ;
+    fprintf(fp,"      0,  0, LWORDSIZE, &\n" ) ;
+    fprintf(fp,"      mytask, ntasks, ntasks_x, ntasks_y,   &\n" ) ;
+    fprintf(fp,"      ids, ide, jds, jde, kds, kde,   &\n") ;
+    fprintf(fp,"      ips, ipe, jps, jpe, kps, kpe    )\n") ;
+/* generate packs prior to stencil exchange  */
+    gen_packs( fp, p, inout, xy, 0, "RSL_LITE_PACK_CYCLE", "local_communicator" ) ;
+/* generate stencil exchange in X */
+    fprintf(fp,"   CALL RSL_LITE_CYCLE ( local_communicator , mytask, ntasks, ntasks_x, ntasks_y )\n") ;
+/* generate unpacks after stencil exchange  */
+    gen_packs( fp, p, inout, xy, 1, "RSL_LITE_PACK_CYCLE", "local_communicator" ) ;
+
+    fprintf(fp,"END IF\n") ;
+
+  }
     close_the_file(fp) ;
   }
   return(0) ;
@@ -415,8 +771,8 @@ gen_xposes ( char * dirname )
   node_t * p, * q ;
   char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[4096], tmp2[4096], tmp3[4096] ;
-  char commuse[4096] ;
+  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char commuse[NAMELEN] ;
   FILE * fp ;
   char * t1, * t2 ;
   char * pos1 , * pos2 ;
@@ -491,6 +847,8 @@ gen_shift (  char * dirname )
   char fname[NAMELEN], vname[NAMELEN] ;
   char indices[NAMELEN], post[NAMELEN], tmp3[NAMELEN] ;
   int zdex ;
+  node_t Shift ;
+int said_it = 0 ;
 
   for ( direction = directions ; *direction != NULL ; direction++ )
   {
@@ -498,12 +856,132 @@ gen_shift (  char * dirname )
   {
     corename = get_corename_i(ncore) ;
     if ( dirname == NULL || corename == NULL ) return(1) ;
-    if ( strlen(dirname) > 0 )
-     { sprintf(fname,"%s/%s_shift_halo_%s.inc",dirname,corename,*direction) ; }
-    else
-     { sprintf(fname,"%s_shift_halo_%s.inc",corename,*direction) ; }
-    if ((fp = fopen( fname , "w" )) == NULL ) return(1) ;
-    print_warning(fp,fname) ;
+    sprintf(fname,"%s_shift_halo_%s",corename,*direction) ;
+
+    Shift.next = NULL ;
+    sprintf( Shift.use, "dyn_%s", corename ) ;
+    strcpy( Shift.comm_define, "48:" ) ;
+    for ( p = Domain.fields ; p != NULL ; p = p->next ) {
+      if (( p->node_kind & (FIELD | FOURD) ) && p->ndims >= 2 && ! p->boundary_array &&
+          ((!strncmp(p->use,"dyn_",4) && !strcmp(corename,p->use+4)) || strncmp(p->use,"dyn_",4)))
+      {
+
+/* special cases in WRF */
+if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) ||
+     !strcmp( p->name , "abstot" ) || !strcmp( p->name,"absnxt" ) || !strcmp( p->name, "emstot" ) )  {
+  if ( sw_move && ! said_it ) { fprintf(stderr,"Info only - not an error: Moving nests not implemented for Grell Ens. Cumulus\n") ;
+                                fprintf(stderr,"Info only - not an error: Moving nests not implemented for CAM radiation\n") ;
+  said_it = 1 ; }
+  continue ;
+}
+
+        if ( p->type->type_type == SIMPLE )
+        {
+          for ( i = 1 ; i <= p->ntl ; i++ )
+          {
+            if ( p->ntl > 1 ) sprintf(vname,"%s_%d",p->name,i ) ;
+            else              sprintf(vname,"%s",p->name ) ;
+
+            strcat( Shift.comm_define, vname ) ;
+            strcat( Shift.comm_define, "," ) ;
+          }
+        }
+      }
+    }
+    if ( strlen(Shift.comm_define) > 0 )Shift.comm_define[strlen(Shift.comm_define)-1] = '\0' ;
+
+    gen_halos( dirname , fname, &Shift ) ;
+
+    if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s_shift_halo_%s.inc",dirname,corename,*direction) ; }
+    else                       { sprintf(fname,"%s_shift_halo_%s.inc",corename,*direction) ; }
+    if ((fp = fopen( fname , "a" )) == NULL ) return(1) ;
+
+/* now generate the shifts themselves */
+    for ( p = Domain.fields ; p != NULL ; p = p->next )
+    {
+
+/* special cases in WRF */
+if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) ||
+     !strcmp( p->name , "abstot" ) || !strcmp( p->name,"absnxt" ) || !strcmp( p->name, "emstot" ) )  {
+  continue ;
+}
+
+      if (( p->node_kind & (FIELD | FOURD) ) && p->ndims >= 2 && ! p->boundary_array &&
+	  ((!strncmp(p->use,"dyn_",4) && !strcmp(corename,p->use+4)) || strncmp(p->use,"dyn_",4)))
+      {
+	if ( p->type->type_type == SIMPLE )
+	{
+	  for ( i = 1 ; i <= p->ntl ; i++ )
+	  {
+            if ( p->ntl > 1 ) sprintf(vname,"%s_%d",p->name,i ) ;
+            else              sprintf(vname,"%s",p->name ) ;
+	    if ( p->node_kind & FOURD )
+            {
+              node_t *member ;
+              zdex = get_index_for_coord( p , COORD_Z ) ;
+              if ( zdex >=1 && zdex <= 3 )
+              {
+#if 1
+                    if ( !strcmp( *direction, "x" ) )
+                    {
+fprintf(fp, "  DO itrace = PARAM_FIRST_SCALAR, num_%s\n", p->name ) ;
+fprintf(fp, "   %s ( ips:min(ide%s,ipe),:,jms:jme,itrace) = %s (ips+px:min(ide%s,ipe)+px,:,jms:jme,itrace)\n",
+                       vname, p->members->stag_x?"":"-1", vname, p->members->stag_x?"":"-1" ) ;
+fprintf(fp, "  ENDDO\n" ) ;
+                    }
+                    else
+                    {
+fprintf(fp, "  DO itrace = PARAM_FIRST_SCALAR, num_%s\n", p->name ) ;
+fprintf(fp, "   %s ( ims:ime,:,jps:min(jde%s,jpe),itrace) = %s (ims:ime,:,jps+py:min(jde%s,jpe)+py,itrace)\n",
+                       vname, p->members->stag_y?"":"-1", vname, p->members->stag_y?"":"-1" ) ;
+fprintf(fp, "  ENDDO\n" ) ;
+                    }
+
+#else
+                for ( member = p->members ; member != NULL ; member = member->next )
+                {
+                  if ( strcmp( member->name, "-" ) )
+                  {
+                    if ( !strcmp( *direction, "x" ) )
+                    {
+                      fprintf(fp,
+   "  if ( P_%s .GT. 1 ) %s ( ips:min(ide%s,ipe),:,jms:jme,P_%s) = %s (ips+px:min(ide%s,ipe)+px,:,jms:jme,P_%s)\n",
+                       member->name, vname, member->stag_x?"":"-1", member->name, vname, member->stag_x?"":"-1", member->name ) ;
+                    }
+                    else
+                    {
+                      fprintf(fp,
+   "  if ( P_%s .GT. 1 ) %s ( ims:ime,:,jps:min(jde%s,jpe),P_%s) = %s (ims:ime,:,jps+py:min(jde%s,jpe)+py,P_%s)\n",
+                       member->name, vname, member->stag_y?"":"-1", member->name, vname, member->stag_y?"":"-1", member->name ) ;
+                    }
+                  }
+                }
+#endif
+              }
+              else
+              {
+                fprintf(stderr,"WARNING: %d some dimension info missing for 4d array %s\n",zdex,t2) ;
+              }
+            }
+            else
+	    {
+	      char * vdim ;
+	      vdim = "" ;
+	      if ( p->ndims == 3 ) vdim = ":," ;
+              if ( !strcmp( *direction, "x" ) )
+              {
+                fprintf(fp,"%s (ips:min(ide%s,ipe),%sjms:jme) = %s (ips+px:min(ide%s,ipe)+px,%sjms:jme)\n", vname,  p->stag_x?"":"-1", vdim, vname, p->stag_x?"":"-1", vdim ) ;
+              }
+              else
+	      {
+                fprintf(fp,"%s (ims:ime,%sjps:min(jde%s,jpe)) = %s (ims:ime,%sjps+py:min(jde%s,jpe)+py)\n", vname, vdim,  p->stag_y?"":"-1", vname, vdim, p->stag_y?"":"-1" ) ;
+              }
+            }
+	  }
+	}
+      }
+    }
+
     close_the_file(fp) ;
   }
   }
@@ -533,62 +1011,6 @@ gen_datacalls ( char * dirname )
   return(0) ;
 }
 
-int
-gen_datacalls1 ( FILE * fp , char * corename , char * structname , int mask , node_t * node )
-{
-  node_t * p, * q  ;
-  int i, member_number ;
-  char tmp[NAMELEN] ;
-  char indices[NAMELEN], post[NAMELEN] ;
-
-  for ( p = node ; p != NULL ; p = p->next )
-  {
-    if ( ( mask & p->node_kind ) &&
-        ((!strncmp(p->use,"dyn_",4) && !strcmp(corename,p->use+4)) || strncmp(p->use,"dyn_",4)))
-    {
-    if ( (p->subject_to_communication == 1) || ( p->type->type_type == DERIVED ) )
-    {
-      if ( p->type->type_type == SIMPLE )
-      {
-        for ( i = 1 ; i <= p->ntl ; i++ )
-        {
-/* IF (P_QI .ge. P_FIRST_SCALAR */
-          if ( p->members != NULL )   /* a 4d array */
-          {
-            member_number = 0 ;
-            for ( q = p->members ; q != NULL ; q = q->next )
-            {
-              sprintf(tmp, "(grid%%sm31,grid%%sm32,grid%%sm33,1+%d)", member_number ) ;
-              if ( p->ntl > 1 ) fprintf(fp," IF(1+%d.LE.num_%s)CALL rsl_register_f90 ( %s%s_%d %s )\n",
-                                             member_number,p->name,structname,p->name,i,tmp) ;
-              else              fprintf(fp," CALL rsl_register_f90 ( %s%s %s )\n"   ,structname,p->name,tmp) ;
-              member_number++ ;
-            }
-          }
-          else
-          {
-            strcpy (indices,"");
-            if ( sw_deref_kludge && parent_type == DERIVED ) 
-            {
-              sprintf(post,")") ;
-              sprintf(indices, "%s",index_with_firstelem("(","",tmp,p,post)) ;
-            }
-            if ( p->ntl > 1 ) fprintf(fp," CALL rsl_register_f90 ( %s%s_%d%s )\n",structname,p->name,i,indices) ;
-            else              fprintf(fp," CALL rsl_register_f90 ( %s%s%s )\n"   ,structname,p->name,indices) ;
-          }
-        }
-      }
-      else if ( p->type->type_type == DERIVED )
-      {
-        parent_type = DERIVED;
-        sprintf( tmp , "%s%%", p->name ) ; 
-        gen_datacalls1 ( fp , corename , tmp , mask, p->type->fields ) ;
-      }
-    }
-  }
-  }
-  return(0) ;
-}
 /*****************/
 /*****************/
 
@@ -611,6 +1033,7 @@ gen_nest_pack ( char * dirname )
   int down_path[] = { INTERP_DOWN , FORCE_DOWN , INTERP_UP } ;
   int ipath ;
   char ** fnp ; char * fn ;
+  char * shw_str ;
   char fname[NAMELEN] ;
   node_t *node, *p, *dim ;
   int xdex, ydex, zdex ;
@@ -618,7 +1041,8 @@ gen_nest_pack ( char * dirname )
   char mdim[3][2][NAMELEN] ;
   char pdim[3][2][NAMELEN] ;
   char vname[NAMELEN] ; char tag[NAMELEN] ; char core[NAMELEN] ;
-  int d2, d3 ;
+  int d2, d3, sw ;
+  char *info_name ;
 
   for ( fnp = fnlst , ipath = 0 ; *fnp ; fnp++ , ipath++ )
   {
@@ -650,53 +1074,43 @@ gen_nest_pack ( char * dirname )
       if ( d2 + d3 > 0 ) {
         if ( down_path[ipath] == INTERP_UP )
         {
-
-          fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
-          fprintf(fp,"CALL rsl_lite_to_parent_info( msize*RWORDSIZE                              &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ;
-          fprintf(fp,"                        ,nig,njg,cm,cn,pig,pjg,retval )\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
- 
-          gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_parent_info( grid%%domdesc, intermediate_grid%%domdesc ,  &\n") ;
-          fprintf(fp,"                         msize*RWORDSIZE,                             &\n") ;
-          fprintf(fp,"                         i,j,nig,njg,cm,cn,pig,pjg,retval )\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_to_parent_info" ;
+          sw = 0 ;
         }
         else
         {
-
-          fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_child_info( msize*RWORDSIZE                               &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
-          fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
-          fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
-          fprintf(fp,"                        ,pig,pjg,retval )\n") ;
-
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-  
-          gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
-
-          fprintf(fp,"CALL rsl_lite_to_child_info( msize*RWORDSIZE                               &\n") ;
-          fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
-          fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
-          fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
-          fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
-          fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
-          fprintf(fp,"                        ,pig,pjg,retval )\n") ;
-
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_to_child_info" ;
+          sw = 1 ;
         }
-      }
 
+        fprintf(fp,"msize = %d * nlev + %d\n", d3, d2 ) ;
+
+        fprintf(fp,"CALL %s( local_communicator, msize*RWORDSIZE                               &\n",info_name ) ;
+        fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
+if (sw) fprintf(fp,"                        ,iids,iide,ijds,ijde                               &\n") ;
+        fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
+if (sw) fprintf(fp,"                        ,pgr , sw                                          &\n") ;
+        fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
+        fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
+        fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
+        fprintf(fp,"                        ,pig,pjg,retval )\n") ;
+
+        fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
+  
+        gen_nest_packunpack ( fp , Domain.fields, corename, PACKIT, down_path[ipath] ) ;
+
+        fprintf(fp,"CALL %s( local_communicator, msize*RWORDSIZE                               &\n",info_name ) ;
+        fprintf(fp,"                        ,cips,cipe,cjps,cjpe                               &\n") ;
+if (sw) fprintf(fp,"                        ,iids,iide,ijds,ijde                               &\n") ;
+        fprintf(fp,"                        ,nids,nide,njds,njde                               &\n") ;
+if (sw) fprintf(fp,"                        ,pgr , sw                                          &\n") ;
+        fprintf(fp,"                        ,ntasks_x,ntasks_y                                 &\n") ; 
+        fprintf(fp,"                        ,icoord,jcoord                                     &\n") ;
+        fprintf(fp,"                        ,idim_cd,jdim_cd                                   &\n") ;
+        fprintf(fp,"                        ,pig,pjg,retval )\n") ;
+
+        fprintf(fp,"ENDDO\n") ;
+      }
       close_the_file(fp) ;
     }
   }
@@ -719,6 +1133,7 @@ gen_nest_unpack ( char * dirname )
   char ddim[3][2][NAMELEN] ;
   char mdim[3][2][NAMELEN] ;
   char pdim[3][2][NAMELEN] ;
+  char *info_name ;
   char vname[NAMELEN] ; char tag[NAMELEN] ; char core[NAMELEN] ;
   int d2, d3 ;
 
@@ -745,37 +1160,19 @@ gen_nest_unpack ( char * dirname )
       if ( d2 + d3 > 0 ) {
         if ( down_path[ipath] == INTERP_UP )
         {
-
-          fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-
-#if 0
-          fprintf(fp," if ( pig .ge. ips_save+1 .and. pjg .ge. jps_save+1 .and. &\n") ;
-          fprintf(fp,"      pig .le. ipe_save-1 .and. pjg .le. jpe_save-1    ) then\n") ;
-#endif
-
-          gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
-
-#if 0
-          fprintf(fp,"endif\n") ;
-#endif
-
-          fprintf(fp,"CALL rsl_from_child_info(i,j,pig,pjg,cm,cn,nig,njg,retval)\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_from_child_info" ;
         }
         else
         {
-
-          fprintf(fp,"CALL rsl_lite_from_parent_info(pig,pjg,retval)\n") ;
-          fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
-          gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
-          fprintf(fp,"CALL rsl_lite_from_parent_info(pig,pjg,retval)\n") ;
-          fprintf(fp,"ENDDO\n") ;
-
+          info_name = "rsl_lite_from_parent_info" ;
         }
-      }
 
+        fprintf(fp,"CALL %s(pig,pjg,retval)\n", info_name ) ;
+        fprintf(fp,"DO while ( retval .eq. 1 )\n") ;
+        gen_nest_packunpack ( fp , Domain.fields, corename, UNPACKIT, down_path[ipath] ) ;
+        fprintf(fp,"CALL %s(pig,pjg,retval)\n", info_name ) ;
+        fprintf(fp,"ENDDO\n") ;
+      }
       close_the_file(fp) ;
     }
   }
@@ -788,6 +1185,7 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
   int i ;
   node_t *p, *p1, *dim ;
   int d2, d3, xdex, ydex, zdex ;
+  int io_mask ;
   char ddim[3][2][NAMELEN] ;
   char mdim[3][2][NAMELEN] ;
   char pdim[3][2][NAMELEN] ;
@@ -799,29 +1197,40 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
 
     if ( p1->node_kind & FOURD )
     {
-      gen_nest_packunpack ( fp, p1->members, corename, dir , down_path ) ;  /* RECURSE over members */
-      continue ;
+      if ( p1->members->next )
+        io_mask = p1->members->next->io_mask ;
+      else
+        continue ;
     }
     else
     {
-      p = p1 ;
+      io_mask = p1->io_mask ;
     }
+    p = p1 ;
 
-    if ( p->io_mask & down_path )
+    if ( io_mask & down_path )
     {
       if ((!strncmp( p->use, "dyn_", 4) && !strcmp(p->use+4,corename)) || strncmp( p->use, "dyn_", 4))
       {
-
-        if (!strncmp( p->use, "dyn_", 4))   sprintf(core,"%s",corename) ;
-        else                                sprintf(core,"") ;
-
-        if ( p->ntl > 1 ) sprintf(tag,"_2") ;
-        else              sprintf(tag,"") ;
-
-        set_dim_strs ( p , ddim , mdim , pdim , "c", 0 ) ;
-        zdex = get_index_for_coord( p , COORD_Z ) ;
-        xdex = get_index_for_coord( p , COORD_X ) ;
-        ydex = get_index_for_coord( p , COORD_Y ) ;
+        if ( p->node_kind & FOURD ) {
+          if (!strncmp( p->members->next->use, "dyn_", 4))   sprintf(core,"%s",corename) ;
+          else                                               sprintf(core,"") ;
+          if ( p->members->next->ntl > 1 ) sprintf(tag,"_2") ;
+          else                             sprintf(tag,"") ;
+          set_dim_strs ( p->members , ddim , mdim , pdim , "c", 0 ) ;
+          zdex = get_index_for_coord( p->members , COORD_Z ) ;
+          xdex = get_index_for_coord( p->members , COORD_X ) ;
+          ydex = get_index_for_coord( p->members , COORD_Y ) ;
+        } else {
+          if (!strncmp( p->use, "dyn_", 4))   sprintf(core,"%s",corename) ;
+          else                                sprintf(core,"") ;
+          if ( p->ntl > 1 ) sprintf(tag,"_2") ;
+          else              sprintf(tag,"") ;
+          set_dim_strs ( p , ddim , mdim , pdim , "c", 0 ) ;
+          zdex = get_index_for_coord( p , COORD_Z ) ;
+          xdex = get_index_for_coord( p , COORD_X ) ;
+          ydex = get_index_for_coord( p , COORD_Y ) ;
+        }
 
         if ( down_path == INTERP_UP )
         {
@@ -831,7 +1240,6 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           c = ( dir == UNPACKIT )?'n':'p' ;
           d = ( dir == UNPACKIT )?'2':'1' ;
         }
-#if 1
 
         if ( zdex >= 0 ) {
           if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"pig,k,pjg") ;
@@ -842,61 +1250,14 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
           if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"pjg,pig") ;
         }
 
-#else
-        if      ( dir == PACKIT   && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && ( down_path == INTERP_DOWN || down_path == FORCE_DOWN ))
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == PACKIT   && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,k,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1,shw,k",c,c) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+i_parent_start-1-shw,%cjg+j_parent_start-1-shw",c,c) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+j_parent_start-1-shw,%cig+i_parent_start-1-shw",c,c) ;
-          }
-        }
-        else  if ( dir == UNPACKIT && down_path == INTERP_UP )
-        {
-          if ( zdex >= 0 ) {
-            if      ( xdex == 0 && zdex == 1 && ydex == 2 )  sprintf(dexes,"%cig+%c*shw,k,%cjg+%c*shw",c,d,c,d) ;
-            else if ( zdex == 0 && xdex == 1 && ydex == 2 )  sprintf(dexes,"k,%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            else if ( xdex == 0 && ydex == 1 && zdex == 2 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw,k",c,d,c,d) ;
-          } else {
-            if ( xdex == 0 && ydex == 1 )  sprintf(dexes,"%cig+%c*shw,%cjg+%c*shw",c,d,c,d) ;
-            if ( ydex == 0 && xdex == 1 )  sprintf(dexes,"%cjg+%c*shw,%cig+%c*shw",c,d,c,d) ;
-          }
-        }
-#endif
-
         /* construct variable name */
-        if ( p->scalar_array_member )
+        if ( p->node_kind & FOURD )
         {
-          sprintf(vname,"%s%s(%s,P_%s)",p->use,tag,dexes,p->name) ;
+          sprintf(vname,"%s%s(%s,itrace)",p->name,tag,dexes) ;
           if ( strlen(core) > 0 )
-            sprintf(vname2,"%s_%s%s(%s,P_%s)",core,p->use,tag,dexes,p->name) ;
+            sprintf(vname2,"%s_%s%s(%s,itrace)",core,p->use,tag,dexes) ;
           else
-            sprintf(vname2,"%s%s(%s,P_%s)",p->use,tag,dexes,p->name) ;
+            sprintf(vname2,"%s%s(%s,itrace)",p->name,tag,dexes) ;
         }
         else
         {
@@ -907,9 +1268,9 @@ gen_nest_packunpack ( FILE *fp , node_t * node , char * corename, int dir, int d
             sprintf(vname2,"%s%s(%s)",p->name,tag,dexes) ;
         }
 
-        if ( p->scalar_array_member )
+        if ( p->node_kind & FOURD )
 	{
-fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
+fprintf(fp,"DO itrace =  PARAM_FIRST_SCALAR, num_%s\n", p->name) ;
 	}
 
         if ( dir == UNPACKIT ) 
@@ -917,18 +1278,14 @@ fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
           if ( down_path == INTERP_UP )
 	  {
             if ( zdex >= 0 ) {
-fprintf(fp,"CALL rsl_from_child_msg(((%s)-(%s)+1)*RWORDSIZE,xv) ;\n",ddim[zdex][1], ddim[zdex][0] ) ;
+fprintf(fp,"CALL rsl_lite_from_child_msg(((%s)-(%s)+1)*RWORDSIZE,xv) ;\n",ddim[zdex][1], ddim[zdex][0] ) ;
             } else {
-#if 0
-fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n%s = xv(1)\n", vname) ;
-#else
-fprintf(fp,"CALL rsl_from_child_msg(RWORDSIZE,xv)\n" ) ;
-#endif
+fprintf(fp,"CALL rsl_lite_from_child_msg(RWORDSIZE,xv)\n" ) ;
             }
 fprintf(fp,"IF ( %s_cd_feedback_mask( pig, ips_save, ipe_save , pjg, jps_save, jpe_save, %s, %s ) ) THEN\n",
                  corename, p->stag_x?".TRUE.":".FALSE." ,p->stag_y?".TRUE.":".FALSE." ) ;
             if ( zdex >= 0 ) {
-fprintf(fp,"DO k = %s,%s\n%s = xv(k)\nENDDO\n", ddim[zdex][0], ddim[zdex][1], vname) ;
+fprintf(fp,"DO k = %s,%s\nNEST_INFLUENCE(%s,xv(k))\nENDDO\n", ddim[zdex][0], ddim[zdex][1], vname, vname) ;
             } else {
 fprintf(fp,"%s = xv(1) ;\n", vname) ;
             }
@@ -965,9 +1322,9 @@ fprintf(fp,"xv(1)=%s\nCALL rsl_lite_to_child_msg(RWORDSIZE,xv)\n", vname) ;
             }
           }
         }
-        if ( p->scalar_array_member )
+        if ( p->node_kind & FOURD )
 	{
-fprintf(fp,"ENDIF\n") ;
+fprintf(fp,"ENDDO\n") ;
 	}
       }
     }
@@ -1021,9 +1378,13 @@ gen_comms ( char * dirname )
   if ( sw_dm_parallel )
     fprintf(stderr,"ADVISORY: RSL_LITE version of gen_comms is linked in with registry program.\n") ;
 
-  gen_halos( "inc" ) ;
+  gen_halos( "inc" , NULL, Halos ) ;
   gen_shift( "inc" ) ;
-  gen_periods( "inc" ) ;
+  gen_periods( "inc", Periods ) ;
+#if 0
+  gen_swaps( "inc", Swaps ) ;
+  gen_cycles( "inc", Cycles ) ;
+#endif
   gen_xposes( "inc" ) ;
   gen_comm_descrips( "inc" ) ;
   gen_datacalls( "inc" ) ;

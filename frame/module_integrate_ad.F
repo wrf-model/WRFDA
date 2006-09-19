@@ -280,9 +280,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
       CALL print_a_timeinterval(grid%domain_clock%TimeStep)
       DO WHILE ( grid%current_time .GT. grid%start_subtime )
-         IF ( wrf_dm_on_monitor() ) THEN
+!         IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
-         END IF
+!         END IF
 
 !--------start check nonlinear and adjoint input
 
@@ -376,11 +376,11 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
             grid_ptr => grid_ptr%sibling
          END DO
          !  Report on the timing for a single time step.
-         IF ( wrf_dm_on_monitor() ) THEN
+!         IF ( wrf_dm_on_monitor() ) THEN
            CALL wrf_timetoa ( grid%current_time, message2 )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
-         END IF
+!         END IF
          dfi_counter = dfi_counter + 1
          CALL jcdfi_add_forcing ( grid , dfi_counter )
       END DO

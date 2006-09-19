@@ -24,7 +24,7 @@ PROGRAM wrf
    INTEGER :: rc
 
    LOGICAL, EXTERNAL :: await_next
-   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
+!   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
    INTEGER comm
 
 write(0,*)'********* ********* *********'

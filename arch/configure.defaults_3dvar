@@ -486,7 +486,7 @@ CC              =       cc
 CC_TOOLS        =       cc
 CFLAGS          =       -DNOUNDERSCORE
 TRADFLAG        =
-FCOPTIM         =       -O0 -qarch=auto
+FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
@@ -535,7 +535,7 @@ CFLAGS          =       -DNOUNDERSCORE -DWRF_RSL_IO \
                         -DMAXDOM_MAKE=$(MAX_DOMAINS) \
 			-DMAXPROC_MAKE=$(MAX_PROC)
 TRADFLAG        =
-FCOPTIM         =       -qarch=auto
+FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90

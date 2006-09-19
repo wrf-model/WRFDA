@@ -92,7 +92,7 @@ static int  Rbufsize ;
 static int  Rbufcurs ;
 static int  Rpointcurs ;
 static char *Recvbuf ;
-static int  Rdisplacements[RSL_MAXPROC] ;
+static int  Rdisplacements[RSL_MAXPROC+1] ;
 static int  Rsizes[RSL_MAXPROC] ;
 static int  Rreclen ;
 
@@ -128,31 +128,143 @@ static rsl_list_t *Pptr ;
 static int s_putmsg = 0 ;
 #endif
 
-#if (defined(vpp) || defined(vpp2))
-static char *blankstage = NULL ;
-static int blankstagesize = 0 ;
-static int blankstagecurs = 0 ;
-#endif
-
-/*@
-  RSL_TO_CHILD_INFO -- Get the next cell in a packing sequence for forcing.
-
-@*/
-
-static int cd_i ;
-static int cd_j ;
-
-RSL_LITE_TO_CHILD_INFO ( msize_p,
-                         cips_p, cipe_p, cjps_p, cjpe_p, /* patch dims of CD */
-                         nids_p, nide_p, njds_p, njde_p, /* domain dims of ND */
+/* parent->nest */
+RSL_LITE_TO_CHILD_INFO ( Fcomm, msize_p,
+                         cips_p, cipe_p, cjps_p, cjpe_p, /* patch dims of SOURCE DOMAIN */
+                         iids_p, iide_p, ijds_p, ijde_p, /* domain dims of INTERMEDIATE DOMAIN */
+                         nids_p, nide_p, njds_p, njde_p, /* domain dims of CHILD DOMAIN */
+                         pgr_p,  shw_p ,                 /* nest ratio and stencil half width */
                          ntasks_x_p , ntasks_y_p ,       /* proc counts in x and y */
                          icoord_p, jcoord_p,
                          idim_cd_p, jdim_cd_p,
                          ig_p, jg_p,
                          retval_p )
+  
   int_p
-     cips_p, cipe_p, cjps_p, cjpe_p   /* (i) c.d. patch dims */
+     Fcomm                            /* Fortran version of MPI communicator */
+    ,cips_p, cipe_p, cjps_p, cjpe_p   /* (i) c.d. patch dims */
+    ,iids_p, iide_p, ijds_p, ijde_p   /* (i) n.n. global dims */
     ,nids_p, nide_p, njds_p, njde_p   /* (i) n.n. global dims */
+    ,pgr_p                            /* nesting ratio */
+    ,ntasks_x_p , ntasks_y_p          /* proc counts in x and y */
+    ,icoord_p       /* i coordinate of nest in cd */
+    ,jcoord_p       /* j coordinate of nest in cd */
+    ,shw_p          /* stencil half width */
+    ,idim_cd_p      /* i width of nest in cd */
+    ,jdim_cd_p      /* j width of nest in cd */
+    ,msize_p        /* (I) Message size in bytes. */
+    ,ig_p           /* (O) Global N index of parent domain point. */
+    ,jg_p           /* (O) Global N index of parent domain point. */
+    ,retval_p ;     /* (O) =1 if a valid point returned; =0 (zero) otherwise. */
+{
+  int P, Px, Py ;
+
+  rsl_list_t *q ;
+  int *r ;
+  int i, j, ni, nj ;
+  int coords[2] ;
+  MPI_Comm *comm, dummy_comm ;
+
+  comm = &dummy_comm ;
+  *comm = MPI_Comm_f2c( *Fcomm ) ;
+
+  if ( Plist == NULL ) {
+    s_ntasks_x = *ntasks_x_p ;
+    s_ntasks_y = *ntasks_y_p ;
+    /* construct Plist */
+    Sendbufsize = 0 ;
+    Plist = RSL_MALLOC( rsl_list_t * , s_ntasks_x * s_ntasks_y ) ;  /* big enough for nest points */
+    for ( j = 0 ; j < s_ntasks_x * s_ntasks_y ; j++ ) {
+       Plist[j] = NULL ;
+       Sdisplacements[j] = 0 ;
+       Ssizes[j] = 0 ;
+    }
+    for ( j = *cjps_p ; j <= *cjpe_p ; j++ )
+    {
+      for ( i = *cips_p ; i <= *cipe_p ; i++ )
+      {
+	if ( ( *jcoord_p <= j && j <= *jcoord_p+*jdim_cd_p-1 ) && ( *icoord_p <= i && i <= *icoord_p+*idim_cd_p-1 ) ) {
+           ni = ( i - (*icoord_p + *shw_p) ) * *pgr_p + 1 + 1 ; /* add 1 to give center point */
+           nj = ( j - (*jcoord_p + *shw_p) ) * *pgr_p + 1 + 1 ;
+
+	   TASK_FOR_POINT ( &ni, &nj, nids_p, nide_p, njds_p, njde_p, &s_ntasks_x, &s_ntasks_y, &Px, &Py ) ;
+           coords[1] = Px ; coords[0] = Py ;
+           MPI_Cart_rank( *comm, coords, &P ) ;
+
+	   q = RSL_MALLOC( rsl_list_t , 1 ) ;
+	   q->info1 = i ;
+	   q->info2 = j ;
+	   q->next = Plist[P] ;
+	   Plist[P] = q ;
+	   Sendbufsize += *msize_p + 3 * sizeof( int ) ;  /* point data plus 3 ints for i, j, and size */
+        }
+      }
+    }
+    Sendbuf = RSL_MALLOC( char , Sendbufsize ) ;
+    Sendbufcurs = 0 ;
+    Recsizeindex = -1 ;
+    Pcurs = -1 ;
+    Pptr = NULL ;
+  }
+
+  if ( Pptr != NULL ) {
+    Pptr = Pptr->next ;
+  } 
+
+  if ( Recsizeindex >= 0 ) {
+          r = (int *) &(Sendbuf[Recsizeindex]) ;
+          *r = Sendbufcurs - Recsizeindex + 2 * sizeof(int) ;
+          Ssizes[Pcurs] += *r ;
+  }
+
+  while ( Pptr == NULL ) {
+      Pcurs++ ;
+      while ( Pcurs < s_ntasks_x * s_ntasks_y && Plist[Pcurs] == NULL  ) Pcurs++ ;
+      if ( Pcurs < s_ntasks_x * s_ntasks_y ) {
+        Sdisplacements[Pcurs] = Sendbufcurs ;
+        Ssizes[Pcurs] = 0 ;
+        Pptr = Plist[Pcurs] ;
+      } else {
+        *retval_p = 0 ;
+#if 0
+fprintf(stderr,"TO _INFO: %d %d %d \n",*ig_p,*jg_p, *retval_p) ;
+#endif
+        return ;  /* done */
+      }
+  }
+
+  *ig_p = Pptr->info1 ;
+  *jg_p = Pptr->info2 ;
+
+  r = (int *) &(Sendbuf[Sendbufcurs]) ;
+  *r++ = Pptr->info1 ; Sendbufcurs += sizeof(int) ;  /* ig to buffer */
+  *r++ = Pptr->info2 ; Sendbufcurs += sizeof(int) ;  /* jg to buffer */
+  Recsizeindex = Sendbufcurs ;
+  *r++ =           0 ; Sendbufcurs += sizeof(int) ;  /* store start for size */
+  *retval_p = 1 ;
+
+#if 0
+fprintf(stderr,"TO  INFO: %d %d %d \n",*ig_p,*jg_p, *retval_p) ;
+#endif
+
+  return ;
+}
+
+/********************************************/
+
+/* nest->parent */
+RSL_LITE_TO_PARENT_INFO ( Fcomm, msize_p,
+                          nips_p, nipe_p, njps_p, njpe_p, /* patch dims of SOURCE DOMAIN (CHILD) */
+                          cids_p, cide_p, cjds_p, cjde_p, /* domain dims of TARGET DOMAIN (PARENT) */
+                          ntasks_x_p , ntasks_y_p ,       /* proc counts in x and y */
+                          icoord_p, jcoord_p,
+                          idim_cd_p, jdim_cd_p,
+                          ig_p, jg_p,
+                          retval_p )
+  int_p
+     Fcomm                            /* Fortran version of MPI communicator */
+    ,nips_p, nipe_p, njps_p, njpe_p   /* (i) n.d. patch dims */
+    ,cids_p, cide_p, cjds_p, cjde_p   /* (i) n.n. global dims */
     ,ntasks_x_p , ntasks_y_p          /* proc counts in x and y */
     ,icoord_p       /* i coordinate of nest in cd */
     ,jcoord_p       /* j coordinate of nest in cd */
@@ -167,29 +279,37 @@ RSL_LITE_TO_CHILD_INFO ( msize_p,
   rsl_list_t *q ;
   int *r ;
   int i, j ;
+  int coords[2] ;
+  MPI_Comm *comm, dummy_comm ;
+
+  comm = &dummy_comm ;
+  *comm = MPI_Comm_f2c( *Fcomm ) ;
 
   if ( Plist == NULL ) {
     s_ntasks_x = *ntasks_x_p ;
     s_ntasks_y = *ntasks_y_p ;
     /* construct Plist */
     Sendbufsize = 0 ;
-    Plist = RSL_MALLOC( rsl_list_t * , s_ntasks_x * s_ntasks_y ) ;  /* big enough for nest points */
-    for ( j = 0 ; j < s_ntasks_x * s_ntasks_y ; j++ ) Plist[j] = NULL ;
-    for ( j = *cjps_p ; j <= *cjpe_p ; j++ )
+    Plist = RSL_MALLOC( rsl_list_t * , s_ntasks_x * s_ntasks_y ) ;
+    for ( j = 0 ; j < s_ntasks_x * s_ntasks_y ; j++ ) {
+       Plist[j] = NULL ;
+       Sdisplacements[j] = 0 ;
+       Ssizes[j] = 0 ;
+    }
+    for ( j = *njps_p ; j <= *njpe_p ; j++ )
     {
-      for ( i = *cips_p ; i <= *cipe_p ; i++ )
+      for ( i = *nips_p ; i <= *nipe_p ; i++ )
       {
 	if ( ( *jcoord_p <= j && j <= *jcoord_p+*jdim_cd_p-1 ) && ( *icoord_p <= i && i <= *icoord_p+*idim_cd_p-1 ) ) {
-	   TASK_FOR_POINT ( &i, &j, nids_p, nide_p, njds_p, njde_p, &s_ntasks_x, &s_ntasks_y, &Px, &Py, &P ) ;
-#if 0
-fprintf(stderr,"%d %d is on P %d (nids_p, nide_p, njds_p, njde_p %d %d %d %d)\n",i,j,P,*nids_p,*nide_p,*njds_p,*njde_p) ;
-#endif
-	   q = RSL_MALLOC( rsl_list_t , 1 ) ;
-	   q->info1 = i ;
-	   q->info2 = j ;
-	   q->next = Plist[P] ;
-	   Plist[P] = q ;
-	   Sendbufsize += *msize_p + 3 * sizeof( int ) ;  /* point data plus 3 ints for i, j, and size */
+	  TASK_FOR_POINT ( &i, &j, cids_p, cide_p, cjds_p, cjde_p, &s_ntasks_x, &s_ntasks_y, &Px, &Py ) ;
+          coords[1] = Px ; coords[0] = Py ;
+          MPI_Cart_rank( *comm, coords, &P ) ;
+	  q = RSL_MALLOC( rsl_list_t , 1 ) ;
+	  q->info1 = i ;
+	  q->info2 = j ;
+	  q->next = Plist[P] ;
+	  Plist[P] = q ;
+	  Sendbufsize += *msize_p + 3 * sizeof( int ) ;  /* point data plus 3 ints for i, j, and size */
         }
       }
     }
@@ -207,74 +327,72 @@ fprintf(stderr,"%d %d is on P %d (nids_p, nide_p, njds_p, njde_p %d %d %d %d)\n"
           r = (int *) &(Sendbuf[Recsizeindex]) ;
           *r = Sendbufcurs - Recsizeindex + 2 * sizeof(int) ;
           Ssizes[Pcurs] += *r ;
-#if 0
-fprintf(stderr,"B Sendbufcurs %d Recsizeindex %d Pcurs %d\n",Sendbufcurs,Recsizeindex,Pcurs);
-fprintf(stderr,"B Ssizes[%d] %d\n",Pcurs,Ssizes[Pcurs]  ) ;
-fprintf(stderr,"B storing size for %d %d (%d %d) %d\n",*ig_p,*jg_p,*(r-2),*(r-1),*r ) ;
-#endif
   }
 
   while ( Pptr == NULL ) {
       Pcurs++ ;
-      while ( Plist[Pcurs] == NULL && Pcurs < s_ntasks_x * s_ntasks_y ) Pcurs++ ;
+      while ( Pcurs < s_ntasks_x * s_ntasks_y && Plist[Pcurs] == NULL ) Pcurs++ ;
       if ( Pcurs < s_ntasks_x * s_ntasks_y ) {
         Sdisplacements[Pcurs] = Sendbufcurs ;
         Ssizes[Pcurs] = 0 ;
         Pptr = Plist[Pcurs] ;
       } else {
         *retval_p = 0 ;
-#if 0
-fprintf(stderr,"to child info returns 0 \n" );
-#endif
         return ;  /* done */
       }
   }
 
-#if 0
-  if ( Recsizeindex >= 0 ) {
-    r = (int *) &(Sendbuf[Recsizeindex]) ;
-    *r = Sendbufcurs - Recsizeindex + 2 * sizeof(int) ;
-    Ssizes[Pcurs] += *r ;
-fprintf(stderr,"A Sendbufcurs %d Recsizeindex %d Pcurs %d\n",Sendbufcurs,Recsizeindex,Pcurs);
-fprintf(stderr,"A Ssizes[Pcurs] %d\n",Ssizes[Pcurs]  ) ;
-fprintf(stderr,"A storing size for %d %d (%d %d) %d\n",*ig_p,*jg_p,*(r-2),*(r-1),*r ) ;
-  }
-#endif
-
   *ig_p = Pptr->info1 ;
   *jg_p = Pptr->info2 ;
 
-#if 0
-fprintf(stderr,"to child info %d %d %d\n",*ig_p,*jg_p,Sendbufcurs) ;
-#endif
   r = (int *) &(Sendbuf[Sendbufcurs]) ;
   *r++ = Pptr->info1 ; Sendbufcurs += sizeof(int) ;  /* ig to buffer */
   *r++ = Pptr->info2 ; Sendbufcurs += sizeof(int) ;  /* jg to buffer */
   Recsizeindex = Sendbufcurs ;
   *r++ =           0 ; Sendbufcurs += sizeof(int) ;  /* store start for size */
   *retval_p = 1 ;
-#if 0
-fprintf(stderr,"to child info returns 1 \n" );
-#endif
 
   return ;
 }
+
+
+/********************************************/
 
 /*@
   RSL_TO_CHILD_MSG -- Pack force data into a message for a nest point.
 
 @*/
 
+/* parent->nest */
 RSL_LITE_TO_CHILD_MSG ( nbuf_p, buf )
   int_p
     nbuf_p ;     /* (I) Number of bytes to be packed. */
   char *
     buf ;        /* (I) Buffer containing the data to be packed. */
 {
-  int kiddex ;
+   rsl_lite_to_peerpoint_msg ( nbuf_p, buf ) ;
+}
+
+/* nest->parent */
+RSL_LITE_TO_PARENT_MSG ( nbuf_p, buf )
+  int_p
+    nbuf_p ;     /* (I) Number of bytes to be packed. */
+  char *
+    buf ;        /* (I) Buffer containing the data to be packed. */
+{
+   rsl_lite_to_peerpoint_msg ( nbuf_p, buf ) ;
+}
+
+/* common code */
+rsl_lite_to_peerpoint_msg ( nbuf_p, buf )
+  int_p
+    nbuf_p ;     /* (I) Number of bytes to be packed. */
+  char *
+    buf ;        /* (I) Buffer containing the data to be packed. */
+{
   int nbuf ;
-  int P, Px, Py ;
   int *p, *q ;
+  char *c, *d ;
   int i ;
 
   RSL_TEST_ERR(buf==NULL,"2nd argument is NULL.  Field allocated?") ;
@@ -287,21 +405,42 @@ RSL_LITE_TO_CHILD_MSG ( nbuf_p, buf )
     RSL_TEST_ERR(1,mess) ;
   }
 
-  for ( p = (int *)buf, q = (int *) &(Sendbuf[Sendbufcurs]), i = 0 ; i < nbuf ; i += sizeof(int) )
-  {
-    *q++ = *p++ ;
+  if ( nbuf % sizeof(int) == 0 ) {
+    for ( p = (int *)buf, q = (int *) &(Sendbuf[Sendbufcurs]), i = 0 ; i < nbuf ; i += sizeof(int) )
+    {
+      *q++ = *p++ ;
+    }
   }
+  else
+  {
+    for ( c = buf, d = &(Sendbuf[Sendbufcurs]), i = 0 ; i < nbuf ; i++ )
+    {
+      *d++ = *c++ ;
+    }
+  }
+
   Sendbufcurs += nbuf ;
 
 }
 
-/*@
-  RSL_BCAST_MSGS -- Convey forcing data from parent to nest points.
+/********************************************/
 
-@*/
-
-
+/* parent->nest */
 RSL_LITE_BCAST_MSGS ( mytask_p, ntasks_p, comm0 )
+  int_p mytask_p, ntasks_p, comm0 ;
+{
+  rsl_lite_allgather_msgs ( mytask_p, ntasks_p, comm0 ) ;
+}
+
+/* nest->parent */
+RSL_LITE_MERGE_MSGS ( mytask_p, ntasks_p, comm0 )
+  int_p mytask_p, ntasks_p, comm0 ;
+{
+  rsl_lite_allgather_msgs ( mytask_p, ntasks_p, comm0 ) ;
+}
+
+/* common code */
+rsl_lite_allgather_msgs ( mytask_p, ntasks_p, comm0 )
   int_p mytask_p, ntasks_p, comm0 ;
 {
   int P ;
@@ -315,10 +454,7 @@ RSL_LITE_BCAST_MSGS ( mytask_p, ntasks_p, comm0 )
   int ig, jg ;
   int *Psize_all ;
   int *sp, *bp ;
-
-#if 0
-fprintf(stderr,"RSL_LITE_BCAST_MSGS %d %d %d\n",*mytask_p, *ntasks_p, *comm0 ) ;
-#endif
+  int rc ;
 
   ntasks = *ntasks_p ;
   mytask = *mytask_p ;
@@ -329,72 +465,35 @@ fprintf(stderr,"RSL_LITE_BCAST_MSGS %d %d %d\n",*mytask_p, *ntasks_p, *comm0 ) ;
   RSL_TEST_ERR( ntasks == RSL_MAXPROC ,
     "RSL_BCAST_MSGS: raise the compile time value of MAXPROC" ) ;
   
-#if 1
-fprintf(stderr,"a1\n") ;
-
-for ( j = 0 ; j < ntasks ; j++ )
-{
-  fprintf(stderr, "%10d ",Ssizes[j]) ;
-}
-#endif
-  fprintf(stderr, "\n xxxxxx\n" ) ;
   Psize_all = RSL_MALLOC( int, ntasks * ntasks ) ;
 
   MPI_Allgather( Ssizes, ntasks, MPI_INT , Psize_all, ntasks, MPI_INT, *comm0 ) ;
 
-#if 1
-for ( j = 0 ; j < ntasks ; j++ )
-{
-for ( i = 0 ; i < ntasks ; i++ )
-{
-  fprintf(stderr, "%10d ",Psize_all[ INDEX_2( j , i , ntasks ) ] ) ;
-}
-fprintf(stderr,"\n") ;
-}
-#endif
-
   for ( j = 0 ; j < ntasks ; j++ ) 
     Rsizes[j] = 0 ;
+
   for ( j = 0 ; j < ntasks ; j++ ) 
   {
     Rsizes[j] += Psize_all[ INDEX_2( j , mytask , ntasks ) ] ;
   }
 
-  for ( Rbufsize = 0, P = 0, Rdisplacements[0] ; P < ntasks ; P++ )
+  for ( Rbufsize = 0, P = 0, Rdisplacements[0] = 0 ; P < ntasks ; P++ )
   {
     Rdisplacements[P+1] = Rsizes[P] + Rdisplacements[P] ;
     Rbufsize += Rsizes[P] ;
-#if 0
-fprintf(stderr,"Rsizes[%d] %d  Rdisplacements[%d] %d Rdisplacements[%d] %d Rbufsize %d \n",
-       P, Rsizes[P], P, Rdisplacements[P], P+1, Rdisplacements[P+1], Rbufsize ) ;
-#endif
   }
-#if 0
-fprintf(stderr,"a5, allocing %d Recvbuf \n", Rbufsize + 3 * sizeof(int) ) ;
-#endif
 
   /* this will be freed later */
+
   Recvbuf = RSL_MALLOC( char , Rbufsize + 3 * sizeof(int) ) ; /* for sentinal record */
   Rbufcurs = 0 ;
   Rreclen = 0 ;
 
-#if 1
-for ( j = 0 ; j < ntasks ; j++ )
-{
-fprintf(stderr,"before all to all Ssizes[%d] %d  Sdisplacements[%d] %d ",
-       j, Ssizes[j], j, Sdisplacements[j] ) ;
-fprintf(stderr,"before all to all Rsizes[%d] %d  Rdisplacements[%d] %d \n",
-       j, Rsizes[j], j, Rdisplacements[j] ) ;
-}
-#endif
-  MPI_Alltoallv ( Sendbuf, Ssizes, Sdisplacements, MPI_BYTE , 
-                  Recvbuf, Rsizes, Rdisplacements, MPI_BYTE ,  *comm0 ) ;
+  rc = MPI_Alltoallv ( Sendbuf, Ssizes, Sdisplacements, MPI_BYTE , 
+                       Recvbuf, Rsizes, Rdisplacements, MPI_BYTE ,  *comm0 ) ;
 
 /* add sentinel to the end of Recvbuf */
 
-#if 1
-fprintf(stderr,"Adding sentinel to %d\n",Rbufsize + 2 * sizeof(int)) ;
-#endif
   r = (int *)&(Recvbuf[Rbufsize + 2 * sizeof(int)]) ;
   *r = RSL_INVALID ;
 
@@ -409,12 +508,30 @@ fprintf(stderr,"Adding sentinel to %d\n",Rbufsize + 2 * sizeof(int)) ;
 
 }
 
-/*@
-  RSL_FROM_PARENT_INFO -- Get the next cell in a unpacking sequence for forcing.
+/********************************************/
 
-@*/
-
+/* parent->nest */
 RSL_LITE_FROM_PARENT_INFO ( ig_p, jg_p, retval_p )
+  int_p
+    ig_p        /* (O) Global index in M dimension of nest. */
+   ,jg_p        /* (O) Global index in N dimension of nest. */
+   ,retval_p ;  /* (O) Return value; =1 valid point, =0 done. */
+{
+  rsl_lite_from_peerpoint_info ( ig_p, jg_p, retval_p ) ;
+}
+
+/* nest->parent */
+RSL_LITE_FROM_CHILD_INFO ( ig_p, jg_p, retval_p )
+  int_p
+    ig_p        /* (O) Global index in M dimension of nest. */
+   ,jg_p        /* (O) Global index in N dimension of nest. */
+   ,retval_p ;  /* (O) Return value; =1 valid point, =0 done. */
+{
+  rsl_lite_from_peerpoint_info ( ig_p, jg_p, retval_p ) ;
+}
+
+/* common code */
+rsl_lite_from_peerpoint_info ( ig_p, jg_p, retval_p )
   int_p
     ig_p        /* (O) Global index in M dimension of nest. */
    ,jg_p        /* (O) Global index in N dimension of nest. */
@@ -434,30 +551,61 @@ RSL_LITE_FROM_PARENT_INFO ( ig_p, jg_p, retval_p )
     RSL_FREE( Recvbuf ) ;
   }
      
-#if 1
-fprintf(stderr,"FROM PARENT INFO: %d %d %d %d %d\n",*ig_p,*jg_p,Rreclen, Rbufcurs + Rpointcurs, *retval_p) ;
+#if 0
+fprintf(stderr,"FROM  INFO: %d %d %d %d %d %d\n",*ig_p,*jg_p,Rreclen, Rpointcurs, Rbufcurs + Rpointcurs, *retval_p) ;
 #endif
   return ;
 }
 
-/*@
-  RSL_FROM_PARENT_MSG -- Unpack feedback data into a nest point.
+/********************************************/
 
-@*/
+/* parent->nest */
 RSL_LITE_FROM_PARENT_MSG ( len_p, buf )
   int_p
     len_p ;          /* (I) Number of bytes to unpack. */
   int *
     buf ;            /* (O) Destination buffer. */
 {
+  rsl_lite_from_peerpoint_msg ( len_p, buf ) ;
+}
+
+/* nest->parent */
+RSL_LITE_FROM_CHILD_MSG ( len_p, buf )
+  int_p
+    len_p ;          /* (I) Number of bytes to unpack. */
+  int *
+    buf ;            /* (O) Destination buffer. */
+{
+  rsl_lite_from_peerpoint_msg ( len_p, buf ) ;
+}
+
+/* common code */
+rsl_lite_from_peerpoint_msg ( len_p, buf )
+  int_p
+    len_p ;          /* (I) Number of bytes to unpack. */
+  int *
+    buf ;            /* (O) Destination buffer. */
+{
   int *p, *q ;
+  char *c, *d ;
   int i ;
-  for ( p = (int *)&(Recvbuf[Rbufcurs+Rpointcurs]), q = buf , i = 0 ; i < *len_p ; i += sizeof(int) ) 
-  {
-    *q++ = *p++ ;
+
+  if ( *len_p % sizeof(int) == 0 ) {
+    for ( p = (int *)&(Recvbuf[Rbufcurs+Rpointcurs]), q = buf , i = 0 ; i < *len_p ; i += sizeof(int) ) 
+    {
+      *q++ = *p++ ;
+    }
+  } else {
+    for ( c = &(Recvbuf[Rbufcurs+Rpointcurs]), d = (char *) buf , i = 0 ; i < *len_p ; i++ )
+    {
+      *d++ = *c++ ;
+    }
   }
+
   Rpointcurs += *len_p ;
 }
+
+/********************************************/
 
 destroy_list( list, dfcn )
   rsl_list_t ** list ;          /* pointer to pointer to list */
@@ -478,185 +626,4 @@ destroy_list( list, dfcn )
   return(0) ;
 }
 
-
-#if 0
-RSL_MOVE_NEST ( d_p, n_p,  mdisp_p, ndisp_p )
-  int_p d_p, n_p, mdisp_p, ndisp_p ;
-{
-  int parent, intermed, nest, mdisp, ndisp ;
-  rsl_domain_info_t *dinfo, *ninfo ;
-  int i, j, cm, cn, irax_m, irax_n, nid ;
-  int mother_id ;
-  rsl_child_info_t ** children_p ;
-
-  parent = *d_p    ; nest = *n_p      ;
-  mdisp = *mdisp_p ; ndisp = *ndisp_p ; 
-
-  RSL_TEST_ERR( parent < 0 || parent > RSL_MAXDOMAINS, "rsl_move_nest: bad parent domain descriptor" ) ;
-  RSL_TEST_ERR( nest < 0   || nest > RSL_MAXDOMAINS,   "rsl_move_nest: bad nested domain descriptor" ) ;
-  dinfo = &( domain_info[parent]) ;
-  ninfo = &( domain_info[nest]) ;
-  irax_m = ninfo->irax_m ;
-  irax_n = ninfo->irax_n ;
-
-  if ( dinfo->child_bcast_compiled[s_nst] != 1 ||
-       ninfo->parent_bcast_compiled != 1 )
-  {
-    rsl_comp_bcast( d_p, n_p ) ;
-  }
-  dinfo->child_bcast_compiled[nest] = 0 ;  /* invalidate broadcast */
-  ninfo->parent_bcast_compiled      = 0 ;  /* invalidate broadcast */
-
-
-  if ( dinfo->child_merge_compiled[s_nst] != 1 ||
-       ninfo->parent_merge_compiled != 1 )
-  {
-    rsl_comp_merge( d_p, n_p ) ;
-  }
-  dinfo->child_merge_compiled[nest] = 0 ;  /* invalidate merge */
-  ninfo->parent_merge_compiled      = 0 ;  /* invalidate merge */
-
-  children_p = RSL_MALLOC( rsl_child_info_t *, dinfo->len_n * dinfo->len_m ) ;
-
-  for ( j = 0 ; j < dinfo->len_n ; j++ )
-    for ( i = 0 ; i < dinfo->len_m ; i++ )
-         children_p[ INDEX_2( j, i, dinfo->len_m ) ] = NULL ;
-
-  for ( j = 0 ; j < dinfo->len_n ; j++ )
-    for ( i = 0 ; i < dinfo->len_m ; i++ )
-       if (    i - mdisp >= 0 && i - mdisp < dinfo->len_m 
-            && j - ndisp >= 0 && j - ndisp < dinfo->len_n ) {
-         children_p[ INDEX_2( j, i, dinfo->len_m ) ] = dinfo->domain[ INDEX_2( j - ndisp , i - mdisp, dinfo->len_m ) ].children_p ;
-       }
-
-  for ( j = 0 ; j < dinfo->len_n ; j++ )
-    for ( i = 0 ; i < dinfo->len_m ; i++ )
-       dinfo->domain[ INDEX_2( j , i , dinfo->len_m ) ].children_p = children_p[ INDEX_2( j, i, dinfo->len_m ) ] ;
-
-  RSL_FREE( children_p ) ;
-
-  for ( j = 0 ; j < dinfo->len_n ; j++ )
-    for ( i = 0 ; i < dinfo->len_m ; i++ )
-      for ( cn = 0 ; cn < irax_n ; cn++ )
-        for ( cm = 0 ; cm < irax_m ; cm++ )
-          if ( dinfo->domain[ INDEX_2( j, i, dinfo->len_m ) ].children_p != NULL )
-          {
-            dinfo->domain[ INDEX_2( j, i, dinfo->len_m ) ].children_p->child[INDEX_2(cn,cm,irax_m)] = RSL_INVALID ;
-          }
-
-  for ( j = 0 ; j < ninfo->len_n ; j++ )
-  {
-    for ( i = 0 ; i < ninfo->len_m ; i++ )
-    {
-      nid = POINTID( nest, j, i ) ;
-      mother_id = ninfo->domain[ INDEX_2( j, i, ninfo->len_m ) ].mother_id ;
-      mother_id = POINTID(parent, (ID_JDEX( mother_id )) + ndisp, (ID_IDEX( mother_id )) + mdisp ) ;
-      ninfo->domain[ INDEX_2( j, i, ninfo->len_m ) ].mother_id = mother_id ;
-      ninfo->domain[ INDEX_2( j, i, ninfo->len_m ) ].mother_P = 
-                       dinfo->domain[ INDEX_2( ID_JDEX( mother_id ), ID_IDEX( mother_id ), dinfo->len_m ) ].P ;
-      cm = ninfo->domain[ INDEX_2( j, i, ninfo->len_m ) ].which_kid_am_i_m ;
-      cn = ninfo->domain[ INDEX_2( j, i, ninfo->len_m ) ].which_kid_am_i_n ;
-      if ( dinfo->domain[ INDEX_2( ID_JDEX( mother_id ), ID_IDEX( mother_id ), dinfo->len_m ) ].children_p != NULL ) {
-        dinfo->domain[ INDEX_2( ID_JDEX( mother_id ), ID_IDEX( mother_id ), dinfo->len_m ) ].children_p->child[INDEX_2(cn,cm,irax_m)] = nid ;
-      }
-    }
-  }
-  ninfo->coord_m += mdisp ;
-  ninfo->coord_n += ndisp ;
-}
-
-
-#ifdef NOUNDERSCORE
-cwrap_fbcast ( pd, nd, msize, mf, pf, upf )
-#else
-# ifdef T3D
-CWRAP_FBCAST ( pd, nd, msize, mf, pf, upf )
-# else
-#   ifdef F2CSTYLE
-cwrap_fbcast__( pd, nd, msize, mf, pf, upf )
-#   else
-cwrap_fbcast_( pd, nd, msize, mf, pf, upf )
-#   endif
-# endif
-#endif
-  int *pd, *nd, *msize ;
-  void (*mf)(), (*pf)(), (*upf)() ;
-{
-  char * buf ;
-  buf = RSL_MALLOC( char, *msize ) ;
-#ifdef NOUNDERSCORE
-  rsl_f_bcast_chld ( pd, nd, msize, buf, mf, pf, upf ) ;
-#else
-# ifdef T3D
-  RSL_F_BCAST_CHLD ( pd, nd, msize, buf, mf, pf, upf ) ;
-# else
-#   ifdef F2CSTYLE
-  rsl_f_bcast_chld__( pd, nd, msize, buf, mf, pf, upf ) ;
-#   else
-  rsl_f_bcast_chld_( pd, nd, msize, buf, mf, pf, upf ) ;
-#   endif
-# endif
-#endif
-  RSL_FREE( buf ) ;
-}
-
-#ifdef NOUNDERSCORE
-cwrap_fmerge ( pd, nd, msize, mf, pf, upf )
-#else
-# ifdef T3D
-CWRAP_FMERGE ( pd, nd, msize, mf, pf, upf )
-# else
-#   ifdef F2CSTYLE
-cwrap_fmerge__( pd, nd, msize, mf, pf, upf )
-#   else
-cwrap_fmerge_( pd, nd, msize, mf, pf, upf )
-#   endif
-# endif
-#endif
-  int *pd, *nd, *msize ;
-  void (*mf)(), (*pf)(), (*upf)() ;
-{
-  char * buf ;
-  buf = RSL_MALLOC( char, *msize ) ;
-#ifdef NOUNDERSCORE
-  rsl_f_merge_chld ( pd, nd, msize, buf, mf, pf, upf ) ;
-#else
-# ifdef T3D
-  RSL_F_MERGE_CHLD ( pd, nd, msize, buf, mf, pf, upf ) ;
-# else
-#   ifdef F2CSTYLE
-  rsl_f_merge_chld__( pd, nd, msize, buf, mf, pf, upf ) ;
-#   else
-  rsl_f_merge_chld_( pd, nd, msize, buf, mf, pf, upf ) ;
-#   endif
-# endif
-#endif
-  RSL_FREE( buf ) ;
-}
-
-vbcopy_C(a,b,c)
-  char *a, *b ; int c ;
-{
-#if (( defined(vpp) || defined(vpp2) ) && ! defined(sx))
-  int l, lb ;
-  l = ((c)/sizeof(int)) ;
-  lb = l*sizeof(int) ;
-  vicopy_(a,b,&l) ;
-  l = c-lb ;
-  vbcopy_(a+lb,b+lb,&l) ;
-#endif
-}
-
-RSL_RESET_STAGING ()
-{
-#if (defined(vpp) || defined(vpp2))
-if ( blankstage != NULL ) RSL_FREE( blankstage ) ;
-blankstage = NULL ;
-blankstagesize = 0 ;
-blankstagecurs = 0 ;
-#endif
-}
-
-
-#endif
-
+/********************************************/

@@ -1212,7 +1212,7 @@ MODULE module_wrf_quilt
 
       CALL mpi_init ( ierr )
       CALL wrf_set_dm_communicator( MPI_COMM_WORLD )
-      CALL wrf_termio_dup
+      CALL wrf_termio_dup ( MPI_COMM_WORLD )
       CALL MPI_Comm_rank ( MPI_COMM_WORLD, mytask, ierr ) ;
       CALL mpi_x_comm_size ( MPI_COMM_WORLD, ntasks, ierr ) ;
 

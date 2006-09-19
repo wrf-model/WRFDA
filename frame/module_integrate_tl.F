@@ -266,9 +266,9 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
       dfi_counter = 0
       CALL jcdfi_tl ( grid, dfi_counter )
       DO WHILE ( grid%current_time .LT. grid%stop_subtime )
-         IF ( wrf_dm_on_monitor() ) THEN
+!         IF ( wrf_dm_on_monitor() ) THEN
            CALL start_timing
-         END IF
+!         END IF
          CALL med_setup_step ( grid , config_flags )
          a_nest_was_opened = .false.
          ! for each nest whose time has come...
@@ -357,11 +357,11 @@ RECURSIVE SUBROUTINE integrate_tl ( grid, nl_date_string, nl_date_index )
             grid_ptr => grid_ptr%sibling
          END DO
          !  Report on the timing for a single time step.
-         IF ( wrf_dm_on_monitor() ) THEN
+!         IF ( wrf_dm_on_monitor() ) THEN
            CALL wrf_timetoa ( grid%current_time, message2 )
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
-         END IF
+!         END IF
          dfi_counter = dfi_counter + 1
          CALL jcdfi_tl ( grid, dfi_counter )
       END DO

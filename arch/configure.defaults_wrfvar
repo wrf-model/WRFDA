@@ -647,7 +647,7 @@ CC              =       cc
 CC_TOOLS        =       cc
 CFLAGS          =       -DNOUNDERSCORE
 TRADFLAG        =
-FCOPTIM         =       -O0 -qarch=auto
+FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       #-g
 FCTYPE          =       -qrealsize=8
 FCFORM          =       -qfree=f90
