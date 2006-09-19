@@ -10,6 +10,7 @@ MODULE module_dfi
 
       real, private :: da_dot
 
+#ifdef WRF_PLUS
 CONTAINS
 
  SUBROUTINE jcdfi_init_coef ( grid , config_flags )
@@ -886,6 +887,7 @@ END SUBROUTINE jcdfi_tl
         RETURN
         END subroutine RHOCOF
 
+#endif
 END MODULE module_dfi
 !min---***************************************************************
         DOUBLE PRECISION FUNCTION CNR(N,R)
