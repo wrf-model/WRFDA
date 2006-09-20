@@ -49,7 +49,9 @@
 
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}            # Start date of test period
 export FINAL_DATE=${FINAL_DATE:-2003012800}              # Final date of test period.
+set -x
 export CYCLE_PERIOD=${CYCLE_PERIOD:-6}                 # Assimilation frequency.
+set +x
 export WINDOW_START=${WINDOW_START:-0}
 export WINDOW_END=${WINDOW_END:-6}
 
@@ -65,8 +67,8 @@ export LONG_FCST_RANGE_2=${LONG_FCST_RANGE_2:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_3=${LONG_FCST_RANGE_3:-$CYCLE_PERIOD}
 export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
 
-export LBC_FREQ=${LBC_FREQ:-06}                        # Boundary condition frequency.
-export OBS_FREQ=${OBS_FREQ:-06}
+export LBC_FREQ=${LBC_FREQ:-6}                        # Boundary condition frequency.
+export OBS_FREQ=${OBS_FREQ:-6}
 export DOMAIN=${DOMAIN:-01}                            # Domain name. 
 export REGION=${REGION:-con200}                        # Region name. 
 export SOLVER=${SOLVER:-em}
@@ -185,7 +187,7 @@ echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 echo 'REL_DIR      <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR      <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'WRF_NL_DIR   <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_VN
-echo 'WRFVAR_DIR   <A HREF="file:'$WRFVAR_DIR'">'$BE_DIR'</a>' $WRFVAR_VN
+echo 'WRFVAR_DIR   <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 echo 'WRFPLUS_DIR  <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 echo 'WPS_DIR      <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
 echo 'WRFSI_DIR    <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
@@ -196,6 +198,11 @@ echo "CLEAN        $CLEAN"
 echo "NUM_PROCS    $NUM_PROCS"
 echo "INITIAL_DATE $INITIAL_DATE"
 echo "FINAL_DATE   $FINAL_DATE"
+echo "CYCLE_PERIOD $CYCLE_PERIOD"
+echo "OBS_FREQ     $OBS_FREQ"
+echo "LBC_FREQ     $LBC_FREQ"
+echo "WINDOW_START $WINDOW_START"
+echo "WINDOW_END   $WINDOW_END"
 echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
 echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
 echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
