@@ -65,7 +65,9 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
                             ips, ipe, jps, jpe, kps, kpe    )
 
    num_3d_m        = num_moist
+#ifdef CHEM
    num_3d_c        = num_chem
+#endif
    num_3d_s        = num_scalar
 
    !  couple or uncouple mass-point variables
@@ -260,6 +262,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
        ENDDO
      END IF
 
+#ifdef CHEM
      IF (num_3d_c >= PARAM_FIRST_SCALAR )  THEN
        DO im = PARAM_FIRST_SCALAR, num_3d_c
          DO k = kps,kpe-1
@@ -269,6 +272,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
          ENDDO
        ENDDO
      END IF
+#endif
 
      IF (num_3d_s >= PARAM_FIRST_SCALAR )  THEN
        DO im = PARAM_FIRST_SCALAR, num_3d_s
@@ -376,7 +380,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
        ENDDO
      ENDIF
 
-
+#ifdef CHEM
      IF (num_3d_c >= PARAM_FIRST_SCALAR) THEN
        DO im = PARAM_FIRST_SCALAR , num_3d_c
 
@@ -388,6 +392,7 @@ SUBROUTINE couple_or_uncouple_em ( grid , config_flags , couple, &
                              ips,ipe, jps,jpe, kps,kpe )
      ENDDO
      ENDIF
+#endif
 
      IF (num_3d_s >= PARAM_FIRST_SCALAR) THEN
        DO im = PARAM_FIRST_SCALAR , num_3d_s

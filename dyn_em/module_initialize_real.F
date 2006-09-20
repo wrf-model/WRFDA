@@ -88,6 +88,7 @@ CONTAINS
       TYPE (domain)          :: grid
 
 # include <em_dummy_decl.inc>
+#include "namelist_defines2.inc"
 
       TYPE (grid_config_rec_type)              :: config_flags
 
@@ -119,7 +120,7 @@ CONTAINS
 
       REAL :: p_top_requested , temp
       INTEGER :: num_metgrid_levels
-      REAL , DIMENSION(max_eta) :: eta_levels
+      REAL , DIMENSION(max_eta) :: eta_levels_local
       REAL :: max_dz
 
 !      INTEGER , PARAMETER :: nl_max = 1000
@@ -398,11 +399,11 @@ integer::oops1,oops2
    
          IF ( znw(1) .NE. 1.0 ) THEN
    
-            eta_levels(1:kde) = model_config_rec%eta_levels(1:kde)
+            eta_levels_local(1:kde) = model_config_rec%eta_levels(1:kde)
             max_dz            = model_config_rec%max_dz
 
             CALL compute_eta ( znw , &
-                               eta_levels , max_eta , max_dz , &
+                               eta_levels_local , max_eta , max_dz , &
                                p_top , g , p00 , cvpm , a , r_d , cp , t00 , p1000mb , t0 , &
                                ids , ide , jds , jde , kds , kde , &
                                ims , ime , jms , jme , kms , kme , &
@@ -1371,6 +1372,7 @@ endif
       TYPE (domain)          :: grid
 
 #include <em_dummy_decl.inc>
+#include "namelist_defines2.inc"
 
       TYPE (grid_config_rec_type)              :: config_flags
 

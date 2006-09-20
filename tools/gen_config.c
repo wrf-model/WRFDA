@@ -252,7 +252,12 @@ gen_get_nl_config ( char * dirname )
               fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%num_moves ) THEN\n") ;
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
               fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
-              fprintf(fp,"  ENDIF\n" ) ;
+              fprintf(fp,"  ENDIF\n" ) ; 
+            } else if ( !strcmp( p->nentries, "max_eta" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%e_vert(1) ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eta_level number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ; 
 	    } else {
 /* JRB I can't see we can't have generic multi-elements
 	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
@@ -288,10 +293,15 @@ gen_get_nl_config ( char * dirname )
               fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range move number: ',id_id\n",gs,p->name) ;
               fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
               fprintf(fp,"  ENDIF\n" ) ;
+	    }  else if ( !strcmp( p->nentries, "max_eta" )) {
+              fprintf(fp,"  IF ( id_id .LT. 1 .OR. id_id .GT. model_config_rec%%e_vert(1) ) THEN\n") ;
+              fprintf(fp,"    WRITE(emess,*)'nl_%s_%s: Out of range eta_level number: ',id_id\n",gs,p->name) ;
+              fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
+              fprintf(fp,"  ENDIF\n" ) ;
 	    } else {
 /* JRB I cannot see why we cannot have multi-element ones
 
-	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
+	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, or max_eta \n") ;
 */	    }
           }
           fprintf(fp,"  model_config_rec%%%s(id_id) = %s\n",p->name,p->name) ;
