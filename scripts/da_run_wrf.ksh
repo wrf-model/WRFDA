@@ -65,6 +65,7 @@ echo "<H1>$EXPT wrf</H1><PRE>"
 
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
+echo 'FC_DIR     <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo "WRF_INPUT  $WRF_INPUT"
 echo "WRF_BDY    $WRF_BDY"
 echo "FCST_RANGE $FCST_RANGE"
@@ -112,13 +113,16 @@ export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
 if test $WRF_NAMELIST'.' != '.'; then
    ln -fs $WRF_NAMELIST namelist.input
-elif test -f WRF_DIR/inc/namelist_script.inc; then
+elif test -f $WRF_DIR/inc/namelist_script.inc; then
    . $WRF_DIR/inc/namelist_script.inc
 else
    ln -fs $WRF_DIR/test/em_real/namelist.input .
 fi
 
 cp namelist.input $RUN_DIR
+
+echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
+echo '<A HREF="namelist.input">Namelist input</a>'
 
 if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
    echo '<A HREF="working">Working directory</a>'

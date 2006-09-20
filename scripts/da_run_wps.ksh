@@ -22,6 +22,10 @@ export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-$DAT_DIR/wps_geog}
 
+if test ! -d $WPS_GEOG_DIR; then
+   ln -s /mmm/users/bray/data/wps_geog ${HOME}/data/wps_geog
+fi
+
 export NL_E_WE=${NL_E_WE:-110}
 export NL_E_SN=${NL_E_SN:-145}
 export MAP_PROJ=${MAP_PROJ:-polar}

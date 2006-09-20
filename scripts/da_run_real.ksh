@@ -103,7 +103,7 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
 
    mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$DATE
    mv $WORK_DIR/wrfbdy_d${DOMAIN} $RC_DIR/$DATE
-   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$DATE
+#   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$DATE
 else
    echo $RC_DIR/$DATE/wrfinput_d${DOMAIN} exists, skipping
 fi
