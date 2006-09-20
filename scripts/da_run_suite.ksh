@@ -250,7 +250,10 @@ while test $DATE != $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+#rizvi      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+      let OFFSET=$FCST_RANGE+$WINDOW_START 
+      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
+#rizvi      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} 72          2>/dev/null`
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
@@ -290,6 +293,9 @@ while test $DATE != $FINAL_DATE; do
    fi
 
    if $RUN_WPS; then
+      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      let OFFSET=$FCST_RANGE+$WINDOW_START 
+      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
       export RUN_DIR=$EXP_DIR/$DATE/wps
       mkdir -p $RUN_DIR
 
@@ -302,6 +308,9 @@ while test $DATE != $FINAL_DATE; do
    fi
 
    if $RUN_REAL; then     
+      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+      let OFFSET=$FCST_RANGE+$WINDOW_START 
+      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
       export RUN_DIR=$EXP_DIR/$DATE/real
       mkdir -p $RUN_DIR
 

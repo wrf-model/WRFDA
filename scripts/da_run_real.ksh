@@ -1,6 +1,7 @@
 #!/bin/ksh
 
 # Run real
+set -x
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
@@ -26,8 +27,6 @@ echo "<H1>$EXPT real</H1><PRE>"
 
 date
 
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
-
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
 echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
@@ -39,6 +38,15 @@ echo "END_DATE   $END_DATE"
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
+
+export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
+export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
+export NL_START_DAY=`echo $START_DATE | cut -c7-8`
+export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
+export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
+export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
+export NL_END_DAY=`echo $END_DATE | cut -c7-8`
+export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
 if test $WRF_NAMELIST'.' != '.' ; then
    ln -fs $WRF_NAMELIST namelist.input

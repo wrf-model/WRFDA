@@ -49,6 +49,8 @@ echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 
 echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
 echo "DATE          $DATE"
+echo "START_DATE    $START_DATE"
+echo "END_DATE      $END_DATE"
 echo "CYCLE_PERIOD  $CYCLE_PERIOD"
 echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
 echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
@@ -63,9 +65,14 @@ cd $WORK_DIR
 
 let LBC_FREQ_SS=$LBC_FREQ*3600
 
-# Calculate end dates
-
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
+export START_YEAR=`echo $START_DATE | cut -c1-4`
+export START_MONTH=`echo $START_DATE | cut -c5-6`
+export START_DAY=`echo $START_DATE | cut -c7-8`
+export START_HOUR=`echo $START_DATE | cut -c9-10`
+export END_YEAR=`echo $END_DATE | cut -c1-4`
+export END_MONTH=`echo $END_DATE | cut -c5-6`
+export END_DAY=`echo $END_DATE | cut -c7-8`
+export END_HOUR=`echo $END_DATE | cut -c9-10`
 
 cat >namelist.wps <<EOF
 &share
@@ -124,12 +131,7 @@ EOF
 # [3.0] Run WPS:
 #-----------------------------------------------------------------------
 
-export CCYY=`echo $DATE | cut -c1-4`
-export MM=`echo $DATE | cut -c5-6`
-export DD=`echo $DATE | cut -c7-8`
-export HH=`echo $DATE | cut -c9-10`
-
-if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc; then
+if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00.nc; then
    if $DUMMY; then
       echo "Dummy wps"
       LOCAL_DATE=$DATE
@@ -143,7 +145,15 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${CCYY}-${MM}-${DD}_${HH}:00:00.nc;
       done
    else
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      $WPS_DIR/link_grib.csh $WPS_INPUT_DIR/$START_DATE/* $WPS_INPUT_DIR/$END_DATE/*
+set -x
+     LOCAL_DATE=$START_DATE
+     FILES=''
+     while test $LOCAL_DATE -le $END_DATE; do
+        FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
+        LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+     done
+     $WPS_DIR/link_grib.csh $FILES
+set +x
       $WPS_DIR/geogrid.exe
       RC=$?
       if test $RC != 0; then
