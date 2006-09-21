@@ -63,6 +63,12 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}    #
 echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT wrf</H1><PRE>"
 
+date
+
+export D1=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+let OFFSET=$FCST_RANGE+$WINDOW_START 
+. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $D1 $OFFSET
+
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
 echo 'FC_DIR     <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
@@ -70,8 +76,9 @@ echo "WRF_INPUT  $WRF_INPUT"
 echo "WRF_BDY    $WRF_BDY"
 echo "FCST_RANGE $FCST_RANGE"
 echo "LBC_FREQ   $LBC_FREQ"
-
-date
+echo "DATE       $DATE"
+echo "START_DATE $START_DATE"
+echo "END_DATE   $END_DATE"
 
 # Create temporary directory:
 mkdir -p ${WORK_DIR}
@@ -90,24 +97,12 @@ ln -fs ${WRF_INPUT} wrfinput_d${DOMAIN}
 ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 #cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
-export CCYY=`echo $DATE | cut -c1-4`
-export MM=`echo $DATE | cut -c5-6`
-export DD=`echo $DATE | cut -c7-8`
-export HH=`echo $DATE | cut -c9-10`
+export YEAR=`echo $DATE | cut -c1-4`
+export MONTH=`echo $DATE | cut -c5-6`
+export DAY=`echo $DATE | cut -c7-8`
+export HOUR=`echo $DATE | cut -c9-10`
 
-export NL_START_YEAR=$CCYY
-export NL_START_MONTH=$MM
-export NL_START_DAY=$DD
-export NL_START_HOUR=$HH
-
-export NL_ANALYSIS_DATE=${CCYY}-${MM}-${DD}_${HH}:00:00.0000
-
-export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $FCST_RANGE`
-
-export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
+export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
 
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
@@ -121,12 +116,10 @@ fi
 
 cp namelist.input $RUN_DIR
 
-echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
+echo 'WORK_DIR   <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 echo '<A HREF="namelist.input">Namelist input</a>'
 
 if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
-   echo '<A HREF="working">Working directory</a>'
-   echo '<A HREF="namelist.input">Namelist input</a>'
 
    if $DUMMY; then
       echo Dummy wrf
@@ -141,6 +134,7 @@ if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}
       done
    else
       $RUN_CMD ./wrf.exe
+      RC=$?
 
       if test -f fort.9; then
         cp fort.9 $RUN_DIR/namelist.output
@@ -162,11 +156,21 @@ if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
+      if test $RC = 0; then
+         echo `date` "${OK}Succeeded${END}"
+      else
+         echo `date` "${ERR}Failed${END} with error $RC"
+         exit $RC
+      fi
    fi
    mv wrfout* $FC_DIR/$DATE
 else
    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
 fi
+
+mkdir -p $FC_DIR/$END_DATE
+ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
+   $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
 
 
 if $CLEAN; then

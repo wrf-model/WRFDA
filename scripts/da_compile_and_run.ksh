@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ksh
 export FULL=${FULL:-false}
 export COMPILE=${COMPILE:-true}
 export RUN=${RUN:-true}

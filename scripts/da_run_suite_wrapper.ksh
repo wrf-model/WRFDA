@@ -13,7 +13,7 @@
 # 2) "export REL_DIR=$HOME/trunk" points to directory
 # containing all code (I always include all components as subdirectories
 # e.g. $REL_DIR/wrfvar contains the WRFVAR code.
-# 3) "export START_DATE=2003010100" begins the experiment at 00 UTC
+# 3) "export INITIAL_DATE=2003010100" begins the experiment at 00 UTC
 # 1 January 2003.
 
 # You will see the full list of environment variables, and their default

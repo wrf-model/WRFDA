@@ -10,9 +10,12 @@
 # 0) Set up various environment variables:
 #--------------------------------------------
 
-export START_DATE=${START_DATE:-2004050100}
-export END_DATE=${END_DATE:-2004050106}
-export LBC_FREQ=${LBC_FREQ:-6}
+export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
+export FCST_RANGE=${FCST_RANGE:-CYCLE_PERIOD}
+export LBC_FREQ=${LBC_FREQ:-CYCLE_PERIOD}
+export WINDOW_START=${WINDOW_START:-0}
+export WINDOW_END=${WINDOW_END:-CYCLE_PERIOD}
+
 export DUMMY=${DUMMY:-false}
 
 # Directories:
@@ -30,6 +33,11 @@ echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
 
 date
 
+export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+let OFFSET=$FCST_RANGE+$WINDOW_START 
+export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
+
+echo "DATE         $DATE"
 echo "START_DATE   $START_DATE"
 echo "END_DATE     $END_DATE"
 echo "LBC_FREQ     $LBC_FREQ"
@@ -40,13 +48,13 @@ LOCAL_DATE=$START_DATE
 
 while test $LOCAL_DATE -le $END_DATE; do
 
-   CCYY=`echo $LOCAL_DATE | cut -c1-4`
+   YEAR=`echo $LOCAL_DATE | cut -c1-4`
    YY=`echo $LOCAL_DATE | cut -c3-4`
-   MM=`echo $LOCAL_DATE | cut -c5-6`
-   DD=`echo $LOCAL_DATE | cut -c7-8`
-   HH=`echo $LOCAL_DATE | cut -c9-10`
+   MONTH=`echo $LOCAL_DATE | cut -c5-6`
+   DAY=`echo $LOCAL_DATE | cut -c7-8`
+   HOUR=`echo $LOCAL_DATE | cut -c9-10`
    
-   FILE=fnl_${YY}${MM}${DD}_${HH}_00
+   FILE=fnl_${YY}${MONTH}${DAY}_${HOUR}_00
    DIR=${NCEP_DIR}/$LOCAL_DATE
    mkdir -p ${DIR}
 

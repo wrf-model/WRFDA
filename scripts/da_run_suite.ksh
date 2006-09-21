@@ -49,9 +49,7 @@
 
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}            # Start date of test period
 export FINAL_DATE=${FINAL_DATE:-2003012800}              # Final date of test period.
-set -x
 export CYCLE_PERIOD=${CYCLE_PERIOD:-6}                 # Assimilation frequency.
-set +x
 export WINDOW_START=${WINDOW_START:-0}
 export WINDOW_END=${WINDOW_END:-6}
 
@@ -211,7 +209,9 @@ echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 
 export FIRST=true
 
-while test $DATE != $FINAL_DATE; do 
+while test $DATE -le $FINAL_DATE; do 
+
+   export NEXT_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
 
    mkdir -p $FC_DIR/$DATE $RC_DIR/$DATE $OB_DIR/$DATE 
 
@@ -219,29 +219,31 @@ while test $DATE != $FINAL_DATE; do
    echo $DATE
    echo "=========="
 
-   CCYY=`echo $DATE | cut -c1-4`
-   MM=`echo $DATE | cut -c5-6`
-   DD=`echo $DATE | cut -c7-8`
-   HH=`echo $DATE | cut -c9-10`
+   YEAR=`echo $DATE | cut -c1-4`
+   MONTH=`echo $DATE | cut -c5-6`
+   DAY=`echo $DATE | cut -c7-8`
+   HOUR=`echo $DATE | cut -c9-10`
 
    # Decide on length of forecast to run
    export FCST_RANGE=$CYCLE_PERIOD
 
-   if test $HH = $LONG_FCST_TIME_1; then
+   if test $HOUR = $LONG_FCST_TIME_1; then
       export FCST_RANGE=$LONG_FCST_RANGE_1
    fi
 
-   if test $HH = $LONG_FCST_TIME_2; then
+   if test $HOUR = $LONG_FCST_TIME_2; then
       export FCST_RANGE=$LONG_FCST_RANGE_2
    fi
 
-   if test $HH = $LONG_FCST_TIME_3; then
+   if test $HOUR = $LONG_FCST_TIME_3; then
       export FCST_RANGE=$LONG_FCST_RANGE_3
    fi
 
-   if test $HH = $LONG_FCST_TIME_4; then
+   if test $HOUR = $LONG_FCST_TIME_4; then
       export FCST_RANGE=$LONG_FCST_RANGE_4
    fi
+
+   export NL_RUN_HOURS=$FCST_RANGE
 
    . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
@@ -249,16 +251,11 @@ while test $DATE != $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/$DATE/restore_data_ncep
       mkdir -p $RUN_DIR
 
-      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-#rizvi      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
-      let OFFSET=$FCST_RANGE+$WINDOW_START 
-      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
-#rizvi      END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} 72          2>/dev/null`
-
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error$?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error$RC$END"
          exit 1
       fi
    fi
@@ -267,13 +264,11 @@ while test $DATE != $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/$DATE/restore_data_rtobs
       mkdir -p $RUN_DIR
 
-      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
-
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error$?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error$RC$END"
          exit 1
       fi
    fi
@@ -286,38 +281,35 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
 
    if $RUN_WPS; then
-      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      let OFFSET=$FCST_RANGE+$WINDOW_START 
-      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
       export RUN_DIR=$EXP_DIR/$DATE/wps
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
 
-   if $RUN_REAL; then     
-      export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-      let OFFSET=$FCST_RANGE+$WINDOW_START 
-      export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
+   if $RUN_REAL; then
       export RUN_DIR=$EXP_DIR/$DATE/real
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
@@ -329,8 +321,9 @@ while test $DATE != $FINAL_DATE; do
       export DA_OBSERVATIONS=$OB_DIR/$DATE/ob.ascii
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
@@ -357,8 +350,9 @@ while test $DATE != $FINAL_DATE; do
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
       export WRF_INPUT=$DA_ANALYSIS
@@ -376,8 +370,9 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
       $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
       if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
       export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
@@ -389,17 +384,22 @@ while test $DATE != $FINAL_DATE; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
       $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $?$END"
+      RC=$?
+      if test $RC != 0; then
+         echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
-      mkdir -p $FC_DIR/$END_DATE
-      ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
-        $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
+      mkdir -p $FC_DIR/$NEXT_DATE
+      export NEXT_YEAR=`echo $NEXT_DATE | cut -c1-4`
+      export NEXT_MONTH=`echo $NEXT_DATE | cut -c5-6`
+      export NEXT_DAY=`echo $NEXT_DATE | cut -c7-8`
+      export NEXT_HOUR=`echo $NEXT_DATE | cut -c9-10`
+      ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
+        $FC_DIR/$NEXT_DATE/wrfinput_d${DOMAIN}
    fi
 
    export PREV_DATE=${DATE}
-   export DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+   export DATE=$NEXT_DATE
 
    export FIRST=false
 

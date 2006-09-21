@@ -1,7 +1,6 @@
 #!/bin/ksh
 
 # Run real
-set -x
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
@@ -25,7 +24,11 @@ cd $WORK_DIR
 echo "<HTML><HEAD><TITLE>$EXPT real</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT real</H1><PRE>"
 
-date
+date    
+
+export D1=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+let OFFSET=$FCST_RANGE+$WINDOW_START 
+. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $D1 $OFFSET
 
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
@@ -33,20 +36,12 @@ echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo "DATE       $DATE"
+echo "START_DATE $START_DATE"
 echo "END_DATE   $END_DATE"
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
-
-export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
-export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
-export NL_START_DAY=`echo $START_DATE | cut -c7-8`
-export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
-export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
 if test $WRF_NAMELIST'.' != '.' ; then
    ln -fs $WRF_NAMELIST namelist.input
@@ -65,7 +60,7 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
       echo "Dummy real"
       echo Dummy real > wrfinput_d${DOMAIN}
       echo Dummy real > wrfbdy_d${DOMAIN}
-      echo Dummy real > wrflowinp_d${DOMAIN}
+      # echo Dummy real > wrflowinp_d${DOMAIN}
    else
       ln -fs $RC_DIR/$DATE/met_em.d* .
       $RUN_CMD ${WRF_DIR}/main/real.exe
@@ -97,7 +92,7 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
          echo `date` "${OK}Succeeded${END}"
       else
          echo `date` "${ERR}Failed${END} with error $RC"
-         exit 1
+         exit $RC
       fi    
    fi
 

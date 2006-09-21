@@ -10,9 +10,8 @@
 # 0) Set up various environment variables:
 #--------------------------------------------
 
-export START_DATE=${START_DATE:-2004050100}
-export END_DATE=${END_DATE:-2004050106}
-export OBS_FREQ=${OBS_FREQ:-6}
+export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
+export OBS_FREQ=${OBS_FREQ:-$CYCLE_PERIOD}
 export DUMMY=${DUMMY:-false}
 
 # Directories:
@@ -30,6 +29,10 @@ echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
 
 date
 
+export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+
+echo "DATE       $DATE"
 echo "START_DATE $START_DATE"
 echo "END_DATE   $END_DATE"
 echo "OBS_FREQ   $OBS_FREQ"
@@ -40,11 +43,10 @@ LOCAL_DATE=$START_DATE
 
 while test $LOCAL_DATE -le $END_DATE; do
 
-   CCYY=`echo $LOCAL_DATE | cut -c1-4`
-   YY=`echo $LOCAL_DATE | cut -c3-4`
-   MM=`echo $LOCAL_DATE | cut -c5-6`
-   DD=`echo $LOCAL_DATE | cut -c7-8`
-   HH=`echo $LOCAL_DATE | cut -c9-10`
+   YEAR=`echo $LOCAL_DATE | cut -c1-4`
+   MONTH=`echo $LOCAL_DATE | cut -c5-6`
+   DAY=`echo $LOCAL_DATE | cut -c7-8`
+   HOUR=`echo $LOCAL_DATE | cut -c9-10`
 
    DIR=${OB_DIR}/${LOCAL_DATE}
    mkdir -p ${DIR}
@@ -52,11 +54,11 @@ while test $LOCAL_DATE -le $END_DATE; do
    export FILE=obs.$LOCAL_DATE.gz
 
    if test ! -f ${DIR}/$FILE; then
-      echo Retrieving ${MSS_RT_DIR}/${CCYY}${MM}/$FILE to $DIR
+      echo Retrieving ${MSS_RT_DIR}/${YEAR}${MONTH}/$FILE to $DIR
       if $DUMMY; then
          echo Dummy restore_data > ${DIR}/${FILE}
       else
-         msrcp ${MSS_RT_DIR}/${CCYY}${MM}/$FILE $DIR
+         msrcp ${MSS_RT_DIR}/${YEAR}${MONTH}/$FILE $DIR
       fi
    else
       echo "File ${DIR}/$FILE exists, skipping"

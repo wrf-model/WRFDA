@@ -1,3 +1,4 @@
+#!/bin/ksh
 DIR=`dirname $0`
 
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
@@ -108,10 +109,10 @@ if test ! -f $DA_ANALYSIS; then
    for INDEX in 01 02 03 04 05 06 07; do
       let H=$INDEX-1+$WINDOW_START
       D_DATE[$INDEX]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
-      export D_CCYY[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c1-4`
-      export D_MM[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c5-6`
-      export D_DD[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c7-8`
-      export D_HH[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
+      export D_YEAR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c1-4`
+      export D_MONTH[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c5-6`
+      export D_DAY[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c7-8`
+      export D_HOUR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
    done
 
    export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
@@ -119,24 +120,24 @@ if test ! -f $DA_ANALYSIS; then
       export NPROC_X=1
    fi
 
-   export CCYY=`echo $DATE | cut -c1-4`
-   export MM=`echo $DATE | cut -c5-6`
-   export DD=`echo $DATE | cut -c7-8`
-   export HH=`echo $DATE | cut -c9-10`
+   export YEAR=`echo $DATE | cut -c1-4`
+   export MONTH=`echo $DATE | cut -c5-6`
+   export DAY=`echo $DATE | cut -c7-8`
+   export HOUR=`echo $DATE | cut -c9-10`
 
-   export START_CCYY=`echo $START_DATE | cut -c1-4`
-   export START_MM=`echo $START_DATE | cut -c5-6`
-   export START_DD=`echo $START_DATE | cut -c7-8`
-   export START_HH=`echo $START_DATE | cut -c9-10`
+   export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
+   export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
+   export NL_START_DAY=`echo $START_DATE | cut -c7-8`
+   export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
 
-   export END_CCYY=`echo $END_DATE | cut -c1-4`
-   export END_MM=`echo $END_DATE | cut -c5-6`
-   export END_DD=`echo $END_DATE | cut -c7-8`
-   export END_HH=`echo $END_DATE | cut -c9-10`
+   export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
+   export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
+   export NL_END_DAY=`echo $END_DATE | cut -c7-8`
+   export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
-   export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_CCYY}-${START_MM}-${START_DD}_${START_HH}:00:00.0000}
-   export NL_ANALYSIS_DATE=${CCYY}-${MM}-${DD}_${HH}:00:00.0000
-   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_CCYY}-${END_MM}-${END_DD}_${END_HH}:00:00.0000}
+   export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00.0000}
+   export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
+   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MIN:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
 
    # Default WRF namelist variables:
    export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
@@ -227,15 +228,6 @@ if test ! -f $DA_ANALYSIS; then
       export NL_USE_RADAROBS=true
    fi
 
-   export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
-   export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
-   export NL_START_DAY=`echo $START_DATE | cut -c7-8`
-   export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
-   export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-   export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-   export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-   export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
-
    if $NL_VAR4D; then
       # Create nl, tl, ad links structures
       mkdir nl tl ad
@@ -275,7 +267,7 @@ if test ! -f $DA_ANALYSIS; then
 
       # Outputs
       for I in 02 03 04 05 06 07; do
-         ln -fs nl/nl_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00 fg$I
+         ln -fs nl/nl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
       done
 
       # tl
@@ -297,14 +289,10 @@ if test ! -f $DA_ANALYSIS; then
 
       # Outputs
       for I in 02 03 04 05 06 07; do
-         ln -s tl/tl_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00 tl$I
+         ln -s tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
       if $NL_JCDFI_USE; then
-         export CCYY=`echo $END_DATE | cut -c1-4`
-         export MM=`echo $END_DATE | cut -c5-6`
-         export DD=`echo $END_DATE | cut -c7-8`
-         export HH=`echo $END_DATE | cut -c9-10`
-         ln -s tl/auxhist3_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 tldf
+         ln -s tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
       fi
 
       # ad
@@ -326,7 +314,7 @@ if test ! -f $DA_ANALYSIS; then
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN ad
       ln -fs $WORK_DIR/fg01 ad/wrfinput_d${DOMAIN}
       for I in 01 02 03 04 05 06 07; do
-         ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_CCYY[$I]}-${D_MM[$I]}-${D_DD[$I]}_${D_HH[$I]}:00:00
+         ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
       done
 # JRB
 #      if $NL_JCDFI_USE; then
@@ -335,11 +323,7 @@ if test ! -f $DA_ANALYSIS; then
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
 
       # Outputs
-      export CCYY=`echo $DATE | cut -c1-4`
-      export MM=`echo $DATE | cut -c5-6`
-      export DD=`echo $DATE | cut -c7-8`
-      export HH=`echo $DATE | cut -c9-10`
-      ln -fs ad/ad_d${DOMAIN}_${CCYY}-${MM}-${DD}_${HH}:00:00 gr01
+      ln -fs ad/ad_d${DOMAIN}_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
 
       export NL_DYN_OPT=2
    fi
