@@ -7,6 +7,7 @@ subroutine da_warning( file_str, line, warnings )
    character(len=*), intent(in) :: warnings(:)
    character*256 :: line_str
    character*256 :: html_file
+   integer :: i
 
    write(line_str,'(i6)') line
 
@@ -25,7 +26,9 @@ subroutine da_warning( file_str, line, warnings )
             '  LINE:  '//TRIM(line_str) )
       end if
    end if
-   call da_messages(warnings)
+   do i=1,SIZE(warnings) 
+      call wrf_message(warnings(i))
+   end do
    call wrf_message( '-------------------------------------------' )
 #else
    call wrf_message2( '-------------- WARNING ---------------' )

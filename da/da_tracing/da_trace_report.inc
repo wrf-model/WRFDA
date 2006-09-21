@@ -19,8 +19,8 @@ subroutine da_trace_report
    INTEGER :: MinCPUPos
    INTEGER :: MaxCPUPos
    INTEGER :: itemp1(MaxNoRoutines)
-   INTEGER :: MasterMaxHeap(0:nproc-1,MaxNoRoutines)
-   INTEGER :: MasterNoCalls(0:nproc-1,MaxNoRoutines)
+   INTEGER :: MasterMaxHeap(0:num_procs-1,MaxNoRoutines)
+   INTEGER :: MasterNoCalls(0:num_procs-1,MaxNoRoutines)
    INTEGER :: OverallNoCalls(MaxNoRoutines)
    INTEGER, ALLOCATABLE :: Index(:)
 
@@ -31,10 +31,10 @@ subroutine da_trace_report
    REAL    :: PercentCPUTime               ! percentage in CPU time
    REAL    :: PercentElapsedTime           ! percentage in elapsed time
    REAL    :: rtemp1(MaxNoRoutines)
-   REAL    :: MasterElapsedTime(0:nproc-1,MaxNoRoutines)
-   REAL    :: MasterElapsedTimeLocal(0:nproc-1,MaxNoRoutines)
-   REAL    :: MasterCPUTime(0:nproc-1,MaxNoRoutines)
-   REAL    :: MasterCPUTimeLocal(0:nproc-1,MaxNoRoutines)
+   REAL    :: MasterElapsedTime(0:num_procs-1,MaxNoRoutines)
+   REAL    :: MasterElapsedTimeLocal(0:num_procs-1,MaxNoRoutines)
+   REAL    :: MasterCPUTime(0:num_procs-1,MaxNoRoutines)
+   REAL    :: MasterCPUTimeLocal(0:num_procs-1,MaxNoRoutines)
    REAL    :: OverallElapsedTime(MaxNoRoutines)
    REAL    :: OverallCPUTime(MaxNoRoutines)
 
@@ -67,7 +67,7 @@ subroutine da_trace_report
 
    MasterTimerNames(:)=TimerNames(:)
 
-   IF (mype == trace_pe) THEN
+   IF (myproc == trace_pe) THEN
       MasterNoRoutines=NoRoutines
    ELSE
       MasterNoRoutines=0
@@ -81,7 +81,7 @@ subroutine da_trace_report
                   TraceNameLen*MaxNoRoutines, &
                   MPI_CHARACTER,trace_pe, MPI_COMM_WORLD,istat)
 
-!   call GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,nproc,istat, &
+!   call GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,num_procs,istat, &
 !      MasterTimerNames(1:MasterNoRoutines))  
 #endif
 
@@ -95,19 +95,19 @@ subroutine da_trace_report
    DO Loop1=1,MaxNoRoutines
       DO Loop2=1,NoRoutines
          IF (TimerNames(Loop2) == MasterTimerNames(Loop1)) THEN
-            MasterElapsedTime(mype,Loop1)=ElapsedTime(Loop2)
-            MasterCPUTime(mype,Loop1)=CPUTime(Loop2)
-            MasterElapsedTimeLocal(mype,Loop1)=ElapsedTimeLocal(Loop2)
-            MasterCPUTimeLocal(mype,Loop1)=CPUTimeLocal(Loop2)
-            MasterNoCalls(mype,Loop1)=NoCalls(Loop2)
-            MasterMaxHeap(mype,Loop1)=MaxHeap(Loop2)
+            MasterElapsedTime(myproc,Loop1)=ElapsedTime(Loop2)
+            MasterCPUTime(myproc,Loop1)=CPUTime(Loop2)
+            MasterElapsedTimeLocal(myproc,Loop1)=ElapsedTimeLocal(Loop2)
+            MasterCPUTimeLocal(myproc,Loop1)=CPUTimeLocal(Loop2)
+            MasterNoCalls(myproc,Loop1)=NoCalls(Loop2)
+            MasterMaxHeap(myproc,Loop1)=MaxHeap(Loop2)
             CYCLE
          END IF
       END DO
    END DO
 
 #ifdef DM_PARALLEL
-   DO i=0,nproc-1
+   DO i=0,num_procs-1
       call da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
       call da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
       call da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
@@ -115,7 +115,7 @@ subroutine da_trace_report
    END DO
 #endif
 
-   IF (mype == 0) THEN
+   IF (myproc == 0) THEN
 
       DO j=1,MasterNoRoutines
         rtemp1(j)=SUM(MasterElapsedTimeLocal(:,j))
@@ -143,7 +143,7 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("<a name=local><h2>Local Timing Summary</h2></a>")')
 
-      IF (nproc == 1) THEN
+      IF (num_procs == 1) THEN
          ! needs changing to work MPP
          WRITE (UNIT=trace_unit, &
             FMT='("(Tracing itself took ",F8.1,"s CPU Time, and ",F8.1,a)') &
@@ -165,7 +165,7 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("<TR><TH></TH><TH>per PE</TH><TH>Average per PE<TH>%<TH>Minimum<TH>Maximum <TH>Total<TH>%<TH>Minimum<TH>Maximum")')
       WRITE(UNIT=trace_unit, &
-         FMT='("<TH>",I4," PE")') nproc
+         FMT='("<TH>",I4," PE")') num_procs
 
       DO loop1=MasterNoRoutines,1,-1
          Pointer=index(loop1)    
@@ -177,13 +177,13 @@ subroutine da_trace_report
          END IF
 
          IF (TotalElapsedTime > 0.0) THEN
-            PercentElapsedTime=100.0*OverallElapsedTime(Pointer)/(REAL(nproc) * TotalElapsedTime)
+            PercentElapsedTime=100.0*OverallElapsedTime(Pointer)/(REAL(num_procs) * TotalElapsedTime)
          ELSE
             PercentElapsedTime=100.0
          END IF
 
          IF (OverallElapsedTime(Pointer) > 0.0) THEN
-            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/REAL(CountRate*nproc))
+            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/REAL(CountRate*num_procs))
          ELSE
             SpeedUp = 0.0
          END IF
@@ -211,8 +211,8 @@ subroutine da_trace_report
             "</a>"
          WRITE (UNIT=trace_unit, &
             FMT='("<TD>",F10.1,2("<TD>",F10.2,"<TD>",F10.1,2("<TD>",F10.1," on",I3)),"<TD>",F5.2)') &
-            REAL(OverallNoCalls(Pointer))/REAL(nproc),                       & ! Average number of calls per PE
-            OverallElapsedTime(Pointer)/(nproc*REAL(CountRate)),             & ! Average Elapsed Time
+            REAL(OverallNoCalls(Pointer))/REAL(num_procs),                       & ! Average number of calls per PE
+            OverallElapsedTime(Pointer)/(num_procs*REAL(CountRate)),             & ! Average Elapsed Time
             PercentElapsedTime,                                              & ! Percent Elapsed Time
             MasterElapsedTimeLocal(MinElapsedPos,Pointer)/REAL(CountRate),   & ! Min average Elapsed Time
             MinElapsedPos,                                                   & ! Which PE
@@ -270,7 +270,7 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("<TR><TH></TH><TH>per PE</TH><TH>Average per PE<TH>%<TH>Minimum<TH>Maximum<TH>Total<TH>%<TH>Minimum<TH>Maximum")')
       WRITE(UNIT=trace_unit, &
-         FMT='("<TH>",I4," PE")') nproc
+         FMT='("<TH>",I4," PE")') num_procs
 
       DO loop1=MasterNoRoutines,1,-1
          Pointer=index(loop1)    
@@ -282,13 +282,13 @@ subroutine da_trace_report
          END IF
 
          IF (TotalElapsedTime > 0.0) THEN
-            PercentElapsedTime=100.0 * OverallElapsedTime(Pointer)/(REAL(nproc) * TotalElapsedTime)
+            PercentElapsedTime=100.0 * OverallElapsedTime(Pointer)/(REAL(num_procs) * TotalElapsedTime)
          ELSE
             PercentElapsedTime=100.0
          END IF
 
          IF (OverallElapsedTime(Pointer) > 0.0) THEN
-            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/REAL(nproc*CountRate))
+            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/REAL(num_procs*CountRate))
          ELSE
             SpeedUp = 0.0
          END IF
@@ -316,8 +316,8 @@ subroutine da_trace_report
             "</a>"
          WRITE (UNIT=trace_unit, &
             FMT='("<TD>",F10.1,2("<TD>",F10.2,"<TD>",F10.1,2("<TD>",F10.1," on",I3)),"<TD>",F5.2)') &
-            REAL(OverallNoCalls(Pointer))/REAL(nproc),                  & ! Number of calls per PE
-            OverallElapsedTime(Pointer)/(REAL(nproc*CountRate)),        & ! Average Elapsed Time
+            REAL(OverallNoCalls(Pointer))/REAL(num_procs),                  & ! Number of calls per PE
+            OverallElapsedTime(Pointer)/(REAL(num_procs*CountRate)),        & ! Average Elapsed Time
             PercentElapsedTime,                                         & ! Percent Elapsed Time
             MasterElapsedTime(MinElapsedPos,Pointer)/REAL(CountRate),   & ! Min average Elapsed Time
             MinElapsedPos,                                              & ! Which PE
@@ -346,7 +346,7 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("</TABLE>")')
 
-   END IF ! mype==0
+   END IF ! myproc==0
 
    !============================================================================
    ! Sort subroutines into memory use order by max memory on one PE
@@ -355,14 +355,14 @@ subroutine da_trace_report
    IF (trace_memory) THEN
 
 #ifdef DM_PARALLEL
-      DO i=0,nproc-1
+      DO i=0,num_procs-1
          DO j=1,MaxNoRoutines
             call da_proc_sum_int(MasterMaxHeap(i,j))
          END DO
       END DO
 #endif
 
-      IF (mype == 0) THEN
+      IF (myproc == 0) THEN
          DO j=1,MasterNoRoutines
             itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
          END DO
@@ -380,7 +380,7 @@ subroutine da_trace_report
                FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I10,"<TD>",I10,"<TD>",I10)') &
                TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
                MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
-               SUM(MasterMaxHeap(:,Pointer))/nproc
+               SUM(MasterMaxHeap(:,Pointer))/num_procs
          END DO
          WRITE (UNIT=trace_unit,FMT='("</table></body></html>")')
       END IF
@@ -390,7 +390,7 @@ subroutine da_trace_report
       CLOSE(trace_unit)
    END IF
 
-   IF (mype == 0) THEN
+   IF (myproc == 0) THEN
       DEALLOCATE(index)
    END IF
 

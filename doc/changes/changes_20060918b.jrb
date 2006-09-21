@@ -12,6 +12,8 @@ Remove wrf timing calls from da routines, as da_trace handles it
 
 Change nproc lookup to use num_procs from da_constants for da routines
 
+Update suite system
+
 
 ------------------------------------------------------
 Tests:

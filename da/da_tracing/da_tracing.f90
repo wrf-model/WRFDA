@@ -29,7 +29,6 @@ MODULE da_tracing
    INTEGER :: BaseElapsedTime
    REAL :: BaseCPUTime
    INTEGER :: LastSpace
-   INTEGER :: nproc, mype
 
    ! All CPU times in seconds
 
