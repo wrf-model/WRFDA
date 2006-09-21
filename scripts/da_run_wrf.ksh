@@ -140,7 +140,8 @@ if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}
         cp fort.9 $RUN_DIR/namelist.output
       fi
 
-      mkdir $RUN_DIR/rsl
+      rm -rf $RUN_DIR/rsl
+      mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
       cd $RUN_DIR/rsl
       for FILE in rsl*; do

@@ -20,6 +20,7 @@ export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/obsproc}
+export WORK_DIR=$RUN_DIR/working
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export DUMMY=${DUMMY:-false}
 
@@ -27,7 +28,7 @@ mkdir -p $RUN_DIR $OB_DIR/$DATE
 
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessing
 
-# Namelist (wrfsi.nl) variables used in obs. preprocessor:
+# Namelist variables used in obs. preprocessor:
 
 export NL_E_WE=${NL_E_WE:-110}
 export NL_E_SN=${NL_E_SN:-145}
@@ -49,6 +50,9 @@ echo 'OBSPROC_DIR  <A HREF="'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
 echo 'OB_DIR       <A HREF="'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RUN_DIR      <A HREF="'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
+
+mkdir -p $WORK_DIR
+cd $WORK_DIR
 
 if test ! -f $OB_DIR/$DATE/ob.ascii; then
 
@@ -79,7 +83,7 @@ if test ! -f $OB_DIR/$DATE/ob.ascii; then
 
    export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
-   cd ${RUN_DIR}
+   ln -s $OB_DIR/$DATE/$OB_FILE .
 
    if test -f $OB_DIR/$DATE/${OB_FILE}.gz; then
       # If compressed, unpack
@@ -92,7 +96,7 @@ if test ! -f $OB_DIR/$DATE/ob.ascii; then
 
    cat > namelist.3dvar_obs << EOF
 &record1
- obs_gts_filename = '$OB_DIR/$DATE/$OB_FILE',
+ obs_gts_filename = '$OB_FILE',
  fg_format        = 'WRF',
  obs_err_filename = 'obserr.txt',
 /

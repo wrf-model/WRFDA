@@ -432,6 +432,7 @@ if test ! -f $DA_ANALYSIS; then
          mv trace/* $RUN_DIR/trace
       fi
 
+      rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
       cd $RUN_DIR/rsl

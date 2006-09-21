@@ -70,6 +70,7 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
         cp fort.9 $RUN_DIR/namelist.output
       fi
 
+      rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl
       cd $RUN_DIR/rsl
@@ -82,7 +83,6 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
       done
       cd $RUN_DIR
 
-      echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="namelist.output">Namelist output</a>'
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'

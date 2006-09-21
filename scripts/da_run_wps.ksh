@@ -64,6 +64,8 @@ echo "END_DATE      $END_DATE"
 echo "CYCLE_PERIOD  $CYCLE_PERIOD"
 echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
 echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
+echo 'RUN_DIR       <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
+echo 'WORK_DIR      <A HREF="file:'$WORK_DIR'"</a>'$WORK_DIR'</a>'
 
 date
 
@@ -138,6 +140,10 @@ cat >namelist.wps <<EOF
 /
 EOF
 
+cp $WORK_DIR/namelist.wps $RUN_DIR
+
+echo '<A HREF="namelist.wps">namelist.wps</a>'
+
 #-----------------------------------------------------------------------
 # [3.0] Run WPS:
 #-----------------------------------------------------------------------
@@ -165,21 +171,28 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL
       $WPS_DIR/link_grib.csh $FILES
       $WPS_DIR/geogrid.exe
       RC=$?
+      cp geogrid.log $RUN_DIR
+      echo '<A HREF="geogrid.log">geogrid.log</a>'
+  
       if test $RC != 0; then
          echo geogrid failed with error $RC
-         exit 1
+         exit $RC
       fi
+
       $WPS_DIR/ungrib.exe
       RC=$?
       if test $RC != 0; then
          echo ungrib failed with error $RC
-         exit 1
+         exit $RC
       fi
+
       $WPS_DIR/metgrid.exe
       RC=$?
+      cp metgrid.log $RUN_DIR
+      echo '<A HREF="metgrid.log">metgrid.log</a>'
       if test $RC != 0; then
          echo metgrid failed with error $RC
-         exit 1
+         exit $RC
       fi
    fi
    mv met_em.d${DOMAIN}* $RC_DIR/$DATE
@@ -188,8 +201,6 @@ else
 fi
 
 cd $OLDPWD
-
-cp $WORK_DIR/namelist.wps $RUN_DIR
 
 if $CLEAN; then
    rm -rf $WORK_DIR

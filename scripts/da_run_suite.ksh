@@ -191,6 +191,7 @@ echo 'WPS_DIR      <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
 echo 'WRFSI_DIR    <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
 echo 'OBSPROC_DIR  <A HREF="file:'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
 
+echo "CYCLING      $CYCLING"
 echo "DUMMY        $DUMMY"
 echo "CLEAN        $CLEAN"
 echo "NUM_PROCS    $NUM_PROCS"
@@ -245,6 +246,7 @@ while test $DATE -le $FINAL_DATE; do
 
    export NL_RUN_HOURS=$FCST_RANGE
 
+   # Work out START_DATE, END_DATE and NL_START_YEAR etc
    . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
    if $RUN_RESTORE_DATA_NCEP; then
@@ -273,8 +275,6 @@ while test $DATE -le $FINAL_DATE; do
       fi
    fi
   
-   # Restore lost values
-
    if $RUN_WRFSI; then
       export RUN_DIR=$EXP_DIR/$DATE/wrfsi
       mkdir -p $RUN_DIR
