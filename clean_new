@@ -2,11 +2,18 @@
 
 cd build
 
+cat > configure.wrfvar <<EOF
+arch_superclean:
+arch_clean:
+EOF
+
+touch depend.txt
+
 if ( "$1" == '-a' ) then
   make superclean
 else
   make clean
 endif
 
-rm ../main/*exe
+rm -f ../main/*exe
 
