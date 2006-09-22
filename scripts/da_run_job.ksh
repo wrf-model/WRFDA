@@ -56,7 +56,8 @@ export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-   -o $HOSTNAME = "bv1103en.ucar.edu" ; then 
+   -o $HOSTNAME = "bv1103en.ucar.edu" \
+   -o $HOSTNAME = "bv1203en.ucar.edu" ; then 
    # lightning and bluesky use lsf
    cat > job.ksh <<EOF
 #!/bin/ksh
@@ -115,7 +116,8 @@ echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
 if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
    llsubmit job.ksh
 elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-     -o $HOSTNAME = "bv1103en.ucar.edu"; then 
+     -o $HOSTNAME = "bv1103en.ucar.edu" \
+     -o $HOSTNAME = "bv1203en.ucar.edu"; then 
    bsub -q regular -n $NUM_PROCS < $PWD/job.ksh
 elif test $HOSTNAME = ocotillo; then
    ./job.ksh
