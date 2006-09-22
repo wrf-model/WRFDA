@@ -117,15 +117,15 @@ $(BUFR_NCEP_NCO)/libbufr.a :
 	( cd $(BUFR_NCEP_NCO); make all )
 
 clean : arch_clean
-	@ $(RM) *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
+	@ rm -rf  *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
-          $(EXTERNAL)/*.o $(EXTERNAL)/*.a $(EXTERNAL)/*/*.o $(EXTERNAL)/*/*.a \
+          ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
           inc/dm_comm_cpp_flags depend
-	@ ( cd $(EXTERNAL); make clean )
+	@ ( cd ../external; make clean )
 
 superclean : clean arch_superclean
-	@ ( cd $(EXTERNAL); make superclean )
-	@ $(RM) *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code \
+	@ ( cd ../external; make superclean )
+	@ rm -rf *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
