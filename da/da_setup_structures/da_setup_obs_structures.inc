@@ -119,7 +119,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
       WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
          'Invalid sfc_assi_option = ', sfc_assi_options
-      call wrf_error_fatal(errmsg(1))
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN

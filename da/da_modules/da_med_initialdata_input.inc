@@ -56,7 +56,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
       enddo
 
       if (nsave < 0) then
-         call wrf_error_fatal("Can not find the needed time")
+         call da_error(__FILE__,__LINE__,(/"Can not find the needed time"/))
       endif
    else
       ! Set start_date to current_date.

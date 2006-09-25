@@ -77,7 +77,8 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
       !TBH:         residual_generic_type AND send this around.  Better to fix 
       !TBH:         allocation in specific types to avoid wasting memory!  
       IF ( SIZE(res_generic%values(n)%ptr) /= iv_num_levels ) THEN
-         call wrf_error_fatal( 'residual_sound_to_generic:  mismatched levels' )
+         call da_error(__FILE__,__LINE__, &
+            (/'residual_sound_to_generic:  mismatched levels'/))
       ENDIF
    ENDDO
 
@@ -299,7 +300,8 @@ subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
 
    IF ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
         ( val_index > UBOUND(res_generic%values,1) ) ) THEN
-      call wrf_error_fatal( 'residual_generic_alloc_and_set:  bad val_index' )
+      call da_error(__FILE__,__LINE__, &
+         (/'residual_generic_alloc_and_set:  bad val_index'/))
    ENDIF
    ALLOCATE( res_generic%values(val_index)%ptr(SIZE(values)) )
    res_generic%values(val_index)%ptr(:) = values(:)

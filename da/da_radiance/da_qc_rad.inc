@@ -65,7 +65,7 @@ subroutine da_qc_rad ( inst, nchan, ob, iv )
 
      WRITE(UNIT=errmsg(1),FMT='(A,A)') &
        "Unrecognized Instrument",TRIM(inst_name(rtminit_sensor(inst)))
-     call wrf_error_fatal(errmsg(1))
+     call da_error(__FILE__,__LINE__,errmsg(1:1))
 
    end if
 

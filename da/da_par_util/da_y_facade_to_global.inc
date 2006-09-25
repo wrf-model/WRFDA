@@ -68,8 +68,8 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    ENDDO
    DO n=1, num_obs_send
       IF ( obs_global_index(n) < 0 ) THEN
-         call wrf_error_fatal ( &
-            'ASSERTION ERROR:  bad local value of obs_global_index' )
+         call da_error(__FILE__,__LINE__, &
+            (/'ASSERTION ERROR:  bad local value of obs_global_index'/))
       ENDIF
    END DO
    ! exchange num_obs_send and obs_global_index
@@ -83,8 +83,8 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
                         MPI_INTEGER, communicator, ierr )
    num_obs_all = SUM( num_obs_send_all )
    IF ( num_obs_all /= re_slice%num_obs_glo ) THEN
-      call wrf_error_fatal ( &
-         'ASSERTION ERROR:  inconsistent count of sound obs' )
+      call da_error (__FILE__,__LINE__, &
+         (/'ASSERTION ERROR:  inconsistent count of sound obs'/))
    ENDIF
    ! set up to gather obs_global_index
    recv_counts = num_obs_send_all
@@ -106,19 +106,19 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    DO n=1, num_obs_all
       IF ( ( obs_global_index_all(n) <  1 ) .OR. &
            ( obs_global_index_all(n) > SIZE(obs_global_index_inv) ) ) THEN
-         call wrf_error_fatal ( &
-            'ASSERTION ERROR:  obs_global_index_all(n) out of range' )
+         call da_error (__FILE__,__LINE__, &
+            (/'ASSERTION ERROR:  obs_global_index_all(n) out of range'/))
       ENDIF
       IF ( obs_global_index_inv(obs_global_index_all(n)) /= -1 ) THEN
-         call wrf_error_fatal ( &
-            'ASSERTION ERROR:  obs owned by more than one task' )
+         call da_error (__FILE__,__LINE__, &
+            (/'ASSERTION ERROR:  obs owned by more than one task'/))
       ENDIF
       obs_global_index_inv(obs_global_index_all(n)) = n
    ENDDO
    DO n=1, num_obs_all
       IF ( obs_global_index_inv(obs_global_index_all(n)) == -1 ) THEN
-         call wrf_error_fatal ( &
-            'ASSERTION ERROR:  obs not owned by any task' )
+         call da_error (__FILE__,__LINE__, &
+            (/'ASSERTION ERROR:  obs not owned by any task'/))
       ENDIF
    ENDDO
 
@@ -202,7 +202,8 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
          ENDIF
       END DO
       IF ( buf_idx /= num_send_buf_lcl ) THEN
-         call wrf_error_fatal ( 'ASSERTION ERROR:  buf_idx /= num_send_buf_lcl' )
+         call da_error (__FILE__,__LINE__, &
+            (/'ASSERTION ERROR:  buf_idx /= num_send_buf_lcl'/))
       ENDIF
       ! allocate receive buffer
       ALLOCATE( re_vals_all(num_recv_all) )
@@ -237,7 +238,8 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
                 recv_counts, recv_displs )
 
 #else
-   call wrf_error_fatal ( 'ASSERTION ERROR y_facade_to_global:  may only be called for a distributed memory parallel run' )
+   call da_error (__FILE__,__LINE__, &
+      (/'may only be called for a distributed memory parallel run'/))
 #endif
 
 end subroutine da_y_facade_to_global

@@ -30,9 +30,9 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
                          output_model_input , "DATASET=INPUT", ierr )
 
    IF ( ierr .NE. 0 ) THEN
-      WRITE( wrf_err_message , * ) __FILE__//': error opening ', &
+      WRITE(UNIT=errmsg(1),FMT=*) 'Error opening ', &
          TRIM(file_name),' for writing ierr=',ierr
-      call wrf_error_fatal( wrf_err_message )
+      call da_error(__FILE__,__LINE__,errmsg(1:1))
    ENDIF
 
    start_date=current_date
