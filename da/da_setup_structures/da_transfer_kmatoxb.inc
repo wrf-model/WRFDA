@@ -1,5 +1,5 @@
 subroutine da_transfer_kmatoxb( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -14,21 +14,21 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
    ! Definitions of dummy arguments to solve
 
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k, n
    integer :: is, ie, js, je, ks, ke
    real    :: tmpvar, tmpvar1, earth_radius_sq,conv
    real    :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
    real    :: ddx, ddy                                        
-   REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme)               :: rgh_fac
+   REAL, DIMENSION(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: rgh_fac
    character(len=19) :: current_date
  
-   REAL, DIMENSION(xp%kms:xp%kme) :: TV, ALPHA, PHALF, PHALFL                     
+   REAL, DIMENSION(grid%xp%kms:grid%xp%kme) :: TV, ALPHA, PHALF, PHALFL                     
 
    real :: pu, pd, coef, delp, hydro, rgasg, shgt
 
-   real, dimension(xp%jds:xp%jde) :: loc_latc_mean
+   real, dimension(grid%xp%jds:grid%xp%jde) :: loc_latc_mean
 
    REAL, ALLOCATABLE :: arrayglobal(:,:) 
 
@@ -44,29 +44,29 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    ! Set xb array range indices for processor subdomain.
    !---------------------------------------------------------------------------
 
-   is = xp % its
-   ie = xp % ite
-   js = xp % jts
-   je = xp % jte
-   ks = xp % kts
-   ke = xp % kte
+   is = grid%xp % its
+   ie = grid%xp % ite
+   js = grid%xp % jts
+   je = grid%xp % jte
+   ks = grid%xp % kts
+   ke = grid%xp % kte
 
-   xb % ds    = grid%dx
-   xb % kma_a = grid%kma_a
-   xb % kma_b = grid%kma_b
+   grid%xb % ds    = grid%dx
+   grid%xb % kma_a = grid%kma_a
+   grid%xb % kma_b = grid%kma_b
 
    if(print_detail_xb) then
      write(UNIT=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
 
      do k=ks,ke
-        write(UNIT=stdout, fmt='(i3,8e20.12)') k, xb%kma_a(k), xb%kma_b(k)
+        write(UNIT=stdout, fmt='(i3,8e20.12)') k, grid%xb%kma_a(k), grid%xb%kma_b(k)
      enddo
    endif
 
-   xb % mix = xp % ide - xp % ids + 1
-   xb % mjy = xp % jde - xp % jds + 1
-   xb % mkz = xp % kde - xp % kds + 1
+   grid%xb % mix = grid%xp % ide - grid%xp % ids + 1
+   grid%xb % mjy = grid%xp % jde - grid%xp % jds + 1
+   grid%xb % mkz = grid%xp % kde - grid%xp % kds + 1
 
    !---------------------------------------------------------------------------
    ! KMA-specific fields:
@@ -78,20 +78,20 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    tis0 = 0.0
    tlp  = 0.0
 
-   xb % ptop = ptop
-   xb % ps0  = ps0
-   xb % tlp  = tlp
+   grid%xb % ptop = ptop
+   grid%xb % ps0  = ps0
+   grid%xb % tlp  = tlp
       
    !---------------------------------------------------------------------------
    ! Convert KMA fields to xb:
    !---------------------------------------------------------------------------
 
-   xb%lat(is:ie,js:je) =  xlat(is:ie,js:je)
-   xb%lon(is:ie,js:je) = xlong(is:ie,js:je)
+   grid%xb%lat(is:ie,js:je) =  grid%xlat(is:ie,js:je)
+   grid%xb%lon(is:ie,js:je) = grid%xlong(is:ie,js:je)
 
    ! Fill halo region for u and v.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
-   tmpvar  = 1.0/real(xp%ide-xp%ids+1)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+   tmpvar  = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
    !---------------------------------------------------------------
    ! transfer u,v,t & q(specific humidity in g/g)
@@ -100,10 +100,10 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            xb%u(i,j,k) = u_2(i,j,k)
-            xb%v(i,j,k) = v_2(i,j,k)
-            xb%t(i,j,k) = t_2(i,j,k)
-            xb%q(i,j,k) = moist(i,j,k,P_QV)
+            grid%xb%u(i,j,k) = grid%em_u_2(i,j,k)
+            grid%xb%v(i,j,k) = grid%em_v_2(i,j,k)
+            grid%xb%t(i,j,k) = grid%em_t_2(i,j,k)
+            grid%xb%q(i,j,k) = moist(i,j,k,P_QV)
          end do
       end do
    end do
@@ -113,79 +113,79 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    !---------------------------------------------------------------------------
 
 #ifndef DEREF_KLUDGE
-    call da_get_vpoles(xb%u,xb%v,xb%lon,          &
-       xp%ids,xp%ide,xp%jds,xp%jde,xp%kds,xp%kde, &
-       xp%ims,xp%ime,xp%jms,xp%jme,xp%kms,xp%kme, &
-       xp%its,xp%ite,xp%jts,xp%jte,xp%kts,xp%kte  )
+    call da_get_vpoles(grid%xb%u,grid%xb%v,grid%xb%lon,          &
+       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
+       grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
+       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 #else
-    call da_get_vpoles(xb%u(xp%ims,xp%jms,xb%kms),&
-                       xb%v(xp%ims,xp%jms,xb%kms),&
-                       xb%lon(xp%ims,xp%jms),     &
-       xp%ids,xp%ide,xp%jds,xp%jde,xp%kds,xp%kde, &
-       xp%ims,xp%ime,xp%jms,xp%jme,xp%kms,xp%kme, &
-       xp%its,xp%ite,xp%jts,xp%jte,xp%kts,xp%kte  )
+    call da_get_vpoles(grid%xb%u(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
+                       grid%xb%v(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
+                       grid%xb%lon(grid%xp%ims,grid%xp%jms),     &
+       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
+       grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
+       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 
 #endif
    if (print_detail_xb) then
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%its, xp%ite=', xp%its, xp%ite
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%jts, xp%jte=', xp%jts, xp%jte
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%kts, xp%kte=', xp%kts, xp%kte
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%ims, xp%ime=', xp%ims, xp%ime
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%jms, xp%jme=', xp%jms, xp%jme
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%kms, xp%kme=', xp%kms, xp%kme
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%ids, xp%ide=', xp%ids, xp%ide
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%jds, xp%jde=', xp%jds, xp%jde
-      WRITE(unit=stdout,FMT='(A,2I5)') 'xp%kds, xp%kde=', xp%kds, xp%kde
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kts, grid%xp%kte=', grid%xp%kts, grid%xp%kte
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
+      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%u, dim=1)=', size(xb%u, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%u, dim=2)=', size(xb%u, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%u, dim=3)=', size(xb%u, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%v, dim=1)=', size(xb%v, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%v, dim=2)=', size(xb%v, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xb%v, dim=3)=', size(xb%v, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=1)=', size(grid%xb%v, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%u, dim=1)=', size(xa%u, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%u, dim=2)=', size(xa%u, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%u, dim=3)=', size(xa%u, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%v, dim=1)=', size(xa%v, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%v, dim=2)=', size(xa%v, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(xa%v, dim=3)=', size(xa%v, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=1)=', size(grid%xa%v, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(u_2, dim=1)=', size(u_2, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(u_2, dim=2)=', size(u_2, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(u_2, dim=3)=', size(u_2, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(v_2, dim=1)=', size(v_2, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(v_2, dim=2)=', size(v_2, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(v_2, dim=3)=', size(v_2, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
+      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
    endif
 
    ALPHA(ke) = LOG(2.0)                                           
 
    do j=js,je
       do i=is,ie
-         xb%cori(i,j) = f(i,j)
-         xb%psfc(i,j) = psfc(i,j)
-         xb%terr(i,j) = ht(i,j)
+         grid%xb%cori(i,j) = grid%f(i,j)
+         grid%xb%psfc(i,j) = grid%psfc(i,j)
+         grid%xb%terr(i,j) = grid%ht(i,j)
 
          ! Zhiquan Liu add some RTTOV variables
          !--------------------------------------
-         xb%t2(i,j) = t2(i,j)
-         xb%q2(i,j) = q2(i,j)
-         xb%u10(i,j) = u10(i,j)
-         xb%v10(i,j) = v10(i,j)
-         xb%tsk(i,j) = sst(i,j)
-         xb%landmask(i,j) = landmask(i,j)
-         xb%xland(i,j) = xland(i,j)
+         grid%xb%t2(i,j) = grid%t2(i,j)
+         grid%xb%q2(i,j) = grid%q2(i,j)
+         grid%xb%u10(i,j) = grid%u10(i,j)
+         grid%xb%v10(i,j) = grid%v10(i,j)
+         grid%xb%tsk(i,j) = grid%sst(i,j)
+         grid%xb%landmask(i,j) = grid%landmask(i,j)
+         grid%xb%xland(i,j) = grid%xland(i,j)
 
-         xb%smois(i,j) = smois(i,j,1)
-         xb%tslb(i,j) = tslb(i,j,1)
-         xb%xice(i,j) = xice(i,j)
-         xb%ivgtyp(i,j) = ivgtyp(i,j)
-         xb%isltyp(i,j) = isltyp(i,j)
-         xb%vegfra(i,j) = vegfra(i,j)
-         xb%snowh(i,j) = snowh(i,j)
+         grid%xb%smois(i,j) = grid%smois(i,j,1)
+         grid%xb%tslb(i,j) = grid%tslb(i,j,1)
+         grid%xb%xice(i,j) = grid%xice(i,j)
+         grid%xb%ivgtyp(i,j) = grid%ivgtyp(i,j)
+         grid%xb%isltyp(i,j) = grid%isltyp(i,j)
+         grid%xb%vegfra(i,j) = grid%vegfra(i,j)
+         grid%xb%snowh(i,j) = grid%snowh(i,j)
          ! convert snow water equivalent kg/m2 to snow depth(mm)
-         xb%snowh(i,j) = snow(i,j)*10. 
+         grid%xb%snowh(i,j) = grid%snow(i,j)*10. 
 
          !---------------------------------------------------------------------
          !  Syed RH Rizvi
@@ -197,52 +197,52 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          !---------------------------------------------------------------------
 
 #if 0
-         xb%tgrn(i,j) = sst(i,j)
-         if (xb%tgrn(i,j) < 100.0) xb%tgrn(i,j) = tmn(i,j)
-         xb%lanu(i,j)     = lu_index(i,j)
-         xb%landmask(i,j) = landmask(i,j)
-         xb%xland(i,j) = xland(i,j)
-         xb%snow(i,j)     = snowc(i,j)
+         grid%xb%tgrn(i,j) = grid%sst(i,j)
+         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
+         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
+         grid%xb%landmask(i,j) = grid%landmask(i,j)
+         grid%xb%xland(i,j) = grid%xland(i,j)
+         grid%xb%snow(i,j)     = grid%snowc(i,j)
 #endif 
 
          ! Since data is on full levels get full level pr & ht.
          ! Note p = A + B * Psfc formula needs Psfc to be in hPa 
 
          DO K = ks,ke-1    
-            PU  = xb%KMA_A(K+1) + xb%KMA_B(K+1)*xb%psfc(i,j)/100.0
-            PD  = xb%KMA_A(K  ) + xb%KMA_B(K  )*xb%psfc(i,j)/100.0
+            PU  = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(i,j)/100.0
+            PD  = grid%xb%KMA_A(K  ) + grid%xb%KMA_B(K  )*grid%xb%psfc(i,j)/100.0
             if (PU == PD )then
                errmsg(1)='PU, PD equal and so denominator will be zero'
                write(unit=errmsg(2),FMT='(A,3I5)') ' i, j, k = ',i,j,k
                write(unit=errmsg(3),FMT='(A,2F10.2)') &
-                  ' KMA_A ',KMA_A(k),KMA_A(K+1)
+                  ' KMA_A ',grid%KMA_A(k),grid%KMA_A(K+1)
                write(unit=errmsg(4),FMT='(A,2F10.2)') &
-                  ' KMA_B ',KMA_B(k),KMA_B(K+1)
+                  ' KMA_B ',grid%KMA_B(k),grid%KMA_B(K+1)
                write(unit=errmsg(5),FMT='(A,2F10.2)') &
-                  ' psfc(Pa) = ',xb%psfc(i,j)
+                  ' psfc(Pa) = ',grid%xb%psfc(i,j)
                call da_error(__FILE__,__LINE__,errmsg(1:5))
             end if
-            xb%p(i,j,k)= 100.0 * exp ( ( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.0 )
+            grid%xb%p(i,j,k)= 100.0 * exp ( ( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.0 )
          END DO 
  
-         xb%p(i,j,ke) = 100.0*(xb%KMA_A(ke)+xb%KMA_B(ke)*xb%psfc(i,j)/100.0)/2.0
+         grid%xb%p(i,j,ke) = 100.0*(grid%xb%KMA_A(ke)+grid%xb%KMA_B(ke)*grid%xb%psfc(i,j)/100.0)/2.0
 
          do k=ks,ke
-            if (xb%t(i,j,k) <= 0.0 ) then
+            if (grid%xb%t(i,j,k) <= 0.0 ) then
                write(unit=errmsg(1),FMT='(A,3I5,F10.2)') &
-                  'Problem in  temp = ',i,j,k,xb%t(i,j,k)   
+                  'Problem in  temp = ',i,j,k,grid%xb%t(i,j,k)   
                call da_error(__FILE__,__LINE__,errmsg(1:1))
             end if
 
-            xb%rho(i,j,k)=xb%p(i,j,k)/( gas_constant*  &
-               (1.0+COEF*xb%q(I,J,K))*xb%t(I,J,K) )   
+            grid%xb%rho(i,j,k)=grid%xb%p(i,j,k)/( gas_constant*  &
+               (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K) )   
          enddo
 
          ! compute full level height
 
          DO K = ks,ke    
-            PHALF(K) = xb%KMA_A(K) + xb%KMA_B(K)*xb%psfc(I,J)/100.0                             
-            TV   (K) = (1.0+COEF*xb%q(I,J,K))*xb%t(I,J,K)*rgasg    
+            PHALF(K) = grid%xb%KMA_A(K) + grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0                             
+            TV   (K) = (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K)*rgasg    
          ENDDO                                                           
 
          DO K = ks,ke-1                                              
@@ -251,15 +251,15 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
             ALPHA(K) = 1.0-PHALF(K+1)*PHALFL(K)/DELP                     
          ENDDO  
 
-         SHGT = xb%terr(i,j)
+         SHGT = grid%xb%terr(i,j)
          DO K = ks, ke                                               
-            xb%h(I,J,K) = SHGT + ALPHA(K)*TV(K)                           
+            grid%xb%h(I,J,K) = SHGT + ALPHA(K)*TV(K)                           
          ENDDO 
 
          HYDRO = 0.0                                                    
          DO K = ks+1, ke
             HYDRO = HYDRO + TV(K-1)*PHALFL(K-1)                           
-            xb%h(I,J,K) = xb%h(I,J,K) + HYDRO                             
+            grid%xb%h(I,J,K) = grid%xb%h(I,J,K) + HYDRO                             
          ENDDO                                                        
       END DO
    END DO
@@ -271,30 +271,30 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    !                    and level wise pressure
    !---------------------------------------------------------------------------
 
-   tmp_ps = sum(xb%psfc(is:ie,js:je)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
+   tmp_ps = sum(grid%xb%psfc(is:ie,js:je)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
 
    tmpps = wrf_dm_sum_real( tmp_ps )
 
    do k=ks,ke
-      tmp_p = sum(xb%p(is:ie,js:je,k)) /real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))
+      tmp_p = sum(grid%xb%p(is:ie,js:je,k)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
       tmpp = wrf_dm_sum_real( tmp_p )
 
       ! 0.01 is added to see that sigmah should not become negative
-      xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
-      if (xb%sigmah(ke+ks-k) < 0.0) then
+      grid%xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
+      if (grid%xb%sigmah(ke+ks-k) < 0.0) then
          write(unit=errmsg(1),FMT='(A,F10.2)') &
             ' average surface pressure = ',tmpps  
          write(unit=errmsg(2),FMT='(A,I5,F10.2)') &
             ' average pressure at this level= ',k,' = ',tmpp  
          write(unit=errmsg(3),FMT='(A,F10.2)') &
-            ' negative sigmah(',ke+ks-k,') = ',xb%sigmah(ke+ks-k) 
+            ' negative sigmah(',ke+ks-k,') = ',grid%xb%sigmah(ke+ks-k) 
          call da_error(__FILE__,__LINE__,errmsg(1:3))
       end if
    end do
    
    ! Fix ztop
    
-   xb%ztop = xb%h(is,js,ke)
+   grid%xb%ztop = grid%xb%h(is,js,ke)
 
    if (print_detail_xb) then
       write(UNIT=stdout, fmt='(/5a/)') &
@@ -302,26 +302,26 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
       do k=ks,ke
          write(UNIT=stdout, fmt='(i3,8e20.12)') k, &
-            xb%h(is,js,k), xb%p(is,js,k), xb%t(is,js,k)
+            grid%xb%h(is,js,k), grid%xb%p(is,js,k), grid%xb%t(is,js,k)
       enddo
 
       write (unit=stdout,FMT='(A)') ' '
-      write (unit=stdout,FMT='(A,I5)') 'xb%u(is,je,ke)=', xb%u(is,je,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%v(ie,js,ke)=', xb%v(ie,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%w(is,js,ke)=', xb%w(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%t(is,js,ke)=', xb%t(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%p(is,js,ke)=', xb%p(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%q(is,js,ke)=', xb%q(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%hf(is,js,ke)=', xb%hf(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'xb%map_factor(is,js)=', xb%map_factor(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%cori(is,js)=', xb%cori(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%tgrn(is,js)=', xb%tgrn(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%lat(is,js)=', xb%lat(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%lon(is,js)=', xb%lon(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%terr(is,js)=', xb%terr(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%snow(is,js)=', xb%snow(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%lanu(is,js)=', xb%lanu(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'xb%landmask(is,js)=', xb%landmask(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%v(ie,js,ke)=', grid%xb%v(ie,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%w(is,js,ke)=', grid%xb%w(is,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%t(is,js,ke)=', grid%xb%t(is,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%p(is,js,ke)=', grid%xb%p(is,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%q(is,js,ke)=', grid%xb%q(is,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%hf(is,js,ke)=', grid%xb%hf(is,js,ke)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%map_factor(is,js)=', grid%xb%map_factor(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%cori(is,js)=', grid%xb%cori(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%tgrn(is,js)=', grid%xb%tgrn(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lat(is,js)=', grid%xb%lat(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lon(is,js)=', grid%xb%lon(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%terr(is,js)=', grid%xb%terr(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%snow(is,js)=', grid%xb%snow(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lanu(is,js)=', grid%xb%lanu(is,js)
+      write (unit=stdout,FMT='(A,I5)') 'grid%xb%landmask(is,js)=', grid%xb%landmask(is,js)
       write (unit=stdout,FMT='(A)') ' '
    endif
 
@@ -346,11 +346,11 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 !
   xbx % mminlu = 'USGS'
 !------------------------------------------------------------------------------
-  call da_roughness_from_lanu(19, xbx % mminlu, current_date, xp, &
+  call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
 #ifdef DEREF_KLUDGE
-                            xb % lanu(xp%ims,xp%jms), xb % rough(xp%ims,xp%jms))
+                            grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
 #else
-                            xb % lanu, xb % rough)
+                            grid%xb % lanu, grid%xb % rough)
 #endif
 !------------------------------------------------------------------------------
 !
@@ -358,23 +358,23 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 !------------------------------------------------------------------------------
    do j=js,je
    do i=is,ie
-      if( xb%ztop < xb%hf(i,j,ke+1) ) xb%ztop = xb%hf(i,j,ke+1)
+      if( grid%xb%ztop < grid%xb%hf(i,j,ke+1) ) grid%xb%ztop = grid%xb%hf(i,j,ke+1)
 !------------------------------------------------------------------------------
 ! Calculate grid_box area and vertical inner product for use in vertical transform:
 !------------------------------------------------------------------------------
-      xb % grid_box_area(i,j) = earth_radius_sq * cos(xlat(i,j)*conv)
+      grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
    IF ( vertical_ip == 1 ) THEN
 
 !     Vertical inner product is SQRT(Delta p):
-      DO k=1,xb%mkz
-      xb % vertical_inner_product(i,j,k) = SQRT(xb%p(i,j,k)-xb%p(i,j,k+1))
+      DO k=1,grid%xb%mkz
+      grid%xb % vertical_inner_product(i,j,k) = SQRT(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
       END DO
 
    ELSE IF ( vertical_ip == 2 ) THEN
 
 !     Vertical inner product is Delta p:
-      DO k=1,xb%mkz
-      xb % vertical_inner_product(i,j,k) = xb%p(i,j,k)-xb%p(i,j,k+1)
+      DO k=1,grid%xb%mkz
+      grid%xb % vertical_inner_product(i,j,k) = grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1)
       END DO
 
    END IF
@@ -388,16 +388,16 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 #if 0
 !------------------------------------------------------------------------------
 
-      call da_sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
-                   xb%p(i,j,ks), xb%t(i,j,ks), xb%q(i,j,ks), &
-                   xb%u(i,j,ks), xb%v(i,j,ks), &
-                   xb%p(i,j,ks+1), xb%t(i,j,ks+1), xb%q(i,j,ks+1), &
-                   xb%h(i,j,ks), xb%rough(i,j),xb%landmask(i,j), &
-                   xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
-                   xb%regime(i,j))
+      call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
+                   grid%xb%p(i,j,ks), grid%xb%t(i,j,ks), grid%xb%q(i,j,ks), &
+                   grid%xb%u(i,j,ks), grid%xb%v(i,j,ks), &
+                   grid%xb%p(i,j,ks+1), grid%xb%t(i,j,ks+1), grid%xb%q(i,j,ks+1), &
+                   grid%xb%h(i,j,ks), grid%xb%rough(i,j),grid%xb%landmask(i,j), &
+                   grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
+                   grid%xb%regime(i,j))
 
       write (UNIT=stdout,FMT='(7I5)') &
-         i,j,xb%psfc(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
+         i,j,grid%xb%psfc(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
 !------------------------------------------------------------------------------
 !
 # endif
@@ -410,8 +410,8 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    do j=js,je
    do k=ks,ke
    do i=is,ie
-      call da_tpq_to_rh( xb % t(i,j,k), xb % p(i,j,k), xb % q(i,j,k), &
-                         xb %es(i,j,k), xb %qs(i,j,k), xb %rh(i,j,k) )
+      call da_tpq_to_rh( grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
+                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k) )
    end do
    end do
    end do
@@ -421,21 +421,21 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 
 #ifdef DEREF_KLUDGE
-   call da_trh_to_td(xb % rh(xp%ims,xp%jms,xp%kms), &
-                     xb %  t(xp%ims,xp%jms,xp%kms), &
-                     xb % td(xp%ims,xp%jms,xp%kms), xp)
+   call da_trh_to_td(grid%xb % rh(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
+                     grid%xb %  t(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
+                     grid%xb % td(grid%xp%ims,grid%xp%jms,grid%xp%kms), grid%xp)
 #else
-   call da_trh_to_td(xb % rh, xb % t, xb % td, xp)
+   call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
 #endif
 
    if (print_detail_xb) then
       i=is; j=js; k=ks
 
       write (unit=stdout,fmt='(A,3I5)') 'i,j,k=', i,j,k
-      write (unit=stdout,fmt='(A,F10.2)') 'xb % td(i,j,k)=', xb % td(i,j,k)
-      write (unit=stdout,fmt='(A,F10.2)') 'xb % es(i,j,k)=', xb % es(i,j,k)
-      write (unit=stdout,fmt='(A,F10.2)') 'xb % rh(i,j,k)=', xb % rh(i,j,k)
-      write (unit=stdout,fmt='(A,F10.2)') 'xb % qs(i,j,k)=', xb % qs(i,j,k)
+      write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % td(i,j,k)=', grid%xb % td(i,j,k)
+      write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % es(i,j,k)=', grid%xb % es(i,j,k)
+      write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % rh(i,j,k)=', grid%xb % rh(i,j,k)
+      write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % qs(i,j,k)=', grid%xb % qs(i,j,k)
       write (unit=stdout,fmt='(A)') ' '
    endif
 
@@ -458,12 +458,12 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 ! for calculating roughness length if sea level pressure is desired
 !
 #if 0
-   call da_wrf_tpq_2_slp ( xb )
+   call da_wrf_tpq_2_slp ( grid%xb )
 !------------------------------------------------------------------------------
 !
 #endif
 !------------------------------------------------------------------------------
-   call da_integrat_dz( xb )
+   call da_integrat_dz( grid%xb )
 !------------------------------------------------------------------------------
 !  Syed RH Rizvi
 ! 
@@ -486,14 +486,14 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    tmpvar = log(10./0.0001)
    do j=js,je
    do i=is,ie
-      if(xb%hf(i,j,ks) <= 0) then
+      if(grid%xb%hf(i,j,ks) <= 0) then
       print*,' zero hf at i/j ',i,j,' ks= ',ks
       stop
       end if
-      rgh_fac(i,j) = 1.0/log(xb%hf(i,j,ks)/0.0001)
+      rgh_fac(i,j) = 1.0/log(grid%xb%hf(i,j,ks)/0.0001)
 
-      xb%speed(i,j) = sqrt(xb%u(i,j,ks)*xb%u(i,j,ks) &
-                         + xb%v(i,j,ks)*xb%v(i,j,ks) + 1.0e-6) &
+      grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
+                         + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
                     *tmpvar*rgh_fac(i,j)
    enddo
    enddo
@@ -528,30 +528,30 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 !--Calculate means for later use in setting up background errors.
 !------------------------------------------------------------------------------
-   allocate ( xbx % latc_mean(xp%jds:xp%jde) )
+   allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
 
-   tmpvar = 1.0/real(xp%ide-xp%ids+1)
+   tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
    loc_latc_mean(:) = 0.0
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
    IF ( testing_dm_exact ) THEN
-      ALLOCATE( arrayglobal( xp%ids:xp%ide, xp%jds:xp%jde ) )
-      call da_wv_patch_to_global( xb%lat, arrayglobal, xp%domdesc, &
-                               xp%ids, xp%ide, xp%jds, xp%jde,  &
-                               xp%ims, xp%ime, xp%jms, xp%jme,  &
-                               xp%its, xp%ite, xp%jts, xp%jte )
-      do j=xp%jds,xp%jde
-         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(xp%ids:xp%ide, j) )
+      ALLOCATE( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
+      call da_wv_patch_to_global( grid%xb%lat, arrayglobal, grid%xp%domdesc, &
+                               grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
+                               grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
+                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
+      do j=grid%xp%jds,grid%xp%jde
+         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
       enddo
       DEALLOCATE( arrayglobal )
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real( loc_latc_mean, (xp%jde-xp%jds+1) )
+      call wrf_dm_bcast_real( loc_latc_mean, (grid%xp%jde-grid%xp%jds+1) )
       xbx % latc_mean = loc_latc_mean
    ELSE
       do j=js,je
-         loc_latc_mean(j) = tmpvar*SUM( xb % lat(is:ie, j) )
+         loc_latc_mean(j) = tmpvar*SUM( grid%xb % lat(is:ie, j) )
       enddo
       call wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
    ENDIF
@@ -560,7 +560,7 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
     write(UNIT=stdout,FMT=*) 'js je is ie= ', js,je,is,ie
 !   do j=js,je
 !     do i=is,ie
-!       write(UNIT=stdout,FMT='(2i4,3f12.2,e12.4,2f12.2)') j,i,xb%psfc(i,j),xb%tsk(i,j),xb%t2(i,j),xb%q2(i,j),xb%u10(i,j),xb%v10(i,j)
+!       write(UNIT=stdout,FMT='(2i4,3f12.2,e12.4,2f12.2)') j,i,grid%xb%psfc(i,j),grid%xb%tsk(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
 !     end do
 !   end do
 

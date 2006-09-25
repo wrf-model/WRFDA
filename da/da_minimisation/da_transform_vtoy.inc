@@ -44,7 +44,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
    if (var4d) then
       call da_transfer_xatowrftl( grid, config_flags, 'tl01', &
-#include "em_actual_args.inc"
+#include "em_actual_new_args.inc"
                                  )
 
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
@@ -79,7 +79,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
          iv%current_ob_time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_transfer_wrftltoxa( grid, config_flags, filnam, &
-#include "em_actual_args.inc"
+#include "em_actual_new_args.inc"
                                  )
          call da_transform_xtoy( xb, iv, xa, xp, y )
       enddo

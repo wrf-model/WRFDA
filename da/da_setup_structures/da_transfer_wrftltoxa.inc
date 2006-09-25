@@ -1,5 +1,5 @@
 subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
    ! Definitions of dummy arguments to solve
 
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    ! Local variables
 
@@ -24,7 +24,7 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    integer :: is, ie, js, je, ks, ke
 
    real    :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: g_press
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: g_press
 
    integer ndynopt
 
@@ -34,12 +34,12 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    ! [0.0] INPUT
    !---------------------------------------------------------------------------
 
-   is=xp%its
-   ie=xp%ite
-   js=xp%jts
-   je=xp%jte
-   ks=xp%kts
-   ke=xp%kte
+   is=grid%xp%its
+   ie=grid%xp%ite
+   js=grid%xp%jts
+   je=grid%xp%jte
+   ks=grid%xp%kts
+   ke=grid%xp%kte
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL
@@ -57,7 +57,7 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      xa%q(i,j,k)=g_moist(i,j,k,P_QV)*(1.0-xb%q(i,j,k))**2
+      grid%xa%q(i,j,k)=g_moist(i,j,k,P_QV)*(1.0-grid%xb%q(i,j,k))**2
    enddo
    enddo
    enddo
@@ -71,10 +71,10 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       sdmd=0.0
       s1md=0.0
       do k=ks,ke
-         sdmd=sdmd+g_moist(i,j,k,P_QV)*dnw(k)
-         s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
+         sdmd=sdmd+g_moist(i,j,k,P_QV)*grid%em_dnw(k)
+         s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
       enddo
-      xa%psfc(i,j)=-xb%psac(i,j)*sdmd-g_mu_2(i,j)*s1md
+      grid%xa%psfc(i,j)=-grid%xb%psac(i,j)*sdmd-grid%em_g_mu_2(i,j)*s1md
    enddo
    enddo
 
@@ -87,9 +87,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       g_press(i,j,ke+1)=0.0
       do k=ke,ks,-1
          g_press(i,j,k)=g_press(i,j,k+1) &
-                 -(g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
-                 +(mu_2(i,j)+mub(i,j))*g_moist(i,j,k,P_QV))*dn(k)
-         xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+                 -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
+                 +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_moist(i,j,k,P_QV))*grid%em_dn(k)
+         grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
       enddo
    enddo
    enddo
@@ -101,8 +101,8 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      xa%t(i,j,k)=xb%t(i,j,k)*(g_t_2(i,j,k)/(300.0+t_2(i,j,k)) &
-                         +kappa*xa%p(i,j,k)/xb%p(i,j,k))
+      grid%xa%t(i,j,k)=grid%xb%t(i,j,k)*(grid%em_g_t_2(i,j,k)/(300.0+grid%em_t_2(i,j,k)) &
+                         +kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
    enddo
    enddo
    enddo
@@ -115,13 +115,13 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    !-------------------------------------------------------------------------
 
    ! Fill the halo region for u and v.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
 
    do k=ks,ke
    do j=js,je
    do i=is,ie
-      xa%u(i,j,k)=0.5*(g_u_2(i+1,j  ,k)+g_u_2(i,j,k))
-      xa%v(i,j,k)=0.5*(g_v_2(i  ,j+1,k)+g_v_2(i,j,k))
+      grid%xa%u(i,j,k)=0.5*(grid%em_g_u_2(i+1,j  ,k)+grid%em_g_u_2(i,j,k))
+      grid%xa%v(i,j,k)=0.5*(grid%em_g_v_2(i  ,j+1,k)+grid%em_g_v_2(i,j,k))
    enddo
    enddo
    enddo
@@ -133,7 +133,7 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do j=js,je
    do k=ks,ke+1
    do i=is,ie
-      xa%w(i,j,k)=g_w_2(i,j,k)
+      grid%xa%w(i,j,k)=grid%em_g_w_2(i,j,k)
    enddo
    enddo
    enddo
@@ -144,8 +144,8 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
-         xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
+         grid%xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
+         grid%xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
       enddo
       enddo
       enddo
@@ -155,8 +155,8 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
-         xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
+         grid%xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
+         grid%xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
       enddo
       enddo
       enddo
@@ -166,7 +166,7 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do k=ks,ke
       do j=js,je
       do i=is,ie
-         xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
+         grid%xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
       enddo
       enddo
       enddo

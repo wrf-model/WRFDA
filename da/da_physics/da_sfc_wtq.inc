@@ -90,10 +90,8 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    rcp = gas_constant/cp
 
    ! 1 Compute the roughness length based upon season and land use 
-   ! =====================================
 
-   ! 1.1 Define the rouhness length
-   !     -----------------
+   ! 1.1 Define the roughness length
 
    z0 = roughness
 
@@ -117,62 +115,48 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
 
    ! 2. Calculate the virtual temperature
-   ! =====================================
 
    ! 2.1 Compute Virtual temperature on the lowest half sigma level
-   !     ---------------------------------------------------------
 
    tvs  = ts * (1. + 0.608 * qs)
 
    ! 2.2 Compute Virtual temperature on the second lowest half sigma level
-   !     -----------------------------------------------------------------
 
    tvs2  = ts2 * (1. + 0.608 * qs2)
 
    ! 2.3 Convert ground virtual temperature assuming it's saturated
-   !     ----------------------------------------------------------
 
    call da_tp_to_qs( tg, psfc, eg, qg )
    tvg  = tg * (1. + 0.608 * qg)
 
    ! 3.  Compute the potential temperature
-   ! ======================================
 
    ! 3.1 Potential temperature on the lowest half sigma level
-   !     ----------------------------------------------------
 
    ths  = ts * (1000. / (ps/100.)) ** rcp
 
    ! 3.2 Potential temperature at the ground
-   !     -----------------------------------
 
    thg  = tg * (1000. / (psfc/100.)) ** rcp
 
-
    ! 4. Virtual potential temperature
-   ! ==================================
 
    ! 4.1 Virtual potential temperature on the lowest half sigma level
-   !     ------------------------------------------------------------
 
    thvs = tvs * (1000. / (ps/100.)) ** rcp
 
    ! 4.2 Virtual potential temperature on the second lowest half sigma level
-   !     ------------------------------------------------------------------
 
    thvs2 = tvs2 * (1000. / (ps2/100.)) ** rcp
 
    ! 4.3 Virtual potential temperature at ground
-   !     ---------------------------------------
 
    thvg = tvg * (1000. / (psfc/100.)) ** rcp
 
 
    ! 5.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
-   ! =================================================
 
    ! 5.1 Velocity
-   !     --------
    
    !     Wind speed:
 
@@ -189,12 +173,10 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    V2  = Va2 + Vc2
 
    ! 5.2 Bulk richardson number
-   !     ----------------------
 
    rib = (gravity * hs / ths) * (thvs - thvg) / V2
 
    ! 6.  CALCULATE PSI BASED UPON REGIME
-   ! =======================================
 
 
    IF (rib .GE. 0.2) THEN
@@ -213,7 +195,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    ELSE IF ((rib .LT. 0.2) .AND. (rib .GT. 0.)) THEN
       ! 6.2 Mechanically driven turbulence (REGIME 2)
-      !     ------------------------------------------
 
       regime = 2.1
       psim = ( -5. * rib ) * gzsoz0 / (1.1 - 5.*rib)
@@ -229,7 +210,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    ELSE IF ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) THEN
       ! 6.3 Unstable Forced convection (REGIME 3)
-      !     -------------------------------------
+
       regime = 3.1
       psim = 0.
       psimz = 0.
@@ -240,7 +221,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    ELSE 
       ! 6.4 Free convection (REGIME 4)
-      !     --------------------------
       regime = 4.1
 
       ! Calculate psi m and pshi h using iteration method
@@ -252,7 +232,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       ! do k = 1 , k_iteration
 
       ! 6.4.1  Calculate   ust, m/L (mol), h/L (hol)
-      !        --------------------------
 
       ! Friction speed
 
@@ -271,7 +250,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       endif
 
       ! 6.4.2  Calculate n, nz, R, Rz
-      !        --------------------------
 
       hol = min(hol,0.)
       hol = max(hol,-10.)
@@ -285,7 +263,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       hol2 = max(hol2,-10.)
 
       ! 6.4.3 Calculate Psim & psih
-      !        --------------------------
 
       !       Using the look-up table:
       !          nn = int( -100. * hol )
@@ -323,7 +300,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       ! enddo 
 
       ! 6.4.4 Define the limit value for psim & psih
-      !        --------------------------
 
       psim = min(psim,0.9*gzsoz0)
       psimz = min(psimz,0.9*gz10oz0)
@@ -334,7 +310,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    ENDIF  ! Regime
 
    ! 7.  CALCULATE PSI FOR WIND, TEMPERATURE AND MOISTURE
-   ! =======================================
 
    psiw = gzsoz0 - psim
    psiz = gz10oz0 - psimz
@@ -348,7 +323,6 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
 
    ! 8.  CALCULATE 10M WIND, 2M TEMPERATURE AND MOISTURE
-   ! =======================================
 
    u10 = us * psiz / psiw
    v10 = vs * psiz / psiw

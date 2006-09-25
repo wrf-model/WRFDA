@@ -1,5 +1,5 @@
 subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                            )
 
    !---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    character*4 filnam
 
@@ -31,12 +31,12 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
       if (write_increments .and. var4d ) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
          call da_transfer_xatowrftl( grid, config_flags, filnam, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                                  )
       endif
 
       call da_transfer_xatowrf( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                            )
 
       if (it < max_ext_its) then
@@ -45,20 +45,20 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
          endif
 
          call da_transfer_wrftoxb( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                           )
       endif
    else if (fg_format == 2) then
       if(it < max_ext_its) then
-         call da_add_increments(it, xp, xa, xb, xbx)
+         call da_add_increments(it, grid%xp, grid%xa, grid%xb, xbx)
       endif
    else if (fg_format == 3) then
       call da_transfer_xatokma( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                            )
       if (it < max_ext_its) then
          call da_transfer_kmatoxb( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                            )
       end if
    end if

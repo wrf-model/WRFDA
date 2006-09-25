@@ -5,7 +5,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
 #ifndef DEREF_KLUDGE
    INTERFACE
       subroutine da_solve ( grid , config_flags , &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
       )
 
       ! Driver layer modules
@@ -32,7 +32,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
       TYPE(domain),                INTENT(INOUT) :: grid
       TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
 
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
       end subroutine da_solve
    END INTERFACE
@@ -66,7 +66,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
 #endif
 
    call da_solve ( grid , config_flags , &
-#include "em_actual_args.inc"
+#include "em_actual_new_args.inc"
     )
 
    call da_trace_exit("da_wrfvar_interface")

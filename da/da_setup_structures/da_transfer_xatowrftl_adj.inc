@@ -1,5 +1,5 @@
 subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    ! Definitions of dummy arguments to solve
 
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    ! Local variables
 
@@ -27,18 +27,18 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
-   REAL, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) :: a_press
+   REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: a_press
 
    integer ndynopt
 
    IF (trace_use) call da_trace_entry("da_transfer_xatowrftl_adj")
 
-   is=xp%its
-   ie=xp%ite
-   js=xp%jts
-   je=xp%jte
-   ks=xp%kts
-   ke=xp%kte
+   is=grid%xp%its
+   ie=grid%xp%ite
+   js=grid%xp%jts
+   je=grid%xp%jte
+   ks=grid%xp%kts
+   ke=grid%xp%kte
 
    !---------------------------------------------------------------------------
    ! [7.0] Adjoint of OUTPUT (INPUT)
@@ -60,7 +60,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    do k=ks,ke+1
       do j=js,je
          do i=is,ie
-            xa%w(i,j,k)=a_w_2(i,j,k)
+            grid%xa%w(i,j,k)=grid%em_a_w_2(i,j,k)
          enddo
       enddo
    enddo
@@ -71,8 +71,8 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               xa%qcw(i,j,k)=a_moist(i,j,k,p_qcw)
-               xa%qrn(i,j,k)=a_moist(i,j,k,p_qrn)
+               grid%xa%qcw(i,j,k)=a_moist(i,j,k,p_qcw)
+               grid%xa%qrn(i,j,k)=a_moist(i,j,k,p_qrn)
             enddo
          enddo
       enddo
@@ -82,8 +82,8 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               xa%qci(i,j,k)=a_moist(i,j,k,p_qci)
-               xa%qsn(i,j,k)=a_moist(i,j,k,p_qsn)
+               grid%xa%qci(i,j,k)=a_moist(i,j,k,p_qci)
+               grid%xa%qsn(i,j,k)=a_moist(i,j,k,p_qsn)
             enddo
          enddo
       enddo
@@ -93,7 +93,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               xa%qgr(i,j,k)=a_moist(i,j,k,p_qgr) 
+               grid%xa%qgr(i,j,k)=a_moist(i,j,k,p_qgr) 
             enddo
          enddo
       enddo
@@ -107,13 +107,13 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    !---------------------------------------------------------------------------
 
    ! Fill the halo region for u and v.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            xa%u(i,j,k)=0.5*(a_u_2(i+1,j  ,k)+a_u_2(i,j,k))
-            xa%v(i,j,k)=0.5*(a_v_2(i  ,j+1,k)+a_v_2(i,j,k))
+            grid%xa%u(i,j,k)=0.5*(grid%em_a_u_2(i+1,j  ,k)+grid%em_a_u_2(i,j,k))
+            grid%xa%v(i,j,k)=0.5*(grid%em_a_v_2(i  ,j+1,k)+grid%em_a_v_2(i,j,k))
          enddo
       enddo
    enddo
@@ -121,46 +121,46 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 #ifdef DM_PARALLEL
 
    ! The western boundary
-   if (is == xp%ids) then
-      xa%u(is  ,js:je,ks:ke)=xa%u(is  ,js:je,ks:ke)+a_u_2(is,js:je,ks:ke)
-      xa%u(is+1,js:je,ks:ke)=xa%u(is+1,js:je,ks:ke)-a_u_2(is,js:je,ks:ke)/2.
+   if (is == grid%xp%ids) then
+      grid%xa%u(is  ,js:je,ks:ke)=grid%xa%u(is  ,js:je,ks:ke)+grid%em_a_u_2(is,js:je,ks:ke)
+      grid%xa%u(is+1,js:je,ks:ke)=grid%xa%u(is+1,js:je,ks:ke)-grid%em_a_u_2(is,js:je,ks:ke)/2.
    endif
 
    ! The eastern boundary
-   if (ie == xp%ide) then
-      xa%u(ie  ,js:je,ks:ke)=xa%u(ie  ,js:je,ks:ke)+a_u_2(ie+1,js:je,ks:ke)
-      xa%u(ie-1,js:je,ks:ke)=xa%u(ie-1,js:je,ks:ke)-a_u_2(ie+1,js:je,ks:ke)/2.
+   if (ie == grid%xp%ide) then
+      grid%xa%u(ie  ,js:je,ks:ke)=grid%xa%u(ie  ,js:je,ks:ke)+grid%em_a_u_2(ie+1,js:je,ks:ke)
+      grid%xa%u(ie-1,js:je,ks:ke)=grid%xa%u(ie-1,js:je,ks:ke)-grid%em_a_u_2(ie+1,js:je,ks:ke)/2.
    endif
 
    ! The southern boundary
-   if (js == xp%jds) then
-      xa%v(is:ie,js  ,ks:ke)=xa%v(is:ie,js  ,ks:ke)+a_v_2(is:ie,js,ks:ke)
-      xa%v(is:ie,js+1,ks:ke)=xa%v(is:ie,js+1,ks:ke)-a_v_2(is:ie,js,ks:ke)/2.
+   if (js == grid%xp%jds) then
+      grid%xa%v(is:ie,js  ,ks:ke)=grid%xa%v(is:ie,js  ,ks:ke)+grid%em_a_v_2(is:ie,js,ks:ke)
+      grid%xa%v(is:ie,js+1,ks:ke)=grid%xa%v(is:ie,js+1,ks:ke)-grid%em_a_v_2(is:ie,js,ks:ke)/2.
    endif
 
    ! The northern boundary
-   if (je == xp%jde) then
-      xa%v(is:ie,je  ,ks:ke)=xa%v(is:ie,je  ,ks:ke)+a_v_2(is:ie,je+1,ks:ke)
-      xa%v(is:ie,js-1,ks:ke)=xa%v(is:ie,je-1,ks:ke)-a_v_2(is:ie,je+1,ks:ke)/2.
+   if (je == grid%xp%jde) then
+      grid%xa%v(is:ie,je  ,ks:ke)=grid%xa%v(is:ie,je  ,ks:ke)+grid%em_a_v_2(is:ie,je+1,ks:ke)
+      grid%xa%v(is:ie,js-1,ks:ke)=grid%xa%v(is:ie,je-1,ks:ke)-grid%em_a_v_2(is:ie,je+1,ks:ke)/2.
    endif
 
 #else
 
    !The western boundary
-   xa%u(is  ,js:je,ks:ke)=xa%u(is  ,js:je,ks:ke)+a_u_2(is,js:je,ks:ke)
-   xa%u(is+1,js:je,ks:ke)=xa%u(is+1,js:je,ks:ke)-a_u_2(is,js:je,ks:ke)/2.
+   grid%xa%u(is  ,js:je,ks:ke)=grid%xa%u(is  ,js:je,ks:ke)+grid%em_a_u_2(is,js:je,ks:ke)
+   grid%xa%u(is+1,js:je,ks:ke)=grid%xa%u(is+1,js:je,ks:ke)-grid%em_a_u_2(is,js:je,ks:ke)/2.
 
    ! The eastern boundary
-   xa%u(ie  ,js:je,ks:ke)=xa%u(ie  ,js:je,ks:ke)+a_u_2(ie+1,js:je,ks:ke)
-   xa%u(ie-1,js:je,ks:ke)=xa%u(ie-1,js:je,ks:ke)-a_u_2(ie+1,js:je,ks:ke)/2.
+   grid%xa%u(ie  ,js:je,ks:ke)=grid%xa%u(ie  ,js:je,ks:ke)+grid%em_a_u_2(ie+1,js:je,ks:ke)
+   grid%xa%u(ie-1,js:je,ks:ke)=grid%xa%u(ie-1,js:je,ks:ke)-grid%em_a_u_2(ie+1,js:je,ks:ke)/2.
 
    ! The southern boundary
-   xa%v(is:ie,js  ,ks:ke)=xa%v(is:ie,js  ,ks:ke)+a_v_2(is:ie,js,ks:ke)
-   xa%v(is:ie,js+1,ks:ke)=xa%v(is:ie,js+1,ks:ke)-a_v_2(is:ie,js,ks:ke)/2.
+   grid%xa%v(is:ie,js  ,ks:ke)=grid%xa%v(is:ie,js  ,ks:ke)+grid%em_a_v_2(is:ie,js,ks:ke)
+   grid%xa%v(is:ie,js+1,ks:ke)=grid%xa%v(is:ie,js+1,ks:ke)-grid%em_a_v_2(is:ie,js,ks:ke)/2.
 
    ! The northern boundary
-   xa%v(is:ie,je  ,ks:ke)=xa%v(is:ie,je  ,ks:ke)+a_v_2(is:ie,je+1,ks:ke)
-   xa%v(is:ie,js-1,ks:ke)=xa%v(is:ie,je-1,ks:ke)-a_v_2(is:ie,je+1,ks:ke)/2.
+   grid%xa%v(is:ie,je  ,ks:ke)=grid%xa%v(is:ie,je  ,ks:ke)+grid%em_a_v_2(is:ie,je+1,ks:ke)
+   grid%xa%v(is:ie,js-1,ks:ke)=grid%xa%v(is:ie,je-1,ks:ke)-grid%em_a_v_2(is:ie,je+1,ks:ke)/2.
 
 #endif
 
@@ -173,13 +173,13 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    do k=ke,ks,-1
       do j=js,je
          do i=is,ie
-            rho_cgrid=-(ph_2(i,j,k+1)-ph_2(i,j,k))*a_ph_2(i,j,k+1)/xb%rho(i,j,k)
-            a_press(i,j,k  )=a_press(i,j,k  )+a_ph_2(i,j,k+1)/xb%rho(i,j,k)
-            a_press(i,j,k+1)=a_press(i,j,k+1)-a_ph_2(i,j,k+1)/xb%rho(i,j,k)
-            a_ph_2(i,j,k  ) =a_ph_2(i,j,k)   +a_ph_2(i,j,k+1)
-            xa%q(i,j,k)=-xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*xb%q(i,j,k))
-            xa%t(i,j,k)=-xb%rho(i,j,k)*rho_cgrid/xb%t(i,j,k)
-            xa%p(i,j,k)= xb%rho(i,j,k)*rho_cgrid/xb%p(i,j,k)
+            rho_cgrid=-(grid%em_ph_2(i,j,k+1)-grid%em_ph_2(i,j,k))*grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
+            a_press(i,j,k  )=a_press(i,j,k  )+grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
+            a_press(i,j,k+1)=a_press(i,j,k+1)-grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
+            grid%em_a_ph_2(i,j,k  ) =grid%em_a_ph_2(i,j,k)   +grid%em_a_ph_2(i,j,k+1)
+            grid%xa%q(i,j,k)=-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*grid%xb%q(i,j,k))
+            grid%xa%t(i,j,k)=-grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%t(i,j,k)
+            grid%xa%p(i,j,k)= grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
          enddo
       enddo
    enddo
@@ -187,8 +187,8 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    do k=ks,ke
       do j=js,je
          do i=is,ie 
-            xa%p(i,j,k)=xa%p(i,j,k)-(300.0+t_2(i,j,k))*kappa*a_t_2(i,j,k)/xb%p(i,j,k)
-            xa%t(i,j,k)=xa%t(i,j,k)+(300.0+t_2(i,j,k))*a_t_2(i,j,k)/xb%t(i,j,k)
+            grid%xa%p(i,j,k)=grid%xa%p(i,j,k)-(300.0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
+            grid%xa%t(i,j,k)=grid%xa%t(i,j,k)+(300.0+grid%em_t_2(i,j,k))*grid%em_a_t_2(i,j,k)/grid%xb%t(i,j,k)
          enddo
       enddo
    enddo
@@ -200,11 +200,11 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*xa%p(i,j,k)
-            a_press(i,j,k  )=a_press(i,j,k  )+0.5*xa%p(i,j,k)
-            xa%p(i,j,k)=0.
-            a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)-(mu_2(i,j)+mub(i,j))*a_press(i,j,k)*dn(k)
-            a_mu_2(i,j)=a_mu_2(i,j)-a_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*dn(k)
+            a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
+            a_press(i,j,k  )=a_press(i,j,k  )+0.5*grid%xa%p(i,j,k)
+            grid%xa%p(i,j,k)=0.
+            a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
+            grid%em_a_mu_2(i,j)=grid%em_a_mu_2(i,j)-a_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*grid%em_dn(k)
             a_press(i,j,k+1)=a_press(i,j,k+1)+a_press(i,j,k)
          enddo
       enddo
@@ -219,12 +219,12 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
          sdmd=0.0
          s1md=0.0
          do k=ks,ke
-            s1md=s1md+(1.0+moist(i,j,k,P_QV))*dnw(k)
+            s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
          enddo
-         sdmd=sdmd-xb%psac(i,j)*a_mu_2(i,j)/s1md
-         xa%psfc(i,j)=-a_mu_2(i,j)/s1md
+         sdmd=sdmd-grid%xb%psac(i,j)*grid%em_a_mu_2(i,j)/s1md
+         grid%xa%psfc(i,j)=-grid%em_a_mu_2(i,j)/s1md
          do k=ks,ke
-            a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)+sdmd*dnw(k)
+            a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)+sdmd*grid%em_dnw(k)
          enddo
       enddo
    enddo
@@ -236,7 +236,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            xa%q(i,j,k)=xa%q(i,j,k)+a_moist(i,j,k,P_QV)/(1.0-xb%q(i,j,k))**2
+            grid%xa%q(i,j,k)=grid%xa%q(i,j,k)+a_moist(i,j,k,P_QV)/(1.0-grid%xb%q(i,j,k))**2
          enddo
       enddo
    enddo

@@ -4,6 +4,8 @@ subroutine da_wrfvar_init( no_init1 )
    !     WRF initialization routine.
    !</DESCRIPTION>
 
+   IMPLICIT NONE
+
    LOGICAL, OPTIONAL, INTENT(IN) :: no_init1
 
    !<DESCRIPTION>
@@ -57,7 +59,7 @@ subroutine da_wrfvar_init( no_init1 )
    call initial_config
 #endif
 
-   ! Copy namelist variables to DA_Constants
+   ! Copy namelist variables to da_constants
 
 #define SOURCE_RECORD model_config_rec%
 #define DEST_RECORD
@@ -93,8 +95,10 @@ subroutine da_wrfvar_init( no_init1 )
    ! run option or we are on an acceptable machine.
    !</DESCRIPTION>
 
-   ! JRB This is the way we will use namelist variables once module_namelists goes
-   ! call nl_get_max_dom( 1, max_dom )
+   call nl_get_max_dom( 1, max_dom )
+
+write (0,*) "da_wrfvar_init max_dom",max_dom
+
    IF ( max_dom > 1 ) THEN
 #if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
       call da_error(__FILE__,__LINE__, &

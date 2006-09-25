@@ -1,7 +1,7 @@
 !MEDIATION_LAYER:SOLVE_DA
 
 SUBROUTINE da_solve ( grid , config_flags , &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                  )
 
    ! Driver layer modules
@@ -35,7 +35,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
    TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments to solve
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
    TYPE (be_type)               :: be          ! Background error structure.
@@ -108,30 +108,30 @@ SUBROUTINE da_solve ( grid , config_flags , &
    ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
-   call da_solve_init( grid, xp, xb, &
+   call da_solve_init( grid, grid%xp, grid%xb, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
 
    !---------------------------------------------------------------------------
-   ! [3.0] Set up first guess field (xb):
+   ! [3.0] Set up first guess field (grid%xb):
    !---------------------------------------------------------------------------
 
    call da_setup_firstguess( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                            )
 
    !---------------------------------------------------------------------------
    ! [4.0] Set up observations (ob):
    !---------------------------------------------------------------------------
 
-   call da_setup_obs_structures( xp, ob, iv )
+   call da_setup_obs_structures( grid%xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
 
-   call da_setup_background_errors( xb, xbx, be, xp, &
+   call da_setup_background_errors( grid%xb, xbx, be, grid%xp, &
                                     its, ite, jts, jte, kts, kte, &
                                     ids, ide, jds, jde, kds, kde )
    cv_size = be % cv % size
@@ -140,9 +140,9 @@ SUBROUTINE da_solve ( grid , config_flags , &
    ! [6.0] Set up ensemble perturbation input:
    !---------------------------------------------------------------------------
 
-   ep % ne = be % ne
+   grid%ep % ne = be % ne
    if (be % ne > 0) THEN
-      call da_setup_flow_predictors( ide, jde, kde, be % ne, ep )
+      call da_setup_flow_predictors( ide, jde, kde, be % ne, grid%ep )
    end if
 
    !---------------------------------------------------------------------------
@@ -154,13 +154,13 @@ SUBROUTINE da_solve ( grid , config_flags , &
    call da_initialize_cv( cv_size, cvt )
    call da_initialize_cv( cv_size, xhat )
       
-   call da_zero_vp_type( vv )
-   call da_zero_vp_type( vp )
+   call da_zero_vp_type( grid%vv )
+   call da_zero_vp_type( grid%vp )
 
    if ( test_transforms .or. Testing_WRFVAR ) then
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                  )
 
       call da_allocate_y( iv, re )
@@ -171,13 +171,13 @@ SUBROUTINE da_solve ( grid , config_flags , &
       call da_initialize_cv( cv_size, cvt )
       call da_initialize_cv( cv_size, xhat )
 
-      call da_check( cv_size, xb, xbx, be, ep, iv, &
-                     xa, vv, vp, xp, ob, y, &
+      call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+                     grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      its, ite, jts, jte, kts, kte )
-      call da_zero_vp_type( vv )
-      call da_zero_vp_type( vp )
+      call da_zero_vp_type( grid%vv )
+      call da_zero_vp_type( grid%vp )
    endif
 
    !---------------------------------------------------------------------------
@@ -205,7 +205,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
                   EXIT
 303                  CONTINUE
                   CALL system("sync")
-                  CALL system("sleep 1")
+                  CALL system("slegrid%ep 1")
                ENDDO
             ENDIF
             CALL wrf_get_dm_communicator ( comm )
@@ -225,20 +225,20 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
       call da_get_innov_vector( it, ob, iv, &
                                 grid , config_flags , &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                  )
 
       if (test_transforms) then
-         call da_check( cv_size, xb, xbx, be, ep, iv, &
-                        xa, vv, vp, xp, ob, y, &
+         call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
                         its, ite, jts, jte, kts, kte )
       end if
 
       if (testing_wrfvar) then
-         call da_check( cv_size, xb, xbx, be, ep, iv, &
-                        xa, vv, vp, xp, ob, y, &
+         call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
                         its, ite, jts, jte, kts, kte )
@@ -248,7 +248,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
       if ((analysis_type(1:6) == "QC-OBS" .or. &
            analysis_type(1:6) == "qc-obs")) then
          if (it == 1) then
-            CALL da_write_filtered_obs(ob, iv, xb, xp, &
+            CALL da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
                           grid%moad_cen_lat, grid%stand_lon,&
                           grid%truelat1, grid%truelat2 )
          end if     
@@ -265,9 +265,9 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
       call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
-                           xb, xbx, be, ep, iv, &
+                           grid%xb, xbx, be, grid%ep, iv, &
                            j_grad_norm_target, xhat, cvt, &
-                           xa, vv, vp, xp, re, y, j,    &
+                           grid%xa, grid%vv, grid%vp, grid%xp, re, y, j,    &
                            ids, ide, jds, jde, kds, kde,        &
                            ims, ime, jms, jme, kms, kme,        &
                            its, ite, jts, jte, kts, kte         )
@@ -276,7 +276,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
       ! [8.5] Update latest analysis solution:
 
-      call da_transform_vtox( cv_size, xb, xbx, be, ep, xhat, vv, vp, xp, xa,  &
+      call da_transform_vtox( cv_size, grid%xb, xbx, be, grid%ep, xhat, grid%vv, grid%vp, grid%xp, grid%xa,  &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
@@ -285,23 +285,23 @@ SUBROUTINE da_solve ( grid , config_flags , &
       !       the W_increment need to be diagnosed:
 
       if (W_INCREMENTS .and. .not. use_RadarObs) then
-         call da_uvprho_to_w_lin( xb, xa, xp,                 &
+         call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
 
-         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
+         call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id13)
       endif
 
       ! [8.7] Write out diagnostics
 
-      call da_write_diagnostics( ob, iv, re, y, xp, xa, j )
+      call da_write_diagnostics( ob, iv, re, y, grid%xp, grid%xa, j )
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 
       if ( lwrite_oa_rad_ascii ) then
         write(UNIT=stdout,FMT=*)  ' writing radiance OMB and OMA ascii file'
-        CALL da_write_oa_rad_ascii(xp,ob,iv,re)
+        CALL da_write_oa_rad_ascii(grid%xp,ob,iv,re)
       end if
 
       !------------------------------------------------------------------------
@@ -309,7 +309,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
       !------------------------------------------------------------------------
 
       call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
          )
    END DO
 

@@ -1,5 +1,5 @@
 subroutine da_setup_firstguess_kma( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                               )
 
    !---------------------------------------------------------------------------
@@ -12,7 +12,7 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
 
    TYPE(domain) , TARGET               :: grid
 
-#include "em_dummy_decl.inc"
+#include "em_dummy_new_decl.inc"
 
    integer           :: i, j
    integer           :: is, ie, js, je, ks, ke
@@ -20,12 +20,12 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
 
    IF (trace_use) call da_trace_entry("da_setup_firstguess_kma")
 
-   is = xp % its
-   ie = xp % ite
-   js = xp % jts
-   je = xp % jte
-   ks = xp % kts
-   ke = xp % kte
+   is = grid%xp % its
+   ie = grid%xp % ite
+   js = grid%xp % jts
+   je = grid%xp % jte
+   ks = grid%xp % kts
+   ke = grid%xp % kte
 
    !------------------------------------------------------------------------
    ! [2.0] Copy header info:
@@ -37,15 +37,15 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    coarse_ix = grid%e_we - grid%s_we + 1
    coarse_jy = grid%e_sn - grid%s_sn + 1
 
-   xb % mix = xp%ide - xp%ids + 1
-   xb % mjy = xp%jde - xp%jds + 1
-   xb % mkz = xp%kde - xp%kds + 1
+   grid%xb % mix = grid%xp%ide - grid%xp%ids + 1
+   grid%xb % mjy = grid%xp%jde - grid%xp%jds + 1
+   grid%xb % mkz = grid%xp%kde - grid%xp%kds + 1
 
-   mix = xb % mix
-   mjy = xb % mjy
-   mkz = xb % mkz
+   mix = grid%xb % mix
+   mjy = grid%xb % mjy
+   mkz = grid%xb % mkz
 
-   xb % ds  = 0.001 * grid%dx
+   grid%xb % ds  = 0.001 * grid%dx
 
    start_x = 1.0
    start_y = 1.0
@@ -61,23 +61,23 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
 
    do j = js,je
       do i = is,ie
-         xlat(i,j) = start_lat + real(j-1)*delt_lat
-         xlong(i,j) = start_lon + real(i-1)*delt_lon
+         grid%xlat(i,j) = start_lat + real(j-1)*delt_lat
+         grid%xlong(i,j) = start_lon + real(i-1)*delt_lon
       end do
    end do
 
    ! Avoid assigning -90,90 value                                           
-   if(xb%jts == xb%jds) then
-      xlat(is:ie,j) = -89.9                               
+   if(grid%xb%jts == grid%xb%jds) then
+      grid%xlat(is:ie,j) = -89.9                               
    end if
 
-   if(xb%jte == xb%jde) then
-      xlat(is:ie,j) = 89.9                               
+   if(grid%xb%jte == grid%xb%jde) then
+      grid%xlat(is:ie,j) = 89.9                               
    end if
 
    ! fix map factor and coriolis parameter
       
-   f(is:ie,js:je) = 2.0 *earth_omega*sin(pi*xlat(is:ie,js:je)/180.0)
+   grid%f(is:ie,js:je) = 2.0 *earth_omega*sin(pi*grid%xlat(is:ie,js:je)/180.0)
 
    xbx%inc = 1
    xbx%ni  = grid%e_we - grid%s_we
@@ -89,7 +89,7 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 
    call da_transfer_kmatoxb( xbx, grid, &
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
                              )
 
    IF (trace_use) call da_trace_exit("da_setup_firstguess_kma")

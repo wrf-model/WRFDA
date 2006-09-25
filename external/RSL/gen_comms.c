@@ -835,7 +835,7 @@ gen_datacalls1 ( FILE * fp , char * corename , char * structname , int mask , no
       else if ( p->type->type_type == DERIVED )
       {
         parent_type = DERIVED;
-        sprintf( tmp , "%s%%", p->name ) ; 
+        sprintf( tmp , "grid%%%s%%", p->name ) ; 
         gen_datacalls1 ( fp , corename , tmp , mask, p->type->fields ) ;
       }
     }
