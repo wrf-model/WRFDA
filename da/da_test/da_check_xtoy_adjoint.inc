@@ -260,7 +260,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
    
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    ENDIF

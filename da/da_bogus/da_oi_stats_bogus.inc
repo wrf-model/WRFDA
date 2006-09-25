@@ -8,7 +8,6 @@ subroutine da_oi_stats_bogus ( stats_unit, oi )
   TYPE (stats_bogus_type)          :: Bogus
   INTEGER                          :: nu, nv, nt, nq, nslp
   INTEGER                          :: n, k
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
   nslp = 0
   nu = 0
@@ -91,7 +90,7 @@ subroutine da_oi_stats_bogus ( stats_unit, oi )
                           Bogus%minimum%slp%n, Bogus%maximum%slp%n, &
                           Bogus%minimum%slp%l, Bogus%maximum%slp%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Bogus'
       call da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )

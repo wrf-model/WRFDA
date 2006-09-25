@@ -9,8 +9,6 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
    INTEGER                          :: ntpw, nspeed, n
    TYPE (stats_ssmi_retrieval_type) :: ssmi_retrieval
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    ntpw = 0
    nspeed = 0
    num_ssmi_rv_tot = 0
@@ -59,7 +57,7 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
               ssmi_retrieval%minimum%speed%n, ssmi_retrieval%maximum%speed%n, &
               ssmi_retrieval%minimum%speed%l, ssmi_retrieval%maximum%speed%l )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
 
     IF ( ntpw /= 0 )THEN
 

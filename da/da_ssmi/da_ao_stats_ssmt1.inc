@@ -12,8 +12,6 @@ subroutine da_ao_stats_ssmt1( stats_unit, iv, re )
    INTEGER                          :: n, k
    real                             :: average, rms_err
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nt = 0
    num_ssmt1_tot = 0
 
@@ -49,7 +47,7 @@ subroutine da_ao_stats_ssmt1( stats_unit, iv, re )
                            minimum%n, maximum%n, &
                            minimum%l, maximum%l )
    
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
    
     IF ( nt /= 0 ) THEN
    

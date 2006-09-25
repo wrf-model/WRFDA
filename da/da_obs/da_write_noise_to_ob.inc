@@ -12,7 +12,6 @@ subroutine da_write_noise_to_ob (iv)
 
    TYPE (ob_type), INTENT(IN)    :: iv   ! Obs and header structure.
    integer                       :: n, k, ounit, iunit
-   logical, external             :: wrf_dm_on_monitor
    integer                       :: root      ! Monitor processor.
    integer                       :: myrank    ! Id of my processor.
    integer                       :: ierr      ! Error code from MPI routines.
@@ -32,12 +31,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'synop', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor())&
+         if (rootproc)&
             call da_read_rand_unit(iunit,ounit,num_obs,'synop',5)
       ENDDO
    endif
@@ -54,13 +53,13 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if ( wrf_dm_on_monitor() )&
+      if (rootproc)&
          write(ounit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'metar',5)    
       ENDDO
    endif
@@ -77,12 +76,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'ships', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'ships', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'ships',5)
       ENDDO
    endif
@@ -99,12 +98,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'geoamv', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'geoamv', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-        if (wrf_dm_on_monitor()) &
+        if (rootproc) &
            call da_read_rand_unit(iunit,ounit,num_obs,'geoamv',6)
       ENDDO
    endif
@@ -121,12 +120,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'polaramv', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'polaramv', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-        if (wrf_dm_on_monitor()) &
+        if (rootproc) &
            call da_read_rand_unit(iunit,ounit,num_obs,'polaramv',8) 
       ENDDO
    endif
@@ -143,12 +142,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'gpspw', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'gpspw', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-        if (wrf_dm_on_monitor()) &
+        if (rootproc) &
            call da_read_rand_unit(iunit,ounit,num_obs,'gpspw',5)     
       ENDDO
    endif
@@ -165,21 +164,21 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'sound', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'sound', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'sound',5)     
       ENDDO
       !  writing Sonde_sfc  
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'sonde_sfc', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'sonde_sfc', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'sonde_sfc',9)
       ENDDO
    endif
@@ -196,12 +195,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'airep', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'airep', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'airep',5)   
       ENDDO
    endif
@@ -218,12 +217,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'pilot', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'pilot', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'pilot',5)    
       ENDDO
    endif
@@ -240,12 +239,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'ssmir', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'ssmir', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
          call da_read_rand_unit(iunit,ounit,num_obs,'ssmir',5)    
      ENDDO
    endif
@@ -262,12 +261,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'ssmiT', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'ssmiT', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
          call da_read_rand_unit(iunit,ounit,num_obs,'ssmiT',5)    
       ENDDO
    endif
@@ -284,12 +283,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'satem', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'satem', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'satem',5)    
       ENDDO
    endif
@@ -306,12 +305,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'ssmt1', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'ssmt1', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'ssmt1',5)    
       ENDDO
    endif
@@ -328,12 +327,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'ssmt2', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'ssmt2', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
           rewind iunit
-          if (wrf_dm_on_monitor()) &
+          if (rootproc) &
              call da_read_rand_unit(iunit,ounit,num_obs,'ssmt2',5)    
       ENDDO
    endif
@@ -350,12 +349,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'qscat', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'qscat', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'qscat',5)    
       ENDDO
    endif
@@ -372,12 +371,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'profiler', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'profiler', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'profiler',8)    
       ENDDO
    endif
@@ -394,12 +393,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'buoy', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'buoy', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'buoy',4)    
       ENDDO
    endif
@@ -416,12 +415,12 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-      if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'bogus', num_obs  
+      if (rootproc) write(ounit,'(a20,i8)')'bogus', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
          iunit = rand_unit*10 +  k
          rewind iunit
-         if (wrf_dm_on_monitor()) &
+         if (rootproc) &
             call da_read_rand_unit(iunit,ounit,num_obs,'bogus',5)    
       ENDDO
    endif
@@ -438,17 +437,17 @@ subroutine da_write_noise_to_ob (iv)
    ENDIF
    call da_proc_sum_int(num_obs)
    if (num_obs > 0) then
-       if (wrf_dm_on_monitor()) write(ounit,'(a20,i8)')'airsr', num_obs  
+       if (rootproc) write(ounit,'(a20,i8)')'airsr', num_obs  
        num_obs = 0
        DO k = 0,numb_procs-1
           iunit = rand_unit*10 +  k
           rewind iunit
-          if (wrf_dm_on_monitor()) &
+          if (rootproc) &
              call da_read_rand_unit(iunit,ounit,num_obs,'airsr',5)    
        ENDDO
     endif
 
-   if ( wrf_dm_on_monitor() ) write(ounit,'(a20,i8)')'********************', 0
+   if (rootproc) write(ounit,'(a20,i8)')'********************', 0
 
    call da_trace_exit("da_write_noise_to_ob")
    

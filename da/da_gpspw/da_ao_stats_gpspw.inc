@@ -12,8 +12,6 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
    real                             :: o_minus_b, o_minus_a, sigma_o, sigma_b
    real                             :: o_minus_b_0, o_minus_a_0, sigma_o_0, sigma_b_0 
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    ntpw = 0
    num_gpspw_tot = 0
    o_minus_b_0 = 0.0; o_minus_a_0 = 0.0; sigma_o_0 = 0.0; sigma_b_0 = 0.0
@@ -53,7 +51,7 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                   'TEST_COVERAGE_da_ao_stats_gpspw:  sigma_o_0 = ', sigma_o_0
                write(unit=stdout,fmt='(A,F10.2)') &
                   'TEST_COVERAGE_da_ao_stats_gpspw:  sigma_b_0 = ', sigma_b_0
-               IF ( wrf_dm_on_monitor() ) THEN  
+               IF ( rootproc ) THEN  
                   write(stats_unit,'(/A,A3,A,f12.3)')  &  
                     ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b_0  
                   write(stats_unit,'( A,A3,A,f12.3)')  &  
@@ -77,7 +75,7 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                            Gpspw%minimum%tpw%n, Gpspw%maximum%tpw%n, &
                            Gpspw%minimum%tpw%l, Gpspw%maximum%tpw%l )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       IF ( ntpw /= 0) THEN
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Gpspw'
          call da_print_stats_gpspw(stats_unit, ntpw, Gpspw)

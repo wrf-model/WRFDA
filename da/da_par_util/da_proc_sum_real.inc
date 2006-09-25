@@ -20,11 +20,9 @@ subroutine da_proc_sum_real ( n, value )
    INTEGER           :: ierr               ! Error code from MPI routines.
    INTEGER           :: root               ! Monitor processor.
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
 #ifdef DM_PARALLEL
 
-   IF (wrf_dm_on_monitor()) root = myproc
+   IF (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    apsum=0
    call MPI_REDUCE(value, apsum, n, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )

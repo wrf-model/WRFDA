@@ -17,8 +17,6 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
   INTEGER                          :: nt, nq
   INTEGER                          :: n, k
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   nt = 0
   nq = 0
 
@@ -62,7 +60,7 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
                           airsr%minimum%q%n, airsr%maximum%q%n, &
                           airsr%minimum%q%l, airsr%maximum%q%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF (nt /= 0 .or. nq /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for AIRS retrievals'
       CALL da_print_stats_airsr( stats_unit, nt, nq, airsr )

@@ -10,8 +10,6 @@ subroutine da_ao_stats_radar( stats_unit, oi, re )
    INTEGER                          :: nrv, nrf
    INTEGER                          :: n, k
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nrv = 0
    nrf = 0
    num_Radar_tot = 0.
@@ -63,7 +61,7 @@ subroutine da_ao_stats_radar( stats_unit, oi, re )
    ENDIF
    num_Radar_tot = nrv + nrf
 
-   IF (wrf_dm_on_monitor()) THEN
+   IF (rootproc) THEN
 
       IF (nrv /= 0 .or. nrf /= 0) THEN 
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Radar'

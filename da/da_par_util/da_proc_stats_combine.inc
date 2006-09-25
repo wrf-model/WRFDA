@@ -30,18 +30,16 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    INTEGER :: ierr               ! Error code from MPI routines.
    INTEGER :: status(mpi_status_size) ! MPI status.
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
 #ifdef DM_PARALLEL
 
-   IF (wrf_dm_on_monitor()) root = myproc
+   IF (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    ! Sum average and rms error over all processors and store on monitor processor.
    call MPI_REDUCE(proc_ave, average, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
    call MPI_REDUCE(proc_err, rms_err, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       proc_ave = average
       proc_err = rms_err
    END IF

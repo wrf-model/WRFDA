@@ -19,8 +19,6 @@ subroutine da_write_kma_increments(xp, xb, xa)
    real, dimension(:,:)  , allocatable :: psfc_g
    real, dimension(:,:,:), allocatable :: u_g, v_g, t_g, q_g, p_g
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    integer                                     :: i, j, k
 
    IF (trace_use) call da_trace_entry("da_write_kma_increments")
@@ -42,37 +40,37 @@ subroutine da_write_kma_increments(xp, xb, xa)
    ALLOCATE (    p_g (1:ix,1:jy,1:kz) )
 
    call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    END IF 
 
    call da_local_to_global( xp, xa % u, gbuf, 3 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    END IF 
 
    call da_local_to_global( xp, xa % v, gbuf, 3 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    END IF 
 
    call da_local_to_global( xp, xa % t, gbuf, 3 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    END IF 
 
    call da_local_to_global( xp, xa % q, gbuf, 3 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    END IF 
 
    call da_local_to_global( xp, xa % p, gbuf, 3 ) 
-   IF (wrf_dm_on_monitor()) THEN 
+   IF (rootproc) THEN 
       p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    END IF 
 #endif
 
-   IF (wrf_dm_on_monitor()) then
+   IF (rootproc) then
 
 #ifdef DM_PARALLEL
 

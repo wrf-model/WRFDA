@@ -9,8 +9,6 @@ subroutine da_oi_stats_gpspw ( stats_unit, oi )
   INTEGER                          :: ntpw
   INTEGER                          :: n
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   ntpw = 0
 
   Gpspw%maximum%tpw = maxmin_type( missing_r, 0, 0)
@@ -40,7 +38,7 @@ subroutine da_oi_stats_gpspw ( stats_unit, oi )
                           Gpspw%minimum%tpw%n, Gpspw%maximum%tpw%n, &
                           Gpspw%minimum%tpw%l, Gpspw%maximum%tpw%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF (ntpw /= 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Gpspw'
       call da_print_stats_gpspw( stats_unit, ntpw, Gpspw )

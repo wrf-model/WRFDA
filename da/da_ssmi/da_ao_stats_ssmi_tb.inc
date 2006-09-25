@@ -13,7 +13,6 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
    INTEGER                          :: n
    TYPE (stats_ssmi_tb_type)        :: ssmi_tb
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 !----------------------------------------------------------------------------
 
    ntb19v = 0
@@ -135,7 +134,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
               ssmi_tb%minimum%tb85h%n, ssmi_tb%maximum%tb85h%n, &
               ssmi_tb%minimum%tb85h%l, ssmi_tb%maximum%tb85h%l )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
 
     if (ntb19v /= 0 ) then
 

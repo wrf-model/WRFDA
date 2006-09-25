@@ -8,7 +8,6 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
   type (jo_type), INTENT(INOUT) :: jo          ! Obs cost function.
 
   INTEGER                      :: n
-  LOGICAL, EXTERNAL            :: wrf_dm_on_monitor
   ! the following "global" objects are used only when testing
   TYPE (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
   TYPE (y_type)  :: re_glob         ! Global Residual vector (O-A).

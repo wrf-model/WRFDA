@@ -10,8 +10,6 @@ subroutine da_ao_stats_ships( stats_unit, oi, re )
    INTEGER                          :: nu, nv, nt, np, nq
    INTEGER                          :: n
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nu = 0
    nv = 0
    nt = 0
@@ -90,7 +88,7 @@ subroutine da_ao_stats_ships( stats_unit, oi, re )
                            Ships%minimum%q%n, Ships%maximum%q%n, &
                            Ships%minimum%q%l, Ships%maximum%q%l )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for ships'
          call da_print_stats_ships(stats_unit, nu, nv, nt, np, nq, ships)

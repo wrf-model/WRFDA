@@ -31,8 +31,6 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    INTEGER :: ierr               ! Error code from MPI routines.
    INTEGER :: status(mpi_status_size) ! MPI status.
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
 #ifdef DM_PARALLEL
 
    ! Allocate buffer.
@@ -55,7 +53,7 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    q(1:sum_levels) = 0.0
 
    ! Get rank of monitor processor and broadcast to others.
-   IF ( wrf_dm_on_monitor() ) root = myproc
+   IF ( rootproc ) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    ! Message pass on_proc and iv field arrays.

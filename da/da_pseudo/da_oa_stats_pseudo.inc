@@ -11,8 +11,6 @@ subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
    INTEGER                          :: n
    real                             :: o_minus_b, o_minus_a, sigma_o, sigma_b
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nu = 0
    nv = 0
    nt = 0
@@ -123,7 +121,7 @@ subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
                            Pseudo%minimum%q%n, Pseudo%maximum%q%n, &
                            Pseudo%minimum%q%l, Pseudo%maximum%q%l )
    
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
    
     IF ( nu /= 0 .or. nv /= 0 .OR. nt /= 0 .or. np /= 0 .OR. nq /= 0 ) THEN
    

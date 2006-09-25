@@ -24,7 +24,6 @@ subroutine da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
    INTEGER :: ids, ide, jds, jde, kds, &
               ims, ime, jms, jme, kms, &
               ips, ipe, jps, jpe, kps
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
    !
    ! Gather to mimic serial summation order.  
@@ -46,7 +45,7 @@ subroutine da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
 
    call da_cv_to_vv ( cv_size, x, xp, mzs, vv_x )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       ! allocate vv_xg
       ALLOCATE( vv_xg%v1(xp%ids:xp%ide,xp%jds:xp%jde,mzs(1)) )
       ALLOCATE( vv_xg%v2(xp%ids:xp%ide,xp%jds:xp%jde,mzs(2)) )
@@ -103,7 +102,7 @@ subroutine da_cv_to_global( cv_size, cv_size_global, x, xp, mzs, xg )
    ! deallocate vv_x
    DEALLOCATE (vv_x%v1, vv_x%v2, vv_x%v3, vv_x%v4, vv_x%v5 )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       ! finally, collapse data back into a globally-sized cv-array
       xpg%ids = xp%ids; xpg%ide = xp%ide
       xpg%ims = xp%ids; xpg%ime = xp%ide

@@ -30,7 +30,6 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    TYPE (y_facade_type), INTENT(INOUT) :: re_glob_slice ! residual vector
 
    ! Local declarations
-   LOGICAL, EXTERNAL            :: wrf_dm_on_monitor
 #ifdef DM_PARALLEL
    INCLUDE 'mpif.h'
    INTEGER                      :: n, k, serial_n, serial_numvals

@@ -23,8 +23,6 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    real    :: sdmd, s1md
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    ! ARRAYS TO HOLD WRF INCREMENTS ON THE C-grid 
 
    REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: &

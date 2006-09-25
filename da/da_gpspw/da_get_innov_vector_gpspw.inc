@@ -34,8 +34,6 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   REAL,DIMENSION(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
   !INTEGER                      :: ierr, unit_gps
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   ! unit_gps = myproc + 140
   !---------------------------------------------------------------------------
 

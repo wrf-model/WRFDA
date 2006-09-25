@@ -8,8 +8,6 @@ subroutine da_oi_stats_ssmi_rv( stats_unit, oi )
    INTEGER                          :: ntpw, nspeed, n
    TYPE (stats_ssmi_retrieval_type) :: ssmi_retrieval
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    ntpw = 0
    nspeed = 0
 
@@ -62,7 +60,7 @@ subroutine da_oi_stats_ssmi_rv( stats_unit, oi )
               ssmi_retrieval%minimum%speed%n, ssmi_retrieval%maximum%speed%n, &
               ssmi_retrieval%minimum%speed%l, ssmi_retrieval%maximum%speed%l )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
 
     IF (ntpw > 0) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_retrieval'

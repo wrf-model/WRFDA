@@ -106,7 +106,7 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    WRITE(UNIT=stdout,FMT='(A,2F12.2)') &
       'TEST_COVERAGE_da_check_cvtovv_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(unit=stdout, fmt='(/)')
       write(unit=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &

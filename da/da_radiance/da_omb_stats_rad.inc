@@ -16,8 +16,6 @@ subroutine da_omb_stats_rad ( stats_unit, iv )
    TYPE (stats_rad_type),    pointer  :: rad(:)
    INTEGER                          :: n, k, i
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    IF ( iv%num_inst < 1 ) RETURN
 
  Allocate ( rad(1:iv%num_inst) )
@@ -69,7 +67,7 @@ subroutine da_omb_stats_rad ( stats_unit, iv )
  
   end do                        !  end loop for channels
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
     IF ( any( rad(i)%ichan(:)%num /= 0 ) ) then
      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Radiance         '//iv%instid(i)%rttovid_string 
      CALL da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )

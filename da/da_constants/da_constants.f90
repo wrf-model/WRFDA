@@ -406,6 +406,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer                :: num_procs, &         ! Number of total processors.
                              numb_procs, &         ! Alternative name
                              myproc                ! My processor ID.
+   logical                :: rootproc             ! Am I the root processor
 
    INTEGER, PARAMETER :: var4d_coupling_disk_linear = 1
    INTEGER, PARAMETER :: var4d_coupling_disk_simul  = 2

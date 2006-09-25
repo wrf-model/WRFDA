@@ -9,8 +9,6 @@ subroutine da_oi_stats_airep ( stats_unit, oi )
   INTEGER                          :: nu, nv, nt
   INTEGER                          :: n, k
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   nu = 0
   nv = 0
   nt = 0
@@ -66,7 +64,7 @@ subroutine da_oi_stats_airep ( stats_unit, oi )
                           Airep%minimum%t%n, Airep%maximum%t%n, &
                           Airep%minimum%t%l, Airep%maximum%t%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Airep'
       call da_print_stats_airep( stats_unit, nu, nv, nt, Airep )

@@ -20,7 +20,6 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
    real, pointer                :: xg(:), yg(:)      ! Serial data arrays.
 
    real                         :: dtemp1, dtemp1x   ! Temporary.
-   logical, external            :: wrf_dm_on_monitor ! True if on monitor PE.
 
    dtemp1 = 0.0
 
@@ -35,7 +34,7 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
       ! arrays xg and yg.  Note that xg and yg will only exist on the 
       ! monitor task.  
 
-      IF (wrf_dm_on_monitor()) THEN
+      IF (rootproc) THEN
          allocate(xg(1:cv_size_domain))
          allocate(yg(1:cv_size_domain))
       ENDIF
@@ -43,7 +42,7 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
       call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
       call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, yg )
 
-      IF ( wrf_dm_on_monitor() ) THEN
+      IF ( rootproc ) THEN
          dtemp1 = da_dot( cv_size_domain, xg, yg )
          deallocate( xg, yg )
       ENDIF

@@ -8,8 +8,6 @@ subroutine da_get_var_diagnostics ( iv, j )
    integer                      :: i,k
    real                         :: jo_radiance
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
-
    IF (trace_use) CALL da_trace_entry("da_get_var_diagnostics")
 
    !--------------------------------------------------------------------------
@@ -92,7 +90,7 @@ subroutine da_get_var_diagnostics ( iv, j )
    ! [2.0] Print out VAR diagnostics:
    !-----------------------------------------------------------------------------
 
-   if ( wrf_dm_on_monitor() ) THEN
+   if ( rootproc ) THEN
 
       write(UNIT=stdout,FMT=*) ' '
       WRITE(UNIT=stdout,FMT='(A,F12.2)')  '    Final cost function J    = ', j % total

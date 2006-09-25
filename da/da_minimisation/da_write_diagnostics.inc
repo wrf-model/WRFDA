@@ -14,8 +14,6 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    type (x_type), intent(in)    :: xa      ! gridded analysis increments.
    type (j_type), intent(inout) :: j       ! Cost function.
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor     ! For statistics output.
-
    IF (trace_use) CALL da_trace_entry("da_write_diagnostics")
 
    !---- ----------------------------------------------------------------------
@@ -220,17 +218,17 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    !---- -------------------------------------------------------------------------
    !  [5.0] Write observation data (O, O-B, O-A, y=hx'):
    !------------------------------------------------------------------------------
-
    call da_write_obs( ob, iv, re )
 
 #ifdef DM_PARALLEL
-   if (numb_procs > 1) call da_final_write_obs(ob, iv, re )
+
+   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
 #endif
 
    call da_write_y( iv, y )
 
 #ifdef DM_PARALLEL
-   if ( numb_procs > 1) call da_final_write_y(iv, y )
+   if ( num_procs > 1) call da_final_write_y(iv, y )
 #endif
 
    IF (trace_use) CALL da_trace_exit("da_write_diagnostics")

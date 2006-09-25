@@ -26,7 +26,6 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
                 nrej_clw,nrej_topo,num_rad
 
    character(len=30)  :: filename
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
     ngood(:)        = 0
     nrej(:)         = 0
@@ -171,7 +170,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
    call da_proc_sum_int ( ngood(k) )
   end do
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
      unit = 22
      if (num_fgat_time > 1) then
        write(filename,'(a,i2.2)') trim(iv%instid(inst)%rttovid_string)//'.QCSTAT',iv%current_ob_time

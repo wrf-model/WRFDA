@@ -10,8 +10,6 @@ subroutine da_ao_stats_satem( stats_unit, oi, re )
   INTEGER                          :: nthickness
   INTEGER                          :: n, k
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   nthickness = 0
   num_satem_tot = 0
 
@@ -50,7 +48,7 @@ subroutine da_ao_stats_satem( stats_unit, oi, re )
             Satem%minimum%thickness%n, Satem%maximum%thickness%n, &
             Satem%minimum%thickness%l, Satem%maximum%thickness%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF ( nthickness /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Satem'
       call da_print_stats_satem(stats_unit, nthickness, Satem)

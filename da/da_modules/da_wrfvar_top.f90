@@ -42,7 +42,6 @@ MODULE da_wrfvar_top
    INTEGER                 :: nbytes
    INTEGER, PARAMETER      :: configbuflen = 4* CONFIG_BUF_LEN
    INTEGER                 :: configbuf( configbuflen )
-   LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
    CHARACTER (LEN=80)      :: rstname

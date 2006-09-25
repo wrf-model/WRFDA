@@ -66,8 +66,16 @@ SUBROUTINE da_solve ( grid , config_flags , &
    call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
    call MPI_COMM_RANK(MPI_COMM_WORLD, myproc, ierr )
 #else
+   num_procs = 1
    numb_procs = 1
+   myproc = 0
 #endif
+
+   if (myproc==0) then
+      rootproc=.TRUE.
+   else
+      rootproc=.FALSE.
+   end if
 
    !---------------------------------------------------------------------------
    ! If it is verification run set check_max_iv as .false.
@@ -196,7 +204,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
          if (var4d_coupling == var4d_coupling_disk_simul) then
             call da_system_4dvar("da_run_wrf_nl.ksh pre ")
             ! call system("./wrf.exe -rmpool 1")
-            IF ( wrf_dm_on_monitor() ) THEN
+            IF (rootproc) THEN
                call system("rm -rf nl/wrf_done")
                call system("touch nl/wrf_go_ahead")
                DO WHILE ( .true. )

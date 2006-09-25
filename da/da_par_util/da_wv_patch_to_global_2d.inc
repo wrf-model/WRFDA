@@ -22,7 +22,6 @@ subroutine da_wv_patch_to_global_2d( vlocal, vglobal,    &
    ! Local declarations
    INTEGER :: kds, kms, kps, mz
    REAL, ALLOCATABLE :: vlocal3d(:,:,:), vglobal3d(:,:,:)
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 
    kds=1; kms=1; kps=1; mz=1
    ALLOCATE( vlocal3d ( ims:ime, jms:jme, 1 ), &
@@ -34,7 +33,7 @@ subroutine da_wv_patch_to_global_2d( vlocal, vglobal,    &
                               ids, ide, jds, jde, kds, &
                               ims, ime, jms, jme, kms, &
                               ips, ipe, jps, jpe, kps )
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       vglobal(:,:) = vglobal3d(:,:,1)
    ENDIF
    DEALLOCATE( vlocal3d, vglobal3d )

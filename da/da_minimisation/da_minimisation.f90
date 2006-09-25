@@ -46,8 +46,6 @@ module da_minimisation
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    private :: da_dot, da_dot_cv
    private :: infoc, brackt, stage1
    private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &

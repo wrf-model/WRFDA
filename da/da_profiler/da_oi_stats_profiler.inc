@@ -9,8 +9,6 @@ subroutine da_oi_stats_profiler ( stats_unit, oi )
    INTEGER                          :: nu, nv
    INTEGER                          :: n, k
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nu = 0
    nv = 0
    
@@ -57,7 +55,7 @@ subroutine da_oi_stats_profiler ( stats_unit, oi )
                            Profiler%minimum%v%n, Profiler%maximum%v%n, &
                            Profiler%minimum%v%l, Profiler%maximum%v%l )
    
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
    
     IF (nu /= 0 .or. nv /= 0 ) THEN
    

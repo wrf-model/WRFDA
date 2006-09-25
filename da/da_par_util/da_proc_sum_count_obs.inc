@@ -27,11 +27,9 @@ subroutine da_proc_sum_count_obs ( count_obs )
    INTEGER           :: root                  ! Monitor processor.
    INTEGER           :: offset                ! Index into procval and sumval arrays.
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
 #ifdef DM_PARALLEL
 
-   IF (wrf_dm_on_monitor()) root = myproc
+   IF (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    offset = 1

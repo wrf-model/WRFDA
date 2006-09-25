@@ -18,8 +18,6 @@ subroutine da_ao_stats_polaramv( stats_unit, oi, re )
    INTEGER                          :: nu, nv
    INTEGER                          :: n, k
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nu = 0
    nv = 0
    num_polaramv_tot = 0
@@ -69,7 +67,7 @@ subroutine da_ao_stats_polaramv( stats_unit, oi, re )
                            polaramv%minimum%v%l, polaramv%maximum%v%l )
    
    
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
    
     IF ( nu /= 0 .or. nv /= 0 ) THEN
    

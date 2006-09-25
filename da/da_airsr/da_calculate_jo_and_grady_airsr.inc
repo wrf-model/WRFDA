@@ -17,7 +17,6 @@ subroutine da_calculate_jo_and_grady_airsr( iv, re, jo, jo_grad_y )
   type (jo_type), INTENT(INOUT) :: jo         ! Obs cost function.
 
   INTEGER                      :: n, k
-  LOGICAL, EXTERNAL            :: wrf_dm_on_monitor
   ! the following "global" objects are used only when testing
   TYPE (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
   TYPE (y_type)  :: re_glob         ! Global Residual vector (O-A).

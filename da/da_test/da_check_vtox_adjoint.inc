@@ -149,7 +149,7 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
       'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(UNIT=stdout, fmt='(/)')
       write(UNIT=stdout, fmt='(a,1pe22.14)') &
          'Whole  Domain: < x, x >     = ', adj_sum_lhs, &

@@ -6,31 +6,31 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
 
    implicit none
 
-   INTEGER,           INTENT (in) :: stats_unit ! Output unit for stats.
-   TYPE (xpose_type), INTENT (in) :: xp         ! Dimensions and xpose buffers.
-   TYPE (x_type),     INTENT (in) :: xa         ! gridded analysis increments.
+   integer,           intent (in) :: stats_unit ! Output unit for stats.
+   type (xpose_type), intent (in) :: xp         ! Dimensions and xpose buffers.
+   type (x_type),     intent (in) :: xa         ! gridded analysis increments.
    
-   INTEGER :: i, j, k
-   INTEGER :: ij_g, ijk_g   ! ij, ijk for global domain. 
+   integer :: i, j, k
+   integer :: ij_g, ijk_g   ! ij, ijk for global domain. 
    integer :: is, ie        ! i range of processor subdomain.
    integer :: js, je        ! j range of processor subdomain.
    integer :: ks, ke, kdim  ! k range 
 
-   REAL    :: um, vm, tm, pm, qm ! On local domain.
-   REAL    :: rij_g, rijk_g      ! On global domain.
+   real    :: um, vm, tm, pm, qm ! On local domain.
+   real    :: rij_g, rijk_g      ! On global domain.
 
-   TYPE (maxmin_field_type) :: max_u(xp%kts:xp%kte), max_v(xp%kts:xp%kte), &
+   type (maxmin_field_type) :: max_u(xp%kts:xp%kte), max_v(xp%kts:xp%kte), &
                                max_t(xp%kts:xp%kte), max_p(xp%kts:xp%kte), &
                                max_q(xp%kts:xp%kte), &
                                min_u(xp%kts:xp%kte), min_v(xp%kts:xp%kte), &
                                min_t(xp%kts:xp%kte), min_p(xp%kts:xp%kte), &
                                min_q(xp%kts:xp%kte)
  
-   REAL                        uv(xp%kts:xp%kte), vv(xp%kts:xp%kte), &
+   real                        uv(xp%kts:xp%kte), vv(xp%kts:xp%kte), &
                                tv(xp%kts:xp%kte), pv(xp%kts:xp%kte), &
                                qv(xp%kts:xp%kte)
 
-   logical, external        :: wrf_dm_on_monitor
+   call da_trace_entry("da_analysis_stats")
 
    is = xp%its
    ie = xp%ite
@@ -47,7 +47,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
    rij_g  = 1.0/real(ij_g)
    rijk_g = 1.0/real(ijk_g)
   
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       write(unit=stats_unit, fmt='(/a/)') &
          ' Minimum of gridded analysis increments'
 
@@ -58,7 +58,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
          't     i    j          ', &
          'p     i    j          ', &
          'q     i    j          '
-   END IF
+   end if
 
    call da_maxmin_in_field(xa%u(is:ie,js:je,ks:ke), max_u, min_u)
    call da_proc_maxmin_combine(kdim, max_u, min_u)
@@ -78,10 +78,10 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
    qm = 999999.0
 
    do k = ks, ke   
-      IF ( wrf_dm_on_monitor() ) THEN
+      if (rootproc) then
          write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
             min_u(k), min_v(k), min_t(k), min_p(k), min_q(k)
-      END IF
+      end if
 
       um=minval(min_u(:)%value)
       vm=minval(min_v(:)%value)
@@ -90,7 +90,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
       qm=minval(min_q(:)%value)
    end do
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
          um, vm, tm, pm, qm
    
@@ -105,22 +105,22 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
          't     i    j          ', &
          'p     i    j          ', &
          'q     i    j          '
-   END IF
+   end if
 
    do k = ks, ke
-     IF ( wrf_dm_on_monitor() ) THEN
-        write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
-           max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
-     END IF
+      if (rootproc) then
+         write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
+            max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
+      end if
 
-     um=maxval(max_u(:)%value)
-     vm=maxval(max_v(:)%value)
-     tm=maxval(max_t(:)%value)
-     pm=maxval(max_p(:)%value)
-     qm=maxval(max_q(:)%value)
+      um=maxval(max_u(:)%value)
+      vm=maxval(max_v(:)%value)
+      tm=maxval(max_t(:)%value)
+      pm=maxval(max_p(:)%value)
+      qm=maxval(max_q(:)%value)
    end do
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
          um, vm, tm, pm, qm
    
@@ -128,7 +128,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
 
       write(unit=stats_unit, fmt='(a/)') &
          ' Lvl        u           v           t           p           q'
-   END IF
+   end if
 
    um = 0.0
    vm = 0.0
@@ -150,7 +150,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
    call da_proc_sum_real ( kdim, pv )
    call da_proc_sum_real ( kdim, qv )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       do k = ks, ke
          write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             uv(k)*rij_g, vv(k)*rij_g, tv(k)*rij_g, &
@@ -162,9 +162,9 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
          pm=pm+pv(k)
          qm=qm+qv(k)
       end do
-   END IF
+   end if
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
          um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
 
@@ -203,7 +203,7 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
    call da_proc_sum_real ( kdim, pv )
    call da_proc_sum_real ( kdim, qv )
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       do k = ks, ke
          write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             sqrt(uv(k)*rij_g), &
@@ -218,15 +218,17 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
          pm=pm+pv(k)
          qm=qm+qv(k)
       end do
-   END IF
+   end if
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   if (rootproc) then
       write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
          sqrt(um*rijk_g), sqrt(vm*rijk_g), sqrt(tm*rijk_g), &
          sqrt(pm*rijk_g), sqrt(qm*rijk_g)
-   END IF
+   end if
 
-CONTAINS
+   call da_trace_exit("da_analysis_stats")
+
+contains
 
 #include "da_maxmin_in_field.inc"
    

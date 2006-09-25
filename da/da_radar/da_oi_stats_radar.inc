@@ -9,8 +9,6 @@ subroutine da_oi_stats_radar ( stats_unit, oi )
    INTEGER                          :: nrv, nrf
    INTEGER                          :: n, k
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    nrv = 0
    nrf = 0
       
@@ -63,7 +61,7 @@ subroutine da_oi_stats_radar ( stats_unit, oi )
                              Radar%minimum%rf%l, Radar%maximum%rf%l )
    ENDIF
 
-   IF (wrf_dm_on_monitor()) THEN
+   IF (rootproc) THEN
       IF (nrv /= 0 .or. nrf /= 0) THEN
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Radar'
          call da_print_stats_radar( stats_unit, nrv, nrf, Radar )

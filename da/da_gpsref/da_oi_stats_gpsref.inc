@@ -14,8 +14,6 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
    INTEGER                          :: ngpsref
    INTEGER                          :: n, k
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    ngpsref = 0
    
    GPSRef%maximum%ref = maxmin_type( missing_r, 0, 0)
@@ -46,7 +44,7 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
              GPSRef%minimum%ref%n, GPSRef%maximum%ref%n, &
              GPSRef%minimum%ref%l, GPSRef%maximum%ref%l )
    
-   IF ( wrf_dm_on_monitor() .and. (ngpsref > 0)) THEN
+   IF ( rootproc .and. (ngpsref > 0)) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for GPSRef'
    
       call da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )

@@ -10,8 +10,6 @@ subroutine da_ao_stats_metar( stats_unit, oi, re )
   INTEGER                          :: nu, nv, nt, np, nq
   INTEGER                          :: n
 
-  LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
   IF (trace_use) call da_trace_entry("da_ao_stats_metar")
 
 
@@ -92,7 +90,7 @@ subroutine da_ao_stats_metar( stats_unit, oi, re )
                           Metar%minimum%q%n, Metar%maximum%q%n, &
                           Metar%minimum%q%l, Metar%maximum%q%l )
 
-  IF ( wrf_dm_on_monitor() ) THEN
+  IF ( rootproc ) THEN
     IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for metar'
       call da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)

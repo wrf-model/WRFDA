@@ -153,7 +153,7 @@ subroutine da_check_vvtovp_adjoint( ne, xb, be, vv, vp, &
       'TEST_COVERAGE_da_check_vvtovp_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(UNIT=stdout, fmt='(/)')
       write(UNIT=stdout, fmt='(a,1pe22.14)') &
          'Whole  Domain: < Vp, Vp >     = ', adj_sum_lhs, &

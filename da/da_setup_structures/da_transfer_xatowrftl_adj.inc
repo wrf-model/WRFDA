@@ -25,8 +25,6 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    real    :: sdmd, s1md
    real    :: rho_cgrid
 
-   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
-
    REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: a_press
 
    integer ndynopt

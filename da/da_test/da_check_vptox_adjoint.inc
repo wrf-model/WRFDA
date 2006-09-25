@@ -77,7 +77,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
       'TEST_COVERAGE_da_check_vptox_adjoint A:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(UNIT=stdout, fmt='(/a/)') &
           ' da_check_da_psichi_to_uv: Adjoint Test Results:'
 
@@ -229,7 +229,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
       'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
-   IF (wrf_dm_on_monitor()) THEN
+   IF (rootproc) THEN
       write(UNIT=stdout, fmt='(/)')
       write(UNIT=stdout, fmt='(a,1pe22.14)') &
          'Whole  Domain: < x, x >       = ', adj_sum_lhs, &

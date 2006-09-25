@@ -52,7 +52,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !</DESCRIPTION>
 
 #ifdef DM_PARALLEL
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       call initial_config
    END IF
    call get_config_as_buffer( configbuf, configbuflen, nbytes )

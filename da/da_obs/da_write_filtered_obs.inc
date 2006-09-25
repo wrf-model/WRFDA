@@ -69,7 +69,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    integer                       :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 
    INTEGER                       :: ounit, nz, mnz
-   logical, external             :: wrf_dm_on_monitor
    INTEGER                       :: root      ! Monitor processor.
    INTEGER                       :: ierr      ! Error code from MPI routines.
 

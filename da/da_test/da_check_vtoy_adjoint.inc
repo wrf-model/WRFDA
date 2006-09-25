@@ -103,7 +103,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 #endif
 
 #ifdef DM_PARALLEL
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < y, y     > = ', adj_sum_lhs
       write(unit=stdout, fmt='(A,1pe22.14)') &

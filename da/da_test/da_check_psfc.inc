@@ -120,7 +120,7 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', &
       adj_ttl_lhs,adj_ttl_rhs
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', &
          adj_ttl_lhs
       write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', &

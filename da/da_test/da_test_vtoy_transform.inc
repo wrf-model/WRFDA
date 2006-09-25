@@ -105,7 +105,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 #endif
 
 #ifdef DM_PARALLEL
-   IF ( wrf_dm_on_monitor() ) THEN
+   IF ( rootproc ) THEN
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < y, y     > = ', adj_sum_lhs
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < v, v_adj > = ', adj_sum_rhs
    END IF

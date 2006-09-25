@@ -95,10 +95,6 @@ subroutine da_wrfvar_init( no_init1 )
    ! run option or we are on an acceptable machine.
    !</DESCRIPTION>
 
-   call nl_get_max_dom( 1, max_dom )
-
-write (0,*) "da_wrfvar_init max_dom",max_dom
-
    IF ( max_dom > 1 ) THEN
 #if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
       call da_error(__FILE__,__LINE__, &
