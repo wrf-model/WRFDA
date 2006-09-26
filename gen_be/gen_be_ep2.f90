@@ -259,5 +259,18 @@ program gen_be_ep2
    if (trace_use) call da_trace_exit("gen_be_ep2")
    if (trace_use) call da_trace_report
 
+#ifdef crayx1
+contains
+
+   subroutine getarg(i, harg)
+     implicit none
+     character(len=*) :: harg
+     integer :: ierr, ilen, i
+
+     call pxfgetarg(i, harg, ilen, ierr)
+     return
+   end subroutine getarg
+#endif
+
 end program gen_be_ep2
 

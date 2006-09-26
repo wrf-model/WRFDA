@@ -872,7 +872,7 @@ FCDEBUG         = # -g
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS) -p$(LAPACK)
+FCBASE          = -p$(BLAS) -p$(LAPACK) -p$(FFTPACK5)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
 
@@ -919,7 +919,7 @@ FCDEBUG         = #-g
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS) -p$(LAPACK)
+FCBASE          = -p$(BLAS) -p$(LAPACK) -p$(FFTPACK5)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
