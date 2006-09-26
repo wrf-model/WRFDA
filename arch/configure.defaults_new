@@ -865,14 +865,14 @@ LD              = $(FC)
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
-#FCOPTIM        = -Ofp3 -O3
+#FCOPTIM        = -Ofp3 -O3 -Ovector0 -Ostream0 -Oscalar1
 FCOPTIM         = -O0
 FCDEBUG         = # -g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
+FCBASE          = -p$(BLAS) -p$(LAPACK)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
 
@@ -889,7 +889,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH   crayx1 UNICOS/mp  CRAY X1
+#ARCH   crayx1 UNICOS/mp  CRAY X1 parallel
 
 SED_FTN		= sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -912,14 +912,14 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 #FCOPTIM        = -Ofp3 -O3
 # needed for OpenMP
 #FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
-#FCOPTIM         = -Ofp2 -O0
+#FCOPTIM         = -Ofp2 -O0 -Ovector0 -Ostream0 -Oscalar1
 FCOPTIM         = -O0
 FCDEBUG         = #-g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = #-Ovector0 -Ostream0 -Oscalar1
+FCBASE          = -p$(BLAS) -p$(LAPACK)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
