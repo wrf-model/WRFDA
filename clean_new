@@ -3,6 +3,7 @@
 cd build
 
 cat > configure.wrfvar <<EOF
+RM=rm -rf
 arch_superclean:
 arch_clean:
 EOF
