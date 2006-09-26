@@ -1,6 +1,6 @@
 setenv MACHINE `hostname`
 
-if ($MACHINE == bs1201en || $MACHINE == bs1101en) then
+if ($MACHINE == bs1201en || $MACHINE == bs1101en || $MACHINE == bv1103en || $MACHINE == bv1203en) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
    # sourced scripts, so force use of xlf
    setenv COMPILER xlf
