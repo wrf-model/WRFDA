@@ -307,6 +307,10 @@ else
   echo "Will configure for use without NetCDF"
 fi
 
+if [ -n "$MPICH" ] ; then
+  echo "Will use MPICH in dir: $MPICH"
+fi
+
 if [ -n "$PHDF5" ] ; then
   echo "Will use PHDF5 in dir: $PHDF5"
 else
@@ -327,15 +331,13 @@ if [ -n "$HDFEOS" ] ; then
   # echo "HDFEOS not set in environment. Will configure WRF for use without."
 fi
 
-if [ "$option" = "var" ] ; then
+if [ "$option" = "wrfvar" ] ; then
   if [ -n "$RTTOV" ] ; then
     echo "Will use RTTOV in dir: $RTTOV"
   else
     echo "Will configure for use without RTTOV"
   fi
-fi
 
-if [ "$option" = "var" ] ; then
   if [ -n "$CRTM" ] ; then
     echo "Will use CRTM in dir: $CRTM"
   else
