@@ -30,7 +30,7 @@ links :
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
-	@ $(LN) $(CONVERTOR)/convert_tool/* .
+	@ $(LN) $(CONVERTOR)/da_module_convert_tool/* .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid/* .
 	@ $(LN) $(CONVERTOR)/wave2grid_kma/* .
 	@ $(LN) $(CONVERTOR)/kma_netcdf/* .
