@@ -7,6 +7,7 @@ subroutine da_wrfvar_init( no_init1 )
    IMPLICIT NONE
 
    LOGICAL, OPTIONAL, INTENT(IN) :: no_init1
+   logical, external :: wrf_dm_on_monitor
 
    !<DESCRIPTION>
    ! Program_name, a global variable defined in frame/module_domain.F, is
