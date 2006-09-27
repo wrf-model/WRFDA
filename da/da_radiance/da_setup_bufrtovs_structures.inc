@@ -1,4 +1,4 @@
-subroutine da_setup_bufrtovs_structures( xp, ob, iv )
+SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
 !------------------------------------------------------------------------------
 ! PURPOSE: Define, allocate and read of tovs raidance observation structure.
@@ -19,77 +19,76 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(INOUT)   :: ob         ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)   :: iv         ! O-B structure.
 
-   CHARACTER(len=200)          :: filename
-   integer                     :: i, j, n, inunit, ios, alloc_status
-
+   CHARACTER(len=200)           :: filename
+   integer                     :: i, j, n, ios, alloc_status
+   logical                     :: lprinttovs 
+   
+   integer                     :: myproc, ierr
 
    if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
 
 !-------------------------------------------------------------------
 !  [1.0] Initialize RTTOV coefs and innovations vector for radiance
 !-------------------------------------------------------------------
-    inunit = bufrtovs_unit
     call da_rtm_init(iv,ob)
-
-!    return
 
 !-------------------------------------------------------------------
 !  [2.0] Read NCEP bufr tovs data in radiance innovations vector
 !-------------------------------------------------------------------
-         if(use_Hirs2Obs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from hirs2.bufr'
+         if(use_hirs2obs) then
+            write(6,'(a)')  ' Reading radiance 1b data from hirs2.bufr'
             filename = ' '
-            write(UNIT=filename(1:10), fmt='(a)') 'hirs2.bufr'
-            call da_read_bufrtovs ('hirs2', iv, xp, inunit, filename)
+            write(filename(1:10), fmt='(a)') 'hirs2.bufr'
+            call da_read_bufrtovs ('hirs2', iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_MsuObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from msu.bufr'
+         if(use_msuobs) then
             filename = ' '
-            write(UNIT=filename(1:8), fmt='(a)') 'msu.bufr'
-            call da_read_bufrtovs ('msu  ', iv, xp, inunit, filename)
+            write(6,'(a)')  ' Reading radiance 1b data from msu.bufr'
+            write(filename(1:8), fmt='(a)') 'msu.bufr'
+            call da_read_bufrtovs ('msu  ', iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_Hirs3Obs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from hirs3.bufr'
+         if(use_hirs3obs) then
+            write(6,'(a)')  ' Reading radiance 1b data from hirs3.bufr'
             filename = ' '
-            write(UNIT=filename(1:10), fmt='(a)') 'hirs3.bufr'
-            call da_read_bufrtovs ('hirs3', iv, xp, inunit, filename)
+            write(filename(1:10), fmt='(a)') 'hirs3.bufr'
+            call da_read_bufrtovs ('hirs3', iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_AmsuaObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from amsua.bufr'
+         if(use_amsuaobs) then
+            write(6,'(a)')  ' Reading radiance 1b data from amsua.bufr'
             filename = ' '
-            write(UNIT=filename(1:10), fmt='(a)') 'amsua.bufr'
-            call da_read_bufrtovs ('amsua', iv, xp, inunit, filename)
+            write(filename(1:10), fmt='(a)') 'amsua.bufr'
+            call da_read_bufrtovs ('amsua', iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_AmsubObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading radiance 1b data from amsub.bufr'
+         if(use_amsubobs) then
+            write(6,'(a)')  ' Reading radiance 1b data from amsub.bufr'
             filename = ' '
-            write(UNIT=filename(1:10), fmt='(a)') 'amsub.bufr'
-            call da_read_bufrtovs ('amsub', iv, xp, inunit, filename)
+            write(filename(1:10), fmt='(a)') 'amsub.bufr'
+            call da_read_bufrtovs ('amsub', iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_AirsObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading airs 1b data from airs.bufr'
+         if(use_airsobs) then
+            write(6,'(a)')  ' Reading airs 1b data from airs.bufr'
             filename = ' '
-            write(UNIT=filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('airs     ',iv, xp, inunit, filename)
+            write(filename(1:9), fmt='(a)') 'airs.bufr'
+            call da_read_bufrairs ('airs     ',iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_Eos_AmsuaObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading eos_amsua 1b data from airs.bufr'
+         if(use_eos_amsuaobs) then
+            write(6,'(a)')  ' Reading eos_amsua 1b data from airs.bufr'
             filename = ' '
-            write(UNIT=filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('eos_amsua',iv, xp, inunit, filename)
+            write(filename(1:9), fmt='(a)') 'airs.bufr'
+            call da_read_bufrairs ('eos_amsua',iv, xp, bufrtovs_unit, filename)
          endif
 
-         if(use_HsbObs) then
-            write(UNIT=stdout,FMT='(a)')  ' Reading hsb 1b data from airs.bufr'
+         if(use_hsbobs) then
+            write(6,'(a)')  ' Reading hsb 1b data from airs.bufr'
             filename = ' '
-            write(UNIT=filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('hsb      ',iv, xp, inunit, filename)
+            write(filename(1:9), fmt='(a)') 'airs.bufr'
+            call da_read_bufrairs ('hsb      ',iv, xp, bufrtovs_unit, filename)
          endif
 
          if(use_filtered_rad) then
@@ -100,8 +99,8 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
            do i=1,rtminit_nsensor
             filename = ' '
             filename='kma1dvar-'//trim(iv%instid(i)%rttovid_string)//'.inv'
-            write(UNIT=stdout,FMT='(a,a)')  ' Reading KMA 1dvar innovation from  ', filename
-            call da_read_kma1dvar (i,iv, ob, xp, inunit, filename)
+            write(6,'(a,a)')  ' Reading KMA 1dvar innovation from  ', filename
+            call da_read_kma1dvar (i,iv, ob, xp, bufrtovs_unit, filename)
            end do
          endif
 
@@ -119,14 +118,14 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
       if (ob % instid(i) % num_rad < 1) cycle
       allocate ( ob % instid(i) % rad(1:ob % instid(i)%num_rad), stat = alloc_status )
       If( alloc_status /= 0 ) Then
-        call da_error(__FILE__,__LINE__, &
-          (/"mem allocation error to ob%instid(n)%rad"/))
+        Write( *, '( "mem allocation error to ob%instid(n)%rad")' )
+        Stop ' in da_setup_bufrtovs_structures '
       End If
       do j = 1, ob % instid(i) % num_rad
         allocate ( ob % instid(i) % rad(j) % tb(1:ob % instid(i) % nchan), stat = alloc_status )
         If( alloc_status /= 0 ) Then
-          call da_error(__FILE__,__LINE__, &
-            (/"mem allocation error to ob%instid(n)%ichan"/))
+          Write( *, '( "mem allocation error to ob%instid(n)%rad(j)%tb")' ) 
+          Stop ' in da_setup_bufrtovs_structures '
         End If
         ob % instid(i) % rad(j)% tb(:) = &
         iv % instid(i) % rad(j)% tb(:)% inv
@@ -135,10 +134,7 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 
  end if
 
-
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
- return
-
-end subroutine da_setup_bufrtovs_structures
+END SUBROUTINE da_setup_bufrtovs_structures
 
