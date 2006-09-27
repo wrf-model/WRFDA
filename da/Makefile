@@ -1179,6 +1179,8 @@ da_radiance.o:		da_radiance.f90 \
 			da_transform_xtoy_rad_adj.inc \
 			da_get_innov_vector_rad.inc \
 			da_biascorr_rad.inc \
+			da_biasprep.inc \
+			da_biaspredictor.inc \
 			da_qc_rad.inc \
 			da_qc_amsua.inc \
 			da_qc_amsub.inc \

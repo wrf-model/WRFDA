@@ -170,11 +170,26 @@ module da_radiance
    
    TYPE (satinfo_type), pointer :: satinfo(:)
 
+   TYPE BIAS
+      INTEGER :: nchan     ! number of channels
+      INTEGER :: npred     ! number of predictors
+      INTEGER :: platform_id,satellite_id,sensor_id
+      INTEGER :: year, month, day, hour, min, sec
+      INTEGER :: scanline,scanpos
+      INTEGER :: landmask
+      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk
+      REAL    :: tb(20), omb(20)
+      REAL    :: pred(6)
+   END TYPE BIAS
+
+
 CONTAINS
 
 #include "da_calculate_jo_and_grady_rad.inc"
 #include "da_calculate_residual_rad.inc"
 #include "da_biascorr_rad.inc"
+#include "da_biasprep.inc"
+#include "da_predictor.inc"
 #include "da_qc_rad.inc"
 #include "da_qc_amsua.inc"
 #include "da_qc_amsub.inc"

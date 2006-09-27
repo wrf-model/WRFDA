@@ -1534,6 +1534,7 @@ rconfig   integer   rtminit_satid         namelist,record14        30           
 rconfig   integer   rtminit_sensor        namelist,record14        30             -1.0         -   "TBD"              "TBD"              "TBD"
 rconfig   logical   lread_biascoef        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   lbiascorr             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   lbiasprep             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   lrttov_scatt          namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   lmonitoring           namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   lwrite_profile        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"

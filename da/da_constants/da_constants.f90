@@ -204,6 +204,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    ! Tracing to unit 100
    INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
    INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
+   INTEGER, PARAMETER :: unit_factor_rad = 111
    INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
    INTEGER, PARAMETER :: filtered_rad_unit   = 193  ! Unit number for writing filtered radiance
    INTEGER, PARAMETER :: innov_rad_unit      = 194  ! Unit number for writing innovation radiance
