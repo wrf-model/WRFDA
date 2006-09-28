@@ -83,7 +83,7 @@ export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
-elif test $HOSTNAME = ocotillo; then
+elif test $HOSTNAME = ocotillo -o $HOSTNAME = snowdrift ; then
    cat > job.ksh <<EOF
 #!/bin/ksh
 # Cannot put - options inside default substitution
