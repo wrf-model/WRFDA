@@ -54,7 +54,6 @@ include io_int.make
 include io_netcdf.make
 include io_grib.make
 include ioapi_share.make
-#include RSL_LITE.make
 include main.make
 
 real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
