@@ -8,6 +8,10 @@ export EXP_CORE=0
 export HDF=${HDF:-}
 export HDFEOS=${HDFEOS:-}  
 export compileflags=""
+export BLAS=${BLAS:-\$(EXTERNAL)/blas}
+export LAPACK=${LAPACK:-\$(EXTERNAL)/lapack}
+export FFTPACK5=${FFTPACK5:-\$(EXTERNAL)/fftpack5}
+export BUFR=${BUFR:-\$(EXTERNAL)/bufr_ncep_nco}
 
 option=$1
 
@@ -29,10 +33,6 @@ elif [ "$option" = "wrf_nmm" ] ; then
     NMM_CORE=1
     REGISTRY=Registry.NMM
 elif [ "$option" = "wrfvar" ] ; then
-    REGISTRY=Registry.wrfvar
-    DA_CORE=1
-    EM_CORE=1
-elif [ "$option" = "var" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
@@ -150,7 +150,7 @@ fi
 
 # Look for RTTOV for VAR radiances. Only needed for satellite radiances
 
-if [ "$option" = "var" ] ; then
+if [ "$option" = "wrfvar" ] ; then
   if test -z "$RTTOV" ; then
     for p in /usr/local/rttov; do
       if test -d $p; then
@@ -163,7 +163,7 @@ fi
 
 # Look for CRTM for VAR radiances. Only needed for satellite radiances
 
-if [ "$option" = "var" ] ; then
+if [ "$option" = "wrfvar" ] ; then
   if test -z "$CRTM" ; then
     for p in /usr/local/crtm; do
       if test -d $p; then
@@ -343,6 +343,30 @@ if [ "$option" = "wrfvar" ] ; then
   else
     echo "Will configure for use without CRTM"
   fi
+
+  if [ -n "$BLAS" ] ; then
+    echo "Will use BLAS in dir: $BLAS"
+  else
+    echo "Will compile BLAS"
+  fi
+
+  if [ -n "$LAPACK" ] ; then
+    echo "Will use LAPACK in dir: $LAPACK"
+  else
+    echo "Will compile LAPACK"
+  fi
+
+  if [ -n "$FFTPACK5" ] ; then
+    echo "Will use FFTPACK5 in dir: $FFTPACK5"
+  else
+    echo "Will compile FFTPACK5"
+  fi
+
+  if [ -n "$BUFR" ] ; then
+    echo "Will use BUFR in dir: $BUFR"
+  else
+    echo "Will compile BUFR"
+  fi
 fi
 
 # Users who are cross-compiling can set environment variable 
@@ -409,7 +433,8 @@ if test -n "$PERL" ; then
      -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE \
-     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE \
+     -lapack=$LAPACK -blas=$BLAS -fftpack5=$FFTPACK5 -bufr=$BUFR
 fi
 
 export CONFIG=configure.wrfvar
