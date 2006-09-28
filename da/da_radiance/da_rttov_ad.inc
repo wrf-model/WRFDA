@@ -1,5 +1,5 @@
 !
-subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
+subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
                       aux_vars, con_vars_ad, tb )
 !------------------------------------------------------------------------------
 !  PURPOSE: interface to the adjoint subroutine of RTTOV8_5.
@@ -395,4 +395,4 @@ subroutine da_rtm_ad( inst, nchanl, nprofiles, con_vars, &
 
  return
 
-end subroutine da_rtm_ad
+end subroutine da_rttov_ad

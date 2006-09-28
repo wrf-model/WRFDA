@@ -430,7 +430,7 @@
 
          !print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
 
-         call da_rtm_direct (inst, model_isflg(1), nchanl, nprofiles, &
+         call da_rttov_direct (inst, model_isflg(1), nchanl, nprofiles, &
                              nfrequencies, nchannels, nbtout, &
                              con_vars, aux_vars, &
                              tb, calcemis, pemsv, pemsh, emissivity )
@@ -486,6 +486,15 @@
 
   end do        ! end loop for sensor
 
+   !------------------------------------------
+   ! 3.1 prepare bias statistics files
+   !------------------------------------------
+
+   if (lbiasprep) then
+      do inst = 1, iv%num_inst
+         call da_biasprep(inst,ob,iv)
+      end do
+   end if
 
 !------------------------------------------------------------------------
 !        [4.0] Perform QC check

@@ -1,5 +1,5 @@
 !
-subroutine da_rtm_direct( inst, isflg, nchanl, nprofiles, &
+subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
                           nfrequencies, nchannels, nbtout , &
                           con_vars, aux_vars, &
                           tb, calcemis_out, emisv, emish, emissivity_out )
@@ -349,4 +349,4 @@ end if
 
  return
 
-end subroutine da_rtm_direct
+end subroutine da_rttov_direct

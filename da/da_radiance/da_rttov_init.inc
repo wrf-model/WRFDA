@@ -1,5 +1,5 @@
 !
-subroutine da_rtm_init(iv,ob)
+subroutine da_rttov_init(iv,ob)
 !------------------------------------------------------------------------------
 !  PURPOSE: interface to the initialization subroutine of RTTOV8_5.
 !
@@ -136,7 +136,7 @@ subroutine da_rtm_init(iv,ob)
       nscan(n)   = 90
    else
       write(6,*) ' unrecorgnized instrument '
-      stop ' in da_rtm_init '
+      stop ' in da_rttov_init '
    end if
 
       iv%instid(n)%nchan  = nchanl(n)
@@ -145,13 +145,13 @@ subroutine da_rtm_init(iv,ob)
       allocate ( iv%instid(n)%ichan(1:nchanl(n)), stat = error )
       if( error /= 0 ) then
         Write( *, '( "mem allocation error to iv%instid(n)%ichan")' )
-        Stop ' in da_rtm_init '
+        Stop ' in da_rttov_init '
       end if
 
       allocate ( ob%instid(n)%ichan(1:nchanl(n)), stat = error )
       if( error /= 0 ) then
         Write( *, '( "mem allocation error to ob%instid(n)%ichan")' )
-        Stop ' in da_rtm_init '
+        Stop ' in da_rttov_init '
       end if
 
 !     if (trim( inst_name(rtminit_sensor(n))) == 'airs') then
@@ -162,7 +162,7 @@ subroutine da_rtm_init(iv,ob)
   if (iost /= 0) then
      write(unit=*, fmt='(/A,A)') &
          'ERROR IN OPEN Radiance Info FILE ', trim(iv%instid(n)%rttovid_string)//'.info'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rtm_init '
+          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
   end if
 
   allocate ( satinfo(n) % ichan(nchanl(n)) )
@@ -211,7 +211,7 @@ subroutine da_rtm_init(iv,ob)
 
   if( any(errorstatus(:) /= errorstatus_success )) then
      write ( 6, * ) 'rttov_setup fatal error'
-     stop ' in da_rtm_init '
+     stop ' in da_rttov_init '
   endif
 
 !-------------------------------------------------------------
@@ -336,7 +336,7 @@ subroutine da_rtm_init(iv,ob)
   if (iost /= 0) then
      write(unit=*, fmt='(/A,A)') &
          'ERROR IN OPEN Radiance biascorr FILE ', trim(iv%instid(n)%rttovid_string)//'.bias'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rtm_init '
+          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
   end if
 
   allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
@@ -388,7 +388,7 @@ subroutine da_rtm_init(iv,ob)
     if (iost /= 0) then
      write(unit=*, fmt='(/A,A)') &
          'ERROR IN OPEN Radiance Error Factor FILE : radiance_error.factor'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rtm_init '
+          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
     end if
 
     read(unit_factor_rad, *)
@@ -416,4 +416,4 @@ subroutine da_rtm_init(iv,ob)
 
   return
 
-end subroutine da_rtm_init
+end subroutine da_rttov_init

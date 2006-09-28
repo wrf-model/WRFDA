@@ -181,7 +181,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
             ! [1.3] Call RTM TL model
 
-            call da_rtm_tl (inst, nchanl, nprofiles, con_vars, aux_vars, &
+            call da_rttov_tl (inst, nchanl, nprofiles, con_vars, aux_vars, &
                                      con_vars_tl, aux_vars_tl, tb )
 
             do iprof = 1, nprofiles

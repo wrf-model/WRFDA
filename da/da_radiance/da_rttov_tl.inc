@@ -1,5 +1,5 @@
 !
-subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
+subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
                       con_vars_tl, aux_vars_tl, tb )
 !------------------------------------------------------------------------------
 !  PURPOSE: interface to the tangent linear subroutine of RTTOV8_5.
@@ -366,4 +366,4 @@ subroutine da_rtm_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
  return
 
-end subroutine da_rtm_tl
+end subroutine da_rttov_tl

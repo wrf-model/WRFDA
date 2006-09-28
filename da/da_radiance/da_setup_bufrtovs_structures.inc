@@ -30,7 +30,7 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 !-------------------------------------------------------------------
 !  [1.0] Initialize RTTOV coefs and innovations vector for radiance
 !-------------------------------------------------------------------
-    call da_rtm_init(iv,ob)
+    call da_rttov_init(iv,ob)
 
 !-------------------------------------------------------------------
 !  [2.0] Read NCEP bufr tovs data in radiance innovations vector

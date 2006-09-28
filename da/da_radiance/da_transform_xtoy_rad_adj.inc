@@ -85,7 +85,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
          end do
 
 !---------------------------------------------
-!        [2.0] get input of da_rtm_ad
+!        [2.0] get input of da_rttov_ad
 !---------------------------------------------
         do iprof = 1, nprofiles
 
@@ -119,7 +119,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !         [3.0] Call RTM Adjoint model
 !-------------------------------------------------
  
-        call da_rtm_ad (inst, nchanl, nprofiles, con_vars, &
+        call da_rttov_ad (inst, nchanl, nprofiles, con_vars, &
                                aux_vars, con_vars_ad, tb )
 
 !----------------------------------------------------------
