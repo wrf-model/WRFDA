@@ -28,7 +28,7 @@ fftpack5.o:	         \
 			$(FFC) -c  $(FIXEDFLAGS) -I$(BUILD) fftpack5.f
 
 clean :
-	$(RM) $(FFTPACK_OBJS) *.mod *.f
+	$(RM) $(FFTPACK_OBJS) *.mod *.f *.o *.a
 
 superclean : clean
 

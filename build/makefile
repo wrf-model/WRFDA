@@ -102,7 +102,7 @@ lapack : blas $(LAPACK)/liblapack.a
 
 fftpack5 : da_constants.o $(FFTPACK5)/libfftpack5.a
 
-bufr : $(BUFR_NCEP_NCO)/libbufr.a
+bufr : $(BUFR)/libbufr.a
 
 $(BLAS)/libblas.a :
 	@ ( cd $(BLAS); make all )
@@ -113,8 +113,8 @@ $(LAPACK)/liblapack.a :
 $(FFTPACK5)/libfftpack5.a :
 	( cd $(FFTPACK5); make all )
 
-$(BUFR_NCEP_NCO)/libbufr.a :
-	( cd $(BUFR_NCEP_NCO); make all )
+$(BUFR)/libbufr.a :
+	( cd $(BUFR); make all )
 
 clean : arch_clean
 	@ rm -rf  *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \

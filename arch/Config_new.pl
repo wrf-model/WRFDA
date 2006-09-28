@@ -20,6 +20,10 @@ $sw_esmflib_path="";
 $sw_esmfinc_path="";
 $sw_rttov_path=""; 
 $sw_crtm_path=""; 
+$sw_blas_path="$(EXTERNAL)/blas"; 
+$sw_lapack_path="$(EXTERNAL)/lapack"; 
+$sw_fftpack5_path="$(EXTERNAL)/fftpack5"; 
+$sw_bufr_path="$(EXTERNAL)/bufr_ncep_nco"; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
@@ -67,6 +71,18 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 5 ) eq "crtm=" ) {
     $sw_crtm_path = substr( $ARGV[0], 6 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 5 ) eq "blas=" ) {
+    $sw_blas_path = substr( $ARGV[0], 6 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 7 ) eq "lapack=" ) {
+    $sw_lapack_path = substr( $ARGV[0], 8 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 9 ) eq "fftpack5=" ) {
+    $sw_fftpack5_path = substr( $ARGV[0], 10 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 5 ) eq "bufr=" ) {
+    $sw_bufr_path = substr( $ARGV[0], 6 ) ;
   }
   if ( substr( $ARGV[0], 1, 3 ) eq "os=" ) {
     $sw_os = substr( $ARGV[0], 4 ) ;
@@ -281,6 +297,13 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_CRTM_LIB::g ;
     $_ =~ s:CONFIGURE_CRTM_INC::g ;
   }
+
+  # always defined
+ 
+  $_ =~ s:CONFIGURE_BLAS:$sw_blas_path:g ;
+  $_ =~ s:CONFIGURE_LAPACK:$sw_lapack_path:g ;
+  $_ =~ s:CONFIGURE_FFTPACK5:$sw_fftpack5_path:g ;
+  $_ =~ s:CONFIGURE_BUFR:$sw_bufr_path:g ;
 
   @machopts1 = ( @machopts1, $_ ) ;
   if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )

@@ -137,7 +137,7 @@ if test ! -f $DA_ANALYSIS; then
 
    export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00.0000}
    export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
-   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MIN:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
+   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
 
    # Default WRF namelist variables:
    export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"

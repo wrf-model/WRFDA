@@ -67,6 +67,18 @@ endif
 if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
 endif
+if (-d ~bray/blas/blas_${COMPILER}) then
+   setenv BLAS ~bray/blas/blas_${COMPILER}
+endif
+if (-d ~bray/lapack/lapack_${COMPILER}) then
+   setenv LAPACK ~bray/lapack/lapack_${COMPILER}
+endif
+if (-d ~bray/fftpack5/fftpack5_${COMPILER}) then
+   setenv FFTPACK5 ~bray/fftpack5/fftpack5_${COMPILER}
+endif
+if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
+   setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
+endif
 
 if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
@@ -136,3 +148,7 @@ echo "MPICH       " $MPICH
 echo "RTTOV       " $RTTOV
 echo "CRTM        " $CRTM
 echo "NETCDF      " $NETCDF
+echo "BLAS        " $BLAS
+echo "LAPACK      " $LAPACK
+echo "FFTPACK5    " $FFTPACK5
+echo "BUFR        " $BUFR

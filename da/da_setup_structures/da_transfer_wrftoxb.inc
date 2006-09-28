@@ -498,9 +498,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          ! Calculate surface variable(wind, moisture, temperature)
          ! sfc variables: 10-m wind, and 2-m T, Q, at cross points
 
-write (0,*) "da_transfer_wrftoxb, grid%xb%p(i,j,ks),grid%xb%p(i,j,ks+1)", &
-   grid%xb%p(i,j,ks),grid%xb%p(i,j,ks+1)
-
          call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
                       grid%xb%p(i,j,ks), grid%xb%t(i,j,ks), grid%xb%q(i,j,ks), &
                       grid%xb%u(i,j,ks), grid%xb%v(i,j,ks), &
