@@ -91,8 +91,7 @@ echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
-echo 'RUN_DIR               <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
-echo 'WORK_DIR              <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
+echo 'RUN_DIR               <A HREF="'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
 echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"

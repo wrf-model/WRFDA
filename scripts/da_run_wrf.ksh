@@ -116,7 +116,7 @@ fi
 
 cp namelist.input $RUN_DIR
 
-echo 'WORK_DIR   <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
+echo 'RUN_DIR               <A HREF="'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
 echo '<A HREF="namelist.input">Namelist input</a>'
 
 if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
