@@ -86,6 +86,18 @@ fi
 if test -d ~/mpich/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=~/mpich/mpich-1.2.7p1_${COMPILER}
 fi
+if test -d ~/blas/blas_${COMPILER}; then
+   export BLAS=~/blas/blas_${COMPILER}
+fi
+if test -d ~/lapack/lapack_${COMPILER}; then
+   export LAPACK=~/lapack/lapack_${COMPILER}
+fi
+if test -d ~/fftpack5/fftpack5_${COMPILER}; then
+   export FFTPACK5=~/fftpack5/fftpack5_${COMPILER}
+fi
+if test -d ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}; then
+   export BUFR=~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
+fi
 
 # mpich2
 

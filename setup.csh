@@ -29,7 +29,6 @@ endif
 
 # List options in order of increasing preference
 
-
 if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
 endif
@@ -93,6 +92,18 @@ if (-d ~/crtm/crtm_${COMPILER}) then
 endif
 if (-d ~/mpich/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH ~/mpich/mpich-1.2.7p1_${COMPILER}
+endif
+if (-d ~/blas/blas_${COMPILER}) then
+   setenv BLAS ~/blas/blas_${COMPILER}
+endif
+if (-d ~/lapack/lapack_${COMPILER}) then
+   setenv LAPACK ~/lapack/lapack-1.2.7p1_${COMPILER}
+endif
+if (-d ~/fftpack5/fftpack5_${COMPILER}) then
+   setenv FFTPACK5 ~/fftpack5/fftpack5_${COMPILER}
+endif
+if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
+   setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
 endif
 
 # mpich2
@@ -162,11 +173,27 @@ if ($COMPILER == 'g95') then
 endif
 
 echo
-echo "MPICH       " $MPICH
-echo "RTTOV       " $RTTOV
-echo "CRTM        " $CRTM
-echo "NETCDF      " $NETCDF
-echo "BLAS        " $BLAS
-echo "LAPACK      " $LAPACK
-echo "FFTPACK5    " $FFTPACK5
-echo "BUFR        " $BUFR
+if ($?MPICH) then
+   echo "MPICH       " $MPICH
+endif
+if ($?RTTOV) then
+   echo "RTTOV       " $RTTOV
+endif
+if ($?CRTM) then
+   echo "CRTM        " $CRTM
+endif
+if ($?NETCDF) then
+   echo "NETCDF      " $NETCDF
+endif
+if ($?BLAS) then
+   echo "BLAS        " $BLAS
+endif
+if ($?LAPACK) then
+   echo "LAPACK      " $LAPACK
+endif
+if ($?FFTPACK5) then
+   echo "FFTPACK5    " $FFTPACK5
+endif
+if ($?BUFR) then
+   echo "BUFR        " $BUFR
+endif
