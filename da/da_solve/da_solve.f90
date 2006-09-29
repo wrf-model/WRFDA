@@ -60,23 +60,6 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    IF (trace_use) call da_trace_entry("da_solve")
 
-   call wrf_message("***  VARIATIONAL ANALYSIS ***")
-#ifdef DM_PARALLEL
-   call MPI_COMM_SIZE(MPI_COMM_WORLD, num_procs, ierr)
-   call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
-   call MPI_COMM_RANK(MPI_COMM_WORLD, myproc, ierr )
-#else
-   num_procs = 1
-   numb_procs = 1
-   myproc = 0
-#endif
-
-   if (myproc==0) then
-      rootproc=.TRUE.
-   else
-      rootproc=.FALSE.
-   end if
-
    !---------------------------------------------------------------------------
    ! If it is verification run set check_max_iv as .false.
    !---------------------------------------------------------------------------

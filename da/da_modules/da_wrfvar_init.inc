@@ -7,7 +7,11 @@ subroutine da_wrfvar_init( no_init1 )
    IMPLICIT NONE
 
    LOGICAL, OPTIONAL, INTENT(IN) :: no_init1
-   logical, external :: wrf_dm_on_monitor
+   integer :: ierr
+
+#if DM_PARALLEL
+   include "mpif.h"
+#endif
 
    !<DESCRIPTION>
    ! Program_name, a global variable defined in frame/module_domain.F, is
@@ -48,8 +52,26 @@ subroutine da_wrfvar_init( no_init1 )
    !
    !</DESCRIPTION>
 
+   call wrf_message("***  VARIATIONAL ANALYSIS ***")
+
 #ifdef DM_PARALLEL
-   IF ( wrf_dm_on_monitor() ) THEN
+   call MPI_COMM_SIZE(MPI_COMM_WORLD, num_procs, ierr)
+   call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
+   call MPI_COMM_RANK(MPI_COMM_WORLD, myproc, ierr )
+#else
+   num_procs = 1
+   numb_procs = 1
+   myproc = 0
+#endif
+
+   if (myproc==0) then
+      rootproc=.TRUE.
+   else
+      rootproc=.FALSE.
+   end if
+
+#ifdef DM_PARALLEL
+   IF (rootproc) THEN
       call initial_config
    ENDIF
    call get_config_as_buffer( configbuf, configbuflen, nbytes )
