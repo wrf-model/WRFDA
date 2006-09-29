@@ -82,6 +82,23 @@ if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
    setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 endif
 
+if (-d ~/netcdf/netcdf-3.6.1_${COMPILER}) then
+   setenv NETCDF ~/netcdf/netcdf-3.6.1_${COMPILER}
+endif
+if (-d ~/rttov/rttov85_${COMPILER}) then
+   setenv RTTOV ~/rttov/rttov85_${COMPILER}
+endif
+if (-d ~/crtm/crtm_${COMPILER}) then
+   setenv CRTM ~/crtm/crtm_${COMPILER}
+endif
+if (-d ~/mpich/mpich-1.2.7p1_${COMPILER}) then
+   setenv MPICH ~/mpich/mpich-1.2.7p1_${COMPILER}
+endif
+
+# mpich2
+
+#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}) then
+
 # mpich2
 
 #if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}) then

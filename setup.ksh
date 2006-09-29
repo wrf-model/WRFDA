@@ -74,6 +74,19 @@ if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}; then
    export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 fi
 
+if test -d ~/netcdf/netcdf-3.6.1_${COMPILER}; then
+   export NETCDF=~/netcdf/netcdf-3.6.1_${COMPILER}
+fi
+if test -d ~/rttov/rttov85_${COMPILER}; then
+   export RTTOV=~/rttov/rttov85_${COMPILER}
+fi
+if test -d ~/crtm/crtm_${COMPILER}; then
+   export CRTM=~/crtm/crtm_${COMPILER}
+fi
+if test -d ~/mpich/mpich-1.2.7p1_${COMPILER}; then
+   export MPICH=~/mpich/mpich-1.2.7p1_${COMPILER}
+fi
+
 # mpich2
 
 #if test -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}; then
