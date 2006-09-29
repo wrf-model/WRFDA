@@ -22,10 +22,6 @@ export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-$DAT_DIR/wps_geog}
 
-if test ! -d $WPS_GEOG_DIR; then
-   ln -s /mmm/users/bray/data/wps_geog ${HOME}/data/wps_geog
-fi
-
 export NL_E_WE=${NL_E_WE:-110}
 export NL_E_SN=${NL_E_SN:-145}
 export MAP_PROJ=${MAP_PROJ:-polar}
@@ -179,13 +175,16 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL
          exit $RC
       fi
 
-      $WPS_DIR/ungrib.exe
+      $WPS_DIR/ungrib.exe > $RUN_DIR/ungrib.log 2>&1
       RC=$?
+      cp ungrib.log $RUN_DIR
+      echo '<A HREF="ungrib.log">ungrib.log</a>'
       if test $RC != 0; then
          echo ungrib failed with error $RC
          exit $RC
       fi
 
+      if test $RC = 0; then
       $WPS_DIR/metgrid.exe
       RC=$?
       cp metgrid.log $RUN_DIR
@@ -194,6 +193,8 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL
          echo metgrid failed with error $RC
          exit $RC
       fi
+      fi      
+      
    fi
    mv met_em.d${DOMAIN}* $RC_DIR/$DATE
 else
