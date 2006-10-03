@@ -14,7 +14,7 @@ LD              = $(FC)
 # Flags (preprocessor, fortran, c, loader)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -56,123 +56,6 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH       Compaq OSF1 alpha          (single-threaded)
-#
-M4              = m4 -B 12000
-FC              = f90
-FFC             = $(FC)
-SFC             = $(FC)
-CC              = cc
-CC_TOOLS        = $(FC)
-LD              = $(FC)
-
-TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
-                    -DNONSTANDARD_SYSTEM                    
-
-#FCOPTIM        = -fast -O2 -Olimit 2000
-FCOPTIM         = #-fast -O2
-FCDEBUG         = # -g
-FCTYPE          = -r8
-FCFREE          = -free
-FCHOST          = -arch host
-FCENDIAN        = -convert big_endian
-FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
-
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
-
-arch : 
-		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
-
-arch_clean : 
-
-arch_superclean : 
-
-###########################################################
-#ARCH       Compaq OSF1 alpha DM       (RSL, MPICH, RSL IO)
-#
-M4              = m4 -B 12000
-FC              = mpif90
-FFC             = f90
-SFC             = f90
-CC              = mpicc
-CC_TOOLS        = cc
-LD              = $(FC)
-
-TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
-                    -DNONSTANDARD_SYSTEM
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-#FCOPTIM        = -fast -O2 -Olimit 2000
-FCOPTIM         = -fast -O2
-FCDEBUG         = -g
-FCTYPE          = -r8
-FCFREE          = -free
-FCHOST          = -arch host
-FCENDIAN        = -convert big_endian
-FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
-
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
-MPI_LIB		= -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST alpha )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 VAR)
-#
-M4              = m4 -B 12000
-FC              = f90
-FFC             = $(FC)
-SFC             = $(FC)
-CC              = cc
-CC_TOOLS        = $(CC)
-LD              = $(FC)
-
-TRADFLAG        =
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DDEC_ALPHA \
-                    -DNONSTANDARD_SYSTEM
-                   
-#FCOPTIM        = -fast -O2 -Olimit 2000
-FCOPTIM         = -O0
-FCDEBUG         = # -g
-FCTYPE          = -r8
-FCFREE          = -free
-FCHOST          = -arch host
-FCENDIAN        = -convert big_endian
-FCBASE          = -automatic -cpp -fpe0 -align dcommons -align records
-
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
-
-arch : 
-		$(LN) $(RSL_STUBS)/* .
-		@ touch arch
-
-arch_clean :
-
-arch_superclean : 
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
 #
 FC              = pgf90
@@ -183,7 +66,7 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
@@ -221,7 +104,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 DM_CPPFLAGS     = -I$(RSL)/RSL
@@ -390,7 +273,7 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
@@ -426,7 +309,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
