@@ -1,0 +1,1 @@
+../temp/inc/namelist_script.inc

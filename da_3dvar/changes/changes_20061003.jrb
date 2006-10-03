@@ -1,0 +1,34 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : John Bray
+Reviewer: Xin Zhang 
+Date: 10/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add inc/namelist_script.inc for use in modern wrfvar trunk scripts to create
+namelists from environment variables at run time
+
+Files added:
+-------------------------------------
+
+ inc/namelist_script.inc
+
+Files Removed:
+-------------------------------------
+
+Files Modified:
+-------------------------------------
+
+CHANGES
+
+changes/changes_20061003.jrb
+
+
+
+Tag:
+
+                  
+
