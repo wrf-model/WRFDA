@@ -68,19 +68,6 @@ if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
    setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
 endif
 
-if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
-   setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
-   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}) then
-   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
-endif
-
 if (-d ~/netcdf/netcdf-3.6.1_${COMPILER}) then
    setenv NETCDF ~/netcdf/netcdf-3.6.1_${COMPILER}
 endif
@@ -105,6 +92,20 @@ endif
 if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
    setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
 endif
+
+if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
+   setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
+   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}) then
+   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
+   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+endif
+
 
 # mpich2
 

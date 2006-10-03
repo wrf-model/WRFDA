@@ -61,19 +61,6 @@ if test -d ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}; then
    export BUFR=~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
 fi
 
-if test -d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}; then
-   export NETCDF=/Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}; then
-   export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}; then
-   export CRTM=/Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}; then
-   export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
-fi
-
 if test -d ~/netcdf/netcdf-3.6.1_${COMPILER}; then
    export NETCDF=~/netcdf/netcdf-3.6.1_${COMPILER}
 fi
@@ -97,6 +84,19 @@ if test -d ~/fftpack5/fftpack5_${COMPILER}; then
 fi
 if test -d ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}; then
    export BUFR=~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
+fi
+
+if test -d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}; then
+   export NETCDF=/Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}; then
+   export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}; then
+   export CRTM=/Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}; then
+   export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
 fi
 
 # mpich2
