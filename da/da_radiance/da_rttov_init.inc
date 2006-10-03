@@ -414,6 +414,10 @@ subroutine da_rttov_init(iv,ob)
   deallocate(nscan)
   deallocate(nchanl)
 
+  allocate ( time_slots(0:num_fgat_time) )
+  call da_get_time_slots(num_fgat_time,time_window_min,time_analysis, &
+                         time_window_max, time_slots)
+
   return
 
 end subroutine da_rttov_init
