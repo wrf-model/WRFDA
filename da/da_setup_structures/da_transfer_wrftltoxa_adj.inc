@@ -137,7 +137,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    grid%em_g_v_2(is:ie,js,ks:ke)=grid%xa%v(is:ie,js,ks:ke)/2.
 
    ! The northern boundary
-   g_v_2(is:ie,je+1,ks:ke)=grid%xa%v(is:ie,je,ks:ke)/2.
+   grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%xa%v(is:ie,je,ks:ke)/2.
 
 #endif
 
