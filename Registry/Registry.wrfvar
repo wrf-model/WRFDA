@@ -1545,6 +1545,8 @@ rconfig   logical   lwrite_filtered_rad   namelist,record14        1            
 rconfig   logical   use_error_factor_rad  namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   use_landem            namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   integer   mw_emis_sea           namelist,record14        1              1            -   "TBD"              "TBD"              "TBD"
+rconfig   integer   tovs_min_transfer     namelist,record14        1              10           -   "tovs_min_transfer" "Minimum number of tovs worth relocating" "n/a"
+rconfig   integer   tovs_max_transfer     namelist,record14        1              10           -   "tovs_max_transfer" "Maximum number of tovs in a transfer" "n/a"
 
 rconfig   integer   num_pseudo            namelist,pseudo_ob_nl    1              0            -   "TBD"              "TBD"              "TBD"
 rconfig   real      pseudo_x              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"

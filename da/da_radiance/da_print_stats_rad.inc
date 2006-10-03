@@ -16,6 +16,8 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
    INTEGER    :: i, k, n, nmin, nmax
    INTEGER    :: used_nchan 
 
+   if (trace_use) call da_trace_entry("da_print_stats_rad")
+
     used_nchan = 0
     do k=1, nchan                  !! loop for channels
        if(rad%ichan(k)%num > 1) used_nchan = used_nchan + 1
@@ -42,6 +44,8 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
         rad%ichan(k)%minimum%value, rad%ichan(k)%maximum%value
     end if
     end do
+
+   if (trace_use) call da_trace_exit("da_print_stats_rad")
 
 
 end subroutine da_print_stats_rad

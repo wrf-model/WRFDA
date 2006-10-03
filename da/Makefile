@@ -101,6 +101,7 @@ da_par_util.o:		da_par_util.f90                   \
 			da_proc_stats_combine.inc         \
 			da_proc_sum_count_obs.inc         \
 			da_proc_sum_int.inc               \
+			da_proc_sum_ints.inc              \
 			da_proc_sum_real.inc              \
 			da_transpose.inc                  \
 			da_unpack_count_obs.inc           \

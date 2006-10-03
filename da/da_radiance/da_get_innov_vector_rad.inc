@@ -71,6 +71,8 @@
 
    IF ( iv%num_inst < 1 ) return
 
+   if (trace_use) call da_trace_entry("da_get_innov_vector_rad")
+
    WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation------- '
 
 !------------------------------------------------------
@@ -507,7 +509,7 @@
   end do        ! end loop for sensor
  end if
 
- return
+   if (trace_use) call da_trace_exit("da_get_innov_vector_rad")
  
 end subroutine da_get_innov_vector_rad
 
