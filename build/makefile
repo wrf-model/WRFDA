@@ -4,7 +4,7 @@ setup : depend
 
 makedepf90.exe : 
 	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; export CC=$(CC_TOOLS); \
-          touch configure; ./configure; touch find_dep.c find_dep.h; make )
+          unset LDFLAGS CCFLAGS CPPFLAGS; touch configure; ./configure; touch find_dep.c find_dep.h; make )
 	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 makedepf90.exe
 
 links : 
