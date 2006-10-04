@@ -16,14 +16,14 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
    IF ( ABS(p - missing_r) > 1. .AND. ABS(t - missing_r) > 1. .AND. &
         ABS(q - missing_r) > 1 ) THEN
 
-!     Calculate rh:
+      ! Calculate rh:
 
       call da_tp_to_qs( t, p, es, qs )
 
       rh = 100.0 * q / qs
       IF ( rh > 100.0 ) rh = 100.0
 
-!     Get observation error for qv. Is this right?
+      ! Get observation error for qv. Is this right?
 
       q_error = da_e_qv_from_rh ( rh_error, t_error, rh, t, p )
 
@@ -34,3 +34,5 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
    if (q_error == 0.0) q_error = missing_r
 
 end subroutine da_get_q_error
+
+

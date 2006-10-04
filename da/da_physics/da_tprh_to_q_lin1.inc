@@ -1,13 +1,11 @@
 subroutine da_tprh_to_q_lin1( t, p, es, q, rh, &
                               t_prime, p_prime, rh_prime, q_prime )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Convert T/pressure/rh to specific humidity increments.
-!
-!  METHOD: q~ = q (rh~/rh + qs~/qs).
-!
-!  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Convert T/pressure/rh to specific humidity increments.
+   !
+   !  METHOD: q~ = q (rh~/rh + qs~/qs)
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -23,16 +21,18 @@ subroutine da_tprh_to_q_lin1( t, p, es, q, rh, &
    
    REAL                          :: qs_prime_over_qs ! qs~/qs.
 
-!------------------------------------------------------------------------------
-!  [1.0] Calculate saturation specific humidity ratio qs~/qs:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
+   !---------------------------------------------------------------------------
 
    call da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, qs_prime_over_qs )
    
-!------------------------------------------------------------------------------
-!  [2.0] Calculate specific humidity increment:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate specific humidity increment:
+   !---------------------------------------------------------------------------
 
    q_prime = q * ( rh_prime / rh + qs_prime_over_qs )
 
 end subroutine da_tprh_to_q_lin1
+
+

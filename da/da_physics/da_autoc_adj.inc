@@ -1,6 +1,6 @@
 subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
-!  Auto-conversion
+   ! Auto-conversion
 
    implicit none
 
@@ -10,13 +10,13 @@ subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
    real, parameter           :: QCTH=0.5E-3, QCK1=1.0E-3
 
    DO k=kts,kte
-
       if (DT(k) <= 0.) cycle
 
       if (SCR2(k) >= QCTH) then
          SCR29(K)=SCR29(K)+QCK1 * PRC9(K)
       endif
-
    ENDDO
 
 end subroutine da_autoc_adj
+
+

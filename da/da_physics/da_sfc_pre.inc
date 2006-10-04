@@ -1,62 +1,62 @@
 subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
-!-----------------------------------------------------------------------------!
-!
-! Correct pressure between two levels. 
-!
-! Reference: make use of the hydrosatic equation:
-!
-!  P2 = P1 * exp [-G/R * (z2-z1) / (tv1 + tv2)/2)
-!
-! Where:
-!  z1  = height at level 1
-!  z1  = height at level 2
-!  tv1 = temperature at level 1
-!  tv2 = temperature at level 2
-!  P1  = Pressure at level 1
-!  P2  = Pressure at level 2
-!-----------------------------------------------------------------------------!
 
-      IMPLICIT NONE
+   !---------------------------------------------------------------------------
+   !
+   ! Correct pressure between two levels. 
+   !
+   ! Reference: make use of the hydrosatic equation:
+   !
+   !  P2 = P1 * exp [-G/R * (z2-z1) / (tv1 + tv2)/2)
+   !
+   ! Where:
+   !  z1  = height at level 1
+   !  z1  = height at level 2
+   !  tv1 = temperature at level 1
+   !  tv2 = temperature at level 2
+   !  P1  = Pressure at level 1
+   !  P2  = Pressure at level 2
+   !---------------------------------------------------------------------------
 
-      REAL, INTENT (out)   :: psfcm   ! model pressure at ho
-      REAL, INTENT (in)    :: psm, tsm, qsm
+   IMPLICIT NONE
 
-      REAL, INTENT (in)           :: hsm, ho
-      REAL, INTENT (in), OPTIONAL :: to, qvo
-    
-      REAL                 :: tvo, tvsm, tv, dz, arg0, arg
+   REAL, INTENT (out)   :: psfcm   ! model pressure at ho
+   REAL, INTENT (in)    :: psm, tsm, qsm
 
-      REAL, PARAMETER      :: GASR =  gas_constant
-      REAL, PARAMETER      :: G = gravity
+   REAL, INTENT (in)           :: hsm, ho
+   REAL, INTENT (in), OPTIONAL :: to, qvo
 
-!-----------------------------------------------------------------------------!
+   REAL                 :: tvo, tvsm, tv, dz, arg0, arg
 
-! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
-! ---------------------------------------------
+   REAL, PARAMETER      :: GASR =  gas_constant
+   REAL, PARAMETER      :: G = gravity
 
-      tvsm = tsm  * (1. + 0.608 * qsm)
-      if (present(to) .and. present(qvo)) then
-        tvo = to  * (1. + 0.608 * qvo)
-      else if (present(to) .and. .not.present(qvo)) then
-        tvo = to
-      else
-        tvo = tvsm
-      endif
+   ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
+   ! ---------------------------------------------
 
-      tv  = 0.5 * (tvsm + tvo)
+   tvsm = tsm  * (1. + 0.608 * qsm)
+   if (present(to) .and. present(qvo)) then
+      tvo = to  * (1. + 0.608 * qvo)
+   else if (present(to) .and. .not.present(qvo)) then
+      tvo = to
+   else
+      tvo = tvsm
+   endif
 
-! 2. HEIGHT DIFFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
-! ------------------------------------------------------------
+   tv  = 0.5 * (tvsm + tvo)
 
-      dz = hsm - ho
-      arg0 = dz * g / gasr
+   ! 2. HEIGHT DIFFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
+   ! ------------------------------------------------------------
 
-! 3.  EXTRAPOLATE PRESSURE OBS TO MODEL SURFACE
-! ---------------------------------------------
+   dz = hsm - ho
+   arg0 = dz * g / gasr
 
-      arg = arg0    / tv 
+   ! 3.  EXTRAPOLATE PRESSURE OBS TO MODEL SURFACE
+   ! ---------------------------------------------
 
-      psfcm = psm * exp (arg)
+   arg = arg0    / tv 
+
+   psfcm = psm * exp (arg)
 
 end subroutine da_sfc_pre
+
 
