@@ -88,7 +88,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
    integer :: num_tovs_total
    integer :: num_tovs_local
    integer, allocatable :: index(:)
-   integer :: i,j
    integer :: num_tovs_avg
    integer, allocatable :: excess_count(:)
    integer, allocatable :: excess_start(:)
