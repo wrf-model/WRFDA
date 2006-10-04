@@ -20,8 +20,6 @@ export COMPILERS=${COMPILERS:-g95}
 
 let COUNT=1
 
-export MACHINE=`hostname`
-
 for CONFIG in $CONFIGS; do
 
   for COMPILER in $COMPILERS; do
@@ -36,7 +34,7 @@ for CONFIG in $CONFIGS; do
         echo "Compiling ${BUILD}/$TARGET"
         cd ~bray/${BUILD}/$TARGET
         svn update #>/dev/null 2>&1
-#        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         if $FULL; then ./clean_new -a; fi
         ./compile_new $TARGET > compile.out 2>&1
       done
