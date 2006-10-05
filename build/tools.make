@@ -14,7 +14,7 @@ registry : $(TOOLS_OBJ)
 
 advance_cymdh.exe : advance_cymdh.o 
 	$(RM) $@
-	$(SFC) -o advance_cymdh.exe advance_cymdh.o
+	$(SFC) $(LDFLAGS) -o advance_cymdh.exe advance_cymdh.o
 	cp advance_cymdh.exe ../main
 
 bufr_little_endian : bufr_little_endian.o

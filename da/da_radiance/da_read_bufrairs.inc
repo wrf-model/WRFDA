@@ -134,6 +134,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   type(model_loc_type)       :: loc
   type (datalink), pointer   :: head, p, current
 
+   if (trace_use) call da_trace_entry("da_read_bufrairs")
+
 !  0.0  Initialize variables
 !-----------------------------------
   platform_id  = 9   ! eos series
@@ -188,8 +190,10 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   table_file = 'gmao_airs_bufr.tbl'      ! make table file name
   inquire(file=table_file,exist=airstab)
   if (airstab) then
-      write(UNIT=stdout,FMT=*) &
-         'da_read_bufrairs:  Reading BUFR Table A file: ',trim(table_file)
+      if (print_detail_radiance) then
+         write(UNIT=stdout,FMT=*) &
+            'da_read_bufrairs:  Reading BUFR Table A file: ',trim(table_file)
+      end if
       open(UNIT=airs_table_unit,file=table_file,iostat = iost)
       IF (iost /= 0) THEN
          call da_error(__FILE__,__LINE__, &
@@ -223,8 +227,10 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 
   write(UNIT=date,FMT='( i10)') idate
   read(UNIT=date,FMT='(i4,3i2)') iy,im,idd,ihh
-  write(UNIT=stdout,FMT=*) 'da_read_bufrairs:     bufr file date is ', &
-      iy,im,idd,ihh
+   if (print_detail_radiance) then
+      write(UNIT=stdout,FMT=*) 'da_read_bufrairs:     bufr file date is ', &
+         iy,im,idd,ihh
+   end if
   
 !   3.0 Loop over observations
 !----------------------------
@@ -420,9 +426,11 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 !  do i = 1, iv%num_inst
    if ( nobs > 0 ) then
       iv%instid(inst)%num_rad = nobs
-      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
-         ' allocating space for radiance innov structure', &
+      if (print_detail_radiance) then
+         write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+            ' allocating space for radiance innov structure', &
                               inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
+      end if
       allocate( iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error )
       If( error /= 0 ) Then
          call da_error(__FILE__,__LINE__, &
@@ -475,6 +483,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 1000 continue
   call closbf(lnbufr)
 
-  return
+   if (trace_use) call da_trace_exit("da_read_bufrairs")
 
 end subroutine da_read_bufrairs

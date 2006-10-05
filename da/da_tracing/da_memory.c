@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-#ifndef MACOS
+#if !(defined(MACOS) || defined(IRIX))
 #include <malloc.h>
 #endif
 
@@ -18,7 +18,7 @@ void da_memory_(
   int *memory_used;
 {
 
-#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1) || defined(MACOS))
+#if !(defined(vpp) || defined(vpp2) || defined(SUN) || defined(crayx1) || defined(MACOS)) || defined(IRIX)
 struct mallinfo result;
 
 result=mallinfo();

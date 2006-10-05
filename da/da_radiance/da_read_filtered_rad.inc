@@ -25,6 +25,8 @@
    integer            :: ierr, ndomain
    logical            :: outside,inside_halo
 
+   if (trace_use) call da_trace_entry("da_read_filtered_rad")
+
  call init_constants_derived
 
  do n = 1, iv%num_inst
@@ -35,7 +37,9 @@
   write(filename, '(a)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
 #endif
 
-  write(UNIT=stdout,FMT=*) 'Reading in ', trim(filename) 
+   if (print_detail_radiance) then
+      write(UNIT=stdout,FMT=*) 'Reading in ', trim(filename) 
+   end if
 
   open(UNIT=filtered_rad_unit,file=trim(filename),form='unformatted',status='old',iostat=ios)
   if( ios /= 0 ) Then
@@ -46,8 +50,10 @@
 
   read(UNIT=filtered_rad_unit) iv%instid(n)%num_rad
   if (iv%instid(n)%num_rad < 1) cycle
-  write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
+   if (print_detail_radiance) then
+       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
                              n, iv%instid(n)%rttovid_string, iv%instid(n)%num_rad
+   end if
   allocate( iv%instid(n)%rad(1:iv%instid(n)%num_rad), stat = ierr )
   If( ierr /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
@@ -84,7 +90,7 @@
 
  end do      ! end do instruments
 
- return
+   if (trace_use) call da_trace_exit("da_read_filtered_rad")
  
 end subroutine da_read_filtered_rad
 
