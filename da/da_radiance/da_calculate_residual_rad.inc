@@ -1,14 +1,12 @@
 subroutine da_calculate_residual_rad( iv, y, re,                 &
                                         np_missing, np_bad_data, &
                                         np_obs_used, np_available )
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculate Obs Residual and counting obs number.
-!
-!  METHOD:  re = (d - H delta_x)
-!
-!  HISTORY: 08/2005 - Creation            Zhiquan Liu
-!
-!------------------------------------------------------------------------------
+
+  !---------------------------------------------------------------------------
+  !  PURPOSE: Calculate Obs Residual and counting obs number.
+  !
+  !  METHOD:  re = (d - H delta_x)
+  !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -28,32 +26,25 @@ subroutine da_calculate_residual_rad( iv, y, re,                 &
    if (trace_use) call da_trace_entry("da_calculate_residual_rad")
 
    DO i = 1, iv%num_inst
-
       IF ( iv%instid(i)%num_rad < 1 ) cycle
 
       n_obs_bad % rad % num = number(0, 0, 0)
 
       DO n=1, iv%instid(i)%num_rad
-
-      if( iv%instid(i)%rad(n)%loc%proc_domain_with_halo ) then
-
-      do k=1, iv%instid(i)%nchan
-
-         np_available = np_available + iv%instid(i)%nchan
-
-         re%instid(i)%rad(n)%tb(k) = da_residual( n, k, y%instid(i)%rad(n)%tb(k), &
-                                      iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
-      end do
-
-      endif
-
+         if (iv%instid(i)%rad(n)%loc%proc_domain_with_halo) then
+            do k=1, iv%instid(i)%nchan
+               np_available = np_available + iv%instid(i)%nchan
+               re%instid(i)%rad(n)%tb(k) = da_residual( n, k, &
+                  y%instid(i)%rad(n)%tb(k), &
+                  iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
+            end do
+         endif
       END DO
+   END DO
 
-    END DO
-
-      np_missing  = np_missing  + n_obs_bad % rad % num % miss
-      np_bad_data = np_bad_data + n_obs_bad % rad % num % bad
-      np_obs_used = np_obs_used + n_obs_bad % rad % num % use 
+   np_missing  = np_missing  + n_obs_bad % rad % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % rad % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % rad % num % use 
 
    if (trace_use) call da_trace_exit("da_calculate_residual_rad")
    

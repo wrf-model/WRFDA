@@ -347,119 +347,121 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
       end do
    end do
 
-   ! Report number of observations to other processors via rootproc
+   if (tovs_redistribute) then
+      ! Report number of observations to other processors via rootproc
 
-   ! count from 0
-   allocate (num_tovs_before(num_procs))
-   allocate (num_tovs_after(num_procs))
+      ! count from 0
+      allocate (num_tovs_before(num_procs))
+      allocate (num_tovs_after(num_procs))
 
-   ! count from 1
-   allocate (index(num_procs))
-   allocate (excess_count(num_procs))
-   allocate (excess_start(num_procs))
-   allocate (spare_count(num_procs))
-   allocate (spare_start(num_procs))
+      ! count from 1
+      allocate (index(num_procs))
+      allocate (excess_count(num_procs))
+      allocate (excess_start(num_procs))
+      allocate (spare_count(num_procs))
+      allocate (spare_start(num_procs))
 
-   ! Cannot be more total send,receives than combination of processors
-   allocate (tovs_send_pe(num_procs*num_procs))
-   allocate (tovs_recv_pe(num_procs*num_procs))
-   allocate (tovs_send_start(num_procs*num_procs))
-   allocate (tovs_send_count(num_procs*num_procs))
-   allocate (tovs_recv_start(num_procs*num_procs))
+      ! Cannot be more total send,receives than combination of processors
+      allocate (tovs_send_pe(num_procs*num_procs))
+      allocate (tovs_recv_pe(num_procs*num_procs))
+      allocate (tovs_send_start(num_procs*num_procs))
+      allocate (tovs_send_count(num_procs*num_procs))
+      allocate (tovs_recv_start(num_procs*num_procs))
 
-   num_tovs_before(:) = 0
-   num_tovs_before(myproc+1)=num_tovs_local
-   call da_proc_sum_ints(num_tovs_before(:))
+      num_tovs_before(:) = 0
+      num_tovs_before(myproc+1)=num_tovs_local
+      call da_proc_sum_ints(num_tovs_before(:))
 #ifdef DM_PARALLEL
-   call wrf_dm_bcast_integer(num_tovs_before(:),num_procs)
+      call wrf_dm_bcast_integer(num_tovs_before(:),num_procs)
 #endif
 
-   num_tovs_after(:) = num_tovs_before(:)
+      num_tovs_after(:) = num_tovs_before(:)
 
-   if (rootproc .AND. print_detail_radiance) then
-      write(unit=stdout,fmt='(A)') "Initial tovs observation distribution, pe, num"
+      if (rootproc .AND. print_detail_radiance) then
+         write(unit=stdout,fmt='(A)') "Initial tovs observation distribution, pe, num"
+         do i=1,num_procs
+            write(unit=stdout,fmt='(I4,I10)') i-1,num_tovs_before(i)
+         end do
+      end if
+
+      ! Decide how to reallocate observations
+
+      num_tovs_avg=sum(num_tovs_before(:))/num_procs
+
+      call da_trace_int_sort(num_tovs_before(:),num_procs,index)
+
       do i=1,num_procs
-         write(unit=stdout,fmt='(I4,I10)') i-1,num_tovs_before(i)
+         excess_count(i)=num_tovs_before(index(i))-num_tovs_avg
+         spare_count(i)=num_tovs_avg-num_tovs_before(index(i))
+         excess_start(i)=num_tovs_avg+1
+         spare_start(i)=num_tovs_before(index(i))+1
       end do
-   end if
 
-   ! Decide how to reallocate observations
+      ! if (rootproc .AND. print_detail_radiance) then
+      !    write(unit=stdout,fmt='(A)') "After sort, pe, num,excess, spare, excess_start, spare_start"
+      !    do i=1,num_procs
+      !       write(unit=stdout,fmt='(2I4,5I10)') i,index(i)-1, &
+      !          num_tovs_before(index(i)), excess_count(i),spare_count(i), &
+      !          excess_start(i),spare_start(i)
+      !    end do
+      ! end if
 
-   num_tovs_avg=sum(num_tovs_before(:))/num_procs
+      tovs_copy_count = 0
+      tovs_send_start(:) = 0
+      tovs_send_count(:) = 0
 
-   call da_trace_int_sort(num_tovs_before(:),num_procs,index)
-
-   do i=1,num_procs
-      excess_count(i)=num_tovs_before(index(i))-num_tovs_avg
-      spare_count(i)=num_tovs_avg-num_tovs_before(index(i))
-      excess_start(i)=num_tovs_avg+1
-      spare_start(i)=num_tovs_before(index(i))+1
-   end do
-
-!   if (rootproc .AND. print_detail_radiance) then
-!      write(unit=stdout,fmt='(A)') "After sort, pe, num,excess, spare, excess_start, spare_start"
-!      do i=1,num_procs
-!         write(unit=stdout,fmt='(2I4,5I10)') i,index(i)-1, &
-!            num_tovs_before(index(i)), excess_count(i),spare_count(i), &
-!            excess_start(i),spare_start(i)
-!      end do
-!   end if
-
-   tovs_copy_count = 0
-   tovs_send_start(:) = 0
-   tovs_send_count(:) = 0
-
-   do
-      copy_found = .false.
-      do i=1,num_procs
-         if (spare_count(i) > tovs_min_transfer) then
-            do j=num_procs,1,-1
-               if (excess_count(j) > tovs_min_transfer ) then
-                  copy_found = .true.
-                  tovs_copy_count=tovs_copy_count+1
-                  tovs_send_pe(tovs_copy_count) = index(j)-1
-                  tovs_recv_pe(tovs_copy_count) = index(i)-1
-                  tovs_send_start(tovs_copy_count) = excess_start(j)
-                  tovs_recv_start(tovs_copy_count) = spare_start(i)
-                  transfer=MIN(spare_count(i),excess_count(j))
-                  tovs_send_count(tovs_copy_count) = transfer
-                  num_tovs_after(index(i))=num_tovs_after(index(i))+transfer
-                  num_tovs_after(index(j))=num_tovs_after(index(j))-transfer
-                  spare_count(i)=spare_count(i)-transfer
-                  spare_start(i)=spare_start(i)+transfer
-                  excess_count(j)=excess_count(j)-transfer
-                  excess_start(j)=excess_start(j)+transfer
-                  exit
-               end if   
-            end do
-         end if
-      end do
-      if (.not. copy_found) exit
-   end do   
-
-   if (rootproc .AND. print_detail_radiance) then
-      do i=1,tovs_copy_count
-         write (unit=stdout,fmt='(5(A,I5))') "Would send ",tovs_send_count(i), &
-            " from ",tovs_send_pe(i),":",tovs_send_start(i)," to ", &
-            tovs_recv_pe(i),":",tovs_recv_start(i)
-      end do
-      ! Need to sort back to PE order
-      write(unit=stdout,fmt='(A)') "Final tovs observation distribution, pe, num"
-      do i=1,num_procs
-         do j=1,num_procs
-            if (index(j)==i) then
-               write(unit=stdout,fmt='(I4,I10)') i-1,num_tovs_after(j)
+      do
+         copy_found = .false.
+         do i=1,num_procs
+            if (spare_count(i) > tovs_min_transfer) then
+               do j=num_procs,1,-1
+                  if (excess_count(j) > tovs_min_transfer ) then
+                     copy_found = .true.
+                     tovs_copy_count=tovs_copy_count+1
+                     tovs_send_pe(tovs_copy_count) = index(j)-1
+                     tovs_recv_pe(tovs_copy_count) = index(i)-1
+                     tovs_send_start(tovs_copy_count) = excess_start(j)
+                     tovs_recv_start(tovs_copy_count) = spare_start(i)
+                     transfer=MIN(spare_count(i),excess_count(j))
+                     tovs_send_count(tovs_copy_count) = transfer
+                     num_tovs_after(index(i))=num_tovs_after(index(i))+transfer
+                     num_tovs_after(index(j))=num_tovs_after(index(j))-transfer
+                     spare_count(i)=spare_count(i)-transfer
+                     spare_start(i)=spare_start(i)+transfer
+                     excess_count(j)=excess_count(j)-transfer
+                     excess_start(j)=excess_start(j)+transfer
+                     exit
+                  end if   
+               end do
             end if
          end do
-      end do
+         if (.not. copy_found) exit
+      end do   
+
+      if (rootproc .AND. print_detail_radiance) then
+         do i=1,tovs_copy_count
+            write (unit=stdout,fmt='(5(A,I5))') "Would send ",tovs_send_count(i), &
+               " from ",tovs_send_pe(i),":",tovs_send_start(i)," to ", &
+               tovs_recv_pe(i),":",tovs_recv_start(i)
+         end do
+         ! Need to sort back to PE order
+         write(unit=stdout,fmt='(A)') "Final tovs observation distribution, pe, num"
+         do i=1,num_procs
+            do j=1,num_procs
+               if (index(j)==i) then
+                  write(unit=stdout,fmt='(I4,I10)') i-1,num_tovs_after(j)
+               end if
+            end do
+         end do
+      end if
+
+
+      deallocate (index)
+      deallocate (excess_start)
+      deallocate (excess_count)
+      deallocate (spare_start)
+      deallocate (spare_count)
    end if
-
-
-   deallocate (index)
-   deallocate (excess_start)
-   deallocate (excess_count)
-   deallocate (spare_start)
-   deallocate (spare_count)
 
    iv%total_obs = iv%total_obs + num_tovs_local
    iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_local

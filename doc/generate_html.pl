@@ -1,25 +1,16 @@
 #!/usr/bin/env perl
 
-$USAGE="Gen_DirToDoc.pl source_directory sink_directory";
+$USAGE="generate_html.pl source_directory sink_directory";
 
 open (ERR,">&2");
 
 if ($#ARGV != 1){
-  print ERR "Gen_DirToDoc.pl: Wrong number of arguments\n";
+  print ERR "generate_html.pl: Wrong number of arguments\n";
   print ERR "USAGE: $USAGE\n";
   die ;
 }
 
-#if ($ENV{"GEN_ROOTDIR"} eq "") {
-#  print ERR "Gen_DirToDoc.pl GEN_ROOTDIR not defined\n";
-#  die ;
-#}
-
 $USER=$ENV{"USER"};
-#$GEN_HOSTNAME=$ENV{"GEN_HOSTNAME"};
-#$GEN_ROOTDIR=$ENV{"GEN_ROOTDIR"};
-#$GEN_STYLESHEET=$ENV{"GEN_STYLESHEET"};
-#$GEN_JAVASCRIPT=$ENV{"GEN_JAVASCRIPT"};
 $GEN_STYLESHEET="StyleSheet.css";
 $GEN_JAVASCRIPT="Documentation.js";
 
@@ -39,8 +30,6 @@ if ($#files >= 0) {
 
     $Infile="$SOURCEDIR/$file";
 
-#    $SHORTDIR=$SOURCEDIR;
-#    $SHORTDIR=~s/$ENV{"GEN_ROOTDIR"}\/// ;
     $SHORT_FILE=$file;
     $NAME=$file;
     $NAME=~s/(\.f90$|\.F90$|\.inc$|\.f$|\.F$|\.dk$|\.cdk$|\.c$|\.h$|\.tcl$|\.pro$|\.proc$|\.pan$|\.pl$|\.elements$)//;
@@ -49,18 +38,11 @@ if ($#files >= 0) {
 
     if (! -e $OUT_HTML || -M $Infile < -M $OUT_HTML) {
     
-#      $Outfile=`GenScr_TempFile`;
-#      chop ($Outfile);
-
       print "Updating $NAME.html\n";
 
       `rm -rf $OUT_HTML`;
       open (IN, "$Infile") || die "unable to open $Infile: $!\n";
       open (OUT,">$OUT_HTML") || die "unable to open $OUT_HTML: $!\n";
-
-#      `rm -f $SINKDIR/$NAME.html`;
-#      $BaseRoot=`basename $ENV{"GEN_ROOTDIR"}`;
-#      chomp $BaseRoot;
 
       print OUT "<!DOCTYPE HTML PUBLIC \"-//W3C/DTD HTML 4.01//EN\">\n" ;
       print OUT "<HTML>\n"  ;
@@ -76,7 +58,6 @@ if ($#files >= 0) {
       if ( ! $GEN_JAVASCRIPT == "" ) {
         print OUT "<SCRIPT TYPE=\"script/javascript\" LANGUAGE=\"JavaScript\" SRC=\"/$GEN_JAVASCRIPT\"></SCRIPT>\n" ;
       }
-#      print OUT "Produced from <A HREF=\"http://$GEN_HOSTNAME/~$USER/$BaseRoot/$SHORTDIR/$SHORT_FILE\">$GEN_ROOTDIR/$SHORTDIR/$SHORT_FILE</A><BR>\n" ;
       print OUT "<A HREF=\"Refs.$NAME.html\">References</A> to this file elsewhere.\n" ;
       print OUT "<PRE>\n" ;
 
@@ -108,7 +89,6 @@ if ($#files >= 0) {
         s/exe.html/html/g ;
         s/pl.html/html/g ;
         s/(needs[ ]*|optional[ ]*|provides[ ]*)(DA_[0-9a-zA-Z_]*)/\1<A HREF="http:\/\/manse.johnbray.org.uk\/mmmwiki\/index.php\/Env_Vars#\2">\2<\/a>/g ;
-#        printf OUT "%s%5d %s%s", "<A NAME=\"l$i\">", $i,"</A>",$_;
          print OUT "$i $_\n";
       }
 
@@ -119,13 +99,8 @@ if ($#files >= 0) {
       close (OUT);
       close (IN);
 
-#      `mv $Outfile $OUT_HTML`;
-
 # ensure html file has same timestamp as source file
       `touch -r $Infile $SINKDIR/$NAME.html`;
-
-# make sure HTML file has correct ownership
-#       `chown $USER $SINKDIR/$NAME.html`;
 
 # make files group readable
 
@@ -141,7 +116,7 @@ closedir (SOURCE);
 if ($#files >= 0) {
   foreach $file (@files){
     if (! -e "$SINKDIR/$file"){
-      `ln -fs $SOURCEDIR/$file $SINKDIR/$file`;
+      `cp $SOURCEDIR/$file $SINKDIR/$file`;
     }
   }
 }

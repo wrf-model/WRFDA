@@ -7,6 +7,7 @@ subroutine da_error( file_str, line, errors)
    character(len=*), intent(in) :: errors(:)
    character*256 :: line_str
    character*256 :: html_file
+   integer       :: i
 
    write(line_str,'(i6)') line
 
@@ -25,10 +26,12 @@ subroutine da_error( file_str, line, errors)
             '  LINE:  '//TRIM(line_str) )
       end if
    end if
-   call da_messages(errors)
+   do i=1,size(errors)
+      call wrf_message(errors(i))
+   end do
    call wrf_message( '-------------------------------------------' )
 #else
-   call wrf_message2( '-------------- FATAL callED ---------------' )
+   call wrf_message2( '-------------- FATAL CALLED ---------------' )
    ! only print file and line if line is positive
    if ( line > 0 ) then
       if (use_html) then
@@ -40,7 +43,9 @@ subroutine da_error( file_str, line, errors)
             '  LINE:  '//TRIM(line_str) )
       end if
    end if
-   call da_messages2(errors)
+   do i=1,size(errors)
+      call wrf_message(errors(i))
+   end do
    call wrf_message2( '-------------------------------------------' )
 #endif
    call wrf_abort

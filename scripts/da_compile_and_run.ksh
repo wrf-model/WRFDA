@@ -33,6 +33,7 @@ for CONFIG in $CONFIGS; do
       for TARGET in $TARGETS; do
         echo "Compiling ${BUILD}/$TARGET"
         cd ~bray/${BUILD}/$TARGET
+        . ./setup.ksh $COMPILER
         svn update #>/dev/null 2>&1
         echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         if $FULL; then ./clean_new -a; fi
