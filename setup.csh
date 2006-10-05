@@ -2,20 +2,28 @@ setenv MACHINE `hostname`
 
 if ($MACHINE == bs1201en || $MACHINE == bs1101en || $MACHINE == bv1103en || $MACHINE == bv1203en) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
-   # sourced scripts, so force use of xlf
-   setenv COMPILER xlf
+   # sourced scripts, so force use of xlf, xlc
+   setenv FC xlf
+   setenv CC xlc
 else
-   setenv COMPILER $1
+   setenv FC $1
+   setenv CC $2
 endif
 
-if ($COMPILER == xlf) then
+if ($FC == xlf) then
    if (-d /opt/ibmcmp/xlf/8.1) then
       setenv PATH    /opt/ibmcmp/xlf/8.1/bin:$PATH
       setenv MANPATH /opt/ibmcmp/xlf/8.1/man/en_US/man:$MANPATH
    endif
 endif
 
-if ($COMPILER == g95) then
+if ($CC == xlc) then
+   if (-d /usr/vac/bin) then
+      setenv PATH    /usr/vac/bin:/usr/vacpp/bin:$PATH
+   endif
+endif
+
+if ($FC == g95) then
    if (-d /data7/da/bray/g95) then
       setenv PATH /data7/da/bray/g95:$PATH
    endif
@@ -29,98 +37,112 @@ endif
 
 # List options in order of increasing preference
 
-if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}) then
-   setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${COMPILER}
+if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${FC}) then
+   setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${FC}
 endif
-if (-d /data7/da/bray/rttov/rttov85_${COMPILER}) then
-   setenv RTTOV /data7/da/bray/rttov/rttov85_$COMPILER
+if (-d /data7/da/bray/rttov/rttov85_${FC}) then
+   setenv RTTOV /data7/da/bray/rttov/rttov85_$FC
 endif
-if (-d /data7/da/bray/crtm/crtm_${COMPILER}) then
-   setenv CRTM /data7/da/bray/crtm/crtm_$COMPILER
+if (-d /data7/da/bray/crtm/crtm_${FC}) then
+   setenv CRTM /data7/da/bray/crtm/crtm_$FC
 endif
-if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${COMPILER}
-endif
-
-if (-d ~bray/netcdf/netcdf-3.6.1_${COMPILER}) then
-   setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${COMPILER}
+if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${FC}) then
+   setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${FC}
 endif
 
-if (-d ~bray/rttov/rttov85_$COMPILER) then
-   setenv RTTOV ~bray/rttov/rttov85_$COMPILER
+# --------------------------------------------------------------------
+
+if (-d ~bray/netcdf/netcdf-3.6.1_${FC}) then
+   setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${FC}
 endif
-if (-d ~bray/crtm/crtm_$COMPILER) then
-   setenv CRTM ~bray/crtm/crtm_$COMPILER
+if (-d ~bray/rttov/rttov85_$FC) then
+   setenv RTTOV ~bray/rttov/rttov85_$FC
 endif
-if (-d ~bray/mpich/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH ~bray/mpich/mpich-1.2.7p1_${COMPILER}
+if (-d ~bray/crtm/crtm_$FC) then
+   setenv CRTM ~bray/crtm/crtm_$FC
 endif
-if (-d ~bray/blas/blas_${COMPILER}) then
-   setenv BLAS ~bray/blas/blas_${COMPILER}
+if (-d ~bray/mpich/mpich-1.2.7p1_${FC}) then
+   setenv MPICH ~bray/mpich/mpich-1.2.7p1_${FC}
 endif
-if (-d ~bray/lapack/lapack_${COMPILER}) then
-   setenv LAPACK ~bray/lapack/lapack_${COMPILER}
+if (-d ~bray/blas/blas_${FC}) then
+   setenv BLAS ~bray/blas/blas_${FC}
 endif
-if (-d ~bray/fftpack5/fftpack5_${COMPILER}) then
-   setenv FFTPACK5 ~bray/fftpack5/fftpack5_${COMPILER}
+if (-d ~bray/lapack/lapack_${FC}) then
+   setenv LAPACK ~bray/lapack/lapack_${FC}
 endif
-if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
-   setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
+if (-d ~bray/fftpack5/fftpack5_${FC}) then
+   setenv FFTPACK5 ~bray/fftpack5/fftpack5_${FC}
+endif
+if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
+   setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
+endif
+if (-d ~bray/makedepf90/makedepf90-2.8.8_${CC}) then
+   setenv MPICH ~bray/makedepf90/makedepf90-2.8.8_${CC}
 endif
 
-if (-d ~/netcdf/netcdf-3.6.1_${COMPILER}) then
-   setenv NETCDF ~/netcdf/netcdf-3.6.1_${COMPILER}
+# --------------------------------------------------------------------
+
+if (-d ~/netcdf/netcdf-3.6.1_${FC}) then
+   setenv NETCDF ~/netcdf/netcdf-3.6.1_${FC}
 endif
-if (-d ~/rttov/rttov85_${COMPILER}) then
-   setenv RTTOV ~/rttov/rttov85_${COMPILER}
+if (-d ~/rttov/rttov85_${FC}) then
+   setenv RTTOV ~/rttov/rttov85_${FC}
 endif
-if (-d ~/crtm/crtm_${COMPILER}) then
-   setenv CRTM ~/crtm/crtm_${COMPILER}
+if (-d ~/crtm/crtm_${FC}) then
+   setenv CRTM ~/crtm/crtm_${FC}
 endif
-if (-d ~/mpich/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH ~/mpich/mpich-1.2.7p1_${COMPILER}
+if (-d ~/mpich/mpich-1.2.7p1_${FC}) then
+   setenv MPICH ~/mpich/mpich-1.2.7p1_${FC}
 endif
-if (-d ~/blas/blas_${COMPILER}) then
-   setenv BLAS ~/blas/blas_${COMPILER}
+if (-d ~/blas/blas_${FC}) then
+   setenv BLAS ~/blas/blas_${FC}
 endif
-if (-d ~/lapack/lapack_${COMPILER}) then
-   setenv LAPACK ~/lapack/lapack-1.2.7p1_${COMPILER}
+if (-d ~/lapack/lapack_${FC}) then
+   setenv LAPACK ~/lapack/lapack-1.2.7p1_${FC}
 endif
-if (-d ~/fftpack5/fftpack5_${COMPILER}) then
-   setenv FFTPACK5 ~/fftpack5/fftpack5_${COMPILER}
+if (-d ~/fftpack5/fftpack5_${FC}) then
+   setenv FFTPACK5 ~/fftpack5/fftpack5_${FC}
 endif
-if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}) then
-   setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${COMPILER}
+if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
+   setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${FC}
+endif
+if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
+   setenv MPICH ~/makedepf90/makedepf90-2.8.8_${CC}
 endif
 
-if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}) then
-   setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${COMPILER}
+# --------------------------------------------------------------------
+
+if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}) then
+   setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}
 endif
-if (-d /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}) then
-   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${COMPILER}
+if (-d /Volumes/$MACHINE/bray/tools/rttov85_${FC}) then
+   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${FC}
 endif
-if (-d /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}) then
-   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${COMPILER}
+if (-d /Volumes/$MACHINE/bray/tools/crtm_${FC}) then
+   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${FC}
 endif
-if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}) then
-   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${COMPILER}
+if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}) then
+   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}) then
+   setenv MPICH /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}
 endif
 
 
 # mpich2
 
-#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}) then
+#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${FC}) then
 
 # mpich2
 
-#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}) then
-#   setenv MPICH /data7/da/bray/mpich/mpich2-1.0.3_${COMPILER}
+#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${FC}) then
+#   setenv MPICH /data7/da/bray/mpich/mpich2-1.0.3_${FC}
 #endif
-#if ( -d ~bray/mpich/mpich2-1.0.3_${COMPILER}) then
-#   setenv MPICH ~bray/mpich/mpich2-1.0.3_${COMPILER}
+#if ( -d ~bray/mpich/mpich2-1.0.3_${FC}) then
+#   setenv MPICH ~bray/mpich/mpich2-1.0.3_${FC}
 #endif
-#if ( -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}) then
-#   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${COMPILER}
+#if ( -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}) then
+#   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}
 #endif
 
 if (-d /usr/lpp/ppe.poe) then
@@ -130,13 +152,13 @@ endif
 # Lightning
 
 if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then 
-   if ( $COMPILER == pathscale ) then
+   if ( $FC == pathscale ) then
       setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
-   if ( $COMPILER == pgi ) then
+   if ( $FC == pgi ) then
       setenv MPICH /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    endif
-   if test $COMPILER == ifort; then
+   if test $FC == ifort; then
       source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
       setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    endif
@@ -145,7 +167,7 @@ endif
 # Crayx1
 
 if ( $MACHINE == "gold.us.cray.com" ) then
-   if ( $COMPILER == crayx1 ) then
+   if ( $FC == crayx1 ) then
       module use /opt/ctl/modulefiles /opt/PE/modulefiles
       module load PrgEnv.56.newest
       module list
@@ -158,9 +180,9 @@ if ( $MACHINE == "gold.us.cray.com" ) then
 endif
 
 setenv MPIHOME $MPICH
-setenv PATH    $MPICH/bin:$PATH
+setenv PATH    $MPICH/bin:$MAKEDEPF90:$PATH
 
-if ($COMPILER == 'g95') then
+if ($FC == 'g95') then
    setenv G95_ENDIAN         BIG
    setenv G95_FPU_INVALID    T
    setenv G95_FPU_ZERODIV    T

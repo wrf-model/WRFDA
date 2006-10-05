@@ -1,8 +1,8 @@
 subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 
-!  This subroutine calculates virtual temperature (tv_ma) on each level
-!  (pre_ma, pressure at the level) at the observed location (i,j). 
-!  dx, dxm, dy, dym are horizontal interpolation weighting.
+   ! This subroutine calculates virtual temperature (tv_ma) on each level
+   ! (pre_ma, pressure at the level) at the observed location (i,j). 
+   ! dx, dxm, dy, dym are horizontal interpolation weighting.
 
    IMPLICIT NONE
 
@@ -18,15 +18,16 @@ subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 
    ks = xp%kts; ke = xp%kte
 
-!  Virtual temperature
+   ! Virtual temperature
 
    do ii=i,i+1
-   do jj=j,j+1
-      tv_m(ii-i+1,jj-j+1,ks:ke) = xb%t(ii,jj,ks:ke) * (1. + 0.61*xb%q(ii,jj,ks:ke))
-   enddo
+      do jj=j,j+1
+         tv_m(ii-i+1,jj-j+1,ks:ke) = xb%t(ii,jj,ks:ke) * &
+            (1. + 0.61*xb%q(ii,jj,ks:ke))
+      enddo
    enddo
 
-!  Horizontal interpolation to the obs. pt.
+   ! Horizontal interpolation to the obs. pt.
 
    pre_ma(ks:ke) = dym* ( dxm * xb%p(i,j,ks:ke) + dx * xb%p(i+1,j,ks:ke) ) + &
                    dy * ( dxm * xb%p(i,j+1,ks:ke) + dx * xb%p(i+1,j+1,ks:ke) )
@@ -37,13 +38,14 @@ subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 end subroutine da_tv_profile
 
 
+
 subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
 
-!  This routine is to find the vertical location in the Tv profile given
-!  a specific pressure and vertically interpolate Tv to that height.
-!  pre_ma,tv_ma give vertical profile of virtual temperature
-!  pre is a given pressure, alpha is the percentage of pre in the layer.
-!  layer,tv are calculated vertical layer and interpolated virtual temp.
+   !  This routine is to find the vertical location in the Tv profile given
+   !  a specific pressure and vertically interpolate Tv to that height.
+   !  pre_ma,tv_ma give vertical profile of virtual temperature
+   !  pre is a given pressure, alpha is the percentage of pre in the layer.
+   !  layer,tv are calculated vertical layer and interpolated virtual temp.
  
    IMPLICIT NONE
 
@@ -55,21 +57,21 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
 
    if ( pre >= pre_ma(ks) ) then
 
-!     Below model bottom
+      ! Below model bottom
       layer = ks
       alpha = log(pre_ma(ks)/pre)/log(pre_ma(ks)/pre_ma(ks+1))
       tv = tv_ma(ks) * (1.-alpha) + tv_ma(ks+1) * alpha
       pre_ma(ks-1)=pre
    else if (pre <= pre_ma(ke) ) then
 
-!     Above model top
+      ! Above model top
       layer = ke+1
       alpha = log(pre_ma(ke-1)/pre)/log(pre_ma(ke-1)/pre_ma(ke))
       tv = tv_ma(ke-1) * (1.-alpha) + tv_ma(ke) * alpha
       pre_ma(ke+1) = pre
    else
 
-!     Between model layers 
+      ! Between model layers 
       do k=ks,ke-1
          if ( pre>=pre_ma(k+1) .and. pre<pre_ma(k) ) then
             layer = k+1
@@ -83,11 +85,12 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
 end subroutine da_find_layer
 
 
+
 subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
 
-!  This routine calculates the thickness between two layers 
-!  using vertical integration of virtual temperatures.
-!  pre1 and pre2 are two pressures for the two layers
+   !  This routine calculates the thickness between two layers 
+   !  using vertical integration of virtual temperatures.
+   !  pre1 and pre2 are two pressures for the two layers
 
    IMPLICIT NONE
 
@@ -100,12 +103,12 @@ subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
 
    real                     :: thk                   ! thickness
 
-!  Thickness at the top and bottom parts of the layer.
+   ! Thickness at the top and bottom parts of the layer.
 
    thk = 0.5 * gas_constant/gravity * (tv1*log(pre_ma(layer1-1)/pre1) +  &
                tv2*log(pre2/pre_ma(layer2)) )
 
-!  Temporary pressure
+   ! Temporary pressure
 
    p_tmp(layer1) = pre1
    p_tmp(layer2-1) = pre2
@@ -113,7 +116,7 @@ subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
       p_tmp(k) = pre_ma(k)
    enddo
 
-!  Vertical integration of the virtual temperature
+   ! Vertical integration of the virtual temperature
 
    do k=layer2,layer1-1
       thk = thk + 0.5 * gas_constant/gravity * tv_ma(k) *                &
@@ -123,10 +126,11 @@ subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
 end subroutine da_thickness
 
 
+
 subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
            pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
-!  This is the tangent-linear routine for Tv_profile
+   ! This is the tangent-linear routine for Tv_profile
 
    IMPLICIT NONE
 
@@ -145,13 +149,11 @@ subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
    ks = xp%kts; ke = xp%kte
 
    do ii=i,i+1
-   do jj=j,j+1
-
-      TGL_tv_m(ii-i+1,jj-j+1,ks:ke) = xa%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke)) +  &
+      do jj=j,j+1
+         TGL_tv_m(ii-i+1,jj-j+1,ks:ke) = xa%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke)) +  &
                                       0.61*xb%t(ii,jj,ks:ke)*xa%q(ii,jj,ks:ke)
-      tv_m(ii-i+1,jj-j+1,ks:ke)     = xb%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
-
-   enddo
+         tv_m(ii-i+1,jj-j+1,ks:ke)     = xb%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
+      enddo
    enddo
  
    TGL_pre_ma(ks:ke) = dym* ( dxm * xa%p(i,j,ks:ke) + dx * xa%p(i+1,j,ks:ke) ) + &
@@ -166,10 +168,11 @@ subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
 end subroutine da_tgl_tv_profile
 
 
+
 subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           TGL_tv,TGL_pre_ma,TGL_tv_ma)
 
-!  This is the tangent-linear routine for find_layer
+   !  This is the tangent-linear routine for find_layer
 
    IMPLICIT NONE
 
@@ -182,11 +185,11 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
    real                      :: alpha, coef1, coef2
    real                      :: TGL_alpha
 
-!  coef1, coef2 are temporarily used in this routine
+   ! coef1, coef2 are temporarily used in this routine
 
    if ( pre >= pre_ma(ks) ) then
 
-!     Below model bottom
+      ! Below model bottom
       layer = ks
       coef1=log(pre/pre_ma(ks+1))/(pre_ma(ks)*     &
             (log(pre_ma(ks)/pre_ma(ks+1)))**2)
@@ -204,7 +207,7 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    else if (pre <= pre_ma(ke) ) then
 
-!     Above model top
+      ! Above model top
       layer = ke+1
       coef1=log(pre/pre_ma(ke))/(pre_ma(ke-1)*           &
             (log(pre_ma(ke-1)/pre_ma(ke)))**2)
@@ -222,7 +225,7 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    else
 
-!     Between model layers
+      ! Between model layers
       do k=ks,ke-1
          if ( pre>=pre_ma(k+1) .and. pre<pre_ma(k) ) then
             layer = k+1
@@ -245,10 +248,11 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 end subroutine da_tgl_find_layer
 
 
+
 subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          TGL_pre_ma,TGL_tv_ma,TGL_tv1,TGL_tv2,TGL_thk)
 
-!  This is the tangent-linear routine for thickness
+   ! This is the tangent-linear routine for thickness
 
    IMPLICIT NONE
 
@@ -277,7 +281,7 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
       p_tmp(k) = pre_ma(k)
    enddo
 
-!  Vertical integration of the virtual temperature
+   ! Vertical integration of the virtual temperature
 
    do k=layer2,layer1-1
       TGL_thk = TGL_thk + 0.5 * gas_constant/gravity * (   &
@@ -289,10 +293,11 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
 end subroutine da_tgl_thickness
 
 
+
 subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
 
-!  This is the adjoint routine for Tv_profile
+   ! This is the adjoint routine for Tv_profile
 
    IMPLICIT NONE
 
@@ -322,21 +327,22 @@ subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
    ADJ_pre_ma(ks:ke)     = 0.
 
    do ii=i,i+1
-   do jj=j,j+1
-      jo_grad_x%t(ii,jj,ks:ke) = jo_grad_x%t(ii,jj,ks:ke) +                    &
+      do jj=j,j+1
+         jo_grad_x%t(ii,jj,ks:ke) = jo_grad_x%t(ii,jj,ks:ke) + &
                   ADJ_tv_m(ii-i+1,jj-j+1,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
-      jo_grad_x%q(ii,jj,ks:ke) = jo_grad_x%q(ii,jj,ks:ke) +                    &
+         jo_grad_x%q(ii,jj,ks:ke) = jo_grad_x%q(ii,jj,ks:ke) + &
                   0.61*xb%t(ii,jj,ks:ke)*ADJ_tv_m(ii-i+1,jj-j+1,ks:ke)
-   enddo
+      enddo
    enddo
 
 end subroutine da_adj_tv_profile
 
 
+
 subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           ADJ_tv,ADJ_pre_ma,ADJ_tv_ma)
 
-!  This is the adjoint routine for find_layer
+   ! This is the adjoint routine for find_layer
 
    IMPLICIT NONE
 
@@ -410,10 +416,11 @@ subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 end subroutine da_adj_find_layer
 
 
+
 subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
 
-!  This is the adjoint routine for thickness
+   ! This is the adjoint routine for thickness
 
    IMPLICIT NONE
 
@@ -426,7 +433,7 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
    real                     :: pre1,pre2
    real                     :: ADJ_thk
 
-!  p_tmp and ADJ_p_tmp are temporary (local) variables
+   ! p_tmp and ADJ_p_tmp are temporary (local) variables
 
    ADJ_p_tmp(:)=0.
 
@@ -457,4 +464,5 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
    ADJ_tv1 = ADJ_tv1 + ADJ_thk*log(pre_ma(layer1-1)/pre1)
 
 end subroutine da_adj_thickness
+
 

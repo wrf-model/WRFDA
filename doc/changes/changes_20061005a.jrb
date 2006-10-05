@@ -1,0 +1,132 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 10/03/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add more tracing to radiance code
+
+Add tovs even redistribution code before rttov_ad. Default is to have this 
+switched off, it has not been tested yet
+
+makedepf90 now an external program, not compiled locally, as that keeps
+tripping up csh users on bluesky
+
+Add fixes to get code to compile and run on sgi
+
+Automatic documentation generation update
+
+------------------------------------------------------
+Tests:
+
+jrb* code compiled everywhere and a full set of regression tests done
+against trunk*
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20061005a.jrb?      compile.out
+M      setup.ksh
+M      da/da_physics/da_evapo.inc
+M      da/da_physics/da_accre.inc
+M      da/da_physics/da_roughness_from_lanu.inc
+M      da/da_physics/da_sfc_pre_lin.inc
+M      da/da_physics/da_tpq_to_slp_lin.inc
+M      da/da_physics/da_sfc_pre_adj.inc
+M      da/da_physics/da_tpq_to_slp_adj.inc
+M      da/da_physics/da_sfc_wtq_lin.inc
+M      da/da_physics/da_autoc_lin.inc
+M      da/da_physics/da_sfc_pre.inc
+M      da/da_physics/da_tprh_to_q_lin1.inc
+M      da/da_physics/da_sfc_wtq_adj.inc
+M      da/da_physics/da_tp_to_qs_adj1.inc
+M      da/da_physics/da_autoc_adj.inc
+M      da/da_physics/da_tprh_to_q_lin.inc
+M      da/da_physics/da_filter_adj.inc
+M      da/da_physics/da_get_q_error.inc
+M      da/da_physics/da_filter.inc
+M      da/da_physics/da_condens_lin.inc
+M      da/da_physics/da_tpq_to_rh_lin.inc
+M      da/da_physics/da_e_qv_from_rh.inc
+M      da/da_physics/da_condens_adj.inc
+M      da/da_physics/da_evapo_lin.inc
+M      da/da_physics/da_julian_day.inc
+M      da/da_physics/da_accre_lin.inc
+M      da/da_physics/da_tpq_to_thickness.inc
+M      da/da_physics/da_evapo_adj.inc
+M      da/da_physics/da_accre_adj.inc
+M      da/da_physics/da_tpq_to_rh.inc
+M      da/da_tracing/da_memory.c
+M      da/da_tracing/da_trace_init.inc
+M      da/da_minimisation/da_calculate_j.inc
+M      da/da_minimisation/da_minimise_cg.inc
+M      da/da_setup_structures/da_setup_be_regional.inc
+M      da/da_reporting/da_error.inc
+M      da/da_radiance/da_read_bufrtovs.inc
+M      da/da_radiance/da_read_bufrairs.inc
+M      da/da_radiance/da_transform_xtoy_rad_adj.inc
+M      da/da_radiance/da_rttov_direct.inc
+M      da/da_radiance/da_calculate_residual_rad.inc
+M      da/da_radiance/da_rttov_tl.inc
+M      da/da_radiance/da_read_filtered_rad.inc
+M      da/da_radiance/da_rttov_ad.inc
+M      da/da_radiance/da_transform_xtoy_rad.inc
+M      da/da_radiance/da_get_innov_vector_rad.inc
+M      scripts/da_compile_and_run.ksh
+M      scripts/da_run_job.ksh
+ M     doc
+M      doc/generate_html.pl
+M      doc/update_html.ksh
+A  +   doc/list_refs.ksh
+M      Registry/Registry.wrfvar
+M      arch/configure.defaults_new
+D      external/makedepf90
+D      external/makedepf90/makedepf90-2.8.8
+D      external/makedepf90/makedepf90-2.8.8/xmalloc.c
+D      external/makedepf90/makedepf90-2.8.8/utils.c
+D      external/makedepf90/makedepf90-2.8.8/configure
+D      external/makedepf90/makedepf90-2.8.8/macro.c
+D      external/makedepf90/makedepf90-2.8.8/Makefile.in
+D      external/makedepf90/makedepf90-2.8.8/strcasecmp.c
+D      external/makedepf90/makedepf90-2.8.8/xmalloc.h
+D      external/makedepf90/makedepf90-2.8.8/utils.h
+D      external/makedepf90/makedepf90-2.8.8/errormesg.c
+D      external/makedepf90/makedepf90-2.8.8/macro.h
+D      external/makedepf90/makedepf90-2.8.8/find_dep.c
+D      external/makedepf90/makedepf90-2.8.8/config.h
+D      external/makedepf90/makedepf90-2.8.8/errormesg.h
+D      external/makedepf90/makedepf90-2.8.8/find_dep.h
+D      external/makedepf90/makedepf90-2.8.8/makedepf90-2.8.8.tar.gz
+D      external/makedepf90/makedepf90-2.8.8/COPYING
+D      external/makedepf90/makedepf90-2.8.8/Makefile.def
+D      external/makedepf90/makedepf90-2.8.8/NEWS
+D      external/makedepf90/makedepf90-2.8.8/.depend
+D      external/makedepf90/makedepf90-2.8.8/find_dep.y
+D      external/makedepf90/makedepf90-2.8.8/makedepf90.1
+D      external/makedepf90/makedepf90-2.8.8/configure.in
+D      external/makedepf90/makedepf90-2.8.8/global.h
+D      external/makedepf90/makedepf90-2.8.8/list.c
+D      external/makedepf90/makedepf90-2.8.8/README
+D      external/makedepf90/makedepf90-2.8.8/finddep.h
+D      external/makedepf90/makedepf90-2.8.8/config.h.in
+D      external/makedepf90/makedepf90-2.8.8/lexer.c
+D      external/makedepf90/makedepf90-2.8.8/modfile_name.c
+D      external/makedepf90/makedepf90-2.8.8/list.h
+D      external/makedepf90/makedepf90-2.8.8/modfile_name.h
+D      external/makedepf90/makedepf90-2.8.8/main.c
+D      external/makedepf90/makedepf90-2.8.8/lexer.l
+D      external/makedepf90/makedepf90-2.8.8/install-sh
+M      external/Makefile
+?      build/compile.out
+M      build/da.make
+M      build/tools.make
+M      build/makefile
+M      setup.csh
+
+

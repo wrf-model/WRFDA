@@ -2,11 +2,6 @@ include configure.wrfvar
 
 setup : depend
 
-makedepf90.exe : 
-	@ ( cd $(EXTERNAL)/makedepf90/makedepf90-2.8.8; export CC=$(CC_TOOLS); \
-          unset LDFLAGS CCFLAGS CPPFLAGS; touch configure; ./configure; touch find_dep.c find_dep.h; make )
-	cp $(EXTERNAL)/makedepf90/makedepf90-2.8.8/makedepf90 makedepf90.exe
-
 links : 
 	@ $(LN) $(CHEM)/* .
 	@ $(LN) $(DYN_NMM)/* .
@@ -63,9 +58,9 @@ real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
               module_domain.o module_machine.o 
 
 
-depend : arch links registry makedepf90.exe module_state_description.F md_calls.inc \
+depend : arch links registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	./makedepf90.exe $(FPPFLAGS) \
+	makedepf90 $(FPPFLAGS) \
            *.F *.f90 *.F90  2>/dev/null | grep -v 'real_em.o :' > depend.txt
 	
 

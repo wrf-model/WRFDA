@@ -15,7 +15,6 @@ clean :
 	@ ( cd fftpack5 ; make clean )
 	@ ( cd lapack ; make clean )
 	@ ( cd bufr_ncep_nco ; make clean )
-	@ ( cd makedepf90/makedepf90-2.8.8; make clean )
 
 superclean :
 	@ ( cd esmf_time_f90 ;  make superclean )
@@ -34,6 +33,5 @@ superclean :
 	@ ( cd fftpack5 ; make superclean )
 	@ ( cd lapack ; make superclean )
 	@ ( cd bufr_ncep_nco ; make superclean )
-	@ ( cd makedepf90/makedepf90-2.8.8; make clean )
 
 

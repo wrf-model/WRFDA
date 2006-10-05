@@ -79,7 +79,7 @@ $SUBMIT_OPTIONS3
 
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
-export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
+export RUN_CMD="${RUN_CMD:-\"$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
@@ -88,7 +88,7 @@ elif test $HOSTNAME = ocotillo -o $HOSTNAME = snowdrift ; then
 #!/bin/ksh
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
-export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 else
@@ -96,7 +96,7 @@ else
 #!/bin/ksh
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
-export RUN_CMD=${RUN_CMD:-\$RUN_CMD_DEFAULT}
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 fi

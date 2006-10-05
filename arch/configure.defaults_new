@@ -34,8 +34,7 @@ CCFLAGS_RSL     =
 
 # Libraries
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                  -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       =  -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 # Architecture
@@ -81,8 +80,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = --L/usr/local/lib
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -122,8 +120,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 
@@ -166,8 +163,7 @@ FCTYPE          = -r8
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -206,8 +202,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       =  -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -251,8 +246,7 @@ FCTYPE          = -r8
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_
+LOCAL_LIB       = -L/usr/local/lib
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -287,8 +281,7 @@ FCBASE          = -Ktrap=fp
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 
 arch :
 		$(LN) $(RSL_STUBS)/* .
@@ -327,8 +320,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -372,8 +364,7 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -412,8 +403,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                  -lncarg -lncarg_gks -lncarg_c 
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -459,8 +449,7 @@ CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-		    -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = -L/usr/local/lib
 
 arch :
 		$(LN) $(RSL_STUBS)/* .
@@ -500,8 +489,7 @@ CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -L/usr/local/lib \
-                  -lncarg -lncarg_gks -lncarg_c 
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -545,10 +533,11 @@ FCENDIAN        =
 FCBASE          = -64 -mips4
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 -DUNDERSCORE
+CCFLAGS2        = -w -64 -mips4 -DUNDERSCORE -DIRIX
+CCFLAGS_BUFR    = -64 -mips4 -DUNDERSCORE
 CCFLAGS_RSL     = 
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = 
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -584,10 +573,11 @@ FCENDIAN        =
 FCBASE          = -64 -mips4 -w
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
+CCFLAGS2        = -w -64 -mips4 -DIRIX -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
+CCFLAGS_BUFR    = -64 -mips4 -DUNDERSCORE
 CCFLAGS_RSL     =
 
-LOCAL_LIB       = -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = 
 MPI_LIB		= -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
@@ -761,7 +751,7 @@ CCFLAGS2        = -UCRAY -Dcrayx1
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = 
 
 arch : 
 	$(LN) $(RSL_STUBS)/* .
@@ -810,7 +800,7 @@ CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
 CCFLAGS_BUFR    = -DUNDERSCORE
 
-LOCAL_LIB       = #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c
+LOCAL_LIB       = 
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 

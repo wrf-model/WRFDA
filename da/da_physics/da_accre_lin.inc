@@ -1,7 +1,7 @@
 subroutine da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
                   SCR29,SCR79,PRA9,kts,kte)
 
-!  Accretion (Collection)
+   ! Accretion (Collection)
 
    implicit none
 
@@ -12,7 +12,6 @@ subroutine da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
    real                      :: PRAC,BVT3
 
    DO K=kts, kte
-
       if (DT(k) <= 0.) cycle
 
       if (SCR3(k) > 0.) then
@@ -23,7 +22,8 @@ subroutine da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
          PRA9(K) = 0.
          PRA(k) = 0.
       endif
-
    ENDDO
 
 end subroutine da_accre_lin
+
+

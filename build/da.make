@@ -183,7 +183,7 @@ update_bc : da_update_bc
 da_update_bc : da_update_bc.exe
 
 da_update_bc.exe : da_update_bc.o
-	$(LD) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
+	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(EXTRA_LIBS)
 	@ $(RM) ../main/da_update_bc.exe

@@ -1,13 +1,9 @@
 subroutine da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
                              qs_prime_over_qs )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of da_tp_to_qs_lin.
-!
-!  METHOD: Standard adjoint coding.
-!
-!  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  PURPOSE: Adjoint of da_tp_to_qs_lin.
+   !---------------------------------------------------------------------------
 
    IMPLICIT NONE
    
@@ -21,9 +17,9 @@ subroutine da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
    REAL                          :: temp             ! Temporary storage.
    REAL                          :: es_prime_over_es ! es~/es
       
-!------------------------------------------------------------------------------
-!  [3.0] Calculate saturation specific humidity increment:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] Calculate saturation specific humidity increment:
+   !---------------------------------------------------------------------------
 
    temp = qs_prime_over_qs / ( p - rd_over_rv1 * es )
    
@@ -31,12 +27,14 @@ subroutine da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
 
    p_prime = p_prime - temp
    
-!------------------------------------------------------------------------------
-!  [2.0] Calculate saturation vapour pressure increment:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Calculate saturation vapour pressure increment:
+   !---------------------------------------------------------------------------
 
    temp = t + es_gammakelvin
 
    t_prime = t_prime + es_gammabeta * es_prime_over_es / ( temp * temp )
 
 end subroutine da_tp_to_qs_adj1
+
+

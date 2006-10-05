@@ -215,7 +215,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
    end do        ! end loop for sensor
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_rad")
 #endif
 
 end subroutine da_transform_xtoy_rad

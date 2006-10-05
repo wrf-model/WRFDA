@@ -1,7 +1,7 @@
 subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
                  PREC1,PREC2,PRE,kts,kte)
 
-!  Rainwater evaporation
+   ! Rainwater evaporation
 
    implicit none
 
@@ -11,7 +11,6 @@ subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
    real, dimension(kts:kte)  :: PRE
 
    DO K=kts, kte
-
       if (DT(k) <= 0.) cycle
 
       if (SCR3(K) > 0.) then
@@ -22,8 +21,8 @@ subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
       endif
 
       PRE(k)=AMAX1(-SCR3(k)/DT(k),PRE(k))
-
    ENDDO
 
 end subroutine da_evapo
+
 

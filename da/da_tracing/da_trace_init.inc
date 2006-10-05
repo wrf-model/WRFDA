@@ -7,6 +7,7 @@ subroutine da_trace_init
    INTEGER :: IOStatus             ! I/O return code
    INTEGER :: Loop1
    CHARACTER (LEN=200) :: TraceFile
+   CHARACTER (LEN=10)  :: temp
 
    !===========================================================================
 
@@ -24,8 +25,8 @@ subroutine da_trace_init
 
    IF (trace_write .AND. trace_unit /= 0) THEN
       if (use_html) then
-         WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
-           "trace/",myproc,".html"
+         WRITE(UNIT=temp,FMT='(I10)') myproc
+         TraceFile="trace/"//TRIM(temp)//".html"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:
@@ -33,8 +34,8 @@ subroutine da_trace_init
             ACTION="WRITE", &   ! I:
             IOSTAT=IOStatus)    ! O:
       else   
-         WRITE(UNIT=TraceFile,FMT='(A,I0,A)') &
-           "trace/",myproc,".txt"
+         WRITE(UNIT=temp,FMT='(I10)') myproc
+         TraceFile="trace/"//TRIM(temp)//".txt"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:
