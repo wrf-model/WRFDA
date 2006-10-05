@@ -13,9 +13,7 @@ MODULE da_par_util
    !---------------------------------------------------------------------------
 
    USE da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
-   USE da_constants           
    USE da_par_util1
-   USE module_wrf_error
     
    IMPLICIT NONE
 

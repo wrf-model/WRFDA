@@ -4,9 +4,7 @@
 MODULE module_io_domain
 USE module_io
 USE module_io_wrf
-USE module_wrf_error
 USE module_date_time
-USE module_configure
 USE module_domain
 
   PRIVATE open_dataset

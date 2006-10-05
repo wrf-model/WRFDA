@@ -4348,7 +4348,8 @@ END
       USE module_domain
       USE module_configure
       USE module_dm
-      USE module_state_description
+! JRB dupllicate
+!      USE module_state_description
 !
       TYPE(domain), TARGET :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE (grid_config_rec_type) :: config_flags ! configureation flags, has vertical dim of 
@@ -4414,7 +4415,8 @@ END
              USE module_domain
              USE module_configure
              USE module_dm
-             USE module_state_description
+! JRB duplicate
+!             USE module_state_description
 !
              TYPE (grid_config_rec_type)            :: config_flags
              TYPE(domain), TARGET                   :: grid

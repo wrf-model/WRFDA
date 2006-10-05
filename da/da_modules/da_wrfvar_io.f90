@@ -7,11 +7,9 @@ MODULE da_wrfvar_io
 
    !--Model layer
 
-   USE module_configure
    USE module_timing
 
    USE da_tracing
-   USE da_constants
    use da_reporting
 
 CONTAINS

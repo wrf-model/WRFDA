@@ -4,13 +4,10 @@ module da_define_structures
     use module_dm       ! for rsl definitions
     use da_tracing
     use da_reporting
-    use module_wrf_error
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Collection of routines to define and allocate structures.
    !---------------------------------------------------------------------------
-
-   use da_constants
 
    IMPLICIT NONE
    
