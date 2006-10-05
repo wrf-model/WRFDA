@@ -49,6 +49,7 @@ for CONFIG in $CONFIGS; do
             echo "Skipping parallel runs of serial code"
           else
             cd ~bray/data/$REGION
+            . $BUILD/wrfvar/setup.ksh $COMPILER
             echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
               ./gen_be.ksh
