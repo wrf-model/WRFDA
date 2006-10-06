@@ -83,12 +83,12 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
             iscan = iv%instid(inst)%rad(n)%scanpos
             do k = 1, nchanl
-               if (lbiascorr) then
-                  tb(nprofiles,k) = satinfo(inst)%b(iscan+1,k)* &
-                     jo_grad_y%instid(inst)%rad(n)%tb(k)
-               else
+               !if (lbiascorr) then
+               !   tb(nprofiles,k) = satinfo(inst)%b(iscan+1,k)* &
+               !      jo_grad_y%instid(inst)%rad(n)%tb(k)
+               !else
                   tb(nprofiles,k) = jo_grad_y%instid(inst)%rad(n)%tb(k) 
-               end if
+               !end if
             end do
 
             !---------------------------------------------

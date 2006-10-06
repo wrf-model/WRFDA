@@ -195,12 +195,12 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
             !-------------------------------------------------------------------
             iscan = iv%instid(inst)%rad(n)%scanpos
             do k = 1, nchanl
-               if (lbiascorr) then
-                  y%instid(inst)%rad(n)%tb(k) = satinfo(inst)%b(iscan+1,k) * &
-                     tb(nprofiles,k)
-               else
+               !if (lbiascorr) then
+               !   y%instid(inst)%rad(n)%tb(k) = satinfo(inst)%b(iscan+1,k) * &
+               !      tb(nprofiles,k)
+               !else
                   y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
-               end if
+               !end if
             end do
          end if   !  end endif for within_halo
       end do       !  end loop for pixels
