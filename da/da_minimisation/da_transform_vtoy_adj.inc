@@ -79,14 +79,14 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          call da_system_4dvar("da_run_wrfplus_ad.ksh pre ")
 
          IF (rootproc) THEN
-            call system("rm -rf ad/wrf_done")
-            call system("touch ad/wrf_go_ahead")
+            call da_system("rm -rf ad/wrf_done")
+            call da_system("touch ad/wrf_go_ahead")
             DO WHILE ( .true. )
                OPEN(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
                CLOSE(wrf_done_unit)
                EXIT
    303         CONTINUE
-               CALL system("sleep 1")
+               CALL da_system("sleep 1")
             ENDDO
          ENDIF
          CALL wrf_get_dm_communicator ( comm )
@@ -94,10 +94,10 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
 
          call da_system_4dvar("da_run_wrfplus_ad.ksh post ")
       else
-         call system("da_run_wrfplus_ad.ksh")
+         call da_system("da_run_wrfplus_ad.ksh")
       end if
 #else
-      call system("da_run_wrfplus_ad.ksh")
+      call da_system("da_run_wrfplus_ad.ksh")
 #endif
       call da_trace("da_transform_vtoy_adj","Finished da_run_wrfplus_ad.ksh")
 

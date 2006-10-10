@@ -23,6 +23,9 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    character(len=30)  :: filename
    integer            :: ndomain
 
+#ifdef RTTOV
+   if (trace_use) call da_trace_entry("da_write_oa_rad_ascii")
+
    do n = 1, iv%num_inst
       if (iv%instid(n)%num_rad < 1) cycle
 
@@ -259,6 +262,9 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
       end do     ! end do pixels
       close(UNIT=oma_rad_unit)
    end do    !! end do instruments
+
+   if (trace_use) call da_trace_exit("da_write_oa_rad_ascii")
+#endif
 
 END SUBROUTINE da_write_oa_rad_ascii
 

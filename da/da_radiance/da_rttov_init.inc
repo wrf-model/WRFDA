@@ -1,4 +1,4 @@
-!
+#ifdef RTTOV
 subroutine da_rttov_init(iv,ob)
 !------------------------------------------------------------------------------
 !  PURPOSE: interface to the initialization subroutine of RTTOV8_5.
@@ -12,10 +12,8 @@ subroutine da_rttov_init(iv,ob)
 
  implicit none 
 
-#ifdef RTTOV
 #include "rttov_setup.interface"
 #include "rttov_readscattcoeffs.interface"
-#endif
  
  type (ob_type), intent (inout) :: iv
  type (y_type) , intent (inout) :: ob
@@ -421,3 +419,4 @@ subroutine da_rttov_init(iv,ob)
   return
 
 end subroutine da_rttov_init
+#endif

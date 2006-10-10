@@ -19,6 +19,8 @@ subroutine da_qc_rad ( inst, nchan, ob, iv )
 ! local variables
 
    logical   :: amsua, amsub, hirs, msu,airs,hsb
+
+#ifdef RTTOV
    
    amsua = trim( inst_name(rtminit_sensor(inst))) == 'amsua'
    amsub = trim( inst_name(rtminit_sensor(inst))) == 'amsub'
@@ -70,5 +72,6 @@ subroutine da_qc_rad ( inst, nchan, ob, iv )
    end if
 
    return
+#endif
 
 end subroutine da_qc_rad

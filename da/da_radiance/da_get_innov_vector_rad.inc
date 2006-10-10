@@ -69,6 +69,11 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
    IF ( iv%num_inst < 1 ) return
 
+#if !defined(RTTOV)
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $RTTOV option for radiances"/))
+#else
+
    if (trace_use) call da_trace_entry("da_get_innov_vector_rad")
 
    WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation------- '
@@ -504,6 +509,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rad")
+#endif
  
 end subroutine da_get_innov_vector_rad
 
