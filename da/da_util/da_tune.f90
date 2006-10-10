@@ -5,6 +5,7 @@ program da_tune
 !        Ref: QJRMS (2001), 127, pp. 1433-1452   
 !             Gerald Desroziers and Serguei Ivanov
 !    Updates: 
+!             03/15/2006  ADD RADIANCE ERROR TUNING    ZHIQUAN LIU
 !             07/05/2007     Syed RH Rizvi
 !-----------------------------------------------------------
    implicit none
@@ -14,9 +15,41 @@ program da_tune
    integer, parameter            :: y_unit    = 47
    integer, parameter            :: jo_unit   = 48
    integer, parameter            :: in_unit   = 49
+   integer, parameter            :: ninst     = 35  ! max snesor number
+   integer, Parameter            :: nplatforms = 20
    real, parameter               :: missing_r = -888888.0
+! below copy from RTTOV
+  !platform names
+  Character (len=8), Parameter :: platform_name(nplatforms) = &
+       (/ 'noaa    ', 'dmsp    ', 'meteosat', 'goes    ', 'gms     ', &
+          'fy2     ', 'trmm    ', 'ers     ', 'eos     ', 'metop   ', &
+          'envisat ', 'msg     ', 'fy1     ', 'adeos   ', 'mtsat   ', &
+          'coriolis', 'npoess  ', 'gifts   ', 'xxxxxxxx', 'xxxxxxxx'/)
 
-   integer                       :: n
+  ! List of instruments  !!!! HIRS is number 0
+  Character (len=8), Dimension(0:ninst-1) :: inst_name  =                &
+       & (/ 'hirs    ', 'msu     ', 'ssu     ', 'amsua   ', 'amsub   ',  &
+       &    'avhrr   ', 'ssmi    ', 'vtpr1   ', 'vtpr2   ', 'tmi     ',  &
+       &    'ssmis   ', 'airs    ', 'hsb     ', 'modis   ', 'atsr    ',  &
+       &    'mhs     ', 'iasi    ', 'amsr    ', 'imager  ', 'atms    ',  &
+       &    'mviri   ', 'seviri  ', 'imager  ', 'sounder ', 'imager  ',  &
+       &    'vissr   ', 'mvisr   ', 'cris    ', 'cmis    ', 'viirs   ',  &
+       &    'windsat ', 'gifts   ', 'xxxxxxxx', 'xxxxxxxx', 'xxxxxxxx'   /)
+
+   integer                       :: n,k,ipixel
+
+!  radiance namelist varibles
+
+   integer                       :: rtminit_nsensor
+   integer, dimension(ninst)     :: rtminit_platform, &
+                                    rtminit_satid,    &
+                                    rtminit_sensor,   &
+                                    rtminit_nchan
+!  radiance relevant variables
+   character*1          :: str1,str2,str3
+   character*4          :: platform
+   character*5          :: sensor
+   integer              :: platform_id,satellite_id,sensor_id,ichan
    
    type field_type
       real                       :: yp
@@ -106,6 +139,21 @@ program da_tune
       type (field_type), pointer :: q(:)
    end type bogus_type
 
+   type pixel_type
+      type (field_type), pointer :: pixel(:)                 ! dimension: num_rad_tot(ichan)
+   end type pixel_type
+
+   type radiance_type
+      CHARACTER*20               :: rttovid_string
+      integer                    :: nchan
+      integer, pointer           :: num_rad_tot(:)        ! dimension: nchan
+      real   , pointer           :: trace_rad  (:), &     ! dimension: nchan
+                                    jo_rad     (:), &     ! dimension: nchan
+                                    joa_rad    (:), &     ! dimension: nchan
+                                    factor_rad (:)        ! dimension: nchan
+      type (pixel_type), pointer :: tb(:)                 ! dimension: nchan
+   end type radiance_type
+
 
    type ob_type
       integer                    :: total_obs
@@ -194,6 +242,8 @@ program da_tune
       type (qscat_type), pointer :: qscat(:)
       type (pilot_type), pointer :: profiler(:)
       type (bogus_type), pointer :: bogus(:)
+      type (radiance_type), pointer :: rad(:)
+
       end type ob_type
    type (ob_type)       :: ob
    
@@ -248,18 +298,19 @@ program da_tune
 !--------------------------------------------------------------------------
 
    call da_calc_jo_expected( ob )
-
 !--------------------------------------------------------------------------
 !  [6.0] Read actual cost function J and error tuning factors used:
 !--------------------------------------------------------------------------
 
    call da_read_jo_actual( ob )
+  if ( rtminit_nsensor > 0 ) call da_read_jo_actual_rad( ob )
 
 !--------------------------------------------------------------------------
 !  [7.0] Calculate observation error tuning factors:
 !--------------------------------------------------------------------------
 
    call da_calc_new_factors( ob )
+   if ( rtminit_nsensor > 0 ) call da_calc_new_factors_rad( ob )
 
 !--------------------------------------------------------------------------
 !  [8.0] Calculate observation error tuning factors:
@@ -302,6 +353,11 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_profiler = 0
    ob % num_bogus = 0
    ob % num_qscat = 0
+!  [1.2] Initialize satellite instrument numbers
+!         and channel numbers for each instrument
+
+   call read_namelist_radiance
+
      times = 0 
 !  [2] Loop through input file to count number of obs:
 
@@ -347,13 +403,39 @@ subroutine da_count_obs( y_unit, ob )
           ob % num_profiler = ob % num_profiler + num_obs
       else if ( index( ob_name,'bogus') > 0 ) then
           ob % num_bogus = ob % num_bogus + num_obs
-            read(y_unit,'(i8)')num_levs
-            read(y_unit,'(a20)')dummy    
+!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
+!--------------------------------------------------------------------
+      else if ( index( ob_name,'noaa') > 0 ) then
+         platform_id = 1
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+               platform, str1,satellite_id,str2,sensor,str3,ichan
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+          print*,' Unrecognized Sensor ',sensor
+
+          stop
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+                ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
+                exit
+           end if
+         end do
+!---------------------------------------------------------------------
+!rizvi            read(y_unit,'(i8)')num_levs
+!rizvi            read(y_unit,'(a20)')dummy    
       elseif ( index( ob_name,'*****') > 0 ) then 
       print*,' scaned for time ', times
+      exit
       else
         print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
       end if
+!
           do n = 1, num_obs
             read(y_unit,'(i8)')num_levs
             do k = 1, num_levs 
@@ -361,9 +443,23 @@ subroutine da_count_obs( y_unit, ob )
             enddo
           enddo
    end do
+
 1000  print*,' end of file reached on unit ',y_unit
+
 !  [3] Allocate ob structures where obs exist:
 
+   if ( rtminit_nsensor > 0 ) then
+     do n=1,rtminit_nsensor
+     do ichan=1,ob%rad(n)%nchan
+      if ( ob%rad(n)%num_rad_tot(ichan) > 0 ) then
+      allocate( ob % rad(n) % tb(ichan) % pixel(1:ob % rad(n) %num_rad_tot(ichan)) )
+      write(6,'(a,i4,a,i8)') ' Number of '//trim(ob%rad(n)%rttovid_string)//' channel ', ichan , ' = ', &
+                        ob%rad(n)%num_rad_tot(ichan)
+      end if
+     end do
+     end do
+   end if
+!
    if ( ob % num_synop > 0 ) then
       allocate( ob % synop(1:ob % num_synop) )
       write(6,'(a,i8)')' Number of synop obs = ', ob % num_synop
@@ -491,6 +587,10 @@ subroutine da_read_y( y_unit, ob )
    iqscat = 0 
    ibogus = 0 
    iprofiler = 0
+  do n = 1,rtminit_nsensor
+    ob%rad(n)%num_rad_tot(:) = 0
+   end do
+
 
    do
    
@@ -728,8 +828,35 @@ subroutine da_read_y( y_unit, ob )
                                         ob % bogus(ibogus) % q(k) % y
             end do
          end do
+!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
+!--------------------------------------------------------------------
+      else if ( index( ob_name,'noaa') > 0 ) then
+         platform_id = 1
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+               platform, str1,satellite_id,str2,sensor,str3,ichan
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+              write(6,*) ' Unrecognized Sensor '
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+                do k = 1,num_obs
+                  ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
+                  read(y_unit,'(2i8,e15.7)') ipixel,kdum,   &
+                        ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%y
+                end do
+                exit
+           end if
+         end do
+!---------------------------------------------------------------------
 
       elseif ( index( ob_name,'*****') > 0 ) then 
+        exit
       else
       print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
       end if
@@ -774,6 +901,10 @@ subroutine da_read_yp( yp_unit, ob )
    iqscat = 0 
    ibogus = 0 
    iprofiler = 0
+
+   do n = 1,rtminit_nsensor
+    ob%rad(n)%num_rad_tot(:) = 0
+   end do
 
    do
    
@@ -975,8 +1106,36 @@ subroutine da_read_yp( yp_unit, ob )
                                         ob % bogus(ibogus) % q(k) % yp
             end do
          end do
+!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
+!--------------------------------------------------------------------
+      elseif ( index( ob_name,'noaa') > 0 ) then
+         platform_id = 1
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+               platform, str1,satellite_id,str2,sensor,str3,ichan
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+              write(6,*) ' Unrecognized Sensor '
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+                do k = 1,num_obs
+                  ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
+                  read(yp_unit,'(2i8,e15.7)') ipixel, kdum,  &
+                       ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%yp
+                end do
+                exit
+           end if
+         end do
+!---------------------------------------------------------------------
+
 
       elseif ( index( ob_name,'*****') > 0 ) then 
+        exit
       else
       print*,' unknown obs type: ',trim(ob_name),' found on unit ',yp_unit
       end if
@@ -1019,17 +1178,18 @@ subroutine da_read_obs_rand( rand_unit, ob )
    iqscat = 0 
    ibogus = 0 
    iprofiler = 0
+   do n = 1,rtminit_nsensor
+    ob%rad(n)%num_rad_tot(:) = 0
+   end do
 
    rewind( rand_unit )
 
    do
    
       read(rand_unit,'(a20,i8)',end=1000)ob_name, num_obs
-
       if ( index( ob_name,'synop') > 0 ) then
          do n = 1, num_obs
             isynop = isynop + 1
-            
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
             ob % synop(isynop) % u % error, ob % synop(isynop) % u % pert, &
@@ -1237,8 +1397,8 @@ subroutine da_read_obs_rand( rand_unit, ob )
             allocate( ob % profiler(iprofiler) % v(1:num_levs) )
              do k = 1, num_levs
              read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-             ob % profiler(iprofiler) % u % error, ob % profiler(iprofiler) % u(k) % pert, &
-             ob % profiler(iprofiler) % v % error, ob % profiler(iprofiler) % v(k) % pert
+             ob % profiler(iprofiler) % u(k) % error, ob % profiler(iprofiler) % u(k) % pert, &
+             ob % profiler(iprofiler) % v(k) % error, ob % profiler(iprofiler) % v(k) % pert
              enddo
          end do
       elseif ( index( ob_name,'bogus') > 0 ) then
@@ -1259,7 +1419,36 @@ subroutine da_read_obs_rand( rand_unit, ob )
              ob % bogus(ibogus) % q % error, ob % bogus(ibogus) % q % pert
              end do
          end do
+!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
+!--------------------------------------------------------------------
+      elseif ( index( ob_name,'noaa') > 0 ) then
+         platform_id = 1
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+               platform, str1,satellite_id,str2,sensor,str3,ichan
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+              write(6,*) ' Unrecognized Sensor '
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+                do k = 1,num_obs
+                  ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
+                  read(rand_unit,'(2i8,f10.3,e15.7)') ipixel, kdum,     &
+                          ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%error, &
+                          ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%pert
+                end do
+                exit
+           end if
+         end do
+!---------------------------------------------------------------------
+
       elseif ( index( ob_name,'*****') > 0 ) then 
+        exit
       else
       print*,' unknown obs type: ',trim(ob_name),' found on unit ',rand_unit
       end if
@@ -1766,6 +1955,32 @@ subroutine da_calc_jo_expected( ob )
       ob % num_bogus = count1 + count2 + count3 + count4
    end if
 
+
+!  radiance part
+   if ( rtminit_nsensor > 0 ) then
+
+      do n = 1, rtminit_nsensor
+      do ichan = 1, ob % rad(n) % nchan
+         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
+           trace1 = 0.0
+           count1 = 0
+           do k=1,ob % rad(n) % num_rad_tot(ichan)
+               call da_calc_trace_single( ob % rad(n) % tb(ichan)%pixel(k), count1, trace1 )
+           end do
+           ob % rad(n) % jo_rad(ichan)    = 0.5 * ( count1 - trace1 )
+           ob % rad(n) % trace_rad(ichan) = trace1
+           if ( ob % rad(n) % trace_rad(ichan) < 0.0 ) &
+              write(6,'(a,i3,a,f15.5)') ' Warning: '//trim(ob%rad(n)%rttovid_string), ichan, &
+                                        ' Trace(HK) < 0 = ', ob%rad(n)%trace_rad(ichan)
+           ob % trace_total = ob % trace_total + ob % rad(n) % trace_rad(ichan)
+           ob % total_obs   = ob % total_obs   + ob % rad(n) % num_rad_tot(ichan)
+         end if
+      end do
+      end do
+
+   end if
+
+
     ob % total_obs = ob % num_synop_tot + ob % num_metar_tot + ob % num_ships_tot + &
                     ob % num_polaramv_tot + ob % num_geoamv_tot + ob % num_gpspw_tot + &
                     ob % num_sound_tot + ob % num_airep_tot + ob % num_pilot_tot + &
@@ -1887,12 +2102,11 @@ subroutine da_read_jo_actual( ob )
    rewind(jo_unit)
    
    do
-
       read(jo_unit,'(a46,10a15)')str, str1, str2, str3, str4, str5, &
                                  str6, str7, str8, str9, str10
       ob_name = str(5:9)
       string = str(16:27)
-     
+       print*,' read ob_name = ',ob_name,str(5:9),' sring= ',string 
       if ( ob_name == 'synop' .and. string == 'Jo (actual) ' ) then
 
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
@@ -2313,6 +2527,166 @@ subroutine da_get_j( ob )
    
 end subroutine da_get_j
 
+
 !--------------------------------------------------------------------------
+subroutine da_calc_new_factors_rad( ob )
+
+   implicit none
+
+   type (ob_type), intent(inout)     :: ob
+
+   write(6,*)
+
+   write(6,*) 'sensor  chan  num  Jo_min  Jo_exp  trace(HK)  factor'
+      do n = 1, rtminit_nsensor
+      do ichan = 1, ob % rad(n) % nchan
+         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
+           ob % rad(n) % factor_rad(ichan) = &
+             sqrt( ob % rad(n) % joa_rad(ichan) / ob % rad(n) % jo_rad(ichan) )
+           write(6,'(a15,i3,i8,3f15.5,f8.3)')   &
+                       trim(ob%rad(n)%rttovid_string), &
+                       ichan,                        &
+                       ob%rad(n)%num_rad_tot(ichan), &
+                       ob%rad(n)%joa_rad(ichan),      &
+                       ob%rad(n)%jo_rad(ichan),     &
+                       ob%rad(n)%trace_rad(ichan),   &
+                       ob%rad(n)%factor_rad(ichan)
+         end if
+      end do
+      end do
+
+
+end subroutine da_calc_new_factors_rad
+
+!--------------------------------------------------------------------------
+subroutine da_read_jo_actual_rad( ob )
+
+   implicit none
+
+   type (ob_type), intent(inout) :: ob
+
+   character (len=30)            :: str
+   character (len=19)            :: ob_name
+   integer                       :: num_obs
+   real                          :: jo
+
+
+   do n = 1,rtminit_nsensor
+    ob%rad(n)%num_rad_tot(:) = 0
+    ob%rad(n)%joa_rad(:) = 0.
+   end do
+
+   rewind(jo_unit)
+
+   do
+
+      read(jo_unit,'(a30,a19,i5,i8,f15.5)') str, ob_name, &
+                                            ichan, num_obs, jo
+
+!      write(6,'(a30,a19,i5,i8,f15.5)') str, ob_name, &
+!                                            ichan, num_obs, jo
+
+!---determine instrument and channel number
+
+      if ( index( ob_name,'noaa') > 0 ) then
+         platform_id = 1
+         read (ob_name,'(a4,a1,i2,a1,a5)') &
+               platform, str1,satellite_id,str2,sensor
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+              write(6,*) ' Unrecognized Sensor '
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+!                if ( num_obs /= ob%rad(n)%num_rad_tot(ichan) ) then
+!                   write(6,*) ' Unconsistent obs number for ',ob_name, ' channel ', &
+!                              ichan,' : ', ob%rad(n)%num_rad_tot(ichan), ' vs. ',num_obs
+!                   stop
+!                else
+                   ob%rad(n)%joa_rad(ichan) = ob%rad(n)%joa_rad(ichan) + jo
+                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
+!                end if
+                exit
+           end if
+         end do
+      end if
+!---------------------------------------------------------------------
+
+
+      if ( str(1:5) == '*****' ) exit
+
+   end do
+
+end subroutine da_read_jo_actual_rad
+!---------------------------------------------
+SUBROUTINE read_namelist_radiance
+!----------------------------------------------------------------------------
+!             03/15/2006   for radiance tuning setup        Zhiquan Liu
+!----------------------------------------------------------------------------
+   IMPLICIT NONE
+
+!  Local scalars:
+
+   CHARACTER*20              :: namelist_file      ! Input namelist filename.
+   INTEGER, PARAMETER        :: namelist_unit = 7  ! Input namelist unit.
+   INTEGER                   :: iost               ! Error code.
+
+!  Namelist contents :
+
+   NAMELIST /rtminit/  rtminit_nsensor, rtminit_platform, &
+                       rtminit_satid, rtminit_sensor, rtminit_nchan
+
+   namelist_file = 'namelist.radiance'
+   WRITE (6, '(3x,A,A)' ) ' radiance namelist file : ', namelist_file
+   IOST = 0
+
+   OPEN ( FILE   = trim(namelist_file), UNIT   = namelist_unit, &
+          STATUS = 'OLD' , ACCESS = 'SEQUENTIAL', &
+          FORM   = 'FORMATTED', ACTION = 'READ', &
+          IOSTAT = IOST )
+   IF ( IOST /= 0 ) stop ' Error in opening namelist file '
+
+   IOST = 0
+
+   READ  ( UNIT = namelist_unit, NML = rtminit,  IOSTAT = IOST)
+      WRITE(6,'(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      WRITE(6,'(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+      WRITE(6,'(A,10I4)') ' rtminit_nchan    = ', rtminit_nchan   (1:rtminit_nsensor)
+
+   IF ( IOST /= 0 ) stop ' Error in reading naemlist file '
+
+   CLOSE (namelist_unit)
+
+   if ( rtminit_nsensor > 0 ) then
+      allocate ( ob % rad(rtminit_nsensor) )
+      do n = 1,rtminit_nsensor
+        ob % rad(n) % nchan = rtminit_nchan(n)
+        allocate ( ob % rad(n) % num_rad_tot(ob % rad(n) % nchan) )
+        allocate ( ob % rad(n) % jo_rad(ob % rad(n) % nchan) )
+        allocate ( ob % rad(n) % joa_rad(ob % rad(n) % nchan) )
+        allocate ( ob % rad(n) % factor_rad(ob % rad(n) % nchan) )
+        allocate ( ob % rad(n) % trace_rad(ob % rad(n) % nchan) )
+        allocate ( ob % rad(n) % tb(ob % rad(n) % nchan) )
+        ob % rad(n) % num_rad_tot(:) = 0
+        write(ob%rad(n)%rttovid_string, '(a,i2.2,a)')  &
+             trim( platform_name(rtminit_platform(n)) )//'-',  &
+             rtminit_satid(n),     &
+             '-'//trim( inst_name(rtminit_sensor(n)) )
+        write(6,*) 'Tuning Radiance Error For ', trim(ob%rad(n)%rttovid_string)
+      end do
+   end if
+   RETURN
+
+END SUBROUTINE read_namelist_radiance
+
+
+
 
 end program da_tune

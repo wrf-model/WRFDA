@@ -4,6 +4,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !
 !  Additions:
 !             07/08/2003  -   Profiler and Buoy Obs         Syed RH Rizvi    
+!             03/08/2006      Add radiance part               Zhiquan Liu
 !             06/23/2006  -   MPI update                    Syed RH Rizvi    
 !             07/03/2006  -   update for AIRS retrievals    Syed RH Rizvi    
 !
@@ -19,10 +20,11 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    TYPE (y_type), INTENT(INOUT)  :: ob   ! (Smaller) observation structure.
 
    real                          :: z1, z2, z3, z4, z5, z6, z7, dum ! Random numbers.
-   integer                       :: n, k     ! Loop counters.
+   integer                       :: n, k, inst     ! Loop counters.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit
    integer                       :: num_obs                 
+   character(len=20)             :: ob_name
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
@@ -30,7 +32,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    if( numb_procs > 1) then
 #ifdef DM_PARALLEL
 ! Get output unit for MPI run
-  ounit = ounit*10 +  myproc
+  ounit = ounit*100 +  myproc
 #endif
    end if
    dum = -999999.9
@@ -38,7 +40,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !  [1.0] Initiate random number sequence:
 !----------------------------------------------------------------------
 
-   call random_seed
+   call da_random_seed
    
 !----------------------------------------------------------------------
 !  [2.0] Create noise and output:
@@ -633,7 +635,43 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
       END DO
    ENDIF
 
-  write(ounit,'(a20,i8)')'********************', 0
+!
+!  Transfer Radiance obs:
+!
+
+   IF ( iv%num_inst > 0 ) THEN
+      do inst = 1, iv%num_inst                 ! loop for sensor
+         if ( iv%instid(inst)%num_rad < 1 ) cycle
+         do k = 1,iv%instid(inst)%nchan        ! loop for channel
+!  Counting number of obs for channle k
+         num_obs = 0
+         do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
+           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                num_obs = num_obs + 1
+           end if
+         end do                                ! end loop for pixel
+         if (num_obs < 1) cycle
+
+         write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
+         write(ounit,'(a20,i8)')  ob_name,num_obs
+
+         num_obs = 0
+         do n= 1, iv%instid(inst)%num_rad      ! loop for pixel
+           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                 num_obs = num_obs + 1
+                 call da_add_noise( iv%instid(inst)%rad(n)%tb(k),  &
+                                    ob%instid(inst)%rad(n)%tb(k), z1)
+                 
+                 write(ounit,'(2i8,f10.3,e15.7)') num_obs, 1,  &
+                          iv%instid(inst)%rad(n)%tb(k)%error, z1
+           end if
+         end do                                ! end loop for pixel
+         end do                                ! end loop for channel
+      end do                                   ! end loop for sensor
+   END IF
+
   close (ounit)
 
 END SUBROUTINE da_add_noise_to_ob

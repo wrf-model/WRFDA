@@ -5,6 +5,7 @@ SUBROUTINE da_write_y(iv, y)
    !
    ! Additions:
    !          07/08/2003 - Profiler and Buoy Obs          Syed RH Rizvi      
+   !          03/07/2006      Add radiance output         Zhiquan Liu
    !          05/16/2006 - Updated for MPI run            Syed RH Rizvi
    !          07/03/2006 - Updated for AIRS retrievals    Syed RH Rizvi
    !
@@ -22,8 +23,9 @@ SUBROUTINE da_write_y(iv, y)
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
 
    integer                       :: ounit ! Output file unit.
-   integer                       :: n, k, num_obs
+   integer                       :: n, k, num_obs, inst
    real                          :: f1, f2, f3, f4, f5, f6, f7, dum
+   character(len=20)             :: ob_name
 
    if (trace_use) call da_trace_entry("da_write_y")
 
@@ -40,7 +42,7 @@ SUBROUTINE da_write_y(iv, y)
 #ifdef DM_PARALLEL
    if (numb_procs > 1) then
       ! Get output unit for MPI run
-      ounit = ounit*10 +  myproc
+      ounit = ounit*100 +  myproc
    end if
 #endif
  
@@ -562,7 +564,38 @@ SUBROUTINE da_write_y(iv, y)
       endif
    ENDIF
 
-   write(ounit,'(a20,i8)')'********************', 0
+  
+   ! [18] Transfer Radiance obs:
+
+   IF ( iv%num_inst > 0 ) THEN
+      do inst = 1, iv%num_inst                 ! loop for sensor
+         if ( iv%instid(inst)%num_rad < 1 ) cycle
+         do k = 1,iv%instid(inst)%nchan        ! loop for channel
+!  Counting number of obs for channle k
+         num_obs = 0
+         do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
+           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                num_obs = num_obs + 1
+           end if
+         end do                                ! end loop for pixel
+         if (num_obs < 1) cycle
+
+         write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
+         write(ounit,'(a20,i8)')  ob_name,num_obs
+
+         num_obs = 0
+         do n= 1, iv%instid(inst)%num_rad      ! loop for pixel
+           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                 num_obs = num_obs + 1
+                 write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(inst)%rad(n)%tb(k)
+           end if
+         end do                                ! end loop for pixel
+         end do                                ! end loop for channel
+      end do                                   ! end loop for sensor
+   END IF
+
    close (ounit)
 
    if (trace_use) call da_trace_exit("da_write_y")
