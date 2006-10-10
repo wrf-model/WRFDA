@@ -1,7 +1,6 @@
 MODULE da_tracing
 
    use da_constants
-   use module_wrf_error
 #ifdef DM_PARALLEL
    use da_par_util1
 #endif

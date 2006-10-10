@@ -10,11 +10,9 @@ MODULE da_wrfvar_top
    USE module_machine
    USE module_domain
    USE module_integrate
-   USE module_driver_constants
    USE module_configure
 
    USE module_timing
-   USE module_wrf_error
    USE da_tracing
 
 #ifdef DM_PARALLEL
@@ -22,8 +20,6 @@ MODULE da_wrfvar_top
 #endif
 
    USE da_wrfvar_io
-
-   USE da_constants
 
    IMPLICIT NONE
 

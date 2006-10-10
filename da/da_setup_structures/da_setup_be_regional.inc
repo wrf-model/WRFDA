@@ -459,10 +459,8 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
                                       xb % ds, be1_rf_lengthscale, be % v1 )
    call da_rescale_background_errors( ix, jy, var_scaling2, len_scaling2, &
                                       xb % ds, be2_rf_lengthscale, be % v2 )
-call da_oi(__FILE__,__LINE__)
    call da_rescale_background_errors( ix, jy, var_scaling3, len_scaling3, &
                                       xb % ds, be3_rf_lengthscale, be % v3 )
-call da_oi(__FILE__,__LINE__)
    call da_rescale_background_errors( ix, jy, var_scaling4, len_scaling4, &
                                       xb % ds, be4_rf_lengthscale, be % v4 )
    call da_rescale_background_errors( ix, jy, var_scaling5, len_scaling5, &

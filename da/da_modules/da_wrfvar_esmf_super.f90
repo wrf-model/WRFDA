@@ -18,7 +18,6 @@ MODULE da_wrfvar_esmf_super
    USE module_configure
 
    USE module_timing
-   USE module_wrf_error
 
 #ifdef DM_PARALLEL
    USE module_dm

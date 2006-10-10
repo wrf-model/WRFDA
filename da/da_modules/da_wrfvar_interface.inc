@@ -11,7 +11,6 @@ subroutine da_wrfvar_interface ( grid, config_flags )
       ! Driver layer modules
       USE module_domain
       USE module_configure
-      USE module_driver_constants
       USE module_machine
       USE module_tiles
       USE module_dm
@@ -23,9 +22,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
       USE da_define_structures
       USE da_setup_structures
       USE da_test
-      USE da_tools
       USE da_minimisation
-      USE da_par_util
 
       !--Input data.
 

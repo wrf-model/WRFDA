@@ -2,7 +2,6 @@ module be_spectral
 
    use da_constants
    use fftpack5
-   USE module_wrf_error
    use da_tracing
 
    !--------------------------------------------------------------------

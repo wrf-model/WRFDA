@@ -7,8 +7,6 @@ MODULE da_ssmi
    USE da_grid_definitions
    USE da_physics
    USE da_tools
-   USE da_par_util
-   USE module_wrf_error
 
    ! The "stats_ssmi_rv_type" is ONLY used locally in da_ssmi_rv:
 

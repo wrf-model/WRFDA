@@ -6,7 +6,6 @@ MODULE da_grid_definitions
    
    USE da_constants
    USE da_define_structures     ! For xpose_type.
-   USE module_wrf_error
    
    IMPLICIT NONE
    

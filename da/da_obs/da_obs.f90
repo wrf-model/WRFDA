@@ -25,7 +25,6 @@ module da_obs
    use da_tracing
    use da_radiance
    use da_airsr   
-   use module_wrf_error
    use da_reporting
 
    IMPLICIT NONE

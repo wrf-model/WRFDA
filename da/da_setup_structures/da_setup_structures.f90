@@ -6,18 +6,13 @@ MODULE da_setup_structures
 
    use module_state_description
    USE da_define_structures
-   USE da_constants
    USE da_grid_definitions
    USE da_obs
    USE da_ssmi
    USE da_vtox_transforms
-   USE da_physics
-   USE da_tools
    USE da_spectral
    use da_wrfvar_io
    use da_radiance
-   USE module_wrf_error
-   use da_tracing
    use da_reporting
 
    IMPLICIT NONE

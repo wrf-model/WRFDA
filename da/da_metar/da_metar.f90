@@ -6,7 +6,6 @@ module da_metar
   use da_statistics
   use da_tools
   use da_physics
-  use da_par_util
   use da_tracing
 
   ! The "stats_metar_type" is ONLY used locally in da_metar:
