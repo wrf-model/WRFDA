@@ -87,7 +87,6 @@ export RUN_WRF=${RUN_WRF:-false}                   # Run if true.
 export CYCLING=${CYCLING:-false}                    # Cold start (false), cycle (true).
 export EXPT=${EXPT:-test}                             # Experiment name.
 export HOSTNAME=${HOSTNAME:-`hostname`}
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
 # Directories:
 export TMP_DIR=${TMP_DIR:-/var/tmp/$USER}  # Temporary directory.
@@ -171,14 +170,6 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$REG_DIR/be/gen_be.NMC.dat} # background
 export DATE=$INITIAL_DATE
 
 export PREV_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
-
-if $CHECK_SVNVERSION; then
-   WRF_VN=`svnversion -n $WRF_DIR 2>/dev/null`
-   WRF_NL_VN=`svnversion -n $WRF_NL_DIR 2>/dev/null`
-   WRFVAR_VN=`svnversion -n $WRFVAR_DIR 2>/dev/null`
-   WRFPLUS_VN=`svnversion -n $WRFPLUS_DIR 2>/dev/null`
-   WPS_VN=`svnversion -n $WPS_DIR 2>/dev/null`
-fi
 
 echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 

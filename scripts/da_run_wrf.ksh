@@ -70,7 +70,7 @@ let OFFSET=$FCST_RANGE+$WINDOW_START
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $D1 $OFFSET
 
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
+echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'FC_DIR     <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo "WRF_INPUT  $WRF_INPUT"
 echo "WRF_BDY    $WRF_BDY"

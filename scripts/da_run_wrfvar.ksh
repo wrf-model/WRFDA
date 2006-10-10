@@ -20,16 +20,6 @@ export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-
-if $CHECK_SVNVERSION; then
-   WRFVAR_REV=`svnversion -n $WRFVAR_DIR 2>/dev/null`
-   if $NL_VAR4D; then
-      WRF_NL_REV=`svnversion -n $WRF_NL_DIR 2>/dev/null`
-      WRFPLUS_REV=`svnversion -n $WRFPLUS_DIR 2>/dev/null`
-   fi
-fi
-
 export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXPT=${EXPT:-test}
@@ -86,10 +76,10 @@ echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><
 date
 
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_REV
+echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 if $NL_VAR4D; then
-   echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_REV
-   echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_REV
+   echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_VN
+   echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
