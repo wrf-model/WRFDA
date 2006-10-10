@@ -35,7 +35,7 @@ subroutine da_write_obs( ob, iv, re)
    if ( numb_procs > 1) then
 #ifdef DM_PARALLEL
       ! Get output unit for MPI run
-      ounit = omb_unit*10 +  myproc
+      ounit = omb_unit*100 +  myproc
 #endif
    end if
 
