@@ -12,9 +12,14 @@ else
       setenv FC g95
    endif
 
-   if ($?2) then
-      setenv CC $2
-   else
+   setenv FC $1
+   setenv CC $2
+
+   if ( $FC"." == "." ) then
+      setenv FC g95
+   endif
+
+   if ( $CC"." == "." ) then
       setenv CC gcc
    endif
 endif
@@ -198,7 +203,10 @@ if ( $MACHINE == "gold.us.cray.com" ) then
 endif
 
 setenv MPIHOME $MPICH
-setenv PATH $MPICH/bin\:$MAKEDEPF90\:$PATH
+setenv PATH $MPICH/bin:$PATH
+if ($?MAKEDEPF90) then
+   setenv PATH $MPICH/bin\:$MAKEDEPF90\:$PATH
+endif
 
 if ($FC == "g95" ) then
    setenv G95_ENDIAN         BIG
