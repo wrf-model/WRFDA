@@ -42,7 +42,6 @@ OBJS_FOR_ALL =		da_solve.o		\
 			da_constants.o		\
 			da_spectral.o           \
 			da_radiance.o		\
-			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
                         da_wrfvar_top.o         \

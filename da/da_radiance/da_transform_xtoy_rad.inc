@@ -195,12 +195,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
             !-------------------------------------------------------------------
             iscan = iv%instid(inst)%rad(n)%scanpos
             do k = 1, nchanl
-               if (lbiascorr) then
-                  y%instid(inst)%rad(n)%tb(k) = satinfo(inst)%b(iscan+1,k) * &
-                     tb(nprofiles,k)
-               else
-                  y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
-               end if
+               y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
             end do
          end if   !  end endif for within_halo
       end do       !  end loop for pixels
@@ -215,7 +210,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
    end do        ! end loop for sensor
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_rad")
 #endif
 
 end subroutine da_transform_xtoy_rad
