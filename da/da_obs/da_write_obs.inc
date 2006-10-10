@@ -22,8 +22,9 @@ subroutine da_write_obs( ob, iv, re)
    TYPE (ob_type), INTENT(IN)    :: iv      ! O-B structure.
    type (y_type), intent(inout)  :: re      ! residual vector.
       
-   integer                       :: n, k, num_obs
+   integer                       :: n, k, num_obs, ios
    integer                       :: ounit     ! Output unit           
+   character(len=20)             :: filename
 
    if (trace_use) call da_trace_entry("da_write_obs")
 
@@ -32,12 +33,19 @@ subroutine da_write_obs( ob, iv, re)
    !-------------------------------------------------------------------------
 
    ounit = omb_unit
-   if ( numb_procs > 1) then
+
 #ifdef DM_PARALLEL
-      ! Get output unit for MPI run
-      ounit = omb_unit*100 +  myproc
+      write(UNIT=filename, FMT='(a,i3.3)') 'gts_omb_oma.', myproc
+#else
+      write(UNIT=filename, FMT='(a)') 'gts_omb_oma.000'
 #endif
-   end if
+
+   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   if (ios /= 0 ) Then
+      call da_error(__FILE__,__LINE__, &
+         (/"Canot open conventional observation omb and oma file"//filename/))
+   Endif
+
 
    ! [1] Transfer surface obs:
 

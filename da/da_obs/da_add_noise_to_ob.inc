@@ -23,19 +23,14 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    integer                       :: n, k, inst     ! Loop counters.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit
-   integer                       :: num_obs                 
-   character(len=20)             :: ob_name
+   integer                       :: num_obs, ios                 
+   character(len=20)             :: ob_name, filename
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
       ounit = rand_unit        
-   if( numb_procs > 1) then
-#ifdef DM_PARALLEL
-! Get output unit for MPI run
-  ounit = ounit*100 +  myproc
-#endif
-   end if
-   dum = -999999.9
+
+      dum = -999999.9
 !----------------------------------------------------------------------
 !  [1.0] Initiate random number sequence:
 !----------------------------------------------------------------------
@@ -45,6 +40,17 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------
 !  [2.0] Create noise and output:
 !----------------------------------------------------------------------
+#ifdef DM_PARALLEL
+      write(UNIT=filename, FMT='(a,i3.3)') 'rand_obs_error.', myproc
+#else
+      write(UNIT=filename, FMT='(a)') 'rand_obs_error.000'
+#endif
+
+   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   if (ios /= 0 ) Then
+      call da_error(__FILE__,__LINE__, &
+         (/"Canot open random observation error file"//filename/))
+   Endif
 
 !  [2.1] Transfer surface obs:
 
