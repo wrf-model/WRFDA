@@ -108,60 +108,56 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'js,je=', js,je
       write(unit=stdout, fmt=*) 'ks,ke=', ks,ke
 
-      if (print_detail_xb) then
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         dnw                dn 		rdnw       rdn'
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         dnw                dn 		rdnw       rdn'
 
-         do k=ks,ke+1
-            write(unit=stdout, fmt='(i3,8f16.8)') k, &
-               grid%em_dnw(k), grid%em_dn(k), grid%em_rdnw(k), grid%em_rdn(k)
-         enddo
+      do k=ks,ke+1
+         write(unit=stdout, fmt='(i3,8f16.8)') k, &
+            grid%em_dnw(k), grid%em_dn(k), grid%em_rdnw(k), grid%em_rdn(k)
+      enddo
 
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         znu                 znw		rdnw       rdn'
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         znu                 znw		rdnw       rdn'
 
-         do k=ks,ke+1
-            write(unit=stdout, fmt='(i3,8f16.8)') k, &
-               grid%xb%sigmah(k), grid%xb%sigmaf(k), grid%em_rdnw(k), grid%em_rdn(k)
+      do k=ks,ke+1
+         write(unit=stdout, fmt='(i3,8f16.8)') k, &
+            grid%xb%sigmah(k), grid%xb%sigmaf(k), grid%em_rdnw(k), grid%em_rdn(k)
+      enddo
+
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         phb                 ph_2'
+
+      do k=ks,ke
+         write(unit=stdout, fmt='(i3,8e20.12)') k, &
+               grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
+      enddo
+
+      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
+
+      if (je == grid%xp%jde) then
+         write(unit=stdout, fmt=*) ' '
+
+         do k=ks+5,ke,10
+            do i=is,ie,10
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
+                    'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
+                     grid%em_v_2(i, grid%xp%jde+1,k)
+            enddo
+            write(unit=stdout, fmt=*) ' '
          enddo
       endif
 
-      if (print_detail_xb) then
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         phb                 ph_2'
+      if (ie == grid%xp%ide) then
+         write(unit=stdout, fmt=*) ' '
 
-         do k=ks,ke
-            write(unit=stdout, fmt='(i3,8e20.12)') k, &
-                  grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
+         do k=ks+5,ke,10
+            do j=js,je,10
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
+                  'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
+                  grid%em_u_2(grid%xp%ide+1,j,k)
+            enddo
+            write(unit=stdout, fmt=*) ' '
          enddo
-
-         write(unit=stdout, fmt='(/5a/)') ' simple variables:'
-
-         if (je == grid%xp%jde) then
-            write(unit=stdout, fmt=*) ' '
-
-            do k=ks+5,ke,10
-               do i=is,ie,10
-                  write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                       'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                        grid%em_v_2(i, grid%xp%jde+1,k)
-               enddo
-               write(unit=stdout, fmt=*) ' '
-            enddo
-         endif
-
-         if (ie == grid%xp%ide) then
-            write(unit=stdout, fmt=*) ' '
-
-            do k=ks+5,ke,10
-               do j=js,je,10
-                  write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                     'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
-                     grid%em_u_2(grid%xp%ide+1,j,k)
-               enddo
-               write(unit=stdout, fmt=*) ' '
-            enddo
-         endif
       endif
 
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
@@ -450,6 +446,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid % xb % psac(is:ie,js:je) * grid%xb%sigmah(k)
       END DO
    END IF
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Roughness
@@ -467,12 +464,14 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    xbx % mminlu = 'USGS'
 
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
 #ifdef DEREF_KLUDGE
       grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
 #else
       grid%xb % lanu, grid%xb % rough)
 #endif
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate 1/grid box areas:
@@ -507,6 +506,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                       grid%xb%regime(i,j))
       enddo
    enddo
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate saturation vapour pressure and relative humidity:
@@ -520,6 +520,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          end do
       end do
    end do
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate dew point temperature:
@@ -532,6 +533,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 #else
    call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
 #endif
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    if (print_detail_xb) then
       i=is; j=js; k=ks
@@ -566,7 +568,9 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    !    end do
    ! end do
 
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_integrat_dz( grid%xb )
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Surface Wind speed
@@ -591,6 +595,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                     *tmpvar*rgh_fac(i,j)
       enddo
    enddo
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Brightness temperature SH Chen
@@ -619,8 +624,10 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          'GPS Refractivity'
    endif
 
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_transform_xtogpsref(grid%xb, grid%xp)
 
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
    !---------------------------------------------------------------------------
    ! Ground-based GPS ZTD must follow the GPS Refractivity calculation.
    !---------------------------------------------------------------------------
@@ -692,6 +699,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       ! write(unit=stdout, fmt=*) 'loc_latc_mean  =', loc_latc_mean(js)
       write(unit=stdout, fmt=*) 'xbx % latc_mean=', xbx % latc_mean(js)
    endif
+IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    ! Calculate time step from one dimensional cloud model parameterization
 

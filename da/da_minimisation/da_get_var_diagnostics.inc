@@ -73,6 +73,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                                                 dum1, dum2 )
    call da_sum_reals( 2, j % jo % airsr_t, j % jo % airsr_q, &
                          dum1, dum2,dum3, dum4, dum5 )
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
 
    if ( use_radiance ) then
       jo_radiance = 0.
@@ -85,6 +86,8 @@ subroutine da_get_var_diagnostics ( iv, j )
          end do
       end do
    end if
+
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
 
    !-----------------------------------------------------------------------------
    ! [2.0] Print out VAR diagnostics:
@@ -116,6 +119,7 @@ subroutine da_get_var_diagnostics ( iv, j )
       write(UNIT=stdout,FMT='(a30,f15.5)')'    WRFVAR Je factor used    = ', je_factor
       write(UNIT=stdout,FMT=*) ' '
 
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
       ! [4.2] Output components of Jo:
 
       if (iv % num_synop_glo > 0 ) then
@@ -128,6 +132,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                   j % jo % synop_q, iv % synop_ef_q
 
       end if
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
 
       if (iv % num_metar_glo > 0 ) then
          write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    metar obs, Jo (actual)  = ', &
@@ -138,6 +143,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                j % jo % metar_p, iv % metar_ef_p, &
                                j % jo % metar_q, iv % metar_ef_q    
       end if
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
 
       if (iv % num_ships_glo > 0 ) then
          write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    ships obs, Jo (actual)  = ', &
@@ -148,6 +154,7 @@ subroutine da_get_var_diagnostics ( iv, j )
                                j % jo % ships_p, iv % ships_ef_p, &
                                j % jo % ships_q, iv % ships_ef_q                                
       end if
+IF (trace_use) CALL da_trace("da_get_var_diagnostics")
 
 
       if (iv % num_geoamv_glo > 0 ) then

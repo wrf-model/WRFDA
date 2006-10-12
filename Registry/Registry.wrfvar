@@ -1464,6 +1464,7 @@ rconfig   integer   max_gpsref_input      namelist,record4         1            
 rconfig   integer   max_airsret_input     namelist,record4         1              100000   -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_start          namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_end            namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
+rconfig   integer   max_num_rad           namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
 
 rconfig   integer   time_window           namelist,record5         1              3.       -       "TBD"              "TBD"              "TBD"
 

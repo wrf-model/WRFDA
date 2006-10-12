@@ -23,29 +23,36 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    ! [1.1] Sondes:
 
    call da_oi_stats_sound ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
    call da_oi_stats_sonde_sfc ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.2] Surface:
 
    call da_oi_stats_synop ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.3.1] Geostationary Satellite Cloud track winds:
 
    call da_oi_stats_geoamv ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.3.2] Polar Satellite Cloud track winds:
 
    call da_oi_stats_polaramv ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.4] Aireps:
 
    call da_oi_stats_airep ( stats_unit, iv )
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.5] Pilot:
 
    call da_oi_stats_pilot ( stats_unit, iv )
 
    ! [1.6] Metar:
+   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    call da_oi_stats_metar ( stats_unit, iv )
 
@@ -220,16 +227,15 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    !------------------------------------------------------------------------------
    call da_write_obs( ob, iv, re )
 
-#ifdef DM_PARALLEL
-
-   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
-#endif
+!#ifdef DM_PARALLEL
+!   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
+!#endif
 
    call da_write_y( iv, y )
 
-#ifdef DM_PARALLEL
-   if ( num_procs > 1) call da_final_write_y(iv, y )
-#endif
+!#ifdef DM_PARALLEL
+!   if ( (num_procs > 1) .and. (.not. use_radiance) ) call da_final_write_y(iv, y )
+!#endif
 
    IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
 

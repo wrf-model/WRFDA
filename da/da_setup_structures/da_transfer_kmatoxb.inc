@@ -173,7 +173,10 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          grid%xb%q2(i,j) = grid%q2(i,j)
          grid%xb%u10(i,j) = grid%u10(i,j)
          grid%xb%v10(i,j) = grid%v10(i,j)
-         grid%xb%tsk(i,j) = grid%sst(i,j)
+         grid%xb%tsk(i,j) = grid%tsk(i,j)
+! currently KMA guess have no SST, replaced by TSK
+!         grid%xb%tgrn(i,j) = grid%sst(i,j)
+         grid%xb%tgrn(i,j) = grid%tsk(i,j)
          grid%xb%landmask(i,j) = grid%landmask(i,j)
          grid%xb%xland(i,j) = grid%xland(i,j)
 
@@ -196,14 +199,14 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          !                              
          !---------------------------------------------------------------------
 
-#if 0
-         grid%xb%tgrn(i,j) = grid%sst(i,j)
-         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
-         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
-         grid%xb%landmask(i,j) = grid%landmask(i,j)
-         grid%xb%xland(i,j) = grid%xland(i,j)
-         grid%xb%snow(i,j)     = grid%snowc(i,j)
-#endif 
+!#if 0
+!         grid%xb%tgrn(i,j) = grid%sst(i,j)
+!         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
+!         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
+!         grid%xb%landmask(i,j) = grid%landmask(i,j)
+!         grid%xb%xland(i,j) = grid%xland(i,j)
+!         grid%xb%snow(i,j)     = grid%snowc(i,j)
+!#endif 
 
          ! Since data is on full levels get full level pr & ht.
          ! Note p = A + B * Psfc formula needs Psfc to be in hPa 
