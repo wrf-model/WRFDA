@@ -23,36 +23,29 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    ! [1.1] Sondes:
 
    call da_oi_stats_sound ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
    call da_oi_stats_sonde_sfc ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.2] Surface:
 
    call da_oi_stats_synop ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.3.1] Geostationary Satellite Cloud track winds:
 
    call da_oi_stats_geoamv ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.3.2] Polar Satellite Cloud track winds:
 
    call da_oi_stats_polaramv ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.4] Aireps:
 
    call da_oi_stats_airep ( stats_unit, iv )
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    ! [1.5] Pilot:
 
    call da_oi_stats_pilot ( stats_unit, iv )
 
    ! [1.6] Metar:
-   IF (trace_use) CALL da_trace("da_write_diagnostics")
 
    call da_oi_stats_metar ( stats_unit, iv )
 
@@ -115,7 +108,6 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    ! [1.21] AIRS retrievals:
 
    call da_oi_stats_airsr ( stats_unit, iv )
-
 
    !---- ----------------------------------------------------------------------
    ! [2.0] Calculate residual vector (O-A) statistics:

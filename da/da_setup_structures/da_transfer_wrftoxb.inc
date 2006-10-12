@@ -446,7 +446,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid % xb % psac(is:ie,js:je) * grid%xb%sigmah(k)
       END DO
    END IF
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Roughness
@@ -464,14 +463,12 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    xbx % mminlu = 'USGS'
 
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
 #ifdef DEREF_KLUDGE
       grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
 #else
       grid%xb % lanu, grid%xb % rough)
 #endif
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate 1/grid box areas:
@@ -506,7 +503,6 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
                       grid%xb%regime(i,j))
       enddo
    enddo
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate saturation vapour pressure and relative humidity:
@@ -520,7 +516,6 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
          end do
       end do
    end do
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Calculate dew point temperature:
@@ -533,7 +528,6 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
 #else
    call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
 #endif
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    if (print_detail_xb) then
       i=is; j=js; k=ks
@@ -568,9 +562,7 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
    !    end do
    ! end do
 
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_integrat_dz( grid%xb )
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Surface Wind speed
@@ -595,7 +587,6 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
                     *tmpvar*rgh_fac(i,j)
       enddo
    enddo
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    !---------------------------------------------------------------------------
    ! Brightness temperature SH Chen
@@ -624,10 +615,8 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
          'GPS Refractivity'
    endif
 
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
    call da_transform_xtogpsref(grid%xb, grid%xp)
 
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
    !---------------------------------------------------------------------------
    ! Ground-based GPS ZTD must follow the GPS Refractivity calculation.
    !---------------------------------------------------------------------------
@@ -640,6 +629,8 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    ! if (.not. associated(xbx % latc_mean)) then
    allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
+   if (trace_use) call da_trace("da_transfer_wrftoxb",&
+      message="allocated xbx%latc_mean")
    ! endif
 
    size2d = (grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1)
@@ -699,7 +690,6 @@ IF (trace_use) call da_trace("da_transfer_wrftoxb")
       ! write(unit=stdout, fmt=*) 'loc_latc_mean  =', loc_latc_mean(js)
       write(unit=stdout, fmt=*) 'xbx % latc_mean=', xbx % latc_mean(js)
    endif
-IF (trace_use) call da_trace("da_transfer_wrftoxb")
 
    ! Calculate time step from one dimensional cloud model parameterization
 

@@ -220,7 +220,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM 
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = -O3 -xW
 FCDEBUG         = # -g
@@ -406,7 +407,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = #-O3 -xW
 FCDEBUG         = # -g -C
@@ -441,7 +443,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -792,7 +795,7 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM                     
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE                   
 
 FCOPTIM         = 
 FCDEBUG         = -g -C
@@ -829,7 +832,7 @@ CC              = mpicc
 CC_TOOLS        = cc
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
