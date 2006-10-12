@@ -2,9 +2,9 @@ setenv MACHINE `hostname`
 
 if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
-   # sourced scripts, so force use of xlf, xlc
+   # sourced scripts, so force use of xlf, gcc
    setenv FC xlf
-   setenv CC gcc
+   setenv CC xlc
 else
    if ($?1) then
       setenv FC $1
@@ -118,7 +118,7 @@ if (-d ~/blas/blas_${FC}) then
    setenv BLAS ~/blas/blas_${FC}
 endif
 if (-d ~/lapack/lapack_${FC}) then
-   setenv LAPACK ~/lapack/lapack-1.2.7p1_${FC}
+   setenv LAPACK ~/lapack/lapack_${FC}
 endif
 if (-d ~/fftpack5/fftpack5_${FC}) then
    setenv FFTPACK5 ~/fftpack5/fftpack5_${FC}
