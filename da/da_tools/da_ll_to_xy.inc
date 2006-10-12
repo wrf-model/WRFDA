@@ -57,7 +57,8 @@ subroutine da_ll_to_xy (info, loc, xp, &
    ENDIF
 
    if(fg_format == 3)then
-      if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
+      if((loc%j < xp%jts-1) .or. (loc%j > xp%jte) .or. &
+         (loc%i <= xp%ids ) .or. (loc%i >= xp%ide )) then
          outside = .true.
          inside_halo = .false.
          return
