@@ -169,7 +169,7 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$REG_DIR/be/gen_be.NMC.dat} # background
 
 export DATE=$INITIAL_DATE
 
-export PREV_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
+export PREV_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
 
 echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 
@@ -203,7 +203,7 @@ export FIRST=true
 
 while test $DATE -le $FINAL_DATE; do 
 
-   export NEXT_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+   export NEXT_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
 
    mkdir -p $FC_DIR/$DATE $RC_DIR/$DATE $OB_DIR/$DATE 
 

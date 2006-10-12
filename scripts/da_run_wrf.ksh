@@ -65,7 +65,7 @@ echo "<H1>$EXPT wrf</H1><PRE>"
 
 date
 
-export D1=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export D1=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
 let OFFSET=$FCST_RANGE+$WINDOW_START 
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $D1 $OFFSET
 
@@ -130,7 +130,7 @@ if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}
          export L_DAY=`echo $LOCAL_DATE | cut -c7-8`
          export L_HOUR=`echo $LOCAL_DATE | cut -c9-10`
          echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
-         LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $LOCAL_DATE $LBC_FREQ`
+         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $LOCAL_DATE $LBC_FREQ`
       done
    else
       $RUN_CMD ./wrf.exe

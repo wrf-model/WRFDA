@@ -72,7 +72,7 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
-   $WRFVAR_DIR/main/da_update_bc.exe
+   $WRFVAR_DIR/build/da_update_bc.exe
    RC=$?
    if test $RC != 0; then
       echo "Update_bc failed with error $RC"
