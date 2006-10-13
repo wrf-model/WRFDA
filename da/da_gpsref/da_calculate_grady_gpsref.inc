@@ -17,16 +17,14 @@ subroutine da_calculate_grady_gpsref( iv, re, jo_grad_y )
    IF ( iv%num_GPSRef < 1 ) return
    
    DO n=1, iv%num_GPSRef
-      if (iv%gpsref(n)%loc%proc_domain_with_halo) then
-         do k=1, iv%gpsref(n)%info%levels
-            if (iv%GPSRef(n)%ref(k)%qc < obs_qc_pointer) then
-               re%GPSRef(n)%ref(k) = 0.0
-            end if
-            jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
-                                      ( iv%GPSRef(n)%ref(k)%error * &
-                                        iv%GPSRef(n)%ref(k)%error )
-         end do
-      endif
+      do k=1, iv%gpsref(n)%info%levels
+         if (iv%GPSRef(n)%ref(k)%qc < obs_qc_pointer) then
+            re%GPSRef(n)%ref(k) = 0.0
+         end if
+         jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
+                                   ( iv%GPSRef(n)%ref(k)%error * &
+                                     iv%GPSRef(n)%ref(k)%error )
+      end do
    END DO
 
 end subroutine da_calculate_grady_gpsref

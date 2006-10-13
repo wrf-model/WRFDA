@@ -25,16 +25,14 @@ subroutine da_calculate_residual_geoamv( oi, y, re,                        &
       n_obs_bad % v % num = number(0, 0, 0)
 
       DO n=1, oi%num_geoamv
-         if( oi%geoamv(n)%loc%proc_domain_with_halo ) then
-            do k=1, oi%geoamv(n)%info%levels
-               np_available = np_available + 2
+         do k=1, oi%geoamv(n)%info%levels
+            np_available = np_available + 2
 
-               re%geoamv(n)%u(k) = da_residual( n, 0, y%geoamv(n)%u(k), &
+            re%geoamv(n)%u(k) = da_residual( n, 0, y%geoamv(n)%u(k), &
                                           oi%geoamv(n)%u(k), n_obs_bad % u )
-               re%geoamv(n)%v (k)= da_residual( n, 0, y%geoamv(n)%v(k), &
+            re%geoamv(n)%v (k)= da_residual( n, 0, y%geoamv(n)%v(k), &
                                        oi%geoamv(n)%v(k), n_obs_bad % v )
-            END DO
-         endif        
+         END DO
       END DO
       
       np_missing = np_missing + n_obs_bad % u % num % miss + &

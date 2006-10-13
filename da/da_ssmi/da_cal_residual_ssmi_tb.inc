@@ -18,8 +18,6 @@ subroutine da_cal_residual_ssmi_tb( oi, y, re, &
 
    DO n=1, oi%num_ssmi_tb
 
-    if( oi%ssmi_tb(n)%loc%proc_domain_with_halo ) then
-
       np_available = np_available + 7
 
       re%ssmi_tb(n)%tb19v = da_residual(n, 0, y%ssmi_tb(n)%tb19v, &
@@ -36,8 +34,6 @@ subroutine da_cal_residual_ssmi_tb( oi, y, re, &
                             oi%ssmi_tb(n)%tb85v, n_obs_bad % t )
       re%ssmi_tb(n)%tb85h = da_residual(n, 0, y%ssmi_tb(n)%tb85h, &
                             oi%ssmi_tb(n)%tb85h, n_obs_bad % t )
-    endif
-
    END DO
 
    np_missing  = np_missing  + n_obs_bad % t % num % miss  

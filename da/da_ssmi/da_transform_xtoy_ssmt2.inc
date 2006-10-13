@@ -14,16 +14,12 @@ subroutine da_transform_xtoy_ssmt2 ( xa, iv, xp, y )
    
 
    IF ( iv%num_ssmt2 > 0 ) THEN
-
       do n=1, iv % num_ssmt2
-
-       if(iv%ssmt2(n)%loc%proc_domain_with_halo) then
-
          y%ssmt2(n)%rh(:) = 0.0
 
          k = iv % ssmt2(n) % info % levels
 
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%ssmt2(n)%loc%i
          dy = iv%ssmt2(n)%loc%dy
@@ -32,7 +28,7 @@ subroutine da_transform_xtoy_ssmt2 ( xa, iv, xp, y )
          dx = iv%ssmt2(n)%loc%dx
          dxm = iv%ssmt2(n)%loc%dxm
 
-!        [1.2] Interpolate horizontally:
+         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % rh, xp, i, j, dx, dy, dxm, dym, &
                             y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
@@ -40,10 +36,7 @@ subroutine da_transform_xtoy_ssmt2 ( xa, iv, xp, y )
          call da_interp_lin_3d(xa % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
 #endif
-       endif
-
-      end do
-
+       end do
    ENDIF
 
 end subroutine da_transform_xtoy_ssmt2

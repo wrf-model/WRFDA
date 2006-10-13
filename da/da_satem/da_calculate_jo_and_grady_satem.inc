@@ -13,13 +13,11 @@ subroutine da_calculate_jo_and_grady_satem( iv, re, jo, jo_grad_y )
 
    IF ( iv%num_Satem > 0 ) THEN
       DO n=1, iv%num_Satem
-         if( iv%satem(n)%loc%proc_domain_with_halo ) then
-            do k=1, iv%satem(n)%info%levels
-               jo_grad_y%Satem(n)%thickness(k) = -re%Satem(n)%thickness(k) / &
+         do k=1, iv%satem(n)%info%levels
+            jo_grad_y%Satem(n)%thickness(k) = -re%Satem(n)%thickness(k) / &
                                         ( iv%Satem(n)%thickness(k)%error * &
                                           iv%Satem(n)%thickness(k)%error )
-            end do
-         endif
+         end do
 
          if (iv%satem(n)%loc%proc_domain ) then
             do k=1, iv%satem(n)%info%levels

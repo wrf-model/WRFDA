@@ -404,7 +404,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , char * fourdname, no
 	  if ( sw_io == GEN_INPUT )
 	  {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
             if ( ok_to_collect_distribute )
 	      fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
@@ -450,7 +450,7 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , char * fourdname, no
             if ( ok_to_collect_distribute )
               fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             if ( !strncmp( p->use, "dyn_", 4 ) )
-              fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+              fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
             fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
@@ -671,7 +671,7 @@ if ( pass == 0 )
           if ( p->io_mask & io_mask && sw_io == GEN_INPUT )
           {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
 	    if ( p->scalar_array_member )
 	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
             if ( ok_to_collect_distribute )
@@ -822,7 +822,7 @@ if ( pass == 0 )
           else if ( sw_io == GEN_OUTPUT )
 	  {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
-	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
 	    if ( p->scalar_array_member )
 	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
 

@@ -18,16 +18,14 @@ subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
 
    IF (iv%num_geoamv > 0) THEN
       DO n=1, iv%num_geoamv
-         if (iv%geoamv(n)%loc%proc_domain_with_halo) then
-            do k=1, iv%geoamv(n)%info%levels
-               jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
+         do k=1, iv%geoamv(n)%info%levels
+            jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
                                          ( iv%geoamv(n)%u(k)%error * &
                                            iv%geoamv(n)%u(k)%error )
-               jo_grad_y%geoamv(n)%v(k) = -re%geoamv(n)%v(k) / &
+            jo_grad_y%geoamv(n)%v(k) = -re%geoamv(n)%v(k) / &
                                          ( iv%geoamv(n)%v(k)%error * &
                                            iv%geoamv(n)%v(k)%error )
-            end do
-         endif
+         end do
 
          if (iv%geoamv(n)%loc%proc_domain) then
             do k=1, iv%geoamv(n)%info%levels

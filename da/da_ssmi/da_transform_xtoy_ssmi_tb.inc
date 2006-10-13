@@ -136,60 +136,56 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    ! enddo
 
    do n=1, oi % num_ssmi_tb
+      i = oi%ssmi_tb(n)%loc%i
+      j = oi%ssmi_tb(n)%loc%j
+      dx = oi%ssmi_tb(n)%loc%dx
+      dy = oi%ssmi_tb(n)%loc%dy
+      dxm = oi%ssmi_tb(n)%loc%dxm
+      dym = oi%ssmi_tb(n)%loc%dym
 
-     if(oi%ssmi_tb(n)%loc%proc_domain_with_halo) then
-
-         i = oi%ssmi_tb(n)%loc%i
-         j = oi%ssmi_tb(n)%loc%j
-         dx = oi%ssmi_tb(n)%loc%dx
-         dy = oi%ssmi_tb(n)%loc%dy
-         dxm = oi%ssmi_tb(n)%loc%dxm
-         dym = oi%ssmi_tb(n)%loc%dym
-
-         ! Interpolating from 4 grid points to obs location
+      ! Interpolating from 4 grid points to obs location
 
 #ifndef DEREF_KLUDGE
-         ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
-         !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then       
-         !    ! only calculate over water
+      ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
+      !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then       
+      !    ! only calculate over water
 
-         call da_interp_lin_2d(xa%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-         call da_interp_lin_2d(xa%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-         call da_interp_lin_2d(xa%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-         call da_interp_lin_2d(xa%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-         call da_interp_lin_2d(xa%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-         call da_interp_lin_2d(xa%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-         call da_interp_lin_2d(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
-         ! endif
+      call da_interp_lin_2d(xa%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
+      call da_interp_lin_2d(xa%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
+      call da_interp_lin_2d(xa%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
+      call da_interp_lin_2d(xa%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
+      call da_interp_lin_2d(xa%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
+      call da_interp_lin_2d(xa%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
+      call da_interp_lin_2d(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
+      ! endif
 #else
-         ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
-         !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then
-         !    ! only calculate over water
+      ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
+      !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then
+      !    ! only calculate over water
 
-         call da_interp_lin_2d(xa%tb19v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-         call da_interp_lin_2d(xa%tb19h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-         call da_interp_lin_2d(xa%tb22v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-         call da_interp_lin_2d(xa%tb37v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-         call da_interp_lin_2d(xa%tb37h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-         call da_interp_lin_2d(xa%tb85v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-         call da_interp_lin_2d(xa%tb85h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
-         ! endif
+      call da_interp_lin_2d(xa%tb19v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
+      call da_interp_lin_2d(xa%tb19h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
+      call da_interp_lin_2d(xa%tb22v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
+      call da_interp_lin_2d(xa%tb37v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
+      call da_interp_lin_2d(xa%tb37h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
+      call da_interp_lin_2d(xa%tb85v(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
+      call da_interp_lin_2d(xa%tb85h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
+                         i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
+      ! endif
 #endif
-      endif
    end do
     
         ! y%ssmi_tb(n)%tb19v = hor_interp(dxm,dx,dym,dy, &

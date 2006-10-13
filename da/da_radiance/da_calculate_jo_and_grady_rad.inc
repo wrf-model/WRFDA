@@ -36,13 +36,12 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
    IF ( iv%instid(i)%num_rad < 1 ) CYCLE
 
    DO n=1, iv%instid(i)%num_rad
-       IF ( iv%instid(i)%rad(n)%loc%proc_domain_with_halo ) THEN
-         DO k=1, iv%instid(i)%nchan
-            jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
-                                      ( iv%instid(i)%rad(n)%tb(k)%error * &
-                                        iv%instid(i)%rad(n)%tb(k)%error )
-         END DO
-       END IF
+      DO k=1, iv%instid(i)%nchan
+         jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
+                                   ( iv%instid(i)%rad(n)%tb(k)%error * &
+                                     iv%instid(i)%rad(n)%tb(k)%error )
+      END DO
+
        IF ( iv%instid(i)%rad(n)%loc%proc_domain ) THEN
          DO k=1, iv%instid(i)%nchan
            IF (iv%instid(i)%rad(n)%tb(k)%qc >= obs_qc_pointer) THEN

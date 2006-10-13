@@ -30,58 +30,56 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
    IF ( iv%num_satem > 0 ) THEN
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
-         if(iv%satem(n)%loc%proc_domain_with_halo) then
-           num_levs = iv % satem(n) % info % levels
+         num_levs = iv % satem(n) % info % levels
 
-           ! [1.0] Get horizontal interpolation weights:
+         ! [1.0] Get horizontal interpolation weights:
 
-           i = iv%satem(n)%loc%i
-           dy = iv%satem(n)%loc%dy
-           dym = iv%satem(n)%loc%dym
-           j = iv%satem(n)%loc%j
-           dx = iv%satem(n)%loc%dx
-           dxm = iv%satem(n)%loc%dxm
-           ks = xp%kts; ke = xp%kte
+         i = iv%satem(n)%loc%i
+         dy = iv%satem(n)%loc%dy
+         dym = iv%satem(n)%loc%dym
+         j = iv%satem(n)%loc%j
+         dx = iv%satem(n)%loc%dx
+         dxm = iv%satem(n)%loc%dxm
+         ks = xp%kts; ke = xp%kte
 
-           ! [2.0] Virtual temperature at obs pt.
+         ! [2.0] Virtual temperature at obs pt.
 
-           call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
+         call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
 
-           ! [3.0] Find model vertical position of pressure and do interp.
+         ! [3.0] Find model vertical position of pressure and do interp.
 
-           call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
-           pres2 = iv%satem(n)%ref_p
+         call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
+         pres2 = iv%satem(n)%ref_p
 
-           ! [4.0] Adjoint calculation of Satem thickness
+         ! [4.0] Adjoint calculation of Satem thickness
 
-           do k=1, num_levs
-              IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
-                 call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
-                   ks,ke)
+         do k=1, num_levs
+            IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
+               call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
+                 ks,ke)
 
-                 call da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1, &
-                     layer2, iv%satem(n)%p(k),pres2,ADJ_pre_ma,ADJ_tv_ma, &
-                     ADJ_tv1,ADJ_tv2,jo_grad_y%satem(n)%thickness(k))
+               call da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1, &
+                   layer2, iv%satem(n)%p(k),pres2,ADJ_pre_ma,ADJ_tv_ma, &
+                   ADJ_tv1,ADJ_tv2,jo_grad_y%satem(n)%thickness(k))
 
-                 call da_adj_find_layer(layer1,tv1,iv%satem(n)%p(k),         &
-                     pre_ma,tv_ma,ks,ke,ADJ_tv1,ADJ_pre_ma,ADJ_tv_ma)
+               call da_adj_find_layer(layer1,tv1,iv%satem(n)%p(k),         &
+                   pre_ma,tv_ma,ks,ke,ADJ_tv1,ADJ_pre_ma,ADJ_tv_ma)
 
-                 pres2 = iv%satem(n)%p(k)
-                 layer2 = layer1
-                 tv2 = tv1
-              ENDIF
-           enddo
+               pres2 = iv%satem(n)%p(k)
+               layer2 = layer1
+               tv2 = tv1
+            ENDIF
+         enddo
 
-           ! [5.0] Adjoint of layer-finding and vertical interpolation
+         ! [5.0] Adjoint of layer-finding and vertical interpolation
 
-           call da_adj_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
-                pre_ma,tv_ma,ks,ke,ADJ_tv2,ADJ_pre_ma,ADJ_tv_ma)
+         call da_adj_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
+              pre_ma,tv_ma,ks,ke,ADJ_tv2,ADJ_pre_ma,ADJ_tv_ma)
 
-           ! [6.0] Adjoint of horizontal interpolation
+         ! [6.0] Adjoint of horizontal interpolation
 
-           call da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
-                pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
-         endif
+         call da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
+              pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
       ENDDO
    ENDIF
 

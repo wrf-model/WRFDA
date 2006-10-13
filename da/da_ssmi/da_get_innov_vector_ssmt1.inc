@@ -25,15 +25,13 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
       itt = 0 ; ittf = 0
       DO n=1, iv % num_ssmt1
       
-       if(iv%ssmt1(n)%loc%proc_domain_with_halo) then
-
          num_levs = iv % ssmt1(n) % info % levels
 
          if ( num_levs < 1 ) cycle
 
          model_t(:) = 0.0
 
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%ssmt1(n)%loc%i
          j = iv%ssmt1(n)%loc%j
@@ -108,15 +106,12 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 !        [5.0] Perform optional maximum error check:
 !------------------------------------------------------------------------
 
-      IF(check_max_iv) call da_check_max_iv_ssmt1(it,iv%ssmt1(n),itt,ittf)
-            
-       endif
-
+         IF (check_max_iv) call da_check_max_iv_ssmt1(it,iv%ssmt1(n),itt,ittf)
       END DO
       write(unit = check_max_iv_unit, FMT ='(A,i5,A)')    &
-      'For outer iteration ',it,' Total Rejections for SSMI (T1) follows:'
-       WRITE (UNIT = check_max_iv_unit, FMT = '(/,2(2(A,I6),/))') &
-      'Number of failed RH (T1) observations:    ',ittf, ' on ',itt
+         'For outer iteration ',it,' Total Rejections for SSMI (T1) follows:'
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,2(2(A,I6),/))') &
+         'Number of failed RH (T1) observations:    ',ittf, ' on ',itt
 
    ENDIF
 

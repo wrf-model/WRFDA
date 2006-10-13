@@ -26,7 +26,6 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y )
    ENDIF
 
    DO n=1, iv%num_synop
-      if( iv%synop(n)%loc%proc_domain_with_halo ) then
 
          jo_grad_y%synop(n)%u = -re%synop(n)%u / &
                                ( iv%synop(n)%u%error * iv%synop(n)%u%error)
@@ -38,7 +37,6 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y )
                                ( iv%synop(n)%p%error * iv%synop(n)%p%error)
          jo_grad_y%synop(n)%q = -re%synop(n)%q / &
                                ( iv%synop(n)%q%error * iv%synop(n)%q%error)
-      endif
    END DO
 
    ! Bitwise-exact reduction preserves operation order of serial code for

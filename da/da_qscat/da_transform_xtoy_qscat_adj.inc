@@ -13,12 +13,9 @@ subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
    REAL                          :: dy, dym  !
 
    IF ( iv%num_qscat > 0 ) THEN
-
       do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
       
-       if(iv%qscat(n)%loc%proc_domain_with_halo) then
-
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%qscat(n)%loc%i
          dy = iv%qscat(n)%loc%dy
@@ -39,10 +36,7 @@ subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
          call da_Interp_Obs_lin_2D_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
 #endif
-       endif
-
       END DO
-   
    END IF
 
 end subroutine da_transform_xtoy_qscat_adj

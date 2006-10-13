@@ -14,23 +14,21 @@ subroutine da_calculate_grady_profiler( iv, re, jo_grad_y )
 
    IF (iv%num_profiler > 0) THEN
       DO n=1, iv%num_profiler
-         if( iv%profiler(n)%loc%proc_domain_with_halo ) then
-            do k=1, iv%profiler(n)%info%levels
-               if (iv%profiler(n)%u(k)%qc < obs_qc_pointer) THEN
-                  re%profiler(n)%u(k) = 0.0
-               end if
-               if (iv%profiler(n)%v(k)%qc < obs_qc_pointer) then
-                  re%profiler(n)%v(k) = 0.0
-               end if
+         do k=1, iv%profiler(n)%info%levels
+            if (iv%profiler(n)%u(k)%qc < obs_qc_pointer) THEN
+               re%profiler(n)%u(k) = 0.0
+            end if
+            if (iv%profiler(n)%v(k)%qc < obs_qc_pointer) then
+               re%profiler(n)%v(k) = 0.0
+            end if
 
-               jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
-                                         ( iv%profiler(n)%u(k)%error * &
-                                           iv%profiler(n)%u(k)%error )
-               jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
-                                         ( iv%profiler(n)%v(k)%error * &
-                                           iv%profiler(n)%v(k)%error )
-            end do
-         endif
+            jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
+                                      ( iv%profiler(n)%u(k)%error * &
+                                        iv%profiler(n)%u(k)%error )
+            jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
+                                      ( iv%profiler(n)%v(k)%error * &
+                                        iv%profiler(n)%v(k)%error )
+         end do
       END DO    
    END IF
 

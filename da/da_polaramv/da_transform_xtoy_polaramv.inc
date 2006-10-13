@@ -1,12 +1,8 @@
 subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
-!-------------------------------------------------------------------------
-!  HISTORY: 
-!
-!      Created: 03/05/2005                   Syed RH Rizvi   
-!
-!      Purpose: X to Y Transform operator for Polar AMV's
-!               
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! Purpose: X to Y Transform operator for Polar AMV's               
+   !----------------------------------------------------------------------
 
    IMPLICIT NONE
 
@@ -21,16 +17,11 @@ subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
    REAL                         :: dy, dym  !
    
    IF ( iv%num_polaramv > 0 ) THEN
-
-
       do n=1, iv % num_polaramv
+         y%polaramv(n)%u(:) = 0.0
+         y%polaramv(n)%v(:) = 0.0
 
-       if(iv%polaramv(n)%loc%proc_domain_with_halo) then
-
-          y%polaramv(n)%u(:) = 0.0
-          y%polaramv(n)%v(:) = 0.0
-
-       k = iv % polaramv(n) % info % levels
+         k = iv % polaramv(n) % info % levels
          if ( k < 1 ) cycle
 
          i = iv%polaramv(n)%loc%i
@@ -40,7 +31,7 @@ subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
          dx = iv%polaramv(n)%loc%dx
          dxm = iv%polaramv(n)%loc%dxm
 
-!   Interpolate horizontally:
+         ! Interpolate horizontally:
 
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
@@ -53,11 +44,7 @@ subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
          call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%polaramv(n)%v(1), k, iv%polaramv(n)%zk(1), k)
 #endif
-
-       endif
-
       end do
-
    ENDIF
 
 end subroutine da_transform_xtoy_polaramv

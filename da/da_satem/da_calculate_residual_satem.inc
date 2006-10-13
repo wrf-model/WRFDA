@@ -18,13 +18,11 @@ subroutine da_calculate_residual_satem( oi, y, re,                        &
     n_obs_bad % thickness % num = number(0, 0, 0)
 
     DO n=1, oi%num_Satem
-      if( oi%satem(n)%loc%proc_domain_with_halo ) then
-        do k=1, oi%satem(n)%info%levels
+       do k=1, oi%satem(n)%info%levels
           np_available = np_available + 1
           re%Satem(n)%thickness(k) = da_residual( n, k, y%Satem(n)%thickness(k), &
                              oi%Satem(n)%thickness(k), n_obs_bad % thickness )
         end do
-      endif
     END DO
 
     np_missing = np_missing + n_obs_bad % thickness % num % miss

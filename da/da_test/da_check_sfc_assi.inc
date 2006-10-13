@@ -74,25 +74,23 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
-      if(iv%synop(n)%loc%proc_domain_with_halo) then
-         call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+      call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
 
 
-         pertile_lhs = pertile_lhs &
+      pertile_lhs = pertile_lhs &
+                  + y%synop(n)%u * y%synop(n)%u &
+                  + y%synop(n)%v * y%synop(n)%v &
+                  + y%synop(n)%t * y%synop(n)%t &
+                  + y%synop(n)%p * y%synop(n)%p &
+                  + y%synop(n)%q * y%synop(n)%q
+
+      if(iv%synop(n)%loc%proc_domain) then
+         partial_lhs = partial_lhs &
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
                      + y%synop(n)%t * y%synop(n)%t &
                      + y%synop(n)%p * y%synop(n)%p &
                      + y%synop(n)%q * y%synop(n)%q
-
-         if(iv%synop(n)%loc%proc_domain) then
-            partial_lhs = partial_lhs &
-                        + y%synop(n)%u * y%synop(n)%u &
-                        + y%synop(n)%v * y%synop(n)%v &
-                        + y%synop(n)%t * y%synop(n)%t &
-                        + y%synop(n)%p * y%synop(n)%p &
-                        + y%synop(n)%q * y%synop(n)%q
-         endif
       endif
    enddo
 
@@ -103,9 +101,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    call da_zero_x( xa )
 
    DO n=1, iv%num_synop
-      if(iv%synop(n)%loc%proc_domain_with_halo) then
-         call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
-      endif
+      call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
    ENDDO
 
    call da_transform_xtowtq_adj ( xp, xb, xa )

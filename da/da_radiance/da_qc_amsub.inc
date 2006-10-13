@@ -45,7 +45,6 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
 !    do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
     do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, iv%ob_numb(iv%current_ob_time)%radiance(inst)
 
-      if(iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
 
 !  0.0  initialise QC flags by assuming good obs
 !---------------------------------------------
@@ -151,7 +150,6 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
          end if
        end do
 
-      end if ! halo
      end do ! end loop pixel
   end if
 

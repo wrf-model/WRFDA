@@ -22,24 +22,14 @@
 
    INTEGER            :: ios
    character(len=50)  :: filename
-   integer            :: ndomain
 
  do n = 1, iv%num_inst
   if (iv%instid(n)%num_rad < 1) cycle
 
-!! count number of obs within the loc%proc_domain_with_halo
-!!----------------------------------------------------------
-  ndomain = 0
-  do i =1,iv%instid(n)%num_rad
-    if(iv%instid(n)%rad(i)%loc%proc_domain_with_halo) then
-      ndomain = ndomain + 1
-    end if
-  end do
-
 #ifdef DM_PARALLEL
-  write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
+  write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
 #else
-  write(UNIT=stdout,FMT='(a,i7)') 'number of obs ', ndomain
+  write(UNIT=stdout,FMT='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
 #endif
 
 #ifdef DM_PARALLEL
@@ -54,13 +44,10 @@
        (/"Canot open filtered radiance file"//filename/))
   Endif
 
-   write(UNIT=filtered_rad_unit) ndomain
+   write(UNIT=filtered_rad_unit) iv%instid(n)%num_rad
 
-   ndomain = 0
   do i =1,iv%instid(n)%num_rad
-   if(iv%instid(n)%rad(i)%loc%proc_domain_with_halo) then
-    ndomain=ndomain+1
-    write(UNIT=filtered_rad_unit) ndomain, &
+    write(UNIT=filtered_rad_unit) i, &
                 iv%instid(n)%rad(i)%info%date_char, &
                 iv%instid(n)%rad(i)%scanpos       , &
                 iv%instid(n)%rad(i)%ifgat         , &
@@ -74,7 +61,6 @@
                 iv%instid(n)%rad(i)%tb(:)%error   , &
                 iv%instid(n)%rad(i)%tb(:)%qc
 
-   end if    ! end if proc_domain
   end do     ! end do pixels
   close(UNIT=filtered_rad_unit)
  end do    !! end do instruments

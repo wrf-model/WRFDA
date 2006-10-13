@@ -10,23 +10,21 @@ subroutine da_check_xtoy_adjoint_satem( oi, y, adjtest_lhs, pertile_lhs )
 
    IF (oi%num_Satem > 0) THEN
       DO n=1, oi%num_Satem
-         if (oi%satem(n)%loc%proc_domain_with_halo) then
-            if (oi%satem(n)%loc%proc_domain) then
-               do k=1, oi%satem(n)%info%levels
-                  adjtest_lhs = adjtest_lhs + &
-                     ( y%Satem(n)%thickness(k)/typical_thickness_rms )**2
-               enddo
-            endif
-
+         if (oi%satem(n)%loc%proc_domain) then
             do k=1, oi%satem(n)%info%levels
-               pertile_lhs = pertile_lhs + &
-                           ( y%Satem(n)%thickness(k)/typical_thickness_rms )**2
-
-               y%satem(n)%thickness(k) = y%satem(n)%thickness(k) /      &
-                                         typical_thickness_rms ** 2
-
+               adjtest_lhs = adjtest_lhs + &
+                  ( y%Satem(n)%thickness(k)/typical_thickness_rms )**2
             enddo
          endif
+
+         do k=1, oi%satem(n)%info%levels
+            pertile_lhs = pertile_lhs + &
+                        ( y%Satem(n)%thickness(k)/typical_thickness_rms )**2
+
+            y%satem(n)%thickness(k) = y%satem(n)%thickness(k) /      &
+                                      typical_thickness_rms ** 2
+
+         enddo
       ENDDO
    ENDIF
 

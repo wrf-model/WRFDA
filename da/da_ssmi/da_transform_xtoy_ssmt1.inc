@@ -14,16 +14,12 @@ subroutine da_transform_xtoy_ssmt1 ( xa, iv, xp, y )
    
 
    IF ( iv%num_ssmt1 > 0 ) THEN
-
       do n=1, iv % num_ssmt1
-
-       if(iv%ssmt1(n)%loc%proc_domain_with_halo) then
-
          y%ssmt1(n)%t(:) = 0.0
 
          k = iv % ssmt1(n) % info % levels
 
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%ssmt1(n)%loc%i
          dy = iv%ssmt1(n)%loc%dy
@@ -32,7 +28,7 @@ subroutine da_transform_xtoy_ssmt1 ( xa, iv, xp, y )
          dx = iv%ssmt1(n)%loc%dx
          dxm = iv%ssmt1(n)%loc%dxm
 
-!        [1.2] Interpolate horizontally:
+         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                             y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
@@ -40,10 +36,7 @@ subroutine da_transform_xtoy_ssmt1 ( xa, iv, xp, y )
          call da_interp_lin_3d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
 #endif
-       endif
-
       end do
-
    ENDIF
 
 end subroutine da_transform_xtoy_ssmt1

@@ -1,47 +1,44 @@
 subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
-!-------------------------------------------------------------------------
-!  History:
-!
-!     Creation:        03/07/2006                Syed RH Rizvi        
-!    
-!     Purpose:   a) Rcomputes innovation vecrot at
-!                   AIRS retrieval locations 
-!                b) Does quality control check on innovation vector
-!                   if required.
-!
-!-------------------------------------------------------------------------
-  IMPLICIT NONE
 
-  INTEGER,           INTENT(IN)    :: it       ! External iteration.
-  TYPE (xb_type),    INTENT(IN)    :: xb       ! first guess state.
-  TYPE (xpose_type), INTENT(IN)    :: xp       ! Domain decomposition vars.
-  TYPE (y_type),     INTENT(INOUT) :: ob       ! Observation structure.
-  TYPE (ob_type),    INTENT(INOUT) :: iv       ! O-B structure.
+   !----------------------------------------------------------------------
+   ! Purpose:   a) Rcomputes innovation vecrot at
+   !                   AIRS retrieval locations 
+   !                b) Does quality control check on innovation vector
+   !                   if required.
+   !----------------------------------------------------------------------
 
-  INTEGER                        :: n        ! Loop counter.
-  INTEGER                        :: i, j, k  ! Index dimension.
-  INTEGER                        :: num_levs ! Number of obs levels.
-  REAL                           :: dx, dxm  ! Interpolation weights.
-  REAL                           :: dy, dym  ! Interpolation weights.
+   IMPLICIT NONE
 
-  REAL, DIMENSION(1:max_ob_levels) :: model_t  ! Model value t at ob location.
-  REAL, DIMENSION(1:max_ob_levels) :: model_q  ! Model value q at ob location.
-  ! REAL, DIMENSION(1:max_ob_levels) :: model_h  ! Model value h at ob location.
+   INTEGER,           INTENT(IN)    :: it       ! External iteration.
+   TYPE (xb_type),    INTENT(IN)    :: xb       ! first guess state.
+   TYPE (xpose_type), INTENT(IN)    :: xp       ! Domain decomposition vars.
+   TYPE (y_type),     INTENT(INOUT) :: ob       ! Observation structure.
+   TYPE (ob_type),    INTENT(INOUT) :: iv       ! O-B structure.
 
-  REAL, DIMENSION(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
-  REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
+   INTEGER                        :: n        ! Loop counter.
+   INTEGER                        :: i, j, k  ! Index dimension.
+   INTEGER                        :: num_levs ! Number of obs levels.
+   REAL                           :: dx, dxm  ! Interpolation weights.
+   REAL                           :: dy, dym  ! Interpolation weights.
 
-  REAL                         :: model_p  ! Model value p at oblocation.
-  REAL                         :: model_h  ! Model value h at oblocation.
+   REAL, DIMENSION(1:max_ob_levels) :: model_t  ! Model value t at ob location.
+   REAL, DIMENSION(1:max_ob_levels) :: model_q  ! Model value q at ob location.
+   ! REAL, DIMENSION(1:max_ob_levels) :: model_h  ! Model value h at ob location.
 
-  INTEGER                      :: itt,ittf,itqv,itqvf
-  !-------------------------------------------------------------------------
-  IF ( iv%num_airsr < 1 ) return
-  itt  = 0; itqv  = 0;
-  ittf = 0; itqvf = 0;
+   REAL, DIMENSION(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
+   REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-  DO n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
-    if(iv%airsr(n)%loc%proc_domain_with_halo) then
+   REAL                         :: model_p  ! Model value p at oblocation.
+   REAL                         :: model_h  ! Model value h at oblocation.
+
+   INTEGER                      :: itt,ittf,itqv,itqvf
+
+   IF ( iv%num_airsr < 1 ) return
+
+   itt  = 0; itqv  = 0;
+   ittf = 0; itqvf = 0;
+
+   DO n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
       num_levs = iv%airsr(n)%info%levels
 
       if ( num_levs < 1 ) cycle
@@ -127,17 +124,16 @@ subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
       !------------------------------------------------------------------------
 
       IF ( check_max_iv ) &    
-      CALL da_check_max_iv_airsr(it, iv % airsr(n),itt,ittf,itqv,itqvf)
-    endif
-  END DO
+         CALL da_check_max_iv_airsr(it, iv % airsr(n),itt,ittf,itqv,itqvf)
+   END DO
 
-  write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-    ', Total Rejections for airsr follows:'
+   write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+      ', Total Rejections for airsr follows:'
 
-  WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-    'Number of failed temperature observations:',ittf, ' on ',itt,   &
-    'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-    'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
+   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+     'Number of failed temperature observations:',ittf, ' on ',itt,   &
+     'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+     'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
 
 end subroutine da_get_innov_vector_airsr
 

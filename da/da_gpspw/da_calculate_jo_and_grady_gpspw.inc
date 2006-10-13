@@ -13,11 +13,9 @@ subroutine da_calculate_jo_and_grady_gpspw( iv, re, jo, jo_grad_y )
 
    IF ( iv%num_Gpspw > 0 ) THEN
       DO n=1, iv%num_Gpspw
-        if( iv%gpspw(n)%loc%proc_domain_with_halo ) then
-          jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
+         jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
                                    ( iv%Gpspw(n)%tpw%error * &
                                      iv%Gpspw(n)%tpw%error)
-        endif
 
          if (iv%gpspw(n)%loc%proc_domain) then
            jo % gpspw_tpw = jo % gpspw_tpw - re%Gpspw(n)%tpw * &

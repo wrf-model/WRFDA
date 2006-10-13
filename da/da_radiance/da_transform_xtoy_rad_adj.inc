@@ -86,7 +86,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
       pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
-!      if (iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
       !---------------------------------------------------------------
       ! [1.0] assign tb = R^-1 Re :
       !---------------------------------------------------------------
@@ -347,7 +346,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
          deallocate (con_vars(iprof) % q)
          deallocate (con_vars_ad(iprof) % t)
          deallocate (con_vars_ad(iprof) % q)
-!         end if   !  end endif for within_halo
       end do       !  end loop for pixels
 
       deallocate (zk)

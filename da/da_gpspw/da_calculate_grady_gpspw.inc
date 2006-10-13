@@ -15,15 +15,13 @@ subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y )
 
    IF ( iv%num_Gpspw > 0 ) THEN
       DO n=1, iv%num_Gpspw
-         if (iv%gpspw(n)%loc%proc_domain_with_halo ) then
-            if (iv%gpspw(n)%tpw%qc < obs_qc_pointer) THEN
-               re%gpspw(n)%tpw = 0.0
-            END IF
+         if (iv%gpspw(n)%tpw%qc < obs_qc_pointer) THEN
+            re%gpspw(n)%tpw = 0.0
+         END IF
 
-            jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
+         jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
                                     ( iv%Gpspw(n)%tpw%error * &
                                       iv%Gpspw(n)%tpw%error)
-         endif
       END DO
    END IF
 

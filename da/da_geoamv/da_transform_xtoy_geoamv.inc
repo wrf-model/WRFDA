@@ -17,35 +17,33 @@ subroutine da_transform_xtoy_geoamv ( xa, iv, xp, y )
    REAL                         :: dy, dym  !
 
    IF ( iv%num_geoamv > 0 ) THEN
-      do n=1, iv % num_geoamv
-         if(iv%geoamv(n)%loc%proc_domain_with_halo) then
-            y%geoamv(n)%u(:) = 0.0
-            y%geoamv(n)%v(:) = 0.0
+   do n=1, iv % num_geoamv
+         y%geoamv(n)%u(:) = 0.0
+         y%geoamv(n)%v(:) = 0.0
 
-            k = iv % geoamv(n) % info % levels
-            if ( k < 1 ) cycle
+         k = iv % geoamv(n) % info % levels
+         if ( k < 1 ) cycle
 
-            i = iv%geoamv(n)%loc%i
-            dy = iv%geoamv(n)%loc%dy
-            dym = iv%geoamv(n)%loc%dym
-            j = iv%geoamv(n)%loc%j
-            dx = iv%geoamv(n)%loc%dx
-            dxm = iv%geoamv(n)%loc%dxm
+         i = iv%geoamv(n)%loc%i
+         dy = iv%geoamv(n)%loc%dy
+         dym = iv%geoamv(n)%loc%dym
+         j = iv%geoamv(n)%loc%j
+         dx = iv%geoamv(n)%loc%dx
+         dxm = iv%geoamv(n)%loc%dxm
 
-            ! Interpolate horizontally:
+         ! Interpolate horizontally:
 
 #ifndef DEREF_KLUDGE
-            call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
-                               y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
-            call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
-                           y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
+         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+                            y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
+         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+                        y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
 #else
-            call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, y%geoamv(n)%u(1), k, iv%geoamv(n)%zk(1), k)
-            call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, y%geoamv(n)%v(1), k, iv%geoamv(n)%zk(1), k)
+         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, y%geoamv(n)%u(1), k, iv%geoamv(n)%zk(1), k)
+         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+            dxm, dym, y%geoamv(n)%v(1), k, iv%geoamv(n)%zk(1), k)
 #endif
-         endif
       end do
    ENDIF
 

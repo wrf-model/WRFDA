@@ -36,125 +36,123 @@ subroutine da_get_innov_vector_sound ( it, xb, xp, ob, iv )
 
    DO n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, &
       iv%ob_numb(iv%current_ob_time)%sound
-      if(iv%sound(n)%loc%proc_domain_with_halo) then
-         num_levs = iv%sound(n)%info%levels
+      num_levs = iv%sound(n)%info%levels
 
-         if ( num_levs < 1 ) cycle
+      if ( num_levs < 1 ) cycle
 
-         model_u(:) = 0.0
-         model_v(:) = 0.0
-         model_t(:) = 0.0
-         model_q(:) = 0.0
-         ! model_h(:) = 0.0
+      model_u(:) = 0.0
+      model_v(:) = 0.0
+      model_t(:) = 0.0
+      model_q(:) = 0.0
+      ! model_h(:) = 0.0
 
-         ! [1.1] Get horizontal interpolation weights:
+      ! [1.1] Get horizontal interpolation weights:
 
-         i = iv%sound(n)%loc%i
-         j = iv%sound(n)%loc%j
-         dx = iv%sound(n)%loc%dx
-         dy = iv%sound(n)%loc%dy
-         dxm = iv%sound(n)%loc%dxm
-         dym = iv%sound(n)%loc%dym
+      i = iv%sound(n)%loc%i
+      j = iv%sound(n)%loc%j
+      dx = iv%sound(n)%loc%dx
+      dy = iv%sound(n)%loc%dy
+      dxm = iv%sound(n)%loc%dxm
+      dym = iv%sound(n)%loc%dym
 
-         do k=xp%kts,xp%kte
-            v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                   + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         enddo
+      do k=xp%kts,xp%kte
+         v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
+                + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
+         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+      enddo
 
-         do k=1, num_levs
-            iv%sound(n)%zk(k)=missing_r
+      do k=1, num_levs
+         iv%sound(n)%zk(k)=missing_r
 
-            IF ( iv%sound(n)%p(k) > 1.0 ) THEN
-               call da_to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, &
-                  iv%sound(n)%zk(k))
-            ELSE IF ( iv%sound(n)%h(k) > 0.0 ) THEN
-               call da_to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, &
-                  iv%sound(n)%zk(k))
-            ENDIF
+         IF ( iv%sound(n)%p(k) > 1.0 ) THEN
+            call da_to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, &
+               iv%sound(n)%zk(k))
+         ELSE IF ( iv%sound(n)%h(k) > 0.0 ) THEN
+            call da_to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, &
+               iv%sound(n)%zk(k))
+         ENDIF
 
-            if (iv%sound(n)%zk(k) < 0.0) then
-               iv%sound(n)%u(k)%qc = missing
-               iv%sound(n)%v(k)%qc = missing
-               iv%sound(n)%t(k)%qc = missing
-               iv%sound(n)%q(k)%qc = missing
-            endif
-         enddo
+         if (iv%sound(n)%zk(k) < 0.0) then
+            iv%sound(n)%u(k)%qc = missing
+            iv%sound(n)%v(k)%qc = missing
+            iv%sound(n)%t(k)%qc = missing
+            iv%sound(n)%q(k)%qc = missing
+         endif
+      enddo
 
-         ! [1.2] Interpolate horizontally to ob:
+      ! [1.2] Interpolate horizontally to ob:
 
 #ifndef DEREF_KLUDGE
-         call da_interp_lin_3d( xb%u, xp, i, j, dx, dy, dxm, dym, &
-                              model_u, max_ob_levels, iv%sound(n)%zk, num_levs )
-         call da_interp_lin_3d( xb%v, xp, i, j, dx, dy, dxm, dym, &
-                              model_v, max_ob_levels, iv%sound(n)%zk, num_levs )
-         call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &
-                              model_t, max_ob_levels, iv%sound(n)%zk, num_levs )
-         call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &
-                              model_q, max_ob_levels, iv%sound(n)%zk, num_levs )
+      call da_interp_lin_3d( xb%u, xp, i, j, dx, dy, dxm, dym, &
+                           model_u, max_ob_levels, iv%sound(n)%zk, num_levs )
+      call da_interp_lin_3d( xb%v, xp, i, j, dx, dy, dxm, dym, &
+                           model_v, max_ob_levels, iv%sound(n)%zk, num_levs )
+      call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &
+                           model_t, max_ob_levels, iv%sound(n)%zk, num_levs )
+      call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &
+                           model_q, max_ob_levels, iv%sound(n)%zk, num_levs )
 
-         ! call da_interp_lin_3d( xb%h, xp, i, j, dx, dy, dxm, dym, &
-         !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs )
+      ! call da_interp_lin_3d( xb%h, xp, i, j, dx, dy, dxm, dym, &
+      !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs )
 #else
-         call da_interp_lin_3d( xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-            dxm, dym, model_u(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-         call da_interp_lin_3d( xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-            dxm, dym, model_v(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-         call da_interp_lin_3d( xb%t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-            dxm, dym, model_t(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
-         call da_interp_lin_3d( xb%q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-            dxm, dym, model_q(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
+      call da_interp_lin_3d( xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+         dxm, dym, model_u(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
+      call da_interp_lin_3d( xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+         dxm, dym, model_v(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
+      call da_interp_lin_3d( xb%t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+         dxm, dym, model_t(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
+      call da_interp_lin_3d( xb%q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+         dxm, dym, model_q(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
 
-         ! call da_interp_lin_3d( xb%h(xp%ims,xp%jms,xp%kms), xp, i, j, dx,dy,&
-         !   dxm, dym, model_h(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
+      ! call da_interp_lin_3d( xb%h(xp%ims,xp%jms,xp%kms), xp, i, j, dx,dy,&
+      !   dxm, dym, model_h(1), max_ob_levels, iv%sound(n)%zk(1), num_levs )
 #endif
 
-         !----------------------------------------------------------------------
-         ! [2.0] Initialise components of innovation vector:
-         !----------------------------------------------------------------------
+      !----------------------------------------------------------------------
+      ! [2.0] Initialise components of innovation vector:
+      !----------------------------------------------------------------------
 
-         do k = 1, iv%sound(n)%info%levels
-            iv%sound(n)%u(k)%inv = 0.0
-            iv%sound(n)%v(k)%inv = 0.0
-            iv%sound(n)%t(k)%inv = 0.0
-            iv%sound(n)%q(k)%inv = 0.0
+      do k = 1, iv%sound(n)%info%levels
+         iv%sound(n)%u(k)%inv = 0.0
+         iv%sound(n)%v(k)%inv = 0.0
+         iv%sound(n)%t(k)%inv = 0.0
+         iv%sound(n)%q(k)%inv = 0.0
 
-            !-------------------------------------------------------------------
-            ! [3.0] Interpolation:
-            !-------------------------------------------------------------------
+         !-------------------------------------------------------------------
+         ! [3.0] Interpolation:
+         !-------------------------------------------------------------------
 
-            IF ( ob%sound(n)%u(k) > missing_r .AND. &
-                 iv%sound(n)%u(k)%qc >= obs_qc_pointer ) THEN
-               iv%sound(n)%u(k)%inv = ob%sound(n)%u(k) - model_u(k)
-            ENDIF
+         IF ( ob%sound(n)%u(k) > missing_r .AND. &
+              iv%sound(n)%u(k)%qc >= obs_qc_pointer ) THEN
+            iv%sound(n)%u(k)%inv = ob%sound(n)%u(k) - model_u(k)
+         ENDIF
 
-            IF ( ob%sound(n)%v(k) > missing_r .AND. &
-                 iv%sound(n)%v(k)%qc >= obs_qc_pointer ) THEN
-               iv%sound(n)%v(k)%inv = ob%sound(n)%v(k) - model_v(k)
-            ENDIF
+         IF ( ob%sound(n)%v(k) > missing_r .AND. &
+              iv%sound(n)%v(k)%qc >= obs_qc_pointer ) THEN
+            iv%sound(n)%v(k)%inv = ob%sound(n)%v(k) - model_v(k)
+         ENDIF
 
 
-            IF ( ob%sound(n)%t(k) > missing_r .AND. &
-                 iv%sound(n)%t(k)%qc >= obs_qc_pointer ) THEN
-               iv%sound(n)%t(k)%inv = ob%sound(n)%t(k) - model_t(k)
-            ENDIF
+         IF ( ob%sound(n)%t(k) > missing_r .AND. &
+              iv%sound(n)%t(k)%qc >= obs_qc_pointer ) THEN
+            iv%sound(n)%t(k)%inv = ob%sound(n)%t(k) - model_t(k)
+         ENDIF
 
-            IF ( ob%sound(n)%q(k) > missing_r .AND. &
-                 iv%sound(n)%q(k)%qc >= obs_qc_pointer ) THEN
-               iv%sound(n)%q(k)%inv = ob%sound(n)%q(k) - model_q(k)
-            ENDIF
-         END DO
+         IF ( ob%sound(n)%q(k) > missing_r .AND. &
+              iv%sound(n)%q(k)%qc >= obs_qc_pointer ) THEN
+            iv%sound(n)%q(k)%inv = ob%sound(n)%q(k) - model_q(k)
+         ENDIF
+      END DO
 
-         !----------------------------------------------------------------------
-         ! [5.0] Perform optional maximum error check:
-         !----------------------------------------------------------------------
+      !----------------------------------------------------------------------
+      ! [5.0] Perform optional maximum error check:
+      !----------------------------------------------------------------------
 
-         IF ( check_max_iv ) THEN
-            call da_check_max_iv_sound(it, iv % sound(n), &
-              itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
-         END IF
-      endif
+      IF ( check_max_iv ) THEN
+         call da_check_max_iv_sound(it, iv % sound(n), &
+           itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
+      END IF
    END DO
 
    write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
