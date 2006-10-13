@@ -1,8 +1,6 @@
-subroutine da_wrfvar_finalize( no_shutdown )
+subroutine da_wrfvar_finalize
 
-   LOGICAL, OPTIONAL, INTENT(IN) :: no_shutdown
-
-   !--output wrfvar analysis
+   ! output wrfvar analysis
 
    IF ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) THEN
@@ -11,13 +9,5 @@ subroutine da_wrfvar_finalize( no_shutdown )
    END IF
 
    call da_messages((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
-
-   IF (trace_use) call da_trace_report
-
-   IF (.NOT. PRESENT(no_shutdown)) THEN
-      ! Finalize time manager
-      call WRFU_Finalize
-      call wrf_shutdown
-   END IF
 
 end subroutine da_wrfvar_finalize
