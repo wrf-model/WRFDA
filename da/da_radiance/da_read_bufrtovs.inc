@@ -196,7 +196,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
 
    num_tovs_local=0
 
-   do while (IREADMG(lnbufr,subset,idate)==0 .and. subset==subfgn)
+   obs: do while (IREADMG(lnbufr,subset,idate)==0 .and. subset==subfgn)
       do while (IREADSB(lnbufr)==0)
 
          ! open(15, file='bufr.out')
@@ -333,6 +333,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
          p%ifgat                = ifgat
 
          num_tovs_local = num_tovs_local + 1
+
          !   print *, num_tovs_local,year,month,day,hour,minute,second,obs_time,ifgat
 
          allocate ( p%next, stat=error)   ! add next data
@@ -343,9 +344,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
 
          p => p%next
          nullify (p%next)
-
+         if (num_tovs_local == max_num_rad) then
+            write (0,*) "Hit maximum number of obs", max_num_rad
+            exit obs
+         end if
       end do
-   end do
+   end do obs
 
    if (tovs_redistribute) then
       ! Report number of observations to other processors via rootproc

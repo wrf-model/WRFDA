@@ -1,12 +1,9 @@
 subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
-!-------------------------------------------------------------------------
-!
-!  History:
-!      Created: 03/05/2005                   Syed RH Rizvi   
-!
-!      Purpose: Calculates innovation vector, does QC for  Polar AMV's
-!               
-!-------------------------------------------------------------------------
+
+   !----------------------------------------------------------------------
+   ! Purpose: Calculates innovation vector, does QC for  Polar AMV's             
+   !----------------------------------------------------------------------
+
    IMPLICIT NONE
 
    INTEGER, INTENT(IN)           :: it      ! External iteration.
@@ -25,19 +22,17 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
    REAL, DIMENSION(1:max_ob_levels) :: model_v  ! Model value v at ob location.
 
    REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
-!
+
    INTEGER           :: itu,ituf,itvv,itvvf
-!
+
    IF ( iv % num_polaramv > 0 ) THEN
 
-   itu   = 0; itvv    = 0;
-   ituf  = 0; itvvf   = 0;
+      itu   = 0; itvv    = 0;
+      ituf  = 0; itvvf   = 0;
 
       DO n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
 
-       if(iv%polaramv(n)%loc%proc_domain_with_halo) then
-
-!        [1.3] Get horizontal interpolation weights:
+         ! [1.3] Get horizontal interpolation weights:
 
         num_levs = iv % polaramv(n) % info % levels
          if ( num_levs < 1 ) cycle
@@ -76,14 +71,14 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
          enddo
 
 #ifndef DEREF_KLUDGE
-         call da_Interp_lin_3D( xb % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                              model_u, max_ob_levels, iv%polaramv(n)%zk, num_levs )
-         call da_Interp_lin_3D( xb % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                              model_v, max_ob_levels, iv%polaramv(n)%zk, num_levs )
 #else
-         call da_Interp_lin_3D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_u(1), max_ob_levels, iv%polaramv(n)%zk(1), num_levs )
-         call da_Interp_lin_3D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_v(1), max_ob_levels, iv%polaramv(n)%zk(1), num_levs )
 #endif
 
@@ -118,15 +113,13 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
         IF ( check_max_iv ) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
                                 itu,ituf,itvv,itvvf)
 
-       endif
-
       END DO
-       write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-       ', Total Rejections for Polar AMVs follows:'
-       WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-      'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-      'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-      'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
+      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Polar AMVs follows:'
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    ENDIF
 
 end subroutine da_get_innov_vector_polaramv

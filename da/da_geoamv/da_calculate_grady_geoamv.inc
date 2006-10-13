@@ -16,19 +16,17 @@ subroutine da_calculate_grady_geoamv( iv, re, jo_grad_y )
 
    IF ( iv%num_geoamv > 0 ) THEN
       DO n=1, iv%num_geoamv
-         if( iv%geoamv(n)%loc%proc_domain_with_halo ) then
-            do k=1, iv%geoamv(n)%info%levels
-              if(iv%geoamv(n)%u(k)%qc < obs_qc_pointer) re%geoamv(n)%u(k) = 0.0
-              if(iv%geoamv(n)%v(k)%qc < obs_qc_pointer) re%geoamv(n)%v(k) = 0.0
+         do k=1, iv%geoamv(n)%info%levels
+            if(iv%geoamv(n)%u(k)%qc < obs_qc_pointer) re%geoamv(n)%u(k) = 0.0
+            if(iv%geoamv(n)%v(k)%qc < obs_qc_pointer) re%geoamv(n)%v(k) = 0.0
 
-              jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
-                                         ( iv%geoamv(n)%u(k)%error * &
-                                           iv%geoamv(n)%u(k)%error )
-              jo_grad_y%geoamv(n)%v(k) = -re%geoamv(n)%v(k) / &
-                                         ( iv%geoamv(n)%v(k)%error * &
-                                           iv%geoamv(n)%v(k)%error )
-            end do
-         endif
+            jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
+                                      ( iv%geoamv(n)%u(k)%error * &
+                                        iv%geoamv(n)%u(k)%error )
+            jo_grad_y%geoamv(n)%v(k) = -re%geoamv(n)%v(k) / &
+                                      ( iv%geoamv(n)%v(k)%error * &
+                                        iv%geoamv(n)%v(k)%error )
+         end do
       END DO
    END IF
 

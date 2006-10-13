@@ -8,11 +8,6 @@ export EXP_CORE=0
 export HDF=${HDF:-}
 export HDFEOS=${HDFEOS:-}  
 export compileflags=""
-export BLAS=${BLAS:-\$(EXTERNAL)/blas}
-export LAPACK=${LAPACK:-\$(EXTERNAL)/lapack}
-export FFTPACK5=${FFTPACK5:-\$(EXTERNAL)/fftpack5}
-export BUFR=${BUFR:-\$(EXTERNAL)/bufr_ncep_nco}
-
 option=$1
 
 echo option = $option
@@ -347,25 +342,29 @@ if [ "$option" = "wrfvar" ] ; then
   if [ -n "$BLAS" ] ; then
     echo "Will use BLAS in dir: $BLAS"
   else
-    echo "Will compile BLAS"
+    echo "BLAS not set in environment"
+    exit 1
   fi
 
   if [ -n "$LAPACK" ] ; then
     echo "Will use LAPACK in dir: $LAPACK"
   else
-    echo "Will compile LAPACK"
+    echo "LAPACK not set in environment"
+    exit 1
   fi
 
   if [ -n "$FFTPACK5" ] ; then
     echo "Will use FFTPACK5 in dir: $FFTPACK5"
   else
-    echo "Will compile FFTPACK5"
+    echo "FFTPACK5 not set in environment"
+    exit 1
   fi
 
   if [ -n "$BUFR" ] ; then
     echo "Will use BUFR in dir: $BUFR"
   else
-    echo "Will compile BUFR"
+    echo "BUFR not set in environment"
+    exit 1
   fi
 fi
 

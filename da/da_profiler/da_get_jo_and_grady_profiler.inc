@@ -15,16 +15,14 @@ subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
 
    IF (iv%num_profiler > 0) THEN
       DO n=1, iv%num_profiler
-         if( iv%profiler(n)%loc%proc_domain_with_halo ) then
-            do k=1, iv%profiler(n)%info%levels
-               jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
-                                         ( iv%profiler(n)%u(k)%error * &
-                                           iv%profiler(n)%u(k)%error )
-               jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
-                                         ( iv%profiler(n)%v(k)%error * &
-                                           iv%profiler(n)%v(k)%error )
-            end do
-         endif
+         do k=1, iv%profiler(n)%info%levels
+            jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
+                                      ( iv%profiler(n)%u(k)%error * &
+                                        iv%profiler(n)%u(k)%error )
+            jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
+                                      ( iv%profiler(n)%v(k)%error * &
+                                        iv%profiler(n)%v(k)%error )
+         end do
 
          if (iv%profiler(n)%loc%proc_domain) then
             do k=1, iv%profiler(n)%info%levels

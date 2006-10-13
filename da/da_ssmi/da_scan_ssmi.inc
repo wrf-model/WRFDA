@@ -29,7 +29,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    TYPE (field_type)            :: tb37v, tb37h, tb85v, tb85h
 
    LOGICAL                      :: isfilter,ipass 
-   LOGICAL                      :: outside, inside_halo
+   LOGICAL                      :: outside
    INTEGER                      :: irain, iprecip
 
    isfilter = .true. ! filter out rain points
@@ -168,7 +168,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_ll_to_xy (info, loc, xp, outside, inside_halo)
+      call da_ll_to_xy (info, loc, xp, outside)
 
       IF ( outside ) CYCLE reports
 

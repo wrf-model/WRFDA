@@ -1464,6 +1464,7 @@ rconfig   integer   max_gpsref_input      namelist,record4         1            
 rconfig   integer   max_airsret_input     namelist,record4         1              100000   -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_start          namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_end            namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
+rconfig   integer   max_num_rad           namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
 
 rconfig   integer   time_window           namelist,record5         1              3.       -       "TBD"              "TBD"              "TBD"
 
@@ -1548,6 +1549,7 @@ rconfig   integer   mw_emis_sea           namelist,record14        1            
 rconfig   logical   tovs_redistribute     namelist,record14        1              .false.      -   "tovs_redistribute" "TBD"              "TBD"
 rconfig   integer   tovs_min_transfer     namelist,record14        1              10           -   "tovs_min_transfer" "Minimum number of tovs worth relocating" "n/a"
 rconfig   integer   tovs_max_transfer     namelist,record14        1              10           -   "tovs_max_transfer" "Maximum number of tovs in a transfer" "n/a"
+rconfig   logical   tovs_use_array        namelist,record14        1              .false.      -   "tovs_use_array" "TBD"              "TBD"
 
 rconfig   integer   num_pseudo            namelist,pseudo_ob_nl    1              0            -   "TBD"              "TBD"              "TBD"
 rconfig   real      pseudo_x              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"

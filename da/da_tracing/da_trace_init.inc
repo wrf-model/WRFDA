@@ -26,7 +26,7 @@ subroutine da_trace_init
    IF (trace_write .AND. trace_unit /= 0) THEN
       if (use_html) then
          WRITE(UNIT=temp,FMT='(I10)') myproc
-         TraceFile="trace/"//TRIM(temp)//".html"
+         TraceFile="trace/"//TRIM(adjustl(temp))//".html"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:
@@ -35,7 +35,7 @@ subroutine da_trace_init
             IOSTAT=IOStatus)    ! O:
       else   
          WRITE(UNIT=temp,FMT='(I10)') myproc
-         TraceFile="trace/"//TRIM(temp)//".txt"
+         TraceFile="trace/"//TRIM(adjustl(temp))//".txt"
          OPEN ( &
             UNIT=trace_unit, &   ! I:
             FILE=TRIM(TraceFile), &   ! I:

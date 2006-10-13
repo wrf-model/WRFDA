@@ -10,24 +10,22 @@ subroutine da_check_xtoy_adjoint_radar( oi, y, adjtest_lhs, pertile_lhs )
 
    IF ( oi%num_Radar > 0 ) THEN
       DO n=1, oi%num_Radar
-         if( oi%Radar(n)%loc%proc_domain_with_halo ) then
-            if( oi%Radar(n)%loc%proc_domain ) then
-               do k=1, oi%Radar(n)%info%levels
-                  adjtest_lhs = adjtest_lhs + &
-                                ( y%Radar(n)%rv(k)/typical_rv_rms )**2 + &
-                                ( y%Radar(n)%rf(k)/typical_rf_rms )**2
-               enddo
-            endif
-
+         if( oi%Radar(n)%loc%proc_domain ) then
             do k=1, oi%Radar(n)%info%levels
-               pertile_lhs = pertile_lhs + &
-                            ( y%Radar(n)%rv(k)/typical_rv_rms )**2 + &
-                            ( y%Radar(n)%rf(k)/typical_rf_rms )**2
-
-               y%Radar(n)%rv(k)= y%Radar(n)%rv(k) / typical_rv_rms ** 2
-               y%Radar(n)%rf(k)= y%Radar(n)%rf(k) / typical_rf_rms ** 2
+               adjtest_lhs = adjtest_lhs + &
+                             ( y%Radar(n)%rv(k)/typical_rv_rms )**2 + &
+                             ( y%Radar(n)%rf(k)/typical_rf_rms )**2
             enddo
          endif
+
+         do k=1, oi%Radar(n)%info%levels
+            pertile_lhs = pertile_lhs + &
+                         ( y%Radar(n)%rv(k)/typical_rv_rms )**2 + &
+                         ( y%Radar(n)%rf(k)/typical_rf_rms )**2
+
+            y%Radar(n)%rv(k)= y%Radar(n)%rv(k) / typical_rv_rms ** 2
+            y%Radar(n)%rf(k)= y%Radar(n)%rf(k) / typical_rf_rms ** 2
+         enddo
       END DO
    ENDIF
 

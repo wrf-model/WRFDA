@@ -17,19 +17,16 @@ subroutine da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
 
    IF (iv%num_ships > 0) THEN
       DO n=1, iv%num_ships
-         if( iv%ships(n)%loc%proc_domain_with_halo ) then
-
-            jo_grad_y%ships(n)%u = -re%ships(n)%u / &
-                                    ( iv%ships(n)%u%error * iv%ships(n)%u%error)
-            jo_grad_y%ships(n)%v = -re%ships(n)%v / &
-                                    ( iv%ships(n)%v%error * iv%ships(n)%v%error)
-            jo_grad_y%ships(n)%t = -re%ships(n)%t / &
-                                    ( iv%ships(n)%t%error * iv%ships(n)%t%error)
-            jo_grad_y%ships(n)%p = -re%ships(n)%p / &
-                                    ( iv%ships(n)%p%error * iv%ships(n)%p%error)
-            jo_grad_y%ships(n)%q = -re%ships(n)%q / &
-                                    ( iv%ships(n)%q%error * iv%ships(n)%q%error)
-          endif
+         jo_grad_y%ships(n)%u = -re%ships(n)%u / &
+                                 ( iv%ships(n)%u%error * iv%ships(n)%u%error)
+         jo_grad_y%ships(n)%v = -re%ships(n)%v / &
+                                 ( iv%ships(n)%v%error * iv%ships(n)%v%error)
+         jo_grad_y%ships(n)%t = -re%ships(n)%t / &
+                                 ( iv%ships(n)%t%error * iv%ships(n)%t%error)
+         jo_grad_y%ships(n)%p = -re%ships(n)%p / &
+                                 ( iv%ships(n)%p%error * iv%ships(n)%p%error)
+         jo_grad_y%ships(n)%q = -re%ships(n)%q / &
+                                 ( iv%ships(n)%q%error * iv%ships(n)%q%error)
 
           if( iv%ships(n)%loc%proc_domain ) then
             jo % ships_u = jo % ships_u - re%ships(n)%u * jo_grad_y%ships(n)%u

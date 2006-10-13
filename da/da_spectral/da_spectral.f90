@@ -3,7 +3,6 @@ module da_spectral
    use da_constants
    use da_define_structures
    use fftpack5
-   USE module_wrf_error
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform

@@ -13,7 +13,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    CHARACTER(*),   INTENT (in)   :: filename
 
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: inside_halo, outside, cycle_report
+   LOGICAL                      :: outside, cycle_report
    REAL                         :: height_error
    INTEGER                      :: total_obs, &
                                    num_sound, &
@@ -117,22 +117,6 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
    call datelen(10)
 
-   INQUIRE (FILE='fort.91', EXIST = exist )
-   if (.not. exist) then
-      errmsg(1) = "BUFR file does not exist"
-      write(UNIT=errmsg(2), fmt='(a, i4)') &
-         'INQUIRE cannot find unit: ',iunit
-      CALL da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
-
-   INQUIRE (iunit, EXIST = exist )
-   if ( .not. exist ) then
-      errmsg(1) = "BUFR file does not exist"
-      write(UNIT=errmsg(2), fmt='(a, i4)') &
-         'INQUIRE cannot find unit: ',iunit
-      CALL da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
-
    call openbf(iunit,'IN',iunit)
    call readmg(iunit,subset,idate,iret)
 
@@ -200,7 +184,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
       END IF
 
       call da_ll_to_xy (platform%info, platform%loc, &
-                       xp, outside, inside_halo )
+                       xp, outside)
 
       if (outside) cycle reports
 

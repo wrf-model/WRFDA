@@ -26,7 +26,6 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
   ENDIF
 
   DO n=1, iv%num_sound
-    if( iv%sonde_sfc(n)%loc%proc_domain_with_halo ) then
 
       jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / &
                                ( iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
@@ -38,7 +37,6 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
                                ( iv%sonde_sfc(n)%p%error * iv%sonde_sfc(n)%p%error)
       jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / &
                                ( iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
-    endif
   END DO
 
   ! Bitwise-exact reduction preserves operation order of serial code for

@@ -29,7 +29,6 @@ module da_minimisation
    use da_radiance
    use da_airsr     
    use module_get_file_names ! for system call on cray
-   use module_configure
    use da_wrfvar_io
 
    implicit none

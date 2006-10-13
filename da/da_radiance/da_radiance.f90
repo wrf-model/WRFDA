@@ -1,4 +1,5 @@
 module da_radiance
+
 !------------------------------------------------------------------------------
 !  PURPOSE: module for radiance data assimilation.
 !
@@ -15,9 +16,9 @@ module da_radiance
    use da_tools
 !   use da_obs
    use da_par_util
-   USE module_wrf_error
    USE da_reporting
 
+#ifdef RTTOV
    use rttov_const,  only : &
             errorstatus_success, &
             platform_name      , &
@@ -26,6 +27,7 @@ module da_radiance
             gas_unit_specconc   ,&
             gas_unit_ppmv, sensor_id_mw
    use rttov_types
+#endif
    use gsi_kinds      ,  only : r_kind,r_double,i_kind,r_single
    use gsi_constants  ,  only : deg2rad, rad2deg,       &
                             init_constants_derived, &
@@ -39,8 +41,10 @@ module da_radiance
    integer                     :: n_scatt_coef
    character(len=5), pointer   :: coefs_scatt_instname(:)
    real,             pointer   :: time_slots(:)
+#ifdef RTTOV
    TYPE( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
    TYPE( rttov_scatt_coef ), pointer :: coefs_scatt(:)
+#endif
 
    TYPE datalink
      type (rad_type)           :: rad

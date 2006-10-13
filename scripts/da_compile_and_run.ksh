@@ -37,6 +37,7 @@ for CONFIG in $CONFIGS; do
         svn update #>/dev/null 2>&1
         echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         if $FULL; then ./clean_new -a; fi
+        rm -f build/links
         ./compile_new $TARGET > compile.out 2>&1
       done
       let COUNT=$COUNT+1
@@ -49,7 +50,7 @@ for CONFIG in $CONFIGS; do
             echo "Skipping parallel runs of serial code"
           else
             cd ~bray/data/$REGION
-            . $BUILD/wrfvar/setup.ksh $COMPILER
+            . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER
             echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
               ./gen_be.ksh

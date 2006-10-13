@@ -28,29 +28,21 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
       n_obs_bad % v % num = number(0, 0, 0)
 
       DO n=1, oi%num_polaramv
+         do k=1, oi%polaramv(n)%info%levels
+            np_available = np_available + 2
 
-       if( oi%polaramv(n)%loc%proc_domain_with_halo ) then
-
-        do k=1, oi%polaramv(n)%info%levels
-
-         np_available = np_available + 2
-
-         re%polaramv(n)%u(k) = da_residual( n, 0, y%polaramv(n)%u(k), &
+            re%polaramv(n)%u(k) = da_residual( n, 0, y%polaramv(n)%u(k), &
                                       oi%polaramv(n)%u(k), n_obs_bad % u )
-         re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
-                                   oi%polaramv(n)%v(k), n_obs_bad % v )
-                          
+            re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
+                                   oi%polaramv(n)%v(k), n_obs_bad % v )            
         END DO
-
-       endif
-         
-      END DO
+     END DO
       
-      np_missing = np_missing + n_obs_bad % u % num % miss + &
+     np_missing = np_missing + n_obs_bad % u % num % miss + &
                    n_obs_bad % v % num % miss
-      np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
+     np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
                     n_obs_bad % v % num % bad
-      np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
+     np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
                     n_obs_bad % v % num % use
 
    ENDIF

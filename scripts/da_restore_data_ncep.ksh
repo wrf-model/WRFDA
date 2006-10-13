@@ -33,9 +33,9 @@ echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
 
 date
 
-export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export START_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
 let OFFSET=$FCST_RANGE+$WINDOW_START 
-export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
 
 echo "DATE         $DATE"
 echo "START_DATE   $START_DATE"
@@ -69,7 +69,7 @@ while test $LOCAL_DATE -le $END_DATE; do
       echo "File $DIR/$FILE exists, skipping"
    fi
 
-   LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
+   LOCAL_DATE=`$WRFVAR_DIR/buil/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
 done
 
 date

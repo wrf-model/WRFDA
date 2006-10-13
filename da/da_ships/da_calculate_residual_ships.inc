@@ -22,20 +22,18 @@ subroutine da_calculate_residual_ships( oi, y, re,                        &
       n_obs_bad % q % num = number(0, 0, 0)
 
       DO n=1, oi%num_ships
-         if( oi%ships(n)%loc%proc_domain_with_halo ) then
-            np_available = np_available + 5
+         np_available = np_available + 5
 
-            re%ships(n)%u = da_residual( n, 0, y%ships(n)%u, &
-                                         oi%ships(n)%u, n_obs_bad % u )
-            re%ships(n)%v = da_residual( n, 0, y%ships(n)%v, &
-                                      oi%ships(n)%v, n_obs_bad % v )
-            re%ships(n)%t = da_residual( n, 0, y%ships(n)%t, &
-                                      oi%ships(n)%t, n_obs_bad % t )
-            re%ships(n)%p = da_residual( n, 0, y%ships(n)%p, &
-                                      oi%ships(n)%p, n_obs_bad % p )
-            re%ships(n)%q = da_residual( n, 0, y%ships(n)%q, &
-                                      oi%ships(n)%q, n_obs_bad % q )
-         endif
+         re%ships(n)%u = da_residual( n, 0, y%ships(n)%u, &
+                                      oi%ships(n)%u, n_obs_bad % u )
+         re%ships(n)%v = da_residual( n, 0, y%ships(n)%v, &
+                                   oi%ships(n)%v, n_obs_bad % v )
+         re%ships(n)%t = da_residual( n, 0, y%ships(n)%t, &
+                                   oi%ships(n)%t, n_obs_bad % t )
+         re%ships(n)%p = da_residual( n, 0, y%ships(n)%p, &
+                                   oi%ships(n)%p, n_obs_bad % p )
+         re%ships(n)%q = da_residual( n, 0, y%ships(n)%q, &
+                                   oi%ships(n)%q, n_obs_bad % q )
       END DO
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &

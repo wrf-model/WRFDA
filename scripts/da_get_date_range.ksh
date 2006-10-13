@@ -25,7 +25,7 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 # [2] Set environment variables:
 #-----------------------------------------------------------------------
 
-export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $START_DATE $TIME_HOURS 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $START_DATE $TIME_HOURS 2>/dev/null`
 
 export START_YEAR=`echo $START_DATE | cut -c1-4`
 export START_MONTH=`echo $START_DATE | cut -c5-6`

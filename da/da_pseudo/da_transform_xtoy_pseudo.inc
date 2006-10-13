@@ -21,10 +21,7 @@ subroutine da_transform_xtoy_pseudo( xa, iv, xp, y )
       y%pseudo(:)%q = 0.0
 
       do n=1, iv % num_pseudo
-
-       if(iv%pseudo(n)%loc%proc_domain_with_halo) then
-
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i
          dy = iv%pseudo(n)%loc%dy
@@ -57,10 +54,7 @@ subroutine da_transform_xtoy_pseudo( xa, iv, xp, y )
          call da_Interp_Obs_lin_2D(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 y%pseudo(n)%q, iv%pseudo(n)%zk)
 #endif
-       endif
-
       end do
-
    ENDIF
 
 end subroutine da_transform_xtoy_pseudo

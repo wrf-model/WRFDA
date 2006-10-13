@@ -158,6 +158,7 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
 !  vvk=zero
 
 !  ////////////  IR emissivity //////////////////
+#ifdef RTTOV
      
 ! Compute or set the emissivity for IR channels.
   if(itype == 0)then
@@ -368,6 +369,8 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
 
 ! End of routine.
   return
+
+#endif
 
   
 contains

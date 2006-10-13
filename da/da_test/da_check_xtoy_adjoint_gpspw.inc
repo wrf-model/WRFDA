@@ -10,17 +10,15 @@ subroutine da_check_xtoy_adjoint_gpspw( oi, y, adjtest_lhs, pertile_lhs )
 
    IF ( oi%num_Gpspw > 0 ) THEN
       DO n=1, oi%num_Gpspw
-         if( oi%gpspw(n)%loc%proc_domain_with_halo ) then
-            if( oi%gpspw(n)%loc%proc_domain ) then
-               adjtest_lhs = adjtest_lhs &
-                          + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
-            endif
-
-            pertile_lhs = pertile_lhs &
+         if( oi%gpspw(n)%loc%proc_domain ) then
+            adjtest_lhs = adjtest_lhs &
                        + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
-
-            y%gpspw (n)%tpw = y%gpspw (n)%tpw/typical_tpw_rms ** 2
          endif
+
+         pertile_lhs = pertile_lhs &
+                    + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
+
+         y%gpspw (n)%tpw = y%gpspw (n)%tpw/typical_tpw_rms ** 2
       END DO
    ENDIF
 

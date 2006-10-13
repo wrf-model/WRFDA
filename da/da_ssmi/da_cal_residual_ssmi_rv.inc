@@ -18,17 +18,12 @@ subroutine da_cal_residual_ssmi_rv( oi, y, re, &
    n_obs_bad % q % num     = number(0, 0, 0)
 
    DO n=1, oi%num_ssmi_retrieval
-
-    if( oi%ssmi_retrieval(n)%loc%proc_domain_with_halo ) then
-
       np_available = np_available + 2
 
       re%ssmi_retrieval(n)%Speed = da_residual(n, 0, y%ssmi_retrieval(n)%Speed, &
                                oi%ssmi_retrieval(n)%Speed, n_obs_bad % Speed )
       re%ssmi_retrieval(n)%tpw   = da_residual(n, 0, y%ssmi_retrieval(n)%tpw,   &
                                oi%ssmi_retrieval(n)%tpw, n_obs_bad % q       )
-    endif
-
    END DO
 
    np_missing  = np_missing + n_obs_bad % Speed % num % miss    &

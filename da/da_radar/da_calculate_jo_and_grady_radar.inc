@@ -15,21 +15,19 @@ subroutine da_calculate_jo_and_grady_radar( iv, re, jo, jo_grad_y )
    IF ( iv%num_Radar < 0 ) RETURN
    
    DO n=1, iv%num_Radar
-      if (iv%Radar(n)%loc%proc_domain_with_halo) then
-         do k=1, iv%Radar(n)%info%levels
-            IF ( USE_Radar_rv ) THEN
-               jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                       ( iv%Radar(n)%rv(k)%error * &
-                                         iv%Radar(n)%rv(k)%error )
-            ENDIF
+      do k=1, iv%Radar(n)%info%levels
+         IF ( USE_Radar_rv ) THEN
+            jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
+                                    ( iv%Radar(n)%rv(k)%error * &
+                                      iv%Radar(n)%rv(k)%error )
+         ENDIF
 
-            IF ( USE_Radar_rf ) THEN
-               jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                       ( iv%Radar(n)%rf(k)%error * &
-                                         iv%Radar(n)%rf(k)%error )
-            ENDIF
-         end do
-      end if
+         IF ( USE_Radar_rf ) THEN
+            jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
+                                    ( iv%Radar(n)%rf(k)%error * &
+                                      iv%Radar(n)%rf(k)%error )
+         ENDIF
+      end do
 
       if (iv%Radar(n)%loc%proc_domain) then
          do k=1, iv%Radar(n)%info%levels

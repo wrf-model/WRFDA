@@ -22,11 +22,7 @@ subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
    REAL                          :: dy, dym  !
 
    IF ( iv%num_polaramv > 0 ) THEN
-
       do n=1, iv % num_polaramv
-
-       if(iv%polaramv(n)%loc%proc_domain_with_halo) then
-
          k = iv % polaramv(n) % info % levels
 
          if ( k < 1 ) cycle
@@ -49,10 +45,7 @@ subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
          call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%polaramv(n)%v(1), k, iv%polaramv(n)%zk(1), k)
 #endif
-       endif
-
       END DO
-
    END IF
 
 end subroutine da_transform_xtoy_polaramv_adj

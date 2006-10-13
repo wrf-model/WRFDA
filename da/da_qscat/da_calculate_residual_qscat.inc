@@ -20,17 +20,12 @@ subroutine da_calculate_residual_qscat( oi, y, re,                        &
       n_obs_bad % v % num = number(0, 0, 0)
 
       DO n=1, oi%num_qscat
-
-       if( oi%qscat(n)%loc%proc_domain_with_halo ) then
-
          np_available = np_available + 2
 
          re%qscat(n)%u = da_residual( n, 0, y%qscat(n)%u, &
                                       oi%qscat(n)%u, n_obs_bad % u )
          re%qscat(n)%v = da_residual( n, 0, y%qscat(n)%v, &
                                    oi%qscat(n)%v, n_obs_bad % v )
-       endif
-
       END DO
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &

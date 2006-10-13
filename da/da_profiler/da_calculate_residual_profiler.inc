@@ -21,20 +21,15 @@ subroutine da_calculate_residual_profiler( oi, y, re,                        &
 
       DO n=1, oi%num_Profiler
 
-      if( oi%profiler(n)%loc%proc_domain_with_halo ) then
+         do k=1, oi%Profiler(n)%info%levels
 
-      do k=1, oi%Profiler(n)%info%levels
+            np_available = np_available + 2
 
-         np_available = np_available + 2
-
-         re%Profiler(n)%u(k) = da_residual( n, k, y%Profiler(n)%u(k), &
-                                   oi%Profiler(n)%u(k), n_obs_bad % u )
-         re%Profiler(n)%v(k) = da_residual( n, k, y%Profiler(n)%v(k), &
-                                   oi%Profiler(n)%v(k), n_obs_bad % v )
-      end do
-
-      endif
-
+            re%Profiler(n)%u(k) = da_residual( n, k, y%Profiler(n)%u(k), &
+                                      oi%Profiler(n)%u(k), n_obs_bad % u )
+            re%Profiler(n)%v(k) = da_residual( n, k, y%Profiler(n)%v(k), &
+                                      oi%Profiler(n)%v(k), n_obs_bad % v )
+         end do
       END DO
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &

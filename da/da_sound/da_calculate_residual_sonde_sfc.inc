@@ -2,29 +2,27 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
-  IMPLICIT NONE
+   IMPLICIT NONE
 
-  TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-  TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-  TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual vector (O-A).
+   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
+   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
+   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual vector (O-A).
 
-  INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
-                                       np_missing  , np_bad_data
+   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+                                        np_missing  , np_bad_data
 
-  TYPE (bad_data_type)              :: n_obs_bad
-  INTEGER                           :: n
+   TYPE (bad_data_type)              :: n_obs_bad
+   INTEGER                           :: n
 
-  IF ( oi%num_sound < 1 ) return
+   IF ( oi%num_sound < 1 ) return
 
-  n_obs_bad % u % num = number(0, 0, 0)
-  n_obs_bad % v % num = number(0, 0, 0)
-  n_obs_bad % t % num = number(0, 0, 0)
-  n_obs_bad % p % num = number(0, 0, 0)
-  n_obs_bad % q % num = number(0, 0, 0)
+   n_obs_bad % u % num = number(0, 0, 0)
+   n_obs_bad % v % num = number(0, 0, 0)
+   n_obs_bad % t % num = number(0, 0, 0)
+   n_obs_bad % p % num = number(0, 0, 0)
+   n_obs_bad % q % num = number(0, 0, 0)
 
-  DO n=1, oi%num_sound
-
-    if (oi%sonde_sfc(n)%loc%proc_domain_with_halo ) then
+   DO n=1, oi%num_sound
       np_available = np_available + 5
 
       re%sonde_sfc(n)%u = da_residual( n, 0, y%sonde_sfc(n)%u, &
@@ -37,17 +35,15 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                  oi%sonde_sfc(n)%p, n_obs_bad % p )
       re%sonde_sfc(n)%q = da_residual( n, 0, y%sonde_sfc(n)%q, &
                                  oi%sonde_sfc(n)%q, n_obs_bad % q )
-    endif
+   END DO
 
-  END DO
-
-  np_missing = np_missing + n_obs_bad % u % num % miss + &
+   np_missing = np_missing + n_obs_bad % u % num % miss + &
                n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &
                n_obs_bad % p % num % miss + n_obs_bad % q % num % miss
-  np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
+   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
                 n_obs_bad % v % num % bad + n_obs_bad % t % num % bad + &
                 n_obs_bad % p % num % bad + n_obs_bad % q % num % bad
-  np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
+   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
                 n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
                 n_obs_bad % p % num % use + n_obs_bad % q % num % use
 

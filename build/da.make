@@ -36,10 +36,6 @@ WRFVAR_OBJS        =	da_par_util.o           \
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
-			rttov_const.o		\
-			rttov_global.o		\
-			rttov_types.o		\
-			parkind1.o	        \
 			gsi_kinds.o		\
 			gsi_constants.o		\
                         da_wrfvar_io.o      \

@@ -1,3 +1,4 @@
+#ifdef RTTOV
 subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
                           nfrequencies, nchannels, nbtout , &
                           con_vars, aux_vars, &
@@ -9,9 +10,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
 
    implicit none
 
-#ifdef RTTOV
 #include "rttov_direct.interface"
-#endif
 
    integer             ,  intent (in) :: inst, isflg, nchanl, nprofiles
    integer             ,  intent (in) :: nfrequencies, nchannels, nbtout
@@ -343,3 +342,4 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
    call da_trace_exit("da_rttov_direct")
 
 end subroutine da_rttov_direct
+#endif

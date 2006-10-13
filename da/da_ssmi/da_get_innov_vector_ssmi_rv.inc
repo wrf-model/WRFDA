@@ -19,54 +19,51 @@ subroutine da_get_innov_vector_ssmi_rv ( it, xb, ob, iv )
       itpw = 0 ; itpwf = 0 ; ispeed = 0 ; ispeedf = 0 
       DO n=1, iv % num_ssmi_retrieval
 
-         if(iv%ssmi_retrieval(n)%loc%proc_domain_with_halo) then
+         ! COMPUTE INNOVATION VECTOR
+         ! =========================
 
-            ! COMPUTE INNOVATION VECTOR
-            ! =========================
+         ! Obs coordinates on model grid
 
-            ! Obs coordinates on model grid
+         ! TPW
 
-            ! TPW
-
-            i = iv%ssmi_retrieval(n)%loc%i
-            j = iv%ssmi_retrieval(n)%loc%j
-            dx = iv%ssmi_retrieval(n)%loc%dx
-            dy = iv%ssmi_retrieval(n)%loc%dy
-            dxm = iv%ssmi_retrieval(n)%loc%dxm
-            dym = iv%ssmi_retrieval(n)%loc%dym
+         i = iv%ssmi_retrieval(n)%loc%i
+         j = iv%ssmi_retrieval(n)%loc%j
+         dx = iv%ssmi_retrieval(n)%loc%dx
+         dy = iv%ssmi_retrieval(n)%loc%dy
+         dxm = iv%ssmi_retrieval(n)%loc%dxm
+         dym = iv%ssmi_retrieval(n)%loc%dym
 
 
-            iv % ssmi_retrieval (n) % tpw % inv  = 0.0
-            IF (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.  .and.  &  
-                  iv % ssmi_retrieval(n) % tpw % qc >= obs_qc_pointer ) THEN
-               model_tpw = dym*(dxm*xb%tpw(i,j)   + dx*xb%tpw(i+1,j)) + &
-                              dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
+         iv % ssmi_retrieval (n) % tpw % inv  = 0.0
+         IF (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.  .and.  &  
+               iv % ssmi_retrieval(n) % tpw % qc >= obs_qc_pointer ) THEN
+            model_tpw = dym*(dxm*xb%tpw(i,j)   + dx*xb%tpw(i+1,j)) + &
+                           dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
 
-               iv % ssmi_retrieval (n) % tpw % inv = &
-                  ob % ssmi_retrieval (n) % tpw - model_tpw
-            ENDIF
+            iv % ssmi_retrieval (n) % tpw % inv = &
+               ob % ssmi_retrieval (n) % tpw - model_tpw
+         ENDIF
 
-            ! SURFACE WIND SPEED
+         ! SURFACE WIND SPEED
 
-            iv % ssmi_retrieval (n) % speed % inv  = 0.0
-            IF (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1. .and.     &
-                   iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer ) THEN
+         iv % ssmi_retrieval (n) % speed % inv  = 0.0
+         IF (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1. .and.     &
+                iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer ) THEN
 
-               model_speed = dym*(dxm*xb%speed (i,j  ) + dx*xb%speed (i+1,j  )) &
-                           + dy *(dxm*xb%speed (i,j+1) + dx*xb%speed (i+1,j+1))
-               iv % ssmi_retrieval (n) % speed % inv =  &
-                  ob % ssmi_retrieval (n) % speed - model_speed
-            ENDIF
+            model_speed = dym*(dxm*xb%speed (i,j  ) + dx*xb%speed (i+1,j  )) &
+                        + dy *(dxm*xb%speed (i,j+1) + dx*xb%speed (i+1,j+1))
+            iv % ssmi_retrieval (n) % speed % inv =  &
+               ob % ssmi_retrieval (n) % speed - model_speed
+         ENDIF
 
-            !------------------------------------------------------------------
-            ! Perform optional maximum error check:
-            !------------------------------------------------------------------
+         !------------------------------------------------------------------
+         ! Perform optional maximum error check:
+         !------------------------------------------------------------------
 
-            IF ( check_max_iv ) THEN
-               call da_check_max_iv_ssmi_rv(it, iv % ssmi_retrieval (n),&
-                  itpw,itpwf, ispeed,ispeedf )
-            END IF
-         endif
+         IF ( check_max_iv ) THEN
+            call da_check_max_iv_ssmi_rv(it, iv % ssmi_retrieval (n),&
+               itpw,itpwf, ispeed,ispeedf )
+         END IF
       ENDDO
 
       write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &

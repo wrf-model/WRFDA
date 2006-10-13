@@ -20,15 +20,13 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
    REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
 
    INTEGER                      :: itu, itvv, ituf, itvvf
-   IF ( iv % num_qscat > 0 ) THEN
 
+   IF ( iv % num_qscat > 0 ) THEN
       DO n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
 
-        itu = 0 ; itvv = 0 ;  ituf = 0 ; itvvf = 0
+         itu = 0 ; itvv = 0 ;  ituf = 0 ; itvvf = 0
 
-       if(iv%qscat(n)%loc%proc_domain_with_halo) then
-
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%qscat(n)%loc%i
          j = iv%qscat(n)%loc%j
@@ -53,9 +51,9 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
 
          iv%qscat(n)%zk=zk
 
-!------------------------------------------------------------------------
-!        [2.0] Initialise components of innovation vector:
-!------------------------------------------------------------------------
+         !------------------------------------------------------------------------
+         ! [2.0] Initialise components of innovation vector:
+         !------------------------------------------------------------------------
 
          iv % qscat(n) % u % inv = 0.0
          iv % qscat(n) % v % inv = 0.0
@@ -65,26 +63,26 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
             iv % qscat(n) % v % qc = missing
          else
 
-!        [1.2] Interpolate horizontally:
+            ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-         call da_Interp_Obs_lin_2D( xb % u, xp, i, j, dx, dy, dxm, dym, &
-                                 model_u, iv%qscat(n)%zk)
-         call da_Interp_Obs_lin_2D( xb % v, xp, i, j, dx, dy, dxm, dym, &
-                                 model_v, iv%qscat(n)%zk)
+            call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+                                    model_u, iv%qscat(n)%zk)
+            call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+                                    model_v, iv%qscat(n)%zk)
 #else
-         call da_Interp_Obs_lin_2D( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                        model_u, iv%qscat(n)%zk)
-         call da_Interp_Obs_lin_2D( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                        model_v, iv%qscat(n)%zk)
+            call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                           model_u, iv%qscat(n)%zk)
+            call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                           model_v, iv%qscat(n)%zk)
 #endif
 
-!------------------------------------------------------------------------
-!        [2.0] Initialise components of innovation vector:
-!------------------------------------------------------------------------
+            !------------------------------------------------------------------------
+            ! [2.0] Initialise components of innovation vector:
+            !------------------------------------------------------------------------
 
-!------------------------------------------------------------------------
-!           [3.0] Fast interpolation:
-!------------------------------------------------------------------------
+            !------------------------------------------------------------------------
+            ! [3.0] Fast interpolation:
+            !------------------------------------------------------------------------
 
             IF ( ob % qscat(n) % u > missing_r .AND. &
                  iv % qscat(n) % u % qc >= obs_qc_pointer ) THEN
@@ -98,23 +96,20 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
                  iv % qscat(n) % v % inv = ob % qscat(n) % v - model_v
             ENDIF
 
-!------------------------------------------------------------------------
-!        [5.0] Perform optional maximum error check:
-!------------------------------------------------------------------------
+            !------------------------------------------------------------------------
+            ! [5.0] Perform optional maximum error check:
+            !------------------------------------------------------------------------
 
-       IF( check_max_iv )& 
-       call da_check_max_iv_qscat(it, iv % qscat(n), itu, itvv, ituf,itvvf)
-
-       endif
-       endif
-            
+            IF ( check_max_iv )& 
+               call da_check_max_iv_qscat(it, iv % qscat(n), itu, itvv, ituf,itvvf)
+         endif
       END DO
 
-     write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it,&
+      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it,&
                    ', Total Rejections for qscat follows:'
-       WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
-      'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-      'Number of failed v-wind observations:     ',itvvf,' on ',itvv
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv
 
    ENDIF
 

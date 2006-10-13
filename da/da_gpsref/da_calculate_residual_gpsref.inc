@@ -23,17 +23,11 @@ subroutine da_calculate_residual_gpsref( oi, y, re,               &
    n_obs_bad % gpsref % num = number(0, 0, 0)
 
    DO n=1, oi%num_GPSRef
-
-      if( oi%gpsref(n)%loc%proc_domain_with_halo ) then
-
-         do k=1, oi%gpsref(n)%info%levels
-            np_available = np_available + 1
-            re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
+      do k=1, oi%gpsref(n)%info%levels
+         np_available = np_available + 1
+         re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
                                   oi%GPSRef(n)%ref(k), n_obs_bad%gpsref )
-         end do
-
-      endif
-
+      end do
    END DO
 
    np_missing = np_missing + n_obs_bad % gpsref % num % miss

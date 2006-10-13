@@ -20,10 +20,7 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
    IF ( iv % num_pseudo > 0 ) THEN
 
       DO n=1, iv % num_pseudo
-
-       if(iv%pseudo(n)%loc%proc_domain_with_halo) then
-
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i
          dy = iv%pseudo(n)%loc%dy
@@ -36,7 +33,7 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
               'pseudo: i,j=', i,j, &
               'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 
-!        [1.2] Interpolate horizontally:
+         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                  model_u, iv%pseudo(n)%zk )
@@ -75,9 +72,6 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
          else if ( pseudo_var(1:1) == 'q' ) then
             ob % pseudo(n) % q = model_q + iv % pseudo(n) % q % inv
          end if 
-         
-       endif
-
       END DO
    ENDIF
 

@@ -108,60 +108,56 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'js,je=', js,je
       write(unit=stdout, fmt=*) 'ks,ke=', ks,ke
 
-      if (print_detail_xb) then
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         dnw                dn 		rdnw       rdn'
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         dnw                dn 		rdnw       rdn'
 
-         do k=ks,ke+1
-            write(unit=stdout, fmt='(i3,8f16.8)') k, &
-               grid%em_dnw(k), grid%em_dn(k), grid%em_rdnw(k), grid%em_rdn(k)
-         enddo
+      do k=ks,ke+1
+         write(unit=stdout, fmt='(i3,8f16.8)') k, &
+            grid%em_dnw(k), grid%em_dn(k), grid%em_rdnw(k), grid%em_rdn(k)
+      enddo
 
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         znu                 znw		rdnw       rdn'
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         znu                 znw		rdnw       rdn'
 
-         do k=ks,ke+1
-            write(unit=stdout, fmt='(i3,8f16.8)') k, &
-               grid%xb%sigmah(k), grid%xb%sigmaf(k), grid%em_rdnw(k), grid%em_rdn(k)
+      do k=ks,ke+1
+         write(unit=stdout, fmt='(i3,8f16.8)') k, &
+            grid%xb%sigmah(k), grid%xb%sigmaf(k), grid%em_rdnw(k), grid%em_rdn(k)
+      enddo
+
+      write(unit=stdout, fmt='(/5a/)') &
+         'lvl         phb                 ph_2'
+
+      do k=ks,ke
+         write(unit=stdout, fmt='(i3,8e20.12)') k, &
+               grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
+      enddo
+
+      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
+
+      if (je == grid%xp%jde) then
+         write(unit=stdout, fmt=*) ' '
+
+         do k=ks+5,ke,10
+            do i=is,ie,10
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
+                    'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
+                     grid%em_v_2(i, grid%xp%jde+1,k)
+            enddo
+            write(unit=stdout, fmt=*) ' '
          enddo
       endif
 
-      if (print_detail_xb) then
-         write(unit=stdout, fmt='(/5a/)') &
-            'lvl         phb                 ph_2'
+      if (ie == grid%xp%ide) then
+         write(unit=stdout, fmt=*) ' '
 
-         do k=ks,ke
-            write(unit=stdout, fmt='(i3,8e20.12)') k, &
-                  grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
+         do k=ks+5,ke,10
+            do j=js,je,10
+               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
+                  'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
+                  grid%em_u_2(grid%xp%ide+1,j,k)
+            enddo
+            write(unit=stdout, fmt=*) ' '
          enddo
-
-         write(unit=stdout, fmt='(/5a/)') ' simple variables:'
-
-         if (je == grid%xp%jde) then
-            write(unit=stdout, fmt=*) ' '
-
-            do k=ks+5,ke,10
-               do i=is,ie,10
-                  write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                       'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                        grid%em_v_2(i, grid%xp%jde+1,k)
-               enddo
-               write(unit=stdout, fmt=*) ' '
-            enddo
-         endif
-
-         if (ie == grid%xp%ide) then
-            write(unit=stdout, fmt=*) ' '
-
-            do k=ks+5,ke,10
-               do j=js,je,10
-                  write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                     'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
-                     grid%em_u_2(grid%xp%ide+1,j,k)
-               enddo
-               write(unit=stdout, fmt=*) ' '
-            enddo
-         endif
       endif
 
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
@@ -633,6 +629,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    ! if (.not. associated(xbx % latc_mean)) then
    allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
+   if (trace_use) call da_trace("da_transfer_wrftoxb",&
+      message="allocated xbx%latc_mean")
    ! endif
 
    size2d = (grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1)

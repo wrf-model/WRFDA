@@ -129,6 +129,9 @@ subroutine da_get_var_diagnostics ( iv, j )
 
       end if
 
+      IF (trace_use) CALL da_trace("da_get_var_diagnostics", &
+         message="Memory increase from internal write")
+
       if (iv % num_metar_glo > 0 ) then
          write(UNIT=jo_unit,FMT='(a30,2i8,10f15.5)')'    metar obs, Jo (actual)  = ', &
                                iv % num_metar_glo, num_metar_tot, &

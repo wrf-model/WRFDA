@@ -16,42 +16,39 @@ subroutine da_transform_xtoy_pseudo_adj( iv, xp, jo_grad_y, jo_grad_x )
 
    IF ( iv%num_pseudo > 0 ) THEN
       DO n=1, iv % num_pseudo
-         if(iv%pseudo(n)%loc%proc_domain_with_halo) then
+         ! [1.1] Get horizontal interpolation weights:
 
-            ! [1.1] Get horizontal interpolation weights:
+         i = iv%pseudo(n)%loc%i
+         dy = iv%pseudo(n)%loc%dy
+         dym = iv%pseudo(n)%loc%dym
+         j = iv%pseudo(n)%loc%j
+         dx = iv%pseudo(n)%loc%dx
+         dxm = iv%pseudo(n)%loc%dxm
 
-            i = iv%pseudo(n)%loc%i
-            dy = iv%pseudo(n)%loc%dy
-            dym = iv%pseudo(n)%loc%dym
-            j = iv%pseudo(n)%loc%j
-            dx = iv%pseudo(n)%loc%dx
-            dxm = iv%pseudo(n)%loc%dxm
-
-            ! [1.2] Interpolate horizontally:
+         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-            call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % p, xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
-#else
-            call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                       jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % p, xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
+#else
+         call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                    jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
+         call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                                 jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
 #endif
-         endif
       END DO
    END IF
 

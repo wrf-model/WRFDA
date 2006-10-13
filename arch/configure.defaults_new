@@ -18,7 +18,6 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
 FCDEBUG         = -g -C
@@ -29,7 +28,6 @@ FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = 
 
 # Libraries
@@ -66,8 +64,6 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fast
 FCDEBUG         = -g -C
@@ -77,7 +73,6 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = --L/usr/local/lib
@@ -104,7 +99,6 @@ LD              = $(FC)
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
@@ -117,7 +111,6 @@ FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -151,8 +144,6 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P  $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = 
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
@@ -160,8 +151,6 @@ FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
 FCTYPE          = -r8
-
-CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -188,7 +177,6 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
@@ -199,7 +187,6 @@ FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       =  -L/usr/local/lib
@@ -233,9 +220,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM 
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = -O3 -xW
 FCDEBUG         = # -g
@@ -243,8 +229,6 @@ FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
 FCTYPE          = -r8
-
-CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -268,8 +252,6 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fastsse
 FCDEBUG         = -g -C
@@ -278,7 +260,6 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp
 
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -306,7 +287,6 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
 
 FCOPTIM         = #-fastsse
 FCDEBUG         = -g -C
@@ -318,7 +298,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
-CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
@@ -350,8 +329,6 @@ LD              = $(FC)
 
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-fastsse
 FCDEBUG         = -g
@@ -361,7 +338,6 @@ FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -389,7 +365,6 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-fastsse
 FCDEBUG         = -g
@@ -401,7 +376,6 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
-CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
@@ -433,9 +407,8 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
-                    
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = #-O3 -xW
 FCDEBUG         = # -g -C
@@ -444,7 +417,6 @@ FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
 
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
 LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
@@ -471,11 +443,11 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-FPPFLAGS_BUFR   = -C -P $(TRADFLAG) -DLINUX -Dlinux -DPATHSCALE
 
 FCOPTIM         = #-O3 -xW
 FCDEBUG         = # -g -C
@@ -487,7 +459,6 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
-CCFLAGS_BUFR    = -DUNDERSCORE
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
@@ -534,7 +505,6 @@ FCBASE          = -64 -mips4
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -w -64 -mips4 -DUNDERSCORE -DIRIX
-CCFLAGS_BUFR    = -64 -mips4 -DUNDERSCORE
 CCFLAGS_RSL     = 
 
 LOCAL_LIB       = 
@@ -574,7 +544,6 @@ FCBASE          = -64 -mips4 -w
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -w -64 -mips4 -DIRIX -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
-CCFLAGS_BUFR    = -64 -mips4 -DUNDERSCORE
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = 
@@ -697,7 +666,6 @@ FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
-CCFLAGS_BUFR    = -DNOUNDERSCORE
 CCFLAGS_RSL     =
 
 LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -749,8 +717,6 @@ FCBASE          = -p$(BLAS) -p$(LAPACK) -p$(FFTPACK5)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
 
-CCFLAGS_BUFR    = -DUNDERSCORE
-
 LOCAL_LIB       = 
 
 arch : 
@@ -798,8 +764,6 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
-CCFLAGS_BUFR    = -DUNDERSCORE
-
 LOCAL_LIB       = 
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
@@ -831,7 +795,7 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM                     
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE                   
 
 FCOPTIM         = 
 FCDEBUG         = -g -C
@@ -843,7 +807,6 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore \
 FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     =
 
 EXTRA_LIBS      = -lSystemStubs
@@ -869,7 +832,7 @@ CC              = mpicc
 CC_TOOLS        = cc
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM		      \
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -883,7 +846,6 @@ FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
-CCFLAGS_BUFR    = -DUNDERSCORE
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB		= -L$(RSL)/RSL -lrsl

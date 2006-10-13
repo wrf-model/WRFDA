@@ -109,7 +109,6 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
 
    call da_oi_stats_airsr ( stats_unit, iv )
 
-
    !---- ----------------------------------------------------------------------
    ! [2.0] Calculate residual vector (O-A) statistics:
    !---------------------------------------------------------------------------

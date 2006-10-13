@@ -31,12 +31,8 @@ module da_test
    use da_buoy 
    use da_bogus 
    use da_setup_structures
-   use da_tools
    use da_qscat
-   use da_grid_definitions
-   use da_physics
    use da_wrfvar_io
-   use module_wrf_error
    use da_minimisation
    use da_reporting
 

@@ -25,6 +25,9 @@ subroutine da_wrf_tpq_2_slp ( xb )
                           TC=273.15+17.5,  &
                           PCONST=10000. ,  &
                           EPS   = 0.622
+
+   if (trace_use) call da_trace_entry("da_wrf_tpq_2_slp")
+
    !                                                                       
    !     ... SEA LEVEL PRESSURE                                            
    !                                                                       
@@ -87,6 +90,8 @@ subroutine da_wrf_tpq_2_slp ( xb )
             (gas_constant*(TS+T0)))
       enddo i_loop
    enddo j_loop
+
+   if (trace_use) call da_trace_exit("da_wrf_tpq_2_slp")
 
 end subroutine da_wrf_tpq_2_slp
 

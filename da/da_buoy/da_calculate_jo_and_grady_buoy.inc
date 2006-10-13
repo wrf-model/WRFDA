@@ -17,20 +17,18 @@ subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
 
    IF ( iv%num_buoy > 0 ) THEN
       DO n=1, iv%num_buoy
-         if (iv%buoy(n)%loc%proc_domain_with_halo) then
 
-            jo_grad_y%buoy(n)%u = -re%buoy(n)%u / &
-                                   ( iv%buoy(n)%u%error * iv%buoy(n)%u%error)
-            jo_grad_y%buoy(n)%v = -re%buoy(n)%v / &
-                                   ( iv%buoy(n)%v%error * iv%buoy(n)%v%error)
-            jo_grad_y%buoy(n)%t = -re%buoy(n)%t / &
-                                   ( iv%buoy(n)%t%error * iv%buoy(n)%t%error)
-            jo_grad_y%buoy(n)%p = -re%buoy(n)%p / &
-                                   ( iv%buoy(n)%p%error * iv%buoy(n)%p%error)
-            jo_grad_y%buoy(n)%q = -re%buoy(n)%q / &
-                                   ( iv%buoy(n)%q%error * iv%buoy(n)%q%error)
+         jo_grad_y%buoy(n)%u = -re%buoy(n)%u / &
+                                ( iv%buoy(n)%u%error * iv%buoy(n)%u%error)
+         jo_grad_y%buoy(n)%v = -re%buoy(n)%v / &
+                                ( iv%buoy(n)%v%error * iv%buoy(n)%v%error)
+         jo_grad_y%buoy(n)%t = -re%buoy(n)%t / &
+                                ( iv%buoy(n)%t%error * iv%buoy(n)%t%error)
+         jo_grad_y%buoy(n)%p = -re%buoy(n)%p / &
+                                ( iv%buoy(n)%p%error * iv%buoy(n)%p%error)
+         jo_grad_y%buoy(n)%q = -re%buoy(n)%q / &
+                                ( iv%buoy(n)%q%error * iv%buoy(n)%q%error)
 
-         endif
 
          if (iv%buoy(n)%loc%proc_domain) then
             jo % buoy_u = jo % buoy_u - re%buoy(n)%u * jo_grad_y%buoy(n)%u

@@ -2,6 +2,10 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrfvar_wrf_nl}
+export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
+export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
@@ -11,6 +15,7 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
 export WORK_DIR=$RUN_DIR/working
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 export POE=false
+export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
 export PLATFORM=`uname`
 export HOSTNAME=`hostname`
@@ -79,7 +84,7 @@ $SUBMIT_OPTIONS3
 
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
-export RUN_CMD="${RUN_CMD:-\"$RUN_CMD_DEFAULT}"
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
@@ -99,6 +104,14 @@ export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
+fi
+
+if $CHECK_SVNVERSION; then
+   export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
+   export WRF_NL_VN=`svnversion -n \$WRF_NL_DIR 2>/dev/null`
+   export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
+   export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
+   export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`
 fi
 
 cat >> job.ksh <<EOF

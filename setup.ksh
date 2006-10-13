@@ -144,14 +144,14 @@ fi
 
 # Lightning
 
-if test $MACHINE == "ln0126en" -o $MACHINE == "ln0127en"; then 
-   if test $FC == pathscale; then
+if test $MACHINE = "ln0126en" -o $MACHINE = "ln0127en"; then 
+   if test $FC = pathscale; then
       export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
-   if test $FC == pgi; then
+   if test $FC = pgi; then
       export MPICH=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    fi
-   if test $FC == ifort; then
+   if test $FC = ifort; then
       . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh
       export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    fi
@@ -159,8 +159,8 @@ fi
 
 # Crayx1
 
-if test $MACHINE == "gold.us.cray.com"; then 
-   if test $FC == crayx1; then
+if test $MACHINE = "gold.us.cray.com"; then 
+   if test $FC = crayx1; then
       module use /opt/ctl/modulefiles /opt/PE/modulefiles
       module load PrgEnv.56.newest
       module list

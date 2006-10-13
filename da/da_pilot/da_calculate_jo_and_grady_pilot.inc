@@ -15,16 +15,14 @@ subroutine da_calculate_jo_and_grady_pilot( iv, re, jo, jo_grad_y )
 
    IF (iv%num_pilot > 0) THEN
       DO n=1, iv%num_pilot
-         if (iv%pilot(n)%loc%proc_domain_with_halo) then
-            do k=1, iv%pilot(n)%info%levels
-               jo_grad_y%pilot(n)%u(k) = -re%pilot(n)%u(k) / &
-                                       ( iv%pilot(n)%u(k)%error * &
-                                         iv%pilot(n)%u(k)%error )
-               jo_grad_y%pilot(n)%v(k) = -re%pilot(n)%v(k) / &
-                                       ( iv%pilot(n)%v(k)%error * &
-                                         iv%pilot(n)%v(k)%error )
-            end do
-        endif
+         do k=1, iv%pilot(n)%info%levels
+            jo_grad_y%pilot(n)%u(k) = -re%pilot(n)%u(k) / &
+                                    ( iv%pilot(n)%u(k)%error * &
+                                      iv%pilot(n)%u(k)%error )
+            jo_grad_y%pilot(n)%v(k) = -re%pilot(n)%v(k) / &
+                                    ( iv%pilot(n)%v(k)%error * &
+                                      iv%pilot(n)%v(k)%error )
+         end do
 
         if (iv%pilot(n)%loc%proc_domain) then
            do k=1, iv%pilot(n)%info%levels

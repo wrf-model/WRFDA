@@ -160,7 +160,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
    INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
-
+   integer, parameter :: iv_rad_binary_unit = 15
+   integer, parameter :: fgat_rad_unit = 22
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
    INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
    INTEGER, PARAMETER :: gen_be_iunit = 30
@@ -210,6 +211,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: innov_rad_unit      = 194  ! Unit number for writing innovation radiance
    INTEGER, PARAMETER :: oma_rad_unit        = 195  ! Unit number for writing oma radiance
    INTEGER, PARAMETER :: error_factor_rad_unit = 196  ! Unit number for radiance error factor
+   INTEGER, PARAMETER :: biasprep_unit         = 211
    INTEGER, PARAMETER :: unit_983            = 983 ! TBD
    integer, parameter  :: iunit = 70
    integer, parameter  :: ounit = iunit + 1
@@ -217,6 +219,11 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter  :: spec_unit = 73      ! Unit for spectral diag. output.
    integer, parameter  :: ep_unit = 74        ! Ensemble perturbation input.
    INTEGER, PARAMETER :: max_num_of_var = 200 ! Maximum # of stored fields.
+
+   INTEGER, PARAMETER :: unit_start = 220
+   INTEGER, PARAMETER :: unit_end = 500
+   LOGICAL :: unit_used(unit_start:unit_end) = .FALSE.
+
 
    !---------------------------------------------------------------------------
    ! [3.0] Variables used in MM5 part of code:

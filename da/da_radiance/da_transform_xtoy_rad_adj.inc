@@ -76,7 +76,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
       do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-         if (iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
             !---------------------------------------------------------------
             ! [1.0] assign tb = R^-1 Re :
             !---------------------------------------------------------------
@@ -281,14 +280,13 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
             call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
                xp%jme, i, j, dx, dy, dxm, dym, con_vars_ad(nprofiles)% ps)
 
-
             do iprof = 1, nprofiles
                deallocate (con_vars(iprof) % t)
                deallocate (con_vars(iprof) % q)
                deallocate (con_vars_ad(iprof) % t)
                deallocate (con_vars_ad(iprof) % q)
             end do        
-         end if   !  end endif for within_halo
+
       end do       !  end loop for pixels
 
       deallocate (zk)
