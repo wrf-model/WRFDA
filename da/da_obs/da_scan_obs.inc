@@ -24,7 +24,6 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 
    TYPE (multi_level_type)      :: platform
 
-   LOGICAL                      :: inside_halo
    LOGICAL                      :: outside, outside_all
 
    REAL                         :: height_error
@@ -251,7 +250,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
       END IF
 
       call da_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, inside_halo,outside_all )
+                        xp, outside, outside_all )
 
       IF(outside) THEN
          cycle reports

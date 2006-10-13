@@ -17,7 +17,6 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
 !
    INTEGER                      :: i, j, iost, fm
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: inside_halo
    LOGICAL                      :: outside
    REAL                         :: height_error
    INTEGER                      :: num_synop, &
@@ -164,7 +163,7 @@ loop_level: DO i = 1, platform%info%levels
       ENDDO loop_level
 !
 !      call DA_ll_to_xy (platform%info, platform%loc,   &
-!                        xp, outside, inside_halo )
+!                        xp, outside )
 !
 !      IF(outside) THEN
 !         cycle reports

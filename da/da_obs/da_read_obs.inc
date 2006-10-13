@@ -46,7 +46,6 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 
    TYPE (multi_level_type)      :: platform
 
-   LOGICAL                      :: inside_halo
    LOGICAL                      :: outside
    LOGICAL                      :: outside_all
    INTEGER                      :: surface_level
@@ -315,7 +314,7 @@ loop_level: DO i = 1, platform%info%levels
       ENDDO loop_level
 
       call da_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, inside_halo, outside_all )
+                        xp, outside, outside_all )
 
 
       IF(outside_all) THEN

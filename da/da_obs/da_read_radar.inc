@@ -26,7 +26,6 @@ subroutine da_read_radar (iunit, ob, xp, filename)
 
    TYPE (Radar_multi_level_type) :: platform
 
-   LOGICAL                       :: inside_halo
    LOGICAL                       :: outside
 
    INTEGER                       :: total_obs, num_Radar, total_Radar
@@ -217,7 +216,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
 
     ENDDO loop_level
 
-    call da_ll_to_xy (platform%info, platform%loc, xp, outside, inside_halo )
+    call da_ll_to_xy (platform%info, platform%loc, xp, outside )
 
     IF(outside) THEN
       cycle reports

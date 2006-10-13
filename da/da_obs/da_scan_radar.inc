@@ -24,7 +24,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
    CHARACTER (LEN = 120)         :: char_total_Radar
    CHARACTER (LEN = 120)         :: char_ned
 
-   LOGICAL                       :: outside, inside_halo
+   LOGICAL                       :: outside
    INTEGER                        ::n_dup, ndup
 
    if (trace_use) call da_trace_entry("da_scan_radar")
@@ -154,7 +154,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
 
     ENDDO loop_level
 
-      call da_ll_to_xy (platform%info, platform%loc, xp, outside, inside_halo )
+      call da_ll_to_xy (platform%info, platform%loc, xp, outside)
 
       IF(outside) THEN
          cycle reports

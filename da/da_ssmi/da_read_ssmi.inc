@@ -30,7 +30,7 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
    TYPE (count_obs_number_type) :: count_obs_ssmit
 
    LOGICAL                      :: isfilter,ipass 
-   LOGICAL                      :: outside, inside_halo
+   LOGICAL                      :: outside
    INTEGER                      :: irain, iprecip
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
@@ -186,7 +186,7 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_ll_to_xy (info, loc, xp, outside, inside_halo)
+      call da_ll_to_xy (info, loc, xp, outside)
 
       IF ( outside ) CYCLE reports
 
