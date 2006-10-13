@@ -56,7 +56,8 @@ MODULE da_wrfvar_top
 
 CONTAINS
 
-#include "da_wrfvar_init.inc"
+#include "da_wrfvar_init1.inc"
+#include "da_wrfvar_init2.inc"
 #include "da_wrfvar_run.inc"
 #include "da_wrfvar_finalize.inc"
 #include "da_wrfvar_interface.inc"
