@@ -220,7 +220,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter  :: ep_unit = 74        ! Ensemble perturbation input.
    INTEGER, PARAMETER :: max_num_of_var = 200 ! Maximum # of stored fields.
 
-   INTEGER, PARAMETER :: unit_start = 200
+   INTEGER, PARAMETER :: unit_start = 220
    INTEGER, PARAMETER :: unit_end = 500
    LOGICAL :: unit_used(unit_start:unit_end) = .FALSE.
 

@@ -309,7 +309,6 @@ while test $DATE -le $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/$DATE/obsproc
       mkdir -p $RUN_DIR
 
-      export DA_OBSERVATIONS=$OB_DIR/$DATE/ob.ascii
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
