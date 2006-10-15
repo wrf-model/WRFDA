@@ -42,6 +42,18 @@ fi
 if test -d /data7/da/bray/mpich/mpich-1.2.7p1_${FC}; then
    export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${FC}
 fi
+if test -d /data7/da/bray/blas/blas_${FC}; then
+   export BLAS=/data7/da/bray/blas/blas_${FC}
+fi
+if test -d /data7/da/bray/lapack/lapack_${FC}; then
+   export LAPACK=/data7/da/bray/lapack/lapack_${FC}
+fi
+if test -d /data7/da/bray/fftpack5/fftpack5_${FC}; then
+   export FFTPACK5=/data7/da/bray/fftpack5/fftpack5_${FC}
+fi
+if test -d /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}; then
+   export BUFR=/data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
+fi
 if test -d /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}; then
    export MAKEDEPF90=/data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}
 fi
