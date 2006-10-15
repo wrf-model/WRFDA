@@ -132,6 +132,18 @@ fi
 if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}; then
    export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
 fi
+if test -d /Volumes/$MACHINE/bray/tools/blas_${FC}; then
+   export BLAS=/Volumes/$MACHINE/bray/tools/blas_${FC}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/lapack_${FC}; then
+   export lapack=/Volumes/$MACHINE/bray/tools/lapack_${FC}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/fftpack5_${FC}; then
+   export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
+fi
+if test -d /Volumes/$MACHINE/bray/tools/burf_ncep_nco_${FC}; then
+   export BUFR=/Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}
+fi
 if test -d  /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}; then
    export MAKEDEPF90=/Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}
 fi
