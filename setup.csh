@@ -63,6 +63,18 @@ endif
 if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${FC}) then
    setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${FC}
 endif
+if (-d /data7/da/bray/blas/blas_${FC}) then
+   setenv BLAS /data7/da/bray/blas/blas_${FC}
+endif
+if (-d /data7/da/bray/lapack/lapack_${FC}) then
+   setenv lapack /data7/da/bray/lapack/lapack_${FC}
+endif
+if (-d /data7/da/bray/fftpack5/fftpack5_${FC}) then
+   setenv FFTPACK5 /data7/da/bray/fftpack5/fftpack5_${FC}
+endif
+if (-d /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
+   setenv BUFR /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
+endif
 if (-d /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}) then
    setenv MAKEDEPF90 /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}
 endif
@@ -146,6 +158,18 @@ if (-d /Volumes/$MACHINE/bray/tools/crtm_${FC}) then
 endif
 if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}) then
    setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/blas_${FC}) then
+   setenv BLAS /Volumes/$MACHINE/bray/tools/blas_${FC}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/lapack_${FC}) then
+   setenv LAPACK /Volumes/$MACHINE/bray/tools/lapack_${FC}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/fftpack5_${FC}) then
+   setenv FFTPACK5 /Volumes/$MACHINE/bray/tools/fftpack5_${FC}
+endif
+if (-d /Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}) then
+   setenv BUFR /Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}
 endif
 if (-d /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}) then
    setenv MAKEDEPF90 /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}
