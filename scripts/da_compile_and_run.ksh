@@ -47,8 +47,7 @@ for CONFIG in $CONFIGS; do
         svn update #>/dev/null 2>&1
         svn status
 	if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
-#        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
-        echo $OPTION | ./configure_new $TARGET
+        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
         rm -f build/links
         ./compile_new $TARGET > compile.out 2>&1
         ls -l build/wrfvar.exe
