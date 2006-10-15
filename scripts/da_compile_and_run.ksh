@@ -14,6 +14,16 @@ export CONFIGS=${CONFIGS:-rsl}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
 
+echo "ID        $ID"
+echo "COMPILE   $COMPILE"
+echo "FULL      $FULL"
+echo "TARGETS   $TARGETS"
+echo "COMPILERS $COMPILERS"
+echo "RUN       $RUN"
+echo "CLEAN     $CLEAN"
+echo "REGIONS   $REGIONS"
+echo "PROCS     $PROCS"
+
 ###########
 # Compiling
 ###########
@@ -33,12 +43,15 @@ for CONFIG in $CONFIGS; do
       for TARGET in $TARGETS; do
         echo "Compiling ${BUILD}/$TARGET"
         cd ~bray/${BUILD}/$TARGET
-        . ./setup.ksh $COMPILER
+        . ./setup.ksh $COMPILER >/dev/null
         svn update #>/dev/null 2>&1
-        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
-        if $FULL; then ./clean_new -a; fi
+        svn status
+	if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
+#        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+        echo $OPTION | ./configure_new $TARGET
         rm -f build/links
         ./compile_new $TARGET > compile.out 2>&1
+        ls -l build/wrfvar.exe
       done
       let COUNT=$COUNT+1
     fi
@@ -50,7 +63,7 @@ for CONFIG in $CONFIGS; do
             echo "Skipping parallel runs of serial code"
           else
             cd ~bray/data/$REGION
-            . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER
+            . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER >/dev/null
             echo "Testing $BUILD $TARGET on $REGION"
             if test $TARGET = be; then
               ./gen_be.ksh
