@@ -199,3 +199,12 @@ echo "LAPACK      " $LAPACK
 echo "FFTPACK5    " $FFTPACK5
 echo "BUFR        " $BUFR
 echo "MAKEDEPF90  " $MAKEDEPF90
+ls -l $MPICH/lib/*.a
+ls -l $RTTOV/lib/*.a
+ls -l $CRTM/lib/*.a
+ls -l $NETCDF/lib/*.a
+ls -l $BLAS/*.a
+ls -l $LAPACK/*.a
+ls -l $FFTPACK5/*.a
+ls -l $BUFR/*.a
+ls -l $MAKEDEPF90/makedepf90
