@@ -53,7 +53,6 @@ fi
 
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
-export ENDIAN=${ENDIAN:-big_endian}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
@@ -215,15 +214,6 @@ if test ! -f $DA_ANALYSIS; then
    for FILE in $OB_DIR/$DATE/*.bufr; do
       if test -f $FILE; then
          ln -s $FILE .
-      fi
-   done
-
-   # Overwrite with specific endian files if available
-
-   for FILE in $OB_DIR/$DATE/*.$ENDIAN; do 
-      if test -f $FILE; then
-         FILE1=`basename $FILE`
-         ln -sf $FILE ${FILE1%%.$ENDIAN}
       fi
    done
 
