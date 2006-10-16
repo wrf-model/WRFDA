@@ -180,7 +180,7 @@ if ( $MACHINE == "gold.us.cray.com" ) then
 endif
 
 setenv MPIHOME $MPICH
-setenv PATH    $MPICH/bin:$MAKEDEPF90:$PATH
+setenv PATH    ${MPICH}/bin:${MAKEDEPF90}:${PATH}
 
 if ($FC == 'g95') then
    setenv G95_ENDIAN         BIG

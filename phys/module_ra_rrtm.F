@@ -6617,8 +6617,8 @@ IMPLICIT NONE
       ENDIF
       CALL wrf_dm_bcast_bytes ( rrtm_unit , IWORDSIZE )
       IF ( rrtm_unit < 0 ) THEN
-        CALL wrf_error_fatal ( &
-           'Can not find unused fortran unit to read in lookup table.' )
+        CALL wrf_error_fatal ( 'module_ra_rrtm: rrtm_lookuptable: Can not '// &
+                               'find unused fortran unit to read in lookup table.' )
       ENDIF
 
 ! start data 1
@@ -6636,9 +6636,11 @@ IMPLICIT NONE
 !  g-points, or sub-intervals, per band.  These data are combined and            
 !  weighted using a mapping procedure in routine RRTMINIT to reduce              
 !  the total number of g-points from 256 to 140 for use in the CCM.              
-! ************************************************************************** 
+! **************************************************************************     
+#ifdef G95
 ! JRB hardwire unit to 98 to ensure it is read big endian by g95
-      rrtm_unit=98    
+      rrtm_unit=98
+#endif
         IF ( wrf_dm_on_monitor() ) THEN
           OPEN(rrtm_unit,FILE='RRTM_DATA',                  &
                FORM='UNFORMATTED',STATUS='OLD',ERR=9009)

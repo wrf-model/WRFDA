@@ -1067,7 +1067,7 @@ END SUBROUTINE wrf_get_nprocy
 SUBROUTINE wrf_dm_bcast_bytes ( buf , size )
    USE module_dm
    IMPLICIT NONE
-      INCLUDE 'mpif.h'
+   INCLUDE 'mpif.h'
    INTEGER size
 #ifndef NEC
    INTEGER*1 BUF(size)
@@ -2083,7 +2083,7 @@ END
 
    SUBROUTINE force_domain_em_part2 ( grid, ngrid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
                  )
       USE module_domain
@@ -2093,7 +2093,7 @@ END
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
@@ -2109,18 +2109,6 @@ END
       INTEGER       ::          ids, ide, jds, jde, kds, kde,    &
                                 ims, ime, jms, jme, kms, kme,    &
                                 ips, ipe, jps, jpe, kps, kpe
-integer myproc
-
-#ifdef DEREF_KLUDGE
-!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
-   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
-#endif
-#include "deref_kludge.h"
-
-#define COPY_IN
-#include <em_scalar_derefs.inc>
 
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
@@ -2143,10 +2131,7 @@ integer myproc
 #include "HALO_EM_FORCE_DOWN.inc"
 
       ! code here to interpolate the data into the nested domain
-#include "em_nest_forcedown_interp.inc"
-
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
+#  include "em_nest_forcedown_interp.inc"
 
       RETURN
    END SUBROUTINE force_domain_em_part2
@@ -2155,7 +2140,7 @@ integer myproc
 
    SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, ngrid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
                  )
       USE module_domain
@@ -2167,7 +2152,7 @@ integer myproc
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
@@ -2190,9 +2175,6 @@ integer myproc
       CALL wrf_get_dm_communicator ( local_comm )
       CALL wrf_get_myproc( myproc )
       CALL wrf_get_nproc( nproc )
-
-#define COPY_IN
-#include <em_scalar_derefs.inc>
 
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
@@ -2222,8 +2204,6 @@ integer myproc
 
       CALL rsl_lite_bcast_msgs( myproc, nproc, local_comm )
 
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
       RETURN
    END SUBROUTINE interp_domain_em_part1
 
@@ -2231,7 +2211,7 @@ integer myproc
 
    SUBROUTINE interp_domain_em_part2 ( grid, ngrid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
                  )
       USE module_domain
@@ -2241,7 +2221,7 @@ integer myproc
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
@@ -2260,16 +2240,6 @@ integer myproc
       INTEGER myproc
       INTEGER ierr
 
-#ifdef DEREF_KLUDGE
-!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
-   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
-#endif
-#include "deref_kludge.h"
-
-#define COPY_IN
-#include <em_scalar_derefs.inc>
       CALL get_ijk_from_grid (  grid ,                   &
                                 cids, cide, cjds, cjde, ckds, ckde,    &
                                 cims, cime, cjms, cjme, ckms, ckme,    &
@@ -2290,10 +2260,7 @@ integer myproc
 
 #include "HALO_EM_INTERP_DOWN.inc"
 
-#include "em_nest_interpdown_interp.inc"
-
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
+#  include "em_nest_interpdown_interp.inc"
 
       RETURN
    END SUBROUTINE interp_domain_em_part2
@@ -2302,7 +2269,7 @@ integer myproc
 
    SUBROUTINE feedback_nest_prep ( grid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
 )
       USE module_domain
@@ -2315,7 +2282,7 @@ integer myproc
       TYPE (grid_config_rec_type) :: config_flags ! configureation flags, has vertical dim of 
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
 
       INTEGER       ::          ids, ide, jds, jde, kds, kde,    &
@@ -2324,17 +2291,6 @@ integer myproc
 
       INTEGER       :: idum1, idum2
 
-
-#ifdef DEREF_KLUDGE
-!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
-   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
-#endif
-#include "deref_kludge.h"
-
-#define COPY_IN
-#include <em_scalar_derefs.inc>
 
       CALL get_ijk_from_grid (  grid ,              &
                                 ids, ide, jds, jde, kds, kde,    &
@@ -2345,16 +2301,13 @@ integer myproc
 #include "HALO_EM_INTERP_UP.inc"
 #endif
 
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
-
    END SUBROUTINE feedback_nest_prep
 
 !------------------------------------------------------------------
 
    SUBROUTINE feedback_domain_em_part1 ( grid, ngrid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
                  )
       USE module_domain
@@ -2364,7 +2317,7 @@ integer myproc
 !
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
@@ -2379,17 +2332,10 @@ integer myproc
                                 nips, nipe, njps, njpe, nkps, nkpe
       INTEGER local_comm, myproc, nproc, idum1, idum2
 
-#ifdef DEREF_KLUDGE
-!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
-   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
-#endif
-
       INTERFACE
           SUBROUTINE feedback_nest_prep ( grid, config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
 )
              USE module_domain
@@ -2399,18 +2345,15 @@ integer myproc
 !
              TYPE (grid_config_rec_type)            :: config_flags
              TYPE(domain), TARGET                   :: grid
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
           END SUBROUTINE feedback_nest_prep
       END INTERFACE
 !
-#define COPY_IN
-#include <em_scalar_derefs.inc>
 
       CALL wrf_get_dm_communicator ( local_comm )
       CALL wrf_get_myproc( myproc )
       CALL wrf_get_nproc( nproc )
-
 
 !
 ! intermediate grid
@@ -2442,10 +2385,10 @@ integer myproc
       CALL set_scalar_indices_from_config ( ngrid%id , idum1 , idum2 )
       xgrid => grid
       grid => ngrid
-#include "deref_kludge.h"
+
       CALL feedback_nest_prep ( grid, nconfig_flags ,  &
 !
-#include "em_actual_args.inc"
+#include "em_actual_new_args.inc"
 !
 )
 
@@ -2458,8 +2401,6 @@ integer myproc
 
 #include "em_nest_feedbackup_interp.inc"
 
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
       RETURN
    END SUBROUTINE feedback_domain_em_part1
 
@@ -2467,7 +2408,7 @@ integer myproc
 
    SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid, ngrid , config_flags ,  &
 !
-#include "em_dummy_args.inc"
+#include "em_dummy_new_args.inc"
 !
                  )
       USE module_domain
@@ -2481,7 +2422,7 @@ integer myproc
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
 
-#include <em_dummy_decl.inc>
+#include <em_dummy_new_decl.inc>
 #include "namelist_defines2.inc"
 #include <em_i1_decl.inc>
       INTEGER nlev, msize
@@ -2506,16 +2447,6 @@ integer myproc
       integer ierr
 
       LOGICAL, EXTERNAL  :: em_cd_feedback_mask
-#ifdef DEREF_KLUDGE
-!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x
-   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y
-#endif
-#include "deref_kludge.h"
-
-#define COPY_IN
-#include <em_scalar_derefs.inc>
 
 ! On entry to this routine, 
 !  "grid" refers to the parent domain
@@ -2583,8 +2514,6 @@ integer myproc
 
 #include "em_nest_feedbackup_smooth.inc"
 
-#define COPY_OUT
-#include <em_scalar_derefs.inc>
       RETURN
    END SUBROUTINE feedback_domain_em_part2
 #endif
@@ -3183,7 +3112,7 @@ integer myproc
                                 ierr )
    USE module_dm
    IMPLICIT NONE
-      INCLUDE 'mpif.h'
+   INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
@@ -3212,7 +3141,7 @@ integer myproc
                                 ierr )
    USE module_dm
    IMPLICIT NONE
-      INCLUDE 'mpif.h'
+   INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
@@ -3240,7 +3169,7 @@ integer myproc
                                 communicator                , &    ! communicator
                                 ierr )
    IMPLICIT NONE
-      INCLUDE 'mpif.h'
+   INCLUDE 'mpif.h'
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
