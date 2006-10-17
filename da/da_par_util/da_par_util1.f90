@@ -6,7 +6,6 @@
 
 MODULE da_par_util1
 
-   USE module_wrf_error
    USE da_constants
 
    !---------------------------------------------------------------------------

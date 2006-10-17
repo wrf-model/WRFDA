@@ -13,19 +13,15 @@ subroutine da_transform_xtoy_profiler ( xa, iv, xp, y )
    REAL                         :: dy, dym  !
    
    IF ( iv%num_profiler > 0 ) THEN
-
       do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
-
-       if(iv%profiler(n)%loc%proc_domain_with_halo) then
-
-!xyh         y%profiler(n)%u(:) = 0.0
-!xyh         y%profiler(n)%v(:) = 0.0
+         !xyh y%profiler(n)%u(:) = 0.0
+         !xyh y%profiler(n)%v(:) = 0.0
 
          k = iv % profiler(n) % info % levels
  
          if ( k < 1 ) cycle
 
-!        [1.3] Get horizontal interpolation weights:
+         ! [1.3] Get horizontal interpolation weights:
 
          i = iv%profiler(n)%loc%i
          dy = iv%profiler(n)%loc%dy
@@ -34,7 +30,7 @@ subroutine da_transform_xtoy_profiler ( xa, iv, xp, y )
          dx = iv%profiler(n)%loc%dx
          dxm = iv%profiler(n)%loc%dxm
 
-!        [1.4] Interpolate horizontally:
+         ! [1.4] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             y%profiler(n)%u, k, iv%profiler(n)%zk, k)
@@ -46,10 +42,7 @@ subroutine da_transform_xtoy_profiler ( xa, iv, xp, y )
          call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%profiler(n)%v(1), k, iv%profiler(n)%zk(1), k)
 #endif
-       endif
-
       end do
-
    ENDIF
 
 end subroutine da_transform_xtoy_profiler 

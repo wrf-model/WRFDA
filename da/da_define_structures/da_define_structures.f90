@@ -4,13 +4,10 @@ module da_define_structures
     use module_dm       ! for rsl definitions
     use da_tracing
     use da_reporting
-    use module_wrf_error
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Collection of routines to define and allocate structures.
    !---------------------------------------------------------------------------
-
-   use da_constants
 
    IMPLICIT NONE
    
@@ -93,7 +90,7 @@ module da_define_structures
       real                    :: dy
       real                    :: dym
       logical                 :: proc_domain
-      logical                 :: proc_domain_with_halo
+!      logical                 :: proc_domain_with_halo
       ! obs_global_index is the original index of this obs in the serial 
       ! code.  It is used to reassemble obs in serial-code-order to replicate 
       ! summation order for bitwise-exact testing of distributed-memory 
@@ -451,6 +448,7 @@ module da_define_structures
       CHARACTER(LEN=20)    :: rttovid_string
       INTEGER              :: num_rad, nchan, nlevels
       INTEGER ,  pointer   :: ichan(:)
+      INTEGER ,  pointer   :: proc_domain(:)
       TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type
    END TYPE instid_type
 

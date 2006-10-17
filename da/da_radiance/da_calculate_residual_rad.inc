@@ -31,14 +31,12 @@ subroutine da_calculate_residual_rad( iv, y, re,                 &
       n_obs_bad % rad % num = number(0, 0, 0)
 
       DO n=1, iv%instid(i)%num_rad
-         if (iv%instid(i)%rad(n)%loc%proc_domain_with_halo) then
-            do k=1, iv%instid(i)%nchan
-               np_available = np_available + iv%instid(i)%nchan
-               re%instid(i)%rad(n)%tb(k) = da_residual( n, k, &
-                  y%instid(i)%rad(n)%tb(k), &
-                  iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
-            end do
-         endif
+         do k=1, iv%instid(i)%nchan
+            np_available = np_available + iv%instid(i)%nchan
+            re%instid(i)%rad(n)%tb(k) = da_residual( n, k, &
+               y%instid(i)%rad(n)%tb(k), &
+               iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
+         end do
       END DO
    END DO
 

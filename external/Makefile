@@ -11,10 +11,6 @@ clean :
 	@ ( cd ioapi_share ;  make clean )
 	@ ( cd RSL/RSL ; make clean )
 	@ ( cd RSL_LITE ; make clean )
-	@ ( cd lapack ; make clean )
-	@ ( cd fftpack5 ; make clean )
-	@ ( cd lapack ; make clean )
-	@ ( cd bufr_ncep_nco ; make clean )
 
 superclean :
 	@ ( cd esmf_time_f90 ;  make superclean )
@@ -29,9 +25,5 @@ superclean :
 	@ ( cd ioapi_share ;  make superclean )
 	@ ( cd RSL/RSL ; make superclean )
 	@ ( cd RSL_LITE ; make superclean )
-	@ ( cd lapack ; make superclean )
-	@ ( cd fftpack5 ; make superclean )
-	@ ( cd lapack ; make superclean )
-	@ ( cd bufr_ncep_nco ; make superclean )
 
 

@@ -17,13 +17,11 @@ subroutine da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y )
 
    IF (iv%num_GPSRef > 0) THEN
       DO n=1, iv%num_GPSRef
-         if (iv%gpsref(n)%loc%proc_domain_with_halo) then
-            do k=1, iv%gpsref(n)%info%levels
-               jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
-                                      ( iv%GPSRef(n)%ref(k)%error * &
-                                        iv%GPSRef(n)%ref(k)%error )
-            end do
-         endif
+         do k=1, iv%gpsref(n)%info%levels
+            jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
+                                   ( iv%GPSRef(n)%ref(k)%error * &
+                                     iv%GPSRef(n)%ref(k)%error )
+         end do
 
          if (iv%gpsref(n)%loc%proc_domain) then
             do k=1, iv%gpsref(n)%info%levels

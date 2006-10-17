@@ -21,7 +21,7 @@ SUBROUTINE da_system_4dvar( cmd_line_in )
 #else
    cmd_line = cmd_line_in // " other"
 #endif
-   CALL system( cmd_line )
+   CALL da_system( cmd_line )
 #ifdef DM_PARALLEL
    call mpi_barrier ( comm, ierr )
 #endif

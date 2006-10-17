@@ -28,25 +28,23 @@ subroutine da_calculate_jo_and_grady_airsr( iv, re, jo, jo_grad_y )
    IF ( iv%num_airsr < 0 ) RETURN
 
   DO n=1, iv%num_airsr
-    if( iv%airsr(n)%loc%proc_domain_with_halo ) then
+    do k=1, iv%airsr(n)%info%levels
+      jo_grad_y%airsr(n)%t(k) = -re%airsr(n)%t(k) / &
+                                   ( iv%airsr(n)%t(k)%error * &
+                                     iv%airsr(n)%t(k)%error )
+      jo_grad_y%airsr(n)%q(k) = -re%airsr(n)%q(k) / &
+                                   ( iv%airsr(n)%q(k)%error * &
+                                     iv%airsr(n)%q(k)%error )
+    end do
+
+    if( iv%airsr(n)%loc%proc_domain ) then
       do k=1, iv%airsr(n)%info%levels
-        jo_grad_y%airsr(n)%t(k) = -re%airsr(n)%t(k) / &
-                                     ( iv%airsr(n)%t(k)%error * &
-                                       iv%airsr(n)%t(k)%error )
-        jo_grad_y%airsr(n)%q(k) = -re%airsr(n)%q(k) / &
-                                     ( iv%airsr(n)%q(k)%error * &
-                                       iv%airsr(n)%q(k)%error )
+         jo % airsr_t = jo % airsr_t - &
+                      re%airsr(n)%t(k) * jo_grad_y%airsr(n)%t(k)
+         jo % airsr_q = jo % airsr_q - &
+                      re%airsr(n)%q(k) * jo_grad_y%airsr(n)%q(k)
       end do
     endif
-
-      if( iv%airsr(n)%loc%proc_domain ) then
-        do k=1, iv%airsr(n)%info%levels
-           jo % airsr_t = jo % airsr_t - &
-                        re%airsr(n)%t(k) * jo_grad_y%airsr(n)%t(k)
-           jo % airsr_q = jo % airsr_q - &
-                        re%airsr(n)%q(k) * jo_grad_y%airsr(n)%q(k)
-        end do
-      endif
   END DO
 
   jo % airsr_t = 0.5 * jo % airsr_t

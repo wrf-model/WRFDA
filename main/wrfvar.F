@@ -17,14 +17,24 @@ PROGRAM wrfvar
 
   IMPLICIT NONE
 
-  !--Initialize WRFVAR
-  CALL da_wrfvar_init
+   ! Split initialisation into 2 parts so we can start and stop trace here
 
-  !--WRFVAR Calls integrate().  
-  CALL da_wrfvar_run
+   CALL da_wrfvar_init1
 
-  !--WRFVAR clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
-  CALL da_wrfvar_finalize
+   IF (trace_use) call da_trace_init
+   IF (trace_use) call da_trace_entry("wrfvar")
+
+   CALL da_wrfvar_init2
+
+   CALL da_wrfvar_run
+
+   CALL da_wrfvar_finalize
+
+   IF (trace_use) call da_trace_exit("wrfvar")
+   IF (trace_use) call da_trace_report
+
+   call WRFU_Finalize
+   call wrf_shutdown
 
 END PROGRAM wrfvar
 

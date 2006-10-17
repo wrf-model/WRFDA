@@ -49,9 +49,9 @@ echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 
 date
 
-export START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export START_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
 let OFFSET=$FCST_RANGE+$WINDOW_START 
-export END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $OFFSET 2>/dev/null`
 
 echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
 echo "DATE          $DATE"
@@ -154,7 +154,7 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL
          export L_DAY=`echo $LOCAL_DATE | cut -c7-8`
          export L_HOUR=`echo $LOCAL_DATE | cut -c9-10`
          echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
-         LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
+         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
       done
    else
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
@@ -162,7 +162,7 @@ if test ! -f $RC_DIR/$DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL
       FILES=''
       while test $LOCAL_DATE -le $END_DATE; do
          FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-         LOCAL_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
       done
       $WPS_DIR/link_grib.csh $FILES
       $WPS_DIR/geogrid.exe

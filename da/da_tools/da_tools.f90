@@ -9,7 +9,6 @@ MODULE da_tools
    USE da_constants
    USE da_define_structures
    USE lapack
-   USE module_wrf_error
    use da_reporting
    
    IMPLICIT NONE
@@ -43,6 +42,8 @@ CONTAINS
 #include "da_unifva.inc"
 #include "da_xyll.inc"
 #include "da_oi.inc"
+#include "da_get_unit.inc"
+#include "da_free_unit.inc"
 
 #include "da_eof_decomposition_test.inc"
 #include "da_eof_decomposition.inc"

@@ -22,7 +22,6 @@ subroutine da_calculate_residual_synop( oi, y, re,                        &
     n_obs_bad % q % num = number(0, 0, 0)
 
     DO n=1, oi%num_synop
-      if( oi%synop(n)%loc%proc_domain_with_halo ) then
         np_available = np_available + 5
 
         re%synop(n)%u = da_residual( n, 0, y%synop(n)%u, &
@@ -35,7 +34,6 @@ subroutine da_calculate_residual_synop( oi, y, re,                        &
                                   oi%synop(n)%p, n_obs_bad % p )
         re%synop(n)%q = da_residual( n, 0, y%synop(n)%q, &
                                   oi%synop(n)%q, n_obs_bad % q )
-      endif
     END DO
 
     np_missing = np_missing + n_obs_bad % u % num % miss + &

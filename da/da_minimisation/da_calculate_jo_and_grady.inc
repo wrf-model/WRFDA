@@ -16,6 +16,8 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
                                    jo_radiance, jo_airsr
    integer                      :: i,k
 
+   if (trace_use) call da_trace_entry("da_calculate_jo_and_grady")
+
    !-------------------------------------------------------------------------
    ! [1.0] Compute components of Grad_y(Jo):
    !-------------------------------------------------------------------------
@@ -245,6 +247,8 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
          'jo_airsr =', jo_airsr          
 
    endif
+
+   if (trace_use) call da_trace_exit("da_calculate_jo_and_grady")
 
 end subroutine da_calculate_jo_and_grady
 

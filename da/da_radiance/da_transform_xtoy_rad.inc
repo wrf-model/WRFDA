@@ -82,127 +82,120 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
       do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-         if (iv%instid(inst)%rad(n)%loc%proc_domain_with_halo) then
-            model_t(:) = 0.0
-            model_q(:) = 0.0
-            model_mr(:)= 0.0
-            model_t2m  = 0.0
-            model_q2m  = 0.0
-            model_mr2m  = 0.0
-            model_ts   = 0.0
-            model_u10  = 0.0
-            model_v10  = 0.0
-            model_psfc = 0.0
+         model_t(:) = 0.0
+         model_q(:) = 0.0
+         model_mr(:)= 0.0
+         model_t2m  = 0.0
+         model_q2m  = 0.0
+         model_mr2m  = 0.0
+         model_ts   = 0.0
+         model_u10  = 0.0
+         model_v10  = 0.0
+         model_psfc = 0.0
 
-            !        [1.1] Get horizontal interpolation weights:
+         !        [1.1] Get horizontal interpolation weights:
 
-            i = iv%instid(inst)%rad(n)%loc%i
-            j = iv%instid(inst)%rad(n)%loc%j
-            dx = iv%instid(inst)%rad(n)%loc%dx
-            dy = iv%instid(inst)%rad(n)%loc%dy
-            dxm = iv%instid(inst)%rad(n)%loc%dxm
-            dym = iv%instid(inst)%rad(n)%loc%dym
+         i = iv%instid(inst)%rad(n)%loc%i
+         j = iv%instid(inst)%rad(n)%loc%j
+         dx = iv%instid(inst)%rad(n)%loc%dx
+         dy = iv%instid(inst)%rad(n)%loc%dy
+         dxm = iv%instid(inst)%rad(n)%loc%dxm
+         dym = iv%instid(inst)%rad(n)%loc%dym
 
-            do k=1, num_levs
-               zk(k)  =  iv%instid(inst)%rad(n)%zk(k) 
-            enddo
+         do k=1, num_levs
+            zk(k)  =  iv%instid(inst)%rad(n)%zk(k) 
+         enddo
 
-            ! [1.2] Interpolate horizontally to ob:
+         ! [1.2] Interpolate horizontally to ob:
 
-            call da_interp_lin_3d( xa%t, xp, i, j, dx, dy, dxm, dym, &
-                                 model_t, max_ob_levels, zk, num_levs )
-            call da_interp_lin_3d( xa%q, xp, i, j, dx, dy, dxm, dym, &
-                                 model_q, max_ob_levels, zk, num_levs )
+         call da_interp_lin_3d( xa%t, xp, i, j, dx, dy, dxm, dym, &
+                              model_t, max_ob_levels, zk, num_levs )
+         call da_interp_lin_3d( xa%q, xp, i, j, dx, dy, dxm, dym, &
+                              model_q, max_ob_levels, zk, num_levs )
 
-            do k=1, num_levs
-               IF ( zk(k) <= 0.0 ) THEN
-                  model_t(k)  = 0.  !coefs(inst) % ref_prfl_t(k,gas_id_watervapour)
-                  model_mr(k) = 0.  !coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
-               ELSE
-                  ! model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv 
-                  model_mr(k) = model_q(k) * q2ppmv
-                  ! call rttov_q2v ( &
-                  !    gas_unit_specconc,  &! in
-                  !    model_q(k),         &! in
-                  !    gas_id_watervapour, &! in
-                  !    model_q(k),         &! in
-                  !    model_mr(k)     )    ! inout
-               END IF
-            end do
+         do k=1, num_levs
+            IF ( zk(k) <= 0.0 ) THEN
+               model_t(k)  = 0.  !coefs(inst) % ref_prfl_t(k,gas_id_watervapour)
+               model_mr(k) = 0.  !coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
+            ELSE
+               ! model_mr(k) = model_q(k) * 1.60771704e+6 ! convert q(kg/kg) to ppmv 
+               model_mr(k) = model_q(k) * q2ppmv
+               ! call rttov_q2v ( &
+               !    gas_unit_specconc,  &! in
+               !    model_q(k),         &! in
+               !    gas_id_watervapour, &! in
+               !    model_q(k),         &! in
+               !    model_mr(k)     )    ! inout
+            END IF
+         end do
 
 
-            call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                                i, j, dx, dy, dxm, dym, &
-                                model_psfc )
+         call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+                             i, j, dx, dy, dxm, dym, &
+                             model_psfc )
 
-            model_psfc = 0.01*model_psfc  ! convert to hPa 
+         model_psfc = 0.01*model_psfc  ! convert to hPa 
 
-            do iprof = 1, nprofiles
-               con_vars(iprof) % nlevels = num_levs 
-               con_vars_tl(iprof) % nlevels = num_levs
+         do iprof = 1, nprofiles
+            con_vars(iprof) % nlevels = num_levs 
+            con_vars_tl(iprof) % nlevels = num_levs
 
-               allocate (con_vars(iprof) % t(num_levs))
-               allocate (con_vars(iprof) % q(num_levs))
-               allocate (con_vars_tl(iprof) % t(num_levs))
-               allocate (con_vars_tl(iprof) % q(num_levs))
+            allocate (con_vars(iprof) % t(num_levs))
+            allocate (con_vars(iprof) % q(num_levs))
+            allocate (con_vars_tl(iprof) % t(num_levs))
+            allocate (con_vars_tl(iprof) % q(num_levs))
 
-               con_vars_tl(iprof) % t(1:num_levs) = model_t  (1:num_levs)
-               con_vars_tl(iprof) % q(1:num_levs) = model_mr (1:num_levs)
-               con_vars_tl(iprof) % ps            = model_psfc
+            con_vars_tl(iprof) % t(1:num_levs) = model_t  (1:num_levs)
+            con_vars_tl(iprof) % q(1:num_levs) = model_mr (1:num_levs)
+            con_vars_tl(iprof) % ps            = model_psfc
 
-               aux_vars_tl(iprof) % t2m = model_t2m
-               aux_vars_tl(iprof) % q2m = model_mr2m
-               aux_vars_tl(iprof) % u10 = model_u10
-               aux_vars_tl(iprof) % v10 = model_v10
+            aux_vars_tl(iprof) % t2m = model_t2m
+            aux_vars_tl(iprof) % q2m = model_mr2m
+            aux_vars_tl(iprof) % u10 = model_u10
+            aux_vars_tl(iprof) % v10 = model_v10
 
-               aux_vars_tl(iprof) % surftype = iv%instid(inst)%rad(n)%landsea_mask 
-               aux_vars_tl(iprof) % surft   = model_ts
-               ! aux_vars_tl(iprof) % fastem(:) = 0.
+            aux_vars_tl(iprof) % surftype = iv%instid(inst)%rad(n)%landsea_mask 
+            aux_vars_tl(iprof) % surft   = model_ts
+            ! aux_vars_tl(iprof) % fastem(:) = 0.
 
-               aux_vars_tl(iprof) % satzen  = iv%instid(inst)%rad(n)%satzen
-               aux_vars_tl(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
+            aux_vars_tl(iprof) % satzen  = iv%instid(inst)%rad(n)%satzen
+            aux_vars_tl(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
 
-               con_vars(iprof) % t(:) = iv%instid(inst)%rad(n)%t (:)
-               con_vars(iprof) % q(:) = iv%instid(inst)%rad(n)%mr(:)
-               con_vars(iprof) % ps   = iv%instid(inst)%rad(n)%ps 
+            con_vars(iprof) % t(:) = iv%instid(inst)%rad(n)%t (:)
+            con_vars(iprof) % q(:) = iv%instid(inst)%rad(n)%mr(:)
+            con_vars(iprof) % ps   = iv%instid(inst)%rad(n)%ps 
 
-               aux_vars(iprof) % t2m = iv%instid(inst)%rad(n)%t2m
-               aux_vars(iprof) % q2m = iv%instid(inst)%rad(n)%mr2m
-               aux_vars(iprof) % u10 = iv%instid(inst)%rad(n)%u10
-               aux_vars(iprof) % v10 = iv%instid(inst)%rad(n)%v10
+            aux_vars(iprof) % t2m = iv%instid(inst)%rad(n)%t2m
+            aux_vars(iprof) % q2m = iv%instid(inst)%rad(n)%mr2m
+            aux_vars(iprof) % u10 = iv%instid(inst)%rad(n)%u10
+            aux_vars(iprof) % v10 = iv%instid(inst)%rad(n)%v10
 
-               aux_vars(iprof) % surftype = iv%instid(inst)%rad(n)%landsea_mask
-               aux_vars(iprof) % surft    = iv%instid(inst)%rad(n)%ts
-               ! aux_vars(iprof) % fastem(:) = 0.
+            aux_vars(iprof) % surftype = iv%instid(inst)%rad(n)%landsea_mask
+            aux_vars(iprof) % surft    = iv%instid(inst)%rad(n)%ts
+            ! aux_vars(iprof) % fastem(:) = 0.
 
-               aux_vars(iprof) % satzen  = iv%instid(inst)%rad(n)%satzen
-               aux_vars(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
-            end do
+            aux_vars(iprof) % satzen  = iv%instid(inst)%rad(n)%satzen
+            aux_vars(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
+         end do
 
-            ! [1.3] Call RTM TL model
+         ! [1.3] Call RTM TL model
 
-            call da_rttov_tl (inst, nchanl, nprofiles, con_vars, aux_vars, &
-                                     con_vars_tl, aux_vars_tl, tb )
+         call da_rttov_tl (inst, nchanl, nprofiles, con_vars, aux_vars, &
+                                  con_vars_tl, aux_vars_tl, tb )
 
-            do iprof = 1, nprofiles
-               deallocate (con_vars(iprof) % t)
-               deallocate (con_vars(iprof) % q)
-               deallocate (con_vars_tl(iprof) % t)
-               deallocate (con_vars_tl(iprof) % q)
-            end do
-            !-------------------------------------------------------------------
-            ! [2.0] assign Hdx :
-            !-------------------------------------------------------------------
-            iscan = iv%instid(inst)%rad(n)%scanpos
-            do k = 1, nchanl
-               !if (lbiascorr) then
-               !   y%instid(inst)%rad(n)%tb(k) = satinfo(inst)%b(iscan+1,k) * &
-               !      tb(nprofiles,k)
-               !else
-                  y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
-               !end if
-            end do
-         end if   !  end endif for within_halo
+         do iprof = 1, nprofiles
+            deallocate (con_vars(iprof) % t)
+            deallocate (con_vars(iprof) % q)
+            deallocate (con_vars_tl(iprof) % t)
+            deallocate (con_vars_tl(iprof) % q)
+         end do
+         !-------------------------------------------------------------------
+         ! [2.0] assign Hdx :
+         !-------------------------------------------------------------------
+         iscan = iv%instid(inst)%rad(n)%scanpos
+         do k = 1, nchanl
+            y%instid(inst)%rad(n)%tb(k) = tb(nprofiles,k)
+         end do
       end do       !  end loop for pixels
 
       deallocate (zk)

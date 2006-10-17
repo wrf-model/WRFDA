@@ -6,7 +6,6 @@ module da_satem
    use da_statistics
    use da_physics
    use da_tools
-   use da_par_util
 
    ! The "stats_satem_type" is ONLY used locally in da_satem:
 

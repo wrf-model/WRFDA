@@ -23,9 +23,9 @@ SUBROUTINE da_write_y(iv, y)
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
 
    integer                       :: ounit ! Output file unit.
-   integer                       :: n, k, num_obs, inst
+   integer                       :: n, k, num_obs, inst, ios
    real                          :: f1, f2, f3, f4, f5, f6, f7, dum
-   character(len=20)             :: ob_name
+   character(len=20)             :: ob_name, filename, file_prefix
 
    if (trace_use) call da_trace_entry("da_write_y")
 
@@ -35,18 +35,26 @@ SUBROUTINE da_write_y(iv, y)
 
    if (omb_add_noise) then
       ounit = yp_unit            ! 3DVAR is a perturbed ob run.
+      file_prefix='pert_obs.'
    else
       ounit = y_unit             ! 3DVAR is an unperturbed ob run.
+      file_prefix='unpert_obs.'
    end if
 
-#ifdef DM_PARALLEL
-   if (numb_procs > 1) then
-      ! Get output unit for MPI run
-      ounit = ounit*100 +  myproc
-   end if
-#endif
- 
    dum = -999999.9
+
+#ifdef DM_PARALLEL
+      write(UNIT=filename, FMT='(a,i3.3)') trim(file_prefix), myproc
+#else
+      write(UNIT=filename, FMT='(a)') trim(file_prefix)//'000'
+#endif
+
+   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   if (ios /= 0 ) Then
+      call da_error(__FILE__,__LINE__, &
+         (/"Canot open (un)perturbed observation file"//filename/))
+   Endif
+
 
    ! [1] Transfer surface obs:
 

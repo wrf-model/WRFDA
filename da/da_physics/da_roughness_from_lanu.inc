@@ -18,6 +18,8 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
    character (len=4)                     :: LUTYPE
    logical                               :: exist
 
+   if (trace_use) call da_trace_entry("da_roughness_from_lanu")
+
    read(UNIT=date_mm5,FMT='(I4,1x,I2,1X,I2)') year, month, day
    call da_julian_day(year,month,day,Julday, 1)
    Isn = 1
@@ -79,6 +81,8 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
          rough(lc,ls) =  sfz0(Li,Isn)/100.
       enddo
    enddo
+
+   if (trace_use) call da_trace_exit("da_roughness_from_lanu")
 
 end subroutine da_roughness_from_lanu
 

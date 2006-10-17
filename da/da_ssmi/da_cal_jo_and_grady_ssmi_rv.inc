@@ -13,16 +13,13 @@ subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
    jo % ssmir_tpw=0.0
 
    do n=1, oi%num_ssmi_retrieval
-      if( oi%ssmi_retrieval(n)%loc%proc_domain_with_halo ) then
-
-        jo_grad_y%ssmi_retrieval(n)%Speed = - re%ssmi_retrieval(n)%Speed / &
+      jo_grad_y%ssmi_retrieval(n)%Speed = - re%ssmi_retrieval(n)%Speed / &
                                            ( oi%ssmi_retrieval(n)%Speed%error * &
                                              oi%ssmi_retrieval(n)%Speed%error )
 
-        jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
+      jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
                                          ( oi%ssmi_retrieval(n)%tpw%error * &
                                            oi%ssmi_retrieval(n)%tpw%error )
-      endif
 
       if (oi%ssmi_retrieval(n)%loc%proc_domain) then
 

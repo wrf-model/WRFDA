@@ -1,44 +1,43 @@
 subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
 
-  !----------------------------------------------------------------
-  !  HISTORY
-  !
-  !    Modified: 2004-04-08 by H. Kusaka and S. R. H. Rizvi
-  !    Purpose:  Considering the difference in the elevation 
-  !              between model surface and GPS site
-  !
-  !    Reviewed and re-written part of the code by Y.-R. Guo 
-  !    because the logic is not suitable for adjoint code.            
-  !                                                    07/16/2004
-  !----------------------------------------------------------------
+   !----------------------------------------------------------------
+   !  HISTORY
+   !
+   !    Modified: 2004-04-08 by H. Kusaka and S. R. H. Rizvi
+   !    Purpose:  Considering the difference in the elevation 
+   !              between model surface and GPS site
+   !
+   !    Reviewed and re-written part of the code by Y.-R. Guo 
+   !    because the logic is not suitable for adjoint code.            
+   !                                                    07/16/2004
+   !----------------------------------------------------------------
 
-  IMPLICIT NONE
+   IMPLICIT NONE
 
-  TYPE (xb_type), INTENT(IN)   :: xb       ! first guess state.
-  TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-  TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-  TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-  TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
+   TYPE (xb_type), INTENT(IN)   :: xb       ! first guess state.
+   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
+   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
+   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
+   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
 
-  INTEGER                      :: n        ! Loop counter.
-  INTEGER                      :: i, j     ! Index dimension.
-  REAL                         :: dx, dxm  ! 
-  REAL                         :: dy, dym  !
-   
-  INTEGER                :: k          ! Index dimension.
-  REAL                   :: dpw, ddpw  ! adjustment pw [mm]
-  REAL                   :: obs_terr   ! real terrain height at GPS site [m]
-  REAL                   :: model_terr ! model terrain height at GPS site[m]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_q    ! model q at GPS site [kg/kg]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_z    ! model z at GPS site [m]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_rho  ! model rho at GPS site [kg/m^3]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
+   INTEGER                      :: n        ! Loop counter.
+   INTEGER                      :: i, j     ! Index dimension.
+   REAL                         :: dx, dxm  ! 
+   REAL                         :: dy, dym  !
 
-  IF ( iv%num_Gpspw > 0 ) THEN
-    y % gpspw(:)% tpw = 0.0
+   INTEGER                :: k          ! Index dimension.
+   REAL                   :: dpw, ddpw  ! adjustment pw [mm]
+   REAL                   :: obs_terr   ! real terrain height at GPS site [m]
+   REAL                   :: model_terr ! model terrain height at GPS site[m]
+   REAL,DIMENSION(xp%kts:xp%kte):: model_q    ! model q at GPS site [kg/kg]
+   REAL,DIMENSION(xp%kts:xp%kte):: model_z    ! model z at GPS site [m]
+   REAL,DIMENSION(xp%kts:xp%kte):: model_rho  ! model rho at GPS site [kg/m^3]
+   REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
+   REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
+
+   IF ( iv%num_Gpspw > 0 ) THEN
+      y % gpspw(:)% tpw = 0.0
       do n=1, iv % num_Gpspw
-        if(iv%gpspw(n)%loc%proc_domain_with_halo) then
           i = iv%gpspw(n)%loc%i
           dy = iv%gpspw(n)%loc%dy
           dym = iv%gpspw(n)%loc%dym
@@ -116,9 +115,8 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
                                    dx  * xa%tpw(i+1,j+1) ) &
                             + 0.1*dpw
 
-      endif
-    end do
-  ENDIF
+      end do
+   ENDIF
 
 end subroutine da_transform_xtoy_gpspw
 

@@ -1,3 +1,4 @@
+#ifdef RTTOV
 subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
                       aux_vars, con_vars_ad, tb )
 
@@ -7,9 +8,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 
    implicit none
 
-#ifdef RTTOV
 #include "rttov_ad.interface"
-#endif
 
    integer             ,  intent (in) :: inst, nchanl, nprofiles
    type (con_vars_type),  intent (in) :: con_vars (nprofiles)
@@ -389,3 +388,4 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    call da_trace_exit("da_rttov_ad")
 
 end subroutine da_rttov_ad
+#endif

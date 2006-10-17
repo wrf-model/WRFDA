@@ -25,51 +25,49 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
    IF ( iv%num_satem > 0 ) THEN
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
-         if(iv%satem(n)%loc%proc_domain_with_halo) then
 
-           !xyh         y%satem(n)%thickness(:) = 0.0
-           num_levs = iv % satem(n) % info % levels
+         !xyh         y%satem(n)%thickness(:) = 0.0
+         num_levs = iv % satem(n) % info % levels
 
-           ! [1.0] Get horizontal interpolation weights:
+         ! [1.0] Get horizontal interpolation weights:
 
-           i = iv%satem(n)%loc%i
-           dy = iv%satem(n)%loc%dy
-           dym = iv%satem(n)%loc%dym
-           j = iv%satem(n)%loc%j
-           dx = iv%satem(n)%loc%dx
-           dxm = iv%satem(n)%loc%dxm
-           ks = xp%kts; ke = xp%kte
+         i = iv%satem(n)%loc%i
+         dy = iv%satem(n)%loc%dy
+         dym = iv%satem(n)%loc%dym
+         j = iv%satem(n)%loc%j
+         dx = iv%satem(n)%loc%dx
+         dxm = iv%satem(n)%loc%dxm
+         ks = xp%kts; ke = xp%kte
 
 
-           ! [2.0] Virtual temperature at obs pt.
+         ! [2.0] Virtual temperature at obs pt.
 
-           call da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,                &
-                pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
+         call da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,                &
+              pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
-           ! [3.0] Find model vertical position of pressure and do interp.
+         ! [3.0] Find model vertical position of pressure and do interp.
 
-           call da_tgl_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
-                pre_ma,tv_ma,ks,ke,TGL_tv2,TGL_pre_ma,TGL_tv_ma)
-           pres2 = iv%satem(n)%ref_p
+         call da_tgl_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
+              pre_ma,tv_ma,ks,ke,TGL_tv2,TGL_pre_ma,TGL_tv_ma)
+         pres2 = iv%satem(n)%ref_p
 
-           ! [4.0] Thickness calculation
+         ! [4.0] Thickness calculation
 
-           do k=1, num_levs
-              IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
+         do k=1, num_levs
+            IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
 
-                call da_tgl_find_layer(layer1,tv1,iv%satem(n)%p(k),            &
-                    pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
+               call da_tgl_find_layer(layer1,tv1,iv%satem(n)%p(k),            &
+                  pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
 
-                call da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,&
-                    iv%satem(n)%p(k),pres2,TGL_pre_ma,TGL_tv_ma,           &
-                    TGL_tv1,TGL_tv2,y%satem(n)%thickness(k))
+               call da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,&
+                  iv%satem(n)%p(k),pres2,TGL_pre_ma,TGL_tv_ma,           &
+                  TGL_tv1,TGL_tv2,y%satem(n)%thickness(k))
 
-                pres2 = iv%satem(n)%p(k)
-                  layer2 = layer1
-                  tv2 = tv1
-               ENDIF
-            enddo
-         endif
+               pres2 = iv%satem(n)%p(k)
+               layer2 = layer1
+               tv2 = tv1
+            ENDIF
+         enddo
       ENDDO
    ENDIF
 

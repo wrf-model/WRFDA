@@ -7,7 +7,6 @@ SUBROUTINE da_solve ( grid , config_flags , &
    ! Driver layer modules
    USE module_domain
    USE module_configure
-   USE module_driver_constants
    USE module_machine
    USE module_tiles
    USE module_dm
@@ -19,15 +18,10 @@ SUBROUTINE da_solve ( grid , config_flags , &
    use da_define_structures
    use da_setup_structures
    use da_test
-   use da_tools
    use da_minimisation
-   use da_par_util
    use da_tracing
    use da_reporting
    use module_get_file_names ! for system interface on cray
-
-   ! Registry generated module
-   USE module_state_description
 
    IMPLICIT NONE
 

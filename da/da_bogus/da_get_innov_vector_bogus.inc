@@ -1,43 +1,40 @@
 subroutine da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
 
-  !------------------------------------------------------------------------------
-  !  This subroutine is to calculate the innovations for the bogus data.
-  !  History: Initial setup for MM5 WRFVAR, on September 2003, by Ying Zhang.
-  !  History: Port to WRF frame,           on November  2004, by Qingnong Xiao
-  !------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   !  This subroutine is to calculate the innovations for the bogus data.
+   !------------------------------------------------------------------------------
 
-  IMPLICIT NONE
+   IMPLICIT NONE
 
-  INTEGER, INTENT(IN)            :: it       ! External iteration.
-  TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-  TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-  TYPE (y_type),  INTENT(IN)     :: ob       ! Observation structure.
-  TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   INTEGER, INTENT(IN)            :: it       ! External iteration.
+   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
+   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
+   TYPE (y_type),  INTENT(IN)     :: ob       ! Observation structure.
+   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
 
-  INTEGER                        :: n        ! Loop counter.
-  INTEGER                        :: i, j, k  ! Index dimension.
-  INTEGER                        :: num_levs ! Number of obs levels.
+   INTEGER                        :: n        ! Loop counter.
+   INTEGER                        :: i, j, k  ! Index dimension.
+   INTEGER                        :: num_levs ! Number of obs levels.
 
-  REAL                           :: dx, dxm  ! Interpolation weights.
-  REAL                           :: dy, dym  ! Interpolation weights.
-  REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
-  REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
+   REAL                           :: dx, dxm  ! Interpolation weights.
+   REAL                           :: dy, dym  ! Interpolation weights.
+   REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
 
-  REAL, DIMENSION(1:max_ob_levels) :: model_u   ! Model value u at ob location.
-  REAL, DIMENSION(1:max_ob_levels) :: model_v   ! Model value v at ob location.
-  REAL, DIMENSION(1:max_ob_levels) :: model_t   ! Model value t at ob location.
-  REAL, DIMENSION(1:max_ob_levels) :: model_q   ! Model value q at ob location.
-  REAL                             :: model_slp ! Model value slp at ob location.
+   REAL, DIMENSION(1:max_ob_levels) :: model_u   ! Model value u at ob location.
+   REAL, DIMENSION(1:max_ob_levels) :: model_v   ! Model value v at ob location.
+   REAL, DIMENSION(1:max_ob_levels) :: model_t   ! Model value t at ob location.
+   REAL, DIMENSION(1:max_ob_levels) :: model_q   ! Model value q at ob location.
+   REAL                             :: model_slp ! Model value slp at ob location.
 
-  INTEGER           :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf
+   INTEGER           :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf
 
-  IF ( iv % num_bogus < 1 ) return
+   IF ( iv % num_bogus < 1 ) return
 
-  itu   = 0; itvv    = 0; itt  = 0; itqv  = 0; itslp  = 0;
-  ituf  = 0; itvvf   = 0; ittf = 0; itqvf = 0; itslpf = 0;
+   itu   = 0; itvv    = 0; itt  = 0; itqv  = 0; itslp  = 0;
+   ituf  = 0; itvvf   = 0; ittf = 0; itqvf = 0; itslpf = 0;
 
-  DO n=iv%ob_numb(iv%current_ob_time-1)%bogus+1,iv%ob_numb(iv%current_ob_time)%bogus
-    if (iv%bogus(n)%loc%proc_domain_with_halo) then
+   DO n=iv%ob_numb(iv%current_ob_time-1)%bogus+1,iv%ob_numb(iv%current_ob_time)%bogus
       num_levs = iv % bogus(n) % info % levels
 
       if ( num_levs < 1 ) cycle
@@ -166,19 +163,18 @@ subroutine da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
         call da_check_max_iv_bogus(it, iv % bogus(n), &
           itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf)
       END IF
-    endif
-  END DO
+   END DO
 
-  write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-    ', Total Rejections for Bogus follows:'
+   write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+      ', Total Rejections for Bogus follows:'
 
-  WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-    'Number of failed u-wind       observations:     ',ituf,  ' on ',itu,   &
-    'Number of failed v-wind       observations:     ',itvvf, ' on ',itvv,   &
-    'Number of failed temperature  observations:     ',ittf,  ' on ',itt,   &
-    'Number of failed mixing ratio observations:     ',itqvf, ' on ',itqv,   &
-    'Number of failed slp          observations:     ',itslpf,' on ',itslp,   &
-    'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
+   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+     'Number of failed u-wind       observations:     ',ituf,  ' on ',itu,   &
+     'Number of failed v-wind       observations:     ',itvvf, ' on ',itvv,   &
+     'Number of failed temperature  observations:     ',ittf,  ' on ',itt,   &
+     'Number of failed mixing ratio observations:     ',itqvf, ' on ',itqv,   &
+     'Number of failed slp          observations:     ',itslpf,' on ',itslp,   &
+     'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
                                       itu +itvv +itt +itqv +itslp
 
 end subroutine da_get_innov_vector_bogus

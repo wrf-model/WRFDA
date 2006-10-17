@@ -19,22 +19,19 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
    REAL, DIMENSION(xp%kms:xp%kme)  :: v_h      ! Model value h at ob hor. location.
    REAL, DIMENSION(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
-!
+
    INTEGER                         :: irh, irhf
-!
+
    IF ( iv % num_ssmt2 > 0 ) THEN
-       irh = 0 ; irhf = 0
+      irh = 0 ; irhf = 0
       DO n=1, iv % num_ssmt2
-
-       if(iv%ssmt2(n)%loc%proc_domain_with_halo) then
-
          num_levs = iv % ssmt2(n) % info % levels
 
          if ( num_levs < 1 ) cycle
 
          model_rh(:) = 0.0
 
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%ssmt2(n)%loc%i
          j = iv%ssmt2(n)%loc%j
@@ -78,10 +75,10 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 !        [1.2] Interpolate horizontally to ob:
 
 #ifndef DEREF_KLUDGE
-         call da_Interp_lin_3D( xb % rh, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % rh, xp, i, j, dx, dy, dxm, dym, &
                              model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
 #else
-         call da_Interp_lin_3D( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                              model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
 #endif
 
@@ -111,14 +108,11 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
          END DO
 
-!------------------------------------------------------------------------
-!        [5.0] Perform optional maximum error check:
-!------------------------------------------------------------------------
+         !------------------------------------------------------------------------
+         ! [5.0] Perform optional maximum error check:
+         !------------------------------------------------------------------------
 
-   IF ( check_max_iv ) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf )
-            
-       endif
-
+         IF ( check_max_iv ) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf )
       END DO
 
        write(unit = check_max_iv_unit, FMT ='(A,i5,A)')    &

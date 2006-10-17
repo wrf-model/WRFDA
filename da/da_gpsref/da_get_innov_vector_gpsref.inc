@@ -93,10 +93,12 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          (iv%gpsref(1)%loc%i > xp%ite)    .or. &
          (iv%gpsref(1)%loc%j < xp%jts-1)  .or. &
          (iv%gpsref(1)%loc%j > xp%jte)) then
-         iv%gpsref(1)%loc%proc_domain_with_halo = .false.
+!         iv%gpsref(1)%loc%proc_domain_with_halo = .false.
+       call da_error(__FILE__,__LINE__,(/"Should never have obs outside halo by now"/))
+
          iv%gpsref(1)%loc%proc_domain = .false.
       else
-         iv%gpsref(1)%loc%proc_domain_with_halo = .true. 
+!         iv%gpsref(1)%loc%proc_domain_with_halo = .true. 
          iv%gpsref(1)%loc%proc_domain = .false. 
 
          if (iv%gpsref(1)%loc%i >= xp%its .and. &
@@ -119,106 +121,102 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
    DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref 
+      num_levs = iv%gpsref(n)%info%levels
 
-      if (iv%gpsref(n)%loc%proc_domain_with_halo) then
+      if ( num_levs < 1 ) cycle
 
-         num_levs = iv%gpsref(n)%info%levels
+      model_ref(:) = 0.0
 
-         if ( num_levs < 1 ) cycle
+      ! Get cross pt. horizontal interpolation weights:
 
-         model_ref(:) = 0.0
+      i = iv%gpsref(n)%loc%i
+      j = iv%gpsref(n)%loc%j
+      dx = iv%gpsref(n)%loc%dx
+      dy = iv%gpsref(n)%loc%dy
+      dxm = iv%gpsref(n)%loc%dxm
+      dym = iv%gpsref(n)%loc%dym
 
-         ! Get cross pt. horizontal interpolation weights:
+      if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
 
-         i = iv%gpsref(n)%loc%i
-         j = iv%gpsref(n)%loc%j
-         dx = iv%gpsref(n)%loc%dx
-         dy = iv%gpsref(n)%loc%dy
-         dxm = iv%gpsref(n)%loc%dxm
-         dym = iv%gpsref(n)%loc%dym
+         ! Get the gpsref%zk from gpsref%h:
 
-         if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
+         do k=xp%kts,xp%kte
+            v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
+                   + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
+         enddo
+         do k=1, num_levs
+            iv%gpsref(n)%zk(k)=missing_r
+            if ( iv%gpsref(n)%h(k) > 0.0 ) &
+               call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, &
+                  iv%gpsref(n)%zk(k))
+            if (iv%gpsref(n)%zk(k) < 0.0) iv%gpsref(n)%ref(k)%qc = missing
+         enddo
+      else
+         iv % gpsref(1)%zk(1) = pseudo_z
+      endif
 
-            ! Get the gpsref%zk from gpsref%h:
-
-            do k=xp%kts,xp%kte
-               v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                      + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-            enddo
-            do k=1, num_levs
-               iv%gpsref(n)%zk(k)=missing_r
-               if ( iv%gpsref(n)%h(k) > 0.0 ) &
-                  call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, &
-                     iv%gpsref(n)%zk(k))
-               if (iv%gpsref(n)%zk(k) < 0.0) iv%gpsref(n)%ref(k)%qc = missing
-            enddo
-         else
-            iv % gpsref(1)%zk(1) = pseudo_z
-         endif
-         
 #ifndef DEREF_KLUDGE
-         call da_interp_lin_3d( xb%ref, xp, i, j, dx, dy, dxm, dym, &
-            model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs )
+      call da_interp_lin_3d( xb%ref, xp, i, j, dx, dy, dxm, dym, &
+         model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs )
 #else
-         call da_interp_lin_3d( xb%ref(xp%ims,xp%jms,xp%kms), xp, i, j, &
-            dx, dy, dxm, dym, &
-            model_ref(1), max_ob_levels, iv%gpsref(n)%zk(1), num_levs )
+      call da_interp_lin_3d( xb%ref(xp%ims,xp%jms,xp%kms), xp, i, j, &
+         dx, dy, dxm, dym, &
+         model_ref(1), max_ob_levels, iv%gpsref(n)%zk(1), num_levs )
 #endif
 
-         if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
-            do k = 1, num_levs
-               iv%gpsref(n)%ref(k)%inv = 0.0
-               if ( ob%gpsref(n)%ref(k) > missing_r .AND. &
-                    iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer ) THEN
-                  iv%gpsref(n)%ref(k)%inv = ob%gpsref(n)%ref(k) - model_ref(k)
+      if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
+         do k = 1, num_levs
+            iv%gpsref(n)%ref(k)%inv = 0.0
+            if ( ob%gpsref(n)%ref(k) > missing_r .AND. &
+                 iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer ) THEN
+               iv%gpsref(n)%ref(k)%inv = ob%gpsref(n)%ref(k) - model_ref(k)
+            endif
+         enddo
+      else
+         ob % gpsref(1)%ref(1) = model_ref(1) + iv %gpsref(1)%ref(1)%inv 
+      endif
+
+      !==========================================================
+      ! Quality control code is implemeted by Y.-R. Guo, 07/18/2005:
+      !==========================================================
+
+      ! Quality check 1: Gross error (departure from the background) check 
+      ! ----------------
+
+      IF ( check_max_iv ) &
+         call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
+
+
+      ! Quality check 2: Error percentage check.
+      ! ---------------
+
+      if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
+
+         do k=1, num_levs
+
+            ! incremetal refractivity or the relative error:
+            ! abs[(O-B)/{(O+B)/2}]               (Lidia Cucurull 2005)
+
+            ntotal = ntotal + 1
+            percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / &
+               (ob%gpsref(n)%ref(k) + model_ref(k)))
+
+            if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
+               if ( iv%gpsref(n)%h(k) < h_1 ) then
+                  if (percnt > pcnt1) iv%gpsref(n)%ref(k)%qc = qc_below
+               else if ( iv%gpsref(n)%h(k) > h_2) then
+                  if (percnt > pcnt3) iv%gpsref(n)%ref(k)%qc = qc_above
+               else
+                  if (percnt > pcnt2) iv%gpsref(n)%ref(k)%qc = qc_middle
                endif
-            enddo
-         else
-            ob % gpsref(1)%ref(1) = model_ref(1) + iv %gpsref(1)%ref(1)%inv 
-         endif
+            endif
 
-         !==========================================================
-         ! Quality control code is implemeted by Y.-R. Guo, 07/18/2005:
-         !==========================================================
+            ! write(UNIT=stdout,FMT='(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
+            !    "ntotal=",ntotal,"  n=",n, " k=",k, " qc=",iv%gpsref(n)%ref(k)%qc, &
+            !    " h=",iv%gpsref(n)%h(k), percnt, &
+            !    iv%gpsref(n)%ref(k)%inv, .5*(ob%gpsref(n)%ref(k) + model_ref(k)) 
 
-         ! Quality check 1: Gross error (departure from the background) check 
-         ! ----------------
-
-         IF ( check_max_iv ) &
-            call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
-
-
-         ! Quality check 2: Error percentage check.
-         ! ---------------
- 
-         if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
-
-            do k=1, num_levs
-
-               ! incremetal refractivity or the relative error:
-               ! abs[(O-B)/{(O+B)/2}]               (Lidia Cucurull 2005)
-
-               ntotal = ntotal + 1
-               percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / &
-                  (ob%gpsref(n)%ref(k) + model_ref(k)))
-
-               if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
-                  if ( iv%gpsref(n)%h(k) < h_1 ) then
-                     if (percnt > pcnt1) iv%gpsref(n)%ref(k)%qc = qc_below
-                  else if ( iv%gpsref(n)%h(k) > h_2) then
-                     if (percnt > pcnt3) iv%gpsref(n)%ref(k)%qc = qc_above
-                  else
-                     if (percnt > pcnt2) iv%gpsref(n)%ref(k)%qc = qc_middle
-                  endif
-               endif
-
-               ! write(UNIT=stdout,FMT='(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
-               !    "ntotal=",ntotal,"  n=",n, " k=",k, " qc=",iv%gpsref(n)%ref(k)%qc, &
-               !    " h=",iv%gpsref(n)%h(k), percnt, &
-               !    iv%gpsref(n)%ref(k)%inv, .5*(ob%gpsref(n)%ref(k) + model_ref(k)) 
-             
-            enddo
-         endif
+         enddo
       endif
    END DO
 
@@ -235,18 +233,16 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
       DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
          iv%ob_numb(iv%current_ob_time)%gpsref 
-         if (iv%gpsref(n)%loc%proc_domain_with_halo) then
 
-            nn = nn + 1
-            num_levs = iv%gpsref(n)%info%levels
-            do k=1, num_levs
-              if (iv%gpsref(n)%ref(k)%qc == qc_below) then
-                  name_qc(nn) = iv%gpsref(n)%info%name
-                  height_below(nn) = max(iv%gpsref(n)%h(k),height_below(nn))
-              endif
-            enddo
-            if (height_below(nn) == 0.0) nn = nn - 1
-         endif
+         nn = nn + 1
+         num_levs = iv%gpsref(n)%info%levels
+         do k=1, num_levs
+           if (iv%gpsref(n)%ref(k)%qc == qc_below) then
+               name_qc(nn) = iv%gpsref(n)%info%name
+               height_below(nn) = max(iv%gpsref(n)%h(k),height_below(nn))
+           endif
+         enddo
+         if (height_below(nn) == 0.0) nn = nn - 1
       ENDDO
 
       ! Set the flag qc_below to the levels below percnt < pcnt1::
@@ -259,36 +255,32 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
       DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
          iv%ob_numb(iv%current_ob_time)%gpsref 
+         num_levs = iv%gpsref(n)%info%levels
 
-         if (iv%gpsref(n)%loc%proc_domain_with_halo) then
+         do n1 = 1,nn
+            if (iv%gpsref(n)%info%name == name_qc(n1)) then
 
-            num_levs = iv%gpsref(n)%info%levels
+               do k=1, num_levs
+                  if (iv%gpsref(n)%h(k) < height_below(n1) .and. &
+                      iv%gpsref(n)%ref(k)%qc >= 0) then
+                     iv%gpsref(n)%ref(k)%qc = qc_below
+                  end if
+               enddo
+               exit
+            endif
+         enddo
 
-            do n1 = 1,nn
-               if (iv%gpsref(n)%info%name == name_qc(n1)) then
-
-                  do k=1, num_levs
-                     if (iv%gpsref(n)%h(k) < height_below(n1) .and. &
-                         iv%gpsref(n)%ref(k)%qc >= 0) then
-                        iv%gpsref(n)%ref(k)%qc = qc_below
-                     end if
-                  enddo
-                  exit
-               endif
-            enddo
-
-            do k=1, num_levs
-               ntotal = ntotal + 1
-               if (iv%gpsref(n)%ref(k)%qc == fails_error_max) nqc0 = nqc0 + 1
-               if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
-               if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
-               if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
-               ! write(UNIT=stdout,FMT='(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
-               !    "ntotal, nqc0, nqc1, nqc2, nqc3:",ntotal, nqc0, nqc1, nqc2, nqc3, &
-               !    "  n=",n, " k=",k, "  qc=",iv%gpsref(n)%ref(k)%qc,  &
-               !    "  h=",iv%gpsref(n)%h(k), "  inv=",iv%gpsref(n)%ref(k)%inv
-            enddo
-         endif
+         do k=1, num_levs
+            ntotal = ntotal + 1
+            if (iv%gpsref(n)%ref(k)%qc == fails_error_max) nqc0 = nqc0 + 1
+            if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
+            if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
+            if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
+            ! write(UNIT=stdout,FMT='(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
+            !    "ntotal, nqc0, nqc1, nqc2, nqc3:",ntotal, nqc0, nqc1, nqc2, nqc3, &
+            !    "  n=",n, " k=",k, "  qc=",iv%gpsref(n)%ref(k)%qc,  &
+            !    "  h=",iv%gpsref(n)%h(k), "  inv=",iv%gpsref(n)%ref(k)%inv
+         enddo
       ENDDO
    endif
 

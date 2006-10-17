@@ -13,16 +13,12 @@ subroutine da_transform_xtoy_ssmt2_adj( iv, xp, jo_grad_y, jo_grad_x )
    REAL                          :: dy, dym  !
 
    IF ( iv%num_ssmt2 > 0 ) THEN
-
       DO n=1, iv % num_ssmt2
-
-       if(iv%ssmt2(n)%loc%proc_domain_with_halo) then
-
          k = iv % ssmt2(n) % info % levels
 
          if ( k < 1 ) cycle
       
-!        [1.1] Get horizontal interpolation weights:
+         ! [1.1] Get horizontal interpolation weights:
 
          i = iv%ssmt2(n)%loc%i
          dy = iv%ssmt2(n)%loc%dy
@@ -31,7 +27,7 @@ subroutine da_transform_xtoy_ssmt2_adj( iv, xp, jo_grad_y, jo_grad_x )
          dx = iv%ssmt2(n)%loc%dx
          dxm = iv%ssmt2(n)%loc%dxm
 
-!        [1.2] Interpolate horizontally:
+         ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % rh, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
@@ -39,10 +35,9 @@ subroutine da_transform_xtoy_ssmt2_adj( iv, xp, jo_grad_y, jo_grad_x )
          call da_interp_lin_3d_adj(jo_grad_x % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
 #endif
-       endif
-
-      END DO
-   
+      END DO 
    END IF
 
 end subroutine da_transform_xtoy_ssmt2_adj
+
+

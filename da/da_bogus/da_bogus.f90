@@ -6,7 +6,6 @@ module da_bogus
    use da_statistics
    use da_tools
    use da_physics
-   use da_par_util
 
    ! The "stats_bogus_type" is ONLY used locally in da_bogus:
 

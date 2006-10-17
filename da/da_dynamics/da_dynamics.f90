@@ -10,7 +10,6 @@ MODULE da_dynamics
    USE da_statistics
    USE da_interpolation
    USE da_tools    
-   use module_wrf_error    
 
    IMPLICIT NONE
 

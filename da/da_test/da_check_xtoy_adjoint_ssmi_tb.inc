@@ -14,40 +14,38 @@ subroutine da_check_xtoy_adjoint_ssmi_tb ( oi, y, adjtest_lhs, pertile_lhs )
 
    IF ( oi%num_ssmi_tb > 0 ) THEN
 
-   do n=1, oi%num_ssmi_tb
-      if( oi%ssmi_tb(n)%loc%proc_domain_with_halo ) then
-        y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms
-        y%ssmi_tb(n)%tb19h = y%ssmi_tb(n)%tb19h/typical_tb19h_rms
-        y%ssmi_tb(n)%tb22v = y%ssmi_tb(n)%tb22v/typical_tb22v_rms
-        y%ssmi_tb(n)%tb37v = y%ssmi_tb(n)%tb37v/typical_tb37v_rms
-        y%ssmi_tb(n)%tb37h = y%ssmi_tb(n)%tb37h/typical_tb37h_rms
-        y%ssmi_tb(n)%tb85v = y%ssmi_tb(n)%tb85v/typical_tb85v_rms
-        y%ssmi_tb(n)%tb85h = y%ssmi_tb(n)%tb85h/typical_tb85h_rms
+      do n=1, oi%num_ssmi_tb
+           y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms
+           y%ssmi_tb(n)%tb19h = y%ssmi_tb(n)%tb19h/typical_tb19h_rms
+           y%ssmi_tb(n)%tb22v = y%ssmi_tb(n)%tb22v/typical_tb22v_rms
+           y%ssmi_tb(n)%tb37v = y%ssmi_tb(n)%tb37v/typical_tb37v_rms
+           y%ssmi_tb(n)%tb37h = y%ssmi_tb(n)%tb37h/typical_tb37h_rms
+           y%ssmi_tb(n)%tb85v = y%ssmi_tb(n)%tb85v/typical_tb85v_rms
+           y%ssmi_tb(n)%tb85h = y%ssmi_tb(n)%tb85h/typical_tb85h_rms
 
-         var = (y%ssmi_tb(n)%tb19v) ** 2 &
-             + (y%ssmi_tb(n)%tb19h) ** 2 &
-             + (y%ssmi_tb(n)%tb22v) ** 2 &
-             + (y%ssmi_tb(n)%tb37v) ** 2 &
-             + (y%ssmi_tb(n)%tb37h) ** 2 &
-             + (y%ssmi_tb(n)%tb85v) ** 2 &
-             + (y%ssmi_tb(n)%tb85h) ** 2 
+            var = (y%ssmi_tb(n)%tb19v) ** 2 &
+                + (y%ssmi_tb(n)%tb19h) ** 2 &
+                + (y%ssmi_tb(n)%tb22v) ** 2 &
+                + (y%ssmi_tb(n)%tb37v) ** 2 &
+                + (y%ssmi_tb(n)%tb37h) ** 2 &
+                + (y%ssmi_tb(n)%tb85v) ** 2 &
+                + (y%ssmi_tb(n)%tb85h) ** 2 
 
-      pertile_lhs = pertile_lhs + var
+         pertile_lhs = pertile_lhs + var
 
-      if( oi%ssmi_tb(n)%loc%proc_domain ) then
-          adjtest_lhs = adjtest_lhs + var
-      endif
-      y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms
-      y%ssmi_tb(n)%tb19h = y%ssmi_tb(n)%tb19h/typical_tb19h_rms
-      y%ssmi_tb(n)%tb22v = y%ssmi_tb(n)%tb22v/typical_tb22v_rms
-      y%ssmi_tb(n)%tb37v = y%ssmi_tb(n)%tb37v/typical_tb37v_rms
-      y%ssmi_tb(n)%tb37h = y%ssmi_tb(n)%tb37h/typical_tb37h_rms
-      y%ssmi_tb(n)%tb85v = y%ssmi_tb(n)%tb85v/typical_tb85v_rms
-      y%ssmi_tb(n)%tb85h = y%ssmi_tb(n)%tb85h/typical_tb85h_rms
+         if( oi%ssmi_tb(n)%loc%proc_domain ) then
+             adjtest_lhs = adjtest_lhs + var
+         endif
+         y%ssmi_tb(n)%tb19v = y%ssmi_tb(n)%tb19v/typical_tb19v_rms
+         y%ssmi_tb(n)%tb19h = y%ssmi_tb(n)%tb19h/typical_tb19h_rms
+         y%ssmi_tb(n)%tb22v = y%ssmi_tb(n)%tb22v/typical_tb22v_rms
+         y%ssmi_tb(n)%tb37v = y%ssmi_tb(n)%tb37v/typical_tb37v_rms
+         y%ssmi_tb(n)%tb37h = y%ssmi_tb(n)%tb37h/typical_tb37h_rms
+         y%ssmi_tb(n)%tb85v = y%ssmi_tb(n)%tb85v/typical_tb85v_rms
+         y%ssmi_tb(n)%tb85h = y%ssmi_tb(n)%tb85h/typical_tb85h_rms
 
-      endif
-   end do
-  ENDIF
+      end do
+   ENDIF
 
 end subroutine da_check_xtoy_adjoint_ssmi_tb
 

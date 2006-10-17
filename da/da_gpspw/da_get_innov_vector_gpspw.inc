@@ -91,10 +91,11 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
     ! Set halo:
     if((iv%gpspw(1)%loc%i < xp%its-1) .or. (iv%gpspw(1)%loc%i > xp%ite) .or. & 
        (iv%gpspw(1)%loc%j < xp%jts-1) .or. (iv%gpspw(1)%loc%j > xp%jte)) then 
-      iv%gpspw(1)%loc%proc_domain_with_halo = .false. 
+       call da_error(__FILE__,__LINE__,(/"Should never have obs outside halo by now"/))
+!      iv%gpspw(1)%loc%proc_domain_with_halo = .false. 
       iv%gpspw(1)%loc%proc_domain = .false. 
     else 
-      iv%gpspw(1)%loc%proc_domain_with_halo = .true.  
+!      iv%gpspw(1)%loc%proc_domain_with_halo = .true.  
       iv%gpspw(1)%loc%proc_domain = .false.  
 
       if(iv%gpspw(1)%loc%i >= xp%its .and. iv%gpspw(1)%loc%i <= xp%ite .and. &  
@@ -120,7 +121,6 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
     !   '   O-B pw ', '    Dpw   ', '  O-B+Dpw '
 
     DO n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
-      if(iv%gpspw(n)%loc%proc_domain_with_halo) then
 
         ! [1.1] Get horizontal interpolation weights:
 
@@ -196,7 +196,6 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
         !              model_tpw , ob%gpspw(n)%tpw-model_tpw, 0.1*dpw,       &
         !              ob%gpspw(n)%tpw-model_tpw+0.1*dpw
         !---   
-      endif
     END DO
 
     write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &

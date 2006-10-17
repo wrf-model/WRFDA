@@ -109,7 +109,6 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
 
    call da_oi_stats_airsr ( stats_unit, iv )
 
-
    !---- ----------------------------------------------------------------------
    ! [2.0] Calculate residual vector (O-A) statistics:
    !---------------------------------------------------------------------------
@@ -220,16 +219,15 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    !------------------------------------------------------------------------------
    call da_write_obs( ob, iv, re )
 
-#ifdef DM_PARALLEL
-
-   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
-#endif
+!#ifdef DM_PARALLEL
+!   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
+!#endif
 
    call da_write_y( iv, y )
 
-#ifdef DM_PARALLEL
-   if ( num_procs > 1) call da_final_write_y(iv, y )
-#endif
+!#ifdef DM_PARALLEL
+!   if ( (num_procs > 1) .and. (.not. use_radiance) ) call da_final_write_y(iv, y )
+!#endif
 
    IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
 

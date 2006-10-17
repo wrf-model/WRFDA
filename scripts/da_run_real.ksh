@@ -26,12 +26,12 @@ echo "<H1>$EXPT real</H1><PRE>"
 
 date    
 
-export D1=`$WRFVAR_DIR/main/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export D1=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
 let OFFSET=$FCST_RANGE+$WINDOW_START 
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $D1 $OFFSET
 
 echo 'REL_DIR    <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_REV
+echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'

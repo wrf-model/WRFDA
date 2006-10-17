@@ -16,7 +16,6 @@ subroutine da_calculate_grady_satem( iv, re, jo_grad_y )
 
    IF ( iv%num_Satem > 0 ) THEN
       DO n=1, iv%num_Satem
-         if (iv%satem(n)%loc%proc_domain_with_halo) then
             do k=1, iv%satem(n)%info%levels
                if (iv%Satem(n)%thickness(k)%qc < obs_qc_pointer) THEN
                   re%Satem(n)%thickness(k) = 0.0
@@ -26,7 +25,6 @@ subroutine da_calculate_grady_satem( iv, re, jo_grad_y )
                                          ( iv%Satem(n)%thickness(k)%error * &
                                            iv%Satem(n)%thickness(k)%error )
             end do
-         endif
       END DO
    END IF
 

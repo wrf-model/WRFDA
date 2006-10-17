@@ -20,20 +20,17 @@ subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
 
   IF ( iv%num_metar > 0 ) THEN
     DO n=1, iv%num_metar
-      if( iv%metar(n)%loc%proc_domain_with_halo ) then
 
-        jo_grad_y%metar(n)%u = -re%metar(n)%u / &
-                               ( iv%metar(n)%u%error * iv%metar(n)%u%error)
-        jo_grad_y%metar(n)%v = -re%metar(n)%v / &
-                               ( iv%metar(n)%v%error * iv%metar(n)%v%error)
-        jo_grad_y%metar(n)%t = -re%metar(n)%t / &
-                               ( iv%metar(n)%t%error * iv%metar(n)%t%error)
-        jo_grad_y%metar(n)%p = -re%metar(n)%p / &
-                               ( iv%metar(n)%p%error * iv%metar(n)%p%error)
-        jo_grad_y%metar(n)%q = -re%metar(n)%q / &
-                               ( iv%metar(n)%q%error * iv%metar(n)%q%error)
-
-      endif
+      jo_grad_y%metar(n)%u = -re%metar(n)%u / &
+                             ( iv%metar(n)%u%error * iv%metar(n)%u%error)
+      jo_grad_y%metar(n)%v = -re%metar(n)%v / &
+                             ( iv%metar(n)%v%error * iv%metar(n)%v%error)
+      jo_grad_y%metar(n)%t = -re%metar(n)%t / &
+                             ( iv%metar(n)%t%error * iv%metar(n)%t%error)
+      jo_grad_y%metar(n)%p = -re%metar(n)%p / &
+                             ( iv%metar(n)%p%error * iv%metar(n)%p%error)
+      jo_grad_y%metar(n)%q = -re%metar(n)%q / &
+                             ( iv%metar(n)%q%error * iv%metar(n)%q%error)
 
       if( iv%metar(n)%loc%proc_domain ) then
 

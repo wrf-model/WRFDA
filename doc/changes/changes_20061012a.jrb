@@ -1,0 +1,345 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 10/12/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Add debugging control max_num_rad to namelist (default 10000000, so no
+effect unless actively used)
+
+Remove external/blas|lapack|bufr_ncep_nco|fftpack5 and force users to compile
+these libraries external. Done for bluesky, bluevista, lightning, ocotillo,
+snowdrift, balsam and the macs.
+
+Add da_system wrapper for system call for Cray use
+
+Remove rttov code we were distributing illegally in the da_radiance directory. 
+This is now be picked up from external library
+
+Add radiance unit numbers to da_constants
+
+Fix bluesky RUN_CMD bug
+
+Add MAKEDEPF90 support in setup.csh for a wider range of platforms
+
+svnversion commands now run in da_run_job before job submission, so we
+do not require svnversion command to exist on client nodes (it didn't
+on bluevista for example). This means the submission takes longer, but
+the job runs quicker. CHECK_SVNVERSION=false to avoid it.
+
+da_compile_and_run runs setup.ksh before submitting tests, so correct
+environment set
+
+wrfvar executables run from build directory, no longer copied to main
+directory in feeble immitation of wrf.
+
+Duplicate USE statements that g95 objected to removed.
+
+Duplicate memory allocation of conv_vars in da_radiance that caused
+a memory bleed fixed.
+
+More tracing added, especially after allocates that have no obvious
+deallocate
+
+Add -DIFORT_KLUDGE and -DMAC_KLUDGE which wrf trunk has
+
+Remove inside_halo argument to da_ll_to_xy
+
+Remove unused da_obs_count.inc
+
+Clean up da_radiance code
+
+Add da_get_unit and da_free_unit routines in new da_util.f90. Never called
+
+Remove proc_domain_inside_halo
+
+
+
+------------------------------------------------------
+Tests:
+
+jrb* code compiled everywhere and a full set of regression tests done
+against trunk*
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20061012a.jrb
+M      setup.ksh
+!      da
+M      da/da_ssmi/da_calculate_grady_ssmi.inc
+M      da/da_ssmi/da_transform_xtoy_ssmi_tb.inc
+M      da/da_ssmi/da_get_innov_vector_ssmi_tb.inc
+M      da/da_ssmi/da_transform_xtoy_ssmt1_adj.inc
+M      da/da_ssmi/da_transform_xtoy_ssmt2_adj.inc
+M      da/da_ssmi/da_cal_residual_ssmi_tb.inc
+M      da/da_ssmi/da_transform_xtoy_ssmt1.inc
+M      da/da_ssmi/da_transform_xtoy_ssmt2.inc
+M      da/da_ssmi/da_cal_jo_and_grady_ssmi_rv.inc
+M      da/da_ssmi/da_get_innov_vector_ssmt1.inc
+M      da/da_ssmi/da_get_innov_vector_ssmt2.inc
+M      da/da_ssmi/da_read_ssmi.inc
+M      da/da_ssmi/da_transform_xtoy_ssmi_rv_adj.inc
+M      da/da_ssmi/da_scan_ssmi.inc
+M      da/da_ssmi/da_ssmi.f90
+M      da/da_ssmi/da_transform_xtoy_ssmi_rv.inc
+M      da/da_ssmi/da_get_innov_vector_ssmi_rv.inc
+M      da/da_ssmi/da_cal_jo_and_grady_ssmi_tb.inc
+M      da/da_ssmi/da_cal_residual_ssmi_rv.inc
+M      da/da_ssmi/da_transform_xtoy_ssmi_tb_adj.inc
+M      da/da_recursive_filter/da_recursive_filter.f90
+M      da/da_constants/da_constants.f90
+M      da/da_spectral/da_be_spectral.f90
+M      da/da_spectral/da_spectral.f90
+M      da/da_gen_be/da_gen_be.f90
+M      da/da_grid_definitions/da_grid_definitions.f90
+M      da/da_polaramv/da_calculate_grady_polaramv.inc
+M      da/da_polaramv/da_calculate_residual_polaramv.inc
+M      da/da_polaramv/da_get_innov_vector_polaramv.inc
+M      da/da_polaramv/da_transform_xtoy_polaramv_adj.inc
+M      da/da_polaramv/da_transform_xtoy_polaramv.inc
+M      da/da_polaramv/da_get_jo_and_grady_polaramv.inc
+M      da/da_profiler/da_calculate_grady_profiler.inc
+M      da/da_profiler/da_calculate_residual_profiler.inc
+M      da/da_profiler/da_get_innov_vector_profiler.inc
+M      da/da_profiler/da_transform_xtoy_profiler_adj.inc
+M      da/da_profiler/da_transform_xtoy_profiler.inc
+M      da/da_profiler/da_get_jo_and_grady_profiler.inc
+M      da/da_physics/da_roughness_from_lanu.inc
+M      da/da_physics/da_trh_to_td.inc
+M      da/da_physics/da_wrf_tpq_2_slp.inc
+M      da/da_obs/da_scan_bufr_obs.inc
+M      da/da_obs/da_count_filtered_obs.inc
+M      da/da_obs/da_scan_obs.inc
+M      da/da_obs/da_scan_radar.inc
+M      da/da_obs/da_obs.f90
+M      da/da_obs/da_read_obs.inc
+M      da/da_obs/da_store_obs_grid_info.inc
+M      da/da_obs/da_read_radar.inc
+M      da/da_obs/da_read_bufr_obs.inc
+M      da/da_tracing/da_tracing.f90
+M      da/da_tracing/da_trace_init.inc
+M      da/da_solve/da_solve.f90
+M      da/da_sound/da_calculate_jo_and_grady_sound.inc
+M      da/da_sound/da_transform_xtoy_sound.inc
+M      da/da_sound/da_calculate_grady_sonde_sfc.inc
+M      da/da_sound/da_calculate_residual_sonde_sfc.inc
+M      da/da_sound/da_sound.f90
+M      da/da_sound/da_transform_xtoy_sonde_sfc.inc
+M      da/da_sound/da_get_innov_vector_sound.inc
+M      da/da_sound/da_transform_xtoy_sound_adj.inc
+M      da/da_sound/da_calculate_grady_sound.inc
+M      da/da_sound/da_get_innov_vector_sonde_sfc.inc
+M      da/da_sound/da_calculate_residual_sound.inc
+M      da/da_sound/da_oi_stats_sound.inc
+M      da/da_sound/da_transform_xtoy_sonde_sfc_adj.inc
+M      da/da_sound/da_get_jo_and_grady_sonde_sfc.inc
+M      da/da_radar/da_calculate_jo_and_grady_radar.inc
+M      da/da_radar/da_transform_xtoy_radar.inc
+M      da/da_radar/da_get_innov_vector_radar.inc
+M      da/da_radar/da_transform_xtoy_radar_adj.inc
+M      da/da_radar/da_calculate_grady_radar.inc
+M      da/da_radar/da_calculate_residual_radar.inc
+M      da/da_define_structures/da_define_structures.f90
+M      da/da_minimisation/da_transform_vtoy_adj.inc
+M      da/da_minimisation/da_get_var_diagnostics.inc
+M      da/da_minimisation/da_write_diagnostics.inc
+M      da/da_minimisation/da_minimise_cg.inc
+M      da/da_minimisation/da_minimisation.f90
+M      da/da_minimisation/da_transform_vtoy.inc
+M      da/da_minimisation/da_calculate_jo_and_grady.inc
+M      da/da_airep/da_calculate_grady_airep.inc
+M      da/da_airep/da_calculate_residual_airep.inc
+M      da/da_airep/da_get_innov_vector_airep.inc
+M      da/da_airep/da_transform_xtoy_airep_adj.inc
+M      da/da_airep/da_calculate_jo_and_grady_airep.inc
+M      da/da_airep/da_transform_xtoy_airep.inc
+R  +   da/da_tools/da_free_unit.inc
+M      da/da_tools/da_ll_to_xy.inc
+R  +   da/da_tools/da_get_unit.inc
+M      da/da_tools/da_tools.f90
+M      da/da_setup_structures/da_setup_be_regional.inc
+M      da/da_setup_structures/da_setup_structures.f90
+M      da/da_setup_structures/da_transfer_wrftoxb.inc
+M      da/da_dynamics/da_dynamics.f90
+R  +   da/da_modules/da_wrfvar_init1.inc
+R  +   da/da_modules/da_wrfvar_init2.inc
+M      da/da_metar/da_transform_xtoy_metar_adj.inc
+M      da/da_metar/da_calculate_jo_and_grady_metar.inc
+M      da/da_metar/da_transform_xtoy_metar.inc
+M      da/da_metar/da_calculate_grady_metar.inc
+M      da/da_metar/da_calculate_residual_metar.inc
+M      da/da_metar/da_metar.f90
+M      da/da_metar/da_get_innov_vector_metar.inc
+M      da/Makefile
+M      da/da_satem/da_get_innov_vector_satem.inc
+M      da/da_satem/da_transform_xtoy_satem_adj.inc
+M      da/da_satem/da_calculate_jo_and_grady_satem.inc
+M      da/da_satem/da_transform_xtoy_satem.inc
+M      da/da_satem/da_calculate_grady_satem.inc
+M      da/da_satem/da_calculate_residual_satem.inc
+M      da/da_satem/da_satem.f90
+M      da/da_qscat/da_get_innov_vector_qscat.inc
+M      da/da_qscat/da_transform_xtoy_qscat_adj.inc
+M      da/da_qscat/da_calculate_jo_and_grady_qscat.inc
+M      da/da_qscat/da_transform_xtoy_qscat.inc
+M      da/da_qscat/da_calculate_grady_qscat.inc
+M      da/da_qscat/da_calculate_residual_qscat.inc
+M      da/da_buoy/da_buoy.f90
+M      da/da_buoy/da_calculate_residual_buoy.inc
+M      da/da_buoy/da_get_innov_vector_buoy.inc
+M      da/da_buoy/da_transform_xtoy_buoy_adj.inc
+M      da/da_buoy/da_calculate_jo_and_grady_buoy.inc
+M      da/da_buoy/da_transform_xtoy_buoy.inc
+M      da/da_buoy/da_calculate_grady_buoy.inc
+M      da/da_geoamv/da_calculate_residual_geoamv.inc
+M      da/da_geoamv/da_get_innov_vector_geoamv.inc
+M      da/da_geoamv/da_transform_xtoy_geoamv_adj.inc
+M      da/da_geoamv/da_ao_stats_geoamv.inc
+M      da/da_geoamv/da_transform_xtoy_geoamv.inc
+M      da/da_geoamv/da_get_jo_and_grady_geoamv.inc
+M      da/da_geoamv/da_calculate_grady_geoamv.inc
+R  +   da/da_par_util/da_system.inc
+M      da/da_bogus/da_bogus.f90
+M      da/da_bogus/da_calculate_residual_bogus.inc
+M      da/da_bogus/da_get_innov_vector_bogus.inc
+M      da/da_bogus/da_transform_xtoy_bogus_adj.inc
+M      da/da_bogus/da_calculate_jo_and_grady_bogus.inc
+M      da/da_bogus/da_transform_xtoy_bogus.inc
+M      da/da_bogus/da_calculate_grady_bogus.inc
+M      da/da_test/da_check_xtoy_adjoint_qscat.inc
+M      da/da_test/da_test.f90
+M      da/da_test/da_check_xtoy_adjoint_buoy.inc
+M      da/da_test/da_check_xtoy_adjoint_geoamv.inc
+M      da/da_test/da_check_xtoy_adjoint_bogus.inc
+M      da/da_test/da_check_xtoy_adjoint_ships.inc
+M      da/da_test/da_check_xtoy_adjoint_gpsref.inc
+M      da/da_test/da_check_xtoy_adjoint_pilot.inc
+M      da/da_test/da_check_xtoy_adjoint_pseudo.inc
+M      da/da_test/da_check_xtoy_adjoint_ssmi_tb.inc
+M      da/da_test/da_check_xtoy_adjoint_gpspw.inc
+M      da/da_test/da_check_psfc.inc
+M      da/da_test/da_check_xtoy_adjoint_sonde_sfc.inc
+M      da/da_test/da_check_xtoy_adjoint_synop.inc
+M      da/da_test/da_check_xtoy_adjoint_polaramv.inc
+M      da/da_test/da_check_xtoy_adjoint_profiler.inc
+M      da/da_test/da_check_xtoy_adjoint_ssmi_rv.inc
+M      da/da_test/da_check_xtoy_adjoint_sound.inc
+M      da/da_test/da_check_xtoy_adjoint_radar.inc
+M      da/da_test/da_check_sfc_assi.inc
+M      da/da_test/da_check_xtoy_adjoint_airep.inc
+M      da/da_test/da_check_xtoy_adjoint_ssmt1.inc
+M      da/da_test/da_check_xtoy_adjoint_satob.inc
+M      da/da_test/da_check_xtoy_adjoint_metar.inc
+M      da/da_test/da_check_xtoy_adjoint_ssmt2.inc
+M      da/da_test/da_check_xtoy_adjoint_satem.inc
+M      da/da_airsr/da_calculate_grady_airsr.inc
+M      da/da_airsr/da_airsr.f90
+M      da/da_airsr/da_calculate_residual_airsr.inc
+M      da/da_airsr/da_get_innov_vector_airsr.inc
+M      da/da_airsr/da_transform_xtoy_airsr_adj.inc
+M      da/da_airsr/da_calculate_jo_and_grady_airsr.inc
+M      da/da_airsr/da_transform_xtoy_airsr.inc
+M      da/da_gpsref/da_transform_xtoy_gpsref.inc
+M      da/da_gpsref/da_get_jo_and_grady_gpsref.inc
+M      da/da_gpsref/da_calculate_grady_gpsref.inc
+M      da/da_gpsref/da_calculate_residual_gpsref.inc
+M      da/da_gpsref/da_get_innov_vector_gpsref.inc
+M      da/da_gpsref/da_transform_xtoy_gpsref_adj.inc
+M      da/da_ships/da_calculate_jo_and_grady_ships.inc
+M      da/da_ships/da_transform_xtoy_ships.inc
+M      da/da_ships/da_calculate_grady_ships.inc
+M      da/da_ships/da_calculate_residual_ships.inc
+M      da/da_ships/da_ships.f90
+M      da/da_ships/da_get_innov_vector_ships.inc
+M      da/da_ships/da_transform_xtoy_ships_adj.inc
+M      da/da_pilot/da_transform_xtoy_pilot_adj.inc
+M      da/da_pilot/da_calculate_jo_and_grady_pilot.inc
+M      da/da_pilot/da_transform_xtoy_pilot.inc
+M      da/da_pilot/da_calculate_grady_pilot.inc
+M      da/da_pilot/da_calculate_residual_pilot.inc
+M      da/da_pilot/da_get_innov_vector_pilot.inc
+M      da/da_pseudo/da_get_innov_vector_pseudo.inc
+M      da/da_pseudo/da_transform_xtoy_pseudo_adj.inc
+M      da/da_pseudo/da_transform_xtoy_pseudo.inc
+M      da/da_pseudo/da_cal_jo_and_grady_pseudo.inc
+M      da/da_pseudo/da_calculate_grady_pseudo.inc
+M      da/da_gpspw/da_calculate_grady_gpspw.inc
+M      da/da_gpspw/da_calculate_residual_gpspw.inc
+M      da/da_gpspw/da_gpspw.f90
+M      da/da_gpspw/da_get_innov_vector_gpspw.inc
+M      da/da_gpspw/da_transform_xtoy_gpspw_adj.inc
+M      da/da_gpspw/da_calculate_jo_and_grady_gpspw.inc
+M      da/da_gpspw/da_transform_xtoy_gpspw.inc
+M      da/da_radiance/da_read_iv_rad_binary.inc
+M      da/da_radiance/da_read_bufrtovs.inc
+M      da/da_radiance/da_biasprep.inc
+M      da/da_radiance/da_calculate_grady_rad.inc
+M      da/da_radiance/da_oma_stats_rad.inc
+M      da/da_radiance/da_omb_stats_rad.inc
+M      da/da_radiance/da_biascorr_rad.inc
+M      da/da_radiance/da_radiance.f90
+M      da/da_radiance/da_transform_xtoy_rad_adj.inc
+M      da/da_radiance/da_write_oa_rad_ascii.inc
+M      da/da_radiance/da_rttov_direct.inc
+M      da/da_radiance/da_calculate_residual_rad.inc
+M      da/da_radiance/da_rttov_tl.inc
+M      da/da_radiance/gsi_emiss.inc
+M      da/da_radiance/da_rttov_ad.inc
+M      da/da_radiance/da_calculate_jo_and_grady_rad.inc
+M      da/da_radiance/da_transform_xtoy_rad.inc
+M      da/da_radiance/da_write_iv_rad_ascii.inc
+M      da/da_radiance/da_qc_amsua.inc
+M      da/da_radiance/da_qc_rad.inc
+M      da/da_radiance/da_qc_amsub.inc
+M      da/da_radiance/da_setup_bufrtovs_structures.inc
+M      da/da_radiance/da_write_filtered_rad.inc
+M      da/da_radiance/da_get_innov_vector_rad.inc
+M      da/da_radiance/da_read_kma1dvar.inc
+M      da/da_radiance/da_rttov_init.inc
+M      da/da_synop/da_transform_xtoy_synop_adj.inc
+M      da/da_synop/da_calculate_jo_and_grady_synop.inc
+M      da/da_synop/da_transform_xtoy_synop.inc
+M      da/da_synop/da_calculate_grady_synop.inc
+M      da/da_synop/da_calculate_residual_synop.inc
+M      da/da_synop/da_synop.f90
+M      da/da_synop/da_get_innov_vector_synop.inc
+M      scripts/da_get_date_range.ksh
+M      scripts/da_run_wrfvar.ksh
+M      scripts/da_run_wps.ksh
+M      scripts/da_run_job.ksh
+M      scripts/da_compile_and_run.ksh
+M      scripts/da_run_real.ksh
+M      scripts/da_run_suite_wrapper.ksh
+M      scripts/da_run_suite.ksh
+M      scripts/da_run_wrfsi.ksh
+M      scripts/da_restore_data_ncep.ksh
+M      scripts/da_run_wrf.ksh
+M      scripts/da_restore_data_rtobs.ksh
+M      scripts/da_update_bc.ksh
+M      tools/gen_wrf_io.c
+M      share/module_io_domain.F
+A      doc/changes/changes_20061012a.jrb
+M      doc/changes/changes_20061005a.jrb
+M      Registry/Registry.wrfvar
+M      arch/postamble_new
+M      arch/configure.defaults_new
+M      convertor/da_module_convert_tool/da_module_convert_tool.F
+M      external/RSL/module_dm.F
+M      external/Makefile
+ M     main
+M      main/wrfvar.F
+M      configure_new
+?      build/compile.out
+M      build/da.make
+M      build/main.make
+M      build/tools.make
+M      setup.csh
+
+

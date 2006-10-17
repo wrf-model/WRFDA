@@ -18,17 +18,15 @@ subroutine da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y )
 
    IF ( iv%num_polaramv > 0 ) THEN
       DO n=1, iv%num_polaramv
-         if (iv%polaramv(n)%loc%proc_domain_with_halo) then
-            do k=1, iv%polaramv(n)%info%levels
+         do k=1, iv%polaramv(n)%info%levels
 
-               jo_grad_y%polaramv(n)%u(k) = -re%polaramv(n)%u(k) / &
-                                         ( iv%polaramv(n)%u(k)%error * &
-                                           iv%polaramv(n)%u(k)%error )
-               jo_grad_y%polaramv(n)%v(k) = -re%polaramv(n)%v(k) / &
-                                         ( iv%polaramv(n)%v(k)%error * &
-                                           iv%polaramv(n)%v(k)%error )
-            end do
-         endif
+            jo_grad_y%polaramv(n)%u(k) = -re%polaramv(n)%u(k) / &
+                                      ( iv%polaramv(n)%u(k)%error * &
+                                        iv%polaramv(n)%u(k)%error )
+            jo_grad_y%polaramv(n)%v(k) = -re%polaramv(n)%v(k) / &
+                                      ( iv%polaramv(n)%v(k)%error * &
+                                        iv%polaramv(n)%v(k)%error )
+         end do
 
          if (iv%polaramv(n)%loc%proc_domain) then
             do k=1, iv%polaramv(n)%info%levels

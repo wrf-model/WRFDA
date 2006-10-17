@@ -60,6 +60,8 @@ subroutine da_trh_to_td (RH, T, TD, xp)
 
    integer :: is,ie,js,je,ks,ke
 
+   if (trace_use) call da_trace_entry("da_trh_to_td")
+
    is = xp%its
    ie = xp%ite
    js = xp%jts
@@ -87,6 +89,8 @@ subroutine da_trh_to_td (RH, T, TD, xp)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_trh_to_td")
 
 end subroutine da_trh_to_td
 

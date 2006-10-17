@@ -254,7 +254,7 @@ while test $LOCAL_DATE != $END_DATE; do
 #   ln -sf ${MD_DIR}/$LOCAL_DATE/${AVN_FILE} ${MD_DIR}/$LOCAL_DATE/${AVN_FILE}
 #   echo "   File ${CSDIR}/$LOCAL_DATE/$AVN_FILE created as link."
 
-   LOCAL_DATE=`${WRFVAR_DIR}/main/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
+   LOCAL_DATE=`${WRFVAR_DIR}/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
 done
 
 #Copy in another static file:

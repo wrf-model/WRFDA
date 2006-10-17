@@ -11,7 +11,6 @@ module da_gen_be
    use da_constants
    use lapack
    use blas
-   use module_wrf_error
    use da_tracing
 
    implicit none

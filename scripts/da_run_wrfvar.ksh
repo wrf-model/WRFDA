@@ -12,6 +12,7 @@ export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 export DATE=${DATE:-2003010112}              # Analysis date.
 export WINDOW_START=${WINDOW_START:-0}
 export WINDOW_END=${WINDOW_END:-6}
+export NL_NUM_FGAT=${NL_NUM_FGAT:-1}
 
 #Default directories/files:
 
@@ -19,16 +20,6 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
-
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-
-if $CHECK_SVNVERSION; then
-   WRFVAR_REV=`svnversion -n $WRFVAR_DIR 2>/dev/null`
-   if $NL_VAR4D; then
-      WRF_NL_REV=`svnversion -n $WRF_NL_DIR 2>/dev/null`
-      WRFPLUS_REV=`svnversion -n $WRFPLUS_DIR 2>/dev/null`
-   fi
-fi
 
 export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
@@ -61,12 +52,7 @@ else
 fi
 
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
-export DA_OBSERVATIONS=${DA_OBSERVATIONS:-$OB_DIR/$DATE/ob.ascii} # wrfvar observation input.
-export DA_BUFR_DIR=${DA_BUFR_DIR:-$OB_DIR/$DATE} # radiance bufr file directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
-export DA_SSMI=${DA_SSMI:-$OB_DIR/$DATE/ssmi.dat}               # SSM/I radiances (ignore if not using).
-export DA_RADAR=${DA_RADAR:-$OB_DIR/$DATE/radar.dat}            # Radar data (ignore if not using).
-export ENDIAN=${ENDIAN:-big_endian}
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
@@ -86,10 +72,10 @@ echo "<HTML><HEAD><TITLE>$EXPT wrfvar</TITLE></HEAD><BODY><H1>$EXPT wrfvar</H1><
 date
 
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
-echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_REV
+echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 if $NL_VAR4D; then
-   echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_REV
-   echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_REV
+   echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_VN
+   echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
@@ -106,12 +92,12 @@ if test ! -f $DA_ANALYSIS; then
    mkdir -p ${WORK_DIR}
    cd $WORK_DIR
 
-   START_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_START`
-   END_DATE=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $WINDOW_END`
+   START_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $WINDOW_START`
+   END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $WINDOW_END`
 
    for INDEX in 01 02 03 04 05 06 07; do
       let H=$INDEX-1+$WINDOW_START
-      D_DATE[$INDEX]=`$WRFVAR_DIR/main/advance_cymdh.exe $DATE $H`
+      D_DATE[$INDEX]=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $H`
       export D_YEAR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c1-4`
       export D_MONTH[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c5-6`
       export D_DAY[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c7-8`
@@ -139,11 +125,10 @@ if test ! -f $DA_ANALYSIS; then
    export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
    export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00.0000}
+# JRB are these duplicates?
    export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
+   export NL_TIME_ANALYSIS=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
    export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
-
-   # Default WRF namelist variables:
-   export NL_OB_FORMAT=${NL_OB_FORMAT:-2}              # Observation format: 1=BUFR, 2=ASCII "little_r"
 
    #-----------------------------------------------------------------------
    # [2.0] Perform sanity checks:
@@ -175,18 +160,13 @@ if test ! -f $DA_ANALYSIS; then
    cp $WRFVAR_DIR/run/gribmap.txt .
    cp $WRFVAR_DIR/run/LANDUSE.TBL .
    cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   ln -s $WRFVAR_DIR/main/wrfvar.exe .
+   ln -s $WRFVAR_DIR/build/wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
    ln -sf $DA_FIRST_GUESS	 fg01
    ln -sf $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
    ln -sf $DA_BACK_ERRORS   fort.34
-   if test $NL_OB_FORMAT = 1; then
-      ln -fs $DA_OBSERVATIONS ob.bufr
-   else
-      ln -fs $DA_OBSERVATIONS ob01.ascii
-   fi
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then
@@ -206,30 +186,36 @@ if test ! -f $DA_ANALYSIS; then
       fi
    done
 
-   for FILE in $DA_BUFR_DIR/*.bufr; do
+   if test $NL_NUM_FGAT -gt 1; then
+      # More than one observation file of each type
+      ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
+      for I in 02 03 04 05 06; do
+         ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
+      done
+      ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
+
+      ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+      for I in 02 03 04 05 06; do
+         ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
+      done
+      ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
+
+      ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+      for I in 02 03 04 05 06; do
+         ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
+      done
+      ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+   else
+      ln -fs $OB_DIR/$DATE/ob.ascii  ob01.ascii
+      ln -sf $OB_DIR/$DATE/ssmi.dat  ssmi01.dat
+      ln -sf $OB_DIR/$DATE/radar.dat radar01.dat
+   fi
+
+   for FILE in $OB_DIR/$DATE/*.bufr; do
       if test -f $FILE; then
          ln -s $FILE .
       fi
    done
-
-   # Overwrite with specific endian files if available
-
-   for FILE in $DA_BUFR_DIR/*.$ENDIAN; do 
-      if test -f $FILE; then
-         FILE1=`basename $FILE`
-         ln -sf $FILE ${FILE1%%.$ENDIAN}
-      fi
-   done
-
-   if test -r $DA_SSMI; then
-      ln -sf $DA_SSMI ssmi01.dat
-      export NL_USE_SSMIRETRIEVALOBS=true
-   fi
-
-   if test -r $DA_RADAR; then
-      ln -sf $DA_RADAR radar01.dat
-      export NL_USE_RADAROBS=true
-   fi
 
    if $NL_VAR4D; then
       # Create nl, tl, ad links structures
@@ -350,24 +336,6 @@ if test ! -f $DA_ANALYSIS; then
       RC=0
    else
       if $NL_VAR4D; then
-         ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
-         for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
-         done
-         ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
-
-         ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
-         for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
-         done
-         ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
-
-         ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
-         for I in 02 03 04 05 06; do
-            ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
-         done
-         ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
-
          if $POE && test $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
@@ -404,6 +372,8 @@ if test ! -f $DA_ANALYSIS; then
             RC=$?
          fi
       else
+        # 3DVAR
+
          $RUN_CMD ./wrfvar.exe
          RC=$?
       fi

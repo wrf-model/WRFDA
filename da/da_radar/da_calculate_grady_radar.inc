@@ -14,28 +14,26 @@ subroutine da_calculate_grady_radar( iv, re, jo_grad_y )
 
    IF (iv%num_Radar > 0) THEN 
       DO n=1, iv%num_Radar
-         if( iv%radar(n)%loc%proc_domain_with_halo ) then
-            do k=1, iv%Radar(n)%info%levels
-               IF ( USE_Radar_rv ) THEN
-                  if (iv%Radar(n)%rv(k)%qc < obs_qc_pointer) THEN
-                     re%Radar(n)%rv(k) = 0.0
-                  end if
+         do k=1, iv%Radar(n)%info%levels
+            IF ( USE_Radar_rv ) THEN
+               if (iv%Radar(n)%rv(k)%qc < obs_qc_pointer) THEN
+                  re%Radar(n)%rv(k) = 0.0
+               end if
 
-                  jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                         ( iv%Radar(n)%rv(k)%error * &
-                                           iv%Radar(n)%rv(k)%error )
-               ENDIF
+               jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
+                                      ( iv%Radar(n)%rv(k)%error * &
+                                        iv%Radar(n)%rv(k)%error )
+            ENDIF
 
-               IF (USE_Radar_rf) THEN
-                  if (iv%Radar(n)%rf(k)%qc < obs_qc_pointer) then
-                     re%Radar(n)%rf(k) = 0.0
-                  end if
-                  jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                         ( iv%Radar(n)%rf(k)%error * &
-                                           iv%Radar(n)%rf(k)%error )
-               ENDIF
-            end do
-         endif  
+            IF (USE_Radar_rf) THEN
+               if (iv%Radar(n)%rf(k)%qc < obs_qc_pointer) then
+                  re%Radar(n)%rf(k) = 0.0
+               end if
+               jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
+                                      ( iv%Radar(n)%rf(k)%error * &
+                                        iv%Radar(n)%rf(k)%error )
+            ENDIF
+         end do
       END DO
    END IF
 

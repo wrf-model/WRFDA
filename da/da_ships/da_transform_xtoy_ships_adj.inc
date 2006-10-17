@@ -18,57 +18,53 @@ subroutine da_transform_xtoy_ships_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
             iv%ob_numb(iv%current_ob_time)%ships
-            if(iv%ships(n)%loc%proc_domain_with_halo) then
 
-               ! [1.1] Get horizontal interpolation weights:
+            ! [1.1] Get horizontal interpolation weights:
 
-               i = iv%ships(n)%loc%i
-               dy = iv%ships(n)%loc%dy
-               dym = iv%ships(n)%loc%dym
-               j = iv%ships(n)%loc%j
-               dx = iv%ships(n)%loc%dx
-               dxm = iv%ships(n)%loc%dxm
+            i = iv%ships(n)%loc%i
+            dy = iv%ships(n)%loc%dy
+            dym = iv%ships(n)%loc%dym
+            j = iv%ships(n)%loc%j
+            dx = iv%ships(n)%loc%dx
+            dxm = iv%ships(n)%loc%dxm
 
-               ! [1.2] Interpolate horizontally:
+            ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-               call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, & 
-                  dxm, dym, jo_grad_y%ships(n)%t, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%q, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, & 
+               dxm, dym, jo_grad_y%ships(n)%t, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%q, iv%ships(n)%zk)
 
-               call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
-                  xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
+            call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
+               xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
 #else
-               call da_interp_obs_lin_2d_adj( &
-                  jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj( &
-                  jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj( &
-                  jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%t, iv%ships(n)%zk)
-               call da_interp_obs_lin_2d_adj( &
-                  jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-                  dxm, dym, jo_grad_y%ships(n)%q, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj( &
+               jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj( &
+               jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj( &
+               jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%t, iv%ships(n)%zk)
+            call da_interp_obs_lin_2d_adj( &
+               jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
+               dxm, dym, jo_grad_y%ships(n)%q, iv%ships(n)%zk)
 
-               call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
-                  xp%ims, xp%ime, xp%jms, xp%jme, &
-                  i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
+            call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
+               xp%ims, xp%ime, xp%jms, xp%jme, &
+               i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
 #endif
-            endif
          END DO
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
             iv%ob_numb(iv%current_ob_time)%ships
-            if(iv%ships(n)%loc%proc_domain_with_halo) then
-               call da_transform_xtopsfc_adj(xb,xp,iv%ships(n), &
+            call da_transform_xtopsfc_adj(xb,xp,iv%ships(n), &
                                                jo_grad_y%ships(n),jo_grad_x)
-            endif
          ENDDO
       endif
    END IF

@@ -17,7 +17,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
    CHARACTER(*),   INTENT (in), OPTIONAL :: filename
 
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: inside_halo, outside, outside_all
+   LOGICAL                      :: outside, outside_all
    REAL                         :: height_error
    INTEGER                      :: total_obs, &
                                    num_sound, &
@@ -175,7 +175,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
       END IF
 
       call da_ll_to_xy (platform%info, platform%loc, &
-                        xp, outside, inside_halo, outside_all )
+                        xp, outside, outside_all )
 
       if(outside_all) cycle reports
 

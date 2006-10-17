@@ -1,5 +1,5 @@
 subroutine da_ll_to_xy (info, loc, xp, &
-                        outside, inside_halo, outside_all)
+                        outside, outside_all)
 
 !  This routine convert the (lat, lon) into (x,y) coordinates
 !  Additions:      10/26/2004    Syed RH Rizvi
@@ -12,11 +12,9 @@ subroutine da_ll_to_xy (info, loc, xp, &
    TYPE(model_loc_type),  intent(inout) :: loc
    TYPE(xpose_type),      intent(in)    :: xp           !Domain decomposition vars.
    LOGICAL      ,         intent(out)   :: outside      !wrt local domain
-   LOGICAL      ,         intent(out)   :: inside_halo
    LOGICAL, OPTIONAL,     intent(out)   :: outside_all  !wrt all domains
 
    outside = .false.
-   inside_halo = .true.
    loc % x   = -1.0
    loc % y   = -1.0
    
@@ -59,7 +57,6 @@ subroutine da_ll_to_xy (info, loc, xp, &
    if(fg_format == 3)then
       if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
          outside = .true.
-         inside_halo = .false.
          return
       endif
 
@@ -76,21 +73,18 @@ subroutine da_ll_to_xy (info, loc, xp, &
    if((loc%i < xp%ids) .or. (loc%i >= xp%ide) .or. &
       (loc%j < xp%jds) .or. (loc%j >= xp%jde)) then
       outside     = .true. 
-      inside_halo = .false.
       return
    endif
 
    if((loc%i < xp%its-1) .or. (loc%i > xp%ite) .or. &
       (loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
       outside = .true.
-      inside_halo = .false.
       return
 
       if(def_sub_domain ) then
          if( x_start_sub_domain > loc%x .or. y_start_sub_domain > loc%y .or. &
              x_end_sub_domain   < loc%x .or. y_end_sub_domain   < loc%y) then
              outside = .true.
-             inside_halo = .false.
          endif
       endif
    endif

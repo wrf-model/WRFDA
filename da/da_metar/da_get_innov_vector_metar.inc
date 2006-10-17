@@ -1,64 +1,63 @@
 subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
 
-  !-------------------------------------------------------------------------
-  !
-  !  History:
-  !
-  !
-  !     Additions:        03/19/2003                    S. R. H. Rizvi
-  !
-  !               1. DA_Check_Max_IV is called for each outer iteration
-  !
-  !               2. Extra diagnostics added for generating detailed information
-  !                  about rejected obs in various outer iterations
-  !
-  !     Modification:	02/18/2004		Wei Huang
-  !		Make obs. operator independent of cv-options.
-  !
-  !-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   !
+   !  History:
+   !
+   !
+   !     Additions:        03/19/2003                    S. R. H. Rizvi
+   !
+   !               1. da_check_max_iv is called for each outer iteration
+   !
+   !               2. Extra diagnostics added for generating detailed information
+   !                  about rejected obs in various outer iterations
+   !
+   !     Modification:	02/18/2004		Wei Huang
+   !		Make obs. operator independent of cv-options.
+   !
+   !-------------------------------------------------------------------------
 
-  IMPLICIT NONE
+   IMPLICIT NONE
 
-  INTEGER, INTENT(IN)           :: it      ! External iteration.
-  TYPE (xb_type), INTENT(IN)    :: xb      ! first guess state.
-  TYPE (xpose_type), INTENT(IN) :: xp      ! Domain decomposition vars.
-  TYPE (y_type),  INTENT(INOUT) :: ob      ! Observation structure.
-  TYPE (ob_type), INTENT(INOUT) :: iv      ! O-B structure.
+   INTEGER, INTENT(IN)           :: it      ! External iteration.
+   TYPE (xb_type), INTENT(IN)    :: xb      ! first guess state.
+   TYPE (xpose_type), INTENT(IN) :: xp      ! Domain decomposition vars.
+   TYPE (y_type),  INTENT(INOUT) :: ob      ! Observation structure.
+   TYPE (ob_type), INTENT(INOUT) :: iv      ! O-B structure.
 
-  !-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
 
-  INTEGER                      :: n        ! Loop counter.
-  INTEGER                      :: i, j, k  ! Index dimension.
-  REAL                         :: dx, dxm  ! Interpolation weights.
-  REAL                         :: dy, dym  ! Interpolation weights.
-  REAL                         :: model_u  ! Model value u at oblocation.
-  REAL                         :: model_v  ! Model value v at oblocation.
-  REAL                         :: model_t  ! Model value t at oblocation.
-  REAL                         :: model_p  ! Model value p at oblocation.
-  REAL                         :: model_q  ! Model value q at oblocation.
+   INTEGER                      :: n        ! Loop counter.
+   INTEGER                      :: i, j, k  ! Index dimension.
+   REAL                         :: dx, dxm  ! Interpolation weights.
+   REAL                         :: dy, dym  ! Interpolation weights.
+   REAL                         :: model_u  ! Model value u at oblocation.
+   REAL                         :: model_v  ! Model value v at oblocation.
+   REAL                         :: model_t  ! Model value t at oblocation.
+   REAL                         :: model_p  ! Model value p at oblocation.
+   REAL                         :: model_q  ! Model value q at oblocation.
 
-  REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
-  REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
+   REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
 
-  REAL :: hd, psfcm
+   REAL :: hd, psfcm
 
-  REAL :: hsm , ho, to, qo
+   REAL :: hsm , ho, to, qo
 
-  INTEGER :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   INTEGER :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-  !-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
 
-  if ( iv % num_metar < 1 ) return
+   if ( iv % num_metar < 1 ) return
 
-  IF (trace_use) call da_trace_entry("da_get_innov_vector_metar")
+   IF (trace_use) call da_trace_entry("da_get_innov_vector_metar")
 
-  !-------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
 
-  itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
-  ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
+   itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
+   ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
 
-  do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
-    if(iv%metar(n)%loc%proc_domain_with_halo) then  ! domain_with_halo
+   do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
       ! [1.1] Get horizontal interpolation weights:
 
       i = iv%metar(n)%loc%i
@@ -260,19 +259,18 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
         call da_check_max_iv_metar(it, iv % metar(n), &
                      itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
       END IF
-    endif  ! domain_with_halo
-  enddo
+   enddo
 
-  write(unit= check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-    ', Total Rejections for Metar follows:'
+   write(unit= check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+      ', Total Rejections for Metar follows:'
 
-  WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-    'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-    'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-    'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
-    'Number of failed temperature observations:',ittf, ' on ',itt,   &
-    'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-    'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+      'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+      'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+      'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
+      'Number of failed temperature observations:',ittf, ' on ',itt,   &
+      'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+      'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                       itu +itvv +itp +itt +itqv
 
   IF (trace_use) call da_trace_exit("da_get_innov_vector_metar")
