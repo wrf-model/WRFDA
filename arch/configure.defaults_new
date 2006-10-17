@@ -75,7 +75,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS_RSL     =
 
-LOCAL_LIB       = --L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
