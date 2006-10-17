@@ -435,14 +435,6 @@ RSL_REGISTER_F90_BASE_AND_SIZE ( base , size )
     f90_base_table[ base_table_cursor ].virt_base =
            f90_base_table[ base_table_cursor-1 ].virt_base +
            f90_base_table[ base_table_cursor-1 ].size_in_bytes + BASE_TABLE_PADDING ;
-
-/*
-fprintf(stderr,"> %3d. base %ld virt_base %ld size %d sizeof(base) %d \n",base_table_cursor,
-                       f90_base_table[ base_table_cursor ].base,
-                       f90_base_table[ base_table_cursor ].virt_base,
-                       f90_base_table[ base_table_cursor ].size_in_bytes,
-                       sizeof(f90_base_table[ base_table_cursor ].base)) ;
-*/
     base_table_cursor++ ;
   }
   else
@@ -450,7 +442,6 @@ fprintf(stderr,"> %3d. base %ld virt_base %ld size %d sizeof(base) %d \n",base_t
     RSL_TEST_ERR(1,"Exceeded MAX_BASE_TABLE_ENTRIES number of f90 fields") ;
   }
 }
-
 
 RSL_END_REGISTER_F90 ()
 {

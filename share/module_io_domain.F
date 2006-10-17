@@ -7,8 +7,6 @@ USE module_io_wrf
 USE module_date_time
 USE module_domain
 
-  PRIVATE open_dataset
-
 CONTAINS
 
   SUBROUTINE open_r_dataset ( id , fname , grid , config_flags , sysdepinfo, ierr )

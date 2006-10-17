@@ -551,7 +551,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
 
         
-    END IF diff_opt1 
+    END IF diff_opt1
 
     IF ( diff_6th_opt .NE. 0 ) THEN
 
@@ -708,7 +708,7 @@ SUBROUTINE rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
    DO k = kts,kte-1
    DO i = its,MIN(ite,ide-1)
      IF(rk_step == 1)t_tendf(i,k,j) = t_tendf(i,k,j) +  t_save(i,k,j)
-      t_tend(i,k,j) =  t_tend(i,k,j) +  t_tendf(i,k,j)/msft(i,j)  &
+     t_tend(i,k,j) =  t_tend(i,k,j) +  t_tendf(i,k,j)/msft(i,j)  &
                                      +  mut(i,j)*h_diabatic(i,k,j)/msft(i,j)
    ENDDO
    ENDDO
@@ -720,7 +720,6 @@ SUBROUTINE rk_addtend_dry ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &
       mu_tend(i,j) =  mu_tend(i,j) +  mu_tendf(i,j)
    ENDDO
    ENDDO
-
 
 END SUBROUTINE rk_addtend_dry
 
@@ -828,7 +827,6 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
                               ims, ime, jms, jme, kms, kme,  &
                               its, ite, jts, jte, kts, kte  )
 
-
      IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN
 
         CALL set_tend( RQVFTEN, advect_tend, msft,     &
@@ -840,9 +838,6 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
      rk_step_1: IF( rk_step == 1 ) THEN
 
        diff_opt1 : IF (config_flags%diff_opt .eq. 1) THEN
-
-
-
 
        CALL horizontal_diffusion ( 'm', scalar(ims,kms,jms,im),            &
                                         scalar_tends(ims,kms,jms,im), mut, &
@@ -876,24 +871,21 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
 
          END IF
 
-      ENDIF pbl_test
+       ENDIF pbl_test
 
+       ENDIF diff_opt1
 
+       IF ( diff_6th_opt .NE. 0 )                                        &
+         CALL sixth_order_diffusion( 'm', scalar(ims,kms,jms,im),        &
+                                          scalar_tends(ims,kms,jms,im),  &
+                                          mut, dt, config_flags,         &
+                                          diff_6th_opt, diff_6th_rate,   &
+                                          ids, ide, jds, jde, kds, kde,  &
+                                          ims, ime, jms, jme, kms, kme,  &
+                                          its, ite, jts, jte, kts, kte )
 
+     ENDIF rk_step_1
 
-    ENDIF diff_opt1
-
-    IF ( diff_6th_opt .NE. 0 )                                        &
-      CALL sixth_order_diffusion( 'm', scalar(ims,kms,jms,im),        &
-                                       scalar_tends(ims,kms,jms,im),  &
-                                       mut, dt, config_flags,         &
-                                       diff_6th_opt, diff_6th_rate,   &
-                                       ids, ide, jds, jde, kds, kde,  &
-                                       ims, ime, jms, jme, kms, kme,  &
-                                       its, ite, jts, jte, kts, kte )
-
-
-   ENDIF rk_step_1
  END DO scalar_loop
 
 END SUBROUTINE rk_scalar_tend
@@ -979,7 +971,6 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
       k_start = kts
       k_end   = min( kte, kde-1 )
     ENDIF
-
 
     IF ( rk_step == 1 ) THEN
 
@@ -1084,127 +1075,6 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
     END IF
 
 END SUBROUTINE rk_update_scalar
-
-!------------------------------------------------------------
-
-SUBROUTINE time_filter  ( u_1, u_2, u_save,             &
-                          v_1, v_2, v_save,             &
-                          w_1, w_2, w_save,             &
-                          t_1, t_2, t_save,             &
-                          ph_1, ph_2, ph_save,          &
-                          mu_1, mu_2, mu_save,          &
-                          epsts,                        & 
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          its, ite, jts, jte, kts, kte )
-
-   IMPLICIT NONE
-
-   !  Input data.
-
-
-   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
-                                    ims, ime, jms, jme, kms, kme, &
-                                    its, ite, jts, jte, kts, kte
-
-   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                        &
-                                               INTENT(INOUT) ::  u_1,       &
-                                                                 v_1,       &
-                                                                 w_1,       &
-                                                                 t_1,       &
-                                                                 ph_1,      &
-                                                                 u_2,       &
-                                                                 v_2,       &
-                                                                 w_2,       &
-                                                                 t_2,       &
-                                                                 ph_2
-
-
-   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                           &
-                                               INTENT(IN   ) ::  u_save,       &
-                                                                 v_save,       &
-                                                                 w_save,       &
-                                                                 t_save,       &
-                                                                 ph_save
-
-
-   REAL , DIMENSION(  ims:ime , jms:jme ) ,                                  &
-                                               INTENT(INOUT) ::  mu_1,       &
-                                                                 mu_2
-
-   REAL , DIMENSION(  ims:ime , jms:jme ) ,                                  &
-                                               INTENT(IN   ) ::  mu_save
-
-   REAL , INTENT(IN   )  :: epsts
-
-   INTEGER :: i,j,k
-
-!<DESCRIPTION>
-!
-!  Asselin timefilter for momentum, theta, geopotential, and mu.
-!  Used with leapfrog option.
-!
-!</DESCRIPTION>
-
-      DO  j = jts, min(jte,jde-1)
-      DO  k = kts, min(kte,kde-1)
-      DO  i = its, ite
-
-      u_1(i,k,j) = u_save(i,k,j) + epsts*( u_1(i,k,j)       &
-                                          -2*u_save(i,k,j)  &
-                                           +u_2(i,k,j)      )
-      ENDDO
-      ENDDO
-      ENDDO
-
-      DO  j = jts, jde
-      DO  k = kts, min(kte,kde-1)
-      DO  i = its, min(ite,ide-1)
-
-      v_1(i,k,j) = v_save(i,k,j) + epsts*( v_1(i,k,j)       &
-                                          -2*v_save(i,k,j)  &
-                                          +v_2(i,k,j)      )
-      ENDDO
-      ENDDO
-      ENDDO
-
-      DO  j = jts, min(jte,jde-1)
-      DO  k = kts, kte
-      DO  i = its, min(ite,ide-1)
-
-      w_1(i,k,j) = w_save(i,k,j) + epsts*( w_1(i,k,j)       &
-                                          -2*w_save(i,k,j)  &
-                                          +w_2(i,k,j)      )
-      ph_1(i,k,j) = ph_save(i,k,j) + epsts*( ph_1(i,k,j)     &
-                                          -2*ph_save(i,k,j)  &
-                                          +ph_2(i,k,j)      )
-      ENDDO
-      ENDDO
-      ENDDO
-
-      DO  j = jts, min(jte,jde-1)
-      DO  k = kts, min(kte,kde-1)
-      DO  i = its, min(ite,ide-1)
-
-      t_1(i,k,j) = t_save(i,k,j) + epsts*( t_1(i,k,j)       &
-                                          -2*t_save(i,k,j)  &
-                                          +t_2(i,k,j)      )
-
-      ENDDO
-      ENDDO
-      ENDDO
-
-      DO  j = jts, min(jte,jde-1)
-      DO  i = its, min(ite,ide-1)
-
-      mu_1(i,j) = mu_save(i,j) + epsts*( mu_1(i,j)       &
-                                          -2*mu_save(i,j)  &
-                                          +mu_2(i,j)      )
-
-      ENDDO
-      ENDDO
-
-END SUBROUTINE time_filter
 
 !-----------------------------------------------------------------------
 

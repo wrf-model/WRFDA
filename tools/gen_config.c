@@ -195,7 +195,7 @@ gen_namelist_script ( char * dirname )
 }
 
 
-
+int
 gen_get_nl_config ( char * dirname )
 {
   FILE * fp ;
