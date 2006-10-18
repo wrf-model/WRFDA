@@ -39,6 +39,26 @@ subroutine da_set_boundary_xb(xb)
          xb%coefy(xb%ide+n,j)      = xb%coefy(xb%ids-1+n,j)
          xb%w(xb%ide+n,j,k)        = xb%w(xb%ids-1+n,j,k)
          ! xb%h(xb%ide+n,j,k)        = xb%h(xb%ids-1+n,j,k)
+
+         ! Zhiquan Liu add some RTTOV variables
+         !--------------------------------------
+         xb%t2(xb%ide+n,j) = xb%t2(xb%ids-1+n,j)
+         xb%q2(xb%ide+n,j) = xb%q2(xb%ids-1+n,j)
+         xb%u10(xb%ide+n,j) = xb%u10(xb%ids-1+n,j)
+         xb%v10(xb%ide+n,j) = xb%v10(xb%ids-1+n,j)
+         xb%tsk(xb%ide+n,j) = xb%tsk(xb%ids-1+n,j)
+         xb%tgrn(xb%ide+n,j) = xb%tgrn(xb%ids-1+n,j)
+         xb%landmask(xb%ide+n,j) = xb%landmask(xb%ids-1+n,j)
+         xb%xland(xb%ide+n,j) = xb%xland(xb%ids-1+n,j)
+
+         xb%smois(xb%ide+n,j) = xb%smois(xb%ids-1+n,j)
+         xb%tslb(xb%ide+n,j) = xb%tslb(xb%ids-1+n,j)
+         xb%xice(xb%ide+n,j) = xb%xice(xb%ids-1+n,j)
+         xb%ivgtyp(xb%ide+n,j) = xb%ivgtyp(xb%ids-1+n,j)
+         xb%isltyp(xb%ide+n,j) = xb%isltyp(xb%ids-1+n,j)
+         xb%vegfra(xb%ide+n,j) = xb%vegfra(xb%ids-1+n,j)
+         xb%snowh(xb%ide+n,j) = xb%snowh(xb%ids-1+n,j)
+
       enddo
    enddo
 
