@@ -16,7 +16,6 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    INTEGER                  :: fft_size_i  ! Efficient FFT 1st dimension.
    INTEGER                  :: fft_size_j  ! Efficient FFT 2nd dimension.
    LOGICAL                  :: found_magic ! TRUE when efficient FFT found
-   LOGICAL                  :: need_pad    ! True when need pad_i > 0.
 
    INTEGER                  :: i, j
    INTEGER                  :: nx            ! nx + 1 = ix + pad_i

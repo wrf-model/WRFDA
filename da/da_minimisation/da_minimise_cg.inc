@@ -75,7 +75,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    j_grad = 0.0
    fhat = 0.0
 
-   call da_allocate_y(iv, jo_grad_y)
+   call da_allocate_y (iv, jo_grad_y)
 
    call da_calculate_j( it, 0, cv_size, be % cv % size_jb, be % cv % size_je, &
                         xb, xbx, be, ep, iv, xhat, cv, &

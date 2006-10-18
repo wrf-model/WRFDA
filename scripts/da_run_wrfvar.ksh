@@ -373,7 +373,6 @@ if test ! -f $DA_ANALYSIS; then
          fi
       else
         # 3DVAR
-
          $RUN_CMD ./wrfvar.exe
          RC=$?
       fi

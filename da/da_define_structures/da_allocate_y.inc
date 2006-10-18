@@ -12,6 +12,9 @@ SUBROUTINE da_allocate_y( iv, y )
    INTEGER                               :: n, i, j ! Loop counter.
    INTEGER                               :: nlevels ! Number of levels.
 
+   if (trace_use) call da_trace_entry("da_allocate_y")
+
+
    !---------------------------------------------------------------------------
    !  [1.0] Copy number of observations:
    !---------------------------------------------------------------------------
@@ -346,5 +349,8 @@ SUBROUTINE da_allocate_y( iv, y )
       end do
    END IF
 
+   if (trace_use) call da_trace_exit("da_allocate_y")
 
 END SUBROUTINE da_allocate_y
+
+

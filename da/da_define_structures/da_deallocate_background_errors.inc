@@ -12,38 +12,49 @@ subroutine da_deallocate_background_errors ( be )
 
    ! Deallocate gridpoint errors:
 
-   IF ( be % v1 % mz > 0 ) DEALLOCATE ( be % v1 % val )
-   IF ( be % v2 % mz > 0 ) DEALLOCATE ( be % v2 % val )
-   IF ( be % v3 % mz > 0 ) DEALLOCATE ( be % v3 % val )
-   IF ( be % v4 % mz > 0 ) DEALLOCATE ( be % v4 % val )
-   IF ( be % v5 % mz > 0 ) DEALLOCATE ( be % v5 % val )  
-   
-   IF ( be % v1 % mz > 0 ) DEALLOCATE ( be % v1 % rf_alpha )
-   IF ( be % v2 % mz > 0 ) DEALLOCATE ( be % v2 % rf_alpha )
-   IF ( be % v3 % mz > 0 ) DEALLOCATE ( be % v3 % rf_alpha )
-   IF ( be % v4 % mz > 0 ) DEALLOCATE ( be % v4 % rf_alpha )
-   IF ( be % v5 % mz > 0 ) DEALLOCATE ( be % v5 % rf_alpha )
-   
-   ! Deallocate eigenvectors of vertical error covariance:
+   if (associated(be % v1 % val)) deallocate ( be % v1 % val )
+   if (associated(be % v2 % val)) deallocate ( be % v2 % val )
+   if (associated(be % v3 % val)) deallocate ( be % v3 % val )
+   if (associated(be % v4 % val)) deallocate ( be % v4 % val )
+   if (associated(be % v5 % val)) deallocate ( be % v5 % val )  
 
-   IF (vert_corr == 2) THEN
-      IF ( be % v1 % mz > 0 )DEALLOCATE ( be % v1 % evec )
-      IF ( be % v2 % mz > 0 )DEALLOCATE ( be % v2 % evec )
-      IF ( be % v3 % mz > 0 )DEALLOCATE ( be % v3 % evec )
-      IF ( be % v4 % mz > 0 )DEALLOCATE ( be % v4 % evec )
-      IF ( be % v5 % mz > 0 )DEALLOCATE ( be % v5 % evec )
-   END IF
+   if (associated(be % v1 % val_g)) deallocate ( be % v1 % val_g )
+   if (associated(be % v2 % val_g)) deallocate ( be % v2 % val_g )
+   if (associated(be % v3 % val_g)) deallocate ( be % v3 % val_g )
+   if (associated(be % v4 % val_g)) deallocate ( be % v4 % val_g )
+   if (associated(be % v5 % val_g)) deallocate ( be % v5 % val_g ) 
    
-   IF ( be % v1 % mz > 0 ) DEALLOCATE( be % v1 % rf_alpha )
-   IF ( be % v2 % mz > 0 ) DEALLOCATE( be % v2 % rf_alpha )
-   IF ( be % v3 % mz > 0 ) DEALLOCATE( be % v3 % rf_alpha )
-   IF ( be % v4 % mz > 0 ) DEALLOCATE( be % v4 % rf_alpha )
-   IF ( be % v5 % mz > 0 ) DEALLOCATE( be % v5 % rf_alpha )
+   if (associated(be % v1 % rf_alpha)) deallocate ( be % v1 % rf_alpha )
+   if (associated(be % v2 % rf_alpha)) deallocate ( be % v2 % rf_alpha )
+   if (associated(be % v3 % rf_alpha)) deallocate ( be % v3 % rf_alpha )
+   if (associated(be % v4 % rf_alpha)) deallocate ( be % v4 % rf_alpha )
+   if (associated(be % v5 % rf_alpha)) deallocate ( be % v5 % rf_alpha )
+   
+   ! deallocate eigenvectors of vertical error covariance:
+
+   if (vert_corr == 2) then
+      if (associated(be % v1 % evec)) deallocate ( be % v1 % evec )
+      if (associated(be % v2 % evec)) deallocate ( be % v2 % evec )
+      if (associated(be % v3 % evec)) deallocate ( be % v3 % evec )
+      if (associated(be % v4 % evec)) deallocate ( be % v4 % evec )
+      if (associated(be % v5 % evec)) deallocate ( be % v5 % evec )
+      if (associated(be % v1 % evec_g)) deallocate ( be % v1 % evec_g )
+      if (associated(be % v2 % evec_g)) deallocate ( be % v2 % evec_g )
+      if (associated(be % v3 % evec_g)) deallocate ( be % v3 % evec_g )
+      if (associated(be % v4 % evec_g)) deallocate ( be % v4 % evec_g )
+      if (associated(be % v5 % evec_g)) deallocate ( be % v5 % evec_g )
+   END IF
    
    ! Deallocate control variable errors (in future uncomment use these to allow 
    ! eg NMC error correlations).
 
-   ! DEALLOCATE ( be % cv % val )
+   ! if (associated(be%cv%val)) deallocate ( be % cv % val )
+
+   ! Other
+
+   if (associated(be%reg_chi)) deallocate(be%reg_chi)
+   if (associated(be%reg_ps))  deallocate(be%reg_ps)
+   if (associated(be%reg_t))   deallocate(be%reg_t)
 
    IF (trace_use) call da_trace_exit("da_deallocate_background_errors")
 

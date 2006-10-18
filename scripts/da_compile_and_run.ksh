@@ -33,12 +33,11 @@ let COUNT=1
 for CONFIG in $CONFIGS; do
 
   for COMPILER in $COMPILERS; do
+    export BUILD=${ID}_${CONFIG}_${COMPILER}_${MACHINE}
     if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
 
       . ~/setup_$COMPILER
-
-      export BUILD=${ID}_${CONFIG}_${COMPILER}_${MACHINE}
 
       for TARGET in $TARGETS; do
         echo "Compiling ${BUILD}/$TARGET"
@@ -64,11 +63,7 @@ for CONFIG in $CONFIGS; do
             cd ~bray/data/$REGION
             . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER >/dev/null
             echo "Testing $BUILD $TARGET on $REGION"
-            if test $TARGET = be; then
-              ./gen_be.ksh
-            else
-              ./test.ksh
-            fi
+            ./test.ksh
           fi
         done
       done

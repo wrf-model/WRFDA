@@ -79,3 +79,5 @@ SUBROUTINE da_allocate_observations ( ob )
    IF (trace_use) CALL da_trace_exit("da_allocate_observations")
 
 END SUBROUTINE da_allocate_observations
+
+

@@ -425,6 +425,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
 
+   logical :: need_pad
+
    ! Tracing
 
    INTEGER :: trace_start_points=0   ! Number of routines to initiate trace
