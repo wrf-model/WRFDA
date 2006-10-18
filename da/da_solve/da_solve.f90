@@ -1,18 +1,18 @@
 !MEDIATION_LAYER:SOLVE_DA
 
-subroutine da_solve ( grid , config_flags , &
+SUBROUTINE da_solve ( grid , config_flags , &
 #include "em_dummy_new_args.inc"
                  )
 
    ! Driver layer modules
-   use module_domain
-   use module_configure
-   use module_machine
-   use module_tiles
-   use module_dm
+   USE module_domain
+   USE module_configure
+   USE module_machine
+   USE module_tiles
+   USE module_dm
    ! Mediation layer modules
    ! Model layer modules
-   use module_model_constants
+   USE module_model_constants
 
    use da_constants
    use da_define_structures
@@ -23,23 +23,23 @@ subroutine da_solve ( grid , config_flags , &
    use da_reporting
    use module_get_file_names ! for system interface on cray
 
-   implicit none
+   IMPLICIT NONE
 
-   type(domain),                intent(inout) :: grid
-   type (grid_config_rec_type), intent(inout) :: config_flags
+   TYPE(domain),                intent(inout) :: grid
+   TYPE (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments to solve
 #include "em_dummy_new_decl.inc"
 
-   type (xbx_type)              :: xbx         ! For header & non-grid arrays.
-   type (be_type)               :: be          ! Background error structure.
+   TYPE (xbx_type)              :: xbx         ! For header & non-grid arrays.
+   TYPE (be_type)               :: be          ! Background error structure.
    real, allocatable            :: cvt(:)      ! Control variable structure.
    real, allocatable            :: xhat(:)     ! Control variable structure.
-   type (y_type)                :: ob          ! Observation structure.
-   type (ob_type)               :: iv          ! Obs. increment structure.
-   type (y_type)                :: re          ! Residual (o-a) structure.
-   type (y_type)                :: y           ! y = H(x_inc) structure.
-   integer                      :: it          ! External loop counter.
+   TYPE (y_type)                :: ob          ! Observation structure.
+   TYPE (ob_type)               :: iv          ! Obs. increment structure.
+   TYPE (y_type)                :: re          ! Residual (o-a) structure.
+   TYPE (y_type)                :: y           ! y = H(x_inc) structure.
+   INTEGER                      :: it          ! External loop counter.
    type (j_type)                :: j           ! Cost function.
 
    INTEGER                      :: ids , ide , jds , jde , kds , kde , &
@@ -62,31 +62,31 @@ subroutine da_solve ( grid , config_flags , &
       check_max_iv = .false.
    endif
 
-   if ( cv_options_hum < 1 .or. cv_options_hum > 3 ) then
-      write(unit=errmsg(1),fmt='(A,I3)') &
+   IF ( cv_options_hum < 1 .OR. cv_options_hum > 3 ) THEN
+      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
       call wrf_error_fatal(errmsg(1))
-   end if
+   END IF
 
-   if ( vert_corr == 2 ) then
-      if ( vertical_ip < 0 .or. vertical_ip > 2 ) then
-         write (unit=errmsg(1),fmt='(A,I3)') &
+   IF ( vert_corr == 2 ) THEN
+      IF ( vertical_ip < 0 .OR. vertical_ip > 2 ) THEN
+         WRITE (UNIT=errmsg(1),FMT='(A,I3)') &
            'Invalid vertical_ip = ', &
            vertical_ip
          call da_warning(__FILE__,__LINE__,errmsg(1:1))
-      end if
-   end if
+      END IF
+   END IF
 
-   if ( 0.5 * real(rf_passes) /= real(rf_passes / 2) ) then
-      write(unit=stdout,fmt='(A,I4,A)')'rf_passes = ', &
+   IF ( 0.5 * REAL(rf_passes) /= REAL(rf_passes / 2) ) THEN
+      WRITE(UNIT=stdout,FMT='(A,I4,A)')'rf_passes = ', &
                          rf_passes, ' .Should be even.'
-      rf_passes = int( real( rf_passes / 2 ) )
-      write(unit=stdout,fmt='(A,I4)') 'Resetting rf_passes = ', rf_passes
-   end if
+      rf_passes = INT( REAL( rf_passes / 2 ) )
+      WRITE(UNIT=stdout,FMT='(A,I4)') 'Resetting rf_passes = ', rf_passes
+   END IF
 
    if ( analysis_type == 'randomcv' ) then
       ntmax = 0
-      write(unit=stdout)' Resetting ntmax = 0 for analysis_type = randomcv' 
+      write(UNIT=stdout)' Resetting ntmax = 0 for analysis_type = randomcv' 
    end if
 
    !---------------------------------------------------------------------------
@@ -126,7 +126,7 @@ subroutine da_solve ( grid , config_flags , &
    !---------------------------------------------------------------------------
 
    grid%ep % ne = be % ne
-   if (be % ne > 0) then
+   if (be % ne > 0) THEN
       call da_setup_flow_predictors( ide, jde, kde, be % ne, grid%ep )
    end if
 
@@ -148,7 +148,8 @@ subroutine da_solve ( grid , config_flags , &
 #include "em_dummy_new_args.inc"
                  )
 
-      call da_allocate_y( iv, y ) ! Deallocated after second da_check call
+      call da_allocate_y( iv, re )
+      call da_allocate_y( iv, y )
 
       allocate( cvt(1:cv_size) )
       allocate( xhat(1:cv_size) )
@@ -180,20 +181,20 @@ subroutine da_solve ( grid , config_flags , &
          if (var4d_coupling == var4d_coupling_disk_simul) then
             call da_system_4dvar("da_run_wrf_nl.ksh pre ")
             ! call system("./wrf.exe -rmpool 1")
-            if (rootproc) then
+            IF (rootproc) THEN
                call system("rm -rf nl/wrf_done")
                call system("touch nl/wrf_go_ahead")
-               do while (.true.)
-                  open(wrf_done_unit,file="wrf_done",status="old",err=303)
-                  close(wrf_done_unit)
-                  exit
-303                  continue
-                  call system("sync")
-                  call system("slegrid%ep 1")
-               enddo
-            endif
-            call wrf_get_dm_communicator ( comm )
-            call mpi_barrier( comm, ierr )
+               DO WHILE ( .true. )
+                  OPEN(wrf_done_unit,file="wrf_done",status="old",err=303)
+                  CLOSE(wrf_done_unit)
+                  EXIT
+303                  CONTINUE
+                  CALL system("sync")
+                  CALL system("slegrid%ep 1")
+               ENDDO
+            ENDIF
+            CALL wrf_get_dm_communicator ( comm )
+            CALL mpi_barrier( comm, ierr )
 
             call da_system_4dvar("da_run_wrf_nl.ksh post ")
          else
@@ -212,20 +213,27 @@ subroutine da_solve ( grid , config_flags , &
 #include "em_dummy_new_args.inc"
                  )
 
-      if (test_transforms .OR. testing_wrfvar) then
+      if (test_transforms) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
                         its, ite, jts, jte, kts, kte )
-         call da_deallocate_y(y)
+      end if
+
+      if (testing_wrfvar) then
+         call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
+                        ids, ide, jds, jde, kds, kde, &
+                        ims, ime, jms, jme, kms, kme, &
+                        its, ite, jts, jte, kts, kte )
       end if
 
       ! Write "clean" QCed observations if requested:
       if ((analysis_type(1:6) == "QC-OBS" .or. &
            analysis_type(1:6) == "qc-obs")) then
          if (it == 1) then
-            call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
+            CALL da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
                           grid%moad_cen_lat, grid%stand_lon,&
                           grid%truelat1, grid%truelat2 )
          end if     
@@ -261,7 +269,7 @@ subroutine da_solve ( grid , config_flags , &
       ! [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
       !       the W_increment need to be diagnosed:
 
-      if (w_increments .and. .not. use_RadarObs) then
+      if (W_INCREMENTS .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
@@ -277,8 +285,8 @@ subroutine da_solve ( grid , config_flags , &
       ! [8.8] Write Ascii radiance OMB and OMA file
 
       if ( lwrite_oa_rad_ascii ) then
-         write(unit=stdout,fmt=*)  ' writing radiance OMB and OMA ascii file'
-         call da_write_oa_rad_ascii(grid%xp,ob,iv,re)
+        write(UNIT=stdout,FMT=*)  ' writing radiance OMB and OMA ascii file'
+        CALL da_write_oa_rad_ascii(grid%xp,ob,iv,re)
       end if
 
       !------------------------------------------------------------------------
@@ -288,25 +296,23 @@ subroutine da_solve ( grid , config_flags , &
       call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_new_args.inc"
          )
-      call da_deallocate_y(re)
-      call da_deallocate_y(y)
-   end do
+   END DO
 
    !---------------------------------------------------------------------------
    ! [9.0] Tidy up:
    !---------------------------------------------------------------------------
 
-   deallocate (cvt)
-   deallocate (xhat)
-   call da_deallocate_observations(iv)
-   call da_deallocate_background_errors(be)
-   call da_deallocate_y(ob)
+   deallocate ( cvt )
+   deallocate ( xhat )
+   call da_deallocate_obs(iv)
+   call da_deallocate_y( re )
+   call da_deallocate_y( y )
 
    call wrf_message("*** WRF-Var completed successfully ***")
 
-   if (trace_use) call da_trace_exit("da_solve")
+   IF (trace_use) call da_trace_exit("da_solve")
 
-contains
+CONTAINS
 
 #include "da_solve_init.inc"
 

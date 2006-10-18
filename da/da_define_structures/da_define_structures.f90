@@ -896,9 +896,9 @@ CONTAINS
 
 #include "da_allocate_background_errors.inc"
 #include "da_allocate_observations.inc"
-#include "da_deallocate_observations.inc"
 #include "da_allocate_y.inc"
 #include "da_deallocate_background_errors.inc"
+#include "da_deallocate_observations.inc"
 #include "da_deallocate_y.inc"
 #include "da_zero_x.inc"
 !#include "da_zero_y.inc"

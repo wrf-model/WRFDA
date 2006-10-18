@@ -67,6 +67,11 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    ! [1.1] transform from control variable to model grid space:
 
+   call da_allocate_y (iv, y)
+
+   ! initialising now the residual array
+   call da_allocate_y (iv, re)
+
    if (iter > 0) &
       call da_transform_vtoy( cv_size, be, ep, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
                               ids, ide, jds, jde, kds, kde,             &

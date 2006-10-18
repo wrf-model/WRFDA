@@ -31,8 +31,8 @@ wrf-phdf5.o:             wrf-phdf5.F90 wrf-phdf5attr.o wrf-phdf5support.o
 			$(CPP) wrf-phdf5.F90 | $(M4) - > wrf-phdf5.f
 			$(FC) $(FFLAGS) -c wrf-phdf5.f
 
-clean :
-	@ rm -rf *.f *.o *.mod
+clean:
+	/bin/rm -f *.f *.o *.mod
 
-superclean:
-	@ rm -rf *.a
+superclean: clean
+	/bin/rm -f libwrfio_phdf5.a

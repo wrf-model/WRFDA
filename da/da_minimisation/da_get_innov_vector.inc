@@ -2,26 +2,26 @@ subroutine da_get_innov_vector( it, ob, iv, &
                                 grid, config_flags, &
 #include "em_dummy_new_args.inc"
                  )
-   implicit none
+   IMPLICIT NONE
 
-   integer,        intent(in)    :: it
-   type (y_type),  intent(inout) :: ob           ! Observations.
-   type (ob_type), intent(inout) :: iv           ! Innovation vector (O-B).
-   type(domain) ,  intent(inout) :: grid
-   type (grid_config_rec_type)   :: config_flags
+   INTEGER,        INTENT(IN)    :: it
+   TYPE (y_type),  INTENT(INOUT) :: ob           ! Observations.
+   TYPE (ob_type), INTENT(INOUT) :: iv           ! Innovation vector (O-B).
+   TYPE(domain) ,  INTENT(INOUT) :: grid
+   TYPE (grid_config_rec_type)   :: config_flags
 
    ! Definitions of dummy arguments to solve
 #include "em_dummy_new_decl.inc"
 
-   type(xbx_type)     :: xbx          ! Header & non-gridded vars.
+   TYPE(xbx_type)     :: xbx          ! Header & non-gridded vars.
 
-   character(len=120) :: filename
+   CHARACTER(len=120) :: filename
 
    integer            :: n
 
-   if (trace_use) call da_trace_entry("da_get_innov_vector") 
+   IF (trace_use) CALL da_trace_entry("da_get_innov_vector") 
 
-   call da_messages((/"[5.1] Calculate innovation vector (iv)"/))
+   CALL da_messages((/"[5.1] Calculate innovation vector (iv)"/))
 
    iv%ptop    = grid%xb%ptop
 
@@ -31,7 +31,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
       iv%current_ob_time = n
 
       if (num_fgat_time > 1) then
-         write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
+         write(UNIT=filename(1:10), fmt='(a, i2.2)') 'fg', n
          call da_med_initialdata_input ( grid , config_flags, &
             filename )
          call da_setup_firstguess( xbx, grid, &
@@ -82,7 +82,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
       ! GPSRF: 
  
-      call da_get_innov_vector_gpsref( it, grid%xb, grid%xp, ob, iv ) 
+      CALL da_get_innov_vector_gpsref( it, grid%xb, grid%xp, ob, iv ) 
 
       ! SSMI:
 
@@ -126,7 +126,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
       ! AIRS retrievals
 
-      call da_get_innov_vector_airsr(it, grid%xb, grid%xp, ob, iv)
+      call da_get_innov_vector_airsr( it, grid%xb, grid%xp, ob, iv )
    enddo
 
    iv%current_ob_time = 1
@@ -136,40 +136,39 @@ subroutine da_get_innov_vector( it, ob, iv, &
    !    random values:
    !----------------------------------------------------------------------- 
    
-   if (omb_set_rand) call da_random_omb_all(iv, ob)
+   if ( omb_set_rand ) CALL da_random_omb_all( iv, ob )
    
    !------------------------------------------------------------------------  
    ! [3] Optionally rescale observation errors:
    !------------------------------------------------------------------------ 
    
-   if (use_obs_errfac) call da_use_obs_errfac(iv)
+   if ( use_obs_errfac ) CALL da_use_obs_errfac( iv )
 
    !------------------------------------------------------------------------  
    ! [4] Optionally add Gaussian noise to O, O-B:
    !------------------------------------------------------------------------ 
 
-   if (omb_add_noise) then
-      call da_add_noise_to_ob( iv, ob )
+   if ( omb_add_noise ) then
+      CALL da_add_noise_to_ob( iv, ob )
 !#ifdef DM_PARALLEL
-      ! if ((num_procs > 1) .and. (.not. use_radiance)) &
-      !    call da_write_noise_to_ob(iv)
+!      if( (numb_procs > 1) .and. (.not. use_radiance) ) call da_write_noise_to_ob(iv)
 !#endif
    endif
 
    !----------------------------------------------
    ! [5]  write out radiance iv in ascii format
    !-----------------------------------------------
-   if (lwrite_iv_rad_ascii) then
-      write(unit=stdout,fmt=*)  ' writing radiance iv ascii'
-      call da_write_iv_rad_ascii(grid%xp,ob,iv)
+   if ( lwrite_iv_rad_ascii ) then
+     write(UNIT=stdout,FMT=*)  ' writing radiance iv ascii'
+     call da_write_iv_rad_ascii(grid%xp,ob,iv)
    end if
 
    !----------------------------------------------------------
    ! [6]  write out filtered radiance obs in binary format
    !----------------------------------------------------------
-   if (lwrite_filtered_rad ) then
-      write(unit=stdout,fmt=*) ' writing filtered radiance'
-      call da_write_filtered_rad(ob,iv)
+   if ( lwrite_filtered_rad ) then
+     write(UNIT=stdout,FMT=*) ' writing filtered radiance'
+     call da_write_filtered_rad(ob,iv)
    end if
 
    if (num_fgat_time > 1) then
@@ -179,36 +178,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
                              )
    endif
 
-! JRB tidy up
-
-!write (0,*) "associated(xbx%fft_coeffs)",associated(xbx%fft_coeffs)
-!write (0,*) "associated(xbx%pad_loc)",associated(xbx%pad_loc)
-!write (0,*) "associated(xbx%pad_pos)",associated(xbx%pad_pos)
-!write (0,*) "associated(xbx%latc_mean)",associated(xbx%latc_mean)
-!call da_oi(__FILE__,__LINE__)
-!   if (associated(xbx%fft_factors_x)) deallocate(xbx%fft_factors_x)
-!call da_oi(__FILE__,__LINE__)
-!   if (associated(xbx%fft_factors_y)) deallocate(xbx%fft_factors_y)
-!call da_oi(__FILE__,__LINE__)
-
-   if (associated(xbx%trig_functs_x)) deallocate(xbx%trig_functs_x)
-!call da_oi(__FILE__,__LINE__)
-   if (associated(xbx%trig_functs_y)) deallocate(xbx%trig_functs_y)
-!call da_oi(__FILE__,__LINE__)
-
-   if (need_pad) then
-!call da_oi(__FILE__,__LINE__)
-!      if (associated(xbx%pad_loc)) deallocate(xbx%pad_loc)
-!call da_oi(__FILE__,__LINE__)
-!    if (associated(xbx%pad_pos)) deallocate(xbx%pad_pos)
-!call da_oi(__FILE__,__LINE__)
-   end if
-
-!call da_oi(__FILE__,__LINE__)
-   if (associated(xbx%latc_mean)) deallocate(xbx%latc_mean)
-!call da_oi(__FILE__,__LINE__)
-
-   if (trace_use) call da_trace_exit("da_get_innov_vector")
+   IF (trace_use) CALL da_trace_exit("da_get_innov_vector")
 
 end subroutine da_get_innov_vector
 

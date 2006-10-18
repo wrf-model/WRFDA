@@ -24,6 +24,7 @@ SUBROUTINE da_deallocate_y( y )
 
    IF ( y % num_metar > 0 ) DEALLOCATE (y % metar)
 
+
    IF ( y % num_sound > 0 ) then
       do n = 1, y % num_sound
          DEALLOCATE (y % sound(n)%u)

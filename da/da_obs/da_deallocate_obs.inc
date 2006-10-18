@@ -29,10 +29,6 @@ SUBROUTINE da_deallocate_obs (ob)
          deallocate (ob%sound(i)%t)
          deallocate (ob%sound(i)%q)
       END DO
-
-      deallocate (ob % sound)
-
-      deallocate (ob % sonde_sfc)
    END IF
 
    IF (use_SatemObs) THEN
