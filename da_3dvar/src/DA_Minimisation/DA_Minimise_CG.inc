@@ -57,6 +57,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
       character(len=4)                  :: filnam
 
+      integer                           :: cg_jcdf
+
       CALL wrf_debug(100,"entering DA_Minimise_CG")
 
       write (6,'(A)') &
@@ -120,6 +122,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
       if( rrmold == 0.) go to 1002
 !-------------------------------------------------------------------------
       fhat = phat
+      cg_jcdf = 1
 
              call DA_Transform_VToY( be, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
                                      ids, ide, jds, jde, kds, kde,                     &
@@ -133,7 +136,7 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
                                      ids, ide, jds, jde, kds, kde,                     &
                                      ims, ime, jms, jme, kms, kme,                     &
                                      its, ite, jts, jte, kts, kte,                     &
-                                     grid, config_flags                                )
+                                     grid, config_flags, cg_jcdf                       )
 
          fhat = - fhat + phat
          apdotp = da_dot(fhat, phat, cv_size)

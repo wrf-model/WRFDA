@@ -48,6 +48,8 @@ SUBROUTINE DA_Check_VToY_Adjoint(grid, config_flags, vp, vv, &
    REAL                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
    REAL                           :: partial_lhs   ! < y, y >
    REAL                           :: pertile_lhs   ! < y, y >
+
+   integer                        :: cg_jcdf
 !-------------------------------------------------------------------------
 
    write(unit=*, fmt='(/a/a)') &
@@ -80,17 +82,17 @@ SUBROUTINE DA_Check_VToY_Adjoint(grid, config_flags, vp, vv, &
 !-------------------------------------------------------------------------
 
    cv = 0.
+   cg_jcdf = 1
 
 !   call da_zero_vp_type(vp)
 !   call da_zero_vp_type(vv)
 !   call da_zero_x(xa)      
 !
-   print*, 'Please check here, xinzhang'
    call DA_Transform_VToY_Adj( 0, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &
-                                 grid, config_flags )
+                                 grid, config_flags, cg_jcdf )
 
    adj_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
 !-------------------------------------------------------------------------

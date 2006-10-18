@@ -51,7 +51,10 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       character(len=4) :: filnam
 
+      integer          :: cg_jcdf
+
 !-------------------------------------------------------------------------
+      cg_jcdf = 0
       
       CALL wrf_debug(100,"entering da_calculate_j")
 
@@ -96,7 +99,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
          jc = 0.0
 
-         if ( iter > 0 ) then
+         if ( iter > 0 .and.lvar4d ) then
 
             ndynopt      = grid%dyn_opt
             grid%dyn_opt = DYN_EM_TL
@@ -156,7 +159,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &
-                                  grid, config_flags )
+                                  grid, config_flags, cg_jcdf )
 
       call da_deallocate_y( jo_grad_y )
 

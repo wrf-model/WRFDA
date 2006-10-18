@@ -2,7 +2,7 @@ subroutine DA_Transform_VToY_Adj(iter, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &
-                                 grid, config_flags )
+                                 grid, config_flags, cg_jcdf )
 
 !-------------------------------------------------------------------------
 !  History:
@@ -34,7 +34,7 @@ subroutine DA_Transform_VToY_Adj(iter, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       type(grid_config_rec_type), intent(inout) :: config_flags
 
       integer :: nobwin,ndynopt
-      integer ierr, comm, iter
+      integer ierr, comm, iter, cg_jcdf
 
       character(len=4) :: filnam
 !------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ subroutine DA_Transform_VToY_Adj(iter, be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
          grid%dyn_opt = DYN_EM_TL
          call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-         if ( iter > 0 ) then
+         if ( iter > 0 .and. cg_jcdf == 1 ) then
             filnam ='tldf'
             call med_initialdata_input_3dvar( grid , config_flags, in_filename=filnam )
          else
