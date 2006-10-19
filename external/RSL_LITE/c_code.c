@@ -9,6 +9,7 @@
 #include "rsl_lite.h"
 
 #define F_PACK
+/*#define CHECKSUM */
 
 RSL_LITE_ERROR_DUP1 ( int *me )
 {
@@ -142,6 +143,7 @@ RSL_LITE_INIT_EXCH (
 }
 
 RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * xy0 , int * pu0 , char * memord , int * xstag0, /* not used */
+           char * varname0 , int *varnamelen0 , int *edition0, char * commname0, int *commnamelen0 , int *lineno0,
            int *me0, int * np0 , int * np_x0 , int * np_y0 , 
            int * ids0 , int * ide0 , int * jds0 , int * jde0 , int * kds0 , int * kde0 ,
            int * ims0 , int * ime0 , int * jms0 , int * jme0 , int * kms0 , int * kme0 ,
@@ -166,6 +168,9 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
   MPI_Comm comm, *comm0, dummy_comm ;
   int js, je, ks, ke, is, ie, wcount ;
 
+  unsigned long int checksum ;
+  char varname[128], commname[128] ;
+
   comm0 = &dummy_comm ;
   *comm0 = MPI_Comm_f2c( *Fcomm0 ) ;
 
@@ -187,6 +192,8 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
 
   da_buf = ( pu == 0 ) ? RSL_SENDBUF : RSL_RECVBUF ;
 
+  checksum = 0L ;
+
   if ( np_y > 1 && xy == 0 ) {
     MPI_Cart_shift( *comm0 , 0, 1, &ym, &yp ) ;
     if ( yp != MPI_PROC_NULL ) {
@@ -203,30 +210,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         }
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_PACK_LINT ( buf, p+yp_curs, &js, &je, &ks, &ke, &is, &ie, 
-                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           yp_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_PACK_INT ( buf, p+yp_curs, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           yp_curs += wcount*typesize ;
-#else
-          wcount = 0 ;
-          for ( j = jpe-shw+1 ; j <= jpe ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-              pi = (int *)(p+yp_curs) ;
-              i = IMAX(ips-shw) ;
-              qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
-                *pi++ = *qi++ ;
-                wcount++ ;
-              }
-              yp_curs += (i-(ips-shw))*typesize ;
-            }
-          }
-#endif
 	}
 	else {
           for ( j = jpe-shw+1 ; j <= jpe ; j++ ) {
@@ -249,28 +239,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = IMAX(ips-shw) ; ie = IMIN(ipe+shw) ;
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_UNPACK_LINT ( p+yp_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           yp_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_UNPACK_INT ( p+yp_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           yp_curs += wcount*typesize ;
-#else
-          for ( j = jpe+1 ; j <= jpe+shw ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-              pi = (int *)(p+yp_curs) ;
-              i = IMAX(ips-shw) ;
-              qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
-                *qi++ = *pi++ ;
-              }
-              yp_curs += (i-(ips-shw))*typesize ;
-            }
-          }
-#endif
 	}
 	else {
           for ( j = jpe+1 ; j <= jpe+shw ; j++ ) {
@@ -303,30 +278,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         }
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_PACK_LINT ( buf, p+ym_curs, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           ym_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_PACK_INT ( buf, p+ym_curs, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           ym_curs += wcount*typesize ;
-#else
-          wcount = 0 ;
-          for ( j = jps ; j <= jps+shw-1 ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-              pi = (int *)(p+ym_curs) ;
-              i = IMAX(ips-shw) ;
-              qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
-                *pi++ = *qi++ ;
-                wcount++ ;
-              }
-              ym_curs += (i-(ips-shw))*typesize ;
-            }
-          }
-#endif
 	}
 	else {
           for ( j = jps ; j <= jps+shw-1 ; j++ ) {
@@ -349,28 +307,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = IMAX(ips-shw) ; ie = IMIN(ipe+shw) ;
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_UNPACK_LINT ( p+ym_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           ym_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_UNPACK_INT ( p+ym_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           ym_curs += wcount*typesize ;
-#else
-         for ( j = jps-shw ; j <= jps-1 ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-              pi = (int *)(p+ym_curs) ;
-              i = IMAX(ips-shw) ;
-              qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = IMAX(ips-shw) ; i <= IMIN(ipe+shw) ; i++ ) {
-                *qi++ = *pi++ ;
-              }
-              ym_curs += (i-(ips-shw))*typesize ;
-            }
-          }
-#endif
 	}
 	else {
           for ( j = jps-shw ; j <= jps-1 ; j++ ) {
@@ -407,28 +350,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         }
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_PACK_LINT ( buf, p+xp_curs, &js, &je, &ks, &ke, &is, &ie,
-                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xp_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_PACK_INT ( buf, p+xp_curs, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xp_curs += wcount*typesize ;
-#else
-          for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-	      pi = (int *)(p+xp_curs) ;
-	      i = ipe-shw+1 ;
-	      qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = ipe-shw+1 ; i <= ipe ; i++ ) {
-	        *pi++ = *qi++ ;
-	      }
-	      xp_curs += shw*typesize ;
-	    }
-	  }
-#endif
 	}
 	else {
           for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
@@ -451,28 +379,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = ipe+1         ; ie = ipe+shw ;
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_UNPACK_LINT ( p+xp_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xp_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_UNPACK_INT ( p+xp_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xp_curs += wcount*typesize ;
-#else
-          for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-	      pi = (int *)(p+xp_curs) ;
-	      i = ipe+1 ;
-	      qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = ipe+1 ; i <= ipe+shw ; i++ ) {
-	        *qi++ = *pi++ ;
-	      }
-	      xp_curs += shw*typesize ;
-	    }
-	  }
-#endif
 	}
 	else {
           for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
@@ -505,28 +418,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         }
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_PACK_LINT ( buf, p+xm_curs, &js, &je, &ks, &ke, &is, &ie,
-                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                              &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xm_curs += wcount*typesize ;
         }
 	else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_PACK_INT ( buf, p+xm_curs, &js, &je, &ks, &ke, &is, &ie,
-                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                             &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xm_curs += wcount*typesize ;
-#else
-          for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-	      pi = (int *)(p+xm_curs) ;
-	      i = ips ;
-	      qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = ips ; i <= ips+shw-1 ; i++ ) {
-	        *pi++ = *qi++ ;
-	      }
-	      xm_curs += shw*typesize ;
-	    }
-	  }
-#endif
 	}
 	else {
           for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
@@ -549,28 +447,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
         is = ips-shw       ; ie = ips-1 ;
         if ( typesize == sizeof(long int) && sizeof( long int ) != sizeof(int) ) {
           F_UNPACK_LINT ( p+xm_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                                &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xm_curs += wcount*typesize ;
         } 
         else if ( typesize == sizeof(int) ) {
-#ifdef F_PACK
           F_UNPACK_INT ( p+xm_curs, buf, &js, &je, &ks, &ke, &is, &ie,
-                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount ) ;
+                                               &jms,&jme,&kms,&kme,&ims,&ime, &wcount, &checksum ) ;
           xm_curs += wcount*typesize ;
-#else
-          for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
-            for ( k = kps ; k <= kpe ; k++ ) {
-	      pi = (int *)(p+xm_curs) ;
-	      i = ips-shw ;
-	      qi = (int *)((buf + typesize*( (i-ims) + (ime-ims+1)*(
-                                             (k-kms) + (j-jms)*(kme-kms+1))))) ;
-              for ( i = ips-shw ; i <= ips-1 ; i++ ) {
-	        *qi++ = *pi++ ;
-	      }
-	      xm_curs += shw*typesize ;
-	    }
-	  }
-#endif
 	}
 	else {
           for ( j = JMAX(jps-shw) ; j <= JMIN(jpe+shw) ; j++ ) {
@@ -590,6 +473,13 @@ RSL_LITE_PACK ( int * Fcomm0, char * buf , int * shw0 , int * typesize0 , int * 
       }
     }
   }
+#ifdef CHECKSUM
+  strncpy(varname, varname0, *varnamelen0 ) ;
+  varname[*varnamelen0] = '\0' ;
+  strncpy(commname, commname0, *commnamelen0 ) ;
+  commname[*commnamelen0] = '\0' ;
+  fprintf(stderr,"%d %s %s %d %d %d %d %lu\n",*lineno0,commname,varname,*edition0,shw,pu,xy,checksum) ;
+#endif
 }
 
 static MPI_Request yp_recv, ym_recv, yp_send, ym_send ;

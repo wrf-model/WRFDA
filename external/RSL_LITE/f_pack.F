@@ -1,10 +1,11 @@
      
       SUBROUTINE f_pack_int ( inbuf, outbuf, js, je, ks, ke, is, ie,      &
-     &                        jms, jme, kms, kme, ims, ime, curs ) 
+     &                        jms, jme, kms, kme, ims, ime, curs, cs ) 
         IMPLICIT NONE
         INTEGER jms, jme, kms, kme, ims, ime
         INTEGER inbuf(ims:ime,kms:kme,jms:jme), outbuf(*)
         INTEGER js, je, ks, ke, is, ie, curs
+        INTEGER*8 cs
         ! Local
         INTEGER i,j,k,p
         p = 1
@@ -12,6 +13,7 @@
           DO k = ks, ke
             DO i = is, ie
               outbuf(p) = inbuf(i,k,j)
+!              cs = cs + outbuf(p)
               p = p + 1
             ENDDO
           ENDDO
@@ -21,11 +23,12 @@
       END SUBROUTINE f_pack_int
      
       SUBROUTINE f_pack_lint ( inbuf, outbuf, js, je, ks, ke, is, ie,    &
-     &                         jms, jme, kms, kme, ims, ime, curs ) 
+     &                         jms, jme, kms, kme, ims, ime, curs, cs ) 
         IMPLICIT NONE
         INTEGER jms, jme, kms, kme, ims, ime
         INTEGER*8 inbuf(ims:ime,kms:kme,jms:jme), outbuf(*)
         INTEGER js, je, ks, ke, is, ie, curs
+        INTEGER*8 cs
         ! Local
         INTEGER i,j,k,p
         p = 1
@@ -33,6 +36,7 @@
           DO k = ks, ke
             DO i = is, ie
               outbuf(p) = inbuf(i,k,j)
+!              cs = cs + outbuf(p)
               p = p + 1
             ENDDO
           ENDDO
@@ -42,11 +46,12 @@
       END SUBROUTINE f_pack_lint
      
       SUBROUTINE f_unpack_int ( inbuf, outbuf, js, je, ks, ke, is, ie,    &
-     &                          jms, jme, kms, kme, ims, ime, curs ) 
+     &                          jms, jme, kms, kme, ims, ime, curs, cs ) 
         IMPLICIT NONE
         INTEGER jms, jme, kms, kme, ims, ime
         INTEGER outbuf(ims:ime,kms:kme,jms:jme), inbuf(*)
         INTEGER js, je, ks, ke, is, ie, curs
+        INTEGER*8 cs
         ! Local
         INTEGER i,j,k,p
         p = 1
@@ -54,6 +59,7 @@
           DO k = ks, ke
             DO i = is, ie
               outbuf(i,k,j) = inbuf(p)
+!              cs = cs + inbuf(p)
               p = p + 1
             ENDDO
           ENDDO
@@ -63,11 +69,12 @@
       END SUBROUTINE f_unpack_int
      
       SUBROUTINE f_unpack_lint ( inbuf, outbuf, js, je, ks, ke, is, ie,    &
-     &                           jms, jme, kms, kme, ims, ime, curs ) 
+     &                           jms, jme, kms, kme, ims, ime, curs, cs ) 
         IMPLICIT NONE
         INTEGER jms, jme, kms, kme, ims, ime
         INTEGER*8 outbuf(ims:ime,kms:kme,jms:jme), inbuf(*)
         INTEGER js, je, ks, ke, is, ie, curs
+        INTEGER*8 cs
         ! Local
         INTEGER i,j,k,p
         p = 1
@@ -75,6 +82,7 @@
           DO k = ks, ke
             DO i = is, ie
               outbuf(i,k,j) = inbuf(p)
+!              cs = cs + inbuf(p)
               p = p + 1
             ENDDO
           ENDDO

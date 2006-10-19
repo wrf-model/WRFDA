@@ -16,6 +16,8 @@ MODULE module_dm
 
    INTEGER :: ips_save, ipe_save, jps_save, jpe_save, itrace
 
+integer lineno
+
    INTEGER ntasks, ntasks_y, ntasks_x, mytask, mytask_x, mytask_y
    INTEGER local_communicator, local_communicator_periodic, local_iocommunicator
    LOGICAL :: dm_debug_flag = .FALSE.

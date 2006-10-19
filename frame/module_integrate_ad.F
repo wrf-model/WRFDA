@@ -269,7 +269,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'currTime_str(1:19)=', currTime_str(1:19), &
               'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-       do input
+call start_timing
          CALL med_auxinput3_in ( grid , config_flags )
+call end_timing('med_auxinput3_in 1 ')
          CALL add_forcing_to_ad(grid)
          ad_date_index = ad_date_index + 1
       endif
@@ -297,7 +299,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
               'xyh AD state at ', currTime_str(1:19)
          write(unit=*, fmt='(2a)') &
               'xyh NL state from ', nl_date_string(nl_date_index+1)
+call start_timing
          CALL med_auxinput2_in4ad ( grid , config_flags , nl_date_string(nl_date_index+1) )
+call end_timing('med_auxinput2_in4ad')
 !-----end check non-linear input
 
 !--------start check adjoint input
@@ -308,7 +312,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
+call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
+call end_timing('med_auxinput3_in 2 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
@@ -404,7 +410,9 @@ RECURSIVE SUBROUTINE integrate_ad ( grid, nl_date_string, nl_date_index, ad_date
                  'currTime_str(1:19)=', currTime_str(1:19), &
                  'ad_date_string(ad_date_index)(1:19)=', ad_date_string(ad_date_index)(1:19)
 !-          do input
+call start_timing
             CALL med_auxinput3_in ( grid , config_flags )
+call end_timing('med_auxinput3_in 3 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
