@@ -83,6 +83,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
                    ob%instid(inst)%rad(n)%tb(2)
                if (si >= 3.) then
                   iv%instid(inst)%rad(n)%tb(:)%qc = -1 
+                  iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                   if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                      nrej_si = nrej_si + 1
                end if
@@ -90,6 +91,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
 
             if (iv%instid(inst)%rad(n)%clwp >= 0.2) then
                iv%instid(inst)%rad(n)%tb(:)%qc = -1
+               iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                   nrej_clw = nrej_clw + 1
             end if

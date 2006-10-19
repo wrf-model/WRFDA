@@ -109,6 +109,19 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 !   sorting obs into FGAT time bins
          call da_sort_rad(iv)
 
+!   allocate cloud_flag in iv structure
+   do i = 1,  iv % num_inst
+      if (iv % instid(i) % num_rad < 1) cycle
+      do j = 1, iv % instid(i) % num_rad
+        allocate ( iv % instid(i) % rad(j) % cloud_flag(1:iv%instid(i)%nchan), stat = alloc_status )
+        If( alloc_status /= 0 ) Then
+          Write( *, '( "mem allocation error to iv%instid(n)%rad(j)%cloud_flag")' )
+          Stop ' in da_setup_bufrtovs_structures '
+        End If
+        iv % instid(i) % rad(j)% cloud_flag(:) = 1  ! no cloud
+      end do
+   end do
+
 !-----------------------------------------------------------------------------
 !  [3.0] create (smaller) ob structure:
 !-----------------------------------------------------------------------------

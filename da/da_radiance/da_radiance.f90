@@ -181,9 +181,11 @@ module da_radiance
       INTEGER :: year, month, day, hour, min, sec
       INTEGER :: scanline,scanpos
       INTEGER :: landmask
+      INTEGER, pointer :: qc_flag(:) ! 1/0:good/bad
+      INTEGER, pointer :: cloud_flag(:) ! 1/0:no-cloud/cloud
       REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk
-      REAL    :: tb(20), omb(20)
-      REAL    :: pred(6)
+      REAL, pointer  :: tb(:), omb(:)
+      REAL, pointer  :: pred(:)
    END TYPE BIAS
 
    integer, allocatable :: num_tovs_before(:)
