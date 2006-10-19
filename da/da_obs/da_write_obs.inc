@@ -71,6 +71,11 @@ subroutine da_write_obs( ob, iv, re)
                   ob%synop(n)%t, iv%synop(n)%t, re%synop(n)%t, &! O, O-B, O-A t
                   ob%synop(n)%p, iv%synop(n)%p, re%synop(n)%p, &! O, O-B, O-A p
                   ob%synop(n)%q, iv%synop(n)%q, re%synop(n)%q   ! O, O-B, O-A q
+         if ( iv % synop(n)%u%qc == 0 )write(hxb_unit,'(3f17.7)') iv%synop(n)%u%inv, iv%synop(n)%u%error, ob%synop(n)%u
+         if ( iv % synop(n)%v%qc == 0 )write(hxb_unit,'(3f17.7)') iv%synop(n)%v%inv, iv%synop(n)%v%error, ob%synop(n)%v
+         if ( iv % synop(n)%t%qc == 0 )write(hxb_unit,'(3f17.7)') iv%synop(n)%t%inv, iv%synop(n)%t%error, ob%synop(n)%t
+         if ( iv % synop(n)%p%qc == 0 )write(hxb_unit,'(3f17.7)') iv%synop(n)%p%inv, iv%synop(n)%p%error, ob%synop(n)%p
+         if ( iv % synop(n)%q%qc == 0 )write(hxb_unit,'(3f17.7)') iv%synop(n)%q%inv, iv%synop(n)%q%error, ob%synop(n)%q
             endif
          END DO
       endif
@@ -100,6 +105,11 @@ subroutine da_write_obs( ob, iv, re)
                          ob%metar(n)%t, iv%metar(n)%t, re%metar(n)%t, &! O, O-B, O-A t
                          ob%metar(n)%p, iv%metar(n)%p, re%metar(n)%p, &! O, O-B, O-A p
                          ob%metar(n)%q, iv%metar(n)%q, re%metar(n)%q   ! O, O-B, O-A q
+         if ( iv % metar(n)%u%qc == 0 )write(hxb_unit,'(3f17.7)') iv%metar(n)%u%inv, iv%metar(n)%u%error, ob%metar(n)%u
+         if ( iv % metar(n)%v%qc == 0 )write(hxb_unit,'(3f17.7)') iv%metar(n)%v%inv, iv%metar(n)%v%error, ob%metar(n)%v
+         if ( iv % metar(n)%t%qc == 0 )write(hxb_unit,'(3f17.7)') iv%metar(n)%t%inv, iv%metar(n)%t%error, ob%metar(n)%t
+         if ( iv % metar(n)%p%qc == 0 )write(hxb_unit,'(3f17.7)') iv%metar(n)%p%inv, iv%metar(n)%p%error, ob%metar(n)%p
+         if ( iv % metar(n)%q%qc == 0 )write(hxb_unit,'(3f17.7)') iv%metar(n)%q%inv, iv%metar(n)%q%error, ob%metar(n)%q
        endif
       END DO
      endif
@@ -129,6 +139,11 @@ subroutine da_write_obs( ob, iv, re)
                          ob%ships(n)%t, iv%ships(n)%t, re%ships(n)%t, &! O, O-B, O-A t
                          ob%ships(n)%p, iv%ships(n)%p, re%ships(n)%p, &! O, O-B, O-A p
                          ob%ships(n)%q, iv%ships(n)%q, re%ships(n)%q   ! O, O-B, O-A q
+         if ( iv % ships(n)%u%qc == 0 )write(hxb_unit,'(3f17.7)') iv%ships(n)%u%inv, iv%ships(n)%u%error, ob%ships(n)%u
+         if ( iv % ships(n)%v%qc == 0 )write(hxb_unit,'(3f17.7)') iv%ships(n)%v%inv, iv%ships(n)%v%error, ob%ships(n)%v
+         if ( iv % ships(n)%t%qc == 0 )write(hxb_unit,'(3f17.7)') iv%ships(n)%t%inv, iv%ships(n)%t%error, ob%ships(n)%t
+         if ( iv % ships(n)%p%qc == 0 )write(hxb_unit,'(3f17.7)') iv%ships(n)%p%inv, iv%ships(n)%p%error, ob%ships(n)%p
+         if ( iv % ships(n)%q%qc == 0 )write(hxb_unit,'(3f17.7)') iv%ships(n)%q%inv, iv%ships(n)%q%error, ob%ships(n)%q
       endif
       END DO
      endif
@@ -155,6 +170,10 @@ subroutine da_write_obs( ob, iv, re)
                  iv % geoamv(n) % p(k), &                ! Obs Pressure
                  ob%geoamv(n)%u(k), iv%geoamv(n)%u(k), re%geoamv(n)%u(k), &! O, O-B, O-A u
                  ob%geoamv(n)%v(k), iv%geoamv(n)%v(k), re%geoamv(n)%v(k)
+         if ( iv % geoamv(n)%u(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%geoamv(n)%u(k)%inv, iv%geoamv(n)%u(k)%error, &
+                                       ob%geoamv(n)%u(k)
+         if ( iv % geoamv(n)%v(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%geoamv(n)%v(k)%inv, iv%geoamv(n)%v(k)%error, &
+                                       ob%geoamv(n)%v(k)
         END DO
       endif
       END DO
@@ -183,7 +202,12 @@ subroutine da_write_obs( ob, iv, re)
                  iv % polaramv(n) % p(k), &                ! Obs Pressure
                  ob%polaramv(n)%u(k), iv%polaramv(n)%u(k), re%polaramv(n)%u(k), &! O, O-B, O-A u
                  ob%polaramv(n)%v(k), iv%polaramv(n)%v(k), re%polaramv(n)%v(k)
+         if ( iv % polaramv(n)%u(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%polaramv(n)%u(k)%inv, iv%polaramv(n)%u(k)%error, &
+                                       ob%polaramv(n)%u(k)
+         if ( iv % polaramv(n)%v(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%polaramv(n)%v(k)%inv, iv%polaramv(n)%v(k)%error, &
+                                       ob%polaramv(n)%v(k)
         END DO
+
        endif
       END DO
      endif
@@ -209,6 +233,8 @@ subroutine da_write_obs( ob, iv, re)
                          iv % gpspw(n) % info % lon, &       ! Longitude
                          missing_r, &
                          ob%gpspw(n)%tpw, iv%gpspw(n)%tpw, re%gpspw(n)%tpw ! O, O-B, O-A u
+         if ( iv % gpspw(n)%tpw%qc == 0 )write(hxb_unit,'(3f17.7)') iv%gpspw(n)%tpw%inv, iv%gpspw(n)%tpw%error, &
+                                       ob%gpspw(n)%tpw
       endif
       END DO
       endif
@@ -239,6 +265,14 @@ subroutine da_write_obs( ob, iv, re)
                          ob%sound(n)%v(k), iv%sound(n)%v(k), re%sound(n)%v(k), &! O,O-B,O-A v
                          ob%sound(n)%t(k), iv%sound(n)%t(k), re%sound(n)%t(k), &! O,O-B,O-A t
                          ob%sound(n)%q(k), iv%sound(n)%q(k), re%sound(n)%q(k)   ! O,O-B,O-A q
+         if ( iv % sound(n)%u(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%sound(n)%u(k)%inv, iv%sound(n)%u(k)%error, &
+                                       ob%sound(n)%u(k)
+         if ( iv % sound(n)%v(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%sound(n)%v(k)%inv, iv%sound(n)%v(k)%error, &
+                                       ob%sound(n)%v(k)
+         if ( iv % sound(n)%t(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%sound(n)%t(k)%inv, iv%sound(n)%t(k)%error, &
+                                       ob%sound(n)%t(k)
+         if ( iv % sound(n)%q(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%sound(n)%q(k)%inv, iv%sound(n)%q(k)%error, &
+                                       ob%sound(n)%q(k)
          END DO
        endif
       END DO
@@ -291,6 +325,12 @@ subroutine da_write_obs( ob, iv, re)
                          ob%airep(n)%u(k), iv%airep(n)%u(k), re%airep(n)%u(k), &! O,O-B,O-A u
                          ob%airep(n)%v(k), iv%airep(n)%v(k), re%airep(n)%v(k), &! O,O-B,O-A v
                          ob%airep(n)%t(k), iv%airep(n)%t(k), re%airep(n)%t(k)
+         if ( iv % airep(n)%u(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%airep(n)%u(k)%inv, iv%airep(n)%u(k)%error, &
+                                       ob%airep(n)%u(k)
+         if ( iv % airep(n)%v(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%airep(n)%v(k)%inv, iv%airep(n)%v(k)%error, &
+                                       ob%airep(n)%v(k)
+         if ( iv % airep(n)%t(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%airep(n)%t(k)%inv, iv%airep(n)%t(k)%error, &
+                                       ob%airep(n)%t(k)
          END DO
        endif
       END DO
@@ -319,7 +359,11 @@ subroutine da_write_obs( ob, iv, re)
                          iv % pilot(n) % p(k), &             ! Obs Pressure
                          ob%pilot(n)%u(k), iv%pilot(n)%u(k), re%pilot(n)%u(k), &! O,O-B,O-A u
                          ob%pilot(n)%v(k), iv%pilot(n)%v(k), re%pilot(n)%v(k) ! O,O-B,O-A v
- 
+          if ( iv % pilot(n)%u(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%pilot(n)%u(k)%inv, iv%pilot(n)%u(k)%error, &
+                                       ob%pilot(n)%u(k)
+         if ( iv % pilot(n)%v(k)%qc == 0 )write(hxb_unit,'(3f17.7)') iv%pilot(n)%v(k)%inv, iv%pilot(n)%v(k)%error, &
+                                       ob%pilot(n)%v(k)
+
          END DO
        endif
       END DO

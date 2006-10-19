@@ -6,7 +6,6 @@ program gen_be_diags_read
    implicit none
 
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method ('NMC', or 'ENS')
    character*8         :: uh_method                  ! Uh_method (power, scale)
    character*80        :: filename                   ! Input filename.
    integer             :: outunit                    ! Output unit for diagnostics.
@@ -23,8 +22,6 @@ program gen_be_diags_read
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m). !!!DALE ADD..
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: scale_length_ps_u          ! Scale length for scalar ps_u.
-   logical             :: data_on_levels             ! False if data is projected onto EOFs.
-   logical             :: use_global_eofs            ! True if projected data uses global EOFs.
 
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
@@ -38,15 +35,14 @@ program gen_be_diags_read
    real, allocatable   :: total_power(:)             ! Total Power spectrum.
    real, allocatable   :: scale_length(:)            ! Scale length for regional application.
 
-   namelist / gen_be_diags_nl / be_method, uh_method
+   namelist / gen_be_diags_nl / uh_method
 
-   be_method = 'NMC'
    open(unit=namelist_unit, file='gen_be_diags_nl.nl', &
         form='formatted', status='old', action='read')
    read(namelist_unit, gen_be_diags_nl)
    close(namelist_unit)
 
-   filename = 'gen_be.'//trim(be_method)//'.dat'
+   filename = 'gen_be.dat'
    print '("*** Unit=",i3,3X,"filename=",a40)',iunit, filename
    open (iunit, file = filename, form='unformatted')
 
@@ -166,7 +162,6 @@ program gen_be_diags_read
    do k = 1, nk
       read(iunit)variable
       read(iunit)max_wavenumber, kdum
-      read(iunit)use_global_eofs
       if ( k == 1 ) allocate( total_power(0:max_wavenumber) )
       read(iunit)total_power(:)
       call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
@@ -175,7 +170,6 @@ program gen_be_diags_read
    do k = 1, nk
       read(iunit)variable
       read(iunit)max_wavenumber, kdum
-      read(iunit)use_global_eofs
       read(iunit)total_power(:)
       call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
@@ -183,7 +177,6 @@ program gen_be_diags_read
    do k = 1, nk
       read(iunit)variable
       read(iunit)max_wavenumber, kdum
-      read(iunit)use_global_eofs
       read(iunit)total_power(:)
       call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
@@ -191,14 +184,12 @@ program gen_be_diags_read
    do k = 1, nk
       read(iunit)variable
       read(iunit)max_wavenumber, kdum
-      read(iunit)use_global_eofs
       read(iunit)total_power(:)
       call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
    end do
 
    read(iunit)variable
    read(iunit)max_wavenumber, kdum
-   read(iunit)use_global_eofs
    read(iunit)total_power(:)
    call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
 

@@ -32,7 +32,7 @@
  if ( ! $?DATA_DISK )     setenv DATA_DISK     /smoke
  if ( ! $?REGION )        setenv REGION        con200
  if ( ! $?EXPT )          setenv EXPT          noobs
- if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
+ if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
  if ( ! $?ID )            setenv ID            gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/$ID
  if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR    ${DAT_DIR}/stage0
@@ -59,6 +59,10 @@
    mkdir ${TMP_DIR} >&! /dev/null
    cd ${TMP_DIR}
 
+   foreach SV ( psi chi t rh ps )
+      if ( ! -d $SV ) mkdir $SV
+   end
+
 #  Create file dates:
    setenv FCST_TIME `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE`
    echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
@@ -81,6 +85,7 @@
 
 #  Tidy:
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
+#   mv mean.${FCST_TIME}* ${STAGE0_DIR}
    mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
    rm -rf $TMP_DIR >&! /dev/null
 

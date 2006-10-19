@@ -9,9 +9,6 @@ program gen_be_stage3
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
-   character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    character*2         :: ck                         ! Level index -> character.
    character*3         :: ce                         ! Member index -> character.
@@ -35,7 +32,6 @@ program gen_be_stage3
    logical             :: use_global_eofs            ! True if projected data uses global EOFs.
    logical             :: data_on_levels             ! True if output level data (diagnostic).
    logical             :: twod_field                 ! True if 2D field.
-   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
@@ -55,11 +51,10 @@ program gen_be_stage3
    real, allocatable   :: eval(:,:)                  ! Gridpoint sqrt(eigenvalues).
 
    namelist / gen_be_stage3_nl / start_date, end_date, interval, variable, &
-                                 be_method, ne, bin_type, &
+                                 ne, bin_type, &
                                  lat_min, lat_max, binwidth_lat, &
                                  hgt_min, hgt_max, binwidth_hgt, &
-                                 testing_eofs, use_global_eofs, data_on_levels, &
-                                 expt, dat_dir
+                                 testing_eofs, use_global_eofs, data_on_levels
 
     stdout = 6
 
@@ -78,7 +73,6 @@ program gen_be_stage3
    end_date = '2004033112'
    interval = 24
    variable = 'psi'
-   be_method = 'NMC'
    ne = 1
    bin_type = 1
    lat_min = -90.0
@@ -90,8 +84,6 @@ program gen_be_stage3
    testing_eofs = .true.
    use_global_eofs = .true.
    data_on_levels = .false.
-   expt = 'gen_be_stage3'
-   dat_dir = '/mmmtmp1/dmbarker'
 
    open(unit=namelist_unit, file='gen_be_stage3_nl.nl', &
         form='formatted', status='old', action='read')
@@ -122,7 +114,7 @@ program gen_be_stage3
          write(ce,'(i3.3)')member
 
 !        Read Full-fields:
-         filename = 'fullflds'//'/'//date(1:10)//'.'//'fullflds'//'.'//trim(be_method)//'.e'//ce
+         filename = 'fullflds'//'/'//date(1:10)//'.'//'fullflds'//'.e'//ce
          open (iunit, file = filename, form='unformatted')
 
          read(iunit)ni, nj, nk
@@ -149,7 +141,7 @@ program gen_be_stage3
          end if
 
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          if ( trim(variable) == 'ps_u' .or. trim(variable) == 'ps' ) then ! 2D field
             twod_field = .true.
             filename = trim(filename)//'.01'
@@ -166,7 +158,6 @@ program gen_be_stage3
             first_time = .false.
          endif
 
-         if ( twod_field ) read (iunit) ldum1, ldum2
          read(iunit)field
          close(iunit)
 
@@ -242,7 +233,7 @@ program gen_be_stage3
    end if
 
 !  Output eigenvectors, eigenvalues for use in WRF_Var:
-   filename = 'gen_be_stage3.'//trim(variable)//'.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage3.'//trim(variable)//'.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)variable
    write(ounit)nk, num_bins2d
@@ -291,7 +282,7 @@ program gen_be_stage3
             write(ce,'(i3.3)')member
 
             filename = trim(variable)//'/'//date(1:10)
-            filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+            filename = trim(filename)//'.'//trim(variable)//'.e'//ce
 
             open (iunit, file = filename, form='unformatted')
             read(iunit)ni, nj, nk
@@ -327,10 +318,9 @@ program gen_be_stage3
                if ( k < 10 ) ck = '0'//ck(2:2)
 !              Assumes variable directory has been created by script:
                filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-               filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
+               filename = trim(filename)//'.e'//ce//'.'//ck
                open (ounit, file = filename, form='unformatted')
                write(ounit)ni, nj, k
-               write(ounit)data_on_levels, use_global_eofs
                write(ounit)field_out(1:ni,1:nj,k)
                close(ounit)
             end do

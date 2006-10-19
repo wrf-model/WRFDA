@@ -1041,6 +1041,14 @@ da_test.o:		da_test.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_test.f90 > da_test.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_test.f
 
+da_etkf.o:	        da_etkf.f90 \
+			da_innerprod.inc \
+                        da_matmulti.inc \
+                        da_matmultiover.inc \
+			da_solve_etkf.inc
+			$(CPP) $(CPPFLAGS) -I../inc da_etkf.f90 > da_etkf.f
+			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_etkf.f
+
 da_gen_be.o:	        da_gen_be.f90 \
 			da_constants.o			\
                         da_tracing.o                    \

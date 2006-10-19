@@ -50,6 +50,7 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field
       allocate ( field3d(1:dim1,1:dim2,1:dim3) )
       call ncvgt( cdfid, id_var, istart, iend, field3d, rcode )
       field(:,:) = field3d(:,:,k)
+      deallocate( field3d )
    end if
 
    rcode = nf_close( cdfid )

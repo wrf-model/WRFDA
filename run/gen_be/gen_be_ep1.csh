@@ -19,8 +19,9 @@
 #set echo
 #Define job via environment variables:
 
- setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar.gen_be
- setenv BE_DIR /smoke/dmbarker/data/con200/xwang/gen_be.2003010112
+ setenv DATE 2003010212
+ setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar
+ setenv BE_FILE /smoke/dmbarker/data/con200/noobs/gen_be.0200-2512/gen_be.NMC.dat
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -39,16 +40,16 @@
  if ( ! $?BINWIDTH_HGT )  setenv BINWIDTH_HGT  1000.0     # Used if BIN_TYPE = 2.
  if ( ! $?REMOVE_MEAN )   setenv REMOVE_MEAN   .true.     # Remove time/ensemble/area mean.
 
- if ( ! $?RELEASE )       setenv RELEASE    WRF_V2.1.2
- if ( ! $?REL_DIR )       setenv REL_DIR    ${HOME}/code/${RELEASE}
- if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${REL_DIR}/wrfvar
- if ( ! $?BUILD_DIR )     setenv BUILD_DIR  ${WRFVAR_DIR}/build
- if ( ! $?DATA_DISK )     setenv DATA_DISK  /smoke
- if ( ! $?REGION )        setenv REGION     con200
- if ( ! $?EXPT )          setenv EXPT       xwang  
- if ( ! $?DAT_DIR )       setenv DAT_DIR    ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
- if ( ! $?BE_DIR )        setenv BE_DIR     ${DAT_DIR}/gen_be
- if ( ! $?RUN_DIR )       setenv RUN_DIR    ${DAT_DIR}/${DATE}/ep1
+ if ( ! $?RELEASE )       setenv RELEASE       WRF_V2.1.2
+ if ( ! $?REL_DIR )       setenv REL_DIR       ${HOME}/code/${RELEASE}
+ if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR    ${REL_DIR}/wrfvar
+ if ( ! $?BUILD_DIR )     setenv BUILD_DIR     ${WRFVAR_DIR}/build
+ if ( ! $?DATA_DISK )     setenv DATA_DISK     /smoke
+ if ( ! $?REGION )        setenv REGION        con200
+ if ( ! $?EXPT )          setenv EXPT          xwang  
+ if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
+ if ( ! $?BE_FILE )       setenv BE_FILE       ${DAT_DIR}/be/gen_be.dat
+ if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/${DATE}/ep1
 
  if ( ! -d ${DAT_DIR}/$DATE ) mkdir ${DAT_DIR}/$DATE
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
@@ -69,9 +70,9 @@
     if ( ! -d $CV ) mkdir $CV
  end
 
- echo "---------------------------------------------------------------------"
- echo "Calculate model-space ensemble perturbations valid at time $DATE."
- echo "---------------------------------------------------------------------"
+ echo "-----------------------------------------------------------------------------"
+ echo "Calculate control-variable -space ensemble perturbations valid at time $DATE."
+ echo "-----------------------------------------------------------------------------"
 
  set BEGIN_CPU = `date`
  echo "Beginning CPU time: ${BEGIN_CPU}"
@@ -113,7 +114,6 @@ cat >! gen_be_stage1_nl.nl << EOF
     hgt_min = ${HGT_MIN},
     hgt_max = ${HGT_MAX},
     binwidth_hgt = ${BINWIDTH_HGT},
-    remove_mean = ${REMOVE_MEAN},
     dat_dir = '${RUN_DIR}/tmp' /
 EOF
 
@@ -128,34 +128,28 @@ EOF
  set END_CPU = `date`
  echo "Ending CPU time: ${END_CPU}"
 
-#First copy regression coefficients:
- ln -sf $BE_DIR/gen_be.${BE_METHOD}.dat .
- ${BUILD_DIR}/gen_be_read_regcoeffs.exe
-
  echo "---------------------------------------------------------------"
- echo "Run gen_be stage 2a: Calculate control variable fields."
+ echo "Run gen_be_ep1: Calculate control variable fields."
  echo "---------------------------------------------------------------"
   
  set BEGIN_CPU = `date`
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
- ln -sf ${BUILD_DIR}/gen_be_stage2a.exe .
+ ln -sf ${BE_FILE} gen_be.dat
+ ln -sf ${BUILD_DIR}/gen_be_ep1.exe .
 
 cat >! gen_be_stage2a_nl.nl << EOF
   &gen_be_stage2a_nl
     start_date = '${DATE}',
     end_date = '${DATE}',
-    be_method = '${BE_METHOD}',
-    ne = ${NE},
-    expt = '${EXPT}',
-    dat_dir = '${RUN_DIR}' /
+    ne = ${NE} /
 EOF
 
- ./gen_be_stage2a.exe >&! gen_be_stage2a.out
+ ./gen_be_ep1.exe >&! gen_be_ep1.out
 
  set RC = $status
  if ( $RC != 0 ) then
-   echo "Stage 2a failed with error" $RC
+   echo "gen_be_ep1 failed with error" $RC
    exit 1
  endif
 
@@ -164,22 +158,28 @@ EOF
 
 #Tidy:
  foreach CV ( $CONTROL_VARIABLES )
-    rm -rf $RUN_DIR/$CV; mkdir $RUN_DIR/$CV
-    setenv MEMBER 1
-    while ( $MEMBER <= $NE )
-       setenv MEM $MEMBER
-       if ( $MEMBER < 100 ) setenv MEM 0$MEMBER
-       if ( $MEMBER < 10 )  setenv MEM 00$MEMBER
-       if ( $CV == 'ps_u' ) then
-          mv $CV/${DATE}.${CV}.${BE_METHOD}.e${MEM}.01 ${RUN_DIR}/${CV}/${CV}.e${MEM}
-       else 
-          mv $CV/${DATE}.${CV}.${BE_METHOD}.e${MEM} ${RUN_DIR}/${CV}/${CV}.e${MEM}
-       endif
-       setenv MEMBER `expr $MEMBER + 1`
-    end
+    rm -rf $RUN_DIR/$CV >&! /dev/null
+    mv $CV ${RUN_DIR}
+#    setenv MEMBER 1
+#    while ( $MEMBER <= $NE )
+#       setenv MEM $MEMBER
+#       if ( $MEMBER < 100 ) setenv MEM 0$MEMBER
+#       if ( $MEMBER < 10 )  setenv MEM 00$MEMBER
+#       mv $CV/${DATE}.${CV}.* ${RUN_DIR}/${CV}
+#       setenv MEMBER `expr $MEMBER + 1`
+#    end
+#    mv $CV/${CV}.mean ${RUN_DIR}/${CV}/.
+#    mv $CV/${CV}.mnsq ${RUN_DIR}/${CV}/.
  end
+
+ foreach SV ( chi t ps )
+    rm -rf $RUN_DIR/$SV
+    mv $SV ${RUN_DIR}
+ end
+
  mv *.out ${RUN_DIR}
- rm -rf $TMP_DIR >&! /dev/null
+
+# rm -rf $TMP_DIR >&! /dev/null
 
 exit(0)
 

@@ -411,7 +411,7 @@ program gen_be_stage1_1dvar
 !        Write T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)t_prime
@@ -420,7 +420,7 @@ program gen_be_stage1_1dvar
 !        Write q:
          variable = 'q'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)q_prime
@@ -429,7 +429,7 @@ program gen_be_stage1_1dvar
 !        Write ps:
          variable = 'ps' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -439,7 +439,7 @@ program gen_be_stage1_1dvar
 !        Write t2:
          variable = 't2' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -449,7 +449,7 @@ program gen_be_stage1_1dvar
 !        Write q2:
          variable = 'q2' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -459,7 +459,7 @@ program gen_be_stage1_1dvar
 !        Write u10:
          variable = 'u10' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -469,7 +469,7 @@ program gen_be_stage1_1dvar
 !        Write v10:
          variable = 'v10' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.

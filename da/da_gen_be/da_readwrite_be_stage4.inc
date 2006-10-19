@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl, variable )
+subroutine da_readwrite_be_stage4( outunit, nk, uh_method, n_smth_sl, variable )
 
    implicit none
 
@@ -7,7 +7,6 @@ subroutine da_readwrite_be_stage4( outunit, nk, be_method, uh_method, n_smth_sl,
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
    integer    , intent(in)  :: n_smth_sl                  ! Number of smoothing. 0: no smoothig
-   character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS').
    character*5, intent(in)  :: uh_method
    character*10, intent(in) :: variable                   ! Variable name.
 
@@ -36,7 +35,7 @@ if (uh_method .eq. 'power') then
       if ( k < 10 ) ck = '0'//ck(2:2)
 
       filename = trim(variable)//'/'//trim(variable)
-      filename = trim(filename)//'.'//trim(be_method)//'.'//ck//'.spectrum'
+      filename = trim(filename)//'.'//ck//'.spectrum'
 
       open (iunit, file = filename, form='unformatted')
       read(iunit)cvar

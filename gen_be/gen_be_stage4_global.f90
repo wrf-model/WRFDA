@@ -9,7 +9,6 @@ program gen_be_stage4_global
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*80        :: filename                   ! Input filename.
    character*2         :: ck                         ! Loop index -> character.
    character*3         :: ce                         ! Member index -> character.
@@ -30,8 +29,6 @@ program gen_be_stage4_global
    integer             :: r_cvsize                   ! Real control variable array size.
 
    logical             :: first_time                 ! True if first time through loop.
-   logical             :: data_on_levels             ! False if data is projected onto EOFs.
-   logical             :: use_global_eofs            ! True if projected data uses global EOFs.
    logical             :: testing_spectral           ! True if testing spectral transforms.
    real                :: pi_over_180                ! pi / 180
    real                :: diff_rms                   ! RMS error measure.
@@ -56,7 +53,7 @@ program gen_be_stage4_global
    real, allocatable   :: rcv(:)                     ! Control variable vector.
 
    namelist / gen_be_stage4_global_nl / start_date, end_date, interval, variable, gaussian_lats, &
-                                        testing_spectral, be_method, ne, k
+                                        testing_spectral, ne, k
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage4_global")
@@ -72,7 +69,6 @@ program gen_be_stage4_global
    interval = 24
    variable = 'psi'
    gaussian_lats = .false.
-   be_method = 'NMC'
    ne = 1
    k = 1
 
@@ -108,10 +104,9 @@ program gen_be_stage4_global
 !---------------------------------------------------------------------------------------------
 
          filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-         filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
+         filename = trim(filename)//'.e'//ce//'.'//ck
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk ! nk not used.
-         read(iunit)data_on_levels, use_global_eofs
 
          if ( first_time ) then
             write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
@@ -121,16 +116,6 @@ program gen_be_stage4_global
          close(iunit)
 
          if ( first_time ) then
-            if ( data_on_levels ) then
-               write(6,'(a)')' Input Data is on model levels.'
-            else
-               write(6,'(a)')' Input Data is projected on vertical modes.'
-               if ( use_global_eofs ) then
-                  write(6,'(a)')' Input 2D field is projected using global EOFs.'
-               else
-                  write(6,'(a)')' Input 2D field is projected using local EOFs.'
-               end if
-            end if
 
 !---------------------------------------------------------------------------------------------
 !           write(6,(a)) Initialize spectral transforms.
@@ -209,11 +194,10 @@ program gen_be_stage4_global
                                 k, ', Variance = ', variance
 
    filename = trim(variable)//'/'//trim(variable)
-   filename = trim(filename)//'.'//trim(be_method)//'.'//ck//'.spectrum'
+   filename = trim(filename)//'.'//ck//'.spectrum'
    open (ounit, file = filename, form='unformatted')
    write(ounit)variable
    write(ounit)max_wavenumber, k
-   write(ounit)data_on_levels, use_global_eofs
    write(ounit)total_power
 
    if (trace_use) call da_trace_exit("gen_be_stage4_global")

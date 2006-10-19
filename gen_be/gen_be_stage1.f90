@@ -23,22 +23,20 @@ program gen_be_stage1
    character*3         :: ce                         ! Ensemble member index.
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: filename                   ! Input filename.
+   integer             :: count                      ! Counter.
    integer             :: ni, nj, nk                 ! Dimensions read in.
-   integer             :: member, b, i, j, k         ! Loop counters.
+   integer             :: member, i, j, k            ! Loop counters.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Interval between file times (hours).
    integer             :: ne                         ! Number of ensemble members.
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (2D fields).
+   real                :: count_inv                  ! 1 / count.
    real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: dphi                       ! Latitude interval (not used).
-   real                :: coeffa, coeffb             ! Accumulating mean coefficients.
-   logical             :: first_time                 ! True if first file.
-   logical             :: remove_mean                ! Remove time/ensemble/area mean.
 
    real, allocatable   :: ps_prime(:,:)              ! Surface pressure perturbation.
    real, allocatable   :: t_prime(:,:,:)             ! Temperature perturbation.
@@ -49,19 +47,16 @@ program gen_be_stage1
    real, allocatable   :: latitude(:,:)              ! Latitude (radians)
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   integer, allocatable:: bin_pts(:)                 ! Number of points in bin (3D fields).
-   integer, allocatable:: bin_pts2d(:)               ! Number of points in bin (2D fields).
-   real, allocatable   :: psi_mean(:)                ! Mean field in bin.
-   real, allocatable   :: chi_mean(:)                ! Mean field in bin.
-   real, allocatable   :: t_mean(:)                  ! Mean field in bin.
-   real, allocatable   :: rh_mean(:)                 ! Mean field in bin.
-   real, allocatable   :: ps_mean(:)                 ! Mean field in bin.
+   real, allocatable   :: psi_mean(:,:,:)            ! Mean field.
+   real, allocatable   :: chi_mean(:,:,:)            ! Mean field.
+   real, allocatable   :: t_mean(:,:,:)              ! Mean field.
+   real, allocatable   :: rh_mean(:,:,:)             ! Mean field.
+   real, allocatable   :: ps_mean(:,:)               ! Mean field.
 
    namelist / gen_be_stage1_nl / start_date, end_date, interval, &
                                  be_method, ne, bin_type, &
                                  lat_min, lat_max, binwidth_lat, &
-                                 hgt_min, hgt_max, binwidth_hgt, &
-                                 remove_mean, gaussian_lats, dat_dir
+                                 hgt_min, hgt_max, binwidth_hgt, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -82,8 +77,6 @@ program gen_be_stage1
    hgt_min = 0.0
    hgt_max = 20000.0
    binwidth_hgt = 1000.0
-   remove_mean = .true.
-   gaussian_lats = .false.
    dat_dir = '/data2/hcshin/youn/DIFF63'
 
    open(unit=namelist_unit, file='gen_be_stage1_nl.nl', &
@@ -101,7 +94,7 @@ program gen_be_stage1
 
    date = start_date
    cdate = sdate
-   first_time = .true.
+   count = 0
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [2] Read fields from standard files, and calculate mean fields'
@@ -109,21 +102,22 @@ program gen_be_stage1
 
    do while ( cdate <= edate )
       do member = 1, ne
+         count = count + 1
+         count_inv = 1.0 / real(count)
 
          write(6,'(a,a)')'    Processing data for date ', date
 
-         filename = 'pert.'//date(1:10)
          if ( be_method == 'NMC' ) then
-            filename = trim(filename)//'.e001'
+            filename = trim(dat_dir)//'/pert.'//date(1:10)//'.e001'
          else
             write(UNIT=ce,FMT='(i3.3)')member
-            filename = trim(filename)//'.e'//trim(ce)
+            filename = trim(dat_dir)//'/pert.'//date(1:10)//'.e'//trim(ce)
          endif
 
-         open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')
+         open (iunit, file = trim(filename), form='unformatted')
          read(iunit)date, ni, nj, nk
 
-         if ( first_time ) then
+         if ( count == 1 ) then
             write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
             allocate( ps_prime(1:ni,1:nj) )
             allocate( t_prime(1:ni,1:nj,1:nk) )
@@ -132,8 +126,22 @@ program gen_be_stage1
             allocate( rh_prime(1:ni,1:nj,1:nk) )
             allocate( height(1:ni,1:nj,1:nk) )
             allocate( latitude(1:ni,1:nj) )
+            allocate( psi_mean(1:ni,1:nj,1:nk) )
+            allocate( chi_mean(1:ni,1:nj,1:nk) )
+            allocate( t_mean(1:ni,1:nj,1:nk) )
+            allocate( rh_mean(1:ni,1:nj,1:nk) )
+            allocate( ps_mean(1:ni,1:nj) )
             allocate( bin(1:ni,1:nj,1:nk) )
             allocate( bin2d(1:ni,1:nj) )
+            psi_mean(:,:,:) = 0.0
+            chi_mean(:,:,:) = 0.0
+            t_mean(:,:,:) = 0.0
+            rh_mean(:,:,:) = 0.0
+            ps_mean(:,:) = 0.0
+
+            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
+                                 lat_min, lat_max, binwidth_lat, &
+                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
          end if
 
          read(iunit)psi_prime
@@ -141,65 +149,19 @@ program gen_be_stage1
          read(iunit)t_prime
          read(iunit)rh_prime
          read(iunit)ps_prime
-
          read(iunit)height
-
          read(iunit)latitude
-
-         if ( first_time ) then
-            call da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d, &
-                                 lat_min, lat_max, binwidth_lat, &
-                                 hgt_min, hgt_max, binwidth_hgt, latitude, height )
-
-            allocate( psi_mean(1:num_bins) )
-            allocate( chi_mean(1:num_bins) )
-            allocate( t_mean(1:num_bins) )
-            allocate( rh_mean(1:num_bins) )
-            allocate( ps_mean(1:num_bins2d) )
-            allocate( bin_pts(1:num_bins) )
-            allocate( bin_pts2d(1:num_bins2d) )
-            psi_mean(:) = 0.0
-            chi_mean(:) = 0.0
-            t_mean(:) = 0.0
-            rh_mean(:) = 0.0
-            ps_mean(:) = 0.0
-            bin_pts(:) = 0
-            bin_pts2d(:) = 0
-            first_time = .false.
-         end if
-
          close(iunit)
 
 !---------------------------------------------------------------------------------------------
-!        write(6,(2a)) [2] Calculate time/bin mean.
+!        write(6,(2a)) [2] Calculate time/ensemble mean.
 !---------------------------------------------------------------------------------------------
 
-!        Calculate means of 3D fields:
-         do k = 1, nk
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin(i,j,k)
-                  bin_pts(b) = bin_pts(b) + 1
-                  coeffa = 1.0 / real(bin_pts(b))
-                  coeffb = real(bin_pts(b)-1) * coeffa
-                  psi_mean(b) = coeffb * psi_mean(b) + coeffa * psi_prime(i,j,k)
-                  chi_mean(b) = coeffb * chi_mean(b) + coeffa * chi_prime(i,j,k)
-                  t_mean(b)   = coeffb * t_mean(b)   + coeffa * t_prime(i,j,k)
-                  rh_mean(b)  = coeffb * rh_mean(b)  + coeffa * rh_prime(i,j,k)
-               end do
-            end do
-         end do
-
-!        Calculate means of 2D fields:
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               bin_pts2d(b) = bin_pts2d(b) + 1
-               coeffa = 1.0 / real(bin_pts2d(b))
-               coeffb = real(bin_pts2d(b)-1) * coeffa
-               ps_mean(b) = coeffb * ps_mean(b) + coeffa * ps_prime(i,j)
-            end do
-         end do
+         psi_mean = ( real( count-1 ) * psi_mean + psi_prime ) * count_inv
+         chi_mean = ( real( count-1 ) * chi_mean + chi_prime ) * count_inv
+         t_mean = ( real( count-1 ) * t_mean + t_prime ) * count_inv
+         rh_mean = ( real( count-1 ) * rh_mean + rh_prime ) * count_inv
+         ps_mean = ( real( count-1 ) * ps_mean + ps_prime ) * count_inv
 
       end do  ! End loop over ensemble members.
 
@@ -208,22 +170,6 @@ program gen_be_stage1
       date = new_date
       read(date(1:10), fmt='(i10)')cdate
    end do     ! End loop over times.
-
-!   do b = 1, num_bins
-!      write(6,'(a,2i8,2f20.5)')' Mean_field for psi', b, bin_pts(b), psi_mean(b)
-!   end do
-!   do b = 1, num_bins
-!      write(6,'(a,2i8,2f20.5)') 'Mean_field for chi', b, bin_pts(b), chi_mean(b)
-!   end do
-!   do b = 1, num_bins
-!      write(6,'(a,2i8,2f20.5)') 'Mean_field for t', b, bin_pts(b), t_mean(b)
-!   end do
-!   do b = 1, num_bins
-!      write(6,'(a,2i8,2f20.5)') 'Mean_field for rh', b, bin_pts(b), rh_mean(b)
-!   end do
-!   do b = 1, num_bins2d
-!      write(6,'(a,2i8,2f20.5)') 'Mean_field for ps', b, bin_pts2d(b), ps_mean(b)
-!   end do
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [2] Read fields again, and remove time/ensemble/area mean'
@@ -237,18 +183,15 @@ program gen_be_stage1
 
          write(6,'(a,a)')'    Removing mean for date ', date
 
-         filename = 'pert.'//date(1:10)
          if ( be_method == 'NMC' ) then
-            filename = trim(filename)//'.e001'
+            filename = trim(dat_dir)//'/pert.'//date(1:10)//'.e001'
          else
             write(UNIT=ce,FMT='(i3.3)')member
-            filename = trim(filename)//'.e'//trim(ce)
+            filename = trim(dat_dir)//'/pert.'//date(1:10)//'.e'//trim(ce)
          endif
 
-         open (iunit, file = trim(dat_dir)//'/'//filename, form='unformatted')
-!         read(iunit)date, ni, nj, nk, dphi
+         open (iunit, file = trim(filename), form='unformatted')
          read(iunit)date, ni, nj, nk
-
          read(iunit)psi_prime
          read(iunit)chi_prime
          read(iunit)t_prime
@@ -262,28 +205,11 @@ program gen_be_stage1
 !        write(6,(2a)) [2] Remove mean.
 !---------------------------------------------------------------------------------------------
 
-         if ( remove_mean ) then
-!           3D fields:
-            do k = 1, nk
-               do j = 1, nj
-                  do i = 1, ni
-                     b = bin(i,j,k)
-                     psi_prime(i,j,k) = psi_prime(i,j,k) - psi_mean(b)
-                     chi_prime(i,j,k) = chi_prime(i,j,k) - chi_mean(b)
-                     t_prime(i,j,k) = t_prime(i,j,k) - t_mean(b)
-                     rh_prime(i,j,k) = rh_prime(i,j,k) - rh_mean(b)
-                  end do
-               end do
-            end do
-
-!           2D fields:
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin2d(i,j)
-                  ps_prime(i,j) = ps_prime(i,j) - ps_mean(b)
-               end do
-            end do
-         end if
+         psi_prime = psi_prime - psi_mean
+         chi_prime = chi_prime - chi_mean
+         t_prime = t_prime - t_mean
+         rh_prime = rh_prime - rh_mean
+         ps_prime = ps_prime - ps_mean
 
 !---------------------------------------------------------------------------------------------
 !        write(6,(2a)) [2] Write fields to file for further processing.
@@ -294,7 +220,7 @@ program gen_be_stage1
 !        Write necessary full-fields:
          variable = 'fullflds'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)latitude
@@ -304,7 +230,7 @@ program gen_be_stage1
 !        Write psi:
          variable = 'psi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)psi_prime
@@ -313,7 +239,7 @@ program gen_be_stage1
 !        Write chi:
          variable = 'chi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)chi_prime
@@ -322,7 +248,7 @@ program gen_be_stage1
 !        Write T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)t_prime
@@ -331,7 +257,7 @@ program gen_be_stage1
 !        Write RH:
          variable = 'rh'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)rh_prime
@@ -340,10 +266,9 @@ program gen_be_stage1
 !        Write ps:
          variable = 'ps' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
-         write(ounit).true., .false.
          write(ounit)ps_prime
          close(ounit)
 

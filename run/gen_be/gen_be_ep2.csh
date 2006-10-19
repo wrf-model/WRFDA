@@ -19,7 +19,7 @@
 
 #set echo
 
-setenv DATE 2003011100
+setenv DATE 2003010212
 setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar
 
 #-----------------------------------------------------------------------------------

@@ -9,9 +9,14 @@ begin
 ; read in data
 ;************************************************
 
- works = "x11"
- dir = "/smoke/dmbarker/data/con200/noobs/gen_be/"
- nrow = 27
+ works = "pdf"
+
+ region = "india_30km"
+ nrow = 50
+; region = "con200"
+; nrow = 27
+
+ dir = "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
  ncol = 6
  y = new((/nrow/),float)
  x = new((/5,nrow/),float)
@@ -36,7 +41,7 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
- wks   = gsn_open_wks (works,"gen_be_global_evecs")  ; open workstation
+ wks   = gsn_open_wks (works,"gen_be_global_evecs_"+region)  ; open workstation
 
  res                  = True                     ; plot mods desired
  res@trXMinF  =  -1.0                  ; min value on x-axis

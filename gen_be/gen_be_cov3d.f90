@@ -9,7 +9,6 @@ program gen_be_cov3d
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable1                  ! Variable name
    character*10        :: variable2                  ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
@@ -38,8 +37,7 @@ program gen_be_cov3d
    real, allocatable   :: var(:)                     ! Autocovariance of field.
 
    namelist / gen_be_cov3d_nl / start_date, end_date, interval, &
-                                be_method, ne, &
-                                variable1, variable2, dat_dir
+                                ne, variable1, variable2, dat_dir
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -48,7 +46,6 @@ program gen_be_cov3d
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
-   be_method = 'NMC'
    ne = 1
    variable1 = 'psi'
    variable2 = 'chi'
@@ -84,7 +81,7 @@ program gen_be_cov3d
 
 !        Read first field:
          filename = trim(variable1)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable1)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
 
@@ -120,7 +117,7 @@ program gen_be_cov3d
 
 !        Read second field:
          filename = trim(variable2)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable2)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable2)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)field2
@@ -148,7 +145,7 @@ program gen_be_cov3d
       read(date(1:10), fmt='(i10)')cdate
    end do     ! End loop over times.
 
-   filename = trim(variable1)//'.'//trim(variable2)//'.'//trim(be_method)
+   filename = trim(variable1)//'.'//trim(variable2)//'.dat'
    open (ounit, file = filename, status='unknown')
 
    do k = 1, nk

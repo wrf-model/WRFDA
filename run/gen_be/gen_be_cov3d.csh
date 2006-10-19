@@ -6,7 +6,6 @@
 if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
-if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
 if ( ! $?BIN_TYPE )      setenv BIN_TYPE      5          # 0=None, 1=1:ni, 2=latitude, ....
 if ( ! $?VARIABLE1 )     setenv VARIABLE1     chi_u      # Experiment ID
@@ -32,7 +31,6 @@ cat >! gen_be_cov3d_nl.nl << EOF
     start_date = '${START_DATE}',
     end_date = '${END_DATE}',
     interval = ${INTERVAL},
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     variable1 = '${VARIABLE1}',
     variable2 = '${VARIABLE2}',

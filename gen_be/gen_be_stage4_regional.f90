@@ -8,7 +8,6 @@ program gen_be_stage4_regional
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method ('NMC', or 'ENS')
    character*200       :: run_dir                    ! Run directory.
    character*200       :: filename                   ! Input filename.
    character*1         :: k_label                    ! = 'k' if model level, 'm' if mode output.
@@ -23,14 +22,13 @@ program gen_be_stage4_regional
    integer             :: ne                         ! Number of ensemble members.
    integer             :: member                     ! Loop counters.
    real                :: count                      ! Counter for times/members.
-   logical             :: use_global_eofs, data_on_levels
    integer, allocatable:: nr(:)                      ! Number of points in each bin.
    real, allocatable   :: field(:,:)                 ! Input 2D field.
    real, allocatable   :: r(:)                       ! Radius of each bin.
    real, allocatable   :: cov(:)                     ! Covariance as a function of distance.
 
    namelist / gen_be_stage4_regional_nl / start_date, end_date, interval, variable, &
-                                          be_method, ne, k, stride, run_dir
+                                          ne, k, stride, run_dir
 
 
    if (trace_use) call da_trace_init
@@ -44,7 +42,6 @@ program gen_be_stage4_regional
    end_date = '2004033112'
    interval = 24
    variable = 'psi'
-   be_method = 'NMC'
    ne = 1
    k = 1
    stride = 1
@@ -84,7 +81,7 @@ program gen_be_stage4_regional
 
 !        Assumes variable directory has been created by script:
          filename = trim(run_dir)//'/'//trim(variable)//'/'//date(1:10)//'.'//trim(variable)
-         filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
+         filename = trim(filename)//'.e'//ce//'.'//ck
          open (UNIT=iunit, file = filename, form='unformatted')
          read(UNIT=iunit) ni, nj, kdum
 
@@ -99,7 +96,6 @@ program gen_be_stage4_regional
             call get_grid_info( ni, nj, nn, stride, nr )
          end if
 
-         read(UNIT=iunit)data_on_levels, use_global_eofs
          read(UNIT=iunit)field(1:ni,1:nj)
          close(UNIT=iunit)
 
