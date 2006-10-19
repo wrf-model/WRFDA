@@ -81,10 +81,8 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !  ---------
 
    if(present(filename)) then
-      OPEN(UNIT   = iunit,     &
-           FILE   = trim(filename), &
-           IOSTAT =  iost,     &
-           STATUS = 'OLD')
+      OPEN(UNIT   = iunit, FILE   = trim(filename), &
+           IOSTAT =  iost, form = 'unformatted', STATUS = 'OLD')
 
       IF (iost /= 0) THEN
          write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &

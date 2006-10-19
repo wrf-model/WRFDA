@@ -1,13 +1,13 @@
 program da_tune
-!-----------------------------------------------------------
+!---------------------------------------------------------------------
 ! Abstract:
-!    Purpose: Observation error tuning  (Desroziers method)
-!        Ref: QJRMS (2001), 127, pp. 1433-1452   
-!             Gerald Desroziers and Serguei Ivanov
-!    Updates: 
-!             03/15/2006  ADD RADIANCE ERROR TUNING    ZHIQUAN LIU
-!             07/05/2007     Syed RH Rizvi
-!-----------------------------------------------------------
+!   Purpose: Observation error tuning  (Desroziers method)
+!       Ref: QJRMS (2001), 127, pp. 1433-1452   
+!            Gerald Desroziers and Serguei Ivanov
+!  Updates: 
+!        03/15/2006  ADD RADIANCE ERROR TUNING           ZHIQUAN LIU
+!        10/16/2006  Merged radiance tuning subroutines  Syed RH Rizvi
+!---------------------------------------------------------------------
    implicit none
 
    integer, parameter            :: rand_unit = 45
@@ -303,14 +303,12 @@ program da_tune
 !--------------------------------------------------------------------------
 
    call da_read_jo_actual( ob )
-  if ( rtminit_nsensor > 0 ) call da_read_jo_actual_rad( ob )
 
 !--------------------------------------------------------------------------
 !  [7.0] Calculate observation error tuning factors:
 !--------------------------------------------------------------------------
 
    call da_calc_new_factors( ob )
-   if ( rtminit_nsensor > 0 ) call da_calc_new_factors_rad( ob )
 
 !--------------------------------------------------------------------------
 !  [8.0] Calculate observation error tuning factors:
@@ -362,7 +360,6 @@ subroutine da_count_obs( y_unit, ob )
 !  [2] Loop through input file to count number of obs:
 
     do   
-
          read(y_unit,'(a20,i8)', end = 1000)ob_name, num_obs
          if( num_obs > 0) times = times + 1 
       if ( index( ob_name,'synop') > 0 ) then
@@ -436,12 +433,18 @@ subroutine da_count_obs( y_unit, ob )
         print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
       end if
 !
+          if ( index( ob_name,'noaa') > 0 ) then
+              do k = 1, num_obs
+              read(y_unit,'(a20)')dummy              
+              enddo
+         else
           do n = 1, num_obs
             read(y_unit,'(i8)')num_levs
             do k = 1, num_levs 
               read(y_unit,'(a20)')dummy              
             enddo
           enddo
+         endif    
    end do
 
 1000  print*,' end of file reached on unit ',y_unit
@@ -545,7 +548,7 @@ subroutine da_count_obs( y_unit, ob )
       write(6,'(a,i8)')' Number of qscat obs = ', ob % num_qscat
    end if
    if ( ob % num_profiler> 0 ) then
-      allocate( ob % profiler(1:ob % num_qscat) )
+      allocate( ob % profiler(1:ob % num_profiler) )
       write(6,'(a,i8)')' Number of  Profiler obs = ', ob % num_profiler
    end if
    
@@ -874,7 +877,7 @@ subroutine da_read_yp( yp_unit, ob )
    integer, intent(in)               :: yp_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*10         :: ob_name, dummy
+   character*20         :: ob_name, dummy
    integer              :: n, ndum, k, kdum, num_obs, num_levs   
    integer              :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
                            iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
@@ -1438,7 +1441,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
              .and. sensor_id    == rtminit_sensor(n)    ) then
                 do k = 1,num_obs
                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
-                  read(rand_unit,'(2i8,f10.3,e15.7)') ipixel, kdum,     &
+                  read(rand_unit,'(2i8,2e15.7)') ipixel, kdum,     &
                           ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%error, &
                           ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%pert
                 end do
@@ -1955,6 +1958,11 @@ subroutine da_calc_jo_expected( ob )
       ob % num_bogus = count1 + count2 + count3 + count4
    end if
 
+    ob % total_obs = ob % num_synop_tot + ob % num_metar_tot + ob % num_ships_tot + &
+                    ob % num_polaramv_tot + ob % num_geoamv_tot + ob % num_gpspw_tot + &
+                    ob % num_sound_tot + ob % num_airep_tot + ob % num_pilot_tot + &
+                    ob % num_ssmir_tot + ob % num_satem_tot + ob % num_ssmt1_tot + ob % num_ssmt2_tot + &
+                    ob % num_buoy_tot + ob % num_sonde_sfc_tot + ob % num_qscat_tot + ob % num_profiler_tot + ob% num_bogus_tot
 
 !  radiance part
    if ( rtminit_nsensor > 0 ) then
@@ -1979,14 +1987,6 @@ subroutine da_calc_jo_expected( ob )
       end do
 
    end if
-
-
-    ob % total_obs = ob % num_synop_tot + ob % num_metar_tot + ob % num_ships_tot + &
-                    ob % num_polaramv_tot + ob % num_geoamv_tot + ob % num_gpspw_tot + &
-                    ob % num_sound_tot + ob % num_airep_tot + ob % num_pilot_tot + &
-                    ob % num_ssmir_tot + ob % num_satem_tot + ob % num_ssmt1_tot + ob % num_ssmt2_tot + &
-                    ob % num_buoy_tot + ob % num_sonde_sfc_tot + ob % num_qscat_tot + ob % num_profiler_tot + ob% num_bogus_tot
-
 
 end subroutine da_calc_jo_expected
 
@@ -2018,31 +2018,8 @@ subroutine da_read_jo_actual( ob )
    character (len=15)            :: str1, str2, str3, str4, str5
    character (len=15)            :: str6, str7, str8, str9, str10
    character (len=5)             :: ob_name
-   
-   real                          :: dum1, dum2, dum3, dum4, dum5
-
-   integer                       :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
-                                    iairep, ipilot, issmir, isatem, issmt1, issmt2, &
-                                    ibuoy, isonde_sfc, iqscat, ibogus, iprofiler
-
-   isynop = 0
-   imetar = 0
-   iships = 0
-   ipolaramv = 0
-   igeoamv = 0
-   igpspw = 0
-   isound = 0
-   iairep = 0
-   ipilot = 0
-   issmir = 0
-   isatem = 0
-   issmt1 = 0
-   issmt2 = 0
-   ibuoy = 0
-   isonde_sfc = 0 
-   iqscat = 0 
-   ibogus = 0 
-   iprofiler = 0
+   real                          :: dum1, dum2, dum3, dum4, dum5, jo
+   integer                       :: n, num_obs
 
    ob % joa_synop_u = 0.0
    ob % joa_synop_v = 0.0
@@ -2099,14 +2076,21 @@ subroutine da_read_jo_actual( ob )
    ob % joa_airsr_t = 0.0
    ob % joa_airsr_q = 0.0
 
+   if ( rtminit_nsensor > 0 ) then   
+    do n = 1,rtminit_nsensor
+    ob%rad(n)%num_rad_tot(:) = 0
+    ob%rad(n)%joa_rad(:) = 0.
+    end do
+   endif
+
    rewind(jo_unit)
-   
+
    do
       read(jo_unit,'(a46,10a15)')str, str1, str2, str3, str4, str5, &
                                  str6, str7, str8, str9, str10
       ob_name = str(5:9)
       string = str(16:27)
-       print*,' read ob_name = ',ob_name,str(5:9),' sring= ',string 
+
       if ( ob_name == 'synop' .and. string == 'Jo (actual) ' ) then
 
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
@@ -2204,7 +2188,6 @@ subroutine da_read_jo_actual( ob )
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_ssmt2_rh, dum1, dum2, dum3, dum4 )
       elseif ( ob_name == 'buoy ' .and. string == 'Jo (actual) ' ) then
-
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                      str6, str7, str8, str9, str10, &
                                      ob % joa_buoy_u, ob % joa_buoy_v, &
@@ -2237,13 +2220,34 @@ subroutine da_read_jo_actual( ob )
                                   ob % joa_bogus_u, ob % joa_bogus_v, &
                                   ob % joa_bogus_t, ob % joa_bogus_q, &
                                   dum1)
+      else if ( ob_name == 'radia' .and. string == 'Jo (actual) ' ) then
+         platform_id = 1
+      read (str,'(30x,a4,1x,i2,1x,a5)')platform, satellite_id,sensor
+      read (str1,'(i5,i10)')ichan, num_obs                     
+      read (str2,'(f15.5)')jo                                 
 
+         if ( sensor == 'amsua' ) then
+              sensor_id = 3
+         else if ( sensor == 'amsub' )  then
+              sensor_id = 4
+         else
+              write(6,*) ' Unrecognized Sensor '
+         end if
+         do n = 1, rtminit_nsensor
+           if (    platform_id  == rtminit_platform(n) &
+             .and. satellite_id == rtminit_satid(n)    &
+             .and. sensor_id    == rtminit_sensor(n)    ) then
+                   ob%rad(n)%joa_rad(ichan) = ob%rad(n)%joa_rad(ichan) + jo
+                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
+                exit
+           end if
+         end do
       else if ( str(1:5) == '*****' ) then
          exit
       end if
 
    end do
-            
+               
 end subroutine da_read_jo_actual
 
 !--------------------------------------------------------------------------
@@ -2289,6 +2293,7 @@ subroutine da_calc_new_factors( ob )
    implicit none
 
    type (ob_type), intent(inout)     :: ob
+   integer                           :: n, ichan
 
    write(6,*)
 
@@ -2409,6 +2414,26 @@ subroutine da_calc_new_factors( ob )
                             ob % jo_bogus_u, ob % jo_bogus_v, ob % jo_bogus_t, ob % jo_bogus_q, 0.0, &
                             ob % joa_bogus_u, ob % joa_bogus_v, ob % joa_bogus_t, ob % joa_bogus_q, 0.0 )
    endif
+  
+   if ( rtminit_nsensor > 0 ) then 
+    write(6,*) '     sensor    chan   num       Jo_mini         Jo_exp       trace(HK)  factor'
+      do n = 1, rtminit_nsensor
+      do ichan = 1, ob % rad(n) % nchan
+         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
+           ob % rad(n) % factor_rad(ichan) = &
+             sqrt( ob % rad(n) % joa_rad(ichan) / ob % rad(n) % jo_rad(ichan) )
+           write(6,'(a15,i3,i8,3f15.5,f8.3)')   &
+                       trim(ob%rad(n)%rttovid_string), &
+                       ichan,                        &
+                       ob%rad(n)%num_rad_tot(ichan), &
+                       ob%rad(n)%joa_rad(ichan),      &
+                       ob%rad(n)%jo_rad(ichan),     &
+                       ob%rad(n)%trace_rad(ichan),   &
+                       ob%rad(n)%factor_rad(ichan)
+         end if
+      end do
+      end do
+   endif
 
 end subroutine da_calc_new_factors
 
@@ -2429,7 +2454,7 @@ subroutine da_calc_new_factors1( ob_name, ob_num, ob_num_tot, &
    real                           :: f1, f2, f3, f4, f5
          
    f1 = 1.0; f2 = 1.0; f3 = 1.0; f4 = 1.0; f5 = 1.0
-
+                             
    if ( j1e > 0.0 ) f1 = sqrt( j1a / j1e )
    if ( j2e > 0.0 ) f2 = sqrt( j2a / j2e )
    if ( j3e > 0.0 ) f3 = sqrt( j3a / j3e )
@@ -2526,103 +2551,6 @@ subroutine da_get_j( ob )
    write(6,*)
    
 end subroutine da_get_j
-
-
-!--------------------------------------------------------------------------
-subroutine da_calc_new_factors_rad( ob )
-
-   implicit none
-
-   type (ob_type), intent(inout)     :: ob
-
-   write(6,*)
-
-   write(6,*) 'sensor  chan  num  Jo_min  Jo_exp  trace(HK)  factor'
-      do n = 1, rtminit_nsensor
-      do ichan = 1, ob % rad(n) % nchan
-         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
-           ob % rad(n) % factor_rad(ichan) = &
-             sqrt( ob % rad(n) % joa_rad(ichan) / ob % rad(n) % jo_rad(ichan) )
-           write(6,'(a15,i3,i8,3f15.5,f8.3)')   &
-                       trim(ob%rad(n)%rttovid_string), &
-                       ichan,                        &
-                       ob%rad(n)%num_rad_tot(ichan), &
-                       ob%rad(n)%joa_rad(ichan),      &
-                       ob%rad(n)%jo_rad(ichan),     &
-                       ob%rad(n)%trace_rad(ichan),   &
-                       ob%rad(n)%factor_rad(ichan)
-         end if
-      end do
-      end do
-
-
-end subroutine da_calc_new_factors_rad
-
-!--------------------------------------------------------------------------
-subroutine da_read_jo_actual_rad( ob )
-
-   implicit none
-
-   type (ob_type), intent(inout) :: ob
-
-   character (len=30)            :: str
-   character (len=19)            :: ob_name
-   integer                       :: num_obs
-   real                          :: jo
-
-
-   do n = 1,rtminit_nsensor
-    ob%rad(n)%num_rad_tot(:) = 0
-    ob%rad(n)%joa_rad(:) = 0.
-   end do
-
-   rewind(jo_unit)
-
-   do
-
-      read(jo_unit,'(a30,a19,i5,i8,f15.5)') str, ob_name, &
-                                            ichan, num_obs, jo
-
-!      write(6,'(a30,a19,i5,i8,f15.5)') str, ob_name, &
-!                                            ichan, num_obs, jo
-
-!---determine instrument and channel number
-
-      if ( index( ob_name,'noaa') > 0 ) then
-         platform_id = 1
-         read (ob_name,'(a4,a1,i2,a1,a5)') &
-               platform, str1,satellite_id,str2,sensor
-         if ( sensor == 'amsua' ) then
-              sensor_id = 3
-         else if ( sensor == 'amsub' )  then
-              sensor_id = 4
-         else
-              write(6,*) ' Unrecognized Sensor '
-         end if
-         do n = 1, rtminit_nsensor
-           if (    platform_id  == rtminit_platform(n) &
-             .and. satellite_id == rtminit_satid(n)    &
-             .and. sensor_id    == rtminit_sensor(n)    ) then
-!                if ( num_obs /= ob%rad(n)%num_rad_tot(ichan) ) then
-!                   write(6,*) ' Unconsistent obs number for ',ob_name, ' channel ', &
-!                              ichan,' : ', ob%rad(n)%num_rad_tot(ichan), ' vs. ',num_obs
-!                   stop
-!                else
-                   ob%rad(n)%joa_rad(ichan) = ob%rad(n)%joa_rad(ichan) + jo
-                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
-!                end if
-                exit
-           end if
-         end do
-      end if
-!---------------------------------------------------------------------
-
-
-      if ( str(1:5) == '*****' ) exit
-
-   end do
-
-end subroutine da_read_jo_actual_rad
 !---------------------------------------------
 SUBROUTINE read_namelist_radiance
 !----------------------------------------------------------------------------
@@ -2685,8 +2613,5 @@ SUBROUTINE read_namelist_radiance
    RETURN
 
 END SUBROUTINE read_namelist_radiance
-
-
-
 
 end program da_tune
