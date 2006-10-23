@@ -408,7 +408,7 @@ subroutine da_rttov_init(iv,ob)
          exit
       end if
     end do
-    call close(unit_factor_rad)
+    close(unit_factor_rad)
     call da_free_unit(unit_factor_rad)
 
  end if

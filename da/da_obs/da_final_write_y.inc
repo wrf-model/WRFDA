@@ -24,10 +24,10 @@ subroutine da_final_write_y( iv, y )
 #endif
 
    if ( omb_add_noise ) then
-      ounit = yp_unit            ! 3DVAR is a perturbed ob run.
+      ! perturbed ob run.
       file_prefix='pert_obs'
    else
-      ounit = y_unit             ! 3DVAR is an unperturbed ob run.
+      ! unperturbed ob run.
       file_prefix='unpert_obs'
    end if
 
@@ -37,6 +37,7 @@ subroutine da_final_write_y( iv, y )
    ENDDO
 
    if( rootproc) then
+      call da_get_unit(ounit)
    open(UNIT=ounit,file=trim(file_prefix),form='formatted',iostat=ios,status='new')
    if (ios /= 0 ) call da_error(__FILE__,__LINE__, &
          (/"Canot open random observation error file"//trim(file_prefix)/))
@@ -413,7 +414,12 @@ subroutine da_final_write_y( iv, y )
       end do                                   ! end loop for sensor
    END IF
 
+   close(ounit)
+   call da_free_unit(ounit)
    deallocate ( filename )
+
    if (trace_use) call da_trace_exit("da_final_write_y")
    
 end subroutine da_final_write_y
+
+

@@ -30,12 +30,8 @@ SUBROUTINE da_write_y(iv, y)
    !-------------------------------------------------------------------------   
 
    if (omb_add_noise) then
-      call da_get_unit(yp_unit)
-      ounit = yp_unit            ! 3DVAR is a perturbed ob run.
       file_prefix='pert_obs.'
    else
-      call da_get_unit(y_unit)
-      ounit = y_unit             ! 3DVAR is an unperturbed ob run.
       file_prefix='unpert_obs.'
    end if
 
@@ -47,6 +43,7 @@ SUBROUTINE da_write_y(iv, y)
       write(UNIT=filename, FMT='(a)') trim(file_prefix)//'000'
 #endif
 
+   call da_get_unit(ounit)
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &

@@ -1,7 +1,7 @@
-subroutine da_read_fort50(filename,unit_in,num,obs_type_in, nc)
+subroutine da_read_omb_temp(filename,unit_in,num,obs_type_in, nc)
 
    !-------------------------------------------------------------------------
-   ! read diagnostics written in fort.50 by WRFVAR
+   ! read diagnostics written to temporary file by WRFVAR
    !-------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -502,7 +502,7 @@ subroutine da_read_fort50(filename,unit_in,num,obs_type_in, nc)
 1000 continue
    write(unit=errmsg(1), fmt='(/a,i3/a/)') &
       'read error on unit: ',unit_in, & 
-      'in da_read_fort50'
+      'in da_read_omb_temp'
    call da_error(__FILE__,__LINE__,errmsg(1:1))
 
-end subroutine da_read_fort50
+end subroutine da_read_omb_temp

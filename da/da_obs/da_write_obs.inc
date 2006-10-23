@@ -27,7 +27,7 @@ subroutine da_write_obs( ob, iv, re)
    ! Fix output unit
    !-------------------------------------------------------------------------
 
-   ounit = omb_unit
+   call da_get_unit(ounit)
 
 #ifdef DM_PARALLEL
       write(UNIT=filename, FMT='(a,i3.3)') 'gts_omb_oma.', myproc
@@ -35,7 +35,7 @@ subroutine da_write_obs( ob, iv, re)
       write(UNIT=filename, FMT='(a)') 'gts_omb_oma.000'
 #endif
 
-   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
          (/"Canot open conventional observation omb and oma file"//filename/))
@@ -615,6 +615,7 @@ subroutine da_write_obs( ob, iv, re)
    ENDIF
 
    close (ounit)
+   call da_free_unit(ounit)
 
    if (trace_use) call da_trace_exit("da_write_obs")
 
