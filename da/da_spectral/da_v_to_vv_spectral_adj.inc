@@ -39,10 +39,6 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    complex             :: ccv(1:sizec)               ! Spectral modes.
    complex             :: ccv_local(1:sizec)         ! Spectral modes.
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    IF (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
 
    !----------------------------------------------------------------------

@@ -7,10 +7,6 @@ subroutine da_write_filtered_rad(ob, iv)
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
-   
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.
    TYPE (ob_type),    INTENT(IN)  :: iv       ! O-B structure.

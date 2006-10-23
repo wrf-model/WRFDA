@@ -15,10 +15,6 @@ SUBROUTINE da_write_y(iv, y)
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    TYPE (ob_type), INTENT(IN)    :: iv   ! O-B structure.
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
 

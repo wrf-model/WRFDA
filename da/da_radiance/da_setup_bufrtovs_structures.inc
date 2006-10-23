@@ -11,10 +11,6 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    TYPE (xpose_type), INTENT(IN)   :: xp         ! Domain decomposition vars.
    TYPE ( y_type), INTENT(INOUT)   :: ob         ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)   :: iv         ! O-B structure.

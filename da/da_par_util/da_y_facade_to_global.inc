@@ -31,7 +31,6 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
 
    ! Local declarations
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
    INTEGER                      :: n, k, serial_n, serial_numvals
    INTEGER                      :: communicator
    INTEGER                      :: proc

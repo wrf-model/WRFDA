@@ -9,11 +9,9 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !             07/03/2006  -   update for AIRS retrievals    Syed RH Rizvi    
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
-!----------------------------------------------------------------------------   
+!---------------------------------------------------------------------------- 
+  
    IMPLICIT NONE
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
 
    TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.

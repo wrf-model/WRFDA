@@ -42,9 +42,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    !---------------------------------------------------------------------------   
 
    IMPLICIT NONE
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    type (y_type),     intent(in)  :: ob      ! Observation structure.
    TYPE (ob_type),    intent(inout) :: iv      ! O-B structure.

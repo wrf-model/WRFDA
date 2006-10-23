@@ -2,10 +2,6 @@ subroutine da_biasprep(inst,ob,iv)
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    ! ACCUMULATE STATS FROM FEEDBACK FILES FOR BIAS CORRECTION PROGS
    !-----------------------------------------------------------------------
 

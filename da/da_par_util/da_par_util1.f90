@@ -7,6 +7,7 @@
 MODULE da_par_util1
 
    USE da_constants
+   USE module_dm
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
@@ -17,8 +18,6 @@ MODULE da_par_util1
    IMPLICIT NONE
 
 #ifdef DM_PARALLEL
-#include "rsl.inc"
-   include "mpif.h"
 
 #if ( DWORDSIZE != RWORDSIZE )
    integer, parameter :: true_mpi_real = MPI_REAL

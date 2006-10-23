@@ -9,10 +9,6 @@ subroutine da_wrfvar_init1( no_init1 )
    LOGICAL, OPTIONAL, INTENT(IN) :: no_init1
    integer :: ierr
 
-#if DM_PARALLEL
-   include "mpif.h"
-#endif
-
    !<DESCRIPTION>
    ! Program_name, a global variable defined in frame/module_domain.F, is
    ! set, then a routine <a href=init_modules.html>init_modules</a> is

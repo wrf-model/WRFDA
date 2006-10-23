@@ -5,10 +5,6 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
-   
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
    TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.

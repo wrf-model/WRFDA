@@ -2,10 +2,6 @@ subroutine da_trace_report
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-    INCLUDE 'mpif.h'
-#endif
-
    INTEGER :: Loop1                        ! loop counter
    INTEGER :: Loop2                        ! loop counter
    INTEGER :: i

@@ -7,9 +7,7 @@ subroutine da_proc_sum_ints ( values )
    !           communication.)
    !---------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
+   implicit none
 
    INTEGER,   INTENT(INOUT)      :: values(:) ! Values
 

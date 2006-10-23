@@ -8,10 +8,6 @@ subroutine da_final_write_obs( ob, iv, re )
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    type (y_type), intent(in)     :: ob      ! Observation structure.
    TYPE (ob_type), INTENT(IN)    :: iv      ! O-B structure.
    type (y_type), intent(inout)  :: re      ! residual vector.

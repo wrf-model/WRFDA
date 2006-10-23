@@ -16,9 +16,6 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
    IMPLICIT NONE
 
    !#include "rttov_q2v.interface"
-#ifdef DM_PARALLEL
-      include "mpif.h"
-#endif
 
    TYPE (x_type), INTENT(IN)      :: xa       ! delta_x
    TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.

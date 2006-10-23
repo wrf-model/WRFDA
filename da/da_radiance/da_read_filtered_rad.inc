@@ -9,10 +9,6 @@
 !------------------------------------------------------------------------------
 
    IMPLICIT NONE
-   
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    TYPE (xpose_type), INTENT(IN)     :: xp       ! Domain decomposition vars.
    TYPE (ob_type),    INTENT(INOUT)  :: iv       ! O-B structure.

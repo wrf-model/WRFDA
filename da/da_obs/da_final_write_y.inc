@@ -5,11 +5,8 @@ subroutine da_final_write_y( iv, y )
    ! History:
    ! Author:    Syed RH Rizvi     MMM/NCAR    05/16/2006     
    !-------------------------------------------------------------------------   
-   IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
+   IMPLICIT NONE
 
    TYPE (ob_type), INTENT(IN)    :: iv   ! O-B structure.
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
