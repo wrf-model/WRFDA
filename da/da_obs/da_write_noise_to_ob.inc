@@ -13,7 +13,7 @@ subroutine da_write_noise_to_ob (iv)
    TYPE (ob_type), INTENT(IN)    :: iv   ! Obs and header structure.
    integer                       :: n, k,kk,inst, iunit
    integer                       :: ierr,ios  ! Error code from MPI routines.
-   integer                       :: iunit, num_obs
+   integer                       :: num_obs
    character*20, allocatable     :: filename(:)   
    character*20                  :: ob_name   
    !-------------------------------------------------------------------------   
