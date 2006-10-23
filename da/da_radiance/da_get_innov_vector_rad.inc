@@ -491,26 +491,29 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       deallocate (pems5)
    end do        ! end loop for sensor
 
-   !------------------------------------------
-   ! 3.1 prepare bias statistics files
-   !------------------------------------------
-
-   if (lbiasprep) then
-      do inst = 1, iv%num_inst
-         call da_biasprep(inst,ob,iv)
-      end do
-   end if
-
    !------------------------------------------------------------------------
    ! [4.0] Perform QC check
    !------------------------------------------------------------------------
  
    if (lqc_rad) then
       do inst = 1, iv%num_inst                 ! loop for sensor
-         WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', trim(iv%instid(inst)%rttovid_string) 
+         WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', &
+                            trim(iv%instid(inst)%rttovid_string) 
          nchanl    = iv%instid(inst)%nchan
          call da_qc_rad(inst,nchanl, ob, iv )
       end do        ! end loop for sensor
+   end if
+
+   !------------------------------------------
+   ! 5.0 prepare bias statistics files
+   !------------------------------------------
+
+   if (lbiasprep) then
+      do inst = 1, iv%num_inst
+         WRITE(UNIT=stdout,FMT='(A,A)') 'Preparing bias statistics files for ', &
+                            trim(iv%instid(inst)%rttovid_string)
+         call da_biasprep(inst,ob,iv)
+      end do
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rad")

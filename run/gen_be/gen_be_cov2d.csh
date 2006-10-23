@@ -6,7 +6,6 @@
 if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Starting time of period.
 if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Ending time of period.
 if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
-if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
 if ( ! $?NE )            setenv NE            1          # Number of ensemble members (for ENS).
 if ( ! $?BIN_TYPE )      setenv BIN_TYPE      5          # 0=None, 1=1:ni, 2=latitude, ....
 if ( ! $?LAT_MIN )       setenv LAT_MIN       -90.0      # Used if BIN_TYPE = 2.
@@ -42,7 +41,6 @@ cat >! gen_be_cov2d_nl.nl << EOF
     start_date = '${START_DATE}',
     end_date = '${END_DATE}',
     interval = ${INTERVAL},
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     bin_type = ${BIN_TYPE},
     lat_min = ${LAT_MIN},
@@ -52,9 +50,7 @@ cat >! gen_be_cov2d_nl.nl << EOF
     hgt_max = ${HGT_MAX},
     binwidth_hgt = ${BINWIDTH_HGT},
     variable1 = '${VARIABLE1}',
-    variable2 = '${VARIABLE2}',
-    expt = '${EXPT}',
-    dat_dir = '${DAT_DIR}' /
+    variable2 = '${VARIABLE2}' /
 EOF
 
 ./gen_be_cov2d.exe

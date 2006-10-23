@@ -182,6 +182,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: anl_inc_unit = 141   ! Analysis increment unit     
    integer, parameter :: fac_unit = 49        ! Input components of ErrFac.
    integer, parameter :: omb_unit = 50        ! Output for O-B values.
+   integer, parameter :: hxb_unit = 51        ! Output for H(xb) values.
 
     INTEGER, PARAMETER :: bufrtovs_unit = 55  ! Input BUFR/TOVS data
 

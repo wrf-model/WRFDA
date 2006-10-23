@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage2( outunit, be_method, nk )
+subroutine da_readwrite_be_stage2( outunit, nk )
 
 ! ----------------------------------------------------------------------
 ! Purpose: Read and write the dimensions, bin information, and 
@@ -8,7 +8,6 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    implicit none
 
    integer, intent(in)      :: outunit                    ! Output unit number.
-   character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS')
    integer, intent(out)     :: nk                         ! Number of vertical levels/modes.
 
    character*80             :: filename                   ! Input filename.
@@ -30,7 +29,7 @@ subroutine da_readwrite_be_stage2( outunit, be_method, nk )
    real, allocatable   :: regcoeff3(:,:,:)                ! psi/T regression cooefficient.
 
 ! Read in the coefficients:
-   filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
    read(iunit)num_bins, num_bins2d

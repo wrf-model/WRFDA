@@ -87,6 +87,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
                si = ob%instid(inst)%rad(n)%tb(1) - ob%instid(inst)%rad(n)%tb(15)
                if (si >= 3.) then
                   iv%instid(inst)%rad(n)%tb(:)%qc = -1 
+                  iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                   if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                      nrej_si = nrej_si + 1
                end if
@@ -94,6 +95,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
 
             if (iv%instid(inst)%rad(n)%clwp >= 0.2) then
                iv%instid(inst)%rad(n)%tb(:)%qc = -1
+               iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                   nrej_clw = nrej_clw + 1
             end if

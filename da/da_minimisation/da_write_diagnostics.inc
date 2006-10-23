@@ -219,15 +219,11 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    !------------------------------------------------------------------------------
    call da_write_obs( ob, iv, re )
 
-!#ifdef DM_PARALLEL
-!   if (num_procs > 1) call da_final_write_obs(ob, iv, re )
-!#endif
+   call da_final_write_obs(ob, iv, re )
 
    call da_write_y( iv, y )
 
-!#ifdef DM_PARALLEL
-!   if ( (num_procs > 1) .and. (.not. use_radiance) ) call da_final_write_y(iv, y )
-!#endif
+   call da_final_write_y(iv, y )
 
    IF (trace_use) CALL da_trace_exit("da_write_diagnostics")
 

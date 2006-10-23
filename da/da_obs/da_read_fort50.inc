@@ -1,4 +1,4 @@
-subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
+subroutine da_read_fort50(filename,unit_in,num,obs_type_in, nc)
 
    !-------------------------------------------------------------------------
    ! read diagnostics written in fort.50 by WRFVAR
@@ -8,10 +8,10 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 
    INTEGER      ,intent (IN)    :: unit_in
    INTEGER      ,intent (INOUT) :: num      
-   character*(*),intent (IN)    :: obs_type_in                 
+   character*(*),intent (IN)    :: obs_type_in, filename                 
    INTEGER      ,intent (IN)    :: nc      
 
-   integer      :: num_obs 
+   integer      :: num_obs, ios 
    character*9  :: dummy_c
    character*20 :: ob_type               
    logical   :: if_write
@@ -28,12 +28,15 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
                    spd_obs, spd_inv, spd_err, spd_inc
    integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, npr
 
+   open(UNIT=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
+   if (ios /= 0 ) Then
+      call da_error(__FILE__,__LINE__, &
+         (/"Canot open file"//trim(filename)/))
+   Endif
+
 1  continue
 
    read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs
-
-   if (ob_type(1:5) =='*****') return
-  
    if_write = .FALSE.
    if( index(ob_type,OBS_TYPE_IN(1:nc)) > 0 ) if_write = .TRUE.
    if( index( ob_type,'synop') > 0) go to 10
@@ -67,8 +70,6 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
 
    if( index( ob_type,'bogus') > 0) go to 120
    if( index( ob_type,'airsr') > 0) go to 130
-
-   if( index( ob_type,'*****') > 0) return   
 
    write(unit=errmsg(1), fmt='(a,a20,a,i3)') &
       'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
@@ -106,7 +107,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
          enddo
       END DO
    ENDIF
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -137,7 +138,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -165,7 +166,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -200,7 +201,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
          enddo 
       END DO
    ENDIF
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -232,7 +233,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -261,7 +262,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
          enddo  
       END DO
    ENDIF
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -289,7 +290,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -328,7 +329,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
          enddo
       END DO
    ENDIF
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -356,7 +357,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
    
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -384,7 +385,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -414,7 +415,7 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !----------------------------------------------------------------------------   
@@ -490,16 +491,14 @@ subroutine da_read_fort50(unit_in,num,obs_type_in, nc)
       END DO
    ENDIF
 
-   if (if_write) return  
+   if (if_write) go to 999
    go to 1
 
 !--------------------------------------------------------------
 
 999 continue
-   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
-      'unexpected end of file on unit: ',unit_in, & 
-      'in da_read_fort50'
-   call da_error(__FILE__,__LINE__,errmsg(1:1))
+    close ( unit_in )
+    return
 1000 continue
    write(unit=errmsg(1), fmt='(/a,i3/a/)') &
       'read error on unit: ',unit_in, & 

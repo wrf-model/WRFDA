@@ -320,7 +320,7 @@ fprintf(fp,"          TRIM(%s_dname_table( grid%%id, itrace )), & !data name\n",
         if ( ok_to_collect_distribute ) {
 fprintf(fp,"                       globbuf_%s               , &  ! Field \n",p->members->type->name ) ;
         } else {
-fprintf(fp,"          grid%%%s%s(ims,kms,jms,itrace)  , &  ! Field\n",p->name,tl) ;
+fprintf(fp,"          grid%%%s%s(ims,jms,kms,itrace)  , &  ! Field\n",p->name,tl) ;
         }
 fprintf(fp,"          WRF_%s             , &  ! FieldType \n" , p->members->type->name ) ;
 fprintf(fp,"          grid%%communicator  , &  ! Comm\n") ;

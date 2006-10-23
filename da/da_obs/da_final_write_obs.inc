@@ -16,17 +16,24 @@ subroutine da_final_write_obs( ob, iv, re )
    TYPE (ob_type), INTENT(IN)    :: iv      ! O-B structure.
    type (y_type), intent(inout)  :: re      ! residual vector.
       
-   integer                       :: n, k, iunit
-   INTEGER                       :: root      ! Monitor processor.
-   INTEGER                       :: ierr      ! Error code from MPI routines.
+   integer                       :: n, k,kk, iunit
+   INTEGER                       :: ierr,ios  ! Error code from MPI routines.
    INTEGER                       :: num_obs, num_sound_obs
+   character*20, allocatable     :: filename(:)
 
    if (trace_use) call da_trace_entry("da_final_write_obs")
-
-
 #ifdef DM_PARALLEL
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
+   call da_get_unit(iunit)
+   allocate ( filename(0:numb_procs-1) )
+   DO k = 0,numb_procs-1
+   write(unit=filename(k),fmt ='(a,i3.3)')'gts_omb_oma.',k
+   ENDDO 
+   if ( rootproc ) then
+   open(UNIT=omb_unit,file='gts_omb_oma',form='formatted',iostat=ios,status='new')
+   if (ios /= 0 )call da_error(__FILE__,__LINE__, (/"Canot open file gts_omb_oma"/))
+   endif
 
    num_obs = 0
    IF (iv % num_synop > 0) THEN
@@ -35,13 +42,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
    ENDIF
    call da_proc_sum_int(num_obs)
-   if (num_obs > 0) then
-      if (rootproc) write(omb_unit,'(a20,i8)')'synop', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
-         iunit = omb_unit*100 +  k
-         rewind iunit
-         if (rootproc) call da_read_fort50(iunit,num_obs,'synop',5)
+       call da_read_fort50(filename(k),iunit,num_obs,'synop',5)
       ENDDO
    endif
 
@@ -56,13 +61,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
    ENDIF
    call da_proc_sum_int(num_obs)
-   if (num_obs > 0) then
-      if ( rootproc ) write(omb_unit,'(a20,20i8)')'metar', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
-         iunit = omb_unit*100 +  k
-         rewind iunit
-         if (rootproc) call da_read_fort50(iunit,num_obs,'metar',5)    
+       call da_read_fort50(filename(k),iunit,num_obs,'metar',5)    
       ENDDO
    endif
 
@@ -77,13 +80,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if (num_obs > 0) then
-       if ( rootproc ) write(omb_unit,'(a20,i8)')'ships', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+       write(omb_unit,'(a20,i8)')'ships', num_obs  
        num_obs = 0
        DO k = 0,numb_procs-1
-          iunit = omb_unit*100 +  k
-          rewind iunit
-          if (rootproc) call da_read_fort50(iunit,num_obs,'ships',5)
+        call da_read_fort50(filename(k),iunit,num_obs,'ships',5)
        ENDDO
     endif
 
@@ -98,13 +99,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
    ENDIF
    call da_proc_sum_int(num_obs)
-   if (num_obs > 0) then
-      if (rootproc) write(omb_unit,'(a20,i8)')'geoamv', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,i8)')'geoamv', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
-         iunit = omb_unit*100 +  k
-         rewind iunit
-         if (rootproc) call da_read_fort50(iunit,num_obs,'geoamv',6)
+       call da_read_fort50(filename(k),iunit,num_obs,'geoamv',6)
       ENDDO
    endif
 
@@ -119,13 +118,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
    ENDIF
    call da_proc_sum_int(num_obs)
-   if (num_obs > 0) then
-      if (rootproc) write(omb_unit,'(a20,i8)')'polaramv', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,i8)')'polaramv', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
-         iunit = omb_unit*100 +  k
-         rewind iunit
-         if (rootproc) call da_read_fort50(iunit,num_obs,'polaramv',8) 
+       call da_read_fort50(filename(k),iunit,num_obs,'polaramv',8) 
       ENDDO
    endif
 
@@ -140,13 +137,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
    ENDIF
    call da_proc_sum_int(num_obs)
-   if (num_obs > 0) then
-      if (rootproc) write(omb_unit,'(a20,i8)')'gpspw', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,i8)')'gpspw', num_obs  
       num_obs = 0
       DO k = 0,numb_procs-1
-         iunit = omb_unit*100 +  k
-         rewind iunit
-         if (rootproc) call da_read_fort50(iunit,num_obs,'gpspw',5)     
+       call da_read_fort50(filename(k),iunit,num_obs,'gpspw',5)     
       ENDDO
    endif
 
@@ -161,22 +156,18 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'sound', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+      write(omb_unit,'(a20,i8)')'sound', num_obs  
       num_sound_obs = num_obs
       num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc ) call da_read_fort50(iunit,num_obs,'sound',5)     
+    call da_read_fort50(filename(k),iunit,num_obs,'sound',5)     
     ENDDO
 !  writing Sonde_sfc  
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'sonde_sfc', num_sound_obs  
+    write(omb_unit,'(a20,i8)')'sonde_sfc', num_sound_obs  
     num_obs = 0 
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'sonde_sfc',9)
+    call da_read_fort50(filename(k),iunit,num_obs,'sonde_sfc',9)
     ENDDO
     endif
 
@@ -190,13 +181,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'airep', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'airep', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'airep',5)   
+    call da_read_fort50(filename(k),iunit,num_obs,'airep',5)   
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -209,13 +198,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'pilot', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'pilot', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'pilot',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'pilot',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -228,13 +215,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'ssmir', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'ssmir', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'ssmir',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'ssmir',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -247,13 +232,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'ssmiT', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'ssmiT', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'ssmiT',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'ssmiT',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -266,13 +249,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'satem', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'satem', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'satem',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'satem',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -285,13 +266,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'ssmt1', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'ssmt1', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'ssmt1',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'ssmt1',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -304,13 +283,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'ssmt2', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'ssmt2', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'ssmt2',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'ssmt2',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -323,13 +300,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'qscat', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'qscat', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'qscat',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'qscat',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -342,13 +317,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'profiler', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'profiler', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'profiler',8)    
+    call da_read_fort50(filename(k),iunit,num_obs,'profiler',8)    
     ENDDO
     endif
 
@@ -363,13 +336,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'buoy', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'buoy', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'buoy',4)    
+    call da_read_fort50(filename(k),iunit,num_obs,'buoy',4)    
     ENDDO
     endif
 
@@ -383,13 +354,11 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'bogus', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'bogus', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc) call da_read_fort50(iunit,num_obs,'bogus',5)    
+    call da_read_fort50(filename(k),iunit,num_obs,'bogus',5)    
     ENDDO
     endif
 !------------------------------------------------------------------
@@ -402,17 +371,16 @@ subroutine da_final_write_obs( ob, iv, re )
       ENDDO
     ENDIF
     call da_proc_sum_int(num_obs)
-    if(num_obs > 0) then
-    if ( rootproc ) write(omb_unit,'(a20,i8)')'airsr', num_obs  
+   if (num_obs > 0 .and. rootproc ) then
+    write(omb_unit,'(a20,i8)')'airsr', num_obs  
     num_obs = 0
     DO k = 0,numb_procs-1
-    iunit = omb_unit*100 +  k
-    rewind iunit
-    if ( rootproc )call da_read_fort50(iunit,num_obs,'airsr',5)
+    call da_read_fort50(filename(k),iunit,num_obs,'airsr',5)
     ENDDO
     endif
-
-   if (rootproc) write(omb_unit,'(a20,i8)')'********************', 0
+!------------------------------------------------------------------
+   call da_free_unit(iunit)
+   deallocate ( filename )
 
    if (trace_use) call da_trace_exit("da_final_write_obs")
    

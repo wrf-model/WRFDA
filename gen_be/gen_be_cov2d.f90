@@ -9,9 +9,6 @@ program gen_be_cov2d
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable1					 ! Variable name
    character*10        :: variable2					 ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
-   character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
@@ -29,7 +26,6 @@ program gen_be_cov2d
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    logical             :: first_time                 ! True if first file.
-   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
@@ -42,10 +38,10 @@ program gen_be_cov2d
    real, allocatable   :: var(:)                     ! Autocovariance of field.
 
    namelist / gen_be_cov2d_nl / start_date, end_date, interval, &
-                                be_method, ne, bin_type, &
+                                ne, bin_type, &
                                 lat_min, lat_max, binwidth_lat, &
                                 hgt_min, hgt_max, binwidth_hgt, &
-                                variable1, variable2, expt, dat_dir
+                                variable1, variable2
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -54,7 +50,6 @@ program gen_be_cov2d
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
-   be_method = 'NMC'
    ne = 1
    bin_type = 1
    lat_min = -90.0
@@ -65,8 +60,6 @@ program gen_be_cov2d
    binwidth_hgt = 1000.0
    variable1 = 'ps_u'
    variable2 = 'ps'
-   expt = 'gen_be_cov2d'
-   dat_dir = '/mmmtmp1/dmbarker'
 
    open(unit=namelist_unit, file='gen_be_cov2d_nl.nl', &
         form='formatted', status='old', action='read')
@@ -98,7 +91,7 @@ program gen_be_cov2d
 
 !        Read Full-fields:
          filename = 'fullflds/'//date(1:10)
-         filename = trim(filename)//'.fullflds.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.fullflds.e'//ce
          open (iunit, file = filename, form='unformatted')
 
          read(iunit)ni, nj, nk
@@ -133,19 +126,17 @@ program gen_be_cov2d
 
 !        Read 2D first field:
          filename = trim(variable1)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable1)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable1)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
-         read(iunit)ldum1, ldum2
          read(iunit)field1
          close(iunit)
 
 !        Read 2D second field:
          filename = trim(variable2)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable2)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable2)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
-         read(iunit)ldum1, ldum2
          read(iunit)field2
          close(iunit)
 
@@ -169,7 +160,7 @@ program gen_be_cov2d
       read(date(1:10), fmt='(i10)')cdate
    end do     ! End loop over times.
 
-   filename = trim(variable1)//'.'//trim(variable2)//'.'//trim(be_method)
+   filename = trim(variable1)//'.'//trim(variable2)//'.dat'
    open (ounit, file = filename, status='unknown')
    
    do j = 1, nj

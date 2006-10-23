@@ -2,8 +2,7 @@
 # Assuming starting from wrfvar/doc directory
 cd ..
 svn update
-./clean_new -a >/dev/null 2>&1
-. ./setup.ksh g95
+./clean_new -a
 echo 1 | ./configure_new wrfvar
 cd build
 make -r setup

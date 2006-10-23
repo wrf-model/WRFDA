@@ -35,8 +35,8 @@
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR ${SRC_DIR}/wrfvar
  if ( ! $?BUILD_DIR )     setenv BUILD_DIR ${WRFVAR_DIR}/build
  if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
- if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
- if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+ if ( ! $?REGION )        setenv REGION katrina.12km
+ if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${REGION}/noobs/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
 
@@ -73,7 +73,6 @@ cat >! gen_be_stage4_global_nl.nl << EOF
     variable = '${VARIABLE}',
     gaussian_lats = ${GAUSSIAN_LATS},
     testing_spectral = ${TESTING_SPECTRAL},
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     k = ${VINDEX} /
 EOF

@@ -67,10 +67,8 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    ! OPEN FILE
    ! ---------
 
-   OPEN(UNIT   = iunit,     &
-      FILE   = trim(filename), &
-      IOSTAT =  iost,     &
-      STATUS = 'OLD')
+   OPEN(UNIT   = iunit, FILE  = trim(filename), &
+      IOSTAT =  iost, form = 'unformatted', STATUS = 'OLD')
 
    IF (iost /= 0) THEN
       write(UNIT=errmsg(1), fmt='(A,I3,A,A)') &

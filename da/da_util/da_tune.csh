@@ -1,35 +1,51 @@
 #! /usr/local/bin/tcsh -f
-
+#-------------------------------------------------------------------------------------------
+# Script for Observation error tuning  (Desroziers method)
+#   Ref: QJRMS (2001), 127, pp. 1433-1452,
+#        Gerald Desroziers and Serguei Ivanov
+#
+#                10/16/2006          Syed RH Rizvi    
+#-------------------------------------------------------------------------------------------
+# Input files :  
+#  a) rand_obs_error WRF-Var output files with "omb_add_noise" & "put_rand_seed" as .TRUE.
+#  b) pert_obs       WRF-Var output files with "omb_add_noise" & "put_rand_seed" as .TRUE.
+#  c) unpert_obs     WRF-Var output files with "omb_add_noise" .FALSE. (Default option)
+#  d) fort.48        WRF-Var output files with "omb_add_noise" .FALSE. (Default option)
+#  e) rsl.out.0000   WRF-Var output files with "omb_add_noise" .FALSE. (Default option)
+#-------------------------------------------------------------------------------------------
+#  Note:  For radiance data tuning edit
+#         "namelist.radiance" generated down this script
+#
+#-------------------------------------------------------------------------------------------
  echo ""
  echo "Running script tune.csh"
  echo ""
 
 # setup env variables
-#-------------------------
+#-------------------------------------------------------------------------------------------
  setenv USER rizvi
- setenv WORKDIR       /ptmp/$USER/work_tune_gts
+ setenv WRFVAR_DIR    $HOME/trunk/wrfvar
+ setenv WORKDIR       /ptmp/$USER/work_tune
  setenv DIR_PREFIX    /ptmp/$USER/katrina_48km
- setenv START_DATE    2005080200
- setenv   END_DATE    2005080200
+ setenv START_DATE    2005080106
+ setenv   END_DATE    2005081500
  setenv CYCLE_PERIOD  6
  setenv DIR_YP        with_noise  # perturbered run
- setenv DIR_Y         no_noise       # normal run
- setenv OUTPUT        wrfvar/working
- setenv FILE_PERT     45                    # fort.45,  random perturbation
- setenv FILE_YP       46                    # fort.46,  perturbed y=Hdx
- setenv FILE_Y        47                    # fort.47,   y=Hdx
- setenv FILE_JO       48                    # fort.48,   Jo
- setenv FILE_RSLOUT   49                    # fort.49,  rsl.out.0000
- setenv NUM_PROCS_START 0
- setenv NUM_PROCS       8
+ setenv DIR_Y         no_noise    # unperturbered run
+ setenv FILE_PERT     fort.45     # fort.45,  random perturbation
+ setenv FILE_YP       fort.46     # fort.46,  perturbed y=Hdx
+ setenv FILE_Y        fort.47     # fort.47,   y=Hdx
+ setenv FILE_JO       fort.48     # fort.48,   Jo
+ setenv FILE_RSLOUT   fort.49     # fort.49,  rsl.out.0000
 
  rm -rf $WORKDIR; mkdir $WORKDIR; cd $WORKDIR
- cp $HOME/trunk-old/wrfvar/da/da_util/da_tune.f90  .
- cp $HOME/trunk-old/wrfvar/main/advance_cymdh.exe .
+ cp $WRFVAR_DIR/da/da_util/da_tune.f90  .
+ cp $HOME/advance_cymdh.exe .
  
+#-------------------------------------------------------------------------------------------
 cat > namelist.radiance << EOF
 &rtminit
- rtminit_nsensor     = 0,
+ rtminit_nsensor     = 2,
  rtminit_platform    =  1,1,
  rtminit_satid       =  15,16,
  rtminit_sensor      =  3,3,
@@ -44,72 +60,77 @@ EOF
  xlf90 -qrealsize=8 -o da_tune.exe da_tune.f90
 
 
-# clean old files
-#----------------------
- rm -f fort.*; touch fort.${FILE_PERT} fort.${FILE_YP} fort.${FILE_Y} 
-
+ touch fort.45 fort.46 fort.47 fort.48 fort.49 
 # loop for date
-#----------------------
+#-------------------------------------------------------------------------------------------
 while ( $START_DATE <= $END_DATE )
 
 echo $START_DATE
 
-# cat fort.45?? into fort.45 from different processors
-#-----------------------------------------------------
-set START_PROC = ${FILE_PERT}${NUM_PROCS_START}
-set   END_PROC = ${FILE_PERT}${NUM_PROCS}
-while ( $START_PROC <= $END_PROC )
- if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/${OUTPUT}/fort.${START_PROC} ) then
-   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/${OUTPUT}/fort.${START_PROC} >> fort.${FILE_PERT}
- endif
- set START_PROC=`expr ${START_PROC} \+ 1`
-end
+# cat rand_obs_error.??? into fort.45 from different processors
+#-------------------------------------------------------------------------------------------
+   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error.000) then
+   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error.* >> $FILE_PERT        
+#   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error  >> $FILE_PERT        
+   else
+   echo " Please check file (rand_obs) in " ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working
+#   exit 1             
+   endif
 
-# cat fort.46?? into fort.46 from different processors
-#-----------------------------------------------------
-set START_PROC = ${FILE_YP}${NUM_PROCS_START}
-set   END_PROC = ${FILE_YP}${NUM_PROCS}
-while ( $START_PROC <= $END_PROC )
- if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/${OUTPUT}/fort.${START_PROC} ) then
-   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/${OUTPUT}/fort.${START_PROC} >> fort.${FILE_YP}
- endif
- set START_PROC=`expr ${START_PROC} \+ 1`
-end
+# cat pert_obs.??? into fort.46 from different processors
+#-------------------------------------------------------------------------------------------
+   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs.000) then                  
+   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs.*       >> $FILE_YP        
+#   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs       >> $FILE_YP        
+   else
+   echo " Please check file(pert_obs) in " ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working
+#   exit 2         
+   endif
 
-# cat fort.47?? into fort.47 from different processors
-#-----------------------------------------------------
-set START_PROC = ${FILE_Y}${NUM_PROCS_START}
-set   END_PROC = ${FILE_Y}${NUM_PROCS}
-while ( $START_PROC <= $END_PROC )
- if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/${OUTPUT}/fort.${START_PROC} ) then
-   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/${OUTPUT}/fort.${START_PROC} >> fort.${FILE_Y}
- endif
- set START_PROC=`expr ${START_PROC} \+ 1`
-end
+# cat unpert_obs.??? into fort.47 from different processors
+#-------------------------------------------------------------------------------------------
+   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs.000) then
+   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs.*      >> $FILE_Y        
+#   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs      >> $FILE_Y        
+   else
+   echo " Please check file(unpert_obs) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working
+#   exit 3          
+   endif
 
-# cat fort.48 into one file
+# cat fort.48  to $FILE_JO              
+#-------------------------------------------------------------------------------------------
+#   if( -s  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/fort.48 ) then
+   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/fort.48           >> $FILE_JO       
+   else
+   echo " Please check file (fort.48) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working
+#   exit 4          
+   endif
 #
- cat  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/${OUTPUT}/fort.${FILE_JO} >> fort.${FILE_JO}
- 
-# cat rsl.out.0000 into fort.49
+# cat rsl.out.0000.htms into fort.49
+#-------------------------------------------------------------------------------------------
 #
- cat  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html  >> fort.${FILE_RSLOUT}
+#   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html ) then
+   cat  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html      >> ${FILE_RSLOUT}
+   else
+   echo " Please check file (rsl.out.0000.html) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar
+#   exit 5       
+   endif
 
  setenv START_DATE `./advance_cymdh.exe $START_DATE $CYCLE_PERIOD`
 end
 
+#-------------------------------------------------------------------------------------------
 # cat ***** to file end
+echo "*****" >> ${FILE_PERT}
+echo "*****" >> ${FILE_YP}
+echo "*****" >> ${FILE_Y}
+echo "*****" >> ${FILE_JO}
+echo "*****" >> ${FILE_RSLOUT}
 
-echo "*****" >> fort.${FILE_PERT}
-echo "*****" >> fort.${FILE_YP}
-echo "*****" >> fort.${FILE_Y}
-echo "*****" >> fort.${FILE_JO}
-echo "*****" >> fort.${FILE_RSLOUT}
-
-#  ./da_tune.exe > test_tuning_amsu.dat
  ./da_tune.exe > test_tuning_gts.dat
 
  echo "da_tune.csh completed"
+#-------------------------------------------------------------------------------------------
 
  exit (0)
 

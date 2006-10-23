@@ -96,8 +96,10 @@ subroutine da_get_var_diagnostics ( iv, j )
       WRITE(UNIT=stdout,FMT='(A,F12.2)')  '    Final cost function J    = ', j % total
       write(UNIT=stdout,FMT=*) ' '
 
+   if ( use_radiance ) then
       write(UNIT=stdout,FMT='(a39,i8)')   '    Total number of radiance obs.    = ', num_radiance_tot
       write(UNIT=stdout,FMT='(a39,f15.5)')'    Cost Function of radiance obs.   = ', jo_radiance
+   endif
 
       write(UNIT=stdout,FMT='(a30,i8)')   '    Total number of obs.     = ', num_obs_tot
       write(UNIT=stdout,FMT='(a30,f15.5)')'    Final WRFVAR value of J  = ', j % total
@@ -289,14 +291,14 @@ subroutine da_get_var_diagnostics ( iv, j )
                                0.0, 1.0, 0.0, 1.0, 0.0, 1.0
       end if
       do i = 1, iv%num_inst                 ! loop for sensor
-         do k = 1, iv%instid(i)%nchan
-            if ( j % jo % rad(i) % num_ichan(k) > 0 ) then
-               write(UNIT=jo_unit,FMT='(a30,a19,i5,i8,f15.5)') 'radiance obs, Jo (actual)  = ', &
-                                 iv%instid(i)%rttovid_string, k , &
-                                 j % jo % rad(i) % num_ichan(k), &
-                                 j % jo % rad(i) % jo_ichan(k)
-            end if
-         end do
+       do k = 1, iv%instid(i)%nchan
+          if ( j % jo % rad(i) % num_ichan(k) > 0 ) then
+            write(UNIT=jo_unit,FMT='(a30,a16,i5,i10,8f15.5)')'    radiance,  Jo (actual)  = ', &
+                               iv%instid(i)%rttovid_string, k , &
+                               j % jo % rad(i) % num_ichan(k), &
+                               j % jo % rad(i) % jo_ichan(k)
+          end if
+       end do
       end do
    end if
 

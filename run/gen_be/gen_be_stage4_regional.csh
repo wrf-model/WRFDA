@@ -25,7 +25,6 @@
  if ( ! $?START_DATE )    setenv START_DATE    2003081512 # Starting time of period.
  if ( ! $?END_DATE )      setenv END_DATE      2003091500 # Ending time of period.
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
- if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC (NMC-method), ENS (Ensemble-Method).
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
  if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point.
  if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
@@ -36,8 +35,8 @@
  if ( ! $?WRFVAR_DIR )    setenv WRFVAR_DIR   ${SRC_DIR}/wrfvar
  if ( ! $?BUILD_DIR )     setenv BUILD_DIR    ${WRFVAR_DIR}/build
  if ( ! $?DATA_DISK )     setenv DATA_DISK /tara
- if ( ! $?DOMAIN )        setenv DOMAIN katrina.12km
- if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${DOMAIN}/noobs/gen_be
+ if ( ! $?REGION )        setenv REGION katrina.12km
+ if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${REGION}/noobs/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
  if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
  if ( ! $?LOCAL )         setenv LOCAL false            # True if local machine.
@@ -83,7 +82,6 @@ cat >! gen_be_stage4_regional_nl.nl << EOF
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     variable = '${VARIABLE}',
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     k = ${VINDEX},
     stride = ${STRIDE},

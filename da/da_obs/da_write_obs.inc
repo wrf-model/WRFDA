@@ -619,8 +619,6 @@ subroutine da_write_obs( ob, iv, re)
     endif
    ENDIF
 
-   write(ounit,'(a20,i8)')'********************', 0
-
    close (ounit)
 
    if (trace_use) call da_trace_exit("da_write_obs")

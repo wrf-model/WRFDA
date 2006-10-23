@@ -429,11 +429,12 @@ module da_define_structures
 
         integer   ::  ifgat, landsea_mask
         integer   ::  scanline, scanpos
-        real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
+        real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
         ! channels' bright temperature
-        type(field_type), pointer   ::   tb(:)                       !  bright temperatures
-        real,    pointer   ::   emiss(:), tb_xb(:)
+        type(field_type), pointer   ::   tb(:)         
+        real,    pointer   ::   emiss(:), tb_xb(:)    !  guess bright temperatures
         ! logical, pointer   ::   calcemis(:)
+        integer, pointer   ::   cloud_flag(:)
         real,    pointer   ::   t(:), mr(:), zk(:)
         real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
         real               ::   ps,ts,t2m,mr2m,u10,v10, clwp

@@ -9,9 +9,6 @@ program gen_be_stage2a
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
-   character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
@@ -29,14 +26,11 @@ program gen_be_stage2a
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    real                :: total_variance             ! Total variance of <psi psi> matrix.
    real                :: cumul_variance             ! Cumulative variance of <psi psi> matrix.
    real                :: summ                       ! Summation dummy.
    real                :: rf_scale                   ! Recursive filter scale.
    logical             :: first_time                 ! True if first file.
-   logical             :: testing_eofs               ! True if testing EOF decomposition.
-   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
@@ -46,8 +40,6 @@ program gen_be_stage2a
    real, allocatable   :: ps(:,:)                    ! Surface pressure.
    integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   integer, allocatable:: bin_pts(:)                 ! Number of points in bin (3D fields).
-   integer, allocatable:: bin_pts2d(:)               ! Number of points in bin (2D fields).
    real, allocatable   :: covar1(:)                  ! Covariance between input fields.
    real, allocatable   :: covar2(:,:)                ! Covariance between input fields.
    real, allocatable   :: covar3(:,:,:)              ! Covariance between input fields.
@@ -63,9 +55,7 @@ program gen_be_stage2a
    real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
-                                  be_method, ne, &
-                                  num_passes, rf_scale, & 
-                                  testing_eofs, expt, dat_dir
+                                  ne, num_passes, rf_scale
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -77,13 +67,9 @@ program gen_be_stage2a
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
-   be_method = 'NMC'
    ne = 1
    num_passes = 0
    rf_scale = 1.0
-   testing_eofs = .true.
-   expt = 'gen_be_stage2a'
-   dat_dir = '/mmmtmp1/dmbarker'
 
    open(unit=namelist_unit, file='gen_be_stage2a_nl.nl', &
         form='formatted', status='old', action='read')
@@ -104,7 +90,7 @@ program gen_be_stage2a
    write(6,'(2a)')' [2] Read regression coefficients and bin information:'
 !--------------------------------------------------------------------------------------------- 
 
-   filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
    read(iunit)num_bins, num_bins2d
@@ -160,22 +146,19 @@ program gen_be_stage2a
 
          write(ce,'(i3.3)')member
 
-!        Read psi:
+!        Read psi predictor:
          variable = 'psi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)psi
          close(iunit)
 
-!--------------------------------------------------------------------------------------
-!        Re-read chi. Calculate, and output unbalanced chi:
-!--------------------------------------------------------------------------------------
-
+!        Calculate unbalanced chi:
          variable = 'chi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)chi
@@ -192,50 +175,16 @@ program gen_be_stage2a
 
          variable = 'chi_u'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)chi
          close(ounit)
 
-!--------------------------------------------------------------------------------------
-!        Re-read surface pressure (ps). Calculate, and output unbalanced ps:
-!--------------------------------------------------------------------------------------
-
-!        Read ps:
-         variable = 'ps'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-         open (iunit, file = filename, form='unformatted')
-         read(iunit)ni, nj, nkdum
-         read(iunit)ldum1, ldum2 ! Dummy logicals.
-         read(iunit)ps
-         close(iunit)
-
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               ps(i,j) = ps(i,j) - SUM(regcoeff2(1:nk,b) * psi(i,j,1:nk))
-            end do
-         end do
-
-         variable = 'ps_u'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-         open (ounit, file = filename, form='unformatted')
-         write(ounit)ni, nj, 1
-         write(ounit)ldum1, ldum2 ! Dummy logicals.
-         write(ounit)ps
-         close(ounit)
-
-!--------------------------------------------------------------------------------------
-!        Re-read temperature. Calculate, and output unbalanced temperature:
-!--------------------------------------------------------------------------------------
-
-!        Read T:
+!        Calculate unbalanced T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)temp
@@ -252,10 +201,34 @@ program gen_be_stage2a
 
          variable = 't_u'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)temp
+         close(ounit)
+
+!        Calculate unbalanced ps:
+         variable = 'ps'
+         filename = trim(variable)//'/'//date(1:10)
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+         open (iunit, file = filename, form='unformatted')
+         read(iunit)ni, nj, nkdum
+         read(iunit)ps
+         close(iunit)
+
+         do j = 1, nj
+            do i = 1, ni
+               b = bin2d(i,j)
+               ps(i,j) = ps(i,j) - SUM(regcoeff2(1:nk,b) * psi(i,j,1:nk))
+            end do
+         end do
+
+         variable = 'ps_u'
+         filename = trim(variable)//'/'//date(1:10)
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+         open (ounit, file = filename, form='unformatted')
+         write(ounit)ni, nj, 1
+         write(ounit)ps
          close(ounit)
 
       end do  ! End loop over ensemble members.
@@ -270,3 +243,4 @@ program gen_be_stage2a
    if (trace_use) call da_trace_report
 
 end program gen_be_stage2a
+

@@ -5,6 +5,7 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 !  Additions:
 !             07/08/2003     Profiler and Buoy Obs           Syed RH Rizvi    
 !             07/03/2006     Updated for AIRS retrievals     Syed RH Rizvi 
+!             10/19/2006     Filled default error factor     Syed RH Rizvi 
 !
 !  Purpose: Allocates observation structure and fills it from iv.
 !----------------------------------------------------------------------------   
@@ -20,9 +21,88 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
    if (trace_use) CALL da_trace_entry("da_fill_obs_structures")
 
 !---------------------------------------------------------------------------
+!  Initialise obs error factors (which will be overwritten in use_obs_errfac)
+!---------------------------------------------------------------------------
+      iv % synop_ef_u = 1.0
+      iv % synop_ef_v = 1.0
+      iv % synop_ef_t = 1.0
+      iv % synop_ef_p = 1.0
+      iv % synop_ef_q = 1.0
+
+      iv % metar_ef_u = 1.0
+      iv % metar_ef_v = 1.0
+      iv % metar_ef_t = 1.0
+      iv % metar_ef_p = 1.0
+      iv % metar_ef_q = 1.0
+
+      iv % ships_ef_u = 1.0
+      iv % ships_ef_v = 1.0
+      iv % ships_ef_t = 1.0
+      iv % ships_ef_p = 1.0
+      iv % ships_ef_q = 1.0
+
+      iv % geoamv_ef_u = 1.0
+      iv % geoamv_ef_v = 1.0
+
+      iv % polaramv_ef_u = 1.0
+      iv % polaramv_ef_v = 1.0
+
+      iv % gpspw_ef_tpw = 1.0
+
+      iv % gpsref_ef_ref = 1.0
+      iv % gpsref_ef_p = 1.0
+      iv % gpsref_ef_t = 1.0
+      iv % gpsref_ef_q = 1.0
+
+      iv % sound_ef_u = 1.0
+      iv % sound_ef_v = 1.0
+      iv % sound_ef_t = 1.0
+      iv % sound_ef_q = 1.0
+
+      iv % airep_ef_u = 1.0
+      iv % airep_ef_v = 1.0
+      iv % airep_ef_t = 1.0
+
+      iv % pilot_ef_u = 1.0
+      iv % pilot_ef_v = 1.0
+
+      iv % ssmir_ef_speed = 1.0
+      iv % ssmir_ef_tpw = 1.0
+
+      iv % satem_ef_thickness = 1.0
+
+      iv % ssmt1_ef_t = 1.0
+
+      iv % ssmt2_ef_rh = 1.0
+
+      iv % qscat_ef_u = 1.0
+      iv % qscat_ef_v = 1.0
+
+      iv % profiler_ef_u = 1.0
+      iv % profiler_ef_v = 1.0
+      
+      iv % buoy_ef_u = 1.0
+      iv % buoy_ef_v = 1.0
+      iv % buoy_ef_t = 1.0
+      iv % buoy_ef_p = 1.0
+      iv % buoy_ef_q = 1.0
+
+      iv % Radar_ef_rv = 1.0
+      iv % Radar_ef_rf = 1.0
+
+      iv % bogus_ef_u = 1.0
+      iv % bogus_ef_v = 1.0
+      iv % bogus_ef_t = 1.0
+      iv % bogus_ef_p = 1.0
+      iv % bogus_ef_q = 1.0
+      iv % bogus_ef_slp = 1.0
+
+      iv % airsr_ef_t = 1.0
+      iv % airsr_ef_q = 1.0
+
+!---------------------------------------------------------------------------
 !  [1.0] Allocate innovation vector and observation structures:
 !---------------------------------------------------------------------------
-   PRINT*,' IN DA_FILL OB_STRUCTURE ALLOCATING Y-ARRAY'
    CALL da_allocate_y( iv, ob )
 
 !----------------------------------------------------------------------
@@ -64,12 +144,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
       END DO
       
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % synop_ef_u = 1.0
-      iv % synop_ef_v = 1.0
-      iv % synop_ef_t = 1.0
-      iv % synop_ef_p = 1.0
-      iv % synop_ef_q = 1.0
       
    ENDIF
 
@@ -100,13 +174,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
       END DO
       
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % metar_ef_u = 1.0
-      iv % metar_ef_v = 1.0
-      iv % metar_ef_t = 1.0
-      iv % metar_ef_p = 1.0
-      iv % metar_ef_q = 1.0
-
    ENDIF
 
 !  [2.2] Transfer ships obs:
@@ -136,13 +203,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          if(iv%ships(n)% q % error == missing_r) iv%ships(n)% q % qc = missing_data
       END DO
       
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % ships_ef_u = 1.0
-      iv % ships_ef_v = 1.0
-      iv % ships_ef_t = 1.0
-      iv % ships_ef_p = 1.0
-      iv % ships_ef_q = 1.0
-
    ENDIF
 
 !  [2.4.1] Transfer Geo. AMVs Obs:
@@ -158,10 +218,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
          END DO
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % geoamv_ef_u = 1.0
-      iv % geoamv_ef_v = 1.0
 
    ENDIF
 
@@ -179,10 +235,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % geoamv_ef_u = 1.0
-      iv % geoamv_ef_v = 1.0
-
    ENDIF
 
 !  [2.5] Transfer gpspw obs:
@@ -193,9 +245,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 !        Copy observations variables:
          ob % gpspw(n) % tpw = iv % gpspw(n) % tpw % inv
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % gpspw_ef_tpw = 1.0
 
    ENDIF
 
@@ -215,12 +264,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
 
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % gpsref_ef_ref = 1.0
-      iv % gpsref_ef_p = 1.0
-      iv % gpsref_ef_t = 1.0
-      iv % gpsref_ef_q = 1.0
 
    ENDIF
 
@@ -269,12 +312,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % sound_ef_u = 1.0
-      iv % sound_ef_v = 1.0
-      iv % sound_ef_t = 1.0
-      iv % sound_ef_q = 1.0
-
    ENDIF
 
 !  [2.8] Transfer airep obs:
@@ -292,11 +329,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % airep_ef_u = 1.0
-      iv % airep_ef_v = 1.0
-      iv % airep_ef_t = 1.0
-
    ENDIF
 
 !  [2.9] Transfer pilot obs:
@@ -313,10 +345,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % pilot_ef_u = 1.0
-      iv % pilot_ef_v = 1.0
-
    ENDIF
 
 !  [2.10] Transfer SSM/I obs:SSMI:
@@ -328,10 +356,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          ob % ssmi_retrieval(n) % speed = iv % ssmi_retrieval(n) % speed % inv
          ob % ssmi_retrieval(n) % tpw   = iv % ssmi_retrieval(n) % tpw % inv
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % ssmir_ef_speed = 1.0
-      iv % ssmir_ef_tpw = 1.0
 
    ENDIF
 
@@ -349,8 +373,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          ob % ssmi_tb(n) % tb85h = iv % ssmi_tb(n) % tb85h % inv
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-!
 !
 
    ENDIF
@@ -369,9 +391,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % satem_ef_thickness = 1.0
-
    ENDIF
    
 !  [2.12] Transfer ssmt1 obs:
@@ -386,9 +405,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          END DO
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % ssmt1_ef_t = 1.0
-
    ENDIF
 
 !  [2.13] Transfer ssmt2 obs:
@@ -402,9 +418,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
             ob % ssmt2(n) % rh(k) = iv % ssmt2(n) % rh(k) % inv
          END DO
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % ssmt2_ef_rh = 1.0
 
    ENDIF
    
@@ -422,10 +435,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          ob % qscat(n) % v = iv % qscat(n) % v % inv
       END DO
       
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % qscat_ef_u = 1.0
-      iv % qscat_ef_v = 1.0
-
    ENDIF
 !
 !  [2.16] Transfer profiler obs:
@@ -441,10 +450,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
             ob % profiler(n) % v(k) = iv % profiler(n) % v(k) % inv
          END DO
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % profiler_ef_u = 1.0
-      iv % profiler_ef_v = 1.0
 
    ENDIF
 
@@ -476,14 +481,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
          if(iv%buoy (n)% q % error == missing_r) iv%buoy (n)% q % qc = missing_data
       END DO
-      
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % buoy_ef_u = 1.0
-      iv % buoy_ef_v = 1.0
-      iv % buoy_ef_t = 1.0
-      iv % buoy_ef_p = 1.0
-      iv % buoy_ef_q = 1.0
-
    ENDIF
 
 !  [2.18] Transfer Radar obs:
@@ -500,10 +497,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
 
          END DO
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % Radar_ef_rv = 1.0
-      iv % Radar_ef_rf = 1.0
 
    ENDIF
 
@@ -536,14 +529,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
          ob % bogus(n) % slp = iv % bogus(n) % slp % inv
       END DO
 
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % bogus_ef_u = 1.0
-      iv % bogus_ef_v = 1.0
-      iv % bogus_ef_t = 1.0
-      iv % bogus_ef_p = 1.0
-      iv % bogus_ef_q = 1.0
-      iv % bogus_ef_slp = 1.0
-
    ENDIF
 
 !  Transfer AIRS  retrievals:
@@ -570,10 +555,6 @@ SUBROUTINE da_fill_obs_structures( iv, ob )
           if(iv%airsr(n)% q(k) % error == missing_r) iv%airsr(n)% q(k) % qc = missing_data
           END DO
       END DO
-
-!     Initialise obs error factors (optionally overwritten in use_obs_errfac)
-      iv % airsr_ef_t = 1.0
-      iv % airsr_ef_q = 1.0
 
    ENDIF
    if (trace_use) CALL da_trace_exit("da_fill_obs_structures")
