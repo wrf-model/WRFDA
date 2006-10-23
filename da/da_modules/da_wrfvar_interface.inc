@@ -66,6 +66,8 @@ subroutine da_wrfvar_interface ( grid, config_flags )
 #include "em_actual_new_args.inc"
     )
 
+#include "em_deallocs.inc"
+
    call da_trace_exit("da_wrfvar_interface")
 
 end subroutine da_wrfvar_interface
