@@ -11,7 +11,6 @@ module da_constants
 #include "namelist_defines.inc"
 
 #ifdef DM_PARALLEL
-!#include "rsl.inc"
    include "mpif.h"
 #endif
 
