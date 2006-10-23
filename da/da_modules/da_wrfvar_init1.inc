@@ -89,5 +89,7 @@ subroutine da_wrfvar_init1( no_init1 )
 
 #include "config_assigns.inc"
 
+   if (.NOT. rootproc) check_max_iv_print=.false.
+
 end subroutine da_wrfvar_init1
 

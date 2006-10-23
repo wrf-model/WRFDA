@@ -188,14 +188,14 @@ module da_radiance
       REAL, pointer  :: pred(:)
    END TYPE BIAS
 
-   integer, allocatable :: num_tovs_before(:)
-   integer, allocatable :: num_tovs_after(:)
-   integer, allocatable :: tovs_send_pe(:)
-   integer, allocatable :: tovs_send_start(:)
-   integer, allocatable :: tovs_send_count(:)
-   integer, allocatable :: tovs_recv_pe(:)
-   integer, allocatable :: tovs_recv_start(:)
-   integer :: tovs_copy_count
+   integer, allocatable :: num_tovs_before(:,:)
+   integer, allocatable :: num_tovs_after(:,:)
+   integer, allocatable :: tovs_send_pe(:,:)
+   integer, allocatable :: tovs_send_start(:,:)
+   integer, allocatable :: tovs_send_count(:,:)
+   integer, allocatable :: tovs_recv_pe(:,:)
+   integer, allocatable :: tovs_recv_start(:,:)
+   integer, allocatable  :: tovs_copy_count(:)
 
 
 CONTAINS

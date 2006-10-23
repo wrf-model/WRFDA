@@ -21,6 +21,7 @@ subroutine da_biasprep(inst,ob,iv)
    CHARACTER(len=1)   :: s1
    REAL        :: pred(6), q(43)
    TYPE(bias)  :: radbias
+   integer     :: biasprep_unit
 
    if (trace_use) call da_trace_entry("da_biasprep")
 
@@ -36,6 +37,7 @@ subroutine da_biasprep(inst,ob,iv)
     write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
 #endif
 
+   call da_get_unit(biasprep_unit)
    open(UNIT=biasprep_unit,FILE=filename,FORM='unformatted')
 
    !---------------------------------------------------------------------------
@@ -124,6 +126,7 @@ subroutine da_biasprep(inst,ob,iv)
    ENDDO
   
    close(UNIT=biasprep_unit)
+   call da_free_unit(biasprep_unit)
 
    deallocate(radbias%tb)
    deallocate(radbias%omb)

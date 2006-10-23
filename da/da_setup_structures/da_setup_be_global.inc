@@ -28,7 +28,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
 
    character*10                :: variable
-   integer                     :: ni, nj, nk, b, nlev           
+   integer                     :: ni, nj, nk, b, nlev , be_unit
    integer, allocatable        :: max_wave(:)
    real, allocatable           :: evec_g(:,:)
    real, allocatable           :: eval_g(:)  
@@ -51,7 +51,8 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    ! [1] Read in be metadata:
    !---------------------------------------------------------------------
 
-   rewind (be_unit)
+   call da_get_unit(be_unit)
+   open(unit=be_unit,file="be.dat",status="old",form="unformatted")
 
    read(be_unit, end= 99, err = 100) ni, nj, nk 
    read(be_unit, err = 100)bin_type
@@ -306,6 +307,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    deallocate( max_wave )
 
    close(be_unit)
+   call da_free_unit(be_unit)
 
    IF (trace_use) call da_trace_exit("da_setup_be_global")
 

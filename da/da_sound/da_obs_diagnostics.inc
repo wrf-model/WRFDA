@@ -8,6 +8,19 @@ subroutine da_obs_diagnostics( num_sound, ob, iv, re )
   type (residual_sound_type), intent(in) :: re(:)
 
   integer                                :: n, k
+  integer :: sound_diag_unit1
+  integer :: sound_diag_unit2
+  integer :: sound_diag_unit3
+  integer :: sound_diag_unit4
+
+  call da_get_unit(sound_diag_unit1)
+  call da_get_unit(sound_diag_unit2)
+  call da_get_unit(sound_diag_unit3)
+  call da_get_unit(sound_diag_unit4)
+   open(unit=sound_diag_unit1,file="sound_diag1",status="new") 
+   open(unit=sound_diag_unit2,file="sound_diag2",status="new") 
+   open(unit=sound_diag_unit3,file="sound_diag3",status="new") 
+   open(unit=sound_diag_unit4,file="sound_diag4",status="new") 
 
   do n = 1, num_sound
     do k = 1, iv(n) % info % levels
@@ -77,6 +90,15 @@ subroutine da_obs_diagnostics( num_sound, ob, iv, re )
 
   write(UNIT=sound_diag_unit4,FMT='(a5,2f9.3,5f17.7,i8)') &
     '00000',0.0,0.0,0.0,0.0,0.0,0.0,0.0,0
+
+   close(sound_diag_unit1)
+   close(sound_diag_unit2)
+   close(sound_diag_unit3)
+   close(sound_diag_unit4)
+   call da_free_unit(sound_diag_unit1)
+   call da_free_unit(sound_diag_unit2)
+   call da_free_unit(sound_diag_unit3)
+   call da_free_unit(sound_diag_unit4)
 
 end subroutine da_obs_diagnostics
 

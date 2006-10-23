@@ -51,6 +51,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 #ifdef DM_PARALLEL
    integer                      :: ierr,comm
 #endif
+   integer                      :: wrf_done_unit
 
    IF (trace_use) call da_trace_entry("da_solve")
 
@@ -184,6 +185,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
             IF (rootproc) THEN
                call system("rm -rf nl/wrf_done")
                call system("touch nl/wrf_go_ahead")
+               call da_get_unit(wrf_done_unit)
                DO WHILE ( .true. )
                   OPEN(wrf_done_unit,file="wrf_done",status="old",err=303)
                   CLOSE(wrf_done_unit)
@@ -192,6 +194,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
                   CALL system("sync")
                   CALL system("slegrid%ep 1")
                ENDDO
+               call da_free_unit(wrf_done_unit)
             ENDIF
             CALL wrf_get_dm_communicator ( comm )
             CALL mpi_barrier( comm, ierr )

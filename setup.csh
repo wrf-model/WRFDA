@@ -243,6 +243,7 @@ if ($FC == "g95" ) then
    setenv G95_UNBUFFERED_ALL T
    setenv G95_MEM_INIT       0x00
    setenv G95_MEM_MAXALLOC   F
+   setenv G95_MEM_SEGEMENTS  0
 endif
 
 echo

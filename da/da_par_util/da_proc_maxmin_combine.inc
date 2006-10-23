@@ -12,11 +12,6 @@ subroutine da_proc_maxmin_combine( n, max, min )
 use da_tools
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
-
    INTEGER,   INTENT(IN)                    :: n       ! Length of input fields.
    TYPE (maxmin_field_type), INTENT(INOUT)  :: max(n)  ! Max values over proc.
    TYPE (maxmin_field_type), INTENT(INOUT)  :: min(n)  ! Min values over proc.

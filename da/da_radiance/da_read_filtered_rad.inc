@@ -20,10 +20,10 @@
    INTEGER                        :: n        ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
 
-   INTEGER            :: ios
+   INTEGER            :: ios, filtered_rad_unit
    character(len=50)  :: filename
    integer            :: ierr, ndomain
-   logical            :: outside,inside_halo
+   logical            :: outside
 
    if (trace_use) call da_trace_entry("da_read_filtered_rad")
 
@@ -41,7 +41,8 @@
       write(UNIT=stdout,FMT=*) 'Reading in ', trim(filename) 
    end if
 
-  open(UNIT=filtered_rad_unit,file=trim(filename),form='unformatted',status='old',iostat=ios)
+   call da_get_unit(filtered_rad_unit)
+   open(UNIT=filtered_rad_unit,file=trim(filename),form='unformatted',status='old',iostat=ios)
   if( ios /= 0 ) Then
       write(UNIT=stdout,FMT=*) 'Can not open filtered radiance file ', filename
       iv%instid(n)%num_rad = 0
@@ -78,11 +79,12 @@
 
         call da_ll_to_xy (iv%instid(n)%rad(i)%info, &
                           iv%instid(n)%rad(i)%loc,  &
-                          xp, outside, inside_halo )
+                          xp, outside)
 !        if (outside) cycle
 
   end do     ! end do pixels
   close(filtered_rad_unit)
+  call da_free_unit(filtered_rad_unit)
 
    iv%total_obs = iv%total_obs + iv%instid(n)%num_rad
    iv%total_rad_pixel   = iv%total_rad_pixel + iv%instid(n)%num_rad

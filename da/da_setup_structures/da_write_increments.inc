@@ -24,6 +24,8 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                         lat_global,  lon_global, lanu_global,             &
                  map_factor_global, cori_global, landmask_global
 
+   integer :: anl_inc_unit
+
    IF (trace_use) call da_trace_entry("da_write_increments")
 
 
@@ -144,6 +146,7 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 #endif
 
    if ( rootproc ) then
+      call da_get_unit(anl_inc_unit)
       open(UNIT=anl_inc_unit, file='ANALYSIS_INCREMENT', form='unformatted')
 
       write (UNIT=anl_inc_unit) ANALYSIS_DATE
@@ -195,6 +198,8 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                     xb%map_factor(1:ix+1,1:jy+1), &
                     xb%cori(1:ix+1,1:jy+1), &
                     xb%landmask(1:ix+1,1:jy+1)
+      close(anl_inc_unit)
+      call da_free_unit(anl_inc_unit)
 #endif
 
    endif

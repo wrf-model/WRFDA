@@ -66,12 +66,14 @@ subroutine da_get_innov_vector_ssmi_rv ( it, xb, ob, iv )
          END IF
       ENDDO
 
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &
-         'For outer iteration ',it,&
-         ' Total Rejections for SSMI (TPW and SPEED) follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
-         'Number of failed ssmi tpw   observations:  ',itpwf,  ' on ',itpw,   &
-         'Number of failed ssmi speed observations:  ',ispeedf,' on ',ispeed
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &
+            'For outer iteration ',it,&
+            ' Total Rejections for SSMI (TPW and SPEED) follows:'
+         WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
+            'Number of failed ssmi tpw   observations:  ',itpwf,  ' on ',itpw,   &
+            'Number of failed ssmi speed observations:  ',ispeedf,' on ',ispeed
+      end if
    ENDIF
 
 end subroutine da_get_innov_vector_ssmi_rv

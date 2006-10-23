@@ -76,9 +76,12 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
 
    call da_get_unit(ounit)
+   open(unit=ounit,file="filtered_obs",status="new")
+
 !----------------------------------------------------------------------
 !  [2.0] Create noise and output:
 !----------------------------------------------------------------------
+
 #ifdef DM_PARALLEL
       write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.', myproc
 #else
@@ -1346,7 +1349,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
         (/"Currently SSMI brightness temperature info is not written for filtered obs"/))
    end if
 
-   close(ounit)
 #ifdef DM_PARALLEL
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif

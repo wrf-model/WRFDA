@@ -157,71 +157,18 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Units 9,10 are used for reading and writing namelist.input/output in WRF
 
-   INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
-   INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
-   INTEGER, PARAMETER :: innov_vector_unit = 14 ! Innovation vector diagnostics
-   integer, parameter :: iv_rad_binary_unit = 15
-   integer, parameter :: fgat_rad_unit = 22
-   INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
-   INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
-   INTEGER, PARAMETER :: gen_be_iunit = 30
-   INTEGER, PARAMETER :: gen_be_ounit = 31
+   integer :: y_unit, yp_unit, cost_unit, grad_unit, stats_unit, jo_unit
+   integer :: check_max_iv_unit, rand_unit, omb_unit, filtered_obs_iunit
+   integer, parameter :: num_alpha_corr_types = 3
+   integer, parameter :: num_sound_diag = 4 
 
-   INTEGER, PARAMETER :: sound_diag_unit1 = 36 ! For da_sound/da_obs_diagnostics
-   INTEGER, PARAMETER :: sound_diag_unit2 = 37
-   INTEGER, PARAMETER :: sound_diag_unit3 = 38
-   INTEGER, PARAMETER :: sound_diag_unit4 = 39
+   integer :: alpha_corr_unit1(num_alpha_corr_types)
+   integer :: alpha_corr_unit2(num_alpha_corr_types)
+   integer :: sound_diag_unit(num_sound_diag)
 
-   INTEGER, PARAMETER :: terrain_unit = 40    ! Unit number for terrain input.
-   INTEGER, PARAMETER :: jpin = 41            ! Unit number for xb input.
-
-   integer, parameter :: rand_unit = 45       ! Output of noise.
-   integer, parameter :: yp_unit = 46         ! Output of H(x'(yo+noise)).
-   integer, parameter :: y_unit = 47          ! Output of H(x'(yo)).
-   integer, parameter :: jo_unit = 48         ! Output of components of Jo, ErrFac.
-   INTEGER, PARAMETER :: anl_inc_unit = 141   ! Analysis increment unit     
-   integer, parameter :: fac_unit = 49        ! Input components of ErrFac.
-   integer, parameter :: omb_unit = 50        ! Output for O-B values.
-   integer, parameter :: hxb_unit = 51        ! Output for H(xb) values.
-
-    INTEGER, PARAMETER :: bufrtovs_unit = 55  ! Input BUFR/TOVS data
-
-   INTEGER, PARAMETER :: check_max_iv_unit=60 ! Unit number for O-B check.
-
-   INTEGER, PARAMETER :: num_alpha_corr_types = 3
-
-   INTEGER, PARAMETER :: alpha_corr_unit1(num_alpha_corr_types) = (/61,62,63/)
-   INTEGER, PARAMETER :: alpha_corr_unit2(num_alpha_corr_types) = (/71,72,73/)
-
-   integer, parameter :: cost_unit = 81       ! Output of cost-function value
-   integer, parameter :: grad_unit = 82       ! Output of gradient norm
-
-   INTEGER, PARAMETER :: bufr_iunit = 91      ! Unit number for bufr obs input.
-   INTEGER, PARAMETER :: gts_iunit  = 92      ! Unit number for GTS obs input.
-   INTEGER, PARAMETER :: ssmi_iunit = 93      ! Unit number for SSMI obs input.
-   INTEGER, PARAMETER :: Radar_iunit = 94     ! Unit number for Radar input.
-   INTEGER, PARAMETER :: airs_table_unit = 95 ! AIRS bufr table input
-   INTEGER, PARAMETER :: wrf_done_unit = 98   ! wrf coupling
-   INTEGER, PARAMETER :: rtm_error_unit = 99  ! RTTOV error unit
-   ! Tracing to unit 100
-   INTEGER, PARAMETER :: rtm_info_unit = 109  ! Radiance info file
-   INTEGER, PARAMETER :: rtm_bias_unit = 110  ! Radiance bias file
-   INTEGER, PARAMETER :: unit_factor_rad = 111
-   INTEGER, PARAMETER :: filtered_obs_iunit  = 192  ! Unit number for writing filtered obs
-   INTEGER, PARAMETER :: filtered_rad_unit   = 193  ! Unit number for writing filtered radiance
-   INTEGER, PARAMETER :: innov_rad_unit      = 194  ! Unit number for writing innovation radiance
-   INTEGER, PARAMETER :: oma_rad_unit        = 195  ! Unit number for writing oma radiance
-   INTEGER, PARAMETER :: error_factor_rad_unit = 196  ! Unit number for radiance error factor
-   INTEGER, PARAMETER :: biasprep_unit         = 211
-   INTEGER, PARAMETER :: unit_983            = 983 ! TBD
-   integer, parameter  :: iunit = 70
-   integer, parameter  :: ounit = iunit + 1
-   integer, parameter  :: namelist_unit = 72
-   integer, parameter  :: spec_unit = 73      ! Unit for spectral diag. output.
-   integer, parameter  :: ep_unit = 74        ! Ensemble perturbation input.
    INTEGER, PARAMETER :: max_num_of_var = 200 ! Maximum # of stored fields.
 
-   INTEGER, PARAMETER :: unit_start = 220
+   INTEGER, PARAMETER :: unit_start = 20
    INTEGER, PARAMETER :: unit_end = 500
    LOGICAL :: unit_used(unit_start:unit_end) = .FALSE.
 
@@ -339,8 +286,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
                       (/ 100.0,100.0, 100.0, 100.0, 100.0, 100.0,100.0,100.0 /)
 
    ! Maximum error check factors:  INV > (Obs_error*factor) --> fails_error_max
-
-   LOGICAL, PARAMETER :: check_max_iv_print = .TRUE.
 
    REAL, PARAMETER :: max_error_t              = 5, &
                       max_error_uv             = 5, &

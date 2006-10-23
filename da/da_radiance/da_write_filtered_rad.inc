@@ -18,7 +18,7 @@ subroutine da_write_filtered_rad(ob, iv)
    INTEGER                        :: n        ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
 
-   INTEGER            :: ios
+   INTEGER            :: ios, filtered_rad_unit
    character(len=50)  :: filename
 
    if (trace_use) call da_trace_entry("da_write_filtered_rad")
@@ -39,7 +39,8 @@ subroutine da_write_filtered_rad(ob, iv)
       write(UNIT=filename, FMT='(a)') &
          'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
 #endif
-
+      
+      call da_get_unit(filtered_rad_unit)
       open(UNIT=filtered_rad_unit,file=trim(filename), &
          form='unformatted',iostat=ios)
       if (ios /= 0) Then
@@ -66,6 +67,7 @@ subroutine da_write_filtered_rad(ob, iv)
 
       end do     ! end do pixels
       close(UNIT=filtered_rad_unit)
+      call da_free_unit(filtered_rad_unit)
    end do    !! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_filtered_rad")

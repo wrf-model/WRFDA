@@ -27,7 +27,11 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    real                        :: ens_scaling_inv       ! Ensemble scaling of perturbations.
 
+   integer                     :: ep_unit
+
    IF (trace_use) call da_trace_entry("da_setup_flow_predictors")
+
+   call da_get_unit(ep_unit)
 
    call da_messages( &
       (/"Setup structures for flow-dependent information and read in"/))
@@ -109,6 +113,8 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
       close(UNIT=ep_unit)
 
    end do 
+
+   call da_free_unit(ep_unit)
 
    IF (trace_use) call da_trace_exit("da_setup_flow_predictors")
 

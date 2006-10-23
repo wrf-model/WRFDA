@@ -261,19 +261,21 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       END IF
    enddo
 
-   write(unit= check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for Metar follows:'
+   if (check_max_iv_print) then
+      write(unit= check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Metar follows:'
 
-   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-      'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-      'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-      'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
-      'Number of failed temperature observations:',ittf, ' on ',itt,   &
-      'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-      'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
-                                      itu +itvv +itp +itt +itqv
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
+         'Number of failed temperature observations:',ittf, ' on ',itt,   &
+         'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+         'Finally Total Metar rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+                                         itu +itvv +itp +itt +itqv
+   end if
 
-  IF (trace_use) call da_trace_exit("da_get_innov_vector_metar")
+   IF (trace_use) call da_trace_exit("da_get_innov_vector_metar")
 
 end subroutine da_get_innov_vector_metar
 

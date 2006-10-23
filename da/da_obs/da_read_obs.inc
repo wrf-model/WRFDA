@@ -1,4 +1,4 @@
-SUBROUTINE da_read_obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_obs (ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
 !
@@ -28,7 +28,6 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
    implicit none
 
-   INTEGER,           INTENT (in)   :: iunit
    TYPE (xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE (ob_type),    INTENT(inout) :: ob
 
@@ -42,7 +41,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, nlevels, fm
+   INTEGER                      :: i, j, iost, nlevels, fm,iunit
 
    TYPE (multi_level_type)      :: platform
 
@@ -101,7 +100,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -1206,6 +1205,9 @@ loop_level: DO i = 1, platform%info%levels
 !          'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
 !     call da_error(__FILE__,__LINE,errmsg(1:1))
 !  endif
+
+   close(iunit)
+   call da_free_unit(iunit)
 
    IF (trace_use) CALL da_trace_exit("da_read_obs")
 

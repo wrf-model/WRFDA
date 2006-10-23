@@ -10,7 +10,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
    TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
 
-   integer :: iost
+   integer :: iost, ssmi_unit
 
    IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
 
@@ -123,16 +123,18 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
-      OPEN ( UNIT   = ssmi_iunit,     &
+      call da_get_unit(ssmi_unit)
+      OPEN ( UNIT   = ssmi_unit,     &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
              IOSTAT =  iost,     &
              STATUS = 'OLD')
-      CLOSE(UNIT=ssmi_iunit)
+      CLOSE(UNIT=ssmi_unit)
+      call da_free_unit(ssmi_unit)
 
       IF (iost /= 0) THEN
          WRITE (UNIT=stderr,FMT='(/,A,I3,A,/)') &
-            ' INPUT FILE UNIT ',ssmi_iunit, &
+            ' INPUT FILE UNIT ',ssmi_unit, &
             ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          Use_SsmiRetrievalObs=.false.
          Use_SsmiTbObs=.false.

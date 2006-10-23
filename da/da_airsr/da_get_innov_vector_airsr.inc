@@ -127,13 +127,15 @@ subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
          CALL da_check_max_iv_airsr(it, iv % airsr(n),itt,ittf,itqv,itqvf)
    END DO
 
-   write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for airsr follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for airsr follows:'
 
-   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-     'Number of failed temperature observations:',ittf, ' on ',itt,   &
-     'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-     'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+        'Number of failed temperature observations:',ittf, ' on ',itt,   &
+        'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+        'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
+   end if
 
 end subroutine da_get_innov_vector_airsr
 

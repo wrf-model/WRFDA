@@ -200,19 +200,20 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       END IF
    END DO
 
-   write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
-      'For outer iteration ', it, ', Total Rejections for Radar follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
+         'For outer iteration ', it, ', Total Rejections for Radar follows:'
 
-   IF ( USE_Radar_rv ) THEN
-       WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rv observations:     ',irvf, ' on ',irv
-   ENDIF
+      IF ( USE_Radar_rv ) THEN
+          WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
+            'Number of failed rv observations:     ',irvf, ' on ',irv
+      ENDIF
 
-   IF ( USE_Radar_rf ) THEN
-      WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rf observations:     ',irff, ' on ',irf
-   ENDIF
-
+      IF ( USE_Radar_rf ) THEN
+         WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
+            'Number of failed rf observations:     ',irff, ' on ',irf
+      ENDIF
+   end if
 
 end subroutine da_get_innov_vector_radar
 

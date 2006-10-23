@@ -211,6 +211,7 @@ if test $FC = 'g95'; then
    export G95_UNBUFFERED_ALL=${G95_UNBUFFERED_ALL:-T}
    export G95_MEM_INIT=${G95_MEM_INIT:-0x00}
    export G95_MEM_MAXALLOC=${G95_MEM_MAXALLOC:-F}
+   export G95_MEM_SEGMENTS=0
 fi
 
 echo

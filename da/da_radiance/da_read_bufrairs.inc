@@ -1,4 +1,4 @@
-subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
+subroutine da_read_bufrairs(obstype,iv,xp,infile)
 !--------------------------------------------------------
 !  PURPOSE: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
 !            to innovation structure
@@ -72,7 +72,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 ! Input/Output variables
   character(9)      ,  intent (in)  :: obstype
   character(100)    ,  intent (in)  :: infile
-  integer           ,  intent (in)  :: lnbufr
   type (xpose_type) ,  intent (in)  :: xp
   type (ob_type)    ,intent (inout) :: iv
 
@@ -115,8 +114,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   integer(i_kind)  :: ifov,size
   integer(i_kind)  :: inst,platform_id,satellite_id,sensor_id
   logical          :: iflag,outside,inside_halo
-  integer(i_kind)  :: i, l, n, error
-  INTEGER          :: iost
+  integer(i_kind)  :: i, l, n, error, airs_table_unit
+  INTEGER          :: iost, lnbufr
   real(r_kind),allocatable,dimension(:,:):: airdata_all
 
 ! Set standard parameters
@@ -194,6 +193,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
          write(UNIT=stdout,FMT=*) &
             'da_read_bufrairs:  Reading BUFR Table A file: ',trim(table_file)
       end if
+      call da_get_unit(airs_table_unit)
       open(UNIT=airs_table_unit,file=table_file,iostat = iost)
       IF (iost /= 0) THEN
          call da_error(__FILE__,__LINE__, &
@@ -202,6 +202,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
   endif
 
 ! Open BUFR file
+  call da_get_unit(lnbufr)
   open(UNIT=lnbufr,file=trim(infile),form='unformatted',iostat = iost)
   IF (iost /= 0) THEN
      call da_error(__FILE__,__LINE__, &
@@ -482,6 +483,12 @@ subroutine da_read_bufrairs(obstype,iv,xp,lnbufr,infile)
 
 1000 continue
   call closbf(lnbufr)
+   close(lnbufr)
+   call da_free_unit(lnbufr)
+   if (airstab) then
+      close(airs_table_unit)
+      call da_free_unit(airs_table_unit)
+   end if
 
    if (trace_use) call da_trace_exit("da_read_bufrairs")
 

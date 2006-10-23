@@ -19,7 +19,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
    real, dimension(:,:)  , allocatable :: psfc_g
    real, dimension(:,:,:), allocatable :: u_g, v_g, t_g, q_g, p_g
 
-   integer                                     :: i, j, k
+   integer                                     :: i, j, k,anl_inc_unit
 
    IF (trace_use) call da_trace_entry("da_write_kma_increments")
 
@@ -75,6 +75,9 @@ subroutine da_write_kma_increments(xp, xb, xa)
 #ifdef DM_PARALLEL
 
       ! 3d- and 2d-increments:
+
+      call da_get_unit(anl_inc_unit)
+      open(unit=anl_inc_unit,file="ANALYSIS_INCREMEMTS_KMA",status="new")
 
       write(anl_inc_unit) &
       ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
@@ -132,6 +135,8 @@ subroutine da_write_kma_increments(xp, xb, xa)
       write(UNIT=stdout,FMT='(10e15.7)') &
          (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
 #endif
+      close(anl_inc_unit)
+      call da_free_unit(anl_inc_unit)
 
    end if
 

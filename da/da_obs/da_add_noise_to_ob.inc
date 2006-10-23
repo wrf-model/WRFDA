@@ -28,7 +28,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
-      ounit = rand_unit        
+   call da_get_unit(ounit)
 
       dum = -999999.9
 !----------------------------------------------------------------------
@@ -679,5 +679,6 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    END IF
 
   close (ounit)
+  call da_free_unit(ounit)
 
 END SUBROUTINE da_add_noise_to_ob

@@ -33,7 +33,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin,ndynopt
-   integer ierr, comm
+   integer :: ierr, comm, wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -81,6 +81,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          IF (rootproc) THEN
             call da_system("rm -rf ad/wrf_done")
             call da_system("touch ad/wrf_go_ahead")
+            call da_get_unit(wrf_done_unit)
             DO WHILE ( .true. )
                OPEN(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
                CLOSE(wrf_done_unit)
@@ -88,6 +89,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    303         CONTINUE
                CALL da_system("sleep 1")
             ENDDO
+            call da_free_unit(wrf_done_unit)
          ENDIF
          CALL wrf_get_dm_communicator ( comm )
          CALL mpi_barrier( comm, ierr )

@@ -8,9 +8,6 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    !           (In this way, we do not have to do all-to-all communication.)
    !---------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    REAL,      INTENT(INOUT)      :: proc_ave       ! Processor average.
    REAL,      INTENT(INOUT)      :: proc_err       ! Processor rms error.

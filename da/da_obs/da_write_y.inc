@@ -34,9 +34,11 @@ SUBROUTINE da_write_y(iv, y)
    !-------------------------------------------------------------------------   
 
    if (omb_add_noise) then
+      call da_get_unit(yp_unit)
       ounit = yp_unit            ! 3DVAR is a perturbed ob run.
       file_prefix='pert_obs.'
    else
+      call da_get_unit(y_unit)
       ounit = y_unit             ! 3DVAR is an unperturbed ob run.
       file_prefix='unpert_obs.'
    end if
@@ -605,6 +607,7 @@ SUBROUTINE da_write_y(iv, y)
    END IF
 
    close (ounit)
+   call da_free_unit(ounit)
 
    if (trace_use) call da_trace_exit("da_write_y")
 

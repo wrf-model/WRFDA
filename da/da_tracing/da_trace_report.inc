@@ -377,7 +377,7 @@ subroutine da_trace_report
          DO loop1=MasterNoRoutines,1,-1
             Pointer=index(loop1)
             WRITE (UNIT=trace_unit, &
-               FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I10,"<TD>",I10,"<TD>",I10)') &
+               FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I11,"<TD>",I11,"<TD>",I11)') &
                TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
                MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
                SUM(MasterMaxHeap(:,Pointer))/num_procs

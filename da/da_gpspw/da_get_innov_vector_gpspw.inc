@@ -198,12 +198,14 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
         !---   
     END DO
 
-    write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for Gpspw follows:'
-    WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-      'Number of failed TPW-observations:     ',ittpwf, ' on ',ittpw, &
-      'Finally all Gpspw rejections ',ittpwf,' on ',ittpw
 
+    if (check_max_iv_print) then
+       write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+          ', Total Rejections for Gpspw follows:'
+       WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+          'Number of failed TPW-observations:     ',ittpwf, ' on ',ittpw, &
+          'Finally all Gpspw rejections ',ittpwf,' on ',ittpw
+    end if
   ENDIF
 
 end subroutine da_get_innov_vector_gpspw

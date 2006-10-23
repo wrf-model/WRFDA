@@ -1,4 +1,4 @@
-subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
+subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: read in kma 1dvar innovation output to innovation and obs structure
@@ -15,13 +15,12 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    ! subroutine argument
    integer           ,  intent (in)    :: inst
    character(20)     ,  intent (in)    :: infile
-   integer           ,  intent (in)    :: inunit
    type (xpose_type) ,  intent (in)    :: xp
    type (y_type)     ,  intent (inout) :: ob
    type (ob_type)    ,  intent (inout) :: iv
 
    ! local variables
-   integer          :: iost, i, j
+   integer          :: iost, i, j,inunit
 
    ! Declare local variables
    logical outside,inside_halo
@@ -68,6 +67,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    ! 0.0  Open unit for kma 1dvar file and read file header
    !--------------------------------------------------------------
 
+   call da_get_unit(inunit)
    open(unit=inunit,file=trim(infile),form='formatted', &
        iostat = iost, status = 'old')
    if (iost /= 0) then
@@ -164,6 +164,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, inunit, infile)
    deallocate (qc)
 
    close(inunit)
+   call da_free_unit(inunit)
 
    !  3.0 allocate innovation and obs radiance structure
    !----------------------------------------------------------------

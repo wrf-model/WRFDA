@@ -16,12 +16,17 @@ MODULE da_par_util1
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL
+#include "rsl.inc"
+   include "mpif.h"
+
 #if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#define TRUE_RSL_REAL     RSL_REAL
+   integer, parameter :: true_mpi_real = MPI_REAL
+   integer, parameter :: true_rsl_real = RSL_REAL
 #else
-#define TRUE_MPI_REAL     MPI_REAL8
-#define TRUE_RSL_REAL     RSL_DOUBLE
+   integer, parameter :: true_mpi_real = MPI_REAL8
+   integer, parameter :: true_rsl_real = RSL_DOUBLE
+#endif
 #endif
 
    CONTAINS
