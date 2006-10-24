@@ -32,7 +32,7 @@ WRFVAR_OBJS        =	da_par_util.o           \
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_constants.o		\
+			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
@@ -143,7 +143,7 @@ da_be4_scale_length: da_be4_scale_length.o
 	$(LD) -o $@.exe $@.o
 
 da_scale_length: da_scale_length.o
-	$(LD) -o $@.exe $@.o da_constants.o
+	$(LD) -o $@.exe $@.o da_control.o
 
 da_diagnostics: da_diagnostics.o
 	$(LD) -o $@.exe $@.o
@@ -182,8 +182,6 @@ da_update_bc.exe : da_update_bc.o
 	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(EXTRA_LIBS)
-	@ $(RM) ../main/da_update_bc.exe
-	cp da_update_bc.exe ../main
 
 da_write_sl_2_be: da_write_sl_2_be.o
 	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \

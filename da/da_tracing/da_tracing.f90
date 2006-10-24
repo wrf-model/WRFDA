@@ -1,6 +1,6 @@
 MODULE da_tracing
 
-   use da_constants
+   use da_control
 #ifdef DM_PARALLEL
    use da_par_util1
 #endif

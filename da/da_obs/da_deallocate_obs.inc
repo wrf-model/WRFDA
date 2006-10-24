@@ -1,6 +1,6 @@
 SUBROUTINE da_deallocate_obs (ob)
 
-   USE da_constants
+   USE da_control
 
    implicit none
 

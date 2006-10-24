@@ -1,6 +1,6 @@
 program gen_be_cov2d
 
-   use da_constants
+   use da_control
    use da_gen_be
 
    implicit none

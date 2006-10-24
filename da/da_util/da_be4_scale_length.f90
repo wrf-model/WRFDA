@@ -1,6 +1,6 @@
 program da_scale_length
 
-   use da_constants
+   use da_control
 
    implicit none
 

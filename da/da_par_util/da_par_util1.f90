@@ -6,7 +6,7 @@
 
 MODULE da_par_util1
 
-   USE da_constants
+   USE da_control
    USE module_dm
 
    !---------------------------------------------------------------------------

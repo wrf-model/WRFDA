@@ -94,7 +94,7 @@ blas : $(BLAS)/libblas.a
 
 lapack : blas $(LAPACK)/liblapack.a
 
-fftpack5 : da_constants.o $(FFTPACK5)/libfftpack5.a
+fftpack5 : $(FFTPACK5)/libfftpack5.a
 
 bufr : $(BUFR)/libbufr.a
 
@@ -125,4 +125,6 @@ superclean : clean arch_superclean
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrfvar ../configure.wrfvar \
           decode_l2_airs.README time_window.nl \
-          da_macros_utl links arch
+          da_macros_utl links arch test.grb readme landread.c.dist \
+          grib1_util g2lib diffwrf build bacio-1.3 WRFIO.doc WGRIB \
+          Test1.out.correct TEST_RESULTS README* Makefile MEL_grib1

@@ -70,7 +70,7 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
 1000      continue
 !  Loop over all data files
 !--------------------------
-file_number: DO files = 0, numb_procs-1
+file_number: DO files = 0, num_procs-1
     iunit = filtered_obs_iunit + files  + 1
     rewind (iunit)
 

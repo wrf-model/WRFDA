@@ -11,7 +11,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !               and deallocate sequential data structure
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
 
    implicit none
 
@@ -348,6 +348,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    deallocate(tb)  
    call closbf(lnbufr)
+   call da_free_unit(lnbufr)
 
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------
@@ -370,20 +371,40 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    p => head
    ! do while ( associated(p) )
 
+   if (interp_new) then
+      allocate(iv%instid(inst)%loc_i(num_tovs_local))
+      allocate(iv%instid(inst)%loc_j(num_tovs_local))
+      allocate(iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,num_tovs_local))
+      allocate(iv%instid(inst)%loc_dx(num_tovs_local))
+      allocate(iv%instid(inst)%loc_dy(num_tovs_local))
+      allocate(iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,num_tovs_local))
+      allocate(iv%instid(inst)%loc_dxm(num_tovs_local))
+      allocate(iv%instid(inst)%loc_dym(num_tovs_local))
+      allocate(iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,num_tovs_local))
+   end if
+
    do i = 1, num_tovs_local
       inst = p%sensor_index
       nread(inst) = nread(inst) + 1
 
-      iv%instid(inst)%rad(nread(inst))%info   =  p%rad%info
-      iv%instid(inst)%rad(nread(inst))%loc    =  p%rad%loc
-
+      iv%instid(inst)%rad(nread(inst))%info = p%rad%info
+      iv%instid(inst)%rad(nread(inst))%loc  = p%rad%loc
+      if (interp_new) then
+         iv%instid(inst)%loc_i(i)   = p%rad%loc%i
+         iv%instid(inst)%loc_j(i)   = p%rad%loc%j
+         iv%instid(inst)%loc_dx(i)  = p%rad%loc%dx
+         iv%instid(inst)%loc_dy(i)  = p%rad%loc%dy
+         iv%instid(inst)%loc_dxm(i) = p%rad%loc%dxm
+         iv%instid(inst)%loc_dym(i) = p%rad%loc%dym
+         ! z done in da_get_innov_vector_rad
+      end if
       iv%instid(inst)%rad(nread(inst))%ifgat  =  p%ifgat
       iv%instid(inst)%rad(nread(inst))%landsea_mask = p%rad%landsea_mask
       !   iv%instid(inst)%rad(nread(inst))%scanline
       iv%instid(inst)%rad(nread(inst))%scanpos      = p%rad%scanpos
-      iv%instid(inst)%rad(nread(inst))%satzen = p%rad%satzen
-      iv%instid(inst)%rad(nread(inst))%satazi = p%rad%satazi
-      iv%instid(inst)%rad(nread(inst))%solzen = p%rad%solzen
+      iv%instid(inst)%rad(nread(inst))%satzen       = p%rad%satzen
+      iv%instid(inst)%rad(nread(inst))%satazi       = p%rad%satazi
+      iv%instid(inst)%rad(nread(inst))%solzen       = p%rad%solzen
       !   iv%instid(inst)%rad(nread(inst))%solazi
       allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error )
       IF (error /= 0) THEN

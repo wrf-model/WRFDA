@@ -1353,7 +1353,7 @@ rconfig   integer var4d_coupling          namelist,record1         1            
 rconfig   logical global                  namelist,record1         1              .false. -       "global"           "global"           "T/F"
 rconfig   integer stdout                  namelist,record1         1              6       -       "stdout"           "stdout"           "1-100"
 rconfig   integer stderr                  namelist,record1         1              0       -       "stderr"           "stderr"           "1-100"
-rconfig   integer trace_unit              namelist,record1         1              100     -       "trace_unit"       "trace_unit"       "1-100"
+rconfig   integer trace_unit              namelist,record1         1              7       -       "trace_unit"       "trace_unit"       "1-100"
 rconfig   integer trace_pe                namelist,record1         1              0       -       "trace_pe"         "trace_pe"         "1-100"
 rconfig   integer trace_repeat_head       namelist,record1         1              10      -       "trace_repeat_head"         "trace_repeat_head"         "1-100"
 rconfig   integer trace_repeat_body       namelist,record1         1              10      -       "trace_repeat_body"         "trace_repeat_body"         "1-100"
@@ -1381,6 +1381,7 @@ rconfig   logical check_max_iv_print      namelist,record1         1            
 rconfig   logical use_html                namelist,record1         1              .true. -        "use_html"              "use_html"             "T/F"
 rconfig   logical obs_jrb                 namelist,record1         1              .false. -       "obs_jrb"           "obs_jrb"          "T/F"
 rconfig   logical warnings_are_fatal      namelist,record1         1              .false. -       "warnings_are_fatal" "warnings_are_fatal"          "T/F"
+rconfig   logical interp_new              namelist,record1         1              .false. -       "interp_new"        "interp_new"          "T/F"
 
 rconfig   character analysis_type         namelist,record2         1              "3D-VAR" -       "TBD"              "TBD"              "3D-PSAS or 3D-VAR"
 rconfig   character analysis_date         namelist,record2         1 "2002-08-03_00:00:00.0000" -  "TBD"              "TBD"              "CCYY-MM-DD_HH:MM:SS.ssss"

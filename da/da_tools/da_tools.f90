@@ -6,7 +6,7 @@ MODULE da_tools
    
    USE module_bc
 
-   USE da_constants
+   USE da_control
    USE da_define_structures
    USE lapack
    use da_reporting
@@ -38,6 +38,7 @@ CONTAINS
 #include "da_llxy.inc"
 #include "da_openfile.inc"
 #include "da_smooth_anl.inc"
+#include "da_togrid_new.inc"
 #include "da_togrid.inc"
 #include "da_unifva.inc"
 #include "da_xyll.inc"

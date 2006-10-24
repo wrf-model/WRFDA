@@ -3,7 +3,7 @@ SUBROUTINE da_messages(strs)
 #ifdef USE_LOGERR
    USE module_utility
 #endif
-   USE da_constants
+   USE da_control
 
    IMPLICIT NONE
 

@@ -20,8 +20,8 @@ subroutine da_write_noise_to_ob (iv)
      call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
    call da_get_unit (iunit)
-   allocate (filename(0:numb_procs-1))
-    DO k = 0,numb_procs-1
+   allocate (filename(0:num_procs-1))
+    DO k = 0,num_procs-1
      write(unit=filename(k), fmt='(a,i3.3)')'rand_obs_error.',k
     ENDDO
    if( rootproc) then
@@ -39,7 +39,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'synop',5)
       ENDDO
    endif
@@ -58,7 +58,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'metar',5)    
       ENDDO
    endif
@@ -77,7 +77,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'ships', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'ships',5)
       ENDDO
    endif
@@ -96,7 +96,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'geoamv', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'geoamv',6)
       ENDDO
    endif
@@ -115,7 +115,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       if (rootproc) write(rand_unit,'(a20,i8)')'polaramv', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'polaramv',8) 
       ENDDO
    endif
@@ -134,7 +134,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'gpspw', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
            call da_read_rand_unit(filename(k),iunit,num_obs,'gpspw',5)     
       ENDDO
    endif
@@ -153,13 +153,13 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'sound', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'sound',5)     
       ENDDO
       !  writing Sonde_sfc  
       if (rootproc) write(rand_unit,'(a20,i8)')'sonde_sfc', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'sonde_sfc',9)
       ENDDO
    endif
@@ -178,7 +178,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'airep', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'airep',5)   
       ENDDO
    endif
@@ -197,7 +197,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'pilot', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'pilot',5)    
       ENDDO
    endif
@@ -216,7 +216,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'ssmir', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'ssmir',5)    
      ENDDO
    endif
@@ -235,7 +235,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'ssmiT', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'ssmiT',5)    
       ENDDO
    endif
@@ -254,7 +254,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'satem', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'satem',5)    
       ENDDO
    endif
@@ -273,7 +273,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'ssmt1', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'ssmt1',5)    
       ENDDO
    endif
@@ -292,7 +292,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'ssmt2', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'ssmt2',5)    
       ENDDO
    endif
@@ -311,7 +311,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'qscat', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'qscat',5)    
       ENDDO
    endif
@@ -330,7 +330,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'profiler', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'profiler',8)    
       ENDDO
    endif
@@ -349,7 +349,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'buoy', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'buoy',4)    
       ENDDO
    endif
@@ -368,7 +368,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
       write(rand_unit,'(a20,i8)')'bogus', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
        call da_read_rand_unit(filename(k),iunit,num_obs,'bogus',5)    
       ENDDO
    endif
@@ -387,7 +387,7 @@ subroutine da_write_noise_to_ob (iv)
    if (num_obs > 0 .and. rootproc ) then
        write(rand_unit,'(a20,i8)')'airsr', num_obs  
        num_obs = 0
-       DO k = 0,numb_procs-1
+       DO k = 0,num_procs-1
         call da_read_rand_unit(filename(k),iunit,num_obs,'airsr',5)    
        ENDDO
     endif
@@ -412,7 +412,7 @@ subroutine da_write_noise_to_ob (iv)
          write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
          write(rand_unit,'(a20,i8)')  ob_name,num_obs
          num_obs = 0
-         DO kk = 0,numb_procs-1
+         DO kk = 0,num_procs-1
          call da_read_rand_unit(filename(kk),iunit,num_obs,trim(ob_name),len(trim(ob_name)))
          ENDDO
        endif

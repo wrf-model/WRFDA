@@ -90,7 +90,6 @@ module da_define_structures
       real                    :: dy
       real                    :: dym
       logical                 :: proc_domain
-!      logical                 :: proc_domain_with_halo
       ! obs_global_index is the original index of this obs in the serial 
       ! code.  It is used to reassemble obs in serial-code-order to replicate 
       ! summation order for bitwise-exact testing of distributed-memory 
@@ -448,8 +447,18 @@ module da_define_structures
       INTEGER              :: platform_id, satellite_id, sensor_id
       CHARACTER(LEN=20)    :: rttovid_string
       INTEGER              :: num_rad, nchan, nlevels
-      INTEGER ,  pointer   :: ichan(:)
-      INTEGER ,  pointer   :: proc_domain(:)
+      INTEGER, pointer     :: ichan(:)
+      INTEGER, pointer     :: proc_domain(:)
+      integer, pointer     :: loc_i(:)
+      integer, pointer     :: loc_j(:)
+      integer, pointer     :: loc_k(:,:)
+      real,    pointer     :: loc_dx(:)  
+      real,    pointer     :: loc_dy(:)  
+      real,    pointer     :: loc_dz(:,:)  
+      real,    pointer     :: loc_dxm(:) 
+      real,    pointer     :: loc_dym(:) 
+      real,    pointer     :: loc_dzm(:,:) 
+      real,    pointer     :: zk(:,:) 
       TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type
    END TYPE instid_type
 

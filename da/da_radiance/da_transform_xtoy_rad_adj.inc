@@ -182,34 +182,34 @@ write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*num_levs
-               allocate(temp_t(len,num_levs))
+               allocate(temp_t(num_levs,len))
                do j=1,len
-                  temp_t(j,:)=con_vars(s+j-1) % t(:)
+                  temp_t(:,j)=con_vars(s+j-1) % t(:)
                end do
                call MPI_SEND( temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+1, MPI_COMM_WORLD, IERR )
 
-               allocate(temp_q(len,num_levs))
+               allocate(temp_q(num_levs,len))
                do j=1,len
-                  temp_q(j,:)=con_vars(s+j-1) % q(:)
+                  temp_q(:,j)=con_vars(s+j-1) % q(:)
                end do
                call MPI_SEND( temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+2, MPI_COMM_WORLD, IERR )
   
                call MPI_SEND( tb(s:e,:),len*nchanl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+3, MPI_COMM_WORLD, IERR )
 
-               allocate (rtemp(8,len))
-               rtemp(1,:)= con_vars(s:e) % ps
-               rtemp(2,:)= aux_vars(s:e) % t2m
-               rtemp(3,:)= aux_vars(s:e) % q2m
-               rtemp(4,:)= aux_vars(s:e) % u10
-               rtemp(5,:)= aux_vars(s:e) % v10
-               rtemp(6,:)= aux_vars(s:e) % surft
-               rtemp(7,:)= aux_vars(s:e) % satzen
-               rtemp(8,:)= aux_vars(s:e) % satazi
+               allocate (rtemp(len,8))
+               rtemp(:,1)= con_vars(s:e) % ps
+               rtemp(:,2)= aux_vars(s:e) % t2m
+               rtemp(:,3)= aux_vars(s:e) % q2m
+               rtemp(:,4)= aux_vars(s:e) % u10
+               rtemp(:,5)= aux_vars(s:e) % v10
+               rtemp(:,6)= aux_vars(s:e) % surft
+               rtemp(:,7)= aux_vars(s:e) % satzen
+               rtemp(:,8)= aux_vars(s:e) % satazi
                call MPI_SEND(rtemp,len*8, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+4, MPI_COMM_WORLD, IERR )
 
-               allocate (itemp(2,len))
-               itemp(1,:)= con_vars(s:e) % nlevels
-               itemp(2,:)= aux_vars(s:e) % surftype
+               allocate (itemp(len,2))
+               itemp(:,1)= con_vars(s:e) % nlevels
+               itemp(:,2)= aux_vars(s:e) % surftype
                call MPI_SEND(itemp,len*2, MPI_INTEGER, tovs_recv_pe(inst,i), i*8+5, MPI_COMM_WORLD, IERR )
 
                deallocate (temp_t)
@@ -222,40 +222,40 @@ write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*num_levs
-               allocate(temp_t(len,num_levs))
+               allocate(temp_t(num_levs,len))
                call MPI_RECV(temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
                   i*8+1, MPI_COMM_WORLD, status, IERR )
                do j=1,len
-                  d_con_vars(s+j-1) % t(:)=temp_t(j,:)
+                  d_con_vars(s+j-1) % t(:)=temp_t(:,j)
                end do
 
-               allocate(temp_q(len,num_levs))
+               allocate(temp_q(num_levs,len))
                call MPI_RECV(temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
                   i*8+2, MPI_COMM_WORLD, status, IERR )
                do j=1,len
-                  d_con_vars(s+j-1) % q(:)=temp_q(j,:)
+                  d_con_vars(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                call MPI_RECV(d_tb(s:e,:),len*nchanl, TRUE_MPI_REAL, &
                   tovs_send_pe(inst,i), i*8+3, MPI_COMM_WORLD, status, IERR )
 
-               allocate (rtemp(8,len))
+               allocate (rtemp(len,8))
                call MPI_RECV(rtemp,len*8, TRUE_MPI_REAL, &
                   tovs_send_pe(inst,i), i*8+4, MPI_COMM_WORLD, status, IERR )
-               d_con_vars(s:e) % ps       = rtemp(1,:)
-               d_aux_vars(s:e) % t2m      = rtemp(2,:)
-               d_aux_vars(s:e) % q2m      = rtemp(3,:)
-               d_aux_vars(s:e) % u10      = rtemp(4,:)
-               d_aux_vars(s:e) % v10      = rtemp(5,:)
-               d_aux_vars(s:e) % surft    = rtemp(6,:)
-               d_aux_vars(s:e) % satzen   = rtemp(7,:)
-               d_aux_vars(s:e) % satazi   = rtemp(8,:)
+               d_con_vars(s:e) % ps       = rtemp(:,1)
+               d_aux_vars(s:e) % t2m      = rtemp(:,2)
+               d_aux_vars(s:e) % q2m      = rtemp(:,3)
+               d_aux_vars(s:e) % u10      = rtemp(:,4)
+               d_aux_vars(s:e) % v10      = rtemp(:,5)
+               d_aux_vars(s:e) % surft    = rtemp(:,6)
+               d_aux_vars(s:e) % satzen   = rtemp(:,7)
+               d_aux_vars(s:e) % satazi   = rtemp(:,8)
 
-               allocate (itemp(2,len))
+               allocate (itemp(len,2))
                call MPI_RECV(itemp,len*2, MPI_INTEGER, &
                   tovs_send_pe(inst,i), i*8+5, MPI_COMM_WORLD, status, IERR )
-               d_con_vars(s:e) % nlevels  = itemp(1,:)
-               d_aux_vars(s:e) % surftype = itemp(2,:)
+               d_con_vars(s:e) % nlevels  = itemp(:,1)
+               d_aux_vars(s:e) % surftype = itemp(:,2)
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -312,20 +312,20 @@ write (0,*) "d_aux_vars(d_nprofiles) % satazi",d_aux_vars(d_nprofiles)%satazi
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*num_levs
-               allocate(temp_t(len,num_levs))
+               allocate(temp_t(num_levs,len))
                do j=1,len
-                  temp_t(j,:)=d_con_vars_ad(s+j-1) % t(:)
+                  temp_t(:,j)=d_con_vars_ad(s+j-1) % t(:)
                end do
                call MPI_SEND( temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+6, MPI_COMM_WORLD, IERR )
 
-               allocate(temp_q(len,num_levs))
+               allocate(temp_q(num_levs,len))
                do j=1,len
-                  temp_q(j,:)=d_con_vars_ad(s+j-1) % q(:)
+                  temp_q(:,j)=d_con_vars_ad(s+j-1) % q(:)
                end do
                call MPI_SEND( temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+7, MPI_COMM_WORLD, IERR )
 
-               allocate(rtemp(1,len))
-               rtemp(1,:) = d_con_vars_ad(s:e) % ps
+               allocate(rtemp(len,1))
+               rtemp(:,1) = d_con_vars_ad(s:e) % ps
                call MPI_SEND(rtemp,len, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+8, MPI_COMM_WORLD, IERR )
 
                deallocate (temp_t)
@@ -337,24 +337,24 @@ write (0,*) "d_aux_vars(d_nprofiles) % satazi",d_aux_vars(d_nprofiles)%satazi
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*num_levs
-               allocate(temp_t(len,num_levs))
+               allocate(temp_t(num_levs,len))
                call MPI_RECV(temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
                i*8+6, MPI_COMM_WORLD, status, IERR )
                do j=1,len
-                  con_vars_ad(s+j-1) % t(:)=temp_t(j,:)
+                  con_vars_ad(s+j-1) % t(:)=temp_t(:,j)
                end do
 
-               allocate(temp_q(len,num_levs))
+               allocate(temp_q(num_levs,len))
                call MPI_RECV(temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
                   i*8+7, MPI_COMM_WORLD, status, IERR )
                do j=1,len
-                  con_vars_ad(s+j-1) % q(:)=temp_q(j,:)
+                  con_vars_ad(s+j-1) % q(:)=temp_q(:,j)
                end do
 
-               allocate(rtemp(1,len))
+               allocate(rtemp(len,1))
                call MPI_RECV(rtemp,len, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
                   i*8+8, MPI_COMM_WORLD, status, IERR )
-               con_vars_ad(s:e) % ps=rtemp(1,:)
+               con_vars_ad(s:e) % ps=rtemp(:,1)
                deallocate (temp_t)
                deallocate (temp_q)
                deallocate (rtemp)

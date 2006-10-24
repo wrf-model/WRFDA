@@ -1,6 +1,6 @@
 program gen_be_stage4_regional
 
-   use da_constants
+   use da_control
    use da_tracing
 
    implicit none

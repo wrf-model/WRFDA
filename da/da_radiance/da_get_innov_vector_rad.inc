@@ -156,12 +156,19 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
             v_p(k) = 0.01*v_p(k)  ! convert to mb
          enddo
 
+         if (interp_new) then
+            iv%instid(inst)%zk(k,n) = 0.0
+         end if
+
          do k=1, num_levs
             zk(k)=missing_r
             IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
                call da_to_zk(pres(k), v_p, xp, v_interp_p, zk(k))
             END IF
             iv%instid(inst)%rad(n)%zk(k) = zk(k)
+            if (interp_new) then
+               iv%instid(inst)%zk(k,n) = zk(k)
+            end if
          enddo
 
          ! [1.2] Interpolate horizontally to ob:
@@ -472,6 +479,13 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                               iv%instid(inst)%rad(n) )
          end if
       end do       !  end loop for pixels
+
+      if (interp_new) then
+         call da_togrid_new (iv%instid(inst)%zk, xp%kts, xp%kte,  &
+            iv%instid(inst)%loc_k, &
+            iv%instid(inst)%loc_dz, &
+            iv%instid(inst)%loc_dzm)
+      end if
 
       deallocate (zk)
       deallocate (pres)

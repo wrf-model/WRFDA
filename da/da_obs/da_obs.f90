@@ -1,6 +1,6 @@
 module da_obs
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_airep
    use da_gpspw
@@ -57,7 +57,7 @@ CONTAINS
 #include "da_final_write_y.inc"
 #include "da_read_y_unit.inc"
 #include "da_read_rand_unit.inc"
-#include "da_read_omb_temp.inc"
+#include "da_read_omb_tmp.inc"
 #include "da_write_noise_to_ob.inc"
 
 end module da_obs

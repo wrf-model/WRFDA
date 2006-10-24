@@ -1,9 +1,0 @@
-#!/bin/sh
-
-export CC=gcc
-./configure
-make
-mkdir lib include
-mv libjpeg.a lib
-cp *.h include
-ranlib lib/libjpeg.a

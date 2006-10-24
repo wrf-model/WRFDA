@@ -4,7 +4,7 @@ MODULE da_physics
    !  PURPOSE: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_grid_definitions
    use da_interpolation

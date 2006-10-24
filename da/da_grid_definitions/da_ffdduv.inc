@@ -9,7 +9,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
    ! Convert MM5 wind (U-V in m/s) components into wind speed (F in m/s) and 
    ! direction (D in degree 0-360)
    !
-   ! Need MM5 map projection parameters from module da_constants
+   ! Need MM5 map projection parameters from module da_control
    !
    ! PHIC:  Central latitude 
    ! XLONC: Central longitude

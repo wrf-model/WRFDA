@@ -1,6 +1,6 @@
 program gen_be_ep1
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 

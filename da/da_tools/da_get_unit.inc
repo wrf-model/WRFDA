@@ -10,6 +10,7 @@ subroutine da_get_unit(unit)
 
    do i = unit_start, unit_end
       if (.NOT. unit_used(i)) then
+write(0,*) "unit",i,"used"
          unit=i
          unit_used(i) = .true.
          exit

@@ -1,0 +1,38 @@
+subroutine da_interp_lin_3d_new(fm3d, xp, &
+                         i, j, k, dx, dy, dz, dxm, dym, dzm, &
+                         fo3d, ml, nl,num)
+
+   implicit none
+
+   TYPE (xpose_type),      intent(in)  :: xp    ! Dimensions and xpose buffers.
+   integer,                intent(in)  :: ml     ! number of output levels
+   integer,                intent(in)  :: nl     ! number of input levels      
+   integer,                intent(in)  :: num    ! number of points   
+   integer,                intent(in)  :: i(num), j(num), k(nl)
+   real,                   intent(in)  :: dx(num), dxm(num)
+   real,                   intent(in)  :: dy(num), dym(num)
+   real,                   intent(in)  :: dz(num), dzm(num)
+   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
+                           intent(in)  :: fm3d    ! Input variable              
+   real,                   intent(out) :: fo3d(ml,num)  ! Output variable 
+
+   integer                             :: point, kk
+   real                                :: fmz(xp%kms:xp%kme,num)
+
+
+   fo3d(:,:) = 0.0
+
+   do point=1,num
+      fmz(xp%kts:xp%kte,point) = dym(point)*(dxm(point)*fm3d(i(point), j(point), xp%kts:xp%kte) &
+                            +dx(point) *fm3d(i(point)+1,j(point), xp%kts:xp%kte)) &
+                      + dy(point) *(dxm(point)*fm3d(i(point), j(point)+1, xp%kts:xp%kte) &
+                            +dx(point) * fm3d(i(point)+1, j(point)+1, xp%kts:xp%kte))
+      do kk = 1, nl
+         if(k(kk) > 0) then
+            fo3d(kk,point) = dzm(point)*fmz(k(kk),point) + dz(point)*fmz(k(kk)+1,point)
+         endif
+      enddo
+   end do
+
+end subroutine da_interp_lin_3d_new
+

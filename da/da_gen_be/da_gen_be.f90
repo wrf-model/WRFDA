@@ -8,7 +8,7 @@ module da_gen_be
 !  HISTORY: 11/21/2004 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use lapack
    use blas
    use da_tracing
