@@ -102,6 +102,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
            iv%instid(inst)%loc_dym, &
            iv%instid(inst)%loc_dzm, &
            model_t, max_ob_levels, num_levs, nprofiles)
+
          call da_interp_lin_3d_new( xa%q, xp, &
            iv%instid(inst)%loc_i, &
            iv%instid(inst)%loc_j, &
@@ -113,6 +114,12 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
            iv%instid(inst)%loc_dym, &
            iv%instid(inst)%loc_dzm, &
            model_q, max_ob_levels, num_levs, nprofiles )
+
+         call da_interp_lin_2d_new( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+            iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
+            model_psfc,nprofiles )
       end if
 
       do iprof= 1, nprofiles           ! loop for pixel
@@ -164,11 +171,11 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
             END IF
          end do
 
-
-         call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         if (.not. interp_new) then
+            call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
-
+         end if
 if (iprof ==1) then
    write (0,*) "xa % psfc",xa % psfc
    write (0,*) "xp%ims, xp%ime, xp%jms, xp%jme",xp%ims, xp%ime, xp%jms, xp%jme

@@ -434,7 +434,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
             aux_vars(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
          end do
 
-         ! [1.3] Call RTM foreward model
+         ! [1.3] Call RTM forward model
 
          ! print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
 

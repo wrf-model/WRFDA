@@ -162,10 +162,12 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       write(unit=grad_unit,fmt='(a)')'Iter          Iter                            '
    endif
 
-   write(unit=cost_unit,fmt='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') &
-      it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc
-   write(unit=stdout,fmt='(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4(f10.3,1x))') &
-      it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, j % jc
+   if (rootproc) then
+      write(unit=cost_unit,fmt='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') &
+         it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc   
+      write(unit=stdout,fmt='(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4(f10.3,1x))') &
+         it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, j % jc
+   end if
 
    j % total = j % jb + j % jo % total + j % je
 

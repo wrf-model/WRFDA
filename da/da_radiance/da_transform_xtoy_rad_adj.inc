@@ -418,34 +418,71 @@ end do
          end do
       end do
 
-      do iprof=1,nprofiles
-         !-----------------------------------------------------
-         ! [4.1] Get horizontal interpolation weights:
-         !-----------------------------------------------------
+      if (interp_new) then
+         call da_interp_lin_3d_adj_new( jo_grad_x%t, xp, &
+            iv%instid(inst)%loc_i, &
+            iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_k, &
+            iv%instid(inst)%loc_dx, &
+            iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dz, &
+            iv%instid(inst)%loc_dxm, &
+            iv%instid(inst)%loc_dym, &
+            iv%instid(inst)%loc_dzm, &
+            con_vars_ad(iprof)% t, max_ob_levels, num_levs,nprofiles )
 
-         i = iv%instid(inst)%rad(iprof)%loc%i
-         j = iv%instid(inst)%rad(iprof)%loc%j
-         dx = iv%instid(inst)%rad(iprof)%loc%dx
-         dy = iv%instid(inst)%rad(iprof)%loc%dy
-         dxm = iv%instid(inst)%rad(iprof)%loc%dxm
-         dym = iv%instid(inst)%rad(iprof)%loc%dym
+         call da_interp_lin_3d_adj_new( jo_grad_x%q, xp, &
+            iv%instid(inst)%loc_i, &
+            iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_k, &
+            iv%instid(inst)%loc_dx, &
+            iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dz, &
+            iv%instid(inst)%loc_dxm, &
+            iv%instid(inst)%loc_dym, &
+            iv%instid(inst)%loc_dzm, &
+            con_vars_ad(iprof)% q, max_ob_levels, num_levs,nprofiles )
 
-         ! [4.3] Interpolate horizontally from ob to grid:
+         call da_interp_lin_2d_adj_new(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
+            xp%jme, &
+            iv%instid(inst)%loc_i, &
+            iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_dx, &
+            iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dxm, &
+            iv%instid(inst)%loc_dym, &
+            con_vars_ad(iprof)% ps,nprofiles)
+      else
 
-         call da_interp_lin_3d_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
-            con_vars_ad(iprof)% t, max_ob_levels, zk, num_levs )
+         do iprof=1,nprofiles
+            !-----------------------------------------------------
+            ! [4.1] Get horizontal interpolation weights:
+            !-----------------------------------------------------
 
-         call da_interp_lin_3d_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
-            con_vars_ad(iprof)% q, max_ob_levels, zk, num_levs )
+            i = iv%instid(inst)%rad(iprof)%loc%i
+            j = iv%instid(inst)%rad(iprof)%loc%j
+            dx = iv%instid(inst)%rad(iprof)%loc%dx
+            dy = iv%instid(inst)%rad(iprof)%loc%dy
+            dxm = iv%instid(inst)%rad(iprof)%loc%dxm
+            dym = iv%instid(inst)%rad(iprof)%loc%dym
 
-         call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
-            xp%jme, i, j, dx, dy, dxm, dym, con_vars_ad(iprof)% ps)
+            ! [4.3] Interpolate horizontally from ob to grid:
 
-         deallocate (con_vars(iprof) % t)
-         deallocate (con_vars(iprof) % q)
-         deallocate (con_vars_ad(iprof) % t)
-         deallocate (con_vars_ad(iprof) % q)
-      end do       !  end loop for pixels
+            call da_interp_lin_3d_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
+               con_vars_ad(iprof)% t, max_ob_levels, zk, num_levs )
+
+            call da_interp_lin_3d_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
+               con_vars_ad(iprof)% q, max_ob_levels, zk, num_levs )
+
+            call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
+               xp%jme, i, j, dx, dy, dxm, dym, con_vars_ad(iprof)% ps)
+
+            deallocate (con_vars(iprof) % t)
+            deallocate (con_vars(iprof) % q)
+            deallocate (con_vars_ad(iprof) % t)
+            deallocate (con_vars_ad(iprof) % q)
+         end do       !  end loop for pixels
+      end if
 
       deallocate (zk)
       deallocate (pres)

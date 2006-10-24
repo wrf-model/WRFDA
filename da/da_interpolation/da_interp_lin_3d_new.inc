@@ -8,10 +8,10 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
    integer,                intent(in)  :: ml     ! number of output levels
    integer,                intent(in)  :: nl     ! number of input levels      
    integer,                intent(in)  :: num    ! number of points   
-   integer,                intent(in)  :: i(num), j(num), k(nl)
+   integer,                intent(in)  :: i(num), j(num), k(nl,num)
    real,                   intent(in)  :: dx(num), dxm(num)
    real,                   intent(in)  :: dy(num), dym(num)
-   real,                   intent(in)  :: dz(num), dzm(num)
+   real,                   intent(in)  :: dz(nl,num), dzm(nl,num)
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
                            intent(in)  :: fm3d    ! Input variable              
    real,                   intent(out) :: fo3d(ml,num)  ! Output variable 
@@ -19,6 +19,7 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
    integer                             :: point, kk
    real                                :: fmz(xp%kms:xp%kme,num)
 
+   if (trace_use) call da_trace_entry("da_interp_lin_3d_new")
 
    fo3d(:,:) = 0.0
 
@@ -28,11 +29,13 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
                       + dy(point) *(dxm(point)*fm3d(i(point), j(point)+1, xp%kts:xp%kte) &
                             +dx(point) * fm3d(i(point)+1, j(point)+1, xp%kts:xp%kte))
       do kk = 1, nl
-         if(k(kk) > 0) then
-            fo3d(kk,point) = dzm(point)*fmz(k(kk),point) + dz(point)*fmz(k(kk)+1,point)
+         if(k(kk,point) > 0) then
+            fo3d(kk,point) = dzm(kk,point)*fmz(k(kk,point),point) + dz(kk,point)*fmz(k(kk,point)+1,point)
          endif
       enddo
    end do
+
+   if (trace_use) call da_trace_exit("da_interp_lin_3d_new")
 
 end subroutine da_interp_lin_3d_new
 

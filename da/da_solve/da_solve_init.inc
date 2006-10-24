@@ -52,7 +52,7 @@ subroutine da_solve_init( grid, xp, xb, &
 
 #ifdef DM_PARALLEL
    if (trace_use) call da_trace("da_solve_init", &
-      Message="Setup Register xpose arrays")
+      Message="Setup register xpose arrays")
 
    ! Register xpose arrays and build messages for processor communication.
 #define REGISTER_I1
