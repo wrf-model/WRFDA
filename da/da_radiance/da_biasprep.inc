@@ -6,7 +6,7 @@ subroutine da_biasprep(inst,ob,iv)
    INCLUDE 'mpif.h'
 #endif
 
-   ! ACCUMULATE STATS FROM FEEDBACK FILES FOR BIAS CORRECTION PROGS
+   ! OUTPUT information FILES FOR BIAS CORRECTION PROGS
    !-----------------------------------------------------------------------
 
    INTEGER       ,  INTENT(IN)      :: inst
@@ -44,6 +44,7 @@ subroutine da_biasprep(inst,ob,iv)
 
    allocate(radbias%tb(nchan))
    allocate(radbias%omb(nchan))
+   allocate(radbias%bias(nchan))
    allocate(radbias%qc_flag(nchan))
    allocate(radbias%cloud_flag(nchan))
    allocate(radbias%pred(npred))
@@ -76,14 +77,17 @@ subroutine da_biasprep(inst,ob,iv)
       radbias%elevation    = iv%instid(inst)%rad(j)%info%elv
       radbias%lat          = iv%instid(inst)%rad(j)%info%lat
       radbias%lon          = iv%instid(inst)%rad(j)%info%lon
+      radbias%surf_flag    = iv%instid(inst)%rad(j)%isflg
       radbias%ps           = iv%instid(inst)%rad(j)%ps
       radbias%t2m          = iv%instid(inst)%rad(j)%t2m
       radbias%q2m          = iv%instid(inst)%rad(j)%mr2m/q2ppmv
       radbias%tsk          = iv%instid(inst)%rad(j)%ts
+      radbias%clwp         = iv%instid(inst)%rad(j)%clwp  ! in mm
 
       radbias%nchan        = nchan 
       radbias%tb(1:nchan)  = ob%instid(inst)%rad(j)%tb(1:nchan)
       radbias%omb(1:nchan) = iv%instid(inst)%rad(j)%tb(1:nchan)%inv
+      radbias%bias(1:nchan) = 0.
 
       radbias%npred         = npred
       radbias%pred(1:npred) = pred(1:npred)
@@ -101,25 +105,8 @@ subroutine da_biasprep(inst,ob,iv)
 
       !write(UNIT=biasprep_unit) radbias ! can not compiled with pointer
 
-      write(UNIT=biasprep_unit) radbias%nchan,radbias%npred
-      write(UNIT=biasprep_unit) radbias%platform_id , & 
-                                radbias%satellite_id, &  
-                                radbias%sensor_id,    &
-                                radbias%year,radbias%month,&
-                                radbias%day, radbias%hour, &
-                                radbias%min, radbias%sec,  &
-                                radbias%scanline, & 
-                                radbias%scanpos,  &   
-                                radbias%landmask, &
-                                radbias%elevation,& 
-                                radbias%lat,radbias%lon, &
-                                radbias%ps,radbias%t2m, &
-                                radbias%q2m,radbias%tsk,& 
-                                radbias%tb(1:nchan), & 
-                                radbias%omb(1:nchan), &
-                                radbias%pred(1:npred), &
-                                radbias%qc_flag(1:nchan), &
-                                radbias%cloud_flag(1:nchan)
+      call da_write_biasprep(radbias)
+
       endif
    ENDDO
   
@@ -127,6 +114,7 @@ subroutine da_biasprep(inst,ob,iv)
 
    deallocate(radbias%tb)
    deallocate(radbias%omb)
+   deallocate(radbias%bias)
    deallocate(radbias%qc_flag)
    deallocate(radbias%cloud_flag)
    deallocate(radbias%pred)

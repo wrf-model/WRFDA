@@ -183,8 +183,9 @@ module da_radiance
       INTEGER :: landmask
       INTEGER, pointer :: qc_flag(:) ! 1/0:good/bad
       INTEGER, pointer :: cloud_flag(:) ! 1/0:no-cloud/cloud
-      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk
-      REAL, pointer  :: tb(:), omb(:)
+      INTEGER :: surf_flag  ! surface type
+      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk, clwp
+      REAL, pointer  :: tb(:), omb(:), bias(:)
       REAL, pointer  :: pred(:)
    END TYPE BIAS
 
@@ -204,6 +205,7 @@ CONTAINS
 #include "da_calculate_residual_rad.inc"
 #include "da_biascorr_rad.inc"
 #include "da_biasprep.inc"
+#include "da_write_biasprep.inc"
 #include "da_predictor.inc"
 #include "da_qc_rad.inc"
 #include "da_qc_amsua.inc"
