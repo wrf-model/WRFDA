@@ -1,8 +1,17 @@
 SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, & 
                           phic, xlonc, truelat1, truelat2)
-
    !------------------------------------------------------------------------
    ! Purpose: Writes filtered observations by WRFVAR
+   !          Author :    Syed RH Rizvi   MMM/NCAR  
+   !  History:     
+   !             10/18/2005         Syed RH Rizvi
+   !
+   !   (a) Original iv & ob arrays are not modified
+   !   (b) "da_count_filtered_obs" is called to get exact count of various
+   !        observations type included in the filtered obs
+   !            10/21/2006          Syed RH Rizvi
+   !   (a)  MPI update
+   !   (b)  Seperate calls for writing header counts and data
    !------------------------------------------------------------------------   
    !  Note:                                                           
    !   (a) Information just needed for WRFVAR  is only written  
@@ -20,10 +29,6 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    !       seperated & used as profile
    !   (g) Currently only MODIS winds from Polar orbiting satellite are used
    !  Modifications:
-   !                 10/18/2005         Syed RH Rizvi
-   !   (a) Original iv & ob arrays are not modified
-   !   (b) "da_count_filtered_obs" is called to get exact count of various
-   !        observations type included in the filtered obs
    !
    !..........................................................................
    ! The Quality Controlled observations (QCed obs) means
@@ -54,7 +59,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
    CHARACTER (LEN =  10)        :: info_fmt_name,srfc_fmt_name,each_fmt_name
    CHARACTER (LEN =  80)        :: blank                                         
-   INTEGER                      :: i, j, nlevels, fm
+   INTEGER                      :: i, j, iost, nlevels, fm
    TYPE (multi_level_type)      :: platform
 
    integer                       :: n1, n2, n, k, zero , ships_elv_qual
@@ -68,28 +73,28 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    integer                       :: thick_qc, t_qc, td_qc, rh_qc, height_qc
    integer                       :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 
-   INTEGER                       :: ounit,ios, nz, mnz
+   INTEGER                       :: ounit, nz, mnz
    INTEGER                       :: root      ! Monitor processor.
    INTEGER                       :: ierr      ! Error code from MPI routines.
    character*20                  :: filename
-
-   if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
-
-   call da_get_unit(ounit)
 !----------------------------------------------------------------------
-!  [2.0] Create noise and output:
+   if (trace_use) CALL da_trace_entry("da_write_filtered_obs")
+!
+!----------------------------------------------------------------------
+!  Create noise and output:
+   call da_get_unit(ounit)
 !----------------------------------------------------------------------
 #ifdef DM_PARALLEL
       write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.', myproc
 #else
       write(UNIT=filename, FMT='(a)') 'filtered_obs.000'
 #endif
-   open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=ios)
-   if (ios /= 0 ) Then
+   open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=iost)
+   if (iost /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
          (/"Canot open filtered observation file"//trim(filename)/))
    Endif
-
+!
    zero = 0
    ! Note: Currently in WRFVAR there is no active role of  
    !       "height" and "TD"        
@@ -517,7 +522,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_geoamv               
          if ( .not. iv%geoamv(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%geoamv(i)%info%platform,    &
             iv%geoamv(i)%info%date_char,   &
             iv%geoamv(i)%info%name,        &
@@ -571,7 +576,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_polaramv               
       if ( .not. iv%polaramv(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%polaramv(i)%info%platform,    &
             iv%polaramv(i)%info%date_char,   &
             iv%polaramv(i)%info%name,        &
@@ -675,7 +680,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
          nz = iv%sound(i)%info%levels + 1 - nz
          if (nz < 1) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%sound(i)%info%platform,    &
             iv%sound(i)%info%date_char,   &
             iv%sound(i)%info%name,        &
@@ -836,7 +841,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
       DO i = 1, iv % num_airep               
          if (.not. iv%airep(i)%loc%proc_domain) cycle
 
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%airep(i)%info%platform,    &
             iv%airep(i)%info%date_char,   &
             iv%airep(i)%info%name,        &
@@ -899,7 +904,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
       DO i = 1, iv % num_pilot               
          if (.not. iv%pilot(i)%loc%proc_domain) cycle
 
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%pilot(i)%info%platform,    &
             iv%pilot(i)%info%date_char,   &
             iv%pilot(i)%info%name,        &
@@ -955,7 +960,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
       DO i = 1, iv % num_satem           
          if (.not. iv%satem(i)%loc%proc_domain) cycle
 
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%satem(i)%info%platform,    &
             iv%satem(i)%info%date_char,   &
             iv%satem(i)%info%name,        &
@@ -997,7 +1002,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
       DO i = 1, iv % num_qscat               
          if ( .not. iv%qscat(i)%loc%proc_domain) cycle
 
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%qscat(i)%info%platform,    &
             iv%qscat(i)%info%date_char,   &
             iv%qscat(i)%info%name,        &
@@ -1048,7 +1053,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_profiler            
          if (.not. iv%profiler(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios)    &
+         write(ounit, FMT = fmt_info, IOSTAT = iost)    &
             iv%profiler(i)%info%platform,    &
             iv%profiler(i)%info%date_char,   &
             iv%profiler(i)%info%name,        &
@@ -1102,7 +1107,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_ssmi_retrieval
          if (.not. iv%ssmi_retrieval(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%ssmi_retrieval(i)%info%platform,    &
             iv%ssmi_retrieval(i)%info%date_char,   &
             iv%ssmi_retrieval(i)%info%name,        &
@@ -1125,7 +1130,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_ssmt1             
          if (.not. iv%ssmt1(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%ssmt1(i)%info%platform,    &
             iv%ssmt1(i)%info%date_char,   &
             iv%ssmt1(i)%info%name,        &
@@ -1161,7 +1166,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_ssmt2              
          if (.not. iv%ssmt2(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%ssmt2(i)%info%platform,    &
             iv%ssmt2(i)%info%date_char,   &
             iv%ssmt2(i)%info%name,        &
@@ -1199,7 +1204,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
          if (.not. iv%gpspw(i)%loc%proc_domain) cycle
          ! hardwired the # of levels = 0 for GPSPW (YRG 03/02/2006)
          iv%gpspw(i)%info%levels = 0
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%gpspw(i)%info%platform,    &
             iv%gpspw(i)%info%date_char,   &
             iv%gpspw(i)%info%name,        &
@@ -1221,7 +1226,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_gpsref
          if (.not. iv%gpsref(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%gpsref(i)%info%platform,    &
             iv%gpsref(i)%info%date_char,   &
             iv%gpsref(i)%info%name,        &
@@ -1294,7 +1299,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
 
       DO i = 1, iv % num_airsr               
          if (.not. iv%airsr(i)%loc%proc_domain) cycle
-         write(ounit, FMT = fmt_info, IOSTAT = ios) &
+         write(ounit, FMT = fmt_info, IOSTAT = iost) &
             iv%airsr(i)%info%platform,    &
             iv%airsr(i)%info%date_char,   &
             iv%airsr(i)%info%name,        &
@@ -1347,12 +1352,20 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    end if
 
    close(ounit)
+   call da_free_unit(ounit)
 #ifdef DM_PARALLEL
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
-   if(rootproc) call da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
-   close (ounit)
-   call da_free_unit(ounit)
+   if ( rootproc ) then
+   open(UNIT=filtered_obs_iunit, &
+        file= 'filtered_obs' ,form='formatted',iostat=iost)
+   if (iost /= 0 ) call da_error(__FILE__,__LINE__, (/"Canot open filtered_obs "/))
+    call da_count_filtered_obs(filtered_obs_iunit, &
+            xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
+            xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
+    call da_final_write_filtered_obs( filtered_obs_iunit )   
+   close ( filtered_obs_iunit )
+   endif
 
    if (trace_use) CALL da_trace_exit("da_write_filtered_obs")
 

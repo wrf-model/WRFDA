@@ -14,7 +14,7 @@ subroutine da_final_write_y( iv, y )
    TYPE (ob_type), INTENT(IN)    :: iv   ! O-B structure.
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
       
-   integer                       :: n, k,kk,inst, ounit, iunit
+   integer                       :: n, k,kk,inst, ounit
    integer                       :: root      ! Monitor processor.
    integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: sound_num_obs, num_obs, ios
@@ -25,7 +25,6 @@ subroutine da_final_write_y( iv, y )
 #ifdef DM_PARALLEL
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
-
    if ( omb_add_noise ) then
       ounit = yp_unit            ! 3DVAR is a perturbed ob run.
       file_prefix='pert_obs'
@@ -389,30 +388,30 @@ subroutine da_final_write_y( iv, y )
 !------------------------------------------------------------------
 !  writing  Radiance data:
 !------------------------------------------------------------------
-
    IF ( iv%num_inst > 0 ) THEN
       do inst = 1, iv%num_inst                 ! loop for sensor
-         if ( iv%instid(inst)%num_rad < 1 ) cycle
-       do k = 1,iv%instid(inst)%nchan        ! loop for channel
-!  Counting number of obs for channle k
+         do k = 1,iv%instid(inst)%nchan        ! loop for channel
          num_obs = 0
+!  Counting number of obs for channle k
          do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
            if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
               (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
                 num_obs = num_obs + 1
            end if
          end do                                ! end loop for pixel
+
         call da_proc_sum_int(num_obs)
+
         if(rootproc .and. num_obs > 0) then
          write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
-         write(ounit,'(a20,i8)')  ob_name,num_obs
-         num_obs = 0
-         DO kk = 0,numb_procs-1
-         call da_read_y_unit(trim(filename(kk)),ounit,num_obs,trim(ob_name),len(trim(ob_name)))    
-         ENDDO
+        write(ounit,'(a20,i8)')  ob_name,num_obs
+        num_obs = 0
+        DO kk = 0,numb_procs-1
+        call da_read_y_unit(trim(filename(kk)),&
+          ounit,num_obs,trim(ob_name),len(trim(ob_name)))    
+        ENDDO
         endif
-
-       end do                                  ! end loop for Chanel 
+        end do                                ! end loop for channel
       end do                                   ! end loop for sensor
    END IF
 

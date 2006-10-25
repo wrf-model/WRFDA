@@ -45,6 +45,11 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 #else
       write(UNIT=filename, FMT='(a)') 'rand_obs_error.000'
 #endif
+   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   if (ios /= 0 ) Then
+      call da_error(__FILE__,__LINE__, &
+         (/"Canot open random observation error file"//trim(filename)/))
+   Endif
 
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
@@ -670,7 +675,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
                  call da_add_noise( iv%instid(inst)%rad(n)%tb(k),  &
                                     ob%instid(inst)%rad(n)%tb(k), z1)
                  
-                 write(ounit,'(2i8,f10.3,e15.7)') num_obs, 1,  &
+                 write(ounit,'(2i8,2e15.7)') num_obs, 1,  &
                           iv%instid(inst)%rad(n)%tb(k)%error, z1
            end if
          end do                                ! end loop for pixel

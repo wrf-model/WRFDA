@@ -154,22 +154,6 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % total = j % jb + j % jo % total + j % je
    endif
 
-      if(it == 1 .and. iter == 0) then
-      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo     Jc'
-      write(81,'(a)')'Iter          Iter                            '
-      write(UNIT=stdout,FMT='(a)')'Outer   EPS   Inner  J=      J          Jb      Jo         Jc'
-      write(82,'(a)')'Outer   EPS   Inner      G          Gb      Go'
-      write(82,'(a)')'Iter          Iter                            '
-      endif
-
-      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc
-      write(*,89) it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, j % jc
- 89   format(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4(f10.3,1x))
- 81   format(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)
-
-
-
-
    j % total = j % jb + j % jo % total + j % je
 
    if (it == 1 .and. iter == 0) then
@@ -179,7 +163,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       write(UNIT=grad_unit,FMT='(a)')'Iter          Iter                            '
    endif
 
-   write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,5f10.3)') &
+   write(UNIT=cost_unit,FMT='(2x,i2,1x,f10.3,2x,i4,2x,5f10.3)') &
       it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je
 
    !-------------------------------------------------------------------------

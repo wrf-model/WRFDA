@@ -401,7 +401,6 @@ subroutine da_write_noise_to_ob (iv)
 
    IF ( iv%num_inst > 0 ) THEN
      do inst = 1, iv%num_inst                 ! loop for sensor
-         if ( iv%instid(inst)%num_rad < 1 ) cycle
        do k = 1,iv%instid(inst)%nchan        ! loop for channel
 !  Counting number of obs for channle k
          num_obs = 0
@@ -417,7 +416,8 @@ subroutine da_write_noise_to_ob (iv)
          write(rand_unit,'(a20,i8)')  ob_name,num_obs
          num_obs = 0
          DO kk = 0,numb_procs-1
-         call da_read_rand_unit(filename(kk),iunit,num_obs,trim(ob_name),len(trim(ob_name)))
+         call da_read_rand_unit(filename(kk),&
+              iunit,num_obs,trim(ob_name),len(trim(ob_name)))
          ENDDO
        endif
        enddo                           ! end loop for channel
