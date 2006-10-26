@@ -31,7 +31,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    open(UNIT=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open file"//trim(filename)/))
+         (/"Cannot open file"//trim(filename)/))
    Endif
 
 1  continue

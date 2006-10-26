@@ -48,7 +48,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
       open(UNIT=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0 ) Then
          call da_error(__FILE__,__LINE__, &
-            (/"Canot open innovation radiance file"//filename/))
+            (/"Cannot open innovation radiance file"//filename/))
       Endif
       write(UNIT=innov_rad_unit,FMT='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels : ', ndomain, &

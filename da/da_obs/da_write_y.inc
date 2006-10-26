@@ -47,7 +47,7 @@ SUBROUTINE da_write_y(iv, y)
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open (un)perturbed observation file"//filename/))
+         (/"Cannot open (un)perturbed observation file"//filename/))
    Endif
 
 

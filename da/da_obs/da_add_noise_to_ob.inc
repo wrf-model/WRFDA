@@ -47,7 +47,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open random observation error file"//filename/))
+         (/"Cannot open random observation error file"//filename/))
    Endif
 
 !  [2.1] Transfer surface obs:

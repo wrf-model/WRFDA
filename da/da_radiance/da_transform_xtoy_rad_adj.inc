@@ -75,7 +75,7 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
 
       if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
-            (/"Canot allocate memory to con_vars"/))
+            (/"Cannot allocate memory to con_vars"/))
       end if
 
       pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)

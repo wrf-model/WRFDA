@@ -26,7 +26,7 @@ subroutine da_write_noise_to_ob (iv)
     ENDDO
    if( rootproc) then
    open(UNIT=rand_unit,file='rand_obs_error',form='formatted',iostat=ios,status='new')
-   if (ios /= 0 )call da_error(__FILE__,__LINE__, (/"Canot open file rand_obs_error"/))
+   if (ios /= 0 )call da_error(__FILE__,__LINE__, (/"Cannot open file rand_obs_error"/))
    endif
 !
    num_obs = 0

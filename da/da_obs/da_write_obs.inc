@@ -38,7 +38,7 @@ subroutine da_write_obs( ob, iv, re)
    open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open conventional observation omb and oma file"//filename/))
+         (/"Cannot open conventional observation omb and oma file"//filename/))
    Endif
 
 

@@ -41,7 +41,7 @@ subroutine da_write_filtered_rad(ob, iv)
          form='unformatted',iostat=ios)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
-            (/"Canot open filtered radiance file"//filename/))
+            (/"Cannot open filtered radiance file"//filename/))
       Endif
 
       write(UNIT=filtered_rad_unit) iv%instid(n)%num_rad

@@ -5,7 +5,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    !
    !  METHOD:  d = y - H(x)
    !       1. interpolate xb to obs location
-   !       2. call foreward RTM to get simulated bright temperature 
+   !       2. call forward RTM to get simulated bright temperature 
    !       3. obs BT - simulated BT
    !---------------------------------------------------------------------------
 

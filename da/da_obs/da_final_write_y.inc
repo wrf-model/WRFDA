@@ -41,7 +41,7 @@ subroutine da_final_write_y( iv, y )
       open(UNIT=ounit,file=trim(file_prefix),form='formatted',iostat=ios, &
          status='new')
       if (ios /= 0 ) call da_error(__FILE__,__LINE__, &
-         (/"Canot open random observation error file"//trim(file_prefix)/))
+         (/"Cannot open random observation error file"//trim(file_prefix)/))
    endif
 
    !------------------------------------------------------------------

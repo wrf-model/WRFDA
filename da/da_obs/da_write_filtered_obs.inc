@@ -87,7 +87,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open filtered observation file"//trim(filename)/))
+         (/"Cannot open filtered observation file"//trim(filename)/))
    Endif
 
    zero = 0

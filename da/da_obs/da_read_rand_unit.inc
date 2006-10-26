@@ -23,7 +23,7 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    open(unit=unit_in,   file=trim(filename), status='old',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open file"//trim(filename)/))
+         (/"Cannot open file"//trim(filename)/))
    Endif
 1  continue
 !----------------------------------------------------------------------------   
