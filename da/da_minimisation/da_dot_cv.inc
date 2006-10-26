@@ -40,7 +40,7 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
       ENDIF
 
       call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
-      call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, yg )
+      call da_cv_to_global( cv_size, cv_size_domain, y, xp, mzs, yg )
 
       IF ( rootproc ) THEN
          dtemp1 = da_dot( cv_size_domain, xg, yg )
