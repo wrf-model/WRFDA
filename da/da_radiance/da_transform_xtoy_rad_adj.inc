@@ -9,6 +9,8 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    !           3. adjoint of interpolation from model grid to obs loc
    !---------------------------------------------------------------------------
 
+use da_interpolation, only : da_interp_lin_3d_adj_new
+
    IMPLICIT NONE
 
 !#include "rttov_v2q.interface"
@@ -44,7 +46,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    type(aux_vars_type),  pointer  :: d_aux_vars(:)
    real,    pointer   :: d_tb(:,:)
    integer :: d_nprofiles, lprofiles,e,s,len,nl,ierr
-   real, allocatable :: temp_t(:,:),temp_q(:,:), rtemp(:,:)
+   real, allocatable :: temp_t(:,:),temp_q(:,:), temp_ps(:), rtemp(:,:)
    integer, allocatable :: itemp(:,:)
 
 #if !defined(RTTOV)
@@ -122,17 +124,17 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       ! [2.9] Distribute evenly across processors
       !-------------------------------------------------
 
-write (0,*) "tb(1,:)",tb(1,:)
-write (0,*) "con_vars(1)%nlevels",con_vars(1)%nlevels
-write (0,*) "aux_vars(1) % surftype",aux_vars(1) % surftype
-write (0,*) "con_vars(1) % ps",con_vars(1)%ps
-write (0,*) "aux_vars(1) % t2m",aux_vars(1)%t2m
-write (0,*) "aux_vars(1) % q2m",aux_vars(1)%q2m
-write (0,*) "aux_vars(1) % u10",aux_vars(1)%u10
-write (0,*) "aux_vars(1) % v10",aux_vars(1)%v10
-write (0,*) "aux_vars(1) % surft",aux_vars(1)%surft
-write (0,*) "aux_vars(1) % satzen",aux_vars(1)%satzen
-write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
+!write (0,*) "tb(1,:)",tb(1,:)
+!write (0,*) "con_vars(1)%nlevels",con_vars(1)%nlevels
+!write (0,*) "aux_vars(1) % surftype",aux_vars(1) % surftype
+!write (0,*) "con_vars(1) % ps",con_vars(1)%ps
+!write (0,*) "aux_vars(1) % t2m",aux_vars(1)%t2m
+!write (0,*) "aux_vars(1) % q2m",aux_vars(1)%q2m
+!write (0,*) "aux_vars(1) % u10",aux_vars(1)%u10
+!write (0,*) "aux_vars(1) % v10",aux_vars(1)%v10
+!write (0,*) "aux_vars(1) % surft",aux_vars(1)%surft
+!write (0,*) "aux_vars(1) % satzen",aux_vars(1)%satzen
+!write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
 
       if (tovs_redistribute) then
 ! if (.false.) then
@@ -264,7 +266,7 @@ write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
             end if
             call mpi_barrier(MPI_COMM_WORLD, IERR)
          end do
-
+if (.false.) then
 write (0,*) "d_tb(1,:)",d_tb(1,:)
 write (0,*) "d_con_vars(1)%nlevels",d_con_vars(1)%nlevels
 write (0,*) "d_aux_vars(1) % surftype",d_aux_vars(1) % surftype
@@ -288,6 +290,7 @@ write (0,*) "d_aux_vars(d_nprofiles) % v10",d_aux_vars(d_nprofiles)%v10
 write (0,*) "d_aux_vars(d_nprofiles) % surft",d_aux_vars(d_nprofiles)%surft
 write (0,*) "d_aux_vars(d_nprofiles) % satzen",d_aux_vars(d_nprofiles)%satzen
 write (0,*) "d_aux_vars(d_nprofiles) % satazi",d_aux_vars(d_nprofiles)%satazi
+endif
 
          call da_rttov_ad (inst, nchanl, d_nprofiles, d_con_vars, &
                            d_aux_vars, d_con_vars_ad, d_tb )
@@ -372,20 +375,21 @@ write (0,*) "d_aux_vars(d_nprofiles) % satazi",d_aux_vars(d_nprofiles)%satazi
          call da_rttov_ad (inst, nchanl, nprofiles, con_vars, &
                            aux_vars, con_vars_ad, tb )
       end if
-
+if (.false.) then
 write (0,*) "con_vars_ad(1) % t(:)",con_vars_ad(1) % t(:)
 write (0,*) "con_vars_ad(1) % q(:)",con_vars_ad(1) % q(:)
 write (0,*) "con_vars_ad(1) % ps",con_vars_ad(1) % ps
 write (0,*) "con_vars_ad(nprofiles) % t(:)",con_vars_ad(nprofiles) % t(:)
 write (0,*) "con_vars_ad(nprofiles) % q(:)",con_vars_ad(nprofiles) % q(:)
 write (0,*) "con_vars_ad(nprofiles) % ps",con_vars_ad(nprofiles) % ps
-do iprof=1,nprofiles
-  write (0,*) "con_vars_ad(iprof) % t(1)",con_vars_ad(iprof) % t(1)
-  write (0,*) "con_vars_ad(iprof) % q(1)",con_vars_ad(iprof) % q(1)
-  write (0,*) "con_vars_ad(iprof) % t(num_levs)",con_vars_ad(iprof) % t(num_levs)
-  write (0,*) "con_vars_ad(iprof) % q(num_levs)",con_vars_ad(iprof) % q(num_levs)
-  write (0,*) "con_vars_ad(iprof) % ps",con_vars_ad(iprof) % ps
-end do
+!do iprof=1,nprofiles
+!  write (0,*) iprof,"con_vars_ad(iprof) % t(1)",con_vars_ad(iprof) % t(1)
+!  write (0,*) iprof,"con_vars_ad(iprof) % q(1)",con_vars_ad(iprof) % q(1)
+!  write (0,*) iprof,"con_vars_ad(iprof) % t(num_levs)",con_vars_ad(iprof) % t(num_levs)
+!  write (0,*) iprof,"con_vars_ad(iprof) % q(num_levs)",con_vars_ad(iprof) % q(num_levs)
+!  write (0,*) iprof,"con_vars_ad(iprof) % ps",con_vars_ad(iprof) % ps
+!end do
+endif
 
       ! adjoint of convert to hPa
 
@@ -418,7 +422,14 @@ end do
          end do
       end do
 
+write (0,*) iprof,"sod con_vars_ad(iprof)% t",con_vars_ad(iprof)% t
       if (interp_new) then
+         allocate(temp_t(num_levs,nprofiles))
+         do iprof=1,nprofiles
+            temp_t(:,iprof) = con_vars_ad(iprof)% t(:)
+         end do
+write (0,*) "temp_t(:,1)",temp_t(:,1)
+write (0,*) "temp_t(:,2)",temp_t(:,2)
          call da_interp_lin_3d_adj_new( jo_grad_x%t, xp, &
             iv%instid(inst)%loc_i, &
             iv%instid(inst)%loc_j, &
@@ -429,8 +440,13 @@ end do
             iv%instid(inst)%loc_dxm, &
             iv%instid(inst)%loc_dym, &
             iv%instid(inst)%loc_dzm, &
-            con_vars_ad(iprof)% t, max_ob_levels, num_levs,nprofiles )
-
+            temp_t, max_ob_levels, num_levs,nprofiles )
+write (0,*) "SUM(jo_grad_x%t)",SUM(jo_grad_x%t)
+         deallocate(temp_t)
+         allocate(temp_q(num_levs,nprofiles))
+         do iprof=1,nprofiles
+            temp_q(:,iprof) = con_vars_ad(iprof)% q(:)
+         end do
          call da_interp_lin_3d_adj_new( jo_grad_x%q, xp, &
             iv%instid(inst)%loc_i, &
             iv%instid(inst)%loc_j, &
@@ -441,8 +457,15 @@ end do
             iv%instid(inst)%loc_dxm, &
             iv%instid(inst)%loc_dym, &
             iv%instid(inst)%loc_dzm, &
-            con_vars_ad(iprof)% q, max_ob_levels, num_levs,nprofiles )
+            temp_q, max_ob_levels, num_levs,nprofiles )
+write (0,*) "SUM(jo_grad_x%q)",SUM(jo_grad_x%q)
+         deallocate(temp_q)
 
+         allocate(temp_ps(nprofiles))
+         do iprof=1,nprofiles
+            temp_ps(iprof) = con_vars_ad(iprof)% ps
+         end do
+write (0,*) "temp_ps", temp_ps
          call da_interp_lin_2d_adj_new(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
             xp%jme, &
             iv%instid(inst)%loc_i, &
@@ -451,7 +474,9 @@ end do
             iv%instid(inst)%loc_dy, &
             iv%instid(inst)%loc_dxm, &
             iv%instid(inst)%loc_dym, &
-            con_vars_ad(iprof)% ps,nprofiles)
+            temp_ps,nprofiles)
+write (0,*) "SUM(jo_grad_x%psfc)",SUM(jo_grad_x%psfc)
+         deallocate(temp_ps)
       else
 
          do iprof=1,nprofiles
@@ -465,18 +490,29 @@ end do
             dy = iv%instid(inst)%rad(iprof)%loc%dy
             dxm = iv%instid(inst)%rad(iprof)%loc%dxm
             dym = iv%instid(inst)%rad(iprof)%loc%dym
+         do k=1, num_levs
+            zk(k)  =  iv%instid(inst)%rad(iprof)%zk(k) 
+         enddo
+
+write (0,*) "iprof",iprof
+write (0,*) "i,j,dx,dy,dxm,dym",i,j,dx,dy,dxm,dym
+write (0,*) "zk",zk
 
             ! [4.3] Interpolate horizontally from ob to grid:
-
+write (0,*) iprof,"con_vars_ad(iprof)% t",con_vars_ad(iprof)% t
             call da_interp_lin_3d_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
-               con_vars_ad(iprof)% t, max_ob_levels, zk, num_levs )
-
+               con_vars_ad(iprof)% t, num_levs, zk, num_levs )
+!               con_vars_ad(iprof)% t, max_ob_levels, zk, num_levs )
+write (0,*) "SUM(jo_grad_x%t)",SUM(jo_grad_x%t)
             call da_interp_lin_3d_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
-               con_vars_ad(iprof)% q, max_ob_levels, zk, num_levs )
+               con_vars_ad(iprof)% q, num_levs, zk, num_levs )
+!               con_vars_ad(iprof)% q, max_ob_levels, zk, num_levs )
+write (0,*) "SUM(jo_grad_x%q)",SUM(jo_grad_x%q)
 
+write(0,*) iprof, "con_vars_ad(iprof)% ps",con_vars_ad(iprof)% ps
             call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
                xp%jme, i, j, dx, dy, dxm, dym, con_vars_ad(iprof)% ps)
-
+write (0,*) "SUM(jo_grad_x%psfc)",SUM(jo_grad_x%psfc)
             deallocate (con_vars(iprof) % t)
             deallocate (con_vars(iprof) % q)
             deallocate (con_vars_ad(iprof) % t)

@@ -102,6 +102,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
            iv%instid(inst)%loc_dym, &
            iv%instid(inst)%loc_dzm, &
            model_t, max_ob_levels, num_levs, nprofiles)
+write(0,*) "SUM(model_t)",SUM(model_t)
 
          call da_interp_lin_3d_new( xa%q, xp, &
            iv%instid(inst)%loc_i, &
@@ -114,12 +115,14 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
            iv%instid(inst)%loc_dym, &
            iv%instid(inst)%loc_dzm, &
            model_q, max_ob_levels, num_levs, nprofiles )
+write(0,*) "SUM(model_q)",SUM(model_q)
 
          call da_interp_lin_2d_new( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
             iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
             iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
             model_psfc,nprofiles )
+write(0,*) "model_psfc",model_psfc
       end if
 
       do iprof= 1, nprofiles           ! loop for pixel
@@ -151,8 +154,10 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
             call da_interp_lin_3d( xa%t, xp, i, j, dx, dy, dxm, dym, &
                               model_t, max_ob_levels, zk, num_levs )
+write(0,*) "SUM(model_t)",SUM(model_t)
             call da_interp_lin_3d( xa%q, xp, i, j, dx, dy, dxm, dym, &
                               model_q, max_ob_levels, zk, num_levs )
+write(0,*) "SUM(model_q)",SUM(model_q)
          end if
 
          do k=1, num_levs
@@ -175,13 +180,14 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
             call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
+write(0,*) "model_psfc",model_psfc
          end if
-if (iprof ==1) then
-   write (0,*) "xa % psfc",xa % psfc
-   write (0,*) "xp%ims, xp%ime, xp%jms, xp%jme",xp%ims, xp%ime, xp%jms, xp%jme
-   write (0,*) "i, j, dx, dy, dxm, dym",i, j, dx, dy, dxm, dym
-   write (0,*) "model_psfc",model_psfc
-end if
+!if (iprof ==1) then
+!   write (0,*) "xa % psfc",xa % psfc
+!   write (0,*) "xp%ims, xp%ime, xp%jms, xp%jme",xp%ims, xp%ime, xp%jms, xp%jme
+!   write (0,*) "i, j, dx, dy, dxm, dym",i, j, dx, dy, dxm, dym
+!   write (0,*) "model_psfc",model_psfc
+!end if
 
          model_psfc = 0.01*model_psfc  ! convert to hPa 
 
@@ -417,6 +423,7 @@ end if
             end if
          end do
 
+if (.false.) then
 write (0,*) "d_con_vars(1)%nlevels",d_con_vars(1)%nlevels
 write (0,*) "d_aux_vars(1) % surftype",d_aux_vars(1) % surftype
 write (0,*) "d_con_vars_tl(1) % ps",d_con_vars_tl(1)%ps
@@ -454,7 +461,7 @@ write (0,*) "d_aux_vars_tl(d_nprofiles) % v10",d_aux_vars_tl(d_nprofiles)%v10
 write (0,*) "d_aux_vars_tl(d_nprofiles) % surft",d_aux_vars_tl(d_nprofiles)%surft
 write (0,*) "d_aux_vars_tl(d_nprofiles) % satzen",d_aux_vars_tl(d_nprofiles)%satzen
 write (0,*) "d_aux_vars_tl(d_nprofiles) % satazi",d_aux_vars_tl(d_nprofiles)%satazi
-
+endif
 
          call da_rttov_tl (inst, nchanl, d_nprofiles, d_con_vars, &
                            d_aux_vars, d_con_vars_tl, d_aux_vars_tl, d_tb )

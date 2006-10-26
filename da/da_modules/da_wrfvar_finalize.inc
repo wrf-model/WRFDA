@@ -37,6 +37,9 @@ subroutine da_wrfvar_finalize
          call da_free_unit(alpha_corr_unit1(i))
          call da_free_unit(alpha_corr_unit2(i))
       end do
+      do i=1,num_sound_diag
+         call da_free_unit(sound_diag_unit(i))
+      end do
    end if
 
    do i=unit_start,unit_end

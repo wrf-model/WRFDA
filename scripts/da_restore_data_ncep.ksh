@@ -69,7 +69,7 @@ while test $LOCAL_DATE -le $END_DATE; do
       echo "File $DIR/$FILE exists, skipping"
    fi
 
-   LOCAL_DATE=`$WRFVAR_DIR/buil/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
+   LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
 done
 
 date

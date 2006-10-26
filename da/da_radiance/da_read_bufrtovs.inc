@@ -85,6 +85,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local
    integer :: lnbufr
+   integer :: iprof
 
    call da_trace_entry("da_read_bufrtovs")
 
@@ -336,7 +337,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          p => p%next
          nullify (p%next)
          if (num_tovs_local == max_num_rad) then
-            write (0,*) "Hit maximum number of obs", max_num_rad
+            write(unit=errmsg(1),fmt='(A,I10)') &
+               "Reached maximum number of obs", max_num_rad
+            call da_warning(__FILE__,__LINE__,errmsg(1:1))
             exit obs
          end if
       end do
@@ -371,33 +374,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    p => head
    ! do while ( associated(p) )
 
-   if (interp_new) then
-      allocate(iv%instid(inst)%loc_i(num_tovs_local))
-      allocate(iv%instid(inst)%loc_j(num_tovs_local))
-      allocate(iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,num_tovs_local))
-      allocate(iv%instid(inst)%loc_dx(num_tovs_local))
-      allocate(iv%instid(inst)%loc_dy(num_tovs_local))
-      allocate(iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,num_tovs_local))
-      allocate(iv%instid(inst)%loc_dxm(num_tovs_local))
-      allocate(iv%instid(inst)%loc_dym(num_tovs_local))
-      allocate(iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,num_tovs_local))
-   end if
-
    do i = 1, num_tovs_local
       inst = p%sensor_index
       nread(inst) = nread(inst) + 1
 
       iv%instid(inst)%rad(nread(inst))%info = p%rad%info
       iv%instid(inst)%rad(nread(inst))%loc  = p%rad%loc
-      if (interp_new) then
-         iv%instid(inst)%loc_i(i)   = p%rad%loc%i
-         iv%instid(inst)%loc_j(i)   = p%rad%loc%j
-         iv%instid(inst)%loc_dx(i)  = p%rad%loc%dx
-         iv%instid(inst)%loc_dy(i)  = p%rad%loc%dy
-         iv%instid(inst)%loc_dxm(i) = p%rad%loc%dxm
-         iv%instid(inst)%loc_dym(i) = p%rad%loc%dym
-         ! z done in da_get_innov_vector_rad
-      end if
       iv%instid(inst)%rad(nread(inst))%ifgat  =  p%ifgat
       iv%instid(inst)%rad(nread(inst))%landsea_mask = p%rad%landsea_mask
       !   iv%instid(inst)%rad(nread(inst))%scanline
@@ -421,7 +403,32 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       deallocate ( current )
 
    end do
+
    deallocate (nread)
+
+   if (interp_new) then
+      do inst = 1, rtminit_nsensor
+         allocate(iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dx(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dy(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dxm(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dym(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%zk(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         do iprof=1,iv%instid(inst)%num_rad
+            iv%instid(inst)%loc_i(iprof)   = iv%instid(inst)%rad(iprof)%loc%i
+            iv%instid(inst)%loc_j(iprof)   = iv%instid(inst)%rad(iprof)%loc%j
+            iv%instid(inst)%loc_dx(iprof)  = iv%instid(inst)%rad(iprof)%loc%dx
+            iv%instid(inst)%loc_dy(iprof)  = iv%instid(inst)%rad(iprof)%loc%dy
+            iv%instid(inst)%loc_dxm(iprof) = iv%instid(inst)%rad(iprof)%loc%dxm
+            iv%instid(inst)%loc_dym(iprof) = iv%instid(inst)%rad(iprof)%loc%dym
+            ! z done in da_get_innov_vector_rad
+         end do
+      end do
+   end if
 
    ! check if sequential structure has been freed
    !

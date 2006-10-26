@@ -59,7 +59,8 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 
       ENDIF
 
-      IF (trace_use) call da_trace_entry("da_mo_correction")
+! too many
+!      IF (trace_use) call da_trace_entry("da_mo_correction")
 
 ! 1.3 Compute the roughness length based upon season and land use 
 !     -----------------------------------------------------------
@@ -197,6 +198,6 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 
       ENDIF
 
-   IF (trace_use) call da_trace_exit("da_mo_correction")
+!   IF (trace_use) call da_trace_exit("da_mo_correction")
 
 END FUNCTION da_mo_correction

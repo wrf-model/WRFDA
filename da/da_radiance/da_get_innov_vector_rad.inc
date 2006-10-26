@@ -170,6 +170,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                iv%instid(inst)%zk(k,n) = zk(k)
             end if
          enddo
+write (0,*) n,"zk",zk
 
          ! [1.2] Interpolate horizontally to ob:
 
