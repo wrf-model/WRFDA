@@ -18,7 +18,7 @@ subroutine da_wrfvar_interface ( grid, config_flags )
       ! Model layer modules
       USE module_model_constants
 
-      USE da_constants
+      USE da_control
       USE da_define_structures
       USE da_setup_structures
       USE da_test

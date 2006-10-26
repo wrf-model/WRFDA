@@ -1,7 +1,7 @@
 module da_reporting
 
    use module_wrf_error
-   use da_constants
+   use da_control
 
    implicit none
 

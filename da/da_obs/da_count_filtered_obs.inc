@@ -70,7 +70,7 @@ subroutine da_count_filtered_obs(ounit, &
    call da_get_unit(iunit)
 !  Loop over all data files
 !--------------------------
-file_number: DO files = 0, numb_procs-1
+file_number: DO files = 0, num_procs-1
    write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.',files  
    open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
    if(iost /= 0) &

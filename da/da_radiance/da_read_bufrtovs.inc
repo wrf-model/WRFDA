@@ -11,7 +11,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,lnbufr,infile)
    !               and deallocate sequential data structure
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
 
    implicit none
 

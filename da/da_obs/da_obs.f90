@@ -1,6 +1,6 @@
 module da_obs
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_airep
    use da_gpspw
@@ -52,7 +52,6 @@ CONTAINS
 #include "da_read_bufr_obs.inc"
 #include "da_scan_bufr_obs.inc"
 #include "da_count_filtered_obs.inc"
-#include "da_deallocate_obs.inc"
 #include "da_final_write_obs.inc"
 #include "da_final_write_y.inc"
 #include "da_read_y_unit.inc"

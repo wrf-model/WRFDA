@@ -1,4 +1,4 @@
-module da_constants
+module da_control
 
    !--------------------------------------------------------------------------
    ! PURPOSE: Common reference point for constants.
@@ -163,7 +163,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: iv_rad_binary_unit = 15
    integer, parameter :: fgat_rad_unit = 22
    INTEGER, PARAMETER :: cov_unit = 25 ! Covariances unit
-   INTEGER, PARAMETER :: be_unit = 34    ! Unit number for be input.
    INTEGER, PARAMETER :: gen_be_iunit = 30
    INTEGER, PARAMETER :: gen_be_ounit = 31
 
@@ -413,7 +412,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER     :: max_Radar = 10000    ! Maximum Number of Radar obs.
 
    integer                :: num_procs, &         ! Number of total processors.
-                             numb_procs, &         ! Alternative name
                              myproc                ! My processor ID.
    logical                :: rootproc             ! Am I the root processor
 
@@ -557,4 +555,4 @@ CONTAINS
 #include "da_find_fft_trig_funcs.inc"
 #include "da_gamma.inc"
 
-end module da_constants
+end module da_control

@@ -13,7 +13,7 @@ program gen_be_ensmean
 #define iargc ipxfargc
 #endif
 
-   use da_constants
+   use da_control
    use da_tracing
 
    implicit none

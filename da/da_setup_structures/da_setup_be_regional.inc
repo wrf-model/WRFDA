@@ -66,6 +66,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    real, allocatable           :: regcoeff2(:,:)
    real, allocatable           :: regcoeff3(:,:,:)
    real                        :: avg,avg2,avg3
+   integer                     :: be_unit
 
    IF (trace_use) call da_trace_entry("da_setup_be_regional")
 
@@ -97,6 +98,9 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    ix = xb % mix
    jy = xb % mjy
    kz = xb % mkz
+
+   call da_get_unit(be_unit)
+   open(unit=be_unit,FILE="be.dat", status="old",form="unformatted")
 
    rewind (be_unit)
    read(be_unit) ni, nj, nk
@@ -451,6 +455,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    ! 6.2 Close the be unit
 
    close(be_unit)
+   call da_free_unit(be_unit)
 
    ! 7.0 Apply empirical and recursive filter rescaling factor:
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

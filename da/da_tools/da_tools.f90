@@ -6,7 +6,7 @@ MODULE da_tools
    
    USE module_bc
 
-   USE da_constants
+   USE da_control
    USE da_define_structures
    USE lapack
    use da_reporting

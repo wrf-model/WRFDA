@@ -56,11 +56,9 @@ subroutine da_wrfvar_init1( no_init1 )
 
 #ifdef DM_PARALLEL
    call MPI_COMM_SIZE(MPI_COMM_WORLD, num_procs, ierr)
-   call MPI_COMM_SIZE(MPI_COMM_WORLD, numb_procs, ierr)
    call MPI_COMM_RANK(MPI_COMM_WORLD, myproc, ierr )
 #else
    num_procs = 1
-   numb_procs = 1
    myproc = 0
 #endif
 
@@ -82,7 +80,7 @@ subroutine da_wrfvar_init1( no_init1 )
    call initial_config
 #endif
 
-   ! Copy namelist variables to da_constants
+   ! Copy namelist variables to da_control
 
 #define SOURCE_RECORD model_config_rec%
 #define DEST_RECORD

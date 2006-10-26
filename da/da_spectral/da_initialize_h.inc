@@ -2,7 +2,7 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
                             wsave, lon, sinlon, coslon, lat, sinlat, coslat, &
                             int_wgts, alp )
 
-   use da_constants
+   use da_control
 
    implicit none
 

@@ -8,7 +8,7 @@ module da_test
 !     HISTORY: 01/07/2000 - Creation.              Dale Barker
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_physics
    use da_vtox_transforms

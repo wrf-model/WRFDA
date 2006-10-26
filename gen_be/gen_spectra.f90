@@ -1,6 +1,6 @@
 program gen_spectra
 
-   use da_constants
+   use da_control
    use da_spectral
    use da_tracing
 

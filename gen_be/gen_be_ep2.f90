@@ -14,7 +14,7 @@ program gen_be_ep2
 #define iargc ipxfargc
 #endif
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 

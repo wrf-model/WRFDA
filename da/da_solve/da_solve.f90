@@ -14,7 +14,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
    ! Model layer modules
    USE module_model_constants
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_setup_structures
    use da_test
@@ -304,7 +304,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
    deallocate ( cvt )
    deallocate ( xhat )
-   call da_deallocate_obs(iv)
+   call da_deallocate_observations(iv)
    call da_deallocate_y( re )
    call da_deallocate_y( y )
 

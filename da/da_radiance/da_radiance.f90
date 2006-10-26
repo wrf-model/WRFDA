@@ -9,7 +9,7 @@ module da_radiance
 !
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics

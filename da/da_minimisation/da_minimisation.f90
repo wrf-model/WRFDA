@@ -4,7 +4,7 @@ module da_minimisation
    ! PURPOSE: Collection of routines associated with minimisation. 
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_vtox_transforms
    use da_obs

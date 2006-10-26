@@ -1,6 +1,6 @@
 MODULE da_gpspw
 
-   USE da_constants
+   USE da_control
    USE da_define_structures
    USE da_interpolation
    USE da_statistics

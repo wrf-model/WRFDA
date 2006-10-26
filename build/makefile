@@ -94,7 +94,7 @@ blas : $(BLAS)/libblas.a
 
 lapack : blas $(LAPACK)/liblapack.a
 
-fftpack5 : da_constants.o $(FFTPACK5)/libfftpack5.a
+fftpack5 : $(FFTPACK5)/libfftpack5.a
 
 bufr : $(BUFR)/libbufr.a
 

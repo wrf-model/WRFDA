@@ -166,7 +166,7 @@ if test ! -f $DA_ANALYSIS; then
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
    ln -sf $DA_FIRST_GUESS	 fg01
    ln -sf $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
-   ln -sf $DA_BACK_ERRORS   fort.34
+   ln -sf $DA_BACK_ERRORS        be.dat
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then

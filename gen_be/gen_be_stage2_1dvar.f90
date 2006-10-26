@@ -9,7 +9,7 @@ program gen_be_stage2_1dvar
 ! Creation (from gen_be_stage_2)   Dale Barker       01/07/2005.
 !---------------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 

@@ -32,7 +32,7 @@ WRFVAR_OBJS        =	da_par_util.o           \
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_constants.o		\
+			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
@@ -143,7 +143,7 @@ da_be4_scale_length: da_be4_scale_length.o
 	$(LD) -o $@.exe $@.o
 
 da_scale_length: da_scale_length.o
-	$(LD) -o $@.exe $@.o da_constants.o
+	$(LD) -o $@.exe $@.o da_control.o
 
 da_diagnostics: da_diagnostics.o
 	$(LD) -o $@.exe $@.o

@@ -25,7 +25,7 @@ MODULE da_wrfvar_esmf_super
 
    USE da_wrfvar_io
 
-   USE da_constants
+   USE da_control
 
    IMPLICIT NONE
 

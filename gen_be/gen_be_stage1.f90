@@ -10,7 +10,7 @@ program gen_be_stage1
 !
 !----------------------------------------------------------------------
 !
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 

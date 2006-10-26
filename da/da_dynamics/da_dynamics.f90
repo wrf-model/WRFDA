@@ -4,7 +4,7 @@ MODULE da_dynamics
    !  PURPOSE: Contains routines to calculate dynamical quantities.
    !---------------------------------------------------------------------------
 
-   USE da_constants
+   USE da_control
    USE da_define_structures
    USE da_ffts
    USE da_statistics

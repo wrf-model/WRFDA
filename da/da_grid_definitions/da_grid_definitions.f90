@@ -4,7 +4,7 @@ MODULE da_grid_definitions
    ! PURPOSE: Calculation of analysis grid variables:
    !---------------------------------------------------------------------------
    
-   USE da_constants
+   USE da_control
    USE da_define_structures     ! For xpose_type.
    
    IMPLICIT NONE

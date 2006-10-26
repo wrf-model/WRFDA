@@ -1,6 +1,6 @@
 program gen_be_stage4_global
 
-   use da_constants
+   use da_control
    use be_spectral
    use da_tracing
 

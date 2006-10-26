@@ -33,8 +33,8 @@ subroutine da_final_write_y( iv, y )
       file_prefix='unpert_obs'
    end if
 
-   allocate ( filename(0:numb_procs-1) )
-   DO k = 0,numb_procs-1
+   allocate ( filename(0:num_procs-1) )
+   DO k = 0,num_procs-1
    write(unit=filename(k),fmt ='(a,a,i3.3)')trim(file_prefix),'.',k
    ENDDO
 
@@ -58,7 +58,7 @@ subroutine da_final_write_y( iv, y )
    if (rootproc .and. num_obs > 0) then
       write(ounit,'(a20,i8)')'synop', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
          call da_read_y_unit(trim(filename(k)),ounit,num_obs,'synop',5)
       ENDDO
    endif
@@ -76,7 +76,7 @@ subroutine da_final_write_y( iv, y )
    if (rootproc .and. num_obs > 0) then
       write(ounit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
          call da_read_y_unit(trim(filename(k)),ounit,num_obs,'metar',5)    
       ENDDO
    endif
@@ -95,7 +95,7 @@ subroutine da_final_write_y( iv, y )
    if (rootproc .and. num_obs > 0) then
       write(ounit,'(a20,i8)')'ships', num_obs  
       num_obs = 0
-      DO k = 0,numb_procs-1
+      DO k = 0,num_procs-1
          call da_read_y_unit(trim(filename(k)),ounit,num_obs,'ships',5)
       ENDDO
    endif
@@ -114,7 +114,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'geoamv', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'geoamv',6)
     ENDDO
     endif
@@ -131,7 +131,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'polaramv', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'polaramv',8) 
     ENDDO
     endif
@@ -149,7 +149,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'gpspw', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'gpspw',5)     
     ENDDO
     endif
@@ -167,13 +167,13 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'sound', sound_num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'sound',5)     
     ENDDO
 !  writing Sonde_sfc  
     write(ounit,'(a20,i8)')'sonde_sfc', sound_num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'sonde_sfc',9)
     ENDDO
     endif
@@ -191,7 +191,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'airep', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'airep',5)   
     ENDDO
     endif
@@ -208,7 +208,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'pilot', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'pilot',5)    
     ENDDO
     endif
@@ -225,7 +225,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'ssmir', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'ssmir',5)    
     ENDDO
     endif
@@ -242,7 +242,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'ssmiT', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'ssmiT',5)    
     ENDDO
     endif
@@ -259,7 +259,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'satem', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'satem',5)    
     ENDDO
     endif
@@ -276,7 +276,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'ssmt1', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'ssmt1',5)    
     ENDDO
     endif
@@ -293,7 +293,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'ssmt2', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'ssmt2',5)    
     ENDDO
     endif
@@ -310,7 +310,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'qscat', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'qscat',5)    
     ENDDO
     endif
@@ -327,7 +327,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'profiler', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'profiler',8)    
     ENDDO
     endif
@@ -346,7 +346,7 @@ subroutine da_final_write_y( iv, y )
    if (rootproc .and. num_obs > 0) then
       write(ounit,'(a20,i8)')'buoy', num_obs  
       num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'buoy',4)    
     ENDDO
    endif
@@ -364,7 +364,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'bogus', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'bogus',5)    
     ENDDO
     endif
@@ -381,7 +381,7 @@ subroutine da_final_write_y( iv, y )
     if(rootproc .and. num_obs > 0) then
     write(ounit,'(a20,i8)')'airsr', num_obs  
     num_obs = 0
-    DO k = 0,numb_procs-1
+    DO k = 0,num_procs-1
     call da_read_y_unit(trim(filename(k)),ounit,num_obs,'airsr',5)    
     ENDDO
     endif
@@ -406,7 +406,7 @@ subroutine da_final_write_y( iv, y )
          write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
         write(ounit,'(a20,i8)')  ob_name,num_obs
         num_obs = 0
-        DO kk = 0,numb_procs-1
+        DO kk = 0,num_procs-1
         call da_read_y_unit(trim(filename(kk)),&
           ounit,num_obs,trim(ob_name),len(trim(ob_name)))    
         ENDDO

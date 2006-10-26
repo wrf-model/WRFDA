@@ -1,6 +1,6 @@
 module be_spectral
 
-   use da_constants
+   use da_control
    use fftpack5
    use da_tracing
 
