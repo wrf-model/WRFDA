@@ -67,7 +67,7 @@ if (-d /data7/da/bray/blas/blas_${FC}) then
    setenv BLAS /data7/da/bray/blas/blas_${FC}
 endif
 if (-d /data7/da/bray/lapack/lapack_${FC}) then
-   setenv lapack /data7/da/bray/lapack/lapack_${FC}
+   setenv LAPACK /data7/da/bray/lapack/lapack_${FC}
 endif
 if (-d /data7/da/bray/fftpack5/fftpack5_${FC}) then
    setenv FFTPACK5 /data7/da/bray/fftpack5/fftpack5_${FC}
@@ -243,6 +243,7 @@ if ($FC == "g95" ) then
    setenv G95_UNBUFFERED_ALL T
    setenv G95_MEM_INIT       0x00
    setenv G95_MEM_MAXALLOC   F
+   setenv G95_MEM_SEGEMENTS  0
 endif
 
 echo
