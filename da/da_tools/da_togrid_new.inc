@@ -5,10 +5,10 @@ subroutine da_togrid_new (x, ib, ie, i, dx, dxm)
 
    implicit none
 
-   real,                     intent(in)  :: x(:,:)
-   integer,                  intent(in)  :: ib, ie
-   real,                     intent(out) :: dx(:,:), dxm(:,:)
-   integer,                  intent(out) :: i(:,:)
+   real,    intent(in)  :: x(:,:)
+   integer, intent(in)  :: ib, ie
+   real,    intent(out) :: dx(:,:), dxm(:,:)
+   integer, intent(out) :: i(:,:)
 
    if (trace_use) call da_trace_entry("da_togrid_new")
 

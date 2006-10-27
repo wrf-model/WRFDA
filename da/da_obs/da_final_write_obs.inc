@@ -246,7 +246,6 @@ subroutine da_final_write_obs( ob, iv, re )
          call da_read_omb_tmp(filename(k),iunit,num_obs,'ssmiT',5)    
       ENDDO
    endif
-call da_oi(__FILE__,__LINE__)
 
    !------------------------------------------------------------------
    ! [11] writing SATEM  
