@@ -112,7 +112,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
       use_Eos_AmsuaObs     = .FALSE.
       use_Eos_radObs       = .FALSE.
       use_HsbObs           = .FALSE.
-      Use_Obsgts           = .FALSE.
+      Use_Obsgts           = .TRUE.
       Use_Radiance         = .FALSE.
    endif
 
