@@ -19,12 +19,12 @@ subroutine da_biasprep(inst,ob,iv)
    TYPE(bias)  :: radbias
    integer     :: biasprep_unit
 
-   if (trace_use) call da_trace_entry("da_biasprep")
-
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
 
    if ( num_rad < 1 ) return
+
+   if (trace_use) call da_trace_entry("da_biasprep")
 
 #ifdef DM_PARALLEL
     call MPI_COMM_RANK( MPI_COMM_WORLD, myproc, ierr )

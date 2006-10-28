@@ -46,7 +46,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
    INTEGER            :: inst, num_rad, nchan, iprof
    INTEGER            :: nfrequencies, nchannels, nbtout
-   REAL,    pointer   :: zk(:), polar(:)
+   REAL,    pointer   :: polar(:)
    REAL,    pointer   :: pres(:)
    real,    pointer   :: tb(:,:)
    logical            :: amsua, amsub, mhs, ssmi
@@ -88,7 +88,6 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       nlevels  = iv%instid(inst)%nlevels
       nchan    = iv%instid(inst)%nchan
 
-      allocate (zk(1:nlevels), stat= alloc_status(1) )
       allocate (pres(1:nlevels), stat= alloc_status(2) )
       allocate (tb(num_rad,nchan), stat= alloc_status(3) )
       allocate (con_vars(num_rad), stat= alloc_status(4) )
@@ -98,7 +97,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       allocate (polar(nchan), stat= alloc_status(8) )
       if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
-            (/"Cannot Allocate mem zk, pres tb con_vars aux_vars"/))
+            (/"Cannot Allocate mem pres tb con_vars aux_vars"/))
       end if
 
       pres(1:nlevels) = coefs(inst) % ref_prfl_p(1:nlevels)
@@ -157,26 +156,25 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          enddo
 
          do k=1, nlevels
-            zk(k)=missing_r
+            iv%instid(inst)%rad(n)%zk(k)=missing_r
             IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
-               call da_to_zk(pres(k), v_p, xp, v_interp_p, zk(k))
+               call da_to_zk(pres(k), v_p, xp, v_interp_p, iv%instid(inst)%rad(n)%zk(k))
             END IF
-            iv%instid(inst)%rad(n)%zk(k) = zk(k)
          enddo
          if (interp_new) then
-            iv%instid(inst)%zk(:,n) = zk(:)
+            iv%instid(inst)%zk(:,n) = iv%instid(inst)%rad(n)%zk(:)
          end if
 
 
          ! [1.2] Interpolate horizontally to ob:
 
-         call da_interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
-                           model_t, max_ob_levels, zk, nlevels )
-         call da_interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
-                           model_q, max_ob_levels, zk, nlevels )
+         call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
+                           model_t, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+         call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
+                           model_q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
 
          do k=1, nlevels
-            IF ( zk(k) <= 0.0 ) THEN
+            IF ( iv%instid(inst)%rad(n)%zk(k) <= 0.0 ) THEN
                model_t(k) = coefs(inst) % ref_prfl_t(k,gas_id_watervapour)  ! outside model level
                model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
@@ -477,7 +475,6 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          end if
       end do       !  end loop for pixels
 
-      deallocate (zk)
       deallocate (pres)
       deallocate (tb)
       deallocate (con_vars)
