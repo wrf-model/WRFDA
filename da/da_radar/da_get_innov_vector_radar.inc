@@ -137,7 +137,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       ! [3.0] Calculate rv, rf at OBS location and initialise components of &
       ! innovation vector:
 
-      if(fg_format == 1) then
+      if(fg_format == fg_format_wrf) then
          call da_latlon_to_ij(map_info, &
                            iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                            iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )

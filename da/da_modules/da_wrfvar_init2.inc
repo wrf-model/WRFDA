@@ -11,6 +11,24 @@ subroutine da_wrfvar_init2
 
    IF (trace_use) call da_trace_entry("da_wrfvar_init2")
 
+   if (analysis_type(1:6) == "VERIFY" .or. analysis_type(1:6) == "verify") then
+      anal_type_verify=.true.
+   else
+      anal_type_verify=.false.
+   end if
+
+   if (analysis_type(1:8) == "RANDOMCV" .or. analysis_type(1:8) == "randomcv") then
+      anal_type_randomcv=.true.
+   else
+      anal_type_randomcv=.false.
+   end if
+
+   if (analysis_type(1:6) == "QC-OBS" .or. analysis_type(1:6) == "qc-obs") then
+      anal_type_qcobs=.true.
+   else
+      anal_type_qcobs=.false.
+   end if
+
    !<DESCRIPTION>
    ! Among the configuration variables read from the namelist is
    ! debug_level. This is retrieved using nl_get_debug_level (Registry

@@ -420,7 +420,7 @@ subroutine da_final_write_y( iv, y )
       do inst = 1, iv%num_inst                 ! loop for sensor
          if ( iv%instid(inst)%num_rad < 1 ) cycle
          do k = 1,iv%instid(inst)%nchan        ! loop for channel
-            !  Counting number of obs for channle k
+            !  Counting number of obs for channel k
             num_obs = 0
             do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
                if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
@@ -439,7 +439,7 @@ subroutine da_final_write_y( iv, y )
                      trim(ob_name),len(trim(ob_name)))    
                ENDDO
             endif
-         end do                                  ! end loop for Chanel 
+         end do                                  ! end loop for Channel 
       end do                                   ! end loop for sensor
    END IF
 

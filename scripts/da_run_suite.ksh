@@ -241,7 +241,7 @@ while test $DATE -le $FINAL_DATE; do
    . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $CYCLE_PERIOD
 
    if $RUN_RESTORE_DATA_NCEP; then
-      export RUN_DIR=$EXP_DIR/$DATE/restore_data_ncep
+      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_ncep
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
@@ -254,7 +254,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_RESTORE_DATA_RTOBS; then
-      export RUN_DIR=$EXP_DIR/$DATE/restore_data_rtobs
+      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_rtobs
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
@@ -267,7 +267,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
   
    if $RUN_WRFSI; then
-      export RUN_DIR=$EXP_DIR/$DATE/wrfsi
+      export RUN_DIR=$EXP_DIR/run/$DATE/wrfsi
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $RUN_DIR
@@ -280,7 +280,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_WPS; then
-      export RUN_DIR=$EXP_DIR/$DATE/wps
+      export RUN_DIR=$EXP_DIR/run/$DATE/wps
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
@@ -293,7 +293,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_REAL; then
-      export RUN_DIR=$EXP_DIR/$DATE/real
+      export RUN_DIR=$EXP_DIR/run/$DATE/real
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
@@ -306,7 +306,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_OBSPROC; then
-      export RUN_DIR=$EXP_DIR/$DATE/obsproc
+      export RUN_DIR=$EXP_DIR/run/$DATE/obsproc
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
@@ -334,7 +334,7 @@ while test $DATE -le $FINAL_DATE; do
          export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       fi
 
-      export RUN_DIR=$EXP_DIR/$DATE/wrfvar
+      export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar
       mkdir -p $RUN_DIR
 
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
@@ -355,7 +355,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_UPDATE_BC; then
-      export RUN_DIR=$EXP_DIR/$DATE/update_bc
+      export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
@@ -369,7 +369,7 @@ while test $DATE -le $FINAL_DATE; do
    fi
 
    if $RUN_WRF; then
-      export RUN_DIR=$EXP_DIR/$DATE/wrf
+      export RUN_DIR=$EXP_DIR/run/$DATE/wrf
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR

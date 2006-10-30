@@ -120,7 +120,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
                      nrej_omb_abs(k) = nrej_omb_abs(k) + 1
                end if
 
-               if (lbiascorr) then
+               if (biascorr) then
                   ! if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(scanpos+1,k)) then
                   if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(1,k)) then
                      iv%instid(inst)%rad(n)%tb(k)%qc  = -1
@@ -143,7 +143,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
                else
                   if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                      ngood(k) = ngood(k) + 1
-                  if (lbiascorr) then
+                  if (biascorr) then
                      ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(scanpos+1,k)
                      if (use_error_factor_rad) then
                         iv%instid(inst)%rad(n)%tb(k)%error =  &

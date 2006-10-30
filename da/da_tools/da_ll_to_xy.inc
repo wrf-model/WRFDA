@@ -20,11 +20,9 @@ subroutine da_ll_to_xy (info, loc, xp, &
    
 !  get the (x, y) coordinates
 
-   if(fg_format == 1) then
+   if(fg_format == fg_format_wrf) then
       call da_latlon_to_ij(map_info, info%lat, info%lon, loc%x, loc%y)
-!  else if(fg_format == 2) then
-!     call llxy (info%lat, info%lon, loc%x, loc%y)
-   else if(fg_format == 3) then
+   else if(fg_format == fg_format_kma) then
       call da_global_ll_to_xy (info%lat, info%lon, loc%x, loc%y)
    else
       call da_llxy (info%lat, info%lon, loc%x, loc%y)
@@ -54,7 +52,7 @@ subroutine da_ll_to_xy (info, loc, xp, &
     ENDIF
    ENDIF
 
-   if(fg_format == 3)then
+   if (fg_format == fg_format_kma) then
       if((loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
          outside = .true.
          return

@@ -139,7 +139,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    call da_pt_to_rho_adj( xb, xa )
    do j=xb%jts,xb%jte
       do i=xb%its,xb%ite
-         if (fg_format == 1) then
+         if (fg_format == fg_format_wrf) then
             mu=0.0
             s1md=0.0
 
@@ -165,7 +165,7 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
                mr_a(k) = mr_a(k) + sdmd*xb%dnw(k)
                xa%q(i,j,k) = xa%q(i,j,k) + mr_a(k)/(1.0 - xb%q(i,j,k))**2
             enddo
-         else if(fg_format == 3)then
+         else if(fg_format == fg_format_kma)then
             do k=xb%kts,xb%kte
                if (k == xb%kte) then
                   coeff = xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)

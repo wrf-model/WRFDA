@@ -12,7 +12,9 @@ subroutine da_proc_sum_count_obs ( count_obs )
    !           which is currently 16. This length should be changed accordingly 
    !           if more observation types are added.
    !----------------------------------------------------------------------------
-  
+
+   implicit none
+   
    integer, parameter:: numvals = 100
 
    TYPE (count_obs_type), INTENT(INOUT)     :: count_obs

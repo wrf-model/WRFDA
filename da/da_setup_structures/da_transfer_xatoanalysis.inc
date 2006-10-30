@@ -27,7 +27,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
    ! Write out analysis in differing formats:
    !---------------------------------------------------------------------------      
 
-   if (fg_format == 1) then
+   if (fg_format == fg_format_wrf) then
       if (write_increments .and. var4d ) then
          write(UNIT=filnam,FMT='(a3,i1)') 'inc',it
          call da_transfer_xatowrftl( grid, config_flags, filnam, &
@@ -48,11 +48,7 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_new_args.inc"
                           )
       endif
-   else if (fg_format == 2) then
-      if(it < max_ext_its) then
-         call da_add_increments(it, grid%xp, grid%xa, grid%xb, xbx)
-      endif
-   else if (fg_format == 3) then
+   else if (fg_format == fg_format_kma) then
       call da_transfer_xatokma( xbx, grid, &
 #include "em_dummy_new_args.inc"
                            )

@@ -1,5 +1,7 @@
 subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
 
+   use da_tools
+
    implicit none
 
    integer, intent(in)  :: nj              ! Number of latitudes.
@@ -91,3 +93,5 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
    call da_free_unit(spec_unit)
 
 end subroutine da_setlegpol_test
+
+

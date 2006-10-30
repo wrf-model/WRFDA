@@ -468,7 +468,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          ! [3.0] Apply Bias Correction 
          !----------------------------------------------------------------
 
-         if (lbiascorr) then
+         if (biascorr) then
             call da_biascorr_rad(inst,nchan,  &
                               ob%instid(inst)%rad(n)%tb, &
                               iv%instid(inst)%rad(n) )
@@ -496,7 +496,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    ! [4.0] Perform QC check
    !------------------------------------------------------------------------
  
-   if (lqc_rad) then
+   if (qc_rad) then
       call da_qc_rad(ob, iv )
    end if
 
@@ -514,7 +514,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    ! 5.0 prepare bias statistics files
    !------------------------------------------
 
-   if (lbiasprep) then
+   if (biasprep) then
       do inst = 1, iv%num_inst
          WRITE(UNIT=stdout,FMT='(A,A)') 'Preparing bias statistics files for ', &
                             trim(iv%instid(inst)%rttovid_string)

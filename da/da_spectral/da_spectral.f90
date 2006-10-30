@@ -2,8 +2,8 @@ module da_spectral
 
    use da_control
    use da_define_structures
-   use da_tools
    use fftpack5
+   use da_tools
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform
@@ -11,12 +11,6 @@ module da_spectral
    !-----------------------------------------------------------------------
 
    implicit none
-
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_COMPLEX   MPI_COMPLEX
-#else
-#define TRUE_MPI_COMPLEX   MPI_DOUBLE_COMPLEX
-#endif
 
    CONTAINS
 

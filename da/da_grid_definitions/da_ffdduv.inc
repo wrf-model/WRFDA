@@ -2,7 +2,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
    !----------------------------------------------------------------------------
    ! When ID =  1
-   ! Convert wind speed (F in m/s) and direction (D in degree 0-360) into MM5
+   ! Convert wind speed (F in m/s) and direction (D in degree 0-360) into
    ! wind (U-V in m/s) components
    !
    ! When ID = -1
@@ -33,7 +33,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
    SELECT CASE (ID)
 
-      CASE (1);
+      CASE (convert_fd2uv);
 
          ! CONVERT WIND MODULE/DIRECTION INTO U/V WIND COMPONENTS ON EARTH,
          ! THEN CONVERT U/V WIND COMPONENTS ON EARTH INTO LAMBERT CONFORMAL OR
@@ -74,7 +74,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
          ! PROJECTIONS CHANGE REQUIRES ONLY A CHANGE OF THE CONE_FACTOR
 
-      CASE (-1);
+      CASE (convert_uv2fd);
 
          XLONRT = XLONC-YLON
 

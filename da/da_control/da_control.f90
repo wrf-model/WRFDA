@@ -20,15 +20,9 @@ module da_control
 
    ! Fundamental constants:
    REAL, PARAMETER    :: pi = 3.1415926535897932346
-#ifdef MM5_CONSTANT
-   REAL, PARAMETER    :: gas_constant = 287.04   ! Value used in MM5.
-   REAL, PARAMETER    :: gas_constant_v = 461.51 ! 
-   REAL, PARAMETER    :: cp = 1004.0             ! Value used in MM5.
-#else
    REAL, PARAMETER    :: gas_constant = 287.     ! Value used in WRF.
    REAL, PARAMETER    :: gas_constant_v = 461.6  ! Value used in WRF.
    REAL, PARAMETER    :: cp = 7.*gas_constant/2. ! Value used in WRF.
-#endif
    REAL, PARAMETER    :: t_kelvin = 273.15
    REAL, PARAMETER       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
@@ -62,7 +56,7 @@ module da_control
    REAL, PARAMETER    :: XLV1=2370., XLF0=.3337E6, XLV0=3.15E6
    REAL, PARAMETER    :: XLS=XLV0-XLV1*273.16+XLF0
 
-   ! Planetary boundary physics (/MM5/physics/pbl_sfc/mrfpbl/mrfpbl.F) constants
+   ! Planetary boundary physics constants
    REAL, PARAMETER         :: k_kar = 0.4    ! Von Karman constant
 
    ! GPS Refractivity constant  
@@ -85,6 +79,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER ::  missing       = -888888
    REAL   , PARAMETER ::  missing_r     = -888888.
    REAL   , PARAMETER ::  Max_StHeight_Diff = 100.
+
+   logical :: anal_type_verify=.false.
+   logical :: anal_type_randomcv=.false.
+   logical :: anal_type_qcobs=.false.
 
    ! WRFVAR Minimisation:
 
@@ -155,6 +153,12 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.2"
    CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.2"
 
+   integer, parameter :: fg_format_wrf = 1
+   integer, parameter :: fg_format_kma = 3
+
+   integer, parameter :: convert_fd2uv = 1
+   integer, parameter :: convert_uv2fd = -1
+
    ! Fortran unit  parameters:
 
    ! stdout, stderr, trace_unit all controlled from namelist
@@ -165,7 +169,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: trace_csv_unit = 8
 
    integer :: y_unit, yp_unit, cost_unit, grad_unit, stats_unit, jo_unit
-   integer :: check_max_iv_unit, rand_unit, omb_unit, filtered_obs_iunit
+   integer :: check_max_iv_unit, rand_unit, omb_unit, filtered_obs_unit
+   integer :: biasprep_unit
+
    integer, parameter :: num_alpha_corr_types = 3
    integer, parameter :: num_sound_diag = 4 
 

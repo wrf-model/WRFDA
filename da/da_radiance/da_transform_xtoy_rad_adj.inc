@@ -33,7 +33,7 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
    
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-   INTEGER            :: inst, num_rad, nchan, unit, n, ios
+   INTEGER            :: inst, nchan, unit, n, ios
    REAL,    pointer   :: pres(:)
    character(len=30)  :: filename
    real,    pointer   :: tb(:,:)

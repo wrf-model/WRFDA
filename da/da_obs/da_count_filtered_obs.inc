@@ -1,23 +1,25 @@
-subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
-
+subroutine da_count_filtered_obs(&
+                    ts0, tlp, ptop, ps0, map, ds, ide, jde,&   
+                    phic, xlonc, truelat1, truelat2)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scans intermediate Filtered Obs file, 
-!           counts various obs type and writes final filtered Obs 
+!           counts various obs type and writes on filtered_obs_unit              
 !-----------------------------------------------------------------------------!
 ! Original code:      10/18/2005            Syed RH Rizvi
 ! Update History:     
 !      06/01/2006  - Updated for MPI run            Syed RH Rizvi
 !      06/01/2006  - Updated for AIRS retrievals    Syed RH Rizvi
+!      10/21/2006  - Update for MPI                 Syed RH Rizvi
+!                    Now writing only header 
 !                     
 !-----------------------------------------------------------------------------!
    implicit none
-   TYPE (xpose_type), intent(in) :: xp           ! Domain decomposition vars.
-   TYPE (xb_type),    intent(in) :: xb           ! First guess structure.
+   REAL,              intent(in) :: ts0, tlp, ptop, ps0, ds
    REAL,              intent(in) :: phic, xlonc, truelat1, truelat2
+   INTEGER,           intent(in) :: map, ide, jde
 !
-   INTEGER                      :: i, j, iost, fm
+   INTEGER                      :: i, k, iost, fm
    TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: outside
    REAL                         :: height_error
    INTEGER                      :: num_synop, &
                                    num_metar, &
@@ -38,15 +40,13 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
                                    num_bogus, &
                                    num_airsr, &
                                    num_others
-
-   INTEGER                        :: iunit, ounit, files, total_obs     
-   CHARACTER (LEN =  80)          :: blank
-   logical                        :: first_time
-   INTEGER                        :: maxnes, numc, idd, nesti, nestj 
-!----------------------------------------------------------------------------!
-  ounit = filtered_obs_iunit 
-   first_time = .true.
 !
+   INTEGER                        :: iunit, files, total_obs     
+   INTEGER                        :: maxnes, numc, idd, nesti, nestj
+   character*20                   :: filename
+!----------------------------------------------------------------------------!
+   if (trace_use) CALL da_trace_entry("da_count_filtered_obs")
+!----------------------------------------------------------------------------!
    num_sound = 0
    num_synop = 0
    num_pilot = 0
@@ -67,20 +67,20 @@ subroutine da_count_filtered_obs(xb, xp, phic, xlonc, truelat1, truelat2)
    num_airsr = 0
    num_others = 0
 !----------------------------------------------------------------------------!
-1000      continue
+   call da_get_unit(iunit)
 !  Loop over all data files
 !--------------------------
 file_number: DO files = 0, num_procs-1
-    iunit = filtered_obs_iunit + files  + 1
-    rewind (iunit)
+   write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.',files  
+   open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
+   if(iost /= 0) &
+   call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
 !  LOOP OVER RECORDS
 !  -----------------
-   reports: &
-   DO
+   reports: DO
 !     READ STATION GENERAL INFO
 !     =============================
-
       READ (iunit, FMT = fmt_info, IOSTAT = iost) &
                    platform%info%platform,    &
                    platform%info%date_char,   &
@@ -93,28 +93,12 @@ file_number: DO files = 0, num_procs-1
       IF (iost /= 0) THEN
           WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
           WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
-         if( first_time) then
          EXIT reports
-         else
-         cycle file_number
-         endif
       ENDIF
-      if( .not. first_time )&
-       write(ounit, FMT = fmt_info)           &
-                   platform%info%platform,    &
-                   platform%info%date_char,   &
-                   platform%info%name,        &
-                   platform%info%levels,      &
-                   platform%info%lat,         &
-                   platform%info%lon,         &
-                   platform%info%elv,         &
-                   platform%info%id
 
 !  Read surface Info
 !  -------------------
       READ (iunit, FMT = fmt_srfc) platform%loc%slp, platform%loc%pw
-      if( .not. first_time )&
-      write(ounit, FMT = fmt_srfc) platform%loc%slp, platform%loc%pw
 
 ! == levels < 1 and not GPSPW, go back to reports
 
@@ -148,33 +132,15 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%t,            &
               platform%each (i)%td,           &
               platform%each (i)%rh
-      if( .not. first_time )&
-       write (UNIT = ounit, FMT = TRIM (fmt_each)) &
-              platform%each (i)%p,            &
-              platform%each (i)%speed,        &
-              platform%each (i)%v,            &
-              platform%each (i)%height,       &
-              platform%each (i)%height_qc,    &
-              height_error,                   &
-              platform%each (i)%t,            &
-              platform%each (i)%td,           &
-              platform%each (i)%rh
+
 
       ENDDO loop_level
-!
-!      call DA_ll_to_xy (platform%info, platform%loc,   &
-!                        xp, outside )
-!
-!      IF(outside) THEN
-!         cycle reports
-!      ENDIF
 
       if( platform%info%levels < 1) then
          if ( fm /= 111 ) then
             cycle reports
          endif
       endif
-
       SELECT CASE(fm)
 
 !        if(index(platform%info%source, 'SYNOP') > 0) then
@@ -313,10 +279,10 @@ loop_level: DO i = 1, platform%info%levels
                  'platform%info%levels=', platform%info%levels
 
       END SELECT
-
-   ENDDO reports
-   ENDDO file_number     !  Loop over all data files
-   if( .not. first_time) return
+   ENDDO reports                  !  Loop over reports              
+   close ( iunit )
+   ENDDO file_number              !  Loop over all data files
+   call da_free_unit (iunit)
 !-------------------------------------------------------------------------------
 !  Write Counts in the Header 
 !-------------------------------------------------------------------------------
@@ -325,16 +291,13 @@ loop_level: DO i = 1, platform%info%levels
              num_geoamv + num_polaramv + num_gpspw + num_gpsref + &
              num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
              num_satem  + num_bogus +  num_airsr + num_others
-      WRITE  (UNIT = ounit, FMT = '(A,I7,A,F8.0,A)')    &
+!
+      WRITE  (UNIT = filtered_obs_unit, FMT = '(A,I7,A,F8.0,A)')    &
       "TOTAL =",total_obs, ", MISS. =",missing_r,","  
-
-! Write missing value 
-! -------------------
-!      WRITE  (UNIT = ounit, FMT = '((A,F8.0),A)') "MISS. =",missing_r,","
 
 ! Write other counts       
 ! -------------------
-      WRITE  (UNIT = ounit, FMT = '(6(A,I7,A))' )    &
+      WRITE  (UNIT = filtered_obs_unit, FMT = '(6(A,I7,A))' )    &
       "SYNOP =",num_synop,", ", &
       "METAR =",num_metar,", ", &
       "SHIP  =",num_ships,", ", &
@@ -358,58 +321,57 @@ loop_level: DO i = 1, platform%info%levels
 ! Write Reference state Info
 ! ---------------------------
 
-        WRITE (UNIT = ounit, FMT = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
         "PHIC  =", phic,", XLONC =", xlonc,", TRUE1 =", truelat1,&
       ", TRUE2 =",truelat2                                                      
-        WRITE (UNIT = ounit, FMT = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
-        "TS0   =",  xb%ts0, ", TLP   =", xb%tlp, &
-      ", PTOP  =",  xb%ptop,", PS0   =",  xb%ps0,"," 
+        WRITE (UNIT = filtered_obs_unit, FMT = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
+        "TS0   =",  ts0, ", TLP   =", tlp, &
+      ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
 
 ! Write Domain Info 
 ! ------------------
 !  Hard wire Following variabless
       maxnes = 1 ; numc = 1 ;  idd = 1
       nesti = 1 ; nestj = 1
-        WRITE (UNIT = ounit, FMT = '(5(A,I7),A)' ) &
-        "IXC   =", xp%ide,", JXC   =", xp%jde,", IPROJ =", xb%map,&
+        WRITE (UNIT = filtered_obs_unit, FMT = '(5(A,I7),A)' ) &
+        "IXC   =", ide   ,", JXC   =", jde   ,", IPROJ =", map,&
         ", IDD   =", idd,", MAXNES=",maxnes,","
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
 !       "NESTIX=",(nestix (i),", ", i = 1, maxnes)
-       "NESTIX=",(xp%ide ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
-       "NESTJX=",(xp%jde    ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+       "NESTIX=",(ide    ,", ", i = 1, maxnes)
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
+       "NESTJX=",(jde       ,", ", i = 1, maxnes)
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NUMC  =",(numc ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,F7.2,A))')&
-       "DIS   =",(xb%ds/1000.,", ",i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,F7.2,A))')&
+       "DIS   =",(ds/1000.,", ",i = 1, maxnes)
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NESTI =",(nesti     ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NESTJ =",(nestj     ,", ", i = 1, maxnes)
 
 ! Write Variable names and Unit
 ! -------------------------------
 
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "INFO  = PLATFORM, DATE, NAME, LEVELS, LATITUDE, LONGITUDE, ELEVATION, ID."
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "SRFC  = SLP, PW (DATA,QC,ERROR)."
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "EACH  = PRES, SPEED, DIR, HEIGHT, TEMP, DEW PT, HUMID (DATA,QC,ERROR)*LEVELS."
 
 ! Write Format Info
 ! ------------------
 
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'INFO_FMT = ', TRIM (fmt_info)
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'SRFC_FMT = ', TRIM (fmt_srfc)
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'EACH_FMT = ', TRIM (fmt_each)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'INFO_FMT = ', TRIM (fmt_info)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'SRFC_FMT = ', TRIM (fmt_srfc)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'EACH_FMT = ', TRIM (fmt_each)
 
 ! Write End of header record
 ! ---------------------------
 
-      WRITE (UNIT = ounit, FMT = '(A)') &
+      WRITE (UNIT = filtered_obs_unit, FMT = '(A)') &
 "#------------------------------------------------------------------------------#"
-   first_time = .false.
-   go to 1000
-!-------------------------------------------------------------------------------
+
+   if (trace_use) CALL da_trace_exit("da_count_filtered_obs")
 end subroutine da_count_filtered_obs 
