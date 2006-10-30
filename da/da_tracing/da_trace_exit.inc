@@ -113,10 +113,10 @@ subroutine da_trace_exit( &
          IF (trace_memory) THEN
             if (use_html) then
                WRITE (UNIT=trace_unit, &
-                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A,I11)', &
+                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
                   IOSTAT=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                  TRIM(Name),TRIM(Name), TotalSpace, Change,Count
+                  TRIM(Name),TRIM(Name), TotalSpace, Change
             else
                WRITE (UNIT=trace_unit, &
                   FMT='(A, "< ",A,I11,A)', &

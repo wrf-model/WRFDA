@@ -161,6 +161,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Units 9,10 are used for reading and writing namelist.input/output in WRF
 
+   ! Do not use get_unit/free_unit because tracing is too low level
+   integer, parameter :: trace_csv_unit = 8
+
    integer :: y_unit, yp_unit, cost_unit, grad_unit, stats_unit, jo_unit
    integer :: check_max_iv_unit, rand_unit, omb_unit, filtered_obs_iunit
    integer, parameter :: num_alpha_corr_types = 3

@@ -97,7 +97,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       allocate (polar(nchan), stat= alloc_status(8) )
       if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
-            (/"Cannot Allocate mem pres tb con_vars aux_vars"/))
+            (/"Cannot allocate mem pres tb con_vars aux_vars"/))
       end if
 
       pres(1:nlevels) = coefs(inst) % ref_prfl_p(1:nlevels)
@@ -124,7 +124,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
          if ( any(alloc_status /= 0) ) then
             call da_error(__FILE__,__LINE__, &
-               (/"Cannot Allocate mem iv%zk, t, mr"/))
+               (/"Cannot allocate mem iv%zk, t, mr"/))
          end if
 
          model_t(:) = 0.0

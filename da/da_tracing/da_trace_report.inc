@@ -36,6 +36,8 @@ subroutine da_trace_report
 
    CHARACTER (LEN=TraceNameLen) :: MasterTimerNames(MaxNoRoutines)
 
+   integer :: iost
+
    !==========================================================================
    ! start of code
    !==========================================================================
@@ -108,13 +110,15 @@ subroutine da_trace_report
       call da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
       call da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
       call da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
+      call da_proc_sum_ints(MasterNoCalls(i,:))
+      call da_proc_sum_ints(MasterMaxHeap(i,:))
    END DO
 #endif
 
-   IF (myproc == 0) THEN
+   IF (rootproc) THEN
 
       DO j=1,MasterNoRoutines
-        rtemp1(j)=SUM(MasterElapsedTimeLocal(:,j))
+         rtemp1(j)=SUM(MasterElapsedTimeLocal(:,j))
       END DO
       !==========================================================================
       ! Sort subroutines into time order based on local Elapsed Time.
@@ -221,6 +225,25 @@ subroutine da_trace_report
             MasterCPUTimeLocal(MaxCPUPos,Pointer),                           & ! Max average CPU Time
             MaxCPUPos,                                                       & ! Which PE
             SpeedUp                                                            ! Speedup
+         if (trace_csv) then
+            write(unit=trace_csv_unit,  &
+               fmt='(A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               '"'//TRIM(MasterTimerNames(Pointer))//'",', &
+               REAL(OverallNoCalls(Pointer))/REAL(num_procs),                       & ! Average number of calls per PE
+               OverallElapsedTime(Pointer)/(num_procs*REAL(CountRate)),             & ! Average Elapsed Time
+               PercentElapsedTime,                                              & ! Percent Elapsed Time
+               MasterElapsedTimeLocal(MinElapsedPos,Pointer)/REAL(CountRate),   & ! Min average Elapsed Time
+               MinElapsedPos,                                                   & ! Which PE
+               MasterElapsedTimeLocal(MaxElapsedPos,Pointer)/REAL(CountRate),   & ! Max average Elapsed Time
+               MaxElapsedPos,                                                   & ! Which PE
+               OverallCPUTime(Pointer),                                         & ! CPU time
+               PercentCPUTime,                                                  & ! Percent CPU time
+               MasterCPUTimeLocal(MinCPUPos,Pointer),                           & ! Min average CPU Time
+               MinCPUPos,                                                       & ! Which PE
+               MasterCPUTimeLocal(MaxCPUPos,Pointer),                           & ! Max average CPU Time
+               MaxCPUPos,                                                       & ! Which PE
+               SpeedUp                                                            ! Speedup
+         end if
       END DO
 
       WRITE (UNIT=trace_unit, &
@@ -236,13 +259,17 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("</TABLE><p><p>")')
 
+      if (trace_csv) then
+         write(unit=trace_csv_unit,FMT=*) " "
+      end if
+
       !===================================================================================
       ! Sort subroutines into time order based on overall Elapsed Time.
       ! All PEs should have the same sort order after the sum. 
       !===================================================================================
 
       DO j=1,MasterNoRoutines
-        rtemp1(j)=SUM(MasterElapsedTime(:,j))
+         rtemp1(j)=SUM(MasterElapsedTime(:,j))
       END DO
 
       call da_trace_real_sort(rtemp1,MasterNoRoutines,index)
@@ -326,6 +353,25 @@ subroutine da_trace_report
             MasterCPUTime(MaxCPUPos,Pointer),                           & ! Max average CPU Time
             MaxCPUPos,                                                  & ! Which PE
             SpeedUp                                                       ! SpeedUp
+         if (trace_csv) then
+            write (unit=trace_csv_unit, &
+               fmt='(A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               '"'//TRIM(MasterTimerNames(Pointer))//'",', &
+               REAL(OverallNoCalls(Pointer))/REAL(num_procs),                  & ! Number of calls per PE
+               OverallElapsedTime(Pointer)/(REAL(num_procs*CountRate)),        & ! Average Elapsed Time
+               PercentElapsedTime,                                         & ! Percent Elapsed Time
+               MasterElapsedTime(MinElapsedPos,Pointer)/REAL(CountRate),   & ! Min average Elapsed Time
+               MinElapsedPos,                                              & ! Which PE
+               MasterElapsedTime(MaxElapsedPos,Pointer)/REAL(CountRate),   & ! Max average Elapsed Time
+               MaxElapsedPos,                                              & ! Which PE
+               OverallCPUTime(Pointer),                                    & ! CPU time
+               PercentCPUTime,                                             & ! Percent CPU time
+               MasterCPUTime(MinCPUPos,Pointer),                           & ! Min average CPU Time
+               MinCPUPos,                                                  & ! Which PE
+               MasterCPUTime(MaxCPUPos,Pointer),                           & ! Max average CPU Time
+               MaxCPUPos,                                                  & ! Which PE
+               SpeedUp                                                       ! SpeedUp
+         end if
       END DO
 
       WRITE (UNIT=trace_unit, &
@@ -342,7 +388,11 @@ subroutine da_trace_report
       WRITE(UNIT=trace_unit, &
          FMT='("</TABLE>")')
 
-   END IF ! myproc==0
+      if (trace_csv) then
+         write(unit=trace_csv_unit,FMT=*) " "
+      end if
+
+   END IF ! rootproc
 
    !============================================================================
    ! Sort subroutines into memory use order by max memory on one PE
@@ -358,7 +408,7 @@ subroutine da_trace_report
       END DO
 #endif
 
-      IF (myproc == 0) THEN
+      IF (rootproc) THEN
          DO j=1,MasterNoRoutines
             itemp1(j)=MAXVAL(MasterMaxHeap(:,j))
          END DO
@@ -377,14 +427,29 @@ subroutine da_trace_report
                TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
                MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
                SUM(MasterMaxHeap(:,Pointer))/num_procs
+            if (trace_csv) then
+               WRITE (UNIT=trace_csv_unit, &
+                  FMT='(A,I11,",",I11,",",I11)') &
+                  '"'//TRIM(TimerNames(Pointer))//'",', &
+                  MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
+                  SUM(MasterMaxHeap(:,Pointer))/num_procs
+            end if        
          END DO
          WRITE (UNIT=trace_unit,FMT='("</table></body></html>")')
+
+         if (trace_csv) then
+            write(unit=trace_csv_unit,FMT=*)
+         end if
       END IF
    END IF
 
    IF (trace_write .AND. trace_unit /= 0) THEN
       CLOSE(trace_unit)
    END IF
+  
+   if (trace_csv .and. rootproc) then
+      close(trace_csv_unit)
+   end if
 
    IF (myproc == 0) THEN
       DEALLOCATE(index)

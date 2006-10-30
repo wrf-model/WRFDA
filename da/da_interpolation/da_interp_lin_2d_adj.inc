@@ -11,14 +11,14 @@ subroutine da_interp_lin_2d_adj(fm2d, is, ie, js, je,&
 
    real   ,            intent(inout)  :: fm2d(is:ie,js:je) ! Input variable
 
-!write (0,*) "fo2d",fo2d
+   if (trace_use) call da_trace_entry("da_interp_lin_2d_adj")
 
    fm2d(i  ,j  ) = dym*dxm* fo2d + fm2d(i  ,j  )
    fm2d(i+1,j  ) = dym*dx * fo2d + fm2d(i+1,j  )
    fm2d(i  ,j+1) = dy *dxm* fo2d + fm2d(i  ,j+1)
    fm2d(i+1,j+1) = dy *dx * fo2d + fm2d(i+1,j+1)
 
-!write (0,*) "SUM(fm2d)",SUM(fm2d)
+   if (trace_use) call da_trace_exit("da_interp_lin_2d_adj")
 
 end subroutine da_interp_lin_2d_adj
 
