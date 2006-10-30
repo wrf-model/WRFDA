@@ -7,7 +7,7 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 !
 ! Reference:
 ! ---------
-!  A description of the fifth generation Penn State/NCAR Mesoscale Model (MM5)
+!  A description of the fifth generation Penn State/NCAR Mesoscale Model
 !  Grell et al. 1994, page 29-30 and 80-83.
 !  
 !------------------------------------------------------------------------------!

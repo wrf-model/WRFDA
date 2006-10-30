@@ -2,7 +2,7 @@
 subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
+   ! Read the header of a SSMI 2.0 GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none

@@ -9,6 +9,7 @@ MODULE da_interpolation
 CONTAINS
 
 #include "da_to_zk.inc"
+#include "da_to_zk_new.inc"
 
 #include "da_interp_obs_lin_2d.inc"
 #include "da_interp_obs_lin_2d_adj.inc"

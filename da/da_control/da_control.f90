@@ -156,6 +156,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: fg_format_wrf = 1
    integer, parameter :: fg_format_kma = 3
 
+   integer, parameter :: ob_format_bufr = 1
+   integer, parameter :: ob_format_ascii = 2
+
    integer, parameter :: convert_fd2uv = 1
    integer, parameter :: convert_uv2fd = -1
 
@@ -226,7 +229,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    INTEGER, PARAMETER :: v_interp_not_specified = missing, &
                          v_interp_p             = 1, &
                          v_interp_h             = 2
-   INTEGER            :: p_below = 0, p_above = 0, h_below = 0, h_above = 0
 
    !------------------------------------------------------------------------------
    ! WRFVAR scalar constants:

@@ -20,12 +20,10 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
             ! Guo (02/06/2006), for VERIFY, allow the extrapolation to obtain the zk:
             if (obs_v > mdl_v(xp%kts)) then
                ! below the lowest level:
-               p_below = p_below + 1
                zk = real(xp%kts+1) - &
                   (obs_v-mdl_v(xp%kts+1))/(mdl_v(xp%kts)-mdl_v(xp%kts+1))
             else if (obs_v < mdl_v(xp%kte)) then
                ! above the highest level:
-               p_above = p_above + 1
                zk = real(xp%kte-1) + &
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
             endif
@@ -47,12 +45,10 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
             ! Guo (02/06/2006), for VERIFY, allow the extrapolation to obtain the zk:
             if (obs_v < mdl_v(xp%kts)) then
                ! below the lowest level:
-               h_below = h_below + 1
                zk = real(xp%kts+1) - &
                   (obs_v-mdl_v(xp%kts+1))/(mdl_v(xp%kts)-mdl_v(xp%kts+1))
             else if (obs_v > mdl_v(xp%kte)) then
                ! above the highest level:
-               h_above = h_above + 1
                zk = real(xp%kte-1) + &
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
             endif

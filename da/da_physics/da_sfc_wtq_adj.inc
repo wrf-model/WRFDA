@@ -9,7 +9,6 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    !
    ! Reference:
    ! ---------
-   !  Detail MM5/physics/pbl_sfc/mrfpbl/MRFPBL.F
    !
    !  Input Variables(basic state):
    ! 

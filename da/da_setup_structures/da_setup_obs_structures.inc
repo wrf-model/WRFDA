@@ -203,7 +203,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 
    IF (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
-      IF ( ob_format == 1 ) THEN
+      IF ( ob_format == ob_format_bufr ) THEN
          CALL da_messages((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
          IF (iv%num_pseudo > 0) THEN
@@ -219,8 +219,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
          ELSE
             CALL da_setup_obs_structures_bufr( xp, ob, iv )
          END IF 
-      ELSE IF ( ob_format == 2 ) THEN
-         ! [1.2] MM5 observation input file:
+      ELSE IF ( ob_format == ob_format_ascii ) THEN
+         ! [1.2] GTS observation input file:
          CALL da_setup_obs_structures_ascii( xp, ob, iv )
       END IF
    END IF

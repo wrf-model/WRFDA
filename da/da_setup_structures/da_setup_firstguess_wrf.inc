@@ -171,7 +171,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       call da_messages(errmsg(1:5))
    endif
 
-   ! Setup the domain definition for use of the MM5/GRAPH:
+   ! Setup the domain definition for use of the GRAPH:
 
    coarse_ds = 0.001 * grid%dx
    coarse_ix = grid%e_we - grid%s_we + 1

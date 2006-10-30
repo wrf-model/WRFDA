@@ -36,7 +36,7 @@ subroutine da_obs_proc_station(obs)
       to   = obs % each(i) % t  % inv
       rho  = obs % each(i) % rh  % inv
 
-      if (ob_format == 2) then ! Calculate q if possible:
+      if (ob_format == ob_format_bufr) then ! Calculate q if possible:
          if (abs(po -  missing_r) > 1. .and. abs(to -  missing_r) > 1. .and. &
              abs(rho-  missing_r) > 1.) then
 

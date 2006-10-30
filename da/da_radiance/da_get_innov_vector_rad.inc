@@ -44,6 +44,8 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                                        model_qci, model_qsn, &
                                        model_qgr, model_qm
 
+   real, allocatable :: v_p_new(:,:)
+
    INTEGER            :: inst, num_rad, nchan, iprof
    INTEGER            :: nfrequencies, nchannels, nbtout
    REAL,    pointer   :: polar(:)
@@ -51,7 +53,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    real,    pointer   :: tb(:,:)
    logical            :: amsua, amsub, mhs, ssmi
 
-   integer            :: ip,kn,knchpf,sensor_type
+   integer            :: ip,kn,knchpf,sensor_type,n1,n2
    integer, pointer   :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
    real   , pointer   :: pemsv(:), pemsh(:), pems5(:), emissivity(:)
    logical, pointer   :: calcemis(:)
@@ -104,10 +106,13 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
       if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
           iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
+      n1 = iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1
+      n2 = iv%ob_numb(iv%current_ob_time)%radiance(inst)
+
+      num_rad=n2-n1+1
 
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
-         iv%ob_numb(iv%current_ob_time)%radiance(inst)
+      do n= n1,n2
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
          allocate (iv%instid(inst)%rad(n)%zk(1:nlevels), stat= alloc_status(6) )
@@ -137,41 +142,97 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          model_u10(1)  = 0.0
          model_v10(1)  = 0.0
          model_psfc = 0.0
+      end do
 
-
-         ! [1.1] Get horizontal interpolation weights:
-
-         i = iv%instid(inst)%rad(n)%loc%i
-         j = iv%instid(inst)%rad(n)%loc%j
-         dx = iv%instid(inst)%rad(n)%loc%dx
-         dy = iv%instid(inst)%rad(n)%loc%dy
-         dxm = iv%instid(inst)%rad(n)%loc%dxm
-         dym = iv%instid(inst)%rad(n)%loc%dym
-
+      if (interp_new) then
+         allocate(v_p_new(num_rad,xp%kms:xp%kme))
+       
          ! horizontal interpolate xb pressure to ob position for every xb levels
-         do k=xp%kts,xp%kte
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-            v_p(k) = 0.01*v_p(k)  ! convert to mb
-         enddo
+         do n=n1,n2
+            do k=xp%kts,xp%kte
+               ! convert to mb
+               v_p_new(k,n) = 0.01*(dym*( &
+                  dxm*xb%p(iv%instid(inst)%loc_i(n),  iv%instid(inst)%loc_j(n),k) + &
+                  dx *xb%p(iv%instid(inst)%loc_i(n)+1,iv%instid(inst)%loc_j(n),k)) + &
+                  dy *( &
+                  dxm*xb%p(iv%instid(inst)%loc_i(n),  iv%instid(inst)%loc_j(n)+1,k) + &
+                  dx *xb%p(iv%instid(inst)%loc_i(n)+1,iv%instid(inst)%loc_j(n)+1,k)))
+            end do
+         end do
+         call da_to_zk_new(pres, v_p_new, xp, v_interp_p, &
+            iv%instid(inst)%zk(:,n1:n2), num_rad,nlevels )
 
-         do k=1, nlevels
-            iv%instid(inst)%rad(n)%zk(k)=missing_r
-            IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
-               call da_to_zk(pres(k), v_p, xp, v_interp_p, iv%instid(inst)%rad(n)%zk(k))
-            END IF
-         enddo
-         if (interp_new) then
-            iv%instid(inst)%zk(:,n) = iv%instid(inst)%rad(n)%zk(:)
-         end if
-
+do n=n1,n2
+   write (0,*) "zk",iv%instid(inst)%zk(:,n)
+end do
+         call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
+            iv%instid(inst)%loc_k(:,n1:n2), &
+            iv%instid(inst)%loc_dz(:,n1:n2), &
+            iv%instid(inst)%loc_dzm(:,n1:n2))
 
          ! [1.2] Interpolate horizontally to ob:
 
-         call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
-                           model_t, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
-         call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
-                           model_q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+         call da_interp_lin_3d_new( xb%t, xp, &
+            iv%instid(inst)%loc_i(n1:n2), &
+            iv%instid(inst)%loc_j(n1:n2), &
+            iv%instid(inst)%loc_k(:,n1:n2), &
+            iv%instid(inst)%loc_dx(n1:n2), &
+            iv%instid(inst)%loc_dy(n1:n2), &
+            iv%instid(inst)%loc_dz(:,n1:n2), &
+            iv%instid(inst)%loc_dxm(n1:n2), &
+            iv%instid(inst)%loc_dym(n1:n2), &
+            iv%instid(inst)%loc_dzm(:,n1:n2), &
+            model_t, nlevels, num_rad )
+
+         call da_interp_lin_3d_new( xb%q, xp, &
+            iv%instid(inst)%loc_i(n1:n2), &
+            iv%instid(inst)%loc_j(n1:n2), &
+            iv%instid(inst)%loc_k(:,n1:n2), &
+            iv%instid(inst)%loc_dx(n1:n2), &
+            iv%instid(inst)%loc_dy(n1:n2), &
+            iv%instid(inst)%loc_dz(:,n1:n2), &
+            iv%instid(inst)%loc_dxm(n1:n2), &
+            iv%instid(inst)%loc_dym(n1:n2), &
+            iv%instid(inst)%loc_dzm(:,n1:n2), &
+            model_q, nlevels, num_rad )
+      else
+         do n=n1,n2
+
+
+            ! [1.1] Get horizontal interpolation weights:
+
+            i = iv%instid(inst)%rad(n)%loc%i
+            j = iv%instid(inst)%rad(n)%loc%j
+            dx = iv%instid(inst)%rad(n)%loc%dx
+            dy = iv%instid(inst)%rad(n)%loc%dy
+            dxm = iv%instid(inst)%rad(n)%loc%dxm
+            dym = iv%instid(inst)%rad(n)%loc%dym
+
+            ! horizontal interpolate xb pressure to ob position for every xb levels
+            do k=xp%kts,xp%kte
+               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+               v_p(k) = 0.01*v_p(k)  ! convert to mb
+            enddo
+
+            do k=1, nlevels
+               iv%instid(inst)%rad(n)%zk(k)=missing_r
+               IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
+                  call da_to_zk(pres(k), v_p, xp, v_interp_p, iv%instid(inst)%rad(n)%zk(k))
+               END IF
+            enddo
+write (0,*) "zk",iv%instid(inst)%rad(n)%zk(:)
+            ! [1.2] Interpolate horizontally to ob:
+
+            call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
+                              model_t, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+            call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
+                              model_q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+         end do
+      end if
+stop
+
+      do n= n1,n2
 
          do k=1, nlevels
             IF ( iv%instid(inst)%rad(n)%zk(k) <= 0.0 ) THEN
@@ -490,6 +551,9 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       deallocate (pemsv)
       deallocate (pemsh) 
       deallocate (pems5)
+      if (interp_new) then
+         deallocate(v_p_new)
+      end if
    end do        ! end loop for sensor
 
    !------------------------------------------------------------------------

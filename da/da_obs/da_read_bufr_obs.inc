@@ -437,7 +437,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 ! Method : 
 !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
 !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
-! Note: Currently da_obs_proc_station is active only for ob_format=2 (Ascii)
+! Note: Currently da_obs_proc_station is active only for ob_format_ascii
 !      CALL da_obs_proc_station(platform)
 !---------------------------------------------------------------------------
 !    Loop over duplicating obs for global
