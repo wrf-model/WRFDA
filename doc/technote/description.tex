@@ -1,0 +1,98 @@
+\documentclass[12pt]{book}
+\def\wrf{ARW}
+%
+% Use graphicsx package for including epsi figures
+\usepackage{graphicx}
+% Use espfig package and wrapfig for less-than column
+% width figures
+\usepackage{epsfig,wrapfig}
+%
+% Use the ams packages for equations
+\usepackage{amsmath}
+\usepackage{amssymb}
+%
+% Use natbib package for the citations
+\usepackage{natbib}
+%\usepackage[square]{natbib}
+%
+% Use locally modified jgr bibliography style
+\bibliographystyle{jgr}
+%
+% Use changebar package for highlighting changes
+\usepackage{changebar}
+%
+% Use fancyheadings package for headers and footers 
+\usepackage{fancyheadings}
+\lhead[\wrf~Scientific Description]{\wrf~Scientific Description}
+\rhead[January, 2007]{January 1, 2007}
+% Use hyperref to insert links in pdf documents
+%\usepackage[colorlinks,citecolor=black,linkcolor=black,urlcolor=black]{hyperref}
+\usepackage[colorlinks,citecolor=blue,linkcolor=red,urlcolor=cyan]{hyperref}
+%
+%\usepackage{html}
+%\begin{htmlonly}
+%  \newcommand{\href}[2]{\htmladdnormallink{#2}{#1}}
+%\end{htmlonly}
+%
+% Set up page layout
+\setlength{\textwidth}{6.75in}
+\setlength{\oddsidemargin}{-0.0in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\textheight}{9.0in}
+\setlength{\topmargin}{-0.5in}
+\setlength{\headheight}{0.0in}
+\setlength{\headsep}{0.5in}
+\setlength{\topskip}{0.0in}
+\setlength{\footskip}{0.5in}
+%\renewcommand{\baselinestretch}{2.0}
+%\setlength{\parindent}{0.0in}
+%\setlength{\parskip}{0.08in}
+%
+% Include some coding shortcuts
+\def \eg{{\emph{e.g.} }}
+\def \ie{{\emph{i.e.} }}
+\def \ni{\noindent}
+\newcommand{\xbmf}[1]{\hbox{\sffamily\slshape #1}}
+\newcommand{\xmathbf}{\boldsymbol}
+
+\begin{document}
+\pagestyle{plain}
+%\pagestyle{fancy}
+
+% preliminary pages
+\include{cover}
+\tableofcontents
+\listoffigures
+\listoftables
+% acknowledgments
+\include{acknow}
+\cleardoublepage
+% chapters
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\include{intro}
+\include{minim}
+\include{gen_be}
+\include{be_modeling}
+\include{obs}
+\include{radiances}
+\include{radar}
+\include{diagnostics}
+\include{suites}
+\include{se}
+% Next two lines MUST come right before the last chapter include
+\addtocontents{toc}{\contentsline {chapter}{}{}{}}
+\addtocontents{toc}{\contentsline {chapter}{Appendices}{}{}}
+%\include{asf}
+%
+% appendices
+\appendix
+\include{appena}
+\include{appenb}
+\include{appenc}
+%
+% bibliography
+\addcontentsline{toc}{chapter}{\numberline{}References}
+\bibliography{description}
+
+\end{document}
