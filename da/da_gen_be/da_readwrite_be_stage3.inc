@@ -16,7 +16,10 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable )
    real                     :: e_val(1:nk)                ! Domain-averaged eigenvalues.  
    real, allocatable        :: e_vec_loc(:,:,:)           ! Latitudinally varying eigenvectors.
    real, allocatable        :: e_val_loc(:,:)             ! Latitudinally varying eigenvalues.
+
+   integer :: iunit
  
+   call da_get_unit(iunit)
    filename = 'gen_be_stage3.'//trim(variable)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
@@ -39,6 +42,7 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable )
    read(iunit)e_vec_loc
    read(iunit)e_val_loc
    close(iunit)
+   call da_free_unit(iunit)
 
    write(outunit)variable
    write(outunit)nk, num_bins2d
@@ -51,3 +55,5 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable )
    deallocate( e_val_loc )
 
 end subroutine da_readwrite_be_stage3
+
+

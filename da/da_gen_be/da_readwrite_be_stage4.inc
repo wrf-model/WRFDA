@@ -25,6 +25,7 @@ subroutine da_readwrite_be_stage4( outunit, nk, uh_method, n_smth_sl, variable )
    real, allocatable        :: scale_length(:)
    real, allocatable        :: sl_smth(:)
    
+   integer :: iunit
 
    first_time = .true.
 
@@ -37,6 +38,7 @@ if (uh_method .eq. 'power') then
       filename = trim(variable)//'/'//trim(variable)
       filename = trim(filename)//'.'//ck//'.spectrum'
 
+      call da_get_unit(iunit)
       open (iunit, file = filename, form='unformatted')
       read(iunit)cvar
       if ( trim(cvar) /=  trim(variable) ) then
@@ -67,6 +69,7 @@ if (uh_method .eq. 'power') then
 
       read(iunit)total_power(:)
       close(iunit)
+      call da_free_unit(iunit)
 
       write(outunit)variable
       write(outunit)max_wavenumber, k
@@ -85,6 +88,7 @@ if (uh_method .eq. 'power') then
            allocate( sl_smth(1:nk) )
       endif
 
+      call da_get_unit(iunit)
       filename = trim(variable)//'/'//'sl_print.'//trim(variable)
       open (iunit, file = filename)
 
@@ -116,6 +120,9 @@ if (uh_method .eq. 'power') then
      
       write(outunit) variable
       write(outunit) scale_length
+
+      close(iunit)
+      call da_free_unit(iunit)
 
       deallocate (scale_length)
 

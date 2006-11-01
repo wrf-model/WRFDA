@@ -3,6 +3,7 @@ program gen_be_stage4_global
    use da_control
    use be_spectral
    use da_tracing
+   use da_tools
 
    implicit none
 
@@ -55,8 +56,14 @@ program gen_be_stage4_global
    namelist / gen_be_stage4_global_nl / start_date, end_date, interval, variable, gaussian_lats, &
                                         testing_spectral, ne, k
 
+   integer :: ounit,iunit,namelist_unit
+
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage4_global")
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
 
    pi_over_180 = pi / 180.0
 

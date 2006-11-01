@@ -39,9 +39,16 @@ program gen_be_cov3d
    namelist / gen_be_cov3d_nl / start_date, end_date, interval, &
                                 ne, variable1, variable2, dat_dir
 
+   integer :: ounit,iunit,namelist_unit
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
 
    start_date = '2004030312'
    end_date = '2004033112'

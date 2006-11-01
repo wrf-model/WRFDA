@@ -56,6 +56,8 @@ program gen_be_stage3
                                  hgt_min, hgt_max, binwidth_hgt, &
                                  testing_eofs, use_global_eofs, data_on_levels
 
+   integer :: ounit,iunit,namelist_unit
+
     stdout = 6
 
 
@@ -65,6 +67,11 @@ program gen_be_stage3
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
 
    vertical_ip = 0
    twod_field = .false.

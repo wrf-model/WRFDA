@@ -12,6 +12,7 @@ module da_gen_be
    use lapack
    use blas
    use da_tracing
+   use da_tools1
 
    implicit none
 

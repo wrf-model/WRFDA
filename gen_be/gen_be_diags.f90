@@ -14,6 +14,12 @@ program gen_be_diags
 
    namelist / gen_be_diags_nl / uh_method, n_smth_sl
 
+   integer :: ounit,iunit,namelist_unit
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
    uh_method = 'scale'
    n_smth_sl = 0
 

@@ -37,6 +37,12 @@ program gen_be_diags_read
 
    namelist / gen_be_diags_nl / uh_method
 
+   integer :: ounit,iunit,namelist_unit
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
    open(unit=namelist_unit, file='gen_be_diags_nl.nl', &
         form='formatted', status='old', action='read')
    read(namelist_unit, gen_be_diags_nl)
