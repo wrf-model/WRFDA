@@ -22,7 +22,7 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
    conv = 180.0 / pi
 
    ! seperate treatment for global fields
-   if (fg_format == 3) then
+   if (fg_format == fg_format_kma) then
       xlat = yy * 180.0 /(coarse_jy-1)  -  90.0    
       xlon = xx * 360.0 /(coarse_ix-1)  - 180.0    
       return

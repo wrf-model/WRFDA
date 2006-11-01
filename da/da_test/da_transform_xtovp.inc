@@ -50,7 +50,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! Convert vorticity to Del**2 psi:
    if(.not. global ) then               
-      if (fg_format == 1 .or. fg_format == 2) then
+      if (fg_format == fg_format_wrf) then
          one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                         xb % map_factor(its:ite,jts:jte) )
          DO k = kts, kte
@@ -84,7 +84,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! Convert divergence to Del**2 chi:
    if(.not. global )  then              
-      if (fg_format == 1 .or. fg_format == 2) then
+      if (fg_format == fg_format_wrf) then
          DO k = kts, kte
             div(its:ite,jts:jte,k) = &
                one_over_m2(its:ite,jts:jte) * div(its:ite,jts:jte,k)

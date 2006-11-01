@@ -93,7 +93,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    do j=xb%jts,xb%jte
       do i=xb%its,xb%ite
-         if (fg_format == 1) then
+         if (fg_format == fg_format_wrf) then
             sdmd=0.0
             s1md=0.0
             do k=xb%kts,xb%kte
@@ -114,7 +114,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
                xa%p(i,j,k)=0.5*(p(k)+p(k+1))
             enddo
-         else if (fg_format == 3) then
+         else if (fg_format == fg_format_kma) then
             do k=xb%kts,xb%kte
                if( k == xb%kte) then
                   coeff=xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)

@@ -107,7 +107,7 @@ subroutine da_llxy (xlati,xloni,x,y)
 
    ratio = coarse_ds / dsm
 
-!--only add 0.5 so that x/y is relative to first cross points (MM5 input):
+!--only add 0.5 so that x/y is relative to first cross points:
 
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5

@@ -43,10 +43,10 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    if ( jts == jds ) js = jds+1
    if ( jte == jde ) je = jde-1
 
-   if( fg_format == 3) then
+   if( fg_format == fg_format_kma) then
       coefx(is:ie,js:je) = xb%coefx(is:ie,js:je)
       coefy(is:ie,js:je) = xb%coefy(is:ie,js:je)
-   else if( fg_format == 1 .or. fg_format==2) then
+   else if( fg_format == fg_format_wrf) then
       coefx(is:ie,js:je) = xb%coefz(is:ie,js:je)
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
