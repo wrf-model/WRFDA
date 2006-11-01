@@ -7,10 +7,6 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
-   
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    TYPE (xpose_type), INTENT(IN)     :: xp       ! Domain decomposition vars.
    TYPE (y_type),     INTENT(INOUT)  :: ob       ! Observation structure.

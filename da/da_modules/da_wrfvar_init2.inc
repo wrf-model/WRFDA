@@ -8,10 +8,6 @@ subroutine da_wrfvar_init2
 
    integer :: ierr
 
-#if DM_PARALLEL
-   include "mpif.h"
-#endif
-
    IF (trace_use) call da_trace_entry("da_wrfvar_init2")
 
    !<DESCRIPTION>

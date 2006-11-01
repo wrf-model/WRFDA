@@ -7,10 +7,6 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
 
   IMPLICIT NONE
 
-  !-----
-  !   INCLUDE 'mpif.h'
-  !-----
-
   INTEGER, INTENT(IN)           :: it      ! External iteration.
   TYPE (xb_type), INTENT(IN)    :: xb      ! first guess state.
   TYPE (xpose_type), INTENT(IN) :: xp      ! Domain decomposition vars.

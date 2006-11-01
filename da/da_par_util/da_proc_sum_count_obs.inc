@@ -13,9 +13,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
    !           if more observation types are added.
    !----------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
+   implicit none
    
    integer, parameter:: numvals = 100
 

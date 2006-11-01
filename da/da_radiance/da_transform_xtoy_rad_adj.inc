@@ -12,9 +12,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    IMPLICIT NONE
 
 !#include "rttov_v2q.interface"
-#ifdef DM_PARALLEL
-      include "mpif.h"
-#endif
 
    TYPE (x_type), INTENT(INOUT)   :: jo_grad_x ! 
    TYPE (xpose_type), INTENT(IN)  :: xp        ! Domain decomposition vars.

@@ -9,13 +9,10 @@ subroutine da_proc_maxmin_combine( n, max, min )
    !           processor 0.  (In this way, we do not have to do all-to-all 
    !           communication.)
    !---------------------------------------------------------------------------
-use da_tools
+   
+   use da_tools
+
    IMPLICIT NONE
-
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
 
    INTEGER,   INTENT(IN)                    :: n       ! Length of input fields.
    TYPE (maxmin_field_type), INTENT(INOUT)  :: max(n)  ! Max values over proc.

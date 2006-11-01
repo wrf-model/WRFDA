@@ -6,10 +6,6 @@ subroutine da_write_noise_to_ob (iv)
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    TYPE (ob_type), INTENT(IN)    :: iv   ! Obs and header structure.
    integer                       :: n, k,kk,inst, iunit
    integer                       :: ierr,ios  ! Error code from MPI routines.

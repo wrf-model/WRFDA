@@ -7,9 +7,7 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
    !          communication.)
    !---------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
+   implicit none
 
    integer, intent(in)                       :: num_sound
    type (sound_type), intent(inout)          :: iv(:)

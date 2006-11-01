@@ -8,10 +8,7 @@ subroutine da_proc_sum_real ( n, value )
    !           to do all-to-all communication.)
    !---------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
+   implicit none
 
    INTEGER, INTENT(IN)         :: n        ! Length of value array. 
    REAL,    INTENT(INOUT)      :: value(n) ! Array to be summed componentwise.

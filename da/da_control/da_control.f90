@@ -1,7 +1,7 @@
 module da_control
 
    !--------------------------------------------------------------------------
-   ! PURPOSE: Common reference point for constants.
+   ! PURPOSE: Common reference point for WRFVAR control.
    !--------------------------------------------------------------------------
 
    USE module_driver_constants
@@ -10,21 +10,19 @@ module da_control
 
 #include "namelist_defines.inc"
 
+#ifdef DM_PARALLEL
+   include "mpif.h"
+#endif
+
    !---------------------------------------------------------------------------
    ! [1.0] Physical parameter constants (all NIST standard values):
    !---------------------------------------------------------------------------
 
    ! Fundamental constants:
    REAL, PARAMETER    :: pi = 3.1415926535897932346
-#ifdef MM5_CONSTANT
-   REAL, PARAMETER    :: gas_constant = 287.04   ! Value used in MM5.
-   REAL, PARAMETER    :: gas_constant_v = 461.51 ! 
-   REAL, PARAMETER    :: cp = 1004.0             ! Value used in MM5.
-#else
    REAL, PARAMETER    :: gas_constant = 287.     ! Value used in WRF.
    REAL, PARAMETER    :: gas_constant_v = 461.6  ! Value used in WRF.
    REAL, PARAMETER    :: cp = 7.*gas_constant/2. ! Value used in WRF.
-#endif
    REAL, PARAMETER    :: t_kelvin = 273.15
    REAL, PARAMETER       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
@@ -76,11 +74,15 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    ! [2.0] WRF-Var parameter constants:
    !---------------------------------------------------------------------------
 
-   ! Missing values and the index number of the quality contro
+   ! Missing values and the index number of the quality control
 
    INTEGER, PARAMETER ::  missing       = -888888
-   REAL   , PARAMETER ::  missing_r     = -888888.
-   REAL   , PARAMETER ::  Max_StHeight_Diff = 100.
+   REAL   , PARAMETER ::  missing_r     = -888888.0
+   REAL   , PARAMETER ::  Max_StHeight_Diff = 100.0
+
+   logical :: anal_type_verify=.false.
+   logical :: anal_type_randomcv=.false.
+   logical :: anal_type_qcobs=.false.
 
    ! WRFVAR Minimisation:
 

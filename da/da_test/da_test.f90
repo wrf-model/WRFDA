@@ -38,15 +38,6 @@ module da_test
 
    implicit none
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
-#endif
-
 contains
 
 #include "da_check_balance.inc"

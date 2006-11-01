@@ -13,17 +13,9 @@ MODULE da_par_util
    !---------------------------------------------------------------------------
 
    USE da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
-   USE da_par_util1
-    
-   IMPLICIT NONE
+   use da_par_util1
 
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#define TRUE_RSL_REAL     RSL_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#define TRUE_RSL_REAL     RSL_DOUBLE
-#endif
+   IMPLICIT NONE
 
 #include "da_generic_typedefs.inc"
 
@@ -37,7 +29,6 @@ MODULE da_par_util
 #include "da_cv_to_vv.inc"
 #include "da_vv_to_cv.inc"
 #include "da_alloc_and_copy_be_arrays.inc"
-#include "da_be_local_copy.inc"
 #include "da_copy_dims.inc"
 #include "da_copy_tile_dims.inc"
 #include "da_pack_count_obs.inc"

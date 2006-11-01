@@ -4,12 +4,9 @@ subroutine da_final_write_y( iv, y )
    ! Purpose: Writes full diagnostics for y=H(x_inc)      
    ! History:
    ! Author:    Syed RH Rizvi     MMM/NCAR    05/16/2006     
-   !-------------------------------------------------------------------------   
+   !------------------------------------------------------------------------- 
+  
    IMPLICIT NONE
-
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    TYPE (ob_type), INTENT(IN)    :: iv   ! O-B structure.
    TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.

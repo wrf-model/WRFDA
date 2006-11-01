@@ -7,6 +7,7 @@ subroutine da_trace_init
    INTEGER :: IOStatus             ! I/O return code
    INTEGER :: Loop1
    CHARACTER (LEN=200) :: TraceFile
+   character(len=200) :: csvname
    CHARACTER (LEN=10)  :: temp
 
    !===========================================================================
@@ -49,6 +50,16 @@ subroutine da_trace_init
             (/"Cannot open trace file "//TraceFile/))
       END IF
    END IF
+
+   if (trace_csv .and. rootproc) then
+         write(unit=csvname,FMT='(I10,A)') myproc,'.csv'
+      open(unit=trace_csv_unit,file="trace/"//trim(adjustl(csvname)), &
+         status="new",iostat=IOStatus)
+      if (IOStatus /= 0) then
+         call da_error(__FILE__,__LINE__,(/"Cannot open "//csvname/))
+      end if
+   end if
+
 
    !-----------------------------------------------------------------
    ! Find out whether to trace memory usage. The Cray routine to check

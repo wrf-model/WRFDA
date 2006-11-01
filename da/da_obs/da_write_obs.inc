@@ -11,12 +11,8 @@ subroutine da_write_obs( ob, iv, re)
    !          05/16/2006 - Updated for MPI run               Syed  RH  Rizvi
    !          07/03/2006 - Updated for AIRS retrievals       Syed  RH  Rizvi
    !-------------------------------------------------------------------------   
+
    IMPLICIT NONE
-
-
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
    type (y_type), intent(in)     :: ob      ! Observation structure.
    TYPE (ob_type), INTENT(IN)    :: iv      ! O-B structure.
