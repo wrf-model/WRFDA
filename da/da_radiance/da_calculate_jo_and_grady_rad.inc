@@ -7,49 +7,48 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
    !              Jo = -( d - H delta_x ) grad_y
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! Innovation vector.
-   TYPE (y_type) , INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type) , INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   TYPE (jo_type), INTENT(INOUT) :: jo          ! Obs cost function.
+   type (ob_type), intent(in)    :: iv          ! Innovation vector.
+   type (y_type) , intent(in)    :: re          ! Residual vector.
+   type (y_type) , intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout) :: jo          ! Obs cost function.
 
-   INTEGER                       :: n, k, i
+   integer                       :: n, k, i
 
-   IF ( iv%num_inst < 1 ) RETURN
+   if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_calculate_jo_and_grady_rad")
 
-   ALLOCATE ( jo % rad(1:iv%num_inst) )
+   allocate ( jo % rad(1:iv%num_inst) )
 
-   DO i =1, iv%num_inst
-      ALLOCATE ( jo % rad(i) % jo_ichan(iv%instid(i)%nchan) )
-      ALLOCATE ( jo % rad(i) % num_ichan(iv%instid(i)%nchan) )
+   do i =1, iv%num_inst
+      allocate (jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
+      allocate (jo % rad(i) % num_ichan(iv%instid(i)%nchan))
 
       jo % rad(i)%jo_ichan(:) = 0.0
       jo % rad(i)%num_ichan(:) = 0
 
-      IF (iv%instid(i)%num_rad < 1) CYCLE
+      if (iv%instid(i)%num_rad < 1) cycle
 
-      DO n=1, iv%instid(i)%num_rad
-         DO k=1, iv%instid(i)%nchan
+      do n=1, iv%instid(i)%num_rad
+         do k=1, iv%instid(i)%nchan
             jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
                                     ( iv%instid(i)%rad(n)%tb(k)%error * &
                                       iv%instid(i)%rad(n)%tb(k)%error )
-         END DO
+         end do
          IF (iv%instid(i)%rad(n)%loc%proc_domain) THEN
-            DO k=1, iv%instid(i)%nchan
+            do k=1, iv%instid(i)%nchan
                IF (iv%instid(i)%rad(n)%tb(k)%qc >= obs_qc_pointer) THEN
                   jo % rad(i) % jo_ichan(k) = jo % rad(i) % jo_ichan(k) - &
                      re%instid(i)%rad(n)%tb(k) * jo_grad_y%instid(i)%rad(n)%tb(k)
                   jo % rad(i) % num_ichan(k) = jo % rad(i) % num_ichan(k) + 1
-               END IF
-            END DO
-         END IF
-      END DO
+               end if
+            end do
+         end if
+      end do
       jo % rad(i)%jo_ichan(:) = 0.5 * jo % rad(i)%jo_ichan(:)
-
-   END DO
+   end do
 
    if (trace_use) call da_trace_exit("da_calculate_jo_and_grady_rad")
 

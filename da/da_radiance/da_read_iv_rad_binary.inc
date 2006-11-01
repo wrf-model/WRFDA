@@ -29,6 +29,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
 #else
       write(filename, '(a)') trim(iv%instid(n)%rttovid_string)//'.inv_bin'
 #endif
+      call da_get_unit(iv_rad_binary_unit)
       open(iv_rad_binary_unit,file=trim(filename),form='unformatted',iostat=ios)
       if (ios /= 0 ) Then
          call da_warning(__FILE__,__LINE__,(/"cannot open the file "//TRIM(filename)/))
@@ -87,6 +88,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
          end if    ! end if proc_domain
       end do     ! end do pixels
       close(iv_rad_binary_unit)
+      call da_free_unit(iv_rad_binary_unit)
    end do    !! end do instruments
 
    if (trace_use) call da_trace_exit("da_read_iv_rad_binary")

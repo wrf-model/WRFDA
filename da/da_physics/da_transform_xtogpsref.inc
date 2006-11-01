@@ -2,9 +2,6 @@ subroutine da_transform_XTogpsref(xb, xp)
 !
 ! input : xb%q, xb%p, xb%t, and xp
 ! output: xb%ref
-!
-! modified from MM5-4DVAR. Wei Huang, reviewed and modified by Y.-R. Guo 
-!                                                           June 9, 2004
 
    TYPE (xb_type), INTENT(inout) :: xb      ! First guess structure.
    type(xpose_type), intent(in)  :: xp      ! Domain decomposition vars.

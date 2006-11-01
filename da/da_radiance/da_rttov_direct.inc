@@ -241,7 +241,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
    end if
 
    !-----------------------------------
-   !  calling RTTOV foreward model
+   !  calling RTTOV forward model
    !----------------------------------
 #ifdef RTTOV
    call rttov_direct( &

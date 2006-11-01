@@ -3,6 +3,7 @@ module da_spectral
    use da_control
    use da_define_structures
    use fftpack5
+   use da_tools
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform
