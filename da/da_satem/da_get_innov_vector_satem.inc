@@ -94,11 +94,13 @@ subroutine da_get_innov_vector_satem ( it, xb, xp, ob, iv )
          endif
       END DO
 
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Satem follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-         'Number of failed thicknesses observations:     ',&
-                   ithicknessf, ' on ',ithickness
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+            ', Total Rejections for Satem follows:'
+         WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+            'Number of failed thicknesses observations:     ',&
+                      ithicknessf, ' on ',ithickness
+      end if
    ENDIF
 
 end subroutine da_get_innov_vector_satem

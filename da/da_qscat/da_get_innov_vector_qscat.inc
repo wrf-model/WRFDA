@@ -105,12 +105,13 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
          endif
       END DO
 
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it,&
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it,&
                    ', Total Rejections for qscat follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
-         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-         'Number of failed v-wind observations:     ',itvvf,' on ',itvv
-
+         WRITE (UNIT = check_max_iv_unit, FMT = '(/,4(2(A,I6),/))') &
+            'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+            'Number of failed v-wind observations:     ',itvvf,' on ',itvv
+      end if
    ENDIF
 
 END subroutine da_get_innov_vector_qscat

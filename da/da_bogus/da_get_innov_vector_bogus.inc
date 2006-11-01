@@ -165,17 +165,19 @@ subroutine da_get_innov_vector_bogus ( it, xb, xp, ob, iv )
       END IF
    END DO
 
-   write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for Bogus follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Bogus follows:'
 
-   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-     'Number of failed u-wind       observations:     ',ituf,  ' on ',itu,   &
-     'Number of failed v-wind       observations:     ',itvvf, ' on ',itvv,   &
-     'Number of failed temperature  observations:     ',ittf,  ' on ',itt,   &
-     'Number of failed mixing ratio observations:     ',itqvf, ' on ',itqv,   &
-     'Number of failed slp          observations:     ',itslpf,' on ',itslp,   &
-     'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
-                                      itu +itvv +itt +itqv +itslp
+      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+        'Number of failed u-wind       observations:     ',ituf,  ' on ',itu,   &
+        'Number of failed v-wind       observations:     ',itvvf, ' on ',itvv,   &
+        'Number of failed temperature  observations:     ',ittf,  ' on ',itt,   &
+        'Number of failed mixing ratio observations:     ',itqvf, ' on ',itqv,   &
+        'Number of failed slp          observations:     ',itslpf,' on ',itslp,   &
+        'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
+                                         itu +itvv +itt +itqv +itslp
+   end if
 
 end subroutine da_get_innov_vector_bogus
 

@@ -109,12 +109,14 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
          END IF
       END DO
 
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Pilot follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-         'Finally Total Pilot rejections ',ituf+itvvf,' on ',itu+itvv
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
+            ', Total Rejections for Pilot follows:'
+         WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+            'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+            'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+            'Finally Total Pilot rejections ',ituf+itvvf,' on ',itu+itvv
+      end if
    ENDIF
 
 end subroutine da_get_innov_vector_pilot

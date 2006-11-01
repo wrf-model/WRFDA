@@ -137,7 +137,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       ! [3.0] Calculate rv, rf at OBS location and initialise components of &
       ! innovation vector:
 
-      if(fg_format == 1) then
+      if(fg_format == fg_format_wrf) then
          call da_latlon_to_ij(map_info, &
                            iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                            iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
@@ -200,19 +200,20 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       END IF
    END DO
 
-   write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
-      'For outer iteration ', it, ', Total Rejections for Radar follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
+         'For outer iteration ', it, ', Total Rejections for Radar follows:'
 
-   IF ( USE_Radar_rv ) THEN
-       WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rv observations:     ',irvf, ' on ',irv
-   ENDIF
+      IF ( USE_Radar_rv ) THEN
+          WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
+            'Number of failed rv observations:     ',irvf, ' on ',irv
+      ENDIF
 
-   IF ( USE_Radar_rf ) THEN
-      WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rf observations:     ',irff, ' on ',irf
-   ENDIF
-
+      IF ( USE_Radar_rf ) THEN
+         WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
+            'Number of failed rf observations:     ',irff, ' on ',irf
+      ENDIF
+   end if
 
 end subroutine da_get_innov_vector_radar
 

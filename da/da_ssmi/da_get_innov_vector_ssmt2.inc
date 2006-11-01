@@ -115,11 +115,12 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
          IF ( check_max_iv ) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf )
       END DO
 
-       write(unit = check_max_iv_unit, FMT ='(A,i5,A)')    &
-      'For outer iteration ',it,' Total Rejections for SSMI (T2) follows:'
-       WRITE (UNIT = check_max_iv_unit, FMT = '(/,2(2(A,I6),/))') &
-      'Number of failed RH (T2) observations:    ',irhf, ' on ',irh
-
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, FMT ='(A,i5,A)')    &
+            'For outer iteration ',it,' Total Rejections for SSMI (T2) follows:'
+         WRITE (UNIT = check_max_iv_unit, FMT = '(/,2(2(A,I6),/))') &
+            'Number of failed RH (T2) observations:    ',irhf, ' on ',irh
+      end if
    ENDIF
 
 end subroutine da_get_innov_vector_ssmt2
