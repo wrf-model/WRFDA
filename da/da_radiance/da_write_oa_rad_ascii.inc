@@ -15,7 +15,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_levs ! Number of obs levels.
 
-   INTEGER            :: ios
+   INTEGER            :: ios, oma_rad_unit
    character(len=30)  :: filename
    integer            :: ndomain
 
@@ -44,10 +44,11 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
 #else
       write(UNIT=filename, FMT='(a)') trim(iv%instid(n)%rttovid_string)//'.oma'
 #endif
+      call da_get_unit(oma_rad_unit)
       open(UNIT=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
-            (/"Canot open oma radiance file"//filename/))
+            (/"Cannot open oma radiance file"//filename/))
       Endif
       write(UNIT=oma_rad_unit,FMT='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                            ' number-of-pixels : ', ndomain, &
@@ -257,6 +258,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
          end if    ! end if proc_domain
       end do     ! end do pixels
       close(UNIT=oma_rad_unit)
+      call da_free_unit(oma_rad_unit)
    end do    !! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_oa_rad_ascii")

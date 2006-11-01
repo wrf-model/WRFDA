@@ -6,9 +6,28 @@ subroutine da_wrfvar_init2
 
    IMPLICIT NONE
 
-   integer :: ierr
+   integer :: ierr,i
+   character(len=80) :: filename
 
    IF (trace_use) call da_trace_entry("da_wrfvar_init2")
+
+   if (analysis_type(1:6) == "VERIFY" .or. analysis_type(1:6) == "verify") then
+      anal_type_verify=.true.
+   else
+      anal_type_verify=.false.
+   end if
+
+   if (analysis_type(1:8) == "RANDOMCV" .or. analysis_type(1:8) == "randomcv") then
+      anal_type_randomcv=.true.
+   else
+      anal_type_randomcv=.false.
+   end if
+
+   if (analysis_type(1:6) == "QC-OBS" .or. analysis_type(1:6) == "qc-obs") then
+      anal_type_qcobs=.true.
+   else
+      anal_type_qcobs=.false.
+   end if
 
    !<DESCRIPTION>
    ! Among the configuration variables read from the namelist is
@@ -113,11 +132,39 @@ subroutine da_wrfvar_init2
    END IF
 
    ! JRB
-   CALL da_warning(__FILE__,__LINE__,(/"Fix me"/))
+!   CALL da_warning(__FILE__,__LINE__,(/"Fix me"/))
    !  head_grid%start_subtime = head_grid%start_time
    !  head_grid%stop_subtime = head_grid%stop_time
 
-  IF (trace_use) call da_trace_exit("da_wrfvar_init2")
+   if (rootproc) then
+      call da_get_unit(cost_unit)
+      call da_get_unit(grad_unit)
+      call da_get_unit(stats_unit)
+      call da_get_unit(jo_unit)
+      call da_get_unit(check_max_iv_unit)
+      open(unit=cost_unit,file="cost_fn",status="new")
+      open(unit=grad_unit,file="grad_fn",status="new")
+      open(unit=stats_unit,file="statistics",status="new")
+      open(unit=jo_unit,file="jo",status="new")
+      open(unit=check_max_iv_unit,file="check_max_iv",status="new")
+
+      do i=1,num_alpha_corr_types
+         call da_get_unit(alpha_corr_unit1(i))
+         call da_get_unit(alpha_corr_unit2(i))
+         write (unit=filename,fmt='(A,I1)') "alpha_corr1_",i
+         open(unit=alpha_corr_unit1(i),file=filename,status="new")
+         write (unit=filename,fmt='(A,I1)') "alpha_corr2_",i
+         open(unit=alpha_corr_unit2(i),file=filename,status="new")
+      end do
+
+      do i=1,num_sound_diag
+         call da_get_unit(sound_diag_unit(i))
+         write (unit=filename,fmt='(A,I1)') "sound_diag_",i
+         open(unit=sound_diag_unit(i),file=filename,status="new")
+      end do
+   end if
+
+   if (trace_use) call da_trace_exit("da_wrfvar_init2")
 
 end subroutine da_wrfvar_init2
 

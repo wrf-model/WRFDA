@@ -83,35 +83,35 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! scan main body of gts observation file
-         call da_scan_obs (gts_iunit, iv, xp, filename)
+         call da_scan_obs (iv, xp, filename)
 
          if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ssmi', n,'.dat'
-            call da_scan_ssmi (ssmi_iunit, iv, xp, filename)
+            call da_scan_ssmi (iv, xp, filename)
          endif
 
          if(Use_RadarObs) then
             ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'dat'
-            call da_scan_radar(Radar_iunit, iv, xp, filename)
+            call da_scan_radar(iv, xp, filename)
          endif
       enddo
    else
       iv%current_ob_time = 1
 
-      call da_scan_obs(gts_iunit, iv, xp,'ob01.ascii')
+      call da_scan_obs(iv, xp,'ob01.ascii')
 
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
-         call da_scan_ssmi(ssmi_iunit, iv, xp,'ssmi01.dat')
+         call da_scan_ssmi(iv, xp,'ssmi01.dat')
       endif
 
       ! scan main body of radar observation file
       if(Use_RadarObs) then
-         call da_scan_radar(Radar_iunit, iv, xp,'radar01.dat')
+         call da_scan_radar(iv, xp,'radar01.dat')
       endif
    endif
 
@@ -224,33 +224,33 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.ascii'
 
          ! Read gts observation file
-         call da_read_obs (gts_iunit, iv, xp, filename)
+         call da_read_obs (iv, xp, filename)
 
          if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi', n,'.dat'
-            call da_read_ssmi (ssmi_iunit, iv, xp, filename)
+            call da_read_ssmi (iv, xp, filename)
          endif
 
          if(Use_RadarObs) then
             ! read radar observation file
             write(filename(1:11), fmt='(a, i2.2)') 'radar', n,'.dat'
-            call da_read_radar(Radar_iunit, iv, xp, filename)
+            call da_read_radar(iv, xp, filename)
          endif
       enddo
    else
       iv%current_ob_time = 1
 
-      call da_read_obs(gts_iunit, iv, xp, 'ob01.ascii')
+      call da_read_obs(iv, xp, 'ob01.ascii')
 
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
          ! read ssmi observation file
-         call da_read_ssmi (ssmi_iunit, iv, xp,'ssmi01.dat')
+         call da_read_ssmi (iv, xp,'ssmi01.dat')
       endif
 
       if(Use_RadarObs) then
          ! read radar observation file
-         call da_read_radar(Radar_iunit, iv, xp,'radar01.dat')
+         call da_read_radar(iv, xp,'radar01.dat')
       endif
    endif
 

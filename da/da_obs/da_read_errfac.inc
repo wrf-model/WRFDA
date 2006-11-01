@@ -12,7 +12,7 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    character (len=5)             :: ob_name1
    character (len=21)            :: string1
    character (len=91)            :: string2
-   integer                       :: ierr
+   integer                       :: ierr, fac_unit
    real                          :: d1, d2, d3, d4, d5
 
    f1 = 1.0
@@ -21,6 +21,7 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    f4 = 1.0
    f5 = 1.0
 
+   call da_get_unit(fac_unit)
    open(UNIT=fac_unit, status='old', file = 'errfac.dat', iostat=ierr )
 
    if ( ierr == 0 ) then
@@ -55,6 +56,7 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    end if
 
    close( fac_unit )
+   call da_free_unit(fac_unit)
 
 end subroutine da_read_errfac
 

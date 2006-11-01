@@ -1,4 +1,4 @@
-subroutine da_scan_ssmi (iunit, ob, xp, filename)
+subroutine da_scan_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
@@ -6,7 +6,6 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,          INTENT(in)    :: iunit
    TYPE(xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE(ob_type),    INTENT(inout) :: ob
    CHARACTER(*), INTENT(in)        :: filename
@@ -18,7 +17,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    CHARACTER (LEN = 40)         :: obs_platform
    CHARACTER (LEN = 120)        :: char_ned
 
-   INTEGER                      :: i, j, k, i1, j1, k1, iost, fm
+   INTEGER                      :: i, j, k, i1, j1, k1, iost, fm,iunit
    REAL                         :: dx, dxm, dy, dym, dz, dzm
 
    TYPE (model_loc_type)        :: loc
@@ -39,7 +38,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 
    ! OPEN FILE
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -220,6 +219,7 @@ subroutine da_scan_ssmi (iunit, ob, xp, filename)
    ENDDO reports
 
    close(UNIT=iunit)
+   call da_free_unit(iunit)
    
    ! PRINT OUT
    ! =========

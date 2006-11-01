@@ -10,7 +10,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
    TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
 
-   integer :: iost
+   integer :: iost, ssmi_unit
 
    IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
 
@@ -112,7 +112,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
       use_Eos_AmsuaObs     = .FALSE.
       use_Eos_radObs       = .FALSE.
       use_HsbObs           = .FALSE.
-      Use_Obsgts           = .TRUE.
+      Use_Obsgts           = .FALSE.
       Use_Radiance         = .FALSE.
    endif
 
@@ -123,16 +123,18 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    END IF
 
    IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
-      OPEN ( UNIT   = ssmi_iunit,     &
+      call da_get_unit(ssmi_unit)
+      OPEN ( UNIT   = ssmi_unit,     &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
              IOSTAT =  iost,     &
              STATUS = 'OLD')
-      CLOSE(UNIT=ssmi_iunit)
+      CLOSE(UNIT=ssmi_unit)
+      call da_free_unit(ssmi_unit)
 
       IF (iost /= 0) THEN
          WRITE (UNIT=stderr,FMT='(/,A,I3,A,/)') &
-            ' INPUT FILE UNIT ',ssmi_iunit, &
+            ' INPUT FILE UNIT ',ssmi_unit, &
             ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
          Use_SsmiRetrievalObs=.false.
          Use_SsmiTbObs=.false.
@@ -201,7 +203,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 
    IF (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
-      IF ( ob_format == 1 ) THEN
+      IF ( ob_format == ob_format_bufr ) THEN
          CALL da_messages((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
          IF (iv%num_pseudo > 0) THEN
@@ -217,8 +219,8 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
          ELSE
             CALL da_setup_obs_structures_bufr( xp, ob, iv )
          END IF 
-      ELSE IF ( ob_format == 2 ) THEN
-         ! [1.2] MM5 observation input file:
+      ELSE IF ( ob_format == ob_format_ascii ) THEN
+         ! [1.2] GTS observation input file:
          CALL da_setup_obs_structures_ascii( xp, ob, iv )
       END IF
    END IF

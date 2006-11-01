@@ -1,5 +1,7 @@
 subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
 
+   use da_tools
+
    implicit none
 
    integer, intent(in)  :: nj              ! Number of latitudes.
@@ -19,6 +21,10 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
    real    :: eq_coeff            ! 1 if equator point, 0 otherwise.
    real    :: alp_norm_test       ! Summation scalar.
    complex :: eq_term             ! Summation scalar.
+   integer :: spec_unit
+
+   call da_get_unit(spec_unit)
+   open(unit=spec_unit,FILE="spec_pol",status="new")
 
    if ( (nj+1) / 2 == nj/2 + 1 ) then
       eq_coeff = 1.0 ! Odd latitudes
@@ -83,4 +89,9 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
       end do
    end do
 
+   close(spec_unit)
+   call da_free_unit(spec_unit)
+
 end subroutine da_setlegpol_test
+
+

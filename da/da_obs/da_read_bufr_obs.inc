@@ -1,4 +1,4 @@
-SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
@@ -10,7 +10,6 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,         INTENT (in)  :: iunit
    TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
    TYPE (ob_type), INTENT(inout) :: ob
 
@@ -50,6 +49,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
    integer               :: year, month, day,hour
    integer               :: iret, idate, kx, nlevels, nrecs,miscd, t29, jx, ix
    integer               :: cat,zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
+   integer               :: iunit
 
    integer, parameter    :: qflag=4         ! Flag for retaining data
    EQUIVALENCE     ( hdr(1), c8id )
@@ -79,7 +79,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
-
+   call da_get_unit(iunit)
    if(present(filename)) then
       OPEN(UNIT   = iunit, FILE   = trim(filename), &
            IOSTAT =  iost, form = 'unformatted', STATUS = 'OLD')
@@ -437,7 +437,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 ! Method : 
 !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
 !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
-! Note: Currently da_obs_proc_station is active only for ob_format=2 (Ascii)
+! Note: Currently da_obs_proc_station is active only for ob_format_ascii
 !      CALL da_obs_proc_station(platform)
 !---------------------------------------------------------------------------
 !    Loop over duplicating obs for global
@@ -959,6 +959,7 @@ SUBROUTINE da_read_bufr_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------
    call closbf(iunit)
    close(iunit)
+   call da_free_unit(iunit)
 !-----------------------------------------------------------------------
 !------------------------------------------------------------------------
    ob%num_sound = num_sound

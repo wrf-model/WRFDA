@@ -1,12 +1,12 @@
-subroutine da_read_ssmi (iunit, ob, xp, filename)
+
+subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
+   ! Read the header of a SSMI 2.0 GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none
 
-   INTEGER,          INTENT(in)    :: iunit
    TYPE(xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE(ob_type),    INTENT(inout) :: ob
    CHARACTER(*), INTENT(in)        :: filename
@@ -17,7 +17,7 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
                                    fmt_loc
    CHARACTER (LEN = 120)        :: char_ned
 
-   INTEGER                      :: iost, fm
+   INTEGER                      :: iost, fm,iunit
 
    TYPE (model_loc_type)        :: loc
    TYPE (info_type)             :: info
@@ -41,6 +41,7 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
 
    ! OPEN FILE
 
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -295,6 +296,7 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
    ENDDO reports
 
    close(iunit)
+   call da_free_unit(iunit)
 
    ! PRINT OUT
    ! =========

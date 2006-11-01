@@ -1,4 +1,4 @@
-subroutine da_scan_radar (iunit, ob, xp, filename)
+subroutine da_scan_radar (ob, xp, filename)
 
 !-----------------------------------------------------------------------------!
 !  Scan the Radar observation file
@@ -10,7 +10,6 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,          INTENT (IN)  :: iunit
    TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
    TYPE (ob_type), INTENT (inout) :: ob
 
@@ -18,6 +17,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
 
    INTEGER                       :: i, j, n, iost, nlevels, num_Radar, fm
    INTEGER                       :: total_Radar
+   integer                       :: iunit
 
    TYPE (Radar_multi_level_type) :: platform
 
@@ -37,7 +37,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
 !----------------------------------------------------------------------------!
 ! 1. OPEN FILE
 ! ============
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -214,6 +214,7 @@ subroutine da_scan_radar (iunit, ob, xp, filename)
   ENDDO loop_total_Radar
 
    close (iunit)
+   call da_free_unit(iunit)
 
 !----------------------------------------------------------------------------!
 ! 4. PRINT OUT

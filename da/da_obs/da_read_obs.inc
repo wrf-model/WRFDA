@@ -1,6 +1,6 @@
-SUBROUTINE da_read_obs (iunit, ob, xp, filename)
+SUBROUTINE da_read_obs (ob, xp, filename)
 !-----------------------------------------------------------------------------!
-!  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
+!  Purpose: Read the header of a GTS observation file
 !
 !  History:
 !
@@ -28,7 +28,6 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
    implicit none
 
-   INTEGER,           INTENT (in)   :: iunit
    TYPE (xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
    TYPE (ob_type),    INTENT(inout) :: ob
 
@@ -42,7 +41,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, nlevels, fm
+   INTEGER                      :: i, j, iost, nlevels, fm,iunit
 
    TYPE (multi_level_type)      :: platform
 
@@ -101,7 +100,7 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !----------------------------------------------------------------------------!
 !  OPEN FILE
 !  ---------
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -297,7 +296,7 @@ loop_level: DO i = 1, platform%info%levels
 
            call da_ffdduv (platform%each (i)%speed%inv, &
                         platform%each (i)%v%inv,     &
-                        U_comp, V_comp, platform%info%lon, 1)
+                        U_comp, V_comp, platform%info%lon, convert_fd2uv)
            platform%each (i)%u = platform%each (i)%speed
            platform%each (i)%v = platform%each (i)%speed
            platform%each (i)%u%inv = U_comp
@@ -632,10 +631,10 @@ loop_level: DO i = 1, platform%info%levels
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
 !  write original thickness errors for filtered obs
-         if( analysis_type(1:6) == "QC-OBS" .or. analysis_type(1:6) == "qc-obs" ) then
-         do i = 1, nlevels
-         ob%satem(num_satem)%org_thickness(i) = platform%each(i)%t
-         end do 
+         if (anal_type_qcobs) then
+            do i = 1, nlevels
+               ob%satem(num_satem)%org_thickness(i) = platform%each(i)%t
+            end do 
          endif
 
 !        Splitting the reported Satem data into smaller layers.
@@ -1206,6 +1205,9 @@ loop_level: DO i = 1, platform%info%levels
 !          'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
 !     call da_error(__FILE__,__LINE,errmsg(1:1))
 !  endif
+
+   close(iunit)
+   call da_free_unit(iunit)
 
    IF (trace_use) CALL da_trace_exit("da_read_obs")
 

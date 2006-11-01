@@ -1,9 +1,9 @@
-subroutine da_count_filtered_obs(ounit, &
+subroutine da_count_filtered_obs(&
                     ts0, tlp, ptop, ps0, map, ds, ide, jde,&   
                     phic, xlonc, truelat1, truelat2)
 !-----------------------------------------------------------------------------!
 !  Purpose: Scans intermediate Filtered Obs file, 
-!           counts various obs type and writes on ounit              
+!           counts various obs type and writes on filtered_obs_unit              
 !-----------------------------------------------------------------------------!
 ! Original code:      10/18/2005            Syed RH Rizvi
 ! Update History:     
@@ -16,7 +16,7 @@ subroutine da_count_filtered_obs(ounit, &
    implicit none
    REAL,              intent(in) :: ts0, tlp, ptop, ps0, ds
    REAL,              intent(in) :: phic, xlonc, truelat1, truelat2
-   INTEGER,           intent(in) :: map, ide, jde , ounit
+   INTEGER,           intent(in) :: map, ide, jde
 !
    INTEGER                      :: i, k, iost, fm
    TYPE (multi_level_type)      :: platform
@@ -74,7 +74,7 @@ file_number: DO files = 0, num_procs-1
    write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.',files  
    open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
    if(iost /= 0) &
-   call da_error(__FILE__,__LINE__, (/"Canot open "//trim(filename)/))
+   call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
 !  LOOP OVER RECORDS
 !  -----------------
@@ -292,12 +292,12 @@ loop_level: DO i = 1, platform%info%levels
              num_profiler + num_qscat + num_ssmt1 + num_ssmt2 +  &
              num_satem  + num_bogus +  num_airsr + num_others
 !
-      WRITE  (UNIT = ounit, FMT = '(A,I7,A,F8.0,A)')    &
+      WRITE  (UNIT = filtered_obs_unit, FMT = '(A,I7,A,F8.0,A)')    &
       "TOTAL =",total_obs, ", MISS. =",missing_r,","  
 
 ! Write other counts       
 ! -------------------
-      WRITE  (UNIT = ounit, FMT = '(6(A,I7,A))' )    &
+      WRITE  (UNIT = filtered_obs_unit, FMT = '(6(A,I7,A))' )    &
       "SYNOP =",num_synop,", ", &
       "METAR =",num_metar,", ", &
       "SHIP  =",num_ships,", ", &
@@ -321,10 +321,10 @@ loop_level: DO i = 1, platform%info%levels
 ! Write Reference state Info
 ! ---------------------------
 
-        WRITE (UNIT = ounit, FMT = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
         "PHIC  =", phic,", XLONC =", xlonc,", TRUE1 =", truelat1,&
       ", TRUE2 =",truelat2                                                      
-        WRITE (UNIT = ounit, FMT = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
         "TS0   =",  ts0, ", TLP   =", tlp, &
       ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
 
@@ -333,44 +333,44 @@ loop_level: DO i = 1, platform%info%levels
 !  Hard wire Following variabless
       maxnes = 1 ; numc = 1 ;  idd = 1
       nesti = 1 ; nestj = 1
-        WRITE (UNIT = ounit, FMT = '(5(A,I7),A)' ) &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(5(A,I7),A)' ) &
         "IXC   =", ide   ,", JXC   =", jde   ,", IPROJ =", map,&
         ", IDD   =", idd,", MAXNES=",maxnes,","
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
 !       "NESTIX=",(nestix (i),", ", i = 1, maxnes)
        "NESTIX=",(ide    ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NESTJX=",(jde       ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NUMC  =",(numc ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,F7.2,A))')&
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,F7.2,A))')&
        "DIS   =",(ds/1000.,", ",i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NESTI =",(nesti     ,", ", i = 1, maxnes)
-        WRITE (UNIT = ounit, FMT = '(A,10(:,I7,A))')  &
+        WRITE (UNIT = filtered_obs_unit, FMT = '(A,10(:,I7,A))')  &
        "NESTJ =",(nestj     ,", ", i = 1, maxnes)
 
 ! Write Variable names and Unit
 ! -------------------------------
 
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "INFO  = PLATFORM, DATE, NAME, LEVELS, LATITUDE, LONGITUDE, ELEVATION, ID."
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "SRFC  = SLP, PW (DATA,QC,ERROR)."
-       WRITE (UNIT = ounit, FMT = '(A)' ) &
+       WRITE (UNIT = filtered_obs_unit, FMT = '(A)' ) &
       "EACH  = PRES, SPEED, DIR, HEIGHT, TEMP, DEW PT, HUMID (DATA,QC,ERROR)*LEVELS."
 
 ! Write Format Info
 ! ------------------
 
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'INFO_FMT = ', TRIM (fmt_info)
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'SRFC_FMT = ', TRIM (fmt_srfc)
-      WRITE (UNIT = ounit, FMT = '(2A)' ) 'EACH_FMT = ', TRIM (fmt_each)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'INFO_FMT = ', TRIM (fmt_info)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'SRFC_FMT = ', TRIM (fmt_srfc)
+      WRITE (UNIT = filtered_obs_unit, FMT = '(2A)' ) 'EACH_FMT = ', TRIM (fmt_each)
 
 ! Write End of header record
 ! ---------------------------
 
-      WRITE (UNIT = ounit, FMT = '(A)') &
+      WRITE (UNIT = filtered_obs_unit, FMT = '(A)') &
 "#------------------------------------------------------------------------------#"
 
    if (trace_use) CALL da_trace_exit("da_count_filtered_obs")

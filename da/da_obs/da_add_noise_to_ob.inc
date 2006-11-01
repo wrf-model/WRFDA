@@ -9,8 +9,10 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !             07/03/2006  -   update for AIRS retrievals    Syed RH Rizvi    
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
-!----------------------------------------------------------------------------   
+!---------------------------------------------------------------------------- 
+  
    IMPLICIT NONE
+
 
    TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.
    TYPE (y_type), INTENT(INOUT)  :: ob   ! (Smaller) observation structure.
@@ -24,7 +26,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
-      ounit = rand_unit        
+   call da_get_unit(ounit)
 
       dum = -999999.9
 !----------------------------------------------------------------------
@@ -41,16 +43,11 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 #else
       write(UNIT=filename, FMT='(a)') 'rand_obs_error.000'
 #endif
-   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
-   if (ios /= 0 ) Then
-      call da_error(__FILE__,__LINE__, &
-         (/"Canot open random observation error file"//trim(filename)/))
-   Endif
 
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open random observation error file"//filename/))
+         (/"Cannot open random observation error file"//filename/))
    Endif
 
 !  [2.1] Transfer surface obs:
@@ -671,7 +668,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
                  call da_add_noise( iv%instid(inst)%rad(n)%tb(k),  &
                                     ob%instid(inst)%rad(n)%tb(k), z1)
                  
-                 write(ounit,'(2i8,2e15.7)') num_obs, 1,  &
+                 write(ounit,'(2i8,f10.3,e15.7)') num_obs, 1,  &
                           iv%instid(inst)%rad(n)%tb(k)%error, z1
            end if
          end do                                ! end loop for pixel
@@ -680,5 +677,6 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    END IF
 
   close (ounit)
+  call da_free_unit(ounit)
 
 END SUBROUTINE da_add_noise_to_ob

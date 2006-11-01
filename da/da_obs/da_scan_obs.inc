@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
+SUBROUTINE da_scan_obs (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan WRFVAR GTS observation file
@@ -6,7 +6,6 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,         INTENT (in)  :: iunit
    TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
    TYPE (ob_type), INTENT(inout) :: ob
 
@@ -20,7 +19,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, fm, report
+   INTEGER                      :: i, j, iost, fm, report,iunit
 
    TYPE (multi_level_type)      :: platform
 
@@ -75,7 +74,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
 
    ! OPEN FILE
    ! ---------
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
       FILE   = trim(filename), &
       FORM   = 'FORMATTED',  &
@@ -368,6 +367,7 @@ SUBROUTINE da_scan_obs (iunit, ob, xp, filename)
    ENDDO reports
 
    CLOSE(iunit)
+   call da_free_unit(iunit)
 
    !------------------------------------------------------------------------
    ! Check the numbers again, make sure we have the right number.

@@ -82,23 +82,23 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.bufr'
 
          ! scan PREPBUFR OBSERVATION FILE
-         call da_scan_bufr_obs (bufr_iunit, iv, xp, filename)
+         call da_scan_bufr_obs (iv, xp, filename)
 
 
          ! if (Use_RadarObs) then
          !    ! scan Radar OBSERVATION FILE
          !    write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'.dat'
-         !    call da_scan_bufr_radar(Radar_iunit-1, iv, xp, filename)
+         !    call da_scan_bufr_radar(iv, xp, filename)
          ! endif
       enddo
    else
       iv%current_ob_time = 1
       filename="ob.bufr"
-      call da_scan_bufr_obs(bufr_iunit, iv, xp, filename)
+      call da_scan_bufr_obs(iv, xp, filename)
 
       ! scan MAIN BODY OF Radar OBSERVATION FILE
       ! if(Use_RadarObs) &
-      ! call da_scan_bufr_radar(Radar_iunit-1, iv, xp,'radar.dat')
+      ! call da_scan_bufr_radar(iv, xp,'radar.dat')
    endif
 
    !-----------------------------------------------------------------
@@ -186,12 +186,12 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
          write(filename(1:10), fmt='(a, i2.2)') 'ob.', n
 
          ! Read PREPBUFR OBSERVATION FILE
-         call da_read_bufr_obs (bufr_iunit, iv, xp, filename)
+         call da_read_bufr_obs (iv, xp, filename)
 
          ! if (Use_RadarObs) then
          !    ! Read Radar OBSERVATION FILE
          !    write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
-         !    call da_read_bufr_radar(Radar_iunit, iv, xp, filename)
+         !    call da_read_bufr_radar(iv, xp, filename)
          ! endif
       enddo
    else
@@ -199,11 +199,11 @@ SUBROUTINE da_setup_obs_structures_bufr( xp, ob, iv )
       iv%current_ob_time = 1
 
       filename="ob.bufr"
-      call da_read_bufr_obs(bufr_iunit, iv, xp,filename)
+      call da_read_bufr_obs(iv, xp,filename)
 
       ! if (Use_RadarObs) then
       !    !Read Radar OBSERVATION FILE
-      !    call da_read_bufr_radar(Radar_iunit, iv, xp)
+      !    call da_read_bufr_radar(iv, xp)
       ! endif
    endif
 

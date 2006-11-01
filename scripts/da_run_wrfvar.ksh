@@ -382,16 +382,16 @@ if test ! -f $DA_ANALYSIS; then
         cp fort.9 $RUN_DIR/namelist.output
       fi
 
-      if test -f fort.12; then
-         cp fort.12 $RUN_DIR/statistics
+      if test -f statistics; then
+         cp statistics $RUN_DIR/statistics
       fi
 
-      if test -f fort.81; then 
-         cp fort.81 $RUN_DIR/cost_fn
+      if test -f cost_fn; then 
+         cp cost_fn $RUN_DIR/cost_fn
       fi
 
-      if test -f fort.82; then
-         cp fort.82 $RUN_DIR/grad_fn
+      if test -f grad_fn; then
+         cp grad_fn $RUN_DIR/grad_fn
       fi
 
       if test -f wrfvar_output; then

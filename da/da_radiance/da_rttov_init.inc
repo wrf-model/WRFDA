@@ -20,7 +20,7 @@ subroutine da_rttov_init(iv,ob)
 
 !  local arguments
 !------------------- 
- integer   :: n, k,j,bunit, iscan,ichan,npos
+ integer   :: n, k,j,bunit, iscan,ichan,npos,unit_factor_rad
  real      :: ave
 
 !
@@ -61,7 +61,7 @@ subroutine da_rttov_init(iv,ob)
 !--------------------------------------------------------------
 
     mxchn           =  300
-    err_unit        =  rtm_error_unit
+    err_unit        =  stderr
     verbosity_level =  rtminit_print
     nsensor         =  rtminit_nsensor
 
@@ -328,7 +328,7 @@ subroutine da_rttov_init(iv,ob)
 !-------------------------------------------------------
 
  if (read_biascoef) then
-  bunit = 109
+  call da_get_unit(bunit)
   open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
   if (iost /= 0) then
@@ -368,6 +368,7 @@ subroutine da_rttov_init(iv,ob)
    end do
 
    close(bunit)
+   call da_free_unit(bunit)
 
  end if
 
@@ -380,6 +381,7 @@ subroutine da_rttov_init(iv,ob)
        satinfo(n)%error_factor(:) = 1.0
     end do
 
+    call da_get_unit(unit_factor_rad)
     open(unit_factor_rad, file='radiance_error.factor', &
          form='formatted',iostat = iost, status='old')    
 
@@ -406,6 +408,8 @@ subroutine da_rttov_init(iv,ob)
          exit
       end if
     end do
+    close(unit_factor_rad)
+    call da_free_unit(unit_factor_rad)
 
  end if
 

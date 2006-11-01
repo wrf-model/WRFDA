@@ -13,7 +13,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
 
 
    ! local variables
-   integer   :: n,scanpos,k,isflg,ios
+   integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
    logical   :: lmix
    real      :: satzen,si
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
@@ -211,6 +211,8 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
       else
          filename = trim(iv%instid(inst)%rttovid_string)//'.QCSTAT'
       endif
+
+      call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
          Write(unit=errmsg(1),FMT='(A,A)') 'error opening the output file ', filename
@@ -236,6 +238,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
       write(fgat_rad_unit,'(10i7)')     ngood(:)
 
       close(fgat_rad_unit)
+      call da_free_unit(fgat_rad_unit)
    End if
 
    if (trace_use) call da_trace_exit("da_qc_amsua")

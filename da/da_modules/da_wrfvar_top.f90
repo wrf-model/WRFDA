@@ -14,6 +14,8 @@ MODULE da_wrfvar_top
 
    USE module_timing
    USE da_tracing
+   use da_tools
+   use da_radiance
 
 #ifdef DM_PARALLEL
    USE module_dm

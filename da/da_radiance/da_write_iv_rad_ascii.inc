@@ -14,7 +14,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_levs ! Number of obs levels.
 
-   INTEGER            :: ios
+   INTEGER            :: ios, innov_rad_unit
    character(len=30)  :: filename
    integer            :: ndomain
 
@@ -44,10 +44,11 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
       write(UNIT=filename, FMT='(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
 #endif
 
+      call da_get_unit(innov_rad_unit)
       open(UNIT=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0 ) Then
          call da_error(__FILE__,__LINE__, &
-            (/"Canot open innovation radiance file"//filename/))
+            (/"Cannot open innovation radiance file"//filename/))
       Endif
       write(UNIT=innov_rad_unit,FMT='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels : ', ndomain, &
@@ -255,6 +256,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
          end if ! end if proc_domain
       end do ! end do pixels
       close(UNIT=innov_rad_unit)
+      call da_free_unit(innov_rad_unit)
    end do ! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_iv_rad_ascii")

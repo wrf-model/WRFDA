@@ -1,4 +1,4 @@
-subroutine da_read_radar (iunit, ob, xp, filename)
+subroutine da_read_radar (ob, xp, filename)
 
 !----------------------------------------------------------------------------------------!
 ! Read the Radar observation file
@@ -13,7 +13,6 @@ subroutine da_read_radar (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,          INTENT (IN)   :: iunit
    TYPE (xpose_type), INTENT(IN)   :: xp    ! Domain decomposition vars.
    TYPE (ob_type), INTENT (inout)  :: ob
 
@@ -29,7 +28,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
    LOGICAL                       :: outside
 
    INTEGER                       :: total_obs, num_Radar, total_Radar
-   INTEGER                        ::n_dup, ndup
+   INTEGER                        ::n_dup, ndup, iunit
 
    if (trace_use) call da_trace_entry("da_read_radar")
 
@@ -42,7 +41,7 @@ subroutine da_read_radar (iunit, ob, xp, filename)
 !----------------------------------------------------------------------------!
 ! 1. OPEN FILE
 ! ============
-
+   call da_get_unit(iunit)
    OPEN(UNIT   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
@@ -336,6 +335,9 @@ subroutine da_read_radar (iunit, ob, xp, filename)
       call da_error(__FILE__,__LINE__,errmsg(1:1))
     endif
 !----------------------------------------------------------------------------!
+
+   close(iunit)
+   call da_free_unit(iunit)
 
    if (trace_use) call da_trace_exit("da_read_radar")
 

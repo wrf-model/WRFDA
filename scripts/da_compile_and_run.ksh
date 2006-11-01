@@ -9,7 +9,6 @@ export RUN=${RUN:-true}
 
 export ID=${ID:-trunk}
 export REGIONS=${REGIONS:-con200}
-export CONFIGS=${CONFIGS:-rsl}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
 
@@ -31,11 +30,9 @@ let COUNT=1
 
 export TARGET=wrfvar
 
-for CONFIG in $CONFIGS; do
-
-  for COMPILER in $COMPILERS; do
-    export BUILD=${ID}_${CONFIG}_${COMPILER}_${MACHINE}
-    if $COMPILE; then
+for COMPILER in $COMPILERS; do
+   export BUILD=${ID}_${COMPILER}_${MACHINE}
+   if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
 
       . ~/setup_$COMPILER
@@ -51,23 +48,18 @@ for CONFIG in $CONFIGS; do
       ./compile_new $TARGET > compile.out 2>&1
       ls -l build/wrfvar.exe
       let COUNT=$COUNT+1
-    fi
-    if $RUN; then
+   fi
+   if $RUN; then
       for REGION in $REGIONS; do
-        for NUM_PROCS in $PROCS; do
-          export NUM_PROCS
-          if test $CONFIG = ser && test $NUM_PROCS != 1; then
-            echo "Skipping parallel runs of serial code"
-          else
+         for NUM_PROCS in $PROCS; do
+            export NUM_PROCS
             cd ~bray/data/$REGION
             . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER >/dev/null
             echo "Testing $BUILD $TARGET on $REGION"
             ./test.ksh
-          fi
-        done
+         done
       done
-    fi
-  done
+   fi
 done
 
 #ls -lrt ~bray/*/*/build/*.exe

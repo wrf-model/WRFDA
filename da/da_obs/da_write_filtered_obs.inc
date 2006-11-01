@@ -89,7 +89,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    open(UNIT=ounit,file=trim(filename),form='formatted',status='new',iostat=iost)
    if (iost /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open filtered observation file"//trim(filename)/))
+         (/"Cannot open filtered observation file"//trim(filename)/))
    Endif
 !
    zero = 0
@@ -160,7 +160,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
               iv%synop(i)%v%qc >= obs_qc_pointer) then
             uu = ob%synop(i)%u
             vv = ob%synop(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%synop(i)%info%lon, -1)             
+            call da_ffdduv( speed, dir, uu, vv, iv%synop(i)%info%lon, convert_uv2fd)             
             speed_qc  = iv%synop(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%synop(i)%u%error
@@ -261,7 +261,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
             iv%metar(i)%v%qc >= obs_qc_pointer) then
             uu = ob%metar(i)%u
             vv = ob%metar(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%metar(i)%info%lon, -1)             
+            call da_ffdduv( speed, dir, uu, vv, iv%metar(i)%info%lon, convert_uv2fd)             
             speed_qc  = iv%metar(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%metar(i)%u%error
@@ -358,7 +358,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
              iv%ships(i)%v%qc >= obs_qc_pointer) then
             uu = ob%ships(i)%u
             vv = ob%ships(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%ships(i)%info%lon, -1)             
+            call da_ffdduv( speed, dir, uu, vv, iv%ships(i)%info%lon, convert_uv2fd)             
             speed_qc  = iv%ships(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%ships(i)%u%error
@@ -455,7 +455,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
               iv%buoy (i)%v%qc >= obs_qc_pointer) then
             uu = ob%buoy (i)%u
             vv = ob%buoy (i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%buoy (i)%info%lon, -1)             
+            call da_ffdduv( speed, dir, uu, vv, iv%buoy (i)%info%lon, convert_uv2fd)             
             speed_qc  = iv%buoy (i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%buoy (i)%u%error
@@ -537,7 +537,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%geoamv(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%geoamv(i)%u(n)
                vv = ob%geoamv(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%geoamv(i)%info%lon, -1)                        
+               call da_ffdduv( speed, dir, uu, vv, iv%geoamv(i)%info%lon, convert_uv2fd)                        
                speed_qc  = iv%geoamv(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%geoamv(i)%u(n)%error
@@ -593,7 +593,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                uu = ob%polaramv(i)%u(n)
                vv = ob%polaramv(i)%v(n)
                call da_ffdduv( speed, dir, uu, vv, &
-                  iv%polaramv(i)%info%lon, -1)                        
+                  iv%polaramv(i)%info%lon, convert_uv2fd)                        
                speed_qc  = iv%polaramv(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%polaramv(i)%u(n)%error
@@ -712,7 +712,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%sonde_sfc(i)%v%qc >= obs_qc_pointer) then
                uu = ob%sonde_sfc(i)%u
                vv = ob%sonde_sfc(i)%v
-               call da_ffdduv( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, -1)             
+               call da_ffdduv( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, convert_uv2fd)             
                speed_qc  = iv%sonde_sfc(i)%u%qc
                dir_qc    = speed_qc
                speed_err = iv%sonde_sfc(i)%u%error
@@ -778,7 +778,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                    iv%sound(i)%v(n)%qc >= obs_qc_pointer) then  
                   uu = ob%sound(i)%u(n)
                   vv = ob%sound(i)%v(n)
-                  call da_ffdduv( speed, dir, uu, vv, iv%sound(i)%info%lon, -1)                        
+                  call da_ffdduv( speed, dir, uu, vv, iv%sound(i)%info%lon, convert_uv2fd)                        
                   speed_qc  = iv%sound(i)%u(n)%qc
                   dir_qc    = speed_qc
                   speed_err = iv%sound(i)%u(n)%error
@@ -856,7 +856,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%airep(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%airep(i)%u(n)
                vv = ob%airep(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%airep(i)%info%lon, -1)             
+               call da_ffdduv( speed, dir, uu, vv, iv%airep(i)%info%lon, convert_uv2fd)             
                speed_qc  = iv%airep(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%airep(i)%u(n)%error
@@ -919,7 +919,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%pilot(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%pilot(i)%u(n)
                vv = ob%pilot(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%pilot(i)%info%lon, -1)                        
+               call da_ffdduv( speed, dir, uu, vv, iv%pilot(i)%info%lon, convert_uv2fd)                        
                speed_qc  = iv%pilot(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%pilot(i)%u(n)%error
@@ -1016,7 +1016,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
              iv%qscat(i)%v%qc >= obs_qc_pointer) then  
             uu = ob%qscat(i)%u
             vv = ob%qscat(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%qscat(i)%info%lon, -1)                        
+            call da_ffdduv( speed, dir, uu, vv, iv%qscat(i)%info%lon, convert_uv2fd)                        
             speed_error = iv%qscat(i)%u%error
          else
             speed = missing_r
@@ -1069,7 +1069,7 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%profiler(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%profiler(i)%u(n)
                vv = ob%profiler(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%profiler(i)%info%lon, -1)
+               call da_ffdduv( speed, dir, uu, vv, iv%profiler(i)%info%lon, convert_uv2fd)
                speed_error = iv%profiler(i)%u(n)%error
             else
                speed = missing_r
@@ -1354,14 +1354,16 @@ SUBROUTINE da_write_filtered_obs( ob, iv, xb, xp, &
    call MPI_BARRIER(MPI_COMM_WORLD, ierr)
 #endif
    if ( rootproc ) then
-   open(UNIT=filtered_obs_iunit, &
-        file= 'filtered_obs' ,form='formatted',iostat=iost)
-   if (iost /= 0 ) call da_error(__FILE__,__LINE__, (/"Canot open filtered_obs "/))
-    call da_count_filtered_obs(filtered_obs_iunit, &
-            xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
-            xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
-    call da_final_write_filtered_obs( filtered_obs_iunit )   
-   close ( filtered_obs_iunit )
+      call da_get_unit(filtered_obs_unit)
+      open(UNIT=filtered_obs_unit, &
+           file= 'filtered_obs' ,form='formatted',iostat=iost)
+      if (iost /= 0 ) call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
+       call da_count_filtered_obs(&
+               xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
+               xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
+      call da_final_write_filtered_obs
+      close ( filtered_obs_unit )
+      call da_free_unit(filtered_obs_unit)
    endif
 
    if (trace_use) CALL da_trace_exit("da_write_filtered_obs")
