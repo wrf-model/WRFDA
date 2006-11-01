@@ -28,7 +28,7 @@ subroutine da_allocate_cv( cv_size, cv )
 
    allocate (cv % array(1:cv_size))
 
-   if (analysis_type == 'randomcv') then
+   if (anal_type_randomcv) then
    
       ! [2.1] Initialize random number generator and scalars:
 

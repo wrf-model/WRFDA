@@ -496,12 +496,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    !------------------------------------------------------------------------
  
    if (qc_rad) then
-      do inst = 1, iv%num_inst                 ! loop for sensor
-         WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', &
-                            trim(iv%instid(inst)%rttovid_string) 
-         nchanl    = iv%instid(inst)%nchan
-         call da_qc_rad(inst,nchanl, ob, iv )
-      end do        ! end loop for sensor
+      call da_qc_rad(ob, iv)
    end if
 
    !------------------------------------------

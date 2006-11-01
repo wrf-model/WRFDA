@@ -25,7 +25,6 @@ be :		setup                   \
 		gen_be_etkf             \
 		gen_be_ensmean          \
                 advance_cymdh.exe
-	cp *.exe ../main
 
 gen_be_stage0_wrf.o      : gen_be_stage0_wrf.f90
 

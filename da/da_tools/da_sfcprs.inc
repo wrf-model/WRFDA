@@ -3,10 +3,6 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    ! Purpose: to compute the pressure at obs height (psfc) from the sea
    !          level pressure (pslv), obs height (h_obs), temperature
    !          (t_obs, optional), and the model profile (p,t,q).
-   !
-   ! This subroutine is originally from MM5/INTERPF: module_diags.F.
-   !  
-   !                               Modified by Yong-Run Guo 10/31/00
     
       IMPLICIT NONE
 

@@ -10,7 +10,7 @@ MODULE da_tools
    USE da_define_structures
    USE lapack
    use da_reporting
-   use da_tools1
+   use da_tools
    
    IMPLICIT NONE
    
@@ -39,9 +39,13 @@ CONTAINS
 #include "da_llxy.inc"
 #include "da_openfile.inc"
 #include "da_smooth_anl.inc"
+#include "da_togrid_new.inc"
 #include "da_togrid.inc"
 #include "da_unifva.inc"
 #include "da_xyll.inc"
+#include "da_oi.inc"
+#include "da_get_unit.inc"
+#include "da_free_unit.inc"
 
 #include "da_eof_decomposition_test.inc"
 #include "da_eof_decomposition.inc"

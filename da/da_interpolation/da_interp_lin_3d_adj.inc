@@ -7,7 +7,7 @@ subroutine da_interp_lin_3d_adj(fm3d, xp, &
    type (xpose_type),      intent(in)    :: xp  ! Dimensions and xpose buffers.
    integer,                intent(in)    :: i, j
    real,                   intent(in)    :: dx, dxm, dy, dym
-   integer,                intent(in)    :: ml, nl
+   integer,                intent(in)    :: nl,ml
    real, dimension(ml),    intent(in)    :: fo3d   
    real, dimension(nl),    intent(in)    :: zk
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
@@ -16,6 +16,8 @@ subroutine da_interp_lin_3d_adj(fm3d, xp, &
    integer                :: kk, k
    real                   :: dz, dzm
    real, dimension(xp%kms:xp%kme) :: fmz
+
+   if (trace_use) call da_trace_entry("da_interp_lin_3d_adj")
 
    fmz = 0.0
 
@@ -35,6 +37,8 @@ subroutine da_interp_lin_3d_adj(fm3d, xp, &
                                + fm3d(i  ,j+1,xp%kts:xp%kte)
    fm3d(i+1,j+1,xp%kts:xp%kte) = dy *dx *fmz(xp%kts:xp%kte) &
                                + fm3d(i+1,j+1,xp%kts:xp%kte)
+
+   if (trace_use) call da_trace_exit("da_interp_lin_3d_adj")
 
 end subroutine da_interp_lin_3d_adj
 
