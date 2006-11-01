@@ -215,7 +215,7 @@ subroutine da_rttov_init(iv,ob)
 !-------------------------------------------------------------
 !  4.0 read coef file for cloud/rain absorption/scattering
 !-------------------------------------------------------------
- if (lrttov_scatt) then
+ if (rttov_scatt) then
     i_amsua = 0
     i_amsub = 0
    do n=1,nsensor
@@ -327,7 +327,7 @@ subroutine da_rttov_init(iv,ob)
 !  6.0 read bias correction coefs files
 !-------------------------------------------------------
 
- if (lread_biascoef) then
+ if (read_biascoef) then
   bunit = 109
   open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')

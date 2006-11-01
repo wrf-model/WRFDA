@@ -239,7 +239,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
          end if     
       endif
 
-      if (lmonitoring) call wrf_shutdown
+      if (monitoring) call wrf_shutdown
 
       ! [8.3] Interpolate x_g to low resolution grid
 
@@ -284,7 +284,7 @@ SUBROUTINE da_solve ( grid , config_flags , &
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 
-      if ( lwrite_oa_rad_ascii ) then
+      if (write_oa_rad_ascii) then
         write(UNIT=stdout,FMT=*)  ' writing radiance OMB and OMA ascii file'
         CALL da_write_oa_rad_ascii(grid%xp,ob,iv,re)
       end if

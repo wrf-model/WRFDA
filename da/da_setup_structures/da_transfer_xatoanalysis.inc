@@ -48,10 +48,6 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 #include "em_dummy_new_args.inc"
                           )
       endif
-   else if (fg_format == 2) then
-      if(it < max_ext_its) then
-         call da_add_increments(it, grid%xp, grid%xa, grid%xb, xbx)
-      endif
    else if (fg_format == 3) then
       call da_transfer_xatokma( xbx, grid, &
 #include "em_dummy_new_args.inc"

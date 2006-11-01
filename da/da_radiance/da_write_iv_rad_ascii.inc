@@ -226,7 +226,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
             write(UNIT=innov_rad_unit,FMT='(10i11)') iv%instid(n)%rad(i)%tb(:)%qc
 
 
-            if (lwrite_profile) then
+            if (write_profile) then
                num_levs  = iv%instid(n)%nlevels
                write(UNIT=innov_rad_unit,FMT=*) &
                   'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'

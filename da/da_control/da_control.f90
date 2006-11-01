@@ -151,11 +151,23 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    CHARACTER(LEN=*),PARAMETER :: wrfvar_version = "WRFVAR V2.2"
    CHARACTER(LEN=*),PARAMETER :: wrf_version    = "WRF V2.2"
 
+   integer, parameter :: fg_format_wrf = 1
+   integer, parameter :: fg_format_kma = 3
+
+   integer, parameter :: ob_format_bufr = 1
+   integer, parameter :: ob_format_ascii = 2
+
+   integer, parameter :: convert_fd2uv = 1
+   integer, parameter :: convert_uv2fd = -1
+
    ! Fortran unit  parameters:
 
    ! stdout, stderr, trace_unit all controlled from namelist
 
    ! Units 9,10 are used for reading and writing namelist.input/output in WRF
+
+   ! Do not use get_unit/free_unit because tracing is too low level
+   integer, parameter :: trace_csv_unit = 8
 
    INTEGER, PARAMETER :: jpout = 11           ! Unit number for x output.
    INTEGER, PARAMETER :: stats_unit = 12      ! Unit number for stats output.
@@ -338,8 +350,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
                       (/ 100.0,100.0, 100.0, 100.0, 100.0, 100.0,100.0,100.0 /)
 
    ! Maximum error check factors:  INV > (Obs_error*factor) --> fails_error_max
-
-   LOGICAL, PARAMETER :: check_max_iv_print = .TRUE.
 
    REAL, PARAMETER :: max_error_t              = 5, &
                       max_error_uv             = 5, &

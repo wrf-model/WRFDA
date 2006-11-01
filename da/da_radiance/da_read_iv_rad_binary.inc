@@ -75,7 +75,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
             read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%tb(:)%error
             read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%tb(:)%qc
 
-            if (lwrite_profile) then
+            if (write_profile) then
                read(iv_rad_binary_unit) num_levs, &
                   coefs(n) % ref_prfl_p(1:num_levs) , &
                   iv%instid(n)%rad(i)%t(1:num_levs) , &

@@ -19,11 +19,10 @@ MODULE da_setup_structures
 
    CONTAINS
 
-#include "da_add_increments.inc"
 #include "da_add_pbl_and_sfc_info.inc"
 #include "da_get_vertical_truncation.inc"
 #include "da_interpolate_regcoeff.inc"
-#include "da_interpolate_stats.inc"
+!#include "da_interpolate_stats.inc"
 #include "da_rescale_background_errors.inc"
 #include "da_setup_background_errors.inc"
 #include "da_setup_be_global.inc"
