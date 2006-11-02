@@ -10,6 +10,17 @@ subroutine da_wrfvar_finalize
       call med_shutdown_io ( head_grid , config_flags )
    END IF
 
+   if (tovs_redistribute) then
+      if (allocated(num_tovs_before)) deallocate (num_tovs_before)
+      if (allocated(num_tovs_after))  deallocate (num_tovs_after)
+      if (allocated(tovs_copy_count)) deallocate (tovs_copy_count)
+      if (allocated(tovs_send_pe))    deallocate (tovs_send_pe)
+      if (allocated(tovs_recv_pe))    deallocate (tovs_recv_pe)
+      if (allocated(tovs_send_start)) deallocate (tovs_send_start)
+      if (allocated(tovs_send_count)) deallocate (tovs_send_count)
+      if (allocated(tovs_recv_start)) deallocate (tovs_recv_start)
+   end if
+
    if (rootproc) then
       close(cost_unit)
       close(grad_unit)

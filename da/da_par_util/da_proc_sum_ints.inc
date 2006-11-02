@@ -20,9 +20,9 @@ subroutine da_proc_sum_ints ( values )
    call wrf_dm_bcast_integer ( root, 1 )
    allocate (sums(size(values)))
    sums(:)=0
-   call MPI_REDUCE(values, sums(:), size(values), MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(values(:), sums(:), size(values), MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
 
-   IF (myproc .eq. root) values(:) = sums(:)
+   IF (rootproc) values(:) = sums(:)
    deallocate(sums)
 #endif
 

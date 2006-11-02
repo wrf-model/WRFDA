@@ -15,10 +15,9 @@ export COMPILERS=${COMPILERS:-g95}
 echo "ID        $ID"
 echo "COMPILE   $COMPILE"
 echo "FULL      $FULL"
-#echo "TARGETS   $TARGETS"
-echo "COMPILERS $COMPILERS"
 echo "RUN       $RUN"
 echo "CLEAN     $CLEAN"
+echo "COMPILERS $COMPILERS"
 echo "REGIONS   $REGIONS"
 echo "PROCS     $PROCS"
 
