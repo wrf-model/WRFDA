@@ -1,25 +1,25 @@
-subroutine da_setup_be_global( ide, jde, kde, be  )
+subroutine da_setup_be_global (ide, jde, kde, be)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define and allocate components of background errors
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in)         :: ide, jde, kde         ! Domain dimensions.
-   TYPE (be_type), INTENT(OUT) :: be                    ! Back. errors structure.
+   type (be_type), intent(out) :: be                    ! Back. errors structure.
 
-   INTEGER                     :: nrec
+   integer                     :: nrec
    integer                     :: max_wave_in           ! Dimension of inppur power.
-   INTEGER                     :: i, j, k, ic, jc, n    ! Loop counters.
-   INTEGER                     :: ier                   ! error index
+   integer                     :: i, j, k, ic, jc, n    ! Loop counters.
+   integer                     :: ier                   ! error index
    ! real, allocatable   :: height(:,:,:)      ! Height field.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point
    integer             :: bin_type           ! Type of bin to average over.
    integer             :: num_bins           ! Number of bins (3D fields).
    integer             :: num_bins2d         ! Number of bins (3D fields).
-   logical  :: use_global_eofs               ! True if projected data uses global EOFs
+   logical             :: use_global_eofs    ! True if projected data uses global EOFs
 
    integer             :: num_bins_hgt               ! Used if bin_type = 2. 
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). 
@@ -27,20 +27,20 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
 
-   character*10                :: variable
-   integer                     :: ni, nj, nk, b, nlev , be_unit
-   integer, allocatable        :: max_wave(:)
-   real, allocatable           :: evec_g(:,:)
-   real, allocatable           :: eval_g(:)  
-   real, allocatable           :: evec_loc(:,:,:)
-   real, allocatable           :: eval_loc(:,:)  
-   real, allocatable           :: regcoeff1(:)
-   real, allocatable           :: regcoeff2(:,:)
-   real, allocatable           :: regcoeff3(:,:,:)
-   real, allocatable           :: power(:)               ! Temporary power spectrum.
-   real, allocatable           :: power2d(:,:)           ! Temporary power spectrum.
+   character*10         :: variable
+   integer              :: ni, nj, nk, b, nlev , be_unit
+   integer, allocatable :: max_wave(:)
+   real, allocatable    :: evec_g(:,:)
+   real, allocatable    :: eval_g(:)  
+   real, allocatable    :: evec_loc(:,:,:)
+   real, allocatable    :: eval_loc(:,:)  
+   real, allocatable    :: regcoeff1(:)
+   real, allocatable    :: regcoeff2(:,:)
+   real, allocatable    :: regcoeff3(:,:,:)
+   real, allocatable    :: power(:)               ! Temporary power spectrum.
+   real, allocatable    :: power2d(:,:)           ! Temporary power spectrum.
 
-   IF (trace_use) call da_trace_entry("da_setup_be_global")
+   if (trace_use) call da_trace_entry("da_setup_be_global")
 
 
    call da_messages((/"[3.0] Set up background errors (be) for global WRF-Var"/))
@@ -52,23 +52,23 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    !---------------------------------------------------------------------
 
    call da_get_unit(be_unit)
-   open(unit=be_unit,file="be.dat",status="old",form="unformatted")
+   open (unit=be_unit,file="be.dat",status="old",form="unformatted")
 
-   read(be_unit, end= 99, err = 100) ni, nj, nk 
-   read(be_unit, err = 100)bin_type
-   read(be_unit, err = 100)lat_min, lat_max, binwidth_lat
-   read(be_unit, err = 100)hgt_min, hgt_max, binwidth_hgt
-   read(be_unit, err = 100) num_bins, num_bins2d
+   read (be_unit, end= 99, err = 100) ni, nj, nk 
+   read (be_unit, err = 100) bin_type
+   read (be_unit, err = 100) lat_min, lat_max, binwidth_lat
+   read (be_unit, err = 100) hgt_min, hgt_max, binwidth_hgt
+   read (be_unit, err = 100) num_bins, num_bins2d
 
-   allocate( bin(1:ni,1:nj,1:nk) )
-   allocate( bin2d(1:ni,1:nj) )
-   read(be_unit, err = 100)bin(1:ni,1:nj,1:nk)
-   read(be_unit, err = 100)bin2d(1:ni,1:nj)
+   allocate (bin(1:ni,1:nj,1:nk))
+   allocate (bin2d(1:ni,1:nj))
+   read (be_unit, err = 100) bin(1:ni,1:nj,1:nk)
+   read (be_unit, err = 100) bin2d(1:ni,1:nj)
 
    if (ni /= ide .or. nj /= jde .or. nk /= kde) THEN
       call da_error(__FILE__,__LINE__, &
          (/"Cannot generate BE at this resolution"/))
-   END IF
+   end if
 
    !---------------------------------------------------------------------
    ! [2] Read in be regression coefficients:
@@ -78,9 +78,9 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    allocate (regcoeff2(1:nk,1:num_bins2d))
    allocate (regcoeff3(1:nk,1:nk,1:num_bins2d))
 
-   read(be_unit,end= 99,  err = 100) regcoeff1  
-   read(be_unit,end= 99,  err = 100) regcoeff2 
-   read(be_unit,end= 99,  err = 100) regcoeff3  
+   read (be_unit,end= 99,  err = 100) regcoeff1  
+   read (be_unit,end= 99,  err = 100) regcoeff2 
+   read (be_unit,end= 99,  err = 100) regcoeff3  
 
    allocate (be%reg_chi(1:jde,1:kde))
    allocate (be%reg_ps (1:jde,1:kde))
@@ -110,71 +110,74 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
       end do
    end do
 
+   deallocate(regcoeff1)
+   deallocate(regcoeff2)
+   deallocate(regcoeff3)
+
    !---------------------------------------------------------------------
    ! [3] Read in be vertical eigenmodes:
    !---------------------------------------------------------------------
 
    do nrec = 1, 4
-      read(be_unit,end= 99,  err = 100) variable   
-      read(be_unit,end= 99,  err = 100) nk, num_bins2d 
+      read (be_unit,end= 99,  err = 100) variable   
+      read (be_unit,end= 99,  err = 100) nk, num_bins2d 
 
-      allocate ( evec_g(1:nk,1:nk) )     
-      allocate ( eval_g(1:nk) )     
-      allocate ( evec_loc(1:nk,1:nk,num_bins2d) )     
-      allocate ( eval_loc(1:nk,num_bins2d) )     
+      allocate (evec_g(1:nk,1:nk))
+      allocate (eval_g(1:nk))
+      allocate (evec_loc(1:nk,1:nk,num_bins2d))
+      allocate (eval_loc(1:nk,num_bins2d))
 
-      read(be_unit,end= 99,  err = 100)  evec_g     
-      read(be_unit,end= 99,  err = 100)  eval_g     
-      read(be_unit,end= 99,  err = 100)  evec_loc     
-      read(be_unit,end= 99,  err = 100)  eval_loc    
+      read (be_unit,end= 99, err = 100) evec_g     
+      read (be_unit,end= 99, err = 100) eval_g     
+      read (be_unit,end= 99, err = 100) evec_loc     
+      read (be_unit,end= 99, err = 100) eval_loc    
 
-      if ( nrec == 1 ) then
+      if (nrec == 1) then
          be % v1 % name = variable               
          call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var1, var_scaling1, be%v1)
 
-      else if( nrec == 2 ) then
+      else if (nrec == 2) then
          be % v2 % name = variable               
          call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var2, var_scaling2, be%v2)
 
-      else if ( nrec == 3 ) then
+      else if (nrec == 3) then
          be % v3 % name = variable               
          call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var3, var_scaling3, be%v3)
 
-      else if ( nrec == 4) then
+      else if (nrec == 4) then
          be % v4 % name = variable               
          call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var4, var_scaling4, be%v4)
-
       end if 
 
-      deallocate ( evec_g )     
-      deallocate ( eval_g )     
-      deallocate ( evec_loc )     
-      deallocate ( eval_loc )     
+      deallocate (evec_g)     
+      deallocate (eval_g)     
+      deallocate (evec_loc)     
+      deallocate (eval_loc)     
 
    end do ! loop nrec
 
-   deallocate( bin )
-   deallocate( bin2d )
+   deallocate (bin)
+   deallocate (bin2d)
 
    !---------------------------------------------------------------------
    ! [4] Read in be power spectra:
    !---------------------------------------------------------------------
 
-   allocate( max_wave(1:nk) )
+   allocate( max_wave(1:nk))
 
    do k = 1, nk
-      read(be_unit) variable
-      read(be_unit) max_wave_in, nrec
-      read(be_unit) use_global_eofs    
-      if ( k == 1 ) then
-          allocate(power(0:max_wave_in))                      ! Temporary.
-          allocate(power2d(0:max_wave_in,1:nk))               ! Temporary.
+      read (be_unit) variable
+      read (be_unit) max_wave_in, nrec
+      read (be_unit) use_global_eofs    
+      if (k == 1) then
+          allocate (power(0:max_wave_in))                      ! Temporary.
+          allocate (power2d(0:max_wave_in,1:nk))               ! Temporary.
       end if
-      read(be_unit) power(0:max_wave_in) 
+      read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
       ! Truncate power spectra:
@@ -183,85 +186,85 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    end do
 
    be % v1 % max_wave = maxval(max_wave(1:nk))
-   write(UNIT=stdout,FMT='(/4x,3a,i6)') &
+   write (unit=stdout,fmt='(/4x,3a,i6)') &
       'Horizontal truncation for ', be % v1 % name, ' = ', be % v1 % max_wave
-   allocate( be % v1 % power(0:be % v1 % max_wave,1:nk))
+   allocate (be % v1 % power(0:be % v1 % max_wave,1:nk))
    be % v1 % power(0:be % v1 % max_wave,1:nk) = power2d(0:be % v1 % max_wave,1:nk)
    be % v1 % power(0,1:nk) = len_scaling1 * be % v1 % power(0,1:nk) 
 
    do k = 1, nk
-      read(be_unit) variable
-      read(be_unit) max_wave_in, nrec
-      read(be_unit) use_global_eofs    
-      read(be_unit) power(0:max_wave_in) 
+      read (be_unit) variable
+      read (be_unit) max_wave_in, nrec
+      read (be_unit) use_global_eofs    
+      read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
       ! Truncate power spectra:
-      call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
-                                power, max_wave(k) )
+      call da_truncate_spectra (be % max_wave, max_wave_in, power_truncation, &
+                                power, max_wave(k))
    end do
 
    be % v2 % max_wave = maxval(max_wave(1:nk))
-   write(UNIT=stdout,FMT='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(4x,3a,i6)') &
       'Horizontal truncation for ', be % v2 % name, ' = ', be % v2 % max_wave
-   allocate( be % v2 % power(0:be % v2 % max_wave,1:nk))
+   allocate (be % v2 % power(0:be % v2 % max_wave,1:nk))
    be % v2 % power(0:be % v2 % max_wave,1:nk) = power2d(0:be % v2 % max_wave,1:nk)
    be % v2 % power(0,1:nk) = len_scaling2 * be % v2 % power(0,1:nk) 
 
    do k = 1, nk
-      read(be_unit) variable
-      read(be_unit) max_wave_in, nrec
-      read(be_unit) use_global_eofs    
-      read(be_unit) power(0:max_wave_in) 
+      read (be_unit) variable
+      read (be_unit) max_wave_in, nrec
+      read (be_unit) use_global_eofs    
+      read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
       ! Truncate power spectra:
-      call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
-                                power, max_wave(k) )
+      call da_truncate_spectra (be % max_wave, max_wave_in, power_truncation, &
+                                power, max_wave(k))
    end do
 
    be % v3 % max_wave = maxval(max_wave(1:nk))
-   write(UNIT=stdout,FMT='(4x,3a,i6)') &
+   write(unit=stdout,fmt='(4x,3a,i6)') &
       'Horizontal truncation for ', be % v3 % name, ' = ', be % v3 % max_wave
-   allocate( be % v3 % power(0:be % v3 % max_wave,1:nk))
+   allocate (be % v3 % power(0:be % v3 % max_wave,1:nk))
    be % v3 % power(0:be % v3 % max_wave,1:nk) = power2d(0:be % v3 % max_wave,1:nk)
    be % v3 % power(0,1:nk) = len_scaling3 * be % v3 % power(0,1:nk) 
 
    do k = 1, nk
-      read(be_unit) variable
-      read(be_unit) max_wave_in, nrec
-      read(be_unit) use_global_eofs    
-      read(be_unit) power(0:max_wave_in) 
+      read (be_unit) variable
+      read (be_unit) max_wave_in, nrec
+      read (be_unit) use_global_eofs    
+      read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
       ! Truncate power spectra:
-      call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
-                                power, max_wave(k) )
+      call da_truncate_spectra (be % max_wave, max_wave_in, power_truncation, &
+                                power, max_wave(k))
    end do
 
    be % v4 % max_wave = maxval(max_wave(1:nk))
-   write(UNIT=stdout,FMT='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(4x,3a,i6)') &
       'Horizontal truncation for ', be % v4 % name, ' = ', be % v4 % max_wave
-   allocate( be % v4 % power(0:be % v4 % max_wave,1:nk))
+   allocate (be % v4 % power(0:be % v4 % max_wave,1:nk))
    be % v4 % power(0:be % v4 % max_wave,1:nk) = power2d(0:be % v4 % max_wave,1:nk)
    be % v4 % power(0,1:nk) = len_scaling4 * be % v4 % power(0,1:nk) 
 
    ! ps_u:
-   read(be_unit) variable
+   read (be_unit) variable
    be % v5 % name = variable
    be % v5 % mz = 1
    if (max_vert_var5 <=  0.0) be % v5 % mz = 0                         
-   read(be_unit) max_wave_in, nrec
-   read(be_unit) use_global_eofs    
-   read(be_unit) power(0:max_wave_in) 
+   read (be_unit) max_wave_in, nrec
+   read (be_unit) use_global_eofs    
+   read (be_unit) power(0:max_wave_in) 
 
    ! Truncate power spectra:
-   call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
-                             power, be % v5 % max_wave )
+   call da_truncate_spectra (be % max_wave, max_wave_in, power_truncation, &
+                             power, be % v5 % max_wave)
 
-   write(UNIT=stdout,FMT='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(4x,3a,i6)') &
       'Horizontal truncation for ', be % v5 % name, ' = ', be % v5 % max_wave
-   allocate( be % v5 % power(0:be % v5 % max_wave,1))
+   allocate (be % v5 % power(0:be % v5 % max_wave,1))
    be % v5 % power(0:be % v5 % max_wave,1) = power(0:be % v5 % max_wave)
    be % v5 % power(0,1) = len_scaling5 * be%v5%power(0,1) 
 
@@ -271,7 +274,7 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    ! [5] Perform checks on eigenvectors:
    !--------------------------------------------------------------
 
-   IF ( test_statistics ) THEN
+   if (test_statistics) then
       call da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
       call da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
@@ -286,37 +289,37 @@ subroutine da_setup_be_global( ide, jde, kde, be  )
    ! [6] Set up alpha (flow-dependent) control variable "errors": 
    !--------------------------------------------------------------
 
-   if ( be % ne > 0 ) then
+   if (be % ne > 0) then
       be % alpha % mz = be % ne
       be % alpha % name = 'alpha'
       be % alpha % max_wave = alpha_truncation
-      IF (print_detail_be) THEN
+      if (print_detail_be) then
          write(UNIT=stdout,FMT='(4x,3a,i6)') &
             'Horizontal truncation for ', be % alpha % name, ' = ', &
             be % alpha % max_wave
-      END IF
-      allocate( power(0:be % alpha % max_wave) )
+      end if
+      allocate (power(0:be % alpha % max_wave))
       call da_calc_power_spectrum( be % alpha % max_wave, power )
 
-      allocate( be % alpha % power(0:be % alpha % max_wave, be % ne) )
+      allocate (be % alpha % power(0:be % alpha % max_wave, be % ne))
       do n = 1, be % ne
          be % alpha % power(0:be % alpha % max_wave,n) = power(0:be % alpha % max_wave)
       end do
    end if
 
-   deallocate( max_wave )
+   deallocate (max_wave)
 
-   close(be_unit)
+   close (be_unit)
    call da_free_unit(be_unit)
 
-   IF (trace_use) call da_trace_exit("da_setup_be_global")
+   if (trace_use) call da_trace_exit("da_setup_be_global")
 
    return
 
-99 write(UNIT=errmsg(1),FMT='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-    call da_error(__FILE__,__LINE__,errmsg(1:1))
+99 write (unit=errmsg(1),fmt='(a, i5)')' Unexpected end on BE-unit = ',be_unit
+   call da_error(__FILE__,__LINE__,errmsg(1:1))
 
-100 write(UNIT=errmsg(1),FMT='(a, i5)')' Read error on BE-unit = ',be_unit
+100 write (unit=errmsg(1),fmt='(a, i5)')' Read error on BE-unit = ',be_unit
    call da_error(__FILE__,__LINE__,errmsg(1:1))
 
    ! JRB daft having these here

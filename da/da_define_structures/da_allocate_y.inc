@@ -16,6 +16,8 @@ SUBROUTINE da_allocate_y( iv, y )
    !  [1.0] Copy number of observations:
    !---------------------------------------------------------------------------
 
+   if (trace_use) call da_trace_entry("da_allocate_y")
+
    y % total_obs = iv % total_obs
    y % num_synop = iv % num_synop
    y % num_ships = iv % num_ships
@@ -346,5 +348,6 @@ SUBROUTINE da_allocate_y( iv, y )
       end do
    END IF
 
+   if (trace_use) call da_trace_exit("da_allocate_y")
 
 END SUBROUTINE da_allocate_y

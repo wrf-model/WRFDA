@@ -420,6 +420,10 @@ subroutine da_rttov_init(iv,ob)
   call da_get_time_slots(num_fgat_time,time_window_min,time_analysis, &
                          time_window_max, time_slots)
 
+  do n=1,nsensor
+     call rttov_dealloc_coef(error,coefs(nsensor))
+  end do
+
   return
 
 end subroutine da_rttov_init

@@ -74,8 +74,21 @@ SUBROUTINE da_deallocate_y( y )
       DEALLOCATE (y % airep)
    endif
 
-   IF ( y % num_geoamv > 0 ) DEALLOCATE (y % geoamv)
-   IF ( y % num_polaramv > 0 ) DEALLOCATE (y % polaramv)
+   if (y % num_geoamv > 0) then
+      do n=1, y % num_geoamv
+         deallocate (y % geoamv(n) % u)
+         deallocate (y % geoamv(n) % v)
+      end do
+      deallocate (y % geoamv)
+   end if
+
+   if (y % num_polaramv > 0) then
+      do n=1, y % num_polaramv
+         deallocate (y % polaramv(n) % u)
+         deallocate (y % polaramv(n) % v)
+      end do
+      deallocate (y % polaramv)
+   end if
 
    IF ( y % num_gpspw > 0 ) DEALLOCATE (y % gpspw)
 

@@ -30,6 +30,8 @@ PROGRAM wrfvar
 
    CALL da_wrfvar_finalize
 
+   call wrf_message("*** WRF-Var completed successfully ***")
+
    IF (trace_use) call da_trace_exit("wrfvar")
    IF (trace_use) call da_trace_report
 

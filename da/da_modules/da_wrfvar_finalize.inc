@@ -1,6 +1,9 @@
 subroutine da_wrfvar_finalize
 
    integer :: i
+   type(domain), pointer :: grid
+
+   if (trace_use) call da_trace_entry("da_wrfvar_finalize")
 
    ! output wrfvar analysis
 
@@ -10,16 +13,31 @@ subroutine da_wrfvar_finalize
       call med_shutdown_io ( head_grid , config_flags )
    END IF
 
-   if (tovs_redistribute) then
-      if (allocated(num_tovs_before)) deallocate (num_tovs_before)
-      if (allocated(num_tovs_after))  deallocate (num_tovs_after)
-      if (allocated(tovs_copy_count)) deallocate (tovs_copy_count)
-      if (allocated(tovs_send_pe))    deallocate (tovs_send_pe)
-      if (allocated(tovs_recv_pe))    deallocate (tovs_recv_pe)
-      if (allocated(tovs_send_start)) deallocate (tovs_send_start)
-      if (allocated(tovs_send_count)) deallocate (tovs_send_count)
-      if (allocated(tovs_recv_start)) deallocate (tovs_recv_start)
-   end if
+   grid => head_grid
+
+   deallocate (grid%parents)
+   deallocate (grid%nests)
+   deallocate (grid%domain_clock)
+   deallocate (grid%alarms)
+   deallocate (grid%alarms_created)
+
+   deallocate (grid%i_start)
+   deallocate (grid%i_end)
+   deallocate (grid%j_start)
+   deallocate (grid%j_end)
+
+#include "em_deallocs.inc"
+
+   deallocate (grid)
+
+   if (allocated(num_tovs_before)) deallocate (num_tovs_before)
+   if (allocated(num_tovs_after))  deallocate (num_tovs_after)
+   if (allocated(tovs_copy_count)) deallocate (tovs_copy_count)
+   if (allocated(tovs_send_pe))    deallocate (tovs_send_pe)
+   if (allocated(tovs_recv_pe))    deallocate (tovs_recv_pe)
+   if (allocated(tovs_send_start)) deallocate (tovs_send_start)
+   if (allocated(tovs_send_count)) deallocate (tovs_send_count)
+   if (allocated(tovs_recv_start)) deallocate (tovs_recv_start)
 
    if (rootproc) then
       close(cost_unit)
@@ -51,5 +69,7 @@ subroutine da_wrfvar_finalize
    end do
 
    call da_messages((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
+
+   if (trace_use) call da_trace_exit("da_wrfvar_finalize")
 
 end subroutine da_wrfvar_finalize
