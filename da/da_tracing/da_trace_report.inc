@@ -423,13 +423,13 @@ subroutine da_trace_report
          DO loop1=MasterNoRoutines,1,-1
             Pointer=index(loop1)
             WRITE (UNIT=trace_unit, &
-               FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I11,"<TD>",I11,"<TD>",I11)') &
+               FMT='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I15,"<TD>",I15,"<TD>",I15)') &
                TRIM(Documentation_url),TRIM(TimerNames(Pointer)),TRIM(TimerNames(Pointer)), &
                MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
                SUM(MasterMaxHeap(:,Pointer))/num_procs
             if (trace_csv) then
                WRITE (UNIT=trace_csv_unit, &
-                  FMT='(A,I11,",",I11,",",I11)') &
+                  FMT='(A,I15,",",I15,",",I15)') &
                   '"'//TRIM(TimerNames(Pointer))//'",', &
                   MAXVAL(MasterMaxHeap(:,Pointer)),SUM(MasterMaxHeap(:,Pointer)), &
                   SUM(MasterMaxHeap(:,Pointer))/num_procs

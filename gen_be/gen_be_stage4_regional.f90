@@ -2,6 +2,8 @@ program gen_be_stage4_regional
 
    use da_control
    use da_tracing
+   use da_tracing
+   use da_tools
 
    implicit none
 
@@ -30,9 +32,16 @@ program gen_be_stage4_regional
    namelist / gen_be_stage4_regional_nl / start_date, end_date, interval, variable, &
                                           ne, k, stride, run_dir
 
+   integer :: ounit,iunit,namelist_unit
+
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage4_regional")
+   if (trace_use) call da_trace_entry("gen_be_stage2_1dvar")
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'

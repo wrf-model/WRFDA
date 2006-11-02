@@ -13,7 +13,7 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
    integer                :: k,n,kk
    real    :: r_kts, r_ktsplus, r_kteminus
 
-   if (trace_use) call da_trace_entry("da_to_zk")
+   if (trace_use) call da_trace_entry("da_to_zk_new")
 
    zk(:,:) = missing_r
 

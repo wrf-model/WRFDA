@@ -5,7 +5,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    !
    !  METHOD:  d = y - H(x)
    !       1. interpolate xb to obs location
-   !       2. call forward RTM to get simulated bright temperature 
+   !       2. call foreward RTM to get simulated bright temperature 
    !       3. obs BT - simulated BT
    !---------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
    INTEGER                        :: n        ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: nlevels ! Number of obs levels.
+   INTEGER                        :: num_levs ! Number of obs levels.
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: alloc_status(40)
@@ -44,16 +44,14 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                                        model_qci, model_qsn, &
                                        model_qgr, model_qm
 
-   real, allocatable :: v_p_new(:,:)
-
-   INTEGER            :: inst, num_rad, nchan, iprof
+   INTEGER            :: inst, nprofiles, nchanl, iprof
    INTEGER            :: nfrequencies, nchannels, nbtout
-   REAL,    pointer   :: polar(:)
+   REAL,    pointer   :: zk(:), polar(:)
    REAL,    pointer   :: pres(:)
    real,    pointer   :: tb(:,:)
    logical            :: amsua, amsub, mhs, ssmi
 
-   integer            :: ip,kn,knchpf,sensor_type,n1,n2
+   integer            :: ip,kn,knchpf,sensor_type
    integer, pointer   :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
    real   , pointer   :: pemsv(:), pemsh(:), pems5(:), emissivity(:)
    logical, pointer   :: calcemis(:)
@@ -84,40 +82,38 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    ! [1.0] calculate the background bright temperature
    !-------------------------------------------------------
 
-   num_rad = 1
+   nprofiles = 1
    do inst = 1, iv%num_inst                 ! loop for sensor
       if ( iv%instid(inst)%num_rad < 1 ) cycle
-      nlevels  = iv%instid(inst)%nlevels
-      nchan    = iv%instid(inst)%nchan
+      num_levs  = iv%instid(inst)%nlevels
+      nchanl    = iv%instid(inst)%nchan
 
-      allocate (pres(1:nlevels), stat= alloc_status(2) )
-      allocate (tb(num_rad,nchan), stat= alloc_status(3) )
-      allocate (con_vars(num_rad), stat= alloc_status(4) )
-      allocate (aux_vars(num_rad), stat= alloc_status(5) )
-      allocate (zasat(num_rad), stat= alloc_status(6) )
-      allocate (zlsat(num_rad), stat= alloc_status(7) )
-      allocate (polar(nchan), stat= alloc_status(8) )
+      allocate (zk(1:num_levs), stat= alloc_status(1) )
+      allocate (pres(1:num_levs), stat= alloc_status(2) )
+      allocate (tb(nprofiles,nchanl), stat= alloc_status(3) )
+      allocate (con_vars(nprofiles), stat= alloc_status(4) )
+      allocate (aux_vars(nprofiles), stat= alloc_status(5) )
+      allocate (zasat(nprofiles), stat= alloc_status(6) )
+      allocate (zlsat(nprofiles), stat= alloc_status(7) )
+      allocate (polar(nchanl), stat= alloc_status(8) )
       if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
-            (/"Cannot allocate mem pres tb con_vars aux_vars"/))
+            (/"Cannot Allocate mem zk, pres tb con_vars aux_vars"/))
       end if
 
-      pres(1:nlevels) = coefs(inst) % ref_prfl_p(1:nlevels)
+      pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
       if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
           iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
-      n1 = iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1
-      n2 = iv%ob_numb(iv%current_ob_time)%radiance(inst)
-
-      num_rad=n2-n1+1
 
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-      do n= n1,n2
+      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
+         iv%ob_numb(iv%current_ob_time)%radiance(inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
-         allocate (iv%instid(inst)%rad(n)%zk(1:nlevels), stat= alloc_status(6) )
-         allocate (iv%instid(inst)%rad(n)%t(1:nlevels), stat= alloc_status(7) )
-         allocate (iv%instid(inst)%rad(n)%mr(1:nlevels), stat= alloc_status(8) )
+         allocate (iv%instid(inst)%rad(n)%zk(1:num_levs), stat= alloc_status(6) )
+         allocate (iv%instid(inst)%rad(n)%t(1:num_levs), stat= alloc_status(7) )
+         allocate (iv%instid(inst)%rad(n)%mr(1:num_levs), stat= alloc_status(8) )
          allocate (iv%instid(inst)%rad(n)%tm(xp%kms:xp%kme), stat= alloc_status(9) )
          allocate (iv%instid(inst)%rad(n)%qm(xp%kms:xp%kme), stat= alloc_status(16) )
          allocate (iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), stat= alloc_status(10) )
@@ -129,7 +125,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
          if ( any(alloc_status /= 0) ) then
             call da_error(__FILE__,__LINE__, &
-               (/"Cannot allocate mem iv%zk, t, mr"/))
+               (/"Cannot Allocate mem iv%zk, t, mr"/))
          end if
 
          model_t(:) = 0.0
@@ -142,100 +138,41 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          model_u10(1)  = 0.0
          model_v10(1)  = 0.0
          model_psfc = 0.0
-      end do
 
-      if (interp_new) then
-         allocate(v_p_new(num_rad,xp%kms:xp%kme))
-       
+
+         ! [1.1] Get horizontal interpolation weights:
+
+         i = iv%instid(inst)%rad(n)%loc%i
+         j = iv%instid(inst)%rad(n)%loc%j
+         dx = iv%instid(inst)%rad(n)%loc%dx
+         dy = iv%instid(inst)%rad(n)%loc%dy
+         dxm = iv%instid(inst)%rad(n)%loc%dxm
+         dym = iv%instid(inst)%rad(n)%loc%dym
+
          ! horizontal interpolate xb pressure to ob position for every xb levels
-         do n=n1,n2
-            do k=xp%kts,xp%kte
-               ! convert to mb
-               v_p_new(k,n) = 0.01*(dym*( &
-                  dxm*xb%p(iv%instid(inst)%loc_i(n),  iv%instid(inst)%loc_j(n),k) + &
-                  dx *xb%p(iv%instid(inst)%loc_i(n)+1,iv%instid(inst)%loc_j(n),k)) + &
-                  dy *( &
-                  dxm*xb%p(iv%instid(inst)%loc_i(n),  iv%instid(inst)%loc_j(n)+1,k) + &
-                  dx *xb%p(iv%instid(inst)%loc_i(n)+1,iv%instid(inst)%loc_j(n)+1,k)))
-            end do
-         end do
-         call da_to_zk_new(pres, v_p_new, xp, v_interp_p, &
-            iv%instid(inst)%zk(:,n1:n2), num_rad,nlevels )
+         do k=xp%kts,xp%kte
+            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+            v_p(k) = 0.01*v_p(k)  ! convert to mb
+         enddo
 
-do n=n1,n2
-   write (0,*) "zk",iv%instid(inst)%zk(:,n)
-end do
-         call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
-            iv%instid(inst)%loc_k(:,n1:n2), &
-            iv%instid(inst)%loc_dz(:,n1:n2), &
-            iv%instid(inst)%loc_dzm(:,n1:n2))
+         do k=1, num_levs
+            zk(k)=missing_r
+            IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
+               call da_to_zk(pres(k), v_p, xp, v_interp_p, zk(k))
+            END IF
+            iv%instid(inst)%rad(n)%zk(k) = zk(k)
+         enddo
 
          ! [1.2] Interpolate horizontally to ob:
 
-         call da_interp_lin_3d_new( xb%t, xp, &
-            iv%instid(inst)%loc_i(n1:n2), &
-            iv%instid(inst)%loc_j(n1:n2), &
-            iv%instid(inst)%loc_k(:,n1:n2), &
-            iv%instid(inst)%loc_dx(n1:n2), &
-            iv%instid(inst)%loc_dy(n1:n2), &
-            iv%instid(inst)%loc_dz(:,n1:n2), &
-            iv%instid(inst)%loc_dxm(n1:n2), &
-            iv%instid(inst)%loc_dym(n1:n2), &
-            iv%instid(inst)%loc_dzm(:,n1:n2), &
-            model_t, nlevels, num_rad )
+         call da_interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
+                           model_t, max_ob_levels, zk, num_levs )
+         call da_interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
+                           model_q, max_ob_levels, zk, num_levs )
 
-         call da_interp_lin_3d_new( xb%q, xp, &
-            iv%instid(inst)%loc_i(n1:n2), &
-            iv%instid(inst)%loc_j(n1:n2), &
-            iv%instid(inst)%loc_k(:,n1:n2), &
-            iv%instid(inst)%loc_dx(n1:n2), &
-            iv%instid(inst)%loc_dy(n1:n2), &
-            iv%instid(inst)%loc_dz(:,n1:n2), &
-            iv%instid(inst)%loc_dxm(n1:n2), &
-            iv%instid(inst)%loc_dym(n1:n2), &
-            iv%instid(inst)%loc_dzm(:,n1:n2), &
-            model_q, nlevels, num_rad )
-      else
-         do n=n1,n2
-
-
-            ! [1.1] Get horizontal interpolation weights:
-
-            i = iv%instid(inst)%rad(n)%loc%i
-            j = iv%instid(inst)%rad(n)%loc%j
-            dx = iv%instid(inst)%rad(n)%loc%dx
-            dy = iv%instid(inst)%rad(n)%loc%dy
-            dxm = iv%instid(inst)%rad(n)%loc%dxm
-            dym = iv%instid(inst)%rad(n)%loc%dym
-
-            ! horizontal interpolate xb pressure to ob position for every xb levels
-            do k=xp%kts,xp%kte
-               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-               v_p(k) = 0.01*v_p(k)  ! convert to mb
-            enddo
-
-            do k=1, nlevels
-               iv%instid(inst)%rad(n)%zk(k)=missing_r
-               IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
-                  call da_to_zk(pres(k), v_p, xp, v_interp_p, iv%instid(inst)%rad(n)%zk(k))
-               END IF
-            enddo
-write (0,*) "zk",iv%instid(inst)%rad(n)%zk(:)
-            ! [1.2] Interpolate horizontally to ob:
-
-            call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
-                              model_t, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
-            call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
-                              model_q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
-         end do
-      end if
-stop
-
-      do n= n1,n2
-
-         do k=1, nlevels
-            IF ( iv%instid(inst)%rad(n)%zk(k) <= 0.0 ) THEN
+         do k=1, num_levs
+            IF ( zk(k) <= 0.0 ) THEN
                model_t(k) = coefs(inst) % ref_prfl_t(k,gas_id_watervapour)  ! outside model level
                model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
@@ -401,18 +338,18 @@ stop
          ! Compute surface emissivity for observation
          !-------------------------------------------
 
-         knchpf = num_rad*nchan
+         knchpf = nprofiles*nchanl
 
-         Allocate ( knchan (num_rad), stat = alloc_status(1) )
+         Allocate ( knchan (nprofiles), stat = alloc_status(1) )
          Allocate ( kprof  (knchpf), stat = alloc_status(2) )
          Allocate ( kchan  (knchpf), stat = alloc_status(3) )
          Allocate ( kochan (knchpf), stat = alloc_status(4) )
-         Allocate ( indexn (1:nchan,1:num_rad), stat = alloc_status(5) )
+         Allocate ( indexn (1:nchanl,1:nprofiles), stat = alloc_status(5) )
          Allocate ( pemsv  (knchpf), stat = alloc_status(7) )
          Allocate ( pemsh  (knchpf), stat = alloc_status(9) )
          Allocate ( pems5  (knchpf), stat = alloc_status(11) )
          Allocate ( calcemis(knchpf), stat = alloc_status(8) )
-         Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchan), stat = alloc_status(10) )
+         Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchanl), stat = alloc_status(10) )
          ! Allocate ( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10) )
 
          if ( any(alloc_status /= 0) ) then
@@ -422,13 +359,13 @@ stop
 
          sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
 
-         do ip=1,num_rad
-            knchan(ip) = nchan
-            do kn=1,nchan 
-               kprof((ip-1)*nchan+kn)  = ip
-               kchan((ip-1)*nchan+kn)  = kn
-               kochan((ip-1)*nchan+kn) = kn
-               indexn(kn,ip) = (ip-1)*nchan+kn 
+         do ip=1,nprofiles
+            knchan(ip) = nchanl
+            do kn=1,nchanl 
+               kprof((ip-1)*nchanl+kn)  = ip
+               kchan((ip-1)*nchanl+kn)  = kn
+               kochan((ip-1)*nchanl+kn) = kn
+               indexn(kn,ip) = (ip-1)*nchanl+kn 
             end do
          end do
          amsua = trim( inst_name(rtminit_sensor(inst))) == 'amsua'
@@ -436,11 +373,11 @@ stop
          ! mhs = trim( inst_name(rtminit_sensor(inst))) == 'mhs'
          ssmi  = trim( inst_name(rtminit_sensor(inst))) == 'ssmi'
 
-         zasat(1:num_rad) = iv%instid(inst)%rad(n)%satzen * deg2rad
-         zlsat(1:num_rad) = iv%instid(inst)%rad(n)%satazi * deg2rad
+         zasat(1:nprofiles) = iv%instid(inst)%rad(n)%satzen * deg2rad
+         zlsat(1:nprofiles) = iv%instid(inst)%rad(n)%satazi * deg2rad
 
 #ifdef RTTOV
-         call rttov_setupchan(num_rad, nchan, coefs(inst), &   ! in
+         call rttov_setupchan(nprofiles, nchanl, coefs(inst), &   ! in
             nfrequencies, nchannels, nbtout )      ! out
 #endif
          Allocate ( emissivity(nchannels))
@@ -465,17 +402,17 @@ stop
                  model_isflg(1),pemsv,pemsh,pems5, model_ts(1), &
                  model_isltyp(1),model_tslb(1), &
                  model_smois(1),model_ivgtyp(1),model_vegfra(1),model_snowh(1), &
-                 sensor_type,num_rad,nchan, &
+                 sensor_type,nprofiles,nchanl, &
                  iv%instid(inst)%rad(n)%tb(:)%inv,amsua,amsub,ssmi, &
                  model_u10(1),model_v10(1))
          end if
 
-         do iprof = 1, num_rad
-            con_vars(iprof) % nlevels = nlevels 
-            allocate (con_vars(iprof) % t(nlevels))
-            allocate (con_vars(iprof) % q(nlevels))
-            con_vars(iprof) % t(1:nlevels) = model_t  (1:nlevels)
-            con_vars(iprof) % q(1:nlevels) = model_mr (1:nlevels)
+         do iprof = 1, nprofiles
+            con_vars(iprof) % nlevels = num_levs 
+            allocate (con_vars(iprof) % t(num_levs))
+            allocate (con_vars(iprof) % q(num_levs))
+            con_vars(iprof) % t(1:num_levs) = model_t  (1:num_levs)
+            con_vars(iprof) % q(1:num_levs) = model_mr (1:num_levs)
             con_vars(iprof) % ps  = model_psfc
 
             aux_vars(iprof) % t2m = model_t2m
@@ -490,16 +427,16 @@ stop
             aux_vars(iprof) % satazi  = iv%instid(inst)%rad(n)%satazi
          end do
 
-         ! [1.3] Call RTM forward model
+         ! [1.3] Call RTM foreward model
 
          ! print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
 
-         call da_rttov_direct (inst, model_isflg(1), nchan, num_rad, &
+         call da_rttov_direct (inst, model_isflg(1), nchanl, nprofiles, &
                           nfrequencies, nchannels, nbtout, &
                           con_vars, aux_vars, &
                           tb, calcemis, pemsv, pemsh, emissivity )
 
-         do iprof = 1, num_rad
+         do iprof = 1, nprofiles
             deallocate (con_vars(iprof) % t)
             deallocate (con_vars(iprof) % q)
          end do
@@ -508,21 +445,21 @@ stop
          ! [2.0] calculate components of innovation vector:
          !----------------------------------------------------------------
 
-         do k = 1, nchan
+         do k = 1, nchanl
             if ( iv%instid(inst)%rad(n)%tb(k)%inv /= missing_r ) then 
-               iv%instid(inst)%rad(n)%tb_xb(k)  = tb(num_rad,k)
+               iv%instid(inst)%rad(n)%tb_xb(k)  = tb(nprofiles,k)
                iv%instid(inst)%rad(n)%tb(k)%inv = &
-               ob%instid(inst)%rad(n)%tb(k) - tb(num_rad,k)
+               ob%instid(inst)%rad(n)%tb(k) - tb(nprofiles,k)
             else
-               iv%instid(inst)%rad(n)%tb_xb(k)    = tb(num_rad,k)
+               iv%instid(inst)%rad(n)%tb_xb(k)    = tb(nprofiles,k)
                iv%instid(inst)%rad(n)%tb(k)%inv   = missing_r
             end if
          end do
 
          if (coefs(inst)%id_sensor == 2) then ! microwave
-            iv%instid(inst)%rad(n)%emiss(1:nchan) = pems5(1:nchan)
+            iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
          else
-            iv%instid(inst)%rad(n)%emiss(1:nchan) = emissivity(1:nchan)
+            iv%instid(inst)%rad(n)%emiss(1:nchanl) = emissivity(1:nchanl)
          end if
 
          !----------------------------------------------------------------
@@ -530,12 +467,13 @@ stop
          !----------------------------------------------------------------
 
          if (biascorr) then
-            call da_biascorr_rad(inst,nchan,  &
+            call da_biascorr_rad(inst,nchanl,  &
                               ob%instid(inst)%rad(n)%tb, &
                               iv%instid(inst)%rad(n) )
          end if
       end do       !  end loop for pixels
 
+      deallocate (zk)
       deallocate (pres)
       deallocate (tb)
       deallocate (con_vars)
@@ -551,9 +489,6 @@ stop
       deallocate (pemsv)
       deallocate (pemsh) 
       deallocate (pems5)
-      if (interp_new) then
-         deallocate(v_p_new)
-      end if
    end do        ! end loop for sensor
 
    !------------------------------------------------------------------------
@@ -561,17 +496,7 @@ stop
    !------------------------------------------------------------------------
  
    if (qc_rad) then
-      call da_qc_rad(ob, iv )
-   end if
-
-   if (interp_new) then
-      do inst = 1, iv%num_inst
-         if ( iv%instid(inst)%num_rad < 1 ) cycle
-         call da_togrid_new (iv%instid(inst)%zk, xp%kts, xp%kte,  &
-            iv%instid(inst)%loc_k, &
-            iv%instid(inst)%loc_dz, &
-            iv%instid(inst)%loc_dzm)
-      end do
+      call da_qc_rad(ob, iv)
    end if
 
    !------------------------------------------

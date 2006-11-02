@@ -35,7 +35,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    character(80) hdr1b
 
    integer(i_kind) ihh,i,j,k,ifov,idd,jdate,ireadmg,ireadsb
-   integer(i_kind) iret,idate,im,iy,iyr,nchanl,klatp1,klonp1
+   integer(i_kind) iret,idate,im,iy,iyr,nchan,klatp1,klonp1
    integer(i_kind) ich1,ich2,ich8,ich10,ich15,klon1,kidsat,klat1
    integer(i_kind) nmind,iobs,jlat,jlon,itx,nk,itt,iobsout
    integer(i_kind) chan1,iskip,ichan10,ichan2,ichan1,ichan15
@@ -69,7 +69,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    integer   ::  landsea_mask
    real      ::  srf_height
    ! channels' bright temperature
-   integer   ::  nchan                              !  number of channels
    real , allocatable ::   tb(:)                    !  bright temperatures
    !  end type bright_temperature
 
@@ -85,13 +84,13 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local
    integer :: lnbufr
-   integer :: iprof
+   integer :: n
 
    call da_trace_entry("da_read_bufrtovs")
 
    ! Initialize variables
 
-   nchanl = 20
+   nchan = 20
    allocate(nread(1:rtminit_nsensor))
    nread(1:rtminit_nsensor) = 0
 
@@ -111,38 +110,37 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
-      nchanl=19
+      nchan=19
       subfgn='NC021021'
       rato=1.1363987_r_kind
    else if ( hirs3 ) then 
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
-      nchanl=19
+      nchan=19
       subfgn='NC021025'
    else if ( msu ) then
       sensor_id    =  1
       step   = 9.474_r_kind
       start  = -47.37_r_kind
-      nchanl=4
+      nchan=4
       subfgn='NC021022'
       rato=1.1363987_r_kind
    else if ( amsua ) then
       sensor_id    =  3
       step   = three + one/three
       start  = -48.33_r_kind
-      nchanl=15
+      nchan=15
       subfgn='NC021023'
    else if ( amsub )  then
       sensor_id    =  4
       step   = 1.1_r_kind
       start  = -48.95_r_kind
-      nchanl=5
+      nchan=5
       subfgn='NC021024'
    end if
 
-   nchan = nchanl
-   allocate ( tb(nchanl) )
+   allocate ( tb(nchan) )
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -182,7 +180,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !-------------------------------------------------------------------------
 
    allocate (head)
-   !  allocate ( head % rad % tb (1:nchanl) )
+   !  allocate ( head % rad % tb (1:nchan) )
    nullify  ( head % next )
    p => head
 
@@ -199,7 +197,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          ! 1.0     Read header record and data record
 
          call ufbint(lnbufr,bfr1bhdr,n1bhdr,1,iret,hdr1b)
-         call ufbrep(lnbufr,data1b8,1,nchanl,iret,'TMBR')
+         call ufbrep(lnbufr,data1b8,1,nchan,iret,'TMBR')
          ! call ufbrep(lnbufr,data1b8,1,1,iret,'BEARAZ')
 
          ! 2.0     Extract observation location and other required information
@@ -304,15 +302,15 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
          ! 3.6 extract channel bright temperature
    
-         tb(1:nchanl) = data1b8(1:nchanl)
-         do k = 1, nchanl
+         tb(1:nchan) = data1b8(1:nchan)
+         do k = 1, nchan
             if ( tb(k) < tbmin .or. tb(k) > tbmax) &
                tb(k) = missing_r
          end do
 
          !  4.0   assign information to sequential radiance structure
          !--------------------------------------------------------------------------
-         allocate ( p % rad % tb (1:nchanl) )
+         allocate ( p % rad % tb (1:nchan) )
          p%rad%info             = info
          p%rad%loc              = loc
          p%rad%landsea_mask     = landsea_mask
@@ -320,7 +318,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          p%rad%satzen           = satzen
          p%rad%satazi           = satazi
          p%rad%solzen           = solzen
-         p%rad%tb(1:nchanl)%inv = tb(1:nchanl)
+         p%rad%tb(1:nchan)%inv = tb(1:nchan)
          p%sensor_index         = inst
          p%ifgat                = ifgat
 
@@ -347,7 +345,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    iv%total_obs = iv%total_obs + num_tovs_local
    iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_local
-   iv%total_rad_channel = iv%total_rad_channel + num_tovs_local*nchanl
+   iv%total_rad_channel = iv%total_rad_channel + num_tovs_local*nchan
 
    deallocate(tb)  
    call closbf(lnbufr)
@@ -388,12 +386,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(inst)%rad(nread(inst))%satazi       = p%rad%satazi
       iv%instid(inst)%rad(nread(inst))%solzen       = p%rad%solzen
       !   iv%instid(inst)%rad(nread(inst))%solazi
-      allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchanl), stat = error )
+      allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error )
       IF (error /= 0) THEN
          call da_error(__FILE__,__LINE__, &
             (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
       END IF
-      iv%instid(inst)%rad(nread(inst))%tb(1:nchanl)%inv = p%rad%tb(1:nchanl)%inv
+      iv%instid(inst)%rad(nread(inst))%tb(1:nchan)%inv = p%rad%tb(1:nchan)%inv
 
       current => p
       p => p%next
@@ -418,13 +416,29 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          allocate(iv%instid(inst)%loc_dym(iv%instid(inst)%num_rad))
          allocate(iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
          allocate(iv%instid(inst)%zk(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         do iprof=1,iv%instid(inst)%num_rad
-            iv%instid(inst)%loc_i(iprof)   = iv%instid(inst)%rad(iprof)%loc%i
-            iv%instid(inst)%loc_j(iprof)   = iv%instid(inst)%rad(iprof)%loc%j
-            iv%instid(inst)%loc_dx(iprof)  = iv%instid(inst)%rad(iprof)%loc%dx
-            iv%instid(inst)%loc_dy(iprof)  = iv%instid(inst)%rad(iprof)%loc%dy
-            iv%instid(inst)%loc_dxm(iprof) = iv%instid(inst)%rad(iprof)%loc%dxm
-            iv%instid(inst)%loc_dym(iprof) = iv%instid(inst)%rad(iprof)%loc%dym
+         allocate (iv%instid(inst)%t(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%mr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%tm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qrn(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qcw(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qci(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qsn(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%qgr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%pm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%tb_xb(nchan,iv%instid(inst)%num_rad))
+         ! allocate ( iv%instid(inst)%calcemis(knchpf,iv%instid(inst)%num_rad))
+         allocate (iv%instid(inst)%emiss(nchan,iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%scanpos(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%satzen(iv%instid(inst)%num_rad))
+         allocate(iv%instid(inst)%satazi(iv%instid(inst)%num_rad))
+         do n=1,iv%instid(inst)%num_rad
+            iv%instid(inst)%loc_i(n)   = iv%instid(inst)%rad(n)%loc%i
+            iv%instid(inst)%loc_j(n)   = iv%instid(inst)%rad(n)%loc%j
+            iv%instid(inst)%loc_dx(n)  = iv%instid(inst)%rad(n)%loc%dx
+            iv%instid(inst)%loc_dy(n)  = iv%instid(inst)%rad(n)%loc%dy
+            iv%instid(inst)%loc_dxm(n) = iv%instid(inst)%rad(n)%loc%dxm
+            iv%instid(inst)%loc_dym(n) = iv%instid(inst)%rad(n)%loc%dym
             ! z done in da_get_innov_vector_rad
          end do
       end do
@@ -434,7 +448,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !
    !  p => head
    !  do i = 1, num_tovs_local
-   !   print *, i, p%rad%tb(1:nchanl)%inv
+   !   print *, i, p%rad%tb(1:nchan)%inv
    !   p => p%next
    !  end do
 

@@ -62,12 +62,17 @@ program gen_be_ep2
    real, allocatable     :: ttmp(:,:)                 ! temperature.
    real, allocatable     :: dummy(:,:)                ! dummy.
 
+   integer :: gen_be_iunit, gen_be_ounit
+
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_ep2")
+
+   call da_get_unit(gen_be_iunit)
+   call da_get_unit(gen_be_ounit)
 
    remove_mean = .true.
 
@@ -340,6 +345,9 @@ program gen_be_ep2
    write(gen_be_ounit)dim1, dim2, dim3
    write(gen_be_ounit)psfc_mnsq
    close(gen_be_ounit)
+
+   call da_free_unit(gen_be_iunit)
+   call da_free_unit(gen_be_ounit)
 
    if (trace_use) call da_trace_exit("gen_be_ep2")
    if (trace_use) call da_trace_report

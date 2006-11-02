@@ -25,7 +25,7 @@ gen_be : 	gen_be_ensrf	\
 
 GEN_BE_OBJS = $(DA)/da_etkf.o $(DA)/da_gen_be.o $(DA)/da_control.o $(DA)/da_be_spectral.o \
   ../frame/module_wrf_error.o \
-  ../frame/module_driver_constants.o $(DA)/da_tracing.o $(DA)/da_memory.o
+  ../frame/module_driver_constants.o $(DA)/da_tracing.o $(DA)/da_memory.o $(DA)/da_tools1.o
 
 include ../configure.wrf
 

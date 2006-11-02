@@ -1542,7 +1542,7 @@ rconfig   logical   biasprep              namelist,record14        1            
 rconfig   logical   rttov_scatt           namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   monitoring            namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   write_profile         namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   qc_rad                namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   qc_rad                namelist,record14        1              .true.       -   "TBD"              "TBD"              "TBD"
 rconfig   logical   write_iv_rad_ascii    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   write_oa_rad_ascii    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   write_filtered_rad    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"

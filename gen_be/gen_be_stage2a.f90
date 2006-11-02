@@ -57,12 +57,18 @@ program gen_be_stage2a
    namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
                                   ne, num_passes, rf_scale
 
+   integer :: ounit,iunit,namelist_unit
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage2a")
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
 
    start_date = '2004030312'
    end_date = '2004033112'

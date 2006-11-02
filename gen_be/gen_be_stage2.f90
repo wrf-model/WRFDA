@@ -60,7 +60,10 @@ program gen_be_stage2
    real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2_nl / start_date, end_date, interval, &
-                                 ne, testing_eofs
+                                 ne, testing_eofs  
+
+   integer :: ounit,iunit,namelist_unit
+
 
    stdout = 6
 
@@ -70,6 +73,12 @@ program gen_be_stage2
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage2")
+
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
 
    start_date = '2004030312'
    end_date = '2004033112'

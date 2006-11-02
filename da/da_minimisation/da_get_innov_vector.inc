@@ -118,7 +118,11 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
       ! Radiance:
 
-      call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
+      if (interp_new) then
+         call da_get_innov_vector_rad_new( it, grid%xb, grid%xp, ob, iv )
+      else
+         call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
+      end if
 
       ! Pseudo obs:
 

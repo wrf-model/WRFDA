@@ -20,8 +20,11 @@ program gen_be_stage0_wrf
    use da_control
    use da_gen_be
    use da_tracing
+   use da_tools1
 
    implicit none
+
+   integer :: gen_be_iunit, gen_be_ounit
 
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
 
@@ -99,6 +102,9 @@ program gen_be_stage0_wrf
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage0_wrf")
+
+   call da_get_unit(gen_be_iunit)
+   call da_get_unit(gen_be_ounit)
 
    test_inverse = .true. 
    ktest = 1
@@ -324,6 +330,7 @@ program gen_be_stage0_wrf
       read(gen_be_iunit)height
       read(gen_be_iunit)xlat
       close(gen_be_iunit)
+      call da_free_unit(gen_be_iunit)
 
 !     Note overwriting mean diagnostic to save memory!
       input_file = 'tmp.e002'
