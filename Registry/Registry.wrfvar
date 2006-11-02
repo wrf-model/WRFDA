@@ -528,32 +528,32 @@ state    real   SST              ij     misc        1         -     i0125rhd=(in
 # gfdl (eta) radiation State Variables
 state    real    HTOP            ij     misc        1         -      r        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
 state    real    HBOT            ij     misc        1         -      r        "HBOT"                 "BOT OF CONVECTION LELVEL"         ""
-state    real    HTOPR           ij     misc        1         -      r        "HTOPR"                "TOP OF CONVECTION LEVEL FOR RADIATION"    ""
-state    real    HBOTR           ij     misc        1         -      r        "HBOTR"                "BOT OF CONVECTION LEVEL FOR RADIATION"    ""
-state    real    CUTOP           ij     misc        1         -      r        "CUTOP"                "TOP OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
-state    real    CUBOT           ij     misc        1         -      r        "CUBOT"                "BOT OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
+#state    real    HTOPR           ij     misc        1         -      r        "HTOPR"                "TOP OF CONVECTION LEVEL FOR RADIATION"    ""
+#state    real    HBOTR           ij     misc        1         -      r        "HBOTR"                "BOT OF CONVECTION LEVEL FOR RADIATION"    ""
+#state    real    CUTOP           ij     misc        1         -      r        "CUTOP"                "TOP OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
+#state    real    CUBOT           ij     misc        1         -      r        "CUBOT"                "BOT OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
 state    REAL      CUPPT         ij     misc        1         -      r        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINC LAST CALL TO THE RADIATION"         ""
-state  real   totswdn   ij    misc        1    -    i
-state  real   totlwdn   ij    misc        1    -    i
-state  real   rswtoa    ij    misc        1    -    i
-state  real   rlwtoa    ij    misc        1    -    i
-state  real   czmean    ij    misc      1    -     i
-state  real   cfracl    ij    misc      1    -     i
-state  real   cfracm    ij    misc      1    -     i
-state  real   cfrach    ij    misc      1    -     i
-state  real   acfrst    ij    misc        1    -    i
-state integer ncfrst    ij    misc        1    -    i
-state  real   acfrcv    ij    misc        1    -    i
-state integer ncfrcv    ij    misc        1    -    i
+#state  real   totswdn   ij    misc        1    -    i
+#state  real   totlwdn   ij    misc        1    -    i
+#state  real   rswtoa    ij    misc        1    -    i
+#state  real   rlwtoa    ij    misc        1    -    i
+#state  real   czmean    ij    misc      1    -     i
+#state  real   cfracl    ij    misc      1    -     i
+#state  real   cfracm    ij    misc      1    -     i
+#state  real   cfrach    ij    misc      1    -     i
+#state  real   acfrst    ij    misc        1    -    i
+#state integer ncfrst    ij    misc        1    -    i
+#state  real   acfrcv    ij    misc        1    -    i
+#state integer ncfrcv    ij    misc        1    -    i
 
 # cam radiation variables
-state  real    -       iqjf ozmixm      1    -   -     -
-state  real    -       idjf aerosolc    2    -   -       -
+#state  real    -       iqjf ozmixm      1    -   -     -
+#state  real    -       idjf aerosolc    2    -   -       -
 
 # new eta microphpysics State Variables
-state    real    F_ICE_PHY       ijk    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
-state    real    F_RAIN_PHY      ijk    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
-state    real    F_RIMEF_PHY     ijk    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
+#state    real    F_ICE_PHY       ijk    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
+#state    real    F_RAIN_PHY      ijk    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
+#state    real    F_RIMEF_PHY     ijk    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ijk     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
@@ -764,18 +764,18 @@ i1       real  REGIME           ij      misc        1         -
 state    real  SNOWC            ij      misc        1         -     irhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)      "SNOWC"                 "FLAG INDICATING SNOW COVERAGE (1 FOR SNOW COVER)"         ""
 state    real  MAVAIL           ij      misc        1         -      r        "MAVAIL"                "SURFACE MOISTURE AVAILABILITY"                ""
                                                 
-state   real   tkesfcf          ij      misc        1         -      r        "tkesfcf"               "TKE AT THE SURFACE"                           "m2 s-2"      
+#state   real   tkesfcf          ij      misc        1         -      r        "tkesfcf"               "TKE AT THE SURFACE"                           "m2 s-2"      
                                                 
 state integer  STEPBL          -        misc        1         -      r        "STEPBL"                "NUMBER OF FUNDAMENTAL TIMESTEPS BETWEEN PBL CALLS" ""      
-state    real  taucldi         ijk      misc        1         -      r        "TAUCLDI"               "CLOUD OPTICAL THICKNESS FOR ICE"              ""
-state    real  taucldc         ijk      misc        1         -      r        "TAUCLDC"               "CLOUD OPTICAL THICKNESS FOR WATER"            ""
+#state    real  taucldi         ijk      misc        1         -      r        "TAUCLDI"               "CLOUD OPTICAL THICKNESS FOR ICE"              ""
+#state    real  taucldc         ijk      misc        1         -      r        "TAUCLDC"               "CLOUD OPTICAL THICKNESS FOR WATER"            ""
                                                 
-state   real  defor11          ijk      misc        1         -     -         "defor11"               "DEFORMATION 11"              "s-1"      
-state   real  defor22          ijk      misc        1         -     -         "defor22"               "DEFORMATION 22"              "s-1"      
-state   real  defor12          ijk      misc        1         -     -         "defor12"               "DEFORMATION 12"              "s-1"      
-state   real  defor33          ijk      misc        1         z     -         "defor33"               "DEFORMATION 33"              "s-1"      
-state   real  defor13          ijk      misc        1         z     -         "defor13"               "DEFORMATION 13"              "s-1"      
-state   real  defor23          ijk      misc        1         z     -         "defor23"               "DEFORMATION 23"              "s-1"      
+#state   real  defor11          ijk      misc        1         -     -         "defor11"               "DEFORMATION 11"              "s-1"      
+#state   real  defor22          ijk      misc        1         -     -         "defor22"               "DEFORMATION 22"              "s-1"      
+#state   real  defor12          ijk      misc        1         -     -         "defor12"               "DEFORMATION 12"              "s-1"      
+#state   real  defor33          ijk      misc        1         z     -         "defor33"               "DEFORMATION 33"              "s-1"      
+#state   real  defor13          ijk      misc        1         z     -         "defor13"               "DEFORMATION 13"              "s-1"      
+#state   real  defor23          ijk      misc        1         z     -         "defor23"               "DEFORMATION 23"              "s-1"      
 state   real   xkmv            ijk      misc        1         -     -         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ijk      misc        1         -     -         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
 state   real   xkmhd           ijk      misc        1         -     -         "xkmhd"                 "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
@@ -783,15 +783,15 @@ state   real   a_xkmhd         ijk      misc        1         -     -         "a
 state   real   g_xkmhd         ijk      misc        1         -     -         "g_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
 state   real   xkhv            ijk      misc        1         -     -         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ijk      misc        1         -     -         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
-state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
-state   real    BN2            ijk      misc        1         -     -         "BN2"                   "BRUNT-VAISALA FREQUENCY"                                         "s-2"
+#state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
+#state   real    BN2            ijk      misc        1         -     -         "BN2"                   "BRUNT-VAISALA FREQUENCY"                                         "s-2"
 state  logical warm_rain        -       misc        1         -     -         "warm_rain"              "WARM_RAIN_LOGICAL"
 state  logical adv_moist_cond   -       misc        1         -     -         "adv_moist_cond"         "ADVECT MOIST CONDENSATES LOGICAL"
 
 ## FDDA variables
 
-state    real    -               ikjf     fdda3d      1         -     -    -
-state    real    -               ivjf     fdda2d      1         Z     -    -
+#state    real    -               ikjf     fdda3d      1         -     -    -
+#state    real    -               ivjf     fdda2d      1         Z     -    -
 
 # flag for nest movement
 state  logical moved            -       misc        1         -     -          
