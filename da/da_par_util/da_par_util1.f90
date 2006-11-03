@@ -17,6 +17,7 @@ MODULE da_par_util1
 
    IMPLICIT NONE
 
+#ifdef DM_PARALLEL
 #if ( DWORDSIZE != RWORDSIZE )
    integer, parameter :: true_mpi_real    = MPI_REAL
    integer, parameter :: true_mpi_complex = MPI_COMPLEX
@@ -25,6 +26,7 @@ MODULE da_par_util1
    integer, parameter :: true_mpi_real    = MPI_REAL8
    integer, parameter :: true_mpi_complex = MPI_DOUBLE_COMPLEX
    integer, parameter :: true_rsl_real    = RSL_DOUBLE
+#endif
 #endif
 
    CONTAINS
