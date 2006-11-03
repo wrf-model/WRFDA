@@ -15,6 +15,7 @@ export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}
 export EXPT=${EXPT:-test}
+export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
 
@@ -159,7 +160,9 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
    else
       if $RUN_GEOGRID; then
 #     Run geogrid:
-      $WPS_DIR/geogrid.exe
+      cp $WPS_DIR/geogrid.exe .
+      ${RUN_CMD} ./geogrid.exe
+
       RC=$?
       cp geogrid.log $RUN_DIR
       echo '<A HREF="geogrid.log">geogrid.log</a>'
@@ -181,7 +184,9 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       done
       $WPS_DIR/link_grib.csh $FILES
 
-      $WPS_DIR/ungrib.exe > ungrib.log 2>&1
+      cp $WPS_DIR/ungrib.exe .
+      ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
+
       RC=$?
       cp ungrib.log $RUN_DIR
       echo '<A HREF="ungrib.log">ungrib.log</a>'
@@ -192,7 +197,9 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       fi
 
 #     Run metgrid:
-      $WPS_DIR/metgrid.exe
+      cp $WPS_DIR/metgrid.exe .
+      ${RUN_CMD} ./metgrid.exe
+
       RC=$?
       cp metgrid.log $RUN_DIR
       echo '<A HREF="metgrid.log">metgrid.log</a>'

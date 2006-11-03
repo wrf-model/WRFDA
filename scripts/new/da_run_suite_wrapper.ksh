@@ -40,23 +40,24 @@ export RUN_CMD=" "
 #export CYCLING=${CYCLING:-true}
 
 #Time info:
-export INITIAL_DATE=2003010100
-export FINAL_DATE=2003012800
+#export INITIAL_DATE=2003010100
+export FINAL_DATE=2003010200
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=24
 export LONG_FCST_TIME_2=12
 export LONG_FCST_RANGE_2=24
 
 #Directories:
-export REL_DIR=$HOME/smoke/code/trunk
+export DATA_DISK=/ocotillo1
+export REL_DIR=${DATA_DISK}/$USER/code/trunk
 export WRFVAR_DIR=$REL_DIR/wrfvar
-export DAT_DIR=$HOME/smoke/data
+export DAT_DIR=${DATA_DISK}/$USER/data
 
 #From WPS (namelist.wps):
 export RUN_GEOGRID=false
 export WPS_GEOG_DIR=${DAT_DIR}/geog
 
-export SCRIPT=${WRFVAR_DIR}/scripts/da_run_suite.ksh
+export SCRIPT=${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
 
 $RUN_CMD $SCRIPT
 

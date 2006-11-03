@@ -241,7 +241,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
+      ${WRFVAR_DIR}/scripts/new/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"
@@ -254,7 +254,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
+      ${WRFVAR_DIR}/scripts/new/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"
@@ -280,7 +280,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
+      ${WRFVAR_DIR}/scripts/new/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
@@ -294,7 +294,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
+      ${WRFVAR_DIR}/scripts/new/da_run_real.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
@@ -363,7 +363,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
-      $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/new/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
