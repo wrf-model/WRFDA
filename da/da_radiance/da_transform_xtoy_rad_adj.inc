@@ -26,7 +26,9 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: alloc_status(40)
+#ifdef DM_PARALLEL
    INTEGER :: status(mpi_status_size) ! MPI status.
+#endif
 
    
    REAL, pointer                  :: model_mr(:)

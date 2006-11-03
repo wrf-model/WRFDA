@@ -50,7 +50,9 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
    integer :: d_num_rad, l_num_rad,e,s,len,nl,ierr
    real, allocatable :: temp_t(:,:),temp_q(:,:), temp_t_tl(:,:),temp_q_tl(:,:),rtemp(:,:)
    integer, allocatable :: itemp(:,:)
+#ifdef DM_PARALLEL
    INTEGER :: status(mpi_status_size) ! MPI status.
+#endif
 
 #if !defined(RTTOV)
     call da_error(__FILE__,__LINE__, &
