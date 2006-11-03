@@ -4,8 +4,6 @@ subroutine da_deallocate_background_errors (be)
    ! PURPOSE: Deallocate components of wrfvar background errors.
    !---------------------------------------------------------------------------
 
-   use da_tools
-
    implicit none
 
    type (be_type), intent(inout)        :: be     ! Background error structure.
