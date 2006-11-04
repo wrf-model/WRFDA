@@ -42,6 +42,8 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    REAL                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
    REAL                           :: partial_lhs   ! < y, y >
    REAL                           :: pertile_lhs   ! < y, y >
+   
+   integer                        :: cg_jcdf
 
    write(unit=*, fmt='(/a/a)') &
         '       da_check_vtoy_adjoint:',&
@@ -72,6 +74,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
 
    cv = 0.
+   cg_jcdf = 1
 
    ! call da_zero_vp_type(vp)
    ! call da_zero_vp_type(vv)
@@ -82,7 +85,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
                                  ids, ide, jds, jde, kds, kde,     &
                                  ims, ime, jms, jme, kms, kme,     &
                                  its, ite, jts, jte, kts, kte,     &
-                                 grid, config_flags )
+                                 grid, config_flags, cg_jcdf )
 
    adj_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
 

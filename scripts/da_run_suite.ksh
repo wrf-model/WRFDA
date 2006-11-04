@@ -103,7 +103,6 @@ export DA_DIR=${DA_DIR:-$REG_DIR/da}     # Forecast directory
 
 export REL_DIR=${REL_DIR:-$HOME/trunk} 
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf} 
-export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
@@ -175,7 +174,6 @@ echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
 
 echo 'REL_DIR      <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRF_DIR      <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
-echo 'WRF_NL_DIR   <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_VN
 echo 'WRFVAR_DIR   <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 echo 'WRFPLUS_DIR  <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 echo 'WPS_DIR      <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
@@ -196,8 +194,8 @@ echo "WINDOW_END   $WINDOW_END"
 echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
 echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
 echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
-echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
+echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 
 export FIRST=true
 
@@ -327,6 +325,7 @@ while test $DATE -le $FINAL_DATE; do
       if $CYCLING; then
          if $FIRST; then
             export DA_FIRST_GUESS=${RC_DIR}/${DATE}/wrfinput_d${DOMAIN}
+            export DA_BOUNDARIES=$RC_DIR/$DATE/wrfbdy_d$DOMAIN    
          else
             export DA_FIRST_GUESS=${FC_DIR}/${DATE}/wrfinput_d${DOMAIN}
          fi
@@ -343,7 +342,7 @@ while test $DATE -le $FINAL_DATE; do
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
-         exit 1
+#        exit 1
       fi
       export WRF_INPUT=$DA_ANALYSIS
    else     
@@ -353,6 +352,7 @@ while test $DATE -le $FINAL_DATE; do
          fi
       fi
    fi
+
 
    if $RUN_UPDATE_BC; then
       export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
@@ -384,7 +384,7 @@ while test $DATE -le $FINAL_DATE; do
       export NEXT_MONTH=`echo $NEXT_DATE | cut -c5-6`
       export NEXT_DAY=`echo $NEXT_DATE | cut -c7-8`
       export NEXT_HOUR=`echo $NEXT_DATE | cut -c9-10`
-      ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
+      ln -fs $FC_DIR/$DATE/wrfinput_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
         $FC_DIR/$NEXT_DATE/wrfinput_d${DOMAIN}
    fi
 

@@ -54,7 +54,11 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    character(len=4) :: filnam
 
+   integer          :: cg_jcdf
+
    IF (trace_use) call da_trace_entry("da_calculate_j")
+
+   cg_jcdf = 0
 
    je_start = cv_size_jb + 1
    je_end = cv_size_jb + cv_size_je
@@ -149,8 +153,6 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % total = j % jb + j % jo % total + j % je
    endif
 
-   j % total = j % jb + j % jo % total + j % je
-
    if (it == 1 .and. iter == 0 .and. rootproc) then
       write(UNIT=cost_unit,FMT='(a)')'Outer   EPS   Inner      J          Jb      Jo      Jc      Je'
       write(UNIT=cost_unit,FMT='(a)')'Iter          Iter                            '
@@ -171,7 +173,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &
-                               grid, config_flags )
+                               grid, config_flags, cg_jcdf )
 
    call da_deallocate_y( jo_grad_y )
 

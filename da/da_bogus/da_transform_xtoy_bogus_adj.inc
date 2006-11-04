@@ -27,7 +27,10 @@ subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    REAL                           :: psfc_loc,terr_loc,ppsfc                     
 
    IF ( iv%num_bogus > 0 ) THEN
-      DO n=1, iv % num_bogus
+!xyh      DO n=1, iv % num_bogus
+
+      DO n= iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+
          num_levs = iv % bogus(n) % info % levels
 
          if ( num_levs < 1 ) cycle

@@ -14,13 +14,15 @@ subroutine da_transform_xtoy_pseudo( xa, iv, xp, y )
    
    IF ( iv%num_pseudo > 0 ) THEN
 
-      y%pseudo(:)%u = 0.0
-      y%pseudo(:)%v = 0.0
-      y%pseudo(:)%t = 0.0
-      y%pseudo(:)%p = 0.0
-      y%pseudo(:)%q = 0.0
+!xyh      y%pseudo(:)%u = 0.0
+!xyh      y%pseudo(:)%v = 0.0
+!xyh      y%pseudo(:)%t = 0.0
+!xyh      y%pseudo(:)%p = 0.0
+!xyh      y%pseudo(:)%q = 0.0
 
-      do n=1, iv % num_pseudo
+!xyh      do n=1, iv % num_pseudo
+      do n=iv%ob_numb(iv%current_ob_time-1)%pseudo + 1, iv%ob_numb(iv%current_ob_time)%pseudo
+ 
          ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i

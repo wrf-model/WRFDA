@@ -3,7 +3,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &
-                                  grid, config_flags )
+                                  grid, config_flags, cg_jcdf )
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -33,7 +33,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin,ndynopt
-   integer :: ierr, comm, wrf_done_unit
+   integer :: ierr, comm, cg_jcdf, wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -55,7 +55,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-      if ( jcdfi_use .AND. iter > 0 ) then
+      if ( jcdfi_use .AND. iter > 0 .AND. cg_jcdf == 1 ) then
          call da_med_initialdata_input( grid , config_flags, 'tldf' )
       else
          grid%em_g_u_2 = 0.0

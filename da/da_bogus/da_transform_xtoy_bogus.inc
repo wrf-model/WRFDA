@@ -25,12 +25,14 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
    REAL                           :: psfc_loc,terr_loc,psfc_loc9
 
    IF ( iv%num_bogus > 0 ) THEN
-      do n=1, iv % num_bogus
-         y%bogus(n)%slp  = 0.0
-         y%bogus(n)%u(:) = 0.0
-         y%bogus(n)%v(:) = 0.0
-         y%bogus(n)%t(:) = 0.0
-         y%bogus(n)%q(:) = 0.0
+!xyh      do n=1, iv % num_bogus
+     do n = iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+
+!xyh         y%bogus(n)%slp  = 0.0
+!xyh         y%bogus(n)%u(:) = 0.0
+!xyh         y%bogus(n)%v(:) = 0.0
+!xyh         y%bogus(n)%t(:) = 0.0
+!xyh         y%bogus(n)%q(:) = 0.0
 
          num_levs = iv % bogus(n) % info % levels
 
@@ -94,6 +96,7 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
          call da_interp_lin_3d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%bogus(n)%q(1), num_levs, iv%bogus(n)%zk(1), num_levs)
 #endif
+ 
       end do
    ENDIF
 

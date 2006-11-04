@@ -22,7 +22,9 @@ subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
    REAL                          :: dy, dym  !
 
    IF ( iv%num_polaramv > 0 ) THEN
-      do n=1, iv % num_polaramv
+!xyh      do n=1, iv % num_polaramv
+      DO n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+
          k = iv % polaramv(n) % info % levels
 
          if ( k < 1 ) cycle

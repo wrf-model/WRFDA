@@ -53,7 +53,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
 
-   integer                           :: ndynopt
+   integer                           :: ndynopt, cg_jcdf
 
    IF (trace_use) call da_trace_entry("da_minimise_cg")
 
@@ -118,6 +118,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    do iter=1, ntmax
       if (rrmold == 0.) go to 1002
       fhat = phat
+      cg_jcdf = 1
 
       call da_transform_vtoy( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
                               ids, ide, jds, jde, kds, kde,                     &
@@ -132,7 +133,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
                                   ids, ide, jds, jde, kds, kde,                     &
                                   ims, ime, jms, jme, kms, kme,                     &
                                   its, ite, jts, jte, kts, kte,                     &
-                                  grid, config_flags                                )
+                                  grid, config_flags, cg_jcdf                       )
 
       je_start = be % cv % size_jb + 1
       je_end = be % cv % size_jb + be % cv % size_je

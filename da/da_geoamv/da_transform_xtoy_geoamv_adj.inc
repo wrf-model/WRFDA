@@ -18,7 +18,9 @@ subroutine da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
    REAL                          :: dy, dym  !
 
    IF ( iv%num_geoamv > 0 ) THEN
-      do n=1, iv % num_geoamv
+!xyh      do n=1, iv % num_geoamv
+      do n=iv%ob_numb(iv%current_ob_time-1)%geoamv+1, iv%ob_numb(iv%current_ob_time)%geoamv
+
          k = iv % geoamv(n) % info % levels
 
          if ( k < 1 ) cycle

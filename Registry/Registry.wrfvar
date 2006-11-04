@@ -180,14 +180,11 @@ i1       real   a_w_save       ijk     dyn_em      1         Z
 i1       real   g_w_save       ijk     dyn_em      1         Z                                          
 
 # Geopotential
-state    real   ph             ijkb     dyn_em      2         Z     \
-       irh03usdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
-state    real   a_ph           ijkb     dyn_em      2         Z     \
-       irh03usdf=(bdy_interp:dt)   "a_ph"   "perturbation geopotential"  "m2 s-2"
-state    real   g_ph           ijkb     dyn_em      2         Z     \
-       irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
+state    real   ph             ijkb     dyn_em      2         Z     irh03usdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
+state    real   a_ph           ijkb     dyn_em      2         Z     irh03usdf=(bdy_interp:dt)   "a_ph"   "perturbation geopotential"  "m2 s-2"
+state    real   g_ph           ijkb     dyn_em      2         Z     irh03usdf=(bdy_interp:dt)   "g_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ijk     dyn_em      1         Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
-state    real   a_phb          ijk     dyn_em      1         Z     irhdus "a_phb"  "base-state geopotential"  "m2 s-2"
+state    real   a_phb          ijk     dyn_em      1         Z     rhdus "a_phb"  "base-state geopotential"  "m2 s-2"
 state    real   g_phb          ijk     dyn_em      1         Z     irhdus "g_phb"  "base-state geopotential"  "m2 s-2"
 state    real   phb_fine       ijk     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
 state    real   ph0            ijk     dyn_em      1         Z      r     "ph0"  "initial geopotential"     "m2 s-2"
@@ -205,12 +202,9 @@ i1       real   a_ph_save      ijk     dyn_em      1         Z
 i1       real   g_ph_save      ijk     dyn_em      1         Z 
 
 # Potential Temperature
-state    real   t              ijkb     dyn_em      2         -     \
-       i01rh03usdf=(bdy_interp:dt)   "t"      "perturbation potential temperature (theta-t0)" "K"
-state    real   a_t            ijkb     dyn_em      2         -     \
-       i01rh03usdf=(bdy_interp:dt)   "a_t"      "perturbation potential temperature (theta-t0)" "K"
-state    real   g_t            ijkb     dyn_em      2         -     \
-       i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   t              ijkb     dyn_em      2         -     i01rh03usdf=(bdy_interp:dt)   "t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   a_t            ijkb     dyn_em      2         -     i01rh03usdf=(bdy_interp:dt)   "a_t"      "perturbation potential temperature (theta-t0)" "K"
+state    real   g_t            ijkb     dyn_em      2         -     i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
 
 state    real   t_init         ijk     dyn_em      1         -      r        "t_init" "initial potential temperature" "K"
 i1       real   t_tend         ijk     dyn_em      1         -  
@@ -230,12 +224,9 @@ state    real   g_t_save       ijk     dyn_em      1         -               "g_
 
 
 # Mass
-state    real   mu              ijb     dyn_em      2         -     \
-     irh03usdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
-state    real   a_mu            ijb     dyn_em      2         -     \
-     irh03usdf=(bdy_interp:dt)   "a_mu"  "perturbation dry air mass in column" "Pa"
-state    real   g_mu            ijb     dyn_em      2         -     \
-     irh03usdf=(bdy_interp:dt)   "g_mu"  "perturbation dry air mass in column" "Pa"
+state    real   mu              ijb     dyn_em      2         -     irh03usdf=(bdy_interp:dt)   "mu"  "perturbation dry air mass in column" "Pa"
+state    real   a_mu            ijb     dyn_em      2         -     irh03usdf=(bdy_interp:dt)   "a_mu"  "perturbation dry air mass in column" "Pa"
+state    real   g_mu            ijb     dyn_em      2         -     irh03usdf=(bdy_interp:dt)   "g_mu"  "perturbation dry air mass in column" "Pa"
 state    real   mub             ij     dyn_em      1         -     irhdus       "mub" "base state dry air mass in column" "Pa"
 state    real   a_mub           ij     dyn_em      1         -     irhdus       "a_mub" "base state dry air mass in column" "Pa"
 state    real   g_mub           ij     dyn_em      1         -     irhdus       "g_mub" "base state dry air mass in column" "Pa"
@@ -448,44 +439,48 @@ state    real    vc_j                 -       misc     -     -    r
 # moist_tend even if there are not any moist scalars (so the essentially                                                
 # dry code will will still link properly)                                               
 #                                               
-state   real    -              ijkftb   moist       1         -     -    -
+state   real    -              ijkftb   moist     1         -     -    -
 state   real    -              ijkftb   a_moist     1         -     -    -
 state   real    -              ijkftb   g_moist     1         -     -    -
-state   real    qv             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
-state   real    a_qv           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
-state   real    g_qv           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
-state   real    qc             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
-state   real    a_qc           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
-state   real    g_qc           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
-state   real    qr             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
-state   real    a_qr           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
-state   real    g_qr           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
-state   real    qi             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
-state   real    a_qi           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QICE"             "Ice mixing ratio"              "kg kg-1"
-state   real    g_qi           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QICE"             "Ice mixing ratio"              "kg kg-1"
-state   real    qs             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
-state   real    a_qs           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QSNOW"            "Snow mixing ratio"             "kg kg-1"
-state   real    g_qs           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QSNOW"            "Snow mixing ratio"             "kg kg-1"
-state   real    qg             ijkftb   moist       1         -     i01rhusdf=(bdy_interp:dt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
-state   real    a_qg           ijkftb   a_moist     1         -     i01rhusdf=(bdy_interp:dt)  "A_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
-state   real    g_qg           ijkftb   g_moist     1         -     i01rhusdf=(bdy_interp:dt)  "G_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    qv             ijkftb   moist     1         -     i01rhusdf=(bdy_interp:dt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    a_qv           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    g_qv           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+state   real    qc             ijkftb   moist       1         -   i01rhusdf=(bdy_interp:dt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    a_qc           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    g_qc           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+state   real    qr             ijkftb   moist       1         -   i01rhusdf=(bdy_interp:dt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    a_qr           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    g_qr           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+state   real    qi             ijkftb   moist       1         -   i01rhusdf=(bdy_interp:dt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    a_qi           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    g_qi           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QICE"             "Ice mixing ratio"              "kg kg-1"
+state   real    qs             ijkftb   moist       1         -   i01rhusdf=(bdy_interp:dt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    a_qs           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    g_qs           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QSNOW"            "Snow mixing ratio"             "kg kg-1"
+state   real    qg             ijkftb   moist       1         -   i01rhusdf=(bdy_interp:dt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    a_qg           ijkftb   a_moist     1         -   i01rhusdf=(bdy_interp:dt)  "A_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+state   real    g_qg           ijkftb   g_moist     1         -   i01rhusdf=(bdy_interp:dt)  "G_QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
 
 # Other Scalars
 state   real    -              ijkftb  scalar      1         -     -    -                                       
 state   real    -              ijkft   a_scalar    1         -     -    -                                       
 state   real    -              ijkft   g_scalar    1         -     -    -                                       
-state   real    qni            ijkftb  scalar      1         -     \
-   i01rhusdf=(bdy_interp:dt)    "QNICE"         "Ice Number concentration" "# kg(-1)"
-state   real    qt             ikjftb  scalar      1         -     \
-   i01rhusdf=(bdy_interp:dt)    "CWM"           "Total condensate mixing ratio"      "kg kg-1"
+state   real    qni            ijkftb  scalar      1         -     i01rhusdf=(bdy_interp:dt)    "QNICE"         "Ice Number concentration" "# kg(-1)"
+state   real    qt             ikjftb  scalar      1         -     i01rhusdf=(bdy_interp:dt)    "CWM"           "Total condensate mixing ratio"      "kg kg-1"
  
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Arrays for Specified LBCs  (lbc arrays REMOVED; Boundary arrays are now specified with the state array; see above, 20050413 JM )
 
 state    real   fcx            w         misc     -         -      ir       "fcx"                  "RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   a_fcx          w         misc     -         -      ir       "a_fcx"                "RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   g_fcx          w         misc     -         -      ir       "g_fcx"                "RELAXATION TERM FOR BOUNDARY ZONE"         ""
 state    real   gcx            w         misc     -         -      ir       "gcx"                  "2ND RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   a_gcx          w         misc     -         -      ir       "a_gcx"                "2ND RELAXATION TERM FOR BOUNDARY ZONE"         ""
+state    real   g_gcx          w         misc     -         -      ir       "g_gcx"                "2ND RELAXATION TERM FOR BOUNDARY ZONE"         ""
 state    real   dtbc            -        misc     -         -      ir       "dtbc"                 "TIME SINCE BOUNDARY READ"         ""
+state    real   a_dtbc          -        misc     -         -      ir       "a_dtbc"               "TIME SINCE BOUNDARY READ"         ""
+state    real   g_dtbc          -        misc     -         -      ir       "g_dtbc"               "TIME SINCE BOUNDARY READ"         ""
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -496,6 +491,10 @@ state    real   dtbc            -        misc     -         -      ir       "dtb
 #-------------------------------------------------------------------------------------------------------------------------------------------
 
 state   real   landmask            ij    misc          1     -     i012rh03d=(interp_fcnm)u=(copy_fcnm)   "LANDMASK"      "LAND MASK (1 FOR LAND, 0 FOR WATER)"  ""
+state   real   shdmax              ij    misc          1     -     i012r   "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
+state   real   shdmin              ij    misc          1     -     i012r   "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
+state   real   snoalb              ij    misc          1     -     i012r   "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" "
+
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 # SI - end variables from netCDF format from Standard Initialization
@@ -510,6 +509,7 @@ state    real   DZS             l        misc      -         Z     irh       "DZ
 # lsm State Variables
 
 state    real   SMOIS            ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
+state    real   SH2O             ijl     -          1         Z     i02rh02d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
 state    real   XICE             ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
 
 state    real   SFCRUNOFF        ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "SFROFF"           "SURFACE RUNOFF"     "mm"
@@ -523,6 +523,7 @@ state    real   ACSNOW           ij     misc        1         -      rd=(interp_
 state    real   ACSNOM           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOM"           "ACCUMULATED MELTED SNOW"  "kg m-2"
 state    real   SNOW             ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOW"             "SNOW WATER EQUIVALENT"    "kg m-2"
 state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOWH"            "PHYSICAL SNOW DEPTH"      "m"
+state    real   CANWAT           ij     misc        1         -     i01rh2d=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
 state    real   SST              ij     misc        1         -     i0125rhd=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
 
 # gfdl (eta) radiation State Variables
@@ -676,10 +677,6 @@ state    real  OLR              ij      misc        1         -      rh        "
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
 state    real  XLAT             ij      misc        1         -     i0123rh01du=(copy_fcnm)      "XLAT"                "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
 state    real  XLONG            ij      misc        1         -     i0123rh01du=(copy_fcnm)      "XLONG"               "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
-state    real  XLAT_U           ij      dyn_em      1         X     i012rh01du=(copy_fcnm)       "XLAT_U"              "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
-state    real  XLONG_U          ij      dyn_em      1         X     i012rh01du=(copy_fcnm)       "XLONG_U"             "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
-state    real  XLAT_V           ij      dyn_em      1         Y     i012rh01du=(copy_fcnm)       "XLAT_V"              "LATITUDE, SOUTH IS NEGATIVE"                                          "degree_north"
-state    real  XLONG_V          ij      dyn_em      1         Y     i012rh01du=(copy_fcnm)       "XLONG_V"             "LONGITUDE, WEST IS NEGATIVE"                                          "degree_east"
 state    real  ALBEDO           ij      misc        1         -       r          "ALBEDO"                   "ALBEDO"
 state    real  ALBBCK           ij      misc        1         -     i012r        "ALBBCK"                   "BACKGROUND ALBEDO"        ""
 state    real  EMISS            ij      misc        1         -      r        "EMISS"                 "SURFACE EMISSIVITY"         "" 
@@ -1589,20 +1586,20 @@ package   dyn_em_tst   dyn_opt==402                 -             -
 package   dyn_em_var   dyn_opt==502                 -             -
 
 package   passivec1     chem_opt==0                  -             
-package   passiveqv     mp_physics==0                -             moist:qv
-package   kesslerscheme mp_physics==1                -             moist:qv,qc,qr
-package   linscheme     mp_physics==2                -             moist:qv,qc,qr,qi,qs,qg
-package   wsm3scheme    mp_physics==3                -             moist:qv,qc,qr
-package   wsm5scheme    mp_physics==4                -             moist:qv,qc,qr,qi,qs
-package   etampnew      mp_physics==5                -             moist:qv,qc
-package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
-package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr
-package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs
-package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
+package   passiveqv     mp_physics==0                -             moist:qv;a_moist:a_qv;g_moist:g_qv
+package   kesslerscheme mp_physics==1                -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   linscheme     mp_physics==2                -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg
+package   wsm3scheme    mp_physics==3                -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   wsm5scheme    mp_physics==4                -             moist:qv,qc,qr,qi,qs;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs
+package   etampnew      mp_physics==5                -             moist:qv,qc;a_moist:a_qv,a_qc;g_moist:g_qv,g_qc
+package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg
+package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs
+package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg;scalar:qni
 
 package   rrtmscheme    ra_lw_physics==1             -             -
 #package   camlwscheme   ra_lw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
-package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi
+package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi;a_moist:a_qv,a_qc,a_qr,a_qi;g_moist:g_qv,g_qc,g_qr,g_qi
 
 package   swradscheme   ra_sw_physics==1             -             -
 package   gsfcswscheme  ra_sw_physics==2             -             -

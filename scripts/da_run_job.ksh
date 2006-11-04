@@ -1,9 +1,7 @@
 #!/bin/ksh
-
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrfvar_wrf_nl}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REGION=${REGION:-con200}
@@ -88,6 +86,14 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
+elif test $HOSTNAME = willow -o $HOSTNAME = hazel -o $HOSTNAME = goldenrain ; then
+   cat > job.ksh <<EOF
+#!/bin/ksh
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT=" "
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
+$SCRIPT > $EXP_DIR/index.html 2>&1
+EOF
 elif test $HOSTNAME = ocotillo -o $HOSTNAME = snowdrift ; then
    cat > job.ksh <<EOF
 #!/bin/ksh
@@ -108,7 +114,6 @@ fi
 
 if $CHECK_SVNVERSION; then
    export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
-   export WRF_NL_VN=`svnversion -n \$WRF_NL_DIR 2>/dev/null`
    export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
    export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
    export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`

@@ -36,8 +36,9 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
    REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
    IF ( iv%num_Gpspw > 0 ) THEN
-      y % gpspw(:)% tpw = 0.0
-      do n=1, iv % num_Gpspw
+!xyh      y % gpspw(:)% tpw = 0.0
+!xyh      do n=1, iv % num_Gpspw
+      do n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
           i = iv%gpspw(n)%loc%i
           dy = iv%gpspw(n)%loc%dy
           dym = iv%gpspw(n)%loc%dym

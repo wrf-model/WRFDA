@@ -15,7 +15,8 @@ subroutine da_transform_xtoy_pseudo_adj( iv, xp, jo_grad_y, jo_grad_x )
    if (trace_use) call da_trace_entry("da_transform_xtoy_pseudo_adj")
 
    IF ( iv%num_pseudo > 0 ) THEN
-      DO n=1, iv % num_pseudo
+!xyh      DO n=1, iv % num_pseudo
+      do n=iv%ob_numb(iv%current_ob_time-1)%pseudo + 1, iv%ob_numb(iv%current_ob_time)%pseudo
          ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i
