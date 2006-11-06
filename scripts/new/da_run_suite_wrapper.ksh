@@ -26,31 +26,33 @@
 #export RUN_RESTORE_DATA_NCEP=true
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
-export RUN_WPS=true
-export RUN_REAL=true
+#export RUN_WPS=true
+#export RUN_REAL=true
 #export RUN_OBSPROC=true
-#export RUN_WRFVAR=false
-#export RUN_UPDATE_BC=true
+export RUN_WRFVAR=true
+export RUN_UPDATE_BC=true
 export RUN_WRF=true
 
 #Experiment details:
 #export DUMMY=${DUMMY:-true}
+export EXPT=cs1
 export RUN_CMD=" "
 #export CLEAN=${CLEAN:-true}
 #export CYCLING=${CYCLING:-true}
 
 #Time info:
-#export INITIAL_DATE=2003010100
-export FINAL_DATE=2003010200
+export INITIAL_DATE=2003010112
+export FINAL_DATE=2003010112
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=24
 export LONG_FCST_TIME_2=12
 export LONG_FCST_RANGE_2=24
 
 #Directories:
-export DATA_DISK=/ocotillo1
+export DATA_DISK=/smoke
 export REL_DIR=${DATA_DISK}/$USER/code/trunk
 export WRFVAR_DIR=$REL_DIR/wrfvar
+export WRF_BC_DIR=/smoke/dmbarker/code/WRF_BC
 export DAT_DIR=${DATA_DISK}/$USER/data
 
 #From WPS (namelist.wps):

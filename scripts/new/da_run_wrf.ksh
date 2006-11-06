@@ -33,7 +33,7 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export FC_DIR=${FC_DIR:-$REG_DIR/fc}
+export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$START_DATE/wrf}
 export WORK_DIR=$RUN_DIR/working
 

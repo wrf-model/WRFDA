@@ -62,13 +62,14 @@ export RUN_WRF=${RUN_WRF:-false}
 export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}                            # Domain name. 
-export EXPT=${EXPT:-test}                             # Experiment name.
+export EXPT=${EXPT:-test}                              # Experiment name.
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export HOSTS=${HOSTS:-${HOME}/hosts}
 export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 export CLEAN=${CLEAN:-false}
-export CYCLING=${CYCLING:-false}                    # Cold start (false), cycle (true).
+export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
+export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
 
 #Time info:
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}        # Start date of test period
@@ -95,18 +96,13 @@ export MSS_NCEP_DIR=${MSS_NCEP_DIR:-mss:/DSS/DS083.2/data}
 export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     # NCEP dir
 export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
 export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs}     # Real-time observation directory.
-export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export FC_DIR=${FC_DIR:-$REG_DIR/fc}     # Forecast directory
+export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
 
-export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
-export DA_DIR=${DA_DIR:-$REG_DIR/da}     # Forecast directory
-export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
+export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}                
 
 export OK='<FONT COLOR="green">'
 export ERR='<FONT COLOR="red">'
@@ -118,6 +114,7 @@ if test ! -d $EXP_DIR; then mkdir $EXP_DIR; fi
 if test ! -d $EXP_DIR/run; then mkdir $EXP_DIR/run; fi
 
 #From WPS (namelist.wps):
+export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
 export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$NCEP_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
@@ -137,6 +134,8 @@ export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export FG_TYPE=${FG_TYPE:-GFS}
 
 #From WRF (namelist.input):
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
@@ -167,18 +166,21 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 #&bdy_control:
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
-# Additional namelist variables for 3DVAR_OBSPROC:
+#From OBSPROC:
+export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
+export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 export PS0=${PS0:-100000.0}
 export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}
 
-# Additional namelist variables for WRF-Var
+#From WRF-Var:
+export NL_VAR4D=${NL_VAR4D:-.false.}
+export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
+export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.dat} # background errors.
 
-export NL_FG_FORMAT=${NL_FG_FORMAT:-1} # First guess format: 1=WRF, 2=MM5, 3=KMA
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2} # Observation format: 1=BUFR, 2=ASCII "little_r"
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$REG_DIR/be/gen_be.NMC.dat} # background errors.
-
 #------------------------------------------------------------------------------------------
 
 echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
@@ -210,7 +212,6 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
 export PREV_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
-export FIRST=true
 
 while test $DATE -le $FINAL_DATE; do 
 
@@ -330,8 +331,14 @@ while test $DATE -le $FINAL_DATE; do
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
+      if $RUN_4DVAR; then
+         $WRFVAR_DIR/scripts/da_trace.ksh da_run_4dvar $RUN_DIR
+         ${WRFVAR_DIR}/scripts/new/da_run_4dvar.ksh > $RUN_DIR/index.html 2>&1
+      else
+         $WRFVAR_DIR/scripts/da_trace.ksh da_run_3dvar $RUN_DIR
+         ${WRFVAR_DIR}/scripts/new/da_run_3dvar.ksh > $RUN_DIR/index.html 2>&1
+      fi
+
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
@@ -349,7 +356,7 @@ while test $DATE -le $FINAL_DATE; do
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
-      $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/new/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $RC$END"
@@ -374,7 +381,7 @@ while test $DATE -le $FINAL_DATE; do
       export NEXT_MONTH=`echo $NEXT_DATE | cut -c5-6`
       export NEXT_DAY=`echo $NEXT_DATE | cut -c7-8`
       export NEXT_HOUR=`echo $NEXT_DATE | cut -c9-10`
-      ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
+      ln -fs $FC_DIR/$DATE/wrf_3dvar_input_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
         $FC_DIR/$NEXT_DATE/wrfinput_d${DOMAIN}
    fi
 
