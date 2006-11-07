@@ -181,6 +181,8 @@ EOF
       echo "Dummy obsproc"
       echo "Dummy obsproc" > obs_gts.3dvar
    else
+      ln -sf $OBSPROC_DIR/obserr.txt .
+      ln -sf $OBSPROC_DIR/prepbufr_table_filename .
       $OBSPROC_DIR/3dvar_obs.exe
       RC=$?
       if test $RC = 0; then
