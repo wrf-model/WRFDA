@@ -12,7 +12,7 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-export START_DATE=${START_DATE:-2003010100}
+export DATE=${DATE:-2003010100}                        # Time of analysis (unchanged on exit).
 export FCST_RANGE=${FCST_RANGE:-6}
 export LBC_FREQ=${LBC_FREQ:-06}
 export DUMMY=${DUMMY:-false}
@@ -34,7 +34,7 @@ export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$START_DATE/wrf}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wrf}
 export WORK_DIR=$RUN_DIR/working
 
 #From WPS (namelist.wps):
@@ -77,16 +77,16 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
 #For WRF:
-export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$START_DATE/wrfinput_d${DOMAIN}}
-export WRF_BDY=${WRF_BDY:-$RC_DIR/$START_DATE/wrfbdy_d${DOMAIN}}
+export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
+export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
 
-if test ! -d $FC_DIR/$START_DATE; then mkdir -p $FC_DIR/$START_DATE; fi
+if test ! -d $FC_DIR/$DATE; then mkdir -p $FC_DIR/$DATE; fi
 rm -rf $WORK_DIR
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
 #Get extra namelist variables:
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $START_DATE $FCST_RANGE
+. ${WRFVAR_DIR}/scripts/new/da_get_date_range.ksh
 
 echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT wrf</H1><PRE>"
@@ -99,7 +99,7 @@ echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR     <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
-echo "START_DATE $START_DATE"
+echo "DATE       $DATE"
 echo "END_DATE   $END_DATE"
 echo "FCST_RANGE $FCST_RANGE"
 echo "LBC_FREQ   $LBC_FREQ"
@@ -117,9 +117,8 @@ ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
 ln -fs ${WRF_DIR}/run/gribmap.txt .
 ln -fs ${WRF_INPUT} wrfinput_d${DOMAIN}
 ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
-#cp ${RC_DIR}/$START_DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+#cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
-export NL_ANALYSIS_DATE=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00.0000
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
 if test $WRF_NAMELIST'.' != '.'; then
@@ -134,18 +133,18 @@ cp namelist.input $RUN_DIR
 
 echo '<A HREF="namelist.input">Namelist input</a>'
 
-#if test ! -f $FC_DIR/$START_DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
+#if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
 
    if $DUMMY; then
       echo Dummy wrf
-      LOCAL_DATE=$START_DATE
+      LOCAL_DATE=$DATE
       while test $LOCAL_DATE -le $END_DATE; do
          export L_YEAR=`echo $LOCAL_DATE | cut -c1-4`
          export L_MONTH=`echo $LOCAL_DATE | cut -c5-6`
          export L_DAY=`echo $LOCAL_DATE | cut -c7-8`
          export L_HOUR=`echo $LOCAL_DATE | cut -c9-10`
          echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
-         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $LOCAL_DATE $LBC_FREQ`
+         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $LOCAL_DATE $NL_HISTORY_INTERVAL`
       done
    else
       $RUN_CMD ./wrf.exe
@@ -157,7 +156,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
 
       rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
-      mv rsl* $RUN_DIR/rsl >&! /dev/null
+      mv rsl* $RUN_DIR/rsl > /dev/null 2>&1
       cd $RUN_DIR/rsl
       for FILE in rsl*; do
          echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
@@ -179,14 +178,14 @@ echo '<A HREF="namelist.input">Namelist input</a>'
          exit $RC
       fi
    fi
-   mv wrfout* $FC_DIR/$START_DATE
-   mv wrf_3dvar* $FC_DIR/$START_DATE
+   mv wrfout* $FC_DIR/$DATE
+   mv wrf_3dvar* $FC_DIR/$DATE
 #else
-#   echo "$FC_DIR/$START_DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
+#   echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
 #fi
 
 #mkdir -p $FC_DIR/$END_DATE
-#ln -fs $FC_DIR/$START_DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
+#ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
 #   $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
 
 if $CLEAN; then

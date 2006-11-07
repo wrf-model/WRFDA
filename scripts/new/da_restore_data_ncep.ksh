@@ -11,7 +11,7 @@
 #--------------------------------------------
 
 export DUMMY=${DUMMY:-false}
-export START_DATE=${START_DATE:-2003010100}
+export DATE=${DATE:-2003010100}
 export FCST_RANGE=${FCST_RANGE:-6}
 export LBC_FREQ=${LBC_FREQ:-6}
 
@@ -28,15 +28,15 @@ echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
 
 date
 
-export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $START_DATE $FCST_RANGE 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
 
-echo "START_DATE   $START_DATE"
+echo "DATE         $DATE"
 echo "END_DATE     $END_DATE"
 echo "LBC_FREQ     $LBC_FREQ"
 echo "MSS_NCEP_DIR $MSS_NCEP_DIR"
 echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
 
-LOCAL_DATE=$START_DATE
+LOCAL_DATE=$DATE
 
 while test $LOCAL_DATE -le $END_DATE; do
 

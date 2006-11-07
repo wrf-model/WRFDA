@@ -12,7 +12,7 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-export START_DATE=${START_DATE:-2003010100}
+export DATE=${DATE:-2003010100}
 export FCST_RANGE=${FCST_RANGE:-6}
 export LBC_FREQ=${LBC_FREQ:-06}
 export DUMMY=${DUMMY:-false}
@@ -33,7 +33,7 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$START_DATE/real}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/real}
 export WORK_DIR=$RUN_DIR/working
 
 #From WPS:
@@ -67,7 +67,7 @@ mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
 #Get extra namelist variables:
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $START_DATE $FCST_RANGE
+. ${WRFVAR_DIR}/scripts/new/da_get_date_range.ksh
 
 echo "<HTML><HEAD><TITLE>$EXPT real</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT real</H1><PRE>"
@@ -79,7 +79,7 @@ echo 'WRF_DIR    <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'RUN_DIR    <A HREF="file:'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR   <A HREF="file:'$WORK_DIR'">'$WORK_DIR'</a>'
 echo 'RC_DIR     <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
-echo "START_DATE $START_DATE"
+echo "DATE       $DATE"
 echo "END_DATE   $END_DATE"
 
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
@@ -98,14 +98,13 @@ cp namelist.input $RUN_DIR
 
 echo '<A HREF="namelist.input">Namelist input</a>'
 
-#if test ! -f $RC_DIR/$START_DATE/wrfinput_d${DOMAIN}; then
    if $DUMMY; then
       echo "Dummy real"
       echo Dummy real > wrfinput_d${DOMAIN}
       echo Dummy real > wrfbdy_d${DOMAIN}
       # echo Dummy real > wrflowinp_d${DOMAIN}
    else
-      ln -fs $RC_DIR/$START_DATE/met_em.d* .
+      ln -fs $RC_DIR/$DATE/met_em.d* .
       cp ${WRF_DIR}/main/real.exe .
       $RUN_CMD ./real.exe
       RC=$?
@@ -140,15 +139,9 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       fi    
    fi
 
-   mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$START_DATE
-   mv $WORK_DIR/wrfbdy_d${DOMAIN} $RC_DIR/$START_DATE
-#   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$START_DATE
-#else
-#   echo $RC_DIR/$START_DATE/wrfinput_d${DOMAIN} exists, skipping
-#fi
-
-#rm -f ${MOAD_DATAROOT}/siprd/wrf_real_input_${SOLVER}*
-#rm -f ${WRF_DIR}/test/${SOLVER}_real/wrf_real_input_${SOLVER}*
+   mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$DATE
+   mv $WORK_DIR/wrfbdy_d${DOMAIN} $RC_DIR/$DATE
+#   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$DATE
 
 if $CLEAN; then
    rm -rf $WORK_DIR

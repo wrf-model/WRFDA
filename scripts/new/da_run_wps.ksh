@@ -8,7 +8,7 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-export START_DATE=${START_DATE:-2003010100}
+export DATE=${DATE:-2003010100}
 export FCST_RANGE=${FCST_RANGE:-6}
 export LBC_FREQ=${LBC_FREQ:-06}
 export DUMMY=${DUMMY:-false}
@@ -28,7 +28,7 @@ export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$START_DATE/wps}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wps}
 export WORK_DIR=$RUN_DIR/working
 
 #WPS:
@@ -49,40 +49,28 @@ export NL_DY=${NL_DY:-200000}
 export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export FG_TYPE=${FG_TYPE:-GFS}
 
+let LBC_FREQ_SS=$LBC_FREQ*3600
+
 if test ! -d $REG_DIR; then mkdir $REG_DIR; fi 
 if test ! -d $RUN_DIR; then mkdir -p $RUN_DIR; fi 
+if test ! -d $RC_DIR/$DATE; then mkdir -p $RC_DIR/$DATE; fi 
 if test ! -d $WORK_DIR; then mkdir $WORK_DIR; fi 
-if test ! -d $RC_DIR/$START_DATE; then mkdir -p $RC_DIR/$START_DATE; fi 
+
+cd $WORK_DIR
 
 echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 
+. ${WRFVAR_DIR}/scripts/new/da_get_date_range.ksh
+
 date
 
-export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${START_DATE} $FCST_RANGE 2>/dev/null`
-
 echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
-echo "START_DATE    $START_DATE"
+echo "DATE          $DATE"
 echo "END_DATE      $END_DATE"
 echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
 echo 'RUN_DIR       <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
 echo 'WORK_DIR      <A HREF="file:'$WORK_DIR'"</a>'$WORK_DIR'</a>'
 echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
-
-date
-
-cd $WORK_DIR
-
-let LBC_FREQ_SS=$LBC_FREQ*3600
-
-export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
-export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
-export NL_START_DAY=`echo $START_DATE | cut -c7-8`
-export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
-
-export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
 cat >namelist.wps <<EOF
 &share
@@ -145,10 +133,9 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
 # [3.0] Run WPS:
 #-----------------------------------------------------------------------
 
-#if test ! -f $RC_DIR/$START_DATE/met_em.d${DOMAIN}.${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.nc; then
    if $DUMMY; then
       echo "Dummy wps"
-      LOCAL_DATE=$START_DATE
+      LOCAL_DATE=$DATE
       while test $LOCAL_DATE -le $END_DATE; do
          export L_YEAR=`echo $LOCAL_DATE | cut -c1-4`
          export L_MONTH=`echo $LOCAL_DATE | cut -c5-6`
@@ -176,7 +163,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
 
 #     Run ungrib:
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      LOCAL_DATE=$START_DATE
+      LOCAL_DATE=$DATE
       FILES=''
       while test $LOCAL_DATE -le $END_DATE; do
          FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
@@ -210,10 +197,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       fi
       
    fi
-   mv met_em.d${DOMAIN}* $RC_DIR/$START_DATE
-#else
-#   echo "$RC_DIR/$START_DATE/met_em.d${DOMAIN}* files exist, skipping"
-#fi
+   mv met_em.d${DOMAIN}* $RC_DIR/$DATE
 
 cd $OLDPWD
 

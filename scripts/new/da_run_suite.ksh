@@ -77,8 +77,8 @@ export FINAL_DATE=${FINAL_DATE:-2003012800}            # Final date of test peri
 export LBC_FREQ=${LBC_FREQ:-06}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
 export OBS_FREQ=${OBS_FREQ:-12}
-export OBS_WINDOW_START=${OBS_WINDOW_START:--3}        # Start ob window difference (hrs).
-export OBS_WINDOW_END=${OBS_WINDOW_END:-3}             # End ob window difference (hrs). 
+export WINDOW_START=${WINDOW_START:-0}                 # Start ob window difference (hrs).
+export WINDOW_END=${WINDOW_END:-0}                     # End ob window difference (hrs). 
 export LONG_FCST_TIME_1=${LONG_FCST_TIME_1:-99}
 export LONG_FCST_TIME_2=${LONG_FCST_TIME_2:-99}
 export LONG_FCST_TIME_3=${LONG_FCST_TIME_3:-99}
@@ -175,7 +175,7 @@ export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}
 
 #From WRF-Var:
-export NL_VAR4D=${NL_VAR4D:-.false.}
+export NL_VAR4D=${NL_VAR4D:-false}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
 export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.dat} # background errors.
@@ -202,8 +202,8 @@ echo "FINAL_DATE   $FINAL_DATE"
 echo "CYCLE_PERIOD $CYCLE_PERIOD"
 echo "LBC_FREQ     $LBC_FREQ"
 echo "OBS_FREQ     $OBS_FREQ"
-echo "OBS_WINDOW_START $OBS_WINDOW_START"
-echo "OBS_WINDOW_END   $OBS_WINDOW_END"
+echo "WINDOW_START $WINDOW_START"
+echo "WINDOW_END   $WINDOW_END"
 echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
 echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
 echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
@@ -211,31 +211,23 @@ echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
-export PREV_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
 
 while test $DATE -le $FINAL_DATE; do 
+   export PREV_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
+   export HOUR=`echo $DATE | cut -c9-10`
 
-   export NEXT_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+   if test ! -d $FC_DIR/$DATE; then mkdir -p $FC_DIR/$DATE; fi
 
    echo "=========="
    echo $DATE
    echo "=========="
 
-   YEAR=`echo $DATE | cut -c1-4`
-   MONTH=`echo $DATE | cut -c5-6`
-   DAY=`echo $DATE | cut -c7-8`
-   HOUR=`echo $DATE | cut -c9-10`
-
    # Decide on length of forecast to run
    export FCST_RANGE=$CYCLE_PERIOD
-
    if test $HOUR = $LONG_FCST_TIME_1; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
    if test $HOUR = $LONG_FCST_TIME_2; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
    if test $HOUR = $LONG_FCST_TIME_3; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
    if test $HOUR = $LONG_FCST_TIME_4; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
-
-   # Work out START_DATE, END_DATE and NL_START_YEAR etc
-   . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh $DATE $FCST_RANGE
 
    if $RUN_RESTORE_DATA_NCEP; then
       export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_ncep
@@ -316,10 +308,7 @@ while test $DATE -le $FINAL_DATE; do
       fi
    fi
 
-   export YEAR=`echo $DATE | cut -c1-4`
-   export MONTH=`echo $DATE | cut -c5-6`
-   export DAY=`echo $DATE | cut -c7-8`
-   export HOUR=`echo $DATE | cut -c9-10`
+   export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
 
    if $RUN_WRFVAR; then
       export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar
@@ -327,17 +316,14 @@ while test $DATE -le $FINAL_DATE; do
 
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       if $CYCLING; then
-         if ! $FIRST; then export DA_FIRST_GUESS=${FC_DIR}/${DATE}/wrfinput_d${DOMAIN}; fi
+         if ! $FIRST; then
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${NL_ANALYSIS_DATE}
+         fi
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
 
-      if $RUN_4DVAR; then
-         $WRFVAR_DIR/scripts/da_trace.ksh da_run_4dvar $RUN_DIR
-         ${WRFVAR_DIR}/scripts/new/da_run_4dvar.ksh > $RUN_DIR/index.html 2>&1
-      else
-         $WRFVAR_DIR/scripts/da_trace.ksh da_run_3dvar $RUN_DIR
-         ${WRFVAR_DIR}/scripts/new/da_run_3dvar.ksh > $RUN_DIR/index.html 2>&1
-      fi
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR
+      ${WRFVAR_DIR}/scripts/new/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
 
       RC=$?
       if test $RC != 0; then
@@ -347,7 +333,9 @@ while test $DATE -le $FINAL_DATE; do
       export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
-         if ! $FIRST; then WRF_INPUT=${FC_DIR}/${DATE}/wrfinput_d$DOMAIN; fi
+         if ! $FIRST; then
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${NL_ANALYSIS_DATE}
+         fi
       fi
    fi
 
@@ -363,6 +351,9 @@ while test $DATE -le $FINAL_DATE; do
          exit 1
       fi
       export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
+#DALE remove
+   else
+      export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
    fi
 
    if $RUN_WRF; then
@@ -376,18 +367,10 @@ while test $DATE -le $FINAL_DATE; do
          echo `date` "${ERR}Failed with error $RC$END"
          exit 1
       fi
-      mkdir -p $FC_DIR/$NEXT_DATE
-      export NEXT_YEAR=`echo $NEXT_DATE | cut -c1-4`
-      export NEXT_MONTH=`echo $NEXT_DATE | cut -c5-6`
-      export NEXT_DAY=`echo $NEXT_DATE | cut -c7-8`
-      export NEXT_HOUR=`echo $NEXT_DATE | cut -c9-10`
-      ln -fs $FC_DIR/$DATE/wrf_3dvar_input_d${DOMAIN}_${NEXT_YEAR}-${NEXT_MONTH}-${NEXT_DAY}_${NEXT_HOUR}:00:00 \
-        $FC_DIR/$NEXT_DATE/wrfinput_d${DOMAIN}
    fi
 
-   export PREV_DATE=${DATE}
+   export NEXT_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
    export DATE=$NEXT_DATE
-
    export FIRST=false
 
 done

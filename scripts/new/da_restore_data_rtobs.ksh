@@ -10,11 +10,11 @@
 # 0) Set up various environment variables:
 #--------------------------------------------
 
-export START_DATE=${START_DATE:-2003010100}
+export DATE=${DATE:-2003010100}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
 export OBS_FREQ=${OBS_FREQ:-$CYCLE_PERIOD}
-export OBS_WINDOW_START=${OBS_WINDOW_START:--3}        # Start ob window difference (hrs).
-export OBS_WINDOW_END=${OBS_WINDOW_END:-3}             # End ob window difference (hrs).
+export WINDOW_START=${WINDOW_START:-0}        # Start ob window difference (hrs).
+export WINDOW_END=${WINDOW_END:-0}             # End ob window difference (hrs).
 export DUMMY=${DUMMY:-false}
 
 #Directories:
@@ -32,8 +32,10 @@ echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
 
 date
 
-export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${START_DATE} $OBS_WINDOW_END 2>/dev/null`
+export START_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
 
+echo "DATE       $DATE"
 echo "START_DATE $START_DATE"
 echo "END_DATE   $END_DATE"
 echo "OBS_FREQ   $OBS_FREQ"
