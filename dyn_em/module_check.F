@@ -9165,7 +9165,7 @@ SUBROUTINE t_calc_mu_uv_1 ( config_flags,                 &
 
    VAL_A=0.
    do i=its,ite
-   do j=jms,jte
+   do j=jts,jte
       VAL_A=VAL_A +P_mu(i,j)*B_mu(i,j)
    enddo
    enddo

@@ -1,0 +1,50 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Tom Henderson
+Reviewer: Qingnong Xiao
+Date: 11/09/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Fix loop-indexing bug in module_check.F
+
+Expected Differences
+--------------------
+
+Adjoint test now passes for calc_mu_uv_1 with the new auto-generated SNL.  
+No change to results.  
+
+
+CPU:
+
+Same.
+
+memory:
+
+Same.
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+bluesky:  see above
+
+--------------------------------------------------------------------------------------
+Files removed:
+--------------
+
+
+Files added:
+------------
+
+changes/changes_20061109.th
+
+Files modified:
+---------------
+
+dyn_em/module_check.F
+
+Tag:
+
+
