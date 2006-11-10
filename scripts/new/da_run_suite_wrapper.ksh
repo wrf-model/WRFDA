@@ -26,8 +26,8 @@
 #export RUN_RESTORE_DATA_NCEP=true
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
-#export RUN_WPS=true
-#export RUN_REAL=true
+export RUN_WPS=true
+export RUN_REAL=true
 #export RUN_OBSPROC=true
 export RUN_WRFVAR=true
 export RUN_UPDATE_BC=true
@@ -35,14 +35,15 @@ export RUN_WRF=true
 
 #Experiment details:
 #export DUMMY=${DUMMY:-true}
-export EXPT=cs1
+export EXPT=cy1
 export RUN_CMD=" "
 #export CLEAN=${CLEAN:-true}
-#export CYCLING=${CYCLING:-true}
+export CYCLING=${CYCLING:-true}
 
 #Time info:
-export INITIAL_DATE=2003010112
-export FINAL_DATE=2003010112
+#export INITIAL_DATE=2003010112
+#export FIRST=false
+#export FINAL_DATE=2003010112
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=24
 export LONG_FCST_TIME_2=12
@@ -59,6 +60,11 @@ export DAT_DIR=${DATA_DISK}/$USER/data
 export RUN_GEOGRID=false
 export WPS_GEOG_DIR=${DAT_DIR}/geog
 
+#WRF:
+export NL_CU_PHYSICS=2
+
+#WRF-Var:
+export NL_CHECK_MAX_IV=.false.
 export SCRIPT=${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
 
 $RUN_CMD $SCRIPT

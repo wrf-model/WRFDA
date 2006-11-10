@@ -48,14 +48,15 @@ export MONTH=`echo $DATE | cut -c5-6`
 export DAY=`echo $DATE | cut -c7-8`
 export HOUR=`echo $DATE | cut -c9-10`
 export PREV_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
-export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
+export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
+export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
 export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}    #DALE: Boundaries look wrong to me.
 if $CYCLING; then
    export DA_BOUNDARIES=${DA_BOUNDARIES:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
    if ! $FIRST; then
-      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${NL_ANALYSIS_DATE}
+      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
    fi
 fi
 

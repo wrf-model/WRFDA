@@ -308,7 +308,7 @@ while test $DATE -le $FINAL_DATE; do
       fi
    fi
 
-   export NL_ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
+   export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 
    if $RUN_WRFVAR; then
       export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar
@@ -317,7 +317,7 @@ while test $DATE -le $FINAL_DATE; do
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       if $CYCLING; then
          if ! $FIRST; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${NL_ANALYSIS_DATE}
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
@@ -334,7 +334,7 @@ while test $DATE -le $FINAL_DATE; do
    else     
       if $CYCLING; then
          if ! $FIRST; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${NL_ANALYSIS_DATE}
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
    fi
