@@ -134,7 +134,7 @@ export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export FG_TYPE=${FG_TYPE:-GFS}
 
 #From WRF (namelist.input):
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}
 export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
@@ -144,6 +144,11 @@ export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
 #&domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
+export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
+                                        " 0.922, 0.894, 0.860, 0.817, 0.766, "\
+                                        " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
+                                        " 0.324, 0.273, 0.228, 0.188, 0.152,"\
+                                        " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
 export NL_E_VERT=${NL_E_VERT:-28}                   #
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
