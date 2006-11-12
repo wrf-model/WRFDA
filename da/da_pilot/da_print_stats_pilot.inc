@@ -1,10 +1,10 @@
 subroutine da_print_stats_pilot( stats_unit, nu, nv, Pilot )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nu, nv
-   TYPE (stats_pilot_type), INTENT(IN):: Pilot
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv
+   type (stats_pilot_type), intent(in):: Pilot
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k  '

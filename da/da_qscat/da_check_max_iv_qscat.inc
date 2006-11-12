@@ -1,15 +1,15 @@
 subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 
-   IMPLICIT NONE
-   INTEGER,           INTENT (IN)         :: it
-   INTEGER,           INTENT (INOUT)      :: itu, itvv, ituf, itvvf
-   TYPE (qscat_type), INTENT(INOUT)       :: qscat
+   implicit none
+   integer,           intent (in)         :: it
+   integer,           intent (inout)      :: itu, itvv, ituf, itvvf
+   type (qscat_type), intent(inout)       :: qscat
 
-   INTEGER                                :: iunit ! Output unit.
-   INTEGER                                :: iu, ivv
-   INTEGER                                :: iuf, ivf
-   INTEGER                                :: i
-   LOGICAL                                :: failed, print
+   integer                                :: iunit ! Output unit.
+   integer                                :: iu, ivv
+   integer                                :: iuf, ivf
+   integer                                :: i
+   logical                                :: failed, print
 
 !-----------------------------------------------------------------------------!
 !  [1.0] Open diagnostic file:
@@ -18,12 +18,12 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   IF ( print )THEN
-      WRITE (iunit,'(A)')  &
+   if ( print )then
+      write (iunit,'(A)')  &
       '----------------------------------------------------------------'
-      WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
      'Error max test ratio for Qscat_U   = ',max_error_uv, &
      'Error max test ratio for Qscat_V   = ',max_error_uv
 
@@ -33,7 +33,7 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 !  [2.0] Perform maximum innovation vector check:
 !-----------------------------------------------------------------------------!
 
-   failed = .FALSE.
+   failed = .false.
 
 !     U-wind
 
@@ -50,10 +50,10 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 !  [3.0] Output test failed results:
 !-----------------------------------------------------------------------------!
  
-   IF ( print .and. failed ) THEN
-      WRITE (UNIT = iunit, FMT = '(/,10(2(A,I6),/))') & 
+   if ( print .and. failed ) then
+      write (unit = iunit, fmt = '(/,10(2(A,I6),/))') & 
       'Number of failed qscat u-wind observations:       ',ituf,  ' on ',itu,   &
       'Number of failed qscat v-wind observations:       ',itvvf,  ' on ',itvv
-   ENDIF
+   end if
 
 end subroutine da_check_max_iv_qscat

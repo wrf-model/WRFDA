@@ -84,7 +84,7 @@
         sigv = a14 + term24 + term34 + term44 + term54 + term64
       else
         sigv = 0.0
-      endif
+      end if
       sigma_v = sigv*wvc
 
       end subroutine da_cal_sigma_v

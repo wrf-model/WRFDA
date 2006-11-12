@@ -6,22 +6,22 @@ subroutine da_trace( &
    Messages,  &          ! in, optional
    MaxNoCalls)           ! in, optional
 
-   IMPLICIT NONE
+   implicit none
 
    ! Arguments
 
-   CHARACTER (LEN=*), INTENT(IN)           :: Name         ! Subroutine name
-   CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Message      ! Text to trace
-   CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Messages(:)  ! Text to trace
-   INTEGER, OPTIONAL, INTENT(IN)           :: MaxNoCalls   ! max no calls to show
+   character (LEN=*), intent(in)           :: Name         ! Subroutine name
+   character (LEN=*), optional, intent(in) :: Message      ! Text to trace
+   character (LEN=*), optional, intent(in) :: Messages(:)  ! Text to trace
+   integer, optional, intent(in)           :: MaxNoCalls   ! max no calls to show
 
    ! Local variables
 
-   INTEGER           :: IOStatus     ! I-O return code
-   INTEGER           :: Loop         ! General loop counter
-   INTEGER           :: TotalSpace
-   INTEGER           :: LocalMaxNoCalls
-   CHARACTER(LEN=25) :: Change
+   integer           :: IOStatus     ! I-O return code
+   integer           :: Loop         ! General loop counter
+   integer           :: TotalSpace
+   integer           :: LocalMaxNoCalls
+   character(LEN=25) :: Change
 
    !-----------------------------------------------------------------------
    ! Start of code
@@ -31,14 +31,14 @@ subroutine da_trace( &
    ! Check whether trace active and depth of trace
    !-----------------------------------------------------------------------
 
-   IF (.NOT. TraceActive) THEN
-      RETURN
-   END IF
+   if (.NOT. TraceActive) then
+      return
+   end if
 
-   IF (TraceDepth >= trace_max_depth) THEN
+   if (TraceDepth >= trace_max_depth) then
       ! already at maximum depth, so return
-      RETURN
-   END IF
+      return
+   end if
 
    !-----------------------------------------------------------------------
    ! Note memory usage
@@ -46,99 +46,99 @@ subroutine da_trace( &
 
    Change = ""
 
-   IF (trace_memory) THEN
+   if (trace_memory) then
       call da_memory( &
          TotalSpace)
-      IF (LastSpace < TotalSpace) THEN
-         WRITE(Change,"(A9,I12)")", bigger", TotalSpace - LastSpace
-      ELSE IF (LastSpace > TotalSpace) THEN
-         WRITE(Change,"(A9,I12)")", smaller", TotalSpace - LastSpace
-      END IF
-      IF (MaxHeap(Pointer) < TotalSpace) THEN
+      if (LastSpace < TotalSpace) then
+         write(Change,"(A9,I12)")", bigger", TotalSpace - LastSpace
+      else if (LastSpace > TotalSpace) then
+         write(Change,"(A9,I12)")", smaller", TotalSpace - LastSpace
+      end if
+      if (MaxHeap(Pointer) < TotalSpace) then
          MaxHeap(Pointer) = TotalSpace
-      END IF
+      end if
       LastSpace = TotalSpace
-   ELSE
+   else
       TotalSpace = 0
-   END IF
+   end if
 
    !-----------------------------------------------------------------------
-   ! Perform the trace if not done too many times before. Only on PE 0
+   ! Perform the trace if not done too many times before. only on PE 0
    !-----------------------------------------------------------------------  
 
-   IF (trace_write) THEN
+   if (trace_write) then
 
-      IF (PRESENT(MaxNoCalls)) THEN
+      if (present(MaxNoCalls)) then
          LocalMaxNoCalls = MaxNoCalls
-      ELSE
+      else
          LocalMaxNoCalls = trace_repeat_body
-      END IF
+      end if
 
       NoCallsBody(Pointer) = NoCallsBody(Pointer)+1
 
-      IF (NoCallsBody(Pointer) <= LocalMaxNoCalls) THEN
-         IF (trace_memory) THEN
+      if (NoCallsBody(Pointer) <= LocalMaxNoCalls) then
+         if (trace_memory) then
              if (use_html) then
-                WRITE (UNIT=trace_unit, &
-                   FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
-                   IOSTAT=IOStatus) &
-                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                   TRIM(Name), TRIM(Name), TotalSpace, Change
+                write (unit=trace_unit, &
+                   fmt='(A, "| <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
+                   iostat=IOStatus) &
+                   pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &
+                   trim(Name), trim(Name), TotalSpace, Change
              else
-                WRITE (UNIT=trace_unit, &
-                   FMT='(A, "| ",A,I11,A)', &
-                   IOSTAT=IOStatus) &
-                   pad(1:TraceDepth*TraceIndentAmount),TRIM(Name), TotalSpace, Change
+                write (unit=trace_unit, &
+                   fmt='(A, "| ",A,I11,A)', &
+                   iostat=IOStatus) &
+                   pad(1:TraceDepth*TraceIndentAmount),trim(Name), TotalSpace, Change
             end if
-         ELSE
+         else
             if (use_html) then
-               WRITE (UNIT=trace_unit, &
-                  FMT='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', &
-                  IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                  TRIM(Name), TRIM(Name)  
+               write (unit=trace_unit, &
+                  fmt='(A, "| <a href=",A,"/",A,".html>",A,"</a>")', &
+                  iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &
+                  trim(Name), trim(Name)  
             else 
-               WRITE (UNIT=trace_unit, &
-                  FMT='(A, "| ",A)', &
-                  IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name)
+               write (unit=trace_unit, &
+                  fmt='(A, "| ",A)', &
+                  iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name)
             end if
-         END IF
-         IF (IOStatus /= 0) THEN
+         end if
+         if (IOStatus /= 0) then
             call da_error(__FILE__,__LINE__, &
-               (/"Cannot write to trace file for "//TRIM(Name)/))
-         END IF
+               (/"Cannot write to trace file for "//trim(Name)/))
+         end if
 
-         IF (PRESENT(Message)) THEN
-            WRITE (UNIT=trace_unit, FMT='(A,"  ",A)', IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
-            IF (IOStatus .NE. 0) THEN
+         if (present(Message)) then
+            write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &
+               pad(1:TraceDepth*TraceIndentAmount),trim(Message)
+            if (IOStatus .NE. 0) then
                call da_error(__FILE__,__LINE__, &
-                  (/"Cannot write to trace file for "//TRIM(Name)/))
-            END IF
-         END IF
+                  (/"Cannot write to trace file for "//trim(Name)/))
+            end if
+         end if
 
-         IF (PRESENT(Messages)) THEN
-            DO Loop = 1, SIZE(Messages)
-               WRITE (UNIT=trace_unit, FMT='(A,"  ",A)', IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
-               IF (IOStatus .NE. 0) THEN
+         if (present(Messages)) then
+            do Loop = 1, size(Messages)
+               write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
+               if (IOStatus .NE. 0) then
                   call da_error(__FILE__,__LINE__, &
-                     (/"Cannot write to trace file for "//TRIM(Name)/))
-               END IF
-            END DO ! Loop
-         END IF
-      END IF
+                     (/"Cannot write to trace file for "//trim(Name)/))
+               end if
+            end do ! Loop
+         end if
+      end if
 
-      IF (NoCallsBody(Pointer) == trace_repeat_body) THEN
-         WRITE (UNIT=trace_unit, FMT='(A,"  Called enough, going quiet")', IOSTAT=IOStatus) &
+      if (NoCallsBody(Pointer) == trace_repeat_body) then
+         write (unit=trace_unit, fmt='(A,"  Called enough, going quiet")', iostat=IOStatus) &
             pad(1:TraceDepth*TraceIndentAmount)
-         IF (IOStatus .NE. 0) THEN
+         if (IOStatus .NE. 0) then
             call da_error(__FILE__,__LINE__, &
-              (/"Cannot write to trace file for "//TRIM(Name)/))
-         END IF
-      END IF
-   END IF ! trace_write
+              (/"Cannot write to trace file for "//trim(Name)/))
+         end if
+      end if
+   end if ! trace_write
 
 end subroutine da_trace
 

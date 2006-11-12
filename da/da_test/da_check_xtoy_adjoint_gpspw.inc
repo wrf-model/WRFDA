@@ -1,26 +1,26 @@
 subroutine da_check_xtoy_adjoint_gpspw( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs
 
-   INTEGER                        :: n             ! Loop counter.
+   integer                        :: n             ! Loop counter.
 
-   IF ( oi%num_Gpspw > 0 ) THEN
-      DO n=1, oi%num_Gpspw
+   if ( oi%num_Gpspw > 0 ) then
+      do n=1, oi%num_Gpspw
          if( oi%gpspw(n)%loc%proc_domain ) then
             adjtest_lhs = adjtest_lhs &
                        + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
-         endif
+         end if
 
          pertile_lhs = pertile_lhs &
                     + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
 
          y%gpspw (n)%tpw = y%gpspw (n)%tpw/typical_tpw_rms ** 2
-      END DO
-   ENDIF
+      end do
+   end if
 
 end subroutine da_check_xtoy_adjoint_gpspw
 

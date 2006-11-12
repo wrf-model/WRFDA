@@ -1,21 +1,21 @@
 subroutine da_transform_xtoy_metar ( xa, xb, iv, xp, y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(INOUT) :: xa       ! gridded analysis increment.
-   TYPE (xb_type), INTENT(IN)    :: xb       ! first guess state.
-   TYPE (ob_type), INTENT(IN)    :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN) :: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT)  :: y        ! y = h (xa) (linear)
+   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
+   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (ob_type), intent(in)    :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout)  :: y        ! y = h (xa) (linear)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
 
-   IF (trace_use) call da_trace_entry("da_transform_xtoy_metar")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_metar")
 
-   IF ( iv%num_metar > 0 ) THEN
+   if ( iv%num_metar > 0 ) then
 
       !xyh      y%metar(:)%u = 0.0
       !xyh      y%metar(:)%v = 0.0
@@ -67,10 +67,10 @@ subroutine da_transform_xtoy_metar ( xa, xb, iv, xp, y )
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
             call da_transform_xtopsfc(xb,xa,xp,iv%metar(n),y%metar(n))
          end do
-      endif
-   ENDIF
+      end if
+   end if
 
-   IF (trace_use) call da_trace_exit("da_transform_xtoy_metar")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_metar")
 
 end subroutine da_transform_xtoy_metar
 

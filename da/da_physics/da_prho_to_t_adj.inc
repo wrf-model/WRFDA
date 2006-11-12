@@ -5,20 +5,20 @@ subroutine da_prho_to_t_adj( xb, xp, xa )
    !
    !  METHOD:  Standard adjoint coding.
    !
-   !  ASSUMPTIONS: 1) Model level stored top down.
+   !  ASsumPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
    integer                       :: ks, ke       ! 3rd dim. end points.
-   INTEGER                       :: k            ! Loop counter.
-   REAL                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
+   integer                       :: k            ! Loop counter.
+   real                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
 
    !---------------------------------------------------------------------------
    !  [1.0] Initialise:
@@ -43,7 +43,7 @@ subroutine da_prho_to_t_adj( xb, xp, xa )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate temperature increments:

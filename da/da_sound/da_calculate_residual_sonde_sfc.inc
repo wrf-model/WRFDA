@@ -2,19 +2,19 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual vector (O-A).
+   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual vector (O-A).
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n
 
-   IF ( oi%num_sound < 1 ) return
+   if ( oi%num_sound < 1 ) return
 
    n_obs_bad % u % num = number(0, 0, 0)
    n_obs_bad % v % num = number(0, 0, 0)
@@ -22,7 +22,7 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
    n_obs_bad % p % num = number(0, 0, 0)
    n_obs_bad % q % num = number(0, 0, 0)
 
-   DO n=1, oi%num_sound
+   do n=1, oi%num_sound
       np_available = np_available + 5
 
       re%sonde_sfc(n)%u = da_residual( n, 0, y%sonde_sfc(n)%u, &
@@ -35,7 +35,7 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                  oi%sonde_sfc(n)%p, n_obs_bad % p )
       re%sonde_sfc(n)%q = da_residual( n, 0, y%sonde_sfc(n)%q, &
                                  oi%sonde_sfc(n)%q, n_obs_bad % q )
-   END DO
+   end do
 
    np_missing = np_missing + n_obs_bad % u % num % miss + &
                n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &

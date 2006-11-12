@@ -1,7 +1,7 @@
 subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh  )
 ! ----------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! ----------------------------------------------------------------
 ! 
 ! Output :: ADJ_gx2, ADJ_sigma
@@ -11,10 +11,10 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
 ! Calculated the effective zenith angle of reflected microwave radiation
 ! at SSM/I frequencies for vertical and horizontal polarization
 !
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: theta,gx2,sigma
-      real   , intent(INOUT) :: ADJ_gx2,ADJ_sigma
-      real   , intent(INOUT) :: ADJ_effangv,ADJ_effangh
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: theta,gx2,sigma
+      real   , intent(inout) :: ADJ_gx2,ADJ_sigma
+      real   , intent(inout) :: ADJ_effangv,ADJ_effangh
       real                   :: effangv,effangh
 !
       real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
@@ -52,7 +52,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
             effangv = theta
             effangh = theta
         return
-      endif
+      end if
       alnsig = alog(sigma)
       gg  = gx2*gx2
       ggg = gg*gx2
@@ -184,13 +184,13 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
          alnthh_save = alnthh
          alnthh =  alnthh + 3.611
 
-      endif
+      end if
       angv =   90.0 - exp(alnthv)
       angh =   90.0 - exp(alnthh)
           y    =   1.0 - 28.0*gx2
       if (y .lt. 0.0) then
           y = 0.0
-      endif
+      end if
 
       dth     = (theta - 53.0)*y
       effangv = angv + dth
@@ -202,7 +202,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
         ADJ_effangv = 0.
         ADJ_effangh = 0.
         return
-      endif
+      end if
 
       ADJ_angh  = ADJ_effangh
       ADJ_dth   = ADJ_effangh
@@ -214,7 +214,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
 
       if (y .lt. 0.0) then
          ADJ_y = 0.0
-      endif
+      end if
 
       ADJ_gx2  = - 28.0*ADJ_y + ADJ_gx2
 
@@ -435,7 +435,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
          ADJ_xd  = 2.*xd*ADJ_xx  + ADJ_xd
          ADJ_alnsig = ADJ_xd  + ADJ_alnsig
 
-      endif
+      end if
 
       ADJ_gg  = ADJ_ggg*gx2   + ADJ_gg
       ADJ_gx2 = gg*ADJ_ggg    + ADJ_gx2
@@ -445,7 +445,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
          ADJ_sigma = ADJ_alnsig/sigma + ADJ_sigma
 !     else
 !        ADJ_sigma = 0.
-      endif
+      end if
 
 
-END subroutine da_adj_effang
+end subroutine da_adj_effang

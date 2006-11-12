@@ -1,11 +1,11 @@
 subroutine da_filter_adj(var, xp)
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Transpose variables.
+   type (xpose_type), intent(inout) :: xp      ! Transpose variables.
 
-   REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      INTENT(INout) :: var
+   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
+                      intent(inout) :: var
 
    integer :: i, j, k
 
@@ -32,16 +32,16 @@ subroutine da_filter_adj(var, xp)
             xp%v1y(i,j-1,k) = xp%v1y(i,j-1,k) + w(1)*xp%v1y(i,j,k)
             xp%v1y(i,j+1,k) = xp%v1y(i,j+1,k) + w(3)*xp%v1y(i,j,k)
             xp%v1y(i,j  ,k) = w(2)*xp%v1y(i,j,k)
-         enddo
+         end do
 
          ! Forward
          do j=xp%jde-1,xp%jds+1,-1
             xp%v1y(i,j-1,k) = xp%v1y(i,j-1,k) + w(1)*xp%v1y(i,j,k)
             xp%v1y(i,j+1,k) = xp%v1y(i,j+1,k) + w(3)*xp%v1y(i,j,k)
             xp%v1y(i,j  ,k) = w(2)*xp%v1y(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
@@ -56,16 +56,16 @@ subroutine da_filter_adj(var, xp)
             xp%v1x(i-1,j,k) = xp%v1x(i-1,j,k) + w(1)*xp%v1x(i,j,k)
             xp%v1x(i+1,j,k) = xp%v1x(i+1,j,k) + w(3)*xp%v1x(i,j,k)
             xp%v1x(i,j  ,k) = w(2)*xp%v1x(i,j,k)
-         enddo
+         end do
 
          ! Forward 
          do i=xp%ide-1,xp%ids+1,-1
             xp%v1x(i-1,j,k) = xp%v1x(i-1,j,k) + w(1)*xp%v1x(i,j,k)
             xp%v1x(i+1,j,k) = xp%v1x(i+1,j,k) + w(3)*xp%v1x(i,j,k)
             xp%v1x(i,j  ,k) = w(2)*xp%v1x(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! Apply (i,j',k' -> i',j',k) transpose ( v1x -> v1z ).
 

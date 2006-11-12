@@ -23,16 +23,16 @@ subroutine da_setup_testfield( xb, xa, xp, &
 
    ! JRB Stop compiler whinging
 
-   IF (kms==0 .OR. ite==0 .OR. ime==0 .OR. ide==0 .OR. ids==0 .OR. kde==0 .OR. &
+   if (kms==0 .OR. ite==0 .OR. ime==0 .OR. ide==0 .OR. ids==0 .OR. kde==0 .OR. &
        its==0 .OR. ims==0 .OR. jds==0 .OR. jde==0 .OR. jts==0 .OR. jme==0 .OR. &
-       jte==0 .OR. jms==0 .OR. kds==0 .OR. kme==0 .OR. kts==0 .OR. kte==0) THEN
-   END IF
+       jte==0 .OR. jms==0 .OR. kds==0 .OR. kme==0 .OR. kts==0 .OR. kte==0) then
+   end if
 
    !-------------------------------------------------------------------------
    ! [1.0]: initialise:
    !-------------------------------------------------------------------------
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
       'Starting da_setup_testfield ...'
 
    !-------------------------------------------------------------------------
@@ -70,21 +70,21 @@ subroutine da_setup_testfield( xb, xa, xp, &
    xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
 
    if(print_detail_testing) then
-      write(UNIT=stdout, fmt='(2a,4x,a,i8)') &
+      write(unit=stdout, fmt='(2a,4x,a,i8)') &
          'file:', __FILE__, 'line:', __LINE__
 
-      write(UNIT=stdout, fmt=*) 'xp%its, xp%ite, xp%jts, xp%jte) =', &
+      write(unit=stdout, fmt=*) 'xp%its, xp%ite, xp%jts, xp%jte) =', &
          xp%its, xp%ite, xp%jts, xp%jte
    
       do j=xp%jts, xp%jte
          do i=xp%its, xp%ite
             if(i == j) then
-               write(UNIT=stdout, fmt='(2(a,i4),a,f14.6)') &
+               write(unit=stdout, fmt='(2(a,i4),a,f14.6)') &
                   'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
-            endif
-         enddo
-      enddo
-   endif
+            end if
+         end do
+      end do
+   end if
 
    !--Exchange XA halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
@@ -92,7 +92,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    if (sfc_assi_options == 2) then
       !-----Exchange XA (surface variable) halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
-   endif
+   end if
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
@@ -107,13 +107,13 @@ subroutine da_setup_testfield( xb, xa, xp, &
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
          call da_transform_xtoseasfcwind_lin( xa, xb )
-      endif
+      end if
 
       !-----Exchange XA halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
-   endif
+   end if
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
       'End of da_setup_testfield.'
 
 end subroutine da_setup_testfield

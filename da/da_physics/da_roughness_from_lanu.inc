@@ -1,74 +1,74 @@
-subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
+subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
 
    implicit none
 
    integer             ,   intent(in)    :: ltbl
    character (len=4)   ,   intent(in)    :: mminlu
-   character (len=19)  ,   intent(in)    :: date_mm5
-   TYPE (xpose_type),      intent(in)    :: xp  ! Domain decomposition vars.
+   character (len=19)  ,   intent(in)    :: date
+   type (xpose_type),      intent(in)    :: xp  ! Domain decomposition vars.
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(in)    :: lanu 
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(out)   :: rough 
 
-   integer                               :: LS, LC, LI, LUCATS, LUSEAS, &
+   integer                               :: LS, LC, LI, LUCATS, LuseAS, &
                                            LUMATCH, year, month, day,  &
                                            julday, Isn, io_error, &
                                            m1, m2, n1, n2 
    real                                  :: albd, slmo, sfem
    real(kind=4), dimension(50,2)         :: sfz0
-   character (len=4)                     :: LUTYPE
+   character (len=4)                     :: LUtype
    logical                               :: exist
 
    if (trace_use) call da_trace_entry("da_roughness_from_lanu")
 
-   read(UNIT=date_mm5,FMT='(I4,1x,I2,1X,I2)') year, month, day
+   read(unit=date,fmt='(I4,1x,I2,1X,I2)') year, month, day
    call da_julian_day(year,month,day,Julday, 1)
    Isn = 1
-   IF (JULDAY < 105 .OR. JULDAY > 288) Isn=2
+   if (JULDAY < 105 .OR. JULDAY > 288) Isn=2
 
-   INQUIRE (FILE = 'LANDUSE.TBL', EXIST = exist )
+   inquire (file = 'LANDUSE.TBL', exist = exist )
 
    if (exist) then
-      OPEN (UNIT = ltbl, FILE = 'LANDUSE.TBL', FORM='formatted', &
-                     ACTION = 'read', IOSTAT = io_error )
+      open (unit = ltbl, file = 'LANDUSE.TBL', form='formatted', &
+                     action = 'read', iostat = io_error )
    else
       call da_error(__FILE__,__LINE__,&
          (/"Cannot open file LANDUSE.TBL for conversion of roughness"/))
-   endif
+   end if
 
-   LUMATCH=0  
+   lumatch=0  
 
-   DO
-      READ (UNIT=ltbl,FMT='(A4)', IOSTAT=io_error) LUTYPE
+   do
+      read (unit=ltbl,fmt='(A4)', iostat=io_error) lutype
       if (io_error /= 0) exit
-      READ (UNIT=ltbl,FMT=*, IOSTAT=io_error) LUCATS,LUSEAS
+      read (unit=ltbl,fmt=*, iostat=io_error) lucats,luseas
 
-      IF(LUTYPE == MMINLU) LUMATCH=1 
+      if(lutype == mminlu) lumatch=1 
 
-      DO LS=1,LUSEAS 
-         READ (UNIT=ltbl,FMT=*)  
-         DO LC=1,LUCATS 
-            IF (LUTYPE == MMINLU)THEN 
-               READ (UNIT=ltbl,FMT=*) LI, ALBD, SLMO, SFEM, SFZ0(LC,LS)
+      do LS=1,LuseAS 
+         read (unit=ltbl,fmt=*)  
+         do lc=1,lucats 
+            if (lutype == mminlu) then 
+               read (unit=ltbl,fmt=*) li, albd, slmo, sfem, sfz0(lc,ls)
                ! JRB stop compiler whinge
-               IF (ALBD == 0.0 .OR. SFEM == 0.0 .OR. SLMO == 0.0) THEN
-               END IF
-               IF (LC /= LI) THEN
+               if (albd == 0.0 .or. sfem == 0.0 .or. slmo == 0.0) then
+               end if
+               if (LC /= LI) then
                  call da_error(__FILE__,__LINE__, &
-                   (/"MISSING LANDUSE: LC"/))
-               END IF
-            ELSE 
-               READ (UNIT=ltbl,FMT=*) 
-            ENDIF 
-         ENDDO 
-      ENDDO
-   ENDDO
+                   (/"Missing landuse: lc"/))
+               end if
+            else 
+               read (unit=ltbl,fmt=*) 
+            end if 
+         end do 
+      end do
+   end do
 
-   close (UNIT=ltbl)
+   close (unit=ltbl)
 
-   IF(LUMATCH == 0)THEN
+   if (lumatch == 0)then
     call da_error(__FILE__,__LINE__,&
-      (/"LANDUSE IN INPUT FILE DOES NOT MATCH LUTABLE"/))
-   ENDIF   
+      (/"landuse in input file does not match lutable"/))
+   end if   
 
    m1 = xp % its
    m2 = xp % ite
@@ -79,8 +79,8 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date_mm5, xp, lanu, rough)
       do ls = n1,n2
          Li = int(lanu(lc,ls)+0.001)
          rough(lc,ls) =  sfz0(Li,Isn)/100.
-      enddo
-   enddo
+      end do
+   end do
 
    if (trace_use) call da_trace_exit("da_roughness_from_lanu")
 

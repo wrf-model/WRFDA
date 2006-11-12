@@ -15,28 +15,28 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   REAL                           :: adj_ttl_lhs   ! < y, y >
-   REAL                           :: adj_ttl_rhs   ! < x, x_adj >
+   real                           :: adj_ttl_lhs   ! < y, y >
+   real                           :: adj_ttl_rhs   ! < x, x_adj >
 
-   REAL                           :: partial_lhs   ! < y, y >
-   REAL                           :: partial_rhs   ! < x, x_adj >
+   real                           :: partial_lhs   ! < y, y >
+   real                           :: partial_rhs   ! < x, x_adj >
 
-   REAL                           :: pertile_lhs   ! < y, y >
-   REAL                           :: pertile_rhs   ! < x, x_adj >
+   real                           :: pertile_lhs   ! < y, y >
+   real                           :: pertile_rhs   ! < x, x_adj >
 
-   INTEGER                        :: n
+   integer                        :: n
 
    real, dimension(ims:ime, jms:jme) :: xa2_u10, xa2_v10, xa2_t2, &
                                         xa2_q2, xa2_psfc
 
-   IF (trace_use) call da_trace_entry("da_check_psfc")
+   if (trace_use) call da_trace_entry("da_check_psfc")
 
    ! JRB Stop compiler whinging
-   IF (ids == 0 .OR. ide == 0 .OR. kme == 0 .OR. jde == 0 .OR. jds == 0 .OR. &
-      kde == 0 .OR. kds == 0 .OR. kte == 0 .OR. kms == 0) THEN
-   END IF
+   if (ids == 0 .OR. ide == 0 .OR. kme == 0 .OR. jde == 0 .OR. jds == 0 .OR. &
+      kde == 0 .OR. kds == 0 .OR. kte == 0 .OR. kms == 0) then
+   end if
    
-   write(UNIT=stdout, fmt='(/3a,i6/a)') &
+   write(unit=stdout, fmt='(/3a,i6/a)') &
         'File: ', __FILE__, ', line:', __LINE__, &
         'Adjoint Test Results:'
 
@@ -69,8 +69,8 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
                      + y%synop(n)%t * y%synop(n)%t &
                      + y%synop(n)%p * y%synop(n)%p &
                      + y%synop(n)%q * y%synop(n)%q
-      endif
-   enddo
+      end if
+   end do
 
    !-------------------------------------------------------------------------
    ! [5.0] Perform adjivnt operation:
@@ -83,9 +83,9 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    xa%t2  (ims:ime, jms:jme) = 0.0
    xa%q2  (ims:ime, jms:jme) = 0.0
    
-   DO n=1, iv%num_synop
+   do n=1, iv%num_synop
       call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
-   ENDDO
+   end do
 
    pertile_rhs = sum( xa%u10 (ims:ime, jms:jme) * xa2_u10 (ims:ime, jms:jme) ) &
                + sum( xa%v10 (ims:ime, jms:jme) * xa2_v10 (ims:ime, jms:jme) ) &
@@ -107,7 +107,7 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    ! [7.0] Print output:
    !----------------------------------------------------------------------
    
-   write(UNIT=stdout, fmt='(A,1pe22.14)') &
+   write(unit=stdout, fmt='(A,1pe22.14)') &
       ' Tile < y, y     > = ', pertile_lhs, &
       ' Tile < x, x_adj > = ', pertile_rhs
 
@@ -116,12 +116,12 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_check_sfc_assi_B:  adj_ttl_lhs,adj_ttl_rhs = ', &
       adj_ttl_lhs,adj_ttl_rhs
-   IF ( rootproc ) THEN
-      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', &
+   if ( rootproc ) then
+      write(unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', &
          adj_ttl_lhs
-      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', &
+      write(unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', &
          adj_ttl_rhs
-   ENDIF
+   end if
 
    ! recover
    xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
@@ -130,8 +130,8 @@ subroutine da_check_psfc( xb, xa, iv, xp, y, &
    xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
    xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
-   IF (trace_use) call da_trace_exit("da_check_psfc")
+   if (trace_use) call da_trace_exit("da_check_psfc")
 
-END subroutine da_check_psfc
+end subroutine da_check_psfc
 
 

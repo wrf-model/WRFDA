@@ -1,10 +1,10 @@
 subroutine da_print_stats_sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                     INTENT(IN)    :: stats_unit
-   INTEGER,                     INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_sonde_sfc_type), INTENT(IN)    :: sonde_sfc
+   integer,                     intent(in)    :: stats_unit
+   integer,                     intent(inout) :: nu, nv, nt, np, nq
+   type (stats_sonde_sfc_type), intent(in)    :: sonde_sfc
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

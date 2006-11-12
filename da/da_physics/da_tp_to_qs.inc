@@ -4,15 +4,15 @@ subroutine da_tp_to_qs( t, p, es, qs)
    ! PURPOSE: Convert T/p to saturation specific humidity.
    !
    !  METHOD: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
-   !          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) )
+   !          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) )
    !--------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    real, intent(in)  :: t, p
    real, intent(out) :: es, qs
    
-   REAL              :: t_c              ! T in degreesC.
+   real              :: t_c              ! T in degreesC.
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:

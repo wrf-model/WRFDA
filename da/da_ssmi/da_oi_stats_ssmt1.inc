@@ -1,14 +1,14 @@
 subroutine da_oi_stats_ssmt1 ( stats_unit, iv )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: iv            ! O-B
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: iv            ! O-B
 
-   TYPE (maxmin_type)               :: minimum
-   TYPE (maxmin_type)               :: maximum
-   INTEGER                          :: nt
-   INTEGER                          :: n, k
+   type (maxmin_type)               :: minimum
+   type (maxmin_type)               :: maximum
+   integer                          :: nt
+   integer                          :: n, k
    real                             :: average, rms_err
 
    nt = 0
@@ -18,23 +18,23 @@ subroutine da_oi_stats_ssmt1 ( stats_unit, iv )
    average = 0.0
    rms_err = 0.0
 
-   IF ( iv%num_ssmt1 > 0 ) THEN
+   if ( iv%num_ssmt1 > 0 ) then
 
-      DO n=1, iv%num_ssmt1
+      do n=1, iv%num_ssmt1
 
          if ( iv%ssmt1(n)%loc%proc_domain ) then
 
             do k=1, iv%ssmt1(n)%info%levels
     
-               CALL da_stats_calculate( n, k, iv%ssmt1(n)%t(k)%qc, &
+               call da_stats_calculate( n, k, iv%ssmt1(n)%t(k)%qc, &
                                      iv%ssmt1(n)%t(k)%inv, nt, &
                                      minimum, maximum, &
                                      average, rms_err)
             end do
          end if    ! end if( iv%ssmt1(n)%loc%proc_domain )
-      END DO
+      end do
       
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nt )
@@ -44,17 +44,17 @@ subroutine da_oi_stats_ssmt1 ( stats_unit, iv )
                            minimum%n, maximum%n, &
                            minimum%l, maximum%l )
    
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    
-     IF ( nt /= 0 ) THEN
+     if ( nt /= 0 ) then
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-B for SSMT1'
    
-      CALL da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
+      call da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
                                  average, rms_err )
    
-     END IF
+     end if
    
-   END IF
+   end if
 
 end subroutine da_oi_stats_ssmt1

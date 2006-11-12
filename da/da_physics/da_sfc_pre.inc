@@ -17,18 +17,18 @@ subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
    !  P2  = Pressure at level 2
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL, INTENT (out)   :: psfcm   ! model pressure at ho
-   REAL, INTENT (in)    :: psm, tsm, qsm
+   real, intent (out)   :: psfcm   ! model pressure at ho
+   real, intent (in)    :: psm, tsm, qsm
 
-   REAL, INTENT (in)           :: hsm, ho
-   REAL, INTENT (in), OPTIONAL :: to, qvo
+   real, intent (in)           :: hsm, ho
+   real, intent (in), optional :: to, qvo
 
-   REAL                 :: tvo, tvsm, tv, dz, arg0, arg
+   real                 :: tvo, tvsm, tv, dz, arg0, arg
 
-   REAL, PARAMETER      :: GASR =  gas_constant
-   REAL, PARAMETER      :: G = gravity
+   real, parameter      :: GASR =  gas_constant
+   real, parameter      :: G = gravity
 
    ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
@@ -40,11 +40,11 @@ subroutine da_sfc_pre (psfcm, psm, tsm, qsm, hsm, ho, to, qvo)
       tvo = to
    else
       tvo = tvsm
-   endif
+   end if
 
    tv  = 0.5 * (tvsm + tvo)
 
-   ! 2. HEIGHT DIFFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
+   ! 2. HEIGHT DifFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
    ! ------------------------------------------------------------
 
    dz = hsm - ho

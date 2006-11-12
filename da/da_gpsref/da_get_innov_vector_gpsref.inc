@@ -3,23 +3,23 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
    !----------------------------------------------------------------------
    ! Called by da_obs/da_get_innov_vector.inc
    !----------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)             :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)      :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)   :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)   :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)   :: iv       ! O-B structure.
+   integer, intent(in)             :: it       ! External iteration.
+   type (xb_type), intent(in)      :: xb       ! first guess state.
+   type (xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
+   type (y_type),  intent(inout)   :: ob       ! Observation structure.
+   type (ob_type), intent(inout)   :: iv       ! O-B structure.
 
-   INTEGER                         :: n        ! Loop counter.
-   INTEGER                         :: i, j, k  ! Index dimension.
-   INTEGER                         :: num_levs ! Number of obs levels.
-   REAL                            :: dx, dxm  ! Interpolation weights.
-   REAL                            :: dy, dym  ! Interpolation weights.
-   REAL, DIMENSION(1:max_ob_levels) :: model_ref !Model gpsref at ob loc
-   REAL, DIMENSION(xp%kms:xp%kme)   :: v_h     ! Model value h at ob
+   integer                         :: n        ! Loop counter.
+   integer                         :: i, j, k  ! Index dimension.
+   integer                         :: num_levs ! Number of obs levels.
+   real                            :: dx, dxm  ! Interpolation weights.
+   real                            :: dy, dym  ! Interpolation weights.
+   real, dimension(1:max_ob_levels) :: model_ref !Model gpsref at ob loc
+   real, dimension(xp%kms:xp%kme)   :: v_h     ! Model value h at ob
                                                ! hor. location.
-   INTEGER           :: pref, fref
+   integer           :: pref, fref
 
    ! For quality control
 
@@ -41,7 +41,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
       ! Deallocate:
       if (iv%num_gpsref > 0) then
-         ! WRITE(UNIT=stdout,FMT='(a,i6)') 'iv%num_gpsref=', iv%num_gpsref
+         ! write(unit=stdout,fmt='(a,i6)') 'iv%num_gpsref=', iv%num_gpsref
          do n = 1, iv%num_gpsref
             deallocate (iv % gpsref(n) %  h )
             deallocate (iv % gpsref(n) %  zk)
@@ -50,10 +50,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
             deallocate (iv % gpsref(n) %   t)
             deallocate (iv % gpsref(n) %   q)
             deallocate (ob % gpsref(n) % ref)
-         enddo
-         DEALLOCATE (iv % gpsref)
-         DEALLOCATE (ob % gpsref)
-      endif
+         end do
+         deallocate (iv % gpsref)
+         deallocate (ob % gpsref)
+      end if
 
       use_GpsrefOBS = .true.
 
@@ -62,13 +62,13 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       iv%ob_numb(1)%gpsref = num_pseudo
       iv%num_pseudo = 0
 
-      ALLOCATE (iv % gpsref(1:num_pseudo))
+      allocate (iv % gpsref(1:num_pseudo))
       allocate (iv%gpsref(num_pseudo)%zk (1:1))
       allocate (iv%gpsref(num_pseudo)%ref(1:1))
       allocate (ob%gpsref(1:num_pseudo))
       allocate (ob%gpsref(num_pseudo)%ref(1:1))
 
-      write(UNIT=stdout,FMT='(a,i2)') &
+      write(unit=stdout,fmt='(a,i2)') &
          '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
 
       iv%gpsref(1)%info%levels = 1
@@ -106,20 +106,20 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
              iv%gpsref(1)%loc%j >= xp%jts .and. &
              iv%gpsref(1)%loc%j <= xp%jte) then 
             iv%gpsref(1)%loc%proc_domain = .true. 
-         endif 
-      endif
+         end if 
+      end if
 
-      write(UNIT=stdout,FMT='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
-      write(UNIT=stdout,FMT='(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
-   endif
+      write(unit=stdout,fmt='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
+      write(unit=stdout,fmt='(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
+   end if
 
 
-   IF (iv%num_gpsref < 1) RETURN
+   if (iv%num_gpsref < 1) return
 
    ntotal = 0
    pref = 0 ; fref = 0
 
-   DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
+   do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref 
       num_levs = iv%gpsref(n)%info%levels
 
@@ -143,17 +143,17 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          do k=xp%kts,xp%kte
             v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                    + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-         enddo
+         end do
          do k=1, num_levs
             iv%gpsref(n)%zk(k)=missing_r
             if ( iv%gpsref(n)%h(k) > 0.0 ) &
                call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, &
                   iv%gpsref(n)%zk(k))
             if (iv%gpsref(n)%zk(k) < 0.0) iv%gpsref(n)%ref(k)%qc = missing
-         enddo
+         end do
       else
          iv % gpsref(1)%zk(1) = pseudo_z
-      endif
+      end if
 
 #ifndef DEREF_KLUDGE
       call da_interp_lin_3d( xb%ref, xp, i, j, dx, dy, dxm, dym, &
@@ -168,13 +168,13 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          do k = 1, num_levs
             iv%gpsref(n)%ref(k)%inv = 0.0
             if ( ob%gpsref(n)%ref(k) > missing_r .AND. &
-                 iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer ) THEN
+                 iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer ) then
                iv%gpsref(n)%ref(k)%inv = ob%gpsref(n)%ref(k) - model_ref(k)
-            endif
-         enddo
+            end if
+         end do
       else
          ob % gpsref(1)%ref(1) = model_ref(1) + iv %gpsref(1)%ref(1)%inv 
-      endif
+      end if
 
       !==========================================================
       ! Quality control code is implemeted by Y.-R. Guo, 07/18/2005:
@@ -183,7 +183,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       ! Quality check 1: Gross error (departure from the background) check 
       ! ----------------
 
-      IF ( check_max_iv ) &
+      if ( check_max_iv ) &
          call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
 
 
@@ -208,17 +208,17 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
                   if (percnt > pcnt3) iv%gpsref(n)%ref(k)%qc = qc_above
                else
                   if (percnt > pcnt2) iv%gpsref(n)%ref(k)%qc = qc_middle
-               endif
-            endif
+               end if
+            end if
 
-            ! write(UNIT=stdout,FMT='(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
+            ! write(unit=stdout,fmt='(a,i6,a,i6,a,i3,a,i8,a,f10.1,"  pecnt, inv, m_ro:", 3f11.4)') &
             !    "ntotal=",ntotal,"  n=",n, " k=",k, " qc=",iv%gpsref(n)%ref(k)%qc, &
             !    " h=",iv%gpsref(n)%h(k), percnt, &
             !    iv%gpsref(n)%ref(k)%inv, .5*(ob%gpsref(n)%ref(k) + model_ref(k)) 
 
-         enddo
-      endif
-   END DO
+         end do
+      end if
+   end do
 
    ! Quality check 3: Low levels quality control
    ! ----------------
@@ -231,7 +231,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       height_below = 0.0
       name_qc      = '                                       '
 
-      DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
+      do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
          iv%ob_numb(iv%current_ob_time)%gpsref 
 
          nn = nn + 1
@@ -240,10 +240,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
            if (iv%gpsref(n)%ref(k)%qc == qc_below) then
                name_qc(nn) = iv%gpsref(n)%info%name
                height_below(nn) = max(iv%gpsref(n)%h(k),height_below(nn))
-           endif
-         enddo
+           end if
+         end do
          if (height_below(nn) == 0.0) nn = nn - 1
-      ENDDO
+      end do
 
       ! Set the flag qc_below to the levels below percnt < pcnt1::
 
@@ -253,7 +253,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       nqc2   = 0
       nqc3   = 0
 
-      DO n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
+      do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
          iv%ob_numb(iv%current_ob_time)%gpsref 
          num_levs = iv%gpsref(n)%info%levels
 
@@ -265,10 +265,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
                       iv%gpsref(n)%ref(k)%qc >= 0) then
                      iv%gpsref(n)%ref(k)%qc = qc_below
                   end if
-               enddo
+               end do
                exit
-            endif
-         enddo
+            end if
+         end do
 
          do k=1, num_levs
             ntotal = ntotal + 1
@@ -276,18 +276,18 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
             if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
             if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
             if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
-            ! write(UNIT=stdout,FMT='(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
+            ! write(unit=stdout,fmt='(a,5i6,a,i6,a,i3,a,i8,a,f10.1,a, f11.4)') &
             !    "ntotal, nqc0, nqc1, nqc2, nqc3:",ntotal, nqc0, nqc1, nqc2, nqc3, &
             !    "  n=",n, " k=",k, "  qc=",iv%gpsref(n)%ref(k)%qc,  &
             !    "  h=",iv%gpsref(n)%h(k), "  inv=",iv%gpsref(n)%ref(k)%inv
-         enddo
-      ENDDO
-   endif
+         end do
+      end do
+   end if
 
-   write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &
+   write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &
         'For outer iteration ',it, &
         ', Total Rejections for GPSRef follows:'
-   write(unit = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+   write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
         'Number of failed gpsrefes observations:', &
                    fref, ' on ',pref
 

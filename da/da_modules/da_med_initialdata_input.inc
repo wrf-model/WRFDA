@@ -104,7 +104,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    if (present(in_date)) then
       do n=1, nsave
-         call da_messages((/"current_date="//trim(current_date)// &
+         call da_message((/"current_date="//trim(current_date)// &
             ', in_date='//trim(in_date)/))
          call ext_ncd_get_next_time( fid, current_date, Status )
       enddo

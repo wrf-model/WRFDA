@@ -4,7 +4,7 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
                         ADJ_lw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,        &
                         ADJ_tauatm                                )
 ! -----------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! -----------------------------------------------------------------
 !
 ! Output : ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,ADJ_lw,ADJ_zcld 
@@ -12,11 +12,11 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 ! Input  : ADJ_tbup,ADJ_tbdn,ADJ_tauatm
 ! Input mean fields : tbup,tbdn,tauatm
 ! -----------------------------------------------------------------
-      integer,intent(IN   ) :: ifreq
-      real   ,intent(IN   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
-      real   ,intent(INOUT) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,       &
+      integer,intent(in   ) :: ifreq
+      real   ,intent(in   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
+      real   ,intent(inout) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,       &
                                ADJ_gamma,ADJ_lw,ADJ_zcld,ADJ_theta
-      real   ,intent(INOUT) :: ADJ_tbup,ADJ_tbdn,ADJ_tauatm
+      real   ,intent(inout) :: ADJ_tbup,ADJ_tbdn,ADJ_tauatm
       real                  :: tbup,tbdn,tauatm,tbdn_save
 
       real :: mu,hdn,hup,hdninf,hupinf,ADJ_mu
@@ -170,7 +170,7 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
       else
          ADJ_mu  = 0.
          ADJ_sig = 0.
-      endif
+      end if
 
       ADJ_tau    = ADJ_tauatm*taucld
       ADJ_taucld = tau*ADJ_tauatm
@@ -289,4 +289,4 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
        ADJ_theta = mu*mu*0.0174533*ADJ_mu*sin(theta*0.0174533) + ADJ_theta
 
 !
-END subroutine da_adj_tbatmos
+end subroutine da_adj_tbatmos

@@ -2,23 +2,23 @@ subroutine da_cal_residual_ssmt1( iv, y, re,                        &
                                   np_missing, np_bad_data,          &
                                   np_obs_used, np_available )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: iv     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(OUT)       :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(out)       :: re     ! Residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n, k
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k
 
    if ( iv%num_ssmt1 > 0 ) then
 
       n_obs_bad % t % num = number(0, 0, 0)
 
-      DO n=1, iv%num_ssmt1
+      do n=1, iv%num_ssmt1
          do k=1, iv%ssmt1(n)%info%levels
             np_available = np_available + 1
 
@@ -33,4 +33,4 @@ subroutine da_cal_residual_ssmt1( iv, y, re,                        &
                     
    end if
 
-END subroutine da_cal_residual_ssmt1
+end subroutine da_cal_residual_ssmt1

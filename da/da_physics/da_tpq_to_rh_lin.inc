@@ -14,11 +14,11 @@ subroutine da_tpq_to_rh_lin( xb, xp, xa )
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
    
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.

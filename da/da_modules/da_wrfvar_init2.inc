@@ -79,7 +79,7 @@ subroutine da_wrfvar_init2
    ! 
    !</DESCRIPTION>
 
-   call da_messages ((/program_name//" "//subversion_version/))
+   call da_message ((/program_name//" "//subversion_version/))
    call da_trace("da_wrfvar_init2",message="calling alloc_and_configure_domain")
    call alloc_and_configure_domain ( domain_id  = 1 ,                  &
                                      grid       = head_grid ,          &

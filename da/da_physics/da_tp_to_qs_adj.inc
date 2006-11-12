@@ -4,12 +4,12 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
    ! PURPOSE: Adjoint of da_tp_to_qs_lin
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
-   REAL, INTENT(IN) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   real, intent(in) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -38,7 +38,7 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate saturation specific humidity increment:
@@ -80,7 +80,7 @@ end subroutine da_tp_to_qs_adj
 !  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
-!   IMPLICIT NONE
+!   implicit none
 
 !   integer      i, n
 !   real         t, p, es, t_prime, p_prime, qs_prime_over_qs
@@ -91,8 +91,8 @@ end subroutine da_tp_to_qs_adj
 !   dimension    p_prime         (n) ! Pressure increment.
 !   dimension    qs_prime_over_qs(n) ! qs~/qs.
    
-!   REAL         temp             ! Temporary storage.
-!   REAL         es_prime_over_es ! es~/es
+!   real         temp             ! Temporary storage.
+!   real         es_prime_over_es ! es~/es
 !      
 !   do i = 1,n
 !------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ end subroutine da_tp_to_qs_adj
 !   temp = t(i) + es_gammakelvin
 
 !   t_prime(i) = t_prime(i) + es_gammabeta * es_prime_over_es / ( temp * temp )
-!   enddo
+!   end do
 
 !end subroutine da_tp_to_qs_adj
 

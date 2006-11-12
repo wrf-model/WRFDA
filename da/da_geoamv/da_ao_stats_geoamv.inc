@@ -5,15 +5,15 @@ subroutine da_ao_stats_geoamv( stats_unit, oi, re )
    !
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
-   TYPE (stats_geoamv_type)         :: geoamv
-   INTEGER                          :: nu, nv
-   INTEGER                          :: n, k
+   type (stats_geoamv_type)         :: geoamv
+   integer                          :: nu, nv
+   integer                          :: n, k
 
    nu = 0
    nv = 0
@@ -26,10 +26,10 @@ subroutine da_ao_stats_geoamv( stats_unit, oi, re )
    geoamv%average = residual_geoamv1_type( 0.0, 0.0)
    geoamv%rms_err = geoamv%average
 
-   IF ( oi%num_geoamv > 0 ) THEN
-      DO n=1, oi%num_geoamv
+   if ( oi%num_geoamv > 0 ) then
+      do n=1, oi%num_geoamv
          if( oi%geoamv(n)%loc%proc_domain ) then
-            DO k=1, oi%geoamv(n)%info%levels
+            do k=1, oi%geoamv(n)%info%levels
                call da_stats_calculate( n, 0, oi%geoamv(n)%u(k)%qc, & 
                                    re%geoamv(n)%u(k), nu, & 
                                    geoamv%minimum%u, geoamv%maximum%u, &
@@ -39,10 +39,10 @@ subroutine da_ao_stats_geoamv( stats_unit, oi, re )
                                    geoamv%minimum%v, geoamv%maximum%v, &
                                    geoamv%average%v, geoamv%rms_err%v )
 
-            END DO
-         endif    ! end if( oi%geoamv(n)%loc%proc_domain )
-      END DO
-   END IF
+            end do
+         end if    ! end if( oi%geoamv(n)%loc%proc_domain )
+      end do
+   end if
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
@@ -59,12 +59,12 @@ subroutine da_ao_stats_geoamv( stats_unit, oi, re )
                            geoamv%minimum%v%l, geoamv%maximum%v%l )
 
 
-   IF ( rootproc ) THEN
-      IF ( nu /= 0 .or. nv /= 0 ) THEN
+   if ( rootproc ) then
+      if ( nu /= 0 .or. nv /= 0 ) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Geoamv'
          call da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
-      END IF
-   END IF
+      end if
+   end if
 
 end subroutine da_ao_stats_geoamv  
 

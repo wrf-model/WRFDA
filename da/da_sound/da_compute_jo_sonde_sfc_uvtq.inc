@@ -4,22 +4,22 @@
 
 subroutine da_compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo )
 
-  TYPE (ob_type), INTENT(IN   ) :: iv         ! Innovation vector.
-  TYPE (y_type),  INTENT(IN   ) :: re         ! Residual vector.
-  TYPE (y_type),  INTENT(INOUT) :: jo_grad_y  ! Grad_y(Jo)
-  TYPE (jo_type), INTENT(INOUT) :: jo         ! Obs cost function.
+  type (ob_type), intent(in   ) :: iv         ! Innovation vector.
+  type (y_type),  intent(in   ) :: re         ! Residual vector.
+  type (y_type),  intent(inout) :: jo_grad_y  ! Grad_y(Jo)
+  type (jo_type), intent(inout) :: jo         ! Obs cost function.
   ! Local declarations
-  INTEGER :: n
+  integer :: n
 
-  DO n=1, iv%num_sound
+  do n=1, iv%num_sound
     if( iv%sonde_sfc(n)%loc%proc_domain ) then
       jo % sonde_sfc_u = jo % sonde_sfc_u - re%sonde_sfc(n)%u * jo_grad_y%sonde_sfc(n)%u
       jo % sonde_sfc_v = jo % sonde_sfc_v - re%sonde_sfc(n)%v * jo_grad_y%sonde_sfc(n)%v
       jo % sonde_sfc_t = jo % sonde_sfc_t - re%sonde_sfc(n)%t * jo_grad_y%sonde_sfc(n)%t
       jo % sonde_sfc_p = jo % sonde_sfc_p - re%sonde_sfc(n)%p * jo_grad_y%sonde_sfc(n)%p
       jo % sonde_sfc_q = jo % sonde_sfc_q - re%sonde_sfc(n)%q * jo_grad_y%sonde_sfc(n)%q
-    endif
-  END DO
+    end if
+  end do
 
 end subroutine da_compute_jo_sonde_sfc_uvtq
 

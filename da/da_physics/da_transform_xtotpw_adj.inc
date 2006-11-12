@@ -29,7 +29,7 @@ subroutine da_transform_xtotpw_adj( xa, xb )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    do j=js, je
       do i=is, ie
@@ -40,9 +40,9 @@ subroutine da_transform_xtotpw_adj( xa, xb )
 
             xa%  q(i,j,k)=xa%  q(i,j,k)+dzpw*xb%rho(i,j,k)
             xa%rho(i,j,k)=xa%rho(i,j,k)+dzpw*xb%  q(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    if (trace_use) call da_trace_exit("da_transform_xtotpw_adj")
  

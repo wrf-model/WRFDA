@@ -334,9 +334,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
          p => p%next
          nullify (p%next)
-         if (num_tovs_local == max_num_rad) then
+         if (num_tovs_local == max_tovs_input) then
             write(unit=errmsg(1),fmt='(A,I10)') &
-               "Reached maximum number of obs", max_num_rad
+               "Reached maximum number of obs", max_tovs_input
             call da_warning(__FILE__,__LINE__,errmsg(1:1))
             exit obs
          end if
@@ -404,7 +404,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    deallocate (nread)
 
-   if (interp_new) then
+!   if (interp_new) then
+if (.false.) then
       do inst = 1, rtminit_nsensor
          allocate(iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
          allocate(iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))

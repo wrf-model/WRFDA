@@ -13,10 +13,10 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 !
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type(domain) ,   TARGET              :: grid
+   type(domain) ,   target              :: grid
    type (vp_type),    intent(inout)     :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout)     :: vp    ! Grdipt/level CV.
    type (xb_type),    intent(in)        :: xb    ! first guess (local).
@@ -25,7 +25,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    type (be_type),    intent(in)        :: be    ! background error structure.
    type (x_type),     intent(out)       :: xa    ! analysis increments (local).
    type (ob_type),    intent(inout)     :: iv    ! ob. increment vector.
-   TYPE (y_type),     intent(inout)     :: y     ! y = h (xa)
+   type (y_type),     intent(inout)     :: y     ! y = h (xa)
 
 
    integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
@@ -41,10 +41,10 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    integer                        :: ierror        ! MPI error code.
 
 !-------------------------------------------------------------------------
-   REAL                           :: adj_sum_lhs               ! < y, y >
-   REAL                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
-   REAL                           :: partial_lhs   ! < y, y >
-   REAL                           :: pertile_lhs   ! < y, y >
+   real                           :: adj_sum_lhs               ! < y, y >
+   real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
+   real                           :: partial_lhs   ! < y, y >
+   real                           :: pertile_lhs   ! < y, y >
 !-------------------------------------------------------------------------
 
    write(unit=*, fmt='(/a/a)') &
@@ -88,7 +88,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
                                  its, ite, jts, jte, kts, kte,     &
                                  grid, config_flags )
 
-   adj_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
+   adj_rhs = sum( cv(1:cv_size) * cv_2(1:cv_size) )
 !-------------------------------------------------------------------------
 !      Print output:
 !-------------------------------------------------------------------------
@@ -96,8 +96,8 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
   if( global ) then
    adj_sum_rhs = adj_rhs
   else
-   call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
+                       mpi_comm_world, IERROR )
   end if
 #else
    adj_sum_rhs = adj_rhs
@@ -105,10 +105,10 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 #endif
 
 #ifdef DM_PARALLEL
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < y, y     > = ', adj_sum_lhs
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < v, v_adj > = ', adj_sum_rhs
-   END IF
+   end if
 #else
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < y, y     > = ', adj_sum_lhs
    write(unit=*, fmt='(A,1pe22.14)') 'Whole Domain  < v, v_adj > = ', adj_sum_rhs

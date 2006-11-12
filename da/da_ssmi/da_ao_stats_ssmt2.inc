@@ -1,15 +1,15 @@
 subroutine da_ao_stats_ssmt2( stats_unit, iv, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: iv            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! O-A
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: iv            ! OI
+   type ( y_type), intent (in)      :: re            ! O-A
 
-   TYPE (maxmin_type)               :: minimum
-   TYPE (maxmin_type)               :: maximum
-   INTEGER                          :: nrh
-   INTEGER                          :: n, k
+   type (maxmin_type)               :: minimum
+   type (maxmin_type)               :: maximum
+   integer                          :: nrh
+   integer                          :: n, k
    real                             :: average, rms_err
 
    nrh = 0
@@ -20,24 +20,24 @@ subroutine da_ao_stats_ssmt2( stats_unit, iv, re )
    average = 0.0
    rms_err = 0.0
 
-   IF ( iv%num_ssmt2 > 0 ) THEN
+   if ( iv%num_ssmt2 > 0 ) then
 
-      DO n=1, iv%num_ssmt2
+      do n=1, iv%num_ssmt2
 
          if ( iv%ssmt2(n)%loc%proc_domain ) then
 
             do k=1, iv%ssmt2(n)%info%levels
 
-               CALL da_stats_calculate( n, k, iv%ssmt2(n)%rh(k)%qc, & 
+               call da_stats_calculate( n, k, iv%ssmt2(n)%rh(k)%qc, & 
                                      re%ssmt2(n)%rh(k), nrh, &
                                      minimum, maximum, &
                                      average, rms_err)
 
             end do
          end if    ! end if( iv%ssmt2(n)%loc%proc_domain )
-      END DO
+      end do
 
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nrh )
@@ -48,17 +48,17 @@ subroutine da_ao_stats_ssmt2( stats_unit, iv, re )
                            minimum%n, maximum%n, &
                            minimum%l, maximum%l )
    
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    
-    IF ( nrh /= 0 ) THEN
+    if ( nrh /= 0 ) then
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-A for SSMT2'
    
       call da_print_stats_ssmt2( stats_unit, nrh, minimum, maximum, &
                                  average, rms_err )
    
-    END IF
+    end if
    
-   END IF
+   end if
 
-END subroutine da_ao_stats_ssmt2
+end subroutine da_ao_stats_ssmt2

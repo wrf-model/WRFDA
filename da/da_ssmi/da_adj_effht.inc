@@ -2,18 +2,18 @@ subroutine da_adj_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu,        &
                      ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf )
 !--------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 !--------------------------------------------------------------------
 !
 !Output  : ADJ_ho, ADJ_hv, ADJ_sigo, ADJ_sigv, ADJ_zcld, ADJ_mu
 !Input   : ADJ_hdn, ADJ_hup, ADJ_hdninf, ADJ_hupinf
 !--------------------------------------------------------------------
 
-      real,   intent(IN   ) :: ho,hv,sigo,sigv,mu,zcld
-      real,   intent(INOUT) :: ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_zcld, &
+      real,   intent(in   ) :: ho,hv,sigo,sigv,mu,zcld
+      real,   intent(inout) :: ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_zcld, &
                                ADJ_mu
-      real,   intent(INOUT) :: hdn,hup,hdninf,hupinf
-      real,   intent(   IN) :: ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf
+      real,   intent(inout) :: hdn,hup,hdninf,hupinf
+      real,   intent(   in) :: ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf
 
       real :: gint,zgint,hint,zhint
       real :: ginf,zginf,hinf,zhinf
@@ -460,4 +460,4 @@ IMPLICIT NONE
 
 !! end !!
 
-END subroutine da_adj_effht
+end subroutine da_adj_effht

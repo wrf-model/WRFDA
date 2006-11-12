@@ -9,7 +9,7 @@ subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
    real, dimension(kts:kte)  :: PRA
    real                      :: PRAC,BVT3
 
-   DO K=kts, kte
+   do K=kts, kte
 
       if (DT(k) <= 0.) cycle
 
@@ -17,9 +17,9 @@ subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
          PRA(k) = PRAC*SCR7(K)**BVT3*SCR2(K)
       else
          PRA(k) = 0.
-      endif
+      end if
 
-   ENDDO
+   end do
 
 end subroutine da_accre
 

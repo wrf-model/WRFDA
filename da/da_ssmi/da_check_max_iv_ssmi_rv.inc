@@ -1,14 +1,14 @@
 subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
                      itpw, itpwf, ispeed, ispeedf)
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,    INTENT (IN)                :: it ! Outer loop 
-   INTEGER,    INTENT (INOUT)             :: itpw, itpwf, ispeed, ispeedf
-   TYPE (ssmi_retrieval_type), INTENT(INOUT)       :: ssmi_retrieval
+   integer,    intent (in)                :: it ! Outer loop 
+   integer,    intent (inout)             :: itpw, itpwf, ispeed, ispeedf
+   type (ssmi_retrieval_type), intent(inout)       :: ssmi_retrieval
 
-   INTEGER                                :: iunit ! Output unit.
-   LOGICAL                                :: failed, print
+   integer                                :: iunit ! Output unit.
+   logical                                :: failed, print
 
 !-----------------------------------------------------------------------------!
 !  [1.0] Open diagnostic file:
@@ -17,21 +17,21 @@ subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   IF ( print )THEN
-      WRITE (iunit,'(A)')  &
+   if ( print )then
+      write (iunit,'(A)')  &
       '----------------------------------------------------------------'
-      WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
      'Error max test ratio for SSMI_rv_TPW   = ',max_error_pw, &
      'Error max test ratio for SSMI_rv_SPEED = ',max_error_uv
-   ENDIF
+   end if
 
 !-----------------------------------------------------------------------------!
 !  [2.0] Perform maximum innovation vector check:
 !-----------------------------------------------------------------------------!
 
-   failed = .FALSE.
+   failed = .false.
 
 !  TPW
 

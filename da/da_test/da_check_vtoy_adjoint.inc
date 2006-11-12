@@ -10,9 +10,9 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    !  METHOD:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.!
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)                  :: cv_size
+   integer, intent(in)                  :: cv_size
    type(grid_config_rec_type), intent(inout) :: config_flags
    type(domain)                   :: grid 
 
@@ -26,7 +26,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    type (x_type),     intent(out)   :: xa    ! analysis increments (local).
    type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
-   TYPE (y_type),     intent(inout) :: y     ! y = h (xa)
+   type (y_type),     intent(inout) :: y     ! y = h (xa)
 
 
    integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
@@ -38,10 +38,10 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    integer                        :: ierror        ! MPI error code.
 
-   REAL                           :: adj_sum_lhs               ! < y, y >
-   REAL                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
-   REAL                           :: partial_lhs   ! < y, y >
-   REAL                           :: pertile_lhs   ! < y, y >
+   real                           :: adj_sum_lhs               ! < y, y >
+   real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
+   real                           :: partial_lhs   ! < y, y >
+   real                           :: pertile_lhs   ! < y, y >
    
    integer                        :: cg_jcdf
 
@@ -87,7 +87,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
                                  its, ite, jts, jte, kts, kte,     &
                                  grid, config_flags, cg_jcdf )
 
-   adj_rhs = SUM( cv(1:cv_size) * cv_2(1:cv_size) )
+   adj_rhs = sum( cv(1:cv_size) * cv_2(1:cv_size) )
 
    !-------------------------------------------------------------------------
    !      Print output:
@@ -97,8 +97,8 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    if( global ) then
       adj_sum_rhs = adj_rhs
    else
-      call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+      call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
+                       mpi_comm_world, IERROR )
    end if
 #else
    adj_sum_rhs = adj_rhs
@@ -106,12 +106,12 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 #endif
 
 #ifdef DM_PARALLEL
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
       write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < y, y     > = ', adj_sum_lhs
       write(unit=stdout, fmt='(A,1pe22.14)') &
          'Whole Domain  < v, v_adj > = ', adj_sum_rhs
-   END IF
+   end if
 #else
    write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < y, y     > = ', adj_sum_lhs

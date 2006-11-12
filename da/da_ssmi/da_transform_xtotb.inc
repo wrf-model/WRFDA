@@ -1,6 +1,6 @@
 subroutine da_transform_xtotb( xb )
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(inout)   :: xb       ! first guess state.
 
@@ -51,7 +51,7 @@ subroutine da_transform_xtotb( xb )
          do k=ks,ke
             zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)* &
                xb%rho(i,j,k)
-         END DO
+         end do
 
          ! Column moisture density on the grid locally
 
@@ -74,7 +74,7 @@ subroutine da_transform_xtotb( xb )
 end subroutine da_transform_xtotb
 
 !--------------------------------------------------------------------------
-!Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
+!Input :   ifREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
 !          THETA = incidence angle (deg.)
 !                                                 (approximate  range)
 !          P0    = surface pressure (mb)                    (940 -1030)
@@ -94,7 +94,7 @@ end subroutine da_transform_xtotb
 !               to be reasonably realistic.
 !
 !Output:   TBV, TBH = vertically and horizontally polarized brightness
-!               temperature (K) at frequency given by IFREQ  
+!               temperature (K) at frequency given by ifREQ  
 !
 !----------------------- tbmod_ssmi.f ---  cut here ----------------------
 ! VERSION:  July 1997
@@ -115,7 +115,7 @@ end subroutine da_transform_xtotb
 !   Grant W. Petty
 !   Earth and Atmospheric Sciences Dept.
 !   Purdue University
-!   West Lafayette, IN  47907
+!   West Lafayette, in  47907
 !   USA
 !
 !   Tel. No. (317) 494-2544
@@ -127,8 +127,8 @@ end subroutine da_transform_xtotb
       implicit none
       integer ifreq
 
-      real   , intent(IN   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
-      real   , intent(  OUT) :: tbv,tbh
+      real   , intent(in   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
+      real   , intent(  out) :: tbv,tbh
       real freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
       real :: f,costhet,gx2,sigma,remv,remh,tbup,tbdn,tauatm
@@ -189,7 +189,7 @@ end subroutine da_transform_xtotb
 
       if (u .gt. 5.0) then
         foam = foam + cf2(ifreq)*(u-5.0)
-      endif
+      end if
 
 ! compute surface emissivities and reflectivity
       emissv = foam*fem + (1.0 - foam)*(remv + ebiasv(ifreq))
@@ -214,7 +214,7 @@ end subroutine da_transform_xtotb
 !  SYNOPSIS OF subroutineS TB, TBATMOS
 !
 !===============================================================
-!  subroutine TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
+!  subroutine TBATMOS(ifREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
 !                    TBDN,TAUATM)
 !
 !  This routine calculates the upwelling and downwelling microwave 
@@ -222,7 +222,7 @@ end subroutine da_transform_xtotb
 !  frequencies.  It is a generalization of "TBCLEAR" and includes a 
 !  cloud layer of known height and total liquid water content.
 !------------------------------------------
-!  Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
+!  Input :   ifREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
 !            THETA = incidence angle (deg.)
 !
 !                                                       ( approximate range )
@@ -319,7 +319,7 @@ end subroutine da_transform_xtotb
 !                       SIGMA_V, EFFHT
 !
 !===============================================================
-!  subroutine TBATMOS(IFREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
+!  subroutine TBATMOS(ifREQ,THETA,P0,WV,HWV,TA,GAMMA,LW,ZCLD,TBUP,
 !                    TBDN,TAUATM)
 !
 !  This routine calculates the upwelling and downwelling microwave 
@@ -327,7 +327,7 @@ end subroutine da_transform_xtotb
 !  frequency.  It is a generalization of "TBCLEAR" and includes a 
 !  cloud layer of known height and total liquid water content.
 !
-!  Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
+!  Input :   ifREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
 !            THETA = incidence angle (deg.)
 !
 !                                                       ( approximate range )
@@ -433,12 +433,12 @@ end subroutine da_transform_xtotb
       end subroutine tbatmos
 !========================================================
 !
-! FUNCTION SIGMA_V(IFREQ,P0,WV,HWV,TA,GAMMA)
+! function SIGMA_V(ifREQ,P0,WV,HWV,TA,GAMMA)
 !
 ! This function returns the contribution of water vapor to total
 ! atmospheric optical depth at SSM/I frequencies.  
 ! -------------------------------------------
-!  Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
+!  Input :   ifREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
 !
 !                                                       ( approximate range )
 !            P0    = surface pressure (mb)                      (940 -1030)
@@ -460,12 +460,12 @@ end subroutine da_transform_xtotb
 !--------------------------------------------- 
 !========================================================
 !
-! FUNCTION SIGMA_V(IFREQ,P0,WV,HWV,TA,GAMMA)
+! function SIGMA_V(ifREQ,P0,WV,HWV,TA,GAMMA)
 !
 ! This function returns the contribution of water vapor to total
 ! atmospheric optical depth at SSM/I frequencies.  
 ! -------------------------------------------
-!  Input :   IFREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
+!  Input :   ifREQ = (1,2,3, or 4 ) for (19.35, 22.235, 37, or 85.5 GHz)
 !
 !                                                       ( approximate range )
 !            P0    = surface pressure (mb)                      (940 -1030)
@@ -564,14 +564,14 @@ end subroutine da_transform_xtotb
         sigv = a14 + term24 + term34 + term44 + term54 + term64
       else
         sigv = 0.0
-      endif
+      end if
       sigma_v = sigv*wvc
 
       end subroutine da_cal_sigma_v
 !
 !******************************************
 !
-! subroutine EFFHT(HO,HV,SIGO,SIGV,MU,ZCLD,HDN,HUP,HDNINF,HUPINF)
+! subroutine EFFHT(HO,HV,SIGO,SIGV,MU,ZCLD,HDN,HUP,HDNinF,HUPinF)
 !
 ! This subroutine returns "effective emitting heights" for an atmosphere
 ! with gaseous absorption approximated by two exponentially-decaying
@@ -607,7 +607,7 @@ end subroutine da_transform_xtotb
 !            and (1 - tau)(Ta - gamma*hdn), respectively, where tau is
 !            the slant path transmittance of the layer at angle theta
 !
-! HDINF,HUPINF  -- same as hdn and hup, but for the entire
+! HDinF,HUPinF  -- same as hdn and hup, but for the entire
 !                  atmosphere  (i.e., zcld set to infinity)
 !
 !
@@ -749,7 +749,7 @@ end subroutine da_transform_xtotb
         effangv = theta
         effangh = theta
         return
-      endif
+      end if
       alnsig = alog(sigma)
       gg = gx2*gx2
       ggg = gg*gx2
@@ -849,7 +849,7 @@ end subroutine da_transform_xtotb
          alnthh = s85h(1)*z1 + s85h(2)*z2 +s85h(3)*z3 + &
            s85h(4)*z4 + s85h(5)*z5 + s85h(6)*z6
          alnthh = alnthh + 3.611
-      endif
+      end if
       angv = 90.0 - exp(alnthv)
       angh = 90.0 - exp(alnthh)
       y  = 1.0 - 28.0*gx2
@@ -906,7 +906,7 @@ end subroutine da_transform_xtotb
       else if (ifreq .eq. 4) then
          remv = x1*a85v(1) + x2*a85v(2) + x3*a85v(3) + x4*a85v(4)
          remh = x1*a85h(1) + x2*a85h(2) + x3*a85h(3) + x4*a85h(4)
-      endif
+      end if
       ssw=36.5
       call spemiss(f(ifreq),tk,theta,ssw,semv,semh)
       remv = remv + semv

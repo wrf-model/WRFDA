@@ -82,18 +82,18 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 !------------- compute ensemble mean.
  do ij=1,ndim
     ensmean(ij) = sum(ens(ij,:))/float(nanals)
- enddo
+ end do
 
  do ij=1,nobs
     ensmean_ob(ij) = sum(ens_ob(ij,:))/float(nanals)
- enddo
+ end do
 
 !------------- remove ens mean to get ensemble perturbations
 
  do nanal=1,nanals
     ens(:,nanal) = ens(:,nanal)-ensmean(:)
     ens_ob(:,nanal) = ens_ob(:,nanal)-ensmean_ob(:)
- enddo
+ end do
 
 !------------- calculate HZTHZ in Bishop et al. 2001
  do i = 1, nobs
@@ -132,14 +132,14 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  tracehpfht = 0.
  do i = 1, nanals-1
  tracehpfht = tracehpfht + eignv(i)
- enddo
+ end do
 
  obsinc = ensmean_ob - obs
 
  squareinno = 0.
  do i = 1, nobs
  squareinno = squareinno + obsinc(i)*obsinc(i)/oberrvar(i)   
- enddo
+ end do
 
  write(99,rec=nout) squareinno 
  
@@ -155,22 +155,22 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  read(99,rec=nt) squareinnosum1
  squareinnosum = squareinnosum + squareinnosum1/float(naccumt1)
  end do
- endif
+ end if
 
 
  ainflat = (squareinnosum-float(nobs))/tracehpfht
  if (ainflat .le. 0) then
  ainflat = 1.
- endif
+ end if
 
  if (nout .le. nstartaccum1) then
  tainflat = ainflat
- endif
+ end if
 
  if (nout .gt. nstartaccum1) then
  read(109, rec=(nout-2)*3+2) tainflat
  tainflat = tainflat*ainflat
- endif
+ end if
 
  write(109, rec=(nout-1)*3+1) ainflat
  write(109, rec=(nout-1)*3+2) tainflat
@@ -181,7 +181,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  tainflat = tainflatinput
  print *, "tainflat=", tainflat
  write(109, rec=(nout-1)*3+2) tainflat
- endif
+ end if
 
 
 !--------------- calculate the rho factor following Wang et al 2006
@@ -227,7 +227,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
   read(89,rec=nt) proj2sum1
   proj2sum = proj2sum + proj2sum1/float(naccumt2)
   end do
-  endif
+  end if
 
   squareinnosum = squareinno
 
@@ -239,13 +239,13 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
   read(99,rec=nt) squareinnosum1
   squareinnosum = squareinnosum + squareinnosum1/float(naccumt2)
   end do
-  endif
+  end if
 
 
   rho = (proj2sum-(float(nanals-1)))/(squareinnosum-float(nobs))
   if (rho .le. 0) then
   rho = 1.
-  endif
+  end if
 
   write(109, rec=(nout-1)*3+3) rho
  else if (naccumt2 .lt. 0.) then
@@ -254,7 +254,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  else
 ! this if for pre-specified rho factor
   rho = rhoinput
- endif
+ end if
 
 
 !----------- calculate the grand transformation matrix following Wang et al 2006

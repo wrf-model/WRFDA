@@ -3,8 +3,8 @@
 
 program da_update_bc
 
-   USE da_netcdf_interface
-   USE da_module_couple_uv
+   use da_netcdf_interface
+   use da_module_couple_uv
 
    implicit none
 
@@ -85,7 +85,7 @@ program da_update_bc
       if(io_status /= 0) then
          print *, 'Error to read control_param. Stopped.'
          stop
-      endif
+      end if
 
       WRITE(unit=*, fmt='(2a)') &
            'wrf_3dvar_output_file = ', trim(wrf_3dvar_output_file), &
@@ -96,7 +96,7 @@ program da_update_bc
            'cycling = ', cycling
 
       close(unit=namelist_unit)
-   endif
+   end if
 !----------------------------------------------------------------------------
 
 !--3D need update
@@ -129,7 +129,7 @@ program da_update_bc
    if(debug) then
       write(unit=*, fmt='(a,i2,2x,a,4i6)') &
            'Times: ndims=', ndims, 'dims=', (dims(i), i=1,ndims)
-   endif
+   end if
 
    time_level = dims(2)
 
@@ -138,7 +138,7 @@ program da_update_bc
            'time_level = ', time_level, &
            'We need at least one time-level BDY.'
       stop 'Wrong BDY file.'
-   endif
+   end if
 
    allocate(times(dims(2)))
    allocate(thisbdytime(dims(2)))
@@ -157,8 +157,8 @@ program da_update_bc
            '       times(', n, ')=', trim(times(n)), &
            'thisbdytime (', n, ')=', trim(thisbdytime(n)), &
            'nextbdytime (', n, ')=', trim(nextbdytime(n))
-      enddo
-   endif
+      end do
+   end if
 
 !---------------------------------------------------------------------
    east_end=0
@@ -229,8 +229,8 @@ program da_update_bc
             do i=1,dims(1)
                if(ivgtyp(i,j) /= 16) &
                   tsk(i,j)=tsk_3dvar(i,j)
-            enddo
-            enddo
+            end do
+            end do
 
             call da_put_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), tsk, &
                                       dims(1), dims(2), 1, debug )
@@ -251,17 +251,17 @@ program da_update_bc
          case default ;
             print *, 'It is impossible here. var2d(n)=', trim(var2d(n))
       end select
-   enddo
+   end do
   
    if(low_bdy_only) then
-      print *, 'Only low boundary updated.'
+      print *, 'only low boundary updated.'
       stop 
-   endif
+   end if
 
    if(east_end < 1 .or. north_end < 1) then
       write(unit=*, fmt='(a)') 'Wrong data for Boundary.'
       stop
-   endif
+   end if
 
 !---------------------------------------------------------------------
 !--boundary variables
@@ -297,7 +297,7 @@ program da_update_bc
                                    dims(1), dims(2), 1, debug )
          call da_get_var_2d_real_cdf( wrf_bdy_file, trim(vbt_name), tend2d, &
                                    dims(1), dims(2), 1, debug )
-      endif
+      end if
 
       if(debug) then
          write(unit=ori_unit, fmt='(a,i2,2x,2a/a,i2,2x,a,4i6)') &
@@ -312,8 +312,8 @@ program da_update_bc
          do j=1,dims(1)
             write(unit=ori_unit, fmt='(i4, 1x, 5e20.7)') &
                   j, (tend2d(j,i), i=1,dims(2))
-         enddo
-      endif
+         end do
+      end if
 
 !-----calculate variable at first time level
       select case(m)
@@ -323,32 +323,32 @@ program da_update_bc
                if(time_level < 2) &
                scnd2d(j,l)=frst2d(j,l)+tend2d(j,l)*bdyfrq
                frst2d(j,l)=mu(l,j)
-            enddo
-            enddo
+            end do
+            end do
          case (2) ;		! East boundary
             do l=1,dims(2)
             do j=1,dims(1)
                if(time_level < 2) &
                scnd2d(j,l)=frst2d(j,l)+tend2d(j,l)*bdyfrq
                frst2d(j,l)=mu(east_end-l,j)
-            enddo
-            enddo
+            end do
+            end do
          case (3) ;		! South boundary
             do l=1,dims(2)
             do i=1,dims(1)
                if(time_level < 2) &
                scnd2d(i,l)=frst2d(i,l)+tend2d(i,l)*bdyfrq
                frst2d(i,l)=mu(i,l)
-            enddo
-            enddo
+            end do
+            end do
          case (4) ;		! North boundary
             do l=1,dims(2)
             do i=1,dims(1)
                if(time_level < 2) &
                scnd2d(i,l)=frst2d(i,l)+tend2d(i,l)*bdyfrq
                frst2d(i,l)=mu(i,north_end-l)
-            enddo
-            enddo
+            end do
+            end do
          case default ;
             print *, 'It is impossible here. mu, m=', m
       end select
@@ -357,8 +357,8 @@ program da_update_bc
       do l=1,dims(2)
       do i=1,dims(1)
          tend2d(i,l)=(scnd2d(i,l)-frst2d(i,l))/bdyfrq
-      enddo
-      enddo
+      end do
+      end do
 
       if(debug) then
          write(unit=new_unit, fmt='(a,i2,2x,2a/a,i2,2x,a,4i6)') &
@@ -371,8 +371,8 @@ program da_update_bc
          do j=1,dims(1)
             write(unit=new_unit, fmt='(i4, 1x, 5e20.7)') &
                   j, (tend2d(j,i), i=1,dims(2))
-         enddo
-      endif
+         end do
+      end if
 
 !-----output new variable at first time level
       call da_put_var_2d_real_cdf( wrf_bdy_file, trim(var_name), frst2d, &
@@ -384,7 +384,7 @@ program da_update_bc
       deallocate(frst2d)
       deallocate(scnd2d)
       deallocate(tend2d)
-   enddo
+   end do
 
 !---------------------------------------------------------------------
 !--For 3D variables
@@ -409,7 +409,7 @@ program da_update_bc
 !  do j=1,dims(2)
 !     write(unit=*, fmt='(2(a,i5), a, f12.8)') &
 !          'u(', dims(1), ',', j, ',1)=', u(dims(1),j,1)
-!  enddo
+!  end do
 
 !--Get V
    call da_get_dims_cdf( wrf_3dvar_output_file, 'V', dims, ndims, debug )
@@ -424,13 +424,13 @@ program da_update_bc
 !  do i=1,dims(1)
 !     write(unit=*, fmt='(2(a,i5), a, f12.8)') &
 !          'v(', i, ',', dims(2), ',1)=', v(i,dims(2),1)
-!  enddo
+!  end do
 
    if(debug) then
       write(unit=*, fmt='(a,e20.12,4x)') &
            'Before couple Sample u=', u(dims(1)/2,dims(2)/2,dims(3)/2), &
            'Before couple Sample v=', v(dims(1)/2,dims(2)/2,dims(3)/2)
-   endif
+   end if
 
 !---------------------------------------------------------------------
 !--Couple u, v.
@@ -440,7 +440,7 @@ program da_update_bc
       write(unit=*, fmt='(a,e20.12,4x)') &
            'After  couple Sample u=', u(dims(1)/2,dims(2)/2,dims(3)/2), &
            'After  couple Sample v=', v(dims(1)/2,dims(2)/2,dims(3)/2)
-   endif
+   end if
 
 !---------------------------------------------------------------------
 !--For 3D variables
@@ -475,21 +475,21 @@ program da_update_bc
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'Before couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
+            end if
 
             do k=1,dims(3)
             do j=1,dims(2)
             do i=1,dims(1)
                full3d(i,j,k)=full3d(i,j,k)*(mu(i,j)+mub(i,j))/msfm(i,j)
-            enddo
-            enddo
-            enddo
+            end do
+            end do
+            end do
 
             if(debug) then
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'After  couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
+            end if
          case ('T', 'PH') ;
             var_pref=trim(var3d(n))
  
@@ -500,22 +500,22 @@ program da_update_bc
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'Before couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
+            end if
 
             do k=1,dims(3)
             do j=1,dims(2)
             do i=1,dims(1)
                full3d(i,j,k)=full3d(i,j,k)*(mu(i,j)+mub(i,j))
-            enddo
-            enddo
-            enddo
+            end do
+            end do
+            end do
 
             if(debug) then
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'After  couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
-         case ('QVAPOR', 'QCLOUD', 'QRAIN', 'QICE', 'QSNOW', 'QGRAUP') ;
+            end if
+         case ('QVAPOR', 'QCLOUD', 'QRAin', 'QICE', 'QSNOW', 'QGRAUP') ;
 !           var_pref='R' // var3d(n)(1:2)
 !           var_pref=var3d(n)(1:2)
             var_pref=var3d(n)
@@ -527,21 +527,21 @@ program da_update_bc
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'Before couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
+            end if
 
             do k=1,dims(3)
             do j=1,dims(2)
             do i=1,dims(1)
                full3d(i,j,k)=full3d(i,j,k)*(mu(i,j)+mub(i,j))
-            enddo
-            enddo
-            enddo
+            end do
+            end do
+            end do
 
             if(debug) then
                write(unit=*, fmt='(3a,e20.12,4x)') &
                     'After  couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
-            endif
+            end if
          case default ;
             print *, 'It is impossible here. var3d(', n, ')=', trim(var3d(n))
       end select
@@ -567,7 +567,7 @@ program da_update_bc
                                       dims(1), dims(2), dims(3), 1, debug )
             call da_get_var_3d_real_cdf( wrf_bdy_file, trim(vbt_name), tend3d, &
                                       dims(1), dims(2), dims(3), 1, debug )
-         endif
+         end if
 
          if(debug) then
             write(unit=ori_unit, fmt='(a,i2,2x,2a/a,i2,2x,a,4i6)') &
@@ -582,8 +582,8 @@ program da_update_bc
             do j=1,dims(1)
                write(unit=ori_unit, fmt='(i4, 1x, 5e20.7)') &
                      j, (tend3d(j,dims(2)/2,i), i=1,dims(3))
-            enddo
-         endif
+            end do
+         end if
    
          select case(trim(bdyname(m)))
             case ('_BXS') ;		! West boundary
@@ -593,9 +593,9 @@ program da_update_bc
                   if(time_level < 2) &
                   scnd3d(j,k,l)=frst3d(j,k,l)+tend3d(j,k,l)*bdyfrq
                   frst3d(j,k,l)=full3d(l,j,k)
-               enddo
-               enddo
-               enddo
+               end do
+               end do
+               end do
             case ('_BXE') ;		! East boundary
                do l=1,dims(3)
                do k=1,dims(2)
@@ -603,9 +603,9 @@ program da_update_bc
                   if(time_level < 2) &
                   scnd3d(j,k,l)=frst3d(j,k,l)+tend3d(j,k,l)*bdyfrq
                   frst3d(j,k,l)=full3d(east_end-l,j,k)
-               enddo
-               enddo
-               enddo
+               end do
+               end do
+               end do
             case ('_BYS') ;		! South boundary
                do l=1,dims(3)
                do k=1,dims(2)
@@ -613,9 +613,9 @@ program da_update_bc
                   if(time_level < 2) &
                   scnd3d(i,k,l)=frst3d(i,k,l)+tend3d(i,k,l)*bdyfrq
                   frst3d(i,k,l)=full3d(i,l,k)
-               enddo
-               enddo
-               enddo
+               end do
+               end do
+               end do
             case ('_BYE') ;		! North boundary
                do l=1,dims(3)
                do k=1,dims(2)
@@ -623,9 +623,9 @@ program da_update_bc
                   if(time_level < 2) &
                   scnd3d(i,k,l)=frst3d(i,k,l)+tend3d(i,k,l)*bdyfrq
                   frst3d(i,k,l)=full3d(i,north_end-l,k)
-               enddo
-               enddo
-               enddo
+               end do
+               end do
+               end do
             case default ;
                print *, 'It is impossible here.'
                print *, 'bdyname(', m, ')=', trim(bdyname(m))
@@ -639,9 +639,9 @@ program da_update_bc
          do k=1,dims(2)
          do i=1,dims(1)
             tend3d(i,k,l)=(scnd3d(i,k,l)-frst3d(i,k,l))/bdyfrq
-         enddo
-         enddo
-         enddo
+         end do
+         end do
+         end do
 
          if(debug) then
             write(unit=new_unit, fmt='(a,i2,2x,2a/a,i2,2x,a,4i6)') &
@@ -654,8 +654,8 @@ program da_update_bc
             do j=1,dims(1)
                write(unit=new_unit, fmt='(i4, 1x, 5e20.7)') &
                      j, (tend3d(j,dims(2)/2,i), i=1,dims(3))
-            enddo
-         endif
+            end do
+         end if
 
 !--------output new variable at first time level
          call da_put_var_3d_real_cdf( wrf_bdy_file, trim(var_name), frst3d, &
@@ -666,10 +666,10 @@ program da_update_bc
          deallocate(frst3d)
          deallocate(scnd3d)
          deallocate(tend3d)
-      enddo
+      end do
       
       deallocate(full3d)
-   enddo
+   end do
 
    deallocate(mu)
    deallocate(mub)
@@ -679,18 +679,18 @@ program da_update_bc
    deallocate(v)
 
    if(io_status /= 0) then
-      print *, 'Only lateral boundary updated.'
+      print *, 'only lateral boundary updated.'
    else
       if(low_bdy_only) then
          if(cycling) then
             print *, 'Both low boudary and lateral boundary updated.'
          else
-            print *, 'Only low boudary updated.'
-         endif
+            print *, 'only low boudary updated.'
+         end if
       else
-         print *, 'Only lateral boundary updated.'
-      endif
-   endif
+         print *, 'only lateral boundary updated.'
+      end if
+   end if
 
 end program da_update_bc
 

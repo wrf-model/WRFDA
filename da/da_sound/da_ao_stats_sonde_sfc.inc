@@ -1,14 +1,14 @@
 subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
-  TYPE ( y_type), INTENT (in)      :: re            ! A - O
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
+  type ( y_type), intent (in)      :: re            ! A - O
 
-  TYPE (stats_sonde_sfc_type)      :: sonde_sfc
-  INTEGER                          :: nu, nv, nt, np, nq
-  INTEGER                          :: n
+  type (stats_sonde_sfc_type)      :: sonde_sfc
+  integer                          :: nu, nv, nt, np, nq
+  integer                          :: n
 
   nu = 0
   nv = 0
@@ -29,8 +29,8 @@ subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
   sonde_sfc%average = residual_sonde_sfc1_type(0.0, 0.0, 0.0, 0.0, 0.0)
   sonde_sfc%rms_err = sonde_sfc%average
 
-  IF ( oi%num_sound > 0 ) THEN
-    DO n=1, oi%num_sound
+  if ( oi%num_sound > 0 ) then
+    do n=1, oi%num_sound
       if( oi%sonde_sfc(n)%loc%proc_domain ) then
         call da_stats_calculate( n, 0, oi%sonde_sfc(n)%u%qc,  & 
                               re%sonde_sfc(n)%u, nu, & 
@@ -53,9 +53,9 @@ subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
                               sonde_sfc%minimum%q, sonde_sfc%maximum%q, &
                               sonde_sfc%average%q, sonde_sfc%rms_err%q )
 
-      endif    ! end if( oi%sonde_sfc(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%sonde_sfc(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -86,12 +86,12 @@ subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
                           Sonde_sfc%minimum%q%n, Sonde_sfc%maximum%q%n, &
                           Sonde_sfc%minimum%q%l, Sonde_sfc%maximum%q%l )
 
-  IF ( rootproc ) THEN
-    IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
+  if ( rootproc ) then
+    if ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for sonde_sfc'
       call da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
-    END IF
-  END IF
+    end if
+  end if
 
 end subroutine da_ao_stats_sonde_sfc
 

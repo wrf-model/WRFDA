@@ -2,43 +2,43 @@ subroutine da_calculate_residual_radar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n, k
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k
 
-   IF ( oi%num_Radar > 0 ) THEN
+   if ( oi%num_Radar > 0 ) then
 
       n_obs_bad % rv % num = number(0, 0, 0)
       n_obs_bad % rf % num = number(0, 0, 0)
 
-      DO n=1, oi%num_Radar
+      do n=1, oi%num_Radar
 
          do k=1, oi%Radar(n)%info%levels
 
-           IF ( USE_Radar_rv ) THEN
+           if ( use_Radar_rv ) then
 
              np_available = np_available + 1
 
              re%Radar(n)%rv(k) = da_residual( n, k, y%Radar(n)%rv(k), &
                                            oi%Radar(n)%rv(k), n_obs_bad % rv )
-           ENDIF
+           end if
 
-           IF ( USE_Radar_rf ) THEN
+           if ( use_Radar_rf ) then
              np_available = np_available + 1
 
              re%Radar(n)%rf(k) = da_residual( n, k, y%Radar(n)%rf(k), &
                                            oi%Radar(n)%rf(k), n_obs_bad % rf )
-           ENDIF
+           end if
          end do
-      END DO
+      end do
 
       np_missing  = np_missing  + n_obs_bad % rv % num % miss  &
                                 + n_obs_bad % rf % num % miss
@@ -46,6 +46,6 @@ subroutine da_calculate_residual_radar( oi, y, re,                        &
                                 + n_obs_bad % rf % num % bad
       np_obs_used = np_obs_used + n_obs_bad % rv % num % use   &
                                 + n_obs_bad % rf % num % use
-   ENDIF
+   end if
 
 end subroutine da_calculate_residual_radar

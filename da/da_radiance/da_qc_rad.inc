@@ -26,7 +26,8 @@ subroutine da_qc_rad (ob, iv)
 #ifdef RTTOV
    if (trace_use) call da_trace_entry("da_qc_rad")
 
-   if (tovs_redistribute) then
+!   if (tovs_redistribute) then
+if (.false.) then
       allocate (num_tovs_before(iv%num_inst,num_procs))
       allocate (num_tovs_after(iv%num_inst,num_procs))
 
@@ -84,7 +85,8 @@ subroutine da_qc_rad (ob, iv)
          call da_error(__FILE__,__LINE__,errmsg(1:1))
       end if
 
-      if (tovs_redistribute) then
+!      if (tovs_redistribute) then
+if (.false.) then
          ! Report number of observations to other processors via rootproc
 
          write(unit=stdout,fmt='(A,I2)') "For instrument", inst
@@ -178,7 +180,8 @@ subroutine da_qc_rad (ob, iv)
       end if
    end do
 
-   if (tovs_redistribute) then
+!   if (tovs_redistribute) then
+if (.false.) then
       deallocate (index)
       deallocate (excess_start)
       deallocate (excess_count)

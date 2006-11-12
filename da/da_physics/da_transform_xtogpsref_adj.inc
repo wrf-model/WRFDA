@@ -5,7 +5,7 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)    :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN) :: xp       ! Domain decomposition vars.
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
 
    integer :: i, j, k, is, ie, js, je, ks, ke
    real    :: partone, parttwo, dividnd
@@ -32,7 +32,7 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    !------------------------------------------------------------------------------
    !  [2.0] Calculate the adjoint for GPS refractivity:
@@ -73,9 +73,9 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
             xa%ref(i,j,k) = 0.0
 
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    if (trace_use) call da_trace_exit("da_transform_xtogpsref_adj")
 

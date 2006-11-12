@@ -1,6 +1,6 @@
 subroutine da_transform_xtoy_ssmi_tb_adj( xb, oi, jo_grad_y, jo_grad_x )
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.
    type (ob_type), intent(in)    :: oi          ! obs. inc vector (o-b).

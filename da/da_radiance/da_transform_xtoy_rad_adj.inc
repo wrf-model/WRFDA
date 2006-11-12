@@ -143,7 +143,8 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
 !write (0,*) "aux_vars(1) % satzen",aux_vars(1)%satzen
 !write (0,*) "aux_vars(1) % satazi",aux_vars(1)%satazi
 
-      if (tovs_redistribute) then
+!      if (tovs_redistribute) then
+if (.false.) then
 #ifdef DM_PARALLEL
          d_num_rad=num_tovs_after(inst,myproc+1)
 
@@ -434,7 +435,8 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
          end do
       end do
 
-      if (interp_new) then
+!      if (interp_new) then
+if (.false.) then
 
          allocate(temp_t(nlevels,num_rad))
          do n=1,num_rad
@@ -526,7 +528,8 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
       deallocate (con_vars)
       deallocate (aux_vars)
       deallocate (con_vars_ad)
-      if (tovs_redistribute) then
+!      if (tovs_redistribute) then
+if (.false.) then
          deallocate (d_tb)
          deallocate (d_con_vars)
          deallocate (d_aux_vars)

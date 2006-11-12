@@ -4,16 +4,16 @@ subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
    ! (pre_ma, pressure at the level) at the observed location (i,j). 
    ! dx, dxm, dy, dym are horizontal interpolation weighting.
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Dimensions and xpose buffers.
-   INTEGER                        :: i, j     ! OBS location
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
+   type (xb_type), intent(in)     :: xb       ! first guess state.
+   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
+   integer                        :: i, j     ! OBS location
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
                           
    integer                        :: ii,jj,ks,ke    ! Index dimension.
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
+   real, dimension(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
    real, dimension(2,2,xp%kts:xp%kte)   :: tv_m     ! Virtual temperatures
 
    ks = xp%kts; ke = xp%kte
@@ -24,8 +24,8 @@ subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
       do jj=j,j+1
          tv_m(ii-i+1,jj-j+1,ks:ke) = xb%t(ii,jj,ks:ke) * &
             (1. + 0.61*xb%q(ii,jj,ks:ke))
-      enddo
-   enddo
+      end do
+   end do
 
    ! Horizontal interpolation to the obs. pt.
 
@@ -47,7 +47,7 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
    !  pre is a given pressure, alpha is the percentage of pre in the layer.
    !  layer,tv are calculated vertical layer and interpolated virtual temp.
  
-   IMPLICIT NONE
+   implicit none
 
    integer                    :: ks, ke, k
    integer                    :: layer
@@ -78,9 +78,9 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
             alpha = log(pre_ma(k)/pre)/log(pre_ma(k)/pre_ma(k+1))
             tv = tv_ma(k) * (1.-alpha) + tv_ma(k+1) * alpha
             exit
-         endif
-      enddo
-   endif
+         end if
+      end do
+   end if
  
 end subroutine da_find_layer
 
@@ -92,7 +92,7 @@ subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
    !  using vertical integration of virtual temperatures.
    !  pre1 and pre2 are two pressures for the two layers
 
-   IMPLICIT NONE
+   implicit none
 
    integer                  :: layer1,layer2         ! two layers
    real                     :: tv1,tv2               ! virtual temp.
@@ -114,14 +114,14 @@ subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
    p_tmp(layer2-1) = pre2
    do k = layer2, layer1-1
       p_tmp(k) = pre_ma(k)
-   enddo
+   end do
 
    ! Vertical integration of the virtual temperature
 
    do k=layer2,layer1-1
       thk = thk + 0.5 * gas_constant/gravity * tv_ma(k) *                &
                log(p_tmp(k-1)/p_tmp(k+1))
-   enddo
+   end do
 
 end subroutine da_thickness
 
@@ -132,14 +132,14 @@ subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
 
    ! This is the tangent-linear routine for Tv_profile
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)     :: xa       ! gridded analysis increment.
-   TYPE (xb_type),  INTENT(IN)    :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Dimensions and xpose buffers.
-   INTEGER                        :: i, j     ! OBS location
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
+   type (x_type),  intent(in)     :: xa       ! gridded analysis increment.
+   type (xb_type),  intent(in)    :: xb       ! first guess state.
+   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
+   integer                        :: i, j     ! OBS location
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
 
    integer                        :: ii,jj,ks,ke
    real, dimension(2,2,xp%kts:xp%kte)       :: tv_m,TGL_tv_m
@@ -153,8 +153,8 @@ subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
          TGL_tv_m(ii-i+1,jj-j+1,ks:ke) = xa%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke)) +  &
                                       0.61*xb%t(ii,jj,ks:ke)*xa%q(ii,jj,ks:ke)
          tv_m(ii-i+1,jj-j+1,ks:ke)     = xb%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
-      enddo
-   enddo
+      end do
+   end do
  
    TGL_pre_ma(ks:ke) = dym* ( dxm * xa%p(i,j,ks:ke) + dx * xa%p(i+1,j,ks:ke) ) + &
                        dy * ( dxm * xa%p(i,j+1,ks:ke) + dx * xa%p(i+1,j+1,ks:ke) )
@@ -174,7 +174,7 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    !  This is the tangent-linear routine for find_layer
 
-   IMPLICIT NONE
+   implicit none
 
    integer                   :: ks, ke, k
    integer                   :: layer
@@ -240,10 +240,10 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                       alpha*TGL_tv_ma(k+1)
             tv = tv_ma(k) * (1.-alpha) + tv_ma(k+1) * alpha
             exit
-         endif
-      enddo
+         end if
+      end do
 
-   endif
+   end if
  
 end subroutine da_tgl_find_layer
 
@@ -254,7 +254,7 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
 
    ! This is the tangent-linear routine for thickness
 
-   IMPLICIT NONE
+   implicit none
 
    integer                  :: layer1,layer2
    integer                  :: ks,ke,k
@@ -279,7 +279,7 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
    do k=layer2,layer1-1
       TGL_p_tmp(k) = TGL_pre_ma(k)
       p_tmp(k) = pre_ma(k)
-   enddo
+   end do
 
    ! Vertical integration of the virtual temperature
 
@@ -288,7 +288,7 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
                 TGL_tv_ma(k)*log(p_tmp(k-1)/p_tmp(k+1)) + &
                 TGL_p_tmp(k-1)*tv_ma(k)/p_tmp(k-1) -       &
                 TGL_p_tmp(k+1)*tv_ma(k)/p_tmp(k+1)     )
-   enddo
+   end do
 
 end subroutine da_tgl_thickness
 
@@ -299,19 +299,19 @@ subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
 
    ! This is the adjoint routine for Tv_profile
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type) , INTENT(INOUT)  :: jo_grad_x ! grad_x(jo)
-   TYPE (xb_type),  INTENT(IN)    :: xb        ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Dimensions and xpose buffers.
-   INTEGER                        :: i, j      ! OBS location
-   REAL                           :: dx, dxm   ! Interpolation weights.
-   REAL                           :: dy, dym   ! Interpolation weights.
+   type (x_type) , intent(inout)  :: jo_grad_x ! grad_x(jo)
+   type (xb_type),  intent(in)    :: xb        ! first guess state.
+   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
+   integer                        :: i, j      ! OBS location
+   real                           :: dx, dxm   ! Interpolation weights.
+   real                           :: dy, dym   ! Interpolation weights.
 
    integer                        :: ii,jj,ks,ke
    real, dimension(2,2,xp%kts:xp%kte)    :: ADJ_tv_m
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)    :: pre_ma,tv_ma
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)    :: ADJ_pre_ma,ADJ_tv_ma
+   real, dimension(xp%kts-1:xp%kte+1)    :: pre_ma,tv_ma
+   real, dimension(xp%kts-1:xp%kte+1)    :: ADJ_pre_ma,ADJ_tv_ma
 
    ks = xp%kts; ke = xp%kte
 
@@ -332,8 +332,8 @@ subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
                   ADJ_tv_m(ii-i+1,jj-j+1,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
          jo_grad_x%q(ii,jj,ks:ke) = jo_grad_x%q(ii,jj,ks:ke) + &
                   0.61*xb%t(ii,jj,ks:ke)*ADJ_tv_m(ii-i+1,jj-j+1,ks:ke)
-      enddo
-   enddo
+      end do
+   end do
 
 end subroutine da_adj_tv_profile
 
@@ -344,7 +344,7 @@ subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    ! This is the adjoint routine for find_layer
 
-   IMPLICIT NONE
+   implicit none
 
    integer                   :: ks, ke, k
    integer                   :: layer
@@ -407,10 +407,10 @@ subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
             ADJ_pre_ma(k)   = ADJ_pre_ma(k) + coef1 * ADJ_alpha
             ADJ_pre_ma(k+1) = ADJ_pre_ma(k+1) + coef2 * ADJ_alpha
             exit
-         endif
-      enddo
+         end if
+      end do
 
-   endif
+   end if
    ADJ_tv           = 0.
  
 end subroutine da_adj_find_layer
@@ -422,7 +422,7 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
 
    ! This is the adjoint routine for thickness
 
-   IMPLICIT NONE
+   implicit none
 
    integer                  :: layer1,layer2
    integer                  :: ks,ke,k
@@ -441,7 +441,7 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
    p_tmp(layer2-1) = pre2
    do k=layer2,layer1-1
       p_tmp(k) = pre_ma(k)
-   enddo
+   end do
 
    do k=layer2,layer1-1
       ADJ_p_tmp(k+1)  = ADJ_p_tmp(k+1) - 0.5*gas_constant/gravity *     &
@@ -450,11 +450,11 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
                         ADJ_thk*tv_ma(k)/p_tmp(k-1)
       ADJ_tv_ma(k)    = ADJ_tv_ma(k)   + 0.5*gas_constant/gravity *     &
                         ADJ_thk*log(p_tmp(k-1)/p_tmp(k+1))
-   enddo
+   end do
 
    do k=layer2,layer1-1
       ADJ_pre_ma(k) = ADJ_pre_ma(k) + ADJ_p_tmp(k)
-   enddo
+   end do
 
    ADJ_thk = 0.5 * gas_constant/gravity * ADJ_thk
    ADJ_pre_ma(layer2) = ADJ_pre_ma(layer2) - ADJ_thk*tv2/pre_ma(layer2)

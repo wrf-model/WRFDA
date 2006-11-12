@@ -5,10 +5,10 @@ subroutine da_check_rh( xb, xa, xp )
    !          Made the modification to those levels, which RH are less than 95%
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(in)           :: xb    ! First guess state
-   TYPE (x_type),  INTENT(inout)        :: xa    ! Analysis increment
+   type (xb_type), intent(in)           :: xb    ! First guess state
+   type (x_type),  intent(inout)        :: xa    ! Analysis increment
    type (xpose_type), intent(in)        :: xp    ! Domain decomposition vars.
 
    integer   :: imod(xp%kts:xp%kte)
@@ -30,8 +30,8 @@ subroutine da_check_rh( xb, xa, xp )
    upper_modify_rh = 95.
    lower_modify_rh = 11.
 
-   DO i=is,ie
-      DO j=js,je
+   do i=is,ie
+      do j=js,je
 
          tol_adjust_moist = 0.
          tol_moist        = 0.
@@ -41,15 +41,15 @@ subroutine da_check_rh( xb, xa, xp )
          x_qs(1)           = 0.
          rhtol(1)          = xb%rh(i,j,1)+xa%rh(i,j,1)
 
-         DO k=ks+1,ke
+         do k=ks+1,ke
             dz(k)=xb%hf(i,j,k-1)-xb%hf(i,j,k)
 
             imod(k)           = 0
             x_qs(k)           = 0.
             rhtol(k)          = xb%rh(i,j,k)+xa%rh(i,j,k)
-         ENDDO
+         end do
 
-         DO k=ks,ke
+         do k=ks,ke
             if ( rhtol(k) .gt. maximum_rh ) then
                oldrha       = xa%rh(i,j,k)
                ! modify xa%rh
@@ -66,7 +66,7 @@ subroutine da_check_rh( xb, xa, xp )
                tol_adjust_moist = tol_adjust_moist + x_qs(k)*(oldrha - &
                   xa%rh(i,j,k))* dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                imod(k)=-1
-            endif
+            end if
 
             if ( rhtol(k) .lt. minimum_rh ) then
                oldrha           = xa%rh(i,j,k)
@@ -82,11 +82,11 @@ subroutine da_check_rh( xb, xa, xp )
                tol_adjust_moist = tol_adjust_moist + x_qs(k)*(oldrha - &
                   xa%rh(i,j,k))* dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                imod(k)=-1
-            endif
-         ENDDO
+            end if
+         end do
 
          if ( tol_adjust_moist .gt. 0. ) then
-            DO k=ks,ke
+            do k=ks,ke
                if ( rhtol(k) .lt. upper_modify_rh .and. imod(k) .eq. 0) then
                   call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k),es,x_qs(k))
@@ -95,12 +95,12 @@ subroutine da_check_rh( xb, xa, xp )
                                  dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                   tol_moist    = tol_moist + each_moist
                   imod(k)      = 1
-               endif
-            ENDDO
-         endif
+               end if
+            end do
+         end if
 
          if ( tol_adjust_moist .lt. 0. ) then
-            DO k=ks,ke
+            do k=ks,ke
                if ( rhtol(k) .gt. lower_modify_rh .and. imod(k) .eq. 0) then
                   call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k), es, x_qs(k) )
@@ -109,24 +109,24 @@ subroutine da_check_rh( xb, xa, xp )
                                  dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                   tol_moist    = tol_moist + each_moist
                   imod(k)      = 1
-               endif
-            ENDDO
-         endif
+               end if
+            end do
+         end if
 
          if (tol_moist > 0) then
            weight       = tol_adjust_moist/tol_moist
-           DO k=ks,ke
+           do k=ks,ke
              if ( imod(k) .eq. 1) then
                xa%rh(i,j,k) = xa%rh(i,j,k)+(xb%rh(i,j,k)+xa%rh(i,j,k))*weight
                call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k), &
                                       xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k), &
                                       xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k) )
 
-             endif
-           ENDDO
-         endif
-      ENDDO
-   ENDDO
+             end if
+           end do
+         end if
+      end do
+   end do
 
 end subroutine da_check_rh
 

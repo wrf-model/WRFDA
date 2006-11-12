@@ -1,50 +1,50 @@
-MODULE da_sound
+module da_sound
 
-   USE da_control
-   USE da_define_structures
-   USE da_interpolation
-   USE da_statistics
-   USE da_tools
-   USE da_physics
+   use da_control
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_physics
 
    ! The "stats_sound_type" is ONLY used locally in da_sound:
 
-   TYPE residual_sound1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_sound1_type
+   type residual_sound1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+      real          :: q                        ! specific humidity
+   end type residual_sound1_type
 
-   TYPE maxmin_sound_stats_type
-      TYPE (maxmin_type)         :: u, v, t, q
-   END TYPE maxmin_sound_stats_type
+   type maxmin_sound_stats_type
+      type (maxmin_type)         :: u, v, t, q
+   end type maxmin_sound_stats_type
 
-   TYPE stats_sound_type
-      TYPE (maxmin_sound_stats_type)  :: maximum, minimum
-      TYPE (residual_sound1_type)     :: average, rms_err
-   END TYPE stats_sound_type
+   type stats_sound_type
+      type (maxmin_sound_stats_type)  :: maximum, minimum
+      type (residual_sound1_type)     :: average, rms_err
+   end type stats_sound_type
 
    ! The "stats_sonde_sfc_type" is ONLY used locally in da_sonde_sfc:
 
-   TYPE residual_sonde_sfc1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_sonde_sfc1_type
+   type residual_sonde_sfc1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+      real          :: p                        ! pressure
+      real          :: q                        ! specific humidity
+   end type residual_sonde_sfc1_type
 
-   TYPE maxmin_sonde_sfc_stats_type
-      TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_sonde_sfc_stats_type
+   type maxmin_sonde_sfc_stats_type
+      type (maxmin_type)         :: u, v, t, p, q
+   end type maxmin_sonde_sfc_stats_type
 
-   TYPE stats_sonde_sfc_type
-      TYPE (maxmin_sonde_sfc_stats_type)  :: maximum, minimum
-      TYPE (residual_sonde_sfc1_type)     :: average, rms_err
-   END TYPE stats_sonde_sfc_type
+   type stats_sonde_sfc_type
+      type (maxmin_sonde_sfc_stats_type)  :: maximum, minimum
+      type (residual_sonde_sfc1_type)     :: average, rms_err
+   end type stats_sonde_sfc_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_sound.inc"
 #include "da_calculate_jo_and_grady_sound.inc"
@@ -71,5 +71,5 @@ CONTAINS
 #include "da_check_max_iv_sonde_sfc.inc"
 #include "da_calculate_grady_sonde_sfc.inc"
 
-END MODULE da_sound
+end module da_sound
 

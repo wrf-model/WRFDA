@@ -1,10 +1,10 @@
 subroutine da_print_stats_ships( stats_unit, nu, nv, nt, np, nq, ships )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_ships_type), INTENT(IN):: ships
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv, nt, np, nq
+   type (stats_ships_type), intent(in):: ships
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

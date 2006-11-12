@@ -4,16 +4,16 @@ subroutine da_calculate_grady_pseudo( iv, re, jo_grad_y )
    ! Purpose: Applies obs inverse on re-vector
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)     :: iv          ! Innovation vector.
-   TYPE (y_type),  INTENT(INOUT)  :: re          ! Residual vector.
-   TYPE (y_type),  INTENT(INOUT)  :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n
+   integer                      :: n
 
-   IF (iv%num_pseudo > 0) THEN
-      DO n=1, iv%num_pseudo
+   if (iv%num_pseudo > 0) then
+      do n=1, iv%num_pseudo
          if(iv%pseudo(n)%u%qc < obs_qc_pointer) re%pseudo(n)%u = 0.0
          if(iv%pseudo(n)%v%qc < obs_qc_pointer) re%pseudo(n)%v = 0.0
          if(iv%pseudo(n)%t%qc < obs_qc_pointer) re%pseudo(n)%t = 0.0
@@ -30,7 +30,7 @@ subroutine da_calculate_grady_pseudo( iv, re, jo_grad_y )
                                ( iv%pseudo(n)%p%error * iv%pseudo(n)%p%error)
          jo_grad_y%pseudo(n)%q = -re%pseudo(n)%q / &
                                ( iv%pseudo(n)%q%error * iv%pseudo(n)%q%error)
-      END DO
-   END IF
+      end do
+   end if
   
 end subroutine da_calculate_grady_pseudo

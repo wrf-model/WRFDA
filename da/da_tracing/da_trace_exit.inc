@@ -4,27 +4,27 @@ subroutine da_trace_exit( &
    Messages, &           ! in, optional
    MaxNoCalls)           ! in, optional
 
-   IMPLICIT NONE
+   implicit none
 
    ! Arguments
 
-   CHARACTER (LEN=*), INTENT(IN)           :: Name         ! subroutine name
-   CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Message      ! text to trace
-   CHARACTER (LEN=*), OPTIONAL, INTENT(IN) :: Messages(:)  ! text to trace
-   INTEGER, OPTIONAL, INTENT(IN)           :: MaxNoCalls   ! max no calls to show
+   character (LEN=*), intent(in)           :: Name         ! subroutine name
+   character (LEN=*), optional, intent(in) :: Message      ! text to trace
+   character (LEN=*), optional, intent(in) :: Messages(:)  ! text to trace
+   integer, optional, intent(in)           :: MaxNoCalls   ! max no calls to show
 
    ! Local variables
 
-   INTEGER                         :: IOStatus        ! I-O return code 
-   INTEGER                         :: Loop            ! General loop counter
-   INTEGER                         :: Count
-   INTEGER                         :: TotalSpace
-   INTEGER                         :: LocalMaxNoCalls
-   INTEGER                         :: Caller
-   REAL                            :: temp_CPUTime
-   REAL                            :: temp1
-   REAL                            :: temp2
-   CHARACTER(LEN=25)               :: Change
+   integer                         :: IOStatus        ! I-O return code 
+   integer                         :: Loop            ! General loop counter
+   integer                         :: Count
+   integer                         :: TotalSpace
+   integer                         :: LocalMaxNoCalls
+   integer                         :: Caller
+   real                            :: temp_CPUTime
+   real                            :: temp1
+   real                            :: temp2
+   character(LEN=25)               :: Change
 
    !======================================================================
    ! Start of code
@@ -41,26 +41,26 @@ subroutine da_trace_exit( &
    ! check whether trace active and whether depth exceeded
    !======================================================================
 
-   IF (.NOT. TraceActive) THEN
-      RETURN
-   END IF
+   if (.NOT. TraceActive) then
+      return
+   end if
 
-   IF (TraceActive) THEN
+   if (TraceActive) then
       ! was tracing enabled by this routine? If it was, disable it, to
       ! take affect after the trace line has been written
-      IF (Name == TraceStartedBy(1:LEN(Name))) THEN
-         TraceActive = .FALSE.
-      END IF
-   END IF
+      if (Name == TraceStartedBy(1:LEN(Name))) then
+         TraceActive = .false.
+      end if
+   end if
 
-   temp1 = REAL(Count - BaseElapsedTime) - ElapsedTimeLocalStart
+   temp1 = real(Count - BaseElapsedTime) - ElapsedTimeLocalStart
    temp2 = temp_CPUTime - CPUTimeLocalStart
 
    TraceDepth=TraceDepth-1
 
-   IF (TraceDepth < 0) THEN
+   if (TraceDepth < 0) then
       TraceDepth = 0
-   END IF
+   end if
 
    !=======================================================================
    ! Check timing and maximum heap memory usage
@@ -76,102 +76,102 @@ subroutine da_trace_exit( &
    CPUTime(Pointer)             = CPUTime(Pointer) + CPUTimeThisCall(Pointer)
 
    Caller=CalledBy(Pointer)
-   IF (Caller /= 0) THEN
+   if (Caller /= 0) then
       ElapsedTimeThisCall(Caller) = ElapsedTimeThisCall(Caller) + &
          ElapsedTimeThisCall(Pointer)
       CPUTimeThisCall(Caller) = CPUTimeThisCall(Caller) + CPUTimeThisCall(Pointer)
-   END IF
+   end if
 
    Change = ""
 
-   IF (trace_memory) THEN
+   if (trace_memory) then
       call da_memory( &
          TotalSpace)
-      IF (EntryHeap(Pointer) < TotalSpace) THEN
-         WRITE(Change,"(A9,I12)")", BIGGER", TotalSpace - EntryHeap(Pointer)
-      ELSE IF (EntryHeap(Pointer) > TotalSpace) THEN
-         WRITE(Change,"(A9,I12)")", SMALLER", TotalSpace - EntryHeap(Pointer)
-      END IF
-      IF (MaxHeap(Pointer) < TotalSpace) THEN
+      if (EntryHeap(Pointer) < TotalSpace) then
+         write(Change,"(A9,I12)")", BIGGER", TotalSpace - EntryHeap(Pointer)
+      else if (EntryHeap(Pointer) > TotalSpace) then
+         write(Change,"(A9,I12)")", SMALLER", TotalSpace - EntryHeap(Pointer)
+      end if
+      if (MaxHeap(Pointer) < TotalSpace) then
          MaxHeap(Pointer) = TotalSpace
-      END IF
-   ELSE
+      end if
+   else
       TotalSpace = 0
-   END IF
+   end if
 
-   IF (trace_write .AND. TraceDepth <= trace_max_depth ) THEN
+   if (trace_write .AND. TraceDepth <= trace_max_depth ) then
 
-      IF (PRESENT(MaxNoCalls)) THEN
+      if (present(MaxNoCalls)) then
          LocalMaxNoCalls = MaxNoCalls
-      ELSE
+      else
          LocalMaxNoCalls = trace_repeat_head
-      END IF
+      end if
 
       IOStatus=0
 
-      IF (NoCalls(Pointer) <= LocalMaxNoCalls) THEN
-         IF (trace_memory) THEN
+      if (NoCalls(Pointer) <= LocalMaxNoCalls) then
+         if (trace_memory) then
             if (use_html) then
-               WRITE (UNIT=trace_unit, &
-                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
-                  IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                  TRIM(Name),TRIM(Name), TotalSpace, Change
+               write (unit=trace_unit, &
+                  fmt='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>",I11,A)', &
+                  iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &
+                  trim(Name),trim(Name), TotalSpace, Change
             else
-               WRITE (UNIT=trace_unit, &
-                  FMT='(A, "< ",A,I11,A)', &
-                  IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name), TotalSpace, Change
+               write (unit=trace_unit, &
+                  fmt='(A, "< ",A,I11,A)', &
+                  iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name), TotalSpace, Change
             end if
-         ELSE
+         else
             if (use_html) then
-               WRITE (UNIT=trace_unit, &
-                  FMT='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>")', &
-                  IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Documentation_url), &
-                  TRIM(Name),TRIM(Name)
+               write (unit=trace_unit, &
+                  fmt='(A, "&lt; <a href=",A,"/",A,".html>",A,"</a>")', &
+                  iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &
+                  trim(Name),trim(Name)
             else
-               WRITE (UNIT=trace_unit, FMT='(A, "< ",A)', IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Name)
+               write (unit=trace_unit, fmt='(A, "< ",A)', iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name)
             end if
-         END IF
+         end if
 
-         IF (IOStatus /= 0) THEN
+         if (IOStatus /= 0) then
             call da_error(__FILE__,__LINE__, &
-              (/"Cannot write to trace file for "//TRIM(Name)/))
-         END IF
+              (/"Cannot write to trace file for "//trim(Name)/))
+         end if
 
-         IF (PRESENT(Message)) THEN
-            WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
-               pad(1:TraceDepth*TraceIndentAmount),TRIM(Message)
-            IF (IOStatus .NE. 0) THEN
+         if (present(Message)) then
+            write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &
+               pad(1:TraceDepth*TraceIndentAmount),trim(Message)
+            if (IOStatus .NE. 0) then
                call da_error(__FILE__,__LINE__, &
-                  (/"Cannot write to trace file for "//TRIM(Name)/))
-            END IF
-         END IF
+                  (/"Cannot write to trace file for "//trim(Name)/))
+            end if
+         end if
 
-         IF (PRESENT(Messages)) THEN
-            DO Loop = 1, SIZE(Messages)
-               WRITE (UNIT=trace_unit, FMT='(A," ",A)', IOSTAT=IOStatus) &
-                  pad(1:TraceDepth*TraceIndentAmount),TRIM(Messages(Loop))
-               IF (IOStatus .NE. 0) THEN
+         if (present(Messages)) then
+            do Loop = 1, size(Messages)
+               write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
+               if (IOStatus .NE. 0) then
                   call da_error(__FILE__,__LINE__, &
-                     (/"Cannot write to trace file for "//TRIM(Name)/))
-               END IF
-            END DO ! Loop
-         END IF
-      END IF
+                     (/"Cannot write to trace file for "//trim(Name)/))
+               end if
+            end do ! Loop
+         end if
+      end if
 
-      IF (NoCalls(Pointer) == trace_repeat_head) THEN
-         WRITE(UNIT=trace_unit,FMT='(A,"  Called enough, going quiet")', &
-            IOSTAT=IOStatus)&
+      if (NoCalls(Pointer) == trace_repeat_head) then
+         write(unit=trace_unit,fmt='(A,"  Called enough, going quiet")', &
+            iostat=IOStatus)&
             pad(1:TraceDepth*TraceIndentAmount)
-         IF (IOStatus .NE. 0) THEN
+         if (IOStatus .NE. 0) then
             call da_error(__FILE__,__LINE__, &
-               (/"Cannot write to trace file for "//TRIM(Name)/))
-         END IF
-      END IF
-   END IF ! trace_write
+               (/"Cannot write to trace file for "//trim(Name)/))
+         end if
+      end if
+   end if ! trace_write
 
    ! Restore pointer
    Pointer = CalledBy(Pointer)
@@ -181,7 +181,7 @@ subroutine da_trace_exit( &
    call SYSTEM_CLOCK( &
      COUNT=Count)
 
-   ElapsedTimeLocalStart = REAL(Count-BaseElapsedTime)
+   ElapsedTimeLocalStart = real(Count-BaseElapsedTime)
    call CPU_TIME(CPUTimeLocalStart)
 
    ! call FLUSH(trace_unit)

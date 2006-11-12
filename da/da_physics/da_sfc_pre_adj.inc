@@ -18,24 +18,24 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    !  P2  = Pressure at level 2
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    ! Perturbation:
-   REAL, INTENT (in)     :: psfcm_prime          ! model pressure at ho
-   REAL, INTENT (inout)  :: psm_prime, tsm_prime, &
+   real, intent (in)     :: psfcm_prime          ! model pressure at ho
+   real, intent (inout)  :: psm_prime, tsm_prime, &
                             qsm_prime            ! model surface p, t, q 
    ! Basic state:
-   REAL, INTENT (in)     :: psm, tsm, qsm        ! model pressure at ho and
+   real, intent (in)     :: psm, tsm, qsm        ! model pressure at ho and
                                                  ! model surface p, t, q 
    ! Constant variables:
-   REAL, INTENT (in)           :: hsm, ho
-   REAL, INTENT (in), OPTIONAL :: to, qvo
+   real, intent (in)           :: hsm, ho
+   real, intent (in), optional :: to, qvo
    ! working array:
-   REAL                 :: tvo, tvsm, tv, dz, arg0
-   REAL                 :: tvsm_prime, tvo_prime, tv_prime, arg, arg_prime
+   real                 :: tvo, tvsm, tv, dz, arg0
+   real                 :: tvsm_prime, tvo_prime, tv_prime, arg, arg_prime
 
-   REAL, PARAMETER      :: GASR =  gas_constant
-   REAL, PARAMETER      :: G = gravity
+   real, parameter      :: GASR =  gas_constant
+   real, parameter      :: G = gravity
 
    !---------------------------------------------------------------------------
    ! 1.0 Basic state
@@ -52,7 +52,7 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
       tvo = to
    else
       tvo = tvsm
-   endif
+   end if
 
    ! 1.2  Mean virtual temperature
    ! ----------------------------
@@ -96,7 +96,7 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
       tvo_prime = 0.0
    else
       tvsm_prime = tvo_prime + tvsm_prime
-   endif
+   end if
 
    ! 2.5 tvsm_prime ==>  tsm_prime, qsm_prime
    ! ----------------------------------------

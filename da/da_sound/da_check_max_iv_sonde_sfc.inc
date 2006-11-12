@@ -1,35 +1,35 @@
 subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
              itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
 
-   IMPLICIT NONE
-   INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-   TYPE (synop_type), INTENT(INOUT)       :: sonde_sfc
-   INTEGER, INTENT(INOUT) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   implicit none
+   integer,           intent (in)         :: it      ! Outer iteration
+   type (synop_type), intent(inout)       :: sonde_sfc
+   integer, intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-   LOGICAL                                :: failed
+   logical                                :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   IF ( check_max_iv_print )THEN
-      WRITE (check_max_iv_unit,'(A)')  &
+   if ( check_max_iv_print )then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for Sonde_sfc_U   = ',max_error_uv, &
          'Error max test ratio for Sonde_sfc_V   = ',max_error_uv, &
          'Error max test ratio for Sonde_sfc_P   = ',max_error_p,  &
          'Error max test ratio for Sonde_sfc_T   = ',max_error_t,  &
          'Error max test ratio for Sonde_sfc_QV  = ',max_error_q
-   ENDIF
+   end if
 
    !---------------------------------------------------------------------------
    ! [2.0] Perform maximum innovation vector check:
    !---------------------------------------------------------------------------
 
-   failed = .FALSE.
+   failed = .false.
 
    ! U-wind
    call da_max_error_qc(it, sonde_sfc % info, sonde_sfc % u, &

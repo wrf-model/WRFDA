@@ -1,33 +1,33 @@
 subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
-   TYPE (xb_type),  INTENT(IN)   :: xb          ! first guess state.
+   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
+   type (xb_type),  intent(in)   :: xb          ! first guess state.
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j     ! Index dimension.
-   REAL                          :: dx, dxm  !
-   REAL                          :: dy, dym  !
-   INTEGER                       :: num_levs ! obs vertical levels
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j     ! Index dimension.
+   real                          :: dx, dxm  !
+   real                          :: dy, dym  !
+   integer                       :: num_levs ! obs vertical levels
 
-   INTEGER                        :: k
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)       :: pre_ma,tv_ma
-   INTEGER                        :: layer1,layer2,ks,ke
-   REAL                           :: tv1,tv2,pres2
+   integer                        :: k
+   real, dimension(xp%kts-1:xp%kte+1)       :: pre_ma,tv_ma
+   integer                        :: layer1,layer2,ks,ke
+   real                           :: tv1,tv2,pres2
 
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
-   REAL                           :: ADJ_tv1,ADJ_tv2
+   real, dimension(xp%kts-1:xp%kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
+   real                           :: ADJ_tv1,ADJ_tv2
 
    ADJ_pre_ma(:) = 0.
    ADJ_tv_ma(:)  = 0.
    ADJ_tv1 = 0.
    ADJ_tv2 = 0.
 
-   IF ( iv%num_satem > 0 ) THEN
+   if ( iv%num_satem > 0 ) then
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
          num_levs = iv % satem(n) % info % levels
@@ -54,7 +54,7 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
          ! [4.0] Adjoint calculation of Satem thickness
 
          do k=1, num_levs
-            IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
+            if ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) then
                call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
                  ks,ke)
 
@@ -68,8 +68,8 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
                pres2 = iv%satem(n)%p(k)
                layer2 = layer1
                tv2 = tv1
-            ENDIF
-         enddo
+            end if
+         end do
 
          ! [5.0] Adjoint of layer-finding and vertical interpolation
 
@@ -80,8 +80,8 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
          call da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
-      ENDDO
-   ENDIF
+      end do
+   end if
 
 end subroutine da_transform_xtoy_satem_adj
 

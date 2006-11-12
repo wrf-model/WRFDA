@@ -1,4 +1,4 @@
-MODULE da_pilot
+module da_pilot
 
    use da_control
    use da_define_structures
@@ -9,21 +9,21 @@ MODULE da_pilot
 
    ! The "stats_pilot_type" is ONLY used locally in da_pilot:
 
-   TYPE residual_pilot1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-   END TYPE residual_pilot1_type
+   type residual_pilot1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+   end type residual_pilot1_type
 
-   TYPE maxmin_pilot_stats_type
-      TYPE (maxmin_type)         :: u, v
-   END TYPE maxmin_pilot_stats_type
+   type maxmin_pilot_stats_type
+      type (maxmin_type)         :: u, v
+   end type maxmin_pilot_stats_type
 
-   TYPE stats_pilot_type
-      TYPE (maxmin_pilot_stats_type)  :: maximum, minimum
-      TYPE (residual_pilot1_type)     :: average, rms_err
-   END TYPE stats_pilot_type
+   type stats_pilot_type
+      type (maxmin_pilot_stats_type)  :: maximum, minimum
+      type (residual_pilot1_type)     :: average, rms_err
+   end type stats_pilot_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_pilot.inc"
 #include "da_calculate_jo_and_grady_pilot.inc"

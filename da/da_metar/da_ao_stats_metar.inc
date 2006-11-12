@@ -1,16 +1,16 @@
 subroutine da_ao_stats_metar( stats_unit, oi, re )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
-  TYPE ( y_type), INTENT (in)      :: re            ! A - O
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
+  type ( y_type), intent (in)      :: re            ! A - O
 
-  TYPE (stats_metar_type)                :: metar
-  INTEGER                          :: nu, nv, nt, np, nq
-  INTEGER                          :: n
+  type (stats_metar_type)                :: metar
+  integer                          :: nu, nv, nt, np, nq
+  integer                          :: n
 
-  IF (trace_use) call da_trace_entry("da_ao_stats_metar")
+  if (trace_use) call da_trace_entry("da_ao_stats_metar")
 
 
   nu = 0
@@ -33,8 +33,8 @@ subroutine da_ao_stats_metar( stats_unit, oi, re )
   metar%average = residual_metar1_type(0.0, 0.0, 0.0, 0.0, 0.0)
   metar%rms_err = metar%average
 
-  IF ( oi%num_metar > 0 ) THEN
-    DO n=1, oi%num_metar
+  if ( oi%num_metar > 0 ) then
+    do n=1, oi%num_metar
       if( oi%metar(n)%loc%proc_domain ) then
         call da_stats_calculate( n, 0, oi%metar(n)%u%qc, & 
                               re%metar(n)%u, nu, &
@@ -57,9 +57,9 @@ subroutine da_ao_stats_metar( stats_unit, oi, re )
                               metar%minimum%q, metar%maximum%q, &
                               metar%average%q, metar%rms_err%q )
 
-      endif    ! end if( oi%metar(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%metar(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -90,14 +90,14 @@ subroutine da_ao_stats_metar( stats_unit, oi, re )
                           Metar%minimum%q%n, Metar%maximum%q%n, &
                           Metar%minimum%q%l, Metar%maximum%q%l )
 
-  IF ( rootproc ) THEN
-    IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) THEN
+  if ( rootproc ) then
+    if ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for metar'
       call da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
-    END IF
-  END IF
+    end if
+  end if
 
-  IF (trace_use) call da_trace_exit("da_ao_stats_metar")
+  if (trace_use) call da_trace_exit("da_ao_stats_metar")
 
 
 end subroutine da_ao_stats_metar

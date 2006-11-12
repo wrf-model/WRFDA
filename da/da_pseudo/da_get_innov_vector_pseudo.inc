@@ -1,25 +1,25 @@
 subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN)   :: xb          ! Background structure 
-   TYPE (xpose_type), INTENT(IN):: xp          ! Domain decomposition vars.
-   TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT):: iv          ! O-B structure.
+   type (xb_type), intent(in)   :: xb          ! Background structure 
+   type (xpose_type), intent(in):: xp          ! Domain decomposition vars.
+   type ( y_type), intent(out)  :: ob          ! Observation structure.
+   type (ob_type), intent(inout):: iv          ! O-B structure.
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  ! Interpolation weights.
-   REAL                         :: dy, dym  ! Interpolation weights.
-   REAL                         :: model_u  ! Model value u at oblocation.
-   REAL                         :: model_v  ! Model value v at oblocation.
-   REAL                         :: model_t  ! Model value t at oblocation.
-   REAL                         :: model_p  ! Model value p at oblocation.
-   REAL                         :: model_q  ! Model value q at oblocation.
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  ! Interpolation weights.
+   real                         :: dy, dym  ! Interpolation weights.
+   real                         :: model_u  ! Model value u at oblocation.
+   real                         :: model_v  ! Model value v at oblocation.
+   real                         :: model_t  ! Model value t at oblocation.
+   real                         :: model_p  ! Model value p at oblocation.
+   real                         :: model_q  ! Model value q at oblocation.
 
-   IF ( iv % num_pseudo > 0 ) THEN
+   if ( iv % num_pseudo > 0 ) then
 
-      DO n=1, iv % num_pseudo
+      do n=1, iv % num_pseudo
          ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i
@@ -29,7 +29,7 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
          dx = iv%pseudo(n)%loc%dx
          dxm = iv%pseudo(n)%loc%dxm
 
-         write(UNIT=stdout, fmt='(/a,2i5/a,4f15.5/)') &
+         write(unit=stdout, fmt='(/a,2i5/a,4f15.5/)') &
               'pseudo: i,j=', i,j, &
               'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 
@@ -72,8 +72,8 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
          else if ( pseudo_var(1:1) == 'q' ) then
             ob % pseudo(n) % q = model_q + iv % pseudo(n) % q % inv
          end if 
-      END DO
-   ENDIF
+      end do
+   end if
 
 end subroutine da_get_innov_vector_pseudo
 

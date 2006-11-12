@@ -1,123 +1,123 @@
-MODULE da_module_couple_uv
+module da_module_couple_uv
 
-CONTAINS
+contains
 
 !------------------------------------------------------------------------
 
 subroutine da_couple_uv ( u,  v,  mu, mub,  msfu, msfv, &
                        ids, ide, jds, jde, kds, kde )
 
-   IMPLICIT NONE
+   implicit none
 
 !--Input data.
 
-   INTEGER, INTENT(IN) :: ids, ide, jds, jde, kds, kde
+   integer, intent(in) :: ids, ide, jds, jde, kds, kde
 
-   REAL, DIMENSION(ids:ide+1, jds:jde  , kds:kde), INTENT(INOUT) :: u
-   REAL, DIMENSION(ids:ide  , jds:jde+1, kds:kde), INTENT(INOUT) :: v
+   real, dimension(ids:ide+1, jds:jde  , kds:kde), intent(inout) :: u
+   real, dimension(ids:ide  , jds:jde+1, kds:kde), intent(inout) :: v
 
-   REAL, DIMENSION(ids:ide+1, jds:jde  ),          INTENT(IN   ) :: msfu
-   REAL, DIMENSION(ids:ide  , jds:jde+1),          INTENT(IN   ) :: msfv
+   real, dimension(ids:ide+1, jds:jde  ),          intent(in   ) :: msfu
+   real, dimension(ids:ide  , jds:jde+1),          intent(in   ) :: msfv
 
-   REAL, DIMENSION(ids:ide  , jds:jde  ),          INTENT(IN   ) :: mu, mub
+   real, dimension(ids:ide  , jds:jde  ),          intent(in   ) :: mu, mub
 
-   REAL, ALLOCATABLE, DIMENSION(:, :) :: muu, muv
+   real, allocatable, dimension(:, :) :: muu, muv
 
    allocate(muu(ids:ide+1, jds:jde  ))
    allocate(muv(ids:ide  , jds:jde+1))
 
 !--couple variables u, v
 
-   CALL da_calc_mu_uv ( mu, mub, muu, muv, &
+   call da_calc_mu_uv ( mu, mub, muu, muv, &
                      ids, ide, jds, jde )
 
-   CALL da_couple ( muu, u, msfu, &
+   call da_couple ( muu, u, msfu, &
                  ids, ide+1, jds, jde, kds, kde )
 
-   CALL da_couple ( muv, v, msfv, &
+   call da_couple ( muv, v, msfv, &
                  ids, ide, jds, jde+1, kds, kde )
 
    deallocate(muu)
    deallocate(muv)
 
-END subroutine da_couple_uv
+end subroutine da_couple_uv
 
 !-------------------------------------------------------------------------------
 
 subroutine da_calc_mu_uv ( mu, mub, muu, muv, &
                         ids, ide, jds, jde )
 
-   IMPLICIT NONE
+   implicit none
 
 !--Input data
 
-   INTEGER, INTENT(IN) :: ids, ide, jds, jde
+   integer, intent(in) :: ids, ide, jds, jde
 
-   REAL, DIMENSION(ids:ide, jds:jde),     INTENT(IN   ) :: mu,  mub
+   real, dimension(ids:ide, jds:jde),     intent(in   ) :: mu,  mub
 
-   REAL, DIMENSION(ids:ide+1, jds:jde  ), INTENT(  OUT) :: muu
-   REAL, DIMENSION(ids:ide  , jds:jde+1), INTENT(  OUT) :: muv
+   real, dimension(ids:ide+1, jds:jde  ), intent(  out) :: muu
+   real, dimension(ids:ide  , jds:jde+1), intent(  out) :: muv
 
-   REAL, DIMENSION(ids-1:ide+1, jds-1:jde+1) :: mut
+   real, dimension(ids-1:ide+1, jds-1:jde+1) :: mut
 
-   INTEGER :: i, j
+   integer :: i, j
 
    DO j=jds,jde
       DO i=ids,ide
          mut(i,j) = mu(i,j)+mub(i,j)
-      ENDDO
+      endDO
 
       mut(ids-1,j) = mut(ids,j)
       mut(ide+1,j) = mut(ide,j)
-   ENDDO
+   endDO
 
    DO i=ids-1,ide+1
       mut(i,jds-1)=mut(i,jds)
       mut(i,jde+1)=mut(i,jde)
-   ENDDO
+   endDO
 
    DO j=jds,jde
    DO i=ids,ide+1
       muu(i,j) = 0.5*(mut(i,j)+mut(i-1,j))
-   ENDDO
-   ENDDO
+   endDO
+   endDO
 
    DO j=jds,jde+1
    DO i=ids,ide
       muv(i,j) = 0.5*(mut(i,j)+mut(i,j-1))
-   ENDDO
-   ENDDO
+   endDO
+   endDO
 
-END subroutine da_calc_mu_uv
+end subroutine da_calc_mu_uv
 
 !-------------------------------------------------------------------------------
 
 subroutine da_couple ( mut, field, msf, &
                     ids, ide, jds, jde, kds, kde )
 
-   IMPLICIT NONE
+   implicit none
 
 !--Input data
 
-   INTEGER, INTENT(IN) :: ids, ide, jds, jde, kds, kde
+   integer, intent(in) :: ids, ide, jds, jde, kds, kde
 
-   REAL, DIMENSION(ids:ide, jds:jde),          INTENT(IN   ) :: mut, msf
+   real, dimension(ids:ide, jds:jde),          intent(in   ) :: mut, msf
   
-   REAL, DIMENSION(ids:ide, jds:jde, kds:kde), INTENT(INOUT) :: field
+   real, dimension(ids:ide, jds:jde, kds:kde), intent(inout) :: field
   
 !--Local data
   
-   INTEGER :: i, j, k
+   integer :: i, j, k
   
    DO j=jds,jde
    DO k=kds,kde
    DO i=ids,ide
       field(i,j,k)=field(i,j,k)*mut(i,j)/msf(i,j)
-   ENDDO
-   ENDDO
-   ENDDO
+   endDO
+   endDO
+   endDO
 
-END subroutine da_couple
+end subroutine da_couple
 
-END MODULE da_module_couple_uv
+end module da_module_couple_uv
 

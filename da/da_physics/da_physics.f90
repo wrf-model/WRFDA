@@ -1,4 +1,4 @@
-MODULE da_physics
+module da_physics
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Contains routines to calculate physical quantities.
@@ -12,9 +12,9 @@ MODULE da_physics
    use da_reporting
    use module_wrf_error
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_prho_to_t_adj.inc"
 #include "da_prho_to_t_lin.inc"
@@ -80,5 +80,5 @@ MODULE da_physics
 #include "da_wdt.inc"
 #include "da_integrat_dz.inc"
 
-END MODULE da_physics
+end module da_physics
 

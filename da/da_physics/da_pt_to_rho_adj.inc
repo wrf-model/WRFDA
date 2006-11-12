@@ -3,19 +3,19 @@ subroutine da_pt_to_rho_adj( xb, xa )
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint of da_pt_to_rho.
    !
-   !  ASSUMPTIONS: 1) Model level stored top down
+   !  ASsumPTIONS: 1) Model level stored top down
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (x_type),  INTENT(INOUT) :: xa           ! Increment structure.
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (x_type),  intent(inout) :: xa           ! Increment structure.
 
-   INTEGER                       :: i,j,k        ! Loop counter.
+   integer                       :: i,j,k        ! Loop counter.
 
-   INTEGER                       :: is, ie, js, je
+   integer                       :: is, ie, js, je
 
-   REAL                          :: temp
+   real                          :: temp
    
    is = xb%its
    js = xb%jts
@@ -35,7 +35,7 @@ subroutine da_pt_to_rho_adj( xb, xa )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! Calculate rho increments:

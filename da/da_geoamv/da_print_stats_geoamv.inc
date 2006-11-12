@@ -2,9 +2,9 @@ subroutine da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
 
    implicit none
 
-   INTEGER,           intent(in)    :: stats_unit
-   INTEGER,           intent(inout) :: nu, nv
-   TYPE (stats_geoamv_type), intent(in)    :: geoamv
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv
+   type (stats_geoamv_type), intent(in)    :: geoamv
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k'

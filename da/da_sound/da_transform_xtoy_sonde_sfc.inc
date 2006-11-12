@@ -1,19 +1,19 @@
 subroutine da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),     INTENT(INoUT) :: xa       ! gridded analysis increment.
-   TYPE (xb_type),    INTENT(IN)    :: xb       ! first guess state.
-   TYPE (ob_type),    INTENT(IN)    :: iv       ! Innovation vector (O-B).
-   type (xpose_type), INTENT(IN)    :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(INOUT) :: y        ! y = h (xa) (linear)
+   type (x_type),     intent(inoUT) :: xa       ! gridded analysis increment.
+   type (xb_type),    intent(in)    :: xb       ! first guess state.
+   type (ob_type),    intent(in)    :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: y        ! y = h (xa) (linear)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
 
-   IF (iv%num_sound > 0) THEN
+   if (iv%num_sound > 0) then
 
       !xyh      y%sonde_sfc(:)%u = 0.0
       !xyh      y%sonde_sfc(:)%v = 0.0
@@ -64,9 +64,9 @@ subroutine da_transform_xtoy_sonde_sfc ( xa, xb, iv, xp, y )
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
             call da_transform_xtopsfc( xb, xa, xp, iv%sonde_sfc(n), y%sonde_sfc(n) )
-         enddo
-     endif
-  ENDIF
+         end do
+     end if
+  end if
 
 end subroutine da_transform_xtoy_sonde_sfc
 

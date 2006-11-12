@@ -1,10 +1,10 @@
 subroutine da_print_stats_qscat( stats_unit, nu, nv, qscat )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nu, nv
-   TYPE (stats_qscat_type), INTENT(IN):: qscat
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv
+   type (stats_qscat_type), intent(in):: qscat
    
    write(unit=stats_unit, fmt='(3a/)') &
         '   var             ', &
@@ -26,5 +26,5 @@ subroutine da_print_stats_qscat( stats_unit, nu, nv, qscat )
         '    RMSE     : ', sqrt(qscat%rms_err%u/real(nu)), &
                       sqrt(qscat%rms_err%v/real(nv))
    
-END subroutine da_print_stats_qscat
+end subroutine da_print_stats_qscat
 

@@ -26,7 +26,7 @@ subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
       call med_shutdown_io ( head_grid , config_flags )
    END IF
 
-   call da_messages((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
+   call da_message((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
    call wrf_shutdown
 
    ! return success status

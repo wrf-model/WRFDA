@@ -22,73 +22,73 @@ subroutine da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
 
    ! Initilization
 
-   DO K=kts,kte
+   do K=kts,kte
       DUM2129(K) = 0.
       SCR89 (K) = 0.
       PRC59 (K) = 0.
-   ENDDO
+   end do
 
-   DO K=kts, kte
+   do K=kts, kte
 
       if (DT(k) <= 0.) cycle
 
       DUM114(K)=1.E3*SVP1*EXP(SVP2*(SCR71(K)-SVPT0)/(SCR71(K)-SVP3))
 
-      IF (SCR71(K) > TO) THEN
+      if (SCR71(K) > TO) then
          DUM212(K)=DUM31(K)*DUM31(K)/(gas_constant_v*PRD(K))
-      ELSE
+      else
          DUM212(K)=XLS*DUM31(K)/(gas_constant_v*PRD(K))
-      ENDIF
+      end if
       PRC5(K)=.622*DUM114(K)/(P_B(K)-DUM114(K))
 
-      IF (SCR42(K) < PRC5(K) .AND. SCR71(K) < TO) THEN
+      if (SCR42(K) < PRC5(K) .AND. SCR71(K) < TO) then
          SCR61(K)=0.
-      ELSE
+      else
          SCR8(K)=(SCR42(K)-PRC5(K))/(1.+DUM212(K)*PRC5(K)/  &
                  (SCR71(K)*SCR71(K)))
 
          DUM115(K)=SCR31(K)+SCR8(K)
-         IF(DUM115(K) >= 0.)THEN
+         if(DUM115(K) >= 0.)then
             SCR61(K)=SCR8(K)/DT(k)
-         ELSE
+         else
             SCR61(K)=-SCR31(K)/DT(k)
-         ENDIF
-      ENDIF
-      IF (SCR71(K) > TO)THEN
+         end if
+      end if
+      if (SCR71(K) > TO)then
          DUM213(K)=DUM31(K)/PRD(K)
-      ELSE
+      else
          DUM213(K)=XLS/PRD(K)
-      ENDIF
+      end if
 
       TTT9(K)=DT(K)*T_A(K)
       SCR619(K)=DT(K)*DUM213(K)*T_A(K)
       DUM2139(K)=DT(K)*SCR61(K)*T_A(K)
-      IF (QRN_B(K) < 1.E-25) QRN_A(K)=0.
+      if (QRN_B(K) < 1.E-25) QRN_A(K)=0.
       QRT9(K)=DT(K)*QRN_A(K)
 
       DUM319(K)=0.
-      IF (SCR71(K) > TO)THEN
+      if (SCR71(K) > TO)then
          DUM319(K)=DUM2139(K)/PRD(K)
          PRD9(K)=-DUM31(K)/(PRD(K)*PRD(K))*DUM2139(K)
-      ELSE
+      else
          PRD9(K)=-XLS/(PRD(K)*PRD(K))*DUM2139(K)
-      ENDIF
-      IF (QCW_B(K) < 1.E-25) QCW_A(K)=0.
+      end if
+      if (QCW_B(K) < 1.E-25) QCW_A(K)=0.
       QCT9(K)=DT(K)*QCW_A(K)
       SCR619(K)=SCR619(K)+DT(K)*QCW_A(K)
-      IF (QV_B(K) < 1.E-25) QV_A(K)=0.
+      if (QV_B(K) < 1.E-25) QV_A(K)=0.
       QVT9(K)=DT(K)*QV_A(K)
       SCR619(K)=SCR619(K)-DT(K)*QV_A(K)
 
       SCR319(K)=0.
       SCR429(K)=0.
       SCR719(K)=0.
-      IF (SCR42(K) >= PRC5(K) .OR. SCR71(K) >= TO) THEN
-         IF (DUM115(K) >= 0.)THEN
+      if (SCR42(K) >= PRC5(K) .OR. SCR71(K) >= TO) then
+         if (DUM115(K) >= 0.)then
             SCR89(K)=SCR89(K)+SCR619(K)/DT(k)
-         ELSE
+         else
             SCR319(K)=-SCR619(K)/DT(k)
-         ENDIF
+         end if
 
          TMP(K)=1./(1.+DUM212(K)*PRC5(K)/(SCR71(K)*SCR71(K)))
          SCR719(K)=TMP(K)*TMP(K)*2.*DUM212(K)*PRC5(K)  &
@@ -98,23 +98,23 @@ subroutine da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
          PRC59(K)=PRC59(K)-TMP(K)*(1.+(SCR42(K)-PRC5(K))*DUM212(K)/  &
                      (SCR71(K)*SCR71(K))*TMP(K))*SCR89(K)
          SCR429(K)=TMP(K)*SCR89(K)
-      ENDIF
+      end if
 
       TMP(K)=.622/(P_B(K)-DUM114(K))**2
       DUM1149(K)=TMP(K)*P_B(K)*PRC59(K)
       P_A(K)=P_A(K)-TMP(K)*DUM114(K)*PRC59(K)
-      IF (SCR71(K) > TO) THEN
+      if (SCR71(K) > TO) then
          PRD9(K)=PRD9(K)-DUM31(K)*DUM31(K)/   &
                  (gas_constant_v*PRD(K)*PRD(K))*DUM2129(K)
          DUM319(K)=DUM319(K)+2.*DUM31(K)/(gas_constant_v*PRD(K))*DUM2129(K)
-      ELSE
+      else
          PRD9(K)=PRD9(K)-XLS*DUM31(K)/(gas_constant_v*PRD(K)*PRD(K))*DUM2129(K)
          DUM319(K)=DUM319(K)+XLS/(gas_constant_v*PRD(K))*DUM2129(K)
-      ENDIF
+      end if
       DUM114(K)=1.E3*SVP1*EXP(SVP2*(SCR71(K)-SVPT0)/(SCR71(K)-SVP3))
       SCR719(K)=SCR719(K)+DUM114(K)*SVP2*(SVPT0-SVP3)/  &
                 (SCR71(K)-SVP3)**2*DUM1149(K)
 
-   ENDDO
+   end do
 
 end subroutine da_condens_adj

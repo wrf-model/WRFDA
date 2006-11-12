@@ -43,7 +43,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    if (trace_use) call da_trace_entry("da_setup_be_global")
 
 
-   call da_messages((/"[3.0] Set up background errors (be) for global WRF-Var"/))
+   call da_message((/"[3.0] Set up background errors (be) for global WRF-Var"/))
 
    be % max_wave = ide / 2 - 1
 

@@ -12,19 +12,19 @@ subroutine da_tpq_to_rh_lin1( t, p, es, rh, &
    !  METHOD: r~ = 100 * (q~/qs) - rh*(qs~/qs)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL, INTENT(IN)              :: t        ! Temperature.
-   REAL, INTENT(IN)              :: p        ! Pressure.
-   REAL, INTENT(IN)              :: es       ! Saturation vapour pressure.
-   REAL, INTENT(IN)              :: rh       ! Relative Humidity.
-   REAL, INTENT(IN)              :: t_prime  ! Temperature increment.
-   REAL, INTENT(IN)              :: p_prime  ! Pressure increment.
-   REAL, INTENT(IN)              :: q_prime  ! Pressure increment.
-   REAL, INTENT(OUT)             :: rh_prime ! Pressure increment.
+   real, intent(in)              :: t        ! Temperature.
+   real, intent(in)              :: p        ! Pressure.
+   real, intent(in)              :: es       ! Saturation vapour pressure.
+   real, intent(in)              :: rh       ! Relative Humidity.
+   real, intent(in)              :: t_prime  ! Temperature increment.
+   real, intent(in)              :: p_prime  ! Pressure increment.
+   real, intent(in)              :: q_prime  ! Pressure increment.
+   real, intent(out)             :: rh_prime ! Pressure increment.
    
-   REAL                          :: es1, qs  ! Saturation specific humidity.
-   REAL                          :: qs_prime_over_qs ! qs~/qs.
+   real                          :: es1, qs  ! Saturation specific humidity.
+   real                          :: qs_prime_over_qs ! qs~/qs.
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:

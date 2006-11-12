@@ -2,28 +2,28 @@ subroutine da_calculate_residual_metar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n
 
-   IF (trace_use) call da_trace_entry("da_calculate_residual_metar")
+   if (trace_use) call da_trace_entry("da_calculate_residual_metar")
 
-   IF ( oi%num_metar > 0 ) THEN
+   if ( oi%num_metar > 0 ) then
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
       n_obs_bad % t % num = number(0, 0, 0)
       n_obs_bad % p % num = number(0, 0, 0)
       n_obs_bad % q % num = number(0, 0, 0)
 
-      DO n=1, oi%num_metar
+      do n=1, oi%num_metar
          np_available = np_available + 5
 
          re%metar(n)%u = da_residual( n, 0, y%metar(n)%u, &
@@ -36,7 +36,7 @@ subroutine da_calculate_residual_metar( oi, y, re,                        &
                                   oi%metar(n)%p, n_obs_bad % p )
          re%metar(n)%q = da_residual( n, 0, y%metar(n)%q, &
                                   oi%metar(n)%q, n_obs_bad % q )
-      END DO
+      end do
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &
                   n_obs_bad % v % num % miss + n_obs_bad % t % num % miss + &
@@ -48,9 +48,9 @@ subroutine da_calculate_residual_metar( oi, y, re,                        &
                    n_obs_bad % v % num % use + n_obs_bad % t % num % use + &
                    n_obs_bad % p % num % use + n_obs_bad % q % num % use
 
-   ENDIF
+   end if
 
-   IF (trace_use) call da_trace_exit("da_calculate_residual_metar")
+   if (trace_use) call da_trace_exit("da_calculate_residual_metar")
 
 end subroutine da_calculate_residual_metar
 

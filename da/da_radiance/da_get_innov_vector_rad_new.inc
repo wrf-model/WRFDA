@@ -80,7 +80,8 @@ subroutine da_get_innov_vector_rad_new ( it, xb, xp, ob, iv )
 
       n1n2=n2-n1+1
 
-      if (.not. interp_new) then
+!      if (.not. interp_new) then
+if (.true.) then
          allocate (pres(1:nlevels))
          allocate (con_vars(n1:n2))
          allocate (aux_vars(n1:n2))

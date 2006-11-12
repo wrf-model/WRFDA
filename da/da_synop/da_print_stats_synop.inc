@@ -1,10 +1,10 @@
 subroutine da_print_stats_synop( stats_unit, nu, nv, nt, np, nq, synop )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                 INTENT(IN)    :: stats_unit
-   INTEGER,                 INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_synop_type), INTENT(IN)    :: synop
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv, nt, np, nq
+   type (stats_synop_type), intent(in)    :: synop
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

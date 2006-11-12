@@ -1,13 +1,13 @@
 subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
    jo%Bogus_u   = 0.0
    jo%Bogus_v   = 0.0
@@ -15,8 +15,8 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
    jo%Bogus_q   = 0.0
    jo%Bogus_slp = 0.0
 
-   IF (iv%num_Bogus > 0) THEN
-      DO n=1, iv%num_Bogus
+   if (iv%num_Bogus > 0) then
+      do n=1, iv%num_Bogus
          jo_grad_y%Bogus(n)%slp = -re%Bogus(n)%slp /  &
                                   ( iv%Bogus(n)%slp%error * &
                                     iv%Bogus(n)%slp%error )
@@ -49,9 +49,9 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
                              re%Bogus(n)%t(k) * jo_grad_y%Bogus(n)%t(k)
                jo%Bogus_q = jo%Bogus_q - &
                              re%Bogus(n)%q(k) * jo_grad_y%Bogus(n)%q(k)
-            enddo
+            end do
          end if 
-      END DO
+      end do
 
       jo % bogus_slp = 0.5 * jo % bogus_slp
       jo % bogus_u = 0.5 * jo % bogus_u
@@ -59,7 +59,7 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
       jo % bogus_t = 0.5 * jo % bogus_t
       jo % bogus_q = 0.5 * jo % bogus_q
 
-   END IF
+   end if
 
 end subroutine da_calculate_jo_and_grady_bogus
 

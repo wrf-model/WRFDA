@@ -1,18 +1,18 @@
 subroutine da_adj_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
                            ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,ADJ_sigma_v)
 ! ---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ---------------------------------------------------------------------------
 !
-!OUTPUT : ADJ_p0, ADJ_wv, ADJ_hwv, ADJ_ta, ADJ_gamma
-!INPUT  : ADJ_sigma_v
+!outPUT : ADJ_p0, ADJ_wv, ADJ_hwv, ADJ_ta, ADJ_gamma
+!inPUT  : ADJ_sigma_v
 ! ---------------------------------------------------------------------------
 
 
       integer ifreq
-      real, intent(IN   ):: p0,wv,hwv,ta,gamma  ! base field
-      real, intent(INOUT):: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma
-      real, intent(IN   ):: ADJ_sigma_v
+      real, intent(in   ):: p0,wv,hwv,ta,gamma  ! base field
+      real, intent(inout):: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma
+      real, intent(in   ):: ADJ_sigma_v
 !
       real wvc, wvcor(4)
       real ADJ_wvc
@@ -141,7 +141,7 @@ IMPLICIT NONE
       else
               sigv = 0.0
 
-      endif
+      end if
 
 !
       ADJ_sigv    = ADJ_sigma_v*wvc
@@ -264,9 +264,9 @@ IMPLICIT NONE
          ADJ_p0    = ADJ_pbar4/(1.0 + hwv/h4) + ADJ_p0
          ADJ_hwv   = -pbar4*ADJ_pbar4/h4/(1.0 + hwv/h4) + ADJ_hwv
 !
-      endif
+      end if
 
       ADJ_wv  = ADJ_wvc*wvcor(ifreq) + ADJ_wv
 
-END subroutine da_adj_cal_sigma_v
+end subroutine da_adj_cal_sigma_v
 

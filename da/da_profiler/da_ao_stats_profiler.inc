@@ -1,14 +1,14 @@
 subroutine da_ao_stats_profiler( stats_unit, oi, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
-   TYPE (stats_profiler_type)       :: Profiler
-   INTEGER                          :: nu, nv
-   INTEGER                          :: n, k
+   type (stats_profiler_type)       :: Profiler
+   integer                          :: nu, nv
+   integer                          :: n, k
 
    nu = 0
    nv = 0
@@ -21,9 +21,9 @@ subroutine da_ao_stats_profiler( stats_unit, oi, re )
    Profiler%average = residual_profiler1_type(0.0, 0.0)
    Profiler%rms_err = Profiler%average
 
-   IF ( oi%num_Profiler > 0 ) THEN
+   if ( oi%num_Profiler > 0 ) then
 
-      DO n=1, oi%num_Profiler
+      do n=1, oi%num_Profiler
 
       if( oi%profiler(n)%loc%proc_domain ) then
 
@@ -37,10 +37,10 @@ subroutine da_ao_stats_profiler( stats_unit, oi, re )
                                Profiler%minimum%v, Profiler%maximum%v, &
                                Profiler%average%v, Profiler%rms_err%v )
        end do
-      endif    ! end if( oi%profiler(n)%loc%proc_domain )
-      END DO
+      end if    ! end if( oi%profiler(n)%loc%proc_domain )
+      end do
       
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
@@ -56,17 +56,17 @@ subroutine da_ao_stats_profiler( stats_unit, oi, re )
                            Profiler%minimum%v%n, Profiler%maximum%v%n, &
                            Profiler%minimum%v%l, Profiler%maximum%v%l )
    
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    
-    IF ( nu /= 0 .or. nv /= 0 ) THEN
+    if ( nu /= 0 .or. nv /= 0 ) then
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Profiler'
    
       call da_print_stats_profiler(stats_unit, nu, nv, Profiler)
    
-    END IF
+    end if
    
-   END IF
+   end if
 
 end subroutine da_ao_stats_profiler
 

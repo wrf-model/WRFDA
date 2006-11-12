@@ -44,47 +44,47 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL, INTENT (in)                :: ps , ts , qs , us, vs
-   REAL, INTENT (in)                :: ps2, ts2, qs2, psfc, tg
-   REAL, INTENT (in)                :: hs, roughness, xland
+   real, intent (in)                :: ps , ts , qs , us, vs
+   real, intent (in)                :: ps2, ts2, qs2, psfc, tg
+   real, intent (in)                :: hs, roughness, xland
 
-   REAL,    INTENT (out)            :: regime
-   REAL   , INTENT (out)            :: u10, v10, t2, q2
+   real,    intent (out)            :: regime
+   real   , intent (out)            :: u10, v10, t2, q2
 
    ! Maximum number of iterations in computing psim, psih
 
-   INTEGER, PARAMETER :: k_iteration = 10
-   ! INTEGER, PARAMETER :: k_iteration = 1
+   integer, parameter :: k_iteration = 10
+   ! integer, parameter :: k_iteration = 1
 
    ! h10 is the height of 10m where the wind observed
    ! h2  is the height of 2m where the temperature and 
    !        moisture observed.
 
-   REAL, PARAMETER :: h10 = 10., h2 = 2.
+   real, parameter :: h10 = 10., h2 = 2.
    
    ! Default roughness over the land
 
-   REAL, PARAMETER :: zint0 = 0.01 
+   real, parameter :: zint0 = 0.01 
    
    ! Von Karman constant
 
-   REAL, PARAMETER :: k_kar = 0.4
+   real, parameter :: k_kar = 0.4
    
    ! Working variables
 
-   REAL :: Vc2, Va2, V2 
-   REAL :: rib, rcp, xx, yy, cc
-   REAL :: psiw, psiz, mol, ust, hol, holz, hol2
-   REAL :: psim, psimz, psim2, psih, psihz, psih2
-   REAL :: psit, psit2, psiq, psiq2
-   REAL :: gzsoz0, gz10oz0, gz2oz0
-   REAL :: eg, qg, tvg, tvs, tvs2
-   REAL :: ths, thg, thvs, thvg, thvs2
-   REAL :: zq0, z0
+   real :: Vc2, Va2, V2 
+   real :: rib, rcp, xx, yy, cc
+   real :: psiw, psiz, mol, ust, hol, holz, hol2
+   real :: psim, psimz, psim2, psih, psihz, psih2
+   real :: psit, psit2, psiq, psiq2
+   real :: gzsoz0, gz10oz0, gz2oz0
+   real :: eg, qg, tvg, tvs, tvs2
+   real :: ths, thg, thvs, thvg, thvs2
+   real :: zq0, z0
 
-   REAL, PARAMETER :: ka = 2.4E-5
+   real, parameter :: ka = 2.4E-5
 
    rcp = gas_constant/cp
 
@@ -102,7 +102,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       zq0 = z0
    else
       zq0 =  zint0
-   endif
+   end if
 
    ! 1.3 Define the some constant variable for psi
 
@@ -167,7 +167,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       Vc2 = 4. * (thvg - thvs)
    else
       Vc2 = 0.
-   endif
+   end if
    
    V2  = Va2 + Vc2
 
@@ -178,7 +178,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    ! 6.  CALCULATE PSI BASED UPON REGIME
 
 
-   IF (rib .GE. 0.2) THEN
+   if (rib .GE. 0.2) then
       ! 6.1 Stable conditions (REGIME 1)
       !     ---------------------------
       regime = 1.1
@@ -192,7 +192,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psihz = psimz
       psih2 = psim2
 
-   ELSE IF ((rib .LT. 0.2) .AND. (rib .GT. 0.)) THEN
+   else if ((rib .LT. 0.2) .AND. (rib .GT. 0.)) then
       ! 6.2 Mechanically driven turbulence (REGIME 2)
 
       regime = 2.1
@@ -207,7 +207,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psihz = psimz
       psih2 = psim2
 
-   ELSE IF ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) THEN
+   else if ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) then
       ! 6.3 Unstable Forced convection (REGIME 3)
 
       regime = 3.1
@@ -218,7 +218,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psihz = psimz
       psih2 = psim2
 
-   ELSE 
+   else 
       ! 6.4 Free convection (REGIME 4)
       regime = 4.1
 
@@ -246,7 +246,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
          hol = rib * gzsoz0
       else
          hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
-      endif
+      end if
 
       ! 6.4.2  Calculate n, nz, R, Rz
 
@@ -296,7 +296,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
       psih2 = 2. * yy
 
-      ! enddo 
+      ! end do 
 
       ! 6.4.4 Define the limit value for psim & psih
 
@@ -306,9 +306,9 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psih = min(psih,0.9*gzsoz0)
       psihz = min(psihz,0.9*gz10oz0)
       psih2 = min(psih2,0.9*gz2oz0)
-   ENDIF  ! Regime
+   end if  ! Regime
 
-   ! 7.  CALCULATE PSI FOR WIND, TEMPERATURE AND MOISTURE
+   ! 7.  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
 
    psiw = gzsoz0 - psim
    psiz = gz10oz0 - psimz
@@ -321,7 +321,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
    psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
 
-   ! 8.  CALCULATE 10M WIND, 2M TEMPERATURE AND MOISTURE
+   ! 8.  CALCULATE 10M WinD, 2M TEMPERATURE AND MOISTURE
 
    u10 = us * psiz / psiw
    v10 = vs * psiz / psiw

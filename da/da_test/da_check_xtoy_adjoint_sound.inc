@@ -1,16 +1,16 @@
 subroutine da_check_xtoy_adjoint_sound( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n, k          ! Loop counter.
+   integer                        :: n, k          ! Loop counter.
 
-   IF ( oi%num_Sound < 1 ) return
+   if ( oi%num_Sound < 1 ) return
 
-   DO n=1, oi%num_Sound
+   do n=1, oi%num_Sound
       if( oi%sound(n)%loc%proc_domain ) then
          do k=1, oi%sound(n)%info%levels
             adjtest_lhs = adjtest_lhs + &
@@ -18,8 +18,8 @@ subroutine da_check_xtoy_adjoint_sound( oi, y, adjtest_lhs, pertile_lhs )
                           ( y%Sound(n)%v(k)/typical_v_rms )**2 + &
                           ( y%Sound(n)%t(k)/typical_t_rms )**2 + &
                           ( y%Sound(n)%q(k)/typical_q_rms )**2
-         enddo
-      endif
+         end do
+      end if
 
       do k=1, oi%sound(n)%info%levels
          pertile_lhs = pertile_lhs + &
@@ -32,8 +32,8 @@ subroutine da_check_xtoy_adjoint_sound( oi, y, adjtest_lhs, pertile_lhs )
          y%sound(n)%v(k) = y%sound(n)%v(k) / typical_v_rms ** 2
          y%sound(n)%t(k) = y%sound(n)%t(k) / typical_t_rms ** 2
          y%sound(n)%q(k) = y%sound(n)%q(k) / typical_q_rms ** 2
-      enddo
-   ENDDO
+      end do
+   end do
 
 end subroutine da_check_xtoy_adjoint_sound
 

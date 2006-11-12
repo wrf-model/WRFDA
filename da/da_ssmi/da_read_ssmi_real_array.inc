@@ -7,6 +7,6 @@ subroutine da_read_ssmi_real_array(aa,nn,i0,i_step)
 
   do i = 1, nn
     ii = i_step*(i-1) + i0
-    READ (UNIT=char_ned (ii:ii+8),FMT='((f7.2,2X))') aa(i)
-  enddo
+    read (unit=char_ned (ii:ii+8),fmt='((f7.2,2X))') aa(i)
+  end do
 end subroutine da_read_ssmi_real_array

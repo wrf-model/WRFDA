@@ -1,21 +1,21 @@
 subroutine da_check_xtoy_adjoint_satem( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n, k          ! Loop counter.
+   integer                        :: n, k          ! Loop counter.
 
-   IF (oi%num_Satem > 0) THEN
-      DO n=1, oi%num_Satem
+   if (oi%num_Satem > 0) then
+      do n=1, oi%num_Satem
          if (oi%satem(n)%loc%proc_domain) then
             do k=1, oi%satem(n)%info%levels
                adjtest_lhs = adjtest_lhs + &
                   ( y%Satem(n)%thickness(k)/typical_thickness_rms )**2
-            enddo
-         endif
+            end do
+         end if
 
          do k=1, oi%satem(n)%info%levels
             pertile_lhs = pertile_lhs + &
@@ -24,9 +24,9 @@ subroutine da_check_xtoy_adjoint_satem( oi, y, adjtest_lhs, pertile_lhs )
             y%satem(n)%thickness(k) = y%satem(n)%thickness(k) /      &
                                       typical_thickness_rms ** 2
 
-         enddo
-      ENDDO
-   ENDIF
+         end do
+      end do
+   end if
 
 end subroutine da_check_xtoy_adjoint_satem
 

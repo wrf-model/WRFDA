@@ -7,29 +7,29 @@ subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    !  Modified to be standard structure by Y.-R. Guo   06/21/2005
    !---------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type),    INTENT(IN)     :: xb       ! first guess state.
-   TYPE (ob_type),    INTENT(IN)     :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN)     :: xp          ! Domain decomposition vars.
-   TYPE (y_type) ,    INTENT(INOUT)  :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) ,    INTENT(INOUT)  :: jo_grad_x   ! grad_x(jo)
+   type (xb_type),    intent(in)     :: xb       ! first guess state.
+   type (ob_type),    intent(in)     :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in)     :: xp          ! Domain decomposition vars.
+   type (y_type) ,    intent(inout)  :: jo_grad_y   ! grad_y(jo)
+   type (x_type) ,    intent(inout)  :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs
-   REAL                           :: dx, dxm  ! 
-   REAL                           :: dy, dym  !
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs
+   real                           :: dx, dxm  ! 
+   real                           :: dy, dym  !
 
-   REAL, DIMENSION(xp%kms:xp%kme) :: model_t,tt
-   REAL, DIMENSION(xp%kms:xp%kme) :: model_q,qq
-   REAL, DIMENSION(xp%kms:xp%kme) :: model_p_c,pp
-   REAL                           :: psfc_loc,terr_loc,ppsfc                     
+   real, dimension(xp%kms:xp%kme) :: model_t,tt
+   real, dimension(xp%kms:xp%kme) :: model_q,qq
+   real, dimension(xp%kms:xp%kme) :: model_p_c,pp
+   real                           :: psfc_loc,terr_loc,ppsfc                     
 
-   IF ( iv%num_bogus > 0 ) THEN
-!xyh      DO n=1, iv % num_bogus
+   if ( iv%num_bogus > 0 ) then
+!xyh      do n=1, iv % num_bogus
 
-      DO n= iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+      do n= iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
 
          num_levs = iv % bogus(n) % info % levels
 
@@ -89,7 +89,7 @@ subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                          + dy *(dxm*xb%q(i,j+1,k) + dx*xb%q(i+1,j+1,k))
             model_p_c(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) &
                          + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         enddo
+         end do
 
          terr_loc = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) &
                    + dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
@@ -128,9 +128,9 @@ subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             jo_grad_x % p(i+1,j,k) = jo_grad_x % p(i+1,j,k)+ dym*dx*pp(k)
             jo_grad_x % p(i,j+1,k) = jo_grad_x % p(i,j+1,k)+ dy*dxm*pp(k)
             jo_grad_x % p(i+1,j+1,k)=jo_grad_x % p(i+1,j+1,k)+dy*dx*pp(k)
-         enddo
-      END DO
-   END IF
+         end do
+      end do
+   end if
 
 end subroutine da_transform_xtoy_bogus_adj
 

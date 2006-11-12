@@ -1,10 +1,10 @@
 subroutine da_print_stats_gpspw( stats_unit, ntpw, Gpspw )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: ntpw
-   TYPE (stats_gpspw_type), INTENT(IN)    :: Gpspw
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: ntpw
+   type (stats_gpspw_type), intent(in)    :: Gpspw
 
    if (ntpw > 0) then
       write(unit=stats_unit, fmt='(a/)') '   var           tpw(cm)     n'
@@ -19,7 +19,7 @@ subroutine da_print_stats_gpspw( stats_unit, ntpw, Gpspw )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
         ' Average   : ', gpspw%average%tpw/real(ntpw), &
         '    RMSE   : ', sqrt(gpspw%rms_err%tpw/real(ntpw))
-   endif
+   end if
 
 end subroutine da_print_stats_gpspw
 

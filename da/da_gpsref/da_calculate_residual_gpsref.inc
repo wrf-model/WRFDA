@@ -6,29 +6,29 @@ subroutine da_calculate_residual_gpsref( oi, y, re,               &
    ! Called by da_minimisation/da_calculate_residual.inc
    !-----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used, &
+   integer       , intent(inout)     :: np_available, np_obs_used, &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n, k
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k
 
-   IF ( oi%num_GPSRef < 1 ) return
+   if ( oi%num_GPSRef < 1 ) return
 
    n_obs_bad % gpsref % num = number(0, 0, 0)
 
-   DO n=1, oi%num_GPSRef
+   do n=1, oi%num_GPSRef
       do k=1, oi%gpsref(n)%info%levels
          np_available = np_available + 1
          re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
                                   oi%GPSRef(n)%ref(k), n_obs_bad%gpsref )
       end do
-   END DO
+   end do
 
    np_missing = np_missing + n_obs_bad % gpsref % num % miss
    np_bad_data = np_bad_data + n_obs_bad % gpsref % num % bad

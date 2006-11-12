@@ -1,44 +1,44 @@
 subroutine da_julian_day(NY,NM,ND,JD,METHOD) 
   
    !-----------------------------------------------------------------------
-   ! METHOD = 1: INPUT ---- NY, NM, ND.  OUTPUT ---- JD                 C        
-   ! METHOD = 2: INPUT ---- NY, JD.      OUTPUT ---- NM, ND             C 
+   ! METHOD = 1: inPUT ---- NY, NM, ND.  outPUT ---- JD                 C        
+   ! METHOD = 2: inPUT ---- NY, JD.      outPUT ---- NM, ND             C 
    !----------------------------------------------------------------------- 
     
-   IMPLICIT NONE
+   implicit none
 
-   integer,  intent(IN)    :: METHOD, NY
-   integer,  intent(INOUT) :: NM, ND, JD
+   integer,  intent(in)    :: METHOD, NY
+   integer,  intent(inout) :: NM, ND, JD
 
    integer                 :: LOOP
-   integer, DIMENSION(12)  :: MDAY = (/31,28,31,30,31,30,31,31,30,31,30,31/)
+   integer, dimension(12)  :: MDAY = (/31,28,31,30,31,30,31,31,30,31,30,31/)
 
-   IF (MOD(NY,4) == 0) then
+   if (MOD(NY,4) == 0) then
       MDAY(2)=29      
-      IF (MOD(NY,100) == 0) then
+      if (MOD(NY,100) == 0) then
          MDAY(2)=28
-         IF (MOD(NY,400) == 0) then
+         if (MOD(NY,400) == 0) then
             MDAY(2)=29
-         ENDIF
-      ENDIF
-   ENDIF
+         end if
+      end if
+   end if
 
-   IF (METHOD == 1) THEN                  
+   if (METHOD == 1) then                  
       JD=ND
-      JuDAY: DO LOOP=1,NM-1                  
+      JuDAY: do LOOP=1,NM-1                  
          JD=JD+MDAY(LOOP)                
-      ENDDO JuDAY                           
-   ELSE IF (METHOD == 2) THEN             
+      end do JuDAY                           
+   else if (METHOD == 2) then             
       NM=1                               
       ND=JD
-      NYEAR: DO LOOP=1,11                    
-         IF (ND <= MDAY(LOOP)) EXIT NYEAR
+      NYEAR: do LOOP=1,11                    
+         if (ND <= MDAY(LOOP)) exit NYEAR
 
          ND=ND-MDAY(LOOP)     
          NM=NM+1                      
-      ENDDO NYEAR                           
-   END IF                                
+      end do NYEAR                           
+   end if                                
 
-END subroutine da_julian_day
+end subroutine da_julian_day
 
 

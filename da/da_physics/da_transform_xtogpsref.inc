@@ -3,7 +3,7 @@ subroutine da_transform_XTogpsref(xb, xp)
 ! input : xb%q, xb%p, xb%t, and xp
 ! output: xb%ref
 
-   TYPE (xb_type), INTENT(inout) :: xb      ! First guess structure.
+   type (xb_type), intent(inout) :: xb      ! First guess structure.
    type(xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
    
    integer :: i, j, k, is, ie, js, je, ks, ke
@@ -33,9 +33,9 @@ subroutine da_transform_XTogpsref(xb, xp)
 !  3, Refractivity:
       xb%ref(i,j,k)= partone * parttwo
 
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
    
 end subroutine da_transform_XTogpsref
 

@@ -1,19 +1,19 @@
 subroutine da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x)
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j     ! Index dimension.
-   REAL                          :: dx, dxm  !
-   REAL                          :: dy, dym  !
-   INTEGER                       :: num_levs ! obs vertical levels
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j     ! Index dimension.
+   real                          :: dx, dxm  !
+   real                          :: dy, dym  !
+   integer                       :: num_levs ! obs vertical levels
 
-   IF ( iv%num_gpsref < 1 ) return
+   if ( iv%num_gpsref < 1 ) return
 
    do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref
@@ -37,7 +37,7 @@ subroutine da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x)
                              jo_grad_y%gpsref(n)%ref(1), num_levs, &
                              iv%gpsref(n)%zk(1), num_levs)
 #endif
-   ENDDO
+   end do
 
 end subroutine da_transform_xtoy_gpsref_adj
 

@@ -1,18 +1,18 @@
 subroutine da_transform_xtoy_pilot ( xa, iv, xp, y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa) (linear)
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j, k  ! Index dimension.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j, k  ! Index dimension.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
 
-   IF ( iv%num_pilot > 0 ) THEN
+   if ( iv%num_pilot > 0 ) then
       do n=iv%ob_numb(iv%current_ob_time-1)%pilot + 1, iv%ob_numb(iv%current_ob_time)%pilot
 
          !xyh         y%pilot(n)%u(:) = 0.0
@@ -44,7 +44,7 @@ subroutine da_transform_xtoy_pilot ( xa, iv, xp, y )
                            y%pilot(n)%v(1), k, iv%pilot(n)%zk(1), k)
 #endif
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_pilot 
 

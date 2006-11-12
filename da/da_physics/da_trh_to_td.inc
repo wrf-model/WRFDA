@@ -2,34 +2,34 @@ subroutine da_trh_to_td (RH, T, TD, xp)
 
    !---------------------------------------------------------------------
    !
-   !                       FUNCTION F_TD_FROM_RH
+   !                       function F_TD_FROM_RH
    !                     **************************
    !
    !  PURPOSE:
    !  -------
-   !     COMPUTE DEW POINT FROM TEMPERATURE AND RELATIVE HUMIDITY
+   !     COMPUTE DEW POinT FROM TEMPERATURE AND RELATIVE HUMIDITY
    !
    !   METHOD:
    !   ------
-   !     INVERT THE RELATION
+   !     inVERT THE RELATION
    !
    !     RH = 100. * EXP ( L_over_Rv * (1./T - 1./TD) )
    !
-   !   INPUT:
+   !   inPUT:
    !   -----
    !      T_K:   TEMPERATURE       in K
    !      RH:    RELAITVE HUMIDITY in %
    !
-   !   OUTPUT:
+   !   outPUT:
    !   ------
-   !      TD:    DEW POINT IN K
+   !      TD:    DEW POinT in K
    !
    !   REFERENCES:
    !   -----------
-   !    R. R. ROGERS AND M. K. YAU, 1989: A SHORT COURSE IN CLOUD PHYSICS,
+   !    R. R. ROGERS AND M. K. YAU, 1989: A SHORT COURSE in CLOUD PHYSICS,
    !                                   3ND EDITION, PERGAMON PRESS, PAGE 14-19.
    !
-   !   VERIFICATION SET:
+   !   VERifICATION SET:
    !   -----------------
    !    T_K  = 268.15 K,  
    !    TD_K = 262.55 K
@@ -37,13 +37,13 @@ subroutine da_trh_to_td (RH, T, TD, xp)
    !    P_PA = 80000  Pa, 
    !    QV   = 2.11E-03 kg/kg,
    !
-   !  MODIFICATIONS:
+   !  MODifICATIONS:
    !   ------------
    !    parallel implementation. -Al Bourgeois
    ! 
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type (xpose_type), intent(in)      :: xp    ! Domain decomposition vars.
 
@@ -54,9 +54,9 @@ subroutine da_trh_to_td (RH, T, TD, xp)
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
       intent(out)   :: td ! Dew Point in K.
 
-   INTEGER :: I, J, K
+   integer :: I, J, K
 
-   REAL    :: INVDIFFTD, INVTD
+   real    :: inVDifFTD, inVTD
 
    integer :: is,ie,js,je,ks,ke
 
@@ -78,11 +78,11 @@ subroutine da_trh_to_td (RH, T, TD, xp)
                RH(i,j,k) = 105.0
             end if
 
-            INVDIFFTD = LOG (RH(i,j,k)/100.) / L_over_Rv
+            inVDifFTD = LOG (RH(i,j,k)/100.) / L_over_Rv
 
-            INVTD = 1/T(i,j,k)  - INVDIFFTD
+            inVTD = 1/T(i,j,k)  - inVDifFTD
 
-            TD(i,j,k)  = 1. / INVTD
+            TD(i,j,k)  = 1. / inVTD
 
             if (TD(i,j,k) > T(i,j,k)) &
                TD(i,j,k) = T(i,j,k)

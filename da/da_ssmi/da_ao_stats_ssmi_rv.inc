@@ -1,13 +1,13 @@
 subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (IN)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (IN)      :: oi            ! OI
-   TYPE ( y_type), INTENT (IN)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
-   INTEGER                          :: ntpw, nspeed, n
-   TYPE (stats_ssmi_retrieval_type) :: ssmi_retrieval
+   integer                          :: ntpw, nspeed, n
+   type (stats_ssmi_retrieval_type) :: ssmi_retrieval
 
    ntpw = 0
    nspeed = 0
@@ -20,9 +20,9 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
    ssmi_retrieval%average = residual_ssmi_retrieval_type(0.0, 0.0)
    ssmi_retrieval%rms_err = ssmi_retrieval%average
 
-   IF ( oi%num_ssmi_retrieval .gt. 0) THEN
+   if ( oi%num_ssmi_retrieval .gt. 0) then
 
-     DO n=1, oi%num_ssmi_retrieval
+     do n=1, oi%num_ssmi_retrieval
   
       if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
   
@@ -36,11 +36,11 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
                     ssmi_retrieval%minimum%Speed,  ssmi_retrieval%maximum%Speed,&
                     ssmi_retrieval%average%Speed,  ssmi_retrieval%rms_err%Speed)
 
-      endif    ! end if( oi%ssmi_retrieval(n)%loc%proc_domain )
+      end if    ! end if( oi%ssmi_retrieval(n)%loc%proc_domain )
 
-     END DO
+     end do
      
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( ntpw )
@@ -57,9 +57,9 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
               ssmi_retrieval%minimum%speed%n, ssmi_retrieval%maximum%speed%n, &
               ssmi_retrieval%minimum%speed%l, ssmi_retrieval%maximum%speed%l )
 
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
 
-    IF ( ntpw /= 0 )THEN
+    if ( ntpw /= 0 )then
 
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for ssmi_retrieval'
       write(unit=stats_unit, fmt='(a/)') '   var           tpw(cm)     n'
@@ -72,9 +72,9 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_retrieval%average%tpw/real(ntpw), &
                        '    RMSE   : ', sqrt(ssmi_retrieval%rms_err%tpw/real(ntpw))
-    END IF
+    end if
 
-    IF ( nspeed /= 0 ) THEN
+    if ( nspeed /= 0 ) then
 
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for ssmi_retrieval'
       write(unit=stats_unit, fmt='(a/)') '   var           Speed(m/s)     n'
@@ -87,9 +87,9 @@ subroutine da_ao_stats_ssmi_rv( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_retrieval%average%Speed/real(nspeed), &
                        '    RMSE   : ', sqrt(ssmi_retrieval%rms_err%Speed/real(nspeed))
-    END IF
+    end if
 
-   END IF
+   end if
 
 end subroutine da_ao_stats_ssmi_rv
 

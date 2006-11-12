@@ -4,19 +4,19 @@ subroutine da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y )
    ! Called by da_minimisation/da_calculate_jo_and_grady.inc
    !----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
    jo % gpsref_ref = 0.0
 
-   IF (iv%num_GPSRef > 0) THEN
-      DO n=1, iv%num_GPSRef
+   if (iv%num_GPSRef > 0) then
+      do n=1, iv%num_GPSRef
          do k=1, iv%gpsref(n)%info%levels
             jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
                                    ( iv%GPSRef(n)%ref(k)%error * &
@@ -28,12 +28,12 @@ subroutine da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y )
                jo % gpsref_ref = jo % gpsref_ref - &
                    re%GPSRef(n)%ref(k) * jo_grad_y%GPSRef(n)%ref(k)
             end do
-         endif
-      END DO
+         end if
+      end do
       
       jo % gpsref_ref = 0.5 * jo % gpsref_ref
       
-   END IF
+   end if
 
 end subroutine da_get_jo_and_grady_gpsref
 

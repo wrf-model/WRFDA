@@ -115,7 +115,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! broadcast of the configuration information.
    ! 
 !</DESCRIPTION>
-   call       da_messages ((/program_name/))
+   call       da_message ((/program_name/))
 
    call da_trace("da_esmf_init",message="calling alloc_and_configure_domain")
    call alloc_and_configure_domain ( domain_id  = 1 ,                  &

@@ -48,9 +48,9 @@ subroutine da_transform_xtogpsref_lin(xa, xb, xp)
 
             xa%ref(i,j,k)= partone9 * parttwo &
                          + partone  * parttwo9
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    call da_trace_exit("da_transform_xtogpsref_lin")
    

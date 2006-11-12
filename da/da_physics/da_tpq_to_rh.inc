@@ -4,7 +4,7 @@
    ! PURPOSE: Convert T/p/q to relative humidity rh.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    real, intent(in)  :: t, p, q
    real, intent(out) :: es, qs, rh

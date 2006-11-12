@@ -14,7 +14,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
 
    IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
 
-   CALL da_messages((/'[4.0] Set up observations (ob)'/))
+   CALL da_message((/'[4.0] Set up observations (ob)'/))
 
    ! Adjust obs switches
 
@@ -83,7 +83,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    ENDIF
     
    if (num_pseudo > 0) then
-      call da_messages((/"Single OBS Test:: Turn off all the OBS switches ***"/))
+      call da_message((/"Single OBS Test:: Turn off all the OBS switches ***"/))
       Use_SynopObs         = .FALSE.
       Use_ShipsObs         = .FALSE.
       Use_MetarObs         = .FALSE.
@@ -204,10 +204,10 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    IF (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
       IF ( ob_format == ob_format_bufr ) THEN
-         CALL da_messages((/'Using BUFR format observation input'/))
+         CALL da_message((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
          IF (iv%num_pseudo > 0) THEN
-            CALL da_messages((/'Pseudo test only.'/))
+            CALL da_message((/'Pseudo test only.'/))
             CALL da_allocate_y( iv, ob )
             CALL da_setup_pseudo_obs( iv, ob )
             iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
@@ -235,7 +235,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
       CALL da_error(__FILE__,__LINE__, &
          (/"Cannot run radiance code if compile directive RTTOV false"/))
 #endif
-      CALL da_messages((/'Using NCEP BUFR radiance 1b input'/))
+      CALL da_message((/'Using NCEP BUFR radiance 1b input'/))
       CALL da_setup_bufrtovs_structures( xp, ob, iv )
       ! These are per processor, so uninteresting
       ! write (UNIT=stderr,FMT=*) ' iv%total_rad_channel = ', iv%total_rad_channel

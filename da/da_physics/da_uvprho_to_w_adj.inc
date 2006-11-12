@@ -15,10 +15,10 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
 !
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)       :: xb           ! First guess structure.
-   TYPE (x_type), INTENT(INOUT)     :: xa           ! Increment structure.
+   type (xb_type), intent(in)       :: xb           ! First guess structure.
+   type (x_type), intent(inout)     :: xa           ! Increment structure.
    type (xpose_type), intent(inout) :: xp           ! Domain decomposition vars.
 
    integer                       :: is, ie       ! 1st dim. end points.
@@ -43,18 +43,18 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
 
 ! Integration to calculate the vertical velocity
 
-   DO J=jts,jte
-   DO I=its,ite
+   do J=jts,jte
+   do I=its,ite
 
-      DO K=kts,kte
+      do K=kts,kte
          xa%w(I,J,K+1)=xa%w(I,J,K+1)+xa%w(I,J,K)
          WZ(I,J,K)=xa%w(I,J,K)*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
          xa%w(I,J,K)=0.
-      ENDDO
+      end do
       xa%w(I,J,kte+1)=0.
 
-   ENDDO
-   ENDDO
+   end do
+   end do
 
    call da_w_adjustment_adj(xb,WZ,                     &
                 ids,ide, jds,jde, kds,kde, &
@@ -63,44 +63,44 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
 
 ! Divided by constant
 
-   DO K=kts,kte
-   DO J=jts,jte
-   DO I=its,ite
+   do K=kts,kte
+   do J=jts,jte
+   do I=its,ite
       WZ(I,J,K)=WZ(I,J,K)/(GAMMA*xb%p(I,J,K))
-   ENDDO
-   ENDDO
-   ENDDO
+   end do
+   end do
+   end do
 
 ! Term 4: Derivative of basic vertical velocity with respect to z.
 
-   DO J=jts,jte
-   DO I=its,ite
+   do J=jts,jte
+   do I=its,ite
 
-      DO K=kte,kts,-1
+      do K=kte,kts,-1
          xa%p(I,J,K)=xa%p(I,J,K)-WZ(I,J,K)*GAMMA*  &
                      (xb%w(I,J,K+1)-xb%w(I,J,K))/  &
                      (xb%hf(I,J,K+1)-xb%hf(I,J,K))
-      ENDDO
+      end do
 
-   ENDDO
-   ENDDO
+   end do
+   end do
 
 ! Term 3.2: Vertical integration of the basic mass divergence
 
-   DO J=jts,jte
-   DO I=its,ite
+   do J=jts,jte
+   do I=its,ite
 
-      DO K=kts,kte-1
+      do K=kts,kte-1
          TERM3=TERM3+WZ(I,J,K)
          DIV(I,J,K+1)=DIV(I,J,K+1)+  &
                       TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
          DIV(I,J,K)  =DIV(I,J,K)+  &
                       TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
-      ENDDO
+      end do
       TERM3=0.
 
-   ENDDO
-   ENDDO
+   end do
+   end do
 
    call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
@@ -114,50 +114,50 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
       if ( jts == jds ) js = jds; if ( jte == jde ) je = jde
    else
       is = its; ie = ite; js = jts; je = jte
-   endif
+   end if
 
-   DO K=kts,kte
-      DO J=js,je
-      DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+      do I=is,ie
          xa%rho(I,J,K)=xa%rho(I,J,K)+VRHO(I,J,K)*xb%v(I,J,K)
          xa%rho(I,J,K)=xa%rho(I,J,K)+URHO(I,J,K)*xb%u(I,J,K)
-      ENDDO
-      ENDDO
-   ENDDO
+      end do
+      end do
+   end do
 
    URHO(:,:,:)=0.
    VRHO(:,:,:)=0.
 
 ! Term 3.1: Vertical integration of the perturbed mass divergence
 
-   DO J=jts,jte
-   DO I=its,ite
+   do J=jts,jte
+   do I=its,ite
 
-      DO K=kts,kte-1
+      do K=kts,kte-1
          TERM3=TERM3+WZ(I,J,K)
          DIV(I,J,K+1)=DIV(I,J,K+1)+  &
                       TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
          DIV(I,J,K)  =DIV(I,J,K)+  &
                       TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
-      ENDDO
+      end do
       TERM3=0.
 
-   ENDDO
-   ENDDO
+   end do
+   end do
 
    call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
                                 ims,ime, jms,jme, kms,kme,         &
                                 its,ite, jts,jte, kts,kte )
 
-   DO K=kts,kte
-      DO J=js,je
-      DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+      do I=is,ie
          xa%v(I,J,K)=xa%v(I,J,K)+VRHO(I,J,K)*xb%rho(I,J,K)
          xa%u(I,J,K)=xa%u(I,J,K)+URHO(I,J,K)*xb%rho(I,J,K)
-      ENDDO
-      ENDDO
-   ENDDO
+      end do
+      end do
+   end do
 
    URHO(:,:,:)=0.
    VRHO(:,:,:)=0.
@@ -169,23 +169,23 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte )
 
-   DO K=kts,kte
-   DO J=jts,jte
-   DO I=its,ite
+   do K=kts,kte
+   do J=jts,jte
+   do I=its,ite
       xa%p(I,J,K)=xa%p(I,J,K)-WZ(I,J,K)*GAMMA*DIV(I,J,K)
-   ENDDO
-   ENDDO
-   ENDDO
+   end do
+   end do
+   end do
 
 ! Term 2.1: Divergence term from perturbed wind
 
-   DO K=kts,kte
-   DO J=jts,jte
-   DO I=its,ite
+   do K=kts,kte
+   do J=jts,jte
+   do I=its,ite
       DIV(I,J,K)=-WZ(I,J,K)*GAMMA*xb%p(I,J,K)  ! DIV redefined
-   ENDDO
-   ENDDO
-   ENDDO
+   end do
+   end do
+   end do
 
    call da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV, &
                                 ids,ide, jds,jde, kds,kde,         &
@@ -201,52 +201,52 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
 
    if ( jte == jde ) then
       j = jte
-      DO K=kts,kte
-      DO I=its, ite
+      do K=kts,kte
+      do I=its, ite
          WZ(I,J-1,K)=WZ(I,J-1,K)+WZ(I,J,K)
-      ENDDO
-      ENDDO
+      end do
+      end do
    end if
 
    if ( jts == jds ) then
       j = jts
-      DO K=kts,kte
-      DO I=its, ite
+      do K=kts,kte
+      do I=its, ite
          WZ(I,J+1,K)=WZ(I,J+1,K)+WZ(I,J,K)
-      ENDDO
-      ENDDO
+      end do
+      end do
    end if
 
    if ( ite == ide ) then
       i = ite
-      DO K=kts,kte
-      DO J=js,je
+      do K=kts,kte
+      do J=js,je
          WZ(I-1,J,K)=WZ(I-1,J,K)+WZ(I,J,K)
-      ENDDO
-      ENDDO
+      end do
+      end do
    end if
 
    if ( its == ids ) then
       i = its
-      DO K=kts,kte
-      DO J=js,je
+      do K=kts,kte
+      do J=js,je
          WZ(I+1,J,K)=WZ(I+1,J,K)+WZ(I,J,K)
-      ENDDO
-      ENDDO
+      end do
+      end do
    end if
 
-   DO K=kts,kte
-      DO J=js,je
-      DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+      do I=is,ie
 
          xa%v(I,J,K)=xa%v(I,J,K)-WZ(I,J,K)*  &
                      (xb%p(I,J+1,K)-xb%p(I,J-1,K))*xb%coefy(I,J)
          xa%u(I,J,K)=xa%u(I,J,K)-WZ(I,J,K)*  &
                      (xb%p(I+1,J,K)-xb%p(I-1,J,K))*xb%coefx(I,J)
 
-      ENDDO
-      ENDDO
-   ENDDO
+      end do
+      end do
+   end do
 
 !-------------------------------------------------------------------------
 !--Computation to check for edge of domain:
@@ -262,41 +262,41 @@ subroutine da_uvprho_to_w_adj( xb, xa, xp,                 &
          is = ids+1
       else
          wz(is, js:je, kts:kte) = xp%v1z(is, js:je, kts:kte)
-      endif
+      end if
 
       if ( ite == ide ) then
          ie = ide-1
       else
          wz(ie, js:je, kts:kte) = xp%v1z(ie, js:je, kts:kte)
-      endif
+      end if
 
       if ( jts == jds ) then
          js = jds+1
       else
          wz(is:ie, js, kts:kte) = xp%v1z(is:ie, js, kts:kte)
-      endif
+      end if
 
       if ( jte == jde ) then
          je = jde-1
       else
          wz(is:ie, je, kts:kte) = xp%v1z(is:ie, je, kts:kte)
-      endif
+      end if
 !-------------------------------------------------------------------------
 
 ! Term 1.1: Perturbed pressure advection along the basic wind
 
-   DO K=kts,kte
-      DO J=js,je
-      DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+      do I=is,ie
 
          xa%p(I,J+1,K)=xa%p(I,J+1,K)-WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
          xa%p(I,J-1,K)=xa%p(I,J-1,K)+WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
          xa%p(I+1,J,K)=xa%p(I+1,J,K)-WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
          xa%p(I-1,J,K)=xa%p(I-1,J,K)+WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
 
-      ENDDO
-      ENDDO
-   ENDDO
+      end do
+      end do
+   end do
 
     WZ(:,:,:) = 0.0
 

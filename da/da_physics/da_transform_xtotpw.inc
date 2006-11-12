@@ -13,7 +13,7 @@ subroutine da_transform_xtotpw( xa, xb )
 
    real    :: pw
 
-!--WEIGHTED SUM OF VERTICAL COLUMN
+!--WEIGHTED sum OF VERTICAL COLUMN
    do j=xb%jts, xb%jte
    do i=xb%its, xb%ite
       pw = 0.0
@@ -21,11 +21,11 @@ subroutine da_transform_xtotpw( xa, xb )
          pw = pw + (xb%hf(i,j,k+1)-xb%hf(i,j,k)) &
                  * (xa%q(i,j,k)*xb%rho(i,j,k) &
                  +  xb%q(i,j,k)*xa%rho(i,j,k) )
-      enddo
+      end do
  
 !-----To convert the unit of PW to cm:
       xa%tpw(i,j) = 0.1*pw
-   enddo
-   enddo
+   end do
+   end do
  
 end subroutine da_transform_xtotpw

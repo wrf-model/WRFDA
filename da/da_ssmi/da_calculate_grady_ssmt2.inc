@@ -4,16 +4,16 @@ subroutine da_calculate_grady_ssmt2( iv, re, jo_grad_y )
    ! Purpose: Applies obs inverse on re-vector
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(INOUT) :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(inout) :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
-   IF ( iv%num_ssmt2 > 0 ) THEN  
-      DO n=1, iv%num_ssmt2
+   if ( iv%num_ssmt2 > 0 ) then  
+      do n=1, iv%num_ssmt2
          do k=1, iv%ssmt2(n)%info%levels
             if(iv%ssmt2(n)%rh(k)%qc < obs_qc_pointer) re%ssmt2(n)%rh(k) = 0.0
 
@@ -22,8 +22,8 @@ subroutine da_calculate_grady_ssmt2( iv, re, jo_grad_y )
                                         iv%ssmt2(n)%rh(k)%error )
 
          end do
-      END DO
-   END IF
+      end do
+   end if
 
-END subroutine da_calculate_grady_ssmt2
+end subroutine da_calculate_grady_ssmt2
 

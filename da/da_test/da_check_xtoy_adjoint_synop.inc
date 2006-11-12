@@ -1,18 +1,18 @@
 subroutine da_check_xtoy_adjoint_synop( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n             ! Loop counter.
+   integer                        :: n             ! Loop counter.
 
 !----------------------------------------------------------------------------
 
-   IF ( oi%num_synop < 1 ) return
+   if ( oi%num_synop < 1 ) return
 
-   DO n=1, oi%num_synop
+   do n=1, oi%num_synop
       if(oi%synop(n)%zk < 1.0) then
          y%synop(n)%u = 0.0
          y%synop(n)%v = 0.0
@@ -21,7 +21,7 @@ subroutine da_check_xtoy_adjoint_synop( oi, y, adjtest_lhs, pertile_lhs )
          y%synop(n)%q = 0.0
 
          cycle
-      endif
+      end if
 
       y%synop(n)%u = y%synop(n)%u/typical_u_rms
       y%synop(n)%v = y%synop(n)%v/typical_v_rms
@@ -36,7 +36,7 @@ subroutine da_check_xtoy_adjoint_synop( oi, y, adjtest_lhs, pertile_lhs )
                      + ( y%synop(n)%t )**2 &
                      + ( y%synop(n)%p )**2 &
                      + ( y%synop(n)%q )**2
-      endif
+      end if
 
       pertile_lhs = pertile_lhs &
                   + ( y%synop(n)%u )**2 &
@@ -51,7 +51,7 @@ subroutine da_check_xtoy_adjoint_synop( oi, y, adjtest_lhs, pertile_lhs )
       y%synop(n)%p = y%synop(n)%p/typical_p_rms
       y%synop(n)%q = y%synop(n)%q/typical_q_rms
 
-   ENDDO
+   end do
 
 end subroutine da_check_xtoy_adjoint_synop
 

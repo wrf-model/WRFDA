@@ -1,21 +1,21 @@
 subroutine da_transform_xtoy_pseudo_adj( iv, xp, jo_grad_y, jo_grad_x )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j     ! Index dimension.
-   REAL                          :: dx, dxm  ! 
-   REAL                          :: dy, dym  !
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j     ! Index dimension.
+   real                          :: dx, dxm  ! 
+   real                          :: dy, dym  !
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_pseudo_adj")
 
-   IF ( iv%num_pseudo > 0 ) THEN
-!xyh      DO n=1, iv % num_pseudo
+   if ( iv%num_pseudo > 0 ) then
+!xyh      do n=1, iv % num_pseudo
       do n=iv%ob_numb(iv%current_ob_time-1)%pseudo + 1, iv%ob_numb(iv%current_ob_time)%pseudo
          ! [1.1] Get horizontal interpolation weights:
 
@@ -50,8 +50,8 @@ subroutine da_transform_xtoy_pseudo_adj( iv, xp, jo_grad_y, jo_grad_x )
          call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                                  jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
 #endif
-      END DO
-   END IF
+      end do
+   end if
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_pseudo_adj")
 

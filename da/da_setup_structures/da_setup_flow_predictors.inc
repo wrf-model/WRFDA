@@ -33,7 +33,7 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    call da_get_unit(ep_unit)
 
-   call da_messages( &
+   call da_message( &
       (/"Setup structures for flow-dependent information and read in"/))
 
    ep % ne = ne

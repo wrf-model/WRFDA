@@ -1,10 +1,10 @@
 Subroutine da_transform_xtowtq_adj ( xp, xb, jo_grad_x )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), intent(in)    :: xp          ! Domain decomposition vars.
-   TYPE (xb_type),    INTENT(IN)    :: xb          ! first guess state.
-   TYPE (x_type),     INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (xpose_type), intent(in)    :: xp          ! Domain decomposition vars.
+   type (xb_type),    intent(in)    :: xb          ! first guess state.
+   type (x_type),     intent(inout) :: jo_grad_x   ! grad_x(jo)
 
 ! ---------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ Subroutine da_transform_xtowtq_adj ( xp, xb, jo_grad_x )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
 ! ---------------------------------------------------------------------------
 
@@ -53,9 +53,9 @@ Subroutine da_transform_xtowtq_adj ( xp, xb, jo_grad_x )
                        jo_grad_x%t2 (i,j),jo_grad_x%q2 (i,j))
     
       jo_grad_x%tgrn(i,j)=0.0
-   enddo
+   end do
     
-   enddo
+   end do
 
-END Subroutine da_transform_xtowtq_adj
+end Subroutine da_transform_xtowtq_adj
 

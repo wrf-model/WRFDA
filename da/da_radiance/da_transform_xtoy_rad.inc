@@ -93,7 +93,8 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       model_mr(:,:)=0.0
       model_psfc(:)=0.0
 
-      if (interp_new) then
+!      if (interp_new) then
+if (.false.) then
          call da_interp_lin_3d_new( xa%t, xp, &
            iv%instid(inst)%loc_i, &
            iv%instid(inst)%loc_j, &
@@ -211,7 +212,8 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       deallocate(model_psfc)
 
       ! [1.3] Call RTM TL model
-      if (tovs_redistribute) then
+!      if (tovs_redistribute) then
+if (.false.) then
 #ifdef DM_PARALLEL
          d_num_rad=num_tovs_after(inst,myproc+1)
 
@@ -463,7 +465,8 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       deallocate (aux_vars)
       deallocate (con_vars_tl)
       deallocate (aux_vars_tl)
-      if (tovs_redistribute) then
+!      if (tovs_redistribute) then
+if (.false.) then
          deallocate (d_tb)
          deallocate (d_con_vars)
          deallocate (d_aux_vars)

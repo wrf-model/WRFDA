@@ -1,4 +1,4 @@
-MODULE da_tracing
+module da_tracing
 
    use da_control
 #ifdef DM_PARALLEL
@@ -7,55 +7,55 @@ MODULE da_tracing
    use da_reporting
 
 
-   INTEGER, PARAMETER :: TraceIndentAmount      = 2   ! default indent
-   INTEGER, PARAMETER :: MaxNoRoutines          = 440 ! maxium number of subroutines
-   INTEGER, PARAMETER :: TraceNameLen           = 31  ! Length of trace name
+   integer, parameter :: TraceIndentAmount      = 2   ! default indent
+   integer, parameter :: MaxNoRoutines          = 440 ! maxium number of subroutines
+   integer, parameter :: TraceNameLen           = 31  ! Length of trace name
 
-   CHARACTER (LEN=*), PARAMETER :: &
+   character (LEN=*), parameter :: &
       pad = "                                                                "
 
 
    ! Variables
 
-   INTEGER :: TraceDepth                   ! Current depth of trace
-   INTEGER :: NoRoutines                   ! Number of routines so far
-   INTEGER :: NoCalls(MaxNoRoutines)       ! Number of calls to each routine
-   INTEGER :: NoCallsBody(MaxNoRoutines)   ! Number of calls in body of each routine
-   INTEGER :: CalledBy(MaxNoRoutines)
-   INTEGER :: MaxHeap(MaxNoRoutines)
-   INTEGER :: EntryHeap(MaxNoRoutines)
-   INTEGER :: Pointer                      ! pointer to routine arrays in TIMER.
-   INTEGER :: BaseElapsedTime
-   REAL :: BaseCPUTime
-   INTEGER :: LastSpace
+   integer :: TraceDepth                   ! Current depth of trace
+   integer :: NoRoutines                   ! Number of routines so far
+   integer :: NoCalls(MaxNoRoutines)       ! Number of calls to each routine
+   integer :: NoCallsBody(MaxNoRoutines)   ! Number of calls in body of each routine
+   integer :: CalledBy(MaxNoRoutines)
+   integer :: MaxHeap(MaxNoRoutines)
+   integer :: EntryHeap(MaxNoRoutines)
+   integer :: Pointer                      ! pointer to routine arrays in TIMER.
+   integer :: BaseElapsedTime
+   real :: BaseCPUTime
+   integer :: LastSpace
 
    ! All CPU times in seconds
 
-   REAL    :: CPUTimeStart(MaxNoRoutines)
-   REAL    :: CPUTimeLocalStart
-   REAL    :: CPUTime(MaxNoRoutines)
-   REAL    :: CPUTimeLocal(MaxNoRoutines)
-   REAL    :: CPUTimeThisCall(MaxNoRoutines)
+   real    :: CPUTimeStart(MaxNoRoutines)
+   real    :: CPUTimeLocalStart
+   real    :: CPUTime(MaxNoRoutines)
+   real    :: CPUTimeLocal(MaxNoRoutines)
+   real    :: CPUTimeThisCall(MaxNoRoutines)
 
    ! All Elapsed times based on wall clock in seconds
 
-   REAL    :: ElapsedTimeStart(MaxNoRoutines)
-   REAL    :: ElapsedTimeLocalStart
-   REAL    :: ElapsedTime(MaxNoRoutines)
-   REAL    :: ElapsedTimeLocal(MaxNoRoutines)
-   REAL    :: ElapsedTimeThisCall(MaxNoRoutines)
+   real    :: ElapsedTimeStart(MaxNoRoutines)
+   real    :: ElapsedTimeLocalStart
+   real    :: ElapsedTime(MaxNoRoutines)
+   real    :: ElapsedTimeLocal(MaxNoRoutines)
+   real    :: ElapsedTimeThisCall(MaxNoRoutines)
 
-   LOGICAL :: TraceActive = .FALSE.        ! Is it active in this routine?
+   logical :: TraceActive = .false.        ! Is it active in this routine?
 
-   CHARACTER (LEN=TraceNameLen) :: TraceStartedBy  ! Subroutine name 
+   character (LEN=TraceNameLen) :: TraceStartedBy  ! Subroutine name 
                                                    ! that activated trace
-   CHARACTER (LEN=TraceNameLen) :: TimerNames(MaxNoRoutines) ! Subroutine names
-   CHARACTER (LEN=TraceNameLen) :: TraceNames(MaxNoRoutines) ! for timing and tracing
+   character (LEN=TraceNameLen) :: TimerNames(MaxNoRoutines) ! Subroutine names
+   character (LEN=TraceNameLen) :: TraceNames(MaxNoRoutines) ! for timing and tracing
 
-   LOGICAL :: trace_write = .FALSE.
+   logical :: trace_write = .false.
 
 
-CONTAINS
+contains
 
 #include "da_trace_init.inc"
 #include "da_trace_entry.inc"
@@ -66,4 +66,4 @@ CONTAINS
 #include "da_trace_report.inc"
 
 
-END module da_tracing
+end module da_tracing

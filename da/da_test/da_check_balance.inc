@@ -6,51 +6,51 @@ subroutine da_check_balance( phi, phi_u )
    ! METHOD:  Calculate correlation between balanced and actual phi.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
       
-   REAL, INTENT(IN)             :: phi(:,:,:)      ! Total phi.
-   REAL, INTENT(IN)             :: phi_u(:,:,:)    ! Unbalanced phi.
+   real, intent(in)             :: phi(:,:,:)      ! Total phi.
+   real, intent(in)             :: phi_u(:,:,:)    ! Unbalanced phi.
 
-   INTEGER                      :: iy              ! Size of 1st dimension.
-   INTEGER                      :: jx              ! Size of 2nd dimension.
-   INTEGER                      :: kz              ! Size of 3rd dimension.
-   INTEGER                      :: i, k            ! Loop counters
-   REAL                         :: corr_coef       ! Correlation coefficient.
-   REAL                         :: accurac         ! Accuracy.
-   REAL, ALLOCATABLE            :: phi_b1(:)       ! 1D balanced phi.
-   REAL, ALLOCATABLE            :: phi_b2(:,:)     ! 2D balanced phi.
-   REAL, ALLOCATABLE            :: corr_coeff(:,:) ! Correlation coefficient.
-   REAL, ALLOCATABLE            :: accuracy(:,:)   ! Accuracy.
+   integer                      :: iy              ! Size of 1st dimension.
+   integer                      :: jx              ! Size of 2nd dimension.
+   integer                      :: kz              ! Size of 3rd dimension.
+   integer                      :: i, k            ! Loop counters
+   real                         :: corr_coef       ! Correlation coefficient.
+   real                         :: accurac         ! Accuracy.
+   real, allocatable            :: phi_b1(:)       ! 1D balanced phi.
+   real, allocatable            :: phi_b2(:,:)     ! 2D balanced phi.
+   real, allocatable            :: corr_coeff(:,:) ! Correlation coefficient.
+   real, allocatable            :: accuracy(:,:)   ! Accuracy.
 
    if (trace_use) call da_trace_entry("da_check_balance")
           
-   IF ( balance_type == balance_geo ) THEN
-      write(UNIT=stdout, fmt='(a)') ' da_check_balance: Balance is geostrophic.'
-   ELSE IF ( balance_type == balance_cyc ) THEN
-      write(UNIT=stdout, fmt='(a)') &
+   if ( balance_type == balance_geo ) then
+      write(unit=stdout, fmt='(a)') ' da_check_balance: Balance is geostrophic.'
+   else if ( balance_type == balance_cyc ) then
+      write(unit=stdout, fmt='(a)') &
          ' da_check_balance: Balance is cyclostrophic.'
-   ELSE IF ( balance_type == balance_geocyc ) THEN
-      write(UNIT=stdout, fmt='(a)') &
+   else if ( balance_type == balance_geocyc ) then
+      write(unit=stdout, fmt='(a)') &
          ' da_check_balance: Balance is geo/cyclostrophic.'
-   END IF
+   end if
       
-   write(UNIT=stdout, fmt='(a)') ' da_check_balance: Correlation/accuracy: '
+   write(unit=stdout, fmt='(a)') ' da_check_balance: Correlation/accuracy: '
       
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:
    !-------------------------------------------------------------------------  
 
-   iy = SIZE(phi_u, DIM=1)
-   jx = SIZE(phi_u, DIM=2)
-   kz = SIZE(phi_u, DIM=3)
+   iy = size(phi_u, DIM=1)
+   jx = size(phi_u, DIM=2)
+   kz = size(phi_u, DIM=3)
       
-   ALLOCATE(phi_b1(1:jx))
-   ALLOCATE(phi_b2(1:iy,1:jx))
+   allocate(phi_b1(1:jx))
+   allocate(phi_b2(1:iy,1:jx))
 
-   ALLOCATE(corr_coeff(1:kz,1:iy))
+   allocate(corr_coeff(1:kz,1:iy))
    corr_coeff(1:kz,1:iy) = 0.0
 
-   ALLOCATE(accuracy(1:kz,1:iy))
+   allocate(accuracy(1:kz,1:iy))
    accuracy(1:kz,1:iy) = 0.0
       
    !-------------------------------------------------------------------------
@@ -73,7 +73,7 @@ subroutine da_check_balance( phi, phi_u )
                                    phi(2:iy-1,2:jx-1,k), &
                                    corr_coef, accurac )
 
-      write(UNIT=stdout, fmt='(i6,1pe9.2,1pe9.2)') &
+      write(unit=stdout, fmt='(i6,1pe9.2,1pe9.2)') &
             k, corr_coef, accurac
 
    end do
@@ -82,10 +82,10 @@ subroutine da_check_balance( phi, phi_u )
    ! [3.0]: Tidy up:
    !-------------------------------------------------------------------------  
 
-   DEALLOCATE(phi_b1)
-   DEALLOCATE(phi_b2)
-   DEALLOCATE(corr_coeff)
-   DEALLOCATE(accuracy)
+   deallocate(phi_b1)
+   deallocate(phi_b2)
+   deallocate(corr_coeff)
+   deallocate(accuracy)
 
    if (trace_use) call da_trace_exit("da_check_balance")
 

@@ -9,24 +9,24 @@ module da_buoy
 
    ! The "stats_buoy_type" is ONLY used locally in da_buoy:
 
-   TYPE residual_buoy1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_buoy1_type
+   type residual_buoy1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+      real          :: p                        ! pressure
+      real          :: q                        ! specific humidity
+   end type residual_buoy1_type
 
-   TYPE maxmin_buoy_stats_type
-      TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_buoy_stats_type
+   type maxmin_buoy_stats_type
+      type (maxmin_type)         :: u, v, t, p, q
+   end type maxmin_buoy_stats_type
 
-   TYPE stats_buoy_type
-      TYPE (maxmin_buoy_stats_type)  :: maximum, minimum
-      TYPE (residual_buoy1_type)     :: average, rms_err
-   END TYPE stats_buoy_type
+   type stats_buoy_type
+      type (maxmin_buoy_stats_type)  :: maximum, minimum
+      type (residual_buoy1_type)     :: average, rms_err
+   end type stats_buoy_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_buoy.inc"
 #include "da_calculate_jo_and_grady_buoy.inc"

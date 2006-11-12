@@ -1,35 +1,35 @@
 subroutine da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
                               T9, Q9, P9, PSFC9, SLP9, xp )
 
-   IMPLICIT NONE
+   implicit none
    !                                                                       
    !     SECTION  DIAGNOSTIC                                               
    !     PURPOSE  COMPUTES SEA LEVEL PRESSURE FROM THE RULE                
    !              T1/T2=(P1/P2)**(GAMMA*R/G).                              
    !                                                                       
-   !     INPUT       T        TEMPERATURE
-   !                 Q        MIXING RATIO
+   !     inPUT       T        TEMPERATURE
+   !                 Q        MIXinG RATIO
    !                 P        PRESSURE
-   !                 TERR     TERRAIN
+   !                 TERR     TERRAin
    !                 PSFC     SURFACE PRESSURE
    !                                                                       
-   !     OUTPUT      SLP      SEA LEVEL PRESSURE
+   !     outPUT      SLP      SEA LEVEL PRESSURE
    !              
 
-   TYPE (xpose_type), INTENT(IN)                 :: xp
-   REAL,                intent(in)               :: TERR, PSFC
-   REAL, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
-   REAL, dimension(xp%kms:xp%kme)                :: T9, Q9, P9
-   ! REAL                                          :: SLP
-   REAL                                          :: SLP9, PSFC9
+   type (xpose_type), intent(in)                 :: xp
+   real,                intent(in)               :: TERR, PSFC
+   real, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
+   real, dimension(xp%kms:xp%kme)                :: T9, Q9, P9
+   ! real                                          :: SLP
+   real                                          :: SLP9, PSFC9
 
-   INTEGER              :: K, KLO, KHI
-   REAL                 :: PL, T0, TS, XTERM,    &
+   integer              :: K, KLO, KHI
+   real                 :: PL, T0, TS, XTERM,    &
                        TLO, THI, TL
-   REAL                 :: PL9,T09,TS9,TLO9,THI9,TL9,COEF1,COEF2
-   REAL                 :: T08,TS8
+   real                 :: PL9,T09,TS9,TLO9,THI9,TL9,COEF1,COEF2
+   real                 :: T08,TS8
 
-   REAL, PARAMETER      :: GAMMA = 6.5E-3,  &
+   real, parameter      :: GAMMA = 6.5E-3,  &
                        TC=273.15+17.5,  &
                        PCONST=10000. ,  &
                        EPS   = 0.622
@@ -47,28 +47,28 @@ subroutine da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
    if (terr <= 0.) then
       psfc9=slp9
       return
-   endif
+   end if
 
    PL  = psfc - PCONST                                        
    klo = 0
 
-   ! FIND 2 LEVELS ON SIGMA SURFACES SURROUNDING PL AT EACH I,J    
+   ! FinD 2 LEVELS ON SIGMA SURFACES SURROUNDinG PL AT EACH I,J    
 
    k_loop: do k=xp%kts, xp%kte-1
       if ((p(k) >= pl) .and. (p(k+1) < pl)) then
          khi = k+1
          klo = k
          exit k_loop
-      endif
-   enddo k_loop
+      end if
+   end do k_loop
 
-   IF (klo < 1) THEN                                      
-      WRITE(UNIT=errmsg(1),FMT='(A,F11.3,A)') &
-         'ERROR FINDING PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
-      WRITE(UNIT=errmsg(2),FMT='(A,F11.3,2X,A,F11.3)') &
+   if (klo < 1) then                                      
+      write(unit=message(1),fmt='(A,F11.3,A)') &
+         'ERROR FinDinG PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
+      write(unit=message(2),fmt='(A,F11.3,2X,A,F11.3)') &
          'PL=',PL,'  PSFC=',psfc
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   END IF                                                         
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if                                                         
 
    ! GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     
    ! AND T AT SEA LEVEL (T0) WITH 6.5 K/KM LAPSE RATE              
@@ -83,15 +83,15 @@ subroutine da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
    T0=TS +GAMMA*terr
    T08=T0
 
-   ! CORRECT SEA LEVEL TEMPERATURE IF TOO HOT                      
+   ! CORRECT SEA LEVEL TEMPERATURE if TOO HOT                      
 
    if ( t0 >= tc ) then
       if ( ts <= tc ) then
          t0 = tc
       else
          t0 = tc-0.005*(ts-tc)**2
-      endif
-   endif
+      end if
+   end if
    
    psfc9=slp9*EXP(2.*gravity*TERR/(gas_constant*(TS+T0)))
    TS9=-slp9*psfc*EXP(2.*gravity*TERR/(gas_constant*(TS+T0)))*  &
@@ -102,9 +102,9 @@ subroutine da_tpq_to_slp_adj ( T, Q, P, TERR, PSFC, &
    if ( t08 >= tc ) then
       if ( ts8 > tc ) then
          ts9=ts9-0.01*(ts-tc)*t09
-      endif
+      end if
       t09=0.
-   endif
+   end if
 
    TS9=TS9+T09
    TL9=TS9*(psfc/PL)**XTERM

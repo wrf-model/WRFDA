@@ -1,15 +1,15 @@
 subroutine da_adj_spemiss(f,tk,theta,ssw,ev,eh,                               &
                        ADJ_tk,ADJ_ev,ADJ_eh                                )
 !---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 !---------------------------------------------------------------------------
 !
 !Output :: ADJ_tk
 !Input  :: ADJ_ev, ADJ_eh, ev, eh
 !---------------------------------------------------------------------------
-      real, intent(IN   ) :: f, tk, theta, ADJ_ev,ADJ_eh
-      real, intent(INOUT) :: ssw
-      real, intent(INOUT) :: ADJ_tk
+      real, intent(in   ) :: f, tk, theta, ADJ_ev,ADJ_eh
+      real, intent(inout) :: ssw
+      real, intent(inout) :: ADJ_tk
 
       real   epsr,epsi,ADJ_epsr,ADJ_epsi, ev, eh
 !
@@ -79,7 +79,7 @@ IMPLICIT NONE
          ADJ_epsnew  = ADJ_cterm2*0.5/cterm2
       else
          ADJ_epsnew  =  0.
-      endif
+      end if
 
       ADJ_eps     =  ADJ_epsnew
 
@@ -95,4 +95,4 @@ IMPLICIT NONE
       ADJ_tk      =  ADJ_tc + ADJ_tk
 
 
-END subroutine da_adj_spemiss
+end subroutine da_adj_spemiss

@@ -4,17 +4,17 @@ subroutine da_tp_to_qs1( xb, xp, es, qs)
    !  PURPOSE: Convert T/p to saturation specific humidity.
    !
    !  METHOD: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
-   !          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
+   !          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
    !
    !  This da_tp_to_qs1 was added and called by the corrected subroutine
    !       da_tpq_to_rh_lin.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
-   REAL, dimension(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte), INTENT(out):: &
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
+   real, dimension(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte), intent(out):: &
                                     es, qs
 
    integer                       :: is, ie       ! 1st dim. end points.

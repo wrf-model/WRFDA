@@ -3,19 +3,19 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
                   ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            )
 ! ---------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! ---------------------------------------------------------------------------
 !
 ! Output : ADJ_p0,  ADJ_ta,   ADJ_gamma, ADJ_sst, ADJ_wv, ADJ_hwv, ADJ_u
 !          ADJ_alw, ADJ_zcld
 ! Input  : ADJ_tbv, ADJ_tbh,  tbv,  tbh
 ! ---------------------------------------------------------------------------
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
-      real   , intent(INOUT) :: ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,     &
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
+      real   , intent(inout) :: ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,     &
                                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld
-      real   , intent(IN   ) :: ADJ_tbv,ADJ_tbh 
-      real   , intent(IN   ) :: tbv,tbh
+      real   , intent(in   ) :: ADJ_tbv,ADJ_tbh 
+      real   , intent(in   ) :: tbv,tbh
 
       real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
@@ -107,7 +107,7 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       if (u .gt. 5.0) then
             foam_save = foam
             foam =     foam + cf2(ifreq)*(   u-5.0)
-      endif
+      end if
 
 ! compute surface emissivities and reflectivity
 
@@ -169,7 +169,7 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       if (u .gt. 5.0) then
         ADJ_u = cf2(ifreq)*ADJ_foam  + ADJ_u
         foam=foam_save
-      endif
+      end if
       ADJ_u = cf1(ifreq)*ADJ_foam    + ADJ_u
       
       ADJ_dum = 0.

@@ -4,16 +4,16 @@ subroutine da_calculate_grady_ssmi( oi, re, jo_grad_y )
    ! Purpose: Applies obs inverse on re-vector
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: oi          ! Ob Inc. structure.
-   TYPE (y_type), INTENT(INOUT) :: re          ! Residual structure.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)   :: oi          ! Ob Inc. structure.
+   type (y_type), intent(inout) :: re          ! Residual structure.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n
+   integer                      :: n
 
-   IF ( oi%num_ssmi_tb .gt. 0 ) THEN
-      DO n=1, oi%num_ssmi_tb
+   if ( oi%num_ssmi_tb .gt. 0 ) then
+      do n=1, oi%num_ssmi_tb
 
          if(oi%ssmi_tb(n)%tb19v%qc < obs_qc_pointer) re%ssmi_tb(n)%tb19v = 0.0
          jo_grad_y%ssmi_tb(n)%tb19v = - re%ssmi_tb(n)%tb19v / &
@@ -49,9 +49,9 @@ subroutine da_calculate_grady_ssmi( oi, re, jo_grad_y )
          jo_grad_y%ssmi_tb(n)%tb85h = - re%ssmi_tb(n)%tb85h / &
                                       ( oi%ssmi_tb(n)%tb85h%error * &
                                         oi%ssmi_tb(n)%tb85h%error )
-      END DO
-   ELSE IF ( oi%num_ssmi_retrieval .gt. 0) THEN
-      DO n=1, oi%num_ssmi_retrieval
+      end do
+   else if ( oi%num_ssmi_retrieval .gt. 0) then
+      do n=1, oi%num_ssmi_retrieval
         if (oi%ssmi_retrieval(n)%speed%qc < obs_qc_pointer) then
             re%ssmi_retrieval(n)%speed = 0.0
         end if
@@ -65,7 +65,7 @@ subroutine da_calculate_grady_ssmi( oi, re, jo_grad_y )
         jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
                                          ( oi%ssmi_retrieval(n)%tpw%error * &
                                            oi%ssmi_retrieval(n)%tpw%error )
-      END DO  
-   ENDIF
+      end do  
+   end if
 
 end subroutine da_calculate_grady_ssmi

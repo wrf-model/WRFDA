@@ -168,7 +168,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
          FMT='("Upper-right: lat,lon,x,y,grid%xp%ide,grid%xp%jde:",4f10.3,2i6)') &
          grid%xlat(grid%xp%ide,grid%xp%jde),  grid%xlong(grid%xp%ide,grid%xp%jde), start_x, start_y, &
          grid%xp%ide, grid%xp%jde
-      call da_messages(errmsg(1:5))
+      call da_message(errmsg(1:5))
    endif
 
    ! Setup the domain definition for use of the GRAPH:

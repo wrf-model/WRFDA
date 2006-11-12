@@ -4,21 +4,21 @@ subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
    ! Purpose: X to Y Transform operator for Polar AMV's               
    !----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j , k ! Index dimension.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j , k ! Index dimension.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
    
-   IF ( iv%num_polaramv > 0 ) THEN
+   if ( iv%num_polaramv > 0 ) then
 !xyh      do n=1, iv % num_polaramv
-      DO n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+      do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
 !xyh         y%polaramv(n)%u(:) = 0.0
 !xyh         y%polaramv(n)%v(:) = 0.0
 
@@ -46,6 +46,6 @@ subroutine da_transform_xtoy_polaramv ( xa, iv, xp, y )
                             y%polaramv(n)%v(1), k, iv%polaramv(n)%zk(1), k)
 #endif
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_polaramv

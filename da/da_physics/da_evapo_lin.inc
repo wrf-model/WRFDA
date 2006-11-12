@@ -14,7 +14,7 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
    real, dimension(kts:kte)  :: SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A
    real, dimension(kts:kte)  :: PRE9
 
-   DO K=kts, kte
+   do K=kts, kte
       if (DT(k) <= 0.) cycle
 
       if (SCR3(K) > 0.) then
@@ -32,14 +32,14 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
       else
          PRE9(K) = 0.
          PRE(k)=0.
-      endif
+      end if
 
-      IF(PRE(K) < -SCR3(K)/DT(K) ) THEN
+      if(PRE(K) < -SCR3(K)/DT(K) ) then
          PRE9(K)=-SCR39(K)/DT(K)
          PRE(k)=-SCR3(K)/DT(K)
-      ENDIF
+      end if
 
-   ENDDO
+   end do
 
 end subroutine da_evapo_lin
 
