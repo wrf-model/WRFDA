@@ -22,7 +22,7 @@ export NUM_PROCS=${NUM_PROCS:-1}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LL_WALL_CLOCK_LIMIT=${LL_WALL_CLOCK_LIMIT:-01:30:00}
-expoer LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
+export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -49,7 +49,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 # @ notification     = never
 # @ network.MPI      = css0,shared,ip
 # @ total_tasks      = $NUM_PROCS
-# @ node_usage       = $LL_NODE_USEAGE
+# @ node_usage       = $LL_NODE_USAGE
 # @ checkpoint       = no
 # @ wall_clock_limit = $LL_WALL_CLOCK_LIMIT
 # NCEP IBM=dev

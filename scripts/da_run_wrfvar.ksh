@@ -1,4 +1,11 @@
 #!/bin/ksh
+
+######################################################################################
+# GENERAL USERS SHOULD NOT EDIT THIS SCRIPT, INSTEAD COPY ~/bray/data/con200/test.ksh,
+# WHICH IS AN EXAMPLE CONUS200 CASE, AND WILL SET UP THE ENVIRONMENT BEFORE SUBMITTING
+# A JOB TO THE CORRECT QUEUING SYSTEM
+######################################################################################
+
 DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -157,14 +164,11 @@ if test ! -f $DA_ANALYSIS; then
       ln -s $DA_RTTOV_COEFFS/* .
    fi
 
-   cp $WRFVAR_DIR/run/gribmap.txt .
-   cp $WRFVAR_DIR/run/LANDUSE.TBL .
-   cp $WRFVAR_DIR/run/GENPARM.TBL .
-   cp $WRFVAR_DIR/run/VEGPARM.TBL .
-   cp $WRFVAR_DIR/run/SOILPARM.TBL .
-   cp $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
-   cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   ln -s $WRFVAR_DIR/build/wrfvar.exe .
+   ln -sf $WRFVAR_DIR/run/gribmap.txt .
+   ln -sf $WRFVAR_DIR/run/*.TBL .
+   ln -sf $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -sf $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
+   ln -sf $WRFVAR_DIR/build/wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
@@ -178,17 +182,7 @@ if test ! -f $DA_ANALYSIS; then
       fi
    done
 
-   for FILE in $WRFVAR_DIR/run/*.bias; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
-
-   for FILE in $WRFVAR_DIR/run/*.info; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
+   ln -s $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
       # More than one observation file of each type
@@ -399,71 +393,70 @@ if test ! -f $DA_ANALYSIS; then
       export NL_DYN_OPT=2
    fi
 
-      export NL_TIME_STEP_FRACT_NUM=0
-      export NL_TIME_STEP_FRACT_DEN=1
-      export NL_FEEDBACK=1
-      export NL_SMOOTH_OPTION=0
-      export NL_MP_PHYSICS=3
-      export NL_RA_LW_PHYSICS=1
-      export NL_RA_SW_PHYSICS=1
-      export NL_RADT=15
-      export NL_SF_SFCLAY_PHYSICS=1
-      export NL_SF_SURFACE_PHYSICS=2
-      export NL_BL_PBL_PHYSICS=1
-      export NL_BLDT=0
-      export NL_CU_PHYSICS=1
-      export NL_CUDT=5
-      export NL_ISFFLX=1
-      export NL_IFSNOW=0
-      export NL_ICLOUD=1
-      export NL_SURFACE_INPUT_SOURCE=1
-      export NL_NUM_SOIL_LAYERS=4
-      export NL_MP_ZERO_OUT=2
-      export NL_MP_ZERO_OUT_THRESH=1.e-8
-      export NL_MAXIENS=1
-      export NL_MAXENS=3
-      export NL_MAXENS2=3
-      export NL_MAXENS3=16
-      export NL_ENSDIM=144
-      export NL_RK_ORD=3
-      export NL_W_DAMPING=1
-      export NL_DIFF_OPT=1
-      export NL_KM_OPT=4
-      export NL_DAMP_OPT=0
-      export NL_BASE_TEMP=290.
-      export NL_ZDAMP=5000.
-      export NL_DAMPCOEF=0.0
-      export NL_KHDIF=0
-      export NL_KVDIF=0
-      export NL_SMDIV=0.1
-      export NL_EMDIV=0.01
-      export NL_EPSSM=0.1
-      export NL_NON_HYDROSTATIC=true
-      export NL_TIME_STEP_SOUND=4
-      export NL_H_MOM_ADV_ORDER=5
-      export NL_V_MOM_ADV_ORDER=3
-      export NL_H_SCA_ADV_ORDER=5
-      export NL_V_SCA_ADV_ORDER=3
-      export NL_SPEC_BDY_WIDTH=5
-      export NL_SPEC_ZONE=1
-      export NL_RELAX_ZONE=4
-      export NL_PERIODIC_X=false
-      export NL_SYMMETRIC_XS=false
-      export NL_SYMMETRIC_XE=false
-      export NL_OPEN_XS=false
-      export NL_OPEN_XE=false
-      export NL_PERIODIC_Y=false
-      export NL_SYMMETRIC_YS=false
-      export NL_SYMMETRIC_YE=false
-      export NL_OPEN_YS=false
-      export NL_OPEN_YE=false
-      export NL_NESTED=false
-      export NL_REAL_DATA_INIT_TYPE=1
-      export NL_LEN_SCALING1=0.5
-      export NL_LEN_SCALING2=0.5
-      export NL_LEN_SCALING3=0.5
-      export NL_LEN_SCALING4=0.5
-      export NL_LEN_SCALING5=0.5
+   # Go back to defaults for these
+
+   unset NL_TIME_STEP_FRACT_NUM
+   unset NL_TIME_STEP_FRACT_DEN
+   unset NL_FEEDBACK
+   unset NL_SMOOTH_OPTION
+   unset NL_MP_PHYSICS
+   unset NL_RA_LW_PHYSICS
+   unset NL_RA_SW_PHYSICS
+   unset NL_RADT5
+   unset NL_SF_SFCLAY_PHYSICS
+   unset NL_SF_SURFACE_PHYSICS
+   unset NL_BL_PBL_PHYSICS
+   unset NL_BLDT
+   unset NL_CU_PHYSICS
+   unset NL_CUDT
+   unset NL_ISFFLX
+   unset NL_IFSNOW
+   unset NL_ICLOUD
+   unset NL_SURFACE_INPUT_SOURCE
+   unset NL_NUM_SOIL_LAYERS
+   unset NL_MP_ZERO_OUT
+   unset NL_MP_ZERO_OUT_THRESH
+   unset NL_MAXIENS
+   unset NL_MAXENS
+   unset NL_MAXENS
+   unset NL_MAXENS
+   unset NL_ENSDIM
+   unset NL_RK_ORD
+   unset NL_W_DAMPING
+   unset NL_DIFF_OPT
+   unset NL_KM_OPT
+   unset NL_DAMP_OPT
+   unset NL_BASE_TEMP
+   unset NL_ZDAMP
+   unset NL_DAMPCOEF
+   unset NL_KHDIF
+   unset NL_KVDIF
+   unset NL_SMDIV
+   unset NL_EMDIV
+   unset NL_EPSSM
+   unset NL_NON_HYDROSTATIC
+   unset NL_TIME_STEP_SOUND
+   unset NL_H_MOM_ADV_ORDER
+   unset NL_V_MOM_ADV_ORDER
+   unset NL_H_SCA_ADV_ORDER
+   unset NL_V_SCA_ADV_ORDER
+   unset NL_SPECIFIED
+   unset NL_SPEC_BDY_WIDTH
+   unset NL_SPEC_ZONE
+   unset NL_RELAX_ZONE
+   unset NL_PERIODIC_X
+   unset NL_SYMMETRIC_XS
+   unset NL_SYMMETRIC_XE
+   unset NL_OPEN_XS
+   unset NL_OPEN_XE
+   unset NL_PERIODIC_Y
+   unset NL_SYMMETRIC_YS
+   unset NL_SYMMETRIC_YE
+   unset NL_OPEN_YS
+   unset NL_OPEN_YE
+   unset NL_NESTED
+   unset NL_REAL_DATA_INIT_TYPE
+
    . $WRFVAR_DIR/inc/namelist_script.inc
 
    if test -f namelist.input; then
@@ -520,7 +513,6 @@ if test ! -f $DA_ANALYSIS; then
          fi
       else
         # 3DVAR
-
          $RUN_CMD ./wrfvar.exe
          RC=$?
       fi

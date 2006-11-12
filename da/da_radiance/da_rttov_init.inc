@@ -49,12 +49,13 @@ subroutine da_rttov_init(iv,ob)
  integer             :: mxchn
  integer , pointer   :: coefs_channels (:,:)
  
- integer             :: idum, wmo_sensor_id, sensor_type, iost
+ integer             :: idum, wmo_sensor_id, sensor_type, iost, iunit
 
 ! local variables for tuning error factor
  character(len=20)   ::  rttovid_string
  integer             ::  num_tot
  real                ::  joa, jo, trace, factor 
+   character(len=80)   :: filename
 
 !--------------------------------------------------------------
 !  1.0 setup RTTOV instrument triplets from namelist parameter
@@ -154,23 +155,24 @@ subroutine da_rttov_init(iv,ob)
 
 !     if (trim( inst_name(rtminit_sensor(n))) == 'airs') then
 
-  open(109,file=trim(iv%instid(n)%rttovid_string)//'.info', &
-           form='formatted',iostat = iost, status='old')
+      call da_get_unit(iunit)
+      filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+      open(unit=iunit,file=filename, &
+         form='formatted',iostat = iost, status='old')
 
-  if (iost /= 0) then
-     write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance Info FILE ', trim(iv%instid(n)%rttovid_string)//'.info'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
-  end if
+      if (iost /= 0) then
+         message(1)="Cannot open radiance info file "//adjustl(filename)
+         call da_error(__FILE__,__LINE__,message(1:1))
+      end if
 
   allocate ( satinfo(n) % ichan(nchanl(n)) )
   allocate ( satinfo(n) % iuse (nchanl(n)) )
   allocate ( satinfo(n) % error(nchanl(n)) )
   allocate ( satinfo(n) % polar(nchanl(n)) )
 
-  read(109,*)
+  read(iunit,*)
   do j = 1, nchanl(n)
-    read(109,'(1x,5i5,2e18.10)')    &
+    read(iunit,'(1x,5i5,2e18.10)')    &
                      wmo_sensor_id, &
                satinfo(n)%ichan(j), &
                        sensor_type, &
@@ -183,6 +185,9 @@ subroutine da_rttov_init(iv,ob)
 ! only load coefs of selected channels for AIRS
     coefs_channels(j,n)   = satinfo(n)%ichan(j) 
   end do
+
+   close(iunit)
+   call da_free_unit(iunit)
 
 !     else
 !      do j = 1, nchanl(n)
@@ -328,14 +333,14 @@ subroutine da_rttov_init(iv,ob)
 !-------------------------------------------------------
 
  if (read_biascoef) then
-  call da_get_unit(bunit)
-  open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
-           form='formatted',iostat = iost, status='old')
-  if (iost /= 0) then
-     write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance biascorr FILE ', trim(iv%instid(n)%rttovid_string)//'.bias'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
-  end if
+         call da_get_unit(bunit)
+         filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.bias'
+         open(bunit,file=filename, &
+            form='formatted',iostat = iost, status='old')
+         if (iost /= 0) then
+            call da_error(__FILE__,__LINE__, &
+               (/"Cannot open radiance biascorr file "//adjustl(filename)/))
+         end if
 
   allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
   allocate ( satinfo(n) % std(nscan(n)+1,nchanl(n)) )
@@ -382,14 +387,14 @@ subroutine da_rttov_init(iv,ob)
     end do
 
     call da_get_unit(unit_factor_rad)
-    open(unit_factor_rad, file='radiance_error.factor', &
-         form='formatted',iostat = iost, status='old')    
+      filename='wrfvar_run/radiance_error.factor'
+      open(unit_factor_rad, file=filename, &
+           form='formatted',iostat = iost, status='old')    
 
-    if (iost /= 0) then
-     write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance Error Factor FILE : radiance_error.factor'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_rttov_init '
-    end if
+      if (iost /= 0) then
+         call da_error(__FILE__,__LINE__, &
+            (/"Cannot open radiance error factor file "//adjustl(filename)/))
+      end if
 
     read(unit_factor_rad, *)
     do 
