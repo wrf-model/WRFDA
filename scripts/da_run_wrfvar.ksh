@@ -55,6 +55,8 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar backgro
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
+export CRTM=${CRTM:-$HOME/crtm}                            # CRTM
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/../crtm_coefs}
 
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
@@ -157,6 +159,10 @@ if test ! -f $DA_ANALYSIS; then
       ln -s $DA_RTTOV_COEFFS/* .
    fi
 
+   if test $DA_CRTM_COEFFS'.' != '.'; then
+      ln -s $DA_CRTM_COEFFS/* .
+   fi
+
    cp $WRFVAR_DIR/run/gribmap.txt .
    cp $WRFVAR_DIR/run/LANDUSE.TBL .
    cp $WRFVAR_DIR/run/GENPARM.TBL .
@@ -210,7 +216,8 @@ if test ! -f $DA_ANALYSIS; then
       done
       ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
    else
-      ln -fs $OB_DIR/${DATE}/ob_6h.ascii  ob01.ascii
+#      ln -fs $OB_DIR/${DATE}/ob_6h.ascii  ob01.ascii
+      ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
       ln -sf $OB_DIR/${DATE}/ssmi_6h.dat  ssmi01.dat
       ln -sf $OB_DIR/${DATE}/radar_6h.dat radar01.dat
    fi
@@ -459,11 +466,11 @@ if test ! -f $DA_ANALYSIS; then
       export NL_OPEN_YE=false
       export NL_NESTED=false
       export NL_REAL_DATA_INIT_TYPE=1
-      export NL_LEN_SCALING1=0.5
-      export NL_LEN_SCALING2=0.5
-      export NL_LEN_SCALING3=0.5
-      export NL_LEN_SCALING4=0.5
-      export NL_LEN_SCALING5=0.5
+#      export NL_LEN_SCALING1=0.5
+#      export NL_LEN_SCALING2=0.5
+#      export NL_LEN_SCALING3=0.5
+#      export NL_LEN_SCALING4=0.5
+#      export NL_LEN_SCALING5=0.5
    . $WRFVAR_DIR/inc/namelist_script.inc
 
    if test -f namelist.input; then

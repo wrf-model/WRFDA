@@ -5,7 +5,8 @@ module da_radiance
 !
 !  METHOD:  radiance for all sensor are defined in a common data structure 
 !
-!  HISTORY: 07/2005 - Creation            Zhiquan Liu
+!  HISTORY: 07/2005      - Creation                Zhiquan Liu
+!           11/09/2006   - Add CRTM related part   Zhiquan Liu
 !
 !------------------------------------------------------------------------------
 
@@ -28,6 +29,27 @@ module da_radiance
             gas_unit_ppmv, sensor_id_mw
    use rttov_types
 #endif
+
+#ifdef CRTM
+  !-----------------------------------------------
+  ! Modules to define CRTM structures
+  !
+  ! -- CRTM Initialization modules
+   USE CRTM_ChannelInfo_Define  ! derived type CRTM_ChannelInfo_type
+   USE CRTM_LifeCycle
+   USE CRTM_ChannelInfo
+
+  ! -- CRTM Utility modules
+   USE Type_Kinds
+   USE Error_Handler
+
+  ! -- CRTM RT_models modules
+  USE CRTM_Module
+  USE CRTM_Atmosphere_Define
+  USE CRTM_Surface_Define
+  USE CRTM_SensorInfo
+#endif
+
    use gsi_kinds      ,  only : r_kind,r_double,i_kind,r_single
    use gsi_constants  ,  only : deg2rad, rad2deg,       &
                             init_constants_derived, &
@@ -198,6 +220,9 @@ module da_radiance
    integer, allocatable :: tovs_recv_start(:,:)
    integer, allocatable :: tovs_copy_count(:)
 
+#ifdef RTTOV
+   CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
+#endif
 
 CONTAINS
 
@@ -231,6 +256,8 @@ CONTAINS
 #include "da_rttov_direct.inc"
 #include "da_rttov_tl.inc"
 #include "da_rttov_ad.inc"
+#include "da_crtm_sensor_descriptor.inc"
+#include "da_crtm_init.inc"
 #include "da_read_bufrtovs.inc"
 #include "da_read_bufrairs.inc"
 #include "da_read_kma1dvar.inc"

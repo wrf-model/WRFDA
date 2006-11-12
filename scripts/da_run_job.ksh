@@ -35,6 +35,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
+# @ account_no       = 64000492
 # @ job_type         = parallel
 # @ environment      = COPY_ALL
 # @ job_name         = $EXPT

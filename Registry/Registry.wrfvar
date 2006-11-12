@@ -1553,7 +1553,12 @@ rconfig   logical   tovs_redistribute     namelist,record14        1            
 rconfig   integer   tovs_min_transfer     namelist,record14        1              10           -   "tovs_min_transfer" "Minimum number of tovs worth relocating" "n/a"
 rconfig   integer   tovs_max_transfer     namelist,record14        1              10           -   "tovs_max_transfer" "Maximum number of tovs in a transfer" "n/a"
 rconfig   logical   tovs_use_array        namelist,record14        1              .false.      -   "tovs_use_array" "TBD"              "TBD"
-
+rconfig   integer   rtm_option            namelist,record14        1              1            -   "TBD"             "TBD"              "TBD"
+#rconfig   character spccoeff_file         namelist,record14        1  "CRTM_SpcCoeff.bin"      -   "TBD"             "TBD"              "TBD"
+#rconfig   character taucoeff_file         namelist,record14        1  "CRTM_TauCoeff.bin"      -   "TBD"             "TBD"              "TBD"
+#rconfig   character aerosolcoeff_file     namelist,record14        1  "CRTM_AerosolCoeff.bin"  -   "TBD"             "TBD"              "TBD"
+#rconfig   character cloudcoeff_file       namelist,record14        1  "CRTM_CldCoeff.bin"      -   "TBD"             "TBD"              "TBD"
+#rconfig   character emiscoeff_file        namelist,record14        1  "CRTM_EmisCoeff.bin"     -   "TBD"             "TBD"              "TBD"
 rconfig   integer   num_pseudo            namelist,pseudo_ob_nl    1              0            -   "TBD"              "TBD"              "TBD"
 rconfig   real      pseudo_x              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"
 rconfig   real      pseudo_y              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"

@@ -5,7 +5,8 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 !
 ! METHOD:  Define, allocate and read of tovs radiance observation structure.
 !
-!   20/07/2005 -     Creation        Zhiquan Liu 
+!   20/07/2005 -     Creation                Zhiquan Liu 
+!   11/09/2006 -     Add call da_crtm_init   Zhiquan Liu
 !
 !------------------------------------------------------------------------------
 
@@ -24,11 +25,21 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
    if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
 
 !-------------------------------------------------------------------
-!  [1.0] Initialize RTTOV coefs and innovations vector for radiance
+!  [1.0] Initialize RTM coefs and innovations vector for radiance
 !-------------------------------------------------------------------
+if (rtm_option == 1) then        ! default use RTTOV
+    write(6,'(a)') ' INITIALIZING  RTTOV'
 #ifdef RTTOV
     call da_rttov_init(iv,ob)
 #endif
+elseif (rtm_option == 2) then   ! use CRTM
+    write(6,'(a)') ' INITIALIZING  CRTM'
+#ifdef CRTM
+    call da_crtm_init(iv,ob)
+#endif
+else
+    write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model'
+endif
 
 !-------------------------------------------------------------------
 !  [2.0] Read NCEP bufr tovs data in radiance innovations vector
@@ -147,5 +158,6 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
+   stop
 END SUBROUTINE da_setup_bufrtovs_structures
 
