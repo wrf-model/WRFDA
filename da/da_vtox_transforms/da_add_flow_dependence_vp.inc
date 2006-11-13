@@ -41,7 +41,7 @@ subroutine da_add_flow_dependence_vp( ne, ep, vp, &
       end do
    end do
 
-   IF (trace_use) call da_trace_exit("da_add_flow_dependence_vp")
+   if (trace_use) call da_trace_exit("da_add_flow_dependence_vp")
 
 end subroutine da_add_flow_dependence_vp
 

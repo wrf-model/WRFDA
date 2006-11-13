@@ -7,7 +7,7 @@ subroutine da_get_avpoles(u,v,lon,       &
    ! PURPOSE: Treatment for Adjoint of Polar winds 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
    integer, intent(in)    :: ids, ide, jds, jde, kds, kde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
@@ -22,8 +22,8 @@ subroutine da_get_avpoles(u,v,lon,       &
    real, dimension(ims:ime) :: xls, xln
 
    ! Stop compiler whinge
-   IF (kds==0 .OR. kde==0) THEN
-   END IF
+   if (kds==0 .OR. kde==0) then
+   end if
 
    if (trace_use) call da_trace_entry("da_get_avpoles")
 

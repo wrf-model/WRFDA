@@ -7,7 +7,7 @@ subroutine da_get_aspoles(x,              &
    ! PURPOSE: Treatment for Adjoint of Scalar field at Poles
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
    integer, intent(in)    :: ids, ide, jds, jde, kds, kde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
@@ -21,8 +21,8 @@ subroutine da_get_aspoles(x,              &
 
    ! Stop compiler whinge
 
-   if (kde ==0) THEN
-   END IF
+   if (kde ==0) then
+   end if
 
    if (trace_use) call da_trace_entry("da_get_aspoles")
 
@@ -34,7 +34,7 @@ subroutine da_get_aspoles(x,              &
       if (jts == jds) then
          x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
          x(its:ite,jts,k) = 0.0
-      endif
+      end if
 
       tmps =0.0  ; tmp_s =0.0
       if (jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte,k))
@@ -43,7 +43,7 @@ subroutine da_get_aspoles(x,              &
       if (jte == jde) then
          x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
          x(its:ite,jte,k) = 0.0
-      endif
+      end if
    end do
 
    if (trace_use) call da_trace_exit("da_get_aspoles")

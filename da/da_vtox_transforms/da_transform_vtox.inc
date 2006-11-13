@@ -30,7 +30,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
-   IF (trace_use) call da_trace_entry("da_transform_vtox")
+   if (trace_use) call da_trace_entry("da_transform_vtox")
 
    call da_zero_x ( xa )
 
@@ -102,7 +102,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
                sdmd=sdmd+mr_a(k)*xb%dnw(k)
                s1md=s1md+(1.0+mr_b(k))*xb%dnw(k)
-            enddo
+            end do
 
             mu=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
 
@@ -113,7 +113,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
                        + xb%psac(i,j)*mr_a(k))*xb%dnw(k)
 
                xa%p(i,j,k)=0.5*(p(k)+p(k+1))
-            enddo
+            end do
          else if (fg_format == fg_format_kma) then
             do k=xb%kts,xb%kte
                if( k == xb%kte) then
@@ -130,12 +130,12 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
             end do
          end if
-      enddo
-   enddo
+      end do
+   end do
 
    call da_pt_to_rho_lin( xb, xa, xp )
  
-   ! If Testing_wrfvar = .TRUE., not "XToY" transform needed to do here:
+   ! If Testing_wrfvar = .true., not "XToY" transform needed to do here:
 
    if (.not.testing_wrfvar) then
       ! Exchange XA halo region.
@@ -145,7 +145,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
          call da_transform_xtowtq ( xp, xb, xa )
          ! Exchange XA (surface variable) halo region.
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
-      endif
+      end if
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
@@ -164,13 +164,13 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
                   (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
             end if
             call da_transform_xtoseasfcwind_lin( xa, xb )
-         endif
+         end if
          if ( Use_SsmiTbObs ) call da_transform_xtotb_lin (xa, xb)
 
          ! Exchange XA halo region.
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
-      endif
-   endif
+      end if
+   end if
 
    ! Compute w increments using Richardson's eqn.
 
@@ -185,13 +185,13 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
             do j=xp%jts,xp%jte
                do i=xp%its,xp%ite
                   xa%wh(i,j,k)=0.5*(xa%w(i,j,k)+xa%w(i,j,k+1))
-               enddo
-            enddo
-         enddo
+               end do
+            end do
+         end do
 
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
 
-   endif
+   end if
 
    !---------------------------------------------------------------
    ! Polar treatment for Global 
@@ -246,7 +246,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
        call da_set_boundary_xa(xa, xb)
    end if   
 
-   IF (trace_use) call da_trace_exit("da_transform_vtox")
+   if (trace_use) call da_trace_exit("da_transform_vtox")
 
 end subroutine da_transform_vtox
 

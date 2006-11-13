@@ -23,10 +23,10 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    integer         :: n, k, j, k1              ! Loop counters.
 
    ! Stop compiler whinge
-   if (ide==0) THEN
-   END IF
+   if (ide==0) then
+   end if
 
-   IF (trace_use) call da_trace_entry("da_transform_vptox_adj")
+   if (trace_use) call da_trace_entry("da_transform_vptox_adj")
 
    !---------------------------------------------------------------------------
    !  [4] Add flow-dependent increments in model space (xa):
@@ -97,7 +97,7 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
                                           its,ite, jts,jte, kts,kte )
    end if
 
-   IF (trace_use) call da_trace_exit("da_transform_vptox_adj")
+   if (trace_use) call da_trace_exit("da_transform_vptox_adj")
 
 end subroutine da_transform_vptox_adj
 

@@ -7,7 +7,7 @@ subroutine da_get_vpoles(u,v,lon,        &
    !  PURPOSE: Treatment for Polar winds  
    !---------------------------------------------------------------------------
    
-   IMPLICIT NONE
+   implicit none
    
    integer, intent(in)    :: ids, ide, jds, jde, kds, kde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
@@ -23,10 +23,10 @@ subroutine da_get_vpoles(u,v,lon,        &
 
    ! Stop compiler whinge
 
-   if (kde==0.OR.kds==0) THEN
-   END IF
+   if (kde==0.OR.kds==0) then
+   end if
 
-   IF (trace_use) call da_trace_entry("da_get_vpoles")
+   if (trace_use) call da_trace_entry("da_get_vpoles")
 
    conv = pi/180.0
 
@@ -74,7 +74,7 @@ subroutine da_get_vpoles(u,v,lon,        &
       end if
    end do
 
-   IF (trace_use) call da_trace_exit("da_get_vpoles")
+   if (trace_use) call da_trace_exit("da_get_vpoles")
 
 end subroutine da_get_vpoles
 
