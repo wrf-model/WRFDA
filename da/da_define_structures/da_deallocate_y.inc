@@ -1,4 +1,4 @@
-SUBROUTINE da_deallocate_y( y )
+subroutine da_deallocate_y( y )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Deallocate arrays used in y and residual obs structures.
@@ -6,73 +6,73 @@ SUBROUTINE da_deallocate_y( y )
    ! METHOD:  Deallocate component in turn.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (y_type), INTENT(INOUT)          :: y      ! residual type structure.
-   INTEGER                               :: n,i,j  ! Loop counter.
+   type (y_type), intent(inout)          :: y      ! residual type structure.
+   integer                               :: n,i,j  ! Loop counter.
 
 
-   IF (trace_use) CALL da_trace_entry("da_deallocate_y")
+   if (trace_use) call da_trace_entry("da_deallocate_y")
 
    !---------------------------------------------------------------------------
    ! [1.0] Deallocate:
    !---------------------------------------------------------------------------
 
-   IF ( y % num_synop > 0 ) DEALLOCATE (y % synop)
+   if ( y % num_synop > 0 ) deallocate (y % synop)
 
-   IF ( y % num_ships > 0 ) DEALLOCATE (y % ships)
+   if ( y % num_ships > 0 ) deallocate (y % ships)
 
-   IF ( y % num_metar > 0 ) DEALLOCATE (y % metar)
+   if ( y % num_metar > 0 ) deallocate (y % metar)
 
 
-   IF ( y % num_sound > 0 ) then
+   if ( y % num_sound > 0 ) then
       do n = 1, y % num_sound
-         DEALLOCATE (y % sound(n)%u)
-         DEALLOCATE (y % sound(n)%v)
-         DEALLOCATE (y % sound(n)%t)
-         DEALLOCATE (y % sound(n)%q)
-      enddo
+         deallocate (y % sound(n)%u)
+         deallocate (y % sound(n)%v)
+         deallocate (y % sound(n)%t)
+         deallocate (y % sound(n)%q)
+      end do
 
-      DEALLOCATE (y % sound)
+      deallocate (y % sound)
 
-      DEALLOCATE (y % sonde_sfc)
-   ENDIF
+      deallocate (y % sonde_sfc)
+   end if
 
-   IF ( y % num_pilot > 0 ) then
+   if ( y % num_pilot > 0 ) then
       do n = 1, y % num_pilot
-         DEALLOCATE (y % pilot(n)%u)
-         DEALLOCATE (y % pilot(n)%v)
-      enddo
-      DEALLOCATE (y % pilot)
-   endif
+         deallocate (y % pilot(n)%u)
+         deallocate (y % pilot(n)%v)
+      end do
+      deallocate (y % pilot)
+   end if
 
-   IF ( y % num_bogus > 0 ) then
+   if ( y % num_bogus > 0 ) then
       do n = 1, y % num_bogus
-         DEALLOCATE (y % bogus(n)%u)
-         DEALLOCATE (y % bogus(n)%v)
-         DEALLOCATE (y % bogus(n)%t)
-         DEALLOCATE (y % bogus(n)%q)
-      enddo
-      DEALLOCATE (y % bogus)
-   endif
+         deallocate (y % bogus(n)%u)
+         deallocate (y % bogus(n)%v)
+         deallocate (y % bogus(n)%t)
+         deallocate (y % bogus(n)%q)
+      end do
+      deallocate (y % bogus)
+   end if
 
-    IF ( y % num_Radar > 0 ) then
+    if ( y % num_Radar > 0 ) then
        do n = 1, y % num_Radar
-          DEALLOCATE (y % Radar(n)%rv)
-          DEALLOCATE (y % Radar(n)%rf)
-       enddo
-       DEALLOCATE (y % Radar)
-    endif
+          deallocate (y % Radar(n)%rv)
+          deallocate (y % Radar(n)%rf)
+       end do
+       deallocate (y % Radar)
+    end if
 
 
-   IF ( y % num_airep > 0 ) then
+   if ( y % num_airep > 0 ) then
       do n = 1, y % num_airep
-         DEALLOCATE (y % airep(n)%u)
-         DEALLOCATE (y % airep(n)%v)
-         DEALLOCATE (y % airep(n)%t)
-      enddo
-      DEALLOCATE (y % airep)
-   endif
+         deallocate (y % airep(n)%u)
+         deallocate (y % airep(n)%v)
+         deallocate (y % airep(n)%t)
+      end do
+      deallocate (y % airep)
+   end if
 
    if (y % num_geoamv > 0) then
       do n=1, y % num_geoamv
@@ -90,76 +90,73 @@ SUBROUTINE da_deallocate_y( y )
       deallocate (y % polaramv)
    end if
 
-   IF ( y % num_gpspw > 0 ) DEALLOCATE (y % gpspw)
+   if ( y % num_gpspw > 0 ) deallocate (y % gpspw)
 
-   IF ( y % num_gpsref > 0 ) then
+   if ( y % num_gpsref > 0 ) then
       do n = 1, y % num_gpsref
-         DEALLOCATE (y % gpsref(n)%ref)
-         DEALLOCATE (y % gpsref(n)%  p)
-         DEALLOCATE (y % gpsref(n)%  t)
-         DEALLOCATE (y % gpsref(n)%  q)
-      enddo
-      DEALLOCATE (y % gpsref)
-   ENDIF
+         deallocate (y % gpsref(n)%ref)
+         deallocate (y % gpsref(n)%  p)
+         deallocate (y % gpsref(n)%  t)
+         deallocate (y % gpsref(n)%  q)
+      end do
+      deallocate (y % gpsref)
+   end if
 
-   IF ( y % num_satem > 0 ) then
+   if ( y % num_satem > 0 ) then
       do n = 1, y % num_satem
-         DEALLOCATE (y % satem(n) % thickness)
-      enddo
-      DEALLOCATE (y % satem)
-   ENDIF
+         deallocate (y % satem(n) % thickness)
+      end do
+      deallocate (y % satem)
+   end if
 
-   IF ( y % num_ssmi_tb > 0 ) DEALLOCATE (y % ssmi_tb)
-   IF ( y % num_ssmi_retrieval > 0 ) DEALLOCATE (y % ssmi_retrieval)
-   IF ( y % num_pseudo > 0 ) DEALLOCATE (y % pseudo)
+   if ( y % num_ssmi_tb > 0 ) deallocate (y % ssmi_tb)
+   if ( y % num_ssmi_retrieval > 0 ) deallocate (y % ssmi_retrieval)
+   if ( y % num_pseudo > 0 ) deallocate (y % pseudo)
 
-   IF ( y % num_ssmt1 > 0 ) then
+   if ( y % num_ssmt1 > 0 ) then
       do n = 1, y % num_ssmt1
-         DEALLOCATE (y % ssmt1(n) % t)
-      enddo
-      DEALLOCATE (y % ssmt1)
-   ENDIF
+         deallocate (y % ssmt1(n) % t)
+      end do
+      deallocate (y % ssmt1)
+   end if
 
-   IF ( y % num_ssmt2 > 0 ) then
+   if ( y % num_ssmt2 > 0 ) then
       do n = 1, y % num_ssmt2
-         DEALLOCATE (y % ssmt2(n) % rh)
-      enddo
-      DEALLOCATE (y % ssmt2)
-   ENDIF
+         deallocate (y % ssmt2(n) % rh)
+      end do
+      deallocate (y % ssmt2)
+   end if
 
-   IF ( y % num_qscat > 0 ) DEALLOCATE (y % qscat)
+   if ( y % num_qscat > 0 ) deallocate (y % qscat)
 
-   IF ( y % num_profiler > 0 ) then
+   if ( y % num_profiler > 0 ) then
       do n = 1, y % num_profiler
-         DEALLOCATE (y % profiler(n)%u)
-         DEALLOCATE (y % profiler(n)%v)
-      enddo
-      DEALLOCATE (y % profiler)
-   endif
+         deallocate (y % profiler(n)%u)
+         deallocate (y % profiler(n)%v)
+      end do
+      deallocate (y % profiler)
+   end if
 
-   IF ( y % num_buoy  > 0 ) DEALLOCATE (y % buoy )
+   if ( y % num_buoy  > 0 ) deallocate (y % buoy )
 
    !  radiance:
  
-   IF ( y % num_inst > 0 ) THEN
+   if ( y % num_inst > 0 ) then
       do i = 1,  y % num_inst
         if (y % instid(i) % num_rad < 1) cycle
-        ! DEALLOCATE ( y % instid(i) % ichan )
-        do j = 1, y % instid(i) % num_rad
-           DEALLOCATE ( y % instid(i) % rad(j) % tb )
-        end do
-        DEALLOCATE ( y % instid(i) % rad )
+        ! deallocate ( y % instid(i) % ichan )
+        deallocate (y % instid(i) % tb)
       end do
-      DEALLOCATE (y % instid)
-   END IF
-   IF ( y % num_airsr > 0 ) then
+      deallocate (y % instid)
+   end if
+   if ( y % num_airsr > 0 ) then
       do n = 1, y % num_airsr
-         DEALLOCATE (y % airsr(n)%t)
-         DEALLOCATE (y % airsr(n)%q)
-      enddo
-      DEALLOCATE (y % airsr)
-   endif
+         deallocate (y % airsr(n)%t)
+         deallocate (y % airsr(n)%q)
+      end do
+      deallocate (y % airsr)
+   end if
 
-   IF (trace_use) CALL da_trace_exit("da_deallocate_y")
+   if (trace_use) call da_trace_exit("da_deallocate_y")
 
-END SUBROUTINE da_deallocate_y
+end subroutine da_deallocate_y

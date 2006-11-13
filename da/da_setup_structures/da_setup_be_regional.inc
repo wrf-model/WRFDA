@@ -70,13 +70,8 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    if (trace_use) call da_trace_entry("da_setup_be_regional")
 
-   write (unit=stdout,fmt='(A)') &
-      ' -------------------------------------------------------'
-   write (unit=stdout,fmt='(A)') &
-      ' [3.0] Set up background errors for regional application'
-   write (unit=stdout,fmt='(A)') &
-      ' -------------------------------------------------------'
-   write (unit=stdout,fmt=*) ' '
+   write (unit=message(1),fmt='(A)') &
+      'Set up background errors for regional application'
 
    be % v1 % name = 'psi  '           ! Streamfunction
    be % v2 % name = 'chi_u'           ! Uncorrelated velocity potential.
@@ -84,23 +79,19 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    be % v4 % name = 'q/qsg'
    be % v5 % name = 'psfc'            ! surface pressure
 
-   write (unit=stdout,fmt='(3x,A)')' da_setup_be_regional: WRF-Var dry control variables are:'
-   write (unit=stdout,fmt='(4x,7A)') &
-      TRIM(be % v1 % name), ', ', TRIM(be % v2 % name), ', ', &
-      TRIM(be % v3 % name), ' and ', TRIM(be % v5 % name)
+   write (unit=message(2),fmt='(3x,A,7A)') 'WRF-Var dry control variables are:', &
+      trim(be % v1 % name), ', ', trim(be % v2 % name), ', ', &
+      trim(be % v3 % name), ' and ', trim(be % v5 % name)
 
-   write (unit=stdout,fmt='(3x,A,A)') &
-      ' da_setup_be_regional: humidity control variable is ',&
-      TRIM(be % v4 % name)
-
-   write (unit=stdout,fmt=*) ' '
+   write (unit=message(3),fmt='(3x,A,A)') &
+      'Humidity control variable is ', trim(be % v4 % name)
 
    ix = xb % mix
    jy = xb % mjy
    kz = xb % mkz
 
    call da_get_unit(be_unit)
-   open(unit=be_unit,FILE="be.dat", status="old",form="unformatted")
+   open(unit=be_unit,file="be.dat", status="old",form="unformatted")
 
    rewind (be_unit)
    read (be_unit) ni, nj, nk
@@ -158,15 +149,11 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    deallocate (regcoeff2)
    deallocate (regcoeff3)
 
-   ! write (901,'(10e13.5)') ((be%reg_chi (j,k),j=1,num_bins2d),k=1,nk)
-   ! write (902,'(10e13.5)') ((be%reg_ps (j,k),j=1,num_bins2d),k=1,nk)
-   ! write (903,'(10e13.5)') ((be%reg_t (j,k,k),j=1,num_bins2d),k=1,nk)
-
    ! 1.3 Domain_averaged regression coefficients
 
    if (.not.lat_stats_option) then
-      write (unit=stdout, fmt='(/5x, a/)') &
-         '*** Using the averaged regression coefficients for unbalanced part ***'
+      write (unit=message(4), fmt='(3x, a)') &
+         'Using the averaged regression coefficients for unbalanced part'
 
       do k=1,nk
          avg= 0.0
@@ -174,13 +161,13 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
          do j=1,num_bins2d
             avg= avg + be%reg_ps (j,k)/float(num_bins2d) 
             avg2= avg2 + be%reg_chi (j,k)/float(num_bins2d) 
-         enddo
+         end do
 
          do j=1,num_bins2d
             be%reg_ps(j,k)=avg
             be%reg_chi (j,k)=avg2
-         enddo
-      enddo
+         end do
+      end do
 
       do m=1,nk
          do k=1,nk
@@ -188,17 +175,19 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
             do j=1,num_bins2d
                avg3= avg3 + be%reg_t (j,k,m)/float(num_bins2d)
-            enddo
+            end do
 
             do j=1,num_bins2d
                be%reg_t(j,k,m)=avg3
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
    else
-      write (unit=stdout, fmt='(/5x, a/)') &
-         '*** Using the latitude-dependent regression coefficients for unbalanced part ***'
-   endif
+      write (unit=message(4), fmt='(3x, a)') &
+         'Using the latitude-dependent regression coefficients for unbalanced part'
+   end if
+
+   call da_message(message(1:4))
     
    ! 2.0 Load the eigenvector and eigenvalue
 
@@ -208,7 +197,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    allocate (be4_eval_loc (1:jy,1:kz))
    allocate (be5_eval_loc (1:jy,1:1))
 
-   if (vert_corr == 2) THEN
+   if (vert_corr == 2) then
 
       allocate (be1_eval_glo(1:kz))
       allocate (be2_eval_glo(1:kz))
@@ -242,16 +231,16 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read (be_unit)  evec_loc
    read (be_unit)  eval_loc
    if (variable(1:3) /= 'psi') then
-      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
-      write (unit=errmsg(2),fmt='(A,A)') ' Expected psi but got ',variable
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
+      message(1)=' Variable mismatch while transfering eigen values from BE file '
+      write (unit=message(2),fmt='(A,A)') ' Expected psi but got ',variable
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if
    be % v1 % name = variable
    do j=1,nj
       b = bin2d(1,j)
       be1_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be1_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
-   enddo
+   end do
 
    ! 2.2.2 Control variable 2 (chi_u)
 
@@ -262,16 +251,16 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read (be_unit)  evec_loc
    read (be_unit)  eval_loc
    if (variable(1:5) /= 'chi_u') then
-      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
-      write (unit=errmsg(2),fmt='(A,A)') ' Expected chi_u but got ',variable
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
+      message(1)=' Variable mismatch while transfering eigen values from BE file '
+      write (unit=message(2),fmt='(A,A)') ' Expected chi_u but got ',variable
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if
    be % v2 % name = variable
    do j=1,nj
       b = bin2d(1,j)
       be2_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be2_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
-   enddo
+   end do
 
    ! 2.2.3 Control variable 3 (t_u)
    read (be_unit) variable
@@ -281,16 +270,16 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read (be_unit)  evec_loc
    read (be_unit)  eval_loc
    if (variable(1:3) /= 't_u') then
-      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
-      write (unit=errmsg(2),fmt='(A,A)') ' Expected t_u but got ',variable
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
+      message(1)=' Variable mismatch while transfering eigen values from BE file '
+      write (unit=message(2),fmt='(A,A)') ' Expected t_u but got ',variable
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if
    be % v3 % name = variable
    do j=1,nj
       b = bin2d(1,j)
       be3_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be3_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
-   enddo
+   end do
 
    ! 2.2.4 Control variable 4 (q/qsg)
 
@@ -301,16 +290,16 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read (be_unit)  evec_loc
    read (be_unit)  eval_loc
    if (variable(1:3) /= 'rh') then
-      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
-      write (unit=errmsg(2),fmt='(A,A)') ' Expected rh but got ',variable
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
+      message(1)=' Variable mismatch while transfering eigen values from BE file '
+      write (unit=message(2),fmt='(A,A)') ' Expected rh but got ',variable
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if
    be % v4 % name = variable
    do j=1,nj
       b = bin2d(1,j)
       be4_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
       be4_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
-   enddo
+   end do
 
    deallocate (evec_loc)
    deallocate (eval_loc)
@@ -326,16 +315,16 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    read (be_unit)  evec_loc
    read (be_unit)  eval_loc
    if (variable(1:4) /= 'ps_u') then
-      errmsg(1)=' Variable mismatch while transfering eigen values from BE file '
-      write (unit=errmsg(2),fmt='(A,A)') ' Expected ps_u but got ',variable
-      call da_error(__FILE__,__LINE__,errmsg(1:2))
-   endif
+      message(1)=' Variable mismatch while transfering eigen values from BE file '
+      write (unit=message(2),fmt='(A,A)') ' Expected ps_u but got ',variable
+      call da_error(__FILE__,__LINE__,message(1:2))
+   end if
    be % v5 % name = variable
    do j=1,nj
       b = bin2d(1,j)
       be5_evec_loc(j,1:1,1:1) = evec_loc(1:1,1:1,b)
       be5_eval_loc(j,1:1   ) = eval_loc(1:1,b)
-   enddo
+   end do
 
    deallocate (evec_loc)
    deallocate (eval_loc)
@@ -343,11 +332,11 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    ! 3.0 Check and get the truncated number of the vertical modes
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   if (vert_corr == 2) THEN
+   if (vert_corr == 2) then
 
       ! 3.1 Perform checks on eigenvectors:
 
-      if (test_statistics) THEN
+      if (test_statistics) then
          call da_check_eof_decomposition(be1_eval_glo(:), be1_evec_glo(:,:), be % v1 % name)
          call da_check_eof_decomposition(be2_eval_glo(:), be2_evec_glo(:,:), be % v2 % name)
          call da_check_eof_decomposition(be3_eval_glo(:), be3_evec_glo(:,:), be % v3 % name)
@@ -401,8 +390,8 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    call da_allocate_background_errors(jy,  1, be5_eval_glo, be5_evec_glo, be5_eval_loc, &
                                        be5_evec_loc, be % v5)
 
-   if (print_detail_be) THEN
-      write (unit=stdout,fmt='(2x,a,i10)') "b) Finished eigenvector processing!"
+   if (print_detail_be) then
+      write (unit=stdout,fmt='(3x,a,i10)') "b) Finished eigenvector processing!"
    end if
 
    ! 5.0 Load the scale lengths
@@ -445,7 +434,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    ! 6.0 Perform checks on eigenvectors with be data structure:
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   if (test_statistics) THEN
+   if (test_statistics) then
       call da_check_eof_decomposition(be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
       call da_check_eof_decomposition(be%v2%val_g(:), be%v2%evec_g(:,:),&
@@ -484,7 +473,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    deallocate (be4_eval_loc)
    deallocate (be5_eval_loc)
 
-   if (vert_corr == 2) THEN
+   if (vert_corr == 2) then
       deallocate (be1_eval_glo)
       deallocate (be2_eval_glo)
       deallocate (be3_eval_glo)

@@ -3,12 +3,12 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
 
    implicit none
 
-   integer, intent(IN)                      :: kts, kte
-   real, intent(INOUT)                      :: ZCB, TCB, QCB, PCB
-   real, intent(IN),   dimension(kts:kte)   :: PK, TE
-   real, intent(OUT),  dimension(kts:kte)   :: Z, T, Q
-   integer, intent(OUT)                     :: LCB, LCT
-   real, intent(OUT)                        :: PCT, ZCT
+   integer, intent(in)                      :: kts, kte
+   real, intent(inout)                      :: ZCB, TCB, QCB, PCB
+   real, intent(in),   dimension(kts:kte)   :: PK, TE
+   real, intent(out),  dimension(kts:kte)   :: Z, T, Q
+   integer, intent(out)                     :: LCB, LCT
+   real, intent(out)                        :: PCT, ZCT
 
    integer   :: k, IA, L, NCB
    real      :: G, CP, R, HL, EM, ET, P
@@ -22,41 +22,41 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
    DT=0.1
    IA=1000
 
-   DO k = kts, kte
+   do k = kts, kte
       Z(k) = 0.0
       T(k) = 0.0
       Q(k) = 0.0
-   ENDDO
+   end do
 
    EM=G*ZCB+CP*TCB+HL*QCB
 
    NCB=kts
 
-   IF ( PK(kte) > PCB ) THEN
+   if ( PK(kte) > PCB ) then
       NCB=kte
-   END IF
+   end if
 
-   DO L=kte-1,kts,-1
-      IF ( PK(L) > PCB ) THEN
+   do L=kte-1,kts,-1
+      if ( PK(L) > PCB ) then
          NCB=L+1
-         EXIT
-      END IF
-   ENDDO
+         exit
+      end if
+   end do
 
-   DO L=NCB,kte
+   do L=NCB,kte
       P=PK(L)
-      DO K=1,IA
-         IF ( L == NCB ) THEN
+      do K=1,IA
+         if ( L == NCB ) then
             TLL=TCB
             QLL=QCB
             PLL=PCB
             ZLL=ZCB
-         ELSE
+         else
             TLL=T(L-1)
             QLL=Q(L-1)
             PLL=PK(L-1)
             ZLL=Z(L-1)
-         ENDIF
+         end if
 
          T(L)=TLL-(K*DT)
 
@@ -69,30 +69,30 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
          DZ=(R*TBAR*(1.+0.61*QBAR)*DP)/(G*PBAR)
          Z(L)=ZLL+DZ
          ET=G*Z(L)+CP*T(L)+HL*Q(L)
-         IF ((ET-EM) <= 0.) EXIT
-      ENDDO
-   ENDDO
+         if ((ET-EM) <= 0.) exit
+      end do
+   end do
 
    LCT=NCB
 
-   DO K=kte,NCB+1,-1
+   do K=kte,NCB+1,-1
       DDT=T(K)-TE(K)
 
-      IF (DDT >= 0.) THEN
+      if (DDT >= 0.) then
          LCT=K
-         EXIT
-      END IF
-   ENDDO
+         exit
+      end if
+   end do
 
    LCB=LCT
 
-   DO K=NCB,kte
+   do K=NCB,kte
       DDT=T(K)-TE(K)
-      IF ( DDT >= 0. ) THEN
+      if ( DDT >= 0. ) then
          LCB=K
-         EXIT
-      END IF
-   ENDDO
+         exit
+      end if
+   end do
 
    PCT=PK(LCT)
    ZCT=Z(LCT)

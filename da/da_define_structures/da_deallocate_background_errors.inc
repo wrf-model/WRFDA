@@ -34,7 +34,7 @@ subroutine da_deallocate_background_errors (be)
 
    ! Deallocate eigenvectors of vertical error covariance:
 
-   IF (vert_corr == 2) THEN
+   if (vert_corr == 2) then
       if (be % v1 % mz > 0) deallocate (be % v1 % evec)
       if (be % v2 % mz > 0) deallocate (be % v2 % evec)
       if (be % v3 % mz > 0) deallocate (be % v3 % evec)

@@ -30,7 +30,7 @@ subroutine da_setup_background_errors( xb, xbx, be, xp, &
       call da_setup_be_global (ide, jde, kde, be)
    else
       call da_setup_be_regional (xb, be, xbx, xp)
-   endif
+   end if
 
    call da_setup_cv (its, ite, jts, jte, &
                      ids, ide, jds, jde, be)

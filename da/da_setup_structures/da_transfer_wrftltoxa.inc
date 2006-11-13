@@ -7,9 +7,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    !           (inverse of the incremental part of xatowrf)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   type(domain) ,   TARGET                   :: grid
+   type(domain) ,   target                   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    character*4 filnam
@@ -28,10 +28,10 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
 
    integer ndynopt
 
-   IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
+   if (trace_use) call da_trace_entry("da_transfer_wrftltoxa")
 
    !---------------------------------------------------------------------------
-   ! [0.0] INPUT
+   ! [0.0] inPUT
    !---------------------------------------------------------------------------
 
    is=grid%xp%its
@@ -58,9 +58,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do j=js,je
    do i=is,ie
       grid%xa%q(i,j,k)=g_moist(i,j,k,P_QV)*(1.0-grid%xb%q(i,j,k))**2
-   enddo
-   enddo
-   enddo
+   end do
+   end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [2.0] COMPUTE psfc increments from mu-increments
@@ -73,10 +73,10 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do k=ks,ke
          sdmd=sdmd+g_moist(i,j,k,P_QV)*grid%em_dnw(k)
          s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
-      enddo
+      end do
       grid%xa%psfc(i,j)=-grid%xb%psac(i,j)*sdmd-grid%em_g_mu_2(i,j)*s1md
-   enddo
-   enddo
+   end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [3.0] COMPUTE pressure increments 
@@ -90,12 +90,12 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
                  -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
                  +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_moist(i,j,k,P_QV))*grid%em_dn(k)
          grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
-      enddo
-   enddo
-   enddo
+      end do
+   end do
+   end do
 
    !---------------------------------------------------------------------------
-   ! [4.0] CONVERT THETA INCREMENTS TO T INCREMENTS
+   ! [4.0] CONVERT THETA inCREMENTS TO T inCREMENTS
    !---------------------------------------------------------------------------
 
    do k=ks,ke
@@ -103,9 +103,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do i=is,ie
       grid%xa%t(i,j,k)=grid%xb%t(i,j,k)*(grid%em_g_t_2(i,j,k)/(300.0+grid%em_t_2(i,j,k)) &
                          +kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
-   enddo
-   enddo
-   enddo
+   end do
+   end do
+   end do
 
    ! FIX. In the inverse, g_ph information is lost. This should be investigated 
    ! later.
@@ -122,9 +122,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do i=is,ie
       grid%xa%u(i,j,k)=0.5*(grid%em_g_u_2(i+1,j  ,k)+grid%em_g_u_2(i,j,k))
       grid%xa%v(i,j,k)=0.5*(grid%em_g_v_2(i  ,j+1,k)+grid%em_g_v_2(i,j,k))
-   enddo
-   enddo
-   enddo
+   end do
+   end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [6.0] ALL THE SIMPLE ONES
@@ -134,9 +134,9 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
    do k=ks,ke+1
    do i=is,ie
       grid%xa%w(i,j,k)=grid%em_g_w_2(i,j,k)
-   enddo
-   enddo
-   enddo
+   end do
+   end do
+   end do
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
@@ -146,10 +146,10 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do i=is,ie
          grid%xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
          grid%xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
-      enddo
-      enddo
-      enddo
-   endif
+      end do
+      end do
+      end do
+   end if
 
    if (size(moist,dim=4) >= 6 ) then
       do k=ks,ke
@@ -157,23 +157,23 @@ subroutine da_transfer_wrftltoxa( grid, config_flags, filnam, &
       do i=is,ie
          grid%xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
          grid%xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
-      enddo
-      enddo
-      enddo
-   endif
+      end do
+      end do
+      end do
+   end if
 
    if (size(moist_2,dim=4) >= 7 ) then
       do k=ks,ke
       do j=js,je
       do i=is,ie
          grid%xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
-      enddo
-      enddo
-      enddo
-   endif
+      end do
+      end do
+      end do
+   end if
 #endif
 
-   IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
+   if (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 
 end subroutine da_transfer_wrftltoxa
 

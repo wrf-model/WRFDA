@@ -9,48 +9,48 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
 !               Applied Max error check on
 !               AIRS retrievals
 !-------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-  TYPE (airsr_type), INTENT(INOUT)       :: airsr
-  INTEGER, INTENT(INOUT)                 :: itt,ittf,itqv,itqvf
+  integer,           intent (in)         :: it      ! Outer iteration
+  type (airsr_type), intent(inout)       :: airsr
+  integer, intent(inout)                 :: itt,ittf,itqv,itqvf
 
-  INTEGER                                :: i, k
-  LOGICAL                                :: failed
+  integer                                :: i, k
+  logical                                :: failed
   !-----------------------------------------------------------------------------!  
   ! [1.0] Open diagnostic file:
   !-----------------------------------------------------------------------------!
 
-  IF ( check_max_iv_print )THEN
-    WRITE (check_max_iv_unit,'(A)')  &
+  if ( check_max_iv_print )then
+    write (check_max_iv_unit,'(A)')  &
       '----------------------------------------------------------------'
-    WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+    write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-    WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
+    write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
       'Error max test ratio for AIRS_T   = ',max_error_t,  &
       'Error max test ratio for AIRS_QV  = ',max_error_q
-  ENDIF
+  end if
 
   !-----------------------------------------------------------------------------!
   ! [2.0] Perform maximum innovation vector check:
   !-----------------------------------------------------------------------------!
 
-  failed = .FALSE.
+  failed = .false.
 
-  DO k = 1, airsr % info % levels
+  do k = 1, airsr % info % levels
     ! Temperature
-    if (airsr % t(k) % qc >= obs_qc_pointer ) THEN
-      CALL da_max_error_qc (it, airsr % info, airsr % t(k),&
+    if (airsr % t(k) % qc >= obs_qc_pointer ) then
+      call da_max_error_qc (it, airsr % info, airsr % t(k),&
            max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
                         failed, check_max_iv_print)
 
-    END IF
+    end if
     ! Mixing ratio, same ratio as relative humidity
-    if (airsr % q(k) % qc >= obs_qc_pointer ) THEN
-      CALL da_max_error_qc (it, airsr % info, airsr % q(k), &
+    if (airsr % q(k) % qc >= obs_qc_pointer ) then
+      call da_max_error_qc (it, airsr % info, airsr % q(k), &
            max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
                         failed, check_max_iv_print)
-    END IF
-  END DO
+    end if
+  end do
 
-END subroutine da_check_max_iv_airsr
+end subroutine da_check_max_iv_airsr

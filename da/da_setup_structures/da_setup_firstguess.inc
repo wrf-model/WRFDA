@@ -5,11 +5,11 @@ subroutine da_setup_firstguess( xbx, grid, &
    ! PURPOSE: Allocate and read in components of first guess state.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xbx_type),INTENT(OUT)  :: xbx   ! Header & non-gridded vars.
+   type (xbx_type),intent(out)  :: xbx   ! Header & non-gridded vars.
 
-   TYPE(domain) , TARGET        :: grid
+   type(domain) , target        :: grid
 
    ! Definitions of dummy arguments to solve
 #include "em_dummy_new_decl.inc"
@@ -17,7 +17,7 @@ subroutine da_setup_firstguess( xbx, grid, &
    integer :: is, ie, js, je
    real    :: ddx , ddy    
 
-   IF (trace_use) call da_trace_entry("da_setup_firstguess")
+   if (trace_use) call da_trace_entry("da_setup_firstguess")
 
    is = grid%xp % its
    ie = grid%xp % ite
@@ -60,9 +60,9 @@ subroutine da_setup_firstguess( xbx, grid, &
       grid%xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(grid%xlat(is:ie,js:je)*pi/180.))
       grid%xb% coefy(is:ie,js:je) = 0.5 /  ddy
    else
-      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+      write(unit=message(1),fmt='(A,I5)') &
          "Wrong choice for fg_format = ",fg_format
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id0)
@@ -81,7 +81,7 @@ subroutine da_setup_firstguess( xbx, grid, &
 
    call da_setup_runconstants( grid%xp, grid%xb, xbx)
 
-   IF (trace_use) call da_trace_exit("da_setup_firstguess")
+   if (trace_use) call da_trace_exit("da_setup_firstguess")
 
 end subroutine da_setup_firstguess
 

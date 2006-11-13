@@ -8,11 +8,11 @@ subroutine da_print_stats_airsr( stats_unit, nt, nq, airsr )
 !              Prints out Table for AIRS diagnostics
 !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nt, nq
-   TYPE (stats_airsr_type), INTENT(IN):: airsr
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nt, nq
+   type (stats_airsr_type), intent(in):: airsr
 !-------------------------------------------------------------------------
    
   write(unit=stats_unit, fmt='(5a/)') &

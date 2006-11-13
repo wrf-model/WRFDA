@@ -7,7 +7,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    !           (inverse of the incremental part of xatowrf)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
    type(domain)                              :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
@@ -25,11 +25,11 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    real    :: sdmd, s1md
    real    :: rho_cgrid
 
-   REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: a_press
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: a_press
 
    integer ndynopt
 
-   IF (trace_use) call da_trace_entry("da_transfer_xatowrftl_adj")
+   if (trace_use) call da_trace_entry("da_transfer_xatowrftl_adj")
 
    is=grid%xp%its
    ie=grid%xp%ite
@@ -39,7 +39,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    ke=grid%xp%kte
 
    !---------------------------------------------------------------------------
-   ! [7.0] Adjoint of OUTPUT (INPUT)
+   ! [7.0] Adjoint of outPUT (inPUT)
    !---------------------------------------------------------------------------
 
    ndynopt      = grid%dyn_opt
@@ -52,16 +52,16 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
    !---------------------------------------------------------------------------
-   ! [6.0] Adjoint of SAVE OTHERINCREMENT
+   ! [6.0] Adjoint of save OTHERinCREMENT
    !---------------------------------------------------------------------------
 
    do k=ks,ke+1
       do j=js,je
          do i=is,ie
             grid%xa%w(i,j,k)=grid%em_a_w_2(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
@@ -71,10 +71,10 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
             do i=is,ie
                grid%xa%qcw(i,j,k)=a_moist(i,j,k,p_qcw)
                grid%xa%qrn(i,j,k)=a_moist(i,j,k,p_qrn)
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
    if ( size(moist,dim=4) >= 6 ) then
       do k=ks,ke
@@ -82,20 +82,20 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
             do i=is,ie
                grid%xa%qci(i,j,k)=a_moist(i,j,k,p_qci)
                grid%xa%qsn(i,j,k)=a_moist(i,j,k,p_qsn)
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
    if ( size(moist,dim=4) >= 7 ) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
                grid%xa%qgr(i,j,k)=a_moist(i,j,k,p_qgr) 
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
 #endif
 
@@ -112,9 +112,9 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
          do i=is,ie
             grid%xa%u(i,j,k)=0.5*(grid%em_a_u_2(i+1,j  ,k)+grid%em_a_u_2(i,j,k))
             grid%xa%v(i,j,k)=0.5*(grid%em_a_v_2(i  ,j+1,k)+grid%em_a_v_2(i,j,k))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 #ifdef DM_PARALLEL
 
@@ -122,25 +122,25 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
    if (is == grid%xp%ids) then
       grid%xa%u(is  ,js:je,ks:ke)=grid%xa%u(is  ,js:je,ks:ke)+grid%em_a_u_2(is,js:je,ks:ke)
       grid%xa%u(is+1,js:je,ks:ke)=grid%xa%u(is+1,js:je,ks:ke)-grid%em_a_u_2(is,js:je,ks:ke)/2.
-   endif
+   end if
 
    ! The eastern boundary
    if (ie == grid%xp%ide) then
       grid%xa%u(ie  ,js:je,ks:ke)=grid%xa%u(ie  ,js:je,ks:ke)+grid%em_a_u_2(ie+1,js:je,ks:ke)
       grid%xa%u(ie-1,js:je,ks:ke)=grid%xa%u(ie-1,js:je,ks:ke)-grid%em_a_u_2(ie+1,js:je,ks:ke)/2.
-   endif
+   end if
 
    ! The southern boundary
    if (js == grid%xp%jds) then
       grid%xa%v(is:ie,js  ,ks:ke)=grid%xa%v(is:ie,js  ,ks:ke)+grid%em_a_v_2(is:ie,js,ks:ke)
       grid%xa%v(is:ie,js+1,ks:ke)=grid%xa%v(is:ie,js+1,ks:ke)-grid%em_a_v_2(is:ie,js,ks:ke)/2.
-   endif
+   end if
 
    ! The northern boundary
    if (je == grid%xp%jde) then
       grid%xa%v(is:ie,je  ,ks:ke)=grid%xa%v(is:ie,je  ,ks:ke)+grid%em_a_v_2(is:ie,je+1,ks:ke)
       grid%xa%v(is:ie,js-1,ks:ke)=grid%xa%v(is:ie,je-1,ks:ke)-grid%em_a_v_2(is:ie,je+1,ks:ke)/2.
-   endif
+   end if
 
 #else
 
@@ -163,8 +163,8 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 #endif
 
    !---------------------------------------------------------------------------
-   ! [4.0] Adjoint of CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS
-   !       EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+   ! [4.0] Adjoint of CONVERT TEMPERATURE inCREMENTS inTO THETA inCREMENTS
+   !       EVALUATE ALSO THE inCREMENTS OF (1/rho) AND GEOPOTENTIAL
    !---------------------------------------------------------------------------
 
    a_press(is:ie,js:je,ks:ke+1)=0.
@@ -178,18 +178,18 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
             grid%xa%q(i,j,k)=-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*grid%xb%q(i,j,k))
             grid%xa%t(i,j,k)=-grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%t(i,j,k)
             grid%xa%p(i,j,k)= grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    do k=ks,ke
       do j=js,je
          do i=is,ie 
             grid%xa%p(i,j,k)=grid%xa%p(i,j,k)-(300.0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
             grid%xa%t(i,j,k)=grid%xa%t(i,j,k)+(300.0+grid%em_t_2(i,j,k))*grid%em_a_t_2(i,j,k)/grid%xb%t(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
  
    !---------------------------------------------------------------------------
    ! [3.0] Adjoint of COMPUTE pressure increments (for computing theta increments)
@@ -204,9 +204,9 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
             a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
             grid%em_a_mu_2(i,j)=grid%em_a_mu_2(i,j)-a_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*grid%em_dn(k)
             a_press(i,j,k+1)=a_press(i,j,k+1)+a_press(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [2.0] Adjoint of COMPUTE increments of dry-column air mass per unit area
@@ -218,14 +218,14 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
          s1md=0.0
          do k=ks,ke
             s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
-         enddo
+         end do
          sdmd=sdmd-grid%xb%psac(i,j)*grid%em_a_mu_2(i,j)/s1md
          grid%xa%psfc(i,j)=-grid%em_a_mu_2(i,j)/s1md
          do k=ks,ke
             a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)+sdmd*grid%em_dnw(k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [1.0] Adjoint of Get the mixing ratio of moisture 
@@ -235,11 +235,11 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             grid%xa%q(i,j,k)=grid%xa%q(i,j,k)+a_moist(i,j,k,P_QV)/(1.0-grid%xb%q(i,j,k))**2
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
-   IF (trace_use) call da_trace_exit("da_transfer_xatowrftl_adj")
+   if (trace_use) call da_trace_exit("da_transfer_xatowrftl_adj")
 
 end subroutine da_transfer_xatowrftl_adj
 

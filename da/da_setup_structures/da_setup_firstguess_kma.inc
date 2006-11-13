@@ -6,11 +6,11 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    ! PURPOSE: Define/allocate components of WRF model state.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xbx_type),INTENT(OUT)         :: xbx    ! Header & non-gridded vars.
+   type (xbx_type),intent(out)         :: xbx    ! Header & non-gridded vars.
 
-   TYPE(domain) , TARGET               :: grid
+   type(domain) , target               :: grid
 
 #include "em_dummy_new_decl.inc"
 
@@ -18,7 +18,7 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    integer           :: is, ie, js, je, ks, ke
    integer           :: max_wavenumber
 
-   IF (trace_use) call da_trace_entry("da_setup_firstguess_kma")
+   if (trace_use) call da_trace_entry("da_setup_firstguess_kma")
 
    is = grid%xp % its
    ie = grid%xp % ite
@@ -92,7 +92,7 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
 #include "em_dummy_new_args.inc"
                              )
 
-   IF (trace_use) call da_trace_exit("da_setup_firstguess_kma")
+   if (trace_use) call da_trace_exit("da_setup_firstguess_kma")
 
 end subroutine da_setup_firstguess_kma
 

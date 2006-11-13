@@ -1,23 +1,23 @@
-MODULE da_setup_structures
+module da_setup_structures
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Sets up various structures.
    !---------------------------------------------------------------------------
 
    use module_state_description
-   USE da_define_structures
-   USE da_grid_definitions
-   USE da_obs
-   USE da_ssmi
-   USE da_vtox_transforms
-   USE da_spectral
+   use da_define_structures
+   use da_grid_definitions
+   use da_obs
+   use da_ssmi
+   use da_vtox_transforms
+   use da_spectral
    use da_wrfvar_io
    use da_radiance
    use da_reporting
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_add_pbl_and_sfc_info.inc"
 #include "da_get_vertical_truncation.inc"
@@ -56,4 +56,4 @@ MODULE da_setup_structures
 #include "da_get_bins_info.inc"
 #include "da_truncate_spectra.inc"
 
-END MODULE da_setup_structures
+end module da_setup_structures

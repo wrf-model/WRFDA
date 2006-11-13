@@ -1,20 +1,20 @@
-SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
+subroutine da_setup_obs_structures_ascii( xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define, allocate and read of observation structure.
    !          07/03/2006 - Update for AIRS retrieval       Syed RH Rizvi
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(IN) :: xp         ! Domain decomposition vars.
-   TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
-   TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
+   type (xpose_type), intent(in) :: xp         ! Domain decomposition vars.
+   type ( y_type), intent(out)  :: ob          ! Observation structure.
+   type (ob_type), intent(out)  :: iv          ! O-B structure.
 
-   CHARACTER(len=120)           :: filename
+   character(len=120)           :: filename
    integer                      :: n
 
-   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures_ascii")
+   if (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
    
    !--------------------------------------------------------------------------
    ! [0.0] Initialize the counters.
@@ -68,7 +68,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       iv%ob_numb(n)%radar  = 0
       iv%ob_numb(n)%bogus  = 0
       iv%ob_numb(n)%airsr  = 0
-   enddo
+   end do
 
    !--------------------------------------------------------------------------
    ! [1.0] Scan GTS observation header and get idea of number of obs:
@@ -89,14 +89,14 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ssmi', n,'.dat'
             call da_scan_ssmi (iv, xp, filename)
-         endif
+         end if
 
          if(Use_RadarObs) then
             ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'dat'
             call da_scan_radar(iv, xp, filename)
-         endif
-      enddo
+         end if
+      end do
    else
       iv%current_ob_time = 1
 
@@ -107,13 +107,13 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       !-----------------------------------------------------------------------
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
          call da_scan_ssmi(iv, xp,'ssmi01.dat')
-      endif
+      end if
 
       ! scan main body of radar observation file
       if(Use_RadarObs) then
          call da_scan_radar(iv, xp,'radar01.dat')
-      endif
-   endif
+      end if
+   end if
 
    !--------------------------------------------------------------------  
    ! Safety guard.
@@ -168,7 +168,7 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
    ! Allocate the ob based on inputed number of obs:
    !--------------------------------------------------------------------------
 
-   CALL da_allocate_observations ( iv )
+   call da_allocate_observations ( iv )
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -230,14 +230,14 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi', n,'.dat'
             call da_read_ssmi (iv, xp, filename)
-         endif
+         end if
 
          if(Use_RadarObs) then
             ! read radar observation file
             write(filename(1:11), fmt='(a, i2.2)') 'radar', n,'.dat'
             call da_read_radar(iv, xp, filename)
-         endif
-      enddo
+         end if
+      end do
    else
       iv%current_ob_time = 1
 
@@ -246,23 +246,23 @@ SUBROUTINE da_setup_obs_structures_ascii( xp, ob, iv )
       if(Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
          ! read ssmi observation file
          call da_read_ssmi (iv, xp,'ssmi01.dat')
-      endif
+      end if
 
       if(Use_RadarObs) then
          ! read radar observation file
          call da_read_radar(iv, xp,'radar01.dat')
-      endif
-   endif
+      end if
+   end if
 
    !--------------------------------------------------------------------------
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   CALL da_fill_obs_structures( iv, ob )
+   call da_fill_obs_structures( iv, ob )
 
    iv%current_ob_time = 1
 
-   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures_ascii")
+   if (trace_use) call da_trace_exit("da_setup_obs_structures_ascii")
 
-END SUBROUTINE da_setup_obs_structures_ascii
+end subroutine da_setup_obs_structures_ascii
 

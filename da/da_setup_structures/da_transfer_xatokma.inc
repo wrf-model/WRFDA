@@ -6,11 +6,11 @@ subroutine da_transfer_xatokma( xbx, grid, &
    !  PURPOSE: Convert analysis increments into KMA increments 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx       ! Header & non-gridded vars.
+   type (xbx_type), intent(inout)     :: xbx       ! Header & non-gridded vars.
 
-   TYPE(domain), TARGET               :: grid
+   type(domain), target               :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -21,7 +21,7 @@ subroutine da_transfer_xatokma( xbx, grid, &
    real    :: sdmd, s1md
    real    :: PU, PD, coeff
 
-   IF (trace_use) call da_trace_entry("da_transfer_xatokma")
+   if (trace_use) call da_trace_entry("da_transfer_xatokma")
 
    !------------------------------------------------------------------------
    ! Set array range indices for processor subdomain.
@@ -41,7 +41,7 @@ subroutine da_transfer_xatokma( xbx, grid, &
    do j=js,je
       do i=is,ie
          grid%xb%w(i,j,ke+1)=  grid%xb%w(i,j,ke+1) + grid%xa%w(i,j,ke+1)
-      enddo
+      end do
       do i=is,ie
          do k = ks, ke
             grid%xb%u(i,j,k)   = grid%xa%u(i,j,k) + grid%xb%u(i,j,k)
@@ -62,10 +62,10 @@ subroutine da_transfer_xatokma( xbx, grid, &
             grid%xa%p(i,j,k) = grid%xa%psfc(i,j) * coeff
             grid%xa%p(i,j,k) = grid%xb%psfc(i,j)*grid%xa%psfc(i,j)
             grid%xb%p(i,j,k) = grid%xb%p(i,j,k) + grid%xa%p(I,J,k)
-         enddo
+         end do
          grid%xb%psfc(i,j) = grid%xb%psfc(i,j) + grid%xa%psfc(i,j)
-      enddo
-   enddo
+      end do
+   end do
 
    if (write_increments) call da_write_kma_increments(grid%xp, grid%xb, grid%xa)
 
@@ -73,7 +73,7 @@ subroutine da_transfer_xatokma( xbx, grid, &
       do i=is,ie
         grid%em_w_2(i,j,ke+1)=  grid%em_w_2(i,j,ke+1) + grid%xa%w(i,j,ke+1)
         grid%psfc(i,j) = grid%psfc(i,j) + grid%xa%psfc(i,j)
-      enddo
+      end do
    end do
 
    do k=ks,ke
@@ -83,11 +83,11 @@ subroutine da_transfer_xatokma( xbx, grid, &
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + grid%xa%v(i,j,k)
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)
             moist(i,j,k,P_QV) = moist(i,j,k,P_QV) + grid%xa%q(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
-   IF (trace_use) call da_trace_exit("da_transfer_xatokma")
+   if (trace_use) call da_trace_exit("da_transfer_xatokma")
 
 
 end subroutine da_transfer_xatokma

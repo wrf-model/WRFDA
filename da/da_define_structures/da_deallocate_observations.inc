@@ -1,21 +1,21 @@
-SUBROUTINE da_deallocate_observations ( ob )
+subroutine da_deallocate_observations ( ob )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Deallocate components of observation structure.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
+   type (ob_type), intent(inout)        :: ob     ! Observation structure.
    integer   :: n
 
-   IF (trace_use) CALL da_trace_entry("da_deallocate_observations")
+   if (trace_use) call da_trace_entry("da_deallocate_observations")
 
    !---------------------------------------------------------------------------
    ! [1.0] Deallocate:
    !---------------------------------------------------------------------------
 
-   IF ( ob % num_sound > 0 ) then
+   if ( ob % num_sound > 0 ) then
       do n = 1, ob % num_sound
          deallocate (ob % sound ( n ) % h )
          deallocate (ob % sound ( n ) % p )
@@ -24,16 +24,16 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % sound ( n ) % v )
          deallocate (ob % sound ( n ) % t )
          deallocate (ob % sound ( n ) % q )
-      enddo
+      end do
 
-      DEALLOCATE (ob % sound)
+      deallocate (ob % sound)
 
-      DEALLOCATE (ob % sonde_sfc)
-   endif
+      deallocate (ob % sonde_sfc)
+   end if
 
-   if (ob % num_synop > 0) DEALLOCATE (ob % synop)
+   if (ob % num_synop > 0) deallocate (ob % synop)
 
-   IF ( ob % num_airep > 0 ) then
+   if ( ob % num_airep > 0 ) then
       do n = 1, ob % num_airep
          deallocate (ob % airep ( n ) % h )
          deallocate (ob % airep ( n ) % p )
@@ -41,10 +41,10 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % airep ( n ) % u )
          deallocate (ob % airep ( n ) % v )
          deallocate (ob % airep ( n ) % t )
-      enddo
+      end do
 
-      DEALLOCATE (ob % airep)
-   endif
+      deallocate (ob % airep)
+   end if
 
    if (ob % num_satem > 0) then
       do n = 1, ob % num_satem
@@ -74,21 +74,21 @@ SUBROUTINE da_deallocate_observations ( ob )
       deallocate (ob % polaramv)
    end if
 
-   if (ob % num_metar > 0) DEALLOCATE (ob % metar)
-   if (ob % num_ships > 0) DEALLOCATE (ob % ships)
+   if (ob % num_metar > 0) deallocate (ob % metar)
+   if (ob % num_ships > 0) deallocate (ob % ships)
 
-   IF ( ob % num_pilot > 0 ) then
+   if ( ob % num_pilot > 0 ) then
       do n = 1, ob % num_pilot
          deallocate (ob % pilot ( n ) % p )
          deallocate (ob % pilot ( n ) % zk)
          deallocate (ob % pilot ( n ) % u )
          deallocate (ob % pilot ( n ) % v )
-      enddo
+      end do
 
-      DEALLOCATE (ob % pilot)
-   endif
+      deallocate (ob % pilot)
+   end if
 
-   IF ( ob % num_bogus > 0 ) then
+   if ( ob % num_bogus > 0 ) then
       do n = 1, ob % num_bogus
          deallocate (ob % bogus ( n ) % h )
          deallocate (ob % bogus ( n ) % p )
@@ -97,24 +97,24 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % bogus ( n ) % v )
          deallocate (ob % bogus ( n ) % t )
          deallocate (ob % bogus ( n ) % q )
-      enddo
+      end do
 
-      DEALLOCATE (ob % bogus)
-   endif
+      deallocate (ob % bogus)
+   end if
 
-   IF ( ob % num_Radar > 0 ) then
+   if ( ob % num_Radar > 0 ) then
       do n = 1, ob % num_Radar
          deallocate (ob % Radar ( n ) % height   )
          deallocate (ob % Radar ( n ) % height_qc)
          deallocate (ob % Radar ( n ) % zk       )
          deallocate (ob % Radar ( n ) % rv       )
          deallocate (ob % Radar ( n ) % rf       )
-      enddo
+      end do
 
-      DEALLOCATE (ob % Radar)
-   endif
+      deallocate (ob % Radar)
+   end if
 
-   if (ob % num_gpspw > 0) DEALLOCATE (ob % gpspw)
+   if (ob % num_gpspw > 0) deallocate (ob % gpspw)
 
    if ( ob % num_gpsref > 0 ) then
       do n = 1, ob % num_gpsref
@@ -124,12 +124,12 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % gpsref(n) %   p)
          deallocate (ob % gpsref(n) %   t)
          deallocate (ob % gpsref(n) %   q)
-      enddo
-      DEALLOCATE (ob % gpsref)
-   endif
+      end do
+      deallocate (ob % gpsref)
+   end if
 
-   if (ob % num_ssmi_tb > 0) DEALLOCATE (ob % ssmi_tb)
-   if (ob % num_ssmi_retrieval > 0) DEALLOCATE (ob % ssmi_retrieval)
+   if (ob % num_ssmi_tb > 0) deallocate (ob % ssmi_tb)
+   if (ob % num_ssmi_retrieval > 0) deallocate (ob % ssmi_retrieval)
 
    if (ob % num_ssmt1 > 0) then
       do n = 1, ob % num_ssmt1
@@ -137,10 +137,10 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % ssmt1(n) % p )
          deallocate (ob % ssmt1(n) % zk)
          deallocate (ob % ssmt1(n) % t )
-      enddo
+      end do
    
-      DEALLOCATE (ob % ssmt1)
-   endif
+      deallocate (ob % ssmt1)
+   end if
    
    if (ob % num_ssmt2 > 0) then
       do n = 1, ob % num_ssmt2
@@ -148,39 +148,39 @@ SUBROUTINE da_deallocate_observations ( ob )
          deallocate (ob % ssmt2(n) % p )
          deallocate (ob % ssmt2(n) % zk)
          deallocate (ob % ssmt2(n) % rh)
-      enddo
+      end do
    
-      DEALLOCATE (ob % ssmt2)
-   endif
+      deallocate (ob % ssmt2)
+   end if
 
-   if (ob % num_qscat > 0) DEALLOCATE (ob % qscat)
+   if (ob % num_qscat > 0) deallocate (ob % qscat)
 
    if (ob%num_profiler > 0) then
       do n = 1, ob % num_profiler
-         DEALLOCATE (ob%profiler(n)%p)
-         DEALLOCATE (ob%profiler(n)%zk)
-         DEALLOCATE (ob%profiler(n)%u)
-         DEALLOCATE (ob%profiler(n)%v)
+         deallocate (ob%profiler(n)%p)
+         deallocate (ob%profiler(n)%zk)
+         deallocate (ob%profiler(n)%u)
+         deallocate (ob%profiler(n)%v)
       end do
 
-      DEALLOCATE(ob%profiler)
-   endif
+      deallocate(ob%profiler)
+   end if
 
-   if (ob%num_buoy     > 0) DEALLOCATE(ob%buoy)
+   if (ob%num_buoy     > 0) deallocate(ob%buoy)
 
-   IF (ob % num_airsr > 0) then
+   if (ob % num_airsr > 0) then
       do n = 1, ob % num_airsr
          deallocate (ob % airsr ( n ) % h )
          deallocate (ob % airsr ( n ) % p )
          deallocate (ob % airsr ( n ) % zk)
          deallocate (ob % airsr ( n ) % t )
          deallocate (ob % airsr ( n ) % q )
-      enddo
+      end do
 
-      DEALLOCATE (ob % airsr)
-   endif
+      deallocate (ob % airsr)
+   end if
 
-   IF (trace_use) CALL da_trace_exit("da_deallocate_observations")
+   if (trace_use) call da_trace_exit("da_deallocate_observations")
 
-END SUBROUTINE da_deallocate_observations
+end subroutine da_deallocate_observations
 

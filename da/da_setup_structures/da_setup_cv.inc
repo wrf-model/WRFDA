@@ -50,7 +50,7 @@ subroutine da_setup_cv( its, ite, jts, jte, &
 
    be % cv % size_je = 0
 
-   IF (ensdim_alpha > 0) THEN
+   if (ensdim_alpha > 0) then
       if ( global ) then
          be % cv % size_alphac = ( be % alpha % max_wave + 1 ) * &
                                  ( be % alpha % max_wave + 2 )  / 2
@@ -59,7 +59,7 @@ subroutine da_setup_cv( its, ite, jts, jte, &
          be % cv % size_alphac = ij * be % alpha % mz
          be % cv % size_je = be % cv % size_alphac
       end if
-   END IF
+   end if
 
    be % cv % size = be % cv % size_jb +  be % cv % size_je
 

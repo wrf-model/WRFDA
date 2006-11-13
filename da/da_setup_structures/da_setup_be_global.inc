@@ -65,7 +65,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    read (be_unit, err = 100) bin(1:ni,1:nj,1:nk)
    read (be_unit, err = 100) bin2d(1:ni,1:nj)
 
-   if (ni /= ide .or. nj /= jde .or. nk /= kde) THEN
+   if (ni /= ide .or. nj /= jde .or. nk /= kde) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot generate BE at this resolution"/))
    end if
@@ -283,7 +283,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
                                      be%v3%name)
       call da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
-   END IF
+   end if
  
    !--------------------------------------------------------------
    ! [6] Set up alpha (flow-dependent) control variable "errors": 
@@ -294,7 +294,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
       be % alpha % name = 'alpha'
       be % alpha % max_wave = alpha_truncation
       if (print_detail_be) then
-         write(UNIT=stdout,FMT='(4x,3a,i6)') &
+         write(unit=stdout,fmt='(4x,3a,i6)') &
             'Horizontal truncation for ', be % alpha % name, ' = ', &
             be % alpha % max_wave
       end if
@@ -316,11 +316,11 @@ subroutine da_setup_be_global (ide, jde, kde, be)
 
    return
 
-99 write (unit=errmsg(1),fmt='(a, i5)')' Unexpected end on BE-unit = ',be_unit
-   call da_error(__FILE__,__LINE__,errmsg(1:1))
+99 write (unit=message(1),fmt='(a, i5)')' Unexpected end on BE-unit = ',be_unit
+   call da_error(__FILE__,__LINE__,message(1:1))
 
-100 write (unit=errmsg(1),fmt='(a, i5)')' Read error on BE-unit = ',be_unit
-   call da_error(__FILE__,__LINE__,errmsg(1:1))
+100 write (unit=message(1),fmt='(a, i5)')' Read error on BE-unit = ',be_unit
+   call da_error(__FILE__,__LINE__,message(1:1))
 
    ! JRB daft having these here
 

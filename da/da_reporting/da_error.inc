@@ -14,15 +14,15 @@ subroutine da_error( file_str, line, errors)
    html_file=file_str(1:LEN_trim(file_str)-4)//'.html'
    
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-   call wrf_message( '-------------- FATAL callED ---------------' )
+   call wrf_message( '-------------- FATAL ERROR ----------------' )
    ! only print file and line if line is positive
    if (line > 0) then
       if (use_html) then
-         call wrf_message( 'FATAL callED FROM FILE: <A HREF="'// &
+         call wrf_message( 'Fatal error in file: <A HREF="'// &
             trim(documentation_url)//'/'//trim(html_file)//'">'//file_str// &
             '</a>  LINE:  '//trim(line_str) )
       else
-         call wrf_message( 'FATAL callED FROM FILE:  '//trim(file_str)// &
+         call wrf_message( 'Fatal error in file:  '//trim(file_str)// &
             '  LINE:  '//trim(line_str) )
       end if
    end if
@@ -31,15 +31,15 @@ subroutine da_error( file_str, line, errors)
    end do
    call wrf_message( '-------------------------------------------' )
 #else
-   call wrf_message2( '-------------- FATAL callED ---------------' )
+   call wrf_message2( '-------------- FATAL ERROR ----------------' )
    ! only print file and line if line is positive
    if ( line > 0 ) then
       if (use_html) then
-         call wrf_message( 'FATAL callED FROM FILE: <A HREF="'// &
+         call wrf_message( 'Fatal error in file: <A HREF="'// &
             trim(documentation_url)//'/'//trim(html_file)//'">'// &
             trim(file_str)//'</a>  LINE:  '//trim(line_str) )
       else
-         call wrf_message2( 'FATAL callED FROM FILE:  '//trim(file_str)// &
+         call wrf_message2( 'Fatal error in file:  '//trim(file_str)// &
             '  LINE:  '//trim(line_str) )
       end if
    end if

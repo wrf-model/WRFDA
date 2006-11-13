@@ -26,13 +26,13 @@ subroutine da_truncate_spectra( max_wave, nw, power_trunc, power, &
    end do
 
    if ( max_wave_trunc > max_wave ) then
-      write(unit=errmsg(1),FMT='(a)') &
+      write(unit=message(1),fmt='(a)') &
          'da_truncate_spectra: Power requested needs higher resolution.'     
-      write(unit=errmsg(2),FMT='(a,i8)') &
+      write(unit=message(2),fmt='(a,i8)') &
          'Maximum grid wavenumber =  ', max_wave
-      write(unit=errmsg(3),FMT='(a,i8)') &
+      write(unit=message(3),fmt='(a,i8)') &
          'Truncating to wavenumber = ', max_wave_trunc
-      call da_warning(__FILE__,__LINE__,errmsg(1:3))
+      call da_warning(__FILE__,__LINE__,message(1:3))
       max_wave_trunc = max_wave
    end if
 
