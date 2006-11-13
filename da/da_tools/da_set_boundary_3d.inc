@@ -17,8 +17,8 @@ subroutine da_set_boundary_3d(var, &
    integer :: n, j, k
 
    ! JRB use variables to stop compiler whinge
-   IF (kds == 1 .OR. jds == 1 .OR. jde == 1 .OR. kde == 1) THEN
-   END IF
+   if (kds == 1 .OR. jds == 1 .OR. jde == 1 .OR. kde == 1) then
+   end if
 
    if((its /= ids) .or. (ite /= ide)) return
 
@@ -27,9 +27,9 @@ subroutine da_set_boundary_3d(var, &
          do n=1,bdyzone
             var(ids-n,j,k) = var(ide+1-n,j,k)
             var(ide+n,j,k) = var(ids-1+n,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 end subroutine da_set_boundary_3d
 

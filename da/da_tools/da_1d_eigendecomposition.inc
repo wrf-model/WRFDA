@@ -46,10 +46,10 @@ subroutine da_1d_eigendecomposition( bx, e, l )
               work_array, work, info )
    
    if ( info /= 0 ) then
-      WRITE(UNIT=errmsg(1),FMT='(A,I4,A)') &
+      write(unit=message(1),fmt='(A,I4,A)') &
          ' da_1d_eigendecomposition: info = ', &
          info,' - error in decomposition.'
-      CALL da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
    
    !--Swap order of eigenvalues, vectors so 1st is one with most

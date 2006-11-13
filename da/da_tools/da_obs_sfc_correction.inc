@@ -14,19 +14,19 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
    ! gone through, otherwise unrealistic results may be obtained.   
    !--------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE(synop_type),       intent(inout) :: sfc_obs
-   TYPE(xb_type),          intent(in)    :: xb
+   type(synop_type),       intent(inout) :: sfc_obs
+   type(xb_type),          intent(in)    :: xb
 
-   REAL                                  :: roughness, psfc, &
+   real                                  :: roughness, psfc, &
                                             mslp, dx, dxm, dy, dym,    &
                                             ho, po, to, qo,   &
                                             hm, pm, tm, qm, um, vm, correc, val
 
-   INTEGER                               :: i, j, k
+   integer                               :: i, j, k
 
-   REAL, dimension(xb%kts:xb%kte)        :: t_mdl, q_mdl, u_mdl, v_mdl, &
+   real, dimension(xb%kts:xb%kte)        :: t_mdl, q_mdl, u_mdl, v_mdl, &
                                             height, pressure
 
 
@@ -68,7 +68,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
       v_mdl(k)    = dym*(dxm*xb%v(i,j  ,k) + dx*xb% v(i+1,j  ,k)) &
                   + dy *(dxm*xb%v(i,j+1,k) + dx*xb% v(i+1,j+1,k))
 
-   enddo 
+   end do 
 
    ! 3. OBS data and recover the surface pressure from the
    ! mean sea level pressure (mslp)
@@ -90,42 +90,42 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
          else
             call da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
                          height, psfc, mslp, ho)
-         endif
-      endif
+         end if
+      end if
       sfc_obs % p % inv = psfc
       ! YRG: to allow assimlate the Psfc from mslp:
       sfc_obs % p % qc  = 0
-   endif
+   end if
 
    if (sfc_obs % p % inv < 1.0) then
       sfc_obs % p % qc  = missing
-   endif
+   end if
 
    po = sfc_obs % p % inv
 
    ! 3.2 Check that obs pressure and height are present
    !     ----------------------------------------------
 
-   IF (abs(po - missing_r) < 1.  .OR. &
-       abs(ho - missing_r) < 1.) THEN
+   if (abs(po - missing_r) < 1.  .OR. &
+       abs(ho - missing_r) < 1.) then
 
       return
 
-      ! WRITE(unit=errmsg(1), fmt='(/3(1x,a))') &
-      !    'MISSING HEIGHT OR PRESSURE OBSERVATION ID ', &
-      !    TRIM (sfc_obs%info % id), TRIM (sfc_obs%info % name)
+      ! write(unit=message(1), fmt='(/3(1x,a))') &
+      !    'MISSinG HEIGHT OR PRESSURE OBSERVATION ID ', &
+      !    trim (sfc_obs%info % id), trim (sfc_obs%info % name)
 
-      ! WRITE(unit=errmsg(2), fmt='(2(A,F12.3,/))') &
+      ! write(unit=message(2), fmt='(2(A,F12.3,/))') &
       !                         ' height   = ',ho,&
       !                         ' pressure = ',po
-      ! call da_error(__FILE__,__LINE__,errmsg(1:2))
+      ! call da_error(__FILE__,__LINE__,message(1:2))
 
-   ENDIF
+   end if
 
    ! 4.  Bring surface observation below model levels with good height quality
    ! ================================================
 
-   IF ( sfc_obs % h < height(xb%kts)) THEN
+   if ( sfc_obs % h < height(xb%kts)) then
 
       ! 2.3 Make use of local variables for model  
       !     -------------------------------------
@@ -140,20 +140,20 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
       ! 3.2 Correction wind based on similarity laws
       !     -------------------------------------------
 
-      IF ((abs(sfc_obs % u % inv - missing_r) > 1.).AND.&
-          (abs(sfc_obs % v % inv - missing_r) > 1.))THEN
+      if ((abs(sfc_obs % u % inv - missing_r) > 1.).AND.&
+          (abs(sfc_obs % v % inv - missing_r) > 1.))then
 
          ! 3.2.1 Correction factor
 
          ! temperature and moisture at sigma level:
 
-         IF (abs(to - missing_r) < 1.0) then
+         if (abs(to - missing_r) < 1.0) then
             correc = da_mo_correction( ho, po, tm, qo, &
                                      hm, pm, tm, qm, um ,vm, roughness )
-         ELSE
+         else
             correc = da_mo_correction( ho, po, to, qo, &
                                     hm, pm, tm, qm, um ,vm, roughness )
-         ENDIF
+         end if
 
          ! 3.2.2 Wind correction 
          !       ---------------
@@ -166,13 +166,13 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
 
          sfc_obs % v % inv = correc * sfc_obs % v % inv
          sfc_obs % v % qc  = surface_correction
-      ENDIF
+      end if
 
       ! 3.4 Correct pressure
       !     ----------------
 
 
-      IF (sfc_obs % p % qc >= 0) THEN
+      if (sfc_obs % p % qc >= 0) then
 
          !  Correct data
 
@@ -183,18 +183,18 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
             call da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
          else
             call da_intpsfc_prs (val, ho, po, hm, tm, qm)
-         endif
+         end if
 
          !  Replace any previous pressure qc by the surface correction
 
          sfc_obs % p % inv = val
          sfc_obs % p % qc  = surface_correction
-      ENDIF
+      end if
 
       ! 3.5 Correct temperature
       !     -------------------
 
-      IF (abs(sfc_obs % t % inv - missing_r) > 1.) THEN
+      if (abs(sfc_obs % t % inv - missing_r) > 1.) then
 
          !  Correct data
 
@@ -207,7 +207,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
 
          sfc_obs % t % qc  = surface_correction
 
-      ENDIF
+      end if
 
       ! 3.6 Assign model lowest level height + 1m to observation
       !      ----------------------------------------------------- 
@@ -219,6 +219,6 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
  
       ! sfc_obs % height_qc = surface_correction
 
-   ENDIF
+   end if
 
-END  subroutine da_obs_sfc_correction
+end  subroutine da_obs_sfc_correction

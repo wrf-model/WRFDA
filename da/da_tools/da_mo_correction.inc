@@ -1,4 +1,4 @@
-FUNCTION da_mo_correction (ho, po, to, qo, &
+function da_mo_correction (ho, po, to, qo, &
                         hm, pm, tm, qm, um ,vm, &
                         roughness)   RESULT (correc)
 !------------------------------------------------------------------------------!
@@ -12,37 +12,37 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 !  
 !------------------------------------------------------------------------------!
 
-      IMPLICIT NONE
+      implicit none
 
-      REAL, INTENT (in)                :: ho, po, to, qo
-      REAL, INTENT (in)                :: hm, pm, tm, qm, um, vm
-      REAL, INTENT (in)                :: roughness
+      real, intent (in)                :: ho, po, to, qo
+      real, intent (in)                :: hm, pm, tm, qm, um, vm
+      real, intent (in)                :: roughness
 
-      REAL                             :: correc, winfac
+      real                             :: correc, winfac
 
-      REAL :: thm , tho, tvm, tvo, thvm, thvo, rcp
-      REAL :: za, Vc2, Va2, V2 
-! JRB      REAL :: hdif, rib, rll, hll, zint
-      REAL :: hdif, rib, hll, zint
+      real :: thm , tho, tvm, tvo, thvm, thvo, rcp
+      real :: za, Vc2, Va2, V2 
+! JRB      real :: hdif, rib, rll, hll, zint
+      real :: hdif, rib, hll, zint
 
       !  Height difference (in m) above wich correction is applied
 
-      REAL, PARAMETER :: hmax = 10., hs_max = 40.   
+      real, parameter :: hmax = 10., hs_max = 40.   
 
       !  Default Roughness length im m (for land, set to 0 if on sea)
 
-      REAL, PARAMETER :: zint0 = 0.2
+      real, parameter :: zint0 = 0.2
 
 !------------------------------------------------------------------------------!
       rcp = gas_constant/cp
 
-! 0.  INITIALIZE CORRECTION FACTOR TO 1
+! 0.  inITIALIZE CORRECTION FACTOR TO 1
 ! =====================================
 
       correc = 1.
       winfac = 1.
 
-! 1.  HEIGHT DIFFERENCE AND ROUGHNESS LENGTH
+! 1.  HEIGHT DifFERENCE AND ROUGHNESS LENGTH
 ! ==========================================
 
 ! 1.1 Height difference
@@ -53,14 +53,14 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 ! 1.2 No correction if height difference is less than hmax. 
 !     -----------------------------------------------------
 
-      IF  (hdif <= hmax) THEN
+      if  (hdif <= hmax) then
 
-           RETURN
+           return
 
-      ENDIF
+      end if
 
 ! too many
-!      IF (trace_use) call da_trace_entry("da_mo_correction")
+!      if (trace_use) call da_trace_entry("da_mo_correction")
 
 ! 1.3 Compute the roughness length based upon season and land use 
 !     -----------------------------------------------------------
@@ -168,7 +168,7 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 
       correc = 1.
 
-      IF (rib < 0.) THEN
+      if (rib < 0.) then
 
 ! 6.3 Unstable Forced convection (REGIME 3)
 !     -------------------------------------
@@ -179,13 +179,13 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 ! 6.4 Free convection (REGIME 4)
 !     --------------------------
 
-         IF(hll > 1.5) THEN
+         if(hll > 1.5) then
 
-           IF (zint < 0.2) THEN
+           if (zint < 0.2) then
                correc = 1.000 + 0.320 * zint ** 0.200
-           ELSE IF (zint < 0.) THEN
+           else if (zint < 0.) then
                correc = 1.169 + 0.315 * zint
-           ENDIF
+           end if
 
 ! 6.4.1 The factor depended on Za (MM5, param.F)
       
@@ -194,10 +194,10 @@ FUNCTION da_mo_correction (ho, po, to, qo, &
 
            correc =  correc * winfac
    
-         ENDIF
+         end if
 
-      ENDIF
+      end if
 
-!   IF (trace_use) call da_trace_exit("da_mo_correction")
+!   if (trace_use) call da_trace_exit("da_mo_correction")
 
-END FUNCTION da_mo_correction
+end function da_mo_correction

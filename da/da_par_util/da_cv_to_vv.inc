@@ -4,11 +4,11 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
    ! PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
    !---------------------------------------------------------------------------
 
-   INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
-   REAL,           INTENT(IN)    :: rcv(1:cv_size) ! Control variables v.
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
-   INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
-   TYPE (vp_type), INTENT(INOUT) :: vv          ! Grdipt/EOF cv_array.
+   integer,        intent(in)    :: cv_size     ! Length of CV array.
+   real,           intent(in)    :: rcv(1:cv_size) ! Control variables v.
+   type (xpose_type), intent(in) :: xp          ! Dimensions and xpose buffers.
+   integer,        intent(in)    :: mzs(:) ! Background error structure levels.
+   type (vp_type), intent(inout) :: vv          ! Grdipt/EOF cv_array.
 
    integer   :: is,ie       ! Local grid range in y coordinate.
    integer   :: js,je       ! Local grid range in x coordinate.

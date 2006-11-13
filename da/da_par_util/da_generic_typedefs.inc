@@ -1,7 +1,7 @@
    ! generic vector type
-   TYPE generic_vector_type
-      REAL, POINTER :: ptr(:)
-   END TYPE generic_vector_type
+   type generic_vector_type
+      real, pointer :: ptr(:)
+   end type generic_vector_type
 
    ! Generic residual type contains lists of vectors and scalars.  
    ! Implementation notes:   
@@ -21,23 +21,23 @@
    !    obs_global_index.  Make this change later when there is
    !    time to modify other objects to also store references (there should 
    !    be only one object responsible for each model_loc_type and info_type
-   !    object, but in Fortran90 this must be implemented as a POINTER).
-   TYPE residual_generic_type
-      LOGICAL                             :: proc_domain
-      INTEGER                             :: obs_global_index
-      TYPE (generic_vector_type), POINTER :: values(:) ! vectors & scalars
-   END TYPE residual_generic_type
+   !    object, but in Fortran90 this must be implemented as a pointer).
+   type residual_generic_type
+      logical                             :: proc_domain
+      integer                             :: obs_global_index
+      type (generic_vector_type), pointer :: values(:) ! vectors & scalars
+   end type residual_generic_type
 
    ! template for allocating memory
-   TYPE residual_template_type
-      INTEGER                             :: lbnd  ! lower bound
-      INTEGER                             :: ubnd  ! upper bound
-   END TYPE residual_template_type
+   type residual_template_type
+      integer                             :: lbnd  ! lower bound
+      integer                             :: ubnd  ! upper bound
+   end type residual_template_type
 
    ! single-obs generic y_type
-   TYPE y_facade_type
-      INTEGER                               :: num_obs
-      INTEGER                               :: num_obs_glo
-      TYPE (residual_generic_type), POINTER :: obs(:)
-   END TYPE y_facade_type
+   type y_facade_type
+      integer                               :: num_obs
+      integer                               :: num_obs_glo
+      type (residual_generic_type), pointer :: obs(:)
+   end type y_facade_type
 

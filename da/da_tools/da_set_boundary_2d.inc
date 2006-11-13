@@ -27,8 +27,8 @@ subroutine da_set_boundary_2d(var, &
       var(ids-n,j) = var(ide+1-n,j)
 
       var(ide+n,j) = var(ids-1+n,j)
-   enddo
-   enddo
+   end do
+   end do
 
 end subroutine da_set_boundary_2d
 

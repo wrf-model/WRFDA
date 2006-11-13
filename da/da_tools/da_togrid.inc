@@ -16,7 +16,7 @@ subroutine da_togrid (x, ib, ie, i, dx, dxm)
       i = ib
    else if (i >= ie) then
       i = ie - 1
-   endif
+   end if
 
    dx = x - real(i)
    dxm= 1.0 - dx

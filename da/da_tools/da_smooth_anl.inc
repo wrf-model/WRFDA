@@ -1,62 +1,62 @@
-subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSDOT)
+subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSdoT)
  
    ! SECTION  TOOLS
    ! PURPOSE  SPATIALLY SMOOTH (USUALLY SLAB) TO REMOVE HIGH
    ! FREQUENCY WAVES
 
-   IMPLICIT NONE
+   implicit none
    
-   REAL, INTENT(INOUT)                :: SLAB(:,:,:)
-   INTEGER, INTENT(IN)                :: imx, jmx, kx
-   INTEGER, INTENT(IN)                :: npass
-   INTEGER, INTENT(IN)                :: icrsdot
+   real, intent(inout)                :: SLAB(:,:,:)
+   integer, intent(in)                :: imx, jmx, kx
+   integer, intent(in)                :: npass
+   integer, intent(in)                :: icrsdot
    
-   REAL, ALLOCATABLE                  :: SLABNEW(:,:)
-   REAL                               :: XNU(1:2)
-   INTEGER                            :: ie, je, k 
-   INTEGER                            :: loop, n, i, j
+   real, allocatable                  :: SLABNEW(:,:)
+   real                               :: XNU(1:2)
+   integer                            :: ie, je, k 
+   integer                            :: loop, n, i, j
    
-   ALLOCATE (SLABNEW(IMX,JMX))
+   allocate (SLABNEW(IMX,JMX))
 
-   IE=IMX-1-ICRSDOT
-   JE=JMX-1-ICRSDOT
+   IE=IMX-1-ICRSdoT
+   JE=JMX-1-ICRSdoT
    XNU(1)=0.50
    XNU(2)=-0.52
-   DO K=1,KX
-      DO LOOP=1,NPASS*2
+   do K=1,KX
+      do LOOP=1,NPASS*2
          N=2-MOD(LOOP,2)
  
-         ! FIRST SMOOTH IN THE IMX DIRECTION
+         ! FIRST SMOOTH in THE IMX DIRECTION
  
-         DO I=2,IE
-            DO J=2,JE
+         do I=2,IE
+            do J=2,JE
                SLABNEW(I,J)=SLAB(I,J,K)+XNU(N) * &
                ((SLAB(I,J+1,K)+SLAB(I,J-1,K))*0.5-SLAB(I,J,K))
-            END DO
-         END DO
-         DO I=2,IE
-            DO J=2,JE
+            end do
+         end do
+         do I=2,IE
+            do J=2,JE
                SLAB(I,J,K)=SLABNEW(I,J)
-            END DO
-         END DO
+            end do
+         end do
  
-         ! NOW SMOOTH IN THE JMX DIRECTION
+         ! NOW SMOOTH in THE JMX DIRECTION
  
-         DO J=2,JE
-            DO I=2,IE
+         do J=2,JE
+            do I=2,IE
                SLABNEW(I,J)=SLAB(I,J,K)+XNU(N) * &
                ((SLAB(I+1,J,K)+SLAB(I-1,J,K))*0.5-SLAB(I,J,K))
-            END DO
-         END DO
+            end do
+         end do
 
-         DO I=2,IE
-            DO J=2,JE
+         do I=2,IE
+            do J=2,JE
                SLAB(I,J,K)=SLABNEW(I,J)
-            END DO
-         END DO
-      END DO
-   END DO
+            end do
+         end do
+      end do
+   end do
 
-   DEALLOCATE (SLABNEW)
+   deallocate (SLABNEW)
 
 end subroutine da_smooth_anl

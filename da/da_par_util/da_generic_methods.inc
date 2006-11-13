@@ -7,11 +7,11 @@ subroutine da_res_generic_set_info( res_generic, proc_domain, &
    ! METHOD:   Set common fields in res_generic.
    !---------------------------------------------------------------------------
    
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
-   LOGICAL,                      INTENT(IN   ) :: proc_domain
-   INTEGER,                      INTENT(IN   ) :: obs_global_index
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   logical,                      intent(in   ) :: proc_domain
+   integer,                      intent(in   ) :: obs_global_index
 
    res_generic%proc_domain = proc_domain
    res_generic%obs_global_index = obs_global_index
@@ -25,9 +25,9 @@ subroutine da_res_sound_create_template( template )
    ! PURPOSE:  Return storage template for specific type stored as 
    !           residual_generic_type.
    !---------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_template_type), INTENT(INOUT) :: template
+   type (residual_template_type), intent(inout) :: template
 
    ! only vector data for this type
    template%lbnd = 1
@@ -53,17 +53,17 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
    !           generic types that do not contain vector data. 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_sound_type),   INTENT(IN   ) :: res_specific ! specific type
-   INTEGER,                      INTENT(IN   ) :: iv_num_levels ! levels
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
+   type (residual_sound_type),   intent(in   ) :: res_specific ! specific type
+   integer,                      intent(in   ) :: iv_num_levels ! levels
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
-   TYPE (residual_template_type) :: template
-   INTEGER :: n
+   type (residual_template_type) :: template
+   integer :: n
 
    call da_res_sound_create_template( template )
-   ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
+   allocate( res_generic%values(template%lbnd:template%ubnd) )
    ! only vector data for this type
    ! store references to vector data
    res_generic%values(1)%ptr => res_specific%u
@@ -71,16 +71,16 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
    res_generic%values(3)%ptr => res_specific%t
    res_generic%values(4)%ptr => res_specific%q
    ! ASSERTION
-   DO n=1,4
-      !TBH:  NOTE:  We could handle iv_num_levels < SIZE(res_generic%values(n)%ptr) 
+   do n=1,4
+      !TBH:  NOTE:  We could handle iv_num_levels < size(res_generic%values(n)%ptr) 
       !TBH:         HOWEVER, we would have to add "num_levels" state to 
       !TBH:         residual_generic_type AND send this around.  Better to fix 
       !TBH:         allocation in specific types to avoid wasting memory!  
-      IF ( SIZE(res_generic%values(n)%ptr) /= iv_num_levels ) THEN
+      if ( size(res_generic%values(n)%ptr) /= iv_num_levels ) then
          call da_error(__FILE__,__LINE__, &
             (/'residual_sound_to_generic:  mismatched levels'/))
-      ENDIF
-   ENDDO
+      end if
+   end do
 
 end subroutine da_res_sound_to_generic
 
@@ -95,10 +95,10 @@ subroutine da_res_sound_from_generic( res_generic, res_specific )
    !           res_specific.  Pointer manipulation is used for vector data, no 
    !           vector data is copied.  Scalar data is copied. 
    !---------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(IN   ) :: res_generic  ! generic type
-   TYPE (residual_sound_type),   INTENT(INOUT) :: res_specific ! specific type
+   type (residual_generic_type), intent(in   ) :: res_generic  ! generic type
+   type (residual_sound_type),   intent(inout) :: res_specific ! specific type
 
    ! only vector data for this type
    ! store references to vector data
@@ -118,9 +118,9 @@ subroutine da_res_synop_create_template( template )
    !           residual_generic_type.  
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_template_type), INTENT(INOUT) :: template
+   type (residual_template_type), intent(inout) :: template
 
    ! only scalar data for this type
    template%lbnd = 0
@@ -146,22 +146,22 @@ subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
    !           generic types that do not contain vector data.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_synop_type),   INTENT(IN   ) :: res_specific ! specific type
-   INTEGER,                      INTENT(IN   ) :: iv_num_levels ! levels
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
+   type (residual_synop_type),   intent(in   ) :: res_specific ! specific type
+   integer,                      intent(in   ) :: iv_num_levels ! levels
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
-   TYPE (residual_template_type) :: template
+   type (residual_template_type) :: template
 
-   ! Use to avoid compiler warning
-   IF  (iv_num_levels==0) THEN
-   END IF
+   ! use to avoid compiler warning
+   if  (iv_num_levels==0) then
+   end if
 
    call da_res_synop_create_template( template )
-   ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
+   allocate( res_generic%values(template%lbnd:template%ubnd) )
    ! only scalar data for this type
-   ALLOCATE( res_generic%values(0)%ptr(5) )
+   allocate( res_generic%values(0)%ptr(5) )
    ! copy scalar data
    res_generic%values(0)%ptr(1) = res_specific%u
    res_generic%values(0)%ptr(2) = res_specific%v
@@ -183,10 +183,10 @@ subroutine da_res_synop_from_generic( res_generic, res_specific )
    !           res_specific.  Pointer manipulation is used for vector data, no 
    !           vector data is copied.  Scalar data is copied.
    !---------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(IN   ) :: res_generic  ! generic type
-   TYPE (residual_synop_type),   INTENT(INOUT) :: res_specific ! specific type
+   type (residual_generic_type), intent(in   ) :: res_generic  ! generic type
+   type (residual_synop_type),   intent(inout) :: res_specific ! specific type
 
    ! only scalar data for this type
    ! copy scalar data
@@ -215,21 +215,21 @@ subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template )
    !           will be copied into them.  
    !
    !---------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (y_facade_type),          INTENT(INOUT) :: slice ! selected residual obs
-   INTEGER,                       INTENT(IN   ) :: num_obs
-   INTEGER,                       INTENT(IN   ) :: num_obs_glo
-   TYPE (residual_template_type), OPTIONAL, INTENT(IN   ) :: template
+   type (y_facade_type),          intent(inout) :: slice ! selected residual obs
+   integer,                       intent(in   ) :: num_obs
+   integer,                       intent(in   ) :: num_obs_glo
+   type (residual_template_type), optional, intent(in   ) :: template
    ! Local declarations
-   INTEGER :: n
+   integer :: n
 
    slice%num_obs     = num_obs
    slice%num_obs_glo = num_obs_glo
-   ALLOCATE( slice%obs(slice%num_obs) )
-   DO n=1, slice%num_obs
+   allocate( slice%obs(slice%num_obs) )
+   do n=1, slice%num_obs
       call da_res_generic_create( slice%obs(n), template=template )
-   ENDDO
+   end do
 
 end subroutine da_y_facade_create
 
@@ -256,20 +256,20 @@ subroutine da_res_generic_create( res_generic, template )
    !             (res_generic%values(:)%ptr) are nullified.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
-   TYPE (residual_template_type), OPTIONAL, INTENT(IN   ) :: template
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   type (residual_template_type), optional, intent(in   ) :: template
    ! Local declarations
-   INTEGER :: i
+   integer :: i
 
-   NULLIFY( res_generic%values )
-   IF ( PRESENT( template ) ) THEN
-      ALLOCATE( res_generic%values(template%lbnd:template%ubnd) )
-      DO i=template%lbnd, template%ubnd
-         NULLIFY( res_generic%values(i)%ptr )
-      ENDDO
-   ENDIF
+   nullify( res_generic%values )
+   if ( present( template ) ) then
+      allocate( res_generic%values(template%lbnd:template%ubnd) )
+      do i=template%lbnd, template%ubnd
+         nullify( res_generic%values(i)%ptr )
+      end do
+   end if
 end subroutine da_res_generic_create
 
 
@@ -277,7 +277,7 @@ end subroutine da_res_generic_create
 
 subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
 
-   ! TODO:  replace this with a full-blown copy-constructor!  
+   ! TOdo:  replace this with a full-blown copy-constructor!  
    !---------------------------------------------------------------------------
    ! PURPOSE:  Allocates and initializes one of the values (either scalar or 
    !           vector) in an already-created residual_generic_type object.  
@@ -292,18 +292,18 @@ subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
    !           deallocated via call to free_global_*().
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
-   INTEGER,                      INTENT(IN   ) :: val_index    ! which value
-   REAL,                         INTENT(IN   ) :: values(:)    ! values
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   integer,                      intent(in   ) :: val_index    ! which value
+   real,                         intent(in   ) :: values(:)    ! values
 
-   IF ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
-        ( val_index > UBOUND(res_generic%values,1) ) ) THEN
+   if ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
+        ( val_index > UBOUND(res_generic%values,1) ) ) then
       call da_error(__FILE__,__LINE__, &
          (/'residual_generic_alloc_and_set:  bad val_index'/))
-   ENDIF
-   ALLOCATE( res_generic%values(val_index)%ptr(SIZE(values)) )
+   end if
+   allocate( res_generic%values(val_index)%ptr(size(values)) )
    res_generic%values(val_index)%ptr(:) = values(:)
 
 end subroutine da_res_generic_alloc_and_set
@@ -311,31 +311,31 @@ end subroutine da_res_generic_alloc_and_set
 
 
 
-LOGICAL FUNCTION da_res_generic_has_vector( res_generic )
+logical function da_res_generic_has_vector( res_generic )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Returns .TRUE. iff res_generic stores vector values
+   ! PURPOSE:  Returns .true. iff res_generic stores vector values
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
-   TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
+   implicit none
+   type (residual_generic_type), intent(in) :: res_generic  ! generic type
    da_res_generic_has_vector = ( UBOUND(res_generic%values,1) > 0 )
 
-END FUNCTION da_res_generic_has_vector
+end function da_res_generic_has_vector
 
 
 
-LOGICAL FUNCTION da_res_generic_has_scalar( res_generic )
+logical function da_res_generic_has_scalar( res_generic )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Returns .TRUE. iff res_generic stores scalar values. 
+   ! PURPOSE:  Returns .true. iff res_generic stores scalar values. 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
-   TYPE (residual_generic_type), INTENT(IN) :: res_generic  ! generic type
+   implicit none
+   type (residual_generic_type), intent(in) :: res_generic  ! generic type
    da_res_generic_has_scalar = ( LBOUND(res_generic%values,1) == 0 )
 
-END FUNCTION da_res_generic_has_scalar
+end function da_res_generic_has_scalar
 
 
 
@@ -344,30 +344,30 @@ subroutine da_res_generic_free( res_generic )
    !---------------------------------------------------------------------------
    ! PURPOSE:  Free memory for residual_generic_type object.  
    !
-   ! METHOD: POINTERs to vector values are assumed to point to memory allocated 
+   ! METHOD: pointers to vector values are assumed to point to memory allocated 
    !         by others and are not deallocated.  
    !         This will fail if called for a residual_generic_type object that 
    !         has never been created.  
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (residual_generic_type), INTENT(INOUT) :: res_generic  ! generic type
+   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
-   LOGICAL :: oktofreevalues
+   logical :: oktofreevalues
 
-   oktofreevalues = .FALSE.
-   IF ( da_res_generic_has_scalar( res_generic) ) THEN
+   oktofreevalues = .false.
+   if ( da_res_generic_has_scalar( res_generic) ) then
       ! free scalar memory
-      DEALLOCATE( res_generic%values(0)%ptr )
-      oktofreevalues = .TRUE.
-   ENDIF
-   IF ( da_res_generic_has_vector( res_generic) ) THEN
-      oktofreevalues = .TRUE.
-   ENDIF
-   IF ( oktofreevalues ) THEN
-      DEALLOCATE( res_generic%values )
-   ENDIF
+      deallocate( res_generic%values(0)%ptr )
+      oktofreevalues = .true.
+   end if
+   if ( da_res_generic_has_vector( res_generic) ) then
+      oktofreevalues = .true.
+   end if
+   if ( oktofreevalues ) then
+      deallocate( res_generic%values )
+   end if
 
 end subroutine da_res_generic_free
 
@@ -381,17 +381,17 @@ subroutine da_y_facade_free( slice )
    ! METHOD:   Brute force.  May want to make this smarter... 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (y_facade_type), INTENT(INOUT) :: slice
+   type (y_facade_type), intent(inout) :: slice
    ! Local declarations
-   INTEGER :: n
-   IF ( ASSOCIATED( slice%obs ) ) THEN
-      DO n=1, SIZE(slice%obs)
+   integer :: n
+   if ( associated( slice%obs ) ) then
+      do n=1, size(slice%obs)
          call da_res_generic_free( slice%obs(n) )
-      ENDDO
-      DEALLOCATE( slice%obs )
-   ENDIF
+      end do
+      deallocate( slice%obs )
+   end if
 end subroutine da_y_facade_free
 
 

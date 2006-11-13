@@ -59,8 +59,8 @@ subroutine da_set_boundary_xb(xb)
          xb%vegfra(xb%ide+n,j) = xb%vegfra(xb%ids-1+n,j)
          xb%snowh(xb%ide+n,j) = xb%snowh(xb%ids-1+n,j)
 
-      enddo
-   enddo
+      end do
+   end do
 
    !--3d
    do k=xb%kts, xb%kte
@@ -91,9 +91,9 @@ subroutine da_set_boundary_xb(xb)
             xb%rh(xb%ide+n,j,k) = xb%rh(xb%ids-1+n,j,k)
             xb%td(xb%ide+n,j,k) = xb%td(xb%ids-1+n,j,k)
             xb%rho(xb%ide+n,j,k) = xb%rho(xb%ids-1+n,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 end subroutine da_set_boundary_xb
 

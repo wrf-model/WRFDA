@@ -13,8 +13,8 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
    integer, intent(in)          :: cv_size_domain    ! Size of array (domain).
    real, dimension(1:cv_size), intent(in) :: x       ! 1st vector.
    real, dimension(1:cv_size), intent(in) :: y       ! 1st vector.
-        TYPE (xpose_type),  INTENT(IN) :: xp         ! decomposed dimensions
-        INTEGER,            INTENT(IN) :: mzs(:)     ! mz for each variable
+        type (xpose_type),  intent(in) :: xp         ! decomposed dimensions
+        integer,            intent(in) :: mzs(:)     ! mz for each variable
                                                      ! (to identify 2D arrays)
 
    real, pointer                :: xg(:), yg(:)      ! Serial data arrays.
@@ -25,27 +25,27 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
-   ! testing.  This will always be .FALSE. for a serial run or 
+   ! testing.  This will always be .false. for a serial run or 
    ! one-processor DM_PARALLEL run.
 
-   IF (testing_dm_exact) THEN
+   if (testing_dm_exact) then
 
       ! Collect local cv arrays x and y to globally-sized serially-ordered 
       ! arrays xg and yg.  Note that xg and yg will only exist on the 
       ! monitor task.  
 
-      IF (rootproc) THEN
+      if (rootproc) then
          allocate(xg(1:cv_size_domain))
          allocate(yg(1:cv_size_domain))
-      ENDIF
+      end if
 
       call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
       call da_cv_to_global( cv_size, cv_size_domain, y, xp, mzs, yg )
 
-      IF ( rootproc ) THEN
+      if ( rootproc ) then
          dtemp1 = da_dot( cv_size_domain, xg, yg )
          deallocate( xg, yg )
-      ENDIF
+      end if
 
       ! Broadcast result from monitor to other tasks.  
       call wrf_dm_bcast_real( dtemp1, 1 )

@@ -17,17 +17,17 @@ subroutine da_proc_sum_count_obs ( count_obs )
    
    integer, parameter:: numvals = 100
 
-   TYPE (count_obs_type), INTENT(INOUT)     :: count_obs
+   type (count_obs_type), intent(inout)     :: count_obs
 
-   INTEGER           :: sumval(1:numvals)     ! Sum across processors.
-   INTEGER           :: procval(1:numvals)    ! Partial values on processor to sum.
-   INTEGER           :: ierr                  ! Error code from MPI routines.
-   INTEGER           :: root                  ! Monitor processor.
-   INTEGER           :: offset                ! Index into procval and sumval arrays.
+   integer           :: sumval(1:numvals)     ! Sum across processors.
+   integer           :: procval(1:numvals)    ! Partial values on processor to sum.
+   integer           :: ierr                  ! Error code from MPI routines.
+   integer           :: root                  ! Monitor processor.
+   integer           :: offset                ! Index into procval and sumval arrays.
 
 #ifdef DM_PARALLEL
 
-   IF (rootproc) root = myproc
+   if (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    offset = 1
@@ -51,9 +51,9 @@ subroutine da_proc_sum_count_obs ( count_obs )
    call da_pack_count_obs( count_obs % num_bogus, offset, procval )
    call da_pack_count_obs( count_obs % num_buoy, offset, procval )
 
-   call MPI_REDUCE(procval, sumval, numvals, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(procval, sumval, numvals, mpi_integer, mpi_sum, root, mpi_comm_world, IERR )
    
-   IF ( myproc .eq. root ) then
+   if ( myproc .eq. root ) then
       offset = 1
       call da_unpack_count_obs( count_obs % num_synop, offset, sumval )
       call da_unpack_count_obs( count_obs % num_sound, offset, sumval )
@@ -74,7 +74,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
       call da_unpack_count_obs( count_obs % num_profiler, offset, sumval )
       call da_unpack_count_obs( count_obs % num_bogus, offset, sumval )
       call da_unpack_count_obs( count_obs % num_buoy, offset, sumval )
-   END IF
+   end if
 #endif
 
 end subroutine da_proc_sum_count_obs

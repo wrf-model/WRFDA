@@ -17,31 +17,31 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 !           09/17/2003 - Mods for WRF, make it easier.      Wei Huang
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xbx_type),INTENT(IN) :: xbx           ! Header & non-gridded vars.
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Dimensions and xpose buffers. 
-   INTEGER   , INTENT(IN)     :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   INTEGER   , INTENT(IN)     :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   INTEGER   , INTENT(IN)     :: its,ite, jts,jte, kts,kte   ! tile   dims.
-   REAL, INTENT(IN)           :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
-   REAL, INTENT(OUT)          :: b(ims:ime,jms:jme,kms:kme)  ! B.
+   type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
+   type (xpose_type),intent(inout)  :: xp      ! Dimensions and xpose buffers. 
+   integer   , intent(in)     :: ids,ide, jds,jde, kds,kde   ! domain dims.
+   integer   , intent(in)     :: ims,ime, jms,jme, kms,kme   ! memory dims.
+   integer   , intent(in)     :: its,ite, jts,jte, kts,kte   ! tile   dims.
+   real, intent(in)           :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
+   real, intent(out)          :: b(ims:ime,jms:jme,kms:kme)  ! B.
    
-   INTEGER                  :: vector_inc    ! Increment between FST data.
-   INTEGER                  :: vector_jump   ! Jump between start of vectors.
-   INTEGER                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
-   INTEGER                  :: num_vectors   ! Number of FSTs to perform.
-   INTEGER                  :: work_area     ! Dimension for FST routine.
-   INTEGER                  :: idim          ! Size of 1st dimension for FST.
-   INTEGER                  :: jdim          ! Size of 2nd dimension for FST.
+   integer                  :: vector_inc    ! Increment between FST data.
+   integer                  :: vector_jump   ! Jump between start of vectors.
+   integer                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
+   integer                  :: num_vectors   ! Number of FSTs to perform.
+   integer                  :: work_area     ! Dimension for FST routine.
+   integer                  :: idim          ! Size of 1st dimension for FST.
+   integer                  :: jdim          ! Size of 2nd dimension for FST.
 
-   INTEGER                  :: i, j, k, n, ij     ! loop counter
+   integer                  :: i, j, k, n, ij     ! loop counter
 
-   REAL, ALLOCATABLE, DIMENSION(:) :: work_1d     ! FFT work array
+   real, allocatable, dimension(:) :: work_1d     ! FFT work array
 
    ! JRB stop compiler whinge
-   IF (ids == 0 .OR. jds == 0 .OR. kds == 0 .OR. kde == 0) THEN
-   END IF
+   if (ids == 0 .OR. jds == 0 .OR. kds == 0 .OR. kde == 0) then
+   end if
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:
@@ -53,7 +53,7 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
            xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
 
 !  Allocate work arrays.
-   ALLOCATE( work_1d(1:n) )
+   allocate( work_1d(1:n) )
 
 !  Copy del2b for transpose.
 
@@ -87,19 +87,19 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
 !  [2.3] Perform forward FFT:
 
-   DO k = xp%ktsx, xp%ktex
+   do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
-         enddo
+         end do
 
          do i=1, xbx%fft_pad_i
             ij=ij+1
             work_1d(ij) = 0.0
-         enddo
-      enddo
+         end do
+      end do
 
       call da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -110,15 +110,15 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          do i=xp%ids, xp%ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)
-         enddo
+         end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc + 1
             ij=ij+1
             xp%v2x(i,j,k) = work_1d(ij)
-         enddo
-      enddo
-   END DO
+         end do
+      end do
+   end do
 
 !------------------------------------------------------------------------------
 !  [3.0] For each k-level, perform forward FFT in y direction, apply spectral 
@@ -146,27 +146,27 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
 !  [2.3] Perform forward FFT in j:
 
-   DO k = xp%ktsy, xp%ktey
+   do k = xp%ktsy, xp%ktey
       ij = 0
       do j=xp%jds, xp%jde
          do i=xp%itsy, xp%itey
             ij=ij+1
             work_1d(ij) = xp%v1y(i,j,k)
-         enddo
+         end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
             work_1d(ij) = xp%v2y(i,j,k)
-         enddo
-      enddo
+         end do
+      end do
 
       do j=1, xbx%fft_pad_j
       do i=xp%itsy, xp%itey+xbx%pad_num
          ij=ij+1
          work_1d(ij) = 0.0
-      enddo
-      enddo
+      end do
+      end do
 
       call da_fast_sine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -182,13 +182,13 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          do i=xp%itsy, xp%itey
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)
-         enddo
+         end do
          do n=1, xbx%pad_num
             i=xbx%pad_pos(n)
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)
-         enddo
-      enddo
+         end do
+      end do
 
 !     [2.3] Reform gridpt. b using inverse double FST in i.
 
@@ -202,15 +202,15 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          do i=xp%itsy, xp%itey
             ij=ij+1
             xp%v1y(i,j,k) = work_1d(ij)
-         enddo
+         end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
             xp%v2y(i,j,k) = work_1d(ij)
-         enddo
-      enddo
-   ENDDO
+         end do
+      end do
+   end do
 
 !------------------------------------------------------------------------------
 !  Perform inverse FFT in x direction:
@@ -236,20 +236,20 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
 !------------------------------------------------------------------------------
 
-   DO k = xp%ktsx, xp%ktex
+   do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
-         enddo
+         end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc + 1
             ij=ij+1
             work_1d(ij) = xp%v2x(i,j,k)
-         enddo
-      enddo
+         end do
+      end do
 
       call da_fast_sine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -260,11 +260,11 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
          do i=xp%ids, xp%ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)
-         enddo
+         end do
 
          ij=ij+xbx%fft_pad_i
-      enddo
-   END DO
+      end do
+   end do
 
 !  Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
 
@@ -274,7 +274,7 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 !  [5.0] Tidy up:
 !------------------------------------------------------------------------------
 
-   if(ALLOCATED( work_1d )) DEALLOCATE( work_1d )
+   if(allocated( work_1d )) deallocate( work_1d )
 
 !  [2.5] Write data array into b:
 

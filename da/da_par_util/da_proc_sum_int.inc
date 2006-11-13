@@ -9,19 +9,19 @@ subroutine da_proc_sum_int ( value )
 
    implicit none
 
-   INTEGER,   INTENT(INOUT)      :: value     ! Value on processor.
+   integer,   intent(inout)      :: value     ! Value on processor.
 
-   INTEGER           :: sum                   ! Sum across processors.
-   INTEGER           :: ierr                  ! Error code from MPI routines.
-   INTEGER           :: root                  ! Monitor processor.
+   integer           :: sum                   ! Sum across processors.
+   integer           :: ierr                  ! Error code from MPI routines.
+   integer           :: root                  ! Monitor processor.
 
 #ifdef DM_PARALLEL
-   IF (rootproc) root = myproc
+   if (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    sum=0
-   call MPI_REDUCE(value, sum, 1, MPI_INTEGER, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call MPI_REDUCE(value, sum, 1, mpi_integer, mpi_sum, root, mpi_comm_world, IERR )
 
-   IF (myproc .eq. root) value = sum
+   if (myproc .eq. root) value = sum
 #endif
 
 end subroutine da_proc_sum_int

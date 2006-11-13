@@ -193,8 +193,8 @@ subroutine da_analysis_stats ( stats_unit, xp, xa )
             tv(k) = tv(k) + xa%t(i,j,k) * xa%t(i,j,k)
             pv(k) = pv(k) + xa%p(i,j,k) * xa%p(i,j,k)
             qv(k) = qv(k) + xa%q(i,j,k) * xa%q(i,j,k)
-         enddo
-      enddo
+         end do
+      end do
    end do
 
    call da_proc_sum_real ( kdim, uv )

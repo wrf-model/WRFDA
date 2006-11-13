@@ -1,11 +1,11 @@
 subroutine da_llxy (xlati,xloni,x,y)
 !------------------------------------------------------------------------------!
 !
-!                 ROUTINE LLXY
+!                 RoutinE LLXY
 !                **************
 !
 !
-! PURPOSE:  CALCULATES THE (X,Y) LOCATION (DOT) IN THE MESOSCALE GRIDS
+! PURPOSE:  CALCULATES THE (X,Y) LOCATION (doT) in THE MESOSCALE GRIDS
 ! -------   FROM LATITUDES AND LONGITUDES
 !
 !  Additions:      10/26/2004    Syed RH Rizvi
@@ -13,15 +13,15 @@ subroutine da_llxy (xlati,xloni,x,y)
 !
 !           For global domain co-ordinates
 !
-!  INPUT:
+!  inPUT:
 !  -----
 !   XLAT:    LATITUDES
 !   XLON:    LONGITUDES
 !
-! OUTPUT:
+! outPUT:
 ! -----
-!   X:        THE COORDINATE IN X (I)-DIRECTION.
-!   Y:        THE COORDINATE IN Y (J)-DIRECTION.
+!   X:        THE COORDinATE in X (I)-DIRECTION.
+!   Y:        THE COORDinATE in Y (J)-DIRECTION.
 !
 !------------------------------------------------------------------------------!
    
@@ -82,7 +82,7 @@ subroutine da_llxy (xlati,xloni,x,y)
          bb = -earth_radius/cone_factor*sin(psi1)
          yc = bb*(tan(psi0/2.0)/tan(psi1/2.0))**cone_factor
           r = bb*(tan(psx /2.0)/tan(psi1/2.0))**cone_factor
-      endif
+      end if
 
       if (phic < 0.0) then
          xx = r*sin(flp)
@@ -90,11 +90,11 @@ subroutine da_llxy (xlati,xloni,x,y)
       else
          xx = -r*sin(flp)
          yy =  r*cos(flp)
-      endif
+      end if
 
-   endif
+   end if
 
-! TRANSFORM (1,1) TO THE ORIGIN
+! TRANSFORM (1,1) TO THE ORIGin
 ! the location of the center in the coarse domain
 
    centri = real (coarse_ix + 1)/2.0  

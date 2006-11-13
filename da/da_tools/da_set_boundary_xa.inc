@@ -24,8 +24,8 @@ subroutine da_set_boundary_xa( xa, xb )
 
          xa%psfc(xb%ide+n,j) = xa%psfc(xb%ids-1+n,j)
          xa%w(xb%ide+n,j,k) = xa%w(xb%ids-1+n,j,k)
-      enddo
-   enddo
+      end do
+   end do
 
    !--3d
 
@@ -45,9 +45,9 @@ subroutine da_set_boundary_xa( xa, xb )
             xa%p(xb%ide+n,j,k) = xa%p(xb%ids-1+n,j,k)
             xa%q(xb%ide+n,j,k) = xa%q(xb%ids-1+n,j,k)
             xa%w(xb%ide+n,j,k) = xa%w(xb%ids-1+n,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 end subroutine da_set_boundary_xa
 

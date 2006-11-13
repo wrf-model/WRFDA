@@ -7,12 +7,12 @@ subroutine da_copy_dims(grid, xp, &
    ! PURPOSE: Copy dimensioning information from grid structure.
    !---------------------------------------------------------------------------
 
-   TYPE(domain), INTENT(IN)         :: grid
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
+   type(domain), intent(in)         :: grid
+   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
 
-   INTEGER,      INTENT(OUT) :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   INTEGER,      INTENT(OUT) :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   INTEGER,      INTENT(OUT) :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
+   integer,      intent(out) :: ids,ide, jds,jde, kds,kde   ! domain dims.
+   integer,      intent(out) :: ims,ime, jms,jme, kms,kme   ! memory dims.
+   integer,      intent(out) :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
    if (trace_use) call da_trace_entry("da_copy_dims")
 
@@ -189,7 +189,7 @@ subroutine da_copy_dims(grid, xp, &
            'xp%ipsy =', xp%ipsy, 'xp%ipey=', xp%ipey, &
            'xp%jpsy =', xp%jpsy, 'xp%jpey=', xp%jpey, &
            'xp%kpsy =', xp%kpsy, 'xp%kpey=', xp%kpey
-   endif
+   end if
 
    if (trace_use) call da_trace_exit("da_copy_dims")
 

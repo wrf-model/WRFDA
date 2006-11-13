@@ -2,9 +2,9 @@ subroutine da_print_stats(stats_unit, nu, nv, nt, np, nq, sound)
 
    implicit none
 
-   INTEGER,           intent(in)    :: stats_unit
-   INTEGER,           intent(inout) :: nu, nv, nt, np, nq
-   TYPE (stats_type), intent(in)    :: sound
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv, nt, np, nq
+   type (stats_type), intent(in)    :: sound
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

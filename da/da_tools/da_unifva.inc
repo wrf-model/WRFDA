@@ -15,50 +15,50 @@ real function da_unifva (kdum)
    !
    !--------------------------------------------------------------------
  
-   IMPLICIT NONE
+   implicit none
  
-   INTEGER ::   KDUM
+   integer ::   KDUM
 
-   INTEGER JPIA,JPIM,JPIQ,JPIR,JPNTAB,JPNDIV
-   REAL PPAM,PPEPS,PPRNMX
+   integer JPIA,JPIM,JPIQ,JPIR,JPNTAB,JPNDIV
+   real PPAM,PPEPS,PPRNMX
 
-   PARAMETER(JPIA=16807,JPIM=2147483647,JPIQ=127773,JPIR=2836, &
+   parameter(JPIA=16807,JPIM=2147483647,JPIQ=127773,JPIR=2836, &
              JPNTAB=32,JPNDIV=1+(JPIM-1)/JPNTAB, &
              PPAM=1./JPIM,PPEPS=1.2E-07,PPRNMX=1.-PPEPS)
 
-   INTEGER JJ
-   INTEGER IJJ,IK
+   integer JJ
+   integer IJJ,IK
  
-   INTEGER NIV(JPNTAB),NIY
-   SAVE NIV,NIY
+   integer NIV(JPNTAB),NIY
+   save NIV,NIY
    DATA NIV /JPNTAB*0/, NIY /0/
 
-   ! BEGIN MAIN
+   ! BEGin MAin
    ! ----------
 
-   IF ( (KDUM.LE.0).OR.(NIY.EQ.0) ) THEN
+   if ( (KDUM.LE.0).OR.(NIY.EQ.0) ) then
       KDUM = MAX( -KDUM , 1 )
 
-       DO JJ = JPNTAB+8,1,-1
+       do JJ = JPNTAB+8,1,-1
           IK   = KDUM/JPIQ
           KDUM = JPIA*( KDUM - IK*JPIQ ) - JPIR*IK
  
-          IF (KDUM.lt.0) KDUM = KDUM + JPIM
-          IF (JJ.LE.JPNTAB) NIV(JJ) = KDUM
+          if (KDUM.lt.0) KDUM = KDUM + JPIM
+          if (JJ.LE.JPNTAB) NIV(JJ) = KDUM
  
-       END DO
+       end do
 
        NIY = NIV(1)
-   ENDIF
+   end if
   
    IK   = KDUM/JPIQ
    KDUM = JPIA*( KDUM - IK*JPIQ ) - JPIR*IK
      
-   IF (KDUM.LT.0) KDUM = KDUM + JPIM
+   if (KDUM.LT.0) KDUM = KDUM + JPIM
 
    IJJ      = 1 + NIY/JPNDIV
    NIY      = NIV(IJJ)
    NIV(IJJ) = KDUM
-   DA_UNIFVA   = MIN( PPAM*NIY , PPRNMX )
+   DA_UNifVA   = Min( PPAM*NIY , PPRNMX )
 
 end function da_unifva

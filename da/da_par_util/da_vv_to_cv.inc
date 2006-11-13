@@ -4,11 +4,11 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
    ! PURPOSE: Fill (local) 1D cv array from 3D (local) vv arrays.
    !---------------------------------------------------------------------------
 
-   TYPE (vp_type), INTENT(IN)    :: vv          ! Grdipt/EOF rcv.
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Dimensions and xpose buffers.
-   INTEGER,        INTENT(IN)    :: mzs(:) ! Background error structure levels.
-   INTEGER,        INTENT(IN)    :: cv_size     ! Length of CV array.
-   REAL,           INTENT(OUT)   :: rcv(1:cv_size) ! Control variables v.
+   type (vp_type), intent(in)    :: vv          ! Grdipt/EOF rcv.
+   type (xpose_type), intent(in) :: xp          ! Dimensions and xpose buffers.
+   integer,        intent(in)    :: mzs(:) ! Background error structure levels.
+   integer,        intent(in)    :: cv_size     ! Length of CV array.
+   real,           intent(out)   :: rcv(1:cv_size) ! Control variables v.
 
    integer   :: is,ie       ! Local grid range in y coordinate.
    integer   :: js,je       ! Local grid range in x coordinate.
@@ -42,9 +42,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%v1(i,j,k)
-            enddo
-        enddo
-     enddo
+            end do
+        end do
+     end do
 #else
      rcv(cv_s:cv_e) = RESHAPE( vv % v1(is:ie,js:je,1:mz), (/ijm/) )
 #endif
@@ -62,9 +62,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%v2(i,j,k)
-            enddo
-        enddo
-     enddo
+            end do
+        end do
+     end do
 #else
      rcv(cv_s:cv_e) = RESHAPE( vv % v2(is:ie,js:je,1:mz), (/ijm/) )
 #endif
@@ -83,9 +83,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%v3(i,j,k)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
 #else
       rcv(cv_s:cv_e) = RESHAPE( vv % v3(is:ie,js:je,1:mz), (/ijm/) )
 #endif
@@ -103,9 +103,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%v4(i,j,k)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
 #else
       rcv(cv_s:cv_e) = RESHAPE( vv % v4(is:ie,js:je,1:mz), (/ijm/) )
 #endif
@@ -123,9 +123,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%v5(i,j,k)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
 #else
       rcv(cv_s:cv_e) = RESHAPE( vv % v5(is:ie,js:je,1:mz), (/ijm/) )
 #endif
@@ -143,9 +143,9 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv )
             do i=is,ie
                ijk = ijk + 1
                rcv(ijk) = vv%alpha(i,j,k)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
 #else
       rcv(cv_s:cv_e) = RESHAPE( vv % alpha(is:ie,js:je,1:mz), (/ijm/) )
 #endif

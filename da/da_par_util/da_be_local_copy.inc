@@ -6,14 +6,14 @@ subroutine da_be_local_copy( be_g, be, jts, jte, kts,kte )
    !           has be_g.
    !---------------------------------------------------------------------------
 
-   TYPE (be_type), INTENT(INOUT):: be_g      ! Background errors (global grid)
-   TYPE (be_type), INTENT(OUT)  :: be        ! Background errors (local grid)
+   type (be_type), intent(inout):: be_g      ! Background errors (global grid)
+   type (be_type), intent(out)  :: be        ! Background errors (local grid)
    integer, intent(in)          :: jts,jte,kts,kte  ! Tile dimension.
  
-   ALLOCATE ( be % pb_vert_reg(jts:jte,kts:kte,kts:kte) )
+   allocate ( be % pb_vert_reg(jts:jte,kts:kte,kts:kte) )
    be % pb_vert_reg(jts:jte,kts:kte,kts:kte) = &
       be_g % pb_vert_reg(jts:jte,kts:kte,kts:kte)
-   DEALLOCATE ( be_g % pb_vert_reg )
+   deallocate ( be_g % pb_vert_reg )
 
    call da_alloc_and_copy_be_arrays( be_g % v1 , be % v1, jts,jte, kts,kte )
    call da_alloc_and_copy_be_arrays( be_g % v2 , be % v2, jts,jte, kts,kte )

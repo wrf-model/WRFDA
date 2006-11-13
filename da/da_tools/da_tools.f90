@@ -1,23 +1,23 @@
-MODULE da_tools
+module da_tools
    
    !---------------------------------------------------------------------------
    ! PURPOSE: Contains general tools.
    !---------------------------------------------------------------------------
    
-   USE module_bc
+   use module_bc
 
-   USE da_control
-   USE da_define_structures
-   USE lapack
+   use da_control
+   use da_define_structures
+   use lapack
    use da_reporting
    use da_tools1
    
-   IMPLICIT NONE
+   implicit none
    
    ! Code copied from SI, see header below
 #include "da_map_utils_defines.inc"
 
-CONTAINS
+contains
 
 #include "da_map_utils.inc"
 #include "da_1d_eigendecomposition.inc"
@@ -30,7 +30,9 @@ CONTAINS
 #include "da_global_ll_to_xy.inc"
 #include "da_ll_to_xy.inc"
 #include "da_residual.inc"
+#include "da_residual_new.inc"
 #include "da_add_noise.inc"
+#include "da_add_noise_new.inc"
 #include "da_max_error_qc.inc"
 #include "da_random_omb.inc"
 #include "da_random_seed.inc"
@@ -55,5 +57,5 @@ CONTAINS
 #include "da_get_2d_sum.inc"
 #include "da_get_3d_sum.inc"
    
-END MODULE da_tools
+end module da_tools
 

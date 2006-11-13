@@ -4,17 +4,17 @@ subroutine da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
    ! PURPOSE: Copy tile dimensions from grid structure.
    !---------------------------------------------------------------------------
 
-   TYPE(domain), INTENT(IN)         :: grid
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
-   INTEGER,      INTENT(OUT)        :: its,ite, jts,jte, kts,kte ! tile dims.
+   type(domain), intent(in)         :: grid
+   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
+   integer,      intent(out)        :: its,ite, jts,jte, kts,kte ! tile dims.
 
-   INTEGER                  :: ij   ! Loop counter
+   integer                  :: ij   ! Loop counter
 
    if (trace_use) call da_trace_entry("da_copy_tile_dims")
 
    ! De-reference tile indices stored in the grid data structure.
 
-   DO ij = 1 , grid%num_tiles
+   do ij = 1 , grid%num_tiles
       its = grid%i_start(ij)
       ite = grid%i_end(ij)
       jts = grid%j_start(ij)
@@ -42,7 +42,7 @@ subroutine da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
          write(unit=stdout, fmt='(A,i3,A,5x,3(i3,A,i3,5x))') 'Tile ',ij, &
                  ' size:', its,':',ite, jts,':',jte, kts,':',kte
       end if
-   END DO
+   end do
 
    if (trace_use) call da_trace_exit("da_copy_tile_dims")
 

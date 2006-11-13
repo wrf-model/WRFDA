@@ -1,25 +1,25 @@
-      subroutine da_openfile (KUNIT, CDFILE, CDACCESS, CDSTATUS, CDFORM)
+      subroutine da_openfile (Kunit, CDFILE, CDACCESS, CDSTATUS, CDFORM)
 !--------------------------------------------------------------------------!
 !
-!                       ROUTINE OPENFILE
+!                       RoutinE OPENFILE
 !                     ********************
 !
 !  PURPOSE:
 !  -------
-!     OPEN AN FILE AND REWIND
+!     OPEN AN FILE AND REWinD
 !
 !   METHOD:
 !   ------
 !
-!   INPUT:
+!   inPUT:
 !   -----
-!      KUNIT:          LOGICAL UNIT
-!      CDFILE:         NAME OF FILE FOR OUTPUT OF DISCARED OBS.
+!      Kunit:          logical unit
+!      CDFILE:         NAME OF FILE FOR outPUT OF DISCARED OBS.
 !      CDA!ESS:       A!ESS (SEQUENTIAL OR ),
 !      CDSTATUS:       STATUS (OLD, NEW OR UNKNOWN)
 !      CDFORM:         FORM (FORMATTED OR UNFORMATTED)
 !
-!   OUTPUT:
+!   outPUT:
 !   ------
 !      OPENED FILE
 !
@@ -30,16 +30,16 @@
 !   REFERENCES:                  NO
 !   ----------
 !
-!   MODIFICATIONS:
+!   MODifICATIONS:
 !   --------------
-!       ORIGINAL :  98-07 (F. VANDENBERGHE)
-!       ADDITIONS : 98-11 Norm DOCTOR (F. VANDENBERGHE)
+!       ORIGinAL :  98-07 (F. VANDENBERGHE)
+!       ADDITIONS : 98-11 Norm doCTOR (F. VANDENBERGHE)
 !----------------------------------------------------------------------------!
 
-!...ARGUMENTS FILE NAME AND LOGICAL UNIT
+!...ARGUMENTS FILE NAME AND logical unit
 
-      INTEGER        KUNIT, iost
-      CHARACTER*(*)  CDFILE, CDACCESS, CDSTATUS, CDFORM
+      integer        Kunit, iost
+      character*(*)  CDFILE, CDACCESS, CDSTATUS, CDFORM
 
 !------------------------------------------------------------------------------C
 
@@ -48,24 +48,24 @@
 
       IOST = 0
 
-      OPEN ( UNIT   = KUNIT, &
+      OPEN ( unit   = Kunit, &
              FILE   = CDFILE, &
              ACCESS = CDACCESS, &
              STATUS = CDSTATUS, &
              FORM   = CDFORM, &
              ERR    =  2000, &
-             IOSTAT = IOST        )
+             iostat = IOST        )
  
-      REWIND (KUNIT)
+      REWinD (Kunit)
  
-      RETURN
+      return
  
-! 2.  ERROR PROCESSING
+! 2.  ERROR PROCESSinG
 ! --------------------
  
- 2000 CONTINUE
+ 2000 CONTinUE
       call da_error(__FILE__,__LINE__, &
-        (/"Cannot open file"//TRIM(CDFILE)/))
+        (/"Cannot open file"//trim(CDFILE)/))
 
       end subroutine da_openfile
 

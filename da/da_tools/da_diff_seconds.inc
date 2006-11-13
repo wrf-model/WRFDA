@@ -36,7 +36,7 @@ real function da_diff_seconds(date_char_1, date_char_2)
    else
       start_year = ccyy_2
       end_year   = ccyy_1
-   endif
+   end if
 
    diff_days = 0
   
@@ -47,23 +47,23 @@ real function da_diff_seconds(date_char_1, date_char_2)
 
          if ((mod(year,100) == 0) .and. (mod(year,400) /= 0)) then
             diff_days = diff_days - 1
-         endif
-      endif
-   enddo
+         end if
+      end if
+   end do
 
    if (mod(ccyy_1,4) == 0) then
       mmday(2) = 29
 
       if((mod(ccyy_1,100) == 0) .and. (mod(ccyy_1,400) /= 0)) then
          mmday(2) = 28
-      endif
-   endif
+      end if
+   end if
 
    jd_1 = dd_1
 
    do i=1,mo_1-1
       jd_1=jd_1+mmday(i)
-   enddo
+   end do
 
    s_1 = real(ss_1) &
        + 60.0*(real(mi_1) &
@@ -75,18 +75,18 @@ real function da_diff_seconds(date_char_1, date_char_2)
 
       if((mod(ccyy_2,100) == 0) .and. (mod(ccyy_2,400) /= 0)) then
          mmday(2) = 28
-      endif
-   endif
+      end if
+   end if
 
    if (ccyy_2 >= ccyy_1) then
       jd_2 = dd_2 + diff_days
    else
       jd_2 = dd_2 - diff_days
-   endif
+   end if
 
    do i=1,mo_2-1
       jd_2=jd_2+mmday(i)
-   enddo
+   end do
 
    s_2 = real(ss_2) &
        + 60.0*(real(mi_2) &
@@ -95,5 +95,5 @@ real function da_diff_seconds(date_char_1, date_char_2)
 
    da_diff_seconds = abs(s_1 - s_2)
 
-END function da_diff_seconds
+end function da_diff_seconds
 

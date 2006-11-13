@@ -16,13 +16,13 @@ subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
 !  P2  = Pressure at level 2
 !------------------------------------------------------------------------------!
 
-      IMPLICIT NONE
+      implicit none
 
-      REAL, INTENT (out)   :: val
-      REAL, INTENT (in)    :: ho, po
-      REAL, INTENT (in), OPTIONAL :: to, qo
-      REAL, INTENT (in)    :: hm, tm, qm    
-      REAL                 :: tvo, tvm, tv, dz, arg
+      real, intent (out)   :: val
+      real, intent (in)    :: ho, po
+      real, intent (in), optional :: to, qo
+      real, intent (in)    :: hm, tm, qm    
+      real                 :: tvo, tvm, tv, dz, arg
 
 !------------------------------------------------------------------------------!
 
@@ -36,11 +36,11 @@ subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
         tvo = to
       else
         tvo = tvm
-      endif
+      end if
 
       tv  = 0.5 * (tvm + tvo)
 
-! 2. HEIGHT DIFFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
+! 2. HEIGHT DifFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
 ! ------------------------------------------------------------
 
       dz = hm - ho
