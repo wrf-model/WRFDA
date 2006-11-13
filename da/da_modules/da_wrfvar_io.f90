@@ -1,20 +1,20 @@
-MODULE da_wrfvar_io
+module da_wrfvar_io
 
    !--Driver layer
 
-   USE module_domain
-   USE module_io_domain
+   use module_domain
+   use module_io_domain
 
    !--Model layer
 
-   USE module_timing
+   use module_timing
 
-   USE da_tracing
+   use da_tracing
    use da_reporting
 
-CONTAINS
+contains
 
 #include "da_med_initialdata_input.inc"
 #include "da_med_initialdata_output.inc"
 
-END MODULE da_wrfvar_io
+end module da_wrfvar_io

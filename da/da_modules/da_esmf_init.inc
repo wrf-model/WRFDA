@@ -1,9 +1,9 @@
 subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
-   TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-   TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
-   TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
-   INTEGER,             INTENT(OUT)   :: rc
+   type(ESMF_GridComp), intent(inout) :: gcomp
+   type(ESMF_State),    intent(inout) :: importState, exportState
+   type(ESMF_Clock),    intent(inout) :: clock
+   integer,             intent(out)   :: rc
 
    !<DESCRIPTION>
    !     WRFVAR init routine.
@@ -34,11 +34,11 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
    !  Get the NAMELIST data for input.
 
-   call init_modules(2)   ! Phase 2 resumes after MPI_INIT() (if it is called)
+   call init_modules(2)   ! Phase 2 resumes after MPI_inIT() (if it is called)
                           ! Phase 1 is called before ESMF starts up
 
    !<DESCRIPTION>
-   ! The wrf namelist.input file is read and stored in the USE associated
+   ! The wrf namelist.input file is read and stored in the use associated
    ! structure model_config_rec, defined in frame/module_configure.F, by the
    ! call to <a href=initial_config.html>initial_config</a>.  On distributed
    ! memory parallel runs this is done only on one processor, and then
@@ -52,9 +52,9 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !</DESCRIPTION>
 
 #ifdef DM_PARALLEL
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
       call initial_config
-   END IF
+   end if
    call get_config_as_buffer( configbuf, configbuflen, nbytes )
    call wrf_dm_bcast_bytes( configbuf, nbytes )
    call set_config_as_buffer( configbuf, configbuflen )
@@ -80,7 +80,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
    ! allocated and configure the mother domain
 
-   NULLIFY( null_domain )
+   nullify( null_domain )
 
    !<DESCRIPTION>
    ! RSL is required for WRFVAR nesting options.
@@ -92,18 +92,18 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !</DESCRIPTION>
 
    call nl_get_max_dom( 1, max_dom )
-   IF ( max_dom > 1 ) THEN
+   if ( max_dom > 1 ) then
 #if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
       call da_error(__FILE__,__LINE__, &
          'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
 #endif
-   END IF
+   end if
 
    !<DESCRIPTION>
    ! The top-most domain in the simulation is then allocated and configured
    ! by calling <a href=alloc_and_configure_domain.html>alloc_and_configure_domain</a>.
    ! Here, in the case of this root domain, the routine is passed the
-   ! globally accessible pointer to TYPE(domain), head_grid, defined in
+   ! globally accessible pointer to type(domain), head_grid, defined in
    ! frame/module_domain.F.  The parent is null and the child index is given
    ! as negative, signifying none.  Afterwards, because the call to
    ! alloc_and_configure_domain may modify the model's configuration data
@@ -161,10 +161,10 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! 
    !</DESCRIPTION>
 
-   IF ((config_flags%real_data_init_type == 1) .OR. &
-       (config_flags%real_data_init_type == 3)) THEN
+   if ((config_flags%real_data_init_type == 1) .OR. &
+       (config_flags%real_data_init_type == 3)) then
       call da_med_initialdata_input( head_grid , config_flags,'fg01' )
-   END IF
+   end if
 
    !<DESCRIPTION>
    ! Once the top-level domain has been allocated, configured, and
@@ -179,7 +179,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! href=wrf_shutdown.html>wrf_shutdown</a> (quilt servers would be
    ! directed to shut down here) is called to properly end the run,
    ! including shutting down the communications (for example, most comm
-   ! layers would call MPI_FINALIZE at this point if they're using MPI).
+   ! layers would call MPI_FinALIZE at this point if they're using MPI).
    ! 
    !</DESCRIPTION>
 
@@ -188,7 +188,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !  integration is from the first step (1) to the last step of the simulation.
 
 ! JRB
-   CALL da_warning(__FILE__,__LINE__,(/"Fix me"/))
+   call da_warning(__FILE__,__LINE__,(/"Fix me"/))
 !   head_grid%start_subtime = head_grid%start_time
 !   head_grid%stop_subtime = head_grid%stop_time
 

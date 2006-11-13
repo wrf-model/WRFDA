@@ -4,12 +4,12 @@ subroutine da_wrfvar_init2
    !     WRF initialization routine, part 2
    !</DESCRIPTION>
 
-   IMPLICIT NONE
+   implicit none
 
    integer :: ierr,i
    character(len=80) :: filename
 
-   IF (trace_use) call da_trace_entry("da_wrfvar_init2")
+   if (trace_use) call da_trace_entry("da_wrfvar_init2")
 
    if (analysis_type(1:6) == "VERIFY" .or. analysis_type(1:6) == "verify") then
       anal_type_verify=.true.
@@ -41,10 +41,10 @@ subroutine da_wrfvar_init2
    ! 
    !</DESCRIPTION>
 
-   CALL nl_get_debug_level ( 1, debug_level )
-   CALL set_wrf_debug_level ( debug_level )
+   call nl_get_debug_level ( 1, debug_level )
+   call set_wrf_debug_level ( debug_level )
 
-   NULLIFY( null_domain )
+   nullify( null_domain )
 
    !<DESCRIPTION>
    ! RSL is required for WRF nesting options.
@@ -55,18 +55,18 @@ subroutine da_wrfvar_init2
    ! run option or we are on an acceptable machine.
    !</DESCRIPTION>
 
-   IF ( max_dom > 1 ) THEN
+   if ( max_dom > 1 ) then
 #if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
       call da_error(__FILE__,__LINE__, &
          (/'nesting requires either an MPI build or use of the -DSTUBMPI option'/)) 
 #endif
-   END IF
+   end if
 
    !<DESCRIPTION>
    ! The top-most domain in the simulation is then allocated and configured
    ! by calling <a href=alloc_and_configure_domain.html>alloc_and_configure_domain</a>.
    ! Here, in the case of this root domain, the routine is passed the
-   ! globally accessible pointer to TYPE(domain), head_grid, defined in
+   ! globally accessible pointer to type(domain), head_grid, defined in
    ! frame/module_domain.F.  The parent is null and the child index is given
    ! as negative, signifying none.  Afterwards, because the call to
    ! alloc_and_configure_domain may modify the model configuration data
@@ -126,13 +126,13 @@ subroutine da_wrfvar_init2
 
    ! call med_initialdata_input( head_grid , config_flags,'fg01' )
 
-   IF ((config_flags%real_data_init_type == 1) .or. &
-       (config_flags%real_data_init_type == 3)) THEN
+   if ((config_flags%real_data_init_type == 1) .or. &
+       (config_flags%real_data_init_type == 3)) then
       call da_med_initialdata_input( head_grid , config_flags,'fg01')
-   END IF
+   end if
 
    ! JRB
-!   CALL da_warning(__FILE__,__LINE__,(/"Fix me"/))
+!   call da_warning(__FILE__,__LINE__,(/"Fix me"/))
    !  head_grid%start_subtime = head_grid%start_time
    !  head_grid%stop_subtime = head_grid%stop_time
 
@@ -142,25 +142,25 @@ subroutine da_wrfvar_init2
       call da_get_unit(stats_unit)
       call da_get_unit(jo_unit)
       call da_get_unit(check_max_iv_unit)
-      open(unit=cost_unit,file="cost_fn",status="new")
-      open(unit=grad_unit,file="grad_fn",status="new")
-      open(unit=stats_unit,file="statistics",status="new")
-      open(unit=jo_unit,file="jo",status="new")
-      open(unit=check_max_iv_unit,file="check_max_iv",status="new")
+      open(unit=cost_unit,file="cost_fn",status="replace")
+      open(unit=grad_unit,file="grad_fn",status="replace")
+      open(unit=stats_unit,file="statistics",status="replace")
+      open(unit=jo_unit,file="jo",status="replace")
+      open(unit=check_max_iv_unit,file="check_max_iv",status="replace")
 
       do i=1,num_alpha_corr_types
          call da_get_unit(alpha_corr_unit1(i))
          call da_get_unit(alpha_corr_unit2(i))
          write (unit=filename,fmt='(A,I1)') "alpha_corr1_",i
-         open(unit=alpha_corr_unit1(i),file=filename,status="new")
+         open(unit=alpha_corr_unit1(i),file=filename,status="replace")
          write (unit=filename,fmt='(A,I1)') "alpha_corr2_",i
-         open(unit=alpha_corr_unit2(i),file=filename,status="new")
+         open(unit=alpha_corr_unit2(i),file=filename,status="replace")
       end do
 
       do i=1,num_sound_diag
          call da_get_unit(sound_diag_unit(i))
          write (unit=filename,fmt='(A,I1)') "sound_diag_",i
-         open(unit=sound_diag_unit(i),file=filename,status="new")
+         open(unit=sound_diag_unit(i),file=filename,status="replace")
       end do
    end if
 

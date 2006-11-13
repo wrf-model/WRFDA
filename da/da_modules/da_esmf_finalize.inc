@@ -1,9 +1,9 @@
 subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
-   TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-   TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
-   TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
-   INTEGER,             INTENT(OUT)   :: rc
+   type(ESMF_GridComp), intent(inout) :: gcomp
+   type(ESMF_State),    intent(inout) :: importState, exportState
+   type(ESMF_Clock),    intent(inout) :: clock
+   integer,             intent(out)   :: rc
 
    !<DESCRIPTION>
    !     WRFVAR finalize routine.
@@ -19,12 +19,12 @@ subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
    !--output wrfvar analysis
 
-   IF ((config_flags%real_data_init_type == 1) .OR. &
-       (config_flags%real_data_init_type == 3)) THEN
+   if ((config_flags%real_data_init_type == 1) .OR. &
+       (config_flags%real_data_init_type == 3)) then
       call da_med_initialdata_output( head_grid , config_flags )
 
       call med_shutdown_io ( head_grid , config_flags )
-   END IF
+   end if
 
    call da_message((/"wrfvar: SUCCESS COMPLETE WRFVAR"/))
    call wrf_shutdown

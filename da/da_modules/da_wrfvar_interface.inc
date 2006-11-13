@@ -1,46 +1,46 @@
 subroutine da_wrfvar_interface ( grid, config_flags ) 
 
-   IMPLICIT NONE
+   implicit none
 
 #ifndef DEREF_KLUDGE
-   INTERFACE
+   interface
       subroutine da_solve ( grid , config_flags , &
 #include "em_dummy_new_args.inc"
       )
 
       ! Driver layer modules
-      USE module_domain
-      USE module_configure
-      USE module_machine
-      USE module_tiles
-      USE module_dm
+      use module_domain
+      use module_configure
+      use module_machine
+      use module_tiles
+      use module_dm
       ! Mediation layer modules
       ! Model layer modules
-      USE module_model_constants
+      use module_model_constants
 
-      USE da_control
-      USE da_define_structures
-      USE da_setup_structures
-      USE da_test
-      USE da_minimisation
+      use da_control
+      use da_define_structures
+      use da_setup_structures
+      use da_test
+      use da_minimisation
 
       !--Input data.
 
-      TYPE(domain),                INTENT(INOUT) :: grid
-      TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
+      type(domain),                intent(inout) :: grid
+      type (grid_config_rec_type), intent(inout) :: config_flags
 
 #include "em_dummy_new_decl.inc"
 
       end subroutine da_solve
-   END INTERFACE
+   end interface
 #endif
 
-   TYPE(domain),                INTENT(INOUT) :: grid
-   TYPE (grid_config_rec_type), INTENT(INOUT) :: config_flags
-   INTEGER :: idum1, idum2
+   type(domain),                intent(inout) :: grid
+   type (grid_config_rec_type), intent(inout) :: config_flags
+   integer :: idum1, idum2
 
 #ifdef DEREF_KLUDGE
-   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
+   integer     :: sm31 , em31 , sm32 , em32 , sm33 , em33
 #endif
 
    call da_trace_entry("da_wrfvar_interface")

@@ -1,61 +1,62 @@
 !WRFVAR:DRIVER_LAYER:TOP
 !
 
-MODULE da_wrfvar_top
+module da_wrfvar_top
    !<DESCRIPTION>
    ! This module defines top-level wrfvar_init(), wrfvar_run(), and wrfvar_finalize() 
    ! routines.  
    !</DESCRIPTION>
 
-   USE module_machine
-   USE module_domain
-   USE module_integrate
-   USE module_configure
+   use module_machine
+   use module_domain
+   use module_integrate
+   use module_configure
 
-   USE module_timing
-   USE da_tracing
+   use module_timing
+   use da_tracing
    use da_tools
    use da_radiance
 
 #ifdef DM_PARALLEL
-   USE module_dm
+   use module_dm
 #endif
 
-   USE da_wrfvar_io
+   use da_wrfvar_io
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL    :: time
+   real    :: time
 
-   INTEGER :: loop, levels_to_process
+   integer :: loop, levels_to_process
 
-   TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
-   TYPE (grid_config_rec_type), SAVE :: config_flags
-   INTEGER                 :: number_at_same_level
-   INTEGER                 :: time_step_begin_restart
+   type (domain) , pointer :: keep_grid, grid_ptr, null_domain
+   type (grid_config_rec_type), save :: config_flags
+   integer                 :: number_at_same_level
+   integer                 :: time_step_begin_restart
 
-   INTEGER :: domain_id , fid , oid , idum1 , idum2 , ierr
+   integer :: domain_id , fid , oid , idum1 , idum2 , ierr
 
 #ifdef DM_PARALLEL
-   INTEGER                 :: nbytes
-   INTEGER, PARAMETER      :: configbuflen = 4* CONFIG_BUF_LEN
-   INTEGER                 :: configbuf( configbuflen )
+   integer                 :: nbytes
+   integer, parameter      :: configbuflen = 4* CONFIG_BUF_LEN
+   integer                 :: configbuf( configbuflen )
 #endif
 
-   CHARACTER (LEN=80)      :: rstname
+   character (LEN=80)      :: rstname
+
 !JRB fix for WRF compilation system later
-!   CHARACTER (LEN=40)      :: subversion_version=SVN_REV
-   CHARACTER (LEN=40)      :: subversion_version="TBD"
+!   character (LEN=40)      :: subversion_version=SVN_REV
+   character (LEN=40)      :: subversion_version="TBD"
 
-   INTERFACE 
-      SUBROUTINE setup_timekeeping( grid )
-        USE module_domain
-        TYPE(domain), POINTER :: grid
-      END SUBROUTINE setup_timekeeping
-   END INTERFACE
+   interface 
+      subroutine setup_timekeeping( grid )
+        use module_domain
+        type(domain), pointer :: grid
+      end subroutine setup_timekeeping
+   end interface
 
 
-CONTAINS
+contains
 
 #include "da_wrfvar_init1.inc"
 #include "da_wrfvar_init2.inc"
@@ -63,4 +64,4 @@ CONTAINS
 #include "da_wrfvar_finalize.inc"
 #include "da_wrfvar_interface.inc"
 
-END MODULE da_wrfvar_top
+end module da_wrfvar_top

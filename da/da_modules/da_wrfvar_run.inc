@@ -17,7 +17,7 @@ subroutine da_wrfvar_run( )
    ! href=wrf_shutdown.html>wrf_shutdown</a> (quilt servers would be
    ! directed to shut down here) is called to properly end the run,
    ! including shutting down the communications (for example, most comm
-   ! layers would call MPI_FINALIZE at this point if they are using MPI).
+   ! layers would call MPI_FinALIZE at this point if they are using MPI).
    ! 
    !</DESCRIPTION>
 
@@ -25,11 +25,11 @@ subroutine da_wrfvar_run( )
    !  integration is from the first step (1) to the last step of the simulation.
 
    !--do wrfvar
-   IF (trace_use) call da_trace_entry("da_wrfvar_run")
+   if (trace_use) call da_trace_entry("da_wrfvar_run")
 
    call da_wrfvar_interface ( head_grid, config_flags )
 
-   IF (trace_use) call da_trace_exit("da_wrfvar_run")
+   if (trace_use) call da_trace_exit("da_wrfvar_run")
 
 end subroutine da_wrfvar_run
 

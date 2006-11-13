@@ -4,9 +4,9 @@ subroutine da_wrfvar_init1( no_init1 )
    !     WRF initialization routine, part 1
    !</DESCRIPTION>
 
-   IMPLICIT NONE
+   implicit none
 
-   LOGICAL, OPTIONAL, INTENT(IN) :: no_init1
+   logical, optional, intent(in) :: no_init1
    integer :: ierr
 
    !<DESCRIPTION>
@@ -25,17 +25,17 @@ subroutine da_wrfvar_init1( no_init1 )
    program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
    ! Initialize WRF modules:  
-   ! Phase 1 returns after MPI_INIT() (if it is called)
-   IF (.NOT. PRESENT(no_init1)) THEN
+   ! Phase 1 returns after MPI_inIT() (if it is called)
+   if (.NOT. present(no_init1)) then
       call init_modules(1)
       ! Initialize utilities (time manager, etc.)
       call wrfu_initialize(defaultCalendar=WRFU_CAL_GREGORIAN)
-   ENDIF
-   ! Phase 2 resumes after MPI_INIT() (if it is called)
+   end if
+   ! Phase 2 resumes after MPI_inIT() (if it is called)
    call init_modules(2)
 
    !<DESCRIPTION>
-   ! The wrf namelist.input file is read and stored in the USE associated
+   ! The wrf namelist.input file is read and stored in the use associated
    ! structure model_config_rec, defined in frame/module_configure.F, by the
    ! call to <a href=initial_config.html>initial_config</a>.  On distributed
    ! memory parallel runs this is done only on one processor, and then
@@ -48,26 +48,27 @@ subroutine da_wrfvar_init1( no_init1 )
    !
    !</DESCRIPTION>
 
-   call wrf_message("***  VARIATIONAL ANALYSIS ***")
+   ! Don't use stdout here, too early
+   write(unit=6,fmt='(A)') "***  VARIATIONAL ANALYSIS ***"
 
 #ifdef DM_PARALLEL
-   call MPI_COMM_SIZE(MPI_COMM_WORLD, num_procs, ierr)
-   call MPI_COMM_RANK(MPI_COMM_WORLD, myproc, ierr )
+   call mpi_comm_size(mpi_comm_world, num_procs, ierr)
+   call mpi_comm_rank(mpi_comm_world, myproc, ierr )
 #else
    num_procs = 1
    myproc = 0
 #endif
 
    if (myproc==0) then
-      rootproc=.TRUE.
+      rootproc=.true.
    else
-      rootproc=.FALSE.
+      rootproc=.false.
    end if
 
 #ifdef DM_PARALLEL
-   IF (rootproc) THEN
+   if (rootproc) then
       call initial_config
-   ENDIF
+   end if
    call get_config_as_buffer( configbuf, configbuflen, nbytes )
    call wrf_dm_bcast_bytes( configbuf, nbytes )
    call set_config_as_buffer( configbuf, configbuflen )

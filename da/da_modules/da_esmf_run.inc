@@ -1,9 +1,9 @@
 subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
-   TYPE(ESMF_GridComp), INTENT(INOUT) :: gcomp
-   TYPE(ESMF_State),    INTENT(INOUT) :: importState, exportState
-   TYPE(ESMF_Clock),    INTENT(INOUT) :: clock
-   INTEGER,             INTENT(OUT)   :: rc
+   type(ESMF_GridComp), intent(inout) :: gcomp
+   type(ESMF_State),    intent(inout) :: importState, exportState
+   type(ESMF_Clock),    intent(inout) :: clock
+   integer,             intent(out)   :: rc
 
    !<DESCRIPTION>
    !     WRFVAR run routine.
