@@ -14,17 +14,17 @@ subroutine da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, tot
    accum_power = 0.0
    variance = sum( total_power(0:max_wavenumber) )
 
-   write(UNIT=6,FMT='(3a,i5,a,i5)')' Power spectra for variable ', trim(variable), &
+   write(unit=6,fmt='(3a,i5,a,i5)')' Power spectra for variable ', trim(variable), &
                           ' and level ', k, ' in unit ', outunit
 
    do n = 0, max_wavenumber
       accum_power = accum_power + total_power(n)
-      write(UNIT=outunit,FMT='(2i4,2f18.5,f8.3)')k, n, total_power(n), accum_power, &
+      write(unit=outunit,fmt='(2i4,2f18.5,f8.3)')k, n, total_power(n), accum_power, &
                                         accum_power / variance
    end do
 
    outunit = outunit + 1
-   write(UNIT=6,FMT=*) ''
+   write(unit=6,fmt=*) ''
 
 end subroutine da_print_be_stats_h_global
 

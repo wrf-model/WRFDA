@@ -44,7 +44,7 @@ if (uh_method .eq. 'power') then
       if ( trim(cvar) /=  trim(variable) ) then
         call da_error(__FILE__,__LINE__, &
           (/"Variable name inconsistency"/))
-      END IF
+      end if
 
       read(iunit)max_wavenumber, kdum
       if ( kdum /= k ) then
@@ -57,10 +57,10 @@ if (uh_method .eq. 'power') then
       if ( first_time ) then
         if ( .not. data_on_levels ) then
           if ( use_global_eofs ) then
-            write(UNIT=6,FMT='(a)') &
+            write(unit=6,fmt='(a)') &
               ' Power spectra calculated for 2D field projected onto global EOFs.'
           else
-            write(UNIT=6,FMT='(a)') &
+            write(unit=6,fmt='(a)') &
               ' Power spectra calculated for 2D field projected onto local EOFs.'
           end if
         end if
@@ -86,7 +86,7 @@ if (uh_method .eq. 'power') then
       if ( first_time ) then
            allocate( scale_length(1:nk) )
            allocate( sl_smth(1:nk) )
-      endif
+      end if
 
       call da_get_unit(iunit)
       filename = trim(variable)//'/'//'sl_print.'//trim(variable)
@@ -106,7 +106,7 @@ if (uh_method .eq. 'power') then
          if ( abs(scale_length(k)-mean_scale) > abs(spike_tolerance * mean_scale) ) then
             scale_length(k) = 2.0 * scale_length(k-1) - scale_length(k-2)
          end if
-      enddo
+      end do
 
 ! Smoothing the scale_length (YRG 07/01/2005):
         sl_smth =  scale_length
@@ -114,9 +114,9 @@ if (uh_method .eq. 'power') then
            do k = 2, nk-1
              sl_smth(k) = scale_length(k) &
                   + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
-           enddo
+           end do
            scale_length = sl_smth 
-        enddo
+        end do
      
       write(outunit) variable
       write(outunit) scale_length
@@ -126,7 +126,7 @@ if (uh_method .eq. 'power') then
 
       deallocate (scale_length)
 
-   endif
+   end if
 
 
 end subroutine da_readwrite_be_stage4

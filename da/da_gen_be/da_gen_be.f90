@@ -41,6 +41,6 @@ contains
 
 end module da_gen_be
 
-SUBROUTINE wrf_abort
+subroutine wrf_abort
   STOP
-END SUBROUTINE wrf_abort
+end subroutine wrf_abort
