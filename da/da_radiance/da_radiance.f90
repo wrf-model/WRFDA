@@ -204,7 +204,6 @@ CONTAINS
 #include "da_calculate_jo_and_grady_rad.inc"
 #include "da_calculate_residual_rad.inc"
 #include "da_biascorr_rad.inc"
-#include "da_biascorr_rad_new.inc"
 #include "da_biasprep.inc"
 #include "da_write_biasprep.inc"
 #include "da_predictor.inc"
@@ -216,7 +215,6 @@ CONTAINS
 #include "da_read_filtered_rad.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_get_innov_vector_rad.inc"
-#include "da_get_innov_vector_rad_new.inc"
 #include "da_detsurtyp.inc"
 #include "da_oma_stats_rad.inc"
 #include "da_omb_stats_rad.inc"
@@ -236,6 +234,7 @@ CONTAINS
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
+#include "da_status_rad.inc"
 
 #include "gsi_emiss.inc"
 #include "emiss_ssmi.inc"

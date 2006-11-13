@@ -186,7 +186,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    allocate (radiance_ad % out_clear( nbtout ) ,stat= alloc_status(122))
    allocate (radiance_ad % total_out( nbtout ) ,stat= alloc_status(123))
    allocate (radiance_ad % clear_out( nbtout ) ,stat= alloc_status(124))
-   call da_oi(__FILE__,__LINE__)
 
    If ( Any(alloc_status /= 0) ) Then
       call da_error(__FILE__,__LINE__, &
@@ -226,7 +225,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 #endif
 
    nc = nchannels/nprofiles
-   call da_oi(__FILE__,__LINE__)
 
    if (coef%id_sensor == 1)  then        ! infrared sensor 
       calcemis (1:nchannels)   = .true.
@@ -245,7 +243,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
          end if
       end do
    end if
-   call da_oi(__FILE__,__LINE__)
 
 #ifdef RTTOV
    call rttov_ad( & 
@@ -270,7 +267,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       & radiance,    &! inout  direct model   (input due to pointers alloc)
       & radiance_ad ) ! inout  adjoint input  (output if converstion Bt -> rad)
 #endif
-   call da_oi(__FILE__,__LINE__)
 
    if ( any(errorstatus(:) /= 0 )) then
        write (errmsg(1),*) 'rttov_direct error code = ', errorstatus(:)
@@ -318,7 +314,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       con_vars_ad(n)%q(:)         = profiles_ad(n) % q(:)
       con_vars_ad(n)%ps           = profiles_ad(n) % s2m  % p
    end do
-   call da_oi(__FILE__,__LINE__)
 
    deallocate (lprofiles )
    deallocate (channels )
@@ -326,7 +321,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    deallocate (emissivity )
    deallocate (emissivity_ad )
    deallocate (calcemis )
-   call da_oi(__FILE__,__LINE__)
 
    do n = 1, nprofiles 
       deallocate (profiles(n)%p )
@@ -343,7 +337,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       deallocate (profiles_ad(n)%co2 )
       deallocate (profiles_ad(n)%clw )
    end do
-   call da_oi(__FILE__,__LINE__)
 
    ! deallocate transmittance structure
    deallocate (transmission % tau_surf      ,stat= alloc_status(6))
@@ -385,7 +378,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    deallocate (radiance_ad % out_clear ,stat= alloc_status(120))
    deallocate (radiance_ad % total_out ,stat= alloc_status(121))
    deallocate (radiance_ad % clear_out ,stat= alloc_status(122))
-   call da_oi(__FILE__,__LINE__)
 
    If (Any(alloc_status /= 0) ) Then
      call da_error(__FILE__,__LINE__, &
