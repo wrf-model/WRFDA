@@ -106,17 +106,17 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
          call da_sort_rad(iv)
 
 !   allocate cloud_flag in iv structure
-   do i = 1,  iv % num_inst
-      if (iv % instid(i) % num_rad < 1) cycle
-      do j = 1, iv % instid(i) % num_rad
-        allocate ( iv % instid(i) % rad(j) % cloud_flag(1:iv%instid(i)%nchan), stat = alloc_status )
-        If( alloc_status /= 0 ) Then
-           call da_error(__FILE__,__LINE__, & 
-             (/"mem allocation error to iv%instid(n)%rad(j)%cloud_flag"/))
-        End If
-        iv % instid(i) % rad(j)% cloud_flag(:) = 1  ! no cloud
-      end do
-   end do
+!   do i = 1,  iv % num_inst
+!      if (iv % instid(i) % num_rad < 1) cycle
+!      do j = 1, iv % instid(i) % num_rad
+!        allocate ( iv % instid(i) % rad(j) % cloud_flag(1:iv%instid(i)%nchan), stat = alloc_status )
+!        If( alloc_status /= 0 ) Then
+!           call da_error(__FILE__,__LINE__, & 
+!             (/"mem allocation error to iv%instid(n)%rad(j)%cloud_flag"/))
+!        End If
+!        iv % instid(i) % rad(j)% cloud_flag(:) = 1  ! no cloud
+!      end do
+!   end do
 
 !-----------------------------------------------------------------------------
 !  [3.0] create (smaller) ob structure:
@@ -144,6 +144,8 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
    end do
 
  end if
+
+   if (print_detail_radiance) call da_status_rad(iv)
 
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 

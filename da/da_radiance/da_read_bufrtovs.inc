@@ -386,6 +386,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(inst)%rad(nread(inst))%satazi       = p%rad%satazi
       iv%instid(inst)%rad(nread(inst))%solzen       = p%rad%solzen
       !   iv%instid(inst)%rad(nread(inst))%solazi
+      iv%instid(inst)%rad(nread(inst))%solazi = 0.0
+      allocate ( iv%instid(inst)%rad(nread(inst))%cloud_flag(1:nchan))
+      iv%instid(inst)%rad(nread(inst))%cloud_flag(:) = 1
       allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error )
       IF (error /= 0) THEN
          call da_error(__FILE__,__LINE__, &
@@ -455,6 +458,8 @@ if (.false.) then
 
    close(lnbufr)
    call da_free_unit(lnbufr)
+
+   if (print_detail_radiance) call da_status_rad(iv)
 
    call da_trace_exit("da_read_bufrtovs")
 
