@@ -18,7 +18,7 @@ subroutine da_uv_to_divergence( xb, u, v, div, &
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims
 
-   TYPE (xb_type), INTENT(IN)           :: xb         ! First guess structure.
+   type (xb_type), intent(in)           :: xb         ! First guess structure.
    real, intent(in)   :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(in)   :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
    real, intent(inout):: div(ims:ime,jms:jme,kms:kme) ! Divergence.
@@ -54,16 +54,16 @@ subroutine da_uv_to_divergence( xb, u, v, div, &
    ! [2.0] Calculate divergence:
    !---------------------------------------------------------------------------
 
-   DO k = kts, kte
+   do k = kts, kte
       ! [2.1] Compute fd divergence at interior points:
 
       if ( global ) then
-         DO j = js, je
-            DO i = is, ie
+         do j = js, je
+            do i = is, ie
                div(i,j,k) = xb%coefx(i,j) * (u(i+1,j,k) - u(i-1,j,k) ) + &
                             xb%coefy(i,j) * (v(i,j+1,k) - v(i,j-1,k) )
-            END DO
-         END DO
+            end do
+         end do
 
          ! if( global ) cycle
       else
@@ -73,12 +73,12 @@ subroutine da_uv_to_divergence( xb, u, v, div, &
 
          ! [2.1] Compute fd divergence at interior points:
 
-         DO j = js, je
-            DO i = is, ie
+         do j = js, je
+            do i = is, ie
                coeff = xb%map_factor(i,j) * xb%map_factor(i,j) * inv_2ds
                div(i,j,k) = ( um(i+1,j) - um(i-1,j) + vm(i,j+1) - vm(i,j-1) ) * coeff
-            END DO
-         END DO
+            end do
+         end do
 
          ! [2.2] Impose zero divergence gradient condition at boundaries:
 
@@ -117,15 +117,15 @@ subroutine da_uv_to_divergence( xb, u, v, div, &
                div(i,j,k) = one_third * ( 4.0 * div(i,j-1,k) - div(i,j-2,k) )
             end do
          end if
-      endif
-   END DO
+      end if
+   end do
 
    if( global ) then
       call da_set_boundary_3d(div, &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
-   endif
+   end if
 
 end subroutine da_uv_to_divergence
 

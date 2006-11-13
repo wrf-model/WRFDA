@@ -9,22 +9,22 @@ module da_airep
 
    ! The "stats_airep_type" is ONLY used locally in da_airep:
 
-   TYPE residual_airep1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-   END TYPE residual_airep1_type
+   type residual_airep1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+   end type residual_airep1_type
 
-   TYPE maxmin_airep_stats_type
-      TYPE (maxmin_type)         :: u, v, t 
-   END TYPE maxmin_airep_stats_type
+   type maxmin_airep_stats_type
+      type (maxmin_type)         :: u, v, t 
+   end type maxmin_airep_stats_type
 
-   TYPE stats_airep_type
-      TYPE (maxmin_airep_stats_type)  :: maximum, minimum
-      TYPE (residual_airep1_type)     :: average, rms_err
-   END TYPE stats_airep_type
+   type stats_airep_type
+      type (maxmin_airep_stats_type)  :: maximum, minimum
+      type (residual_airep1_type)     :: average, rms_err
+   end type stats_airep_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_airep.inc"
 #include "da_calculate_jo_and_grady_airep.inc"

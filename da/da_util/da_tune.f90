@@ -5,7 +5,7 @@ program da_tune
 !       Ref: QJRMS (2001), 127, pp. 1433-1452   
 !            Gerald Desroziers and Serguei Ivanov
 !  Updates: 
-!        03/15/2006  ADD RADIANCE ERROR TUNING           ZHIQUAN LIU
+!        03/15/2006  ADD RADIANCE ERROR TUNinG           ZHIQUAN LIU
 !        10/16/2006  Merged radiance tuning subroutines  Syed RH Rizvi
 !---------------------------------------------------------------------
    implicit none
@@ -144,7 +144,7 @@ program da_tune
    end type pixel_type
 
    type radiance_type
-      CHARACTER*20               :: rttovid_string
+      character*20               :: rttovid_string
       integer                    :: nchan
       integer, pointer           :: num_rad_tot(:)        ! dimension: nchan
       real   , pointer           :: trace_rad  (:), &     ! dimension: nchan
@@ -436,15 +436,15 @@ subroutine da_count_obs( y_unit, ob )
           if ( index( ob_name,'noaa') > 0 ) then
               do k = 1, num_obs
               read(y_unit,'(a20)')dummy              
-              enddo
+              end do
          else
           do n = 1, num_obs
             read(y_unit,'(i8)')num_levs
             do k = 1, num_levs 
               read(y_unit,'(a20)')dummy              
-            enddo
-          enddo
-         endif    
+            end do
+          end do
+         end if    
    end do
 
 1000  print*,' end of file reached on unit ',y_unit
@@ -952,7 +952,7 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
                                         ob % geoamv(igeoamv) % u(k) % yp, &
                                         ob % geoamv(igeoamv) % v(k) % yp
-           enddo
+           end do
          end do
 
       elseif ( index( ob_name,'polaramv') > 0 ) then
@@ -963,7 +963,7 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
                                         ob % polaramv(ipolaramv) % u(k) % yp, &
                                         ob % polaramv(ipolaramv) % v(k) % yp
-           enddo
+           end do
          end do
 
       elseif ( index( ob_name,'gpspw') > 0 ) then
@@ -1402,7 +1402,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
              read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
              ob % profiler(iprofiler) % u(k) % error, ob % profiler(iprofiler) % u(k) % pert, &
              ob % profiler(iprofiler) % v(k) % error, ob % profiler(iprofiler) % v(k) % pert
-             enddo
+             end do
          end do
       elseif ( index( ob_name,'bogus') > 0 ) then
          do n = 1, num_obs
@@ -2081,7 +2081,7 @@ subroutine da_read_jo_actual( ob )
     ob%rad(n)%num_rad_tot(:) = 0
     ob%rad(n)%joa_rad(:) = 0.
     end do
-   endif
+   end if
 
    rewind(jo_unit)
 
@@ -2403,17 +2403,17 @@ subroutine da_calc_new_factors( ob )
       call da_calc_new_factors1( 'profi', ob % num_profiler, ob % num_profiler_tot, &
                             ob % jo_profiler_u, ob % jo_profiler_v, 0.0, 0.0, 0.0, &
                             ob % joa_profiler_u, ob % joa_profiler_v, 0.0, 0.0, 0.0 )
-   endif
+   end if
    if ( ob % num_qscat > 0 ) then
       call da_calc_new_factors1( 'qscat', ob % num_qscat, ob % num_qscat_tot, &
                             ob % jo_qscat_u, ob % jo_qscat_v, 0.0, 0.0, 0.0, &
                             ob % joa_qscat_u, ob % joa_qscat_v, 0.0, 0.0, 0.0 )
-   endif
+   end if
    if ( ob % num_bogus > 0 ) then
       call da_calc_new_factors1( 'bogus', ob % num_bogus, ob % num_bogus_tot, &
                             ob % jo_bogus_u, ob % jo_bogus_v, ob % jo_bogus_t, ob % jo_bogus_q, 0.0, &
                             ob % joa_bogus_u, ob % joa_bogus_v, ob % joa_bogus_t, ob % joa_bogus_q, 0.0 )
-   endif
+   end if
   
    if ( rtminit_nsensor > 0 ) then 
     write(6,*) '     sensor    chan   num       Jo_mini         Jo_exp       trace(HK)  factor'
@@ -2433,7 +2433,7 @@ subroutine da_calc_new_factors( ob )
          end if
       end do
       end do
-   endif
+   end if
 
 end subroutine da_calc_new_factors
 
@@ -2552,17 +2552,17 @@ subroutine da_get_j( ob )
    
 end subroutine da_get_j
 !---------------------------------------------
-SUBROUTINE read_namelist_radiance
+subroutine read_namelist_radiance
 !----------------------------------------------------------------------------
 !             03/15/2006   for radiance tuning setup        Zhiquan Liu
 !----------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
 !  Local scalars:
 
-   CHARACTER*20              :: namelist_file      ! Input namelist filename.
-   INTEGER, PARAMETER        :: namelist_unit = 7  ! Input namelist unit.
-   INTEGER                   :: iost               ! Error code.
+   character*20              :: namelist_file      ! Input namelist filename.
+   integer, parameter        :: namelist_unit = 7  ! Input namelist unit.
+   integer                   :: iost               ! Error code.
 
 !  Namelist contents :
 
@@ -2573,15 +2573,15 @@ SUBROUTINE read_namelist_radiance
    WRITE (6, '(3x,A,A)' ) ' radiance namelist file : ', namelist_file
    IOST = 0
 
-   OPEN ( FILE   = trim(namelist_file), UNIT   = namelist_unit, &
+   OPEN ( FILE   = trim(namelist_file), unit   = namelist_unit, &
           STATUS = 'OLD' , ACCESS = 'SEQUENTIAL', &
-          FORM   = 'FORMATTED', ACTION = 'READ', &
-          IOSTAT = IOST )
+          FORM   = 'FORMATTED', ACTION = 'read', &
+          iostat = IOST )
    IF ( IOST /= 0 ) stop ' Error in opening namelist file '
 
    IOST = 0
 
-   READ  ( UNIT = namelist_unit, NML = rtminit,  IOSTAT = IOST)
+   read  ( unit = namelist_unit, NML = rtminit,  iostat = IOST)
       WRITE(6,'(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
       WRITE(6,'(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
       WRITE(6,'(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
@@ -2590,7 +2590,7 @@ SUBROUTINE read_namelist_radiance
 
    IF ( IOST /= 0 ) stop ' Error in reading naemlist file '
 
-   CLOSE (namelist_unit)
+   close (namelist_unit)
 
    if ( rtminit_nsensor > 0 ) then
       allocate ( ob % rad(rtminit_nsensor) )
@@ -2610,8 +2610,8 @@ SUBROUTINE read_namelist_radiance
         write(6,*) 'Tuning Radiance Error For ', trim(ob%rad(n)%rttovid_string)
       end do
    end if
-   RETURN
+   return
 
-END SUBROUTINE read_namelist_radiance
+end subroutine read_namelist_radiance
 
 end program da_tune

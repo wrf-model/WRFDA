@@ -11,10 +11,10 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
 
    implicit none
    
-   TYPE (xb_type), INTENT(IN) :: xb           ! First guess structure.
-   INTEGER, INTENT(IN)        :: k            ! Model level.
-   REAL, INTENT(INOUT)        :: term_x(:,:)  ! x component of term.
-   REAL, INTENT(INOUT)        :: term_y(:,:)  ! y component of term.
+   type (xb_type), intent(in) :: xb           ! First guess structure.
+   integer, intent(in)        :: k            ! Model level.
+   real, intent(inout)        :: term_x(:,:)  ! x component of term.
+   real, intent(inout)        :: term_y(:,:)  ! y component of term.
 
    integer, intent(in)  :: ids,ide, jds,jde, kds,kde    ! domain dims.
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
@@ -29,9 +29,9 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
    real                 :: varb
 
    ! JRB stop compiling whinging
-   IF (kte == 0 .OR. kms == 0 .OR. kds == 0 .OR. kde == 0 .OR. kme == 0 &
-      .OR. kts == 0) THEN
-   END IF
+   if (kte == 0 .OR. kms == 0 .OR. kds == 0 .OR. kde == 0 .OR. kme == 0 &
+      .OR. kts == 0) then
+   end if
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -58,7 +58,7 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
       end do
    end do
    
-   if (.NOT. global) THEN ! For global only interior points
+   if (.NOT. global) then ! For global only interior points
 
       ! [2.2] Bottom boundaries:
 
@@ -130,7 +130,7 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
          data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
       end if
 
-   END IF ! not global
+   end if ! not global
 
    !  [2.7] Multiply by rho  and add to term_x:
       
@@ -151,7 +151,7 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
    end do
    
    
-   if (.NOT. global) THEN ! For global only interior points
+   if (.NOT. global) then ! For global only interior points
 
       ! [3.2] Bottom boundaries:
 
@@ -222,7 +222,7 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
       if ( ite == ide .AND. jte == jde ) then 
          data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
       end if
-   END IF ! not global
+   end if ! not global
 
    ! [3.7] Multiply by rho and add to term_y
 

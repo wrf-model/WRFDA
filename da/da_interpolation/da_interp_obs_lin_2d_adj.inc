@@ -23,7 +23,7 @@ subroutine da_interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
       fm2d(i+1,j  ,kk) = dym*dx * fmz(kk) + fm2d(i+1,j  ,kk)
       fm2d(i  ,j+1,kk) = dy *dxm* fmz(kk) + fm2d(i  ,j+1,kk)
       fm2d(i+1,j+1,kk) = dy *dx * fmz(kk) + fm2d(i+1,j+1,kk)
-   enddo
+   end do
 
 end subroutine da_interp_obs_lin_2d_adj
 

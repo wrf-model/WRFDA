@@ -14,7 +14,7 @@ subroutine da_apply_power( power, max_wavenumber, ccv, c_cvsize)
    integer             :: m, n, index
 
 
-   IF (trace_use) call da_trace_entry("da_apply_power")
+   if (trace_use) call da_trace_entry("da_apply_power")
 
    ! Adjust Power spectrum
 
@@ -28,6 +28,6 @@ subroutine da_apply_power( power, max_wavenumber, ccv, c_cvsize)
       end do
    end do
 
-   IF (trace_use) call da_trace_exit("da_apply_power")
+   if (trace_use) call da_trace_exit("da_apply_power")
 
 end subroutine da_apply_power           

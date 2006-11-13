@@ -20,7 +20,7 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
       coslat(j) = cos(lat(j))
       int_wgts(j) = coslat(j) * delta_phi
 
-      ! Use symmetry for northern hemisphere:
+      ! use symmetry for northern hemisphere:
       lat(nj+1-j) = -lat(j)
       sinlat(nj+1-j) = -sinlat(j)
       coslat(nj+1-j) = coslat(j)

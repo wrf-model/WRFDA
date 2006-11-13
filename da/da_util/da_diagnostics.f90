@@ -314,7 +314,7 @@ program da_diagnostics
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 )
 
- endif
+ end if
 !  [4.2] Synop O-B:
    if ( ob % num_synop  > 0 ) then
 
@@ -346,7 +346,7 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
- endif
+ end if
 !  [4.3] Metar O-B:
  if ( ob % num_metar  > 0 ) then
 
@@ -378,7 +378,7 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
- endif
+ end if
 !  [4.4] Polar AMV O-B:
  if ( ob % num_polaramv  > 0 ) then
    open( unit1, file = 'polaramvu_omb.dat', status = 'unknown' )
@@ -397,7 +397,7 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
- endif
+ end if
 !  [4.5] Geo AMV O-B:
  if ( ob % num_geoamv  > 0 ) then
 
@@ -418,7 +418,7 @@ program da_diagnostics
 
    close( unit1 ); close( unit2 )
 
- endif
+ end if
 !  [4.6] Buoy  O-B:
 
  if ( ob % num_buoy > 0 ) then
@@ -450,7 +450,7 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
- endif
+ end if
 
 !  [4.7] sonde_sfc  O-B:
 
@@ -483,7 +483,7 @@ program da_diagnostics
    write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
- endif
+ end if
 !  [4.8] Profiler  O-B:
  if ( ob % num_profiler  > 0 ) then
    open( unit1, file = 'profileru_omb.dat', status = 'unknown' )
@@ -496,7 +496,7 @@ program da_diagnostics
                           ob % profiler(n) % pressure(k), ob % profiler(n) % u(k) )
       call da_write_data( 1, current_time, unit2, ob % profiler(n) % info, &
                           ob % profiler(n) % pressure(k), ob % profiler(n) % v(k) )
-      enddo
+      end do
       current_time = ob % profiler(n) % info % time
    end do
 
@@ -504,7 +504,7 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
- endif
+ end if
 !  [4.9] AIRS retrievals  O-B:
  if ( ob % num_airsret > 0 ) then
    open( unit1, file = 'airsrt_omb.dat', status = 'unknown' )
@@ -525,7 +525,7 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
- endif
+ end if
 !  [4.10] Pilot  O-B:
  if ( ob % num_pilot  > 0 ) then
    open( unit1, file = 'pilotu_omb.dat', status = 'unknown' )
@@ -546,7 +546,7 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
    close( unit1 ); close( unit2 )
- endif
+ end if
 !--------------------------------------------------------------------------
 !  [4.11] For Bogus O-B:
  if ( ob % num_bogus > 0 ) then
@@ -577,7 +577,7 @@ program da_diagnostics
 
    close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 )
 
- endif
+ end if
 !--------------------------------------------------------------------------
 !  [4.11] For Airep O-B:
  if ( ob % num_airep > 0 ) then
@@ -603,7 +603,7 @@ program da_diagnostics
 
    close( unit1 ); close( unit2 ); close( unit3 )
 
- endif
+ end if
 contains
 
 subroutine da_write_data( lev, current_time, ounit, info, p, field )
@@ -719,12 +719,12 @@ subroutine da_count_obs( y_unit, ob )
            if( index( ob_name,'bogus')  > 0  ) then
             read(y_unit,'(i8)') levels
             read(y_unit,'(a20)') dummy 
-           endif
+           end if
             read(y_unit,'(i8)') levels
             do k=1,levels
             read(y_unit,'(a20)') dummy 
             end do
-          enddo
+          end do
       end do
       
       if ( index( ob_name,'*end*') > 0 ) then  
@@ -1263,21 +1263,21 @@ subroutine da_read_y( y_unit, ob )
                         ob % bogus(n) % v(k), &             ! O, O-B, O-A
                         ob % bogus(n) % t(k), &             ! O, O-B, O-A
                         ob % bogus(n) % q(k)                ! O, O-B, O-A
-            enddo
+            end do
             ob % bogus(n) % info % time = bogust
-          enddo
+          end do
          num_obs_bogus = num_obs_bogus + num_obs
 
       elseif ( index( ob_name,'ssmiT') > 0 ) then
          do n = 1, num_obs
             read(y_unit,'(i8)')num_levs
             read(y_unit,'(a)')dummy
-         enddo
+         end do
       else
       print*,' Got unknown obs_tye : ',trim(ob_name)
       stop
-      endif
-    enddo     ! loop over particular time (ends in *****)
+      end if
+    end do     ! loop over particular time (ends in *****)
       if ( index( ob_name,'*end*') > 0 ) exit  
   end do      ! loop over entire input file: (ends in *end*)
 

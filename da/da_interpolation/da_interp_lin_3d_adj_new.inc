@@ -25,8 +25,8 @@ subroutine da_interp_lin_3d_adj_new(fm3d, xp, &
          if (k(kk,point) > 0) then
             fmz(k(kk,point))   = dzm(kk,point)*fo3d(kk,point) + fmz(k(kk,point))
             fmz(k(kk,point)+1) = dz(kk,point) *fo3d(kk,point) + fmz(k(kk,point)+1)
-         endif
-      enddo
+         end if
+      end do
 
       fm3d(i(point)  ,j(point)  ,xp%kts:xp%kte) = dym(point)*dxm(point)*fmz(xp%kts:xp%kte) &
                                   + fm3d(i(point)  ,j(point)  ,xp%kts:xp%kte)

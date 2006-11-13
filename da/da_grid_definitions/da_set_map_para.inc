@@ -1,47 +1,47 @@
 subroutine da_set_map_para
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL            :: phictr, r, conv
-   REAL            :: cell, cell2, psx
+   real            :: phictr, r, conv
+   real            :: cell, cell2, psx
 
    conv = 180.0 / pi
                                                                   
-   ! DEFINE PSI1:
-   IF (map_projection.EQ.1 .OR. map_projection.EQ.2) THEN
-      IF(PHIC.LT.0) THEN 
-         PSI1 = 90.+TRUELAT1_3DV
+   ! DEFinE PSI1:
+   if (map_projection.EQ.1 .OR. map_projection.EQ.2) then
+      if(PHIC.LT.0) then 
+         PSI1 = 90.+trueLAT1_3DV
          PSI1 = -PSI1
-      ELSE
-        PSI1 = 90.-TRUELAT1_3DV
-      END IF          
-   ELSE
+      else
+        PSI1 = 90.-trueLAT1_3DV
+      end if          
+   else
       PSI1 = 0.
-   END IF 
+   end if 
 
    PSI1 = PSI1/CONV
          
    ! CALCULATE R
-   IF (map_projection.NE.3) THEN
+   if (map_projection.NE.3) then
       PSX = (POLE-PHIC)/CONV
-      IF (map_projection.EQ.1) THEN
-         CELL  = earth_radius*SIN(PSI1)/cone_factor  
+      if (map_projection.EQ.1) then
+         CELL  = earth_radius*Sin(PSI1)/cone_factor  
          CELL2 = (TAN(PSX/2.))/(TAN(PSI1/2.))
-      END IF 
-      IF (map_projection.EQ.2) THEN
-         CELL  = earth_radius*SIN(PSX)/cone_factor   
+      end if 
+      if (map_projection.EQ.2) then
+         CELL  = earth_radius*Sin(PSX)/cone_factor   
          CELL2 = (1. + COS(PSI1))/(1. + COS(PSX)) 
-      END IF  
+      end if  
       R = CELL*(CELL2)**cone_factor 
       YCNTR = -R
-   END IF  
+   end if  
 
-   ! FOR MERCATOR PROJECTION, THE PROJECTION IS TRUE AT LAT AT PHI1
-   IF (map_projection.EQ.3) THEN
+   ! FOR MERCATOR PROJECTION, THE PROJECTION IS true AT LAT AT PHI1
+   if (map_projection.EQ.3) then
       C2     = earth_radius*COS(PSI1) 
       PHICTR = PHIC/CONV 
-      CELL   = COS(PHICTR)/(1.0+SIN(PHICTR)) 
+      CELL   = COS(PHICTR)/(1.0+Sin(PHICTR)) 
       YCNTR  = - C2*LOG(CELL)  
-   END IF 
+   end if 
 
 end subroutine da_set_map_para

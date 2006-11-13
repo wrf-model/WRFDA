@@ -490,8 +490,8 @@ module da_define_structures
       integer, pointer     :: isflg(:)
       integer, pointer     :: landsea_mask(:)
       real,    pointer     :: elv(:)
-      real,    pointer     :: isltyp(:)
-      real,    pointer     :: ivgtyp(:)
+      real,    pointer     :: soiltyp(:)
+      real,    pointer     :: vegtyp(:)
       real,    pointer     :: vegfra(:)
       real,    pointer     :: clwp(:)
       TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type

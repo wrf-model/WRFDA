@@ -19,7 +19,7 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
 
    integer              :: jc, iequator
 
-   IF (trace_use) call da_trace_entry("da_legtra_inv_adj")
+   if (trace_use) call da_trace_entry("da_legtra_inv_adj")
 
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
@@ -40,8 +40,8 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
             sum_legtra = sum_legtra - r_leg(j) * alp(index_j + index_m + l)
          else
             sum_legtra = sum_legtra + r_leg(j) * alp(index_j + index_m + l)
-         endif
-      enddo
+         end if
+      end do
 
       do j = jts, je
          index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * (max_wavenumber+2) / 2
@@ -51,7 +51,7 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
       v(l) = sum_legtra
    end do
 
-   IF (trace_use) call da_trace_exit("da_legtra_inv_adj")
+   if (trace_use) call da_trace_exit("da_legtra_inv_adj")
 
 end subroutine da_legtra_inv_adj
 

@@ -17,7 +17,7 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
    if (v_interp_optn == v_interp_p) then
       if (obs_v > mdl_v(xp%kts) .or. obs_v < mdl_v(xp%kte)) then
          if (anal_type_verify) then
-            ! Guo (02/06/2006), for VERIFY, allow the extrapolation to obtain the zk:
+            ! Guo (02/06/2006), for VERifY, allow the extrapolation to obtain the zk:
             if (obs_v > mdl_v(xp%kts)) then
                ! below the lowest level:
                zk = real(xp%kts+1) - &
@@ -26,23 +26,23 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
                ! above the highest level:
                zk = real(xp%kte-1) + &
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
-            endif
+            end if
          else
             if (trace_use) call da_trace_exit("da_to_zk")
             return
-         endif
+         end if
       else
          do k = xp%kts,xp%kte-1
             if(obs_v <= mdl_v(k) .and. obs_v >= mdl_v(k+1)) then
                zk = real(k) + (mdl_v(k) - obs_v)/(mdl_v(k) - mdl_v(k+1))
                exit
-            endif
-         enddo
-      endif
+            end if
+         end do
+      end if
    else if(v_interp_optn == v_interp_h) then
       if (obs_v < mdl_v(xp%kts) .or. obs_v > mdl_v(xp%kte)) then
          if (anal_type_verify) then
-            ! Guo (02/06/2006), for VERIFY, allow the extrapolation to obtain the zk:
+            ! Guo (02/06/2006), for VERifY, allow the extrapolation to obtain the zk:
             if (obs_v < mdl_v(xp%kts)) then
                ! below the lowest level:
                zk = real(xp%kts+1) - &
@@ -51,20 +51,20 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
                ! above the highest level:
                zk = real(xp%kte-1) + &
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
-            endif
+            end if
          else
             if (trace_use) call da_trace_exit("da_to_zk")
             return
-         endif
+         end if
       else
          do k = xp%kts,xp%kte-1
             if(obs_v >= mdl_v(k) .and. obs_v <= mdl_v(k+1)) then
                zk = real(k) + (mdl_v(k) - obs_v)/(mdl_v(k) - mdl_v(k+1))
                exit
-            endif
-         enddo
-      endif
-   endif
+            end if
+         end do
+      end if
+   end if
 
    if (trace_use) call da_trace_exit("da_to_zk")
 

@@ -12,7 +12,7 @@ module da_spectral
 
    implicit none
 
-   CONTAINS
+   contains
 
 #include "da_asslegpol.inc"
 #include "da_calc_power_spectrum.inc"

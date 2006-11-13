@@ -145,7 +145,7 @@ program da_plot_gen_be
    if (ier/=0) then
       print '(a,i2,a)','iostat=',ier,'  Error in Namelist file...'
       stop
-   endif
+   end if
    print  plot_title
    close (5)
    read(start_date(1:10), fmt='(i10)')sdate
@@ -192,7 +192,7 @@ program da_plot_gen_be
    print '(a,a,a)', "Not support this version of ",code_version," code."
    stop 22222
 
-    endif
+    end if
 
 ! ----------------------------------------------------------------------------------
 ! PART I. Regression coefficient
@@ -261,13 +261,13 @@ program da_plot_gen_be
         do j=1,nj
           avg = avg  + reg_ps  (j,k)/float(nj) 
           avg2= avg2 + reg_chi (j,k)/float(nj) 
-        enddo
+        end do
 !
         do j=1,nj
           reg_ps (j,k)=avg
           reg_chi(j,k)=avg2
-        enddo
-      enddo
+        end do
+      end do
 
 ! .. temperature:
       do i=1,nk
@@ -276,16 +276,16 @@ program da_plot_gen_be
 
         do j=1,nj
           avg3= avg3 + reg_t (j,k,i)/float(nj)
-        enddo
+        end do
 
         do j=1,nj
           reg_t(j,k,i)=avg3
-        enddo
+        end do
 
-      enddo
-      enddo
+      end do
+      end do
 
-    endif
+    end if
     
     print '(a)', "2) Re-assign the regression coefficients."
 
@@ -367,7 +367,7 @@ program da_plot_gen_be
 !            unbalan = chi(i,j,k) - balance
 !            if (abs(chi_u(i,j,k)-unbalan) > 1.E-25) &
 !               print '("n,i,j,k,chi_u,unbalan:",4i5,2e20.12)', n_times,i,j,k, chi_u(i,j,k), unbalan
-          enddo
+          end do
         end do
       end do
     
@@ -395,14 +395,14 @@ program da_plot_gen_be
 
         do j =1, nj
           do i = 1,ni
-            balance = SUM(reg_ps(j,1:nk) * psi(i,j,1:nk))
+            balance = sum(reg_ps(j,1:nk) * psi(i,j,1:nk))
             ps_loc(j) = ps_loc(j) + balance * ps(i,j)
             ps_var(j) = ps_var(j) + ps(i,j) * ps(i,j)
 
 !            unbalan = ps(i,j) - balance
 !            if (abs(ps_u(i,j)-unbalan) > 1.E-12) &
 !               print '("n,i,j,ps_u,unbalan:",3i5,2e20.12)', n_times,i,j,k, ps_u(i,j), unbalan
-          enddo
+          end do
         end do
     
 ! 4.2.4 Read t (mean-removed):
@@ -428,14 +428,14 @@ program da_plot_gen_be
       do k=1,nk
         do j =1, nj
           do i = 1,ni
-            balance =  SUM(reg_t(j,k,1:nk) * psi(i,j,1:nk))
+            balance =  sum(reg_t(j,k,1:nk) * psi(i,j,1:nk))
             temp_loc(j,k) = temp_loc(j,k) + balance * temp(i,j,k)
             temp_var(j,k) = temp_var(j,k) + temp(i,j,k) * temp(i,j,k)
 
 !            unbalan = temp(i,j,k) - balance
 !            if (abs(t_u(i,j,k)-unbalan) > 1.E-12) &
 !               print '("n,i,j,k,temp_u,unbalan:",4i5,2e20.12)', n_times,i,j,k, t_u(i,j,k), unbalan
-          enddo
+          end do
         end do
       end do
       
@@ -482,7 +482,7 @@ program da_plot_gen_be
       do j = 1,nj
         ps_loc(j) = ps_loc(j) / ps_var(j)
         print '(10x,i6,f12.5)', j,ps_loc(j)
-      enddo
+      end do
   
 ! 6.0 Plot the <Xb*X> / <X*X>
 
@@ -505,16 +505,16 @@ program da_plot_gen_be
 
 ! Contour: 
       cint= 0.025 
-        CALL CONREC(chi_loc,nj,nk,nk,flo,hi, cint,-1, 0, NDOT) 
-        CALL PERIML( nj/10, 5, nk/5, 5) 
+        call CONREC(chi_loc,nj,nk,nk,flo,hi, cint,-1, 0, NDOT) 
+        call PERIML( nj/10, 5, nk/5, 5) 
       
-        write(Title,'("CHI_B LOCALLY EXPLAINED BY PSI")')  
+        write(Title,'("CHI_B LOcallY EXPLAinED BY PSI")')  
         print '(a)', Title 
         call set(0.1,0.97,0.1,0.97, 0.0,100.,0.0,100.,1)  
-        CALL PWRITX(50.0, 95.0,Title,23,20,0,0) 
-        CALL PWRITX(40.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
-        CALL PWRITX(1.5,30.0,"<CHI_B*CHI> / <CHI*CHI>",23,20,90,-1) 
-        CALL FRAME 
+        call PWRITX(50.0, 95.0,Title,23,20,0,0) 
+        call PWRITX(40.0, 2.0,"GRID in Y-DIRECTION",19,20,0,0) 
+        call PWRITX(1.5,30.0,"<CHI_B*CHI> / <CHI*CHI>",23,20,90,-1) 
+        call FRAME 
 
 ! 6.2.1 Balanced temperature
 
@@ -524,16 +524,16 @@ program da_plot_gen_be
 
 ! Contour: 
       cint= 0.050 
-        CALL CONREC(temp_loc,nj,nk,nk,flo,hi, cint,-1, 0, NDOT) 
-        CALL PERIML( nj/10, 5, nk/5, 5) 
+        call CONREC(temp_loc,nj,nk,nk,flo,hi, cint,-1, 0, NDOT) 
+        call PERIML( nj/10, 5, nk/5, 5) 
       
-        write(Title,'("TEMP_B LOCALLY EXPLAINED BY PSI")')  
+        write(Title,'("TEMP_B LOcallY EXPLAinED BY PSI")')  
         print '(a)', Title 
         call set(0.1,0.97,0.1,0.97, 0.0,100.,0.0,100.,1)  
-        CALL PWRITX(50.0, 95.0,Title,24,20,0,0) 
-        CALL PWRITX(40.0, 2.0,"GRID IN Y-DIRECTION",19,20,0,0) 
-        CALL PWRITX(1.5,30.0,"<TEMP_B*TEMP> / <TEMP*TEMP>",26,20,90,-1) 
-        CALL FRAME 
+        call PWRITX(50.0, 95.0,Title,24,20,0,0) 
+        call PWRITX(40.0, 2.0,"GRID in Y-DIRECTION",19,20,0,0) 
+        call PWRITX(1.5,30.0,"<TEMP_B*TEMP> / <TEMP*TEMP>",26,20,90,-1) 
+        call FRAME 
 
 ! --------------------------------------------------------------------------
 ! PART II. Eigenvector and eigenvalue
@@ -583,15 +583,15 @@ program da_plot_gen_be
  
        do j = 1,nj
          ps_var(j) = cv%l_val(1,j)
-       enddo
+       end do
 
        call da_covariance_plot (cvv, ps_var, nj, main_title1)
 
-      endif
+      end if
 
  2000 continue
 
-   enddo
+   end do
 
 
 ! -------------------------------------------------------------------------
@@ -604,7 +604,7 @@ program da_plot_gen_be
        read(input_unit) cv%sl(1:1)
      else
        read(input_unit) cv%sl
-     endif
+     end if
 
      cvv = trim(variable)
 
@@ -616,7 +616,7 @@ program da_plot_gen_be
      call da_scale_plot(cvv, cv, main_title1, resolution_km)
 
 
-   enddo
+   end do
 
 ! -------------------------------------------------------------------------
 
@@ -716,12 +716,12 @@ contains
 
         if ( mod(ccyy,100) == 0) then
            mmday(2) = 28
-        endif
+        end if
 
         if(mod(ccyy,400) == 0) then
            mmday(2) = 29
         end if
-     endif
+     end if
 
      dd = dd + delta
 
@@ -731,7 +731,7 @@ contains
         if(mm == 0) then
            mm = 12
            ccyy = ccyy - 1
-        endif
+        end if
 
         dd = mmday(mm)
      elseif ( dd .gt. mmday(mm) ) then
@@ -949,7 +949,7 @@ contains
 
 !     Setup horizontal bins:
       write(6,'(/a,f12.5)')'   Number of grid-cells to average over = ', binwidth_lat
-!     Use binwidth_lat, but actually an integer number of points.
+!     use binwidth_lat, but actually an integer number of points.
  
       num_bins_j = int( real(nj) / real(binwidth_lat) )
       njj = int(binwidth_lat) * num_bins_j
@@ -1179,7 +1179,7 @@ contains
       elseif (iopt.eq.98) then
         ix = size(ev%power, dim=1)
         jy = size(ev%power, dim=2)
-      endif
+      end if
 
       mmy       = 6
       mny       = 2
@@ -1205,7 +1205,7 @@ contains
       do j=1,ix
         if (iopt.eq.99)   y(j) = ev%l_val(1,j)
         if (iopt.eq.98)   y(j) = ev%power(j,1)
-      enddo
+      end do
 
       ymin = minval(y(1:ix))
       ymax = maxval(y(1:ix))
@@ -1223,7 +1223,7 @@ contains
           ye=50.0
         elseif (vn.eq.'RH') then
           ye =100.0
-        endif
+        end if
 
       else 
 
@@ -1234,7 +1234,7 @@ contains
         if (vn.eq.'T_U'.or.vn.eq.'T'.or.vn.eq.'T_B') &
           ye=50.0
 
-      endif
+      end if
 
 !      if (iopt.eq.98.and.vn.eq.'rh') ye=150.
       if (iopt.eq.98.and.vn.eq.'chi_b') ye=100.
@@ -1407,7 +1407,7 @@ contains
       elseif (iopt.eq.2) then
         title = trim(x_title) 
         title2 = trim(y_title)//' MAGNIFIED BY 10**(' // chr_3 // ')' 
-      endif
+      end if
       print '(I2," magnitude=",i6,2x,a)', mn, magnitude, chr_3
       print '("title=",a)', title
 
@@ -1477,7 +1477,7 @@ contains
          write(title,'("VECT ",I2)') mn
          call setusv('LW',2000)
          call pwrity(xe-15.0, ye-mn*1.5+0.5, title(1:7),7,10,0,0)
-      endif
+      end if
    
    end subroutine da_line_plot
   

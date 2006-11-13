@@ -23,10 +23,10 @@ subroutine da_interp_lin_2d_adj_new(fm2d, is, ie, js, je,&
       fm2d(i(point)+1,j(point)  ) = dym(point)*dx(point) * fo2d(point) + fm2d(i(point)+1,j(point)  )
       fm2d(i(point)  ,j(point)+1) = dy(point) *dxm(point)* fo2d(point) + fm2d(i(point)  ,j(point)+1)
       fm2d(i(point)+1,j(point)+1) = dy(point) *dx(point) * fo2d(point) + fm2d(i(point)+1,j(point)+1)
-!write (0,*) point,"SUM(fm2d)",SUM(fm2d)
+!write (0,*) point,"sum(fm2d)",sum(fm2d)
    end do
 
-!write (0,*) "SUM(fm2d)",SUM(fm2d)
+!write (0,*) "sum(fm2d)",sum(fm2d)
 
    if (trace_use) call da_trace_exit("da_interp_lin_2d_adj_new")
 

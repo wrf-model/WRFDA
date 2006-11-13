@@ -107,7 +107,7 @@ program daprog_ominusb
          if ( station_id(1:5) == '*****' .or. station_id == '*end*' ) then
             print*,' Hit station_id as ',station_id
             exit
-         endif
+         end if
          
          ! [1.2] Store data:
 
@@ -326,8 +326,8 @@ subroutine da_obs_stats( num_times, obs )
    
    ! Calculate basic statistics:
    if ( nobs > 0 ) then
-      obs % mean_omb = sumobs1 / REAL(nobs)
-      obs % stdv_omb = sumobs2 / REAL(nobs) ! Actually mean square here.
+      obs % mean_omb = sumobs1 / real(nobs)
+      obs % stdv_omb = sumobs2 / real(nobs) ! Actually mean square here.
       obs % stdv_omb = sqrt( obs % stdv_omb - obs % mean_omb**2 )
    end if
 

@@ -18,103 +18,103 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
    !
    !----------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL,    INTENT (inout) :: F,D
-   REAL,    INTENT (inout) :: U, V
-   REAL,    INTENT (in)    :: YLON
-   INTEGER, INTENT (in)    :: ID
+   real,    intent (inout) :: F,D
+   real,    intent (inout) :: U, V
+   real,    intent (in)    :: YLON
+   integer, intent (in)    :: ID
 
-   REAL :: AEARTH, UEARTH, VEARTH
-   REAL :: XLONRT, ANG, conv
+   real :: AEARTH, UEARTH, VEARTH
+   real :: XLONRT, ANG, conv
 
 
    conv = 180.0 / pi
 
-   SELECT CASE (ID)
+   select case (ID)
 
-      CASE (convert_fd2uv);
+      case (convert_fd2uv);
 
-         ! CONVERT WIND MODULE/DIRECTION INTO U/V WIND COMPONENTS ON EARTH,
-         ! THEN CONVERT U/V WIND COMPONENTS ON EARTH INTO LAMBERT CONFORMAL OR
-         ! POLAR STEREOGRAPHIC PROJECTION U/V WIND COMPONENTS.
+         ! CONVERT WinD module/DIRECTION inTO U/V WinD COMPONENTS ON EARTH,
+         ! then CONVERT U/V WinD COMPONENTS ON EARTH inTO LAMBERT CONFORMAL OR
+         ! POLAR STEREOGRAPHIC PROJECTION U/V WinD COMPONENTS.
 
          ! PROJECTIONS CHANGE REQUIRES ONLY A CHANGE OF THE CONE CONSTANT, XN
-         ! EQUATIONS REMAIN THE SAME.
+         ! EQUATIONS REMAin THE SAME.
 
          AEARTH = D/CONV
 
-         UEARTH = -F*SIN(AEARTH)
+         UEARTH = -F*Sin(AEARTH)
          VEARTH = -F*COS(AEARTH)
 
-         ! FOR CONVERSION TO GRID COORDINATES,
-         ! SEE PROGRAM DATAMAP, SUBR VECT, AND
+         ! FOR CONVERSION TO GRID COORDinATES,
+         ! SEE program DATAMAP, SUBR VECT, AND
          ! ANTHES METEO. 597 NOTES, EQUA. 2.23, 2.25, 2.28.
 
          XLONRT = XLONC-YLON
 
-         IF (XLONRT .GT. 180.) XLONRT=XLONRT-360.
-         IF (XLONRT .LT.-180.) XLONRT=XLONRT+360.
+         if (XLONRT .GT. 180.) XLONRT=XLONRT-360.
+         if (XLONRT .LT.-180.) XLONRT=XLONRT+360.
 
          ANG=XLONRT*CONE_FACTOR/CONV
 
-         ! FOR MERCATOR PROJECTION, THE WINDS ARE AS IN EARTH COORDINATES
+         ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
 
-         IF (map_projection.EQ.3) ANG=0.
+         if (map_projection.EQ.3) ANG=0.
 
-         IF (PHIC.LT.0.0) ANG=-ANG
+         if (PHIC.LT.0.0) ANG=-ANG
 
-         U = VEARTH*SIN(ANG) + UEARTH*COS(ANG)
-         V = VEARTH*COS(ANG) - UEARTH*SIN(ANG)
+         U = VEARTH*Sin(ANG) + UEARTH*COS(ANG)
+         V = VEARTH*COS(ANG) - UEARTH*Sin(ANG)
 
 
          ! CONVERT LAMBERT CONFORMAL OR POLAR STEREOGRAPHIC PROJECTION U/V
-         ! WIND COMPONENTS INTO U/V WIND COMPONENTS ON EART
-         ! THEN CONVERT U/V WIND COMPONENTS ON EARTH INTO WIND MODULE/DIRECTION
+         ! WinD COMPONENTS inTO U/V WinD COMPONENTS ON EART
+         ! then CONVERT U/V WinD COMPONENTS ON EARTH inTO WinD module/DIRECTION
 
          ! PROJECTIONS CHANGE REQUIRES ONLY A CHANGE OF THE CONE_FACTOR
 
-      CASE (convert_uv2fd);
+      case (convert_uv2fd);
 
          XLONRT = XLONC-YLON
 
-         IF (XLONRT .GT. 180.) XLONRT=XLONRT-360.
-         IF (XLONRT .LT.-180.) XLONRT=XLONRT+360.
+         if (XLONRT .GT. 180.) XLONRT=XLONRT-360.
+         if (XLONRT .LT.-180.) XLONRT=XLONRT+360.
 
          ANG=XLONRT*CONE_FACTOR/CONV
 
-         ! FOR MERCATOR PROJECTION, THE WINDS ARE AS IN EARTH COORDINATES
+         ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
 
-         IF (map_projection .EQ.  3) ANG = 0.
-         IF (PHIC  .LT. 0.) ANG = -ANG
+         if (map_projection .EQ.  3) ANG = 0.
+         if (PHIC  .LT. 0.) ANG = -ANG
 
-         UEARTH = U*COS(ANG) - V*SIN(ANG)
-         VEARTH = U*SIN(ANG) + V*COS(ANG)
+         UEARTH = U*COS(ANG) - V*Sin(ANG)
+         VEARTH = U*Sin(ANG) + V*COS(ANG)
 
-         F = SQRT(UEARTH*UEARTH + VEARTH*VEARTH)
+         F = sqrt(UEARTH*UEARTH + VEARTH*VEARTH)
 
-         IF (F .EQ. 0.0) THEN
+         if (F .EQ. 0.0) then
             D = 0.
-            RETURN
-         END IF
+            return
+         end if
 
-         IF (VEARTH .EQ. 0.) THEN
-            IF (UEARTH .GT. 0.) D = 270.
-            IF (UEARTH .LT. 0.) D =  90.
-         ELSE
+         if (VEARTH .EQ. 0.) then
+            if (UEARTH .GT. 0.) D = 270.
+            if (UEARTH .LT. 0.) D =  90.
+         else
             AEARTH = ATAN (UEARTH/VEARTH)*CONV
 
-            IF (UEARTH .LE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH
-            IF (UEARTH .LE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
-            IF (UEARTH .GE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
-            IF (UEARTH .GE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH + 360.0
+            if (UEARTH .LE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH
+            if (UEARTH .LE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
+            if (UEARTH .GE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
+            if (UEARTH .GE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH + 360.0
 
-         END IF
+         end if
 
-      CASE DEFAULT
-         WRITE(UNIT=errmsg(1),FMT='(A,I2)') ' UNKNOWN OPTION ',ID
-         call da_error(__FILE__,__LINE__,errmsg(1:1))
+      case default
+         write(unit=message(1),fmt='(A,I2)') ' UNKNOWN OPTION ',ID
+         call da_error(__FILE__,__LINE__,message(1:1))
 
-   END SELECT
+   end select
 
 end subroutine da_ffdduv

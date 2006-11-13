@@ -1,36 +1,36 @@
 subroutine da_check_max_iv_airep(it, airep , &
                   itu,ituf,itvv,itvvf,itt,ittf )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT (IN)         :: it      ! Outer iteration
+   integer,           intent (in)         :: it      ! Outer iteration
 
-   TYPE (airep_type), INTENT(INOUT)       :: airep
-   INTEGER, INTENT(INOUT) :: itu,ituf,itvv,itvvf,itt,ittf
-   INTEGER                                :: k
-   LOGICAL                                :: failed
+   type (airep_type), intent(inout)       :: airep
+   integer, intent(inout) :: itu,ituf,itvv,itvvf,itt,ittf
+   integer                                :: k
+   logical                                :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
 
-   if ( check_max_iv_print ) THEN
-      WRITE (check_max_iv_unit,'(A)')  &
+   if ( check_max_iv_print ) then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for Airep_U   = ',max_error_uv, &
          'Error max test ratio for Airep_V   = ',max_error_uv, &
          'Error max test ratio for Airep_T   = ',max_error_t
-   ENDIF
+   end if
 
    !---------------------------------------------------------------------------
    ! [2.0] Perform maximum innovation vector check:
    !---------------------------------------------------------------------------
 
-   failed = .FALSE.
+   failed = .false.
 
    do k = 1, airep % info % levels
       if ( airep % zk(k) > 0.0) then
@@ -47,7 +47,7 @@ subroutine da_check_max_iv_airep(it, airep , &
          call da_max_error_qc (it, airep % info, airep % t(k),&
                     max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
                                    failed, check_max_iv_print)
-      endif
-   enddo
+      end if
+   end do
 
 end subroutine da_check_max_iv_airep

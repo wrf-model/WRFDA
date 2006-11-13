@@ -1,10 +1,10 @@
 subroutine da_print_stats_airep( stats_unit, nu, nv, nt, Airep )
 
-    IMPLICIT NONE
+    implicit none
 
-    INTEGER,           INTENT(IN)    :: stats_unit
-    INTEGER,           INTENT(INOUT) :: nu, nv, nt
-    TYPE (stats_airep_type), INTENT(IN):: Airep
+    integer,           intent(in)    :: stats_unit
+    integer,           intent(inout) :: nu, nv, nt
+    type (stats_airep_type), intent(in):: Airep
 
     write(unit=stats_unit, fmt='(4a/)') &
        '   var             ', &

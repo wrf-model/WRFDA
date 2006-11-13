@@ -26,8 +26,8 @@ subroutine da_interp_lin_3d_adj(fm3d, xp, &
          call da_togrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
          fmz(k)   = dzm*fo3d(kk) + fmz(k)
          fmz(k+1) = dz *fo3d(kk) + fmz(k+1)
-      endif
-   enddo
+      end if
+   end do
 
    fm3d(i  ,j  ,xp%kts:xp%kte) = dym*dxm*fmz(xp%kts:xp%kte) &
                                + fm3d(i  ,j  ,xp%kts:xp%kte)

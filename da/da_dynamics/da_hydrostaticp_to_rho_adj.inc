@@ -5,27 +5,27 @@ subroutine da_hydrostaticp_to_rho_adj( xb, xp, rho, p )
    !
    !  METHOD:  Standard adjoint coding.
    !
-   !  ASSUMPTIONS: 1) Hydrostatic pressure.
+   !  ASsumPTIONS: 1) Hydrostatic pressure.
    !               2) Model level stored top down.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN) :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Dimensions and xpose buffers.
-   REAL, INTENT(IN)    :: rho(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) 
+   type (xb_type), intent(in) :: xb           ! First guess structure.
+   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
+   real, intent(in)    :: rho(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) 
                                                    ! Density inc. (cross pts).
-   REAL, INTENT(INOUT) :: p(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   
+   real, intent(inout) :: p(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   
                                                    ! Pressure inc. (cross pts)
 
    integer               :: is, ie       ! 1st dim. end points.
    integer               :: js, je       ! 2nd dim. end points.
    integer               :: ks, ke       ! 3rd dim. end points.
-   INTEGER               :: i, j, k      ! Loop counters.
-   REAL                  :: delta1       ! Height difference.
-   REAL                  :: delta2       ! Height difference.
-   REAL                  :: dPdz         ! Vertical pressure gradient.
-   REAL                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
+   integer               :: i, j, k      ! Loop counters.
+   real                  :: delta1       ! Height difference.
+   real                  :: delta2       ! Height difference.
+   real                  :: dPdz         ! Vertical pressure gradient.
+   real                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
   
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -93,14 +93,14 @@ subroutine da_hydrostaticp_to_rho_adj( xb, xp, rho, p )
    ! [2.0] Calculate density increments at all levels except top/bottom:
    !---------------------------------------------------------------------------
 
-   DO k = ke-1, ks+1, -1 
+   do k = ke-1, ks+1, -1 
       temp(is:ie,js:je) = -rho(is:ie,js:je,k) / &
                         ( ( xb % h(is:ie,js:je,k+1) - xb % h(is:ie,js:je,k-1) ) * &
                           gravity )
 
       p(is:ie,js:je,k-1) = p(is:ie,js:je,k-1) - temp(is:ie,js:je)
       p(is:ie,js:je,k+1) = p(is:ie,js:je,k+1) + temp(is:ie,js:je)
-   END DO                                  
+   end do                                  
 
 end subroutine da_hydrostaticp_to_rho_adj
 

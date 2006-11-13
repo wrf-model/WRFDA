@@ -39,7 +39,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    complex             :: ccv(1:sizec)               ! Spectral modes.
    complex             :: ccv_local(1:sizec)         ! Spectral modes.
 
-   IF (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
+   if (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
 
    !----------------------------------------------------------------------
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
@@ -84,8 +84,8 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
 
       n = index_end - index_start + 1
       call MPI_ALLREDUCE( ccv_local(index_start:index_end), &
-                          ccv(index_start:index_end), n, TRUE_MPI_COMPLEX, MPI_SUM, &
-                          MPI_COMM_WORLD, IER )
+                          ccv(index_start:index_end), n, true_mpi_COMPLEX, mpi_sum, &
+                          mpi_comm_world, IER )
 #else
       call da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, &
                               ccv(index_start:index_end), v_fou(jts:jte,m) )
@@ -103,7 +103,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
       rcv(2*n     ) = aimag( ccv(n) )
    end do 
 
-   IF (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")
+   if (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")
 
 end subroutine da_v_to_vv_spectral_adj
 

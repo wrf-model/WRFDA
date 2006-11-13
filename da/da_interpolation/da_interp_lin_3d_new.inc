@@ -4,7 +4,7 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
 
    implicit none
 
-   TYPE (xpose_type),      intent(in)  :: xp    ! Dimensions and xpose buffers.
+   type (xpose_type),      intent(in)  :: xp    ! Dimensions and xpose buffers.
    integer,                intent(in)  :: nl     ! number of input levels      
    integer,                intent(in)  :: num    ! number of ns   
    integer,                intent(in)  :: i(num), j(num), k(nl,num)
@@ -32,8 +32,8 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
       do kk = 1, nl
          if(k(kk,n) > 0) then
             fo3d(kk,n) = dzm(kk,n)*fmz(k(kk,n)) + dz(kk,n)*fmz(k(kk,n)+1)
-         endif
-      enddo
+         end if
+      end do
    end do
 
    if (trace_use) call da_trace_exit("da_interp_lin_3d_new")

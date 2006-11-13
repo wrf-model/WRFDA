@@ -32,9 +32,9 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    call rfft1i( ni, wsave, lensav, ier )
 
    if ( ier /= 0 ) then
-     WRITE(UNIT=errmsg(1),FMT='(A,I4)') &
+     write(unit=message(1),fmt='(A,I4)') &
         "Fourier initialization failed. ier = ", ier
-     call da_error(__FILE__,__LINE__,errmsg(1:1))
+     call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    !----------------------------------------------------------------------------

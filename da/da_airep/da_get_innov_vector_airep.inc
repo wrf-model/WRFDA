@@ -1,34 +1,34 @@
 subroutine da_get_innov_vector_airep ( it, xb, xp, ob, iv )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)            :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   integer, intent(in)            :: it       ! External iteration.
+   type (xb_type), intent(in)     :: xb       ! first guess state.
+   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type (y_type),  intent(inout)  :: ob       ! Observation structure.
+   type (ob_type), intent(inout)  :: iv       ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
-   REAL, DIMENSION(1:max_ob_levels) :: model_u  ! Model value u at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_v  ! Model value v at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_t  ! Model value t at ob location.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
+   real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
+   real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
+   real, dimension(1:max_ob_levels) :: model_t  ! Model value t at ob location.
 
 
-   REAL, DIMENSION(xp%kms:xp%kme)  :: v_h      ! Model value h at ob hor. location.
-   REAL, DIMENSION(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
+   real, dimension(xp%kms:xp%kme)  :: v_h      ! Model value h at ob hor. location.
+   real, dimension(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
 
-   INTEGER           :: itu,ituf,itvv,itvvf,itt,ittf
+   integer           :: itu,ituf,itvv,itvvf,itt,ittf
 
-   IF ( iv % num_airep > 0 ) THEN
+   if ( iv % num_airep > 0 ) then
 
       itu   = 0; itvv    = 0; itt  = 0;
       ituf  = 0; itvvf   = 0; ittf = 0;
 
-      DO n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
+      do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
          num_levs = iv % airep(n) % info % levels
          if ( num_levs < 1 ) cycle
 
@@ -50,25 +50,25 @@ subroutine da_get_innov_vector_airep ( it, xb, xp, ob, iv )
                     + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
             v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                     + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         enddo
+         end do
 
          num_levs=0
          do k=1, iv % airep(n) % info % levels
             iv%airep(n)%zk(k)=missing_r
-            IF ( iv % airep(n) % p(k) > 1.0 ) THEN
+            if ( iv % airep(n) % p(k) > 1.0 ) then
                call da_to_zk(iv % airep(n) % p(k), v_p, xp, v_interp_p, &
                   iv%airep(n)%zk(k))
-            ELSE IF ( iv % airep(n) % h(k) > 0.0 ) THEN
+            else if ( iv % airep(n) % h(k) > 0.0 ) then
                call da_to_zk(iv % airep(n) % h(k), v_h, xp, v_interp_h, &
                   iv%airep(n)%zk(k))
-            ENDIF
+            end if
 
             if(iv%airep(n)%zk(k) < 0.0) then
                iv % airep(n) % u(k) % qc = missing
                iv % airep(n) % v(k) % qc = missing
                iv % airep(n) % t(k) % qc = missing
-            endif
-         enddo
+            end if
+         end do
 
          num_levs = iv % airep(n) % info % levels
 
@@ -109,44 +109,44 @@ subroutine da_get_innov_vector_airep ( it, xb, xp, ob, iv )
             ! [3.0] Fast interpolation:
             !----------------------------------------------------------------
 
-            IF ( ob % airep(n) % u(k) > missing_r .AND. &
-                 iv % airep(n) % u(k) % qc >= obs_qc_pointer ) THEN
+            if ( ob % airep(n) % u(k) > missing_r .AND. &
+                 iv % airep(n) % u(k) % qc >= obs_qc_pointer ) then
                iv % airep(n) % u(k) % inv = ob % airep(n) % u(k) - model_u(k)
-            ENDIF
+            end if
 
-            IF ( ob % airep(n) % v(k) > missing_r .AND. &
-                 iv % airep(n) % v(k) % qc >= obs_qc_pointer ) THEN
+            if ( ob % airep(n) % v(k) > missing_r .AND. &
+                 iv % airep(n) % v(k) % qc >= obs_qc_pointer ) then
                iv % airep(n) % v(k) % inv = ob % airep(n) % v(k) - model_v(k)
-            ENDIF
+            end if
 
-            IF ( ob % airep(n) % t(k) > missing_r .AND. &
-                 iv % airep(n) % t(k) % qc >= obs_qc_pointer ) THEN
+            if ( ob % airep(n) % t(k) > missing_r .AND. &
+                 iv % airep(n) % t(k) % qc >= obs_qc_pointer ) then
                iv % airep(n) % t(k) % inv = ob % airep(n) % t(k) - model_t(k)
-            ENDIF
-         END DO
+            end if
+         end do
 
          !-------------------------------------------------------------------
          ! [5.0] Perform optional maximum error check:
          !-------------------------------------------------------------------
 
-         IF ( check_max_iv )THEN
+         if ( check_max_iv )then
             call da_check_max_iv_airep(it, iv % airep(n),itu,ituf,itvv, &
                itvvf,itt,ittf)
-         END IF
-      END DO
+         end if
+      end do
 
       if (check_max_iv_print) then
-         write(unit = check_max_iv_unit, FMT ='(A,i5,A)') &
+         write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &
             'For outer iteration ',it, &
             ', Total Rejections for Airep follows:'
-         WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
+         write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
             'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
             'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
             'Number of failed temperature observations:',ittf, ' on ',itt,   &
             'Finally Total Airep rejections ',ituf+itvvf+ittf,' on ', &
             itu +itvv +itt
-      endif
-   ENDIF
+      end if
+   end if
 
 end subroutine da_get_innov_vector_airep
 

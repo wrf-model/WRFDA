@@ -1,14 +1,14 @@
 subroutine da_ao_stats_airep( stats_unit, oi, re )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
-  TYPE ( y_type), INTENT (in)      :: re            ! A - O
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
+  type ( y_type), intent (in)      :: re            ! A - O
 
-  TYPE (stats_airep_type)          :: Airep
-  INTEGER                          :: nu, nv, nt
-  INTEGER                          :: n, k
+  type (stats_airep_type)          :: Airep
+  integer                          :: nu, nv, nt
+  integer                          :: n, k
 
   num_airep_tot = 0
 
@@ -25,9 +25,9 @@ subroutine da_ao_stats_airep( stats_unit, oi, re )
   Airep%average = residual_airep1_type(0.0, 0.0, 0.0)
   Airep%rms_err = Airep%average
 
-  IF ( oi%num_Airep > 0 ) THEN
+  if ( oi%num_Airep > 0 ) then
 
-    DO n=1, oi%num_Airep
+    do n=1, oi%num_Airep
 
       if( oi%airep(n)%loc%proc_domain ) then
 
@@ -45,9 +45,9 @@ subroutine da_ao_stats_airep( stats_unit, oi, re )
                                  Airep%minimum%t, Airep%maximum%t, &
                                  Airep%average%t, Airep%rms_err%t )
         end do
-      endif    ! end if( oi%airep(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%airep(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -68,11 +68,11 @@ subroutine da_ao_stats_airep( stats_unit, oi, re )
                           Airep%minimum%t%n, Airep%maximum%t%n, &
                           Airep%minimum%t%l, Airep%maximum%t%l )
    
-  IF ( rootproc ) THEN
-    IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 ) THEN
+  if ( rootproc ) then
+    if ( nu /= 0 .or. nv /= 0 .or. nt /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Airep'
       call da_print_stats_airep(stats_unit, nu, nv, nt, Airep)
-    END IF
-  END IF
+    end if
+  end if
 
 end subroutine da_ao_stats_airep

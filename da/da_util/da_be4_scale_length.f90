@@ -88,7 +88,7 @@ program da_scale_length
          !    filename = trim(filename)//'.'//trim(be_method)//'.e'//ce 
          ! else 
          !    filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//k_label//ck
-         ! endif
+         ! end if
          filename = trim(filename)//'.'//trim(be_method)//'.e'//ce//'.'//ck
 
          open (iunit, file = filename, form='unformatted')
@@ -96,7 +96,7 @@ program da_scale_length
          if (ni.ne.ni0.or.nj.ne.nj0) then
             write(*,'(a)') 'dimension problem',ni,ni0,nj,nj0
             stop
-         endif
+         end if
          read(iunit) data_on_levels, use_global_eofs
          read(iunit)field(1:ni,1:nj,num)
       end do ! End loop over members.
@@ -114,6 +114,6 @@ program da_scale_length
 
    if (nk.eq.vertical_level) then
       call da_merge_scale_length(variable, nk)
-   endif
+   end if
 
 end program da_scale_length

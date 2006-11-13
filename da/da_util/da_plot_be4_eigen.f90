@@ -107,12 +107,12 @@ program da_plot_be4_eigen
         read(11,'(a80)') name
         do k=1,kz
         read(11,'(24x,e20.8)')    cv%sl(k)
-        enddo
+        end do
         close(11)
  
    call da_scale_plot(cvv, cv, main_title1, km_resolution) 
 
-   endif
+   end if
 
    if (power_spectra) then
    first_time = .true.
@@ -136,17 +136,17 @@ program da_plot_be4_eigen
 
       close(11)
       first_time = .false. 
-   enddo
+   end do
    close(11)
 
    
    call da_eigen_plot2(cvv, cv, main_title1,km_resolution,98)
 
-   endif
+   end if
     
    call clsgks
 
-CONTAINS
+contains
 
    subroutine da_allocate_eigen(eigen_var, ix, jy, kz)
 
@@ -345,7 +345,7 @@ CONTAINS
    
       call frame
 
-      endif
+      end if
 
 !------------- Now plot scale length  ---------------------   
 
@@ -390,7 +390,7 @@ CONTAINS
                      red, 3500, thick_dash, magnitude,0)
       call frame
 
-      endif
+      end if
 !-----------------------------------------------------   
    
    end subroutine da_eigen_plot
@@ -442,7 +442,7 @@ CONTAINS
       elseif (iopt.eq.98) then
       ix = size(ev%power, dim=1)
       jy = size(ev%power, dim=2)
-      endif
+      end if
 
       mmy       = 6
       mny       = 2
@@ -468,7 +468,7 @@ CONTAINS
       do j=1,ix
       if (iopt.eq.99)   y(j) = ev%l_val(1,j)
       if (iopt.eq.98)   y(j) = ev%power(j,1)
-      enddo
+      end do
 
       ymin = minval(y(1:ix))
       ymax = maxval(y(1:ix))
@@ -486,7 +486,7 @@ CONTAINS
       ye=50.0
       elseif (vn.eq.'rh') then
       ye =10.0
-      endif
+      end if
 
     else 
 
@@ -497,7 +497,7 @@ CONTAINS
       if (vn.eq.'t_u'.or.vn.eq.'t'.or.vn.eq.'t_b') &
       ye=50.0
 
-    endif
+    end if
 
 !      if (iopt.eq.98.and.vn.eq.'rh') ye=150.
       if (iopt.eq.98.and.vn.eq.'chi_b') ye=100.
@@ -582,7 +582,7 @@ CONTAINS
       elseif (iopt.eq.2) then
       title = trim(x_title) 
       title2 = trim(y_title)//' MAGNIFIED BY 10**(' // chr_3 // ')' 
-      endif
+      end if
       print '(I2," magnitude=",i6,2x,a)', mn, magnitude, chr_3
       print '("title=",a)', title
 
@@ -652,7 +652,7 @@ CONTAINS
          write(title,'("VECT ",I2)') mn
          call setusv('LW',2000)
          call pwrity(xe-15.0, ye-mn*1.5+0.5, title(1:7),7,10,0,0)
-      endif
+      end if
    
    end subroutine da_line_plot
   
@@ -767,7 +767,7 @@ end subroutine da_setup_color_table
       call frame
 
 
-      endif
+      end if
 !-----------------------------------------------------
 
 end subroutine da_scale_plot

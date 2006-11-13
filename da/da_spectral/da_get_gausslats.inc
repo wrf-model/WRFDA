@@ -6,7 +6,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    !  polynomial Pn(sin(lat)) = 0.0, n=nj, m=0.
    !  The integral from -1 to +1 of f(x)*Pn(x) where f is a polynomial
    !  of degree <= 2n-1 can be calculated using
-   !  0.5 * SUM(GaussWgts(:)*Pn(:)*f(:)) with the values at Gaussian latitudes.
+   !  0.5 * sum(GaussWgts(:)*Pn(:)*f(:)) with the values at Gaussian latitudes.
    !  See eqns 77-79 of 'The Spectral Technique' M.Jarraud and A.J.Simmons
    !  (1983 ECMWF Seminar or 1990 ECMWF Lecture Notes).
    !  The orthogonality and normalisation of the Legendre polynomials
@@ -16,7 +16,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    !  (with bisection steps to add robustness)
    !  to find the zeros of the Legendre polynomial Pn(x), 0 <= x < 1,
    !  the negative roots (-1 < x < 0) are set by symmetry.
-   !  ASIN(x) gives the Gaussian latitudes.
+   !  ASin(x) gives the Gaussian latitudes.
    !  This gives slightly better results than finding the roots of Pn(sin(lat))
    !  (Algorithm from Numerical Recipies (Fortran version), 1989, p 258)
 
@@ -58,8 +58,8 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       fjold = fj
 
       ! Roots are approximately equally spaced in asin(x)
-      xj = SIN(REAL(j)*Pi/REAL(nj*4))
-      z  = SQRT(1.0-xj*xj)
+      xj = Sin(real(j)*Pi/real(nj*4))
+      z  = sqrt(1.0-xj*xj)
       call da_asslegpol(nj, 0, xj, z, fj)
 
       if ( fj >= 0.0 .AND. fjold < 0.0 .OR. fj <  0.0 .AND. fjold >= 0.0 ) then
@@ -76,10 +76,10 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
          x = 0.5*(x1 + x2)     ! Initialise the guess for the root
          dxold = ABS(x1 - x2)  ! the step size before last
          dx    = dxold         ! and the last step
-         z = SQRT(1.0-x*x)
+         z = sqrt(1.0-x*x)
          call da_asslegpol(nj, 0, x, z, fn)
          call da_asslegpol(nj-1,0,x,z,fn1)
-         dfr = (1.0 - x * x) / (REAL(nj)*(fn1 - x * fn))
+         dfr = (1.0 - x * x) / (real(nj)*(fn1 - x * fn))
 
          do i = 1, maxiter
 
@@ -95,11 +95,11 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
                x = x - dx
             end if
 
-            if (ABS(dx) < 2.0*SPACING(x)) exit
-            z = SQRT(1.0-x*x)
+            if (ABS(dx) < 2.0*SPACinG(x)) exit
+            z = sqrt(1.0-x*x)
             call da_asslegpol(nj,0,x,z,fn)
             call da_asslegpol(nj-1,0,x,z,fn1)
-            dfr = (1.0 - x * x) / (REAL(nj)*(fn1 - x * fn))
+            dfr = (1.0 - x * x) / (real(nj)*(fn1 - x * fn))
 
             if (fn < 0.0) then   ! Maintain the bracket on the root
                x1 = x
@@ -113,10 +113,10 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
               (/"No convergence finding Gaussian latitudes"/))
          end if
 
-         glats(k) = ASIN(x)
-         z = SQRT(1.0-x*x)
+         glats(k) = ASin(x)
+         z = sqrt(1.0-x*x)
          call da_asslegpol(nj-1,0,x,z,fn1)
-         gwgts(k) = 2.0*(1.0 - x * x) / (REAL(nj) * fn1)**2
+         gwgts(k) = 2.0*(1.0 - x * x) / (real(nj) * fn1)**2
          glats(nj+1-k) = -glats(k)
          gwgts(nj+1-k) = gwgts(k)
          k=k+1
@@ -133,7 +133,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       sinlat(j) = sin(glats(j))
       coslat(j) = cos(glats(j))
 
-      ! Use symmetry for northern hemisphere:
+      ! use symmetry for northern hemisphere:
       sinlat(nj+1-j) = -sinlat(j)
       coslat(nj+1-j) = coslat(j)
    end do

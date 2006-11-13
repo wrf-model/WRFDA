@@ -33,9 +33,9 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
    real                 :: var, varb, uar
 
    ! JRB Stop compiler whinging
-   IF (kts == 0 .OR. kde ==0 .OR. kte == 0 .OR. kme == 0 .OR. kms == 0 &
-      .OR. kds == 0) THEN
-   END IF
+   if (kts == 0 .OR. kde ==0 .OR. kte == 0 .OR. kme == 0 .OR. kms == 0 &
+      .OR. kds == 0) then
+   end if
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -56,7 +56,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
    data(its:ite,jts:jte) = rho(its:ite,jts:jte) * term_y(its:ite,jts:jte)
 
-   if (.NOT. global) THEN      
+   if (.NOT. global) then      
 
       ! [3.6] Corner points:
 
@@ -166,7 +166,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
             v(i+2,j) = v(i+2,j) - var
          end do
       end if
-   END IF ! not global
+   end if ! not global
    
    !  [3.1] Interior points:
 
@@ -192,7 +192,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
    data(its:ite,jts:jte) = rho(its:ite,jts:jte) * term_x(its:ite,jts:jte)
 
-   if( .NOT. global) THEN
+   if( .NOT. global) then
       ! [2.6] Corner points:
 
       if ( its == ids .AND. jts == jds ) then
@@ -298,7 +298,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
             u(i+2,j) =  u(i+2,j) - var
          end do
       end if
-   END IF ! not global
+   end if ! not global
 
    ! [2.1] Interior points:
 

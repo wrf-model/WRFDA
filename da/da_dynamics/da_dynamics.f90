@@ -1,19 +1,19 @@
-MODULE da_dynamics
+module da_dynamics
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Contains routines to calculate dynamical quantities.
    !---------------------------------------------------------------------------
 
-   USE da_control
-   USE da_define_structures
-   USE da_ffts
-   USE da_statistics
-   USE da_interpolation
-   USE da_tools    
+   use da_control
+   use da_define_structures
+   use da_ffts
+   use da_statistics
+   use da_interpolation
+   use da_tools    
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_balance_cycloterm.inc"
 #include "da_balance_cycloterm_adj.inc"

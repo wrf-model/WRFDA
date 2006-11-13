@@ -19,7 +19,7 @@ subroutine da_interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
    do kk = k,k+1 
       fmz(kk) = dym*(dxm*fm2d(i,j  ,kk) + dx*fm2d(i+1,j  ,kk)) &
               + dy *(dxm*fm2d(i,j+1,kk) + dx*fm2d(i+1,j+1,kk))
-   enddo
+   end do
 
    fo2d = dzm*fmz(k) + dz*fmz(k+1)
 

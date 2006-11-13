@@ -55,13 +55,13 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
       coefx = xb%coefz
       coefy = coefx   
    else
-      WRITE(UNIT=errmsg(1),FMT='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      write(unit=message(1),fmt='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
 
-   DO k = kts, kte
+   do k = kts, kte
    
       term_x(ims:ime,jms:jme) = 0.0
       term_y(ims:ime,jms:jme) = 0.0
@@ -72,18 +72,18 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
 
       ! [2.1] Include geostrophic terms in balance eqn if requested:
 
-      IF ( balance_type == balance_geo .OR. &
-           balance_type == balance_geocyc ) THEN
+      if ( balance_type == balance_geo .OR. &
+           balance_type == balance_geocyc ) then
          call da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
                                       u(:,:,k), v(:,:,k), &
                                       term_x, term_y, ids,ide, jds,jde, &
                                       ims,ime, jms,jme, its,ite, jts,jte )
-      END IF
+      end if
       
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      IF ( balance_type == balance_cyc .OR. &
-           balance_type == balance_geocyc ) THEN
+      if ( balance_type == balance_cyc .OR. &
+           balance_type == balance_geocyc ) then
          call da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:), &
@@ -91,16 +91,16 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
                                         ids,ide, jds,jde, kds,kde,  &
                                         ims,ime, jms,jme, kms,kme,  &
                                         its,ite, jts,jte, kts,kte )
-      END IF
+      end if
       
       ! [2.3] Take divergence to get Del**2 phi_b/M**2:
 
-      DO j = js, je
-         DO i = is, ie
+      do j = js, je
+         do i = is, ie
           del2phi_b(i,j,k) = -coefx(i,j)*( term_x(i+1,j) - term_x(i-1,j)) &
                              -coefy(i,j)*( term_y(i,j+1) - term_y(i,j-1)) 
-         END DO
-      END DO
+         end do
+      end do
 
       ! [2.4] Del**2 Phi_b  boundary conditions:
 
@@ -114,7 +114,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
       if ( .not. global .and. (ite == ide .and. jts == jds) ) del2phi_b(ite,jts,k) = 0.0
       if ( .not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0
       
-   END DO
+   end do
 
    !------------------------------------------------------------------------------
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:

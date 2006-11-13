@@ -5,17 +5,17 @@ subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y )
    !
    !  METHOD:  Term is k x rho f u on a single level.
    !
-   !  ASSUMPTIONS: Various (see documentation).
+   !  ASsumPTIONS: Various (see documentation).
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN) :: xb           ! First guess structure.
-   INTEGER, INTENT(IN)        :: k            ! Model level.
-   REAL, INTENT(IN)           :: u(:,:)       ! u wind comp. (dot pts)
-   REAL, INTENT(IN)           :: v(:,:)       ! v wind comp. (dot pts)
-   REAL, INTENT(OUT)          :: term_x(:,:)  ! x component of term.
-   REAL, INTENT(OUT)          :: term_y(:,:)  ! y component of term.
+   type (xb_type), intent(in) :: xb           ! First guess structure.
+   integer, intent(in)        :: k            ! Model level.
+   real, intent(in)           :: u(:,:)       ! u wind comp. (dot pts)
+   real, intent(in)           :: v(:,:)       ! v wind comp. (dot pts)
+   real, intent(out)          :: term_x(:,:)  ! x component of term.
+   real, intent(out)          :: term_y(:,:)  ! y component of term.
 
    !---------------------------------------------------------------------------
    !  [1.0] Initialise:

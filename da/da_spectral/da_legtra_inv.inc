@@ -50,7 +50,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
             sum_legtra = sum_legtra - v(l) * alp(index_j + index_m + l)
          else
             sum_legtra = sum_legtra + v(l) * alp(index_j + index_m + l)
-         endif
+         end if
       end do
       r_leg(j) = sum_legtra
    end do

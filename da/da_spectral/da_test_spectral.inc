@@ -25,14 +25,14 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    complex, dimension(1:sizec) :: ccv, ccv1    ! Spectral modes.
    real                :: den, num, xx
 
-   write (unit=stdout, FMT='(A)') &
+   write (unit=stdout, fmt='(A)') &
       ' Test orthogonality of Associated Legendre Polynomials:'
 
    ! Initialise Power spectrum
    power  = 1.0
    call da_setlegpol_test( jde, max_wave, xbx%alp_size, xbx%int_wgts, xbx%alp )
 
-   write(unit=stdout,FMT='(A)') &
+   write(unit=stdout,fmt='(A)') &
       ' Test invertibility of spectral (Fourier, Legendre) transforms:'
 
    ! Gridpoint to spectral:
@@ -50,7 +50,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
                              ims, ime, jms, jme, &
                              its, ite, jts, jte )
 
-   write(unit=stdout,FMT='(1x,a,e30.10)') &
+   write(unit=stdout,fmt='(1x,a,e30.10)') &
       'Domain-Averaged (Grid->Spectral->Grid) Error = ', &
               sqrt( sum( ( field_out(1:xbx%ni,1:xbx%nj) - field(1:xbx%ni,1:xbx%nj) )**2 ) / &
                     sum( field(1:xbx%ni,1:xbx%nj)**2 ) )
@@ -62,7 +62,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
 
    rcv_out(1:2*sizec) = rcv_out(1:2*sizec) - rcv(1:2*sizec) ! Create difference for test diags.
     
-   write(unit=stdout,FMT='(1x,a,e30.10)') &
+   write(unit=stdout,fmt='(1x,a,e30.10)') &
       ' Domain-Averaged (Spectral->Grid->Spectral) Error = ', &
                        sqrt( sum( rcv_out(1:2*sizec)**2 ) ) / sqrt( sum( rcv(1:2*sizec)**2 ) )
 
@@ -76,26 +76,26 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
                                  ims, ime, jms, jme, &
                                  its, ite, jts, jte )
 
-   write(UNIT=stdout,FMT='(A)') ' Adjoint test result for  Spectral -> Grid : '
-   write(unit=stdout,FMT='(1x,a,e30.10)') &
+   write(unit=stdout,fmt='(A)') ' Adjoint test result for  Spectral -> Grid : '
+   write(unit=stdout,fmt='(1x,a,e30.10)') &
       ' LHS  ( LX.LX)       = ',&
       sum( field_out(1:xbx%ni,1:xbx%nj)*field_out(1:xbx%ni,1:xbx%nj) ) 
-   write(unit=stdout,FMT='(1x,a,e30.10)') &
+   write(unit=stdout,fmt='(1x,a,e30.10)') &
       ' RHS  (  X.L^TLX )   = ', sum( rcv(1:2*sizec)*rcv_out(1:2*sizec) ) 
 
    ! Inverse test for Legendre Transform
 
-   write(unit=stdout,FMT='(A)') '  Inverse and Adjoint Legendre test result:'
+   write(unit=stdout,fmt='(A)') '  Inverse and Adjoint Legendre test result:'
 
    do m = 0, max_wave
       index_start = m * ( max_wave + 1 - m ) + m * ( m + 1 ) / 2 + 1
       index_end   = index_start + max_wave - m
 
       do mm = index_start, index_end
-         if (2*mm > 2*sizec) THEN
+         if (2*mm > 2*sizec) then
             call da_error(__FILE__,__LINE__, &
                (/"rcv_out index bounce"/))
-         END IF
+         end if
          ccv(mm) = cmplx (rcv_out(2*mm-1), rcv_out(2*mm))
       end do
       r_leg = 0.0
@@ -111,7 +111,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
          aimag(ccv1(index_start:index_end))* aimag(ccv1(index_start:index_end)) )     
       den =  sum ( real(ccv(index_start:index_end))*real(ccv(index_start:index_end))+&
          aimag(ccv(index_start:index_end))* aimag(ccv(index_start:index_end)) )     
-      write(UNIT=stdout,FMT='(A,I4,A,E30.20)') &
+      write(unit=stdout,fmt='(A,I4,A,E30.20)') &
          'For zonal wave number',m,' difference ',sqrt(num)/sqrt(den)
 
       xx = sum( real(r_leg(1:xbx%nj))* real(r_leg(1:xbx%nj))+ &

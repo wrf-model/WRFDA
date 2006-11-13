@@ -4,7 +4,7 @@ subroutine da_interp_lin_3d(fm3d, xp, &
 
    implicit none
 
-   TYPE (xpose_type),      intent(in)  :: xp    ! Dimensions and xpose buffers.
+   type (xpose_type),      intent(in)  :: xp    ! Dimensions and xpose buffers.
    integer,                intent(in)  :: i, j
    real,                   intent(in)  :: dx, dxm, dy, dym
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
@@ -32,8 +32,8 @@ subroutine da_interp_lin_3d(fm3d, xp, &
       if(zk(kk) > 0.0) then
          call da_togrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
          fo3d(kk) = dzm*fmz(k) + dz*fmz(k+1)
-      endif
-   enddo
+      end if
+   end do
 
    if (trace_use) call da_trace_exit("da_interp_lin_3d")
 

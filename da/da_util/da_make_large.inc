@@ -30,7 +30,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          do k=1,2
             sub_header_small%start_index(k)=sub_header_large%start_index(k)
             sub_header_small%end_index(k)  =sub_header_large%end_index(k)
-         enddo
+         end do
 
          if(sub_header_small%ndim == 2) then
             do k=3,4
@@ -55,7 +55,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          !    sub_header_small%end_index(3)  =mkx
          ! end if
       end if
-   endif
+   end if
 
    if (print_info) then
       call da_print_sub_header(sub_header_small)
@@ -151,8 +151,8 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          end do
 
       else
-         write(unit=errmsg(1), fmt='(a)') 'Something is wrong, check dimensions.'
-         call da_error(__FILE__,__LINE__,errmsg(1:1))
+         write(unit=message(1), fmt='(a)') 'Something is wrong, check dimensions.'
+         call da_error(__FILE__,__LINE__,message(1:1))
       end if
    else
       data_large = data_small

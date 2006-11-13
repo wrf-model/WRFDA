@@ -9,7 +9,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    !  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
    !           v = coefy * (  dpsi/dx + dchi/dy )
    !
-   !  ASSUMPTIONS: Unstaggered grid.
+   !  ASsumPTIONS: Unstaggered grid.
    !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
    !               grid size may or may not be equal
    !
@@ -103,8 +103,8 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
             v(ite-1,jte,k) = v(ite-1,jte,k) + 0.5 * v(ite,jte,k)
             v(ite,jte-1,k) = v(ite,jte-1,k) + 0.5 * v(ite,jte,k)
          end if
-      enddo
-   endif
+      end do
+   end if
 
    ! [3.0] Compute u, v at domain boundaries:
 
@@ -182,7 +182,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
                chi(i,  j,k) = chi(i,  j,k) - coefx(i,j) * u(i,j,k)
             end do
          end if
-      endif
+      end if
 
       !------------------------------------------------------------------------
       ! [2.0] Compute u, v at interior points (2nd order central finite diffs):

@@ -3,9 +3,9 @@ subroutine da_wz_base(xb,WZ_b,                       &
                       ims,ime, jms,jme, kms,kme,  &
                       its,ite, jts,jte, kts,kte )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb                ! First guess structure.
+   type (xb_type), intent(in)    :: xb                ! First guess structure.
 
    integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
@@ -36,54 +36,54 @@ subroutine da_wz_base(xb,WZ_b,                       &
    if ( jte == jde ) je = jde-1
 
 
-   DO K=kts,kte
-      DO J=js,je
-         DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+         do I=is,ie
             WZ_b(I,J,K)=-xb%u(I,J,K)*(xb%p(I+1,J,K)-xb%p(I-1,J,K))*xb%coefx(I,J)
-         ENDDO
-      ENDDO
+         end do
+      end do
 
-      DO J=js,je
-         DO I=is,ie
+      do J=js,je
+         do I=is,ie
             WZ_b(I,J,K)=WZ_b(I,J,K)-xb%v(I,J,K)*(xb%p(I,J+1,K)-xb%p(I,J-1,K))*xb%coefy(I,J)
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
    if ( its == ids ) then
       i = its
-      DO K=kts,kte
-         DO J=js,je
+      do K=kts,kte
+         do J=js,je
             WZ_b(I,J,K)=WZ_b(I+1,J,K)
-         ENDDO
-      ENDDO
+         end do
+      end do
    end if
 
    if ( ite == ide ) then
       i = ite
-      DO K=kts,kte
-         DO J=js,je
+      do K=kts,kte
+         do J=js,je
             WZ_b(I,J,K)=WZ_b(I-1,J,K)
-         ENDDO
-      ENDDO
+         end do
+      end do
    end if
 
    if ( jts == jds ) then
       j = jts
-      DO K=kts,kte
-         DO I=its, ite
+      do K=kts,kte
+         do I=its, ite
             WZ_b(I,J,K)=WZ_b(I,J+1,K)
-         ENDDO
-      ENDDO
+         end do
+      end do
    end if
 
    if ( jte == jde ) then
       j = jte
-      DO K=kts,kte
-         DO I=its, ite
+      do K=kts,kte
+         do I=its, ite
             WZ_b(I,J,K)=WZ_b(I,J-1,K)
-         ENDDO
-      ENDDO
+         end do
+      end do
    end if
 
 
@@ -92,13 +92,13 @@ subroutine da_wz_base(xb,WZ_b,                       &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)
 
-   DO K=kts,kte
-      DO J=jts,jte
-         DO I=its,ite
+   do K=kts,kte
+      do J=jts,jte
+         do I=its,ite
             WZ_b(I,J,K)=WZ_b(I,J,K)-GAMMA*xb%p(I,J,K)*DIV(I,J,K)
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
 
    ! Computation to check for edge of domain:
@@ -106,39 +106,39 @@ subroutine da_wz_base(xb,WZ_b,                       &
    if ( its == ids ) is = ids; if ( ite == ide ) ie = ide
    if ( jts == jds ) js = jds; if ( jte == jde ) je = jde
 
-   DO K=kts,kte
-      DO J=js,je
-         DO I=is,ie
+   do K=kts,kte
+      do J=js,je
+         do I=is,ie
             URHO(I,J,K)=xb%rho(I,J,K)*xb%u(I,J,K)
             VRHO(I,J,K)=xb%rho(I,J,K)*xb%v(I,J,K)
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
    call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
                             ids,ide, jds,jde, kds,kde,         &
                             ims,ime, jms,jme, kms,kme,         &
                             its,ite, jts,jte, kts,kte)
 
-   DO J=jts,jte
-      DO I=its,ite
+   do J=jts,jte
+      do I=its,ite
          TERM3=0.
 
-         DO K=kte-1,kts,-1
+         do K=kte-1,kts,-1
             TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &
                        *(xb%h(I,J,K+1)-xb%h(I,J,K))
             WZ_b(I,J,K)=WZ_b(I,J,K)+TERM3
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
 
-   DO K=kts,kte
-      DO J=jts,jte
-         DO I=its,ite
+   do K=kts,kte
+      do J=jts,jte
+         do I=its,ite
             WZ_b(I,J,K)=WZ_b(I,J,K)/(GAMMA*xb%p(I,J,K))
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
 end subroutine da_wz_base
