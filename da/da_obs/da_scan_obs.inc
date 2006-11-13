@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_obs (ob, xp, filename)
+subroutine da_scan_obs (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan WRFVAR GTS observation file
@@ -6,29 +6,29 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
 
    implicit none
 
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
-   TYPE (ob_type), INTENT(inout) :: ob
+   type (xpose_type), intent(in) :: xp           ! Domain decomposition vars.
+   type (ob_type), intent(inout) :: ob
 
-   CHARACTER(*),   INTENT (in)   :: filename
+   character(*),   intent (in)   :: filename
 
-   CHARACTER (LEN =  10)        :: fmt_name
+   character (LEN =  10)        :: fmt_name
 
-   CHARACTER (LEN = 160)        :: info_string
+   character (LEN = 160)        :: info_string
 
-   CHARACTER (LEN = 160)        :: fmt_info,    &
+   character (LEN = 160)        :: fmt_info,    &
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, fm, report,iunit
+   integer                      :: i, j, iost, fm, report,iunit
 
-   TYPE (multi_level_type)      :: platform
+   type (multi_level_type)      :: platform
 
-   LOGICAL                      :: outside, outside_all
+   logical                      :: outside, outside_all
 
-   REAL                         :: height_error
+   real                         :: height_error
 
 
-   INTEGER                      :: total_obs, &
+   integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
@@ -47,7 +47,7 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
                                    num_pseudo, num_qscat, &
                                    num_profiler, num_buoy, num_bogus
 
-   INTEGER                        :: ndup, n
+   integer                        :: ndup, n
 
    ! default value
 
@@ -75,19 +75,19 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
    ! OPEN FILE
    ! ---------
    call da_get_unit(iunit)
-   OPEN(UNIT   = iunit,     &
+   OPEN(unit   = iunit,     &
       FILE   = trim(filename), &
       FORM   = 'FORMATTED',  &
       ACCESS = 'SEQUENTIAL', &
-      IOSTAT =  iost,     &
+      iostat =  iost,     &
       STATUS = 'OLD')
 
-   IF (iost /= 0) THEN
-      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
-         "Error",iost," opening gts obs file "//TRIM(filename)
-      CALL da_warning(__FILE__,__LINE__,errmsg(1:1))
-      RETURN
-   ENDIF
+   if (iost /= 0) then
+      write(unit=message(1),fmt='(A,I5,A)') &
+         "Error",iost," opening gts obs file "//trim(filename)
+      call da_warning(__FILE__,__LINE__,message(1:1))
+      return
+   end if
 
    total_obs = 0
    num_sound = 0
@@ -112,39 +112,39 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
    num_bogus = 0
    num_airsr = 0
 
-   ! READ HEADER
+   ! read HEADER
    ! ===========
 
-   head_info: DO
-      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) info_string
-      IF (iost /= 0) THEN
-         WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
+   head_info: do
+      read (unit = iunit, fmt = '(A)', iostat = iost) info_string
+      if (iost /= 0) then
+         write(unit=message(1),fmt='(A,I3,A,I3)') &
             "Error",iost,"reading gts obs header on unit",iunit
-         CALL da_warning(__FILE__,__LINE__,errmsg(1:1))
+         call da_warning(__FILE__,__LINE__,message(1:1))
          return
-      ENDIF
-      if (info_string(1:6) == 'EACH  ') EXIT
-   ENDDO head_info
+      end if
+      if (info_string(1:6) == 'EACH  ') exit
+   end do head_info
 
-   ! READ FORMATS
+   ! read FORMATS
    ! ------------
 
-   READ (iunit, FMT = '(A,1X,A)', IOSTAT = iost) &
+   read (iunit, fmt = '(A,1X,A)', iostat = iost) &
        fmt_name, fmt_info, &
        fmt_name, fmt_loc,  &
        fmt_name, fmt_each
 
-   IF (iost /= 0) THEN
-      WRITE(UNIT=errmsg(1),FMT='(A,I3,A,I3)') &
+   if (iost /= 0) then
+      write(unit=message(1),fmt='(A,I3,A,I3)') &
          "Error",iost,"reading gts obs formats on unit",iunit
-         CALL da_warning(__FILE__,__LINE__,errmsg(1:1))
-      RETURN
-   ENDIF
+         call da_warning(__FILE__,__LINE__,message(1:1))
+      return
+   end if
 
-   ! SKIP UNITS
+   ! SKIP unitS
    ! ----------
 
-   READ (iunit, FMT = '(A)') fmt_name
+   read (iunit, fmt = '(A)') fmt_name
 
    ! LOOP OVER RECORDS
    ! -----------------
@@ -152,14 +152,14 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
    report = 0 ! report number in file
 
    reports: &
-   DO
+   do
 
       report = report+1
 
-      ! READ STATION GENERAL INFO
+      ! read STATION GENERAL inFO
       ! =============================
 
-      READ (iunit, FMT = fmt_info, IOSTAT = iost) &
+      read (iunit, fmt = fmt_info, iostat = iost) &
                    platform%info%platform,    &
                    platform%info%date_char,   &
                    platform%info%name,        &
@@ -169,15 +169,15 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
                    platform%info%elv,         &
                    platform%info%id
 
-      IF (iost /= 0) THEN
+      if (iost /= 0) then
          ! This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
-         EXIT reports
-      ENDIF
+         exit reports
+      end if
 
       if (print_detail_obs) then
-         write(UNIT=stdout, FMT = fmt_info) &
+         write(unit=stdout, fmt = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -186,34 +186,34 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
                platform%info%lon,         &
                platform%info%elv,         &
                platform%info%id
-      endif
+      end if
 
       if (platform%info%lon == 180.0) platform%info%lon =-180.000
       ! Fix funny wind direction at South Poles
       ! if (platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999) then
       !    platform%info%lon = 0.0
-      ! endif
+      ! end if
 
       read(platform%info%platform(4:6), '(I3)') fm
 
-      ! READ MODEL LOCATION
+      ! read MODEL LOCATION
       ! =========================
 
-      READ (iunit, FMT = fmt_loc) platform%loc%slp, platform%loc%pw
+      read (iunit, fmt = fmt_loc) platform%loc%slp, platform%loc%pw
 
       total_obs = total_obs + 1
 
       ! levels < 1 and not GPSPW, go back to reports
 
-      IF ((platform%info%levels < 1) .AND.            &
+      if ((platform%info%levels < 1) .AND.            &
           (index(platform%info%platform, 'GPSPW') <= 0)) then
          cycle reports
-      ENDIF
+      end if
 
-      ! READ EACH LEVELS
+      ! read EACH LEVELS
       ! ----------------
 
-      loop_level: DO i = 1, platform%info%levels
+      loop_level: do i = 1, platform%info%levels
 
          platform%each (i) = each_level_type(missing_r, missing, -1.0, & ! height
             field_type(missing_r, missing, missing_r), & ! u
@@ -225,7 +225,7 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
             field_type(missing_r, missing, missing_r), & ! td
             field_type(missing_r, missing, missing_r))  ! speed 
 
-         READ (UNIT = iunit, FMT = TRIM (fmt_each)) &
+         read (unit = iunit, fmt = trim (fmt_each)) &
             platform%each (i)%p,            &
             platform%each (i)%speed,        &
          ! Here the 'direction' is stored in platform%each (i)%v:
@@ -236,30 +236,30 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
             platform%each (i)%t,            &
             platform%each (i)%td,           &
             platform%each (i)%rh
-      ENDDO loop_level
+      end do loop_level
 
       ! Restrict to a range of reports, useful for debugging
 
-      IF (report < report_start) THEN
-         CYCLE
-      END IF
+      if (report < report_start) then
+         cycle
+      end if
 
-      IF (report > report_end) THEN
-         EXIT
-      END IF
+      if (report > report_end) then
+         exit
+      end if
 
       call da_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, outside_all )
 
-      IF(outside) THEN
+      if(outside) then
          cycle reports
-      ENDIF
+      end if
 
       if (platform%info%levels < 1) then
          if ( fm /= 111 ) then
             cycle reports
-         endif
-      endif
+         end if
+      end if
 
       ! Loop over duplicating obs for global
       ndup = 1
@@ -268,40 +268,40 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
 
       if (Testing_WRFVAR) ndup = 1
 
-      DO n = 1, ndup
-         SELECT CASE(fm)
+      do n = 1, ndup
+         select case(fm)
 
-         CASE (12) ;
+         case (12) ;
             if (.not.use_SynopObs) cycle reports
             num_synop = num_synop + 1
 
-         CASE (13, 17) ;                  ! ships          
+         case (13, 17) ;                  ! ships          
             if (.not.use_ShipsObs) cycle reports
             num_ships  = num_ships  + 1
 
-         CASE (15:16) ;
+         case (15:16) ;
             if(.not.use_MetarObs) cycle reports
             num_metar = num_metar + 1
 
-         CASE (32:34) ;
+         case (32:34) ;
             if (.not.use_PilotObs) cycle reports
             num_pilot = num_pilot + 1
 
-         CASE (35:38) ;
+         case (35:38) ;
             if (.not.use_SoundObs) cycle reports
             num_sound = num_sound + 1
 
-         CASE (86) ;
+         case (86) ;
             if (.not.use_SatemObs) cycle reports
 
             ! Reject cloudy Satem obs.
             if (platform%loc%pw%inv > 10.) then
                cycle reports
-            endif
+            end if
 
             num_satem = num_satem + 1
 
-         CASE (88)    ;
+         case (88)    ;
             ! Geostationary or Polar orbitting Satellite AMVs:
             if (index(platform%info%name, 'MODIS') > 0 .or. &
                 index(platform%info%name, 'modis') > 0 )  then
@@ -312,61 +312,61 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
                num_geoamv = num_geoamv + 1
             end if
 
-         CASE (42,96:97) ;
+         case (42,96:97) ;
             if (.not.use_AirepObs) cycle reports
             num_airep = num_airep + 1
 
-         CASE (111) ;       
+         case (111) ;       
             if (.not.use_GpspwObs) cycle reports
             num_gpspw = num_gpspw + 1
 
-         CASE (116) ;
+         case (116) ;
             if (.not.use_GpsrefObs) cycle reports
             num_gpsref = num_gpsref + 1
 
-         CASE (121) ;
+         case (121) ;
             ! SSM/T1 temperatures
             if (.not.use_ssmt1obs) cycle reports
             num_ssmt1 = num_ssmt1 + 1
 
-         CASE (122) ;
+         case (122) ;
             ! SSM/T2 relative humidities:
             if (.not.use_ssmt2obs) cycle reports
             num_ssmt2 = num_ssmt2 + 1
 
-         CASE (281)    ;
+         case (281)    ;
             ! Scatterometer:
             if (.not.use_qscatobs) cycle reports
             num_qscat  = num_qscat  + 1
 
-         CASE (132) ;
+         case (132) ;
             if (.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 
-         CASE (135) ;
+         case (135) ;
             if (.not.use_BogusObs) cycle reports
             num_bogus = num_bogus + 1
 
-         CASE (18,19) ;             ! buoy
+         case (18,19) ;             ! buoy
             if (.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
 
-         CASE (133) ;               ! AIRS retrievals
+         case (133) ;               ! AIRS retrievals
             if (.not.use_AIRSRETObs) cycle reports
             num_airsr = num_airsr + 1
 
-         CASE DEFAULT;
-            write(UNIT=errmsg(1), fmt='(a)') 'unsaved obs found:'
-            write(UNIT=errmsg(2), fmt='(2a)') &
+         case default;
+            write(unit=message(1), fmt='(a)') 'unsaved obs found:'
+            write(unit=message(2), fmt='(2a)') &
                'platform%info%platform=', platform%info%platform
-            write(UNIT=errmsg(3), fmt='(a, i3)') &
+            write(unit=message(3), fmt='(a, i3)') &
                  'platform%info%levels=', platform%info%levels
-            call da_warning(__FILE__,__LINE__,errmsg(1:3))
-         END SELECT
-      ENDDO        !  loop over duplicate
-   ENDDO reports
+            call da_warning(__FILE__,__LINE__,message(1:3))
+         end select
+      end do        !  loop over duplicate
+   end do reports
 
-   CLOSE(iunit)
+   close(iunit)
    call da_free_unit(iunit)
 
    !------------------------------------------------------------------------
@@ -419,12 +419,12 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! PRINT OUT
+   ! PRinT out
    ! =============
 
    if (print_detail_obs) then
-      write(UNIT=stdout, fmt='(a)')  ' '
-      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      write(unit=stdout, fmt='(a)')  ' '
+      write(unit=stdout, fmt='(5x,a,i6,a)') &
            'Scan:  ', ob%current_ob_time, ' ob time:', &
            'Scan:  ', total_obs, ' Total reports.', &
            'Scan:  ', num_sound, ' SOUND reports,', &
@@ -446,11 +446,11 @@ SUBROUTINE da_scan_obs (ob, xp, filename)
            'Scan:  ', num_ssmt2, ' SSMT2 reports.', &
            'Scan:  ', num_airsr, ' AIRS retrieval reports'
 
-      ! write(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      ! write(unit=stdout, fmt='(5x,a,i6,a)') &
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
 
    end if
 
-END SUBROUTINE da_scan_obs
+end subroutine da_scan_obs
 

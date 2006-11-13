@@ -1,37 +1,37 @@
-! REV PROCESSED 213 LINES OF CODE. PROGRAM DONE.
-REAL FUNCTION da_gamma(X)
-!D    DOUBLE PRECISION FUNCTION DGAMMA(X)
+! REV PROCESSED 213 LINES OF CODE. program doNE.
+real function da_gamma(X)
+!D    doUBLE PRECISION function DGAMMA(X)
 !----------------------------------------------------------------------
 ! 
-! THIS ROUTINE CALCULATES THE GAMMA FUNCTION FOR A REAL ARGUMENT X.
-!   COMPUTATION IS BASED ON AN ALGORITHM OUTLINED IN REFERENCE 1.
-!   THE PROGRAM USES RATIONAL FUNCTIONS THAT APPROXIMATE THE GAMMA
-!   FUNCTION TO AT LEAST 20 SIGNIFICANT DECIMAL DIGITS.  COEFFICIENTS
-!   FOR THE APPROXIMATION OVER THE INTERVAL (1,2) ARE UNPUBLISHED.
+! THIS RoutinE CALCULATES THE GAMMA function FOR A real ARGUMENT X.
+!   COMPUTATION IS BASED ON AN ALGORITHM outLINED in REFERENCE 1.
+!   THE program useS RATIONAL functionS THAT APPROXIMATE THE GAMMA
+!   function TO AT LEAST 20 SIGNifICANT DECIMAL DIGITS.  COEFFICIENTS
+!   FOR THE APPROXIMATION OVER THE inTERVAL (1,2) ARE UNPUBLISHED.
 !   THOSE FOR THE APPROXIMATION FOR X .GE. 12 ARE FROM REFERENCE 2.
-!   THE ACCURACY ACHIEVED DEPENDS ON THE ARITHMETIC SYSTEM, THE
-!   COMPILER, THE INTRINSIC FUNCTIONS, AND PROPER SELECTION OF THE
-!   MACHINE-DEPENDENT CONSTANTS.
+!   THE ACCURACY ACHIEVED DEPendS ON THE ARITHMETIC SYSTEM, THE
+!   COMPILER, THE inTRinSIC functionS, AND PROPER selectION OF THE
+!   MACHinE-DEPendENT CONSTANTS.
 ! 
 ! 
 !*******************************************************************
 !*******************************************************************
 ! 
-! EXPLANATION OF MACHINE-DEPENDENT CONSTANTS
+! EXPLANATION OF MACHinE-DEPendENT CONSTANTS
 ! 
-! BETA   - RADIX FOR THE FLOATING-POINT REPRESENTATION
+! BETA   - RADIX FOR THE FLOATinG-POinT REpresentATION
 ! MAXEXP - THE SMALLEST POSITIVE POWER OF BETA THAT OVERFLOWS
-! XBIG   - THE LARGEST ARGUMENT FOR WHICH GAMMA(X) IS REPRESENTABLE
-!          IN THE MACHINE, I.E., THE SOLUTION TO THE EQUATION
+! XBIG   - THE LARGEST ARGUMENT FOR WHICH GAMMA(X) IS REpresentABLE
+!          in THE MACHinE, I.E., THE SOLUTION TO THE EQUATION
 !                  GAMMA(XBIG) = BETA**MAXEXP
-! XINF   - THE LARGEST MACHINE REPRESENTABLE FLOATING-POINT NUMBER;
+! XinF   - THE LARGEST MACHinE REpresentABLE FLOATinG-POinT NUMBER;
 !          APPROXIMATELY BETA**MAXEXP
-! EPS    - THE SMALLEST POSITIVE FLOATING-POINT NUMBER SUCH THAT
+! EPS    - THE SMALLEST POSITIVE FLOATinG-POinT NUMBER SUCH THAT
 !          1.0+EPS .GT. 1.0
-! XMININ - THE SMALLEST POSITIVE FLOATING-POINT NUMBER SUCH THAT
-!          1/XMININ IS MACHINE REPRESENTABLE
+! XMinin - THE SMALLEST POSITIVE FLOATinG-POinT NUMBER SUCH THAT
+!          1/XMinin IS MACHinE REpresentABLE
 ! 
-!     APPROXIMATE VALUES FOR SOME IMPORTANT MACHINES ARE:
+!     APPROXIMATE VALUES FOR SOME IMPORTANT MACHinES ARE:
 ! 
 !                            BETA       MAXEXP        XBIG
 ! 
@@ -46,7 +46,7 @@ REAL FUNCTION da_gamma(X)
 ! VAX D-FORMAT   (D.P.)        2          127        34.844
 ! VAX G-FORMAT   (D.P.)        2         1023        171.489
 ! 
-!                            XINF         EPS        XMININ
+!                            XinF         EPS        XMinin
 ! 
 ! CRAY-1         (S.P.)   5.45E+2465   7.11E-15    1.84E-2466
 ! CYBER 180/855
@@ -62,27 +62,27 @@ REAL FUNCTION da_gamma(X)
 !*******************************************************************
 !*******************************************************************
 ! 
-! ERROR RETURNS
+! ERROR returnS
 ! 
-!  THE PROGRAM RETURNS THE VALUE XINF FOR SINGULARITIES OR
+!  THE program returnS THE VALUE XinF FOR SinGULARITIES OR
 !     WHEN OVERFLOW WOULD OCCUR.  THE COMPUTATION IS BELIEVED
 !     TO BE FREE OF UNDERFLOW AND OVERFLOW.
 ! 
 ! 
-!  INTRINSIC FUNCTIONS REQUIRED ARE:
+!  inTRinSIC functionS REQUIRED ARE:
 ! 
-!     INT, DBLE, EXP, LOG, REAL, SIN
+!     inT, DBLE, EXP, LOG, real, Sin
 ! 
 ! 
 ! REFERENCES:  AN OVERVIEW OF SOFTWARE DEVELOPMENT FOR SPECIAL
-!              FUNCTIONS   W. J. CODY, LECTURE NOTES IN MATHEMATICS,
+!              functionS   W. J. CODY, LECTURE NOTES in MATHEMATICS,
 !              506, NUMERICAL ANALYSIS DUNDEE, 1975, G. A. WATSON
-!              (ED.), SPRINGER VERLAG, BERLIN, 1976.
+!              (ED.), SPRinGER VERLAG, BERLin, 1976.
 ! 
 !              COMPUTER APPROXIMATIONS, HART, ET. AL., WILEY AND
 !              SONS, NEW YORK, 1968.
 ! 
-!  LATEST MODIFICATION: OCTOBER 12, 1989
+!  LATEST MODifICATION: OCTOBER 12, 1989
 ! 
 !  AUTHORS: W. J. CODY AND L. STOLTZ
 !           APPLIED MATHEMATICS DIVISION
@@ -90,31 +90,31 @@ REAL FUNCTION da_gamma(X)
 !           ARGONNE, IL 60439
 ! 
 !----------------------------------------------------------------------
-      INTEGER I,N
-      LOGICAL PARITY
-!D    DOUBLE PRECISION
-      REAL :: &
-         C,CONV,EPS,FACT,HALF,ONE,P,PI,Q,RES,SQRTPI,SUM,TWELVE,  &
-         TWO,X,XBIG,XDEN,XINF,XMININ,XNUM,Y,Y1,YSQ,Z,ZERO
-      DIMENSION C(7),P(8),Q(8)
+      integer I,N
+      logical PARITY
+!D    doUBLE PRECISION
+      real :: &
+         C,CONV,EPS,FACT,HALF,ONE,P,PI,Q,RES,sqrtPI,sum,TWELVE,  &
+         TWO,X,XBIG,XDEN,XinF,XMinin,XNUM,Y,Y1,YSQ,Z,ZERO
+      dimension C(7),P(8),Q(8)
 !----------------------------------------------------------------------
 !  MATHEMATICAL CONSTANTS
 !----------------------------------------------------------------------
       DATA ONE,HALF,TWELVE,TWO,ZERO/1.0E0,0.5E0,12.0E0,2.0E0,0.0E0/,  &
-           SQRTPI/0.9189385332046727417803297E0/,  &
+           sqrtPI/0.9189385332046727417803297E0/,  &
            PI/3.1415926535897932384626434E0/
 !D    DATA ONE,HALF,TWELVE,TWO,ZERO/1.0D0,0.5D0,12.0D0,2.0D0,0.0D0/,
-!D   1     SQRTPI/0.9189385332046727417803297D0/,
+!D   1     sqrtPI/0.9189385332046727417803297D0/,
 !D   2     PI/3.1415926535897932384626434D0/
 !----------------------------------------------------------------------
-!  MACHINE DEPENDENT PARAMETERS
+!  MACHinE DEPendENT parameterS
 !----------------------------------------------------------------------
-      DATA XBIG,XMININ,EPS/35.040E0,1.18E-38,1.19E-7/,  &
-          XINF/3.4E38/
-!D    DATA XBIG,XMININ,EPS/171.624D0,2.23D-308,2.22D-16/,
-!D   1     XINF/1.79D308/
+      DATA XBIG,XMinin,EPS/35.040E0,1.18E-38,1.19E-7/,  &
+          XinF/3.4E38/
+!D    DATA XBIG,XMinin,EPS/171.624D0,2.23D-308,2.22D-16/,
+!D   1     XinF/1.79D308/
 !----------------------------------------------------------------------
-!  NUMERATOR AND DENOMINATOR COEFFICIENTS FOR RATIONAL MINIMAX
+!  NUMERATOR AND DENOMinATOR COEFFICIENTS FOR RATIONAL MinIMAX
 !     APPROXIMATION OVER (1,2).
 !----------------------------------------------------------------------
       DATA P/-1.71618513886549492533811E+0,2.47656508055759199108314E+1, &
@@ -134,7 +134,7 @@ REAL FUNCTION da_gamma(X)
 !D   2        2.25381184209801510330112D+4,4.75584627752788110767815D+3,
 !D   3      -1.34659959864969306392456D+5,-1.15132259675553483497211D+5/
 !----------------------------------------------------------------------
-!  COEFFICIENTS FOR MINIMAX APPROXIMATION OVER (12, INF).
+!  COEFFICIENTS FOR MinIMAX APPROXIMATION OVER (12, inF).
 !----------------------------------------------------------------------
       DATA C/-1.910444077728E-03,8.4171387781295E-04, &
            -5.952379913043012E-04,7.93650793500350248E-04, &
@@ -145,108 +145,108 @@ REAL FUNCTION da_gamma(X)
 !D   2     -2.777777777777681622553D-03,8.333333333333333331554247D-02,
 !D   3      5.7083835261D-03/
 !----------------------------------------------------------------------
-!  STATEMENT FUNCTIONS FOR CONVERSION BETWEEN INTEGER AND FLOAT
+!  STATEMENT functionS FOR CONVERSION BETWEEN integer AND FLOAT
 !----------------------------------------------------------------------
-      CONV(I) = REAL(I)
+      CONV(I) = real(I)
 !D    CONV(I) = DBLE(I)
-      PARITY=.FALSE.
+      PARITY=.false.
       FACT=ONE
       N=0
       Y=X
-      IF(Y.LE.ZERO)THEN
+      if(Y.LE.ZERO)then
 !----------------------------------------------------------------------
 !  ARGUMENT IS NEGATIVE
 !----------------------------------------------------------------------
         Y=-X
-        Y1=AINT(Y)
+        Y1=AinT(Y)
         RES=Y-Y1
-        IF(RES.NE.ZERO)THEN
-          IF(Y1.NE.AINT(Y1*HALF)*TWO)PARITY=.TRUE.
-          FACT=-PI/SIN(PI*RES)
+        if(RES.NE.ZERO)then
+          if(Y1.NE.AinT(Y1*HALF)*TWO)PARITY=.true.
+          FACT=-PI/Sin(PI*RES)
           Y=Y+ONE
-        ELSE
-          RES=XINF
-          GOTO 900
-        ENDIF
-      ENDIF
+        else
+          RES=XinF
+          goto 900
+        end if
+      end if
 !----------------------------------------------------------------------
 !  ARGUMENT IS POSITIVE
 !----------------------------------------------------------------------
-      IF(Y.LT.EPS)THEN
+      if(Y.LT.EPS)then
 !----------------------------------------------------------------------
 !  ARGUMENT .LT. EPS
 !----------------------------------------------------------------------
-        IF(Y.GE.XMININ)THEN
+        if(Y.GE.XMinin)then
           RES=ONE/Y
-        ELSE
-          RES=XINF
-          GOTO 900
-        ENDIF
-      ELSEIF(Y.LT.TWELVE)THEN
+        else
+          RES=XinF
+          goto 900
+        end if
+      elseif(Y.LT.TWELVE)then
         Y1=Y
-        IF(Y.LT.ONE)THEN
+        if(Y.LT.ONE)then
 !----------------------------------------------------------------------
 !  0.0 .LT. ARGUMENT .LT. 1.0
 !----------------------------------------------------------------------
           Z=Y
           Y=Y+ONE
-        ELSE
+        else
 !----------------------------------------------------------------------
-!  1.0 .LT. ARGUMENT .LT. 12.0, REDUCE ARGUMENT IF NECESSARY
+!  1.0 .LT. ARGUMENT .LT. 12.0, REDUCE ARGUMENT if NECESSARY
 !----------------------------------------------------------------------
-          N=INT(Y)-1
+          N=inT(Y)-1
           Y=Y-CONV(N)
           Z=Y-ONE
-        ENDIF
+        end if
 !----------------------------------------------------------------------
 !  EVALUATE APPROXIMATION FOR 1.0 .LT. ARGUMENT .LT. 2.0
 !----------------------------------------------------------------------
         XNUM=ZERO
         XDEN=ONE
-        DO 260 I=1,8
+        do 260 I=1,8
           XNUM=(XNUM+P(I))*Z
           XDEN=XDEN*Z+Q(I)
-  260   CONTINUE
+  260   CONTinUE
         RES=XNUM/XDEN+ONE
-        IF(Y1.LT.Y)THEN
+        if(Y1.LT.Y)then
 !----------------------------------------------------------------------
-!  ADJUST RESULT FOR CASE  0.0 .LT. ARGUMENT .LT. 1.0
+!  ADJUST RESULT FOR case  0.0 .LT. ARGUMENT .LT. 1.0
 !----------------------------------------------------------------------
           RES=RES/Y1
-        ELSEIF(Y1.GT.Y)THEN
+        elseif(Y1.GT.Y)then
 !----------------------------------------------------------------------
-!  ADJUST RESULT FOR CASE  2.0 .LT. ARGUMENT .LT. 12.0
+!  ADJUST RESULT FOR case  2.0 .LT. ARGUMENT .LT. 12.0
 !----------------------------------------------------------------------
-          DO 290 I=1,N
+          do 290 I=1,N
             RES=RES*Y
             Y=Y+ONE
-  290     CONTINUE
-        ENDIF
-      ELSE
+  290     CONTinUE
+        end if
+      else
 !----------------------------------------------------------------------
 !  EVALUATE FOR ARGUMENT .GE. 12.0,
 !----------------------------------------------------------------------
-        IF(Y.LE.XBIG)THEN
+        if(Y.LE.XBIG)then
           YSQ=Y*Y
-          SUM=C(7)
-          DO 350 I=1,6
-            SUM=SUM/YSQ+C(I)
-  350     CONTINUE
-          SUM=SUM/Y-Y+SQRTPI
-          SUM=SUM+(Y-HALF)*LOG(Y)
-          RES=EXP(SUM)
-        ELSE
-          RES=XINF
-          GOTO 900
-        ENDIF
-      ENDIF
+          sum=C(7)
+          do 350 I=1,6
+            sum=sum/YSQ+C(I)
+  350     CONTinUE
+          sum=sum/Y-Y+sqrtPI
+          sum=sum+(Y-HALF)*LOG(Y)
+          RES=EXP(sum)
+        else
+          RES=XinF
+          goto 900
+        end if
+      end if
 !----------------------------------------------------------------------
-!  FINAL ADJUSTMENTS AND RETURN
+!  FinAL ADJUSTMENTS AND return
 !----------------------------------------------------------------------
-      IF(PARITY)RES=-RES
-      IF(FACT.NE.ONE)RES=FACT/RES
+      if(PARITY)RES=-RES
+      if(FACT.NE.ONE)RES=FACT/RES
   900 da_gamma=RES
 !D900 DGAMMA = RES
 ! ---------- LAST LINE OF GAMMA ----------
-END FUNCTION da_gamma
+end function da_gamma
   

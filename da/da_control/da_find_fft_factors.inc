@@ -4,16 +4,16 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    ! PURPOSE: Calculates prime factors of input number.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)        :: n
-   LOGICAL, INTENT(OUT)       :: n_ok
-   INTEGER, INTENT(OUT)       :: fft_factors(:)
+   integer, intent(in)        :: n
+   logical, intent(out)       :: n_ok
+   integer, intent(out)       :: fft_factors(:)
 
-   INTEGER                    :: i, k, l
-   INTEGER                    :: nfax, nu, ifac
-   INTEGER                    :: jfax(num_fft_factors)
-   INTEGER                    :: lfax(7)
+   integer                    :: i, k, l
+   integer                    :: nfax, nu, ifac
+   integer                    :: jfax(num_fft_factors)
+   integer                    :: lfax(7)
 
    DATA lfax /6,8,5,4,3,2,1/
 
@@ -21,52 +21,52 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    ! [1.0] Find factors of vector size (8,6,5,4,3,2; ONLY ONE 8 ALLOWED):
    !---------------------------------------------------------------------------
 
-   n_ok = .FALSE.
+   n_ok = .false.
    fft_factors(:) = 0
 
-   ! LOOK FOR SIXES FIRST, STORE FACTORS IN DESCENDING ORDER
+   ! LOOK FOR SIXES FIRST, STORE FACTORS in DESCendinG ORDER
    NU=N
-   IFAC=6
+   ifAC=6
    K=0
    L=1
 
-20 CONTINUE
+20 CONTinUE
 
-   IF (MOD(NU,IFAC).NE.0) GO TO 30
+   if (MOD(NU,ifAC).NE.0) goto 30
    
    ! 6 is a factor:
    K=K+1
-   JFAX(K)=IFAC
-   IF (IFAC.NE.8) GO TO 25
-   IF (K.EQ.1) GO TO 25
+   JFAX(K)=ifAC
+   if (ifAC.NE.8) goto 25
+   if (K.EQ.1) goto 25
    JFAX(1)=8
    JFAX(K)=6
 
-25 CONTINUE
-   NU=NU/IFAC
-   IF (NU.EQ.1) GO TO 50
-   IF (IFAC.NE.8) GO TO 20
+25 CONTinUE
+   NU=NU/ifAC
+   if (NU.EQ.1) goto 50
+   if (ifAC.NE.8) goto 20
 
-30 CONTINUE
+30 CONTinUE
    L=L+1
-   IFAC=LFAX(L)
-   IF (IFAC .GT. 1) GO TO 20
+   ifAC=LFAX(L)
+   if (ifAC .GT. 1) goto 20
 
    ! Illegal factors:
-   ! write (UNIT=stderr,FMT='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
+   ! write (unit=stderr,fmt='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
    
-   GOTO 9
+   goto 9
 
    ! NOW REVERSE ORDER OF FACTORS
-50 CONTINUE
+50 CONTinUE
    NFAX=K
    fft_factors(1)=NFAX
-   DO I=1,NFAX
+   do I=1,NFAX
       fft_factors(NFAX+2-I)=JFAX(I)
-   END DO
+   end do
    
-   n_ok = .TRUE.
+   n_ok = .true.
       
-9  CONTINUE
+9  CONTinUE
 
 end subroutine da_find_fft_factors

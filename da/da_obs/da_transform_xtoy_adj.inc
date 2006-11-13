@@ -29,6 +29,7 @@ subroutine da_transform_xtoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    ! Geostationary Satellite
    call da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
+
    ! Polar orbitting Satellite
    call da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
@@ -132,7 +133,7 @@ subroutine da_transform_xtoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
+   call da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [21.0]  AIRS retrievals adjoint observation operator y = H(x):

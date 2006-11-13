@@ -4,12 +4,12 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    ! read diagnostics written to temporary file by WRFVAR
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER      ,intent (IN)    :: unit_in
-   INTEGER      ,intent (INOUT) :: num      
-   character*(*),intent (IN)    :: obs_type_in, filename                 
-   INTEGER      ,intent (IN)    :: nc      
+   integer      ,intent (in)    :: unit_in
+   integer      ,intent (inout) :: num      
+   character*(*),intent (in)    :: obs_type_in, filename                 
+   integer      ,intent (in)    :: nc      
 
    integer      :: num_obs, ios 
    character*9  :: dummy_c
@@ -28,7 +28,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                    spd_obs, spd_inv, spd_err, spd_inc
    integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, npr
 
-   open(UNIT=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
+   open(unit=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open file"//trim(filename)/))
@@ -37,8 +37,8 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 1  continue
 
    read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs
-   if_write = .FALSE.
-   if( index(ob_type,OBS_TYPE_IN(1:nc)) > 0 ) if_write = .TRUE.
+   if_write = .false.
+   if( index(ob_type,OBS_type_in(1:nc)) > 0 ) if_write = .true.
    if( index( ob_type,'synop') > 0) go to 10
    if( index( ob_type,'metar') > 0) go to 10
    if( index( ob_type,'ships') > 0) go to 10
@@ -71,16 +71,16 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if( index( ob_type,'bogus') > 0) go to 120
    if( index( ob_type,'airsr') > 0) go to 130
 
-   write(unit=errmsg(1), fmt='(a,a20,a,i3)') &
+   write(unit=message(1), fmt='(a,a20,a,i3)') &
       'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
-   call da_error(__FILE__,__LINE__,errmsg(1:1))
+   call da_error(__FILE__,__LINE__,message(1:1))
     
 !----------------------------------------------------------------------------
 10 continue      !   Synop, Metar, Ships, Buoy , Sonde_sfc
 !----------------------------------------------------------------------------
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if (if_write) then
             write(omb_unit,'(i8)')levels
@@ -104,9 +104,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          t_obs, t_inv, t_qc, t_error, t_inc, &
                          p_obs, p_inv, p_qc, p_error, p_inc, &
                          q_obs, q_inv, q_qc, q_error, q_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
    if (if_write) go to 999
    go to 1
 
@@ -114,13 +114,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 20 continue      !    Polar or Geo AMV's
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if (if_write) then
             write(omb_unit,'(i8)')levels
          num = num + 1
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk, l, stn_id, &          ! Station
@@ -134,9 +134,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
 
-         enddo 
-      END DO
-   ENDIF
+         end do 
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -145,13 +145,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 30 continue      !    Gpspw  
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
          num = num + 1
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -162,9 +162,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          num, k, stn_id,  &       ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          tpw_obs, tpw_inv, tpw_qc, tpw_err, tpw_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -175,13 +175,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 
    !  [6] Transfer sonde obs:
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if(if_write) then
              write(omb_unit,'(i8)')levels
              num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -198,9 +198,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc, &
                          q_obs, q_inv, q_qc, q_error, q_inc
-         enddo 
-      END DO
-   ENDIF
+         end do 
+      end do
+   end if
    if (if_write) go to 999
    go to 1
 
@@ -208,13 +208,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 50 continue      !    Airep  
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -229,9 +229,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc    
-         enddo  
-      END DO
-   ENDIF
+         end do  
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -240,13 +240,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 60 continue      !    Pilot & Profiler  
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -259,9 +259,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-         enddo  
-      END DO
-   ENDIF
+         end do  
+      end do
+   end if
    if (if_write) go to 999
    go to 1
 
@@ -269,13 +269,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 70 continue      !  SSMI Radiance
 !----------------------------------------------------------------------------   
 
-   IF (num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if (num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -286,9 +286,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          num, k, stn_id,  &       ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          spd_obs, spd_inv, spd_qc, spd_err, spd_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -297,13 +297,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 80 continue      !  SSMI radiance   
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,7(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -326,9 +326,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy, &    
                          dummy, dummy, dummy_i, dummy, dummy
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
    if (if_write) go to 999
    go to 1
 
@@ -336,13 +336,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 90 continue      !  SATEM           
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -353,9 +353,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-         enddo  
-      END DO
-   ENDIF
+         end do  
+      end do
+   end if
    
    if (if_write) go to 999
    go to 1
@@ -364,13 +364,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 100  continue      !  SSMT1 & 2           
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -381,9 +381,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-         enddo 
-      END DO
-   ENDIF
+         end do 
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -392,13 +392,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 110  continue      !  Scatrometer winds   
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -411,9 +411,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -426,13 +426,13 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 ! 2nd is for upper air
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if(if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -445,11 +445,11 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-         enddo
+         end do
          read(unit_in,'(i8)') levels
          if (if_write) then
             write(omb_unit,'(i8)')levels
-         endif
+         end if
          do k = 1, levels
             read(unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          kk,l, stn_id, &          ! Station
@@ -462,16 +462,16 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
 !----------------------------------------------------------------------------   
 130  continue      !  AIRS  retrievals        
 !----------------------------------------------------------------------------   
 
-   IF ( num_obs > 0 ) THEN
-      DO n = 1, num_obs    
+   if ( num_obs > 0 ) then
+      do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if (if_write) write(omb_unit,'(i8)')levels
          num = num + 1
@@ -487,9 +487,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                          lat, lon, press, &       ! Lat/lon, dummy    
                          t_obs, t_inv, t_qc, t_error, t_inc, & 
                          q_obs, q_inv, q_qc, q_error, q_inc
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
    if (if_write) go to 999
    go to 1
@@ -500,9 +500,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
     close ( unit_in )
     return
 1000 continue
-   write(unit=errmsg(1), fmt='(/a,i3/a/)') &
+   write(unit=message(1), fmt='(/a,i3/a/)') &
       'read error on unit: ',unit_in, & 
       'in da_read_omb_tmp'
-   call da_error(__FILE__,__LINE__,errmsg(1:1))
+   call da_error(__FILE__,__LINE__,message(1:1))
 
 end subroutine da_read_omb_tmp

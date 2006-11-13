@@ -1,24 +1,24 @@
-SUBROUTINE da_read_bufr_obs (ob, xp, filename)
+subroutine da_read_bufr_obs (ob, xp, filename)
 !-----------------------------------------------------------------------------!
 !  Purpose: Read BUFR observation file for input to wrfvar
 !-----------------------------------------------------------------------------!
 !
 ! HISTORY: 08/03/2005 - Creation of F90 version         Syed RH Rizvi
 !
-! PARENT_MODULE: DA_Obs
+! PARENT_module: DA_Obs
 !-----------------------------------------------------------------------------!
 
    implicit none
 
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
-   TYPE (ob_type), INTENT(inout) :: ob
+   type (xpose_type), intent(in) :: xp           ! Domain decomposition vars.
+   type (ob_type), intent(inout) :: ob
 
-   CHARACTER(*),   INTENT (in), OPTIONAL :: filename
+   character(*),   intent (in), optional :: filename
 
-   TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: outside, outside_all
-   REAL                         :: height_error
-   INTEGER                      :: total_obs, &
+   type (multi_level_type)      :: platform
+   logical                      :: outside, outside_all
+   real                         :: height_error
+   integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
@@ -81,17 +81,17 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !  ---------
    call da_get_unit(iunit)
    if(present(filename)) then
-      OPEN(UNIT   = iunit, FILE   = trim(filename), &
-           IOSTAT =  iost, form = 'unformatted', STATUS = 'OLD')
+      OPEN(unit   = iunit, FILE   = trim(filename), &
+           iostat =  iost, form = 'unformatted', STATUS = 'OLD')
 
-      IF (iost /= 0) THEN
-         write(UNIT=stdout, fmt='(/A,I3,3(2X,A)/)') &
-              'ERROR IN OBS INPUT FILE UNIT ',iunit, &
+      if (iost /= 0) then
+         write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
+              'ERROR in OBS inPUT FILE unit ',iunit, &
               'OBS FILENAME:', trim(filename), &
               'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-         RETURN
-      ENDIF
-   endif
+         return
+      end if
+   end if
 
 !
    hdstr='SID XOB YOB DHR TYP ELV T29     '
@@ -104,16 +104,16 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
    nrecs = 0
    miscd = 0
 !------------------------------------------------------------------------------
-!  READ BUFR OBSERVATION FILE
-!   call openbf(iunit,'IN',iunit)
+!  read BUFR OBSERVATION FILE
+!   call openbf(iunit,'in',iunit)
    call readmg(iunit,subset,idate,iret)
 
    if(iret/=0) then
-      write(UNIT=stdout, fmt='(a, i4)') &
+      write(unit=stdout, fmt='(a, i4)') &
            'return code from readmg:', iret, &
            'Reach the end of obs unit: ', iunit
 
-      CALL da_error(__FILE__,__LINE__, &
+      call da_error(__FILE__,__LINE__, &
          (/"No BUFR observations"/))
    end if
 !------------------------------------------------------------------------------
@@ -128,12 +128,12 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
          call readmg(iunit,subset,idate,iret)
 
          if(iret/=0) then
-            write(UNIT=stdout, fmt='(a, i4)') &
+            write(unit=stdout, fmt='(a, i4)') &
                  'return code from readmg:', iret, &
                  'Reach the end of prepbufr obs unit: ', iunit
 
             exit reports
-         endif
+         end if
 
          cycle reports
       end if
@@ -150,7 +150,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 ! Put a check on Lat
       
       hdr(3) = MAX(hdr(3), -89.95)
-      hdr(3) = MIN(hdr(3),  89.95)
+      hdr(3) = Min(hdr(3),  89.95)
       platform%info%lon = hdr(2)
       platform%info%lat = hdr(3)
 
@@ -160,31 +160,31 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !-----Fix funny wind direction at Poles
       if(platform%info%lat <= -89.95 .or. platform%info%lat >= 89.95 ) then
          platform%info%lon = 0.0
-      endif
+      end if
 
       ! Restrict to a range of reports, useful for debugging
 
-      IF (report < report_start) THEN
-        CYCLE
-      END IF
+      if (report < report_start) then
+        cycle
+      end if
 
-      IF (report > report_end) THEN
-        EXIT
-      END IF
+      if (report > report_end) then
+        exit
+      end if
 
       call da_ll_to_xy (platform%info, platform%loc, &
                         xp, outside, outside_all )
 
       if(outside_all) cycle reports
 
-      IF (print_detail_obs) THEN
+      if (print_detail_obs) then
         ! Simplistic approach, could be improved to get it all done on PE 0
-        IF (.NOT. outside) THEN
-          WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2I3)') &
+        if (.NOT. outside) then
+          write(unit=stdout,fmt='(A,I4,A,F8.2,A,F8.2,A,I3,A,2I3)') &
              "Report",report,"at",platform%info%lon,"E",platform%info%lat,"N", &
              "on processor", myproc,"position", platform%loc%x,platform%loc%y
-        END IF
-      END IF
+        end if
+      end if
 
       time=hdr(4)
       if(time >  3.) time=3.
@@ -201,38 +201,38 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
         if (t29 .eq. 531) kx = 180
         if (t29 .eq. 561) kx = 180
         if (t29 .eq. 562) kx = 180
-      endif
+      end if
 
 !     if((kx >= 160) .and. (kx <= 179)) then	! bypass satellite data
 !    if (t29 .eq. 61 .or. t29 .eq. 63 .or. t29 .ge. 571) then
 !        cycle reports
-!     endif
+!     end if
       ob % total_obs = ob % total_obs + 1
 
 
 !-----Conventional data
 
       call ufbint(iunit,pmo,2,1,nlevels,'PMO PMQ')
-!     write(UNIT=stdout,FMT=*) 'PMO = ',pmo(1,1)
+!     write(unit=stdout,fmt=*) 'PMO = ',pmo(1,1)
 
       call ufbint(iunit,obs,9,255,nlevels,obstr)
       call ufbint(iunit,qms,9,255,nlevels,qmstr)
       call ufbint(iunit,oes,9,255,nlevels,oestr)
       if (c8id(1:5) .eq. 'RJOR ') then
 !       if (kx .eq. 180) then
-      write(UNIT=stdout,FMT=*) 'report, ',c8id(1:5),' typ = ',kx,' nlevels = ',nlevels
+      write(unit=stdout,fmt=*) 'report, ',c8id(1:5),' typ = ',kx,' nlevels = ',nlevels
           do ix = 1,nlevels
-            write(UNIT=stdout,FMT='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
-            write(UNIT=stdout,FMT='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
-            write(UNIT=stdout,FMT=*) 'PMO = ',pmo(1,1)
-          enddo
+            write(unit=stdout,fmt='(9(f10.4,2x))') (obs(jx,ix),jx=1,9)
+            write(unit=stdout,fmt='(9(f10.4,2x))') (qms(jx,ix),jx=1,9)
+            write(unit=stdout,fmt=*) 'PMO = ',pmo(1,1)
+          end do
 !         kx = 180
-!       endif
-      endif
+!       end if
+      end if
 
 ! no need for balloon drift
-!     SELECT CASE(kx)
-!        CASE ( 120, 132, 220:221, 232) ;	! read drift
+!     select case(kx)
+!        case ( 120, 132, 220:221, 232) ;	! read drift
 !           call ufbint(iunit,drf,9,255,iret,drift)
 !           do k=1,nlevels
 !              if(drf(1,k) .ge. 360.)drf(1,k)=drf(1,k)-360.
@@ -245,8 +245,8 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !                drf(3,k)=time
 !              end if
 !           end do
-!        CASE DEFAULT ;                      	! Do nothing
-!     END SELECT
+!        case default ;                      	! Do nothing
+!     end select
 
       platform  % info % levels   =nlevels
       platform  % info % elv      =hdr(6)
@@ -281,25 +281,25 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
          platform % each (i) % q % inv = missing_r
          platform % each (i) % q % qc  = missing_data
          platform % each (i) % q % error =.1      
-      enddo loop_init_value
+      end do loop_init_value
 
-      loop_level: DO k = 1, platform % info % levels
+      loop_level: do k = 1, platform % info % levels
          pob=obs(1,k)
 ! scale q and compute t from tv and set units to Kelvin, if they aren't missing
-!         WRITE(UNIT=stdout,FMT=*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
+!         write(unit=stdout,fmt=*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
 
 
 	 if ( obs(2,k) .gt. 0. .and. obs(2,k) .lt. 1e9 ) then   
 	   obs(2,k) = obs(2,k)*1e-6
 	   if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
 	     obs(3,k) = (obs(3,k)+t_kelvin) / (1. + 0.608 * obs(2,k))
-	   endif
+	   end if
 	 else
 	   if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
 	     obs(3,k) = obs(3,k) + t_kelvin
-!            WRITE(UNIT=stdout,FMT=*) '--------- t is now ',obs(3,k)
-	   endif
-	 endif
+!            write(unit=stdout,fmt=*) '--------- t is now ',obs(3,k)
+	   end if
+	 end if
          qob=obs(2,k)
          tob=obs(3,k)
          zob=obs(4,k)
@@ -326,13 +326,13 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             platform % loc % slp % inv =pmo(1,1)*100.
             platform % loc % slp % qc  =pmq
             platform % loc % slp % error = 200.
-         endif
+         end if
 
          if ( pwq < qflag ) then
             platform % loc % pw % inv = obs(7,k) * 0.1    ! convert to cm
             platform % loc % pw % qc  =  pwq
             platform % loc % pw % error = 0.2     ! hardwired to 0.2 cm
-         endif
+         end if
 
          poe=100.
 
@@ -341,7 +341,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             platform % each (k) % t % inv =obs(3,k)
             platform % each (k) % t % qc  =tqm
             platform % each (k) % t % error =toe
-         endif
+         end if
 
          if ( wqm < qflag ) then
             woe=oes(5,k)
@@ -366,49 +366,49 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                platform % each (k) % u % qc  = missing_data
                platform % each (k) % v % qc  = missing_data
            end if
-         endif
+         end if
 
          if(qqm<qflag .and. obs(2,k)<1.0e9) then
             qoe=oes(2,k)
             platform % each (k) % q % inv =obs(2,k)
             platform % each (k) % q % qc  =qqm
             platform % each (k) % q % error =qoe
-         endif
+         end if
 
          if(zqm<qflag)then
             platform % each (k) % height  =zob
             platform % each (k) % height_qc =zqm
-         endif
+         end if
 
          if(rqm<qflag)then
             roe = oes(8,k)
             platform % each (k) % u % inv =rob
             platform % each (k) % u % qc =rqm
             platform % each (k) % u % error =roe
-         endif
+         end if
 
          if(pqm<qflag)then
             platform % each (k) % p % inv =obs(1,k)*100.
             platform % each (k) % p % qc  =pqm
             platform % each (k) % p % error =poe
-         endif
-!           WRITE(UNIT=stdout,FMT=*) 'id = ',c8id,' elv = ',hdr(6),' k = ',k
-!           WRITE(UNIT=stdout,FMT=*) 'slp = ',platform % loc % slp % inv,' z = ',platform % each (k) % height
-!           WRITE(UNIT=stdout,FMT=*) 't = ',platform % each (k) % t % inv , &
+         end if
+!           write(unit=stdout,fmt=*) 'id = ',c8id,' elv = ',hdr(6),' k = ',k
+!           write(unit=stdout,fmt=*) 'slp = ',platform % loc % slp % inv,' z = ',platform % each (k) % height
+!           write(unit=stdout,fmt=*) 't = ',platform % each (k) % t % inv , &
 !             ' q = ',platform % each (k) % q % inv
-!           WRITE(UNIT=stdout,FMT=*) 'u = ',platform % each (k) % u % inv,' v = ', platform % each (k) % v % inv
+!           write(unit=stdout,fmt=*) 'u = ',platform % each (k) % u % inv,' v = ', platform % each (k) % v % inv
 
-      ENDDO loop_level
+      end do loop_level
 
       nlevels    = platform%info%levels
 
       if(nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(UNIT=stdout, fmt='(/a/)') &
-               'WARNING: Too many levels.'
+         write(unit=stdout, fmt='(/a/)') &
+               'WARNinG: Too many levels.'
 
-          write(UNIT=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -417,10 +417,10 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                'level: ', platform%info%levels, &
                'kx:    ', kx
        else if( (nlevels < 1) .and. ((kx /= 164) .or. (kx /= 174))) then
-          write(UNIT=stdout, fmt='(/a/)') &
-               'WARNING: Too few levels.'
+          write(unit=stdout, fmt='(/a/)') &
+               'WARNinG: Too few levels.'
   
-          write(UNIT=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -430,7 +430,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                'kx:    ', kx
 
            cycle reports
-      endif
+      end if
 
 !---------------------------------------------------------------------------
 ! This is basically converting  rh to q i
@@ -438,7 +438,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
 !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
 ! Note: Currently da_obs_proc_station is active only for ob_format_ascii
-!      CALL da_obs_proc_station(platform)
+!      call da_obs_proc_station(platform)
 !---------------------------------------------------------------------------
 !    Loop over duplicating obs for global
      ndup = 1
@@ -448,9 +448,9 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 !    It is possible that logic for counting obs is incorrect for the
 !    global case with >1 MPI tasks due to obs duplication, halo, etc.
 !    TBH:  20050913
-    IF(.not.outside) THEN
+    if(.not.outside) then
      if( print_detail_obs .and. ndup > 1) then
-         write(UNIT=stdout, FMT = '(A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A5)') &  
+         write(unit=stdout, fmt = '(A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A5)') &  
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -460,24 +460,24 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                platform%info%elv,         &
                platform%info%id
 
-         write(UNIT=stdout, FMT = '(a,2i5,4e20.10)') &
+         write(unit=stdout, fmt = '(a,2i5,4e20.10)') &
           ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
           platform%loc%i,  platform%loc%j,   &
           platform%loc%dx, platform%loc%dxm, &
           platform%loc%dy, platform%loc%dym
 
      end if
-    ENDIF
+    end if
 
-   dup_loop: DO n = 1, ndup
-      SELECT CASE(t29)
-	 CASE (11, 12, 13, 22, 23, 31)
-	 SELECT CASE (kx)
-         CASE (120, 122, 132, 220, 222, 232) ;         ! Sound
+   dup_loop: do n = 1, ndup
+      select case(t29)
+	 case (11, 12, 13, 22, 23, 31)
+	 select case (kx)
+         case (120, 122, 132, 220, 222, 232) ;         ! Sound
 	   ob%num_sound_glo = ob%num_sound_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
             if (.not.Use_SoundObs) cycle reports
 
@@ -508,8 +508,8 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                ob%sonde_sfc(num_sound)%p = platform%each(i)%p
 
                exit
-            endif
-         enddo
+            end if
+         end do
 
 ! ............................
 !        processing the sound_sfc data:
@@ -528,7 +528,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             ob%sonde_sfc(num_sound)%t = ob%sonde_sfc(num_sound)%u
             ob%sonde_sfc(num_sound)%p = ob%sonde_sfc(num_sound)%u
             ob%sonde_sfc(num_sound)%q = ob%sonde_sfc(num_sound)%u
-         endif
+         end if
 
          if(nlevels < 1) cycle reports
 
@@ -552,15 +552,15 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            ob%sound(num_sound)%v(j) = platform%each(i)%v
            ob%sound(num_sound)%t(j) = platform%each(i)%t
            ob%sound(num_sound)%q(j) = platform%each(i)%q
-         enddo
+         end do
 
          ob%sound(num_sound)%info%levels = nlevels
 
-         CASE (221) ;		! Pilot 
+         case (221) ;		! Pilot 
 	   ob%num_pilot_glo = ob%num_pilot_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
            if (.not.Use_PilotObs) cycle reports
            num_pilot = num_pilot + 1
@@ -580,15 +580,15 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            ob%pilot(num_pilot)%p(i) = platform%each(i)%p%inv
            ob%pilot(num_pilot)%u(i) = platform%each(i)%u
            ob%pilot(num_pilot)%v(i) = platform%each(i)%v
-         enddo
-         END SELECT
+         end do
+         end select
 
-         CASE (41)
-!        CASE (130:131, 133, 230:231, 233) ; ! Airep
+         case (41)
+!        case (130:131, 133, 230:231, 233) ; ! Airep
 	   ob%num_airep_glo = ob%num_airep_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
             if (.not.Use_AirepObs) cycle reports
 
@@ -616,15 +616,15 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                ob % airep ( num_airep ) % v(i) = platform % each(i) % v
                ob % airep ( num_airep ) % t(i) = platform % each(i) % t
                ob % airep ( num_airep ) %zk(i) = platform % each(i) % zk
-            enddo
+            end do
 
-!        CASE (180, 182, 280, 282) ;         ! Ships and  buoys
-	    CASE (522, 523);        ! Ships
+!        case (180, 182, 280, 282) ;         ! Ships and  buoys
+	    case (522, 523);        ! Ships
 
 	     ob%num_ships_glo = ob%num_ships_glo + 1
-	     IF(outside) THEN
-               CYCLE reports
-	     ENDIF
+	     if(outside) then
+               cycle reports
+	     end if
 
               if (.not.Use_ShipsObs) cycle reports
 
@@ -646,19 +646,19 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
               ob % ships ( num_ships ) % q = platform % each(1) % q
               ob % ships ( num_ships ) % zk= platform % each(1) % zk
 
-!           write(UNIT=stdout,FMT=*) 'id = ',c8id,' elv = ',hdr(6),' t29 = ',t29,' numships = ',num_ships
-!           write(UNIT=stdout,FMT=*) 'lat = ',hdr(3),' lon = ',hdr(2)
-!           write(UNIT=stdout,FMT=*) 'slp = ',ob % ships ( num_ships ) % p,' z = ',ob % ships ( num_ships ) % h
-!           write(UNIT=stdout,FMT=*) 't = ',ob % ships ( num_ships ) % t , &
+!           write(unit=stdout,fmt=*) 'id = ',c8id,' elv = ',hdr(6),' t29 = ',t29,' numships = ',num_ships
+!           write(unit=stdout,fmt=*) 'lat = ',hdr(3),' lon = ',hdr(2)
+!           write(unit=stdout,fmt=*) 'slp = ',ob % ships ( num_ships ) % p,' z = ',ob % ships ( num_ships ) % h
+!           write(unit=stdout,fmt=*) 't = ',ob % ships ( num_ships ) % t , &
 !          ' q = ',ob % ships ( num_ships ) % q
-!           write(UNIT=stdout,FMT=*) 'zk = ',ob % ships ( num_ships ) % zk 
-!           write(UNIT=stdout,FMT=*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
+!           write(unit=stdout,fmt=*) 'zk = ',ob % ships ( num_ships ) % zk 
+!           write(unit=stdout,fmt=*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
 
-	    CASE (531, 561, 562) ;          ! Buoy  
+	    case (531, 561, 562) ;          ! Buoy  
 	     ob%num_buoy_glo = ob%num_buoy_glo + 1
-	     IF(outside) THEN
-		CYCLE reports
-	     ENDIF
+	     if(outside) then
+		cycle reports
+	     end if
 
               if(.not.use_BuoyObs) cycle reports
               platform  % info % platform ='FM-18 BUOY '
@@ -677,13 +677,13 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
               ob%buoy(num_buoy)%p = platform%each(1)%p
               ob%buoy(num_buoy)%q = platform%each(1)%q
  
-         CASE (511)
-!        CASE (181, 281) ;                   ! Synop
+         case (511)
+!        case (181, 281) ;                   ! Synop
 
 	   ob%num_synop_glo = ob%num_synop_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
             if (.not.Use_SynopObs) cycle reports
 
@@ -706,19 +706,19 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             ob % synop ( num_synop ) % q = platform % each(1) % q
             ob % synop ( num_synop ) % zk= platform % each(1) % zk
 
-!         write(UNIT=stdout,FMT=*) 'using obs from synop ',platform%info%id,' t = ',platform%each(1)%t
+!         write(unit=stdout,fmt=*) 'using obs from synop ',platform%info%id,' t = ',platform%each(1)%t
 
             if(ob % synop(num_synop) % h < ob % synop (num_synop) % info % elv) then
                ob % synop(num_synop) % h = ob % synop (num_synop) % info % elv
-            endif
+            end if
 
 
-         CASE (512)
-!        CASE (187, 287) ;                        ! Metar
+         case (512)
+!        case (187, 287) ;                        ! Metar
 	   ob%num_metar_glo = ob%num_metar_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
             if (.not.Use_MetarObs) cycle reports
 
@@ -739,15 +739,15 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             ob % metar ( num_metar ) % q = platform % each(1) % q
             ob % metar ( num_metar ) % zk= platform % each(1) % zk
      
-!         WRITE(UNIT=stdout,FMT=*) 'using obs from metar ',platform%info%id,' t = ',platform%each(1)%t
+!         write(unit=stdout,fmt=*) 'using obs from metar ',platform%info%id,' t = ',platform%each(1)%t
 
 
-         CASE (63)
-!        CASE (242:246, 252:253, 255) ;         ! Geo. CMVs
+         case (63)
+!        case (242:246, 252:253, 255) ;         ! Geo. CMVs
 	   ob%num_geoamv_glo = ob%num_geoamv_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
             if (.not.Use_geoamvObs) cycle reports
             platform  % info % platform ='FM-88 SATOB'
@@ -770,11 +770,11 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
             ob % geoamv (num_geoamv) %zk(i)  = platform % each(i) % zk
             end do
 
-        CASE (582)
+        case (582)
          ob%num_qscat_glo = ob%num_qscat_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_qscatobs) cycle reports
          platform  % info % platform ='FM-281 Quiks'
@@ -793,11 +793,11 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
          ob%qscat(num_qscat)%u%error = max(platform%each(1)%u%error,1.0)
          ob%qscat(num_qscat)%v%error = max(platform%each(1)%v%error,1.0)
 
-	 CASE (583)       ! GPS PW
+	 case (583)       ! GPS PW
 	   ob%num_gpspw_glo = ob%num_gpspw_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
 	   if(.not.use_GpspwObs) cycle reports
            platform  % info % platform ='FM-111 GPSPW'
@@ -810,13 +810,13 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            ob%gpspw(num_gpspw)%loc  = platform%loc 
            ob%gpspw(num_gpspw)%tpw  = platform%loc%pw
 
-!         WRITE(UNIT=stdout,FMT=*) 'using obs from gps ',platform%info%id,' tpw = ',platform%loc%pw
+!         write(unit=stdout,fmt=*) 'using obs from gps ',platform%info%id,' tpw = ',platform%loc%pw
 
-	 CASE (584)       ! GPS REF
+	 case (584)       ! GPS REF
 	   ob%num_gpsref_glo = ob%num_gpsref_glo + 1
-	   IF(outside) THEN
-	      CYCLE reports
-	   ENDIF
+	   if(outside) then
+	      cycle reports
+	   end if
 
 	   if(.not.use_GpsrefObs) cycle reports
            platform  % info % platform ='FM-116 GPSRF'
@@ -835,7 +835,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 	   allocate (ob%gpsref(num_gpsref)%  t(1:nlevels))
 	   allocate (ob%gpsref(num_gpsref)%  q(1:nlevels))
 
-!         WRITE(UNIT=stdout,FMT=*) 'using obs from gps ref ',platform%info%id
+!         write(unit=stdout,fmt=*) 'using obs from gps ref ',platform%info%id
 	   do i = 1, nlevels
 	     ob%gpsref(num_gpsref)%h(i)   = platform%each(i)%height
 ! u is used to store ref in this routine (ascii version uses td)
@@ -845,18 +845,18 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 	     ob%gpsref(num_gpsref)%t(i)   = platform%each(i)%t
 	     ob%gpsref(num_gpsref)%q(i)   = platform%each(i)%q
 	   
-!         WRITE(UNIT=stdout,FMT=*) 'p = ',ob%gpsref(num_gpsref)%p(i),' ref = ',ob%gpsref(num_gpsref)%ref(i)
-!         WRITE(UNIT=stdout,FMT=*) 't = ',ob%gpsref(num_gpsref)%t(i),' q = ',ob%gpsref(num_gpsref)%q(i)
+!         write(unit=stdout,fmt=*) 'p = ',ob%gpsref(num_gpsref)%p(i),' ref = ',ob%gpsref(num_gpsref)%ref(i)
+!         write(unit=stdout,fmt=*) 't = ',ob%gpsref(num_gpsref)%t(i),' q = ',ob%gpsref(num_gpsref)%q(i)
 
-	   enddo
+	   end do
 
 
-        CASE (71, 72)
-!       CASE (223, 224  )        ;         !  Profiler & VADWND - NEXRAD winds    
+        case (71, 72)
+!       case (223, 224  )        ;         !  Profiler & VADWND - NEXRAD winds    
          ob%num_profiler_glo = ob%num_profiler_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_ProfilerObs) cycle reports
 	 platform  % info % platform ='FM-132 PRFLR'
@@ -877,17 +877,17 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            ob%profiler(num_profiler)%p(i) = platform%each(i)%p%inv
            ob%profiler(num_profiler)%u(i) = platform%each(i)%u
            ob%profiler(num_profiler)%v(i) = platform%each(i)%v
-         enddo
+         end do
 
-         CASE DEFAULT 
+         case default 
 
-         SELECT CASE (kx)
-         CASE (111 , 210)    ;         !  Tropical Cyclone Bogus
+         select case (kx)
+         case (111 , 210)    ;         !  Tropical Cyclone Bogus
 !  Note Tropical cyclone Bougus is given type 135 in Obs-ascii
          ob%num_bogus_glo = ob%num_bogus_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_BogusObs) cycle reports
 	 platform  % info % platform ='FM-135 TCBOG'
@@ -897,10 +897,10 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
          platform%loc%obs_global_index = ob%num_bogus_glo
 
          if( num_bogus > max_bogus_input) then
-           WRITE(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+           write(unit=message(1),fmt='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL da_error(__FILE__,__LINE__,errmsg(1:1))
-         endif
+           call da_error(__FILE__,__LINE__,message(1:1))
+         end if
 
          ob%bogus(num_bogus)%info = platform%info
          ob%bogus(num_bogus)%loc  = platform%loc
@@ -920,25 +920,25 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            ob%bogus(num_bogus)%v(i) = platform%each(i)%v
            ob%bogus(num_bogus)%t(i) = platform%each(i)%t
            ob%bogus(num_bogus)%q(i) = platform%each(i)%q
-         enddo
+         end do
 
          ob%bogus(num_bogus)%slp    = platform%loc%slp
 
-         CASE DEFAULT
+         case default
 
-            write(UNIT=stdout, fmt='(/a/)') &
-                 'WARNING   WARNING   WARNING   WARNING   WARNING :'
+            write(unit=stdout, fmt='(/a/)') &
+                 'WARNinG   WARNinG   WARNinG   WARNinG   WARNinG :'
 
-            write(UNIT=stdout, fmt='(a, i12)') 'unsaved obs found with type: ',kx
+            write(unit=stdout, fmt='(a, i12)') 'unsaved obs found with type: ',kx
 
-!            write(UNIT=stdout, fmt='(2a)') &
+!            write(unit=stdout, fmt='(2a)') &
 !                 'platform%info%platform=', platform%info%platform
 
-!            write(UNIT=stdout, fmt='(a, i3)') &
+!            write(unit=stdout, fmt='(a, i3)') &
 !                 'platform%info%levels=', platform%info%levels
 
-        END SELECT
-      END SELECT
+        end select
+      end select
     if( global .and. n < 2 ) then
       if( Testing_WRFVAR ) exit dup_loop
       if( platform%loc % i >= xp % ide) then
@@ -952,9 +952,9 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 
 
 !---------------------------------------------------------------------------
-   enddo dup_loop   
+   end do dup_loop   
 
-   enddo reports
+   end do reports
 
 !-----------------------------------------------------------------------
    call closbf(iunit)
@@ -985,14 +985,14 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
 
 !------------------------------------------------------------------------
 
-!  PRINT OUT
+!  PRinT out
 !  =============
 
    if(print_detail_obs) then
 
-      write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
+      write(unit=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
-      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      write(unit=stdout, fmt='(5x,a,i6,a)') &
            'Read:  ', num_sound,           ' SOUND          reports,', &
            'Read:  ', num_synop,           ' SYNOP          reports,', &
            'Read:  ', num_pilot,           ' PILOT          reports,', &
@@ -1023,7 +1023,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
                                    - num_profiler - num_buoy, &
                                    - num_bogus - num_bogus, &
                                    '  reports unsaved.'
-      write(UNIT=stdout, fmt=*) ' '
+      write(unit=stdout, fmt=*) ' '
    end if
 
    if((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
@@ -1044,7 +1044,7 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
       (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
-      write(UNIT=stderr, fmt='(a, i6, 2x, a, i6)') &
+      write(unit=stderr, fmt='(a, i6, 2x, a, i6)') &
            'ob%ob_numb(ob%current_ob_time)%sound=', ob%ob_numb(ob%current_ob_time)%sound, &
            'ob%num_sound=', ob%num_sound, &
            'ob%ob_numb(ob%current_ob_time)%synop=', ob%ob_numb(ob%current_ob_time)%synop, &
@@ -1080,6 +1080,6 @@ SUBROUTINE da_read_bufr_obs (ob, xp, filename)
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
-   endif
-END SUBROUTINE da_read_bufr_obs
+      call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
+   end if
+end subroutine da_read_bufr_obs

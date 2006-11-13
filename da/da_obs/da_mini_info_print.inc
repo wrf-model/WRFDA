@@ -2,9 +2,9 @@ subroutine DA_Mini_Info_print(print_unit, oi_each, re_each, gr_each, k)
 
    implicit none
 
-   TYPE (each_level_type), intent(in) :: oi_each
-   TYPE (residual_type),   intent(in) :: re_each, gr_each
-   INTEGER,                intent(in) :: print_unit, k
+   type (each_level_type), intent(in) :: oi_each
+   type (residual_type),   intent(in) :: re_each, gr_each
+   integer,                intent(in) :: print_unit, k
 
    write(unit=print_unit, fmt='(a,i3,8e12.4)') &
         '  oi  ', k, &

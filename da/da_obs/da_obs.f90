@@ -27,9 +27,9 @@ module da_obs
    use da_airsr   
    use da_reporting
 
-   IMPLICIT NONE
+   implicit none
 
-CONTAINS
+contains
 
 #include "da_obs_proc_station.inc"
 #include "da_read_obs.inc"

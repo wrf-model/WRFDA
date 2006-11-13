@@ -22,6 +22,6 @@ subroutine da_advance_cymdh( start_date, dh, end_date )
       call da_change_date ( ccyy, mm, dd, 1 )
    end do
 
-   write(UNIT=end_date(1:10), fmt='(i4, 3i2.2)')  ccyy, mm, dd, hh
+   write(unit=end_date(1:10), fmt='(i4, 3i2.2)')  ccyy, mm, dd, hh
 
 end subroutine da_advance_cymdh

@@ -4,14 +4,14 @@ subroutine da_setup_pseudo_obs( iv, ob )
    ! Purpose: Sets up pseudo ob part of observation structure.
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.
-   TYPE (y_type), INTENT(INOUT)  :: ob   ! (Smaller) observation structure.
+   type (ob_type), intent(inout) :: iv   ! Obs and header structure.
+   type (y_type), intent(inout)  :: ob   ! (Smaller) observation structure.
 
    integer                       :: n    ! Loop counters.
 
-   IF (trace_use) call da_trace_entry("da_setup_pseudo_obs")
+   if (trace_use) call da_trace_entry("da_setup_pseudo_obs")
 
    iv % num_pseudo = num_pseudo
    ob % num_pseudo = num_pseudo
@@ -84,12 +84,12 @@ subroutine da_setup_pseudo_obs( iv, ob )
             iv % pseudo(n) % q % qc = 0
          end if 
          
-         write(UNIT=stdout,FMT='(a4,2f15.5)')pseudo_var, pseudo_val, pseudo_err
-         write(UNIT=stdout,FMT='(3f15.5)')pseudo_x, pseudo_y, pseudo_z
+         write(unit=stdout,fmt='(a4,2f15.5)')pseudo_var, pseudo_val, pseudo_err
+         write(unit=stdout,fmt='(3f15.5)')pseudo_x, pseudo_y, pseudo_z
       end do
    end if
 
-   IF (trace_use) call da_trace_exit("da_setup_pseudo_obs")
+   if (trace_use) call da_trace_exit("da_setup_pseudo_obs")
 
 end subroutine da_setup_pseudo_obs
 

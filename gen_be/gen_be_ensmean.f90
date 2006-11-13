@@ -78,9 +78,9 @@ program gen_be_ensmean
    length = len_trim(filestub)
    rcode = nf_open(filestub(1:length), NF_WRITE, cdfid_mean )
    if ( rcode /= 0) then
-      write(UNIT=errmsg(1),FMT='(A,A)') &
+      write(UNIT=message(1),FMT='(A,A)') &
          ' Error opening netcdf file ', filestub(1:length)
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
 !---------------------------------------------------------------------------------------------
@@ -104,9 +104,9 @@ program gen_be_ensmean
 
 !           Check variable is in file:
             if ( rcode /= 0 ) then
-               write(UNIT=errmsg(1),FMT='(A,A)') &
+               write(UNIT=message(1),FMT='(A,A)') &
                   var, ' variable is not in input file'
-               call da_error(__FILE__,__LINE__,errmsg(1:1))
+               call da_error(__FILE__,__LINE__,message(1:1))
              end if
 
 !            Get dimension information for this field:
@@ -128,9 +128,9 @@ program gen_be_ensmean
                 allocate( data_r_mean(iend(1),iend(2),iend(3)))
                 data_r_mean = 0.0
              else
-                write(UNIT=errmsg(1),FMT='(A,A)') &
+                write(UNIT=message(1),FMT='(A,A)') &
                    var, ' variable is not real type'
-                call da_error(__FILE__,__LINE__,errmsg(1:1))
+                call da_error(__FILE__,__LINE__,message(1:1))
              end if
 
          end if

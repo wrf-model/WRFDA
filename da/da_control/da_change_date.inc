@@ -16,12 +16,12 @@ subroutine da_change_date( ccyy, mm, dd, delta )
 
       if ( mod(ccyy,100) == 0) then
          mmday(2) = 28
-      endif
+      end if
 
       if(mod(ccyy,400) == 0) then
          mmday(2) = 29
       end if
-   endif
+   end if
 
    dd = dd + delta
 
@@ -31,7 +31,7 @@ subroutine da_change_date( ccyy, mm, dd, delta )
       if(mm == 0) then
          mm = 12
          ccyy = ccyy - 1
-      endif
+      end if
 
       dd = mmday(mm)
    elseif ( dd .gt. mmday(mm) ) then

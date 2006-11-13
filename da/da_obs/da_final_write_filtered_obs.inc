@@ -9,29 +9,29 @@ subroutine da_final_write_filtered_obs
 !-----------------------------------------------------------------------------!
    implicit none        
 !
-   INTEGER                    :: i,k, iost,iunit, files, total_obs     
-   TYPE (multi_level_type)    :: platform
-   REAL                       :: height_error
+   integer                    :: i,k, iost,iunit, files, total_obs     
+   type (multi_level_type)    :: platform
+   real                       :: height_error
    character*20               :: filename
 !----------------------------------------------------------------------------!
-   if (trace_use) CALL da_trace_entry("da_final_write_filtered_obs")
+   if (trace_use) call da_trace_entry("da_final_write_filtered_obs")
 !----------------------------------------------------------------------------!
    call da_get_unit(iunit)
 !  Loop over all data files
 !--------------------------
-file_number: DO files = 0, num_procs-1
+file_number: do files = 0, num_procs-1
 
-   write(UNIT=filename, FMT='(a,i3.3)') 'filtered_obs.',files      
+   write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.',files      
    open(unit=iunit, file= trim(filename),form='formatted',iostat=iost)
    if(iost /= 0) &
    call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
 !  LOOP OVER RECORDS
 !  -----------------
-   reports: DO
-!     READ STATION GENERAL INFO
+   reports: do
+!     read STATION GENERAL inFO
 !     =============================
-      READ (iunit, FMT = fmt_info, IOSTAT = iost) &
+      read (iunit, fmt = fmt_info, iostat = iost) &
                    platform%info%platform,    &
                    platform%info%date_char,   &
                    platform%info%name,        &
@@ -40,12 +40,12 @@ file_number: DO files = 0, num_procs-1
                    platform%info%lon,         &
                    platform%info%elv,         &
                    platform%info%id
-      IF (iost /= 0) THEN
-          WRITE (0,'(/A,I9)') ' END OF OBS UNIT: ',iunit
-          WRITE (0,'(/A,I9)') ' IOSTAT:          ',iost
-         EXIT reports
-      ENDIF
-       write(filtered_obs_unit, FMT = fmt_info)           &
+      if (iost /= 0) then
+          write (0,'(/A,I9)') ' end OF OBS unit: ',iunit
+          write (0,'(/A,I9)') ' iostat:          ',iost
+         exit reports
+      end if
+       write(filtered_obs_unit, fmt = fmt_info)           &
                    platform%info%platform,    &
                    platform%info%date_char,   &
                    platform%info%name,        &
@@ -57,19 +57,19 @@ file_number: DO files = 0, num_procs-1
 
 !  Read surface Info
 !  -------------------
-      READ (iunit, FMT = fmt_srfc) platform%loc%slp, platform%loc%pw
-      write(filtered_obs_unit, FMT = fmt_srfc) platform%loc%slp, platform%loc%pw
+      read (iunit, fmt = fmt_srfc) platform%loc%slp, platform%loc%pw
+      write(filtered_obs_unit, fmt = fmt_srfc) platform%loc%slp, platform%loc%pw
 
 ! == levels < 1 and not GPSPW, go back to reports
 
-      IF ((platform%info%levels < 1) .AND.            &
+      if ((platform%info%levels < 1) .AND.            &
           (index(platform%info%platform, 'GPSPW') <= 0)) then
            cycle reports
-      ENDIF
+      end if
 
-!     READ EACH LEVELS
+!     read EACH LEVELS
 !     ----------------
-loop_level: DO i = 1, platform%info%levels
+loop_level: do i = 1, platform%info%levels
 
       platform%each (i) = each_level_type(missing_r, missing, -1.0, & ! height
                        field_type(missing_r, missing, missing_r), & ! u
@@ -81,7 +81,7 @@ loop_level: DO i = 1, platform%info%levels
                        field_type(missing_r, missing, missing_r), & ! td
                        field_type(missing_r, missing, missing_r))  ! speed 
 
-       READ (UNIT = iunit, FMT = TRIM (fmt_each)) &
+       read (unit = iunit, fmt = trim (fmt_each)) &
               platform%each (i)%p,            &
               platform%each (i)%speed,        &
               platform%each (i)%v,            &
@@ -92,7 +92,7 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%td,           &
               platform%each (i)%rh
 
-       write (UNIT = filtered_obs_unit, FMT = TRIM (fmt_each)) &
+       write (unit = filtered_obs_unit, fmt = trim (fmt_each)) &
               platform%each (i)%p,            &
               platform%each (i)%speed,        &
               platform%each (i)%v,            &
@@ -103,14 +103,14 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%td,           &
               platform%each (i)%rh
 
-      ENDDO loop_level
+      end do loop_level
 
-   ENDDO reports                  !  Loop over reports              
+   end do reports                  !  Loop over reports              
    close ( iunit )
-   ENDDO file_number              !  Loop over all data files
+   end do file_number              !  Loop over all data files
 
    call da_free_unit (iunit)
 
-   if (trace_use) CALL da_trace_exit("da_final_write_filtered_obs")
+   if (trace_use) call da_trace_exit("da_final_write_filtered_obs")
 
 end subroutine da_final_write_filtered_obs 
