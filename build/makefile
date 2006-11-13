@@ -62,6 +62,7 @@ depend : arch links registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	makedepf90 $(FPPFLAGS) \
            *.F *.f90 *.F90  2>/dev/null | grep -v 'real_em.o :' > depend.txt
+	touch depend
 	
 
 include depend.txt
@@ -114,7 +115,7 @@ clean : arch_clean
 	@ rm -rf  *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
-          inc/dm_comm_cpp_flags depend
+          inc/dm_comm_cpp_flags depend depend.txt
 	@ ( cd ../external; make clean )
 
 superclean : clean arch_superclean
@@ -124,5 +125,7 @@ superclean : clean arch_superclean
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \
           scl_plotting_routines configure.wrfvar ../configure.wrfvar \
-          decode_l2_airs.README time_window.nl \
-          da_macros_utl links arch
+          decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
+          da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
+          landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3
+    

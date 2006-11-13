@@ -138,7 +138,8 @@ else
   echo " "
 
   cd build
-  touch -t01010101 depend.txt
+  # seperate setup stage for make programs that don't update include
+  # files before using them. gnu make good. Aix make bad
   make -r setup
   make -r $arglist A2DCASE="$A2DCASE"
 

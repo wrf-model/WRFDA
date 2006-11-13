@@ -2,59 +2,59 @@
 
 var : wrfvar
 
-wrfvar  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar.o
+wrfvar  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar.o
 	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB)
 
-wrfvar_esmf  : advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar_esmf.o \
+wrfvar_esmf  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar_esmf.o \
           da_wrfvar_esmf_super.o
 	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o
 
-wrf     : $(WRF_LIBS) wrf.o
+wrf     : setup $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
-wrfplus : $(WRFPLUS_LIBS) wrf.o
+wrfplus : setup $(WRFPLUS_LIBS) wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
 
 k2n : kma2netcdf
 
 n2k : netcdf2kma
 
-kma2netcdf :  $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
+kma2netcdf :  setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
 	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
-netcdf2kma : $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
+netcdf2kma : setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
 	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o \
            $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
-$(SOLVER) : $(WRF_LIBS) $(SOLVER).o
+$(SOLVER) : setup $(WRF_LIBS) $(SOLVER).o
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrf.a $(WRF_LIB)
 
-$(SOLVER)_wrf : $(WRF_LIBS) wrf.o
+$(SOLVER)_wrf : setup $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
-$(SOLVER)_wrfplus : $(WRFPLUS_LIBS) wrfplus.o
+$(SOLVER)_wrfplus : setup $(WRFPLUS_LIBS) wrfplus.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
 
-$(SOLVER)_wrf_ESMFApp : $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
+$(SOLVER)_wrf_ESMFApp : setup $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
 	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o $(WRF_LIB)
 	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o $(WRF_LIB)
 
-$(SOLVER)_ideal : $(WRF_LIBS) module_initialize ideal.o
+$(SOLVER)_ideal : setup $(WRF_LIBS) module_initialize ideal.o
 	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 
-$(SOLVER)_real : $(WRF_LIBS) module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
+$(SOLVER)_real : setup $(WRF_LIBS) module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
 	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
 
-convert_bioemiss : $(WRF_LIBS) convert_bioemiss.o
+convert_bioemiss : setup $(WRF_LIBS) convert_bioemiss.o
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrf.a $(WRF_LIB)
 
-convert_emiss : $(WRF_LIBS) convert_emiss.o
+convert_emiss : setup $(WRF_LIBS) convert_emiss.o
 	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrf.a $(WRF_LIB)
 
-real_em : $(WRF_LIBS) real_em.o
+real_em : setup $(WRF_LIBS) real_em.o
 	$(FC) -o real.exe $(LDFLAGS) real_em.o module_bc.o \
             module_big_step_utilities_em.o \
             module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
