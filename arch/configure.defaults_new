@@ -208,6 +208,51 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95 compiler optimised  (RSL, MPICH)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2
+FCDEBUG         = #-g -ftrace=full -finteger=-9999 -freal=nan -C
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       =  -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
 #ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
 #
 
@@ -689,6 +734,56 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH	AIX DM-Parallel Optimised (RSL, IBM-MPI)
+#
+M4              = m4 -B24000
+FC              = mpxlf90_r
+FFC             = xlf_r
+SFC             = xlf90_r
+CC              = mpcc_r
+CC_TOOLS        = xlc
+SCC             = cc_r
+LD              = $(FC)
+
+TRADFLAG        =
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -qarch=auto
+FCDEBUG         = #-g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
+                  -qsuppress=1514-008
+FCTYPE          = -qrealsize=8
+FCFREE          = -qfree=f90
+FCENDIAN        =
+FCBASE          = -w -qspill=20000 -qmaxmem=-1
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+CCFLAGS_RSL     =
+
+LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
+
+LOCAL_LIB	= -lmass -lmassv
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST sp2 )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
 #ARCH   crayx1 UNICOS/mp  CRAY X1 serial 
 
 SED_FTN		= sed -f ../arch/cray_csd.sed
@@ -706,7 +801,7 @@ LD              = $(FC)
 TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
-#FCOPTIM        = -Ofp3 -O3 -Ovector0 -Ostream0 -Oscalar1
+#FCOPTIM         = -Ofp3 -O3 -Ovector0 -Ostream0 -Oscalar1
 FCOPTIM         = -O0
 FCDEBUG         = # -g
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
@@ -839,6 +934,53 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
+FCTYPE          = -r8
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+EXTRA_LIBS      = -lSystemStubs
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST darwin )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Darwin	(g95 optimised parallel for G4/5 (RSL, MPICH, RSL IO)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+LD              = $(FC)
+CC              = mpicc
+CC_TOOLS        = cc
+
+TRADFLAG        =
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
+                     
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2
+FCDEBUG         = #-g -ftrace=full -finteger=-9999 -freal=nan -C
 FCTYPE          = -r8
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
