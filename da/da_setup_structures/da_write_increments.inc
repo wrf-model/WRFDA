@@ -147,7 +147,7 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    if ( rootproc ) then
       call da_get_unit(anl_inc_unit)
-      open(unit=anl_inc_unit, file='ANALYSIS_inCREMENT', form='unformatted')
+      open(unit=anl_inc_unit, file='ANALYSIS_INCREMENT', form='unformatted')
 
       write (unit=anl_inc_unit) ANALYSIS_DATE
 

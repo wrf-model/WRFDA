@@ -77,7 +77,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
       ! 3d- and 2d-increments:
 
       call da_get_unit(anl_inc_unit)
-      open(unit=anl_inc_unit,file="ANALYSIS_inCREMEMTS_KMA",status="replace")
+      open(unit=anl_inc_unit,file="ANALYSIS_INCREMEMTS_KMA",status="replace")
 
       write(anl_inc_unit) &
       ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
