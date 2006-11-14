@@ -16,7 +16,7 @@ C GPS: モデル地表気圧(レベル1/2）(HPA)
 C<OUTPUT>
 C GRH: 相対湿度（フルレベル）(NON-UNIT)
 C***********************************************************************
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+!      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
 C
       PARAMETER (KM=50,IMAXD=640)
 C
@@ -41,7 +41,9 @@ C : ハーフレベル気圧(HPA)計算
           PU  = A(K+1) + B(K+1)*GPS(I,J)
           PD  = A(K  ) + B(K  )*GPS(I,J)
 C : フルレベル気圧(HPA)計算
-          PFULL(I,K) = DEXP(( PD*DLOG(PD)-PU*DLOG(PU) )/(PD-PU) -1.D0)
+! JRB
+!          PFULL(I,K) = DEXP(( PD*DLOG(PD)-PU*DLOG(PU) )/(PD-PU) -1.D0)
+          PFULL(I,K) = EXP(( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.D0)
  1100 CONTINUE
   100   CONTINUE
       DO 1300 I = 1, IMAX

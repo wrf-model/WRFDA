@@ -3,25 +3,25 @@ subroutine da_solve_init( grid, xp, xb, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE(domain)              :: grid
+   type(domain)              :: grid
 
-   TYPE (xpose_type),INTENT(INOUT)  :: xp      ! Transpose variables.
-   TYPE (xb_type), INTENT(INOUT)    :: xb      ! Background state
+   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
+   type (xb_type), intent(inout)    :: xb      ! Background state
 
-   INTEGER,      INTENT(OUT)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   INTEGER,      INTENT(OUT)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   INTEGER,      INTENT(OUT)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
+   integer,      intent(out)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
+   integer,      intent(out)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
+   integer,      intent(out)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
-   INTEGER :: ii
+   integer :: ii
 
-   INTEGER :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
+   integer :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
 
-!if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MSG_XPOSE add_msg_xpose_real
+!if ( DWORDsize != RWORDsize )
+#define true_MSG_XPOSE add_msg_xpose_real
 !else
-!define TRUE_MSG_XPOSE add_msg_xpose_doubleprecision
+!define true_MSG_XPOSE add_msg_xpose_doubleprecision
 !endif
 
    if (trace_use) call da_trace_entry("da_solve_init")
@@ -58,32 +58,32 @@ subroutine da_solve_init( grid, xp, xb, &
 #define REGISTER_I1
 #include "em_data_calls.inc"
    ! XPOSE_V1
-   IF ( grid%comms( XPOSE_V1 ) == invalid_message_value ) THEN
+   if ( grid%comms( XPOSE_V1 ) == invalid_message_value ) then
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call TRUE_MSG_XPOSE ( xp%v1z, xp%v1x, xp%v1y, 3 )
+      call true_MSG_XPOSE ( xp%v1z, xp%v1x, xp%v1y, 3 )
 #else
-      call TRUE_MSG_XPOSE ( xp%v1z(ims,jms,kms), &
+      call true_MSG_XPOSE ( xp%v1z(ims,jms,kms), &
                          xp%v1x(xp%imsx,xp%jmsx,xp%kmsx), &
                          xp%v1y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
 #endif
       call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V1 ) )
-   ENDIF
+   end if
 
    ! XPOSE_V2
-   IF ( grid%comms( XPOSE_V2 ) == invalid_message_value ) THEN
+   if ( grid%comms( XPOSE_V2 ) == invalid_message_value ) then
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call TRUE_MSG_XPOSE ( xp%v2z, xp%v2x, xp%v2y, 3 )
+      call true_MSG_XPOSE ( xp%v2z, xp%v2x, xp%v2y, 3 )
 #else
-      call TRUE_MSG_XPOSE ( xp%v2z(ims,jms,kms), &
+      call true_MSG_XPOSE ( xp%v2z(ims,jms,kms), &
                          xp%v2x(xp%imsx,xp%jmsx,xp%kmsx), &
                          xp%v2y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
 #endif
       call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
-   ENDIF
+   end if
 
    if (trace_use) call da_trace("da_solve_init", &
       Message="Setup halo region communication")
@@ -125,7 +125,7 @@ subroutine da_solve_init( grid, xp, xb, &
    xp%domdesc = grid%domdesc
    do ii = 1, max_comms
      xp%comms(ii) = grid%comms(ii)
-   enddo
+   end do
 
    ! Copy halo and transpose IDs.
 

@@ -26,7 +26,8 @@ subroutine da_ll_to_xy (info, loc, xp, &
       call da_llxy (info%lat, info%lon, loc%x, loc%y)
    end if
 
-   call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)
+   call da_togrid (loc%x, xp%its-2, xp%ite+2, loc%i, loc%dx, loc%dxm)!
+
    call da_togrid (loc%y, xp%jts-2, xp%jte+2, loc%j, loc%dy, loc%dym)
 
    ! refactor to remove this ugly duplication later

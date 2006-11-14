@@ -24,7 +24,7 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
          write(unit=*, fmt='(2a,2x,a,i4/a)') &
               'file:', __FILE__, 'line:', __LINE__, &
               'monotonic increase in vertical interpolation.'
-      endif
+      end if
 #endif
    else
       increase_in_vertical = .false.
@@ -34,9 +34,9 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
          write(unit=*, fmt='(2a,2x,a,i4/a)') &
               'file:', __FILE__, 'line:', __LINE__, &
               'monotonic decrease in vertical interpolation.'
-      endif
+      end if
 #endif
-   endif
+   end if
 
    if(increase_in_vertical) then
       do k=1, n_out
@@ -49,9 +49,9 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
                if(z_out(k) <= z_in(i)) then
                   kabv = i
                   exit i_loop
-               endif
-            enddo i_loop
-         endif
+               end if
+            end do i_loop
+         end if
 
          kblw = kabv - 1
          w2 = (z_in(kabv)-z_out(k))/(z_in(kabv)-z_in(kblw))
@@ -63,9 +63,9 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
             write(unit=*, fmt='(a,2i4,2x,a,2f8.4,2x,a,3f18.10)') &
                  'index:', kabv, k, 'weight:', w1, w2, &
                  'value:', v_in(kabv), v_in(kblw), v_out(k)
-         endif
+         end if
 #endif
-      enddo
+      end do
    else
       do k=1, n_out
          if(z_out(k) >= z_in(1)) then
@@ -77,9 +77,9 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
                if(z_out(k) >= z_in(i)) then
                   kabv = i
                   exit d_loop
-               endif
-            enddo d_loop
-         endif
+               end if
+            end do d_loop
+         end if
 
          kblw = kabv - 1
          w2 = (z_in(kabv)-z_out(k))/(z_in(kabv)-z_in(kblw))
@@ -91,10 +91,10 @@ subroutine da_convertor_v_interp( v_in, z_in, n_in, &
             write(unit=*, fmt='(a,2i4,2x,a,2f8.4,2x,a,3f18.10)') &
                  'index:', kabv, k, 'weight:', w1, w2, &
                  'value:', v_in(kabv), v_in(kblw), v_out(k)
-         endif
+         end if
 #endif
-      enddo
-   endif
+      end do
+   end if
 
 end subroutine da_convertor_v_interp
 

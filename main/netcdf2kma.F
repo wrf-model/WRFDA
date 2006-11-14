@@ -34,8 +34,6 @@ PROGRAM netcdf2kma
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
-   CHARACTER (LEN=80)      :: message
-
    INTERFACE
      SUBROUTINE Setup_Timekeeping( grid )
       USE module_domain
@@ -107,7 +105,7 @@ PROGRAM netcdf2kma
 
 
 !-- read input in netcdf format
-     CALL da_med_initialdata_input( head_grid , config_flags )  
+     CALL da_med_initialdata_input( head_grid , config_flags, 'rizvi_to_choose' )  
 
 !--write in grid-array in kma-ascii format
 
@@ -119,12 +117,12 @@ PROGRAM netcdf2kma
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
-      message = 'Time elapsed in netcdf2kma'
-      CALL end_timing ( TRIM(message) )
+      message(1) = 'Time elapsed in netcdf2kma'
+      CALL end_timing ( TRIM(message(1)) )
    END IF
 #else
-   message = 'Time elapsed in netcdf2kma'
-   CALL end_timing ( TRIM(message) )
+   message(1) = 'Time elapsed in netcdf2kma'
+   CALL end_timing ( TRIM(message(1)) )
 #endif
 
    CALL wrf_shutdown

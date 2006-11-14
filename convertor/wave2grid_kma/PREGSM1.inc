@@ -197,8 +197,11 @@ C   =================================================================
             AANAL        = AGES + 0.5*RES + AA*ATAN(XN/AA)
           ENDIF
         ENDIF
-        AANAL        = DMAX1( AANAL, 1.0D-6 )  ! \215\305\217I\222\262\220\256
-        AANAL        = DMIN1( AANAL, 1.0D0  )
+! JRB
+!        AANAL        = DMAX1( AANAL, 1.0D-6 )  ! \215\305\217I\222\262\220\256
+!        AANAL        = DMIN1( AANAL, 1.0D0  )
+        AANAL        = MAX( AANAL, 1.0E-6 )  ! \215\305\217I\222\262\220\256
+        AANAL        = MIN( AANAL, 1.0E0  )
         GRH(I,J,K) = AANAL
  3737 CONTINUE
  3738 CONTINUE

@@ -34,8 +34,6 @@ PROGRAM kma2netcdf
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
-   CHARACTER (LEN=80)      :: message
-
    INTERFACE
      SUBROUTINE Setup_Timekeeping( grid )
       USE module_domain
@@ -123,12 +121,12 @@ PROGRAM kma2netcdf
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
-      message = 'Time elapsed in kma2netcdf'
-      CALL end_timing ( TRIM(message) )
+      message(1) = 'Time elapsed in kma2netcdf'
+      CALL end_timing ( TRIM(message(1)) )
    END IF
 #else
-   message = 'Time elapsed in kma2netcdf'
-   CALL end_timing ( TRIM(message) )
+   message(1) = 'Time elapsed in kma2netcdf'
+   CALL end_timing ( TRIM(message(1)) )
 #endif
 
    CALL wrf_shutdown

@@ -32,7 +32,9 @@ CX    CLBYCPI = HICE/CP
       IF(ICE.EQ.0) THEN                                                         
       DO 10 I = 1,25000                                                         
       X = 123.2D0 + 0.01D0*I                                                    
-      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                       
+! JRB
+!      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                         
+      TABLE(I) = 0.622*EXP(B-C/(X-TSAT))                                     
       DTABLE(I) = TABLE(I)*C/(X-TSAT)**2                                        
       CTABLE(I) = HL                                                            
       RTABLE(I) = 1.                                                !##         
@@ -41,21 +43,28 @@ CX    CLBYCPI = HICE/CP
       DO 20 I = 1,25000                                                         
       X = 123.2D0 + 0.01D0*I                                                    
       IF(X.GE.TEMP0) THEN                                                       
-      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                       
+! JRB
+!      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                        
+      TABLE(I) = 0.622*EXP(B-C/(X-TSAT))                                       
       DTABLE(I) = TABLE(I)*C/(X-TSAT)**2                                        
       CTABLE(I) = HL                                                            
       RTABLE(I) = 1.                                                !##         
       ELSEIF(X.LE.TEMPI) THEN                                                   
-      TABLE(I) = 0.622*DEXP(BI-CI/(X-TSATI))                                    
+!      TABLE(I) = 0.622*DEXP(BI-CI/(X-TSATI))                                   
+      TABLE(I) = 0.622*EXP(BI-CI/(X-TSATI))                                    
       DTABLE(I) = TABLE(I)*CI/(X-TSATI)**2                                      
       CTABLE(I) = HICE                                                          
       RTABLE(I) = 0.                                                !##         
       ELSE                                                                      
       RR = (TEMP0-X)/DTEMP                                                      
       CTABLE(I) = HL*(1.0-RR) + HICE*RR                                         
-      TBL1 = 0.622*DEXP(B-C/(X-TSAT))                                           
-      DTBL1 = TBL1*C/(X-TSAT)**2                                                
-      TBL2 = 0.622*DEXP(BI-CI/(X-TSATI))                                        
+! JRB
+!      TBL1 = 0.622*DEXP(B-C/(X-TSAT))                                             
+      TBL1 = 0.622*EXP(B-C/(X-TSAT))                                         
+      DTBL1 = TBL1*C/(X-TSAT)**2     
+! JRB                                           
+!      TBL2 = 0.622*DEXP(BI-CI/(X-TSATI))                                          
+      TBL2 = 0.622*EXP(BI-CI/(X-TSATI))                                      
       DTBL2 = TBL2*CI/(X-TSATI)**2                                              
       TABLE(I)  = TBL1*(1.D0-RR)+TBL2*RR                                        
       DTABLE(I) = DTBL1*(1.D0-RR)+DTBL2*RR+(TBL1-TBL2)/DTEMP                    
