@@ -78,7 +78,7 @@
                               ims, ime, jms, jme, kms, kme,    &
                               ips, ipe, jps, jpe, kps, kpe    )
 
-! simulation start time
+! simulation start time is a Singleton maintained by head_grid
     IF ( ( switch .EQ.     model_input_only  ) .OR. &
          ( switch .EQ.          restart_only ) ) THEN
       CALL wrf_get_dom_ti_char ( fid , 'SIMULATION_START_DATE' , simulation_start_date , ierr )
@@ -88,12 +88,12 @@
                simulation_start_year,   simulation_start_month,                     &
                simulation_start_day,    simulation_start_hour,                      &
                simulation_start_minute, simulation_start_second
-        CALL nl_set_simulation_start_year   ( grid%id , simulation_start_year   )
-        CALL nl_set_simulation_start_month  ( grid%id , simulation_start_month  )
-        CALL nl_set_simulation_start_day    ( grid%id , simulation_start_day    )
-        CALL nl_set_simulation_start_hour   ( grid%id , simulation_start_hour   )
-        CALL nl_set_simulation_start_minute ( grid%id , simulation_start_minute )
-        CALL nl_set_simulation_start_second ( grid%id , simulation_start_second )
+        CALL nl_set_simulation_start_year   ( 1 , simulation_start_year   )
+        CALL nl_set_simulation_start_month  ( 1 , simulation_start_month  )
+        CALL nl_set_simulation_start_day    ( 1 , simulation_start_day    )
+        CALL nl_set_simulation_start_hour   ( 1 , simulation_start_hour   )
+        CALL nl_set_simulation_start_minute ( 1 , simulation_start_minute )
+        CALL nl_set_simulation_start_second ( 1 , simulation_start_second )
         IF ( switch .EQ. model_input_only  ) THEN
           WRITE(wrf_err_message,*)fid,' input_wrf, model_input_only:  SIMULATION_START_DATE = ', &
                                   simulation_start_date(1:19)
@@ -104,24 +104,28 @@
           CALL wrf_debug ( 300 , TRIM(wrf_err_message ) )
         ENDIF
       ELSE
-        CALL nl_get_start_year   ( grid%id , simulation_start_year   )
-        CALL nl_get_start_month  ( grid%id , simulation_start_month  )
-        CALL nl_get_start_day    ( grid%id , simulation_start_day    )
-        CALL nl_get_start_hour   ( grid%id , simulation_start_hour   )
-        CALL nl_get_start_minute ( grid%id , simulation_start_minute )
-        CALL nl_get_start_second ( grid%id , simulation_start_second )
-        CALL nl_set_simulation_start_year   ( grid%id , simulation_start_year   )
-        CALL nl_set_simulation_start_month  ( grid%id , simulation_start_month  )
-        CALL nl_set_simulation_start_day    ( grid%id , simulation_start_day    )
-        CALL nl_set_simulation_start_hour   ( grid%id , simulation_start_hour   )
-        CALL nl_set_simulation_start_minute ( grid%id , simulation_start_minute )
-        CALL nl_set_simulation_start_second ( grid%id , simulation_start_second )
-! JRB stop this message in WRFVAR, as we don't handle dates well
-#ifndef DA_CORE
+        CALL nl_get_start_year   ( 1 , simulation_start_year   )
+        CALL nl_get_start_month  ( 1 , simulation_start_month  )
+        CALL nl_get_start_day    ( 1 , simulation_start_day    )
+        CALL nl_get_start_hour   ( 1 , simulation_start_hour   )
+        CALL nl_get_start_minute ( 1 , simulation_start_minute )
+        CALL nl_get_start_second ( 1 , simulation_start_second )
+        CALL nl_set_simulation_start_year   ( 1 , simulation_start_year   )
+        CALL nl_set_simulation_start_month  ( 1 , simulation_start_month  )
+        CALL nl_set_simulation_start_day    ( 1 , simulation_start_day    )
+        CALL nl_set_simulation_start_hour   ( 1 , simulation_start_hour   )
+        CALL nl_set_simulation_start_minute ( 1 , simulation_start_minute )
+        CALL nl_set_simulation_start_second ( 1 , simulation_start_second )
         CALL wrf_message('input_wrf: SIMULATION_START_DATE not available in input')
-        CALL wrf_message('will use namelist information') 
-#endif
+        CALL wrf_message('will use head_grid start time from namelist') 
       ENDIF
+      ! Initialize derived time quantity in grid%xtime.  
+      ! Note that this call is also made in setup_timekeeping().  
+      ! Ugh, what a hack.  Simplify all this later...  
+      CALL domain_clock_get( grid, minutesSinceSimulationStart=grid%xtime )
+      ! Note that it is NOT necessary to reset grid%julian here.  
+      WRITE(wrf_err_message,*) 'input_wrf:  set xtime to ',grid%xtime
+      CALL wrf_debug ( 100, TRIM(wrf_err_message) )
     ENDIF
 
 #if (EM_CORE == 1)
@@ -501,6 +505,20 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
       CALL wrf_auxinput4in( fid , grid , config_flags , switch , ierr )
     ELSE IF ( switch .EQ. aux_model_input5_only ) THEN
       CALL wrf_auxinput5in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input6_only ) THEN
+      CALL wrf_auxinput6in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input7_only ) THEN
+      CALL wrf_auxinput7in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input8_only ) THEN
+      CALL wrf_auxinput8in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input9_only ) THEN
+      CALL wrf_auxinput9in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input10_only ) THEN
+      CALL wrf_auxinput10in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_model_input11_only ) THEN
+      CALL wrf_auxinput11in( fid , grid , config_flags , switch , ierr )
+
+
     ELSE IF ( switch .EQ. aux_hist1_only ) THEN
       CALL wrf_auxhist1in( fid , grid , config_flags , switch , ierr )
     ELSE IF ( switch .EQ. aux_hist2_only ) THEN
@@ -511,6 +529,18 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
       CALL wrf_auxhist4in( fid , grid , config_flags , switch , ierr )
     ELSE IF ( switch .EQ. aux_hist5_only ) THEN
       CALL wrf_auxhist5in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist6_only ) THEN
+      CALL wrf_auxhist6in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist7_only ) THEN
+      CALL wrf_auxhist7in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist8_only ) THEN
+      CALL wrf_auxhist8in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist9_only ) THEN
+      CALL wrf_auxhist9in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist10_only ) THEN
+      CALL wrf_auxhist10in( fid , grid , config_flags , switch , ierr )
+    ELSE IF ( switch .EQ. aux_hist11_only ) THEN
+      CALL wrf_auxhist11in( fid , grid , config_flags , switch , ierr )
 
     ELSE IF ( switch .EQ. restart_only ) THEN
       CALL wrf_restartin( fid , grid , config_flags , switch , ierr )

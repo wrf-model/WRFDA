@@ -16,6 +16,8 @@ MODULE module_ra_gsfcsw
 CONTAINS
 
 !------------------------------------------------------------------
+! urban related variable are added to arguments of gsfcswrad
+!------------------------------------------------------------------
    SUBROUTINE GSFCSWRAD(rthraten,gsw,xlat,xlong                   &
                    ,dz8w,rho_phy                                  &
                    ,alb,t3d,qv3d,qc3d,qr3d                        &
@@ -29,7 +31,8 @@ CONTAINS
                    ,f_qv,f_qc,f_qr,f_qi,f_qs,f_qg                 &
                    ,ids,ide, jds,jde, kds,kde                     & 
                    ,ims,ime, jms,jme, kms,kme                     &
-                   ,its,ite, jts,jte, kts,kte                     ) 
+                   ,its,ite, jts,jte, kts,kte                     & 
+                   ,cosz_urb2d,omg_urb2d                          ) !Optional urban
 !------------------------------------------------------------------
    IMPLICIT NONE
 !------------------------------------------------------------------
@@ -160,6 +163,11 @@ CONTAINS
    REAL    :: XLAT0,XLONG0
    REAL    :: fac,latrmp
    REAL    :: xt24,tloctm,hrang,xxlat
+
+!URBAN
+   REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)  :: COSZ_URB2D !urban
+   REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)  :: OMG_URB2D  !urban
+
    real, dimension(11) :: midbands  ! jcb
    data midbands/.2,.235,.27,.2875,.3025,.305,.3625,.55,1.92,1.745,6.135/   ! jcb
    real :: ang,slope ! jcb
@@ -636,22 +644,22 @@ CONTAINS
 
             call wrf_message("Diagnostics 1: k, tauaer300, tauaer400, tauaer600, tauaer999")
             do k=kts,kte
-               write(msg,'(i4,4f8.2)') k, tauaer300(i,k,ib), tauaer400(i,k,ib), &
-                    tauaer600(i,k,ib), tauaer999(i,k,ib)
+               write(msg,'(i4,4f8.2)') k, tauaer300(i,k,j), tauaer400(i,k,j), &
+                    tauaer600(i,k,j), tauaer999(i,k,j)
                call wrf_message(msg)
             end do
 
             call wrf_message("Diagnostics 2: k, gaer300, gaer400, gaer600, gaer999")
             do k=kts,kte
-               write(msg,'(i4,4f8.2)') k, gaer300(i,k,ib), gaer400(i,k,ib), &
-                    gaer600(i,k,ib), gaer999(i,k,ib)
+               write(msg,'(i4,4f8.2)') k, gaer300(i,k,j), gaer400(i,k,j), &
+                    gaer600(i,k,j), gaer999(i,k,j)
                call wrf_message(msg)
             end do
 
             call wrf_message("Diagnostics 3: k, waer300, waer400, waer600, waer999")
             do k=kts,kte
-               write(msg,'(i4,4f8.2)') k, waer300(i,k,ib), waer400(i,k,ib), &
-                    waer600(i,k,ib), waer999(i,k,ib)
+               write(msg,'(i4,4f8.2)') k, waer300(i,k,j), waer400(i,k,j), &
+                    waer600(i,k,j), waer999(i,k,j)
                call wrf_message(msg)
             end do
 
@@ -693,6 +701,9 @@ CONTAINS
         xxlat = XLAT(i,j) * degrad
         cosz(i) = sin(xxlat) * sin(declin) + &
                   cos(xxlat) * cos(declin) * cos(hrang)
+!urban
+       if(present(COSZ_URB2D)) COSZ_URB2D(i,j)=cosz(i)  !urban
+       if(present(OMG_URB2D)) OMG_URB2D(i,j)=hrang     !urban
         rsuvbm(i) = ALB(i,j)
         rsuvdf(i) = ALB(i,j)
         rsirbm(i) = ALB(i,j)

@@ -25,9 +25,14 @@
       USE MODULE_DIFFUSION_NMM,ONLY: HDIFF
       USE MODULE_BNDRY_COND,   ONLY: BOCOH, BOCOV
       USE MODULE_PHYSICS_INIT
-      USE MODULE_RA_GFDLETA
+!     USE MODULE_RA_GFDLETA
 !
       USE MODULE_EXT_INTERNAL
+!
+#ifdef WRF_CHEM
+   USE MODULE_AEROSOLS_SORGAM, ONLY: SUM_PM_SORGAM
+   USE MODULE_MOSAIC_DRIVER, ONLY: SUM_PM_MOSAIC
+#endif
 !
 !----------------------------------------------------------------------
 !
@@ -44,6 +49,10 @@
 !
       TYPE(GRID_CONFIG_REC_TYPE) :: CONFIG_FLAGS
 !
+#ifdef WRF_CHEM
+   REAL        RGASUNIV ! universal gas constant [ J/mol-K ]
+   PARAMETER ( RGASUNIV = 8.314510 )
+#endif
 !
 !***
 !***  LOCAL DATA
@@ -67,9 +76,10 @@
      &          ,LB,LLMH,LMHK,LMVK,LRECBC                               &
      &          ,N,NMAP,NRADLH,NRADSH,NREC,NS,RECL,STAT                 &
      &          ,STEPBL,STEPCU,STEPRA
+      INTEGER :: i_m
 !
       INTEGER :: ILPAD2,IRPAD2,JBPAD2,JTPAD2
-      INTEGER :: ITS,ITE,JTS,JTE,KTS,KTE
+      INTEGER :: ITS,ITE,JTS,JTE,KTS,KTE,KK,L
 !
       INTEGER,DIMENSION(3) :: LPTOP
 !
@@ -111,22 +121,22 @@
      &                                    ,RQCCUTEN,RQICUTEN,RQRCUTEN   &
      &                                    ,RQSCUTEN,RQVCUTEN,RTHCUTEN   &
      &                                    ,RTHRATEN                     &
-     &                                    ,RTHRATENLW,RTHRATENSW        &
-     &                                    ,TSLB
-      REAL,ALLOCATABLE,DIMENSION(:,:) :: EMISS,GLW,GSW,HFX              &
-     &                                  ,MAVAIL,NCA                     &
+     &                                    ,RTHRATENLW,RTHRATENSW
+      REAL,ALLOCATABLE,DIMENSION(:,:) :: EMISS,GLW,HFX                  &
+     &                                  ,NCA                            &
      &                                  ,QFX,RAINBL,RAINC,RAINNC        &
-     &                                  ,RAINCV,RAINNCV                 &
-     &                                  ,SNOWC,THC,TMN,TSFC             &
-     &                                  ,XLAND,XLAT,XLONG
+     &                                  ,RAINNCV                        &
+     &                                  ,SNOWC,THC,TMN,TSFC
 
       REAL,ALLOCATABLE,DIMENSION(:,:) :: Z0_DUM, ALBEDO_DUM
 !
-!!!   REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG,ZINT,ZMID
+      REAL,ALLOCATABLE,DIMENSION(:,:,:) :: ZINT,RRI,CONVFAC
+!     REAL,ALLOCATABLE,DIMENSION(:,:,:) :: ZMID
 #if 0
       REAL,ALLOCATABLE,DIMENSION(:,:,:) :: W0AVG
 #endif
       LOGICAL :: E_BDY,N_BDY,S_BDY,W_BDY,WARM_RAIN,ADV_MOIST_COND
+      LOGICAL :: START_OF_SIMULATION
       integer :: jam,retval
       character(20) :: seeout="hi08.t00z.nhbmeso"
       real :: dummyx(791)
@@ -186,7 +196,7 @@
      &                             ,config_flags)
 !
         RESTRT=config_flags%restart
-        write(0,*) 'set RESTRT to: ', RESTRT
+!       write(0,*) 'set RESTRT to: ', RESTRT
 
 #if 1
       IF(IME.GT. NMM_MAX_DIM )THEN
@@ -375,7 +385,7 @@
 !          Z0(I,J)    =SM(I,J)*Z0SEA+(1.-SM(I,J))*                      &
 !     &                (Z0(I,J)*Z0MAX+FISx    *FCM+Z0LAND)
 !!!  &                (prodx        +FISx    *FCM+Z0LAND)
-          QS(I,J)    =0.
+          QSH(I,J)   =0.
           AKMS(I,J)  =0.
           AKHS(I,J)  =0.
           TWBS(I,J)  =0.
@@ -406,15 +416,15 @@
           TSFCK=T(I,KOFF+1,J)
 	ENDIF
 
-	if (I .eq. IFE/2 .and. J .eq. JFE/2) then
-	write(6,*) 'I,J,T(I,KOFF+1,J),NMM_TSK(I,J):: ', I,J,T(I,KOFF+1,J),NMM_TSK(I,J)
-	write(6,*) 'THS(I,J): ', THS(I,J)
-	endif
+!	if (I .eq. IFE/2 .and. J .eq. JFE/2) then
+!	write(6,*) 'I,J,T(I,KOFF+1,J),NMM_TSK(I,J):: ', I,J,T(I,KOFF+1,J),NMM_TSK(I,J)
+!	write(6,*) 'THS(I,J): ', THS(I,J)
+!	endif
 
           PSFCK=PD(I,J)+PDTOP+PT
 !
           IF(SM(I,J).LT.0.5) THEN
-            QS(I,J)=PQ0/PSFCK*EXP(A2*(TSFCK-A3)/(TSFCK-A4))
+            QSH(I,J)=PQ0/PSFCK*EXP(A2*(TSFCK-A3)/(TSFCK-A4))
           ELSEIF(SM(I,J).GT.0.5) THEN
             THS(I,J)=SST(I,J)*(1.E5/(PD(I,J)+PDTOP+PT))**CAPA
           ENDIF
@@ -424,7 +434,7 @@
 !
           USTAR(I,J)=0.1
           THZ0(I,J)=THS(I,J)
-          QZ0(I,J)=QS(I,J)
+          QZ0(I,J)=QSH(I,J)
           UZ0(I,J)=0.
           VZ0(I,J)=0.
 ! 
@@ -502,7 +512,7 @@
           IF(SM(I,J).GT.0.5)THEN
             CLOGES =-CM1/SST(I,J)-CM2*ALOG10(SST(I,J))+CM3
             ESE    = 10.**(CLOGES+2.)
-            QS(I,J)= SM(I,J)*EPS*ESE/(PD(I,J)+PDTOP+PT-ESE*(1.-EPS))
+            QSH(I,J)= SM(I,J)*EPS*ESE/(PD(I,J)+PDTOP+PT-ESE*(1.-EPS))
           ENDIF
         ENDDO
         ENDDO
@@ -1091,10 +1101,13 @@
 !***
       IF(NSTART.EQ.0)THEN
 !
+         GRID%NSOIL= GRID%NUM_SOIL_LAYERS
         DO J=JFS,JFE
         DO I=IFS,IFE
           PCTSNO(I,J)=-999.0
           IF(SM(I,J).LT.0.5)THEN
+              CMC(I,J)=0.0
+!              CMC(I,J)=canwat(i,j)   ! tgs
             IF(SICE(I,J).GT.0.5)THEN
 !***
 !***  SEA-ICE CASE
@@ -1118,7 +1131,7 @@
             SMSTOT(I,J)=1.0
             SSROFF(I,J)=0.0
             BGROFF(I,J)=0.0
-            SOILTB(I,J)=273.16
+            SOILTB(I,J)=NMM_TSK(I,J)
             GRNFLX(I,J)=0.
             SUBSHX(I,J)=0.0
             ACSNOW(I,J)=0.0
@@ -1128,7 +1141,7 @@
             SNO(I,J)=0.0
             DO NS=1,GRID%NSOIL
               SMC(I,NS,J)=1.0
-              STC(I,NS,J)=273.16
+              STC(I,NS,J)=NMM_TSK(I,J)
 !             SH2O(I,NS,J)=0.05
               SH2O(I,NS,J)=1.0
             ENDDO
@@ -1255,7 +1268,7 @@
 !
         IF(.NOT.RESTRT)THEN
           TH10(I,J)=FAC2*THS(I,J)+FAC1*THLM
-          Q10(I,J)=FAC2*QS(I,J)+FAC1*QLM
+          Q10(I,J)=FAC2*QSH(I,J)+FAC1*QLM
           U10(I,J)=ULM
           V10(I,J)=VLM
         ENDIF
@@ -1279,8 +1292,8 @@
 
           TSHLTR(I,J)=FAC2*THS(I,J)+FAC1*THLM
 !          TSHLTR(I,J)=0.2*THS(I,J)+0.8*THLM
-          QSHLTR(I,J)=FAC2*QS(I,J)+FAC1*QLM
-!          QSHLTR(I,J)=0.2*QS(I,J)+0.8*QLM
+          QSHLTR(I,J)=FAC2*QSH(I,J)+FAC1*QLM
+!          QSHLTR(I,J)=0.2*QSH(I,J)+0.8*QLM
         ENDIF
 !***
 !***  NEED TO CONVERT TO THETA IF IS THE RESTART CASE
@@ -1450,15 +1463,13 @@
       ALLOCATE(SMID(KMS:KME),STAT=I)            ; SMID     = 0.
       ALLOCATE(EMISS(IMS:IME,JMS:JME),STAT=I)   ; EMISS    = 0.
       ALLOCATE(GLW(IMS:IME,JMS:JME),STAT=I)     ; GLW      = 0.
-      ALLOCATE(GSW(IMS:IME,JMS:JME),STAT=I)     ; GSW      = 0.
       ALLOCATE(HFX(IMS:IME,JMS:JME),STAT=I)     ; HFX      = 0.
       ALLOCATE(LOWLYR(IMS:IME,JMS:JME),STAT=I)  ; LOWLYR   = 0.
-      ALLOCATE(MAVAIL(IMS:IME,JMS:JME),STAT=I)  ; MAVAIL   = 0.
+!     ALLOCATE(MAVAIL(IMS:IME,JMS:JME),STAT=I)  ; MAVAIL   = 0.
       ALLOCATE(NCA(IMS:IME,JMS:JME),STAT=I)     ; NCA      = 0.
       ALLOCATE(QFX(IMS:IME,JMS:JME),STAT=I)     ; QFX      = 0.
       ALLOCATE(RAINBL(IMS:IME,JMS:JME),STAT=I)  ; RAINBL   = 0.
       ALLOCATE(RAINC(IMS:IME,JMS:JME),STAT=I)   ; RAINC    = 0.
-      ALLOCATE(RAINCV(IMS:IME,JMS:JME),STAT=I)  ; RAINCV   = 0.
       ALLOCATE(RAINNC(IMS:IME,JMS:JME),STAT=I)  ; RAINNC   = 0.
       ALLOCATE(RAINNCV(IMS:IME,JMS:JME),STAT=I) ; RAINNCV  = 0.
 
@@ -1467,9 +1478,6 @@
       ALLOCATE(THC(IMS:IME,JMS:JME),STAT=I)     ; THC      = 0.
       ALLOCATE(TMN(IMS:IME,JMS:JME),STAT=I)     ; TMN      = 0.
       ALLOCATE(TSFC(IMS:IME,JMS:JME),STAT=I)    ; TSFC     = 0.
-      ALLOCATE(XLAND(IMS:IME,JMS:JME),STAT=I)   ; XLAND    = 0.
-      ALLOCATE(XLAT(IMS:IME,JMS:JME),STAT=I)    ; XLAT     = 0.
-      ALLOCATE(XLONG(IMS:IME,JMS:JME),STAT=I)   ; XLONG    = 0.
       ALLOCATE(Z0_DUM(IMS:IME,JMS:JME),STAT=I)  ; Z0_DUM   = 0.
       ALLOCATE(ALBEDO_DUM(IMS:IME,JMS:JME),STAT=I)  ; ALBEDO_DUM   = 0.
 
@@ -1489,7 +1497,10 @@
       ALLOCATE(RTHRATEN(IMS:IME,KMS:KME,JMS:JME),STAT=I)    ; RTHRATEN  = 0.
       ALLOCATE(RTHRATENLW(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; RTHRATENLW = 0.
       ALLOCATE(RTHRATENSW(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; RTHRATENSW = 0.
-      ALLOCATE(TSLB(IMS:IME,KMS:KME,JMS:JME),STAT=I)        ; TSLB = 0.
+      ALLOCATE(RRI(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; RRI = 0.
+      ALLOCATE(ZINT(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; ZINT = 0.
+!     ALLOCATE(ZMID(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; ZMID = 0.
+      ALLOCATE(CONVFAC(IMS:IME,KMS:KME,JMS:JME),STAT=I)  ; CONVFAC = 0.
 #if 0
       ALLOCATE(W0AVG(IMS:IME,KMS:KME,JMS:JME),STAT=I)       ; W0AVG = 0.
 #endif
@@ -1505,7 +1516,7 @@
       DO J=MYJS,MYJE
       DO I=MYIS,MYIE
         SFCZ=FIS(I,J)*G_INV
-!!!!    ZINT(I,KTS,J)=SFCZ
+        ZINT(I,KTS,J)=SFCZ
         PDSL(I,J)=PD(I,J)*RES(I,J)
         PSURF=PINT(I,KTS,J)
         EXNSFC=(1.E5/PSURF)**CAPA
@@ -1514,14 +1525,15 @@
      &        +THS(I,J)*(2.-SM(I,J))
         TSFC(I,J)=THSIJ/EXNSFC
 !
-!        DO K=KTS,KTE-1
-!         PLYR=(PINT(I,K,J)+PINT(I,K+1,J))*0.5
-!         TL=T(I,K,J)
-!         CWML=CWM(I,K,J)
-!!!       ZINT(I,K+1,J)=ZINT(I,K,J)+TL/PLYR                             &
-!!!  &                  *(DETA1(K)*PDTOP+DETA2(K)*PDSL(I,J))*ROG        &
-!!!  &                  *(Q(I,K,J)*P608-CWML+1.)
-!        ENDDO
+        DO K=KTS,KTE-1
+          PLYR=(PINT(I,K,J)+PINT(I,K+1,J))*0.5
+          TL=T(I,K,J)
+          CWML=CWM(I,K,J)
+          rri(i,k,j)=r_d*tl*(1.+p608*q(i,k,j))/plyr
+          ZINT(I,K+1,J)=ZINT(I,K,J)+TL/PLYR                             & 
+                     *(DETA1(K)*PDTOP+DETA2(K)*PDSL(I,J))*ROG        & 
+                     *(Q(I,K,J)*P608-CWML+1.)
+        ENDDO
 !
 !        DO K=KTS,KTE
 !!!       ZMID(I,K,J)=0.5*(ZINT(I,K,J)+ZINT(I,K+1,J))
@@ -1588,10 +1600,18 @@
       num_ozmixm=1
       num_aerosolc=1
 
+! Set GMT, JULDAY, and JULYR outside of phy_init because it is no longer 
+! called inside phy_init due to moving nest changes.  (When nests move 
+! phy_init may not be called on a process if, for example, it is a moving 
+! nest and if this part of the domain is not being initialized (not the 
+! leading edge).)  Calling domain_setgmtetc() here will avoid this problem 
+! when NMM moves to moving nests.  
+      CALL domain_setgmtetc( GRID, START_OF_SIMULATION )
+
 ! Several arguments are RCONFIG entries in Registry.NMM. Registry no longer
 ! includes these as dummy arguments or declares them.  Access them from 
 ! GRID.  JM 20050819
-      CALL PHY_INIT(GRID,GRID%ID,CONFIG_FLAGS,GRID%DT,sfull,smid        &
+      CALL PHY_INIT(GRID%ID,CONFIG_FLAGS,GRID%DT,GRID%RESTART,sfull,smid&
      &             ,PT,TSFC,GRID%RADT,GRID%BLDT,GRID%CUDT,GRID%GSMDT    &
      &             ,RTHCUTEN, RQVCUTEN, RQRCUTEN                        &
      &             ,RQCCUTEN, RQSCUTEN, RQICUTEN                        &
@@ -1605,25 +1625,28 @@
      &             ,MASS_FLUX                                           &
      &             ,RTHFTEN, RQVFTEN                                    &
      &             ,CLDFRA,GLW,GSW,EMISS,LU_INDEX                       &
+     &             ,GRID%LANDUSE_ISICE, GRID%LANDUSE_LUCATS             &
+     &             ,GRID%LANDUSE_LUSEAS, GRID%LANDUSE_ISN               &
+     &             ,GRID%LU_STATE                                       &
      &             ,XLAT,XLONG,ALBEDO,ALBBCK                            &
      &             ,GRID%GMT,GRID%JULYR,GRID%JULDAY                     &
-     &             ,grid%levsiz, num_ozmixm, num_aerosolc, grid%paerlev &
+     &             ,GRID%LEVSIZ, NUM_OZMIXM, NUM_AEROSOLC, GRID%PAERLEV &
      &             ,TMN,XLAND,ZNT,Z0,USTAR,MOL,PBLH,TKE_MYJ             &
      &             ,EXCH_H,THC,SNOWC,MAVAIL,HFX,QFX,RAINBL              &
-     &             ,TSLB,ZS,DZS,GRID%num_soil_layers,warm_rain          &
-     &             ,adv_moist_cond                                      &
+     &             ,STC,ZS,DZS,GRID%NUM_SOIL_LAYERS,WARM_RAIN           &
+     &             ,ADV_MOIST_COND                                      &
      &             ,APR_GR,APR_W,APR_MC,APR_ST,APR_AS                   &
      &             ,APR_CAPMA,APR_CAPME,APR_CAPMI                       &
      &             ,XICE,VEGFRA,SNOW,CANWAT,SMSTAV                      &
      &             ,SMSTOT, SFCRUNOFF,UDRUNOFF,GRDFLX,ACSNOW            &
-     &             ,ACSNOM,IVGTYP,ISLTYP,SFCEVP,SMOIS                   &
+     &             ,ACSNOM,IVGTYP,ISLTYP,SFCEVP,SMC                     &
      &             ,SH2O, SNOWH, SMFR3D                                 &  ! temporary
      &             ,GRID%DX,GRID%DY,F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY    &
      &             ,MP_RESTART_STATE,TBPVS_STATE,TBPVS0_STATE           &
-     &             ,.TRUE.,.FALSE.                                      &
-     &             ,ids, ide, jds, jde, kds, kde                        &
-     &             ,ims, ime, jms, jme, kms, kme                        &
-     &             ,its, ite, jts, jte, kts, kte                        &
+     &             ,.TRUE.,.FALSE.,START_OF_SIMULATION                  &
+     &             ,IDS, IDE, JDS, JDE, KDS, KDE                        &
+     &             ,IMS, IME, JMS, JME, KMS, KME                        &
+     &             ,ITS, ITE, JTS, JTE, KTS, KTE                        &
      &                )
 
 !-----------------------------------------------------------------------
@@ -1631,6 +1654,81 @@
 !mp replace F*_PHY with values defined in module_initialize_real.F?
 
 	IF (.NOT. RESTRT) THEN
+! Added by Greg Thompson, NCAR-RAL, for initializing water vapor
+! mixing ratio (from NMM's specific humidity var) into moist array.
+
+        write(0,*) 'Initializng moist(:,:,:, Qv) from Q'
+        DO J=JFS,JFE
+        DO K=KPS,KPE
+        DO I=IFS,IFE
+           moist(I,K,J,P_QV) = Q(I,K,J) / (1.-Q(I,K,J))                 
+        enddo      
+        enddo      
+        enddo      
+     
+! Also sum cloud water, ice, rain, snow, graupel into Ferrier CWM       
+! array (if any hydrometeors found and non-zero from initialization     
+! package).  Then, determine fractions ice and rain from species.       
+     
+        IF (.not. (MAXVAL(CWM).gt.0. .and. MAXVAL(CWM).lt.1.) ) then    
+          do i_m = 2, num_moist
+          if (i_m.ne.p_qv) &
+     &       write(0,*) ' summing moist(:,:,:,',i_m,') into CWM array'  
+          DO J=JFS,JFE
+          DO K=KPS,KPE
+          DO I=IFS,IFE
+            IF ( (moist(I,K,J,i_m).gt.EPSQ) .and. (i_m.ne.p_qv) ) THEN  
+               CWM(I,K,J) = CWM(I,K,J) + moist(I,K,J,i_m)               
+            ENDIF  
+          enddo    
+          enddo
+          enddo
+          enddo
+
+          IF (.not. ( (maxval(F_ICE)+maxval(F_RAIN)) .gt. EPSQ) ) THEN
+            write(0,*) '  computing F_ICE'
+            do i_m = 2, num_moist
+            DO J=JFS,JFE
+            DO K=KPS,KPE
+            DO I=IFS,IFE
+              IF ( (moist(I,K,J,i_m).gt.EPSQ) .and. &
+     &               ( (i_m.eq.p_qi).or.(i_m.eq.p_qs).or.(i_m.eq.p_qg) ) ) THEN
+                 F_ICE(I,K,J) = F_ICE(I,K,J) + moist(I,K,J,i_m)
+              ENDIF
+        if (model_config_rec%mp_physics(grid%id).EQ.ETAMPNEW) then
+            if ((i_m.eq.p_qi).or.(i_m.eq.p_qg) ) then
+               moist(I,K,J,p_qs)=moist(I,K,J,p_qs)+moist(I,K,J,i_m)
+               moist(I,K,J,i_m) =0.
+            endif
+        endif
+            enddo
+            enddo
+            enddo
+            enddo
+            write(0,*) '  computing F_RAIN'
+            DO J=JFS,JFE
+            DO K=KPS,KPE
+            DO I=IFS,IFE
+          IF(F_ICE(i,k,j)<=EPSQ)THEN
+              F_ICE(I,K,J)=0.
+          ELSE
+              F_ICE(I,K,J) = F_ICE(I,K,J)/CWM(I,K,J)
+          ENDIF
+              IF ( (moist(I,K,J,p_qr)+moist(I,K,J,p_qc)).gt.EPSQ) THEN
+           IF(moist(i,k,j,p_qr)<=EPSQ)THEN
+              F_RAIN(I,K,J)=0.
+           ELSE
+              F_RAIN(I,K,J) = moist(i,k,j,p_qr) &
+     &                    / (moist(i,k,j,p_qr)+moist(i,k,j,p_qc))
+           ENDIF
+              ENDIF
+            enddo
+            enddo
+            enddo
+          ENDIF
+        ENDIF
+! End addition by Greg Thompson
+
         IF (maxval(F_ICE) .gt. 0.) THEN
         write(0,*) 'F_ICE > 0'
          do J=JMS,JME
@@ -1647,7 +1745,7 @@
          do J=JMS,JME
          do K=KMS,KME
          do I=IMS,IME
-          F_RAIN_PHY(I,K,J)=F_ICE(I,K,J)
+          F_RAIN_PHY(I,K,J)=F_RAIN(I,K,J)
          enddo
          enddo
          enddo
@@ -1690,21 +1788,76 @@
         CUPREC(I,J)=RAINCV(I,J)*1.E-3
       ENDDO
       ENDDO
+!following will need mods Sep06
 !
+#ifdef WRF_CHEM
+      do j=jts,jte
+        jj=min(jde-1,j)
+        do k=kts,kte-1
+          kk=min(kde-1,k)
+          do i=its,ite
+            ii=min(ide-1,i)
+            convfac(i,k,j) = pint(ii,kk,jj)/rgasuniv/t(ii,kk,jj)
+          enddo
+        enddo
+      enddo
+!
+         CALL chem_init (grid%id,chem,grid%dt,grid%bioemdt,grid%photdt,grid%chemdt, &
+               stepbioe,stepphot,stepchem,                           &
+               zint,g,aerwrf,config_flags,                           &
+               rri,t,pint,convfac,                                   &
+               tauaer1,tauaer2,tauaer3,tauaer4,                      &
+               gaer1,gaer2,gaer3,gaer4,                              &
+               waer1,waer2,waer3,waer4,                              &
+               pm2_5_dry,pm2_5_water,pm2_5_dry_ec,grid%chem_in_opt,  &
+               ids , ide , jds , jde , kds , kde ,                   &
+               ims , ime , jms , jme , kms , kme ,                   &
+               its , ite , jts , jte , kts , kte                     )
+!     
+! calculate initial pm
+!     
+        select case (config_flags%chem_opt)
+        case (RADM2SORG, RACMSORG,RACMSORG_KPP)
+           call sum_pm_sorgam (                                             &
+                rri, chem, h2oaj, h2oai,                                    &
+                pm2_5_dry, pm2_5_water, pm2_5_dry_ec, pm10,                 &
+                ids,ide, jds,jde, kds,kde,                                  &
+                ims,ime, jms,jme, kms,kme,                                  &
+                its,ite, jts,jte, kts,kte                                   )
+               
+        case (CBMZ_MOSAIC_AA, CBMZ_MOSAIC_BB)
+           call sum_pm_mosaic (                                             &
+                rri, chem,                                                  &
+                pm2_5_dry, pm2_5_water, pm2_5_dry_ec, pm10,                 &
+                ids,ide, jds,jde, kds,kde,                                  &
+                ims,ime, jms,jme, kms,kme,                                  &
+                its,ite, jts,jte, kts,kte                                   )
+               
+        case default
+           do j=jts,min(jte,jde-1)
+              do k=kts,min(kte,kde-1)
+                 do i=its,min(ite,ide-1)
+                    pm2_5_dry(i,k,j)    = 0.
+                    pm2_5_water(i,k,j)  = 0.
+                    pm2_5_dry_ec(i,k,j) = 0.
+                    pm10(i,k,j)         = 0.
+                 enddo
+              enddo
+           enddo
+        end select
+#endif
       DEALLOCATE(SFULL)
       DEALLOCATE(SMID)
       DEALLOCATE(DZS)
       DEALLOCATE(EMISS)
       DEALLOCATE(GLW)
-      DEALLOCATE(GSW)
       DEALLOCATE(HFX)
       DEALLOCATE(LOWLYR)
-      DEALLOCATE(MAVAIL)
+!     DEALLOCATE(MAVAIL)
       DEALLOCATE(NCA)
       DEALLOCATE(QFX)
       DEALLOCATE(RAINBL)
       DEALLOCATE(RAINC)
-      DEALLOCATE(RAINCV)
       DEALLOCATE(RAINNC)
       DEALLOCATE(RAINNCV)
       DEALLOCATE(RQCBLTEN)
@@ -1722,14 +1875,14 @@
       DEALLOCATE(RTHRATEN)
       DEALLOCATE(RTHRATENLW)
       DEALLOCATE(RTHRATENSW)
+      DEALLOCATE(ZINT)
+      DEALLOCATE(CONVFAC)
+      DEALLOCATE(RRI)
+!     DEALLOCATE(ZMID)
       DEALLOCATE(SNOWC)
       DEALLOCATE(THC)
       DEALLOCATE(TMN)
       DEALLOCATE(TSFC)
-      DEALLOCATE(TSLB)
-      DEALLOCATE(XLAND)
-      DEALLOCATE(XLAT)
-      DEALLOCATE(XLONG)
       DEALLOCATE(ZS)
 #if 0
       DEALLOCATE(W0AVG)
@@ -1903,6 +2056,7 @@
 #  include <HALO_NMM_INIT_13.inc>
 #  include <HALO_NMM_INIT_14.inc>
 #  include <HALO_NMM_INIT_15.inc>
+#  include <HALO_NMM_INIT_15B.inc>
 #  include <HALO_NMM_INIT_16.inc>
 #  include <HALO_NMM_INIT_17.inc>
 #  include <HALO_NMM_INIT_18.inc>

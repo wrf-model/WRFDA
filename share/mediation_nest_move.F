@@ -111,8 +111,8 @@ SUBROUTINE med_nest_move ( parent, nest )
 
    check_for_move: IF ( time_for_move ( parent , nest , dx, dy ) ) THEN
 
-     IF ( (dx .gt. 1 .and. dx .lt. -1 ) .or.  &
-          (dy .gt. 1 .and. dy .lt. -1 ) ) THEN
+     IF ( (dx .gt. 1 .or. dx .lt. -1 ) .or.  &
+          (dy .gt. 1 .or. dy .lt. -1 ) ) THEN
        WRITE(mess,*)' invalid move: dx, dy ', dx, dy
        CALL wrf_error_fatal( mess )
      ENDIF
@@ -871,7 +871,7 @@ LOGICAL FUNCTION should_not_move ( id )
   INTEGER, INTENT(IN) :: id
  ! Local
   LOGICAL retval
-  INTEGER cu_physics, ra_sw_physics, ra_lw_physics
+  INTEGER cu_physics, ra_sw_physics, ra_lw_physics, ucmcall, obs_nudge_opt
 
   retval = .FALSE.
 ! check for GD ensemble cumulus, which can not move
@@ -889,6 +889,18 @@ LOGICAL FUNCTION should_not_move ( id )
   CALL nl_get_ra_lw_physics( id , ra_lw_physics )
   IF ( ra_lw_physics .EQ. CAMLWSCHEME ) THEN
     CALL wrf_message('CAM LW radiation can not be specified with moving nests. Movement disabled.')
+    retval = .TRUE.
+  ENDIF
+! check for urban canopy Noah LSM, which can not move
+  CALL nl_get_ucmcall( id , ucmcall )
+  IF ( ucmcall .EQ. 1 ) THEN
+    CALL wrf_message('UCM Noah LSM can not be specified with moving nests. Movement disabled.')
+    retval = .TRUE.
+  ENDIF
+! check for observation nudging, which can not move
+  CALL nl_get_obs_nudge_opt( id , obs_nudge_opt )
+  IF ( obs_nudge_opt .EQ. 1 ) THEN
+    CALL wrf_message('Observation nudging can not be specified with moving nests. Movement disabled.')
     retval = .TRUE.
   ENDIF
   should_not_move = retval

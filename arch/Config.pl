@@ -7,6 +7,7 @@
 
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
+$sw_pnetcdf_path = "" ;
 $sw_phdf5_path=""; 
 $sw_jasperlib_path=""; 
 $sw_jasperinc_path=""; 
@@ -27,6 +28,10 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
   if ( substr( $ARGV[0], 1, 7 ) eq "netcdf=" )
   {
     $sw_netcdf_path = substr( $ARGV[0], 8 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 8 ) eq "pnetcdf=" )
+  {
+    $sw_pnetcdf_path = substr( $ARGV[0], 9 ) ;
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" )
   {
@@ -155,6 +160,7 @@ while ( <CONFIGURE_DEFAULTS> )
   {
     $_ =~ s/CONFIGURE_PERL_PATH/$sw_perl_path/g ;
     $_ =~ s/CONFIGURE_NETCDF_PATH/$sw_netcdf_path/g ;
+    $_ =~ s/CONFIGURE_PNETCDF_PATH/$sw_pnetcdf_path/g ;
     $_ =~ s/CONFIGURE_PHDF5_PATH/$sw_phdf5_path/g ;
     $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
     $_ =~ s/CONFIGURE_COMPILEFLAGS/$sw_compileflags/g ;
@@ -167,6 +173,17 @@ while ( <CONFIGURE_DEFAULTS> )
       { $_ =~ s/CONFIGURE_WRFIO_NF//g ;
 	$_ =~ s:CONFIGURE_NETCDF_FLAG::g ;
 	$_ =~ s:CONFIGURE_NETCDF_LIB_PATH::g ;
+	 }
+
+    if ( $sw_pnetcdf_path ) 
+      { $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
+	$_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF: ;
+	$_ =~ s:CONFIGURE_PNETCDF_LIB_PATH:-L../external/io_pnetcdf -lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+	 }
+    else                   
+      { $_ =~ s/CONFIGURE_WRFIO_PNF//g ;
+	$_ =~ s:CONFIGURE_PNETCDF_FLAG::g ;
+	$_ =~ s:CONFIGURE_PNETCDF_LIB_PATH::g ;
 	 }
 
     if ( $sw_phdf5_path ) 
@@ -276,6 +293,26 @@ open ARCH_POSTAMBLE, "< arch/postamble" or die "cannot open arch/postamble" ;
 while ( <ARCH_POSTAMBLE> ) { print CONFIGURE_WRF } ;
 close ARCH_POSTAMBLE ;
 close CONFIGURE_WRF ;
+
+# Die if attempting to configure with both RSL_LITE and a separately-installed ESMF library
+if ( $sw_esmflib_path && $sw_esmfinc_path )
+  {
+  my $RSL_LITE_plus_ESMF = "";
+  open CONFIGURE_WRF, "< configure.wrf" or die "cannot open configure.wrf for reading" ;
+  while ( <CONFIGURE_WRF> )
+    {
+    if ( $_ =~ /DRSL_LITE/ )
+      {
+      $RSL_LITE_plus_ESMF = "TRUE";
+      }
+    }
+  close CONFIGURE_WRF ;
+  if ( $RSL_LITE_plus_ESMF )
+    {
+    unlink("configure.wrf") ;
+    die "\nCONFIGURATION FAILED:  cannot use a separately-installed ESMF library with RSL_LITE.  Please reconfigure to use RSL instead.\n\n" ;
+    }
+  }
 
 printf "Configuration successful. To build the model type compile . \n" ;
 printf "------------------------------------------------------------------------\n" ;

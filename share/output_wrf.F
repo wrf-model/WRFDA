@@ -87,6 +87,19 @@
       CALL nl_get_io_form_auxinput4( 1, io_form )
     ELSE IF ( switch .EQ. aux_model_input5_only ) THEN
       CALL nl_get_io_form_auxinput5( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input6_only ) THEN
+      CALL nl_get_io_form_auxinput6( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input7_only ) THEN
+      CALL nl_get_io_form_auxinput7( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input8_only ) THEN
+      CALL nl_get_io_form_auxinput8( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input9_only ) THEN
+      CALL nl_get_io_form_auxinput9( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input10_only ) THEN
+      CALL nl_get_io_form_auxinput10( 1, io_form )
+    ELSE IF ( switch .EQ. aux_model_input11_only ) THEN
+      CALL nl_get_io_form_auxinput11( 1, io_form )
+
     ELSE IF ( switch .EQ. history_only ) THEN
       CALL nl_get_io_form_history( 1, io_form )
     ELSE IF ( switch .EQ. aux_hist1_only ) THEN
@@ -99,6 +112,19 @@
       CALL nl_get_io_form_auxhist4( 1, io_form )
     ELSE IF ( switch .EQ. aux_hist5_only ) THEN
       CALL nl_get_io_form_auxhist5( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist6_only ) THEN
+      CALL nl_get_io_form_auxhist6( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist7_only ) THEN
+      CALL nl_get_io_form_auxhist7( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist8_only ) THEN
+      CALL nl_get_io_form_auxhist8( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist9_only ) THEN
+      CALL nl_get_io_form_auxhist9( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist10_only ) THEN
+      CALL nl_get_io_form_auxhist10( 1, io_form )
+    ELSE IF ( switch .EQ. aux_hist11_only ) THEN
+      CALL nl_get_io_form_auxhist11( 1, io_form )
+
     ELSE IF ( switch .EQ. restart_only ) THEN
       CALL nl_get_io_form_restart( 1, io_form )
     ELSE IF ( switch .EQ. boundary_only ) THEN
@@ -179,12 +205,12 @@
     IF ( switch .EQ. model_input_only) THEN
        CALL wrf_put_dom_ti_char ( fid , 'SIMULATION_START_DATE', TRIM(start_date) , ierr )
     ELSE IF ( ( switch .EQ. restart_only ) .OR. ( switch .EQ. history_only ) ) THEN
-       CALL nl_get_simulation_start_year   ( grid%id, simulation_start_year   )
-       CALL nl_get_simulation_start_month  ( grid%id, simulation_start_month  )
-       CALL nl_get_simulation_start_day    ( grid%id, simulation_start_day    )
-       CALL nl_get_simulation_start_hour   ( grid%id, simulation_start_hour   )
-       CALL nl_get_simulation_start_minute ( grid%id, simulation_start_minute )
-       CALL nl_get_simulation_start_second ( grid%id, simulation_start_second )
+       CALL nl_get_simulation_start_year   ( 1, simulation_start_year   )
+       CALL nl_get_simulation_start_month  ( 1, simulation_start_month  )
+       CALL nl_get_simulation_start_day    ( 1, simulation_start_day    )
+       CALL nl_get_simulation_start_hour   ( 1, simulation_start_hour   )
+       CALL nl_get_simulation_start_minute ( 1, simulation_start_minute )
+       CALL nl_get_simulation_start_second ( 1, simulation_start_second )
        WRITE ( simulation_start_date , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2)' ) &
                simulation_start_year,simulation_start_month,simulation_start_day,&
                simulation_start_hour,simulation_start_minute,simulation_start_second
@@ -376,12 +402,30 @@
     ELSE IF ( switch .EQ. aux_model_input5_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput5out.inc' )
       CALL wrf_auxinput5out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input6_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput6out.inc' )
+      CALL wrf_auxinput6out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input7_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput7out.inc' )
+      CALL wrf_auxinput7out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input8_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput8out.inc' )
+      CALL wrf_auxinput8out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input9_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput9out.inc' )
+      CALL wrf_auxinput9out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input10_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput10out.inc' )
+      CALL wrf_auxinput10out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_model_input11_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput11out.inc' )
+      CALL wrf_auxinput11out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. history_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_histout.inc' )
       IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( HISTORY_ALARM ), currentTime, startTime, current_date )
       CALL wrf_histout( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist1_only ) THEN
-      CALL wrf_debug ( 300 , 'output_wrf: calling wrf_auxhist1out' )
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist1out' )
       IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST1_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist1out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist2_only ) THEN
@@ -393,13 +437,37 @@
       IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST3_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist3out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist4_only ) THEN
-      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist1out.inc' )
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist4out.inc' )
       IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST4_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist4out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. aux_hist5_only ) THEN
-      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist4out.inc' )
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist5out.inc' )
       IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST5_ALARM ), currentTime, startTime, current_date )
       CALL wrf_auxhist5out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist6_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist6out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST6_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist6out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist7_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist7out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST7_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist7out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist8_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist8out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST8_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist8out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist9_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist9out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST9_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist9out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist10_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist10out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST10_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist10out( fid , grid , config_flags, switch, dryrun,  ierr )
+    ELSE IF ( switch .EQ. aux_hist11_only ) THEN
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist11out.inc' )
+      IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXHIST11_ALARM ), currentTime, startTime, current_date )
+      CALL wrf_auxhist11out( fid , grid , config_flags, switch, dryrun,  ierr )
     ELSE IF ( switch .EQ. restart_only ) THEN
       CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_restartout.inc' )
       CALL wrf_restartout( fid , grid , config_flags, switch, dryrun,  ierr )

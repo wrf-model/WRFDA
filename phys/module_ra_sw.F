@@ -17,7 +17,8 @@ CONTAINS
                     RADFRQ,ICLOUD,DEGRAD,warm_rain,               &
                     ids,ide, jds,jde, kds,kde,                    & 
                     ims,ime, jms,jme, kms,kme,                    &
-                    its,ite, jts,jte, kts,kte                     &
+                    its,ite, jts,jte, kts,kte,                    &
+                    cosz_urb2d,omg_urb2d                          & !Optional urban
                     )
 !------------------------------------------------------------------
    IMPLICIT NONE
@@ -89,6 +90,9 @@ CONTAINS
                                                             QG1D
 !
    REAL::      XLAT0,XLONG0,ALB0,GSW0
+
+   REAL, OPTIONAL, DIMENSION( ims:ime, jms:jme), INTENT(OUT) :: COSZ_URB2D, OMG_URB2D !Optional urban
+   REAL :: COSZ, OMG   !urban
 !
    INTEGER :: i,j,K,NK
    LOGICAL :: predicate
@@ -215,8 +219,14 @@ CONTAINS
                      T1D,QV1D,QC1D,QR1D,QI1D,QS1D,QG1D,P1D,      &
                      XTIME,GMT,RHO01D,DZ,                        &
                      R,CP,G,DECLIN,SOLCON,                       &
+                     COSZ, OMG,                                  & !urban
                      RADFRQ,ICLOUD,DEGRAD,aer_dry1,aer_water1,   &
                      kts,kte                                     )
+
+       IF (PRESENT(COSZ_URB2D) .AND.  PRESENT(OMG_URB2D)) THEN   
+         COSZ_URB2D(I,J)=COSZ !urban
+         OMG_URB2D(I,J)=OMG !urban
+       ENDIF
 
          GSW(I,J)=GSW0
          DO K=kts,kte          
@@ -234,6 +244,7 @@ CONTAINS
                      T,QV,QC,QR,QI,QS,QG,P,            		  &
                      XTIME, GMT, RHO0, DZ,             		  &
                      R,CP,G,DECLIN,SOLCON,             		  &
+                     COSZ, OMG,                                   & !urban
                      RADFRQ,ICLOUD,DEGRAD,aer_dry1,aer_water1,    &
                      kts,kte                            	  )
 !------------------------------------------------------------------
@@ -285,6 +296,9 @@ CONTAINS
 
    REAL, DIMENSION( 4    ) ::                             XMUVAL
 
+   REAL, INTENT(OUT)    ::                                  COSZ   !urban
+   REAL, INTENT(OUT)    ::                                  OMG    !urban
+
    REAL :: beta
 
 !------------------------------------------------------------------
@@ -319,6 +333,9 @@ CONTAINS
       HRANG=15.*(TLOCTM-12.)*DEGRAD
       XXLAT=XLAT*DEGRAD
       CSZA=SIN(XXLAT)*SIN(DECLIN)+COS(XXLAT)*COS(DECLIN)*COS(HRANG)
+
+      COSZ = CSZA  !urban
+      OMG  = HRANG !urban
 
 !     RETURN IF NIGHT
       IF(CSZA.LE.1.E-9)GOTO 7
@@ -448,7 +465,7 @@ CONTAINS
    END SUBROUTINE SWPARA
 
 !====================================================================
-   SUBROUTINE swinit(RTHRATEN,RTHRATENSW,swrad_scat,restart,        &
+   SUBROUTINE swinit(swrad_scat,                                    &
                      allowed_to_read ,                              &
                      ids, ide, jds, jde, kds, kde,                  &
                      ims, ime, jms, jme, kms, kme,                  &
@@ -456,37 +473,16 @@ CONTAINS
 !--------------------------------------------------------------------
    IMPLICIT NONE
 !--------------------------------------------------------------------
-   LOGICAL , INTENT(IN)           :: restart
    LOGICAL , INTENT(IN)           :: allowed_to_read 
    INTEGER , INTENT(IN)           :: ids, ide, jds, jde, kds, kde,  &
                                      ims, ime, jms, jme, kms, kme,  &
                                      its, ite, jts, jte, kts, kte
 
-   REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(INOUT) ::        &
-                                                          RTHRATEN, &
-                                                        RTHRATENSW
    REAL , INTENT(IN)              :: swrad_scat
-   INTEGER :: i, j, k, itf, jtf, ktf
-
-   jtf=min0(jte,jde-1)
-   ktf=min0(kte,kde-1)
-   itf=min0(ite,ide-1)
 
 !     CSSCA - CLEAR-SKY SCATTERING SET FROM NAMELIST SWRAD_SCAT
    cssca = swrad_scat * 1.e-5
 
-   IF(.not.restart)THEN
-     DO j=jts,jtf
-     DO k=kts,ktf
-     DO i=its,itf
-        RTHRATEN(i,k,j)=0.
-        RTHRATENSW(i,k,j)=0.
-     ENDDO
-     ENDDO
-     ENDDO
-   ENDIF
-
    END SUBROUTINE swinit
-
 
 END MODULE module_ra_sw

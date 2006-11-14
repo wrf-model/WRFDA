@@ -32,6 +32,7 @@
 #BSUB -J reg.test                       # job name
 #BSUB -q premium                        # queue
 #BSUB -W 6:00                           # wallclock time
+#BSUB -P 64000400
 
 # QSUB -q ded_4             # submit to 4 proc
 # QSUB -l mpp_p=4           # request 4 processors
@@ -233,6 +234,11 @@ else if ( $NESTED == TRUE ) then
 	exit ( 1 ) 
 endif
 
+#	We can choose to do grid and obs nudging tests.
+
+set FDDA = TRUE
+set FDDA = FALSE
+
 #	The default floating point precision is either 4 bytes or 8 bytes.
 #	We assume that it is 4 (or the default for the architecture) unless 
 #	REAL8 is set to TRUE.
@@ -307,10 +313,10 @@ set thedatanmm = $WRFREGDATANMM
 set RSL_LITE = TRUE
 set RSL_LITE = FALSE
 
-set COMBO_NEST_RSL_LITE = TRUE
-set COMBO_NEST_RSL_LITE = FALSE
+set COMBO_NEST_RSL__LITE = TRUE
+set COMBO_NEST_RSL__LITE = FALSE
 
-if ( $COMBO_NEST_RSL_LITE == TRUE ) then
+if ( $COMBO_NEST_RSL__LITE == TRUE ) then
 	set NESTED = TRUE
 	set RSL_LITE = TRUE
 endif
@@ -440,6 +446,9 @@ else if ( ( $NESTED != TRUE ) && ( $RSL_LITE != TRUE ) ) then
 	if ( $IO_FORM_NAME[$IO_FORM] == io_grib1 ) then
 		set CORES = ( em_real em_b_wave em_quarter_ss )
 	endif
+	if ( $FDDA == TRUE ) then
+		set CORES = ( em_real )
+	endif
 else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
 	set CORES = ( em_real em_quarter_ss nmm_real )
 	if ( $CHEM == TRUE ) then
@@ -449,6 +458,9 @@ else if ( ( $NESTED != TRUE ) && ( $RSL_LITE == TRUE ) ) then
 		set CORES = ( em_real )
 	endif
 	if ( $IO_FORM_NAME[$IO_FORM] == io_grib1 ) then
+		set CORES = ( em_real )
+	endif
+	if ( $FDDA == TRUE ) then
 		set CORES = ( em_real )
 	endif
 endif
@@ -464,7 +476,11 @@ if      ( $REAL8 == TRUE ) then
 	set CORES = ( em_real em_quarter_ss )
 endif
 
-if ( $CHEM != TRUE ) then
+if      ( ( $CHEM != TRUE ) && ( $FDDA != TRUE ) && ( $NESTED != TRUE ) ) then
+	set PHYSOPTS =	( 1 2 3 4 )
+else if ( ( $CHEM != TRUE ) && ( $FDDA != TRUE ) && ( $NESTED == TRUE ) ) then
+	set PHYSOPTS =	( 1 2 3 )
+else if ( ( $CHEM != TRUE ) && ( $FDDA == TRUE ) ) then
 	set PHYSOPTS =	( 1 2 3 )
 else if ( $CHEM == TRUE ) then
 	set PHYSOPTS =	( 1 2 3 4 5 6 )
@@ -629,6 +645,24 @@ cat >! phys_real_1  << EOF
  ensdim                              = 144,
 EOF
 
+cat >! dyn_real_SAFE  << EOF
+ pd_moist                            = .false., .false., .false.,
+ pd_scalar                           = .false., .false., .false.,
+ pd_chem                             = .false., .false., .false.,
+ pd_tke                              = .false., .false., .false.,
+EOF
+
+cat >! dyn_real_1  << EOF
+ pd_moist                            = .true.,  .true.,  .false.,
+ pd_scalar                           = .false., .false., .false.,
+ pd_chem                             = .false., .false., .false.,
+ pd_tke                              = .false., .false., .false.,
+EOF
+
+cat >! time_real_1  << EOF
+ auxinput1_inname                    = "met_em.d<domain>.<date>"
+EOF
+
 cat >! phys_real_2 << EOF
  mp_physics                          = 4,     4,     4,
  ra_lw_physics                       = 1,     1,     1,
@@ -653,6 +687,17 @@ cat >! phys_real_2 << EOF
  ensdim                              = 144,
 EOF
 
+cat >! dyn_real_2  << EOF
+ pd_moist                            = .true.,  .true.,  .false.,
+ pd_scalar                           = .false., .false., .false.,
+ pd_chem                             = .false., .false., .false.,
+ pd_tke                              = .false., .false., .false.,
+EOF
+
+cat >! time_real_2  << EOF
+ auxinput1_inname                    = "wrf_real_input_em.d<domain>.<date>"
+EOF
+
 cat >! phys_real_3 << EOF
  mp_physics                          = 5,     5,     5,
  ra_lw_physics                       = 1,     1,     1,
@@ -675,6 +720,155 @@ cat >! phys_real_3 << EOF
  maxens2                             = 3,
  maxens3                             = 16,
  ensdim                              = 144,
+EOF
+
+cat >! dyn_real_3  << EOF
+ pd_moist                            = .false., .false., .false.,
+ pd_scalar                           = .false., .false., .false.,
+ pd_chem                             = .false., .false., .false.,
+ pd_tke                              = .false., .false., .false.,
+EOF
+
+cat >! time_real_3  << EOF
+ auxinput1_inname                    = "met_em.d<domain>.<date>"
+EOF
+
+cat >! phys_real_4 << EOF
+ mp_physics                          = 4,     4,     4,
+ ra_lw_physics                       = 1,     1,     1,
+ ra_sw_physics                       = 2,     2,     2,
+ radt                                = 30,    30,    30,
+ sf_sfclay_physics                   = 2,     2,     2,
+ sf_surface_physics                  = 2,     2,     2,
+ bl_pbl_physics                      = 2,     2,     2,
+ bldt                                = 0,     0,     0,
+ cu_physics                          = 2,     2,     0,
+ cudt                                = 5,     5,     5,
+ isfflx                              = 1,
+ ifsnow                              = 0,
+ icloud                              = 1,
+ ucmcall                             = 1,
+ surface_input_source                = 1,
+ num_soil_layers                     = 4,
+ mp_zero_out                         = 0,
+ maxiens                             = 1,
+ maxens                              = 3,
+ maxens2                             = 3,
+ maxens3                             = 16,
+ ensdim                              = 144,
+EOF
+
+cat >! dyn_real_4  << EOF
+ pd_moist                            = .false., .false., .false.,
+ pd_scalar                           = .false., .false., .false.,
+ pd_chem                             = .false., .false., .false.,
+ pd_tke                              = .false., .false., .false.,
+EOF
+
+cat >! time_real_4  << EOF
+ auxinput1_inname                    = "wrf_real_input_em.d<domain>.<date>"
+EOF
+
+cat >! fdda_real_1 << EOF
+ grid_fdda                           = 1,     1,     1,
+ fgdt                                = 0,     0,     0,
+ if_no_pbl_nudging_uv                = 0,     0,     1,
+ if_no_pbl_nudging_t                 = 0,     0,     1,
+ if_no_pbl_nudging_q                 = 0,     0,     1,
+ if_zfac_uv                          = 0,     0,     1,
+  k_zfac_uv                          = 10,   10,     1,
+ if_zfac_t                           = 0,     0,     1,
+  k_zfac_t                           = 10,   10,     1,
+ if_zfac_q                           = 0,     0,     1,
+  k_zfac_q                           = 10,   10,     1,
+ guv                                 = 0.0003,     0.0003,     0.0003,
+ gt                                  = 0.0003,     0.0003,     0.0003,
+ gq                                  = 0.0003,     0.0003,     0.0003,
+ if_ramping                          = 0,
+ dtramp_min                          = 120.0,
+EOF
+
+cat >! fdda_real_time_1 << EOF
+ auxinput10_inname                   = "wrffdda_d<domain>"
+ auxinput10_interval                 = 360
+ auxinput10_end_h                    = 6
+ io_form_auxinput10                  = 2
+EOF
+
+cat >! fdda_real_2 << EOF
+ obs_nudge_opt                       = 1,1,1,1,1
+ max_obs                             = 150000,
+ nobs_ndg_vars                       = 5,
+ nobs_err_flds                       = 9,
+ obs_nudge_wind                      = 1,1,1,1,1
+ obs_coef_wind                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_nudge_temp                      = 1,1,1,1,1
+ obs_coef_temp                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_nudge_mois                      = 1,1,1,1,1
+ obs_coef_mois                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_rinxy                           = 240.,240.,180.,180,180
+ obs_rinsig                          = 0.1,
+ obs_twindo                          = 40.
+ obs_npfi                            = 10,
+ obs_ionf                            = 2,
+ obs_idynin                          = 0,
+ obs_dtramp                          = 40.,
+ obs_ipf_errob                       = .true.
+ obs_ipf_nudob                       = .true.
+ obs_ipf_in4dob                      = .true.
+EOF
+
+cat >! fdda_real_time_2 << EOF
+ auxinput11_interval_s               = 180
+ auxinput11_end_h                    = 6
+EOF
+
+cat >! fdda_real_3 << EOF
+ grid_fdda                           = 1,     1,     1,
+ fgdt                                = 0,     0,     0,
+ if_no_pbl_nudging_uv                = 0,     0,     1,
+ if_no_pbl_nudging_t                 = 0,     0,     1,
+ if_no_pbl_nudging_q                 = 0,     0,     1,
+ if_zfac_uv                          = 0,     0,     1,
+  k_zfac_uv                          = 10,   10,     1,
+ if_zfac_t                           = 0,     0,     1,
+  k_zfac_t                           = 10,   10,     1,
+ if_zfac_q                           = 0,     0,     1,
+  k_zfac_q                           = 10,   10,     1,
+ guv                                 = 0.0003,     0.0003,     0.0003,
+ gt                                  = 0.0003,     0.0003,     0.0003,
+ gq                                  = 0.0003,     0.0003,     0.0003,
+ if_ramping                          = 0,
+ dtramp_min                          = 120.0,
+ obs_nudge_opt                       = 1,1,1,1,1
+ max_obs                             = 150000,
+ nobs_ndg_vars                       = 5,
+ nobs_err_flds                       = 9,
+ obs_nudge_wind                      = 1,1,1,1,1
+ obs_coef_wind                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_nudge_temp                      = 1,1,1,1,1
+ obs_coef_temp                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_nudge_mois                      = 1,1,1,1,1
+ obs_coef_mois                       = 6.E-4,6.E-4,6.E-4,6.E-4,6.E-4
+ obs_rinxy                           = 240.,240.,180.,180,180
+ obs_rinsig                          = 0.1,
+ obs_twindo                          = 40.
+ obs_npfi                            = 10,
+ obs_ionf                            = 2,
+ obs_idynin                          = 0,
+ obs_dtramp                          = 40.,
+ obs_ipf_errob                       = .true.
+ obs_ipf_nudob                       = .true.
+ obs_ipf_in4dob                      = .true.
+EOF
+
+cat >! fdda_real_time_3 << EOF
+ auxinput10_inname                   = "wrffdda_d<domain>"
+ auxinput10_interval                 = 360
+ auxinput10_end_h                    = 6
+ io_form_auxinput10                  = 2
+ auxinput11_interval_s               = 180
+ auxinput11_end_h                    = 6
 EOF
 
 #	Tested options for ideal case em_b_wave.  Modifying these
@@ -1364,6 +1558,10 @@ if ( $QUILT == TRUE ) then
 	echo "One WRF output quilt server will be used for some tests" >>! ${DEF_DIR}/wrftest.output
 	echo " " >>! ${DEF_DIR}/wrftest.output
 endif
+if ( $FDDA == TRUE ) then
+	echo "Running FDDA tests" >>! ${DEF_DIR}/wrftest.output
+	echo " " >>! ${DEF_DIR}/wrftest.output
+endif
 if ( $GENERATE_BASELINE != FALSE ) then
 	echo "WRF output will be archived in baseline directory ${GENERATE_BASELINE} for some tests" >>! \
 	     ${DEF_DIR}/wrftest.output
@@ -1528,10 +1726,10 @@ banner 7
 		if ( $REG_TYPE == BIT4BIT ) then
 			if ( `uname` == AIX ) then
 				if ( ( $compopt == $COMPOPTS[1] ) || ( $compopt == $COMPOPTS[3] ) ) then
-					sed -e '/^OMP/d' -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/-g -O0 /g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+					sed -e '/^OMP/d' -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/-O0 /g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
 				else
 					sed -e '/^OMP/s/noauto/noauto:noopt/' \
-					    -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/-g -O0 /g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
+					    -e '/^FCOPTIM/d' -e '/^FCDEBUG/s/#/-O0 /g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
 				endif
 				sed -e 's/-lmassv//g'  -e 's/-lmass//g'  -e 's/-DNATIVE_MASSV//g' -e '/^FCBASEOPTS/s/#//g' ./configure.wrf >! foo ; /bin/mv foo configure.wrf
 			else if ( `uname` == Linux ) then
@@ -1700,7 +1898,22 @@ banner 12
 
 				if ( $CHEM != TRUE ) then
 					cp ${CUR_DIR}/phys_real_${phys_option} phys_opt
+					if ( ( $RSL_LITE == TRUE ) && ( $NESTED != TRUE ) ) then
+						cp ${CUR_DIR}/dyn_real_${phys_option} dyn_opt
+					else
+						cp ${CUR_DIR}/dyn_real_SAFE dyn_opt
+					endif
+					cp ${CUR_DIR}/time_real_${phys_option} time_opt
 					cp ${CUR_DIR}/dom_real dom_real
+					if ( -e fdda_opt ) rm fdda_opt
+					cat " grid_fdda=0" > fdda_opt
+					if ( -e fdda_time ) rm fdda_time
+					cat " auxinput4_interval=0" > fdda_time
+
+					if ( $FDDA == TRUE ) then
+						cp ${CUR_DIR}/fdda_real_${phys_option} fdda_opt
+						cp ${CUR_DIR}/fdda_real_time_${phys_option} fdda_time
+					endif
 	
 					set time_step = `awk ' /^ time_step /{ print $3 } ' namelist.input.$dataset | cut -d, -f1`
 	
@@ -1726,12 +1939,16 @@ EOF
 	
 					cp ${CUR_DIR}/io_format io_format
 					sed -e '/^ mp_physics/,/ensdim/d' -e '/^ &physics/r ./phys_opt' \
+					    -e '/^ pd_moist/,/pd_tke/d' -e '/^ v_sca_adv_order/r ./dyn_opt' \
+					    -e '/^ auxinput1_inname/d' -e '/^ debug_level/r ./time_opt' \
 					    -e '/^ time_step /,/^ smooth_option/d' -e '/^ &domains/r ./dom_real' \
 					    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format' \
 					    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 200/g' \
 					    -e 's/ run_days *= [0-9][0-9]*/ run_days = 0/g' \
 					    -e 's/ run_hours *= [0-9][0-9]*/ run_hours = 0/g' \
 					    -e 's/ run_minutes *= [0-9][0-9]*/ run_minutes = 0/g' \
+					    -e '/^ &fdda/r fdda_opt' \
+					    -e '/^ debug_level/r fdda_time' \
 					namelist.input.temp >! namelist.input
 				
 				#	The chem run has its own namelist, due to special input files (io_form not tested for chem)
@@ -2050,6 +2267,25 @@ echo running nmm on $n procs
 banner 21
 #set ans = "$<"
 #DAVE###################################################
+
+				if      ( ( $n != 1 ) && ( $QUILT != TRUE ) ) then
+					@ nmm_proc = $Num_Procs
+					cat >! nproc_xy << EOF
+ nproc_x = $nmm_proc
+ nproc_y = 1
+EOF
+					sed -e '/^ numtiles/r nproc_xy' namelist.input >! file.foo
+					mv file.foo namelist.input
+				else if ( ( $n != 1 ) && ( $QUILT == TRUE ) ) then
+					@ nmm_proc = $Num_Procs - 1
+					cat >! nproc_xy << EOF
+ nproc_x = $nmm_proc
+ nproc_y = 1
+EOF
+					sed -e '/^ numtiles/r nproc_xy' namelist.input >! file.foo
+					mv file.foo namelist.input
+				endif
+
 				if ( `uname` == AIX ) then
 					set RUNCOMMAND = $MPIRUNCOMMAND
 				else

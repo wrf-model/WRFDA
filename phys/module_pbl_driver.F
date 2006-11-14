@@ -495,11 +495,12 @@ CONTAINS
            IF ( PRESENT( qv_curr )  .AND. PRESENT( qc_curr )  .AND. &
                 PRESENT( rqvblten ) .AND. PRESENT( rqcblten ) .AND. &
                                                         .TRUE.  ) THEN
+
              CALL wrf_debug(100,'in MYJPBL')
              CALL myjpbl(                                           &
                DT=dt,STEPBL=stepbl,HT=ht,DZ=dz8w                    &
               ,PMID=p_phy,PINT=p8w,TH=th_phy,T=t_phy,EXNER=pi_phy   &
-              ,QV=qv_curr, CWM=qc_curr                              &
+              ,QV=qv_curr, CWM=qc_curr                               &
               ,U=u_phy,V=v_phy,RHO=rho                              &
               ,TSK=tsk,QSFC=qsfc,CHKLOWQ=chklowq,THZ0=thz0          &
               ,QZ0=qz0,UZ0=uz0,VZ0=vz0                              &
