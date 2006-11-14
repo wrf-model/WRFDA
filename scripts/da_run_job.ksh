@@ -23,6 +23,7 @@ export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LL_WALL_CLOCK_LIMIT=${LL_WALL_CLOCK_LIMIT:-01:30:00}
 export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
+export LL_PTILE=${LL_PTILE:-8}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -67,6 +68,7 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
    -o $HOSTNAME = "bv1103en.ucar.edu" \
    -o $HOSTNAME = "bv1203en.ucar.edu" ; then 
    # lightning and bluesky use lsf
+
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -80,6 +82,7 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
 #BSUB -e $EXPT.err               
 #BSUB -q $QUEUE 
 #BSUB -W $LSF_MAX_RUNTIME
+#BSUB -R "span[ptile=$LL_PTILE]"
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
