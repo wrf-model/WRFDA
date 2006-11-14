@@ -33,6 +33,7 @@ if ( ! $?SRC_DIR )          setenv SRC_DIR ${HOME}/code_development/WRF_V2.1 # C
 if ( ! $?WRFSI_DIR )        setenv WRFSI_DIR ${SRC_DIR}/wrfsi
 if ( ! $?SOURCE_ROOT )      setenv SOURCE_ROOT ${WRFSI_DIR}
 if ( ! $?INSTALLROOT )      setenv INSTALLROOT ${SOURCE_ROOT}             # Where SI binaries created.
+
 if ( ! $?GEOG_DATAROOT )    setenv GEOG_DATAROOT /data2/powers/wrfsi/extdata/GEOG # Where case directories reside.
 if ( ! $?EXT_DATAROOT )     setenv EXT_DATAROOT ${INSTALLROOT}/extdata    # GRIB files processed in grib_prep here.
 if ( ! $?DATAROOT )         setenv DATAROOT ${INSTALLROOT}/domains

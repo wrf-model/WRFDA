@@ -39,12 +39,12 @@
 #########################################################################
 
 #setenv RUN_RESTORE_DATA .TRUE.
-setenv RUN_SI .TRUE.
-setenv RUN_REAL .TRUE.
+#setenv RUN_SI .TRUE.
+#setenv RUN_REAL .TRUE.
 #setenv RUN_OBSPROC .TRUE.
-#setenv RUN_VAR .TRUE.
+setenv RUN_VAR .TRUE.
 #setenv RUN_WRF_BC .TRUE.
-setenv RUN_WRF .TRUE.
+#setenv RUN_WRF .TRUE.
 #setenv CYCLING .TRUE.
 
 #########################################################################
@@ -52,32 +52,32 @@ setenv RUN_WRF .TRUE.
 #########################################################################
 
 #source ~/.cshrc
-setenv NETCDF /usr/local/netcdf-3.5.0-pgi
+#setenv NETCDF /usr/local/netcdf-3.5.0-pgi
 #setenv MPICH /snowdrift/users/bray/mpich/mpich-1.2.7p1_pgi
 #setenv PATH $MPICH/bin:$PATH
 
 #Disks, directories:
-setenv DATA_DISK /data3
-setenv DAT_DIR /snowdrift/users/dmbarker/data
-setenv AVN_DIR /data3/dmbarker/data/ncep
-setenv SRC_DIR /data1/dmbarker/code/WRF_V2.1
+setenv DATA_DISK /ocotillo1
+setenv SRC_DIR ${DATA_DISK}/dmbarker/code/WRF_V2.1
 setenv WRF_DIR ${SRC_DIR}/WRFV2.1.2
-setenv WRFVAR_DIR /data1/dmbarker/code/branches/wrfvar.RB_V21
+setenv WRFVAR_DIR ${DATA_DISK}/dmbarker/code/branches/wrfvar.rb_v21
 
 #setenv WRF_BC_DIR /ocotillo1/caya/WRF_BC/src
 #setenv OBS_DIR /ocotillo1/caya/data/conus200 # Alain's "unclean" obs!
 #setenv OBS_DIR /ocotillo1/dmbarker/data/con200/get_obs # Cleaned obs.
 
 #Job details:
-setenv EXPT noda.v21
-#setenv NUM_PROCS 8 
-#setenv START_DATE 2003010100
-#setenv FINAL_DATE 2003010100
+setenv EXPT cs1.v21
+setenv NUM_PROCS 8 
+setenv START_DATE 2003010112
+setenv FINAL_DATE 2003010112
 setenv FCST_RANGE_OUT 24
 
 #WRF SI:
-setenv GEOG_DATAROOT /data2/powers/wrfsi_211/extdata/GEOG
-setenv DATAROOT /data3/dmbarker/data/wrfsi/domains
+#smoke: setenv GEOG_DATAROOT /data2/powers/wrfsi_211/extdata/GEOG
+#smoke: setenv DATAROOT /data1/dmbarker/data/wrfsi/domains
+setenv GEOG_DATAROOT /usr/local/wrfsi/SI_GEOG
+setenv DATAROOT /ocotillo5/dmbarker/data/wrfsi/domains
 setenv RUN_GRID_GEN .FALSE.
 
 #WRF:
@@ -85,7 +85,7 @@ setenv RUN_GRID_GEN .FALSE.
 #setenv DEBUG_LEVEL 500
 
 #WRF-Var:
-#setenv DA_Check_Max_IV .FALSE.
+setenv DA_Check_Max_IV .FALSE.
 #setenv DA_CV_OPTIONS 5
 #setenv DA_BACK_ERRORS /ocotillo1/dmbarker/data/con200/noobs/gen_be/NMC.bin_type1/gen_be.NMC.dat
 

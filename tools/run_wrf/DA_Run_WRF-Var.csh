@@ -514,12 +514,12 @@ EOF
 #-------------------------------------------------------------------
 
 #PC-Linux:
-if ( $NUM_PROCS > 1  )then
- cp $WRFVAR_DIR/run/nodes .
-   mpirun -v -np ${NUM_PROCS} -nolocal -machinefile nodes ./wrfvar.exe >&! /dev/null
-else
-   mpirun -v -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
-endif
+#if ( $NUM_PROCS > 1  )then
+ cp $WRFVAR_DIR/tools/run_wrf/nodes .
+   mpirun -nolocal -np ${NUM_PROCS} -machinefile nodes ./wrfvar.exe >&! /dev/null
+#else
+#   mpirun -nolocal -np 1 ./wrfvar.exe >&! /dev/null #Assumes compile in DM mode.
+#endif
 
 #DEC:
 #./wrfvar.exe >&! wrfvar.out

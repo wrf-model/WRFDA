@@ -107,7 +107,7 @@ if ( ! $?GEOG_DATAROOT )    setenv GEOG_DATAROOT /usr/local/wrfsi/SI_GEOG # Wher
 if ( ! $?EXT_DATAROOT )     setenv EXT_DATAROOT ${INSTALLROOT}/extdata    # GRIB files processed in grib_prep here.
 if ( ! $?DATAROOT )         setenv DATAROOT ${DATA_DISK}/${user}/wrfsi/domains
 if ( ! $?MOAD_DATAROOT )    setenv MOAD_DATAROOT ${DATAROOT}/${REGION}
-if ( ! $?AVN_DIR )          setenv AVN_DIR ${DAT_DIR}/fnl    # Directory for AVN data (for SI).
+if ( ! $?AVN_DIR )          setenv AVN_DIR ${DAT_DIR}/ncep    # Directory for AVN data (for SI).
 if ( ! -d $AVN_DIR )        mkdir $AVN_DIR
 
 #WRFSI namelist (wrfsi.nl) variables:
@@ -227,8 +227,7 @@ while ( $START_DATE <= $FINAL_DATE )
       cd ${WRF_DIR}/test/em_real
 
 #     Run real:
-#DALE06      mpirun -v -nolocal -np ${NUM_PROCS} -machinefile nodes ./real.exe >&! /dev/null
-      mpirun -v -np 1 ./real.exe #>&! /dev/null
+      mpirun -nolocal -np 1 -machinefile nodes ./real.exe >&! /dev/null
       mv wrfinput_d01  ${REG_DIR}/wrfinput_d01.${START_DATE}
       mv wrfbdy_d01    ${REG_DIR}/wrfbdy_d01.${START_DATE}
       mv wrflowinp_d01 ${REG_DIR}/wrflowinp_d01.${START_DATE} >&! /dev/null
@@ -336,8 +335,7 @@ while ( $START_DATE <= $FINAL_DATE )
       cp ${RUN_DIR}/wrfbdy_d01 wrfbdy_d01
 #      cp ${REG_DIR}/wrflowinp_d01.${START_DATE} wrflowinp_d01
 
-#      mpirun -v -nolocal -np ${NUM_PROCS} -machinefile nodes ./wrf.exe >&! /dev/null
-      mpirun -np 1 ./wrf.exe >&! /dev/null
+      mpirun -nolocal -np ${NUM_PROCS} -machinefile nodes ./wrf.exe >&! /dev/null
 
       mv wrf_3dvar_input* ../.
       mv wrfout* ../.
