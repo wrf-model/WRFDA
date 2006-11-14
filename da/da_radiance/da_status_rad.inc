@@ -1,14 +1,19 @@
-subroutine da_status_rad(iv)
+subroutine da_status_rad(iv,str,line)
 
    implicit none
 
-   type(ob_type), intent(in) :: iv
+   type(ob_type),    intent(in) :: iv
+   character(len=*), intent(in) :: str
+   integer,          intent(in) :: line
+
 
    integer :: i,n,j
    integer :: isum(10)
    real    :: rsum(40)
 
    if (trace_use) call da_trace_entry("da_status_rad")
+
+   write (unit=stderr,fmt='(A,I6)') str,line
 
    do i=1,rtminit_nsensor
       isum(:) = 0

@@ -525,7 +525,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       end do
    end if
 
-   if (print_detail_radiance) call da_status_rad(iv)
+   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rad")
 #endif

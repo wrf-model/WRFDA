@@ -189,7 +189,7 @@ if (.false.) then
       deallocate (spare_count)
    end if
 
-   if (print_detail_radiance) call da_status_rad(iv)
+   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_qc_rad")
 #endif

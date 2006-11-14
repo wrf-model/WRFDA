@@ -476,7 +476,7 @@ if (.false.) then
 
    end do        ! end loop for sensor
 
-   if (print_detail_radiance) call da_status_rad(iv)
+   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rad")
 #endif
