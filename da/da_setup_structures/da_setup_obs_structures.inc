@@ -201,6 +201,31 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    iv%num_pseudo=num_pseudo
    iv%num_pseudo_glo=iv%num_pseudo
 
+   ob%num_sound=0
+   ob%num_synop=0
+   ob%num_geoamv=0
+   ob%num_polaramv=0
+   ob%num_airep=0
+   ob%num_metar=0
+   ob%num_ships=0
+   ob%num_pilot=0
+   ob%num_satem=0
+   ob%num_gpspw=0
+   ob%num_gpsref=0
+   ob%num_qscat=0
+   ob%num_ssmt1=0
+   ob%num_ssmt2=0
+   ob%num_ssmi_tb=0
+   ob%num_ssmi_retrieval=0
+   ob%num_buoy=0
+   ob%num_profiler=0
+   ob%num_radar=0
+   ob%num_bogus=0
+   ob%num_airsr=0
+   ob%num_inst=0
+
+   ob%num_pseudo=num_pseudo
+
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
       if ( ob_format == ob_format_bufr ) then
