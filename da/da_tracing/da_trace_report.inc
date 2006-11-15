@@ -227,7 +227,8 @@ subroutine da_trace_report
             SpeedUp                                                            ! Speedup
          if (trace_csv) then
             write(unit=trace_csv_unit,  &
-               fmt='(A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               fmt='(2A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               '"local,"', &
                '"'//trim(MasterTimerNames(Pointer))//'",', &
                real(OverallNoCalls(Pointer))/real(num_procs),                       & ! Average number of calls per PE
                OverallElapsedTime(Pointer)/(num_procs*real(CountRate)),             & ! Average Elapsed Time
@@ -355,7 +356,8 @@ subroutine da_trace_report
             SpeedUp                                                       ! SpeedUp
          if (trace_csv) then
             write (unit=trace_csv_unit, &
-               fmt='(A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               fmt='(2A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &
+               '"overall,"', &
                '"'//trim(MasterTimerNames(Pointer))//'",', &
                real(OverallNoCalls(Pointer))/real(num_procs),                  & ! Number of calls per PE
                OverallElapsedTime(Pointer)/(real(num_procs*CountRate)),        & ! Average Elapsed Time
@@ -429,7 +431,8 @@ subroutine da_trace_report
                sum(MasterMaxHeap(:,Pointer))/num_procs
             if (trace_csv) then
                write (unit=trace_csv_unit, &
-                  fmt='(A,I15,",",I15,",",I15)') &
+                  fmt='(2A,I15,",",I15,",",I15)') &
+                  '"memory,"', &
                   '"'//trim(TimerNames(Pointer))//'",', &
                   MAXVAL(MasterMaxHeap(:,Pointer)),sum(MasterMaxHeap(:,Pointer)), &
                   sum(MasterMaxHeap(:,Pointer))/num_procs
