@@ -136,9 +136,6 @@ if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
    setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${FC}
 endif
 if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MPICH ~/makedepf90/makedepf90-2.8.8_${CC}
-endif
-if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
    setenv MAKEDEPF90 ~/makedepf90/makedepf90-2.8.8_${CC}
 endif
 
