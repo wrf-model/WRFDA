@@ -118,7 +118,13 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
       ! Radiance:
 
-      call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
+      if (rtm_option == 1) then
+         call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
+      elseif (rtm_option == 2) then
+         call da_get_innov_vector_rad_crtm( it, grid%xb, grid%xp, ob, iv )
+      else
+         write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_get_innov_vector'
+      endif
 
       ! Pseudo obs:
 

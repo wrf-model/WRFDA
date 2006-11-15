@@ -1,10 +1,11 @@
 subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, & 
                          is, ie, js, je, &
                          i, j, dx, dy, dxm, dym, &
-                         isflg,ob_vegtyp,ob_soiltyp)
+                         isflg,ob_vegtyp,ob_soiltyp, &
+                         seap, icep, lndp, snop)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: determine surface type at obs locations.
+   ! PURPOSE: determine surface type/coverage percentage at obs locations.
    !
    ! METHOD: using the background information 
    !      1. get the background landmask/snow/sea-ice
@@ -26,6 +27,7 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    integer, intent(out) :: isflg                ! Output variable 
    real,    intent(out) :: ob_vegtyp            ! Output variable
    real,    intent(out) :: ob_soiltyp            ! Output variable
+   real,    intent(out) :: seap, icep, lndp, snop ! percentage of surface type
    
    !     isflg    - surface flag
    !                0 sea
@@ -41,7 +43,6 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    integer   ::  n, xbflag(4)   ! surface type at xb location
                                ! 0:sea  1:sea-ice 2:land  3:snow
    real      ::  w(4),minw      ! weight at 4 xb locations
-   real      ::  seap, icep, lndp, snop ! percentage of surface type
 
    ! 1.0 determine surface type of xb at 4 location around obs
    !-------------------------------------------------------

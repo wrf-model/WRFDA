@@ -158,6 +158,5 @@ endif
 
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
-   stop
 END SUBROUTINE da_setup_bufrtovs_structures
 

@@ -38,6 +38,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    REAL                             :: model_smois(1), model_tslb(1), model_snowh(1)
    REAL                             :: model_isltyp(1), model_ivgtyp(1), model_vegfra(1)
    INTEGER                          :: model_isflg(1)
+   real                             :: seap, icep, lndp, snop
 
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, model_tm, &     ! Model value p at ob hor. location.
                                        model_qrn, model_qcw, &
@@ -195,7 +196,8 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                             xb%ivgtyp, xb%isltyp, &
                             xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_isflg(1),model_ivgtyp(1), model_isltyp(1) )
+                            model_isflg(1),model_ivgtyp(1), model_isltyp(1), &
+                            seap, icep, lndp, snop )
 
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &

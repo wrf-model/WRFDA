@@ -34,19 +34,23 @@ module da_radiance
   !-----------------------------------------------
   ! Modules to define CRTM structures
   !
+   USE CRTM_Parameters
   ! -- CRTM Initialization modules
-   USE CRTM_ChannelInfo_Define  ! derived type CRTM_ChannelInfo_type
-   USE CRTM_LifeCycle
-   USE CRTM_ChannelInfo
+  ! USE CRTM_ChannelInfo_Define  ! derived type CRTM_ChannelInfo_type
+  ! USE CRTM_Atmosphere_Define
+  ! USE CRTM_Surface_Define
+  ! USE CRTM_GeometryInfo_Define
+  ! USE CRTM_RTSolution_Define
+   
+  ! USE CRTM_LifeCycle      ! crtm_init
+  ! USE CRTM_ChannelInfo    ! crtm_set_channelinfo
 
   ! -- CRTM Utility modules
    USE Type_Kinds
    USE Error_Handler
 
   ! -- CRTM RT_models modules
-  USE CRTM_Module
-  USE CRTM_Atmosphere_Define
-  USE CRTM_Surface_Define
+  USE CRTM_Module   ! include 12 modules
   USE CRTM_SensorInfo
 #endif
 
@@ -60,6 +64,24 @@ module da_radiance
    implicit none
    
    real, parameter             :: q2ppmv = 1.60771704e+6
+
+! n=noaa; f=dmsp; g=goes; c=npoess; eos-1/2=aqua/terra;
+   character(len=8), parameter :: crtm_platform_name(1:20) = &
+       (/ 'n       ', 'f       ', 'meteosat', 'g       ', 'gms     ', &
+          'fy2     ', 'trmm    ', 'ers     ', 'eos     ', 'metop   ', &
+          'envisat ', 'msg     ', 'fy1     ', 'adeos   ', 'mtsat   ', &
+          'coriolis', 'c       ', 'gifts   ', 'xxxxxxxx', 'xxxxxxxx'/)
+
+! List of instruments  !!!! HIRS is number 0
+  Character (len=8), Dimension(0:34) :: crtm_sensor_name  =                &
+       & (/ 'hirs    ', 'msu     ', 'ssu     ', 'amsua   ', 'amsub   ',  &
+       &    'avhrr   ', 'ssmi    ', 'vtpr1   ', 'vtpr2   ', 'tmi     ',  &
+       &    'ssmis   ', 'airs    ', 'hsb     ', 'modis   ', 'atsr    ',  &
+       &    'mhs     ', 'iasi    ', 'amsre   ', 'imager  ', 'atms    ',  &
+       &    'mviri   ', 'seviri  ', 'imgr    ', 'sndr    ', 'imager  ',  &
+       &    'vissr   ', 'mvisr   ', 'cris    ', 'cmis    ', 'viirs   ',  &
+       &    'windsat ', 'gifts   ', 'amsre   ', 'SUBSET  ', 'xxxxxxxx'   /)
+
    integer                     :: n_scatt_coef
    character(len=5), pointer   :: coefs_scatt_instname(:)
    real,             pointer   :: time_slots(:)
@@ -241,7 +263,8 @@ CONTAINS
 #include "da_read_filtered_rad.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_get_innov_vector_rad.inc"
-#include "da_get_innov_vector_rad_new.inc"
+!#include "da_get_innov_vector_rad_new.inc"
+#include "da_get_innov_vector_rad_crtm.inc"
 #include "da_detsurtyp.inc"
 #include "da_oma_stats_rad.inc"
 #include "da_omb_stats_rad.inc"
