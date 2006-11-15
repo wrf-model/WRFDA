@@ -131,6 +131,7 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         wrf_auxinput9out.o \
                         wrf_auxinput10out.o \
                         wrf_auxinput11out.o \
+			wrf_fddaobs_in.o \
                         wrf_bdyin.o \
                         wrf_bdyout.o \
                         wrf_restartin.o \
