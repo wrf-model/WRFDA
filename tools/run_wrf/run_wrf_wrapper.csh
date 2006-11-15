@@ -43,8 +43,8 @@
 #setenv RUN_REAL .TRUE.
 #setenv RUN_OBSPROC .TRUE.
 setenv RUN_VAR .TRUE.
-#setenv RUN_WRF_BC .TRUE.
-#setenv RUN_WRF .TRUE.
+setenv RUN_WRF_BC .TRUE.
+setenv RUN_WRF .TRUE.
 #setenv CYCLING .TRUE.
 
 #########################################################################
@@ -60,7 +60,7 @@ setenv RUN_VAR .TRUE.
 setenv DATA_DISK /ocotillo1
 setenv SRC_DIR ${DATA_DISK}/dmbarker/code/WRF_V2.1
 setenv WRF_DIR ${SRC_DIR}/WRFV2.1.2
-setenv WRFVAR_DIR ${DATA_DISK}/dmbarker/code/branches/wrfvar.rb_v21
+setenv WRFVAR_DIR ${DATA_DISK}/dmbarker/code/WRF_V2.1/wrfvar_v2.1
 
 #setenv WRF_BC_DIR /ocotillo1/caya/WRF_BC/src
 #setenv OBS_DIR /ocotillo1/caya/data/conus200 # Alain's "unclean" obs!
@@ -68,9 +68,9 @@ setenv WRFVAR_DIR ${DATA_DISK}/dmbarker/code/branches/wrfvar.rb_v21
 
 #Job details:
 setenv EXPT cs1.v21
-setenv NUM_PROCS 8 
+#setenv NUM_PROCS 8
 setenv START_DATE 2003010112
-setenv FINAL_DATE 2003010112
+#setenv FINAL_DATE 2003010212
 setenv FCST_RANGE_OUT 24
 
 #WRF SI:

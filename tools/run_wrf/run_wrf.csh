@@ -303,7 +303,7 @@ while ( $START_DATE <= $FINAL_DATE )
       echo "---------------------------------------------------------------"
       echo ""
 
-      $BIN_DIR/update_wrf_bc.csh >&! /dev/null
+      $BIN_DIR/update_wrf_bc.csh #>&! /dev/null
 
    else
       ln -sf $REG_DIR/wrfbdy_d01.${START_DATE} ${RUN_DIR}/wrfbdy_d01         #LBCs

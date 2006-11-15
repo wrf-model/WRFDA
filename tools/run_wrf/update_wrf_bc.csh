@@ -26,7 +26,7 @@ if ( ! -d ${RUN_DIR} ) then
 endif
 
 if ( ! $?SRC_DIR )          setenv SRC_DIR ${HOME}/code_development/WRF_V2.1 # Code directory.
-if ( ! $?WRF_BC_DIR )       setenv WRF_BC_DIR ${SRC}/WRF_BC
+if ( ! $?WRF_BC_DIR )       setenv WRF_BC_DIR ${SRC_DIR}/WRF_BC
 if ( ! $?DA_FIRST_GUESS )   setenv DA_FIRST_GUESS ${RUN_DIR}/wrf_3dvar_input
 if ( ! $?DA_ANALYSIS )      setenv DA_ANALYSIS ${RUN_DIR}/wrf_3dvar_output
 
