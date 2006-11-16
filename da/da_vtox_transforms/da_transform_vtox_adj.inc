@@ -233,8 +233,8 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 
    if (global) then
       call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv, vv, &
-                                          ids,ide, jds,jde, kds,kde,  &
-                                          ims,ime, jms,jme, kms,kme,  &
+                                          ids,ide, jds,jde,  &
+                                          ims,ime, jms,jme,  &
                                           its,ite, jts,jte, kts,kte )
    else
       call da_transform_vtovv_adj( cv_size, xb, be, cv, vv, xp, &

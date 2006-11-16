@@ -39,6 +39,12 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    complex             :: ccv(1:sizec)               ! Spectral modes.
    complex             :: ccv_local(1:sizec)         ! Spectral modes.
 
+   integer              :: l, js, je           ! Loop counters.
+   integer              :: index_m, index_j    ! Markers.
+   complex              :: sum_legtra          ! Summation scalars.
+
+   integer              :: jc, iequator, temp
+
    if (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
 
    !----------------------------------------------------------------------
@@ -73,30 +79,62 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    ! [2] Perform adjoint of inverse Legendre decomposition in N-S direction:
    !----------------------------------------------------------------------
 
+   ccv_local(:) = 0.0
+
    do m = 0, max_wavenumber
-      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
-      index_end   = index_start + max_wavenumber - m
+      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 +1
+
+      index_m     = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+
+      jc = (jde-jds+1)/2
+
+      iequator = mod(jde-jds+1, 2)
+
+      js = max(jts, jc+iequator+1)
+      je = min(jc+iequator, jte)
+
+      temp = (max_wavenumber + 1) * (max_wavenumber + 2) / 2
+
+      do l = m, max_wavenumber
+         sum_legtra = da_zero_complex
+
+         if (mod(l+m,2) == 1) then
+            do j = js, jte
+               index_j = ( jds+jde - j - 1 ) * temp
+               sum_legtra = sum_legtra - v_fou(j,m) * alp(index_j + index_m + l)
+            end do
+         else
+            do j = js, jte
+               index_j = ( jds+jde - j - 1 ) * temp
+               sum_legtra = sum_legtra + v_fou(j,m) * alp(index_j + index_m + l)
+            end do
+         end if
+
+         do j = jts, je
+            index_j = ( j - 1 ) * temp
+            sum_legtra = sum_legtra + v_fou(j,m) * alp(index_j + index_m + l) 
+         end do
+   
+         ccv_local(index_start+l-m) = sum_legtra
+      end do
+   end do
 
 #ifdef DM_PARALLEL
-      ccv_local(index_start:index_end) = 0.0
-      call da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, m,alp, &
-                              ccv_local(index_start:index_end), v_fou(jts:jte,m) )
+   index_start = 1
+   index_end   = max_wavenumber + &
+      max_wavenumber * ( max_wavenumber + 1 ) / 2 + 1
 
-      n = index_end - index_start + 1
-      call MPI_ALLREDUCE( ccv_local(index_start:index_end), &
-                          ccv(index_start:index_end), n, true_mpi_COMPLEX, mpi_sum, &
-                          mpi_comm_world, IER )
-#else
-      call da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, m, alp, &
-                              ccv(index_start:index_end), v_fou(jts:jte,m) )
+   n = index_end - index_start + 1
+   call mpi_allreduce(ccv_local(index_start:index_end), &
+                      ccv(index_start:index_end), n, true_mpi_complex, mpi_sum, &
+                      mpi_comm_world, IER)
 #endif
-   end do
 
    !----------------------------------------------------------------------
    ! [2] Apply Power spectrum
    !-------------------------------------------------------------------------
 
-   if( .not. test_transforms ) call da_apply_power(power, max_wavenumber, ccv, sizec)
+   if (.not. test_transforms) call da_apply_power(power, max_wavenumber, ccv, sizec)
 
    do n = 1, sizec
       rcv(2*n - 1 ) = real ( ccv(n) )

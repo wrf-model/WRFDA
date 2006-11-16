@@ -1,6 +1,6 @@
 subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
-                                           ids, ide, jds, jde, kds, kde, &
-                                           ims, ime, jms, jme, kms, kme, &
+                                           ids, ide, jds, jde, &
+                                           ims, ime, jms, jme, &
                                            its, ite, jts, jte, kts, kte )
 
    !--------------------------------------------------------------------------
@@ -15,8 +15,8 @@ subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
    type (be_type), intent(in)           :: be   ! background errors.
    real, intent(out)                    :: cv(1:cv_size) ! control variables.
    type (vp_type),intent(in)            :: vv   ! grdipt/eof cv (local).
-   integer, intent(in)                  :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)                  :: ims,ime, jms,jme, kms,kme ! memory dims.
+   integer, intent(in)                  :: ids,ide, jds,jde ! domain dims.
+   integer, intent(in)                  :: ims,ime, jms,jme ! memory dims.
    integer, intent(in)                  :: its,ite, jts,jte, kts,kte ! tile   dims
 
    integer                              :: k, m ! Loop counters.
@@ -24,11 +24,6 @@ subroutine da_transform_vtovv_global_adj ( cv_size, xb, xbx, be, cv, vv, &
    integer                              :: cv_e ! Counter.
 
    if (trace_use) call da_trace_entry("da_transform_vtovv_global_adj")
-
-   ! Stop compiler whinging
-
-   if (kde==0 .OR. kds==0 .OR. kms==0 .OR. kme==0) then
-   end if
 
    !-------------------------------------------------------------------------
    ! [1] Spectral to grid transform for standard control variables:
