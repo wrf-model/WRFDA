@@ -465,6 +465,8 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
          end do
       end do
    end if
+   if (if_write) go to 999
+   go to 1
 
 !----------------------------------------------------------------------------   
 130  continue      !  AIRS  retrievals        
