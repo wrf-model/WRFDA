@@ -1,0 +1,10 @@
+These little blighters didn't want to go in until forced
+--This line, and those below, will be ignored--
+
+M    da_trace_exit.inc
+M    da_trace_report.inc
+M    da_tracing.f90
+M    da_cpu_time.c
+M    da_trace.inc
+M    da_trace_entry.inc
+M    da_trace_init.inc
