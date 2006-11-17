@@ -94,7 +94,8 @@ subroutine da_trace_entry( &
    if (NewRoutine) then
       ! New subroutine entered
       if( NoRoutines >= MaxNoRoutines )then ! too many to trace
-          stop
+          call da_error(__FILE__,__LINE__, &
+             (/"Too many routines. Not timing " // Name/))
 
          !All the timings etc are put instead to the calling routine,
          ! which therefore may have incorrect summaries.
@@ -163,14 +164,16 @@ subroutine da_trace_entry( &
             end if
          end if
          if (IOStatus /= 0) then
-            stop
+            call da_error(__FILE__,__LINE__, &
+               (/"Cannot write to trace file for "//trim(Name)/))
          end if
 
          if (present(Message)) then
             write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),trim(Message)
             if (IOStatus .NE. 0) then
-               stop
+               call da_error(__FILE__,__LINE__, &
+                  (/"Cannot write to trace file for "//trim(Name)/))
             end if
          end if
 
@@ -179,7 +182,8 @@ subroutine da_trace_entry( &
                write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
                if (IOStatus .NE. 0) then
-                  stop
+                  call da_error(__FILE__,__LINE__, &
+                     (/"Cannot write to trace file for "//trim(Name)/))
                end if
             end do ! Loop
          end if

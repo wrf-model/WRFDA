@@ -105,14 +105,16 @@ subroutine da_trace( &
             end if
          end if
          if (IOStatus /= 0) then
-            stop
+            call da_error(__FILE__,__LINE__, &
+               (/"Cannot write to trace file for "//trim(Name)/))
          end if
 
          if (present(Message)) then
             write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &
                pad(1:TraceDepth*TraceIndentAmount),trim(Message)
             if (IOStatus .NE. 0) then
-               stop
+               call da_error(__FILE__,__LINE__, &
+                  (/"Cannot write to trace file for "//trim(Name)/))
             end if
          end if
 
@@ -121,7 +123,8 @@ subroutine da_trace( &
                write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &
                   pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))
                if (IOStatus .NE. 0) then
-                  stop
+                  call da_error(__FILE__,__LINE__, &
+                     (/"Cannot write to trace file for "//trim(Name)/))
                end if
             end do ! Loop
          end if
@@ -131,7 +134,8 @@ subroutine da_trace( &
          write (unit=trace_unit, fmt='(A,"  Called enough, going quiet")', iostat=IOStatus) &
             pad(1:TraceDepth*TraceIndentAmount)
          if (IOStatus .NE. 0) then
-            stop
+            call da_error(__FILE__,__LINE__, &
+              (/"Cannot write to trace file for "//trim(Name)/))
          end if
       end if
    end if ! trace_write
