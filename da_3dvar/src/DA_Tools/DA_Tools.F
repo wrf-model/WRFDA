@@ -13,6 +13,7 @@ MODULE DA_Tools
    USE DA_Constants
    USE DA_Define_Structures
    USE LAPACK
+   use da_tracing
    
    IMPLICIT NONE
    

@@ -22,6 +22,7 @@ MODULE module_wrfvar_top
 
    USE module_wrf_3dvar_io
    USE module_wrf_3dvar_interface
+   use da_tracing
 
    IMPLICIT NONE
 
@@ -282,12 +283,6 @@ CONTAINS
    endif
 
    CALL       wrf_debug (   0 , 'wrfvar: SUCCESS COMPLETE WRFVAR' )
-
-   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
-     ! Finalize time manager
-     CALL WRF_UTIL_Finalize
-     CALL wrf_shutdown
-   ENDIF
 
    END SUBROUTINE wrfvar_finalize
 

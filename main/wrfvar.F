@@ -4,6 +4,7 @@
 PROGRAM wrfvar
 
    USE module_wrfvar_top
+   use da_tracing
 
 !<DESCRIPTION>
 ! Main program of WRFVAR.  Responsible for starting up, reading in (and
@@ -16,14 +17,24 @@ PROGRAM wrfvar
 
    IMPLICIT NONE
 
+   call da_trace_init
+
 !--Initialize WRFVAR
    CALL wrfvar_init
 
 !--WRFVAR Calls integrate().  
    CALL wrfvar_run
 
-!--WRFVAR clean-up.  This calls MPI_FINALIZE() for DM parallel runs.  
+!--WRFVAR clean-up.  
    CALL wrfvar_finalize
+
+   call da_trace_report
+
+   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
+     ! Finalize time manager
+     CALL WRF_UTIL_Finalize
+     CALL wrf_shutdown
+   ENDIF
 
 END PROGRAM wrfvar
 

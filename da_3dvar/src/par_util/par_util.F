@@ -48,6 +48,7 @@ MODULE PAR_UTIL
 #include <local_to_global.inc>
 #include <mm5_struct_bcast.inc>
 #include <proc_sum_int.inc>
+#include <proc_sum_ints.inc>
 #include <proc_sum_real.inc>
 #include <proc_sum_count_obs.inc>
 #include <proc_stats_combine.inc>

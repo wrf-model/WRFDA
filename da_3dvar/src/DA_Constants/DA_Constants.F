@@ -506,6 +506,27 @@ MODULE DA_Constants
                            max_Bogus_input, &
                            max_qscat_input
 
+integer :: trace_unit         = 8      
+integer :: trace_pe           = 0           
+integer :: trace_repeat_head  = 10
+integer :: trace_repeat_body  = 01
+integer :: trace_max_depth    = 30
+logical :: trace_use          = .true.
+logical :: trace_memory       = .true.
+logical :: trace_all_pes      = .false.
+logical :: trace_csv          = .true.
+
+integer :: trace_csv_unit = 9
+
+logical, parameter :: use_html=.true.
+
+character(len=80), parameter :: documentation_url = "unknown"
+integer :: trace_start_points=0 
+
+logical :: rootproc
+integer :: num_procs
+integer :: myproc
+
  integer                :: numb_procs, &         ! Number of total processors.
                            my_proc_id            ! My processor ID.
  LOGICAL                :: global 

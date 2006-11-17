@@ -57,6 +57,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
 
       character(len=4)                  :: filnam
 
+      call da_trace_entry("da_minimise_cg")
+
       write (6,'(A)') &
         ' ----------------------------------------------------------'
       write(6,*)
@@ -207,6 +209,8 @@ subroutine DA_Minimise_CG( grid, config_flags,            &
       cv % array = cv % array + xhat
 
       call da_deallocate_y( jo_grad_y)
+
+      call da_trace_exit("da_minimise_cg")
 
       end subroutine DA_Minimise_CG
 

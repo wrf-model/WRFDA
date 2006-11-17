@@ -3,6 +3,9 @@
 
 OBJS_FOR_ALL =		da_solve_v3d.o		\
 			par_util.o              \
+                        da_tracing.o            \
+                        da_cpu_time.o           \
+                        da_memory.o             \
 			DA_Setup_Structures.o	\
 			DA_Minimisation.o	\
 			DA_VToX_Transforms.o	\
@@ -139,6 +142,7 @@ par_util.o:		DA_Define_Structures.o		\
 			par_util/proc_stats_combine.inc		\
 			par_util/proc_sum_count_obs.inc		\
 			par_util/proc_sum_int.inc		\
+			par_util/proc_sum_ints.inc		\
 			par_util/proc_sum_real.inc		\
 			par_util/transpose.inc			\
 			par_util/unpack_count_obs.inc		\
@@ -208,6 +212,25 @@ DA_Minimisation.o:	\
 			$(RM) $@
 			$(CPP) -I./DA_Minimisation $(CPPFLAGS_3DVAR) DA_Minimisation/DA_Minimisation.F > DA_Minimisation.f
 			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) DA_Minimisation.f
+
+da_memory.o : da_tracing/da_memory.c
+	$(CC) -c $(CFLAGS) da_tracing/da_memory.c
+
+da_cpu_time.o : da_tracing/da_cpu_time.c
+	$(CC) -c  $(CFLAGS) da_tracing/da_cpu_time.c
+
+da_tracing.o:           \
+                        da_tracing/da_trace.inc \
+                        da_tracing/da_trace_exit.inc \
+                        da_tracing/da_trace_int_sort.inc \
+                        da_tracing/da_trace_report.inc \
+                        da_tracing/da_trace_entry.inc \
+                        da_tracing/da_trace_init.inc \
+                        da_tracing/da_trace_real_sort.inc \
+                        da_tracing/da_tracing.f90
+			$(RM) $@
+			$(CPP) -I./da_tracing $(CPPFLAGS_3DVAR) da_tracing/da_tracing.f90 > da_tracing.f
+			$(FC) -c $(FCFLAGS_3DVAR) $(MODULE_DIRS) da_tracing.f
 
 DA_Setup_Structures.o:	\
 			DA_Define_Structures.o \
