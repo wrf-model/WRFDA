@@ -17,10 +17,11 @@ PROGRAM wrfvar
 
    IMPLICIT NONE
 
-   call da_trace_init
-
 !--Initialize WRFVAR
    CALL wrfvar_init
+
+   call da_trace_init
+   call da_trace_entry("da_wrfvar_main")
 
 !--WRFVAR Calls integrate().  
    CALL wrfvar_run
@@ -28,13 +29,14 @@ PROGRAM wrfvar
 !--WRFVAR clean-up.  
    CALL wrfvar_finalize
 
+   call da_trace_exit("da_wrfvar_main")
    call da_trace_report
 
-   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
+!   IF ( .NOT. PRESENT( no_shutdown ) ) THEN
      ! Finalize time manager
      CALL WRF_UTIL_Finalize
      CALL wrf_shutdown
-   ENDIF
+!   ENDIF
 
 END PROGRAM wrfvar
 

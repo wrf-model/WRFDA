@@ -31,6 +31,8 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
 
 !----------------------------------------------------------------------------   
 
+   call da_trace_entry("da_get_innov_vector")
+
    write (6,'(/,A)') ' --------------------------------------'
    write (6,'(A)')   ' [5.1] Calculate innovation vector (iv)'
    write (6,'(A)')   ' --------------------------------------'
@@ -169,6 +171,7 @@ SUBROUTINE da_get_innov_vector( it, ob, iv, &
  write(*,'(/a,i5,a,i5)') "OBS below lowest  level: p#=",p_below,"  h#=",h_below
  write(*,'(a,i5,a,i5/)') "OBS above highest level: p#=",p_above,"  h#=",h_above
  endif
+   call da_trace_exit("da_get_innov_vector")
 
 END SUBROUTINE da_get_innov_vector
 

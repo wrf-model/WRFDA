@@ -230,9 +230,12 @@
 # [3.0] Prepare for assimilation:
 #-----------------------------------------------------------------------
 
- rm -rf ${RUN_DIR}/wrf-var >&! /dev/null
- mkdir ${RUN_DIR}/wrf-var >&! /dev/null
- cd $RUN_DIR/wrf-var
+ rm -rf ${RUN_DIR}/trace >&! /dev/null
+ mkdir ${RUN_DIR}/trace >&! /dev/null
+ rm -rf ${RUN_DIR}/wrfvar >&! /dev/null
+ mkdir ${RUN_DIR}/wrfvar >&! /dev/null
+ ln -fs $RUN_DIR/wrfvar $RUN_DIR/wrf-var
+ cd $RUN_DIR/wrfvar
 
  cp $WRFVAR_DIR/run/gribmap.txt .
  cp $WRFVAR_DIR/run/LANDUSE.TBL .
@@ -513,7 +516,6 @@ EOF
 #-------------------------------------------------------------------
 #Run WRF-Var:
 #-------------------------------------------------------------------
-
 setenv PLATFORM `uname`
 
 if ( $PLATFORM == "Linux" ) then
@@ -541,7 +543,7 @@ if ( $PLATFORM == "AIX" ) then
   #IBM (llsubmit):
   #poe ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  ./wrfvar.exe >&! wrfvar.out
+  $RUN_CMD ./wrfvar.exe >&! wrfvar.out
 endif
 
 cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
@@ -554,6 +556,8 @@ cp DAProg_WRF_Var.grad_fn ../grad_fn >&! /dev/null
 
 mkdir ../rsl
 cp rsl* ../rsl
+
+mv *.html *.csv ../trace
 
 echo "WRF-Var completed"
 

@@ -91,7 +91,7 @@ $SUBMIT_OPTIONS3
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-. $SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
 elif test $HOSTNAME = willow -o $HOSTNAME = hazel -o $HOSTNAME = goldenrain ; then

@@ -47,6 +47,8 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
 
       character(len=4) :: filnam
 
+      call da_trace_entry("da_calculate_j")
+
 !-------------------------------------------------------------------------
       
       call da_allocate_y( iv, jo_grad_y )
@@ -165,6 +167,7 @@ subroutine da_calculate_j( it, iter, xb, xbx, be, iv, xhat, cv, vv, &
       gnorm_j = sqrt(gnorm_j )
 
       write(82,81) it, EPS(it), iter, gnorm_j, gnorm_cv, gnorm_jo
+      call da_trace_exit("da_calculate_j")
 
   end subroutine da_calculate_j
 
