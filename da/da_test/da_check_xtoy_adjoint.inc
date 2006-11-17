@@ -15,20 +15,20 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    type (x_type),     intent(inout) :: xa    ! analysis increments (local).
    type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
    type (xpose_type), intent(in)    :: xp    ! Dimensions and xpose buffers(be).
-   type (y_type),     intent(inout) :: y     ! y = h (xa)
+   TYPE (y_type),     intent(inout) :: y     ! y = h (xa)
 
    integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   real                           :: adj_ttl_lhs   ! < y, y >
-   real                           :: adj_ttl_rhs   ! < x, x_adj >
+   REAL                           :: adj_ttl_lhs   ! < y, y >
+   REAL                           :: adj_ttl_rhs   ! < x, x_adj >
 
-   real                           :: partial_lhs   ! < y, y >
-   real                           :: partial_rhs   ! < x, x_adj >
+   REAL                           :: partial_lhs   ! < y, y >
+   REAL                           :: partial_rhs   ! < x, x_adj >
 
-   real                           :: pertile_lhs   ! < y, y >
-   real                           :: pertile_rhs   ! < x, x_adj >
+   REAL                           :: pertile_lhs   ! < y, y >
+   REAL                           :: pertile_rhs   ! < x, x_adj >
  
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_u, xa2_v, xa2_t, &
                                                  xa2_p, xa2_q, xa2_rh
@@ -38,13 +38,13 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
 
 
    ! JRB stop compiler whinging
-   if (jde ==0 .OR. ids==0 .OR. jds==0 .OR. kde==0 .OR. ide==0 .OR. &
-       kds ==0) then
-   end if
+   IF (jde ==0 .OR. ids==0 .OR. jds==0 .OR. kde==0 .OR. ide==0 .OR. &
+       kds ==0) THEN
+   END IF
 
-   if (trace_use) call da_trace_entry("da_check_xtoy_adjoint")
+   IF (trace_use) call da_trace_entry("da_check_xtoy_adjoint")
 
-   write(unit=stdout, fmt='(/a)') ' da_check_xtoy_adjoint: Adjoint Test Results:'
+   write(UNIT=stdout, fmt='(/a)') ' da_check_xtoy_adjoint: Adjoint Test Results:'
 
    !----------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -80,7 +80,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
       call da_transform_xtowtq ( xp, xb, xa )
       ! Exchange XA (surface variable: u10, v10, t2, q2) halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
-   end if
+   endif
 
    if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
         use_GpsrefObs .or.                                    &
@@ -90,9 +90,9 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
       call da_transform_xtotpw( xa, xb )
 
       ! GPS Refractivity:
-      if ( use_gpsrefobs ) then
+      if ( use_gpsrefobs ) THEN
          call da_transform_xtogpsref_lin(xa, xb, xp)
-      end if
+      END IF
 
       if ( use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
@@ -101,13 +101,13 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
              (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
          end if
          call da_transform_xtoseasfcwind_lin( xa, xb )
-      end if
+      endif
 
       if ( Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
       ! Exchange XA halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
-   end if
+   endif
 
    !----------------------------------------------------------------------
    ! [2.0] Perform y = Hx transform:
@@ -126,7 +126,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    if( Use_SoundObs ) then
       call da_check_xtoy_adjoint_sound( iv, y, partial_lhs, pertile_lhs )
       call da_check_xtoy_adjoint_sonde_sfc( iv, y, partial_lhs, pertile_lhs )
-   end if
+   endif
    if( Use_SynopObs ) &
    call da_check_xtoy_adjoint_synop( iv, y, partial_lhs, pertile_lhs )
 
@@ -181,6 +181,9 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    if( Use_BogusObs ) &
    call da_check_xtoy_adjoint_bogus( iv, y, partial_lhs, pertile_lhs )
 
+   if( Use_Radiance ) &
+   call da_check_xtoy_adjoint_rad( iv, y, partial_lhs, pertile_lhs )
+
    !----------------------------------------------------------------------
    ! [5.0] Perform adjoint operation:
    !----------------------------------------------------------------------
@@ -210,13 +213,13 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
                (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
          end if
          call da_transform_xtoseasfcwind_adj( xa, xb )
-      end if
-   end if
+      endif
+   endif
 
    ! Now do something for surface variables
    if (sfc_assi_options == 2) then
       call da_transform_xtowtq_adj ( xp, xb, xa )
-   end if
+   endif
 
    call da_pt_to_rho_adj( xb, xa )
 
@@ -253,18 +256,18 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    !  [7.0] Print output:
    !----------------------------------------------------------------------
    
-   write(unit=stdout, fmt='(A,1pe22.14)') &
+   write(UNIT=stdout, fmt='(A,1pe22.14)') &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
    adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
    adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
    
-   if ( rootproc ) then
-      write(unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
-      write(unit=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
-   end if
+   IF ( rootproc ) THEN
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < y, y     > = ', adj_ttl_lhs
+      write(UNIT=stdout, fmt='(A,1pe22.14)') ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
+   ENDIF
    
-   if (trace_use) call da_trace_exit("da_check_xtoy_adjoint")
+   IF (trace_use) call da_trace_exit("da_check_xtoy_adjoint")
 
 end subroutine da_check_xtoy_adjoint
