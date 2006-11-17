@@ -61,15 +61,15 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
 !        [3.0] Calculate observation O = B + (O-B):
 !------------------------------------------------------------------------
 
-         if ( pseudo_var(1:1) == 'u' ) then
+         if ( pseudo_var(1:1) == 'u' .or.  pseudo_var(1:1) == 'U' ) then
             ob % pseudo(n) % u = model_u + iv % pseudo(n) % u % inv
-         else if ( pseudo_var(1:1) == 'v' ) then
+         else if ( pseudo_var(1:1) == 'v' .or.  pseudo_var(1:1) == 'V' ) then
             ob % pseudo(n) % v = model_v + iv % pseudo(n) % v % inv
-         else if ( pseudo_var(1:1) == 't' ) then
+         else if ( pseudo_var(1:1) == 't' .or.  pseudo_var(1:1) == 'T' ) then
             ob % pseudo(n) % t = model_t + iv % pseudo(n) % t % inv
-         else if ( pseudo_var(1:1) == 'p' ) then
+         else if ( pseudo_var(1:1) == 'p' .or.  pseudo_var(1:1) == 'P' ) then
             ob % pseudo(n) % p = model_p + iv % pseudo(n) % p % inv
-         else if ( pseudo_var(1:1) == 'q' ) then
+         else if ( pseudo_var(1:1) == 'q' .or.  pseudo_var(1:1) == 'Q' ) then
             ob % pseudo(n) % q = model_q + iv % pseudo(n) % q % inv
          end if 
       end do

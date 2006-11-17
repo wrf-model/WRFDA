@@ -146,8 +146,6 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
       iv%num_bogus = max_bogus_input
    if(iv%num_airsr > max_airsret_input ) &
       iv%num_airsr = max_airsret_input
-   ! if(iv%num_pseudo > max_pseudo_input ) &
-   !    iv%num_pseudo = max_pseudo_input
 
    !-------------------------------------------------------------------------
    ! Allocate the ob based on inputed number of obs:
@@ -211,7 +209,7 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   call da_fill_obs_structures( iv, ob )
+   call da_fill_obs_structures(xp, iv, ob )
 
    iv%current_ob_time = 1
 

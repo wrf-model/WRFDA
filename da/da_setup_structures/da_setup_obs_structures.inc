@@ -175,6 +175,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    iv%num_bogus=0
    iv%num_airsr=0
    iv%num_inst=0
+   iv%num_pseudo=0          
 
    iv%num_sound_glo=0
    iv%num_synop_glo=0
@@ -197,9 +198,8 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    iv%num_Radar_glo=0
    iv%num_bogus_glo=0
    iv%num_airsr_glo=0
+   iv%num_pseudo_glo=0             
 
-   iv%num_pseudo=num_pseudo
-   iv%num_pseudo_glo=iv%num_pseudo
 
    ob%num_sound=0
    ob%num_synop=0
@@ -223,29 +223,14 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    ob%num_bogus=0
    ob%num_airsr=0
    ob%num_inst=0
-
-   ob%num_pseudo=num_pseudo
+   ob%num_pseudo=0          
 
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
       if ( ob_format == ob_format_bufr ) then
          call da_message((/'Using BUFR format observation input'/))
-
          ! [1.1] BUFR observation input file:
-         if (iv%num_pseudo > 0) then
-            call da_message((/'Pseudo test only.'/))
-            call da_allocate_y( iv, ob )
-            call da_setup_pseudo_obs( iv, ob )
-
-            iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
-            iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
-            iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
-            iv%pseudo(1)%loc%dy=iv%pseudo(1)%loc%y-real(iv%pseudo(1)%loc%j)
-            iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
-            iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
-         else
             call da_setup_obs_structures_bufr( xp, ob, iv )
-         end if 
       else if ( ob_format == ob_format_ascii ) then
          ! [1.2] GTS observation input file:
          call da_setup_obs_structures_ascii( xp, ob, iv )

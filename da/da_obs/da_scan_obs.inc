@@ -44,7 +44,7 @@ subroutine da_scan_obs (ob, xp, filename)
                                    num_ssmi_tb      , &
                                    num_ssmt1, &
                                    num_ssmt2, num_airsr, &
-                                   num_pseudo, num_qscat, &
+                                   num_qscat, &
                                    num_profiler, num_buoy, num_bogus
 
    integer                        :: ndup, n
@@ -105,7 +105,6 @@ subroutine da_scan_obs (ob, xp, filename)
    num_ssmi_tb       = 0   
    num_ssmt1 = 0
    num_ssmt2 = 0
-   num_pseudo = 0
    num_qscat = 0
    num_profiler = 0
    num_buoy = 0
