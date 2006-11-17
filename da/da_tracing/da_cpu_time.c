@@ -1,27 +1,9 @@
 #include <sys/times.h>
 
-#if defined(LOWERCASE) 
-#if defined(UNDERSCORE)
-void gen_cputime_(
-#else
-#if defined(DOUBLEUNDERSCORE)
-void gen_cputime__(
-#else
+#ifdef NOUNDERSCORE
 void gen_cputime(
-#endif
-#endif
-#endif
-
-#if defined(UPPERCASE) 
-#if defined(UNDERSCORE)
-void GEN_CPUTIME_(
 #else
-#if defined(DOUBLEUNDERSCORE)
-void GEN_CPUTIME__(
-#else
-void GEN_CPUTIME(
-#endif
-#endif
+void gen_cputime_(
 #endif
 
   pr_CPUTime,

@@ -2,9 +2,11 @@ subroutine da_trace_init
 
    implicit none
 
+include "mpif.h"
+
    ! Local variables
 
-   integer :: IOStatus             ! I/O return code
+   integer :: IOStatus,ierr             ! I/O return code
    integer :: Loop1
    character (LEN=200) :: TraceFile
    character(len=200) :: csvname
@@ -13,6 +15,17 @@ subroutine da_trace_init
    !===========================================================================
 
    ! Start of code
+
+   call mpi_comm_size(mpi_comm_world, num_procs, ierr)
+   call mpi_comm_rank(mpi_comm_world, myproc, ierr )
+
+   if (myproc == 0) then
+      rootproc=.true.
+   else
+      rootproc=.false.
+   end if
+
+write (0,*) "myproc,numb_procs,rootproc",myproc,num_procs,rootproc
 
    IOStatus = 0
 
@@ -27,7 +40,7 @@ subroutine da_trace_init
    if (trace_write .AND. trace_unit /= 0) then
       if (use_html) then
          write(unit=temp,fmt='(I10)') myproc
-         TraceFile="trace/"//trim(adjustl(temp))//".html"
+         TraceFile=trim(adjustl(temp))//".html"
          OPEN ( &
             unit=trace_unit, &   ! I:
             file=trim(TraceFile), &   ! I:
@@ -46,17 +59,16 @@ subroutine da_trace_init
       end if
 
       if (IOStatus /= 0) then
-         call da_error(__FILE__,__LINE__, &
-            (/"Cannot open trace file "//TraceFile/))
+         stop
       end if
    end if
 
    if (trace_csv .and. rootproc) then
          write(unit=csvname,fmt='(I10,A)') myproc,'.csv'
-      open(unit=trace_csv_unit,file="trace/"//trim(adjustl(csvname)), &
+      open(unit=trace_csv_unit,file=trim(adjustl(csvname)), &
          status="replace",iostat=IOStatus)
       if (IOStatus /= 0) then
-         call da_error(__FILE__,__LINE__,(/"Cannot open "//csvname/))
+         stop
       end if
    end if
 

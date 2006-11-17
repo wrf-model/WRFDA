@@ -1,10 +1,10 @@
 module da_tracing
 
-   use da_control
+   use da_constants
 #ifdef DM_PARALLEL
-   use da_par_util1
+   use par_util
+   include "mpif.h"
 #endif
-   use da_reporting
 
 
    integer, parameter :: TraceIndentAmount      = 2   ! default indent
