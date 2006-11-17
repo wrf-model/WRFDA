@@ -12,7 +12,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    ! Local
 
-   integer                 :: fid , ierr , status, n, nsave
+   integer                 :: fid , status, n, nsave
 
    integer :: julyr, julday
    real    :: gmt

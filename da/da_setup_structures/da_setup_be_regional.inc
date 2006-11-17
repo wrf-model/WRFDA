@@ -13,7 +13,6 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    integer                     :: nrec, max_wavenumber  ! Scalar.
    integer                     :: i, j, k, m, ic, jc       ! Loop counters.
-   integer                     :: ier                   ! error index
    real, allocatable   :: height(:,:,:)      ! Height field.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point

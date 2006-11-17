@@ -3,7 +3,7 @@ subroutine da_get_var_diagnostics ( iv, j )
    type (ob_type), intent(inout):: iv      ! innovation vector.
    type (j_type), intent(inout) :: j       ! Cost function.
 
-   integer                      :: num_obs_tot, ierror
+   integer                      :: num_obs_tot
    real                         :: dum1, dum2, dum3, dum4, dum5, dum6
    integer                      :: i,k
    real                         :: jo_radiance

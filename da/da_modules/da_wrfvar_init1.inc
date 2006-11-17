@@ -7,7 +7,6 @@ subroutine da_wrfvar_init1( no_init1 )
    implicit none
 
    logical, optional, intent(in) :: no_init1
-   integer :: ierr
 
    !<DESCRIPTION>
    ! Program_name, a global variable defined in frame/module_domain.F, is
@@ -25,13 +24,13 @@ subroutine da_wrfvar_init1( no_init1 )
    program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
    ! Initialize WRF modules:  
-   ! Phase 1 returns after MPI_inIT() (if it is called)
+   ! Phase 1 returns after mpi_init() (if it is called)
    if (.NOT. present(no_init1)) then
       call init_modules(1)
       ! Initialize utilities (time manager, etc.)
       call wrfu_initialize(defaultCalendar=WRFU_CAL_GREGORIAN)
    end if
-   ! Phase 2 resumes after MPI_inIT() (if it is called)
+   ! Phase 2 resumes after mpi_init() (if it is called)
    call init_modules(2)
 
    !<DESCRIPTION>
@@ -52,11 +51,13 @@ subroutine da_wrfvar_init1( no_init1 )
    write(unit=6,fmt='(A)') "***  VARIATIONAL ANALYSIS ***"
 
 #ifdef DM_PARALLEL
-   call mpi_comm_size(mpi_comm_world, num_procs, ierr)
-   call mpi_comm_rank(mpi_comm_world, myproc, ierr )
+   call mpi_comm_size(comm, num_procs, ierr)
+   call mpi_comm_rank(comm, myproc, ierr )
+   call wrf_get_dm_communicator (comm)
 #else
    num_procs = 1
    myproc = 0
+   comm = 0
 #endif
 
    if (myproc==0) then

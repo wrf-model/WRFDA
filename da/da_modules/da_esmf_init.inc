@@ -34,7 +34,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
    !  Get the NAMELIST data for input.
 
-   call init_modules(2)   ! Phase 2 resumes after MPI_inIT() (if it is called)
+   call init_modules(2)   ! Phase 2 resumes after mpi_init() (if it is called)
                           ! Phase 1 is called before ESMF starts up
 
    !<DESCRIPTION>
@@ -179,7 +179,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! href=wrf_shutdown.html>wrf_shutdown</a> (quilt servers would be
    ! directed to shut down here) is called to properly end the run,
    ! including shutting down the communications (for example, most comm
-   ! layers would call MPI_FinALIZE at this point if they're using MPI).
+   ! layers would call mpi_finalize at this point if they're using MPI).
    ! 
    !</DESCRIPTION>
 

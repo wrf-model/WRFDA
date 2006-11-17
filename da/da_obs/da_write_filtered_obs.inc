@@ -72,7 +72,6 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
 
    integer                       :: ounit, nz, mnz
    integer                       :: root      ! Monitor processor.
-   integer                       :: ierr      ! Error code from MPI routines.
    character*20                  :: filename
 !----------------------------------------------------------------------
    if (trace_use) call da_trace_entry("da_write_filtered_obs")
@@ -1352,7 +1351,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    close(ounit)
    call da_free_unit(ounit)
 #ifdef DM_PARALLEL
-   call MPI_BARRIER(mpi_comm_world, ierr)
+   call mpi_barrier(comm, ierr)
 #endif
    if ( rootproc ) then
       call da_get_unit(filtered_obs_unit)

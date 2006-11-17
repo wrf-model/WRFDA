@@ -38,7 +38,7 @@ module da_wrfvar_esmf_super
    integer                 :: number_at_same_level
    integer                 :: time_step_begin_restart
 
-   integer :: domain_id , fid , oid , idum1 , idum2 , ierr
+   integer :: domain_id , fid , oid , idum1 , idum2
 
 #ifdef DM_PARALLEL
    integer                 :: nbytes

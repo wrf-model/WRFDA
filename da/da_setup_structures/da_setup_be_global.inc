@@ -12,7 +12,6 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    integer                     :: nrec
    integer                     :: max_wave_in           ! Dimension of inppur power.
    integer                     :: i, j, k, ic, jc, n    ! Loop counters.
-   integer                     :: ier                   ! error index
    ! real, allocatable   :: height(:,:,:)      ! Height field.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point

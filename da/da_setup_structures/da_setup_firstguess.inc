@@ -44,6 +44,28 @@ subroutine da_setup_firstguess( xbx, grid, &
                                  )
    end if
 
+   ! Calculate sin and cosine values used in da_get_avpoles
+
+   if (global) then
+      if (grid%xb%jts == grid%xb%jds) then 
+         allocate(cos_xls(grid%xb%its:grid%xb%ite))
+         allocate(sin_xls(grid%xb%its:grid%xb%ite))
+         cos_xls(grid%xb%its:grid%xb%ite) = & 
+            deg_to_rad*cos(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jts))
+         sin_xls(grid%xb%its:grid%xb%ite) = &
+            deg_to_rad*sin(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jts))
+      end if
+
+      if (grid%xb%jte == grid%xb%jde) then 
+         allocate(cos_xle(grid%xb%its:grid%xb%ite))
+         allocate(sin_xle(grid%xb%its:grid%xb%ite))
+         cos_xle(grid%xb%its:grid%xb%ite) = &
+            deg_to_rad*cos(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jte))
+         sin_xle(grid%xb%its:grid%xb%ite) = &
+            deg_to_rad*sin(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jte))
+      end if
+   end if
+
    !---------------------------------------------------------------------------
    ! Exchange halo region for XB arrays.
    !---------------------------------------------------------------------------

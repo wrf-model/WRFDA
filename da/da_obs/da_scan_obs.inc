@@ -72,10 +72,10 @@ subroutine da_scan_obs (ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! OPEN FILE
+   ! open FILE
    ! ---------
    call da_get_unit(iunit)
-   OPEN(unit   = iunit,     &
+   open(unit   = iunit,     &
       FILE   = trim(filename), &
       FORM   = 'FORMATTED',  &
       ACCESS = 'SEQUENTIAL', &

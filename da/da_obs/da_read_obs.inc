@@ -98,10 +98,10 @@ subroutine da_read_obs (ob, xp, filename)
    num_bogus= ob%num_bogus
    num_airsr= ob%num_airsr
 !----------------------------------------------------------------------------!
-!  OPEN FILE
+!  open FILE
 !  ---------
    call da_get_unit(iunit)
-   OPEN(unit   = iunit,     &
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
@@ -146,7 +146,7 @@ subroutine da_read_obs (ob, xp, filename)
    if (iost /= 0) then
       write(unit=stdout, fmt='(/A,I3,A/)') &
            ' ERROR in inPUT FILE unit ',iunit, &
-           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
       return
    end if
 

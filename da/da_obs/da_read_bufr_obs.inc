@@ -77,18 +77,18 @@ subroutine da_read_bufr_obs (ob, xp, filename)
    num_bogus= ob%num_bogus
    num_pseudo = 0
 !----------------------------------------------------------------------------!
-!  OPEN FILE
+!  open FILE
 !  ---------
    call da_get_unit(iunit)
    if(present(filename)) then
-      OPEN(unit   = iunit, FILE   = trim(filename), &
+      open(unit   = iunit, FILE   = trim(filename), &
            iostat =  iost, form = 'unformatted', STATUS = 'OLD')
 
       if (iost /= 0) then
          write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
               'ERROR in OBS inPUT FILE unit ',iunit, &
               'OBS FILENAME:', trim(filename), &
-              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+              'FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
          return
       end if
    end if

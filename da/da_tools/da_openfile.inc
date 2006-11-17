@@ -1,12 +1,12 @@
       subroutine da_openfile (Kunit, CDFILE, CDACCESS, CDSTATUS, CDFORM)
 !--------------------------------------------------------------------------!
 !
-!                       RoutinE OPENFILE
+!                       RoutinE openFILE
 !                     ********************
 !
 !  PURPOSE:
 !  -------
-!     OPEN AN FILE AND REWinD
+!     open AN FILE AND REWinD
 !
 !   METHOD:
 !   ------
@@ -21,7 +21,7 @@
 !
 !   outPUT:
 !   ------
-!      OPENED FILE
+!      openED FILE
 !
 !   COMMON:                      NO
 !   -------
@@ -43,12 +43,12 @@
 
 !------------------------------------------------------------------------------C
 
-! 1.  OPEN FILE
+! 1.  open FILE
 ! -------------
 
       IOST = 0
 
-      OPEN ( unit   = Kunit, &
+      open ( unit   = Kunit, &
              FILE   = CDFILE, &
              ACCESS = CDACCESS, &
              STATUS = CDSTATUS, &
@@ -63,7 +63,7 @@
 ! 2.  ERROR PROCESSinG
 ! --------------------
  
- 2000 CONTinUE
+ 2000 continue
       call da_error(__FILE__,__LINE__, &
         (/"Cannot open file"//trim(CDFILE)/))
 

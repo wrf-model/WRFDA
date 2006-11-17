@@ -243,3 +243,4 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
 end subroutine da_calculate_j
 
+

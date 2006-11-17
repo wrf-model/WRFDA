@@ -28,6 +28,8 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                    spd_obs, spd_inv, spd_err, spd_inc
    integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, npr
 
+   if (trace_use) call da_trace_entry("da_read_omb_tmp")
+
    open(unit=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
@@ -71,6 +73,9 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if( index( ob_type,'bogus') > 0) go to 120
    if( index( ob_type,'airsr') > 0) go to 130
 
+!jrb
+write(unit=stderr, fmt='(a,a20,a,i3)') &
+   'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
    write(unit=message(1), fmt='(a,a20,a,i3)') &
       'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
    call da_error(__FILE__,__LINE__,message(1:1))
@@ -500,11 +505,11 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 
 999 continue
     close ( unit_in )
+   if (trace_use) call da_trace_exit("da_read_omb_tmp")
     return
 1000 continue
-   write(unit=message(1), fmt='(/a,i3/a/)') &
-      'read error on unit: ',unit_in, & 
-      'in da_read_omb_tmp'
+   write(unit=message(1), fmt='(a,i3)') &
+      'read error on unit: ',unit_in
    call da_error(__FILE__,__LINE__,message(1:1))
 
 end subroutine da_read_omb_tmp

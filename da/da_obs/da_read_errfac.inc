@@ -12,7 +12,7 @@ subroutine da_read_errfac( ob_name, f1, f2, f3, f4, f5 )
    character (len=5)             :: ob_name1
    character (len=21)            :: string1
    character (len=91)            :: string2
-   integer                       :: ierr, fac_unit
+   integer                       :: fac_unit
    real                          :: d1, d2, d3, d4, d5
 
    f1 = 1.0

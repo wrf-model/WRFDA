@@ -10,7 +10,7 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    !--Local
 
-   integer                :: fid , ierr
+   integer                :: fid
    character (LEN=80)     :: file_name
 
    integer :: julyr, julday
@@ -26,7 +26,7 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    call da_trace ("da_med_initialdata_ouput",Message="Writing wrfvar output")
    call open_w_dataset ( fid, trim(file_name), grid , config_flags , &
-                         output_model_input , "DATASET=inPUT", ierr )
+                         output_model_input , "DATASET=INPUT", ierr )
 
    if ( ierr .NE. 0 ) then
       write(unit=message(1),fmt=*) 'Error opening ', &
@@ -43,7 +43,7 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    call output_model_input ( fid, grid , config_flags , ierr )
 
-   call close_dataset ( fid , config_flags, "DATASET=inPUT" )
+   call close_dataset ( fid , config_flags, "DATASET=INPUT" )
 
    if (trace_use) call da_trace_exit("da_med_initialdata_output")
 

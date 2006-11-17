@@ -124,7 +124,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
 
    if (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) then
       call da_get_unit(ssmi_unit)
-      OPEN ( unit   = ssmi_unit,     &
+      open ( unit   = ssmi_unit,     &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
              iostat =  iost,     &
@@ -135,7 +135,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
       if (iost /= 0) then
          write (unit=stderr,fmt='(/,A,I3,A,/)') &
             ' inPUT FILE unit ',ssmi_unit, &
-            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
          Use_SsmiRetrievalObs=.false.
          Use_SsmiTbObs=.false.
       end if 

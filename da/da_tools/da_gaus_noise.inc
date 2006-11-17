@@ -62,7 +62,7 @@ real function da_gaus_noise (KDUM)
 
    if (NISET.EQ.0) then
 
-1000  CONTinUE
+1000  continue
       ZV1   = 2.*DA_UNifVA (KDUM) - 1.
       ZV2   = 2.*DA_UNifVA (KDUM) - 1.
       ZRSQ  = ZV1**2 + ZV2**2

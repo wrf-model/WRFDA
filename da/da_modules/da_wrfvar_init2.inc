@@ -6,7 +6,7 @@ subroutine da_wrfvar_init2
 
    implicit none
 
-   integer :: ierr,i
+   integer :: i
    character(len=80) :: filename
 
    if (trace_use) call da_trace_entry("da_wrfvar_init2")

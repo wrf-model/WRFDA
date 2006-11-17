@@ -17,7 +17,7 @@ subroutine da_wrfvar_run( )
    ! href=wrf_shutdown.html>wrf_shutdown</a> (quilt servers would be
    ! directed to shut down here) is called to properly end the run,
    ! including shutting down the communications (for example, most comm
-   ! layers would call MPI_FinALIZE at this point if they are using MPI).
+   ! layers would call mpi_finalize at this point if they are using MPI).
    ! 
    !</DESCRIPTION>
 

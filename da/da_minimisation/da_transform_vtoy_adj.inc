@@ -33,7 +33,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin,ndynopt
-   integer :: ierr, comm, cg_jcdf, wrf_done_unit
+   integer :: cg_jcdf, wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -82,16 +82,15 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
             call da_system("rm -rf ad/wrf_done")
             call da_system("touch ad/wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
-            do WHILE ( .true. )
-               OPEN(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
+            do while ( .true. )
+               open(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
                close(wrf_done_unit)
                exit
-   303         CONTinUE
+   303         continue
                call da_system("sleep 1")
             end do
             call da_free_unit(wrf_done_unit)
          end if
-         call wrf_get_dm_communicator ( comm )
          call mpi_barrier( comm, ierr )
 
          call da_system_4dvar("da_run_wrfplus_ad.ksh post ")
@@ -122,4 +121,5 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    call da_trace_exit("da_transform_vtoy_adj")
 
 end subroutine da_transform_vtoy_adj
+
 

@@ -35,10 +35,10 @@ subroutine da_scan_radar (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%Radar = ob%num_Radar
 
 !----------------------------------------------------------------------------!
-! 1. OPEN FILE
+! 1. open FILE
 ! ============
    call da_get_unit(iunit)
-   OPEN(unit   = iunit,     &
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
@@ -49,7 +49,7 @@ subroutine da_scan_radar (ob, xp, filename)
       write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
            'ERROR in OBS inPUT FILE unit ',iunit, &
            'OBS FILENAME:', trim(filename), &
-           'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+           'FOR RADAR OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
       return
    end if
 

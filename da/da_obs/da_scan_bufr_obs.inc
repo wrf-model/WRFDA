@@ -64,18 +64,18 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! OPEN FILE
+   ! open FILE
    ! ---------
 
    call da_get_unit(iunit)
-   OPEN(unit   = iunit, FILE  = trim(filename), &
+   open(unit   = iunit, FILE  = trim(filename), &
       iostat =  iost, form = 'unformatted', STATUS = 'OLD')
 
    if (iost /= 0) then
       write(unit=message(1), fmt='(A,I3,A,A)') &
          'ERROR in OBS inPUT FILE unit ',iunit, &
          'OBS FILENAME:', trim(filename)
-      message(2)="BUFR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED"
+      message(2)="BUFR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED"
       call da_warning(__FILE__,__LINE__,message(1:2))
       call da_free_unit(iunit)
       return

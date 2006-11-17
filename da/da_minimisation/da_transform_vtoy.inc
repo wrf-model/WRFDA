@@ -31,7 +31,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin
-   integer :: ierr, comm, wrf_done_unit
+   integer :: wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -56,16 +56,15 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
             call da_system("rm -rf tl/wrf_done")
             call da_system("touch tl/wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
-            do WHILE ( .true. )
-               OPEN(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
+            do while ( .true. )
+               open(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
                close(wrf_done_unit)
                exit
-303            CONTinUE
+303            continue
                call da_system("sleep 1")
             end do
             call da_free_unit(wrf_done_unit)
          end if
-         call wrf_get_dm_communicator ( comm )
          call mpi_barrier( comm, ierr )
 
          call da_system_4dvar("da_run_wrfplus_tl.ksh post ")

@@ -33,7 +33,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    real, dimension(grid%xp%jds:grid%xp%jde) :: loc_latc_mean
 
-   integer :: ierror, size2d
+   integer :: size2d
 
    real, dimension(grid%xp%kms:grid%xp%kme) :: DDT
 
