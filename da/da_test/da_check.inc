@@ -27,6 +27,8 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
    real    :: cvtest(1:cv_size)    ! background error structure.
    real    :: field(its:ite,jts:jte) ! Field for spectral transform test.
 
+   call da_trace_entry("da_check")
+
    !----------------------------------------------------------------------------
    ! [1] Set up test data:
    !----------------------------------------------------------------------------
@@ -132,8 +134,10 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 
    end if
 
-   call wrf_shutdown
-   call da_error(__FILE__,__LINE__,(/"wrf_shutdown failed"/))
+   !call wrf_shutdown
+   !call da_error(__FILE__,__LINE__,(/"wrf_shutdown failed"/))
+
+   call da_trace_exit("da_check")
 
 end subroutine da_check
 

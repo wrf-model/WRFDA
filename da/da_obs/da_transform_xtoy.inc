@@ -139,7 +139,13 @@ subroutine da_transform_xtoy( xb, iv, xa, xp, y )
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   IF (use_radiance) call da_transform_xtoy_rad ( xa, iv, xp, y )
+    if (rtm_option == 1) then
+       call da_transform_xtoy_rad ( xa, iv, xp, y )
+    elseif (rtm_option == 2) then
+       call da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
+    else
+       write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_tranform_xtoy'
+    endif
 
    if (trace_use) call da_trace_exit("da_transform_xtoy")
 

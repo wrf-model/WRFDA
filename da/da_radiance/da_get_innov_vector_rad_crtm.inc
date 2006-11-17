@@ -43,7 +43,7 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
                                        model_qci, model_qsn, &
                                        model_qgr, model_qm
 
-   INTEGER            :: inst, nprofiles, nchanl
+   INTEGER            :: inst, nchanl
    INTEGER            :: nchan_emis
    integer            :: sensor_type
 
@@ -53,8 +53,8 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    REAL                               :: clwp
 
    ! CRTM local varaibles and types
-   INTEGER :: wmo_sensor_id,Error_Status, Allocate_Status, nlevcrtm, levrev
-   TYPE( CRTM_RTSolution_type ), ALLOCATABLE, DIMENSION( : ) :: RTSolution
+   INTEGER :: wmo_sensor_id,Error_Status, Allocate_Status
+   TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:)
    TYPE (CRTM_ChannelInfo_type)   :: ChannelInfo
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere
    TYPE( CRTM_Surface_type )      :: Surface
@@ -100,11 +100,9 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    ! [1.0] calculate the background bright temperature
    !-------------------------------------------------------
 
-   nprofiles = 1
    do inst = 1, iv%num_inst                 ! loop for sensor
       if ( iv%instid(inst)%num_rad < 1 ) cycle
       num_levs  = xp%kte-xp%kts+1 
-     ! nchanl    = iv%instid(inst)%nchan
 
   ! CRTM channel information structure
       Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -441,6 +439,10 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          iv%instid(inst)%rad(n)%vegtyp   = model_ivgtyp
          iv%instid(inst)%rad(n)%vegfra  = model_vegfra
          iv%instid(inst)%rad(n)%clwp    = clwp
+         iv%instid(inst)%rad(n)%water_coverage=surface%water_coverage
+         iv%instid(inst)%rad(n)%land_coverage=surface%land_coverage
+         iv%instid(inst)%rad(n)%ice_coverage=surface%ice_coverage                              
+         iv%instid(inst)%rad(n)%snow_coverage=surface%snow_coverage
 
          !----------------------------------------------------------------
          ! [4.0] Apply Bias Correction 
@@ -462,7 +464,7 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
       Error_Status = CRTM_Destroy_Surface(Surface)
       if ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
-          (/"Error in deallocatting CRTM Surface Structure Structure"/))
+          (/"Error in deallocatting CRTM Surface Structure"/))
       endif
 
    end do        ! end loop for sensor

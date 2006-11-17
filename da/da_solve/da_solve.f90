@@ -143,29 +143,6 @@ subroutine da_solve ( grid , config_flags , &
    call da_zero_vp_type( grid%vv )
    call da_zero_vp_type( grid%vp )
 
-   if (test_transforms .or. Testing_WRFVAR) then
-      call da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags , &
-#include "em_dummy_new_args.inc"
-                 )
-
-      call da_allocate_y (iv, re)
-      call da_allocate_y (iv, y)
-
-      allocate (cvt(1:cv_size))
-      allocate (xhat(1:cv_size))
-      call da_initialize_cv (cv_size, cvt)
-      call da_initialize_cv (cv_size, xhat)
-
-      call da_check (cv_size, grid%xb, xbx, be, grid%ep, iv, &
-                     grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
-                     ids, ide, jds, jde, kds, kde, &
-                     ims, ime, jms, jme, kms, kme, &
-                     its, ite, jts, jte, kts, kte)
-      call da_zero_vp_type (grid%vv)
-      call da_zero_vp_type (grid%vp)
-   endif
-
    !---------------------------------------------------------------------------
    ! [8] Outerloop
    !---------------------------------------------------------------------------
@@ -222,6 +199,7 @@ subroutine da_solve ( grid , config_flags , &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
                         its, ite, jts, jte, kts, kte )
+         call wrf_shutdown
       end if
 
       if (testing_wrfvar) then
@@ -230,6 +208,7 @@ subroutine da_solve ( grid , config_flags , &
                         ids, ide, jds, jde, kds, kde, &
                         ims, ime, jms, jme, kms, kme, &
                         its, ite, jts, jte, kts, kte )
+         call wrf_shutdown
       end if
 
       ! Write "clean" QCed observations if requested:

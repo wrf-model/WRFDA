@@ -31,27 +31,14 @@ module da_radiance
 #endif
 
 #ifdef CRTM
-  !-----------------------------------------------
-  ! Modules to define CRTM structures
-  !
+  ! -- Modules to define CRTM constants etc.
    USE CRTM_Parameters
-  ! -- CRTM Initialization modules
-  ! USE CRTM_ChannelInfo_Define  ! derived type CRTM_ChannelInfo_type
-  ! USE CRTM_Atmosphere_Define
-  ! USE CRTM_Surface_Define
-  ! USE CRTM_GeometryInfo_Define
-  ! USE CRTM_RTSolution_Define
-   
-  ! USE CRTM_LifeCycle      ! crtm_init
-  ! USE CRTM_ChannelInfo    ! crtm_set_channelinfo
-
-  ! -- CRTM Utility modules
    USE Type_Kinds
    USE Error_Handler
 
   ! -- CRTM RT_models modules
-  USE CRTM_Module   ! include 12 modules
-  USE CRTM_SensorInfo
+   USE CRTM_Module   ! include 12 modules
+   USE CRTM_SensorInfo
 #endif
 
    use gsi_kinds      ,  only : r_kind,r_double,i_kind,r_single
@@ -271,6 +258,8 @@ CONTAINS
 #include "da_print_stats_rad.inc"
 #include "da_transform_xtoy_rad.inc"
 #include "da_transform_xtoy_rad_adj.inc"
+#include "da_transform_xtoy_rad_crtm.inc"
+#include "da_transform_xtoy_rad_crtm_adj.inc"
 #include "da_calculate_grady_rad.inc"
 #include "da_get_julian_time.inc"
 #include "da_get_time_slots.inc"

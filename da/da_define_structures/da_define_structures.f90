@@ -439,6 +439,7 @@ module da_define_structures
         real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
         real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
         integer            ::   isflg
+        real               ::   water_coverage,land_coverage,ice_coverage,snow_coverage
 
    END TYPE rad_type
 
