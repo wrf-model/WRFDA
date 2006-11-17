@@ -46,14 +46,12 @@ subroutine da_solve ( grid , config_flags , &
                                    ims , ime , jms , jme , kms , kme , &
                                    its , ite , jts , jte , kts , kte
 
-   integer                      :: cv_size
+   integer                      :: cv_size, i
    real                         :: j_grad_norm_target ! TArget j norm.
-#ifdef DM_PARALLEL
-   integer                      :: ierr,comm
-#endif
    integer                      :: wrf_done_unit
 
    if (trace_use) call da_trace_entry("da_solve")
+call mpi_barrier(comm,ierr)
 
    !---------------------------------------------------------------------------
    ! If it is verification run set check_max_iv as .false.
@@ -61,20 +59,20 @@ subroutine da_solve ( grid , config_flags , &
 
    if (anal_type_verify) then
       check_max_iv = .false.
-   endif
+   end if
 
    if (cv_options_hum < 1 .or. cv_options_hum > 3) then
-      write(unit=errmsg(1),fmt='(A,I3)') &
+      write(unit=message(1),fmt='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
-      call wrf_error_fatal(errmsg(1))
+      call wrf_error_fatal(message(1))
    end if
 
    if (vert_corr == 2) then
       if (vertical_ip < 0 .or. vertical_ip > 2) then
-         write (unit=errmsg(1),fmt='(A,I3)') &
+         write (unit=message(1),fmt='(A,I3)') &
            'Invalid vertical_ip = ', &
            vertical_ip
-         call da_warning(__FILE__,__LINE__,errmsg(1:1))
+         call da_warning(__FILE__,__LINE__,message(1:1))
       end if
    end if
 
@@ -170,10 +168,9 @@ subroutine da_solve ( grid , config_flags , &
 303                  continue
                   call system("sync")
                   call system("slegrid%ep 1")
-               enddo
+               end do
                call da_free_unit(wrf_done_unit)
-            endif
-            call wrf_get_dm_communicator ( comm )
+            end if
             call mpi_barrier( comm, ierr )
 
             call da_system_4dvar("da_run_wrf_nl.ksh post ")
@@ -184,7 +181,7 @@ subroutine da_solve ( grid , config_flags , &
          call system("da_run_wrf_nl.ksh")
 #endif
          call da_trace("da_solve","Finished da_run_wrf_nl.ksh")
-      endif
+      end if
 
       ! [8.2] Calculate innovation vector (O-B):
 
@@ -214,11 +211,11 @@ subroutine da_solve ( grid , config_flags , &
       ! Write "clean" QCed observations if requested:
       if (anal_type_qcobs) then
          if (it == 1) then
-            CALL da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
+            call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
                           grid%moad_cen_lat, grid%stand_lon,&
                           grid%truelat1, grid%truelat2 )
          end if     
-      endif
+      end if
 
       if (monitoring) call wrf_shutdown
 
@@ -247,17 +244,17 @@ subroutine da_solve ( grid , config_flags , &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
 
-      ! [8.6] Only when use_RadarObs = .false. and W_INCREMENTS =.true.,
+      ! [8.6] Only when use_RadarObs = .false. and W_inCREMENTS =.true.,
       !       the W_increment need to be diagnosed:
 
-      if (W_INCREMENTS .and. .not. use_RadarObs) then
+      if (W_inCREMENTS .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
                                   its,ite, jts,jte, kts, kte )
 
          call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id13)
-      endif
+      end if
 
       ! [8.7] Write out diagnostics
 
@@ -267,7 +264,7 @@ subroutine da_solve ( grid , config_flags , &
 
       if (write_oa_rad_ascii) then
          write(unit=stdout,fmt=*)  ' writing radiance OMB and OMA ascii file'
-         call da_write_oa_rad_ascii(grid%xp,ob,iv,re)
+         call da_write_oa_rad_ascii (grid%xp,ob,iv,re)
       end if
 
       !------------------------------------------------------------------------
@@ -285,6 +282,29 @@ subroutine da_solve ( grid , config_flags , &
 
    deallocate (cvt)
    deallocate (xhat)
+
+   if (use_radiance) then
+      do i =1, iv%num_inst
+         deallocate (j % jo % rad(i) % jo_ichan)
+         deallocate (j % jo % rad(i) % num_ichan)
+         deallocate (satinfo(i) % ichan)
+         deallocate (satinfo(i) % iuse)
+         deallocate (satinfo(i) % error)
+         deallocate (satinfo(i) % polar)
+         deallocate (satinfo(i) % rms)
+         deallocate (satinfo(i) % std)
+         deallocate (satinfo(i) % a)
+         deallocate (satinfo(i) % b)
+         deallocate (iv%instid(i) % ichan)
+         deallocate (ob%instid(i) % ichan)
+#ifdef RTTOV
+         call rttov_dealloc_coef (ierr,coefs(i))
+#endif
+      end do
+      deallocate (j % jo % rad)
+      deallocate (satinfo)
+   end if
+
    call da_deallocate_observations(iv)
    call da_deallocate_y (re)
    call da_deallocate_y (y)
@@ -310,10 +330,20 @@ subroutine da_solve ( grid , config_flags , &
       deallocate (xbx%int_wgts)
       deallocate (xbx%alp)
       deallocate (xbx%wsave)
+      if (grid%xb%jts == grid%xb%jds) then
+         deallocate(cos_xls)
+         deallocate(sin_xls)
+      end if
+                                                                                
+      if (grid%xb%jte == grid%xb%jde) then
+         deallocate(cos_xle)
+         deallocate(sin_xle)
+      end if
    end if
 
    deallocate (xbx % latc_mean)
 
+call mpi_barrier(comm,ierr)
    if (trace_use) call da_trace_exit("da_solve")
 
 contains
