@@ -1,32 +1,10 @@
 # MAIN
 
-var : wrfvar
-
-wrfvar  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar.o
-	$(LD) -o wrfvar.exe $(LDFLAGS) wrfvar.o $(WRFVAR_LIB)
-
-wrfvar_esmf  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) wrfvar_esmf.o \
-          da_wrfvar_esmf_super.o
-	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) wrfvar_esmf.o $(WRFVAR_LIB) \
-          da_wrfvar_esmf_super.o
-
 wrf     : setup $(WRF_LIBS) wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 
 wrfplus : setup $(WRFPLUS_LIBS) wrf.o
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o $(WRFPLUS_LIB)
-
-k2n : kma2netcdf
-
-n2k : netcdf2kma
-
-kma2netcdf :  setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) kma2netcdf.o
-	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
-          $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
-
-netcdf2kma : setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) netcdf2kma.o
-	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o \
-           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
 $(SOLVER) : setup $(WRF_LIBS) $(SOLVER).o
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrf.a $(WRF_LIB)

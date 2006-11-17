@@ -20,6 +20,15 @@ $(LIBTARGET) :  $(MODULES) $(OBJS)
 
 include ../configure.wrf
 
+kma2netcdf : kma2netcdf.o
+        $(RANLIB) libwrflib.a
+        $(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o libwrflib.a $(LIB) -L.
+
+netcdf2kma : netcdf2kma.o
+        $(RANLIB) libwrflib.a
+        $(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o libwrflib.a $(LIB) -L.
+
+
 module_kma_wave2grid.o: \
 		kma_wave2grid/BSSLZ1.inc \
 		kma_wave2grid/CUT.inc \

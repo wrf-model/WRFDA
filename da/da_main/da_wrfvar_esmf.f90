@@ -1,7 +1,7 @@
 !WRF:DRIVER_LAYER:MAIN
 !
 
-PROGRAM wrfvar
+PROGRAM da_wrfvar_esmf
 
    USE da_wrfvar_esmf_super
 
@@ -37,5 +37,5 @@ PROGRAM wrfvar
 
    CALL ESMF_Finalize( rc=rc )
 
-END PROGRAM wrfvar
+END PROGRAM da_wrfvar_esmf
 

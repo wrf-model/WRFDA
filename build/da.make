@@ -1,7 +1,7 @@
-WRFVAR_OBJS        =	da_par_util.o           \
-			da_par_util1.o          \
-			da_setup_structures.o	\
-			da_minimisation.o	\
+WRFVAR_OBJS        =	da_par_util.o \
+			da_par_util1.o \
+			da_setup_structures.o \
+			da_minimisation.o \
 			da_vtox_transforms.o	\
 			da_obs.o		\
 			da_metar.o		\
@@ -149,6 +149,16 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         start_domain.o \
                         interp_fcn.o \
                         couple_or_uncouple_em.o
+
+var : wrfvar
+
+wrfvar  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_main.o
+	$(LD) -o wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+
+wrfvar_esmf  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
+          da_wrfvar_esmf_super.o
+	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
+          da_wrfvar_esmf_super.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc

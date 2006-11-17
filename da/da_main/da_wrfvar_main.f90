@@ -1,7 +1,7 @@
 !WRFVAR:DRIVER_LAYER:MAIN
 !
 
-PROGRAM wrfvar
+PROGRAM da_wrfvar_main
 
   USE da_wrfvar_top
 
@@ -22,7 +22,7 @@ PROGRAM wrfvar
    CALL da_wrfvar_init1
 
    IF (trace_use) call da_trace_init
-   IF (trace_use) call da_trace_entry("wrfvar")
+   IF (trace_use) call da_trace_entry("da_wrfvar_main")
 
    CALL da_wrfvar_init2
 
@@ -32,11 +32,11 @@ PROGRAM wrfvar
 
    call wrf_message("*** WRF-Var completed successfully ***")
 
-   IF (trace_use) call da_trace_exit("wrfvar")
+   IF (trace_use) call da_trace_exit("da_wrfvar_main")
    IF (trace_use) call da_trace_report
 
    call WRFU_Finalize
    call wrf_shutdown
 
-END PROGRAM wrfvar
+END PROGRAM da_wrfvar_main
 
