@@ -12,14 +12,13 @@ subroutine da_proc_sum_int ( value )
    integer,   intent(inout)      :: value     ! Value on processor.
 
    integer           :: sum                   ! Sum across processors.
-   integer           :: ierr                  ! Error code from MPI routines.
    integer           :: root                  ! Monitor processor.
 
 #ifdef DM_PARALLEL
    if (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    sum=0
-   call MPI_REDUCE(value, sum, 1, mpi_integer, mpi_sum, root, mpi_comm_world, IERR )
+   call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, comm, ierr )
 
    if (myproc .eq. root) value = sum
 #endif

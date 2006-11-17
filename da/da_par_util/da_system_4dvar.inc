@@ -10,13 +10,11 @@ subroutine da_system_4dvar( cmd_line_in )
    character*256 cmd_line
 
 #ifdef DM_PARALLEL
-   integer comm, ierr
    if (rootproc) then
       cmd_line = trim(cmd_line_in) // " monitor"
    else
       cmd_line = trim(cmd_line_in) // " other"
    end if
-   call wrf_get_dm_communicator ( comm )
    call mpi_barrier ( comm, ierr )
 #else
    cmd_line = cmd_line_in // " other"
@@ -27,3 +25,5 @@ subroutine da_system_4dvar( cmd_line_in )
 #endif
 
 end subroutine da_system_4dvar
+
+

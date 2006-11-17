@@ -13,7 +13,7 @@
 !C     N IS THE LENGTH OF THE VECTORS
 !C     ifAC IS THE CURRENT FACTOR OF N
 !C     LA = N/(PRODUCT OF FACTORS useD SO FAR)
-!C     IERR IS AN ERROR inDICATOR:
+!C     ERR IS AN ERROR inDICATOR:
 !C              0 - PASS COMPLETED WITHout ERROR
 !C              1 - LOT GREATER THAN VectorLength
 !C              2 - ifAC NOT CATERED FOR
@@ -21,9 +21,9 @@
 !C
 !C-----------------------------------------------------------------------
 !C
-     subroutine da_qpassm(A,B,C,D,TRIGS,inC1,inC2,inC3,inC4,LOT,N,ifAC,LA,IERR)
+     subroutine da_qpassm(A,B,C,D,TRIGS,inC1,inC2,inC3,inC4,LOT,N,ifAC,LA,ERR)
 
-      integer :: inc1, inc2, inc3, inc4, lot, n, ifac, la, ierr
+      integer :: inc1, inc2, inc3, inc4, lot, n, ifac, la, err
 
       real  :: a, b, c, d, trigs
       dimension A(*),B(*),C(*),D(*),TRIGS(N)
@@ -64,7 +64,7 @@
 !
 !     CODinG FOR FACTOR 2
 !     -------------------
-  200 CONTinUE
+  200 continue
       IA=1
       IB=IA+IinK
       JA=1
@@ -81,10 +81,10 @@
       C(JB+J)=A(IA+I)-A(IB+I)
       I=I+inC3
       J=J+inC4
-  210 CONTinUE
+  210 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  220 CONTinUE
+  220 continue
       JA=JA+JinK
       JinK=2*JinK
       JB=JB-JinK
@@ -107,16 +107,16 @@
       D(JB+J)=(C1*B(IB+I)-S1*A(IB+I))-B(IA+I)
       I=I+inC3
       J=J+inC4
-  230 CONTinUE
+  230 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  240 CONTinUE
+  240 continue
       IBASE=IBASE+IJUMP
       JA=JA+JinK
       JB=JB-JinK
-  250 CONTinUE
+  250 continue
       if (JA.GT.JB) goto 900
-  260 CONTinUE
+  260 continue
       JBASE=0
       do 280 L=1,LA
       I=IBASE
@@ -127,13 +127,13 @@
       D(JA+J)=-A(IB+I)
       I=I+inC3
       J=J+inC4
-  270 CONTinUE
+  270 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  280 CONTinUE
+  280 continue
       goto 900
 !
-  290 CONTinUE
+  290 continue
       Z=1.0/FLOAT(N)
       do 294 L=1,LA
       I=IBASE
@@ -144,15 +144,15 @@
       C(JB+J)=Z*(A(IA+I)-A(IB+I))
       I=I+inC3
       J=J+inC4
-  292 CONTinUE
+  292 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  294 CONTinUE
+  294 continue
       goto 900
 !
 !     CODinG FOR FACTOR 3
 !     -------------------
-  300 CONTinUE
+  300 continue
       IA=1
       IB=IA+IinK
       IC=IB+IinK
@@ -172,10 +172,10 @@
       D(JB+J)=Sin60*(A(IC+I)-A(IB+I))
       I=I+inC3
       J=J+inC4
-  310 CONTinUE
+  310 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  320 CONTinUE
+  320 continue
       JA=JA+JinK
       JinK=2*JinK
       JB=JB+JinK
@@ -210,17 +210,17 @@
       D(JC+J)=-(B2+A3)
       I=I+inC3
       J=J+inC4
-  330 CONTinUE
+  330 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  340 CONTinUE
+  340 continue
       IBASE=IBASE+IJUMP
       JA=JA+JinK
       JB=JB+JinK
       JC=JC-JinK
-  350 CONTinUE
+  350 continue
       if (JA.GT.JC) goto 900
-  360 CONTinUE
+  360 continue
       JBASE=0
       do 380 L=1,LA
       I=IBASE
@@ -232,13 +232,13 @@
       C(JB+J)=A(IA+I)-(A(IB+I)-A(IC+I))
       I=I+inC3
       J=J+inC4
-  370 CONTinUE
+  370 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  380 CONTinUE
+  380 continue
       goto 900
 !
-  390 CONTinUE
+  390 continue
       Z=1.0/FLOAT(N)
       ZSin60=Z*Sin60
       do 394 L=1,LA
@@ -251,15 +251,15 @@
       D(JB+J)=ZSin60*(A(IC+I)-A(IB+I))
       I=I+inC3
       J=J+inC4
-  392 CONTinUE
+  392 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  394 CONTinUE
+  394 continue
       goto 900
 !
 !     CODinG FOR FACTOR 4
 !     -------------------
-  400 CONTinUE
+  400 continue
       IA=1
       IB=IA+IinK
       IC=IB+IinK
@@ -282,10 +282,10 @@
       D(JB+J)=A(ID+I)-A(IB+I)
       I=I+inC3
       J=J+inC4
-  410 CONTinUE
+  410 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  420 CONTinUE
+  420 continue
       JA=JA+JinK
       JinK=2*JinK
       JB=JB+JinK
@@ -328,18 +328,18 @@
       D(JD+J)=-(B2+A3)
       I=I+inC3
       J=J+inC4
-  430 CONTinUE
+  430 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  440 CONTinUE
+  440 continue
       IBASE=IBASE+IJUMP
       JA=JA+JinK
       JB=JB+JinK
       JC=JC-JinK
       JD=JD-JinK
-  450 CONTinUE
+  450 continue
       if (JB.GT.JC) goto 900
-  460 CONTinUE
+  460 continue
       Sin45=sqrt(0.5)
       JBASE=0
       do 480 L=1,LA
@@ -353,13 +353,13 @@
       D(JB+J)=A(IC+I)-Sin45*(A(IB+I)+A(ID+I))
       I=I+inC3
       J=J+inC4
-  470 CONTinUE
+  470 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  480 CONTinUE
+  480 continue
       goto 900
 !
-  490 CONTinUE
+  490 continue
       Z=1.0/FLOAT(N)
       do 494 L=1,LA
       I=IBASE
@@ -372,15 +372,15 @@
       D(JB+J)=Z*(A(ID+I)-A(IB+I))
       I=I+inC3
       J=J+inC4
-  492 CONTinUE
+  492 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  494 CONTinUE
+  494 continue
       goto 900
 !
 !     CODinG FOR FACTOR 5
 !     -------------------
-  500 CONTinUE
+  500 continue
       IA=1
       IB=IA+IinK
       IC=IB+IinK
@@ -412,10 +412,10 @@
       D(JC+J)=-Sin36*A3+Sin72*A4
       I=I+inC3
       J=J+inC4
-  510 CONTinUE
+  510 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  520 CONTinUE
+  520 continue
       JA=JA+JinK
       JinK=2*JinK
       JB=JB+JinK
@@ -476,19 +476,19 @@
       D(JD+J)=-(B20+B21)
       I=I+inC3
       J=J+inC4
-  530 CONTinUE
+  530 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  540 CONTinUE
+  540 continue
       IBASE=IBASE+IJUMP
       JA=JA+JinK
       JB=JB+JinK
       JC=JC+JinK
       JD=JD-JinK
       JE=JE-JinK
-  550 CONTinUE
+  550 continue
       if (JB.GT.JD) goto 900
-  560 CONTinUE
+  560 continue
       JBASE=0
       do 580 L=1,LA
       I=IBASE
@@ -508,13 +508,13 @@
       D(JB+J)=-Sin72*A1+Sin36*A2
       I=I+inC3
       J=J+inC4
-  570 CONTinUE
+  570 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  580 CONTinUE
+  580 continue
       goto 900
 !
-  590 CONTinUE
+  590 continue
       Z=1.0/FLOAT(N)
       ZQRT5=Z*QRT5
       ZSin36=Z*Sin36
@@ -537,15 +537,15 @@
       D(JC+J)=-ZSin36*A3+ZSin72*A4
       I=I+inC3
       J=J+inC4
-  592 CONTinUE
+  592 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  594 CONTinUE
+  594 continue
       goto 900
 !
 !     CODinG FOR FACTOR 6
 !     -------------------
-  600 CONTinUE
+  600 continue
       IA=1
       IB=IA+IinK
       IC=IB+IinK
@@ -576,10 +576,10 @@
       C(JD+J)=(A(IA+I)-A(ID+I))+A11
       I=I+inC3
       J=J+inC4
-  610 CONTinUE
+  610 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  620 CONTinUE
+  620 continue
       JA=JA+JinK
       JinK=2*JinK
       JB=JB+JinK
@@ -648,10 +648,10 @@
       D(JF+J)=A21+B20
       I=I+inC3
       J=J+inC4
-  630 CONTinUE
+  630 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  640 CONTinUE
+  640 continue
       IBASE=IBASE+IJUMP
       JA=JA+JinK
       JB=JB+JinK
@@ -659,9 +659,9 @@
       JD=JD-JinK
       JE=JE-JinK
       JF=JF-JinK
-  650 CONTinUE
+  650 continue
       if (JC.GT.JD) goto 900
-  660 CONTinUE
+  660 continue
       JBASE=0
       do 680 L=1,LA
       I=IBASE
@@ -676,13 +676,13 @@
       D(JC+J)=-(A(ID+I)+0.5*(A(IB+I)+A(if+I)))+Sin60*(A(IC+I)+A(IE+I))
       I=I+inC3
       J=J+inC4
-  670 CONTinUE
+  670 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  680 CONTinUE
+  680 continue
       goto 900
 !
-  690 CONTinUE
+  690 continue
       Z=1.0/FLOAT(N)
       ZSin60=Z*Sin60
       do 694 L=1,LA
@@ -700,15 +700,15 @@
       C(JD+J)=Z*((A(IA+I)-A(ID+I))+A11)
       I=I+inC3
       J=J+inC4
-  692 CONTinUE
+  692 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  694 CONTinUE
+  694 continue
       goto 900
 !
 !     CODinG FOR FACTOR 8
 !     -------------------
-  800 CONTinUE
+  800 continue
       IBAD=3
       if (LA.NE.M) goto 910
       IA=1
@@ -744,16 +744,16 @@
       D(JD+J)=ZSin45*((A(IH+I)-A(ID+I))+(A(if+I)-A(IB+I)))-Z*(A(IG+I)-A(IC+I))
       I=I+inC3
       J=J+inC4
-  810 CONTinUE
+  810 continue
       IBASE=IBASE+inC1
       JBASE=JBASE+inC2
-  820 CONTinUE
+  820 continue
 !
 
-  900 CONTinUE
+  900 continue
       IBAD=0
-  910 CONTinUE
-      IERR=IBAD
+  910 continue
+      ERR=IBAD
 
       return
       end subroutine da_qpassm

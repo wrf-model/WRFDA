@@ -30,7 +30,7 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    K=0
    L=1
 
-20 CONTinUE
+20 continue
 
    if (MOD(NU,ifAC).NE.0) goto 30
    
@@ -42,12 +42,12 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    JFAX(1)=8
    JFAX(K)=6
 
-25 CONTinUE
+25 continue
    NU=NU/ifAC
    if (NU.EQ.1) goto 50
    if (ifAC.NE.8) goto 20
 
-30 CONTinUE
+30 continue
    L=L+1
    ifAC=LFAX(L)
    if (ifAC .GT. 1) goto 20
@@ -58,7 +58,7 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    goto 9
 
    ! NOW REVERSE ORDER OF FACTORS
-50 CONTinUE
+50 continue
    NFAX=K
    fft_factors(1)=NFAX
    do I=1,NFAX
@@ -67,6 +67,6 @@ subroutine da_find_fft_factors( n, n_ok, fft_factors )
    
    n_ok = .true.
       
-9  CONTinUE
+9  continue
 
 end subroutine da_find_fft_factors

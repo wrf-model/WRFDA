@@ -529,6 +529,18 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    character(len=120)  :: fmt_each = &
       '(3(f12.3,i4,f7.2),11x,3(f12.3,i4,f7.2),11x,1(f12.3,i4,f7.2))'
 
+   ! lat/long information calculated in da_setup_firstguess_wrf
+
+   real, parameter :: deg_to_rad = pi/180.0
+  
+   real, allocatable :: cos_xls(:)
+   real, allocatable :: sin_xls(:)
+   real, allocatable :: cos_xle(:)
+   real, allocatable :: sin_xle(:)
+
+   integer :: ierr ! General error code
+   integer :: comm ! MPI communicator
+
 contains
 
 #include "da_advance_cymdh.inc"

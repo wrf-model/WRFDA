@@ -35,3 +35,5 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
    end if
 
 end subroutine da_get_reglats
+
+

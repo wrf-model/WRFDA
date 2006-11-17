@@ -14,7 +14,6 @@ subroutine da_proc_sum_real ( n, value )
    real,    intent(inout)      :: value(n) ! Array to be summed componentwise.
 
    real              :: apsum(n)             ! Sum across processors.
-   integer           :: ierr               ! Error code from MPI routines.
    integer           :: root               ! Monitor processor.
 
 #ifdef DM_PARALLEL
@@ -22,7 +21,7 @@ subroutine da_proc_sum_real ( n, value )
    if (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
    apsum=0
-   call MPI_REDUCE(value, apsum, n, true_mpi_real, mpi_sum, root, mpi_comm_world, IERR )
+   call mpi_reduce(value, apsum, n, true_mpi_real, mpi_sum, root, comm, ierr )
 
    if (myproc .eq. root) value = apsum
 #endif

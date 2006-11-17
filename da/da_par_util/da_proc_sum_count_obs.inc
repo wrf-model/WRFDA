@@ -21,7 +21,6 @@ subroutine da_proc_sum_count_obs ( count_obs )
 
    integer           :: sumval(1:numvals)     ! Sum across processors.
    integer           :: procval(1:numvals)    ! Partial values on processor to sum.
-   integer           :: ierr                  ! Error code from MPI routines.
    integer           :: root                  ! Monitor processor.
    integer           :: offset                ! Index into procval and sumval arrays.
 
@@ -51,7 +50,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
    call da_pack_count_obs( count_obs % num_bogus, offset, procval )
    call da_pack_count_obs( count_obs % num_buoy, offset, procval )
 
-   call MPI_REDUCE(procval, sumval, numvals, mpi_integer, mpi_sum, root, mpi_comm_world, IERR )
+   call mpi_reduce(procval, sumval, numvals, mpi_integer, mpi_sum, root, comm, ierr )
    
    if ( myproc .eq. root ) then
       offset = 1

@@ -37,47 +37,47 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    if (global) then     
       ! Poles treatment for global WRFVAR
 #ifndef DEREF_KLUDGE
-      call da_get_avpoles(xa%u,xa%v,xb%lon,&
-            ids, ide, jds, jde, kds, kde,  &
+      call da_get_avpoles(xa%u,xa%v,&
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%t,            &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%p,            &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%q,            &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%psfc,         &
-            ids, ide, jds, jde,   1,   1,  &
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1   )
 #else
       call da_get_avpoles(xa%u(ims,jms,kms),         &
                           xa%v(ims,jms,kms),         &
                           xb%lon(ims,jms),           &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,  &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%t(ims,jms,kms),         &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%p(ims,jms,kms),         &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,  &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%q(ims,jms,kms),         &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,  &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_aspoles(xa%psfc(ims,jms),          &
-                      ids, ide, jds, jde,   1,   1,  &
+                      ids, ide, jds, jde,  &
                       ims, ime, jms, jme,   1,   1,  &
                       its, ite, jts, jte,   1,   1   )
 #endif
@@ -204,9 +204,10 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
    call da_zero_vp_type ( vv )
 
    ! Uv for alpha is a null transform:
-!   if ( be % ne > 0 ) then
-!      vv % alpha(its:ite,jts:jte,1:be%ne) = vp % alpha(its:ite,jts:jte,1:be%ne) 
-!   end if
+   ! if ( be % ne > 0 ) then
+   !    vv % alpha(its:ite,jts:jte,1:be%ne) = &
+   !    vp % alpha(its:ite,jts:jte,1:be%ne) 
+   ! end if
 
    if ( vert_corr == 2 ) then      
       call da_vertical_transform( 'u_adj', be, &
@@ -245,6 +246,6 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 
    if (trace_use) call da_trace_exit("da_transform_vtox_adj")
 
-
 end subroutine da_transform_vtox_adj
+
 

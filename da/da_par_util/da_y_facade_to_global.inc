@@ -32,7 +32,6 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    ! Local declarations
 #ifdef DM_PARALLEL
    integer                      :: n, k, serial_n, serial_numvals
-   integer                      :: communicator
    integer                      :: proc
    integer                      :: num_obs_send
    integer                      :: buf_idx
@@ -51,7 +50,6 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    integer,allocatable          :: recv_displs(:)
    real,allocatable             :: re_vals_lcl(:)
    real,allocatable             :: re_vals_all(:)
-   integer                      :: ierr
    integer                      :: i
 
    ! TOdo:  later, upgrade from "allgather" to "gather-broadcast"
@@ -72,14 +70,13 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
       end if
    end do
    ! exchange num_obs_send and obs_global_index
-   call wrf_get_dm_communicator ( communicator )
    allocate( num_obs_send_all(0:num_procs-1),     &
               num_send_buf_all(0:num_procs-1),     &
               recv_counts(0:num_procs-1),          &
               recv_displs(0:num_procs-1) )
    ! gather num_obs_send
-   call MPI_ALLGATHER( num_obs_send, 1, mpi_integer, num_obs_send_all, 1, &
-                        mpi_integer, communicator, ierr )
+   call mpi_allgather( num_obs_send, 1, mpi_integer, num_obs_send_all, 1, &
+                        mpi_integer, comm, ierr )
    num_obs_all = sum( num_obs_send_all )
    if ( num_obs_all /= re_slice%num_obs_glo ) then
       call da_error (__FILE__,__LINE__, &
@@ -96,9 +93,9 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
               obs_global_index_inv(num_obs_all), &
               obs_start_all(num_obs_all) )
    ! gather obs_global_index
-   call MPI_ALLGATHERV( obs_global_index, num_obs_send, mpi_integer,    &
+   call mpi_allgatherv( obs_global_index, num_obs_send, mpi_integer,    &
                          obs_global_index_all, recv_counts, recv_displs, &
-                         mpi_integer, communicator, ierr )
+                         mpi_integer, comm, ierr )
    ! invert obs_global_index_all
    ! initialize to "invalid" value
    obs_global_index_inv = -1
@@ -163,9 +160,9 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
          end if
       end do
       ! gather num_send_buf_lcl
-      call MPI_ALLGATHER( num_send_buf_lcl, 1, mpi_integer, &
+      call mpi_allgather( num_send_buf_lcl, 1, mpi_integer, &
                           num_send_buf_all, 1,              &
-                          mpi_integer, communicator, ierr )
+                          mpi_integer, comm, ierr )
       ! gather num_values
       recv_counts = num_obs_send_all
       recv_displs(0) = 0
@@ -173,9 +170,9 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
       end do
       ! num_values
-      call MPI_ALLGATHERV( num_values, num_obs_send, mpi_integer,    &
+      call mpi_allgatherv( num_values, num_obs_send, mpi_integer,    &
                            num_values_all, recv_counts, recv_displs, &
-                           mpi_integer, communicator, ierr )
+                           mpi_integer, comm, ierr )
       ! set up to gather local arrays
       ! compute start index of each obs in gathered buffers
       obs_start_all(1) = 1
@@ -207,9 +204,9 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
       ! allocate receive buffer
       allocate( re_vals_all(num_recv_all) )
       ! finally, actually gather the values
-      call MPI_ALLGATHERV( re_vals_lcl, num_send_buf_lcl, true_mpi_real,   &
+      call mpi_allgatherv( re_vals_lcl, num_send_buf_lcl, true_mpi_real,   &
                            re_vals_all, recv_counts, recv_displs, &
-                           true_mpi_real, communicator, ierr )
+                           true_mpi_real, comm, ierr )
       ! initialize re_glob_slice
       ! NOTE:  The i loop should be inside this n loop, see comment above...  
       ! TOdo:  Refactor...  

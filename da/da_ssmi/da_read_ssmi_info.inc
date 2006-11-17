@@ -28,12 +28,12 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
    iost = -99999
 
-   ! 1. OPEN FILE
+   ! 1. open FILE
    !    ---------
 
    if( use_ssmiretrievalobs .or. use_ssmitbobs .or. &
        use_ssmt1obs .or. use_ssmt2obs ) then
-      OPEN ( unit   = iunit,     &
+      open ( unit   = iunit,     &
            FORM   = 'FORMATTED',  &
            ACCESS = 'SEQUENTIAL', &
            iostat =  iost,     &

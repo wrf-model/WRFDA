@@ -81,7 +81,7 @@ Implicit none
  integer                  :: NFAX,NX,NH
  integer                  :: NBLOX,NVEX,NB
  integer                  :: K,JA,JB,IA,IB,IGO,LA,J
- integer                  :: ifAC,IERR,ISTART
+ integer                  :: ifAC,ISTART
 
  real                     :: SI,T1,T2,SCALE
  integer                  :: vectorlength
@@ -114,7 +114,7 @@ Implicit none
          IB=IB+JUMP
          JA=JA+NX
          JB=JB+NX
-  110    CONTinUE
+  110    continue
       else
 !DIR$ IVDEP
          do 115 J=1,NVEX
@@ -124,9 +124,9 @@ Implicit none
          A(IB) = T2
          IA=IA+JUMP
          IB=IB+JUMP
-  115    CONTinUE
+  115    continue
       end if
-  120 CONTinUE
+  120 continue
 
       JA=1
       JB=NH+1
@@ -140,7 +140,7 @@ Implicit none
          IB=IB+JUMP
          JA=JA+NX
          JB=JB+NX
-  130    CONTinUE
+  130    continue
          IGO = +1
       else
 !DIR$ IVDEP
@@ -149,7 +149,7 @@ Implicit none
          A(IB)=2.0*A(IB)
          IA=IA+JUMP
          IB=IB+JUMP
-  135    CONTinUE
+  135    continue
          IGO = -1
       end if
 !
@@ -161,17 +161,17 @@ Implicit none
       do 140 K=1,NFAX
       ifAC=ifAX(NFAX+2-K)
       LA=LA/ifAC
-      IERR=-1
+      ierr=-1
       if (IGO.EQ.+1) then
         call da_qpassm(WORK,WORK(ifAC*LA+1),A(IA),A(LA*inC+IA), &
-                    TRIGS,1,inC,NX,JUMP,NVEX,N,ifAC,LA,IERR)
+                    TRIGS,1,inC,NX,JUMP,NVEX,N,ifAC,LA,ierr)
       else if (IGO.EQ.-1) then
         call da_qpassm(A(IA),A(ifAC*LA*inC+IA),WORK,WORK(LA+1), &
-                    TRIGS,inC,1,JUMP,NX,NVEX,N,ifAC,LA,IERR)
+                    TRIGS,inC,1,JUMP,NX,NVEX,N,ifAC,LA,ierr)
       end if
-      if (IERR.NE.0) goto 500
+      if (ierr.NE.0) goto 500
       IGO=-IGO
-  140 CONTinUE
+  140 continue
 !
 !     POSTPROCESSinG
 !     --------------
@@ -188,7 +188,7 @@ Implicit none
       IA=IA+NX
       JA=JA+JUMP
       JB=JB+JUMP
-  150 CONTinUE
+  150 continue
 !
       do 170 K=2,N-2,2
       JA=ISTART+K*inC
@@ -199,28 +199,28 @@ Implicit none
       A(JA+inC)=SCALE*WORK(IA)+A(JA-inC)
       IA=IA+NX
       JA=JA+JUMP
-  160 CONTinUE
-  170 CONTinUE
+  160 continue
+  170 continue
 !
       ISTART=ISTART+NVEX*JUMP
       NVEX=VectorLength
-  200 CONTinUE
+  200 continue
 
       Go To 570
 !
 !     ERROR MESSAGES
 !     --------------
-  500 CONTinUE
-      goto (510,530,550) IERR
-  510 CONTinUE
+  500 continue
+      goto (510,530,550) ierr
+  510 continue
       write(unit=stderr,fmt='(A,I5,A)') 'NVEX=', NVEX ,' GREATER THAN VectorLength'
       goto 570
-  530 CONTinUE
+  530 continue
       write(unit=stderr,fmt='(A,I5,A)') 'ifAC=', ifAC, 'NOT CATERED FOR'
       goto 570
-  550 CONTinUE
+  550 continue
       write(unit=stderr,fmt='(A,I5,A)') 'ifAC=', ifAC, ' ONLY CATERED FOR if LA*ifAC=N'
-  570 CONTinUE
+  570 continue
 
 
       return

@@ -47,7 +47,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
    type(con_vars_type),  pointer  :: d_con_vars(:), d_con_vars_tl(:)
    type(aux_vars_type),  pointer  :: d_aux_vars(:), d_aux_vars_tl(:)
    real,    pointer   :: d_tb(:,:)
-   integer :: d_num_rad, l_num_rad,e,s,len,nl,ierr
+   integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:), temp_t_tl(:,:),temp_q_tl(:,:),rtemp(:,:)
    integer, allocatable :: itemp(:,:)
 #ifdef DM_PARALLEL

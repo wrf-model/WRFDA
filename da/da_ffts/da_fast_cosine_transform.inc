@@ -81,7 +81,7 @@ Subroutine da_fast_cosine_transform & ! in
  integer                  :: NFAX,NX,NH
  integer                  :: NBLOX,NVEX,NB
  integer                  :: K, IC, J, LA, IGO, JA,JB,IA,IB
- integer                  :: ifAC,IERR,ISTART
+ integer                  :: ifAC,ISTART
 
  real                     :: CO,S, t1,t2,si,scale
  integer                  :: vectorlength
@@ -112,7 +112,7 @@ Subroutine da_fast_cosine_transform & ! in
          A(IC)=T2
          IA=IA+JUMP
          IC=IC+JUMP
-  105    CONTinUE
+  105    continue
       else  
 !DIR$ IVDEP
          do 110 J=1,NVEX
@@ -124,7 +124,7 @@ Subroutine da_fast_cosine_transform & ! in
          IC=IC+JUMP
          JA=JA+NX
          JB=JB+NX
-  110    CONTinUE
+  110    continue
       end if
 !
       do 130 K=1,NH-1
@@ -146,7 +146,7 @@ Subroutine da_fast_cosine_transform & ! in
          IA=IA+JUMP
          IB=IB+JUMP
          IC=IC+JUMP
-  115    CONTinUE
+  115    continue
       else
 !DIR$ IVDEP
          do 120 J=1,NVEX
@@ -158,9 +158,9 @@ Subroutine da_fast_cosine_transform & ! in
          IC=IC+JUMP
          JA=JA+NX
          JB=JB+NX
-  120    CONTinUE
+  120    continue
       end if
-  130 CONTinUE
+  130 continue
 !
 !     PERIODIC FOURIER ANALYSIS
 !     -------------------------
@@ -171,17 +171,17 @@ Subroutine da_fast_cosine_transform & ! in
       do 140 K=1,NFAX
       ifAC=ifAX(NFAX+2-K)
       LA=LA/ifAC
-      IERR=-1
+      ierr=-1
       if (IGO.EQ.+1) then
         call da_qpassm(WORK,WORK(ifAC*LA+1),A(IA),A(IA+LA*inC), &
-                    TRIGS,1,inC,NX,JUMP,NVEX,N,ifAC,LA,IERR)
+                    TRIGS,1,inC,NX,JUMP,NVEX,N,ifAC,LA,ierr)
       else if (IGO.EQ.-1) then
         call da_qpassm(A(IA),A(IA+ifAC*LA*inC),WORK,WORK(LA+1), &
-                    TRIGS,inC,1,JUMP,NX,NVEX,N,ifAC,LA,IERR)
+                    TRIGS,inC,1,JUMP,NX,NVEX,N,ifAC,LA,ierr)
       end if
-      if (IERR.NE.0) goto 500
+      if (ierr.NE.0) goto 500
       IGO=-IGO
-  140 CONTinUE
+  140 continue
 !
 !     POSTPROCESSinG
 !     --------------
@@ -202,7 +202,7 @@ Subroutine da_fast_cosine_transform & ! in
       IB=IB+NX
       JA=JA+JUMP
       JB=JB+JUMP
-  150 CONTinUE
+  150 continue
 !
       do 170 K=2,N-2,2
       JA=ISTART+K*inC
@@ -213,30 +213,30 @@ Subroutine da_fast_cosine_transform & ! in
       A(JA+inC)=-SCALE*WORK(IA+1)+A(JA-inC)
       IA=IA+NX
       JA=JA+JUMP
-  160 CONTinUE
-  170 CONTinUE
+  160 continue
+  170 continue
 !
       ISTART=ISTART+NVEX*JUMP
       NVEX=VectorLength
-  200 CONTinUE
+  200 continue
       goto 570
 !
 !     ERROR MESSAGES
 !     --------------
-  500 CONTinUE
-      goto (510,530,550) IERR
-  510 CONTinUE
+  500 continue
+      goto (510,530,550) ierr
+  510 continue
       write(unit=stderr,fmt='(A,I4,A)') &
         'VECTOR LENGTH =',NVEX,', GREATER THAN VectorLength'
       goto 570
-  530 CONTinUE
+  530 continue
       write(unit=stderr,fmt='(A,I3,A)') &
         'FACTOR =',ifAC,', NOT CATERED FOR'
       goto 570
-  550 CONTinUE
+  550 continue
       write(unit=stderr,fmt='(A,I3,A)') &
         'FACTOR =',ifAC,', ONLY CATERED FOR if LA*ifAC=N'
-  570 CONTinUE
+  570 continue
 
       return
       end subroutine da_fast_cosine_transform

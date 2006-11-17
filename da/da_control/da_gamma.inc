@@ -206,7 +206,7 @@ real function da_gamma(X)
         do 260 I=1,8
           XNUM=(XNUM+P(I))*Z
           XDEN=XDEN*Z+Q(I)
-  260   CONTinUE
+  260   continue
         RES=XNUM/XDEN+ONE
         if(Y1.LT.Y)then
 !----------------------------------------------------------------------
@@ -220,7 +220,7 @@ real function da_gamma(X)
           do 290 I=1,N
             RES=RES*Y
             Y=Y+ONE
-  290     CONTinUE
+  290     continue
         end if
       else
 !----------------------------------------------------------------------
@@ -231,7 +231,7 @@ real function da_gamma(X)
           sum=C(7)
           do 350 I=1,6
             sum=sum/YSQ+C(I)
-  350     CONTinUE
+  350     continue
           sum=sum/Y-Y+sqrtPI
           sum=sum+(Y-HALF)*LOG(Y)
           RES=EXP(sum)

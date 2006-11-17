@@ -36,8 +36,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
    real, dimension(1:cv_size)        :: cv_2
 
-   integer                        :: ierror        ! MPI error code.
-
    real                           :: adj_sum_lhs               ! < y, y >
    real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
    real                           :: partial_lhs   ! < y, y >
@@ -97,8 +95,8 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    if( global ) then
       adj_sum_rhs = adj_rhs
    else
-      call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
-                       mpi_comm_world, IERROR )
+      call mpi_allreduce( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
+                       comm, ierr )
    end if
 #else
    adj_sum_rhs = adj_rhs

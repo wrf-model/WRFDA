@@ -1,5 +1,5 @@
 subroutine da_get_aspoles(x,              &
-          ids, ide, jds, jde, kds, kde,  &
+          ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
 
@@ -9,42 +9,53 @@ subroutine da_get_aspoles(x,              &
 
    implicit none
    
-   integer, intent(in)    :: ids, ide, jds, jde, kds, kde
+   integer, intent(in)    :: ids, ide, jds, jde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
    integer, intent(in)    :: its, ite, jts, jte, kts, kte
    real,    intent(inout) :: x(ims:ime,jms:jme,kms:kme)   
 
    integer                :: k
-   real                   :: tmpvar,tmps,tmp_s
+   real                   :: tmpvar
+   real                   :: tmps(kts:kte)
+   real                   :: tmp_s(kts:kte)
 
    tmpvar      = 1.0/real(ide-ids+1)
 
-   ! Stop compiler whinge
-
-   if (kde ==0) then
-   end if
-
    if (trace_use) call da_trace_entry("da_get_aspoles")
 
-   do k = kts, kte
-      tmps =0.0  ; tmp_s =0.0
-      if (jts == jds) tmp_s = tmpvar*sum(x(its:ite,jts,k))
+   tmp_s(:) = 0.0
 
-      tmps = wrf_dm_sum_real( tmp_s )
-      if (jts == jds) then
-         x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps
+   if (jts == jds) then
+      do k = kts, kte
+         tmp_s(k) = tmpvar*sum(x(its:ite,jts,k))
+      end do
+   end if
+
+   call wrf_dm_sum_reals (tmp_s(:),tmps(:))
+
+   if (jts == jds) then
+      do k = kts, kte
+         x(its:ite,jts+1,k) = x(its:ite,jts+1,k) + tmps(k)
          x(its:ite,jts,k) = 0.0
-      end if
+      end do
+   end if
 
-      tmps =0.0  ; tmp_s =0.0
-      if (jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte,k))
+   tmp_s(:) = 0.0
 
-      tmps = wrf_dm_sum_real( tmp_s )
-      if (jte == jde) then
-         x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps
+   if (jte == jde) then
+      do k = kts, kte
+         tmp_s(k) = tmpvar*sum(x(its:ite,jte,k))
+      end do
+   end if
+
+   call wrf_dm_sum_reals (tmp_s(:),tmps(:))
+
+   if (jte == jde) then
+      do k = kts, kte
+         x(its:ite,jte-1,k) = x(its:ite,jte-1,k) + tmps(k)
          x(its:ite,jte,k) = 0.0
-      end if
-   end do
+      end do
+   end if
 
    if (trace_use) call da_trace_exit("da_get_aspoles")
 

@@ -24,10 +24,10 @@ subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff )
 
    if ( print )then
       filename = 'obs_max_error_check'
-      inQUIRE (unit = iunit, OPENED = connected )
+      inQUIRE (unit = iunit, openED = connected )
 
       if ( .NOT. connected) then
-         OPEN (unit = iunit , FILE = filename , FORM = 'FORMATTED'  , &
+         open (unit = iunit , FILE = filename , FORM = 'FORMATTED'  , &
                ACTION = 'write' , STATUS = 'REPLACE', iostat = io_error )
       end if
    end if

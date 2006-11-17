@@ -12,7 +12,6 @@ subroutine da_proc_sum_ints ( values )
    integer,   intent(inout)      :: values(:) ! Values
 
    integer, allocatable :: sums(:) ! Sum across processors.
-   integer           :: ierr                  ! Error code from MPI routines.
    integer           :: root                  ! Monitor processor.
 
 #ifdef DM_PARALLEL
@@ -20,7 +19,7 @@ subroutine da_proc_sum_ints ( values )
    call wrf_dm_bcast_integer ( root, 1 )
    allocate (sums(size(values)))
    sums(:)=0
-   call MPI_REDUCE(values(:), sums(:), size(values), mpi_integer, mpi_sum, root, mpi_comm_world, IERR )
+   call mpi_reduce(values(:), sums(:), size(values), mpi_integer, mpi_sum, root, comm, ierr )
 
    if (rootproc) values(:) = sums(:)
    deallocate(sums)

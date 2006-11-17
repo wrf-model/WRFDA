@@ -28,7 +28,6 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   real,dimension(xp%kts:xp%kte):: model_q ! model q at GPS site [kg/kg]
   real,dimension(xp%kts:xp%kte):: model_z ! model z at GPS site [m]
   real,dimension(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
-  !integer                      :: ierr, unit_gps
 
   ! unit_gps = myproc + 140
   !---------------------------------------------------------------------------

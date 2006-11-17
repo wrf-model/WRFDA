@@ -22,18 +22,17 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    real, intent(out)   :: alp(1:alp_size)            ! Associated Legendre Polynomial.
 
    integer             :: i                          ! Loop counters.
-   integer             :: ier                        ! Error return.
 
    !----------------------------------------------------------------------------
    ! [1] Initialize FFT coefficients.'
    !----------------------------------------------------------------------------
 
    wsave(:) = 0.0
-   call rfft1i( ni, wsave, lensav, ier )
+   call rfft1i( ni, wsave, lensav, ierr )
 
-   if ( ier /= 0 ) then
+   if ( ierr /= 0 ) then
      write(unit=message(1),fmt='(A,I4)') &
-        "Fourier initialization failed. ier = ", ier
+        "Fourier initialization failed. ierr = ", ierr
      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 

@@ -38,8 +38,6 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 
    real, dimension(ims:ime, jms:jme) :: field
 !-------------------------------------------------------------------------
-   integer                        :: ierror        ! MPI error code.
-
 !-------------------------------------------------------------------------
    real                           :: adj_sum_lhs               ! < y, y >
    real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
@@ -92,12 +90,14 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 !-------------------------------------------------------------------------
 !      Print output:
 !-------------------------------------------------------------------------
+! JRB fix with wrf_dm_sum_real
+
 #ifdef DM_PARALLEL
   if( global ) then
    adj_sum_rhs = adj_rhs
   else
-   call MPI_ALLREDUCE( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
-                       mpi_comm_world, IERROR )
+   call mpi_allreduce( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
+                       comm, ierr)
   end if
 #else
    adj_sum_rhs = adj_rhs

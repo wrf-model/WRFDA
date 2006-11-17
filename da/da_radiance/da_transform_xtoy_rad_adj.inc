@@ -47,7 +47,7 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
    type(con_vars_type),  pointer  :: d_con_vars(:), d_con_vars_ad(:)
    type(aux_vars_type),  pointer  :: d_aux_vars(:)
    real,    pointer   :: d_tb(:,:)
-   integer :: d_num_rad, l_num_rad,e,s,len,nl,ierr
+   integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:), temp_ps(:), rtemp(:,:)
    integer, allocatable :: itemp(:,:)
 

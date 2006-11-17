@@ -26,7 +26,6 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
 
    integer :: iproc              ! Loop counter.
    integer :: root               ! Monitor processor.
-   integer :: ierr               ! Error code from MPI routines.
    integer :: status(mpi_status_size) ! MPI status.
 
 #ifdef DM_PARALLEL
@@ -72,28 +71,28 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
          end if
          obs_level = obs_level + nlevels
       end do
-      call mpi_send( on_proc, num_sound, MPI_logical, root, &
-                    30, mpi_comm_world, IERR )
-      call mpi_send( u, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    31, mpi_comm_world, IERR )
-      call mpi_send( v, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    32, mpi_comm_world, IERR )
-      call mpi_send( t, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    33, mpi_comm_world, IERR )
-      call mpi_send( q, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    34, mpi_comm_world, IERR )
+      call mpi_send( on_proc, num_sound, mpi_logical, root, &
+                    30, comm, ierr )
+      call mpi_send( u, sum_levels, mpi_double_precision, root, &
+                    31, comm, ierr )
+      call mpi_send( v, sum_levels, mpi_double_precision, root, &
+                    32, comm, ierr )
+      call mpi_send( t, sum_levels, mpi_double_precision, root, &
+                    33, comm, ierr )
+      call mpi_send( q, sum_levels, mpi_double_precision, root, &
+                    34, comm, ierr )
    else    
       do iproc = 1, num_procs-1
-         call mpi_recv(on_proc, num_sound, MPI_logical, MPI_ANY_SOURCE, &
-                     30, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(u, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     31, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(v, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     32, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(t, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     33, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(q, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     34, mpi_comm_world, STATUS, IERR )
+         call mpi_recv(on_proc, num_sound, mpi_logical, mpi_any_source, &
+                     30, comm, STATUS, ierr )
+         call mpi_recv(u, sum_levels, mpi_double_precision, mpi_any_source, &
+                     31, comm, STATUS, ierr )
+         call mpi_recv(v, sum_levels, mpi_double_precision, mpi_any_source, &
+                     32, comm, STATUS, ierr )
+         call mpi_recv(t, sum_levels, mpi_double_precision, mpi_any_source, &
+                     33, comm, STATUS, ierr )
+         call mpi_recv(q, sum_levels, mpi_double_precision, mpi_any_source, &
+                     34, comm, STATUS, ierr )
 
          obs_level = 0
          do n = 1, num_sound
@@ -127,25 +126,25 @@ subroutine da_proc_diagnostics_collect(num_sound, iv, re )
          end if
          obs_level = obs_level + nlevels
       end do
-      call mpi_send( u, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    31, mpi_comm_world, IERR )
-      call mpi_send( v, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    32, mpi_comm_world, IERR )
-      call mpi_send( t, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    33, mpi_comm_world, IERR )
-      call mpi_send( q, sum_levels, MPI_doUBLE_PRECISION, root, &
-                    34, mpi_comm_world, IERR )
+      call mpi_send( u, sum_levels, mpi_double_precision, root, &
+                    31, comm, ierr )
+      call mpi_send( v, sum_levels, mpi_double_precision, root, &
+                    32, comm, ierr )
+      call mpi_send( t, sum_levels, mpi_double_precision, root, &
+                    33, comm, ierr )
+      call mpi_send( q, sum_levels, mpi_double_precision, root, &
+                    34, comm, ierr )
    else
       do iproc = 1, num_procs-1
 
-         call mpi_recv(u, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     31, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(v, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     32, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(t, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     33, mpi_comm_world, STATUS, IERR )
-         call mpi_recv(q, sum_levels, MPI_doUBLE_PRECISION, MPI_ANY_SOURCE, &
-                     34, mpi_comm_world, STATUS, IERR )
+         call mpi_recv(u, sum_levels, mpi_double_precision, mpi_any_source, &
+                     31, comm, STATUS, ierr )
+         call mpi_recv(v, sum_levels, mpi_double_precision, mpi_any_source, &
+                     32, comm, STATUS, ierr )
+         call mpi_recv(t, sum_levels, mpi_double_precision, mpi_any_source, &
+                     33, comm, STATUS, ierr )
+         call mpi_recv(q, sum_levels, mpi_double_precision, mpi_any_source, &
+                     34, comm, STATUS, ierr )
 
          obs_level = 0
          do n = 1, num_sound

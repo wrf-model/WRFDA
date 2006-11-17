@@ -39,10 +39,10 @@ subroutine da_read_ssmi (ob, xp, filename)
    isfilter = .true. ! filter out rain points
    irain = 0
 
-   ! OPEN FILE
+   ! open FILE
 
    call da_get_unit(iunit)
-   OPEN(unit   = iunit,     &
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
@@ -53,7 +53,7 @@ subroutine da_read_ssmi (ob, xp, filename)
       write(unit=stderr, fmt='(/A,I3,3(2X,A)/)') &
          'ERROR in SSMI inPUT FILE unit ',iunit, &
          'SSMI FILENAME:', trim(filename), &
-         'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
+         'FOR SSMI CANNOT BE FOUND OR CANNOT BE openED'
       return
    end if
 

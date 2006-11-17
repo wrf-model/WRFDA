@@ -199,7 +199,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    if (global)  then   
 #ifndef DEREF_KLUDGE
-      call da_get_vpoles(xa%u,xa%v,xb%lon, &
+      call da_get_vpoles(xa%u,xa%v, &
             ids, ide, jds, jde, kds, kde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
@@ -222,7 +222,6 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 #else
       call da_get_vpoles(xa%u(ims,jms,kms),          &
                          xa%v(ims,jms,kms),          &
-                         xb%lon(ims,jms),            &
                       ids, ide, jds, jde, kds, kde,  &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
@@ -249,4 +248,5 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    if (trace_use) call da_trace_exit("da_transform_vtox")
 
 end subroutine da_transform_vtox
+
 

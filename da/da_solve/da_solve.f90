@@ -46,14 +46,12 @@ subroutine da_solve ( grid , config_flags , &
                                    ims , ime , jms , jme , kms , kme , &
                                    its , ite , jts , jte , kts , kte
 
-   integer                      :: cv_size, i,err
+   integer                      :: cv_size, i
    real                         :: j_grad_norm_target ! TArget j norm.
-#ifdef DM_PARALLEL
-   integer                      :: ierr,comm
-#endif
    integer                      :: wrf_done_unit
 
    if (trace_use) call da_trace_entry("da_solve")
+call mpi_barrier(comm,ierr)
 
    !---------------------------------------------------------------------------
    ! If it is verification run set check_max_iv as .false.
@@ -196,7 +194,6 @@ subroutine da_solve ( grid , config_flags , &
                end do
                call da_free_unit(wrf_done_unit)
             end if
-            call wrf_get_dm_communicator ( comm )
             call mpi_barrier( comm, ierr )
 
             call da_system_4dvar("da_run_wrf_nl.ksh post ")
@@ -322,7 +319,7 @@ subroutine da_solve ( grid , config_flags , &
          deallocate (iv%instid(i) % ichan)
          deallocate (ob%instid(i) % ichan)
 #ifdef RTTOV
-         call rttov_dealloc_coef (err,coefs(i))
+         call rttov_dealloc_coef (ierr,coefs(i))
 #endif
       end do
       deallocate (j % jo % rad)
@@ -354,10 +351,20 @@ subroutine da_solve ( grid , config_flags , &
       deallocate (xbx%int_wgts)
       deallocate (xbx%alp)
       deallocate (xbx%wsave)
+      if (grid%xb%jts == grid%xb%jds) then 
+         deallocate(cos_xls)
+         deallocate(sin_xls)
+      end if
+
+      if (grid%xb%jte == grid%xb%jde) then 
+         deallocate(cos_xle)
+         deallocate(sin_xle)
+      end if
    end if
 
    deallocate (xbx % latc_mean)
 
+call mpi_barrier(comm,ierr)
    if (trace_use) call da_trace_exit("da_solve")
 
 contains

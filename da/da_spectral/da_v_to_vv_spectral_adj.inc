@@ -30,7 +30,6 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    integer             :: index_start, index_end     ! Position markers in cv.
    integer             :: index                      ! Position markers in rcv.
    integer             :: index_r, index_c           ! Array index for complex v_fou.
-   integer             :: ier                        ! Error return.
 
    real                :: r_fou(1:lenr)              ! FFT array.
    real                :: work(1:lenwrk)             ! FFT work array.
@@ -54,7 +53,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    v_fou = 0.
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
-      call rfft1f( ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ier )
+      call rfft1f( ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr )
 
       !----------------------------------------------------------------------
       ! Adjust the output for adjoint test
@@ -127,7 +126,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    n = index_end - index_start + 1
    call mpi_allreduce(ccv_local(index_start:index_end), &
                       ccv(index_start:index_end), n, true_mpi_complex, mpi_sum, &
-                      mpi_comm_world, IER)
+                      comm, ierr)
 #endif
 
    !----------------------------------------------------------------------

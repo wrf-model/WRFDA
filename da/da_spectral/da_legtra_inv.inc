@@ -19,6 +19,8 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
 
    integer              :: jc, iequator
 
+   if (trace_use) call da_trace_entry("da_legtra_inv")
+
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
    jc = (jde-jds+1)/2
@@ -30,12 +32,8 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    do j = jts, je
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
 
-      sum_legtra = da_zero_complex
-      do l = m, max_wavenumber
-         ! Calculate first quadrant values:
-         sum_legtra = sum_legtra + v(l) * alp(index_j + index_m + l)
-      end do
-      r_leg(j) = sum_legtra
+      r_leg(j) = sum(v(m:max_wavenumber) * &
+         alp(index_j+index_m+m:index_j+index_m+max_wavenumber))
    end do
 
    js = max(jts, jc+iequator+1)
@@ -55,5 +53,8 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
       r_leg(j) = sum_legtra
    end do
 
+   if (trace_use) call da_trace_exit("da_legtra_inv")
+
 end subroutine da_legtra_inv
+
 

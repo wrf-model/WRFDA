@@ -12,8 +12,6 @@ subroutine da_get_y_lhs_value( iv, y, &
 
 !-------------------------------------------------------------------------
 
-   integer                        :: ierror        ! MPI error code.
-
 !-------------------------------------------------------------------------
 
    partial_lhs = 0.0
@@ -77,9 +75,10 @@ subroutine da_get_y_lhs_value( iv, y, &
    if( Use_BogusObs ) &
    call da_check_xtoy_adjoint_Bogus( iv, y, partial_lhs, pertile_lhs )
 
+! JRB use dm_sum_real
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, true_mpi_real, mpi_sum, &
-                       mpi_comm_world, IERROR )
+   call mpi_allreduce( partial_lhs, adj_ttl_lhs, 1, true_mpi_real, mpi_sum, &
+                       comm, ierr )
 #else
    adj_ttl_lhs = partial_lhs
 #endif

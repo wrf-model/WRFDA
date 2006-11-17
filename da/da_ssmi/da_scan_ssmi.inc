@@ -37,9 +37,9 @@ subroutine da_scan_ssmi (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
    ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
 
-   ! OPEN FILE
+   ! open FILE
    call da_get_unit(iunit)
-   OPEN(unit   = iunit,     &
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
@@ -50,7 +50,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
       write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
            'ERROR in SSMI inPUT FILE unit ',iunit, &
            'SSMI FILENAME:', trim(filename), &
-           'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
+           'FOR SSMI CANNOT BE FOUND OR CANNOT BE openED'
       return
    end if
 
