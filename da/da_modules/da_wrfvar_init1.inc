@@ -51,9 +51,9 @@ subroutine da_wrfvar_init1( no_init1 )
    write(unit=6,fmt='(A)') "***  VARIATIONAL ANALYSIS ***"
 
 #ifdef DM_PARALLEL
+   call wrf_get_dm_communicator (comm)
    call mpi_comm_size(comm, num_procs, ierr)
    call mpi_comm_rank(comm, myproc, ierr )
-   call wrf_get_dm_communicator (comm)
 #else
    num_procs = 1
    myproc = 0
