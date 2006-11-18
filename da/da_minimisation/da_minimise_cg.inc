@@ -213,8 +213,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
       rrmnew_norm = sqrt(rrmnew_norm)
     end if
 
-    write(unit=stdout,fmt=15) j%total , rrmnew_norm
-15  format('Final cost function : ',1PD15.8,' and gradient: ',1PD15.8)
+    write(unit=stdout,fmt=15) iter, j%total , rrmnew_norm
+15  format('Final: ',I3,' iter, J=',1PD15.8,', g=',1PD15.8)
     write(unit=stdout,fmt='(A)') &
       ' ----------------------------------------------------------'
 1004 continue

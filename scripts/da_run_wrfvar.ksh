@@ -84,7 +84,7 @@ if $NL_VAR4D; then
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
-echo "DA_BOUNDARIES          $DA_BOUNDARIES"
+echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"

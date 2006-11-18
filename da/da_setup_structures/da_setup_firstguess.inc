@@ -24,6 +24,29 @@ subroutine da_setup_firstguess( xbx, grid, &
    js = grid%xp % jts
    je = grid%xp % jte
 
+   ! Calculate sin and cosine values used in da_get_avpoles
+
+   if (global) then
+      if (grid%xp%jts == grid%xp%jds) then
+
+         allocate(cos_xls(grid%xp%its:grid%xp%ite))
+         allocate(sin_xls(grid%xp%its:grid%xp%ite))
+         cos_xls(grid%xp%its:grid%xp%ite) = & 
+            deg_to_rad*cos(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
+         sin_xls(grid%xp%its:grid%xp%ite) = &
+            deg_to_rad*sin(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
+      end if
+
+      if (grid%xp%jte == grid%xp%jde) then 
+         allocate(cos_xle(grid%xp%its:grid%xp%ite))
+         allocate(sin_xle(grid%xp%its:grid%xp%ite))
+         cos_xle(grid%xp%its:grid%xp%ite) = &
+            deg_to_rad*cos(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
+         sin_xle(grid%xp%its:grid%xp%ite) = &
+            deg_to_rad*sin(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
+      end if
+   end if
+
    !---------------------------------------------------------------------------      
    ! [1.0] Setup and read in fields from first guess:
    !---------------------------------------------------------------------------      
@@ -32,45 +55,21 @@ subroutine da_setup_firstguess( xbx, grid, &
 
       ! First guess is a WRF C-grid format file:
 
-     call da_setup_firstguess_wrf( xbx, grid, &
+      call da_setup_firstguess_wrf( xbx, grid, &
 #include "em_dummy_new_args.inc"
                                  )
    else if ( fg_format == fg_format_kma ) then
-
       ! First guess is an KMA format file:
-
-     call da_setup_firstguess_kma( xbx, grid, &
+      call da_setup_firstguess_kma( xbx, grid, &
 #include "em_dummy_new_args.inc"
                                  )
-   end if
-
-   ! Calculate sin and cosine values used in da_get_avpoles
-
-   if (global) then
-      if (grid%xb%jts == grid%xb%jds) then 
-         allocate(cos_xls(grid%xb%its:grid%xb%ite))
-         allocate(sin_xls(grid%xb%its:grid%xb%ite))
-         cos_xls(grid%xb%its:grid%xb%ite) = & 
-            deg_to_rad*cos(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jts))
-         sin_xls(grid%xb%its:grid%xb%ite) = &
-            deg_to_rad*sin(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jts))
-      end if
-
-      if (grid%xb%jte == grid%xb%jde) then 
-         allocate(cos_xle(grid%xb%its:grid%xb%ite))
-         allocate(sin_xle(grid%xb%its:grid%xb%ite))
-         cos_xle(grid%xb%its:grid%xb%ite) = &
-            deg_to_rad*cos(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jte))
-         sin_xle(grid%xb%its:grid%xb%ite) = &
-            deg_to_rad*sin(grid%xb%lon(grid%xb%its:grid%xb%ite,grid%xb%jte))
-      end if
    end if
 
    !---------------------------------------------------------------------------
    ! Exchange halo region for XB arrays.
    !---------------------------------------------------------------------------
 
-   if ( fg_format == fg_format_wrf) then
+   if (fg_format == fg_format_wrf) then
       ! Calculate multiplicative constants for PsiChi_TO_UV 
       grid%xb%coefx(is:ie,js:je) = 0.5 * grid%xb%map_factor(is:ie,js:je)/grid%xb%ds
       grid%xb%coefy(is:ie,js:je) = grid%xb%coefx(is:ie,js:je)

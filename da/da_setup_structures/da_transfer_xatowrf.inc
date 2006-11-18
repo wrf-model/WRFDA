@@ -23,7 +23,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    real    :: sdmd, s1md
 
-   ! ARRAYS TO HOLD WRF inCREMENTS ON THE C-grid 
+   ! arrays to hold wrf increments on the c-grid 
 
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: &
       u_cgrid, v_cgrid, q_cgrid, ph_cgrid
@@ -36,7 +36,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    if (trace_use) call da_trace_entry("da_transfer_xatowrf")
 
    !------------------------------------------------------------------------
-   ! SET ARRAY RANGE inDICES FOR PROCESSOR SUBdoMAin.
+   ! set array range indices for processor subdomain.et array range indices for processor subdomain.
    !------------------------------------------------------------------------
 
    is = grid%xp % its
@@ -73,7 +73,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    end do
 
    !---------------------------------------------------------------------------
-   ! [2.0] COMPUTE increments of dry-column air mass per unit area
+   ! [2.0] compute increments of dry-column air mass per unit area
    !---------------------------------------------------------------------------
 
    do j=js,je
@@ -90,7 +90,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    end do
 
    !---------------------------------------------------------------------------
-   ! [3.0] COMPUTE pressure increments 
+   ! [3.0] compute pressure increments 
    !---------------------------------------------------------------------------
 
    ! Tangent linear code for grid%xa%p (based on WRF "real.init.code") 
@@ -143,8 +143,8 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    end do
 
    !---------------------------------------------------------------------------
-   ! [4.0] CONVERT TEMPERATURE inCREMENTS inTO THETA inCREMENTS 
-   !       EVALUATE ALSO THE inCREMENTS OF (1/rho) AND GEOPOTENTIAL
+   ! [4.0] Convert temperature increments into theta increments 
+   !       Evaluate also the increments of (1/rho) and geopotential
    !---------------------------------------------------------------------------
 
    if (print_detail_xa) then
@@ -235,7 +235,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    ! ========================
 
    if (write_increments) then
-      write(unit=stdout,fmt='(/"write out inCREMENT FOR PLOTTinG......")')
+      write(unit=stdout,fmt='(/"Write out increment for plotting......")')
       call da_write_increments ( grid%xp, grid%xb, grid%xa, q_cgrid, mu_cgrid, ph_cgrid )
    end if
 
@@ -301,7 +301,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    end if
 
    !---------------------------------------------------------------------------
-   ! [5.0] ADD inCREMENT TO THE ORIGinAL GUESS AND UPDATE "grid"
+   ! [5.0] add increment to the original guess and update "grid"
    !---------------------------------------------------------------------------
 
    do j=js,je
