@@ -451,6 +451,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
          deallocate (con_vars_tl(n) % t)
          deallocate (con_vars_tl(n) % q)
          y%instid(inst)%rad(n)%tb(:) = tb(n,:)
+         !if (n<=10) write(6,'(15f8.3)') y%instid(inst)%rad(n)%tb(:)
       end do
       !-------------------------------------------------------------------
       ! [2.0] assign Hdx :

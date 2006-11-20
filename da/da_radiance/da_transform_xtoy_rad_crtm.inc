@@ -66,25 +66,6 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
 
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
-                                    
-! Atmosphere_TL structure
-    Atmosphere_TL%n_Layers=(xp%kte-xp%kts)+1   ! number of vertical levels
-    Atmosphere_TL%n_Absorbers=2
-    Atmosphere_TL%n_Clouds=0
-    Atmosphere_TL%n_Aerosols=0
-                                                                                                                          
-    Error_Status = CRTM_Allocate_Atmosphere( Atmosphere_TL%n_Layers, &
-                                             Atmosphere_TL%n_Absorbers, &
-                                             Atmosphere_TL%n_Clouds, &
-                                             Atmosphere_TL%n_Aerosols, &
-                                             Atmosphere_TL)
-    if ( Error_Status /= 0 ) THEN
-       call da_error(__FILE__,__LINE__, &
-         (/"Error in allocatting CRTM Atmosphere_TL Structure"/))
-    endif
-                                                                                                                          
-    Atmosphere_TL%Absorber_ID(1)=H2O_ID
-    Atmosphere_TL%Absorber_ID(2)=O3_ID
 !-------------------------------------------------------------------------------
 
    do inst = 1, iv%num_inst                 ! loop for sensor
@@ -101,18 +82,11 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
                                         
   ! Allocate forward model solution RTSolution array to number of channels
       ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
+                RTSolution_TL( ChannelInfo%n_Channels ), &
                STAT = Allocate_Status )
       IF ( Allocate_Status /= 0 ) THEN
          call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting RTSolution"/))
-      END IF
-
-  ! Allocate forward model solution RTSolution_TL array to number of channels
-      ALLOCATE( RTSolution_TL( ChannelInfo%n_Channels ), &
-               STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-         call da_error(__FILE__,__LINE__, &
-          (/"Error in allocatting RTSolution_TL"/))
       END IF
 
   ! CRTM Surface Structure
@@ -138,13 +112,6 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
       if ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting CRTM Surface Structure"/))
-      endif
-
-      Error_Status = CRTM_Allocate_Surface( nchan_emis,     &  ! Input
-                                   Surface_TL)  ! Output
-      if ( Error_Status /= 0 ) THEN
-        call da_error(__FILE__,__LINE__, &
-          (/"Error in allocatting CRTM Surface_TL Structure"/))
       endif
 
   ! CRTM Options structure
@@ -251,12 +218,14 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
               call da_interp_lin_2d( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                      i, j, dx, dy, dxm, dym, &  ! specific humidity (in kg/kg)
                                      Atmosphere_TL%Absorber(xp%kte-k+1,1) )
+              if (atmosphere%pressure(xp%kte-k+1) < 75.) Atmosphere_TL%Absorber(xp%kte-k+1,1) = 0.
             end do
               call da_interp_lin_2d( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                                      i, j, dx, dy, dxm, dym, &  ! in Pa
                                      Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers) )
-              Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers)= &
-                         0.01*Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers)
+
+              Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)= &
+                         0.01*Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)
               Atmosphere_TL%Absorber(:,1) = 1000.*Atmosphere_TL%Absorber(:,1) ! in g/kg
 
       ! [1.5] CRTM GeometryInfo Structure
@@ -288,33 +257,34 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
       ! [1.7] assign Hdx :
       !-------------------------------------------------------------------
          y%instid(inst)%rad(n)%tb(:) = RTSolution_TL(:)%brightness_temperature
-         !write(6,'(15f8.3)') RTSolution_TL(:)%brightness_temperature
-      end do  ! end loop for pixels                                                                                                                          
-      !-------------------------------------------------------------------
-      ! [2.0] Deallocating CRTM structures
-      !-------------------------------------------------------------------
-         deallocate( rtsolution, STAT = Allocate_Status )
-         IF ( Allocate_Status /= 0 ) THEN
-            call da_error(__FILE__,__LINE__, &
-              (/"Error in deallocatting RTSolution"/))
-         END IF
-             
-         deallocate( rtsolution_tl, STAT = Allocate_Status )
-         IF ( Allocate_Status /= 0 ) THEN
-            call da_error(__FILE__,__LINE__, &
-              (/"Error in deallocatting RTSolution_TL"/))
-         END IF
+         !if (n <= 10 ) write(6,'(15f8.3)') RTSolution_TL(:)%brightness_temperature
 
-         Error_Status = CRTM_Destroy_Surface(Surface)
+         Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_TL )
          if ( Error_Status /= 0 ) THEN
             call da_error(__FILE__,__LINE__, &
-               (/"Error in deallocatting CRTM Surface Structure"/))
+               (/"Error in deallocatting CRTM Atmosphere_TL Structure"/))
          endif
 
          Error_Status = CRTM_Destroy_Surface(Surface_TL)
          if ( Error_Status /= 0 ) THEN
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Surface_TL Structure"/))
+         endif
+
+      end do  ! end loop for pixels                                                                                                                          
+      !-------------------------------------------------------------------
+      ! [2.0] Deallocating CRTM structures
+      !-------------------------------------------------------------------
+         deallocate( rtsolution, rtsolution_tl, STAT = Allocate_Status )
+         IF ( Allocate_Status /= 0 ) THEN
+            call da_error(__FILE__,__LINE__, &
+              (/"Error in deallocatting RTSolution"/))
+         END IF
+             
+         Error_Status = CRTM_Destroy_Surface(Surface)
+         if ( Error_Status /= 0 ) THEN
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Surface Structure"/))
          endif
 
    end do     ! end loop for sensor
@@ -326,12 +296,6 @@ subroutine da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
     if ( Error_Status /= 0 ) THEN
        call da_error(__FILE__,__LINE__, &
          (/"Error in deallocatting CRTM Atmosphere Structure"/))
-    endif
-
-    Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_TL )
-    if ( Error_Status /= 0 ) THEN
-       call da_error(__FILE__,__LINE__, &
-         (/"Error in deallocatting CRTM Atmosphere_TL Structure"/))
     endif
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rad_crtm")

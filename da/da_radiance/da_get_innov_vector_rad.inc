@@ -473,6 +473,14 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                               ob%instid(inst)%rad(n)%tb, &
                               iv%instid(inst)%rad(n) )
          end if
+
+        !if (n<=10) then 
+        ! do k=1,num_levs
+        !    write(6,'(i5,3f10.3)') k, pres(k), iv%instid(inst)%rad(n)%t(k), &
+        !                     iv%instid(inst)%rad(n)%mr(k)/q2ppmv*1000. ! g/kg
+        ! end do
+        !end if
+
       end do       !  end loop for pixels
 
       deallocate (zk)

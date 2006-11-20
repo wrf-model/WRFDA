@@ -91,6 +91,7 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
          do k = 1, nchan
             tb(n,k) = jo_grad_y%instid(inst)%rad(n)%tb(k) 
          end do
+         !if (n<=10) write(6,'(15f8.3)') tb(n,:)
       end do
 
       !---------------------------------------------
@@ -511,6 +512,14 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
             deallocate (con_vars(n) % q)
             deallocate (con_vars_ad(n) % t)
             deallocate (con_vars_ad(n) % q)
+            
+            !if (n<=10) then
+            !   write(6,'(e15.5)') jo_grad_x%psfc(i,j)
+            !  do k=xp%kts,xp%kte
+            !   write(6,'(i5,2e15.5)') k,jo_grad_x%t(i,j,k),jo_grad_x%q(i,j,k)*1000.
+            !  end do
+            !end if
+
          end do       !  end loop for pixels
       end if
 

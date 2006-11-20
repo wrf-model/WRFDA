@@ -26,9 +26,6 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: alloc_status(40)
 
-   REAL, DIMENSION(1:max_ob_levels) :: model_t  ! Model value t at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_q  ! Model value q(kg/kg) at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_mr ! Model value mr(ppmv) at ob location.
    REAL                             :: model_t2m
    REAL                             :: model_q2m, model_mr2m
    REAL                             :: model_u10, model_v10
@@ -153,23 +150,24 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
-         Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchanl), stat = alloc_status(7) )
-         Allocate ( iv%instid(inst)%rad(n)%emiss(nchanl), stat = alloc_status(8) )
-         allocate (iv%instid(inst)%rad(n)%tm(xp%kts:xp%kte), stat= alloc_status(9) )
-         allocate (iv%instid(inst)%rad(n)%qm(xp%kts:xp%kte), stat= alloc_status(16) )
-         !allocate (iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), stat= alloc_status(10) )
-         allocate (iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme), stat= alloc_status(11) )
-         !allocate (iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), stat= alloc_status(12) )
-         !allocate (iv%instid(inst)%rad(n)%qsn(xp%kms:xp%kme), stat= alloc_status(13) )
-         !allocate (iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), stat= alloc_status(14) )
-         allocate (iv%instid(inst)%rad(n)%pm(xp%kts:xp%kte), stat= alloc_status(15) )
-         allocate (iv%instid(inst)%rad(n)%t(0:xp%kte), stat= alloc_status(16) )
- 
+         Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchanl), &
+                    iv%instid(inst)%rad(n)%emiss(nchanl), &
+                    iv%instid(inst)%rad(n)%tm(xp%kts:xp%kte), &
+                    iv%instid(inst)%rad(n)%qm(xp%kts:xp%kte), &
+                    iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme),  &
+                    iv%instid(inst)%rad(n)%pm(xp%kts:xp%kte),   &
+                    iv%instid(inst)%rad(n)%t(0:xp%kte),         &
+                    STAT = Allocate_Status )
 
-         if ( any(alloc_status /= 0) ) then
-            call da_error(__FILE__,__LINE__, &
-               (/"Cannot Allocate mem iv%tm,qm,pm,pf"/))
-         end if
+!iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), &
+!iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), &
+!iv%instid(inst)%rad(n)%qsn(xp%kms:xp%kme), &
+!iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), &
+
+         IF ( Allocate_Status /= 0 ) THEN
+           call da_error(__FILE__,__LINE__, &
+             (/"Error in allocatting innovation structure"/))
+         END IF
 
          model_ts   = 0.0
          model_u10  = 0.0
@@ -204,7 +202,10 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
                                     i, j, dx, dy, dxm, dym, &      ! specific humidity (in kg/kg)
                                     Atmosphere%Absorber(xp%kte-k+1,1) ) 
              Atmosphere%Absorber(xp%kte-k+1,1) = 1000.*Atmosphere%Absorber(xp%kte-k+1,1) ! in g/kg
+           ! NOTE: WRF high-level q values seems too big, replaced by constants
+             if ( v_p(k) < 75. ) Atmosphere%Absorber(xp%kte-k+1,1) = 0.001
          enddo
+ 
 
          ! determine surface type of obs location
          !-----------------------------------------
@@ -216,19 +217,12 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
                             Surface%Water_Coverage, Surface%Ice_Coverage, &
                             Surface%Land_Coverage, Surface%Snow_Coverage )
 
-
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_u10 )
          call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_v10 )
-         !call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                    i, j, dx, dy, dxm, dym, &
-         !                    model_t2m )
-         !call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                    i, j, dx, dy, dxm, dym, &
-         !                    model_q2m )
          call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_psfc )
@@ -243,7 +237,7 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
             Atmosphere%Level_Pressure(xp%kte-k+1)= &
               xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
          enddo
-
+         
          if ( model_isflg == 0 ) then   ! over sea using SST
              call da_interp_lin_2d( xb % tgrn, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
@@ -279,12 +273,12 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          ! variables for calculation of cloud affected radiance
          !-------------------------------------------------------
          do k=xp%kts,xp%kte
-         !   call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                       i, j, dx, dy, dxm, dym, &      ! rain
-         !                       model_qrn(k) )
             call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! cloud water
                                 model_qcw(xp%kte-xp%kts+1) )
+         !   call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         !                       i, j, dx, dy, dxm, dym, &      ! rain
+         !                       model_qrn(k) )
          !   call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
          !                       i, j, dx, dy, dxm, dym, &      ! cloud ice
          !                       model_qci(k) )
@@ -324,11 +318,6 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 !     GeometryInfo%Source_Zenith_Angle=
 
   ! CRTM Surface parameter data
-  ! tv comment, 10/06: values entered are DEFAULTs from Table 9 in CRTM User Guide
-     !Surface%Land_Coverage=1.               ! fraction
-     !Surface%Water_Coverage=0.              ! fraction
-     !Surface%Snow_Coverage=0.               ! fraction
-     !Surface%Ice_Coverage=0.                ! fraction
 
      if (Surface%Land_Coverage > 0.) then
        Surface%Land_Type=GRASS_SOIL           ! land type (User guide appendix 3)
@@ -370,21 +359,15 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
                             GeometryInfo, &
                             ChannelInfo,  &
                             RTSolution)
-
-         !write(6,'(f10.3)') Atmosphere%pressure(0)
+         !if (n<=10) then
+         !write(6,'(f10.3)') Atmosphere%level_pressure(0)
          !do k=1,Atmosphere%n_layers
-         !  write(6,'(4f10.3)') Atmosphere%pressure(k),Atmosphere%level_pressure(k), &
+         !  write(6,'(4f10.3)') Atmosphere%Level_pressure(k),Atmosphere%pressure(k), &
          !                      Atmosphere%temperature(k),Atmosphere%absorber(k,1)
          !enddo
          !  write(6,'(15f8.3)') RTSolution(1:nchanl)%Brightness_Temperature
          !  write(6,'(15f8.3)') RTSolution(1:nchanl)%surface_emissivity
-
-         !IF ( Error_Status /= SUCCESS) THEN
-         !   CALL Display_Message( 'da_get_innov_vector_rad_crtm', &
-         !                  'Error initializing CRTM', &
-         !                   Error_Status)
-         !   STOP
-         !END IF
+         !end if
 
          if ( Error_Status /= 0 ) THEN
               call da_error(__FILE__,__LINE__, &
