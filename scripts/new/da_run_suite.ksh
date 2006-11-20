@@ -160,6 +160,7 @@ export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
 export NL_RADT=${NL_RADT:-30}                #
 export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
 export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
+export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
 export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
@@ -167,6 +168,8 @@ export NL_CUDT=${NL_CUDT:-5}
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
 export NL_KM_OPT=${NL_KM_OPT:-1}               #
+export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}
+export NL_DAMPCOEF=${NL_DAMPCOEF:-0.0}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 #&bdy_control:
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #

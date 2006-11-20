@@ -49,16 +49,27 @@ export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
+export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
+                                        " 0.922, 0.894, 0.860, 0.817, 0.766, "\
+                                        " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
+                                        " 0.324, 0.273, 0.228, 0.188, 0.152,"\
+                                        " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
 export NL_E_VERT=${NL_E_VERT:-28}                   #
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
 export NL_RADT=${NL_RADT:-30}                #
+export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
 export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
+export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
+export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
+export NL_CUDT=${NL_CUDT:-5}           #(1=, 2=,3=).
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
 export NL_KM_OPT=${NL_KM_OPT:-1}               #
-export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}    #
+export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}               #
+export NL_DAMPCOEF=${NL_DAMPCOEF:-0.0}
+export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
 if test ! -d $RC_DIR; then mkdir $RC_DIR; fi
