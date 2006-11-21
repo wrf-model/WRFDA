@@ -25,7 +25,7 @@ PROGRAM kma2netcdf
    TYPE (domain) , POINTER :: keep_grid, grid_ptr, null_domain
    TYPE (grid_config_rec_type)              :: config_flags
 
-   INTEGER :: domain_id , fid , oid , idum1 , idum2 , ierr
+   INTEGER :: domain_id , fid , oid , idum1 , idum2 
 
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
@@ -49,11 +49,11 @@ PROGRAM kma2netcdf
 
 !--Get the NAMELIST data for input.
 
-!shc-wei start
-!  CALL init_modules
    CALL init_modules(1)
-!shc-wei end
-
+!rizvi's add  start
+     ! Initialize utilities (time manager, etc.)
+      call wrfu_initialize(defaultCalendar=WRFU_CAL_GREGORIAN)
+!rizvi's add over
 
 #ifdef DM_PARALLEL
    IF ( wrf_dm_on_monitor() ) THEN
