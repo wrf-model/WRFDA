@@ -121,7 +121,11 @@ subroutine da_get_innov_vector( it, ob, iv, &
       if (rtm_option == 1) then
          call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
       elseif (rtm_option == 2) then
+        if (use_crtm_kmatrix_fast) then
+         call da_get_innov_vector_rad_crtmk( it, grid%xb, grid%xp, ob, iv )
+        else
          call da_get_innov_vector_rad_crtm( it, grid%xb, grid%xp, ob, iv )
+        end if
       else
          write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_get_innov_vector'
       endif

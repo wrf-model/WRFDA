@@ -207,19 +207,17 @@ subroutine da_crtm_init(iv,ob)
   !----------------------------------------------------------------- 
 
      Error_Status = CRTM_Init( ChannelInfo, &
-                              SpcCoeff_File, &
-                              TauCoeff_File, &
-                              AerosolCoeff_File, &
-                              CloudCoeff_File, & 
-                              EmisCoeff_File)
+                              SpcCoeff_File = SpcCoeff_File, &
+                              TauCoeff_File = TauCoeff_File, &
+                              AerosolCoeff_File = AerosolCoeff_File, &
+                              EmisCoeff_File = EmisCoeff_File, &
+                              CloudCoeff_File = CloudCoeff_File) 
 
 !   Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(1),ChannelInfo)
 
-     IF ( Error_Status /= SUCCESS) THEN 
-       CALL Display_Message( PROGRAM_NAME, &
-                           'Error initializing CRTM', & 
-                            Error_Status)  
-       STOP
+     IF ( Error_Status /= 0 ) THEN 
+       call da_error(__FILE__,__LINE__, &
+         (/"Error in initializing CRTM"/))
      END IF
 
 !   write (6,*) 'ChannelInfo content'

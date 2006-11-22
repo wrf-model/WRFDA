@@ -436,6 +436,7 @@ module da_define_structures
         integer, pointer   ::   cloud_flag(:)
         real,    pointer   ::   t(:), mr(:), zk(:)
         real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
+        real,    pointer   ::   ps_jacobian(:), t_jacobian(:,:),q_jacobian(:,:)
         real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
         real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
         integer            ::   isflg

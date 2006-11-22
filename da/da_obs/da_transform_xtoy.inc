@@ -142,7 +142,13 @@ subroutine da_transform_xtoy( xb, iv, xa, xp, y )
     if (rtm_option == 1) then
        call da_transform_xtoy_rad ( xa, iv, xp, y )
     elseif (rtm_option == 2) then
+      if (use_crtm_kmatrix) then
+       call da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
+      else if (use_crtm_kmatrix_fast) then
+       call da_transform_xtoy_rad_crtmk_fast ( xa, iv, xp, y )
+      else
        call da_transform_xtoy_rad_crtm ( xa, iv, xp, y )
+      end if
     else
        write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_tranform_xtoy'
     endif
