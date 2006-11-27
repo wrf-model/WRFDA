@@ -140,12 +140,13 @@ C
           CALL REOWV
      1     (QDAT1,QPHIS,MEND1,NEND1,JEND1,MNWAV,KMX2,2,0,0,2,LAG)
 !shc-rizvi start
-          print*,' Doing Wave to grid transform for Topo'
+          print*,'1. Doing Wave to grid transform for Topo'
           CALL W2G
      I     (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,   1,
      I      IFAX ,TRIGS,PNM  ,QPHIS,
      O      EDAT1,
      W      EDAT2)
+          print*,'1. Done  Wave to grid transform for Topo'
 !shc-rizvi end
 C
         ELSE
@@ -164,7 +165,7 @@ C
 Crizvi            CALL REOWV
 Crizvi     1      (QDAT1,QPHIS,MEND1,NEND1,JEND1,MNWAV,KMX2,2,0,0,2,LAG)
 !shc-rizvi start
-            print*,' Doing Wave to grid transform for Topo'
+            print*,'2. Doing Wave to grid transform for Topo'
             CALL W2G
      I       (MEND1,NEND1,JEND1,MNWAV,IMAX,JOUT,IMX,JOUTHF,   1,
      I        IFAX ,TRIGS,PNM  ,QDAT1,
