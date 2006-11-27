@@ -97,21 +97,14 @@ and then compiling the decoder itself. The following steps may be followed.
     export G95_UNBUFFERED_ALL=${G95_UNBUFFERED_ALL:-T}
     export G95_MEM_INIT=${G95_MEM_INIT:-0x00}
     export G95_MEM_MAXALLOC=${G95_MEM_MAXALLOC:-F}
- 
+
  1) Set the NETCDF environment variable to the location where NETCDF is 
     installed.
  
- 2) > ./configure_new wrfvar
+ 2) Edit the Makefile to use the correct compilers and compiler flags; also
+    set the paths to the libraries compiled above.
  
- 3) > ./setup_g95
- 
- 4) > cd ../../../build
- 
- 5) > touch depend.txt
- 
- 6) > make setup 
- 
- 7) > make -r decode_airs
+ 7) Run 'make'.
 
 
 Running the decoder

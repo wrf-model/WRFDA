@@ -1,5 +1,9 @@
-include ../../configure.wrf
+CC = gcc
+FC = pgf90
+FFLAGS = -Mfree -g
+CFLAGS = -g
 
+EXTERNAL = /data1/duda/libs
 JPEGLIB    =  $(EXTERNAL)/jpeg-6b/lib
 ZLIBLIB    =  $(EXTERNAL)/zlib-1.2.3/lib
 
@@ -20,7 +24,7 @@ all: decode_airs.exe
 
 decode_airs.exe: decode_airs.o module_read_airs.o geth_newdate.o calc_rh.o
 	$(FC) -o $@ decode_airs.o module_read_airs.o geth_newdate.o calc_rh.o \
-           -L${HDFEOS_LIB} -L${HDF_LIB} -I${HDFEOS_INC} -I${HDF_INC} -lhdfeos \
+           -L${HDFEOS_LIB} -L${HDFLIB} -I${HDFEOS_INC} -I${HDFINC} -lhdfeos \
            -lGctp -lmfhdf -ldf -L${ZLIBLIB} -lz -L${JPEGLIB} -ljpeg -lm
 
 decode_airs.o: module_read_airs.o geth_newdate.o calc_rh.o
