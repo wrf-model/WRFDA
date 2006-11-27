@@ -334,12 +334,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
          p => p%next
          nullify (p%next)
-         if (num_tovs_local == max_tovs_input) then
-            write(unit=errmsg(1),fmt='(A,I10)') &
-               "Reached maximum number of obs", max_tovs_input
-            call da_warning(__FILE__,__LINE__,errmsg(1:1))
-            exit obs
-         end if
+!         if (num_tovs_local == max_num_rad) then
+!            write(unit=errmsg(1),fmt='(A,I10)') &
+!               "Reached maximum number of obs", max_num_rad
+!            call da_warning(__FILE__,__LINE__,errmsg(1:1))
+!            exit obs
+!         end if
       end do
    end do obs
 
@@ -406,47 +406,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    end do
 
    deallocate (nread)
-
-!   if (interp_new) then
-if (.false.) then
-      do inst = 1, rtminit_nsensor
-         allocate(iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dx(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dy(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dxm(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dym(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%zk(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%t(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%mr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%tm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qrn(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qcw(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qci(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qsn(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%qgr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%pm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%tb_xb(nchan,iv%instid(inst)%num_rad))
-         ! allocate ( iv%instid(inst)%calcemis(knchpf,iv%instid(inst)%num_rad))
-         allocate (iv%instid(inst)%emiss(nchan,iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%scanpos(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%satzen(iv%instid(inst)%num_rad))
-         allocate(iv%instid(inst)%satazi(iv%instid(inst)%num_rad))
-         do n=1,iv%instid(inst)%num_rad
-            iv%instid(inst)%loc_i(n)   = iv%instid(inst)%rad(n)%loc%i
-            iv%instid(inst)%loc_j(n)   = iv%instid(inst)%rad(n)%loc%j
-            iv%instid(inst)%loc_dx(n)  = iv%instid(inst)%rad(n)%loc%dx
-            iv%instid(inst)%loc_dy(n)  = iv%instid(inst)%rad(n)%loc%dy
-            iv%instid(inst)%loc_dxm(n) = iv%instid(inst)%rad(n)%loc%dxm
-            iv%instid(inst)%loc_dym(n) = iv%instid(inst)%rad(n)%loc%dym
-            ! z done in da_get_innov_vector_rad
-         end do
-      end do
-   end if
 
    ! check if sequential structure has been freed
    !
