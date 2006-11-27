@@ -10,7 +10,7 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
 
    integer                :: k
 
-   if (trace_use) call da_trace_entry("da_to_zk")
+   if (trace_use_frequent) call da_trace_entry("da_to_zk")
 
    zk = missing_r
 
@@ -66,7 +66,7 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
       end if
    end if
 
-   if (trace_use) call da_trace_exit("da_to_zk")
+   if (trace_use_frequent) call da_trace_exit("da_to_zk")
 
 end subroutine da_to_zk
 

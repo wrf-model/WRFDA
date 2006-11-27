@@ -1074,6 +1074,7 @@ rconfig   integer trace_repeat_head       namelist,record1         1            
 rconfig   integer trace_repeat_body       namelist,record1         1              10      -       "trace_repeat_body"         "trace_repeat_body"         "1-100"
 rconfig   integer trace_max_depth         namelist,record1         1              30      -       "trace_max_depth"               "trace_max_depth"         "1-100"
 rconfig   logical trace_use               namelist,record1         1              .true.  -       "trace_use"        "trace_use"        "T/F"
+rconfig   logical trace_use_frequent      namelist,record1         1              .false.  -       "trace_use_frequent" "trace_use_frequent"        "T/F"
 rconfig   logical trace_memory            namelist,record1         1              .true.  -       "trace_memory"     "trace_memory"     "T/F"
 rconfig   logical trace_all_pes           namelist,record1         1              .false. -       "trace_all_pes"    "trace_all_pes"    "T/F"
 rconfig   logical trace_csv               namelist,record1         1              .false. -       "trace_csv"        "trace_csv"        "T/F"
