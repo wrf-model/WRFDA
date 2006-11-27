@@ -99,7 +99,7 @@ export NL_TIME_STEP_SOUND=4
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
 
-${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
+${RUN_CMD} ${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
 
 exit 0
 
