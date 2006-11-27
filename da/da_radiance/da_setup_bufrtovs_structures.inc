@@ -145,8 +145,6 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
  end if
 
-   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
-
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
 END SUBROUTINE da_setup_bufrtovs_structures

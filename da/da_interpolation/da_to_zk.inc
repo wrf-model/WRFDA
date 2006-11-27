@@ -28,7 +28,7 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
             end if
          else
-            if (trace_use) call da_trace_exit("da_to_zk")
+            if (trace_use_frequent) call da_trace_exit("da_to_zk")
             return
          end if
       else
@@ -53,7 +53,7 @@ subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
                   (obs_v-mdl_v(xp%kte-1))/(mdl_v(xp%kte)-mdl_v(xp%kte-1))
             end if
          else
-            if (trace_use) call da_trace_exit("da_to_zk")
+            if (trace_use_frequent) call da_trace_exit("da_to_zk")
             return
          end if
       else

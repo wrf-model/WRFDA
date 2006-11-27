@@ -459,8 +459,6 @@ if (.false.) then
    close(lnbufr)
    call da_free_unit(lnbufr)
 
-   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
-
    call da_trace_exit("da_read_bufrtovs")
 
 end subroutine da_read_bufrtovs
