@@ -487,3 +487,5 @@ if test ! -z "$NL_FORECAST_PROC_ID"; then echo "forecast_proc_id=${NL_FORECAST_P
 if test ! -z "$NL_PRODUCTION_STATUS"; then echo "production_status=${NL_PRODUCTION_STATUS}," >> namelist.input;fi
 if test ! -z "$NL_COMPRESSION"; then echo "compression=${NL_COMPRESSION}," >> namelist.input;fi
 echo / >> namelist.input
+echo \&namelist_quilt >> namelist.input
+echo / >> namelist.input
