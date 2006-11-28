@@ -69,6 +69,6 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    write(unit=message(1), fmt='(/a,i3/a/)') &
               'read error on unit: ',unit_in, &
               'in da_read_rand_unit'
-   call da_error(__FILE__,__LINE__,message(1:1))
+   call da_warning(__FILE__,__LINE__,message(1:1))
 
 end subroutine da_read_rand_unit

@@ -510,6 +510,6 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
 1000 continue
    write(unit=message(1), fmt='(a,i3)') &
       'read error on unit: ',unit_in
-   call da_error(__FILE__,__LINE__,message(1:1))
+   call da_warning(__FILE__,__LINE__,message(1:1))
 
 end subroutine da_read_omb_tmp

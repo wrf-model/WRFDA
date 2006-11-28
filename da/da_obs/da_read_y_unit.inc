@@ -70,6 +70,6 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
 1000  continue 
    write(unit=message(1), fmt='(a,i3,a,a)') &
       'read error on unit: ',unit_in, ' for ob_type', trim(ob_type)
-   call da_error(__FILE__,__LINE__,message(1:1))
+   call da_warning(__FILE__,__LINE__,message(1:1))
 
 end subroutine da_read_y_unit

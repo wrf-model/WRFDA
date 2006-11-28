@@ -21,7 +21,6 @@ subroutine da_final_write_obs( ob, iv, re)
    call mpi_barrier(comm, ierr)
 #endif
 
-write (0,*) "num_procs", num_procs
    if (rootproc) then
       call da_get_unit(iunit)
       allocate ( filename(0:num_procs-1))
