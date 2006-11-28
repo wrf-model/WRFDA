@@ -123,9 +123,8 @@ subroutine da_read_obs (ob, xp, filename)
       read (unit = iunit, fmt = '(A)', iostat = iost) info_string
 
       if (iost /= 0) then
-         write(unit=stdout, fmt='(/a,i3/a/)') &
-              'ERROR readinG FILE unit:', iunit, &
-              'in read_obs_gts_header.F' 
+         call da_warning(__FILE__,__LINE__, &
+           (/"Problem reading gts obs header, skipping file"/))
          return
       end if
 
@@ -144,9 +143,8 @@ subroutine da_read_obs (ob, xp, filename)
         fmt_name, fmt_each
 
    if (iost /= 0) then
-      write(unit=stdout, fmt='(/A,I3,A/)') &
-           ' ERROR in inPUT FILE unit ',iunit, &
-           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
+      call da_warning(__FILE__,__LINE__, &
+         (/"Problem reading gts obs file, skipping"/))
       return
    end if
 
@@ -272,17 +270,6 @@ loop_level: do i = 1, platform%info%levels
               platform%each (i)%rh
       end if
 
-      ! Restrict to a range of reports, useful for debugging
-
-      if (report < report_start) then
-         cycle
-      end if
-
-      if (report > report_end) then
-         exit
-      end if
-
-
 ! Uncomment the following if errors in reported heights (test later):             
 !      if(fm == 97 .or. fm == 96 .or. fm == 42) then
 !         platform%each (i)%height_qc = -5 ! Aircraft heights are not above surface.
@@ -311,6 +298,17 @@ loop_level: do i = 1, platform%info%levels
        end if
 
       end do loop_level
+
+      ! Restrict to a range of reports, useful for debugging
+
+      if (report < report_start) then
+         cycle
+      end if
+
+      if (report > report_end) then
+         exit
+      end if
+
 
       call da_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, outside_all )
