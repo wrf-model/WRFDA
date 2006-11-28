@@ -9,7 +9,7 @@
 !   Additions: 07/15/2003 - Added Buo and Profiler               S.R.H. Rizvi
 !   Additions: 07/20/2003 - Added DA_Add_PBL_And_SFC_Info        S.R.H. Rizvi
 !------------------------------------------------------------------------------
-
+      use da_tracing
       USE DA_Constants
       USE DA_Define_Structures
       USE DA_VToX_Transforms

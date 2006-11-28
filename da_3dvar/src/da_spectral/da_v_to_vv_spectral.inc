@@ -37,6 +37,8 @@ subroutine da_v_to_vv_spectral(xbx, power, rcv, field, &
    real                :: xx
 !---------------------------------------------------------------------------------
 
+   if (trace_use) call da_trace_entry("da_v_to_vv_spectral")
+
    v_fou = 0.0
    do n = 1, xbx%c_cv_size
       cv(n)  = CMPLX( rcv(2*n-1), rcv(2*n) )
@@ -79,6 +81,8 @@ subroutine da_v_to_vv_spectral(xbx, power, rcv, field, &
                    work, xbx%lenwrk, ier )
       field(its:ite,j) = r_fou(its:ite)
    end do
+
+   if (trace_use) call da_trace_exit("da_v_to_vv_spectral")
    
 end subroutine da_v_to_vv_spectral
 

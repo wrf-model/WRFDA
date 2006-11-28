@@ -29,6 +29,8 @@ subroutine DA_Transform_VvToVp( evec, eval, vertical_wgt, &
    integer               :: i, j, k, m                 ! Loop counters.
    real                  :: temp
 
+   if (trace_use) call da_trace_entry("da_transform_vvtovp")
+
 !-------------------------------------------------------------------
 !  [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
 !------------------------------------------------------------------- 
@@ -56,6 +58,8 @@ subroutine DA_Transform_VvToVp( evec, eval, vertical_wgt, &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)
                            
    END IF
+
+   if (trace_use) call da_trace_exit("da_transform_vvtovp")
 
 END subroutine DA_Transform_VvToVp
 

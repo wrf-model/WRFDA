@@ -38,6 +38,8 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
    include 'mpif.h'
 #endif
 
+   if (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
+
 !-------------------------------------------------------------------------
 !  logical             :: odd_longitudes             ! True if odd longitudes.
 !  if(mod(ide-ids+1, 2) == 1 ) then    ! Odd number of longitudes:
@@ -102,6 +104,8 @@ subroutine da_v_to_vv_spectral_adj(xbx, power, rcv, field, &
      rcv(2*i - 1 ) = real ( cv(i) )
      rcv(2*i     ) = aimag( cv(i) )
     end do 
+
+   if (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")
 
 end subroutine da_v_to_vv_spectral_adj
 

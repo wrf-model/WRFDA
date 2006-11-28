@@ -37,6 +37,8 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
 
       character(len=4) :: filnam
 
+   if (trace_use) call da_trace_entry("da_transform_vtoy")
+
 !
       call da_transform_vtox( xb, xbx, be, cv, vv, vp, xp, xa,  &
                               ids, ide, jds, jde, kds, kde,     &
@@ -71,6 +73,8 @@ subroutine DA_Transform_VToY(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
          call da_transform_xtoy( xb, iv, xa, xp, y )
 
       endif ! lvar4d
+
+   if (trace_use) call da_trace_exit("da_transform_vtoy")
 
 end subroutine DA_Transform_VToY
 

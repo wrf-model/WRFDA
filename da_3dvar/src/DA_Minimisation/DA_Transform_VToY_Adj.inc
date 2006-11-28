@@ -38,6 +38,8 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
       character(len=4) :: filnam
 !-------------------------------------------------------------------------
 
+   if (trace_use) call da_trace_entry("da_transform_vtoy_adj")
+
       if ( lvar4d ) then
 
 #ifdef WRFVAR
@@ -74,6 +76,8 @@ subroutine DA_Transform_VToY_Adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
                                ids, ide, jds, jde, kds, kde,       &
                                ims, ime, jms, jme, kms, kme,       &
                                its, ite, jts, jte, kts, kte )
+
+   if (trace_use) call da_trace_exit("da_transform_vtoy_adj")
 !
 end subroutine DA_Transform_VToY_Adj
 
