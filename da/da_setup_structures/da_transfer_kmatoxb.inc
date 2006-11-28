@@ -327,6 +327,7 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    end if
 
    write(current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
+      grid%start_year, '-', &
       grid%start_month, '-', &
       grid%start_day,   '_', &
       grid%start_hour,  ':', &
