@@ -24,6 +24,7 @@ export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LL_WALL_CLOCK_LIMIT=${LL_WALL_CLOCK_LIMIT:-01:30:00}
 export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
 export LL_PTILE=${LL_PTILE:-8}
+export LL_CLASS=${LL_CLASS:-com_rg8}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 export HOSTS=${HOSTS:-$PWD/hosts}
@@ -54,8 +55,7 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 # @ checkpoint       = no
 # @ wall_clock_limit = $LL_WALL_CLOCK_LIMIT
 # NCEP IBM=dev
-# NCAR IBM(bluesky)=com_rg8:
-# @ class      =  share
+# @ class      =  ${LL_CLASS}
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
