@@ -419,8 +419,8 @@ subroutine da_trace_report
 
          write (unit=trace_unit,fmt='("<hr><a name=memory><h2>Maximum memory usage for routines</h2></a>")')
          write (unit=trace_unit,fmt='("<TABLE BORDER>")')
-         write (unit=trace_unit,fmt='("<TR><TH>Routine<TH>Max in any PE (bytes)")')
-         write (unit=trace_unit,fmt='("<TH>Overall (bytes)<TH>Average per PE (bytes)")')
+         write (unit=trace_unit,fmt='("<TR><TH>Routine<TH>Max in any PE (kbytes)")')
+         write (unit=trace_unit,fmt='("<TH>Overall (bytes)<TH>Average per PE (kbytes)")')
 
          do loop1=MasterNoRoutines,1,-1
             Pointer=index(loop1)
