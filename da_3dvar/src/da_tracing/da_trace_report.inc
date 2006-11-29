@@ -72,7 +72,7 @@ subroutine da_trace_report
    end if
 
 #ifdef DM_PARALLEL
-   call proc_sum_int(MasterNoRoutines)
+   call da_proc_sum_int(MasterNoRoutines)
    ! only PE 0 knows the result
 
    call MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
@@ -106,12 +106,12 @@ subroutine da_trace_report
 
 #ifdef DM_PARALLEL
    do i=0,num_procs-1
-      call proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
-      call proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
-      call proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
-      call proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
-      call proc_sum_ints(MasterNoCalls(i,:))
-      call proc_sum_ints(MasterMaxHeap(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
+      call da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
+      call da_proc_sum_ints(MasterNoCalls(i,:))
+      call da_proc_sum_ints(MasterMaxHeap(i,:))
    end do
 #endif
 
@@ -405,7 +405,7 @@ subroutine da_trace_report
 #ifdef DM_PARALLEL
       do i=0,num_procs-1
          do j=1,MaxNoRoutines
-            call proc_sum_int(MasterMaxHeap(i,j))
+            call da_proc_sum_int(MasterMaxHeap(i,j))
          end do
       end do
 #endif
@@ -419,8 +419,8 @@ subroutine da_trace_report
 
          write (unit=trace_unit,fmt='("<hr><a name=memory><h2>Maximum memory usage for routines</h2></a>")')
          write (unit=trace_unit,fmt='("<TABLE BORDER>")')
-         write (unit=trace_unit,fmt='("<TR><TH>Routine<TH>Max in any PE (bytes)")')
-         write (unit=trace_unit,fmt='("<TH>Overall (bytes)<TH>Average per PE (bytes)")')
+         write (unit=trace_unit,fmt='("<TR><TH>Routine<TH>Max in any PE (kbytes)")')
+         write (unit=trace_unit,fmt='("<TH>Overall (bytes)<TH>Average per PE (kbytes)")')
 
          do loop1=MasterNoRoutines,1,-1
             Pointer=index(loop1)
