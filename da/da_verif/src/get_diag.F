@@ -532,7 +532,7 @@ CONTAINS
       if      ( pr >= stdp(1)    ) then
        npr = 1
        return
-      else if ( pr <= stdp(nstd) ) then
+      else if ( pr < stdp(nstd-1) ) then
        npr = nstd
        return
       else
