@@ -59,6 +59,7 @@ call mpi_barrier(comm,ierr)
 
    if (anal_type_verify) then
       check_max_iv = .false.
+      ntmax=0
    end if
 
    if (cv_options_hum < 1 .or. cv_options_hum > 3) then
