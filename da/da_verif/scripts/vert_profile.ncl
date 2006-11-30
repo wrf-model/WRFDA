@@ -131,6 +131,10 @@ pnumber = flt2string(ob_tot(iv-1,:))
 ;----------------------------------------------------------------------------------------
  res          = True                              ; plot mods desired
 ;----------------------------------------------------------------------------------------
+ setvalues wks
+ "wksForegroundColor":(/0.,0.,0./)
+ "wksBackgroundColor":(/1.,1.,1./)
+ end setvalues 
  res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,4.0,4.0,4.0,4.0/)            ; make 2nd lines thicker
  res@xyLineColors      = legend_line_cols                               ; change line color
  res@xyDashPatterns    = (/0,0,0,0,2,2,3,3,4,4/)                        ; choose dash patterns

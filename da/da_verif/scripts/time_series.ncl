@@ -165,6 +165,11 @@ end do
  y = smth9(y,0.50,0.25,False)
 ;----------------------------------------------------------
  res          = True                              ; plot mods desired
+ setvalues wks 
+ "wksForegroundColor":(/0.,0.,0./)
+ "wksBackgroundColor":(/1.,1.,1./)
+ end setvalues 
+
  res@gsnDraw               = False                ; (a) do not draw
  res@gsnFrame              = False                ; (b) do not advance 'frame'
  res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)    ; make lines thicker
@@ -190,6 +195,11 @@ end do
  res@tiXAxisString   = Xaxis_title                ; Label for the X axis
 ;----------------------------------------------------------
  resN          = True                              ; plot mods desired
+ setvalues wks 
+ "wksForegroundColor":(/0.,0.,0./)
+ "wksBackgroundColor":(/1.,1.,1./)
+ end setvalues 
+
  resN@gsnDraw               = False                ; (a) do not draw
  resN@gsnFrame              = False                ; (b) do not advance 'frame'
  resN@xyLineThicknesses = (/1.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)    ; make lines thicker
