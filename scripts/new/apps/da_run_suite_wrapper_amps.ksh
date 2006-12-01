@@ -21,13 +21,14 @@
 # variable then email wrfhelp@ucar.edu and we will add it for the next
 # release.
 #########################################################################
+set echo 
 
 #Decide which stages to run (run if true):
 #export RUN_RESTORE_DATA_NCEP=true
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
 #export RUN_WPS=true
-export RUN_REAL=true
+#export RUN_REAL=true
 #export RUN_OBSPROC=true
 #export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
@@ -37,31 +38,48 @@ export RUN_WRF=true
 #export DUMMY=${DUMMY:-true}
 export REGION=amps1
 export EXPT=noda
-export RUN_CMD=" "
-#export CLEAN=${CLEAN:-true}
+export CLEAN=${CLEAN:-true}
 #export CYCLING=${CYCLING:-true}
 #export CYCLE_PERIOD=6
-#export NUM_PROCS=4
 #export FIRST=false
 
+export LSF_EXCLUSIVE=" "
+export NUM_PROCS=64
+export QUEUE=premium
+#export QUEUE=share
+export PROJECT_ID=68000001
+#export PROJECT_ID=64000420
+export LSF_MAX_RUNTIME=180
+#export LSF_MAX_RUNTIME=60
+export LL_PTILE=16
+#export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
+#export RUN_CMD=mpirun.lsf
+
 #Time info:
-export INITIAL_DATE=2006100100
-export FINAL_DATE=2006100100
+export INITIAL_DATE=2006100912
+export FINAL_DATE=2006102900
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=72
 export LONG_FCST_TIME_2=12
 export LONG_FCST_RANGE_2=72
 
 #Directories:
-export REL_DIR=/data1/$USER/code/trunk
+#snowdrift:
+#export REL_DIR=/data1/$USER/code/trunk
+#export DAT_DIR=/data3/$USER/data
+#export WPS_GEOG_DIR=/data1/dmbarker/data/geog
 #export WRF_BC_DIR=/data1/dmbarker/code/WRF_BC
-export DAT_DIR=/data3/$USER/data
+#bluevista:
+export REL_DIR=/mmm/users/dmbarker/code/trunk
+export DAT_DIR=/mmm/users/dmbarker/data
+#import NCEP_DIR=/mmm/users/dmbarker/data/ncep
+#export DAT_DIR=/ptmp/dmbarker/data
+export WPS_GEOG_DIR=/mmm/users/gill/DATA/GEOG
+
 export WRFVAR_DIR=$REL_DIR/wrfvar
-#export EXP_DIR=$HOME/data/con200/noda
 
 #From WPS (namelist.wps):
 export RUN_GEOGRID=false
-export WPS_GEOG_DIR=/data1/dmbarker/data/geog
 export NL_E_WE=165
 export NL_E_SN=217 
 export MAP_PROJ=polar
@@ -99,7 +117,10 @@ export NL_TIME_STEP_SOUND=4
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
 
-${RUN_CMD} ${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
+export SCRIPT=$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+
+export MACHINE=bluevista
+$WRFVAR_DIR/scripts/new/da_run_job.${MACHINE}.ksh
 
 exit 0
 
