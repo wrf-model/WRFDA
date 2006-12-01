@@ -155,7 +155,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
 #   mv $WORK_DIR/wrflowinp_d${DOMAIN} $RC_DIR/$DATE
 
 if $CLEAN; then
-   rm -rf $WORK_DIR
+   rm -rf $WORK_DIR $RC_DIR/$DATE/met_em.d* 
 fi
 
 date
