@@ -51,7 +51,8 @@ export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.} 
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
-export NL_INPUTOUT_END_H=$FCST_RANGE             # Outputs stop at end of forecast.
+export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
+export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
 #&domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   #
@@ -68,6 +69,7 @@ export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 
 export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
+export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-0}
 #&dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 

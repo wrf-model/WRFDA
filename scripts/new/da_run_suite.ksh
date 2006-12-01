@@ -164,6 +164,7 @@ export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
 export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
+export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-0}
 #&dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
