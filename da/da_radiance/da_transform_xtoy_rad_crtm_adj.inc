@@ -52,6 +52,7 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
     Atmosphere%n_Absorbers=2
     Atmosphere%n_Clouds=0
     Atmosphere%n_Aerosols=0
+    if (crtm_cloud) Atmosphere%n_Clouds=6
  
     Error_Status = CRTM_Allocate_Atmosphere( Atmosphere%n_Layers, &
                                              Atmosphere%n_Absorbers, &
@@ -65,6 +66,15 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
  
+    if (crtm_cloud) then
+       Atmosphere%Cloud(1)%Type=WATER_CLOUD
+       Atmosphere%Cloud(2)%Type=ICE_CLOUD
+       Atmosphere%Cloud(3)%Type=RAIN_CLOUD
+       Atmosphere%Cloud(4)%Type=SNOW_CLOUD
+       Atmosphere%Cloud(5)%Type=GRAUPEL_CLOUD
+       Atmosphere%Cloud(6)%Type=HAIL_CLOUD
+    end if
+
 !-------------------------------------------------------------------------------
 
    do inst = 1, iv%num_inst                 ! loop for sensor
@@ -131,6 +141,20 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
             atmosphere%level_pressure(k) = iv%instid(inst)%rad(n)%t(k)
             atmosphere%temperature(k) = iv%instid(inst)%rad(n)%tm(k)
             atmosphere%absorber(k,1) = iv%instid(inst)%rad(n)%qm(k)
+           if (crtm_cloud) then
+            atmosphere%cloud(1)%water_content(k)=iv%instid(inst)%rad(n)%qcw(k)
+            atmosphere%cloud(2)%water_content(k)=iv%instid(inst)%rad(n)%qci(k)
+            atmosphere%cloud(3)%water_content(k)=iv%instid(inst)%rad(n)%qrn(k)
+            atmosphere%cloud(4)%water_content(k)=iv%instid(inst)%rad(n)%qsn(k)
+            atmosphere%cloud(5)%water_content(k)=iv%instid(inst)%rad(n)%qgr(k)
+            atmosphere%cloud(6)%water_content(k)=0.
+            atmosphere%cloud(1)%effective_radius(k)=10.
+            atmosphere%cloud(2)%effective_radius(k)=200.
+            atmosphere%cloud(3)%effective_radius(k)=200.
+            atmosphere%cloud(4)%effective_radius(k)=200.
+            atmosphere%cloud(5)%effective_radius(k)=200.
+            atmosphere%cloud(6)%effective_radius(k)=200.
+           end if
            enddo
 
       ! [1.1] User-supplied emissivity

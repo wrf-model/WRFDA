@@ -187,6 +187,8 @@ subroutine da_crtm_init(iv,ob)
   ! INPUT: 
      SpcCoeff_File     = 'CRTM_SpcCoeff.bin'
      TauCoeff_File     = 'CRTM_TauCoeff.bin'
+     !SpcCoeff_File     = 'CRTM_amsua_n15-n16.SpcCoeff.bin'
+     !TauCoeff_File     = 'CRTM_amsua_n15-n16.TauCoeff.bin'
      AerosolCoeff_File = 'CRTM_AerosolCoeff.bin'
      CloudCoeff_File   = 'CRTM_CldCoeff.bin'
      EmisCoeff_File    = 'CRTM_EmisCoeff.bin'
@@ -210,7 +212,7 @@ subroutine da_crtm_init(iv,ob)
                               SpcCoeff_File = SpcCoeff_File, &
                               TauCoeff_File = TauCoeff_File, &
                               AerosolCoeff_File = AerosolCoeff_File, &
-                              EmisCoeff_File = EmisCoeff_File, &
+                              EmisCoeff_File = EmisCoeff_File , &
                               CloudCoeff_File = CloudCoeff_File) 
 
 !   Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(1),ChannelInfo)

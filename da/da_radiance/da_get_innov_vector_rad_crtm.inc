@@ -19,7 +19,7 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
+   INTEGER                        :: n, icld  ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_levs ! Number of obs levels.
    REAL                           :: dx, dxm  ! Interpolation weights.
@@ -36,9 +36,8 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    INTEGER                          :: model_isflg
 
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, model_tm, &     ! Model value p at ob hor. location.
-                                       model_qrn, model_qcw, &
-                                       model_qci, model_qsn, &
-                                       model_qgr, model_qm
+                                       model_qcw, &
+                                       model_qm
 
    INTEGER            :: inst, nchanl
    INTEGER            :: nchan_emis
@@ -79,7 +78,8 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
     Atmosphere%n_Absorbers=2
     Atmosphere%n_Clouds=0
     Atmosphere%n_Aerosols=0
- 
+    if (crtm_cloud) Atmosphere%n_Clouds=6
+  
     Error_Status = CRTM_Allocate_Atmosphere( Atmosphere%n_Layers, &
                                              Atmosphere%n_Absorbers, &
                                              Atmosphere%n_Clouds, &
@@ -92,6 +92,15 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
+
+    if (crtm_cloud) then
+       Atmosphere%Cloud(1)%Type=WATER_CLOUD
+       Atmosphere%Cloud(2)%Type=ICE_CLOUD
+       Atmosphere%Cloud(3)%Type=RAIN_CLOUD
+       Atmosphere%Cloud(4)%Type=SNOW_CLOUD
+       Atmosphere%Cloud(5)%Type=GRAUPEL_CLOUD
+       Atmosphere%Cloud(6)%Type=HAIL_CLOUD
+    end if
 
    !------------------------------------------------------
    ! [1.0] calculate the background bright temperature
@@ -154,20 +163,27 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
                     iv%instid(inst)%rad(n)%emiss(nchanl), &
                     iv%instid(inst)%rad(n)%tm(xp%kts:xp%kte), &
                     iv%instid(inst)%rad(n)%qm(xp%kts:xp%kte), &
-                    iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme),  &
+                    iv%instid(inst)%rad(n)%qcw(xp%kts:xp%kte),  &
                     iv%instid(inst)%rad(n)%pm(xp%kts:xp%kte),   &
                     iv%instid(inst)%rad(n)%t(0:xp%kte),         &
                     STAT = Allocate_Status )
-
-!iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), &
-!iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), &
-!iv%instid(inst)%rad(n)%qsn(xp%kms:xp%kme), &
-!iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), &
 
          IF ( Allocate_Status /= 0 ) THEN
            call da_error(__FILE__,__LINE__, &
              (/"Error in allocatting innovation structure"/))
          END IF
+
+         if (crtm_cloud) then
+          Allocate ( iv%instid(inst)%rad(n)%qrn(xp%kts:xp%kte), & ! rain (kg/kg)
+                     iv%instid(inst)%rad(n)%qci(xp%kts:xp%kte), & ! ice
+                     iv%instid(inst)%rad(n)%qsn(xp%kts:xp%kte), & ! snow
+                     iv%instid(inst)%rad(n)%qgr(xp%kts:xp%kte), & ! granple
+                     STAT = Allocate_Status )
+          IF ( Allocate_Status /= 0 ) THEN
+           call da_error(__FILE__,__LINE__, &
+             (/"Error in allocatting innovation cloud structure"/))
+          END IF
+         end if
 
          model_ts   = 0.0
          model_u10  = 0.0
@@ -195,15 +211,49 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 
          ! [1.2] Interpolate horizontally to ob:
          do k=xp%kts,xp%kte ! from bottem to top
-             call da_interp_lin_2D( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+             call da_interp_lin_2d( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                     i, j, dx, dy, dxm, dym, &      ! temperature (in K)
                                     Atmosphere%Temperature(xp%kte-k+1) )
-             call da_interp_lin_2D( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                    i, j, dx, dy, dxm, dym, &      ! specific humidity (in kg/kg)
+             call da_interp_lin_2d( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                    i, j, dx, dy, dxm, dym, &  ! mixture ratio (in kg/kg)
                                     Atmosphere%Absorber(xp%kte-k+1,1) ) 
              Atmosphere%Absorber(xp%kte-k+1,1) = 1000.*Atmosphere%Absorber(xp%kte-k+1,1) ! in g/kg
            ! NOTE: WRF high-level q values seems too big, replaced by constants
              if ( v_p(k) < 75. ) Atmosphere%Absorber(xp%kte-k+1,1) = 0.001
+
+            call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                i, j, dx, dy, dxm, dym, &   ! cloud water
+                                model_qcw(xp%kte-xp%kts+1) )
+            
+           if (crtm_cloud) then
+            Atmosphere%Cloud(1)%Effective_Radius(xp%kte-xp%kts+1)=10.
+            Atmosphere%Cloud(1)%Water_Content(xp%kte-xp%kts+1) = &
+                  model_qcw(xp%kte-xp%kts+1)
+
+            Atmosphere%Cloud(2)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                i, j, dx, dy, dxm, dym, &  ! cloud ice
+                                Atmosphere%Cloud(2)%Water_Content(xp%kte-xp%kts+1) )
+
+            Atmosphere%Cloud(3)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                i, j, dx, dy, dxm, dym, &  ! rain
+                                Atmosphere%Cloud(3)%Water_Content(xp%kte-xp%kts+1) )
+
+            Atmosphere%Cloud(4)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            call da_interp_lin_2d( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                i, j, dx, dy, dxm, dym, &  ! snow
+                                Atmosphere%Cloud(4)%Water_Content(xp%kte-xp%kts+1) )
+
+            Atmosphere%Cloud(5)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            call da_interp_lin_2d( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                i, j, dx, dy, dxm, dym, &  ! grauple
+                                Atmosphere%Cloud(5)%Water_Content(xp%kte-xp%kts+1) )
+ 
+            Atmosphere%Cloud(6)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            Atmosphere%Cloud(6)%Water_Content(xp%kte-xp%kts+1) = 0.
+
+            end if
          enddo
  
 
@@ -237,7 +287,17 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
             Atmosphere%Level_Pressure(xp%kte-k+1)= &
               xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
          enddo
-         
+ 
+         ! convert cloud content unit from kg/kg to kg/m^2        
+         if (crtm_cloud) then
+          do k=xp%kts,xp%kte
+          do icld=1,Atmosphere%n_Clouds
+            Atmosphere%Cloud(icld)%Water_Content(k)= Atmosphere%Cloud(icld)%Water_Content(k)* &
+            (Atmosphere%Level_Pressure(k)- Atmosphere%Level_Pressure(k-1))*100./gravity 
+          enddo
+          enddo
+         end if
+
          if ( model_isflg == 0 ) then   ! over sea using SST
              call da_interp_lin_2d( xb % tgrn, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
@@ -269,26 +329,6 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 
          ! model_snowh = model_snowh*100.0   ! convert from m to mm
          model_vegfra = 0.01*model_vegfra  ! convert range to 0~1
-
-         ! variables for calculation of cloud affected radiance
-         !-------------------------------------------------------
-         do k=xp%kts,xp%kte
-            call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                i, j, dx, dy, dxm, dym, &      ! cloud water
-                                model_qcw(xp%kte-xp%kts+1) )
-         !   call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                       i, j, dx, dy, dxm, dym, &      ! rain
-         !                       model_qrn(k) )
-         !   call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                       i, j, dx, dy, dxm, dym, &      ! cloud ice
-         !                       model_qci(k) )
-         !   call da_interp_lin_2d( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                       i, j, dx, dy, dxm, dym, &      ! snow
-         !                       model_qsn(k) )
-         !   call da_interp_lin_2d( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-         !                       i, j, dx, dy, dxm, dym, &      ! granpul
-         !                       model_qgr(k) )
-         enddo
 
          do k=xp%kts,xp%kte
          ! ADD for computing cloud liquid water path
@@ -375,10 +415,10 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          !  write(6,'(15f8.3)') RTSolution(1:nchanl)%surface_emissivity
          !end if
 
-         if ( Error_Status /= 0 ) THEN
-              call da_error(__FILE__,__LINE__, &
-                 (/"Error in calling CRTM_Forward"/))
-         endif
+         !if ( Error_Status /= 0 ) THEN
+         !     call da_error(__FILE__,__LINE__, &
+         !        (/"Error in calling CRTM_Forward"/))
+         !endif
 
          !----------------------------------------------------------------
          ! [2.0] calculate components of innovation vector:
@@ -406,11 +446,13 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
             iv%instid(inst)%rad(n)%t(k)   = atmosphere%level_pressure(k)
             iv%instid(inst)%rad(n)%tm(k)  = atmosphere%temperature(k)
             iv%instid(inst)%rad(n)%qm(k)  = atmosphere%absorber(k,1)
-         !   iv%instid(inst)%rad(n)%qrn(k) = model_qrn(k)
-         !   iv%instid(inst)%rad(n)%qcw(k) = model_qcw(k)
-         !   iv%instid(inst)%rad(n)%qci(k) = model_qci(k)
-         !   iv%instid(inst)%rad(n)%qsn(k) = model_qsn(k)
-         !   iv%instid(inst)%rad(n)%qgr(k) = model_qgr(k)
+          if (crtm_cloud) then
+            iv%instid(inst)%rad(n)%qcw(k) = atmosphere%cloud(1)%water_content(k)
+            iv%instid(inst)%rad(n)%qci(k) = atmosphere%cloud(2)%water_content(k)
+            iv%instid(inst)%rad(n)%qrn(k) = atmosphere%cloud(3)%water_content(k)
+            iv%instid(inst)%rad(n)%qsn(k) = atmosphere%cloud(4)%water_content(k)
+            iv%instid(inst)%rad(n)%qgr(k) = atmosphere%cloud(5)%water_content(k)
+          end if
          enddo
 
          iv%instid(inst)%rad(n)%u10  = model_u10
