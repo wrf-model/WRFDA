@@ -51,7 +51,9 @@ subroutine da_solve ( grid , config_flags , &
    integer                      :: wrf_done_unit
 
    if (trace_use) call da_trace_entry("da_solve")
+#ifdef DM_PARALLEL
 call mpi_barrier(comm,ierr)
+#endif
 
    !---------------------------------------------------------------------------
    ! If it is verification run set check_max_iv as .false.
@@ -344,7 +346,9 @@ call mpi_barrier(comm,ierr)
 
    deallocate (xbx % latc_mean)
 
+#ifdef DM_PARALLEL
 call mpi_barrier(comm,ierr)
+#endif
    if (trace_use) call da_trace_exit("da_solve")
 
 contains
