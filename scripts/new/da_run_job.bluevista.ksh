@@ -22,7 +22,8 @@ cat > job.ksh <<EOF
 # LSF batch script
 #
 #BSUB $LSF_EXCLUSIVE     
-#BSUB -a mpich_gm      
+############BSUB -a mpich_gm      
+#BSUB -a poe 
 #BSUB -n $NUM_PROCS              
 #BSUB -J $EXPT                   
 #BSUB -o $EXPT.out               
