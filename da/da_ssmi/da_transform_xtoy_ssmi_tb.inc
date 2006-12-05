@@ -1,6 +1,6 @@
 subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(in)   :: xb       ! first guess state.
    type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
@@ -44,7 +44,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    !       do k=1,mkz
    !          zh(k)=xb%h(i,j,k)
    !          zf(k+1)=xb%hf(i,j,k)
-   !       enddo
+   !       end do
 
    !       ! surface pressure (mb) (940 -1030)
 
@@ -99,8 +99,8 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    !       TGL_htpw(i,j) = TGL_zrhom/tpw(i,j)/1000. &
    !                   - TGL_tpw(i,j)/tpw(i,j)*htpw(i,j)
 
-   !    enddo
-   ! enddo
+   !    end do
+   ! end do
 
    ! do j=1,mjy-1
    !    do i=1,mix-1
@@ -132,8 +132,8 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !                 TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
    !                 TGL_zcld(i,j),TGL_tb85v(i,j),TGL_tb85h(i,j)            )
-   !    enddo
-   ! enddo
+   !    end do
+   ! end do
 
    do n=1, oi % num_ssmi_tb
       i = oi%ssmi_tb(n)%loc%i
@@ -164,7 +164,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
       call da_interp_lin_2d(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
-      ! endif
+      ! end if
 #else
       ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
       !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then
@@ -184,7 +184,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
       call da_interp_lin_2d(xa%tb85h(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
-      ! endif
+      ! end if
 #endif
    end do
     
@@ -215,8 +215,8 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
         ! y%ssmi_tb(n)%tb85h = hor_interp(dxm,dx,dym,dy, &
         !                                 TGL_tb85h(i,j  ),TGL_tb85h(i+1,j  ), &
         !                                 TGL_tb85h(i,j+1),TGL_tb85h(i+1,j+1)  )
-        !     endif
-        !    endif
+        !     end if
+        !    end if
 
     !  end do
 

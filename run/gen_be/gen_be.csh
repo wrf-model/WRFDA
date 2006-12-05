@@ -150,8 +150,6 @@ cat >! gen_be_stage1_nl.nl << EOF
     hgt_min = ${HGT_MIN},
     hgt_max = ${HGT_MAX},
     binwidth_hgt = ${BINWIDTH_HGT},
-    remove_mean = ${REMOVE_MEAN},
-    gaussian_lats = ${GAUSSIAN_LATS},
     dat_dir = '${STAGE0_DIR}' /
 EOF
 
@@ -188,11 +186,8 @@ cat >! gen_be_stage2_nl.nl << EOF
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
-    be_method = '${BE_METHOD}',
     ne = ${NE},
-    testing_eofs = ${TESTING_EOFS},
-    expt = '${EXPT}',
-    dat_dir = '${RUN_DIR}' /
+    testing_eofs = ${TESTING_EOFS} /
 EOF
 
    ./gen_be_stage2.exe >& gen_be_stage2.log
@@ -226,12 +221,9 @@ cat >! gen_be_stage2a_nl.nl << EOF
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     num_passes = ${NUM_PASSES},
-    rf_scale = ${RF_SCALE},
-    testing_eofs = ${TESTING_EOFS},
-    dat_dir = '${RUN_DIR}' /
+    rf_scale = ${RF_SCALE} /
 EOF
 
    ./gen_be_stage2a.exe >& gen_be_stage2a.log
@@ -270,7 +262,6 @@ cat >! gen_be_stage3_nl.nl << EOF
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
     variable = '${CV}',
-    be_method = '${BE_METHOD}',
     ne = ${NE},
     bin_type = ${BIN_TYPE},
     lat_min = ${LAT_MIN},
@@ -281,9 +272,7 @@ cat >! gen_be_stage3_nl.nl << EOF
     binwidth_hgt = ${BINWIDTH_HGT},
     testing_eofs = ${TESTING_EOFS},
     use_global_eofs = ${USE_GLOBAL_EOFS},
-    data_on_levels = ${DATA_ON_LEVELS},
-    expt = '${EXPT}',
-    dat_dir = '${RUN_DIR}' /
+    data_on_levels = ${DATA_ON_LEVELS} /
 EOF
 
      ./gen_be_stage3.exe >& gen_be_stage3.${CV}.log
@@ -350,7 +339,6 @@ if ( $?RUN_GEN_BE_DIAGS ) then
 
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
-    be_method = '${BE_METHOD}',
     uh_method = '${UH_METHOD}',
     n_smth_sl = ${N_SMTH_SL}, /
 EOF
@@ -372,7 +360,6 @@ if ( $?RUN_GEN_BE_DIAGS_READ ) then
 
 cat >! gen_be_diags_nl.nl << EOF
   &gen_be_diags_nl
-    be_method = '${BE_METHOD}',
     uh_method = '${UH_METHOD}' /
 EOF
 

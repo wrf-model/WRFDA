@@ -1,6 +1,6 @@
 module da_qscat
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -9,21 +9,21 @@ module da_qscat
 
    ! The "stats_qscat_type" is ONLY used locally in da_qscat:
 
-   TYPE residual_qscat1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-   END TYPE residual_qscat1_type
+   type residual_qscat1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+   end type residual_qscat1_type
 
-   TYPE maxmin_qscat_stats_type
-      TYPE (maxmin_type)         :: u, v
-   END TYPE maxmin_qscat_stats_type
+   type maxmin_qscat_stats_type
+      type (maxmin_type)         :: u, v
+   end type maxmin_qscat_stats_type
 
-   TYPE stats_qscat_type
-      TYPE (maxmin_qscat_stats_type)  :: maximum, minimum
-      TYPE (residual_qscat1_type)     :: average, rms_err
-   END TYPE stats_qscat_type
+   type stats_qscat_type
+      type (maxmin_qscat_stats_type)  :: maximum, minimum
+      type (residual_qscat1_type)     :: average, rms_err
+   end type stats_qscat_type
 
-CONTAINS
+contains
 
 #include "da_calculate_jo_and_grady_qscat.inc"
 #include "da_calculate_residual_qscat.inc"

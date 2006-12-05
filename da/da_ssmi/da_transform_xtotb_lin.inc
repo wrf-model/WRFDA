@@ -2,7 +2,7 @@
 !============================================================================
 subroutine da_transform_xtotb_lin( xa, xb )
 !----------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 !----------------------------------------------------------------------------
    type (xb_type), intent(in)   :: xb       ! first guess state.
    type (x_type),  intent(inout):: xa       ! gridded analysis increment.
@@ -10,7 +10,7 @@ subroutine da_transform_xtotb_lin( xa, xb )
 !  LOCAL VARS
 
    integer                      :: n        ! loop counter.
-   INTEGER                      :: ks,ke    ! Range of 3rd dimension of arrays.
+   integer                      :: ks,ke    ! Range of 3rd dimension of arrays.
    integer                      :: i,j,k
    real                         :: dum1, dum2, zrhom, TGL_zrhom
 
@@ -77,14 +77,14 @@ subroutine da_transform_xtotb_lin( xa, xb )
       zrhom = 0.0
       do k=ks,ke
          zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
-      END DO
+      end do
 
       TGL_zrhom = 0.
-      DO k = ks,ke
+      do k = ks,ke
          TGL_zrhom = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*(xb%q(i,j,k)*xa%rho(i,j,k) + &
                                             xa%q(i,j,k)*xb%rho(i,j,k)   &
                                            ) + TGL_zrhom
-      END DO
+      end do
 
 !     call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
 !     call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
@@ -118,10 +118,10 @@ subroutine da_transform_xtotb_lin( xa, xb )
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb85v(i,j),xa%tb85h(i,j)              )
-   enddo
-   enddo
+   end do
+   end do
 
-END subroutine da_transform_xtotb_lin
+end subroutine da_transform_xtotb_lin
 
 !============================================================================
 subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
@@ -129,19 +129,19 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
                   TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh            )
 ! ---------------------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! ---------------------------------------------------------------------------
 !
 ! Input  : TGL_p0,  TGL_ta,   TGL_gamma, TGL_sst, TGL_wv, TGL_hwv, TGL_u
 !          TGL_alw, TGL_zcld
 ! Output : TGL_tbv, TGL_tbh,  tbv,  tbh
 ! ---------------------------------------------------------------------------
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
-      real   , intent(IN   ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
+      real   , intent(in   ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
                                 TGL_hwv,TGL_u,TGL_alw,TGL_zcld
-      real   , intent(IN   ) :: tbv,tbh
-      real   , intent(  OUT) :: TGL_tbv,TGL_tbh 
+      real   , intent(in   ) :: tbv,tbh
+      real   , intent(  out) :: TGL_tbv,TGL_tbh 
 
       real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
@@ -228,7 +228,7 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       if (u .gt. 5.0) then
         TGL_foam = TGL_foam + cf2(ifreq)*TGL_u
             foam =     foam + cf2(ifreq)*(   u-5.0)
-      endif
+      end if
 
 ! compute surface emissivities and reflectivity
 
@@ -272,7 +272,7 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 subroutine da_tglcal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_sigma_v)
 ! ---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ---------------------------------------------------------------------------
 !
 !Input             : TGL_p0, TGL_wv, TGL_hwv, TGL_ta, TGL_gamma
@@ -282,9 +282,9 @@ IMPLICIT NONE
 
 
       integer ifreq
-      real, intent(IN   ):: p0,wv,hwv,ta,gamma  ! base field
-      real, intent(IN   ):: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma
-      real, intent(OUT  ):: TGL_sigma_v,sigma_v
+      real, intent(in   ):: p0,wv,hwv,ta,gamma  ! base field
+      real, intent(in   ):: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma
+      real, intent(out  ):: TGL_sigma_v,sigma_v
 !
       real wvc, wvcor(4)
       real TGL_wvc
@@ -430,19 +430,19 @@ IMPLICIT NONE
               sigv = 0.0
           TGL_sigv = 0.0
 
-      endif
+      end if
 
            sigma_v = sigv*wvc
        TGL_sigma_v = TGL_sigv*wvc+sigv*TGL_wvc
 
-END subroutine da_tglcal_sigma_v
+end subroutine da_tglcal_sigma_v
 
 !====================================================================
 subroutine da_tgleffht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_mu,        &
                      TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf )
 !--------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 !--------------------------------------------------------------------
 !
 !Input  : TGL_ho, TGL_hv, TGL_sigo, TGL_sigv, TGL_mu, TGL_zcld
@@ -450,11 +450,11 @@ IMPLICIT NONE
 !         TGL_hdninf, hdninf, TGL_hupinf, hupinf
 !--------------------------------------------------------------------
 
-      real,   intent(IN   ) :: ho,hv,sigo,sigv,mu,zcld
-      real,   intent(IN   ) :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, &
+      real,   intent(in   ) :: ho,hv,sigo,sigv,mu,zcld
+      real,   intent(in   ) :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, &
                                TGL_mu
-      real,   intent(  OUT) :: hdn,hup,hdninf,hupinf
-      real,   intent(  OUT) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
+      real,   intent(  out) :: hdn,hup,hdninf,hupinf
+      real,   intent(  out) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
 
       real :: gint,zgint,hint,zhint
       real :: ginf,zginf,hinf,zhinf
@@ -749,13 +749,13 @@ IMPLICIT NONE
           hupinf = zhinf/hinf
       TGL_hupinf = TGL_zhinf/hinf - hupinf*TGL_hinf/hinf
 
-END subroutine da_tgleffht
+end subroutine da_tgleffht
 
 !============================================================================
 subroutine da_tglepsalt(f,t,ssw,epsr,epsi,                                    &
                       TGL_t, TGL_epsr, TGL_epsi                             )
 ! ---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ---------------------------------------------------------------------------
 !
 !Input  : TGL_t      (ssw is treated as a constant now)
@@ -770,9 +770,9 @@ IMPLICIT NONE
 !             ssw = salinity (permil) (if ssw < 0, ssw = 32.54)
 !     Output  epsr,epsi  = real and imaginary parts of dielectric constant
 !
-      real, intent(IN   ) :: f, t, TGL_t
-      real, intent(INOUT) :: ssw
-      real, intent(  OUT) :: TGL_epsr, TGL_epsi, epsr, epsi
+      real, intent(in   ) :: f, t, TGL_t
+      real, intent(inout) :: ssw
+      real, intent(  out) :: TGL_epsr, TGL_epsi, epsr, epsi
 
       complex :: cdum1,cdum2,cdum3
       complex :: TGL_cdum1,TGL_cdum2,TGL_cdum3
@@ -836,13 +836,13 @@ IMPLICIT NONE
       epsi       = -aimag(cdum3)
       TGL_epsi   = -aimag(TGL_cdum3)
 
-END subroutine da_tglepsalt
+end subroutine da_tglepsalt
 
 !---------------------------------------------------------------------------
 subroutine da_tglspemiss(f,tk,theta,ssw,ev,eh,                               &
                        TGL_tk,TGL_ev,TGL_eh                                )
 !---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 !---------------------------------------------------------------------------
 !
 !Input  : TGL_tk
@@ -854,9 +854,9 @@ IMPLICIT NONE
 !     Returned values verified against data in Klein and Swift (1977) and
 !     against Table 3.8 in Olson (1987, Ph.D. Thesis)
 !
-      real, intent(IN   ) :: f, tk, theta, TGL_tk
-      real, intent(INOUT) :: ssw
-      real, intent(  OUT) :: TGL_ev, TGL_eh, ev, eh
+      real, intent(in   ) :: f, tk, theta, TGL_tk
+      real, intent(inout) :: ssw
+      real, intent(  out) :: TGL_ev, TGL_eh, ev, eh
 
       real   epsr,epsi,TGL_epsr,TGL_epsi
 !
@@ -898,7 +898,7 @@ IMPLICIT NONE
          TGL_cterm2      =  TGL_epsnew*0.5/cterm2
       else
          TGL_cterm2      =  0.
-      endif
+      end if
 
 ! Wei's Comment
 !     It is not a standard fortran if statement here.
@@ -918,12 +918,12 @@ IMPLICIT NONE
 !             else
 !                TGL_rnorm =  TGL_tmp0r
 !                TGL_cterm2=  TGL_tmp0r*0.5/sqrt(tmp0r)
-!             endif
+!             end if
 !           else 
 !             TGL_rnorm =  0.
 !             TGL_cterm2=  0.
-!           endif
-!     endif
+!           end if
+!     end if
 
 ! End Wei's Comment
 
@@ -949,7 +949,7 @@ IMPLICIT NONE
           eh      =  1.0 - (tmp2r*tmp2r+tmp2i*tmp2i)
       TGL_eh      = -2.*tmp2r*TGL_tmp2r - 2.*tmp2i*TGL_tmp2i
 !
-END subroutine da_tglspemiss
+end subroutine da_tglspemiss
 
 !==================================================================
  subroutine da_tgltbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
@@ -958,18 +958,18 @@ END subroutine da_tglspemiss
                         TGL_lw,TGL_zcld,TGL_tbup,TGL_tbdn,        &
                         TGL_tauatm                                )
 ! -----------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! -----------------------------------------------------------------
 !
 ! Input  : TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_lw,TGL_zcld 
 !          TGL_theta (somtime theta is a variable)
 ! Output : TGL_tbup,TGL_tbdn,TGL_tauatm,tbup,tbdn,tauatm
 ! -----------------------------------------------------------------
-      integer,intent(IN   ) :: ifreq
-      real   ,intent(IN   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
-      real   ,intent(IN   ) :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,       &
+      integer,intent(in   ) :: ifreq
+      real   ,intent(in   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
+      real   ,intent(in   ) :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,       &
                                TGL_gamma,TGL_lw,TGL_zcld,TGL_theta
-      real   ,intent(  OUT) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, &
+      real   ,intent(  out) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, &
                                TGL_tauatm
 
       real :: mu,hdn,hup,hdninf,hupinf,TGL_mu
@@ -1131,18 +1131,18 @@ END subroutine da_tglspemiss
                     (TGL_mu*sig + mu*TGL_sig)*atan(mu*sig)/(1.+mu*mu*sig*sig)
       else
          TGL_alph = 0.
-      endif
+      end if
       TGL_tbdn = - TGL_alph*tbdn + (1.0-alph)*TGL_tbdn &
                  + TGL_em*alph*ta + em*TGL_alph*ta + em*alph*TGL_ta 
       tbdn = (1.0-alph)*tbdn + em*alph*ta
 !
-END subroutine da_tgltbatmos
+end subroutine da_tgltbatmos
 
 !=================================================================
 subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh  )
 ! ----------------------------------------------------------------
-  IMPLICIT NONE
+  implicit none
 ! ----------------------------------------------------------------
 ! 
 ! Input  :: TGL_gx2, TGL_sigma
@@ -1153,9 +1153,9 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
 ! Calculated the effective zenith angle of reflected microwave radiation
 ! at SSM/I frequencies for vertical and horizontal polarization
 !
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: theta,gx2,sigma,TGL_gx2, TGL_sigma
-      real   , intent(  OUT) :: TGL_effangv,TGL_effangh,effangv,effangh
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: theta,gx2,sigma,TGL_gx2, TGL_sigma
+      real   , intent(  out) :: TGL_effangv,TGL_effangh,effangv,effangh
 !
       real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
       real s19v(6),s19h(6),s22v(6),s22h(6), &
@@ -1185,13 +1185,13 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
             effangh = theta
         TGL_effangh = 0.
         return
-      endif
+      end if
       alnsig = alog(sigma)
       if (abs(sigma) .gt. 0.) then
          TGL_alnsig = TGL_sigma/sigma
       else
          TGL_alnsig = 0.
-      endif
+      end if
           gg  = gx2*gx2
       TGL_gg  = 2.*gx2*TGL_gx2
           ggg = gg*gx2
@@ -1383,7 +1383,7 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       s85h(4)*TGL_z4 + s85h(5)*TGL_z5 + s85h(6)*TGL_z6
          alnthh     =     alnthh + 3.611
 !        TGL_alnthh = TGL_alnthh
-      endif
+      end if
           angv =   90.0 - exp(alnthv)
       TGL_angv = - TGL_alnthv*exp(alnthv)
           angh =   90.0 - exp(alnthh)
@@ -1393,7 +1393,7 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
       if (y .lt. 0.0) then
              y = 0.0
          TGL_y = 0.0
-      endif
+      end if
           dth     = (theta - 53.0)*y
       TGL_dth     = (theta - 53.0)*TGL_y
           effangv =     angv +     dth
@@ -1401,13 +1401,13 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
           effangh =     angh +     dth
       TGL_effangh = TGL_angh + TGL_dth
 
-END subroutine da_tgleffang
+end subroutine da_tgleffang
 
 !=================================================================
 subroutine da_tglroughem(ifreq,gx2,tk,theta,remv,remh,             &
                        TGL_gx2,TGL_tk,TGL_remv,TGL_remh          )
 ! ----------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ----------------------------------------------------------------
 !
 ! Input  :: TGL_tk, TGL_gx2
@@ -1416,9 +1416,9 @@ IMPLICIT NONE
 ! Calculates rough-surface emissivity of ocean surface at SSM/I
 ! frequencies.
 !
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: tk, theta, gx2, TGL_tk,TGL_gx2
-      real   , intent(  OUT) :: TGL_remv,TGL_remh, remv,remh
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: tk, theta, gx2, TGL_tk,TGL_gx2
+      real   , intent(  out) :: TGL_remv,TGL_remh, remv,remh
       real a19v(4),a22v(4),a37v(4),a85v(4)
       real a19h(4),a22h(4),a37h(4),a85h(4)
       real f(4)
@@ -1471,7 +1471,7 @@ IMPLICIT NONE
          TGL_remv = TGL_x1*a85v(1) + TGL_x2*a85v(2) + TGL_x3*a85v(3) + TGL_x4*a85v(4)
              remh =     x1*a85h(1) +     x2*a85h(2) +     x3*a85h(3) +     x4*a85h(4)
          TGL_remh = TGL_x1*a85h(1) + TGL_x2*a85h(2) + TGL_x3*a85h(3) + TGL_x4*a85h(4)
-      endif
+      end if
 
       ssw=36.5
       call da_tglspemiss(f(ifreq),tk,theta,ssw,semv,semh,  &
@@ -1481,4 +1481,4 @@ IMPLICIT NONE
       TGL_remh = TGL_remh + TGL_semh
           remh =     remh +     semh
       
-END subroutine da_tglroughem
+end subroutine da_tglroughem

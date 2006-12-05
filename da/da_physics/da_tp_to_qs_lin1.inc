@@ -5,22 +5,22 @@ subroutine da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, &
 !  PURPOSE: Convert es/p/es_prime to saturation specific humidity increment.
 !
 !  METHOD: qs~ = qs * ( p es'/es - p' ) / ( p - (1-rd_over_rv) es ).
-!          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
+!          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
 !
 !  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   REAL, INTENT(IN)              :: t                ! Temperature.
-   REAL, INTENT(IN)              :: p                ! Pressure.
-   REAL, INTENT(IN)              :: es               ! Sat. vapour pressure.
-   REAL, INTENT(IN)              :: t_prime          ! Temperature increment.
-   REAL, INTENT(IN)              :: p_prime          ! Pressure increment.
-   REAL, INTENT(OUT)             :: qs_prime_over_qs ! qs~/qs.
+   real, intent(in)              :: t                ! Temperature.
+   real, intent(in)              :: p                ! Pressure.
+   real, intent(in)              :: es               ! Sat. vapour pressure.
+   real, intent(in)              :: t_prime          ! Temperature increment.
+   real, intent(in)              :: p_prime          ! Pressure increment.
+   real, intent(out)             :: qs_prime_over_qs ! qs~/qs.
    
-   REAL                          :: temp           ! Temporary value.
-   REAL                          :: es_prime_over_es ! es~/es
+   real                          :: temp           ! Temporary value.
+   real                          :: es_prime_over_es ! es~/es
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:

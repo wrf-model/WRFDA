@@ -6,19 +6,19 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    ! PURPOSE: Define/allocate components of WRF model state.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xbx_type),INTENT(OUT)         :: xbx    ! Header & non-gridded vars.
+   type (xbx_type),intent(out)         :: xbx    ! Header & non-gridded vars.
 
-   TYPE(domain) , TARGET               :: grid
+   type(domain) , target               :: grid
 
 #include "em_dummy_new_decl.inc"
 
-   INTEGER           :: ier    ! error index
+   integer           :: ier    ! error index
 
    integer           :: i, j, map_util_project
    integer           :: wrf_dim1, wrf_dim2, wrf_dim3
-   REAL              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
+   real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
   
    real              :: theta1, theta2, conv
 
@@ -26,32 +26,32 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    integer(kind=4)   :: flag
    integer           :: len, index, seconds, i_grid,  j_grid, m_expand
 
-   IF (trace_use) call da_trace_entry("da_setup_firstguess_wrf")
+   if (trace_use) call da_trace_entry("da_setup_firstguess_wrf")
 
    !-----------------------------------------------------------------------
    ! [0.0] check the xb_date for 3DVAR
    !-----------------------------------------------------------------------
 
    if (.NOT. var4d) then
-      write(UNIT=xb_date,FMT='(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
+      write(unit=xb_date,fmt='(i4.4,2("-",i2.2),"_",i2.2,2(":",i2.2),".0000")')  &
            grid%start_year, grid%start_month, grid%start_day, &
            grid%start_hour, grid%start_minute,grid%start_second
 
       len = len_trim(ANALYSIS_DATE)
 
-      write(UNIT=an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
+      write(unit=an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
 
       seconds = da_diff_seconds(an_date, xb_date)
 
       if (seconds > ANALYSIS_ACCU) then
-         WRITE(UNIT=errmsg(1),FMT='(A,A,A,A)') &
+         write(unit=message(1),fmt='(A,A,A,A)') &
             "xb_date=",xb_date," an_date=", an_date
-         WRITE(UNIT=errmsg(2),FMT='(A,I6,A,I6)') &
+         write(unit=message(2),fmt='(A,I6,A,I6)') &
             "diff=",seconds,"   ANALYSIS_ACCU=",ANALYSIS_ACCU
-         errmsg(3)="=======> Wrong xb time found???"
-         call da_warning(__FILE__,__LINE__,errmsg(1:3))
-      endif
-   endif
+         message(3)="=======> Wrong xb time found???"
+         call da_warning(__FILE__,__LINE__,message(1:3))
+      end if
+   end if
 
    !------------------------------------------------------------------------
    ! [1.0] Read original WRF format first guess:
@@ -66,7 +66,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    if ((grid%xp%its == grid%xp%ids) .and. (grid%xp%jts == grid%xp%jds)) then
       start_lat = grid%xlat(grid%xp%its, grid%xp%jts)
       start_lon = grid%xlong(grid%xp%its, grid%xp%jts)
-   endif
+   end if
 
    call wrf_dm_bcast_real(start_lat, 1)
    call wrf_dm_bcast_real(start_lon, 1)
@@ -106,7 +106,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
            'start_lat =', start_lat, &
            'start_lon =', start_lon, &
            'dsm      =', dsm
-   endif
+   end if
 
    ! Set map projection in WRFSI world.
    map_util_project = PROJ_LC
@@ -119,7 +119,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       map_util_project = PROJ_PS
    else if(grid%map_proj == 3) then
       map_util_project = PROJ_MERC
-   endif
+   end if
 
    call da_map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
                 real(grid%xp%ide-grid%xp%ids+2)/2., real(grid%xp%jde-grid%xp%jds+2)/2., &
@@ -136,11 +136,11 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       ! Check the ll_to_ij:
       !----------------------------------------------------------------------
 
-      errmsg(1)="Check the map_set correctness::::::::::::::::::::::::"
+      message(1)="Check the map_set correctness::::::::::::::::::::::::"
 
       ! Domain center:
       call  da_latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
-      WRITE(UNIT=errmsg(2),FMT='("Center: latc,lonc,x,y, Xc, Yc:",6f10.3)') &
+      write(unit=message(2),fmt='("Center: latc,lonc,x,y, Xc, Yc:",6f10.3)') &
                   grid%cen_lat, grid%cen_lon, start_x, start_y, &
                   real(grid%xp%ide-grid%xp%ids+2)/2., real(grid%xp%jde-grid%xp%jds+2)/2.
 
@@ -149,29 +149,29 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       lat_cen = -999.9
       lon_cen = -999.9
       call  da_ij_to_latlon(map_info, start_x, start_y, lat_cen, lon_cen)
-      WRITE(UNIT=errmsg(3), &
-         FMT='("Center: X, Y, latc, lonc, phic, xlonc:",6f10.3)') &
+      write(unit=message(3), &
+         fmt='("Center: X, Y, latc, lonc, phic, xlonc:",6f10.3)') &
          start_x, start_y, lat_cen, lon_cen,   &
          grid%cen_lat, grid%cen_lon
 
       ! Low-left corner:
       call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ids,grid%xp%jds), grid%xlong(grid%xp%ids,grid%xp%jds), &
                                                             start_x, start_y)
-      WRITE(UNIT=errmsg(4), &
-         FMT='("Low-left: lat,lon,x,y,grid%xp%ids,grid%xp%jds:",4f10.3,2i6)') &
+      write(unit=message(4), &
+         fmt='("Low-left: lat,lon,x,y,grid%xp%ids,grid%xp%jds:",4f10.3,2i6)') &
                 grid%xlat(grid%xp%ids,grid%xp%jds),  grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y, &
                                                              grid%xp%ids, grid%xp%jds
       ! Upper-right corner:
       call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ide,grid%xp%jde), grid%xlong(grid%xp%ide,grid%xp%jde),&
                                                             start_x, start_y)
-      WRITE(UNIT=errmsg(5), &
-         FMT='("Upper-right: lat,lon,x,y,grid%xp%ide,grid%xp%jde:",4f10.3,2i6)') &
+      write(unit=message(5), &
+         fmt='("Upper-right: lat,lon,x,y,grid%xp%ide,grid%xp%jde:",4f10.3,2i6)') &
          grid%xlat(grid%xp%ide,grid%xp%jde),  grid%xlong(grid%xp%ide,grid%xp%jde), start_x, start_y, &
          grid%xp%ide, grid%xp%jde
-      call da_messages(errmsg(1:5))
-   endif
+      call da_message(message(1:5))
+   end if
 
-   ! Setup the domain definition for use of the MM5/GRAPH:
+   ! Setup the domain definition for use of the GRAPH:
 
    coarse_ds = 0.001 * grid%dx
    coarse_ix = grid%e_we - grid%s_we + 1
@@ -186,11 +186,11 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    if (ABS(grid%cen_lon-grid%stand_lon)/grid%cen_lon > 0.001 .or. &
        ABS(grid%cen_lat-grid%moad_cen_lat)/grid%cen_lat > 0.001) then
 
-      WRITE(UNIT=errmsg(1),FMT='(a,2e20.12)')'grid%cen_lon  , grid%cen_lat     :', &
+      write(unit=message(1),fmt='(a,2e20.12)')'grid%cen_lon  , grid%cen_lat     :', &
                            grid%cen_lon, grid%cen_lat
-      WRITE(UNIT=errmsg(2),FMT='( a,2e20.12)')'grid%stand_lon, grid%moad_cen_lat:', &
+      write(unit=message(2),fmt='( a,2e20.12)')'grid%stand_lon, grid%moad_cen_lat:', &
                            grid%stand_lon, grid%moad_cen_lat
-      WRITE(UNIT=errmsg(3),FMT='(a)')  &
+      write(unit=message(3),fmt='(a)')  &
          '## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##'
 
       call da_latlon_to_ij(map_info, phic        , xlonc       , xxx, yyy)
@@ -207,11 +207,11 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
       start_y = m_expand/2 + 1
       if (j_grid < 0) start_y = start_y - 2*j_grid
 
-      WRITE(UNIT=errmsg(4),FMT='(a,2i5,2x,a,2f6.1)') &
+      write(unit=message(4),fmt='(a,2i5,2x,a,2f6.1)') &
             'Dimension of MOAD: ix, jy:',coarse_ix, coarse_jy, &
             'parent_x, parent_y:', start_x, start_y
-      call da_warning(__FILE__,__LINE__,errmsg(1:4))
-   endif
+      call da_warning(__FILE__,__LINE__,message(1:4))
+   end if
 
    call da_set_map_para ! set up the map background parameters
 
@@ -236,7 +236,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    call da_transfer_wrftoxb( xbx, grid, &
 #include "em_dummy_new_args.inc"
                            )
-   IF (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
+   if (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
 
 end subroutine da_setup_firstguess_wrf
 

@@ -8,7 +8,7 @@ module da_test
 !     HISTORY: 01/07/2000 - Creation.              Dale Barker
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_physics
    use da_vtox_transforms
@@ -38,15 +38,6 @@ module da_test
 
    implicit none
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#endif
-#endif
-
 contains
 
 #include "da_check_balance.inc"
@@ -74,6 +65,7 @@ contains
 #include "da_check_xtoy_adjoint_sound.inc"
 #include "da_check_xtoy_adjoint_sonde_sfc.inc"
 #include "da_check_xtoy_adjoint_synop.inc"
+#include "da_check_xtoy_adjoint_rad.inc"
 !#include "da_test_vxtransform.inc"
 #include "da_transform_xtovp.inc"
 #include "da_check.inc"

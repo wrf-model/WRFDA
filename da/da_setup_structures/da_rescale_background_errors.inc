@@ -7,21 +7,21 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
    ! METHOD:  Empirical scaling and inclusion of recursive filter rescaling.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)              :: ix                ! I dimension of grid.
-   INTEGER, INTENT(IN)              :: jy                ! J dimension of grid.
-   REAL, INTENT(IN)                 :: var_scaling       ! Variance factor.
-   REAL, INTENT(IN)                 :: len_scaling       ! Lengthscale factor.
-   REAL, INTENT(IN)                 :: ds                ! Resolution (m)
-   REAL, INTENT(INOUT)              :: s(:)              ! RF lengthscale.
-   TYPE (be_subtype), INTENT(INOUT) :: be_sub            ! Backgrd error struct.
+   integer, intent(in)              :: ix                ! I dimension of grid.
+   integer, intent(in)              :: jy                ! J dimension of grid.
+   real, intent(in)                 :: var_scaling       ! Variance factor.
+   real, intent(in)                 :: len_scaling       ! Lengthscale factor.
+   real, intent(in)                 :: ds                ! Resolution (m)
+   real, intent(inout)              :: s(:)              ! RF lengthscale.
+   type (be_subtype), intent(inout) :: be_sub            ! Backgrd error struct.
     
-   INTEGER                          :: mz                ! Vertical truncation.
-   INTEGER                          :: m
-   REAL, ALLOCATABLE                :: rf_scale_factor(:)! RF rescaling.
+   integer                          :: mz                ! Vertical truncation.
+   integer                          :: m
+   real, allocatable                :: rf_scale_factor(:)! RF rescaling.
 
-   IF (trace_use) call da_trace_entry("da_rescale_background_errors")
+   if (trace_use) call da_trace_entry("da_rescale_background_errors")
 
    !--------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -33,17 +33,17 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
    ! [2.0] Perform various rescalings:
    !--------------------------------------------------------------------------
 
-   IF ( mz > 0 ) THEN
+   if ( mz > 0 ) then
 
       ! [2.1] Empirical rescaling of lengthscales:
       s(1:mz) = len_scaling * s(1:mz)
    
-      IF (print_detail_be) THEN
-         WRITE(UNIT=stdout,FMT='(a,a)')TRIM(be_sub % name), 'Error Lengthscales (m):'
+      if (print_detail_be) then
+         write(unit=stdout,fmt='(a,a)')trim(be_sub % name), 'Error Lengthscales (m):'
          do m = 1, mz
-            WRITE(UNIT=stdout,FMT='(a,i4,1pe13.5)')be_sub % name, m, s(m)
+            write(unit=stdout,fmt='(a,i4,1pe13.5)')be_sub % name, m, s(m)
          end do
-      END IF
+      end if
       
       ! [2.2] Make lengthscale nondimensional:
       s(1:mz) = s(1:mz) / ds
@@ -53,20 +53,20 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
 
       ! Calculate recursive filter rescaling:
 
-      ALLOCATE( rf_scale_factor(1:mz) )
+      allocate( rf_scale_factor(1:mz) )
 
       call da_calculate_rf_factors( s(:), be_sub % rf_alpha(:), &
                                     rf_scale_factor(:) )
 
-      DO m = 1, mz
+      do m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
-      END DO
+      end do
                                        
-      DEALLOCATE ( rf_scale_factor )   
+      deallocate ( rf_scale_factor )   
 
-   END IF
+   end if
 
-   IF (trace_use) call da_trace_exit("da_rescale_background_errors")
+   if (trace_use) call da_trace_exit("da_rescale_background_errors")
 
 end subroutine da_rescale_background_errors
 

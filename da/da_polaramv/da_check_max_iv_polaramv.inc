@@ -1,24 +1,24 @@
 subroutine da_check_max_iv_polaramv(it, polaramv, &
                            itu,ituf,itvv,itvvf)
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-   TYPE (polaramv_type), INTENT(INOUT)      :: polaramv
-   INTEGER, INTENT(INOUT) :: itu,ituf,itvv,itvvf
+   integer,           intent (in)         :: it      ! Outer iteration
+   type (polaramv_type), intent(inout)      :: polaramv
+   integer, intent(inout) :: itu,ituf,itvv,itvvf
 
-   INTEGER                                :: k
-   LOGICAL                                :: failed
+   integer                                :: k
+   logical                                :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   IF ( check_max_iv_print )THEN
-      WRITE (check_max_iv_unit,'(A)')  &
+   if ( check_max_iv_print )then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for Polar AMV_U   = ',max_error_uv, &
          'Error max test ratio for Polar AMV_V   = ',max_error_uv
    end if
@@ -27,9 +27,9 @@ subroutine da_check_max_iv_polaramv(it, polaramv, &
    ! [2.0] Perform maximum innovation vector check:
    !---------------------------------------------------------------------------
 
-   failed = .FALSE.
+   failed = .false.
 
-   DO k = 1, polaramv % info % levels
+   do k = 1, polaramv % info % levels
 
       ! U-wind
 
@@ -42,6 +42,6 @@ subroutine da_check_max_iv_polaramv(it, polaramv, &
               max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
                              failed, check_max_iv_print)                           
     
-   END DO
+   end do
 end subroutine da_check_max_iv_polaramv      
 

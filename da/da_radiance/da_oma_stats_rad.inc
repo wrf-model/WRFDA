@@ -15,13 +15,13 @@ subroutine da_oma_stats_rad ( stats_unit, iv, re )
    TYPE (stats_rad_type),    pointer  :: rad(:)
    INTEGER                          :: n, k, i
 
+   num_radiance_tot = 0
+
    IF ( iv%num_inst < 1 ) RETURN
 
    if (trace_use) call da_trace_entry("da_oma_stats_rad")
 
    Allocate ( rad(1:iv%num_inst) )
-
-   num_radiance_tot = 0
 
    do i = 1, iv%num_inst                          !! loop for sensors
 

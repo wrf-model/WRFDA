@@ -1,5 +1,0 @@
-./configure
-make
-mkdir lib include
-mv libz.a lib
-cp *.h include

@@ -9,12 +9,17 @@ begin
 ; read in data
 ;************************************************
 
- works = "x11"
+ works = "pdf"
 
- dir =  "/smoke/dmbarker/data/con200/noobs/gen_be/"
- nrow = 27
- resolution = 200.0
+ region = "india_30km"
+ nrow = 50
+ resolution = 30.0
 
+; region = "con200"
+; nrow = 27
+; resolution = 200.0
+
+ dir =  "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
  ncol = 2
 
  var1="psi"
@@ -47,7 +52,7 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
- wks   = gsn_open_wks (works,"gen_be_lengthscales")  ; open workstation
+ wks   = gsn_open_wks (works,"gen_be_lengthscales_"+region)  ; open workstation
 
  res                  = True                     ; plot mods desired
  res@trXMinF  =  1.0                  ; min value on x-axis

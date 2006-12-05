@@ -2,8 +2,8 @@ subroutine da_check_rh_simple( xb, xa, xp )
 
    implicit none
 
-   TYPE (x_type),  INTENT(INOUT)  :: xa      ! Analysis increment
-   TYPE (xb_type), INTENT(INOUT)  :: xb      ! First guess state
+   type (x_type),  intent(inout)  :: xa      ! Analysis increment
+   type (xb_type), intent(inout)  :: xb      ! First guess state
    type (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
 
    integer                        :: i, j, k ! Loop counters.

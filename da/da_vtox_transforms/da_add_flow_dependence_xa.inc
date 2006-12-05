@@ -43,7 +43,7 @@ subroutine da_add_flow_dependence_xa( ne, ep, vp, xa, &
                                   ep % v5(its:ite,jts:jte,1,n) ! v5 = ps
    end do
 
-   IF (trace_use) call da_trace_exit("da_add_flow_dependence_xa")
+   if (trace_use) call da_trace_exit("da_add_flow_dependence_xa")
 
 end subroutine da_add_flow_dependence_xa
 

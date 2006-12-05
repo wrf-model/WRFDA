@@ -1,13 +1,13 @@
 subroutine da_oi_stats_pilot ( stats_unit, oi )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
 
-  TYPE (stats_pilot_type)          :: Pilot
-  INTEGER                          :: nu, nv
-  INTEGER                          :: n, k
+  type (stats_pilot_type)          :: Pilot
+  integer                          :: nu, nv
+  integer                          :: n, k
 
   nu = 0
   nv = 0
@@ -19,8 +19,8 @@ subroutine da_oi_stats_pilot ( stats_unit, oi )
   Pilot%average = residual_pilot1_type(0.0, 0.0)
   Pilot%rms_err = Pilot%average
 
-  IF ( oi%num_Pilot > 0 ) THEN
-    DO n=1, oi%num_Pilot
+  if ( oi%num_Pilot > 0 ) then
+    do n=1, oi%num_Pilot
       if( oi%pilot(n)%loc%proc_domain ) then
         do k=1, oi%Pilot(n)%info%levels
           call da_stats_calculate( oi%Pilot(n)%loc%obs_global_index, &
@@ -34,9 +34,9 @@ subroutine da_oi_stats_pilot ( stats_unit, oi )
                               Pilot%minimum%v, Pilot%maximum%v, &
                               Pilot%average%v, Pilot%rms_err%v)
         end do
-      endif    ! end if( oi%pilot(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%pilot(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -51,12 +51,12 @@ subroutine da_oi_stats_pilot ( stats_unit, oi )
                           Pilot%minimum%v%n, Pilot%maximum%v%n, &
                           Pilot%minimum%v%l, Pilot%maximum%v%l )
 
-  IF ( rootproc ) THEN
-    IF (nu /= 0 .or. nv /= 0 ) THEN
+  if ( rootproc ) then
+    if (nu /= 0 .or. nv /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Pilot'
       call da_print_stats_pilot( stats_unit, nu, nv, Pilot )
-    END IF
-  END IF
+    end if
+  end if
 
 end subroutine da_oi_stats_pilot
 

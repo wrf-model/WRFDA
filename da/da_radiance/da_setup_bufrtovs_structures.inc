@@ -11,10 +11,6 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
    IMPLICIT NONE
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
-
    TYPE (xpose_type), INTENT(IN)   :: xp         ! Domain decomposition vars.
    TYPE ( y_type), INTENT(INOUT)   :: ob         ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)   :: iv         ! O-B structure.
@@ -41,56 +37,56 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
             write(6,'(a)')  ' Reading radiance 1b data from hirs2.bufr'
             filename = ' '
             write(filename(1:10), fmt='(a)') 'hirs2.bufr'
-            call da_read_bufrtovs ('hirs2', iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrtovs ('hirs2', iv, xp, filename)
          endif
 
          if(use_msuobs) then
             filename = ' '
             write(6,'(a)')  ' Reading radiance 1b data from msu.bufr'
             write(filename(1:8), fmt='(a)') 'msu.bufr'
-            call da_read_bufrtovs ('msu  ', iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrtovs ('msu  ', iv, xp, filename)
          endif
 
          if(use_hirs3obs) then
             write(6,'(a)')  ' Reading radiance 1b data from hirs3.bufr'
             filename = ' '
             write(filename(1:10), fmt='(a)') 'hirs3.bufr'
-            call da_read_bufrtovs ('hirs3', iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrtovs ('hirs3', iv, xp, filename)
          endif
 
          if(use_amsuaobs) then
             write(6,'(a)')  ' Reading radiance 1b data from amsua.bufr'
             filename = ' '
             write(filename(1:10), fmt='(a)') 'amsua.bufr'
-            call da_read_bufrtovs ('amsua', iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrtovs ('amsua', iv, xp, filename)
          endif
 
          if(use_amsubobs) then
             write(6,'(a)')  ' Reading radiance 1b data from amsub.bufr'
             filename = ' '
             write(filename(1:10), fmt='(a)') 'amsub.bufr'
-            call da_read_bufrtovs ('amsub', iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrtovs ('amsub', iv, xp, filename)
          endif
 
          if(use_airsobs) then
             write(6,'(a)')  ' Reading airs 1b data from airs.bufr'
             filename = ' '
             write(filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('airs     ',iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrairs ('airs     ',iv, xp, filename)
          endif
 
          if(use_eos_amsuaobs) then
             write(6,'(a)')  ' Reading eos_amsua 1b data from airs.bufr'
             filename = ' '
             write(filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('eos_amsua',iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrairs ('eos_amsua',iv, xp, filename)
          endif
 
          if(use_hsbobs) then
             write(6,'(a)')  ' Reading hsb 1b data from airs.bufr'
             filename = ' '
             write(filename(1:9), fmt='(a)') 'airs.bufr'
-            call da_read_bufrairs ('hsb      ',iv, xp, bufrtovs_unit, filename)
+            call da_read_bufrairs ('hsb      ',iv, xp, filename)
          endif
 
          if(use_filtered_rad) then
@@ -101,13 +97,26 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
            do i=1,rtminit_nsensor
             filename = ' '
             filename='kma1dvar-'//trim(iv%instid(i)%rttovid_string)//'.inv'
-            write(6,'(a,a)')  ' Reading KMA 1dvar innovation from  ', filename
-            call da_read_kma1dvar (i,iv, ob, xp, bufrtovs_unit, filename)
+            write(unit=stdout,fmt='(a,a)')  ' Reading KMA 1dvar innovation from  ', filename
+            call da_read_kma1dvar (i,iv, ob, xp, filename)
            end do
          endif
 
 !   sorting obs into FGAT time bins
          call da_sort_rad(iv)
+
+!   allocate cloud_flag in iv structure
+!   do i = 1,  iv % num_inst
+!      if (iv % instid(i) % num_rad < 1) cycle
+!      do j = 1, iv % instid(i) % num_rad
+!        allocate ( iv % instid(i) % rad(j) % cloud_flag(1:iv%instid(i)%nchan), stat = alloc_status )
+!        If( alloc_status /= 0 ) Then
+!           call da_error(__FILE__,__LINE__, & 
+!             (/"mem allocation error to iv%instid(n)%rad(j)%cloud_flag"/))
+!        End If
+!        iv % instid(i) % rad(j)% cloud_flag(:) = 1  ! no cloud
+!      end do
+!   end do
 
 !-----------------------------------------------------------------------------
 !  [3.0] create (smaller) ob structure:
@@ -119,15 +128,15 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
       ob % instid(i) % num_rad = iv % instid(i) % num_rad
       if (ob % instid(i) % num_rad < 1) cycle
       allocate ( ob % instid(i) % rad(1:ob % instid(i)%num_rad), stat = alloc_status )
-      If( alloc_status /= 0 ) Then
-        Write( *, '( "mem allocation error to ob%instid(n)%rad")' )
-        Stop ' in da_setup_bufrtovs_structures '
-      End If
+      if (alloc_status /= 0) then       
+         call da_error(__FILE__,__LINE__, & 
+            (/"mem allocation error to ob%instid(n)%rad"/))
+      end if
       do j = 1, ob % instid(i) % num_rad
         allocate ( ob % instid(i) % rad(j) % tb(1:ob % instid(i) % nchan), stat = alloc_status )
         If( alloc_status /= 0 ) Then
-          Write( *, '( "mem allocation error to ob%instid(n)%rad(j)%tb")' ) 
-          Stop ' in da_setup_bufrtovs_structures '
+           call da_error(__FILE__,__LINE__, & 
+             (/"mem allocation error to ob%instid(n)%rad(j)%tb"/))
         End If
         ob % instid(i) % rad(j)% tb(:) = &
         iv % instid(i) % rad(j)% tb(:)% inv

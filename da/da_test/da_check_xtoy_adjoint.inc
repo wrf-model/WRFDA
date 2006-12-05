@@ -181,6 +181,9 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    if( Use_BogusObs ) &
    call da_check_xtoy_adjoint_bogus( iv, y, partial_lhs, pertile_lhs )
 
+   if( Use_Radiance ) &
+   call da_check_xtoy_adjoint_rad( iv, y, partial_lhs, pertile_lhs )
+
    !----------------------------------------------------------------------
    ! [5.0] Perform adjoint operation:
    !----------------------------------------------------------------------

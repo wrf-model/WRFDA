@@ -1,6 +1,6 @@
 program gen_be_stage2
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 
@@ -11,9 +11,6 @@ program gen_be_stage2
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
-   character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
@@ -36,7 +33,6 @@ program gen_be_stage2
    real                :: summ                       ! Summation dummy.
    logical             :: first_time                 ! True if first file.
    logical             :: testing_eofs               ! True if testing EOF decomposition.
-   logical             :: ldum1, ldum2               ! Dummy logicals.
 
    real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
    real, allocatable   :: height(:,:,:)              ! Height field.
@@ -64,7 +60,10 @@ program gen_be_stage2
    real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2_nl / start_date, end_date, interval, &
-                                 be_method, ne, testing_eofs, expt, dat_dir
+                                 ne, testing_eofs  
+
+   integer :: ounit,iunit,namelist_unit
+
 
    stdout = 6
 
@@ -75,14 +74,17 @@ program gen_be_stage2
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage2")
 
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
+
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
-   be_method = 'NMC'
    ne = 1
    testing_eofs = .true.
-   expt = 'gen_be_stage2'
-   dat_dir = '/mmmtmp1/dmbarker'
 
    open(unit=namelist_unit, file='gen_be_stage2_nl.nl', &
         form='formatted', status='old', action='read')
@@ -115,7 +117,7 @@ program gen_be_stage2
 !        Read Full-fields:
          variable = 'fullflds'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
 
          read(iunit)ni, nj, nk
@@ -168,7 +170,7 @@ program gen_be_stage2
 !        Read psi:
          variable = 'psi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)psi
@@ -177,7 +179,7 @@ program gen_be_stage2
 !        Read chi:
          variable = 'chi'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)chi
@@ -186,7 +188,7 @@ program gen_be_stage2
 !        Read T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)temp
@@ -195,10 +197,9 @@ program gen_be_stage2
 !        Read ps:
          variable = 'ps'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
-         read(iunit)ldum1, ldum2 ! Dummy logicals.
          read(iunit)ps
          close(iunit)
 
@@ -367,7 +368,7 @@ program gen_be_stage2
    end do
 
 !  Output regression coefficients for use in 3/4D-Var:
-   filename = 'gen_be_stage2.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)ni, nj, nk
    write(ounit)num_bins, num_bins2d

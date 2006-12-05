@@ -1,32 +1,32 @@
-MODULE da_synop
+module da_synop
 
-   USE da_constants
-   USE da_define_structures
-   USE da_interpolation
-   USE da_statistics
-   USE da_tools
-   USE da_physics
+   use da_control
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_physics
 
    ! The "stats_synop_type" is ONLY used locally in da_synop:
 
-   TYPE residual_synop1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_synop1_type
+   type residual_synop1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+      real          :: p                        ! pressure
+      real          :: q                        ! specific humidity
+   end type residual_synop1_type
 
-   TYPE maxmin_synop_stats_type
-      TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_synop_stats_type
+   type maxmin_synop_stats_type
+      type (maxmin_type)         :: u, v, t, p, q
+   end type maxmin_synop_stats_type
 
-   TYPE stats_synop_type
-      TYPE (maxmin_synop_stats_type)  :: maximum, minimum
-      TYPE (residual_synop1_type)     :: average, rms_err
-   END TYPE stats_synop_type
+   type stats_synop_type
+      type (maxmin_synop_stats_type)  :: maximum, minimum
+      type (residual_synop1_type)     :: average, rms_err
+   end type stats_synop_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_synop.inc"
 #include "da_calculate_jo_and_grady_synop.inc"
@@ -40,5 +40,5 @@ CONTAINS
 #include "da_check_max_iv_synop.inc"
 #include "da_calculate_grady_synop.inc"
 
-END MODULE da_synop
+end module da_synop
 

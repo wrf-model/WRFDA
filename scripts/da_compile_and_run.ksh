@@ -9,18 +9,15 @@ export RUN=${RUN:-true}
 
 export ID=${ID:-trunk}
 export REGIONS=${REGIONS:-con200}
-export TARGETS=${TARGETS:-wrfvar}
-export CONFIGS=${CONFIGS:-rsl}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
 
 echo "ID        $ID"
 echo "COMPILE   $COMPILE"
 echo "FULL      $FULL"
-echo "TARGETS   $TARGETS"
-echo "COMPILERS $COMPILERS"
 echo "RUN       $RUN"
 echo "CLEAN     $CLEAN"
+echo "COMPILERS $COMPILERS"
 echo "REGIONS   $REGIONS"
 echo "PROCS     $PROCS"
 
@@ -30,50 +27,38 @@ echo "PROCS     $PROCS"
 
 let COUNT=1
 
-for CONFIG in $CONFIGS; do
+export TARGET=wrfvar
 
-  for COMPILER in $COMPILERS; do
-    if $COMPILE; then
+for COMPILER in $COMPILERS; do
+   export BUILD=${ID}_${COMPILER}_${MACHINE}
+   if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
 
       . ~/setup_$COMPILER
 
-      export BUILD=${ID}_${CONFIG}_${COMPILER}_${MACHINE}
-
-      for TARGET in $TARGETS; do
-        echo "Compiling ${BUILD}/$TARGET"
-        cd ~bray/${BUILD}/$TARGET
-        . ./setup.ksh $COMPILER >/dev/null
-        svn update #>/dev/null 2>&1
-        svn status
-	if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
-        echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
-        rm -f build/links
-        ./compile_new $TARGET > compile.out 2>&1
-        ls -l build/wrfvar.exe
-      done
+      echo "Compiling ${BUILD}/$TARGET"
+      cd ~bray/${BUILD}/$TARGET
+      . ./setup.ksh $COMPILER >/dev/null
+      svn update #>/dev/null 2>&1
+      svn status
+      if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
+      echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+      rm -f build/links
+      ./compile_new $TARGET > compile.out 2>&1
+      ls -l build/wrfvar.exe
       let COUNT=$COUNT+1
-    fi
-    if $RUN; then
+   fi
+   if $RUN; then
       for REGION in $REGIONS; do
-        for NUM_PROCS in $PROCS; do
-          export NUM_PROCS
-          if test $CONFIG = ser && test $NUM_PROCS != 1; then
-            echo "Skipping parallel runs of serial code"
-          else
+         for NUM_PROCS in $PROCS; do
+            export NUM_PROCS
             cd ~bray/data/$REGION
             . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER >/dev/null
             echo "Testing $BUILD $TARGET on $REGION"
-            if test $TARGET = be; then
-              ./gen_be.ksh
-            else
-              ./test.ksh
-            fi
-          fi
-        done
+            ./test.ksh
+         done
       done
-    fi
-  done
+   fi
 done
 
 #ls -lrt ~bray/*/*/build/*.exe

@@ -36,7 +36,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
    REAL                             :: model_psfc
    REAL                             :: model_ts(1), model_elv
    REAL                             :: model_smois(1), model_tslb(1), model_snowh(1)
-   REAL                             :: model_isltyp(1), model_ivgtyp(1), model_vegfra(1)
+   REAL                             :: model_soiltyp(1), model_vegtyp(1), model_vegfra(1)
    INTEGER                          :: model_isflg(1)
 
    REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, model_tm, &     ! Model value p at ob hor. location.
@@ -123,6 +123,18 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          allocate (iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), stat= alloc_status(14) )
          allocate (iv%instid(inst)%rad(n)%pm(xp%kms:xp%kme), stat= alloc_status(15) )
 
+         iv%instid(inst)%rad(n)%zk = 0.0
+         iv%instid(inst)%rad(n)%t = 0.0
+         iv%instid(inst)%rad(n)%mr = 0.0
+         iv%instid(inst)%rad(n)%tm = 0.0
+         iv%instid(inst)%rad(n)%qm = 0.0
+         iv%instid(inst)%rad(n)%qrn = 0.0
+         iv%instid(inst)%rad(n)%qcw = 0.0
+         iv%instid(inst)%rad(n)%qci = 0.0
+         iv%instid(inst)%rad(n)%qsn = 0.0
+         iv%instid(inst)%rad(n)%qgr = 0.0
+         iv%instid(inst)%rad(n)%pm  = 0.0
+
          if ( any(alloc_status /= 0) ) then
             call da_error(__FILE__,__LINE__, &
                (/"Cannot Allocate mem iv%zk, t, mr"/))
@@ -195,7 +207,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
                             xb%ivgtyp, xb%isltyp, &
                             xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_isflg(1),model_ivgtyp(1), model_isltyp(1) )
+                            model_isflg(1),model_vegtyp(1), model_soiltyp(1) )
 
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
@@ -330,8 +342,8 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          iv%instid(inst)%rad(n)%snowh  = model_snowh(1)
          iv%instid(inst)%rad(n)%isflg  = model_isflg(1)
          iv%instid(inst)%rad(n)%elevation = model_elv
-         iv%instid(inst)%rad(n)%soiltyp  = model_isltyp(1)
-         iv%instid(inst)%rad(n)%vegtyp   = model_ivgtyp(1)
+         iv%instid(inst)%rad(n)%soiltyp  = model_soiltyp(1)
+         iv%instid(inst)%rad(n)%vegtyp   = model_vegtyp(1)
          iv%instid(inst)%rad(n)%vegfra  = model_vegfra(1)
          iv%instid(inst)%rad(n)%clwp    = clwp
 
@@ -400,8 +412,8 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
             call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
                  zasat,zlsat, polar, &
                  model_isflg(1),pemsv,pemsh,pems5, model_ts(1), &
-                 model_isltyp(1),model_tslb(1), &
-                 model_smois(1),model_ivgtyp(1),model_vegfra(1),model_snowh(1), &
+                 model_soiltyp(1),model_tslb(1), &
+                 model_smois(1),model_vegtyp(1),model_vegfra(1),model_snowh(1), &
                  sensor_type,nprofiles,nchanl, &
                  iv%instid(inst)%rad(n)%tb(:)%inv,amsua,amsub,ssmi, &
                  model_u10(1),model_v10(1))
@@ -429,8 +441,6 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
          ! [1.3] Call RTM foreward model
 
-         ! print *, n, iv%instid(inst)%rad(n)%info%lat,iv%instid(inst)%rad(n)%info%lon
-
          call da_rttov_direct (inst, model_isflg(1), nchanl, nprofiles, &
                           nfrequencies, nchannels, nbtout, &
                           con_vars, aux_vars, &
@@ -456,6 +466,10 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
             end if
          end do
 
+         if (nchannels > nchanl) then
+            iv%instid(inst)%rad(n)%emiss(nchanl+1:nchannels) = 0.0
+         end if
+
          if (coefs(inst)%id_sensor == 2) then ! microwave
             iv%instid(inst)%rad(n)%emiss(1:nchanl) = pems5(1:nchanl)
          else
@@ -466,7 +480,7 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
          ! [3.0] Apply Bias Correction 
          !----------------------------------------------------------------
 
-         if (lbiascorr) then
+         if (biascorr) then
             call da_biascorr_rad(inst,nchanl,  &
                               ob%instid(inst)%rad(n)%tb, &
                               iv%instid(inst)%rad(n) )
@@ -491,27 +505,27 @@ subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
       deallocate (pems5)
    end do        ! end loop for sensor
 
-   !------------------------------------------
-   ! 3.1 prepare bias statistics files
-   !------------------------------------------
-
-   if (lbiasprep) then
-      do inst = 1, iv%num_inst
-         call da_biasprep(inst,ob,iv)
-      end do
-   end if
-
    !------------------------------------------------------------------------
    ! [4.0] Perform QC check
    !------------------------------------------------------------------------
  
-   if (lqc_rad) then
-      do inst = 1, iv%num_inst                 ! loop for sensor
-         WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', trim(iv%instid(inst)%rttovid_string) 
-         nchanl    = iv%instid(inst)%nchan
-         call da_qc_rad(inst,nchanl, ob, iv )
-      end do        ! end loop for sensor
+   if (qc_rad) then
+      call da_qc_rad(ob, iv)
    end if
+
+   !------------------------------------------
+   ! 5.0 prepare bias statistics files
+   !------------------------------------------
+
+   if (biasprep) then
+      do inst = 1, iv%num_inst
+         WRITE(UNIT=stdout,FMT='(A,A)') 'Preparing bias statistics files for ', &
+                            trim(iv%instid(inst)%rttovid_string)
+         call da_biasprep(inst,ob,iv)
+      end do
+   end if
+
+   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rad")
 #endif

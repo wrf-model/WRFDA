@@ -1,10 +1,10 @@
 Subroutine da_transform_xtowtq ( xp, xb, xa )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(INOUT) :: xa       ! gridded analysis increment.
-   TYPE (xb_type), INTENT(IN)    :: xb       ! first guess state.
-   TYPE (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
+   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
 
    integer                      :: i, j, kz
 
@@ -32,8 +32,8 @@ Subroutine da_transform_xtowtq ( xp, xb, xa )
                        xb%h(i,j,kz), xb%rough(i,j), xb%xland(i,j), &
                        xa%u10(i,j), xa%v10(i,j), &
                        xa%t2(i,j),  xa%q2(i,j))
-   enddo
-   enddo
+   end do
+   end do
 
-END Subroutine da_transform_xtowtq
+end Subroutine da_transform_xtowtq
  

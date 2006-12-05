@@ -7,11 +7,11 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    !  PURPOSE: Convert analysis increments into WRF increments
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx          ! Header & non-gridded vars.
+   type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
 
-   TYPE(domain), TARGET               :: grid
+   type(domain), target               :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -23,20 +23,20 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    real    :: sdmd, s1md
 
-   ! ARRAYS TO HOLD WRF INCREMENTS ON THE C-grid 
+   ! arrays to hold wrf increments on the c-grid 
 
-   REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: &
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: &
       u_cgrid, v_cgrid, q_cgrid, ph_cgrid
 
-   REAL, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: mu_cgrid
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: mu_cgrid
 
-   REAL    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
+   real    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
 
-   IF (trace_use) call da_trace_entry("da_transfer_xatowrf")
+   if (trace_use) call da_trace_entry("da_transfer_xatowrf")
 
    !------------------------------------------------------------------------
-   ! SET ARRAY RANGE INDICES FOR PROCESSOR SUBDOMAIN.
+   ! set array range indices for processor subdomain.et array range indices for processor subdomain.
    !------------------------------------------------------------------------
 
    is = grid%xp % its
@@ -52,9 +52,9 @@ subroutine da_transfer_xatowrf( xbx, grid, &
       do i=is,ie
          do k=ks, ke+1
             ph_cgrid(i,j,k) = grid%em_ph_2(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [1.0] Get the mixing ratio of moisture first, as it is easy.
@@ -67,13 +67,13 @@ subroutine da_transfer_xatowrf( xbx, grid, &
                q_cgrid(i,j,k) =-grid%xb%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
             else
                q_cgrid(i,j,k) = grid%xa%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
-            endif
-         enddo
-      enddo
-   enddo
+            end if
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
-   ! [2.0] COMPUTE increments of dry-column air mass per unit area
+   ! [2.0] compute increments of dry-column air mass per unit area
    !---------------------------------------------------------------------------
 
    do j=js,je
@@ -83,14 +83,14 @@ subroutine da_transfer_xatowrf( xbx, grid, &
          do k=ks,ke
             sdmd=sdmd+q_cgrid(i,j,k)*grid%em_dnw(k)
             s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
-         enddo
+         end do
 
          mu_cgrid(i,j)=-(grid%xa%psfc(i,j)+grid%xb%psac(i,j)*sdmd)/s1md
-      enddo
-   enddo
+      end do
+   end do
 
    !---------------------------------------------------------------------------
-   ! [3.0] COMPUTE pressure increments 
+   ! [3.0] compute pressure increments 
    !---------------------------------------------------------------------------
 
    ! Tangent linear code for grid%xa%p (based on WRF "real.init.code") 
@@ -120,13 +120,13 @@ subroutine da_transfer_xatowrf( xbx, grid, &
                        - (1./grid%em_rdn(k+1)) * &
                        ( (mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
                         -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! Adjust grid%xa%q to make grid%xb%q + grid%xa%q > 0.0
 
-   if ( check_rh == 2 ) THEN
+   if ( check_rh == 2 ) then
       ! Shu-Hua~s TPW conservation:
       call da_check_rh( grid%xb, grid%xa, grid%xp )
    else if ( check_rh == 1 ) then
@@ -138,13 +138,13 @@ subroutine da_transfer_xatowrf( xbx, grid, &
       do j=js,je
          do i=is,ie
             q_cgrid(i,j,k) = grid%xa%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
-   ! [4.0] CONVERT TEMPERATURE INCREMENTS INTO THETA INCREMENTS 
-   !       EVALUATE ALSO THE INCREMENTS OF (1/rho) AND GEOPOTENTIAL
+   ! [4.0] Convert temperature increments into theta increments 
+   !       Evaluate also the increments of (1/rho) and geopotential
    !---------------------------------------------------------------------------
 
    if (print_detail_xa) then
@@ -185,7 +185,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
           maxval(grid%xa%psfc(is:ie,js:je)), &
           'minval(grid%xa%psfc(is:ie,js:je))   =', &
           minval(grid%xa%psfc(is:ie,js:je))
-   endif
+   end if
 
    do j=js,je
       do i=is,ie
@@ -216,9 +216,9 @@ subroutine da_transfer_xatowrf( xbx, grid, &
             ! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
             grid%em_ph_2(i,j,k+1) = ph_full - grid%em_phb(i,j,k+1) &
                             + (grid%xb%hf(i,j,k+1)*gravity - ph_xb_hd)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! .. To compute the geopotential height increment:
 
@@ -226,18 +226,18 @@ subroutine da_transfer_xatowrf( xbx, grid, &
      do j=js,je
         do i=is,ie
            ph_cgrid(i,j,k) = grid%em_ph_2(i,j,k) - ph_cgrid(i,j,k)
-        enddo
-     enddo
-   enddo
+        end do
+     end do
+   end do
 
    ! ========================
    ! Write out the increment:
    ! ========================
 
    if (write_increments) then
-      WRITE(UNIT=stdout,FMT='(/"WRITE OUT INCREMENT FOR PLOTTING......")')
+      write(unit=stdout,fmt='(/"Write out increment for plotting......")')
       call da_write_increments ( grid%xp, grid%xb, grid%xa, q_cgrid, mu_cgrid, ph_cgrid )
-   endif
+   end if
 
    ! CONVERT FROM A-GRID TO C-GRID
 
@@ -257,34 +257,34 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    if(js == grid%xp%jds) then
       grid%xa%v(is:ie,js-1,ks:ke)=2.0*grid%xa%v(is:ie,js  ,ks:ke) &
                             -    grid%xa%v(is:ie,js+1,ks:ke)
-   endif
+   end if
 
    ! The northern boundary
    if(je == grid%xp%jde) then
       grid%xa%v(is:ie,je+1,ks:ke)=2.0*grid%xa%v(is:ie,je  ,ks:ke) &
                             -    grid%xa%v(is:ie,je-1,ks:ke)
-   endif
+   end if
 
    ! The western boundary
    if(is == grid%xp%ids) then
       grid%xa%u(is-1,js:je,ks:ke)=2.0*grid%xa%u(is  ,js:je,ks:ke) &
                             -    grid%xa%u(is+1,js:je,ks:ke)
-   endif
+   end if
 
    ! The eastern boundary
    if(ie == grid%xp%ide) then
       grid%xa%u(ie+1,js:je,ks:ke)=2.0*grid%xa%u(ie  ,js:je,ks:ke) &
                             -    grid%xa%u(ie-1,js:je,ks:ke)
-   endif
+   end if
 
    do k=ks,ke
       do j=js,je+1
          do i=is,ie+1
             u_cgrid(i,j,k)=0.5*(grid%xa%u(i-1,j  ,k)+grid%xa%u(i,j,k))
             v_cgrid(i,j,k)=0.5*(grid%xa%v(i  ,j-1,k)+grid%xa%v(i,j,k))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !------------------------------------------------------------------------
    ! For later plot and comparation purpose only, zero out the unused var.
@@ -293,15 +293,15 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    ! The northern boundary
    if(je == grid%xp%jde) then
       u_cgrid(is:ie+1,je+1,ks:ke)=0.0
-   endif
+   end if
 
    ! The eastern boundary
    if (ie == grid%xp%ide) then
       v_cgrid(ie+1,js:je+1,ks:ke)=0.0
-   endif
+   end if
 
    !---------------------------------------------------------------------------
-   ! [5.0] ADD INCREMENT TO THE ORIGINAL GUESS AND UPDATE "grid"
+   ! [5.0] add increment to the original guess and update "grid"
    !---------------------------------------------------------------------------
 
    do j=js,je
@@ -309,7 +309,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
          grid%em_mu_2(i,j) = grid%em_mu_2(i,j) + mu_cgrid(i,j)
          grid%em_mu0(i,j) = grid%em_mub(i,j) + grid%em_mu_2(i,j)
          grid%em_w_2(i,j,ke+1)=  grid%em_w_2(i,j,ke+1) + grid%xa%w(i,j,ke+1)
-      enddo
+      end do
 
       do k=ks,ke
          do i=is,ie
@@ -325,22 +325,22 @@ subroutine da_transfer_xatowrf( xbx, grid, &
                moist(i,j,k,p_qr) = moist(i,j,k,p_qr) + grid%xa%qrn(i,j,k)
                if(moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
                if(moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
-            endif
+            end if
 
             if ( size(moist,dim=4) >= 6 ) then
                moist(i,j,k,p_qi) = moist(i,j,k,p_qi) + grid%xa%qci(i,j,k)
                moist(i,j,k,p_qs) = moist(i,j,k,p_qs) + grid%xa%qsn(i,j,k)
                if(moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
                if(moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
-            endif
+            end if
 
             if ( size(moist,dim=4) >= 7 ) then
                moist(i,j,k,p_qg) = moist(i,j,k,p_qg) + grid%xa%qgr(i,j,k)
                if(moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
-            endif
-         enddo
-      enddo
-   enddo
+            end if
+         end do
+      end do
+   end do
 
    ! The northern boundary
    if(je == grid%xp%jde) then
@@ -348,9 +348,9 @@ subroutine da_transfer_xatowrf( xbx, grid, &
       do k=ks,ke
          do i=is,ie
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + v_cgrid(i,j,k)
-         enddo
-      enddo
-   endif
+         end do
+      end do
+   end if
 
    ! The eastern boundary
    if(ie == grid%xp%ide) then
@@ -358,9 +358,9 @@ subroutine da_transfer_xatowrf( xbx, grid, &
       do k=ks,ke
          do j=js,je
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + u_cgrid(i,j,k)
-         enddo
-      enddo
-   endif
+         end do
+      end do
+   end if
 
    if(print_detail_xa) then
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
@@ -373,10 +373,10 @@ subroutine da_transfer_xatowrf( xbx, grid, &
                write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                     'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
                      grid%em_u_2(grid%xp%ide+1,j,k)
-            enddo
+            end do
             write(unit=stdout, fmt=*) ' '
-         enddo
-      endif
+         end do
+      end if
 
       if(je == grid%xp%jde) then
          write(unit=stdout, fmt=*) ' '
@@ -386,10 +386,10 @@ subroutine da_transfer_xatowrf( xbx, grid, &
                write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                     'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
                      grid%em_v_2(i, grid%xp%jde+1,k)
-            enddo
+            end do
             write(unit=stdout, fmt=*) ' '
-         enddo
-      endif
+         end do
+      end if
 
       write(unit=stdout, fmt='(2(2x, a, e20.12))') &
          'maxval(mu_cgrid(is:ie,js:je))       =', &
@@ -419,10 +419,10 @@ subroutine da_transfer_xatowrf( xbx, grid, &
             'minval(v_cgrid(is:ie,js:je,k))  =', minval(v_cgrid(is:ie,js:je,k)), &
             'maxval(q_cgrid(is:ie,js:je,k))  =', maxval(q_cgrid(is:ie,js:je,k)), &
             'minval(q_cgrid(is:ie,js:je,k))  =', minval(q_cgrid(is:ie,js:je,k))
-      enddo
-   endif
+      end do
+   end if
 
-   IF (trace_use) call da_trace_exit("da_transfer_xatowrf")
+   if (trace_use) call da_trace_exit("da_transfer_xatowrf")
 
 end subroutine da_transfer_xatowrf
 

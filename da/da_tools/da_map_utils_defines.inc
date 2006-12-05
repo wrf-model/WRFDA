@@ -28,17 +28,17 @@
    !dis    software, the FSL Software Policy Manager
    !dis    (softwaremgr@fsl.noaa.gov) should be notified.
    !dis    
-   !dis    THIS SOFTWARE AND ITS DOCUMENTATION ARE IN THE PUBLIC DOMAIN
-   !dis    AND ARE FURNISHED "AS IS."  THE AUTHORS, THE UNITED STATES
-   !dis    GOVERNMENT, ITS INSTRUMENTALITIES, OFFICERS, EMPLOYEES, AND
-   !dis    AGENTS MAKE NO WARRANTY, EXPRESS OR IMPLIED, AS TO THE USEFULNESS
-   !dis    OF THE SOFTWARE AND DOCUMENTATION FOR ANY PURPOSE.  THEY ASSUME
-   !dis    NO RESPONSIBILITY (1) FOR THE USE OF THE SOFTWARE AND
-   !dis    DOCUMENTATION; OR (2) TO PROVIDE TECHNICAL SUPPORT TO USERS.
+   !dis    THIS SOFTWARE AND ITS doCUMENTATION ARE in THE PUBLIC doMAin
+   !dis    AND ARE FURNISHED "AS IS."  THE AUTHORS, THE unitED STATES
+   !dis    GOVERNMENT, ITS inSTRUMENTALITIES, OFFICERS, EMPLOYEES, AND
+   !dis    AGENTS MAKE NO WARRANTY, EXPRESS OR IMPLIED, AS TO THE useFULNESS
+   !dis    OF THE SOFTWARE AND doCUMENTATION FOR ANY PURPOSE.  THEY ASsumE
+   !dis    NO RESPONSIBILITY (1) FOR THE use OF THE SOFTWARE AND
+   !dis    doCUMENTATION; OR (2) TO PROVIDE TECHNICAL SUPPORT TO useRS.
    !dis   
    !dis 
 
-   !MODULE map_utils
+   !module map_utils
 
    ! Module that defines constants, data structures, and
    ! subroutines used to convert grid indices to lat/lon
@@ -61,7 +61,7 @@
    ! Additionally, coding was improved to F90 standards and the routines were
    ! combined into this module.  
    !
-   ! ASSUMPTIONS
+   ! ASsumPTIONS
    ! -----------
    !  Grid Definition:
    !    For mercator, lambert conformal, and polar-stereographic projections,
@@ -107,19 +107,19 @@
    ! -----
    ! To use the routines in this module, the calling routines must have the 
    ! following statement at the beginning of its declaration block:
-   !   USE map_utils
+   !   use map_utils
    ! 
    ! The use of the module not only provides access to the necessary routines,
-   ! but also defines a structure of TYPE (proj_info) that can be used
+   ! but also defines a structure of type (proj_info) that can be used
    ! to declare a variable of the same type to hold your map projection
    ! information.  It also defines some integer parameters that contain
    ! the projection codes so one only has to use those variable names rather
    ! than remembering the acutal code when using them.  The basic steps are
    ! as follows:
    !  
-   !   1.  Ensure the "USE map_utils" is in your declarations.
+   !   1.  Ensure the "use map_utils" is in your declarations.
    !   2.  Declare the projection information structure as type(proj_info):
-   !         TYPE(proj_info) :: proj
+   !         type(proj_info) :: proj
    !   3.  Populate your structure by calling the map_set routine:
    !         call map_set(code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truelat2,proj)
    !       where:
@@ -148,7 +148,7 @@
    !
    !       It is incumbent upon the calling routine to determine whether or
    !       not the values returned are within your domain's bounds.  All values
-   !       of i, j, lat, and lon are REAL values.
+   !       of i, j, lat, and lon are real values.
    !
    !
    ! REFERENCES
@@ -169,48 +169,48 @@
 
   ! Define some private constants
 
-  REAL, PRIVATE, PARAMETER    :: deg_per_rad = 180./pi
-  REAL, PRIVATE, PARAMETER    :: rad_per_deg = pi / 180.
+  real, PRIVATE, parameter    :: deg_per_rad = 180.0/pi
+  real, PRIVATE, parameter    :: rad_per_deg = pi / 180.0
 
   ! Mean Earth Radius in m.  The value below is consistent
   ! with NCEP's routines and grids.
-  ! REAL, PUBLIC , PARAMETER    :: earth_radius_m = 6371200. ! from Brent
-  REAL, PUBLIC , PARAMETER    :: earth_radius_m = 6370000. ! same as MM5 system
-  REAL, PUBLIC , PARAMETER    :: radians_per_degree = pi / 180.
+  ! real, PUBLIC , parameter    :: earth_radius_m = 6371200. ! from Brent
+  real, PUBLIC , parameter    :: earth_radius_m = 6370000.0
+  real, PUBLIC , parameter    :: radians_per_degree = pi / 180.0
 
   ! Define public parameters
  
   ! Projection codes for proj_info structure:
-  INTEGER, PUBLIC, PARAMETER  :: PROJ_LATLON = 0
-  INTEGER, PUBLIC, PARAMETER  :: PROJ_MERC = 1
-  INTEGER, PUBLIC, PARAMETER  :: PROJ_LC = 3
-  INTEGER, PUBLIC, PARAMETER  :: PROJ_PS = 5
+  integer, PUBLIC, parameter  :: PROJ_LATLON = 0
+  integer, PUBLIC, parameter  :: PROJ_MERC = 1
+  integer, PUBLIC, parameter  :: PROJ_LC = 3
+  integer, PUBLIC, parameter  :: PROJ_PS = 5
 
    
   ! Define data structures to define various projections
 
-  TYPE proj_info
+  type proj_info
 
-    INTEGER          :: code     ! Integer code for projection type
-    REAL             :: lat1     ! SW latitude (1,1) in degrees (-90->90N)
-    REAL             :: lon1     ! SW longitude (1,1) in degrees (-180->180E)
-    REAL             :: dx       ! Grid spacing in meters at truelats, used
+    integer          :: code     ! integer code for projection type
+    real             :: lat1     ! SW latitude (1,1) in degrees (-90->90N)
+    real             :: lon1     ! SW longitude (1,1) in degrees (-180->180E)
+    real             :: dx       ! Grid spacing in meters at truelats, used
                                  ! only for ps, lc, and merc projections
-    REAL             :: dlat     ! Lat increment for lat/lon grids
-    REAL             :: dlon     ! Lon increment for lat/lon grids
-    REAL             :: stdlon   ! Longitude parallel to y-axis (-180->180E)
-    REAL             :: truelat1 ! First true latitude (all projections)
-    REAL             :: truelat2 ! Second true lat (LC only)
-    REAL             :: hemi     ! 1 for NH, -1 for SH
-    REAL             :: cone     ! Cone factor for LC projections
-    REAL             :: polei    ! Computed i-location of pole point
-    REAL             :: polej    ! Computed j-location of pole point
-    REAL             :: rsw      ! Computed radius to SW corner
-    REAL             :: rebydx   ! Earth radius divided by dx
-    REAL             :: knowni   ! X-location of known lat/lon
-    REAL             :: knownj   ! Y-location of known lat/lon
-    LOGICAL          :: init     ! Flag to indicate if this struct is 
+    real             :: dlat     ! Lat increment for lat/lon grids
+    real             :: dlon     ! Lon increment for lat/lon grids
+    real             :: stdlon   ! Longitude parallel to y-axis (-180->180E)
+    real             :: truelat1 ! First true latitude (all projections)
+    real             :: truelat2 ! Second true lat (LC only)
+    real             :: hemi     ! 1 for NH, -1 for SH
+    real             :: cone     ! Cone factor for LC projections
+    real             :: polei    ! Computed i-location of pole point
+    real             :: polej    ! Computed j-location of pole point
+    real             :: rsw      ! Computed radius to SW corner
+    real             :: rebydx   ! Earth radius divided by dx
+    real             :: knowni   ! X-location of known lat/lon
+    real             :: knownj   ! Y-location of known lat/lon
+    logical          :: init     ! Flag to indicate if this struct is 
                                  ! ready for use
-  END TYPE proj_info
+  end type proj_info
 
-  TYPE(proj_info) :: map_info
+  type(proj_info) :: map_info

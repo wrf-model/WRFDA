@@ -13,7 +13,7 @@ subroutine da_allocate_cv( cv_size, cv )
    real                                 :: z, mean_cv, rms_cv, std_dev_cv
    real                                 :: sum_cv, sum_cv2
 
-   IF (trace_use) call da_trace_entry("da_allocate_cv")
+   if (trace_use) call da_trace_entry("da_allocate_cv")
 
 
    !---------------------------------------------------------------------------
@@ -28,7 +28,7 @@ subroutine da_allocate_cv( cv_size, cv )
 
    allocate (cv % array(1:cv_size))
 
-   if (analysis_type == 'randomcv') then
+   if (anal_type_randomcv) then
    
       ! [2.1] Initialize random number generator and scalars:
 
@@ -55,16 +55,16 @@ subroutine da_allocate_cv( cv_size, cv )
 
       end do
 
-      write(UNIT=stdout)
-      write(UNIT=stdout,FMT='(a)')' Gaussian (Normal) noise statistics:'
-      write(UNIT=stdout,FMT='(a,f15.5)')' Mean = ',mean_cv
-      write(UNIT=stdout,FMT='(a,f15.5)')' RMS = ', rms_cv
-      write(UNIT=stdout,FMT='(a,f15.5)')' STD DEV = ', std_dev_cv
+      write(unit=stdout)
+      write(unit=stdout,fmt='(a)')' Gaussian (Normal) noise statistics:'
+      write(unit=stdout,fmt='(a,f15.5)')' Mean = ',mean_cv
+      write(unit=stdout,fmt='(a,f15.5)')' RMS = ', rms_cv
+      write(unit=stdout,fmt='(a,f15.5)')' STD DEV = ', std_dev_cv
 
    else
       cv % array = 0.0
    end if
 
-   IF (trace_use) call da_trace_exit("da_allocate_cv")
+   if (trace_use) call da_trace_exit("da_allocate_cv")
 
 end subroutine da_allocate_cv

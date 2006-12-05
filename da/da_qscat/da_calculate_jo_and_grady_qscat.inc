@@ -1,20 +1,20 @@
 subroutine da_calculate_jo_and_grady_qscat( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % qscat_u = 0.0
    jo % qscat_v = 0.0
 
-   IF ( iv%num_qscat > 0 ) THEN
+   if ( iv%num_qscat > 0 ) then
 
-      DO n=1, iv%num_qscat
+      do n=1, iv%num_qscat
          jo_grad_y%qscat(n)%u = -re%qscat(n)%u / &
                                   ( iv%qscat(n)%u%error * iv%qscat(n)%u%error)
           jo_grad_y%qscat(n)%v = -re%qscat(n)%v / &
@@ -23,13 +23,13 @@ subroutine da_calculate_jo_and_grady_qscat( iv, re, jo, jo_grad_y )
          if ( iv%qscat(n)%loc%proc_domain ) then
             jo % qscat_u = jo % qscat_u - re%qscat(n)%u * jo_grad_y%qscat(n)%u
             jo % qscat_v = jo % qscat_v - re%qscat(n)%v * jo_grad_y%qscat(n)%v
-         endif
-      END DO
+         end if
+      end do
       
       jo % qscat_u = 0.5 * jo % qscat_u
       jo % qscat_v = 0.5 * jo % qscat_v
 
-   END IF
+   end if
      
 end subroutine da_calculate_jo_and_grady_qscat
 

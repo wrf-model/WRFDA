@@ -1,20 +1,20 @@
 subroutine da_calculate_jo_and_grady_airep( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! Innovation vector.
-   TYPE (y_type),  INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type),  INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(OUT)   :: jo          ! Obs cost function.
+   type (ob_type), intent(in)    :: iv          ! Innovation vector.
+   type (y_type),  intent(in)    :: re          ! Residual vector.
+   type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(out)   :: jo          ! Obs cost function.
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
    jo % airep_u = 0.0
    jo % airep_v = 0.0
    jo % airep_t = 0.0
 
-   IF (iv%num_airep > 0) THEN
-      DO n=1, iv%num_airep
+   if (iv%num_airep > 0) then
+      do n=1, iv%num_airep
          do k=1, iv%airep(n)%info%levels
             jo_grad_y%airep(n)%u(k) = -re%airep(n)%u(k) / &
                                         ( iv%airep(n)%u(k)%error * &
@@ -36,14 +36,14 @@ subroutine da_calculate_jo_and_grady_airep( iv, re, jo, jo_grad_y )
                jo % airep_t = jo % airep_t - &
                               re%airep(n)%t(k) * jo_grad_y%airep(n)%t(k)
              end do
-         endif
-      END DO
+         end if
+      end do
 
       jo % airep_u = 0.5 * jo % airep_u
       jo % airep_v = 0.5 * jo % airep_v
       jo % airep_t = 0.5 * jo % airep_t
 
-   END IF
+   end if
 
 end subroutine da_calculate_jo_and_grady_airep
 

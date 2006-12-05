@@ -1,21 +1,21 @@
 subroutine da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type),    INTENT(IN) :: xb          ! first guess state.
-   TYPE (ob_type),    INTENT(IN) :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(INOUT) :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (xb_type),    intent(in) :: xb          ! first guess state.
+   type (ob_type),    intent(in) :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j     ! Index dimension.
-   REAL                          :: dx, dxm  ! 
-   REAL                          :: dy, dym  !
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j     ! Index dimension.
+   real                          :: dx, dxm  ! 
+   real                          :: dy, dym  !
 
-   IF (trace_use) call da_trace_entry("da_transform_xtoy_metar_adj")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_metar_adj")
 
-   IF ( iv%num_metar > 0 ) THEN
+   if ( iv%num_metar > 0 ) then
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, &
             iv%ob_numb(iv%current_ob_time)%metar
@@ -60,17 +60,17 @@ subroutine da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                jo_grad_x % psfc(xp%ims,xp%jms), xp%ims, xp%ime, &
                xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
 #endif
-         END DO
+         end do
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, &
             iv%ob_numb(iv%current_ob_time)%metar
             call da_transform_xtopsfc_adj(xb,xp,iv%metar(n), &
                                             jo_grad_y%metar(n),jo_grad_x)
-         ENDDO
-      endif
-   END IF
+         end do
+      end if
+   end if
 
-   IF (trace_use) call da_trace_exit("da_transform_xtoy_metar_adj")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_metar_adj")
 
 end subroutine da_transform_xtoy_metar_adj
 

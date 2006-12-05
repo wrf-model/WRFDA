@@ -1,14 +1,14 @@
 subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! O-B
-   TYPE ( y_type), INTENT (in)      :: re            ! O-A
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! O-B
+   type ( y_type), intent (in)      :: re            ! O-A
 
-   TYPE (stats_pseudo_type)         :: pseudo
-   INTEGER                          :: nu, nv, nt, np, nq
-   INTEGER                          :: n
+   type (stats_pseudo_type)         :: pseudo
+   integer                          :: nu, nv, nt, np, nq
+   integer                          :: n
    real                             :: o_minus_b, o_minus_a, sigma_o, sigma_b
 
    nu = 0
@@ -30,9 +30,9 @@ subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
    pseudo%average = residual_pseudo1_type(0.0, 0.0, 0.0, 0.0, 0.0)
    pseudo%rms_err = pseudo%average
 
-   IF ( oi%num_pseudo > 0 ) THEN
+   if ( oi%num_pseudo > 0 ) then
 
-      DO n=1, oi%num_pseudo
+      do n=1, oi%num_pseudo
 
        if( oi%pseudo(n)%loc%proc_domain ) then
 
@@ -84,14 +84,14 @@ subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
          write(stats_unit,'( A,A1,A,e15.5)')' Pseudo ', pseudo_var, ' sigma_o: ', sigma_o
 
 !        Calculate equivalent sigma_b using O-A=(O-B)*sigma_o/(sigma_o+sigma_b)
-         sigma_b = SQRT( (o_minus_b - o_minus_a) / o_minus_a ) * sigma_o
+         sigma_b = sqrt( (o_minus_b - o_minus_a) / o_minus_a ) * sigma_o
          write(stats_unit,'(A,A1,A,e15.5)')' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b
          
-       endif    ! end if( oi%pseudo(n)%loc%proc_domain )
+       end if    ! end if( oi%pseudo(n)%loc%proc_domain )
 
-      END DO
+      end do
       
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
@@ -121,16 +121,16 @@ subroutine da_oa_stats_pseudo ( stats_unit, oi, re )
                            Pseudo%minimum%q%n, Pseudo%maximum%q%n, &
                            Pseudo%minimum%q%l, Pseudo%maximum%q%l )
    
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    
-    IF ( nu /= 0 .or. nv /= 0 .OR. nt /= 0 .or. np /= 0 .OR. nq /= 0 ) THEN
+    if ( nu /= 0 .or. nv /= 0 .OR. nt /= 0 .or. np /= 0 .OR. nq /= 0 ) then
    
      write(unit=stats_unit, fmt='(/a/)') ' O-A Diagnostics for pseudo'
    
      call da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
    
-    END IF
+    end if
    
-   END IF
+   end if
 
 end subroutine da_oa_stats_pseudo

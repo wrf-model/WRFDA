@@ -10,7 +10,7 @@ subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
    real, dimension(kts:kte)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV
    real, dimension(kts:kte)  :: PRE
 
-   DO K=kts, kte
+   do K=kts, kte
       if (DT(k) <= 0.) cycle
 
       if (SCR3(K) > 0.) then
@@ -18,10 +18,10 @@ subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
                  PREC2*DUM111(K)*SCR7(K)**BVT2)/DUM41(K)
       else
          PRE(k)=0.
-      endif
+      end if
 
       PRE(k)=AMAX1(-SCR3(k)/DT(k),PRE(k))
-   ENDDO
+   end do
 
 end subroutine da_evapo
 

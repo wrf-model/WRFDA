@@ -1,13 +1,13 @@
 subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % buoy_u = 0.0
    jo % buoy_v = 0.0
@@ -15,8 +15,8 @@ subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
    jo % buoy_p = 0.0
    jo % buoy_q = 0.0
 
-   IF ( iv%num_buoy > 0 ) THEN
-      DO n=1, iv%num_buoy
+   if ( iv%num_buoy > 0 ) then
+      do n=1, iv%num_buoy
 
          jo_grad_y%buoy(n)%u = -re%buoy(n)%u / &
                                 ( iv%buoy(n)%u%error * iv%buoy(n)%u%error)
@@ -36,9 +36,9 @@ subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
             jo % buoy_t = jo % buoy_t - re%buoy(n)%t * jo_grad_y%buoy(n)%t
             jo % buoy_p = jo % buoy_p - re%buoy(n)%p * jo_grad_y%buoy(n)%p
             jo % buoy_q = jo % buoy_q - re%buoy(n)%q * jo_grad_y%buoy(n)%q
-         endif
+         end if
 
-      END DO
+      end do
 
       jo % buoy_u = 0.5 * jo % buoy_u
       jo % buoy_v = 0.5 * jo % buoy_v
@@ -46,7 +46,7 @@ subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
       jo % buoy_p = 0.5 * jo % buoy_p
       jo % buoy_q = 0.5 * jo % buoy_q
 
-   END IF
+   end if
      
 end subroutine da_calculate_jo_and_grady_buoy
 

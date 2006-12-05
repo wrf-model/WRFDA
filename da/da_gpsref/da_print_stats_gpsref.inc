@@ -1,10 +1,10 @@
 subroutine DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: ngpsref
-   TYPE (stats_gpsref_type), INTENT(IN)  :: GPSRef
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: ngpsref
+   type (stats_gpsref_type), intent(in)  :: GPSRef
    
    write(unit=stats_unit, fmt='(a/)') &
         '   var           ref(m)  n    k'  

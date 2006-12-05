@@ -1,16 +1,16 @@
 subroutine da_check_xtoy_adjoint_bogus( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n, k          ! Loop counter.
+   integer                        :: n, k          ! Loop counter.
 
-   IF ( oi%num_Bogus > 0 ) THEN
+   if ( oi%num_Bogus > 0 ) then
 
-      DO n=1, oi%num_Bogus
+      do n=1, oi%num_Bogus
          if( oi%bogus(n)%loc%proc_domain ) then
             do k=1, oi%bogus(n)%info%levels
                adjtest_lhs = adjtest_lhs + &
@@ -18,7 +18,7 @@ subroutine da_check_xtoy_adjoint_bogus( oi, y, adjtest_lhs, pertile_lhs )
                              ( y%Bogus(n)%v(k)/typical_v_rms )**2 + &
                              ( y%Bogus(n)%t(k)/typical_t_rms )**2 + &
                              ( y%Bogus(n)%q(k)/typical_q_rms )**2 
-            enddo
+            end do
             adjtest_lhs = adjtest_lhs + &
                           ( y%Bogus(n)%slp/typical_p_rms )**2
          end if
@@ -34,11 +34,11 @@ subroutine da_check_xtoy_adjoint_bogus( oi, y, adjtest_lhs, pertile_lhs )
             y%bogus(n)%v(k) = y%bogus(n)%v(k) / typical_v_rms ** 2
             y%bogus(n)%t(k) = y%bogus(n)%t(k) / typical_t_rms ** 2
             y%bogus(n)%q(k) = y%bogus(n)%q(k) / typical_q_rms ** 2
-         enddo
+         end do
          pertile_lhs = pertile_lhs + &
                        ( y%bogus(n)%slp/typical_p_rms )**2
          y%bogus(n)%slp = y%bogus(n)%slp / typical_p_rms ** 2
-      END DO
-   ENDIF
+      end do
+   end if
 
 end subroutine da_check_xtoy_adjoint_bogus

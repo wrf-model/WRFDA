@@ -1,13 +1,13 @@
 subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % pseudo_u = 0.0
    jo % pseudo_v = 0.0
@@ -15,8 +15,8 @@ subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
    jo % pseudo_p = 0.0
    jo % pseudo_q = 0.0
 
-   IF ( iv%num_pseudo > 0 ) THEN
-      DO n=1, iv%num_pseudo
+   if ( iv%num_pseudo > 0 ) then
+      do n=1, iv%num_pseudo
 
          jo_grad_y%pseudo(n)%u = -re%pseudo(n)%u / &
                                 ( iv%pseudo(n)%u%error * iv%pseudo(n)%u%error)
@@ -35,8 +35,8 @@ subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
             jo % pseudo_t = jo % pseudo_t - re%pseudo(n)%t * jo_grad_y%pseudo(n)%t
             jo % pseudo_p = jo % pseudo_p - re%pseudo(n)%p * jo_grad_y%pseudo(n)%p
             jo % pseudo_q = jo % pseudo_q - re%pseudo(n)%q * jo_grad_y%pseudo(n)%q
-         endif
-      END DO
+         end if
+      end do
       
       jo % pseudo_u = 0.5 * jo % pseudo_u
       jo % pseudo_v = 0.5 * jo % pseudo_v
@@ -44,7 +44,7 @@ subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
       jo % pseudo_p = 0.5 * jo % pseudo_p
       jo % pseudo_q = 0.5 * jo % pseudo_q      
       
-   END IF
+   end if
   
 end subroutine da_cal_jo_and_grady_pseudo
 

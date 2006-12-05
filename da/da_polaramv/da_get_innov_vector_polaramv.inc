@@ -4,33 +4,33 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
    ! Purpose: Calculates innovation vector, does QC for  Polar AMV's             
    !----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)           :: it      ! External iteration.
-   TYPE (xb_type), INTENT(IN)    :: xb      ! first guess state.
-   TYPE (xpose_type), INTENT(IN) :: xp      ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(IN)    :: ob      ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT) :: iv      ! O-B structure.
+   integer, intent(in)           :: it      ! External iteration.
+   type (xb_type), intent(in)    :: xb      ! first guess state.
+   type (xpose_type), intent(in) :: xp      ! Domain decomposition vars.
+   type (y_type),  intent(in)    :: ob      ! Observation structure.
+   type (ob_type), intent(inout) :: iv      ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
 
-   REAL                         :: dx, dxm  ! Interpolation weights.
-   REAL                         :: dy, dym  ! Interpolation weights.
-   REAL, DIMENSION(1:max_ob_levels) :: model_u  ! Model value u at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_v  ! Model value v at ob location.
+   real                         :: dx, dxm  ! Interpolation weights.
+   real                         :: dy, dym  ! Interpolation weights.
+   real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
+   real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
 
-   REAL, DIMENSION(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
+   real, dimension(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
 
-   INTEGER           :: itu,ituf,itvv,itvvf
+   integer           :: itu,ituf,itvv,itvvf
 
-   IF ( iv % num_polaramv > 0 ) THEN
+   if ( iv % num_polaramv > 0 ) then
 
       itu   = 0; itvv    = 0;
       ituf  = 0; itvvf   = 0;
 
-      DO n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+      do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
 
          ! [1.3] Get horizontal interpolation weights:
 
@@ -50,7 +50,7 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
          do k=xp%kts,xp%kte
             v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                    + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         enddo
+         end do
 
 
 
@@ -59,16 +59,16 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
          do k=1, iv % polaramv(n) % info % levels
             iv%polaramv(n)%zk(k)=missing_r
 
-            IF ( iv % polaramv(n) % p(k) > 1.0 ) THEN
+            if ( iv % polaramv(n) % p(k) > 1.0 ) then
 
                call da_to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
-            ENDIF
+            end if
 
             if(iv%polaramv(n)%zk(k) < 0.0) then
                iv % polaramv(n) % u(k) % qc = missing
                iv % polaramv(n) % v(k) % qc = missing
-            endif
-         enddo
+            end if
+         end do
 
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
@@ -90,37 +90,40 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv )
             iv % polaramv(n) % v(k) % inv = 0.0
 
 
-            IF ( ob % polaramv(n) % u(k) > missing_r .AND. &
-                 iv % polaramv(n) % u(k) % qc >= obs_qc_pointer ) THEN
+            if ( ob % polaramv(n) % u(k) > missing_r .AND. &
+                 iv % polaramv(n) % u(k) % qc >= obs_qc_pointer ) then
 
                  iv % polaramv(n) % u(k) % inv = ob % polaramv(n) % u(k) - &
                                               model_u(k)
-            ENDIF
+            end if
 
-            IF ( ob % polaramv(n) % v(k) > missing_r .AND. &
-                 iv % polaramv(n) % v(k) % qc >= obs_qc_pointer ) THEN
+            if ( ob % polaramv(n) % v(k) > missing_r .AND. &
+                 iv % polaramv(n) % v(k) % qc >= obs_qc_pointer ) then
 
                  iv % polaramv(n) % v(k) % inv = ob % polaramv(n) % v(k) - &
                                               model_v(k)
-            ENDIF
+            end if
 
-         END DO
+         end do
 
 !------------------------------------------------------------------------
 !  Perform optional maximum error check:
 !------------------------------------------------------------------------
 
-        IF ( check_max_iv ) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
+        if ( check_max_iv ) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
                                 itu,ituf,itvv,itvvf)
 
-      END DO
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Polar AMVs follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-         'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
-   ENDIF
+      end do
+
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+            ', Total Rejections for Polar AMVs follows:'
+         write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+            'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+            'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+            'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
+      end if
+   end if
 
 end subroutine da_get_innov_vector_polaramv
 

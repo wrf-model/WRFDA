@@ -10,21 +10,21 @@ subroutine da_wv_patch_to_global_2d( vlocal, vglobal,    &
    !
    ! Must be called by all MPI tasks.  
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL,              INTENT(IN   ) :: vlocal(:,:)
-   REAL,              INTENT(  OUT) :: vglobal(:,:)
-   INTEGER,           INTENT(IN   ) :: domdesc
-   INTEGER,           INTENT(IN   ) :: ids, ide, jds, jde, &
+   real,              intent(in   ) :: vlocal(:,:)
+   real,              intent(  out) :: vglobal(:,:)
+   integer,           intent(in   ) :: domdesc
+   integer,           intent(in   ) :: ids, ide, jds, jde, &
                                       ims, ime, jms, jme, &
                                       ips, ipe, jps, jpe
 #ifdef DM_PARALLEL
    ! Local declarations
-   INTEGER :: kds, kms, kps, mz
-   REAL, ALLOCATABLE :: vlocal3d(:,:,:), vglobal3d(:,:,:)
+   integer :: kds, kms, kps, mz
+   real, allocatable :: vlocal3d(:,:,:), vglobal3d(:,:,:)
 
    kds=1; kms=1; kps=1; mz=1
-   ALLOCATE( vlocal3d ( ims:ime, jms:jme, 1 ), &
+   allocate( vlocal3d ( ims:ime, jms:jme, 1 ), &
             vglobal3d( ids:ide, jds:jde, 1 ) )
    ! get rid of copies later
    vlocal3d(:,:,1) = vlocal(:,:)
@@ -33,10 +33,10 @@ subroutine da_wv_patch_to_global_2d( vlocal, vglobal,    &
                               ids, ide, jds, jde, kds, &
                               ims, ime, jms, jme, kms, &
                               ips, ipe, jps, jpe, kps )
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
       vglobal(:,:) = vglobal3d(:,:,1)
-   ENDIF
-   DEALLOCATE( vlocal3d, vglobal3d )
+   end if
+   deallocate( vlocal3d, vglobal3d )
 #endif
 
 end subroutine da_wv_patch_to_global_2d

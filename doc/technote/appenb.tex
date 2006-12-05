@@ -1,0 +1,154 @@
+\chapter{List of Symbols}
+\label{List of Symbols}
+
+This is the WRF version. Needs to be updated for WRF-VAR!!!!!!!
+
+
+
+Symbols used in this document are listed in alphabatical order in this appendix.
+\\[2ex]
+
+\begin{tabular}{ l p{5.5in} }
+
+{\em Symbols}  & {\em Definition} \\   
+\\
+$a$            & generic variable \\ 
+$A$            & coefficient (Chapter \ref{filter_chap}), base-state lapse rate constant (Chapter \ref{initialization_chap})  \\  
+{\bf B}        & background error covariance matrix \\  
+$c$            & scalar coefficient \\  
+$c_s$          & speed of sound      \\  
+$C_k$          & a constant used in TKE closure \\  
+$Cr$           & Courant number      \\  
+$Cr_{max}$     & maximum Courant number      \\  
+$Cr_{theory}$  & Courant number from Table 3.1 \\  
+$Cr_{\beta}$   & activation Courant number in vertical velocity damping \\  
+$C_s$          & a constant used in eddy viscosity calculation \\  
+$D$            & deformation \\
+$D_{nm}$       & deformation tensor, where $n, m$ = 1, 2 and 3 \\  
+$e$            & cosine component of the Coriolis term (Chapters \ref{equation_chap}, \ref{discretization_chap}); turbulent kinetic energy (Chapter \ref{filter_chap}) \\
+{\bf E}        & observation error covariance matrix \\
+$f$            & sine component of the Coriolis term \\
+$F$            & forcing terms for $U$, $V$, $W$, $\Theta$ and $Q_m$  \\
+{\bf F}        & representivity error covariance matrix \\
+$F_{X_{cor}}$  & Coriolis forcing terms for $X = $ $U$, $V$, and $W$  \\
+$F_{1,2}$      & coefficients for weighting functions in specified boundary condition \\
+$g$            & acceleration due to gravity \\
+$G_k$          & regression coefficient \\
+$H$            & observation operator \\
+$J$            & cost function \\
+$K_{dh,dv}$    & horizontal and vertical eddy viscosity for gravity wave absorbing layer \\
+$K_{h,v}$      & horizontal and vertical eddy viscosities \\
+\end{tabular}
+
+\newpage
+\vskip 5pt
+\begin{tabular}{ l p{5.5in} }
+
+{\em Symbols}  & {\em Definition} \\
+\\
+$l_0$          & minimum length scale for dissipation \\
+$l_{h,v}$      & horizontal and vertical length scales for turbulence \\
+$l_{cr}$       & critical length scale for dissipation \\
+$L$            & latent heat of condensation \\
+$L_{x,y}$      & periodicity length in $x$ and $y$ \\
+$m$            & map scale factor \\ 
+$n_s$          & ratio of the RK3 time step to the acoustic time step \\
+$N$            & Brunt-V\"ais\"al\"a frequency \\
+$p$            & pressure \\
+$p'$           & perturbation pressure \\
+$p_0$          & reference sea-level pressure \\
+$p_h$          & hydrostatic pressure \\
+$p_{ht,hs}$    & hydrostatic pressure at the top and surface of the model \\
+$p_{dht,dhs}$  & dry hydrostatic pressure at the top and surface of the model \\
+$p_s$          & surface pressure \\
+$P_r$          & Prandtl number \\
+$q$            & generic scalar \\
+$q_{c,i,r,s}$  & mixing ratios for cloud water, ice, rain water and snow \\
+$q_m$          & generic mixing ratios for moisture \\
+$q_v$          & mixing ratio for water vapor \\
+$q_{vs}$       & saturation mixing ratio for water vapor \\
+$Q_m$          & generic coupled moisture variable \\
+$r$            & relative humidity   \\
+$r_e$          & radius of earth \\
+$R$            & remaining terms in equations  \\
+$R_d$          & gas constant for dry air \\
+$R_v$          & gas constant for water vapor \\
+$t$            & time \\
+$\Delta t$     & a full model time step \\
+$T$            & temperature \\
+$T_0$          & reference sea-level temperature \\
+$u$            & horizontal component of velocity in $x$-direction \\
+$U$            & coupled horizontal component of velocity in $x$-direction (Chapters \ref{equation_chap}, \ref{discretization_chap}, \ref{lbc_chap}, \ref{nesting_chap}); control variable transform (Chapter \ref{var_chap}) \\
+$U_h$          & horizontal correlation \\
+$U_p$          & multivariate covariance \\
+$U_v$          & vertical covariance \\
+$v$            & horizontal component of velocity in $y$-direction \\
+$\bf v$        & three dimensional vector velocity \\
+$V$            & coupled horizontal component of velocity in $y$-direction \\
+$\bf V$        & three dimensional coupled vector velocity \\
+$w$            & vertical component of velocity \\
+$W$            & coupled vertical component of velocity \\
+
+\end{tabular}
+
+\newpage
+\begin{tabular}{ l p{5.5in} }
+{\em Symbols}  & {\em Definition} \\
+\\
+$W_k$          & regression coefficient \\
+$z$            & height \\
+$z_d$          & depth of damping layer \\
+$z_{top}$      & height of model top \\
+
+$\alpha$       & inverse density of air \\  
+$\alpha'$      & perturbation inverse density of air \\  
+$\bar\alpha$   & inverse density of air for the reference state \\  
+$\alpha_d$     & inverse density of dry air \\  
+$\alpha_r$     & local rotation angle between $y$-axis and the meridian \\  
+$\beta$        & off-centering coefficient for semi-implicit acoustic step \\  
+$\gamma$       & ratio of heat capacities for dry air at constant pressure and volume \\
+$\gamma_d$     & divergence damping coefficient \\
+$\gamma_e$     & external mode damping coefficient \\
+$\gamma_g$     & damping coefficient for upper boundary gravity wave absorbing layer \\
+$\gamma_r$     & Rayleigh damping coefficient \\
+$\epsilon$     & molecular weight of water over the molecular weight of dry air (Chapter \ref{filter_chap}); true background error (Chapter \ref{var_chap}) \\
+
+$\eta$         & terrain-following hydrostatic-pressure vertical coordinate \\
+$\dot\eta$     & contravariant `vertical' velocity or coordinate velocity \\
+$\theta$       & potential temperature  \\
+$\theta_e$     & equivalent potential temperature  \\
+$\theta_m$     & moist potential temperature  \\
+$\Theta$       & coupled potential temperature  \\  
+$\mu$          & hydrostatic pressure difference between surface and top of the model  \\  
+$\bar\mu$      & reference state hydrostatic pressure difference between surface and top of the model  \\  
+$\mu_d$        & dry hydrostatic pressure difference between surface and top of the model  \\  
+$\tau$         & acoustic time (Chapter \ref{discretization_chap}), vertical structure function for Rayleigh damping (Chapter \ref{filter_chap}) \\  
+$\tau_{nm}$    & stress tensor (Chapter \ref{filter_chap}) where $n. m$ = 1, 2 and 3 \\  
+$\Delta \tau$  & acoustic time step \\  
+$\phi$         & geopotential (Chapters \ref{equation_chap}, \ref{discretization_chap}, \ref{initialization_chap}); latitude (Chapter \ref{var_chap}) \\  
+$\bar \phi$    & geopotential for reference state \\  
+$\phi'$        & perturbation geopotential \\  
+$\Phi$         & generic prognostic variable (coupled) \\  
+$\psi$         & generic variable (Chapter \ref{lbc_chap}) \\  
+$\psi'$        & streamfunction increment \\  
+$\chi'$        & velocity potential increment \\  
+$\omega$       & same as $\dot\eta$ \\  
+$\Omega$       & coupled coordinate velocity \\  
+$\Omega_e$     & angular rotation rate of the earth \\  
+\\
+\end{tabular}
+
+\newpage
+\normalsize
+\begin{tabular}{ l p{5.5in} }
+{\em Subscripts/Superscripts}  & {\em Definition} \\
+\\
+$()_d$         & dry \\
+$()_h$         & hydrostatic \\
+$()_0$         & base state sea-level constant \\
+$\overline{()}$ & reference state \\
+$()'$          & perturbation from reference state \\
+$()^{t^*}$     & full value at a Runge-Kutta step \\
+$()''$         & perturbation from Runge-Kutta step value in acoustic steps \\
+\end{tabular}
+

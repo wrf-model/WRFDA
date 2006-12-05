@@ -1,14 +1,14 @@
 subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)                    :: it     ! outer iteration
-   INTEGER, INTENT(INOUT)                 :: irh, irhf
-   TYPE (ssmt2_type), INTENT(INOUT)       :: ssmt2
+   integer, intent(in)                    :: it     ! outer iteration
+   integer, intent(inout)                 :: irh, irhf
+   type (ssmt2_type), intent(inout)       :: ssmt2
 
-   INTEGER                                :: iunit ! Output unit.
-   INTEGER                                :: k
-   LOGICAL                                :: failed, print
+   integer                                :: iunit ! Output unit.
+   integer                                :: k
+   logical                                :: failed, print
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -17,27 +17,27 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   IF (print)THEN
-      WRITE (iunit,'(A)')  &
+   if (print)then
+      write (iunit,'(A)')  &
          '----------------------------------------------------------------'
-      WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for SSMT2_RH  = ',max_error_rh
-   ENDIF
+   end if
 
    !---------------------------------------------------------------------------
    !  [2.0] Perform maximum innovation vector check:
    !---------------------------------------------------------------------------
 
-   failed = .FALSE.
+   failed = .false.
 
    do k = 1, ssmt2 % info % levels
       ! Temperature
       call da_max_error_qc (it, ssmt2 % info, ssmt2 % rh(k),&
                              max_error_t, irh, irhf, iunit, 'RH  ', &
                              failed, print)
-   END DO
+   end do
 
 end subroutine da_check_max_iv_ssmt2
 

@@ -17,9 +17,9 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
    integer              :: index_m, index_j    ! Markers.
    complex              :: sum_legtra          ! Summation scalars.
 
-   integer              :: jc, iequator
+   integer              :: jc, iequator, temp
 
-   IF (trace_use) call da_trace_entry("da_legtra_inv_adj")
+   if (trace_use) call da_trace_entry("da_legtra_inv_adj")
 
    index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
 
@@ -30,28 +30,32 @@ subroutine da_legtra_inv_adj( jds, jde, jts, jte, max_wavenumber, alp_size, &
    js = max(jts, jc+iequator+1)
    je = min(jc+iequator, jte)
 
+   temp = (max_wavenumber + 1) * (max_wavenumber + 2) / 2
+
    do l = m, max_wavenumber
       sum_legtra = da_zero_complex
 
-      do j = js, jte
-         index_j = ( jds+jde - j - 1 ) * ( max_wavenumber + 1 ) * &
-            ( max_wavenumber + 2 ) / 2
-         if(mod(l+m,2) == 1) then
+      if (mod(l+m,2) == 1) then
+         do j = js, jte
+            index_j = ( jds+jde - j - 1 ) * temp
             sum_legtra = sum_legtra - r_leg(j) * alp(index_j + index_m + l)
-         else
+         end do
+      else
+         do j = js, jte
+            index_j = ( jds+jde - j - 1 ) * temp
             sum_legtra = sum_legtra + r_leg(j) * alp(index_j + index_m + l)
-         endif
-      enddo
+         end do
+      end if
 
       do j = jts, je
-         index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * (max_wavenumber+2) / 2
+         index_j = ( j - 1 ) * temp
          sum_legtra = sum_legtra + r_leg(j) * alp(index_j + index_m + l) 
       end do
 
       v(l) = sum_legtra
    end do
 
-   IF (trace_use) call da_trace_exit("da_legtra_inv_adj")
+   if (trace_use) call da_trace_exit("da_legtra_inv_adj")
 
 end subroutine da_legtra_inv_adj
 

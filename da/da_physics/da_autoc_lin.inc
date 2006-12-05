@@ -9,7 +9,7 @@ subroutine da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
    real, dimension(kts:kte)  :: SCR29, PRC9
    real, parameter           :: QCTH=0.5E-3, QCK1=1.0E-3
 
-   DO k=kts,kte
+   do k=kts,kte
       if (DT(k) <= 0.) cycle
 
       if (SCR2(k) >= QCTH) then
@@ -18,8 +18,8 @@ subroutine da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
       else
          PRC9(K) = 0.
          PRC(k) = 0.
-      endif
-   ENDDO
+      end if
+   end do
 
 end subroutine da_autoc_lin
 

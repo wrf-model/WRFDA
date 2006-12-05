@@ -5,20 +5,20 @@ subroutine da_tprh_to_q_adj1( t, p, es, q, rh, &
    !  PURPOSE: Adjoint of da_tprh_to_q_adj.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL, INTENT(IN)              :: t        ! Temperature.
-   REAL, INTENT(IN)              :: es       ! Saturation vapour pressure.
-   REAL, INTENT(IN)              :: p        ! Pressure.
-   REAL, INTENT(IN)              :: q        ! Specific humidity.
-   REAL, INTENT(IN)              :: rh       ! Relative Humidity.
-   REAL, INTENT(INOUT)           :: t_prime  ! Temperature increment.
-   REAL, INTENT(INOUT)           :: p_prime  ! Pressure increment.
-   REAL, INTENT(INOUT)           :: rh_prime ! Pressure increment.
-   REAL, INTENT(IN)              :: q_prime  ! Pressure increment.
+   real, intent(in)              :: t        ! Temperature.
+   real, intent(in)              :: es       ! Saturation vapour pressure.
+   real, intent(in)              :: p        ! Pressure.
+   real, intent(in)              :: q        ! Specific humidity.
+   real, intent(in)              :: rh       ! Relative Humidity.
+   real, intent(inout)           :: t_prime  ! Temperature increment.
+   real, intent(inout)           :: p_prime  ! Pressure increment.
+   real, intent(inout)           :: rh_prime ! Pressure increment.
+   real, intent(in)              :: q_prime  ! Pressure increment.
    
-   REAL                          :: temp     ! Temporary storage.
-   REAL                          :: qs_prime_over_qs ! qs~/qs.
+   real                          :: temp     ! Temporary storage.
+   real                          :: qs_prime_over_qs ! qs~/qs.
 
    temp = q * q_prime
 

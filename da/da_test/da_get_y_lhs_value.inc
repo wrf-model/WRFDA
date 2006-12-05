@@ -6,13 +6,11 @@ subroutine da_get_y_lhs_value( iv, y, &
    implicit none
    
    type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
-   TYPE (y_type),     intent(inout) :: y     ! y = h (xa)
+   type (y_type),     intent(inout) :: y     ! y = h (xa)
 
    real,              intent(out)   :: partial_lhs, pertile_lhs, adj_ttl_lhs
 
 !-------------------------------------------------------------------------
-
-   integer                        :: ierror        ! MPI error code.
 
 !-------------------------------------------------------------------------
 
@@ -22,7 +20,7 @@ subroutine da_get_y_lhs_value( iv, y, &
    if( Use_SoundObs ) then
        call da_check_xtoy_adjoint_Sound( iv, y, partial_lhs, pertile_lhs )
        call da_check_xtoy_adjoint_Sonde_sfc( iv, y, partial_lhs, pertile_lhs )
-   endif
+   end if
    if( Use_SynopObs ) &
    call da_check_xtoy_adjoint_Synop( iv, y, partial_lhs, pertile_lhs )
 
@@ -77,9 +75,10 @@ subroutine da_get_y_lhs_value( iv, y, &
    if( Use_BogusObs ) &
    call da_check_xtoy_adjoint_Bogus( iv, y, partial_lhs, pertile_lhs )
 
+! JRB use dm_sum_real
 #ifdef DM_PARALLEL
-   call MPI_ALLREDUCE( partial_lhs, adj_ttl_lhs, 1, TRUE_MPI_REAL, MPI_SUM, &
-                       MPI_COMM_WORLD, IERROR )
+   call mpi_allreduce( partial_lhs, adj_ttl_lhs, 1, true_mpi_real, mpi_sum, &
+                       comm, ierr )
 #else
    adj_ttl_lhs = partial_lhs
 #endif

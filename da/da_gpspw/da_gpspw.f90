@@ -1,28 +1,28 @@
-MODULE da_gpspw
+module da_gpspw
 
-   USE da_constants
-   USE da_define_structures
-   USE da_interpolation
-   USE da_statistics
-   USE da_physics
-   USE da_tools
+   use da_control
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_physics
+   use da_tools
 
    ! The "stats_gpspw_type" is ONLY used locally in da_gpspw:
 
-   TYPE residual_gpspw1_type
-      REAL          :: tpw                      ! Precipitable water
-   END TYPE residual_gpspw1_type
+   type residual_gpspw1_type
+      real          :: tpw                      ! Precipitable water
+   end type residual_gpspw1_type
 
-   TYPE maxmin_gpspw_stats_type
-      TYPE (maxmin_type)         :: tpw
-   END TYPE maxmin_gpspw_stats_type
+   type maxmin_gpspw_stats_type
+      type (maxmin_type)         :: tpw
+   end type maxmin_gpspw_stats_type
 
-   TYPE stats_gpspw_type
-      TYPE (maxmin_gpspw_stats_type)  :: maximum, minimum
-      TYPE (residual_gpspw1_type)     :: average, rms_err
-   END TYPE stats_gpspw_type
+   type stats_gpspw_type
+      type (maxmin_gpspw_stats_type)  :: maximum, minimum
+      type (residual_gpspw1_type)     :: average, rms_err
+   end type stats_gpspw_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_gpspw.inc"
 #include "da_calculate_jo_and_grady_gpspw.inc"

@@ -1,43 +1,43 @@
-SUBROUTINE da_setup_obs_structures( xp, ob, iv )
+subroutine da_setup_obs_structures( xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate and read in components of observation structure.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xpose_type), INTENT(IN):: xp          ! Domain decomposition vars. 
-   TYPE ( y_type), INTENT(OUT)  :: ob          ! Observation structure.
-   TYPE (ob_type), INTENT(OUT)  :: iv          ! O-B structure.
+   type (xpose_type), intent(in):: xp          ! Domain decomposition vars. 
+   type ( y_type), intent(out)  :: ob          ! Observation structure.
+   type (ob_type), intent(out)  :: iv          ! O-B structure.
 
-   integer :: iost
+   integer :: iost, ssmi_unit
 
-   IF (trace_use) CALL da_trace_entry("da_setup_obs_structures")
+   if (trace_use) call da_trace_entry("da_setup_obs_structures")
 
-   CALL da_messages((/'[4.0] Set up observations (ob)'/))
+   call da_message((/'Set up observations (ob)'/))
 
    ! Adjust obs switches
 
 
-   IF (Use_SynopObs .OR. Use_ShipsObs .OR. Use_MetarObs .OR. Use_PilotObs .OR. &
+   if (Use_SynopObs .OR. Use_ShipsObs .OR. Use_MetarObs .OR. Use_PilotObs .OR. &
       Use_ProfilerObs .OR. Use_BuoyObs .OR. Use_SoundObs .OR. Use_BogusObs .OR. &
       Use_RadarObs .OR. Use_Radar_rv .OR. Use_Radar_rf .OR. Use_SatemObs .OR. &
       Use_GeoAMVObs .OR. Use_PolarAMVObs .OR. Use_AirepObs .OR. &
       Use_GpspwObs .OR. Use_GpsrefObs .OR. Use_SsmiRetrievalObs .OR. &
-      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs) THEN
+      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs) then
  
-      use_obsgts = .TRUE.
-   ELSE
-      use_obsgts = .FALSE.
-   END IF
+      use_obsgts = .true.
+   else
+      use_obsgts = .false.
+   end if
 
-   IF (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
+   if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) THEN
-      use_radiance = .TRUE.
-   ELSE
-      use_radiance = .FALSE.
-   END IF
+      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) then
+      use_radiance = .true.
+   else
+      use_radiance = .false.
+   end if
 
    ! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
    ! to produce results that are bitwise-identical regardless of the number of 
@@ -45,99 +45,101 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    ! are not a source of bugs.  Runtime will be much longer.  This option is 
    ! automatically overridden to .false. for serial or 1-MPI-task runs.  
 
-   IF (testing_dm_exact) THEN
-      IF (num_procs == 1) THEN
-         testing_dm_exact = .FALSE.
-         WRITE(UNIT=stdout,FMT='(A)') &
-            ' testing_dm_exact overridden to .FALSE. for serial or 1-MPI-task run'
-      ENDIF
-      ! Only implmenented for Sound and Synop, so switch other types off
-      Use_ShipsObs         = .FALSE.
-      Use_MetarObs         = .FALSE.
-      Use_BogusObs         = .FALSE.
-      Use_PilotObs         = .FALSE.
-      Use_AirepObs         = .FALSE.
-      Use_GeoAMVObs        = .FALSE.
-      Use_PolarAMVObs      = .FALSE.
-      Use_BuoyObs          = .FALSE.
-      Use_ProfilerObs      = .FALSE.
-      Use_SatemObs         = .FALSE.
-      Use_GpspwObs         = .FALSE.
-      Use_GpsrefObs        = .FALSE.
-      Use_SsmiRetrievalObs = .FALSE.
-      Use_SsmiTbObs        = .FALSE.
-      use_ssmt1obs         = .FALSE.
-      use_ssmt2obs         = .FALSE.
-      use_qscatobs         = .FALSE.
-      use_Hirs2Obs         = .FALSE.
-      use_Hirs3Obs         = .FALSE.
-      use_MsuObs           = .FALSE.
-      use_AmsuaObs         = .FALSE.
-      use_AmsubObs         = .FALSE.
-      use_AirsObs          = .FALSE.
-      use_Eos_AmsuaObs     = .FALSE.
-      use_Eos_radObs       = .FALSE.
-      use_HsbObs           = .FALSE.
-      Use_Obsgts           = .FALSE.
-      Use_Radiance         = .FALSE.
-   ENDIF
+   if (testing_dm_exact) then
+      if (num_procs == 1) then
+         testing_dm_exact = .false.
+         write(unit=stdout,fmt='(A)') &
+            ' testing_dm_exact overridden to .false. for serial or 1-MPI-task run'
+      end if
+      ! only implmenented for Sound and Synop, so switch other types off
+      Use_ShipsObs         = .false.
+      Use_MetarObs         = .false.
+      Use_BogusObs         = .false.
+      Use_PilotObs         = .false.
+      Use_AirepObs         = .false.
+      Use_GeoAMVObs        = .false.
+      Use_PolarAMVObs      = .false.
+      Use_BuoyObs          = .false.
+      Use_ProfilerObs      = .false.
+      Use_SatemObs         = .false.
+      Use_GpspwObs         = .false.
+      Use_GpsrefObs        = .false.
+      Use_SsmiRetrievalObs = .false.
+      Use_SsmiTbObs        = .false.
+      use_ssmt1obs         = .false.
+      use_ssmt2obs         = .false.
+      use_qscatobs         = .false.
+      use_Hirs2Obs         = .false.
+      use_Hirs3Obs         = .false.
+      use_MsuObs           = .false.
+      use_AmsuaObs         = .false.
+      use_AmsubObs         = .false.
+      use_AirsObs          = .false.
+      use_Eos_AmsuaObs     = .false.
+      use_Eos_radObs       = .false.
+      use_HsbObs           = .false.
+      Use_Obsgts           = .false.
+      Use_Radiance         = .false.
+   end if
     
    if (num_pseudo > 0) then
-      call da_messages((/"Single OBS Test:: Turn off all the OBS switches ***"/))
-      Use_SynopObs         = .FALSE.
-      Use_ShipsObs         = .FALSE.
-      Use_MetarObs         = .FALSE.
-      Use_SoundObs         = .FALSE.
-      Use_BogusObs         = .FALSE.
-      Use_PilotObs         = .FALSE.
-      Use_AirepObs         = .FALSE.
-      Use_GeoAMVObs        = .FALSE.
-      Use_PolarAMVObs      = .FALSE.
-      Use_BuoyObs          = .FALSE.
-      Use_ProfilerObs      = .FALSE.
-      Use_SatemObs         = .FALSE.
-      Use_GpspwObs         = .FALSE.
-      Use_GpsrefObs        = .FALSE.
-      Use_SsmiRetrievalObs = .FALSE.
-      Use_SsmiTbObs        = .FALSE.
-      use_ssmt1obs         = .FALSE.
-      use_ssmt2obs         = .FALSE.
-      use_qscatobs         = .FALSE.
-      use_Hirs2Obs         = .FALSE.
-      use_Hirs3Obs         = .FALSE.
-      use_MsuObs           = .FALSE.
-      use_AmsuaObs         = .FALSE.
-      use_AmsubObs         = .FALSE.
-      use_AirsObs          = .FALSE.
-      use_Eos_AmsuaObs     = .FALSE.
-      use_Eos_radObs       = .FALSE.
-      use_HsbObs           = .FALSE.
-      Use_Obsgts           = .FALSE.
-      Use_Radiance         = .FALSE.
-   endif
+      call da_message((/"Single OBS Test:: Turn off all the OBS switches ***"/))
+      Use_SynopObs         = .false.
+      Use_ShipsObs         = .false.
+      Use_MetarObs         = .false.
+      Use_SoundObs         = .false.
+      Use_BogusObs         = .false.
+      Use_PilotObs         = .false.
+      Use_AirepObs         = .false.
+      Use_GeoAMVObs        = .false.
+      Use_PolarAMVObs      = .false.
+      Use_BuoyObs          = .false.
+      Use_ProfilerObs      = .false.
+      Use_SatemObs         = .false.
+      Use_GpspwObs         = .false.
+      Use_GpsrefObs        = .false.
+      Use_SsmiRetrievalObs = .false.
+      Use_SsmiTbObs        = .false.
+      use_ssmt1obs         = .false.
+      use_ssmt2obs         = .false.
+      use_qscatobs         = .false.
+      use_Hirs2Obs         = .false.
+      use_Hirs3Obs         = .false.
+      use_MsuObs           = .false.
+      use_AmsuaObs         = .false.
+      use_AmsubObs         = .false.
+      use_AirsObs          = .false.
+      use_Eos_AmsuaObs     = .false.
+      use_Eos_radObs       = .false.
+      use_HsbObs           = .false.
+      Use_Obsgts           = .true.
+      Use_Radiance         = .false.
+   end if
 
-   IF ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) THEN
-      WRITE(UNIT=errmsg(1),FMT='(A,I3)') &
+   if ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) then
+      write(unit=message(1),fmt='(A,I3)') &
          'Invalid sfc_assi_option = ', sfc_assi_options
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
-   END IF
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
 
-   IF (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) THEN
-      OPEN ( UNIT   = ssmi_iunit,     &
+   if (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) then
+      call da_get_unit(ssmi_unit)
+      open ( unit   = ssmi_unit,     &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
-             IOSTAT =  iost,     &
+             iostat =  iost,     &
              STATUS = 'OLD')
-      CLOSE(UNIT=ssmi_iunit)
+      close(unit=ssmi_unit)
+      call da_free_unit(ssmi_unit)
 
-      IF (iost /= 0) THEN
-         WRITE (UNIT=stderr,FMT='(/,A,I3,A,/)') &
-            ' INPUT FILE UNIT ',ssmi_iunit, &
-            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
+      if (iost /= 0) then
+         write (unit=stderr,fmt='(/,A,I3,A,/)') &
+            ' inPUT FILE unit ',ssmi_unit, &
+            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
          Use_SsmiRetrievalObs=.false.
          Use_SsmiTbObs=.false.
-      END IF 
-   END IF 
+      end if 
+   end if 
 
 
    !---------------------------------------------------------------------------      
@@ -173,6 +175,7 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_bogus=0
    iv%num_airsr=0
    iv%num_inst=0
+   iv%num_pseudo=0          
 
    iv%num_sound_glo=0
    iv%num_synop_glo=0
@@ -195,55 +198,68 @@ SUBROUTINE da_setup_obs_structures( xp, ob, iv )
    iv%num_Radar_glo=0
    iv%num_bogus_glo=0
    iv%num_airsr_glo=0
+   iv%num_pseudo_glo=0             
 
-   iv%num_pseudo=num_pseudo
-   iv%num_pseudo_glo=iv%num_pseudo
 
-   IF (use_obsgts) then
+   ob%num_sound=0
+   ob%num_synop=0
+   ob%num_geoamv=0
+   ob%num_polaramv=0
+   ob%num_airep=0
+   ob%num_metar=0
+   ob%num_ships=0
+   ob%num_pilot=0
+   ob%num_satem=0
+   ob%num_gpspw=0
+   ob%num_gpsref=0
+   ob%num_qscat=0
+   ob%num_ssmt1=0
+   ob%num_ssmt2=0
+   ob%num_ssmi_tb=0
+   ob%num_ssmi_retrieval=0
+   ob%num_buoy=0
+   ob%num_profiler=0
+   ob%num_radar=0
+   ob%num_bogus=0
+   ob%num_airsr=0
+   ob%num_inst=0
+   ob%num_pseudo=0          
+
+   if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
-      IF ( ob_format == 1 ) THEN
-         CALL da_messages((/'Using BUFR format observation input'/))
+      if ( ob_format == ob_format_bufr ) then
+         call da_message((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
-         IF (iv%num_pseudo > 0) THEN
-            CALL da_messages((/'Pseudo test only.'/))
-            CALL da_allocate_y( iv, ob )
-            CALL da_setup_pseudo_obs( iv, ob )
-            iv%pseudo(1)%loc%i=int(iv%pseudo(1)%loc%x)
-            iv%pseudo(1)%loc%j=int(iv%pseudo(1)%loc%y)
-            iv%pseudo(1)%loc%dx=iv%pseudo(1)%loc%x-real(iv%pseudo(1)%loc%i)
-            iv%pseudo(1)%loc%dy=iv%pseudo(1)%loc%y-real(iv%pseudo(1)%loc%j)
-            iv%pseudo(1)%loc%dxm=1.0-iv%pseudo(1)%loc%dx
-            iv%pseudo(1)%loc%dym=1.0-iv%pseudo(1)%loc%dy
-         ELSE
-            CALL da_setup_obs_structures_bufr( xp, ob, iv )
-         END IF 
-      ELSE IF ( ob_format == 2 ) THEN
-         ! [1.2] MM5 observation input file:
-         CALL da_setup_obs_structures_ascii( xp, ob, iv )
-      END IF
-   END IF
+            call da_setup_obs_structures_bufr( xp, ob, iv )
+      else if ( ob_format == ob_format_ascii ) then
+         ! [1.2] GTS observation input file:
+         call da_setup_obs_structures_ascii( xp, ob, iv )
+      end if
+   end if
 
    ! Radiance files can only be in BUFR
 
-   IF (use_radiance) then
+   if (use_radiance) then
 #ifndef RTTOV
       ! Stop any radiance work if RTTOV not defined, as there are
       ! huge preprocessor defined holes in the subsequent code, made so people
       ! can compile without the RTTOV library
-      CALL da_error(__FILE__,__LINE__, &
+      call da_error(__FILE__,__LINE__, &
          (/"Cannot run radiance code if compile directive RTTOV false"/))
 #endif
-      CALL da_messages((/'Using NCEP BUFR radiance 1b input'/))
-      CALL da_setup_bufrtovs_structures( xp, ob, iv )
+      call da_message((/'Using NCEP BUFR radiance 1b input'/))
+      call da_setup_bufrtovs_structures( xp, ob, iv )
+
       ! These are per processor, so uninteresting
-      ! write (UNIT=stderr,FMT=*) ' iv%total_rad_channel = ', iv%total_rad_channel
-      ! write (UNIT=stderr,FMT=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
-   END IF
+      ! write (unit=stderr,fmt=*) ' iv%total_rad_channel = ', iv%total_rad_channel
+      ! write (unit=stderr,fmt=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
+   end if
 
    ! Get horizontal interpolation weights.
+
    call da_setup_obs_interp_wts( xp, iv ) 
 
-   IF (trace_use) CALL da_trace_exit("da_setup_obs_structures")    
+   if (trace_use) call da_trace_exit("da_setup_obs_structures")    
 
-END SUBROUTINE da_setup_obs_structures
+end subroutine da_setup_obs_structures
 

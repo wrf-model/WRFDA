@@ -1,10 +1,10 @@
 subroutine da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                 INTENT(IN)       :: stats_unit
-   INTEGER,                 INTENT(INOUT)    :: nu, nv, nt, nq, nslp
-   TYPE (stats_bogus_type), INTENT(IN)       :: Bogus
+   integer,                 intent(in)       :: stats_unit
+   integer,                 intent(inout)    :: nu, nv, nt, nq, nslp
+   type (stats_bogus_type), intent(in)       :: Bogus
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

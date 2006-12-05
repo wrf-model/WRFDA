@@ -7,7 +7,7 @@ subroutine da_get_spoles(x,              &
    ! PURPOSE: Treatment for Scalar field at Poles
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
 
    integer, intent(in)    :: ids, ide, jds, jde, kds, kde
@@ -19,8 +19,8 @@ subroutine da_get_spoles(x,              &
    real                   :: tmpvar,tmps,tmp_s
 
    ! Stop compiler whinge
-   if (kde==0 .OR. kds==0) THEN
-   END IF
+   if (kde==0 .OR. kds==0) then
+   end if
 
    if (trace_use) call da_trace_entry("da_get_spoles")
 

@@ -1,15 +1,15 @@
-MODULE da_statistics
+module da_statistics
    
    !---------------------------------------------------------------------------
    ! PURPOSE: Contains routines used to calculates statistical quantities.
    !---------------------------------------------------------------------------
    
-   USE da_define_structures
-   USE da_par_util
+   use da_define_structures
+   use da_par_util
    
-   IMPLICIT NONE
+   implicit none
    
-   CONTAINS
+   contains
    
 #include "da_analysis_stats.inc"
 #include "da_correlation_coeff1d.inc"
@@ -17,5 +17,5 @@ MODULE da_statistics
 #include "da_data_distribution.inc"
 #include "da_stats_calculate.inc"
 
-END MODULE da_statistics
+end module da_statistics
 

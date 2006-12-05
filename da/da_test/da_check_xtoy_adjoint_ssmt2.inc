@@ -1,30 +1,30 @@
 subroutine da_check_xtoy_adjoint_ssmt2( iv, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: iv            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: iv            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n, k          ! Loop counter.
+   integer                        :: n, k          ! Loop counter.
 
 !----------------------------------------------------------------------------
 
-   IF ( iv%num_ssmt2 > 0 ) THEN
-      DO n=1, iv%num_ssmt2
+   if ( iv%num_ssmt2 > 0 ) then
+      do n=1, iv%num_ssmt2
          if( iv%ssmt2(n)%loc%proc_domain ) then
             do k=1, iv%ssmt2(n)%info%levels
                adjtest_lhs = adjtest_lhs + ( y%ssmt2(n)%rh(k)/typical_rh_rms )**2
-            enddo
-         endif
+            end do
+         end if
 
          do k=1, iv%ssmt2(n)%info%levels
             pertile_lhs = pertile_lhs + ( y%ssmt2(n)%rh(k)/typical_rh_rms )**2
 
             y%ssmt2(n)%rh(k) = y%ssmt2(n)%rh(k) / typical_rh_rms ** 2
-         enddo
-      ENDDO
-   ENDIF
+         end do
+      end do
+   end if
 
 end subroutine da_check_xtoy_adjoint_ssmt2
 

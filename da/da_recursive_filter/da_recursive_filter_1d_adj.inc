@@ -4,16 +4,16 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
    ! PURPOSE: Perform one pass of recursive filter on 1D array - adjoint.
    !---------------------------------------------------------------------------
 
-   INTEGER, INTENT(IN)    :: pass           ! Current pass of filter.
-   REAL, INTENT(IN)       :: alpha          ! Alpha coefficient for RF.
-   REAL, INTENT(INOUT)    :: field(:)       ! Array to be filtered.
-   INTEGER, INTENT(IN)    :: n              ! Size of field array.
+   integer, intent(in)    :: pass           ! Current pass of filter.
+   real, intent(in)       :: alpha          ! Alpha coefficient for RF.
+   real, intent(inout)    :: field(:)       ! Array to be filtered.
+   integer, intent(in)    :: n              ! Size of field array.
    
-   INTEGER                :: j, p           ! Loop counter.
-   REAL                   :: one_alpha      ! 1 - alpha.
-   REAL                   :: a(1:n)         ! Input field.
-   REAL                   :: b(1:n)         ! Field after left-right pass.
-   REAL                   :: c(1:n)         ! Field after right-left pass.
+   integer                :: j, p           ! Loop counter.
+   real                   :: one_alpha      ! 1 - alpha.
+   real                   :: a(1:n)         ! Input field.
+   real                   :: b(1:n)         ! Field after left-right pass.
+   real                   :: c(1:n)         ! Field after right-left pass.
 
    !-------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -35,19 +35,19 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
 
    b(1:n) = 0.0   
 
-   DO j = 1, n-1
+   do j = 1, n-1
       c(j+1) = c(j+1) + alpha * c(j)
       b(j) = one_alpha * c(j)
-   END DO
+   end do
 
-   ! Use turning conditions as in the appendix of Hayden & Purser (1995):
+   ! use turning conditions as in the appendix of Hayden & Purser (1995):
 
-   IF (pass == 1) THEN
+   if (pass == 1) then
       b(n) = b(n) + c(n) / ( 1.0 + alpha )
-   ELSE
+   else
       b(n) = b(n) + one_alpha * c(n) / ( 1.0 - alpha**2)**2
       b(n-1) = b(n-1) - one_alpha * alpha**3 * c(n) / ( 1.0 - alpha**2)**2
-   END IF
+   end if
 
    !-------------------------------------------------------------------------
    ! [2.0] Perform right-moving filter:
@@ -57,21 +57,21 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
 
    ! [2.2] Perform pass left to right:
 
-   DO j = n, 2, -1
+   do j = n, 2, -1
       b(j-1) = b(j-1) + alpha * b(j)
       a(j) = a(j) + one_alpha * b(j)
-   END DO
+   end do
 
-   ! Use turning conditions as in the appendix of Hayden & Purser (1995):
+   ! use turning conditions as in the appendix of Hayden & Purser (1995):
 
-   IF (pass == 1) THEN
+   if (pass == 1) then
       a(1) = a(1) + one_alpha * b(1)
-   ELSE IF (pass == 2) THEN
+   else if (pass == 2) then
       a(1) = a(1) + b(1) / ( 1.0 + alpha )
-   ELSE
+   else
       a(1) = a(1) + one_alpha * b(1) / ( 1.0 - alpha**2)**2
       a(2) = a(2) - one_alpha * alpha**3 * b(1) / ( 1.0 - alpha**2)**2
-   END IF
+   end if
 
    field(1:n) = a(1:n)
    

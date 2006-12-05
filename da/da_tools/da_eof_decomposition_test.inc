@@ -30,15 +30,15 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    tot_variance = sum(l(1:kz))
    cum_variance = 0.0
    
-   write(UNIT=stdout,FMT='(A)')'  Mode    Eigenvalue     Cumulative Variance      e(k,k)'
+   write(unit=stdout,fmt='(A)')'  Mode    Eigenvalue     Cumulative Variance      e(k,k)'
 
    do k = 1, kz
       cum_variance = cum_variance + l(k)
-      write(UNIT=stdout,FMT='(I4,4x,e12.4,10x,f8.4,4x,e12.4)') &
+      write(unit=stdout,fmt='(I4,4x,e12.4,10x,f8.4,4x,e12.4)') &
             k, l(k), cum_variance / tot_variance, e(k,k)
    end do
 
-   write(UNIT=stdout,fmt=*)
+   write(unit=stdout,fmt=*)
    
    call da_array_print( 1, e, 'Global Eigenvectors' )
 
@@ -46,8 +46,8 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
    ! [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
    !-------------------------------------------------------------------------
    
-   write(UNIT=stdout,FMT='(A)')' Eigenvector orthogonality check:'
-   write(UNIT=stdout,FMT='(A)')' Mode     Diagonal         Maximum off-diagonal'
+   write(unit=stdout,fmt='(A)')' Eigenvector orthogonality check:'
+   write(unit=stdout,fmt='(A)')' Mode     Diagonal         Maximum off-diagonal'
 
    do k1 = 1, kz
       do k2 = 1, kz
@@ -57,16 +57,16 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
       array_mask(1:kz) =.true.
       array_mask(k1) = .false.
       max_off_diag = maxval(abs(work(k1,:)),mask=array_mask(:))
-      write(UNIT=stdout,FMT='(I4,4x,1pe12.4,10x,1pe12.4)')k1, work(k1,k1), max_off_diag
+      write(unit=stdout,fmt='(I4,4x,1pe12.4,10x,1pe12.4)')k1, work(k1,k1), max_off_diag
    end do
-   write(UNIT=stdout,FMT=*)
+   write(unit=stdout,fmt=*)
 
    !-------------------------------------------------------------------------   
    ! [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:
    !-------------------------------------------------------------------------   
    
-   write(UNIT=stdout,FMT='(A)')' Eigenvector completeness check:'
-   write(UNIT=stdout,FMT='(A)')' Level    Diagonal         Maximum off-diagonal'
+   write(unit=stdout,fmt='(A)')' Eigenvector completeness check:'
+   write(unit=stdout,fmt='(A)')' Level    Diagonal         Maximum off-diagonal'
 
    do k1 = 1, kz
       do k2 = 1, kz
@@ -76,17 +76,17 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
       array_mask(1:kz) =.true.
       array_mask(k1) = .false.
       max_off_diag = maxval(abs(work(k1,:)),mask=array_mask(:))
-      write(UNIT=stdout,FMT='(I4,4x,1pe12.4,10x,1pe12.4)')k1, work(k1,k1), max_off_diag
+      write(unit=stdout,fmt='(I4,4x,1pe12.4,10x,1pe12.4)')k1, work(k1,k1), max_off_diag
    end do
-   write(UNIT=stdout,fmt=*)
+   write(unit=stdout,fmt=*)
 
    !-------------------------------------------------------------------------
    ! [4]  check B correctness: B = E*L*E^T
    !-------------------------------------------------------------------------
 
-   write(UNIT=stdout,FMT='(a/a)') &
-        'Real and Calculated B (diagonal)', &
-        'lvl                 Real-B                    Calculated-B'
+   write(unit=stdout,fmt='(a/a)') &
+        'real and Calculated B (diagonal)', &
+        'lvl                 real-B                    Calculated-B'
 
    do k=1,kz
       do m=1,kz
@@ -102,16 +102,16 @@ subroutine da_eof_decomposition_test( kz, bx, e, l )
          end do
       end do
 
-      WRITE(UNIT=stdout,FMT='(I5,2F20.5)') k1, bx(k1,k1), bc(k1,k1)
+      write(unit=stdout,fmt='(I5,2F20.5)') k1, bx(k1,k1), bc(k1,k1)
    end do
 
    do k2=1,kz
       write(unit=stdout, fmt='(a,i4/a)') &
-           'Real and Calculated B (off diagonal):', k2, &
-           'lvl                 Real-B                    Calculated-B'
+           'real and Calculated B (off diagonal):', k2, &
+           'lvl                 real-B                    Calculated-B'
 
       do k1=1,kz
-        WRITE(UNIT=stdout,FMT='(I5,2F20.5)') k1, bx(k1,k2), bc(k1,k2)
+        write(unit=stdout,fmt='(I5,2F20.5)') k1, bx(k1,k2), bc(k1,k2)
       end do
    end do
    

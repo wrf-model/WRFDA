@@ -8,61 +8,58 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    !           (In this way, we do not have to do all-to-all communication.)
    !---------------------------------------------------------------------------
 
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
+   implicit none
 
-   REAL,      INTENT(INOUT)      :: proc_ave       ! Processor average.
-   REAL,      INTENT(INOUT)      :: proc_err       ! Processor rms error.
-   REAL,      INTENT(INOUT)      :: proc_min       ! Processor minumum.
-   REAL,      INTENT(INOUT)      :: proc_max       ! Processor maximum.
-   INTEGER,   INTENT(INOUT)      :: nobs_min       ! Obs number of minimum.
-   INTEGER,   INTENT(INOUT)      :: nobs_max       ! Obs number of maximum.
-   INTEGER,   INTENT(INOUT)      :: klev_min       ! Level of minimum.
-   INTEGER,   INTENT(INOUT)      :: klev_max       ! Level of maximum.
+   real,      intent(inout)      :: proc_ave       ! Processor average.
+   real,      intent(inout)      :: proc_err       ! Processor rms error.
+   real,      intent(inout)      :: proc_min       ! Processor minumum.
+   real,      intent(inout)      :: proc_max       ! Processor maximum.
+   integer,   intent(inout)      :: nobs_min       ! Obs number of minimum.
+   integer,   intent(inout)      :: nobs_max       ! Obs number of maximum.
+   integer,   intent(inout)      :: klev_min       ! Level of minimum.
+   integer,   intent(inout)      :: klev_max       ! Level of maximum.
 
-   REAL    :: average            ! Global average.
-   REAL    :: rms_err            ! Global rms_error.
-   REAL    :: in(2)              ! MPI_REDUCE input value with processor rank.
-   REAL    :: out(2)             ! MPI_REDUCE output min/max with associated processor.
-   INTEGER :: proc_id            ! Id of processor with max or min value.
-   INTEGER :: root               ! Monitor processor.
-   INTEGER :: ierr               ! Error code from MPI routines.
-   INTEGER :: status(mpi_status_size) ! MPI status.
+   real    :: average            ! Global average.
+   real    :: rms_err            ! Global rms_error.
+   real    :: in(2)              ! mpi_reduce input value with processor rank.
+   real    :: out(2)             ! mpi_reduce output min/max with associated processor.
+   integer :: proc_id            ! Id of processor with max or min value.
+   integer :: root               ! Monitor processor.
+   integer :: status(mpi_status_size) ! MPI status.
 
 #ifdef DM_PARALLEL
 
-   IF (rootproc) root = myproc
+   if (rootproc) root = myproc
    call wrf_dm_bcast_integer ( root, 1 )
 
    ! Sum average and rms error over all processors and store on monitor processor.
-   call MPI_REDUCE(proc_ave, average, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
-   call MPI_REDUCE(proc_err, rms_err, 1, TRUE_MPI_REAL, MPI_SUM, root, MPI_COMM_WORLD, IERR )
+   call mpi_reduce(proc_ave, average, 1, true_mpi_real, mpi_sum, root, comm, ierr )
+   call mpi_reduce(proc_err, rms_err, 1, true_mpi_real, mpi_sum, root, comm, ierr )
 
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
       proc_ave = average
       proc_err = rms_err
-   END IF
+   end if
 
    ! Get minimum value and associated processor index.
    in(1) = proc_min
    in(2) = myproc
-   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MINLOC, root, MPI_COMM_WORLD, IERR )
+   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_minloc, root, comm, ierr )
 
    if (myproc .eq. root) then
       proc_min = out(1)
-      proc_id = INT(out(2))
+      proc_id = inT(out(2))
    end if
    call wrf_dm_bcast_integer ( proc_id, 1 )
 
    ! Get obs number and k-level where minimum occurs.
    if (proc_id .ne. root) then
       if (myproc .eq. root) then
-         call MPI_RECV( nobs_min, 1, MPI_INTEGER, proc_id, 10, MPI_COMM_WORLD, STATUS, IERR )
-         call MPI_RECV( klev_min, 1, MPI_INTEGER, proc_id, 11, MPI_COMM_WORLD, STATUS, IERR )
+         call mpi_recv( nobs_min, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr )
+         call mpi_recv( klev_min, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr )
       else if (myproc .eq. proc_id) then
-         call MPI_SEND( nobs_min, 1, MPI_INTEGER, root, 10, MPI_COMM_WORLD, IERR )
-         call MPI_SEND( klev_min, 1, MPI_INTEGER, root, 11, MPI_COMM_WORLD, IERR )
+         call mpi_send( nobs_min, 1, mpi_integer, root, 10, comm, ierr )
+         call mpi_send( klev_min, 1, mpi_integer, root, 11, comm, ierr )
       end if
    end if
 
@@ -70,11 +67,11 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    in(1) = proc_max
    in(2) = myproc
 
-   call MPI_REDUCE(in, out, 1, MPI_2DOUBLE_PRECISION, MPI_MAXLOC, root, MPI_COMM_WORLD, IERR )
+   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_maxloc, root, comm, ierr )
 
    if (myproc .eq. root) then
       proc_max = out(1)
-      proc_id = INT(out(2))
+      proc_id = inT(out(2))
    end if
 
    call wrf_dm_bcast_integer ( proc_id, 1 )
@@ -82,11 +79,11 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    ! Get obs number and k-level where maximum occurs.
    if (proc_id .ne. root) then
       if (myproc .eq. root) then
-         call MPI_RECV( nobs_max, 1, MPI_INTEGER, proc_id, 10, MPI_COMM_WORLD, STATUS, IERR )
-         call MPI_RECV( klev_max, 1, MPI_INTEGER, proc_id, 11, MPI_COMM_WORLD, STATUS, IERR )
+         call mpi_recv( nobs_max, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr )
+         call mpi_recv( klev_max, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr )
       else if( myproc .eq. proc_id ) then
-         call MPI_SEND( nobs_max, 1, MPI_INTEGER, root, 10, MPI_COMM_WORLD, IERR )
-         call MPI_SEND( klev_max, 1, MPI_INTEGER, root, 11, MPI_COMM_WORLD, IERR )
+         call mpi_send( nobs_max, 1, mpi_integer, root, 10, comm, ierr )
+         call mpi_send( klev_max, 1, mpi_integer, root, 11, comm, ierr )
       end if
    end if
 #endif

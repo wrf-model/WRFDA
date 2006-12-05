@@ -6,7 +6,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
    !           and builds up background error structure 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in)    :: nj, nk       ! W-E, S-N and Vert. Dims 
    integer, intent(in)    :: bin2d(:,:)       ! Bin assigned to each 2D
@@ -25,9 +25,11 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
 
    !---------------------------------------------------------------------------
 
+   if (trace_use) call da_trace_entry("da_get_bins_info")
+
    allocate (e_vec_loc(1:nj,1:nk,1:nk))
    allocate (e_val_loc(1:nj,1:nk))
-   if (vert_evalue == 1) then              ! Use global eigen vectors
+   if (vert_evalue == 1) then              ! use global eigen vectors
       do k = 1, nk
          e_val_loc(1:nj,k)     = eval_g(k)
          do i =1,nk
@@ -35,7 +37,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
          end do  
       end do  
   
-   else if (vert_evalue == 2) then          ! Use local  eigen vectors
+   else if (vert_evalue == 2) then          ! use local  eigen vectors
       do j = 1, nj
          b = bin2d(1,j)         
          do k=1,nk
@@ -46,9 +48,9 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
          end do
       end do
    else
-      WRITE(UNIT=errmsg(1),FMT='(A,I5)') &
+      write(unit=message(1),fmt='(A,I5)') &
          "Invalid value of vert_evalue=",vert_evalue
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    call da_get_vertical_truncation(max_vert_var, eval_g, be_sub)
@@ -57,6 +59,8 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
    if (be_sub%mz > 0) be_sub%val(:,:) = var_scaling * be_sub%val(:,:)
    deallocate ( e_vec_loc )
    deallocate ( e_val_loc )
+
+   if (trace_use) call da_trace_exit("da_get_bins_info")
   
 end subroutine da_get_bins_info
 

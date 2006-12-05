@@ -1,29 +1,29 @@
-MODULE da_geoamv
+module da_geoamv
 
-   USE da_constants
-   USE da_define_structures
-   USE da_interpolation
-   USE da_statistics
-   USE da_tools
-   USE da_par_util
+   use da_control
+   use da_define_structures
+   use da_interpolation
+   use da_statistics
+   use da_tools
+   use da_par_util
 
    ! The "stats_geoamv_type" is ONLY used locally in da_geoamv:
 
-   TYPE residual_geoamv1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-   END TYPE residual_geoamv1_type
+   type residual_geoamv1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+   end type residual_geoamv1_type
 
-   TYPE maxmin_geoamv_stats_type
-      TYPE (maxmin_type)         :: u, v, t, q
-   END TYPE maxmin_geoamv_stats_type
+   type maxmin_geoamv_stats_type
+      type (maxmin_type)         :: u, v, t, q
+   end type maxmin_geoamv_stats_type
 
-   TYPE stats_geoamv_type
-      TYPE (maxmin_geoamv_stats_type)  :: maximum, minimum
-      TYPE (residual_geoamv1_type)     :: average, rms_err
-   END TYPE stats_geoamv_type
+   type stats_geoamv_type
+      type (maxmin_geoamv_stats_type)  :: maximum, minimum
+      type (residual_geoamv1_type)     :: average, rms_err
+   end type stats_geoamv_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_geoamv.inc"
 #include "da_get_jo_and_grady_geoamv.inc"

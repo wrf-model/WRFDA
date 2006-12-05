@@ -1,6 +1,6 @@
 module da_satem
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -9,21 +9,21 @@ module da_satem
 
    ! The "stats_satem_type" is ONLY used locally in da_satem:
 
-   TYPE residual_satem1_type
-      REAL          :: thickness                ! Satem thickness
-   END TYPE residual_satem1_type
+   type residual_satem1_type
+      real          :: thickness                ! Satem thickness
+   end type residual_satem1_type
 
-   TYPE maxmin_satem_stats_type
-      TYPE (maxmin_type)         :: thickness
-   END TYPE maxmin_satem_stats_type
+   type maxmin_satem_stats_type
+      type (maxmin_type)         :: thickness
+   end type maxmin_satem_stats_type
 
-   TYPE stats_satem_type
-      TYPE (maxmin_satem_stats_type)  :: maximum, minimum
-      TYPE (residual_satem1_type)     :: average, rms_err
-   END TYPE stats_satem_type
+   type stats_satem_type
+      type (maxmin_satem_stats_type)  :: maximum, minimum
+      type (residual_satem1_type)     :: average, rms_err
+   end type stats_satem_type
 
 
-CONTAINS
+contains
 
 #include "da_ao_stats_satem.inc"
 #include "da_calculate_jo_and_grady_satem.inc"

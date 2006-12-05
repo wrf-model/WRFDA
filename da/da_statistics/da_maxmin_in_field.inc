@@ -1,8 +1,8 @@
 subroutine da_maxmin_in_field(field, max, min)
 
-   REAL                  :: field(is:ie,js:je,ks:ke)
+   real                  :: field(is:ie,js:je,ks:ke)
 
-   TYPE (maxmin_field_type) :: max(xp%kts:xp%kte), min(xp%kts:xp%kte)
+   type (maxmin_field_type) :: max(xp%kts:xp%kte), min(xp%kts:xp%kte)
 
    do k = ks, ke
       max(k)%value = -1.E20

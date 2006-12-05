@@ -8,14 +8,14 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
 !               Print's out innov diagnostics for AIRS retrievals  
 !-------------------------------------------------------------------------
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
 
-  TYPE (stats_airsr_type)          :: airsr
-  INTEGER                          :: nt, nq
-  INTEGER                          :: n, k
+  type (stats_airsr_type)          :: airsr
+  integer                          :: nt, nq
+  integer                          :: n, k
 
   nt = 0
   nq = 0
@@ -27,8 +27,8 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
   airsr%average = residual_airsr1_type(0.0, 0.0)
   airsr%rms_err = airsr%average
 
-  IF ( oi%num_airsr > 0 ) THEN
-    DO n=1, oi%num_airsr
+  if ( oi%num_airsr > 0 ) then
+    do n=1, oi%num_airsr
       if( oi%airsr(n)%loc%proc_domain ) then
         do k=1, oi%airsr(n)%info%levels
 
@@ -43,9 +43,9 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
                               airsr%minimum%q, airsr%maximum%q, &
                               airsr%average%q, airsr%rms_err%q)
         end do
-      endif    ! end if( oi%airsr(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%airsr(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nt )
@@ -60,12 +60,12 @@ subroutine da_oi_stats_airsr ( stats_unit, oi )
                           airsr%minimum%q%n, airsr%maximum%q%n, &
                           airsr%minimum%q%l, airsr%maximum%q%l )
 
-  IF ( rootproc ) THEN
-    IF (nt /= 0 .or. nq /= 0) THEN
+  if ( rootproc ) then
+    if (nt /= 0 .or. nq /= 0) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for AIRS retrievals'
-      CALL da_print_stats_airsr( stats_unit, nt, nq, airsr )
-    END IF
-  END IF
+      call da_print_stats_airsr( stats_unit, nt, nq, airsr )
+    end if
+  end if
 
 end subroutine da_oi_stats_airsr
 

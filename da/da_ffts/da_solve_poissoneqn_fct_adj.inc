@@ -9,31 +9,31 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
    !           4) Remove mean b (arbitrary constant).
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xbx_type),   INTENT(IN)    :: xbx     ! Header & non-gridded vars.
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
-   REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      INTENT(INOUT) :: del2b   ! Del**2 B.
-   REAL, DIMENSION(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      INTENT(IN)    :: b       ! B
+   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
+                      intent(inout) :: del2b   ! Del**2 B.
+   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
+                      intent(in)    :: b       ! B
 
-   INTEGER                  :: vector_inc    ! Increment between FST data.
-   INTEGER                  :: vector_jump   ! Jump between start of vectors.
-   INTEGER                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
-   INTEGER                  :: num_vectors   ! Number of FSTs to perform.
-   INTEGER                  :: work_area     ! Dimension for FST routine.
-   INTEGER                  :: idim          ! Size of 1st dimension for FST.
-   INTEGER                  :: jdim          ! Size of 2nd dimension for FST.
+   integer                  :: vector_inc    ! Increment between FST data.
+   integer                  :: vector_jump   ! Jump between start of vectors.
+   integer                  :: vector_size   ! Of form 2**p 3**q 5**r for FSTs.
+   integer                  :: num_vectors   ! Number of FSTs to perform.
+   integer                  :: work_area     ! Dimension for FST routine.
+   integer                  :: idim          ! Size of 1st dimension for FST.
+   integer                  :: jdim          ! Size of 2nd dimension for FST.
 
-   INTEGER                  :: i, j, k, n, ij     ! loop counter
+   integer                  :: i, j, k, n, ij     ! loop counter
 
-   REAL, ALLOCATABLE, DIMENSION(:) :: work_1d     ! FFT work array
+   real, allocatable, dimension(:) :: work_1d     ! FFT work array
 
-   REAL, DIMENSION(xp%kts:xp%kte) :: global_mean, local_mean
+   real, dimension(xp%kts:xp%kte) :: global_mean, local_mean
 
-   REAL :: rij
+   real :: rij
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -45,29 +45,29 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
            xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
 
    ! Allocate work arrays.
-   ALLOCATE( work_1d(1:n) )
+   allocate( work_1d(1:n) )
 
    ! Remove mean b (set arbitrary constant to zero):
 
    rij = 1.0/real((xp%ite-xp%its)*(xp%jte-xp%jts))
 
    do k=xp%kts, xp%kte
-      local_mean(k) = SUM(b(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
-   enddo
+      local_mean(k) = sum(b(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
+   end do
 
    call wrf_dm_sum_reals ( local_mean, global_mean )
    do k=xp%kts,xp%kte
-      PRINT *, &
+      PRinT *, &
          'TEST_COVERAGE_da_solve_poissoneqn_fct_adj:  global_mean(',k,') = ', &
          global_mean(k)
-   enddo
+   end do
 
    ! [2.5] Write data array into b:
 
    do k=xp%kts, xp%kte
       xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,k) = b(xp%its:xp%ite,xp%jts:xp%jte,k) &
          - global_mean(k)
-   enddo
+   end do
       
    !---------------------------------------------------------------------------
    ! [2.0] Perform calculation of gridpoint b level by level:
@@ -92,19 +92,19 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    ! [2.3] Perform forward FFT:
 
-   DO k = xp%ktsx, xp%ktex
+   do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
-         enddo
+         end do
 
          do n=1, xbx%fft_pad_i
             ij=ij+1
             work_1d(ij) = 0.0
-         enddo
-      enddo
+         end do
+      end do
 
       call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
@@ -115,15 +115,15 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          do i=xp%ids, xp%ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)
-         enddo
+         end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc+1
             ij=ij+1
             xp%v2x(i,j,k) = work_1d(ij)
-         enddo
-      enddo
-   END DO
+         end do
+      end do
+   end do
 
    !------------------------------------------------------------------------------
    ! [3.0] For each k-level, perform forward FFT in y direction, apply spectral
@@ -147,27 +147,27 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    work_area   = (vector_size+1)*num_vectors
 
-   DO k = xp%ktsy, xp%ktey
+   do k = xp%ktsy, xp%ktey
       ij = 0
       do j=xp%jds, xp%jde
          do i=xp%itsy, xp%itey
             ij=ij+1
             work_1d(ij) = xp%v1y(i,j,k)
-         enddo
+         end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
             work_1d(ij) = xp%v2y(i,j,k)
-         enddo
-      enddo
+         end do
+      end do
 
       do j=1, xbx%fft_pad_j
          do i=xp%itsy, xp%itey+xbx%pad_num
             ij=ij+1
             work_1d(ij) = 0.0
-         enddo
-      enddo
+         end do
+      end do
 
       call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -183,13 +183,13 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          do i=xp%itsy, xp%itey
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)/xbx%fft_adjoint_factor
-         enddo
+         end do
          do n=1, xbx%pad_num
             i=xbx%pad_pos(n)
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)/xbx%fft_adjoint_factor
-         enddo
-      enddo
+         end do
+      end do
 
       ! Reform gridpt. b using inverse double FST in i.
 
@@ -202,15 +202,15 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          do i=xp%itsy, xp%itey
             ij=ij+1
             xp%v1y(i,j,k) = work_1d(ij)
-         enddo
+         end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
             xp%v2y(i,j,k) = work_1d(ij)
-         enddo
-      enddo
-   ENDDO
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! Perform inverse FFT in x direction:
@@ -236,20 +236,20 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    ! [2.3] Perform forward FFT:
 
-   DO k = xp%ktsx, xp%ktex
+   do k = xp%ktsx, xp%ktex
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
             ij=ij+1
             work_1d(ij) = xp%v1x(i,j,k)
-         enddo
+         end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc+1
             ij=ij+1
             work_1d(ij) = xp%v2x(i,j,k)
-         enddo
-      enddo
+         end do
+      end do
 
       call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
@@ -261,11 +261,11 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          do i=xp%ids, xp%ide
             ij=ij+1
             xp%v1x(i,j,k) = work_1d(ij)*xbx%fft_adjoint_factor
-         enddo
+         end do
 
          ij=ij+xbx%fft_pad_i
-      enddo
-   END DO
+      end do
+   end do
 
    ! Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
 
@@ -283,7 +283,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
    ! [5.0] Tidy up:
    !---------------------------------------------------------------------------
 
-   if (ALLOCATED(work_1d)) DEALLOCATE (work_1d)
+   if (allocated(work_1d)) deallocate (work_1d)
 
 end subroutine da_solve_poissoneqn_fct_adj
 

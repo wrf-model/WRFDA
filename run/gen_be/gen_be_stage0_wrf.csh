@@ -18,9 +18,11 @@
 #-----------------------------------------------------------------------------------
 
 #Define environment variables:
+ if ( ! $?DOMAIN )        setenv DOMAIN        01         # domain id
  if ( ! $?START_DATE )    setenv START_DATE    2003010200 # Time of first perturbation.
  if ( ! $?END_DATE )      setenv END_DATE      2003012812 # Time of last perturbation.
- if ( ! $?FCST_RANGE )    setenv FCST_RANGE    24         # Forecast range of forecast (hours).
+ if ( ! $?FCST_RANGE1 )   setenv FCST_RANGE1   24         # Forecast range 1 (hours).
+ if ( ! $?FCST_RANGE2 )   setenv FCST_RANGE2   12         # Forecast range 2 (hours).
  if ( ! $?INTERVAL )      setenv INTERVAL      12         # Period between files (hours).
  if ( ! $?BE_METHOD )     setenv BE_METHOD     NMC        # NMC-method or ENS-Method.
  if ( ! $?NE )            setenv NE 1                     # Number of ensemble members (for ENS).
@@ -32,7 +34,7 @@
  if ( ! $?DATA_DISK )     setenv DATA_DISK     /smoke
  if ( ! $?REGION )        setenv REGION        con200
  if ( ! $?EXPT )          setenv EXPT          noobs
- if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${DOMAIN}/${EXPT}
+ if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
  if ( ! $?ID )            setenv ID            gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/$ID
  if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR    ${DAT_DIR}/stage0
@@ -47,8 +49,8 @@
 #OK, let's go!
 
 #Derive times of initial/final FCST_RANGE forecasts:
- setenv START_DATE_STAGE0 `${BUILD_DIR}/advance_cymdh.exe $START_DATE -$FCST_RANGE`
- setenv END_DATE_STAGE0   `${BUILD_DIR}/advance_cymdh.exe $END_DATE   -$FCST_RANGE`
+ setenv START_DATE_STAGE0 `${BUILD_DIR}/advance_cymdh.exe $START_DATE -$FCST_RANGE1`
+ setenv END_DATE_STAGE0   `${BUILD_DIR}/advance_cymdh.exe $END_DATE   -$FCST_RANGE1`
 
  setenv DATE $START_DATE_STAGE0
 
@@ -59,8 +61,12 @@
    mkdir ${TMP_DIR} >&! /dev/null
    cd ${TMP_DIR}
 
+   foreach SV ( psi chi t rh ps )
+      if ( ! -d $SV ) mkdir $SV
+   end
+
 #  Create file dates:
-   setenv FCST_TIME `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE`
+   setenv FCST_TIME `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE1`
    echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
 
    set YYYY = `echo $FCST_TIME | cut -c1-4`
@@ -70,7 +76,7 @@
    set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
    set FILE = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
 
-   set NEXT_DATE = `${BUILD_DIR}/advance_cymdh.exe $DATE $INTERVAL`
+   set NEXT_DATE = `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE2`
    if ( $BE_METHOD == NMC ) then
       ln -sf $FILE ${FILE}.e001
       ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002
@@ -81,10 +87,12 @@
 
 #  Tidy:
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
+#   mv mean.${FCST_TIME}* ${STAGE0_DIR}
    mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
    rm -rf $TMP_DIR >&! /dev/null
 
-   setenv DATE $NEXT_DATE
+   echo $DATE $FILE ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
+   setenv DATE `${BUILD_DIR}/advance_cymdh.exe $DATE $INTERVAL`
 
  end     # End loop over dates.
 

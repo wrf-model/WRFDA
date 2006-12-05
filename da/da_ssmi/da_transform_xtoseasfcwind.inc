@@ -4,11 +4,11 @@ subroutine da_transform_xtoseasfcwind(U,V,Speed,zhmkz)
    ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
    !----------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL,   INTENT (out  ) :: Speed
-   REAL,   INTENT (in   ) :: U, V, zhmkz
-   REAL                   :: usfc, vsfc
+   real,   intent (out  ) :: Speed
+   real,   intent (in   ) :: U, V, zhmkz
+   real                   :: usfc, vsfc
 
    if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind")
 

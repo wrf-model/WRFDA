@@ -26,32 +26,32 @@ subroutine da_stage0_initialize( input_file, var, dim1, dim2, dim3, ds )
 
    integer                        :: dimids(10)       !
    integer                        :: dims(1:4)        ! Dimensions of field. 
-   real (kind=4), allocatable     :: value_real(:)    ! Real attribute value. 
+   real (kind=4), allocatable     :: value_real(:)    ! real attribute value. 
    character (len=80)             :: value_chr        ! Character.
 
 !  Check file exists:
    length = len_trim(input_file)
-   rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
+   rcode = nf_open( input_file(1:length), NF_NOwrite, cdfid )
    if ( rcode /= 0) then
-      write(UNIT=errmsg(1),FMT='(A,A)') &
+      write(unit=message(1),fmt='(A,A)') &
          ' Error opening netcdf file ', input_file(1:length)
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
 !  Check variable is in file:
    rcode = nf_inq_varid ( cdfid, var, id_var )
    if ( rcode /= 0 ) then 
-      write(UNIT=errmsg(1),FMT='(A,A)') &
+      write(unit=message(1),fmt='(A,A)') &
          var, ' variable is not in input file'
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
-   endif
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
 
 !  Get metadata (time, dimensions, global attributes):
 
    rcode = nf_inq_var( cdfid, id_var, var, ivtype, ndims, dimids, natts )
    do i = 1, ndims
      rcode = nf_inq_dimlen( cdfid, dimids(i), dims(i) )
-   enddo
+   end do
    dim1 = dims(1)
    dim2 = dims(2)
    dim3 = dims(3)
@@ -59,7 +59,7 @@ subroutine da_stage0_initialize( input_file, var, dim1, dim2, dim3, ds )
    att_name = 'DX'  ! Assume dx= dy.
    rcode = nf_inq_att( cdfid, nf_global, att_name, ivtype, attlen )
    allocate( value_real(1:attlen) )
-   rcode = NF_GET_ATT_REAL(cdfid, nf_global, att_name, value_real )
+   rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, value_real )
    ds = value_real(1)
    deallocate( value_real )
 

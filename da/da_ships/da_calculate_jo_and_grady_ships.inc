@@ -1,13 +1,13 @@
 subroutine da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % ships_u = 0.0
    jo % ships_v = 0.0
@@ -15,8 +15,8 @@ subroutine da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
    jo % ships_p = 0.0
    jo % ships_q = 0.0
 
-   IF (iv%num_ships > 0) THEN
-      DO n=1, iv%num_ships
+   if (iv%num_ships > 0) then
+      do n=1, iv%num_ships
          jo_grad_y%ships(n)%u = -re%ships(n)%u / &
                                  ( iv%ships(n)%u%error * iv%ships(n)%u%error)
          jo_grad_y%ships(n)%v = -re%ships(n)%v / &
@@ -34,15 +34,15 @@ subroutine da_calculate_jo_and_grady_ships( iv, re, jo, jo_grad_y )
             jo % ships_t = jo % ships_t - re%ships(n)%t * jo_grad_y%ships(n)%t
             jo % ships_p = jo % ships_p - re%ships(n)%p * jo_grad_y%ships(n)%p
             jo % ships_q = jo % ships_q - re%ships(n)%q * jo_grad_y%ships(n)%q
-          endif
-      END DO
+          end if
+      end do
 
       jo % ships_u = 0.5 * jo % ships_u
       jo % ships_v = 0.5 * jo % ships_v
       jo % ships_t = 0.5 * jo % ships_t
       jo % ships_p = 0.5 * jo % ships_p
       jo % ships_q = 0.5 * jo % ships_q
-   END IF
+   end if
      
 end subroutine da_calculate_jo_and_grady_ships
 

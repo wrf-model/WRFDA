@@ -10,24 +10,24 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
 !               
 !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual vector (O-A).
+   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual vector (O-A).
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n, k
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k
 
-   IF ( oi%num_polaramv > 0 ) THEN
+   if ( oi%num_polaramv > 0 ) then
 
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
 
-      DO n=1, oi%num_polaramv
+      do n=1, oi%num_polaramv
          do k=1, oi%polaramv(n)%info%levels
             np_available = np_available + 2
 
@@ -35,8 +35,8 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
                                       oi%polaramv(n)%u(k), n_obs_bad % u )
             re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
                                    oi%polaramv(n)%v(k), n_obs_bad % v )            
-        END DO
-     END DO
+        end do
+     end do
       
      np_missing = np_missing + n_obs_bad % u % num % miss + &
                    n_obs_bad % v % num % miss
@@ -45,7 +45,7 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
      np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
                     n_obs_bad % v % num % use
 
-   ENDIF
+   end if
 
 end subroutine da_calculate_residual_polaramv
 

@@ -9,11 +9,9 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !             07/03/2006  -   update for AIRS retrievals    Syed RH Rizvi    
 !
 !  Purpose: Allocates observation structure and fills it fro iv.
-!----------------------------------------------------------------------------   
+!---------------------------------------------------------------------------- 
+  
    IMPLICIT NONE
-#ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-#endif
 
 
    TYPE (ob_type), INTENT(INOUT) :: iv   ! Obs and header structure.
@@ -28,7 +26,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
 !----------------------------------------------------------------------------
 !  Fix output unit
 !----------------------------------------------------------------------------
-      ounit = rand_unit        
+   call da_get_unit(ounit)
 
       dum = -999999.9
 !----------------------------------------------------------------------
@@ -49,7 +47,7 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
-         (/"Canot open random observation error file"//filename/))
+         (/"Cannot open random observation error file"//filename/))
    Endif
 
 !  [2.1] Transfer surface obs:
@@ -679,5 +677,6 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
    END IF
 
   close (ounit)
+  call da_free_unit(ounit)
 
 END SUBROUTINE da_add_noise_to_ob

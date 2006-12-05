@@ -24,7 +24,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
                             ww, ww_save,                  &
                             dnw, c2a, pb, p, alt,         &
                             msfu, msfv, msft,             &
-                            rk_step,             &
+                            rk_step,                      &
                             ids,ide, jds,jde, kds,kde,    & 
                             ims,ime, jms,jme, kms,kme,    &
                             its,ite, jts,jte, kts,kte    )
@@ -121,7 +121,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
     !  if this is the first RK step, reset *_1 to *_2
     !  (we are replacing the t-dt fields with the time t fields)
 
-    IF (rk_step == 1) THEN
+    IF ((rk_step == 1) ) THEN
 
 ! 1 jun 2001 -> added boundary copy to 2D boundary condition routines,
 !  should be OK now without the following data copy
@@ -191,7 +191,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
         muts(i,j)=mub(i,j)+mu_2(i,j)
       ENDDO
       DO i=i_start, i_endu
-!  rk_step==1, not leapfrog, WCS fix for tiling
+!  rk_step==1, WCS fix for tiling
 !        muus(i,j)=0.5*(mub(i,j)+mu_2(i,j)+mub(i-1,j)+mu_2(i-1,j))
         muus(i,j) = muu(i,j)
       ENDDO
@@ -199,7 +199,7 @@ SUBROUTINE small_step_prep( u_1, u_2, v_1, v_2, w_1, w_2, &
 
     DO j=j_start, j_endv
     DO i=i_start, i_end
-!  rk_step==1, not leapfrog, WCS fix for tiling
+!  rk_step==1, WCS fix for tiling
 !      muvs(i,j)=0.5*(mub(i,j)+mu_2(i,j)+mub(i,j-1)+mu_2(i,j-1))
         muvs(i,j) = muv(i,j)
     ENDDO
@@ -1511,6 +1511,7 @@ SUBROUTINE sumflux ( ru, rv, ww,                             &
   REAL, DIMENSION(ims:ime, jms:jme) , INTENT(IN   ) :: muu, muv, msfu, msfv
 
   INTEGER :: mini, minj, mink
+
 
   REAL, INTENT(IN   )  ::  epssm
   INTEGER   :: i,j,k

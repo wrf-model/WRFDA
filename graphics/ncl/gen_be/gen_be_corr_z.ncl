@@ -9,20 +9,25 @@ begin
 ; open file and read in data
 ;=================================================;
 
- works = "x11"
+ works = "pdf"
 
- dir =  "/smoke/dmbarker/data/con200/noobs/gen_be/"
- be_method = "NMC"
- ni = 44
- nj = 44
- nk = 27
+ region = "india_30km"
+ ni = 150
+ nj = 150
+ nk = 50
+
+; region = "con200"
+; ni = 44
+; nj = 44
+; nk = 27
+
+ dir =  "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
  nij = ni * nj
-
  var1 = "chi"
  var2 = "t"
 
- filename1 = var1+"_u."+var1+"."+be_method
- filename2 = var2+"_u."+var2+"."+be_method
+ filename1 = var1+"_u."+var1+".dat"
+ filename2 = var2+"_u."+var2+".dat"
 
  data1=asciiread(dir+filename1,(/nk,nij/),"float")
  data2=asciiread(dir+filename2,(/nk,nij/),"float")
@@ -42,7 +47,7 @@ begin
 ;************************************************
 ; plotting parameters
 ;************************************************
- wks   = gsn_open_wks (works,"gen_be_corr_z")      ; open workstation
+ wks   = gsn_open_wks (works,"gen_be_corr_z_"+region)      ; open workstation
 
  res                  = True                     ; plot mods desired
  res@trXMinF  =  0.0                   ; min value on x-axis

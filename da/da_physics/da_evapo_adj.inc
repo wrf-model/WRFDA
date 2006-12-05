@@ -14,7 +14,7 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
    real, dimension(kts:kte)  :: SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A
    real, dimension(kts:kte)  :: PRE9
 
-   DO K=kts, kte
+   do K=kts, kte
       if (DT(k) <= 0.) cycle
 
       if (SCR3(K) > 0.) then
@@ -22,17 +22,17 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
                  PREC2*DUM111(K)*SCR7(K)**BVT2)/DUM41(K)
       else
          PRE(k)=0.
-      endif
-   ENDDO
+      end if
+   end do
 
-   DO K=kts, kte
+   do K=kts, kte
       if (DT(k) <= 0.) cycle
  
       SCR39(K)=0.
-      IF(PRE(K) < -SCR3(K)/DT(K) ) THEN
+      if(PRE(K) < -SCR3(K)/DT(K) ) then
          SCR39(K)=-PRE9(K)/DT(K)
          PRE9(K)=0.
-      ENDIF
+      end if
 
       SCR59(K)=0.
       SCR79(K)=0.
@@ -48,8 +48,8 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
          DUM1119(K)=(QV_B(K)/SCR5(K)-1.)/DUM41(K)*  &
                    PREC2*SCR7(K)**BVT2*PRE9(K)
          DUM419(K)=-(QV_B(K)/SCR5(K)-1.)/DUM41(K)*TMP(K)*PRE9(K)
-      endif
-   ENDDO
+      end if
+   end do
 
 end subroutine da_evapo_adj
 

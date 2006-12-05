@@ -5,17 +5,17 @@ subroutine da_calculate_grady_geoamv( iv, re, jo_grad_y )
    !               
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
 
-   TYPE (ob_type), INTENT(IN)     :: iv          ! Innovation vector.
-   TYPE (y_type),  INTENT(INOUT)  :: re          ! Residual vector.
-   TYPE (y_type),  INTENT(INOUT)  :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n , k
+   integer                      :: n , k
 
-   IF ( iv%num_geoamv > 0 ) THEN
-      DO n=1, iv%num_geoamv
+   if ( iv%num_geoamv > 0 ) then
+      do n=1, iv%num_geoamv
          do k=1, iv%geoamv(n)%info%levels
             if(iv%geoamv(n)%u(k)%qc < obs_qc_pointer) re%geoamv(n)%u(k) = 0.0
             if(iv%geoamv(n)%v(k)%qc < obs_qc_pointer) re%geoamv(n)%v(k) = 0.0
@@ -27,7 +27,7 @@ subroutine da_calculate_grady_geoamv( iv, re, jo_grad_y )
                                       ( iv%geoamv(n)%v(k)%error * &
                                         iv%geoamv(n)%v(k)%error )
          end do
-      END DO
-   END IF
+      end do
+   end if
 
 end subroutine da_calculate_grady_geoamv

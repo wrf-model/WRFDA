@@ -2,9 +2,9 @@ subroutine da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
 
    implicit none
 
-   INTEGER,           intent(in)    :: stats_unit
-   INTEGER,           intent(inout) :: nu, nv, nt, np, nq
-   TYPE (stats_pseudo_type), intent(in):: pseudo
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv, nt, np, nq
+   type (stats_pseudo_type), intent(in):: pseudo
 
    write(unit=stats_unit, fmt='(6a/)') &
         '   var             ', &

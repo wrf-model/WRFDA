@@ -11,7 +11,7 @@ subroutine da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
    real, dimension(kts:kte)  :: SCR29,SCR79,PRA9
    real                      :: PRAC,BVT3
 
-   DO K=kts, kte
+   do K=kts, kte
       if (DT(k) <= 0.) cycle
 
       if (SCR3(k) > 0.) then
@@ -21,8 +21,8 @@ subroutine da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
       else
          PRA9(K) = 0.
          PRA(k) = 0.
-      endif
-   ENDDO
+      end if
+   end do
 
 end subroutine da_accre_lin
 

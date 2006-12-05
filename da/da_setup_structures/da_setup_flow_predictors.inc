@@ -7,7 +7,7 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 !
 !  HISTORY: 11/10/2005 - Creation.                          Dale Barker
 !
-!  PARENT_MODULE: da_setup_structures
+!  PARENT_module: da_setup_structures
 !------------------------------------------------------------------------------
 
    implicit none
@@ -27,9 +27,13 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    real                        :: ens_scaling_inv       ! Ensemble scaling of perturbations.
 
-   IF (trace_use) call da_trace_entry("da_setup_flow_predictors")
+   integer                     :: ep_unit
 
-   call da_messages( &
+   if (trace_use) call da_trace_entry("da_setup_flow_predictors")
+
+   call da_get_unit(ep_unit)
+
+   call da_message( &
       (/"Setup structures for flow-dependent information and read in"/))
 
    ep % ne = ne
@@ -58,59 +62,61 @@ subroutine da_setup_flow_predictors( ix, jy, kz, ne, ep )
 
    do e = 1, ne
 
-      write(UNIT=ce,FMT='(i3.3)')e
+      write(unit=ce,fmt='(i3.3)')e
 
 !     v1:
       filename = 'ep/'//trim(var(1))//'/'//trim(var(1))//'.e'//trim(ce)
-      open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(UNIT=ep_unit) ni, nj, nk
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old' )
+      read(unit=ep_unit) ni, nj, nk
 
       if ( ni /= ix .or. nj /= jy .or. nk /= kz) then
-         write(UNIT=stdout,FMT='(a)')' da_setup_flow_predictors: Inconsistent grid dimensions. Stop.'
-         write(UNIT=stdout,FMT='(a,3i6)')' Grid dims for analysis grid: ', ix, jy
-         write(UNIT=stdout,FMT='(a,3i6)')' Grid dims for flow predictors: ', ni, nj
+         write(unit=stdout,fmt='(a)')' da_setup_flow_predictors: Inconsistent grid dimensions. Stop.'
+         write(unit=stdout,fmt='(a,3i6)')' Grid dims for analysis grid: ', ix, jy
+         write(unit=stdout,fmt='(a,3i6)')' Grid dims for flow predictors: ', ni, nj
       end if
 
-      read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
-      close(UNIT=ep_unit)
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      close(unit=ep_unit)
       ep % v1(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
 
 !     v2:
       filename = 'ep/'//trim(var(2))//'/'//trim(var(2))//'.e'//trim(ce)
-      open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(UNIT=ep_unit) ni, nj, nk
-      read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old' )
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
       ep % v2(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
-      close(UNIT=ep_unit)
+      close(unit=ep_unit)
 
 !     v3:
       filename = 'ep/'//trim(var(3))//'/'//trim(var(3))//'.e'//trim(ce)
-      open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(UNIT=ep_unit) ni, nj, nk
-      read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old' )
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
       ep % v3(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
-      close(UNIT=ep_unit)
+      close(unit=ep_unit)
 
 !     v4:
       filename = 'ep/'//trim(var(4))//'/'//trim(var(4))//'.e'//trim(ce)
-      open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(UNIT=ep_unit) ni, nj, nk
-      read(UNIT=ep_unit) temp3d(1:ix,1:jy,1:kz)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old' )
+      read(unit=ep_unit) ni, nj, nk
+      read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)
       ep % v4(1:ix,1:jy,1:kz,e) = ens_scaling_inv * temp3d(1:ix,1:jy,1:kz)
-      close(UNIT=ep_unit)
+      close(unit=ep_unit)
 
 !     v5:
       filename = 'ep/'//trim(var(5))//'/'//trim(var(5))//'.e'//trim(ce)
-      open(UNIT=ep_unit, file = filename, form = 'unformatted', status = 'old' )
-      read(UNIT=ep_unit) ni, nj, nkdum
-      read(UNIT=ep_unit) ldum1, ldum2
-      read(UNIT=ep_unit) temp2d(1:ix,1:jy)
+      open(unit=ep_unit, file = filename, form = 'unformatted', status = 'old' )
+      read(unit=ep_unit) ni, nj, nkdum
+      read(unit=ep_unit) ldum1, ldum2
+      read(unit=ep_unit) temp2d(1:ix,1:jy)
       ep % v5(1:ix,1:jy,1,e) = ens_scaling_inv * temp2d(1:ix,1:jy)
-      close(UNIT=ep_unit)
+      close(unit=ep_unit)
 
    end do 
 
-   IF (trace_use) call da_trace_exit("da_setup_flow_predictors")
+   call da_free_unit(ep_unit)
+
+   if (trace_use) call da_trace_exit("da_setup_flow_predictors")
 
 end subroutine da_setup_flow_predictors
 

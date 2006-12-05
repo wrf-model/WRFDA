@@ -4,34 +4,34 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    ! This subroutine is the adjoint of Doppler radar observation operators.
    !------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.
-   TYPE (ob_type), INTENT(IN)    :: iv          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(INOUT) :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j, k  ! Index dimension.
-   INTEGER                       :: num_levs
-   REAL                          :: dx, dxm  ! 
-   REAL                          :: dy, dym  !
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j, k  ! Index dimension.
+   integer                       :: num_levs
+   real                          :: dx, dxm  ! 
+   real                          :: dy, dym  !
 
-   REAL, DIMENSION(max_ob_levels)   :: model_p  ! Model value p at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_u  ! Model value u at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_v  ! Model value v at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_w  ! Model value w at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_rho ! Model rho at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_qrn ! Model qrn at ob location.
-   REAL, DIMENSION(max_ob_levels)   :: model_qrnb! Model qrn at ob location.
-   REAL                             :: model_ps
+   real, dimension(max_ob_levels)   :: model_p  ! Model value p at ob location.
+   real, dimension(max_ob_levels)   :: model_u  ! Model value u at ob location.
+   real, dimension(max_ob_levels)   :: model_v  ! Model value v at ob location.
+   real, dimension(max_ob_levels)   :: model_w  ! Model value w at ob location.
+   real, dimension(max_ob_levels)   :: model_rho ! Model rho at ob location.
+   real, dimension(max_ob_levels)   :: model_qrn ! Model qrn at ob location.
+   real, dimension(max_ob_levels)   :: model_qrnb! Model qrn at ob location.
+   real                             :: model_ps
 
-   REAL                          :: xr,yr,zr
+   real                          :: xr,yr,zr
 
    ! W_HALF is vertical velocity at half-sigma levels.
 
-   IF ( iv%num_Radar > 0 ) THEN
+   if ( iv%num_Radar > 0 ) then
       do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
          iv%ob_numb(iv%current_ob_time)%radar
          do k = 1, max_ob_levels
@@ -62,31 +62,31 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             model_qrnb(k) = iv%Radar(n)%model_qrn(k)
             model_p(k)    = iv%Radar(n)%model_p(k)
 
-            IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-                 iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN
+            if ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+                 iv % Radar(n) % height_qc(k) /= above_model_lid ) then
 
-               IF ( USE_Radar_rf ) THEN
-                  IF ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
+               if ( use_Radar_rf ) then
+                  if ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) then
                     call da_reflectivity_adj( jo_grad_y%Radar(n)%rf(k), &
                          model_rho(k), model_qrn(k), model_qrnb(k) )
-                  ENDIF
-               ENDIF
+                  end if
+               end if
 
-               IF ( USE_Radar_rv ) THEN
-                  IF ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) THEN
+               if ( use_Radar_rv ) then
+                  if ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) then
                      zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
                      call da_radial_velocity_adj( jo_grad_y%Radar(n)%rv(k), &
                         model_p(k), model_u(k), model_v(k), model_w(k),  &
                         model_qrn(k), model_ps, xr, yr, zr, model_qrnb(k) )
-                  ENDIF
-               ENDIF
-            ENDIF
+                  end if
+               end if
+            end if
 
             jo_grad_y%Radar(n)%rv(k) = 0.0
             jo_grad_y%Radar(n)%rf(k) = 0.0
 
-         enddo
+         end do
 
 
          ! [1.6] Interpolate horizontally from crs points:
@@ -119,8 +119,8 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             i, j, dx, dy, dxm, dym, &
             model_u(1), num_levs, iv%Radar(n)%zk(1), num_levs)
 #endif
-      END DO
-   END IF
+      end do
+   end if
 
 end subroutine da_transform_xtoy_radar_adj
 

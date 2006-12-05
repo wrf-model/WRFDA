@@ -1,13 +1,13 @@
 subroutine da_ob_stats_qscat ( stats_unit, oi )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
 
-   TYPE (stats_qscat_type)          :: qscat
-   INTEGER                          :: nu, nv
-   INTEGER                          :: n
+   type (stats_qscat_type)          :: qscat
+   integer                          :: nu, nv
+   integer                          :: n
 
    nu = 0
    nv = 0
@@ -19,9 +19,9 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
    qscat%average = residual_qscat1_type(0.0, 0.0)
    qscat%rms_err = qscat%average
 
-   IF ( oi%num_qscat > 0 ) THEN
+   if ( oi%num_qscat > 0 ) then
 
-      DO n=1, oi%num_qscat
+      do n=1, oi%num_qscat
 
        if( oi%qscat(n)%loc%proc_domain ) then
 
@@ -34,11 +34,11 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
                                qscat%minimum%v, qscat%maximum%v, &
                                qscat%average%v, qscat%rms_err%v)
 
-       endif    ! end if( oi%qscat(n)%loc%proc_domain )
+       end if    ! end if( oi%qscat(n)%loc%proc_domain )
 
-      END DO
+      end do
 
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
@@ -53,17 +53,17 @@ subroutine da_ob_stats_qscat ( stats_unit, oi )
                            qscat%minimum%v%n, qscat%maximum%v%n, &
                            qscat%minimum%v%l, qscat%maximum%v%l )
    
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
    
-    IF (nu /= 0 .or. nv /= 0 ) THEN
+    if (nu /= 0 .or. nv /= 0 ) then
    
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for qscat'
    
       call da_print_stats_qscat( stats_unit, nu, nv, qscat )
    
-    END IF
+    end if
    
-   END IF
+   end if
 
 end subroutine da_ob_stats_qscat
 

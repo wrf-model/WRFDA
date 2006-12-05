@@ -1,16 +1,22 @@
 subroutine da_store_obs_grid_info ( xp, loc )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type),     INTENT(IN)    :: xp     ! Domain decomposition vars.
-   TYPE (model_loc_type), INTENT(INOUT) :: loc    ! Obs location 
+   type (xpose_type),     intent(in)    :: xp     ! Domain decomposition vars.
+   type (model_loc_type), intent(inout) :: loc    ! Obs location 
 
    loc%proc_domain = .false.
    
+! JRB hack
    if (loc%i >= xp%its .and. loc%i <= xp%ite .and. &
       loc%j >= xp%jts .and. loc%j <= xp%jte) then
       loc%proc_domain = .true.
-   endif
+   end if
+
+!   if (loc%i >= xp%its .and. loc%i < xp%ite .and. &
+!      loc%j >= xp%jts .and. loc%j < xp%jte) then
+!      loc%proc_domain = .true.
+!   end if
 
 end subroutine da_store_obs_grid_info
 

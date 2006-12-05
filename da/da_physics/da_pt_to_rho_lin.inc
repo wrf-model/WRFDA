@@ -5,14 +5,14 @@ subroutine da_pt_to_rho_lin( xb, xa, xp )
    !
    ! METHOD:  Linearised ideal gas law: rho~/rho = p'/p - T'/T
    !
-   ! ASSUMPTIONS: 1) Model level stored top down.
+   ! ASsumPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.

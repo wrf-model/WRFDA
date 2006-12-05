@@ -6,31 +6,31 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
    ! It is linearized. 
    !---------------------------------------------------------------------
  
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)   :: xb          ! first guess state.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa) (linear)
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j, k  ! Index dimension.
-   INTEGER                      :: num_levs ! Number of obs levels.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j, k  ! Index dimension.
+   integer                      :: num_levs ! Number of obs levels.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
 
-   REAL, DIMENSION(max_ob_levels)  :: model_p  ! Model value p at ob location.
-   REAL, DIMENSION(max_ob_levels)  :: model_u  ! Model value u at ob location.
-   REAL, DIMENSION(max_ob_levels)  :: model_v  ! Model value v at ob location.
-   REAL, DIMENSION(max_ob_levels)  :: model_w  ! Model value w at ob location.
-   REAL, DIMENSION(max_ob_levels)  :: model_qrn ! Model qrn at ob location.
-   REAL, DIMENSION(max_ob_levels)  :: model_qrnb! Model qrn at ob location.
-   REAL                            :: model_ps
+   real, dimension(max_ob_levels)  :: model_p  ! Model value p at ob location.
+   real, dimension(max_ob_levels)  :: model_u  ! Model value u at ob location.
+   real, dimension(max_ob_levels)  :: model_v  ! Model value v at ob location.
+   real, dimension(max_ob_levels)  :: model_w  ! Model value w at ob location.
+   real, dimension(max_ob_levels)  :: model_qrn ! Model qrn at ob location.
+   real, dimension(max_ob_levels)  :: model_qrnb! Model qrn at ob location.
+   real                            :: model_ps
 
-   REAL                         :: xr,yr,zr
+   real                         :: xr,yr,zr
 
-   IF ( iv%num_Radar > 0 ) THEN
+   if ( iv%num_Radar > 0 ) then
       do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
          iv%ob_numb(iv%current_ob_time)%radar
          num_levs = iv % Radar(n) % info % levels
@@ -96,30 +96,30 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
             ! y%Radar(n)%rv(k) = 0.0
             ! y%Radar(n)%rf(k) = 0.0
 
-            IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-                 iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN
-               IF ( USE_Radar_rv ) THEN
-                  IF ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) THEN
+            if ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+                 iv % Radar(n) % height_qc(k) /= above_model_lid ) then
+               if ( use_Radar_rv ) then
+                  if ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) then
                      zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
                      call da_radial_velocity_lin(y%Radar(n)%rv(k), &
                         model_p(k), &
                         model_u(k), model_v(k), model_w(k), model_qrn(k),    &
                         model_ps, xr, yr, zr, model_qrnb(k) )
-                  ENDIF
-               ENDIF
+                  end if
+               end if
 
-               IF ( USE_Radar_rf ) THEN
-                  IF ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
+               if ( use_Radar_rf ) then
+                  if ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) then
                      call da_reflectivity_lin( y%Radar(n)%rf(k), &
                         model_qrn(k), &
                         model_qrnb(k) )
-                  ENDIF
-               ENDIF
-            ENDIF
+                  end if
+               end if
+            end if
          end do
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_radar 
 

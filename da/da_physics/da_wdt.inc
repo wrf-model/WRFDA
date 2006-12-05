@@ -9,21 +9,21 @@ subroutine da_wdt(H,W,TERR,DT,kts,kte)
    real, dimension(kts:kte+1)   :: W
    real                         :: TERR
 
-   DO k=kte,kts+1,-1
+   do k=kte,kts+1,-1
 
       if (W(k) >= 0.1) then
          DT(k)=(H(k)-H(k-1))/W(k)
       else
          DT(k)=0.
-      endif
+      end if
 
-   ENDDO
+   end do
 
    if (W(kts) >= 0.1) then
       DT(kts)=(H(kts)-TERR)/W(kts)
    else
       DT(kts)=0.
-   endif
+   end if
 
 
 end subroutine da_wdt

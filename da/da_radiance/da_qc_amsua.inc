@@ -13,7 +13,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
 
 
    ! local variables
-   integer   :: n,scanpos,k,isflg,ios
+   integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
    logical   :: lmix
    real      :: satzen,si
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
@@ -87,6 +87,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
                si = ob%instid(inst)%rad(n)%tb(1) - ob%instid(inst)%rad(n)%tb(15)
                if (si >= 3.) then
                   iv%instid(inst)%rad(n)%tb(:)%qc = -1 
+                  iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                   if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                      nrej_si = nrej_si + 1
                end if
@@ -94,6 +95,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
 
             if (iv%instid(inst)%rad(n)%clwp >= 0.2) then
                iv%instid(inst)%rad(n)%tb(:)%qc = -1
+               iv%instid(inst)%rad(n)%cloud_flag(:) = -1
                if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                   nrej_clw = nrej_clw + 1
             end if
@@ -143,7 +145,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
                      nrej_omb_abs(k) = nrej_omb_abs(k) + 1
                end if
 
-               if (lbiascorr) then
+               if (biascorr) then
                   ! if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(scanpos+1,k) ) then
                   if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(1,k) ) then
                      iv%instid(inst)%rad(n)%tb(k)%qc  = -1
@@ -166,7 +168,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
                   else
                      if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                         ngood(k) = ngood(k) + 1
-                     if (lbiascorr) then
+                     if (biascorr) then
                      ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(scanpos+1,k)
                      if (use_error_factor_rad) then
                         iv%instid(inst)%rad(n)%tb(k)%error = &
@@ -209,6 +211,8 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
       else
          filename = trim(iv%instid(inst)%rttovid_string)//'.QCSTAT'
       endif
+
+      call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
          Write(unit=errmsg(1),FMT='(A,A)') 'error opening the output file ', filename
@@ -234,6 +238,7 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
       write(fgat_rad_unit,'(10i7)')     ngood(:)
 
       close(fgat_rad_unit)
+      call da_free_unit(fgat_rad_unit)
    End if
 
    if (trace_use) call da_trace_exit("da_qc_amsua")

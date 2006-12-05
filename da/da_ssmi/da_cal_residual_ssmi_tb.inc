@@ -2,21 +2,21 @@ subroutine da_cal_residual_ssmi_tb( oi, y, re, &
                                           np_missing, np_bad_data, &
                                           np_obs_used, np_available )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)        :: oi     ! Obs increment vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(OUT)       :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: oi     ! Obs increment vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(out)       :: re     ! Residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n
 
    n_obs_bad % t % num = number(0, 0, 0)
 
-   DO n=1, oi%num_ssmi_tb
+   do n=1, oi%num_ssmi_tb
 
       np_available = np_available + 7
 
@@ -34,7 +34,7 @@ subroutine da_cal_residual_ssmi_tb( oi, y, re, &
                             oi%ssmi_tb(n)%tb85v, n_obs_bad % t )
       re%ssmi_tb(n)%tb85h = da_residual(n, 0, y%ssmi_tb(n)%tb85h, &
                             oi%ssmi_tb(n)%tb85h, n_obs_bad % t )
-   END DO
+   end do
 
    np_missing  = np_missing  + n_obs_bad % t % num % miss  
 

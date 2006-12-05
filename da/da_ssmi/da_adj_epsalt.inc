@@ -1,15 +1,15 @@
 subroutine da_adj_epsalt(f,t,ssw,epsr,epsi,                                    &
                       ADJ_t, ADJ_epsr, ADJ_epsi                             )
 ! ---------------------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ---------------------------------------------------------------------------
 !Output  : ADJ_t      (ssw is treated as a constant now)
 !Input   : ADJ_epsr, ADJ_epsi, epsr, epsi
 ! ---------------------------------------------------------------------------
-      real, intent(IN   ) :: f, t
-      real, intent(INOUT) :: ADJ_t
-      real, intent(INOUT) :: ssw
-      real, intent(IN   ) :: ADJ_epsr, ADJ_epsi, epsr, epsi
+      real, intent(in   ) :: f, t
+      real, intent(inout) :: ADJ_t
+      real, intent(inout) :: ssw
+      real, intent(in   ) :: ADJ_epsr, ADJ_epsi, epsr, epsi
 
       complex :: cdum1,cdum2,cdum3
       complex :: ADJ_cdum1,ADJ_cdum2,ADJ_cdum3
@@ -106,6 +106,6 @@ IMPLICIT NONE
 !!! end
 
 
-END subroutine da_adj_epsalt
+end subroutine da_adj_epsalt
 
 

@@ -25,7 +25,6 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
    real, intent(in)    :: int_wgts(1:nj)             ! Legendre integration weights.
 
    integer             :: i, j, k, m, mm             ! Loop counters.
-   integer             :: ier                        ! Error return.
    integer             :: sizec                      ! Size of complex cv-array
    integer             :: index_r, index_c           ! Array index for complex v_fou.
    integer             :: index_start, index_end     ! Position markers in cv.
@@ -59,7 +58,7 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
 
    do j = 1, nj
       r_fou(1:ni) = field(1:ni,j)
-      call rfft1f( ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ier )
+      call rfft1f( ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr )
 
       if ( odd_longitudes ) then
          v_fou(j,0) = CMPLX( r_fou(1), 0.0 ) ! m = 0 is real.

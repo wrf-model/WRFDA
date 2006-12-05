@@ -12,32 +12,33 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
    !                                                    07/16/2004
    !----------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)   :: xb       ! first guess state.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
+   type (xb_type), intent(in)   :: xb       ! first guess state.
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  ! 
-   REAL                         :: dy, dym  !
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  ! 
+   real                         :: dy, dym  !
 
-   INTEGER                :: k          ! Index dimension.
-   REAL                   :: dpw, ddpw  ! adjustment pw [mm]
-   REAL                   :: obs_terr   ! real terrain height at GPS site [m]
-   REAL                   :: model_terr ! model terrain height at GPS site[m]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_q    ! model q at GPS site [kg/kg]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_z    ! model z at GPS site [m]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_rho  ! model rho at GPS site [kg/m^3]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
+   integer                :: k          ! Index dimension.
+   real                   :: dpw, ddpw  ! adjustment pw [mm]
+   real                   :: obs_terr   ! real terrain height at GPS site [m]
+   real                   :: model_terr ! model terrain height at GPS site[m]
+   real,dimension(xp%kts:xp%kte):: model_q    ! model q at GPS site [kg/kg]
+   real,dimension(xp%kts:xp%kte):: model_z    ! model z at GPS site [m]
+   real,dimension(xp%kts:xp%kte):: model_rho  ! model rho at GPS site [kg/m^3]
+   real,dimension(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
+   real,dimension(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
-   IF ( iv%num_Gpspw > 0 ) THEN
-      y % gpspw(:)% tpw = 0.0
-      do n=1, iv % num_Gpspw
+   if ( iv%num_Gpspw > 0 ) then
+!xyh      y % gpspw(:)% tpw = 0.0
+!xyh      do n=1, iv % num_Gpspw
+      do n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
           i = iv%gpspw(n)%loc%i
           dy = iv%gpspw(n)%loc%dy
           dym = iv%gpspw(n)%loc%dym
@@ -57,7 +58,7 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
           model_terr = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) + &
                        dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
 
-          IF ( obs_terr <= model_terr ) THEN 
+          if ( obs_terr <= model_terr ) then 
             model_q(1) = dym*(dxm*xb%q(i,j,1)   + dx*xb%q(i+1,j,1)) + &
                           dy *(dxm*xb%q(i,j+1,1) + dx*xb%q(i+1,j+1,1))
             model_rho(1) = dym*(dxm*xb%rho(i,j,1)   + dx*xb%rho(i+1,j,1)) + &
@@ -70,10 +71,10 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
 
             dpw = ( model_rho(1)*model_dq(1) + model_drho(1)*model_q(1) ) &
                  * ( obs_terr - model_terr )
-          ELSE 
+          else 
              model_z(1) = dym*(dxm*xb%hf(i,j,1)   + dx*xb%hf(i+1,j,1)) + &
                           dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
-            DO k = xp%kts, xp%kte
+            do k = xp%kts, xp%kte
 
               if (model_z(k) >= obs_terr ) exit
 
@@ -103,11 +104,11 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
               else 
                 ddpw = ( model_rho(k)*model_dq(k) + model_drho(k)*model_q(k) ) &
                   * ( obs_terr -  model_z(k) )
-              endif
+              end if
  
             dpw = dpw + ddpw
-          END DO 
-        END IF 
+          end do 
+        end if 
 
         y % gpspw(n)% tpw = dym* ( dxm * xa%tpw(i,j) + &
                                    dx  * xa%tpw(i+1,j) ) + &
@@ -116,7 +117,7 @@ subroutine da_transform_xtoy_gpspw ( xb, iv, xa, xp, y )
                             + 0.1*dpw
 
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_gpspw
 

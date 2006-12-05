@@ -2,9 +2,9 @@ subroutine da_print_stats_polaramv( stats_unit, nu, nv, polaramv )
 
    implicit none
 
-   INTEGER,           intent(in)    :: stats_unit
-   INTEGER,           intent(inout) :: nu, nv
-   TYPE (stats_polaramv_type), intent(in)    :: polaramv
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv
+   type (stats_polaramv_type), intent(in)    :: polaramv
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k'

@@ -1,6 +1,6 @@
 module da_profiler
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -9,21 +9,21 @@ module da_profiler
 
    ! The "stats_profiler_type" is ONLY used locally in da_profiler:
 
-   TYPE residual_profiler1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-   END TYPE residual_profiler1_type
+   type residual_profiler1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+   end type residual_profiler1_type
 
-   TYPE maxmin_profiler_stats_type
-      TYPE (maxmin_type)         :: u, v
-   END TYPE maxmin_profiler_stats_type
+   type maxmin_profiler_stats_type
+      type (maxmin_type)         :: u, v
+   end type maxmin_profiler_stats_type
 
-   TYPE stats_profiler_type
-      TYPE (maxmin_profiler_stats_type)  :: maximum, minimum
-      TYPE (residual_profiler1_type)     :: average, rms_err
-   END TYPE stats_profiler_type
+   type stats_profiler_type
+      type (maxmin_profiler_stats_type)  :: maximum, minimum
+      type (residual_profiler1_type)     :: average, rms_err
+   end type stats_profiler_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_profiler.inc"
 #include "da_get_jo_and_grady_profiler.inc"

@@ -43,15 +43,15 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    if ( jts == jds ) js = jds+1
    if ( jte == jde ) je = jde-1
 
-   if( fg_format == 3) then
+   if( fg_format == fg_format_kma) then
       coefx(is:ie,js:je) = xb%coefx(is:ie,js:je)
       coefy(is:ie,js:je) = xb%coefy(is:ie,js:je)
-   else if( fg_format == 1 .or. fg_format==2) then
+   else if( fg_format == fg_format_wrf) then
       coefx(is:ie,js:je) = xb%coefz(is:ie,js:je)
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
-      WRITE (UNIT=errmsg(1),FMT='(A,I3)') ' Wrong FG_FORMAT = ',fg_format
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      write (unit=message(1),fmt='(A,I3)') ' Wrong FG_FORMAT = ',fg_format
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    ! [1.1] Multiplicative coefficent for conversion RHS->Del**2 phi_b/M**2:
@@ -72,7 +72,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    ! [2.0] Calculate RHS of balance equation in gridpt space:
    !---------------------------------------------------------------------------
 
-   DO k = kts, kte
+   do k = kts, kte
       ! [2.4] Del**2 Phi_b boundary conditions (null as zero boundary conditions):
 
       ! [2.3] Take divergence to get Del**2 phi_b/M**2:
@@ -80,8 +80,8 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
       term_x(ims:ime,jms:jme) = 0.0
       term_y(ims:ime,jms:jme) = 0.0
 
-      DO j = je, js, -1
-         DO i = ie, is, -1
+      do j = je, js, -1
+         do i = ie, is, -1
             coeff1 = coefx(i,j) * del2phi_b(i,j,k)
             coeff2 = coefy(i,j) * del2phi_b(i,j,k)
 
@@ -89,13 +89,13 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
             term_x(i-1,j) = term_x(i-1,j) + coeff1
             term_y(i,j+1) = term_y(i,j+1) - coeff2
             term_y(i,j-1) = term_y(i,j-1) + coeff2
-         END DO
-      END DO
+         end do
+      end do
 
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      IF ( balance_type == balance_cyc .OR. &
-           balance_type == balance_geocyc ) THEN
+      if ( balance_type == balance_cyc .OR. &
+           balance_type == balance_geocyc ) then
          call da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:),&
@@ -103,18 +103,18 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
                                         ids,ide, jds,jde, kds,kde,  &
                                         ims,ime, jms,jme, kms,kme,  &
                                         its,ite, jts,jte, kts,kte )
-      END IF
+      end if
 
       
       ! [2.1] Calculate geostrophic terms in balance eqn:
  
-      IF ( balance_type == balance_geo .OR. &
-           balance_type == balance_geocyc ) THEN
+      if ( balance_type == balance_geo .OR. &
+           balance_type == balance_geocyc ) then
          call da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
                                       term_x, term_y, &
                                       u(:,:,k), v(:,:,k), &
                                       ims,ime, jms,jme, its,ite, jts,jte )
-      END IF
-   END DO
+      end if
+   end do
 
 end subroutine da_balance_equation_adj

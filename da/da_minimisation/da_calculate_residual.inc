@@ -8,7 +8,7 @@ subroutine da_calculate_residual( iv, y, re )
 
    integer    :: np_available, np_obs_used, np_missing  , np_bad_data 
 
-   IF (trace_use) CALL da_trace_entry("da_calculate_residual")
+   if (trace_use) call da_trace_entry("da_calculate_residual")
       
    np_available = 0
    np_obs_used  = 0
@@ -124,15 +124,17 @@ subroutine da_calculate_residual( iv, y, re )
                                      np_obs_used, np_available )
 
    ! for radiance
-
    call da_calculate_residual_rad( iv, y, re, np_missing, np_bad_data, &
                                      np_obs_used, np_available )
+
    ! for AIRS retrievals
 
    call da_calculate_residual_airsr( iv, y, re, np_missing, np_bad_data, &
                                      np_obs_used, np_available )
 
-   IF (trace_use) CALL da_trace_exit("da_calculate_residual")
+   if (trace_use) call da_trace_exit("da_calculate_residual")
 
 
 end subroutine da_calculate_residual
+
+

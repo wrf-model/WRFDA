@@ -33,7 +33,7 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
    do j = 1, ( nj + 1 ) / 2
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
 
-      ! Use Num. Rec. recursion relation for m = 0, 1:
+      ! use Num. Rec. recursion relation for m = 0, 1:
 
       do m = 0, 1
          index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
@@ -57,15 +57,15 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
 
    do m = 2, max_wavenumber
       do l = m, max_wavenumber
-         c(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-3)) * (REAL(l+m-1)/REAL(l+m)) * &
-                  (REAL(l+m-3)/REAL(l+m-2)) )
-         d(l,m) = SQRT ( (REAL(2*l+1)/real(2*l-1)) * (REAL(l+m-1)/REAL(l+m)) * &
-                  (real(l-m+1)/REAL(l+m-2)) )
-         e(l,m) = SQRT ( (REAL(2*l+1)/REAL(2*l-1)) * (REAL(l-m)  /REAL(l+m)))
+         c(l,m) = sqrt ( (real(2*l+1)/real(2*l-3)) * (real(l+m-1)/real(l+m)) * &
+                  (real(l+m-3)/real(l+m-2)) )
+         d(l,m) = sqrt ( (real(2*l+1)/real(2*l-1)) * (real(l+m-1)/real(l+m)) * &
+                  (real(l-m+1)/real(l+m-2)) )
+         e(l,m) = sqrt ( (real(2*l+1)/real(2*l-1)) * (real(l-m)  /real(l+m)))
       end do
    end do
 
-   ! Use Jarraud recursion relation for m>=2:
+   ! use Jarraud recursion relation for m>=2:
 
    do j = 1, ( nj + 1 ) / 2
       index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2

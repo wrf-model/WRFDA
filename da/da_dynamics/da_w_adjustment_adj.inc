@@ -6,13 +6,13 @@ subroutine da_w_adjustment_adj(xb,WZ_a,                      &
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjust vertical velocity increments
    !
-   !  ASSUMPTIONS: 1) Model level stored top down.
+   !  ASsumPTIONS: 1) Model level stored top down.
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb                ! First guess structure.
+   type (xb_type), intent(in)    :: xb                ! First guess structure.
 
    integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
@@ -32,33 +32,33 @@ subroutine da_w_adjustment_adj(xb,WZ_a,                      &
                 ims,ime, jms,jme, kms,kme,  &
                 its,ite, jts,jte, kts,kte )
 
-   DO J=jts,jte
-      DO I=its,ite
+   do J=jts,jte
+      do I=its,ite
          EBXL19=0.
          EBXL29=0.
 
-         DO K=kte,kts,-1
+         do K=kte,kts,-1
             EBXL19=EBXL19+WZ_b(I,J,K)*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
             EBXL29=EBXL29+ABS(WZ_b(I,J,K))*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
-         ENDDO
+         end do
 
          EBXL1=0.
          EBXL2=0.
 
-         DO K=kts,kte
+         do K=kts,kte
             EBXL1=EBXL1-WZ_a(I,J,K)*ABS(WZ_b(I,J,K))/EBXL29
             EBXL2=EBXL2-WZ_a(I,J,K)*   &
                   ABS(WZ_b(I,J,K))*(-EBXL19)/EBXL29**2
             WZ_a(I,J,K)=WZ_a(I,J,K)*(1.-EBXL19/EBXL29   &
                                    *SIGN(1.,WZ_b(I,J,K)))
-         ENDDO
+         end do
 
-         DO K=kte,kts,-1
+         do K=kte,kts,-1
             WZ_a(I,J,K)=WZ_a(I,J,K)+EBXL2*(xb%hf(I,J,K)-xb%hf(I,J,K+1))   &
                           *SIGN(1.,WZ_b(I,J,K))
             WZ_a(I,J,K)=WZ_a(I,J,K)+EBXL1*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
 end subroutine da_w_adjustment_adj

@@ -22,8 +22,8 @@ void da_memory_(
 struct mallinfo result;
 
 result=mallinfo();
-
-*memory_used=result.uordblks;
+/* return memory in kbytes, both for smaller numbers, and to avoid going outside integer*4 range */
+*memory_used=result.uordblks/1024;
 #else
   *memory_used=0;
 #endif

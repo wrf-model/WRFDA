@@ -27,35 +27,35 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
    integer               :: i, j, k, m                 ! Loop counters.
    real                  :: temp
 
-   IF (trace_use) call da_trace_entry("da_transform_vvtovp")
+   if (trace_use) call da_trace_entry("da_transform_vvtovp")
 
    !-------------------------------------------------------------------
    ! [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
    !------------------------------------------------------------------- 
 
    vp = 0.0
-   DO k = kts, kte
-      DO m = 1, mz
-         DO j = jts, jte
+   do k = kts, kte
+      do m = 1, mz
+         do j = jts, jte
             temp = evec(j,k,m) * eval(j,m)
 
-            DO i = its, ite
+            do i = its, ite
                vp(i,j,k) = vp(i,j,k) + temp*vv(i,j,m)
-            END DO
-         END DO
-      END DO
-   END DO
+            end do
+         end do
+      end do
+   end do
    
    !-------------------------------------------------------------------
    ! [2.0] Apply inner-product weighting if vertical_ip > 0:
    !------------------------------------------------------------------- 
 
-   IF ( vertical_ip /= 0 ) THEN
+   if ( vertical_ip /= 0 ) then
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)                          
-   END IF
+   end if
 
-   IF (trace_use) call da_trace_exit("da_transform_vvtovp")
+   if (trace_use) call da_trace_exit("da_transform_vvtovp")
 
-END subroutine da_transform_vvtovp
+end subroutine da_transform_vvtovp
 

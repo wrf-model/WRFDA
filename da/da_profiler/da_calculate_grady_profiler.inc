@@ -4,18 +4,18 @@ subroutine da_calculate_grady_profiler( iv, re, jo_grad_y )
    ! Purpose: Applies obs inverse on re-vector
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)     :: iv          ! Innovation vector.
-   TYPE (y_type),  INTENT(INOUT)  :: re          ! Residual vector.
-   TYPE (y_type),  INTENT(INOUT)  :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)     :: iv          ! Innovation vector.
+   type (y_type),  intent(inout)  :: re          ! Residual vector.
+   type (y_type),  intent(inout)  :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
-   IF (iv%num_profiler > 0) THEN
-      DO n=1, iv%num_profiler
+   if (iv%num_profiler > 0) then
+      do n=1, iv%num_profiler
          do k=1, iv%profiler(n)%info%levels
-            if (iv%profiler(n)%u(k)%qc < obs_qc_pointer) THEN
+            if (iv%profiler(n)%u(k)%qc < obs_qc_pointer) then
                re%profiler(n)%u(k) = 0.0
             end if
             if (iv%profiler(n)%v(k)%qc < obs_qc_pointer) then
@@ -29,8 +29,8 @@ subroutine da_calculate_grady_profiler( iv, re, jo_grad_y )
                                       ( iv%profiler(n)%v(k)%error * &
                                         iv%profiler(n)%v(k)%error )
          end do
-      END DO    
-   END IF
+      end do    
+   end if
 
 end subroutine da_calculate_grady_profiler
 

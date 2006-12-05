@@ -29,7 +29,7 @@ subroutine da_transform_through_rf( mz, grid_box_area, rf_alpha, val,&
       
    integer             :: rf_passes_over_two ! rf_passes / 2
    integer             :: i, j, m, n, pass   ! Loop counters.
-   real                :: p_x(ims:ime,jms:jme)! SQRT(Grid box area).
+   real                :: p_x(ims:ime,jms:jme)! sqrt(Grid box area).
    real                :: val_j(xp%jtsy:xp%jtey)
 
    !----------------------------------------------------------------------
@@ -39,7 +39,7 @@ subroutine da_transform_through_rf( mz, grid_box_area, rf_alpha, val,&
    rf_passes_over_two = rf_passes / 2
    
    ! [1.1] Define inner product (square root of grid box area):
-   p_x(its:ite,jts:jte) = SQRT( grid_box_area(its:ite,jts:jte) )
+   p_x(its:ite,jts:jte) = sqrt( grid_box_area(its:ite,jts:jte) )
 
    ! [1.2] Transform to nondimensional v_hat space:
 
@@ -114,13 +114,13 @@ subroutine da_transform_through_rf( mz, grid_box_area, rf_alpha, val,&
    ! vert_corr = 1 as scaling is performed in vertical transform
    ! for vert_corr = 2:
 
-   IF ( vert_corr == 1 ) THEN
+   if ( vert_corr == 1 ) then
       do m = 1, mz
-      DO i = its, ite
+      do i = its, ite
          field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
-      END DO
       end do
-   END IF
+      end do
+   end if
 
 end subroutine da_transform_through_rf
 

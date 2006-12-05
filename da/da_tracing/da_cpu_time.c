@@ -1,29 +1,3 @@
-/*----------------------------------------------------------------------
-! Subroutine: Gen_CPUTime
-!
-! Get current CPU time using Posix function times
-!
-! Description:
-!
-! TBD
-!
-! Method:
-!
-!
-! Owner: Manager of Operational Data Assimilation
-!
-! History:
-! Version Date     Comment
-! ------- ----     -------
-! 1.7     15/02/01 Creation as standalone C routine. John Bray
-! 1.8     10/04/03 Add definition FRL8 for 64-bit real. Matt Shin
-!
-! Code description:
-!
-! ANSI C portable to all POSIX systems
-!
-!---------------------------------------------------------------------*/
-
 #include <sys/times.h>
 
 #if defined(LOWERCASE) 

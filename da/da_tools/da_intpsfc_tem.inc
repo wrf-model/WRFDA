@@ -11,29 +11,29 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 !
 !------------------------------------------------------------------------------!
 
-      IMPLICIT NONE
+      implicit none
 
-      REAL,    INTENT (out):: val
-      INTEGER, INTENT (in) :: kts, kte
-      REAL,    INTENT (in) :: ho, po, to
-      REAL, DIMENSION (kts:kte), INTENT (in) :: height, pressure, temp
+      real,    intent (out):: val
+      integer, intent (in) :: kts, kte
+      real,    intent (in) :: ho, po, to
+      real, dimension (kts:kte), intent (in) :: height, pressure, temp
 
-      REAL, DIMENSION (kts:kte) :: prs_mb
+      real, dimension (kts:kte) :: prs_mb
 ! JRB
-!      REAL    :: dth_12, dth_21, dth_sfc, dth_obs
-!     REAL    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
-      REAL    :: dth_21, dth_sfc, dth_obs
-      REAL    :: dhe_12, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
-      REAL    :: th_100mb, th_200mb, th_obs, th_sfc
-      REAL    :: th_obs_int, th_sfc_int
-      REAL    :: pdif, rcp
-      INTEGER :: k_100mb, k_200mb, jk
-      INTEGER :: inc_100mb, inc_200mb
+!      real    :: dth_12, dth_21, dth_sfc, dth_obs
+!     real    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+      real    :: dth_21, dth_sfc, dth_obs
+      real    :: dhe_12, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+      real    :: th_100mb, th_200mb, th_obs, th_sfc
+      real    :: th_obs_int, th_sfc_int
+      real    :: pdif, rcp
+      integer :: k_100mb, k_200mb, jk
+      integer :: inc_100mb, inc_200mb
 
 !------------------------------------------------------------------------------!
       rcp = gas_constant/cp
 
-! 1.   FIND LEVELS: MODEL SURFACE + 100hPa AND MODEL SURFACE + 200hPa AR OBS LOC
+! 1.   FinD LEVELS: MODEL SURFACE + 100hPa AND MODEL SURFACE + 200hPa AR OBS LOC
 ! ==============================================================================
 
 ! 1.1 Convert model pressure profile from Pa to hPa  
@@ -48,13 +48,13 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
        k_100mb   = kts
 
 
-       DO jk =  kts+1, kte
+       do jk =  kts+1, kte
           pdif = prs_mb (kts) - prs_mb (jk)
-          IF (pdif .GE. inc_100mb) THEN
+          if (pdif .GE. inc_100mb) then
               k_100mb = jk
-              EXIT
-          ENDIF
-       ENDDO
+              exit
+          end if
+       end do
 
 ! 1.2  Find levels surface + 200hPA
 !      ----------------------------
@@ -62,27 +62,27 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
        inc_200mb = 200.
        k_200mb   = kts
 
-       DO jk =  kts+1, kte
+       do jk =  kts+1, kte
           pdif = prs_mb (kts) - prs_mb (jk)
-          IF (pdif .GE. inc_200mb) THEN
+          if (pdif .GE. inc_200mb) then
               k_200mb = jk
-              EXIT
-          ENDIF
-       ENDDO
+              exit
+          end if
+       end do
 
 ! 1.3  Check consistency 
 !      -----------------
 
-       IF ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
-           (k_200mb .LT. k_100mb)) THEN
-            WRITE (UNIT=errmsg(1),FMT='(A)') ' CANNOT FIND SFC + 200hPA AND SFC + 100hPA' 
-            WRITE (UNIT=errmsg(2),FMT='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
-            WRITE (UNIT=errmsg(3),FMT='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
-            WRITE (UNIT=errmsg(4),FMT='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
-          call da_warning(__FILE__,__LINE__,errmsg(1:4))
+       if ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
+           (k_200mb .LT. k_100mb)) then
+            write (unit=message(1),fmt='(A)') ' CANNOT FinD SFC + 200hPA AND SFC + 100hPA' 
+            write (unit=message(2),fmt='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
+            write (unit=message(3),fmt='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
+            write (unit=message(4),fmt='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
+          call da_warning(__FILE__,__LINE__,message(1:4))
           val = missing_r
           return
-       ENDIF
+       end if
 
 
 ! 2.  POTENTIAL TEMPERATURE 
@@ -133,7 +133,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
       th_obs_int = th_100mb + (dth_21/dhe_12) * dhe_obs1 
 
 
-! 4.  BRING TEMPERATURE ONTO MODEL SURFACE
+! 4.  BRinG TEMPERATURE ONTO MODEL SURFACE
 ! ========================================
 
 ! 4.1 Difference at observation locations

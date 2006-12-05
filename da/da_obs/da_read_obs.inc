@@ -1,6 +1,6 @@
-SUBROUTINE da_read_obs (iunit, ob, xp, filename)
+subroutine da_read_obs (ob, xp, filename)
 !-----------------------------------------------------------------------------!
-!  Purpose: Read the header of a MM5 3D-VAR 2.0 GTS observation file
+!  Purpose: Read the header of a GTS observation file
 !
 !  History:
 !
@@ -28,29 +28,28 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
 !-----------------------------------------------------------------------------!
    implicit none
 
-   INTEGER,           INTENT (in)   :: iunit
-   TYPE (xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
-   TYPE (ob_type),    INTENT(inout) :: ob
+   type (xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
+   type (ob_type),    intent(inout) :: ob
 
-   CHARACTER(*), INTENT(in)         :: filename
+   character(*), intent(in)         :: filename
 
-   CHARACTER (LEN =  10)        :: fmt_name
+   character (LEN =  10)        :: fmt_name
 
-   CHARACTER (LEN = 160)        :: info_string
+   character (LEN = 160)        :: info_string
 
-   CHARACTER (LEN = 160)        :: fmt_info,    &
+   character (LEN = 160)        :: fmt_info,    &
                                    fmt_loc, & 
                                    fmt_each
 
-   INTEGER                      :: i, j, iost, nlevels, fm
+   integer                      :: i, j, iost, nlevels, fm,iunit
 
-   TYPE (multi_level_type)      :: platform
+   type (multi_level_type)      :: platform
 
-   LOGICAL                      :: outside
-   LOGICAL                      :: outside_all
-   INTEGER                      :: surface_level
-   REAL                         :: height_error, u_comp, v_comp
-   INTEGER                      :: total_obs, &
+   logical                      :: outside
+   logical                      :: outside_all
+   integer                      :: surface_level
+   real                         :: height_error, u_comp, v_comp
+   integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
@@ -70,12 +69,12 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                                    num_profiler, &
                                    num_airsr,num_buoy, num_bogus
 
-   INTEGER                        :: ndup, n, report
-   LOGICAL                        :: surface_sound
+   integer                        :: ndup, n, report
+   logical                        :: surface_sound
 
 !--------------------------------------------------------------------
 
-   if (trace_use) CALL da_trace_entry("da_read_obs")
+   if (trace_use) call da_trace_entry("da_read_obs")
 
    total_obs = ob%total_obs
    num_sound = ob%num_sound
@@ -99,71 +98,69 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
    num_bogus= ob%num_bogus
    num_airsr= ob%num_airsr
 !----------------------------------------------------------------------------!
-!  OPEN FILE
+!  open FILE
 !  ---------
-
-   OPEN(UNIT   = iunit,     &
+   call da_get_unit(iunit)
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
-        IOSTAT =  iost,     &
+        iostat =  iost,     &
         STATUS = 'OLD')
 
-   IF (iost /= 0) THEN
-      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
-         "Error",iost," opening gts obs file "//TRIM(filename)
-      CALL da_warning(__FILE__,__LINE__,errmsg(1:1))
-      RETURN
-   ENDIF
+   if (iost /= 0) then
+      write(unit=message(1),fmt='(A,I5,A)') &
+         "Error",iost," opening gts obs file "//trim(filename)
+      call da_warning(__FILE__,__LINE__,message(1:1))
+      return
+   end if
 
-!  READ HEADER
+!  read HEADER
 !  ===========
 
-   head_info: DO
+   head_info: do
  
-      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) info_string
+      read (unit = iunit, fmt = '(A)', iostat = iost) info_string
 
-      IF (iost /= 0) THEN
-         write(unit=stdout, fmt='(/a,i3/a/)') &
-              'ERROR READING FILE UNIT:', iunit, &
-              'in read_obs_gts_header.F' 
+      if (iost /= 0) then
+         call da_warning(__FILE__,__LINE__, &
+           (/"Problem reading gts obs header, skipping file"/))
          return
-      ENDIF
+      end if
 
-      if (info_string(1:6) == 'EACH  ') EXIT
+      if (info_string(1:6) == 'EACH  ') exit
 
-   ENDDO head_info
+   end do head_info
 
 !----------------------------------------------------------------------------!
 
-!  READ FORMATS
+!  read FORMATS
 !  ------------
 
-   READ (iunit, FMT = '(A,1X,A)', IOSTAT = iost) &
+   read (iunit, fmt = '(A,1X,A)', iostat = iost) &
         fmt_name, fmt_info, &
         fmt_name, fmt_loc,  &
         fmt_name, fmt_each
 
-   IF (iost /= 0) THEN
-      write(unit=stdout, fmt='(/A,I3,A/)') &
-           ' ERROR IN INPUT FILE UNIT ',iunit, &
-           ' FOR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED'
-      RETURN
-   ENDIF
+   if (iost /= 0) then
+      call da_warning(__FILE__,__LINE__, &
+         (/"Problem reading gts obs file, skipping"/))
+      return
+   end if
 
    if(print_detail_obs) then
       write(unit=stdout, fmt='(2a)') &
            'fmt_info=', fmt_info, &
            'fmt_loc =', fmt_loc,  &
            'fmt_each=', fmt_each
-   endif
+   end if
 
 !----------------------------------------------------------------------------!
 
 !  SKIP LINE
 !  ----------
 
-   READ (iunit, FMT = '(A)') fmt_name
+   read (iunit, fmt = '(A)') fmt_name
 
 !  LOOP OVER RECORDS
 !  -----------------
@@ -171,14 +168,14 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
    report = 0 ! report number in file
 
    reports: &
-   DO
+   do
 
      report = report+1
 
-!     READ STATION GENERAL INFO
+!     read STATION GENERAL inFO
 !     =============================
 
-      READ (iunit, FMT = fmt_info, IOSTAT = iost) &
+      read (iunit, fmt = fmt_info, iostat = iost) &
                    platform%info%platform,    &
                    platform%info%date_char,   &
                    platform%info%name,        &
@@ -188,12 +185,12 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                    platform%info%elv,         &
                    platform%info%id
 
-      IF (iost /= 0) THEN
+      if (iost /= 0) then
          ! JRB This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
-         EXIT reports
-      ENDIF
+         exit reports
+      end if
 
       if(print_detail_obs) then
          write(unit=stdout, fmt=fmt_info) &
@@ -205,37 +202,37 @@ SUBROUTINE da_read_obs (iunit, ob, xp, filename)
                platform%info%lon,         &
                platform%info%elv,         &
                platform%info%id
-      endif
+      end if
 
       if(platform%info%lon == 180.0   ) platform%info%lon =-180.000 
 !-----Fix funny wind direction at Poles
       if(platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999 ) then
          platform%info%lon = 0.0
-      endif
+      end if
 
       if(platform%info%platform(6:6) == ' ') then
          read(platform%info%platform(4:5), '(I2)') fm
       else
          read(platform%info%platform(4:6), '(I3)') fm
-      endif
+      end if
 
-!     READ MODEL LOCATION
+!     read MODEL LOCATION
 !     =========================
 
-      READ (iunit, FMT = fmt_loc) platform%loc%slp, platform%loc%pw
+      read (iunit, fmt = fmt_loc) platform%loc%slp, platform%loc%pw
       total_obs = total_obs + 1
 
 ! == levels < 1 and not GPSPW, go back to reports
 
-      IF ((platform%info%levels < 1) .AND.            &
+      if ((platform%info%levels < 1) .AND.            &
           (index(platform%info%platform, 'GPSPW') <= 0)) then
            cycle reports
-      ENDIF
+      end if
 
-!     READ EACH LEVELS
+!     read EACH LEVELS
 !     ----------------
 
-loop_level: DO i = 1, platform%info%levels
+loop_level: do i = 1, platform%info%levels
 
       platform%each (i) = each_level_type(missing_r, missing, -1.0, & ! height
                        field_type(missing_r, missing, missing_r), & ! u
@@ -247,7 +244,7 @@ loop_level: DO i = 1, platform%info%levels
                        field_type(missing_r, missing, missing_r), & ! td
                        field_type(missing_r, missing, missing_r))  ! speed 
 
-       READ (UNIT = iunit, FMT = TRIM (fmt_each)) &
+       read (unit = iunit, fmt = trim (fmt_each)) &
               platform%each (i)%p,            &
               platform%each (i)%speed,        &
       ! Here the 'direction' is stored in platform%each (i)%v:
@@ -260,8 +257,8 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%rh
 
       if(print_detail_obs) then
-         write(unit=stdout, FMT = '( a, i6)') 'i=', i
-         write(unit=stdout, FMT = TRIM (fmt_each)) &
+         write(unit=stdout, fmt = '( a, i6)') 'i=', i
+         write(unit=stdout, fmt = trim (fmt_each)) &
               platform%each (i)%p,            &
               platform%each (i)%speed,        &
               platform%each (i)%v,            &
@@ -271,18 +268,7 @@ loop_level: DO i = 1, platform%info%levels
               platform%each (i)%t,            &
               platform%each (i)%td,           &
               platform%each (i)%rh
-      endif
-
-      ! Restrict to a range of reports, useful for debugging
-
-      IF (report < report_start) THEN
-         CYCLE
-      END IF
-
-      IF (report > report_end) THEN
-         EXIT
-      END IF
-
+      end if
 
 ! Uncomment the following if errors in reported heights (test later):             
 !      if(fm == 97 .or. fm == 96 .or. fm == 42) then
@@ -297,7 +283,7 @@ loop_level: DO i = 1, platform%info%levels
 
            call da_ffdduv (platform%each (i)%speed%inv, &
                         platform%each (i)%v%inv,     &
-                        U_comp, V_comp, platform%info%lon, 1)
+                        U_comp, V_comp, platform%info%lon, convert_fd2uv)
            platform%each (i)%u = platform%each (i)%speed
            platform%each (i)%v = platform%each (i)%speed
            platform%each (i)%u%inv = U_comp
@@ -309,32 +295,43 @@ loop_level: DO i = 1, platform%info%levels
            platform%each (i)%v%error = missing_r
            platform%each (i)%u%qc  = missing_data
            platform%each (i)%v%qc  = missing_data
-       endif
+       end if
 
-      ENDDO loop_level
+      end do loop_level
+
+      ! Restrict to a range of reports, useful for debugging
+
+      if (report < report_start) then
+         cycle
+      end if
+
+      if (report > report_end) then
+         exit
+      end if
+
 
       call da_ll_to_xy (platform%info, platform%loc,   &
                         xp, outside, outside_all )
 
 
-      IF(outside_all) THEN
+      if(outside_all) then
          cycle reports
-      ENDIF
+      end if
 
-      IF (print_detail_obs) THEN
+      if (print_detail_obs) then
         ! Simplistic approach, could be improved to get it all done on PE 0
-        IF (.NOT. outside) THEN
-          WRITE(UNIT=stdout,FMT='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
+        if (.NOT. outside) then
+          write(unit=stdout,fmt='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
              "Report",report," at",platform%info%lon,"E",platform%info%lat, &
              "N on processor", myproc,", position", platform%loc%x,platform%loc%y
-        END IF
-      END IF
+        end if
+      end if
 
 
       nlevels = platform%info%levels
       if( nlevels > max_ob_levels) then
          nlevels = max_ob_levels
-         write(unit=errmsg(1), fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
+         write(unit=message(1), fmt='(/4(2a,2x),a,2f8.2,2x,2(a,f9.2,2x),2(a,i4,2x)/)') &
               'Station: ', trim(platform%info%name), &
               'ID: ', trim(platform%info%id), &
               'Platform: ', trim(platform%info%platform), &
@@ -345,7 +342,7 @@ loop_level: DO i = 1, platform%info%levels
               'Has level: ', platform%info%levels, &
               'which is great than max_ob_levels: ', max_ob_levels
 
-          write (unit=errmsg(2), FMT = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
+          write (unit=message(2), fmt = '(A,1X,A,1X,A,1X,I4,2f9.3,f9.1,1X,A)') &
              platform%info%name,        &
              platform%info%platform,    &
              platform%info%date_char,   &
@@ -354,17 +351,17 @@ loop_level: DO i = 1, platform%info%levels
              platform%info%lon,         &
              platform%info%elv,         &
              platform%info%id
-         CALL da_warning(__FILE__,__LINE__,errmsg(1:2))
+         call da_warning(__FILE__,__LINE__,message(1:2))
 
          platform%info%levels = nlevels
       else if( nlevels < 1) then
       ! Not GPSPW and GPSZD data:
          if ( fm /= 111 .and. fm /= 114 ) then
             cycle reports
-         endif
-      endif
+         end if
+      end if
 
-      if( fm /= 86) CALL da_obs_proc_station(platform)
+      if( fm /= 86) call da_obs_proc_station(platform)
 
       nlevels = platform%info%levels
 !    Loop over duplicating obs for global
@@ -375,9 +372,9 @@ loop_level: DO i = 1, platform%info%levels
 !    It is possible that logic for counting obs is incorrect for the 
 !    global case with >1 MPI tasks due to obs duplication, halo, etc.  
 !    TBH:  20050913
-    IF(.not.outside) THEN
+    if(.not.outside) then
      if( print_detail_obs .and. ndup > 1) then
-         write(unit=stdout, FMT = fmt_info) &
+         write(unit=stdout, fmt = fmt_info) &
                platform%info%platform,    &
                platform%info%date_char,   &
                platform%info%name,        &
@@ -387,26 +384,26 @@ loop_level: DO i = 1, platform%info%levels
                platform%info%elv,         &
                platform%info%id
 
-         write(unit=stdout, FMT = '(a,2i5,4e20.10)') &
+         write(unit=stdout, fmt = '(a,2i5,4e20.10)') &
           ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
           platform%loc%i,  platform%loc%j,   &
           platform%loc%dx, platform%loc%dxm, &
           platform%loc%dy, platform%loc%dym
 
      end if
-    ENDIF
-   dup_loop: DO n = 1, ndup
+    end if
+   dup_loop: do n = 1, ndup
 
-      SELECT CASE(fm)
+      select case(fm)
 
 !     if(index(platform%info%source, 'SYNOP') > 0) then
 
-         CASE (12) ;
+         case (12) ;
 
          if( n==1) ob%num_synop_glo = ob%num_synop_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_SynopObs) cycle reports
 
@@ -428,12 +425,12 @@ loop_level: DO i = 1, platform%info%levels
 !     else if(index(platform%info%source, 'SHIP') > 0 .or. &
 !             index(platform%info%source, 'BUOY') > 0) then
 
-         CASE (13, 17) ;                  ! ships   
+         case (13, 17) ;                  ! ships   
 
          if (n == 1) ob%num_ships_glo = ob%num_ships_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_ShipsObs) cycle reports
 
@@ -455,12 +452,12 @@ loop_level: DO i = 1, platform%info%levels
 
 !     else if(index(platform%info%source, 'METAR') > 0) then
 
-         CASE (15:16) ;
+         case (15:16) ;
 
          if( n==1) ob%num_metar_glo = ob%num_metar_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_MetarObs) cycle reports
 
@@ -481,12 +478,12 @@ loop_level: DO i = 1, platform%info%levels
 
 !     else if(index(platform%info%source, 'PILOT') > 0) then
 
-         CASE (32:34) ;
+         case (32:34) ;
 
          if( n==1) ob%num_pilot_glo = ob%num_pilot_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_PilotObs) cycle reports
 
@@ -507,16 +504,16 @@ loop_level: DO i = 1, platform%info%levels
            ob%pilot(num_pilot)%p(i) = platform%each(i)%p%inv
            ob%pilot(num_pilot)%u(i) = platform%each(i)%u
            ob%pilot(num_pilot)%v(i) = platform%each(i)%v
-         enddo
+         end do
 
 !     else if(index(platform%info%source, 'FM-35 TEMP') > 0) then
 
-         CASE (35:38) ;
+         case (35:38) ;
 
          if( n==1) ob%num_sound_glo = ob%num_sound_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_SoundObs) cycle reports
 
@@ -547,8 +544,8 @@ loop_level: DO i = 1, platform%info%levels
                ob%sonde_sfc(num_sound)%p = platform%each(i)%p
 
                exit
-            endif
-         enddo
+            end if
+         end do
 
 ! ............................
 !        processing the sound_sfc data:
@@ -567,9 +564,9 @@ loop_level: DO i = 1, platform%info%levels
             ob%sonde_sfc(num_sound)%t = ob%sonde_sfc(num_sound)%u
             ob%sonde_sfc(num_sound)%p = ob%sonde_sfc(num_sound)%u
             ob%sonde_sfc(num_sound)%q = ob%sonde_sfc(num_sound)%u
-         endif
+         end if
 
-         if (nlevels > 0) THEN
+         if (nlevels > 0) then
 
             allocate (ob%sound(num_sound)%h (1:nlevels))
             allocate (ob%sound(num_sound)%p (1:nlevels))
@@ -591,19 +588,19 @@ loop_level: DO i = 1, platform%info%levels
               ob%sound(num_sound)%v(j) = platform%each(i)%v
               ob%sound(num_sound)%t(j) = platform%each(i)%t
               ob%sound(num_sound)%q(j) = platform%each(i)%q
-            enddo
+            end do
          end if
 
          ob%sound(num_sound)%info%levels = nlevels
 
 !     else if(index(platform%info%source, 'SATEM') > 0) then
 
-         CASE (86)    ;
+         case (86)    ;
 
          if( n==1) ob%num_satem_glo = ob%num_satem_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_SatemObs) cycle reports
 
@@ -611,7 +608,7 @@ loop_level: DO i = 1, platform%info%levels
 
          if(platform%loc%pw%inv > 10.) then
             cycle reports
-         endif
+         end if
 
          num_satem = num_satem + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -632,11 +629,11 @@ loop_level: DO i = 1, platform%info%levels
          ob%satem(num_satem)%p(1) = platform%each(1)%p%inv
          ob%satem(num_satem)%thickness(1) = platform%each(1)%t
 !  write original thickness errors for filtered obs
-         if( analysis_type(1:6) == "QC-OBS" .or. analysis_type(1:6) == "qc-obs" ) then
-         do i = 1, nlevels
-         ob%satem(num_satem)%org_thickness(i) = platform%each(i)%t
-         end do 
-         endif
+         if (anal_type_qcobs) then
+            do i = 1, nlevels
+               ob%satem(num_satem)%org_thickness(i) = platform%each(i)%t
+            end do 
+         end if
 
 !        Splitting the reported Satem data into smaller layers.
 
@@ -650,8 +647,8 @@ loop_level: DO i = 1, platform%info%levels
            else
               ob%satem(num_satem)%thickness(i)%inv = missing_r
               ob%satem(num_satem)%thickness(i)%qc  = missing_data
-           endif
-         enddo
+           end if
+         end do
    
 !--------Thickness error (m):
 
@@ -667,15 +664,15 @@ loop_level: DO i = 1, platform%info%levels
 
 !--------Geostatinary ot Polar orbitting Satellite AMVs:
 
-         CASE (88)    ;
+         case (88)    ;
 
       if(index(platform%info%name, 'MODIS') > 0 .or. &
          index(platform%info%name, 'modis') > 0 )  then
 
          if( n==1) ob%num_polaramv_glo = ob%num_polaramv_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_polaramvObs) cycle reports
    
@@ -701,9 +698,9 @@ loop_level: DO i = 1, platform%info%levels
       else
 
          if( n==1) ob%num_geoamv_glo = ob%num_geoamv_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_geoamvObs) cycle reports
 
@@ -724,18 +721,18 @@ loop_level: DO i = 1, platform%info%levels
            ob%geoamv(num_geoamv)%p(i) = platform%each(i)%p%inv
            ob%geoamv(num_geoamv)%u(i) = platform%each(i)%u
            ob%geoamv(num_geoamv)%v(i) = platform%each(i)%v
-         enddo
+         end do
 !
       end if
 !
 !     else if(index(platform%info%source, 'AIREP') > 0) then
 
-         CASE (42,96:97) ;
+         case (42,96:97) ;
 
          if( n==1) ob%num_airep_glo = ob%num_airep_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_AirepObs) cycle reports
 
@@ -760,16 +757,16 @@ loop_level: DO i = 1, platform%info%levels
            ob%airep(num_airep)%u(i) = platform%each(i)%u
            ob%airep(num_airep)%v(i) = platform%each(i)%v
            ob%airep(num_airep)%t(i) = platform%each(i)%t
-         enddo
+         end do
 
 !     else if(index(platform%info%source, 'GPSPW') > 0) then
         ! GPSPW(111), GPSZD(114):
-         CASE (111, 114) ;
+         case (111, 114) ;
          
          if( n==1) ob%num_gpspw_glo = ob%num_gpspw_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_GpspwObs) cycle reports
 
@@ -783,12 +780,12 @@ loop_level: DO i = 1, platform%info%levels
          ob%gpspw(num_gpspw)%tpw  = platform%loc%pw
 
 !     else if(index(platform%info%source, 'GPSRF') > 0) then
-         CASE (116) ;
+         case (116) ;
 
          if( n==1) ob%num_gpsref_glo = ob%num_gpsref_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_GpsrefObs) cycle reports
 
@@ -816,15 +813,15 @@ loop_level: DO i = 1, platform%info%levels
            ob%gpsref(num_gpsref)%p(i)   = platform%each(i)%p
            ob%gpsref(num_gpsref)%t(i)   = platform%each(i)%t
            ob%gpsref(num_gpsref)%q(i)   = platform%each(i)%q
-         enddo
+         end do
 
 !        SSM/T1 temperatures:
-         CASE (121) ;
+         case (121) ;
 
          if( n==1) ob%num_ssmt1_glo = ob%num_ssmt1_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_ssmt1obs) cycle reports
 
@@ -845,15 +842,15 @@ loop_level: DO i = 1, platform%info%levels
            ob%ssmt1(num_ssmt1)%h(i) = platform%each(i)%height
            ob%ssmt1(num_ssmt1)%p(i) = platform%each(i)%p%inv
            ob%ssmt1(num_ssmt1)%t(i) = platform%each(i)%t
-         enddo
+         end do
          
 !        SSM/T2 relative humidities:
-         CASE (122) ;
+         case (122) ;
 
          if( n==1) ob%num_ssmt2_glo = ob%num_ssmt2_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_ssmt2obs) cycle reports
 
@@ -874,16 +871,16 @@ loop_level: DO i = 1, platform%info%levels
            ob%ssmt2(num_ssmt2)% h(i) = platform%each(i)%height
            ob%ssmt2(num_ssmt2)% p(i) = platform%each(i)%p%inv
            ob%ssmt2(num_ssmt2)%rh(i) = platform%each(i)%rh
-         enddo
+         end do
 
 !        Scatterometer:
 
-         CASE (281)    ;
+         case (281)    ;
 
          if( n==1) ob%num_qscat_glo = ob%num_qscat_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_qscatobs) cycle reports
 
@@ -904,12 +901,12 @@ loop_level: DO i = 1, platform%info%levels
          ob%qscat(num_qscat)%v%error = max(platform%each(1)%v%error,1.0)
 !!!DALE 
 
-         CASE (132) ;
+         case (132) ;
 
          if( n==1) ob%num_profiler_glo = ob%num_profiler_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_ProfilerObs) cycle reports
 
@@ -930,16 +927,16 @@ loop_level: DO i = 1, platform%info%levels
            ob%profiler(num_profiler)%p(i) = platform%each(i)%p%inv
            ob%profiler(num_profiler)%u(i) = platform%each(i)%u
            ob%profiler(num_profiler)%v(i) = platform%each(i)%v
-         enddo
+         end do
 
 !     else if(index(platform%info%source, 'TCBGS') > 0) then
 
-         CASE (135) ;
+         case (135) ;
 
          if( n==1) ob%num_bogus_glo = ob%num_bogus_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_BogusObs) cycle reports
 
@@ -949,10 +946,10 @@ loop_level: DO i = 1, platform%info%levels
          platform%loc%obs_global_index = ob%num_bogus_glo
 
          if( num_bogus > max_bogus_input) then
-           write(UNIT=errmsg(1),FMT='(A,I6,A,I6)') &
+           write(unit=message(1),fmt='(A,I6,A,I6)') &
              'Bogus #=', num_bogus, ' > max_bogus_input=', max_bogus_input
-           CALL da_error(__FILE__,__LINE__,errmsg(1:1))
-         endif
+           call da_error(__FILE__,__LINE__,message(1:1))
+         end if
 
          ob%bogus(num_bogus)%info = platform%info
          ob%bogus(num_bogus)%loc  = platform%loc
@@ -972,31 +969,31 @@ loop_level: DO i = 1, platform%info%levels
            ob%bogus(num_bogus)%v(i) = platform%each(i)%v
            ob%bogus(num_bogus)%t(i) = platform%each(i)%t
            ob%bogus(num_bogus)%q(i) = platform%each(i)%q
-         enddo
+         end do
 
          ob%bogus(num_bogus)%slp    = platform%loc%slp
 
          if ( print_detail_obs) then
-           WRITE(UNIT=stdout,FMT=*) 'nlevels=', nlevels
-           WRITE(UNIT=stdout,FMT=*) 'ob % num_bogus,slp', num_bogus,  &
+           write(unit=stdout,fmt=*) 'nlevels=', nlevels
+           write(unit=stdout,fmt=*) 'ob % num_bogus,slp', num_bogus,  &
                     ob % bogus ( num_bogus ) % slp
   	    do i=1,nlevels
-               WRITE(UNIT=stdout,FMT=*) 'ob % num_bogus, i ', num_bogus,i
-               WRITE(UNIT=stdout,FMT=*) 'ob%bogus(ob%num_bogus)%u,v=',  &
+               write(unit=stdout,fmt=*) 'ob % num_bogus, i ', num_bogus,i
+               write(unit=stdout,fmt=*) 'ob%bogus(ob%num_bogus)%u,v=',  &
                        ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)
-               WRITE(UNIT=stdout,FMT=*) 'ob%bogus(ob%num_bogus)%t,q=',  &
+               write(unit=stdout,fmt=*) 'ob%bogus(ob%num_bogus)%t,q=',  &
                        ob%bogus(num_bogus)%t(i),ob%bogus(num_bogus)%q(i)
-            enddo
-            write(UNIT=stdout,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
+            end do
+            write(unit=stdout,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
                                      'nlevels=',nlevels
          end if
 
-         CASE (18,19) ;             ! buoy
+         case (18,19) ;             ! buoy
 
          if( n==1) ob%num_buoy_glo = ob%num_buoy_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_BuoyObs) cycle reports
 
@@ -1016,11 +1013,11 @@ loop_level: DO i = 1, platform%info%levels
          ob%buoy(num_buoy)%q = platform%each(1)%q
 !--------AIRS retrievals                                     
 
-         CASE (133)    ;         ! AIRS retrievals  
+         case (133)    ;         ! AIRS retrievals  
          if( n==1) ob%num_airsr_glo = ob%num_airsr_glo + 1
-         IF(outside) THEN
-            CYCLE reports
-         ENDIF
+         if(outside) then
+            cycle reports
+         end if
 
          if(.not.use_AIRSRETObs) cycle reports
    
@@ -1044,16 +1041,16 @@ loop_level: DO i = 1, platform%info%levels
               ob%airsr(num_airsr)%q(i) = platform%each(i)%q
          end do
 
-         CASE DEFAULT;
+         case default;
 
-            write(unit=errmsg(1), fmt='(a)') 'unsaved obs found:'
-            write(unit=errmsg(2), fmt='(2a)') &
+            write(unit=message(1), fmt='(a)') 'unsaved obs found:'
+            write(unit=message(2), fmt='(2a)') &
                'platform%info%platform=', platform%info%platform
-            write(unit=errmsg(3), fmt='(a, i3)') &
+            write(unit=message(3), fmt='(a, i3)') &
                'platform%info%levels=', platform%info%levels
-            CALL da_warning(__FILE__,__LINE__,errmsg(1:3))
+            call da_warning(__FILE__,__LINE__,message(1:3))
 
-      END SELECT
+      end select
 
      if( global .and. n < 2 ) then
       if( Testing_WRFVAR ) exit dup_loop
@@ -1066,9 +1063,9 @@ loop_level: DO i = 1, platform%info%levels
       platform%loc%proc_domain = .not. platform%loc%proc_domain
      end if
 
-    ENDDO dup_loop
+    end do dup_loop
 
-   ENDDO reports
+   end do reports
 
 !------------------------------------------------------------------------
    ob%num_sound = num_sound
@@ -1095,14 +1092,14 @@ loop_level: DO i = 1, platform%info%levels
 
 !------------------------------------------------------------------------
 
-!  PRINT OUT
+!  PRinT out
 !  =============
 
    if(print_detail_obs) then
 
-      write(UNIT=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
+      write(unit=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
 
-      write(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      write(unit=stdout, fmt='(5x,a,i6,a)') &
            'Read:  ', num_sound,           ' SOUND          reports,', &
            'Read:  ', num_synop,           ' SYNOP          reports,', &
            'Read:  ', num_pilot,           ' PILOT          reports,', &
@@ -1134,7 +1131,7 @@ loop_level: DO i = 1, platform%info%levels
                                    - num_profiler - num_buoy &
                                    - num_bogus - num_airsr , &
                                    '  reports unsaved.'
-      write(unit=stdout,FMT=*) ' '
+      write(unit=stdout,fmt=*) ' '
    end if
 
    if((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
@@ -1194,19 +1191,22 @@ loop_level: DO i = 1, platform%info%levels
            'ob%ob_numb(ob%current_ob_time)%profiler=', ob%ob_numb(ob%current_ob_time)%profiler, &
            'ob%num_profiler=', ob%num_profiler
 
-      CALL da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
-   endif
+      call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
+   end if
 
 !  if((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
 !     (ob%ob_numb(ob%current_ob_time)%ssmi_retrieval /= ob%num_ssmi_retrieval)) then
-!     write(unit=errmsg(1), fmt='(a, i6, 2x, a, i6)') &
+!     write(unit=message(1), fmt='(a, i6, 2x, a, i6)') &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_tb       =', ob%ob_numb(ob%current_ob_time)%ssmi_tb, &
 !          'ob%num_ssmi_tb       =', ob%num_ssmi_tb, &
 !          'ob%ob_numb(ob%current_ob_time)%ssmi_retrieval=', ob%ob_numb(ob%current_ob_time)%ssmi_retrieval, &
 !          'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
-!     call da_error(__FILE__,__LINE,errmsg(1:1))
-!  endif
+!     call da_error(__FILE__,__LINE,message(1:1))
+!  end if
 
-   IF (trace_use) CALL da_trace_exit("da_read_obs")
+   close(iunit)
+   call da_free_unit(iunit)
 
-END SUBROUTINE da_read_obs
+   if (trace_use) call da_trace_exit("da_read_obs")
+
+end subroutine da_read_obs

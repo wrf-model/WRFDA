@@ -39,7 +39,7 @@ OBJS_FOR_ALL =		da_solve.o		\
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_constants.o		\
+			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
 			gsi_kinds.o		\
@@ -84,7 +84,7 @@ da_generic_boilerplate.inc:	da_generic_boilerplate.m4
 
 da_par_util.o:		da_par_util.f90                   \
                         da_define_structures.o		  \
-			da_constants.o			  \
+			da_control.o			  \
                         da_par_util1.o                    \
 			da_alloc_and_copy_be_arrays.inc   \
 			da_be_local_copy.inc              \
@@ -119,7 +119,7 @@ da_par_util1.o:		da_proc_sum_int.inc               \
 			$(CPP) $(CPPFLAGS) -I../inc da_par_util1.f90 > da_par_util1.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_par_util1.f
 
-da_solve.o:		da_constants.o			\
+da_solve.o:		da_control.o			\
 			da_define_structures.o		\
 			da_setup_structures.o		\
 			da_test.o			\
@@ -134,7 +134,7 @@ da_solve.o:		da_constants.o			\
 
 da_minimisation.o:	da_minimisation.f90 \
 			da_wrfvar_io.o \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_vtox_transforms.o \
 			da_obs.o \
@@ -176,7 +176,7 @@ da_minimisation.o:	da_minimisation.f90 \
 
 da_setup_structures.o:	da_setup_structures.f90 \
 			da_define_structures.o \
-			da_constants.o \
+			da_control.o \
 			da_grid_definitions.o \
 			da_obs.o \
 			da_ssmi.o \
@@ -229,7 +229,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_define_structures.o \
 			da_tools.o \
 			da_recursive_filter.o \
-			da_constants.o \
+			da_control.o \
 			da_dynamics.o \
 			da_physics.o \
 			da_spectral.o \
@@ -259,7 +259,7 @@ da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_vtox_transforms.f
 
 da_obs.o:		da_obs.f90 \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_airep.o \
 			da_gpspw.o \
@@ -310,7 +310,7 @@ da_obs.o:		da_obs.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_obs.f
 
 da_pseudo.o:		da_pseudo.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -329,7 +329,7 @@ da_pseudo.o:		da_pseudo.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pseudo.f
 
 da_metar.o:		da_metar.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -350,7 +350,7 @@ da_metar.o:		da_metar.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_metar.f
 
 da_geoamv.o:		da_geoamv.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -370,7 +370,7 @@ da_geoamv.o:		da_geoamv.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_geoamv.f
 
 da_polaramv.o:		da_polaramv.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -390,7 +390,7 @@ da_polaramv.o:		da_polaramv.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_polaramv.f
 
 da_satem.o:		da_satem.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -410,7 +410,7 @@ da_satem.o:		da_satem.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_satem.f
 
 da_ships.o:		da_ships.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -431,7 +431,7 @@ da_ships.o:		da_ships.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ships.f
 
 da_synop.o:		da_synop.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -453,7 +453,7 @@ da_synop.o:		da_synop.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_synop.f
 
 da_sound.o:		da_sound.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -486,7 +486,7 @@ da_sound.o:		da_sound.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_sound.f
 
 da_airep.o:		da_airep.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -506,7 +506,7 @@ da_airep.o:		da_airep.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_airep.f
 
 da_pilot.o:		da_pilot.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -526,7 +526,7 @@ da_pilot.o:		da_pilot.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pilot.f
 
 da_bogus.o:		da_bogus.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -547,7 +547,7 @@ da_bogus.o:		da_bogus.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bogus.f
 
 da_radar.o:		da_radar.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -575,7 +575,7 @@ da_radar.o:		da_radar.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radar.f
 
 da_gpspw.o:		da_gpspw.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -596,7 +596,7 @@ da_gpspw.o:		da_gpspw.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_gpspw.f
 
 da_gpsref.o:		da_gpsref.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -617,7 +617,7 @@ da_gpsref.o:		da_gpsref.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_gpsref.f
 
 da_ssmi.o:		da_ssmi.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -682,7 +682,7 @@ da_ssmi.o:		da_ssmi.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ssmi.f
 
 da_qscat.o:		da_qscat.f90 \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_interpolation.o \
 			da_statistics.o \
@@ -718,7 +718,7 @@ da_airsr.o:		da_airsr.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_airsr.f
 
 da_profiler.o:		da_profiler.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -740,7 +740,7 @@ da_profiler.o:		da_profiler.f90 \
 
 
 da_buoy.o:		da_buoy.f90 \
-			da_constants.o \
+			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
 			da_interpolation.o \
@@ -761,7 +761,7 @@ da_buoy.o:		da_buoy.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_buoy.f
 
 da_dynamics.o:		da_dynamics.f90 \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_statistics.o \
 			da_ffts.o \
@@ -789,7 +789,7 @@ da_dynamics.o:		da_dynamics.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_dynamics.f
 
 da_physics.o:		da_physics.f90 \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_grid_definitions.o \
 			da_interpolation.o \
@@ -859,7 +859,7 @@ da_ffts.o:		\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ffts.f
 
 da_tools.o:		\
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_tools.f90 \
 			da_map_utils_defines.inc \
@@ -893,7 +893,7 @@ da_tools.o:		\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools.f
 
 da_recursive_filter.o:	\
-			da_constants.o \
+			da_control.o \
 			da_recursive_filter.f90 \
                         da_perform_2drf.inc \
 			da_calculate_rf_factors.inc \
@@ -906,7 +906,7 @@ da_recursive_filter.o:	\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_recursive_filter.f
 
 da_interpolation.o:	\
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_grid_definitions.o \
 			da_tools.o \
@@ -923,7 +923,7 @@ da_interpolation.o:	\
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_interpolation.f
 
 da_grid_definitions.o:	\
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_grid_definitions.f90 \
 			da_ref_height.inc \
@@ -949,7 +949,7 @@ da_statistics.o:	da_statistics.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_statistics.f
 
 da_define_structures.o:	da_define_structures.f90 \
-			da_constants.o \
+			da_control.o \
                         da_tracing.o \
 			da_allocate_background_errors.inc \
 			da_allocate_observations.inc \
@@ -966,7 +966,7 @@ da_define_structures.o:	da_define_structures.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_define_structures.f90 > da_define_structures.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_define_structures.f
 
-da_constants.o:		da_constants.f90 \
+da_control.o:		da_control.f90 \
 			da_array_print.inc \
 			da_advance_cymdh.inc \
 			da_change_date.inc \
@@ -974,11 +974,11 @@ da_constants.o:		da_constants.f90 \
 			da_find_fft_trig_funcs.inc \
                         ../frame/module_driver_constants.o 
 			$(RM) $@
-			$(CPP) -I../inc $(CPPFLAGS) -I../inc da_constants.f90 > da_constants.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_constants.f
+			$(CPP) -I../inc $(CPPFLAGS) -I../inc da_control.f90 > da_control.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_control.f
 
 da_test.o:		da_test.f90 \
-			da_constants.o \
+			da_control.o \
 			da_define_structures.o \
 			da_physics.o \
 			da_vtox_transforms.o \
@@ -1041,8 +1041,16 @@ da_test.o:		da_test.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_test.f90 > da_test.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_test.f
 
+da_etkf.o:	        da_etkf.f90 \
+			da_innerprod.inc \
+                        da_matmulti.inc \
+                        da_matmultiover.inc \
+			da_solve_etkf.inc
+			$(CPP) $(CPPFLAGS) -I../inc da_etkf.f90 > da_etkf.f
+			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_etkf.f
+
 da_gen_be.o:	        da_gen_be.f90 \
-			da_constants.o			\
+			da_control.o			\
                         da_tracing.o                    \
 			da_transform_vptovv.inc	\
 			da_eof_decomposition.inc       \
@@ -1066,7 +1074,7 @@ da_gen_be.o:	        da_gen_be.f90 \
 			$(FC) -c $(FCFLAGS) -I${NETCDF}/include -I../frame da_gen_be.f
 
 da_spectral.o:		da_spectral.f90             \
-			da_constants.o		    \
+			da_control.o		    \
 			da_define_structures.o	    \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
@@ -1122,7 +1130,7 @@ da_tracing.o:           da_tracing.f90           \
                         da_trace_real_sort.inc \
                         da_trace_report.inc    \
                         da_reporting.o                    \
-                        da_constants.o                    \
+                        da_control.o                    \
                         da_memory.o                       \
                         da_par_util1.o
 			$(CPP) $(CPPFLAGS) -I../inc da_tracing.f90 > da_tracing.f
@@ -1137,7 +1145,7 @@ da_reporting.o:         da_reporting.f90       \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_reporting.f
 
 be_spectral.o:		da_be_spectral.f90          \
-			da_constants.o	            \
+			da_control.o	            \
 			da_asslegpol.inc            \
 			da_calc_power.inc           \
 			da_get_gausslats.inc        \
@@ -1155,7 +1163,7 @@ be_spectral.o:		da_be_spectral.f90          \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_be_spectral.f
 
 da_radiance.o:		da_radiance.f90 \
-                        da_constants.o          \
+                        da_control.o          \
 			da_define_structures.o  \
 			da_interpolation.o \
 			da_statistics.o \

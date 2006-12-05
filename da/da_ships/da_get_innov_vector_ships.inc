@@ -1,33 +1,33 @@
 subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: it      ! External iteration.
-   TYPE (xb_type),    INTENT(IN)    :: xb      ! first guess state.
-   TYPE (xpose_type), INTENT(IN)    :: xp      ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(INOUT) :: ob      ! Observation structure.
-   TYPE (ob_type),    INTENT(INOUT) :: iv      ! O-B structure.
+   integer,           intent(in)    :: it      ! External iteration.
+   type (xb_type),    intent(in)    :: xb      ! first guess state.
+   type (xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: ob      ! Observation structure.
+   type (ob_type),    intent(inout) :: iv      ! O-B structure.
 
    !-------------------------------------------------------------------------
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j, k  ! Index dimension.
-   REAL                         :: dx, dxm  ! Interpolation weights.
-   REAL                         :: dy, dym  ! Interpolation weights.
-   REAL                         :: model_u  ! Model value u at oblocation.
-   REAL                         :: model_v  ! Model value v at oblocation.
-   REAL                         :: model_t  ! Model value t at oblocation.
-   REAL                         :: model_p  ! Model value p at oblocation.
-   REAL                         :: model_q  ! Model value q at oblocation.
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j, k  ! Index dimension.
+   real                         :: dx, dxm  ! Interpolation weights.
+   real                         :: dy, dym  ! Interpolation weights.
+   real                         :: model_u  ! Model value u at oblocation.
+   real                         :: model_v  ! Model value v at oblocation.
+   real                         :: model_t  ! Model value t at oblocation.
+   real                         :: model_p  ! Model value p at oblocation.
+   real                         :: model_q  ! Model value q at oblocation.
 
-   REAL, DIMENSION(xp%kms:xp%kme) :: v_h   ! Model value h at ob hor. location.
-   REAL, DIMENSION(xp%kms:xp%kme) :: v_p   ! Model value p at ob hor. location.
+   real, dimension(xp%kms:xp%kme) :: v_h   ! Model value h at ob hor. location.
+   real, dimension(xp%kms:xp%kme) :: v_p   ! Model value p at ob hor. location.
 
-   REAL :: hd, psfcm
+   real :: hd, psfcm
 
-   REAL :: hsm , ho, to, qo
+   real :: hsm , ho, to, qo
 
-   INTEGER :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
+   integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
    !-------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
 
-   DO n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
+   do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &
       iv%ob_numb(iv%current_ob_time)%ships
 
       ! [1.1] Get horizontal interpolation weights:
@@ -61,15 +61,15 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
       if (sfc_assi_options == 1) then
          iv%ships(n)%zk=missing_r
 
-         IF ( iv % ships(n) % h > missing_r) THEN
+         if ( iv % ships(n) % h > missing_r) then
             do k=xp%kts,xp%kte
               v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                         + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-            enddo
+            end do
 
             hd = v_h(xp%kts) - iv % ships(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) THEN
+            if (abs(hd) <= Max_StHeight_Diff) then
                if(iv % ships(n) % h < v_h(xp%kts)) then
                   iv%ships(n)%zk = 1.0+1.0e-6
                   call da_obs_sfc_correction(iv%ships(n), xb)
@@ -85,15 +85,15 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
                else
                   call da_to_zk(iv % ships(n) % h, v_h, xp, v_interp_h, &
                      iv%ships(n)%zk)
-               endif
+               end if
             else
                iv%ships(n)%zk = missing_r
-            endif
-         ELSE IF ( ob % ships(n) % p > 1.0 ) THEN
+            end if
+         else if ( ob % ships(n) % p > 1.0 ) then
             do k=xp%kts,xp%kte
               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                        + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-            enddo
+            end do
 
             call da_to_zk(ob % ships(n) % p, v_p, xp, v_interp_p, &
                iv%ships(n)%zk)
@@ -102,8 +102,8 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
                iv % ships(n) % p % inv = missing_r
                iv % ships(n) % p % qc  = missing
                iv%ships(n)%zk = 1.0+1.0e-6
-            endif
-         ENDIF
+            end if
+         end if
 
          !-------------------------------------------------------------------
          ! [2.0] Initialise components of innovation vector:
@@ -140,7 +140,7 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
             call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xb%kms), xp, &
                i, j, dx, dy, dxm, dym, model_p, iv%ships(n)%zk)
 #endif
-         endif
+         end if
       else if (sfc_assi_options == 2) then
 
          ! Surface data assimilation approca 2
@@ -188,73 +188,75 @@ subroutine da_get_innov_vector_ships ( it, xb, xp, ob, iv )
             else
                 call da_sfc_pre (psfcm, model_p, model_t, model_q, &
                                  hsm, ho)
-            endif
+            end if
 
             !.......... Pressure at the observed height:
             model_p = psfcm
-         endif
-      endif
+         end if
+      end if
 
       !-----------------------------------------------------------------------
       ! [3.0] Fast interpolation:
       !-----------------------------------------------------------------------
 
-      IF (ob % ships(n) % u > missing_r .AND. &
-         iv % ships(n) % u % qc >= obs_qc_pointer ) THEN
+      if (ob % ships(n) % u > missing_r .AND. &
+         iv % ships(n) % u % qc >= obs_qc_pointer ) then
          iv % ships(n) % u % inv = iv%ships(n)%u%inv - model_u
-      ELSE
+      else
          iv % ships(n) % u % inv = 0.0
-      ENDIF
+      end if
 
-      IF (ob % ships(n) % v > missing_r .AND. &
-         iv % ships(n) % v % qc >= obs_qc_pointer ) THEN
+      if (ob % ships(n) % v > missing_r .AND. &
+         iv % ships(n) % v % qc >= obs_qc_pointer ) then
          iv % ships(n) % v % inv = iv%ships(n)%v%inv - model_v
-      ELSE
+      else
          iv % ships(n) % v % inv = 0.0
-      ENDIF
+      end if
 
-      IF (ob % ships(n) % p > 0.0 .AND. &
-          iv % ships(n) % p % qc >= obs_qc_pointer ) THEN
+      if (ob % ships(n) % p > 0.0 .AND. &
+          iv % ships(n) % p % qc >= obs_qc_pointer ) then
          iv % ships(n) % p % inv = iv%ships(n)%p%inv - model_p
-      ELSE
+      else
          iv % ships(n) % p % inv = 0.0
-      ENDIF
+      end if
 
-      IF (ob % ships(n) % t > 0.0 .AND. &
-          iv % ships(n) % t % qc >= obs_qc_pointer ) THEN
+      if (ob % ships(n) % t > 0.0 .AND. &
+          iv % ships(n) % t % qc >= obs_qc_pointer ) then
          iv % ships(n) % t % inv = iv%ships(n)%t%inv - model_t
-      ELSE
+      else
          iv % ships(n) % t % inv = 0.0
-      ENDIF
+      end if
 
-      IF (ob % ships(n) % q > 0.0 .AND. &
-          iv % ships(n) % q % qc >= obs_qc_pointer ) THEN
+      if (ob % ships(n) % q > 0.0 .AND. &
+          iv % ships(n) % q % qc >= obs_qc_pointer ) then
          iv % ships(n) % q % inv = iv%ships(n)%q%inv - model_q
-      ELSE
+      else
          iv % ships(n) % q % inv = 0.0
-      ENDIF
+      end if
 
       !---------------------------------------------------------------------
       ! [5.0] Perform optional maximum error check:
       !---------------------------------------------------------------------
 
-      IF ( check_max_iv ) THEN
+      if ( check_max_iv ) then
         call da_check_max_iv_ships(it, iv % ships(n), &
                        itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
-      END IF
-   enddo
+      end if
+   end do
 
-   write(unit= check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for Ships follows:'
+   if (check_max_iv_print) then
+      write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Ships follows:'
 
-   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-      'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-      'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-      'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
-      'Number of failed temperature observations:',ittf, ' on ',itt,   &
-      'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-      'Finally Total Ships rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
-                                        itu +itvv +itp +itt +itqv
+      write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
+         'Number of failed temperature observations:',ittf, ' on ',itt,   &
+         'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+         'Finally Total Ships rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+                                           itu +itvv +itp +itt +itqv
+   end if
 
 end subroutine da_get_innov_vector_ships
 

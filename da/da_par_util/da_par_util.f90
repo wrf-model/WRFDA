@@ -4,7 +4,7 @@
 ! Utility subroutines for parallel WRFVAR.
 !---------------------------------------------------------------------------
 
-MODULE da_par_util
+module da_par_util
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
@@ -12,32 +12,23 @@ MODULE da_par_util
    ! METHOD:  RSL/MPI.
    !---------------------------------------------------------------------------
 
-   USE da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
-   USE da_par_util1
-    
-   IMPLICIT NONE
+   use da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
+   use da_par_util1
 
-#if ( DWORDSIZE != RWORDSIZE )
-#define TRUE_MPI_REAL     MPI_REAL
-#define TRUE_RSL_REAL     RSL_REAL
-#else
-#define TRUE_MPI_REAL     MPI_REAL8
-#define TRUE_RSL_REAL     RSL_DOUBLE
-#endif
+   implicit none
 
 #include "da_generic_typedefs.inc"
 
-   INTERFACE da_wv_patch_to_global
-      MODULE PROCEDURE da_wv_patch_to_global_2d
-      MODULE PROCEDURE da_wv_patch_to_global_3d
-   END INTERFACE
+   interface da_wv_patch_to_global
+      module PROCEDURE da_wv_patch_to_global_2d
+      module PROCEDURE da_wv_patch_to_global_3d
+   end interface
 
-   CONTAINS
+   contains
 
 #include "da_cv_to_vv.inc"
 #include "da_vv_to_cv.inc"
 #include "da_alloc_and_copy_be_arrays.inc"
-#include "da_be_local_copy.inc"
 #include "da_copy_dims.inc"
 #include "da_copy_tile_dims.inc"
 #include "da_pack_count_obs.inc"
@@ -68,5 +59,5 @@ MODULE da_par_util
 
 #endif
 
-END MODULE da_par_util
+end module da_par_util
 

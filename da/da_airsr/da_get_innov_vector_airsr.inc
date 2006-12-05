@@ -7,38 +7,38 @@ subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
    !                   if required.
    !----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: it       ! External iteration.
-   TYPE (xb_type),    INTENT(IN)    :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)    :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(INOUT) :: ob       ! Observation structure.
-   TYPE (ob_type),    INTENT(INOUT) :: iv       ! O-B structure.
+   integer,           intent(in)    :: it       ! External iteration.
+   type (xb_type),    intent(in)    :: xb       ! first guess state.
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: ob       ! Observation structure.
+   type (ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
 
-   REAL, DIMENSION(1:max_ob_levels) :: model_t  ! Model value t at ob location.
-   REAL, DIMENSION(1:max_ob_levels) :: model_q  ! Model value q at ob location.
-   ! REAL, DIMENSION(1:max_ob_levels) :: model_h  ! Model value h at ob location.
+   real, dimension(1:max_ob_levels) :: model_t  ! Model value t at ob location.
+   real, dimension(1:max_ob_levels) :: model_q  ! Model value q at ob location.
+   ! real, dimension(1:max_ob_levels) :: model_h  ! Model value h at ob location.
 
-   REAL, DIMENSION(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
-   REAL, DIMENSION(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
+   real, dimension(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
+   real, dimension(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-   REAL                         :: model_p  ! Model value p at oblocation.
-   REAL                         :: model_h  ! Model value h at oblocation.
+   real                         :: model_p  ! Model value p at oblocation.
+   real                         :: model_h  ! Model value h at oblocation.
 
-   INTEGER                      :: itt,ittf,itqv,itqvf
+   integer                      :: itt,ittf,itqv,itqvf
 
-   IF ( iv%num_airsr < 1 ) return
+   if ( iv%num_airsr < 1 ) return
 
    itt  = 0; itqv  = 0;
    ittf = 0; itqvf = 0;
 
-   DO n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
+   do n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
       num_levs = iv%airsr(n)%info%levels
 
       if ( num_levs < 1 ) cycle
@@ -61,22 +61,22 @@ subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                 + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-      enddo
+      end do
 
       do k=1, num_levs
         iv%airsr(n)%zk(k)=missing_r
 
-        IF ( iv%airsr(n)%p(k) > 1.0 ) THEN
+        if ( iv%airsr(n)%p(k) > 1.0 ) then
           call da_to_zk(iv%airsr(n)%p(k), v_p, xp, v_interp_p, iv%airsr(n)%zk(k))
-        ELSE IF ( iv%airsr(n)%h(k) > 0.0 ) THEN
+        else if ( iv%airsr(n)%h(k) > 0.0 ) then
           call da_to_zk(iv%airsr(n)%h(k), v_h, xp, v_interp_h, iv%airsr(n)%zk(k))
-        ENDIF
+        end if
 
         if (iv%airsr(n)%zk(k) < 0.0) then
           iv%airsr(n)%t(k)%qc = missing
           iv%airsr(n)%q(k)%qc = missing
-        endif
-      enddo
+        end if
+      end do
 
       ! [1.2] Interpolate horizontally to ob:
 
@@ -108,32 +108,34 @@ subroutine da_get_innov_vector_airsr ( it, xb, xp, ob, iv )
         ! [3.0] Interpolation:
         !------------------------------------------------------------------------
 
-        IF ( ob%airsr(n)%t(k) > missing_r .AND. &
-             iv%airsr(n)%t(k)%qc >= obs_qc_pointer ) THEN
+        if ( ob%airsr(n)%t(k) > missing_r .AND. &
+             iv%airsr(n)%t(k)%qc >= obs_qc_pointer ) then
           iv%airsr(n)%t(k)%inv = ob%airsr(n)%t(k) - model_t(k)
-        ENDIF
+        end if
 
-        IF ( ob%airsr(n)%q(k) > missing_r .AND. &
-             iv%airsr(n)%q(k)%qc >= obs_qc_pointer ) THEN
+        if ( ob%airsr(n)%q(k) > missing_r .AND. &
+             iv%airsr(n)%q(k)%qc >= obs_qc_pointer ) then
           iv%airsr(n)%q(k)%inv = ob%airsr(n)%q(k) - model_q(k)
-        ENDIF
-      END DO
+        end if
+      end do
 
       !------------------------------------------------------------------------
       ! [5.0] Perform optional maximum error check:
       !------------------------------------------------------------------------
 
-      IF ( check_max_iv ) &    
-         CALL da_check_max_iv_airsr(it, iv % airsr(n),itt,ittf,itqv,itqvf)
-   END DO
+      if ( check_max_iv ) &    
+         call da_check_max_iv_airsr(it, iv % airsr(n),itt,ittf,itqv,itqvf)
+   end do
 
-   write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for airsr follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for airsr follows:'
 
-   WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-     'Number of failed temperature observations:',ittf, ' on ',itt,   &
-     'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-     'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
+      write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+        'Number of failed temperature observations:',ittf, ' on ',itt,   &
+        'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+        'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
+   end if
 
 end subroutine da_get_innov_vector_airsr
 

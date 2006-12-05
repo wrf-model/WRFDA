@@ -1,20 +1,20 @@
 subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type(jo_type), INTENT(INOUT) :: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
    jo % profiler_u = 0.0
    jo % profiler_v = 0.0
 
-   IF (iv%num_profiler > 0) THEN
-      DO n=1, iv%num_profiler
+   if (iv%num_profiler > 0) then
+      do n=1, iv%num_profiler
          do k=1, iv%profiler(n)%info%levels
             jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
                                       ( iv%profiler(n)%u(k)%error * &
@@ -31,13 +31,13 @@ subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
                jo % profiler_v = jo % profiler_v - &
                          re%profiler(n)%v(k) * jo_grad_y%profiler(n)%v(k)
             end do
-         endif
-      END DO
+         end if
+      end do
       
       jo % profiler_u = 0.5 * jo % profiler_u
       jo % profiler_v = 0.5 * jo % profiler_v
       
-   END IF
+   end if
 
 end subroutine da_get_jo_and_grady_profiler
 

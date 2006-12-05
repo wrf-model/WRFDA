@@ -1,29 +1,29 @@
-SUBROUTINE da_system_4dvar( cmd_line_in )
+subroutine da_system_4dvar( cmd_line_in )
 
    ! Not sure if this should go here, but here it goes for now.
    ! This is a wrapper around the "system" call.  Will compile
    ! to just system for single processor. On DM_PARALLEL compiles,
    ! it will call system only on the 0th processor.
 
-   IMPLICIT NONE
-   CHARACTER*(*) cmd_line_in
-   CHARACTER*256 cmd_line
+   implicit none
+   character*(*) cmd_line_in
+   character*256 cmd_line
 
 #ifdef DM_PARALLEL
-   INTEGER comm, ierr
-   IF (rootproc) THEN
-      cmd_line = TRIM(cmd_line_in) // " monitor"
-   ELSE
-      cmd_line = TRIM(cmd_line_in) // " other"
-   ENDIF
-   call wrf_get_dm_communicator ( comm )
+   if (rootproc) then
+      cmd_line = trim(cmd_line_in) // " monitor"
+   else
+      cmd_line = trim(cmd_line_in) // " other"
+   end if
    call mpi_barrier ( comm, ierr )
 #else
    cmd_line = cmd_line_in // " other"
 #endif
-   CALL da_system( cmd_line )
+   call da_system( cmd_line )
 #ifdef DM_PARALLEL
    call mpi_barrier ( comm, ierr )
 #endif
 
-END subroutine da_system_4dvar
+end subroutine da_system_4dvar
+
+

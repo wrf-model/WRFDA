@@ -38,7 +38,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   TARGET                   :: grid
+   type(domain) ,   target                   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer                           :: iter            
@@ -53,22 +53,19 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
 
-   integer                           :: ndynopt
+   integer                           :: ndynopt, cg_jcdf
 
-   IF (trace_use) call da_trace_entry("da_minimise_cg")
+   if (trace_use) call da_trace_entry("da_minimise_cg")
 
-   write (UNIT=stdout,FMT='(a/)') ' ----------------------------------------------------------'
-   WRITE(UNIT=stdout,FMT='(A)') ' [5.2] Minimize cost function Using CG Method'
+   write(unit=stdout,fmt='(A)') 'Minimize cost function using CG method'
    if (calculate_cg_cost_fn) then
-      WRITE(UNIT=stdout,FMT='(A)') &
-         '  For this run cost function diagnostics will be written'
+      write(unit=stdout,fmt='(A)') &
+         'For this run cost function diagnostics will be written'
    else
-      WRITE(UNIT=stdout,FMT='(A)') &
-         '  For this run cost function diagnostics will not be written'
+      write(unit=stdout,fmt='(A)') &
+         'For this run cost function diagnostics will not be written'
    end if
-   WRITE(UNIT=stdout,FMT='(A)') &
-      ' ----------------------------------------------------------'
-   WRITE(UNIT=stdout,FMT=*) ' '
+   write(unit=stdout,fmt=*) ' '
 
    ! Initialize temporary cv structures:
    xhat = 0.0
@@ -76,6 +73,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    fhat = 0.0
 
    call da_allocate_y(iv, jo_grad_y)
+
 
    call da_calculate_j( it, 0, cv_size, be % cv % size_jb, be % cv % size_je, &
                         xb, xbx, be, ep, iv, xhat, cv, &
@@ -95,29 +93,30 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    if (it == 1) j_grad_norm_target = sqrt (rrmold)
 
-   WRITE(UNIT=stdout,FMT='("Starting outer iteration : ",i310)') it
-   WRITE(UNIT=stdout,FMT=11)j_grad_norm_target,eps(it)*j_grad_norm_target, &
+   write(unit=stdout,fmt='("Starting outer iteration : ",i3)') it
+   write(unit=stdout,fmt=11) j_grad_norm_target,eps(it)*j_grad_norm_target, &
               j%total, sqrt(rrmold)
-11 format(2x,'Original gradient is ',1PD15.8,/,&
-          2x,'For this outer iteration Gradient target is ',1PD15.8,/,&
-          2x,'Starting Cost function: ' ,1PD15.8,' Gradient= ',1PD15.8)
-   WRITE(UNIT=stdout,FMT='(A)') &
+11 format('Original gradient is ',1PD15.8,/,&
+          'For this outer iteration gradient target is ',1PD15.8,/,&
+          'Starting cost function: ' ,1PD15.8,' gradient= ',1PD15.8)
+   write(unit=stdout,fmt='(A)') &
       ' ----------------------------------------------------------'
    if (calculate_cg_cost_fn) then
-      WRITE(UNIT=stdout,FMT='(2x,/,2x,A)') &
-         ' Iter    Cost Function         Gradient             Step'
+      write(unit=stdout,fmt='(1x,/,A)') &
+         'Iter    Cost Function         Gradient             Step'
    else
-      WRITE(UNIT=stdout,FMT='(2x,/,2x,A)')' Iter      Gradient             Step'
-   endif
-   WRITE(UNIT=stdout,FMT=*) ' '
+      write(unit=stdout,fmt='(1x,/,A)')'Iter      Gradient             Step'
+   end if
+   write(unit=stdout,fmt=*) ' '
 
    !-------------------------------------------------------------------------
    ! [2.0] iteratively solve for minimum of cost function:
    !-------------------------------------------------------------------------
 
    do iter=1, ntmax
-      if (rrmold == 0.) go to 1002
+      if (rrmold == 0.0) go to 1002
       fhat = phat
+      cg_jcdf = 1
 
       call da_transform_vtoy( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
                               ids, ide, jds, jde, kds, kde,                     &
@@ -132,7 +131,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
                                   ids, ide, jds, jde, kds, kde,                     &
                                   ims, ime, jms, jme, kms, kme,                     &
                                   its, ite, jts, jte, kts, kte,                     &
-                                  grid, config_flags                                )
+                                  grid, config_flags, cg_jcdf                       )
 
       je_start = be % cv % size_jb + 1
       je_end = be % cv % size_jb + be % cv % size_je
@@ -141,7 +140,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
       fhat(1:cv_size_jb) = - fhat(1:cv_size_jb) + jb_factor*phat(1:cv_size_jb)
       fhat(je_start:je_end) = - fhat(je_start:je_end) + je_factor*phat(je_start:je_end)
       apdotp = da_dot_cv( cv_size, cv_size_domain, fhat, phat, xp, & 
-                       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
       step = 0.0
       if (apdotp .gt. 0.0) step = rrmold/apdotp
@@ -156,30 +155,30 @@ subroutine da_minimise_cg( grid, config_flags,            &
                              ims, ime, jms, jme, kms, kme,             &
                              its, ite, jts, jte, kts, kte,             &
                              grid, config_flags                        )
-          ob_grad = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
-                       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+            ob_grad = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
+            (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
          ob_grad = sqrt(ob_grad)
       end if
 
-      rrmnew = da_dot_cv( cv_size, cv_size_domain, ghat, ghat, xp, &
-                       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, xp, &
+         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
       rrmnew_norm = sqrt(rrmnew)
 
       if (rrmnew_norm  < eps(it) * j_grad_norm_target) go to 1002
       ratio = 0.0
-      if(rrmold .gt. 0.0 ) ratio = rrmnew/rrmold
+      if (rrmold .gt. 0.0) ratio = rrmnew/rrmold
 
       phat = - ghat       + ratio * phat
 
       rrmold=rrmnew
       if (calculate_cg_cost_fn) then
-         WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
+         write(unit=stdout,fmt=12)iter, j%total, ob_grad, step
       else
-         WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
-      endif
-12    format(2x,i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
-14    format(2x,i3,5x,1PD15.8,5x,1PD15.8)
+         write(unit=stdout,fmt=14)iter, rrmnew_norm , step
+      end if
+12    format(i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
+14    format(i3,5x,1PD15.8,5x,1PD15.8)
    end do
 
    !-------------------------------------------------------------------------
@@ -189,14 +188,14 @@ subroutine da_minimise_cg( grid, config_flags,            &
    go to 1003
 1002 continue
    if (calculate_cg_cost_fn) then
-      WRITE(UNIT=stdout,FMT=12)iter, j%total, ob_grad, step
+      write(unit=stdout,fmt=12)iter, j%total, ob_grad, step
    else
-     WRITE(UNIT=stdout,FMT=14)iter, rrmnew_norm , step
-   endif
+      write(unit=stdout,fmt=14)iter, rrmnew_norm , step
+   end if
 1003 continue
-   WRITE(UNIT=stdout,FMT='(A)') &
+   write(unit=stdout,fmt='(A)') &
       ' ----------------------------------------------------------'
-   WRITE(UNIT=stdout,FMT='(2x,"Inner iteration stopped after ",i4," iterations")') iter
+   write(unit=stdout,fmt='("Inner iteration stopped after ",i4," iterations")') iter
 
    if (calculate_cg_cost_fn) then 
       rrmnew_norm = ob_grad
@@ -212,11 +211,11 @@ subroutine da_minimise_cg( grid, config_flags,            &
       rrmnew_norm = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
                               (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
       rrmnew_norm = sqrt(rrmnew_norm)
-    endif
+    end if
 
-    WRITE(UNIT=stdout,FMT=15)j%total , rrmnew_norm
-15  format(2x,' Final cost function : ',1PD15.8,' and Gradient: ',1PD15.8)
-    WRITE(UNIT=stdout,FMT='(A)') &
+    write(unit=stdout,fmt=15) iter, j%total , rrmnew_norm
+15  format('Final: ',I3,' iter, J=',1PD15.8,', g=',1PD15.8)
+    write(unit=stdout,fmt='(A)') &
       ' ----------------------------------------------------------'
 1004 continue
 
@@ -224,7 +223,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    call da_deallocate_y( jo_grad_y)   
 
-   IF (trace_use) call da_trace_exit("da_minimise_cg")
+   if (trace_use) call da_trace_exit("da_minimise_cg")
 
 end subroutine da_minimise_cg
+
 

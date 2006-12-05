@@ -6,7 +6,7 @@ subroutine da_integrat_dz( xb )
    !
    ! PURPOSE: To calculate the IWV from the model QV and PP, TT.
    !
-   ! METHOD:  IWV = SUM {QV * RHO * dZ}
+   ! METHOD:  IWV = sum {QV * RHO * dZ}
    !
    !           Unit: Qv (Kg/Kg), RHO(Kg/M^3), dZ(M)
    !                 PW (cm)
@@ -17,7 +17,7 @@ subroutine da_integrat_dz( xb )
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(inout) :: xb    ! first guess (local).
 
@@ -25,7 +25,7 @@ subroutine da_integrat_dz( xb )
 
    real    :: pw
 
-   ! WEIGHTED SUM OF VERTICAL COLUMN 
+   ! WEIGHTED sum OF VERTICAL COLUMN 
 
    do j=xb%jts, xb%jte
       do i=xb%its, xb%ite
@@ -33,11 +33,11 @@ subroutine da_integrat_dz( xb )
          do k=xb%kts, xb%kte
             pw = pw + (xb%hf(i,j,k+1)-xb%hf(i,j,k)) &
                  *  xb%q(i,j,k)*xb%rho(i,j,k)
-         enddo
+         end do
 
          xb%tpw(i,j) = 0.1*pw
-      enddo
-   enddo
+      end do
+   end do
 
 end subroutine da_integrat_dz
 

@@ -4,17 +4,17 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
    !  PURPOSE: Adjoint of da_tprh_to_q_adj.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb       ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp       ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT(INOUT)  :: xa       ! Increment structure
+   type (xb_type), intent(in)    :: xb       ! First guess structure.
+   type (xpose_type), intent(in) :: xp       ! Dimensions and xpose buffers.
+   type (x_type), intent(inout)  :: xa       ! Increment structure
 
    integer                       :: is, ie   ! 1st dim. end points.
    integer                       :: js, je   ! 2nd dim. end points.
    integer                       :: ks, ke   ! 3rd dim. end points.
-   INTEGER                       :: i, j, k  ! Loop counter.
-   REAL :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) ! Temp.
+   integer                       :: i, j, k  ! Loop counter.
+   real :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) ! Temp.
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
@@ -36,7 +36,7 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate relative humidity increment:
@@ -68,10 +68,10 @@ end subroutine da_tprh_to_q_adj
 !  PURPOSE: Adjoint of da_tprh_to_q_adj.
 !------------------------------------------------------------------------------
 
-!   IMPLICIT NONE
+!   implicit none
 
-!   INTEGER        i, n
-!   REAL           t, es, p, q, rh,t_prime, p_prime, rh_prime, q_prime  
+!   integer        i, n
+!   real           t, es, p, q, rh,t_prime, p_prime, rh_prime, q_prime  
 !   dimension      t       (n) ! Temperature.
 !   dimension      es      (n) ! Saturation vapour pressure.
 !   dimension      p       (n) ! Pressure.
@@ -94,7 +94,7 @@ end subroutine da_tprh_to_q_adj
 
 !   rh_prime(i) = rh_prime(i) + temp / rh(i)
 !   qs_prime_over_qs(i) = temp
-!   enddo
+!   end do
 
 !------------------------------------------------------------------------------
 !  [1.0] Calculate saturation specific humidity ratio qs~/qs:

@@ -1,6 +1,6 @@
-MODULE da_netcdf_interface
+module da_netcdf_interface
 
-CONTAINS
+contains
 
 !--------------------------------------------------------------------
 
@@ -35,11 +35,11 @@ CONTAINS
   rcode = nf_inq_var( cdfid, id_time, varnam, ivtype, ndims, dimids, natts )
   if(debug) then
     write(6,*) ' number of dims for Time ',ndims
-  endif
+  end if
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
     if(debug) write(6,*) ' dimension ',i,idims(i)
-  enddo
+  end do
 
 !  get the times
   
@@ -57,7 +57,7 @@ CONTAINS
 
     if(debug) write(6,*) trim(file), time1(1:19)
     times(i) = time1(1:19)
-  enddo
+  end do
 
   write(6,*) ' exiting get_times_cdf '
 
@@ -98,11 +98,11 @@ CONTAINS
   rcode = nf_inq_var( cdfid, id_time, varnam, ivtype, ndims, dimids, natts )
   if(debug) then
     write(6,*) ' number of dims for ',var,' ',ndims
-  endif
+  end if
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), dims(i) )
     if(debug) write(6,*) ' dimension ',i,dims(i)
-  enddo
+  end do
 
   call ncclos(cdfid,rcode)
 
@@ -132,7 +132,7 @@ CONTAINS
     stop
   end if
 
-  rcode = NF_GET_ATT_INT(cdfid, nf_global, att_name, value )
+  rcode = NF_GET_ATT_inT(cdfid, nf_global, att_name, value )
 
   call ncclos(cdfid,rcode)
 
@@ -165,26 +165,26 @@ CONTAINS
       stop
     end if
 
-    rcode = NF_INQ_ATTTYPE( cdfid, nf_global, att_name, ivtype )
+    rcode = NF_inQ_ATTtype( cdfid, nf_global, att_name, ivtype )
 
     write(unit=*, fmt='(a, i6)') &
          'ivtype:', ivtype, &
-         'NF_REAL=', NF_REAL, &
+         'NF_real=', NF_real, &
          'NF_DOUBLE=', NF_DOUBLE, &
          'kind(value)=', kind(value)
 
-    if((ivtype == NF_REAL) .and. (kind(value) == 4)) then
-       rcode = NF_GET_ATT_REAL(cdfid, nf_global, att_name, value )
+    if((ivtype == NF_real) .and. (kind(value) == 4)) then
+       rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, value )
     else if((ivtype == NF_DOUBLE) .and. (kind(value) == 4)) then
-       rcode = NF_GET_ATT_REAL(cdfid, nf_global, att_name, tmp )
+       rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, tmp )
        value = tmp
     else if((ivtype == NF_DOUBLE) .and. (kind(value) == 8)) then
-       rcode = NF_GET_ATT_REAL(cdfid, nf_global, att_name, value )
+       rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, value )
     else
        write(unit=*, fmt='(a, i6)') &
             'Unrecognizable ivtype:', ivtype
        stop
-    endif
+    end if
 
     call ncclos(cdfid,rcode)
 
@@ -230,12 +230,12 @@ CONTAINS
     write(unit=*, fmt='(a,i6)') ' ivtype=', ivtype
     write(unit=*, fmt='(a, a)') ' varnam=', trim(varnam)
     write(unit=*, fmt='(a,i6)') ' kind(data)=', kind(data)
-  endif
+  end if
 
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
     if(debug) write(unit=*, fmt='(a,2i6)') ' dimension ',i,idims(i)
-  enddo
+  end do
 
 !  check the dimensions
 
@@ -265,7 +265,7 @@ CONTAINS
     istart(4) = time
     iend(4) = 1
 
-    if((ivtype == NF_REAL) .and. (kind(data) == 4)) then
+    if((ivtype == NF_real) .and. (kind(data) == 4)) then
        call ncvgt( cdfid,id_data,istart,iend,data,rcode)
     else if((ivtype == NF_DOUBLE) .and. (kind(data) == 4)) then
        call ncvgt( cdfid,id_data,istart,iend,tmp,rcode)
@@ -276,11 +276,11 @@ CONTAINS
        write(unit=*, fmt='(a, i6)') &
             'Unrecognizable ivtype:', ivtype
        stop
-    endif
+    end if
 
     if(debug) then
        write(unit=*, fmt='(a,e24.12)') ' Sample data=', data(1,1,1)
-    endif
+    end if
 
     call ncclos(cdfid,rcode)
 
@@ -320,7 +320,7 @@ CONTAINS
 
   if(debug) then
     write(unit=*, fmt='(3a,i6)') ' get_var_2d_real_cdf: dims for ',var,' ',ndims
-  endif
+  end if
 
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
@@ -328,8 +328,8 @@ CONTAINS
       write(unit=*, fmt='(a,2i6)') ' dimension ',i,idims(i)
       write(unit=*, fmt='(a,i6)') ' ivtype=', ivtype
       write(unit=*, fmt='(a, a)') ' varnam=', trim(varnam)
-    endif
-  enddo
+    end if
+  end do
 
 !  check the dimensions
 
@@ -355,7 +355,7 @@ CONTAINS
     istart(3) = time
     iend(3) = 1
 
-    if((ivtype == NF_REAL) .and. (kind(data) == 4)) then
+    if((ivtype == NF_real) .and. (kind(data) == 4)) then
        call ncvgt( cdfid,id_data,istart,iend,data,rcode)
     else if((ivtype == NF_DOUBLE) .and. (kind(data) == 8)) then
        call ncvgt( cdfid,id_data,istart,iend,data,rcode)
@@ -366,11 +366,11 @@ CONTAINS
        write(unit=*, fmt='(a, i6)') &
             'Unrecognizable ivtype:', ivtype
        stop
-    endif
+    end if
 
     if(debug) then
        write(unit=*, fmt='(a,e24.12)') ' Sample data=', data(1,1)
-    endif
+    end if
 
     call ncclos(cdfid,rcode)
 
@@ -410,12 +410,12 @@ CONTAINS
 
   if(debug) then
     write(unit=*, fmt='(3a,i6)') ' put_var_3d_real_cdf: dims for ',var,' ',ndims
-  endif
+  end if
 
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
     if(debug) write(6,*) ' dimension ',i,idims(i)
-  enddo
+  end do
 
 !  check the dimensions
 
@@ -445,7 +445,7 @@ CONTAINS
     istart(4) = time
     iend(4) = 1
 
-    if((ivtype == NF_REAL) .and. (kind(data) == 4)) then
+    if((ivtype == NF_real) .and. (kind(data) == 4)) then
        call ncvpt( cdfid,id_data,istart,iend,data,rcode)
     else if((ivtype == NF_DOUBLE) .and. (kind(data) == 8)) then
        tmp = data
@@ -457,7 +457,7 @@ CONTAINS
        write(unit=*, fmt='(a, i6)') &
             'Unrecognizable ivtype:', ivtype
        stop
-    endif
+    end if
 
     call ncclos(cdfid,rcode)
 
@@ -498,11 +498,11 @@ CONTAINS
     rcode = nf_inq_var( cdfid, id_data, varnam, ivtype, ndims, dimids, natts )
     if(debug) then
       write(6,*) ' number of dims for ',var,' ',ndims
-    endif
+    end if
     do i=1,ndims
       rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
       if(debug) write(6,*) ' dimension ',i,idims(i)
-    enddo
+    end do
 
 !---check the dimensions
 
@@ -527,7 +527,7 @@ CONTAINS
      istart(3) = time
      iend(3) = 1
 
-     if((ivtype == NF_REAL) .and. (kind(data) == 4)) then
+     if((ivtype == NF_real) .and. (kind(data) == 4)) then
         call ncvpt( cdfid,id_data,istart,iend,data,rcode)
      else if((ivtype == NF_DOUBLE) .and. (kind(data) == 8)) then
         tmp = data
@@ -539,7 +539,7 @@ CONTAINS
         write(unit=*, fmt='(a, i6)') &
             'Unrecognizable ivtype:', ivtype
         stop
-     endif
+     end if
 
      call ncclos(cdfid,rcode)
 
@@ -577,7 +577,7 @@ CONTAINS
 
   if(debug) then
     write(unit=*, fmt='(3a,i6)') ' get_var_2d_real_cdf: dims for ',var,' ',ndims
-  endif
+  end if
 
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
@@ -585,8 +585,8 @@ CONTAINS
       write(unit=*, fmt='(a,2i6)') ' dimension ',i,idims(i)
       write(unit=*, fmt='(a,i6)') ' ivtype=', ivtype
       write(unit=*, fmt='(a, a)') ' varnam=', trim(varnam)
-    endif
-  enddo
+    end if
+  end do
 
 !  check the dimensions
 
@@ -616,7 +616,7 @@ CONTAINS
 
     if(debug) then
        write(unit=*, fmt='(a, i8)') ' Sample data=', data(1,1)
-    endif
+    end if
 
     call ncclos(cdfid,rcode)
 
@@ -639,7 +639,7 @@ CONTAINS
 
      status = NF_OPEN(file, NF_NOWRITE, cdfid )
 
-     status = NF_INQ_VARID( cdfid, var, varid )
+     status = NF_inQ_VARID( cdfid, var, varid )
 
      if( status == 0) then
        if(debug) write(6,*) ' open netcdf file ', trim(file)
@@ -648,16 +648,16 @@ CONTAINS
        stop
      end if
 
-     status = NF_INQ_VARNATTS(cdfid, varid, natts )
+     status = NF_inQ_VARNATTS(cdfid, varid, natts )
 
      do n=1, natts
-        status = NF_INQ_ATTNAME(cdfid, varid, n, att_name )
+        status = NF_inQ_ATTNAME(cdfid, varid, n, att_name )
    
         write(unit=*, fmt='(a,i2,2a)') &
           'att_name(',n,')=', trim(att_name)
-     enddo
+     end do
 
-     status = NF_CLOSE(cdfid)
+     status = NF_close(cdfid)
 
   end subroutine da_get_att_cdf
 
@@ -685,12 +685,12 @@ CONTAINS
        stop
      end if
 
-     status = NF_INQ_VARID( cdfid, var, varid )
+     status = NF_inQ_VARID( cdfid, var, varid )
 
-     status = NF_INQ_VARNATTS(cdfid, varid, natts )
+     status = NF_inQ_VARNATTS(cdfid, varid, natts )
 
      do n=1, natts
-        status = NF_INQ_ATTNAME(cdfid, varid, n, loc_att_name )
+        status = NF_inQ_ATTNAME(cdfid, varid, n, loc_att_name )
 
         write(unit=*, fmt='(a,i2,2a)') &
           'loc_att_name(',n,')=', trim(loc_att_name)
@@ -705,7 +705,7 @@ CONTAINS
               if(debug) then
                  write(unit=*, fmt='(4a)') &
                       'write ', trim(att_name), 'to netcdf file ', trim(file)
-              endif
+              end if
            else
               write(unit=*, fmt='(a, i8)') &
                      'Status= ', status
@@ -715,13 +715,13 @@ CONTAINS
 
 !             if(status /= NF_NOERR) call handle_err(status)
               stop
-           endif
+           end if
 
            exit
-        endif
-     enddo
+        end if
+     end do
 
-     status = NF_CLOSE(cdfid)
+     status = NF_close(cdfid)
 
   end subroutine da_put_att_cdf
 
@@ -737,8 +737,8 @@ CONTAINS
 
   real    :: this_bdy_time, next_bdy_time
 
-  CALL da_atotime(this_datestr, this_bdy_time)
-  CALL da_atotime(next_datestr, next_bdy_time)
+  call da_atotime(this_datestr, this_bdy_time)
+  call da_atotime(next_datestr, next_bdy_time)
 
   bdyfrq = next_bdy_time - this_bdy_time
 
@@ -747,7 +747,7 @@ CONTAINS
           'next_bdy_time=', next_bdy_time, &
           'this_bdy_time=', this_bdy_time, &
           'bdyfrq       =', bdyfrq
-  endif
+  end if
 
   end subroutine da_get_bdyfrq
 
@@ -786,12 +786,12 @@ CONTAINS
 
   if(debug) then
     write(6,*) ' number of dims for bdytime ',ndims
-  endif
+  end if
 
   do i=1,ndims
     rcode = nf_inq_dimlen( cdfid, dimids(i), idims(i) )
     if(debug) write(6,*) ' dimension ',i,idims(i)
-  enddo
+  end do
 
 !  get the bdytime
   
@@ -808,7 +808,7 @@ CONTAINS
 
     if(debug) write(6,*) trim(file), time1(1:19)
     bdytimestr(i) = time1(1:19)
-  enddo
+  end do
 
   call ncclos(cdfid,rcode)
 
@@ -842,21 +842,21 @@ CONTAINS
          mmday(2) = 29
       else if (mod(ccyy,100) == 0) then
          mmday(2) = 28
-      endif
-   endif
+      end if
+   end if
   
    dd=dd+365*(ccyy-2000)
 
    do i=1,mo-1
       dd=dd+mmday(i)
-   enddo
+   end do
   
    st = real(ss) &
       + 60.0*(real(mi) &
       + 60.0*(real(hh) &
       + 24.0* real(dd)))
 
-END subroutine da_atotime
+end subroutine da_atotime
 
-END MODULE da_netcdf_interface
+end module da_netcdf_interface
 

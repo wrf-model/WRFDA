@@ -94,10 +94,10 @@ program decode_airs
       ! Read all retrievals from file_name and place them in ret
       call airs_ret_rdr(file_name, ret)
 
-      if (granule_out_of_timewin((ret%Time), min_time, max_time)) cycle      
+      if (granule_out_of_timewin(ret%Time, min_time, max_time)) cycle      
    
-      do track = 1, 45
-      do xtrack = 1, 30
+      do track = 1, AIRS_RET_GEOTRACK
+      do xtrack = 1, AIRS_RET_GEOXTRACK
          nvalid = 0
       
          delta_time = nint(ret%Time(xtrack,track))/3600
@@ -107,8 +107,13 @@ program decode_airs
          ss = mod(nint(ret%Time(xtrack,track)),60)
          write(date_char(17:20),'(i2.2,i2.2)') mm, ss
    
-         call cmp_datestr(date_char(7:20), min_time, cmp_min)
-         call cmp_datestr(date_char(7:20), max_time, cmp_max)
+         if (ret%Time(xtrack,track) < 0.) then
+            cmp_min = LESS
+         else
+            call cmp_datestr(date_char(7:20), min_time, cmp_min)
+            call cmp_datestr(date_char(7:20), max_time, cmp_max)
+         end if
+
 
          if (cmp_min /= LESS .and. cmp_max /= MORE) then
 
@@ -457,8 +462,12 @@ function granule_out_of_timewin(time_arr, min_time, max_time)
       ss = mod(nint(time_arr(i,j)),60)
       write(date_char(11:14),'(i2.2,i2.2)') mm, ss
    
-      call cmp_datestr(date_char, min_time, cmp_min)
-      call cmp_datestr(date_char, max_time, cmp_max)
+      if (time_arr(i,j) < 0.) then
+         cmp_min = LESS
+      else
+         call cmp_datestr(date_char, min_time, cmp_min)
+         call cmp_datestr(date_char, max_time, cmp_max)
+      end if
 
       if (cmp_min /= LESS .and. cmp_max /= MORE) then
          granule_out_of_timewin = .false.

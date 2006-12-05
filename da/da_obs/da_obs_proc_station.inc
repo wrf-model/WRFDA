@@ -6,15 +6,15 @@ subroutine da_obs_proc_station(obs)
    ! (2) Vertical checks
    ! (3) Missing data check
 
-   IMPLICIT NONE
+   implicit none
                              
-   TYPE (multi_level_type), intent(inout) :: obs
+   type (multi_level_type), intent(inout) :: obs
 
-   REAL :: po, to, rho, es, qs, qvo
-   INTEGER :: i
+   real :: po, to, rho, es, qs, qvo
+   integer :: i
 
 
-   loop_levels: DO i = 1, obs % info % levels
+   loop_levels: do i = 1, obs % info % levels
       !-----------------------------------------------------------------------
       ! Gross check for t, p & q
       !-----------------------------------------------------------------------
@@ -22,21 +22,21 @@ subroutine da_obs_proc_station(obs)
       if (obs%each(i)%t %inv <  75.0 .or. obs%each(i)%t %inv > 350.0   ) then
          obs%each(i)%t %inv = missing_r
          obs%each(i)%t %qc  = missing
-      endif
+      end if
       if (obs%each(i)%p %inv <=  0.0 .or. obs%each(i)%p %inv > 110000.0) then
          obs%each(i)%p %inv = missing_r
          obs%each(i)%p %qc  = missing
-      endif
+      end if
       if (obs%each(i)%rh%inv < 0.0)  then
          obs%each(i)%rh%inv = missing_r
          obs%each(i)%rh%qc  = missing
-      endif
+      end if
 
       po   = obs % each(i) % p  % inv
       to   = obs % each(i) % t  % inv
       rho  = obs % each(i) % rh  % inv
 
-      if (ob_format == 2) then ! Calculate q if possible:
+      if (ob_format == ob_format_ascii) then ! Calculate q if possible:
          if (abs(po -  missing_r) > 1. .and. abs(to -  missing_r) > 1. .and. &
              abs(rho-  missing_r) > 1.) then
 
@@ -46,16 +46,16 @@ subroutine da_obs_proc_station(obs)
                qvo = qs
             else
                qvo  = rho * qs / 100.
-            endif
+            end if
          else
             qvo       = missing_r
-         endif
+         end if
 
          obs % each(i) % q  % inv = qvo
          obs % each(i) % q  % qc = obs % each(i) % rh % qc
          obs % each(i) % q  % error = obs % each(i) % rh % error
-      endif
-   enddo loop_levels
+      end if
+   end do loop_levels
 
 end subroutine da_obs_proc_station
 

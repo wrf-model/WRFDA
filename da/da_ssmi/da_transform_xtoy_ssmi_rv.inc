@@ -1,6 +1,6 @@
 subroutine da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
 
-   IMPLICIT NONE
+   implicit none
    type (xb_type), intent(in)   :: xb       ! first guess state.
    type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
    type (x_type),  intent(in)   :: xa       ! gridded analysis increment.

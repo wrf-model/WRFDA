@@ -34,7 +34,7 @@ subroutine da_asslegpol( l, m, sinlat, coslat, alp )
             do loop = m+2,l
                alp2 = alp1
                alp1 = alp
-               alp = (REAL(2*loop-1) * sinlat * alp1 - real(loop-1+m) * alp2) &
+               alp = (real(2*loop-1) * sinlat * alp1 - real(loop-1+m) * alp2) &
                   / real(loop-m)
             end do
          end if

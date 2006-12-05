@@ -473,6 +473,7 @@ subroutine camrad(RTHRATENLW,RTHRATENSW,                           &
    real(r8), dimension(its:ite,kts:kte+1)           :: emstot ! Total emissivity
    CHARACTER(LEN=256) :: msgstr
 
+#if !defined(MAC_KLUDGE)
    lchnk = 1
    begchunk = ims
    endchunk = ime
@@ -801,11 +802,11 @@ subroutine camrad(RTHRATENLW,RTHRATENSW,                           &
 
     enddo    ! j-loop
 
+#endif
 
 end subroutine camrad
 !====================================================================
-   SUBROUTINE camradinit(RTHRATEN, RTHRATENLW, RTHRATENSW,          &
-                         restart,                       &
+   SUBROUTINE camradinit(                                           &
                          R_D,R_V,CP,G,STBOLT,EP_2,shalf,pptop,               &
                          ozmixm,pin,levsiz,XLAT,num_months,         &
                          m_psp,m_psn,m_hybi,aerosolcp,aerosolcn,    &
@@ -820,7 +821,6 @@ end subroutine camrad
 !--------------------------------------------------------------------
    IMPLICIT NONE
 !--------------------------------------------------------------------
-   LOGICAL , INTENT(IN)           :: restart
    INTEGER , INTENT(IN)           :: ids, ide, jds, jde, kds, kde,  &
                                      ims, ime, jms, jme, kms, kme,  &
                                      its, ite, jts, jte, kts, kte
@@ -828,11 +828,6 @@ end subroutine camrad
    REAL, INTENT(IN)               :: R_D,R_V,CP,G,STBOLT,EP_2
 
    REAL,     DIMENSION( kms:kme )  :: shalf
-
-   REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(INOUT) ::        &
-                                                          RTHRATEN, &
-                                                        RTHRATENLW, &
-                                                        RTHRATENSW
 
    INTEGER,      INTENT(IN   )    ::   levsiz, num_months
    INTEGER,      INTENT(IN   )    ::   paerlev, naer_c
@@ -848,13 +843,10 @@ end subroutine camrad
    REAL,  DIMENSION( ims:ime, paerlev, jms:jme, naer_c ),      &
           INTENT(INOUT) ::                             aerosolcp,aerosolcn
 
-   INTEGER :: i, j, k, itf, jtf, ktf
    REAL(r8)    :: pstd
    REAL(r8)    :: rh2o, cpair
 
-   jtf=min0(jte,jde-1)
-   ktf=min0(kte,kde-1)
-   itf=min0(ite,ide-1)
+#if !defined(MAC_KLUDGE)
    ozncyc = .true.
    dosw = .true.
    dolw = .true.
@@ -908,20 +900,12 @@ end subroutine camrad
                      ids, ide, jds, jde, kds, kde,                  &
                      ims, ime, jms, jme, kms, kme,                  &
                      its, ite, jts, jte, kts, kte)
-   IF(.not.restart)THEN
-     DO j=jts,jtf
-     DO k=kts,ktf
-     DO i=its,itf
-        RTHRATEN(i,k,j)=0.
-        RTHRATENLW(i,k,j)=0.
-        RTHRATENSW(i,k,j)=0.
-     ENDDO
-     ENDDO
-     ENDDO
-   ENDIF
+
+#endif
 
    END SUBROUTINE camradinit
 
+#if !defined(MAC_KLUDGE)
 subroutine oznini(ozmixm,pin,levsiz,num_months,XLAT,                &
                      ids, ide, jds, jde, kds, kde,                  &
                      ims, ime, jms, jme, kms, kme,                  &
@@ -1513,7 +1497,7 @@ subroutine oznint(julday,julian,dt,gmt,xtime,ozmixmj,ozmix,levsiz,num_months,pco
    REAL(r8),  DIMENSION( pcols, levsiz ),      &
           INTENT(OUT  ) ::                                  ozmix
    !Local
-   REAL(r8)  :: oldJULIAN, intJULIAN
+   REAL(r8)  :: intJULIAN
    integer   :: np1,np,nm,m,k,i
    integer   :: IJUL
    integer, dimension(12) ::  date_oz
@@ -1523,17 +1507,8 @@ subroutine oznint(julday,julian,dt,gmt,xtime,ozmixmj,ozmix,levsiz,num_months,pco
    logical  :: finddate
    CHARACTER(LEN=256) :: msgstr
 
-   oldJULIAN=FLOAT(JULDAY)+(XTIME/60.+GMT)/24.
-   intJULIAN = JULIAN + 1.0    ! offset by one day
-   IF ( oldJULIAN .NE. intJULIAN ) THEN
-     WRITE( msgstr , * ) 'oznint:  JULIAN DATE MISMATCH:  intJULIAN = ',intJULIAN, &
-       '  oldJULIAN,JULDAY,XTIME,GMT = ',oldJULIAN,JULDAY,XTIME,GMT
-     CALL wrf_debug ( 50, TRIM(msgstr) )
-   ENDIF
-!$$$DEBUG
-!use old value till new julian is implemented
-intJULIAN = oldJULIAN
-!$$$END DEBUG
+   ! JULIAN starts from 0.0 at 0Z on 1 Jan.
+   intJULIAN = JULIAN + 1.0_r8    ! offset by one day
 ! jan 1st 00z is julian=1.0 here
    IJUL=INT(intJULIAN)
 !  Note that following will drift. 
@@ -1702,7 +1677,7 @@ subroutine get_rf_scales(scales)
 
 end subroutine get_rf_scales
 
-subroutine get_aerosol(c, julday, julian_in, dt, gmt, xtime, m_psp, m_psn, aerosoljp, aerosoljn, m_hybi, paerlev, naer_c, pint, pcols, pver, pverp, pverr, pverrp, AEROSOLt, scale)
+subroutine get_aerosol(c, julday, julian, dt, gmt, xtime, m_psp, m_psn, aerosoljp, aerosoljn, m_hybi, paerlev, naer_c, pint, pcols, pver, pverp, pverr, pverrp, AEROSOLt, scale)
 !------------------------------------------------------------------
 !
 !  Input:
@@ -1735,7 +1710,7 @@ subroutine get_aerosol(c, julday, julian_in, dt, gmt, xtime, m_psp, m_psn, aeros
    real(r8), intent(in) :: scale(naer_all)    ! scale each aerosol by this amount
    REAL, INTENT(IN    )      ::        XTIME,GMT
    INTEGER, INTENT(IN )      ::        JULDAY
-   REAL, INTENT(IN    )      ::        JULIAN_in
+   REAL, INTENT(IN    )      ::        JULIAN
    REAL, INTENT(IN    )      ::        DT
    real(r8), intent(in   )      ::        m_psp(pcols),m_psn(pcols)  ! Match surface pressure
    real(r8), intent(in   )   ::        aerosoljp(pcols,paerlev,naer_c) 
@@ -1764,7 +1739,7 @@ subroutine get_aerosol(c, julday, julian_in, dt, gmt, xtime, m_psp, m_psn, aeros
    integer lats(pcols),lons(pcols)        ! latitude and longitudes of column
    integer ncol                           ! number of columns
    INTEGER IJUL
-   REAL oldJULIAN, JULIAN
+   REAL(r8) intJULIAN
 
    real(r8) speciesmin(naer)              ! minimal value for each species
 !
@@ -1780,27 +1755,16 @@ subroutine get_aerosol(c, julday, julian_in, dt, gmt, xtime, m_psp, m_psn, aeros
    real(r8) AEROSOLp(pcols,pver,naer) ! aerosol mmr from MATCH in column at next (plus) month
    CHARACTER(LEN=256) :: msgstr
 
-!  caldayloc = get_curr_calday ()
-!   caldayloc = FLOAT(JULDAY-1)+(XTIME/60.+GMT)/24.
-   JULIAN = JULIAN_in + 1.0    ! offset by one day
-   oldJULIAN=FLOAT(JULDAY)+(XTIME/60.+GMT)/24.
-   IF ( oldJULIAN .NE. JULIAN ) THEN
-     WRITE( msgstr , * ) 'get_aerosol:  JULIAN DATE MISMATCH:  JULIAN = ',JULIAN, &
-       '  oldJULIAN,JULDAY,XTIME,GMT = ',oldJULIAN,JULDAY,XTIME,GMT
-     CALL wrf_debug ( 50, TRIM(msgstr) )
-   ENDIF
-!$$$DEBUG
-!use old value till new julian is implemented
-JULIAN = oldJULIAN
-!$$$END DEBUG
+   ! JULIAN starts from 0.0 at 0Z on 1 Jan.
+   intJULIAN = JULIAN + 1.0_r8    ! offset by one day
 ! jan 1st 00z is julian=1.0 here
-   IJUL=INT(JULIAN)
+   IJUL=INT(intJULIAN)
 !  Note that following will drift. 
 !    Need to use actual month/day info to compute julian.
-   JULIAN=JULIAN-FLOAT(IJUL)
+   intJULIAN=intJULIAN-FLOAT(IJUL)
    IJUL=MOD(IJUL,365)
    IF(IJUL.EQ.0)IJUL=365
-   caldayloc=JULIAN+IJUL
+   caldayloc=intJULIAN+IJUL
 
    if (caldayloc < Mid(1)) then
       mo_prv = 12
@@ -11557,7 +11521,7 @@ function findvalue(ix,n,ain,indxa)
    end do
 end function findvalue
 
-
+#endif
 
 
 

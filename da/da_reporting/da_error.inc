@@ -11,19 +11,19 @@ subroutine da_error( file_str, line, errors)
 
    write(line_str,'(i6)') line
 
-   html_file=file_str(1:LEN_TRIM(file_str)-4)//'.html'
+   html_file=file_str(1:LEN_trim(file_str)-4)//'.html'
    
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-   call wrf_message( '-------------- FATAL CALLED ---------------' )
+   call wrf_message( '-------------- FATAL ERROR ----------------' )
    ! only print file and line if line is positive
    if (line > 0) then
       if (use_html) then
-         call wrf_message( 'FATAL CALLED FROM FILE: <A HREF="'// &
-            TRIM(documentation_url)//'/'//trim(html_file)//'">'//file_str// &
-            '</a>  LINE:  '//TRIM(line_str) )
+         call wrf_message( 'Fatal error in file: <A HREF="'// &
+            trim(documentation_url)//'/'//trim(html_file)//'">'//file_str// &
+            '</a>  LINE:  '//trim(line_str) )
       else
-         call wrf_message( 'FATAL CALLED FROM FILE:  '//trim(file_str)// &
-            '  LINE:  '//TRIM(line_str) )
+         call wrf_message( 'Fatal error in file:  '//trim(file_str)// &
+            '  LINE:  '//trim(line_str) )
       end if
    end if
    do i=1,size(errors)
@@ -31,16 +31,16 @@ subroutine da_error( file_str, line, errors)
    end do
    call wrf_message( '-------------------------------------------' )
 #else
-   call wrf_message2( '-------------- FATAL CALLED ---------------' )
+   call wrf_message2( '-------------- FATAL ERROR ----------------' )
    ! only print file and line if line is positive
    if ( line > 0 ) then
       if (use_html) then
-         call wrf_message( 'FATAL CALLED FROM FILE: <A HREF="'// &
-            TRIM(documentation_url)//'/'//trim(html_file)//'">'// &
-            trim(file_str)//'</a>  LINE:  '//TRIM(line_str) )
+         call wrf_message( 'Fatal error in file: <A HREF="'// &
+            trim(documentation_url)//'/'//trim(html_file)//'">'// &
+            trim(file_str)//'</a>  LINE:  '//trim(line_str) )
       else
-         call wrf_message2( 'FATAL CALLED FROM FILE:  '//trim(file_str)// &
-            '  LINE:  '//TRIM(line_str) )
+         call wrf_message2( 'Fatal error in file:  '//trim(file_str)// &
+            '  LINE:  '//trim(line_str) )
       end if
    end if
    do i=1,size(errors)

@@ -1,16 +1,16 @@
 subroutine da_check_xtoy_adjoint_ssmi_rv( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(INOUT)  :: y             ! y = h (xa)
-   REAL          , INTENT(INOUT)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n             ! loop counter.
+   integer                        :: n             ! loop counter.
 
    real :: var
 
-   IF ( oi%num_ssmi_retrieval > 0 ) THEN
+   if ( oi%num_ssmi_retrieval > 0 ) then
       do n=1, oi%num_ssmi_retrieval
             y%ssmi_retrieval(n)%speed = y%ssmi_retrieval(n)%speed/typical_speed_rms
             y%ssmi_retrieval(n)%tpw   = y%ssmi_retrieval(n)%tpw/typical_tpw_rms
@@ -22,12 +22,12 @@ subroutine da_check_xtoy_adjoint_ssmi_rv( oi, y, adjtest_lhs, pertile_lhs )
 
             if( oi%ssmi_retrieval(n)%loc%proc_domain ) then
                adjtest_lhs = adjtest_lhs + var
-            endif
+            end if
 
             y%ssmi_retrieval(n)%speed = y%ssmi_retrieval(n)%speed/typical_speed_rms
             y%ssmi_retrieval(n)%tpw   = y%ssmi_retrieval(n)%tpw/typical_tpw_rms
       end do
-   ENDIF
+   end if
 
 end subroutine da_check_xtoy_adjoint_ssmi_rv
 

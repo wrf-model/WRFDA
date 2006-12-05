@@ -1,16 +1,16 @@
-MODULE da_recursive_filter
+module da_recursive_filter
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Jim Pursers recursive filter routines.
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_par_util
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_perform_2drf.inc"
 #include "da_calculate_rf_factors.inc"

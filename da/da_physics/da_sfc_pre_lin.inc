@@ -18,24 +18,24 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    !  P2  = Pressure at level 2
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    ! Perturbation:
-   REAL, INTENT (out)   :: psfcm_prime          ! model pressure at ho
-   REAL, INTENT (in)    :: psm_prime, tsm_prime, &
+   real, intent (out)   :: psfcm_prime          ! model pressure at ho
+   real, intent (in)    :: psm_prime, tsm_prime, &
                            qsm_prime            ! model surface p, t, q 
    ! Basic state:
-   REAL, INTENT (in)    :: psm, tsm, qsm ! model pressure at ho and
+   real, intent (in)    :: psm, tsm, qsm ! model pressure at ho and
                                                 ! model surface p, t, q 
    ! Constant variables:
-   REAL, INTENT (in)           :: hsm, ho
-   REAL, INTENT (in), OPTIONAL :: to, qvo
+   real, intent (in)           :: hsm, ho
+   real, intent (in), optional :: to, qvo
    ! working array:
-   REAL                 :: tvo, tvsm, tv, dz, arg0
-   REAL                 :: tvsm_prime, tvo_prime, tv_prime, arg, arg_prime
+   real                 :: tvo, tvsm, tv, dz, arg0
+   real                 :: tvsm_prime, tvo_prime, tv_prime, arg, arg_prime
 
-   REAL, PARAMETER      :: GASR =  gas_constant
-   REAL, PARAMETER      :: G = gravity
+   real, parameter      :: GASR =  gas_constant
+   real, parameter      :: G = gravity
 
    ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
@@ -53,12 +53,12 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    else
       tvo_prime = tvsm_prime
       tvo = tvsm
-   endif
+   end if
 
    tv_prime = 0.5 * (tvsm_prime + tvo_prime)
    tv  = 0.5 * (tvsm + tvo)
 
-   ! 2. HEIGHT DIFFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
+   ! 2. HEIGHT DifFERENCE BEWTEEN MODEL SURFACE AND OBSERVATIONS
    ! ------------------------------------------------------------
 
    dz = hsm - ho

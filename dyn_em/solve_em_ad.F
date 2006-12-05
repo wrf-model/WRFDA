@@ -712,25 +712,25 @@ moist_tend,chem_tend,scalar_tend,num_3d_m,num_3d_c,num_3d_s,rk_step,&
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (im .eq. p_qc) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qr) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qi) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qs) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qg) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
@@ -998,25 +998,25 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 &grid%j_end(ij),k_start,k_end )
           if ((config_flags%specified .or. config_flags%nested) .and. rk_step1 .eq. 1) then
             if (im .eq. p_qv) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             endif
           endif
           if (config_flags%nested .and. rk_step1 .eq. 1) then
             if (im .eq. p_qc) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             else if (im .eq. p_qr) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             else if (im .eq. p_qi) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             else if (im .eq. p_qs) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             else if (im .eq. p_qg) then
-              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+              call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
             endif
           endif
@@ -1264,25 +1264,25 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (im .eq. p_qc) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qr) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qi) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qs) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qg) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
@@ -1595,25 +1595,25 @@ moist_tend(:,:,:,:) = moist_tendz(:,:,:,:)
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (iy .eq. p_qv) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqv_b,rqv_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (iy .eq. p_qc) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqc_b,rqc_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (iy .eq. p_qr) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqr_b,rqr_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (iy .eq. p_qi) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqi_b,rqi_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (iy .eq. p_qs) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqs_b,rqs_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (iy .eq. p_qg) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,iy),rqg_b,rqg_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
@@ -1634,25 +1634,25 @@ moist_tend(:,:,:,:) = moist_tendz(:,:,:,:)
 &j_end(ij),k_start,k_end )
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (im .eq. p_qc) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qr) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qi) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qs) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qg) then
-            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
+            call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,config_flags,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif

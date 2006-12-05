@@ -1,11 +1,10 @@
-subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
+subroutine da_readwrite_be_stage3( outunit, nk, variable )
 
    implicit none
 
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
    character*10, intent(in) :: variable                   ! Variable name
-   character*3, intent(in)  :: be_method                  ! Be method ('NMC', or 'ENS')
 
    character*80             :: filename                   ! Input filename.
    character*10             :: vardum                     ! Dummy variable name.
@@ -17,8 +16,11 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    real                     :: e_val(1:nk)                ! Domain-averaged eigenvalues.  
    real, allocatable        :: e_vec_loc(:,:,:)           ! Latitudinally varying eigenvectors.
    real, allocatable        :: e_val_loc(:,:)             ! Latitudinally varying eigenvalues.
+
+   integer :: iunit
  
-   filename = 'gen_be_stage3.'//trim(variable)//'.'//trim(be_method)//'.dat'
+   call da_get_unit(iunit)
+   filename = 'gen_be_stage3.'//trim(variable)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
    if ( trim(vardum) /= trim(variable) ) then
@@ -40,6 +42,7 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    read(iunit)e_vec_loc
    read(iunit)e_val_loc
    close(iunit)
+   call da_free_unit(iunit)
 
    write(outunit)variable
    write(outunit)nk, num_bins2d
@@ -52,3 +55,5 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable, be_method )
    deallocate( e_val_loc )
 
 end subroutine da_readwrite_be_stage3
+
+

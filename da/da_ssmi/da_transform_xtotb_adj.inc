@@ -1,6 +1,6 @@
 subroutine da_transform_xtotb_adj (xa, xb)
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.
    type (x_type) , intent(inout) :: xa          ! grad_x(jo)
@@ -39,7 +39,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
    ! Mean fields
 
@@ -64,7 +64,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
          do k=ks,ke
             zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)* &
                xb%rho(i,j,k)
-         END DO
+         end do
 
          ! call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
 
@@ -115,12 +115,12 @@ subroutine da_transform_xtotb_adj (xa, xb)
          ADJ_zrhom    = ADJ_htpw/tpw/1000.
          ADJ_tpw      = ADJ_tpw - ADJ_htpw/tpw*htpw
 
-         DO k = ks,ke
+         do k = ks,ke
             xa%rho(i,j,k) = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
                xb%q(i,j,k)*ADJ_zrhom + xa%rho(i,j,k)
             xa%q(i,j,k)   = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
                ADJ_zrhom*xb%rho(i,j,k) + xa%q(i,j,k)
-         END DO
+         end do
 
          ! call da_transform_xtozrhoq_adj(xb,xa,i,j,zh,zf,ADJ_zrhom)
 
@@ -138,8 +138,8 @@ subroutine da_transform_xtotb_adj (xa, xb)
          ADJ_sst = 0.
 
          xa%psfc(i,j) = xa%psfc(i,j) + ADJ_psfc*0.01 
-      enddo
-   enddo
+      end do
+   end do
 
 end subroutine da_transform_xtotb_adj
 

@@ -24,14 +24,14 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field
    real (kind=4), allocatable     :: field3d(:,:,:)   ! Used if 3D field read. 
 
    length = len_trim(input_file)
-   rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
+   rcode = nf_open( input_file(1:length), NF_NOwrite, cdfid )
 
 !  Check variable is in file:
    rcode = nf_inq_varid ( cdfid, var, id_var )
    if ( rcode /= 0 ) then
-      write(unit=errmsg(1),FMT='(2a)')var, ' variable is not in input file'
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
-   endif
+      write(unit=message(1),fmt='(2a)')var, ' variable is not in input file'
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
 
    istart = 1
    iend(1) = dim1
@@ -50,6 +50,7 @@ subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field
       allocate ( field3d(1:dim1,1:dim2,1:dim3) )
       call ncvgt( cdfid, id_var, istart, iend, field3d, rcode )
       field(:,:) = field3d(:,:,k)
+      deallocate( field3d )
    end if
 
    rcode = nf_close( cdfid )

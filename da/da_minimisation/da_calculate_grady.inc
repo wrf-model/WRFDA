@@ -6,11 +6,11 @@ subroutine da_calculate_grady( iv, re, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(IN)    :: iv          ! Innovation vector (O-B).
-   type (y_type),  intent(INOUT) :: re          ! Residual vector (O-A).
-   type (y_type),  intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)    :: iv          ! Innovation vector (O-B).
+   type (y_type),  intent(inout) :: re          ! Residual vector (O-A).
+   type (y_type),  intent(out)   :: jo_grad_y   ! Grad_y(Jo)
 
-   IF (trace_use) CALL da_trace_entry("da_calculate_grady")
+   if (trace_use) call da_trace_entry("da_calculate_grady")
 
    !-------------------------------------------------------------------------
    ! [1.0] Compute components of Grad_y(Jo):
@@ -97,13 +97,12 @@ subroutine da_calculate_grady( iv, re, jo_grad_y)
    call da_calculate_grady_radar( iv, re, jo_grad_y)
 
    ! Radiance:
-
    call da_calculate_grady_rad( iv, re, jo_grad_y)
 
    ! AIRS retrievals
 
    call da_calculate_grady_airsr( iv, re,  jo_grad_y)
 
-   IF (trace_use) CALL da_trace_exit("da_calculate_grady")
+   if (trace_use) call da_trace_exit("da_calculate_grady")
 
 end subroutine da_calculate_grady

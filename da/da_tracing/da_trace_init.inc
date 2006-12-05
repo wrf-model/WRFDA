@@ -1,13 +1,14 @@
 subroutine da_trace_init
 
-   IMPLICIT NONE
+   implicit none
 
    ! Local variables
 
-   INTEGER :: IOStatus             ! I/O return code
-   INTEGER :: Loop1
-   CHARACTER (LEN=200) :: TraceFile
-   CHARACTER (LEN=10)  :: temp
+   integer :: IOStatus             ! I/O return code
+   integer :: Loop1
+   character (LEN=200) :: TraceFile
+   character(len=200) :: csvname
+   character (LEN=10)  :: temp
 
    !===========================================================================
 
@@ -15,40 +16,49 @@ subroutine da_trace_init
 
    IOStatus = 0
 
-   IF (trace_all_pes .OR. myproc == trace_pe) THEN
-     trace_write = .TRUE.  
-   END IF
+   if (trace_all_pes .OR. myproc == trace_pe) then
+     trace_write = .true.  
+   end if
 
    !-----------------------------------------------------------------
    ! Open trace output file. 
    !-----------------------------------------------------------------
 
-   IF (trace_write .AND. trace_unit /= 0) THEN
+   if (trace_write .AND. trace_unit /= 0) then
       if (use_html) then
-         WRITE(UNIT=temp,FMT='(I10)') myproc
-         TraceFile="trace/"//TRIM(adjustl(temp))//".html"
+         write(unit=temp,fmt='(I10)') myproc
+         TraceFile="trace/"//trim(adjustl(temp))//".html"
          OPEN ( &
-            UNIT=trace_unit, &   ! I:
-            FILE=TRIM(TraceFile), &   ! I:
+            unit=trace_unit, &   ! I:
+            file=trim(TraceFile), &   ! I:
             STATUS="REPLACE", & ! I:
-            ACTION="WRITE", &   ! I:
-            IOSTAT=IOStatus)    ! O:
+            ACTION="write", &   ! I:
+            iostat=IOStatus)    ! O:
       else   
-         WRITE(UNIT=temp,FMT='(I10)') myproc
-         TraceFile="trace/"//TRIM(adjustl(temp))//".txt"
+         write(unit=temp,fmt='(I10)') myproc
+         TraceFile="trace/"//trim(adjustl(temp))//".txt"
          OPEN ( &
-            UNIT=trace_unit, &   ! I:
-            FILE=TRIM(TraceFile), &   ! I:
+            unit=trace_unit, &   ! I:
+            file=trim(TraceFile), &   ! I:
             STATUS="REPLACE", & ! I:
-            ACTION="WRITE", &   ! I:
-            IOSTAT=IOStatus)    ! O:
+            ACTION="write", &   ! I:
+            iostat=IOStatus)    ! O:
       end if
 
-      IF (IOStatus /= 0) THEN
+      if (IOStatus /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open trace file "//TraceFile/))
-      END IF
-   END IF
+      end if
+   end if
+
+   if (trace_csv .and. rootproc) then
+         write(unit=csvname,fmt='(I10,A)') myproc,'.csv'
+      open(unit=trace_csv_unit,file="trace/"//trim(adjustl(csvname)), &
+         status="replace",iostat=IOStatus)
+      if (IOStatus /= 0) then
+         call da_error(__FILE__,__LINE__,(/"Cannot open "//csvname/))
+      end if
+   end if
 
    !-----------------------------------------------------------------
    ! Find out whether to trace memory usage. The Cray routine to check
@@ -60,7 +70,7 @@ subroutine da_trace_init
    ! Set up timing and memory usage
    !-----------------------------------------------------------------
 
-   DO Loop1=1,MaxNoRoutines
+   do Loop1=1,MaxNoRoutines
       CPUTimeStart(Loop1)     = 0.0
       ElapsedTimeStart(Loop1) = 0.0
       ElapsedTime(Loop1)      = 0.0
@@ -72,7 +82,7 @@ subroutine da_trace_init
       CalledBy(Loop1)         = 0
       MaxHeap(Loop1)          = 0
       TimerNames(Loop1)       = ""
-   END DO
+   end do
 
    Pointer     = 0
    NoRoutines  = 0
@@ -87,25 +97,21 @@ subroutine da_trace_init
 
    TraceDepth = 0
 
-   IF (trace_write) THEN
+   if (trace_write) then
       if (use_html) then
-         WRITE (UNIT=trace_unit,FMT='(A)') "<html><head><title>Tracing</title></head>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<body><h1>Trace Output</h1>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<ul>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#tree>Calling Tree</a>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#local>Local routine timings</a>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#overall>Overall routine timings</a>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<li><a href=#memory>Memory usage</a>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "</ul>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "Links are to documentation set"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<a href=",TRIM(Documentation_url), &
-            ">",TRIM(Documentation_url),"</a>"
-         WRITE (UNIT=trace_unit,FMT='(A)') ", <strong>NOT</strong> to exact code under test.<p>"
-         WRITE (UNIT=trace_unit,FMT='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
+         write (unit=trace_unit,fmt='(A)') "<html><head><title>Tracing</title></head>"
+         write (unit=trace_unit,fmt='(A)') "<body><h1>Trace Output</h1>"
+         write (unit=trace_unit,fmt='(A)') "<ul>"
+         write (unit=trace_unit,fmt='(A)') "<li><a href=#tree>Calling Tree</a>"
+         write (unit=trace_unit,fmt='(A)') "<li><a href=#local>Local routine timings</a>"
+         write (unit=trace_unit,fmt='(A)') "<li><a href=#overall>Overall routine timings</a>"
+         write (unit=trace_unit,fmt='(A)') "<li><a href=#memory>Memory usage</a>"
+         write (unit=trace_unit,fmt='(A)') "</ul>"
+         write (unit=trace_unit,fmt='(A)') "<a name=tree><h2>Calling Tree</h2></a><pre>"
       else
-         WRITE (UNIT=trace_unit,FMT='(A)') "Trace Output"
-         WRITE (UNIT=trace_unit,FMT='(A)') ""
+         write (unit=trace_unit,fmt='(A)') "Trace Output"
+         write (unit=trace_unit,fmt='(A)') ""
       end if
-   END IF
+   end if
 
 end subroutine da_trace_init

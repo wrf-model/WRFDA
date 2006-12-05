@@ -1,4 +1,4 @@
-MODULE da_vtox_transforms
+module da_vtox_transforms
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Contains routines used to transform control variable V to model
@@ -6,33 +6,33 @@ MODULE da_vtox_transforms
    !---------------------------------------------------------------------------
 
    ! Driver layer modules
-   USE module_domain
-   USE module_configure
-   USE module_driver_constants
-   USE module_machine
-   USE module_tiles
-   USE module_dm
-   USE da_tracing
-   USE module_wrf_error
+   use module_domain
+   use module_configure
+   use module_driver_constants
+   use module_machine
+   use module_tiles
+   use module_dm
+   use da_tracing
+   use module_wrf_error
 
    ! Registry generated module
-   USE module_state_description
+   use module_state_description
 
-   USE da_define_structures
-   USE da_tools
-   USE da_recursive_filter
-   USE da_dynamics
-   USE da_physics
-   USE da_constants
-   USE da_par_util
-   USE da_ssmi
-   USE da_spectral
-   USE fftpack5
+   use da_define_structures
+   use da_tools
+   use da_recursive_filter
+   use da_dynamics
+   use da_physics
+   use da_control
+   use da_par_util
+   use da_ssmi
+   use da_spectral
+   use fftpack5
 
-   IMPLICIT NONE
+   implicit none
 
 
-   CONTAINS
+   contains
 
 #include "da_add_flow_dependence_vp.inc"
 #include "da_add_flow_dependence_vp_adj.inc"
@@ -56,4 +56,4 @@ MODULE da_vtox_transforms
 #include "da_transform_vtovv_global.inc"
 #include "da_transform_vtovv_global_adj.inc"
 
-END MODULE da_vtox_transforms
+end module da_vtox_transforms

@@ -4,20 +4,20 @@ subroutine da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y )
    ! Purpose:  Calculates Cost function and Gradient for Polar AMVs Obs
    !----------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: iv          ! Innovation vector.
+   type (y_type), intent(in)    :: re          ! Residual vector.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n, k
+   integer                      :: n, k
 
    jo % polaramv_u = 0.0
    jo % polaramv_v = 0.0
 
-   IF ( iv%num_polaramv > 0 ) THEN
-      DO n=1, iv%num_polaramv
+   if ( iv%num_polaramv > 0 ) then
+      do n=1, iv%num_polaramv
          do k=1, iv%polaramv(n)%info%levels
 
             jo_grad_y%polaramv(n)%u(k) = -re%polaramv(n)%u(k) / &
@@ -35,13 +35,13 @@ subroutine da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y )
                jo % polaramv_v = jo % polaramv_v - &
                          re%polaramv(n)%v(k) * jo_grad_y%polaramv(n)%v(k)
             end do
-         endif
-      END DO
+         end if
+      end do
 
       jo % polaramv_u = 0.5 * jo % polaramv_u
       jo % polaramv_v = 0.5 * jo % polaramv_v
 
-   END IF
+   end if
      
 end subroutine da_get_jo_and_grady_polaramv
 

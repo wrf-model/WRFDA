@@ -5,7 +5,7 @@ subroutine da_gauss_noise( z )
    real,intent(out)     :: z
    real                 :: x, y, r, coeff
 
-   IF (trace_use) call da_trace_entry("da_gauss_noise")
+   if (trace_use) call da_trace_entry("da_gauss_noise")
 
 
    ! [2.1] Get two uniform variate random numbers in range 0 to 1:
@@ -23,11 +23,11 @@ subroutine da_gauss_noise( z )
       if (r > 0.0 .and. r < 1.0) exit        
    end do
 
-   ! [2.3] Use Box-Muller transformation to get normal deviates:
+   ! [2.3] use Box-Muller transformation to get normal deviates:
 
    coeff = sqrt( -2.0 * log(r) / r )         
    z = coeff * x
 
-   IF (trace_use) call da_trace_exit("da_gauss_noise")
+   if (trace_use) call da_trace_exit("da_gauss_noise")
       
 end subroutine da_gauss_noise

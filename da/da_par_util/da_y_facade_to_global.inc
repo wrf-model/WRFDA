@@ -21,106 +21,102 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    !                     up if testing is too slow.  
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   ! task-local objects  (really INTENT(IN   ))
-   TYPE (y_facade_type), INTENT(INOUT) :: re_slice      ! residual vector
-   TYPE (residual_template_type), INTENT(IN) :: template  ! allocation info
-   ! task-global objects (really INTENT(  OUT))
-   TYPE (y_facade_type), INTENT(INOUT) :: re_glob_slice ! residual vector
+   ! task-local objects  (really intent(in   ))
+   type (y_facade_type), intent(inout) :: re_slice      ! residual vector
+   type (residual_template_type), intent(in) :: template  ! allocation info
+   ! task-global objects (really intent(  out))
+   type (y_facade_type), intent(inout) :: re_glob_slice ! residual vector
 
    ! Local declarations
 #ifdef DM_PARALLEL
-   INCLUDE 'mpif.h'
-   INTEGER                      :: n, k, serial_n, serial_numvals
-   INTEGER                      :: communicator
-   INTEGER                      :: proc
-   INTEGER                      :: num_obs_send
-   INTEGER                      :: buf_idx
-   INTEGER                      :: num_obs_all
-   INTEGER                      :: num_recv_all
-   INTEGER                      :: obs_global_index(re_slice%num_obs)
-   INTEGER                      :: num_values(re_slice%num_obs)
-   INTEGER                      :: num_send_buf_lcl
-   INTEGER,ALLOCATABLE          :: num_obs_send_all(:)
-   INTEGER,ALLOCATABLE          :: obs_global_index_all(:)
-   INTEGER,ALLOCATABLE          :: obs_global_index_inv(:)
-   INTEGER,ALLOCATABLE          :: obs_start_all(:)  ! start index of each obs
-   INTEGER,POINTER              :: num_values_all(:)
-   INTEGER,ALLOCATABLE          :: num_send_buf_all(:)
-   INTEGER,ALLOCATABLE          :: recv_counts(:)
-   INTEGER,ALLOCATABLE          :: recv_displs(:)
-   REAL,ALLOCATABLE             :: re_vals_lcl(:)
-   REAL,ALLOCATABLE             :: re_vals_all(:)
-   INTEGER                      :: ierr
-   INTEGER                      :: i
+   integer                      :: n, k, serial_n, serial_numvals
+   integer                      :: proc
+   integer                      :: num_obs_send
+   integer                      :: buf_idx
+   integer                      :: num_obs_all
+   integer                      :: num_recv_all
+   integer                      :: obs_global_index(re_slice%num_obs)
+   integer                      :: num_values(re_slice%num_obs)
+   integer                      :: num_send_buf_lcl
+   integer,allocatable          :: num_obs_send_all(:)
+   integer,allocatable          :: obs_global_index_all(:)
+   integer,allocatable          :: obs_global_index_inv(:)
+   integer,allocatable          :: obs_start_all(:)  ! start index of each obs
+   integer,pointer              :: num_values_all(:)
+   integer,allocatable          :: num_send_buf_all(:)
+   integer,allocatable          :: recv_counts(:)
+   integer,allocatable          :: recv_displs(:)
+   real,allocatable             :: re_vals_lcl(:)
+   real,allocatable             :: re_vals_all(:)
+   integer                      :: i
 
-   ! TODO:  later, upgrade from "allgather" to "gather-broadcast"
+   ! TOdo:  later, upgrade from "allgather" to "gather-broadcast"
 
    ! collect information about all observations
    num_obs_send = 0
    obs_global_index = -1
-   DO n=1, re_slice%num_obs
-      IF ( re_slice%obs(n)%proc_domain ) THEN
+   do n=1, re_slice%num_obs
+      if ( re_slice%obs(n)%proc_domain ) then
          num_obs_send = num_obs_send + 1
          obs_global_index(num_obs_send) = re_slice%obs(n)%obs_global_index
-      ENDIF
-   ENDDO
-   DO n=1, num_obs_send
-      IF ( obs_global_index(n) < 0 ) THEN
+      end if
+   end do
+   do n=1, num_obs_send
+      if ( obs_global_index(n) < 0 ) then
          call da_error(__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  bad local value of obs_global_index'/))
-      ENDIF
-   END DO
+      end if
+   end do
    ! exchange num_obs_send and obs_global_index
-   call wrf_get_dm_communicator ( communicator )
-   ALLOCATE( num_obs_send_all(0:num_procs-1),     &
+   allocate( num_obs_send_all(0:num_procs-1),     &
               num_send_buf_all(0:num_procs-1),     &
               recv_counts(0:num_procs-1),          &
               recv_displs(0:num_procs-1) )
    ! gather num_obs_send
-   call MPI_ALLGATHER( num_obs_send, 1, MPI_INTEGER, num_obs_send_all, 1, &
-                        MPI_INTEGER, communicator, ierr )
-   num_obs_all = SUM( num_obs_send_all )
-   IF ( num_obs_all /= re_slice%num_obs_glo ) THEN
+   call mpi_allgather( num_obs_send, 1, mpi_integer, num_obs_send_all, 1, &
+                        mpi_integer, comm, ierr )
+   num_obs_all = sum( num_obs_send_all )
+   if ( num_obs_all /= re_slice%num_obs_glo ) then
       call da_error (__FILE__,__LINE__, &
          (/'ASSERTION ERROR:  inconsistent count of sound obs'/))
-   ENDIF
+   end if
    ! set up to gather obs_global_index
    recv_counts = num_obs_send_all
    recv_displs(0) = 0
-   DO proc=1, num_procs-1
+   do proc=1, num_procs-1
       recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
-   ENDDO
-   ALLOCATE( num_values_all(num_obs_all),       &
+   end do
+   allocate( num_values_all(num_obs_all),       &
               obs_global_index_all(num_obs_all), &
               obs_global_index_inv(num_obs_all), &
               obs_start_all(num_obs_all) )
    ! gather obs_global_index
-   call MPI_ALLGATHERV( obs_global_index, num_obs_send, MPI_INTEGER,    &
+   call mpi_allgatherv( obs_global_index, num_obs_send, mpi_integer,    &
                          obs_global_index_all, recv_counts, recv_displs, &
-                         MPI_INTEGER, communicator, ierr )
+                         mpi_integer, comm, ierr )
    ! invert obs_global_index_all
    ! initialize to "invalid" value
    obs_global_index_inv = -1
-   DO n=1, num_obs_all
-      IF ( ( obs_global_index_all(n) <  1 ) .OR. &
-           ( obs_global_index_all(n) > SIZE(obs_global_index_inv) ) ) THEN
+   do n=1, num_obs_all
+      if ( ( obs_global_index_all(n) <  1 ) .OR. &
+           ( obs_global_index_all(n) > size(obs_global_index_inv) ) ) then
          call da_error (__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  obs_global_index_all(n) out of range'/))
-      ENDIF
-      IF ( obs_global_index_inv(obs_global_index_all(n)) /= -1 ) THEN
+      end if
+      if ( obs_global_index_inv(obs_global_index_all(n)) /= -1 ) then
          call da_error (__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  obs owned by more than one task'/))
-      ENDIF
+      end if
       obs_global_index_inv(obs_global_index_all(n)) = n
-   ENDDO
-   DO n=1, num_obs_all
-      IF ( obs_global_index_inv(obs_global_index_all(n)) == -1 ) THEN
+   end do
+   do n=1, num_obs_all
+      if ( obs_global_index_inv(obs_global_index_all(n)) == -1 ) then
          call da_error (__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  obs not owned by any task'/))
-      ENDIF
-   ENDDO
+      end if
+   end do
 
    ! Create re_glob_slice and populate with residual_generic_type objects 
    ! allocated to match template.  
@@ -132,14 +128,14 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    ! (serialize/deserialize) itself for arbitrary I/O or communications (MPI or 
    ! otherwise) that clients may choose to implement.  Below are a possible set 
    ! of new methods for residual_generic_type:  
-   !  residual_generic_pack_counts( res_generic, (OUT)rcount, (OUT)icount )
+   !  residual_generic_pack_counts( res_generic, (out)rcount, (out)icount )
    !  [client allocates ibuf(icount) and rbuf(rcount)]
-   !  residual_generic_pack( res_generic, (INOUT)rstart, (INOUT)rbuf, &
-   !                         (INOUT)istart, (INOUT)ibuf )
+   !  residual_generic_pack( res_generic, (inout)rstart, (inout)rbuf, &
+   !                         (inout)istart, (inout)ibuf )
    !  [client MPI communications:   ibuf->ibufg  rbuf->rbufg]
-   !  residual_generic_unpack_counts( ibufg, (OUT)rstarts, (OUT)rcounts )
-   !  residual_generic_unpack( (OUT)res_generic, rstarts(n), rcounts(n), rbufg )
-   ! TODO:  
+   !  residual_generic_unpack_counts( ibufg, (out)rstarts, (out)rcounts )
+   !  residual_generic_unpack( (out)res_generic, rstarts(n), rcounts(n), rbufg )
+   ! TOdo:  
    !  1) Design serialization for residual_generic_type.  
    !  2) Implement new methods.  
    !  3) Refactor below...  
@@ -149,92 +145,92 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    ! (yet) a concern for testing.  
    ! Loop over vector and scalar elements
    
-   DO i=template%lbnd,template%ubnd
+   do i=template%lbnd,template%ubnd
       num_obs_send = 0
       num_values = 0
       num_send_buf_lcl = 0
       ! collect information to allocate buffers
-      DO n=1, re_slice%num_obs
-         IF ( re_slice%obs(n)%proc_domain ) THEN
+      do n=1, re_slice%num_obs
+         if ( re_slice%obs(n)%proc_domain ) then
             num_obs_send = num_obs_send + 1
             ! track number of scalars/levels per obs element
-            num_values(num_obs_send) = SIZE(re_slice%obs(n)%values(i)%ptr)
+            num_values(num_obs_send) = size(re_slice%obs(n)%values(i)%ptr)
             ! track total buffer size
             num_send_buf_lcl = num_send_buf_lcl + num_values(num_obs_send)
-         ENDIF
-      ENDDO
+         end if
+      end do
       ! gather num_send_buf_lcl
-      call MPI_ALLGATHER( num_send_buf_lcl, 1, MPI_INTEGER, &
+      call mpi_allgather( num_send_buf_lcl, 1, mpi_integer, &
                           num_send_buf_all, 1,              &
-                          MPI_INTEGER, communicator, ierr )
+                          mpi_integer, comm, ierr )
       ! gather num_values
       recv_counts = num_obs_send_all
       recv_displs(0) = 0
-      DO proc=1, num_procs-1
+      do proc=1, num_procs-1
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
-      ENDDO
+      end do
       ! num_values
-      call MPI_ALLGATHERV( num_values, num_obs_send, MPI_INTEGER,    &
+      call mpi_allgatherv( num_values, num_obs_send, mpi_integer,    &
                            num_values_all, recv_counts, recv_displs, &
-                           MPI_INTEGER, communicator, ierr )
+                           mpi_integer, comm, ierr )
       ! set up to gather local arrays
       ! compute start index of each obs in gathered buffers
       obs_start_all(1) = 1
-      DO n=2, num_obs_all
+      do n=2, num_obs_all
          obs_start_all(n) = obs_start_all(n-1) + num_values_all(n-1)
-      ENDDO
+      end do
       ! finish setting up to gather local arrays
       recv_counts = num_send_buf_all
       recv_displs(0) = 0
-      DO proc=1, num_procs-1
+      do proc=1, num_procs-1
          recv_displs(proc) = recv_displs(proc-1) + recv_counts(proc-1)
-      ENDDO
-      num_recv_all = SUM( recv_counts )
+      end do
+      num_recv_all = sum( recv_counts )
       ! allocate and initialize send buffer
-      ALLOCATE( re_vals_lcl(num_send_buf_lcl) )
+      allocate( re_vals_lcl(num_send_buf_lcl) )
       buf_idx = 0
-      DO n=1, re_slice%num_obs
-         IF ( re_slice%obs(n)%proc_domain ) THEN
-            DO k=1, SIZE(re_slice%obs(n)%values(i)%ptr)
+      do n=1, re_slice%num_obs
+         if ( re_slice%obs(n)%proc_domain ) then
+            do k=1, size(re_slice%obs(n)%values(i)%ptr)
                buf_idx = buf_idx + 1
                re_vals_lcl(buf_idx) = re_slice%obs(n)%values(i)%ptr(k)
-            ENDDO
-         ENDIF
-      END DO
-      IF ( buf_idx /= num_send_buf_lcl ) THEN
+            end do
+         end if
+      end do
+      if ( buf_idx /= num_send_buf_lcl ) then
          call da_error (__FILE__,__LINE__, &
             (/'ASSERTION ERROR:  buf_idx /= num_send_buf_lcl'/))
-      ENDIF
+      end if
       ! allocate receive buffer
-      ALLOCATE( re_vals_all(num_recv_all) )
+      allocate( re_vals_all(num_recv_all) )
       ! finally, actually gather the values
-      call MPI_ALLGATHERV( re_vals_lcl, num_send_buf_lcl, TRUE_MPI_REAL,   &
+      call mpi_allgatherv( re_vals_lcl, num_send_buf_lcl, true_mpi_real,   &
                            re_vals_all, recv_counts, recv_displs, &
-                           TRUE_MPI_REAL, communicator, ierr )
+                           true_mpi_real, comm, ierr )
       ! initialize re_glob_slice
       ! NOTE:  The i loop should be inside this n loop, see comment above...  
-      ! TODO:  Refactor...  
-      DO n=1, re_glob_slice%num_obs
+      ! TOdo:  Refactor...  
+      do n=1, re_glob_slice%num_obs
          serial_n = obs_global_index_inv(n)
          serial_numvals = num_values_all(serial_n)
          buf_idx = obs_start_all(serial_n)
          ! note that we only collected obs someone owns
-         re_glob_slice%obs(n)%proc_domain = .TRUE.
+         re_glob_slice%obs(n)%proc_domain = .true.
          re_glob_slice%obs(n)%obs_global_index = obs_global_index_all(serial_n)
          call da_res_generic_alloc_and_set( re_glob_slice%obs(n), i, &
             re_vals_all(buf_idx:(buf_idx+serial_numvals-1)) )
-      END DO
+      end do
       ! deallocate communication buffers, etc.
-      DEALLOCATE( re_vals_all )
-      DEALLOCATE( re_vals_lcl ) 
+      deallocate( re_vals_all )
+      deallocate( re_vals_lcl ) 
 
-   ENDDO  ! end of i loop
+   end do  ! end of i loop
 
    call da_y_facade_free( re_slice )
 
-   DEALLOCATE( num_values_all, obs_global_index_all, &
+   deallocate( num_values_all, obs_global_index_all, &
                 obs_global_index_inv, obs_start_all )
-   DEALLOCATE( num_obs_send_all, num_send_buf_all, &
+   deallocate( num_obs_send_all, num_send_buf_all, &
                 recv_counts, recv_displs )
 
 #else

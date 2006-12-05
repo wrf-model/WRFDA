@@ -49,7 +49,7 @@ subroutine da_add_flow_dependence_xa_adj( ne, ep, xa, vp, &
       end do
    end do
 
-   IF (trace_use) call da_trace_exit("da_add_flow_dependence_xa_adj")
+   if (trace_use) call da_trace_exit("da_add_flow_dependence_xa_adj")
 
 end subroutine da_add_flow_dependence_xa_adj
 

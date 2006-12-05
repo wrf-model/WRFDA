@@ -13,7 +13,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type (xb_type), intent(in)        :: xb    ! first guess (local).
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
@@ -25,12 +25,12 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   TYPE (vp_type), intent(out)       :: vp          ! Test CV structure.
-   TYPE (vp_type), intent(out)       :: vv          ! Test CV structure.
+   type (vp_type), intent(out)       :: vp          ! Test CV structure.
+   type (vp_type), intent(out)       :: vv          ! Test CV structure.
 
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
    integer            :: i   
-   TYPE (vp_type)                    :: vp1, vv1    ! Test CV structure.
+   type (vp_type)                    :: vp1, vv1    ! Test CV structure.
    real, dimension(ims:ime, jms:jme) :: field
 
 
@@ -39,27 +39,27 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
                                                  xa2_qt, xa2_qcw, xa2_qrn
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_w
 
-   IF (trace_use) call da_trace_entry("da_test_vxtransform")
+   if (trace_use) call da_trace_entry("da_test_vxtransform")
 
-   ALLOCATE (vp1 % v1(ims:ime,jms:jme,kms:kme))
-   ALLOCATE (vp1 % v2(ims:ime,jms:jme,kms:kme))
-   ALLOCATE (vp1 % v3(ims:ime,jms:jme,kms:kme))
-   ALLOCATE (vp1 % v4(ims:ime,jms:jme,kms:kme))
-   ALLOCATE (vp1 % v5(ims:ime,jms:jme,kms:kme))
+   allocate (vp1 % v1(ims:ime,jms:jme,kms:kme))
+   allocate (vp1 % v2(ims:ime,jms:jme,kms:kme))
+   allocate (vp1 % v3(ims:ime,jms:jme,kms:kme))
+   allocate (vp1 % v4(ims:ime,jms:jme,kms:kme))
+   allocate (vp1 % v5(ims:ime,jms:jme,kms:kme))
 
-   ALLOCATE (vv1 % v1(ims:ime,jms:jme,1:kz_vv(1)))
-   ALLOCATE (vv1 % v2(ims:ime,jms:jte,1:kz_vv(2)))
-   ALLOCATE (vv1 % v3(ims:ime,jms:jme,1:kz_vv(3)))
-   ALLOCATE (vv1 % v4(ims:ime,jms:jme,1:kz_vv(4)))
-   ALLOCATE (vv1 % v5(ims:ime,jms:jme,1:kz_vv(5)))
+   allocate (vv1 % v1(ims:ime,jms:jme,1:kz_vv(1)))
+   allocate (vv1 % v2(ims:ime,jms:jte,1:kz_vv(2)))
+   allocate (vv1 % v3(ims:ime,jms:jme,1:kz_vv(3)))
+   allocate (vv1 % v4(ims:ime,jms:jme,1:kz_vv(4)))
+   allocate (vv1 % v5(ims:ime,jms:jme,1:kz_vv(5)))
 
    call da_zero_vp_type(vp1)
    call da_zero_vp_type(vv1)
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         'da_testvxtransform:'
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         '---------------------------------------'
 
    ! Make cv all constant value 1.0
@@ -69,16 +69,16 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    call da_zero_x(xa)
    
    if ( global ) then
-      write(UNIT=stdout, fmt='(/a/)') &
+      write(unit=stdout, fmt='(/a/)') &
       ' Inverse tests not performed for global application'
       go to 1111
    end if
 
 #ifdef DM_PARALLEL
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
          ' Inverse tests will not be done as it is MPP run'
 #else
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
          ' Inverse tests follows:'
    call da_transform_vtox( xb, xbx, be, cv, &
                            vv, vp, xp, xa, &
@@ -96,14 +96,14 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    xa2_q(ims:ime,jms:jme,:) = xa % q(ims:ime,jms:jme,:)
    xa2_rho(ims:ime,jms:jme,:) = xa % rho(ims:ime,jms:jme,:)
 
-   IF ( cv_options_hum == 2 ) THEN
+   if ( cv_options_hum == 2 ) then
       xa2_rh(ims:ime,jms:jme,:) = xa % rh(ims:ime,jms:jme,:)
-   END IF
-   IF ( cv_options_hum == 3 ) THEN
+   end if
+   if ( cv_options_hum == 3 ) then
       xa2_qt (ims:ime,jms:jme,:) = xa % qt (ims:ime,jms:jme,:)
       xa2_qcw(ims:ime,jms:jme,:) = xa % qcw(ims:ime,jms:jme,:)
       xa2_qrn(ims:ime,jms:jme,:) = xa % qrn(ims:ime,jms:jme,:)
-   END IF
+   end if
 
    vv1 % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
    vv1 % v2(its:ite,jts:jte,1:kz_vv(2)) = vv % v2(its:ite,jts:jte,1:kz_vv(2))
@@ -146,7 +146,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    end if
 
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         'da_check_vvtovptovv_errors'
 
    call da_check_vp_errors( vv1, vv, kz_vv, its,ite, jts,jte, kts,kte )
@@ -178,7 +178,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
    ! Check inverse errors:
 
-   write(UNIT=stdout, fmt='(/a/)') &
+   write(unit=stdout, fmt='(/a/)') &
         'da_check_vptovvtovp_errors'
 
    call da_check_vp_errors( vp1, vp, kz_vv, its,ite, jts,jte, kts,kte )
@@ -205,7 +205,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
       ! [4.1] Test XToVpToX differences:
 
-      write(UNIT=stdout, fmt='(/a/)') &
+      write(unit=stdout, fmt='(/a/)') &
          'da_check_xtovptox_errors'
    
       call da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
@@ -224,7 +224,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
       
       ! [2.4] Check inverse errors:
 
-      write(UNIT=stdout, fmt='(/a/)') &
+      write(unit=stdout, fmt='(/a/)') &
          'da_check_vptoxtovp_errors'
 
       call da_check_vp_errors( vp, vv, kz_vp, its,ite, jts,jte, kts,kte )
@@ -276,21 +276,21 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
                           ims, ime, jms, jme, &
                           its, ite, jts, jte )
 #endif
-   endif
+   end if
 
-   DEALLOCATE (vp1 % v1)
-   DEALLOCATE (vp1 % v2)
-   DEALLOCATE (vp1 % v3)
-   DEALLOCATE (vp1 % v4)
-   DEALLOCATE (vp1 % v5)
+   deallocate (vp1 % v1)
+   deallocate (vp1 % v2)
+   deallocate (vp1 % v3)
+   deallocate (vp1 % v4)
+   deallocate (vp1 % v5)
 
-   DEALLOCATE (vv1 % v1)
-   DEALLOCATE (vv1 % v2)
-   DEALLOCATE (vv1 % v3)
-   DEALLOCATE (vv1 % v4)
-   DEALLOCATE (vv1 % v5)
+   deallocate (vv1 % v1)
+   deallocate (vv1 % v2)
+   deallocate (vv1 % v3)
+   deallocate (vv1 % v4)
+   deallocate (vv1 % v5)
 
-   IF (trace_use) call da_trace_exit("da_test_vxtransform") 
+   if (trace_use) call da_trace_exit("da_test_vxtransform") 
 
 end subroutine da_test_vxtransform
 

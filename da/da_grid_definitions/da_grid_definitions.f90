@@ -1,15 +1,15 @@
-MODULE da_grid_definitions
+module da_grid_definitions
    
    !---------------------------------------------------------------------------
    ! PURPOSE: Calculation of analysis grid variables:
    !---------------------------------------------------------------------------
    
-   USE da_constants
-   USE da_define_structures     ! For xpose_type.
+   use da_control
+   use da_define_structures     ! For xpose_type.
    
-   IMPLICIT NONE
+   implicit none
    
-   CONTAINS
+   contains
    
 #include "da_ref_height.inc"
 #include "da_ref_pres.inc"
@@ -17,4 +17,4 @@ MODULE da_grid_definitions
 #include "da_earth_2_model_wind.inc"
 #include "da_set_map_para.inc"
 
-END MODULE da_grid_definitions
+end module da_grid_definitions

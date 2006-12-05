@@ -33,6 +33,7 @@ MODULES = \
 	module_sf_gfs.o \
 	module_sf_slab.o  \
 	module_sf_noahlsm.o  \
+        module_sf_urban.o  \
 	module_sf_lsm_nmm.o  \
 	module_sf_ruclsm.o \
 	module_sf_sfcdiags.o \
@@ -49,8 +50,11 @@ MODULES = \
 	module_microphysics_zero_out.o \
 	module_radiation_driver.o \
 	module_surface_driver.o \
+	module_diagnostics.o \
 	module_fdda_psufddagd.o \
-	module_fddagd_driver.o
+	module_fddagd_driver.o  \
+        module_fddaobs_rtfdda.o \
+	module_fddaobs_driver.o
   
 OBJS    =
 
@@ -121,7 +125,8 @@ module_sf_gfs.o: module_gfs_machine.o \
 		 module_gfs_physcons.o \
 		 module_progtm.o
 
-module_sf_noahlsm.o: ../share/module_model_constants.o 
+module_sf_noahlsm.o: ../share/module_model_constants.o  \
+                     module_sf_urban.o
 
 module_sf_ruclsm.o: ../frame/module_wrf_error.o
 
@@ -158,14 +163,13 @@ module_physics_init.o : \
 		module_mp_wsm6.o		\
 		module_mp_etanew.o		\
 		module_fdda_psufddagd.o		\
+		module_fddaobs_rtfdda.o		\
 		module_mp_thompson.o            \
 		../frame/module_state_description.o \
 		../frame/module_configure.o \
-		../frame/module_domain.o \
 		../frame/module_wrf_error.o \
 		../frame/module_dm.o \
 		../share/module_model_constants.o \
-		../share/module_date_time.o  \
 		module_sf_lsm_nmm.o	
 
 module_microphysics_driver.o: \
@@ -221,10 +225,19 @@ module_surface_driver.o: \
 		../frame/module_configure.o \
 		../share/module_model_constants.o  \
  		module_sf_lsm_nmm.o
+
+module_diagnostics.o: ../frame/module_dm.o
+
 module_fddagd_driver.o: \
 		../frame/module_state_description.o \
 		../frame/module_configure.o \
 		../share/module_model_constants.o  \
 		module_fdda_psufddagd.o
+
+module_fddaobs_driver.o: \
+		../frame/module_domain.o \
+		../share/module_bc.o  \
+		../share/module_model_constants.o  \
+		module_fddaobs_rtfdda.o
 
 # DO NOT DELETE

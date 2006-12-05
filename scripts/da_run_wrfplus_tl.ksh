@@ -9,7 +9,7 @@
 # 2000-01-25 by the namelist file, renamed to tl01 to tl03 for
 # use by VAR
 
-set -x
+#set -x
 
 arg1=$1
 arg2=$2

@@ -6,8 +6,8 @@ subroutine da_map_init(proj)
 
    ! Initializes the map projection structure to missing values
 
-   IMPLICIT NONE
-   TYPE(proj_info), INTENT(INOUT)  :: proj
+   implicit none
+   type(proj_info), intent(inout)  :: proj
 
    proj%lat1 =    -999.9
    proj%lon1 =    -999.9
@@ -22,7 +22,7 @@ subroutine da_map_init(proj)
    proj%rsw      = -999.9
    proj%knowni   = -999.9
    proj%knownj   = -999.9
-   proj%init     = .FALSE.
+   proj%init     = .false.
 
 end subroutine da_map_init
 
@@ -37,18 +37,18 @@ end subroutine da_map_init
     ! will call the appropriate subroutines based on the 
     ! proj%code which indicates which projection type  this is.
 
-    IMPLICIT NONE
+    implicit none
     
     ! Declare arguments
-    INTEGER, INTENT(IN)               :: proj_code
-    REAL, INTENT(IN)                  :: lat1
-    REAL, INTENT(IN)                  :: lon1
-    REAL, INTENT(IN)                  :: dx
-    REAL, INTENT(IN)                  :: stdlon
-    REAL, INTENT(IN)                  :: truelat1
-    REAL, INTENT(IN)                  :: truelat2
-    REAL, INTENT(IN)                  :: knowni , knownj
-    TYPE(proj_info), INTENT(OUT)      :: proj
+    integer, intent(in)               :: proj_code
+    real, intent(in)                  :: lat1
+    real, intent(in)                  :: lon1
+    real, intent(in)                  :: dx
+    real, intent(in)                  :: stdlon
+    real, intent(in)                  :: truelat1
+    real, intent(in)                  :: truelat2
+    real, intent(in)                  :: knowni , knownj
+    type(proj_info), intent(out)      :: proj
 
     ! Local variables
 
@@ -56,26 +56,26 @@ end subroutine da_map_init
     ! Executable code
 
     ! First, check for validity of mandatory variables in proj
-    IF ( ABS(lat1) .GT. 90. ) THEN
+    if ( ABS(lat1) .GT. 90. ) then
       call da_error(__FILE__,__LINE__, &
         (/"Latitude of origin corner required as follows: -90N <= lat1 < = 90.N"/))
-    ENDIF
-    IF ( ABS(lon1) .GT. 180.) THEN
+    end if
+    if ( ABS(lon1) .GT. 180.) then
       call da_error(__FILE__,__LINE__, &
         (/"Longitude of origin required as follows: -180E <= lon1 <= 180W"/))
-    ENDIF
-    IF ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) THEN
+    end if
+    if ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) then
       call da_error(__FILE__,__LINE__, &
         (/"Require grid spacing (dx) in meters be positive!"/))
-    ENDIF
-    IF ((ABS(stdlon) .GT. 180.).AND.(proj_code .NE. PROJ_MERC)) THEN
+    end if
+    if ((ABS(stdlon) .GT. 180.).AND.(proj_code .NE. PROJ_MERC)) then
       call da_error(__FILE__,__LINE__, &
         (/"Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W"/)) 
-    ENDIF
-    IF (ABS(truelat1).GT.90.) THEN
+    end if
+    if (ABS(truelat1).GT.90.) then
       call da_error(__FILE__,__LINE__, &
         (/"Set true latitude 1 for all projections!"/))
-    ENDIF
+    end if
    
     call da_map_init(proj) 
     proj%code  = proj_code
@@ -87,146 +87,146 @@ end subroutine da_map_init
     proj%stdlon = stdlon
     proj%truelat1 = truelat1
     proj%truelat2 = truelat2
-    IF (proj%code .NE. PROJ_LATLON) THEN
+    if (proj%code .NE. PROJ_LATLON) then
       proj%dx = dx
-      IF (truelat1 .LT. 0.) THEN
+      if (truelat1 .LT. 0.) then
         proj%hemi = -1.0 
-      ELSE
+      else
         proj%hemi = 1.0
-      ENDIF
+      end if
       proj%rebydx = earth_radius_m / dx
-    ENDIF
-    pick_proj: SELECT CASE(proj%code)
+    end if
+    pick_proj: select case(proj%code)
 
-      CASE(PROJ_PS)
-        IF (print_detail_map) THEN
-           WRITE(UNIT=stdout,FMT='(A)') 'Setting up POLAR STEREOGRAPHIC map...'
-        END IF
+      case(PROJ_PS)
+        if (print_detail_map) then
+           write(unit=stdout,fmt='(A)') 'Setting up POLAR STEREOGRAPHIC map...'
+        end if
         call da_set_ps(proj)
 
-      CASE(PROJ_LC)
-        IF (print_detail_map) THEN
-           WRITE(UNIT=stdout,FMT='(A)') 'Setting up LAMBERT CONFORMAL map...'
-        END IF
-        IF (ABS(proj%truelat2) .GT. 90.) THEN
-           IF (print_detail_map) THEN
-              WRITE(UNIT=stdout,FMT='(A)') 'Second true latitude not set, assuming a tangent'
-              WRITE(UNIT=stdout,FMT='(A,F10.3)') 'projection at truelat1: ', proj%truelat1
-           END IF
+      case(PROJ_LC)
+        if (print_detail_map) then
+           write(unit=stdout,fmt='(A)') 'Setting up LAMBERT CONFORMAL map...'
+        end if
+        if (ABS(proj%truelat2) .GT. 90.) then
+           if (print_detail_map) then
+              write(unit=stdout,fmt='(A)') 'Second true latitude not set, assuming a tangent'
+              write(unit=stdout,fmt='(A,F10.3)') 'projection at truelat1: ', proj%truelat1
+           end if
           proj%truelat2=proj%truelat1
-        ENDIF
+        end if
         call da_set_lc(proj)
    
-      CASE (PROJ_MERC)
-        IF (print_detail_map) THEN
-           WRITE(UNIT=stdout,FMT='(A)') 'Setting up MERCATOR map...'
-        END IF
+      case (PROJ_MERC)
+        if (print_detail_map) then
+           write(unit=stdout,fmt='(A)') 'Setting up MERCATOR map...'
+        end if
         call da_set_merc(proj)
    
-      CASE (PROJ_LATLON)
-        IF (print_detail_map) THEN
-           WRITE(UNIT=stdout,FMT='(A)') 'Setting up CYLINDRICAL EQUIDISTANT LATLON map...'
-        END IF
+      case (PROJ_LATLON)
+        if (print_detail_map) then
+           write(unit=stdout,fmt='(A)') 'Setting up CYLinDRICAL EQUIDISTANT LATLON map...'
+        end if
         ! Convert lon1 to 0->360 notation
-        IF (proj%lon1 .LT. 0.) proj%lon1 = proj%lon1 + 360.
+        if (proj%lon1 .LT. 0.) proj%lon1 = proj%lon1 + 360.
    
-      CASE DEFAULT
-        WRITE(UNIT=errmsg(1),FMT='(A,I2)') 'Unknown projection code: ', proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1:1))
-      END SELECT pick_proj
-    proj%init = .TRUE.
-    RETURN
+      case default
+        write(unit=message(1),fmt='(A,I2)') 'Unknown projection code: ', proj%code
+        call da_error(__FILE__,__LINE__,message(1:1))
+      end select pick_proj
+    proj%init = .true.
+    return
   end subroutine da_map_set
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_latlon_to_ij(proj, lat, lon, i, j)
     ! Converts input lat/lon values to the cartesian (i,j) value
     ! for the given projection. 
 
-    IMPLICIT NONE
-    TYPE(proj_info), INTENT(IN)          :: proj
-    REAL, INTENT(IN)                     :: lat
-    REAL, INTENT(IN)                     :: lon
-    REAL, INTENT(OUT)                    :: i
-    REAL, INTENT(OUT)                    :: j
+    implicit none
+    type(proj_info), intent(in)          :: proj
+    real, intent(in)                     :: lat
+    real, intent(in)                     :: lon
+    real, intent(out)                    :: i
+    real, intent(out)                    :: j
 
-    IF (.NOT.proj%init) THEN
+    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
         (/"You have not called map_set for this projection!"/))
-    ENDIF
+    end if
 
-    SELECT CASE(proj%code)
+    select case(proj%code)
  
-      CASE(PROJ_LATLON)
+      case(PROJ_LATLON)
         call da_llij_latlon(lat,lon,proj,i,j)
 
-      CASE(PROJ_MERC)
+      case(PROJ_MERC)
         call da_llij_merc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
-      CASE(PROJ_PS)
+      case(PROJ_PS)
         call da_llij_ps(lat,lon,proj,i,j)
       
-      CASE(PROJ_LC)
+      case(PROJ_LC)
         call da_llij_lc(lat,lon,proj,i,j)
         i = i + proj%knowni - 1.0
         j = j + proj%knownj - 1.0
 
-      CASE DEFAULT
-        WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      case default
+        write(unit=message(1),fmt='(A,I2)') &
           'Unrecognized map projection code: ', proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1:1))
+        call da_error(__FILE__,__LINE__,message(1:1))
  
-    END SELECT
-    RETURN
+    end select
+    return
   end subroutine da_latlon_to_ij
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_ij_to_latlon(proj, ii, jj, lat, lon)
     ! Computes geographical latitude and longitude for a given (i,j) point
     ! in a grid with a projection of proj
 
-    IMPLICIT NONE
-    TYPE(proj_info),INTENT(IN)          :: proj
-    REAL, INTENT(IN)                    :: ii
-    REAL, INTENT(IN)                    :: jj
-    REAL, INTENT(OUT)                   :: lat
-    REAL, INTENT(OUT)                   :: lon
-    REAL                                :: i, j
+    implicit none
+    type(proj_info),intent(in)          :: proj
+    real, intent(in)                    :: ii
+    real, intent(in)                    :: jj
+    real, intent(out)                   :: lat
+    real, intent(out)                   :: lon
+    real                                :: i, j
 
-    IF (.NOT.proj%init) THEN
+    if (.NOT.proj%init) then
       call da_error(__FILE__,__LINE__, &
         (/"You have not called map_set for this projection!"/))
-    ENDIF
+    end if
 
     i = ii
     j = jj
 
-    SELECT CASE (proj%code)
+    select case (proj%code)
 
-      CASE (PROJ_LATLON)
+      case (PROJ_LATLON)
         call da_ijll_latlon(i, j, proj, lat, lon)
 
-      CASE (PROJ_MERC)
+      case (PROJ_MERC)
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
         call da_ijll_merc(i, j, proj, lat, lon)
 
-      CASE (PROJ_PS)
+      case (PROJ_PS)
         call da_ijll_ps(i, j, proj, lat, lon)
 
-      CASE (PROJ_LC)
+      case (PROJ_LC)
 
         i = ii - proj%knowni + 1.0
         j = jj - proj%knownj + 1.0
         call da_ijll_lc(i, j, proj, lat, lon)
 
-      CASE DEFAULT
-        WRITE(UNIT=errmsg(1),FMT='(A,I2)') &
+      case default
+        write(unit=message(1),fmt='(A,I2)') &
           "Unrecognized map projection code: ", proj%code
-        call da_error(__FILE__,__LINE__,errmsg(1:1))
+        call da_error(__FILE__,__LINE__,message(1:1))
 
-    END SELECT
-    RETURN
+    end select
+    return
   end subroutine da_ij_to_latlon
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_set_ps(proj)
@@ -234,16 +234,16 @@ end subroutine da_map_init
     ! filled proj structure. This routine computes the radius to the
     ! southwest corner and computes the i/j location of the pole for use
     ! in llij_ps and ijll_ps.
-    IMPLICIT NONE
+    implicit none
  
     ! Declare args
-    TYPE(proj_info), INTENT(INOUT)    :: proj
+    type(proj_info), intent(inout)    :: proj
 
     ! Local vars
-    REAL                              :: ala1
-    REAL                              :: alo1
-    REAL                              :: reflon
-    REAL                              :: scale_top
+    real                              :: ala1
+    real                              :: alo1
+    real                              :: reflon
+    real                              :: scale_top
 
     ! Executable code
 
@@ -254,20 +254,20 @@ end subroutine da_map_init
     reflon = proj%stdlon + 90.
 
     ! Compute numerator term of map scale factor
-    scale_top = 1. + proj%hemi * SIN(proj%truelat1 * rad_per_deg)
+    scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
     ! Compute radius to lower-left (SW) corner
     ala1 = proj%lat1 * rad_per_deg
-    proj%rsw = proj%rebydx*COS(ala1)*scale_top/(1.+proj%hemi*SIN(ala1))
+    proj%rsw = proj%rebydx*COS(ala1)*scale_top/(1.+proj%hemi*Sin(ala1))
 
     ! Find the pole point
     alo1 = (proj%lon1 - reflon) * rad_per_deg
     proj%polei = proj%knowni - proj%rsw * COS(alo1)
-    proj%polej = proj%knownj - proj%hemi * proj%rsw * SIN(alo1)
-    IF (print_detail_map) THEN
-       PRINT '(A,2F10.1)', 'Computed (I,J) of pole point: ',proj%polei,proj%polej
-    END IF
-    RETURN
+    proj%polej = proj%knownj - proj%hemi * proj%rsw * Sin(alo1)
+    if (print_detail_map) then
+       PRinT '(A,2F10.1)', 'Computed (I,J) of pole point: ',proj%polei,proj%polej
+    end if
+    return
   end subroutine da_set_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_llij_ps(lat,lon,proj,i,j)
@@ -276,42 +276,42 @@ end subroutine da_map_init
     ! public proj structure, this routine returns the i/j indices which
     ! if within the domain range from 1->nx and 1->ny, respectively.
 
-    IMPLICIT NONE
+    implicit none
 
     ! Delcare input arguments
-    REAL, INTENT(IN)               :: lat
-    REAL, INTENT(IN)               :: lon
-    TYPE(proj_info),INTENT(IN)     :: proj
+    real, intent(in)               :: lat
+    real, intent(in)               :: lon
+    type(proj_info),intent(in)     :: proj
 
     ! Declare output arguments     
-    REAL, INTENT(OUT)              :: i !(x-index)
-    REAL, INTENT(OUT)              :: j !(y-index)
+    real, intent(out)              :: i !(x-index)
+    real, intent(out)              :: j !(y-index)
 
     ! Declare local variables
     
-    REAL                           :: reflon
-    REAL                           :: scale_top
-    REAL                           :: ala
-    REAL                           :: alo
-    REAL                           :: rm
+    real                           :: reflon
+    real                           :: scale_top
+    real                           :: ala
+    real                           :: alo
+    real                           :: rm
 
-    ! BEGIN CODE
+    ! BEGin CODE
 
   
     reflon = proj%stdlon + 90.
    
     ! Compute numerator term of map scale factor
 
-    scale_top = 1. + proj%hemi * SIN(proj%truelat1 * rad_per_deg)
+    scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
     ! Find radius to desired point
     ala = lat * rad_per_deg
-    rm = proj%rebydx * COS(ala) * scale_top/(1. + proj%hemi *SIN(ala))
+    rm = proj%rebydx * COS(ala) * scale_top/(1. + proj%hemi *Sin(ala))
     alo = (lon - reflon) * rad_per_deg
     i = proj%polei + rm * COS(alo)
-    j = proj%polej + proj%hemi * rm * SIN(alo)
+    j = proj%polej + proj%hemi * rm * Sin(alo)
  
-    RETURN
+    return
   end subroutine da_llij_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_ijll_ps(i, j, proj, lat, lon)
@@ -320,23 +320,23 @@ end subroutine da_map_init
     ! latitude and longitude of an i/j point given the projection info 
     ! structure.  
 
-    IMPLICIT NONE
+    implicit none
 
     ! Declare input arguments
-    REAL, INTENT(IN)                    :: i    ! Column
-    REAL, INTENT(IN)                    :: j    ! Row
-    TYPE (proj_info), INTENT(IN)        :: proj
+    real, intent(in)                    :: i    ! Column
+    real, intent(in)                    :: j    ! Row
+    type (proj_info), intent(in)        :: proj
     
     ! Declare output arguments
-    REAL, INTENT(OUT)                   :: lat     ! -90 -> 90 North
-    REAL, INTENT(OUT)                   :: lon     ! -180 -> 180 East
+    real, intent(out)                   :: lat     ! -90 -> 90 North
+    real, intent(out)                   :: lon     ! -180 -> 180 East
 
     ! Local variables
-    REAL                                :: reflon
-    REAL                                :: scale_top
-    REAL                                :: xx,yy
-    REAL                                :: gi2, r2
-    REAL                                :: arccos
+    real                                :: reflon
+    real                                :: scale_top
+    real                                :: xx,yy
+    real                                :: gi2, r2
+    real                                :: arccos
 
     ! Begin Code
 
@@ -345,7 +345,7 @@ end subroutine da_map_init
     reflon = proj%stdlon + 90.
    
     ! Compute numerator term of map scale factor
-    scale_top = 1. + proj%hemi * SIN(proj%truelat1 * rad_per_deg)
+    scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
     ! Compute radius to point of interest
     xx = i - proj%polei
@@ -353,24 +353,24 @@ end subroutine da_map_init
     r2 = xx**2 + yy**2
 
     ! Now the magic code
-    IF (r2 .EQ. 0.) THEN 
+    if (r2 .EQ. 0.) then 
       lat = proj%hemi * 90.
       lon = reflon
-    ELSE
+    else
       gi2 = (proj%rebydx * scale_top)**2.
-      lat = deg_per_rad * proj%hemi * ASIN((gi2-r2)/(gi2+r2))
-      arccos = ACOS(xx/SQRT(r2))
-      IF (yy .GT. 0) THEN
+      lat = deg_per_rad * proj%hemi * ASin((gi2-r2)/(gi2+r2))
+      arccos = ACOS(xx/sqrt(r2))
+      if (yy .GT. 0) then
         lon = reflon + deg_per_rad * arccos
-      ELSE
+      else
         lon = reflon - deg_per_rad * arccos
-      ENDIF
-    ENDIF
+      end if
+    end if
   
     ! Convert to a -180 -> 180 East convention
-    IF (lon .GT. 180.) lon = lon - 360.
-    IF (lon .LT. -180.) lon = lon + 360.
-    RETURN
+    if (lon .GT. 180.) lon = lon - 360.
+    if (lon .LT. -180.) lon = lon + 360.
+    return
   
   end subroutine da_ijll_ps
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -378,25 +378,25 @@ end subroutine da_map_init
     ! Initialize the remaining items in the proj structure for a
     ! lambert conformal grid.
 
-    IMPLICIT NONE
+    implicit none
     
-    TYPE(proj_info), INTENT(INOUT)     :: proj
+    type(proj_info), intent(inout)     :: proj
 
-    REAL                               :: arg
-    REAL                               :: deltalon1
-    REAL                               :: tl1r
-    REAL                               :: ctl1r
+    real                               :: arg
+    real                               :: deltalon1
+    real                               :: tl1r
+    real                               :: ctl1r
 
     ! Compute cone factor
     call da_lc_cone(proj%truelat1, proj%truelat2, proj%cone)
-    IF (print_detail_map) THEN
-       PRINT '(A,F8.6)', 'Computed cone factor: ', proj%cone
-    END IF
+    if (print_detail_map) then
+       PRinT '(A,F8.6)', 'Computed cone factor: ', proj%cone
+    end if
     ! Compute longitude differences and ensure we stay out of the
     ! forbidden "cut zone"
     deltalon1 = proj%lon1 - proj%stdlon
-    IF (deltalon1 .GT. +180.) deltalon1 = deltalon1 - 360.
-    IF (deltalon1 .LT. -180.) deltalon1 = deltalon1 + 360.
+    if (deltalon1 .GT. +180.) deltalon1 = deltalon1 - 360.
+    if (deltalon1 .LT. -180.) deltalon1 = deltalon1 + 360.
 
     ! Convert truelat1 to radian and compute COS for later use
     tl1r = proj%truelat1 * rad_per_deg
@@ -409,45 +409,45 @@ end subroutine da_map_init
 
     ! Find pole point
     arg = proj%cone*(deltalon1*rad_per_deg)
-    proj%polei = 1. - proj%hemi * proj%rsw * SIN(arg)
+    proj%polei = 1. - proj%hemi * proj%rsw * Sin(arg)
     proj%polej = 1. + proj%rsw * COS(arg)  
-    IF (print_detail_map) THEN
-       PRINT '(A,2F10.3)', 'Computed pole i/j = ', proj%polei, proj%polej
-    END IF
-    RETURN
+    if (print_detail_map) then
+       PRinT '(A,2F10.3)', 'Computed pole i/j = ', proj%polei, proj%polej
+    end if
+    return
   end subroutine da_set_lc                             
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_lc_cone(truelat1, truelat2, cone)
 
   ! subroutine da_to compute the cone factor of a Lambert Conformal projection
 
-    IMPLICIT NONE
+    implicit none
     
     ! Input Args
-    REAL, INTENT(IN)             :: truelat1  ! (-90 -> 90 degrees N)
-    REAL, INTENT(IN)             :: truelat2  !   "   "  "   "     "
+    real, intent(in)             :: truelat1  ! (-90 -> 90 degrees N)
+    real, intent(in)             :: truelat2  !   "   "  "   "     "
 
     ! Output Args
-    REAL, INTENT(OUT)            :: cone
+    real, intent(out)            :: cone
 
     ! Locals
 
-    ! BEGIN CODE
+    ! BEGin CODE
 
     ! First, see if this is a secant or tangent projection.  For tangent
     ! projections, truelat1 = truelat2 and the cone is tangent to the 
     ! Earth's surface at this latitude.  For secant projections, the cone
     ! intersects the Earth's surface at each of the distinctly different
     ! latitudes
-    IF (ABS(truelat1-truelat2) .GT. 0.1) THEN
+    if (ABS(truelat1-truelat2) .GT. 0.1) then
       cone = ALOG10(COS(truelat1*rad_per_deg)) - &
              ALOG10(COS(truelat2*rad_per_deg))
       cone = cone /(ALOG10(TAN((45.0 - ABS(truelat1)/2.0) * rad_per_deg)) - &
              ALOG10(TAN((45.0 - ABS(truelat2)/2.0) * rad_per_deg)))        
-    ELSE
-       cone = SIN(ABS(truelat1)*rad_per_deg )  
-    ENDIF
-  RETURN
+    else
+       cone = Sin(ABS(truelat1)*rad_per_deg )  
+    end if
+  return
   end subroutine da_lc_cone
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_ijll_lc( i, j, proj, lat, lon)
@@ -458,52 +458,52 @@ end subroutine da_map_init
   ! History:
   ! 25 Jul 01: Corrected by B. Shaw, NOAA/FSL
   ! 
-    IMPLICIT NONE
+    implicit none
 
     ! Input Args
-    REAL, INTENT(IN)              :: i        ! Cartesian X coordinate
-    REAL, INTENT(IN)              :: j        ! Cartesian Y coordinate
-    TYPE(proj_info),INTENT(IN)    :: proj     ! Projection info structure
+    real, intent(in)              :: i        ! Cartesian X coordinate
+    real, intent(in)              :: j        ! Cartesian Y coordinate
+    type(proj_info),intent(in)    :: proj     ! Projection info structure
 
     ! Output Args                 
-    REAL, INTENT(OUT)             :: lat      ! Latitude (-90->90 deg N)
-    REAL, INTENT(OUT)             :: lon      ! Longitude (-180->180 E)
+    real, intent(out)             :: lat      ! Latitude (-90->90 deg N)
+    real, intent(out)             :: lon      ! Longitude (-180->180 E)
 
     ! Locals 
-    REAL                          :: inew
-    REAL                          :: jnew
-    REAL                          :: r
-    REAL                          :: chi,chi1,chi2
-    REAL                          :: r2
-    REAL                          :: xx
-    REAL                          :: yy
+    real                          :: inew
+    real                          :: jnew
+    real                          :: r
+    real                          :: chi,chi1,chi2
+    real                          :: r2
+    real                          :: xx
+    real                          :: yy
 
-    ! BEGIN CODE
+    ! BEGin CODE
 
     chi1 = (90. - proj%hemi*proj%truelat1)*rad_per_deg
     chi2 = (90. - proj%hemi*proj%truelat2)*rad_per_deg
 
     ! See if we are in the southern hemispere and flip the indices
     ! if we are. 
-    IF (proj%hemi .EQ. -1.) THEN 
+    if (proj%hemi .EQ. -1.) then 
       inew = -i + 2.
       jnew = -j + 2.
-    ELSE
+    else
       inew = i
       jnew = j
-    ENDIF
+    end if
 
     ! Compute radius**2 to i/j location
     xx = inew - proj%polei
     yy = proj%polej - jnew
     r2 = (xx*xx + yy*yy)
-    r = SQRT(r2)/proj%rebydx
+    r = sqrt(r2)/proj%rebydx
    
     ! Convert to lat/lon
-    IF (r2 .EQ. 0.) THEN
+    if (r2 .EQ. 0.) then
       lat = proj%hemi * 90.
       lon = proj%stdlon
-    ELSE
+    else
        
       ! Longitude
       lon = proj%stdlon + deg_per_rad * ATAN2(proj%hemi*xx,yy)/proj%cone
@@ -514,18 +514,18 @@ end subroutine da_map_init
       !  Maling, D.H., 1973: Coordinate Systems and Map Projections
       ! Equations #20 in Appendix I.  
         
-      IF (chi1 .EQ. chi2) THEN
+      if (chi1 .EQ. chi2) then
         chi = 2.0*ATAN( ( r/TAN(chi1) )**(1./proj%cone) * TAN(chi1*0.5) )
-      ELSE
-        chi = 2.0*ATAN( (r*proj%cone/SIN(chi1))**(1./proj%cone) * TAN(chi1*0.5)) 
-      ENDIF
+      else
+        chi = 2.0*ATAN( (r*proj%cone/Sin(chi1))**(1./proj%cone) * TAN(chi1*0.5)) 
+      end if
       lat = (90.0-chi*deg_per_rad)*proj%hemi
 
-    ENDIF
+    end if
 
-    IF (lon .GT. +180.) lon = lon - 360.
-    IF (lon .LT. -180.) lon = lon + 360.
-    RETURN
+    if (lon .GT. +180.) lon = lon - 360.
+    if (lon .LT. -180.) lon = lon + 360.
+    return
     end subroutine da_ijll_lc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_llij_lc( lat, lon, proj, i, j)
@@ -533,32 +533,32 @@ end subroutine da_map_init
   ! subroutine da_to compute the geographical latitude and longitude values
   ! to the cartesian x/y on a Lambert Conformal projection.
     
-    IMPLICIT NONE
+    implicit none
 
     ! Input Args
-    REAL, INTENT(IN)              :: lat      ! Latitude (-90->90 deg N)
-    REAL, INTENT(IN)              :: lon      ! Longitude (-180->180 E)
-    TYPE(proj_info),INTENT(IN)      :: proj     ! Projection info structure
+    real, intent(in)              :: lat      ! Latitude (-90->90 deg N)
+    real, intent(in)              :: lon      ! Longitude (-180->180 E)
+    type(proj_info),intent(in)      :: proj     ! Projection info structure
 
     ! Output Args                 
-    REAL, INTENT(OUT)             :: i        ! Cartesian X coordinate
-    REAL, INTENT(OUT)             :: j        ! Cartesian Y coordinate
+    real, intent(out)             :: i        ! Cartesian X coordinate
+    real, intent(out)             :: j        ! Cartesian Y coordinate
 
     ! Locals 
-    REAL                          :: arg
-    REAL                          :: deltalon
-    REAL                          :: tl1r
-    REAL                          :: rm
-    REAL                          :: ctl1r
+    real                          :: arg
+    real                          :: deltalon
+    real                          :: tl1r
+    real                          :: rm
+    real                          :: ctl1r
     
 
-    ! BEGIN CODE
+    ! BEGin CODE
     
     ! Compute deltalon between known longitude and standard lon and ensure
     ! it is not in the cut zone
     deltalon = lon - proj%stdlon
-    IF (deltalon .GT. +180.) deltalon = deltalon - 360.
-    IF (deltalon .LT. -180.) deltalon = deltalon + 360.
+    if (deltalon .GT. +180.) deltalon = deltalon - 360.
+    if (deltalon .LT. -180.) deltalon = deltalon + 360.
     
     ! Convert truelat1 to radian and compute COS for later use
     tl1r = proj%truelat1 * rad_per_deg
@@ -570,7 +570,7 @@ end subroutine da_map_init
           TAN((90.*proj%hemi-proj%truelat1)*rad_per_deg/2.))**proj%cone
 
     arg = proj%cone*(deltalon*rad_per_deg)
-    i = proj%polei + proj%hemi * rm * SIN(arg)
+    i = proj%polei + proj%hemi * rm * Sin(arg)
     j = proj%polej - rm * COS(arg)
 
     ! Finally, if we are in the southern hemisphere, flip the i/j
@@ -578,20 +578,20 @@ end subroutine da_map_init
     ! (what we assume) which is different than the original NCEP
     ! algorithms which used the NE corner as the origin in the 
     ! southern hemisphere (left-hand vs. right-hand coordinate?)
-    IF (proj%hemi .EQ. -1.) THEN
+    if (proj%hemi .EQ. -1.) then
       i = 2. - i  
       j = 2. - j
-    ENDIF
-    RETURN
+    end if
+    return
   end subroutine da_llij_lc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_set_merc(proj)
   
     ! Sets up the remaining basic elements for the mercator projection
 
-    IMPLICIT NONE
-    TYPE(proj_info), INTENT(INOUT)       :: proj
-    REAL                                 :: clain
+    implicit none
+    type(proj_info), intent(inout)       :: proj
+    real                                 :: clain
 
 
     !  Preliminary variables
@@ -603,68 +603,68 @@ end subroutine da_map_init
     ! proj%rsw tag.
 
     proj%rsw = 0.
-    IF (proj%lat1 .NE. 0.) THEN
+    if (proj%lat1 .NE. 0.) then
       proj%rsw = (ALOG(TAN(0.5*((proj%lat1+90.)*rad_per_deg))))/proj%dlon
-    ENDIF
-    RETURN
+    end if
+    return
   end subroutine da_set_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_llij_merc(lat, lon, proj, i, j)
 
     ! Compute i/j coordinate from lat lon for mercator projection
   
-    IMPLICIT NONE
-    REAL, INTENT(IN)              :: lat
-    REAL, INTENT(IN)              :: lon
-    TYPE(proj_info),INTENT(IN)    :: proj
-    REAL,INTENT(OUT)              :: i
-    REAL,INTENT(OUT)              :: j
-    REAL                          :: deltalon
+    implicit none
+    real, intent(in)              :: lat
+    real, intent(in)              :: lon
+    type(proj_info),intent(in)    :: proj
+    real,intent(out)              :: i
+    real,intent(out)              :: j
+    real                          :: deltalon
 
     deltalon = lon - proj%lon1
-    IF (deltalon .LT. -180.) deltalon = deltalon + 360.
-    IF (deltalon .GT. 180.) deltalon = deltalon - 360.
+    if (deltalon .LT. -180.) deltalon = deltalon + 360.
+    if (deltalon .GT. 180.) deltalon = deltalon - 360.
     i = 1. + (deltalon/(proj%dlon*deg_per_rad))
     j = 1. + (ALOG(TAN(0.5*((lat + 90.) * rad_per_deg)))) / &
            proj%dlon - proj%rsw
 
-    RETURN
+    return
   end subroutine da_llij_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_ijll_merc(i, j, proj, lat, lon)
 
     ! Compute the lat/lon from i/j for mercator projection
 
-    IMPLICIT NONE
-    REAL,INTENT(IN)               :: i
-    REAL,INTENT(IN)               :: j    
-    TYPE(proj_info),INTENT(IN)    :: proj
-    REAL, INTENT(OUT)             :: lat
-    REAL, INTENT(OUT)             :: lon 
+    implicit none
+    real,intent(in)               :: i
+    real,intent(in)               :: j    
+    type(proj_info),intent(in)    :: proj
+    real, intent(out)             :: lat
+    real, intent(out)             :: lon 
 
 
     lat = 2.0*ATAN(EXP(proj%dlon*(proj%rsw + j-1.)))*deg_per_rad - 90.
     lon = (i-1.)*proj%dlon*deg_per_rad + proj%lon1
-    IF (lon.GT.180.) lon = lon - 360.
-    IF (lon.LT.-180.) lon = lon + 360.
-    RETURN
+    if (lon.GT.180.) lon = lon - 360.
+    if (lon.LT.-180.) lon = lon + 360.
+    return
   end subroutine da_ijll_merc
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_llij_latlon(lat, lon, proj, i, j)
  
     ! Compute the i/j location of a lat/lon on a LATLON grid.
-    IMPLICIT NONE
-    REAL, INTENT(IN)             :: lat
-    REAL, INTENT(IN)             :: lon
-    TYPE(proj_info), INTENT(IN)  :: proj
-    REAL, INTENT(OUT)            :: i
-    REAL, INTENT(OUT)            :: j
+    implicit none
+    real, intent(in)             :: lat
+    real, intent(in)             :: lon
+    type(proj_info), intent(in)  :: proj
+    real, intent(out)            :: i
+    real, intent(out)            :: j
 
-    REAL                         :: deltalat
-    REAL                         :: deltalon
-    REAL                         :: lon360
-    REAL                         :: latinc
-    REAL                         :: loninc
+    real                         :: deltalat
+    real                         :: deltalon
+    real                         :: lon360
+    real                         :: latinc
+    real                         :: loninc
 
     ! Extract the latitude and longitude increments for this grid
     ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
@@ -680,33 +680,33 @@ end subroutine da_map_init
 
     ! To account for issues around the dateline, convert the incoming
     ! longitudes to be 0->360.
-    IF (lon .LT. 0) THEN 
+    if (lon .LT. 0) then 
       lon360 = lon + 360. 
-    ELSE 
+    else 
       lon360 = lon
-    ENDIF    
+    end if    
     deltalon = lon360 - proj%lon1      
     
     ! Compute i/j
     i = deltalon/loninc + 1.
     j = deltalat/latinc + 1.
-    RETURN
+    return
     end subroutine da_llij_latlon
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   subroutine da_ijll_latlon(i, j, proj, lat, lon)
  
     ! Compute the lat/lon location of an i/j on a LATLON grid.
-    IMPLICIT NONE
-    REAL, INTENT(IN)             :: i
-    REAL, INTENT(IN)             :: j
-    TYPE(proj_info), INTENT(IN)  :: proj
-    REAL, INTENT(OUT)            :: lat
-    REAL, INTENT(OUT)            :: lon
+    implicit none
+    real, intent(in)             :: i
+    real, intent(in)             :: j
+    type(proj_info), intent(in)  :: proj
+    real, intent(out)            :: lat
+    real, intent(out)            :: lon
 
-    REAL                         :: deltalat
-    REAL                         :: deltalon
-    REAL                         :: latinc
-    REAL                         :: loninc
+    real                         :: deltalat
+    real                         :: deltalon
+    real                         :: latinc
+    real                         :: loninc
 
     ! Extract the latitude and longitude increments for this grid
     ! (e.g., 2.5 deg for NCEP reanalysis) from the proj structure, where
@@ -722,15 +722,15 @@ end subroutine da_map_init
     lat = proj%lat1 + deltalat
     lon = proj%lon1 + deltalon
 
-    IF ((ABS(lat) .GT. 90.).OR.(ABS(deltalon) .GT.360.)) THEN
+    if ((ABS(lat) .GT. 90.).OR.(ABS(deltalon) .GT.360.)) then
       ! Off the earth for this grid
       lat = -999.
       lon = -999.
-    ELSE
+    else
       lon = lon + 360.
       lon = MOD(lon,360.)
-      IF (lon .GT. 180.) lon = lon -360.
-    ENDIF
+      if (lon .GT. 180.) lon = lon -360.
+    end if
 
-    RETURN
+    return
   end subroutine da_ijll_latlon

@@ -1,10 +1,10 @@
 subroutine da_print_stats_radar( stats_unit, nrv, nrf, Radar )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                 INTENT(IN)    :: stats_unit
-   INTEGER,                 INTENT(INOUT) :: nrv, nrf
-   TYPE (stats_Radar_type), INTENT(IN)    :: Radar
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nrv, nrf
+   type (stats_Radar_type), intent(in)    :: Radar
    
    write(unit=stats_unit, fmt='(a/)') &
       '   var             rv (m/s)        n    k         rf (dBZ)        n    k  '

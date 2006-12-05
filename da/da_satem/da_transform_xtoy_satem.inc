@@ -1,28 +1,28 @@
 subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-   TYPE (xb_type),  INTENT(IN)  :: xb       ! first guess state.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (xb_type),  intent(in)  :: xb       ! first guess state.
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  !
-   REAL                         :: dy, dym  !
-   INTEGER                      :: num_levs ! obs vertical levels
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  !
+   real                         :: dy, dym  !
+   integer                      :: num_levs ! obs vertical levels
 
-   INTEGER                      :: k
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
-   INTEGER                      :: layer1,layer2,ks,ke
-   REAL                         :: tv1,tv2,pres2
+   integer                      :: k
+   real, dimension(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
+   integer                      :: layer1,layer2,ks,ke
+   real                         :: tv1,tv2,pres2
 
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)   :: TGL_pre_ma,TGL_tv_ma
-   REAL                         :: TGL_tv1,TGL_tv2
+   real, dimension(xp%kts-1:xp%kte+1)   :: TGL_pre_ma,TGL_tv_ma
+   real                         :: TGL_tv1,TGL_tv2
 
-   IF ( iv%num_satem > 0 ) THEN
+   if ( iv%num_satem > 0 ) then
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
 
@@ -54,7 +54,7 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
          ! [4.0] Thickness calculation
 
          do k=1, num_levs
-            IF ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) THEN
+            if ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) then
 
                call da_tgl_find_layer(layer1,tv1,iv%satem(n)%p(k),            &
                   pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
@@ -66,10 +66,10 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
                pres2 = iv%satem(n)%p(k)
                layer2 = layer1
                tv2 = tv1
-            ENDIF
-         enddo
-      ENDDO
-   ENDIF
+            end if
+         end do
+      end do
+   end if
 
 end subroutine da_transform_xtoy_satem
 

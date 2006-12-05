@@ -22,7 +22,7 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
 
    integer              :: k, j, k1            ! Loop counters.
 
-   IF (trace_use) call da_trace_entry("da_transform_vptox") 
+   if (trace_use) call da_trace_entry("da_transform_vptox") 
 
    !---------------------------------------------------------------------------
    !  [1] Add flow-dependent increments in control variable space (vp):
@@ -92,7 +92,7 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
                                       its,ite, jts,jte, kts,kte )
    end if
 
-   IF (trace_use) call da_trace_exit("da_transform_vptox") 
+   if (trace_use) call da_trace_exit("da_transform_vptox") 
  
 end subroutine da_transform_vptox
 

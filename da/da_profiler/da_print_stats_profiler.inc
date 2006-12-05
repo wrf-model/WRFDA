@@ -1,10 +1,10 @@
 subroutine da_print_stats_profiler( stats_unit, nu, nv, Profiler )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                    INTENT(IN)    :: stats_unit
-   INTEGER,                    INTENT(INOUT) :: nu, nv
-   TYPE (stats_profiler_type), INTENT(IN)    :: Profiler
+   integer,                    intent(in)    :: stats_unit
+   integer,                    intent(inout) :: nu, nv
+   type (stats_profiler_type), intent(in)    :: Profiler
    
    write(unit=stats_unit, fmt='(a/)') &
       '   var             u (m/s)     n    k    v (m/s)     n    k  '

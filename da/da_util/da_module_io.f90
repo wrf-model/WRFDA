@@ -4,7 +4,7 @@ module da_module_io
 
    implicit none
 
-CONTAINS
+contains
 
 !#include "da_clean_rows.inc"
 #include "da_crs_2_dot.inc"

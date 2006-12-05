@@ -1,21 +1,26 @@
-MODULE da_interpolation
+module da_interpolation
 
-   USE da_constants
-   USE da_define_structures
-   USE da_tools
+   use da_control
+   use da_define_structures
+   use da_tools
 
-   IMPLICIT NONE
+   implicit none
 
-CONTAINS
+contains
 
 #include "da_to_zk.inc"
+#include "da_to_zk_new.inc"
 
 #include "da_interp_obs_lin_2d.inc"
 #include "da_interp_obs_lin_2d_adj.inc"
 #include "da_interp_lin_2d.inc"
+#include "da_interp_lin_2d_new.inc"
 #include "da_interp_lin_2d_adj.inc"
+#include "da_interp_lin_2d_adj_new.inc"
 #include "da_interp_lin_3d.inc"
+#include "da_interp_lin_3d_new.inc"
 #include "da_interp_lin_3d_adj.inc"
+#include "da_interp_lin_3d_adj_new.inc"
 
-END MODULE da_interpolation
+end module da_interpolation
 

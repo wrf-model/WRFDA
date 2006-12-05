@@ -5,14 +5,14 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
 !
 !                                           Y.-R. Guo  06/02/2004
 ! ----------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
 
-   TYPE (stats_gpsref_type)          :: GPSRef
-   INTEGER                          :: ngpsref
-   INTEGER                          :: n, k
+   type (stats_gpsref_type)          :: GPSRef
+   integer                          :: ngpsref
+   integer                          :: n, k
 
    ngpsref = 0
    
@@ -21,7 +21,7 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
    GPSRef%average = residual_gpsref1_type(0.0,0.0,0.0,0.0)
    GPSRef%rms_err = GPSRef%average
 
-   DO n=1, oi%num_GPSRef
+   do n=1, oi%num_GPSRef
 
       if( oi%gpsref(n)%loc%proc_domain ) then
          do k=1, oi%gpsref(n)%info%levels
@@ -32,8 +32,8 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
                           GPSRef%minimum%ref, GPSRef%maximum%ref, &
                           GPSRef%average%ref, GPSRef%rms_err%ref)
          end do
-      endif    ! end if( oi%gpsref(n)%loc%proc_domain )
-   END DO
+      end if    ! end if( oi%gpsref(n)%loc%proc_domain )
+   end do
 
 !--Do inter-processor communication to gather statistics.
 
@@ -44,11 +44,11 @@ subroutine da_oi_stats_gpsref ( stats_unit, oi )
              GPSRef%minimum%ref%n, GPSRef%maximum%ref%n, &
              GPSRef%minimum%ref%l, GPSRef%maximum%ref%l )
    
-   IF ( rootproc .and. (ngpsref > 0)) THEN
+   if ( rootproc .and. (ngpsref > 0)) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for GPSRef'
    
       call da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )
-   END IF
+   end if
 
 end subroutine da_oi_stats_gpsref
 

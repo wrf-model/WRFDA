@@ -1,16 +1,16 @@
 subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   INTEGER                        :: n             ! Loop counter.
+   integer                        :: n             ! Loop counter.
 
-   IF (oi%num_buoy < 1) return
+   if (oi%num_buoy < 1) return
 
-   DO n=1, oi%num_buoy
+   do n=1, oi%num_buoy
       if (oi%buoy(n)%zk < 1.0) then
          y%buoy(n)%u = 0.0
          y%buoy(n)%v = 0.0
@@ -19,7 +19,7 @@ subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
          y%buoy(n)%q = 0.0
 
          cycle
-      endif
+      end if
 
       y%buoy(n)%u = y%buoy(n)%u/typical_u_rms
       y%buoy(n)%v = y%buoy(n)%v/typical_v_rms
@@ -34,7 +34,7 @@ subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
                      + ( y%buoy(n)%t )**2 &
                      + ( y%buoy(n)%p )**2 &
                      + ( y%buoy(n)%q )**2
-      endif
+      end if
 
       pertile_lhs = pertile_lhs &
                   + ( y%buoy(n)%u )**2 &
@@ -48,7 +48,7 @@ subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
       y%buoy(n)%t = y%buoy(n)%t/typical_t_rms
       y%buoy(n)%p = y%buoy(n)%p/typical_p_rms
       y%buoy(n)%q = y%buoy(n)%q/typical_q_rms
-   ENDDO
+   end do
 
 end subroutine da_check_xtoy_adjoint_buoy
 

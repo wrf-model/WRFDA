@@ -1,10 +1,10 @@
 subroutine da_print_stats_buoy( stats_unit, nu, nv, nt, np, nq, buoy )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nu, nv, nt, np, nq
-   TYPE (stats_buoy_type), INTENT(IN):: buoy
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nu, nv, nt, np, nq
+   type (stats_buoy_type), intent(in):: buoy
 
    write(unit=stats_unit, fmt='(6a/)') &
       '   var             ', &

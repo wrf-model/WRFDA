@@ -1,13 +1,15 @@
 subroutine da_oi_stats_sound ( stats_unit, oi )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
 
-  TYPE (stats_sound_type)          :: Sound
-  INTEGER                          :: nu, nv, nt, nq
-  INTEGER                          :: n, k
+  type (stats_sound_type)          :: Sound
+  integer                          :: nu, nv, nt, nq
+  integer                          :: n, k
+
+  if (trace_use) call da_trace_entry("da_oi_stats_sound")
 
   if (trace_use) call da_trace_entry("da_oi_stats_sound")
 
@@ -27,8 +29,8 @@ subroutine da_oi_stats_sound ( stats_unit, oi )
   Sound%average = residual_sound1_type(0.0, 0.0, 0.0, 0.0)
   Sound%rms_err = Sound%average
 
-  IF ( oi%num_Sound > 0 ) THEN
-    DO n=1, oi%num_Sound
+  if ( oi%num_Sound > 0 ) then
+    do n=1, oi%num_Sound
       if( oi%sound(n)%loc%proc_domain ) then
         do k=1, oi%sound(n)%info%levels
 
@@ -53,9 +55,9 @@ subroutine da_oi_stats_sound ( stats_unit, oi )
                               Sound%minimum%q, Sound%maximum%q, &
                               Sound%average%q, Sound%rms_err%q)
         end do
-      endif    ! end if( oi%sound(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%sound(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -80,12 +82,14 @@ subroutine da_oi_stats_sound ( stats_unit, oi )
                           Sound%minimum%q%n, Sound%maximum%q%n, &
                           Sound%minimum%q%l, Sound%maximum%q%l )
 
-  IF ( rootproc ) THEN
-    IF (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) THEN
+  if ( rootproc ) then
+    if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Sound'
       call da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
-    END IF
-  END IF
+    end if
+  end if
+
+  if (trace_use) call da_trace_exit("da_oi_stats_sound")
 
   if (trace_use) call da_trace_exit("da_oi_stats_sound")
 

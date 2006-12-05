@@ -1,37 +1,37 @@
-subroutine da_read_ssmi (iunit, ob, xp, filename)
+
+subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Read the header of a MM5 3D-VAR 2.0 GTS observation file
+   ! Read the header of a SSMI 2.0 GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none
 
-   INTEGER,          INTENT(in)    :: iunit
-   TYPE(xpose_type), INTENT(IN)    :: xp    ! Domain decomposition vars.
-   TYPE(ob_type),    INTENT(inout) :: ob
-   CHARACTER(*), INTENT(in)        :: filename
+   type(xpose_type), intent(in)    :: xp    ! Domain decomposition vars.
+   type(ob_type),    intent(inout) :: ob
+   character(*), intent(in)        :: filename
 
-   CHARACTER (LEN =  10)        :: fmt_name
+   character (LEN =  10)        :: fmt_name
 
-   CHARACTER (LEN = 160)        :: fmt_info,    &
+   character (LEN = 160)        :: fmt_info,    &
                                    fmt_loc
-   CHARACTER (LEN = 120)        :: char_ned
+   character (LEN = 120)        :: char_ned
 
-   INTEGER                      :: iost, fm
+   integer                      :: iost, fm,iunit
 
-   TYPE (model_loc_type)        :: loc
-   TYPE (info_type)             :: info
-   TYPE (field_type)            :: speed, tpw
+   type (model_loc_type)        :: loc
+   type (info_type)             :: info
+   type (field_type)            :: speed, tpw
 
-   TYPE (field_type)            :: tb19v, tb19h, tb22v
-   TYPE (field_type)            :: tb37v, tb37h, tb85v, tb85h
+   type (field_type)            :: tb19v, tb19h, tb22v
+   type (field_type)            :: tb37v, tb37h, tb85v, tb85h
 
-   TYPE (count_obs_number_type) :: count_obs_ssmir
-   TYPE (count_obs_number_type) :: count_obs_ssmit
+   type (count_obs_number_type) :: count_obs_ssmir
+   type (count_obs_number_type) :: count_obs_ssmit
 
-   LOGICAL                      :: isfilter,ipass 
-   LOGICAL                      :: outside
-   INTEGER                      :: irain, iprecip
+   logical                      :: isfilter,ipass 
+   logical                      :: outside
+   integer                      :: irain, iprecip
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -39,91 +39,92 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
    isfilter = .true. ! filter out rain points
    irain = 0
 
-   ! OPEN FILE
+   ! open FILE
 
-   OPEN(UNIT   = iunit,     &
+   call da_get_unit(iunit)
+   open(unit   = iunit,     &
         FILE   = trim(filename), &
         FORM   = 'FORMATTED',  &
         ACCESS = 'SEQUENTIAL', &
-        IOSTAT =  iost,     &
+        iostat =  iost,     &
         STATUS = 'OLD')
 
-   IF (iost /= 0) THEN
+   if (iost /= 0) then
       write(unit=stderr, fmt='(/A,I3,3(2X,A)/)') &
-         'ERROR IN SSMI INPUT FILE UNIT ',iunit, &
+         'ERROR in SSMI inPUT FILE unit ',iunit, &
          'SSMI FILENAME:', trim(filename), &
-         'FOR SSMI CANNOT BE FOUND OR CANNOT BE OPENED'
-      RETURN
-   ENDIF
+         'FOR SSMI CANNOT BE FOUND OR CANNOT BE openED'
+      return
+   end if
 
-   REWIND (UNIT = iunit)
+   REWinD (unit = iunit)
 
-   ! 2.  READ HEADER
+   ! 2.  read HEADER
    ! ===============
 
-   ! 2.1 READ FIRST LINE
+   ! 2.1 read FIRST LINE
    !     ---------------
 
-   READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
    ! 2.2 PROCESS ERROR
    !     -------------
 
-   IF (iost /= 0) THEN
+   if (iost /= 0) then
       write(unit=stderr, fmt='(/a,i3/)') &
-           'ERROR READING FILE UNIT:', iunit, &
+           'ERROR readinG FILE unit:', iunit, &
            'ERROR CODE:', iost
 
       return
    else
       write(unit=stdout, fmt='(/2a/)') &
            'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
-   ENDIF
+   end if
 
-   ! 2.3 READ NUMBER OF REPORTS
+   ! 2.3 read NUMBER OF REPORTS
    !     ---------------------
 
-   DO
-      READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   do
+      read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
-      IF (iost /= 0) THEN
+      if (iost /= 0) then
          write(unit=stderr, fmt='(/a,i3/)') &
-              'ERROR READING FILE UNIT:', iunit, &
+              'ERROR readinG FILE unit:', iunit, &
               'ERROR CODE:', iost
 
          return
-      ENDIF
+      end if
 
-      if (char_ned(1:6) == 'NESTIX') EXIT
+      if (char_ned(1:6) == 'NESTIX') exit
 
-   ENDDO
+   end do
 
-   DO
+   do
 
-     READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
-     if (char_ned(1:6) == 'INFO  ') EXIT
+     read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
+     if (char_ned(1:6) == 'inFO  ') exit
 
-   ENDDO
+   end do
 
-   READ (UNIT = iunit, FMT = '(A)', IOSTAT = iost) char_ned
+   read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
-   ! READ FORMATS
+   ! read FORMATS
    ! ------------
 
-   READ (UNIT=iunit, FMT = '(A,1X,A)') &
+   read (unit=iunit, fmt = '(A,1X,A)') &
         fmt_name, fmt_info, &
         fmt_name, fmt_loc
 
    ! write(unit=stdout, fmt='(2a)') &
-   !      'fmt_info=', TRIM (fmt_info), &
-   !      'fmt_loc =', TRIM (fmt_loc)
+   !      'fmt_info=', trim (fmt_info), &
+   !      'fmt_loc =', trim (fmt_loc)
 
    !  SKIP 1 line
    !  -----------
 
-   READ (UNIT=iunit, FMT = '(A)') fmt_name
+   read (unit=iunit, fmt = '(A)') fmt_name
 
-   !  WRITE (UNIT = *, FMT = '(/,2(A,F3.0,/))')  &
+   !  write (unit = *, fmt = '(/,2(A,F3.0,/))')  &
    !     'Error max test ratio for SWS = ',max_error_uv,  &
    !     'Error max test ratio for PW  = ',max_error_pw,  &
    !     'Error max test ratio for PW  = ',max_error_tb
@@ -131,12 +132,12 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
    !  LOOP OVER RECORDS
    !  -----------------
 
-   reports: DO
+   reports: do
 
-      ! READ STATION GENERAL INFO
+      ! read STATION GENERAL inFO
       ! =========================
 
-      READ (UNIT=iunit, FMT = fmt_info, IOSTAT = iost) &
+      read (unit=iunit, fmt = fmt_info, iostat = iost) &
                    info % platform,    &
                    info % date_char,   &
                    info % name,        &
@@ -146,20 +147,20 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
                    info % elv,         &
                    info % id
 
-      read(UNIT=info % platform (4:6),FMT='(I3)') fm
+      read(unit=info % platform (4:6),fmt='(I3)') fm
 
-      IF (iost /= 0) THEN
-         EXIT reports
-      ENDIF
+      if (iost /= 0) then
+         exit reports
+      end if
 
       ob % total_obs = ob % total_obs + 1
 
-      SELECT CASE(fm)
-         CASE (125)    ;
-            ! READ SURFACE WIND SPEED AND PRECIPITABLE WATER
-            READ (UNIT=iunit, FMT = fmt_loc) speed, tpw
-         CASE (126)    ;
-            READ (UNIT=iunit, FMT = fmt_loc) &
+      select case(fm)
+         case (125)    ;
+            ! read SURFACE WinD SPEED AND PRECIPITABLE WATER
+            read (unit=iunit, fmt = fmt_loc) speed, tpw
+         case (126)    ;
+            read (unit=iunit, fmt = fmt_loc) &
                tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
 
                tb19v % error = tb19v % error + 2.
@@ -170,17 +171,17 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
                tb85h % error = tb85h % error + 2.
                tb85v % error = tb85v % error + 2.
 
-         CASE DEFAULT;
+         case default;
             write(unit=stderr, fmt='(/a/)') &
-                 'WARNING   WARNING   WARNING   WARNING   WARNING :'
+                 'WARNinG   WARNinG   WARNinG   WARNinG   WARNinG :'
 
             write(unit=stderr, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
 
             write(unit=stderr, fmt='(a, 2f12.6)') &
                  'info%(lon,lat)=', info%lon, info%lat
-      END SELECT
+      end select
 
-      ! CHECK IF OBS IS IN HORIZONTAL DOMAIN
+      ! CHECK if OBS IS in HORIZONTAL doMAin
       ! ====================================
 
       ! Compute the model horizontal coordinate x, y
@@ -188,22 +189,22 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
 
       call da_ll_to_xy (info, loc, xp, outside)
 
-      IF ( outside ) CYCLE reports
+      if ( outside ) cycle reports
 
       loc % pw  % inv = missing_r
       loc % pw  % qc  = missing
       loc % slp = loc % pw
 
-      SELECT CASE(fm)
-         CASE (125) ;
-            if ( .not. Use_SsmiRetrievalObs ) CYCLE reports
+      select case(fm)
+         case (125) ;
+            if ( .not. Use_SsmiRetrievalObs ) cycle reports
 
             ! Check if at least one field is present
-            IF ((tpw % qc == missing) .AND. (speed % qc == missing)) THEN
+            if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
                count_obs_ssmir % num_missing = &
                count_obs_ssmir % num_missing + 1
-               CYCLE reports
-            ENDIF
+               cycle reports
+            end if
 
             ! FILL PERMANENT STRUCTURE
             ! ========================
@@ -225,25 +226,25 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
             ob % ssmi_retrieval (ob%num_ssmi_retrieval) % speed = speed
             ob % ssmi_retrieval (ob%num_ssmi_retrieval) % tpw   = tpw
 
-         CASE (126) ;
-            if ( .not. Use_SsmiTbObs ) CYCLE reports
+         case (126) ;
+            if ( .not. Use_SsmiTbObs ) cycle reports
 
             ! Check if at least one field is present
 
-            IF ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
+            if ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
                 (tb22v % qc == missing)                                .AND. &
                 (tb37v % qc == missing) .AND. (tb37h % qc == missing)  .AND. &
-                (tb85v % qc == missing) .AND. (tb85h % qc == missing)) THEN
+                (tb85v % qc == missing) .AND. (tb85h % qc == missing)) then
                count_obs_ssmit % num_missing = &
                count_obs_ssmit % num_missing + 1
                ! print*,'missing data'
-               CYCLE reports
-            ENDIF
+               cycle reports
+            end if
 
-            ! FILTER RAIN PIXELS
+            ! FILTER RAin PIXELS
             !  ====================================
 
-            IF (isfilter) then
+            if (isfilter) then
                ipass = .false.
                iprecip = 0
                call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
@@ -258,9 +259,9 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
                   tb85h % qc    = -88.
                   tb85v % qc    = -88.
                   irain = irain + 1
-                  CYCLE reports
-               endif
-            ENDIF
+                  cycle reports
+               end if
+            end if
 
             ! FILL PERMANENT STRUCTURE
             ! ========================
@@ -289,14 +290,15 @@ subroutine da_read_ssmi (iunit, ob, xp, filename)
             ob % ssmi_tb (ob % num_ssmi_tb) % tb85v = tb85v
             ob % ssmi_tb (ob % num_ssmi_tb) % tb85h = tb85h
 
-         CASE DEFAULT;
+         case default;
             ! Do nothing.
-      END SELECT
-   ENDDO reports
+      end select
+   end do reports
 
    close(iunit)
+   call da_free_unit(iunit)
 
-   ! PRINT OUT
+   ! PRinT out
    ! =========
  
    write(unit=stdout, fmt='(5x,a,i6,a)') &
@@ -325,15 +327,15 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                      tb37h, tb85v, tb85h, ipass, iprecip, xlat  )
    implicit none
 
-   REAL    ,  INTENT (in)  :: tb19v, tb19h, tb22v, tb37v, &
+   real    ,  intent (in)  :: tb19v, tb19h, tb22v, tb37v, &
                               tb37h, tb85v, tb85h, xlat
-   REAL                     :: tb(7)
-   LOGICAL ,  INTENT (inout):: ipass
-   INTEGER ,  INTENT (inout):: iprecip
+   real                     :: tb(7)
+   logical ,  intent (inout):: ipass
+   integer ,  intent (inout):: iprecip
 
-   INTEGER                 :: ipass1, ipass2
-   REAL                    :: rc, sst, dsst
-   REAL                    :: theta,tc,wv,u,alw19,alw37,alw85
+   integer                 :: ipass1, ipass2
+   real                    :: rc, sst, dsst
+   real                    :: theta,tc,wv,u,alw19,alw37,alw85
 
    !  print*,'tbdata',tb19v, tb19h, tb22v, tb37v,tb37h, tb85v, tb85h
    ! tc : cloud top temperature (C)
@@ -374,7 +376,7 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
 
        tb(3)-tb(1) .gt. 4. ) then
       ipass1 = 1
-   endif
+   end if
 
    ! second check
 
@@ -387,9 +389,9 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
              alw19 .gt. -999. .and. alw37 .gt. -999. .and. &
              alw85 .gt. -999.  ) then
             ipass2 = 1
-            ! write(UNIT=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
+            ! write(unit=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
             !    tb(4),tb(5),tb(6),tb(7)
-         endif
+         end if
 
       ! third check
 
@@ -399,20 +401,20 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
       !        alw19 .ge. -0.01 .and. alw19 .le. 0.5 .and. &
       !        alw37 .ge. -0.01 .and. alw37 .le. 0.5 .and. &
       !        alw85 .ge. -0.01 .and. alw85 .le. 0.5 ) then
-      !       write(UNIT=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
+      !       write(unit=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
       !          tb(4),tb(5),tb(6),tb(7)
       !       ipass = .true.
-      !    endif
-      ! endif
+      !    end if
+      ! end if
       ! if (iprecip .eq. 1 ) then
       !    ipass = .true.
-      !    WRITE(UNIT=stdout,*) 'precipitation',lat,long,wv,u,alw19,alw37,alw85,iprecip
+      !    write(unit=stdout,*) 'precipitation',lat,long,wv,u,alw19,alw37,alw85,iprecip
       ! else
       !    ipass = .true.
-      ! endif
-   endif
+      ! end if
+   end if
 
-   ! WRITE(UNIT=stdout,*) 'pass=',ipass1,ipass2,iprecip,ipass
+   ! write(unit=stdout,*) 'pass=',ipass1,ipass2,iprecip,ipass
 
 
 end subroutine filter
@@ -435,7 +437,7 @@ end subroutine filter
    !       Grant W. Petty
    !       Earth and Atmospheric Sciences Dept.
    !       Purdue University
-   !       West Lafayette, IN 47907-1397
+   !       West Lafayette, in 47907-1397
    !       (765) 494-2544
    !       gpetty@rain.atms.purdue.edu
    ! 
@@ -516,7 +518,7 @@ end subroutine filter
    ! inhomogeneity in cloud fields.
    ! 
    ! Also, liquid water values in excess of 0.5 kg/m**2 are generally
-   ! flagged as precipitating, and a value of MISSING is returned.  There
+   ! flagged as precipitating, and a value of MISSinG is returned.  There
    ! is no known method for separating cloud water from precipitation
    ! water.  Furthermore, any attempt to retrieve total liquid water path
    ! when precipitation is present will require a considerably more
@@ -571,18 +573,18 @@ subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
    real tb(7),theta,alw,tc,xlat
    integer ifreq,iprecip
    real, parameter :: BAD = -1000.0
-   real t19v,t19h,t22v,t37v,t37h,t85v,t85h,MISSING,pclr
+   real t19v,t19h,t22v,t37v,t37h,t85v,t85h,MISSinG,pclr
    real :: p,s85,v0,wv,u
    integer :: ich
  
    iprecip = 0
-   MISSING = -8888.
+   MISSinG = -8888.
    pclr=0.
    if (ifreq.lt.1 .or. ifreq.gt.3) then
-      pause "BAD VALUE OF IFREQ in PettyLWP"
+      pause "BAD VALUE OF ifREQ in PettyLWP"
       alw = BAD
       return
-   endif
+   end if
 
    ! initialize brightness temperatures
 
@@ -601,7 +603,7 @@ subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
    ! if value of Tc is invalid, then set to reasonable intermediate value
    if (tc .lt. -20.0 .or. tc .gt. 40.0) then
       tc = 8.0
-   endif
+   end if
 
    ! calculate normalized polarization
    if (ifreq .eq. 1) then
@@ -616,30 +618,30 @@ subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
       if (wv .eq. BAD) then
          alw = BAD
          return
-      endif
+      end if
       call PettyWind(tb,theta,-99.9,1000.0,u)
       if (u .eq. BAD) then
          u = 5.0
          alw = BAD
-      endif
+      end if
      ich = 6 
      call tb_clear(ich,u,wv,v0)
      s85 = p*v0 + (1.0-p)*273.0 - t85v 
-     if (s85 .gt. 10.0 .or. (t85v-t85h) .lt. 5.0) p = MISSING 
-   endif
+     if (s85 .gt. 10.0 .or. (t85v-t85h) .lt. 5.0) p = MISSinG 
+   end if
 
    ! convert normalized polarization to LWP
-   if (p .ne. MISSING .and. p .lt. 1.4 .and. p .gt. 0.1) then
+   if (p .ne. MISSinG .and. p .lt. 1.4 .and. p .gt. 0.1) then
       call P2LWP(ifreq,p,tc,theta,alw,xlat)
    else
       alw = BAD
-   endif
+   end if
 
 end subroutine PettyLWP
 
    !*********************************************************
    ! This routine computes liquid water path from normalized polarization
-   ! at 19.35, 37, or 85.5 GHz  (indicated by IFREQ)
+   ! at 19.35, 37, or 85.5 GHz  (indicated by ifREQ)
 
 subroutine p2lwp(ifreq,p,tc,theta,alw,xlat) 
 
@@ -657,7 +659,7 @@ subroutine p2lwp(ifreq,p,tc,theta,alw,xlat)
       alw = BAD
       iprecip = 1
       return
-   endif
+   end if
 
    !  get liquid water mass extinction coefficient
    ext = alw_ext(ifreq,tc)
@@ -676,7 +678,7 @@ subroutine p2lwp(ifreq,p,tc,theta,alw,xlat)
    if (alw .gt. threshhold) then
       alw = BAD
       iprecip = 1
-   endif
+   end if
 
 end subroutine p2lwp
 
@@ -702,12 +704,12 @@ subroutine ClearPol(tb,theta,ifreq,pclr,iprecip)
    real :: wv,u
    integer :: ich
 
-   ! check for valid IFREQ
+   ! check for valid ifREQ
    if (ifreq.lt.1 .or. ifreq.gt.3) then
-      pause 'BAD VALUE OF IFREQ in ClearPol'
+      pause 'BAD VALUE OF ifREQ in ClearPol'
       pclr = BAD
       return
-   endif
+   end if
 
    iprecip = 0
 
@@ -719,7 +721,7 @@ subroutine ClearPol(tb,theta,ifreq,pclr,iprecip)
    if (wv .lt. 0.0) then
       pclr = BAD
       return
-   endif
+   end if
 
    ! get wind speed estimate.  If this value is returned as 'bad', assume
    ! that it is due to precipitation, and substitute a reasonable 'average'
@@ -729,7 +731,7 @@ subroutine ClearPol(tb,theta,ifreq,pclr,iprecip)
    if (u .eq. BAD) then
       iprecip = 1
       u = 5.0
-   endif
+   end if
 
    ! now that we finally have estimates of water vapor and wind speed,
    ! compute the clear-sky polarization difference at the desired frequency
@@ -753,7 +755,7 @@ subroutine ClearPol(tb,theta,ifreq,pclr,iprecip)
 
 function alw_ext(ifreq,tc)
 
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in) :: ifreq
    real, intent(in) :: tc
@@ -770,7 +772,7 @@ function alw_ext(ifreq,tc)
       alw_ext = exp(-1.35-0.0234*tc-1.22e-4*tc2+5.48e-6*tc3) 
    else if (ifreq .eq. 3) then
       alw_ext = exp(-0.0713-8.00e-3*tc-1.62e-4*tc2+1.18e-6*tc3)
-   endif
+   end if
 
 end function alw_ext
 
@@ -793,13 +795,13 @@ end function alw_ext
    !         tb = brightness temperature
 
 subroutine tb_clear(ich,u,wv,tb)
-   IMPLICIT NONE
+   implicit none
    integer, intent(in)  :: ich
    real,    intent(in)  :: u
    real,    intent(in)  :: wv
    real,    intent(out) :: tb
 
-   REAL :: wvp,up,x,x2,x3,y,y2,y3,xy,x2y,xy2
+   real :: wvp,up,x,x2,x3,y,y2,y3,xy,x2y,xy2
 
    real a(10,10)
    data a/ &
@@ -875,11 +877,11 @@ subroutine PettyVapor(tb,wv)
    do i=1,5
       if (tbold(i) .ne. tb(i)) flag = .true.
       tbold(i) = tb(i)
-   enddo
+   end do
    if (.not. flag) then
       wv = wvold
       return
-   endif
+   end if
 
    ! initialize brightness temperatures
 
@@ -896,7 +898,7 @@ subroutine PettyVapor(tb,wv)
       wv = BAD
       wvold = wv
       return
-   endif
+   end if
 
    ! special check for sea ice
 
@@ -908,7 +910,7 @@ subroutine PettyVapor(tb,wv)
       wv = BAD
       wvold = wv
       return
-   endif
+   end if
 
    ! check for abnormally warm brightness temperatures
    if (t22v .gt. 285.0 .or.  &
@@ -917,7 +919,7 @@ subroutine PettyVapor(tb,wv)
       wv = BAD
       wvold = wv
       return
-   endif
+   end if
 
    ! compute water vapor from first-stage regression algorithm
 
@@ -975,7 +977,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
       ia = 2
    else
       ia = 1
-   endif
+   end if
 
    ! check for same TBs used in previous call in order to avoid
    ! redundant calculations
@@ -988,11 +990,11 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
    do i=1,5
       if (tbold(i) .ne. tb(i)) flag = .true.
       tbold(i) = tb(i)
-   enddo
+   end do
    if (.not. flag) then
       u = uold
       return
-   endif
+   end if
 
    ! initialize brightness temperatures
 
@@ -1012,7 +1014,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
       u = BAD
       uold = u
       return
-   endif
+   end if
 
 
    call ualg(ia,theta,sst,tb,u)
@@ -1029,7 +1031,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
       u = BAD
       uold = u
       return
-   endif
+   end if
 
    ! select appropriate corrections
    if (ia .eq. 1) then
@@ -1045,7 +1047,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          errlw =  -6.3889*alw37 + 0.36111
       else
          errlw = 0.83333*alw37 - 0.21667
-      endif
+      end if
       u = u - errlw
 
       ! check for unphysical values
@@ -1053,7 +1055,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          u = BAD
          uold = u
          return
-      endif
+      end if
 
       ! apply correction for non-linearity
       if (u .lt. 2.5) then
@@ -1062,7 +1064,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          erru  =  3.243 -0.3478*u + 0.3679E-02*u*u
       else
          erru = 0.0
-      endif
+      end if
       u = u - erru
 
    else if (ia .eq. 2) then
@@ -1080,7 +1082,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          errlw = -8.125*alw37 + 0.4
       else
          errlw = -0.25
-      endif
+      end if
       u = u - errlw
 
       ! check for unphysical values
@@ -1088,7 +1090,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          u = BAD
          uold = u
          return
-      endif
+      end if
 
       ! apply correction for non-linearity
       if (u .lt. 2.5) then
@@ -1097,9 +1099,9 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
          erru = 3.360-0.3918*u + 0.8121E-02*u*u
       else
          erru = 0.0
-      endif
+      end if
       u = u - erru
-   endif
+   end if
    uold = u
 
 end subroutine PettyWind
@@ -1131,18 +1133,18 @@ subroutine ualg(ia,theta,sst,tb,u)
       u = coeff1(1)
       do i=1,5
          u = u + coeff1(i+1)*tb(i)
-      enddo
+      end do
       u = u + coeff1(7)*(theta-53.0)
       u = u + coeff1(8)*sst
    else if (ia .eq. 2) then
       u = coeff2(1)
       do i=1,5
          u = u + coeff2(i+1)*tb(i)
-      enddo
+      end do
       u = u + coeff2(7)*(theta-53.0)
    else
       call da_error(__FILE__,__LINE__,(/"Invalid algorithm ID"/))
-   endif
+   end if
 
 end subroutine ualg
 

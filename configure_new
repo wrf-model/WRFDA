@@ -440,6 +440,8 @@ export CONFIG=configure.wrfvar
 
 ln -fs $PWD/$CONFIG build
 
+touch -t01010101 build/depend.txt
+
 # new feb 2005.  test whether MPI-2
 #if test -e $CONFIG ; then
 #  grepresult=`grep DM_PARALLEL $CONFIG`

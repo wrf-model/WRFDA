@@ -5,7 +5,8 @@
 C***********************************************************************
 C                CALCULATION OF GEOPOTENTIAL HEIGHT                     
 C***********************************************************************
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)                             
+!JRB
+!      IMPLICIT DOUBLE PRECISION (A-H,O-Z)                             
 C                                                                       
       REAL*8    RGAS,G                                                  
       REAL*8    GPS (IMAX,JMAX     ), GTMP(IMAX,JMAX,KMAX),             

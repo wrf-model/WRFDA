@@ -12,13 +12,13 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
 
    implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
    integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
 
-   TYPE (xb_type), INTENT(IN)           :: xb         ! First guess structure.
+   type (xb_type), intent(in)           :: xb         ! First guess structure.
    real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(out)  :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
    real, intent(inout):: div(ims:ime,jms:jme,kms:kme) ! Divergence.
@@ -40,7 +40,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
       um(ims:ime,jms:jme) = 0.
       vm(ims:ime,jms:jme) = 0.
       inv_2ds = 0.5 / xb%ds
-   endif
+   end if
 
    one_third = 1.0 / 3.0
 
@@ -48,7 +48,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
       is = its; ie = ite; js = jts; je = jte
    else
       is = its - 1; ie = ite + 1; js = jts - 1; je = jte + 1
-   endif
+   end if
 
    if ( .not. global .and. its == ids ) is = ids+1
    if ( .not. global .and. ite == ide ) ie = ide-1
@@ -63,9 +63,9 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
                               ids,ide, jds,jde, kds,kde,  &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
-   endif
+   end if
 
-   DO k =kds, kde
+   do k =kds, kde
       if( .not. global ) then
          ! [2.2] Impose zero divergence gradient condition at boundaries:
 
@@ -126,17 +126,17 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
             div(ie, js:je, k) = xp%vxy(ie, js:je)
             div(is:ie, js, k) = xp%vxy(is:ie, js)
             div(is:ie, je, k) = xp%vxy(is:ie, je)
-         endif
+         end if
 
-         DO j = js, je
-            DO i = is, ie
+         do j = js, je
+            do i = is, ie
               coeff = xb%map_factor(i,j) * xb%map_factor(i,j) * inv_2ds
               um(i+1,j)=um(i+1,j)+div(i,j,k)*coeff
               um(i-1,j)=um(i-1,j)-div(i,j,k)*coeff
               vm(i,j+1)=vm(i,j+1)+div(i,j,k)*coeff
               vm(i,j-1)=vm(i,j-1)-div(i,j,k)*coeff
-           END DO
-         END DO
+           end do
+         end do
 
          u(is-1:ie+1,js-1:je+1,k) = u(is-1:ie+1,js-1:je+1,k) &
             +um(is-1:ie+1,js-1:je+1) / xb%map_factor(is-1:ie+1,js-1:je+1)
@@ -158,10 +158,10 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
                u(i-1,j,k) = u(i-1,j,k) - xb%coefx(i,j) * div(i,j,k) 
                v(i,j+1,k) = v(i,j+1,k) + xb%coefy(i,j) * div(i,j,k) 
                v(i,j-1,k) = v(i,j-1,k) - xb%coefy(i,j) * div(i,j,k) 
-            enddo
-         enddo
-      endif
-   END DO
+            end do
+         end do
+      end if
+   end do
 
    div = 0.0
 

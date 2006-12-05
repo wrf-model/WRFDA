@@ -4,14 +4,14 @@ subroutine da_oi_stats_polaramv( stats_unit, oi )
    ! Purpose: Calculates (Obs - Analysis) statistics for Polar AMVs
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
 
-   TYPE (stats_polaramv_type)       :: polaramv
-   INTEGER                          :: nu, nv
-   INTEGER                          :: n, k
+   type (stats_polaramv_type)       :: polaramv
+   integer                          :: nu, nv
+   integer                          :: n, k
 
    nu = 0
    nv = 0
@@ -23,8 +23,8 @@ subroutine da_oi_stats_polaramv( stats_unit, oi )
    polaramv%average = residual_polaramv1_type(0.0, 0.0)
    polaramv%rms_err = polaramv%average
 
-   IF (oi%num_polaramv > 0) THEN
-      DO n=1, oi%num_polaramv
+   if (oi%num_polaramv > 0) then
+      do n=1, oi%num_polaramv
          if( oi%polaramv(n)%loc%proc_domain ) then
             do k=1, oi%polaramv(n)%info%levels
                call da_stats_calculate( oi%polaramv(n)%loc%obs_global_index, &
@@ -39,9 +39,9 @@ subroutine da_oi_stats_polaramv( stats_unit, oi )
                                      polaramv%minimum%v, polaramv%maximum%v, &
                                      polaramv%average%v, polaramv%rms_err%v )
             end do
-         endif    ! end if( oi%polaramv(n)%loc%proc_domain )
-      END DO
-   END IF
+         end if    ! end if( oi%polaramv(n)%loc%proc_domain )
+      end do
+   end if
 
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( nu )
@@ -55,12 +55,12 @@ subroutine da_oi_stats_polaramv( stats_unit, oi )
                            polaramv%minimum%v%n, polaramv%maximum%v%n, &
                            polaramv%minimum%v%l, polaramv%maximum%v%l )
       
-   IF (rootproc) THEN
-      IF (nu /= 0 .or. nv /= 0 ) THEN
+   if (rootproc) then
+      if (nu /= 0 .or. nv /= 0 ) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for polaramv'
          call da_print_stats_polaramv( stats_unit, nu, nv, polaramv )
-      END IF
-   END IF
+      end if
+   end if
 
 end subroutine da_oi_stats_polaramv
 

@@ -4,7 +4,7 @@ subroutine da_ref_height(pres, ref_height)
    ! PURPOSE: To calculate the height from the reference pressure
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    real, intent(in)  :: pres
    real, intent(out) :: ref_height

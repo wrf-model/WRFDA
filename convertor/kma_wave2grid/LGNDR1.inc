@@ -1,6 +1,7 @@
       SUBROUTINE LGNDR1(COA,MFP,ALP,DALP)                                       
 C                                                                               
-      DIMENSION ALP(1),DALP(1)                                                  
+Crizvi      DIMENSION ALP(1),DALP(1)                                                  
+      DIMENSION ALP(*),DALP(*)                                                  
 C                                                                               
       SIA=SQRT(1.D0-COA*COA)                                                    
       LM=2                                                                      

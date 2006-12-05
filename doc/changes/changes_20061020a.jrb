@@ -1,0 +1,136 @@
+Change Log for update to WRFVAR code
+---------------------------------------
+
+Author: John Bray
+Reviewer: John Bray
+Date: 10/20/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Fix typo in setup.csh, da_restore_data_ncep.ksh
+
+Set G95_MAX_SEGMENTS to 0 in setup*, so functionality hidden from users by 
+default
+
+Rename da_constants da_control, as it contains many things that aren't
+constant.
+
+Rename da_obs/da_deallocate_obs to 
+da_define_structures/da_deallocate_observations.inc, removing the 
+original file there, which was never used. No attempt to change how it
+works, even though it misses stuff.
+
+background errors read from be.dat, not fort.34
+
+Rename numb_procs num_procs, to match environment variable name
+
+da_run_suite puts individual component run output in $EXP_DIR/run/$DATE
+
+------------------------------------------------------
+Tests:
+
+con200 run on balsam
+
+--------------------------------------------------------------------------------------
+
+File changes:
+------------
+
+A    doc/changes/changes_20061020a.jrb
+M      gen_be/gen_be_stage1.f90
+M      gen_be/gen_be_ep1.f90
+M      gen_be/gen_be_stage2.f90
+M      gen_be/gen_be_stage3.f90
+M      gen_be/gen_be_stage2a.f90
+M      gen_be/gen_be_ensmean.f90
+M      gen_be/gen_be_ep2.f90
+M      gen_be/gen_be_diags.f90
+M      gen_be/gen_be_etkf.f90
+M      gen_be/gen_spectra.f90
+M      gen_be/gen_be_stage0_wrf.f90
+M      gen_be/gen_be_stage4_regional.f90
+M      gen_be/gen_be_stage4_global.f90
+M      gen_be/gen_be_ensrf.f90
+M      gen_be/gen_be_cov2d.f90
+M      gen_be/gen_be_cov3d.f90
+M      gen_be/gen_be_stage1_1dvar.f90
+M      gen_be/gen_be_stage2_1dvar.f90
+M      gen_be/gen_be_diags_read.f90
+M      da/da_ssmi/da_ssmi.f90
+M      da/da_recursive_filter/da_recursive_filter.f90
+D      da/da_constants
+D      da/da_constants/da_advance_cymdh.inc
+D      da/da_constants/da_deallocate_constants.inc
+D      da/da_constants/da_array_print.inc
+D      da/da_constants/da_find_fft_factors.inc
+D      da/da_constants/da_constants.f90
+D      da/da_constants/da_change_date.inc
+D      da/da_constants/da_find_fft_trig_funcs.inc
+D      da/da_constants/da_gamma.inc
+M      da/da_spectral/da_be_spectral.f90
+M      da/da_spectral/da_initialize_h.inc
+M      da/da_spectral/da_spectral.f90
+M      da/da_util/da_be4_scale_length.f90
+M      da/da_vtox_transforms/da_vtox_transforms.f90
+M      da/da_gen_be/da_gen_be.f90
+M      da/da_grid_definitions/da_grid_definitions.f90
+M      da/da_grid_definitions/da_ffdduv.inc
+A  +   da/da_control/da_control.f90
+D      da/da_control/da_constants.f90
+M      da/da_polaramv/da_polaramv.f90
+M      da/da_profiler/da_profiler.f90
+M      da/da_physics/da_physics.f90
+M      da/da_obs/da_write_noise_to_ob.inc
+M      da/da_obs/da_count_filtered_obs.inc
+M      da/da_obs/da_final_write_filtered_obs.inc
+M      da/da_obs/da_final_write_y.inc
+M      da/da_obs/da_final_write_obs.inc
+M      da/da_obs/da_obs.f90
+D      da/da_obs/da_deallocate_obs.inc
+M      da/da_interpolation/da_interpolation.f90
+M      da/da_tracing/da_tracing.f90
+M      da/da_solve/da_solve.f90
+M      da/da_sound/da_sound.f90
+M      da/da_radar/da_radar.f90
+M      da/da_define_structures/da_deallocate_observations.inc
+M      da/da_minimisation/da_get_innov_vector.inc
+M      da/da_minimisation/da_minimisation.f90
+M      da/da_airep/da_airep.f90
+M      da/da_tools/da_tools.f90
+M      da/da_setup_structures/da_setup_be_regional.inc
+M      da/da_setup_structures/da_setup_be_global.inc
+M      da/da_dynamics/da_dynamics.f90
+M      da/da_modules/da_wrfvar_esmf_super.f90
+M      da/da_modules/da_wrfvar_interface.inc
+M      da/da_modules/da_wrfvar_init1.inc
+M      da/da_metar/da_metar.f90
+M      da/Makefile
+M      da/da_reporting/da_messages.inc
+M      da/da_reporting/da_reporting.f90
+M      da/da_satem/da_satem.f90
+M      da/da_qscat/da_qscat.f90
+M      da/da_buoy/da_buoy.f90
+M      da/da_geoamv/da_geoamv.f90
+M      da/da_par_util/da_par_util1.f90
+M      da/da_bogus/da_bogus.f90
+M      da/da_test/da_test.f90
+M      da/da_airsr/da_airsr.f90
+M      da/da_gpsref/da_gpsref.f90
+M      da/da_ships/da_ships.f90
+M      da/da_pilot/da_pilot.f90
+M      da/da_etkf/da_etkf.f90
+M      da/da_pseudo/da_pseudo.f90
+M      da/da_gpspw/da_gpspw.f90
+M      da/da_radiance/da_read_bufrtovs.inc
+M      da/da_radiance/da_radiance.f90
+M      da/da_synop/da_synop.f90
+M      scripts/da_run_wrfvar.ksh
+M      scripts/da_compile_and_run.ksh
+M      scripts/da_run_suite.ksh
+M      scripts/da_restore_data_ncep.ksh
+A      doc/changes/changes_20061020a.jrb
+M      convertor/da_module_convert_tool/da_module_convert_tool.F
+M      build/gen_be.make
+M      build/da.make
+M      build/makefile

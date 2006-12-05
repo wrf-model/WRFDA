@@ -3,7 +3,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   its, ite, jts, jte, kts, kte,     &
-                                  grid, config_flags )
+                                  grid, config_flags, cg_jcdf )
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -29,11 +29,11 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   TARGET                   :: grid
+   type(domain) ,   target                   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin,ndynopt
-   integer ierr, comm
+   integer :: cg_jcdf, wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -44,18 +44,18 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          iv%current_ob_time = nobwin
          call da_zero_x(xa)
          call da_transform_xtoy_adj( xb, iv, xp, y, xa )
-         write(UNIT=filnam,FMT='(a2,i2.2)') 'af',nobwin
+         write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
 
          call da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 #include "em_actual_new_args.inc"
                               )
-      enddo
+      end do
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
       call nl_set_dyn_opt ( 1 , DYN_EM_TL )
 
-      if ( jcdfi_use .AND. iter > 0 ) then
+      if ( jcdfi_use .AND. iter > 0 .AND. cg_jcdf == 1 ) then
          call da_med_initialdata_input( grid , config_flags, 'tldf' )
       else
          grid%em_g_u_2 = 0.0
@@ -65,7 +65,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
          grid%em_g_ph_2 = 0.0
          grid%em_g_mu_2 = 0.0
          grid%g_moist = 0.0
-      endif
+      end if
 
       call da_med_initialdata_output( grid , config_flags, 'afdf')
 
@@ -78,19 +78,20 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       if (var4d_coupling == var4d_coupling_disk_simul) then
          call da_system_4dvar("da_run_wrfplus_ad.ksh pre ")
 
-         IF (rootproc) THEN
+         if (rootproc) then
             call da_system("rm -rf ad/wrf_done")
             call da_system("touch ad/wrf_go_ahead")
-            DO WHILE ( .true. )
-               OPEN(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
-               CLOSE(wrf_done_unit)
-               EXIT
-   303         CONTINUE
-               CALL da_system("sleep 1")
-            ENDDO
-         ENDIF
-         CALL wrf_get_dm_communicator ( comm )
-         CALL mpi_barrier( comm, ierr )
+            call da_get_unit(wrf_done_unit)
+            do while ( .true. )
+               open(wrf_done_unit,file="ad/wrf_done",status="old",err=303)
+               close(wrf_done_unit)
+               exit
+   303         continue
+               call da_system("sleep 1")
+            end do
+            call da_free_unit(wrf_done_unit)
+         end if
+         call mpi_barrier( comm, ierr )
 
          call da_system_4dvar("da_run_wrfplus_ad.ksh post ")
       else
@@ -109,7 +110,7 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
       call da_zero_x(xa)
       call da_transform_xtoy_adj( xb, iv, xp, y, xa )
 
-   endif ! var4d
+   end if ! var4d
 
    cv = 0.0
    call da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
@@ -120,4 +121,5 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    call da_trace_exit("da_transform_vtoy_adj")
 
 end subroutine da_transform_vtoy_adj
+
 

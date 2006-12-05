@@ -37,7 +37,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    integer   , intent(in)       :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer   , intent(in)       :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   TARGET                   :: grid
+   type(domain) ,   target                   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer          :: je_start, je_end             ! Start/end indices of Je.
@@ -54,7 +54,11 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    character(len=4) :: filnam
 
-   IF (trace_use) call da_trace_entry("da_calculate_j")
+   integer          :: cg_jcdf
+
+   if (trace_use) call da_trace_entry("da_calculate_j")
+
+   cg_jcdf = 0
 
    je_start = cv_size_jb + 1
    je_end = cv_size_jb + cv_size_je
@@ -66,11 +70,6 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    !-------------------------------------------------------------------------
 
    ! [1.1] transform from control variable to model grid space:
-
-   call da_allocate_y (iv, y)
-
-   ! initialising now the residual array
-   call da_allocate_y (iv, re)
 
    if (iter > 0) &
       call da_transform_vtoy( cv_size, be, ep, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
@@ -87,12 +86,12 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
 
-   IF ( testing_dm_exact ) THEN
+   if ( testing_dm_exact ) then
       ! jo_partial has been already summed at lower level
       j % jo % total = jo_partial
-   ELSE
+   else
       j % jo % total = wrf_dm_sum_real( jo_partial )
-   ENDIF
+   end if
 
    ! [1.4] calculate jc-dfi:
 
@@ -115,7 +114,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % jc = j % jc + 0.5*da_dot( size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
       j % jc = j % jc + 0.5*da_dot( size(grid%g_moist),  grid%g_moist,   grid%g_moist)
 
-   endif
+   end if
 
    !-------------------------------------------------------------------------
    ! [2.0] calculate jb:
@@ -141,7 +140,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % je = 0.5 * da_dot_cv( cv_size_je, cv_size_domain_je, &
           cv_je + xhat_je, cv_je + xhat_je, xp, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
-   endif
+   end if
    j % je = je_factor * j % je
 
    !-------------------------------------------------------------------------
@@ -152,35 +151,19 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % total = j % jb + j % jo % total + j % jc + j % je
    else
       j % total = j % jb + j % jo % total + j % je
-   endif
+   end if
 
-      if(it == 1 .and. iter == 0) then
-      write(81,'(a)')'Outer   EPS   Inner      J          Jb      Jo     Jc'
-      write(81,'(a)')'Iter          Iter                            '
-      write(UNIT=stdout,FMT='(a)')'Outer   EPS   Inner  J=      J          Jb      Jo         Jc'
-      write(82,'(a)')'Outer   EPS   Inner      G          Gb      Go'
-      write(82,'(a)')'Iter          Iter                            '
-      endif
+   if (it == 1 .and. iter == 0 .and. rootproc) then
+      write(unit=cost_unit,fmt='(a)')'Outer   EPS   Inner      J          Jb      Jo      Jc      Je'
+      write(unit=cost_unit,fmt='(a)')'Iter          Iter                            '
+      write(unit=grad_unit,fmt='(a)')'Outer   EPS   Inner      G          Gb      Go              Ge'
+      write(unit=grad_unit,fmt='(a)')'Iter          Iter                            '
+   end if
 
-      write(81,81) it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc
-      write(*,89) it, EPS(it), iter, ' J= ',j % total, j % jb, j % jo % total, j % jc
- 89   format(2x,i2,1x,f6.3,2x,i4,2x,a,2x,4(f10.3,1x))
- 81   format(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)
-
-
-
-
-   j % total = j % jb + j % jo % total + j % je
-
-   if (it == 1 .and. iter == 0) then
-      write(UNIT=cost_unit,FMT='(a)')'Outer   EPS   Inner      J          Jb      Jo      Jc      Je'
-      write(UNIT=cost_unit,FMT='(a)')'Iter          Iter                            '
-      write(UNIT=grad_unit,FMT='(a)')'Outer   EPS   Inner      G          Gb      Go              Ge'
-      write(UNIT=grad_unit,FMT='(a)')'Iter          Iter                            '
-   endif
-
-   write(UNIT=cost_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,5f10.3)') &
-      it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je
+   if (rootproc) then
+      write(unit=cost_unit,fmt='(2x,i2,1x,f10.3,2x,i4,2x,5f10.3)') &
+         it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je
+   end if
 
    !-------------------------------------------------------------------------
    ! [5.0] calculate grad_v (jo):
@@ -190,7 +173,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &
-                               grid, config_flags )
+                               grid, config_flags, cg_jcdf )
 
    call da_deallocate_y( jo_grad_y )
 
@@ -202,7 +185,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                             xhat(1:cv_size))
       write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * &
                                             j_grad(1:cv_size))
-   endif
+   end if
 
    !-------------------------------------------------------------------------
    ! [6.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo) + grad_v (je):
@@ -241,7 +224,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                        sum(xhat_je(1:cv_size_je) * xhat_je(1:cv_size_je))
       write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * &
                                        j_grad(1:cv_size))
-   endif
+   end if
 
    gnorm_j = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
@@ -251,10 +234,13 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    gnorm_je= je_factor * sqrt(gnorm_je )
    gnorm_j = sqrt(gnorm_j )
 
-   write(grad_unit,FMT='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') & 
-      it, EPS(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
+   if (rootproc) then
+      write(grad_unit,fmt='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') & 
+         it, EPS(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
+   end if
 
-   IF (trace_use) call da_trace_exit("da_calculate_j")
+   if (trace_use) call da_trace_exit("da_calculate_j")
 
 end subroutine da_calculate_j
+
 

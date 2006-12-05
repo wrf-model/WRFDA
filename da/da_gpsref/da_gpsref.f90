@@ -1,6 +1,6 @@
 module da_gpsref
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -9,23 +9,23 @@ module da_gpsref
 
    ! The "stats_gpsref_type" is ONLY used locally in da_gpsref:
 
-   TYPE residual_gpsref1_type
-      REAL :: ref                   ! GPS Refractivity
-      REAL ::   p                   ! Retrieved from GPS Refractivity
-      REAL ::   t                   ! Retrieved from GPS Refractivity
-      REAL ::   q                   ! Used in GPS Refra. retrieval.
-   END TYPE residual_gpsref1_type
+   type residual_gpsref1_type
+      real :: ref                   ! GPS Refractivity
+      real ::   p                   ! Retrieved from GPS Refractivity
+      real ::   t                   ! Retrieved from GPS Refractivity
+      real ::   q                   ! Used in GPS Refra. retrieval.
+   end type residual_gpsref1_type
 
-   TYPE maxmin_gpsref_stats_type
-      TYPE (maxmin_type)         :: ref          ! GPS Refractivity
-   END TYPE maxmin_gpsref_stats_type
+   type maxmin_gpsref_stats_type
+      type (maxmin_type)         :: ref          ! GPS Refractivity
+   end type maxmin_gpsref_stats_type
 
-   TYPE stats_gpsref_type
-      TYPE (maxmin_gpsref_stats_type)  :: maximum, minimum
-      TYPE (residual_gpsref1_type)     :: average, rms_err
-   END TYPE stats_gpsref_type
+   type stats_gpsref_type
+      type (maxmin_gpsref_stats_type)  :: maximum, minimum
+      type (residual_gpsref1_type)     :: average, rms_err
+   end type stats_gpsref_type
 
-CONTAINS
+contains
 
 #include "da_ao_stats_gpsref.inc"
 #include "da_calculate_grady_gpsref.inc"

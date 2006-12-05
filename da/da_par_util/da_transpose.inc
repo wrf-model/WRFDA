@@ -1,8 +1,8 @@
 subroutine da_transpose_z2x ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_z2x( xp % domdesc, xp % comms, xp % xpose_id1 )
@@ -15,9 +15,9 @@ end subroutine da_transpose_z2x
 
 subroutine da_transpose_x2y ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_x2y( xp % domdesc, xp % comms, xp % xpose_id1 )
@@ -30,9 +30,9 @@ end subroutine da_transpose_x2y
 
 subroutine da_transpose_x2y_v2( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_x2y( xp % domdesc, xp % comms, xp % xpose_id2 )
@@ -45,9 +45,9 @@ end subroutine da_transpose_x2y_v2
 
 subroutine da_transpose_y2z ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_y2z ( xp%domdesc, xp%comms, xp%xpose_id1 )
@@ -60,9 +60,9 @@ end subroutine da_transpose_y2z
 
 subroutine da_transpose_z2y ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_z2y ( xp%domdesc, xp%comms, xp%xpose_id1 )
@@ -75,9 +75,9 @@ end subroutine da_transpose_z2y
 
 subroutine da_transpose_y2x ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_y2x( xp % domdesc, xp % comms, xp % xpose_id1 )
@@ -90,9 +90,9 @@ end subroutine da_transpose_y2x
 
 subroutine da_transpose_y2x_v2( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_y2x( xp % domdesc, xp % comms, xp % xpose_id2 )
@@ -105,9 +105,9 @@ end subroutine da_transpose_y2x_v2
 
 subroutine da_transpose_x2z ( xp )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(INOUT) :: xp      ! Dimensions and xpose buffers.
+   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
 #ifdef DM_PARALLEL
    call wrf_dm_xpose_x2z( xp % domdesc , xp % comms, xp % xpose_id1 )

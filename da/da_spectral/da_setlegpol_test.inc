@@ -1,5 +1,7 @@
 subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
 
+   use da_tools
+
    implicit none
 
    integer, intent(in)  :: nj              ! Number of latitudes.
@@ -19,6 +21,10 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
    real    :: eq_coeff            ! 1 if equator point, 0 otherwise.
    real    :: alp_norm_test       ! Summation scalar.
    complex :: eq_term             ! Summation scalar.
+   integer :: spec_unit
+
+   call da_get_unit(spec_unit)
+   open(unit=spec_unit,file="spec_pol",status="replace")
 
    if ( (nj+1) / 2 == nj/2 + 1 ) then
       eq_coeff = 1.0 ! Odd latitudes
@@ -67,14 +73,14 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
             alp_norm_test = 0.5 * ( alp_norm_test + eq_coeff * eq_term )
 
             ! if ( l1 /= l2 .and. abs(alp_norm_test) >= tolerance ) then
-            !    write(UNIT=stdout,FMT='(a,3i6,f15.10,a,f15.10)')
-            !      ' WARNING: ALP normalization error (m, l1, l2) = ', !&
+            !    write(unit=stdout,fmt='(a,3i6,f15.10,a,f15.10)')
+            !      ' WARNinG: ALP normalization error (m, l1, l2) = ', !&
             !                                      m, l1, l2, alp_norm_test, &
             !                                      ', > tolerance = ', tolerance
             !            end if
             if ( l1 == l2 .and. abs(alp_norm_test-1.0) >= tolerance ) then
-               write(UNIT=spec_unit,FMT='(a,3i6,f15.10,a,f15.10)') &
-                 ' WARNING: ALP normalization error (m, l1, l2) = ', &
+               write(unit=spec_unit,fmt='(a,3i6,f15.10,a,f15.10)') &
+                 ' WARNinG: ALP normalization error (m, l1, l2) = ', &
                                                  m, l1, l2, alp_norm_test - 1.0, &
                                                  ', > tolerance = ', tolerance
 
@@ -83,4 +89,9 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
       end do
    end do
 
+   close(spec_unit)
+   call da_free_unit(spec_unit)
+
 end subroutine da_setlegpol_test
+
+

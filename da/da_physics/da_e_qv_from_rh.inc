@@ -1,32 +1,32 @@
-FUNCTION da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
+function da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
 
    !--------------------------------------------------------------------------
    !
-   !                       FUNCTION F_QV_FROM_RH
+   !                       function F_QV_FROM_RH
    !                     **************************
    !
    !  PURPOSE: 
    !  -------
    !     TANGENT LINEAR CODE FOR
-   !     COMPUTING MIXING RATIO FROM RELATIVE HUMIDITY, TEMPERATURE AND PRESSURE
+   !     COMPUTinG MIXinG RATIO FROM RELATIVE HUMIDITY, TEMPERATURE AND PRESSURE
    !
-   !     THE ERROR DERIVATION SHOULD USED THE TANGENT LINEAR CODE, NOT THE
-   !     ORIGINAL NON-LINEAR CODE.
+   !     THE ERROR DERIVATION SHOULD useD THE TANGENT LINEAR CODE, NOT THE
+   !     ORIGinAL NON-LINEAR CODE.
    !
    !   METHOD:
    !   ------
-   !      LINEAR OR LOGARITHMIC VERTICAL INTERPOLATION
-   !      OUT OF BOUND LOCATIONS ARE EXTRAPOLATED
+   !      LINEAR OR LOGARITHMIC VERTICAL inTERPOLATION
+   !      out OF BOUND LOCATIONS ARE EXTRAPOLATED
    !
-   !   INPUT:
+   !   inPUT:
    !   -----
    !      RH:    RELAITVE HUMIDITY in %
    !      P_PA:  PRESSURE          in Pa
    !      T_K:   TEMPERATURE       in K
    !
-   !   OUTPUT:
+   !   outPUT:
    !   ------
-   !      QV_KG: MIXING RATIO IN kg/kg
+   !      QV_KG: MIXinG RATIO in kg/kg
    !
    !   COMMON:           NO
    !   -------
@@ -35,10 +35,10 @@ FUNCTION da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
    !
    !   REFERENCES:
    !   -----------
-   !    R. R. ROGERS AND M. K. YAU, 1989: A SHORT COURSE IN CLOUD PHYSICS,
+   !    R. R. ROGERS AND M. K. YAU, 1989: A SHORT COURSE in CLOUD PHYSICS,
    !                                      3ND EDITION, PERGAMON PRESS, PAGE 14-19.
    !
-   !   VERIFICATION SET:
+   !   VERifICATION SET:
    !   -----------------
    !    T_K  = 268.15 K,  
    !    TD_K = 262.55 K
@@ -47,12 +47,12 @@ FUNCTION da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
    !    QV   = 2.11E-03 kg/kg,
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL T_K , RH , QV_KG
-   REAL P_PA0, T_K0, RH0
-   REAL ES , QS
-   REAL P_MB0, ES0, QS0, QV_KG0
+   real T_K , RH , QV_KG
+   real P_PA0, T_K0, RH0
+   real ES , QS
+   real P_MB0, ES0, QS0, QV_KG0
 
    ! P in mb
 
@@ -65,21 +65,21 @@ FUNCTION da_e_qv_from_rh (RH, T_K, RH0, T_K0, P_PA0) RESULT (QV_KG)
                  EXP (17.67*(T_K0-273.15)/(T_K0-273.15+243.5))
    ES0 = 6.112 * EXP (17.67*(T_K0-273.15)/(T_K0-273.15+243.5)) 
 
-   ! SATURATION MIXING RATIO in kg/kg
+   ! SATURATION MIXinG RATIO in kg/kg
 
    QS  = 0.622 * (P_MB0 * ES ) /  &
                 ((P_MB0 - ES0) * (P_MB0 - ES0))
    QS0 = 0.622 * ES0 /(P_MB0-ES0)            
 
-   ! MIXING RATIO in kg/kg
+   ! MIXinG RATIO in kg/kg
 
    QV_KG  = 0.01 * (RH0 * QS + RH * QS0)
    QV_KG0 = 0.01 * RH0 * QS0
 
    ! Mixing ratio must be positive
 
-   IF (QV_KG0 < 0.) QV_KG = 0.
+   if (QV_KG0 < 0.) QV_KG = 0.
 
-END FUNCTION da_e_qv_from_rh
+end function da_e_qv_from_rh
 
 

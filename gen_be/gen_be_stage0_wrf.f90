@@ -17,11 +17,14 @@ program gen_be_stage0_wrf
 #define iargc ipxfargc
 #endif
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
+   use da_tools1
 
    implicit none
+
+   integer :: gen_be_iunit, gen_be_ounit
 
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
 
@@ -54,7 +57,6 @@ program gen_be_stage0_wrf
    real                  :: dim12_inv_v               ! 1 / (dim1*dim2).
    real                  :: dim12_inv                 ! 1 / (dim1*dim2).
    logical               :: test_inverse              ! Test conversion by performing inverse.
-   logical               :: remove_mean               ! Remove mean from standard fields.
 
    integer               :: ifax1(1:num_fft_factors)  ! FFT factors.
    integer               :: ifax2(1:num_fft_factors)  ! FFT factors.
@@ -88,12 +90,11 @@ program gen_be_stage0_wrf
    real, allocatable     :: rh(:,:,:)                 ! Relative humidity.
    real, allocatable     :: psfc(:,:)                 ! Surface pressure.
    real, allocatable     :: height(:,:,:)             ! Height.
-   real, allocatable     :: psi_store(:,:,:)          ! Streamfunction.
-   real, allocatable     :: chi_store(:,:,:)          ! Velocity Potential.
-   real, allocatable     :: temp_store(:,:,:)         ! Temperature.
-   real, allocatable     :: rh_store(:,:,:)           ! Relative humidity.
-   real, allocatable     :: psfc_store(:,:)           ! Surface pressure.
-   real, allocatable     :: height_store(:,:,:)       ! Height.
+   real, allocatable     :: psi_mean(:,:,:)           ! Streamfunction.
+   real, allocatable     :: chi_mean(:,:,:)           ! Velocity Potential.
+   real, allocatable     :: temp_mean(:,:,:)          ! Temperature.
+   real, allocatable     :: rh_mean(:,:,:)            ! Relative humidity.
+   real, allocatable     :: psfc_mean(:,:)            ! Surface pressure.
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
@@ -102,11 +103,13 @@ program gen_be_stage0_wrf
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage0_wrf")
 
+   call da_get_unit(gen_be_iunit)
+   call da_get_unit(gen_be_ounit)
+
    test_inverse = .true. 
    ktest = 1
    poisson_method = 1    
    fft_method = 2
-   remove_mean = .true.
 
    numarg = iargc()
    if ( numarg /= 4 )then
@@ -124,13 +127,8 @@ program gen_be_stage0_wrf
    if ( be_method == "NMC" ) then
       write(6,'(a,a)')' Computing gen_be NMC-method forecast difference files for date ', date
       ne = 2                      ! NMC-method uses differences between 2 forecasts.
-      remove_mean = .false.
    else if ( be_method == "ENS" ) then
-      if ( remove_mean ) then
-         write(6,'(a,a)')' Computing gen_be ensemble perturbation files for date ', date
-      else
-         write(6,'(a,a)')' Computing gen_be ensemble forecast files for date ', date
-      end if
+      write(6,'(a,a)')' Computing gen_be ensemble perturbation files for date ', date
       write(6,'(a,i4)')' Ensemble Size = ', ne
    else
       write(6,'(a,a)')trim(be_method), ' is an invalid value of be_method. Stop'
@@ -189,18 +187,16 @@ program gen_be_stage0_wrf
    allocate( psfc(1:dim1,1:dim2) )
    allocate( height(1:dim1,1:dim2,1:dim3) )
 
-   allocate( psi_store(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
-   allocate( chi_store(1:dim1,1:dim2,1:dim3) )
-   allocate( temp_store(1:dim1,1:dim2,1:dim3) )
-   allocate( rh_store(1:dim1,1:dim2,1:dim3) )
-   allocate( psfc_store(1:dim1,1:dim2) )
-   allocate( height_store(1:dim1,1:dim2,1:dim3) )
-   psi_store = 0.0
-   chi_store = 0.0
-   temp_store = 0.0
-   rh_store = 0.0
-   psfc_store = 0.0
-   height_store = 0.0
+   allocate( psi_mean(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
+   allocate( chi_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( temp_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( rh_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( psfc_mean(1:dim1,1:dim2) )
+   psi_mean = 0.0
+   chi_mean = 0.0
+   temp_mean = 0.0
+   rh_mean = 0.0
+   psfc_mean = 0.0
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [3] Convert WRF forecast fields to standard fields and output' 
@@ -295,16 +291,14 @@ program gen_be_stage0_wrf
       write(gen_be_ounit)xlat
       close(gen_be_ounit)
 
-!     Optionally calculate accumulating mean:
-      if ( remove_mean ) then
-         member_inv = 1.0 / real(member)
-         psi_store = ( real( member-1 ) * psi_store + psi ) * member_inv
-         chi_store = ( real( member-1 ) * chi_store + chi ) * member_inv
-         temp_store = ( real( member-1 ) * temp_store + temp ) * member_inv
-         rh_store = ( real( member-1 ) * rh_store + rh ) * member_inv
-         psfc_store = ( real( member-1 ) * psfc_store + psfc ) * member_inv
-         height_store = ( real( member-1 ) * height_store + height ) * member_inv
-      end if
+!     Calculate accumulating mean:
+      member_inv = 1.0 / real(member)
+
+      psi_mean = ( real( member-1 ) * psi_mean + psi ) * member_inv
+      chi_mean = ( real( member-1 ) * chi_mean + chi ) * member_inv
+      temp_mean = ( real( member-1 ) * temp_mean + temp ) * member_inv
+      rh_mean = ( real( member-1 ) * rh_mean + rh ) * member_inv
+      psfc_mean = ( real( member-1 ) * psfc_mean + psfc ) * member_inv
 
    end do
 
@@ -336,26 +330,27 @@ program gen_be_stage0_wrf
       read(gen_be_iunit)height
       read(gen_be_iunit)xlat
       close(gen_be_iunit)
+      call da_free_unit(gen_be_iunit)
 
+!     Note overwriting mean diagnostic to save memory!
       input_file = 'tmp.e002'
       open (gen_be_iunit, file = input_file, form='unformatted')
       read(gen_be_iunit)date, dim1, dim2, dim3
-      read(gen_be_iunit)psi_store
-      read(gen_be_iunit)chi_store
-      read(gen_be_iunit)temp_store
-      read(gen_be_iunit)rh_store
-      read(gen_be_iunit)psfc_store
-      read(gen_be_iunit)height_store
+      read(gen_be_iunit)psi_mean
+      read(gen_be_iunit)chi_mean
+      read(gen_be_iunit)temp_mean
+      read(gen_be_iunit)rh_mean
+      read(gen_be_iunit)psfc_mean
+      read(gen_be_iunit)height
       read(gen_be_iunit)xlat
       close(gen_be_iunit)
 
 !     Take forecast difference:
-      psi = psi - psi_store
-      chi = chi - chi_store
-      temp = temp - temp_store
-      rh  = rh - rh_store
-      psfc = psfc - psfc_store
-      height = height - height_store
+      psi = psi - psi_mean
+      chi = chi - chi_mean
+      temp = temp - temp_mean
+      rh  = rh - rh_mean
+      psfc = psfc - psfc_mean
 
 !     Write out NMC-method standard perturbations:
       output_file = 'pert.'//date(1:10)//'.e001'
@@ -370,13 +365,16 @@ program gen_be_stage0_wrf
       write(gen_be_ounit)xlat
       close(gen_be_ounit)
 
+!     Restore mean (1 member only for NMC-method):
+      psi_mean = psi
+      chi_mean = chi
+      temp_mean = temp
+      rh_mean  = rh
+      psfc_mean = psfc
+
    else ! be_method = "ENS"
 
-      if ( remove_mean ) then
-         write(6,'(/a)') "[4] Convert ensemble of standard fields to perturbations"
-      else
-         write(6,'(/a)') "[4] WARNING: Outputting ensemble member standard fields in pert files!"
-      end if
+      write(6,'(/a)') "     [4.1] Convert ensemble of standard fields to perturbations"
 
       do member = 1, ne
          write(UNIT=ce,FMT='(i3.3)')member
@@ -394,14 +392,11 @@ program gen_be_stage0_wrf
          read(gen_be_iunit)xlat
          close(gen_be_iunit)
 
-         if ( remove_mean ) then
-            psi = psi - psi_store
-            chi = chi - chi_store
-            temp = temp - temp_store
-            rh  = rh - rh_store
-            psfc = psfc - psfc_store
-            height = height - height_store
-         end if
+         psi = psi - psi_mean
+         chi = chi - chi_mean
+         temp = temp - temp_mean
+         rh  = rh - rh_mean
+         psfc = psfc - psfc_mean
 
 !        Write out standard perturbations for this member:
          output_file = 'pert.'//date(1:10)//'.e'//ce  
@@ -412,11 +407,44 @@ program gen_be_stage0_wrf
          write(gen_be_ounit)temp
          write(gen_be_ounit)rh
          write(gen_be_ounit)psfc
-         write(gen_be_ounit)height
-         write(gen_be_ounit)xlat
+         write(gen_be_ounit)height ! Full height
+         write(gen_be_ounit)xlat   ! Full latitude
          close(gen_be_ounit)
       end do
+
    end if
+
+!  Write out mean/mean square fields:
+
+   output_file = 'psi/'//date(1:10)//'.psi.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)psi_mean
+   close(gen_be_ounit)
+
+   output_file = 'chi/'//date(1:10)//'.chi.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)chi_mean
+   close(gen_be_ounit)
+
+   output_file = 't/'//date(1:10)//'.t.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)temp_mean
+   close(gen_be_ounit)
+
+   output_file = 'rh/'//date(1:10)//'.rh.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)rh_mean
+   close(gen_be_ounit)
+
+   output_file = 'ps/'//date(1:10)//'.ps.mean'
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)psfc_mean
+   close(gen_be_ounit)
 
    deallocate( psi )
    deallocate( chi )
@@ -425,12 +453,11 @@ program gen_be_stage0_wrf
    deallocate( psfc )
    deallocate( height )
    deallocate( xlat )
-   deallocate( psi_store )
-   deallocate( chi_store )
-   deallocate( temp_store )
-   deallocate( rh_store )
-   deallocate( psfc_store )
-   deallocate( height_store )
+   deallocate( psi_mean )
+   deallocate( chi_mean )
+   deallocate( temp_mean )
+   deallocate( rh_mean )
+   deallocate( psfc_mean )
 
    if (trace_use) call da_trace_exit("gen_be_stage0_wrf")
    if (trace_use) call da_trace_report

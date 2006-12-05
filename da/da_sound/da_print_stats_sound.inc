@@ -1,10 +1,10 @@
 subroutine da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                 INTENT(IN)    :: stats_unit
-   INTEGER,                 INTENT(INOUT) :: nu, nv, nt, nq
-   TYPE (stats_sound_type), INTENT(IN)    :: Sound
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nu, nv, nt, nq
+   type (stats_sound_type), intent(in)    :: Sound
 
    write(unit=stats_unit, fmt='(5a/)') &
       '   var             ', &

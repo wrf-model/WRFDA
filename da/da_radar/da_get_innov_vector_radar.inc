@@ -1,43 +1,43 @@
 subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)            :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   integer, intent(in)            :: it       ! External iteration.
+   type (xb_type), intent(in)     :: xb       ! first guess state.
+   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type (y_type),  intent(inout)  :: ob       ! Observation structure.
+   type (ob_type), intent(inout)  :: iv       ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
 
-   REAL, DIMENSION(max_ob_levels) :: model_p   ! Model value p at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_u   ! Model value u at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_v   ! Model value v at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_w   ! Model value w at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_rho ! Model value rho at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_qrn ! Model value qrn at ob location.
+   real, dimension(max_ob_levels) :: model_p   ! Model value p at ob location.
+   real, dimension(max_ob_levels) :: model_u   ! Model value u at ob location.
+   real, dimension(max_ob_levels) :: model_v   ! Model value v at ob location.
+   real, dimension(max_ob_levels) :: model_w   ! Model value w at ob location.
+   real, dimension(max_ob_levels) :: model_rho ! Model value rho at ob location.
+   real, dimension(max_ob_levels) :: model_qrn ! Model value qrn at ob location.
 
-   REAL, DIMENSION(max_ob_levels) :: model_rv ! Model value rv at ob location.
-   REAL, DIMENSION(max_ob_levels) :: model_rf ! Model value rf at ob location.
+   real, dimension(max_ob_levels) :: model_rv ! Model value rv at ob location.
+   real, dimension(max_ob_levels) :: model_rf ! Model value rf at ob location.
 
-   REAL, DIMENSION(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
 
-   REAL                           :: model_ps
+   real                           :: model_ps
 
-   REAL                           :: xr,yr,zr
-   INTEGER                        :: irv, irvf
-   INTEGER                        :: irf, irff
+   real                           :: xr,yr,zr
+   integer                        :: irv, irvf
+   integer                        :: irf, irff
 
 
-   IF ( iv % num_Radar < 1 ) RETURN
+   if ( iv % num_Radar < 1 ) return
 
    irv = 0; irvf = 0; irf = 0; irff = 0
 
-   DO n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
+   do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
 
       num_levs = iv % Radar(n) % info % levels
 
@@ -62,7 +62,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       do k=xp%kts,xp%kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-      enddo
+      end do
 
       do k=1, num_levs
          call da_to_zk(iv%Radar(n)%height(k), v_h, xp, v_interp_h, iv%Radar(n)%zk(k))
@@ -71,8 +71,8 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
             iv%Radar(n)%height_qc(k) = below_model_surface
          else if ( iv%Radar(n)%zk(k) > mkz ) then
             iv%Radar(n)%height_qc(k) = above_model_lid
-         endif
-      enddo
+         end if
+      end do
 
 
       ! [2.0] Interpolate horizontally to ob points:
@@ -123,7 +123,7 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
 
       do k=1,num_levs
          model_qrn(k)=amax1(5.E-5,model_qrn(k))
-      enddo
+      end do
 
       model_ps = dxm * (dym * xb % psac(i,  j) + dy * xb%psac(i+1,  j)) + &
                  dx  * (dym * xb % psac(i,j+1) + dy * xb%psac(i+1,j+1)) + &
@@ -137,14 +137,14 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
       ! [3.0] Calculate rv, rf at OBS location and initialise components of &
       ! innovation vector:
 
-      if(fg_format == 1) then
+      if(fg_format == fg_format_wrf) then
          call da_latlon_to_ij(map_info, &
                            iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                            iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
       else
          call da_llxy ( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
                      iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y )
-      endif
+      end if
 
       xr = xb%ds * (iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
       yr = xb%ds * (iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
@@ -156,13 +156,13 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
          iv % Radar(n) % rv(k) % inv = 0.0
          iv % Radar(n) % rf(k) % inv = 0.0
 
-         IF ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-              iv % Radar(n) % height_qc(k) /= above_model_lid ) THEN
+         if ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+              iv % Radar(n) % height_qc(k) /= above_model_lid ) then
 
-            IF (USE_Radar_rv) THEN
-               IF ( ABS(iv % Radar(n) % rv(k) % qc - missing_data) > 1 ) THEN
-                  IF ( ABS(ob % Radar(n) % rv(k) - missing_r) > 1. .AND. &
-                       iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) THEN
+            if (use_Radar_rv) then
+               if ( ABS(iv % Radar(n) % rv(k) % qc - missing_data) > 1 ) then
+                  if ( ABS(ob % Radar(n) % rv(k) - missing_r) > 1. .AND. &
+                       iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) then
 
                      zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
@@ -172,47 +172,48 @@ subroutine da_get_innov_vector_radar ( it, xb, xp, ob, iv )
 
                      iv % Radar(n) % rv(k) % inv = ob % Radar(n) % rv(k) - &
                                               model_rv(k)
-                  END IF
-               END IF
-            END IF
+                  end if
+               end if
+            end if
 
-            IF (USE_Radar_rf) THEN
-               IF ( ABS(iv % Radar(n) % rf(k) % qc - missing_data) > 1 ) THEN
-                  IF ( ABS(ob % Radar(n) % rf(k) - missing_r) > 1. .AND. &
-                     iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) THEN
+            if (use_Radar_rf) then
+               if ( ABS(iv % Radar(n) % rf(k) % qc - missing_data) > 1 ) then
+                  if ( ABS(ob % Radar(n) % rf(k) - missing_r) > 1. .AND. &
+                     iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) then
                      call da_reflectivity( model_rf(k), model_rho(k), &
                         model_qrn(k) )
 
                      iv % Radar(n) % rf(k) % inv = ob % Radar(n) % rf(k) - &
                                               model_rf(k)
-                  END IF
-               END IF
-            END IF
-         END IF
+                  end if
+               end if
+            end if
+         end if
       end do
 
       !------------------------------------------------------------------------
       ! [4.0] Perform optional maximum error check:  
       !------------------------------------------------------------------------
 
-      IF (check_max_iv )  THEN
+      if (check_max_iv )  then
          call da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff )
-      END IF
-   END DO
+      end if
+   end do
 
-   write(unit = check_max_iv_unit, FMT ='(/,A,i5,A)')   &
-      'For outer iteration ', it, ', Total Rejections for Radar follows:'
+   if (check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(/,A,i5,A)')   &
+         'For outer iteration ', it, ', Total Rejections for Radar follows:'
 
-   IF ( USE_Radar_rv ) THEN
-       WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rv observations:     ',irvf, ' on ',irv
-   ENDIF
+      if ( use_Radar_rv ) then
+          write ( unit = check_max_iv_unit, fmt = '(/,2(A,I6))' ) &
+            'Number of failed rv observations:     ',irvf, ' on ',irv
+      end if
 
-   IF ( USE_Radar_rf ) THEN
-      WRITE ( UNIT = check_max_iv_unit, FMT = '(/,2(A,I6))' ) &
-         'Number of failed rf observations:     ',irff, ' on ',irf
-   ENDIF
-
+      if ( use_Radar_rf ) then
+         write ( unit = check_max_iv_unit, fmt = '(/,2(A,I6))' ) &
+            'Number of failed rf observations:     ',irff, ' on ',irf
+      end if
+   end if
 
 end subroutine da_get_innov_vector_radar
 

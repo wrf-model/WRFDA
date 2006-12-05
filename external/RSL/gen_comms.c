@@ -582,6 +582,7 @@ if ( !strcmp( p->name , "xf_ens" ) || !strcmp( p->name,"pr_ens" ) ||
      !strcmp( p->name , "abstot" ) || !strcmp( p->name,"absnxt" ) || !strcmp( p->name, "emstot" ) )  {
   if ( sw_move && ! said_it ) { fprintf(stderr,"Info only - not an error: Moving nests not implemented for Grell Ens. Cumulus\n") ;
                                 fprintf(stderr,"Info only - not an error: Moving nests not implemented for CAM radiation\n") ;
+                                fprintf(stderr,"Info only - not an error: Moving nests not implemented for Observation Nudging\n") ;
   said_it = 1 ; }
   continue ;
 }

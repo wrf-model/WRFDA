@@ -31,7 +31,7 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
    real                :: pb_vert_reg_temp(1:iys,1:kz,1:kz)
    real                :: weight(1:kz)
 
-   IF (trace_use) call da_trace_entry("da_interpolate_regcoeff")
+   if (trace_use) call da_trace_entry("da_interpolate_regcoeff")
 
    pb_vert_reg = 0.0
 
@@ -129,9 +129,9 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
          'pb_vert_reg_stats(:,1,:)' )
       call da_array_print( 1, pb_vert_reg(:,1,:), &
          'pb_vert_reg(:,1,:)' )
-   endif
+   end if
 
-   IF (trace_use) call da_trace_exit("da_interpolate_regcoeff")
+   if (trace_use) call da_trace_exit("da_interpolate_regcoeff")
    
 end subroutine da_interpolate_regcoeff
 

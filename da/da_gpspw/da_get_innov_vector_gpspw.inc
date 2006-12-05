@@ -5,34 +5,29 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   !                                                    07/16/2004
   !----------------------------------------------------------------
 
-  IMPLICIT NONE
+  implicit none
 
-  !-----
-  !   INCLUDE 'mpif.h'
-  !-----
+  integer, intent(in)           :: it      ! External iteration.
+  type (xb_type), intent(in)    :: xb      ! first guess state.
+  type (xpose_type), intent(in) :: xp      ! Domain decomposition vars.
+  type (y_type),  intent(inout) :: ob      ! Observation structure.
+  type (ob_type), intent(inout) :: iv      ! O-B structure.
 
-  INTEGER, INTENT(IN)           :: it      ! External iteration.
-  TYPE (xb_type), INTENT(IN)    :: xb      ! first guess state.
-  TYPE (xpose_type), INTENT(IN) :: xp      ! Domain decomposition vars.
-  TYPE (y_type),  INTENT(INOUT) :: ob      ! Observation structure.
-  TYPE (ob_type), INTENT(INOUT) :: iv      ! O-B structure.
-
-  INTEGER                      :: n        ! Loop counter.
-  INTEGER                      :: i, j     ! Index dimension.
-  REAL                         :: dx, dxm  ! Interpolation weights.
-  REAL                         :: dy, dym  ! Interpolation weights.
-  REAL                         :: model_tpw! Model value u at oblocation.
-  INTEGER           :: ittpw,ittpwf
+  integer                      :: n        ! Loop counter.
+  integer                      :: i, j     ! Index dimension.
+  real                         :: dx, dxm  ! Interpolation weights.
+  real                         :: dy, dym  ! Interpolation weights.
+  real                         :: model_tpw! Model value u at oblocation.
+  integer           :: ittpw,ittpwf
 
   !--------------------------------------------------------------------------
-  INTEGER                :: k            ! Index dimension
-  REAL                   :: dpw, ddpw    ! adjustment pw [mm]
-  REAL                   :: obs_terr     ! real terrain height at GPS site [m]
-  REAL                   :: model_terr   ! model terrain height at GPS site[m]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_q ! model q at GPS site [kg/kg]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_z ! model z at GPS site [m]
-  REAL,DIMENSION(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
-  !INTEGER                      :: ierr, unit_gps
+  integer                :: k            ! Index dimension
+  real                   :: dpw, ddpw    ! adjustment pw [mm]
+  real                   :: obs_terr     ! real terrain height at GPS site [m]
+  real                   :: model_terr   ! model terrain height at GPS site[m]
+  real,dimension(xp%kts:xp%kte):: model_q ! model q at GPS site [kg/kg]
+  real,dimension(xp%kts:xp%kte):: model_z ! model z at GPS site [m]
+  real,dimension(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
 
   ! unit_gps = myproc + 140
   !---------------------------------------------------------------------------
@@ -40,14 +35,14 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
   !
   ! GPS TPW Pseudo OBS test:
   !
-  IF ( pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0 ) then
+  if ( pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0 ) then
     ! Deallocate:
     if (iv%num_gpspw > 0) then
       write(unit=stdout, fmt='(a,i4)') &
         'iv%num_gpspw =', iv%num_gpspw
       deallocate (iv % gpspw)
       deallocate (ob % gpspw)
-    endif
+    end if
 
     Use_GpspwObs = .true.
 
@@ -59,7 +54,7 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
     allocate (iv % gpspw (1:num_pseudo))
     allocate (ob % gpspw (1:num_pseudo))
 
-    write(UNIT=stdout,FMT='(a,i2)') &
+    write(unit=stdout,fmt='(a,i2)') &
       '==> GPS TPW pseudo OBS test: num_pseudo=',num_pseudo
 
     iv % gpspw(1) % loc % x   = pseudo_x
@@ -101,17 +96,17 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
       if(iv%gpspw(1)%loc%i >= xp%its .and. iv%gpspw(1)%loc%i <= xp%ite .and. &  
         iv%gpspw(1)%loc%j >= xp%jts .and. iv%gpspw(1)%loc%j <= xp%jte) then  
         iv%gpspw(1)%loc%proc_domain = .true.  
-      endif  
-    endif 
+      end if  
+    end if 
 
-    write(UNIT=stdout,FMT='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
-    write(UNIT=stdout,FMT='(3f15.5)')    pseudo_x,  pseudo_y,  pseudo_z
-    write(UNIT=stdout,FMT='(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
+    write(unit=stdout,fmt='(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
+    write(unit=stdout,fmt='(3f15.5)')    pseudo_x,  pseudo_y,  pseudo_z
+    write(unit=stdout,fmt='(a,f8.2)')    'iv%gpspw: elv=',iv%gpspw(1)%info%elv
 
-  ENDIF 
+  end if 
   ! ----------------------------------------------------------------------------
 
-  IF ( iv % num_gpspw > 0 ) THEN
+  if ( iv % num_gpspw > 0 ) then
 
     ittpw   = 0 ; ittpwf  = 0
 
@@ -120,7 +115,7 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
     !   ' obsh-mdlh', '   obs pw ', '  model pw',  &
     !   '   O-B pw ', '    Dpw   ', '  O-B+Dpw '
 
-    DO n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
+    do n=iv%ob_numb(iv%current_ob_time-1)%gpspw + 1, iv%ob_numb(iv%current_ob_time)%gpspw
 
         ! [1.1] Get horizontal interpolation weights:
 
@@ -140,23 +135,23 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
         else
           ! To compute the 'inv':
           iv % gpspw(n) % tpw % inv = 0.0
-          IF ( ob % gpspw(n) % tpw > missing_r .AND. &
-               iv % gpspw(n) % tpw % qc >= obs_qc_pointer ) THEN
+          if ( ob % gpspw(n) % tpw > missing_r .AND. &
+               iv % gpspw(n) % tpw % qc >= obs_qc_pointer ) then
             dpw = 0.0
             obs_terr   = iv%gpspw(n)%info%elv
             model_terr = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) + &
                          dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
 
-            IF ( obs_terr <= model_terr ) THEN
+            if ( obs_terr <= model_terr ) then
                model_q(1) = dym*(dxm*xb%q(i,j,1)   + dx*xb%q(i+1,j,1)) + &
                             dy *(dxm*xb%q(i,j+1,1) + dx*xb%q(i+1,j+1,1))
                model_rho(1) = dym*(dxm*xb%rho(i,j,1) + dx*xb%rho(i+1,j,1)) + &
                             dy *(dxm*xb%rho(i,j+1,1) + dx*xb%rho(i+1,j+1,1))
                dpw = model_rho(1) * model_q(1) * ( obs_terr - model_terr )
-            ELSE
+            else
               model_z(1) = dym*(dxm*xb%hf(i,j,1)   + dx*xb%hf(i+1,j,1)) + &
                            dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
-              DO k = xp%kts, xp%kte
+              do k = xp%kts, xp%kte
                 if (model_z(k) >= obs_terr ) exit
 
                 model_z(k+1) = dym*(dxm*xb%hf(i,j,k+1)   + dx*xb%hf(i+1,j,k+1)) + &
@@ -170,24 +165,24 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
                   ddpw = model_rho(k) * model_q(k) * ( model_z(k+1) - model_z(k) )
                 else
                   ddpw = model_rho(k) * model_q(k) * ( obs_terr - model_z(k) )
-                endif
+                end if
 
                 dpw = dpw + ddpw
-              END DO
-            END IF
+              end do
+            end if
 
             iv % gpspw(n) % tpw % inv = ob % gpspw(n) % tpw - model_tpw &
                                         + 0.1*dpw
-          END IF
-        endif
+          end if
+        end if
 
         !------------------------------------------------------------------------
         ! [5.0] Perform optional maximum error check:
         !------------------------------------------------------------------------
 
-        IF (  check_max_iv ) THEN
+        if (  check_max_iv ) then
           call da_check_max_iv_gpspw(it, iv % gpspw(n), ittpw,ittpwf )
-        END IF
+        end if
 
         !---   
         !        write(unit=unit_gps, fmt='(i4,10f10.3)') n, &
@@ -196,15 +191,17 @@ subroutine da_get_innov_vector_gpspw ( it, xb, xp, ob, iv )
         !              model_tpw , ob%gpspw(n)%tpw-model_tpw, 0.1*dpw,       &
         !              ob%gpspw(n)%tpw-model_tpw+0.1*dpw
         !---   
-    END DO
+    end do
 
-    write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-      ', Total Rejections for Gpspw follows:'
-    WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-      'Number of failed TPW-observations:     ',ittpwf, ' on ',ittpw, &
-      'Finally all Gpspw rejections ',ittpwf,' on ',ittpw
 
-  ENDIF
+    if (check_max_iv_print) then
+       write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+          ', Total Rejections for Gpspw follows:'
+       write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+          'Number of failed TPW-observations:     ',ittpwf, ' on ',ittpw, &
+          'Finally all Gpspw rejections ',ittpwf,' on ',ittpw
+    end if
+  end if
 
 end subroutine da_get_innov_vector_gpspw
 

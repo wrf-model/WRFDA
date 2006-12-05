@@ -9,8 +9,8 @@
       real                             :: rr
 
       ! JRB use variable to stop compiler whinge
-      IF (k ==0 .OR. n==0) THEN
-      END IF
+      if (k ==0 .OR. n==0) then
+      end if
 
       rr = 0.0
 
@@ -24,7 +24,7 @@
 !             n_bad % kk(n_bad % num % bad) = k
 !           else
 !             n_bad % num % miss = n_bad % num % miss + 1
-!           endif
-        endif
+!           end if
+        end if
       end function da_residual
 

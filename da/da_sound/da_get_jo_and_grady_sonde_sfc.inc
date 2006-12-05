@@ -1,17 +1,17 @@
 subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
 
-  IMPLICIT NONE
+  implicit none
 
-  TYPE (ob_type), INTENT(IN)    :: iv          ! Innovation vector.
-  TYPE (y_type),  INTENT(IN)    :: re          ! Residual vector.
-  TYPE (y_type),  INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-  type (jo_type), INTENT(INOUT) :: jo          ! Obs cost function.
+  type (ob_type), intent(in)    :: iv          ! Innovation vector.
+  type (y_type),  intent(in)    :: re          ! Residual vector.
+  type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+  type (jo_type), intent(inout) :: jo          ! Obs cost function.
 
-  INTEGER                      :: n
+  integer                      :: n
   ! the following "global" objects are used only when testing
-  TYPE (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
-  TYPE (y_type)  :: re_glob         ! Global Residual vector (O-A).
-  TYPE (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
+  type (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
+  type (y_type)  :: re_glob         ! Global Residual vector (O-A).
+  type (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
 
   jo % sonde_sfc_u = 0.0
   jo % sonde_sfc_v = 0.0
@@ -19,13 +19,13 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
   jo % sonde_sfc_p = 0.0
   jo % sonde_sfc_q = 0.0
 
-  IF ( testing_dm_exact ) THEN
-    IF ( iv%num_sound_glo == 0 ) RETURN
-  ELSE
-    IF ( iv%num_sound < 1 ) return
-  ENDIF
+  if ( testing_dm_exact ) then
+    if ( iv%num_sound_glo == 0 ) return
+  else
+    if ( iv%num_sound < 1 ) return
+  end if
 
-  DO n=1, iv%num_sound
+  do n=1, iv%num_sound
 
       jo_grad_y%sonde_sfc(n)%u = -re%sonde_sfc(n)%u / &
                                ( iv%sonde_sfc(n)%u%error * iv%sonde_sfc(n)%u%error)
@@ -37,12 +37,12 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
                                ( iv%sonde_sfc(n)%p%error * iv%sonde_sfc(n)%p%error)
       jo_grad_y%sonde_sfc(n)%q = -re%sonde_sfc(n)%q / &
                                ( iv%sonde_sfc(n)%q%error * iv%sonde_sfc(n)%q%error)
-  END DO
+  end do
 
   ! Bitwise-exact reduction preserves operation order of serial code for
   ! testing, at the cost of much-increased run-time.  Turn it off when not
-  ! testing.  This will always be .FALSE. for a serial run.
-  IF ( testing_dm_exact ) THEN
+  ! testing.  This will always be .false. for a serial run.
+  if ( testing_dm_exact ) then
     ! collect all obs in serial order and allocate global objects
     call da_to_global_sonde_sfc( iv,      re,      jo_grad_y, &
                           iv_glob, re_glob, jo_grad_y_glob )
@@ -50,10 +50,10 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
     call da_compute_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
     ! free global objects
     call da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob )
-  ELSE
+  else
     ! perform remaining computations
     call da_compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo )
-  ENDIF
+  end if
 
   jo % sonde_sfc_u = 0.5 * jo % sonde_sfc_u
   jo % sonde_sfc_v = 0.5 * jo % sonde_sfc_v
@@ -61,6 +61,6 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y )
   jo % sonde_sfc_p = 0.5 * jo % sonde_sfc_p
   jo % sonde_sfc_q = 0.5 * jo % sonde_sfc_q
 
-  RETURN
+  return
 
 end subroutine da_get_jo_and_grady_sonde_sfc

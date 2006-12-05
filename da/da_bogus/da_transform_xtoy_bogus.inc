@@ -6,31 +6,33 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
    !  Port the algorithm to WRF frame. Xianyan Zhang and Qingnong Xiao, February 2005.
    !---------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type),    INTENT(IN)    :: xb       ! first guess state.
-   TYPE (x_type),     INTENT(IN)    :: xa       ! gridded analysis increment.
-   TYPE (ob_type),    INTENT(IN)    :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN)    :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(INOUT) :: y        ! y = h (xa) (linear)
+   type (xb_type),    intent(in)    :: xb       ! first guess state.
+   type (x_type),     intent(in)    :: xa       ! gridded analysis increment.
+   type (ob_type),    intent(in)    :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: y        ! y = h (xa) (linear)
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
-   REAL                           :: dx, dxm  ! 
-   REAL                           :: dy, dym  !
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_t,model_t9
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_q,model_q9
-   REAL, DIMENSION(xp%kts:xp%kte) :: model_p_c,model_p_c9
-   REAL                           :: psfc_loc,terr_loc,psfc_loc9
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
+   real                           :: dx, dxm  ! 
+   real                           :: dy, dym  !
+   real, dimension(xp%kts:xp%kte) :: model_t,model_t9
+   real, dimension(xp%kts:xp%kte) :: model_q,model_q9
+   real, dimension(xp%kts:xp%kte) :: model_p_c,model_p_c9
+   real                           :: psfc_loc,terr_loc,psfc_loc9
 
-   IF ( iv%num_bogus > 0 ) THEN
-      do n=1, iv % num_bogus
-         y%bogus(n)%slp  = 0.0
-         y%bogus(n)%u(:) = 0.0
-         y%bogus(n)%v(:) = 0.0
-         y%bogus(n)%t(:) = 0.0
-         y%bogus(n)%q(:) = 0.0
+   if ( iv%num_bogus > 0 ) then
+!xyh      do n=1, iv % num_bogus
+     do n = iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+
+!xyh         y%bogus(n)%slp  = 0.0
+!xyh         y%bogus(n)%u(:) = 0.0
+!xyh         y%bogus(n)%v(:) = 0.0
+!xyh         y%bogus(n)%t(:) = 0.0
+!xyh         y%bogus(n)%q(:) = 0.0
 
          num_levs = iv % bogus(n) % info % levels
 
@@ -60,7 +62,7 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
                            + dy *(dxm*xa%p(i,j+1,k) + dx*xa%p(i+1,j+1,k))
             model_p_c(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) &
                            + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         enddo
+         end do
 
          terr_loc = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) &
                     + dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
@@ -94,8 +96,9 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
          call da_interp_lin_3d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
                             y%bogus(n)%q(1), num_levs, iv%bogus(n)%zk(1), num_levs)
 #endif
+ 
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_bogus
 

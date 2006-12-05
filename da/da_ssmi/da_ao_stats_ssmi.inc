@@ -1,10 +1,10 @@
 subroutine da_ao_stats_ssmi ( stats_unit, oi, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
    integer  :: num_ssmi_tb, num_ssmi_retrieval       ! # obs over global domain.
 
@@ -12,17 +12,17 @@ subroutine da_ao_stats_ssmi ( stats_unit, oi, re )
    num_ssmi_tb = wrf_dm_sum_integer( oi%num_ssmi_tb )
    num_ssmi_retrieval = wrf_dm_sum_integer( oi%num_ssmi_retrieval )
 
-   IF ( num_ssmi_tb .gt. 0 ) THEN
+   if ( num_ssmi_tb .gt. 0 ) then
 
       call da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       num_ssmi_tot = num_ssmi_tb_tot
 
-   ELSE IF ( num_ssmi_retrieval .gt. 0) THEN
+   else if ( num_ssmi_retrieval .gt. 0) then
 
       call da_ao_stats_ssmi_rv( stats_unit, oi, re )
       num_ssmi_tot = num_ssmi_rv_tot
 
-   ENDIF
+   end if
 
 end subroutine da_ao_stats_ssmi
 

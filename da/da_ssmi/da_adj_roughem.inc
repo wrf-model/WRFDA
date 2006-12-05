@@ -1,7 +1,7 @@
 subroutine da_adj_roughem(ifreq,gx2,tk,theta,remv,remh,             &
                        ADJ_gx2,ADJ_tk,ADJ_remv,ADJ_remh          )
 ! ----------------------------------------------------------------
-IMPLICIT NONE
+implicit none
 ! ----------------------------------------------------------------
 !
 ! Input  :: ADJ_tk, ADJ_gx2
@@ -10,10 +10,10 @@ IMPLICIT NONE
 ! Calculates rough-surface emissivity of ocean surface at SSM/I
 ! frequencies.
 !
-      integer, intent(IN   ) :: ifreq
-      real   , intent(IN   ) :: tk, theta, gx2
-      real   , intent(IN   ) :: ADJ_remv,ADJ_remh
-      real   , intent(INOUT) :: ADJ_tk,ADJ_gx2
+      integer, intent(in   ) :: ifreq
+      real   , intent(in   ) :: tk, theta, gx2
+      real   , intent(in   ) :: ADJ_remv,ADJ_remh
+      real   , intent(inout) :: ADJ_tk,ADJ_gx2
 
       real                   :: remv,remh,ssw
       real a19v(4),a22v(4),a37v(4),a85v(4)
@@ -58,7 +58,7 @@ IMPLICIT NONE
       else if (ifreq .eq. 4) then
              remv =     x1*a85v(1) +     x2*a85v(2) +     x3*a85v(3) +     x4*a85v(4)
              remh =     x1*a85h(1) +     x2*a85h(2) +     x3*a85h(3) +     x4*a85h(4)
-      endif
+      end if
 
       ssw=36.5
       call spemiss(f(ifreq),tk,theta,ssw,semv,semh)
@@ -128,7 +128,7 @@ IMPLICIT NONE
          ADJ_x3   = ADJ_remv*a85v(3) + ADJ_x3
          ADJ_x4   = ADJ_remv*a85v(4) + ADJ_x4
    
-      endif
+      end if
 
       ADJ_tp = ADJ_x4*x3
       ADJ_x3 = tp*ADJ_x4     + ADJ_x3
@@ -139,5 +139,5 @@ IMPLICIT NONE
       ADJ_gx2= 0.5*ADJ_g     + ADJ_gx2
       ADJ_tk = ADJ_tp/273.0  + ADJ_tk
  
-END subroutine da_adj_roughem
+end subroutine da_adj_roughem
 

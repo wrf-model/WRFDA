@@ -6,11 +6,11 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    ! PURPOSE: Transfers fields from KMA to first guess (xb) structure.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx          ! Header & non-gridded vars.
+   type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
 
-   TYPE(domain), TARGET               :: grid
+   type(domain), target               :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -21,18 +21,18 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    real    :: tmpvar, tmpvar1, earth_radius_sq,conv
    real    :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
    real    :: ddx, ddy                                        
-   REAL, DIMENSION(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: rgh_fac
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: rgh_fac
    character(len=19) :: current_date
  
-   REAL, DIMENSION(grid%xp%kms:grid%xp%kme) :: TV, ALPHA, PHALF, PHALFL                     
+   real, dimension(grid%xp%kms:grid%xp%kme) :: TV, ALPHA, PHALF, PHALFL                     
 
    real :: pu, pd, coef, delp, hydro, rgasg, shgt
 
    real, dimension(grid%xp%jds:grid%xp%jde) :: loc_latc_mean
 
-   REAL, ALLOCATABLE :: arrayglobal(:,:) 
+   real, allocatable :: arrayglobal(:,:) 
 
-   IF (trace_use) call da_trace_entry("da_transfer_kmatoxb")
+   if (trace_use) call da_trace_entry("da_transfer_kmatoxb")
 
    conv = pi/180. 
    earth_radius_sq = earth_radius*1000. * earth_radius*1000. * &
@@ -56,13 +56,13 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    grid%xb % kma_b = grid%kma_b
 
    if(print_detail_xb) then
-     write(UNIT=stdout, fmt='(/a/)') &
+     write(unit=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
 
      do k=ks,ke
-        write(UNIT=stdout, fmt='(i3,8e20.12)') k, grid%xb%kma_a(k), grid%xb%kma_b(k)
-     enddo
-   endif
+        write(unit=stdout, fmt='(i3,8e20.12)') k, grid%xb%kma_a(k), grid%xb%kma_b(k)
+     end do
+   end if
 
    grid%xb % mix = grid%xp % ide - grid%xp % ids + 1
    grid%xb % mjy = grid%xp % jde - grid%xp % jds + 1
@@ -113,51 +113,50 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    !---------------------------------------------------------------------------
 
 #ifndef DEREF_KLUDGE
-    call da_get_vpoles(grid%xb%u,grid%xb%v,grid%xb%lon,          &
+    call da_get_vpoles(grid%xb%u,grid%xb%v,          &
        grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 #else
     call da_get_vpoles(grid%xb%u(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
                        grid%xb%v(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
-                       grid%xb%lon(grid%xp%ims,grid%xp%jms),     &
        grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 
 #endif
    if (print_detail_xb) then
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kts, grid%xp%kte=', grid%xp%kts, grid%xp%kte
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
-      WRITE(unit=stdout,FMT='(A,2I5)') 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%kts, grid%xp%kte=', grid%xp%kts, grid%xp%kte
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
+      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=1)=', size(grid%xb%v, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%v, dim=1)=', size(grid%xb%v, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=1)=', size(grid%xa%v, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%v, dim=1)=', size(grid%xa%v, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
 
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
-      WRITE(unit=stdout,FMT='(A,I5)') 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
-   endif
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
+      write(unit=stdout,fmt='(A,I5)') 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
+   end if
 
    ALPHA(ke) = LOG(2.0)                                           
 
@@ -186,7 +185,6 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          grid%xb%ivgtyp(i,j) = grid%ivgtyp(i,j)
          grid%xb%isltyp(i,j) = grid%isltyp(i,j)
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
-         grid%xb%snowh(i,j) = grid%snowh(i,j)
          ! convert snow water equivalent kg/m2 to snow depth(mm)
          grid%xb%snowh(i,j) = grid%snow(i,j)*10. 
 
@@ -211,61 +209,61 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          ! Since data is on full levels get full level pr & ht.
          ! Note p = A + B * Psfc formula needs Psfc to be in hPa 
 
-         DO K = ks,ke-1    
+         do K = ks,ke-1    
             PU  = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(i,j)/100.0
             PD  = grid%xb%KMA_A(K  ) + grid%xb%KMA_B(K  )*grid%xb%psfc(i,j)/100.0
             if (PU == PD )then
-               errmsg(1)='PU, PD equal and so denominator will be zero'
-               write(unit=errmsg(2),FMT='(A,3I5)') ' i, j, k = ',i,j,k
-               write(unit=errmsg(3),FMT='(A,2F10.2)') &
+               message(1)='PU, PD equal and so denominator will be zero'
+               write(unit=message(2),fmt='(A,3I5)') ' i, j, k = ',i,j,k
+               write(unit=message(3),fmt='(A,2F10.2)') &
                   ' KMA_A ',grid%KMA_A(k),grid%KMA_A(K+1)
-               write(unit=errmsg(4),FMT='(A,2F10.2)') &
+               write(unit=message(4),fmt='(A,2F10.2)') &
                   ' KMA_B ',grid%KMA_B(k),grid%KMA_B(K+1)
-               write(unit=errmsg(5),FMT='(A,2F10.2)') &
+               write(unit=message(5),fmt='(A,2F10.2)') &
                   ' psfc(Pa) = ',grid%xb%psfc(i,j)
-               call da_error(__FILE__,__LINE__,errmsg(1:5))
+               call da_error(__FILE__,__LINE__,message(1:5))
             end if
             grid%xb%p(i,j,k)= 100.0 * exp ( ( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.0 )
-         END DO 
+         end do 
  
          grid%xb%p(i,j,ke) = 100.0*(grid%xb%KMA_A(ke)+grid%xb%KMA_B(ke)*grid%xb%psfc(i,j)/100.0)/2.0
 
          do k=ks,ke
             if (grid%xb%t(i,j,k) <= 0.0 ) then
-               write(unit=errmsg(1),FMT='(A,3I5,F10.2)') &
+               write(unit=message(1),fmt='(A,3I5,F10.2)') &
                   'Problem in  temp = ',i,j,k,grid%xb%t(i,j,k)   
-               call da_error(__FILE__,__LINE__,errmsg(1:1))
+               call da_error(__FILE__,__LINE__,message(1:1))
             end if
 
             grid%xb%rho(i,j,k)=grid%xb%p(i,j,k)/( gas_constant*  &
                (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K) )   
-         enddo
+         end do
 
          ! compute full level height
 
-         DO K = ks,ke    
+         do K = ks,ke    
             PHALF(K) = grid%xb%KMA_A(K) + grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0                             
             TV   (K) = (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K)*rgasg    
-         ENDDO                                                           
+         end do                                                           
 
-         DO K = ks,ke-1                                              
+         do K = ks,ke-1                                              
             DELP     = PHALF(K) - PHALF(K+1)                              
             PHALFL(K)= LOG(PHALF(K)/PHALF(K+1))                           
             ALPHA(K) = 1.0-PHALF(K+1)*PHALFL(K)/DELP                     
-         ENDDO  
+         end do  
 
          SHGT = grid%xb%terr(i,j)
-         DO K = ks, ke                                               
+         do K = ks, ke                                               
             grid%xb%h(I,J,K) = SHGT + ALPHA(K)*TV(K)                           
-         ENDDO 
+         end do 
 
          HYDRO = 0.0                                                    
-         DO K = ks+1, ke
+         do K = ks+1, ke
             HYDRO = HYDRO + TV(K-1)*PHALFL(K-1)                           
             grid%xb%h(I,J,K) = grid%xb%h(I,J,K) + HYDRO                             
-         ENDDO                                                        
-      END DO
-   END DO
+         end do                                                        
+      end do
+   end do
                                                     
    !---------------------------------------------------------------------------
    ! Sigma values are needed for interpolating 
@@ -285,13 +283,13 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
       ! 0.01 is added to see that sigmah should not become negative
       grid%xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
       if (grid%xb%sigmah(ke+ks-k) < 0.0) then
-         write(unit=errmsg(1),FMT='(A,F10.2)') &
+         write(unit=message(1),fmt='(A,F10.2)') &
             ' average surface pressure = ',tmpps  
-         write(unit=errmsg(2),FMT='(A,I5,F10.2)') &
+         write(unit=message(2),fmt='(A,I5,F10.2)') &
             ' average pressure at this level= ',k,' = ',tmpp  
-         write(unit=errmsg(3),FMT='(A,F10.2)') &
+         write(unit=message(3),fmt='(A,F10.2)') &
             ' negative sigmah(',ke+ks-k,') = ',grid%xb%sigmah(ke+ks-k) 
-         call da_error(__FILE__,__LINE__,errmsg(1:3))
+         call da_error(__FILE__,__LINE__,message(1:3))
       end if
    end do
    
@@ -300,42 +298,43 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    grid%xb%ztop = grid%xb%h(is,js,ke)
 
    if (print_detail_xb) then
-      write(UNIT=stdout, fmt='(/5a/)') &
+      write(unit=stdout, fmt='(/5a/)') &
          'lvl         h                 p                t'
 
       do k=ks,ke
-         write(UNIT=stdout, fmt='(i3,8e20.12)') k, &
+         write(unit=stdout, fmt='(i3,8e20.12)') k, &
             grid%xb%h(is,js,k), grid%xb%p(is,js,k), grid%xb%t(is,js,k)
-      enddo
+      end do
 
-      write (unit=stdout,FMT='(A)') ' '
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%v(ie,js,ke)=', grid%xb%v(ie,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%w(is,js,ke)=', grid%xb%w(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%t(is,js,ke)=', grid%xb%t(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%p(is,js,ke)=', grid%xb%p(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%q(is,js,ke)=', grid%xb%q(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%hf(is,js,ke)=', grid%xb%hf(is,js,ke)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%map_factor(is,js)=', grid%xb%map_factor(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%cori(is,js)=', grid%xb%cori(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%tgrn(is,js)=', grid%xb%tgrn(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lat(is,js)=', grid%xb%lat(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lon(is,js)=', grid%xb%lon(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%terr(is,js)=', grid%xb%terr(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%snow(is,js)=', grid%xb%snow(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%lanu(is,js)=', grid%xb%lanu(is,js)
-      write (unit=stdout,FMT='(A,I5)') 'grid%xb%landmask(is,js)=', grid%xb%landmask(is,js)
-      write (unit=stdout,FMT='(A)') ' '
-   endif
+      write (unit=stdout,fmt='(A)') ' '
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%v(ie,js,ke)=', grid%xb%v(ie,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%w(is,js,ke)=', grid%xb%w(is,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%t(is,js,ke)=', grid%xb%t(is,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%p(is,js,ke)=', grid%xb%p(is,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%q(is,js,ke)=', grid%xb%q(is,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%hf(is,js,ke)=', grid%xb%hf(is,js,ke)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%map_factor(is,js)=', grid%xb%map_factor(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%cori(is,js)=', grid%xb%cori(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%tgrn(is,js)=', grid%xb%tgrn(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lat(is,js)=', grid%xb%lat(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lon(is,js)=', grid%xb%lon(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%terr(is,js)=', grid%xb%terr(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%snow(is,js)=', grid%xb%snow(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lanu(is,js)=', grid%xb%lanu(is,js)
+      write (unit=stdout,fmt='(A,I5)') 'grid%xb%landmask(is,js)=', grid%xb%landmask(is,js)
+      write (unit=stdout,fmt='(A)') ' '
+   end if
 
    write(current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
+      grid%start_year, '-', &
       grid%start_month, '-', &
       grid%start_day,   '_', &
       grid%start_hour,  ':', &
       grid%start_minute,':', &
       grid%start_second
 
-   write(UNIT=stdout,FMT='(2A)') 'Current date is ',current_date 
+   write(unit=stdout,fmt='(2A)') 'Current date is ',current_date 
 
    !---------------------------------------------------------------------------
    ! Syed RH Rizvi
@@ -357,7 +356,7 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 #endif
 !------------------------------------------------------------------------------
 !
-# endif
+#endif
 !------------------------------------------------------------------------------
    do j=js,je
    do i=is,ie
@@ -366,21 +365,21 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 ! Calculate grid_box area and vertical inner product for use in vertical transform:
 !------------------------------------------------------------------------------
       grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
-   IF ( vertical_ip == 1 ) THEN
+   if ( vertical_ip == 1 ) then
 
-!     Vertical inner product is SQRT(Delta p):
-      DO k=1,grid%xb%mkz
-      grid%xb % vertical_inner_product(i,j,k) = SQRT(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
-      END DO
+!     Vertical inner product is sqrt(Delta p):
+      do k=1,grid%xb%mkz
+      grid%xb % vertical_inner_product(i,j,k) = sqrt(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
+      end do
 
-   ELSE IF ( vertical_ip == 2 ) THEN
+   else if ( vertical_ip == 2 ) then
 
 !     Vertical inner product is Delta p:
-      DO k=1,grid%xb%mkz
+      do k=1,grid%xb%mkz
       grid%xb % vertical_inner_product(i,j,k) = grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1)
-      END DO
+      end do
 
-   END IF
+   end if
 !------------------------------------------------------------------------------
 !  Syed RH Rizvi
 ! 
@@ -399,14 +398,14 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
                    grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
                    grid%xb%regime(i,j))
 
-      write (UNIT=stdout,FMT='(7I5)') &
+      write (unit=stdout,fmt='(7I5)') &
          i,j,grid%xb%psfc(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
 !------------------------------------------------------------------------------
 !
-# endif
+#endif
 !------------------------------------------------------------------------------
-   enddo
-   enddo
+   end do
+   end do
 !------------------------------------------------------------------------------
 !--Calculate saturation vapour pressure and relative humidity:
 !------------------------------------------------------------------------------
@@ -440,19 +439,19 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
       write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % rh(i,j,k)=', grid%xb % rh(i,j,k)
       write (unit=stdout,fmt='(A,F10.2)') 'grid%xb % qs(i,j,k)=', grid%xb % qs(i,j,k)
       write (unit=stdout,fmt='(A)') ' '
-   endif
+   end if
 
 !------------------------------------------------------------------------------
 !--Sea level pressure and total precipitable water
 !------------------------------------------------------------------------------
 
    if(print_detail_xb) then
-     write(UNIT=stdout, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(UNIT=stdout, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'Sea level pressure and total precipitable water'
-   endif
+   end if
 
 !------------------------------------------------------------------------------
 !  Syed RH Rizvi
@@ -479,12 +478,12 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 #if 0
 !------------------------------------------------------------------------------
    if(print_detail_xb) then
-     write(UNIT=stdout, fmt='(3a, i8)') &
+     write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
-     write(UNIT=stdout, fmt='(a)') &
+     write(unit=stdout, fmt='(a)') &
           'Surface Wind speed'
-   endif
+   end if
 
    tmpvar = log(10./0.0001)
    do j=js,je
@@ -498,8 +497,8 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
       grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
                          + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
                     *tmpvar*rgh_fac(i,j)
-   enddo
-   enddo
+   end do
+   end do
 !------------------------------------------------------------------------------
 !
 #endif
@@ -515,12 +514,12 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 !------------------------------------------------------------------------------
 
   if(print_detail_xb) then
-   write(UNIT=stdout, fmt='(3a, i8)') &
+   write(unit=stdout, fmt='(3a, i8)') &
    'file:', __FILE__, ', line:', __LINE__
 
-    write(UNIT=stdout, fmt='(a)') &
+    write(unit=stdout, fmt='(a)') &
          'Brightness temperature'
- endif
+ end if
 !
   call da_transform_xtotb( xa )
 !------------------------------------------------------------------------------
@@ -538,36 +537,36 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
-   ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.  
-   IF ( testing_dm_exact ) THEN
-      ALLOCATE( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
+   ! testing.  This will always be .false. for a serial or 1-process MPI run.  
+   if ( testing_dm_exact ) then
+      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
       call da_wv_patch_to_global( grid%xb%lat, arrayglobal, grid%xp%domdesc, &
                                grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
                                grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
                                grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
       do j=grid%xp%jds,grid%xp%jde
-         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
-      enddo
-      DEALLOCATE( arrayglobal )
+         loc_latc_mean(j) = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
+      end do
+      deallocate( arrayglobal )
       ! Broadcast result from monitor to other tasks.
       call wrf_dm_bcast_real( loc_latc_mean, (grid%xp%jde-grid%xp%jds+1) )
       xbx % latc_mean = loc_latc_mean
-   ELSE
+   else
       do j=js,je
-         loc_latc_mean(j) = tmpvar*SUM( grid%xb % lat(is:ie, j) )
-      enddo
+         loc_latc_mean(j) = tmpvar*sum( grid%xb % lat(is:ie, j) )
+      end do
       call wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
-   ENDIF
+   end if
 
 !------------------------------------------------------------------------------
-    write(UNIT=stdout,FMT=*) 'js je is ie= ', js,je,is,ie
+    write(unit=stdout,fmt=*) 'js je is ie= ', js,je,is,ie
 !   do j=js,je
 !     do i=is,ie
-!       write(UNIT=stdout,FMT='(2i4,3f12.2,e12.4,2f12.2)') j,i,grid%xb%psfc(i,j),grid%xb%tsk(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
+!       write(unit=stdout,fmt='(2i4,3f12.2,e12.4,2f12.2)') j,i,grid%xb%psfc(i,j),grid%xb%tsk(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
 !     end do
 !   end do
 
-   IF (trace_use) call da_trace_exit("da_transfer_kmatoxb")
+   if (trace_use) call da_trace_exit("da_transfer_kmatoxb")
 
 
 

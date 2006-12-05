@@ -4,7 +4,7 @@ subroutine da_transform_xtoseasfcwind_adj( xa, xb )
    ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    type (x_type),  intent(inout) :: xa   ! model space analysis (local).
    type (xb_type), intent(in)    :: xb   ! first guess.
@@ -35,7 +35,7 @@ subroutine da_transform_xtoseasfcwind_adj( xa, xb )
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
 
    do j=js, je
@@ -46,8 +46,8 @@ subroutine da_transform_xtoseasfcwind_adj( xa, xb )
 
          xa%u(i,j,k)=xa%u(i,j,k)+var*xa%speed(i,j)*xb%u(i,j,k)
          xa%v(i,j,k)=xa%v(i,j,k)+var*xa%speed(i,j)*xb%v(i,j,k)
-      enddo
-   enddo
+      end do
+   end do
 
    if (trace_use) call da_trace_exit("da_transform_xtoseasfcwind_adj")
 

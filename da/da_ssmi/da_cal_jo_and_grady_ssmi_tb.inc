@@ -1,13 +1,13 @@
 subroutine da_cal_jo_and_grady_ssmi_tb( oi, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: oi          ! Ob Inc. structure.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual structure.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(OUT)  :: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: oi          ! Ob Inc. structure.
+   type (y_type), intent(in)    :: re          ! Residual structure.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(out)  :: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % ssmi_tb19v = 0.
    jo % ssmi_tb19h = 0.
@@ -17,7 +17,7 @@ subroutine da_cal_jo_and_grady_ssmi_tb( oi, re, jo, jo_grad_y )
    jo % ssmi_tb85v = 0.
    jo % ssmi_tb85h = 0.
 
-   DO n=1, oi%num_ssmi_tb
+   do n=1, oi%num_ssmi_tb
 
       jo_grad_y%ssmi_tb(n)%tb19v = - re%ssmi_tb(n)%tb19v / &
                                     ( oi%ssmi_tb(n)%tb19v%error * &
@@ -69,8 +69,8 @@ subroutine da_cal_jo_and_grady_ssmi_tb( oi, re, jo, jo_grad_y )
          jo % ssmi_tb85h = jo % ssmi_tb85h - &
                          re%ssmi_tb(n)%tb85h * jo_grad_y%ssmi_tb(n)%tb85h
 
-      endif
-   END DO
+      end if
+   end do
    
    jo % ssmi_tb19h = 0.5 * jo % ssmi_tb19h
    jo % ssmi_tb19v = 0.5 * jo % ssmi_tb19v

@@ -61,7 +61,8 @@ C     -------------------------------------------------------------
       RETURN                                                                    
       END SUBROUTINE CVDATE 
 C
-      SUBROUTINE DATECK (ISTAT, IDATE, IBDATE, NDATE)                           
+! JRB
+C      SUBROUTINE DATECK (ISTAT, IDATE, IBDATE, NDATE)                           
 C     IMPLICIT DOUBLE PRECISION (A-H,O-Z,\)                                     
 C                                                                               
 C JUDGE WHETHER IDATE IS YOUNGER OR OLDER THAN IDATEB                           
@@ -76,22 +77,22 @@ C               =2 ,        YEAR, MONTH
 C               =3 ,        YEAR, MONTH, DAY                                    
 C               =4 ,        YEAR, MONTH, DAY, HOUR                              
 C                                                                               
-      DIMENSION IDATE(5), IBDATE(5)                                             
+C      DIMENSION IDATE(5), IBDATE(5)                                             
 C                                                                               
-      DO 1000 J=1,NDATE                                                         
-        IF(IDATE(J) .LT. IBDATE(J)) GO TO 1100                                  
-        IF(IDATE(J) .GT. IBDATE(J)) GO TO 1200                                  
- 1000 CONTINUE                                                                  
+C      DO 1000 J=1,NDATE                                                         
+C        IF(IDATE(J) .LT. IBDATE(J)) GO TO 1100                                  
+C        IF(IDATE(J) .GT. IBDATE(J)) GO TO 1200                                  
+C 1000 CONTINUE                                                                  
                                                                                 
-        ISTAT='SAME'                                                            
-        RETURN                                                                  
+C        ISTAT='SAME'                                                            
+C        RETURN                                                                  
                                                                                 
- 1100 CONTINUE                                                                  
-        ISTAT='PAST'                                                            
-        RETURN                                                                  
+C 1100 CONTINUE                                                                  
+C        ISTAT='PAST'                                                            
+C        RETURN                                                                  
                                                                                 
- 1200 CONTINUE                                                                  
-        ISTAT='FUTR'                                                            
-        RETURN                                                                  
+C 1200 CONTINUE                                                                  
+C        ISTAT='FUTR'                                                            
+C        RETURN                                                                  
 C                                                                               
-        END SUBROUTINE DATECK 
+C        END SUBROUTINE DATECK 

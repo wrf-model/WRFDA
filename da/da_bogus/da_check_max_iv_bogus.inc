@@ -1,17 +1,17 @@
 subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
                                  itt,ittf,itqv,itqvf,itslp,itslpf)
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-  TYPE (bogus_type), INTENT(INOUT)       :: bogus
-  INTEGER,           INTENT(INOUT)       :: itu,ituf,itvv,itvvf,itslp,itslpf,&
+  integer,           intent (in)         :: it      ! Outer iteration
+  type (bogus_type), intent(inout)       :: bogus
+  integer,           intent(inout)       :: itu,ituf,itvv,itvvf,itslp,itslpf,&
                                             itt,ittf,itqv,itqvf
-  INTEGER                                :: k
-  LOGICAL                                :: failed
+  integer                                :: k
+  logical                                :: failed
 
-  INTEGER                                :: iunit ! Output unit.
-  LOGICAL                                :: print ! Output if .TRUE
+  integer                                :: iunit ! Output unit.
+  logical                                :: print ! Output if .true
 
   !-----------------------------------------------------------------------------!
   ! [1.0] Open diagnostic file:
@@ -20,23 +20,23 @@ subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
   iunit = check_max_iv_unit
   print = check_max_iv_print
 
-  IF ( print )THEN
-     WRITE (iunit,'(A)')  &
+  if ( print )then
+     write (iunit,'(A)')  &
        '----------------------------------------------------------------'
-     WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
-     WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+     write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+     write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
        'Error max test ratio for Bogus_U   = ',max_error_buv, &
        'Error max test ratio for Bogus_V   = ',max_error_buv, &
        'Error max test ratio for Bogus_T   = ',max_error_bt , &
        'Error max test ratio for Bogus_QV  = ',max_error_bq , &
        'Error max test ratio for Bogus_SLP = ',max_error_slp  
-  ENDIF
+  end if
 
   !-----------------------------------------------------------------------------!
   ! [2.0] Perform maximum innovation vector check:
   !-----------------------------------------------------------------------------!
 
-  failed = .FALSE.
+  failed = .false.
 
   do k = 1, bogus % info % levels
      ! U-wind
@@ -56,7 +56,7 @@ subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
                             max_error_bq, itqv, itqvf, iunit, 'QV   ', &
                             failed, print)                           
 
-  END DO
+  end do
 
   ! Sea Level Pressure
 

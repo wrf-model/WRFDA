@@ -1,81 +1,81 @@
-SUBROUTINE da_allocate_observations ( ob )
+subroutine da_allocate_observations ( ob )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate components of observation structure.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), intent(inout)        :: ob     ! Observation structure.
+   type (ob_type), intent(inout)        :: ob     ! Observation structure.
 
-   IF (trace_use) CALL da_trace_entry("da_allocate_observations")
+   if (trace_use) call da_trace_entry("da_allocate_observations")
 
    if (ob%num_sound > 0) then
-      ALLOCATE(ob%sound(1:ob%num_sound))
+      allocate(ob%sound(1:ob%num_sound))
 
-      ALLOCATE(ob%sonde_sfc(1:ob%num_sound))
-   endif
+      allocate(ob%sonde_sfc(1:ob%num_sound))
+   end if
 
    if (ob%num_synop > 0) &
-      ALLOCATE(ob%synop(1:ob%num_synop))
+      allocate(ob%synop(1:ob%num_synop))
 
    if (ob%num_airep > 0) &
-      ALLOCATE(ob%airep(1:ob%num_airep))
+      allocate(ob%airep(1:ob%num_airep))
 
    if (ob%num_geoamv> 0) &
-      ALLOCATE(ob%geoamv(1:ob%num_geoamv))
+      allocate(ob%geoamv(1:ob%num_geoamv))
 
    if (ob%num_polaramv> 0) &
-      ALLOCATE(ob%polaramv(1:ob%num_polaramv))
+      allocate(ob%polaramv(1:ob%num_polaramv))
 
    if (ob%num_satem > 0) &
-      ALLOCATE(ob%satem(1:ob%num_satem))
+      allocate(ob%satem(1:ob%num_satem))
 
    if (ob%num_metar > 0) &
-      ALLOCATE(ob%metar(1:ob%num_metar))
+      allocate(ob%metar(1:ob%num_metar))
 
    if (ob%num_ships > 0) &
-      ALLOCATE(ob%ships(1:ob%num_ships))
+      allocate(ob%ships(1:ob%num_ships))
 
    if (ob%num_pilot > 0) &
-      ALLOCATE(ob%pilot(1:ob%num_pilot))
+      allocate(ob%pilot(1:ob%num_pilot))
 
    if (ob%num_gpspw > 0) &
-      ALLOCATE(ob%gpspw(1:ob%num_gpspw))
+      allocate(ob%gpspw(1:ob%num_gpspw))
 
    if (ob%num_gpsref > 0) &
-      ALLOCATE(ob%gpsref(1:ob%num_gpsref))
+      allocate(ob%gpsref(1:ob%num_gpsref))
 
    if (ob%num_ssmi_tb > 0) &
-      ALLOCATE(ob%ssmi_tb(1:ob%num_ssmi_tb))
+      allocate(ob%ssmi_tb(1:ob%num_ssmi_tb))
 
    if (ob%num_ssmi_retrieval > 0) &
-      ALLOCATE(ob%ssmi_retrieval(1:ob%num_ssmi_retrieval))
+      allocate(ob%ssmi_retrieval(1:ob%num_ssmi_retrieval))
 
    if (ob%num_ssmt1 > 0) &
-      ALLOCATE(ob%ssmt1(1:ob%num_ssmt1))
+      allocate(ob%ssmt1(1:ob%num_ssmt1))
 
    if (ob%num_ssmt2 > 0) &
-      ALLOCATE(ob%ssmt2(1:ob%num_ssmt2))
+      allocate(ob%ssmt2(1:ob%num_ssmt2))
 
    if (ob%num_qscat > 0) &
-      ALLOCATE(ob%qscat(1:ob%num_qscat))
+      allocate(ob%qscat(1:ob%num_qscat))
 
    if (ob%num_profiler > 0) &
-      ALLOCATE(ob%profiler(1:ob%num_profiler))
+      allocate(ob%profiler(1:ob%num_profiler))
 
    if (ob%num_buoy     > 0) &
-      ALLOCATE(ob%buoy(1:ob%num_buoy))
+      allocate(ob%buoy(1:ob%num_buoy))
 
    if (ob%num_Radar     > 0) &
-      ALLOCATE(ob%Radar(1:ob%num_Radar))
+      allocate(ob%Radar(1:ob%num_Radar))
 
    if (ob%num_Bogus     > 0) &
-      ALLOCATE(ob%Bogus(1:ob%num_Bogus))
+      allocate(ob%Bogus(1:ob%num_Bogus))
 
    if (ob%num_airsr     > 0) &
-      ALLOCATE(ob%airsr(1:ob%num_airsr))
+      allocate(ob%airsr(1:ob%num_airsr))
 
-   IF (trace_use) CALL da_trace_exit("da_allocate_observations")
+   if (trace_use) call da_trace_exit("da_allocate_observations")
 
-END SUBROUTINE da_allocate_observations
+end subroutine da_allocate_observations

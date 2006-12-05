@@ -27,11 +27,11 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain), INTENT(IN)           :: grid
+   type(domain), intent(in)           :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin
-   integer ierr, comm
+   integer :: wrf_done_unit
 
    character(len=4) :: filnam
 
@@ -52,19 +52,20 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
       if (var4d_coupling == var4d_coupling_disk_simul) then
          call da_system_4dvar("da_run_wrfplus_tl.ksh pre")
 
-         IF (rootproc) THEN
+         if (rootproc) then
             call da_system("rm -rf tl/wrf_done")
             call da_system("touch tl/wrf_go_ahead")
-            DO WHILE ( .true. )
-               OPEN(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
-               CLOSE(wrf_done_unit)
-               EXIT
-303            CONTINUE
-               CALL da_system("sleep 1")
-            ENDDO
-         ENDIF
-         CALL wrf_get_dm_communicator ( comm )
-         CALL mpi_barrier( comm, ierr )
+            call da_get_unit(wrf_done_unit)
+            do while ( .true. )
+               open(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
+               close(wrf_done_unit)
+               exit
+303            continue
+               call da_system("sleep 1")
+            end do
+            call da_free_unit(wrf_done_unit)
+         end if
+         call mpi_barrier( comm, ierr )
 
          call da_system_4dvar("da_run_wrfplus_tl.ksh post ")
       else
@@ -82,10 +83,10 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 #include "em_actual_new_args.inc"
                                  )
          call da_transform_xtoy( xb, iv, xa, xp, y )
-      enddo
+      end do
    else  ! not var4d
       call da_transform_xtoy( xb, iv, xa, xp, y )
-   endif ! var4d
+   end if ! var4d
 
    call da_trace_exit("da_transform_vtoy")
 

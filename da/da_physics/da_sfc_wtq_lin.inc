@@ -9,7 +9,6 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    !
    ! Reference:
    ! ---------
-   !  Detail MM5/physics/pbl_sfc/mrfpbl/MRFPBL.F
    !
    !  Input Variables(basic state):
    ! 
@@ -43,61 +42,61 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL   , INTENT (in)          :: regime
-   REAL   , INTENT (in)          :: ps , ts , qs , us, vs, psfc, tg
-   REAL   , INTENT (in)          :: ps_prime, ts_prime, qs_prime  , &
+   real   , intent (in)          :: regime
+   real   , intent (in)          :: ps , ts , qs , us, vs, psfc, tg
+   real   , intent (in)          :: ps_prime, ts_prime, qs_prime  , &
                                     us_prime, vs_prime, psfc_prime, tg_prime
-   REAL   , INTENT (in)          :: hs, roughness, xland
+   real   , intent (in)          :: hs, roughness, xland
 
-   REAL   , INTENT (out)         :: u10_prime, v10_prime, t2_prime, q2_prime
+   real   , intent (out)         :: u10_prime, v10_prime, t2_prime, q2_prime
 
    ! Maximum number of iterations in computing psim, psih
 
-   INTEGER, PARAMETER :: k_iteration = 10 
-   !      INTEGER, PARAMETER :: k_iteration = 1
+   integer, parameter :: k_iteration = 10 
+   !      integer, parameter :: k_iteration = 1
 
    ! h10 is the height of 10m where the wind observed
    ! h2  is the height of 2m where the temperature and 
    !        moisture observed.
 
-   REAL, PARAMETER :: h10 = 10., h2 = 2.
+   real, parameter :: h10 = 10., h2 = 2.
    !
    ! Default roughness over the land
 
-   REAL, PARAMETER :: zint0 = 0.01 
+   real, parameter :: zint0 = 0.01 
    !
    ! Von Karman constant
 
-   REAL, PARAMETER :: k_kar = 0.4
+   real, parameter :: k_kar = 0.4
    !
    ! Working variables
 
-   REAL :: Vc2, Va2, V2 
-   REAL :: rib, rcp, xx, yy, cc, Pi
-   REAL :: psiw, psiz, mol, ust, hol, holz, hol2
-   REAL :: psim, psimz, psim2, psih, psihz, psih2
-   REAL :: psit, psit2, psiq, psiq2
-   REAL :: gzsoz0, gz10oz0, gz2oz0
-   REAL :: eg, qg, tvg, tvs
-   REAL :: ths, thg, thvs, thvg
-   REAL :: zq0, z0
+   real :: Vc2, Va2, V2 
+   real :: rib, rcp, xx, yy, cc, Pi
+   real :: psiw, psiz, mol, ust, hol, holz, hol2
+   real :: psim, psimz, psim2, psih, psihz, psih2
+   real :: psit, psit2, psiq, psiq2
+   real :: gzsoz0, gz10oz0, gz2oz0
+   real :: eg, qg, tvg, tvs
+   real :: ths, thg, thvs, thvg
+   real :: zq0, z0
 
-   REAL :: Vc2_prime, Va2_prime, V2_prime
-   REAL :: rib_prime, xx_prime, yy_prime
-   REAL :: psiw_prime, psiz_prime, mol_prime, ust_prime, &
+   real :: Vc2_prime, Va2_prime, V2_prime
+   real :: rib_prime, xx_prime, yy_prime
+   real :: psiw_prime, psiz_prime, mol_prime, ust_prime, &
            hol_prime, holz_prime, hol2_prime
-   REAL :: psim_prime, psimz_prime, psim2_prime, &
+   real :: psim_prime, psimz_prime, psim2_prime, &
            psih_prime, psihz_prime, psih2_prime
-   REAL :: psit_prime, psit2_prime, &
+   real :: psit_prime, psit2_prime, &
            psiq_prime, psiq2_prime
-   REAL :: qg_prime, tvg_prime, tvs_prime
-   REAL :: ths_prime, thg_prime, thvs_prime, thvg_prime
+   real :: qg_prime, tvg_prime, tvs_prime
+   real :: ths_prime, thg_prime, thvs_prime, thvg_prime
 
-   REAL, PARAMETER :: ka = 2.4E-5
+   real, parameter :: ka = 2.4E-5
 
-   INTEGER :: iregime
+   integer :: iregime
 
    rcp = gas_constant/cp
 
@@ -118,7 +117,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       zq0 = z0
     else
       zq0 =  zint0
-   endif
+   end if
 
    ! 1.3 Define the some constant variable for psi
    !     -----------------
@@ -199,7 +198,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    else
       Vc2_prime = 0.
       Vc2 = 0.
-   endif
+   end if
    
    V2_prime  = Va2_prime+ Vc2_prime
    V2  = Va2 + Vc2
@@ -218,12 +217,12 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    iregime = int(regime)
 
-   SELECT CASE ( iregime  ) 
+   select case ( iregime  ) 
 
    ! 5.1 Stable conditions (REGIME 1)
    !     ---------------------------
 
-   CASE ( 1 );
+   case ( 1 );
 
       psim_prime  = 0.
       psimz_prime = 0.
@@ -245,7 +244,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 5.2 Mechanically driven turbulence (REGIME 2)
    !     ------------------------------------------
 
-   CASE ( 2 );
+   case ( 2 );
 
       Pi =  - 1.0 / ((1.1 - 5.*rib)*(1.1 - 5.*rib))
       psim_prime  = 5.5 * gzsoz0  * rib_prime * Pi 
@@ -263,21 +262,21 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          psim = -10.
          psim_prime = 0.
-      endif
+      end if
       if ( psimz >= -10. ) then
          psimz = psimz
          psimz_prime = psimz_prime
       else
          psimz = -10.
          psimz_prime = 0.
-      endif
+      end if
       if ( psim2 >= -10. ) then
          psim2 = psim2
          psim2_prime = psim2_prime
       else
          psim2 = -10.
          psim2_prime = 0.
-      endif
+      end if
 
       psih_prime  = psim_prime
       psihz_prime = psimz_prime
@@ -289,7 +288,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 5.3 Unstable Forced convection (REGIME 3)
    !     -------------------------------------
 
-   CASE ( 3 );
+   case ( 3 );
 
       psim_prime = 0.
       psimz_prime = 0.
@@ -310,7 +309,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       ! 5.4 Free convection (REGIME 4)
       !     --------------------------
 
-   CASE ( 4 );
+   case ( 4 );
 
       ! Calculate psi m and pshi h using iteration method
 
@@ -345,7 +344,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
          hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
          hol_prime = ( mol_prime / mol - ths_prime / ths &
                         - 2.* ust_prime / ust ) * hol
-      endif
+      end if
 
       ! 5.4.2  Calculate n, nz, R, Rz
       !        --------------------------
@@ -356,14 +355,14 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          hol_prime = hol_prime
          hol = hol
-      endif
+      end if
       if ( hol >= -10. ) then
          hol_prime = hol_prime
          hol = hol
       else
          hol_prime = 0.
          hol = -10.
-      endif
+      end if
 
       holz_prime = (h10 / hs) * hol_prime
       holz = (h10 / hs) * hol
@@ -373,14 +372,14 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          holz_prime = holz_prime
          holz = holz
-      endif
+      end if
       if ( holz >= -10. ) then
          holz_prime = holz_prime
          holz = holz
       else
          holz_prime = 0.
          holz = -10.
-      endif
+      end if
 
       hol2_prime = (h2 / hs) * hol_prime
       hol2 = (h2 / hs) * hol
@@ -390,14 +389,14 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          hol2_prime = hol2_prime
          hol2 = hol2
-      endif
+      end if
       if ( hol2 >= -10. ) then
          hol2_prime = hol2_prime
          hol2 = hol2
       else
          hol2_prime = 0.
          hol2 = -10.
-      endif
+      end if
 
       ! 5.4.3 Calculate Psim & psih
       !        --------------------------
@@ -432,7 +431,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       psih2_prime = 2. * yy_prime
       psih2 = 2. * yy
 
-      ! enddo 
+      ! end do 
 
       ! 5.4.4 Define the limit value for psim & psih
       !        --------------------------
@@ -443,51 +442,51 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          psim = 0.9*gzsoz0
          psim_prime = 0.
-      endif
+      end if
       if ( psimz <= 0.9*gz10oz0 ) then
          psimz_prime = psimz_prime
          psimz = psimz
       else
          psimz_prime = 0.
          psimz = 0.9*gz10oz0
-      endif
+      end if
       if ( psim2 <= 0.9*gz2oz0 ) then
          psim2_prime = psim2_prime
          psim2 = psim2
       else
          psim2_prime = 0.
          psim2 = 0.9*gz2oz0
-      endif
+      end if
       if ( psih <= 0.9*gzsoz0 ) then
          psih_prime = psih_prime
          psih = psih
       else
          psih_prime = 0.
          psih = 0.9*gzsoz0
-      endif
+      end if
       if ( psihz <= 0.9*gz10oz0 ) then
          psihz_prime = psihz_prime
          psihz = psihz
       else
          psihz_prime = 0.
          psihz = 0.9*gz10oz0
-      endif
+      end if
       if ( psih2 <= 0.9*gz2oz0 ) then
          psih2_prime = psih2_prime
          psih2 = psih2
       else
          psih2_prime = 0.
          psih2 = 0.9*gz2oz0
-       endif
+       end if
 
-    CASE DEFAULT;
-       WRITE(UNIT=errmsg(1),FMT='(A,I2,A)') &
+    case default;
+       write(unit=message(1),fmt='(A,I2,A)') &
           "Regime=",iregime," is invalid."
-       call da_error(__FILE__,__LINE__,errmsg(1:1))
+       call da_error(__FILE__,__LINE__,message(1:1))
 
-   END SELECT
+   end select
 
-   ! 6.  CALCULATE PSI FOR WIND, TEMPERATURE AND MOISTURE
+   ! 6.  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
    ! =======================================
 
    psiw_prime = - psim_prime
@@ -509,7 +508,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
    psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
 
-   ! 7.  CALCULATE THE PERTURBATIONS for 10M WIND, 2M TEMPERATURE AND MOISTURE
+   ! 7.  CALCULATE THE PERTURBATIONS for 10M WinD, 2M TEMPERATURE AND MOISTURE
    ! =======================================
 
    Pi = psiz / psiw

@@ -1,13 +1,13 @@
 subroutine da_check_max_iv_gpsref(it, gpsref, pref, fref )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,            INTENT(IN)    :: it       ! External iteration.
-   TYPE (gpsref_type), INTENT(INOUT) :: gpsref
-   INTEGER,            INTENT(INOUT) :: pref, fref
-   INTEGER                           :: iunit ! Output unit.
-   INTEGER                           :: k
-   LOGICAL                           :: failed
+   integer,            intent(in)    :: it       ! External iteration.
+   type (gpsref_type), intent(inout) :: gpsref
+   integer,            intent(inout) :: pref, fref
+   integer                           :: iunit ! Output unit.
+   integer                           :: k
+   logical                           :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
@@ -15,26 +15,26 @@ subroutine da_check_max_iv_gpsref(it, gpsref, pref, fref )
 
    iunit = check_max_iv_unit
 
-   IF ( check_max_iv_print ) THEN
-      WRITE (iunit,'(A)')  &
+   if ( check_max_iv_print ) then
+      write (iunit,'(A)')  &
          '----------------------------------------------------------------'
-      WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
             'Error max test ratio for GPSRef = ', max_error_ref
-   ENDIF
+   end if
 
    !----------------------------------------------------------------------------
    ! [2.0] Perform maximum innovation vector check:
    !----------------------------------------------------------------------------
 
-   failed = .FALSE.
+   failed = .false.
 
    do k = 1, gpsref % info % levels
       call da_max_error_qc(it, gpsref % info, gpsref % ref(k), &
            max_error_ref, pref, fref, iunit, &
            'GPSRef    ', failed, check_max_iv_print)
-   END DO
+   end do
 
 end subroutine da_check_max_iv_gpsref
 

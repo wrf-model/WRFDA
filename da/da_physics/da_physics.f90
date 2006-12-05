@@ -1,10 +1,10 @@
-MODULE da_physics
+module da_physics
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_grid_definitions
    use da_interpolation
@@ -12,9 +12,9 @@ MODULE da_physics
    use da_reporting
    use module_wrf_error
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_prho_to_t_adj.inc"
 #include "da_prho_to_t_lin.inc"
@@ -80,5 +80,5 @@ MODULE da_physics
 #include "da_wdt.inc"
 #include "da_integrat_dz.inc"
 
-END MODULE da_physics
+end module da_physics
 

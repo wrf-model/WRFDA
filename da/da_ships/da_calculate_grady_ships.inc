@@ -4,16 +4,16 @@ subroutine da_calculate_grady_ships( iv, re, jo_grad_y )
    ! Purpose: Applies obs inverse on re-vector
    !-------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv          ! Innovation vector.
-   TYPE (y_type),  INTENT(INOUT) :: re          ! Residual vector.
-   TYPE (y_type),  INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)    :: iv          ! Innovation vector.
+   type (y_type),  intent(inout) :: re          ! Residual vector.
+   type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
-   INTEGER                      :: n
+   integer                      :: n
 
-   IF ( iv%num_ships > 0 ) THEN
-      DO n=1, iv%num_ships
+   if ( iv%num_ships > 0 ) then
+      do n=1, iv%num_ships
          if(iv%ships(n)%u%qc < obs_qc_pointer) re%ships(n)%u = 0.0
          if(iv%ships(n)%v%qc < obs_qc_pointer) re%ships(n)%v = 0.0
          if(iv%ships(n)%t%qc < obs_qc_pointer) re%ships(n)%t = 0.0
@@ -30,8 +30,8 @@ subroutine da_calculate_grady_ships( iv, re, jo_grad_y )
                                 ( iv%ships(n)%p%error * iv%ships(n)%p%error)
          jo_grad_y%ships(n)%q = -re%ships(n)%q / &
                                 ( iv%ships(n)%q%error * iv%ships(n)%q%error)
-      END DO
-   END IF
+      end do
+   end if
      
 end subroutine da_calculate_grady_ships
 

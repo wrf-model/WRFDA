@@ -1,17 +1,17 @@
 !============================================================================
 subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
 !----------------------------------------------------------------------------
-   IMPLICIT NONE
+   implicit none
 !----------------------------------------------------------------------------
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
 !  LOCAL VARS
-   INTEGER                          :: ntb19v,ntb19h,ntb22v,ntb37v,ntb37h, &
+   integer                          :: ntb19v,ntb19h,ntb22v,ntb37v,ntb37h, &
                                        ntb85v,ntb85h
-   INTEGER                          :: n
-   TYPE (stats_ssmi_tb_type)        :: ssmi_tb
+   integer                          :: n
+   type (stats_ssmi_tb_type)        :: ssmi_tb
 
 !----------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
    ssmi_tb%average = residual_ssmi_tb_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    ssmi_tb%rms_err = ssmi_tb%average
 
-   IF ( oi%num_ssmi_tb .gt. 0) THEN
+   if ( oi%num_ssmi_tb .gt. 0) then
 
      do n=1, oi%num_ssmi_tb
   
@@ -83,10 +83,10 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
                                ssmi_tb%minimum%tb85h,  ssmi_tb%maximum%tb85h,&
                                ssmi_tb%average%tb85h,  ssmi_tb%rms_err%tb85h)
 
-      endif    ! end if( oi%ssmi_tb(n)%loc%proc_domain )
+      end if    ! end if( oi%ssmi_tb(n)%loc%proc_domain )
      end do
      
-   END IF
+   end if
 
 ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int( ntb19v )
@@ -134,7 +134,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
               ssmi_tb%minimum%tb85h%n, ssmi_tb%maximum%tb85h%n, &
               ssmi_tb%minimum%tb85h%l, ssmi_tb%maximum%tb85h%l )
 
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
 
     if (ntb19v /= 0 ) then
 
@@ -152,7 +152,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb19v/real(ntb19v), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb19v/real(ntb19v))
-    endif
+    end if
 
     if (ntb19h /= 0 ) then
 
@@ -170,7 +170,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb19h/real(ntb19h), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb19h/real(ntb19h))
-    endif
+    end if
 
     if (ntb22v /= 0 ) then
 
@@ -188,7 +188,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb22v/real(ntb22v), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb22v/real(ntb22v))
-    endif
+    end if
 
 
     if (ntb37v /= 0 ) then
@@ -207,7 +207,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb37v/real(ntb37v), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb37v/real(ntb37v))
-    endif
+    end if
 
     if (ntb37h /= 0 ) then
 
@@ -225,7 +225,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb37h/real(ntb37h), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb37h/real(ntb37h))
-    endif
+    end if
 
     if (ntb85v /= 0 ) then
 
@@ -243,7 +243,7 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb85v/real(ntb85v), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb85v/real(ntb85v))
-    endif
+    end if
 
     if (ntb85h /= 0 ) then
 
@@ -261,9 +261,9 @@ subroutine da_ao_stats_ssmi_tb ( stats_unit, oi, re )
       write(unit=stats_unit, fmt='(a, f12.4,5x)') &
                        ' Average   : ', ssmi_tb%average%tb85h/real(ntb85h), &
                        '    RMSE   : ', sqrt(ssmi_tb%rms_err%tb85h/real(ntb85h))
-    endif
+    end if
 
-   END IF
+   end if
 
 end subroutine da_ao_stats_ssmi_tb
 

@@ -1,29 +1,29 @@
 subroutine da_get_innov_vector_satem ( it, xb, xp, ob, iv )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)             :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)      :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)   :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(IN)      :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)   :: iv       ! O-B structure.
+   integer, intent(in)             :: it       ! External iteration.
+   type (xb_type), intent(in)      :: xb       ! first guess state.
+   type (xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
+   type (y_type),  intent(in)      :: ob       ! Observation structure.
+   type (ob_type), intent(inout)   :: iv       ! O-B structure.
 
-   INTEGER                         :: n        ! Loop counter.
-   INTEGER                         :: i, j, k  ! Index dimension.
-   INTEGER                         :: num_levs ! Number of obs levels.
-   REAL                            :: dx, dxm  ! Interpolation weights.
-   REAL                            :: dy, dym  ! Interpolation weights.
-   REAL, DIMENSION(1:max_ob_levels) :: model_thickness !Model thickness at ob loc
-   INTEGER           :: ithickness,ithicknessf
+   integer                         :: n        ! Loop counter.
+   integer                         :: i, j, k  ! Index dimension.
+   integer                         :: num_levs ! Number of obs levels.
+   real                            :: dx, dxm  ! Interpolation weights.
+   real                            :: dy, dym  ! Interpolation weights.
+   real, dimension(1:max_ob_levels) :: model_thickness !Model thickness at ob loc
+   integer           :: ithickness,ithicknessf
 
-   REAL, DIMENSION(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
-   INTEGER                         :: layer1,layer2,ks,ke
-   REAL                            :: tv1,tv2,pres2
+   real, dimension(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
+   integer                         :: layer1,layer2,ks,ke
+   real                            :: tv1,tv2,pres2
 
-   IF ( iv % num_satem > 0 ) THEN
+   if ( iv % num_satem > 0 ) then
       ithickness = 0 ; ithicknessf = 0
 
-      DO n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
+      do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
          num_levs = iv % satem(n) % info % levels
 
          if ( num_levs < 1 ) cycle
@@ -59,29 +59,29 @@ subroutine da_get_innov_vector_satem ( it, xb, xp, ob, iv )
             call da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
               iv%satem(n)%p(k),pres2,model_thickness(k))
 
-            IF ( ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
-                 iv % satem(n) % thickness(k)%qc /= missing_data ) THEN
+            if ( ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
+                 iv % satem(n) % thickness(k)%qc /= missing_data ) then
               iv % satem(n) % thickness(k) % inv =     &
                      ob % satem(n) % thickness(k) - model_thickness(k)
-              ! write(UNIT=stdout,FMT="(A, 2F10.3,F10.0,A,F5.0,A)") &
+              ! write(unit=stdout,fmt="(A, 2F10.3,F10.0,A,F5.0,A)") &
               !   "observed, model_thickness, layer = ", &
               !   ob%satem(n)%thickness(k), &
               ! model_thickness(k), 0.01*pres2, " -", &
               ! iv%satem(n)%p(k)*0.01,'hPa'
-            ENDIF
+            end if
 
             pres2 = iv%satem(n)%p(k)
             layer2 = layer1
             tv2 = tv1
-         END DO
+         end do
 
          !------------------------------------------------------------------------
          ! [5.0] Perform optional maximum error check:
          !------------------------------------------------------------------------
 
-         IF ( check_max_iv ) THEN
+         if ( check_max_iv ) then
            call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf )
-         END IF
+         end if
 
          !------------------------------------------------------------------------
          ! [6.0] Perform land/ocean check
@@ -91,15 +91,17 @@ subroutine da_get_innov_vector_satem ( it, xb, xp, ob, iv )
              xb%landmask(i,j+1) /= 0. .or. xb%landmask(i+1,j+1) /= 0.) then
             iv % satem(n) % thickness(1) % inv = 0.
             ithicknessf = ithicknessf + 1
-         endif
-      END DO
+         end if
+      end do
 
-      write(unit = check_max_iv_unit, FMT ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Satem follows:'
-      WRITE (UNIT = check_max_iv_unit, FMT = '(/,10(2(A,I6),/))') &
-         'Number of failed thicknesses observations:     ',&
-                   ithicknessf, ' on ',ithickness
-   ENDIF
+      if (check_max_iv_print) then
+         write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+            ', Total Rejections for Satem follows:'
+         write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+            'Number of failed thicknesses observations:     ',&
+                      ithicknessf, ' on ',ithickness
+      end if
+   end if
 
 end subroutine da_get_innov_vector_satem
 

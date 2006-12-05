@@ -11,31 +11,32 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
    !    because the original adjoint code is wrong.      07/16/2004
    !----------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb          ! first guess state.
-   TYPE (ob_type), INTENT(IN)    :: oi          ! obs. inc vector (o-b).
-   TYPE (xpose_type), INTENT(IN) :: xp          ! Domain decomposition vars.
-   TYPE (y_type) , INTENT(IN)    :: jo_grad_y   ! grad_y(jo)
-   TYPE (x_type) , INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (xb_type), intent(in)    :: xb          ! first guess state.
+   type (ob_type), intent(in)    :: oi          ! obs. inc vector (o-b).
+   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
+   type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
-   INTEGER                       :: n        ! Loop counter.
-   INTEGER                       :: i, j     ! Index dimension.
-   REAL                          :: dx, dxm  !
-   REAL                          :: dy, dym  !
+   integer                       :: n        ! Loop counter.
+   integer                       :: i, j     ! Index dimension.
+   real                          :: dx, dxm  !
+   real                          :: dy, dym  !
 
-   INTEGER                :: k        ! Index dimension.
-   REAL                   :: dpw,ddpw     ! adjustment pw [mm]
-   REAL                   :: obs_terr     ! real terrain height at GPS site [m]
-   REAL                   :: model_terr   ! model terrain height at GPS site[m]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_q   ! model q at GPS site [kg/kg]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_z   ! model z at GPS site [m]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-   REAL,DIMENSION(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
+   integer                :: k        ! Index dimension.
+   real                   :: dpw,ddpw     ! adjustment pw [mm]
+   real                   :: obs_terr     ! real terrain height at GPS site [m]
+   real                   :: model_terr   ! model terrain height at GPS site[m]
+   real,dimension(xp%kts:xp%kte):: model_q   ! model q at GPS site [kg/kg]
+   real,dimension(xp%kts:xp%kte):: model_z   ! model z at GPS site [m]
+   real,dimension(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
+   real,dimension(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
+   real,dimension(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
-   IF ( oi%num_Gpspw > 0 ) THEN
-      do n=1, oi % num_Gpspw
+   if ( oi%num_Gpspw > 0 ) then
+!xyh      do n=1, oi % num_Gpspw
+      do n=oi%ob_numb(oi%current_ob_time-1)%gpspw + 1, oi%ob_numb(oi%current_ob_time)%gpspw
          i = oi%gpspw(n)%loc%i
          dy = oi%gpspw(n)%loc%dy
          dym = oi%gpspw(n)%loc%dym
@@ -65,7 +66,7 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
          jo_grad_x%tpw(i+1,j+1) = jo_grad_x%tpw(i+1,j+1) &
                                 + dx *dy *jo_grad_y%gpspw(n)%tpw
 
-         IF ( obs_terr <= model_terr ) THEN 
+         if ( obs_terr <= model_terr ) then 
            model_q(1)   = dym*(dxm*xb%q(i,j,1)   + dx*xb%q(i+1,j,1)) + &
                           dy *(dxm*xb%q(i,j+1,1) + dx*xb%q(i+1,j+1,1))
            model_rho(1) = dym*(dxm*xb%rho(i,j,1)   + dx*xb%rho(i+1,j,1)) + &
@@ -83,11 +84,11 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
            jo_grad_x%rho(i+1,j,1)   = jo_grad_x%rho(i+1,j,1)   + dym*dx*model_drho(1)
            jo_grad_x%rho(i,j+1,1)   = jo_grad_x%rho(i,j+1,1)   + dy*dxm*model_drho(1)
            jo_grad_x%rho(i+1,j+1,1) = jo_grad_x%rho(i+1,j+1,1) + dy*dx*model_drho(1)
-         ELSE 
+         else 
            model_z(1) = dym*(dxm*xb%hf(i,j,1)   + dx*xb%hf(i+1,j,1)) + &
                         dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
 
-           DO k = xp%kts, xp%kte
+           do k = xp%kts, xp%kte
              if ( model_z(k) >= obs_terr ) exit
 
              model_z(k+1) = dym*(dxm*xb%hf(i,j,k+1)   + dx*xb%hf(i+1,j,k+1)) + &
@@ -120,10 +121,10 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
              jo_grad_x%rho(i+1,j,k)   = jo_grad_x%rho(i+1,j,k)   + dym*dx*model_drho(k)
              jo_grad_x%rho(i,j+1,k)   = jo_grad_x%rho(i,j+1,k)   + dy*dxm*model_drho(k)
              jo_grad_x%rho(i+1,j+1,k) = jo_grad_x%rho(i+1,j+1,k) + dy*dx*model_drho(k)
-           END DO
-         END IF 
+           end do
+         end if 
       end do
-   ENDIF
+   end if
 
 end subroutine da_transform_xtoy_gpspw_adj
 

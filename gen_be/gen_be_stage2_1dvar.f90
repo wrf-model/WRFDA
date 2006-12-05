@@ -9,7 +9,7 @@ program gen_be_stage2_1dvar
 ! Creation (from gen_be_stage_2)   Dale Barker       01/07/2005.
 !---------------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 
@@ -23,7 +23,6 @@ program gen_be_stage2_1dvar
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*80        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
    character*80        :: filename                   ! Input filename.
@@ -79,7 +78,9 @@ program gen_be_stage2_1dvar
    real, allocatable   :: be_test(:,:)               ! BE matrix inverse.
 
    namelist / gen_be_stage2_1dvar_nl / start_date, end_date, interval, &
-                                       be_method, ne, testing_eofs, expt, dat_dir
+                                       ne, testing_eofs, expt, dat_dir
+
+   integer :: ounit,iunit,namelist_unit
 
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
@@ -88,10 +89,13 @@ program gen_be_stage2_1dvar
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage2_1dvar")
 
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
+
    start_date = '2004030312'
    end_date = '2004033112'
    interval = 24
-   be_method = 'NMC'
    ne = 1
    testing_eofs = .false.
    expt = 'gen_be_stage2_1dvar'
@@ -134,7 +138,7 @@ program gen_be_stage2_1dvar
 !        Read T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          nk1 = nk + 1
@@ -205,7 +209,7 @@ program gen_be_stage2_1dvar
 !        Read t2:
          variable = 't2'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
@@ -215,7 +219,7 @@ program gen_be_stage2_1dvar
 !        Read q:
          variable = 'q'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nk
          read(iunit)q(1:ni,1:nj,2:nk+1)
@@ -224,7 +228,7 @@ program gen_be_stage2_1dvar
 !        Read q2:
          variable = 'q2'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
@@ -234,7 +238,7 @@ program gen_be_stage2_1dvar
 !        Read ps:
          variable = 'ps'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
@@ -244,7 +248,7 @@ program gen_be_stage2_1dvar
 !        Read u10:
          variable = 'u10'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
@@ -254,7 +258,7 @@ program gen_be_stage2_1dvar
 !        Read v10:
          variable = 'v10'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (iunit, file = filename, form='unformatted')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
@@ -446,7 +450,7 @@ program gen_be_stage2_1dvar
    end do
 
 !  Write data for input in 1D-Var:
-   filename = 'gen_be_stage2_1dvar.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2_1dvar.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)ni, nj, nk1
    write(ounit)num_bins2d
@@ -480,7 +484,7 @@ program gen_be_stage2_1dvar
       end do
    end do
 
-   filename = 'gen_be_stage2_1dvar.inv.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2_1dvar.inv.dat'
    open (ounit, file = filename, form='unformatted')
    write(ounit)ni, nj, nk1
    write(ounit)num_bins2d
@@ -497,7 +501,7 @@ program gen_be_stage2_1dvar
    be_inv = 0.0
 
 !  Output BE covariance matrix:
-   filename = 'gen_be_stage2_1dvar.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2_1dvar.dat'
    open (iunit, file = filename, form='unformatted', status = 'old')
    read(iunit)ni, nj, nk1
    read(iunit)num_bins2d
@@ -513,7 +517,7 @@ program gen_be_stage2_1dvar
    end do
 
 !  Output inverse BE covariance matrix:
-   filename = 'gen_be_stage2_1dvar.inv.'//trim(be_method)//'.dat'
+   filename = 'gen_be_stage2_1dvar.inv.dat'
    open (iunit, file = filename, form='unformatted', status = 'old')
    read(iunit)ni, nj, nk1
    read(iunit)num_bins2d

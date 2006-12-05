@@ -172,7 +172,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                          diff_6th_opt, diff_6th_rate,                     &
                          dampcoef,zdamp,damp_opt,                         &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
-                         non_hydrostatic,                       &
+                         non_hydrostatic,                                 &
                          ids, ide, jds, jde, kds, kde,                    &
                          ims, ime, jms, jme, kms, kme,                    &
                          its, ite, jts, jte, kts, kte                    )
@@ -419,7 +419,6 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                   its, ite, jts, jte, kts, kte      )
 
 
-
   CALL horizontal_pressure_gradient( ru_tend,rv_tend,                &
                                      ph,alt,p,pb,al,php,cqu,cqv,     &
                                      muu,muv,mu,fnm,fnp,rdnw,        &
@@ -549,8 +548,6 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
    !  Theta tendency computations.
 
-
-        
     END IF diff_opt1
 
     IF ( diff_6th_opt .NE. 0 ) THEN
@@ -725,7 +722,7 @@ END SUBROUTINE rk_addtend_dry
 
 !-------------------------------------------------------------------------------
 
-SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
+SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                             rk_step, dt,                  &
                             ru, rv, ww, mut, alt,         &
                             scalar,                       &
@@ -827,6 +824,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
                               ims, ime, jms, jme, kms, kme,  &
                               its, ite, jts, jte, kts, kte  )
 
+
      IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN
 
         CALL set_tend( RQVFTEN, advect_tend, msft,     &
@@ -871,20 +869,20 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,    &
 
          END IF
 
-       ENDIF pbl_test
+      ENDIF pbl_test
 
-       ENDIF diff_opt1
+    ENDIF diff_opt1
 
-       IF ( diff_6th_opt .NE. 0 )                                        &
-         CALL sixth_order_diffusion( 'm', scalar(ims,kms,jms,im),        &
-                                          scalar_tends(ims,kms,jms,im),  &
-                                          mut, dt, config_flags,         &
-                                          diff_6th_opt, diff_6th_rate,   &
-                                          ids, ide, jds, jde, kds, kde,  &
-                                          ims, ime, jms, jme, kms, kme,  &
-                                          its, ite, jts, jte, kts, kte )
+    IF ( diff_6th_opt .NE. 0 )                                        &
+      CALL sixth_order_diffusion( 'm', scalar(ims,kms,jms,im),        &
+                                       scalar_tends(ims,kms,jms,im),  &
+                                       mut, dt, config_flags,         &
+                                       diff_6th_opt, diff_6th_rate,   &
+                                       ids, ide, jds, jde, kds, kde,  &
+                                       ims, ime, jms, jme, kms, kme,  &
+                                       its, ite, jts, jte, kts, kte )
 
-     ENDIF rk_step_1
+  ENDIF rk_step_1
 
  END DO scalar_loop
 
@@ -897,7 +895,7 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
                              advect_tend, msft,             &
                              mu_old, mu_new, mu_base,       &
                              rk_step, dt, spec_zone,        &
-                             config_flags, &
+                             config_flags,                  &
                              ids, ide, jds, jde, kds, kde,  &
                              ims, ime, jms, jme, kms, kme,  &
                              its, ite, jts, jte, kts, kte  )
@@ -943,6 +941,7 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
 !  of the scalar and the scalar tendency.  
 !
 !</DESCRIPTION>
+
 
 !
 !  set loop limits.
@@ -1076,7 +1075,125 @@ SUBROUTINE rk_update_scalar( scs, sce,                      &
 
 END SUBROUTINE rk_update_scalar
 
-!-----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
+
+SUBROUTINE rk_update_scalar_pd( scs, sce,                      &
+                                scalar, sc_tend,               &
+                                msft,                          &
+                                mu_old, mu_new, mu_base,       &
+                                rk_step, dt, spec_zone,        &
+                                config_flags,                  &
+                                ids, ide, jds, jde, kds, kde,  &
+                                ims, ime, jms, jme, kms, kme,  &
+                                its, ite, jts, jte, kts, kte  )
+
+   IMPLICIT NONE
+
+   !  Input data.
+
+   TYPE(grid_config_rec_type   ) ,   INTENT(IN   ) :: config_flags
+
+   INTEGER ,                INTENT(IN   ) :: scs, sce, rk_step, spec_zone
+   INTEGER ,                INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
+                                             ims, ime, jms, jme, kms, kme, &
+                                             its, ite, jts, jte, kts, kte
+
+   REAL,                    INTENT(IN   ) :: dt
+
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce),                &
+         INTENT(INOUT)                                  :: scalar,      &
+                                                           sc_tend
+
+   REAL, DIMENSION(ims:ime, jms:jme  ), INTENT(IN   ) ::  mu_old,  &
+                                                          mu_new,  &
+                                                          mu_base, &
+                                                          msft
+
+   INTEGER :: i,j,k,im
+   REAL    :: sc_middle, msfsq
+   REAL, DIMENSION(its:ite) :: muold, r_munew
+
+   REAL, DIMENSION(its:ite, kts:kte, jts:jte  ) :: tendency
+
+   INTEGER :: i_start,i_end,j_start,j_end,k_start,k_end
+   INTEGER :: i_start_spc,i_end_spc,j_start_spc,j_end_spc,k_start_spc,k_end_spc
+
+!<DESCRIPTION>
+!
+!  rk_scalar_update advances the scalar equation given the time t value
+!  of the scalar and the scalar tendency.  
+!
+!</DESCRIPTION>
+
+
+!
+!  set loop limits.
+
+      i_start = its
+      i_end   = ite
+      j_start = jts
+      j_end   = jte
+      k_start = kts
+      k_end   = kte-1
+      IF(j_end == jde) j_end = j_end - 1
+      IF(i_end == ide) i_end = i_end - 1
+
+      i_start_spc = i_start
+      i_end_spc   = i_end
+      j_start_spc = j_start
+      j_end_spc   = j_end
+      k_start_spc = k_start
+      k_end_spc   = k_end
+
+    IF( config_flags%nested .or. config_flags%specified ) THEN
+      IF( .NOT. config_flags%periodic_x)i_start = max( its,ids+spec_zone )
+      IF( .NOT. config_flags%periodic_x)i_end   = min( ite,ide-spec_zone-1 )
+      j_start = max( jts,jds+spec_zone )
+      j_end   = min( jte,jde-spec_zone-1 )
+      k_start = kts
+      k_end   = min( kte, kde-1 )
+    ENDIF
+
+      DO  im = scs, sce
+
+       DO  j = jts, min(jte,jde-1)
+       DO  k = kts, min(kte,kde-1)
+       DO  i = its, min(ite,ide-1)
+           tendency(i,k,j) = 0.
+       ENDDO
+       ENDDO
+       ENDDO
+   
+       DO  j = j_start_spc,j_end_spc
+       DO  k = k_start_spc,k_end_spc
+       DO  i = i_start_spc,i_end_spc
+           tendency(i,k,j) = tendency(i,k,j) + sc_tend(i,k,j,im)
+           sc_tend(i,k,j,im) = 0.
+       ENDDO
+       ENDDO
+       ENDDO
+
+      DO  j = jts, min(jte,jde-1)
+
+      DO  i = its, min(ite,ide-1)
+        muold(i) = mu_old(i,j) + mu_base(i,j)
+        r_munew(i) = 1./(mu_new(i,j) + mu_base(i,j))
+      ENDDO
+
+      DO  k = kts, min(kte,kde-1)
+      DO  i = its, min(ite,ide-1)
+
+        scalar(i,k,j,im) = (muold(i)*scalar(i,k,j,im)   &
+                             + dt*tendency(i,k,j))*r_munew(i)
+      ENDDO
+      ENDDO
+      ENDDO
+
+      ENDDO
+
+END SUBROUTINE rk_update_scalar_pd
+
+!------------------------------------------------------------
 
 SUBROUTINE init_zero_tendency(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &
                               t_tendf,  tke_tendf, mu_tendf,           &

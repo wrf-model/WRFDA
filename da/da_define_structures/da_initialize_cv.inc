@@ -13,13 +13,13 @@ subroutine da_initialize_cv( cv_size, cv )
    real                                 :: z, mean_cv, rms_cv, std_dev_cv
    real                                 :: sum_cv, sum_cv2
 
-   IF (trace_use) call da_trace_entry("da_initialize_cv")
+   if (trace_use) call da_trace_entry("da_initialize_cv")
 
    !---------------------------------------------------------------------------
    ! [1.0] Initialize cv:
    !---------------------------------------------------------------------------
 
-   if ( analysis_type == 'randomcv' ) then
+   if (anal_type_randomcv) then
    
       ! [2.1] Initialize random number generator and scalars:
 
@@ -54,7 +54,7 @@ subroutine da_initialize_cv( cv_size, cv )
       cv = 0.0
    end if
 
-   IF (trace_use) call da_trace_exit("da_initialize_cv")
+   if (trace_use) call da_trace_exit("da_initialize_cv")
 
 end subroutine da_initialize_cv
 

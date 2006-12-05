@@ -1,20 +1,20 @@
 subroutine da_check_xtoy_adjoint_ssmi( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(INOUT)  :: y             ! y = h (xa)
-   REAL          , INTENT(INOUT)  :: adjtest_lhs, pertile_lhs   
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs   
 
-   IF ( oi%num_ssmi_tb > 0 ) THEN
+   if ( oi%num_ssmi_tb > 0 ) then
 
       call da_check_xtoy_adjoint_ssmi_tb ( oi, y, adjtest_lhs, pertile_lhs )
 
-   ELSE IF ( oi%num_ssmi_retrieval > 0) THEN
+   else if ( oi%num_ssmi_retrieval > 0) then
 
       call da_check_xtoy_adjoint_ssmi_rv( oi, y, adjtest_lhs, pertile_lhs )
 
-   ENDIF
+   end if
 
 end subroutine da_check_xtoy_adjoint_ssmi
 

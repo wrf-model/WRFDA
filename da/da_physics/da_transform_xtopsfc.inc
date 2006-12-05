@@ -1,19 +1,19 @@
 subroutine da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
 
-   TYPE (x_type),     INTENT(IN) :: xa       ! gridded analysis increment.
-   TYPE (xb_type),    INTENT(IN) :: xb       ! first guess state.
-   type (xpose_type), INTENT(IN) :: xp       ! Domain decomposition vars.
+   type (x_type),     intent(in) :: xa       ! gridded analysis increment.
+   type (xb_type),    intent(in) :: xb       ! first guess state.
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
 
-   TYPE (synop_type),          INTENT(IN)  :: synop
-   TYPE (residual_synop_type), INTENT(OUT) :: y_synop
+   type (synop_type),          intent(in)  :: synop
+   type (residual_synop_type), intent(out) :: y_synop
 
-   INTEGER                :: i, j     ! Index dimension.
-   REAL                   :: dx, dxm  ! 
-   REAL                   :: dy, dym  !
+   integer                :: i, j     ! Index dimension.
+   real                   :: dx, dxm  ! 
+   real                   :: dy, dym  !
 
-   REAL    :: hsm, to, qo
-   REAL    :: tsm, qsm, psm    
-   REAL    :: psm_prime
+   real    :: hsm, to, qo
+   real    :: tsm, qsm, psm    
+   real    :: psm_prime
 
 !----------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ subroutine da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
    if (synop%p%qc < 0) then
        y_synop%p = 0.0
        return
-   endif
+   end if
 
 ! 3.0 The pressure at the observed height: 
 
@@ -126,7 +126,7 @@ subroutine da_transform_xtopsfc( xb, xa, xp, synop, y_synop )
 
      call da_sfc_pre_lin(y_synop%p, psm_prime, y_synop%t, y_synop%q, &
                          psm, tsm, qsm, hsm, synop%h)
-    endif
+    end if
 
 end subroutine da_transform_xtopsfc
 

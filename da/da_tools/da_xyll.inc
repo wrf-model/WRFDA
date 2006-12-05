@@ -1,32 +1,32 @@
 subroutine da_xyll(XX,YY,XLAT,XLON)
 
    ! PURPOSE      : CALCULATES THE LATITUDES AND LONGITUDES FROM THE
-   !                  (X,Y) LOCATION (DOT) IN THE MESOSCALE GRIDS.
+   !                  (X,Y) LOCATION (doT) in THE MESOSCALE GRIDS.
    ! ON ENTRY     :   
-   ! X            : THE COORDINATE IN X (J)-DIRECTION.
-   ! Y            : THE COORDINATE IN Y (I)-DIRECTION.
+   ! X            : THE COORDinATE in X (J)-DIRECTION.
+   ! Y            : THE COORDinATE in Y (I)-DIRECTION.
    !
-   ! ON EXIT      :                      
+   ! ON exit      :                      
    ! XLAT         : LATITUDES 
    ! XLON         : LONGITUDES 
 
-   IMPLICIT NONE
+   implicit none
 
-   REAL, INTENT(IN)  :: XX, YY
-   REAL, INTENT(OUT) :: XLAT,XLON
+   real, intent(in)  :: XX, YY
+   real, intent(out) :: XLAT,XLON
         
-   REAL              :: flp, flpp, r, cell, cel1, cel2
-   REAL              :: rcone_factor, psx, conv
-   REAL              :: cntri, cntrj, x, y, xcntr
+   real              :: flp, flpp, r, cell, cel1, cel2
+   real              :: rcone_factor, psx, conv
+   real              :: cntri, cntrj, x, y, xcntr
    
    conv = 180.0 / pi
 
    ! seperate treatment for global fields
-   if (fg_format == 3) then
+   if (fg_format == fg_format_kma) then
       xlat = yy * 180.0 /(coarse_jy-1)  -  90.0    
       xlon = xx * 360.0 /(coarse_ix-1)  - 180.0    
       return
-   endif
+   end if
 
    CNTRI = real(coarse_ix+1)/2.
    CNTRJ = real(coarse_jy+1)/2. 
@@ -40,47 +40,47 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
    x = xcntr + (x-cntri)*coarse_ds
    y = ycntr + (y-cntrj)*coarse_ds
 
-   ! NOW CALCULATE LAT AND LON OF THIS POINT
+   ! NOW CALCULATE LAT AND LON OF THIS POinT
 
-   IF (map_projection.NE.3) THEN
-      IF(Y.EQ.0.) THEN      
-         IF (X.GE.0.0) FLP =  90.0/CONV 
-         IF (X.LT.0.0) FLP = -90.0/CONV
-      ELSE
-         IF (PHIC.LT.0.0)THEN
+   if (map_projection.NE.3) then
+      if(Y.EQ.0.) then      
+         if (X.GE.0.0) FLP =  90.0/CONV 
+         if (X.LT.0.0) FLP = -90.0/CONV
+      else
+         if (PHIC.LT.0.0)then
             FLP = ATAN2(X,Y)   
-         ELSE
+         else
             FLP = ATAN2(X,-Y) 
-         ENDIF
-      ENDIF 
+         end if
+      end if 
       FLPP = (FLP/cone_factor)*CONV+XLONC  
-      IF (FLPP.LT.-180.) FLPP = FLPP + 360    
-      IF (FLPP.GT.180.)  FLPP = FLPP - 360.  
+      if (FLPP.LT.-180.) FLPP = FLPP + 360    
+      if (FLPP.GT.180.)  FLPP = FLPP - 360.  
       XLON = FLPP 
       ! NOW SOLVE FOR LATITUDE
-      R = SQRT(X*X+Y*Y)  
-      IF (PHIC.LT.0.0) R = -R  
-      IF (map_projection.EQ.1) THEN   
-         CELL = (R*cone_factor)/(earth_radius*SIN(PSI1))    
+      R = sqrt(X*X+Y*Y)  
+      if (PHIC.LT.0.0) R = -R  
+      if (map_projection.EQ.1) then   
+         CELL = (R*cone_factor)/(earth_radius*Sin(PSI1))    
          Rcone_factor  = 1.0/cone_factor   
          CEL1 = TAN(PSI1/2.)*(CELL)**Rcone_factor    
-      ENDIF 
-      IF (map_projection.EQ.2) THEN
+      end if 
+      if (map_projection.EQ.2) then
          CELL = R/earth_radius        
          CEL1 = CELL/(1.0+COS(PSI1))  
-      ENDIF 
+      end if 
       CEL2 = ATAN(CEL1)    
       PSX  = 2.*CEL2*CONV
       XLAT = POLE-PSX 
-   ENDIF   
+   end if   
    ! CALCULATIONS FOR MERCATOR LAT,LON    
-   IF (map_projection.EQ.3) THEN   
+   if (map_projection.EQ.3) then   
       XLON = XLONC + ((X-XCNTR)/C2)*CONV 
-      IF (XLON.LT.-180.) XLON = XLON + 360
-      IF (XLON.GT.180.)  XLON = XLON - 360.
+      if (XLON.LT.-180.) XLON = XLON + 360
+      if (XLON.GT.180.)  XLON = XLON - 360.
       CELL = EXP(Y/C2)  
       XLAT = 2.*(CONV*ATAN(CELL))-90.0 
-   ENDIF  
+   end if  
 
 end subroutine da_xyll
 

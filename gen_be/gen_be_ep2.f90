@@ -14,7 +14,7 @@ program gen_be_ep2
 #define iargc ipxfargc
 #endif
 
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 
@@ -46,16 +46,23 @@ program gen_be_ep2
    real, allocatable     :: temp(:,:,:)               ! Temperature.
    real, allocatable     :: q(:,:,:)                  ! Specific humidity.
    real, allocatable     :: psfc(:,:)                 ! Surface pressure.
-   real, allocatable     :: u_store(:,:,:)            ! u-wind.
-   real, allocatable     :: v_store(:,:,:)            ! v-wind.
-   real, allocatable     :: temp_store(:,:,:)         ! Temperature.
-   real, allocatable     :: q_store(:,:,:)            ! Specific humidity.
-   real, allocatable     :: psfc_store(:,:)           ! Surface pressure.
+   real, allocatable     :: u_mean(:,:,:)             ! u-wind.
+   real, allocatable     :: v_mean(:,:,:)             ! v-wind.
+   real, allocatable     :: temp_mean(:,:,:)          ! Temperature.
+   real, allocatable     :: q_mean(:,:,:)             ! Specific humidity.
+   real, allocatable     :: psfc_mean(:,:)            ! Surface pressure.
+   real, allocatable     :: u_mnsq(:,:,:)             ! u-wind.
+   real, allocatable     :: v_mnsq(:,:,:)             ! v-wind.
+   real, allocatable     :: temp_mnsq(:,:,:)          ! Temperature.
+   real, allocatable     :: q_mnsq(:,:,:)             ! Specific humidity.
+   real, allocatable     :: psfc_mnsq(:,:)            ! Surface pressure.
 
    real, allocatable     :: utmp(:,:)                 ! u-wind.
    real, allocatable     :: vtmp(:,:)                 ! v-wind.
    real, allocatable     :: ttmp(:,:)                 ! temperature.
    real, allocatable     :: dummy(:,:)                ! dummy.
+
+   integer :: gen_be_iunit, gen_be_ounit
 
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
@@ -63,6 +70,9 @@ program gen_be_ep2
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_ep2")
+
+   call da_get_unit(gen_be_iunit)
+   call da_get_unit(gen_be_ounit)
 
    remove_mean = .true.
 
@@ -104,16 +114,26 @@ program gen_be_ep2
    allocate( temp(1:dim1,1:dim2,1:dim3) )
    allocate( q(1:dim1,1:dim2,1:dim3) )
    allocate( psfc(1:dim1,1:dim2) )
-   allocate( u_store(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
-   allocate( v_store(1:dim1,1:dim2,1:dim3) )
-   allocate( temp_store(1:dim1,1:dim2,1:dim3) )
-   allocate( q_store(1:dim1,1:dim2,1:dim3) )
-   allocate( psfc_store(1:dim1,1:dim2) )
-   u_store = 0.0
-   v_store = 0.0
-   temp_store = 0.0
-   q_store = 0.0
-   psfc_store = 0.0
+   allocate( u_mean(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
+   allocate( v_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( temp_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( q_mean(1:dim1,1:dim2,1:dim3) )
+   allocate( psfc_mean(1:dim1,1:dim2) )
+   allocate( u_mnsq(1:dim1,1:dim2,1:dim3) ) ! Note - interpolated to chi pts for output.
+   allocate( v_mnsq(1:dim1,1:dim2,1:dim3) )
+   allocate( temp_mnsq(1:dim1,1:dim2,1:dim3) )
+   allocate( q_mnsq(1:dim1,1:dim2,1:dim3) )
+   allocate( psfc_mnsq(1:dim1,1:dim2) )
+   u_mean = 0.0
+   v_mean = 0.0
+   temp_mean = 0.0
+   q_mean = 0.0
+   psfc_mean = 0.0
+   u_mnsq = 0.0
+   v_mnsq = 0.0
+   temp_mnsq = 0.0
+   q_mnsq = 0.0
+   psfc_mnsq = 0.0
 
 !  Temporary arrays:
    allocate( utmp(1:dim1s,1:dim2) ) ! u on Arakawa C-grid.
@@ -172,15 +192,18 @@ program gen_be_ep2
       write(gen_be_ounit)psfc
       close(gen_be_ounit)
 
-!     Optionally calculate accumulating mean:
-      if ( remove_mean ) then
-         member_inv = 1.0 / real(member)
-         u_store = ( real( member-1 ) * u_store + u ) * member_inv
-         v_store = ( real( member-1 ) * v_store + v ) * member_inv
-         temp_store = ( real( member-1 ) * temp_store + temp ) * member_inv
-         q_store = ( real( member-1 ) * q_store + q ) * member_inv
-         psfc_store = ( real( member-1 ) * psfc_store + psfc ) * member_inv
-      end if
+!     Calculate accumulating mean and mean square:
+      member_inv = 1.0 / real(member)
+      u_mean = ( real( member-1 ) * u_mean + u ) * member_inv
+      v_mean = ( real( member-1 ) * v_mean + v ) * member_inv
+      temp_mean = ( real( member-1 ) * temp_mean + temp ) * member_inv
+      q_mean = ( real( member-1 ) * q_mean + q ) * member_inv
+      psfc_mean = ( real( member-1 ) * psfc_mean + psfc ) * member_inv
+      u_mnsq = ( real( member-1 ) * u_mnsq + u * u ) * member_inv
+      v_mnsq = ( real( member-1 ) * v_mnsq + v * v ) * member_inv
+      temp_mnsq = ( real( member-1 ) * temp_mnsq + temp * temp ) * member_inv
+      q_mnsq = ( real( member-1 ) * q_mnsq + q * q ) * member_inv
+      psfc_mnsq = ( real( member-1 ) * psfc_mnsq + psfc * psfc ) * member_inv
 
    end do
 
@@ -214,40 +237,40 @@ program gen_be_ep2
       close(gen_be_iunit)
 
       if ( remove_mean ) then
-         u = u - u_store
-         v = v - v_store
-         temp = temp - temp_store
-         q = q - q_store
-         psfc = psfc - psfc_store
+         u = u - u_mean
+         v = v - v_mean
+         temp = temp - temp_mean
+         q = q - q_mean
+         psfc = psfc - psfc_mean
       end if
 
 !     Write out perturbations for this member:
 
-      output_file = 'u/u.e'//trim(ce) ! Output u.
+      output_file = 'u/'//date(1:10)//'.u.e'//trim(ce) ! Output u.
       open (gen_be_ounit, file = output_file, form='unformatted')
       write(gen_be_ounit)dim1, dim2, dim3
       write(gen_be_ounit)u
       close(gen_be_ounit)
 
-      output_file = 'v/v.e'//trim(ce) ! Output v.
+      output_file = 'v/'//date(1:10)//'.v.e'//trim(ce) ! Output v.
       open (gen_be_ounit, file = output_file, form='unformatted')
       write(gen_be_ounit)dim1, dim2, dim3
       write(gen_be_ounit)v
       close(gen_be_ounit)
 
-      output_file = 't/t.e'//trim(ce) ! Output T.
+      output_file = 't/'//date(1:10)//'.t.e'//trim(ce) ! Output t.
       open (gen_be_ounit, file = output_file, form='unformatted')
       write(gen_be_ounit)dim1, dim2, dim3
       write(gen_be_ounit)temp
       close(gen_be_ounit)
 
-      output_file = 'q/q.e'//trim(ce) ! Output q.
+      output_file = 'q/'//date(1:10)//'.q.e'//trim(ce) ! Output q.
       open (gen_be_ounit, file = output_file, form='unformatted')
       write(gen_be_ounit)dim1, dim2, dim3
       write(gen_be_ounit)q
       close(gen_be_ounit)
 
-      output_file = 'ps/ps.e'//trim(ce) ! Output ps.
+      output_file = 'ps/'//date(1:10)//'.ps.e'//trim(ce) ! Output ps.
       open (gen_be_ounit, file = output_file, form='unformatted')
       write(gen_be_ounit)dim1, dim2, dim3
       write(gen_be_ounit).false., .false.
@@ -255,6 +278,76 @@ program gen_be_ep2
       close(gen_be_ounit)
 
    end do
+
+!  Write out mean/stdv fields (stdv stored in mnsq arrays):
+   u_mnsq = sqrt( u_mnsq - u_mean * u_mean )
+   v_mnsq = sqrt( v_mnsq - v_mean * v_mean )
+   temp_mnsq = sqrt( temp_mnsq - temp_mean * temp_mean )
+   q_mnsq = sqrt( q_mnsq - q_mean * q_mean )
+   psfc_mnsq = sqrt( psfc_mnsq - psfc_mean * psfc_mean )
+
+   output_file = 'u/'//date(1:10)//'.u.mean' ! Output u.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)u_mean
+   close(gen_be_ounit)
+
+   output_file = 'u/'//date(1:10)//'.u.stdv' ! Output u.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)u_mnsq
+   close(gen_be_ounit)
+
+   output_file = 'v/'//date(1:10)//'.v.mean' ! Output v.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)v_mean
+   close(gen_be_ounit)
+
+   output_file = 'v/'//date(1:10)//'.v.stdv' ! Output v.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)v_mnsq
+   close(gen_be_ounit)
+
+   output_file = 't/'//date(1:10)//'.t.mean' ! Output t.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)temp_mean
+   close(gen_be_ounit)
+
+   output_file = 't/'//date(1:10)//'.t.stdv' ! Output t.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)temp_mnsq
+   close(gen_be_ounit)
+
+   output_file = 'q/'//date(1:10)//'.q.mean' ! Output q.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)q_mean
+   close(gen_be_ounit)
+
+   output_file = 'q/'//date(1:10)//'.q.stdv' ! Output q.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)q_mnsq
+   close(gen_be_ounit)
+
+   output_file = 'ps/'//date(1:10)//'.ps.mean' ! Output ps.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)psfc_mean
+   close(gen_be_ounit)
+
+   output_file = 'ps/'//date(1:10)//'.ps.stdv' ! Output ps.
+   open (gen_be_ounit, file = output_file, form='unformatted')
+   write(gen_be_ounit)dim1, dim2, dim3
+   write(gen_be_ounit)psfc_mnsq
+   close(gen_be_ounit)
+
+   call da_free_unit(gen_be_iunit)
+   call da_free_unit(gen_be_ounit)
 
    if (trace_use) call da_trace_exit("gen_be_ep2")
    if (trace_use) call da_trace_report

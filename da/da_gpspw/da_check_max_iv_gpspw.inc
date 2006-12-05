@@ -12,26 +12,26 @@ subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
   !
   !-------------------------------------------------------------------------
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,           INTENT (IN)         :: it      ! Outer iteration
-  TYPE (gpspw_type), INTENT(INOUT)       :: gpspw
-  INTEGER, INTENT(INOUT) :: ittpw,ittpwf
-  LOGICAL                                :: failed 
+  integer,           intent (in)         :: it      ! Outer iteration
+  type (gpspw_type), intent(inout)       :: gpspw
+  integer, intent(inout) :: ittpw,ittpwf
+  logical                                :: failed 
 
-  IF ( check_max_iv_print )THEN
-    WRITE (check_max_iv_unit,'(A)')  &
+  if ( check_max_iv_print )then
+    write (check_max_iv_unit,'(A)')  &
       '----------------------------------------------------------------'
-    WRITE (UNIT = check_max_iv_unit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
-    WRITE (UNIT = check_max_iv_unit, FMT = '(/,9(A,F3.0,/))')  &
+    write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+    write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
      'Error max test ratio for gps_tpw = ',max_error_pw
-  endif
+  end if
 
   !-----------------------------------------------------------------------------!
   ! [2.0] Perform maximum innovation vector check:
   !-----------------------------------------------------------------------------!
 
-  failed = .FALSE.
+  failed = .false.
 
   ! TPW:
   call da_max_error_qc(it, gpspw % info, gpspw % tpw, max_error_pw, ittpw, &

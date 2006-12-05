@@ -1,10 +1,10 @@
 subroutine da_print_stats_satem( stats_unit, nthickness, Satem )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,                 INTENT(IN)    :: stats_unit
-   INTEGER,                 INTENT(INOUT) :: nthickness
-   TYPE (stats_satem_type), INTENT(IN)    :: Satem
+   integer,                 intent(in)    :: stats_unit
+   integer,                 intent(inout) :: nthickness
+   type (stats_satem_type), intent(in)    :: Satem
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var           thickness(m)  n    k'  

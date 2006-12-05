@@ -1,21 +1,21 @@
 subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x ) 
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type),    INTENT(IN) :: xb       ! first guess state.
-   type (xpose_type), INTENT(IN) :: xp       ! Domain decomposition vars.
+   type (xb_type),    intent(in) :: xb       ! first guess state.
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
 
-   TYPE (synop_type),          INTENT(IN)    :: synop
-   TYPE (residual_synop_type), INTENT(INOUT) :: j_synop_y   ! grad_y(jo)
-   TYPE (x_type),              INTENT(INOUT) :: jo_grad_x   ! grad_x(jo)
+   type (synop_type),          intent(in)    :: synop
+   type (residual_synop_type), intent(inout) :: j_synop_y   ! grad_y(jo)
+   type (x_type),              intent(inout) :: jo_grad_x   ! grad_x(jo)
    
-   INTEGER                :: i, j     ! Index dimension.
-   REAL                   :: dx, dxm  ! 
-   REAL                   :: dy, dym  !
+   integer                :: i, j     ! Index dimension.
+   real                   :: dx, dxm  ! 
+   real                   :: dy, dym  !
 
-   REAL    :: hsm, to, qo
-   REAL    :: tsm, qsm, psm
-   REAL    :: psm_prime
+   real    :: hsm, to, qo
+   real    :: tsm, qsm, psm
+   real    :: psm_prime
 
 !--------------------------------------------------------------------
 ! 1.0 Get cross pt. horizontal interpolation weights:
@@ -78,7 +78,7 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x )
      call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
                           psm, tsm, qsm, hsm, synop%h, to, qo)
 
-! 4.2 Only observed to available:
+! 4.2 only observed to available:
 
    else if (synop%t%qc >= 0 .and. synop%q%qc < 0) then
      to = tsm + synop%t%inv
@@ -90,9 +90,9 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x )
    else
      call da_sfc_pre_adj (j_synop_y%p, psm_prime, j_synop_y%t, j_synop_y%q, &
                           psm, tsm, qsm, hsm, synop%h)
-   endif
+   end if
 
-   endif
+   end if
 !   2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
 #ifndef DEREF_KLUDGE
    call da_interp_lin_2d_adj(jo_grad_x%t2, xp%ims, xp%ime, xp%jms, xp%jme, &

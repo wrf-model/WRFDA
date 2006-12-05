@@ -4,18 +4,18 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
                                    itb37v, itb37vf, itb37h, itb37hf, &
                                    itb85v, itb85vf, itb85h, itb85hf  )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,             INTENT(IN)        :: it
-   TYPE (ssmi_tb_type), INTENT(INOUT)     :: ssmi_tb
+   integer,             intent(in)        :: it
+   type (ssmi_tb_type), intent(inout)     :: ssmi_tb
 
-   INTEGER,    INTENT (INOUT)             :: itb19h, itb19v, itb22v
-   INTEGER,    INTENT (INOUT)             :: itb37h, itb37v, itb85h, itb85v
-   INTEGER,    INTENT (INOUT)             :: itb19hf, itb19vf, itb22vf 
-   INTEGER,    INTENT (INOUT)             :: itb37hf, itb37vf, itb85hf, itb85vf
+   integer,    intent (inout)             :: itb19h, itb19v, itb22v
+   integer,    intent (inout)             :: itb37h, itb37v, itb85h, itb85v
+   integer,    intent (inout)             :: itb19hf, itb19vf, itb22vf 
+   integer,    intent (inout)             :: itb37hf, itb37vf, itb85hf, itb85vf
 
-   INTEGER                                :: iunit ! Output unit.
-   LOGICAL                                :: failed, print
+   integer                                :: iunit ! Output unit.
+   logical                                :: failed, print
 
 !-----------------------------------------------------------------------------!
 !  [1.0] Open diagnostic file:
@@ -24,11 +24,11 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   IF ( print )THEN
-      WRITE (iunit,'(A)')  &
+   if ( print )then
+      write (iunit,'(A)')  &
       '----------------------------------------------------------------'
-      WRITE (UNIT = iunit, FMT = '(A,/)') 'MAX ERROR TEST QC:'
-      WRITE (UNIT = iunit, FMT = '(/,9(A,F3.0,/))')  &
+      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
      'Error max test ratio for SSMI_tb_TB19h = ',max_error_tb, &
      'Error max test ratio for SSMI_tb_TB19v = ',max_error_tb, &
      'Error max test ratio for SSMI_tb_TB22v = ',max_error_tb, &
@@ -36,7 +36,7 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
      'Error max test ratio for SSMI_tb_TB37v = ',max_error_tb, &
      'Error max test ratio for SSMI_tb_TB85h = ',max_error_tb, &
      'Error max test ratio for SSMI_tb_TB85v = ',max_error_tb
-   ENDIF
+   end if
 
 !  itb19h  = 0; itb19v  = 0; itb22v  = 0; 
 !  itb37h  = 0; itb37v  = 0; itb85h  = 0; itb85v  = 0
@@ -48,7 +48,7 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 !-----------------------------------------------------------------------------!
 
 !  failed=.false. is defined inside the da_max_error_qc 
-!  failed = .FALSE.
+!  failed = .false.
 
 !  Tb19h
 
@@ -98,8 +98,8 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 !  [3.0] Output test failed results:
 !-----------------------------------------------------------------------------!
 
-!  IF ( print .and. failed) THEN
-!     WRITE (UNIT = iunit, FMT = '(/,10(2(A,I6),/))') &
+!  if ( print .and. failed) then
+!     write (unit = iunit, fmt = '(/,10(2(A,I6),/))') &
 !     'Number of failed ssmi tb19h observations:  ',itb19hf,' on ',itb19h, &
 !     'Number of failed ssmi tb19v observations:  ',itb19vf,' on ',itb19v, &
 !     'Number of failed ssmi tb22v observations:  ',itb22vf,' on ',itb22v, &
@@ -107,6 +107,6 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
 !     'Number of failed ssmi tb37v observations:  ',itb37vf,' on ',itb37v, &
 !     'Number of failed ssmi tb85h observations:  ',itb85hf,' on ',itb85h, &
 !     'Number of failed ssmi tb85v observations:  ',itb85vf,' on ',itb85v
-!  ENDIF
+!  end if
 
 end subroutine da_check_max_iv_ssmi_tb

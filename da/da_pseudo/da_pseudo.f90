@@ -1,6 +1,6 @@
-MODULE da_pseudo
+module da_pseudo
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -9,24 +9,24 @@ MODULE da_pseudo
 
 ! The "stats_pseudo_type" is ONLY used locally in da_pseudo:
 
-   TYPE residual_pseudo1_type
-      REAL          :: u                        ! u-wind.
-      REAL          :: v                        ! v-wind.
-      REAL          :: t                        ! temperature
-      REAL          :: p                        ! pressure
-      REAL          :: q                        ! specific humidity
-   END TYPE residual_pseudo1_type
+   type residual_pseudo1_type
+      real          :: u                        ! u-wind.
+      real          :: v                        ! v-wind.
+      real          :: t                        ! temperature
+      real          :: p                        ! pressure
+      real          :: q                        ! specific humidity
+   end type residual_pseudo1_type
 
-   TYPE maxmin_pseudo_stats_type
-      TYPE (maxmin_type)         :: u, v, t, p, q
-   END TYPE maxmin_pseudo_stats_type
+   type maxmin_pseudo_stats_type
+      type (maxmin_type)         :: u, v, t, p, q
+   end type maxmin_pseudo_stats_type
 
-   TYPE stats_pseudo_type
-      TYPE (maxmin_pseudo_stats_type)  :: maximum, minimum
-      TYPE (residual_pseudo1_type)     :: average, rms_err
-   END TYPE stats_pseudo_type
+   type stats_pseudo_type
+      type (maxmin_pseudo_stats_type)  :: maximum, minimum
+      type (residual_pseudo1_type)     :: average, rms_err
+   end type stats_pseudo_type
 
-CONTAINS
+contains
 
 #include "da_cal_jo_and_grady_pseudo.inc"
 #include "da_calculate_residual_pseudo.inc"
@@ -38,5 +38,5 @@ CONTAINS
 #include "da_transform_xtoy_pseudo_adj.inc"
 #include "da_calculate_grady_pseudo.inc"
 
-END MODULE da_pseudo
+end module da_pseudo
 

@@ -1,14 +1,14 @@
 subroutine da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
                                  average, rms_err )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,           INTENT(IN)    :: stats_unit
-   INTEGER,           INTENT(INOUT) :: nt
-   TYPE (maxmin_type), INTENT(IN)   :: minimum
-   TYPE (maxmin_type), INTENT(IN)   :: maximum
-   real, INTENT(IN)                 :: average
-   real, INTENT(IN)                 :: rms_err
+   integer,           intent(in)    :: stats_unit
+   integer,           intent(inout) :: nt
+   type (maxmin_type), intent(in)   :: minimum
+   type (maxmin_type), intent(in)   :: maximum
+   real, intent(in)                 :: average
+   real, intent(in)                 :: rms_err
    
    write(unit=stats_unit, fmt='(a/)') '   var              T(K)     n    k'
 
@@ -24,5 +24,5 @@ subroutine da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
         ' Average     : ', average/real(nt),    &
         '    RMSE     : ', sqrt(rms_err/real(nt))
 
-END subroutine da_print_stats_ssmt1
+end subroutine da_print_stats_ssmt1
 

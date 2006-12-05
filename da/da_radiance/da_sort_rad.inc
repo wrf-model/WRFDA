@@ -34,7 +34,7 @@ subroutine da_sort_rad (iv)
      allocate( rad(iv%instid(inst)%num_rad), stat=error )
      if (error /= 0 ) then
        call da_error(__FILE__,__LINE__, &
-         (/"Canot allocate memory to rad"/))
+         (/"Cannot allocate memory to rad"/))
      end if
 
      j = 0
@@ -53,7 +53,7 @@ subroutine da_sort_rad (iv)
           allocate ( rad(j)%tb(iv%instid(inst)%nchan), stat=error )
           if (error /= 0 ) then
              call da_error(__FILE__,__LINE__, &
-               (/"Canot allocate memory to rad(j)%tb"/))
+               (/"Cannot allocate memory to rad(j)%tb"/))
           end if
           rad(j)%tb(1:iv%instid(inst)%nchan)%inv=iv%instid(inst)%rad(n)%tb(1:iv%instid(inst)%nchan)%inv 
   end do
@@ -80,3 +80,5 @@ subroutine da_sort_rad (iv)
   end do
 
 end subroutine da_sort_rad
+
+

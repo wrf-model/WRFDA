@@ -2,11 +2,11 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(IN)   :: iv          ! Innovation vector (O-B).
-   type (y_type), intent(IN)    :: re          ! Residual vector (O-A).
-   real, intent(OUT)            :: jot         ! Obs cost function.
-   type (jo_type), intent(OUT)  :: jo          ! Obs cost function.
-   type (y_type), intent(OUT)   :: jo_grad_y   ! Grad_y(Jo)
+   type (ob_type), intent(in)   :: iv          ! Innovation vector (O-B).
+   type (y_type), intent(in)    :: re          ! Residual vector (O-A).
+   real, intent(out)            :: jot         ! Obs cost function.
+   type (jo_type), intent(out)  :: jo          ! Obs cost function.
+   type (y_type), intent(out)   :: jo_grad_y   ! Grad_y(Jo)
    real                         :: jo_sound, jo_synop, jo_geoamv, jo_polaramv, &
                                    jo_airep, jo_pilot, jo_satem, &
                                    jo_metar, jo_ships, jo_gpspw, &
@@ -29,27 +29,27 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
               jo % sound_t + jo % sound_q
 
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_sound =', jo_sound, &
          'jo%sound_u =', jo%sound_u, &
          'jo%sound_v =', jo%sound_v, &
          'jo%sound_t =', jo%sound_t, &
          'jo%sound_q =', jo%sound_q
-   endif
+   end if
 
    call da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
    jo_sound = jo_sound         + jo % sonde_sfc_u + jo % sonde_sfc_v + &
               jo % sonde_sfc_t + jo % sonde_sfc_q + jo % sonde_sfc_p
 
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_sound =', jo_sound, &
          'jo%sonde_sfc_u =', jo%sonde_sfc_u, &
          'jo%sonde_sfc_v =', jo%sonde_sfc_v, &
          'jo%sonde_sfc_t =', jo%sonde_sfc_t, &
          'jo%sonde_sfc_p =', jo%sonde_sfc_p, &
          'jo%sonde_sfc_q =', jo%sonde_sfc_q
-   endif
+   end if
 
    ! Surface
 
@@ -58,14 +58,14 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
               jo % synop_p + jo % synop_q
 
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_synop =', jo_synop, &
          'jo%synop_u =', jo%synop_u, &
          'jo%synop_v =', jo%synop_v, &
          'jo%synop_t =', jo%synop_t, &
          'jo%synop_p =', jo%synop_p, &
          'jo%synop_q =', jo%synop_q
-   endif
+   end if
 
 
    ! Geostationary Satellite AMVs:
@@ -73,7 +73,7 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
    call da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
    jo_geoamv = jo % geoamv_u + jo % geoamv_v
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_geoamv =', jo_geoamv, &
          'jo%geoamv_u =', jo%geoamv_u, &
          'jo%geoamv_v =', jo%geoamv_v
@@ -84,7 +84,7 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
    call da_get_jo_and_grady_polaramv( iv, re, jo, jo_grad_y)
    jo_polaramv = jo % polaramv_u + jo % polaramv_v
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_polaramv =', jo_polaramv, &
          'jo%polaramv_u =', jo%polaramv_u, &
          'jo%polaramv_v =', jo%polaramv_v
@@ -177,6 +177,7 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
    ! Radiance:
 
    call da_calculate_jo_and_grady_rad ( iv, re, jo, jo_grad_y)
+
    jo_radiance = 0. 
    if (use_radiance) then
       do i=1,iv%num_inst
@@ -186,10 +187,10 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
       end do
    end if
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_radiance =', jo_radiance
       do i = 1, iv%num_inst
-         write(UNIT=stdout, fmt='(a, e24.12)') &
+         write(unit=stdout, fmt='(a, e24.12)') &
             trim('jo_'//iv%instid(i)%rttovid_string), sum(jo % rad(i)%jo_ichan(:))
       end do
    end if
@@ -200,11 +201,11 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
    jo_airsr = jo % airsr_t + jo % airsr_q
 
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_airsr =', jo_airsr, &
          'jo%airsr_t =', jo%airsr_t, &
          'jo%airsr_q =', jo%airsr_q
-   endif
+   end if
 
    !-------------------------------------------------------------------------
    ! [2.0] Jo = 1/2 * (yo-y)**2/ob_err_variance:
@@ -219,10 +220,10 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
    jot = jo % total
 
    if (print_detail_grad) then
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo % total = ', jot
 
-      write(UNIT=stdout, fmt='(a, e24.12)') &
+      write(unit=stdout, fmt='(a, e24.12)') &
          'jo_sound =', jo_sound, &
          'jo_geoamv =', jo_geoamv, &
          'jo_polaramv =', jo_polaramv, &
@@ -246,7 +247,7 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
          'jo_radiance =', jo_radiance, &
          'jo_airsr =', jo_airsr          
 
-   endif
+   end if
 
    if (trace_use) call da_trace_exit("da_calculate_jo_and_grady")
 

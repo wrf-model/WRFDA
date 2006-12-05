@@ -1,14 +1,14 @@
 subroutine da_ao_stats_gpspw( stats_unit, oi, re )
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: oi            ! OI
-   TYPE ( y_type), INTENT (in)      :: re            ! A - O
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: oi            ! OI
+   type ( y_type), intent (in)      :: re            ! A - O
 
-   TYPE (stats_gpspw_type)                :: Gpspw
-   INTEGER                          :: ntpw
-   INTEGER                          :: n
+   type (stats_gpspw_type)                :: Gpspw
+   integer                          :: ntpw
+   integer                          :: n
    real                             :: o_minus_b, o_minus_a, sigma_o, sigma_b
    real                             :: o_minus_b_0, o_minus_a_0, sigma_o_0, sigma_b_0 
 
@@ -21,8 +21,8 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
    Gpspw%average = residual_gpspw1_type(0.0)
    Gpspw%rms_err = Gpspw%average
 
-   IF ( oi%num_Gpspw > 0 ) THEN
-      DO n=1, oi%num_Gpspw
+   if ( oi%num_Gpspw > 0 ) then
+      do n=1, oi%num_Gpspw
          if (oi%gpspw(n)%loc%proc_domain) then
             call  da_stats_calculate( n, 0, oi%gpspw(n)%tpw%qc, &
                                   re%gpspw(n)%tpw, ntpw,   &
@@ -38,7 +38,7 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                ! 
                ! O-A=(O-B)*sigma_o/(sigma_o+sigma_b)
 
-               sigma_b = SQRT( (o_minus_b - o_minus_a) / o_minus_a ) * sigma_o
+               sigma_b = sqrt( (o_minus_b - o_minus_a) / o_minus_a ) * sigma_o
                o_minus_b_0 = wrf_dm_sum_real( o_minus_b )
                o_minus_a_0 = wrf_dm_sum_real( o_minus_a )
                sigma_o_0 = wrf_dm_sum_real( sigma_o )
@@ -51,7 +51,7 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                   'TEST_COVERAGE_da_ao_stats_gpspw:  sigma_o_0 = ', sigma_o_0
                write(unit=stdout,fmt='(A,F10.2)') &
                   'TEST_COVERAGE_da_ao_stats_gpspw:  sigma_b_0 = ', sigma_b_0
-               IF ( rootproc ) THEN  
+               if ( rootproc ) then  
                   write(stats_unit,'(/A,A3,A,f12.3)')  &  
                     ' Pseudo ', pseudo_var, ' O-B: ', o_minus_b_0  
                   write(stats_unit,'( A,A3,A,f12.3)')  &  
@@ -60,10 +60,10 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                     ' Pseudo ', pseudo_var, ' sigma_o: ', sigma_o_0  
                   write(stats_unit,'(A,A3,A,f12.3)')  &  
                     ' Pseudo ', pseudo_var, ' sigma_b: ', sigma_b_0 
-               ENDIF  
-            endif
-         endif    ! end if( oi%gpspw(n)%loc%proc_domain )
-      END DO
+               end if  
+            end if
+         end if    ! end if( oi%gpspw(n)%loc%proc_domain )
+      end do
    end if
 
    ! Do inter-processor communication to gather statistics.
@@ -75,12 +75,12 @@ subroutine da_ao_stats_gpspw( stats_unit, oi, re )
                            Gpspw%minimum%tpw%n, Gpspw%maximum%tpw%n, &
                            Gpspw%minimum%tpw%l, Gpspw%maximum%tpw%l )
 
-   IF ( rootproc ) THEN
-      IF ( ntpw /= 0) THEN
+   if ( rootproc ) then
+      if ( ntpw /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Gpspw'
          call da_print_stats_gpspw(stats_unit, ntpw, Gpspw)
-       END IF
-   END IF
+       end if
+   end if
 
 end subroutine da_ao_stats_gpspw
 

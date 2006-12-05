@@ -7,9 +7,9 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    !          (following xatowrf, but only keep the increments)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   type(domain) ,   TARGET                   :: grid
+   type(domain) ,   target                   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    character*4 filnam
@@ -24,7 +24,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    real    :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: g_press
 
-   IF (trace_use) call da_trace_entry("da_transfer_wrftltoxa_adj")
+   if (trace_use) call da_trace_entry("da_transfer_wrftltoxa_adj")
 
    is=grid%xp%its
    ie=grid%xp%ite
@@ -41,9 +41,9 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             grid%em_g_w_2(i,j,k)=grid%xa%w(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
@@ -53,10 +53,10 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
             do i=is,ie
                g_moist(i,j,k,p_qcw) =  grid%xa%qcw(i,j,k)
                g_moist(i,j,k,p_qrn) =  grid%xa%qrn(i,j,k)
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
    if ( size(moist,dim=4) >= 6 ) then
       do k=ks,ke
@@ -64,20 +64,20 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
             do i=is,ie
                g_moist(i,j,k,p_qci) =  grid%xa%qci(i,j,k)
                g_moist(i,j,k,p_qsn) =  grid%xa%qsn(i,j,k)
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
    if ( size(moist,dim=4) >= 7 ) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
                g_moist(i,j,k,p_qgr) =  grid%xa%qgr(i,j,k)
-            enddo
-         enddo
-      enddo
-   endif
+            end do
+         end do
+      end do
+   end if
 
 #endif
 
@@ -102,9 +102,9 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
          do i=is,ie
             grid%em_g_u_2(i,j,k)=0.5*(grid%xa%u(i-1,j  ,k)+grid%xa%u(i,j,k))
            grid%em_g_v_2(i,j,k)=0.5*(grid%xa%v(i  ,j-1,k)+grid%xa%v(i,j,k))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! The eastern boundary
    if (ie == grid%xp%ide) grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%xa%u(ie,js:je,ks:ke)/2.
@@ -118,14 +118,14 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is+1,ie
             grid%em_g_u_2(i,j,k)=0.5*(grid%xa%u(i-1,j,k)+grid%xa%u(i,j,k))
-         enddo
-      enddo
+         end do
+      end do
       do j=js+1,je
          do i=is,ie
             grid%em_g_v_2(i,j,k)=0.5*(grid%xa%v(i,j-1,k)+grid%xa%v(i,j,k))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! The western boundary
    grid%em_g_u_2(is,js:je,ks:ke)=grid%xa%u(is,js:je,ks:ke)/2.
@@ -142,7 +142,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 #endif
 
    !---------------------------------------------------------------------------
-   ! [4.0] CONVERT THETA INCREMENTS TO T INCREMENTS
+   ! [4.0] CONVERT THETA inCREMENTS TO T inCREMENTS
    !---------------------------------------------------------------------------
 
    ! In the inverse, g_ph information is lost. This should be investigated later!!!
@@ -153,18 +153,18 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             grid%em_g_ph_2(i,j,k)=0.
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
             grid%xa%p(i,j,k)=grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
             grid%em_g_t_2(i,j,k)=grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(300.0+grid%em_t_2(i,j,k))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [3.0] COMPUTE pressure increments 
@@ -179,9 +179,9 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
             g_moist(i,j,k,P_QV)=-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
             grid%em_g_mu_2(i,j)=-g_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*grid%em_dn(k)
             g_press(i,j,k+1)=g_press(i,j,k+1)+g_press(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [2.0] COMPUTE psfc increments from mu-increments
@@ -192,14 +192,14 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
          s1md=0.0
          do k=ks,ke
             s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
-         enddo
+         end do
          grid%em_g_mu_2(i,j)=grid%em_g_mu_2(i,j)-grid%xa%psfc(i,j)*s1md
          sdmd=-grid%xb%psac(i,j)*grid%xa%psfc(i,j)
          do k=ks,ke
             g_moist(i,j,k,P_QV)=g_moist(i,j,k,P_QV)+sdmd*grid%em_dnw(k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [1.0] Get the specific humidity increments from mixing ratio increments
@@ -210,9 +210,9 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
          do i=is,ie
             g_moist(i,j,k,P_QV)=g_moist(i,j,k,P_QV)+grid%xa%q(i,j,k)* &
                (1.0-grid%xb%q(i,j,k))**2
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL
@@ -223,7 +223,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
-IF (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
+if (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
 
 
 end subroutine da_transfer_wrftltoxa_adj

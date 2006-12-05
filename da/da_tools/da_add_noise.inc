@@ -8,6 +8,8 @@ subroutine da_add_noise( fld, yo, z )
 
    real                             :: noise
 
+   if (trace_use) call da_trace_entry("da_add_noise")
+
    z = missing_r
 
    if ( fld % qc >= obs_qc_pointer ) then
@@ -22,6 +24,8 @@ subroutine da_add_noise( fld, yo, z )
       fld % inv = fld % inv + noise
 
    end if
+
+   if (trace_use) call da_trace_exit("da_add_noise")
 
 end subroutine da_add_noise
 

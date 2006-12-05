@@ -1,6 +1,12 @@
 #!/bin/ksh
-DIR=`dirname $0`
 
+######################################################################################
+# GENERAL USERS SHOULD NOT EDIT THIS SCRIPT, INSTEAD COPY ~/bray/data/con200/test.ksh,
+# WHICH IS AN EXAMPLE CONUS200 CASE, AND WILL SET UP THE ENVIRONMENT BEFORE SUBMITTING
+# A JOB TO THE CORRECT QUEUING SYSTEM
+######################################################################################
+
+DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$PWD/hosts}
 export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
@@ -12,12 +18,12 @@ export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 export DATE=${DATE:-2003010112}              # Analysis date.
 export WINDOW_START=${WINDOW_START:-0}
 export WINDOW_END=${WINDOW_END:-6}
-export NL_NUM_FGAT=${NL_NUM_FGAT:-1}
+export NL_NUM_FGAT=${NL_NUM_FGAT_TIME:-1}
 
 #Default directories/files:
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl}
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
@@ -74,10 +80,11 @@ date
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 if $NL_VAR4D; then
-   echo 'WRF_NL_DIR            <A HREF="file:'$WRF_NL_DIR'">'$WRF_NL_DIR'</a>' $WRF_NL_VN
+   echo 'WRF_DIR               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
+echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
@@ -157,16 +164,17 @@ if test ! -f $DA_ANALYSIS; then
       ln -s $DA_RTTOV_COEFFS/* .
    fi
 
-   cp $WRFVAR_DIR/run/gribmap.txt .
-   cp $WRFVAR_DIR/run/LANDUSE.TBL .
-   cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   ln -s $WRFVAR_DIR/build/wrfvar.exe .
+   ln -sf $WRFVAR_DIR/run/gribmap.txt .
+   ln -sf $WRFVAR_DIR/run/*.TBL .
+   ln -sf $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -sf $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
+   ln -sf $WRFVAR_DIR/build/wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
    ln -sf $DA_FIRST_GUESS	 fg01
    ln -sf $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
-   ln -sf $DA_BACK_ERRORS   fort.34
+   ln -sf $DA_BACK_ERRORS        be.dat
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then
@@ -174,17 +182,7 @@ if test ! -f $DA_ANALYSIS; then
       fi
    done
 
-   for FILE in $WRFVAR_DIR/run/*.bias; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
-
-   for FILE in $WRFVAR_DIR/run/*.info; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
+   ln -s $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
       # More than one observation file of each type
@@ -206,9 +204,9 @@ if test ! -f $DA_ANALYSIS; then
       done
       ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
    else
-      ln -fs $OB_DIR/$DATE/ob.ascii  ob01.ascii
-      ln -sf $OB_DIR/$DATE/ssmi.dat  ssmi01.dat
-      ln -sf $OB_DIR/$DATE/radar.dat radar01.dat
+      ln -fs $OB_DIR/${DATE}/ob_6h.ascii  ob01.ascii
+      ln -sf $OB_DIR/${DATE}/ssmi_6h.dat  ssmi01.dat
+      ln -sf $OB_DIR/${DATE}/radar_6h.dat radar01.dat
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
@@ -228,23 +226,85 @@ if test ! -f $DA_ANALYSIS; then
       export NL_DYN_OPT=2
       export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
       export NL_INPUTOUT_INTERVAL=60
-      export NL_AUXHIST2_INTERVAL=10
+      export NL_AUXHIST2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_FRAMES_PER_AUXHIST2=1
-      export NL_INTERVAL_SECONDS=10800
-      export NL_HISTORY_INTERVAL=180
+      export NL_HISTORY_INTERVAL=9999
       export NL_RESTART=false
       export NL_FRAMES_PER_OUTFILE=1000
       export NL_INPUT_FROM_FILE=true
-      export NL_TIME_STEP=600
       export NL_WRITE_INPUT=true
-      export NL_DEBUG_LEVEL=999
-      . $WRF_NL_DIR/inc/namelist_script.inc
+      export NL_DEBUG_LEVEL=0
+
+      export NL_TIME_STEP_FRACT_NUM=0
+      export NL_TIME_STEP_FRACT_DEN=1
+      export NL_FEEDBACK=1
+      export NL_SMOOTH_OPTION=0
+      export NL_MP_PHYSICS=3
+      export NL_RA_LW_PHYSICS=1
+      export NL_RA_SW_PHYSICS=1
+      export NL_RADT=15
+      export NL_SF_SFCLAY_PHYSICS=1
+      export NL_SF_SURFACE_PHYSICS=2
+      export NL_BL_PBL_PHYSICS=1
+      export NL_BLDT=0
+      export NL_CU_PHYSICS=1
+      export NL_CUDT=5
+      export NL_ISFFLX=1
+      export NL_IFSNOW=0
+      export NL_ICLOUD=1
+      export NL_SURFACE_INPUT_SOURCE=1
+      export NL_NUM_SOIL_LAYERS=4
+      export NL_MP_ZERO_OUT=2
+      export NL_MP_ZERO_OUT_THRESH=1.e-8
+      export NL_MAXIENS=1
+      export NL_MAXENS=3
+      export NL_MAXENS2=3
+      export NL_MAXENS3=16
+      export NL_ENSDIM=144
+      export NL_RK_ORD=3
+      export NL_W_DAMPING=1
+      export NL_DIFF_OPT=1
+      export NL_KM_OPT=4
+      export NL_DAMP_OPT=0
+      export NL_BASE_TEMP=290.
+      export NL_ZDAMP=5000.
+      export NL_DAMPCOEF=0.0
+      export NL_KHDIF=0
+      export NL_KVDIF=0
+      export NL_SMDIV=0.1
+      export NL_EMDIV=0.01
+      export NL_EPSSM=0.1
+      export NL_NON_HYDROSTATIC=true
+      export NL_TIME_STEP_SOUND=4
+      export NL_H_MOM_ADV_ORDER=5
+      export NL_V_MOM_ADV_ORDER=3
+      export NL_H_SCA_ADV_ORDER=5
+      export NL_V_SCA_ADV_ORDER=3
+      export NL_SPECIFIED=true
+      export NL_SPEC_BDY_WIDTH=5
+      export NL_SPEC_ZONE=1
+      export NL_RELAX_ZONE=4
+      export NL_PERIODIC_X=false
+      export NL_SYMMETRIC_XS=false
+      export NL_SYMMETRIC_XE=false
+      export NL_OPEN_XS=false
+      export NL_OPEN_XE=false
+      export NL_PERIODIC_Y=false
+      export NL_SYMMETRIC_YS=false
+      export NL_SYMMETRIC_YE=false
+      export NL_OPEN_YS=false
+      export NL_OPEN_YE=false
+      export NL_NESTED=false
+      export NL_REAL_DATA_INIT_TYPE=1
+      . $WRF_DIR/inc/namelist_script.inc
       export NL_DEBUG_LEVEL=0
       unset NL_AUXHIST2_INNAME
       unset NL_AUXHIST2_INTERVAL
       unset NL_FRAMES_PER_AUXHIST2
+      unset NL_MP_ZERO_OUT_THRESH
       mv namelist.input nl
-      ln -fs $WORK_DIR/LANDUSE.TBL nl
+      ln -fs $WORK_DIR/*.TBL nl
+      ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
       ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
 #      if test -e $WORK_DIR/wrfvar_output; then
@@ -252,7 +312,7 @@ if test ! -f $DA_ANALYSIS; then
 #      else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
 #      fi
-      ln -s $WRF_NL_DIR/main/wrf.exe nl
+      ln -s $WRF_DIR/main/wrf.exe nl
 
       # Outputs
       for I in 02 03 04 05 06 07; do
@@ -265,13 +325,29 @@ if test ! -f $DA_ANALYSIS; then
 
       export NL_DYN_OPT=202
       export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
-      export NL_AUXHIST3_OUTNAME='auxhist3_d<domain>_<date>'
-      export NL_AUXHIST3_INTERVAL=60
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-      export NL_AUXINPUT2_INTERVAL=10
+      export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
+      export NL_MP_PHYSICS=0
+      export NL_RA_LW_PHYSICS=0
+      export NL_RA_SW_PHYSICS=0
+      export NL_RADT=00
+      export NL_SF_SFCLAY_PHYSICS=0
+      export NL_SF_SURFACE_PHYSICS=0
+      export NL_BL_PBL_PHYSICS=0
+      export NL_BLDT=0
+      export NL_CU_PHYSICS=0
+      export NL_CUDT=0
+      export NL_ISFFLX=0
+      export NL_IFSNOW=0
+      export NL_ICLOUD=0
+      export NL_W_DAMPING=0
+      export NL_DIFF_OPT=0
+      export NL_KM_OPT=1
+      export NL_DAMPCOEF=0.01
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input tl
-      ln -fs $WORK_DIR/LANDUSE.TBL tl
+      ln -fs $WORK_DIR/*.TBL tl
+      ln -fs $WORK_DIR/RRTM_DATA tl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN tl
       ln -fs $WORK_DIR/tl01 tl/wrfinput_d${DOMAIN}
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
@@ -290,16 +366,16 @@ if test ! -f $DA_ANALYSIS; then
       export NL_DYN_OPT=302
       export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-      export NL_AUXINPUT2_INTERVAL=10
+      export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
       export NL_AUXINPUT3_INTERVAL=60
       export NL_HISTORY_INTERVAL=9999
       export NL_AUXHIST3_INTERVAL=60
       export NL_INPUTOUT_INTERVAL=60
-      export NL_INTERVAL_SECONDS=21600
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input ad
-      ln -fs $WORK_DIR/LANDUSE.TBL ad
+      ln -fs $WORK_DIR/*.TBL ad
+      ln -fs $WORK_DIR/RRTM_DATA ad
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN ad
       ln -fs $WORK_DIR/fg01 ad/wrfinput_d${DOMAIN}
       for I in 01 02 03 04 05 06 07; do
@@ -316,6 +392,70 @@ if test ! -f $DA_ANALYSIS; then
 
       export NL_DYN_OPT=2
    fi
+
+   # Go back to defaults for these
+
+   unset NL_TIME_STEP_FRACT_NUM
+   unset NL_TIME_STEP_FRACT_DEN
+   unset NL_FEEDBACK
+   unset NL_SMOOTH_OPTION
+   unset NL_MP_PHYSICS
+   unset NL_RA_LW_PHYSICS
+   unset NL_RA_SW_PHYSICS
+   unset NL_RADT5
+   unset NL_SF_SFCLAY_PHYSICS
+   unset NL_SF_SURFACE_PHYSICS
+   unset NL_BL_PBL_PHYSICS
+   unset NL_BLDT
+   unset NL_CU_PHYSICS
+   unset NL_CUDT
+   unset NL_ISFFLX
+   unset NL_IFSNOW
+   unset NL_ICLOUD
+   unset NL_SURFACE_INPUT_SOURCE
+   unset NL_NUM_SOIL_LAYERS
+   unset NL_MP_ZERO_OUT
+   unset NL_MP_ZERO_OUT_THRESH
+   unset NL_MAXIENS
+   unset NL_MAXENS
+   unset NL_MAXENS
+   unset NL_MAXENS
+   unset NL_ENSDIM
+   unset NL_RK_ORD
+   unset NL_W_DAMPING
+   unset NL_DIFF_OPT
+   unset NL_KM_OPT
+   unset NL_DAMP_OPT
+   unset NL_BASE_TEMP
+   unset NL_ZDAMP
+   unset NL_DAMPCOEF
+   unset NL_KHDIF
+   unset NL_KVDIF
+   unset NL_SMDIV
+   unset NL_EMDIV
+   unset NL_EPSSM
+   unset NL_NON_HYDROSTATIC
+   unset NL_TIME_STEP_SOUND
+   unset NL_H_MOM_ADV_ORDER
+   unset NL_V_MOM_ADV_ORDER
+   unset NL_H_SCA_ADV_ORDER
+   unset NL_V_SCA_ADV_ORDER
+   unset NL_SPECIFIED
+   unset NL_SPEC_BDY_WIDTH
+   unset NL_SPEC_ZONE
+   unset NL_RELAX_ZONE
+   unset NL_PERIODIC_X
+   unset NL_SYMMETRIC_XS
+   unset NL_SYMMETRIC_XE
+   unset NL_OPEN_XS
+   unset NL_OPEN_XE
+   unset NL_PERIODIC_Y
+   unset NL_SYMMETRIC_YS
+   unset NL_SYMMETRIC_YE
+   unset NL_OPEN_YS
+   unset NL_OPEN_YE
+   unset NL_NESTED
+   unset NL_REAL_DATA_INIT_TYPE
 
    . $WRFVAR_DIR/inc/namelist_script.inc
 
@@ -373,7 +513,6 @@ if test ! -f $DA_ANALYSIS; then
          fi
       else
         # 3DVAR
-
          $RUN_CMD ./wrfvar.exe
          RC=$?
       fi
@@ -382,16 +521,16 @@ if test ! -f $DA_ANALYSIS; then
         cp fort.9 $RUN_DIR/namelist.output
       fi
 
-      if test -f fort.12; then
-         cp fort.12 $RUN_DIR/statistics
+      if test -f statistics; then
+         cp statistics $RUN_DIR/statistics
       fi
 
-      if test -f fort.81; then 
-         cp fort.81 $RUN_DIR/cost_fn
+      if test -f cost_fn; then 
+         cp cost_fn $RUN_DIR/cost_fn
       fi
 
-      if test -f fort.82; then
-         cp fort.82 $RUN_DIR/grad_fn
+      if test -f grad_fn; then
+         cp grad_fn $RUN_DIR/grad_fn
       fi
 
       if test -f wrfvar_output; then

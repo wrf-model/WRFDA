@@ -6,10 +6,10 @@ subroutine da_local_to_global(xp, x, xg, dim)
    !          processor (typically, processor 0).
    !---------------------------------------------------------------------------
 
-   TYPE (XPOSE_TYPE), INTENT(IN):: xp                                    ! Domain decomposition vars.
-   REAL,  INTENT(IN)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
-   REAL,  INTENT(OUT)  :: xg(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)  ! Global-grid output array.
-   INTEGER, INTENT(IN) :: dim                         ! Number of dimensions (=2 for 2D, =3 for 3D).
+   type (XPOSE_type), intent(in):: xp                                    ! Domain decomposition vars.
+   real,  intent(in)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
+   real,  intent(out)  :: xg(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)  ! Global-grid output array.
+   integer, intent(in) :: dim                         ! Number of dimensions (=2 for 2D, =3 for 3D).
 
    integer             :: i, j, k
 
@@ -17,20 +17,20 @@ subroutine da_local_to_global(xp, x, xg, dim)
       do j=xp%jds, xp%jde
          do i=xp%ids, xp%ide
             xg(i,j,1) = x(i,j,1)
-         enddo
-      enddo
+         end do
+      end do
    else if (dim == 3) then
       do j=xp%jds, xp%jde
          do k=xp%kds, xp%kde
             do i=xp%ids, xp%ide
                xg(i,j,k) = x(i,j,k)
-            enddo
-         enddo
-      enddo
+            end do
+         end do
+      end do
    else
-      WRITE(UNIT=errmsg(1),FMT='(A,I5,A)') &
+      write(unit=message(1),fmt='(A,I5,A)') &
          "dim=",dim,"must be 2 or 3"
-      call da_error(__FILE__,__LINE__,errmsg(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
 end subroutine da_local_to_global
@@ -49,7 +49,7 @@ subroutine da_proc_sum_count_obs ( count_obs )
    !          be changed accordingly if more observation types are added.
    !---------------------------------------------------------------------------
 
-   TYPE (count_obs_type), INTENT(INOUT)     :: count_obs
+   type (count_obs_type), intent(inout)     :: count_obs
 
 end subroutine da_proc_sum_count_obs
 
@@ -64,14 +64,14 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    !
    !---------------------------------------------------------------------------
 
-   REAL,      INTENT(INOUT)      :: proc_ave       ! Processor average.
-   REAL,      INTENT(INOUT)      :: proc_err       ! Processor rms error.
-   REAL,      INTENT(INOUT)      :: proc_min       ! Processor minumum.
-   REAL,      INTENT(INOUT)      :: proc_max       ! Processor maximum.
-   INTEGER,   INTENT(INOUT)      :: nobs_min       ! Obs number of minimum.
-   INTEGER,   INTENT(INOUT)      :: nobs_max       ! Obs number of maximum.
-   INTEGER,   INTENT(INOUT)      :: klev_min       ! Level of minimum.
-   INTEGER,   INTENT(INOUT)      :: klev_max       ! Level of maximum.
+   real,      intent(inout)      :: proc_ave       ! Processor average.
+   real,      intent(inout)      :: proc_err       ! Processor rms error.
+   real,      intent(inout)      :: proc_min       ! Processor minumum.
+   real,      intent(inout)      :: proc_max       ! Processor maximum.
+   integer,   intent(inout)      :: nobs_min       ! Obs number of minimum.
+   integer,   intent(inout)      :: nobs_max       ! Obs number of maximum.
+   integer,   intent(inout)      :: klev_min       ! Level of minimum.
+   integer,   intent(inout)      :: klev_max       ! Level of maximum.
 
 end subroutine da_proc_stats_combine
 
@@ -88,9 +88,9 @@ subroutine da_proc_maxmin_combine( n, max, min )
    !
    !---------------------------------------------------------------------------
 
-   INTEGER,   INTENT(IN)                    :: n       ! Length of input fields.
-   TYPE (maxmin_field_type), INTENT(INOUT)  :: max(n)  ! Max values over proc.
-   TYPE (maxmin_field_type), INTENT(INOUT)  :: min(n)  ! Min values over proc.
+   integer,   intent(in)                    :: n       ! Length of input fields.
+   type (maxmin_field_type), intent(inout)  :: max(n)  ! Max values over proc.
+   type (maxmin_field_type), intent(inout)  :: min(n)  ! Min values over proc.
 
 end subroutine da_proc_maxmin_combine
 

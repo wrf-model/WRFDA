@@ -10,7 +10,7 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in)             :: cv_size
    type (xb_type), intent(in)      :: xb     ! first guess (local).
@@ -29,10 +29,10 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    integer, intent(in)    :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                   :: cv2(1:cv_size)    ! control variable (local).
-   REAL                   :: adj_par_lhs ! < x, x >
-   REAL                   :: adj_par_rhs ! < x, x >
-   REAL                   :: adj_sum_lhs ! < x, x >
-   REAL                   :: adj_sum_rhs ! < v_adj, v >
+   real                   :: adj_par_lhs ! < x, x >
+   real                   :: adj_par_rhs ! < x, x >
+   real                   :: adj_sum_lhs ! < x, x >
+   real                   :: adj_sum_rhs ! < v_adj, v >
 
    if (trace_use) call da_trace_entry("da_check_vtox_adjoint")
 
@@ -60,34 +60,34 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [3.0] Calculate LHS of adjoint test equation: 
    !----------------------------------------------------------------------
 
-   adj_par_lhs = SUM(xa % u(its:ite, jts:jte, kts:kte)**2 ) / typical_u_rms**2 &
-               + SUM(xa % v(its:ite, jts:jte, kts:kte)**2 ) / typical_v_rms**2 &     
-               + SUM(xa % p(its:ite, jts:jte, kts:kte)**2 ) / typical_p_rms**2 &     
-               + SUM(xa % t(its:ite, jts:jte, kts:kte)**2 ) / typical_t_rms**2 &     
-               + SUM(xa % q(its:ite, jts:jte, kts:kte)**2 ) / typical_q_rms**2 &     
-               + SUM(xa % rho(its:ite,jts:jte,kts:kte)**2)/ typical_rho_rms**2 & 
-               + SUM(xa % psfc(its:ite, jts:jte)**2 ) / typical_p_rms**2             
+   adj_par_lhs = sum(xa % u(its:ite, jts:jte, kts:kte)**2 ) / typical_u_rms**2 &
+               + sum(xa % v(its:ite, jts:jte, kts:kte)**2 ) / typical_v_rms**2 &     
+               + sum(xa % p(its:ite, jts:jte, kts:kte)**2 ) / typical_p_rms**2 &     
+               + sum(xa % t(its:ite, jts:jte, kts:kte)**2 ) / typical_t_rms**2 &     
+               + sum(xa % q(its:ite, jts:jte, kts:kte)**2 ) / typical_q_rms**2 &     
+               + sum(xa % rho(its:ite,jts:jte,kts:kte)**2)/ typical_rho_rms**2 & 
+               + sum(xa % psfc(its:ite, jts:jte)**2 ) / typical_p_rms**2             
 
-   IF ( cv_options_hum == 2 ) THEN
+   if ( cv_options_hum == 2 ) then
       adj_par_lhs = adj_par_lhs &
-              + SUM( xa % rh(its:ite, jts:jte, kts:kte)**2 ) / typical_rh_rms**2
-   END IF
+              + sum( xa % rh(its:ite, jts:jte, kts:kte)**2 ) / typical_rh_rms**2
+   end if
 
-   IF ( cv_options_hum == 3 ) THEN
+   if ( cv_options_hum == 3 ) then
       adj_par_lhs = adj_par_lhs &
-             + SUM( xa % qcw(its:ite, jts:jte, kts:kte)**2)/typical_qcw_rms**2 &
-             + SUM( xa % qrn(its:ite, jts:jte, kts:kte)**2)/typical_qrn_rms**2
+             + sum( xa % qcw(its:ite, jts:jte, kts:kte)**2)/typical_qcw_rms**2 &
+             + sum( xa % qrn(its:ite, jts:jte, kts:kte)**2)/typical_qrn_rms**2
       adj_par_lhs = adj_par_lhs &
-             + SUM( xa % qt (its:ite, jts:jte, kts:kte)**2)/typical_q_rms**2
-   END IF
+             + sum( xa % qt (its:ite, jts:jte, kts:kte)**2)/typical_q_rms**2
+   end if
 
-   IF ( Use_RadarObs ) THEN
+   if ( Use_RadarObs ) then
       adj_par_lhs = adj_par_lhs &
-         + SUM( xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+         + sum( xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
       adj_par_lhs = adj_par_lhs &
-         + SUM( xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
-   END IF
+         + sum( xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+   end if
 
    !-------------------------------------------------------------------------
    ! [4.0] Rescale input to adjoint routine:
@@ -102,22 +102,22 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
 
    xa % psfc(:,:) = xa % psfc(:,:) / typical_p_rms**2
 
-   IF ( cv_options_hum == 2 ) THEN
+   if ( cv_options_hum == 2 ) then
       xa % rh(:,:,:) = xa % rh(:,:,:) / typical_rh_rms**2
-   END IF
+   end if
 
-   IF ( cv_options_hum == 3 ) THEN
+   if ( cv_options_hum == 3 ) then
       xa % qcw(:,:,:) = xa % qcw(:,:,:) / typical_qcw_rms**2
       xa % qrn(:,:,:) = xa % qrn(:,:,:) / typical_qrn_rms**2
       xa % qt (:,:,:) = xa % qt (:,:,:) / typical_q_rms**2
-   END IF
+   end if
 
-   IF ( Use_RadarObs ) THEN
+   if ( Use_RadarObs ) then
       xa %wh(:,:,:) = xa %wh(:,:,:) / typical_w_rms**2
       xa % w(:,:,:) = 0.0
    else
       xa %w (:,:,:) = xa %w (:,:,:) / typical_w_rms**2
-   END IF
+   end if
 
    !-------------------------------------------------------------------------
    ! [5.0] Perform adjoint operation:
@@ -132,7 +132,7 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [6.0] Calculate RHS of adjoint test equation:
    !-------------------------------------------------------------------------
 
-   adj_par_rhs = SUM( cv1(1:cv_size) * cv2(1:cv_size) )
+   adj_par_rhs = sum( cv1(1:cv_size) * cv2(1:cv_size) )
 
    !-------------------------------------------------------------------------
    ! [7.0] Print output:
@@ -145,18 +145,18 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    else
       adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
    end if
-   write (unit=stdout,FMT='(A,2F10.2)') &
+   write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
-   IF ( rootproc ) THEN
-      write(UNIT=stdout, fmt='(/)')
-      write(UNIT=stdout, fmt='(a,1pe22.14)') &
+   if ( rootproc ) then
+      write(unit=stdout, fmt='(/)')
+      write(unit=stdout, fmt='(a,1pe22.14)') &
          'Whole  Domain: < x, x >     = ', adj_sum_lhs, &
          'Whole  Domain: < v_adj, v > = ', adj_sum_rhs
-   ENDIF
+   end if
 
-   write(UNIT=stdout, fmt='(/a/)') 'da_check_vtox_adjoint: Finished'
+   write(unit=stdout, fmt='(/a/)') 'da_check_vtox_adjoint: Finished'
 
    if (trace_use) call da_trace_exit("da_check_vtox_adjoint")
 

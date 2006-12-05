@@ -1,14 +1,14 @@
 subroutine da_ao_stats_bogus( stats_unit, oi, re )
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
-  TYPE ( y_type), INTENT (in)      :: re            ! A - O
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
+  type ( y_type), intent (in)      :: re            ! A - O
 
-  TYPE (stats_bogus_type)          :: Bogus
-  INTEGER                          :: nu, nv, nt, nq, nslp
-  INTEGER                          :: n, k
+  type (stats_bogus_type)          :: Bogus
+  integer                          :: nu, nv, nt, nq, nslp
+  integer                          :: n, k
 
   nu = 0
   nv = 0
@@ -30,8 +30,8 @@ subroutine da_ao_stats_bogus( stats_unit, oi, re )
   Bogus%average = residual_bogus1_type(0.0, 0.0, 0.0, 0.0, 0.0)
   Bogus%rms_err = Bogus%average
 
-  IF ( oi%num_Bogus > 0 ) THEN
-    DO n=1, oi%num_Bogus
+  if ( oi%num_Bogus > 0 ) then
+    do n=1, oi%num_Bogus
       if( oi%bogus(n)%loc%proc_domain ) then
         call da_stats_calculate( n, 0, oi%Bogus(n)%slp%qc,  &
                               re%Bogus(n)%slp, nslp,     &
@@ -56,9 +56,9 @@ subroutine da_ao_stats_bogus( stats_unit, oi, re )
                                   Bogus%minimum%q, Bogus%maximum%q, &
                                   Bogus%average%q, Bogus%rms_err%q )
         end do
-      endif
-    END DO
-  ENDIF
+      end if
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nu )
@@ -89,11 +89,11 @@ subroutine da_ao_stats_bogus( stats_unit, oi, re )
                           Bogus%minimum%slp%n, Bogus%maximum%slp%n, &
                           Bogus%minimum%slp%l, Bogus%maximum%slp%l )
 
-  IF ( rootproc ) THEN
-    IF ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0 ) THEN
+  if ( rootproc ) then
+    if ( nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Bogus'
       call da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, Bogus)
-    END IF
-  END IF
+    end if
+  end if
 
 end subroutine da_ao_stats_bogus

@@ -1,15 +1,15 @@
 subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
 
-  IMPLICIT NONE
+  implicit none
 
-  TYPE (ob_type), INTENT(IN)   :: iv          ! Innovation vector.
-  TYPE (y_type), INTENT(IN)    :: re          ! Residual vector.
-  TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-  type(jo_type), INTENT(INOUT) :: jo          ! Obs cost function.
+  type (ob_type), intent(in)   :: iv          ! Innovation vector.
+  type (y_type), intent(in)    :: re          ! Residual vector.
+  type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+  type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
-  INTEGER                      :: n
+  integer                      :: n
 
-  IF (trace_use) call da_trace_entry("da_calculate_jo_and_grady_metar")
+  if (trace_use) call da_trace_entry("da_calculate_jo_and_grady_metar")
 
 
   jo % metar_u = 0.0
@@ -18,8 +18,8 @@ subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
   jo % metar_p = 0.0
   jo % metar_q = 0.0
 
-  IF ( iv%num_metar > 0 ) THEN
-    DO n=1, iv%num_metar
+  if ( iv%num_metar > 0 ) then
+    do n=1, iv%num_metar
 
       jo_grad_y%metar(n)%u = -re%metar(n)%u / &
                              ( iv%metar(n)%u%error * iv%metar(n)%u%error)
@@ -40,9 +40,9 @@ subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
         jo % metar_p = jo % metar_p - re%metar(n)%p * jo_grad_y%metar(n)%p
         jo % metar_q = jo % metar_q - re%metar(n)%q * jo_grad_y%metar(n)%q
 
-      endif
+      end if
 
-    END DO
+    end do
 
     jo % metar_u = 0.5 * jo % metar_u
     jo % metar_v = 0.5 * jo % metar_v
@@ -50,9 +50,9 @@ subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
     jo % metar_p = 0.5 * jo % metar_p
     jo % metar_q = 0.5 * jo % metar_q
 
-  END IF
+  end if
 
-  IF (trace_use) call da_trace_exit("da_calculate_jo_and_grady_metar")
+  if (trace_use) call da_trace_exit("da_calculate_jo_and_grady_metar")
      
 end subroutine DA_Calculate_Jo_and_GradY_metar
 

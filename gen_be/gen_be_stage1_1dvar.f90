@@ -13,7 +13,7 @@ program gen_be_stage1_1dvar
 !
 !----------------------------------------------------------------------
 !
-   use da_constants
+   use da_control
    use da_gen_be
    use da_tracing
 
@@ -85,12 +85,18 @@ program gen_be_stage1_1dvar
                                  hgt_min, hgt_max, binwidth_hgt, &
                                  remove_mean, gaussian_lats, expt, dat_dir
 
+  integer :: ounit,iunit,namelist_unit
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage1_1dvar")
+
+   call da_get_unit(ounit)
+   call da_get_unit(iunit)
+   call da_get_unit(namelist_unit)
 
    start_date = '2004030312'
    end_date = '2004033112'
@@ -411,7 +417,7 @@ program gen_be_stage1_1dvar
 !        Write T:
          variable = 't'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)t_prime
@@ -420,7 +426,7 @@ program gen_be_stage1_1dvar
 !        Write q:
          variable = 'q'
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, nk
          write(ounit)q_prime
@@ -429,7 +435,7 @@ program gen_be_stage1_1dvar
 !        Write ps:
          variable = 'ps' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -439,7 +445,7 @@ program gen_be_stage1_1dvar
 !        Write t2:
          variable = 't2' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -449,7 +455,7 @@ program gen_be_stage1_1dvar
 !        Write q2:
          variable = 'q2' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -459,7 +465,7 @@ program gen_be_stage1_1dvar
 !        Write u10:
          variable = 'u10' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.
@@ -469,7 +475,7 @@ program gen_be_stage1_1dvar
 !        Write v10:
          variable = 'v10' ! 2D field
          filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
          open (ounit, file = filename, form='unformatted')
          write(ounit)ni, nj, 1
          write(ounit).true., .false.

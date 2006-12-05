@@ -1,7 +1,7 @@
-WRFVAR_OBJS        =	da_par_util.o           \
-			da_par_util1.o          \
-			da_setup_structures.o	\
-			da_minimisation.o	\
+WRFVAR_OBJS        =	da_par_util.o \
+			da_par_util1.o \
+			da_setup_structures.o \
+			da_minimisation.o \
 			da_vtox_transforms.o	\
 			da_obs.o		\
 			da_metar.o		\
@@ -27,12 +27,13 @@ WRFVAR_OBJS        =	da_par_util.o           \
 			da_ffts.o		\
 			da_test.o		\
 			da_tools.o		\
+			da_tools1.o		\
 			da_recursive_filter.o	\
 			da_interpolation.o	\
 			da_grid_definitions.o	\
 			da_statistics.o		\
 			da_define_structures.o	\
-			da_constants.o		\
+			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
                         da_tracing.o            \
@@ -87,25 +88,50 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         wrf_num_bytes_between.o \
                         input_wrf.o \
                         wrf_auxhist1in.o \
-                        wrf_auxhist2out.o \
-                        wrf_auxhist4in.o \
-                        wrf_auxhist5out.o \
-                        wrf_auxinput2in.o \
-                        wrf_auxinput3out.o \
-                        wrf_auxinput5in.o \
-                        wrf_auxhist1out.o \
-                        wrf_auxhist3in.o \
-                        wrf_auxhist4out.o \
-                        wrf_auxinput1in.o \
-                        wrf_auxinput2out.o \
-                        wrf_auxinput4in.o \
-                        wrf_auxinput5out.o \
                         wrf_auxhist2in.o \
-                        wrf_auxhist3out.o \
+                        wrf_auxhist3in.o \
+                        wrf_auxhist4in.o \
                         wrf_auxhist5in.o \
-                        wrf_auxinput1out.o \
+                        wrf_auxhist6in.o \
+                        wrf_auxhist7in.o \
+                        wrf_auxhist8in.o \
+                        wrf_auxhist9in.o \
+                        wrf_auxhist10in.o \
+                        wrf_auxhist11in.o \
+                        wrf_auxhist1out.o \
+                        wrf_auxhist2out.o \
+                        wrf_auxhist3out.o \
+                        wrf_auxhist4out.o \
+                        wrf_auxhist5out.o \
+                        wrf_auxhist6out.o \
+                        wrf_auxhist7out.o \
+                        wrf_auxhist8out.o \
+                        wrf_auxhist9out.o \
+                        wrf_auxhist10out.o \
+                        wrf_auxhist11out.o \
+                        wrf_auxinput1in.o \
+                        wrf_auxinput2in.o \
                         wrf_auxinput3in.o \
+                        wrf_auxinput4in.o \
+                        wrf_auxinput5in.o \
+                        wrf_auxinput6in.o \
+                        wrf_auxinput7in.o \
+                        wrf_auxinput8in.o \
+                        wrf_auxinput9in.o \
+                        wrf_auxinput10in.o \
+                        wrf_auxinput11in.o \
+                        wrf_auxinput1out.o \
+                        wrf_auxinput2out.o \
+                        wrf_auxinput3out.o \
                         wrf_auxinput4out.o \
+                        wrf_auxinput5out.o \
+                        wrf_auxinput6out.o \
+                        wrf_auxinput7out.o \
+                        wrf_auxinput8out.o \
+                        wrf_auxinput9out.o \
+                        wrf_auxinput10out.o \
+                        wrf_auxinput11out.o \
+			wrf_fddaobs_in.o \
                         wrf_bdyin.o \
                         wrf_bdyout.o \
                         wrf_restartin.o \
@@ -123,6 +149,16 @@ WRFVAR_OBJS        =	da_par_util.o           \
                         start_domain.o \
                         interp_fcn.o \
                         couple_or_uncouple_em.o
+
+var : wrfvar
+
+wrfvar  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_main.o
+	$(LD) -o wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+
+wrfvar_esmf  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
+          da_wrfvar_esmf_super.o
+	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
+          da_wrfvar_esmf_super.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
@@ -143,7 +179,7 @@ da_be4_scale_length: da_be4_scale_length.o
 	$(LD) -o $@.exe $@.o
 
 da_scale_length: da_scale_length.o
-	$(LD) -o $@.exe $@.o da_constants.o
+	$(LD) -o $@.exe $@.o da_control.o
 
 da_diagnostics: da_diagnostics.o
 	$(LD) -o $@.exe $@.o
@@ -182,8 +218,6 @@ da_update_bc.exe : da_update_bc.o
 	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(EXTRA_LIBS)
-	@ $(RM) ../main/da_update_bc.exe
-	cp da_update_bc.exe ../main
 
 da_write_sl_2_be: da_write_sl_2_be.o
 	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \

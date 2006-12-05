@@ -11,23 +11,23 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
    !  METHOD: The warm rain process is according to Hsie and Anthes (1984)
    !          and Dudhia (1989)
    !
-   !  ASSUMPTIONS: 1) Model level stored top down.
+   !  ASsumPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
-   TYPE (xpose_type), INTENT(INOUT) :: xp        ! Dimensions and xpose buffers.
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (xpose_type), intent(inout) :: xp        ! Dimensions and xpose buffers.
 
    integer         :: ids,ide, jds,jde, kds,kde
    integer         :: ims,ime, jms,jme, kms,kme
    integer         :: its,ite, jts,jte, kts,kte
 
-   REAL, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
-   REAL, dimension(ims:ime,jms:jme,kms:kme) :: Q_OLD,Q_NEW
-   REAL, dimension(ims:ime,jms:jme,kms:kme) :: QCW_OLD,QCW_NEW
-   REAL, dimension(ims:ime,jms:jme,kms:kme) :: QRN_OLD,QRN_NEW
+   real, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
+   real, dimension(ims:ime,jms:jme,kms:kme) :: Q_OLD,Q_NEW
+   real, dimension(ims:ime,jms:jme,kms:kme) :: QCW_OLD,QCW_NEW
+   real, dimension(ims:ime,jms:jme,kms:kme) :: QRN_OLD,QRN_NEW
 
    real, dimension(kms:kme)                 :: EES, QVSS
    real, dimension(kms:kme)                 :: EES9, QVSS9
@@ -62,9 +62,9 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
    PREC1=2.*pi*N0R*0.78
    PREC2=2.*pi*N0R*0.32*AVT**0.5*G5PB
 
-   DO k=kts,kte
-      DO j=jts,jte
-         DO i=its,ite
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
             QRN_NEW(i,j,k) = xa % qrn (i,j,k) 
             QRN_OLD(i,j,k) = xa % qrn (i,j,k)
             QCW_NEW(i,j,k) = xa % qcw (i,j,k)
@@ -73,18 +73,18 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             Q_OLD(i,j,k) = xa % q (i,j,k)
             T_NEW(i,j,k) = xa % t (i,j,k)
             T_OLD(i,j,k) = xa % t (i,j,k)
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
    call da_filter_adj(t_new, xp)
    call da_filter_adj(q_new, xp)
    call da_filter_adj(qcw_new, xp)
    call da_filter_adj(qrn_new, xp)
 
-   DO k=kts,kte
-      DO j=jts,jte
-         DO i=its,ite
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
             xa % qrn (i,j,k) = QRN_NEW(i,j,k)
             QRN_OLD(i,j,k) = QRN_OLD(i,j,k) - QRN_NEW(i,j,k)
             xa % qcw (i,j,k) = QCW_NEW(i,j,k)
@@ -94,95 +94,95 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             xa % t (i,j,k) = T_NEW(i,j,k)
             T_OLD(i,j,k) = T_OLD(i,j,k) - T_NEW(i,j,k)
 
-         ENDDO
-      ENDDO
+         end do
+      end do
 
-   ENDDO
+   end do
 
-   DO j=jts,jte
-      DO i=its,ite
+   do j=jts,jte
+      do i=its,ite
 
    !  Preparation
 
         if ( DT_cloud_model ) then
-          DO K=kts,kte
+          do K=kts,kte
             DT(k) = xb%delt(i,j,k)
-          ENDDO
+          end do
         else
          call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
-        endif
+        end if
 
-         DO K=kts,kte
+         do K=kts,kte
 
             if (DT(k) <= 0.) cycle
 
-            IF( xb%t(I,J,K) > TO )THEN
+            if( xb%t(I,J,K) > TO )then
                EES(K)=SVP1*EXP(SVP2*(xb%t(I,J,K)-SVPT0)/(xb%t(I,J,K)-SVP3))
-            ELSE
+            else
                EES(K)=.611*EXP(22.514-6.15E3/xb%t(I,J,K))
-            ENDIF
+            end if
 
             QVSS(K)=622.*EES(K)/(xb%p(I,J,K)-EES(K))
 
             SCR4(K)=xb%q(I,J,K)/QVSS(K)
 
-         ENDDO
+         end do
 
-         DO K=kts,kte
+         do K=kts,kte
 
             if (DT(k) <= 0.) cycle
 
-            IF(xb%qcw(I,J,K) > 0.) THEN
+            if(xb%qcw(I,J,K) > 0.) then
                SCR2(K)=xb%qcw(I,J,K)
-            ELSE
+            else
                SCR2(K)=0.
-            ENDIF
-            IF(xb%qrn(I,J,K) > 1.E-25) THEN
+            end if
+            if(xb%qrn(I,J,K) > 1.E-25) then
                SCR3(K)=xb%qrn(I,J,K)
-            ELSE
+            else
                SCR3(K)=1.E-25
-            ENDIF
+            end if
             SCR5(K)=xb%q(I,J,K)/SCR4(K)
 
             SCR6(K)=xb%p(I,J,K)/(gas_constant*xb%t(I,J,K))
 
-            IF( xb%t(I,J,K) > TO ) THEN
+            if( xb%t(I,J,K) > TO ) then
                SCR7(K)=(SCR6(K)*SCR3(K)*PPI*0.001)**0.25
-            ELSE
+            else
                SCR7(K)=(SCR6(K)*SCR3(K)*PPIS*0.001)**0.25
-            ENDIF
+            end if
 
             DUM11(K)=8.794E-5*xb%t(I,J,K)**1.81/xb%p(I,J,K)
 
             DUM21(K)=1.496E-6*xb%t(I,J,K)**1.5/(xb%t(I,J,K)+120.)
             DUM31(K)=3.1484E6-XLV1*xb%t(I,J,K)
             SCR41(K)=1.414E3*DUM21(K)
-            IF(xb%t(I,J,K) > TO)THEN
+            if(xb%t(I,J,K) > TO)then
                PRA1(K)=DUM31(K)
-            ELSE
+            else
                PRA1(K)=XLS
-            ENDIF
+            end if
             DUM41(K)=SCR6(K)*PRA1(K)*PRA1(K)/(SCR41(K)*  &
                      gas_constant_v*xb%t(I,J,K)*xb%t(I,J,K))+1./(SCR5(K)*DUM11(K))
             PRE1(K)=DUM21(K)/SCR6(K)
             PRC1(K)=PRE1(K)/DUM11(K)
             DUM111(K)=PRC1(K)**.3333/PRE1(K)**.5
-         ENDDO
+         end do
 
          call da_autoc(DT,SCR2,PRC,kts,kte)
-         DO k=kts,kte
+         do k=kts,kte
             PRC2(K)=PRC(K)
-         ENDDO
+         end do
 
          call da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
-         DO k=kts,kte
+         do k=kts,kte
             PRA2(K)=PRA(K)
-         ENDDO
+         end do
 
          call da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
                     PREC1,PREC2,PRE,kts,kte)
 
-         DO K=kts, kte
+         do K=kts, kte
 
             if (DT(k) <= 0.) cycle
 
@@ -192,32 +192,32 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             if (DUM112(K) > SCR2(k)) then
                PRC(k)=SCR2(K)*PRC(K)/DUM112(K)
                PRA(k)=SCR2(K)*PRA(K)/DUM112(K)
-            endif
+            end if
             QVT(K)=-PRE(K)
             QCT(K)=-PRC(K)-PRA(K)
             QRT(K)=PRC(K)+PRA(K)+PRE(K)
-            IF(xb%t(I,J,K).GT.TO)THEN
+            if(xb%t(I,J,K).GT.TO)then
                DUM411(K)=DUM31(K)
-            ELSE
+            else
                DUM411(K)=XLS
-            ENDIF
+            end if
             PRD(K)=cp*(1.+0.887*xb%q(I,J,K))
             TTT(K)=-DUM411(K)*QVT(K)/PRD(K)
 
             DUM113(K)=xb%q(I,J,K)+DT(K)*QVT(K)
-            IF(DUM113(K) > 1.E-12 ) THEN
+            if(DUM113(K) > 1.E-12 ) then
                SCR42(K)=DUM113(K)
-            ELSE
+            else
                SCR42(K)=1.E-12
-            ENDIF
+            end if
             DUM211(K)=xb%qcw(I,J,K)+QCT(K)*DT(k)
-            IF(DUM211(K) > 0.) THEN
+            if(DUM211(K) > 0.) then
                SCR31(K)=DUM211(K)
-            ELSE
+            else
                SCR31(K)=0.
-            ENDIF
+            end if
             SCR71(K)=xb%t(I,J,K)+TTT(K)*DT(k)
-         ENDDO
+         end do
 
          call da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,       &
                              QVT,QCT,QRT,TTT,                      &
@@ -228,7 +228,7 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
                              xa%p(I,J,:),xa%t(I,J,:),xa%q(I,J,:),  &
                              xa%qcw(I,J,:),xa%qrn(I,J,:),kts,kte)
 
-         DO K=kts, kte
+         do K=kts, kte
 
             if (DT(k) <= 0.) cycle
 
@@ -237,15 +237,15 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             xa%t(I,J,K)=xa%t(I,J,K)+SCR719(K)
             TTT9(K)=TTT9(K)+DT(k)*SCR719(K)
             DUM2119(K)=0.
-            IF(DUM211(K) > 0.) THEN
+            if(DUM211(K) > 0.) then
                DUM2119(K)=SCR319(K)
-            ENDIF
+            end if
             xa%qcw(I,J,K)=xa%qcw(I,J,K)+DUM2119(K)
             QCT9(K)=QCT9(K)+DT(K)*DUM2119(K)
             DUM1139(K)=0.
-            IF(DUM113(K) > 1.E-12 ) THEN
+            if(DUM113(K) > 1.E-12 ) then
                DUM1139(K)=SCR429(K)
-            ENDIF
+            end if
             xa%q(I,J,K)=xa%q(I,J,K)+DUM1139(K)
             QVT9(K)=QVT9(K)+DT(K)*DUM1139(K)
             PRD9(K)=PRD9(K)+DUM411(K)*QVT(K)/(PRD(K)*PRD(K))*TTT9(K)
@@ -253,9 +253,9 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             DUM4119(K)=-QVT(K)/PRD(K)*TTT9(K)
             xa%q(I,J,K)=xa%q(I,J,K)+cp*0.887*PRD9(K)
 
-            IF(xb%t(I,J,K).GT.TO)THEN
+            if(xb%t(I,J,K).GT.TO)then
                DUM319(K)=DUM319(K)+DUM4119(K)
-            ENDIF
+            end if
             PRC9(K)=QRT9(K)
             PRA9(K)=QRT9(K)
             PRE9(K)=QRT9(K)
@@ -272,11 +272,11 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
                DUM1129(K)=DUM1129(K)-SCR2(K)*PRC2(K)/(DUM112(K)*DUM112(K))*PRC9(K)
                SCR29(K)=SCR29(K)+PRC2(K)/DUM112(K)*PRC9(K)
                PRC9(K)=PRC9(K)*SCR2(K)/DUM112(K)
-            endif
+            end if
             PRC9(K)=PRC9(K)+DT(K)*DUM1129(K)
             PRA9(K)=PRA9(K)+DT(K)*DUM1129(K)
 
-         ENDDO
+         end do
 
          call da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
                     PREC1,PREC2,PRE,  &
@@ -289,7 +289,7 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
 
          !  Preparation
 
-         DO K=kts,kte
+         do K=kts,kte
 
             if (DT(k) <= 0.) cycle
 
@@ -308,9 +308,9 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
                         /TMP(K)**2*DUM419(K)
             DUM119(K)=DUM119(K)-DUM419(K)/(DUM11(K)*DUM11(K)*SCR5(K))
             SCR59(K)=SCR59(K)-DUM419(K)/(DUM11(K)*SCR5(K)*SCR5(K))
-            IF(xb%t(I,J,K) > TO)THEN
+            if(xb%t(I,J,K) > TO)then
                DUM319(K)=DUM319(K)+PRA19(K)
-            ENDIF
+            end if
             DUM219(K)=DUM219(K)+1.414E3*SCR419(K)
             xa%t(I,J,K)=xa%t(I,J,K)-XLV1*DUM319(K)
             xa%t(I,J,K)=xa%t(I,J,K)+ &
@@ -322,31 +322,31 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             xa%p(I,J,K)=xa%p(I,J,K)-8.794E-5*xb%t(I,J,K)**1.81/   &
                         xb%p(I,J,K)**2*DUM119(K)
 
-            IF( xb%t(I,J,K) > TO ) THEN
+            if( xb%t(I,J,K) > TO ) then
                TMP(K)=0.25*PPI*0.001/(SCR6(K)*SCR3(K)*PPI*0.001)**0.75
                SCR69(K)=SCR69(K)+TMP(K)*SCR3(K)*SCR79(K)
                SCR39(K)=SCR39(K)+TMP(K)*SCR6(K)*SCR79(K)
-            ELSE
+            else
                TMP(K)=0.25*PPIS*0.001/(SCR6(K)*SCR3(K)*PPIS*0.001)**0.75
                SCR69(K)=SCR69(K)+TMP(K)*SCR3(K)*SCR79(K)
                SCR39(K)=SCR39(K)+TMP(K)*SCR6(K)*SCR79(K)
-            ENDIF
+            end if
             xa%p(I,J,K)=xa%p(I,J,K)+SCR69(K)/(gas_constant*xb%t(I,J,K))
             xa%t(I,J,K)=xa%t(I,J,K)-xb%p(I,J,K)/  &
                         (gas_constant*xb%t(I,J,K)**2)*SCR69(K)
             xa%q(I,J,K)=xa%q(I,J,K)+SCR59(K)/SCR4(K)
             SCR49(K)=-xb%q(I,J,K)/SCR4(K)**2*SCR59(K)
 
-            IF(xb%qrn(I,J,K) > 1.E-25) THEN
+            if(xb%qrn(I,J,K) > 1.E-25) then
                xa%qrn(I,J,K)=xa%qrn(I,J,K)+SCR39(K)
-            ENDIF
-            IF(xb%qcw(I,J,K) > 0.) THEN
+            end if
+            if(xb%qcw(I,J,K) > 0.) then
                xa%qcw(I,J,K)=xa%qcw(I,J,K)+SCR29(K)
-            ENDIF
+            end if
 
-         ENDDO
+         end do
 
-         DO K=kts,kte
+         do K=kts,kte
 
             if (DT(k) <= 0.) cycle
 
@@ -355,38 +355,38 @@ subroutine da_moist_phys_adj( xb, xa, xp,    &
             TMP(K)=622./((xb%p(I,J,K)-EES(K))**2)
             EES9(K)=TMP(K)*xb%p(I,J,K)*QVSS9(K)
             xa%p(I,J,K)=xa%p(I,J,K)-TMP(K)*EES(K)*QVSS9(K)
-            IF( xb%t(I,J,K) > TO )THEN
+            if( xb%t(I,J,K) > TO )then
                xa%t(I,J,K)=xa%t(I,J,K)+EES(K)*SVP2*(SVPT0-SVP3)/   &
                            ((xb%t(I,J,K)-SVP3)*(xb%t(I,J,K)-SVP3))*EES9(K)
-            ELSE
+            else
                xa%t(I,J,K)=xa%t(I,J,K)+EES(K)*6.15E3/(xb%t(I,J,K)*   &
                            xb%t(I,J,K))*EES9(K)
-            ENDIF
+            end if
 
-         ENDDO
+         end do
 
-         DO K=kts,kte
+         do K=kts,kte
 
             xa % qt (i,j,k) = xa % qt (i,j,k) + xa % q(i,j,k)
             xa % qcw(i,j,k) = xa % qcw(i,j,k) - xa % q(i,j,k)
             xa % qrn(i,j,k) = xa % qrn(i,j,k) - xa % q(i,j,k)
 
-         ENDDO
+         end do
 
-      ENDDO
-   ENDDO
+      end do
+   end do
 
-   DO k=kts,kte
-      DO j=jts,jte
-         DO i=its,ite
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
 
             xa % qrn (i,j,k) = xa % qrn (i,j,k) + QRN_OLD(i,j,k)
             xa % qcw (i,j,k) = xa % qcw (i,j,k) + QCW_OLD(i,j,k)
             xa % q (i,j,k) = xa % q (i,j,k) + Q_OLD(i,j,k)
             xa % t (i,j,k) = xa % t (i,j,k) + T_OLD(i,j,k)
 
-         ENDDO
-      ENDDO
-   ENDDO
+         end do
+      end do
+   end do
 
 end subroutine da_moist_phys_adj

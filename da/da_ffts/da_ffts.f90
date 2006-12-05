@@ -1,15 +1,15 @@
-MODULE da_ffts
+module da_ffts
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines to perform Fourier transforms.
    !---------------------------------------------------------------------------
 
-   USE da_define_structures
-   USE da_par_util
+   use da_define_structures
+   use da_par_util
 
-   IMPLICIT NONE
+   implicit none
 
-   CONTAINS
+   contains
 
 #include "da_fast_cosine_transform.inc"
 #include "da_fast_sine_transform.inc"

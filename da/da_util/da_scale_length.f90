@@ -81,7 +81,7 @@ program da_scale_length
       else
          do n = 1,4
          read(input_unit) tmp(:,:,:)
-         enddo
+         end do
       end if
 !
       if(varname(1:3) == 'RHM' .or. varname(1:3) == 'rhm') then
@@ -97,7 +97,7 @@ program da_scale_length
          do n = 1,6
          read(input_unit) tmp(:,:,:)
          read(input_scnd) tmp(:,:,:)
-         enddo
+         end do
       read(input_unit, iostat=ier) iy, jx, kz
       read(input_scnd, iostat=ier) iy, jx, kz
 
@@ -112,7 +112,7 @@ program da_scale_length
 
    call clsgks
 
-CONTAINS
+contains
 
    subroutine da_process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
 
@@ -250,7 +250,7 @@ CONTAINS
 !          print*,n,' ---> -ve corr bb= ',bb(n),' nr= ',nr(n) 
 !         if( n ==  1) cycle
          exit
-         endif
+         end if
          radius=r(n)/nr(n)
 !
          nl=nl+1

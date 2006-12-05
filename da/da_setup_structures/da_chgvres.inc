@@ -27,7 +27,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
    real agv_avn(0:nlath*2+1,1:nsig,1:nsig)
    real bv_avn(0:nlath*2+1,1:nsig),wgv_avn(0:nlath*2+1,1:nsig)
 
-   IF (trace_use) call da_trace_entry("da_chgvres")
+   if (trace_use) call da_trace_entry("da_chgvres")
 
    if (kz==nsig) then
       corz_kz=corz_avn
@@ -40,14 +40,14 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
       bv_kz=bv_avn
       wgv_kz=wgv_avn
       return
-   endif
+   end if
 
    do k=1,kz
       rsig(k)=log(sigmah(k))
-   enddo
+   end do
    do k=1,nsig
       rsigo(k)=log(sigma_avn(k))
-   enddo
+   end do
 
    do k=1,kz
       if (rsig(k).ge.rsigo(1)) then
@@ -78,8 +78,8 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
             lsig(k)=nsig-1
             coef2(k)=1.
             coef1(k)=0.
-         endif
-      endif
+         end if
+      end if
    end do
 
    ! agv wgv bv
@@ -89,7 +89,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
       do i=1,nlath*2
          wgv_kz(i,k)=wgv_avn(i,m)*coef1(k)+wgv_avn(i,m1)*coef2(k)
          bv_kz(i,k)=bv_avn(i,m)*coef1(k)+bv_avn(i,m1)*coef2(k)
-      enddo
+      end do
 
       do j=1,kz
          l=lsig(j)
@@ -97,9 +97,9 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
          do i=1,nlath*2
             agv_kz(i,j,k)=(agv_avn(i,l,m)*coef1(j)+agv_avn(i,l1,m)*coef2(j))*coef1(k) &
                     +(agv_avn(i,l,m1)*coef1(j)+agv_avn(i,l1,m1)*coef2(j))*coef2(k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    agv_kz(0,:,:)=agv_kz(1,:,:)
    wgv_kz(0,:)=wgv_kz(1,:)
@@ -118,7 +118,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
          cord_kz(i,k)=cord_avn(i,m)*coef1(k)+cord_avn(i,m1)*coef2(k)
          corh_kz(i,k)=corh_avn(i,m)*coef1(k)+corh_avn(i,m1)*coef2(k)
          corq_kz(i,k)=corq_avn(i,m)*coef1(k)+corq_avn(i,m1)*coef2(k)
-      enddo
+      end do
 
       do n=1,4 
          do i=1,nlath*2
@@ -126,11 +126,11 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
             hwll_kz(i,k,n)=hwll_avn(i,m,n)*coef1(k)+hwll_avn(i,m1,n)*coef2(k)
             ! vztdq
             vztdq_kz(k,i,n)=vztdq_avn(m,i,n)*coef1(k)+vztdq_avn(m1,i,n)*coef2(k)
-          enddo
-      enddo
-   enddo
+          end do
+      end do
+   end do
 
-   IF (trace_use) call da_trace_exit("da_chgvres")
+   if (trace_use) call da_trace_exit("da_chgvres")
 
 end subroutine da_chgvres
 

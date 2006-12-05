@@ -4,22 +4,22 @@ subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
    !  PURPOSE: Updates PBL and Surface parameters information for background field 
    !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xpose_type), intent(in)      :: xp           ! Domain decomposition vars.
-   TYPE (xb_type), INTENT(INOUT)      :: xb           ! First guess state
-   TYPE (xbx_type),INTENT(IN)         :: xbx          ! Header & non-gridded vars.
+   type (xpose_type), intent(in)      :: xp           ! Domain decomposition vars.
+   type (xb_type), intent(inout)      :: xb           ! First guess state
+   type (xbx_type),intent(in)         :: xbx          ! Header & non-gridded vars.
 
-   INTEGER                            :: is,ie   ! Range of 1st dimension of arrays.
-   INTEGER                            :: js,je   ! Range of 2nd dimension of arrays.
-   INTEGER                            :: ks,ke   ! Range of 3rd dimension of arrays.
-   INTEGER                            :: i,j,k        ! Loop counter
+   integer                            :: is,ie   ! Range of 1st dimension of arrays.
+   integer                            :: js,je   ! Range of 2nd dimension of arrays.
+   integer                            :: ks,ke   ! Range of 3rd dimension of arrays.
+   integer                            :: i,j,k        ! Loop counter
 
-   REAL                               :: ta,gamma,zcld
-   REAL                               :: tpw,alw,zrhom,htpw
-   REAL                               :: dum1
+   real                               :: ta,gamma,zcld
+   real                               :: tpw,alw,zrhom,htpw
+   real                               :: dum1
 
-   IF (trace_use) call da_trace_entry("da_add_pbl_and_sfc_info")
+   if (trace_use) call da_trace_entry("da_add_pbl_and_sfc_info")
 
    ! Set xb array range indices for processor subdomain.
    is = xp%its
@@ -92,8 +92,8 @@ subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
       do i=is,ie
          call da_transform_xtoseasfcwind( xb%u(i,j,ks),xb%v(i,j,ks), &
                                        xb%speed(i,j),xb%h(i,j,ks)  )
-      enddo
-   enddo
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! [7.0]  Brightness temperature SH Chen
@@ -116,7 +116,7 @@ subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
             zrhom = 0.0
             do k=ks,ke
                zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
-            END DO
+            end do
 
             !  call da_transform_xtozrhoq(xb, i, j, xb%h(i,j,:), xb%hf(i,j,:), zrhom)
 
@@ -130,9 +130,9 @@ subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
                     htpw,xb%speed(i,j),alw,zcld, xb%tb37v(i,j),xb%tb37h(i,j))
             call tb(4,53.,0.01*xb%psfc(i,j),ta,gamma,xb%tgrn(i,j),tpw, &
                htpw,xb%speed(i,j),alw,zcld, xb%tb85v(i,j),xb%tb85h(i,j))
-         enddo
-      enddo
-   endif
+         end do
+      end do
+   end if
 
    !---------------------------------------------------------------------------
    ! [7.0]  Calculate surface variable(wind (10-m) , moistureR & temperature (2-m)
@@ -147,10 +147,10 @@ subroutine da_add_pbl_and_sfc_info( xp, xb, xbx )
                       xb%h(i,j,1), xb%rough(i,j),xb%landmask(i,j), &
                       xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
                       xb%regime(i,j))
-      enddo
-   enddo
+      end do
+   end do
 
-   IF (trace_use) call da_trace_exit("da_add_pbl_and_sfc_info")
+   if (trace_use) call da_trace_exit("da_add_pbl_and_sfc_info")
 
 end subroutine da_add_pbl_and_sfc_info
 

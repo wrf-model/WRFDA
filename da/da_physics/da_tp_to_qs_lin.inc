@@ -4,18 +4,18 @@ subroutine da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
 !  PURPOSE: Convert es/p/es_prime to saturation specific humidity increment.
 !
 !  METHOD: qs~ = qs * ( p es'/es - p' ) / ( p - (1-rd_over_rv) es ).
-!          Use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
+!          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).
 !
 !  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
 !           02/21/2002 - Modified for parallel version.     Al Bourgeois
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)    :: xb           ! First guess structure.
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Dimensions and xpose buffers.
-   TYPE (x_type), INTENT(INOUT)  :: xa           ! Increment structure.
-   REAL, INTENT(OUT) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   type (xb_type), intent(in)    :: xb           ! First guess structure.
+   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
+   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   real, intent(out) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.

@@ -1,26 +1,26 @@
-REAL FUNCTION da_gaus_noise (KDUM)
+real function da_gaus_noise (KDUM)
 
 !---------------------------------------------------------------------
 !
-!                       ROUTINE GAUS_NOISE
+!                       RoutinE GAUS_NOISE
 !                     *********************
 !
 !  PURPOSE :
 !  -------
-!     RETURN A NORMALLY (GAUSSIAN) DISTRIBUTED RANDOM VARIABLE CTIONS
+!     return A NORMALLY (GAUSSIAN) DISTRIBUTED RANdoM VARIABLE CTIONS
 !     WITH 0 MEAN AND 1 STANDARD DEVIATION
 !
 !   METHOD :
 !   ------
 !
-!   INPUT :
+!   inPUT :
 !   -----
 !      ARGUMENT
-!         KDUM             : SEED FOR RANDOM NUMBER GENERATOR 
+!         KDUM             : SEED FOR RANdoM NUMBER GENERATOR 
 !                            (SET TO A LARGE NEGATIVE NUMBER ON ENTRY)
 !      COMMON              : NONE
 !
-!   OUTPUT :
+!   outPUT :
 !   ------
 !      ARGUMENT
 !         GAUSS_NOISE      : Gaussian random betwen 
@@ -32,53 +32,53 @@ REAL FUNCTION da_gaus_noise (KDUM)
 !
 !   EXTERNAL :  
 !   --------
-!      UNIFVA     
+!      UNifVA     
 !
 !   REFERENCE :
 !   ---------
-!      NUMERICAL RECIPES IN FORTRAN. THE ART OF SCIENTIFIC COMPUTING.
+!      NUMERICAL RECIPES in FORTRAN. THE ART OF SCIENTifIC COMPUTinG.
 !      SECOND EDITION.  CAMBRIDGE UNIVERSITY PRESS.
 !      PRESS ET. AL., 1986.
 !
-!   MODIFICATIONS:
+!   MODifICATIONS:
 !   --------------
-!       ORIGINAL  : 95-01 (F. VANDENBERGHE)
+!       ORIGinAL  : 95-01 (F. VANDENBERGHE)
 !       ADDITION  : 96-06 (A. WEAVER)
 !---------------------------------------------------------------------
  
-   IMPLICIT NONE
+   implicit none
  
-   INTEGER, INTENT(IN) :: KDUM
+   integer, intent(in) :: KDUM
 
-   INTEGER             :: NISET
-   REAL                :: GSET
-   SAVE NISET,GSET
+   integer             :: NISET
+   real                :: GSET
+   save NISET,GSET
    DATA NISET/0/
 
-   REAL ZFAC,ZRSQ,ZV1,ZV2
+   real ZFAC,ZRSQ,ZV1,ZV2
 
-!  BEGIN MAIN
+!  BEGin MAin
 !  ----------
 
-   IF (NISET.EQ.0) THEN
+   if (NISET.EQ.0) then
 
-1000  CONTINUE
-      ZV1   = 2.*DA_UNIFVA (KDUM) - 1.
-      ZV2   = 2.*DA_UNIFVA (KDUM) - 1.
+1000  continue
+      ZV1   = 2.*DA_UNifVA (KDUM) - 1.
+      ZV2   = 2.*DA_UNifVA (KDUM) - 1.
       ZRSQ  = ZV1**2 + ZV2**2
           
-      IF ( (ZRSQ.GE.1.).OR.(ZRSQ.EQ.0.) ) GO TO 1000
+      if ( (ZRSQ.GE.1.).OR.(ZRSQ.EQ.0.) ) goto 1000
 
-      ZFAC  = SQRT(-2.*LOG(ZRSQ)/ZRSQ)
+      ZFAC  = sqrt(-2.*LOG(ZRSQ)/ZRSQ)
       GSET  = ZV1*ZFAC
       DA_GAUS_NOISE = ZV2*ZFAC
       NISET = 1
-   ELSE
+   else
       DA_GAUS_NOISE = gset
       NISET = 0
-   ENDIF
+   end if
       
-   RETURN
+   return
 
-END FUNCTION da_gaus_noise
+end function da_gaus_noise
 

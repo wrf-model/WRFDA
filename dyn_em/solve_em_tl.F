@@ -2017,6 +2017,7 @@ BENCH_START(rlx_bdy_scalar_tim)
                                     moist_b(1,1,1,1,im),                     &
                                     moist_bt(1,1,1,1,im),                    &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2055,6 +2056,7 @@ g_moist_bt(1,1,1,1,im),spec_bdy_width,&
          CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                  chem_b(1,1,1,1,im), chem_bt(1,1,1,1,im),                             &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2089,6 +2091,7 @@ g_moist_bt(1,1,1,1,im),spec_bdy_width,&
                                     moist_b(1,1,1,1,im),                   &
                                     moist_bt(1,1,1,1,im),                  &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2122,6 +2125,7 @@ moist_bt(1,1,1,1,im),g_moist_btm(1,1,1,1,im),spec_bdy_width,&
                                     moist_b(1,1,1,1,im),                   &
                                     moist_bt(1,1,1,1,im),                  &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2153,6 +2157,7 @@ moist_bt(1,1,1,1,im),g_moist_btm(1,1,1,1,im),spec_bdy_width,&
          CALL spec_bdy_scalar  ( moist_tend(ims,kms,jms,im),                &
                                  scalar_b(1,1,1,1,im), scalar_bt(1,1,1,1,im),                             &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2187,6 +2192,7 @@ scalar_bt(1,1,1,1,im),g_scalar_btm(1,1,1,1,im),spec_bdy_width,&
                                     moist_b(1,1,1,1,im),                   &
                                     moist_bt(1,1,1,1,im),                  &
                                  spec_bdy_width, spec_zone,                 &
+                                 config_flags, &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims

@@ -5,9 +5,9 @@ subroutine da_pack_count_obs ( num_obs, offset, value )
    !          value(offset+3).
    !---------------------------------------------------------------------------
 
-   TYPE (count_obs_number_type), INTENT(IN)     :: num_obs
-   INTEGER                     , INTENT(INOUT)  :: offset
-   INTEGER                     , INTENT(INOUT)  :: value(*)
+   type (count_obs_number_type), intent(in)     :: num_obs
+   integer                     , intent(inout)  :: offset
+   integer                     , intent(inout)  :: value(*)
 
    value(offset)   = num_obs % num_used
    value(offset+1) = num_obs % num_outside_iyjx

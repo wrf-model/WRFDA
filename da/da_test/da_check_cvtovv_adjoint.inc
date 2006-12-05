@@ -9,7 +9,7 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    ! METHOD:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    integer, intent(in)               :: cv_size ! Size of cv array.      
    type (xb_type), intent(in)        :: xb    ! first guess (local).
@@ -23,10 +23,10 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   REAL                              :: adj_par_lhs ! < Vv, Vv >
-   REAL                              :: adj_par_rhs ! < cv_adj, cv >
-   REAL                              :: adj_sum_lhs ! < Vv, Vv >
-   REAL                              :: adj_sum_rhs ! < cv_adj, cv >
+   real                              :: adj_par_lhs ! < Vv, Vv >
+   real                              :: adj_par_rhs ! < cv_adj, cv >
+   real                              :: adj_sum_lhs ! < Vv, Vv >
+   real                              :: adj_sum_rhs ! < cv_adj, cv >
    real                              :: cv2(1:cv_size)! control variable.
 
    !-------------------------------------------------------------------------
@@ -57,11 +57,11 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
    ! [3.0] Calculate LHS of adjoint test equation:
    !----------------------------------------------------------------------
 
-   adj_par_lhs = SUM( vv % v1(its:ite,jts:jte,1:be%v1%mz)**2 ) &
-               + SUM( vv % v2(its:ite,jts:jte,1:be%v2%mz)**2 ) &
-               + SUM( vv % v3(its:ite,jts:jte,1:be%v3%mz)**2 ) &
-               + SUM( vv % v4(its:ite,jts:jte,1:be%v4%mz)**2 ) &
-               + SUM( vv % v5(its:ite,jts:jte,1:be%v5%mz)**2 )
+   adj_par_lhs = sum( vv % v1(its:ite,jts:jte,1:be%v1%mz)**2 ) &
+               + sum( vv % v2(its:ite,jts:jte,1:be%v2%mz)**2 ) &
+               + sum( vv % v3(its:ite,jts:jte,1:be%v3%mz)**2 ) &
+               + sum( vv % v4(its:ite,jts:jte,1:be%v4%mz)**2 ) &
+               + sum( vv % v5(its:ite,jts:jte,1:be%v5%mz)**2 )
 
    if ( be % ne > 0 ) then
       adj_par_lhs = adj_par_lhs + sum( vv % alpha(its:ite,jts:jte,1:be%ne)**2 )
@@ -73,8 +73,8 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
 
    if ( global ) then
       call da_transform_vtovv_global_adj( cv_size, xb, xbx, be, cv2, vv, &
-                                           ids, ide, jds, jde, kds, kde, &
-                                           ims, ime, jms, jme, kms, kme, &
+                                           ids, ide, jds, jde, &
+                                           ims, ime, jms, jme, &
                                            its, ite, jts, jte, kts, kte )
    else
       call da_transform_vtovv_adj( cv_size, xb, be, cv2, vv, xp, &
@@ -83,7 +83,7 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
                                    its,ite, jts,jte, kts,kte )
    end if
 
-   adj_par_rhs = SUM( cv(1:cv_size) * cv2(1:cv_size) )
+   adj_par_rhs = sum( cv(1:cv_size) * cv2(1:cv_size) )
 
    !----------------------------------------------------------------------
    ! [5.0] Print output:
@@ -93,7 +93,7 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
       write(unit=stdout, fmt='(a,1pe22.14)') &
          'Single Domain: < Vv, Vv >     = ', adj_par_lhs, &
          'Single Domain: < cv_adj, cv > = ', adj_par_rhs
-   endif
+   end if
 
    adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs )
 
@@ -101,17 +101,17 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
       adj_sum_rhs = adj_par_rhs
    else
       adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs )
-   endif  
+   end if  
 
-   WRITE(UNIT=stdout,FMT='(A,2F12.2)') &
+   write(unit=stdout,fmt='(A,2F12.2)') &
       'TEST_COVERAGE_da_check_cvtovv_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
-   IF ( rootproc ) THEN
+   if ( rootproc ) then
       write(unit=stdout, fmt='(/)')
       write(unit=stdout, fmt='(a,1pe22.14)') &
            'Whole  Domain: < Vv, Vv >     = ', adj_sum_lhs, &
            'Whole  Domain: < cv_adj, cv > = ', adj_sum_rhs
-   ENDIF
+   end if
       
    write(unit=stdout, fmt='(/a/)') &
       'da_check_cvtovv_adjoint: Test Finished.'

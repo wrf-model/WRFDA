@@ -5,39 +5,39 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    ! PURPOSE: Bin ob data to get distribution.
    !---------------------------------------------------------------------------
    
-   CHARACTER (LEN=*), INTENT(IN)    :: ob_name       ! Data description.
-   INTEGER, INTENT(IN)              :: num_obs       ! Number of obs.
-   REAL, INTENT(IN)                 :: min_val       ! Minimum bin value.
-   REAL, INTENT(IN)                 :: max_val       ! Maximum bin value.
-   REAL, INTENT(IN)                 :: bin_width     ! Bin width.
-   REAL, INTENT(IN)                 :: ob(:)         ! Ob data.
+   character (LEN=*), intent(in)    :: ob_name       ! Data description.
+   integer, intent(in)              :: num_obs       ! Number of obs.
+   real, intent(in)                 :: min_val       ! Minimum bin value.
+   real, intent(in)                 :: max_val       ! Maximum bin value.
+   real, intent(in)                 :: bin_width     ! Bin width.
+   real, intent(in)                 :: ob(:)         ! Ob data.
    
-   INTEGER                          :: num_bins      ! Number of bins
-   INTEGER                          :: bin           ! Bin counter.
-   INTEGER                          :: n             ! Data counter.
-   INTEGER                          :: num_missing   ! Number of missing data.
+   integer                          :: num_bins      ! Number of bins
+   integer                          :: bin           ! Bin counter.
+   integer                          :: n             ! Data counter.
+   integer                          :: num_missing   ! Number of missing data.
    
-   REAL, ALLOCATABLE                :: bin_val(:)    ! Central value of bin.
-   REAL, ALLOCATABLE                :: bin_min(:)    ! Minimum value of bin.
-   INTEGER, ALLOCATABLE             :: num_in_bin(:) ! Number of values in bin.   
+   real, allocatable                :: bin_val(:)    ! Central value of bin.
+   real, allocatable                :: bin_min(:)    ! Minimum value of bin.
+   integer, allocatable             :: num_in_bin(:) ! Number of values in bin.   
    
    !---------------------------------------------------------------------------
    ! [1.0] Initialise bins:
    !---------------------------------------------------------------------------
 
-   num_bins = INT( ( max_val - min_val ) / bin_width ) + 1
+   num_bins = inT( ( max_val - min_val ) / bin_width ) + 1
 
-   ALLOCATE( bin_val(1:num_bins) )
+   allocate( bin_val(1:num_bins) )
    bin_val(1) = min_val
-   DO bin = 2, num_bins
+   do bin = 2, num_bins
       bin_val(bin) = bin_val(bin-1) + bin_width
-   END DO
+   end do
    
-   ALLOCATE( bin_min(1:num_bins+1) )
+   allocate( bin_min(1:num_bins+1) )
    bin_min(1:num_bins) = bin_val(1:num_bins) - 0.5 * bin_width
    bin_min(num_bins+1) = bin_val(num_bins) + 0.5 * bin_width
 
-   ALLOCATE( num_in_bin(0:num_bins+1) )
+   allocate( num_in_bin(0:num_bins+1) )
    num_in_bin(0:num_bins+1) = 0
    num_missing = 0
    
@@ -45,45 +45,45 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    ! [2.0] Assign data to bins:
    !---------------------------------------------------------------------------
    
-   DO n = 1, num_obs
-      IF ( ob(n) == missing_r ) THEN
+   do n = 1, num_obs
+      if ( ob(n) == missing_r ) then
          num_missing = num_missing + 1
-      ELSE IF ( ob(n) < bin_min(1) .AND. ob(n) /= missing_r ) THEN
+      else if ( ob(n) < bin_min(1) .AND. ob(n) /= missing_r ) then
          num_in_bin(0) = num_in_bin(0) + 1
-      ELSE IF ( ob(n) >= bin_min(num_bins+1) ) THEN
+      else if ( ob(n) >= bin_min(num_bins+1) ) then
          num_in_bin(num_bins+1) = num_in_bin(num_bins+1) + 1
-      ELSE
-         DO bin = 1, num_bins
-            IF ( ob(n) >= bin_min(bin) .AND. ob(n) < bin_min(bin+1) ) THEN
+      else
+         do bin = 1, num_bins
+            if ( ob(n) >= bin_min(bin) .AND. ob(n) < bin_min(bin+1) ) then
                  num_in_bin(bin) = num_in_bin(bin) + 1
-               EXIT
-            END IF
-         END DO
-      END IF
-   END DO
+               exit
+            end if
+         end do
+      end if
+   end do
 
    !---------------------------------------------------------------------------
    ! [3.0] Output statistics:
    !---------------------------------------------------------------------------
    
-   WRITE(UNIT=stderr,FMT='(A,A,A,I8)')' Number of ', TRIM( ob_name ), &
+   write(unit=stderr,fmt='(A,A,A,I8)')' Number of ', trim( ob_name ), &
       ' obs = ', num_obs
-   WRITE(UNIT=stderr,FMT='(A,I8)')' Number with missing data indicator = ', &
+   write(unit=stderr,fmt='(A,I8)')' Number with missing data indicator = ', &
       num_missing
-   WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number below minimum O-B(', &
+   write(unit=stderr,fmt='(A,f12.5,A,I8)')' Number below minimum O-B(', &
       min_val-0.5*bin_width, ') = ', num_in_bin(0)
-   DO bin = 1, num_bins
-      WRITE(UNIT=stderr,FMT='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
-   END DO
-   WRITE(UNIT=stderr,FMT='(A,f12.5,A,I8)')' Number above maximum O-B(', &
+   do bin = 1, num_bins
+      write(unit=stderr,fmt='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
+   end do
+   write(unit=stderr,fmt='(A,f12.5,A,I8)')' Number above maximum O-B(', &
       max_val+0.5*bin_width, ') = ', num_in_bin(num_bins+1)
                                
    !---------------------------------------------------------------------------
    ! [4.0] Tidy up:
    !---------------------------------------------------------------------------
 
-   DEALLOCATE( bin_val )
-   DEALLOCATE( bin_min )
-   DEALLOCATE( num_in_bin )
+   deallocate( bin_val )
+   deallocate( bin_min )
+   deallocate( num_in_bin )
 
 end subroutine da_data_distribution

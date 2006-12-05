@@ -1,23 +1,20 @@
-subroutine da_transform_XTogpsref_adj(xa, xb, xp)
+subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
-!
-!  input: xb%q, xb%p, xb%t, xa%ref, and xp
-! output: xa%q, xa%p, xa%t
-!
-! modified from MM5-4DVAR. Wei Huang, 
-! Reviewd and modified by Y.-R. Guo.
-!                                             June 9, 2004
-!
+   !  input: xb%q, xb%p, xb%t, xa%ref, and xp
+   ! output: xa%q, xa%p, xa%t
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)    :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN) :: xp       ! Domain decomposition vars.
-   
+   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+
    integer :: i, j, k, is, ie, js, je, ks, ke
    real    :: partone, parttwo, dividnd
    real    :: partone9,parttwo9,dividnd9
 
-! 1.0 Get the range for a tile
+
+   if (trace_use) call da_trace_entry("da_transform_xtogpsref_adj")
+
+   ! 1.0 Get the range for a tile
 
    is = xp%its; ie = xp%ite
    js = xp%jts; je = xp%jte
@@ -35,50 +32,52 @@ subroutine da_transform_XTogpsref_adj(xa, xb, xp)
 
       if ( ie > xb%ide ) ie = xb%ide
       if ( je > xb%jde ) je = xb%jde
-   endif
+   end if
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate the adjoint for GPS refractivity:
-!------------------------------------------------------------------------------
+   !------------------------------------------------------------------------------
+   !  [2.0] Calculate the adjoint for GPS refractivity:
+   !------------------------------------------------------------------------------
 
    do k = ks, ke
       do j = js, je
          do i = is, ie
-   
-!  Note: p in Pascal, q is the specific humidity
 
-!   2.1 basic state
+            !  Note: p in Pascal, q is the specific humidity
 
-      partone9 = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
-      dividnd9 = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
-      parttwo9 = 1.0+coeff*xb%q(i,j,k)/dividnd9
+            !   2.1 basic state
 
-!   2.2 Adjoint of partone and parttwo
+            partone9 = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
+            dividnd9 = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
+            parttwo9 = 1.0+coeff*xb%q(i,j,k)/dividnd9
 
-      partone = xa%ref(i,j,k) * parttwo9
-      parttwo = xa%ref(i,j,k) * partone9
+            !   2.2 Adjoint of partone and parttwo
 
-!   2.3 Adjoint of q and dividnd
+            partone = xa%ref(i,j,k) * parttwo9
+            parttwo = xa%ref(i,j,k) * partone9
 
-      xa%q(i,j,k) = xa%q(i,j,k) + coeff*parttwo/dividnd9
-      dividnd=-coeff*xb%q(i,j,k)*parttwo/(dividnd9*dividnd9)
+            !   2.3 Adjoint of q and dividnd
 
-!   2.4 Adjoint of t, q, and p
+            xa%q(i,j,k) = xa%q(i,j,k) + coeff*parttwo/dividnd9
+            dividnd=-coeff*xb%q(i,j,k)*parttwo/(dividnd9*dividnd9)
 
-      xa%t(i,j,k) = xa%t(i,j,k) + dividnd*(0.622+0.378*xb%q(i,j,k))
-      xa%q(i,j,k) = xa%q(i,j,k) + xb%t(i,j,k)*0.378*dividnd
+            !   2.4 Adjoint of t, q, and p
 
-      xa%p(i,j,k) = xa%p(i,j,k) + 0.776*partone/xb%t(i,j,k)
-      xa%t(i,j,k) = xa%t(i,j,k) - &
-                    0.776*xb%p(i,j,k)*partone/(xb%t(i,j,k)*xb%t(i,j,k))
+            xa%t(i,j,k) = xa%t(i,j,k) + dividnd*(0.622+0.378*xb%q(i,j,k))
+            xa%q(i,j,k) = xa%q(i,j,k) + xb%t(i,j,k)*0.378*dividnd
 
-!  [3.0] Clean the xa%ref    
+            xa%p(i,j,k) = xa%p(i,j,k) + 0.776*partone/xb%t(i,j,k)
+            xa%t(i,j,k) = xa%t(i,j,k) - &
+               0.776*xb%p(i,j,k)*partone/(xb%t(i,j,k)*xb%t(i,j,k))
 
-      xa%ref(i,j,k) = 0.0
+            !  [3.0] Clean the xa%ref    
 
-         enddo
-      enddo
-   enddo
+            xa%ref(i,j,k) = 0.0
 
-end subroutine da_transform_XTogpsref_adj
+         end do
+      end do
+   end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtogpsref_adj")
+
+end subroutine da_transform_xtogpsref_adj
 

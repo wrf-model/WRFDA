@@ -1,4 +1,4 @@
-SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
+subroutine da_scan_bufr_obs (ob, xp, filename)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scan BUFR observation file for input to wrfvar
@@ -6,16 +6,15 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
    implicit none
 
-   INTEGER,         INTENT (in)  :: iunit
-   TYPE (xpose_type), INTENT(IN) :: xp           ! Domain decomposition vars.
-   TYPE (ob_type), INTENT(inout) :: ob
+   type (xpose_type), intent(in) :: xp           ! Domain decomposition vars.
+   type (ob_type), intent(inout) :: ob
 
-   CHARACTER(*),   INTENT (in)   :: filename
+   character(*),   intent (in)   :: filename
 
-   TYPE (multi_level_type)      :: platform
-   LOGICAL                      :: outside, cycle_report
-   REAL                         :: height_error
-   INTEGER                      :: total_obs, &
+   type (multi_level_type)      :: platform
+   logical                      :: outside, cycle_report
+   real                         :: height_error
+   integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
                                    num_pilot, &
@@ -42,6 +41,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    integer           :: year,month, day,hour
    integer           :: iret,idate, kx, nrecs,miscd, t29
    logical           :: exist
+   integer           :: iunit
 
    ! default value
    ob%ob_numb(ob%current_ob_time)%sound = ob%num_sound
@@ -64,22 +64,22 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! OPEN FILE
+   ! open FILE
    ! ---------
 
-   OPEN(UNIT   = iunit,     &
-      FILE   = trim(filename), &
-      IOSTAT =  iost,     &
-      STATUS = 'OLD')
+   call da_get_unit(iunit)
+   open(unit   = iunit, FILE  = trim(filename), &
+      iostat =  iost, form = 'unformatted', STATUS = 'OLD')
 
-   IF (iost /= 0) THEN
-      write(UNIT=errmsg(1), fmt='(A,I3,A,A)') &
-         'ERROR IN OBS INPUT FILE UNIT ',iunit, &
+   if (iost /= 0) then
+      write(unit=message(1), fmt='(A,I3,A,A)') &
+         'ERROR in OBS inPUT FILE unit ',iunit, &
          'OBS FILENAME:', trim(filename)
-      errmsg(2)="BUFR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE OPENED"
-      call da_warning(__FILE__,__LINE__,errmsg(1:2))
+      message(2)="BUFR GTS OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED"
+      call da_warning(__FILE__,__LINE__,message(1:2))
+      call da_free_unit(iunit)
       return
-   endif
+   end if
 
    !--------------------------------------------------------------------------
    ! Initialise the obs-counter
@@ -117,20 +117,21 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
    call datelen(10)
 
-   call openbf(iunit,'IN',iunit)
+   call openbf(iunit,'in',iunit)
    call readmg(iunit,subset,idate,iret)
 
    if (iret/=0) then
-      errmsg(1) = "No BUFR observations"
-      write(UNIT=errmsg(2), fmt='(a, i4)') &
+      message(1) = "No BUFR observations"
+      write(unit=message(2), fmt='(a, i4)') &
          'return code from readmg:', iret, &
          'Reach the end of obs unit: ', iunit
-      CALL da_error(__FILE__,__LINE__,errmsg(1:2))
+      call da_error(__FILE__,__LINE__,message(1:2))
    end if
 
-   write(UNIT=date,FMT='( i10)') idate
-   read (UNIT=date,FMT='(i4,3i2)') year,month, day,hour
-   write(UNIT=stdout,FMT=*)'READ_BUFR:  bufr file date is ',year,month, day,hour
+   write(unit=date,fmt='( i10)') idate
+   read (unit=date,fmt='(i4,3i2)') year,month, day,hour
+   write(unit=message(1),fmt=*) 'Bufr file date is ',year,month, day,hour
+   call da_message(message(1:1))
 
    report = 0 ! report number in file
 
@@ -144,11 +145,12 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
          call readmg(iunit,subset,idate,iret)
 
          if (iret/=0) then
-            write(UNIT=stdout, fmt='(a, i4)') &
+            write (unit=message(1), fmt='(a, i4)') &
                'return code from readmg:', iret, &
                'Reach the end of obs unit: ', iunit
+            call da_warning(__FILE__,__LINE__,message(1:1))
             exit reports
-         endif
+         end if
 
          cycle reports
       end if
@@ -163,7 +165,7 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
       ! Put a check on Lat 
       hdr(3) = MAX(hdr(3), -89.95)     
-      hdr(3) = MIN(hdr(3),  89.95)     
+      hdr(3) = Min(hdr(3),  89.95)     
       platform%info%lon = hdr(2)
       platform%info%lat = hdr(3)
 
@@ -171,17 +173,17 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
       ! Fix funny wind direction at Poles
       if (platform%info%lat <= -89.95 .or. platform%info%lat >= 89.95 ) then
          platform%info%lon = 0.0
-      endif
+      end if
 
       ! Restrict to a range of reports, useful for debugging
 
-      IF (report < report_start) THEN
-         CYCLE
-      END IF
+      if (report < report_start) then
+         cycle
+      end if
 
-      IF (report > report_end) THEN
-         EXIT
-      END IF
+      if (report > report_end) then
+         exit
+      end if
 
       call da_ll_to_xy (platform%info, platform%loc, &
                        xp, outside)
@@ -201,12 +203,12 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
          if (t29 .eq. 531) kx = 180
          if (t29 .eq. 561) kx = 180
          if (t29 .eq. 562) kx = 180
-      endif
+      end if
 
       ! if ((kx >= 160) .and. (kx <= 179)) then    ! bypass satellite data
       !    if (t29 .eq. 61 .or. t29 .eq. 63 .or. t29 .ge. 571) then
       !      cycle reports
-      !    endif
+      !    end if
 
       ! Loop over duplicating obs for global
       ndup = 1
@@ -215,90 +217,91 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
 
       if (Testing_WRFVAR ) ndup = 1
 
-      DO n = 1, ndup
+      do n = 1, ndup
 
-         SELECT CASE(t29)
+         select case(t29)
 
-         CASE (11, 12, 13, 22, 23, 31)
-            SELECT CASE(kx)
-            CASE (120, 122, 132, 220, 222, 232) ;         ! Sound
+         case (11, 12, 13, 22, 23, 31)
+            select case(kx)
+            case (120, 122, 132, 220, 222, 232) ;         ! Sound
                if (.not.use_SoundObs) cycle reports
                num_sound = num_sound + 1
 
-            CASE (221) ;                   ! Pilot 
+            case (221) ;                   ! Pilot 
                if (.not.Use_PilotObs) cycle reports
                num_pilot = num_pilot + 1
-            END SELECT
+            end select
 
-         CASE (41)
-         ! CASE (130:131, 133, 230:231, 233) ;	! Airep
+         case (41)
+         ! case (130:131, 133, 230:231, 233) ;	! Airep
             if (.not.use_AirepObs) cycle reports
             num_airep = num_airep + 1
 
-         ! CASE (180, 182, 280, 282) ;		! Ships and buoys
-	 CASE (522, 523) ;
+         ! case (180, 182, 280, 282) ;		! Ships and buoys
+	 case (522, 523) ;
             if (.not.use_ShipsObs) cycle reports
             num_ships = num_ships + 1
 
-         CASE (531, 561, 562) ;                ! Buoy
+         case (531, 561, 562) ;                ! Buoy
             if (.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
 
-         CASE (511)
-         ! CASE (181, 281) ;		! Synop
+         case (511)
+         ! case (181, 281) ;		! Synop
             if (.not.use_SynopObs) cycle reports
             num_synop = num_synop + 1
 
-         CASE (512)
-         ! CASE (187 , 287) ;			! Metar
+         case (512)
+         ! case (187 , 287) ;			! Metar
             if (.not.use_MetarObs) cycle reports
             num_metar = num_metar + 1
 
-         CASE (63)
-         ! CASE (242:246, 252:253, 255);  ! Geo. CMVs
+         case (63)
+         ! case (242:246, 252:253, 255);  ! Geo. CMVs
             if (.not.use_GeoAMVObs) cycle reports
             num_geoamv = num_geoamv + 1
 
-         CASE (71, 72 )        ;         !  Profiler & VADWND - NEXRAD winds
+         case (71, 72 )        ;         !  Profiler & VADWND - NEXRAD winds
             if (.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 
-         CASE (582)    ;                 !  Quikscat
+         case (582)    ;                 !  Quikscat
             if (.not.use_qscatobs) cycle reports
             num_qscat  = num_qscat  + 1
 
-         CASE (583)    ;                 !  GPS IPW
+         case (583)    ;                 !  GPS IPW
             if (.not.use_GpspwObs) cycle reports
 	    num_gpspw  = num_gpspw + 1
 
-         CASE (584)    ;                 !  GPS REF
+         case (584)    ;                 !  GPS REF
             if (.not.use_GpsrefObs) cycle reports
 	    num_gpsref  = num_gpsref + 1
 
-         CASE DEFAULT ;
-            SELECT CASE (kx)
-            CASE (111 , 210)    ;           !  Tropical Cyclone Bogus
+         case default ;
+            select case (kx)
+            case (111 , 210)    ;           !  Tropical Cyclone Bogus
                !  Note Tropical cyclone Bougus is given type 135 in Obs-ascii
                if (.not.use_BogusObs) cycle reports
             num_bogus = num_bogus + 1
 
-            CASE DEFAULT 
+            case default 
                miscd = miscd + 1
-               errmsg(1)='unsaved obs found:'
-               write(UNIT=errmsg(2), fmt='(2a)') &
+               message(1)='unsaved obs found:'
+               write(unit=message(2), fmt='(2a)') &
                  'platform%info%platform=', platform%info%platform
-               call da_warning(__FILE__,__LINE__,errmsg(1:2))
-            END SELECT
-         END SELECT
-      ENDDO        !  loop over duplicate
-   enddo reports
+               call da_warning(__FILE__,__LINE__,message(1:2))
+            end select
+         end select
+      end do        !  loop over duplicate
+   end do reports
 
    rewind iunit
    ! close(iunit)
 
-   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  total bufr records =',nrecs
-   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  number in domain   =',total_obs
-   WRITE(UNIT=stdout,FMT=*) 'READ_BUFR:  number Unhandled   =',miscd 
+   write (unit=message(1),fmt=*) 'total bufr records =',nrecs
+   write (unit=message(2),fmt=*) 'number in domain   =',total_obs
+   write (unit=message(3),fmt=*) 'number Unhandled   =',miscd 
+   call da_message(message(1:3))
 
    !------------------------------------------------------------------------
    ! Check the numbers again, make sure we have the right number.
@@ -348,13 +351,13 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! PRINT OUT
+   ! PRinT out
    ! =============
 
    if (print_detail_obs) then
-      WRITE(UNIT=stdout, fmt='(a)')  ' '
+      write(unit=stdout, fmt='(a)')  ' '
 
-      WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      write(unit=stdout, fmt='(5x,a,i6,a)') &
          'Scan:  ', ob%current_ob_time, ' ob time:', &
          'Scan:  ', total_obs,    ' Total reports.', &
          'Scan:  ', num_sound,    ' SOUND      reports,', &
@@ -374,12 +377,15 @@ SUBROUTINE da_scan_bufr_obs (iunit, ob, xp, filename)
          'Scan:  ', num_bogus,    ' TCBGS      reports,', & 
          'Scan:  ', num_ssmt1,    ' SSMT1      reports,', & 
          'Scan:  ', num_ssmt2,    ' SSMT2      reports.'    
-      write(UNIT=stdout,FMT=*) ' '
+      write(unit=stdout,fmt=*) ' '
 
-      ! WRITE(UNIT=stdout, fmt='(5x,a,i6,a)') &
+      ! write(unit=stdout, fmt='(5x,a,i6,a)') &
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
 
    end if
 
-END SUBROUTINE da_scan_bufr_obs
+   close(iunit)
+   call da_free_unit(iunit)
+
+end subroutine da_scan_bufr_obs

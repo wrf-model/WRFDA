@@ -8,15 +8,15 @@ subroutine da_ao_stats_airsr( stats_unit, oi, re )
 !              Compute analysis increment at AIRS retrieval locations
 !-------------------------------------------------------------------------
 
-  IMPLICIT NONE
+  implicit none
 
-  INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-  TYPE (ob_type), INTENT (in)      :: oi            ! OI
-  TYPE ( y_type), INTENT (in)      :: re            ! A - O
+  integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+  type (ob_type), intent (in)      :: oi            ! OI
+  type ( y_type), intent (in)      :: re            ! A - O
 
-  TYPE (stats_airsr_type)          :: airsr
-  INTEGER                          :: nt, nq
-  INTEGER                          :: n, k
+  type (stats_airsr_type)          :: airsr
+  integer                          :: nt, nq
+  integer                          :: n, k
 
   nt = 0
   nq = 0
@@ -28,23 +28,23 @@ subroutine da_ao_stats_airsr( stats_unit, oi, re )
   airsr%average = residual_airsr1_type(0.0, 0.0)
   airsr%rms_err = airsr%average
 
-  IF ( oi%num_airsr > 0 ) THEN
-    DO n=1, oi%num_airsr
+  if ( oi%num_airsr > 0 ) then
+    do n=1, oi%num_airsr
       if( oi%airsr(n)%loc%proc_domain ) then
         do k=1, oi%airsr(n)%info%levels
 
-          CALL da_stats_calculate( n, k, oi%airsr(n)%t(k)%qc, & 
+          call da_stats_calculate( n, k, oi%airsr(n)%t(k)%qc, & 
                               re%airsr(n)%t(k), nt, &
                               airsr%minimum%t, airsr%maximum%t, &
                               airsr%average%t, airsr%rms_err%t )
-          CALL da_stats_calculate( n, k, oi%airsr(n)%q(k)%qc, & 
+          call da_stats_calculate( n, k, oi%airsr(n)%q(k)%qc, & 
                               re%airsr(n)%q(k), nq, &
                               airsr%minimum%q, airsr%maximum%q, &
                               airsr%average%q, airsr%rms_err%q )
         end do
-      endif    ! end if( oi%airsr(n)%loc%proc_domain )
-    END DO
-  END IF
+      end if    ! end if( oi%airsr(n)%loc%proc_domain )
+    end do
+  end if
 
   ! Do inter-processor communication to gather statistics.
   call da_proc_sum_int( nt )
@@ -60,11 +60,11 @@ subroutine da_ao_stats_airsr( stats_unit, oi, re )
                           airsr%minimum%q%n, airsr%maximum%q%n, &
                           airsr%minimum%q%l, airsr%maximum%q%l )
 
-  IF ( rootproc ) THEN
-    IF ( nt /= 0 .or. nq /= 0 ) THEN
+  if ( rootproc ) then
+    if ( nt /= 0 .or. nq /= 0 ) then
       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for AIRS retrievals'
       call da_print_stats_airsr(stats_unit, nt, nq, airsr)
-    END IF
-  END IF
+    end if
+  end if
 
 end subroutine da_ao_stats_airsr

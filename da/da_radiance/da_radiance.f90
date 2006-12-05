@@ -9,7 +9,7 @@ module da_radiance
 !
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use da_define_structures
    use da_interpolation
    use da_statistics
@@ -181,19 +181,22 @@ module da_radiance
       INTEGER :: year, month, day, hour, min, sec
       INTEGER :: scanline,scanpos
       INTEGER :: landmask
-      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk
-      REAL    :: tb(20), omb(20)
-      REAL    :: pred(6)
+      INTEGER, pointer :: qc_flag(:) ! 1/0:good/bad
+      INTEGER, pointer :: cloud_flag(:) ! 1/0:no-cloud/cloud
+      INTEGER :: surf_flag  ! surface type
+      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk, clwp
+      REAL, pointer  :: tb(:), omb(:), bias(:)
+      REAL, pointer  :: pred(:)
    END TYPE BIAS
 
-   integer, allocatable :: num_tovs_before(:)
-   integer, allocatable :: num_tovs_after(:)
-   integer, allocatable :: tovs_send_pe(:)
-   integer, allocatable :: tovs_send_start(:)
-   integer, allocatable :: tovs_send_count(:)
-   integer, allocatable :: tovs_recv_pe(:)
-   integer, allocatable :: tovs_recv_start(:)
-   integer :: tovs_copy_count
+   integer, allocatable :: num_tovs_before(:,:)
+   integer, allocatable :: num_tovs_after(:,:)
+   integer, allocatable :: tovs_send_pe(:,:)
+   integer, allocatable :: tovs_send_start(:,:)
+   integer, allocatable :: tovs_send_count(:,:)
+   integer, allocatable :: tovs_recv_pe(:,:)
+   integer, allocatable :: tovs_recv_start(:,:)
+   integer, allocatable :: tovs_copy_count(:)
 
 
 CONTAINS
@@ -202,6 +205,7 @@ CONTAINS
 #include "da_calculate_residual_rad.inc"
 #include "da_biascorr_rad.inc"
 #include "da_biasprep.inc"
+#include "da_write_biasprep.inc"
 #include "da_predictor.inc"
 #include "da_qc_rad.inc"
 #include "da_qc_amsua.inc"
@@ -230,6 +234,7 @@ CONTAINS
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
+#include "da_status_rad.inc"
 
 #include "gsi_emiss.inc"
 #include "emiss_ssmi.inc"

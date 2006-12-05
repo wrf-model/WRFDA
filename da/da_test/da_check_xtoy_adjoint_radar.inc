@@ -1,22 +1,22 @@
 subroutine da_check_xtoy_adjoint_radar( oi, y, adjtest_lhs, pertile_lhs )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(in)     :: oi            ! obs. inc. vector (o-b).
-   TYPE (y_type) , INTENT(inout)  :: y             ! y = h (xa)
-   REAL          , INTENT(inout)  :: adjtest_lhs, pertile_lhs
+   type (ob_type), intent(in)     :: oi            ! obs. inc. vector (o-b).
+   type (y_type) , intent(inout)  :: y             ! y = h (xa)
+   real          , intent(inout)  :: adjtest_lhs, pertile_lhs
 
-   INTEGER                        :: n, k          ! Loop counter.
+   integer                        :: n, k          ! Loop counter.
 
-   IF ( oi%num_Radar > 0 ) THEN
-      DO n=1, oi%num_Radar
+   if ( oi%num_Radar > 0 ) then
+      do n=1, oi%num_Radar
          if( oi%Radar(n)%loc%proc_domain ) then
             do k=1, oi%Radar(n)%info%levels
                adjtest_lhs = adjtest_lhs + &
                              ( y%Radar(n)%rv(k)/typical_rv_rms )**2 + &
                              ( y%Radar(n)%rf(k)/typical_rf_rms )**2
-            enddo
-         endif
+            end do
+         end if
 
          do k=1, oi%Radar(n)%info%levels
             pertile_lhs = pertile_lhs + &
@@ -25,8 +25,8 @@ subroutine da_check_xtoy_adjoint_radar( oi, y, adjtest_lhs, pertile_lhs )
 
             y%Radar(n)%rv(k)= y%Radar(n)%rv(k) / typical_rv_rms ** 2
             y%Radar(n)%rf(k)= y%Radar(n)%rf(k) / typical_rf_rms ** 2
-         enddo
-      END DO
-   ENDIF
+         end do
+      end do
+   end if
 
 end subroutine da_check_xtoy_adjoint_radar

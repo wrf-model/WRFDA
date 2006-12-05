@@ -70,7 +70,7 @@ subroutine da_calc_power_spectrum( max_wave, power )
    end do
 
    do j = 1, nj
-      write(UNIT=alpha_corr_unit1(alpha_corr_type),FMT='(i4,2f12.4)') &
+      write(unit=alpha_corr_unit1(alpha_corr_type),fmt='(i4,2f12.4)') &
         j, 6371.0 * glats(j), corr(j)
    end do
 
@@ -89,7 +89,7 @@ subroutine da_calc_power_spectrum( max_wave, power )
 
       if ( power_nj(l) < 0.0 ) power_nj(l) = 0.0
    end do
-   write(UNIT=stdout,FMT='(a,2f12.5)')' Total, unscale variance = ', &
+   write(unit=stdout,fmt='(a,2f12.5)')' Total, unscale variance = ', &
                 sum(power_nj(0:max_wave_nj))
 
    ! Rescale so variance = 1 (take out later?):
@@ -97,13 +97,13 @@ subroutine da_calc_power_spectrum( max_wave, power )
    power_nj(0:max_wave_nj) = power_nj(0:max_wave_nj) / variance
 
    do l = 0, max_wave_nj
-      write(UNIT=alpha_corr_unit2(alpha_corr_type),FMT='(i4,2f12.4)') &
+      write(unit=alpha_corr_unit2(alpha_corr_type),fmt='(i4,2f12.4)') &
         l, power_nj(l), sum(power_nj(0:l))
    end do
 
-   write(UNIT=stdout,FMT='(a,2i6)')' Total, truncated wave_max = ', &
+   write(unit=stdout,fmt='(a,2i6)')' Total, truncated wave_max = ', &
                      max_wave_nj, max_wave
-   write(UNIT=stdout,FMT='(a,2f12.5)')' Total, truncated variance = ', &
+   write(unit=stdout,fmt='(a,2f12.5)')' Total, truncated variance = ', &
                 sum(power_nj(0:max_wave_nj)), sum(power_nj(0:max_wave))
 
    power(0:max_wave) = power_nj(0:max_wave)

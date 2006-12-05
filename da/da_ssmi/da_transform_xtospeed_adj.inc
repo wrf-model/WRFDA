@@ -4,13 +4,13 @@ subroutine da_transform_xtospeed_adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
    ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
    !----------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER                :: i, j
-   REAL,   INTENT (in   ) :: ADJ_speed
-   REAL,   INTENT (in   ) :: U, V
-   REAL,   INTENT (inout) :: ADJ_u, ADJ_v
-   REAL                   :: speed
+   integer                :: i, j
+   real,   intent (in   ) :: ADJ_speed
+   real,   intent (in   ) :: U, V
+   real,   intent (inout) :: ADJ_u, ADJ_v
+   real                   :: speed
 
    if (trace_use) call da_trace_entry("da_transform_xtospeed_adj")
 

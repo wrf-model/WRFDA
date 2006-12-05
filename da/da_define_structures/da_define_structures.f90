@@ -90,7 +90,6 @@ module da_define_structures
       real                    :: dy
       real                    :: dym
       logical                 :: proc_domain
-!      logical                 :: proc_domain_with_halo
       ! obs_global_index is the original index of this obs in the serial 
       ! code.  It is used to reassemble obs in serial-code-order to replicate 
       ! summation order for bitwise-exact testing of distributed-memory 
@@ -429,11 +428,12 @@ module da_define_structures
 
         integer   ::  ifgat, landsea_mask
         integer   ::  scanline, scanpos
-        real      ::  satzen, satazi, solzen, solazi        !  satellite and solar angles
+        real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
         ! channels' bright temperature
-        type(field_type), pointer   ::   tb(:)                       !  bright temperatures
-        real,    pointer   ::   emiss(:), tb_xb(:)
+        type(field_type), pointer   ::   tb(:)         
+        real,    pointer   ::   emiss(:), tb_xb(:)    !  guess bright temperatures
         ! logical, pointer   ::   calcemis(:)
+        integer, pointer   ::   cloud_flag(:)
         real,    pointer   ::   t(:), mr(:), zk(:)
         real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
         real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
@@ -447,8 +447,53 @@ module da_define_structures
       INTEGER              :: platform_id, satellite_id, sensor_id
       CHARACTER(LEN=20)    :: rttovid_string
       INTEGER              :: num_rad, nchan, nlevels
-      INTEGER ,  pointer   :: ichan(:)
-      INTEGER ,  pointer   :: proc_domain(:)
+      INTEGER, pointer     :: ichan(:)
+      INTEGER, pointer     :: proc_domain(:)
+      integer, pointer     :: loc_i(:)
+      integer, pointer     :: loc_j(:)
+      integer, pointer     :: loc_k(:,:)
+      real,    pointer     :: loc_dx(:)  
+      real,    pointer     :: loc_dy(:)  
+      real,    pointer     :: loc_dz(:,:)  
+      real,    pointer     :: loc_dxm(:) 
+      real,    pointer     :: loc_dym(:) 
+      real,    pointer     :: loc_dzm(:,:) 
+      real,    pointer     :: zk(:,:) 
+      real,    pointer     :: tb(:,:)
+      real,    pointer     :: tb_inv(:,:)
+      real,    pointer     :: tb_xb(:,:) 
+      integer, pointer     :: scanpos(:)
+      real,    pointer     :: satzen(:) 
+      real,    pointer     :: satazi(:) 
+      real,    pointer     :: t(:,:)
+      real,    pointer     :: q(:,:)
+      real,    pointer     :: mr(:,:)
+      real,    pointer     :: tm(:,:)
+      real,    pointer     :: qm(:,:)
+      real,    pointer     :: qrn(:,:)
+      real,    pointer     :: qcw(:,:)
+      real,    pointer     :: qci(:,:)
+      real,    pointer     :: qsn(:,:)
+      real,    pointer     :: qgr(:,:)
+      real,    pointer     :: pm(:,:)
+      real,    pointer     :: emiss(:,:)
+      real,    pointer     :: u10(:)
+      real,    pointer     :: v10(:)
+      real,    pointer     :: t2m(:)
+      real,    pointer     :: q2m(:)
+      real,    pointer     :: mr2m(:)
+      real,    pointer     :: psfc(:)
+      real,    pointer     :: ts(:)
+      real,    pointer     :: smois(:)
+      real,    pointer     :: tslb(:)
+      real,    pointer     :: snowh(:)
+      integer, pointer     :: isflg(:)
+      integer, pointer     :: landsea_mask(:)
+      real,    pointer     :: elv(:)
+      real,    pointer     :: soiltyp(:)
+      real,    pointer     :: vegtyp(:)
+      real,    pointer     :: vegfra(:)
+      real,    pointer     :: clwp(:)
       TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type
    END TYPE instid_type
 
@@ -729,6 +774,7 @@ module da_define_structures
       integer                          :: num_rad
       integer                          :: nchan
       integer ,  pointer               :: ichan (:)
+      real, pointer                    :: tb(:,:)
       type(residual_rad_type), POINTER :: rad(:)
    END TYPE residual_instid_type
 

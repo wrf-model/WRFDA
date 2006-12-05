@@ -7,13 +7,13 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
    ! PURPOSE: Transforms analysis to control variables (Vp-type)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xb_type), INTENT(IN)           :: xb         ! First guess structure.
-   TYPE (xbx_type),INTENT(IN)           :: xbx        ! Header/non-gridded vars.
-   TYPE (x_type), INTENT(INOUT)         :: xa         ! Analysis increments.
+   type (xb_type), intent(in)           :: xb         ! First guess structure.
+   type (xbx_type),intent(in)           :: xbx        ! Header/non-gridded vars.
+   type (x_type), intent(inout)         :: xa         ! Analysis increments.
    type (xpose_type), intent(inout)     :: xp         ! Dimensions and xpose buffers. 
-   TYPE (vp_type), INTENT(OUT)          :: vp         ! CV on grid structure.
+   type (vp_type), intent(out)          :: vp         ! CV on grid structure.
    type (be_type), intent(in), optional :: be         ! Background errors.
    integer, intent(in)  :: ids,ide, jds,jde, kds,kde  ! domain dims.
    integer, intent(in)  :: ims,ime, jms,jme, kms,kme  ! memory dims.
@@ -50,17 +50,17 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! Convert vorticity to Del**2 psi:
    if(.not. global ) then               
-      if (fg_format == 1 .or. fg_format == 2) then
+      if (fg_format == fg_format_wrf) then
          one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
                                         xb % map_factor(its:ite,jts:jte) )
-         DO k = kts, kte
+         do k = kts, kte
             vor(its:ite,jts:jte,k) = &
               one_over_m2(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
-         END DO
+         end do
       else
-         WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
+         write(unit=message(1),fmt='(A,I5,A,L10)') &
             ' Wrong choice of fg_format= ',fg_format,' with global = ',global
-         call da_error(__FILE__,__LINE__,errmsg(1:1))
+         call da_error(__FILE__,__LINE__,message(1:1))
       end if
    end if
 
@@ -70,7 +70,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! [2.3] Transform u, v to velocity potential via divergence:
 
-   call da_messages((/'calling UV_To_Divergence'/))
+   call da_message((/'calling UV_To_Divergence'/))
 #ifndef DEREF_KLUDGE
    call da_uv_to_divergence(xb, xa % u, xa % v, div, &
 #else
@@ -84,53 +84,53 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 
    ! Convert divergence to Del**2 chi:
    if(.not. global )  then              
-      if (fg_format == 1 .or. fg_format == 2) then
-         DO k = kts, kte
+      if (fg_format == fg_format_wrf) then
+         do k = kts, kte
             div(its:ite,jts:jte,k) = &
                one_over_m2(its:ite,jts:jte) * div(its:ite,jts:jte,k)
-         END DO
+         end do
       else
-         WRITE(UNIT=errmsg(1),FMT='(A,I5,A,L10)') &
+         write(unit=message(1),fmt='(A,I5,A,L10)') &
             ' Wrong choice of fg_format= ',fg_format,' with global = ',global
-         call da_error(__FILE__,__LINE__,errmsg(1:1))
+         call da_error(__FILE__,__LINE__,message(1:1))
       end if
    end if
 
    ! Calculate chi:
 
-   call da_messages((/' calling Solve_PoissonEquation for Chi'/))
+   call da_message((/' calling Solve_PoissonEquation for Chi'/))
    call da_solve_poissoneqn_fct(xbx, div, vp%v2, xp)
 
    ! [2.4] Transform chi to chi_u:
-   call da_messages((/' calculating chi_u'/))
+   call da_message((/' calculating chi_u'/))
    do k=kts,kte
       do j=jts,jte
          vp%v2(its:ite,j,k) = vp%v2(its:ite,j,k) - &
             be%reg_chi(j,k)*vp%v1(its:ite,j,k)
-      enddo
-   enddo
+      end do
+   end do
 
-   call da_messages((/' calculating t_u'/))
+   call da_message((/' calculating t_u'/))
    ! [2.4] Compute t_u:
    do k=kts,kte
       do j=jts,jte
          do i=its,ite
             vp%v3(i,j,k) = xa%t(i,j,k) - &
                sum(be%reg_t(j,k,kts:kte)*vp%v1(i,j,kts:kte))
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! [2.6] Choice of moisture control variable: 
    
-   call da_messages((/' calculating psudo rh'/))
+   call da_message((/' calculating psudo rh'/))
    vp % v4(its:ite,jts:jte,kts:kte) = xa % q  (its:ite,jts:jte,kts:kte) /   &
                                       xb % qs (its:ite,jts:jte,kts:kte) 
 
    ! [2.7] Choice of surface pressure control variable: 
       
    ! [2.7] compute psfc_u:
-   call da_messages((/' calculating psfc_u '/))
+   call da_message((/' calculating psfc_u '/))
    do j=jts,jte
       do i=its,ite
           vp % v5(i,j,1) = xa%psfc(i,j) - &
@@ -138,4 +138,4 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
       end do
    end do
 
-END subroutine da_transform_xtovp
+end subroutine da_transform_xtovp

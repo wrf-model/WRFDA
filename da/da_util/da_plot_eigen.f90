@@ -45,7 +45,7 @@ program da_plot_eigen
          if(ier/=0) then
             write(*,'("Error reading big header small domain")')
             call abort()
-         endif
+         end if
 
          iy=big_header%bhi(16,1)
          jx=big_header%bhi(17,1)
@@ -155,9 +155,9 @@ program da_plot_eigen
       else
          print *, 'something is going on here'
          stop 11111
-      endif
+      end if
 
-   enddo
+   end do
 
    call da_eigen_plot('PSI', psi)
    call da_eigen_plot('CHI', chi)
@@ -165,7 +165,7 @@ program da_plot_eigen
 
    call close_gks
 
-CONTAINS
+contains
 
    subroutine da_allocate_eigen(eigen_var, iy, kz)
 

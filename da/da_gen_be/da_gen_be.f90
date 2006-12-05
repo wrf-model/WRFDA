@@ -8,10 +8,11 @@ module da_gen_be
 !  HISTORY: 11/21/2004 - Creation of F90 version.           Dale Barker
 !------------------------------------------------------------------------------
 
-   use da_constants
+   use da_control
    use lapack
    use blas
    use da_tracing
+   use da_tools1
 
    implicit none
 
@@ -40,6 +41,6 @@ contains
 
 end module da_gen_be
 
-SUBROUTINE wrf_abort
+subroutine wrf_abort
   STOP
-END SUBROUTINE wrf_abort
+end subroutine wrf_abort

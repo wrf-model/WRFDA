@@ -49,6 +49,9 @@ dimspec    s      3     namelist=num_soil_cat     z          soil_cat
 dimspec    p      -     constant=7501             c          microphysics_rstrt_state
 dimspec    w      -     namelist=spec_bdy_width   c          spec_bdy_width
 dimspec    e      3     namelist=ensdim           z          ensemble dimension
+dimspec    z      -     namelist=max_obs          c          max_obs
+dimspec    h      -     namelist=nobs_err_flds    c          nobs_err_flds
+dimspec    n      -     namelist=nobs_ndg_vars    c          nobs_ndg_vars
 dimspec    r      4     namelist=ensdim_alpha     c          alpha ensemble dimension
 dimspec    g      2     namelist=num_metgrid_levels  z          num_metgrid_levels
 dimspec    m      2     constant=12                  z          months_per_year
@@ -394,30 +397,16 @@ state   real    julian         -        -          -         -     -          "j
 
 # for noise diagnoses
 
-state    real   dpsdt           ij     misc      1          -     h        "dpsdt" "surface pressure tendency" "hPa/3h"
-state    real   dmudt           ij     misc      1          -     h        "dmudt" "mu tendency" "hPa/3h"
-state    real   psfcm           ij     misc      1          -     h        "psfcm" "surface pressure at previous step" "Pa"
-state    real   avg_abs_dpsdt   -      misc      -          -     h        "avg_abs_dpsdt" "average absolute surface pressure (psfc) tendency" "hPa/3h"
-state    real   avg_abs_dmudt   -      misc      -          -     h        "avg_abs_dmudt" "average absolute mu tendency" "hPa/3h"
+#state    real   dpsdt           ij     misc      1          -     h        "dpsdt" "surface pressure tendency" "hPa/3h"
+#state    real   dmudt           ij     misc      1          -     h        "dmudt" "mu tendency" "hPa/3h"
+#state    real   psfcm           ij     misc      1          -     h        "psfcm" "surface pressure at previous step" "Pa"
+#state    real   avg_abs_dpsdt   -      misc      -          -     h        "avg_abs_dpsdt" "average absolute surface pressure (psfc) tendency" "hPa/3h"
+#state    real   avg_abs_dmudt   -      misc      -          -     h        "avg_abs_dmudt" "average absolute mu tendency" "hPa/3h"
 
 # for moisture convergences
 
-state    real   q_conve_3d      ikj    misc      1          -     h         "q_conve_3d" "Water vapour convergence (3d)"   "(g/kg)/3h"
-state    real   q_conve_2d      ij     misc      1          -     h         "q_conve_2d" "Water vapour convergence (2d)"   "(g/kg)/s"
-
-# Output file descriptor for a domain                                           
-state   integer oid            -        -          -         -     -         "oid"                   ""         ""      
-state   integer auxhist1_oid   -        -          -         -     -         "auxhist1_oid"          ""         ""
-state   integer auxhist2_oid   -        -          -         -     -         "auxhist2_oid"          ""         ""
-state   integer auxhist3_oid   -        -          -         -     -         "auxhist3_oid"          ""         ""
-state   integer auxhist4_oid   -        -          -         -     -         "auxhist4_oid"          ""         ""
-state   integer auxhist5_oid   -        -          -         -     -         "auxhist5_oid"          ""         ""
-
-state   integer auxinput1_oid  -        -          -         -     -         "auxinput1_oid"         ""         ""
-state   integer auxinput2_oid  -        -          -         -     -         "auxinput2_oid"         ""         ""
-state   integer auxinput3_oid  -        -          -         -     -         "auxinput3_oid"         ""         ""
-state   integer auxinput4_oid  -        -          -         -     -         "auxinput4_oid"         ""         ""
-state   integer auxinput5_oid  -        -          -         -     -         "auxinput5_oid"         ""         ""
+#state    real   q_conve_3d      ikj    misc      1          -     h         "q_conve_3d" "Water vapour convergence (3d)"   "(g/kg)/3h"
+#state    real   q_conve_2d      ij     misc      1          -     h         "q_conve_2d" "Water vapour convergence (2d)"   "(g/kg)/s"
 
 # input file descriptor for lbcs on parent domain                                               
 state   integer lbc_fid        -        -          -         -     -         "lbc_fid"               ""         ""      
@@ -528,32 +517,32 @@ state    real   SST              ij     misc        1         -     i0125rhd=(in
 # gfdl (eta) radiation State Variables
 state    real    HTOP            ij     misc        1         -      r        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
 state    real    HBOT            ij     misc        1         -      r        "HBOT"                 "BOT OF CONVECTION LELVEL"         ""
-state    real    HTOPR           ij     misc        1         -      r        "HTOPR"                "TOP OF CONVECTION LEVEL FOR RADIATION"    ""
-state    real    HBOTR           ij     misc        1         -      r        "HBOTR"                "BOT OF CONVECTION LEVEL FOR RADIATION"    ""
-state    real    CUTOP           ij     misc        1         -      r        "CUTOP"                "TOP OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
-state    real    CUBOT           ij     misc        1         -      r        "CUBOT"                "BOT OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
+#state    real    HTOPR           ij     misc        1         -      r        "HTOPR"                "TOP OF CONVECTION LEVEL FOR RADIATION"    ""
+#state    real    HBOTR           ij     misc        1         -      r        "HBOTR"                "BOT OF CONVECTION LEVEL FOR RADIATION"    ""
+#state    real    CUTOP           ij     misc        1         -      r        "CUTOP"                "TOP OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
+#state    real    CUBOT           ij     misc        1         -      r        "CUBOT"                "BOT OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
 state    REAL      CUPPT         ij     misc        1         -      r        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINC LAST CALL TO THE RADIATION"         ""
-state  real   totswdn   ij    misc        1    -    i
-state  real   totlwdn   ij    misc        1    -    i
-state  real   rswtoa    ij    misc        1    -    i
-state  real   rlwtoa    ij    misc        1    -    i
-state  real   czmean    ij    misc      1    -     i
-state  real   cfracl    ij    misc      1    -     i
-state  real   cfracm    ij    misc      1    -     i
-state  real   cfrach    ij    misc      1    -     i
-state  real   acfrst    ij    misc        1    -    i
-state integer ncfrst    ij    misc        1    -    i
-state  real   acfrcv    ij    misc        1    -    i
-state integer ncfrcv    ij    misc        1    -    i
+#state  real   totswdn   ij    misc        1    -    i
+#state  real   totlwdn   ij    misc        1    -    i
+#state  real   rswtoa    ij    misc        1    -    i
+#state  real   rlwtoa    ij    misc        1    -    i
+#state  real   czmean    ij    misc      1    -     i
+#state  real   cfracl    ij    misc      1    -     i
+#state  real   cfracm    ij    misc      1    -     i
+#state  real   cfrach    ij    misc      1    -     i
+#state  real   acfrst    ij    misc        1    -    i
+#state integer ncfrst    ij    misc        1    -    i
+#state  real   acfrcv    ij    misc        1    -    i
+#state integer ncfrcv    ij    misc        1    -    i
 
 # cam radiation variables
-state  real    -       iqjf ozmixm      1    -   -     -
-state  real    -       idjf aerosolc    2    -   -       -
+#state  real    -       iqjf ozmixm      1    -   -     -
+#state  real    -       idjf aerosolc    2    -   -       -
 
 # new eta microphpysics State Variables
-state    real    F_ICE_PHY       ijk    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
-state    real    F_RAIN_PHY      ijk    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
-state    real    F_RIMEF_PHY     ijk    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
+#state    real    F_ICE_PHY       ijk    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
+#state    real    F_RAIN_PHY      ijk    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
+#state    real    F_RIMEF_PHY     ijk    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ijk     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
@@ -755,7 +744,7 @@ state    real  QFX              ij      misc        1         -      rh       "Q
 state    real  LH               ij      misc        1         -      rh       "LH"                    "LATENT HEAT FLUX AT THE SURFACE"              "W m-2"
 state    real  FLHC             ij      misc        1         -      r        "FLHC"                  "SURFACE EXCHANGE COEFFICIENT FOR HEAT"       ""
 state    real  FLQC             ij      misc        1         -      r        "FLQC"                  "SURFACE EXCHANGE COEFFICIENT FOR MOISTURE"   ""
-state    real  QSG              ij      misc        1         -      r        "QSG"                   "SURFACE SATURATION WATER VAPOR MIXING RATIO   "kg kg-1"
+state    real  QSG              ij      misc        1         -      r        "QSG"                   "SURFACE SATURATION WATER VAPOR MIXING RATIO"  "kg kg-1"
 state    real  QVG              ij      misc        1         -      r        "QVG"                   "WATER VAPOR MIXING RATIO AT THE SURFACE"      "kg kg-1"
 state    real  QCG              ij      misc        1         -      r        "QCG"                   "CLOUD WATER MIXING RATIO AT THE SURFACE"      "kg kg-1"
 state    real  SOILT1           ij      misc        1         -      r        "SOILT1"                "TEMPERATURE INSIDE SNOW "    "K"
@@ -764,18 +753,18 @@ i1       real  REGIME           ij      misc        1         -
 state    real  SNOWC            ij      misc        1         -     irhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)      "SNOWC"                 "FLAG INDICATING SNOW COVERAGE (1 FOR SNOW COVER)"         ""
 state    real  MAVAIL           ij      misc        1         -      r        "MAVAIL"                "SURFACE MOISTURE AVAILABILITY"                ""
                                                 
-state   real   tkesfcf          ij      misc        1         -      r        "tkesfcf"               "TKE AT THE SURFACE"                           "m2 s-2"      
+#state   real   tkesfcf          ij      misc        1         -      r        "tkesfcf"               "TKE AT THE SURFACE"                           "m2 s-2"      
                                                 
 state integer  STEPBL          -        misc        1         -      r        "STEPBL"                "NUMBER OF FUNDAMENTAL TIMESTEPS BETWEEN PBL CALLS" ""      
-state    real  taucldi         ijk      misc        1         -      r        "TAUCLDI"               "CLOUD OPTICAL THICKNESS FOR ICE"              ""
-state    real  taucldc         ijk      misc        1         -      r        "TAUCLDC"               "CLOUD OPTICAL THICKNESS FOR WATER"            ""
+#state    real  taucldi         ijk      misc        1         -      r        "TAUCLDI"               "CLOUD OPTICAL THICKNESS FOR ICE"              ""
+#state    real  taucldc         ijk      misc        1         -      r        "TAUCLDC"               "CLOUD OPTICAL THICKNESS FOR WATER"            ""
                                                 
-state   real  defor11          ijk      misc        1         -     -         "defor11"               "DEFORMATION 11"              "s-1"      
-state   real  defor22          ijk      misc        1         -     -         "defor22"               "DEFORMATION 22"              "s-1"      
-state   real  defor12          ijk      misc        1         -     -         "defor12"               "DEFORMATION 12"              "s-1"      
-state   real  defor33          ijk      misc        1         z     -         "defor33"               "DEFORMATION 33"              "s-1"      
-state   real  defor13          ijk      misc        1         z     -         "defor13"               "DEFORMATION 13"              "s-1"      
-state   real  defor23          ijk      misc        1         z     -         "defor23"               "DEFORMATION 23"              "s-1"      
+#state   real  defor11          ijk      misc        1         -     -         "defor11"               "DEFORMATION 11"              "s-1"      
+#state   real  defor22          ijk      misc        1         -     -         "defor22"               "DEFORMATION 22"              "s-1"      
+#state   real  defor12          ijk      misc        1         -     -         "defor12"               "DEFORMATION 12"              "s-1"      
+#state   real  defor33          ijk      misc        1         z     -         "defor33"               "DEFORMATION 33"              "s-1"      
+#state   real  defor13          ijk      misc        1         z     -         "defor13"               "DEFORMATION 13"              "s-1"      
+#state   real  defor23          ijk      misc        1         z     -         "defor23"               "DEFORMATION 23"              "s-1"      
 state   real   xkmv            ijk      misc        1         -     -         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ijk      misc        1         -     -         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
 state   real   xkmhd           ijk      misc        1         -     -         "xkmhd"                 "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
@@ -783,15 +772,15 @@ state   real   a_xkmhd         ijk      misc        1         -     -         "a
 state   real   g_xkmhd         ijk      misc        1         -     -         "g_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
 state   real   xkhv            ijk      misc        1         -     -         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ijk      misc        1         -     -         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
-state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
-state   real    BN2            ijk      misc        1         -     -         "BN2"                   "BRUNT-VAISALA FREQUENCY"                                         "s-2"
+#state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
+#state   real    BN2            ijk      misc        1         -     -         "BN2"                   "BRUNT-VAISALA FREQUENCY"                                         "s-2"
 state  logical warm_rain        -       misc        1         -     -         "warm_rain"              "WARM_RAIN_LOGICAL"
 state  logical adv_moist_cond   -       misc        1         -     -         "adv_moist_cond"         "ADVECT MOIST CONDENSATES LOGICAL"
 
 ## FDDA variables
 
-state    real    -               ikjf     fdda3d      1         -     -    -
-state    real    -               ivjf     fdda2d      1         Z     -    -
+#state    real    -               ikjf     fdda3d      1         -     -    -
+#state    real    -               ivjf     fdda2d      1         Z     -    -
 
 # flag for nest movement
 state  logical moved            -       misc        1         -     -          
@@ -829,324 +818,8 @@ rconfig   logical input_from_file         namelist,time_control		max_domains    
 rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 5, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
 rconfig   logical input_from_hires        namelist,time_control		max_domains    .false. irh    "input_from_hires"     "T/F INPUT FOR THIS DOMAIN FROM USGS HI RES TERRAIN"  ""
 rconfig   character rsmas_data_path       namelist,time_control		1              "."     -    "rsmas_data_path"      ""  ""
-rconfig   integer history_interval        namelist,time_control		max_domains    0       h     "history_interval"       ""      "MINUTES"
-rconfig   integer frames_per_outfile      namelist,time_control		max_domains    10      h     "frames_per_outfile"            ""      ""
-rconfig   integer frames_per_auxhist1     namelist,time_control		max_domains    10      h     "frames_per_auxhist1"            ""      ""
-rconfig   integer frames_per_auxhist2     namelist,time_control		max_domains    10      h     "frames_per_auxhist2"            ""      ""
-rconfig   integer frames_per_auxhist3     namelist,time_control		max_domains    10      h     "frames_per_auxhist3"            ""      ""
-rconfig   integer frames_per_auxhist4     namelist,time_control		max_domains    10      h     "frames_per_auxhist4"            ""      ""
-rconfig   integer frames_per_auxhist5     namelist,time_control		max_domains    10      h     "frames_per_auxhist5"            ""      ""
-rconfig   logical restart                 namelist,time_control		1             .false. h    "restart"              ""      ""
-rconfig   integer restart_interval        namelist,time_control		1              0       h     "restart_interval"       ""      "MINUTES"
-rconfig   integer     io_form_input       namelist,time_control		1              2       h        "io_form_input"                 ""      ""
-rconfig   integer     io_form_history     namelist,time_control		1              2       h        "io_form_history"               ""      ""
-rconfig   integer     io_form_restart     namelist,time_control		1              2       h        "io_form_restart"               ""      ""
-rconfig   integer     io_form_boundary    namelist,time_control		1              2       h        "io_form_boundary"               ""      ""
-rconfig   integer debug_level             namelist,time_control		1             0       -      "debug_level"           ""      ""
-rconfig   logical self_test_domain        namelist,time_control		1              .false. -      "self_test_domain"           ""      ""
 
-
-rconfig   character  history_outname   namelist,time_control		1  "wrfout_d<domain>_<date>"     -     "name of history outfile"  ""      ""
-rconfig   character  auxhist1_outname  namelist,time_control		1  "auxhist1_d<domain>_<date>"   -     "name of auxhist1 outfile" ""      ""
-rconfig   character  auxhist2_outname  namelist,time_control		1  "auxhist2_d<domain>_<date>"   -     "name of auxhist2 outfile" ""      ""
-rconfig   character  auxhist3_outname  namelist,time_control		1  "auxhist3_d<domain>_<date>"   -     "name of auxhist3 outfile" ""      ""
-rconfig   character  auxhist4_outname  namelist,time_control		1  "auxhist4_d<domain>_<date>"   -     "name of auxhist4 outfile" ""      ""
-rconfig   character  auxhist5_outname  namelist,time_control		1  "auxhist5_d<domain>_<date>"   -     "name of auxhist5 outfile" ""      ""
-
-rconfig   character  history_inname    namelist,time_control		1  "wrfhist_d<domain>_<date>"    -     "name of history infile"  ""      ""
-rconfig   character  auxhist1_inname   namelist,time_control		1  "auxhist1_d<domain>_<date>"   -     "name of auxhist1 infile" ""      ""
-rconfig   character  auxhist2_inname   namelist,time_control		1  "auxhist2_d<domain>_<date>"   -     "name of auxhist2 infile" ""      ""
-rconfig   character  auxhist3_inname   namelist,time_control		1  "auxhist3_d<domain>_<date>"   -     "name of auxhist3 infile" ""      ""
-rconfig   character  auxhist4_inname   namelist,time_control		1  "auxhist4_d<domain>_<date>"   -     "name of auxhist4 infile" ""      ""
-rconfig   character  auxhist5_inname   namelist,time_control		1  "auxhist5_d<domain>_<date>"   -     "name of auxhist5 infile" ""      ""
-
-rconfig   character  auxinput1_outname  namelist,time_control            1  "auxinput1_d<domain>_<date>"   -     "name of auxinput1 outfile" ""      ""
-rconfig   character  auxinput2_outname  namelist,time_control            1  "auxinput2_d<domain>_<date>"   -     "name of auxinput2 outfile" ""      ""
-rconfig   character  auxinput3_outname  namelist,time_control            1  "auxinput3_d<domain>_<date>"   -     "name of auxinput3 outfile" ""      ""
-rconfig   character  auxinput4_outname  namelist,time_control            1  "auxinput4_d<domain>_<date>"   -     "name of auxinput4 outfile" ""      ""
-rconfig   character  auxinput5_outname  namelist,time_control            1  "auxinput5_d<domain>_<date>"   -     "name of auxinput5 outfile" ""      ""
-
-rconfig   character  auxinput1_inname   namelist,time_control            1  "wrf_real_input_em.d<domain>.<date>"   -     "name of auxinput1 infile" ""      ""
-rconfig   character  auxinput2_inname   namelist,time_control            1  "auxinput2_d<domain>"   -     "name of auxinput2 infile" ""      ""
-rconfig   character  auxinput3_inname   namelist,time_control            1  "auxinput3_d<domain>"   -     "name of auxinput3 infile" ""      ""
-rconfig   character  auxinput4_inname   namelist,time_control            1  "auxinput4_d<domain>"   -     "name of auxinput4 infile" ""      ""
-rconfig   character  auxinput5_inname   namelist,time_control            1  "auxinput5_d<domain>"   -     "name of auxinput5 infile" ""      ""
-
-rconfig   integer history_interval_mo     namelist,time_control		max_domains    0       h     "history_interval_mo"       ""      "MONTHS"
-rconfig   integer history_interval_d      namelist,time_control		max_domains    0       h     "history_interval_d"       ""      "DAYS"
-rconfig   integer history_interval_h      namelist,time_control		max_domains    0       h     "history_interval_h"       ""      "HOURS"
-rconfig   integer history_interval_m      namelist,time_control		max_domains    0       h     "history_interval_m"       ""      "MINUTES"
-rconfig   integer history_interval_s      namelist,time_control		max_domains    0       h     "history_interval_s"       ""      "SECONDS"
-
-rconfig   integer inputout_interval_mo      namelist,time_control	max_domains    0       h     "inputout_interval_mo"       ""      "MONTHS"
-rconfig   integer inputout_interval_d      namelist,time_control	max_domains    0       h     "inputout_interval_d"       ""      "DAYS"
-rconfig   integer inputout_interval_h      namelist,time_control	max_domains    0       h     "inputout_interval_h"       ""      "HOURS"
-rconfig   integer inputout_interval_m      namelist,time_control	max_domains    0       h     "inputout_interval_m"       ""      "MINUTES"
-rconfig   integer inputout_interval_s      namelist,time_control	max_domains    0       h     "inputout_interval_s"       ""      "SECONDS"
-rconfig   integer inputout_interval        namelist,time_control	max_domains    0       h     "inputout_interval"       ""      "MINUTES"
-
-rconfig   integer auxhist1_interval_mo      namelist,time_control	max_domains    0       h     "auxhist1_interval_mo"       ""      "MONTHS"
-rconfig   integer auxhist1_interval_d      namelist,time_control	max_domains    0       h     "auxhist1_interval_d"       ""      "DAYS"
-rconfig   integer auxhist1_interval_h      namelist,time_control	max_domains    0       h     "auxhist1_interval_h"       ""      "HOURS"
-rconfig   integer auxhist1_interval_m      namelist,time_control	max_domains    0       h     "auxhist1_interval_m"       ""      "MINUTES"
-rconfig   integer auxhist1_interval_s      namelist,time_control	max_domains    0       h     "auxhist1_interval_s"       ""      "SECONDS"
-rconfig   integer auxhist1_interval        namelist,time_control	max_domains    0       h     "auxhist1_interval"       ""      "MINUTES"
-
-rconfig   integer auxhist2_interval_mo      namelist,time_control	max_domains    0       h     "auxhist2_interval_mo"       ""      "MONTHS"
-rconfig   integer auxhist2_interval_d      namelist,time_control	max_domains    0       h     "auxhist2_interval_d"       ""      "DAYS"
-rconfig   integer auxhist2_interval_h      namelist,time_control	max_domains    0       h     "auxhist2_interval_h"       ""      "HOURS"
-rconfig   integer auxhist2_interval_m      namelist,time_control	max_domains    0       h     "auxhist2_interval_m"       ""      "MINUTES"
-rconfig   integer auxhist2_interval_s      namelist,time_control	max_domains    0       h     "auxhist2_interval_s"       ""      "SECONDS"
-rconfig   integer auxhist2_interval        namelist,time_control	max_domains    0       h     "auxhist2_interval"       ""      "MINUTES"
-
-rconfig   integer auxhist3_interval_mo      namelist,time_control	max_domains    0       h     "auxhist3_interval_mo"       ""      "MONTHS"
-rconfig   integer auxhist3_interval_d      namelist,time_control	max_domains    0       h     "auxhist3_interval_d"       ""      "DAYS"
-rconfig   integer auxhist3_interval_h      namelist,time_control	max_domains    0       h     "auxhist3_interval_h"       ""      "HOURS"
-rconfig   integer auxhist3_interval_m      namelist,time_control	max_domains    0       h     "auxhist3_interval_m"       ""      "MINUTES"
-rconfig   integer auxhist3_interval_s      namelist,time_control	max_domains    0       h     "auxhist3_interval_s"       ""      "SECONDS"
-rconfig   integer auxhist3_interval        namelist,time_control	max_domains    0       h     "auxhist3_interval"       ""      "MINUTES"
-
-rconfig   integer auxhist4_interval_mo     namelist,time_control	max_domains    0       h     "auxhist4_interval_mo"       ""      "MONTHS"
-rconfig   integer auxhist4_interval_d      namelist,time_control	max_domains    0       h     "auxhist4_interval_d"       ""      "DAYS"
-rconfig   integer auxhist4_interval_h      namelist,time_control	max_domains    0       h     "auxhist4_interval_h"       ""      "HOURS"
-rconfig   integer auxhist4_interval_m      namelist,time_control	max_domains    0       h     "auxhist4_interval_m"       ""      "MINUTES"
-rconfig   integer auxhist4_interval_s      namelist,time_control	max_domains    0       h     "auxhist4_interval_s"       ""      "SECONDS"
-rconfig   integer auxhist4_interval        namelist,time_control	max_domains    0       h     "auxhist4_interval"       ""      "MINUTES"
-
-rconfig   integer auxhist5_interval_mo     namelist,time_control	max_domains    0       h     "auxhist5_interval_mo"       ""      "MONTHS"
-rconfig   integer auxhist5_interval_d      namelist,time_control	max_domains    0       h     "auxhist5_interval_d"       ""      "DAYS"
-rconfig   integer auxhist5_interval_h      namelist,time_control	max_domains    0       h     "auxhist5_interval_h"       ""      "HOURS"
-rconfig   integer auxhist5_interval_m      namelist,time_control	max_domains    0       h     "auxhist5_interval_m"       ""      "MINUTES"
-rconfig   integer auxhist5_interval_s      namelist,time_control	max_domains    0       h     "auxhist5_interval_s"       ""      "SECONDS"
-rconfig   integer auxhist5_interval        namelist,time_control	max_domains    0       h     "auxhist5_interval"       ""      "MINUTES"
-
-rconfig   integer auxinput1_interval_mo     namelist,time_control	max_domains    0       h     "auxinput1_interval_mo"       ""      "MONTHS"
-rconfig   integer auxinput1_interval_d      namelist,time_control	max_domains    0       h     "auxinput1_interval_d"       ""      "DAYS"
-rconfig   integer auxinput1_interval_h      namelist,time_control	max_domains    0       h     "auxinput1_interval_h"       ""      "HOURS"
-rconfig   integer auxinput1_interval_m      namelist,time_control	max_domains    0       h     "auxinput1_interval_m"       ""      "MINUTES"
-rconfig   integer auxinput1_interval_s      namelist,time_control	max_domains    0       h     "auxinput1_interval_s"       ""      "SECONDS"
-rconfig   integer auxinput1_interval        namelist,time_control	max_domains    0       h     "auxinput1_interval"       ""      "MINUTES"
-
-rconfig   integer auxinput2_interval_mo     namelist,time_control	max_domains    0       h     "auxinput2_interval_mo"       ""      "MONTHS"
-rconfig   integer auxinput2_interval_d      namelist,time_control	max_domains    0       h     "auxinput2_interval_d"       ""      "DAYS"
-rconfig   integer auxinput2_interval_h      namelist,time_control	max_domains    0       h     "auxinput2_interval_h"       ""      "HOURS"
-rconfig   integer auxinput2_interval_m      namelist,time_control	max_domains    0       h     "auxinput2_interval_m"       ""      "MINUTES"
-rconfig   integer auxinput2_interval_s      namelist,time_control	max_domains    0       h     "auxinput2_interval_s"       ""      "SECONDS"
-rconfig   integer auxinput2_interval        namelist,time_control	max_domains    0       h     "auxinput2_interval"       ""      "MINUTES"
-
-rconfig   integer auxinput3_interval_mo     namelist,time_control	max_domains    0       h     "auxinput3_interval_mo"       ""      "MONTHS"
-rconfig   integer auxinput3_interval_d      namelist,time_control	max_domains    0       h     "auxinput3_interval_d"       ""      "DAYS"
-rconfig   integer auxinput3_interval_h      namelist,time_control	max_domains    0       h     "auxinput3_interval_h"       ""      "HOURS"
-rconfig   integer auxinput3_interval_m      namelist,time_control	max_domains    0       h     "auxinput3_interval_m"       ""      "MINUTES"
-rconfig   integer auxinput3_interval_s      namelist,time_control	max_domains    0       h     "auxinput3_interval_s"       ""      "SECONDS"
-rconfig   integer auxinput3_interval        namelist,time_control	max_domains    0       h     "auxinput3_interval"       ""      "MINUTES"
-
-rconfig   integer auxinput4_interval_mo     namelist,time_control	max_domains    0       h     "auxinput4_interval_mo"       ""      "MONTHS"
-rconfig   integer auxinput4_interval_d      namelist,time_control	max_domains    0       h     "auxinput4_interval_d"       ""      "DAYS"
-rconfig   integer auxinput4_interval_h      namelist,time_control	max_domains    0       h     "auxinput4_interval_h"       ""      "HOURS"
-rconfig   integer auxinput4_interval_m      namelist,time_control	max_domains    0       h     "auxinput4_interval_m"       ""      "MINUTES"
-rconfig   integer auxinput4_interval_s      namelist,time_control	max_domains    0       h     "auxinput4_interval_s"       ""      "SECONDS"
-rconfig   integer auxinput4_interval        namelist,time_control	max_domains    0       h     "auxinput4_interval"       ""      "MINUTES"
-
-rconfig   integer auxinput5_interval_mo     namelist,time_control	max_domains    0       h     "auxinput5_interval_mo"       ""      "MONTHS"
-rconfig   integer auxinput5_interval_d      namelist,time_control	max_domains    0       h     "auxinput5_interval_d"       ""      "DAYS"
-rconfig   integer auxinput5_interval_h      namelist,time_control	max_domains    0       h     "auxinput5_interval_h"       ""      "HOURS"
-rconfig   integer auxinput5_interval_m      namelist,time_control	max_domains    0       h     "auxinput5_interval_m"       ""      "MINUTES"
-rconfig   integer auxinput5_interval_s      namelist,time_control	max_domains    0       h     "auxinput5_interval_s"       ""      "SECONDS"
-rconfig   integer auxinput5_interval        namelist,time_control	max_domains    0       h     "auxinput5_interval"       ""      "MINUTES"
-
-rconfig   integer restart_interval_mo     namelist,time_control		1              0       h     "restart_interval_mo"       ""      "MONTHS"
-rconfig   integer restart_interval_d      namelist,time_control		1              0       h     "restart_interval_d"       ""      "DAYS"
-rconfig   integer restart_interval_h      namelist,time_control		1              0       h     "restart_interval_h"       ""      "HOURS"
-rconfig   integer restart_interval_m      namelist,time_control		1              0       h     "restart_interval_m"       ""      "MINUTES"
-rconfig   integer restart_interval_s      namelist,time_control		1              0       h     "restart_interval_s"       ""      "SECONDS"
-
-
-rconfig  integer history_begin_y  namelist,time_control		max_domains    0     h   "history_begin_y"    ""   "YEARS from start of run"
-rconfig  integer history_begin_mo  namelist,time_control	max_domains    0     h   "history_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer history_begin_d   namelist,time_control	max_domains    0     h   "history_begin_d"    ""   "DAYS from start of run"
-rconfig  integer history_begin_h   namelist,time_control	max_domains    0     h   "history_begin_h"    ""   "HOURS from start of run"
-rconfig  integer history_begin_m   namelist,time_control	max_domains    0     h   "history_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer history_begin_s   namelist,time_control	max_domains    0     h   "history_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer inputout_begin_y   namelist,time_control	max_domains    0     h   "inputout_begin_y"    ""   "YEARS from start of run"
-rconfig  integer inputout_begin_mo   namelist,time_control	max_domains    0     h   "inputout_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer inputout_begin_d   namelist,time_control	max_domains    0     h   "inputout_begin_d"    ""   "DAYS from start of run"
-rconfig  integer inputout_begin_h   namelist,time_control	max_domains    0     h   "inputout_begin_h"    ""   "HOURS from start of run"
-rconfig  integer inputout_begin_m   namelist,time_control	max_domains    0     h   "inputout_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer inputout_begin_s   namelist,time_control	max_domains    0     h   "inputout_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxhist1_begin_y   namelist,time_control	max_domains    0     h   "auxhist1_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxhist1_begin_mo   namelist,time_control	max_domains    0     h   "auxhist1_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxhist1_begin_d   namelist,time_control	max_domains    0     h   "auxhist1_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxhist1_begin_h   namelist,time_control	max_domains    0     h   "auxhist1_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxhist1_begin_m   namelist,time_control	max_domains    0     h   "auxhist1_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxhist1_begin_s   namelist,time_control	max_domains    0     h   "auxhist1_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxhist2_begin_y   namelist,time_control	max_domains    0     h   "auxhist2_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxhist2_begin_mo   namelist,time_control	max_domains    0     h   "auxhist2_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxhist2_begin_d   namelist,time_control	max_domains    0     h   "auxhist2_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxhist2_begin_h   namelist,time_control	max_domains    0     h   "auxhist2_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxhist2_begin_m   namelist,time_control	max_domains    0     h   "auxhist2_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxhist2_begin_s   namelist,time_control	max_domains    0     h   "auxhist2_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxhist3_begin_y   namelist,time_control	max_domains    0     h   "auxhist3_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxhist3_begin_mo   namelist,time_control	max_domains    0     h   "auxhist3_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxhist3_begin_d   namelist,time_control	max_domains    0     h   "auxhist3_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxhist3_begin_h   namelist,time_control	max_domains    0     h   "auxhist3_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxhist3_begin_m   namelist,time_control	max_domains    0     h   "auxhist3_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxhist3_begin_s   namelist,time_control	max_domains    0     h   "auxhist3_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxhist4_begin_y  namelist,time_control	max_domains    0     h   "auxhist4_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxhist4_begin_mo  namelist,time_control	max_domains    0     h   "auxhist4_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxhist4_begin_d   namelist,time_control	max_domains    0     h   "auxhist4_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxhist4_begin_h   namelist,time_control	max_domains    0     h   "auxhist4_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxhist4_begin_m   namelist,time_control	max_domains    0     h   "auxhist4_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxhist4_begin_s   namelist,time_control	max_domains    0     h   "auxhist4_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxhist5_begin_y  namelist,time_control	max_domains    0     h   "auxhist5_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxhist5_begin_mo  namelist,time_control	max_domains    0     h   "auxhist5_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxhist5_begin_d   namelist,time_control	max_domains    0     h   "auxhist5_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxhist5_begin_h   namelist,time_control	max_domains    0     h   "auxhist5_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxhist5_begin_m   namelist,time_control	max_domains    0     h   "auxhist5_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxhist5_begin_s   namelist,time_control	max_domains    0     h   "auxhist5_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxinput1_begin_y  namelist,time_control	max_domains    0     h   "auxinput1_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxinput1_begin_mo  namelist,time_control	max_domains    0     h   "auxinput1_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxinput1_begin_d   namelist,time_control	max_domains    0     h   "auxinput1_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxinput1_begin_h   namelist,time_control	max_domains    0     h   "auxinput1_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxinput1_begin_m   namelist,time_control	max_domains    0     h   "auxinput1_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxinput1_begin_s   namelist,time_control	max_domains    0     h   "auxinput1_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxinput2_begin_y  namelist,time_control	max_domains    0     h   "auxinput2_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxinput2_begin_mo  namelist,time_control	max_domains    0     h   "auxinput2_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxinput2_begin_d   namelist,time_control	max_domains    0     h   "auxinput2_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxinput2_begin_h   namelist,time_control	max_domains    0     h   "auxinput2_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxinput2_begin_m   namelist,time_control	max_domains    0     h   "auxinput2_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxinput2_begin_s   namelist,time_control	max_domains    0     h   "auxinput2_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxinput3_begin_y  namelist,time_control	max_domains    0     h   "auxinput3_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxinput3_begin_mo  namelist,time_control	max_domains    0     h   "auxinput3_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxinput3_begin_d   namelist,time_control	max_domains    0     h   "auxinput3_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxinput3_begin_h   namelist,time_control	max_domains    0     h   "auxinput3_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxinput3_begin_m   namelist,time_control	max_domains    0     h   "auxinput3_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxinput3_begin_s   namelist,time_control	max_domains    0     h   "auxinput3_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxinput4_begin_y  namelist,time_control	max_domains    0     h   "auxinput4_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxinput4_begin_mo  namelist,time_control	max_domains    0     h   "auxinput4_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxinput4_begin_d   namelist,time_control	max_domains    0     h   "auxinput4_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxinput4_begin_h   namelist,time_control	max_domains    0     h   "auxinput4_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxinput4_begin_m   namelist,time_control	max_domains    0     h   "auxinput4_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxinput4_begin_s   namelist,time_control	max_domains    0     h   "auxinput4_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer auxinput5_begin_y  namelist,time_control	max_domains    0     h   "auxinput5_begin_y"    ""   "YEARS from start of run"
-rconfig  integer auxinput5_begin_mo  namelist,time_control	max_domains    0     h   "auxinput5_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer auxinput5_begin_d   namelist,time_control	max_domains    0     h   "auxinput5_begin_d"    ""   "DAYS from start of run"
-rconfig  integer auxinput5_begin_h   namelist,time_control	max_domains    0     h   "auxinput5_begin_h"    ""   "HOURS from start of run"
-rconfig  integer auxinput5_begin_m   namelist,time_control	max_domains    0     h   "auxinput5_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer auxinput5_begin_s   namelist,time_control	max_domains    0     h   "auxinput5_begin_s"    ""   "SECONDS from start of run"
-
-rconfig  integer restart_begin_y  namelist,time_control		1              0     h   "restart_begin_y"    ""   "YEARS from start of run"
-rconfig  integer restart_begin_mo  namelist,time_control	1              0     h   "restart_begin_mo"    ""   "MONTHS from start of run"
-rconfig  integer restart_begin_d   namelist,time_control	1              0     h   "restart_begin_d"    ""   "DAYS from start of run"
-rconfig  integer restart_begin_h   namelist,time_control	1              0     h   "restart_begin_h"    ""   "HOURS from start of run"
-rconfig  integer restart_begin_m   namelist,time_control	1              0     h   "restart_begin_m"    ""   "MINUTES from start of run"
-rconfig  integer restart_begin_s   namelist,time_control	1              0     h   "restart_begin_s"    ""   "SECONDS from start of run"
-
-rconfig integer history_end_y      namelist,time_control	max_domains    0    h  "history_end_y"       ""      "YEARS from start of run"
-rconfig integer history_end_mo     namelist,time_control	max_domains    0    h  "history_end_mo"       ""      "MONTHS from start of run"
-rconfig integer history_end_d      namelist,time_control	max_domains    0    h  "history_end_d"       ""      "DAYS from start of run"
-rconfig integer history_end_h      namelist,time_control	max_domains    0    h  "history_end_h"       ""      "HOURS from start of run"
-rconfig integer history_end_m      namelist,time_control	max_domains    0    h  "history_end_m"       ""      "MINUTES from start of run"
-rconfig integer history_end_s      namelist,time_control	max_domains    0    h  "history_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer inputout_end_y      namelist,time_control     max_domains    0    h  "inputout_end_y"       ""      "YEARS from start of run"
-rconfig integer inputout_end_mo      namelist,time_control     max_domains    0    h  "inputout_end_mo"       ""      "MONTHS from start of run"
-rconfig integer inputout_end_d      namelist,time_control     max_domains    0    h  "inputout_end_d"       ""      "DAYS from start of run"
-rconfig integer inputout_end_h      namelist,time_control     max_domains    0    h  "inputout_end_h"       ""      "HOURS from start of run"
-rconfig integer inputout_end_m      namelist,time_control     max_domains    0    h  "inputout_end_m"       ""      "MINUTES from start of run"
-rconfig integer inputout_end_s      namelist,time_control     max_domains    0    h  "inputout_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxhist1_end_y      namelist,time_control     max_domains    0    h  "auxhist1_end_y"       ""      "YEARS from start of run"
-rconfig integer auxhist1_end_mo      namelist,time_control     max_domains    0    h  "auxhist1_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxhist1_end_d      namelist,time_control     max_domains    0    h  "auxhist1_end_d"       ""      "DAYS from start of run"
-rconfig integer auxhist1_end_h      namelist,time_control     max_domains    0    h  "auxhist1_end_h"       ""      "HOURS from start of run"
-rconfig integer auxhist1_end_m      namelist,time_control     max_domains    0    h  "auxhist1_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxhist1_end_s      namelist,time_control     max_domains    0    h  "auxhist1_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxhist2_end_y      namelist,time_control     max_domains    0    h  "auxhist2_end_y"       ""      "YEARS from start of run"
-rconfig integer auxhist2_end_mo      namelist,time_control     max_domains    0    h  "auxhist2_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxhist2_end_d      namelist,time_control     max_domains    0    h  "auxhist2_end_d"       ""      "DAYS from start of run"
-rconfig integer auxhist2_end_h      namelist,time_control     max_domains    0    h  "auxhist2_end_h"       ""      "HOURS from start of run"
-rconfig integer auxhist2_end_m      namelist,time_control     max_domains    0    h  "auxhist2_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxhist2_end_s      namelist,time_control     max_domains    0    h  "auxhist2_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxhist3_end_y      namelist,time_control     max_domains    0    h  "auxhist3_end_y"       ""      "YEARS from start of run"
-rconfig integer auxhist3_end_mo      namelist,time_control     max_domains    0    h  "auxhist3_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxhist3_end_d      namelist,time_control     max_domains    0    h  "auxhist3_end_d"       ""      "DAYS from start of run"
-rconfig integer auxhist3_end_h      namelist,time_control     max_domains    0    h  "auxhist3_end_h"       ""      "HOURS from start of run"
-rconfig integer auxhist3_end_m      namelist,time_control     max_domains    0    h  "auxhist3_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxhist3_end_s      namelist,time_control     max_domains    0    h  "auxhist3_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxhist4_end_y     namelist,time_control     max_domains    0    h  "auxhist4_end_y"       ""      "YEARS from start of run"
-rconfig integer auxhist4_end_mo     namelist,time_control     max_domains    0    h  "auxhist4_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxhist4_end_d      namelist,time_control     max_domains    0    h  "auxhist4_end_d"       ""      "DAYS from start of run"
-rconfig integer auxhist4_end_h      namelist,time_control     max_domains    0    h  "auxhist4_end_h"       ""      "HOURS from start of run"
-rconfig integer auxhist4_end_m      namelist,time_control     max_domains    0    h  "auxhist4_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxhist4_end_s      namelist,time_control     max_domains    0    h  "auxhist4_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxhist5_end_y     namelist,time_control     max_domains    0    h  "auxhist5_end_y"       ""      "YEARS from start of run"
-rconfig integer auxhist5_end_mo     namelist,time_control     max_domains    0    h  "auxhist5_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxhist5_end_d      namelist,time_control     max_domains    0    h  "auxhist5_end_d"       ""      "DAYS from start of run"
-rconfig integer auxhist5_end_h      namelist,time_control     max_domains    0    h  "auxhist5_end_h"       ""      "HOURS from start of run"
-rconfig integer auxhist5_end_m      namelist,time_control     max_domains    0    h  "auxhist5_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxhist5_end_s      namelist,time_control     max_domains    0    h  "auxhist5_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxinput1_end_y     namelist,time_control     max_domains    0    h  "auxinput1_end_y"       ""      "YEARS from start of run"
-rconfig integer auxinput1_end_mo     namelist,time_control     max_domains    0    h  "auxinput1_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxinput1_end_d      namelist,time_control     max_domains    0    h  "auxinput1_end_d"       ""      "DAYS from start of run"
-rconfig integer auxinput1_end_h      namelist,time_control     max_domains    0    h  "auxinput1_end_h"       ""      "HOURS from start of run"
-rconfig integer auxinput1_end_m      namelist,time_control     max_domains    0    h  "auxinput1_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxinput1_end_s      namelist,time_control     max_domains    0    h  "auxinput1_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxinput2_end_y     namelist,time_control     max_domains    0    h  "auxinput2_end_y"       ""      "YEARS from start of run"
-rconfig integer auxinput2_end_mo     namelist,time_control     max_domains    0    h  "auxinput2_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxinput2_end_d      namelist,time_control     max_domains    0    h  "auxinput2_end_d"       ""      "DAYS from start of run"
-rconfig integer auxinput2_end_h      namelist,time_control     max_domains    0    h  "auxinput2_end_h"       ""      "HOURS from start of run"
-rconfig integer auxinput2_end_m      namelist,time_control     max_domains    0    h  "auxinput2_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxinput2_end_s      namelist,time_control     max_domains    0    h  "auxinput2_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxinput3_end_y     namelist,time_control     max_domains    0    h  "auxinput3_end_y"       ""      "YEARS from start of run"
-rconfig integer auxinput3_end_mo     namelist,time_control     max_domains    0    h  "auxinput3_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxinput3_end_d      namelist,time_control     max_domains    0    h  "auxinput3_end_d"       ""      "DAYS from start of run"
-rconfig integer auxinput3_end_h      namelist,time_control     max_domains    0    h  "auxinput3_end_h"       ""      "HOURS from start of run"
-rconfig integer auxinput3_end_m      namelist,time_control     max_domains    0    h  "auxinput3_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxinput3_end_s      namelist,time_control     max_domains    0    h  "auxinput3_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxinput4_end_y     namelist,time_control     max_domains    0    h  "auxinput4_end_y"       ""      "YEARS from start of run"
-rconfig integer auxinput4_end_mo     namelist,time_control     max_domains    0    h  "auxinput4_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxinput4_end_d      namelist,time_control     max_domains    0    h  "auxinput4_end_d"       ""      "DAYS from start of run"
-rconfig integer auxinput4_end_h      namelist,time_control     max_domains    0    h  "auxinput4_end_h"       ""      "HOURS from start of run"
-rconfig integer auxinput4_end_m      namelist,time_control     max_domains    0    h  "auxinput4_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxinput4_end_s      namelist,time_control     max_domains    0    h  "auxinput4_end_s"       ""      "SECONDS from start of run"
-
-rconfig integer auxinput5_end_y     namelist,time_control     max_domains    0    h  "auxinput5_end_y"       ""      "YEARS from start of run"
-rconfig integer auxinput5_end_mo     namelist,time_control     max_domains    0    h  "auxinput5_end_mo"       ""      "MONTHS from start of run"
-rconfig integer auxinput5_end_d      namelist,time_control     max_domains    0    h  "auxinput5_end_d"       ""      "DAYS from start of run"
-rconfig integer auxinput5_end_h      namelist,time_control     max_domains    0    h  "auxinput5_end_h"       ""      "HOURS from start of run"
-rconfig integer auxinput5_end_m      namelist,time_control     max_domains    0    h  "auxinput5_end_m"       ""      "MINUTES from start of run"
-rconfig integer auxinput5_end_s      namelist,time_control     max_domains    0    h  "auxinput5_end_s"       ""      "SECONDS from start of run"
-
-rconfig   integer     io_form_auxinput1   namelist,time_control		1              2       h        "io_form_auxinput1"                 ""      ""
-rconfig   integer     io_form_auxinput2   namelist,time_control		1              2       h        "io_form_auxinput2"                 ""      ""
-rconfig   integer     io_form_auxinput3   namelist,time_control		1              2       h        "io_form_auxinput3"                 ""      ""
-rconfig   integer     io_form_auxinput4   namelist,time_control		1              2       h        "io_form_auxinput4"                 ""      ""
-rconfig   integer     io_form_auxinput5   namelist,time_control		1              2       h        "io_form_auxinput5"                 ""      ""
-rconfig   integer     io_form_auxhist1    namelist,time_control		1              2       h        "io_form_auxhist1"               ""      ""
-rconfig   integer     io_form_auxhist2    namelist,time_control		1              2       h        "io_form_auxhist2"               ""      ""
-rconfig   integer     io_form_auxhist3    namelist,time_control		1              2       h        "io_form_auxhist3"               ""      ""
-rconfig   integer     io_form_auxhist4    namelist,time_control		1              2       h        "io_form_auxhist4"               ""      ""
-rconfig   integer     io_form_auxhist5    namelist,time_control		1              2       h        "io_form_auxhist5"               ""      ""
+include registry.io_boilerplate
 
 rconfig   integer JULYR                   namelist,time_control		max_domains    0       h    "JULYR"                 ""      ""
 rconfig   integer JULDAY                  namelist,time_control		max_domains    1       h    "JULDAY"                ""      ""
@@ -1224,10 +897,10 @@ rconfig   real      max_dz          namelist,domains    1               1000.
 rconfig   integer     mp_physics          namelist,physics	max_domains    3       rh       "mp_physics"            ""      ""
 rconfig   integer     ra_lw_physics       namelist,physics	max_domains    1       rh       "ra_lw_physics"         ""      ""
 rconfig   integer     ra_sw_physics       namelist,physics	max_domains    1       rh       "ra_sw_physics"         ""      ""
-rconfig   real    radt                    namelist,physics	max_domains    10      h    "RADT"          ""      ""
+rconfig   real    radt                    namelist,physics	max_domains    15      h    "RADT"          ""      ""
 rconfig   integer     sf_sfclay_physics   namelist,physics	max_domains    1       rh       "sf_sfclay_physics"             ""      ""
 rconfig   integer     sf_surface_physics  namelist,physics	max_domains    1       rh       "sf_surface_physics"            ""      ""
-rconfig   integer     bl_pbl_physics      namelist,physics	max_domains    1       rh       "bl_pbl_physics"                ""      ""
+rconfig   integer     bl_pbl_physics      namelist,physics	max_domains    2       rh       "bl_pbl_physics"                ""      ""
 rconfig   real    BLDT                    namelist,physics	max_domains    0       h    "BLDT"          ""      ""
 rconfig   integer     cu_physics          namelist,physics	max_domains    1       rh       "cu_physics"            ""      ""
 rconfig   real    CUDT                    namelist,physics	max_domains    5       h    "CUDT"          ""      ""
@@ -1237,17 +910,17 @@ rconfig   integer IFSNOW                  namelist,physics	1             0      
 rconfig   integer ICLOUD                  namelist,physics	1             1       irh    "ICLOUD"                        ""      ""
 rconfig   real    swrad_scat              namelist,physics	1             1       irh    "SWRAD_SCAT" "SCATTERING FACTOR IN SWRAD"      ""
 rconfig   integer surface_input_source    namelist,physics	1             1       irh    "surface_input_source"          "1=static (fractional), 2=time dependent (dominant), 3=hybrid (not yet implemented)"      ""
-rconfig   integer num_soil_layers         namelist,physics	1             5       irh    "num_soil_layers"               ""      ""
+rconfig   integer num_soil_layers         namelist,physics	1             4       irh    "num_soil_layers"               ""      ""
 rconfig   integer num_months              namelist,physics      1            12       irh    "num_months"               ""      ""
 rconfig   integer maxiens                 namelist,physics	1             1       irh    "maxiens"                    ""      ""
 rconfig   integer maxens                  namelist,physics	1             3       irh    "maxens"                    ""      ""
 rconfig   integer maxens2                 namelist,physics	1             3       irh    "maxens2"                    ""      ""
 rconfig   integer maxens3                 namelist,physics	1            16       irh    "maxens3"                    ""      ""
-rconfig   integer ensdim                  namelist,physics	1            3        irh    "ensdim"                    ""      ""
+rconfig   integer ensdim                  namelist,physics	1            144        irh    "ensdim"                    ""      ""
 rconfig   integer     chem_opt            namelist,physics	max_domains    0       rh       "chem_opt"              ""      ""
 rconfig   integer num_land_cat            namelist,physics	1            24       -      "num_land_cat"                  ""      ""
 rconfig   integer num_soil_cat            namelist,physics	1            16       -      "num_soil_cat"                  ""      ""
-rconfig   integer mp_zero_out             namelist,physics	1             0       -      "mp_zero_out"  "microphysics fields set to zero  0=no action taken, 1=all fields but Qv, 2=all fields including Qv"      "flag"
+rconfig   integer mp_zero_out             namelist,physics	1             2       -      "mp_zero_out"  "microphysics fields set to zero  0=no action taken, 1=all fields but Qv, 2=all fields including Qv"      "flag"
 rconfig   real mp_zero_out_thresh         namelist,physics	1          1.e-8      -      "mp_zero_out_thresh"  "minimum threshold for non-Qv moist fields, below are set to zero"  "kg/kg"
 rconfig   real    seaice_threshold        namelist,physics	1            271       h    "seaice_threshold"  "tsk below which which water points are set to sea ice for slab scheme"   "K"
 rconfig   integer sst_update              namelist,physics	1            0         h    "sst_update"  "update sst from wrflowinp file  0=no, 1=yes"   ""
@@ -1259,16 +932,58 @@ rconfig   integer paerlev                 namelist,physics      1             1 
 rconfig   integer cam_abs_dim1            namelist,physics      1             1       -      "cam_abs_dim1" "dimension for absnxt in CAM radiation"  ""
 rconfig   integer cam_abs_dim2            namelist,physics      1             1       -      "cam_abs_dim2" "dimension for abstot in CAM radiation"  ""
 
+#FDDA namelist parameters
+rconfig   real    FGDT                    namelist,fdda         max_domains    0       h        "FGDT"          ""      ""
+rconfig   integer  grid_fdda              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_uv   namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_t    namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_no_pbl_nudging_q    namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_uv             namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_uv             namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_t              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_t              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer  if_zfac_q              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   integer   k_zfac_q              namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        guv                 namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        gt                  namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real        gq                  namelist,fdda         max_domains    0       rh       "grid_fdda"            ""      ""
+rconfig   real    dtramp_min              namelist,fdda         1              0       h        "grid_fdda"            ""      ""
+rconfig   integer if_ramping              namelist,fdda         1              0       h        "grid_fdda"            ""      ""
+
+#Observational Nudging
+rconfig   integer     obs_nudge_opt       namelist,fdda            max_domains    0       rh       "obs_nudge_opt"     "Obs-nudging flag for domain"   ""
+rconfig   integer     max_obs             namelist,fdda            1              0       h        "max_obs"           "Maximum number of observations"   ""
+rconfig   integer     nobs_ndg_vars       namelist,fdda            1              0       h        "num_ndg_vars"      "Number of nudging variables"   ""
+rconfig   integer     nobs_err_flds       namelist,fdda            1              0       h        "num_err_flds"      "Number of error fields"   ""
+rconfig   real        fdda_start          namelist,fdda            max_domains    0       rh       "fdda_start"        "Nudging start time for domain"   "min"
+rconfig   real        fdda_end            namelist,fdda            max_domains    0       rh       "fdda_end"          "Nudging end time for domain"   "min"
+rconfig   integer     obs_nudge_wind      namelist,fdda            max_domains    0       rh       "obs_nudge_wind"    "Wind-nudging flag for domain"   ""
+rconfig   real        obs_coef_wind       namelist,fdda            max_domains    0       rh       "obs_coef_wind"     "Wind-nudging coeficient for domain"   "s-1"
+rconfig   integer     obs_nudge_temp      namelist,fdda            max_domains    0       rh       "obs_nudge_temp"    "Temperature-nudging flag for domain"  ""
+rconfig   real        obs_coef_temp       namelist,fdda            max_domains    0       rh       "obs_coef_temp"     "Temperature-nudging coef for domain"  "s-1"
+rconfig   integer     obs_nudge_mois      namelist,fdda            max_domains    0       rh       "obs_nudge_mois"    "Moisture-nudging flag for domain"   ""
+rconfig   real        obs_coef_mois       namelist,fdda            max_domains    0       rh       "obs_coef_mois"     "Moisture-nudging coef for domain"   "s-1"
+rconfig   integer     obs_nudge_pstr      namelist,fdda            max_domains    0       rh       "obs_nudge_pstr"    "Not used"   ""
+rconfig   real        obs_coef_pstr       namelist,fdda            max_domains    0       rh       "obs_coef_pstr"     "Not used"   ""
+rconfig   real        obs_rinxy           namelist,fdda            max_domains    0       rh       "obs_rinxy"         "Horizontal radius of influence"   "km"
+rconfig   real        obs_rinsig          namelist,fdda            1              0       h        "obs_rinsig"        "Vertical radius of influence"   "sigma"
+rconfig   real        obs_twindo          namelist,fdda            1              0       h        "obs_twindo"        "Half-period time window for nudging"  "min"
+rconfig   integer     obs_npfi            namelist,fdda            1              0       h        "obs_npfi"          "Freq in cg timesteps for diag print"  ""
+rconfig   integer     obs_ionf            namelist,fdda            1              0       h        "obs_ionf"          "Freq in cg timesteps for obs input and error calc"   ""
+rconfig   integer     obs_idynin          namelist,fdda            1              0       h        "obs_idynin"        "Flag for dynamic initialization"   ""
+rconfig   real        obs_dtramp          namelist,fdda            1              0       h        "obs_dtramp"        "Time period for ramping (idynin)"   "min"
+rconfig   logical     obs_ipf_in4dob      namelist,fdda            1              .false. h        "obs_ipf_in4dob"    "Print obs input diagnostics"   "min"rconfig   logical     obs_ipf_errob       namelist,fdda            1              .false. h        "obs_ipf_errob"     "Print obs error diagnostics"   "min"rconfig   logical     obs_ipf_nudob       namelist,fdda            1              .false. h        "obs_ipf_nudob"     "Print obs nudge diagnostics"   "min"
+
 # Dynamics
 # dynamics option (see package definitions, below)
 rconfig   integer dyn_opt                 namelist,dynamics	1             2       irh   "dyn_opt"               ""      ""
 rconfig   integer rk_ord                  namelist,dynamics	1             3       irh   "rk_order"               ""      ""
-rconfig   integer w_damping               namelist,dynamics	1             0       irh    "w_damping"             ""      ""
-rconfig   integer diff_opt                namelist,dynamics	1             0       irh    "diff_opt"              ""      ""
-rconfig   integer km_opt                  namelist,dynamics	1             1       irh    "km_opt"                ""      ""
+rconfig   integer w_damping               namelist,dynamics	1             1       irh    "w_damping"             ""      ""
+rconfig   integer diff_opt                namelist,dynamics	1             1       irh    "diff_opt"              ""      ""
+rconfig   integer km_opt                  namelist,dynamics	1             4       irh    "km_opt"                ""      ""
 rconfig   integer damp_opt                namelist,dynamics	1             0       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
-rconfig   real    dampcoef                namelist,dynamics     max_domains    0.01     h    "dampcoef"              ""      ""
+rconfig   real    dampcoef                namelist,dynamics     max_domains    0.0     h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
 rconfig   real    diff_6th_rate           namelist,dynamics     max_domains    0.12    h    "diff_6th_rate" "rate 6th-order numerical diffusion"
@@ -1277,11 +992,11 @@ rconfig   real    smdiv                   namelist,dynamics	max_domains    0.1  
 rconfig   real    emdiv                   namelist,dynamics	max_domains    0.01    h    "emdiv"         ""      ""
 rconfig   real    epssm                   namelist,dynamics	max_domains    0.1     h    "epssm"         ""      ""
 rconfig   logical non_hydrostatic         namelist,dynamics	max_domains  .true.   irh  "non_hydrostatic"    ""   ""
-rconfig   integer time_step_sound         namelist,dynamics	max_domains    0       h     "time_step_sound"               ""      ""
+rconfig   integer time_step_sound         namelist,dynamics	max_domains    4       h     "time_step_sound"               ""      ""
 rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    5       rh       "h_mom_adv_order"               ""      ""
-rconfig   integer     v_mom_adv_order     namelist,dynamics	max_domains    5       rh       "v_mom_adv_order"               ""      ""
+rconfig   integer     v_mom_adv_order     namelist,dynamics	max_domains    3       rh       "v_mom_adv_order"               ""      ""
 rconfig   integer     h_sca_adv_order     namelist,dynamics	max_domains    5       rh       "h_sca_adv_order"               ""      ""
-rconfig   integer     v_sca_adv_order     namelist,dynamics	max_domains    5       rh       "v_sca_adv_order"               ""      ""
+rconfig   integer     v_sca_adv_order     namelist,dynamics	max_domains    3       rh       "v_sca_adv_order"               ""      ""
 rconfig   logical top_radiation           namelist,dynamics	max_domains    .false. rh    "top_radiation"         ""      ""
 rconfig   real    mix_cr_len              namelist,dynamics	max_domains    200.    h    "mix_cr_len"            ""      ""
 rconfig   real    tke_upper_bound         namelist,dynamics	max_domains    1000.   h    "tke_upper_bound"            ""      ""
@@ -1346,21 +1061,24 @@ rconfig   integer simulation_start_minute derived                  1            
 rconfig   integer simulation_start_second derived                  1              0       -        "simulation_start_second" "start of simulation through restarts" "2-digit second"
 
 rconfig   character model_type            namelist,record1         1              "WRF"   -       "model_type"       "model_type"       "TBD"
-rconfig   character documentation_url     namelist,record1         1              "http://box.mmm.ucar.edu/people/bray/wrfvar/html" - "TBD" "TBD" "TBD"
+rconfig   character documentation_url     namelist,record1         1              "unknown" - "TBD" "TBD" "TBD"
 rconfig   logical write_increments        namelist,record1         1              .false. -       "write_increments" "write_increments" "T/F"
 rconfig   logical var4d                   namelist,record1         1              .false. -       "var4d"            "var4d"            "T/F"
 rconfig   integer var4d_coupling          namelist,record1         1              1       -       "var4d_coupling"   "var4d_coupling"           "1-2"
 rconfig   logical global                  namelist,record1         1              .false. -       "global"           "global"           "T/F"
 rconfig   integer stdout                  namelist,record1         1              6       -       "stdout"           "stdout"           "1-100"
 rconfig   integer stderr                  namelist,record1         1              0       -       "stderr"           "stderr"           "1-100"
-rconfig   integer trace_unit              namelist,record1         1              100     -       "trace_unit"       "trace_unit"       "1-100"
+rconfig   integer trace_unit              namelist,record1         1              7       -       "trace_unit"       "trace_unit"       "1-100"
 rconfig   integer trace_pe                namelist,record1         1              0       -       "trace_pe"         "trace_pe"         "1-100"
 rconfig   integer trace_repeat_head       namelist,record1         1              10      -       "trace_repeat_head"         "trace_repeat_head"         "1-100"
 rconfig   integer trace_repeat_body       namelist,record1         1              10      -       "trace_repeat_body"         "trace_repeat_body"         "1-100"
 rconfig   integer trace_max_depth         namelist,record1         1              30      -       "trace_max_depth"               "trace_max_depth"         "1-100"
 rconfig   logical trace_use               namelist,record1         1              .true.  -       "trace_use"        "trace_use"        "T/F"
+rconfig   logical trace_use_frequent      namelist,record1         1              .false.  -       "trace_use_frequent" "trace_use_frequent"        "T/F"
 rconfig   logical trace_memory            namelist,record1         1              .true.  -       "trace_memory"     "trace_memory"     "T/F"
 rconfig   logical trace_all_pes           namelist,record1         1              .false. -       "trace_all_pes"    "trace_all_pes"    "T/F"
+rconfig   logical trace_csv               namelist,record1         1              .false. -       "trace_csv"        "trace_csv"        "T/F"
+rconfig   logical oi_use                  namelist,record1         1              .true.  -       "oi_use"           "oi_use"        "T/F"
 rconfig   logical print_detail_airep      namelist,record1         1              .false. -       "print_detail_airep" "print_detail_airep"    "T/F"
 rconfig   logical print_detail_radar      namelist,record1         1              .false. -       "print_detail_radar" "print_detail_radar"    "T/F"
 rconfig   logical print_detail_radiance   namelist,record1         1              .false. -       "print_detail_radiance" "print_detail_radiance"    "T/F"
@@ -1368,7 +1086,6 @@ rconfig   logical print_detail_xa         namelist,record1         1            
 rconfig   logical print_detail_xb         namelist,record1         1              .false. -       "print_detail_xb" "print_detail_xb"    "T/F"
 rconfig   logical print_detail_obs        namelist,record1         1              .false. -       "print_detail_obs" "print_detail_obs"    "T/F"
 rconfig   logical print_detail_f_obs      namelist,record1         1              .false. -       "print_detail_f_obs" "print_detail_f_obs"    "T/F"
-rconfig   logical print_detail_mm5        namelist,record1         1              .false. -       "print_detail_mm5" "print_detail_mm5"    "T/F"
 rconfig   logical print_detail_map        namelist,record1         1              .false. -       "print_detail_map" "print_detail_map"    "T/F"
 rconfig   logical print_detail_grad       namelist,record1         1              .false. -       "print_detail_grad" "print_detail_grad"   "T/F"
 rconfig   logical print_detail_regression namelist,record1         1              .false. -       "print_detail_regression" "print_detail_regression"   "T/F"
@@ -1377,8 +1094,10 @@ rconfig   logical print_detail_testing    namelist,record1         1            
 rconfig   logical print_detail_parallel   namelist,record1         1              .false. -       "print_detail_parallel" "print_detail_parallel"   "T/F"
 rconfig   logical print_detail_be         namelist,record1         1              .false. -       "print_detail_be"   "print_detail_be"  "T/F"
 rconfig   logical print_detail_timing     namelist,record1         1              .false. -       "print_detail_timing"   "print_detail_timing"  "T/F"
+rconfig   logical check_max_iv_print      namelist,record1         1              .true. -        "check_max_iv_print"   "check_max_iv_print"  "T/F"
 rconfig   logical use_html                namelist,record1         1              .true. -        "use_html"              "use_html"             "T/F"
 rconfig   logical obs_jrb                 namelist,record1         1              .false. -       "obs_jrb"           "obs_jrb"          "T/F"
+rconfig   logical warnings_are_fatal      namelist,record1         1              .false. -       "warnings_are_fatal" "warnings_are_fatal"          "T/F"
 
 rconfig   character analysis_type         namelist,record2         1              "3D-VAR" -       "TBD"              "TBD"              "3D-PSAS or 3D-VAR"
 rconfig   character analysis_date         namelist,record2         1 "2002-08-03_00:00:00.0000" -  "TBD"              "TBD"              "CCYY-MM-DD_HH:MM:SS.ssss"
@@ -1392,7 +1111,7 @@ rconfig   logical   write_qsn             namelist,record2         1            
 rconfig   logical   write_qgr             namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"             
 rconfig   logical   write_filtered_obs    namelist,record2         1              .FALSE.  -       "TBD"              "TBD"              "TBD"             
 
-rconfig   integer   fg_format             namelist,record3         1              1        -       "TBD"              "TBD"                      "1=WRF, 2=MM5"
+rconfig   integer   fg_format             namelist,record3         1              1        -       "TBD"              "TBD"                      "1=WRF, 3=KMA"
 rconfig   integer   ob_format             namelist,record3         1              2        -       "TBD"              "TBD"                       "1=BFR,2=ASCI I"
 rconfig   integer   num_fgat_time         namelist,record3         1              1        -       "TBD"              "number of FGAT time level" "TBD"
 rconfig   character time_window_min       namelist,record3         1 "2002-08-02_21:00:00.0000" -  "TBD"              "TBD"              "CCYY-MM-DD_HH:MM:SS.ssss"
@@ -1462,10 +1181,11 @@ rconfig   integer   max_ssmt2_input       namelist,record4         1            
 rconfig   integer   max_qscat_input       namelist,record4         1              50000    -       "TBD"              "TBD"              "TBD"
 rconfig   integer   max_gpsref_input      namelist,record4         1              800000   -       "TBD"              "TBD"              "TBD"
 rconfig   integer   max_airsret_input     namelist,record4         1              100000   -       "TBD"              "TBD"              "TBD"
+rconfig   integer   max_tovs_input        namelist,record4         1              100000   -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_start          namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"
 rconfig   integer   report_end            namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
-rconfig   integer   max_num_rad           namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
-
+rconfig   integer   tovs_start            namelist,record4         1              1        -       "TBD"              "TBD"              "TBD"
+rconfig   integer   tovs_end              namelist,record4         1              10000000 -       "TBD"              "TBD"              "TBD"
 rconfig   integer   time_window           namelist,record5         1              3.       -       "TBD"              "TBD"              "TBD"
 
 rconfig   integer   max_ext_its           namelist,record6         1              1        -       "TBD"              "TBD"              "TBD"
@@ -1481,11 +1201,11 @@ rconfig   real      var_scaling2          namelist,record7         1            
 rconfig   real      var_scaling3          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
 rconfig   real      var_scaling4          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
 rconfig   real      var_scaling5          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
-rconfig   real      len_scaling1          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
-rconfig   real      len_scaling2          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
-rconfig   real      len_scaling3          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
-rconfig   real      len_scaling4          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
-rconfig   real      len_scaling5          namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
+rconfig   real      len_scaling1          namelist,record7         1              0.5      -       "TBD"              "TBD"              "TBD"
+rconfig   real      len_scaling2          namelist,record7         1              0.5      -       "TBD"              "TBD"              "TBD"
+rconfig   real      len_scaling3          namelist,record7         1              0.5      -       "TBD"              "TBD"              "TBD"
+rconfig   real      len_scaling4          namelist,record7         1              0.5      -       "TBD"              "TBD"              "TBD"
+rconfig   real      len_scaling5          namelist,record7         1              0.5      -       "TBD"              "TBD"              "TBD"
 rconfig   real      jb_factor             namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
 rconfig   real      je_factor             namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
 rconfig   real      power_truncation      namelist,record7         1              1.0      -       "TBD"              "TBD"              "TBD"
@@ -1533,23 +1253,21 @@ rconfig   integer   rtminit_nsensor       namelist,record14        1            
 rconfig   integer   rtminit_platform      namelist,record14        30             -1           -   "TBD"              "TBD"              "TBD"
 rconfig   integer   rtminit_satid         namelist,record14        30             -1.0         -   "TBD"              "TBD"              "TBD"
 rconfig   integer   rtminit_sensor        namelist,record14        30             -1.0         -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lread_biascoef        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lbiascorr             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lbiasprep             namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lrttov_scatt          namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lmonitoring           namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lwrite_profile        namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lqc_rad               namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lwrite_iv_rad_ascii   namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lwrite_oa_rad_ascii   namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
-rconfig   logical   lwrite_filtered_rad   namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   read_biascoef         namelist,record14        1              .true.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   biascorr              namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   biasprep              namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   rttov_scatt           namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   monitoring            namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   write_profile         namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   qc_rad                namelist,record14        1              .true.       -   "TBD"              "TBD"              "TBD"
+rconfig   logical   write_iv_rad_ascii    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   write_oa_rad_ascii    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
+rconfig   logical   write_filtered_rad    namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   use_error_factor_rad  namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   use_landem            namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   integer   mw_emis_sea           namelist,record14        1              1            -   "TBD"              "TBD"              "TBD"
-rconfig   logical   tovs_redistribute     namelist,record14        1              .false.      -   "tovs_redistribute" "TBD"              "TBD"
 rconfig   integer   tovs_min_transfer     namelist,record14        1              10           -   "tovs_min_transfer" "Minimum number of tovs worth relocating" "n/a"
 rconfig   integer   tovs_max_transfer     namelist,record14        1              10           -   "tovs_max_transfer" "Maximum number of tovs in a transfer" "n/a"
-rconfig   logical   tovs_use_array        namelist,record14        1              .false.      -   "tovs_use_array" "TBD"              "TBD"
 
 rconfig   integer   num_pseudo            namelist,pseudo_ob_nl    1              0            -   "TBD"              "TBD"              "TBD"
 rconfig   real      pseudo_x              namelist,pseudo_ob_nl    1              1.0          -   "TBD"              "TBD"              "TBD"
@@ -1637,6 +1355,7 @@ package   io_esmf     io_form_restart==7                     -             -
 package   io_yyy      io_form_restart==8                     -             -
 package   io_zzz      io_form_restart==9                     -             -
 package   io_grib2    io_form_restart==10                    -             -
+package   io_pnetcdf  io_form_restart==11                     -             -
                                                 
 #---------------------------------------------------------------------------------------------------------------------------------------
 ## communications                                               
@@ -1654,14 +1373,16 @@ halo      HALO_EM_VINTERP_UV_1 dyn_em 8:pd_gc,pb
 halo      HALO_EM_A dyn_em  8:ru,rv,rw,ww,php,alt,al,p,muu,muv,mut
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
 halo      HALO_EM_PHYS_PBL dyn_em        4:rublten,rvblten
-halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
+#halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
+halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
 halo      HALO_EM_TKE_ADVECT_3 dyn_em 24:tke_2
 halo      HALO_EM_TKE_ADVECT_5 dyn_em 48:tke_2
 halo      HALO_EM_TKE_A dyn_em 4:ph_2,phb
 halo      HALO_EM_TKE_B dyn_em 4:z,rdz,rdzw,zx,zy
 halo      HALO_EM_TKE_C dyn_em 8:u_2,v_2,z,zx,zy,rdz,rdzw
-halo      HALO_EM_TKE_D dyn_em 8:defor11,defor22,defor33,defor12,defor13,defor23,div
-halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,moist
+#halo      HALO_EM_TKE_D dyn_em 8:defor11,defor22,defor33,defor12,defor13,defor23,div
+#halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,moist
+halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,moist
 halo      HALO_EM_TKE_3 dyn_em   24:tke_1,tke_2
 halo      HALO_EM_TKE_5 dyn_em   48:tke_1,tke_2
 halo      HALO_EM_TKE_F dyn_em   48:tke_1,tke_2
@@ -1700,7 +1421,8 @@ period    PERIOD_BDY_EM_MOIST dyn_em 3:moist
 period    PERIOD_BDY_EM_SCALAR dyn_em 3:scalar
 period    PERIOD_BDY_EM_A dyn_em 2:ru,rv,rw,ww,php,alt,p,muu,muv,mut,ph_2
 period    PERIOD_BDY_EM_A1  dyn_em 3:rdzw,rdz,z,zx,zy
-period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2
+#period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2
+period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,tke_2
 period    PERIOD_BDY_EM_B dyn_em 2:ru_tend,rv_tend,ph_2,al,p,t_1,t_save,u_save,v_save,mu_1,mu_2,mudf,php,alt,pb
 period    PERIOD_BDY_EM_B3 dyn_em 2:ph_2,al,p,mu_2,muts,mudf
 period    PERIOD_BDY_EM_B2 dyn_em 2:ru_tend,rv_tend
@@ -2047,3 +1769,42 @@ state xpose_type xp - -
 
 ##
 
+# FDDA (Observational-nudging) Variables
+typedef fdob_type integer domain_tot   # total number of domains to apply obs-nudging
+typedef fdob_type integer domain_init  # domain initialization flag
+typedef fdob_type integer IEODI        # end of obs data flag for current model step
+typedef fdob_type integer IWTSIG       # flag for nudging on pressure surfaces
+typedef fdob_type integer NSTAT        # number of obs stations used to nudge current model step
+typedef fdob_type integer KTAUR        # restart model step
+typedef fdob_type integer SN_MAXCG     # coarse domain grid dimension in south-north coordinate
+typedef fdob_type integer WE_MAXCG     # coarse domain grid dimension in west-east coordinate
+typedef fdob_type integer SN_END       # ending north-south grid index
+typedef fdob_type integer LEVIDN(max_domains)   # level of nest
+typedef fdob_type real    DS_CG        # coarse domain grid size
+typedef fdob_type real    WINDOW       # time window half-period for nudging (in minutes)
+typedef fdob_type real    RTLAST       # time in hours of last obs used in current model step
+typedef fdob_type real    DATEND       # time in minutes after which data are asuumed to have ended
+typedef fdob_type real    RINFMN       # minimum radius of influence
+typedef fdob_type real    RINFMX       # maximum radius of influence
+typedef fdob_type real    PFREE        # pressure level (cb) where terrain effect becomes small
+typedef fdob_type real    DCON         # 1/DPSMX
+typedef fdob_type real    DPSMX        # max pres change (cb) allowed within infl range of surf obs
+typedef fdob_type real    TFACI        # scale factor used for ramp-down in dynamic initialization
+typedef fdob_type real    XN           # cone factor for Lambert projection
+
+# table entries are of the form
+#      <Table>  <Type>  <Sym>                <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
+#Grid variables
+typedef fdob_type real    varobs               nz       -         1        -       -       "varobs"          "observational values in each variable"
+typedef fdob_type real    errf                 hz       -         1        -       -       "errf"            "errors between model and obs values"
+typedef fdob_type real    timeob               z        -         1        -       -       "timeob"          "model times for each observation"          "hours"
+typedef fdob_type real    nlevs_ob             z        -         1        -       -       "nlevs_ob"        "numbers of levels in sounding obs"
+typedef fdob_type real    lev_in_ob            z        -         1        -       -       "lev_in_ob"       "level in sounding-type obs"
+typedef fdob_type real    plfo                 z        -         1        -       -       "plfo"            "index for type of obs-platform"
+typedef fdob_type real    elevob               z        -         1        -       -       "elevob"          "elevation of observation"                  "meters"
+typedef fdob_type real    rio                  z        -         1        -       -       "rio"             "west-east grid coordinate"
+typedef fdob_type real    rjo                  z        -         1        -       -       "rjo"             "south-north grid coordinate"
+typedef fdob_type real    rko                  z        -         1        -       -       "rko"             "vertical grid coordinate"
+
+state fdob_type fdob - -
+##

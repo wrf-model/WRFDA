@@ -6,11 +6,11 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ! PURPOSE: Transfers fields from WRF to first guess structure.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
-   TYPE (xbx_type), INTENT(INOUT)     :: xbx        ! Header & non-gridded vars.
+   type (xbx_type), intent(inout)     :: xbx        ! Header & non-gridded vars.
 
-   TYPE(domain), TARGET               :: grid
+   type(domain), target               :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -25,7 +25,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    real    :: ssmi_psfc, ssmi_ta,  ssmi_gamma, zcld, &
               ssmi_tpw,  ssmi_alw, ssmi_dum,   ssmi_htpw 
 
-   REAL, DIMENSION(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme) :: rgh_fac
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme) :: rgh_fac
 
    character(len=19) :: current_date
 
@@ -33,18 +33,18 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    real, dimension(grid%xp%jds:grid%xp%jde) :: loc_latc_mean
 
-   integer :: ierror, size2d
+   integer :: size2d
 
    real, dimension(grid%xp%kms:grid%xp%kme) :: DDT
 
-   REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
-   REAL, ALLOCATABLE :: arrayglobal(:,:)
+   real   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
+   real, allocatable :: arrayglobal(:,:)
 
    !---------------------------------------------------------------------------
    ! Set xb array range indices for processor subdomain.
    !---------------------------------------------------------------------------
 
-   IF (trace_use) call da_trace_entry("da_transfer_wrftoxb")
+   if (trace_use) call da_trace_entry("da_transfer_wrftoxb")
 
    is = grid%xp % its
    ie = grid%xp % ite
@@ -89,7 +89,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       grid%xb%znw(k) = grid%em_znw(k)
       grid%xb%dn(k)  = grid%em_dn(k)
       grid%xb%dnw(k) = grid%em_dnw(k)
-   enddo
+   end do
 
    grid%xb % ptop = ptop
    grid%xb % ps0  = ps0
@@ -114,7 +114,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       do k=ks,ke+1
          write(unit=stdout, fmt='(i3,8f16.8)') k, &
             grid%em_dnw(k), grid%em_dn(k), grid%em_rdnw(k), grid%em_rdn(k)
-      enddo
+      end do
 
       write(unit=stdout, fmt='(/5a/)') &
          'lvl         znu                 znw		rdnw       rdn'
@@ -122,7 +122,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       do k=ks,ke+1
          write(unit=stdout, fmt='(i3,8f16.8)') k, &
             grid%xb%sigmah(k), grid%xb%sigmaf(k), grid%em_rdnw(k), grid%em_rdn(k)
-      enddo
+      end do
 
       write(unit=stdout, fmt='(/5a/)') &
          'lvl         phb                 ph_2'
@@ -130,7 +130,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       do k=ks,ke
          write(unit=stdout, fmt='(i3,8e20.12)') k, &
                grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
-      enddo
+      end do
 
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
@@ -142,10 +142,10 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                     'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
                      grid%em_v_2(i, grid%xp%jde+1,k)
-            enddo
+            end do
             write(unit=stdout, fmt=*) ' '
-         enddo
-      endif
+         end do
+      end if
 
       if (ie == grid%xp%ide) then
          write(unit=stdout, fmt=*) ' '
@@ -155,10 +155,10 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
                   'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
                   grid%em_u_2(grid%xp%ide+1,j,k)
-            enddo
+            end do
             write(unit=stdout, fmt=*) ' '
-         enddo
-      endif
+         end do
+      end if
 
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
@@ -195,7 +195,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', moist(is,js,ks,2)
       write(unit=stdout, fmt=*) ' '
-   endif
+   end if
 
    !---------------------------------------------------------------
    ! Need this to exchange values in the halo region.
@@ -212,17 +212,17 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       do k=ks,ke
          do i=is,ie+1
             grid%xa%u(i,j,k) = grid%em_u_2(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    do j=js,je+1
       do k=ks,ke
          do i=is,ie
             grid%xa%v(i,j,k) = grid%em_v_2(i,j,k)
-         enddo
-      enddo
-   enddo
+         end do
+      end do
+   end do
 
    ! Fill the halo region for u and v.
 
@@ -261,7 +261,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
       write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
-   endif
+   end if
 
    do j=js,je
       k = ke+1
@@ -289,7 +289,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
          ! convert snow water equivalent kg/m2 to snow depth mm
          grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
-      enddo
+      end do
 
 #if 0
       ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
@@ -306,8 +306,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
             qvf2 = 1./(1.+qvf1)
             qvf1 = qvf1*qvf2
             grid%p(i,j,k) = grid%p(i,j,k+1) - (grid%mu_2(i,j)+qvf1*grid%mub(i,j))/qvf2/rdn(k+1)
-         enddo
-      enddo
+         end do
+      end do
 #endif
 
       ! Adapted the code from WRF module_big_step_utilities_em.F ----
@@ -333,16 +333,16 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
             grid%xb%rho(i,j,k)= 1.0 / (albn+aln)
             ! pressure purtubation:
             grid%em_p(i,j,k) = grid%xb%p(i,j,k) - ppb
-         enddo
-      enddo
+         end do
+      end do
 
       do k=ks,ke+1
          do i=is,ie
             grid%xb%hf(i,j,k) = (grid%em_phb(i,j,k)+grid%em_ph_2(i,j,k))/gravity
             grid%xa%w (i,j,k) = grid%em_w_2(i,j,k)
             grid%xb%w (i,j,k) = grid%em_w_2(i,j,k)
-         enddo
-       enddo
+         end do
+       end do
 
       do k=ks,ke
          do i=is,ie
@@ -368,18 +368,18 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                grid%xb%qcw(i,j,k) = moist(i,j,k,p_qc)
                grid%xb%qrn(i,j,k) = moist(i,j,k,p_qr)
                grid%xb%qt (i,j,k) = grid%xb%q(i,j,k) + grid%xb%qcw(i,j,k) + grid%xb%qrn(i,j,k)
-            endif
+            end if
 
             if (size(moist,dim=4) >= 6 ) then
                grid%xb%qci(i,j,k) = moist(i,j,k,p_qi)
                grid%xb%qsn(i,j,k) = moist(i,j,k,p_qs)
-            endif
+            end if
 
             if (size(moist,dim=4) >= 7 ) then
                grid%xb%qgr(i,j,k) = moist(i,j,k,p_qg)
-            endif
-         enddo
-      enddo
+            end if
+         end do
+      end do
 
       do i=is,ie
          grid%xb%psac(i,j) = grid%em_mub(i,j)+grid%em_mu_2(i,j)
@@ -387,8 +387,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
          if (grid%xb%tgrn(i,j) < 100.0) &
             grid%xb%tgrn(i,j) = grid%xb%t(i,j,ks)+0.0065*(grid%xb%h(i,j,ks+1)-grid%xb%hf(i,j,ks))
-      enddo
-   enddo
+      end do
+   end do
 
    grid%xb%ztop = grid%xb%hf(is,js,ke+1)
 
@@ -401,8 +401,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          do k=ks,ke
             write(unit=stdout, fmt='(i3,8e20.12)') k, &
                grid%xb%h(is,js,k), grid%xb%p(is,js,k), grid%xb%t(is,js,k)
-         enddo
-      endif
+         end do
+      end if
 
       write(unit=stdout, fmt=*) ' '
       write(unit=stdout, fmt=*) 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
@@ -426,26 +426,26 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'grid%xb%lat(ie,je)=', grid%xb%lat(ie,je)     !hcl
       write(unit=stdout, fmt=*) 'grid%xb%lon(ie,je)=', grid%xb%lon(ie,je)     !hcl
       write(unit=stdout, fmt=*) ' '
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate vertical inner product for use in vertical transform:
    !---------------------------------------------------------------------------
       
-   IF ( vertical_ip == 1 ) THEN
-      ! Vertical inner product is SQRT(Delta p):
-      DO k=ks,ke
+   if ( vertical_ip == 1 ) then
+      ! Vertical inner product is sqrt(Delta p):
+      do k=ks,ke
          grid%xb % vertical_inner_product(is:ie,js:je,k) = &
-              SQRT( grid%xb % psac(is:ie,js:je) * grid%xb%sigmah(k) )
-      END DO 
-   ELSE IF ( vertical_ip == 2 ) THEN
+              sqrt( grid%xb % psac(is:ie,js:je) * grid%xb%sigmah(k) )
+      end do 
+   else if ( vertical_ip == 2 ) then
 
       ! Vertical inner product is Delta p:
-      DO k=1,grid%xb%mkz
+      do k=1,grid%xb%mkz
          grid % xb % vertical_inner_product(is:ie,js:je,k) = &
          grid % xb % psac(is:ie,js:je) * grid%xb%sigmah(k)
-      END DO
-   END IF
+      end do
+   end if
 
    !---------------------------------------------------------------------------
    ! Roughness
@@ -480,7 +480,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       write(unit=stdout, fmt='(a, e24.16/)') &
            'grid%xb % map_factor(is,js)=', grid%xb % map_factor(is,js)
-   endif
+   end if
 
    do j=js,je
       do i=is,ie
@@ -501,8 +501,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
                       grid%xb%h(i,j,ks), grid%xb%rough(i,j),grid%xb%xland(i,j), &
                       grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
                       grid%xb%regime(i,j))
-      enddo
-   enddo
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! Calculate saturation vapour pressure and relative humidity:
@@ -538,7 +538,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'grid%xb % rh(i,j,k)=', grid%xb % rh(i,j,k)
       write(unit=stdout, fmt=*) 'grid%xb % qs(i,j,k)=', grid%xb % qs(i,j,k)
       write(unit=stdout, fmt=*) ' '
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    ! Sea level pressure and total precipitable water
@@ -550,7 +550,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
      write(unit=stdout, fmt='(a)') &
           'Sea level pressure and total precipitable water'
-   endif
+   end if
 
    call da_wrf_tpq_2_slp ( grid%xb )
 
@@ -574,7 +574,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       write(unit=stdout, fmt='(a)') &
          'Surface Wind speed'
-   endif
+   end if
 
    tmpvar = log(10./0.0001)
 
@@ -585,8 +585,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
                          + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
                     *tmpvar*rgh_fac(i,j)
-      enddo
-   enddo
+      end do
+   end do
 
    !---------------------------------------------------------------------------
    ! Brightness temperature SH Chen
@@ -598,7 +598,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       write(unit=stdout, fmt='(a)') &
           'Brightness temperature'
-   endif
+   end if
 
    if ( Use_SsmiTbObs)   &
       call da_transform_xtotb( grid%xb )
@@ -613,7 +613,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       write(unit=stdout, fmt='(a)') &
          'GPS Refractivity'
-   endif
+   end if
 
    call da_transform_xtogpsref(grid%xb, grid%xp)
 
@@ -631,7 +631,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
    if (trace_use) call da_trace("da_transfer_wrftoxb",&
       message="allocated xbx%latc_mean")
-   ! endif
+   ! end if
 
    size2d = (grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1)
 
@@ -640,48 +640,48 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
-   ! testing.  This will always be .FALSE. for a serial or 1-process MPI run.
-   IF ( testing_dm_exact ) THEN
-      ALLOCATE( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
+   ! testing.  This will always be .false. for a serial or 1-process MPI run.
+   if ( testing_dm_exact ) then
+      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
       call da_wv_patch_to_global( grid%xb%psac, arrayglobal, grid%xp%domdesc, &
                                grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,   &
                                grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,   &
                                grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
-      loc_psac_mean = tmpvar*SUM( arrayglobal(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde) )
-      DEALLOCATE( arrayglobal )
-   ELSE
-      loc_psac_mean = tmpvar*SUM( grid%xb % psac(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte) )
-   ENDIF
+      loc_psac_mean = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde) )
+      deallocate( arrayglobal )
+   else
+      loc_psac_mean = tmpvar*sum( grid%xb % psac(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte) )
+   end if
 
    tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
-   IF ( testing_dm_exact ) THEN
-      ALLOCATE( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
+   if ( testing_dm_exact ) then
+      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
       call da_wv_patch_to_global( grid%xb%lat, arrayglobal, grid%xp%domdesc, &
                                grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
                                grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
                                grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
       do j=grid%xp%jds,grid%xp%jde
-         loc_latc_mean(j) = tmpvar*SUM( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
-      enddo
-      DEALLOCATE( arrayglobal )
-   ELSE
+         loc_latc_mean(j) = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
+      end do
+      deallocate( arrayglobal )
+   else
       do j=js,je
-         loc_latc_mean(j) = tmpvar*SUM( grid%xb % lat(is:ie, j) )
-      enddo
-   ENDIF
+         loc_latc_mean(j) = tmpvar*sum( grid%xb % lat(is:ie, j) )
+      end do
+   end if
 
-   IF ( testing_dm_exact ) THEN
+   if ( testing_dm_exact ) then
       ! Broadcast result from monitor to other tasks.
       call wrf_dm_bcast_real( loc_psac_mean, 1 )
       xbx % psac_mean = loc_psac_mean
       ! Broadcast result from monitor to other tasks.
       call wrf_dm_bcast_real( loc_latc_mean, (grid%xp%jde-grid%xp%jds+1) )
       xbx % latc_mean = loc_latc_mean
-   ELSE
+   else
       xbx % psac_mean = wrf_dm_sum_real( loc_psac_mean )
       call wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
-   ENDIF
+   end if
 
    if (print_detail_xb) then
       ! write(unit=stdout, fmt=*) 'loc_psac_mean  =', loc_psac_mean
@@ -689,11 +689,11 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
       ! write(unit=stdout, fmt=*) 'loc_latc_mean  =', loc_latc_mean(js)
       write(unit=stdout, fmt=*) 'xbx % latc_mean=', xbx % latc_mean(js)
-   endif
+   end if
 
    ! Calculate time step from one dimensional cloud model parameterization
 
-   IF ( DT_cloud_model ) THEN
+   if ( DT_cloud_model ) then
       do j = grid%xp%jts, grid%xp%jte
          do i = grid%xp%its, grid%xp%ite
             call da_cloud_model ( grid%xb%t(I,J,:),   grid%xb%p(I,J,:), grid%xb%q(I,J,:), &
@@ -703,12 +703,12 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
             do k = grid%xp%kts, grid%xp%kte
                grid%xb%delt(i,j,k) = DDT(k)
-            enddo
-         enddo
-      enddo
-   ENDIF
+            end do
+         end do
+      end do
+   end if
 
-   IF (trace_use) call da_trace_exit("da_transfer_wrftoxb")
+   if (trace_use) call da_trace_exit("da_transfer_wrftoxb")
 
 end subroutine da_transfer_wrftoxb
 

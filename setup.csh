@@ -67,7 +67,7 @@ if (-d /data7/da/bray/blas/blas_${FC}) then
    setenv BLAS /data7/da/bray/blas/blas_${FC}
 endif
 if (-d /data7/da/bray/lapack/lapack_${FC}) then
-   setenv lapack /data7/da/bray/lapack/lapack_${FC}
+   setenv LAPACK /data7/da/bray/lapack/lapack_${FC}
 endif
 if (-d /data7/da/bray/fftpack5/fftpack5_${FC}) then
    setenv FFTPACK5 /data7/da/bray/fftpack5/fftpack5_${FC}
@@ -106,9 +106,6 @@ if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
    setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
 endif
 if (-d ~bray/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MPICH ~bray/makedepf90/makedepf90-2.8.8_${CC}
-endif
-if (-d ~bray/makedepf90/makedepf90-2.8.8_${CC}) then
    setenv MAKEDEPF90 ~bray/makedepf90/makedepf90-2.8.8_${CC}
 endif
 
@@ -137,9 +134,6 @@ if (-d ~/fftpack5/fftpack5_${FC}) then
 endif
 if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
    setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${FC}
-endif
-if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MPICH ~/makedepf90/makedepf90-2.8.8_${CC}
 endif
 if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
    setenv MAKEDEPF90 ~/makedepf90/makedepf90-2.8.8_${CC}
@@ -243,6 +237,7 @@ if ($FC == "g95" ) then
    setenv G95_UNBUFFERED_ALL T
    setenv G95_MEM_INIT       0x00
    setenv G95_MEM_MAXALLOC   F
+   setenv G95_MEM_SEGEMENTS  0
 endif
 
 echo

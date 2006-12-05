@@ -1,19 +1,19 @@
 subroutine da_transform_xtoy_gpsref ( xa, iv, xp, y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type),  INTENT(IN)   :: xa       ! gridded analysis increment.
-   TYPE (ob_type), INTENT(IN)   :: iv       ! Innovation vector (O-B).
-   TYPE (xpose_type), INTENT(IN):: xp       ! Domain decomposition vars.
-   TYPE (y_type), INTENT(INOUT) :: y        ! y = h (xa)
+   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
+   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
+   type (y_type), intent(inout) :: y        ! y = h (xa)
 
-   INTEGER                      :: n        ! Loop counter.
-   INTEGER                      :: i, j     ! Index dimension.
-   REAL                         :: dx, dxm  !
-   REAL                         :: dy, dym  !
-   INTEGER                      :: num_levs ! obs vertical levels
+   integer                      :: n        ! Loop counter.
+   integer                      :: i, j     ! Index dimension.
+   real                         :: dx, dxm  !
+   real                         :: dy, dym  !
+   integer                      :: num_levs ! obs vertical levels
 
-   IF ( iv%num_gpsref < 1 ) return
+   if ( iv%num_gpsref < 1 ) return
 
    do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref
@@ -36,7 +36,7 @@ subroutine da_transform_xtoy_gpsref ( xa, iv, xp, y )
          dx, dy, dxm, dym, &
          y%gpsref(n)%ref(1), num_levs, iv%gpsref(n)%zk(1), num_levs)
 #endif
-   ENDDO
+   end do
 
 end subroutine da_transform_xtoy_gpsref
 

@@ -1,13 +1,13 @@
 subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)   :: oi          ! Ob Inc. structure.
-   TYPE (y_type), INTENT(IN)    :: re          ! Residual structure.
-   TYPE (y_type), INTENT(INOUT) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), INTENT(INOUT):: jo          ! Obs cost function.
+   type (ob_type), intent(in)   :: oi          ! Ob Inc. structure.
+   type (y_type), intent(in)    :: re          ! Residual structure.
+   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type (jo_type), intent(inout):: jo          ! Obs cost function.
 
-   INTEGER                      :: n
+   integer                      :: n
 
    jo % ssmir_Speed=0.0
    jo % ssmir_tpw=0.0
@@ -30,7 +30,7 @@ subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
         jo % ssmir_tpw = jo % ssmir_tpw - &
                       re%ssmi_retrieval(n)%tpw * jo_grad_y%ssmi_retrieval(n)%tpw
 
-      endif
+      end if
    end do
    
    jo % ssmir_Speed = 0.5 * jo % ssmir_Speed
