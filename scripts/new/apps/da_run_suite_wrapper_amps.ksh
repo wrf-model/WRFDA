@@ -44,19 +44,20 @@ export CLEAN=${CLEAN:-true}
 #export FIRST=false
 
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=64
+export NUM_PROCS=1
+export NUM_PROCS=16
 export QUEUE=premium
 #export QUEUE=share
 export PROJECT_ID=68000001
 #export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=180
-#export LSF_MAX_RUNTIME=60
+export LSF_MAX_RUNTIME=360
+#export LSF_MAX_RUNTIME=10
 export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
 #export RUN_CMD=mpirun.lsf
 
 #Time info:
-export INITIAL_DATE=2006100912
+export INITIAL_DATE=2006101000
 export FINAL_DATE=2006102900
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=72
@@ -71,9 +72,10 @@ export LONG_FCST_RANGE_2=72
 #export WRF_BC_DIR=/data1/dmbarker/code/WRF_BC
 #bluevista:
 export REL_DIR=/mmm/users/dmbarker/code/trunk
-export DAT_DIR=/mmm/users/dmbarker/data
-#import NCEP_DIR=/mmm/users/dmbarker/data/ncep
-#export DAT_DIR=/ptmp/dmbarker/data
+#export DAT_DIR=/mmm/users/dmbarker/data
+export NCEP_DIR=/mmm/users/dmbarker/data/ncep
+export DAT_DIR=/ptmp/dmbarker/data
+export RC_DIR=/mmm/users/dmbarker/data/amps1/rc
 export WPS_GEOG_DIR=/mmm/users/gill/DATA/GEOG
 
 export WRFVAR_DIR=$REL_DIR/wrfvar

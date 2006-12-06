@@ -28,7 +28,7 @@
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
 #export RUN_WPS=true
-export RUN_REAL=true
+#export RUN_REAL=true
 #export RUN_OBSPROC=true
 #export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
@@ -43,15 +43,15 @@ export EXPT=noda
 #export FIRST=false
 
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=1
-#export QUEUE=premium
-export QUEUE=share
+export NUM_PROCS=16
+export QUEUE=premium
+#export QUEUE=share
 export PROJECT_ID=68000001
 #export PROJECT_ID=64000420
-#export LSF_MAX_RUNTIME=180
-#export LSF_MAX_RUNTIME=60
-export LSF_MAX_RUNTIME=10
-#export LL_PTILE=16
+export LSF_MAX_RUNTIME=180
+export LSF_MAX_RUNTIME=60
+#export LSF_MAX_RUNTIME=10
+export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
 #export RUN_CMD=mpirun.lsf
 
@@ -68,20 +68,20 @@ export LONG_FCST_RANGE_2=72
 
 #Directories:
 #bluevista:
-#export REL_DIR=/mmm/users/dmbarker/code/trunk
-#export DAT_DIR=/mmm/users/dmbarker/data
+export REL_DIR=/mmm/users/dmbarker/code/trunk
+export DAT_DIR=/mmm/users/dmbarker/data
 #export NCEP_DIR=/mmm/users/dmbarker/data/ncep
 #export DAT_DIR=/ptmp/dmbarker/data
-#export WPS_GEOG_DIR=/mmm/users/gill/DATA/GEOG
+export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG
 #smoke:
-export REL_DIR=/smoke/dmbarker/code/trunk
-export DAT_DIR=/smoke/dmbarker/data
-export WPS_GEOG_DIR=/smoke/dmbarker/data/geog
+#export REL_DIR=/smoke/dmbarker/code/trunk
+#export DAT_DIR=/smoke/dmbarker/data
+#export WPS_GEOG_DIR=/smoke/dmbarker/data/geog
 
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
 #From WPS (namelist.wps):
-export RUN_GEOGRID=false
+#export RUN_GEOGRID=false
 export NL_E_WE=301
 export NL_E_SN=238
 export REF_LAT=31.4
@@ -120,12 +120,12 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
 
-#export SCRIPT=$WRFVAR_DIR/scripts/new/da_run_suite.ksh
-#export MACHINE=bluevista
-#$WRFVAR_DIR/scripts/new/da_run_job.${MACHINE}.ksh
+export SCRIPT=$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+export MACHINE=bluevista
+$WRFVAR_DIR/scripts/new/da_run_job.${MACHINE}.ksh
 
-export RUN_CMD=" "
-$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+#export RUN_CMD=" "
+#$WRFVAR_DIR/scripts/new/da_run_suite.ksh
 
 exit 0
 
