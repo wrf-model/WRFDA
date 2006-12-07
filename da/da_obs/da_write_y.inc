@@ -599,6 +599,30 @@ SUBROUTINE da_write_y(iv, y)
       end do                                   ! end loop for sensor
    END IF
 
+
+! Transfer gpsref obs:
+
+   IF ( iv % num_gpsref > 0 ) THEN
+      num_obs = 0
+      do n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+    if( num_obs > 0) then
+      write(ounit,'(a20,i8)')'gpsref', num_obs
+      num_obs = 0
+      DO n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) then
+         num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % gpsref(n) % info % levels
+         DO k = 1, iv % gpsref(n) % info % levels
+         call da_check_missing(iv%gpsref(n)%ref(k)%qc, y%gpsref(n)%ref(k), f1)
+         write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum, dum, dum, dum, dum,dum
+         END DO
+       endif
+      END DO
+    endif
+   ENDIF
+
    close (ounit)
    call da_free_unit(ounit)
 

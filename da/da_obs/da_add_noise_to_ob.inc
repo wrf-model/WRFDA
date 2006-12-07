@@ -676,6 +676,32 @@ SUBROUTINE da_add_noise_to_ob( iv, ob )
       end do                                   ! end loop for sensor
    END IF
 
+! Transfer gpsref obs:
+
+   IF ( iv % num_gpsref > 0 ) THEN
+
+
+      num_obs = 0
+      DO n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      ENDDO
+      write(ounit,'(a20,i8)')'gpsref', num_obs
+      num_obs = 0 
+      DO n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) then
+         num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % gpsref(n) % info % levels
+         DO k = 1, iv % gpsref(n) % info % levels
+            call da_add_noise( iv % gpsref(n) % ref(k), ob % gpsref(n) % ref(k), z1 )
+            write(ounit,'(2i8,10e15.7)')num_obs, k, &
+                               iv % gpsref(n) % ref(k) % error, z1, &
+                               dum, dum, dum, dum, dum, dum, dum, dum
+         END DO
+       endif
+      END DO
+   ENDIF
+
+
   close (ounit)
   call da_free_unit(ounit)
 
