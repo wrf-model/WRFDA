@@ -139,18 +139,21 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
             !  f. check innovation
             !-----------------------------------------------------------
             do k = 1, nchan
+
+              ! check absolute value of omb
                if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 15. ) then
                   iv%instid(inst)%rad(n)%tb(k)%qc  = -1
                   if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                      nrej_omb_abs(k) = nrej_omb_abs(k) + 1
                end if
 
+              ! check outliers of innovation
                if (biascorr) then
                   ! if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(scanpos+1,k) ) then
                   if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(1,k) ) then
                      iv%instid(inst)%rad(n)%tb(k)%qc  = -1
-                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                     nrej_omb_std(k) = nrej_omb_std(k) + 1
+                     if (iv%instid(inst)%rad(n)%loc%proc_domain) &
+                       nrej_omb_std(k) = nrej_omb_std(k) + 1
                   end if
                else
                   ! if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%rms(scanpos+1,k) ) then
@@ -158,24 +161,25 @@ subroutine da_qc_amsua ( inst, nchan, ob, iv )
                      iv%instid(inst)%rad(n)%tb(k)%qc  = -1
                      if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                         nrej_omb_rms(k) = nrej_omb_rms(k) + 1
-                     end if
                   end if
+               end if
 
-                  if (iv%instid(inst)%rad(n)%tb(k)%qc == -1) then
+              ! assignment of observation error
+               if (iv%instid(inst)%rad(n)%tb(k)%qc == -1) then
                      iv%instid(inst)%rad(n)%tb(k)%error = 500.0
                      if (iv%instid(inst)%rad(n)%loc%proc_domain) &
                         nrej(k) = nrej(k) + 1
-                  else
-                     if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                        ngood(k) = ngood(k) + 1
-                     if (biascorr) then
+               else
+                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
+                     ngood(k) = ngood(k) + 1
+                  if (biascorr) then
                      ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(scanpos+1,k)
-                     if (use_error_factor_rad) then
+                    if (use_error_factor_rad) then
                         iv%instid(inst)%rad(n)%tb(k)%error = &
                            satinfo(inst)%std(1,k)*satinfo(inst)%error_factor(k)
-                     else
-                        iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(1,k)
-                     end if
+                    else
+                       iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(1,k)
+                    end if
                   else
                      ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%rms(scanpos+1,k)
                      if (use_error_factor_rad) then
