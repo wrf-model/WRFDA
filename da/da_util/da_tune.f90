@@ -1201,7 +1201,6 @@ subroutine da_read_obs_rand( rand_unit, ob )
             ob % synop(isynop) % p % error, ob % synop(isynop) % p % pert, &
             ob % synop(isynop) % q % error, ob % synop(isynop) % q % pert
          end do
-         
       elseif ( index( ob_name,'metar') > 0 ) then
          
          do n = 1, num_obs
@@ -1441,7 +1440,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
              .and. sensor_id    == rtminit_sensor(n)    ) then
                 do k = 1,num_obs
                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
-                  read(rand_unit,'(2i8,2e15.7)') ipixel, kdum,     &
+                  read(rand_unit,'(2i8,f10.3,e15.7)') ipixel, kdum,     &
                           ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%error, &
                           ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%pert
                 end do
