@@ -22,7 +22,7 @@ export NUM_PROCS=${NUM_PROCS:-1}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LL_WALL_CLOCK_LIMIT=${LL_WALL_CLOCK_LIMIT:-01:30:00}
-export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
+export LL_NODE_USAGE=${LL_NODE_USAGE:-not_shared}
 export LL_PTILE=${LL_PTILE:-8}
 export LL_CLASS=${LL_CLASS:-com_rg8}
 export QUEUE=${QUEUE:-regular}
@@ -55,11 +55,11 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 # @ checkpoint       = no
 # @ wall_clock_limit = $LL_WALL_CLOCK_LIMIT
 # NCEP IBM=dev
-# @ class      =  ${LL_CLASS}
+# @ class            = ${LL_CLASS}
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
-# @ queue
+# @ queue            = $QUEUE
 
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
