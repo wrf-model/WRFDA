@@ -44,6 +44,7 @@ export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
 
 # Additional Namelist variable for real (namelist.input):
 
+# Note things DIFFERENT from Registry.EM
 export NL_RUN_HOURS=${NL_RUN_HOURS:-$CYCLE_PERIOD}
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
@@ -52,11 +53,10 @@ export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           # 
 export NL_RADT=${NL_RADT:-30}                # 
 export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
+export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5} # goes with surface_physics
+
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
-export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-0}          # 
-export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
-export NL_KM_OPT=${NL_KM_OPT:-1}               # 
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}           # 
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}    # 
 
@@ -109,72 +109,8 @@ export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 if test $WRF_NAMELIST'.' != '.'; then
    ln -fs $WRF_NAMELIST namelist.input
 elif test -f $WRF_DIR/inc/namelist_script.inc; then
-      export NL_INPUT_FROM_FILE=true
-      export NL_WRITE_INPUT=true
-      export NL_INPUTOUT_INTERVAL=180
-      export NL_INPUT_OUTNAME="wrfinput_d<domain>_<date>"
-      export NL_TIME_STEP_FRACT_NUM=0
-      export NL_TIME_STEP_FRACT_DEN=1
-      export NL_FEEDBACK=1
-      export NL_SMOOTH_OPTION=0
-      export NL_MP_PHYSICS=3
-      export NL_RA_LW_PHYSICS=1
-      export NL_RA_SW_PHYSICS=1
-      export NL_RADT=15
-      export NL_SF_SFCLAY_PHYSICS=1
-      export NL_SF_SURFACE_PHYSICS=2
-      export NL_BL_PBL_PHYSICS=1
-      export NL_BLDT=0
-      export NL_CU_PHYSICS=1
-      export NL_CUDT=5
-      export NL_ISFFLX=1
-      export NL_IFSNOW=0
-      export NL_ICLOUD=1
-      export NL_SURFACE_INPUT_SOURCE=1
-      export NL_NUM_SOIL_LAYERS=4
-      export NL_MP_ZERO_OUT=2
-      export NL_MP_ZERO_OUT_THRESH=1.e-8
-      export NL_MAXIENS=1
-      export NL_MAXENS=3
-      export NL_MAXENS2=3
-      export NL_ENSDIM=144
-      export NL_RK_ORD=3
-      export NL_W_DAMPING=1
-      export NL_DIFF_OPT=1
-      export NL_KM_OPT=4
-      export NL_DAMP_OPT=0
-      export NL_BASE_TEMP=290.
-      export NL_ZDAMP=5000.
-      export NL_DAMPCOEF=0.0
-      export NL_KHDIF=0
-      export NL_KVDIF=0
-      export NL_SMDIV=0.1
-      export NL_EMDIV=0.01
-      export NL_EPSSM=0.1
-      export NL_NON_HYDROSTATIC=true
-      export NL_TIME_STEP_SOUND=4
-      export NL_H_MOM_ADV_ORDER=5
-      export NL_V_MOM_ADV_ORDER=3
-      export NL_H_SCA_ADV_ORDER=5
-      export NL_V_SCA_ADV_ORDER=3
-      export NL_SPECIFIED=true
-      export NL_SPEC_BDY_WIDTH=5
-      export NL_SPEC_ZONE=1
-      export NL_RELAX_ZONE=4
-      export NL_PERIODIC_X=false
-      export NL_SYMMETRIC_XS=false
-      export NL_SYMMETRIC_XE=false
-      export NL_OPEN_XS=false
-      export NL_OPEN_XE=false
-      export NL_PERIODIC_Y=false
-      export NL_SYMMETRIC_YS=false
-      export NL_SYMMETRIC_YE=false
-      export NL_OPEN_YS=false
-      export NL_OPEN_YE=false
-      export NL_NESTED=false
-      export NL_REAL_DATA_INIT_TYPE=1
+   rm namelist.input
    . $WRF_DIR/inc/namelist_script.inc
-      unset NL_MP_ZERO_OUT_THRESH
 else
    ln -fs $WRF_DIR/test/em_real/namelist.input .
 fi
