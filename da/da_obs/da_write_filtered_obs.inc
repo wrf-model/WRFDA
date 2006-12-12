@@ -1,17 +1,8 @@
 subroutine da_write_filtered_obs( ob, iv, xb, xp, & 
-                          phic, xlonc, truelat1, truelat2)
+   phic, xlonc, truelat1, truelat2)
+
    !------------------------------------------------------------------------
    ! Purpose: Writes filtered observations by WRFVAR
-   !          Author :    Syed RH Rizvi   MMM/NCAR  
-   !  History:     
-   !             10/18/2005         Syed RH Rizvi
-   !
-   !   (a) Original iv & ob arrays are not modified
-   !   (b) "da_count_filtered_obs" is called to get exact count of various
-   !        observations type included in the filtered obs
-   !            10/21/2006          Syed RH Rizvi
-   !   (a)  MPI update
-   !   (b)  Seperate calls for writing header counts and data
    !------------------------------------------------------------------------   
    !  Note:                                                           
    !   (a) Information just needed for WRFVAR  is only written  
@@ -42,8 +33,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    !
    ! iii) For Sound data, the above-top/below-bottom data are not written out.
    !
-   ! The can be use for 3D-Var with check_max_iv = .false., or for
-   ! verification with  ANALYSIS_type = 'VERifY.
+   ! This can be used for Var with check_max_iv = .false., or for
+   ! verification with  analysis_type = 'VERIFY.
    !---------------------------------------------------------------------------   
 
    implicit none
@@ -59,39 +50,38 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    integer                      :: i, j, iost, nlevels, fm
    type (multi_level_type)      :: platform
 
-   integer                       :: n1, n2, n, k, zero , ships_elv_qual
-   real                          :: es, qs, speed, dir, rh, rh_error, uu, vv
-   real                          :: xmiss, height, height_error, pr_error, slp_error
-   real                          :: thick, thick_error,dir_error,speed_error
-   real                          :: td, td_error , elv_error,ships_elv, ships_pr_error
+   integer            :: n1, n2, n, k, zero , ships_elv_qual
+   real               :: es, qs, speed, dir, rh, rh_error, uu, vv
+   real               :: xmiss, height, height_error, pr_error, slp_error
+   real               :: thick, thick_error,dir_error,speed_error
+   real               :: td, td_error , elv_error,ships_elv, ships_pr_error
 
-   real                          :: slp_inv,speed_err,dir_err, p,p_err
-   real                          :: t, t_err,ref, ref_err
-   integer                       :: thick_qc, t_qc, td_qc, rh_qc, height_qc
-   integer                       :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
+   real               :: slp_inv,speed_err,dir_err, p,p_err
+   real               :: t, t_err,ref, ref_err
+   integer            :: thick_qc, t_qc, td_qc, rh_qc, height_qc
+   integer            :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 
-   integer                       :: ounit, nz, mnz
-   integer                       :: root      ! Monitor processor.
-   character*20                  :: filename
-!----------------------------------------------------------------------
+   integer            :: ounit, nz, mnz
+   integer            :: root      ! Monitor processor.
+   character*20       :: filename
+
    if (trace_use) call da_trace_entry("da_write_filtered_obs")
-!
-!----------------------------------------------------------------------
-!  Create noise and output:
+
+   ! Create noise and output:
    call da_get_unit(ounit)
-!----------------------------------------------------------------------
+
 #ifdef DM_PARALLEL
-      write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.', myproc
+   write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.', myproc
 #else
-      write(unit=filename, fmt='(a)') 'filtered_obs.000'
+   write(unit=filename, fmt='(a)') 'filtered_obs.000'
 #endif
    open(unit=ounit,file=trim(filename),form='formatted',status='replace', &
       iostat=iost)
-   if (iost /= 0 ) Then
+   if (iost /= 0 ) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open filtered observation file"//trim(filename)/))
-   Endif
-!
+   end if
+
    zero = 0
    ! Note: Currently in WRFVAR there is no active role of  
    !       "height" and "TD"        
@@ -120,7 +110,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
 
    if (iv % num_synop > 0) then
       if (print_detail_f_obs) then
-         write(unit=stdout, fmt='(A,I6)') ' writing filtered Obs for synop ', &
+         write(unit=stdout, fmt='(A,I6)') ' writing filtered obs for synop ', &
             iv%num_synop
       end if
 
@@ -160,7 +150,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
               iv%synop(i)%v%qc >= obs_qc_pointer) then
             uu = ob%synop(i)%u
             vv = ob%synop(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%synop(i)%info%lon, convert_uv2fd)             
+            call da_ffdduv( speed, dir, uu, vv, iv%synop(i)%info%lon, &
+               convert_uv2fd)             
             speed_qc  = iv%synop(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%synop(i)%u%error
@@ -221,7 +212,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if ( iv % num_metar > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for metar ',iv%num_metar
+            ' writing filtered obs for metar ',iv%num_metar
       end if
 
       do i = 1, iv % num_metar
@@ -261,7 +252,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
             iv%metar(i)%v%qc >= obs_qc_pointer) then
             uu = ob%metar(i)%u
             vv = ob%metar(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%metar(i)%info%lon, convert_uv2fd)             
+            call da_ffdduv( speed, dir, uu, vv, iv%metar(i)%info%lon, &
+               convert_uv2fd)             
             speed_qc  = iv%metar(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%metar(i)%u%error
@@ -320,7 +312,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_ships > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for ships ',iv%num_ships
+            ' writing filtered obs for ships ',iv%num_ships
       end if
 
       do i = 1, iv % num_ships
@@ -358,7 +350,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
              iv%ships(i)%v%qc >= obs_qc_pointer) then
             uu = ob%ships(i)%u
             vv = ob%ships(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%ships(i)%info%lon, convert_uv2fd)             
+            call da_ffdduv( speed, dir, uu, vv, iv%ships(i)%info%lon, &
+               convert_uv2fd)             
             speed_qc  = iv%ships(i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%ships(i)%u%error
@@ -416,7 +409,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_buoy  > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for buoy  ',iv%num_buoy 
+            ' writing filtered obs for buoy  ',iv%num_buoy 
       end if
 
       do i = 1, iv % num_buoy
@@ -455,7 +448,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
               iv%buoy (i)%v%qc >= obs_qc_pointer) then
             uu = ob%buoy (i)%u
             vv = ob%buoy (i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%buoy (i)%info%lon, convert_uv2fd)             
+            call da_ffdduv( speed, dir, uu, vv, iv%buoy (i)%info%lon, &
+               convert_uv2fd)             
             speed_qc  = iv%buoy (i)%u%qc
             dir_qc    = speed_qc
             speed_err = iv%buoy (i)%u%error
@@ -514,7 +508,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_geoamv > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for geoamv ',iv%num_geoamv
+            ' writing filtered obs for geoamv ',iv%num_geoamv
       end if
 
       do i = 1, iv % num_geoamv               
@@ -537,7 +531,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%geoamv(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%geoamv(i)%u(n)
                vv = ob%geoamv(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%geoamv(i)%info%lon, convert_uv2fd)                        
+               call da_ffdduv( speed, dir, uu, vv, iv%geoamv(i)%info%lon, &
+                  convert_uv2fd)                        
                speed_qc  = iv%geoamv(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%geoamv(i)%u(n)%error
@@ -568,7 +563,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if ( iv % num_polaramv > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for polaramv ',iv%num_polaramv
+            ' writing filtered obs for polaramv ',iv%num_polaramv
       end if
 
       do i = 1, iv % num_polaramv               
@@ -624,7 +619,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_sound > 0) then
       if (print_detail_f_obs) then
          write(stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for sound  ',iv%num_sound 
+            ' writing filtered obs for sound  ',iv%num_sound 
       end if
       mnz = 0
       ! write(999 ,'(5X,a,i4/)') "Sound out unit =", ounit
@@ -712,7 +707,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%sonde_sfc(i)%v%qc >= obs_qc_pointer) then
                uu = ob%sonde_sfc(i)%u
                vv = ob%sonde_sfc(i)%v
-               call da_ffdduv( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, convert_uv2fd)             
+               call da_ffdduv( speed, dir, uu, vv, iv%sonde_sfc(i)%info%lon, &
+                  convert_uv2fd)             
                speed_qc  = iv%sonde_sfc(i)%u%qc
                dir_qc    = speed_qc
                speed_err = iv%sonde_sfc(i)%u%error
@@ -778,7 +774,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                    iv%sound(i)%v(n)%qc >= obs_qc_pointer) then  
                   uu = ob%sound(i)%u(n)
                   vv = ob%sound(i)%v(n)
-                  call da_ffdduv( speed, dir, uu, vv, iv%sound(i)%info%lon, convert_uv2fd)                        
+                  call da_ffdduv( speed, dir, uu, vv, iv%sound(i)%info%lon, &
+                     convert_uv2fd)                        
                   speed_qc  = iv%sound(i)%u(n)%qc
                   dir_qc    = speed_qc
                   speed_err = iv%sound(i)%u(n)%error
@@ -832,7 +829,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_airep > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for airep  ',iv%num_airep 
+            ' writing filtered obs for airep  ',iv%num_airep 
       end if
 
       do i = 1, iv % num_airep               
@@ -856,7 +853,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%airep(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%airep(i)%u(n)
                vv = ob%airep(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%airep(i)%info%lon, convert_uv2fd)             
+               call da_ffdduv( speed, dir, uu, vv, iv%airep(i)%info%lon, &
+                  convert_uv2fd)             
                speed_qc  = iv%airep(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%airep(i)%u(n)%error
@@ -895,7 +893,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_pilot > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-           ' writing filtered Obs for pilot  ',iv%num_pilot 
+           ' writing filtered obs for pilot  ',iv%num_pilot 
       end if
 
       do i = 1, iv % num_pilot               
@@ -919,7 +917,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%pilot(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%pilot(i)%u(n)
                vv = ob%pilot(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%pilot(i)%info%lon, convert_uv2fd)                        
+               call da_ffdduv( speed, dir, uu, vv, iv%pilot(i)%info%lon, &
+                  convert_uv2fd)                        
                speed_qc  = iv%pilot(i)%u(n)%qc
                dir_qc    = speed_qc
                speed_err = iv%pilot(i)%u(n)%error
@@ -951,7 +950,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_satem > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for satem  ',iv%num_satem 
+            ' writing filtered obs for satem  ',iv%num_satem 
       end if
 
       do i = 1, iv % num_satem           
@@ -972,7 +971,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
             thick_qc = iv%satem(i)%thickness(n)%qc
             thick = iv%satem(i)%org_thickness(n)%inv   
             thick_error = iv%satem(i)%org_thickness(n)%error
-            if (iv%satem(i)%thickness(n)%qc < obs_qc_pointer) thick_qc = missing_data
+            if (iv%satem(i)%thickness(n)%qc < obs_qc_pointer) &
+               thick_qc = missing_data
 
             write(ounit, fmt = trim (fmt_each))               &
                iv%satem(i)%p(n),zero, slp_error,                 &
@@ -993,7 +993,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_qscat > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for qscat  ',iv%num_qscat 
+            ' writing filtered obs for qscat  ',iv%num_qscat 
       end if
  
       do i = 1, iv % num_qscat               
@@ -1016,7 +1016,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
              iv%qscat(i)%v%qc >= obs_qc_pointer) then  
             uu = ob%qscat(i)%u
             vv = ob%qscat(i)%v
-            call da_ffdduv( speed, dir, uu, vv, iv%qscat(i)%info%lon, convert_uv2fd)                        
+            call da_ffdduv( speed, dir, uu, vv, iv%qscat(i)%info%lon, &
+               convert_uv2fd)                        
             speed_error = iv%qscat(i)%u%error
          else
             speed = missing_r
@@ -1045,7 +1046,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_profiler > 0 ) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for profiler  ',iv%num_profiler 
+            ' writing filtered obs for profiler  ',iv%num_profiler 
       end if
 
       do i = 1, iv % num_profiler            
@@ -1069,7 +1070,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
                 iv%profiler(i)%v(n)%qc >= obs_qc_pointer) then  
                uu = ob%profiler(i)%u(n)
                vv = ob%profiler(i)%v(n)
-               call da_ffdduv( speed, dir, uu, vv, iv%profiler(i)%info%lon, convert_uv2fd)
+               call da_ffdduv( speed, dir, uu, vv, iv%profiler(i)%info%lon, &
+                  convert_uv2fd)
                speed_error = iv%profiler(i)%u(n)%error
             else
                speed = missing_r
@@ -1099,7 +1101,8 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_ssmi_retrieval > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for ssmi retrieval  ', iv % num_ssmi_retrieval 
+            ' writing filtered obs for ssmi retrieval  ', &
+            iv % num_ssmi_retrieval 
       end if
 
       do i = 1, iv % num_ssmi_retrieval
@@ -1122,7 +1125,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_ssmt1 > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for ssmt1 ', iv % num_ssmt1 
+            ' writing filtered obs for ssmt1 ', iv % num_ssmt1 
       end if
 
       do i = 1, iv % num_ssmt1             
@@ -1158,7 +1161,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_ssmt2 > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for ssmt2 ', iv % num_ssmt2 
+            ' writing filtered obs for ssmt2 ', iv % num_ssmt2 
       end if
 
       do i = 1, iv % num_ssmt2              
@@ -1194,7 +1197,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_gpspw > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for gpspw ', iv % num_gpspw 
+            ' writing filtered obs for gpspw ', iv % num_gpspw 
       end if
 
       do i = 1, iv % num_gpspw
@@ -1218,7 +1221,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_gpsref > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for gpsref ', iv % num_gpsref
+            ' writing filtered obs for gpsref ', iv % num_gpsref
       end if
 
       do i = 1, iv % num_gpsref
@@ -1291,7 +1294,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    if (iv % num_airsr > 0) then
       if (print_detail_f_obs) then
          write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered Obs for AIRS retrievals ',iv%num_airsr 
+            ' writing filtered obs for AIRS retrievals ',iv%num_airsr 
       end if
 
       do i = 1, iv % num_airsr               
@@ -1353,19 +1356,22 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
 #ifdef DM_PARALLEL
    call mpi_barrier(comm, ierr)
 #endif
-   if ( rootproc ) then
+   if (rootproc) then
       call da_get_unit(filtered_obs_unit)
-      open(unit=filtered_obs_unit, &
-           file= 'filtered_obs' ,form='formatted',iostat=iost)
-      if (iost /= 0 ) call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
-       call da_count_filtered_obs(&
-               xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
-               xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
+      open (unit=filtered_obs_unit, &
+         file= 'filtered_obs' ,form='formatted',iostat=iost)
+      if (iost /= 0) &
+         call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
+      call da_count_filtered_obs(&
+         xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
+         xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
       call da_final_write_filtered_obs
-      close ( filtered_obs_unit )
+      close (filtered_obs_unit)
       call da_free_unit(filtered_obs_unit)
    end if
 
    if (trace_use) call da_trace_exit("da_write_filtered_obs")
 
 end subroutine da_write_filtered_obs
+
+
