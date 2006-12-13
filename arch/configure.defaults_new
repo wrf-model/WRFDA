@@ -92,7 +92,6 @@ FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
 CC              = mpicc -DMPI2_SUPPORT
-#CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -104,6 +103,52 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-fast
 FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI compiler optimised (RSL, MPICH, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc -DMPI2_SUPPORT
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -fast
+FCDEBUG         = # -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -266,7 +311,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
                     -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = -O3 -xW
@@ -336,6 +381,51 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-fastsse
 FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = 
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = 
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler optimised  (RSL, MPICH, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -fastsse
+FCDEBUG         = # -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -442,6 +532,51 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux x86_64, Pathscale compiler optimised  (RSL, MPICH, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pathf90
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+		     
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -fastsse
+FCDEBUG         = # -g
+FCTYPE          = -r8
+FCFREE          = -freeform
+FCENDIAN        = -convert big_endian
+FCBASE          = -fno-second-underscore
+FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+          LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
 #ARCH Settings for PC Linux x86_64, ifort compiler  (Single-threaded)
 #
 M4              = m4 -B12000
@@ -453,7 +588,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
                     -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = #-O3 -xW
@@ -489,13 +624,60 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
+FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
                     -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-O3 -xW
+FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -FR -cm -w
+FCENDIAN        = -convert big_endian
+FCBASE          = 
+FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+          LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, ifort compiler, optimised  (RSL, MPICH, RSL IO)
+#
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = ifort
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
+                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+		     
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -xW
 FCDEBUG         = # -g -C
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
