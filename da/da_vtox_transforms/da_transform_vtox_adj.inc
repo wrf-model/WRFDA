@@ -60,7 +60,6 @@ subroutine da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, 
 #else
       call da_get_avpoles(xa%u(ims,jms,kms),         &
                           xa%v(ims,jms,kms),         &
-                          xb%lon(ims,jms),           &
                       ids, ide, jds, jde,  &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
