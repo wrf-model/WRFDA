@@ -400,10 +400,12 @@ BENCH_START(init_zero_tend_tim)
 
 #ifdef WRF_PLUS
         if(TEST_init_zero_tendency) THEN
-        CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,     &
-                                  ph_tendf, t_tendf, tke_tend,mu_tendf,      &
-                                  moist_tend,chem_tend,scalar_tend,    &
-                                  num_3d_m,num_3d_c,num_3d_s,rk_step,        &
+        CALL t_init_zero_tendency ( ru_tendf, rv_tendf, rw_tendf,   &
+                                  ph_tendf, t_tendf, tke_tend,      &
+                                  mu_tendf,                         &
+                                  moist_tend,chem_tend,scalar_tend, &
+                                  num_3d_m,num_3d_c,num_3d_s,       &
+                                  rk_step,                          &
                                   ids, ide, jds, jde, kds, kde,     &
                                   ims, ime, jms, jme, kms, kme,     &
                                   grid%i_start(ij), grid%i_end(ij), &
@@ -477,7 +479,7 @@ BENCH_START(phy_prep_tim)
 #endif
          CALL wrf_debug ( 200 , ' call phy_prep' )
          CALL phy_prep ( config_flags,                           &
-                         grid%em_mut, grid%em_muu, grid%em_muv, grid%em_u_2, grid%em_v_2, grid%em_p, grid%em_pb, grid%em_alt,              &
+                         grid%em_mut, grid%em_u_2, grid%em_v_2, grid%em_p, grid%em_pb, grid%em_alt,              &
                          grid%em_ph_2, grid%em_phb, grid%em_t_2, grid%tsk, moist, num_3d_m,   &
                          mu_3d, rho,                             &
                          th_phy, p_phy, pi_phy, u_phy, v_phy,    &
@@ -489,8 +491,6 @@ BENCH_START(phy_prep_tim)
                          grid%rthcuten, grid%rqvcuten, grid%rqccuten,           &
                          grid%rqrcuten, grid%rqicuten, grid%rqscuten,           &
                          grid%rthften,  grid%rqvften,                      &
-                         grid%RUNDGDTEN, grid%RVNDGDTEN, grid%RTHNDGDTEN,       &
-                         grid%RQVNDGDTEN, grid%RMUNDGDTEN,                 &
                          ids, ide, jds, jde, kds, kde,           &
                          ims, ime, jms, jme, kms, kme,           &
                          grid%i_start(ij), grid%i_end(ij),       &
@@ -1411,7 +1411,7 @@ BENCH_START(relax_bdy_dry_tim)
      ENDIF
 #ifdef WRF_PLUS
      if(TEST_rk_addtend_dry) THEN
-     CALL t_rk_addtend_dry( grid%em_ru_tend,  grid%rv_tend,  rw_tend,  ph_tend,  t_tend,  &
+     CALL t_rk_addtend_dry( grid%em_ru_tend,  grid%em_rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
                           grid%em_u_save, grid%em_v_save, w_save, ph_save, grid%em_t_save, &
                           mu_tend, mu_tendf, rk_step,                      &
@@ -1848,7 +1848,7 @@ BENCH_END(spec_bdy_uv_tim)
         if(TEST_advance_mu_t) THEN
           CALL t_advance_mu_t( grid%em_ww, ww1, grid%em_u_2, grid%em_u_save, grid%em_v_2, grid%em_v_save, &
                            grid%em_mu_2, grid%em_mut, muave, grid%em_muts, grid%em_muu, grid%em_muv,  &
-                           grid%em_mudf, grid%em_ru_m, grid%em_rv_m, ww_m,            &
+                           grid%em_mudf, grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,            &
                            grid%em_t_2, grid%em_t_save, t_2save, t_tend,      &
                            mu_tend,                           &
                            grid%rdx, grid%rdy, dts_rk, grid%epssm,           &
@@ -1924,7 +1924,7 @@ BENCH_END(spec_bdy_t_tim)
            CALL t_sumflux ( grid%em_u_2, grid%em_v_2, grid%em_ww,                         &
                         grid%em_u_save, grid%em_v_save, ww1,                  &
                         grid%em_muu, grid%em_muv,                             &
-                        grid%em_ru_m, grid%em_rv_m, ww_m, grid%epssm,              &
+                        grid%em_ru_m, grid%em_rv_m, grid%em_ww_m, grid%epssm,              &
                         grid%msfu, grid%msfv,                           &
                         iteration, number_of_small_timesteps, &
                         ids, ide, jds, jde, kds, kde,         &
@@ -2553,7 +2553,7 @@ BENCH_END(small_step_finish_tim)
        if(TEST_rk_scalar_tend) THEN
          CALL t_rk_scalar_tend (  im, im, config_flags,             &
                               rk_step, dt_rk,                   &
-                              grid%em_ru_m, grid%em_rv_m, ww_m,                 &
+                              grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,                 &
                               grid%em_mut, grid%em_alt,                         &
                               moist(ims,kms,jms,im),       &
                               moist_tend(ims,kms,jms,im),       &
@@ -2576,9 +2576,7 @@ BENCH_START(rk_scalar_tend_tim)
        CALL rk_scalar_tend (  im, im, config_flags,                                      &
                               rk_step, dt_rk,                                            &
                               grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,                  &
-                              grid%em_mut, grid%em_mub, grid%em_mu_1,                    &
-                              grid%em_alt,                                               &
-                              moist_old(ims,kms,jms,im),                                 &
+                              grid%em_mut, grid%em_alt,                                  &
                               moist(ims,kms,jms,im),                                     &
                               moist_tend(ims,kms,jms,im),                                &
                               advect_tend,grid%rqvften,                                  &
@@ -2587,7 +2585,6 @@ BENCH_START(rk_scalar_tend_tim)
                               grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw, grid%khdif, &
                               grid%kvdif, grid%xkmhd,                                    &
                               grid%diff_6th_opt, grid%diff_6th_rate,                     &
-                              config_flags%pd_moist,            &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2619,6 +2616,7 @@ BENCH_START(rlx_bdy_scalar_tim)
                                     moist_b(1,1,1,1,im),                     &
                                     moist_bt(1,1,1,1,im),                    &
                                  config_flags%spec_bdy_width, grid%spec_zone,                 &
+                                 config_flags,               &
                                  ijds, ijde,                 & ! min/max(id,jd)
                                  ids,ide, jds,jde, kds,kde,  & ! domain dims
                                  ims,ime, jms,jme, kms,kme,  & ! memory dims
@@ -2735,9 +2733,7 @@ BENCH_START(tke_adv_tim)
      CALL rk_scalar_tend ( 1, 1, config_flags,                                        &
                            rk_step, dt_rk,                                            &
                            grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,                  &
-                           grid%em_mut, grid%em_mub, grid%em_mu_1,                    &
-                           grid%em_alt,                                               &
-                           grid%em_tke_1,                                             &
+                           grid%em_mut, grid%em_alt,                                  &
                            grid%em_tke_2,                                             &
                            tke_tend(ims,kms,jms),                                     &
                            advect_tend,grid%rqvften,                                  &
@@ -2746,7 +2742,6 @@ BENCH_START(tke_adv_tim)
                            grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw, grid%khdif, &
                            grid%kvdif, grid%xkmhd,                                    &
                            grid%diff_6th_opt, grid%diff_6th_rate,                     &
-                           config_flags%pd_tke,              &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
                            grid%i_start(ij), grid%i_end(ij), &
@@ -2818,9 +2813,7 @@ BENCH_START(chem_adv_tim)
        CALL rk_scalar_tend ( ic, ic, config_flags,                            &
                              rk_step, dt_rk,                                  &
                              grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,        &
-                             grid%em_mut, grid%em_mub, grid%em_mu_1,          &
-                             grid%em_alt,                                     &
-                             chem_old(ims,kms,jms,ic),                        &
+                             grid%em_mut, grid%em_alt,                        &
                              chem(ims,kms,jms,ic),                            &
                              chem_tend(ims,kms,jms,ic),                       &
                              advect_tend,grid%rqvften,                        &
@@ -2829,7 +2822,6 @@ BENCH_START(chem_adv_tim)
                              grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw,   &
                              grid%khdif, grid%kvdif, grid%xkmhd,              &
                              grid%diff_6th_opt, grid%diff_6th_rate,           &
-                             config_flags%pd_chem,             &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &
@@ -2951,9 +2943,7 @@ BENCH_END(chem_adv_tim)
        CALL rk_scalar_tend ( is, is, config_flags,                            &
                              rk_step, dt_rk,                                  &
                              grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,        &
-                             grid%em_mut, grid%em_mub, grid%em_mu_1,          &
-                             grid%em_alt,                                     &
-                             scalar_old(ims,kms,jms,is),                      &
+                             grid%em_mut, grid%em_alt,                        &
                              scalar(ims,kms,jms,is),                          &
                              scalar_tend(ims,kms,jms,is),                     &
                              advect_tend,grid%rqvften,                        &
@@ -2962,7 +2952,6 @@ BENCH_END(chem_adv_tim)
                              grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw,   &
                              grid%khdif, grid%kvdif, grid%xkmhd,              &
                              grid%diff_6th_opt, grid%diff_6th_rate,           &
-                             config_flags%pd_scalar,           &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &

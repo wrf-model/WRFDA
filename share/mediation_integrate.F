@@ -810,7 +810,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    INTERFACE 
      SUBROUTINE med_init_domain_constants ( parent , nest )
         USE module_domain
-        TYPE(domain) :: parent , nest
+        TYPE(domain), POINTER :: parent , nest
      END SUBROUTINE med_init_domain_constants
    END INTERFACE 
    CALL init_domain_constants_em ( parent, nest )

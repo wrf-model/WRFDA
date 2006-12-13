@@ -11,6 +11,8 @@ subroutine da_oi_stats_sound ( stats_unit, oi )
 
   if (trace_use) call da_trace_entry("da_oi_stats_sound")
 
+  if (trace_use) call da_trace_entry("da_oi_stats_sound")
+
   nu = 0
   nv = 0
   nt = 0
@@ -86,6 +88,8 @@ subroutine da_oi_stats_sound ( stats_unit, oi )
       call da_print_stats_sound( stats_unit, nu, nv, nt, nq, Sound )
     end if
   end if
+
+  if (trace_use) call da_trace_exit("da_oi_stats_sound")
 
   if (trace_use) call da_trace_exit("da_oi_stats_sound")
 

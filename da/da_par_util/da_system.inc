@@ -1,14 +1,12 @@
-subroutine da_system(cmd)
+SUBROUTINE da_system(cmd)
 
-   implicit none
-   character (LEN=*) , intent(in) :: cmd
-
+   IMPLICIT NONE
+   CHARACTER (LEN=*) , INTENT(IN) :: cmd
+   integer :: ierr
 #ifdef crayx1
    call pxfsystem(cmd, len(cmd), ierr)
 #else
    call system(cmd)
 #endif
 
-end subroutine da_system
-
-
+END SUBROUTINE da_system

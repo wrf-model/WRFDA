@@ -31,6 +31,7 @@ PHYS_MODULES = \
 	module_sf_ruclsm.o \
 	module_sf_sfcdiags.o \
 	module_sf_myjsfc.o \
+	module_sf_urban.o \
 	module_physics_addtendc.o \
 	module_physics_init.o \
 	module_gfs_machine.o \
@@ -44,7 +45,10 @@ PHYS_MODULES = \
 	module_radiation_driver.o \
 	module_surface_driver.o \
         module_fdda_psufddagd.o \
-        module_fddagd_driver.o
+        module_fddagd_driver.o \
+	module_fddaobs_driver.o \
+	module_fddaobs_rtfdda.o \
+	module_diagnostics.o
 
   
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

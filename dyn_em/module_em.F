@@ -724,9 +724,8 @@ END SUBROUTINE rk_addtend_dry
 
 SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                             rk_step, dt,                  &
-                            ru, rv, ww, mut, mub, mu_old, &
-                            alt,                          &
-                            scalar_old, scalar,           &
+                            ru, rv, ww, mut, alt,         &
+                            scalar,                       &
                             scalar_tends, advect_tend,    &
                             RQVFTEN,                      &
                             base, moist_step, fnm, fnp,   &
@@ -734,7 +733,6 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
                             diff_6th_opt, diff_6th_rate,  &
-                            pd_advection,                 &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -753,7 +751,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
    LOGICAL , INTENT(IN   ) :: moist_step
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                &
-                                         INTENT(INOUT)  :: scalar, scalar_old
+                                         INTENT(INOUT)  :: scalar
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                      &
                                          INTENT(INOUT)  :: scalar_tends
@@ -778,9 +776,8 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
    REAL , DIMENSION( ims:ime , jms:jme ) ,       INTENT(IN   ) :: msfu,    &
                                                                   msfv,    &
                                                                   msft,    &
-                                                                  mub,     &
-                                                                  mut,     &
-                                                                  mu_old
+                                                                  mut
+
 
    REAL ,                                        INTENT(IN   ) :: rdx,     &
                                                                   rdy,     &
@@ -792,7 +789,6 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
 
    REAL ,                                        INTENT(IN   ) :: dt
 
-   LOGICAL, INTENT(IN   ) :: pd_advection
 
    ! Local data
   
@@ -818,31 +814,16 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                       ims, ime, jms, jme, kms, kme, &
                       its, ite, jts, jte, kts, kte )
 
-      IF( (rk_step == 3) .and. pd_advection ) THEN
+     CALL advect_scalar     ( scalar(ims,kms,jms,im),        &
+                              scalar(ims,kms,jms,im),        &
+                              advect_tend(ims,kms,jms),      &
+                              ru, rv, ww, mut, config_flags, &
+                              msfu, msfv, msft, fnm, fnp,    &
+                              rdx, rdy, rdnw,                &
+                              ids, ide, jds, jde, kds, kde,  &
+                              ims, ime, jms, jme, kms, kme,  &
+                              its, ite, jts, jte, kts, kte  )
 
-       CALL advect_scalar_pd       ( scalar(ims,kms,jms,im),             &
-                                     scalar_old(ims,kms,jms,im),         &
-                                     advect_tend(ims,kms,jms),           &
-                                     ru, rv, ww, mut, mub, mu_old,       &
-                                     config_flags,                       &
-                                     msfu, msfv, msft, fnm, fnp,         &
-                                     rdx, rdy, rdnw,dt,                  &
-                                     ids, ide, jds, jde, kds, kde,       &
-                                     ims, ime, jms, jme, kms, kme,       &
-                                     its, ite, jts, jte, kts, kte     )
-
-      ELSE
-
-       CALL advect_scalar     ( scalar(ims,kms,jms,im),        &
-                                scalar(ims,kms,jms,im),        &
-                                advect_tend(ims,kms,jms),      &
-                                ru, rv, ww, mut, config_flags, &
-                                msfu, msfv, msft, fnm, fnp,    &
-                                rdx, rdy, rdnw,                &
-                                ids, ide, jds, jde, kds, kde,  &
-                                ims, ime, jms, jme, kms, kme,  &
-                                its, ite, jts, jte, kts, kte  )
-      END IF
 
      IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN
 
