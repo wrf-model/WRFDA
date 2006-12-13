@@ -6,17 +6,17 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
    ! METHOD: write out for separated PEs 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(IN)     :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(INOUT)  :: ob       ! Observation structure.
-   TYPE (ob_type),    INTENT(INOUT)  :: iv       ! O-B structure.
+   type (xpose_type), intent(in)     :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout)  :: ob       ! Observation structure.
+   type (ob_type),    intent(inout)  :: iv       ! O-B structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
 
-   INTEGER            :: iv_rad_binary_unit, ios
+   integer            :: iv_rad_binary_unit, ios
    character(len=30)  :: filename
    integer            :: ndomain
 
@@ -35,7 +35,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
          call da_warning(__FILE__,__LINE__,(/"cannot open the file "//TRIM(filename)/))
          iv%instid(n)%num_rad = 0
          cycle
-      Endif
+      end if
 
       read(iv_rad_binary_unit) iv%instid(n)%num_rad, iv%instid(n)%nchan,iv%instid(n)%ichan
       do i =1,iv%instid(n)%num_rad
@@ -93,6 +93,6 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
 
    if (trace_use) call da_trace_exit("da_read_iv_rad_binary")
  
-END SUBROUTINE da_read_iv_rad_binary
+end subroutine da_read_iv_rad_binary
 
 

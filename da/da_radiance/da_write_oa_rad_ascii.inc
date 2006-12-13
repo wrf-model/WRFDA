@@ -4,18 +4,18 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    ! PURPOSE: write out OMB and OMA vector structure for radiance data.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.
-   TYPE (ob_type),    INTENT(IN)  :: iv       ! O-B structure.
-   TYPE (y_type),     INTENT(IN)  :: re       ! O-A structure.
+   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(in)  :: ob       ! Observation structure.
+   type (ob_type),    intent(in)  :: iv       ! O-B structure.
+   type (y_type),     intent(in)  :: re       ! O-A structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
 
-   INTEGER            :: ios, oma_rad_unit
+   integer            :: ios, oma_rad_unit
    character(len=30)  :: filename
    integer            :: ndomain
 
@@ -34,35 +34,35 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
          end if
       end do
 #ifdef DM_PARALLEL
-      write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
+      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
 #else
-      write(UNIT=stdout,FMT='(a,i7)') 'number of obs ', ndomain
+      write(unit=stdout,fmt='(a,i7)') 'number of obs ', ndomain
 #endif
 
 #ifdef DM_PARALLEL
-      write(UNIT=filename, FMT='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.oma_', myproc
+      write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.oma_', myproc
 #else
-      write(UNIT=filename, FMT='(a)') trim(iv%instid(n)%rttovid_string)//'.oma'
+      write(unit=filename, fmt='(a)') trim(iv%instid(n)%rttovid_string)//'.oma'
 #endif
       call da_get_unit(oma_rad_unit)
-      open(UNIT=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
+      open(unit=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open oma radiance file"//filename/))
-      Endif
-      write(UNIT=oma_rad_unit,FMT='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
+      end if
+      write(unit=oma_rad_unit,fmt='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                            ' number-of-pixels : ', ndomain, &
                            ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
                            ' index-of-channels : '
-      write(UNIT=oma_rad_unit,FMT='(10i5)') iv%instid(n)%ichan
-      write(UNIT=oma_rad_unit,FMT= *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
-      write(UNIT=oma_rad_unit,FMT= *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
+      write(unit=oma_rad_unit,fmt='(10i5)') iv%instid(n)%ichan
+      write(unit=oma_rad_unit,fmt= *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
+      write(unit=oma_rad_unit,fmt= *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                        & soiltyp vegtyp vegfra elev clwp'
       ndomain = 0
       do i=1,iv%instid(n)%num_rad
          if (iv%instid(n)%rad(i)%loc%proc_domain) then
             ndomain=ndomain+1
-            write(UNIT=oma_rad_unit,FMT='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
+            write(unit=oma_rad_unit,fmt='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
                                    iv%instid(n)%rad(i)%info%date_char, &
                                    iv%instid(n)%rad(i)%scanpos,   &
                                    iv%instid(n)%rad(i)%landsea_mask, &
@@ -72,7 +72,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%satzen,    &
                                    iv%instid(n)%rad(i)%satazi
              if (iv%instid(n)%rad(i)%isflg==0) then
-                write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', i, &
+                write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -89,7 +89,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==1) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' ICE : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -106,7 +106,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==2) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'LAND : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -123,7 +123,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==3) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'SNOW : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -140,7 +140,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==4) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSEA : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -157,7 +157,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==5) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MICE : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -174,7 +174,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==6) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MLND : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -191,7 +191,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%elevation, &
                                    iv%instid(n)%rad(i)%clwp
             else if (iv%instid(n)%rad(i)%isflg==7) then
-               write(UNIT=oma_rad_unit,FMT='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', i, &
+               write(unit=oma_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') 'MSNO : ', i, &
                                    iv%instid(n)%rad(i)%t2m, &
                                    iv%instid(n)%rad(i)%mr2m,   &
                                    iv%instid(n)%rad(i)%u10, &
@@ -209,28 +209,28 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                                    iv%instid(n)%rad(i)%clwp
             end if
 
-            write(UNIT=oma_rad_unit,FMT='(a)') 'OBS  : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)') ob%instid(n)%rad(i)%tb(:)
-            write(UNIT=oma_rad_unit,FMT='(a)') 'BAK  : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)') iv%instid(n)%rad(i)%tb_xb(:)
-            write(UNIT=oma_rad_unit,FMT='(a)') 'IVBC : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)')  iv%instid(n)%rad(i)%tb(:)%inv
-            write(UNIT=oma_rad_unit,FMT='(a)') 'OMA  : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)')  re%instid(n)%rad(i)%tb(:)
-            write(UNIT=oma_rad_unit,FMT='(a)') 'EMS  : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)')  iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
-            write(UNIT=oma_rad_unit,FMT='(a)') 'ERR  : '
-            write(UNIT=oma_rad_unit,FMT='(10f11.2)') iv%instid(n)%rad(i)%tb(:)%error
-            write(UNIT=oma_rad_unit,FMT='(a)') 'QC   : '
-            write(UNIT=oma_rad_unit,FMT='(10i11)') iv%instid(n)%rad(i)%tb(:)%qc
+            write(unit=oma_rad_unit,fmt='(a)') 'OBS  : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)') ob%instid(n)%rad(i)%tb(:)
+            write(unit=oma_rad_unit,fmt='(a)') 'BAK  : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)') iv%instid(n)%rad(i)%tb_xb(:)
+            write(unit=oma_rad_unit,fmt='(a)') 'IVBC : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)')  iv%instid(n)%rad(i)%tb(:)%inv
+            write(unit=oma_rad_unit,fmt='(a)') 'OMA  : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)')  re%instid(n)%rad(i)%tb(:)
+            write(unit=oma_rad_unit,fmt='(a)') 'EMS  : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)')  iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+            write(unit=oma_rad_unit,fmt='(a)') 'ERR  : '
+            write(unit=oma_rad_unit,fmt='(10f11.2)') iv%instid(n)%rad(i)%tb(:)%error
+            write(unit=oma_rad_unit,fmt='(a)') 'QC   : '
+            write(unit=oma_rad_unit,fmt='(10i11)') iv%instid(n)%rad(i)%tb(:)%qc
 
             if (write_profile) then
                num_levs  = iv%instid(n)%nlevels
-               write(UNIT=oma_rad_unit,FMT=*) &
+               write(unit=oma_rad_unit,fmt=*) &
                   'RTM_level pres(mb) T(k) Q(ppmv) WRF_level pres(mb) T(k) q(g/kg) clw(g/kg) rain(g/kg)'
                do k=xp%kts,xp%kte
                   if (k <= num_levs) then
-                     write(UNIT=oma_rad_unit,FMT='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
+                     write(unit=oma_rad_unit,fmt='(i3,f10.2,f8.2,e11.4,i3,f10.2,f8.2,3e11.4)') &
                         k, &                             ! RTTOV levels
                         coefs(n) % ref_prfl_p(k) , &
                         iv%instid(n)%rad(i)%t(k) , &
@@ -243,7 +243,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
                         iv%instid(n)%rad(i)%qrn(k)*1000.
 
                   else
-                     write(UNIT=oma_rad_unit,FMT='(32x,i3,f10.2,f8.2,3e11.4)') k, &
+                     write(unit=oma_rad_unit,fmt='(32x,i3,f10.2,f8.2,3e11.4)') k, &
                         iv%instid(n)%rad(i)%pm(k) , &
                         iv%instid(n)%rad(i)%tm(k) , &
                         iv%instid(n)%rad(i)%qm(k)*1000 , &
@@ -257,12 +257,12 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
             end if   ! end if write_profile
          end if    ! end if proc_domain
       end do     ! end do pixels
-      close(UNIT=oma_rad_unit)
+      close(unit=oma_rad_unit)
       call da_free_unit(oma_rad_unit)
-   end do    !! end do instruments
+   end do    ! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_oa_rad_ascii")
 #endif
 
-END SUBROUTINE da_write_oa_rad_ascii
+end subroutine da_write_oa_rad_ascii
 

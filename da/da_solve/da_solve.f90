@@ -25,7 +25,7 @@ subroutine da_solve ( grid , config_flags , &
 
    implicit none
 
-   type (domain),                intent(inout) :: grid
+   type (domain),               intent(inout) :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
 
    ! Definitions of dummy arguments to solve
@@ -51,8 +51,9 @@ subroutine da_solve ( grid , config_flags , &
    integer                      :: wrf_done_unit
 
    if (trace_use) call da_trace_entry("da_solve")
+
 #ifdef DM_PARALLEL
-call mpi_barrier(comm,ierr)
+   call mpi_barrier(comm,ierr)
 #endif
 
    !---------------------------------------------------------------------------
@@ -136,13 +137,13 @@ call mpi_barrier(comm,ierr)
    ! [7.0] Setup control variable (cv):
    !---------------------------------------------------------------------------
 
-   allocate( cvt(1:cv_size) )
-   allocate( xhat(1:cv_size) )
-   call da_initialize_cv( cv_size, cvt )
-   call da_initialize_cv( cv_size, xhat )
+   allocate (cvt(1:cv_size))
+   allocate (xhat(1:cv_size))
+   call da_initialize_cv (cv_size, cvt)
+   call da_initialize_cv (cv_size, xhat)
       
-   call da_zero_vp_type( grid%vv )
-   call da_zero_vp_type( grid%vp )
+   call da_zero_vp_type (grid%vv)
+   call da_zero_vp_type (grid%vp)
 
    !---------------------------------------------------------------------------
    ! [8] Outerloop
@@ -247,10 +248,10 @@ call mpi_barrier(comm,ierr)
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte )
 
-      ! [8.6] Only when use_RadarObs = .false. and W_inCREMENTS =.true.,
-      !       the W_increment need to be diagnosed:
+      ! [8.6] Only when use_RadarObs = .false. and w_increments =.true.,
+      !       the w_increment need to be diagnosed:
 
-      if (W_inCREMENTS .and. .not. use_RadarObs) then
+      if (w_increments .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp,                 &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
@@ -347,8 +348,9 @@ call mpi_barrier(comm,ierr)
    deallocate (xbx % latc_mean)
 
 #ifdef DM_PARALLEL
-call mpi_barrier(comm,ierr)
+   call mpi_barrier(comm,ierr)
 #endif
+
    if (trace_use) call da_trace_exit("da_solve")
 
 contains

@@ -1,4 +1,4 @@
-SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
    ! ------------------------------------------------------------------------
    ! Called by da_obs/da_get_innov_vector.inc
@@ -20,7 +20,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
    real, dimension(1:max_ob_levels) :: model_ref !Model gpsref at ob loc
    real, dimension(xp%kms:xp%kme)   :: v_h     ! Model value h at ob
                                                ! hor. location.
-   INTEGER           :: pref, fref
+   integer           :: pref, fref
 
    ! For quality control
 
@@ -44,16 +44,16 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       ! Deallocate:
       if (iv%num_gpsref > 0) then
          do n = 1, iv%num_gpsref
-           deallocate (iv % gpsref(n) %  h )
-           deallocate (iv % gpsref(n) %  zk)
-           deallocate (iv % gpsref(n) % ref)
-           deallocate (iv % gpsref(n) %   p)
-           deallocate (iv % gpsref(n) %   t)
-           deallocate (iv % gpsref(n) %   q)
-           deallocate (ob % gpsref(n) % ref)
-        end do
-        deallocate (iv % gpsref)
-        deallocate (ob % gpsref)
+            deallocate (iv % gpsref(n) %  h )
+            deallocate (iv % gpsref(n) %  zk)
+            deallocate (iv % gpsref(n) % ref)
+            deallocate (iv % gpsref(n) %   p)
+            deallocate (iv % gpsref(n) %   t)
+            deallocate (iv % gpsref(n) %   q)
+            deallocate (ob % gpsref(n) % ref)
+         end do
+         deallocate (iv % gpsref)
+         deallocate (ob % gpsref)
       end if
 
       use_gpsrefobs = .true.
@@ -69,7 +69,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       allocate (ob%gpsref(1:num_pseudo))
       allocate (ob%gpsref(num_pseudo)%ref(1:1))
 
-      write(6,'(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
+      write(stdout,'(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
 
       iv%gpsref(1)%info%levels = 1
 
@@ -101,8 +101,8 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          end if 
       end if
 
-      write(6,'(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
-      write(6,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
+      write(stdout,'(a4,2f15.5)') pseudo_var, pseudo_val, pseudo_err
+      write(stdout,'(3f15.5)')    pseudo_x, pseudo_y, pseudo_z
    end if
 
    if (iv%num_gpsref < 1) return
@@ -139,7 +139,7 @@ SUBROUTINE da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
             if (iv%gpsref(n)%h(k) > 0.0) &
                call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, iv%gpsref(n)%zk(k))
             if (iv%gpsref(n)%zk(k) < 0.0 .and. &
-               (ANALYSIS_TYPE /= 'VERIFY' .and. ANALYSIS_TYPE /= 'verify')) then
+               (analysis_type /= 'VERIFY' .and. analysis_type /= 'verify')) then
                iv%gpsref(n)%ref(k)%qc = missing
             end if
          end do

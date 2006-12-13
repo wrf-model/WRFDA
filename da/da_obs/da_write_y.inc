@@ -1,22 +1,13 @@
-SUBROUTINE da_write_y(iv, y)
+subroutine da_write_y (iv, y)
 
    !-------------------------------------------------------------------------   
-   ! History:
-   !
-   ! Additions:
-   !          07/08/2003 - Profiler and Buoy Obs          Syed RH Rizvi      
-   !          03/07/2006      Add radiance output         Zhiquan Liu
-   !          05/16/2006 - Updated for MPI run            Syed RH Rizvi
-   !          07/03/2006 - Updated for AIRS retrievals    Syed RH Rizvi
-   !
-   !
-   !Purpose: Writes out components of y=H(x_inc) structure.
+   ! Purpose: Writes out components of y=H(x_inc) structure.
    !-------------------------------------------------------------------------   
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (ob_type), INTENT(IN)    :: iv   ! O-B structure.
-   TYPE (y_type), INTENT(IN)     :: y    ! y = H(x_inc) structure.
+   type (ob_type), intent(in)    :: iv   ! O-B structure.
+   type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
 
    integer                       :: ounit ! Output file unit.
    integer                       :: n, k, num_obs, inst, ios
@@ -38,30 +29,29 @@ SUBROUTINE da_write_y(iv, y)
    dum = -999999.9
 
 #ifdef DM_PARALLEL
-      write(UNIT=filename, FMT='(a,i3.3)') trim(file_prefix), myproc
+    write (unit=filename, fmt='(a,i3.3)') trim(file_prefix), myproc
 #else
-      write(UNIT=filename, FMT='(a)') trim(file_prefix)//'000'
+    write (unit=filename, fmt='(a)') trim(file_prefix)//'000'
 #endif
 
    call da_get_unit(ounit)
-   open(UNIT=ounit,file=trim(filename),form='formatted',iostat=ios)
+   open (unit=ounit,file=trim(filename),form='formatted',iostat=ios)
    if (ios /= 0 ) Then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open (un)perturbed observation file"//filename/))
-   Endif
-
+   endif
 
    ! [1] Transfer surface obs:
 
-   IF ( iv % num_synop > 0 ) THEN
+   if ( iv % num_synop > 0 ) then
       num_obs = 0
-      DO n = 1, iv % num_synop
+      do n = 1, iv % num_synop
          if (iv%synop(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'synop', num_obs
          num_obs = 0
-         DO n = 1, iv % num_synop
+         do n = 1, iv % num_synop
             if (iv%synop(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -73,17 +63,17 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, &
                   dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [2] Transfer metar obs:
 
-   IF ( iv % num_metar > 0 ) THEN
+   if ( iv % num_metar > 0 ) then
       num_obs = 0
-      DO n = 1, iv % num_metar
+      do n = 1, iv % num_metar
          if(iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'metar', num_obs
          num_obs = 0
@@ -99,21 +89,21 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, &
                dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [3] Transfer ships obs:
 
-   IF (iv % num_ships > 0) THEN
+   if (iv % num_ships > 0) then
       num_obs = 0
-      DO n = 1, iv % num_ships
+      do n = 1, iv % num_ships
         if (iv%ships(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ships', num_obs
          num_obs = 0
-         DO n = 1, iv % num_ships
+         do n = 1, iv % num_ships
             if (iv%ships(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -125,75 +115,75 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, &
                   dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [4.1] Transfer Geo. AMVs Obs:
 
-   IF ( iv % num_geoamv > 0 ) THEN 
+   if ( iv % num_geoamv > 0 ) then 
       num_obs = 0
-      DO n = 1, iv % num_geoamv
+      do n = 1, iv % num_geoamv
          if (iv%geoamv(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'geoamv', num_obs
          num_obs = 0
-         DO n = 1, iv % num_geoamv
+         do n = 1, iv % num_geoamv
             if (iv%geoamv(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % geoamv(n) % info % levels
-               DO k = 1, iv % geoamv(n) % info % levels
+               do k = 1, iv % geoamv(n) % info % levels
                   call da_check_missing(iv%geoamv(n)%u(k)%qc, &
                      y%geoamv(n)%u(k), f1)
                   call da_check_missing(iv%geoamv(n)%v(k)%qc, &
                      y%geoamv(n)%v(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2 , dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [4.2] Transfer Polar AMVs Obs:
 
-   IF (iv % num_polaramv > 0) THEN
+   if (iv % num_polaramv > 0) then
       num_obs = 0
-      DO n = 1, iv % num_polaramv
+      do n = 1, iv % num_polaramv
          if (iv%polaramv(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'polaramv', num_obs
          num_obs = 0
-         DO n = 1, iv % num_polaramv
+         do n = 1, iv % num_polaramv
             if (iv%polaramv(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % polaramv(n) % info % levels
-               DO k = 1, iv % polaramv(n) % info % levels
+               do k = 1, iv % polaramv(n) % info % levels
                   call da_check_missing(iv%polaramv(n)%u(k)%qc, &
                      y%polaramv(n)%u(k), f1)
                   call da_check_missing(iv%polaramv(n)%v(k)%qc, &
                      y%polaramv(n)%v(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2 , dum,dum,dum,&
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [5] Transfer gpspw obs:
 
-   IF ( iv % num_gpspw > 0 ) THEN
+   if ( iv % num_gpspw > 0 ) then
       num_obs = 0
-      DO n = 1, iv % num_gpspw
+      do n = 1, iv % num_gpspw
          if (iv%gpspw(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'gpspw', num_obs
          num_obs = 0
-         DO n = 1, iv % num_gpspw
+         do n = 1, iv % num_gpspw
             if (iv%gpspw(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -201,44 +191,44 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, dum,dum,dum,dum, &
                   dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [6] Transfer sonde obs:
 
-   IF (iv % num_sound > 0) THEN
+   if (iv % num_sound > 0) then
       num_obs = 0
-      DO n = 1, iv % num_sound
+      do n = 1, iv % num_sound
          if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sound', num_obs
          num_obs = 0
-         DO n = 1, iv % num_sound
+         do n = 1, iv % num_sound
             if (iv%sound(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % sound(n) % info % levels
-               DO k = 1, iv % sound(n) % info % levels
+               do k = 1, iv % sound(n) % info % levels
                   call da_check_missing(iv%sound(n)%u(k)%qc, y%sound(n)%u(k), f1)
                   call da_check_missing(iv%sound(n)%v(k)%qc, y%sound(n)%v(k), f2)
                   call da_check_missing(iv%sound(n)%t(k)%qc, y%sound(n)%t(k), f3)
                   call da_check_missing(iv%sound(n)%q(k)%qc, y%sound(n)%q(k), f4)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, f3, f4, dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
 
       num_obs = 0
-      DO n = 1, iv % num_sound
+      do n = 1, iv % num_sound
          if (iv%sound(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'sonde_sfc', num_obs
          num_obs = 0
-         DO n = 1, iv % num_sound
+         do n = 1, iv % num_sound
             if (iv%sound(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -250,72 +240,72 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, &
                   dum,dum
             endif 
-         ENDDO
+         enddo
       endif
-   ENDIF
+   endif
 
    ! [7] Transfer airep obs:
 
-   IF (iv % num_airep > 0) THEN
+   if (iv % num_airep > 0) then
       num_obs = 0
-      DO n = 1, iv % num_airep
+      do n = 1, iv % num_airep
          if (iv%airep(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airep', num_obs
          num_obs = 0
-         DO n = 1, iv % num_airep
+         do n = 1, iv % num_airep
             if (iv%airep(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % airep(n) % info % levels
-               DO k = 1, iv % airep(n) % info % levels
+               do k = 1, iv % airep(n) % info % levels
                   call da_check_missing(iv%airep(n)%u(k)%qc, y%airep(n)%u(k), f1)
                   call da_check_missing(iv%airep(n)%v(k)%qc, y%airep(n)%v(k), f2)
                   call da_check_missing(iv%airep(n)%t(k)%qc, y%airep(n)%t(k), f3)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, f3, dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [8] Transfer pilot obs:
 
-   IF (iv % num_pilot > 0) THEN
+   if (iv % num_pilot > 0) then
       num_obs = 0
-      DO n = 1, iv % num_pilot
+      do n = 1, iv % num_pilot
          if (iv%pilot(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'pilot', num_obs
          num_obs = 0
-         DO n = 1, iv % num_pilot
+         do n = 1, iv % num_pilot
             if (iv%pilot(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % pilot(n) % info % levels
-               DO k = 1, iv % pilot(n) % info % levels
+               do k = 1, iv % pilot(n) % info % levels
                   call da_check_missing(iv%pilot(n)%u(k)%qc, y%pilot(n)%u(k), f1)
                   call da_check_missing(iv%pilot(n)%v(k)%qc, y%pilot(n)%v(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
      endif
-   ENDIF
+   endif
 
    ! [9] Transfer SSM/I obs:SSMI:
 
-   IF (iv % num_ssmi_retrieval > 0) THEN
+   if (iv % num_ssmi_retrieval > 0) then
       num_obs = 0
-      DO n = 1, iv % num_ssmi_retrieval
+      do n = 1, iv % num_ssmi_retrieval
          if (iv%ssmi_retrieval(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmir', num_obs
          num_obs = 0
-         DO n = 1, iv % num_ssmi_retrieval
+         do n = 1, iv % num_ssmi_retrieval
             if (iv%ssmi_retrieval(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -326,19 +316,19 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, dum,dum,dum, &
                   dum,dum
             endif 
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
-   IF (iv % num_ssmi_tb > 0) THEN
+   if (iv % num_ssmi_tb > 0) then
       num_obs = 0
-      DO n = 1, iv % num_ssmi_tb            
+      do n = 1, iv % num_ssmi_tb            
          if (iv%ssmi_tb(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
-         write(ounit,'(a20,i8)')'ssmiT', num_obs
+         write(ounit,'(a20,i8)')'ssmit', num_obs
          num_obs = 0
-         DO n = 1, iv % num_ssmi_tb
+         do n = 1, iv % num_ssmi_tb
             if (iv%ssmi_tb(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -358,96 +348,96 @@ SUBROUTINE da_write_y(iv, y)
                                       y %ssmi_tb(n)%tb85v, f7 )
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, f6, f7
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [10] Transfer satem obs:
 
-   IF (iv % num_satem > 0 ) THEN
+   if (iv % num_satem > 0 ) then
       num_obs = 0
-      DO n = 1, iv % num_satem            
+      do n = 1, iv % num_satem            
          if (iv%satem(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'satem', num_obs
          num_obs = 0
-         DO n = 1, iv % num_satem
+         do n = 1, iv % num_satem
             if (iv%satem(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % satem(n) % info % levels
-               DO k = 1, iv % satem(n) % info % levels
+               do k = 1, iv % satem(n) % info % levels
                   call da_check_missing(iv%satem(n)%thickness(k)%qc, &
                      y % satem(n) % thickness(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
    
    ! [11] Transfer ssmt1 obs:
 
-   IF ( iv % num_ssmt1 > 0 ) THEN
+   if ( iv % num_ssmt1 > 0 ) then
       num_obs = 0
-      DO n = 1, iv % num_ssmt1            
+      do n = 1, iv % num_ssmt1            
          if (iv%ssmt1(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt1', num_obs
          num_obs = 0
-         DO n = 1, iv % num_ssmt1
+         do n = 1, iv % num_ssmt1
             if (iv%ssmt1(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % ssmt1(n) % info % levels
-               DO k = 1, iv % ssmt1(n) % info % levels
+               do k = 1, iv % ssmt1(n) % info % levels
                   call da_check_missing(iv%ssmt1(n)%t(k)%qc, &
                      y % ssmt1(n) % t(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [12] Transfer ssmt2 obs:
 
-   IF (iv % num_ssmt2 > 0) THEN
+   if (iv % num_ssmt2 > 0) then
       num_obs = 0
-      DO n = 1, iv % num_ssmt2            
+      do n = 1, iv % num_ssmt2            
          if (iv%ssmt2(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'ssmt2', num_obs
          num_obs = 0
-         DO n = 1, iv % num_ssmt2
+         do n = 1, iv % num_ssmt2
             if (iv%ssmt2(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % ssmt2(n) % info % levels
-               DO k = 1, iv % ssmt2(n) % info % levels
+               do k = 1, iv % ssmt2(n) % info % levels
                   call da_check_missing(iv%ssmt2(n)%rh(k)%qc, &
                   y % ssmt2(n) % rh(k), f1)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum,dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [13] Transfer scatterometer obs:
 
-   IF (iv % num_qscat > 0) THEN
+   if (iv % num_qscat > 0) then
       num_obs = 0
-      DO n = 1, iv % num_qscat            
+      do n = 1, iv % num_qscat            
          if (iv%qscat(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'qscat', num_obs
          num_obs = 0
-         DO n = 1, iv % num_qscat
+         do n = 1, iv % num_qscat
             if (iv%qscat(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -456,48 +446,48 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, dum,dum,dum, &
                   dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
    
    ! [14] Transfer profiler obs:
 
-   IF (iv % num_profiler > 0) THEN
+   if (iv % num_profiler > 0) then
       num_obs = 0
-      DO n = 1, iv % num_profiler            
+      do n = 1, iv % num_profiler            
          if (iv%profiler(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'profiler', num_obs
          num_obs = 0
-         DO n = 1, iv % num_profiler
+         do n = 1, iv % num_profiler
             if (iv%profiler(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % profiler(n) % info % levels
-               DO k = 1, iv % profiler(n) % info % levels
+               do k = 1, iv % profiler(n) % info % levels
                   call da_check_missing(iv%profiler(n)%u(k)%qc, &
                      y%profiler(n)%u(k), f1)
                   call da_check_missing(iv%profiler(n)%v(k)%qc, &
                      y%profiler(n)%v(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum,dum,dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [15] Transfer buoy  obs:
 
-   IF (iv % num_buoy > 0) THEN
+   if (iv % num_buoy > 0) then
       num_obs = 0
-      DO n = 1, iv % num_buoy            
+      do n = 1, iv % num_buoy            
          if (iv%buoy(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'buoy', num_obs
          num_obs = 0
-         DO n = 1, iv % num_buoy
+         do n = 1, iv % num_buoy
             if (iv%buoy(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
@@ -509,123 +499,121 @@ SUBROUTINE da_write_y(iv, y)
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, f2, f3, f4, f5, &
                   dum,dum
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [16] Transfer TC bogus obs:
 
-   IF (iv % num_bogus > 0) THEN
+   if (iv % num_bogus > 0) then
       num_obs = 0
-      DO n = 1, iv % num_bogus            
+      do n = 1, iv % num_bogus            
          if (iv%bogus(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'bogus', num_obs
          num_obs = 0
-         DO n = 1, iv % num_bogus
+         do n = 1, iv % num_bogus
             if (iv%bogus(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         
                write(ounit,'(2i8,7e15.7)')num_obs, 1, f1, dum,dum,dum,dum,dum,dum
                write(ounit,'(i8)')iv % bogus(n) % info % levels
-               DO k = 1, iv % bogus(n) % info % levels
+               do k = 1, iv % bogus(n) % info % levels
                   call da_check_missing(iv%bogus(n)%u(k)%qc, y%bogus(n)%u(k), f2)
                   call da_check_missing(iv%bogus(n)%v(k)%qc, y%bogus(n)%v(k), f3)
                   call da_check_missing(iv%bogus(n)%t(k)%qc, y%bogus(n)%t(k), f4)
                   call da_check_missing(iv%bogus(n)%q(k)%qc, y%bogus(n)%q(k), f5)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f2, f3, f4, f5, dum, &
                      dum,dum
-               END DO
+               end do
             endif
-         END DO
+         end do
       endif
-   ENDIF
+   endif
 
    ! [17] Transfer AIRS retrievals:
 
-   IF (iv % num_airsr > 0) THEN
+   if (iv % num_airsr > 0) then
       num_obs = 0
-      DO n = 1, iv % num_airsr
+      do n = 1, iv % num_airsr
          if (iv%airsr(n)%loc%proc_domain) num_obs = num_obs + 1
-      ENDDO
+      enddo
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'airsr', num_obs
          num_obs = 0
-         DO n = 1, iv % num_airsr
+         do n = 1, iv % num_airsr
             if (iv%airsr(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')iv % airsr(n) % info % levels
-               DO k = 1, iv % airsr(n) % info % levels
+               do k = 1, iv % airsr(n) % info % levels
                   call da_check_missing(iv%airsr(n)%t(k)%qc, y%airsr(n)%t(k), f1)
                   call da_check_missing(iv%airsr(n)%q(k)%qc, y%airsr(n)%q(k), f2)
                   write(ounit,'(2i8,7e15.7)')num_obs, k, f1, f2, dum, dum, &
                      dum, dum,dum
-               END DO
-            endif
-         END DO
-      endif
-   ENDIF
-
+               end do
+            end if
+         end do
+      end if
+   end if
   
    ! [18] Transfer Radiance obs:
 
-   IF ( iv%num_inst > 0 ) THEN
+   if (iv%num_inst > 0) then
       do inst = 1, iv%num_inst                 ! loop for sensor
          if ( iv%instid(inst)%num_rad < 1 ) cycle
          do k = 1,iv%instid(inst)%nchan        ! loop for channel
-!  Counting number of obs for channle k
-         num_obs = 0
-         do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
-           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
-              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
-                num_obs = num_obs + 1
-           end if
-         end do                                ! end loop for pixel
-         if (num_obs < 1) cycle
+            ! Counting number of obs for channel k
+            num_obs = 0
+            do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
+               if (iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+                  (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                  num_obs = num_obs + 1
+               end if
+            end do                                ! end loop for pixel
+            if (num_obs < 1) cycle
 
-         write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
-         write(ounit,'(a20,i8)')  ob_name,num_obs
+            write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
+            write(ounit,'(a20,i8)')  ob_name,num_obs
 
-         num_obs = 0
-         do n= 1, iv%instid(inst)%num_rad      ! loop for pixel
-           if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
-              (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
-                 num_obs = num_obs + 1
-                 write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(inst)%rad(n)%tb(k)
-           end if
-         end do                                ! end loop for pixel
+            num_obs = 0
+            do n= 1, iv%instid(inst)%num_rad      ! loop for pixel
+              if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
+                 (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+                    num_obs = num_obs + 1
+                    write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(inst)%rad(n)%tb(k)
+              end if
+            end do                                ! end loop for pixel
          end do                                ! end loop for channel
       end do                                   ! end loop for sensor
-   END IF
+   end if
 
+   ! Transfer gpsref obs:
 
-! Transfer gpsref obs:
-
-   IF ( iv % num_gpsref > 0 ) THEN
+   if ( iv % num_gpsref > 0 ) then
       num_obs = 0
       do n = 1, iv % num_gpsref
-       if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+         if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
-    if( num_obs > 0) then
-      write(ounit,'(a20,i8)')'gpsref', num_obs
-      num_obs = 0
-      DO n = 1, iv % num_gpsref
-       if(iv%gpsref(n)%loc%proc_domain) then
-         num_obs = num_obs + 1
-         write(ounit,'(i8)')iv % gpsref(n) % info % levels
-         DO k = 1, iv % gpsref(n) % info % levels
-         call da_check_missing(iv%gpsref(n)%ref(k)%qc, y%gpsref(n)%ref(k), f1)
-         write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum, dum, dum, dum, dum,dum
-         END DO
-       endif
-      END DO
-    endif
-   ENDIF
+      if (num_obs > 0) then
+         write(ounit,'(a20,i8)')'gpsref', num_obs
+         num_obs = 0
+         do n = 1, iv % num_gpsref
+            if (iv%gpsref(n)%loc%proc_domain) then
+               num_obs = num_obs + 1
+               write(ounit,'(i8)')iv % gpsref(n) % info % levels
+               do k = 1, iv % gpsref(n) % info % levels
+                  call da_check_missing(iv%gpsref(n)%ref(k)%qc, y%gpsref(n)%ref(k), f1)
+                  write(ounit,'(2i8,7e15.7)')num_obs, k, f1, dum, dum, dum, dum, dum,dum
+               end do
+            end if
+         end do
+      end if
+   end if
 
    close (ounit)
    call da_free_unit(ounit)
 
    if (trace_use) call da_trace_exit("da_write_y")
 
-END SUBROUTINE da_write_y
+end subroutine da_write_y
