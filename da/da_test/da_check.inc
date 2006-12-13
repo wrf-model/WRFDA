@@ -109,7 +109,6 @@ subroutine da_check( cv_size, xb, xbx, be, ep, iv, &
 #endif
 
    call da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
-                               ids,ide, jds,jde, kds,kde, &
                                ims,ime, jms,jme, kms,kme, &
                                its,ite, jts,jte, kts,kte )
 
