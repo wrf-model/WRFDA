@@ -9,12 +9,12 @@ Forecast (first guess or background) error covariances are a vital input to any 
 
 WRF-Var is a freely available community variational data assimilation system. It is used in a number of applications spanning convective to synoptic scales, tropical to polar domains, and variable observation distributions. In addition, the WRF-Var system is used to provide initial conditions for a number of forecast models in addition to WRF, e.g. MM5, the Korean Meteorological Administration's (KMA's) global spectral model, and the Taiwanese Nonhydrostatic Forecast Model (NFS). Perhaps understandably, the issue of forecast error generation for WRF-Var applications is the number 1 user question to date. For all these reasons, it is therefore vital that an accurate, portable, flexible, and efficient utility to generate and tune forecast error statistics be made available for community use. 
 
-In the next subsection, a brief overview of the role of forecast error covariances in variational data assimilation is given. Default forecast error statistics are supplied with the WRF-Var release. These data files are made available primarily for training purposes, i.e. to permit the user to configure and test the WRF-Var/WRF system in their own application. It is important to note that the default statistics are not intended for extended testing or real-time applications of WRF-Var. For those applications, there is no substitute to creating one's own forecast error covariances with the {\it gen\_be} utility, described in subsection (\ref{gen_be_sub}). Having created domain-specific statistics, it may then be necessary to further tune both forecast and observation error statistics. A variety of algorithms are supplied with WRF-Var to perform this tuning, and documented in section 4. These tuning algorithms include both innovation vector-based approaches \citep{hollingsworth86}
+In the next subsection, a brief overview of the role of forecast error covariances in variational data assimilation is given. Default forecast error statistics are supplied with the WRF-Var release. These data files are made available primarily for training purposes, i.e. to permit the user to configure and test the WRF-Var/WRF system in their own application. It is important to note that the default statistics are not intended for extended testing or real-time applications of WRF-Var. For those applications, there is no substitute to creating one's own forecast error covariances with the {\it gen\_be} utility, described in subsection (\ref{gen_be_sub}). Having created domain-specific statistics, it may then be necessary to further tune both forecast and observation error statistics. A variety of algorithms are supplied with WRF-Var to perform this tuning, and documented in Chapter (\ref{diagnostics}). These tuning algorithms include both innovation vector-based approaches \citep{hollingsworth86}
 and variational tuning approaches \citep{desroziers01}. Clearly, the whole process of tuning error statistics for data assimilation is rather complex. However, it has been shown in many applications, that this work is vital if one is to produce the optimal analysis.
 
 \section{Scientific Background}
 
-As shown in Chapter (\ref{intro}), the basic goal of any variational data assimilation system is to produce an optimal estimate of the true atmospheric state at analysis time through iterative solution of a prescribed cost-function {\it J}. The particular variational data assimilation algorithm adopted in WRF-Var is a model-space, incremental formulation of the variational problem.  In this approach, observations, previous forecasts, their errors, and physical laws are combined to produce analysis increments ${\partial \bf x^{a}}$, which are added to the first guess xb to provide an updated analysis.
+As shown in Chapter (\ref{intro}), the basic goal of any variational data assimilation system is to produce an optimal estimate of the true atmospheric state at analysis time through iterative solution of a prescribed cost-function {\it J}. The particular variational data assimilation algorithm adopted in WRF-Var is a model-space, incremental formulation of the variational problem.  In this approach, observations, previous forecasts, their errors, and physical laws are combined to produce analysis increments ${\partial \bf x^{a}}$, which are added to the first guess $x_{b}$ to provide an updated analysis.
 
 The background (or "first guess") error covariance matrix is defined as 
 
@@ -35,11 +35,10 @@ In model-space variational data assimilation systems, the background error covar
 where the breakdown into components of U represents transformations of variable (p), and vertical (v) and horizontal (h) components of spatial error covariances. The transform (\ref{var-cv}), and its adjoint are required in the WRF-Var code, and will be dsecribed in more detail in Chapter (\ref{be_modeling}). In contrast, the gen\_be code performs the inverse transform
 
 \begin{equation}
-{\bf v} = {\rm U}{\bf v}= {\rm U}^{-1}_{h} {\rm U}^{-1}_{v} {\rm U}^{-1}_{p} {\bf x'}.
+{\bf v} = {\rm U}^{-1}{\bf x'}= {\rm U}^{-1}_{h} {\rm U}^{-1}_{v} {\rm U}^{-1}_{p} {\bf x'}.
 \label{var-cv-inv}
 \end{equation}
-
-In order to accumulate statistics for each component of the control vector $\bf v$. The detailed procedure for performing this calculation is described in the next section.
+in order to accumulate statistics for each component of the control vector $\bf v$. The detailed procedure for performing this calculation is described in the next section.
 
 
 \section{WRF's Forecast Error Covariance Estimator - gen\_be}
@@ -62,10 +61,9 @@ Input: Model-specific forecast files.
 
 Processing: Read forecasts, calculate ${\bf x'}$ perturbations, transform to standard perturbation fields.
 
-Output: File containing standard fields in specific binary format, with filename e.g. diff.2003-01-01\_12:00:00 (perturbation valid at 12Z on 1 January 2003).
+Output: File containing standard fields in specific binary format, with filename e.g. \\pert.2003010112.e001 (perturbation valid at 12Z on 1 January 2003).
 
 The standard gridpoint fields are:
-
 
 \begin{itemize}\setlength{\parskip}{-4pt}
 \item
@@ -88,7 +86,7 @@ The calculation of streamfunction and velocity potential from input $u$ and $v$ 
 
 
 
-This stage simply reads the difference fields output by stage0 and removes the time/bin mean from each standard field and level. The zero-mean fields are output to separate directories/files for each variable, date and member (e.g. psi/2003010112.psi.NMC contains the 3D psi field from NMC-method data, with mean removed).
+This stage simply reads the perturbation fields output by stage0 and removes the time/bin mean from each standard field and level. The zero-mean fields are output to separate directories/files for each variable, date and member (e.g. psi/2003010112.psi.e001 contains the 3D psi field with mean removed).
 
 Input: Perturbation fields (output of stage 0)
 
@@ -101,7 +99,7 @@ $T'(i,j,k)$, $r'(i,j,k)$, $p_s'(i,j)$.
 
 The standard control variables (i.e. those variable for which we assume cross-correlations are zero) in WRF-Var are streamfunction, "pseudo" relative humidity, and the unbalanced components of velocity potential, temperature, and surface pressure.
 
-The unbalanced control variables are defined as the difference between full and balanced (or correlated) components of the field. In this stage of the calculation of background errors, the balanced component of particular fields is modeled via a regression analysis of the field using specified predictor fields (e.g. streamfunction). (see \citet{wu02} for further details). The resulting regression coefficients are output for use in WRF-Vars ${\rm U}_p$ transform, and are also used in gen\_be\_stage2a (see below). Currently, three regression analyses are performed resulting in three sets of regression coefficients (note: drop the perturbation notation from now on for clarity):
+The unbalanced control variables are defined as the difference between full and balanced (or correlated) components of the field. In this stage of the calculation of background errors, the balanced component of particular fields is modeled via a regression analysis of the field using specified predictor fields (e.g. streamfunction). (see \citet{wu02} for further details). The resulting regression coefficients are output for use in WRF-Var's ${\rm U}_p$ transform, and are also used in gen\_be\_stage2a (see below). Currently, three regression analyses are performed resulting in three sets of regression coefficients (note: drop the perturbation notation from now on for clarity):
 
 
 \begin{itemize}\setlength{\parskip}{-4pt}
@@ -171,21 +169,40 @@ Output: Eigenvectors $\bf E$, eigenvalues $\Lambda$, and projected 3D (i,j,m) co
 
 The last aspect of the climatological component of background error covariance data required for WRF-Var are the horizontal error correlations, the representation of which forms the largest difference between running WRF-Var in regional and global mode (it is however, still a fairly local change).
 
-In global applications (gen\_be\_stage4\_global). a spectral decomposition of the grid-point data is perfomed, and power spectra computed for each variable and vertical mode. Details of the spectral technique used to project gridpoint fields to spectral modes are given in Appendix B together with a description of the power spectra computed from the spectral modes.
+In global applications (gen\_be\_stage4\_global). a spectral decomposition of the grid-point data is performed, and power spectra computed for each variable and vertical mode. Details of the spectral technique used to project gridpoint fields to spectral modes are given in Appendix B together with a description of the power spectra computed from the spectral modes.
 
 In regional applications (gen\_be\_stage4\_regional), a recursive filter is used to provide the horizontal correlations (\citet{barker04}). The error covariance inputs to the recursive filter is a correlation lengthscale (provided by gen\_be\_stage4\_regional), and a WRF-Var namelist parameters to define the correlations shape (the number of passes through the recursive filter).  The calculation of horizontal lengthscales in gen\_be\_stage4\_regional is described in section 8c of (\citet{barker04}). Note: This is the most expensive part of the entire gen\_be process.
 
-Input: Projected 3D (i,j,m) control variable fields: $\psi$, $\chi_u$,  $T_u$, and $r$, and $p_{su}$(i,j).
+Input: Projected 3D (i,j,m) control variable fields: $\psi$, $\chi_u$,  $T_u$, and $r$, and $p_{su}$(i,j). (output from stage 3 and 2a)
 
 Processing (regional): Perform linear regression of horizontal correlations to calculate recursive filter lengthscales (see \citet{barker04}).
 
 Processing (global): Perform horizontal spectral decomposition, and compute power spectra for each field/mode (see Appendix B).
 
 Output (regional): Recursive filter lengthscales for each control variable, vertical mode.
+
 Output (global): Power spectra for each control variable, vertical mode.
 
 
-\section{Example Results From An Application Of gen\_be}
+\subsection{gen\_be\_diags - Generate gen\_be.dat to be used in WRF-Var}
+
+The gen\_be\_diags program simply gathers information from gen\_be\_stage2-4 output and writes out a file named gen\_be.dat which is one of the required input files when running WRF-Var.
+
+Input:
+\begin{itemize}\setlength{\parskip}{-4pt}
+\item Regression coefficients $c$, $W$, $G$. (output of stage 2)
+\item Eigenvectors $\bf E$, eigenvalues $\Lambda$. (output of stage 3)
+\item Recursive filter lengthscales. (output of stage 4 regional) or Power spectra. (output of stage 4 global)
+\end{itemize}
+
+Output: A binary-format gen\_be.dat to be used in WRF-Var.
 
 
+\section{Example Results from an Application of gen\_be}
+
+Background error statistics calculated with NMC-method (24-hour and 12-hour forecast difference) from a low-resolution (200km) CONUS domain is shown in the figure below. The data period is one month in January 2003.
+
+\includegraphics[width=7.0in]{figures/gen_be_results.pdf}
+
+NCL scripts for plotting gen\_be results are included in the WRF-Var system in the directory graphics/ncl/gen\_be. The ASCII format input data required by the NCL scripts are generated using programs gen\_be\_diags\_read, gen\_be\_cov2d, and gen\_be\_cov3d in the gen\_be utility.
 
