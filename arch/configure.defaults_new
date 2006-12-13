@@ -1026,7 +1026,7 @@ FCENDIAN        =
 FCBASE          = -cpp -Wno=101,139,155,158 -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCOPTIM         = 02
+CCOPTIM         = -O2
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
