@@ -671,14 +671,14 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
+FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
                     -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2 -xW
-FCDEBUG         = # -g -C
+FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
@@ -705,7 +705,6 @@ arch_clean :
 
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
-
 
 ###########################################################
 
