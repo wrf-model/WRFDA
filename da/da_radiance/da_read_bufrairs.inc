@@ -194,7 +194,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
        end if
        call da_get_unit(airs_table_unit)
        open(unit=airs_table_unit,file=table_file,iostat = iost)
-       if (iost /= 0) THEN
+       if (iost /= 0) then
           call da_error(__FILE__,__LINE__, &
              (/"Cannot open file "//TRIM(table_file)/))
        end if
@@ -203,7 +203,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    ! Open BUFR file
    call da_get_unit(lnbufr)
    open(unit=lnbufr,file=trim(infile),form='unformatted',iostat = iost)
-   if (iost /= 0) THEN
+   if (iost /= 0) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open file "//TRIM(infile)/))
    end if
@@ -314,8 +314,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
       ! QC3: time consistency check with the background date
 
-      if (idate5(1) .LE. 99) THEN
-         if (idate5(1) .LT. 78) THEN
+      if (idate5(1) .LE. 99) then
+         if (idate5(1) .LT. 78) then
             idate5(1) = idate5(1) + 2000
          else
             idate5(1) = idate5(1) + 1900
@@ -432,7 +432,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
              inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
       end if
       allocate (iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error)
-      if (error /= 0) Then
+      if (error /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"mem allocation error to iv%instid(inst)%rad"/))
       end if
