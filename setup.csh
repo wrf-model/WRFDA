@@ -1,4 +1,5 @@
-setenv MACHINE `hostname`
+setenv MACHINE `uname -n`
+setenv PROCESSOR `uname -p`
 
 if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
@@ -12,17 +13,36 @@ else
       setenv FC g95
    endif
 
-   setenv FC $1
-   setenv CC $2
-
-   if ( $FC"." == "." ) then
-      setenv FC g95
-   endif
-
-   if ( $CC"." == "." ) then
+   if ($?2) then
+      setenv CC $2
+   else
       setenv CC gcc
    endif
 endif
+
+
+# Wait until files on wrfhelp
+#if (-d /mmm/users/wrfhelp) then
+#   setenv WRFHELP /mmm/users/wrfhelp
+#else if (-d /data3/mp/wrfhelp) then
+#   setenv WRFHELP /data3/mp/wrfhelp
+#else if (-d /users/wrfhelp) then
+#   setenv WRFHELP /users/wrfhelp
+#else if (-d ~wrfhelp}) then
+#   setenv WRFHELP ~wrfhelp
+#else if (-d /mmm/users/bray) then
+if (-d /mmm/users/bray) then
+   setenv WRFHELP /mmm/users/bray
+else if (-d /data7/da/bray) then
+   setenv WRFHELP /data7/da/bray
+else if (-d /users/bray) then
+   setenv WRFHELP /users/bray
+else if (-d ~bray) then
+   setenv WRFHELP=~bray
+else
+   setenv WRFHELP ~
+endif
+
 
 if ($FC == xlf) then
    if (-d /opt/ibmcmp/xlf/8.1) then
@@ -38,152 +58,54 @@ if ($CC == xlc) then
 endif
 
 if ($FC == g95) then
-   if (-d /data7/da/bray/g95) then
-      setenv PATH /data7/da/bray/g95:$PATH
-   endif
-   if (-d ~bray/g95) then
-      setenv PATH ~bray/g95:$PATH
-   endif
-   if (-d /Volumes/$MACHINE/bray/tools/g95) then
-      setenv PATH /Volumes/$MACHINE/bray/tools/g95:$PATH
+   if (-d ${WRFHELP}/g95/g95) then
+      setenv PATH ${WRFHELP}/g95/g95_${PROCESSOR}:$PATH
    endif
 endif
 
 # List options in order of increasing preference
 
-if (-d /data7/da/bray/netcdf/netcdf-3.6.1_${FC}) then
-   setenv NETCDF /data7/da/bray/netcdf/netcdf-3.6.1_${FC}
+if (-d ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}) then
+   setenv NETCDF ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/rttov/rttov85_${FC}) then
-   setenv RTTOV /data7/da/bray/rttov/rttov85_$FC
+if (-d ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}) then
+   setenv RTTOV ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/crtm/crtm_${FC}) then
-   setenv CRTM /data7/da/bray/crtm/crtm_$FC
+if (-d ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}) then
+   setenv CRTM ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/mpich/mpich-1.2.7p1_${FC}) then
-   setenv MPICH /data7/da/bray/mpich/mpich-1.2.7p1_${FC}
+if (-d ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
+   setenv MPICH ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/blas/blas_${FC}) then
-   setenv BLAS /data7/da/bray/blas/blas_${FC}
+if (-d ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}) then
+   setenv BLAS ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/lapack/lapack_${FC}) then
-   setenv LAPACK /data7/da/bray/lapack/lapack_${FC}
+if (-d ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}) then
+   setenv LAPACK ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/fftpack5/fftpack5_${FC}) then
-   setenv FFTPACK5 /data7/da/bray/fftpack5/fftpack5_${FC}
+if (-d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}) then
+   setenv FFTPACK5 ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
-   setenv BUFR /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
+if (-d ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}) then
+   setenv BUFR ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}
 endif
-if (-d /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MAKEDEPF90 /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}
-endif
-
-# --------------------------------------------------------------------
-
-if (-d ~bray/netcdf/netcdf-3.6.1_${FC}) then
-   setenv NETCDF ~bray/netcdf/netcdf-3.6.1_${FC}
-endif
-if (-d ~bray/rttov/rttov85_$FC) then
-   setenv RTTOV ~bray/rttov/rttov85_$FC
-endif
-if (-d ~bray/crtm/crtm_$FC) then
-   setenv CRTM ~bray/crtm/crtm_$FC
-endif
-if (-d ~bray/mpich/mpich-1.2.7p1_${FC}) then
-   setenv MPICH ~bray/mpich/mpich-1.2.7p1_${FC}
-endif
-if (-d ~bray/blas/blas_${FC}) then
-   setenv BLAS ~bray/blas/blas_${FC}
-endif
-if (-d ~bray/lapack/lapack_${FC}) then
-   setenv LAPACK ~bray/lapack/lapack_${FC}
-endif
-if (-d ~bray/fftpack5/fftpack5_${FC}) then
-   setenv FFTPACK5 ~bray/fftpack5/fftpack5_${FC}
-endif
-if (-d ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
-   setenv BUFR ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
-endif
-if (-d ~bray/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MAKEDEPF90 ~bray/makedepf90/makedepf90-2.8.8_${CC}
+if (-d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}) then
+   setenv MAKEDEPF90 ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
 endif
 
-# --------------------------------------------------------------------
-
-if (-d ~/netcdf/netcdf-3.6.1_${FC}) then
-   setenv NETCDF ~/netcdf/netcdf-3.6.1_${FC}
-endif
-if (-d ~/rttov/rttov85_${FC}) then
-   setenv RTTOV ~/rttov/rttov85_${FC}
-endif
-if (-d ~/crtm/crtm_${FC}) then
-   setenv CRTM ~/crtm/crtm_${FC}
-endif
-if (-d ~/mpich/mpich-1.2.7p1_${FC}) then
-   setenv MPICH ~/mpich/mpich-1.2.7p1_${FC}
-endif
-if (-d ~/blas/blas_${FC}) then
-   setenv BLAS ~/blas/blas_${FC}
-endif
-if (-d ~/lapack/lapack_${FC}) then
-   setenv LAPACK ~/lapack/lapack_${FC}
-endif
-if (-d ~/fftpack5/fftpack5_${FC}) then
-   setenv FFTPACK5 ~/fftpack5/fftpack5_${FC}
-endif
-if (-d ~/bufr_ncep_nco/bufr_ncep_nco_${FC}) then
-   setenv BUFR ~/bufr_ncep_nco/bufr_ncep_nco_${FC}
-endif
-if (-d ~/makedepf90/makedepf90-2.8.8_${CC}) then
-   setenv MAKEDEPF90 ~/makedepf90/makedepf90-2.8.8_${CC}
-endif
-
-# --------------------------------------------------------------------
-
-if (-d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}) then
-   setenv NETCDF /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/rttov85_${FC}) then
-   setenv RTTOV /Volumes/$MACHINE/bray/tools/rttov85_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/crtm_${FC}) then
-   setenv CRTM /Volumes/$MACHINE/bray/tools/crtm_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}) then
-   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/blas_${FC}) then
-   setenv BLAS /Volumes/$MACHINE/bray/tools/blas_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/lapack_${FC}) then
-   setenv LAPACK /Volumes/$MACHINE/bray/tools/lapack_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/fftpack5_${FC}) then
-   setenv FFTPACK5 /Volumes/$MACHINE/bray/tools/fftpack5_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}) then
-   setenv BUFR /Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}
-endif
-if (-d /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}) then
-   setenv MAKEDEPF90 /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}
-endif
 
 
 # mpich2
 
-#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${FC}) then
+#if ( -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
 
 # mpich2
 
-#if ( -d /data7/da/bray/mpich/mpich2-1.0.3_${FC}) then
-#   setenv MPICH /data7/da/bray/mpich/mpich2-1.0.3_${FC}
+#if ( -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPICH ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
-#if ( -d ~bray/mpich/mpich2-1.0.3_${FC}) then
-#   setenv MPICH ~bray/mpich/mpich2-1.0.3_${FC}
-#endif
-#if ( -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}) then
-#   setenv MPICH /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}
+#if ( -d ~${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPICH ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
 
 if (-d /usr/lpp/ppe.poe) then

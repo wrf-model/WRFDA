@@ -1,6 +1,30 @@
-MACHINE=`hostname`
+MACHINE=`uname -n`
 FC=${1:-g95}
 CC=${2:-gcc}
+
+PROCESSOR=`uname -p`
+
+# Wait until files on wrfhelp
+#if test -d /mmm/users/wrfhelp; then
+#   WRFHELP=/mmm/users/wrfhelp
+#elif test -d /data3/mp/wrfhelp; then
+#   WRFHELP=/data3/mp/wrfhelp
+#elif test -d /users/wrfhelp; then
+#   WRFHELP=/users/wrfhelp
+#elif test -d ~wrfhelp; then
+#   WRFHELP=~wrfhelp
+#elif test -d /mmm/users/bray; then
+if test -d /mmm/users/bray; then
+   WRFHELP=/mmm/users/bray
+elif test -d /data7/da/bray; then
+   WRFHELP=/data7/da/bray
+elif test -d /users/bray; then
+   WRFHELP=/users/bray
+elif test -d ~bray; then
+   WRFHELP=~bray
+else
+   WRFHELP=~
+fi
 
 if test $FC = xlf; then
    if test -d /opt/ibmcmp/xlf/8.1; then
@@ -16,150 +40,51 @@ if test $CC = xlc; then
 fi
 
 if test $FC = g95; then
-   if test -d /data7/da/bray/g95; then
-      export PATH=/data7/da/bray/g95:$PATH
-   fi
-   if test -d ~bray/g95; then
-      export PATH=~bray/g95:$PATH
-   fi
-   if test -d /Volumes/$MACHINE/bray/tools/g95; then
-      export PATH=/Volumes/$MACHINE/bray/tools/g95:$PATH
+   if test -d ${WRFHELP}/g95/g95_${PROCESSOR}; then
+      export PATH=${WRFHELP}/g95/g95_${PROCESSOR}:$PATH
    fi
 fi
 
-
-# List options in order of increasing preference
-
-if test -d /data7/da/bray/netcdf/netcdf-3.6.1_${FC}; then
-  export NETCDF=/data7/da/bray/netcdf/netcdf-3.6.1_${FC}
+if test -d ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}; then
+  export NETCDF=${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/rttov/rttov85_${FC}; then
-   export RTTOV=/data7/da/bray/rttov/rttov85_${FC}
+if test -d ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}; then
+   export RTTOV=${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/crtm/crtm_${FC}; then
-   export CRTM=/data7/da/bray/crtm/crtm_${FC}
+if test -d ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}; then
+   export CRTM=${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/mpich/mpich-1.2.7p1_${FC}; then
-   export MPICH=/data7/da/bray/mpich/mpich-1.2.7p1_${FC}
+if test -d ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}; then
+   export MPICH=${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/blas/blas_${FC}; then
-   export BLAS=/data7/da/bray/blas/blas_${FC}
+if test -d ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}; then
+   export BLAS=${WRFHELP}/blas/blas_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/lapack/lapack_${FC}; then
-   export LAPACK=/data7/da/bray/lapack/lapack_${FC}
+if test -d ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}; then
+   export LAPACK=${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/fftpack5/fftpack5_${FC}; then
-   export FFTPACK5=/data7/da/bray/fftpack5/fftpack5_${FC}
+if test -d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}; then
+   export FFTPACK5=${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}; then
-   export BUFR=/data7/da/bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
+if test -d ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}; then
+   export BUFR=${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}
 fi
-if test -d /data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}; then
-   export MAKEDEPF90=/data7/da/bray/makedepf90/makedepf90-2.8.8_${CC}
-fi
-
-# -----------------------------------------
-
-if test -d ~bray/netcdf/netcdf-3.6.1_${FC}; then
-   export NETCDF=~bray/netcdf/netcdf-3.6.1_${FC}
-fi
-if test -d ~bray/rttov/rttov85_${FC}; then
-   export RTTOV=~bray/rttov/rttov85_${FC}
-fi
-if test -d ~bray/crtm/crtm_${FC}; then
-   export CRTM=~bray/crtm/crtm_${FC}
-fi
-if test -d ~bray/mpich/mpich-1.2.7p1_${FC}; then
-   export MPICH=~bray/mpich/mpich-1.2.7p1_${FC}
-fi
-if test -d ~bray/lapack/lapack_${FC}; then
-   export LAPACK=~bray/lapack/lapack_${FC}
-fi
-if test -d ~bray/blas/blas_${FC}; then
-   export BLAS=~bray/blas/blas_${FC}
-fi
-if test -d ~bray/fftpack5/fftpack5_${FC}; then
-   export FFTPACK5=~bray/fftpack5/fftpack5_${FC}
-fi
-if test -d ~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}; then
-   export BUFR=~bray/bufr_ncep_nco/bufr_ncep_nco_${FC}
-fi
-if test -d ~bray/makedepf90/makedepf90-2.8.8_${CC}; then
-   export MAKEDEPF90=~bray/makedepf90/makedepf90-2.8.8_${CC}
-fi
-
-# -----------------------------------------
-
-if test -d ~/netcdf/netcdf-3.6.1_${FC}; then
-   export NETCDF=~/netcdf/netcdf-3.6.1_${FC}
-fi
-if test -d ~/rttov/rttov85_${FC}; then
-   export RTTOV=~/rttov/rttov85_${FC}
-fi
-if test -d ~/crtm/crtm_${FC}; then
-   export CRTM=~/crtm/crtm_${FC}
-fi
-if test -d ~/mpich/mpich-1.2.7p1_${FC}; then
-   export MPICH=~/mpich/mpich-1.2.7p1_${FC}
-fi
-if test -d ~/blas/blas_${FC}; then
-   export BLAS=~/blas/blas_${FC}
-fi
-if test -d ~/lapack/lapack_${FC}; then
-   export LAPACK=~/lapack/lapack_${FC}
-fi
-if test -d ~/fftpack5/fftpack5_${FC}; then
-   export FFTPACK5=~/fftpack5/fftpack5_${FC}
-fi
-if test -d ~/bufr_ncep_nco/bufr_ncep_nco_${FC}; then
-   export BUFR=~/bufr_ncep_nco/bufr_ncep_nco_${FC}
-fi
-if test -d  ~/makedepf90/makedepf90-2.8.8_${CC}; then
-   export MAKEDEPF90=~/makedepf90/makedepf90-2.8.8_${CC}
-fi
-
-# -----------------------------------------
-
-if test -d /Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}; then
-   export NETCDF=/Volumes/$MACHINE/bray/tools/netcdf-3.6.1_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/rttov85_${FC}; then
-   export RTTOV=/Volumes/$MACHINE/bray/tools/rttov85_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/crtm_${FC}; then
-   export CRTM=/Volumes/$MACHINE/bray/tools/crtm_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}; then
-   export MPICH=/Volumes/$MACHINE/bray/tools/mpich-1.2.7p1_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/blas_${FC}; then
-   export BLAS=/Volumes/$MACHINE/bray/tools/blas_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/lapack_${FC}; then
-   export LAPACK=/Volumes/$MACHINE/bray/tools/lapack_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/fftpack5_${FC}; then
-   export FFTPACK5=/Volumes/$MACHINE/bray/tools/fftpack5_${FC}
-fi
-if test -d /Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}; then
-   export BUFR=/Volumes/$MACHINE/bray/tools/bufr_ncep_nco_${FC}
-fi
-if test -d  /Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}; then
-   export MAKEDEPF90=/Volumes/$MACHINE/bray/tools/makedepf90-2.8.8_${CC}
+if test -d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}; then
+   export MAKEDEPF90=${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
 fi
 
 # -----------------------------------------
 
 # mpich2
 
-#if test -d /data7/da/bray/mpich/mpich2-1.0.3_${FC}; then
-#   export MPICH=/data7/da/bray/mpich/mpich2-1.0.3_${FC}
+#if test -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
+#   export MPICH=${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
-#if test -d ~bray/mpich/mpich2-1.0.3_${FC}; then
-#   export MPICH=~bray/mpich/mpich2-1.0.3_${FC}
+#if test -d ~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
+#   export MPICH=~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
-#if test -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}; then
-#   export MPICH=/Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}
+#if test -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}_${PROCESSOR}; then
+#   export MPICH=/Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
 
 if test -d /usr/lpp/ppe.poe; then
