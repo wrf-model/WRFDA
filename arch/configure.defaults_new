@@ -299,7 +299,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
+#ARCH Settings for PC Linux i486 i586 i686, ifort compiler (single-threaded, no nesting)
 #
 
 M4              = m4 -B12000
@@ -311,11 +311,10 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
-                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
-FCOPTIM         = -O3 -xW
-FCDEBUG         = # -g
+FCOPTIM         = # -O3 -xW
+FCDEBUG         = # -g -C
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
@@ -330,6 +329,99 @@ arch :
 arch_clean :
 
 arch_superclean :
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, ifort compiler  (RSL, MPICH, RSL IO)
+#
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = ifort
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DDEREF_KLUDGE -DIFORT_KLUDGE
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = # -O3 -xW
+FCDEBUG         = # -g -C
+FCFREE          = -FR -cm -w
+FCENDIAN        = -convert big_endian
+FCBASE          =
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       =  -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, ifort compiler optimised  (RSL, MPICH, RSL IO)
+#
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = ifort
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DDEREF_KLUDGE -DIFORT_KLUDGE
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O3 -xW
+FCDEBUG         = # -g -C
+FCFREE          = -FR -cm -w
+FCENDIAN        = -convert big_endian
+FCBASE          =
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       =  -L/usr/local/lib
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST linux )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
@@ -624,14 +716,14 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
-                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = #-O3 -xW
-FCDEBUG         = -g -C
+# Switch off debug options to stop running out of memory
+FCDEBUG         = #-g -C
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
