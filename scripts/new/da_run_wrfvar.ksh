@@ -268,7 +268,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_IFSNOW=0
       export NL_ICLOUD=1
       export NL_SURFACE_INPUT_SOURCE=1
-      export NL_NUM_SOIL_LAYERS=4
       export NL_MP_ZERO_OUT=2
       export NL_MP_ZERO_OUT_THRESH=1.e-8
       export NL_MAXIENS=1
@@ -426,7 +425,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_IFSNOW=0
       export NL_ICLOUD=1
       export NL_SURFACE_INPUT_SOURCE=1
-      export NL_NUM_SOIL_LAYERS=4
       export NL_MP_ZERO_OUT=2
       export NL_MP_ZERO_OUT_THRESH=1.e-8
       export NL_MAXIENS=1
