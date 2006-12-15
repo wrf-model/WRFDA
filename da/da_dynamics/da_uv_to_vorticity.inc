@@ -130,7 +130,7 @@ subroutine da_uv_to_vorticity(xb , u, v, vor, &
 
    if ( global ) then
       call da_set_boundary_3d(vor, &
-                              ids,ide, jds,jde, kds,kde,  &
+                              ids,ide, &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
    end if

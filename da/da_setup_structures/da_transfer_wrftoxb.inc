@@ -109,7 +109,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       write(unit=stdout, fmt=*) 'ks,ke=', ks,ke
 
       write(unit=stdout, fmt='(/5a/)') &
-         'lvl         dnw                dn 		rdnw       rdn'
+         'lvl         dnw                dn             rdnw       rdn'
 
       do k=ks,ke+1
          write(unit=stdout, fmt='(i3,8f16.8)') k, &
@@ -117,7 +117,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
       end do
 
       write(unit=stdout, fmt='(/5a/)') &
-         'lvl         znu                 znw		rdnw       rdn'
+         'lvl         znu                 znw           rdnw       rdn'
 
       do k=ks,ke+1
          write(unit=stdout, fmt='(i3,8f16.8)') k, &

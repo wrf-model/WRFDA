@@ -1,5 +1,5 @@
 subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
-                                    ids,ide, jds,jde, kds,kde,      &
+                                    ide, jde,      &
                                     ims,ime, jms,jme, kms,kme,      &
                                     its,ite, jts,jte, kts,kte )
 
@@ -21,7 +21,7 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
 
    type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
    type (xpose_type),intent(inout)  :: xp      ! Dimensions and xpose buffers. 
-   integer   , intent(in)     :: ids,ide, jds,jde, kds,kde   ! domain dims.
+   integer   , intent(in)     :: ide, jde   ! domain dims.
    integer   , intent(in)     :: ims,ime, jms,jme, kms,kme   ! memory dims.
    integer   , intent(in)     :: its,ite, jts,jte, kts,kte   ! tile   dims.
    real, intent(in)           :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
@@ -38,10 +38,6 @@ subroutine da_solve_poissoneqn_fst( xbx, xp, del2b, b,          &
    integer                  :: i, j, k, n, ij     ! loop counter
 
    real, allocatable, dimension(:) :: work_1d     ! FFT work array
-
-   ! JRB stop compiler whinge
-   if (ids == 0 .OR. jds == 0 .OR. kds == 0 .OR. kde == 0) then
-   end if
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:

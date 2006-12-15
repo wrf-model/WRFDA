@@ -43,8 +43,8 @@ subroutine da_check_cvtovv_adjoint( cv_size, xb, xbx, xp, be, cv, vv, &
 
    if ( global ) then
       call da_transform_vtovv_global( cv_size, xbx, be, cv, vv, &
-                                      ids, ide, jds, jde, kds, kde, &
-                                      ims, ime, jms, jme, kms, kme, &
+                                      ids, ide, jds, jde, &
+                                      ims, ime, jms, jme, &
                                       its, ite, jts, jte, kts, kte )
    else
       call da_transform_vtovv( cv_size, xb, be, cv, vv, xp,         &

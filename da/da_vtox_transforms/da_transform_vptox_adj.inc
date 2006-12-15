@@ -1,5 +1,5 @@
 subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
-                                   ids,ide, jds,jde, kds,kde,  &
+                                   ids, ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
                                    its,ite, jts,jte, kts,kte )
 
@@ -21,10 +21,6 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    integer, intent(in)             :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    integer         :: n, k, j, k1              ! Loop counters.
-
-   ! Stop compiler whinge
-   if (ide==0) then
-   end if
 
    if (trace_use) call da_trace_entry("da_transform_vptox_adj")
 

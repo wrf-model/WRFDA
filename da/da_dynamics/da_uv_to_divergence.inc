@@ -122,7 +122,7 @@ subroutine da_uv_to_divergence( xb, u, v, div, &
 
    if( global ) then
       call da_set_boundary_3d(div, &
-                              ids,ide, jds,jde, kds,kde,  &
+                              ids,ide,   &
                               ims,ime, jms,jme, kms,kme,  &
                               its,ite, jts,jte, kts,kte )
    end if

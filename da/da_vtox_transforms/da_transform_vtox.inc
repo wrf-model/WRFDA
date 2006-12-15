@@ -40,8 +40,8 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    if ( global ) then
       call da_transform_vtovv_global( cv_size, xbx, be, cv, vv, &
-                                      ids,ide, jds,jde, kds,kde,  &
-                                      ims,ime, jms,jme, kms,kme,  &
+                                      ids,ide, jds,jde,   &
+                                      ims,ime, jms,jme,   &
                                       its,ite, jts,jte, kts,kte ) 
    else
       call da_transform_vtovv( cv_size, xb, be, cv, vv, xp,         &
@@ -200,45 +200,45 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    if (global)  then   
 #ifndef DEREF_KLUDGE
       call da_get_vpoles(xa%u,xa%v, &
-            ids, ide, jds, jde, kds, kde,  &
-            ims, ime, jms, jme, kms, kme,  &
+            ids, ide, jds, jde, &
+            ims, ime, jms, jme, kms, kme, &
             its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%t,             &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%p,             &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%q,             &
-            ids, ide, jds, jde, kds, kde,  &
+            ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%psfc,          &
-            ids, ide, jds, jde,   1,   1,  &
+            ids, ide, jds, jde,   &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1   )
 #else
       call da_get_vpoles(xa%u(ims,jms,kms),          &
                          xa%v(ims,jms,kms),          &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde, &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%t(ims,jms,kms),          &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%p(ims,jms,kms),          &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%q(ims,jms,kms),          &
-                      ids, ide, jds, jde, kds, kde,  &
+                      ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
                       its, ite, jts, jte, kts, kte   )
       call da_get_spoles(xa%psfc(ims,jms),           &
-                      ids, ide, jds, jde,   1,   1,  &
+                      ids, ide, jds, jde, &
                       ims, ime, jms, jme,   1,   1,  &
                       its, ite, jts, jte,   1,   1   )
 #endif

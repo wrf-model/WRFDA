@@ -1,5 +1,5 @@
 subroutine da_get_vpoles(u,v,        &
-          ids, ide, jds, jde, kds, kde,  &
+          ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
 
@@ -9,7 +9,7 @@ subroutine da_get_vpoles(u,v,        &
    
    implicit none
    
-   integer, intent(in)    :: ids, ide, jds, jde, kds, kde
+   integer, intent(in)    :: ids, ide, jds, jde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
    integer, intent(in)    :: its, ite, jts, jte, kts, kte
    real, intent(inout)    :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
@@ -18,11 +18,6 @@ subroutine da_get_vpoles(u,v,        &
    real                   :: conv,tmpvar                                         
    real                   :: tmpu,tmp_u,tmpv,tmp_v
    integer                :: k
-
-   ! Stop compiler whinge
-
-   if (kde==0.OR.kds==0) then
-   end if
 
    if (trace_use) call da_trace_entry("da_get_vpoles")
 

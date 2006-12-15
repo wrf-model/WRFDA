@@ -114,13 +114,13 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
 #ifndef DEREF_KLUDGE
     call da_get_vpoles(grid%xb%u,grid%xb%v,          &
-       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
+       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 #else
     call da_get_vpoles(grid%xb%u(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
                        grid%xb%v(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
-       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde,grid%xp%kds,grid%xp%kde, &
+       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
 

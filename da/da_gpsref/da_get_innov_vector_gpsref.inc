@@ -138,8 +138,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
             iv%gpsref(n)%zk(k)=missing_r
             if (iv%gpsref(n)%h(k) > 0.0) &
                call da_to_zk(iv%gpsref(n)%h(k), v_h, xp, v_interp_h, iv%gpsref(n)%zk(k))
-            if (iv%gpsref(n)%zk(k) < 0.0 .and. &
-               (analysis_type /= 'VERIFY' .and. analysis_type /= 'verify')) then
+            if (iv%gpsref(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
                iv%gpsref(n)%ref(k)%qc = missing
             end if
          end do
@@ -175,7 +174,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
       ! Quality check 2: Error percentage check.
 
-      if (analysis_type /= 'VERIFY' .and. analysis_type /= 'verify') then
+      if (.not. anal_type_verify) then
          if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
             do k=1, num_levs
 
@@ -203,7 +202,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
    ! Quality check 3: Low levels quality control
 
-   if (analysis_type /= 'VERIFY' .and. analysis_type /= 'verify') then
+   if (.not. anal_type_verify) then
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
          ! Search for the GPS RO's name with the 'qc_below':
 

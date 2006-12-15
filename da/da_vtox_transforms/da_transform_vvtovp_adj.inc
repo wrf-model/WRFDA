@@ -1,6 +1,6 @@
 subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
                                     vp, vv, mz, &
-                                    ids,ide, jds,jde, kds,kde,  &
+                                    jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
                                     its,ite, jts,jte, kts,kte )
 
@@ -11,7 +11,7 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
    implicit none
    
    integer, intent(in)   :: mz                         ! # vertical modes.
-   integer, intent(in)   :: ids,ide, jds,jde, kds,kde  ! domain dims.
+   integer, intent(in)   :: jds,jde, kds,kde  ! domain dims.
    integer, intent(in)   :: ims,ime, jms,jme, kms,kme  ! memory dims.
    integer, intent(in)   :: its,ite, jts,jte, kts,kte  ! tile   dims
 
@@ -23,10 +23,6 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
  
    integer               :: i, j, m, k                 ! Loop counters.
    real                  :: temp
-
-   ! Stop compiler whinge
-   if (ide==0 .OR. ids==0) then
-   end if
 
    if (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
 

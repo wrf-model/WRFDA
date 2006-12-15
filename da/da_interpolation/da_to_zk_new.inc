@@ -20,7 +20,7 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
    r_kts      = real(xp%kts)
    r_ktsplus  = real(xp%kts+1)
    r_kteminus = real(xp%kte-1)
-!write (0,*) "anal_type_verify",anal_type_verify
+
    if (v_interp_optn == v_interp_p) then
       if (anal_type_verify) then
          do n=1,num

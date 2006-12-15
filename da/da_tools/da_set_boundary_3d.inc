@@ -1,5 +1,5 @@
 subroutine da_set_boundary_3d(var, &
-                              ids, ide, jds, jde, kds, kde, &
+                              ids, ide, &
                               ims, ime, jms, jme, kms, kme, &
                               its, ite, jts, jte, kts, kte)
    !------------------------------------------------------------------------
@@ -9,16 +9,12 @@ subroutine da_set_boundary_3d(var, &
    !------------------------------------------------------------------------
 
    implicit none
-   integer, intent(in) :: ids, ide, jds, jde, kds, kde, &
+   integer, intent(in) :: ids, ide, &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte
    real, dimension(ims:ime, jms:jme, kms:kme) :: var
 
    integer :: n, j, k
-
-   ! JRB use variables to stop compiler whinge
-   if (kds == 1 .OR. jds == 1 .OR. jde == 1 .OR. kde == 1) then
-   end if
 
    if((its /= ids) .or. (ite /= ide)) return
 

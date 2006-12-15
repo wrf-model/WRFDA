@@ -121,7 +121,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    !------------------------------------------------------------------------------
 
    call da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b,  &
-                                 ids,ide, jds,jde, kds,kde,      &
+                                 ide, jde,      &
                                  ims,ime, jms,jme, kms,kme,      &
                                  its,ite, jts,jte, kts,kte ) 
 

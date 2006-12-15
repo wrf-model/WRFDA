@@ -64,7 +64,6 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
 
    call da_solve_poissoneqn_fst_adj(xbx, xp, phi_b, &
                                  del2phi_b, &
-                                 ids,ide, jds,jde, kds,kde,      &
                                  ims,ime, jms,jme, kms,kme,      &
                                  its,ite, jts,jte, kts,kte )
 

@@ -38,11 +38,11 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
    if (global) then
       call da_set_boundary_3d(u, &
-                            ids,ide, jds,jde, kds,kde,  & 
+                            ids,ide,   & 
                             ims,ime, jms,jme, kms,kme,  & 
                             its,ite, jts,jte, kts,kte ) 
       call da_set_boundary_3d(v, &
-                            ids,ide, jds,jde, kds,kde,  & 
+                            ids,ide,  & 
                             ims,ime, jms,jme, kms,kme,  & 
                             its,ite, jts,jte, kts,kte ) 
    end if
@@ -209,11 +209,11 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
    if( global ) then
        call da_set_boundary_3d(psi, &
-                            ids,ide, jds,jde, kds,kde,  &
+                            ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
        call da_set_boundary_3d(chi, &
-                            ids,ide, jds,jde, kds,kde,  &
+                            ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
                             its,ite, jts,jte, kts,kte )
    end if

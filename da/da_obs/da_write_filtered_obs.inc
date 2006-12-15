@@ -34,7 +34,7 @@ subroutine da_write_filtered_obs( ob, iv, xb, xp, &
    ! iii) For Sound data, the above-top/below-bottom data are not written out.
    !
    ! This can be used for Var with check_max_iv = .false., or for
-   ! verification with  analysis_type = 'VERIFY.
+   ! verification with  analysis_type = 'VERIFY'.
    !---------------------------------------------------------------------------   
 
    implicit none

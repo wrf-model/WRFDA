@@ -203,7 +203,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
         if (t29 .eq. 562) kx = 180
       end if
 
-!     if((kx >= 160) .and. (kx <= 179)) then	! bypass satellite data
+!     if((kx >= 160) .and. (kx <= 179)) then    ! bypass satellite data
 !    if (t29 .eq. 61 .or. t29 .eq. 63 .or. t29 .ge. 571) then
 !        cycle reports
 !     end if
@@ -232,7 +232,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
 ! no need for balloon drift
 !     select case(kx)
-!        case ( 120, 132, 220:221, 232) ;	! read drift
+!        case ( 120, 132, 220:221, 232) ;       ! read drift
 !           call ufbint(iunit,drf,9,255,iret,drift)
 !           do k=1,nlevels
 !              if(drf(1,k) .ge. 360.)drf(1,k)=drf(1,k)-360.
@@ -245,7 +245,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 !                drf(3,k)=time
 !              end if
 !           end do
-!        case default ;                      	! Do nothing
+!        case default ;                         ! Do nothing
 !     end select
 
       platform  % info % levels   =nlevels
@@ -289,17 +289,17 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 !         write(unit=stdout,fmt=*) '--------- k = ',k,' q = ',obs(2,k),' t = ',obs(3,k)
 
 
-	 if ( obs(2,k) .gt. 0. .and. obs(2,k) .lt. 1e9 ) then   
-	   obs(2,k) = obs(2,k)*1e-6
-	   if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
-	     obs(3,k) = (obs(3,k)+t_kelvin) / (1. + 0.608 * obs(2,k))
-	   end if
-	 else
-	   if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
-	     obs(3,k) = obs(3,k) + t_kelvin
+         if ( obs(2,k) .gt. 0. .and. obs(2,k) .lt. 1e9 ) then   
+           obs(2,k) = obs(2,k)*1e-6
+           if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
+             obs(3,k) = (obs(3,k)+t_kelvin) / (1. + 0.608 * obs(2,k))
+           end if
+         else
+           if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300. ) then
+             obs(3,k) = obs(3,k) + t_kelvin
 !            write(unit=stdout,fmt=*) '--------- t is now ',obs(3,k)
-	   end if
-	 end if
+           end if
+         end if
          qob=obs(2,k)
          tob=obs(3,k)
          zob=obs(4,k)
@@ -316,9 +316,9 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          if( abs(qms(5,k)) < qflag) wqm=nint(qms(5,k))
          pwq = qflag
          if( abs(qms(7,k)) < qflag) pwq=nint(qms(7,k))
-	 rqm = qflag
+         rqm = qflag
          if( abs(qms(9,k)) < qflag) rqm=nint(qms(9,k))
-	 pmq = qflag
+         pmq = qflag
          if( abs(pmo(2,1)) < qflag) pmq=nint(pmo(2,1))
          cat=nint(obs(9,k))
 
@@ -471,13 +471,13 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
    dup_loop: do n = 1, ndup
       select case(t29)
-	 case (11, 12, 13, 22, 23, 31)
-	 select case (kx)
+         case (11, 12, 13, 22, 23, 31)
+         select case (kx)
          case (120, 122, 132, 220, 222, 232) ;         ! Sound
-	   ob%num_sound_glo = ob%num_sound_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+           ob%num_sound_glo = ob%num_sound_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
             if (.not.Use_SoundObs) cycle reports
 
@@ -556,11 +556,11 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
          ob%sound(num_sound)%info%levels = nlevels
 
-         case (221) ;		! Pilot 
-	   ob%num_pilot_glo = ob%num_pilot_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+         case (221) ;           ! Pilot 
+           ob%num_pilot_glo = ob%num_pilot_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
            if (.not.Use_PilotObs) cycle reports
            num_pilot = num_pilot + 1
@@ -585,10 +585,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
          case (41)
 !        case (130:131, 133, 230:231, 233) ; ! Airep
-	   ob%num_airep_glo = ob%num_airep_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+           ob%num_airep_glo = ob%num_airep_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
             if (.not.Use_AirepObs) cycle reports
 
@@ -619,12 +619,12 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             end do
 
 !        case (180, 182, 280, 282) ;         ! Ships and  buoys
-	    case (522, 523);        ! Ships
+            case (522, 523);        ! Ships
 
-	     ob%num_ships_glo = ob%num_ships_glo + 1
-	     if(outside) then
+             ob%num_ships_glo = ob%num_ships_glo + 1
+             if(outside) then
                cycle reports
-	     end if
+             end if
 
               if (.not.Use_ShipsObs) cycle reports
 
@@ -654,11 +654,11 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 !           write(unit=stdout,fmt=*) 'zk = ',ob % ships ( num_ships ) % zk 
 !           write(unit=stdout,fmt=*) 'u = ',ob % ships ( num_ships ) % u,' v = ',ob % ships ( num_ships ) % v 
 
-	    case (531, 561, 562) ;          ! Buoy  
-	     ob%num_buoy_glo = ob%num_buoy_glo + 1
-	     if(outside) then
-		cycle reports
-	     end if
+            case (531, 561, 562) ;          ! Buoy  
+             ob%num_buoy_glo = ob%num_buoy_glo + 1
+             if(outside) then
+                cycle reports
+             end if
 
               if(.not.use_BuoyObs) cycle reports
               platform  % info % platform ='FM-18 BUOY '
@@ -680,10 +680,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          case (511)
 !        case (181, 281) ;                   ! Synop
 
-	   ob%num_synop_glo = ob%num_synop_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+           ob%num_synop_glo = ob%num_synop_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
             if (.not.Use_SynopObs) cycle reports
 
@@ -715,10 +715,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
          case (512)
 !        case (187, 287) ;                        ! Metar
-	   ob%num_metar_glo = ob%num_metar_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+           ob%num_metar_glo = ob%num_metar_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
             if (.not.Use_MetarObs) cycle reports
 
@@ -744,10 +744,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
          case (63)
 !        case (242:246, 252:253, 255) ;         ! Geo. CMVs
-	   ob%num_geoamv_glo = ob%num_geoamv_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+           ob%num_geoamv_glo = ob%num_geoamv_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
             if (.not.Use_geoamvObs) cycle reports
             platform  % info % platform ='FM-88 SATOB'
@@ -793,15 +793,15 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          ob%qscat(num_qscat)%u%error = max(platform%each(1)%u%error,1.0)
          ob%qscat(num_qscat)%v%error = max(platform%each(1)%v%error,1.0)
 
-	 case (583)       ! GPS PW
-	   ob%num_gpspw_glo = ob%num_gpspw_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+         case (583)       ! GPS PW
+           ob%num_gpspw_glo = ob%num_gpspw_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
-	   if(.not.use_GpspwObs) cycle reports
+           if(.not.use_GpspwObs) cycle reports
            platform  % info % platform ='FM-111 GPSPW'
-	   num_gpspw  = num_gpspw + 1
+           num_gpspw  = num_gpspw + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit
          ! tests with different numbers of MPI tasks.  
            platform%loc%obs_global_index = ob%num_gpspw_glo
@@ -812,43 +812,43 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
 !         write(unit=stdout,fmt=*) 'using obs from gps ',platform%info%id,' tpw = ',platform%loc%pw
 
-	 case (584)       ! GPS REF
-	   ob%num_gpsref_glo = ob%num_gpsref_glo + 1
-	   if(outside) then
-	      cycle reports
-	   end if
+         case (584)       ! GPS REF
+           ob%num_gpsref_glo = ob%num_gpsref_glo + 1
+           if(outside) then
+              cycle reports
+           end if
 
-	   if(.not.use_GpsrefObs) cycle reports
+           if(.not.use_GpsrefObs) cycle reports
            platform  % info % platform ='FM-116 GPSRF'
-	   num_gpsref  = num_gpsref + 1
+           num_gpsref  = num_gpsref + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit
          ! tests with different numbers of MPI tasks.  
            platform%loc%obs_global_index = ob%num_gpsref_glo
 
-	   ob%gpsref(num_gpsref)%info = platform%info
-	   ob%gpsref(num_gpsref)%loc  = platform%loc
+           ob%gpsref(num_gpsref)%info = platform%info
+           ob%gpsref(num_gpsref)%loc  = platform%loc
 
-	   allocate (ob%gpsref(num_gpsref)%h (1:nlevels))
-	   allocate (ob%gpsref(num_gpsref)%zk(1:nlevels))
-	   allocate (ob%gpsref(num_gpsref)%ref(1:nlevels))
-	   allocate (ob%gpsref(num_gpsref)%  p(1:nlevels))
-	   allocate (ob%gpsref(num_gpsref)%  t(1:nlevels))
-	   allocate (ob%gpsref(num_gpsref)%  q(1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%h (1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%zk(1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%ref(1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%  p(1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%  t(1:nlevels))
+           allocate (ob%gpsref(num_gpsref)%  q(1:nlevels))
 
 !         write(unit=stdout,fmt=*) 'using obs from gps ref ',platform%info%id
-	   do i = 1, nlevels
-	     ob%gpsref(num_gpsref)%h(i)   = platform%each(i)%height
+           do i = 1, nlevels
+             ob%gpsref(num_gpsref)%h(i)   = platform%each(i)%height
 ! u is used to store ref in this routine (ascii version uses td)
-	     ob%gpsref(num_gpsref)%ref(i) = platform%each(i)%u
+             ob%gpsref(num_gpsref)%ref(i) = platform%each(i)%u
 ! ==> Keep the retrieved p and t (and q) as "field_type":
-	     ob%gpsref(num_gpsref)%p(i)   = platform%each(i)%p
-	     ob%gpsref(num_gpsref)%t(i)   = platform%each(i)%t
-	     ob%gpsref(num_gpsref)%q(i)   = platform%each(i)%q
-	   
+             ob%gpsref(num_gpsref)%p(i)   = platform%each(i)%p
+             ob%gpsref(num_gpsref)%t(i)   = platform%each(i)%t
+             ob%gpsref(num_gpsref)%q(i)   = platform%each(i)%q
+           
 !         write(unit=stdout,fmt=*) 'p = ',ob%gpsref(num_gpsref)%p(i),' ref = ',ob%gpsref(num_gpsref)%ref(i)
 !         write(unit=stdout,fmt=*) 't = ',ob%gpsref(num_gpsref)%t(i),' q = ',ob%gpsref(num_gpsref)%q(i)
 
-	   end do
+           end do
 
 
         case (71, 72)
@@ -859,7 +859,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          end if
 
          if(.not.use_ProfilerObs) cycle reports
-	 platform  % info % platform ='FM-132 PRFLR'
+         platform  % info % platform ='FM-132 PRFLR'
          num_profiler = num_profiler + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit
          ! tests with different numbers of MPI tasks.  
@@ -890,7 +890,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          end if
 
          if(.not.use_BogusObs) cycle reports
-	 platform  % info % platform ='FM-135 TCBOG'
+         platform  % info % platform ='FM-135 TCBOG'
          num_bogus = num_bogus + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit
          ! tests with different numbers of MPI tasks.  

@@ -1,5 +1,5 @@
 subroutine da_get_spoles(x,              &
-          ids, ide, jds, jde, kds, kde,  &
+          ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
           its, ite, jts, jte, kts, kte   )
 
@@ -10,17 +10,13 @@ subroutine da_get_spoles(x,              &
    implicit none
    
 
-   integer, intent(in)    :: ids, ide, jds, jde, kds, kde
+   integer, intent(in)    :: ids, ide, jds, jde
    integer, intent(in)    :: ims, ime, jms, jme, kms, kme
    integer, intent(in)    :: its, ite, jts, jte, kts, kte
    real,    intent(inout) :: x(ims:ime,jms:jme,kms:kme)   
 
    integer                :: k
    real                   :: tmpvar,tmps,tmp_s
-
-   ! Stop compiler whinge
-   if (kde==0 .OR. kds==0) then
-   end if
 
    if (trace_use) call da_trace_entry("da_get_spoles")
 

@@ -371,7 +371,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       iflag = .false.
 
       do l=1,nchanl
-         airdata(l+nreal) = airschan(l)%tmbrst	         ! brightness temerature
+         airdata(l+nreal) = airschan(l)%tmbrst           ! brightness temerature
          if (airdata(l+nreal) > 0._r_kind .and. airdata(l+nreal) < 500._r_kind) then
             iflag = .true.
          else

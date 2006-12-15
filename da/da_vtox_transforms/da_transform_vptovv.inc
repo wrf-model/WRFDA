@@ -1,6 +1,6 @@
 subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
                                 vp, vv, mz, &
-                                ids,ide, jds,jde, kds,kde,  &
+                                kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
                                 its,ite, jts,jte, kts,kte )
 
@@ -14,7 +14,7 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
    implicit none
 
    integer, intent(in)   :: mz                         ! # vertical modes.
-   integer, intent(in)   :: ids,ide, jds,jde, kds,kde  ! domain dims.
+   integer, intent(in)   :: kds,kde  ! domain dims.
    integer, intent(in)   :: ims,ime, jms,jme, kms,kme  ! memory dims.
    integer, intent(in)   :: its,ite, jts,jte, kts,kte  ! tile   dims
    real, intent(in)      :: evec(jts:jte,kds:kde,1:mz) ! Eigenvectors.
@@ -25,10 +25,6 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
    
    integer               :: i, j, m                    ! Loop counters.
    real                  :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
-
-   ! Stop compiler whinge
-   if (ids==0 .OR. ide==0 .OR. jde==0) then
-   end if
 
    if (trace_use) call da_trace_entry("da_transform_vptovv")
    

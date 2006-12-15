@@ -12,8 +12,8 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
    !               2. Extra diagnostics added for generating detailed information
    !                  about rejected obs in various outer iterations
    !
-   !     Modification:	02/18/2004		Wei Huang
-   !		Make obs. operator independent of cv-options.
+   !     Modification:  02/18/2004              Wei Huang
+   !            Make obs. operator independent of cv-options.
    !
    !-------------------------------------------------------------------------
 

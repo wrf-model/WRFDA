@@ -977,7 +977,7 @@ loop_level: do i = 1, platform%info%levels
            write(unit=stdout,fmt=*) 'nlevels=', nlevels
            write(unit=stdout,fmt=*) 'ob % num_bogus,slp', num_bogus,  &
                     ob % bogus ( num_bogus ) % slp
-  	    do i=1,nlevels
+            do i=1,nlevels
                write(unit=stdout,fmt=*) 'ob % num_bogus, i ', num_bogus,i
                write(unit=stdout,fmt=*) 'ob%bogus(ob%num_bogus)%u,v=',  &
                        ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)

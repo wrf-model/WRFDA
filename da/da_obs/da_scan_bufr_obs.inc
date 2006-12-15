@@ -233,12 +233,12 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
             end select
 
          case (41)
-         ! case (130:131, 133, 230:231, 233) ;	! Airep
+         ! case (130:131, 133, 230:231, 233) ;  ! Airep
             if (.not.use_AirepObs) cycle reports
             num_airep = num_airep + 1
 
-         ! case (180, 182, 280, 282) ;		! Ships and buoys
-	 case (522, 523) ;
+         ! case (180, 182, 280, 282) ;          ! Ships and buoys
+         case (522, 523) ;
             if (.not.use_ShipsObs) cycle reports
             num_ships = num_ships + 1
 
@@ -247,12 +247,12 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
             num_buoy  = num_buoy  + 1
 
          case (511)
-         ! case (181, 281) ;		! Synop
+         ! case (181, 281) ;            ! Synop
             if (.not.use_SynopObs) cycle reports
             num_synop = num_synop + 1
 
          case (512)
-         ! case (187 , 287) ;			! Metar
+         ! case (187 , 287) ;                   ! Metar
             if (.not.use_MetarObs) cycle reports
             num_metar = num_metar + 1
 
@@ -271,11 +271,11 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
 
          case (583)    ;                 !  GPS IPW
             if (.not.use_GpspwObs) cycle reports
-	    num_gpspw  = num_gpspw + 1
+            num_gpspw  = num_gpspw + 1
 
          case (584)    ;                 !  GPS REF
             if (.not.use_GpsrefObs) cycle reports
-	    num_gpsref  = num_gpsref + 1
+            num_gpsref  = num_gpsref + 1
 
          case default ;
             select case (kx)
