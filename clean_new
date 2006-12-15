@@ -11,9 +11,9 @@ EOF
 touch depend.txt
 
 if ( "$1" == '-a' ) then
-  make superclean
+  make superclean >/dev/null
 else
-  make clean
+  make clean > /dev/null
 endif
 
 rm -f ../main/*exe
