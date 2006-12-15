@@ -1,4 +1,4 @@
-subroutine da_copy_dims(grid, xp, &
+subroutine da_copy_dims(grid, &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      ips, ipe, jps, jpe, kps, kpe )
@@ -7,8 +7,7 @@ subroutine da_copy_dims(grid, xp, &
    ! PURPOSE: Copy dimensioning information from grid structure.
    !---------------------------------------------------------------------------
 
-   type(domain), intent(in)         :: grid
-   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
+   type(domain), intent(inout)         :: grid
 
    integer,      intent(out) :: ids,ide, jds,jde, kds,kde   ! domain dims.
    integer,      intent(out) :: ims,ime, jms,jme, kms,kme   ! memory dims.
@@ -41,63 +40,63 @@ subroutine da_copy_dims(grid, xp, &
 
    ! Indices for yz decomposition
 
-   xp%idsx = grid%sd31
-   xp%idex = grid%ed31 - 1
-   xp%jdsx = grid%sd32
-   xp%jdex = grid%ed32 - 1
-   xp%kdsx = grid%sd33
-   xp%kdex = grid%ed33 - 1
+   grid%xp%idsx = grid%sd31
+   grid%xp%idex = grid%ed31 - 1
+   grid%xp%jdsx = grid%sd32
+   grid%xp%jdex = grid%ed32 - 1
+   grid%xp%kdsx = grid%sd33
+   grid%xp%kdex = grid%ed33 - 1
 
-   xp%imsx = grid%sm31x
-   xp%imex = grid%em31x
-   xp%jmsx = grid%sm32x
-   xp%jmex = grid%em32x
-   xp%kmsx = grid%sm33x
-   xp%kmex = grid%em33x
+   grid%xp%imsx = grid%sm31x
+   grid%xp%imex = grid%em31x
+   grid%xp%jmsx = grid%sm32x
+   grid%xp%jmex = grid%em32x
+   grid%xp%kmsx = grid%sm33x
+   grid%xp%kmex = grid%em33x
 
-   xp%itsx = grid%sp31x
-   xp%itex = grid%ep31x
-   xp%jtsx = grid%sp32x
-   xp%jtex = grid%ep32x
-   xp%ktsx = grid%sp33x
-   xp%ktex = grid%ep33x
+   grid%xp%itsx = grid%sp31x
+   grid%xp%itex = grid%ep31x
+   grid%xp%jtsx = grid%sp32x
+   grid%xp%jtex = grid%ep32x
+   grid%xp%ktsx = grid%sp33x
+   grid%xp%ktex = grid%ep33x
 
-   xp%ipsx = grid%sp31x
-   xp%ipex = grid%ep31x
-   xp%jpsx = grid%sp32x
-   xp%jpex = grid%ep32x
-   xp%kpsx = grid%sp33x
-   xp%kpex = grid%ep33x
+   grid%xp%ipsx = grid%sp31x
+   grid%xp%ipex = grid%ep31x
+   grid%xp%jpsx = grid%sp32x
+   grid%xp%jpex = grid%ep32x
+   grid%xp%kpsx = grid%sp33x
+   grid%xp%kpex = grid%ep33x
 
    ! Indices for xz decomposition
 
-   xp%idsy = grid%sd31
-   xp%idey = grid%ed31 - 1
-   xp%jdsy = grid%sd32
-   xp%jdey = grid%ed32 - 1
-   xp%kdsy = grid%sd33
-   xp%kdey = grid%ed33 - 1
+   grid%xp%idsy = grid%sd31
+   grid%xp%idey = grid%ed31 - 1
+   grid%xp%jdsy = grid%sd32
+   grid%xp%jdey = grid%ed32 - 1
+   grid%xp%kdsy = grid%sd33
+   grid%xp%kdey = grid%ed33 - 1
 
-   xp%imsy = grid%sm31y
-   xp%imey = grid%em31y
-   xp%jmsy = grid%sm32y
-   xp%jmey = grid%em32y
-   xp%kmsy = grid%sm33y
-   xp%kmey = grid%em33y
+   grid%xp%imsy = grid%sm31y
+   grid%xp%imey = grid%em31y
+   grid%xp%jmsy = grid%sm32y
+   grid%xp%jmey = grid%em32y
+   grid%xp%kmsy = grid%sm33y
+   grid%xp%kmey = grid%em33y
 
-   xp%itsy = grid%sp31y
-   xp%itey = grid%ep31y
-   xp%jtsy = grid%sp32y
-   xp%jtey = grid%ep32y
-   xp%ktsy = grid%sp33y
-   xp%ktey = grid%ep33y
+   grid%xp%itsy = grid%sp31y
+   grid%xp%itey = grid%ep31y
+   grid%xp%jtsy = grid%sp32y
+   grid%xp%jtey = grid%ep32y
+   grid%xp%ktsy = grid%sp33y
+   grid%xp%ktey = grid%ep33y
 
-   xp%ipsy = grid%sp31y
-   xp%ipey = grid%ep31y
-   xp%jpsy = grid%sp32y
-   xp%jpey = grid%ep32y
-   xp%kpsy = grid%sp33y
-   xp%kpey = grid%ep33y
+   grid%xp%ipsy = grid%sp31y
+   grid%xp%ipey = grid%ep31y
+   grid%xp%jpsy = grid%sp32y
+   grid%xp%jpey = grid%ep32y
+   grid%xp%kpsy = grid%sp33y
+   grid%xp%kpey = grid%ep33y
 
    if (ipe > ide) ipe = ide
    if (jpe > jde) jpe = jde
@@ -105,90 +104,90 @@ subroutine da_copy_dims(grid, xp, &
 
    ! Indices for yz decomposition
 
-   if (xp%itex > ide) xp%itex = ide
-   if (xp%jtex > jde) xp%jtex = jde
-   if (xp%ktex > kde) xp%ktex = kde
+   if (grid%xp%itex > ide) grid%xp%itex = ide
+   if (grid%xp%jtex > jde) grid%xp%jtex = jde
+   if (grid%xp%ktex > kde) grid%xp%ktex = kde
 
-   if (xp%ipex > ide) xp%ipex = ide
-   if (xp%jpex > jde) xp%jpex = jde
-   if (xp%kpex > kde) xp%kpex = kde
+   if (grid%xp%ipex > ide) grid%xp%ipex = ide
+   if (grid%xp%jpex > jde) grid%xp%jpex = jde
+   if (grid%xp%kpex > kde) grid%xp%kpex = kde
 
    ! Indices for xz decomposition
 
-   if (xp%itey > ide) xp%itey = ide
-   if (xp%jtey > jde) xp%jtey = jde
-   if (xp%ktey > kde) xp%ktey = kde
+   if (grid%xp%itey > ide) grid%xp%itey = ide
+   if (grid%xp%jtey > jde) grid%xp%jtey = jde
+   if (grid%xp%ktey > kde) grid%xp%ktey = kde
 
-   if (xp%ipey > ide) xp%ipey = ide
-   if (xp%jpey > jde) xp%jpey = jde
-   if (xp%kpey > kde) xp%kpey = kde
+   if (grid%xp%ipey > ide) grid%xp%ipey = ide
+   if (grid%xp%jpey > jde) grid%xp%jpey = jde
+   if (grid%xp%kpey > kde) grid%xp%kpey = kde
 
-   ! Copy xpose dimensions from grid structure to xp structure.
+   ! Copy grid%xpose dimensions from grid structure to grid%xp structure.
 
    ! Indices for xy decomposition
 
-   xp%ids = ids
-   xp%ide = ide
-   xp%jds = jds
-   xp%jde = jde
-   xp%kds = kds
-   xp%kde = kde
+   grid%xp%ids = ids
+   grid%xp%ide = ide
+   grid%xp%jds = jds
+   grid%xp%jde = jde
+   grid%xp%kds = kds
+   grid%xp%kde = kde
 
-   xp%ims = ims
-   xp%ime = ime
-   xp%jms = jms
-   xp%jme = jme
-   xp%kms = kms
-   xp%kme = kme
+   grid%xp%ims = ims
+   grid%xp%ime = ime
+   grid%xp%jms = jms
+   grid%xp%jme = jme
+   grid%xp%kms = kms
+   grid%xp%kme = kme
 
-   xp%ips = ips
-   xp%ipe = ipe
-   xp%jps = jps
-   xp%jpe = jpe
-   xp%kps = kps
-   xp%kpe = kpe
+   grid%xp%ips = ips
+   grid%xp%ipe = ipe
+   grid%xp%jps = jps
+   grid%xp%jpe = jpe
+   grid%xp%kps = kps
+   grid%xp%kpe = kpe
 
    if (print_detail_parallel) then
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%ids =', xp%ids , 'xp%ide =', xp%ide , &
-           'xp%jds =', xp%jds , 'xp%jde =', xp%jde , &
-           'xp%kds =', xp%kds , 'xp%kde =', xp%kde
+           'grid%xp%ids =', grid%xp%ids , 'grid%xp%ide =', grid%xp%ide , &
+           'grid%xp%jds =', grid%xp%jds , 'grid%xp%jde =', grid%xp%jde , &
+           'grid%xp%kds =', grid%xp%kds , 'grid%xp%kde =', grid%xp%kde
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%ims =', xp%ims , 'xp%ime =', xp%ime , &
-           'xp%jms =', xp%jms , 'xp%jme =', xp%jme , &
-           'xp%kms =', xp%kms , 'xp%kme =', xp%kme
+           'grid%xp%ims =', grid%xp%ims , 'grid%xp%ime =', grid%xp%ime , &
+           'grid%xp%jms =', grid%xp%jms , 'grid%xp%jme =', grid%xp%jme , &
+           'grid%xp%kms =', grid%xp%kms , 'grid%xp%kme =', grid%xp%kme
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%ips =', xp%ips , 'xp%ipe =', xp%ipe , &
-           'xp%jps =', xp%jps , 'xp%jpe =', xp%jpe , &
-           'xp%kps =', xp%kps , 'xp%kpe =', xp%kpe
+           'grid%xp%ips =', grid%xp%ips , 'grid%xp%ipe =', grid%xp%ipe , &
+           'grid%xp%jps =', grid%xp%jps , 'grid%xp%jpe =', grid%xp%jpe , &
+           'grid%xp%kps =', grid%xp%kps , 'grid%xp%kpe =', grid%xp%kpe
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%imsx =', xp%imsx, 'xp%imex=', xp%imex, &
-           'xp%jmsx =', xp%jmsx, 'xp%jmex=', xp%jmex, &
-           'xp%kmsx =', xp%kmsx, 'xp%kmex=', xp%kmex
+           'grid%xp%imsx =', grid%xp%imsx, 'grid%xp%imex=', grid%xp%imex, &
+           'grid%xp%jmsx =', grid%xp%jmsx, 'grid%xp%jmex=', grid%xp%jmex, &
+           'grid%xp%kmsx =', grid%xp%kmsx, 'grid%xp%kmex=', grid%xp%kmex
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%ipsx =', xp%ipsx, 'xp%ipex=', xp%ipex, &
-           'xp%jpsx =', xp%jpsx, 'xp%jpex=', xp%jpex, &
-           'xp%kpsx =', xp%kpsx, 'xp%kpex=', xp%kpex
+           'grid%xp%ipsx =', grid%xp%ipsx, 'grid%xp%ipex=', grid%xp%ipex, &
+           'grid%xp%jpsx =', grid%xp%jpsx, 'grid%xp%jpex=', grid%xp%jpex, &
+           'grid%xp%kpsx =', grid%xp%kpsx, 'grid%xp%kpex=', grid%xp%kpex
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%imsy =', xp%imsy, 'xp%imey=', xp%imey, &
-           'xp%jmsy =', xp%jmsy, 'xp%jmey=', xp%jmey, &
-           'xp%kmsy =', xp%kmsy, 'xp%kmey=', xp%kmey
+           'grid%xp%imsy =', grid%xp%imsy, 'grid%xp%imey=', grid%xp%imey, &
+           'grid%xp%jmsy =', grid%xp%jmsy, 'grid%xp%jmey=', grid%xp%jmey, &
+           'grid%xp%kmsy =', grid%xp%kmsy, 'grid%xp%kmey=', grid%xp%kmey
       write(unit=stdout, fmt='(//)')
 
       write(unit=stdout, fmt='(2(a, i4, 5x))') &
-           'xp%ipsy =', xp%ipsy, 'xp%ipey=', xp%ipey, &
-           'xp%jpsy =', xp%jpsy, 'xp%jpey=', xp%jpey, &
-           'xp%kpsy =', xp%kpsy, 'xp%kpey=', xp%kpey
+           'grid%xp%ipsy =', grid%xp%ipsy, 'grid%xp%ipey=', grid%xp%ipey, &
+           'grid%xp%jpsy =', grid%xp%jpsy, 'grid%xp%jpey=', grid%xp%jpey, &
+           'grid%xp%kpsy =', grid%xp%kpsy, 'grid%xp%kpey=', grid%xp%kpey
    end if
 
    if (trace_use) call da_trace_exit("da_copy_dims")

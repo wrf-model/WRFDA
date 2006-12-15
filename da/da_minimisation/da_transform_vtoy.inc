@@ -27,7 +27,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain), intent(in)           :: grid
+   type(domain), intent(inout)           :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin

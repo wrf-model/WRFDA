@@ -1,6 +1,6 @@
 subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
-                           xb, xbx, be, ep, iv, xhat, cv, vv, &
-                           vp, xp, re, y, xa, j, j_grad,            &
+                           xbx, be, iv, xhat, cv, &
+                           re, y, j, j_grad,            &
                            ids, ide, jds, jde, kds, kde,            &
                            ims, ime, jms, jme, kms, kme,            &
                            its, ite, jts, jte, kts, kte,            &
@@ -17,27 +17,21 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    integer, intent(in)                :: cv_size    ! Total cv size.
    integer, intent(in)                :: cv_size_jb ! Jb cv size.
    integer, intent(in)                :: cv_size_je ! Je cv size.
-   type (xb_type), intent(in)         :: xb     ! first guess (local).
    type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.
    type (be_type), intent(in)         :: be     ! background error structure.
-   type (ep_type), intent(in)         :: ep     ! Ensemble perturbations.
    type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
    real, intent(in)                   :: xhat(1:cv_size) ! control variables.
    real, intent(in)                   :: cv(1:cv_size)   ! control variables.
-   type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
-   type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
-   type (xpose_type), intent(inout)   :: xp     ! Domain decomposition vars.
    type (y_type) , intent(inout)      :: re     ! residual vector (o-a).
    type (y_type) , intent(inout)      :: y      ! y = H(x_inc).
    real, intent(out)                  :: j_grad(1:cv_size) ! control variables.
-   type (x_type) , intent(inout)      :: xa     ! gridded analy. incs. (local)
    type (j_type) , intent(out)        :: j      ! cost function j
 
    integer   , intent(in)       :: ids,ide, jds,jde, kds,kde ! domain dims.
    integer   , intent(in)       :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer   , intent(in)       :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   target                   :: grid
+   type(domain), intent(inout)  :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer          :: je_start, je_end             ! Start/end indices of Je.
@@ -72,7 +66,8 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [1.1] transform from control variable to model grid space:
 
    if (iter > 0) &
-      call da_transform_vtoy( cv_size, be, ep, xhat, iv, vp, vv, xa, xb, xbx, xp, y, &
+      call da_transform_vtoy( cv_size, be, grid%ep, xhat, iv, grid%vp, grid%vv,&
+                              grid%xa, grid%xb, xbx, grid%xp, y, &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte,             &
@@ -124,7 +119,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    xhat_jb(1:cv_size_jb) = xhat (1:cv_size_jb)
 
    j % jb = 0.5 * da_dot_cv( cv_size_jb, cv_size_domain_jb, &
-       cv_jb + xhat_jb, cv_jb + xhat_jb, xp, &
+       cv_jb + xhat_jb, cv_jb + xhat_jb, grid%xp, &
        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
    j % jb = jb_factor * j % jb
@@ -138,7 +133,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       cv_je(1:cv_size_je) = cv(je_start:je_end)
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
       j % je = 0.5 * da_dot_cv( cv_size_je, cv_size_domain_je, &
-          cv_je + xhat_je, cv_je + xhat_je, xp, &
+          cv_je + xhat_je, cv_je + xhat_je, grid%xp, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
    end if
    j % je = je_factor * j % je
@@ -169,7 +164,8 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [5.0] calculate grad_v (jo):
    !-------------------------------------------------------------------------
 
-   call da_transform_vtoy_adj( iter, cv_size, be, ep, j_grad, iv, vp, vv, xa, xb, xbx, xp, jo_grad_y, &
+   call da_transform_vtoy_adj( iter, cv_size, be, grid%ep, j_grad, iv, &
+                               grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &
@@ -191,7 +187,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [6.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo) + grad_v (je):
    !-------------------------------------------------------------------------
 
-   gnorm_jo = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
+   gnorm_jo = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
    ! Add Del_v (Jb)
@@ -206,10 +202,10 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                 j_grad(je_start:je_end)
    end if
    gnorm_jb = da_dot_cv( cv_size_jb, cv_size_domain_jb, &
-                         cv_jb + xhat_jb , cv_jb + xhat_jb, xp, &
+                         cv_jb + xhat_jb , cv_jb + xhat_jb, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
    gnorm_je = da_dot_cv( cv_size_je, cv_size_domain_je, &
-                         cv_je + xhat_je , cv_je + xhat_je, xp, &
+                         cv_je + xhat_je , cv_je + xhat_je, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
    if (print_detail_grad) then
@@ -226,7 +222,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                        j_grad(1:cv_size))
    end if
 
-   gnorm_j = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
+   gnorm_j = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
    gnorm_jo= sqrt(gnorm_jo)
@@ -236,7 +232,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    if (rootproc) then
       write(grad_unit,fmt='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') & 
-         it, EPS(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
+         it, eps(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
    end if
 
    if (trace_use) call da_trace_exit("da_calculate_j")

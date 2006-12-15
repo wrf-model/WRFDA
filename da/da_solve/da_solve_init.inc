@@ -1,14 +1,11 @@
-subroutine da_solve_init( grid, xp, xb, &
+subroutine da_solve_init( grid, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
 
    implicit none
 
-   type(domain)              :: grid
-
-   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
-   type (xb_type), intent(inout)    :: xb      ! Background state
+   type(domain), intent(inout)      :: grid
 
    integer,      intent(out)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
    integer,      intent(out)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
@@ -18,7 +15,7 @@ subroutine da_solve_init( grid, xp, xb, &
 
    integer :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
 
-!if ( DWORDsize != RWORDsize )
+!if ( dwordsize != rwordsize )
 #define true_MSG_XPOSE add_msg_xpose_real
 !else
 !define true_MSG_XPOSE add_msg_xpose_doubleprecision
@@ -28,7 +25,7 @@ subroutine da_solve_init( grid, xp, xb, &
 
    ! De-reference dimension information stored in the grid data structure.
 
-   call da_copy_dims( grid, xp, &
+   call da_copy_dims( grid, &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
                    ips, ipe, jps, jpe, kps, kpe  )
@@ -38,7 +35,7 @@ subroutine da_solve_init( grid, xp, xb, &
 
    call set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
 
-   call da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
+   call da_copy_tile_dims( grid, its, ite, jts, jte, kts, kte )
 
    sm31             = grid%sm31
    sm32             = grid%sm32
@@ -62,11 +59,11 @@ subroutine da_solve_init( grid, xp, xb, &
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call true_MSG_XPOSE ( xp%v1z, xp%v1x, xp%v1y, 3 )
+      call true_MSG_XPOSE ( grid%xp%v1z, grid%xp%v1x, grid%xp%v1y, 3 )
 #else
-      call true_MSG_XPOSE ( xp%v1z(ims,jms,kms), &
-                         xp%v1x(xp%imsx,xp%jmsx,xp%kmsx), &
-                         xp%v1y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
+      call true_MSG_XPOSE ( grid%xp%v1z(ims,jms,kms), &
+                         grid%xp%v1x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
+                         grid%xp%v1y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3 )
 #endif
       call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V1 ) )
    end if
@@ -76,11 +73,11 @@ subroutine da_solve_init( grid, xp, xb, &
       call setup_xpose_rsl( grid )
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call true_MSG_XPOSE ( xp%v2z, xp%v2x, xp%v2y, 3 )
+      call true_MSG_XPOSE ( grid%xp%v2z, grid%xp%v2x, grid%xp%v2y, 3 )
 #else
-      call true_MSG_XPOSE ( xp%v2z(ims,jms,kms), &
-                         xp%v2x(xp%imsx,xp%jmsx,xp%kmsx), &
-                         xp%v2y(xp%imsy,xp%jmsy,xp%kmsy), 3 )
+      call true_MSG_XPOSE ( grid%xp%v2z(ims,jms,kms), &
+                         grid%xp%v2x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
+                         grid%xp%v2y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3 )
 #endif
       call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
    end if
@@ -122,54 +119,54 @@ subroutine da_solve_init( grid, xp, xb, &
 
    ! Copy domain and transpose descriptors.
 
-   xp%domdesc = grid%domdesc
+   grid%xp%domdesc = grid%domdesc
    do ii = 1, max_comms
-     xp%comms(ii) = grid%comms(ii)
+     grid%xp%comms(ii) = grid%comms(ii)
    end do
 
    ! Copy halo and transpose IDs.
 
-   xp%halo_id0 = HALO_INIT
-   xp%halo_id1 = HALO_PSICHI_UV
-   xp%halo_id2 = HALO_BAL_EQN_ADJ
-   xp%halo_id3 = HALO_PSICHI_UV_ADJ
-   xp%halo_id4 = HALO_XA
-   xp%halo_id5 = HALO_XB
-   xp%halo_id6 = HALO_SFC_XA
-   xp%halo_id7 = HALO_SFC_XB
-   xp%halo_id8 = HALO_SSMI_XA
-   xp%halo_id9 = HALO_SSMI_XB
-   xp%halo_id10 = HALO_RADAR_XA
-   xp%halo_id11 = HALO_RADAR_XB
-   xp%halo_id12 = HALO_2D_WORK
-   xp%halo_id13 = HALO_RADAR_XA_W
+   grid%xp%halo_id0 = HALO_INIT
+   grid%xp%halo_id1 = HALO_PSICHI_UV
+   grid%xp%halo_id2 = HALO_BAL_EQN_ADJ
+   grid%xp%halo_id3 = HALO_PSICHI_UV_ADJ
+   grid%xp%halo_id4 = HALO_XA
+   grid%xp%halo_id5 = HALO_XB
+   grid%xp%halo_id6 = HALO_SFC_XA
+   grid%xp%halo_id7 = HALO_SFC_XB
+   grid%xp%halo_id8 = HALO_SSMI_XA
+   grid%xp%halo_id9 = HALO_SSMI_XB
+   grid%xp%halo_id10 = HALO_RADAR_XA
+   grid%xp%halo_id11 = HALO_RADAR_XB
+   grid%xp%halo_id12 = HALO_2D_WORK
+   grid%xp%halo_id13 = HALO_RADAR_XA_W
 
-   xp%xpose_id1 = XPOSE_V1
-   xp%xpose_id2 = XPOSE_V2
+   grid%xp%xpose_id1 = XPOSE_V1
+   grid%xp%xpose_id2 = XPOSE_V2
 #endif
 
    ! Fill background scalars:
 
-   xb%ids = xp%ids 
-   xb%ide = xp%ide
-   xb%jds = xp%jds 
-   xb%jde = xp%jde
-   xb%kds = xp%kds 
-   xb%kde = xp%kde 
+   grid%xb%ids = grid%xp%ids 
+   grid%xb%ide = grid%xp%ide
+   grid%xb%jds = grid%xp%jds 
+   grid%xb%jde = grid%xp%jde
+   grid%xb%kds = grid%xp%kds 
+   grid%xb%kde = grid%xp%kde 
 
-   xb%ims = xp%ims 
-   xb%ime = xp%ime
-   xb%jms = xp%jms 
-   xb%jme = xp%jme
-   xb%kms = xp%kms 
-   xb%kme = xp%kme 
+   grid%xb%ims = grid%xp%ims 
+   grid%xb%ime = grid%xp%ime
+   grid%xb%jms = grid%xp%jms 
+   grid%xb%jme = grid%xp%jme
+   grid%xb%kms = grid%xp%kms 
+   grid%xb%kme = grid%xp%kme 
 
-   xb%its = xp%its 
-   xb%ite = xp%ite
-   xb%jts = xp%jts 
-   xb%jte = xp%jte 
-   xb%kts = xp%kts
-   xb%kte = xp%kte 
+   grid%xb%its = grid%xp%its 
+   grid%xb%ite = grid%xp%ite
+   grid%xb%jts = grid%xp%jts 
+   grid%xb%jte = grid%xp%jte 
+   grid%xb%kts = grid%xp%kts
+   grid%xb%kte = grid%xp%kte 
 
    if (trace_use) call da_trace_exit("da_solve_init")
 

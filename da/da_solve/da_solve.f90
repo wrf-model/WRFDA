@@ -96,7 +96,7 @@ subroutine da_solve ( grid , config_flags , &
    ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
-   call da_solve_init( grid, grid%xp, grid%xb, &
+   call da_solve_init( grid, &
                        ids, ide, jds, jde, kds, kde, &
                        ims, ime, jms, jme, kms, kme, &
                        its, ite, jts, jte, kts, kte )
@@ -232,9 +232,9 @@ subroutine da_solve ( grid , config_flags , &
 
       call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
-                           grid%xb, xbx, be, grid%ep, iv, &
+                           xbx, be, iv, &
                            j_grad_norm_target, xhat, cvt, &
-                           grid%xa, grid%vv, grid%vp, grid%xp, re, y, j,    &
+                           re, y, j,    &
                            ids, ide, jds, jde, kds, kde,        &
                            ims, ime, jms, jme, kms, kme,        &
                            its, ite, jts, jte, kts, kte         )

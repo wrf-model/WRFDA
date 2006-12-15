@@ -1,11 +1,10 @@
-subroutine da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
+subroutine da_copy_tile_dims( grid, its, ite, jts, jte, kts, kte )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Copy tile dimensions from grid structure.
    !---------------------------------------------------------------------------
 
-   type(domain), intent(in)         :: grid
-   type (xpose_type),intent(inout)  :: xp      ! Transpose variables.
+   type(domain), intent(inout)         :: grid
    integer,      intent(out)        :: its,ite, jts,jte, kts,kte ! tile dims.
 
    integer                  :: ij   ! Loop counter
@@ -19,23 +18,23 @@ subroutine da_copy_tile_dims( grid, xp, its, ite, jts, jte, kts, kte )
       ite = grid%i_end(ij)
       jts = grid%j_start(ij)
       jte = grid%j_end(ij)
-      kts = xp%kds
-      kte = xp%kde
+      kts = grid%xp%kds
+      kte = grid%xp%kde
 
-      xp%its = its
-      xp%ite = ite
-      xp%jts = jts
-      xp%jte = jte
-      xp%kts = kts
-      xp%kte = kte
+      grid%xp%its = its
+      grid%xp%ite = ite
+      grid%xp%jts = jts
+      grid%xp%jte = jte
+      grid%xp%kts = kts
+      grid%xp%kte = kte
 
-      if(xp%ite > xp%ide) xp%ite = xp%ide
-      if(xp%jte > xp%jde) xp%jte = xp%jde
-      if(xp%kte > xp%kde) xp%kte = xp%kde
+      if (grid%xp%ite > grid%xp%ide) grid%xp%ite = grid%xp%ide
+      if (grid%xp%jte > grid%xp%jde) grid%xp%jte = grid%xp%jde
+      if (grid%xp%kte > grid%xp%kde) grid%xp%kte = grid%xp%kde
 
-      if(ite > xp%ide) ite = xp%ide
-      if(jte > xp%jde) jte = xp%jde
-      if(kte > xp%kde) kte = xp%kde
+      if (ite > grid%xp%ide) ite = grid%xp%ide
+      if (jte > grid%xp%jde) jte = grid%xp%jde
+      if (kte > grid%xp%kde) kte = grid%xp%kde
 
       if (print_detail_parallel) then
          write(unit=stdout, fmt='(/)')

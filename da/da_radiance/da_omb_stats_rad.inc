@@ -6,23 +6,23 @@ subroutine da_omb_stats_rad ( stats_unit, iv )
    ! METHOD:  average, rms, minimum, maximum of iv
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER,        INTENT (in)      :: stats_unit    ! Output unit for stats.
-   TYPE (ob_type), INTENT (in)      :: iv            ! Innovation
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: iv            ! Innovation
 
-   TYPE (stats_rad_type),    pointer  :: rad(:)
-   INTEGER                          :: n, k, i
+   type (stats_rad_type),    pointer  :: rad(:)
+   integer                          :: n, k, i
 
-   IF ( iv%num_inst < 1 ) RETURN
+   if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_omb_stats_rad")
 
-   Allocate ( rad(1:iv%num_inst) )
+   allocate ( rad(1:iv%num_inst) )
 
    do i = 1, iv%num_inst                          !! loop for sensors
 
-      Allocate ( rad(i)%ichan(1:iv%instid(i)%nchan) )
+      allocate ( rad(i)%ichan(1:iv%instid(i)%nchan) )
       rad(i)%ichan(1:iv%instid(i)%nchan)%num  = 0
       rad(i)%ichan(1:iv%instid(i)%nchan)%ave  = 0.0
       rad(i)%ichan(1:iv%instid(i)%nchan)%rms  = 0.0
@@ -44,7 +44,7 @@ subroutine da_omb_stats_rad ( stats_unit, iv )
                                   rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                                   rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
 
-            endif          ! end if( oi%sound(n)%loc%proc_domain )
+            end if          ! end if( oi%sound(n)%loc%proc_domain )
          END DO                                 !! end loop for pixels
       end do                        !  end loop for channels
    end do                         !  end loop for sensor

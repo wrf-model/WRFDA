@@ -1,7 +1,7 @@
 subroutine da_minimise_cg( grid, config_flags,            &
-                           it, cv_size, xb, xbx, be, ep, iv, &
+                           it, cv_size, xbx, be, iv, &
                            j_grad_norm_target, xhat, cv, &
-                           xa, vv, vp, xp, re, y, j,  &
+                           re, y, j,  &
                            ids, ide, jds, jde, kds, kde,  &
                            ims, ime, jms, jme, kms, kme,  &
                            its, ite, jts, jte, kts, kte   )
@@ -18,18 +18,12 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
    integer, intent(in)               :: it    ! external iteration.
    integer, intent(in)               :: cv_size          ! Total cv size
-   type (xb_type), intent(in)        :: xb    ! first guess (local).
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
    type (be_type), intent(in)        :: be    ! background error structure.
-   type (ep_type), intent(in)        :: ep    ! Ensemble perturbations.
    type (ob_type), intent(inout)     :: iv    ! ob. increment vector.
    real, intent(inout)               :: j_grad_norm_target ! Target norm.
    real, intent(out)                 :: xhat(1:cv_size)  ! control variable (local).
    real, intent(inout)               :: cv(1:cv_size)    ! control variable (local).
-   type (x_type), intent(out)        :: xa    ! analysis increments (local).
-   type (vp_type), intent(inout)     :: vv    ! Grdipt/EOF CV.
-   type (vp_type), intent(inout)     :: vp    ! Grdipt/level CV.
-   type (xpose_type), intent(inout)  :: xp    ! Dimensions and xpose buffers. 
    type (y_type), intent(inout)      :: re    ! residual (o-a) structure.
    type (y_type), intent(inout)      :: y     ! y = H(x_inc) structure.
 
@@ -38,7 +32,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   target                   :: grid
+   type(domain), intent(inout)   :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer                           :: iter            
@@ -76,8 +70,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
 
    call da_calculate_j( it, 0, cv_size, be % cv % size_jb, be % cv % size_je, &
-                        xb, xbx, be, ep, iv, xhat, cv, &
-                        vv, vp, xp, re, y, xa, j, j_grad,         &
+                        xbx, be, iv, xhat, cv, &
+                        re, y, j, j_grad,         &
                         ids, ide, jds, jde, kds, kde,             &
                         ims, ime, jms, jme, kms, kme,             &
                         its, ite, jts, jte, kts, kte,             &
@@ -86,7 +80,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
    ghat  = j_grad
    phat  = - ghat
 
-   rrmold = da_dot_cv( cv_size, cv_size_domain, ghat, ghat, xp, & 
+   rrmold = da_dot_cv( cv_size, cv_size_domain, ghat, ghat, grid%xp, & 
                        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
    if (j%total == 0.0) go to 1004
@@ -118,7 +112,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
       fhat = phat
       cg_jcdf = 1
 
-      call da_transform_vtoy( cv_size, be, ep, fhat, iv, vp, vv, xa, xb, xbx, xp, y,         &
+      call da_transform_vtoy( cv_size, be, grid%ep, fhat, iv, grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, y,         &
                               ids, ide, jds, jde, kds, kde,                     &
                               ims, ime, jms, jme, kms, kme,                     &
                               its, ite, jts, jte, kts, kte,                     &
@@ -126,8 +120,8 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       call da_calculate_grady( iv, y , jo_grad_y)
 
-      call da_transform_vtoy_adj( iter, cv_size, be, ep, fhat, iv, vp, vv, \
-                                  xa, xb, xbx, xp, jo_grad_y, &
+      call da_transform_vtoy_adj( iter, cv_size, be, grid%ep, fhat, iv, grid%vp, grid%vv, \
+                                  grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
                                   ids, ide, jds, jde, kds, kde,                     &
                                   ims, ime, jms, jme, kms, kme,                     &
                                   its, ite, jts, jte, kts, kte,                     &
@@ -139,7 +133,7 @@ subroutine da_minimise_cg( grid, config_flags,            &
 
       fhat(1:cv_size_jb) = - fhat(1:cv_size_jb) + jb_factor*phat(1:cv_size_jb)
       fhat(je_start:je_end) = - fhat(je_start:je_end) + je_factor*phat(je_start:je_end)
-      apdotp = da_dot_cv( cv_size, cv_size_domain, fhat, phat, xp, & 
+      apdotp = da_dot_cv( cv_size, cv_size_domain, fhat, phat, grid%xp, & 
          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
       step = 0.0
@@ -149,18 +143,18 @@ subroutine da_minimise_cg( grid, config_flags,            &
       if (calculate_cg_cost_fn) then
          j_grad = 0.
          call da_calculate_j( it, iter, cv_size, be % cv % size_jb, be % cv % size_je, &
-                             xb, xbx, be, ep, iv, xhat, cv, &
-                             vv, vp, xp, re, y, xa, j, j_grad,         &
+                             xbx, be, iv, xhat, cv, &
+                             re, y, j, j_grad,         &
                              ids, ide, jds, jde, kds, kde,             &
                              ims, ime, jms, jme, kms, kme,             &
                              its, ite, jts, jte, kts, kte,             &
                              grid, config_flags                        )
-            ob_grad = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
+            ob_grad = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
             (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
          ob_grad = sqrt(ob_grad)
       end if
 
-      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, xp, &
+      rrmnew = da_dot_cv (cv_size, cv_size_domain, ghat, ghat, grid%xp, &
          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
 
       rrmnew_norm = sqrt(rrmnew)
@@ -201,14 +195,14 @@ subroutine da_minimise_cg( grid, config_flags,            &
       rrmnew_norm = ob_grad
    else
       call da_calculate_j( it, iter, cv_size, be % cv % size_jb, be % cv % size_je, &
-                           xb, xbx, be, ep, iv, xhat, cv, &
-                           vv, vp, xp, re, y, xa, j, j_grad,         &
+                           xbx, be, iv, xhat, cv, &
+                           re, y, j, j_grad,         &
                            ids, ide, jds, jde, kds, kde,             &
                            ims, ime, jms, jme, kms, kme,             &
                            its, ite, jts, jte, kts, kte,             &
                            grid, config_flags                        )
 
-      rrmnew_norm = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, xp, &
+      rrmnew_norm = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
                               (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
       rrmnew_norm = sqrt(rrmnew_norm)
     end if
