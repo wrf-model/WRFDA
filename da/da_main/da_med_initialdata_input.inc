@@ -4,7 +4,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    ! Arguments
 
-   type(domain)                               :: grid
+   type(domain), intent(inout)                :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
 
    character(*),  intent (in)                 :: filename

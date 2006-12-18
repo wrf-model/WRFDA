@@ -9,10 +9,11 @@ subroutine da_set_boundary_3d(var, &
    !------------------------------------------------------------------------
 
    implicit none
+
    integer, intent(in) :: ids, ide, &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte
-   real, dimension(ims:ime, jms:jme, kms:kme) :: var
+   real, dimension(ims:ime, jms:jme, kms:kme),intent(inout) :: var
 
    integer :: n, j, k
 

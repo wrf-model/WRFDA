@@ -281,7 +281,7 @@ implicit none
 ! ---------------------------------------------------------------------------
 
 
-      integer ifreq
+      integer, intent(in) :: ifreq
       real, intent(in   ):: p0,wv,hwv,ta,gamma  ! base field
       real, intent(in   ):: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma
       real, intent(out  ):: TGL_sigma_v,sigma_v

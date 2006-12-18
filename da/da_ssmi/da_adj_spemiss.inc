@@ -5,13 +5,14 @@ implicit none
 !---------------------------------------------------------------------------
 !
 !Output :: ADJ_tk
-!Input  :: ADJ_ev, ADJ_eh, ev, eh
+!Input  :: ADJ_ev, ADJ_eh
 !---------------------------------------------------------------------------
       real, intent(in   ) :: f, tk, theta, ADJ_ev,ADJ_eh
       real, intent(inout) :: ssw
       real, intent(inout) :: ADJ_tk
+      real, intent(out)   :: ev, eh
 
-      real   epsr,epsi,ADJ_epsr,ADJ_epsi, ev, eh
+      real   epsr,epsi,ADJ_epsr,ADJ_epsi
 !
       real      tc,costh,sinth,rthet
       complex   etav,etah,eps,cterm1v,cterm1h,cterm2,cterm3v,cterm3h,epsnew

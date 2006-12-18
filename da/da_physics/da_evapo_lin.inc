@@ -6,13 +6,15 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real                      :: PREC1, PREC2
-   real, dimension(kts:kte)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B
-   real, dimension(kts:kte)  :: PRE
+   integer, intent(in)                   :: kts, kte
+   real, intent(in)                      :: PREC1, PREC2
+   real, dimension(kts:kte), intent(in)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B
+   real, dimension(kts:kte), intent(out)  :: PRE
+   real, dimension(kts:kte), intent(in)  :: SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A
+   real, dimension(kts:kte), intent(out) :: PRE9
+
+   integer                   :: k
    real, dimension(kts:kte)  :: TMP
-   real, dimension(kts:kte)  :: SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A
-   real, dimension(kts:kte)  :: PRE9
 
    do K=kts, kte
       if (DT(k) <= 0.) cycle

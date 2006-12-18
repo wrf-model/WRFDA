@@ -4,10 +4,13 @@ subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT,SCR2,SCR3,SCR7
-   real, dimension(kts:kte)  :: PRA
-   real                      :: PRAC,BVT3
+   integer, intent(in)       :: kts, kte
+   real, dimension(kts:kte), intent(in)  :: DT,SCR2,SCR3,SCR7
+   real, dimension(kts:kte), intent(out) :: PRA
+
+   real, intent(in)                      :: PRAC,BVT3
+
+   integer       :: k
 
    do K=kts, kte
 

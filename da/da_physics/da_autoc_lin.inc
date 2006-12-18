@@ -4,10 +4,15 @@ subroutine da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT, SCR2, PRC
-   real, dimension(kts:kte)  :: SCR29, PRC9
-   real, parameter           :: QCTH=0.5E-3, QCK1=1.0E-3
+   integer, intent(in)                   :: kts, kte
+   real, dimension(kts:kte), intent(in)  :: DT, SCR2
+   real, dimension(kts:kte), intent(out)  :: PRC
+   real, dimension(kts:kte), intent(in)  :: SCR29
+   real, dimension(kts:kte), intent(out) :: PRC9
+
+   integer                   :: k
+
+   real, parameter          :: QCTH=0.5E-3, QCK1=1.0E-3
 
    do k=kts,kte
       if (DT(k) <= 0.) cycle

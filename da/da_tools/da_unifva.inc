@@ -17,7 +17,7 @@ real function da_unifva (kdum)
  
    implicit none
  
-   integer ::   KDUM
+   integer, intent(inout) ::   KDUM
 
    integer JPIA,JPIM,JPIQ,JPIR,JPNTAB,JPNDIV
    real PPAM,PPEPS,PPRNMX

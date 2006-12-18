@@ -9,10 +9,11 @@ implicit none
 ! ---------------------------------------------------------------------------
 
 
-      integer ifreq
-      real, intent(in   ):: p0,wv,hwv,ta,gamma  ! base field
-      real, intent(inout):: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma
-      real, intent(in   ):: ADJ_sigma_v
+      integer, intent(in) :: ifreq
+      real, intent(in)    :: p0,wv,hwv,ta,gamma  ! base field
+      real, intent(inout) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma
+      real, intent(in)    :: ADJ_sigma_v
+      real, intent(out)   :: sigv
 !
       real wvc, wvcor(4)
       real ADJ_wvc
@@ -44,7 +45,7 @@ implicit none
       real const1,const2,const3,const4
       real h1,h2,h3,h4
 
-      real sigv, ADJ_sigv
+      real ADJ_sigv
 !
       data const1,const2,const3,const4/0.6,2.8,0.2,0.2/
       data h1,h2,h3,h4/5.0,4.9,6.8,6.4/

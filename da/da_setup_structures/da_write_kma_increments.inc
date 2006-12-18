@@ -7,9 +7,9 @@ subroutine da_write_kma_increments(xp, xb, xa)
 
    implicit none
 
-   type(xb_type)                               :: xb
-   type(x_type)                                :: xa
-   type(xpose_type)                            :: xp
+   type(xb_type),intent(in)                     :: xb
+   type(x_type),intent(in)                      :: xa
+   type(xpose_type),intent(in)                  :: xp
 
    ! Arrays for write out increments:
    integer                                     :: ix, jy, kz

@@ -2,12 +2,12 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
 
    implicit none
 
-   type(xb_type)                               :: xb
-   type(x_type)                                :: xa
-   type(xpose_type)                            :: xp
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   :: q_cgrid
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   :: ph_cgrid
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme)                 :: mu_cgrid
+   type(xb_type), intent(in)                            :: xb
+   type(x_type), intent(in)                             :: xa
+   type(xpose_type), intent(inout)                      :: xp
+   real,intent(in) :: q_cgrid(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)
+   real,intent(in) :: ph_cgrid(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)
+   real,intent(in) :: mu_cgrid(xp%ims:xp%ime,xp%jms:xp%jme)
 
    ! Arrays for write out increments:
    integer                                          :: ix, jy, kz

@@ -14,7 +14,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    integer, intent(in)                  :: cv_size
    type(grid_config_rec_type), intent(inout) :: config_flags
-   type(domain)                   :: grid 
+   type(domain), intent(inout)          :: grid 
 
    type (vp_type),    intent(inout) :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout) :: vp    ! Grdipt/level CV.
@@ -119,3 +119,5 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
 
 end subroutine da_check_vtoy_adjoint
+
+

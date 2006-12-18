@@ -5,11 +5,14 @@ subroutine da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT,SCR2,SCR3,SCR7
-   real, dimension(kts:kte)  :: PRA
-   real, dimension(kts:kte)  :: SCR29,SCR79,PRA9
-   real                      :: PRAC,BVT3
+   integer, intent(in)       :: kts, kte
+   real, dimension(kts:kte), intent(in)  :: DT,SCR2,SCR3,SCR7
+   real, dimension(kts:kte), intent(in)  :: PRA
+   real, dimension(kts:kte), intent(out) :: SCR29,SCR79
+   real, dimension(kts:kte), intent(in)  :: PRA9
+   real, intent(in)                      :: PRAC,BVT3
+
+   integer       :: k
 
    do K=kts, kte
       if (DT(k) <= 0.) cycle

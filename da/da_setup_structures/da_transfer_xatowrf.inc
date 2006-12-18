@@ -11,7 +11,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    
    type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
 
-   type(domain), target               :: grid
+   type(domain), intent(inout)        :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -425,4 +425,5 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    if (trace_use) call da_trace_exit("da_transfer_xatowrf")
 
 end subroutine da_transfer_xatowrf
+
 

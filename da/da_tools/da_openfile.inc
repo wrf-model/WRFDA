@@ -1,45 +1,47 @@
-      subroutine da_openfile (Kunit, CDFILE, CDACCESS, CDSTATUS, CDFORM)
+      subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
 !--------------------------------------------------------------------------!
 !
-!                       RoutinE openFILE
+!                       routine openfile
 !                     ********************
 !
-!  PURPOSE:
+!  purpose:
 !  -------
-!     open AN FILE AND REWinD
+!     open an file and rewind
 !
-!   METHOD:
+!   method:
 !   ------
 !
-!   inPUT:
+!   input:
 !   -----
-!      Kunit:          logical unit
-!      CDFILE:         NAME OF FILE FOR outPUT OF DISCARED OBS.
-!      CDA!ESS:       A!ESS (SEQUENTIAL OR ),
-!      CDSTATUS:       STATUS (OLD, NEW OR UNKNOWN)
-!      CDFORM:         FORM (FORMATTED OR UNFORMATTED)
+!      kunit:          logical unit
+!      cdfile:         name of file for output of discared obs.
+!      cda!ess:       a!ess (sequential or ),
+!      cdstatus:       status (old, new or unknown)
+!      cdform:         form (formatted or unformatted)
 !
-!   outPUT:
+!   output:
 !   ------
-!      openED FILE
+!      opened file
 !
-!   COMMON:                      NO
+!   common:                      no
 !   -------
-!   EXTERNAL:                    NO
+!   external:                    no
 !   --------
-!   REFERENCES:                  NO
+!   references:                  no
 !   ----------
 !
-!   MODifICATIONS:
+!   modifications:
 !   --------------
-!       ORIGinAL :  98-07 (F. VANDENBERGHE)
-!       ADDITIONS : 98-11 Norm doCTOR (F. VANDENBERGHE)
+!       original :  98-07 (f. vandenberghe)
+!       additions : 98-11 norm doctor (f. vandenberghe)
 !----------------------------------------------------------------------------!
 
 !...ARGUMENTS FILE NAME AND logical unit
 
-      integer        Kunit, iost
-      character*(*)  CDFILE, CDACCESS, CDSTATUS, CDFORM
+      integer, intent(in) :: Kunit
+      character*(*), intent(in) :: CDFILE, CDACCESS, CDSTATUS, CDFORM
+
+      integer :: iost
 
 !------------------------------------------------------------------------------C
 
@@ -56,7 +58,7 @@
              ERR    =  2000, &
              iostat = IOST        )
  
-      REWinD (Kunit)
+      rewind (Kunit)
  
       return
  

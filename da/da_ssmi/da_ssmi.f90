@@ -98,6 +98,7 @@ contains
 #include "da_calculate_grady_ssmi.inc"
 #include "da_calculate_grady_ssmt1.inc"
 #include "da_calculate_grady_ssmt2.inc"
+#include "da_cal_sigma_v.inc"
 #include "da_adj_tb.inc"
 #include "da_adj_cal_sigma_v.inc"
 #include "da_adj_effang.inc"
@@ -106,6 +107,15 @@ contains
 #include "da_adj_roughem.inc"
 #include "da_adj_spemiss.inc"
 #include "da_adj_tbatmos.inc"
+
+#include "epsalt.inc"
+#include "spemiss.inc"
+#include "tb.inc"
+#include "tbatmos.inc"
+#include "effht.inc"
+#include "effang.inc"
+#include "roughem.inc"
+
    
 end module da_ssmi
 

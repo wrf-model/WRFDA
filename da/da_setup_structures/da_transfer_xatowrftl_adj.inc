@@ -9,10 +9,10 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    implicit none
    
-   type(domain)                              :: grid
+   type(domain), intent(inout)               :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
-   character*4 filnam
+   character*4, intent(in) :: filnam
 
    ! Definitions of dummy arguments to solve
 

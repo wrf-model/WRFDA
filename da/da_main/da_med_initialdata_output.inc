@@ -2,13 +2,13 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    implicit none
 
-   !--Arguments
+   ! Arguments
 
-   type(domain)                                :: grid
+   type(domain), intent(in)                   :: grid
    type (grid_config_rec_type) , intent(inout) :: config_flags       
    character(*),  intent (in),  optional       :: out_filename
 
-   !--Local
+   ! Local
 
    integer                :: fid
    character (LEN=80)     :: file_name
@@ -18,7 +18,7 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
 
    if (trace_use) call da_trace_entry("da_med_initialdata_output")
 
-   if(present(out_filename)) then
+   if (present(out_filename)) then
       file_name = trim(out_filename)
    else
       file_name = 'wrfvar_output'
@@ -28,7 +28,7 @@ subroutine da_med_initialdata_output ( grid , config_flags, out_filename )
    call open_w_dataset ( fid, trim(file_name), grid , config_flags , &
                          output_model_input , "DATASET=INPUT", ierr )
 
-   if ( ierr .NE. 0 ) then
+   if (ierr /= 0) then
       write(unit=message(1),fmt=*) 'Error opening ', &
          trim(file_name),' for writing ierr=',ierr
       call da_error(__FILE__,__LINE__,message(1:1))

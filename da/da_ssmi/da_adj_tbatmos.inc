@@ -10,14 +10,16 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 ! Output : ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,ADJ_lw,ADJ_zcld 
 !          ADJ_theta (somtime theta is a variable)
 ! Input  : ADJ_tbup,ADJ_tbdn,ADJ_tauatm
-! Input mean fields : tbup,tbdn,tauatm
+! Output mean fields : tbup,tbdn,tauatm
 ! -----------------------------------------------------------------
       integer,intent(in   ) :: ifreq
       real   ,intent(in   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
       real   ,intent(inout) :: ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,       &
                                ADJ_gamma,ADJ_lw,ADJ_zcld,ADJ_theta
       real   ,intent(inout) :: ADJ_tbup,ADJ_tbdn,ADJ_tauatm
-      real                  :: tbup,tbdn,tauatm,tbdn_save
+      real, intent(out)     :: tbup,tbdn,tauatm
+
+      real :: tbdn_save
 
       real :: mu,hdn,hup,hdninf,hupinf,ADJ_mu
 !

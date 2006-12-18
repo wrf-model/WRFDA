@@ -8,7 +8,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
    type (y_type),  intent(inout) :: ob           ! Observations.
    type (ob_type), intent(inout) :: iv           ! Innovation vector (O-B).
    type(domain) ,  intent(inout) :: grid
-   type (grid_config_rec_type)   :: config_flags
+   type (grid_config_rec_type), intent(inout)   :: config_flags
 
    ! Definitions of dummy arguments to solve
 #include "em_dummy_new_decl.inc"

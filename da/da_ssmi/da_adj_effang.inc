@@ -15,7 +15,7 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
       real   , intent(in   ) :: theta,gx2,sigma
       real   , intent(inout) :: ADJ_gx2,ADJ_sigma
       real   , intent(inout) :: ADJ_effangv,ADJ_effangh
-      real                   :: effangv,effangh
+      real   , intent(out)   :: effangv,effangh
 !
       real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
       real s19v(6),s19h(6),s22v(6),s22h(6), &

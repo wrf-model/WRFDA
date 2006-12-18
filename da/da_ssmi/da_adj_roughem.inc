@@ -14,8 +14,10 @@ implicit none
       real   , intent(in   ) :: tk, theta, gx2
       real   , intent(in   ) :: ADJ_remv,ADJ_remh
       real   , intent(inout) :: ADJ_tk,ADJ_gx2
+      real, intent(out)      :: remv,remh
 
-      real                   :: remv,remh,ssw
+      real :: ssw
+
       real a19v(4),a22v(4),a37v(4),a85v(4)
       real a19h(4),a22h(4),a37h(4),a85h(4)
       real f(4)

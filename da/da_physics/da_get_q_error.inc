@@ -25,7 +25,7 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
 
       ! Get observation error for qv. Is this right?
 
-      q_error = da_e_qv_from_rh ( rh_error, t_error, rh, t, p )
+      q_error = f_qv_from_rh ( rh_error, t_error, rh, t, p )
 
    else
       q_error = missing_r

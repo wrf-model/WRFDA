@@ -1,13 +1,16 @@
 subroutine da_wdt(H,W,TERR,DT,kts,kte)
 
-!  Calculate DT
+   !  Calculate DT
 
    implicit none
 
-   integer                      :: kts, kte, k
-   real, dimension(kts:kte)     :: H, DT
-   real, dimension(kts:kte+1)   :: W
-   real                         :: TERR
+   integer,intent(in)                      :: kts, kte
+   real, dimension(kts:kte),intent(in)     :: H
+   real, dimension(kts:kte),intent(out)  :: DT
+   real, dimension(kts:kte+1),intent(in)   :: W
+   real,intent(in)                         :: TERR
+
+   integer                     :: k
 
    do k=kte,kts+1,-1
 
@@ -27,4 +30,5 @@ subroutine da_wdt(H,W,TERR,DT,kts,kte)
 
 
 end subroutine da_wdt
+
 

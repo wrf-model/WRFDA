@@ -1,7 +1,7 @@
-subroutine da_transform_XTogpsref(xb, xp)
-!
-! input : xb%q, xb%p, xb%t, and xp
-! output: xb%ref
+subroutine da_transform_xtogpsref(xb, xp)
+
+   ! input : xb%q, xb%p, xb%t, and xp
+   ! output: xb%ref
 
    type (xb_type), intent(inout) :: xb      ! First guess structure.
    type(xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
@@ -17,25 +17,25 @@ subroutine da_transform_XTogpsref(xb, xp)
       do j = js, je
          do i = is, ie
 
-!--calculate refractivity
+            ! calculate refractivity
 
-!  1, Hydrostatic part of refractivity:
-!     Note: p in Pascal.
+            !  1, Hydrostatic part of refractivity:
+            !     Note: p in Pascal.
 
-      partone  = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
+            partone  = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
 
-!  2, (Wet part) / (hydrostatic part):
-!     Note: xb%q is the specific humidity --- a 3DAVR analysis variable. 
+            !  2, (Wet part) / (hydrostatic part):
+            !     Note: xb%q is the specific humidity --- an analysis variable. 
 
-      dividnd  = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
-      parttwo  = 1.0+coeff*xb%q(i,j,k)/dividnd
+            dividnd  = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
+            parttwo  = 1.0+coeff*xb%q(i,j,k)/dividnd
 
-!  3, Refractivity:
-      xb%ref(i,j,k)= partone * parttwo
-
+            !  3, Refractivity:
+            xb%ref(i,j,k)= partone * parttwo
          end do
       end do
    end do
    
-end subroutine da_transform_XTogpsref
+end subroutine da_transform_xtogpsref
+
 

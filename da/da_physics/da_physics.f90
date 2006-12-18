@@ -40,7 +40,16 @@ module da_physics
 #include "da_wrf_tpq_2_slp.inc"
 #include "da_tpq_to_slp_lin.inc"
 #include "da_tpq_to_slp_adj.inc"
-#include "da_tpq_to_thickness.inc"
+#include "da_tv_profile.inc"
+#include "da_tgl_find_layer.inc"
+#include "da_adj_thickness.inc"
+#include "da_find_layer.inc"
+#include "da_adj_tv_profile.inc"
+#include "da_thickness.inc"
+#include "da_adj_find_layer.inc"
+#include "da_tgl_thickness.inc"
+#include "da_tgl_tv_profile.inc"
+
 #include "da_transform_xtotpw.inc"
 #include "da_transform_xtotpw_adj.inc"
 #include "da_transform_xtogpsref.inc"
@@ -48,7 +57,6 @@ module da_physics
 #include "da_transform_xtogpsref_lin.inc"
 #include "da_check_rh.inc"
 #include "da_check_rh_simple.inc"
-#include "da_e_qv_from_rh.inc"
 #include "da_get_q_error.inc"
 #include "da_roughness_from_lanu.inc"
 #include "da_julian_day.inc"
@@ -79,6 +87,8 @@ module da_physics
 #include "da_filter_adj.inc"
 #include "da_wdt.inc"
 #include "da_integrat_dz.inc"
+
+#include "f_qv_from_rh.inc"
 
 end module da_physics
 

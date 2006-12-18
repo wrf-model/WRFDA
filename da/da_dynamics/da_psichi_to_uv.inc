@@ -20,8 +20,8 @@ subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
    integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
    integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
    
-   real, intent(in)   :: psi(ims:ime,jms:jme,kms:kme) ! Stream function
-   real, intent(in)   :: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
+   real, intent(inout) :: psi(ims:ime,jms:jme,kms:kme) ! Stream function
+   real, intent(inout) :: chi(ims:ime,jms:jme,kms:kme) ! Velocity potential
    real, intent(in)   :: coefx(ims:ime,jms:jme)       ! Multiplicative coeff.
    real, intent(in)   :: coefy(ims:ime,jms:jme)       ! Multiplicative coeff.
    real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.

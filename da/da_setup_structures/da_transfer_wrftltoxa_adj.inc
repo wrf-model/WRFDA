@@ -9,10 +9,10 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 
    implicit none
    
-   type(domain) ,   target                   :: grid
+   type(domain), intent(inout)               :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
-   character*4 filnam
+   character*4, intent(in) :: filnam
 
    ! Definitions of dummy arguments to solve
 
@@ -227,4 +227,5 @@ if (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
 
 
 end subroutine da_transfer_wrftltoxa_adj
+
 

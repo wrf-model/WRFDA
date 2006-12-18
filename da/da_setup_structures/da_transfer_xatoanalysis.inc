@@ -10,9 +10,9 @@ subroutine da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
 
    implicit none
 
-   integer,         intent(in)  :: it    ! outer-loop index
-   type (xbx_type), intent(out) :: xbx    ! Header & non-gridded vars.
-   type(domain) ,   target      :: grid
+   integer,         intent(in)    :: it    ! outer-loop index
+   type (xbx_type), intent(out)   :: xbx    ! Header & non-gridded vars.
+   type(domain),    intent(inout) :: grid
 
    type (grid_config_rec_type), intent(inout) :: config_flags
 

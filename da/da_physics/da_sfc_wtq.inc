@@ -329,3 +329,5 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    q2 = qg + (qs - qg)*psiq2/psiq 
 
 end subroutine da_sfc_wtq
+
+

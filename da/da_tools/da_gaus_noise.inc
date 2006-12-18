@@ -48,7 +48,7 @@ real function da_gaus_noise (KDUM)
  
    implicit none
  
-   integer, intent(in) :: KDUM
+   integer, intent(inout) :: KDUM
 
    integer             :: NISET
    real                :: GSET

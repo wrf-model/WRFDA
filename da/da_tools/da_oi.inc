@@ -2,7 +2,7 @@ subroutine da_oi( str,line )
 
    ! Quick way of showing location
    IMPLICIT NONE
-   CHARACTER*(*) str
+   CHARACTER*(*), INTENT(IN) :: str
    INTEGER, INTENT(IN) :: line
 
    write(unit=stderr,fmt=*) str, line

@@ -8,24 +8,28 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
 
    implicit none
 
-   integer nlath,nsig,kz,i,j,k,m,l,l1,m1,n
-   real rsigo(nsig),rsig(kz),sigmah(kz)
-   integer lsig(kz)
-   real coef1(kz),coef2(kz)
-   real corz_kz(1:2*nlath+1,1:kz),cord_kz(1:2*nlath+1,1:kz) 
-   real corh_kz(1:2*nlath+1,1:kz),corq_kz(1:2*nlath+1,1:kz)
-   real hwll_kz(0:nlath*2+1,1:kz,1:4)
-   real vztdq_kz(1:kz,0:nlath*2+1,1:4)
-   real agv_kz(0:nlath*2+1,1:kz,1:kz)
-   real bv_kz(0:nlath*2+1,1:kz),wgv_kz(0:nlath*2+1,1:kz)
+   integer, intent(in) :: nlath,nsig,kz
+   real, intent(in)    ::  sigmah(kz),sigma_avn(1:nsig)
 
-   real corz_avn(1:2*nlath+1,1:nsig),cord_avn(1:2*nlath+1,1:nsig)
-   real corh_avn(1:2*nlath+1,1:nsig),corq_avn(1:2*nlath+1,1:nsig)
-   real clat_avn(1:2*nlath),sigma_avn(1:nsig)
-   real hwll_avn(0:nlath*2+1,1:nsig,1:4)
-   real vztdq_avn(1:nsig,0:nlath*2+1,1:4)
-   real agv_avn(0:nlath*2+1,1:nsig,1:nsig)
-   real bv_avn(0:nlath*2+1,1:nsig),wgv_avn(0:nlath*2+1,1:nsig)
+   real, intent(out) :: corz_kz(1:2*nlath+1,1:kz),cord_kz(1:2*nlath+1,1:kz) 
+   real, intent(out) :: corh_kz(1:2*nlath+1,1:kz),corq_kz(1:2*nlath+1,1:kz)
+   real, intent(out) :: hwll_kz(0:nlath*2+1,1:kz,1:4)
+   real, intent(out) :: vztdq_kz(1:kz,0:nlath*2+1,1:4)
+   real, intent(out) :: agv_kz(0:nlath*2+1,1:kz,1:kz)
+   real, intent(out) :: bv_kz(0:nlath*2+1,1:kz),wgv_kz(0:nlath*2+1,1:kz)
+
+   real, intent(in) :: corz_avn(1:2*nlath+1,1:nsig),cord_avn(1:2*nlath+1,1:nsig)
+   real, intent(in) :: corh_avn(1:2*nlath+1,1:nsig),corq_avn(1:2*nlath+1,1:nsig)
+   real, intent(in) :: hwll_avn(0:nlath*2+1,1:nsig,1:4)
+   real, intent(in) :: vztdq_avn(1:nsig,0:nlath*2+1,1:4)
+   real, intent(in) :: agv_avn(0:nlath*2+1,1:nsig,1:nsig)
+   real, intent(in) :: bv_avn(0:nlath*2+1,1:nsig),wgv_avn(0:nlath*2+1,1:nsig)
+
+   integer :: i,j,k,m,l,l1,m1,n
+   real    :: rsigo(nsig),rsig(kz)
+   real    :: coef1(kz),coef2(kz)
+   integer ::  lsig(kz)
+   real    :: clat_avn(1:2*nlath)
 
    if (trace_use) call da_trace_entry("da_chgvres")
 

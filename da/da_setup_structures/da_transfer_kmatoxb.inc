@@ -10,7 +10,7 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    
    type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
 
-   type(domain), target               :: grid
+   type(domain), intent(inout)        :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -571,4 +571,5 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
 
 end subroutine da_transfer_kmatoxb
+
 

@@ -5,10 +5,12 @@ subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real                      :: PREC1, PREC2
-   real, dimension(kts:kte)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV
-   real, dimension(kts:kte)  :: PRE
+   integer,intent(in)                   :: kts, kte
+   real,intent(in)                      :: PREC1, PREC2
+   real, dimension(kts:kte),intent(in)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV
+   real, dimension(kts:kte),intent(out)  :: PRE
+
+   integer                   :: k
 
    do K=kts, kte
       if (DT(k) <= 0.) cycle

@@ -9,7 +9,7 @@ subroutine da_setup_firstguess( xbx, grid, &
 
    type (xbx_type),intent(out)  :: xbx   ! Header & non-gridded vars.
 
-   type(domain) , target        :: grid
+   type(domain),intent(inout)   :: grid
 
    ! Definitions of dummy arguments to solve
 #include "em_dummy_new_decl.inc"

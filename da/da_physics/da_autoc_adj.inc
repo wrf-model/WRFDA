@@ -4,9 +4,13 @@ subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT, SCR2, PRC
-   real, dimension(kts:kte)  :: SCR29, PRC9
+   integer, intent(in)       :: kts, kte
+   real, dimension(kts:kte), intent(in)  :: DT, SCR2, PRC
+   real, dimension(kts:kte), intent(out)  :: SCR29
+   real, dimension(kts:kte), intent(in)  :: PRC9
+
+   integer       :: k
+
    real, parameter           :: QCTH=0.5E-3, QCK1=1.0E-3
 
    do k=kts,kte

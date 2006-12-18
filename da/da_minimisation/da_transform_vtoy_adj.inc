@@ -29,11 +29,12 @@ subroutine da_transform_vtoy_adj( iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, 
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   type(domain) ,   target                   :: grid
+   type(domain), intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
+   integer, intent(in) :: cg_jcdf
 
    integer :: nobwin,ndynopt
-   integer :: cg_jcdf, wrf_done_unit
+   integer :: wrf_done_unit
 
    character(len=4) :: filnam
 

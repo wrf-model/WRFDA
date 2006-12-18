@@ -42,7 +42,7 @@ subroutine da_solve ( grid , config_flags , &
    integer                      :: it          ! External loop counter.
    type (j_type)                :: j           ! Cost function.
 
-   integer                      :: ids , ide , jds , jde , kds , kde , &
+   integer                      :: ide , jds , jde , kds , kde , &
                                    ims , ime , jms , jme , kms , kme , &
                                    its , ite , jts , jte , kts , kte
 

@@ -6,7 +6,7 @@ subroutine da_system_4dvar( cmd_line_in )
    ! it will call system only on the 0th processor.
 
    implicit none
-   character*(*) cmd_line_in
+   character*(*),intent(in) :: cmd_line_in
    character*256 cmd_line
 
 #ifdef DM_PARALLEL

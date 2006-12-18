@@ -1,11 +1,15 @@
 subroutine da_autoc(DT,SCR2,PRC,kts,kte)
 
-!  Auto-conversion
+   !  Auto-conversion
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT, SCR2, PRC
+   integer, intent(in)       :: kts, kte
+   real, dimension(kts:kte), intent(in)  :: DT, SCR2
+   real, dimension(kts:kte), intent(out) :: PRC
+
+   integer       :: k
+
    real, parameter           :: QCTH=0.5E-3, QCK1=1.0E-3
 
    do k=kts,kte
@@ -20,4 +24,5 @@ subroutine da_autoc(DT,SCR2,PRC,kts,kte)
    end do
 
 end subroutine da_autoc
+
 

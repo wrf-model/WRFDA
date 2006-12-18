@@ -541,6 +541,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer :: ierr ! General error code
    integer :: comm ! MPI communicator
 
+   integer :: ids
+
 contains
 
 #include "da_advance_cymdh.inc"

@@ -1,4 +1,4 @@
- subroutine da_tpq_to_rh( t, p, q, es, qs, rh )
+subroutine da_tpq_to_rh( t, p, q, es, qs, rh )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Convert T/p/q to relative humidity rh.

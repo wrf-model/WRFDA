@@ -4,7 +4,7 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
    type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
-   type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
+   type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
    type (xb_type),  intent(in)   :: xb          ! first guess state.
 
