@@ -1,4 +1,4 @@
-subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
+subroutine da_tv_profile_adj(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
 
    ! This is the adjoint routine for Tv_profile
@@ -40,7 +40,6 @@ subroutine da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
       end do
    end do
 
-end subroutine da_adj_tv_profile
-
+end subroutine da_tv_profile_adj
 
 

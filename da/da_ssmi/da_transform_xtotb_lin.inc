@@ -95,25 +95,25 @@ subroutine da_transform_xtotb_lin( xa, xb )
       TGL_htpw = TGL_zrhom/tpw/1000. &
                - TGL_tpw/tpw*htpw
 
-      call da_tgl_tb(1,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+      call da_tb_tl(1,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb19v(i,j),xb%tb19h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb19v(i,j),xa%tb19h(i,j)              )
 
-      call da_tgl_tb(2,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+      call da_tb_tl(2,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb22v(i,j),dum1,                               &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb22v(i,j),dum2                       )
 
-      call da_tgl_tb(3,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+      call da_tb_tl(3,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb37v(i,j),xb%tb37h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb37v(i,j),xa%tb37h(i,j)              )
 
-      call da_tgl_tb(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+      call da_tb_tl(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb85v(i,j),xb%tb85h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
@@ -124,7 +124,7 @@ subroutine da_transform_xtotb_lin( xa, xb )
 end subroutine da_transform_xtotb_lin
 
 !============================================================================
-subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
+subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   tbv,tbh,                                                  &
                   TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
                   TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh            )
@@ -185,7 +185,7 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 ! get upwelling atmospheric brightness temperature
 
       TGL_theta=0.
-      call da_tgltbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
+      call da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
                        TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,  &
                        TGL_alw,TGL_zcld,TGL_tbup,TGL_tbdn,      &
@@ -198,23 +198,23 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
 ! get rough surface emissivity
 
-      call da_tglroughem(ifreq,gx2,sst,theta,remv,remh,         &
+      call da_roughem_tl(ifreq,gx2,sst,theta,remv,remh,         &
                        TGL_gx2,TGL_sst,TGL_remv,TGL_remh      )
 
 ! get effective zenith angles for scattered radiation at surface
 
-      call da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,    &
+      call da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,    &
                       TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh )
 
 ! get effective sky brightness temperatures for scattered radiation
 
-      call da_tgltbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
+      call da_tbatmos_tl(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnv,dum,                      &
                        TGL_effangv,TGL_p0,TGL_wv,TGL_hwv,       &
                        TGL_ta,TGL_gamma,TGL_alw,TGL_zcld,       & 
                        TGL_dum,TGL_tbdnv,TGL_dum                )
 
-      call da_tgltbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
+      call da_tbatmos_tl(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnh,dum,                      &
                        TGL_effangh,TGL_p0,TGL_wv,TGL_hwv,       &
                        TGL_ta,TGL_gamma,TGL_alw,TGL_zcld,       &
@@ -266,10 +266,10 @@ subroutine da_tgl_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       TGL_tbh = TGL_tbup + TGL_tauatm*(semh + scath)   &
                          + tauatm*(TGL_semh + TGL_scath)
 
- end subroutine da_tgl_tb
+ end subroutine da_tb_tl
 
 !============================================================================
-subroutine da_tglcal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
+subroutine da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_sigma_v)
 ! ---------------------------------------------------------------------------
 implicit none
@@ -435,10 +435,10 @@ implicit none
            sigma_v = sigv*wvc
        TGL_sigma_v = TGL_sigv*wvc+sigv*TGL_wvc
 
-end subroutine da_tglcal_sigma_v
+end subroutine da_cal_sigma_v_tl
 
 !====================================================================
-subroutine da_tgleffht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
+subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_mu,        &
                      TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf )
 !--------------------------------------------------------------------
@@ -749,10 +749,10 @@ implicit none
           hupinf = zhinf/hinf
       TGL_hupinf = TGL_zhinf/hinf - hupinf*TGL_hinf/hinf
 
-end subroutine da_tgleffht
+end subroutine da_effht_tl
 
 !============================================================================
-subroutine da_tglepsalt(f,t,ssw,epsr,epsi,                                    &
+subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
                       TGL_t, TGL_epsr, TGL_epsi                             )
 ! ---------------------------------------------------------------------------
 implicit none
@@ -836,10 +836,10 @@ implicit none
       epsi       = -aimag(cdum3)
       TGL_epsi   = -aimag(TGL_cdum3)
 
-end subroutine da_tglepsalt
+end subroutine da_epsalt_tl
 
 !---------------------------------------------------------------------------
-subroutine da_tglspemiss(f,tk,theta,ssw,ev,eh,                               &
+subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
                        TGL_tk,TGL_ev,TGL_eh                                )
 !---------------------------------------------------------------------------
 implicit none
@@ -873,7 +873,7 @@ implicit none
       tc          =      tk - 273.15
       TGL_tc      =  TGL_tk
 
-      call da_tglepsalt(f,tc,ssw,epsr,epsi,         &
+      call da_epsalt_tl(f,tc,ssw,epsr,epsi,         &
                       TGL_tc, TGL_epsr, TGL_epsi  )
 
           eps     =  cmplx(epsr,epsi)
@@ -949,10 +949,10 @@ implicit none
           eh      =  1.0 - (tmp2r*tmp2r+tmp2i*tmp2i)
       TGL_eh      = -2.*tmp2r*TGL_tmp2r - 2.*tmp2i*TGL_tmp2i
 !
-end subroutine da_tglspemiss
+end subroutine da_spemiss_tl
 
 !==================================================================
- subroutine da_tgltbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
+ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
                         tbup,tbdn,tauatm,                         &
                         TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,   &
                         TGL_lw,TGL_zcld,TGL_tbup,TGL_tbdn,        &
@@ -1011,7 +1011,7 @@ end subroutine da_tglspemiss
 ! get water vapor optical depth
 !=====
 
-      call da_tglcal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
+      call da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,    &
                            TGL_gamma,TGL_sigv               )
 
@@ -1056,7 +1056,7 @@ end subroutine da_tglspemiss
 
 ! get effective emission heights for layer 1 and total atmosphere
 
-      call da_tgleffht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
+      call da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
                      hdninf,hupinf,                          &
                      TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_mu, &
                      TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,    &
@@ -1136,10 +1136,10 @@ end subroutine da_tglspemiss
                  + TGL_em*alph*ta + em*TGL_alph*ta + em*alph*TGL_ta 
       tbdn = (1.0-alph)*tbdn + em*alph*ta
 !
-end subroutine da_tgltbatmos
+end subroutine da_tbatmos_tl
 
 !=================================================================
-subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
+subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh  )
 ! ----------------------------------------------------------------
   implicit none
@@ -1401,10 +1401,10 @@ subroutine da_tgleffang(ifreq,theta,gx2,sigma,effangv,effangh,     &
           effangh =     angh +     dth
       TGL_effangh = TGL_angh + TGL_dth
 
-end subroutine da_tgleffang
+end subroutine da_effang_tl
 
 !=================================================================
-subroutine da_tglroughem(ifreq,gx2,tk,theta,remv,remh,             &
+subroutine da_roughem_tl(ifreq,gx2,tk,theta,remv,remh,             &
                        TGL_gx2,TGL_tk,TGL_remv,TGL_remh          )
 ! ----------------------------------------------------------------
 implicit none
@@ -1474,11 +1474,11 @@ implicit none
       end if
 
       ssw=36.5
-      call da_tglspemiss(f(ifreq),tk,theta,ssw,semv,semh,  &
+      call da_spemiss_tl(f(ifreq),tk,theta,ssw,semv,semh,  &
                        TGL_tk,TGL_semv,TGL_semh           )
       TGL_remv = TGL_remv + TGL_semv
           remv =     remv +     semv
       TGL_remh = TGL_remh + TGL_semh
           remh =     remh +     semh
       
-end subroutine da_tglroughem
+end subroutine da_roughem_tl

@@ -1,4 +1,4 @@
-subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
+subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
 
    ! This is the adjoint routine for thickness
@@ -48,6 +48,6 @@ subroutine da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
                           ADJ_thk*tv1/pre_ma(layer1-1)
    ADJ_tv1 = ADJ_tv1 + ADJ_thk*log(pre_ma(layer1-1)/pre1)
 
-end subroutine da_adj_thickness
+end subroutine da_thickness_adj
 
 

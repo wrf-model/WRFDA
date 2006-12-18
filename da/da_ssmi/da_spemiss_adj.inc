@@ -1,4 +1,4 @@
-subroutine da_adj_spemiss(f,tk,theta,ssw,ev,eh,                               &
+subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
                        ADJ_tk,ADJ_ev,ADJ_eh                                )
 !---------------------------------------------------------------------------
 implicit none
@@ -91,9 +91,9 @@ implicit none
       ADJ_epsr    =  real(ADJ_eps)
       ADJ_epsi    =  -aimag(ADJ_eps) 
       ADJ_tc      =  0.
-      call da_adj_epsalt(f,tc,ssw,epsr,epsi,ADJ_tc, ADJ_epsr, ADJ_epsi  )
+      call da_epsalt_adj(f,tc,ssw,epsr,epsi,ADJ_tc, ADJ_epsr, ADJ_epsi  )
 
       ADJ_tk      =  ADJ_tc + ADJ_tk
 
 
-end subroutine da_adj_spemiss
+end subroutine da_spemiss_adj

@@ -1,4 +1,4 @@
-subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
+subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           TGL_tv,TGL_pre_ma,TGL_tv_ma)
 
    !  This is the tangent-linear routine for find_layer
@@ -79,6 +79,6 @@ subroutine da_tgl_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    end if
  
-end subroutine da_tgl_find_layer
+end subroutine da_find_layer_tl
 
 

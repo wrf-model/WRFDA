@@ -1,4 +1,4 @@
-subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
+subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   tbv,tbh,                                                  &
                   ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
                   ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            )
@@ -175,7 +175,7 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
       ADJ_dum = 0.
       dum     = 0.
       ADJ_effangh = 0.
-      call da_adj_tbatmos(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
+      call da_tbatmos_adj(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnh,dum,                      &
                        ADJ_effangh,ADJ_p0,ADJ_wv,ADJ_hwv,       &
                        ADJ_ta,ADJ_gamma,ADJ_alw,ADJ_zcld,       &
@@ -187,7 +187,7 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
       ADJ_effangv = 0.
-      call da_adj_tbatmos(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
+      call da_tbatmos_adj(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnv,dum,                      &
                        ADJ_effangv,ADJ_p0,ADJ_wv,ADJ_hwv,       &
                        ADJ_ta,ADJ_gamma,ADJ_alw,ADJ_zcld,       & 
@@ -198,10 +198,10 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !    print*,'ifreq 3',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
-      call da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,    &
+      call da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,    &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh )
 
-      call da_adj_roughem(ifreq,gx2,sst,theta,remv,remh,         &
+      call da_roughem_adj(ifreq,gx2,sst,theta,remv,remh,         &
                        ADJ_gx2,ADJ_sst,ADJ_remv,ADJ_remh      )
 
       ADJ_tauatm = - costhet*ADJ_sigma/tauatm + ADJ_tauatm
@@ -210,7 +210,7 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !     print*,'ifreq 4',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 
-      call da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
+      call da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
                        ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,  &
                        ADJ_alw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,      &
@@ -224,4 +224,4 @@ subroutine da_adj_tb(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
 !!! end
 
- end subroutine da_adj_tb
+ end subroutine da_tb_adj

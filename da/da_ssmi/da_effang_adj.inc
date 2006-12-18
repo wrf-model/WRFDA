@@ -1,4 +1,4 @@
-subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
+subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh  )
 ! ----------------------------------------------------------------
   implicit none
@@ -448,4 +448,4 @@ subroutine da_adj_effang(ifreq,theta,gx2,sigma,effangv,effangh,     &
       end if
 
 
-end subroutine da_adj_effang
+end subroutine da_effang_adj

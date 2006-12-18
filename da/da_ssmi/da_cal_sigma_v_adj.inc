@@ -1,4 +1,4 @@
-subroutine da_adj_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
+subroutine da_cal_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
                            ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,ADJ_sigma_v)
 ! ---------------------------------------------------------------------------
 implicit none
@@ -269,5 +269,6 @@ implicit none
 
       ADJ_wv  = ADJ_wvc*wvcor(ifreq) + ADJ_wv
 
-end subroutine da_adj_cal_sigma_v
+end subroutine da_cal_sigma_v_adj
+
 

@@ -1,4 +1,4 @@
-subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
+subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
            pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
    ! This is the tangent-linear routine for Tv_profile
@@ -36,6 +36,6 @@ subroutine da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
    tv_ma (ks:ke) = dym* ( dxm * tv_m (1,1,ks:ke) + dx * tv_m (2,1,ks:ke) ) + &
                    dy * ( dxm * tv_m (1,2,ks:ke) + dx * tv_m (2,2,ks:ke) )
  
-end subroutine da_tgl_tv_profile
+end subroutine da_tv_profile_tl
 
 

@@ -58,11 +58,11 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
                call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
                  ks,ke)
 
-               call da_adj_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1, &
+               call da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1, &
                    layer2, iv%satem(n)%p(k),pres2,ADJ_pre_ma,ADJ_tv_ma, &
                    ADJ_tv1,ADJ_tv2,jo_grad_y%satem(n)%thickness(k))
 
-               call da_adj_find_layer(layer1,tv1,iv%satem(n)%p(k),         &
+               call da_find_layer_adj(layer1,tv1,iv%satem(n)%p(k),         &
                    pre_ma,tv_ma,ks,ke,ADJ_tv1,ADJ_pre_ma,ADJ_tv_ma)
 
                pres2 = iv%satem(n)%p(k)
@@ -73,12 +73,12 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
 
          ! [5.0] Adjoint of layer-finding and vertical interpolation
 
-         call da_adj_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
+         call da_find_layer_adj(layer2,tv2,iv%satem(n)%ref_p,              &
               pre_ma,tv_ma,ks,ke,ADJ_tv2,ADJ_pre_ma,ADJ_tv_ma)
 
          ! [6.0] Adjoint of horizontal interpolation
 
-         call da_adj_tv_profile(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
+         call da_tv_profile_adj(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
       end do
    end if

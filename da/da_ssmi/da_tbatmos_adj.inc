@@ -1,4 +1,4 @@
-subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
+subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
                         tbup,tbdn,tauatm,                         &
                         ADJ_theta,ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,ADJ_gamma,   &
                         ADJ_lw,ADJ_zcld,ADJ_tbup,ADJ_tbdn,        &
@@ -246,7 +246,7 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
        ADJ_sigo = ADJ_sig + ADJ_sigo
        ADJ_sigv = ADJ_sig + ADJ_sigv
 
-       call da_adj_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
+       call da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,        &
                       hdninf,hupinf,                          &
                       ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu, &
                       ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,    &
@@ -284,11 +284,11 @@ subroutine da_adj_tbatmos(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
        ADJ_ta    = - otbar*otbar*ADJ_otbar + ADJ_ta
        ADJ_gamma =   otbar*otbar*ADJ_otbar*zeta(ifreq) + ADJ_gamma
 
-       call da_adj_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
+       call da_cal_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                             ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,    &
                             ADJ_gamma,ADJ_sigv               )
 
        ADJ_theta = mu*mu*0.0174533*ADJ_mu*sin(theta*0.0174533) + ADJ_theta
 
-!
-end subroutine da_adj_tbatmos
+
+end subroutine da_tbatmos_adj

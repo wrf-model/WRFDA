@@ -1,4 +1,4 @@
-subroutine da_adj_effht(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
+subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      ADJ_ho,ADJ_hv,ADJ_sigo,ADJ_sigv,ADJ_mu,        &
                      ADJ_zcld,ADJ_hdn,ADJ_hup,ADJ_hdninf,ADJ_hupinf )
 !--------------------------------------------------------------------
@@ -460,4 +460,4 @@ implicit none
 
 !! end !!
 
-end subroutine da_adj_effht
+end subroutine da_effht_adj

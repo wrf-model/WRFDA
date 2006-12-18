@@ -42,12 +42,12 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
 
          ! [2.0] Virtual temperature at obs pt.
 
-         call da_tgl_tv_profile(xp,xa,xb,i,j,dx,dxm,dy,dym,                &
+         call da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,                &
               pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
          ! [3.0] Find model vertical position of pressure and do interp.
 
-         call da_tgl_find_layer(layer2,tv2,iv%satem(n)%ref_p,              &
+         call da_find_layer_tl(layer2,tv2,iv%satem(n)%ref_p,              &
               pre_ma,tv_ma,ks,ke,TGL_tv2,TGL_pre_ma,TGL_tv_ma)
          pres2 = iv%satem(n)%ref_p
 
@@ -56,10 +56,10 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
          do k=1, num_levs
             if ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) then
 
-               call da_tgl_find_layer(layer1,tv1,iv%satem(n)%p(k),            &
+               call da_find_layer_tl(layer1,tv1,iv%satem(n)%p(k),            &
                   pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)
 
-               call da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,&
+               call da_thickness_tl(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,&
                   iv%satem(n)%p(k),pres2,TGL_pre_ma,TGL_tv_ma,           &
                   TGL_tv1,TGL_tv2,y%satem(n)%thickness(k))
 

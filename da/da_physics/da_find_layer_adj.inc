@@ -1,4 +1,4 @@
-subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
+subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           ADJ_tv,ADJ_pre_ma,ADJ_tv_ma)
 
    ! This is the adjoint routine for find_layer
@@ -74,6 +74,6 @@ subroutine da_adj_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
    end if
    ADJ_tv           = 0.
  
-end subroutine da_adj_find_layer
+end subroutine da_find_layer_adj
 
 

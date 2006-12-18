@@ -1,4 +1,4 @@
-subroutine da_adj_roughem(ifreq,gx2,tk,theta,remv,remh,             &
+subroutine da_roughem_adj(ifreq,gx2,tk,theta,remv,remh,             &
                        ADJ_gx2,ADJ_tk,ADJ_remv,ADJ_remh          )
 ! ----------------------------------------------------------------
 implicit none
@@ -77,7 +77,7 @@ implicit none
       remv = remv_save
       remh = remh_save
 
-      call da_adj_spemiss(f(ifreq),tk,theta,ssw,semv,semh,  &
+      call da_spemiss_adj(f(ifreq),tk,theta,ssw,semv,semh,  &
                        ADJ_tk,ADJ_semv,ADJ_semh           )
 
  
@@ -141,5 +141,6 @@ implicit none
       ADJ_gx2= 0.5*ADJ_g     + ADJ_gx2
       ADJ_tk = ADJ_tp/273.0  + ADJ_tk
  
-end subroutine da_adj_roughem
+end subroutine da_roughem_adj
+
 

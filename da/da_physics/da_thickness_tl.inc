@@ -1,4 +1,4 @@
-subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
+subroutine da_thickness_tl(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          TGL_pre_ma,TGL_tv_ma,TGL_tv1,TGL_tv2,TGL_thk)
 
    ! This is the tangent-linear routine for thickness
@@ -43,6 +43,6 @@ subroutine da_tgl_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
                 TGL_p_tmp(k+1)*tv_ma(k)/p_tmp(k+1)     )
    end do
 
-end subroutine da_tgl_thickness
+end subroutine da_thickness_tl
 
 

@@ -1,4 +1,4 @@
-subroutine da_adj_epsalt(f,t,ssw,epsr,epsi,                                    &
+subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
                       ADJ_t, ADJ_epsr, ADJ_epsi                             )
 ! ---------------------------------------------------------------------------
 implicit none
@@ -106,6 +106,6 @@ implicit none
 !!! end
 
 
-end subroutine da_adj_epsalt
+end subroutine da_epsalt_adj
 
 
