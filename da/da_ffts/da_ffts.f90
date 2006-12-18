@@ -11,9 +11,9 @@ module da_ffts
 
    contains
 
-#include "da_fast_cosine_transform.inc"
-#include "da_fast_sine_transform.inc"
-#include "da_qpassm.inc"
+#include "FFT551.inc"
+#include "FFT661.inc"
+#include "qpassm.inc"
 #include "da_solve_poissoneqn_fct.inc"
 #include "da_solve_poissoneqn_fct_adj.inc"
 #include "da_solve_poissoneqn_fst.inc"

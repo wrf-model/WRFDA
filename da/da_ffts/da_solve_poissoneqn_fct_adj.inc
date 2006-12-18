@@ -106,7 +106,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call fft551( Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx % fft_factors_x, xbx % trig_functs_x, &
                                      work_1d(1), work_area )
@@ -169,7 +169,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call da_fast_cosine_transform( Forward_FFT, vector_inc, vector_jump, &
+      call fft551( Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -193,7 +193,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
       ! Reform gridpt. b using inverse double FST in i.
 
-      call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call fft551( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
                                    work_1d(1), work_area )
@@ -251,7 +251,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call da_fast_cosine_transform( Inverse_FFT, vector_inc, vector_jump, &
+      call fft551( Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
                                    work_1d(1), work_area )

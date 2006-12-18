@@ -1,24 +1,24 @@
-Subroutine da_fast_sine_transform  & ! in
+Subroutine FFT661  & ! in
  ( ISIGN,              & ! in
-   inC,                & ! in
+   INC,                & ! in
    JUMP,               & ! in
    LOT,                & ! in
    N,                  & ! in
-   ifAX,               & ! in
+   IFAX,               & ! in
    TRIGS,              & ! in
    A,                  & ! inout
    DIM )                 ! in
 !
 !
 ! Description:
-!     MULTIPLE FAST SinE TRANSFORM
+!     MULTIPLE FAST SINE TRANSFORM
 !     (Originally called FFT661, then Var_SinTrans)
 !      author: clive temperton, may 1988 
 !       (slightly modified for all-fortran version)
 !
 !     Sine transform of length n is converted to
-!     real periodic transform of length n by pre- and post-
-!     processing. real periodic transform is performed by
+!     Real periodic transform of length n by pre- and post-
+!     processing. Real periodic transform is performed by
 !     pruning redundant operations from complex transform.
 !
 !     see for example paul swarztrauber, "symmetric fft's",
@@ -53,180 +53,179 @@ Subroutine da_fast_sine_transform  & ! in
 ! 1.2       01/06/95 Tracing added. JB
 !
 ! Code Description:
-!    NB   BECAuse OF THE TRICKY NESTED LOOPS 
-!         ORIGinAL CODE F77 IS HARDLY TOUCHED !!!
+!    NB   BECAUSE OF THE TRICKY NESTED LOOPS 
+!         ORIGINAL CODE F77 IS HARDLY TOUCHED !!!
 
 Implicit none
 
 ! Subroutine arguments
- integer , intent (in)    :: ISIGN         ! Switch forward (-1) or inverse (+1)
- integer , intent (in)    :: inC           ! increment within each data
-                                           ! vector  (e.g. inC=1 for 
+ Integer , intent (in)    :: ISIGN         ! Switch forward (-1) or inverse (+1)
+ Integer , intent (in)    :: INC           ! increment within each data
+                                           ! vector  (e.g. INC=1 for 
                                            ! consecutively stored data)
- integer , intent (in)    :: Jump          ! increment between start of
+ Integer , intent (in)    :: Jump          ! increment between start of
                                            ! data vectors
- integer , intent (in)    :: LOT           ! Number of data vectors
- integer , intent (in)    :: N             ! N+1 is the length of the data 
+ Integer , intent (in)    :: LOT           ! Number of data vectors
+ Integer , intent (in)    :: N             ! N+1 is the length of the data 
                                            !  vectors  (which include zeros 
                                            ! at the endpoints)
- integer , intent (in)    :: DIM           ! dimension workspace 
- integer , intent (in)    :: ifAX(10)      ! previously prepared list of 
+ Integer , intent (in)    :: DIM           ! dimension workspace 
+ Integer , intent (in)    :: IFAX(10)      ! previously prepared list of 
                                            ! factors of N
  
- real    , intent (in)    :: TRIGS(3*N)    ! previously prepared list of 
+ Real    , intent (in)    :: TRIGS(3*N)    ! previously prepared list of 
                                            ! trigonometric function values
- real    , intent (inout) :: A( inC*(N+1) + JUMP*(LOT-1) ) ! data array
+ Real    , intent (inout) :: A( INC*(N+1) + JUMP*(LOT-1) ) ! data array
 
                                                     ! No descriptions given
- integer                  :: NFAX,NX,NH
- integer                  :: NBLOX,NVEX,NB
- integer                  :: K,JA,JB,IA,IB,IGO,LA,J
- integer                  :: ifAC,ISTART
+ Integer                  :: NFAX,NX,NH
+ Integer                  :: NBLOX,NVEX,NB
+ Integer                  :: K,JA,JB,IA,IB,IGO,LA,J
+ Integer                  :: IFAC,IERR,ISTART
 
- real                     :: SI,T1,T2,SCALE
- integer                  :: vectorlength
- real                     :: WORK(DIM)     ! size (n+1)*min(lot,VectorLength)
+ Real                     :: SI,T1,T2,SCALE, vectorlength
+ Real                     :: WORK(DIM)     ! size (n+1)*min(lot,VectorLength)
      
       VectorLength = LOT
-      NFAX=ifAX(1)
+      NFAX=IFAX(1)
       NX=N+1
       NH=N/2
       NBLOX=1+(LOT-1)/VectorLength
       NVEX=LOT-(NBLOX-1)*VectorLength
       ISTART=1
 !
-      do 200 NB=1,NBLOX
+      DO 200 NB=1,NBLOX
 !
-!     PREPROCESSinG
+!     PREPROCESSING
 !     -------------
-      do 120 K=1,NH-1
+      DO 120 K=1,NH-1
       JA=K+1
       JB=N+1-K
-      IA=ISTART+K*inC
-      IB=ISTART+(JB-1)*inC
+      IA=ISTART+K*INC
+      IB=ISTART+(JB-1)*INC
       SI=TRIGS(2*N+K)
-      if (MOD(NFAX,2).EQ.0) then
+      IF (MOD(NFAX,2).EQ.0) THEN
 !DIR$ IVDEP
-         do 110 J=1,NVEX
+         DO 110 J=1,NVEX
          WORK(JA) = SI*(A(IA)+A(IB)) + 0.5*(A(IA)-A(IB))
          WORK(JB) = SI*(A(IA)+A(IB)) - 0.5*(A(IA)-A(IB))
          IA=IA+JUMP
          IB=IB+JUMP
          JA=JA+NX
          JB=JB+NX
-  110    continue
-      else
+  110    CONTINUE
+      ELSE
 !DIR$ IVDEP
-         do 115 J=1,NVEX
+         DO 115 J=1,NVEX
          T1 = SI*(A(IA)+A(IB)) + 0.5*(A(IA)-A(IB))
          T2 = SI*(A(IA)+A(IB)) - 0.5*(A(IA)-A(IB))
          A(IA) = T1
          A(IB) = T2
          IA=IA+JUMP
          IB=IB+JUMP
-  115    continue
-      end if
-  120 continue
+  115    CONTINUE
+      ENDIF
+  120 CONTINUE
 
       JA=1
       JB=NH+1
       IA=ISTART
-      IB=ISTART+NH*inC
-      if (MOD(NFAX,2).EQ.0) then
+      IB=ISTART+NH*INC
+      IF (MOD(NFAX,2).EQ.0) THEN
 !DIR$ IVDEP
-         do 130 J=1,NVEX
+         DO 130 J=1,NVEX
          WORK(JA)=0.0
          WORK(JB)=2.0*A(IB)
          IB=IB+JUMP
          JA=JA+NX
          JB=JB+NX
-  130    continue
+  130    CONTINUE
          IGO = +1
-      else
+      ELSE
 !DIR$ IVDEP
-         do 135 J=1,NVEX
+         DO 135 J=1,NVEX
          A(IA)=0.0
          A(IB)=2.0*A(IB)
          IA=IA+JUMP
          IB=IB+JUMP
-  135    continue
+  135    CONTINUE
          IGO = -1
-      end if
+      ENDIF
 !
 !     PERIODIC FOURIER ANALYSIS
 !     -------------------------
       IA=ISTART
       LA=N
 !
-      do 140 K=1,NFAX
-      ifAC=ifAX(NFAX+2-K)
-      LA=LA/ifAC
-      ierr=-1
-      if (IGO.EQ.+1) then
-        call da_qpassm(WORK,WORK(ifAC*LA+1),A(IA),A(LA*inC+IA), &
-                    TRIGS,1,inC,NX,JUMP,NVEX,N,ifAC,LA,ierr)
-      else if (IGO.EQ.-1) then
-        call da_qpassm(A(IA),A(ifAC*LA*inC+IA),WORK,WORK(LA+1), &
-                    TRIGS,inC,1,JUMP,NX,NVEX,N,ifAC,LA,ierr)
-      end if
-      if (ierr.NE.0) goto 500
+      DO 140 K=1,NFAX
+      IFAC=IFAX(NFAX+2-K)
+      LA=LA/IFAC
+      IERR=-1
+      IF (IGO.EQ.+1) THEN
+        CALL qpassm(WORK,WORK(IFAC*LA+1),A(IA),A(LA*INC+IA), &
+                    TRIGS,1,INC,NX,JUMP,NVEX,N,IFAC,LA,IERR)
+      ELSE IF (IGO.EQ.-1) THEN
+        CALL qpassm(A(IA),A(IFAC*LA*INC+IA),WORK,WORK(LA+1), &
+                    TRIGS,INC,1,JUMP,NX,NVEX,N,IFAC,LA,IERR)
+      ENDIF
+      IF (IERR.NE.0) GO TO 500
       IGO=-IGO
-  140 continue
+  140 CONTINUE
 !
-!     POSTPROCESSinG
+!     POSTPROCESSING
 !     --------------
       SCALE=2.0
-      if (ISIGN.EQ.+1) SCALE = FLOAT(N)
+      IF (ISIGN.EQ.+1) SCALE = FLOAT(N)
       JA=ISTART
-      JB=JA+N*inC
+      JB=JA+N*INC
       IA=1
 !DIR$ IVDEP
-      do 150 J=1,NVEX
+      DO 150 J=1,NVEX
       A(JA)=0.0
-      A(JA+inC)=0.5*SCALE*WORK(IA)
+      A(JA+INC)=0.5*SCALE*WORK(IA)
       A(JB)=0.0
       IA=IA+NX
       JA=JA+JUMP
       JB=JB+JUMP
-  150 continue
+  150 CONTINUE
 !
-      do 170 K=2,N-2,2
-      JA=ISTART+K*inC
+      DO 170 K=2,N-2,2
+      JA=ISTART+K*INC
       IA=K
 !DIR$ IVDEP
-      do 160 J=1,NVEX
+      DO 160 J=1,NVEX
       A(JA)=-SCALE*WORK(IA+1)
-      A(JA+inC)=SCALE*WORK(IA)+A(JA-inC)
+      A(JA+INC)=SCALE*WORK(IA)+A(JA-INC)
       IA=IA+NX
       JA=JA+JUMP
-  160 continue
-  170 continue
+  160 CONTINUE
+  170 CONTINUE
 !
       ISTART=ISTART+NVEX*JUMP
       NVEX=VectorLength
-  200 continue
+  200 CONTINUE
 
       Go To 570
 !
 !     ERROR MESSAGES
 !     --------------
-  500 continue
-      goto (510,530,550) ierr
-  510 continue
-      write(unit=stderr,fmt='(A,I5,A)') 'NVEX=', NVEX ,' GREATER THAN VectorLength'
-      goto 570
-  530 continue
-      write(unit=stderr,fmt='(A,I5,A)') 'ifAC=', ifAC, 'NOT CATERED FOR'
-      goto 570
-  550 continue
-      write(unit=stderr,fmt='(A,I5,A)') 'ifAC=', ifAC, ' ONLY CATERED FOR if LA*ifAC=N'
-  570 continue
+  500 CONTINUE
+      GO TO (510,530,550) IERR
+  510 CONTINUE
+      WRITE(UNIT=stderr,FMT='(A,I5,A)') 'NVEX=', NVEX ,' GREATER THAN VectorLength'
+      GO TO 570
+  530 CONTINUE
+      WRITE(UNIT=stderr,FMT='(A,I5,A)') 'IFAC=', IFAC, 'NOT CATERED FOR'
+      GO TO 570
+  550 CONTINUE
+      WRITE(UNIT=stderr,FMT='(A,I5,A)') 'IFAC=', IFAC, ' ONLY CATERED FOR IF LA*IFAC=N'
+  570 CONTINUE
 
 
-      return
+      RETURN
 
 
-End subroutine da_fast_sine_transform
+End subroutine FFT661
 
 
 
