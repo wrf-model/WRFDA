@@ -1,0 +1,56 @@
+Change Log for update to WRF-Var (RB_V21) code
+---------------------------------------
+
+Author  : Yong-Run Guo
+Reviewer: 
+Date: 03/02/2006
+
+Reason for changes 
+-------------------
+
+1, With sfc_assi_options=2, when SLP data are available for SYNOP, METAR, 
+   SHIPS, BUOY, and SOUND/sonde_sfc, the SLP is reduced to be Psfc, and then
+   assimilated.
+
+2, To hardwire the number of levels = 0 for GPSPW in 
+   da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+ 
+Files removed:
+--------------
+None
+
+Files added:
+------------
+
+da_3dvar/changes/change_20060302.yrg
+
+
+Files modified:
+---------------
+M da_3dvar/src/DA_Buoy/da_get_innov_vector_buoy.inc
+M da_3dvar/src/DA_Metar/da_get_innov_vector_metar.inc
+M da_3dvar/src/DA_Ships/da_get_innov_vector_ships.inc
+M da_3dvar/src/DA_Synop/da_get_innov_vector_synop.inc
+M da_3dvar/src/DA_Sound/DA_Sonde_sfc/da_get_innov_vector_sonde_sfc.inc
+M da_3dvar/src/DA_Tools/DA_Obs_Sfc_correction.inc
+M da_3dvar/src/DA_Obs/da_write_filtered_obs.inc
+
+Expected Differences
+--------------------
+
+The results may be changed with sfc_assi_optins=2 for SYNOP, METAR, SHIPS, 
+BUOY, and SOUND/sonde_sfc when the SLP data available, otherwise no change.  
+
+Accuracy: 
+
+CPU:
+
+No changes are expected.
+
+memory:
+
+No changes are expected.
+
+Test results (run on mac machines?)
+------------------------------------------------------
+

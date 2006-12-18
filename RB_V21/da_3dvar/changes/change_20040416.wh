@@ -1,0 +1,57 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Wei, Mi-Seon
+Reviewer: 	YR 
+Date: 		04/14/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+1. Bug fix for wrftoxb, xatowrf, VtoX, and date for cycling.
+2. Using WRF variables.
+
+Expected Differences
+--------------------
+
+Accuracy: 	Have impacts on results.
+CPU/memory:	Minor change (4 1D arrays added).
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+T4b.
+
+Files removed:
+--------------
+
+None
+
+Files added:
+------------
+
+Non
+
+Files modified:
+---------------
+
+ Registry/Registry_3dvar
+ da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+ da_3dvar/src/DA_Setup_Structures/da_transfer_xatowrf.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+ da_3dvar/src/DA_Test/DA_Check_VToX_Adjoint.inc
+ share/module_io_wrf.F
+
+ da_3dvar/src/DA_Physics/DA_PT_To_Rho_Adj.inc
+ da_3dvar/src/DA_Test/DA_Check_XToY_Adjoint_SSMI_Tb.inc
+ da_3dvar/src/DA_Test/DA_Test_VXTransform.inc
+ da_3dvar/src/DA_Test/da_check.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_bal_adj.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox.inc
+ da_3dvar/src/DA_VToX_Transforms/da_transform_vtox_adj.inc
+
+Minor-tag:
+
+beta_version_3
+

@@ -1,0 +1,45 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 	Qingnong
+Reviewer: 	Mi-Seon
+Date: 		04/13/04
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Bug fix for SATEM.
+
+
+Expected Differences
+--------------------
+
+Accuracy: 	Only impact on SATEM.
+CPU/memory:	No
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Files removed:
+--------------
+
+None
+
+Files added:
+------------
+
+None
+
+Files modified:
+---------------
+
+DA_TPQ_To_Thickness.inc
+DA_Transform_XToY_Satem.inc
+DA_Transform_XToY_Satem_Adj.inc
+da_get_innov_vector_satem.inc
+
+
+Minor tag:
+
+tag beta_version_1
+

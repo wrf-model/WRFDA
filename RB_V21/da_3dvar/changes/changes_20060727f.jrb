@@ -1,0 +1,52 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author  : Syed Rizvi
+Reviewer: John Bray 
+Date: 07/27/06
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+RB_V21 will not read Spring 06 CV 5 background error files because the
+arrays are incorrectly dimensioned.
+
+Test results
+------------------------------------------------------
+
+bluesky: 
+
+No change with old CV5 BE file (from WRF tutorial)
+
+New BE files run without warning message
+
+ocotillo:
+
+No change with old CV5 BE file (from WRF tutorial)
+
+New BE files run, where there was a fatal error before
+
+
+Files added:
+-------------------------------------
+
+da_3dvar/changes/changes_20060727f.jrb (this file)
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors5.inc
+
+Files Removed:
+-------------------------------------
+
+Files Modified:
+-------------------------------------
+da_3dvar/src/DA_Setup_Structures/da_setup_background_errors5.inc
+
+CHANGES
+
+changes/changes_20060727f.jrb
+
+
+
+Tag:
+
+                  
+

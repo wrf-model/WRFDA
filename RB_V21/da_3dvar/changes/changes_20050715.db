@@ -1,0 +1,69 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: Dale Barker
+Reviewer: Yong-Run Guo
+Date: 07/15/05
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+Tidy up and fix gen_be prior to V2.1 release:
+
+1. Remove redundant scripts in run/gen_be.
+2. Fix namelist.
+3. Change to DA_Gen_Be_Stats routines to make code clearer, and
+   conform to standard naming convention for input files, e.g.
+   2004050100/wrfout_d01_2004-05-02_00:00:00 
+   is a 24hr forecast valid at 2004050200 from 2004050100.
+   (note - each wrfout file contains only one time - this reduces
+   the size of files needed to be retained for gen_be).
+
+Expected Differences
+--------------------
+
+No differences in output expected.
+
+Test results (run on which machines?)
+------------------------------------------------------
+
+Tested two domains on Linux cluster (snowdrift):
+
+WRF AMPS (60km) domain - May 2004 data.
+WRF CONUS (200km) domain - January 2003 data. 
+NMC-method (24-12hr fcsts) used.
+
+Tested WRF_stage0 and stages1-4 (bin_type 1 and 5).
+
+Results consistent with previous AMPS results, and regression
+coefficients latitude dependence similar to KMA (Dec/March data).
+
+--------------------------------------------------------------------------------------
+Files removed:
+--------------
+
+cvs remove run/gen_be/da_wrf_stage0_ens.csh \
+           run/gen_be/gen_be_ens.csh \
+           run/gen_be/gen_be_nmc.csh \
+           run/gen_be/gen_be_stage4_regional_ens.csh
+
+Files added:
+------------
+
+da_3dvar/changes/changes_20050715.db (this file)
+
+Files modified:
+---------------
+
+cvs commit da_3dvar/src/DA_Gen_Be_Stats/DA_Make_Ensemble_Mean.inc \
+da_3dvar/src/DA_Gen_Be_Stats/DA_Make_Filename.inc \
+da_3dvar/src/DA_Gen_Be_Stats/DA_Statistics_Step0.inc \
+gen_be/gen_be_cov3d.f \
+run/gen_be/gen_be.csh \
+run/gen_be/gen_be_cov3d.csh \
+run/gen_be/gen_be_stage0_wrf_nmc.csh
+
+Tag:
+
+version_2_?
+

@@ -1,0 +1,56 @@
+Change Log for update to WRF 3DVAR code
+---------------------------------------
+
+Author: 
+Reviewer: 
+Date: mm/dd/yy
+
+Reason for changes (explain before making changes)
+--------------------------------------------------
+
+
+Expected Differences
+--------------------
+
+Accuracy: 
+CPU/memory:
+
+Test results (run on what machines?)
+------------------------------------------------------
+
+Standard 1999/08/19/12 CAA Domain 1 test with defaults namelist
+
+Old code: Mem = ?M, cpu = ?s
+New code: Mem = ?M, cpu = ?s
+
+Final output from minimization:
+Old code: 31   36     2.719D+04   7.000D+00   1.000D+00  NTHITE
+New code: 31   36     2.718D+04   6.939D+00   1.000D+00  NTHITE
+
+Files removed:
+--------------
+
+cvs remove ?
+
+Files added:
+------------
+
+cvs add ?
+
+Files modified:
+---------------
+
+cvs commit ?
+
+tag info:
+---------------
+
+wrfvar_version_2_0_a_b_c
+
+2_0	following WRF release
+2_0_a	Major wrfvar develope
+2_0_a_b	Bug fix on 2_0_a
+2_0_a_b_c Bug fix on 2_0_a_b
+
+(a, b, and c are integeres stat from 0)
+              
