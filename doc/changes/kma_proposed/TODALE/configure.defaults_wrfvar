@@ -1,0 +1,923 @@
+###########################################################
+#ARCH       Compaq OSF1 alpha          (single-threaded)
+#
+OMP             =
+OMPCPP          =
+FC              =       f90
+SFC             =       $(FC)
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       cc
+CC_TOOLS        =       cc
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+TRADFLAG        =
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -fast -O2
+FCDEBUG         =       -g
+FCTYPE          =       -r8
+FCFORM          =       -free
+FCHOST          =       -arch host
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
+FCBASE          =       $(FCBUFR) -convert big_endian
+FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+NETCDF_IO_PATH  =       external/io_netcdf
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /usr/bin/cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B 12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH       Compaq OSF1 alpha DM       (RSL, MPICH, RSL IO)
+#
+DMPARALLEL      =       1
+OMP             =
+OMPCPP          =
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       cc
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
+                        -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+ARCHFLAGS4      =       -I../external/RSL/RSL
+TRADFLAG        =
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -fast -O2
+FCDEBUG         =       -g
+FCTYPE          =       -r8
+FCFORM          =       -free
+FCHOST          =       -arch host
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
+FCBASE          =       $(FCBUFR) -convert big_endian
+FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /usr/bin/cpp
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                        -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B 12000
+
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+          /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; \
+          make CC="$(CC)" FC="$(FC)" MAX_DOMAINS=$(MAX_DOMAINS) \
+                                 MAX_PROC=$(MAX_PROC) \
+                                 LEARN_BCAST=-DLEARN_BCAST alpha )
+
+###########################################################
+#ARCH       Compaq OSF1 alpha    (single-threaded, for compare with MM5 VAR)
+#
+OMP             =
+OMPCPP          =
+FC              =       f90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       cc
+CC_TOOLS        =       cc
+ARCHFLAGS3       =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DINTIO \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+TRADFLAG        =
+#FCOPTIM         =       -fast -O2 -Olimit 2000
+FCOPTIM         =       -O0
+FCDEBUG         =       -g
+FCTYPE          =       -r8
+FCFORM          =       -free
+FCHOST          =       -arch host
+FCBUFR          =       -automatic -cpp -fpe0 -align dcommons -align records
+FCBASE          =       $(FCBUFR) -convert big_endian
+FC_FFT_RF       =       -automatic -cpp -fpe2 -align dcommons -align records -convert big_endian
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /usr/bin/cpp
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DDEC_ALPHA -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+                        -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B 12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (Single-threaded)
+#
+FC              =       pgf90
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fast
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =       
+FCBUFR          =       -Ktrap=fp -tp p6
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI compiler  (RSL, MPICH, RSL IO)
+#
+DMPARALLEL      =       1
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+SFC             =       pgf90
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I../external/RSL/RSL
+TRADFLAG        =       -traditional
+FCOPTIM         =       #-fast
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =
+FCBUFR          =       -Ktrap=fp -tp p6
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       -byteswapio
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
+			-DNO_RRTM_PHYSICS  -DPGF90
+DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+
+externals : $(WRFIO) esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ;  \
+          /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+#ARCH Intel xeon i686 ia32 Xeon Linux, ifort compiler (single-threaded, no nesting)
+#
+FC              =       ifort
+F77             =       $(FC)
+CC              =       icc
+CC_TOOLS        =       gcc
+SFC             =       $(FC)
+LD              =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       -O3 -xW
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -FR -cm -w
+FCHOST          =       
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -convert big_endian
+FC_FFT_RF       =       $(FCBUFR) -convert big_endian
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DNO_RRTM_PHYSICS -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+	/bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95 compiler  (Single-threaded)
+#
+FC              =       g95
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -ffree-form
+FCHOST          =       
+FCBUFR          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBASE          =       $(FCBUFR)
+FC_FFT_RF       =       $(FCBUFR)
+ARCHFLAGS3      =       -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (Single-threaded)
+#
+FC              =       pgf90
+F77             =       $(FC)
+CC              =       gcc
+CC_TOOLS        =       gcc
+LD              =       $(FC)
+SFC             =       $(FC)
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =       
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+EXTRAMODULES    =       
+
+LDFLAGS         =
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X11R6/lib -L/usr/local/lib \
+			-lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =
+DM_2_CPP_FLAGS  =
+POUND_DEF       =       -DLINUX -DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Settings for PC Linux x86_64, PGI compiler  (RSL, MPICH, RSL IO)
+#
+DMPARALLEL      =       1
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       gcc
+SFC             =       pgf90
+ARCHFLAGS3      =       -DDEREF_KLUDGE -DIO_DEREF_KLUDGE \
+                        -DINTIO -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO
+ARCHFLAGS4      =       -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I../external/RSL/RSL
+TRADFLAG        =       -traditional
+FCOPTIM         =       -fastsse
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -Mfree
+FCHOST          =
+FCBUFR          =       
+FCBASE          =       $(FCBUFR) -byteswapio
+FC_FFT_RF       =       $(FCBUFR) -byteswapio
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       -byteswapio
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -L/usr/X12R6/lib -L/usr/local/lib \
+                        -lncarg -lncarg_gks -lncarg_c -lX11 
+
+CPP             =       /lib/cpp $(TRADFLAG)
+CPPFLAGS_BUFR   =       -C -P -DLINUX -Dlinux
+CFLAGS_BUFR     =       -DUNDERSCORE
+DM_1_CPP_FLAGS  =       -I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags` \
+			-DNO_RRTM_PHYSICS  -DPGF90
+DM_2_CPP_FLAGS  =       -I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DLINUX -DNO_RRTM_PHYSICS  \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4
+
+
+externals : $(WRFIO) esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ;  \
+          /bin/cp module_dm_warning module_dm.F ; cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; make CC="$(CC)" FC="$(FC) -byteswapio" MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST linux )
+
+###########################################################
+#ARCH       SGI 64 bit machine IRIX64     (single-threaded)
+#
+OMP             =
+OMPCPP          =
+FC              =       f90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       cc
+CC_TOOLS        =       cc
+ARCHFLAGS3      =       -DINTIO \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DNORESHAPE
+ARCHFLAGS4      =       -w -64 -mips4 -DUNDERSCORE \
+                        -I../external/RSL/RSL
+TRADFLAG        =
+FCOPTIM         =       -O2
+FCDEBUG         =       -g
+FCTYPE          =       -r8
+FCFORM          =       -freeform
+FCHOST          =       
+FCBASE          =       -64 -mips4
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       -64 -mips4
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DIRIX \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+RANLIB          =       echo
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; \
+          cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH   SGI O2K DM IRIX64            (RSL, RSL_IO, SGI-MPI)
+#
+DMPARALLEL      =       1
+OMP             =
+OMPCPP          =
+LIBINCLUDE	=	/tea2/huangwei/mpich-1.2.4/include
+FC              =       mpif90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       mpicc
+CC_TOOLS        =       cc
+ARCHFLAGS3      =       -DINTIO \
+                        -DWRF_RSL_IO -DDM_PARALLEL -DRSL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO 
+ARCHFLAGS4      =       -w -64 -mips4 \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -I../external/RSL/RSL \
+			-I/tea2/huangwei/mpich-1.2.4/include
+TRADFLAG        =
+FCOPTIM         =       -O3 -OPT:roundoff=3:IEEE_arithmetic=3
+FCDEBUG         =       -g
+FCTYPE          =       -r8
+FCFORM          =       -freeform
+FCHOST          =       
+FCBASE          =       -64 -mips4 -w
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =       
+
+LDFLAGS         =       $(FCOPTIM) $(FCBASE)
+MPI_LIB		=	-L../external/RSL/RSL -lrsl -lmpi
+
+LOCAL_LIBRARIES =       -L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       /lib/cpp
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DIRIX \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+RANLIB          =       echo
+M4              =       m4 -B12000
+
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+          /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; \
+          make CC=$(CC) FC=$(FC) MAX_DOMAINS=$(MAX_DOMAINS) \
+                                 MAX_PROC=$(MAX_PROC) \
+                                 LEARN_BCAST=-DLEARN_BCAST o2k )
+
+###########################################################
+#ARCH   NEC                      (single-threaded)
+#
+OMP             =
+OMPCPP          =
+FC              =       f90
+F77             =       $(FC)
+LD              =       $(FC)
+CC              =       cc
+CC_TOOLS        =       cc
+ARCHFLAGS3      =       -DINTIO \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
+			-DMPI -I$(MPIINCDIR) 
+TRADFLAG        =
+FCOPTIM         =
+FCDEBUG         =      
+FCTYPE          =   
+FCFORM          =     	-f4
+FCHOST          = 
+FCBASE          =       -C hopt \
+			-Wf"-init stack=zero heap=zero -pvctl loopcnt=100000000 noassume -O nooverlap" \
+                        -pi -ew -eb -float0 -Wf"-L fmtlist"
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =
+
+NETCDF_IO_PATH  =       main
+NETCDF_LIB	=
+MPI_LIB		=
+
+LOCAL_LIBRARIES =       
+
+LDFLAGS         =  	#-Wl"-Z 3000000"
+
+CPP             =       /usr/lib0/cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DNEC \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+MAX_PROC        =       256
+RANLIB          =       echo
+M4              =       m4 -B12000
+
+externals : wrfio_int wrfio_grib1
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH   AIX             (single-threaded, no nesting)
+#
+FC              =       xlf90_r
+F77             =       xlf_r
+LD              =       $(FC)
+CC              =       cc_r
+CC_TOOLS        =       cc
+TRADFLAG        =
+FCOPTIM         =       -O0 -qarch=auto
+FCDEBUG         =       -g -qfullpath
+FCTYPE          =       -qrealsize=8
+FCFORM          =       -qfree=f90
+FCHOST          =
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
+ARCHFLAGS3      =       -DGRIB1 -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99
+LOCAL_LIB	=	-lmass -lmassv
+
+LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+CPP             =       /lib/cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DAIX \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH	AIX DM-Parallel          (RSL, IBM-MPI, supports nesting)
+#
+DMPARALLEL      =       1
+SFC             =       xlf90_r
+SCC             =       cc_r
+FC              =       mpxlf90_r
+F77             =       mpxlf_r
+LD              =       $(FC)
+CC              =       mpcc_r
+CC_TOOLS        =       cc
+TRADFLAG        =
+FCOPTIM         =       -O0 -qarch=auto
+FCDEBUG         =       -g -qfullpath
+FCTYPE          =       -qrealsize=8
+FCFORM          =       -qfree=f90
+FCHOST          =
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+			-qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
+ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL -DDM_PARALLEL \
+			-DTRIEDNTRUE -DGRIB1 -DINTIO \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV \
+			-DNORESHAPE
+ARCHFLAGS4      =       -DNOUNDERSCORE -DNCARIBM_NOC99 \
+			-I../external/RSL/RSL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+			-DMAXPROC_MAKE=$(MAX_PROC)
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+LOCAL_LIB	=	-lmass -lmassv
+LDFLAGS         =	-bmaxstack:256000000 -bmaxdata:2048000000
+CPP		=	/lib/cpp
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DAIX \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals :	$(WRFIO) esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+	cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c )
+	( /bin/cp module_dm_warning module_dm.F ; \
+	cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; \
+	make MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) LEARN_BCAST=-DLEARN_BCAST sp2 )
+
+###########################################################
+#ARCH   crayx1 UNICOS/mp  CRAY X1
+#
+## Use these for X1 cross compiler to build Registry
+##X1_CROSS_COMP = "gcc"
+##X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+X1_CROSS_COMP = "cc"
+X1_CROSS_CFLG = "-hcommand"
+CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
+
+SED_FTN		=	sed -f ../arch/cray_csd.sed
+
+OMP             =
+OMPCPP          =
+DMPARALLEL      =       1
+SFC             =       ftn 
+SCC             =       cc
+FC              =       ftn
+LD              =       $(FC)
+F77             =       $(FC)
+CC              =       cc
+
+ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
+                        -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+                        -DNORESHAPE -Dcrayx1
+ARCHFLAGS4      =       -UCRAY \
+                        -I../external/RSL/RSL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
+TRADFLAG        =
+#FCOPTIM         =     	-Ofp3 -O3
+FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
+#FCOPTIM         =     	-Ofp2 -O0
+FCDEBUG         =       #-g
+#FCTYPE          =       -sinteger32 -e m -sreal64 -dp
+FCTYPE          =       -e m -sreal64 -dp
+FCFORM          =       -f free -N 255
+FCHOST          =   
+FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =       
+
+LDFLAGS         =
+MPI_LIB		=	-L../external/RSL/RSL -lrsl
+LOCAL_LIB	=	-L../frame -L../share -L$(DA_VAR) -L$(DA_SRC)
+CONVERTOR_LIB	=	-L../convertor
+LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       cpp -C -P -Dcrayx1
+#CPP             =       cpp -C -P
+DM_1_CPP_FLAGS	=	-I../external/RSL/RSL -C -P `cat ../inc/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I../../external/RSL/RSL -C -P `cat ../../inc/dm_comm_cpp_flags`
+POUND_DEF       =       -DCRAYX1 \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+RANLIB          =       echo
+M4              =       m4 -B12000
+
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp ../tools/gen_comms_warning ../tools/gen_comms.c ; \
+          cat ../external/RSL/gen_comms.c >> ../tools/gen_comms.c ; \
+          /bin/cp module_dm_warning module_dm.F ; \
+          cat ../external/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd ../external/RSL/RSL ; \
+          make CC="$(CC)" \
+	       MAX_DOMAINS=$(MAX_DOMAINS) \
+               MAX_PROC=$(MAX_PROC) \
+               LEARN_BCAST=-DLEARN_BCAST crayx1 )
+
+###########################################################
+#ARCH   crayx1 UNICOS/mp  CRAY X1 (KMA)
+#
+## Use these for X1 cross compiler to build Registry
+X1_CROSS_COMP = "gcc"
+X1_CROSS_CFLG = ""
+## Use these for X1 native (trigger) compiler
+#X1_CROSS_COMP = "cc"
+#X1_CROSS_CFLG = "-hcommand"
+CC_TOOLS        =       $(X1_CROSS_COMP) $(X1_CROSS_CFLG)
+
+SED_FTN		=	sed -f $(ARCH)/cray_csd.sed
+
+OMP             =
+OMPCPP          =
+DMPARALLEL      =       1
+SFC             =       ftn 
+SCC             =       cc
+FC              =       ftn -N 255
+LD              =       ftn
+F77             =       $(FC)
+CC              =       cc
+
+ARCHFLAGS3      =       -DWRF_RSL_IO -DRSL \
+                        -DDM_PARALLEL \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+                        -DNORESHAPE -Dcrayx1
+ARCHFLAGS4      =       -UCRAY \
+                        -I$(EXTERNAL)/RSL/RSL \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+			-h gen_private_callee
+ARCHFLAGS       =       -DWRF_RSL_IO -DRSL \
+                        -DDM_PARALLEL \
+                        $(WORDSIZE_DEF) \
+                        -DNETCDF -DRTTOV \
+                        -DTRIEDNTRUE -DONLY_WRFMODEL_IO -DINTIO \
+                        -DNORESHAPE -Dcrayx1 -DKMA
+CFLAGS          =       -UCRAY -Dcrayx1 \
+                        -DWRF_RSL_IO \
+                        -I$(EXTERNAL)/RSL/RSL \
+                        -DDM_PARALLEL  \
+                        -DMAXDOM_MAKE=$(MAX_DOMAINS) \
+                        -DMAXPROC_MAKE=$(MAX_PROC) \
+                        -h gen_private_callee
+CFLAGS_BUFR     =       -DUNDERSCORE
+
+TRADFLAG        =
+#FCOPTIM         =     	-Ofp3 -O3
+#FCOPTIM         =     	-Ofp2 -O1 -Ogen_private_callee
+FCOPTIM         =     	-Ofp2 -O1
+FCDEBUG         =       #-g
+FCTYPE          =       -e m -sreal64 -dp -eh
+FCFORM          =       -f free 
+FCHOST          =   
+FCBASE          =       #-Ovector0 -Ostream0 -Oscalar1
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+
+EXTRAMODULES    =       
+
+LDFLAGS         =
+MPI_LIB		=	-L$(EXTERNAL)/RSL/RSL -lrsl
+LOCAL_LIB	=	-L$(FRAME) -L$(SHARE) -L$(DA_VAR) -L$(DA_SRC) $(RTTOV_LIB)
+CONVERTOR_LIB	=	-L$(CONVERTOR)
+LOCAL_LIBRARIES =       #-L/usr/local/ncarg/lib -lncarg -lncarg_gks -lncarg_c -lX11
+
+CPP             =       cpp -C -P -Dcrayx1
+DM_1_CPP_FLAGS	=	-I$(EXTERNAL)/RSL/RSL -C -P `cat $(INC)/dm_comm_cpp_flags`
+DM_2_CPP_FLAGS	=	-I$(EXTERNAL)/RSL/RSL -C -P `cat $(INC)/dm_comm_cpp_flags`
+POUND_DEF       =       -DCRAYX1 \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+
+RANLIB          =       echo
+M4              =       m4 -B12000
+
+externals : wrfio_nf wrfio_int wrfio_grib1 esmf_time lib_rsl
+	( /bin/cp $(TOOLS)/gen_comms_warning $(TOOLS)/gen_comms.c ; \
+          cat $(EXTERNAL)/RSL/gen_comms.c >> $(TOOLS)/gen_comms.c ; \
+          /bin/cp module_dm_warning module_dm.F ; \
+          cat $(EXTERNAL)/RSL/module_dm.F >> module_dm.F )
+
+lib_rsl :
+	( cd $(EXTERNAL)/RSL/RSL ; \
+          make CC="$(CC)" \
+               MAX_DOMAINS=$(MAX_DOMAINS) \
+               MAX_PROC=$(MAX_PROC) \
+               LEARN_BCAST=-DLEARN_BCAST crayx1 )
+
+###########################################################
+#ARCH Darwin		(xlf single-threaded, no nesting, for G5)
+#
+FC              =       xlf90_r
+F77             =       xlf_r
+LD              =       xlf90_r
+CC              =       cc
+CC_TOOLS        =       cc
+TRADFLAG        =
+FCOPTIM         =       -O0 -qarch=auto
+FCDEBUG         =       #-g
+FCTYPE          =       -qrealsize=8
+FCFORM          =       -qfree=f90
+FCHOST          =
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
+EXTRAMODULES    =       
+ARCHFLAGS3      =       -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
+LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DMACOS \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Darwin		(xlf single-threaded, no nesting, for G4)
+#
+FC              =       xlf90_r
+F77             =       xlf_r
+LD              =       xlf90_r
+CC              =       cc
+CC_TOOLS        =       cc
+TRADFLAG        =
+FCOPTIM         =       -O0 -qarch=auto
+FCDEBUG         =       #-g
+FCTYPE          =       -qrealsize=8
+FCFORM          =       -qfree=f90
+FCHOST          =
+FCBASE          =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 \
+                        -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
+EXTRAMODULES    =       
+ARCHFLAGS3      =       -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+ARCHFLAGS4      =       -DNOUNDERSCORE -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
+LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+POUND_DEF       =       -DMACOS \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH Darwin		(g95 single-threaded, no nesting, for G4/G5)
+#
+FC              =       g95
+F77             =       g95
+LD              =       g95
+CC              =       cc
+CC_TOOLS        =       cc
+TRADFLAG        =
+FCOPTIM         =       -O0
+FCDEBUG         =       #-g
+FCTYPE          =       -r8
+FCFORM          =       -ffree-form
+FCBASE          =       -cpp -Wno=101,139,155,158 -fno-second-underscore -ftrace=full
+FCBUFR          =       $(FCBASE)
+FC_FFT_RF       =       $(FCBASE)
+EXTRAMODULES    =
+EXTRAMODULES    =       
+ARCHFLAGS3      =       -DINTIO \
+                        -DTRIEDNTRUE   \
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT
+ARCHFLAGS4      =       -DLANDREAD_STUB -DMACOS
+EXTRA_LIBS      =       -lSystemStubs
+LDFLAGS         =	 -Wl,-stack_size,10000000,-stack_addr,0xc0000000
+CPP             =       /usr/bin/cpp  -C -P -xassembler-with-cpp
+DM_1_CPP_FLAGS	=
+DM_2_CPP_FLAGS	=
+
+CFLAGS_BUFR     =       -DUNDERSCORE
+POUND_DEF       =       -DMACOS \
+			-DNONSTANDARD_SYSTEM -DF90_STANDALONE \
+			-DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) -DMAX_DOMAINS_F=$(MAX_DOMAINS)
+M4              =       m4 -B12000
+
+externals : $(WRFIO) esmf_time
+	( /bin/cp module_dm_warning module_dm.F ; cat module_dm_stubs.F >> module_dm.F )
+
+###########################################################
+#ARCH  NULL
+
