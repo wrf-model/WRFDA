@@ -313,7 +313,7 @@ program gen_be_stage3
 !              Project fields onto vertical modes:
                call da_transform_vptovv( evec, eval, vertical_wgt, &
                                          field, field_out, nk, &
-                                         1, ni, 1, nj, 1, nk, & ! WRF ids, ide etc.
+                                         1, nk, & ! WRF ids, ide etc.
                                          1, ni, 1, nj, 1, nk, & ! WRF ims, ime etc.
                                          1, ni, 1, nj, 1, nk )  ! WRF its, ite etc.
             end if
