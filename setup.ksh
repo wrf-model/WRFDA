@@ -66,8 +66,8 @@ fi
 if test -d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}; then
    export FFTPACK5=${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}; then
-   export BUFR=${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}
+if test -d ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}; then
+   export BUFR=${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
 fi
 if test -d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}; then
    export MAKEDEPF90=${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}

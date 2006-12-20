@@ -86,8 +86,8 @@ endif
 if (-d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}) then
    setenv FFTPACK5 ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}) then
-   setenv BUFR ${WRFHELP}/bufr_ncep_nco/bufr_ncep_nco_${FC}_${PROCESSOR}
+if (-d ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}) then
+   setenv BUFR ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
 endif
 if (-d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}) then
    setenv MAKEDEPF90 ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
