@@ -1,0 +1,5 @@
+#!/bin/ksh
+export FFC=g95
+export FFCFLAGS="-O2 -r8"
+make clean
+make all

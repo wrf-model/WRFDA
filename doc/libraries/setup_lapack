@@ -1,0 +1,6 @@
+export BLAS=../../blas/blas_g95_i686
+export FFCFLAGS="-O2 -r8"
+export FFC=g95
+rm *.a
+make clean
+make

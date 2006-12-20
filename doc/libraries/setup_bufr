@@ -1,0 +1,9 @@
+#!/bin/ksh
+export CC=gcc
+export FFC=g95
+export FFCFLAGS="-O2 -r8 -fno-second-underscore"
+export CCFLAGS="-DUNDERSCORE"
+export CPPFLAGS="-C -P -traditional -DLINUX -Dlinux"
+rm *.a
+make clean
+make all
