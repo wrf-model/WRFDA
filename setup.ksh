@@ -5,25 +5,12 @@ CC=${2:-gcc}
 PROCESSOR=`uname -p`
 
 # Wait until files on wrfhelp
-#if test -d /mmm/users/wrfhelp; then
-#   WRFHELP=/mmm/users/wrfhelp
-#elif test -d /data3/mp/wrfhelp; then
-#   WRFHELP=/data3/mp/wrfhelp
-#elif test -d /users/wrfhelp; then
-#   WRFHELP=/users/wrfhelp
-#elif test -d ~wrfhelp; then
-#   WRFHELP=~wrfhelp
-#elif test -d /mmm/users/bray; then
-if test -d /mmm/users/bray; then
-   WRFHELP=/mmm/users/bray
-elif test -d /data7/da/bray; then
-   WRFHELP=/data7/da/bray
-elif test -d /users/bray; then
-   WRFHELP=/users/bray
-elif test -d ~bray; then
-   WRFHELP=~bray
+#if test -d ~wrfhelp/external; then
+#   EXT_DIR=${EXT_DIR:-~wrfhelp/external}
+if test -d ~bray/external; then
+   EXT_DIR=${EXT_DIR:-~bray/external}
 else
-   WRFHELP=~
+   EXT_DIR=${EXT_DIR:-~/external}
 fi
 
 if test $FC = xlf; then
@@ -40,45 +27,45 @@ if test $CC = xlc; then
 fi
 
 if test $FC = g95; then
-   if test -d ${WRFHELP}/g95/g95_${PROCESSOR}; then
-      export PATH=${WRFHELP}/g95/g95_${PROCESSOR}:$PATH
+   if test -d ${EXT_DIR}/g95/g95_${PROCESSOR}; then
+      export PATH=${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
    fi
 fi
 
-if test -d ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}; then
-  export NETCDF=${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}; then
+  export NETCDF=${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}; then
-   export RTTOV=${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}; then
+   export RTTOV=${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}; then
-   export CRTM=${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}; then
+   export CRTM=${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}; then
-   export MPICH=${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}; then
+   export MPICH=${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}; then
-   export BLAS=${WRFHELP}/blas/blas_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}; then
+   export BLAS=${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}; then
-   export LAPACK=${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}; then
+   export LAPACK=${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}; then
-   export FFTPACK5=${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}; then
+   export FFTPACK5=${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}; then
-   export BUFR=${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}; then
+   export BUFR=${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
 fi
-if test -d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}; then
-   export MAKEDEPF90=${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
+if test -d ${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}; then
+   export MAKEDEPF90=${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
 fi
 
 # -----------------------------------------
 
 # mpich2
 
-#if test -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
-#   export MPICH=${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if test -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
+#   export MPICH=${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
 #if test -d ~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
 #   export MPICH=~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}

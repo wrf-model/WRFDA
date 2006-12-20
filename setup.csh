@@ -22,25 +22,10 @@ endif
 
 
 # Wait until files on wrfhelp
-#if (-d /mmm/users/wrfhelp) then
-#   setenv WRFHELP /mmm/users/wrfhelp
-#else if (-d /data3/mp/wrfhelp) then
-#   setenv WRFHELP /data3/mp/wrfhelp
-#else if (-d /users/wrfhelp) then
-#   setenv WRFHELP /users/wrfhelp
-#else if (-d ~wrfhelp}) then
-#   setenv WRFHELP ~wrfhelp
-#else if (-d /mmm/users/bray) then
-if (-d /mmm/users/bray) then
-   setenv WRFHELP /mmm/users/bray
-else if (-d /data7/da/bray) then
-   setenv WRFHELP /data7/da/bray
-else if (-d /users/bray) then
-   setenv WRFHELP /users/bray
-else if (-d ~bray) then
-   setenv WRFHELP=~bray
-else
-   setenv WRFHELP ~
+# if (-d ~wrfhelp/external}) then
+#   setenv EXT_DIR ~wrfhelp/external
+if (-d ~bray/external) then
+   setenv EXT_DIR=~bray/external
 endif
 
 
@@ -58,54 +43,54 @@ if ($CC == xlc) then
 endif
 
 if ($FC == g95) then
-   if (-d ${WRFHELP}/g95/g95) then
-      setenv PATH ${WRFHELP}/g95/g95_${PROCESSOR}:$PATH
+   if (-d ${EXT_DIR}/g95/g95) then
+      setenv PATH ${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
    endif
 endif
 
 # List options in order of increasing preference
 
-if (-d ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}) then
-   setenv NETCDF ${WRFHELP}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}) then
+   setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}) then
-   setenv RTTOV ${WRFHELP}/rttov/rttov85_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}) then
+   setenv RTTOV ${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}) then
-   setenv CRTM ${WRFHELP}/crtm/crtm_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}) then
+   setenv CRTM ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
-   setenv MPICH ${WRFHELP}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
+   setenv MPICH ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}) then
-   setenv BLAS ${WRFHELP}/blas/blas_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}) then
+   setenv BLAS ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}) then
-   setenv LAPACK ${WRFHELP}/lapack/lapack_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}) then
+   setenv LAPACK ${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}) then
-   setenv FFTPACK5 ${WRFHELP}/fftpack5/fftpack5_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}) then
+   setenv FFTPACK5 ${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}) then
-   setenv BUFR ${WRFHELP}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}) then
+   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
 endif
-if (-d ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}) then
-   setenv MAKEDEPF90 ${WRFHELP}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}) then
+   setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
 endif
 
 
 
 # mpich2
 
-#if ( -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#if ( -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
 
 # mpich2
 
-#if ( -d ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
-#   setenv MPICH ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if ( -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPICH ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
-#if ( -d ~${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
-#   setenv MPICH ${WRFHELP}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if ( -d ~${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPICH ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
 
 if (-d /usr/lpp/ppe.poe) then
