@@ -225,7 +225,7 @@ gen_get_nl_config ( char * dirname )
         fprintf(fp,"  USE module_configure\n") ;
       }
       fprintf(fp,"  %s , INTENT(%s) :: %s\n",p->type->name,intnt,p->name) ;
-      fprintf(fp,"  INTEGER id_id\n") ;
+      fprintf(fp,"  INTEGER, INTENT(in) :: id_id\n") ;
       fprintf(fp,"  CHARACTER*80 emess\n") ;
       if ( sw == 0 ) /* get */
       {

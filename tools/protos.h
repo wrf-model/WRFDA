@@ -23,7 +23,7 @@ int show_nodelist1( node_t * p , int indent ) ;
 #endif
 
 int gen_state_struct ( char * fname ) ;
-int gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_point , int mask , int layer ) ;
+int gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_point , int mask , int layer, char * intent ) ;
 int gen_state_subtypes ( char * fname ) ;
 int gen_state_subtypes1 ( FILE * fp , node_t * node , int sw_ranges, int sw_point , int mask ) ;
 int print_warning( FILE * fp , char * fname ) ;
