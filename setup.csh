@@ -20,12 +20,12 @@ else
    endif
 endif
 
+if (! $?EXT_DIR) then
+   setenv EXT_DIR ~wrfhelp/external
+endif
 
-# Wait until files on wrfhelp
-# if (-d ~wrfhelp/external}) then
-#   setenv EXT_DIR ~wrfhelp/external
-if (-d ~bray/external) then
-   setenv EXT_DIR=~bray/external
+if (! -d $EXT_DIR) then
+   echo "Cannot find EXT_DIR=$EXT_DIR"
 endif
 
 

@@ -4,13 +4,12 @@ CC=${2:-gcc}
 
 PROCESSOR=`uname -p`
 
-# Wait until files on wrfhelp
-#if test -d ~wrfhelp/external; then
-#   EXT_DIR=${EXT_DIR:-~wrfhelp/external}
-if test -d ~bray/external; then
-   EXT_DIR=${EXT_DIR:-~bray/external}
-else
-   EXT_DIR=${EXT_DIR:-~/external}
+export EXT_DIR=${EXT_DIR:-~wrfhelp/external}
+
+echo
+
+if ! test -d $EXT_DIR; then
+   echo "No directory EXT_DIR=$EXT_DIR"
 fi
 
 if test $FC = xlf; then
@@ -67,12 +66,6 @@ fi
 #if test -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
 #   export MPICH=${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
-#if test -d ~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
-#   export MPICH=~bray/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
-#fi
-#if test -d /Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}_${PROCESSOR}; then
-#   export MPICH=/Volumes/$MACHINE/bray/tools/mpich2-1.0.3_${FC}_${PROCESSOR}
-#fi
 
 if test -d /usr/lpp/ppe.poe; then
    export MPICH=/usr/lpp/ppe.poe
@@ -126,16 +119,16 @@ if test $FC = 'g95'; then
    export G95_MEM_SEGMENTS=0
 fi
 
-ls -l $MPICH/lib/*.a
-ls -l $RTTOV/lib/*.a
-ls -l $CRTM/lib/*.a
-ls -l $NETCDF/lib/*.a
-ls -l $BLAS/*.a
-ls -l $LAPACK/*.a
-ls -l $FFTPACK5/*.a
-ls -l $BUFR/*.a
-ls -l $MAKEDEPF90/makedepf90
-echo
+#ls -l $MPICH/lib/*.a
+#ls -l $RTTOV/lib/*.a
+#ls -l $CRTM/lib/*.a
+#ls -l $NETCDF/lib/*.a
+#ls -l $BLAS/*.a
+#ls -l $LAPACK/*.a
+#ls -l $FFTPACK5/*.a
+#ls -l $BUFR/*.a
+#ls -l $MAKEDEPF90/makedepf90
+#echo
 echo "MPICH       " $MPICH
 echo "RTTOV       " $RTTOV
 echo "CRTM        " $CRTM
