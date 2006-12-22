@@ -11,7 +11,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
    !  METHOD: The warm rain process is according to Hsie and Anthes (1984)
    !          and Dudhia (1989)
    !
-   !  ASsumPTIONS: 1) Model level stored top down.
+   !  ASSUMPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none

@@ -568,8 +568,6 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
    if (trace_use) call da_trace_exit("da_transfer_kmatoxb")
 
-
-
 end subroutine da_transfer_kmatoxb
 
 

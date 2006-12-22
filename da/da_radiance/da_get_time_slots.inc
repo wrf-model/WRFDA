@@ -47,3 +47,5 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
    if (trace_use) call da_trace_exit("da_get_time_slots")
 
 end subroutine da_get_time_slots
+
+

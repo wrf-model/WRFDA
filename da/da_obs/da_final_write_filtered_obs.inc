@@ -114,3 +114,5 @@ loop_level: do i = 1, platform%info%levels
    if (trace_use) call da_trace_exit("da_final_write_filtered_obs")
 
 end subroutine da_final_write_filtered_obs 
+
+

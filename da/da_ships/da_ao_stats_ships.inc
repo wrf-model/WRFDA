@@ -96,3 +96,5 @@ subroutine da_ao_stats_ships( stats_unit, oi, re )
    end if
 
 end subroutine da_ao_stats_ships
+
+

@@ -36,3 +36,4 @@ subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
 
 end subroutine da_balance_geoterm_adj
 
+

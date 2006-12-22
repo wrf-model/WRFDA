@@ -33,7 +33,7 @@ real function da_unifva (kdum)
    save NIV,NIY
    DATA NIV /JPNTAB*0/, NIY /0/
 
-   ! BEGin MAin
+   ! begin main
    ! ----------
 
    if ( (KDUM.LE.0).OR.(NIY.EQ.0) ) then
@@ -62,3 +62,5 @@ real function da_unifva (kdum)
    DA_UNifVA   = Min( PPAM*NIY , PPRNMX )
 
 end function da_unifva
+
+

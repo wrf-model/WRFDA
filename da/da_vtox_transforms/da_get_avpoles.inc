@@ -87,4 +87,3 @@ subroutine da_get_avpoles(u,v,       &
 end subroutine da_get_avpoles
 
 
-

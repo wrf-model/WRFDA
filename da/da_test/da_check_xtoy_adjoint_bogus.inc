@@ -42,3 +42,5 @@ subroutine da_check_xtoy_adjoint_bogus( oi, y, adjtest_lhs, pertile_lhs )
    end if
 
 end subroutine da_check_xtoy_adjoint_bogus
+
+

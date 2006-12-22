@@ -39,3 +39,5 @@ subroutine da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
                       sqrt(pseudo%rms_err%q/real(nq))
 
 end subroutine da_print_stats_pseudo
+
+

@@ -78,5 +78,3 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
 end subroutine da_recursive_filter_1d_adj
 
 
-
-

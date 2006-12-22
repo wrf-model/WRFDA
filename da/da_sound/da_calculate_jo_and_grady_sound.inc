@@ -62,6 +62,6 @@ subroutine da_calculate_jo_and_grady_sound( iv, re, jo, jo_grad_y )
    jo % sound_t = 0.5 * jo % sound_t
    jo % sound_q = 0.5 * jo % sound_q
 
-end subroutine DA_Calculate_Jo_and_GradY_sound
+end subroutine da_calculate_jo_and_grady_sound
 
 

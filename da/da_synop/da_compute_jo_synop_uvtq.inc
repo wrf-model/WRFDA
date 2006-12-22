@@ -22,5 +22,3 @@ subroutine da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo )
 end subroutine da_compute_jo_synop_uvtq
 
 
-
-

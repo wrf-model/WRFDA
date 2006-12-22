@@ -40,4 +40,3 @@ subroutine da_calculate_grady_metar( iv, re, jo_grad_y )
 end subroutine da_calculate_grady_metar
 
 
-

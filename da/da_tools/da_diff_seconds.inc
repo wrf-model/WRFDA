@@ -97,3 +97,4 @@ real function da_diff_seconds(date_char_1, date_char_2)
 
 end function da_diff_seconds
 
+

@@ -24,5 +24,3 @@ subroutine da_compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo )
 end subroutine da_compute_jo_sonde_sfc_uvtq
 
 
-
-

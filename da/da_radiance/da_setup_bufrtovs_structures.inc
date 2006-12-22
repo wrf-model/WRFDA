@@ -147,5 +147,6 @@ SUBROUTINE da_setup_bufrtovs_structures( xp, ob, iv )
 
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
-END SUBROUTINE da_setup_bufrtovs_structures
+end subroutine da_setup_bufrtovs_structures
+
 

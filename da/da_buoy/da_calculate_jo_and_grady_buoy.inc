@@ -51,4 +51,3 @@ subroutine da_calculate_jo_and_grady_buoy( iv, re, jo, jo_grad_y )
 end subroutine da_calculate_jo_and_grady_buoy
 
 
-

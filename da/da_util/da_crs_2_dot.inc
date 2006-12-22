@@ -31,3 +31,5 @@ subroutine da_crs_2_dot (crs, dot)
    dot (ix, 1) = crs (ix-1,   1)
 
 end subroutine da_crs_2_dot
+
+

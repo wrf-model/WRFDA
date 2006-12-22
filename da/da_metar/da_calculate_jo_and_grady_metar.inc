@@ -1,4 +1,4 @@
-subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
+subroutine da_calculate_jo_and_grady_metar( iv, re, jo, jo_grad_y )
 
   implicit none
 
@@ -54,5 +54,6 @@ subroutine DA_Calculate_Jo_and_GradY_metar( iv, re, jo, jo_grad_y )
 
   if (trace_use) call da_trace_exit("da_calculate_jo_and_grady_metar")
      
-end subroutine DA_Calculate_Jo_and_GradY_metar
+end subroutine da_calculate_jo_and_grady_metar
+
 

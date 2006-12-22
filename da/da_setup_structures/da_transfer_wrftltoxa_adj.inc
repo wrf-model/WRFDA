@@ -223,8 +223,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
    grid%dyn_opt = ndynopt
    call nl_set_dyn_opt ( 1 , DYN_EM )
 
-if (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
-
+   if (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
 
 end subroutine da_transfer_wrftltoxa_adj
 

@@ -89,7 +89,6 @@ subroutine da_transfer_xatokma( xbx, grid, &
 
    if (trace_use) call da_trace_exit("da_transfer_xatokma")
 
-
 end subroutine da_transfer_xatokma
 
 

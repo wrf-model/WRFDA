@@ -96,6 +96,3 @@ subroutine da_ao_stats_sonde_sfc( stats_unit, oi, re )
 end subroutine da_ao_stats_sonde_sfc
 
 
-
-
-

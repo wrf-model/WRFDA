@@ -10,3 +10,5 @@ subroutine da_read_ssmi_real_array(aa,nn,i0,i_step)
     read (unit=char_ned (ii:ii+8),fmt='((f7.2,2X))') aa(i)
   end do
 end subroutine da_read_ssmi_real_array
+
+

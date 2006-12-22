@@ -228,3 +228,5 @@ subroutine da_write_diagnostics( ob, iv, re, y, xp, xa, j )
    if (trace_use) call da_trace_exit("da_write_diagnostics")
 
 end subroutine da_write_diagnostics
+
+

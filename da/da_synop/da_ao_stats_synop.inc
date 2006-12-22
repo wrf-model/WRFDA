@@ -97,6 +97,3 @@ subroutine da_ao_stats_synop( stats_unit, oi, re )
 end subroutine da_ao_stats_synop
 
 
-
-
-

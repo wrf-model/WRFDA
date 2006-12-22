@@ -1,4 +1,4 @@
-subroutine DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
+subroutine da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )
 
    implicit none
 
@@ -6,13 +6,13 @@ subroutine DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
    integer,           intent(inout) :: ngpsref
    type (stats_gpsref_type), intent(in)  :: GPSRef
    
-   write(unit=stats_unit, fmt='(a/)') &
+   write (unit=stats_unit, fmt='(a/)') &
         '   var           ref(m)  n    k'  
 
-   write(unit=stats_unit, fmt='(a,i16)') &
+   write (unit=stats_unit, fmt='(a,i16)') &
         '  Number: ', ngpsref
 
-   if(ngpsref < 1) ngpsref = 1
+   if (ngpsref < 1) ngpsref = 1
    
    write(unit=stats_unit, fmt='((a,f12.4,2i5))') &
         ' Minimum(n,k): ', GPSRef%minimum%ref,    &
@@ -21,5 +21,6 @@ subroutine DA_Print_Stats_GPSRef( stats_unit, ngpsref, GPSRef )
         ' Average     : ', GPSRef%average%ref/real(ngpsref),    &
         '    RMSE     : ', sqrt(GPSRef%rms_err%ref/real(ngpsref))
 
-end subroutine DA_Print_Stats_GPSRef
+end subroutine da_print_stats_gpsref
+
 

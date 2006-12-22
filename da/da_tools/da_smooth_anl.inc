@@ -60,3 +60,5 @@ subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSdoT)
    deallocate (SLABNEW)
 
 end subroutine da_smooth_anl
+
+

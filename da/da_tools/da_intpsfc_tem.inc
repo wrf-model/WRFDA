@@ -1,159 +1,144 @@
 subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
-!------------------------------------------------------------------------------!
-!
-! Correct temperature between two levels.
-!
-! Reference: 
-! ---------
-! The use of surface observations in four dimensional data assimilation
-!  Using a mesoscale model.
-!  Ruggiero et al., 1996, Monthly Weather Review, Volume 124, 1018-1033
-!
-!------------------------------------------------------------------------------!
 
-      implicit none
+   !----------------------------------------------------------------------------
+   ! Correct temperature between two levels.
+   !
+   ! Reference: 
+   ! ---------
+   ! The use of surface observations in four dimensional data assimilation
+   !  Using a mesoscale model.
+   !  Ruggiero et al., 1996, Monthly Weather Review, Volume 124, 1018-1033
+   !
+   !----------------------------------------------------------------------------
 
-      real,    intent (out):: val
-      integer, intent (in) :: kts, kte
-      real,    intent (in) :: ho, po, to
-      real, dimension (kts:kte), intent (in) :: height, pressure, temp
+   implicit none
 
-      real, dimension (kts:kte) :: prs_mb
-! JRB
-!      real    :: dth_12, dth_21, dth_sfc, dth_obs
-!     real    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
-      real    :: dth_21, dth_sfc, dth_obs
-      real    :: dhe_12, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
-      real    :: th_100mb, th_200mb, th_obs, th_sfc
-      real    :: th_obs_int, th_sfc_int
-      real    :: pdif, rcp
-      integer :: k_100mb, k_200mb, jk
-      integer :: inc_100mb, inc_200mb
+   real,    intent (out):: val
+   integer, intent (in) :: kts, kte
+   real,    intent (in) :: ho, po, to
+   real, dimension (kts:kte), intent (in) :: height, pressure, temp
 
-!------------------------------------------------------------------------------!
-      rcp = gas_constant/cp
+   real, dimension (kts:kte) :: prs_mb
+   ! calculated but never used
+   !      real    :: dth_12, dth_21, dth_sfc, dth_obs
+   !     real    :: dhe_12, dhe_21, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+   real    :: dth_21, dth_sfc, dth_obs
+   real    :: dhe_12, dhe_sfc1, dhe_obs1, dhe_sfc2, dhe_obs2
+   real    :: th_100mb, th_200mb, th_obs, th_sfc
+   real    :: th_obs_int, th_sfc_int
+   real    :: pdif, rcp
+   integer :: k_100mb, k_200mb, jk
+   integer :: inc_100mb, inc_200mb
 
-! 1.   FinD LEVELS: MODEL SURFACE + 100hPa AND MODEL SURFACE + 200hPa AR OBS LOC
-! ==============================================================================
+   rcp = gas_constant/cp
 
-! 1.1 Convert model pressure profile from Pa to hPa  
-!     ---------------------------------------------
+   ! 1.Find levels: model surface + 100hpa and model surface + 200hpa ar obs loc
+   ! ===========================================================================
 
-       prs_mb = pressure / 100.
+   ! 1.1 Convert model pressure profile from Pa to hPa  
 
-! 1.2  Find levels surface + 100hPA
-!      ----------------------------
+   prs_mb = pressure / 100.
 
-       inc_100mb = 100.
-       k_100mb   = kts
+   ! 1.2  Find levels surface + 100hPA
 
+   inc_100mb = 100.0
+   k_100mb   = kts
 
-       do jk =  kts+1, kte
-          pdif = prs_mb (kts) - prs_mb (jk)
-          if (pdif .GE. inc_100mb) then
-              k_100mb = jk
-              exit
-          end if
-       end do
+   do jk =  kts+1, kte
+      pdif = prs_mb (kts) - prs_mb (jk)
+      if (pdif .GE. inc_100mb) then
+          k_100mb = jk
+          exit
+      end if
+   end do
 
-! 1.2  Find levels surface + 200hPA
-!      ----------------------------
+   ! 1.2  Find levels surface + 200hPA
 
-       inc_200mb = 200.
-       k_200mb   = kts
+   inc_200mb = 200.0
+   k_200mb   = kts
 
-       do jk =  kts+1, kte
-          pdif = prs_mb (kts) - prs_mb (jk)
-          if (pdif .GE. inc_200mb) then
-              k_200mb = jk
-              exit
-          end if
-       end do
+   do jk =  kts+1, kte
+      pdif = prs_mb (kts) - prs_mb (jk)
+      if (pdif .GE. inc_200mb) then
+          k_200mb = jk
+          exit
+      end if
+   end do
 
-! 1.3  Check consistency 
-!      -----------------
+   ! 1.3  Check consistency 
 
-       if ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
-           (k_200mb .LT. k_100mb)) then
-            write (unit=message(1),fmt='(A)') ' CANNOT FinD SFC + 200hPA AND SFC + 100hPA' 
-            write (unit=message(2),fmt='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
-            write (unit=message(3),fmt='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
-            write (unit=message(4),fmt='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
-          call da_warning(__FILE__,__LINE__,message(1:4))
-          val = missing_r
-          return
-       end if
+   if ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
+        (k_200mb .LT. k_100mb)) then
+      write (unit=message(1),fmt='(A)') ' CANNOT FinD SFC + 200hPA AND SFC + 100hPA' 
+      write (unit=message(2),fmt='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
+      write (unit=message(3),fmt='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
+      write (unit=message(4),fmt='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 
+      call da_warning(__FILE__,__LINE__,message(1:4))
+      val = missing_r
+      return
+   end if
 
+   ! 2.  POTENTIAL TEMPERATURE 
+   ! =========================
 
-! 2.  POTENTIAL TEMPERATURE 
-! =========================
+   ! 2.1 Potential temperature at 100hPa above model surface
 
-! 2.1 Potential temperature at 100hPa above model surface
-!     ---------------------------------------------------
+   th_100mb = temp (k_100mb) * (1000. / prs_mb (k_100mb))**rcp
 
-      th_100mb = temp (k_100mb) * (1000. / prs_mb (k_100mb))**rcp
+   ! 2.2 Potential temperature at 200hPa above model surface
 
-! 2.2 Potential temperature at 200hPa above model surface
-!     ---------------------------------------------------
+   th_200mb = temp (K_200mb) * (1000. / prs_mb (k_200mb))**rcp
 
-      th_200mb = temp (K_200mb) * (1000. / prs_mb (k_200mb))**rcp
+   ! 2.3 Potential temperature at observation location
 
-! 2.3 Potential temperature at observation location
-!     ---------------------------------------------
-
-      th_obs   = to * (1000. / (po/100.)) ** rcp
+   th_obs   = to * (1000. / (po/100.)) ** rcp
 
 
-! 3.  LAPSE RATE BETWEEN SURFACE+200hPA AND SURFACE+100hPa
-! =========================================================
+   ! 3.  LAPSE RATE BETWEEN SURFACE+200hPA AND SURFACE+100hPa
+   ! =========================================================
 
-! 3.1 Potential temperature increment
-!     -------------------------------
+   ! 3.1 Potential temperature increment
     
-      dth_21 = th_100mb - th_200mb
-! JRB never used
-!      dth_12 = th_200mb - th_100mb
+   dth_21 = th_100mb - th_200mb
+   ! never used
+   ! dth_12 = th_200mb - th_100mb
 
-! 3.1 Height increments
-!     ----------------
+   ! 3.1 Height increments
     
-! JRB never used
-!      dhe_21   = height (k_100mb )- height (k_200mb)
-      dhe_sfc1 = height (k_100mb )- height (kts)
-      dhe_obs1 = height (k_100mb )- ho
+   ! never used
+   ! dhe_21   = height (k_100mb )- height (k_200mb)
+   dhe_sfc1 = height (k_100mb )- height (kts)
+   dhe_obs1 = height (k_100mb )- ho
 
-      dhe_12   = height (k_200mb )- height (k_100mb)
-      dhe_sfc2 = height (k_200mb )- height (kts)
-      dhe_obs2 = height (k_200mb )- ho
+   dhe_12   = height (k_200mb )- height (k_100mb)
+   dhe_sfc2 = height (k_200mb )- height (kts)
+   dhe_obs2 = height (k_200mb )- ho
 
-! 3.2 Extrapolated potential temperature at model surface and observation loc
-!     -----------------------------------------------------------------------
+   ! 3.2 Extrapolated potential temperature at model surface and observation loc
 
-      th_sfc_int = th_100mb + (dth_21/dhe_12) * dhe_sfc1 
-      th_obs_int = th_100mb + (dth_21/dhe_12) * dhe_obs1 
+   th_sfc_int = th_100mb + (dth_21/dhe_12) * dhe_sfc1 
+   th_obs_int = th_100mb + (dth_21/dhe_12) * dhe_obs1 
 
 
-! 4.  BRinG TEMPERATURE ONTO MODEL SURFACE
-! ========================================
+   ! 4.  BRING TEMPERATURE ONTO MODEL SURFACE
+   ! ========================================
 
-! 4.1 Difference at observation locations
-!     -----------------------------------
+   ! 4.1 Difference at observation locations
 
-      dth_obs = th_obs_int - th_obs
+   dth_obs = th_obs_int - th_obs
 
-! 4.2 Difference at model surface
-!     ---------------------------
+   ! 4.2 Difference at model surface
 
-      dth_sfc = (dhe_sfc2/dhe_obs2) * dth_obs
+   dth_sfc = (dhe_sfc2/dhe_obs2) * dth_obs
 
-! 4.3 Potentiel temperature brought to model surface
-!     ----------------------------------------------
+   ! 4.3 Potentiel temperature brought to model surface
 
-      th_sfc = th_sfc_int - dth_sfc
+   th_sfc = th_sfc_int - dth_sfc
 
-! 4.3 Corresponding Temperature
-!     -------------------------
+   ! 4.3 Corresponding Temperature
 
-      val  = th_sfc * (prs_mb (kts) / 1000.)**rcp
+   val  = th_sfc * (prs_mb (kts) / 1000.)**rcp
 
 end subroutine da_intpsfc_tem
+
+

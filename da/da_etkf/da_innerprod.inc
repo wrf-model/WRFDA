@@ -20,3 +20,4 @@ subroutine da_innerprod(mata,matc,ni,nj)
 
 end subroutine da_innerprod
 
+

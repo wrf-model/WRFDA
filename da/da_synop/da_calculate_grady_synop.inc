@@ -45,4 +45,3 @@ subroutine da_calculate_grady_synop( iv, re, jo_grad_y )
 end subroutine da_calculate_grady_synop
 
 
-
