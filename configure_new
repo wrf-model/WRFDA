@@ -40,11 +40,11 @@ elif [ "$option" = "be" ] ; then
     DA_CORE=1
     EM_CORE=1
 else
-   echo "Please type : <configure_new wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile wrf,"
-   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
-   echo "    or type : <configure_new wrfvar> to compile wrfvar."
-   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
+   echo "Please type : <configure_new wrfvar> to compile wrfvar."
    echo "    or type : <configure_new be> to compile be."
+   echo "    or type : <configure_new wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile WRF,"
+   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
+   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
    exit
 fi
 
