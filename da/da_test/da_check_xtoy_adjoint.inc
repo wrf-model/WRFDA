@@ -82,7 +82,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
       call da_transform_xtotpw( xa, xb)
 
       ! GPS Refractivity:
-      if ( use_gpsrefobs) then
+      if (use_gpsrefobs) then
          call da_transform_xtogpsref_lin(xa, xb, xp)
       end if
 
@@ -150,7 +150,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    if (use_GpspwObs) &
       call da_check_xtoy_adjoint_gpspw( iv, y, partial_lhs, pertile_lhs)
 
-   if ( use_GpsrefObs) &
+   if (use_GpsrefObs) &
       call da_check_xtoy_adjoint_gpsref( iv, y, partial_lhs, pertile_lhs)
    
    if (use_SsmiTbObs .or. Use_SsmiRetrievalObs) &
@@ -190,7 +190,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
        use_GpsrefObs .or.                                    &
        use_SsmiTbObs .or. use_SsmiRetrievalObs) then
 
-      if ( Use_SsmiTbObs) call da_transform_xtotb_adj (xa, xb)
+      if (Use_SsmiTbObs) call da_transform_xtotb_adj (xa, xb)
 
       ! for PW
       call da_transform_xtotpw_adj (xa, xb)

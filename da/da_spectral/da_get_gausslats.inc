@@ -1,4 +1,4 @@
-subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
+subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
 
    implicit none
 
@@ -8,20 +8,20 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    !  of degree <= 2n-1 can be calculated using
    !  0.5 * sum(GaussWgts(:)*Pn(:)*f(:)) with the values at Gaussian latitudes.
    !  See eqns 77-79 of 'The Spectral Technique' M.Jarraud and A.J.Simmons
-   !  (1983 ECMWF Seminar or 1990 ECMWF Lecture Notes).
+   ! (1983 ECMWF Seminar or 1990 ECMWF Lecture Notes).
    !  The orthogonality and normalisation of the Legendre polynomials
    !  checked in this way are very accurate on the Cray, but somewhat
-   !  less accurate on the HPs (32-bit arithmetic).
+   !  less accurate on the HPs(32-bit arithmetic).
    !  Starting with a regular latitude grid, use Newton-Raphson interpolation
-   !  (with bisection steps to add robustness)
+   ! (with bisection steps to add robustness)
    !  to find the zeros of the Legendre polynomial Pn(x), 0 <= x < 1,
-   !  the negative roots (-1 < x < 0) are set by symmetry.
+   !  the negative roots(-1 < x < 0) are set by symmetry.
    !  ASin(x) gives the Gaussian latitudes.
    !  This gives slightly better results than finding the roots of Pn(sin(lat))
-   !  (Algorithm from Numerical Recipies (Fortran version), 1989, p 258)
+   ! (Algorithm from Numerical Recipies(Fortran version), 1989, p 258)
 
    integer, intent(in)    :: nj                ! Gridpoints in N-S direction.
-   real, intent(out)      :: glats(1:nj)       ! Gaussian latitudes (S->N, radians).
+   real, intent(out)      :: glats(1:nj)       ! Gaussian latitudes(S->N, radians).
    real, intent(out)      :: gwgts(1:nj)       ! Gaussian weights.
    real, intent(out), optional :: sinlat(1:nj) ! sin(Latitude).
    real, intent(out), optional :: coslat(1:nj) ! cos(Latitude).
@@ -39,7 +39,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    real                   :: dfr               ! 1/Pn'(x)
    real                   :: dx, dxold         ! step size, previous step
 
-   k = (nj + 2) / 2
+   k =(nj + 2) / 2
    xj = 0.0
    z  = 1.0
 
@@ -48,7 +48,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
    if (mod(nj,2) == 1) then
       call da_asslegpol(nj-1,0,xj,z,fn1)
       glats(k) = 0.0
-      gwgts(k) = 2.0 * (1.0 - xj * xj) / (real(nj) * fn1)**2
+      gwgts(k) = 2.0 *(1.0 - xj * xj) /(real(nj) * fn1)**2
       k = k+1
    end if
 
@@ -62,9 +62,9 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       z  = sqrt(1.0-xj*xj)
       call da_asslegpol(nj, 0, xj, z, fj)
 
-      if ( fj >= 0.0 .AND. fjold < 0.0 .OR. fj <  0.0 .AND. fjold >= 0.0 ) then
+      if (fj >= 0.0 .AND. fjold < 0.0 .OR. fj <  0.0 .AND. fjold >= 0.0) then
 
-         ! Perform simple interpolation to improve roots (find Gaussian latitudes)
+         ! Perform simple interpolation to improve roots(find Gaussian latitudes)
          if (fjold < 0.0) then  ! Orient the search so that fn(x1) < 0
             x1 = xjold
             x2 = xj
@@ -79,7 +79,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
          z = sqrt(1.0-x*x)
          call da_asslegpol(nj, 0, x, z, fn)
          call da_asslegpol(nj-1,0,x,z,fn1)
-         dfr = (1.0 - x * x) / (real(nj)*(fn1 - x * fn))
+         dfr =(1.0 - x * x) /(real(nj)*(fn1 - x * fn))
 
          do i = 1, maxiter
 
@@ -87,7 +87,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
             if (((x-x1)-fn*dfr)*((x-x2)-fn*dfr) > 0.0 &
                .OR. ABS(2.0*fn) > ABS(dxold/dfr)) then
                dxold = dx
-               dx = 0.5 * (x1 - x2)
+               dx = 0.5 *(x1 - x2)
                x = x2 + dx
             else ! Newton-Raphson step
                dxold  = dx
@@ -99,7 +99,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
             z = sqrt(1.0-x*x)
             call da_asslegpol(nj,0,x,z,fn)
             call da_asslegpol(nj-1,0,x,z,fn1)
-            dfr = (1.0 - x * x) / (real(nj)*(fn1 - x * fn))
+            dfr =(1.0 - x * x) /(real(nj)*(fn1 - x * fn))
 
             if (fn < 0.0) then   ! Maintain the bracket on the root
                x1 = x
@@ -110,13 +110,13 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
 
          if (i >= MaxIter) then
             call da_error(__FILE__,__LINE__, &
-              (/"No convergence finding Gaussian latitudes"/))
+             (/"No convergence finding Gaussian latitudes"/))
          end if
 
          glats(k) = ASin(x)
          z = sqrt(1.0-x*x)
          call da_asslegpol(nj-1,0,x,z,fn1)
-         gwgts(k) = 2.0*(1.0 - x * x) / (real(nj) * fn1)**2
+         gwgts(k) = 2.0*(1.0 - x * x) /(real(nj) * fn1)**2
          glats(nj+1-k) = -glats(k)
          gwgts(nj+1-k) = gwgts(k)
          k=k+1
@@ -138,7 +138,7 @@ subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat )
       coslat(nj+1-j) = coslat(j)
    end do
 
-   if ( (nj+1) / 2 == nj/2 + 1 ) then  ! Odd, then equator point:
+   if ((nj+1) / 2 == nj/2 + 1) then  ! Odd, then equator point:
       glats(nj/2+1) = 0.0
       sinlat(nj/2+1) = 0.0
       coslat(nj/2+1) = 1.0

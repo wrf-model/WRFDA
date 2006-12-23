@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_synop( iv, re, jo_grad_y )
+subroutine da_calculate_grady_synop( iv, re, jo_grad_y)
 
   !-------------------------------------------------------------------------
   ! Purpose: Applies obs inverse on re-vector
@@ -15,7 +15,7 @@ subroutine da_calculate_grady_synop( iv, re, jo_grad_y )
   integer                      :: n
 
 
-  if ( iv%num_synop > 0 ) then
+  if (iv%num_synop > 0) then
      do n=1, iv%num_synop
         if(iv%synop(n)%u%qc < obs_qc_pointer) re%synop(n)%u = 0.0
         if(iv%synop(n)%v%qc < obs_qc_pointer) re%synop(n)%v = 0.0

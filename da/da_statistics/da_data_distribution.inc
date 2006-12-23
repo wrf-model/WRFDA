@@ -4,6 +4,8 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    !---------------------------------------------------------------------------
    ! PURPOSE: Bin ob data to get distribution.
    !---------------------------------------------------------------------------
+
+   implicit none
    
    character (LEN=*), intent(in)    :: ob_name       ! Data description.
    integer, intent(in)              :: num_obs       ! Number of obs.

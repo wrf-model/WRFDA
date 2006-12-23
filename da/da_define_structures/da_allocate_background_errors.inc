@@ -1,5 +1,5 @@
-subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
-                                           be_evec_loc, be_sub )
+subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
+                                           be_evec_loc, be_sub)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate components of wrfvar background errors.
@@ -20,7 +20,6 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
 
    if (trace_use) call da_trace_entry("da_allocate_background_errors")
 
-
    !--------------------------------------------------------------------------
    ! [1.0] Initialise:
    !--------------------------------------------------------------------------
@@ -30,11 +29,11 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
    !--------------------------------------------------------------------------
    ! [2.0] Allocate components of be_sub structure:
    !--------------------------------------------------------------------------
-   if ( mz > 0 ) then
 
-      allocate ( be_sub % val(1:jy,1:mz) )
+   if (mz > 0) then
+      allocate  (be_sub % val(1:jy,1:mz))
       
-      if ( vert_corr == 2 ) then
+      if (vert_corr == 2) then
 
          !--------------------------------------------------------------------
          ! [3.0] Allocate eigenvalues of vertical error covariance matrix:
@@ -43,7 +42,7 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
          if (vert_evalue == 1) then
             ! use global eigenvalues:
             do m = 1, mz
-               be_sub % val(1:jy,m) = sqrt( l(m) )
+               be_sub % val(1:jy,m) = sqrt (l(m))
             end do
          else
             ! use eigenvalues varying with j-direction.
@@ -56,21 +55,21 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
                   end if
                end do
             end do
-            be_sub % val(1:jy,1:mz) = sqrt( be_eval_loc(1:jy,1:mz) )            
+            be_sub % val(1:jy,1:mz) = sqrt (be_eval_loc(1:jy,1:mz))            
          end if
  
          if (print_detail_be) then
             write(unit=stdout,fmt='(/A,A)')' j*k Eigenvalues for ', be_sub % name
-            call da_array_print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues' )
+            call da_array_print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues')
          end if
 
          !----------------------------------------------------------------------- 
          ! [4.0] Allocate global eigenvectors of vertical error cov.:
          !-----------------------------------------------------------------------
 
-         allocate ( be_sub % evec(1:jy,1:kz,1:mz) )
+         allocate  (be_sub % evec(1:jy,1:kz,1:mz))
          
-         if ( vert_evalue == 1 ) then
+         if (vert_evalue == 1) then
             ! use global eigenvectors:
             do j = 1, jy
                be_sub % evec(j,1:kz,1:mz) = e(1:kz,1:mz)
@@ -82,12 +81,12 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
          
          if (print_detail_be) then      
             write(unit=stdout,fmt='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
-            call da_array_print( 2, be_sub % evec(1,1:kz,1:mz), &
-                                 'Eigenvectors for j=1' )
+            call da_array_print (2, be_sub % evec(1,1:kz,1:mz), &
+                                 'Eigenvectors for j=1')
          
             write(unit=stdout,fmt='(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
-            call da_array_print( 2, be_sub % evec(jy,1:kz,1:mz), &
-                                 'Eigenvectors for j=jy' )
+            call da_array_print (2, be_sub % evec(jy,1:kz,1:mz), &
+                                 'Eigenvectors for j=jy')
          end if
 
          allocate (be_sub%val_g(1:mz))
@@ -95,23 +94,21 @@ subroutine da_allocate_background_errors ( jy, kz, l, e, be_eval_loc, &
   
          be_sub % val_g(1:mz) = l(1:mz)
          be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
-      else if ( vert_corr == 1 ) then
+      else if (vert_corr == 1) then
          if (print_detail_be) then
            write(unit=stdout,fmt='(A)') &
               'Change be std dev to variance in NMC code'
          end if
          be_sub % val(1:jy,1:mz) = be_eval_loc(1:jy,1:mz)
-
       end if
 
       !-----------------------------------------------------------------------
       ! [2.2] Allocate recursive filter lengthscales and variance scaling factors:
       !-----------------------------------------------------------------------
 
-      allocate( be_sub % rf_alpha(1:mz) )
+      allocate (be_sub % rf_alpha(1:mz))
 
-      be_sub % rf_alpha(1:mz) = 1.0
-      
+      be_sub % rf_alpha(1:mz) = 1.0    
    end if
 
    if (trace_use) call da_trace_exit("da_allocate_background_errors")

@@ -1,5 +1,5 @@
 subroutine da_res_generic_set_info( res_generic, proc_domain, &
-                                      obs_global_index )
+                                      obs_global_index)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -9,25 +9,25 @@ subroutine da_res_generic_set_info( res_generic, proc_domain, &
    
    implicit none
 
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
-   logical,                      intent(in   ) :: proc_domain
-   integer,                      intent(in   ) :: obs_global_index
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
+   logical,                      intent(in  ) :: proc_domain
+   integer,                      intent(in  ) :: obs_global_index
 
    res_generic%proc_domain = proc_domain
    res_generic%obs_global_index = obs_global_index
 end subroutine da_res_generic_set_info
 
 
-
-subroutine da_res_sound_create_template( template )
+subroutine da_res_sound_create_template( template)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Return storage template for specific type stored as 
    !           residual_generic_type.
    !---------------------------------------------------------------------------
+
    implicit none
 
-   type (residual_template_type), intent(inout) :: template
+   type(residual_template_type), intent(inout) :: template
 
    ! only vector data for this type
    template%lbnd = 1
@@ -36,10 +36,8 @@ subroutine da_res_sound_create_template( template )
 end subroutine da_res_sound_create_template
 
 
-
-
 subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
-                                      res_generic )
+                                      res_generic)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -55,15 +53,15 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
 
    implicit none
 
-   type (residual_sound_type),   intent(in   ) :: res_specific ! specific type
-   integer,                      intent(in   ) :: iv_num_levels ! levels
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   type(residual_sound_type),   intent(in  ) :: res_specific ! specific type
+   integer,                      intent(in  ) :: iv_num_levels ! levels
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
-   type (residual_template_type) :: template
+   type(residual_template_type) :: template
    integer :: n
 
-   call da_res_sound_create_template( template )
-   allocate( res_generic%values(template%lbnd:template%ubnd) )
+   call da_res_sound_create_template( template)
+   allocate( res_generic%values(template%lbnd:template%ubnd))
    ! only vector data for this type
    ! store references to vector data
    res_generic%values(1)%ptr => res_specific%u
@@ -76,17 +74,16 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
       !TBH:         HOWEVER, we would have to add "num_levels" state to 
       !TBH:         residual_generic_type AND send this around.  Better to fix 
       !TBH:         allocation in specific types to avoid wasting memory!  
-      if ( size(res_generic%values(n)%ptr) /= iv_num_levels ) then
+      if (size(res_generic%values(n)%ptr) /= iv_num_levels) then
          call da_error(__FILE__,__LINE__, &
-            (/'residual_sound_to_generic:  mismatched levels'/))
+           (/'residual_sound_to_generic:  mismatched levels'/))
       end if
    end do
 
 end subroutine da_res_sound_to_generic
 
 
-
-subroutine da_res_sound_from_generic( res_generic, res_specific )
+subroutine da_res_sound_from_generic( res_generic, res_specific)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -95,10 +92,11 @@ subroutine da_res_sound_from_generic( res_generic, res_specific )
    !           res_specific.  Pointer manipulation is used for vector data, no 
    !           vector data is copied.  Scalar data is copied. 
    !---------------------------------------------------------------------------
+
    implicit none
 
-   type (residual_generic_type), intent(in   ) :: res_generic  ! generic type
-   type (residual_sound_type),   intent(inout) :: res_specific ! specific type
+   type(residual_generic_type), intent(in  ) :: res_generic  ! generic type
+   type(residual_sound_type),   intent(inout) :: res_specific ! specific type
 
    ! only vector data for this type
    ! store references to vector data
@@ -110,8 +108,7 @@ subroutine da_res_sound_from_generic( res_generic, res_specific )
 end subroutine da_res_sound_from_generic
 
 
-
-subroutine da_res_synop_create_template( template )
+subroutine da_res_synop_create_template( template)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Return storage template for specific type stored as 
@@ -120,7 +117,7 @@ subroutine da_res_synop_create_template( template )
 
    implicit none
 
-   type (residual_template_type), intent(inout) :: template
+   type(residual_template_type), intent(inout) :: template
 
    ! only scalar data for this type
    template%lbnd = 0
@@ -129,10 +126,8 @@ subroutine da_res_synop_create_template( template )
 end subroutine da_res_synop_create_template
 
 
-
-
 subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
-                                      res_generic )
+                                      res_generic)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -148,20 +143,20 @@ subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
 
    implicit none
 
-   type (residual_synop_type),   intent(in   ) :: res_specific ! specific type
-   integer,                      intent(in   ) :: iv_num_levels ! levels
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   type(residual_synop_type),   intent(in  ) :: res_specific ! specific type
+   integer,                      intent(in  ) :: iv_num_levels ! levels
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
-   type (residual_template_type) :: template
+   type(residual_template_type) :: template
 
    ! use to avoid compiler warning
-   if  (iv_num_levels==0) then
+   if (iv_num_levels==0) then
    end if
 
-   call da_res_synop_create_template( template )
-   allocate( res_generic%values(template%lbnd:template%ubnd) )
+   call da_res_synop_create_template( template)
+   allocate( res_generic%values(template%lbnd:template%ubnd))
    ! only scalar data for this type
-   allocate( res_generic%values(0)%ptr(5) )
+   allocate( res_generic%values(0)%ptr(5))
    ! copy scalar data
    res_generic%values(0)%ptr(1) = res_specific%u
    res_generic%values(0)%ptr(2) = res_specific%v
@@ -172,9 +167,7 @@ subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
 end subroutine da_res_synop_to_generic
 
 
-
-
-subroutine da_res_synop_from_generic( res_generic, res_specific )
+subroutine da_res_synop_from_generic( res_generic, res_specific)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Eliminate redundant code for many obs types.  
@@ -183,10 +176,11 @@ subroutine da_res_synop_from_generic( res_generic, res_specific )
    !           res_specific.  Pointer manipulation is used for vector data, no 
    !           vector data is copied.  Scalar data is copied.
    !---------------------------------------------------------------------------
+
    implicit none
 
-   type (residual_generic_type), intent(in   ) :: res_generic  ! generic type
-   type (residual_synop_type),   intent(inout) :: res_specific ! specific type
+   type(residual_generic_type), intent(in  ) :: res_generic  ! generic type
+   type(residual_synop_type),   intent(inout) :: res_specific ! specific type
 
    ! only scalar data for this type
    ! copy scalar data
@@ -199,9 +193,7 @@ subroutine da_res_synop_from_generic( res_generic, res_specific )
 end subroutine da_res_synop_from_generic
 
 
-
-
-subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template )
+subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Create a y_facade_type containing specified number of 
@@ -215,28 +207,27 @@ subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template )
    !           will be copied into them.  
    !
    !---------------------------------------------------------------------------
+
    implicit none
 
-   type (y_facade_type),          intent(inout) :: slice ! selected residual obs
-   integer,                       intent(in   ) :: num_obs
-   integer,                       intent(in   ) :: num_obs_glo
-   type (residual_template_type), optional, intent(in   ) :: template
+   type(y_facade_type),          intent(inout) :: slice ! selected residual obs
+   integer,                       intent(in  ) :: num_obs
+   integer,                       intent(in  ) :: num_obs_glo
+   type(residual_template_type), optional, intent(in  ) :: template
    ! Local declarations
    integer :: n
 
    slice%num_obs     = num_obs
    slice%num_obs_glo = num_obs_glo
-   allocate( slice%obs(slice%num_obs) )
+   allocate( slice%obs(slice%num_obs))
    do n=1, slice%num_obs
-      call da_res_generic_create( slice%obs(n), template=template )
+      call da_res_generic_create( slice%obs(n), template=template)
    end do
 
 end subroutine da_y_facade_create
 
 
-
-
-subroutine da_res_generic_create( res_generic, template )
+subroutine da_res_generic_create( res_generic, template)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Create a residual_generic_type object.  This must be called 
@@ -253,33 +244,31 @@ subroutine da_res_generic_create( res_generic, template )
    !             copied.  Also, proc_domain and obs_global_index fields are 
    !             not copied from the template.  Finally, memory is not allocated 
    !             for vector or scalar data, these pointers 
-   !             (res_generic%values(:)%ptr) are nullified.
+   !            (res_generic%values(:)%ptr) are nullified.
    !---------------------------------------------------------------------------
 
    implicit none
 
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
-   type (residual_template_type), optional, intent(in   ) :: template
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
+   type(residual_template_type), optional, intent(in  ) :: template
    ! Local declarations
    integer :: i
 
-   nullify( res_generic%values )
-   if ( present( template ) ) then
-      allocate( res_generic%values(template%lbnd:template%ubnd) )
+   nullify( res_generic%values)
+   if (present( template)) then
+      allocate( res_generic%values(template%lbnd:template%ubnd))
       do i=template%lbnd, template%ubnd
-         nullify( res_generic%values(i)%ptr )
+         nullify( res_generic%values(i)%ptr)
       end do
    end if
 end subroutine da_res_generic_create
 
 
-
-
-subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
+subroutine da_res_generic_alloc_and_set( res_generic, val_index, values)
 
    ! TOdo:  replace this with a full-blown copy-constructor!  
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Allocates and initializes one of the values (either scalar or 
+   ! PURPOSE:  Allocates and initializes one of the values(either scalar or 
    !           vector) in an already-created residual_generic_type object.  
    !
    ! METHOD:   Allocate pointer and copy data from values.  Note that a call
@@ -288,58 +277,56 @@ subroutine da_res_generic_alloc_and_set( res_generic, val_index, values )
    !           deallocate pointers to vector data.  In this particular case, 
    !           any vector data allocated here is later passed by reference to 
    !           a global specific object via call to residual_*_from_generic() 
-   !           (called from y_type_insert_sound_global()) and later explictly 
+   !          (called from y_type_insert_sound_global()) and later explictly 
    !           deallocated via call to free_global_*().
    !---------------------------------------------------------------------------
 
    implicit none
 
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
-   integer,                      intent(in   ) :: val_index    ! which value
-   real,                         intent(in   ) :: values(:)    ! values
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
+   integer,                      intent(in  ) :: val_index    ! which value
+   real,                         intent(in  ) :: values(:)    ! values
 
-   if ( ( val_index < LBOUND(res_generic%values,1) ) .OR. &
-        ( val_index > UBOUND(res_generic%values,1) ) ) then
+   if (( val_index < LBOUND(res_generic%values,1)) .OR. &
+       ( val_index > UBOUND(res_generic%values,1))) then
       call da_error(__FILE__,__LINE__, &
-         (/'residual_generic_alloc_and_set:  bad val_index'/))
+        (/'residual_generic_alloc_and_set:  bad val_index'/))
    end if
-   allocate( res_generic%values(val_index)%ptr(size(values)) )
+   allocate( res_generic%values(val_index)%ptr(size(values)))
    res_generic%values(val_index)%ptr(:) = values(:)
 
 end subroutine da_res_generic_alloc_and_set
 
 
-
-
-logical function da_res_generic_has_vector( res_generic )
+logical function da_res_generic_has_vector( res_generic)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Returns .true. iff res_generic stores vector values
    !---------------------------------------------------------------------------
 
    implicit none
-   type (residual_generic_type), intent(in) :: res_generic  ! generic type
-   da_res_generic_has_vector = ( UBOUND(res_generic%values,1) > 0 )
+
+   type(residual_generic_type), intent(in) :: res_generic  ! generic type
+   da_res_generic_has_vector =( UBOUND(res_generic%values,1) > 0)
 
 end function da_res_generic_has_vector
 
 
-
-logical function da_res_generic_has_scalar( res_generic )
+logical function da_res_generic_has_scalar( res_generic)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Returns .true. iff res_generic stores scalar values. 
    !---------------------------------------------------------------------------
 
    implicit none
-   type (residual_generic_type), intent(in) :: res_generic  ! generic type
-   da_res_generic_has_scalar = ( LBOUND(res_generic%values,1) == 0 )
+
+   type(residual_generic_type), intent(in) :: res_generic  ! generic type
+   da_res_generic_has_scalar =( LBOUND(res_generic%values,1) == 0)
 
 end function da_res_generic_has_scalar
 
 
-
-subroutine da_res_generic_free( res_generic )
+subroutine da_res_generic_free( res_generic)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Free memory for residual_generic_type object.  
@@ -352,28 +339,27 @@ subroutine da_res_generic_free( res_generic )
 
    implicit none
 
-   type (residual_generic_type), intent(inout) :: res_generic  ! generic type
+   type(residual_generic_type), intent(inout) :: res_generic  ! generic type
    ! Local declarations
    logical :: oktofreevalues
 
    oktofreevalues = .false.
-   if ( da_res_generic_has_scalar( res_generic) ) then
+   if (da_res_generic_has_scalar( res_generic)) then
       ! free scalar memory
-      deallocate( res_generic%values(0)%ptr )
+      deallocate( res_generic%values(0)%ptr)
       oktofreevalues = .true.
    end if
-   if ( da_res_generic_has_vector( res_generic) ) then
+   if (da_res_generic_has_vector( res_generic)) then
       oktofreevalues = .true.
    end if
-   if ( oktofreevalues ) then
-      deallocate( res_generic%values )
+   if (oktofreevalues) then
+      deallocate( res_generic%values)
    end if
 
 end subroutine da_res_generic_free
 
 
-
-subroutine da_y_facade_free( slice )
+subroutine da_y_facade_free( slice)
 
    !---------------------------------------------------------------------------
    ! PURPOSE:  Free memory for y_facade_type object.  
@@ -383,14 +369,14 @@ subroutine da_y_facade_free( slice )
 
    implicit none
 
-   type (y_facade_type), intent(inout) :: slice
+   type(y_facade_type), intent(inout) :: slice
    ! Local declarations
    integer :: n
-   if ( associated( slice%obs ) ) then
+   if (associated( slice%obs)) then
       do n=1, size(slice%obs)
-         call da_res_generic_free( slice%obs(n) )
+         call da_res_generic_free( slice%obs(n))
       end do
-      deallocate( slice%obs )
+      deallocate( slice%obs)
    end if
 end subroutine da_y_facade_free
 

@@ -1,9 +1,8 @@
-subroutine da_add_flow_dependence_xa_adj( ne, ep, xa, vp, &
-                                          its,ite, jts,jte, kts,kte )
+subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp, &
+                                          its,ite, jts,jte, kts,kte)
 
    !-----------------------------------------------------------------------
    ! Purpose : Add flow-dependent increments in model space (xa).
-   ! Owner: Dale Barker
    !-----------------------------------------------------------------------
                                       
    implicit none

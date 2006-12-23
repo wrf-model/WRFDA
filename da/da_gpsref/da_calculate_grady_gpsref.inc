@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_gpsref( iv, re, jo_grad_y )
+subroutine da_calculate_grady_gpsref( iv, re, jo_grad_y)
 
    !----------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector         
@@ -14,7 +14,7 @@ subroutine da_calculate_grady_gpsref( iv, re, jo_grad_y )
 
    integer :: n, k
 
-   if ( iv%num_GPSRef < 1 ) return
+   if (iv%num_GPSRef < 1) return
    
    do n=1, iv%num_GPSRef
       do k=1, iv%gpsref(n)%info%levels
@@ -23,7 +23,7 @@ subroutine da_calculate_grady_gpsref( iv, re, jo_grad_y )
          end if
          jo_grad_y%GPSRef(n)%ref(k) = -re%GPSRef(n)%ref(k) / &
                                    ( iv%GPSRef(n)%ref(k)%error * &
-                                     iv%GPSRef(n)%ref(k)%error )
+                                     iv%GPSRef(n)%ref(k)%error)
       end do
    end do
 

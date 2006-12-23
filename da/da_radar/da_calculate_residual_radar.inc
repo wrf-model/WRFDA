@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_radar( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_radar( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_Radar > 0 ) then
+   if (oi%num_Radar > 0) then
 
       n_obs_bad % rv % num = number(0, 0, 0)
       n_obs_bad % rf % num = number(0, 0, 0)
@@ -23,19 +23,19 @@ subroutine da_calculate_residual_radar( oi, y, re,                        &
 
          do k=1, oi%Radar(n)%info%levels
 
-           if ( use_Radar_rv ) then
+           if (use_Radar_rv) then
 
              np_available = np_available + 1
 
              re%Radar(n)%rv(k) = da_residual( n, k, y%Radar(n)%rv(k), &
-                                           oi%Radar(n)%rv(k), n_obs_bad % rv )
+                                           oi%Radar(n)%rv(k), n_obs_bad % rv)
            end if
 
-           if ( use_Radar_rf ) then
+           if (use_Radar_rf) then
              np_available = np_available + 1
 
              re%Radar(n)%rf(k) = da_residual( n, k, y%Radar(n)%rf(k), &
-                                           oi%Radar(n)%rf(k), n_obs_bad % rf )
+                                           oi%Radar(n)%rf(k), n_obs_bad % rf)
            end if
          end do
       end do

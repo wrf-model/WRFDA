@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_sonde_sfc( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_sonde_sfc( oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
@@ -8,7 +8,7 @@ subroutine da_check_xtoy_adjoint_sonde_sfc( oi, y, adjtest_lhs, pertile_lhs )
 
    integer                        :: n             ! Loop counter.
 
-   if ( oi%num_sound < 1 ) return
+   if (oi%num_sound < 1) return
 
    do n=1, oi%num_sound
       if(oi%sonde_sfc(n)%zk < 1.0) then
@@ -27,21 +27,21 @@ subroutine da_check_xtoy_adjoint_sonde_sfc( oi, y, adjtest_lhs, pertile_lhs )
       y%sonde_sfc(n)%p = y%sonde_sfc(n)%p/typical_p_rms
       y%sonde_sfc(n)%q = y%sonde_sfc(n)%q/typical_q_rms
 
-      if( oi%sonde_sfc(n)%loc%proc_domain ) then
+      if (oi%sonde_sfc(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
-                     + ( y%sonde_sfc(n)%u )**2 &
-                     + ( y%sonde_sfc(n)%v )**2 &
-                     + ( y%sonde_sfc(n)%t )**2 &
-                     + ( y%sonde_sfc(n)%p )**2 &
-                     + ( y%sonde_sfc(n)%q )**2
+                     + ( y%sonde_sfc(n)%u)**2 &
+                     + ( y%sonde_sfc(n)%v)**2 &
+                     + ( y%sonde_sfc(n)%t)**2 &
+                     + ( y%sonde_sfc(n)%p)**2 &
+                     + ( y%sonde_sfc(n)%q)**2
       end if
 
       pertile_lhs = pertile_lhs &
-                  + ( y%sonde_sfc(n)%u )**2 &
-                  + ( y%sonde_sfc(n)%v )**2 &
-                  + ( y%sonde_sfc(n)%t )**2 &
-                  + ( y%sonde_sfc(n)%p )**2 &
-                  + ( y%sonde_sfc(n)%q )**2
+                  + ( y%sonde_sfc(n)%u)**2 &
+                  + ( y%sonde_sfc(n)%v)**2 &
+                  + ( y%sonde_sfc(n)%t)**2 &
+                  + ( y%sonde_sfc(n)%p)**2 &
+                  + ( y%sonde_sfc(n)%q)**2
 
       y%sonde_sfc(n)%u = y%sonde_sfc(n)%u/typical_u_rms
       y%sonde_sfc(n)%v = y%sonde_sfc(n)%v/typical_v_rms

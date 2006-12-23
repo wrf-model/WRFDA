@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_sound( iv, re, jo_grad_y )
+subroutine da_calculate_grady_sound( iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -22,16 +22,16 @@ subroutine da_calculate_grady_sound( iv, re, jo_grad_y )
 
             jo_grad_y%sound(n)%u(k) = -re%sound(n)%u(k) / &
                                       ( iv%sound(n)%u(k)%error * &
-                                        iv%sound(n)%u(k)%error )
+                                        iv%sound(n)%u(k)%error)
             jo_grad_y%sound(n)%v(k) = -re%sound(n)%v(k) / &
                                       ( iv%sound(n)%v(k)%error * &
-                                        iv%sound(n)%v(k)%error )
+                                        iv%sound(n)%v(k)%error)
             jo_grad_y%sound(n)%t(k) = -re%sound(n)%t(k) / &
                                       ( iv%sound(n)%t(k)%error * &
-                                        iv%sound(n)%t(k)%error )
+                                        iv%sound(n)%t(k)%error)
             jo_grad_y%sound(n)%q(k) = -re%sound(n)%q(k) / &
                                       ( iv%sound(n)%q(k)%error * &
-                                        iv%sound(n)%q(k)%error )
+                                        iv%sound(n)%q(k)%error)
          end do
       end do
   end if

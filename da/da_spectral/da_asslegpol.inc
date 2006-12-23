@@ -1,4 +1,4 @@
-subroutine da_asslegpol( l, m, sinlat, coslat, alp )
+subroutine da_asslegpol (l, m, sinlat, coslat, alp)
 
    implicit none
 
@@ -16,21 +16,21 @@ subroutine da_asslegpol( l, m, sinlat, coslat, alp )
 
    ! Calculate ALP:
 
-   if ( l < m ) then
+   if (l < m) then
       alp = 0.0
    else
       alp = 1.0
       do i = m+1, 2*m
          alp = alp * real(i) * half_co
       end do
-      if ( mod(m,2) /= 0 ) then
+      if (mod(m,2) /= 0) then
          alp = -alp
       end if
 
-      if ( l > m ) then
+      if (l > m) then
          alp1 = alp
          alp = real(2*m+1) * sinlat * alp1
-         if ( l /= m+1 ) then
+         if (l /= m+1) then
             do loop = m+2,l
                alp2 = alp1
                alp1 = alp

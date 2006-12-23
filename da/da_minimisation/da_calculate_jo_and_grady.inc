@@ -148,7 +148,7 @@ subroutine da_calculate_jo_and_grady( iv, re, jot, jo, jo_grad_y)
 
    ! Pseudo obs:
 
-   call da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )    
+   call da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y)    
    jo_pseudo = jo % pseudo_u + jo % pseudo_v + jo % pseudo_t + &
                jo % pseudo_p + jo % pseudo_q
 

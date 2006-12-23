@@ -1,4 +1,4 @@
-subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y )
+subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y)
 
    implicit none
 
@@ -19,10 +19,10 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y )
    jo % synop_p = 0.0
    jo % synop_q = 0.0
 
-   if ( testing_dm_exact ) then
-      if ( iv%num_synop_glo == 0 ) return
+   if (testing_dm_exact) then
+      if (iv%num_synop_glo == 0) return
    else
-      if ( iv%num_synop < 1 ) return
+      if (iv%num_synop < 1) return
    end if
 
    do n=1, iv%num_synop
@@ -42,17 +42,17 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y )
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
    ! testing.  This will always be .false. for a serial run.
-   if ( testing_dm_exact ) then
+   if (testing_dm_exact) then
       ! collect all obs in serial order and allocate global objects
       call da_to_global_synop( iv,      re,      jo_grad_y, &
-                           iv_glob, re_glob, jo_grad_y_glob )
+                           iv_glob, re_glob, jo_grad_y_glob)
       ! perform remaining computations
-      call da_compute_jo_synop_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo )
+      call da_compute_jo_synop_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
       ! free global objects
-      call da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob )
+      call da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob)
    else
       ! perform remaining computations
-      call da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo )
+      call da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo)
    end if
 
    jo % synop_u = 0.5 * jo % synop_u

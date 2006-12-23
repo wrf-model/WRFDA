@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_gpsref(it, gpsref, pref, fref )
+subroutine da_check_max_iv_gpsref(it, gpsref, pref, fref)
 
    implicit none
 
@@ -15,7 +15,7 @@ subroutine da_check_max_iv_gpsref(it, gpsref, pref, fref )
 
    iunit = check_max_iv_unit
 
-   if ( check_max_iv_print ) then
+   if (check_max_iv_print) then
       write (iunit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

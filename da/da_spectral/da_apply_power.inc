@@ -1,4 +1,4 @@
-subroutine da_apply_power( power, max_wavenumber, ccv, c_cvsize) 
+subroutine da_apply_power (power, max_wavenumber, ccv, c_cvsize) 
 
    !-------------------------------------------------------------------------
    ! Adjust power spectrum for the control variable
@@ -20,11 +20,11 @@ subroutine da_apply_power( power, max_wavenumber, ccv, c_cvsize)
 
    do n =0, max_wavenumber
       
-      ccv(n+1) = ccv(n+1) * sqrt (power(n)/(2*n+1) )
+      ccv(n+1) = ccv(n+1) * sqrt (power(n)/(2*n+1))
 
       do m=1, n
          index = m*(max_wavenumber+1- m) + m*(m+1)/2+n-m + 1
-         ccv(index) = ccv(index) * sqrt (power(n)/(2*n+1) )
+         ccv(index) = ccv(index) * sqrt (power(n)/(2*n+1))
       end do
    end do
 

@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
    implicit none
 
    integer,           intent(in)    :: it      ! External iteration.
-   type (xb_type),    intent(in)    :: xb      ! first guess state.
-   type (xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
-   type (y_type),     intent(inout) :: ob      ! Observation structure.
-   type (ob_type),    intent(inout) :: iv      ! O-B structure.
+   type(xb_type),    intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob      ! Observation structure.
+   type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -27,7 +27,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-   if ( iv % num_sound < 1 ) return
+   if (iv % num_sound < 1) return
 
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
@@ -55,7 +55,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
       if (sfc_assi_options == 1) then
          iv%sonde_sfc(n)%zk=missing_r
 
-         if ( iv % sonde_sfc(n) % h > missing_r) then
+         if (iv % sonde_sfc(n) % h > missing_r) then
             do k=xp%kts,xp%kte
               v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                        + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
@@ -83,7 +83,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
             else
                iv%sonde_sfc(n)%zk = missing_r
             end if
-         else if ( ob % sonde_sfc(n) % p > 1.0 ) then
+         else if (ob % sonde_sfc(n) % p > 1.0) then
             do k=xp%kts,xp%kte
                v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                       + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
@@ -102,7 +102,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
          ! [2.0] Initialise components of innovation vector:
          !------------------------------------------------------------------------
 
-         if(iv%sonde_sfc(n)%zk < 0.0) then
+         if (iv%sonde_sfc(n)%zk < 0.0) then
             iv % sonde_sfc(n) % u % qc = missing
             iv % sonde_sfc(n) % v % qc = missing
             iv % sonde_sfc(n) % t % qc = missing
@@ -139,23 +139,23 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
          !------- Surface data assimilation approca 2
          !-------------------------------------------
 
-         ! 1.2.1 Surface assimilation approach 2 (10-m u, v, 2-m t, q, and sfc_p)
+         ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_u )
+                             model_u)
          call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_v )
+                             model_v)
          call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_t )
+                             model_t)
          call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_q )
+                             model_q)
          call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_p )
+                             model_p)
 
          if (iv%sonde_sfc(n)%p%qc >= 0) then
 
@@ -163,7 +163,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
 
             call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                               i, j, dx, dy, dxm, dym, &
-                              hsm )
+                              hsm)
 
             ho = iv%sonde_sfc(n)%h
             to = -888888.0
@@ -173,14 +173,14 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
                 iv%sonde_sfc(n)%q%qc >= 0) then
                to = ob%sonde_sfc(n)%t
                qo = ob%sonde_sfc(n)%q
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                 hsm, ho, to, qo)
             else if (iv%sonde_sfc(n)%t%qc >= 0 .and. &
                      iv%sonde_sfc(n)%q%qc < 0) then
                to = ob%sonde_sfc(n)%t
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, hsm, ho,to)
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho,to)
             else
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, hsm, ho)
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho)
             end if
 
             !.......... Pressure at the observed height:
@@ -193,35 +193,35 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
       !-----------------------------------------------------------------------
 
       if (ob % sonde_sfc(n) % u > missing_r .AND. &
-          iv % sonde_sfc(n) % u % qc >= obs_qc_pointer ) then
+          iv % sonde_sfc(n) % u % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % u % inv = iv%sonde_sfc(n)%u%inv - model_u
       else
          iv % sonde_sfc(n) % u % inv = 0.0
       end if
 
       if (ob % sonde_sfc(n) % v > missing_r .AND. &
-          iv % sonde_sfc(n) % v % qc >= obs_qc_pointer ) then
+          iv % sonde_sfc(n) % v % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % v % inv = iv%sonde_sfc(n)%v%inv - model_v
       else
          iv % sonde_sfc(n) % v % inv = 0.0
       end if
 
       if (ob % sonde_sfc(n) % p > 0.0 .AND. &
-          iv % sonde_sfc(n) % p % qc >= obs_qc_pointer ) then
+          iv % sonde_sfc(n) % p % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % p % inv = iv%sonde_sfc(n)%p%inv - model_p
       else
          iv % sonde_sfc(n) % p % inv = 0.0
       end if
 
       if (ob % sonde_sfc(n) % t > 0.0 .AND. &
-          iv % sonde_sfc(n) % t % qc >= obs_qc_pointer ) then
+          iv % sonde_sfc(n) % t % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % t % inv = iv%sonde_sfc(n)%t%inv - model_t
       else
          iv % sonde_sfc(n) % t % inv = 0.0
       end if
 
       if (ob % sonde_sfc(n) % q > 0.0 .AND. &
-          iv % sonde_sfc(n) % q % qc >= obs_qc_pointer ) then
+          iv % sonde_sfc(n) % q % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % q % inv = iv%sonde_sfc(n)%q%inv - model_q
       else
          iv % sonde_sfc(n) % q % inv = 0.0
@@ -231,9 +231,9 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
       !     [5.0] Perform optional maximum error check:
       !-----------------------------------------------------------------------
 
-      if ( check_max_iv ) then
+      if (check_max_iv) then
          call da_check_max_iv_sonde_sfc(it, iv % sonde_sfc(n), &
-                       itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
+                       itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
       end if
    end do
 
@@ -241,7 +241,7 @@ subroutine da_get_innov_vector_sonde_sfc ( it, xb, xp, ob, iv )
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
          ', Total Rejections for Sonde_Sfc follows:'
 
-      write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
          'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
          'Number of failed pressure observations:   ',itpf, ' on ',itp,   &

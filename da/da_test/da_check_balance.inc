@@ -1,4 +1,4 @@
-subroutine da_check_balance( phi, phi_u )
+subroutine da_check_balance( phi, phi_u)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Compare balanced mass (phi_b - function of wind) and actual phi.
@@ -24,12 +24,12 @@ subroutine da_check_balance( phi, phi_u )
 
    if (trace_use) call da_trace_entry("da_check_balance")
           
-   if ( balance_type == balance_geo ) then
+   if (balance_type == balance_geo) then
       write(unit=stdout, fmt='(a)') ' da_check_balance: Balance is geostrophic.'
-   else if ( balance_type == balance_cyc ) then
+   else if (balance_type == balance_cyc) then
       write(unit=stdout, fmt='(a)') &
          ' da_check_balance: Balance is cyclostrophic.'
-   else if ( balance_type == balance_geocyc ) then
+   else if (balance_type == balance_geocyc) then
       write(unit=stdout, fmt='(a)') &
          ' da_check_balance: Balance is geo/cyclostrophic.'
    end if
@@ -63,7 +63,7 @@ subroutine da_check_balance( phi, phi_u )
          phi_b1(2:jx-1) = phi(i,2:jx-1,k) - phi_u(i,2:jx-1,k)
             
          call da_correlation_coeff1d( phi_b1(2:jx-1), phi(i,2:jx-1,k), &
-                                      corr_coeff(k,i), accuracy(k,i) )
+                                      corr_coeff(k,i), accuracy(k,i))
      
          ! write(58,*) corr_coeff(k,i), accuracy(k,i)
       end do
@@ -71,7 +71,7 @@ subroutine da_check_balance( phi, phi_u )
       phi_b2(2:iy-1,2:jx-1) = phi(2:iy-1,2:jx-1,k) - phi_u(2:iy-1,2:jx-1,k)
       call da_correlation_coeff2d( phi_b2(2:iy-1,2:jx-1), &
                                    phi(2:iy-1,2:jx-1,k), &
-                                   corr_coef, accurac )
+                                   corr_coef, accurac)
 
       write(unit=stdout, fmt='(i6,1pe9.2,1pe9.2)') &
             k, corr_coef, accurac

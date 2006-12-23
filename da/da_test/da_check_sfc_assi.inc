@@ -1,7 +1,7 @@
 subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
                            ids,ide, jds,jde, kds,kde, &
                            ims,ime, jms,jme, kms,kme, &
-                           its,ite, jts,jte, kts,kte )
+                           its,ite, jts,jte, kts,kte)
    
    implicit none
   
@@ -39,7 +39,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
 
    if (ids == 0 .OR. ide ==0 .OR. jde == 0 .OR. jds == 0 .OR. &
       kde == 0 .OR. kds == 0 .OR. kms == 0 .OR. ime == 0 .OR. &
-      its == 0 ) then
+      its == 0) then
    end if
   
    call da_message((/"check_sfc_assi: Adjoint Test Results:"/))
@@ -60,11 +60,11 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    ! call check_psfc( xb, xa, iv, xp, y, &
    !                  ids,ide, jds,jde, kds,kde, &
    !                  ims,ime, jms,jme, kms,kme, &
-   !                  its,ite, jts,jte, kts,kte )
+   !                  its,ite, jts,jte, kts,kte)
 
    ! call wrf_shutdown
 
-   call da_transform_xtowtq ( xp, xb, xa )
+   call da_transform_xtowtq ( xp, xb, xa)
 
    ! Exchange XA(SURFACE) halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
@@ -74,7 +74,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
-      call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+      call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n))
 
 
       pertile_lhs = pertile_lhs &
@@ -98,25 +98,25 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    ! [5.0] Perform adjoint operation:
    !----------------------------------------------------------------------
 
-   call da_zero_x( xa )
+   call da_zero_x( xa)
 
    do n=1, iv%num_synop
       call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
    end do
 
-   call da_transform_xtowtq_adj ( xp, xb, xa )
+   call da_transform_xtowtq_adj ( xp, xb, xa)
    
    pertile_rhs = sum( xa%u(ims:ime, jms:jme, kms:kme) * &
-      xa2_u(ims:ime, jms:jme, kms:kme) ) + &
+      xa2_u(ims:ime, jms:jme, kms:kme)) + &
                  sum( xa%v(ims:ime, jms:jme, kms:kme) * &
-      xa2_v(ims:ime, jms:jme, kms:kme) ) + &
+      xa2_v(ims:ime, jms:jme, kms:kme)) + &
                  sum( xa%t(ims:ime, jms:jme, kms:kme) * &
-      xa2_t(ims:ime, jms:jme, kms:kme) ) + &
+      xa2_t(ims:ime, jms:jme, kms:kme)) + &
                  sum( xa%p(ims:ime, jms:jme, kms:kme) * &
-      xa2_p(ims:ime, jms:jme, kms:kme) ) + &
+      xa2_p(ims:ime, jms:jme, kms:kme)) + &
                  sum( xa%q(ims:ime, jms:jme, kms:kme) * &
-      xa2_q(ims:ime, jms:jme, kms:kme) ) + &
-                 sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme) )
+      xa2_q(ims:ime, jms:jme, kms:kme)) + &
+                 sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjivnt test equation:
@@ -128,7 +128,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
       sum(xa%t(its:ite, jts:jte, kts:kte) * xa2_t(its:ite,jts:jte,kts:kte)) + &
       sum(xa%p(its:ite, jts:jte, kts:kte) * xa2_p(its:ite,jts:jte,kts:kte)) + &
       sum(xa%q(its:ite, jts:jte, kts:kte) * xa2_q(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte) )
+      sum(xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
    
    !-------------------------------------------------------------------------
    ! [7.0] Print output:
@@ -138,12 +138,12 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
-   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs )
-   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs )
+   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs)
+   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs)
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', &
       adj_ttl_lhs,adj_ttl_rhs
-   if ( rootproc ) then
+   if (rootproc) then
       write(unit=stdout, fmt='(A,1pe22.14)') &
          ' Whole Domain < y, y     > = ', adj_ttl_lhs
       write(unit=stdout, fmt='(A,1pe22.14)') &

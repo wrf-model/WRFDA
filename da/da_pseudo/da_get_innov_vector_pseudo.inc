@@ -1,11 +1,11 @@
-subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
+subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
 
    implicit none
    
-   type (xb_type), intent(in)   :: xb          ! Background structure 
-   type (xpose_type), intent(in):: xp          ! Domain decomposition vars.
-   type ( y_type), intent(out)  :: ob          ! Observation structure.
-   type (ob_type), intent(inout):: iv          ! O-B structure.
+   type(xb_type), intent(in)   :: xb          ! Background structure 
+   type(xpose_type), intent(in):: xp          ! Domain decomposition vars.
+   type( y_type), intent(out)  :: ob          ! Observation structure.
+   type(ob_type), intent(inout):: iv          ! O-B structure.
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j     ! Index dimension.
@@ -17,8 +17,7 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
    real                         :: model_p  ! Model value p at oblocation.
    real                         :: model_q  ! Model value q at oblocation.
 
-   if ( iv % num_pseudo > 0 ) then
-
+   if (iv % num_pseudo > 0) then
       do n=1, iv % num_pseudo
          ! [1.1] Get horizontal interpolation weights:
 
@@ -36,40 +35,40 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv )
          ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
-                                 model_u, iv%pseudo(n)%zk )
+                                 model_u, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
-                                 model_v, iv%pseudo(n)%zk )
+                                 model_v, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % t, xp, i, j, dx, dy, dxm, dym, &
-                                 model_t, iv%pseudo(n)%zk )
+                                 model_t, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
-                                 model_p, iv%pseudo(n)%zk )
+                                 model_p, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
-                                 model_q, iv%pseudo(n)%zk )
+                                 model_q, iv%pseudo(n)%zk)
 #else
          call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_u, iv%pseudo(n)%zk )
+                                 model_u, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_v, iv%pseudo(n)%zk )
+                                 model_v, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_t, iv%pseudo(n)%zk )
+                                 model_t, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_p, iv%pseudo(n)%zk )
+                                 model_p, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_q, iv%pseudo(n)%zk )
+                                 model_q, iv%pseudo(n)%zk)
 #endif
 !------------------------------------------------------------------------
-!        [3.0] Calculate observation O = B + (O-B):
+!        [3.0] Calculate observation O = B +(O-B):
 !------------------------------------------------------------------------
 
-         if ( pseudo_var(1:1) == 'u' .or.  pseudo_var(1:1) == 'U' ) then
+         if (pseudo_var(1:1) == 'u' .or.  pseudo_var(1:1) == 'U') then
             ob % pseudo(n) % u = model_u + iv % pseudo(n) % u % inv
-         else if ( pseudo_var(1:1) == 'v' .or.  pseudo_var(1:1) == 'V' ) then
+         else if (pseudo_var(1:1) == 'v' .or.  pseudo_var(1:1) == 'V') then
             ob % pseudo(n) % v = model_v + iv % pseudo(n) % v % inv
-         else if ( pseudo_var(1:1) == 't' .or.  pseudo_var(1:1) == 'T' ) then
+         else if (pseudo_var(1:1) == 't' .or.  pseudo_var(1:1) == 'T') then
             ob % pseudo(n) % t = model_t + iv % pseudo(n) % t % inv
-         else if ( pseudo_var(1:1) == 'p' .or.  pseudo_var(1:1) == 'P' ) then
+         else if (pseudo_var(1:1) == 'p' .or.  pseudo_var(1:1) == 'P') then
             ob % pseudo(n) % p = model_p + iv % pseudo(n) % p % inv
-         else if ( pseudo_var(1:1) == 'q' .or.  pseudo_var(1:1) == 'Q' ) then
+         else if (pseudo_var(1:1) == 'q' .or.  pseudo_var(1:1) == 'Q') then
             ob % pseudo(n) % q = model_q + iv % pseudo(n) % q % inv
          end if 
       end do

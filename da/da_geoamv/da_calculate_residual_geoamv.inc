@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_geoamv( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates residual vector for Geo. CMV's
@@ -19,7 +19,7 @@ subroutine da_calculate_residual_geoamv( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_geoamv > 0 ) then
+   if (oi%num_geoamv > 0) then
 
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
@@ -29,9 +29,9 @@ subroutine da_calculate_residual_geoamv( oi, y, re,                        &
             np_available = np_available + 2
 
             re%geoamv(n)%u(k) = da_residual( n, 0, y%geoamv(n)%u(k), &
-                                          oi%geoamv(n)%u(k), n_obs_bad % u )
+                                          oi%geoamv(n)%u(k), n_obs_bad % u)
             re%geoamv(n)%v (k)= da_residual( n, 0, y%geoamv(n)%v(k), &
-                                       oi%geoamv(n)%v(k), n_obs_bad % v )
+                                       oi%geoamv(n)%v(k), n_obs_bad % v)
          end do
       end do
       

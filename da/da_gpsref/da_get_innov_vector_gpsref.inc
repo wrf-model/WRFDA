@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
 
    ! ------------------------------------------------------------------------
    ! Called by da_obs/da_get_innov_vector.inc
@@ -7,10 +7,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
    implicit none
 
    integer, intent(in)             :: it       ! External iteration.
-   type (xb_type), intent(in)      :: xb       ! first guess state.
-   type (xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)   :: ob       ! Observation structure.
-   type (ob_type), intent(inout)   :: iv       ! O-B structure.
+   type(xb_type), intent(in)      :: xb       ! first guess state.
+   type(xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
+   type(y_type),  intent(inout)   :: ob       ! Observation structure.
+   type(ob_type), intent(inout)   :: iv       ! O-B structure.
 
    integer                         :: n        ! Loop counter.
    integer                         :: i, j, k  ! Index dimension.
@@ -33,7 +33,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
    integer :: nn, n1, ntotal, nqc0, nqc1, nqc2, nqc3
    real    :: percnt
-   character (len=40), dimension(5000) :: name_qc
+   character(len=40), dimension(5000) :: name_qc
    real              , dimension(5000) :: height_below
 
 
@@ -44,16 +44,16 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       ! Deallocate:
       if (iv%num_gpsref > 0) then
          do n = 1, iv%num_gpsref
-            deallocate (iv % gpsref(n) %  h )
-            deallocate (iv % gpsref(n) %  zk)
-            deallocate (iv % gpsref(n) % ref)
-            deallocate (iv % gpsref(n) %   p)
-            deallocate (iv % gpsref(n) %   t)
-            deallocate (iv % gpsref(n) %   q)
-            deallocate (ob % gpsref(n) % ref)
+            deallocate(iv % gpsref(n) %  h)
+            deallocate(iv % gpsref(n) %  zk)
+            deallocate(iv % gpsref(n) % ref)
+            deallocate(iv % gpsref(n) %   p)
+            deallocate(iv % gpsref(n) %   t)
+            deallocate(iv % gpsref(n) %   q)
+            deallocate(ob % gpsref(n) % ref)
          end do
-         deallocate (iv % gpsref)
-         deallocate (ob % gpsref)
+         deallocate(iv % gpsref)
+         deallocate(ob % gpsref)
       end if
 
       use_gpsrefobs = .true.
@@ -63,11 +63,11 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       iv%ob_numb(1)%gpsref = num_pseudo
       iv%num_pseudo = 0
 
-      allocate (iv % gpsref(1:num_pseudo))
-      allocate (iv%gpsref(num_pseudo)%zk (1:1))
-      allocate (iv%gpsref(num_pseudo)%ref(1:1))
-      allocate (ob%gpsref(1:num_pseudo))
-      allocate (ob%gpsref(num_pseudo)%ref(1:1))
+      allocate(iv % gpsref(1:num_pseudo))
+      allocate(iv%gpsref(num_pseudo)%zk(1:1))
+      allocate(iv%gpsref(num_pseudo)%ref(1:1))
+      allocate(ob%gpsref(1:num_pseudo))
+      allocate(ob%gpsref(num_pseudo)%ref(1:1))
 
       write(stdout,'(a,i2)') '==> GPS REF pseudo OBS test: num_pseudo=',num_pseudo
 
@@ -89,8 +89,8 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
       iv % gpsref(1) %ref(1) % qc = 0
 
       ! Set halo:
-      if ((iv%gpsref(1)%loc%i < xp%its-1) .or. (iv%gpsref(1)%loc%i > xp%ite) .or. &
-           (iv%gpsref(1)%loc%j < xp%jts-1) .or. (iv%gpsref(1)%loc%j > xp%jte)) then
+      if ((iv%gpsref(1)%loc%i < xp%its-1) .or.(iv%gpsref(1)%loc%i > xp%ite) .or. &
+          (iv%gpsref(1)%loc%j < xp%jts-1) .or.(iv%gpsref(1)%loc%j > xp%jte)) then
          iv%gpsref(1)%loc%proc_domain = .false.
       else
          iv%gpsref(1)%loc%proc_domain = .false. 
@@ -113,7 +113,7 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
    do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, iv%ob_numb(iv%current_ob_time)%gpsref 
       num_levs = iv%gpsref(n)%info%levels
 
-      if ( num_levs < 1 ) cycle
+      if (num_levs < 1) cycle
 
       model_ref(:) = 0.0
 
@@ -148,10 +148,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
 
 #ifndef DEREF_KLUDGE
       call da_interp_lin_3d( xb%ref, xp, i, j, dx, dy, dxm, dym, &
-         model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs )
+         model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
 #else
       call da_interp_lin_3d( xb%ref(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-         model_ref(1), max_ob_levels, iv%gpsref(n)%zk(1), num_levs )
+         model_ref(1), max_ob_levels, iv%gpsref(n)%zk(1), num_levs)
 #endif
 
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then
@@ -167,10 +167,10 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
          ob % gpsref(1)%ref(1) = model_ref(1) + iv %gpsref(1)%ref(1)%inv 
       end if
 
-      ! Quality check 1: Gross error (departure from the background) check 
+      ! Quality check 1: Gross error(departure from the background) check 
 
       if (check_max_iv) &
-         call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref )
+         call da_check_max_iv_gpsref(it, iv%gpsref(n), pref, fref)
 
       ! Quality check 2: Error percentage check.
 
@@ -179,17 +179,17 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
             do k=1, num_levs
 
                ! incremetal refractivity or the relative error:
-               !   abs[(O-B)/{(O+B)/2}]               (Lidia Cucurull 2005)
+               !   abs[(O-B)/{(O+B)/2}]              (Lidia Cucurull 2005)
 
                ntotal = ntotal + 1
                percnt = 2.0 * abs(iv%gpsref(n)%ref(k)%inv / &
-                  (ob%gpsref(n)%ref(k) + model_ref(k)))
+                 (ob%gpsref(n)%ref(k) + model_ref(k)))
 
                if (iv%gpsref(n)%ref(k)%qc >= obs_qc_pointer) then
 
-                  if ( iv%gpsref(n)%h(k) < h_1 ) then
+                  if (iv%gpsref(n)%h(k) < h_1) then
                      if (percnt > pcnt1) iv%gpsref(n)%ref(k)%qc = qc_below
-                  else if ( iv%gpsref(n)%h(k) > h_2) then
+                  else if (iv%gpsref(n)%h(k) > h_2) then
                      if (percnt > pcnt3) iv%gpsref(n)%ref(k)%qc = qc_above
                   else
                      if (percnt > pcnt2) iv%gpsref(n)%ref(k)%qc = qc_middle
@@ -247,17 +247,17 @@ subroutine da_get_innov_vector_gpsref ( it, xb, xp, ob, iv )
                ntotal = ntotal + 1
                if (iv%gpsref(n)%ref(k)%qc == fails_error_max) nqc0 = nqc0 + 1
                if (iv%gpsref(n)%ref(k)%qc == qc_middle) nqc1 = nqc1 + 1
-               if (iv%gpsref(n)%ref(k)%qc == qc_below ) nqc2 = nqc2 + 1
-               if (iv%gpsref(n)%ref(k)%qc == qc_above ) nqc3 = nqc3 + 1
+               if (iv%gpsref(n)%ref(k)%qc == qc_below) nqc2 = nqc2 + 1
+               if (iv%gpsref(n)%ref(k)%qc == qc_above) nqc3 = nqc3 + 1
             end do
          end do
       end if
    end if  ! end of if verify check
 
-   write (unit = check_max_iv_unit, fmt ='(A,i5,A)') &
+   write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &
       'For outer iteration ',it, &
       ', Total Rejections for GPSRef follows:'
-   write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+   write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
       'Number of failed GPSRef observations:', &
       fref, ' on ',pref
 

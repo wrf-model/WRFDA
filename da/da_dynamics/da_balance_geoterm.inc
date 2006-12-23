@@ -1,11 +1,9 @@
 subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y ) 
  
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculates nonlinear geostrophic term in balance equation.
+   ! purpose: calculates nonlinear geostrophic term in balance equation.
    !
-   !  METHOD:  Term is k x rho f u on a single level.
-   !
-   !  ASsumPTIONS: Various (see documentation).
+   ! method:  term is k x rho f u on a single level.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -21,8 +19,8 @@ subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y )
    !  [1.0] Initialise:
    !---------------------------------------------------------------------------
 
-      term_x(:,:) = 0.0
-      term_y(:,:) = 0.0
+   term_x(:,:) = 0.0
+   term_y(:,:) = 0.0
 
    !---------------------------------------------------------------------------
    !  [2.0] Calculate term_x = -f rho v~:

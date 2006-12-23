@@ -1,4 +1,4 @@
-subroutine da_advance_cymdh( start_date, dh, end_date )
+subroutine da_advance_cymdh (start_date, dh, end_date)
 
    implicit none
 
@@ -14,12 +14,12 @@ subroutine da_advance_cymdh( start_date, dh, end_date )
 
    do while (hh < 0) 
       hh = hh + 24
-      call da_change_date ( ccyy, mm, dd, -1 )
+      call da_change_date  (ccyy, mm, dd, -1)
    end do
 
    do while (hh > 23) 
       hh = hh - 24
-      call da_change_date ( ccyy, mm, dd, 1 )
+      call da_change_date  (ccyy, mm, dd, 1)
    end do
 
    write(unit=end_date(1:10), fmt='(i4, 3i2.2)')  ccyy, mm, dd, hh

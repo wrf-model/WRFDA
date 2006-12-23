@@ -19,7 +19,7 @@ subroutine da_get_3d_sum(var, name, &
 
    partial = sum(var(its:ite,jts:jte,kts:kte)*var(its:ite,jts:jte,kts:kte))
 
-   total = wrf_dm_sum_real( partial )
+   total = wrf_dm_sum_real( partial)
    write(unit=*,fmt=*) 'TEST_COVERAGE_get_3d_sum:  total = ', total
 
    write(unit=stderr, fmt='(3a, e24.14)') &

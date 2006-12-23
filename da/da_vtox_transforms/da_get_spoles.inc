@@ -1,7 +1,7 @@
 subroutine da_get_spoles(x,              &
           ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
+          its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Treatment for Scalar field at Poles
@@ -26,13 +26,13 @@ subroutine da_get_spoles(x,              &
       tmps =0.0  ; tmp_s =0.0
       if (jts == jds)  tmp_s = tmpvar*sum(x(its:ite,jts+1,k))
 
-      tmps = wrf_dm_sum_real( tmp_s )
+      tmps = wrf_dm_sum_real( tmp_s)
       if (jts == jds) x(its:ite,jts,k) = tmps
  
       tmps =0.0  ; tmp_s =0.0
       if (jte == jde) tmp_s = tmpvar*sum(x(its:ite,jte-1,k))
 
-      tmps = wrf_dm_sum_real( tmp_s )
+      tmps = wrf_dm_sum_real( tmp_s)
       if (jte == jde) x(its:ite,jte,k) = tmps
    end do
 

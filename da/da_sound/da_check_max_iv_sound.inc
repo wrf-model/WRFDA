@@ -1,5 +1,5 @@
 subroutine da_check_max_iv_sound(it, sound,  &
-                itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf )
+                itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_check_max_iv_sound(it, sound,  &
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
@@ -35,7 +35,7 @@ subroutine da_check_max_iv_sound(it, sound,  &
    do k = 1, sound % info % levels
       ! U-wind
 
-      if (sound % u(k) % qc >= obs_qc_pointer ) then
+      if (sound % u(k) % qc >= obs_qc_pointer) then
          call da_max_error_qc(it, sound % info, sound % u(k), &
                   max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &
                                 failed, check_max_iv_print)
@@ -43,7 +43,7 @@ subroutine da_check_max_iv_sound(it, sound,  &
 
       ! V-wind
 
-      if (sound % v(k) % qc >= obs_qc_pointer ) then
+      if (sound % v(k) % qc >= obs_qc_pointer) then
          call da_max_error_qc (it, sound % info, sound % v(k),&
                   max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
                                  failed, check_max_iv_print)                           
@@ -51,7 +51,7 @@ subroutine da_check_max_iv_sound(it, sound,  &
 
       ! Temperature
 
-      if (sound % t(k) % qc >= obs_qc_pointer ) then
+      if (sound % t(k) % qc >= obs_qc_pointer) then
          call da_max_error_qc (it, sound % info, sound % t(k),&
                   max_error_t, itt, ittf, check_max_iv_unit, 'TEMP ', &
                                  failed, check_max_iv_print)
@@ -59,7 +59,7 @@ subroutine da_check_max_iv_sound(it, sound,  &
 
       ! Mixing ratio, same ratio as relative humidity
 
-      if (sound % q(k) % qc >= obs_qc_pointer ) then
+      if (sound % q(k) % qc >= obs_qc_pointer) then
          call da_max_error_qc (it, sound % info, sound % q(k), &
                   max_error_q, itqv, itqvf, check_max_iv_unit, 'QV   ', &
                                  failed, check_max_iv_print)

@@ -1,31 +1,17 @@
-subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
 
    !-------------------------------------------------------------------------
-   !
-   !  History:
-   !
-   !
-   !     Additions:        03/19/2003                    S. R. H. Rizvi
-   !
-   !               1. da_check_max_iv is called for each outer iteration
-   !
-   !               2. Extra diagnostics added for generating detailed information
-   !                  about rejected obs in various outer iterations
-   !
-   !     Modification:  02/18/2004              Wei Huang
-   !            Make obs. operator independent of cv-options.
-   !
+   ! Purpose: TBD   !
    !-------------------------------------------------------------------------
 
    implicit none
 
    integer, intent(in)           :: it      ! External iteration.
-   type (xb_type), intent(in)    :: xb      ! first guess state.
-   type (xpose_type), intent(in) :: xp      ! Domain decomposition vars.
-   type (y_type),  intent(inout) :: ob      ! Observation structure.
-   type (ob_type), intent(inout) :: iv      ! O-B structure.
+   type(xb_type), intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in) :: xp      ! Domain decomposition vars.
+   type(y_type),  intent(inout) :: ob      ! Observation structure.
+   type(ob_type), intent(inout) :: iv      ! O-B structure.
 
-   !-------------------------------------------------------------------------
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -46,13 +32,10 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-   !-------------------------------------------------------------------------
 
-   if ( iv % num_metar < 1 ) return
+   if (iv % num_metar < 1) return
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_metar")
-
-   !-------------------------------------------------------------------------
 
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
@@ -76,140 +59,135 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       iv%metar(n)%v%inv = ob%metar(n)%v
 
       if (sfc_assi_options == 1) then
-        iv%metar(n)%zk=missing_r
+         iv%metar(n)%zk=missing_r
 
-        if ( iv % metar(n) % h > missing_r) then
-          do k=xp%kts,xp%kte
-            v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
+         if (iv % metar(n) % h > missing_r) then
+            do k=xp%kts,xp%kte
+               v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                       + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
-          end do
+            end do
 
-          hd = v_h(xp%kts) - iv % metar(n) % h
+            hd = v_h(xp%kts) - iv % metar(n) % h
 
-          if (abs(hd) <= Max_StHeight_Diff) then
-            if (iv % metar(n) % h < v_h(xp%kts)) then
-              iv%metar(n)%zk = 1.0+1.0e-6
+            if (abs(hd) <= Max_StHeight_Diff) then
+               if (iv % metar(n) % h < v_h(xp%kts)) then
+                  iv%metar(n)%zk = 1.0+1.0e-6
 
-              call da_obs_sfc_correction(iv%metar(n), xb)
+                  call da_obs_sfc_correction(iv%metar(n), xb)
 
-              ! To keep the original "ob" with no change for multiple 
-              ! outer-loops use:
+                  ! To keep the original "ob" with no change for multiple 
+                  ! outer-loops use:
 
-              ! ob%metar(n)%p = iv%metar(n)%p%inv
-              ! ob%metar(n)%t = iv%metar(n)%t%inv
-              ! ob%metar(n)%q = iv%metar(n)%q%inv
-              ! ob%metar(n)%u = iv%metar(n)%u%inv
-              ! ob%metar(n)%v = iv%metar(n)%v%inv
+                  ! ob%metar(n)%p = iv%metar(n)%p%inv
+                  ! ob%metar(n)%t = iv%metar(n)%t%inv
+                  ! ob%metar(n)%q = iv%metar(n)%q%inv
+                  ! ob%metar(n)%u = iv%metar(n)%u%inv
+                  ! ob%metar(n)%v = iv%metar(n)%v%inv
+               else
+                 call da_to_zk(iv % metar(n) % h, v_h, xp, v_interp_h, iv%metar(n)%zk)
+               end if
             else
-              call da_to_zk(iv % metar(n) % h, v_h, xp, v_interp_h, iv%metar(n)%zk)
+              iv%metar(n)%zk = missing_r
             end if
-          else
-            iv%metar(n)%zk = missing_r
-          end if
-        else if ( ob % metar(n) % p > 1.0 ) then
-          do k=xp%kts,xp%kte
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+         else if (ob % metar(n) % p > 1.0) then
+            do k=xp%kts,xp%kte
+               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                      + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-          end do
+            end do
 
-          call da_to_zk(ob % metar(n) % p, v_p, xp, v_interp_p, iv%metar(n)%zk)
+            call da_to_zk(ob % metar(n) % p, v_p, xp, v_interp_p, iv%metar(n)%zk)
 
-          if (iv%metar(n)%zk < 0.0) then
-            iv % metar(n) % p % inv = missing_r
-            iv % metar(n) % p % qc  = missing
-            iv%metar(n)%zk = 1.0+1.0e-6
-          end if
-        end if
+            if (iv%metar(n)%zk < 0.0) then
+               iv % metar(n) % p % inv = missing_r
+               iv % metar(n) % p % qc  = missing
+               iv%metar(n)%zk = 1.0+1.0e-6
+            end if
+         end if
 
-        !------------------------------------------------------------------------
-        ! [2.0] Initialise components of innovation vector:
-        !------------------------------------------------------------------------
+         !------------------------------------------------------------------------
+         ! [2.0] Initialise components of innovation vector:
+         !------------------------------------------------------------------------
 
-        if (iv%metar(n)%zk < 0.0) then
-          iv % metar(n) % u % qc = missing
-          iv % metar(n) % v % qc = missing
-          iv % metar(n) % t % qc = missing
-          iv % metar(n) % q % qc = missing
-          iv % metar(n) % p % qc = missing
-        else
-          !------------[1.2] Interpolate horizontally:
+         if (iv%metar(n)%zk < 0.0) then
+           iv % metar(n) % u % qc = missing
+           iv % metar(n) % v % qc = missing
+           iv % metar(n) % t % qc = missing
+           iv % metar(n) % q % qc = missing
+           iv % metar(n) % p % qc = missing
+         else
+           !------------[1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
-          call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                     model_u, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                                     model_v, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % t, xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % t, xp, i, j, dx, dy, dxm, dym, &
                                     model_t, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
                                     model_q, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
                                     model_p, iv%metar(n)%zk)
 #else
-          call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                     model_u, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                     model_v, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                     model_t, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                     model_q, iv%metar(n)%zk)
-          call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
+           call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
                                     model_p, iv%metar(n)%zk)
 #endif
-        end if
+         end if
       else if (sfc_assi_options == 2) then
+         ! 1.2.1 Surface assimilation approach 2 
+         !(10-m u, v, 2-m t, q, and sfc_p)
 
-        !------- Surface data assimilation approca 2
-        !-------------------------------------------
-
-        !------- 1.2.1 Surface assimilation approach 2 
-        ! (10-m u, v, 2-m t, q, and sfc_p)
-
-        call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_u )
-        call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+                            model_u)
+         call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_v )
-        call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+                            model_v)
+         call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_t )
-        call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+                            model_t)
+         call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_q )
-        call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+                            model_q)
+         call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_p )
+                            model_p)
 
-        if (iv%metar(n)%p%qc >= 0) then
+         if (iv%metar(n)%p%qc >= 0) then
+            ! model surface p, t, q, h at observed site:
 
-          !.......... model surface p, t, q, h at observed site:
-
-          call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
+            call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            hsm )
+                            hsm)
 
-          ho = iv%metar(n)%h
-          to = -888888.0
-          qo = -888888.0
+            ho = iv%metar(n)%h
+            to = -888888.0
+            qo = -888888.0
 
-          if (iv%metar(n)%t%qc >= 0 .and. iv%metar(n)%q%qc >= 0) then
-            to = ob%metar(n)%t
-            qo = ob%metar(n)%q
-            call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+            if (iv%metar(n)%t%qc >= 0 .and. iv%metar(n)%q%qc >= 0) then
+               to = ob%metar(n)%t
+               qo = ob%metar(n)%q
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                hsm, ho, to, qo)
-          else if (iv%metar(n)%t%qc >= 0 .and. iv%metar(n)%q%qc < 0) then
-            to = ob%metar(n)%t
-            call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+            else if (iv%metar(n)%t%qc >= 0 .and. iv%metar(n)%q%qc < 0) then
+               to = ob%metar(n)%t
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                hsm, ho, to)
-          else
-            call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+            else
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                hsm, ho)
-          end if
+            end if
 
-          !.......... Pressure at the observed height:
-          model_p = psfcm
-        end if
+            ! Pressure at the observed height:
+            model_p = psfcm
+         end if
       end if
 
       !-----------------------------------------------------------------------
@@ -217,35 +195,35 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       !-----------------------------------------------------------------------
 
       if (ob % metar(n) % u > missing_r .AND. &
-        iv % metar(n) % u % qc >= obs_qc_pointer ) then
-        iv % metar(n) % u % inv = iv%metar(n)%u%inv - model_u
+         iv % metar(n) % u % qc >= obs_qc_pointer) then
+         iv % metar(n) % u % inv = iv%metar(n)%u%inv - model_u
       else
-        iv % metar(n) % u % inv = 0.0
+         iv % metar(n) % u % inv = 0.0
       end if
 
       if (ob % metar(n) % v > missing_r .AND. &
-        iv % metar(n) % v % qc >= obs_qc_pointer ) then
-        iv % metar(n) % v % inv = iv%metar(n)%v%inv - model_v
+         iv % metar(n) % v % qc >= obs_qc_pointer) then
+         iv % metar(n) % v % inv = iv%metar(n)%v%inv - model_v
       else
-        iv % metar(n) % v % inv = 0.0
+         iv % metar(n) % v % inv = 0.0
       end if
 
       if (ob % metar(n) % p > 0.0 .AND. &
-        iv % metar(n) % p % qc >= obs_qc_pointer ) then
-        iv % metar(n) % p % inv = iv%metar(n)%p%inv - model_p
+         iv % metar(n) % p % qc >= obs_qc_pointer) then
+         iv % metar(n) % p % inv = iv%metar(n)%p%inv - model_p
       else
-        iv % metar(n) % p % inv = 0.0
+         iv % metar(n) % p % inv = 0.0
       end if
 
       if (ob % metar(n) % t > 0.0 .AND. &
-        iv % metar(n) % t % qc >= obs_qc_pointer ) then
+        iv % metar(n) % t % qc >= obs_qc_pointer) then
         iv % metar(n) % t % inv = iv%metar(n)%t%inv - model_t
       else
         iv % metar(n) % t % inv = 0.0
       end if
 
       if (ob % metar(n) % q > 0.0 .AND. &
-        iv % metar(n) % q % qc >= obs_qc_pointer ) then
+        iv % metar(n) % q % qc >= obs_qc_pointer) then
         iv % metar(n) % q % inv = iv%metar(n)%q%inv - model_q
       else
         iv % metar(n) % q % inv = 0.0
@@ -255,9 +233,9 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       ! [5.0] Perform optional maximum error check:
       !-----------------------------------------------------------------------
 
-      if ( check_max_iv ) then
-        call da_check_max_iv_metar(it, iv % metar(n), &
-                     itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
+      if (check_max_iv) then
+         call da_check_max_iv_metar(it, iv % metar(n), &
+                     itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
       end if
    end do
 
@@ -265,7 +243,7 @@ subroutine da_get_innov_vector_metar ( it, xb, xp, ob, iv )
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
          ', Total Rejections for Metar follows:'
 
-      write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
          'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
          'Number of failed pressure observations:   ',itpf, ' on ',itp,   &

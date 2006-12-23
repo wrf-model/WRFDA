@@ -40,8 +40,8 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    is = its-1; ie = ite+1; js = jts-1; je = jte+1
    if (.not. global .and. its == ids ) is = ids+1
    if (.not. global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (jts == jds ) js = jds+1
+   if (jte == jde ) je = jde-1
 
    if( fg_format == fg_format_kma) then
       coefx(is:ie,js:je) = xb%coefx(is:ie,js:je)
@@ -93,7 +93,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
 
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      if ( balance_type == balance_cyc .OR. &
+      if (balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) then
          call da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
@@ -107,7 +107,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
       
       ! [2.1] Calculate geostrophic terms in balance eqn:
  
-      if ( balance_type == balance_geo .OR. &
+      if (balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) then
          call da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
                                       term_x, term_y, &

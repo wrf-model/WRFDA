@@ -1,15 +1,7 @@
 subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
 
   !-------------------------------------------------------------------------
-  !
-  !  History:
-  !
-  !     Additions:        02/26/2003                    S. R. H. Rizvi
-  !
-  !            outer iteration and extra counters are added in the  argument
-  !            list for generating detailed information about rejected obs in
-  !            various outer iterations
-  !
+  ! Purpose: TBD
   !-------------------------------------------------------------------------
 
   implicit none
@@ -19,7 +11,7 @@ subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
   integer, intent(inout) :: ittpw,ittpwf
   logical                                :: failed 
 
-  if ( check_max_iv_print )then
+  if (check_max_iv_print) then
     write (check_max_iv_unit,'(A)')  &
       '----------------------------------------------------------------'
     write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
@@ -27,9 +19,9 @@ subroutine da_check_max_iv_gpspw(it, gpspw, ittpw,ittpwf)
      'Error max test ratio for gps_tpw = ',max_error_pw
   end if
 
-  !-----------------------------------------------------------------------------!
+  !---------------------------------------------------------------------------
   ! [2.0] Perform maximum innovation vector check:
-  !-----------------------------------------------------------------------------!
+  !---------------------------------------------------------------------------
 
   failed = .false.
 

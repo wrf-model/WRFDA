@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
 
    implicit none
 
    integer, intent(in)            :: it       ! External iteration.
-   type (xb_type), intent(in)     :: xb       ! first guess state.
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)  :: ob       ! Observation structure.
-   type (ob_type), intent(inout)  :: iv       ! O-B structure.
+   type(xb_type), intent(in)     :: xb       ! first guess state.
+   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type(y_type),  intent(inout)  :: ob       ! Observation structure.
+   type(ob_type), intent(inout)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i, j, k  ! Index dimension.
@@ -22,7 +22,7 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
 
    integer           :: itu,ituf,itvv,itvvf
 
-   if ( iv % num_pilot > 0 ) then
+   if (iv % num_pilot > 0) then
 
       itu   = 0
       itvv  = 0
@@ -33,7 +33,7 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
 
          num_levs = iv % pilot(n) % info % levels
 
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          model_u(:) = 0.0
          model_v(:) = 0.0
@@ -55,7 +55,7 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
          do k=1, iv % pilot(n) % info % levels
            iv%pilot(n)%zk(k)=missing_r
 
-           if ( iv % pilot(n) % p(k) > 1.0 ) then
+           if (iv % pilot(n) % p(k) > 1.0) then
              call da_to_zk(iv % pilot(n) % p(k), v_p, xp, v_interp_p, iv%pilot(n)%zk(k))
            end if
 
@@ -68,14 +68,14 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
          ! [1.4] Interpolate horizontally:
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
-                            model_u, max_ob_levels, iv%pilot(n)%zk, num_levs )
+                            model_u, max_ob_levels, iv%pilot(n)%zk, num_levs)
          call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
-                            model_v, max_ob_levels, iv%pilot(n)%zk, num_levs )
+                            model_v, max_ob_levels, iv%pilot(n)%zk, num_levs)
 #else
          call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            model_u(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs )
+                            model_u(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs)
          call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            model_v(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs )
+                            model_v(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs)
 #endif
          !------------------------------------------------------------------------
          ! [2.0] Initialise components of innovation vector:
@@ -89,13 +89,13 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
            ! [4.0] Fast interpolation:
            !------------------------------------------------------------------------
 
-           if ( ob % pilot(n) % u(k) > missing_r .AND. &
-                iv % pilot(n) % u(k) % qc >= obs_qc_pointer ) then
+           if (ob % pilot(n) % u(k) > missing_r .AND. &
+                iv % pilot(n) % u(k) % qc >= obs_qc_pointer) then
              iv % pilot(n) % u(k) % inv = ob % pilot(n) % u(k) - model_u(k)
            end if
 
-           if ( ob % pilot(n) % v(k) > missing_r .AND. &
-                iv % pilot(n) % v(k) % qc >= obs_qc_pointer ) then
+           if (ob % pilot(n) % v(k) > missing_r .AND. &
+                iv % pilot(n) % v(k) % qc >= obs_qc_pointer) then
              iv % pilot(n) % v(k) % inv = ob % pilot(n) % v(k) - model_v(k)
            end if
          end do
@@ -104,7 +104,7 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
          ! [5.0] Perform optional maximum error check:
          !------------------------------------------------------------------------
 
-         if ( check_max_iv ) then
+         if (check_max_iv) then
            call da_check_max_iv_pilot(it, iv % pilot(n), itu,ituf,itvv,itvvf)
          end if
       end do
@@ -112,7 +112,7 @@ subroutine da_get_innov_vector_pilot ( it, xb, xp, ob, iv )
       if (check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
             ', Total Rejections for Pilot follows:'
-         write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
             'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
             'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
             'Finally Total Pilot rejections ',ituf+itvvf,' on ',itu+itvv

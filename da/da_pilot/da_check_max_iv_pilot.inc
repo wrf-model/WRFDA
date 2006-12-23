@@ -12,7 +12,7 @@ subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

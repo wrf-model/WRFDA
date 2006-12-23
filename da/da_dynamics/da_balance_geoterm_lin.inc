@@ -3,11 +3,11 @@ subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
                                    its,ite, jts,jte )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculates linearised geostrophic term in balance equation.
+   !  purpose: calculates linearised geostrophic term in balance equation.
    !
-   !  METHOD:  Term is k x rho f u on a single level.
+   !  method:  term is k x rho f u on a single level.
    !
-   !  ASsumPTIONS: Various (see documentation).
+   !  assumptions: Various (see documentation).
    !---------------------------------------------------------------------------
 
    implicit none
@@ -30,9 +30,14 @@ subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
 
    ! Set loop limits
 
-   is = its-1; ie = ite+1; js = jts-1; je = jte+1
-   if ( its == ids ) is = ids; if ( ite == ide ) ie = ide
-   if ( jts == jds ) js = jds; if ( jte == jde ) je = jde
+   is = its-1
+   ie = ite+1
+   js = jts-1
+   je = jte+1
+   if (its == ids ) is = ids
+   if (ite == ide ) ie = ide
+   if (jts == jds ) js = jds
+   if (jte == jde ) je = jde
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate term_x = -f rho v~:

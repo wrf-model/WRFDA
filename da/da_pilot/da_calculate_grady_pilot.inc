@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_pilot( iv, re, jo_grad_y )
+subroutine da_calculate_grady_pilot( iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -15,7 +15,7 @@ subroutine da_calculate_grady_pilot( iv, re, jo_grad_y )
    integer                      :: n, k
 
 
-   if ( iv%num_pilot > 0 ) then
+   if (iv%num_pilot > 0) then
       do n=1, iv%num_pilot
          do k=1, iv%pilot(n)%info%levels
             if(iv%pilot(n)%u(k)%qc < obs_qc_pointer) re%pilot(n)%u(k) = 0.0
@@ -23,10 +23,10 @@ subroutine da_calculate_grady_pilot( iv, re, jo_grad_y )
 
             jo_grad_y%pilot(n)%u(k) = -re%pilot(n)%u(k) / &
                                       ( iv%pilot(n)%u(k)%error * &
-                                        iv%pilot(n)%u(k)%error )
+                                        iv%pilot(n)%u(k)%error)
             jo_grad_y%pilot(n)%v(k) = -re%pilot(n)%v(k) / &
                                       ( iv%pilot(n)%v(k)%error * &
-                                        iv%pilot(n)%v(k)%error )
+                                        iv%pilot(n)%v(k)%error)
          end do
       end do
    end if

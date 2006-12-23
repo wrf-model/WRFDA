@@ -1,5 +1,5 @@
 subroutine da_check_max_iv_airep(it, airep , &
-                  itu,ituf,itvv,itvvf,itt,ittf )
+                  itu,ituf,itvv,itvvf,itt,ittf)
 
    implicit none
 
@@ -15,7 +15,7 @@ subroutine da_check_max_iv_airep(it, airep , &
    !---------------------------------------------------------------------------
 
 
-   if ( check_max_iv_print ) then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
@@ -33,7 +33,7 @@ subroutine da_check_max_iv_airep(it, airep , &
    failed = .false.
 
    do k = 1, airep % info % levels
-      if ( airep % zk(k) > 0.0) then
+      if (airep % zk(k) > 0.0) then
          ! U-wind
          call da_max_error_qc(it, airep % info, airep % u(k), &
                     max_error_uv, itu, ituf, check_max_iv_unit, 'U    ', &

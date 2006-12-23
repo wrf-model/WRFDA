@@ -1,10 +1,11 @@
 subroutine da_eof_decomposition( kz, bx, e, l )
    
-   !------------------------------------------------------------------------------
-   ! PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance 
+   !          matrix
    !          B_{x} defined by equation:  E^{T} B_{x} E = L, given input kz x kz 
    !          BE field.
-   !------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
    
    implicit none
 
@@ -37,7 +38,7 @@ subroutine da_eof_decomposition( kz, bx, e, l )
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
    
-   !--Swap order of eigenvalues, vectors so 1st is one with most variance:
+   ! Swap order of eigenvalues, vectors so 1st is one with most variance:
    
    do m = 1, kz
       l(m) = lcopy(kz+1-m)

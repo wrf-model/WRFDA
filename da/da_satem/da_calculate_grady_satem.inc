@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_satem( iv, re, jo_grad_y )
+subroutine da_calculate_grady_satem( iv, re, jo_grad_y)
 
    !----------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -14,7 +14,7 @@ subroutine da_calculate_grady_satem( iv, re, jo_grad_y )
 
    integer                      :: n, k
 
-   if ( iv%num_Satem > 0 ) then
+   if (iv%num_Satem > 0) then
       do n=1, iv%num_Satem
             do k=1, iv%satem(n)%info%levels
                if (iv%Satem(n)%thickness(k)%qc < obs_qc_pointer) then
@@ -23,7 +23,7 @@ subroutine da_calculate_grady_satem( iv, re, jo_grad_y )
 
                jo_grad_y%Satem(n)%thickness(k) = -re%Satem(n)%thickness(k) / &
                                          ( iv%Satem(n)%thickness(k)%error * &
-                                           iv%Satem(n)%thickness(k)%error )
+                                           iv%Satem(n)%thickness(k)%error)
             end do
       end do
    end if

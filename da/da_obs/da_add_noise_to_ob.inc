@@ -53,11 +53,11 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%synop(n)%loc%proc_domain) then
             num_obs = num_obs + 1
             write (ounit,'(i8)')  1
-            call da_add_noise( iv % synop(n) % u, ob % synop(n) % u, z1 )
-            call da_add_noise( iv % synop(n) % v, ob % synop(n) % v, z2 )
-            call da_add_noise( iv % synop(n) % t, ob % synop(n) % t, z3 )
-            call da_add_noise( iv % synop(n) % p, ob % synop(n) % p, z4 )
-            call da_add_noise( iv % synop(n) % q, ob % synop(n) % q, z5 )
+            call da_add_noise (iv % synop(n) % u, ob % synop(n) % u, z1)
+            call da_add_noise (iv % synop(n) % v, ob % synop(n) % v, z2)
+            call da_add_noise (iv % synop(n) % t, ob % synop(n) % t, z3)
+            call da_add_noise (iv % synop(n) % p, ob % synop(n) % p, z4)
+            call da_add_noise (iv % synop(n) % q, ob % synop(n) % q, z5)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, iv % synop(n) % u % error, &
                                      z1, &
@@ -82,11 +82,11 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%metar(n)%loc%proc_domain) then
             num_obs = num_obs + 1 
             write(ounit,'(i8)')  1
-            call da_add_noise( iv % metar(n) % u, ob % metar(n) % u, z1 )
-            call da_add_noise( iv % metar(n) % v, ob % metar(n) % v, z2 )
-            call da_add_noise( iv % metar(n) % t, ob % metar(n) % t, z3 )
-            call da_add_noise( iv % metar(n) % p, ob % metar(n) % p, z4 )
-            call da_add_noise( iv % metar(n) % q, ob % metar(n) % q, z5 )
+            call da_add_noise (iv % metar(n) % u, ob % metar(n) % u, z1)
+            call da_add_noise (iv % metar(n) % v, ob % metar(n) % v, z2)
+            call da_add_noise (iv % metar(n) % t, ob % metar(n) % t, z3)
+            call da_add_noise (iv % metar(n) % p, ob % metar(n) % p, z4)
+            call da_add_noise (iv % metar(n) % q, ob % metar(n) % q, z5)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                      iv % metar(n) % u % error, z1, &
@@ -112,11 +112,11 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')  1
             ! Add random perturbation:
-            call da_add_noise( iv % ships(n) % u, ob % ships(n) % u, z1 )
-            call da_add_noise( iv % ships(n) % v, ob % ships(n) % v, z2 )
-            call da_add_noise( iv % ships(n) % t, ob % ships(n) % t, z3 )
-            call da_add_noise( iv % ships(n) % p, ob % ships(n) % p, z4 )
-            call da_add_noise( iv % ships(n) % q, ob % ships(n) % q, z5 )
+            call da_add_noise (iv % ships(n) % u, ob % ships(n) % u, z1)
+            call da_add_noise (iv % ships(n) % v, ob % ships(n) % v, z2)
+            call da_add_noise (iv % ships(n) % t, ob % ships(n) % t, z3)
+            call da_add_noise (iv % ships(n) % p, ob % ships(n) % p, z4)
+            call da_add_noise (iv % ships(n) % q, ob % ships(n) % q, z5)
             ! Write out data:
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                      iv % ships(n) % u % error, z1, &
@@ -143,9 +143,9 @@ subroutine da_add_noise_to_ob (iv, ob)
             write(ounit,'(i8)')iv % geoamv(n) % info % levels
             do k = 1, iv % geoamv(n) % info % levels
                ! Add random perturbation:
-               call da_add_noise( iv % geoamv(n) % u(k), &
+               call da_add_noise (iv % geoamv(n) % u(k), &
                   ob % geoamv(n) % u(k), z1)
-               call da_add_noise( iv % geoamv(n) % v(k), &
+               call da_add_noise (iv % geoamv(n) % v(k), &
                   ob % geoamv(n) % v(k), z2)
 
                ! Write out data:
@@ -173,9 +173,9 @@ subroutine da_add_noise_to_ob (iv, ob)
             write(ounit,'(i8)')iv % polaramv(n) % info % levels
             do k = 1, iv % polaramv(n) % info % levels
                ! Add random perturbation:
-               call da_add_noise( iv % polaramv(n) % u(k), &
+               call da_add_noise (iv % polaramv(n) % u(k), &
                   ob % polaramv(n) % u(k), z1)
-               call da_add_noise( iv % polaramv(n) % v(k), &
+               call da_add_noise (iv % polaramv(n) % v(k), &
                   ob % polaramv(n) % v(k), z2)
 
                ! Write out data:
@@ -202,7 +202,7 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
            write(ounit,'(i8)')  1
            ! Add random perturbation:
-           call da_add_noise( iv % gpspw(n) % tpw, ob % gpspw(n) % tpw, z1 )
+           call da_add_noise (iv % gpspw(n) % tpw, ob % gpspw(n) % tpw, z1)
          
            ! Write out data:
            write(ounit,'(2i8,10e15.7)')num_obs, 1, &
@@ -256,11 +256,11 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%sound(n)%loc%proc_domain) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
-            call da_add_noise( iv % sonde_sfc(n) % u, ob % sonde_sfc(n) % u, z1 )
-            call da_add_noise( iv % sonde_sfc(n) % v, ob % sonde_sfc(n) % v, z2 )
-            call da_add_noise( iv % sonde_sfc(n) % t, ob % sonde_sfc(n) % t, z3 )
-            call da_add_noise( iv % sonde_sfc(n) % p, ob % sonde_sfc(n) % p, z4 )
-            call da_add_noise( iv % sonde_sfc(n) % q, ob % sonde_sfc(n) % q, z5 )
+            call da_add_noise (iv % sonde_sfc(n) % u, ob % sonde_sfc(n) % u, z1)
+            call da_add_noise (iv % sonde_sfc(n) % v, ob % sonde_sfc(n) % v, z2)
+            call da_add_noise (iv % sonde_sfc(n) % t, ob % sonde_sfc(n) % t, z3)
+            call da_add_noise (iv % sonde_sfc(n) % p, ob % sonde_sfc(n) % p, z4)
+            call da_add_noise (iv % sonde_sfc(n) % q, ob % sonde_sfc(n) % q, z5)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                iv % sonde_sfc(n) % u % error, z1, &
@@ -314,8 +314,8 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % pilot(n) % info % levels
             do k = 1, iv % pilot(n) % info % levels
-               call da_add_noise( iv % pilot(n) % u(k), ob % pilot(n) % u(k), z1)
-               call da_add_noise( iv % pilot(n) % v(k), ob % pilot(n) % v(k), z2)
+               call da_add_noise (iv % pilot(n) % u(k), ob % pilot(n) % u(k), z1)
+               call da_add_noise (iv % pilot(n) % v(k), ob % pilot(n) % v(k), z2)
 
                write(ounit,'(2i8,10e15.7)')num_obs, k, &
                                iv % pilot(n) % u(k) % error, z1, &
@@ -340,10 +340,10 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1 
  
-            call da_add_noise( iv % ssmi_retrieval(n) % speed, &
-                            ob % ssmi_retrieval(n) % speed, z1 )
-            call da_add_noise( iv % ssmi_retrieval(n) % tpw, &
-                            ob % ssmi_retrieval(n) % tpw, z2 )
+            call da_add_noise (iv % ssmi_retrieval(n) % speed, &
+                            ob % ssmi_retrieval(n) % speed, z1)
+            call da_add_noise (iv % ssmi_retrieval(n) % tpw, &
+                            ob % ssmi_retrieval(n) % tpw, z2)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                   iv % ssmi_retrieval(n) % speed % error, z1, &
@@ -363,19 +363,19 @@ subroutine da_add_noise_to_ob (iv, ob)
       do n = 1, iv % num_ssmi_tb
          if (iv%ssmi_tb(n)%loc%proc_domain) then
             num_obs = num_obs + 1
-            call da_add_noise( iv % ssmi_tb(n) % tb19h, &
+            call da_add_noise (iv % ssmi_tb(n) % tb19h, &
                                ob % ssmi_tb(n) % tb19h, z1)
-            call da_add_noise( iv % ssmi_tb(n) % tb19v, &
+            call da_add_noise (iv % ssmi_tb(n) % tb19v, &
                                ob % ssmi_tb(n) % tb19v, z2)
-            call da_add_noise( iv % ssmi_tb(n) % tb22v, &
+            call da_add_noise (iv % ssmi_tb(n) % tb22v, &
                                ob % ssmi_tb(n) % tb22v, z3)
-            call da_add_noise( iv % ssmi_tb(n) % tb37h, &
+            call da_add_noise (iv % ssmi_tb(n) % tb37h, &
                                ob % ssmi_tb(n) % tb37h, z4)
-            call da_add_noise( iv % ssmi_tb(n) % tb37v, &
+            call da_add_noise (iv % ssmi_tb(n) % tb37v, &
                                ob % ssmi_tb(n) % tb37v, z5)
-            call da_add_noise( iv % ssmi_tb(n) % tb85h, &
+            call da_add_noise (iv % ssmi_tb(n) % tb85h, &
                                ob % ssmi_tb(n) % tb85h, z6)
-            call da_add_noise( iv % ssmi_tb(n) % tb85v, &
+            call da_add_noise (iv % ssmi_tb(n) % tb85v, &
                                ob % ssmi_tb(n) % tb85v, z7)
 
             write(ounit,'(i8)') 1 
@@ -405,8 +405,8 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % satem(n) % info % levels
             do k = 1, iv % satem(n) % info % levels
-               call da_add_noise( iv % satem(n) % thickness(k), &
-                  ob % satem(n) % thickness(k), z1 )
+               call da_add_noise (iv % satem(n) % thickness(k), &
+                  ob % satem(n) % thickness(k), z1)
                write(ounit,'(2i8,10e15.7)')num_obs, k, &
                   iv % satem(n) % thickness(k) % error, z1, &
                   dum, dum, dum, dum, dum, dum, dum, dum
@@ -430,8 +430,8 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % ssmt1(n) % info % levels      
             do k = 1, iv % ssmt1(n) % info % levels
-               call da_add_noise( iv % ssmt1(n) % t(k), &
-                               ob % ssmt1(n) % t(k), z1 )
+               call da_add_noise (iv % ssmt1(n) % t(k), &
+                               ob % ssmt1(n) % t(k), z1)
 
                write (ounit,'(2i8,10e15.7)') num_obs, k, &
                   iv % ssmt1(n) % t(k) % error, z1, &
@@ -458,8 +458,8 @@ subroutine da_add_noise_to_ob (iv, ob)
          
             do k = 1, iv % ssmt2(n) % info % levels
 
-               call da_add_noise( iv % ssmt2(n) % rh(k), &
-                               ob % ssmt2(n) % rh(k), z1 )
+               call da_add_noise (iv % ssmt2(n) % rh(k), &
+                               ob % ssmt2(n) % rh(k), z1)
 
                write (ounit,'(2i8,10e15.7)')num_obs, k, &
                   iv % ssmt2(n) % rh(k) % error, z1, &
@@ -482,8 +482,8 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%qscat(n)%loc%proc_domain) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
-            call da_add_noise( iv % qscat(n) % u, ob % qscat(n) % u, z1 )
-            call da_add_noise( iv % qscat(n) % v, ob % qscat(n) % v, z2 )
+            call da_add_noise (iv % qscat(n) % u, ob % qscat(n) % u, z1)
+            call da_add_noise (iv % qscat(n) % v, ob % qscat(n) % v, z2)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                   iv % qscat(n) % u % error, z1, &
@@ -506,11 +506,11 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%buoy(n)%loc%proc_domain) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
-            call da_add_noise( iv % buoy(n) % u, ob % buoy(n) % u, z1 )
-            call da_add_noise( iv % buoy(n) % v, ob % buoy(n) % v, z2 )
-            call da_add_noise( iv % buoy(n) % t, ob % buoy(n) % t, z3 )
-            call da_add_noise( iv % buoy(n) % p, ob % buoy(n) % p, z4 )
-            call da_add_noise( iv % buoy(n) % q, ob % buoy(n) % q, z5 )
+            call da_add_noise (iv % buoy(n) % u, ob % buoy(n) % u, z1)
+            call da_add_noise (iv % buoy(n) % v, ob % buoy(n) % v, z2)
+            call da_add_noise (iv % buoy(n) % t, ob % buoy(n) % t, z3)
+            call da_add_noise (iv % buoy(n) % p, ob % buoy(n) % p, z4)
+            call da_add_noise (iv % buoy(n) % q, ob % buoy(n) % q, z5)
 
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                   iv % buoy(n) % u % error, z1, &
@@ -536,9 +536,9 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % profiler(n) % info % levels
             do k = 1, iv % profiler(n) % info % levels
-               call da_add_noise( iv % profiler(n) % u(k), &
+               call da_add_noise (iv % profiler(n) % u(k), &
                   ob % profiler(n) % u(k), z1)
-               call da_add_noise( iv % profiler(n) % v(k), &
+               call da_add_noise (iv % profiler(n) % v(k), &
                   ob % profiler(n) % v(k), z2)
 
                write(ounit,'(2i8,10e15.7)')num_obs, k, &
@@ -564,17 +564,17 @@ subroutine da_add_noise_to_ob (iv, ob)
          if (iv%bogus(n)%loc%proc_domain) then
             num_obs = num_obs + 1
             write(ounit,'(i8)') 1
-            call da_add_noise( iv % bogus(n) % slp, ob % bogus(n) % slp, z1 )
+            call da_add_noise (iv % bogus(n) % slp, ob % bogus(n) % slp, z1)
             write(ounit,'(2i8,10e15.7)')num_obs, 1, &
                                   iv % bogus(n) % slp % error, z1, &
                                   dum, dum, dum, dum, dum, dum, dum, dum
 
             write(ounit,'(i8)')iv % bogus(n) % info % levels
             do k = 1, iv % bogus(n) % info % levels
-               call da_add_noise( iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
-               call da_add_noise( iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
-               call da_add_noise( iv % bogus(n) % t(k), ob % bogus(n) % t(k), z3)
-               call da_add_noise( iv % bogus(n) % q(k), ob % bogus(n) % q(k), z4)
+               call da_add_noise (iv % bogus(n) % u(k), ob % bogus(n) % u(k), z1)
+               call da_add_noise (iv % bogus(n) % v(k), ob % bogus(n) % v(k), z2)
+               call da_add_noise (iv % bogus(n) % t(k), ob % bogus(n) % t(k), z3)
+               call da_add_noise (iv % bogus(n) % q(k), ob % bogus(n) % q(k), z4)
 
                write(ounit,'(2i8,10e15.7)')num_obs, k, &
                                iv % bogus(n) % u(k) % error, z1, &
@@ -601,8 +601,8 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % airsr(n) % info % levels
             do k = 1, iv % airsr(n) % info % levels
-               call da_add_noise( iv % airsr(n) % t(k), ob % airsr(n) % t(k), z1)
-               call da_add_noise( iv % airsr(n) % q(k), ob % airsr(n) % q(k), z2)
+               call da_add_noise (iv % airsr(n) % t(k), ob % airsr(n) % t(k), z1)
+               call da_add_noise (iv % airsr(n) % q(k), ob % airsr(n) % q(k), z2)
 
                write(ounit,'(2i8,10e15.7)')num_obs, k, &
                                iv % airsr(n) % t(k) % error, z1, &
@@ -638,7 +638,7 @@ subroutine da_add_noise_to_ob (iv, ob)
                if (iv%instid(inst)%rad(n)%loc%proc_domain .and. &
                   (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
                   num_obs = num_obs + 1
-                  call da_add_noise( iv%instid(inst)%rad(n)%tb(k),  &
+                  call da_add_noise (iv%instid(inst)%rad(n)%tb(k),  &
                                     ob%instid(inst)%rad(n)%tb(k), z1)
                  
                   write(ounit,'(2i8,f10.3,e15.7)') num_obs, 1,  &
@@ -663,8 +663,8 @@ subroutine da_add_noise_to_ob (iv, ob)
             num_obs = num_obs + 1
             write(ounit,'(i8)')iv % gpsref(n) % info % levels
             do k = 1, iv % gpsref(n) % info % levels
-               call da_add_noise( iv % gpsref(n) % ref(k), &
-                  ob % gpsref(n) % ref(k), z1 )
+               call da_add_noise (iv % gpsref(n) % ref(k), &
+                  ob % gpsref(n) % ref(k), z1)
                write (ounit,'(2i8,10e15.7)')num_obs, k, &
                   iv % gpsref(n) % ref(k) % error, z1, &
                   dum, dum, dum, dum, dum, dum, dum, dum

@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf )
+subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
 
    implicit none
    integer,           intent (in)         ::  it      ! outer iteration
@@ -16,7 +16,7 @@ subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf )
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   if ( print )then
+   if (print) then
       write (iunit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates innovation vector does QC for  Geo. AMV's
@@ -8,10 +8,10 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
    implicit none
 
    integer, intent(in)           :: it      ! External iteration.
-   type (xb_type), intent(in)    :: xb      ! first guess state.
-   type (xpose_type), intent(in) :: xp      ! Domain decomposition vars.
-   type (y_type),  intent(in)    :: ob      ! Observation structure.
-   type (ob_type), intent(inout) :: iv      ! O-B structure.
+   type(xb_type), intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in) :: xp      ! Domain decomposition vars.
+   type(y_type),  intent(in)    :: ob      ! Observation structure.
+   type(ob_type), intent(inout) :: iv      ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i, j, k  ! Index dimension.
@@ -26,7 +26,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
 
    integer           :: itu,ituf,itvv,itvvf
 
-   if ( iv % num_geoamv > 0 ) then
+   if (iv % num_geoamv > 0) then
       itu   = 0
       itvv  = 0
       ituf  = 0
@@ -37,7 +37,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
          ! [1.3] Get horizontal interpolation weights:
 
          num_levs = iv % geoamv(n) % info % levels
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          model_u(:) = 0.0
          model_v(:) = 0.0
@@ -57,7 +57,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
          do k=1, iv % geoamv(n) % info % levels
             iv%geoamv(n)%zk(k)=missing_r
 
-            if ( iv % geoamv(n) % p(k) > 1.0 ) then
+            if (iv % geoamv(n) % p(k) > 1.0) then
                call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
             end if
 
@@ -75,22 +75,22 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
 #else
          call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
                              dy, dxm, dym, model_u(1), max_ob_levels, &
-                             iv%geoamv(n)%zk(1), num_levs )
+                             iv%geoamv(n)%zk(1), num_levs)
          call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, &
                              dy, dxm, dym, model_v(1), max_ob_levels, &
-                             iv%geoamv(n)%zk(1), num_levs )
+                             iv%geoamv(n)%zk(1), num_levs)
 #endif
 
          do k = 1, iv % geoamv(n) % info % levels
             iv % geoamv(n) % u(k) % inv = 0.0
             iv % geoamv(n) % v(k) % inv = 0.0
-            if ( ob % geoamv(n) % u(k) > missing_r .AND. &
-                 iv % geoamv(n) % u(k) % qc >= obs_qc_pointer ) then
+            if (ob % geoamv(n) % u(k) > missing_r .AND. &
+                 iv % geoamv(n) % u(k) % qc >= obs_qc_pointer) then
                iv % geoamv(n) % u(k) % inv = ob % geoamv(n) % u(k) - model_u(k)
             end if
 
-            if ( ob % geoamv(n) % v(k) > missing_r .AND. &
-                 iv % geoamv(n) % v(k) % qc >= obs_qc_pointer ) then
+            if (ob % geoamv(n) % v(k) > missing_r .AND. &
+                 iv % geoamv(n) % v(k) % qc >= obs_qc_pointer) then
                iv % geoamv(n) % v(k) % inv = ob % geoamv(n) % v(k) - model_v(k)
             end if
          end do
@@ -99,7 +99,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
          ! Perform optional maximum error check:
          !------------------------------------------------------------------------
 
-         if ( check_max_iv ) then
+         if (check_max_iv) then
            call da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
          end if
       end do
@@ -107,7 +107,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv )
       if (check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
             ', Total Rejections for Geo. AMVs follows:'
-         write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
             'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
             'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
             'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv

@@ -2,8 +2,7 @@ subroutine da_check_max_iv_geoamv(it, geoamv, &
                            itu,ituf,itvv,itvvf)
 
    !-------------------------------------------------------------------------
-   ! Purpose: Innovation vector check for Geo. AMV's 
-   !               
+   ! Purpose: Innovation vector check for Geo. AMVs               
    !-------------------------------------------------------------------------
 
    implicit none
@@ -18,7 +17,7 @@ subroutine da_check_max_iv_geoamv(it, geoamv, &
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

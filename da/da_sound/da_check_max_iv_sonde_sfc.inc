@@ -1,5 +1,5 @@
 subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
-             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
+             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    implicit none
    integer,           intent (in)         :: it      ! Outer iteration
@@ -12,7 +12,7 @@ subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

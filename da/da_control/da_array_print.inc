@@ -31,7 +31,7 @@ subroutine da_array_print(direction, a, ch)
 
    ! Direction indicates the order of the rows of the print out:
 
-   if ( direction == 1 ) then
+   if (direction == 1) then
       jstart = 1
       jend = len1
       jump = 1

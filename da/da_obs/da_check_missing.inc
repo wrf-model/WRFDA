@@ -1,4 +1,4 @@
-subroutine da_check_missing( qc_flag, y_in, y_out )
+subroutine da_check_missing( qc_flag, y_in, y_out)
 
    implicit none
    
@@ -6,7 +6,7 @@ subroutine da_check_missing( qc_flag, y_in, y_out )
    real, intent(in)      :: y_in
    real, intent(out)     :: y_out
 
-   if ( qc_flag < obs_qc_pointer ) then
+   if (qc_flag < obs_qc_pointer) then
       y_out = missing_r
    else
       y_out = y_in

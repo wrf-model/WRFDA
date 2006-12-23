@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   if ( oi%num_sound < 1 ) return
+   if (oi%num_sound < 1) return
 
    n_obs_bad % u % num = number(0, 0, 0)
    n_obs_bad % v % num = number(0, 0, 0)
@@ -26,15 +26,15 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
       np_available = np_available + 5
 
       re%sonde_sfc(n)%u = da_residual( n, 0, y%sonde_sfc(n)%u, &
-                                    oi%sonde_sfc(n)%u, n_obs_bad % u )
+                                    oi%sonde_sfc(n)%u, n_obs_bad % u)
       re%sonde_sfc(n)%v = da_residual( n, 0, y%sonde_sfc(n)%v, &
-                                 oi%sonde_sfc(n)%v, n_obs_bad % v )
+                                 oi%sonde_sfc(n)%v, n_obs_bad % v)
       re%sonde_sfc(n)%t = da_residual( n, 0, y%sonde_sfc(n)%t, &
-                                 oi%sonde_sfc(n)%t, n_obs_bad % t )
+                                 oi%sonde_sfc(n)%t, n_obs_bad % t)
       re%sonde_sfc(n)%p = da_residual( n, 0, y%sonde_sfc(n)%p, &
-                                 oi%sonde_sfc(n)%p, n_obs_bad % p )
+                                 oi%sonde_sfc(n)%p, n_obs_bad % p)
       re%sonde_sfc(n)%q = da_residual( n, 0, y%sonde_sfc(n)%q, &
-                                 oi%sonde_sfc(n)%q, n_obs_bad % q )
+                                 oi%sonde_sfc(n)%q, n_obs_bad % q)
    end do
 
    np_missing = np_missing + n_obs_bad % u % num % miss + &

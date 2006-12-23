@@ -1,44 +1,44 @@
 subroutine da_calculate_residual_rad( iv, y, re,                 &
                                         np_missing, np_bad_data, &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
   !---------------------------------------------------------------------------
-  !  PURPOSE: Calculate Obs Residual and counting obs number.
+  ! Purpose: calculate obs residual and counting obs number.
   !
-  !  METHOD:  re = (d - H delta_x)
+  ! Method:  re = (d - h delta_x)
   !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
 
-   TYPE (ob_type), INTENT(IN)        :: iv     ! Innovation vector (O-B).
-   TYPE (y_type) , INTENT(IN)        :: y      ! y = H (xa)
-   TYPE (y_type) , INTENT(INOUT)     :: re     ! Residual structure.
+   type (ob_type), intent(in)        :: iv     ! innovation vector (o-b).
+   type (y_type) , intent(in)        :: y      ! y = h (xa)
+   type (y_type) , intent(inout)     :: re     ! residual structure.
 
-   INTEGER       , INTENT(INOUT)     :: np_available, np_obs_used,          &
+   integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   TYPE (bad_data_type)              :: n_obs_bad
-   INTEGER                           :: n, k, i
+   type (bad_data_type)              :: n_obs_bad
+   integer                           :: n, k, i
 
-   IF ( iv%num_inst < 1 ) return
+   if (iv%num_inst < 1) return
 
    if (trace_use) call da_trace_entry("da_calculate_residual_rad")
 
-   DO i = 1, iv%num_inst
-      IF ( iv%instid(i)%num_rad < 1 ) cycle
+   do i = 1, iv%num_inst
+      if (iv%instid(i)%num_rad < 1) cycle
 
       n_obs_bad % rad % num = number(0, 0, 0)
 
-      DO n=1, iv%instid(i)%num_rad
+      do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             np_available = np_available + iv%instid(i)%nchan
             re%instid(i)%rad(n)%tb(k) = da_residual( n, k, &
                y%instid(i)%rad(n)%tb(k), &
-               iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad )
+               iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad)
          end do
-      END DO
-   END DO
+      end do
+   end do
 
    np_missing  = np_missing  + n_obs_bad % rad % num % miss
    np_bad_data = np_bad_data + n_obs_bad % rad % num % bad

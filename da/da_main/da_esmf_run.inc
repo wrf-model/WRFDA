@@ -1,5 +1,7 @@
 subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
 
+   implicit none
+
    type(ESMF_GridComp), intent(inout) :: gcomp
    type(ESMF_State),    intent(inout) :: importState, exportState
    type(ESMF_Clock),    intent(inout) :: clock

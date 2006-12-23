@@ -4,7 +4,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                            ids, ide, jds, jde, kds, kde,            &
                            ims, ime, jms, jme, kms, kme,            &
                            its, ite, jts, jte, kts, kte,            &
-                           grid, config_flags                       )
+                           grid, config_flags                      )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Initialises the Y-array
@@ -57,7 +57,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    je_start = cv_size_jb + 1
    je_end = cv_size_jb + cv_size_je
 
-   call da_allocate_y( iv, jo_grad_y )
+   call da_allocate_y( iv, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! [1.0] calculate jo:
@@ -71,21 +71,21 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte,             &
-                              grid, config_flags                        )
+                              grid, config_flags                       )
 
    ! [1.2] compute residual (o-a) = (o-b) - h x~
 
-   call da_calculate_residual( iv, y, re )
+   call da_calculate_residual( iv, y, re)
 
    ! [1.3] calculate jo:
 
    call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
 
-   if ( testing_dm_exact ) then
+   if (testing_dm_exact) then
       ! jo_partial has been already summed at lower level
       j % jo % total = jo_partial
    else
-      j % jo % total = wrf_dm_sum_real( jo_partial )
+      j % jo % total = wrf_dm_sum_real( jo_partial)
    end if
 
    ! [1.4] calculate jc-dfi:
@@ -96,12 +96,12 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
-      call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+      call nl_set_dyn_opt ( 1 , DYN_EM_TL)
 
       call da_med_initialdata_input( grid , config_flags, 'tldf')
 
       grid%dyn_opt = ndynopt
-      call nl_set_dyn_opt ( 1 , DYN_EM )
+      call nl_set_dyn_opt ( 1 , DYN_EM)
 
       j % jc = j % jc + 0.5*da_dot( size(grid%em_g_u_2), grid%em_g_u_2 , grid%em_g_u_2)
       j % jc = j % jc + 0.5*da_dot( size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
@@ -120,7 +120,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % jb = 0.5 * da_dot_cv( cv_size_jb, cv_size_domain_jb, &
        cv_jb + xhat_jb, cv_jb + xhat_jb, grid%xp, &
-       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    j % jb = jb_factor * j % jb
 
@@ -134,7 +134,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
       j % je = 0.5 * da_dot_cv( cv_size_je, cv_size_domain_je, &
           cv_je + xhat_je, cv_je + xhat_je, grid%xp, &
-          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    end if
    j % je = je_factor * j % je
 
@@ -142,7 +142,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [4.0] calculate total cost function j = jo + jb + jc + je:
    !-------------------------------------------------------------------------
 
-   if( grid%jcdfi_use ) then
+   if (grid%jcdfi_use) then
       j % total = j % jb + j % jo % total + j % jc + j % je
    else
       j % total = j % jb + j % jo % total + j % je
@@ -169,9 +169,9 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &
-                               grid, config_flags, cg_jcdf )
+                               grid, config_flags, cg_jcdf)
 
-   call da_deallocate_y( jo_grad_y )
+   call da_deallocate_y( jo_grad_y)
 
    if (print_detail_grad) then
       write(unit=stdout, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
@@ -188,25 +188,25 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    !-------------------------------------------------------------------------
 
    gnorm_jo = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
-      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+      (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    ! Add Del_v (Jb)
    j_grad(1:cv_size_jb) =  jb_factor * &
-                           ( cv(1:cv_size_jb) + xhat(1:cv_size_jb) ) + &
+                           ( cv(1:cv_size_jb) + xhat(1:cv_size_jb)) + &
                            j_grad(1:cv_size_jb)
 
    ! Add Del_v (Je)
-   if ( cv_size_je > 0 ) then
+   if (cv_size_je > 0) then
       j_grad(je_start:je_end) = je_factor * &
-                                ( cv(je_start:je_end) + xhat(je_start:je_end) ) + &
+                                ( cv(je_start:je_end) + xhat(je_start:je_end)) + &
                                 j_grad(je_start:je_end)
    end if
    gnorm_jb = da_dot_cv( cv_size_jb, cv_size_domain_jb, &
                          cv_jb + xhat_jb , cv_jb + xhat_jb, grid%xp, &
-                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    gnorm_je = da_dot_cv( cv_size_je, cv_size_domain_je, &
                          cv_je + xhat_je , cv_je + xhat_je, grid%xp, &
-                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    if (print_detail_grad) then
       write(unit=stdout, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
@@ -223,12 +223,12 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    end if
 
    gnorm_j = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
-                        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /) )
+                        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    gnorm_jo= sqrt(gnorm_jo)
-   gnorm_jb= jb_factor * sqrt(gnorm_jb )
-   gnorm_je= je_factor * sqrt(gnorm_je )
-   gnorm_j = sqrt(gnorm_j )
+   gnorm_jb= jb_factor * sqrt(gnorm_jb)
+   gnorm_je= je_factor * sqrt(gnorm_je)
+   gnorm_j = sqrt(gnorm_j)
 
    if (rootproc) then
       write(grad_unit,fmt='(2x,i2,1x,f6.3,2x,i4,2x,4f10.3)') & 

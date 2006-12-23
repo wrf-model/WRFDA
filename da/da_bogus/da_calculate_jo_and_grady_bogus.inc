@@ -1,4 +1,4 @@
-subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
+subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y)
 
    implicit none
 
@@ -19,24 +19,23 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
       do n=1, iv%num_Bogus
          jo_grad_y%Bogus(n)%slp = -re%Bogus(n)%slp /  &
                                   ( iv%Bogus(n)%slp%error * &
-                                    iv%Bogus(n)%slp%error )
+                                    iv%Bogus(n)%slp%error)
          do k=1, iv%bogus(n)%info%levels
             jo_grad_y%Bogus(n)%u(k) = -re%Bogus(n)%u(k) / &
                                        ( iv%Bogus(n)%u(k)%error * &
-                                         iv%Bogus(n)%u(k)%error )
+                                         iv%Bogus(n)%u(k)%error)
             jo_grad_y%Bogus(n)%v(k) = -re%Bogus(n)%v(k) / &
                                        ( iv%Bogus(n)%v(k)%error * &
-                                         iv%Bogus(n)%v(k)%error )
+                                         iv%Bogus(n)%v(k)%error)
             jo_grad_y%Bogus(n)%t(k) = -re%Bogus(n)%t(k) / &
                                        ( iv%Bogus(n)%t(k)%error * &
-                                         iv%Bogus(n)%t(k)%error )
+                                         iv%Bogus(n)%t(k)%error)
             jo_grad_y%Bogus(n)%q(k) = -re%Bogus(n)%q(k) / &
                                        ( iv%Bogus(n)%q(k)%error * &
-                                         iv%Bogus(n)%q(k)%error )
+                                         iv%Bogus(n)%q(k)%error)
          end do
 
          if (iv%bogus(n)%loc%proc_domain) then
-
             jo%Bogus_slp = jo%Bogus_slp -   &
                            re%Bogus(n)%slp * jo_grad_y%Bogus(n)%slp
 
@@ -58,7 +57,6 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y )
       jo % bogus_v = 0.5 * jo % bogus_v
       jo % bogus_t = 0.5 * jo % bogus_t
       jo % bogus_q = 0.5 * jo % bogus_q
-
    end if
 
 end subroutine da_calculate_jo_and_grady_bogus

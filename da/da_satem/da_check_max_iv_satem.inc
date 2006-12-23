@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_satem(it, satem,ith,ithf )
+subroutine da_check_max_iv_satem(it, satem,ith,ithf)
 
    implicit none
 
@@ -16,7 +16,7 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf )
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   if ( print )then
+   if (print) then
       write (iunit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

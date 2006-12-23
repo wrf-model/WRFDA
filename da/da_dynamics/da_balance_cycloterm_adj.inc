@@ -45,8 +45,8 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
    is = its; ie = ite; js = jts; je = jte
    if (.not. global .and. its == ids ) is = ids+1
    if (.not. global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (jts == jds ) js = jds+1
+   if (jte == jde ) je = jde-1
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate term_y = rho M ( u'dv/dx + v'dv/dy + udv'/dx + vdv'/dy ):
@@ -60,29 +60,29 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [3.6] Corner points:
 
-      if ( its == ids .AND. jts == jds ) then
+      if (its == ids .AND. jts == jds ) then
          data(its,jts+1) = data(its,jts+1) + 0.5 * data(its,jts)
          data(its+1,jts) = data(its+1,jts) + 0.5 * data(its,jts)
       end if
 
-      if ( ite == ide .AND. jts == jds ) then
+      if (ite == ide .AND. jts == jds ) then
          data(ite-1,jts) = data(ite-1,jts) + 0.5 * data(ite,jts)
          data(ite,jts+1) = data(ite,jts+1) + 0.5 * data(ite,jts)
       end if
 
-      if ( its == ids .AND. jte == jde ) then
+      if (its == ids .AND. jte == jde ) then
          data(its,jde-1) = data(its,jde-1) + 0.5 * data(its,jde)
          data(its+1,jde) = data(its+1,jde) + 0.5 * data(its,jde)
       end if
 
-      if ( ite == ide .AND. jte == jde ) then 
+      if (ite == ide .AND. jte == jde ) then 
          data(ite-1,jte) = data(ite-1,jte) + 0.5 * data(ite,jte)
          data(ite,jte-1) = data(ite,jte-1) + 0.5 * data(ite,jte)
       end if
 
       ! [3.5] Right boundaries:
 
-      if ( jte == jde ) then
+      if (jte == jde ) then
          j = jte
 
          do i = is, ie
@@ -104,7 +104,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [3.4] Left boundaries:
 
-      if ( jts == jds ) then
+      if (jts == jds ) then
          j = jts
 
          do i = is, ie
@@ -125,7 +125,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [3.3] Top boundaries:
 
-      if ( ite == ide ) then
+      if (ite == ide ) then
          i = ite
 
          do j = js, je
@@ -147,7 +147,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [3.2] Bottom boundaries:
 
-      if ( its == ids ) then
+      if (its == ids ) then
          i = its
 
          do j = js, je
@@ -195,29 +195,29 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
    if( .NOT. global) then
       ! [2.6] Corner points:
 
-      if ( its == ids .AND. jts == jds ) then
+      if (its == ids .AND. jts == jds ) then
          data(its,jts+1) = data(its,jts+1) + 0.5 * data(its,jts)
          data(its+1,jts) = data(its+1,jts) + 0.5 * data(its,jts)
       end if
 
-      if ( ite == ide .AND. jts == jds ) then
+      if (ite == ide .AND. jts == jds ) then
          data(ite-1,jts) = data(ite-1,jts) + 0.5 * data(ite,jts)
          data(ite,jts+1) = data(ite,jts+1) + 0.5 * data(ite,jts)
       end if
 
-      if ( its == ids .AND. jte == jde ) then
+      if (its == ids .AND. jte == jde ) then
          data(its,jde-1) = data(its,jde-1) + 0.5 * data(its,jde)
          data(its+1,jde) = data(its+1,jde) + 0.5 * data(its,jde)
       end if
 
-      if ( ite == ide .AND. jte == jde ) then 
+      if (ite == ide .AND. jte == jde ) then 
          data(ite-1,jte) = data(ite-1,jte) + 0.5 * data(ite,jte)
          data(ite,jte-1) = data(ite,jte-1) + 0.5 * data(ite,jte)
       end if
 
       ! [2.5] Right boundaries:
 
-      if ( jte == jde ) then
+      if (jte == jde ) then
          j = jte
 
          do i = is, ie
@@ -238,7 +238,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [2.4] Left boundaries:
 
-      if ( jts == jds ) then
+      if (jts == jds ) then
          j = jts
 
          do i = is, ie
@@ -259,7 +259,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [2.3] Top boundaries:
 
-      if ( ite == ide ) then
+      if (ite == ide ) then
          i = ite
 
          do j = js, je
@@ -280,7 +280,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
 
       ! [2.2] Bottom boundaries:
 
-      if ( its == ids ) then
+      if (its == ids ) then
          i = its
 
          do j = js, je

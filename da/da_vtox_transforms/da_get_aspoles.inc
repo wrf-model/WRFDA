@@ -1,7 +1,7 @@
 subroutine da_get_aspoles(x,              &
           ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
+          its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Treatment for Adjoint of Scalar field at Poles
@@ -31,7 +31,7 @@ subroutine da_get_aspoles(x,              &
       end do
    end if
 
-   call wrf_dm_sum_reals (tmp_s(:),tmps(:))
+   call wrf_dm_sum_reals(tmp_s(:),tmps(:))
 
    if (jts == jds) then
       do k = kts, kte
@@ -48,7 +48,7 @@ subroutine da_get_aspoles(x,              &
       end do
    end if
 
-   call wrf_dm_sum_reals (tmp_s(:),tmps(:))
+   call wrf_dm_sum_reals(tmp_s(:),tmps(:))
 
    if (jte == jde) then
       do k = kts, kte

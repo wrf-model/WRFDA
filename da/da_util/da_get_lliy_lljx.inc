@@ -3,7 +3,7 @@ subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
 
    implicit none
 
-   type (big_record_header), intent(in)  :: big_header_CAA_domain, big_header_current
+   type(big_record_header), intent(in)  :: big_header_CAA_domain, big_header_current
    integer,                  intent(out) :: lliy, lljx
 
 
@@ -13,19 +13,19 @@ subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
 
    ! For CAA domain
 
-   ! lliy_CAA_domain: low-left corner i-direction (y-direction) in its mother domain
-   ! lljx_CAA_domain: low-left corner j-direction (x-direction) in its mother domain
-   ! miy_CAA_domain_coarse: The most coarse domain size in i-direction (y-direction)
-   ! mjx_CAA_domain_coarse: The most coarse domain size in j-direction (x-direction)
+   ! lliy_CAA_domain: low-left corner i-direction(y-direction) in its mother domain
+   ! lljx_CAA_domain: low-left corner j-direction(x-direction) in its mother domain
+   ! miy_CAA_domain_coarse: The most coarse domain size in i-direction(y-direction)
+   ! mjx_CAA_domain_coarse: The most coarse domain size in j-direction(x-direction)
 
    integer :: lliy_CAA_domain, lljx_CAA_domain, miy_CAA_domain_coarse, mjx_CAA_domain_coarse
 
    ! For WRFVAR domain
 
-   ! lliy_current: low-left corner i-direction (y-direction) in its mother domain
-   ! lljx_current: low-left corner j-direction (x-direction) in its mother domain
-   ! miy_current_coarse: The most coarse domain size in i-direction (y-direction)
-   ! mjx_current_coarse: The most coarse domain size in j-direction (x-direction)
+   ! lliy_current: low-left corner i-direction(y-direction) in its mother domain
+   ! lljx_current: low-left corner j-direction(x-direction) in its mother domain
+   ! miy_current_coarse: The most coarse domain size in i-direction(y-direction)
+   ! mjx_current_coarse: The most coarse domain size in j-direction(x-direction)
 
    integer :: lliy_current, lljx_current, miy_current_coarse, mjx_current_coarse
 
@@ -37,14 +37,14 @@ subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
    mjx_current=big_header_current%bhi(17,1)
 
    ! Calcuclate distance of the low-left corner to its
-   ! mother domain's low-left corner (WRFVAR domain)
+   ! mother domain's low-left corner(WRFVAR domain)
 
    dy = 0.5+(big_header_current%bhr(10,1)-1.0) &
       * real(big_header_current%bhi(20,1))
    dx = 0.5+(big_header_current%bhr(11,1)-1.0) &
       * real(big_header_current%bhi(20,1))
 
-   ! transfer to grid number (low-left corner's grid index)
+   ! transfer to grid number(low-left corner's grid index)
 
    lliy_current=int(dy) + 1
    lljx_current=int(dx) + 1
@@ -65,7 +65,7 @@ subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
    mjx_CAA_domain_coarse=big_header_CAA_domain%bhi(6,1)
 
    ! Calcuclate distance of the low-left corner to its 
-   ! mother domain's low-left corner (CAA Domain)
+   ! mother domain's low-left corner(CAA Domain)
 
    dy = 0.5+(big_header_CAA_domain%bhr(10,1)-1.0) &
       * real(big_header_CAA_domain%bhi(20,1))
@@ -81,7 +81,7 @@ subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
    lljx_CAA_domain=big_header_CAA_domain%bhi(20,1)*lljx+int(dx)+1
 
    ! low-left corner index of CAA original domain in WRFVAR domain.
-   ! (WRFVAR is extended CAA domain, &
+   !(WRFVAR is extended CAA domain, &
    ! so WRFVAR domain is bigger than CAA domain)
 
    lliy=lliy_CAA_domain - lliy_current + 1

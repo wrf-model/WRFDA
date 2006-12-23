@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_buoy( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_buoy( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   if ( oi%num_buoy > 0 ) then
+   if (oi%num_buoy > 0) then
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
       n_obs_bad % t % num = number(0, 0, 0)
@@ -25,15 +25,15 @@ subroutine da_calculate_residual_buoy( oi, y, re,                        &
          np_available = np_available + 5
 
          re%buoy(n)%u = da_residual( n, 0, y%buoy(n)%u, &
-                                     oi%buoy(n)%u, n_obs_bad % u )
+                                     oi%buoy(n)%u, n_obs_bad % u)
          re%buoy(n)%v = da_residual( n, 0, y%buoy(n)%v, &
-                                  oi%buoy(n)%v, n_obs_bad % v )
+                                  oi%buoy(n)%v, n_obs_bad % v)
          re%buoy(n)%t = da_residual( n, 0, y%buoy(n)%t, &
-                                  oi%buoy(n)%t, n_obs_bad % t )
+                                  oi%buoy(n)%t, n_obs_bad % t)
          re%buoy(n)%p = da_residual( n, 0, y%buoy(n)%p, &
-                                  oi%buoy(n)%p, n_obs_bad % p )
+                                  oi%buoy(n)%p, n_obs_bad % p)
          re%buoy(n)%q = da_residual( n, 0, y%buoy(n)%q, &
-                                  oi%buoy(n)%q, n_obs_bad % q )
+                                  oi%buoy(n)%q, n_obs_bad % q)
       end do
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &

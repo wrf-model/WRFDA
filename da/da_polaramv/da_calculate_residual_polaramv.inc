@@ -1,14 +1,9 @@
 subroutine da_calculate_residual_polaramv( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
-!-------------------------------------------------------------------------
-!  HISTORY: 
-!
-!      Created: 03/05/2005                   Syed RH Rizvi   
-!
-!      Purpose: Calculates residual vector for Polar. AMVs    
-!               
-!-------------------------------------------------------------------------
+                                        np_obs_used, np_available)
+   !-------------------------------------------------------------------------
+   ! Purpose: TBD
+   !-------------------------------------------------------------------------
 
    implicit none
 
@@ -22,7 +17,7 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_polaramv > 0 ) then
+   if (oi%num_polaramv > 0) then
 
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
@@ -32,9 +27,9 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
             np_available = np_available + 2
 
             re%polaramv(n)%u(k) = da_residual( n, 0, y%polaramv(n)%u(k), &
-                                      oi%polaramv(n)%u(k), n_obs_bad % u )
+                                      oi%polaramv(n)%u(k), n_obs_bad % u)
             re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
-                                   oi%polaramv(n)%v(k), n_obs_bad % v )            
+                                   oi%polaramv(n)%v(k), n_obs_bad % v)            
         end do
      end do
       

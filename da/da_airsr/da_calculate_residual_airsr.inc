@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_airsr( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    !----------------------------------------------------------------------
    ! Purpose: Calculates residual at AIRS retrieval locations                   
@@ -18,7 +18,7 @@ subroutine da_calculate_residual_airsr( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_airsr > 0 ) then
+   if (oi%num_airsr > 0) then
       n_obs_bad % t % num = number(0, 0, 0)
       n_obs_bad % q % num = number(0, 0, 0)
 
@@ -27,9 +27,9 @@ subroutine da_calculate_residual_airsr( oi, y, re,                        &
            np_available = np_available + 4
 
            re%airsr(n)%t(k) = da_residual( n, k, y%airsr(n)%t(k), &
-                                      oi%airsr(n)%t(k), n_obs_bad % t )
+                                      oi%airsr(n)%t(k), n_obs_bad % t)
            re%airsr(n)%q(k) = da_residual( n, k, y%airsr(n)%q(k), &
-                                      oi%airsr(n)%q(k), n_obs_bad % q )
+                                      oi%airsr(n)%q(k), n_obs_bad % q)
          end do
       end do
 

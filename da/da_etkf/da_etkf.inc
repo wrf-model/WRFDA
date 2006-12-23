@@ -230,7 +230,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccum
 
   proj2sum = proj2
 
-  if(nout .ge. nstartaccum2) then 
+  if (nout .ge. nstartaccum2) then 
   proj2sum = 0.
   do nt = nout-naccumt2+1,nout
   read(89,rec=nt) proj2sum1

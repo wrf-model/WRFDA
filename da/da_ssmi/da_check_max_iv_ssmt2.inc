@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
+subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
 
    implicit none
 
@@ -17,7 +17,7 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf )
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   if (print)then
+   if (print) then
       write (iunit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

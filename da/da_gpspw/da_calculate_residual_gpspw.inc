@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_gpspw( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,12 +14,12 @@ subroutine da_calculate_residual_gpspw( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   if ( oi%num_Gpspw > 0 ) then
+   if (oi%num_Gpspw > 0) then
       n_obs_bad % q % num = number(0, 0, 0)
       do n=1, oi%num_Gpspw
          np_available = np_available + 1
          re%gpspw(n)%tpw = da_residual(n, 0, y%gpspw(n)%tpw, &
-            oi%gpspw(n)%tpw, n_obs_bad % q )
+            oi%gpspw(n)%tpw, n_obs_bad % q)
       end do
 
       np_missing  = np_missing  + n_obs_bad % q % num % miss 

@@ -1,8 +1,9 @@
-subroutine da_calculate_grady_rad( iv, re, jo_grad_y ) 
+subroutine da_calculate_grady_rad( iv, re, jo_grad_y) 
+
    !------------------------------------------------------------------------------
    !  PURPOSE: Calculate Gradient_y for radiance data.
    !
-   !  METHOD:  grad_y = -R^-1 (d - H delta_x ).
+   !  METHOD:  grad_y = -R^-1 (d - H delta_x).
    !------------------------------------------------------------------------------
 
    implicit none
@@ -18,12 +19,12 @@ subroutine da_calculate_grady_rad( iv, re, jo_grad_y )
    if (trace_use) call da_trace_entry("da_calculate_grady_rad")
 
    do i =1, iv%num_inst
-      if ( iv%instid(i)%num_rad < 1 ) cycle
+      if (iv%instid(i)%num_rad < 1) cycle
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
                                       ( iv%instid(i)%rad(n)%tb(k)%error * &
-                                        iv%instid(i)%rad(n)%tb(k)%error )
+                                        iv%instid(i)%rad(n)%tb(k)%error)
          end do
       end do
    end do

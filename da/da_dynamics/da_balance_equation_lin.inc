@@ -46,7 +46,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    is = its; ie = ite; js = jts; je = jte
    if (.not.global .and. its == ids ) is = ids+1
    if (.not.global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+   if (jts == jds ) js = jds+1; if (jte == jde ) je = jde-1
 
    if( fg_format == fg_format_kma) then
       coefx = xb%coefx
@@ -72,7 +72,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
 
       ! [2.1] Include geostrophic terms in balance eqn if requested:
 
-      if ( balance_type == balance_geo .OR. &
+      if (balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) then
          call da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
                                       u(:,:,k), v(:,:,k), &
@@ -82,7 +82,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
       
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
 
-      if ( balance_type == balance_cyc .OR. &
+      if (balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) then
          call da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
@@ -104,15 +104,15 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
 
       ! [2.4] Del**2 Phi_b  boundary conditions:
 
-      if ( .not. global .and. its == ids ) del2phi_b(its,js:je,k) = 0.0
-      if ( .not. global .and. ite == ide ) del2phi_b(ite,js:je,k) = 0.0
-      if ( jts == jds ) del2phi_b(is:ie,jts,k) = 0.0
-      if ( jte == jde ) del2phi_b(is:ie,jte,k) = 0.0
+      if (.not. global .and. its == ids ) del2phi_b(its,js:je,k) = 0.0
+      if (.not. global .and. ite == ide ) del2phi_b(ite,js:je,k) = 0.0
+      if (jts == jds ) del2phi_b(is:ie,jts,k) = 0.0
+      if (jte == jde ) del2phi_b(is:ie,jte,k) = 0.0
 
-      if ( .not. global .and. (its == ids .and. jts == jds) ) del2phi_b(its,jts,k) = 0.0
-      if ( .not. global .and. (its == ids .and. jte == jde) ) del2phi_b(its,jte,k) = 0.0
-      if ( .not. global .and. (ite == ide .and. jts == jds) ) del2phi_b(ite,jts,k) = 0.0
-      if ( .not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0
+      if (.not. global .and. (its == ids .and. jts == jds) ) del2phi_b(its,jts,k) = 0.0
+      if (.not. global .and. (its == ids .and. jte == jde) ) del2phi_b(its,jte,k) = 0.0
+      if (.not. global .and. (ite == ide .and. jts == jds) ) del2phi_b(ite,jts,k) = 0.0
+      if (.not. global .and. (ite == ide .and. jte == jde) ) del2phi_b(ite,jte,k) = 0.0
       
    end do
 

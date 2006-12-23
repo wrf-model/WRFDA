@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_gpsref( oi, y, re,               &
                                         np_missing, np_bad_data,  &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Called by da_minimisation/da_calculate_residual.inc
@@ -18,7 +18,7 @@ subroutine da_calculate_residual_gpsref( oi, y, re,               &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_GPSRef < 1 ) return
+   if (oi%num_GPSRef < 1) return
 
    n_obs_bad % gpsref % num = number(0, 0, 0)
 
@@ -26,7 +26,7 @@ subroutine da_calculate_residual_gpsref( oi, y, re,               &
       do k=1, oi%gpsref(n)%info%levels
          np_available = np_available + 1
          re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
-                                  oi%GPSRef(n)%ref(k), n_obs_bad%gpsref )
+                                  oi%GPSRef(n)%ref(k), n_obs_bad%gpsref)
       end do
    end do
 

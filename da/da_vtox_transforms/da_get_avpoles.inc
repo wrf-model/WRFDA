@@ -1,7 +1,7 @@
 subroutine da_get_avpoles(u,v,       &
           ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
+          its, ite, jts, jte, kts, kte  )
 
    !--------------------------------------------------------------------------- 
    ! PURPOSE: Treatment for Adjoint of Polar winds 

@@ -1,4 +1,4 @@
-subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
+subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose:  Calculates Cost function and Gradient for Geo. CVMs 
@@ -6,10 +6,10 @@ subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
 
    implicit none
 
-   type (ob_type), intent(in)   :: iv          ! Innovation vector.
-   type (y_type), intent(in)    :: re          ! Residual vector.
-   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
-   type (jo_type), intent(inout):: jo          ! Obs cost function.
+   type(ob_type), intent(in)   :: iv          ! Innovation vector.
+   type(y_type), intent(in)    :: re          ! Residual vector.
+   type(y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type(jo_type), intent(inout):: jo          ! Obs cost function.
 
    integer                      :: n, k
 
@@ -20,11 +20,11 @@ subroutine da_get_jo_and_grady_geoamv( iv, re, jo, jo_grad_y )
       do n=1, iv%num_geoamv
          do k=1, iv%geoamv(n)%info%levels
             jo_grad_y%geoamv(n)%u(k) = -re%geoamv(n)%u(k) / &
-                                         ( iv%geoamv(n)%u(k)%error * &
-                                           iv%geoamv(n)%u(k)%error )
+                                        ( iv%geoamv(n)%u(k)%error * &
+                                           iv%geoamv(n)%u(k)%error)
             jo_grad_y%geoamv(n)%v(k) = -re%geoamv(n)%v(k) / &
-                                         ( iv%geoamv(n)%v(k)%error * &
-                                           iv%geoamv(n)%v(k)%error )
+                                        ( iv%geoamv(n)%v(k)%error * &
+                                           iv%geoamv(n)%v(k)%error)
          end do
 
          if (iv%geoamv(n)%loc%proc_domain) then

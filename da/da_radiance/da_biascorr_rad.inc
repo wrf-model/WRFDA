@@ -1,22 +1,22 @@
 subroutine da_biascorr_rad ( inst, nchan, tb_ob, iv )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: perform bias correction for radiance data.
+   ! purpose: perform bias correction for radiance data.
    !
-   ! METHOD:  Tb*(xb)=a+b*Tb(xb)
+   ! method:  tb*(xb)=a+b*tb(xb)
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   INTEGER, INTENT(IN)             :: inst       ! sensor index.
-   INTEGER, INTENT(IN)             :: nchan      ! number of channel
-   REAL,    INTENT(IN)             :: tb_ob(nchan)  ! Observation Tb.
-   TYPE (rad_type), INTENT(INOUT)  :: iv         ! O-B structure.
+   integer, intent(in)             :: inst       ! sensor index.
+   integer, intent(in)             :: nchan      ! number of channel
+   real,    intent(in)             :: tb_ob(nchan)  ! observation tb.
+   type (rad_type), intent(inout)  :: iv         ! o-b structure.
 
-   ! Local variables
+   ! local variables
 
-   INTEGER   :: i,iscan
-   REAL      :: tb_xb
+   integer   :: i,iscan
+   real      :: tb_xb
 
    if (trace_use) call da_trace_entry("da_biascorr_rad")
 

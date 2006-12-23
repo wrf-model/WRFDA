@@ -13,7 +13,6 @@ subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
    integer       :: k
 
    do K=kts, kte
-
       if (DT(k) <= 0.) cycle
 
       if (SCR3(k) > 0.) then
@@ -21,7 +20,6 @@ subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
       else
          PRA(k) = 0.
       end if
-
    end do
 
 end subroutine da_accre

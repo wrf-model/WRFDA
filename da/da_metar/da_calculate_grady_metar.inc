@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_metar( iv, re, jo_grad_y )
+subroutine da_calculate_grady_metar( iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -14,7 +14,7 @@ subroutine da_calculate_grady_metar( iv, re, jo_grad_y )
 
    if (trace_use) call da_trace_entry("da_calculate_grady_metar")
 
-   if ( iv%num_metar > 0 ) then
+   if (iv%num_metar > 0) then
       do n=1, iv%num_metar
          if(iv%metar(n)%u%qc < obs_qc_pointer) re%metar(n)%u = 0.0
          if(iv%metar(n)%v%qc < obs_qc_pointer) re%metar(n)%v = 0.0

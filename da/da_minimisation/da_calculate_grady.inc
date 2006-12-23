@@ -82,11 +82,11 @@ subroutine da_calculate_grady( iv, re, jo_grad_y)
 
    ! Pseudo obs:
 
-   call da_calculate_grady_pseudo( iv, re,  jo_grad_y )    
+   call da_calculate_grady_pseudo( iv, re,  jo_grad_y)    
 
    ! TC bogus obs:
 
-   call da_calculate_grady_bogus( iv, re,  jo_grad_y )    
+   call da_calculate_grady_bogus( iv, re,  jo_grad_y)    
 
    ! Quikscat scatterometer:
 

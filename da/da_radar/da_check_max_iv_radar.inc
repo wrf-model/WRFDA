@@ -1,4 +1,4 @@
-subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff )
+subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff)
 
    implicit none
 
@@ -22,13 +22,13 @@ subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff )
    iunit = check_max_iv_unit
    print = check_max_iv_print
 
-   if ( print )then
+   if (print) then
       filename = 'obs_max_error_check'
-      inQUIRE (unit = iunit, openED = connected )
+      inQUIRE (unit = iunit, openED = connected)
 
-      if ( .NOT. connected) then
+      if (.NOT. connected) then
          open (unit = iunit , FILE = filename , FORM = 'FORMATTED'  , &
-               ACTION = 'write' , STATUS = 'REPLACE', iostat = io_error )
+               ACTION = 'write' , STATUS = 'REPLACE', iostat = io_error)
       end if
    end if
 
@@ -51,19 +51,18 @@ subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff )
    failed = .false.
 
    do k = 1, Radar % info % levels
-
-      if ( Radar % height_qc(k) /= far_below_model_surface .AND. &
-           Radar % height_qc(k) /= above_model_lid ) then
+      if (Radar % height_qc(k) /= far_below_model_surface .AND. &
+           Radar % height_qc(k) /= above_model_lid) then
 
          ! rv
-         if ( use_Radar_rv ) then
+         if (use_Radar_rv) then
             call da_max_error_qc_Radar(it, Radar % info, Radar % rv(k), &
                                     max_error_rv, irv, irvf, iunit, 'rv   ', &
                                     failed, print)
          end if
 
          ! rf
-         if ( use_Radar_rf ) then
+         if (use_Radar_rf) then
             call da_max_error_qc_Radar(it, Radar % info, Radar % rf(k),&
                                     max_error_rf, irf, irff, iunit, 'rf   ', &
                                     failed, print)

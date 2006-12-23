@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
@@ -8,11 +8,9 @@ subroutine da_check_xtoy_adjoint_pseudo( oi, y, adjtest_lhs, pertile_lhs )
 
    integer                        :: n             ! Loop counter.
 
-!----------------------------------------------------------------------------
-
-   if ( oi%num_pseudo > 0 ) then
+   if (oi%num_pseudo > 0) then
       do n=1, oi%num_pseudo
-         if( oi%synop(n)%loc%proc_domain ) then
+         if (oi%synop(n)%loc%proc_domain) then
             adjtest_lhs = adjtest_lhs + (y%pseudo(n)%u/typical_u_rms)**2 + &
                           (y%pseudo(n)%v/typical_v_rms)**2 + &
                           (y%pseudo(n)%v/typical_t_rms)**2 + &

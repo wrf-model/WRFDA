@@ -1,5 +1,5 @@
 subroutine da_check_max_iv_metar(it, metar, &
-             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
+             itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
    implicit none
 
@@ -9,11 +9,11 @@ subroutine da_check_max_iv_metar(it, metar, &
 
    logical                                :: failed
 
-   !-----------------------------------------------------------------------------!
+   !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
-   !-----------------------------------------------------------------------------!
+   !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
@@ -26,9 +26,9 @@ subroutine da_check_max_iv_metar(it, metar, &
          'Error max test ratio for Metar_QV  = ',max_error_q
     end if
 
-   !-----------------------------------------------------------------------------!
+   !---------------------------------------------------------------------------
    ! [2.0] Perform maximum innovation vector check:
-   !-----------------------------------------------------------------------------!
+   !---------------------------------------------------------------------------
 
    failed = .false.
 

@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_qscat( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_qscat( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   if ( oi%num_qscat > 0 ) then
+   if (oi%num_qscat > 0) then
 
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
@@ -23,9 +23,9 @@ subroutine da_calculate_residual_qscat( oi, y, re,                        &
          np_available = np_available + 2
 
          re%qscat(n)%u = da_residual( n, 0, y%qscat(n)%u, &
-                                      oi%qscat(n)%u, n_obs_bad % u )
+                                      oi%qscat(n)%u, n_obs_bad % u)
          re%qscat(n)%v = da_residual( n, 0, y%qscat(n)%v, &
-                                   oi%qscat(n)%v, n_obs_bad % v )
+                                   oi%qscat(n)%v, n_obs_bad % v)
       end do
 
       np_missing = np_missing + n_obs_bad % u % num % miss + &

@@ -14,7 +14,7 @@ subroutine da_check_max_iv_polaramv(it, polaramv, &
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   if ( check_max_iv_print )then
+   if (check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
@@ -30,7 +30,6 @@ subroutine da_check_max_iv_polaramv(it, polaramv, &
    failed = .false.
 
    do k = 1, polaramv % info % levels
-
       ! U-wind
 
       call da_max_error_qc(it, polaramv % info, polaramv % u(k), &
@@ -40,9 +39,9 @@ subroutine da_check_max_iv_polaramv(it, polaramv, &
 
       call da_max_error_qc (it, polaramv % info, polaramv % v(k),&
               max_error_uv, itvv, itvvf, check_max_iv_unit, 'V    ', &
-                             failed, check_max_iv_print)                           
-    
+                             failed, check_max_iv_print)                              
    end do
+
 end subroutine da_check_max_iv_polaramv      
 
 

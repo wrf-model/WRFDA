@@ -3,8 +3,8 @@ subroutine da_get_y_lhs_value( iv, y, &
     
    implicit none
    
-   type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
-   type (y_type),     intent(inout) :: y     ! y = h (xa)
+   type(ob_type),    intent(in)    :: iv    ! ob. increment vector.
+   type(y_type),     intent(inout) :: y     ! y = h(xa)
 
    real,              intent(out)   :: partial_lhs, pertile_lhs, adj_ttl_lhs
 
@@ -46,11 +46,11 @@ subroutine da_get_y_lhs_value( iv, y, &
    if (use_gpspwobs)  &
       call da_check_xtoy_adjoint_gpspw( iv, y, partial_lhs, pertile_lhs) 
 
-   if ( use_gpsrefobs)  &
+   if (use_gpsrefobs)  &
       call da_check_xtoy_adjoint_gpsref( iv, y, partial_lhs, pertile_lhs) 
    
    if (use_ssmitbobs .or. use_ssmiretrievalobs)  &
-      call da_check_xtoy_adjoint_ssmi ( iv, y, partial_lhs, pertile_lhs) 
+      call da_check_xtoy_adjoint_ssmi( iv, y, partial_lhs, pertile_lhs) 
 
    if (use_ssmt1obs)  &
       call da_check_xtoy_adjoint_ssmt1( iv, y, partial_lhs, pertile_lhs) 

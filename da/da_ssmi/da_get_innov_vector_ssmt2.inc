@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
 
    implicit none
 
    integer, intent(in)            :: it       ! External iteration.
-   type (xb_type), intent(in)     :: xb       ! first guess state.
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)  :: ob       ! Observation structure.
-   type (ob_type), intent(inout)  :: iv       ! O-B structure.
+   type(xb_type), intent(in)     :: xb       ! first guess state.
+   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type(y_type),  intent(inout)  :: ob       ! Observation structure.
+   type(ob_type), intent(inout)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i, j, k  ! Index dimension.
@@ -22,12 +22,12 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
    integer                         :: irh, irhf
 
-   if ( iv % num_ssmt2 > 0 ) then
+   if (iv % num_ssmt2 > 0) then
       irh = 0 ; irhf = 0
       do n=1, iv % num_ssmt2
          num_levs = iv % ssmt2(n) % info % levels
 
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          model_rh(:) = 0.0
 
@@ -52,13 +52,13 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
             zk=missing_r
 
-            if ( iv % ssmt2(n) % h(k) > 0.0 ) then
+            if (iv % ssmt2(n) % h(k) > 0.0) then
                call da_to_zk(iv % ssmt2(n) % h(k), v_h, xp, v_interp_h, zk)
-            else if ( iv % ssmt2(n) % p(k) > 1.0 ) then
+            else if (iv % ssmt2(n) % p(k) > 1.0) then
                call da_to_zk(iv % ssmt2(n) % p(k), v_p, xp, v_interp_p, zk)
             end if
 
-            if(zk > 0.0) then
+            if (zk > 0.0) then
                num_levs=num_levs+1
                iv%ssmt2(n)%zk(num_levs)=zk
 
@@ -76,10 +76,10 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 
 #ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % rh, xp, i, j, dx, dy, dxm, dym, &
-                             model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
+                             model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 #else
          call da_interp_lin_3d( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs )
+                             model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 #endif
 
 !------------------------------------------------------------------------
@@ -94,8 +94,8 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
 !           [3.0] Interpolation:
 !------------------------------------------------------------------------
 
-            if ( ob % ssmt2(n) % rh(k) > missing_r .AND. &
-               iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer ) then
+            if (ob % ssmt2(n) % rh(k) > missing_r .AND. &
+               iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer) then
 
                iv % ssmt2(n) % rh(k) % inv = ob % ssmt2(n) % rh(k) - &
                                             model_rh(k)
@@ -112,14 +112,14 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv )
          ! [5.0] Perform optional maximum error check:
          !------------------------------------------------------------------------
 
-         if ( check_max_iv ) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf )
+         if (check_max_iv) call da_check_max_iv_ssmt2(it, iv % ssmt2(n), irh,irhf)
       end do
 
       if (check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')    &
-            'For outer iteration ',it,' Total Rejections for SSMI (T2) follows:'
-         write (unit = check_max_iv_unit, fmt = '(/,2(2(A,I6),/))') &
-            'Number of failed RH (T2) observations:    ',irhf, ' on ',irh
+            'For outer iteration ',it,' Total Rejections for SSMI(T2) follows:'
+         write(unit = check_max_iv_unit, fmt = '(/,2(2(A,I6),/))') &
+            'Number of failed RH(T2) observations:    ',irhf, ' on ',irh
       end if
    end if
 

@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_ships( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_ships( oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
@@ -8,9 +8,7 @@ subroutine da_check_xtoy_adjoint_ships( oi, y, adjtest_lhs, pertile_lhs )
 
    integer                        :: n             ! Loop counter.
 
-!----------------------------------------------------------------------------
-
-   if ( oi%num_ships < 1 ) return
+   if (oi%num_ships < 1) return
 
    do n=1, oi%num_ships
       if(oi%ships(n)%zk < 1.0) then
@@ -29,21 +27,21 @@ subroutine da_check_xtoy_adjoint_ships( oi, y, adjtest_lhs, pertile_lhs )
       y%ships(n)%p = y%ships(n)%p/typical_p_rms
       y%ships(n)%q = y%ships(n)%q/typical_q_rms
 
-      if( oi%ships(n)%loc%proc_domain ) then
+      if (oi%ships(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
-                     + ( y%ships(n)%u )**2 &
-                     + ( y%ships(n)%v )**2 &
-                     + ( y%ships(n)%t )**2 &
-                     + ( y%ships(n)%p )**2 &
-                     + ( y%ships(n)%q )**2
+                     + ( y%ships(n)%u)**2 &
+                     + ( y%ships(n)%v)**2 &
+                     + ( y%ships(n)%t)**2 &
+                     + ( y%ships(n)%p)**2 &
+                     + ( y%ships(n)%q)**2
       end if
 
       pertile_lhs = pertile_lhs &
-                  + ( y%ships(n)%u )**2 &
-                  + ( y%ships(n)%v )**2 &
-                  + ( y%ships(n)%t )**2 &
-                  + ( y%ships(n)%p )**2 &
-                  + ( y%ships(n)%q )**2
+                  + ( y%ships(n)%u)**2 &
+                  + ( y%ships(n)%v)**2 &
+                  + ( y%ships(n)%t)**2 &
+                  + ( y%ships(n)%p)**2 &
+                  + ( y%ships(n)%q)**2
 
       y%ships(n)%u = y%ships(n)%u/typical_u_rms
       y%ships(n)%v = y%ships(n)%v/typical_v_rms

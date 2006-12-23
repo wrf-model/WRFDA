@@ -1,7 +1,7 @@
 subroutine da_get_vpoles(u,v,        &
           ids, ide, jds, jde, &
           ims, ime, jms, jme, kms, kme,  &
-          its, ite, jts, jte, kts, kte   )
+          its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Treatment for Polar winds  
@@ -40,8 +40,8 @@ subroutine da_get_vpoles(u,v,        &
                             -v(its:ite,jts+1,k)*cos_xls(its:ite))
       end if
 
-      tmpu = wrf_dm_sum_real( tmp_u )
-      tmpv = wrf_dm_sum_real( tmp_v )
+      tmpu = wrf_dm_sum_real( tmp_u)
+      tmpv = wrf_dm_sum_real( tmp_v)
 
       if (jts == jds) then 
         u(its:ite,jts,k) = -tmpu*cos_xls(its:ite) -tmpv*sin_xls(its:ite)
@@ -59,8 +59,8 @@ subroutine da_get_vpoles(u,v,        &
          tmp_v = tmpvar*sum( u(its:ite,jte-1,k)*sin_xle(its:ite)& 
                             -v(its:ite,jte-1,k)*cos_xle(its:ite))
       end if
-      tmpu = wrf_dm_sum_real( tmp_u )
-      tmpv = wrf_dm_sum_real( tmp_v )
+      tmpu = wrf_dm_sum_real( tmp_u)
+      tmpv = wrf_dm_sum_real( tmp_v)
       if (jte == jde) then 
          u(its:ite,jte,k) = -tmpu*cos_xle(its:ite) +tmpv*sin_xle(its:ite)
          v(its:ite,jte,k) = -tmpu*sin_xle(its:ite) -tmpv*cos_xle(its:ite)

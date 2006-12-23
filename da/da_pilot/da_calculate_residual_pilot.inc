@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_pilot( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_pilot( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_Pilot > 0 ) then
+   if (oi%num_Pilot > 0) then
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
 
@@ -22,9 +22,9 @@ subroutine da_calculate_residual_pilot( oi, y, re,                        &
          do k=1, oi%Pilot(n)%info%levels
             np_available = np_available + 2
             re%Pilot(n)%u(k) = da_residual( n, k, y%Pilot(n)%u(k), &
-                                  oi%Pilot(n)%u(k), n_obs_bad % u )
+                                  oi%Pilot(n)%u(k), n_obs_bad % u)
             re%Pilot(n)%v(k) = da_residual( n, k, y%Pilot(n)%v(k), &
-                                  oi%Pilot(n)%v(k), n_obs_bad % v )
+                                  oi%Pilot(n)%v(k), n_obs_bad % v)
          end do
       end do
 

@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_pseudo( iv, re, jo_grad_y )
+subroutine da_calculate_grady_pseudo( iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector

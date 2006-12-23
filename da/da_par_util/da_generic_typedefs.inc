@@ -19,13 +19,13 @@
    !  - It would be better to store references to model_loc_type and
    !    info_type objects here rather than copying proc_domain and
    !    obs_global_index.  Make this change later when there is
-   !    time to modify other objects to also store references (there should 
+   !    time to modify other objects to also store references(there should 
    !    be only one object responsible for each model_loc_type and info_type
    !    object, but in Fortran90 this must be implemented as a pointer).
    type residual_generic_type
       logical                             :: proc_domain
       integer                             :: obs_global_index
-      type (generic_vector_type), pointer :: values(:) ! vectors & scalars
+      type(generic_vector_type), pointer :: values(:) ! vectors & scalars
    end type residual_generic_type
 
    ! template for allocating memory
@@ -38,7 +38,7 @@
    type y_facade_type
       integer                               :: num_obs
       integer                               :: num_obs_glo
-      type (residual_generic_type), pointer :: obs(:)
+      type(residual_generic_type), pointer :: obs(:)
    end type y_facade_type
 
 

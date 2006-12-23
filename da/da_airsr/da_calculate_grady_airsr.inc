@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_airsr( iv, re, jo_grad_y )
+subroutine da_calculate_grady_airsr( iv, re, jo_grad_y)
 
    !----------------------------------------------------------------------
    ! Purpose: Applies obs inverse on AIRS re-vector             
@@ -12,7 +12,7 @@ subroutine da_calculate_grady_airsr( iv, re, jo_grad_y )
 
    integer                      :: n, k
 
-   if ( iv%num_airsr > 0 ) then
+   if (iv%num_airsr > 0) then
       do n=1, iv%num_airsr
          do k=1, iv%airsr(n)%info%levels
             if(iv%airsr(n)%t(k)%qc < obs_qc_pointer) re%airsr(n)%t(k) = 0.0
@@ -20,10 +20,10 @@ subroutine da_calculate_grady_airsr( iv, re, jo_grad_y )
 
             jo_grad_y%airsr(n)%t(k) = -re%airsr(n)%t(k) / &
                                      ( iv%airsr(n)%t(k)%error * &
-                                       iv%airsr(n)%t(k)%error )
+                                       iv%airsr(n)%t(k)%error)
             jo_grad_y%airsr(n)%q(k) = -re%airsr(n)%q(k) / &
                                      ( iv%airsr(n)%q(k)%error * &
-                                       iv%airsr(n)%q(k)%error )
+                                       iv%airsr(n)%q(k)%error)
           end do
        end do
    end if

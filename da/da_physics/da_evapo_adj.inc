@@ -31,7 +31,7 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
       if (DT(k) <= 0.) cycle
  
       SCR39(K)=0.
-      if(PRE(K) < -SCR3(K)/DT(K) ) then
+      if (PRE(K) < -SCR3(K)/DT(K) ) then
          SCR39(K)=-PRE9(K)/DT(K)
          PRE9(K)=0.
       end if

@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
@@ -29,19 +29,19 @@ subroutine da_check_xtoy_adjoint_buoy( oi, y, adjtest_lhs, pertile_lhs )
 
       if (oi%buoy(n)%loc%proc_domain) then
          adjtest_lhs = adjtest_lhs  &
-                     + ( y%buoy(n)%u )**2 &
-                     + ( y%buoy(n)%v )**2 &
-                     + ( y%buoy(n)%t )**2 &
-                     + ( y%buoy(n)%p )**2 &
-                     + ( y%buoy(n)%q )**2
+                     + ( y%buoy(n)%u)**2 &
+                     + ( y%buoy(n)%v)**2 &
+                     + ( y%buoy(n)%t)**2 &
+                     + ( y%buoy(n)%p)**2 &
+                     + ( y%buoy(n)%q)**2
       end if
 
       pertile_lhs = pertile_lhs &
-                  + ( y%buoy(n)%u )**2 &
-                  + ( y%buoy(n)%v )**2 &
-                  + ( y%buoy(n)%t )**2 &
-                  + ( y%buoy(n)%p )**2 &
-                  + ( y%buoy(n)%q )**2
+                  + ( y%buoy(n)%u)**2 &
+                  + ( y%buoy(n)%v)**2 &
+                  + ( y%buoy(n)%t)**2 &
+                  + ( y%buoy(n)%p)**2 &
+                  + ( y%buoy(n)%q)**2
 
       y%buoy(n)%u = y%buoy(n)%u/typical_u_rms
       y%buoy(n)%v = y%buoy(n)%v/typical_v_rms

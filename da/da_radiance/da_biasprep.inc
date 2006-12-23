@@ -23,13 +23,13 @@ subroutine da_biasprep(inst,ob,iv)
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
 
-   if ( num_rad < 1 ) return
+   if (num_rad < 1 ) return
 
 #ifdef DM_PARALLEL
-    call mpi_comm_rank( mpi_comm_world, myproc, ierr )
-    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
+   call mpi_comm_rank( mpi_comm_world, myproc, ierr )
+   write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
 #else
-    write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
+   write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
 #endif
 
    call da_get_unit(biasprep_unit)

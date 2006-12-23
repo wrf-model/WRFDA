@@ -1,10 +1,10 @@
-subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
+subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in)   :: iv          ! Innovation vector.
-   type (y_type), intent(in)    :: re          ! Residual vector.
-   type (y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
+   type(ob_type), intent(in)   :: iv          ! Innovation vector.
+   type(y_type), intent(in)    :: re          ! Residual vector.
+   type(y_type), intent(inout) :: jo_grad_y   ! Grad_y(Jo)
    type(jo_type), intent(inout) :: jo          ! Obs cost function.
 
 
@@ -17,11 +17,11 @@ subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y )
       do n=1, iv%num_profiler
          do k=1, iv%profiler(n)%info%levels
             jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
-                                      ( iv%profiler(n)%u(k)%error * &
-                                        iv%profiler(n)%u(k)%error )
+                                     ( iv%profiler(n)%u(k)%error * &
+                                        iv%profiler(n)%u(k)%error)
             jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
-                                      ( iv%profiler(n)%v(k)%error * &
-                                        iv%profiler(n)%v(k)%error )
+                                     ( iv%profiler(n)%v(k)%error * &
+                                        iv%profiler(n)%v(k)%error)
          end do
 
          if (iv%profiler(n)%loc%proc_domain) then

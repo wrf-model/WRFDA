@@ -1,7 +1,7 @@
 subroutine da_get_2d_sum(var, name, &
                       ids, ide, jds, jde, &
                       ims, ime, jms, jme, &
-                      its, ite, jts, jte )
+                      its, ite, jts, jte)
 
    implicit none
    integer, intent(in) :: ids, ide, jds, jde, &
@@ -18,7 +18,7 @@ subroutine da_get_2d_sum(var, name, &
 
    partial = sum(var(its:ite,jts:jte)*var(its:ite,jts:jte))
 
-   total = wrf_dm_sum_real( partial )
+   total = wrf_dm_sum_real( partial)
    write(unit=stdout,fmt=*) 'TEST_COVERAGE_get_2d_sum:  total = ', total
 
    write(unit=stderr, fmt='(3a, e24.14)') &

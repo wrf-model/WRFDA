@@ -1,4 +1,4 @@
-subroutine da_allocate_y( iv, y )
+subroutine da_allocate_y (iv, y)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate arrays used in y and residual obs structures.
@@ -49,7 +49,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize synops:
 
-   if ( y % num_synop > 0 ) then
+   if (y % num_synop > 0) then
       allocate (y % synop(1:y % num_synop))
       y % synop(1:y % num_synop) % u = 0.0
       y % synop(1:y % num_synop) % v = 0.0
@@ -60,7 +60,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize ships:
 
-   if ( y % num_ships > 0 ) then
+   if (y % num_ships > 0) then
       allocate (y % ships(1:y % num_ships))
       y % ships(1:y % num_ships) % u = 0.0
       y % ships(1:y % num_ships) % v = 0.0
@@ -71,7 +71,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize metars:
 
-   if ( y % num_metar > 0 ) then
+   if (y % num_metar > 0) then
       allocate (y % metar(1:y % num_metar))
       y % metar(1:y % num_metar) % u = 0.0
       y % metar(1:y % num_metar) % v = 0.0
@@ -82,7 +82,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize Geo. CMVs Obs:
 
-   if ( y % num_geoamv > 0 ) then
+   if (y % num_geoamv > 0) then
       allocate (y % geoamv(1:y % num_geoamv))
       do n = 1, y % num_geoamv
          nlevels = iv % geoamv(n) % info % levels
@@ -95,7 +95,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize Polar CMVS;
 
-   if ( y % num_polaramv > 0 ) then
+   if (y % num_polaramv > 0) then
       allocate (y % polaramv(1:y % num_polaramv))
 
       do n = 1, y % num_polaramv
@@ -109,14 +109,14 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize GPS TPW:
  
-   if ( y % num_gpspw > 0 ) then
+   if (y % num_gpspw > 0) then
       allocate (y % gpspw(1:y % num_gpspw))
       y % gpspw(1:y % num_gpspw) % tpw = 0.0
    end if
 
    ! Initialize GPS Refractivity:
 
-   if ( y % num_gpsref > 0 ) then
+   if (y % num_gpsref > 0) then
       allocate (y % gpsref(1:y % num_gpsref))
       do n = 1, y % num_gpsref
          nlevels = iv % gpsref(n) % info % levels
@@ -134,7 +134,7 @@ subroutine da_allocate_y( iv, y )
 
    !  Initialize sondes:
 
-   if ( y % num_sound > 0 ) then
+   if (y % num_sound > 0) then
       allocate (y % sound(1:y % num_sound))
       do n = 1, y % num_sound
          nlevels = max(1,iv % sound(n) % info % levels)
@@ -162,7 +162,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize pilots:
 
-   if ( y % num_pilot > 0 ) then
+   if (y % num_pilot > 0) then
       allocate (y % pilot(1:y % num_pilot))
       do n = 1, y % num_pilot
          nlevels = iv % pilot(n) % info % levels
@@ -176,7 +176,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize Radar:
 
-   if ( y % num_Radar > 0 ) then
+   if (y % num_Radar > 0) then
       allocate (y % Radar(1:y % num_Radar))
       do n = 1, y % num_Radar
          nlevels = iv % Radar(n) % info % levels
@@ -190,7 +190,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize AIREPs:
 
-   if ( y % num_airep > 0 ) then
+   if (y % num_airep > 0) then
       allocate (y % airep(1:y % num_airep))
       do n = 1, y % num_airep
          nlevels = iv % airep(n) % info % levels
@@ -206,7 +206,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize Bogus:
 
-   if ( y % num_bogus > 0 ) then
+   if (y % num_bogus > 0) then
       allocate (y % bogus(1:y % num_bogus))
       do n = 1, y % num_bogus
          nlevels = iv % bogus(n) % info % levels
@@ -226,7 +226,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize satem:
 
-   if ( y % num_satem > 0 ) then
+   if (y % num_satem > 0) then
       allocate (y % satem(1:y % num_satem))
       do n = 1, y % num_satem
          nlevels = iv % satem(n) % info % levels
@@ -236,7 +236,7 @@ subroutine da_allocate_y( iv, y )
       end do
    end if
 
-   if ( y % num_ssmi_tb > 0 ) then
+   if (y % num_ssmi_tb > 0) then
       allocate (y % ssmi_tb(1:y % num_ssmi_tb))
       y % ssmi_tb(1:y % num_ssmi_tb) % tb19v = 0.0
       y % ssmi_tb(1:y % num_ssmi_tb) % tb19h = 0.0
@@ -247,13 +247,13 @@ subroutine da_allocate_y( iv, y )
       y % ssmi_tb(1:y % num_ssmi_tb) % tb85h = 0.0
    end if
 
-   if ( y % num_ssmi_retrieval > 0 ) then
+   if (y % num_ssmi_retrieval > 0) then
         allocate (y % ssmi_retrieval(1:y % num_ssmi_retrieval))
         y % ssmi_retrieval(1:y % num_ssmi_retrieval) % tpw = 0.0
         y % ssmi_retrieval(1:y % num_ssmi_retrieval) % Speed = 0.0
    end if
    
-   if ( y % num_ssmt1 > 0 ) then
+   if (y % num_ssmt1 > 0) then
       allocate (y % ssmt1(1:y % num_ssmt1))
       do n = 1, y % num_ssmt1
          nlevels = iv % ssmt1(n) % info % levels
@@ -262,7 +262,7 @@ subroutine da_allocate_y( iv, y )
       end do
    end if
    
-   if ( y % num_ssmt2 > 0 ) then
+   if (y % num_ssmt2 > 0) then
       allocate (y % ssmt2(1:y % num_ssmt2))
       do n = 1, y % num_ssmt2
          nlevels = iv % ssmt2(n) % info % levels
@@ -271,7 +271,7 @@ subroutine da_allocate_y( iv, y )
       end do
    end if
    
-   if ( y % num_pseudo > 0 ) then
+   if (y % num_pseudo > 0) then
         allocate (y % pseudo(1:y % num_pseudo))
         y % pseudo(1:y % num_pseudo) % u = 0.0
         y % pseudo(1:y % num_pseudo) % v = 0.0
@@ -282,7 +282,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize Quikscat:
 
-   if ( y % num_qscat > 0 ) then
+   if (y % num_qscat > 0) then
       allocate (y % qscat(1:y % num_qscat))
       y % qscat(1:y % num_qscat) % u = 0.0
       y % qscat(1:y % num_qscat) % v = 0.0
@@ -290,7 +290,7 @@ subroutine da_allocate_y( iv, y )
       
    ! Initialize profilers:
 
-   if ( y % num_profiler > 0 ) then
+   if (y % num_profiler > 0) then
       allocate (y % profiler(1:y % num_profiler))
       do n = 1, y % num_profiler
 
@@ -306,7 +306,7 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize buoy:
 
-   if ( y % num_buoy > 0 ) then
+   if (y % num_buoy > 0) then
       allocate (y % buoy(1:y % num_buoy))
       y % buoy(1:y % num_buoy) % u = 0.0
       y % buoy(1:y % num_buoy) % v = 0.0
@@ -317,12 +317,12 @@ subroutine da_allocate_y( iv, y )
 
    ! Initialize radiance:
 
-   if ( y % num_inst > 0 ) then
+   if (y % num_inst > 0) then
       allocate (y % instid(1:y % num_inst))
       do i = 1,  y % num_inst
          y % instid(i) % num_rad = iv % instid(i) % num_rad
          y % instid(i) % nchan   = iv % instid(i) % nchan
-         ! allocate (y % instid(i) % ichan(1:y % instid(i) % nchan ))
+         ! allocate (y % instid(i) % ichan(1:y % instid(i) % nchan))
          ! do n = 1, y % instid(i) % nchan
          !     y % instid(i) % ichan(n) = n
          ! end do
@@ -332,14 +332,14 @@ subroutine da_allocate_y( iv, y )
          end if
          allocate (y % instid(i) % rad(y % instid(i) % num_rad))
          do j = 1, y % instid(i) % num_rad
-            allocate (y % instid(i) % rad(j) % tb (1:y % instid(i) % nchan) )
+            allocate (y % instid(i) % rad(j) % tb (1:y % instid(i) % nchan))
             y % instid(i) % rad(j)% tb(:) = 0.0
          end do
       end do
    end if
    ! Initialize AIRS retrievals:
 
-   if ( y % num_airsr > 0 ) then
+   if (y % num_airsr > 0) then
       allocate (y % airsr(1:y % num_airsr))
       do n = 1, y % num_airsr
          nlevels = iv % airsr(n) % info % levels

@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
 
    implicit none
 
    integer, intent(in)           :: it      ! External iteration.
-   type (xb_type), intent(in)    :: xb      ! first guess state.
-   type (xpose_type), intent(in) :: xp      ! Domain decomposition vars.
-   type (y_type),  intent(inout)    :: ob      ! Observation structure.
-   type (ob_type), intent(inout) :: iv      ! O-B structure.
+   type(xb_type), intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in) :: xp      ! Domain decomposition vars.
+   type(y_type),  intent(inout)    :: ob      ! Observation structure.
+   type(ob_type), intent(inout) :: iv      ! O-B structure.
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -21,7 +21,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
 
    integer                      :: itu, itvv, ituf, itvvf
 
-   if ( iv % num_qscat > 0 ) then
+   if (iv % num_qscat > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
 
          itu = 0 ; itvv = 0 ;  ituf = 0 ; itvvf = 0
@@ -42,9 +42,9 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
 
          zk=missing_r
 
-         if ( iv % qscat(n) % h > missing_r) then
+         if (iv % qscat(n) % h > missing_r) then
             call da_to_zk(iv % qscat(n) % h, v_h, xp, v_interp_h, zk)
-            if(zk < 1.0) then
+            if (zk < 1.0) then
                zk = 1.0
             end if
          end if
@@ -58,7 +58,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
          iv % qscat(n) % u % inv = 0.0
          iv % qscat(n) % v % inv = 0.0
 
-         if(zk < 0.0) then
+         if (zk < 0.0) then
             iv % qscat(n) % u % qc = missing
             iv % qscat(n) % v % qc = missing
          else
@@ -84,14 +84,14 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
             ! [3.0] Fast interpolation:
             !------------------------------------------------------------------------
 
-            if ( ob % qscat(n) % u > missing_r .AND. &
-                 iv % qscat(n) % u % qc >= obs_qc_pointer ) then
+            if (ob % qscat(n) % u > missing_r .AND. &
+                 iv % qscat(n) % u % qc >= obs_qc_pointer) then
 
                  iv % qscat(n) % u % inv = ob % qscat(n) % u - model_u
             end if
 
-            if ( ob % qscat(n) % v > missing_r .AND. &
-                 iv % qscat(n) % v % qc >= obs_qc_pointer ) then
+            if (ob % qscat(n) % v > missing_r .AND. &
+                 iv % qscat(n) % v % qc >= obs_qc_pointer) then
 
                  iv % qscat(n) % v % inv = ob % qscat(n) % v - model_v
             end if
@@ -100,7 +100,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
             ! [5.0] Perform optional maximum error check:
             !------------------------------------------------------------------------
 
-            if ( check_max_iv )& 
+            if (check_max_iv)& 
                call da_check_max_iv_qscat(it, iv % qscat(n), itu, itvv, ituf,itvvf)
          end if
       end do
@@ -108,7 +108,7 @@ subroutine da_get_innov_vector_qscat ( it, xb, xp, ob, iv )
       if (check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it,&
                    ', Total Rejections for qscat follows:'
-         write (unit = check_max_iv_unit, fmt = '(/,4(2(A,I6),/))') &
+         write(unit = check_max_iv_unit, fmt = '(/,4(2(A,I6),/))') &
             'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
             'Number of failed v-wind observations:     ',itvvf,' on ',itvv
       end if

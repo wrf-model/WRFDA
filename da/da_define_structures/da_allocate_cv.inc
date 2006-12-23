@@ -1,4 +1,4 @@
-subroutine da_allocate_cv( cv_size, cv )
+subroutine da_allocate_cv (cv_size, cv)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate components of control variable.
@@ -28,8 +28,7 @@ subroutine da_allocate_cv( cv_size, cv )
 
    allocate (cv % array(1:cv_size))
 
-   if (anal_type_randomcv) then
-   
+   if (anal_type_randomcv) then  
       ! [2.1] Initialize random number generator and scalars:
 
       call random_seed
@@ -41,7 +40,6 @@ subroutine da_allocate_cv( cv_size, cv )
       ! [2.2] Calculate random numbers with Gaussian distribution:
 
       do i = 1, cv_size
-
          call da_gauss_noise(z)
          cv % array(i) = z
 
@@ -50,9 +48,8 @@ subroutine da_allocate_cv( cv_size, cv )
          count = count + 1
 
          mean_cv = sum_cv / real(count)
-         rms_cv = sqrt(sum_cv2 / real(count) )
-         std_dev_cv = sqrt( rms_cv * rms_cv - mean_cv * mean_cv )
-
+         rms_cv = sqrt(sum_cv2 / real(count))
+         std_dev_cv = sqrt (rms_cv * rms_cv - mean_cv * mean_cv)
       end do
 
       write(unit=stdout)
@@ -60,7 +57,6 @@ subroutine da_allocate_cv( cv_size, cv )
       write(unit=stdout,fmt='(a,f15.5)')' Mean = ',mean_cv
       write(unit=stdout,fmt='(a,f15.5)')' RMS = ', rms_cv
       write(unit=stdout,fmt='(a,f15.5)')' STD DEV = ', std_dev_cv
-
    else
       cv % array = 0.0
    end if

@@ -1,5 +1,5 @@
 subroutine da_check_vp_errors( vp1, vp2, ne, &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Test invertibility of transform to/from Vp or Vv
@@ -23,7 +23,7 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
 
    if (trace_use) call da_trace_entry("da_check_vp_errors")
 
-   inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1) * (kte-kts+1) )
+   inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1) * (kte-kts+1))
 
    !-------------------------------------------------------------------------
    ! [1.0]: Check v1 differences:
@@ -33,11 +33,11 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
                                     vp1 % v1(its:ite,jts:jte,kts:kte)
 
    rms_fild = sqrt( sum( vp1 % v1(its:ite, jts:jte,kts:kte) &
-                       * vp1 % v1(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * vp1 % v1(its:ite, jts:jte,kts:kte)) * inv_size)
    rms_diff = sqrt( sum( diff(its:ite, jts:jte,kts:kte) &
-                       * diff(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
      
-   if ( rms_fild == 0.0 ) then
+   if (rms_fild == 0.0) then
       write(unit=stdout, fmt='(a)') ' v1 is zero ' 
    else
       write(unit=stdout, fmt='(a,1pe10.4)') &
@@ -52,11 +52,11 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
                                     vp1 % v2(its:ite,jts:jte,kts:kte)
 
    rms_fild = sqrt( sum( vp1 % v2(its:ite, jts:jte,kts:kte) &
-                       * vp1 % v2(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * vp1 % v2(its:ite, jts:jte,kts:kte)) * inv_size)
    rms_diff = sqrt( sum( diff(its:ite, jts:jte,kts:kte) &
-                       * diff(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
      
-   if ( rms_fild == 0.0 ) then
+   if (rms_fild == 0.0) then
       write(unit=stdout, fmt='(a)') ' v2 is zero ' 
    else
       write(unit=stdout, fmt='(a,1pe10.4)') &
@@ -71,11 +71,11 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
                                     vp1 % v3(its:ite,jts:jte,kts:kte)
 
    rms_fild = sqrt( sum( vp1 % v3(its:ite, jts:jte,kts:kte) &
-                       * vp1 % v3(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * vp1 % v3(its:ite, jts:jte,kts:kte)) * inv_size)
    rms_diff = sqrt( sum( diff(its:ite, jts:jte,kts:kte) &
-                       * diff(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
      
-   if ( rms_fild == 0.0 ) then
+   if (rms_fild == 0.0) then
       write(unit=stdout, fmt='(a)') ' v3 is zero ' 
    else
       write(unit=stdout, fmt='(a,1pe10.4)') &
@@ -90,11 +90,11 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
                                     vp1 % v4(its:ite,jts:jte,kts:kte)
 
    rms_fild = sqrt( sum( vp1 % v4(its:ite, jts:jte,kts:kte) &
-                       * vp1 % v4(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * vp1 % v4(its:ite, jts:jte,kts:kte)) * inv_size)
    rms_diff = sqrt( sum( diff(its:ite, jts:jte,kts:kte) &
-                       * diff(its:ite, jts:jte,kts:kte) ) * inv_size )
+                       * diff(its:ite, jts:jte,kts:kte)) * inv_size)
      
-   if ( rms_fild == 0.0 ) then
+   if (rms_fild == 0.0) then
       write(unit=stdout, fmt='(a)') ' v4 is zero ' 
    else
       write(unit=stdout, fmt='(a,1pe10.4)') &
@@ -105,17 +105,17 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
    ! [5.0]: Check v5 differences:
    !-------------------------------------------------------------------------
 
-   inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1) )
+   inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1))
 
    diff(its:ite, jts:jte,kts:kte) = vp2 % v5(its:ite, jts:jte,kts:kte) - &
       vp1 % v5(its:ite, jts:jte,kts:kte)
 
    rms_fild = sqrt( sum( vp1 % v5(its:ite, jts:jte,kts:kte) * &
-      vp1 % v5(its:ite, jts:jte,kts:kte) ) * inv_size )
+      vp1 % v5(its:ite, jts:jte,kts:kte)) * inv_size)
    rms_diff = sqrt( sum( diff(its:ite, jts:jte,1) * &
-      diff(its:ite, jts:jte,1) ) * inv_size )
+      diff(its:ite, jts:jte,1)) * inv_size)
      
-   if ( rms_fild == 0.0 ) then
+   if (rms_fild == 0.0) then
       write(unit=stdout, fmt='(a)') ' v5 is zero ' 
    else
       write(unit=stdout, fmt='(a,1pe10.4)') &
@@ -126,17 +126,17 @@ subroutine da_check_vp_errors( vp1, vp2, ne, &
    ! [6.0]: Check alpha differences:
    !-------------------------------------------------------------------------
  
-   if ( ne > 0 ) then
-      inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1) * ne )
+   if (ne > 0) then
+      inv_size = 1.0 / real( (ite-its+1) * (jte-jts+1) * ne)
       diff_alpha(its:ite,jts:jte,1:ne) = vp2 % alpha(its:ite,jts:jte,1:ne) - &
                                          vp1 % alpha(its:ite,jts:jte,1:ne)
 
       rms_fild = sqrt( sum( vp1 % alpha(its:ite, jts:jte,1:ne) &
-                          * vp1 % alpha(its:ite, jts:jte,1:ne) ) * inv_size )
+                          * vp1 % alpha(its:ite, jts:jte,1:ne)) * inv_size)
       rms_diff = sqrt( sum( diff_alpha(its:ite, jts:jte,1:ne) &
-                          * diff_alpha(its:ite, jts:jte,1:ne) ) * inv_size )
+                          * diff_alpha(its:ite, jts:jte,1:ne)) * inv_size)
      
-      if ( rms_fild /= 0.0 ) then
+      if (rms_fild /= 0.0) then
          write(unit=stdout, fmt='(a,1pe10.4)') ' alpha RMS error/RMS field = ',&
             rms_diff/rms_fild
       end if

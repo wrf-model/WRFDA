@@ -7,7 +7,7 @@ real function da_gamma(X)
 !   COMPUTATION IS BASED ON AN ALGORITHM outLINED in REFERENCE 1.
 !   THE program useS RATIONAL functionS THAT APPROXIMATE THE GAMMA
 !   function TO AT LEAST 20 SIGNifICANT DECIMAL DIGITS.  COEFFICIENTS
-!   FOR THE APPROXIMATION OVER THE inTERVAL (1,2) ARE UNPUBLISHED.
+!   FOR THE APPROXIMATION OVER THE inTERVAL(1,2) ARE UNPUBLISHED.
 !   THOSE FOR THE APPROXIMATION FOR X .GE. 12 ARE FROM REFERENCE 2.
 !   THE ACCURACY ACHIEVED DEPendS ON THE ARITHMETIC SYSTEM, THE
 !   COMPILER, THE inTRinSIC functionS, AND PROPER selectION OF THE
@@ -35,29 +35,29 @@ real function da_gamma(X)
 ! 
 !                            BETA       MAXEXP        XBIG
 ! 
-! CRAY-1         (S.P.)        2         8191        966.961
+! CRAY-1        (S.P.)        2         8191        966.961
 ! CYBER 180/855
-!   UNDER NOS    (S.P.)        2         1070        177.803
-! IEEE (IBM/XT,
-!   SUN, ETC.)   (S.P.)        2          128        35.040
-! IEEE (IBM/XT,
-!   SUN, ETC.)   (D.P.)        2         1024        171.624
-! IBM 3033       (D.P.)       16           63        57.574
-! VAX D-FORMAT   (D.P.)        2          127        34.844
-! VAX G-FORMAT   (D.P.)        2         1023        171.489
+!   UNDER NOS   (S.P.)        2         1070        177.803
+! IEEE(IBM/XT,
+!   SUN, ETC.)  (S.P.)        2          128        35.040
+! IEEE(IBM/XT,
+!   SUN, ETC.)  (D.P.)        2         1024        171.624
+! IBM 3033      (D.P.)       16           63        57.574
+! VAX D-FORMAT  (D.P.)        2          127        34.844
+! VAX G-FORMAT  (D.P.)        2         1023        171.489
 ! 
 !                            XinF         EPS        XMinin
 ! 
-! CRAY-1         (S.P.)   5.45E+2465   7.11E-15    1.84E-2466
+! CRAY-1        (S.P.)   5.45E+2465   7.11E-15    1.84E-2466
 ! CYBER 180/855
-!   UNDER NOS    (S.P.)   1.26E+322    3.55E-15    3.14E-294
-! IEEE (IBM/XT,
-!   SUN, ETC.)   (S.P.)   3.40E+38     1.19E-7     1.18E-38
-! IEEE (IBM/XT,
-!   SUN, ETC.)   (D.P.)   1.79D+308    2.22D-16    2.23D-308
-! IBM 3033       (D.P.)   7.23D+75     2.22D-16    1.39D-76
-! VAX D-FORMAT   (D.P.)   1.70D+38     1.39D-17    5.88D-39
-! VAX G-FORMAT   (D.P.)   8.98D+307    1.11D-16    1.12D-308
+!   UNDER NOS   (S.P.)   1.26E+322    3.55E-15    3.14E-294
+! IEEE(IBM/XT,
+!   SUN, ETC.)  (S.P.)   3.40E+38     1.19E-7     1.18E-38
+! IEEE(IBM/XT,
+!   SUN, ETC.)  (D.P.)   1.79D+308    2.22D-16    2.23D-308
+! IBM 3033      (D.P.)   7.23D+75     2.22D-16    1.39D-76
+! VAX D-FORMAT  (D.P.)   1.70D+38     1.39D-17    5.88D-39
+! VAX G-FORMAT  (D.P.)   8.98D+307    1.11D-16    1.12D-308
 ! 
 !*******************************************************************
 !*******************************************************************
@@ -77,7 +77,7 @@ real function da_gamma(X)
 ! REFERENCES:  AN OVERVIEW OF SOFTWARE DEVELOPMENT FOR SPECIAL
 !              functionS   W. J. CODY, LECTURE NOTES in MATHEMATICS,
 !              506, NUMERICAL ANALYSIS DUNDEE, 1975, G. A. WATSON
-!              (ED.), SPRinGER VERLAG, BERLin, 1976.
+!             (ED.), SPRinGER VERLAG, BERLin, 1976.
 ! 
 !              COMPUTER APPROXIMATIONS, HART, ET. AL., WILEY AND
 !              SONS, NEW YORK, 1968.
@@ -115,7 +115,7 @@ real function da_gamma(X)
 !D   1     XinF/1.79D308/
 !----------------------------------------------------------------------
 !  NUMERATOR AND DENOMinATOR COEFFICIENTS FOR RATIONAL MinIMAX
-!     APPROXIMATION OVER (1,2).
+!     APPROXIMATION OVER(1,2).
 !----------------------------------------------------------------------
       DATA P/-1.71618513886549492533811E+0,2.47656508055759199108314E+1, &
              -3.79804256470945635097577E+2,6.29331155312818442661052E+2, &
@@ -134,7 +134,7 @@ real function da_gamma(X)
 !D   2        2.25381184209801510330112D+4,4.75584627752788110767815D+3,
 !D   3      -1.34659959864969306392456D+5,-1.15132259675553483497211D+5/
 !----------------------------------------------------------------------
-!  COEFFICIENTS FOR MinIMAX APPROXIMATION OVER (12, inF).
+!  COEFFICIENTS FOR MinIMAX APPROXIMATION OVER(12, inF).
 !----------------------------------------------------------------------
       DATA C/-1.910444077728E-03,8.4171387781295E-04, &
            -5.952379913043012E-04,7.93650793500350248E-04, &
@@ -153,15 +153,15 @@ real function da_gamma(X)
       FACT=ONE
       N=0
       Y=X
-      if(Y.LE.ZERO)then
+      if (Y.LE.ZERO)then
 !----------------------------------------------------------------------
 !  ARGUMENT IS NEGATIVE
 !----------------------------------------------------------------------
         Y=-X
         Y1=AinT(Y)
         RES=Y-Y1
-        if(RES.NE.ZERO)then
-          if(Y1.NE.AinT(Y1*HALF)*TWO)PARITY=.true.
+        if (RES.NE.ZERO)then
+          if (Y1.NE.AinT(Y1*HALF)*TWO)PARITY=.true.
           FACT=-PI/Sin(PI*RES)
           Y=Y+ONE
         else
@@ -172,19 +172,19 @@ real function da_gamma(X)
 !----------------------------------------------------------------------
 !  ARGUMENT IS POSITIVE
 !----------------------------------------------------------------------
-      if(Y.LT.EPS)then
+      if (Y.LT.EPS)then
 !----------------------------------------------------------------------
 !  ARGUMENT .LT. EPS
 !----------------------------------------------------------------------
-        if(Y.GE.XMinin)then
+        if (Y.GE.XMinin)then
           RES=ONE/Y
         else
           RES=XinF
           goto 900
         end if
-      elseif(Y.LT.TWELVE)then
+      elseif (Y.LT.TWELVE)then
         Y1=Y
-        if(Y.LT.ONE)then
+        if (Y.LT.ONE)then
 !----------------------------------------------------------------------
 !  0.0 .LT. ARGUMENT .LT. 1.0
 !----------------------------------------------------------------------
@@ -208,12 +208,12 @@ real function da_gamma(X)
           XDEN=XDEN*Z+Q(I)
   260   continue
         RES=XNUM/XDEN+ONE
-        if(Y1.LT.Y)then
+        if (Y1.LT.Y)then
 !----------------------------------------------------------------------
 !  ADJUST RESULT FOR case  0.0 .LT. ARGUMENT .LT. 1.0
 !----------------------------------------------------------------------
           RES=RES/Y1
-        elseif(Y1.GT.Y)then
+        elseif (Y1.GT.Y)then
 !----------------------------------------------------------------------
 !  ADJUST RESULT FOR case  2.0 .LT. ARGUMENT .LT. 12.0
 !----------------------------------------------------------------------
@@ -226,7 +226,7 @@ real function da_gamma(X)
 !----------------------------------------------------------------------
 !  EVALUATE FOR ARGUMENT .GE. 12.0,
 !----------------------------------------------------------------------
-        if(Y.LE.XBIG)then
+        if (Y.LE.XBIG)then
           YSQ=Y*Y
           sum=C(7)
           do 350 I=1,6
@@ -243,8 +243,8 @@ real function da_gamma(X)
 !----------------------------------------------------------------------
 !  FinAL ADJUSTMENTS AND return
 !----------------------------------------------------------------------
-      if(PARITY)RES=-RES
-      if(FACT.NE.ONE)RES=FACT/RES
+      if (PARITY)RES=-RES
+      if (FACT.NE.ONE)RES=FACT/RES
   900 da_gamma=RES
 !D900 DGAMMA = RES
 ! ---------- LAST LINE OF GAMMA ----------

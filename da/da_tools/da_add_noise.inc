@@ -1,4 +1,4 @@
-subroutine da_add_noise( fld, yo, z )
+subroutine da_add_noise (fld, yo, z)
 
    implicit none
 
@@ -12,17 +12,15 @@ subroutine da_add_noise( fld, yo, z )
 
    z = missing_r
 
-   if ( fld % qc >= obs_qc_pointer ) then
-
+   if (fld % qc >= obs_qc_pointer) then
       ! [1] Calculate scaled Gaussian noise:
 
-      call da_gauss_noise( z )      
+      call da_gauss_noise (z)      
       noise = fld % error * z
       
       ! [3] Recalculate corresponding O and O-B:
       yo = yo + noise
       fld % inv = fld % inv + noise
-
    end if
 
    if (trace_use) call da_trace_exit("da_add_noise")

@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint_gpspw( oi, y, adjtest_lhs, pertile_lhs )
+subroutine da_check_xtoy_adjoint_gpspw( oi, y, adjtest_lhs, pertile_lhs)
 
    implicit none
 
@@ -8,9 +8,9 @@ subroutine da_check_xtoy_adjoint_gpspw( oi, y, adjtest_lhs, pertile_lhs )
 
    integer                        :: n             ! Loop counter.
 
-   if ( oi%num_Gpspw > 0 ) then
+   if (oi%num_Gpspw > 0) then
       do n=1, oi%num_Gpspw
-         if( oi%gpspw(n)%loc%proc_domain ) then
+         if (oi%gpspw(n)%loc%proc_domain) then
             adjtest_lhs = adjtest_lhs &
                        + (y%gpspw(n) %tpw/typical_tpw_rms) ** 2
          end if

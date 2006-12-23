@@ -48,7 +48,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
    is = its; ie = ite; js = jts; je = jte
    if (.not. global .and. its == ids ) is = ids+1
    if (.not. global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+   if (jts == jds ) js = jds+1; if (jte == jde ) je = jde-1
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate term_x = rho M ( u'du/dx + v'du/dy + udu'/dx + vdu'/dy ):
@@ -69,7 +69,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       ! [2.2] Bottom boundaries:
 
-      if ( its == ids ) then
+      if (its == ids ) then
          i = its
 
          do j = js, je 
@@ -85,7 +85,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       ! [2.3] Top boundaries:
 
-      if ( ite == ide ) then
+      if (ite == ide ) then
          i = ite
 
          do j = js, je
@@ -101,7 +101,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       ! [2.4] Left boundaries:
 
-      if ( jts == jds ) then
+      if (jts == jds ) then
          j = jts
 
          do i = is, ie
@@ -117,7 +117,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       ! [2.5] Right boundaries:
 
-      if ( jte == jde ) then
+      if (jte == jde ) then
          j = jte
 
          do i = is, ie
@@ -133,19 +133,19 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       ! [2.6] Corner points:
 
-      if ( its == ids .AND. jts == jds ) then
+      if (its == ids .AND. jts == jds ) then
          data(its,jts) = 0.5 * ( data(its,jts+1) + data(its+1,jts) )
       end if
 
-      if ( ite == ide .AND. jts == jds ) then
+      if (ite == ide .AND. jts == jds ) then
          data(ite,jts) = 0.5 * ( data(ite-1,jts) + data(ite,jts+1) )
       end if
 
-      if ( its == ids .AND. jte == jde ) then
+      if (its == ids .AND. jte == jde ) then
          data(its,jde) = 0.5 * ( data(its,jde-1) + data(its+1,jde) )
       end if
 
-      if ( ite == ide .AND. jte == jde ) then 
+      if (ite == ide .AND. jte == jde ) then 
          data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
       end if
    end if ! not global
@@ -173,7 +173,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
    if (.NOT. global) then      ! For global only interior points needed  
       ! [3.2] Bottom boundaries:
 
-      if ( its == ids ) then
+      if (its == ids ) then
          i = its
 
          do j = js, je
@@ -189,7 +189,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       !  [3.3] Top boundaries:
 
-      if ( ite == ide ) then
+      if (ite == ide ) then
          i = ite
 
          do j = js, je
@@ -205,7 +205,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       !  [3.4] Left boundaries:
 
-      if ( jts == jds ) then
+      if (jts == jds ) then
          j = jts
 
          do i = is, ie
@@ -221,7 +221,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       !  [3.5] Right boundaries:
 
-      if ( jte == jde ) then
+      if (jte == jde ) then
          j = jte
 
          do i = is, ie
@@ -237,19 +237,19 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
       !  [3.6] Corner points:
 
-      if ( its == ids .AND. jts == jds ) then
+      if (its == ids .AND. jts == jds ) then
          data(its,jts) = 0.5 * ( data(its,jts+1) + data(its+1,jts) )
       end if
 
-      if ( ite == ide .AND. jts == jds ) then
+      if (ite == ide .AND. jts == jds ) then
          data(ite,jts) = 0.5 * ( data(ite-1,jts) + data(ite,jts+1) )
       end if
 
-      if ( its == ids .AND. jte == jde ) then
+      if (its == ids .AND. jte == jde ) then
          data(its,jde) = 0.5 * ( data(its,jde-1) + data(its+1,jde) )
       end if
 
-      if ( ite == ide .AND. jte == jde ) then 
+      if (ite == ide .AND. jte == jde ) then 
          data(ite,jte) = 0.5 * ( data(ite-1,jte) + data(ite,jte-1) )
       end if
    end if ! not global

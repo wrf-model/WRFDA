@@ -1,10 +1,10 @@
-subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
+subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts)
 
    implicit none
 
    integer, intent(in)    :: nj             ! Number of latitudes
    real,    intent(in)    :: pi             ! pi
-   real,    intent(out)   :: lat(1:nj)      ! Latitude (radians, from south).
+   real,    intent(out)   :: lat(1:nj)      ! Latitude(radians, from south).
    real,    intent(out)   :: sinlat(1:nj)   ! sin(Latitude).
    real,    intent(out)   :: coslat(1:nj)   ! cos(Latitude).
    real,    intent(out)   :: int_wgts(1:nj) ! Legendre Integration weights. 
@@ -27,7 +27,7 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
       int_wgts(nj+1-j) = int_wgts(j)
    end do
 
-   if ( (nj+1) / 2 == nj/2 + 1 ) then  ! Odd, then equator point:
+   if ((nj+1) / 2 == nj/2 + 1) then  ! Odd, then equator point:
       lat(nj/2+1) = 0.0
       sinlat(nj/2+1) = 0.0
       coslat(nj/2+1) = 1.0

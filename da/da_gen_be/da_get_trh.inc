@@ -1,22 +1,18 @@
-subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh  )
+subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh )
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Calculates T, RH from input WRF file.
-!  
-!  NOTE: 
-!
-!  HISTORY: 08/09/2005 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! PURPOSE: Calculates T, RH from input WRF file.
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   character (len=200), intent(in) :: input_file       ! NETCDF file nane.
+   character(len=200), intent(in) :: input_file       ! NETCDF file nane.
    integer, intent(in)   :: dim1, dim2, dim3          ! Dimensions.
    integer, intent(in)   :: k                         ! Model level.
    real, intent(out)     :: temp(1:dim1,1:dim2)       ! Temperature.
    real, intent(out)     :: rh(1:dim1,1:dim2)         ! Relative humidity.
 
-   character (len=10)    :: var                       ! Variable to search for. var = "T"
+   character(len=10)    :: var                       ! Variable to search for. var = "T"
    integer               :: i, j                      ! Loop counters.
 
    real                  :: thetap(1:dim1,1:dim2)     ! Perturbation potential temperature.
@@ -32,34 +28,33 @@ subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh  )
    real                  :: qs                        ! Saturation specific humidity.
 
    var = "T" ! Perturbation potential temperature in WRF.
-   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, thetap )
+   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, thetap)
 
    var = "PB"  ! Base state pressure in WRF.
-   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, pb )
+   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, pb)
 
    var = "P" ! Perturbation pressure in WRF.
-   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, pp )
+   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, pp)
 
    var = "QVAPOR"  ! Water vapor mixing ratio.
-   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, x )
+   call da_get_field( input_file, var, 3, dim1, dim2, dim3, k, x)
 
    do j = 1, dim2
       do i = 1, dim1
 
-!        Convert p', theta' to T:
+         ! Convert p', theta' to T:
          theta = ts0 + thetap(i,j)                 ! Theta = Theta0 + Thetap
          p = pb(i,j) + pp(i,j)                     ! p = base p + pert p.
-        temp(i,j) = theta * ( p * ps0_inv )**kappa ! Theta to T.
+         temp(i,j) = theta *( p * ps0_inv)**kappa ! Theta to T.
 
-!        Convert to specific humidity.
-         q = x(i,j) / ( 1.0 + x(i,j) )
+         ! Convert to specific humidity.
+         q = x(i,j) /( 1.0 + x(i,j))
 
-!        Calculate relative humidity:
+         ! Calculate relative humidity:
          t_c = temp(i,j) - t_kelvin
-         es = es_alpha * exp( es_beta * t_c / ( t_c + es_gamma ) )
-         qs = rd_over_rv * es / ( p - rd_over_rv1 * es )
+         es = es_alpha * exp( es_beta * t_c /( t_c + es_gamma))
+         qs = rd_over_rv * es /( p - rd_over_rv1 * es)
          rh(i,j) = 100.0 * q / qs
-
       end do
    end do
 

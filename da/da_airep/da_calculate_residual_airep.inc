@@ -1,6 +1,6 @@
 subroutine da_calculate_residual_airep( oi, y, re,                        &
                                         np_missing, np_bad_data,          &
-                                        np_obs_used, np_available )
+                                        np_obs_used, np_available)
 
    implicit none
 
@@ -14,7 +14,7 @@ subroutine da_calculate_residual_airep( oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( oi%num_Airep > 0 ) then
+   if (oi%num_Airep > 0) then
       n_obs_bad % u % num = number(0, 0, 0)
       n_obs_bad % v % num = number(0, 0, 0)
       n_obs_bad % t % num = number(0, 0, 0)
@@ -23,11 +23,11 @@ subroutine da_calculate_residual_airep( oi, y, re,                        &
          do k=1, oi%Airep(n)%info%levels
             np_available = np_available + 3
             re%Airep(n)%u(k) = da_residual( n, k, y%Airep(n)%u(k), &
-                                    oi%Airep(n)%u(k), n_obs_bad % u )
+                                    oi%Airep(n)%u(k), n_obs_bad % u)
             re%Airep(n)%v(k) = da_residual( n, k, y%Airep(n)%v(k), &
-                                    oi%Airep(n)%v(k), n_obs_bad % v )
+                                    oi%Airep(n)%v(k), n_obs_bad % v)
             re%Airep(n)%t(k) = da_residual( n, k, y%Airep(n)%t(k), &
-                                    oi%Airep(n)%t(k), n_obs_bad % t )
+                                    oi%Airep(n)%t(k), n_obs_bad % t)
          end do
       end do
 

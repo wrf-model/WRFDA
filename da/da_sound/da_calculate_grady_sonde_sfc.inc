@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_sonde_sfc( iv, re, jo_grad_y )
+subroutine da_calculate_grady_sonde_sfc( iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector              
@@ -13,7 +13,7 @@ subroutine da_calculate_grady_sonde_sfc( iv, re, jo_grad_y )
 
    integer                      :: n
 
-   if ( iv%num_sound < 1 ) return
+   if (iv%num_sound < 1) return
 
    do n=1, iv%num_sound
       if(iv%sonde_sfc(n)%u%qc < obs_qc_pointer) re%sonde_sfc(n)%u = 0.0

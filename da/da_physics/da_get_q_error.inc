@@ -1,4 +1,4 @@
-subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
+subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error)
 
    implicit none
 
@@ -13,19 +13,19 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error )
    real                      :: qs    ! Saturation specific humidity.
    real                      :: rh    ! Relative humidity.
 
-   if ( ABS(p - missing_r) > 1. .AND. ABS(t - missing_r) > 1. .AND. &
-        ABS(q - missing_r) > 1 ) then
+   if (ABS(p - missing_r) > 1.0 .AND. ABS(t - missing_r) > 1.0 .AND. &
+        ABS(q - missing_r) > 1) then
 
       ! Calculate rh:
 
-      call da_tp_to_qs( t, p, es, qs )
+      call da_tp_to_qs( t, p, es, qs)
 
       rh = 100.0 * q / qs
-      if ( rh > 100.0 ) rh = 100.0
+      if (rh > 100.0) rh = 100.0
 
       ! Get observation error for qv. Is this right?
 
-      q_error = f_qv_from_rh ( rh_error, t_error, rh, t, p )
+      q_error = f_qv_from_rh( rh_error, t_error, rh, t, p)
 
    else
       q_error = missing_r

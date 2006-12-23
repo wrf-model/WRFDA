@@ -36,7 +36,7 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
          PRE(k)=0.
       end if
 
-      if(PRE(K) < -SCR3(K)/DT(K) ) then
+      if (PRE(K) < -SCR3(K)/DT(K) ) then
          PRE9(K)=-SCR39(K)/DT(K)
          PRE(k)=-SCR3(K)/DT(K)
       end if

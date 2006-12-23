@@ -1,4 +1,4 @@
-subroutine da_gauss_noise( z )
+subroutine da_gauss_noise( z)
       
    implicit none
    
@@ -7,12 +7,11 @@ subroutine da_gauss_noise( z )
 
    if (trace_use) call da_trace_entry("da_gauss_noise")
 
-
    ! [2.1] Get two uniform variate random numbers in range 0 to 1:
 
    do
-      call random_number( x )
-      call random_number( y )
+      call random_number( x)
+      call random_number( y)
 
       ! [2.2] Transform to range -1 to 1 and calculate sum of squares:
 
@@ -25,7 +24,7 @@ subroutine da_gauss_noise( z )
 
    ! [2.3] use Box-Muller transformation to get normal deviates:
 
-   coeff = sqrt( -2.0 * log(r) / r )         
+   coeff = sqrt( -2.0 * log(r) / r)         
    z = coeff * x
 
    if (trace_use) call da_trace_exit("da_gauss_noise")

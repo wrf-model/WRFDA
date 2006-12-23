@@ -23,7 +23,7 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
 
-   if(map_projection == 3) then
+   if (map_projection == 3) then
       mu = eu
       mv = ev
       return
@@ -40,7 +40,7 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    ANG=XLONRT*CONE_FACTOR*pi/180.0
 
-   if(PHIC < 0.0) ANG=-ANG
+   if (PHIC < 0.0) ANG=-ANG
 
    mu = ev*Sin(ANG) + eu*COS(ANG)
    mv = ev*COS(ANG) - eu*Sin(ANG)

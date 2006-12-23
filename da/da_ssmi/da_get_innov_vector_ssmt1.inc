@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
 
    implicit none
 
    integer, intent(in)            :: it       ! External iteration.
-   type (xb_type), intent(in)     :: xb       ! first guess state.
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)  :: ob       ! Observation structure.
-   type (ob_type), intent(inout)  :: iv       ! O-B structure.
+   type(xb_type), intent(in)     :: xb       ! first guess state.
+   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
+   type(y_type),  intent(inout)  :: ob       ! Observation structure.
+   type(ob_type), intent(inout)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i, j, k  ! Index dimension.
@@ -21,13 +21,13 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
    real, dimension(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
 
    integer                         :: itt, ittf
-   if ( iv % num_ssmt1 > 0 ) then
+   if (iv % num_ssmt1 > 0) then
       itt = 0 ; ittf = 0
       do n=1, iv % num_ssmt1
       
          num_levs = iv % ssmt1(n) % info % levels
 
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          model_t(:) = 0.0
 
@@ -52,13 +52,13 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 
             zk=missing_r
 
-            if ( iv % ssmt1(n) % h(k) > 0.0 ) then
+            if (iv % ssmt1(n) % h(k) > 0.0) then
                call da_to_zk(iv % ssmt1(n) % h(k), v_h, xp, v_interp_h, zk)
-            else if ( iv % ssmt1(n) % p(k) > 1.0 ) then
+            else if (iv % ssmt1(n) % p(k) > 1.0) then
                call da_to_zk(iv % ssmt1(n) % p(k), v_p, xp, v_interp_p, zk)
             end if
 
-            if(zk > 0.0) then
+            if (zk > 0.0) then
                num_levs=num_levs+1
                iv%ssmt1(n)%zk(num_levs)=zk
 
@@ -75,11 +75,11 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 !        [1.2] Interpolate horizontally to ob:
 
 #ifndef DEREF_KLUDGE
-         call da_Interp_lin_3D( xb % t, xp, i, j, dx, dy, dxm, dym, &
-                             model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs )
+         call da_interp_lin_3d( xb % t, xp, i, j, dx, dy, dxm, dym, &
+                             model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
 #else
-         call da_Interp_lin_3D( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs )
+         call da_interp_lin_3d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
+                             model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
 #endif
 
 !------------------------------------------------------------------------
@@ -94,8 +94,8 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 !           [3.0] Interpolation:
 !------------------------------------------------------------------------
 
-            if ( ob % ssmt1(n) % t(k) > missing_r .AND. &
-               iv % ssmt1(n) % t(k) % qc >= obs_qc_pointer ) then
+            if (ob % ssmt1(n) % t(k) > missing_r .AND. &
+               iv % ssmt1(n) % t(k) % qc >= obs_qc_pointer) then
 
                iv % ssmt1(n) % t(k) % inv = ob % ssmt1(n) % t(k) - &
                                             model_t(k)
@@ -111,9 +111,9 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv )
 
       if (check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')    &
-            'For outer iteration ',it,' Total Rejections for SSMI (T1) follows:'
-         write (unit = check_max_iv_unit, fmt = '(/,2(2(A,I6),/))') &
-            'Number of failed RH (T1) observations:    ',ittf, ' on ',itt
+            'For outer iteration ',it,' Total Rejections for SSMI(T1) follows:'
+         write(unit = check_max_iv_unit, fmt = '(/,2(2(A,I6),/))') &
+            'Number of failed RH(T1) observations:    ',ittf, ' on ',itt
       end if
    end if
 

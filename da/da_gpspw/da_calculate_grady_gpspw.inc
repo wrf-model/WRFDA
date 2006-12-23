@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y )
+subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -13,7 +13,7 @@ subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y )
    integer                      :: n
 
 
-   if ( iv%num_Gpspw > 0 ) then
+   if (iv%num_Gpspw > 0) then
       do n=1, iv%num_Gpspw
          if (iv%gpspw(n)%tpw%qc < obs_qc_pointer) then
             re%gpspw(n)%tpw = 0.0

@@ -1,12 +1,12 @@
-subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
    implicit none
 
    integer,           intent(in)    :: it      ! External iteration.
-   type (xb_type),    intent(in)    :: xb      ! first guess state.
-   type (xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
-   type (y_type),     intent(inout) :: ob      ! Observation structure.
-   type (ob_type),    intent(inout) :: iv      ! O-B structure.
+   type(xb_type),    intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob      ! Observation structure.
+   type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -56,7 +56,7 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
       if (sfc_assi_options == 1) then
          iv%synop(n)%zk=missing_r
 
-         if ( iv % synop(n) % h > missing_r) then
+         if (iv % synop(n) % h > missing_r) then
             do k=xp%kts,xp%kte
                v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                        + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
@@ -83,7 +83,7 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
             else
               iv%synop(n)%zk = missing_r
             end if
-         else if ( ob % synop(n) % p > 1.0 ) then
+         else if (ob % synop(n) % p > 1.0) then
             do k=xp%kts,xp%kte
               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                        + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
@@ -140,29 +140,29 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
          ! Surface data assimilation approca 2
          !------------------------------------
 
-         ! 1.2.1 Surface assimilation approach 2 (10-m u, v, 2-m t, q, and sfc_p)
+         ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_u )
+                             model_u)
          call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_v )
+                             model_v)
          call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_t )
+                             model_t)
          call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_q )
+                             model_q)
          call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_p )
+                             model_p)
 
          if (iv%synop(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
             call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, &
-               xp%jme, i, j, dx, dy, dxm, dym, hsm )
+               xp%jme, i, j, dx, dy, dxm, dym, hsm)
 
             ho = iv%synop(n)%h
             to = -888888.0
@@ -171,14 +171,14 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
             if (iv%synop(n)%t%qc >= 0 .and. iv%synop(n)%q%qc >= 0) then
                to = ob%synop(n)%t
                qo = ob%synop(n)%q
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                  hsm, ho, to, qo)
             else if (iv%synop(n)%t%qc >= 0 .and. iv%synop(n)%q%qc < 0) then
                to = ob%synop(n)%t
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                  hsm, ho, to)
             else
-               call da_sfc_pre (psfcm, model_p, model_t, model_q, &
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
                                  hsm, ho)
             end if
 
@@ -192,35 +192,35 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
       !--------------------------------------------------------------------
 
       if (ob % synop(n) % u > missing_r .AND. &
-          iv % synop(n) % u % qc >= obs_qc_pointer ) then
+          iv % synop(n) % u % qc >= obs_qc_pointer) then
          iv % synop(n) % u % inv = iv%synop(n)%u%inv - model_u
       else
          iv % synop(n) % u % inv = 0.0
       end if
 
       if (ob % synop(n) % v > missing_r .AND. &
-          iv % synop(n) % v % qc >= obs_qc_pointer ) then
+          iv % synop(n) % v % qc >= obs_qc_pointer) then
          iv % synop(n) % v % inv = iv%synop(n)%v%inv - model_v
       else
          iv % synop(n) % v % inv = 0.0
       end if
 
       if (ob % synop(n) % p > 0.0 .AND. &
-          iv % synop(n) % p % qc >= obs_qc_pointer ) then
+          iv % synop(n) % p % qc >= obs_qc_pointer) then
          iv % synop(n) % p % inv = iv%synop(n)%p%inv - model_p
       else
          iv % synop(n) % p % inv = 0.0
       end if
 
       if (ob % synop(n) % t > 0.0 .AND. &
-         iv % synop(n) % t % qc >= obs_qc_pointer ) then
+         iv % synop(n) % t % qc >= obs_qc_pointer) then
          iv % synop(n) % t % inv = iv%synop(n)%t%inv - model_t
       else
          iv % synop(n) % t % inv = 0.0
       end if
 
       if (ob % synop(n) % q > 0.0 .AND. &
-         iv % synop(n) % q % qc >= obs_qc_pointer ) then
+         iv % synop(n) % q % qc >= obs_qc_pointer) then
          iv % synop(n) % q % inv = iv%synop(n)%q%inv - model_q
       else
          iv % synop(n) % q % inv = 0.0
@@ -230,9 +230,9 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
       !     [5.0] Perform optional maximum error check:
       !--------------------------------------------------------------------
 
-      if ( check_max_iv ) then
+      if (check_max_iv) then
          call da_check_max_iv_synop(it, iv % synop(n), &
-                      itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf )
+                      itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
       end if
    end do
 
@@ -240,7 +240,7 @@ subroutine da_get_innov_vector_synop ( it, xb, xp, ob, iv )
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
         ', Total Rejections for Synop follows:'
 
-      write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
         'Number of failed pressure observations:   ',itpf, ' on ',itp,   &

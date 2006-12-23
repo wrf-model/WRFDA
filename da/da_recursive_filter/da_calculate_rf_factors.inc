@@ -1,4 +1,4 @@
-subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
+subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Calculate:
@@ -37,8 +37,8 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
       ! [2.0]: Calculate RF alpha:
       !-------------------------------------------------------------------------  
 
-      rf_e = 0.25 * rf_passes / ( rf_lengthscale(k) * rf_lengthscale(k) )
-      rf_alpha(k) = 1.0 + rf_e - sqrt( rf_e * ( rf_e + 2.0 ) )
+      rf_e = 0.25 * rf_passes / ( rf_lengthscale(k) * rf_lengthscale(k))
+      rf_alpha(k) = 1.0 + rf_e - sqrt( rf_e * ( rf_e + 2.0))
 
       !-------------------------------------------------------------------------
       ! [3.0]: Calculate rescaling factor:
@@ -53,11 +53,11 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
       field_out(-n:n) = field_in(-n:n)
 
       do pass = 1, rf_passes / 2
-         call da_recursive_filter_1d_adj( pass, rf_alpha(k), field_out, 2*n+1 )
+         call da_recursive_filter_1d_adj( pass, rf_alpha(k), field_out, 2*n+1)
       end do
 
       do pass = 1, rf_passes / 2
-         call da_recursive_filter_1d( pass, rf_alpha(k), field_out, 2*n+1 )
+         call da_recursive_filter_1d( pass, rf_alpha(k), field_out, 2*n+1)
       end do
 
       rf_scale_factor(k) = 1.0 / field_out(0)
@@ -66,14 +66,14 @@ subroutine da_calculate_rf_factors( rf_lengthscale, rf_alpha, rf_scale_factor )
       ! write(unit=stderr,fmt='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
       ! field_out1(-n:n) = field_in(-n:n)
       ! do pass = 1, rf_passes
-      !    call da_recursive_filter_1d( pass, rf_alpha(k), field_out1, 2*n+1 )
+      !    call da_recursive_filter_1d( pass, rf_alpha(k), field_out1, 2*n+1)
       ! end do
 
       ! do nn = -n, n
       !    write(unit=stderr,fmt='(2i5,4f12.5)')k, nn, field_in(nn), &
       !                             field_out(nn) / field_out(0), &
       !                             field_out1(nn) / field_out1(0), &
-      !                             exp( -0.125*(real(nn)/rf_lengthscale(k))**2 )
+      !                             exp( -0.125*(real(nn)/rf_lengthscale(k))**2)
       ! end do
 
    end do ! End loop over k
