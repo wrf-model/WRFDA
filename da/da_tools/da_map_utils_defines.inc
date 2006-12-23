@@ -167,52 +167,51 @@
    !
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  ! Define some private constants
+   ! Define some private constants
 
-  real, PRIVATE, parameter    :: deg_per_rad = 180.0/pi
-  real, PRIVATE, parameter    :: rad_per_deg = pi / 180.0
+   real, private, parameter    :: deg_per_rad = 180.0/pi
+   real, private, parameter    :: rad_per_deg = pi / 180.0
 
-  ! Mean Earth Radius in m.  The value below is consistent
-  ! with NCEP's routines and grids.
-  ! real, PUBLIC , parameter    :: earth_radius_m = 6371200. ! from Brent
-  real, PUBLIC , parameter    :: earth_radius_m = 6370000.0
-  real, PUBLIC , parameter    :: radians_per_degree = pi / 180.0
+   ! Mean Earth Radius in m.  The value below is consistent
+   ! with NCEP's routines and grids.
+   ! real, public , parameter    :: earth_radius_m = 6371200. ! from Brent
+   real, public , parameter    :: earth_radius_m = 6370000.0
+   real, public , parameter    :: radians_per_degree = pi / 180.0
 
-  ! Define public parameters
+   ! Define public parameters
  
-  ! Projection codes for proj_info structure:
-  integer, PUBLIC, parameter  :: PROJ_LATLON = 0
-  integer, PUBLIC, parameter  :: PROJ_MERC = 1
-  integer, PUBLIC, parameter  :: PROJ_LC = 3
-  integer, PUBLIC, parameter  :: PROJ_PS = 5
+   ! Projection codes for proj_info structure:
+   integer, public, parameter  :: PROJ_LATLON = 0
+   integer, public, parameter  :: PROJ_MERC = 1
+   integer, public, parameter  :: PROJ_LC = 3
+   integer, public, parameter  :: PROJ_PS = 5
 
    
   ! Define data structures to define various projections
 
-  type proj_info
-
-    integer          :: code     ! integer code for projection type
-    real             :: lat1     ! SW latitude (1,1) in degrees (-90->90N)
-    real             :: lon1     ! SW longitude (1,1) in degrees (-180->180E)
-    real             :: dx       ! Grid spacing in meters at truelats, used
+   type proj_info
+      integer          :: code     ! integer code for projection type
+      real             :: lat1     ! SW latitude (1,1) in degrees (-90->90N)
+      real             :: lon1     ! SW longitude (1,1) in degrees (-180->180E)
+      real             :: dx       ! Grid spacing in meters at truelats, used
                                  ! only for ps, lc, and merc projections
-    real             :: dlat     ! Lat increment for lat/lon grids
-    real             :: dlon     ! Lon increment for lat/lon grids
-    real             :: stdlon   ! Longitude parallel to y-axis (-180->180E)
-    real             :: truelat1 ! First true latitude (all projections)
-    real             :: truelat2 ! Second true lat (LC only)
-    real             :: hemi     ! 1 for NH, -1 for SH
-    real             :: cone     ! Cone factor for LC projections
-    real             :: polei    ! Computed i-location of pole point
-    real             :: polej    ! Computed j-location of pole point
-    real             :: rsw      ! Computed radius to SW corner
-    real             :: rebydx   ! Earth radius divided by dx
-    real             :: knowni   ! X-location of known lat/lon
-    real             :: knownj   ! Y-location of known lat/lon
-    logical          :: init     ! Flag to indicate if this struct is 
+      real             :: dlat     ! Lat increment for lat/lon grids
+      real             :: dlon     ! Lon increment for lat/lon grids
+      real             :: stdlon   ! Longitude parallel to y-axis (-180->180E)
+      real             :: truelat1 ! First true latitude (all projections)
+      real             :: truelat2 ! Second true lat (LC only)
+      real             :: hemi     ! 1 for NH, -1 for SH
+      real             :: cone     ! Cone factor for LC projections
+      real             :: polei    ! Computed i-location of pole point
+      real             :: polej    ! Computed j-location of pole point
+      real             :: rsw      ! Computed radius to SW corner
+      real             :: rebydx   ! Earth radius divided by dx
+      real             :: knowni   ! X-location of known lat/lon
+      real             :: knownj   ! Y-location of known lat/lon
+      logical          :: init     ! Flag to indicate if this struct is 
                                  ! ready for use
-  end type proj_info
+   end type proj_info
 
-  type(proj_info) :: map_info
+   type(proj_info) :: map_info
 
 

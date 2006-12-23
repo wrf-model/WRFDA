@@ -29,7 +29,7 @@ subroutine da_interp_lin_3d(fm3d, xp, &
    fo3d(:) = 0.0
 
    do kk = 1, nl
-      if(zk(kk) > 0.0) then
+      if (zk(kk) > 0.0) then
          call da_togrid(zk(kk), xp%kts, xp%kte, k, dz, dzm)
          fo3d(kk) = dzm*fmz(k) + dz*fmz(k+1)
       end if

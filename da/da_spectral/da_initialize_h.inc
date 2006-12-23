@@ -1,6 +1,6 @@
-subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
+subroutine da_initialize_h(ni, nj, max_wavenumber, lensav, alp_size, &
                             wsave, lon, sinlon, coslon, lat, sinlat, coslat, &
-                            int_wgts, alp )
+                            int_wgts, alp)
 
    use da_control
 
@@ -10,7 +10,7 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    integer, intent(in) :: nj                         ! Number of latitudes.
    integer, intent(in) :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
    integer, intent(in) :: lensav                     ! Size of FFTs wsave array.
-   integer, intent(in ):: alp_size                   ! Size of ALP array.
+   integer, intent(in):: alp_size                   ! Size of ALP array.
    real, intent(out)   :: wsave(1:lensav)            ! Primes for FFT.
    real, intent(out)   :: lon(1:ni)                  ! Longitude (radians).
    real, intent(out)   :: sinlon(1:ni)               ! sine(longitude).
@@ -28,9 +28,9 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    !----------------------------------------------------------------------------
 
    wsave(:) = 0.0
-   call rfft1i( ni, wsave, lensav, ierr )
+   call rfft1i(ni, wsave, lensav, ierr)
 
-   if ( ierr /= 0 ) then
+   if (ierr /= 0) then
      write(unit=message(1),fmt='(A,I4)') &
         "Fourier initialization failed. ierr = ", ierr
      call da_error(__FILE__,__LINE__,message(1:1))
@@ -40,10 +40,10 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    ! [2] Calculate latitudes, and their sines/cosines.'
    !---------------------------------------------------------------------------
  
-   if ( gaussian_lats ) then
-      call da_get_gausslats( nj, lat, int_wgts, sinlat, coslat )
+   if (gaussian_lats) then
+      call da_get_gausslats(nj, lat, int_wgts, sinlat, coslat)
    else
-      call da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts )
+      call da_get_reglats(nj, pi, lat, sinlat, coslat, int_wgts)
    end if
 
    do i = 1, ni
@@ -56,7 +56,7 @@ subroutine da_initialize_h( ni, nj, max_wavenumber, lensav, alp_size, &
    ! [3] Initialize Legendre coefficients.'
    !----------------------------------------------------------------------------
 
-   call da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
+   call da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
 
 end subroutine da_initialize_h
 

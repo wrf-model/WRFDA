@@ -30,7 +30,7 @@ subroutine da_interp_lin_3d_new(fm3d, xp, &
                       + dy(n) *(dxm(n)*fm3d(i(n), j(n)+1, xp%kts:xp%kte) &
                             +dx(n) * fm3d(i(n)+1, j(n)+1, xp%kts:xp%kte))
       do kk = 1, nl
-         if(k(kk,n) > 0) then
+         if (k(kk,n) > 0) then
             fo3d(kk,n) = dzm(kk,n)*fmz(k(kk,n)) + dz(kk,n)*fmz(k(kk,n)+1)
          end if
       end do

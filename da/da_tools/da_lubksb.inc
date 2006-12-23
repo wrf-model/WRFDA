@@ -1,12 +1,10 @@
-subroutine da_lubksb( n, np, indx, a, b)
+subroutine da_lubksb(n, np, indx, a, b)
 
    implicit none
 
    !  Adapted Numerical Recipes routine to solve the set of n linear equations A.X=B.
    !  Routine takes in to account possibility that B will begin with many zero elements, 
    !  so it is efficient for matrix inversion.
-
-   !  Adapted for WRF by Dale Barker, 11/5/04.
 
    integer, intent(in)  :: n              ! Logical size of array.
    integer, intent(in)  :: np             ! Physical size of array.
@@ -23,11 +21,11 @@ subroutine da_lubksb( n, np, indx, a, b)
       sum = b(ll)
       b(ll) = b(i)
 
-      if ( ii /= 0 ) then
+      if (ii /= 0) then
          do j = ii , i - 1
             sum = sum - a(i,j) * b(j)
          end do
-      else if ( sum /= 0.0 ) then
+      else if (sum /= 0.0) then
          ii = i
       end if
       b(i) = sum
@@ -35,7 +33,7 @@ subroutine da_lubksb( n, np, indx, a, b)
 
    do i = n , 1 , -1
       sum = b(i)
-      if ( i < n ) then
+      if (i < n) then
          do j = i + 1 , n
             sum = sum - a(i,j) * b(j)
          end do

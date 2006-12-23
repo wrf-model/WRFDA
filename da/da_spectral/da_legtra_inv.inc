@@ -1,5 +1,5 @@
-subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
-   alp, v, r_leg )
+subroutine da_legtra_inv(jds, jde, jts, jte, max_wavenumber, alp_size, m, &
+   alp, v, r_leg)
 
    implicit none
 
@@ -21,7 +21,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
 
    if (trace_use) call da_trace_entry("da_legtra_inv")
 
-   index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+   index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
 
    jc = (jde-jds+1)/2
 
@@ -30,7 +30,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    je = min(jc+iequator, jte)
 
    do j = jts, je
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+      index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
 
       r_leg(j) = sum(v(m:max_wavenumber) * &
          alp(index_j+index_m+m:index_j+index_m+max_wavenumber))
@@ -39,7 +39,7 @@ subroutine da_legtra_inv( jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    js = max(jts, jc+iequator+1)
 
    do j = js, jte
-      index_j = ( jds+jde - j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+      index_j = (jds+jde - j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
 
       sum_legtra = da_zero_complex
       do l = m, max_wavenumber

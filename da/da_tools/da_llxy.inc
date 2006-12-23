@@ -1,29 +1,27 @@
 subroutine da_llxy (xlati,xloni,x,y)
-!------------------------------------------------------------------------------!
-!
-!                 RoutinE LLXY
-!                **************
-!
-!
-! PURPOSE:  CALCULATES THE (X,Y) LOCATION (doT) in THE MESOSCALE GRIDS
-! -------   FROM LATITUDES AND LONGITUDES
-!
-!  Additions:      10/26/2004    Syed RH Rizvi
-!                  Global domain co-ordinates
-!
-!           For global domain co-ordinates
-!
-!  inPUT:
-!  -----
-!   XLAT:    LATITUDES
-!   XLON:    LONGITUDES
-!
-! outPUT:
-! -----
-!   X:        THE COORDinATE in X (I)-DIRECTION.
-!   Y:        THE COORDinATE in Y (J)-DIRECTION.
-!
-!------------------------------------------------------------------------------!
+
+   !----------------------------------------------------------------------------
+   !
+   !                 routine llxy
+   !                **************
+   !
+   !
+   ! purpose:  calculates the (x,y) location (dot) in the mesoscale grids
+   ! -------   from latitudes and longitudes
+   !
+   !           for global domain co-ordinates
+   !
+   !  input:
+   !  -----
+   !   xlat:    latitudes
+   !   xlon:    longitudes
+   !
+   ! output:
+   ! -----
+   !   x:        the coordinate in x (i)-direction.
+   !   y:        the coordinate in y (j)-direction.
+   !
+   !----------------------------------------------------------------------------
    
    implicit none
    
@@ -39,8 +37,6 @@ subroutine da_llxy (xlati,xloni,x,y)
    real              :: bb
    real, parameter   :: conv = 180.0 / pi
    
-!------------------------------------------------------------------------------!
-
    xlon = xloni
    xlat = xlati
 
@@ -51,8 +47,6 @@ subroutine da_llxy (xlati,xloni,x,y)
    if (dxlon >  180) dxlon = dxlon - 360.
    if (dxlon < -180) dxlon = dxlon + 360.
    
-!------------------------------------------------------------------------------!
-
    if (map_projection == 3) then
       xc = 0.0
       yc = YCNTR
@@ -60,25 +54,23 @@ subroutine da_llxy (xlati,xloni,x,y)
       cell = cos(xlat/conv)/(1.0+sin(xlat/conv))
       yy = -c2*alog(cell)
       xx = c2*dxlon/conv
-
    else
-
-      psi0 = ( pole - phic )/conv
+      psi0 = (pole - phic)/conv
       xc = 0.0
 
-!-----CALCULATE X,Y COORDS. RELATIVE TO POLE
+      ! calculate x,y coords. relative to pole
 
       flp = cone_factor*dxlon/conv
    
-      psx = ( pole - xlat )/conv
+      psx = (pole - xlat)/conv
    
       if (map_projection == 2) then
-! ...... Polar stereographics:
+         ! Polar stereographics:
          bb = 2.0*(cos(psi1/2.0)**2)
          yc = -earth_radius*bb*tan(psi0/2.0)
           r = -earth_radius*bb*tan(psx/2.0)
       else
-! ...... Lambert conformal:
+         ! Lambert conformal:
          bb = -earth_radius/cone_factor*sin(psi1)
          yc = bb*(tan(psi0/2.0)/tan(psi1/2.0))**cone_factor
           r = bb*(tan(psx /2.0)/tan(psi1/2.0))**cone_factor
@@ -94,23 +86,24 @@ subroutine da_llxy (xlati,xloni,x,y)
 
    end if
 
-! TRANSFORM (1,1) TO THE ORIGin
-! the location of the center in the coarse domain
+   ! transform (1,1) to the origin
+   ! the location of the center in the coarse domain
 
    centri = real (coarse_ix + 1)/2.0  
    centrj = real (coarse_jy + 1)/2.0  
 
-! the (X,Y) coordinates in the coarse domain
+   ! the (x,y) coordinates in the coarse domain
 
-   x = ( xx - xc )/coarse_ds + centri 
-   y = ( yy - yc )/coarse_ds + centrj  
+   x = (xx - xc)/coarse_ds + centri 
+   y = (yy - yc)/coarse_ds + centrj  
 
    ratio = coarse_ds / dsm
 
-!--only add 0.5 so that x/y is relative to first cross points:
+   ! only add 0.5 so that x/y is relative to first cross points:
 
    x = (x - start_x)*ratio + 0.5
    y = (y - start_y)*ratio + 0.5
+
 end subroutine da_llxy
 
 

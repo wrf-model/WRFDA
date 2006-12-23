@@ -6,13 +6,13 @@ subroutine da_local_to_global(xp, x, xg, dim)
    !           processor (typically, processor 0). 
    !---------------------------------------------------------------------------
 
-    type (XPOSE_type), intent(in):: xp                                    ! Domain decomposition vars.
-    real,  intent(in)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
-    real,  intent(out)  :: xg(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)  ! Global-grid output array.
-    integer, intent(in) :: dim                         ! Number of dimensions (=2 for 2D, =3 for 3D). 
+   type (XPOSE_type), intent(in):: xp                                    ! Domain decomposition vars.
+   real,  intent(in)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
+   real,  intent(out)  :: xg(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)  ! Global-grid output array.
+   integer, intent(in) :: dim                         ! Number of dimensions (=2 for 2D, =3 for 3D). 
 
-    integer                      :: glen(3) ! Global grid dimensions
-    integer                      :: llen(3) ! Local grid dimensions
+   integer                      :: glen(3) ! Global grid dimensions
+   integer                      :: llen(3) ! Local grid dimensions
 
    ! Set global and local index extent arrays.
    glen(1) = xp%ide-xp%ids+1

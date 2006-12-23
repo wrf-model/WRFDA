@@ -2,15 +2,11 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    implicit none
 
-   ! Arguments
-
    type(domain), intent(inout)                :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
 
    character(*),  intent (in)                 :: filename
    character(*),  intent (in),  optional      :: in_date
-
-   ! Local
 
    integer                 :: fid , status, n, nsave
 
@@ -25,7 +21,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    grid%input_from_file = .true.
 
-   call ext_ncd_open_for_read( trim(filename), 0, 0, "", fid, ierr)
+   call ext_ncd_open_for_read(trim(filename), 0, 0, "", fid, ierr)
 
    if (ierr /= 0) then
       write(unit=message(1), fmt='(2a)') &
@@ -33,7 +29,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   call ext_ncd_get_next_time( fid, current_date, Status )
+   call ext_ncd_get_next_time(fid, current_date, Status)
 
    if (present(in_date)) then
       ! Set start_date to current_date.
@@ -51,7 +47,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
             nsave = n - 1
             exit
          end if
-         call ext_ncd_get_next_time( fid, current_date, Status )
+         call ext_ncd_get_next_time(fid, current_date, Status)
       end do
 
       if (nsave < 0) then
@@ -73,14 +69,14 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
    call nl_set_julyr (grid%id, julyr)
    call nl_set_julday (grid%id, julday)
 
-   call nl_set_iswater (grid%id, grid%iswater )
-   call nl_set_cen_lat ( grid%id , grid%cen_lat )
-   call nl_set_cen_lon ( grid%id , grid%cen_lon )
-   call nl_set_truelat1 ( grid%id , grid%truelat1 )
-   call nl_set_truelat2 ( grid%id , grid%truelat2 )
-   call nl_set_moad_cen_lat ( grid%id , grid%moad_cen_lat )
-   call nl_set_stand_lon ( grid%id , grid%stand_lon )
-   call nl_set_map_proj ( grid%id , grid%map_proj )
+   call nl_set_iswater (grid%id, grid%iswater)
+   call nl_set_cen_lat (grid%id , grid%cen_lat)
+   call nl_set_cen_lon (grid%id , grid%cen_lon)
+   call nl_set_truelat1 (grid%id , grid%truelat1)
+   call nl_set_truelat2 (grid%id , grid%truelat2)
+   call nl_set_moad_cen_lat (grid%id , grid%moad_cen_lat)
+   call nl_set_stand_lon (grid%id , grid%stand_lon)
+   call nl_set_map_proj (grid%id , grid%map_proj)
 
    start_date=current_date
 
@@ -92,26 +88,26 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
    call ext_ncd_ioclose(fid, ierr)
 
    call da_trace("da_med_initialdata_input",message="open_r_dataset for "//trim(filename))
-   call open_r_dataset ( fid, trim(filename), grid , config_flags , &
-      "DATASET=inPUT", ierr )
+   call open_r_dataset (fid, trim(filename), grid , config_flags , &
+      "DATASET=inPUT", ierr)
 
-   if ( ierr .NE. 0 ) then
-     write(unit=message(1),fmt='(A,A,A,I5)') 'Error opening ', &
-       trim(filename),' for reading ierr=',ierr
-     call da_error(__FILE__,__LINE__,message(1:1))
+   if (ierr .NE. 0) then
+      write(unit=message(1),fmt='(A,A,A,I5)') 'Error opening ', &
+        trim(filename),' for reading ierr=',ierr
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    if (present(in_date)) then
       do n=1, nsave
          call da_message((/"current_date="//trim(current_date)// &
             ', in_date='//trim(in_date)/))
-         call ext_ncd_get_next_time( fid, current_date, Status )
+         call ext_ncd_get_next_time(fid, current_date, Status)
       end do
    end if
 
-   call input_model_input ( fid ,   grid , config_flags , ierr )
+   call input_model_input (fid ,   grid , config_flags , ierr)
 
-   call close_dataset ( fid , config_flags , "DATASET=inPUT" )
+   call close_dataset (fid , config_flags , "DATASET=inPUT")
 
    if (trace_use) call da_trace_exit("da_med_initialdata_input")
 

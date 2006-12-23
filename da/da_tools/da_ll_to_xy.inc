@@ -1,10 +1,9 @@
 subroutine da_ll_to_xy (info, loc, xp, &
                         outside, outside_all)
 
-   ! This routine convert the (lat, lon) into (x,y) coordinates
+   ! This routine converts (lat, lon) into (x,y) coordinates
 
    implicit none
-
 
    type(info_type),       intent(in)    :: info
    type(model_loc_type),  intent(inout) :: loc
@@ -71,11 +70,11 @@ subroutine da_ll_to_xy (info, loc, xp, &
       return
    end if
 
-! JRB hack
+   ! JRB hack
    if ((loc%i < xp%its-1) .or. (loc%i > xp%ite) .or. &
       (loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
-!   if ((loc%i < xp%its-1) .or. (loc%i >= xp%ite) .or. &
-!      (loc%j < xp%jts-1) .or. (loc%j >= xp%jte)) then
+   ! if ((loc%i < xp%its-1) .or. (loc%i >= xp%ite) .or. &
+   !     (loc%j < xp%jts-1) .or. (loc%j >= xp%jte)) then
       outside = .true.
       return
 

@@ -1,4 +1,4 @@
-subroutine da_ludcmp( n, np, indx, a, d)
+subroutine da_ludcmp(n, np, indx, a, d)
 
    implicit none
 
@@ -22,19 +22,19 @@ subroutine da_ludcmp( n, np, indx, a, d)
       aamax = 0.0
 
       do j = 1 , n
-         if ( abs(a(i,j)) > aamax ) aamax = abs(a(i,j))
+         if (abs(a(i,j)) > aamax) aamax = abs(a(i,j))
       end do
-      if ( aamax == 0.0 ) then
+      if (aamax == 0.0) then
          call da_error(__FILE__,__LINE__,(/"Singular matrix"/))
       end if
       vv(i) = 1.0 / aamax
    end do
 
    do j = 1 , n
-      if ( j > 1 ) then
+      if (j > 1) then
          do i = 1 , j - 1
             sum = a(i,j)
-            if ( i > 1 ) then
+            if (i > 1) then
                do k = 1 , i - 1
                   sum = sum - a(i,k) * a(k,j)
                end do
@@ -46,20 +46,20 @@ subroutine da_ludcmp( n, np, indx, a, d)
       aamax = 0.0
       do i = j , n
          sum = a(i,j)
-         if ( j > 1 ) then
+         if (j > 1) then
             do k = 1 , j - 1
                sum = sum - a(i,k) * a(k,j)
             end do
             a(i,j) = sum
          end if
          dum = vv(i) * abs(sum)
-         if ( dum >= aamax ) then
+         if (dum >= aamax) then
             imax = i
             aamax = dum
          end if
       end do
 
-      if ( j /= imax ) then
+      if (j /= imax) then
          do k = 1 , n
             dum = a(imax,k)
             a(imax,k) = a(j,k)
@@ -70,8 +70,8 @@ subroutine da_ludcmp( n, np, indx, a, d)
       end if
 
       indx(j) = imax
-      if ( j /= n ) then
-         if ( a(j,j) == 0.0 ) a(j,j) = tiny
+      if (j /= n) then
+         if (a(j,j) == 0.0) a(j,j) = tiny
          dum = 1.0 / a(j,j)
          do i = j + 1 , n
             a(i,j) = a(i,j) * dum
@@ -79,7 +79,7 @@ subroutine da_ludcmp( n, np, indx, a, d)
       end if
    end do
 
-   if ( a(n,n) == 0.0 ) a(n,n) = tiny
+   if (a(n,n) == 0.0) a(n,n) = tiny
 
 end subroutine da_ludcmp
 

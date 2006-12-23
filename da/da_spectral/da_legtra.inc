@@ -1,4 +1,4 @@
-subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
+subroutine da_legtra (nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
 
    implicit none
 
@@ -18,7 +18,7 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
    complex              :: sum_legtra              ! Summation scalar.
    complex              :: eq_term                 ! Summation scalar.
 
-   index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+   index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
 
    if ((nj+1) / 2 == nj/2 + 1) then
       eq_coeff = 1.0 ! Odd latitudes
@@ -29,11 +29,11 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
 
    do l = m, max_wavenumber
 
-      sign_switch = (-1)**( l + m )
+      sign_switch = (-1)**(l + m)
       sum_legtra = da_zero_complex
 
       do j = 1, nj / 2
-         index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+         index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
          index = index_j + index_m + l
 
          ! Sum first quadrant:
@@ -49,12 +49,12 @@ subroutine da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, v)
          ! Skip this step for Even lats    ! Syed RH Rizvi
          ! Add equator term (wrong if even nj, but then eq_coeff = 0.0 so OK):
          j = nj/2 + 1
-         index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * (max_wavenumber+2) / 2
+         index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber+2) / 2
          index = index_j + index_m + l
          eq_term = int_wgts(j) * r_leg(j) * alp(index)
       end if
 
-      v(l) = 0.5 * ( sum_legtra + eq_coeff * eq_term )
+      v(l) = 0.5 * (sum_legtra + eq_coeff * eq_term)
    end do
 
 end subroutine da_legtra

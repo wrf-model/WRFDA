@@ -1,36 +1,35 @@
 subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, var, &
-                                  failed, print)
+                                   failed, print)
 
-  implicit none
+   implicit none
 
-  integer          ,   intent (in)   :: it
-  type (info_type) ,   intent(in)    :: info
-  type (field_type),   intent(inout) :: field
-  real             ,   intent(in)    :: max_error
-  integer          ,   intent(inout) :: ix, ixf
-  integer          ,   intent(in)    :: iunit
-  character (LEN=*),   intent(in)    :: var
-  logical          ,   intent(out)   :: failed
-  logical          ,   intent(in)    :: print
+   integer          ,   intent (in)   :: it
+   type (info_type) ,   intent(in)    :: info
+   type (field_type),   intent(inout) :: field
+   real             ,   intent(in)    :: max_error
+   integer          ,   intent(inout) :: ix, ixf
+   integer          ,   intent(in)    :: iunit
+   character (LEN=*),   intent(in)    :: var
+   logical          ,   intent(out)   :: failed
+   logical          ,   intent(in)    :: print
 
-  real                               :: err, err_max
-  integer                            :: qc_flag
- 
-  failed = .false.
- 
-  qc_flag = field % qc
-  err_max = field % error * max_error
-  err     = field % inv
-  err     = ABS (err)
+   real                               :: err, err_max
+   integer                            :: qc_flag
 
-  ix     = ix + 1
-  if (it > 1 .and. qc_flag == fails_error_max) field%qc = 0
-  if (err > err_max) then
-     if (field % qc > fails_error_max) field % qc = fails_error_max 
-     ! rizvi  field % inv = 0.0
+   failed = .false.
 
-     ixf = ixf + 1
-     failed = .true.
+   qc_flag = field % qc
+   err_max = field % error * max_error
+   err     = field % inv
+   err     = ABS (err)
+
+   ix     = ix + 1
+   if (it > 1 .and. qc_flag == fails_error_max) field%qc = 0
+   if (err > err_max) then
+      if (field % qc > fails_error_max) field % qc = fails_error_max 
+
+      ixf = ixf + 1
+      failed = .true.
 
       if (print .and. failed) then
          if (err_max .LE. 0.) then
@@ -46,7 +45,6 @@ subroutine da_max_error_qc_radar (it, info, field, max_error, ix, ixf, iunit, va
             "  Ix=", ix, "  Ixf=", ixf, " Err_max ratio =",err/err_max, &
             " for ", var, " inv, error:",field % inv, field % error
       end if
-      ! rizvi
       field % inv = 0.0
    end if
 

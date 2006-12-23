@@ -47,8 +47,8 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    do jk =  kts+1, kte
       pdif = prs_mb (kts) - prs_mb (jk)
       if (pdif .GE. inc_100mb) then
-          k_100mb = jk
-          exit
+         k_100mb = jk
+         exit
       end if
    end do
 
@@ -60,8 +60,8 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    do jk =  kts+1, kte
       pdif = prs_mb (kts) - prs_mb (jk)
       if (pdif .GE. inc_200mb) then
-          k_200mb = jk
-          exit
+         k_200mb = jk
+         exit
       end if
    end do
 
@@ -106,13 +106,13 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    ! 3.1 Height increments
     
    ! never used
-   ! dhe_21   = height (k_100mb )- height (k_200mb)
-   dhe_sfc1 = height (k_100mb )- height (kts)
-   dhe_obs1 = height (k_100mb )- ho
+   ! dhe_21   = height (k_100mb)- height (k_200mb)
+   dhe_sfc1 = height (k_100mb)- height (kts)
+   dhe_obs1 = height (k_100mb)- ho
 
-   dhe_12   = height (k_200mb )- height (k_100mb)
-   dhe_sfc2 = height (k_200mb )- height (kts)
-   dhe_obs2 = height (k_200mb )- ho
+   dhe_12   = height (k_200mb)- height (k_100mb)
+   dhe_sfc2 = height (k_200mb)- height (kts)
+   dhe_obs2 = height (k_200mb)- ho
 
    ! 3.2 Extrapolated potential temperature at model surface and observation loc
 

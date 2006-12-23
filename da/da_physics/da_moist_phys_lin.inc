@@ -1,7 +1,7 @@
-subroutine da_moist_phys_lin( xb, xa, xp,  &
+subroutine da_moist_phys_lin(xb, xa, xp,  &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
-                its,ite, jts,jte, kts,kte )
+                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Partition of the hydrometeors via the moist explicit scheme.
@@ -82,7 +82,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
            xa % q(i,j,k) =xa % qt(i,j,k) - xa % qcw(i,j,k) - xa %qrn(i,j,k)
          end do
 
-         if ( DT_cloud_model ) then
+         if (DT_cloud_model) then
             do K=kts,kte
                DT(k) = xb%delt(i,j,k)
             end do
@@ -94,7 +94,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
 
             if (DT(k) <= 0.) cycle
 
-            if( xb%t(I,J,K) > TO )then
+            if (xb%t(I,J,K) > TO)then
                EES(K)=SVP1*EXP(SVP2*(xb%t(I,J,K)-SVPT0)/(xb%t(I,J,K)-SVP3))
                EES9(K)=EES(K)*SVP2*(SVPT0-SVP3)/((xb%t(I,J,K)-SVP3)*  &
                        (xb%t(I,J,K)-SVP3))*xa%t(I,J,K)
@@ -117,14 +117,14 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
 
             if (DT(k) <= 0.) cycle
 
-            if(xb%qcw(I,J,K) > 0.) then
+            if (xb%qcw(I,J,K) > 0.) then
                SCR29(K)=xa%qcw(I,J,K)
                SCR2(K)=xb%qcw(I,J,K)
             else
                SCR29(K)=0.
                SCR2(K)=0.
             end if
-            if(xb%qrn(I,J,K) > 1.E-25) then
+            if (xb%qrn(I,J,K) > 1.E-25) then
                SCR39(K)=xa%qrn(I,J,K)
                SCR3(K)=xb%qrn(I,J,K)
             else
@@ -139,7 +139,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
             SCR6(K)=xb%p(I,J,K)/(gas_constant*xb%t(I,J,K))
 
 
-            if( xb%t(I,J,K) > TO ) then
+            if (xb%t(I,J,K) > TO) then
                TMP(K)=0.25*PPI*0.001/(SCR6(K)*SCR3(K)*PPI*0.001)**0.75
                SCR79(K)=TMP(K)*SCR3(K)*SCR69(K)+TMP(K)*SCR6(K)*SCR39(K)
                SCR7(K)=(SCR6(K)*SCR3(K)*PPI*0.001)**0.25
@@ -163,7 +163,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
             DUM31(K)=3.1484E6-XLV1*xb%t(I,J,K)
             SCR419(K)=1.414E3*DUM219(K)
             SCR41(K)=1.414E3*DUM21(K)
-            if(xb%t(I,J,K) > TO)then
+            if (xb%t(I,J,K) > TO)then
                PRA19(K)=DUM319(K)
                PRA1(K)=DUM31(K)
             else
@@ -224,7 +224,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
             QCT(K)=-PRC(K)-PRA(K)
             QRT9(K)=PRC9(K)+PRA9(K)+PRE9(K)
             QRT(K)=PRC(K)+PRA(K)+PRE(K)
-            if(xb%t(I,J,K).GT.TO)then
+            if (xb%t(I,J,K).GT.TO)then
                DUM4119(K)=DUM319(K)
                DUM411(K)=DUM31(K)
             else
@@ -240,7 +240,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
 
             DUM1139(K)=xa%q(I,J,K)+DT(K)*QVT9(K)
             DUM113(K)=xb%q(I,J,K)+DT(K)*QVT(K)
-            if(DUM113(K) > 1.E-12 ) then
+            if (DUM113(K) > 1.E-12) then
                SCR429(K)=DUM1139(K)
                SCR42(K)=DUM113(K)
             else
@@ -249,7 +249,7 @@ subroutine da_moist_phys_lin( xb, xa, xp,  &
             end if
             DUM2119(K)=xa%qcw(I,J,K)+QCT9(K)*DT(k)
             DUM211(K)=xb%qcw(I,J,K)+QCT(K)*DT(k)
-            if(DUM211(K) > 0.) then
+            if (DUM211(K) > 0.) then
                SCR319(K)=DUM2119(K)
                SCR31(K)=DUM211(K)
             else

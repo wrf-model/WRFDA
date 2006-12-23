@@ -26,19 +26,19 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
    if (sub_header_small%ndim > 1  .and. &
       sub_header_small%end_index(1) == iy) then
 
-      if(sub_header_small%end_index(2) == jx) then
+      if (sub_header_small%end_index(2) == jx) then
          do k=1,2
             sub_header_small%start_index(k)=sub_header_large%start_index(k)
             sub_header_small%end_index(k)  =sub_header_large%end_index(k)
          end do
 
-         if(sub_header_small%ndim == 2) then
+         if (sub_header_small%ndim == 2) then
             do k=3,4
                sub_header_small%start_index(k)=1
                sub_header_small%end_index(k)  =1
             end do
          end if
-      else if(sub_header_small%end_index(2) == mkx) then
+      else if (sub_header_small%end_index(2) == mkx) then
          sub_header_small%start_index(1)=sub_header_large%start_index(1)
          sub_header_small%end_index(1)  =sub_header_large%end_index(1)
 
@@ -50,7 +50,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          !    sub_header_small%end_index(k)  =1
          ! end do
 
-         ! if(sub_header_small%ndim == 3) then
+         ! if (sub_header_small%ndim == 3) then
          !    sub_header_small%start_index(3)=1
          !    sub_header_small%end_index(3)  =mkx
          ! end if
@@ -75,7 +75,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
       index(sub_header_small%name, '_EVECG') > 0) then
       data_large = data_small
    else if (sub_header_small%end_index(1) == iy_large) then
-      if (sub_header_small%end_index(2) == jx_large ) then
+      if (sub_header_small%end_index(2) == jx_large) then
          do k=sub_header_small%start_index(3), sub_header_large%end_index(3)
             do j=1,jx
                do i=1,iy
@@ -104,7 +104,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
                end do
             end do
          end do
-      else if(sub_header_small%end_index(2) == mkx) then
+      else if (sub_header_small%end_index(2) == mkx) then
             write(unit=*, fmt='(2a, 8i4)') &
                   sub_header_small%name, &
                   '   index=', size(data_large, dim=1), &
@@ -143,7 +143,7 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
          end do
 
          do i=iy_large,1,-1
-            if(i > lliy .and. i < iy+lliy ) then
+            if (i > lliy .and. i < iy+lliy) then
                write(unit=*, fmt='(a, i4, 2e20.8)') 'i,data=', i, data_large(i,1,1,1), data_small(i-lliy,1,1,1)
             else
                write(unit=*, fmt='(a, i4, e20.8)') 'i,data=', i, data_large(i,1,1,1)
@@ -158,21 +158,21 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
       data_large = data_small
    end if
 
-   if(index(sub_header_small%name, '_EVALG') > 0) then
+   if (index(sub_header_small%name, '_EVALG') > 0) then
       sub_header_small%ndim = 1
       sub_header_small%staggering = 'M'
       sub_header_small%ordering   = 'M  '
-   else if(index(sub_header_small%name, '_EVECG') > 0) then
+   else if (index(sub_header_small%name, '_EVECG') > 0) then
       sub_header_small%ndim = 2
       sub_header_small%staggering = 'K'
       sub_header_small%ordering   = 'KM '
-   else if(index(sub_header_small%name, '_EVALL') > 0) then
+   else if (index(sub_header_small%name, '_EVALL') > 0) then
       sub_header_small%staggering = 'Y'
       sub_header_small%ordering   = 'YM'
-   else if(index(sub_header_small%name, '_EVECL') > 0) then
+   else if (index(sub_header_small%name, '_EVECL') > 0) then
       sub_header_small%staggering = 'Y'
       sub_header_small%ordering   = 'YKM'
-   else if(index(sub_header_small%name, 'PB_REG') > 0) then
+   else if (index(sub_header_small%name, 'PB_REG') > 0) then
       sub_header_small%staggering = 'Y'
       sub_header_small%ordering   = 'YKM'
    end if

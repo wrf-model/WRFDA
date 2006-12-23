@@ -1,4 +1,4 @@
-subroutine da_oi_stats_ssmt2 ( stats_unit, iv )
+subroutine da_oi_stats_ssmt2 (stats_unit, iv)
 
    implicit none
 
@@ -14,47 +14,37 @@ subroutine da_oi_stats_ssmt2 ( stats_unit, iv )
    nrh = 0
    
    maximum = maxmin_type(-1.0E+20, 0, 0)
-   minimum = maxmin_type( 1.0E+20, 0, 0)
+   minimum = maxmin_type(1.0E+20, 0, 0)
    average = 0.0
    rms_err = 0.0
 
-   if ( iv%num_ssmt2 > 0 ) then
-
+   if (iv%num_ssmt2 > 0) then
       do n=1, iv%num_ssmt2
-
-         if ( iv%ssmt2(n)%loc%proc_domain ) then
-
-            do k=1, iv%ssmt2(n)%info%levels
-    
-               call da_stats_calculate( n, k, iv%ssmt2(n)%rh(k)%qc, &
+         if (iv%ssmt2(n)%loc%proc_domain) then
+            do k=1, iv%ssmt2(n)%info%levels   
+               call da_stats_calculate(n, k, iv%ssmt2(n)%rh(k)%qc, &
                                      iv%ssmt2(n)%rh(k)%inv, nrh, &
                                      minimum, maximum, &
                                      average, rms_err)
             end do
-         end if    ! end if( iv%ssmt2(n)%loc%proc_domain )
+         end if    ! end if (iv%ssmt2(n)%loc%proc_domain)
       end do
-      
    end if
 
-! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int( nrh )
+   ! Do inter-processor communication to gather statistics.
+   call da_proc_sum_int(nrh)
    
    call da_proc_stats_combine(average, rms_err, &
                            minimum%value, maximum%value, &
                            minimum%n, maximum%n, &
-                           minimum%l, maximum%l )
+                           minimum%l, maximum%l)
    
-   if ( rootproc ) then
-   
-     if ( nrh /= 0 ) then
-   
-      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-B for SSMT2'
-   
-      call da_print_stats_ssmt2( stats_unit, nrh, minimum, maximum, &
-                                 average, rms_err )
-   
-     end if
-   
+   if (rootproc) then
+      if (nrh /= 0) then
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of O-B for SSMT2'
+         call da_print_stats_ssmt2(stats_unit, nrh, minimum, maximum, &
+                                 average, rms_err)
+      end if 
    end if
 
 end subroutine da_oi_stats_ssmt2

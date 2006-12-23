@@ -1,6 +1,6 @@
-subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
+subroutine da_interpolate_regcoeff(iy, iys, kz, kzs, meanl_stats, &
                                     meanl_xb, meanp_stats, meanp_xb, &
-                                    pb_vert_reg_stats, pb_vert_reg )
+                                    pb_vert_reg_stats, pb_vert_reg)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Interpolate statistical regression coefficient to new domain.
@@ -40,18 +40,18 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
    !------------------------------------------------------------------------
 
    do k = 1, kz
-      if(meanp_xb(k) <= meanp_stats(1) ) then
+      if (meanp_xb(k) <= meanp_stats(1)) then
          weight(k) = 1.0e-6
          k_above(k) = 1
-      else if(meanp_xb(k) >= meanp_stats(kzs) ) then
+      else if (meanp_xb(k) >= meanp_stats(kzs)) then
          weight(k) = 1.0-1.0e-6
          k_above(k) = kzs-1
       else
          do ks = 1, kzs-1
-            if ( meanp_xb(k) >= meanp_stats(ks) .AND. &
-                 meanp_xb(k) <= meanp_stats(ks+1) ) then
-               weight(k) = ( meanp_xb(k) - meanp_stats(ks) ) / &
-                           ( meanp_stats(ks+1) - meanp_stats(ks) )
+            if (meanp_xb(k) >= meanp_stats(ks) .AND. &
+                 meanp_xb(k) <= meanp_stats(ks+1)) then
+               weight(k) = (meanp_xb(k) - meanp_stats(ks)) / &
+                           (meanp_stats(ks+1) - meanp_stats(ks))
                k_above(k) = ks
                exit
             end if
@@ -93,19 +93,19 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
    
       ! Find position of xb latitude in statistics rows:
 
-      if ( meanl_xb(i) <= meanl_stats(    2) ) then
+      if (meanl_xb(i) <= meanl_stats(   2)) then
          i_south = 2
          lat_wgt = 0.5
-      else if ( meanl_xb(i) >= meanl_stats(iys-1) ) then
+      else if (meanl_xb(i) >= meanl_stats(iys-1)) then
          i_south = iys-2
          lat_wgt = 0.5
       else
          do is = 1, iys-1
-            if ( meanl_xb(i) >= meanl_stats(is) .AND. &
-                 meanl_xb(i) <= meanl_stats(is+1) ) then
+            if (meanl_xb(i) >= meanl_stats(is) .AND. &
+                 meanl_xb(i) <= meanl_stats(is+1)) then
 
-               lat_wgt = ( meanl_xb(i) - meanl_stats(is) ) / &
-                         ( meanl_stats(is+1) - meanl_stats(is) )
+               lat_wgt = (meanl_xb(i) - meanl_stats(is)) / &
+                         (meanl_stats(is+1) - meanl_stats(is))
                i_south = is
                exit
             end if
@@ -115,20 +115,20 @@ subroutine da_interpolate_regcoeff( iy, iys, kz, kzs, meanl_stats, &
       do k1 = 1, kz
          do k2 = 1, kz
             pb_vert_reg(i,k1,k2) = lat_wgt * pb_vert_reg_temp(i_south+1,k1,k2) + &
-                                   ( 1.0 - lat_wgt ) * pb_vert_reg_temp(i_south,k1,k2)
+                                   (1.0 - lat_wgt) * pb_vert_reg_temp(i_south,k1,k2)
          end do
       end do     
    end do
 
-   if(print_detail_regression) then
-      call da_array_print( 1, pb_vert_reg_stats(1,:,:), &
-         'pb_vert_reg_stats(1,:,:)' )
-      call da_array_print( 1, pb_vert_reg(1,:,:), &
-         'pb_vert_reg(1,:,:)' )
-      call da_array_print( 1, pb_vert_reg_stats(:,1,:), &
-         'pb_vert_reg_stats(:,1,:)' )
-      call da_array_print( 1, pb_vert_reg(:,1,:), &
-         'pb_vert_reg(:,1,:)' )
+   if (print_detail_regression) then
+      call da_array_print(1, pb_vert_reg_stats(1,:,:), &
+         'pb_vert_reg_stats(1,:,:)')
+      call da_array_print(1, pb_vert_reg(1,:,:), &
+         'pb_vert_reg(1,:,:)')
+      call da_array_print(1, pb_vert_reg_stats(:,1,:), &
+         'pb_vert_reg_stats(:,1,:)')
+      call da_array_print(1, pb_vert_reg(:,1,:), &
+         'pb_vert_reg(:,1,:)')
    end if
 
    if (trace_use) call da_trace_exit("da_interpolate_regcoeff")

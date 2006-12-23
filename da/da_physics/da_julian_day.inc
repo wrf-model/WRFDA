@@ -31,12 +31,12 @@ subroutine da_julian_day(NY,NM,ND,JD,METHOD)
    else if (METHOD == 2) then             
       NM=1                               
       ND=JD
-      NYEAR: do LOOP=1,11                    
-         if (ND <= MDAY(LOOP)) exit NYEAR
+      do LOOP=1,11                    
+         if (ND <= MDAY(LOOP)) exit
 
          ND=ND-MDAY(LOOP)     
          NM=NM+1                      
-      end do NYEAR                           
+      end do
    end if                                
 
 end subroutine da_julian_day

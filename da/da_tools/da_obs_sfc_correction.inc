@@ -1,4 +1,4 @@
-subroutine da_obs_sfc_correction(sfc_obs, xb )
+subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    !--------------------------------------------------------------------
    ! This subroutine is used to correct the surface measurements (wind, 
@@ -125,7 +125,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
    ! 4.  Bring surface observation below model levels with good height quality
    ! ================================================
 
-   if ( sfc_obs % h < height(xb%kts)) then
+   if (sfc_obs % h < height(xb%kts)) then
 
       ! 2.3 Make use of local variables for model  
       !     -------------------------------------
@@ -148,11 +148,11 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
          ! temperature and moisture at sigma level:
 
          if (abs(to - missing_r) < 1.0) then
-            correc = da_mo_correction( ho, po, tm, qo, &
-                                     hm, pm, tm, qm, um ,vm, roughness )
+            correc = da_mo_correction(ho, po, tm, qo, &
+                                     hm, pm, tm, qm, um ,vm, roughness)
          else
-            correc = da_mo_correction( ho, po, to, qo, &
-                                    hm, pm, tm, qm, um ,vm, roughness )
+            correc = da_mo_correction(ho, po, to, qo, &
+                                    hm, pm, tm, qm, um ,vm, roughness)
          end if
 
          ! 3.2.2 Wind correction 
@@ -195,7 +195,6 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
       !     -------------------
 
       if (abs(sfc_obs % t % inv - missing_r) > 1.) then
-
          !  Correct data
 
          call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, &
@@ -206,7 +205,6 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
          !  Replace any previous temperature qc by the surface correction
 
          sfc_obs % t % qc  = surface_correction
-
       end if
 
       ! 3.6 Assign model lowest level height + 1m to observation
@@ -218,7 +216,6 @@ subroutine da_obs_sfc_correction(sfc_obs, xb )
       !     ---------
  
       ! sfc_obs % height_qc = surface_correction
-
    end if
 
 end  subroutine da_obs_sfc_correction

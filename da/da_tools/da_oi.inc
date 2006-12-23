@@ -1,9 +1,9 @@
-subroutine da_oi( str,line )
+subroutine da_oi(str,line)
 
-   ! Quick way of showing location
-   IMPLICIT NONE
-   CHARACTER*(*), INTENT(IN) :: str
-   INTEGER, INTENT(IN) :: line
+   ! quick way of showing location
+   implicit none
+   character*(*), intent(in) :: str
+   integer, intent(in) :: line
 
    write(unit=stderr,fmt=*) str, line
 

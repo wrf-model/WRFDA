@@ -1,4 +1,4 @@
-subroutine da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
+subroutine da_lcl(P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
    do
       TLCL=T0*((PLCL/P0)**0.286)
 
-      call da_qfrmrh( PLCL, TLCL, 100., QS )
+      call da_qfrmrh(PLCL, TLCL, 100., QS)
 
       EPS=QS-Q0
 
@@ -24,7 +24,7 @@ subroutine da_lcl( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
       else
          PLCL=PLCL+DP
 
-         if ( PLCL >= P0 ) then
+         if (PLCL >= P0) then
             ZLCL=Z0
             QLCL=Q0
             PLCL=P0

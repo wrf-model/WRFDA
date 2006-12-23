@@ -1,4 +1,4 @@
-subroutine da_oi_stats_ssmi_tb ( stats_unit, oi )
+subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
 
    implicit none
 
@@ -20,13 +20,13 @@ subroutine da_oi_stats_ssmi_tb ( stats_unit, oi )
    ntb85v = 0
    ntb85h = 0
 
-   ssmi_tb%maximum%tb19v = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb19h = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb22v = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb37v = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb37h = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb85v = maxmin_type( missing_r, 0, 0)
-   ssmi_tb%maximum%tb85h = maxmin_type( missing_r, 0, 0)
+   ssmi_tb%maximum%tb19v = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb19h = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb22v = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb37v = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb37h = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb85v = maxmin_type(missing_r, 0, 0)
+   ssmi_tb%maximum%tb85h = maxmin_type(missing_r, 0, 0)
    ssmi_tb%minimum%tb19v = maxmin_type(-missing_r, 0, 0)
    ssmi_tb%minimum%tb19h = maxmin_type(-missing_r, 0, 0)
    ssmi_tb%minimum%tb22v = maxmin_type(-missing_r, 0, 0)
@@ -37,96 +37,96 @@ subroutine da_oi_stats_ssmi_tb ( stats_unit, oi )
    ssmi_tb%average = residual_ssmi_tb_type(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
    ssmi_tb%rms_err = ssmi_tb%average
 
-   if ( oi%num_ssmi_tb .gt. 0) then
+   if (oi%num_ssmi_tb .gt. 0) then
       do n=1, oi%num_ssmi_tb
 
-         if( oi%ssmi_tb(n)%loc%proc_domain ) then
+         if (oi%ssmi_tb(n)%loc%proc_domain) then
 
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb19v%qc, & 
                                   oi%ssmi_tb(n)%tb19v%inv, ntb19v, &
                                   ssmi_tb%minimum%tb19v, ssmi_tb%maximum%tb19v,&
                                   ssmi_tb%average%tb19v, ssmi_tb%rms_err%tb19v)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb19h%qc, & 
                                   oi%ssmi_tb(n)%tb19h%inv, ntb19h, &
                                   ssmi_tb%minimum%tb19h, ssmi_tb%maximum%tb19h,&
                                   ssmi_tb%average%tb19h, ssmi_tb%rms_err%tb19h)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb22v%qc, & 
                                   oi%ssmi_tb(n)%tb22v%inv, ntb22v, &
                                   ssmi_tb%minimum%tb22v, ssmi_tb%maximum%tb22v,&
                                   ssmi_tb%average%tb22v, ssmi_tb%rms_err%tb22v)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb37v%qc, & 
                                   oi%ssmi_tb(n)%tb37v%inv, ntb37v, &
                                   ssmi_tb%minimum%tb37v, ssmi_tb%maximum%tb37v,&
                                   ssmi_tb%average%tb37v, ssmi_tb%rms_err%tb37v)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb37h%qc, & 
                                   oi%ssmi_tb(n)%tb37h%inv, ntb37h, &
                                   ssmi_tb%minimum%tb37h, ssmi_tb%maximum%tb37h,&
                                   ssmi_tb%average%tb37h, ssmi_tb%rms_err%tb37h)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb85v%qc, & 
                                   oi%ssmi_tb(n)%tb85v%inv, ntb85v, &
                                   ssmi_tb%minimum%tb85v, ssmi_tb%maximum%tb85v,&
                                   ssmi_tb%average%tb85v, ssmi_tb%rms_err%tb85v)
-            call da_stats_calculate( oi%ssmi_tb(n)%loc%obs_global_index, &
+            call da_stats_calculate(oi%ssmi_tb(n)%loc%obs_global_index, &
                                   0, oi%ssmi_tb(n)%tb85h%qc, & 
                                   oi%ssmi_tb(n)%tb85h%inv, ntb85h, &
                                   ssmi_tb%minimum%tb85h, ssmi_tb%maximum%tb85h,&
                                   ssmi_tb%average%tb85h, ssmi_tb%rms_err%tb85h)
 
-         end if    ! end if( oi%ssmi_tb(n)%loc%proc_domain )
+         end if    ! end if (oi%ssmi_tb(n)%loc%proc_domain)
       end do
    end if
 
    ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int( ntb19v )
-   call da_proc_sum_int( ntb19h )
-   call da_proc_sum_int( ntb22v )
-   call da_proc_sum_int( ntb37v )
-   call da_proc_sum_int( ntb37h )
-   call da_proc_sum_int( ntb85v )
-   call da_proc_sum_int( ntb85h )
+   call da_proc_sum_int(ntb19v)
+   call da_proc_sum_int(ntb19h)
+   call da_proc_sum_int(ntb22v)
+   call da_proc_sum_int(ntb37v)
+   call da_proc_sum_int(ntb37h)
+   call da_proc_sum_int(ntb85v)
+   call da_proc_sum_int(ntb85h)
 
    call da_proc_stats_combine(ssmi_tb%average%tb19v, ssmi_tb%rms_err%tb19v, &
               ssmi_tb%minimum%tb19v%value, ssmi_tb%maximum%tb19v%value, &
               ssmi_tb%minimum%tb19v%n, ssmi_tb%maximum%tb19v%n, &
-              ssmi_tb%minimum%tb19v%l, ssmi_tb%maximum%tb19v%l )
+              ssmi_tb%minimum%tb19v%l, ssmi_tb%maximum%tb19v%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb19h, ssmi_tb%rms_err%tb19h, &
               ssmi_tb%minimum%tb19h%value, ssmi_tb%maximum%tb19h%value, &
               ssmi_tb%minimum%tb19h%n, ssmi_tb%maximum%tb19h%n, &
-              ssmi_tb%minimum%tb19h%l, ssmi_tb%maximum%tb19h%l )
+              ssmi_tb%minimum%tb19h%l, ssmi_tb%maximum%tb19h%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb22v, ssmi_tb%rms_err%tb22v, &
               ssmi_tb%minimum%tb22v%value, ssmi_tb%maximum%tb22v%value, &
               ssmi_tb%minimum%tb22v%n, ssmi_tb%maximum%tb22v%n, &
-              ssmi_tb%minimum%tb22v%l, ssmi_tb%maximum%tb22v%l )
+              ssmi_tb%minimum%tb22v%l, ssmi_tb%maximum%tb22v%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb37v, ssmi_tb%rms_err%tb37v, &
               ssmi_tb%minimum%tb37v%value, ssmi_tb%maximum%tb37v%value, &
               ssmi_tb%minimum%tb37v%n, ssmi_tb%maximum%tb37v%n, &
-              ssmi_tb%minimum%tb37v%l, ssmi_tb%maximum%tb37v%l )
+              ssmi_tb%minimum%tb37v%l, ssmi_tb%maximum%tb37v%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb37h, ssmi_tb%rms_err%tb37h, &
               ssmi_tb%minimum%tb37h%value, ssmi_tb%maximum%tb37h%value, &
               ssmi_tb%minimum%tb37h%n, ssmi_tb%maximum%tb37h%n, &
-              ssmi_tb%minimum%tb37h%l, ssmi_tb%maximum%tb37h%l )
+              ssmi_tb%minimum%tb37h%l, ssmi_tb%maximum%tb37h%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb85v, ssmi_tb%rms_err%tb85v, &
               ssmi_tb%minimum%tb85v%value, ssmi_tb%maximum%tb85v%value, &
               ssmi_tb%minimum%tb85v%n, ssmi_tb%maximum%tb85v%n, &
-              ssmi_tb%minimum%tb85v%l, ssmi_tb%maximum%tb85v%l )
+              ssmi_tb%minimum%tb85v%l, ssmi_tb%maximum%tb85v%l)
 
    call da_proc_stats_combine(ssmi_tb%average%tb85h, ssmi_tb%rms_err%tb85h, &
               ssmi_tb%minimum%tb85h%value, ssmi_tb%maximum%tb85h%value, &
               ssmi_tb%minimum%tb85h%n, ssmi_tb%maximum%tb85h%n, &
-              ssmi_tb%minimum%tb85h%l, ssmi_tb%maximum%tb85h%l )
+              ssmi_tb%minimum%tb85h%l, ssmi_tb%maximum%tb85h%l)
 
-   if ( rootproc ) then
+   if (rootproc) then
       if (ntb19v > 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb19v(m/s)     n'

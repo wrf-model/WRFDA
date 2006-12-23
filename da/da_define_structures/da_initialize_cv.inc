@@ -1,4 +1,4 @@
-subroutine da_initialize_cv( cv_size, cv )
+subroutine da_initialize_cv(cv_size, cv)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Initialize components of control variable.
@@ -40,8 +40,8 @@ subroutine da_initialize_cv( cv_size, cv )
          count = count + 1
 
          mean_cv = sum_cv / real(count)
-         rms_cv = sqrt(sum_cv2 / real(count) )
-         std_dev_cv = sqrt( rms_cv * rms_cv - mean_cv * mean_cv )
+         rms_cv = sqrt(sum_cv2 / real(count))
+         std_dev_cv = sqrt(rms_cv * rms_cv - mean_cv * mean_cv)
 
       end do
 

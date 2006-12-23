@@ -24,10 +24,9 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
    err     = ABS (err)
 
    ix     = ix + 1
-   if( it > 1 .and. qc_flag == fails_error_max ) field%qc = 0
+   if (it > 1 .and. qc_flag == fails_error_max) field%qc = 0
    if (err > err_max) then
       if (field % qc > fails_error_max) field % qc = fails_error_max 
-      !rizvi  field % inv = 0.0
 
       ixf = ixf + 1
       failed = .true.

@@ -14,12 +14,12 @@ subroutine da_obs_proc_station(obs)
    integer :: i
 
 
-   loop_levels: do i = 1, obs % info % levels
+   do i = 1, obs % info % levels
       !-----------------------------------------------------------------------
       ! Gross check for t, p & q
       !-----------------------------------------------------------------------
 
-      if (obs%each(i)%t %inv <  75.0 .or. obs%each(i)%t %inv > 350.0   ) then
+      if (obs%each(i)%t %inv <  75.0 .or. obs%each(i)%t %inv > 350.0  ) then
          obs%each(i)%t %inv = missing_r
          obs%each(i)%t %qc  = missing
       end if
@@ -40,7 +40,7 @@ subroutine da_obs_proc_station(obs)
          if (abs(po -  missing_r) > 1. .and. abs(to -  missing_r) > 1. .and. &
              abs(rho-  missing_r) > 1.) then
 
-            call da_tp_to_qs(to, po, es, qs )
+            call da_tp_to_qs(to, po, es, qs)
 
             if (rho > 100.) then
                qvo = qs
@@ -55,7 +55,7 @@ subroutine da_obs_proc_station(obs)
          obs % each(i) % q  % qc = obs % each(i) % rh % qc
          obs % each(i) % q  % error = obs % each(i) % rh % error
       end if
-   end do loop_levels
+   end do
 
 end subroutine da_obs_proc_station
 

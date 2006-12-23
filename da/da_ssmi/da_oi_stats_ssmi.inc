@@ -1,4 +1,4 @@
-subroutine da_oi_stats_ssmi ( stats_unit, oi )
+subroutine da_oi_stats_ssmi (stats_unit, oi)
 
    implicit none
 
@@ -7,17 +7,13 @@ subroutine da_oi_stats_ssmi ( stats_unit, oi )
 
    integer  :: num_ssmi_tb, num_ssmi_retrieval       ! # obs over global domain.
 
-   num_ssmi_tb = wrf_dm_sum_integer( oi%num_ssmi_tb )
-   num_ssmi_retrieval = wrf_dm_sum_integer( oi%num_ssmi_retrieval )
+   num_ssmi_tb = wrf_dm_sum_integer(oi%num_ssmi_tb)
+   num_ssmi_retrieval = wrf_dm_sum_integer(oi%num_ssmi_retrieval)
 
-   if ( num_ssmi_tb .gt. 0 ) then
-
-           call da_oi_stats_ssmi_tb ( stats_unit, oi )
-
-   else if ( num_ssmi_retrieval .gt. 0) then
-
-           call da_oi_stats_ssmi_rv ( stats_unit, oi )
-
+   if (num_ssmi_tb .gt. 0) then
+      call da_oi_stats_ssmi_tb (stats_unit, oi)
+   else if (num_ssmi_retrieval .gt. 0) then
+      call da_oi_stats_ssmi_rv (stats_unit, oi)
    end if
 
 end subroutine da_oi_stats_ssmi

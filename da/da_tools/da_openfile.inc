@@ -1,74 +1,71 @@
-      subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
-!--------------------------------------------------------------------------!
-!
-!                       routine openfile
-!                     ********************
-!
-!  purpose:
-!  -------
-!     open an file and rewind
-!
-!   method:
-!   ------
-!
-!   input:
-!   -----
-!      kunit:          logical unit
-!      cdfile:         name of file for output of discared obs.
-!      cda!ess:       a!ess (sequential or ),
-!      cdstatus:       status (old, new or unknown)
-!      cdform:         form (formatted or unformatted)
-!
-!   output:
-!   ------
-!      opened file
-!
-!   common:                      no
-!   -------
-!   external:                    no
-!   --------
-!   references:                  no
-!   ----------
-!
-!   modifications:
-!   --------------
-!       original :  98-07 (f. vandenberghe)
-!       additions : 98-11 norm doctor (f. vandenberghe)
-!----------------------------------------------------------------------------!
+subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
 
-!...ARGUMENTS FILE NAME AND logical unit
+   !------------------------------------------------------------------------
+   !
+   !                       routine openfile
+   !                     ********************
+   !
+   !  purpose:
+   !  -------
+   !     open an file and rewind
+   !
+   !   method:
+   !   ------
+   !
+   !   input:
+   !   -----
+   !      kunit:          logical unit
+   !      cdfile:         name of file for output of discared obs.
+   !      cda!ess:       a!ess (sequential or),
+   !      cdstatus:       status (old, new or unknown)
+   !      cdform:         form (formatted or unformatted)
+   !
+   !   output:
+   !   ------
+   !      opened file
+   !
+   !   common:                      no
+   !   -------
+   !   external:                    no
+   !   --------
+   !   references:                  no
+   !   ----------
+   !
+   !   modifications:
+   !   --------------
+   !       original :  98-07 (f. vandenberghe)
+   !       additions : 98-11 norm doctor (f. vandenberghe)
+   !--------------------------------------------------------------------------
 
-      integer, intent(in) :: Kunit
-      character*(*), intent(in) :: CDFILE, CDACCESS, CDSTATUS, CDFORM
+   integer, intent(in) :: Kunit
+   character*(*), intent(in) :: CDFILE, CDACCESS, CDSTATUS, CDFORM
 
-      integer :: iost
+   integer :: iost
 
-!------------------------------------------------------------------------------C
+   ! 1.  open FILE
+   ! -------------
 
-! 1.  open FILE
-! -------------
+   IOST = 0
 
-      IOST = 0
-
-      open ( unit   = Kunit, &
-             FILE   = CDFILE, &
-             ACCESS = CDACCESS, &
-             STATUS = CDSTATUS, &
-             FORM   = CDFORM, &
-             ERR    =  2000, &
-             iostat = IOST        )
+   open (unit   = Kunit, &
+          FILE   = CDFILE, &
+          ACCESS = CDACCESS, &
+          STATUS = CDSTATUS, &
+          FORM   = CDFORM, &
+          ERR    =  2000, &
+          iostat = IOST       )
  
-      rewind (Kunit)
+   rewind (Kunit)
  
-      return
+   return
  
-! 2.  ERROR PROCESSinG
-! --------------------
+  ! 2.  ERROR PROCESSinG
+   ! --------------------
  
- 2000 continue
-      call da_error(__FILE__,__LINE__, &
-        (/"Cannot open file"//trim(CDFILE)/))
+2000 continue
+   call da_error(__FILE__,__LINE__, &
+      (/"Cannot open file"//trim(CDFILE)/))
 
-      end subroutine da_openfile
+end subroutine da_openfile
 
 

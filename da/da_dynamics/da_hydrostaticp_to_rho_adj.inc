@@ -5,7 +5,7 @@ subroutine da_hydrostaticp_to_rho_adj( xb, xp, rho, p )
    !
    !  METHOD:  Standard adjoint coding.
    !
-   !  ASsumPTIONS: 1) Hydrostatic pressure.
+   !  ASSUMPTIONS: 1) Hydrostatic pressure.
    !               2) Model level stored top down.
    !---------------------------------------------------------------------------
 

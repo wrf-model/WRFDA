@@ -7,7 +7,7 @@ subroutine da_message(strs)
    character(len=*), intent(in) :: strs(:)
    integer :: i
 
-#if defined( DM_PARALLEL ) && ! defined( STUBMPI)
+#if defined(DM_PARALLEL) && ! defined(STUBMPI)
    do i=1,size(strs) 
       write(unit=stdout,fmt='(a)') trim(strs(i))
    end do
