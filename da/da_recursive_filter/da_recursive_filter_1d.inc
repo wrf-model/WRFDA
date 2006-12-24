@@ -1,10 +1,12 @@
-subroutine da_recursive_filter_1d( pass, alpha, field, n )
+subroutine da_recursive_filter_1d(pass, alpha, field, n)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Perform one pass of recursive filter on 1D array.
    !
    ! METHOD:  Perform right-moving filter followed by left-moving filter.
    !---------------------------------------------------------------------------
+
+   implicit none
 
    integer, intent(in)    :: pass           ! Current pass of filter.
    real, intent(in)       :: alpha          ! Alpha coefficient for RF.
@@ -31,12 +33,12 @@ subroutine da_recursive_filter_1d( pass, alpha, field, n )
 
    ! use turning conditions as in the appendix of Hayden & Purser (1995):
 
-   if ( pass == 1 ) then
+   if (pass == 1) then
       b(1) = one_alpha * a(1)
-   else if ( pass == 2 ) then
-      b(1) = a(1) / ( 1.0 + alpha )
+   else if (pass == 2) then
+      b(1) = a(1) / (1.0 + alpha)
    else
-      b(1) = one_alpha * ( a(1) - alpha**3 * a(2) ) / ( 1.0 - alpha**2)**2
+      b(1) = one_alpha * (a(1) - alpha**3 * a(2)) / (1.0 - alpha**2)**2
    end if
 
    ! [2.2] Perform pass left to right:
@@ -51,10 +53,10 @@ subroutine da_recursive_filter_1d( pass, alpha, field, n )
 
    ! use turning conditions as in the appendix of Hayden & Purser (1995):
 
-   if ( pass == 1 ) then
-      c(n) = b(n) / ( 1.0 + alpha )
+   if (pass == 1) then
+      c(n) = b(n) / (1.0 + alpha)
    else
-      c(n) = one_alpha * ( b(n) - alpha**3 * b(n-1) ) / ( 1.0 - alpha**2)**2
+      c(n) = one_alpha * (b(n) - alpha**3 * b(n-1)) / (1.0 - alpha**2)**2
    end if
 
    ! [3.2] Perform pass left to right:

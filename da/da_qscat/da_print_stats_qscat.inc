@@ -1,4 +1,4 @@
-subroutine da_print_stats_qscat( stats_unit, nu, nv, qscat )
+subroutine da_print_stats_qscat(stats_unit, nu, nv, qscat)
 
    implicit none
 
@@ -14,8 +14,8 @@ subroutine da_print_stats_qscat( stats_unit, nu, nv, qscat )
    write(unit=stats_unit, fmt='(a,i16,4i22)') &
         '  Number: ', nu, nv
 
-   if(nu < 1) nu = 1
-   if(nv < 1) nv = 1
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
 
    write(unit=stats_unit, fmt='((a,2(f12.4,2i5)))') &
         ' Minimum(n,k): ', qscat%minimum%u, qscat%minimum%v, &

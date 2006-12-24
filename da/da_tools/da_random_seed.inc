@@ -10,11 +10,11 @@ subroutine da_random_seed
    !----------------------------------------------------------------------------
 
    call random_seed(size=seed_size)              ! Get size of seed array.
-   allocate( seed_array(1:seed_size) )
+   allocate(seed_array(1:seed_size))
    seed_array(1:seed_size) = 0
 
-   if ( put_rand_seed ) then            ! Manually set random seed.
-      if ( seed_size /= 2 ) then
+   if (put_rand_seed) then            ! Manually set random seed.
+      if (seed_size /= 2) then
          write(unit=stdout,fmt='(a)') &
             ' Warning: only setting first two values of seed_array'
       end if
@@ -30,7 +30,7 @@ subroutine da_random_seed
       write(unit=stdout,fmt='(a,10i16)')' Random number seed array = ', seed_array
    end if
    
-   deallocate( seed_array )
+   deallocate(seed_array)
 
 end subroutine da_random_seed
 

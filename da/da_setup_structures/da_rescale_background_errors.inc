@@ -1,5 +1,5 @@
-subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
-                                          ds, s, be_sub )
+subroutine da_rescale_background_errors (ix, jy, var_scaling, len_scaling, &
+                                          ds, s, be_sub)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Rescale wrfvar background errors.
@@ -33,7 +33,7 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
    ! [2.0] Perform various rescalings:
    !--------------------------------------------------------------------------
 
-   if ( mz > 0 ) then
+   if (mz > 0) then
 
       ! [2.1] Empirical rescaling of lengthscales:
       s(1:mz) = len_scaling * s(1:mz)
@@ -53,16 +53,16 @@ subroutine da_rescale_background_errors ( ix, jy, var_scaling, len_scaling, &
 
       ! Calculate recursive filter rescaling:
 
-      allocate( rf_scale_factor(1:mz) )
+      allocate(rf_scale_factor(1:mz))
 
-      call da_calculate_rf_factors( s(:), be_sub % rf_alpha(:), &
-                                    rf_scale_factor(:) )
+      call da_calculate_rf_factors(s(:), be_sub % rf_alpha(:), &
+                                    rf_scale_factor(:))
 
       do m = 1, mz
          be_sub % val(:,m) = rf_scale_factor(m) * be_sub % val(:,m)
       end do
                                        
-      deallocate ( rf_scale_factor )   
+      deallocate (rf_scale_factor)   
 
    end if
 

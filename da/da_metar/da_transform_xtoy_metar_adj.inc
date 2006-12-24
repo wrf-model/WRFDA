@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_metar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -15,7 +15,7 @@ subroutine da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_metar_adj")
 
-   if ( iv%num_metar > 0 ) then
+   if (iv%num_metar > 0) then
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, &
             iv%ob_numb(iv%current_ob_time)%metar
@@ -43,16 +43,16 @@ subroutine da_transform_xtoy_metar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
                xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
 #else
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%u, iv%metar(n)%zk)
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%v, iv%metar(n)%zk)
             call da_interp_obs_lin_2d_adj(& 
                jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%t, iv%metar(n)%zk)
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%q, iv%metar(n)%zk)
 

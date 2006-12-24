@@ -7,41 +7,41 @@ subroutine da_set_map_para
 
    conv = 180.0 / pi
                                                                   
-   ! DEFinE PSI1:
-   if (map_projection.EQ.1 .OR. map_projection.EQ.2) then
-      if(PHIC.LT.0) then 
-         PSI1 = 90.+trueLAT1_3DV
-         PSI1 = -PSI1
+   ! define psi1:
+   if (map_projection.eq.1 .or. map_projection.eq.2) then
+      if (phic.lt.0) then 
+         psi1 = 90.+truelat1_3dv
+         psi1 = -psi1
       else
-        PSI1 = 90.-trueLAT1_3DV
+        psi1 = 90.-truelat1_3dv
       end if          
    else
-      PSI1 = 0.
+      psi1 = 0.
    end if 
 
-   PSI1 = PSI1/CONV
+   psi1 = psi1/conv
          
-   ! CALCULATE R
-   if (map_projection.NE.3) then
-      PSX = (POLE-PHIC)/CONV
-      if (map_projection.EQ.1) then
-         CELL  = earth_radius*Sin(PSI1)/cone_factor  
-         CELL2 = (TAN(PSX/2.))/(TAN(PSI1/2.))
+   ! calculate r
+   if (map_projection.ne.3) then
+      psx = (pole-phic)/conv
+      if (map_projection.eq.1) then
+         cell  = earth_radius*sin(psi1)/cone_factor  
+         cell2 = (tan(psx/2.))/(tan(psi1/2.))
       end if 
-      if (map_projection.EQ.2) then
-         CELL  = earth_radius*Sin(PSX)/cone_factor   
-         CELL2 = (1. + COS(PSI1))/(1. + COS(PSX)) 
+      if (map_projection.eq.2) then
+         cell  = earth_radius*sin(psx)/cone_factor   
+         cell2 = (1. + cos(psi1))/(1. + cos(psx)) 
       end if  
-      R = CELL*(CELL2)**cone_factor 
-      YCNTR = -R
+      r = cell*(cell2)**cone_factor 
+      ycntr = -r
    end if  
 
-   ! FOR MERCATOR PROJECTION, THE PROJECTION IS true AT LAT AT PHI1
-   if (map_projection.EQ.3) then
-      C2     = earth_radius*COS(PSI1) 
-      PHICTR = PHIC/CONV 
-      CELL   = COS(PHICTR)/(1.0+Sin(PHICTR)) 
-      YCNTR  = - C2*LOG(CELL)  
+   ! for mercator projection, the projection is true at lat at phi1
+   if (map_projection.eq.3) then
+      c2     = earth_radius*cos(psi1) 
+      phictr = phic/conv 
+      cell   = cos(phictr)/(1.0+sin(phictr)) 
+      ycntr  = - c2*log(cell)  
    end if 
 
 end subroutine da_set_map_para

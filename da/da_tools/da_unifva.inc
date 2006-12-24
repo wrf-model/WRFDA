@@ -1,9 +1,7 @@
 real function da_unifva (kdum) 
 
    !--------------------------------------------------------------------
-   !  PURPOSE :
-   !  -------
-   !  Minimal random number generator of Park and Miller with 
+   !  PURPOSE : Minimal random number generator of Park and Miller with 
    !  Bays-Durham shuffle and added safeguards.
    !  Returns a uniform random deviate between 0.0. and 1.0 (exclusive 
    !  of the endpoint values). Call with kdum a negative integer to 
@@ -12,7 +10,6 @@ real function da_unifva (kdum)
    !  floating value less than 1. 
    !
    !  See descripiton of function 'ran1', pg. 271.
-   !
    !--------------------------------------------------------------------
  
    implicit none
@@ -36,12 +33,12 @@ real function da_unifva (kdum)
    ! begin main
    ! ----------
 
-   if ( (KDUM.LE.0).OR.(NIY.EQ.0) ) then
-      KDUM = MAX( -KDUM , 1 )
+   if ((KDUM.LE.0).OR.(NIY.EQ.0)) then
+      KDUM = MAX(-KDUM , 1)
 
        do JJ = JPNTAB+8,1,-1
           IK   = KDUM/JPIQ
-          KDUM = JPIA*( KDUM - IK*JPIQ ) - JPIR*IK
+          KDUM = JPIA*(KDUM - IK*JPIQ) - JPIR*IK
  
           if (KDUM.lt.0) KDUM = KDUM + JPIM
           if (JJ.LE.JPNTAB) NIV(JJ) = KDUM
@@ -52,14 +49,14 @@ real function da_unifva (kdum)
    end if
   
    IK   = KDUM/JPIQ
-   KDUM = JPIA*( KDUM - IK*JPIQ ) - JPIR*IK
+   KDUM = JPIA*(KDUM - IK*JPIQ) - JPIR*IK
      
    if (KDUM.LT.0) KDUM = KDUM + JPIM
 
    IJJ      = 1 + NIY/JPNDIV
    NIY      = NIV(IJJ)
    NIV(IJJ) = KDUM
-   DA_UNifVA   = Min( PPAM*NIY , PPRNMX )
+   DA_UNifVA   = Min(PPAM*NIY , PPRNMX)
 
 end function da_unifva
 

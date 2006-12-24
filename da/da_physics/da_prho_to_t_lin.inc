@@ -1,11 +1,11 @@
-subroutine da_prho_to_t_lin( xb, xp, xa ) 
+subroutine da_prho_to_t_lin(xb, xp, xa) 
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Calculates temperature increments from pressure/density increments
    !
-   ! METHOD:  Linearised ideal gas law: T~ = T ( p"/p - rho"/rho )
+   ! METHOD:  Linearised ideal gas law: T~ = T (p"/p - rho"/rho)
    !
-   ! ASsumPTIONS: 1) Model level stored top down.
+   ! ASSUMPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -34,10 +34,10 @@ subroutine da_prho_to_t_lin( xb, xp, xa )
    !---------------------------------------------------------------------------
 
    xa % t(is:ie,js:je,ks:ke) = xb % t(is:ie,js:je,ks:ke) * &
-                            ( xa % p(is:ie,js:je,ks:ke) / &
+                            (xa % p(is:ie,js:je,ks:ke) / &
                               xb % p(is:ie,js:je,ks:ke) - &
                               xa % rho(is:ie,js:je,ks:ke) / &
-                              xb % rho(is:ie,js:je,ks:ke) )     
+                              xb % rho(is:ie,js:je,ks:ke))     
 
 end subroutine da_prho_to_t_lin
 

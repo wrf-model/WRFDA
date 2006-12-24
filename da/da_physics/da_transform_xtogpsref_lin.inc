@@ -1,7 +1,10 @@
 subroutine da_transform_xtogpsref_lin(xa, xb, xp)
 
+   !---------------------------------------------------------------------
+   ! Purpose : TBD
    ! input: xa%q, xa%p, xa%t, xb%q, xb%p, xb%t, and xp
-   ! output: xa%ref                             June 9, 2004
+   ! output: xa%ref                             
+   !---------------------------------------------------------------------
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)    :: xb       ! first guess state.

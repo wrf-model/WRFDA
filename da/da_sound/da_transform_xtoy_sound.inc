@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_sound ( xa, iv, xp, y )
+subroutine da_transform_xtoy_sound (xa, iv, xp, y)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_sound ( xa, iv, xp, y )
    real                         :: dy, dym  !
 
 
-   if ( iv%num_sound > 0 ) then
+   if (iv%num_sound > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
 
          ! [1.1] Get horizontal interpolation weights:
@@ -32,7 +32,7 @@ subroutine da_transform_xtoy_sound ( xa, iv, xp, y )
 
          k = iv % sound(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE

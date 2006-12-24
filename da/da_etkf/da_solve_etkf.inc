@@ -105,10 +105,10 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
 !------------- calculate C and Gamma in Bishop et al. 2001
 ! in outputs, hzthz contains C, eignv contains gamma  
- call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, workt, -1, info )
+ call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, workt, -1, info)
  lwork = int(workt(1))
  allocate (work(lwork))
- call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, work, lwork, info )
+ call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, work, lwork, info)
  deallocate(work)
 
 ! note eignv1 output from SSYEV is in ascending order !!!
@@ -221,7 +221,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
   proj2sum = proj2
 
-  if(nout .ge. nstartaccum2) then 
+  if (nout .ge. nstartaccum2) then 
   proj2sum = 0.
   do nt = nout-naccumt2+1,nout
   read(89,rec=nt) proj2sum1

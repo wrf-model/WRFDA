@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_airsr_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_airsr_adj(iv, xp, jo_grad_y, jo_grad_x)
 
    !----------------------------------------------------------------------
    ! Purpose: Does adjoint computation at AIRS retrieval locations
@@ -16,7 +16,7 @@ subroutine da_transform_xtoy_airsr_adj( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_airsr > 0 ) then
+   if (iv%num_airsr > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%airsr + 1, iv%ob_numb(iv%current_ob_time)%airsr
 
          ! [1.1] Get horizontal interpolation weights:
@@ -30,7 +30,7 @@ subroutine da_transform_xtoy_airsr_adj( iv, xp, jo_grad_y, jo_grad_x )
 
          k = iv % airsr(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
 #ifndef DEREF_KLUDGE

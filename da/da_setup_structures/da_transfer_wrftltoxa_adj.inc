@@ -1,6 +1,6 @@
-subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
+subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam, &
 #include "em_dummy_new_args.inc"
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Convert analysis increments into WRFAD increments 
@@ -47,7 +47,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
-   if ( size(moist,dim=4) >= 4 ) then
+   if (size(moist,dim=4) >= 4) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -58,7 +58,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       end do
    end if
 
-   if ( size(moist,dim=4) >= 6 ) then
+   if (size(moist,dim=4) >= 6) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -69,7 +69,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       end do
    end if
 
-   if ( size(moist,dim=4) >= 7 ) then
+   if (size(moist,dim=4) >= 7) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -175,7 +175,7 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
-            g_press(i,j,k  )=g_press(i,j,k  )+0.5*grid%xa%p(i,j,k)
+            g_press(i,j,k )=g_press(i,j,k )+0.5*grid%xa%p(i,j,k)
             g_moist(i,j,k,P_QV)=-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
             grid%em_g_mu_2(i,j)=-g_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*grid%em_dn(k)
             g_press(i,j,k+1)=g_press(i,j,k+1)+g_press(i,j,k)
@@ -216,12 +216,12 @@ subroutine da_transfer_wrftltoxa_adj( grid, config_flags, filnam, &
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL
-   call nl_set_dyn_opt ( 1 , DYN_EM_TL )
+   call nl_set_dyn_opt (1 , DYN_EM_TL)
 
-   call da_med_initialdata_output( grid , config_flags, filnam )
+   call da_med_initialdata_output(grid , config_flags, filnam)
 
    grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt ( 1 , DYN_EM )
+   call nl_set_dyn_opt (1 , DYN_EM)
 
    if (trace_use) call da_trace_exit("da_transfer_wrftltoxa_adj")
 

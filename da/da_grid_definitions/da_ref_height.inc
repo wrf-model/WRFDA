@@ -21,11 +21,11 @@ subroutine da_ref_height(pres, ref_height)
    ref_height = -(bb + aa * cc) * cc
 
    if (tis0 > 0.0) then
-      p0iso=ps0*exp( (tis0-ts0)/tlp )
+      p0iso=ps0*exp((tis0-ts0)/tlp)
       cc=log(p0iso/ps0)
       ziso=-(aa*cc+bb)*cc
 
-      if(ref_height > ziso) then
+      if (ref_height > ziso) then
          ref_height=ziso+rovg*tis0*log(p0iso/pres)
       end if
    end if

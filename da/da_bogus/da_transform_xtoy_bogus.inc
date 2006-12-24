@@ -1,9 +1,7 @@
-subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y)
 
    !---------------------------------------------------------------------
-   !  This subroutine is the linearized bogus observation operators.
-   !  It includes slp, winds.          Ying Zhang, September 2003.
-   !  Port the algorithm to WRF frame. Xianyan Zhang and Qingnong Xiao, February 2005.
+   ! Purpose: the linearized bogus observation operators.
    !---------------------------------------------------------------------
 
    implicit none
@@ -24,19 +22,18 @@ subroutine da_transform_xtoy_bogus (xa, xb, iv, xp, y )
    real, dimension(xp%kts:xp%kte) :: model_p_c,model_p_c9
    real                           :: psfc_loc,terr_loc,psfc_loc9
 
-   if ( iv%num_bogus > 0 ) then
-!xyh      do n=1, iv % num_bogus
-     do n = iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
+   if (iv%num_bogus > 0) then
+      do n = iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
 
-!xyh         y%bogus(n)%slp  = 0.0
-!xyh         y%bogus(n)%u(:) = 0.0
-!xyh         y%bogus(n)%v(:) = 0.0
-!xyh         y%bogus(n)%t(:) = 0.0
-!xyh         y%bogus(n)%q(:) = 0.0
+         !xyh         y%bogus(n)%slp  = 0.0
+         !xyh         y%bogus(n)%u(:) = 0.0
+         !xyh         y%bogus(n)%v(:) = 0.0
+         !xyh         y%bogus(n)%t(:) = 0.0
+         !xyh         y%bogus(n)%q(:) = 0.0
 
          num_levs = iv % bogus(n) % info % levels
 
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          ! [1.1] Get cross pt. horizontal interpolation weights:
 

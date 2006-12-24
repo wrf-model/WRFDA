@@ -1,4 +1,8 @@
-subroutine da_transform_xtoy_airep_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_airep_adj(iv, xp, jo_grad_y, jo_grad_x)
+
+   !--------------------------------------------------------------------------
+   ! Purpose: TBD
+   !--------------------------------------------------------------------------
 
    implicit none
 
@@ -12,10 +16,10 @@ subroutine da_transform_xtoy_airep_adj( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_airep > 0 ) then
+   if (iv%num_airep > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%airep + 1, iv%ob_numb(iv%current_ob_time)%airep
          k = iv % airep(n) % info % levels
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
 
          ! [1.1] Get horizontal interpolation weights:
 

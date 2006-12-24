@@ -1,8 +1,10 @@
 subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
 
-   ! This subroutine calculates virtual temperature (tv_ma) on each level
+   !--------------------------------------------------------------------------
+   ! Purpose: Calculates virtual temperature (tv_ma) on each level
    ! (pre_ma, pressure at the level) at the observed location (i,j). 
    ! dx, dxm, dy, dym are horizontal interpolation weighting.
+   !--------------------------------------------------------------------------
 
    implicit none
 

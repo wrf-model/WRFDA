@@ -1,4 +1,4 @@
-subroutine da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
+subroutine da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, Bogus)
 
    implicit none
 
@@ -17,11 +17,11 @@ subroutine da_print_stats_bogus( stats_unit, nu, nv, nt, nq, nslp, Bogus )
    write(unit=stats_unit, fmt='(a,i16,4i22)') &
       '  Number: ', nu, nv, nt, nq, nslp
 
-   if(nu < 1) nu = 1
-   if(nv < 1) nv = 1
-   if(nt < 1) nt = 1
-   if(nq < 1) nq = 1
-   if(nslp < 1) nslp = 1
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
+   if (nt < 1) nt = 1
+   if (nq < 1) nq = 1
+   if (nslp < 1) nslp = 1
 
    write(unit=stats_unit, fmt='((a,3(f12.4,2i5),e12.4,2i5,f12.4,2i5))') &
       ' Minimum(n,k): ', Bogus%minimum%u, Bogus%minimum%v, Bogus%minimum%t, &

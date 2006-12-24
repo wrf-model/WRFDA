@@ -1,5 +1,5 @@
-subroutine da_truncate_spectra( max_wave, nw, power_trunc, power, &
-   max_wave_trunc )
+subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, &
+   max_wave_trunc)
 
    implicit none
 
@@ -19,13 +19,13 @@ subroutine da_truncate_spectra( max_wave, nw, power_trunc, power, &
    max_wave_trunc = max_wave
    do l = 0, nw - 1 
       cumul_power = cumul_power + power(l)
-      if ( cumul_power > truncated_power ) then
+      if (cumul_power > truncated_power) then
          max_wave_trunc = l - 1
          exit
       end if
    end do
 
-   if ( max_wave_trunc > max_wave ) then
+   if (max_wave_trunc > max_wave) then
       write(unit=message(1),fmt='(a)') &
          'da_truncate_spectra: Power requested needs higher resolution.'     
       write(unit=message(2),fmt='(a,i8)') &

@@ -190,7 +190,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
       call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
-         Write(unit=errmsg(1),FMT='(A,A)') 'error opening the output file ', filename
+         Write(unit=errmsg(1),fmt='(A,A)') 'error opening the output file ', filename
          call da_error(__FILE__,__LINE__,errmsg(1:1))
       Endif
 

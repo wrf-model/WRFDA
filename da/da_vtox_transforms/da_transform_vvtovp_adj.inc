@@ -1,8 +1,8 @@
-subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
+subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
                                     vp, vv, mz, &
                                     jds,jde, kds,kde,  &
                                     ims,ime, jms,jme, kms,kme,  &
-                                    its,ite, jts,jte, kts,kte )
+                                    its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Adjoint of da_transform_vvtovp.
@@ -30,7 +30,7 @@ subroutine da_transform_vvtovp_adj( evec, eval, vertical_wgt, &
    ! [1.0] Apply inner-product weighting if vertical_ip > 0:
    !------------------------------------------------------------------- 
 
-   if ( vertical_ip /= 0 ) then
+   if (vertical_ip /= 0) then
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)
    end if

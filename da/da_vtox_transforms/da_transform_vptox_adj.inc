@@ -1,7 +1,7 @@
-subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
+subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
                                    ids, ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
 
    !--------------------------------------------------------------------------
    ! Purpose : Adjoint for Physical transform of variables 
@@ -28,9 +28,9 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    !  [4] Add flow-dependent increments in model space (xa):
    !---------------------------------------------------------------------------
       
-   if ( be % ne > 0 .and. alphacv_method == 2 ) then
-      call da_add_flow_dependence_xa_adj( be % ne, ep, xa, vp, &
-                                          its,ite, jts,jte, kts,kte )
+   if (be % ne > 0 .and. alphacv_method == 2) then
+      call da_add_flow_dependence_xa_adj(be % ne, ep, xa, vp, &
+                                          its,ite, jts,jte, kts,kte)
    end if
 
    !--------------------------------------------------------------------------
@@ -45,11 +45,11 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
    ! Transform psi and chi to u and v:
-   call da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
+   call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
                              ids,ide, jds,jde, kds,kde,    &
                              ims,ime, jms,jme, kms,kme,    &
-                             its,ite, jts,jte, kts,kte )
+                             its,ite, jts,jte, kts,kte)
 
    !--------------------------------------------------------------------------
    ! [2] Impose statistical balance constraints:
@@ -88,9 +88,9 @@ subroutine da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
    !  [1] Add flow-dependent increments in control variable space (vp):
    !---------------------------------------------------------------------------
    
-   if ( be % ne > 0 .and. alphacv_method == 1 ) then
-      call da_add_flow_dependence_vp_adj( be % ne, ep, vp, &
-                                          its,ite, jts,jte, kts,kte )
+   if (be % ne > 0 .and. alphacv_method == 1) then
+      call da_add_flow_dependence_vp_adj(be % ne, ep, vp, &
+                                          its,ite, jts,jte, kts,kte)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vptox_adj")

@@ -31,60 +31,55 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (trace_use) call da_trace_entry("da_read_omb_tmp")
 
    open(unit=unit_in,file=trim(filename),form='formatted',status='old',iostat=ios)
-   if (ios /= 0 ) Then
+   if (ios /= 0) Then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open file"//trim(filename)/))
-   Endif
+   end if
 
 1  continue
 
    read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs
    if_write = .false.
-   if( index(ob_type,OBS_type_in(1:nc)) > 0 ) if_write = .true.
-   if( index( ob_type,'synop') > 0) go to 10
-   if( index( ob_type,'metar') > 0) go to 10
-   if( index( ob_type,'ships') > 0) go to 10
-   if( index( ob_type,'buoy' ) > 0) go to 10
-   if( index( ob_type,'sonde_sfc') > 0 ) go to 10
+   if (index(ob_type,OBS_type_in(1:nc)) > 0) if_write = .true.
+   if (index(ob_type,'synop') > 0) goto 10
+   if (index(ob_type,'metar') > 0) goto 10
+   if (index(ob_type,'ships') > 0) goto 10
+   if (index(ob_type,'buoy') > 0) goto 10
+   if (index(ob_type,'sonde_sfc') > 0) goto 10
 
-   if( index( ob_type,'polaramv') > 0) go to 20
-   if( index( ob_type,'geoamv'  ) > 0) go to 20
+   if (index(ob_type,'polaramv') > 0) goto 20
+   if (index(ob_type,'geoamv' ) > 0) goto 20
 
-   if( index( ob_type,'gpspw') > 0) go to 30
+   if (index(ob_type,'gpspw') > 0) goto 30
 
-   if( index( ob_type,'sound') > 0) go to 40
+   if (index(ob_type,'sound') > 0) goto 40
 
-   if( index( ob_type,'airep') > 0) go to 50
+   if (index(ob_type,'airep') > 0) goto 50
 
-   if( index( ob_type,'pilot')    > 0) go to 60
-   if( index( ob_type,'profiler') > 0) go to 60
+   if (index(ob_type,'pilot')    > 0) goto 60
+   if (index(ob_type,'profiler') > 0) goto 60
 
-   if( index( ob_type,'ssmir') > 0) go to 70
+   if (index(ob_type,'ssmir') > 0) goto 70
 
-   if( index( ob_type,'ssmiT') > 0) go to 80
+   if (index(ob_type,'ssmiT') > 0) goto 80
 
-   if( index( ob_type,'satem') > 0) go to 90
+   if (index(ob_type,'satem') > 0) goto 90
 
-   if( index( ob_type,'ssmt1') > 0) go to 100
-   if( index( ob_type,'ssmt2') > 0) go to 100
+   if (index(ob_type,'ssmt1') > 0) goto 100
+   if (index(ob_type,'ssmt2') > 0) goto 100
 
-   if( index( ob_type,'qscat') > 0) go to 110
+   if (index(ob_type,'qscat') > 0) goto 110
 
-   if( index( ob_type,'bogus') > 0) go to 120
-   if( index( ob_type,'airsr') > 0) go to 130
+   if (index(ob_type,'bogus') > 0) goto 120
+   if (index(ob_type,'airsr') > 0) goto 130
 
-!jrb
-write(unit=stderr, fmt='(a,a20,a,i3)') &
-   'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
    write(unit=message(1), fmt='(a,a20,a,i3)') &
       'Got unknown obs_type string:', trim(ob_type),' on unit ',unit_in
    call da_error(__FILE__,__LINE__,message(1:1))
     
-!----------------------------------------------------------------------------
 10 continue      !   Synop, Metar, Ships, Buoy , Sonde_sfc
-!----------------------------------------------------------------------------
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if (if_write) then
@@ -112,14 +107,12 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
          end do
       end do
    end if
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
-!----------------------------------------------------------------------------   
 20 continue      !    Polar or Geo AMV's
-!----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
          if (if_write) then
@@ -143,17 +136,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 30 continue      !    Gpspw  
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
          num = num + 1
          end if
@@ -171,8 +164,8 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 40 continue      !    Sound 
@@ -180,10 +173,10 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
 
    !  [6] Transfer sonde obs:
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) then
+         if (if_write) then
              write(omb_unit,'(i8)')levels
              num = num + 1 
          end if
@@ -195,7 +188,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc, &
                          q_obs, q_inv, q_qc, q_error, q_inc
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -206,17 +199,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
          end do 
       end do
    end if
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 50 continue      !    Airep  
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -227,7 +220,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc, &
                          t_obs, t_inv, t_qc, t_error, t_inc    
-           if(if_write) &
+           if (if_write) &
               write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -238,17 +231,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 60 continue      !    Pilot & Profiler  
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -258,7 +251,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-           if(if_write) &
+           if (if_write) &
               write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num, k, stn_id,  &       ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -267,17 +260,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
          end do  
       end do
    end if
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 70 continue      !  SSMI Radiance
 !----------------------------------------------------------------------------   
 
-   if (num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -286,7 +279,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          spd_obs, spd_inv, spd_qc, spd_err, spd_inc
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num, k, stn_id,  &       ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
@@ -295,17 +288,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 80 continue      !  SSMI radiance   
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)')levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -334,17 +327,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
          end do
       end do
    end if
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 90 continue      !  SATEM           
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -353,7 +346,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
@@ -362,17 +355,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
    
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 100  continue      !  SSMT1 & 2           
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -381,7 +374,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          kk,l, stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
                          dummy,dummy, dummy_i, dummy, dummy
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num,k,stn_id, &          ! Station
                          lat, lon, dummy, &       ! Lat/lon, dummy    
@@ -390,17 +383,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 110  continue      !  Scatrometer winds   
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -410,7 +403,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num,k,stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -420,8 +413,8 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 120  continue      !  TC bogus data           
@@ -431,10 +424,10 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
 ! 2nd is for upper air
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
-         if(if_write) then
+         if (if_write) then
             write(omb_unit,'(i8)')levels
             num = num + 1 
          end if
@@ -444,7 +437,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          lat, lon, press, &       ! Lat/lon, dummy    
                          u_obs, u_inv, u_qc, u_error, u_inc, & 
                          v_obs, v_inv, v_qc, v_error, v_inc
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num,l,stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -470,14 +463,14 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
          end do
       end do
    end if
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !----------------------------------------------------------------------------   
 130  continue      !  AIRS  retrievals        
 !----------------------------------------------------------------------------   
 
-   if ( num_obs > 0 ) then
+   if (num_obs > 0) then
       do n = 1, num_obs    
          read(unit_in,'(i8)') levels
          if (if_write) write(omb_unit,'(i8)')levels
@@ -488,7 +481,7 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
                          lat, lon, press, &       ! Lat/lon, dummy    
                          t_obs, t_inv, t_qc, t_error, t_inc, & 
                          q_obs, q_inv, q_qc, q_error, q_inc
-            if(if_write) &
+            if (if_write) &
                write(omb_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          num,k,stn_id, &          ! Station
                          lat, lon, press, &       ! Lat/lon, dummy    
@@ -498,15 +491,17 @@ write(unit=stderr, fmt='(a,a20,a,i3)') &
       end do
    end if
 
-   if (if_write) go to 999
-   go to 1
+   if (if_write) goto 999
+   goto 1
 
 !--------------------------------------------------------------
 
 999 continue
-    close ( unit_in )
+   close (unit_in)
+
    if (trace_use) call da_trace_exit("da_read_omb_tmp")
-    return
+   return
+
 1000 continue
    write(unit=message(1), fmt='(a,i3)') &
       'read error on unit: ',unit_in

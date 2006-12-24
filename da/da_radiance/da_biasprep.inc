@@ -65,8 +65,8 @@ subroutine da_biasprep(inst,ob,iv)
                                    radbias%year,s1, radbias%month,s1, radbias%day, &
                                    s1,radbias%hour, s1,radbias%min, s1,radbias%sec
          !if (j < 10 .and. print_detail_radiance) then
-         !   write(UNIT=stdout,FMT=*) iv%instid(inst)%rad(j)%info%date_char
-         !   write(UNIT=stdout,FMT=*) radbias%year, radbias%month, radbias%day, &
+         !   write(unit=stdout,fmt=*) iv%instid(inst)%rad(j)%info%date_char
+         !   write(unit=stdout,fmt=*) radbias%year, radbias%month, radbias%day, &
          !      radbias%hour, radbias%min, radbias%sec
          !endif
 

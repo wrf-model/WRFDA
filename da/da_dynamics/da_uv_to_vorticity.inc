@@ -1,13 +1,13 @@
 subroutine da_uv_to_vorticity(xb , u, v, vor, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculate vorticity on a co-ordinate surface, given an input
+   !  PURPOSE: Calculate vorticity on a co-ordinate surface, given an input 
    !           wind field.
    !
-   !  METHOD:  vor = m**2 ( d(v/m)/dx - d(u/m)/dy )
+   !  METHOD:  vor = m**2 (d(v/m)/dx - d(u/m)/dy)
    !---------------------------------------------------------------------------
 
    implicit none
@@ -46,12 +46,12 @@ subroutine da_uv_to_vorticity(xb , u, v, vor, &
    ie = ite
    js = jts
    je = jte
-   if ( .not. global .and. its == ids ) is = ids+1 
-   if ( .not. global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (.not. global .and. its == ids) is = ids+1 
+   if (.not. global .and. ite == ide) ie = ide-1
+   if (jts == jds) js = jds+1
+   if (jte == jde) je = jde-1
 
-   if ( .not.global ) then
+   if (.not.global) then
        inv_2ds = 0.5 / xb%ds
        coeff(its:ite,jts:jte) = xb%map_factor(its:ite,jts:jte) * &
                                 xb%map_factor(its:ite,jts:jte) * inv_2ds
@@ -65,16 +65,16 @@ subroutine da_uv_to_vorticity(xb , u, v, vor, &
 
       ! [2.1] Compute finite difference vorticity at interior points:
 
-      if( global ) then
+      if (global) then
 
          do j = js, je
             do i = is, ie
-               vor(i,j,k) = xb%coefy(i,j) * ( -u(i,j+1,k) + u(i,j-1,k) )  + & 
-                            xb%coefx(i,j) * (  v(i+1,j,k) - v(i-1,j,k) )
+               vor(i,j,k) = xb%coefy(i,j) * (-u(i,j+1,k) + u(i,j-1,k))  + & 
+                            xb%coefx(i,j) * ( v(i+1,j,k) - v(i-1,j,k))
             end do
          end do
 
-         ! if( global ) cycle
+         ! if (global) cycle
       else
 
          um(is-1:ie+1,js-1:je+1) = u(is-1:ie+1,js-1:je+1,k) / xb%map_factor(is-1:ie+1,js-1:je+1)
@@ -84,7 +84,7 @@ subroutine da_uv_to_vorticity(xb , u, v, vor, &
 
          do j = js, je
             do i = is, ie
-               vor(i,j,k) = ( -um(i,j+1) + um(i,j-1) + vm(i+1,j) - vm(i-1,j) ) * coeff(i,j)
+               vor(i,j,k) = (-um(i,j+1) + um(i,j-1) + vm(i+1,j) - vm(i-1,j)) * coeff(i,j)
             end do
          end do
 
@@ -92,47 +92,47 @@ subroutine da_uv_to_vorticity(xb , u, v, vor, &
 
          ! [2.2.1] Bottom boundaries:
 
-         if ( its == ids ) then
+         if (its == ids) then
             i = its 
             do j = jts, jte
-               vor(i,j,k) = one_third * ( 4.0 * vor(i+1,j,k) - vor(i+2,j,k) )
+               vor(i,j,k) = one_third * (4.0 * vor(i+1,j,k) - vor(i+2,j,k))
             end do
          end if
 
          ! [2.2.2] Top boundaries:
 
-         if ( ite == ide ) then
+         if (ite == ide) then
             i = ite
             do j = jts, jte
-               vor(i,j,k) = one_third * ( 4.0 * vor(i-1,j,k) - vor(i-2,j,k) )
+               vor(i,j,k) = one_third * (4.0 * vor(i-1,j,k) - vor(i-2,j,k))
             end do
          end if
 
          ! [2.2.3] Left boundaries:
 
-         if ( jts == jds ) then
+         if (jts == jds) then
             j = jts
             do i = its, ite
-               vor(i,j,k) = one_third * ( 4.0 * vor(i,j+1,k) - vor(i,j+2,k) )
+               vor(i,j,k) = one_third * (4.0 * vor(i,j+1,k) - vor(i,j+2,k))
             end do
          end if
 
          ! [2.2.4] right boundaries:
 
-         if ( jte == jde ) then
+         if (jte == jde) then
             j = jte
             do i = its, ite
-               vor(i,j,k) = one_third * ( 4.0 * vor(i,j-1,k) - vor(i,j-2,k) )
+               vor(i,j,k) = one_third * (4.0 * vor(i,j-1,k) - vor(i,j-2,k))
             end do
          end if
       end if
    end do
 
-   if ( global ) then
+   if (global) then
       call da_set_boundary_3d(vor, &
                               ids,ide, &
                               ims,ime, jms,jme, kms,kme,  &
-                              its,ite, jts,jte, kts,kte )
+                              its,ite, jts,jte, kts,kte)
    end if
 
 end subroutine da_uv_to_vorticity

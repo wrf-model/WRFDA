@@ -1,7 +1,7 @@
-subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
+subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
                                ids,ide, jds,jde, kds,kde,   &
                                ims,ime, jms,jme, kms,kme,   &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !-----------------------------------------------------------------------
    ! Purpose : Physical transform of analysis increment variables.
@@ -28,9 +28,9 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
    !  [1] Add flow-dependent increments in control variable space (vp):
    !---------------------------------------------------------------------------
 
-   if ( be % ne > 0 .and. alphacv_method == 1 ) then
-      call da_add_flow_dependence_vp( be % ne, ep, vp, &
-                                      its,ite, jts,jte, kts,kte )
+   if (be % ne > 0 .and. alphacv_method == 1) then
+      call da_add_flow_dependence_vp(be % ne, ep, vp, &
+                                      its,ite, jts,jte, kts,kte)
    end if
 
    !--------------------------------------------------------------------------
@@ -73,11 +73,11 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
 
    ! Psi and chi to u and v:
 
-   call da_PsiChi_To_UV( vp % v1, vp % v2, xb % coefx, &
+   call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
                          xb % coefy , xa % u, xa % v, &
                          ids,ide, jds,jde, kds,kde, &
                          ims,ime, jms,jme, kms,kme, &
-                         its,ite, jts,jte, kts,kte )
+                         its,ite, jts,jte, kts,kte)
 
    ! Pseudo RH --> Specific humidity:
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
@@ -87,9 +87,9 @@ subroutine da_transform_vptox( xb, vp, xp, xa, be, ep, &
    !  [4] Add flow-dependent increments in model space (xa):
    !---------------------------------------------------------------------------
 
-   if ( be % ne > 0 .and. alphacv_method == 2 ) then
-      call da_add_flow_dependence_xa( be % ne, ep, vp, xa, &
-                                      its,ite, jts,jte, kts,kte )
+   if (be % ne > 0 .and. alphacv_method == 2) then
+      call da_add_flow_dependence_xa(be % ne, ep, vp, xa, &
+                                      its,ite, jts,jte, kts,kte)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vptox") 

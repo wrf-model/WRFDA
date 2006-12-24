@@ -1,4 +1,5 @@
-subroutine da_set_boundary_xa( xa, xb )
+subroutine da_set_boundary_xa(xa, xb)
+
    !------------------------------------------------------------------------
    !  Purpose: 
    !
@@ -12,9 +13,9 @@ subroutine da_set_boundary_xa( xa, xb )
 
    integer :: n, j, k
 
-   if((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
+   if ((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
 
-   !--2d
+   ! 2d
 
    k = xb%kte + 1
    do j=xb%jms, xb%jme
@@ -27,7 +28,7 @@ subroutine da_set_boundary_xa( xa, xb )
       end do
    end do
 
-   !--3d
+   ! 3d
 
    do k=xb%kts, xb%kte
       do j=xb%jms, xb%jme

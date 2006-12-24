@@ -1,15 +1,15 @@
-subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
+subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint code of da_psichi_to_uv  
    !
-   !  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
-   !           v = coefy * (  dpsi/dx + dchi/dy )
+   !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
+   !           v = coefy * ( dpsi/dx + dchi/dy)
    !
-   !  ASsumPTIONS: Unstaggered grid.
+   !  ASSUMPTIONS: Unstaggered grid.
    !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
    !               grid size may or may not be equal
    !
@@ -40,11 +40,11 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
       call da_set_boundary_3d(u, &
                             ids,ide,   & 
                             ims,ime, jms,jme, kms,kme,  & 
-                            its,ite, jts,jte, kts,kte ) 
+                            its,ite, jts,jte, kts,kte) 
       call da_set_boundary_3d(v, &
                             ids,ide,  & 
                             ims,ime, jms,jme, kms,kme,  & 
-                            its,ite, jts,jte, kts,kte ) 
+                            its,ite, jts,jte, kts,kte) 
    end if
 
    !---------------------------------------------------------------------------
@@ -55,12 +55,12 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    ie = ite+1
    js = jts-1
    je = jte+1
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (jts == jds) js = jds+1
+   if (jte == jde) je = jde-1
 
-   if ( .not. global ) then
-      if ( its == ids ) is = ids+1
-      if ( ite == ide ) ie = ide-1
+   if (.not. global) then
+      if (its == ids) is = ids+1
+      if (ite == ide) ie = ide-1
 
       do k = kts, kte
 
@@ -70,7 +70,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
          ! [4.1] Bottom-left point:
 
-         if ( its == ids .AND. jts == jds ) then
+         if (its == ids .AND. jts == jds) then
             u(its+1,jts,k) = u(its+1,jts,k) + 0.5 * u(its,jts,k)
             u(its,jts+1,k) = u(its,jts+1,k) + 0.5 * u(its,jts,k)
             v(its+1,jts,k) = v(its+1,jts,k) + 0.5 * v(its,jts,k)
@@ -79,7 +79,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
         ! [4.2] Top-left point:
 
-         if ( ite == ide .AND. jts == jds ) then
+         if (ite == ide .AND. jts == jds) then
             u(ite-1,jts,k) = u(ite-1,jts,k) + 0.5 * u(ite,jts,k)
             u(ite,jts+1,k) = u(ite,jts+1,k) + 0.5 * u(ite,jts,k)
             v(ite-1,jts,k) = v(ite-1,jts,k) + 0.5 * v(ite,jts,k)
@@ -88,7 +88,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
          ! [4.3] Bottom-right point:
 
-         if ( its == ids .AND. jte == jde ) then
+         if (its == ids .AND. jte == jde) then
             u(its+1,jte,k) = u(its+1,jte,k) + 0.5 * u(its,jte,k)
             u(its,jte-1,k) = u(its,jte-1,k) + 0.5 * u(its,jte,k)
             v(its+1,jte,k) = v(its+1,jte,k) + 0.5 * v(its,jte,k)
@@ -97,7 +97,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
          ! [4.4] Top-right point:
 
-         if ( ite == ide .AND. jte == jde ) then
+         if (ite == ide .AND. jte == jde) then
             u(ite-1,jte,k) = u(ite-1,jte,k) + 0.5 * u(ite,jte,k)
             u(ite,jte-1,k) = u(ite,jte-1,k) + 0.5 * u(ite,jte,k)
             v(ite-1,jte,k) = v(ite-1,jte,k) + 0.5 * v(ite,jte,k)
@@ -109,10 +109,10 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    ! [3.0] Compute u, v at domain boundaries:
 
    do k = kts, kte
-      if( .not. global ) then
+      if (.not. global) then
          ! [3.4] Northern boundaries:
 
-         if ( jte == jde ) then
+         if (jte == jde) then
             j = jte
 
             do i = ie, is, -1
@@ -130,7 +130,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
          ! [3.3] Southern boundaries:
 
-         if ( jts == jds ) then
+         if (jts == jds) then
             j = jts
 
             do i = ie, is, -1
@@ -151,7 +151,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
 
          ! [3.2] Eastern boundaries:
 
-         if ( ite == ide ) then
+         if (ite == ide) then
             i = ite
             do j = je, js, -1
                psi(i  ,j,k) = psi(i  ,j,k) + coefx(i,j) * v(i,j,k)
@@ -167,7 +167,7 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
          end if
 
          ! [3.1] Western boundaries:
-         if ( its == ids ) then
+         if (its == ids) then
             i = its
 
             do j = je, js, -1
@@ -207,15 +207,15 @@ subroutine da_psichi_to_uv_adj( u, v, coefx, coefy, psi, chi, &
    ! [5.0] For Global application, set Wast-Eest Periodic boundary
    !---------------------------------------------------------------------------
 
-   if( global ) then
+   if (global) then
        call da_set_boundary_3d(psi, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
        call da_set_boundary_3d(chi, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
    end if
 
 end subroutine da_psichi_to_uv_adj

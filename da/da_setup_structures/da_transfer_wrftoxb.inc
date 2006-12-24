@@ -1,6 +1,6 @@
-subroutine da_transfer_wrftoxb( xbx, grid, &
+subroutine da_transfer_wrftoxb(xbx, grid, &
 #include <em_dummy_new_args.inc>
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Transfers fields from WRF to first guess structure.
@@ -205,7 +205,6 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ! Note, this is needed as u_2 and v_2 has no guarantee
    ! the most east column, and the most north raw are
    ! properly initailized for each tile.
-   !                            Wei Huang, 03/06/03
    !---------------------------------------------------------------
 
    do j=js,je
@@ -271,7 +270,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid%xb%map_factor(i,j) = grid%msft(i,j)
          grid%xb%cori(i,j) = grid%f(i,j)
          grid%xb%tgrn(i,j) = grid%sst(i,j)
-         if(grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = grid%tmn(i,j)
+         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = grid%tmn(i,j)
          grid%xb%lat(i,j) = grid%xlat(i,j)
          grid%xb%lon(i,j) = grid%xlong(i,j)
          grid%xb%terr(i,j) = grid%ht(i,j)
@@ -291,24 +290,25 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
          grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
       end do
 
-#if 0
+      ! WHY
       ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
 
-      do i=is,ie
-         k = ke
-         qvf1 = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k,P_QV))
-         qvf2 = 1./(1.+qvf1)
-         qvf1 = qvf1*qvf2
-         grid%xb%p(i,j,k) = -0.5*(grid%mu_2(i,j)+qvf1*grid%mub(i,j))/grid%em_rdnw(k)/qvf2
+      ! do i=is,ie
+      !    k = ke
+      !    qvf1 = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k,P_QV))
+      !    qvf2 = 1./(1.+qvf1)
+      !    qvf1 = qvf1*qvf2
+      !    grid%xb%p(i,j,k) = -0.5*(grid%mu_2(i,j)+qvf1* &
+      !       grid%mub(i,j))/grid%em_rdnw(k)/qvf2
 
-         do k = ke-1,1,-1
-            qvf1 = 0.5*(moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
-            qvf2 = 1./(1.+qvf1)
-            qvf1 = qvf1*qvf2
-            grid%p(i,j,k) = grid%p(i,j,k+1) - (grid%mu_2(i,j)+qvf1*grid%mub(i,j))/qvf2/rdn(k+1)
-         end do
-      end do
-#endif
+      !    do k = ke-1,1,-1
+      !       qvf1 = 0.5*(moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
+      !       qvf2 = 1./(1.+qvf1)
+      !       qvf1 = qvf1*qvf2
+      !       grid%p(i,j,k) = grid%p(i,j,k+1) - &
+      !          (grid%mu_2(i,j)+qvf1*grid%mub(i,j))/qvf2/rdn(k+1)
+      !    end do
+      ! end do
 
       ! Adapted the code from WRF module_big_step_utilities_em.F ----
       !         subroutine calc_p_rho_phi      Y.-R. Guo (10/20/2004)
@@ -324,11 +324,11 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
             albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
 
             qvf1 = 1. + moist(i,j,k,P_QV) / rd_over_rv
-            aln  = -1. / (grid%em_mub(i,j)+grid%em_mu_2(i,j)) * ( albn*grid%em_mu_2(i,j) &
-                + grid%em_rdnw(k) *(grid%em_ph_2(i,j,k+1) - grid%em_ph_2(i,j,k)) )
+            aln  = -1. / (grid%em_mub(i,j)+grid%em_mu_2(i,j)) * (albn*grid%em_mu_2(i,j) &
+                + grid%em_rdnw(k) *(grid%em_ph_2(i,j,k+1) - grid%em_ph_2(i,j,k)))
             ! total pressure:
-            grid%xb%p(i,j,k) = ps0 * ( (gas_constant*(ts0+grid%em_t_2(i,j,k))*qvf1) / &
-                            (ps0*(aln+albn)) )**cpovcv
+            grid%xb%p(i,j,k) = ps0 * ((gas_constant*(ts0+grid%em_t_2(i,j,k))*qvf1) / &
+                            (ps0*(aln+albn)))**cpovcv
             ! total density
             grid%xb%rho(i,j,k)= 1.0 / (albn+aln)
             ! pressure purtubation:
@@ -342,7 +342,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
             grid%xa%w (i,j,k) = grid%em_w_2(i,j,k)
             grid%xb%w (i,j,k) = grid%em_w_2(i,j,k)
          end do
-       end do
+      end do
 
       do k=ks,ke
          do i=is,ie
@@ -364,18 +364,18 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    
             ! Background qrn needed for Radar Radial velocity assimilation:
 
-            if (size(moist,dim=4) >= 4 ) then
+            if (size(moist,dim=4) >= 4) then
                grid%xb%qcw(i,j,k) = moist(i,j,k,p_qc)
                grid%xb%qrn(i,j,k) = moist(i,j,k,p_qr)
                grid%xb%qt (i,j,k) = grid%xb%q(i,j,k) + grid%xb%qcw(i,j,k) + grid%xb%qrn(i,j,k)
             end if
 
-            if (size(moist,dim=4) >= 6 ) then
+            if (size(moist,dim=4) >= 6) then
                grid%xb%qci(i,j,k) = moist(i,j,k,p_qi)
                grid%xb%qsn(i,j,k) = moist(i,j,k,p_qs)
             end if
 
-            if (size(moist,dim=4) >= 7 ) then
+            if (size(moist,dim=4) >= 7) then
                grid%xb%qgr(i,j,k) = moist(i,j,k,p_qg)
             end if
          end do
@@ -432,13 +432,13 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ! [3.0] Calculate vertical inner product for use in vertical transform:
    !---------------------------------------------------------------------------
       
-   if ( vertical_ip == 1 ) then
+   if (vertical_ip == 1) then
       ! Vertical inner product is sqrt(Delta p):
       do k=ks,ke
          grid%xb % vertical_inner_product(is:ie,js:je,k) = &
-              sqrt( grid%xb % psac(is:ie,js:je) * grid%xb%sigmah(k) )
+              sqrt(grid%xb % psac(is:ie,js:je) * grid%xb%sigmah(k))
       end do 
-   else if ( vertical_ip == 2 ) then
+   else if (vertical_ip == 2) then
 
       ! Vertical inner product is Delta p:
       do k=1,grid%xb%mkz
@@ -484,7 +484,7 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    do j=js,je
       do i=is,ie
-         if ( grid%xb%ztop < grid%xb%hf(i,j,ke+1) ) &
+         if (grid%xb%ztop < grid%xb%hf(i,j,ke+1)) &
              grid%xb%ztop = grid%xb%hf(i,j,ke+1)
 
          tmpvar = grid%xb%ds / grid%xb%map_factor(i,j)
@@ -511,8 +511,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    do j=js,je
       do k=ks,ke
          do i=is,ie
-            call da_tpq_to_rh( grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
-                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k) )
+            call da_tpq_to_rh(grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
+                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k))
          end do
       end do
    end do
@@ -546,26 +546,27 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    if (print_detail_xb) then
       write(unit=stdout, fmt='(3a, i8)') &
-          'file:', __FILE__, ', line:', __LINE__
+         'file:', __FILE__, ', line:', __LINE__
 
-     write(unit=stdout, fmt='(a)') &
-          'Sea level pressure and total precipitable water'
+      write(unit=stdout, fmt='(a)') &
+         'Sea level pressure and total precipitable water'
    end if
 
-   call da_wrf_tpq_2_slp ( grid%xb )
+   call da_wrf_tpq_2_slp (grid%xb)
 
+   ! WHY
    ! do j = js,je
    !    do i = is,ie
-   !       call da_tpq_to_slp( grid%xb%t(i,j,:), grid%xb%q(i,j,:), grid%xb%p(i,j,:), &
+   !       call da_tpq_to_slp(grid%xb%t(i,j,:), grid%xb%q(i,j,:), grid%xb%p(i,j,:), &
    !          grid%xb%terr(i,j), &
-   !                        grid%xb%psfc(i,j), grid%xb%slp(i,j), grid%xp )
+   !                        grid%xb%psfc(i,j), grid%xb%slp(i,j), grid%xp)
    !    end do
    ! end do
 
-   call da_integrat_dz( grid%xb )
+   call da_integrat_dz(grid%xb)
 
    !---------------------------------------------------------------------------
-   ! Surface Wind speed
+   ! Surface wind speed
    !---------------------------------------------------------------------------
 
    if (print_detail_xb) then
@@ -600,8 +601,8 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
           'Brightness temperature'
    end if
 
-   if ( Use_SsmiTbObs)   &
-      call da_transform_xtotb( grid%xb )
+   if (Use_SsmiTbObs)   &
+      call da_transform_xtotb(grid%xb)
 
    !---------------------------------------------------------------------------
    ! GPS Refractivity linked by Y.-R. Guo 05/28/2004
@@ -621,14 +622,14 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ! Ground-based GPS ZTD must follow the GPS Refractivity calculation.
    !---------------------------------------------------------------------------
 
-   ! if (Use_GpsztdObs) call da_transform_xtoztd( grid%xb )
+   ! if (Use_GpsztdObs) call da_transform_xtoztd(grid%xb)
 
    !---------------------------------------------------------------------------
    ! Calculate means for later use in setting up background errors.
    !---------------------------------------------------------------------------
 
    ! if (.not. associated(xbx % latc_mean)) then
-   allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
+   allocate (xbx % latc_mean(grid%xp%jds:grid%xp%jde))
    if (trace_use) call da_trace("da_transfer_wrftoxb",&
       message="allocated xbx%latc_mean")
    ! end if
@@ -641,46 +642,46 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
    ! testing.  This will always be .false. for a serial or 1-process MPI run.
-   if ( testing_dm_exact ) then
-      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
-      call da_wv_patch_to_global( grid%xb%psac, arrayglobal, grid%xp%domdesc, &
+   if (testing_dm_exact) then
+      allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
+      call da_wv_patch_to_global(grid%xb%psac, arrayglobal, grid%xp%domdesc, &
                                grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,   &
                                grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,   &
-                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
-      loc_psac_mean = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde) )
-      deallocate( arrayglobal )
+                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte)
+      loc_psac_mean = tmpvar*sum(arrayglobal(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde))
+      deallocate(arrayglobal)
    else
-      loc_psac_mean = tmpvar*sum( grid%xb % psac(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte) )
+      loc_psac_mean = tmpvar*sum(grid%xb % psac(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte))
    end if
 
    tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
-   if ( testing_dm_exact ) then
-      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
-      call da_wv_patch_to_global( grid%xb%lat, arrayglobal, grid%xp%domdesc, &
+   if (testing_dm_exact) then
+      allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
+      call da_wv_patch_to_global(grid%xb%lat, arrayglobal, grid%xp%domdesc, &
                                grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
                                grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
-                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
+                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte)
       do j=grid%xp%jds,grid%xp%jde
-         loc_latc_mean(j) = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
+         loc_latc_mean(j) = tmpvar*sum(arrayglobal(grid%xp%ids:grid%xp%ide, j))
       end do
-      deallocate( arrayglobal )
+      deallocate(arrayglobal)
    else
       do j=js,je
-         loc_latc_mean(j) = tmpvar*sum( grid%xb % lat(is:ie, j) )
+         loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(is:ie, j))
       end do
    end if
 
-   if ( testing_dm_exact ) then
+   if (testing_dm_exact) then
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real( loc_psac_mean, 1 )
+      call wrf_dm_bcast_real(loc_psac_mean, 1)
       xbx % psac_mean = loc_psac_mean
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real( loc_latc_mean, (grid%xp%jde-grid%xp%jds+1) )
+      call wrf_dm_bcast_real(loc_latc_mean, (grid%xp%jde-grid%xp%jds+1))
       xbx % latc_mean = loc_latc_mean
    else
-      xbx % psac_mean = wrf_dm_sum_real( loc_psac_mean )
-      call wrf_dm_sum_reals( loc_latc_mean, xbx % latc_mean )
+      xbx % psac_mean = wrf_dm_sum_real(loc_psac_mean)
+      call wrf_dm_sum_reals(loc_latc_mean, xbx % latc_mean)
    end if
 
    if (print_detail_xb) then
@@ -693,13 +694,13 @@ subroutine da_transfer_wrftoxb( xbx, grid, &
 
    ! Calculate time step from one dimensional cloud model parameterization
 
-   if ( DT_cloud_model ) then
+   if (DT_cloud_model) then
       do j = grid%xp%jts, grid%xp%jte
          do i = grid%xp%its, grid%xp%ite
-            call da_cloud_model ( grid%xb%t(I,J,:),   grid%xb%p(I,J,:), grid%xb%q(I,J,:), &
+            call da_cloud_model (grid%xb%t(I,J,:),   grid%xb%p(I,J,:), grid%xb%q(I,J,:), &
                grid%xb%qcw(I,J,:),  &
                              grid%xb%qrn(I,J,:), grid%xb%h(I,J,:), grid%xb%hf(I,J,:),     &
-                             DDT, grid%xp%kts, grid%xp%kte  )
+                             DDT, grid%xp%kts, grid%xp%kte )
 
             do k = grid%xp%kts, grid%xp%kte
                grid%xb%delt(i,j,k) = DDT(k)

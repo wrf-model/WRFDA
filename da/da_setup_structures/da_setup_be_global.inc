@@ -6,25 +6,25 @@ subroutine da_setup_be_global (ide, jde, kde, be)
 
    implicit none
 
-   integer, intent(in)         :: ide, jde, kde         ! Domain dimensions.
-   type (be_type), intent(out) :: be                    ! Back. errors structure.
+   integer, intent(in)         :: ide, jde, kde      ! Domain dimensions
+   type (be_type), intent(out) :: be                 ! Back. errors structure
 
    integer                     :: nrec
-   integer                     :: max_wave_in           ! Dimension of inppur power.
-   integer                     :: i, j, k, ic, jc, n    ! Loop counters.
+   integer                     :: max_wave_in        ! Dimension of input power
+   integer                     :: i, j, k, ic, jc, n ! Loop counters
    ! real, allocatable   :: height(:,:,:)      ! Height field.
-   integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
-   integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point
-   integer             :: bin_type           ! Type of bin to average over.
-   integer             :: num_bins           ! Number of bins (3D fields).
-   integer             :: num_bins2d         ! Number of bins (3D fields).
-   logical             :: use_global_eofs    ! True if projected data uses global EOFs
+   integer, allocatable:: bin(:,:,:)      ! Bin assigned to each 3D point
+   integer, allocatable:: bin2d(:,:)      ! Bin assigned to each 2D point
+   integer             :: bin_type        ! Type of bin to average over.
+   integer             :: num_bins        ! Number of bins (3D fields).
+   integer             :: num_bins2d      ! Number of bins (3D fields).
+   logical             :: use_global_eofs ! True if projected data uses global EOFs
 
-   integer             :: num_bins_hgt               ! Used if bin_type = 2. 
-   real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). 
-   real                :: binwidth_hgt               ! Used if bin_type = 2 (m). 
-   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
-   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
+   integer             :: num_bins_hgt       ! Used if bin_type = 2. 
+   real                :: binwidth_lat       ! Used if bin_type = 2 (degrees) 
+   real                :: binwidth_hgt       ! Used if bin_type = 2 (m)
+   real                :: hgt_min, hgt_max   ! Used if bin_type = 2 (m)
+   real                :: lat_min, lat_max   ! Used if bin_type = 2 (degrees)
 
    character*10         :: variable
    integer              :: ni, nj, nk, b, nlev , be_unit
@@ -40,7 +40,6 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    real, allocatable    :: power2d(:,:)           ! Temporary power spectrum.
 
    if (trace_use) call da_trace_entry("da_setup_be_global")
-
 
    call da_message((/"[3.0] Set up background errors (be) for global WRF-Var"/))
 
@@ -133,22 +132,22 @@ subroutine da_setup_be_global (ide, jde, kde, be)
 
       if (nrec == 1) then
          be % v1 % name = variable               
-         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
+         call da_get_bins_info(nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var1, var_scaling1, be%v1)
 
       else if (nrec == 2) then
          be % v2 % name = variable               
-         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
+         call da_get_bins_info(nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var2, var_scaling2, be%v2)
 
       else if (nrec == 3) then
          be % v3 % name = variable               
-         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
+         call da_get_bins_info(nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var3, var_scaling3, be%v3)
 
       else if (nrec == 4) then
          be % v4 % name = variable               
-         call da_get_bins_info( nj, nk, bin2d, evec_g, eval_g, &
+         call da_get_bins_info(nj, nk, bin2d, evec_g, eval_g, &
             evec_loc, eval_loc, max_vert_var4, var_scaling4, be%v4)
       end if 
 
@@ -166,7 +165,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    ! [4] Read in be power spectra:
    !---------------------------------------------------------------------
 
-   allocate( max_wave(1:nk))
+   allocate(max_wave(1:nk))
 
    do k = 1, nk
       read (be_unit) variable
@@ -180,8 +179,8 @@ subroutine da_setup_be_global (ide, jde, kde, be)
       power2d(:,k) = power(:) 
 
       ! Truncate power spectra:
-      call da_truncate_spectra( be % max_wave, max_wave_in, power_truncation, &
-                                power, max_wave(k) )
+      call da_truncate_spectra(be % max_wave, max_wave_in, power_truncation, &
+                                power, max_wave(k))
    end do
 
    be % v1 % max_wave = maxval(max_wave(1:nk))
@@ -267,20 +266,20 @@ subroutine da_setup_be_global (ide, jde, kde, be)
    be % v5 % power(0:be % v5 % max_wave,1) = power(0:be % v5 % max_wave)
    be % v5 % power(0,1) = len_scaling5 * be%v5%power(0,1) 
 
-   deallocate( power )
+   deallocate(power)
 
    !--------------------------------------------------------------
    ! [5] Perform checks on eigenvectors:
    !--------------------------------------------------------------
 
    if (test_statistics) then
-      call da_check_eof_decomposition( be%v1%val_g(:), be%v1%evec_g(:,:),&
+      call da_check_eof_decomposition(be%v1%val_g(:), be%v1%evec_g(:,:),&
                                      be%v1%name)
-      call da_check_eof_decomposition( be%v2%val_g(:), be%v2%evec_g(:,:),&
+      call da_check_eof_decomposition(be%v2%val_g(:), be%v2%evec_g(:,:),&
                                      be%v2%name)
-      call da_check_eof_decomposition( be%v3%val_g(:), be%v3%evec_g(:,:),&
+      call da_check_eof_decomposition(be%v3%val_g(:), be%v3%evec_g(:,:),&
                                      be%v3%name)
-      call da_check_eof_decomposition( be%v4%val_g(:), be%v4%evec_g(:,:),&
+      call da_check_eof_decomposition(be%v4%val_g(:), be%v4%evec_g(:,:),&
                                      be%v4%name)
    end if
  
@@ -298,7 +297,7 @@ subroutine da_setup_be_global (ide, jde, kde, be)
             be % alpha % max_wave
       end if
       allocate (power(0:be % alpha % max_wave))
-      call da_calc_power_spectrum( be % alpha % max_wave, power )
+      call da_calc_power_spectrum(be % alpha % max_wave, power)
 
       allocate (be % alpha % power(0:be % alpha % max_wave, be % ne))
       do n = 1, be % ne
@@ -323,8 +322,8 @@ subroutine da_setup_be_global (ide, jde, kde, be)
 
    ! JRB daft having these here
 
-   deallocate( power )
-   deallocate( power2d )
+   deallocate(power)
+   deallocate(power2d)
 
 end subroutine da_setup_be_global
 

@@ -1,4 +1,4 @@
-subroutine da_print_stats_sonde_sfc( stats_unit, nu, nv, nt, np, nq, sonde_sfc )
+subroutine da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
 
    implicit none
 

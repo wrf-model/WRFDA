@@ -1,17 +1,7 @@
 subroutine da_use_obs_errfac(iv)
 
    !-------------------------------------------------------------------------
-   !  History:
-   !
-   !  Additions:
-   !           07/08/2003 - Profiler and Buoy Obs            Syed  RH  Rizvi
-   !           03/04/2005 - AMV's from Geostationary and     Syed  RH  Rizvi
-   !                        Polar orbiting satellite are
-   !                        seperated & used as profile
-   !
-   !           07/03/2005 - Updated for AIRS retrievals      Syed  RH  Rizvi
-   !
-   !  Purpose: Allocates observation structure and fills it fro iv.
+   ! Purpose: Allocates observation structure and fills it from iv.
    !-------------------------------------------------------------------------
 
    implicit none
@@ -30,9 +20,9 @@ subroutine da_use_obs_errfac(iv)
    ! [2.1] Transfer surface obs:
 
    if (iv % num_synop > 0) then
-      call da_read_errfac( 'synop', iv % synop_ef_u, &
+      call da_read_errfac('synop', iv % synop_ef_u, &
                            iv % synop_ef_v, iv % synop_ef_t, &
-                           iv % synop_ef_p, iv % synop_ef_q )                           
+                           iv % synop_ef_p, iv % synop_ef_q)                           
 
       do n = 1, iv % num_synop
          iv % synop(n) % u % error = iv % synop(n) % u % error * iv % synop_ef_u
@@ -45,11 +35,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.2] Transfer metar obs:
 
-   if ( iv % num_metar > 0 ) then
+   if (iv % num_metar > 0) then
 
-      call da_read_errfac( 'metar', iv % metar_ef_u, &
+      call da_read_errfac('metar', iv % metar_ef_u, &
                            iv % metar_ef_v, iv % metar_ef_t, &
-                           iv % metar_ef_p, iv % metar_ef_q )
+                           iv % metar_ef_p, iv % metar_ef_q)
                            
       do n = 1, iv % num_metar
          iv % metar(n) % u % error = iv % metar(n) % u % error * iv % metar_ef_u
@@ -62,11 +52,11 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.2] Transfer ships obs:
 
-   if ( iv % num_ships > 0 ) then
+   if (iv % num_ships > 0) then
       
-      call da_read_errfac( 'ships', iv % ships_ef_u, &
+      call da_read_errfac('ships', iv % ships_ef_u, &
                            iv % ships_ef_v, iv % ships_ef_t, &
-                           iv % ships_ef_p, iv % ships_ef_q )
+                           iv % ships_ef_p, iv % ships_ef_q)
                            
       do n = 1, iv % num_ships
          iv % ships(n) % u % error = iv % ships(n) % u % error * iv % ships_ef_u
@@ -79,9 +69,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.4.1] Transfer Geo. AMVs Obs:
    
-   if ( iv % num_geoamv > 0 ) then
+   if (iv % num_geoamv > 0) then
    
-      call da_read_errfac( 'geoamv', iv % geoamv_ef_u, iv % geoamv_ef_v, d1, d2, d3 )
+      call da_read_errfac('geoamv', iv % geoamv_ef_u, iv % geoamv_ef_v, d1, d2, d3)
 
       do n = 1, iv % num_geoamv
         do k = 1, iv % geoamv(n) % info % levels
@@ -93,9 +83,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.4.2] Transfer Polar AMVs Obs:
 
-   if ( iv % num_polaramv > 0 ) then 
+   if (iv % num_polaramv > 0) then 
 
-      call da_read_errfac( 'polaramv', iv % polaramv_ef_u, iv % polaramv_ef_v, d1, d2, d3 )
+      call da_read_errfac('polaramv', iv % polaramv_ef_u, iv % polaramv_ef_v, d1, d2, d3)
 
       do n = 1, iv % num_polaramv
         do k = 1, iv % polaramv(n) % info % levels
@@ -108,9 +98,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.5] Transfer gpspw obs:
 
-   if ( iv % num_gpspw > 0 ) then
+   if (iv % num_gpspw > 0) then
 
-      call da_read_errfac( 'gpspw', iv % gpspw_ef_tpw, d1, d2, d3, d4 )
+      call da_read_errfac('gpspw', iv % gpspw_ef_tpw, d1, d2, d3, d4)
 
       do n = 1, iv % num_gpspw
          iv % gpspw(n) % tpw % error = iv % gpspw(n) % tpw % error * &
@@ -121,10 +111,10 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.6] Transfer sonde obs:
 
-   if ( iv % num_sound > 0 ) then
+   if (iv % num_sound > 0) then
 
-      call da_read_errfac( 'sound', iv % sound_ef_u, iv % sound_ef_v, &
-                           iv % sound_ef_t, iv % sound_ef_q, d1 )
+      call da_read_errfac('sound', iv % sound_ef_u, iv % sound_ef_v, &
+                           iv % sound_ef_t, iv % sound_ef_q, d1)
 
       do n = 1, iv % num_sound
          do k = 1, iv % sound(n) % info % levels
@@ -148,10 +138,10 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.7] Transfer airep obs:
 
-   if ( iv % num_airep > 0 ) then
+   if (iv % num_airep > 0) then
    
-      call da_read_errfac( 'airep', iv % airep_ef_u, iv % airep_ef_v, &
-                           iv % airep_ef_t, d1, d2 )
+      call da_read_errfac('airep', iv % airep_ef_u, iv % airep_ef_v, &
+                           iv % airep_ef_t, d1, d2)
 
       do n = 1, iv % num_airep
          do k = 1, iv % airep(n) % info % levels
@@ -167,9 +157,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.8] Transfer pilot obs:
 
-   if ( iv % num_pilot > 0 ) then
+   if (iv % num_pilot > 0) then
 
-      call da_read_errfac( 'pilot', iv % pilot_ef_u, iv % pilot_ef_v, d1, d2, d3 )
+      call da_read_errfac('pilot', iv % pilot_ef_u, iv % pilot_ef_v, d1, d2, d3)
 
       do n = 1, iv % num_pilot
          do k = 1, iv % pilot(n) % info % levels
@@ -184,9 +174,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.9] Transfer SSM/I obs:SSMI:
 
-   if ( iv % num_ssmi_retrieval > 0 ) then
+   if (iv % num_ssmi_retrieval > 0) then
 
-      call da_read_errfac( 'ssmir', iv % ssmir_ef_speed, iv % ssmir_ef_tpw, d1, d2, d3 )
+      call da_read_errfac('ssmir', iv % ssmir_ef_speed, iv % ssmir_ef_tpw, d1, d2, d3)
 
       do n = 1, iv % num_ssmi_retrieval
          iv%ssmi_retrieval(n)%tpw%error = iv%ssmi_retrieval(n)%tpw%error * &
@@ -196,7 +186,7 @@ subroutine da_use_obs_errfac(iv)
       end do
    end if
 
-   if ( iv % num_ssmi_tb > 0 ) then
+   if (iv % num_ssmi_tb > 0) then
 
       ! iv % ssmit_ef_tb19h = 1.0 ! Tuning not yet coded.
       ! iv % ssmit_ef_tb19v = 1.0 ! Tuning not yet coded.
@@ -223,8 +213,8 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.10] Transfer satem obs:
 
-   if ( iv % num_satem > 0 ) then
-      call da_read_errfac( 'satem', iv % satem_ef_thickness, d1, d2, d3, d4 )
+   if (iv % num_satem > 0) then
+      call da_read_errfac('satem', iv % satem_ef_thickness, d1, d2, d3, d4)
 
       do n = 1, iv % num_satem
          do k = 1, iv % satem(n) % info % levels
@@ -236,8 +226,8 @@ subroutine da_use_obs_errfac(iv)
    
    ! [2.11] Transfer ssmt1 obs:
 
-   if ( iv % num_ssmt1 > 0 ) then
-      call da_read_errfac( 'ssmt1', iv % ssmt1_ef_t, d1, d2, d3, d4 )
+   if (iv % num_ssmt1 > 0) then
+      call da_read_errfac('ssmt1', iv % ssmt1_ef_t, d1, d2, d3, d4)
       
       do n = 1, iv % num_ssmt1
          do k = 1, iv % ssmt1(n) % info % levels   
@@ -249,8 +239,8 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.12] Transfer ssmt2 obs:
 
-   if ( iv % num_ssmt2 > 0 ) then
-      call da_read_errfac( 'ssmt2', iv % ssmt2_ef_rh, d1, d2, d3, d4 )
+   if (iv % num_ssmt2 > 0) then
+      call da_read_errfac('ssmt2', iv % ssmt2_ef_rh, d1, d2, d3, d4)
 
       do n = 1, iv % num_ssmt2
          do k = 1, iv % ssmt2(n) % info % levels      
@@ -262,9 +252,9 @@ subroutine da_use_obs_errfac(iv)
    
    ! [2.13] Transfer scatterometer obs:
 
-   if ( iv % num_qscat > 0 ) then
-      call da_read_errfac( 'qscat', iv % qscat_ef_u, &
-                           iv % qscat_ef_v, d1, d2, d3 )
+   if (iv % num_qscat > 0) then
+      call da_read_errfac('qscat', iv % qscat_ef_u, &
+                           iv % qscat_ef_v, d1, d2, d3)
                            
       do n = 1, iv % num_qscat
          iv % qscat(n) % u % error = iv % qscat(n) % u % error * iv % qscat_ef_u
@@ -274,8 +264,8 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.14] Transfer profiler obs:
 
-   if ( iv % num_profiler > 0 ) then
-      call da_read_errfac( 'profi', iv % profiler_ef_u, iv % profiler_ef_v, d1, d2, d3 )
+   if (iv % num_profiler > 0) then
+      call da_read_errfac('profi', iv % profiler_ef_u, iv % profiler_ef_v, d1, d2, d3)
 
       do n = 1, iv % num_profiler
          do k = 1, iv % profiler(n) % info % levels
@@ -290,10 +280,10 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.15] Transfer buoy obs:
 
-   if ( iv % num_buoy > 0 ) then  
-      call da_read_errfac( 'buoy ', iv % buoy_ef_u, &
+   if (iv % num_buoy > 0) then  
+      call da_read_errfac('buoy ', iv % buoy_ef_u, &
                            iv % buoy_ef_v, iv % buoy_ef_t, &
-                           iv % buoy_ef_p, iv % buoy_ef_q )
+                           iv % buoy_ef_p, iv % buoy_ef_q)
                            
       do n = 1, iv % num_buoy
          iv % buoy(n) % u % error = iv % buoy(n) % u % error * iv % buoy_ef_u
@@ -306,9 +296,9 @@ subroutine da_use_obs_errfac(iv)
 
    ! [2.16] Transfer TC bogus obs:
 
-   if ( iv % num_bogus > 0 ) then
-      call da_read_errfac( 'bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
-                           iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp )
+   if (iv % num_bogus > 0) then
+      call da_read_errfac('bogus', iv % bogus_ef_u, iv % bogus_ef_v, &
+                           iv % bogus_ef_t, iv % bogus_ef_q, iv % bogus_ef_slp)
 
       do n = 1, iv % num_bogus
          do k = 1, iv % bogus(n) % info % levels
@@ -327,10 +317,10 @@ subroutine da_use_obs_errfac(iv)
       end do
    end if
 
-! Transfer AIRS retrievals:
+   ! Transfer AIRS retrievals:
 
-   if ( iv % num_airsr > 0 ) then
-      call da_read_errfac( 'airsr', iv % airsr_ef_t, iv % airsr_ef_q, d1, d3, d3)
+   if (iv % num_airsr > 0) then
+      call da_read_errfac('airsr', iv % airsr_ef_t, iv % airsr_ef_q, d1, d3, d3)
 
       do n = 1, iv % num_airsr
          do k = 1, iv % airsr(n) % info % levels

@@ -142,8 +142,8 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    !     temperature
    !     ----------------------------------------------------------------
 
-   call da_tp_to_qs( tg, psfc, eg, qg )
-   call da_tp_to_qs_lin1( tg, psfc, eg, tg_prime, psfc_prime, qg_prime )
+   call da_tp_to_qs(tg, psfc, eg, qg)
+   call da_tp_to_qs_lin1(tg, psfc, eg, tg_prime, psfc_prime, qg_prime)
 
    qg_prime = qg_prime * qg
 
@@ -157,7 +157,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    !     ----------------------------------------------------
 
    Pi = (100000. / ps) ** rcp
-   ths_prime  = (ts_prime - ps_prime * rcp * ts/ps ) * Pi 
+   ths_prime  = (ts_prime - ps_prime * rcp * ts/ps) * Pi 
    ths  = ts * Pi
 
    ! 3.2 Virtual potential temperature on the lowest half sigma level
@@ -207,9 +207,9 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    !     ----------------------
 
    Pi = gravity * hs / (ths*V2)
-   rib_prime = ( thvs_prime - thvg_prime   &
+   rib_prime = (thvs_prime - thvg_prime   &
               - (thvs-thvg)/V2  * V2_prime &
-              - (thvs-thvg)/ths * ths_prime ) * Pi 
+              - (thvs-thvg)/ths * ths_prime) * Pi 
    rib = (thvs - thvg) * Pi
 
    ! 5.  CALCULATE PSI BASED UPON REGIME
@@ -217,12 +217,12 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    iregime = int(regime)
 
-   select case ( iregime  ) 
+   select case (iregime) 
 
    ! 5.1 Stable conditions (REGIME 1)
    !     ---------------------------
 
-   case ( 1 );
+   case (1);
 
       psim_prime  = 0.
       psimz_prime = 0.
@@ -244,33 +244,33 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 5.2 Mechanically driven turbulence (REGIME 2)
    !     ------------------------------------------
 
-   case ( 2 );
+   case (2);
 
       Pi =  - 1.0 / ((1.1 - 5.*rib)*(1.1 - 5.*rib))
       psim_prime  = 5.5 * gzsoz0  * rib_prime * Pi 
       psimz_prime = 5.5 * gz10oz0 * rib_prime * Pi
       psim2_prime = 5.5 * gz2oz0  * rib_prime * Pi
 
-      Pi =  ( -5. * rib ) / (1.1 - 5.*rib)
+      Pi =  (-5. * rib) / (1.1 - 5.*rib)
       psim  = gzsoz0  * Pi
       psimz = gz10oz0 * Pi
       psim2 = gz2oz0  * Pi
 
-      if ( psim >= -10. ) then
+      if (psim >= -10.) then
          psim = psim
          psim_prime = psim_prime
       else
          psim = -10.
          psim_prime = 0.
       end if
-      if ( psimz >= -10. ) then
+      if (psimz >= -10.) then
          psimz = psimz
          psimz_prime = psimz_prime
       else
          psimz = -10.
          psimz_prime = 0.
       end if
-      if ( psim2 >= -10. ) then
+      if (psim2 >= -10.) then
          psim2 = psim2
          psim2_prime = psim2_prime
       else
@@ -288,7 +288,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 5.3 Unstable Forced convection (REGIME 3)
    !     -------------------------------------
 
-   case ( 3 );
+   case (3);
 
       psim_prime = 0.
       psimz_prime = 0.
@@ -309,7 +309,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       ! 5.4 Free convection (REGIME 4)
       !     --------------------------
 
-   case ( 4 );
+   case (4);
 
       ! Calculate psi m and pshi h using iteration method
 
@@ -326,37 +326,37 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
       ! Friction speed
 
-      ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+      ust = k_kar * sqrt(v2) /(gzsoz0 - psim)
       ust_prime = (0.5/V2 * v2_prime + psim_prime /(gzsoz0 - psim)) * ust
 
       ! Heat fux factor
 
-      mol = k_kar * (ths - thg )/( gzsoz0 - psih)
-      mol_prime = ( (ths_prime - thg_prime ) /(ths - thg) + &
-                     psih_prime /( gzsoz0 - psih) ) * mol
+      mol = k_kar * (ths - thg)/(gzsoz0 - psih)
+      mol_prime = ((ths_prime - thg_prime) /(ths - thg) + &
+                     psih_prime /(gzsoz0 - psih)) * mol
 
       ! Ratio of PBL height to Monin-Obukhov length
 
-      if ( ust .LT. 0.01 ) then
+      if (ust .LT. 0.01) then
          hol_prime = rib_prime * gzsoz0
          hol = rib * gzsoz0
       else
-         hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
-         hol_prime = ( mol_prime / mol - ths_prime / ths &
-                        - 2.* ust_prime / ust ) * hol
+         hol = k_kar * gravity * hs * mol / (ths * ust * ust)
+         hol_prime = (mol_prime / mol - ths_prime / ths &
+                        - 2.* ust_prime / ust) * hol
       end if
 
       ! 5.4.2  Calculate n, nz, R, Rz
       !        --------------------------
 
-      if ( hol >= 0. ) then
+      if (hol >= 0.) then
          hol_prime = 0.
          hol = 0.
       else
          hol_prime = hol_prime
          hol = hol
       end if
-      if ( hol >= -10. ) then
+      if (hol >= -10.) then
          hol_prime = hol_prime
          hol = hol
       else
@@ -366,14 +366,14 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
       holz_prime = (h10 / hs) * hol_prime
       holz = (h10 / hs) * hol
-      if ( holz >= 0. ) then
+      if (holz >= 0.) then
          holz_prime = 0.
          holz = 0.
       else
          holz_prime = holz_prime
          holz = holz
       end if
-      if ( holz >= -10. ) then
+      if (holz >= -10.) then
          holz_prime = holz_prime
          holz = holz
       else
@@ -383,14 +383,14 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
       hol2_prime = (h2 / hs) * hol_prime
       hol2 = (h2 / hs) * hol
-      if ( hol2 >= 0. ) then
+      if (hol2 >= 0.) then
          hol2_prime = 0.
          hol2 = 0.
       else
          hol2_prime = hol2_prime
          hol2 = hol2
       end if
-      if ( hol2 >= -10. ) then
+      if (hol2 >= -10.) then
          hol2_prime = hol2_prime
          hol2 = hol2
       else
@@ -436,42 +436,42 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       ! 5.4.4 Define the limit value for psim & psih
       !        --------------------------
 
-      if ( psim <= 0.9*gzsoz0 ) then
+      if (psim <= 0.9*gzsoz0) then
          psim_prime = psim_prime
          psim = psim
       else
          psim = 0.9*gzsoz0
          psim_prime = 0.
       end if
-      if ( psimz <= 0.9*gz10oz0 ) then
+      if (psimz <= 0.9*gz10oz0) then
          psimz_prime = psimz_prime
          psimz = psimz
       else
          psimz_prime = 0.
          psimz = 0.9*gz10oz0
       end if
-      if ( psim2 <= 0.9*gz2oz0 ) then
+      if (psim2 <= 0.9*gz2oz0) then
          psim2_prime = psim2_prime
          psim2 = psim2
       else
          psim2_prime = 0.
          psim2 = 0.9*gz2oz0
       end if
-      if ( psih <= 0.9*gzsoz0 ) then
+      if (psih <= 0.9*gzsoz0) then
          psih_prime = psih_prime
          psih = psih
       else
          psih_prime = 0.
          psih = 0.9*gzsoz0
       end if
-      if ( psihz <= 0.9*gz10oz0 ) then
+      if (psihz <= 0.9*gz10oz0) then
          psihz_prime = psihz_prime
          psihz = psihz
       else
          psihz_prime = 0.
          psihz = 0.9*gz10oz0
       end if
-      if ( psih2 <= 0.9*gz2oz0 ) then
+      if (psih2 <= 0.9*gz2oz0) then
          psih2_prime = psih2_prime
          psih2 = psih2
       else
@@ -498,15 +498,15 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    psit2_prime = - psih2_prime
    psit2 = gz2oz0 - psih2
 
-   ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+   ust = k_kar * sqrt(v2) /(gzsoz0 - psim)
    ust_prime = (0.5/V2 * v2_prime + psim_prime /(gzsoz0 - psim)) * ust
 
-   psiq2_prime = k_kar*hs/(ka*(k_kar*ust*hs/ka + hs / zq0 ))*ust_prime
+   psiq2_prime = k_kar*hs/(ka*(k_kar*ust*hs/ka + hs / zq0))*ust_prime
    psiq_prime  = psiq2_prime - psih_prime
    psiq2_prime = psiq2_prime - psih2_prime
 
-   psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
-   psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
+   psiq  = log(k_kar*ust*hs/ka + hs / zq0) - psih
+   psiq2 = log(k_kar*ust*h2/ka + h2 / zq0) - psih2
 
    ! 7.  CALCULATE THE PERTURBATIONS for 10M WinD, 2M TEMPERATURE AND MOISTURE
    ! =======================================
@@ -515,10 +515,10 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    u10_prime= (us_prime + us/psiz * psiz_prime - us/psiw * psiw_prime) * Pi
    v10_prime= (vs_prime + vs/psiz * psiz_prime - vs/psiw * psiw_prime) * Pi
 
-   t2_prime = ( (1.0-psit2/psit) * thg_prime + ( ths_prime + &
+   t2_prime = ((1.0-psit2/psit) * thg_prime + (ths_prime + &
                            (ths - thg)/psit2 * psit2_prime - &
-                           (ths - thg)/psit  * psit_prime ) * psit2/psit &
-             + rcp*( thg + ( ths - thg )*psit2/psit)/psfc * psfc_prime ) &
+                           (ths - thg)/psit  * psit_prime) * psit2/psit &
+             + rcp*(thg + (ths - thg)*psit2/psit)/psfc * psfc_prime) &
              * (psfc/100000.)**rcp
 
    q2_prime = (1.0-psiq2/psiq) * qg_prime + psiq2/psiq * qs_prime + &

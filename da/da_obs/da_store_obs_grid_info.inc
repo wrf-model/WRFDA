@@ -1,4 +1,4 @@
-subroutine da_store_obs_grid_info ( xp, loc )
+subroutine da_store_obs_grid_info (xp, loc)
 
    implicit none
 
@@ -7,16 +7,16 @@ subroutine da_store_obs_grid_info ( xp, loc )
 
    loc%proc_domain = .false.
    
-! JRB hack
+   ! JRB hack
    if (loc%i >= xp%its .and. loc%i <= xp%ite .and. &
       loc%j >= xp%jts .and. loc%j <= xp%jte) then
       loc%proc_domain = .true.
    end if
 
-!   if (loc%i >= xp%its .and. loc%i < xp%ite .and. &
-!      loc%j >= xp%jts .and. loc%j < xp%jte) then
-!      loc%proc_domain = .true.
-!   end if
+   ! if (loc%i >= xp%its .and. loc%i < xp%ite .and. &
+   !    loc%j >= xp%jts .and. loc%j < xp%jte) then
+   !    loc%proc_domain = .true.
+   ! end if
 
 end subroutine da_store_obs_grid_info
 

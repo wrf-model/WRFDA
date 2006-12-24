@@ -34,7 +34,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
                                    num_profiler, num_buoy, num_bogus
    character(len=40) :: hdstr
    character(len=10) :: date
-   character(len=8 ) :: subset
+   character(len=8) :: subset
    real,dimension(7) :: hdr
 
    integer           :: iost, ndup, n, report
@@ -128,7 +128,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       call da_error(__FILE__,__LINE__,message(1:2))
    end if
 
-   write(unit=date,fmt='( i10)') idate
+   write(unit=date,fmt='(i10)') idate
    read (unit=date,fmt='(i4,3i2)') year,month, day,hour
    write(unit=message(1),fmt=*) 'Bufr file date is ',year,month, day,hour
    call da_message(message(1:1))
@@ -161,7 +161,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       platform  % info % name(1:8) = subset
       platform  % info % id        = hdstr(1:5)
 
-      if(hdr(2) > 180.) hdr(2)=hdr(2)-360.
+      if (hdr(2) > 180.) hdr(2)=hdr(2)-360.
 
       ! Put a check on Lat 
       hdr(3) = MAX(hdr(3), -89.95)     
@@ -169,9 +169,9 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       platform%info%lon = hdr(2)
       platform%info%lat = hdr(3)
 
-      if (platform%info%lon == 180.0   ) platform%info%lon =-180.000
+      if (platform%info%lon == 180.0 ) platform%info%lon =-180.000
       ! Fix funny wind direction at Poles
-      if (platform%info%lat <= -89.95 .or. platform%info%lat >= 89.95 ) then
+      if (platform%info%lat <= -89.95 .or. platform%info%lat >= 89.95) then
          platform%info%lon = 0.0
       end if
 
@@ -215,7 +215,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       if (global .and. &
          (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
 
-      if (Testing_WRFVAR ) ndup = 1
+      if (Testing_WRFVAR) ndup = 1
 
       do n = 1, ndup
 
@@ -261,7 +261,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
             if (.not.use_GeoAMVObs) cycle reports
             num_geoamv = num_geoamv + 1
 
-         case (71, 72 )        ;         !  Profiler & VADWND - NEXRAD winds
+         case (71, 72)        ;         !  Profiler & VADWND - NEXRAD winds
             if (.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 

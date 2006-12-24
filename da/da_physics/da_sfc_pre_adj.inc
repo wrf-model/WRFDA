@@ -44,10 +44,10 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    ! 1.1  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
 
-   tvsm = tsm  * (1. + 0.608 * qsm)
+   tvsm = tsm  * (1.0 + 0.608 * qsm)
 
    if (present(to) .and. present(qvo)) then
-      tvo = to  * (1. + 0.608 * qvo)
+      tvo = to  * (1.0 + 0.608 * qvo)
    else if (present(to) .and. .not.present(qvo)) then
       tvo = to
    else

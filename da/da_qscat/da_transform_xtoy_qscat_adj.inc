@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_qscat_adj(iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -12,7 +12,7 @@ subroutine da_transform_xtoy_qscat_adj( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_qscat > 0 ) then
+   if (iv%num_qscat > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%qscat + 1, iv%ob_numb(iv%current_ob_time)%qscat
       
          ! [1.1] Get horizontal interpolation weights:

@@ -1,4 +1,3 @@
-
 subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
@@ -57,7 +56,7 @@ subroutine da_read_ssmi (ob, xp, filename)
       return
    end if
 
-   REWinD (unit = iunit)
+   rewind (unit = iunit)
 
    ! 2.  read HEADER
    ! ===============
@@ -189,7 +188,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
       call da_ll_to_xy (info, loc, xp, outside)
 
-      if ( outside ) cycle reports
+      if (outside) cycle reports
 
       loc % pw  % inv = missing_r
       loc % pw  % qc  = missing
@@ -197,7 +196,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
       select case(fm)
          case (125) ;
-            if ( .not. Use_SsmiRetrievalObs ) cycle reports
+            if (.not. Use_SsmiRetrievalObs) cycle reports
 
             ! Check if at least one field is present
             if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
@@ -227,7 +226,7 @@ subroutine da_read_ssmi (ob, xp, filename)
             ob % ssmi_retrieval (ob%num_ssmi_retrieval) % tpw   = tpw
 
          case (126) ;
-            if ( .not. Use_SsmiTbObs ) cycle reports
+            if (.not. Use_SsmiTbObs) cycle reports
 
             ! Check if at least one field is present
 
@@ -324,7 +323,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 end subroutine da_read_ssmi
 
 subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
-                     tb37h, tb85v, tb85h, ipass, iprecip, xlat  )
+                     tb37h, tb85v, tb85h, ipass, iprecip, xlat )
    implicit none
 
    real    ,  intent (in)  :: tb19v, tb19h, tb22v, tb37v, &
@@ -374,7 +373,7 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
 
        ! T19V always at least 4 K less than  T22V, except in heavy rain
 
-       tb(3)-tb(1) .gt. 4. ) then
+       tb(3)-tb(1) .gt. 4.) then
       ipass1 = 1
    end if
 
@@ -387,7 +386,7 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
 
          if (wv    .gt. -999. .and. u     .gt. -999. .and. &
              alw19 .gt. -999. .and. alw37 .gt. -999. .and. &
-             alw85 .gt. -999.  ) then
+             alw85 .gt. -999. ) then
             ipass2 = 1
             ! write(unit=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
             !    tb(4),tb(5),tb(6),tb(7)
@@ -395,18 +394,18 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
 
       ! third check
 
-      ! if (ipass2 .eq. 1 ) then
+      ! if (ipass2 .eq. 1) then
       !    if (wv    .ge. 5.    .and. wv .le. 70 .and.     &
       !        u     .ge. -5    .and. u  .le. 30 .and.     &
       !        alw19 .ge. -0.01 .and. alw19 .le. 0.5 .and. &
       !        alw37 .ge. -0.01 .and. alw37 .le. 0.5 .and. &
-      !        alw85 .ge. -0.01 .and. alw85 .le. 0.5 ) then
+      !        alw85 .ge. -0.01 .and. alw85 .le. 0.5) then
       !       write(unit=stdout,*)a1,a2,lat,long,theta,tb(1),tb(2),tb(3), &
       !          tb(4),tb(5),tb(6),tb(7)
       !       ipass = .true.
       !    end if
       ! end if
-      ! if (iprecip .eq. 1 ) then
+      ! if (iprecip .eq. 1) then
       !    ipass = .true.
       !    write(unit=stdout,*) 'precipitation',lat,long,wv,u,alw19,alw37,alw85,iprecip
       ! else
@@ -1060,7 +1059,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
       ! apply correction for non-linearity
       if (u .lt. 2.5) then
          erru  =  -1.267 + 0.7142*u -0.8395E-01*u*u
-      else if (u .gt. 10.0  ) then
+      else if (u .gt. 10.0 ) then
          erru  =  3.243 -0.3478*u + 0.3679E-02*u*u
       else
          erru = 0.0
@@ -1095,7 +1094,7 @@ subroutine PettyWind(tb,theta,sst,dsst,u)
       ! apply correction for non-linearity
       if (u .lt. 2.5) then
          erru = -1.219+ 0.9327*u -0.1852*u*u
-      else if (u .gt. 10.0  ) then
+      else if (u .gt. 10.0 ) then
          erru = 3.360-0.3918*u + 0.8121E-02*u*u
       else
          erru = 0.0

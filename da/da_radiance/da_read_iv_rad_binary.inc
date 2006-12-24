@@ -28,10 +28,10 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
       write(filename, '(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_bin_', myproc
 #else
       write(filename, '(a)') trim(iv%instid(n)%rttovid_string)//'.inv_bin'
-#endif
+#end if
       call da_get_unit(iv_rad_binary_unit)
       open(iv_rad_binary_unit,file=trim(filename),form='unformatted',iostat=ios)
-      if (ios /= 0 ) Then
+      if (ios /= 0) Then
          call da_warning(__FILE__,__LINE__,(/"cannot open the file "//TRIM(filename)/))
          iv%instid(n)%num_rad = 0
          cycle

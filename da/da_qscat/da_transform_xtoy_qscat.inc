@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_qscat( xa, iv, xp, y )
+subroutine da_transform_xtoy_qscat(xa, iv, xp, y)
 
    implicit none
 
@@ -12,7 +12,7 @@ subroutine da_transform_xtoy_qscat( xa, iv, xp, y )
    real                         :: dx, dxm  ! 
    real                         :: dy, dym  !
    
-   if ( iv%num_qscat > 0 ) then
+   if (iv%num_qscat > 0) then
       !xyh y%qscat(:)%u = 0.0
       !xyh y%qscat(:)%v = 0.0
 

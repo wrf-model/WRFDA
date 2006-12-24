@@ -1,10 +1,11 @@
-subroutine da_readwrite_be_stage2( outunit, nk )
+subroutine da_readwrite_be_stage2(outunit, nk)
 
-! ----------------------------------------------------------------------
-! Purpose: Read and write the dimensions, bin information, and 
-!          regression coefficients.
-!
-! ----------------------------------------------------------------------
+   ! ----------------------------------------------------------------------
+   ! Purpose: Read and write the dimensions, bin information, and 
+   !          regression coefficients.
+   !
+   ! ----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)      :: outunit                    ! Output unit number.
@@ -30,26 +31,27 @@ subroutine da_readwrite_be_stage2( outunit, nk )
 
    integer :: iunit
 
-! Read in the coefficients:
+   ! Read in the coefficients:
+
    call da_get_unit(iunit)
    filename = 'gen_be_stage2.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)ni, nj, nk
    read(iunit)num_bins, num_bins2d
 
-   allocate( regcoeff1(1:num_bins) )
-   allocate( regcoeff2(1:nk,1:num_bins2d) )
-   allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
+   allocate(regcoeff1(1:num_bins))
+   allocate(regcoeff2(1:nk,1:num_bins2d))
+   allocate(regcoeff3(1:nk,1:nk,1:num_bins2d))
 
    read(iunit)regcoeff1 ! psi/chi regression coefficient.
    read(iunit)regcoeff2 ! psi/ps  regression coefficient.
    read(iunit)regcoeff3 ! psi/T   regression coefficient.
    close(iunit)
 
-! Read in the bin information:
+   ! Read in the bin information:
 
-   allocate( bin(1:ni,1:nj,1:nk) )
-   allocate( bin2d(1:ni,1:nj) )
+   allocate(bin(1:ni,1:nj,1:nk))
+   allocate(bin2d(1:ni,1:nj))
 
    filename = 'bin.data'
    open (iunit, file = filename, form='unformatted')
@@ -63,7 +65,7 @@ subroutine da_readwrite_be_stage2( outunit, nk )
    close(iunit)
    call da_free_unit(iunit)
 
-! Write out the dimensions and bin information:
+   ! Write out the dimensions and bin information:
 
    write(outunit)ni, nj, nk
 
@@ -74,18 +76,18 @@ subroutine da_readwrite_be_stage2( outunit, nk )
    write(outunit)bin(1:ni,1:nj,1:nk)
    write(outunit)bin2d(1:ni,1:nj)
 
-   deallocate( bin )
-   deallocate( bin2d )
+   deallocate(bin)
+   deallocate(bin2d)
 
-! Write out the coefficients:
+   ! Write out the coefficients:
 
    write(outunit)regcoeff1
    write(outunit)regcoeff2
    write(outunit)regcoeff3
 
-   deallocate( regcoeff1 )
-   deallocate( regcoeff2 )
-   deallocate( regcoeff3 )
+   deallocate(regcoeff1)
+   deallocate(regcoeff2)
+   deallocate(regcoeff3)
 
 end subroutine da_readwrite_be_stage2
 

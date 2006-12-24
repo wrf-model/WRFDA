@@ -1,20 +1,22 @@
-subroutine da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
+subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, total_power)
 
    implicit none 
 
-   integer, intent(inout)   :: outunit               ! Output file unit.
-   character*10, intent(in) :: variable              ! Variable name.
-   integer, intent(in)      :: k                     ! Vertical index.
-   integer, intent(in)      :: max_wavenumber        ! Smallest scale required (ni/2 - 1).
-   real, intent(in) :: total_power(0:max_wavenumber) ! Total Power spectrum (averaged over time/members).
+   integer, intent(inout)   :: outunit        ! Output file unit.
+   character*10, intent(in) :: variable       ! Variable name.
+   integer, intent(in)      :: k              ! Vertical index.
+   integer, intent(in)      :: max_wavenumber ! Smallest scale required (ni/2-1)
 
-   integer             :: n                          ! Loop counter.
-   real                :: accum_power, variance      ! Accumulated power, variance.
+   ! Total Power spectrum (averaged over time/members)
+   real, intent(in) :: total_power(0:max_wavenumber)
+
+   integer             :: n                     ! Loop counter.
+   real                :: accum_power, variance ! Accumulated power, variance.
 
    accum_power = 0.0
-   variance = sum( total_power(0:max_wavenumber) )
+   variance = sum(total_power(0:max_wavenumber))
 
-   write(unit=6,fmt='(3a,i5,a,i5)')' Power spectra for variable ', trim(variable), &
+   write(unit=stdout,fmt='(3a,i5,a,i5)')' Power spectra for variable ', trim(variable), &
                           ' and level ', k, ' in unit ', outunit
 
    do n = 0, max_wavenumber
@@ -24,7 +26,7 @@ subroutine da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, tot
    end do
 
    outunit = outunit + 1
-   write(unit=6,fmt=*) ''
+   write(unit=stdout,fmt=*) ''
 
 end subroutine da_print_be_stats_h_global
 

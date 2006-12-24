@@ -1,4 +1,4 @@
-subroutine da_transform_xtozrhoq_lin( xb, xa, i, j, zh, zf, tgl_zrhom)
+subroutine da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, tgl_zrhom)
 
    implicit none
    
@@ -19,7 +19,7 @@ subroutine da_transform_xtozrhoq_lin( xb, xa, i, j, zh, zf, tgl_zrhom)
    do k = 1,mkz
       TGL_zrhom = (zf(k)-zf(k+1))*zh(k)*(xb%q(i,j,k)*xa%rho(i,j,k) + &
                                          xa%q(i,j,k)*xb%rho(i,j,k)   &
-                                        ) + TGL_zrhom
+                                       ) + TGL_zrhom
    end do
 
    if (trace_use) call da_trace_exit("da_transform_xtozrhoq_lin")

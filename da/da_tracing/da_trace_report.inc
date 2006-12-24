@@ -1,5 +1,9 @@
 subroutine da_trace_report
 
+   !--------------------------------------------------------------------
+   ! Purpose: Produce a trace report
+   !--------------------------------------------------------------------
+
    implicit none
 
    integer :: Loop1                        ! loop counter
@@ -34,14 +38,9 @@ subroutine da_trace_report
    real    :: OverallElapsedTime(MaxNoRoutines)
    real    :: OverallCPUTime(MaxNoRoutines)
 
-   character (LEN=TraceNameLen) :: MasterTimerNames(MaxNoRoutines)
+   character (len=TraceNameLen) :: MasterTimerNames(MaxNoRoutines)
 
    integer :: iost
-
-   !==========================================================================
-   ! start of code
-   !==========================================================================
-
 
    if (.not. use_html) then
       write (unit=trace_unit, fmt='(A)') &
@@ -57,7 +56,7 @@ subroutine da_trace_report
 
    TotalCPUTime(1) = TempCpuTime - BaseCPUTime
 
-   call SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK(&
       COUNT_RATE=CountRate)
 
    ! Ensure the lists from each PE match. use the routine list from the 

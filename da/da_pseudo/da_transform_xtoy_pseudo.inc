@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_pseudo( xa, iv, xp, y )
+subroutine da_transform_xtoy_pseudo(xa, iv, xp, y)
 
    implicit none
 
@@ -12,7 +12,7 @@ subroutine da_transform_xtoy_pseudo( xa, iv, xp, y )
    real                         :: dx, dxm  ! 
    real                         :: dy, dym  !
    
-   if ( iv%num_pseudo > 0 ) then
+   if (iv%num_pseudo > 0) then
 
 !xyh      y%pseudo(:)%u = 0.0
 !xyh      y%pseudo(:)%v = 0.0

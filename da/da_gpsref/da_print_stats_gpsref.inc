@@ -1,4 +1,4 @@
-subroutine da_print_stats_gpsref( stats_unit, ngpsref, GPSRef )
+subroutine da_print_stats_gpsref(stats_unit, ngpsref, GPSRef)
 
    implicit none
 

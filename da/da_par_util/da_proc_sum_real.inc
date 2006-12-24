@@ -1,4 +1,4 @@
-subroutine da_proc_sum_real ( n, value )
+subroutine da_proc_sum_real (n, value)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Do MPI reduction operation across processors to sum a real vector.  
@@ -19,11 +19,11 @@ subroutine da_proc_sum_real ( n, value )
 #ifdef DM_PARALLEL
 
    if (rootproc) root = myproc
-   call wrf_dm_bcast_integer ( root, 1 )
-   apsum=0
-   call mpi_reduce(value, apsum, n, true_mpi_real, mpi_sum, root, comm, ierr )
+   call wrf_dm_bcast_integer (root, 1)
+   apsum(:)=0
+   call mpi_reduce(value, apsum, n, true_mpi_real, mpi_sum, root, comm, ierr)
 
-   if (myproc .eq. root) value = apsum
+   if (myproc == root) value = apsum
 #endif
 
 end subroutine da_proc_sum_real

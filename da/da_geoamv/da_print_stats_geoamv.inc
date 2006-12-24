@@ -1,4 +1,4 @@
-subroutine da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
+subroutine da_print_stats_geoamv(stats_unit, nu, nv, geoamv)
 
    implicit none
 
@@ -12,8 +12,8 @@ subroutine da_print_stats_geoamv( stats_unit, nu, nv, geoamv )
    write(unit=stats_unit, fmt='(a,i16,4i22)') &
       '  Number: ', nu, nv
 
-   if(nu < 1) nu = 1
-   if(nv < 1) nv = 1
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
 
    write(unit=stats_unit, fmt='((a,2(f12.4,2i5)))') &
       ' Minimum(n,k): ', geoamv%minimum%u, geoamv%minimum%v, &

@@ -54,6 +54,7 @@ subroutine plot_it(plt,num,k,varname,nx,ny,nt)
 
 end subroutine plot_it
 
+
 subroutine point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                              xpb,xpe,ypb,ype)
 
@@ -133,6 +134,7 @@ subroutine point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
 
 end subroutine point_plot
 
+
 subroutine line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
                        xpb,xpe,ypb,ype)
 
@@ -176,7 +178,7 @@ subroutine line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
    n = 0
 
    do i=1,nx+ny
-      if(sum(i) < 0.5) exit
+      if (sum(i) < 0.5) exit
 
       avg(i)=avg(i)/sum(i)
       n=i
@@ -209,12 +211,13 @@ subroutine line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
    call gstxci(blue)
 
    do i=2,nx+ny
-      if(sum(i) < 0.5) exit
+      if (sum(i) < 0.5) exit
 
       call line(real(i-2), avg(i-1), real(i-1), avg(i))
    end do
 
 end subroutine line_plot
+
 
 subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
 
@@ -274,7 +277,7 @@ subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
 
    do
       y=y+1.0
-      if(y > ype) exit
+      if (y > ype) exit
       call line(xpb,y,x,y)
    end do
 
@@ -298,7 +301,7 @@ subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
       x=real(i)
       y=slnt*x+cnst
 
-      if(y   > ype) exit
+      if (y   > ype) exit
 
       call line(xpb,ypb,x,y)
 

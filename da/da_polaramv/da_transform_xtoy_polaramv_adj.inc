@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_polaramv_adj (iv, xp, jo_grad_y, jo_grad_x)
 
 !-------------------------------------------------------------------------
 !  HISTORY:
@@ -21,13 +21,13 @@ subroutine da_transform_xtoy_polaramv_adj ( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_polaramv > 0 ) then
+   if (iv%num_polaramv > 0) then
 !xyh      do n=1, iv % num_polaramv
       do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
 
          k = iv % polaramv(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
 
          i = iv%polaramv(n)%loc%i
          dy = iv%polaramv(n)%loc%dy

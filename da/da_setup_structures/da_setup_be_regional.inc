@@ -238,7 +238,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    do j=1,nj
       b = bin2d(1,j)
       be1_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-      be1_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
+      be1_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
    end do
 
    ! 2.2.2 Control variable 2 (chi_u)
@@ -258,7 +258,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    do j=1,nj
       b = bin2d(1,j)
       be2_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-      be2_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
+      be2_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
    end do
 
    ! 2.2.3 Control variable 3 (t_u)
@@ -277,7 +277,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    do j=1,nj
       b = bin2d(1,j)
       be3_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-      be3_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
+      be3_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
    end do
 
    ! 2.2.4 Control variable 4 (q/qsg)
@@ -297,7 +297,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    do j=1,nj
       b = bin2d(1,j)
       be4_evec_loc(j,1:nk,1:nk) = evec_loc(1:nk,1:nk,b)
-      be4_eval_loc(j,1:nk    ) = eval_loc(1:nk,b)
+      be4_eval_loc(j,1:nk  ) = eval_loc(1:nk,b)
    end do
 
    deallocate (evec_loc)
@@ -322,7 +322,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    do j=1,nj
       b = bin2d(1,j)
       be5_evec_loc(j,1:1,1:1) = evec_loc(1:1,1:1,b)
-      be5_eval_loc(j,1:1   ) = eval_loc(1:1,b)
+      be5_eval_loc(j,1:1 ) = eval_loc(1:1,b)
    end do
 
    deallocate (evec_loc)

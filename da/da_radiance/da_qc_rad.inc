@@ -50,7 +50,7 @@ if (.false.) then
 
 
    do inst = 1, iv%num_inst
-      WRITE(UNIT=stdout,FMT='(A,A)') 'performing QC for ', trim(iv%instid(inst)%rttovid_string) 
+      WRITE(unit=stdout,fmt='(A,A)') 'performing QC for ', trim(iv%instid(inst)%rttovid_string) 
       nchan    = iv%instid(inst)%nchan
 
       amsua = trim(inst_name(rtminit_sensor(inst))) == 'amsua'
@@ -63,13 +63,13 @@ if (.false.) then
       if (hirs) then
          ! 1.0 QC for HIRS
          ! call da_qc_hirs(inst,nchan,ob,iv)
-         WRITE(UNIT=stderr,FMT='(A)') 'QC Not impemented for HIRS' 
+         WRITE(unit=stderr,fmt='(A)') 'QC Not impemented for HIRS' 
       else if (airs) then
          ! call da_qc_airs(inst,nchan,ob,iv)
-         WRITE(UNIT=stderr,FMT='(A)') 'QC Not impemented for AIRS'
+         WRITE(unit=stderr,fmt='(A)') 'QC Not impemented for AIRS'
       else if ( hsb ) then
          ! call da_qc_hsb(inst,nchan,ob,iv)
-         WRITE(UNIT=stderr,FMT='(A)') 'QC Not impemented for HSB'
+         WRITE(unit=stderr,fmt='(A)') 'QC Not impemented for HSB'
       else if (amsua) then
          !  2.0 QC for AMSU-A
          call da_qc_amsua(inst,nchan,ob,iv)
@@ -78,9 +78,9 @@ if (.false.) then
          call da_qc_amsub(inst,nchan,ob,iv)
       else if (msu) then
          ! call da_qc_msu(inst,nchan, ob,iv)
-         WRITE(UNIT=stderr,FMT='(A)') 'QC Not impemented for MSU'
+         WRITE(unit=stderr,fmt='(A)') 'QC Not impemented for MSU'
       else
-         WRITE(UNIT=errmsg(1),FMT='(A,A)') &
+         WRITE(unit=errmsg(1),fmt='(A,A)') &
             "Unrecognized Instrument",TRIM(inst_name(rtminit_sensor(inst)))
          call da_error(__FILE__,__LINE__,errmsg(1:1))
       end if

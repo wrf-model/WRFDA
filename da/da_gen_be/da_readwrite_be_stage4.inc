@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage4( outunit, nk, uh_method, n_smth_sl, variable )
+subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
 
    implicit none
 
@@ -29,63 +29,61 @@ subroutine da_readwrite_be_stage4( outunit, nk, uh_method, n_smth_sl, variable )
 
    first_time = .true.
 
-if (uh_method .eq. 'power') then
+   if (uh_method .eq. 'power') then
+      do k = 1, nk
+         write(ck,'(i2)')k
+         if (k < 10) ck = '0'//ck(2:2)
 
-   do k = 1, nk
-      write(ck,'(i2)')k
-      if ( k < 10 ) ck = '0'//ck(2:2)
+         filename = trim(variable)//'/'//trim(variable)
+         filename = trim(filename)//'.'//ck//'.spectrum'
 
-      filename = trim(variable)//'/'//trim(variable)
-      filename = trim(filename)//'.'//ck//'.spectrum'
+         call da_get_unit(iunit)
+         open (iunit, file = filename, form='unformatted')
+         read(iunit)cvar
+         if (trim(cvar) /=  trim(variable)) then
+           call da_error(__FILE__,__LINE__, &
+             (/"Variable name inconsistency"/))
+         end if
 
-      call da_get_unit(iunit)
-      open (iunit, file = filename, form='unformatted')
-      read(iunit)cvar
-      if ( trim(cvar) /=  trim(variable) ) then
-        call da_error(__FILE__,__LINE__, &
-          (/"Variable name inconsistency"/))
-      end if
+         read(iunit)max_wavenumber, kdum
+         if (kdum /= k) then
+           call da_error(__FILE__,__LINE__, &
+             (/"Inconsistent vertical label"/))
+         end if
 
-      read(iunit)max_wavenumber, kdum
-      if ( kdum /= k ) then
-        call da_error(__FILE__,__LINE__, &
-          (/"Inconsistent vertical label"/))
-      end if
+         read(iunit)data_on_levels, use_global_eofs
 
-      read(iunit)data_on_levels, use_global_eofs
+         if (first_time) then
+            if (.not. data_on_levels) then
+               if (use_global_eofs) then
+                  write(unit=6,fmt='(a)') &
+                     ' Power spectra calculated for 2D field projected onto global EOFs.'
+               else
+                  write(unit=6,fmt='(a)') &
+                     ' Power spectra calculated for 2D field projected onto local EOFs.'
+               end if
+            end if
+            allocate(total_power(0:max_wavenumber))
+         end if
 
-      if ( first_time ) then
-        if ( .not. data_on_levels ) then
-          if ( use_global_eofs ) then
-            write(unit=6,fmt='(a)') &
-              ' Power spectra calculated for 2D field projected onto global EOFs.'
-          else
-            write(unit=6,fmt='(a)') &
-              ' Power spectra calculated for 2D field projected onto local EOFs.'
-          end if
-        end if
-        allocate( total_power(0:max_wavenumber) )
-      end if
+         read(iunit)total_power(:)
+         close(iunit)
+         call da_free_unit(iunit)
 
-      read(iunit)total_power(:)
-      close(iunit)
-      call da_free_unit(iunit)
+         write(outunit)variable
+         write(outunit)max_wavenumber, k
+         write(outunit)use_global_eofs
+         write(outunit)total_power(:)
 
-      write(outunit)variable
-      write(outunit)max_wavenumber, k
-      write(outunit)use_global_eofs
-      write(outunit)total_power(:)
+         first_time = .false.
+      end do
 
-      first_time = .false.
-   end do
-
-   deallocate( total_power )
+      deallocate(total_power)
 
    else if (uh_method == 'scale   ') then
-
-      if ( first_time ) then
-           allocate( scale_length(1:nk) )
-           allocate( sl_smth(1:nk) )
+      if (first_time) then
+         allocate(scale_length(1:nk))
+         allocate(sl_smth(1:nk))
       end if
 
       call da_get_unit(iunit)
@@ -94,29 +92,29 @@ if (uh_method .eq. 'power') then
 
       do k=1, nk
          read(iunit,'(a,2e20.8)') ck, ml, scale_length(k)
-! If missing value is encountered, use the value from the last
-! mode or level (YRG, 06/30/2005):
+         ! If missing value is encountered, use the value from the last
+         ! mode or level (YRG, 06/30/2005):
          if (ml == 0.0 .and. scale_length(k) == 0.0) &
              scale_length(k) = scale_length(k-1)
       end do
 
-!     Remove spikes in lengthscales (extrapolate if spike detected):
+      ! Remove spikes in lengthscales (extrapolate if spike detected):
       do k = 3, nk
-         mean_scale = 0.5 * ( scale_length(k-1) + scale_length(k-2) )
-         if ( abs(scale_length(k)-mean_scale) > abs(spike_tolerance * mean_scale) ) then
+         mean_scale = 0.5 * (scale_length(k-1) + scale_length(k-2))
+         if (abs(scale_length(k)-mean_scale) > abs(spike_tolerance * mean_scale)) then
             scale_length(k) = 2.0 * scale_length(k-1) - scale_length(k-2)
          end if
       end do
 
-! Smoothing the scale_length (YRG 07/01/2005):
-        sl_smth =  scale_length
-        do kdum = 1, n_smth_sl
-           do k = 2, nk-1
-             sl_smth(k) = scale_length(k) &
-                  + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
-           end do
-           scale_length = sl_smth 
-        end do
+      ! Smoothing the scale_length
+      sl_smth =  scale_length
+      do kdum = 1, n_smth_sl
+         do k = 2, nk-1
+            sl_smth(k) = scale_length(k) &
+               + 0.25*(scale_length(k-1)+scale_length(k+1)-2.0*scale_length(k))
+         end do
+         scale_length = sl_smth 
+      end do
      
       write(outunit) variable
       write(outunit) scale_length
@@ -125,9 +123,7 @@ if (uh_method .eq. 'power') then
       call da_free_unit(iunit)
 
       deallocate (scale_length)
-
    end if
-
 
 end subroutine da_readwrite_be_stage4
 

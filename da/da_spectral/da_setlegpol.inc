@@ -1,4 +1,4 @@
-subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
+subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
 
    implicit none
 
@@ -30,16 +30,16 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
 
    ! Compute Associated Legendre polynomials for latitude range:
 
-   do j = 1, ( nj + 1 ) / 2
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+   do j = 1, (nj + 1) / 2
+      index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
 
       ! use Num. Rec. recursion relation for m = 0, 1:
 
       do m = 0, 1
-         index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+         index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
          do l = m, max_wavenumber
             index = index_m + index_j + l
-            call da_asslegpol( l, m, sinlat(j), coslat(j), alp(index) )
+            call da_asslegpol(l, m, sinlat(j), coslat(j), alp(index))
 
             ! Multiply by normalization constant 
             ! (to ensure 1/2 integral^1_-1 Pml Pml1 = 1 if l = l1):
@@ -48,7 +48,7 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
             do mm = l-m+1, l+m
                s = s * real(mm)
             end do
-            alp(index) = sqrt( real(2*l+1) / s ) * alp(index)
+            alp(index) = sqrt(real(2*l+1) / s) * alp(index)
          end do
       end do
    end do
@@ -57,23 +57,23 @@ subroutine da_setlegpol( nj, max_wavenumber, alp_size, sinlat, coslat, alp )
 
    do m = 2, max_wavenumber
       do l = m, max_wavenumber
-         c(l,m) = sqrt ( (real(2*l+1)/real(2*l-3)) * (real(l+m-1)/real(l+m)) * &
-                  (real(l+m-3)/real(l+m-2)) )
-         d(l,m) = sqrt ( (real(2*l+1)/real(2*l-1)) * (real(l+m-1)/real(l+m)) * &
-                  (real(l-m+1)/real(l+m-2)) )
-         e(l,m) = sqrt ( (real(2*l+1)/real(2*l-1)) * (real(l-m)  /real(l+m)))
+         c(l,m) = sqrt ((real(2*l+1)/real(2*l-3)) * (real(l+m-1)/real(l+m)) * &
+                  (real(l+m-3)/real(l+m-2)))
+         d(l,m) = sqrt ((real(2*l+1)/real(2*l-1)) * (real(l+m-1)/real(l+m)) * &
+                  (real(l-m+1)/real(l+m-2)))
+         e(l,m) = sqrt ((real(2*l+1)/real(2*l-1)) * (real(l-m)  /real(l+m)))
       end do
    end do
 
    ! use Jarraud recursion relation for m>=2:
 
-   do j = 1, ( nj + 1 ) / 2
-      index_j = ( j - 1 ) * ( max_wavenumber + 1 ) * ( max_wavenumber + 2 ) / 2
+   do j = 1, (nj + 1) / 2
+      index_j = (j - 1) * (max_wavenumber + 1) * (max_wavenumber + 2) / 2
 
       do m = 2, max_wavenumber
-         index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+         index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
          m2 = m - 2
-         index_m2 = m2 * ( max_wavenumber + 1 - m2 ) + m2 * (m2+1) / 2 + 1 - m2
+         index_m2 = m2 * (max_wavenumber + 1 - m2) + m2 * (m2+1) / 2 + 1 - m2
 
          do l = m, max_wavenumber
             l1 = l - 1

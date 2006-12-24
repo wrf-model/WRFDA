@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
 
    !---------------------------------------------------------------------
    ! This subroutine is to calculate the Doppler radial velocity and 
@@ -30,7 +30,7 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
 
    real                         :: xr,yr,zr
 
-   if ( iv%num_Radar > 0 ) then
+   if (iv%num_Radar > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
          iv%ob_numb(iv%current_ob_time)%radar
          num_levs = iv % Radar(n) % info % levels
@@ -66,7 +66,7 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
          call da_interp_lin_3d(xa%wh, xp,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w, num_levs, iv%Radar(n)%zk, &
-                            num_levs )
+                            num_levs)
 #else
          call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, &
                             i, j, dx, dy, dxm, dym, &
@@ -83,7 +83,7 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
          call da_interp_lin_3d(xa%wh(xp%ims,xp%jms,xp%kms), xp,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs )
+                            num_levs)
 #endif
 
          ! [1.7] Calculate rv and rf at OBS location
@@ -96,24 +96,24 @@ subroutine da_transform_xtoy_radar ( xa, xb, iv, xp, y )
             ! y%Radar(n)%rv(k) = 0.0
             ! y%Radar(n)%rf(k) = 0.0
 
-            if ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-                 iv % Radar(n) % height_qc(k) /= above_model_lid ) then
-               if ( use_Radar_rv ) then
-                  if ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) then
+            if (iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+                 iv % Radar(n) % height_qc(k) /= above_model_lid) then
+               if (use_Radar_rv) then
+                  if (iv % Radar(n) % rv(k) % qc >= obs_qc_pointer) then
                      zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
                      call da_radial_velocity_lin(y%Radar(n)%rv(k), &
                         model_p(k), &
                         model_u(k), model_v(k), model_w(k), model_qrn(k),    &
-                        model_ps, xr, yr, zr, model_qrnb(k) )
+                        model_ps, xr, yr, zr, model_qrnb(k))
                   end if
                end if
 
-               if ( use_Radar_rf ) then
-                  if ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) then
-                     call da_reflectivity_lin( y%Radar(n)%rf(k), &
+               if (use_Radar_rf) then
+                  if (iv % Radar(n) % rf(k) % qc >= obs_qc_pointer) then
+                     call da_reflectivity_lin(y%Radar(n)%rf(k), &
                         model_qrn(k), &
-                        model_qrnb(k) )
+                        model_qrnb(k))
                   end if
                end if
             end if

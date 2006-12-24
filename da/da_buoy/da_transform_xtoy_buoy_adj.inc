@@ -1,6 +1,10 @@
-subroutine da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_buoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
-  implicit none
+   !--------------------------------------------------------------------------
+   ! Purpose: TBD
+   !--------------------------------------------------------------------------
+
+   implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
@@ -13,7 +17,7 @@ subroutine da_transform_xtoy_buoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_buoy > 0 ) then
+   if (iv%num_buoy > 0) then
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
 

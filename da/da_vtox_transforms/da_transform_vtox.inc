@@ -1,7 +1,7 @@
-subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
+subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
                               ids, ide, jds, jde, kds, kde,           &
                               ims, ime, jms, jme, kms, kme,           &
-                              its, ite, jts, jte, kts, kte )
+                              its, ite, jts, jte, kts, kte)
 
    !--------------------------------------------------------------------------
    ! Purpose   : Control variable transform x' = Uv. 
@@ -32,30 +32,30 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    if (trace_use) call da_trace_entry("da_transform_vtox")
 
-   call da_zero_x ( xa )
+   call da_zero_x (xa)
 
    !----------------------------------------------------------------------
    ! [1.0]: Perform vv = u_h cv transform:
    !----------------------------------------------------------------------
 
-   if ( global ) then
-      call da_transform_vtovv_global( cv_size, xbx, be, cv, vv, &
+   if (global) then
+      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv, &
                                       ids,ide, jds,jde,   &
                                       ims,ime, jms,jme,   &
-                                      its,ite, jts,jte, kts,kte ) 
+                                      its,ite, jts,jte, kts,kte) 
    else
-      call da_transform_vtovv( cv_size, xb, be, cv, vv, xp,         &
+      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp,         &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
    end if
 
    !----------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
    !----------------------------------------------------------------------
 
-   if ( vert_corr == 2 ) then      
-      call da_vertical_transform( 'u', be, &
+   if (vert_corr == 2) then      
+      call da_vertical_transform('u', be, &
 #ifndef DEREF_KLUDGE
                                   xb % vertical_inner_product, &
 #else
@@ -64,7 +64,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
                                   vv, vp,  &
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte )
+                                  its,ite, jts,jte, kts,kte)
 
    else
       vp % v1(its:ite,jts:jte,kts:kte) = vv % v1(its:ite,jts:jte,kts:kte)
@@ -74,18 +74,19 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       vp % v5(its:ite,jts:jte,kts:kte) = vv % v5(its:ite,jts:jte,kts:kte)
    end if
 
-!   if ( be % ne > 0 ) then
-!      vp % alpha(its:ite,jts:jte,1:be%ne) = vv % alpha(its:ite,jts:jte,1:be%ne)
-!   end if
+   ! WHY
+   ! if (be % ne > 0) then
+   !    vp % alpha(its:ite,jts:jte,1:be%ne) = vv%alpha(its:ite,jts:jte,1:be%ne)
+   ! end if
 
    !----------------------------------------------------------------------  
    ! [3.0]: Perform x = u_p vp transform::
    !----------------------------------------------------------------------
 
-   call da_transform_vptox( xb, vp, xp, xa, be, ep,   &
+   call da_transform_vptox(xb, vp, xp, xa, be, ep,   &
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
 
    !----------------------------------------------------------------------
    ! [4.0]: Move the following:
@@ -116,14 +117,14 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
             end do
          else if (fg_format == fg_format_kma) then
             do k=xb%kts,xb%kte
-               if( k == xb%kte) then
+               if (k == xb%kte) then
                   coeff=xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)
                else
                   PU = xb%KMA_A(K+1) + xb%KMA_B(K+1)*xb%psfc(I,J)/100.0
-                  PD = xb%KMA_A(K  ) + xb%KMA_B(K  )*xb%psfc(I,J)/100.0
+                  PD = xb%KMA_A(K ) + xb%KMA_B(K )*xb%psfc(I,J)/100.0
                   coeff=xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU)) &
                     + PD-PU)&
-                    + xb%KMA_B(K+1)*1.0/(PD-PU)**2*( PD*(LOG(PD)-LOG(PU))-PD+PU)
+                    + xb%KMA_B(K+1)*1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
                end if
                ! Here since xa%psfc holds value in Pa. dlnp -> dp
                xa%p(i,j,k) =  xb%p(i,j,k) * xa%psfc(I,J)/100. * coeff
@@ -133,7 +134,7 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       end do
    end do
 
-   call da_pt_to_rho_lin( xb, xa, xp )
+   call da_pt_to_rho_lin(xb, xa, xp)
  
    ! If Testing_wrfvar = .true., not "XToY" transform needed to do here:
 
@@ -142,30 +143,30 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
       if (sfc_assi_options == 2) then
-         call da_transform_xtowtq ( xp, xb, xa )
+         call da_transform_xtowtq (xp, xb, xa)
          ! Exchange XA (surface variable) halo region.
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
       end if
 
-      if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
+      if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
 
          ! Now do something for PW
-         call da_transform_xtotpw( xa, xb )
+         call da_transform_xtotpw(xa, xb)
 
          ! GPS Refractivity:
-         if ( use_GpsrefObs ) &
+         if (use_GpsrefObs) &
             call da_transform_xtogpsref_lin(xa, xb, xp)
 
-         if ( use_ssmt1obs .or. use_ssmt2obs .or. &
-              Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-            if( global ) then
+         if (use_ssmt1obs .or. use_ssmt2obs .or. &
+              Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
+            if (global) then
                call da_error(__FILE__,__LINE__, &
                   (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
             end if
-            call da_transform_xtoseasfcwind_lin( xa, xb )
+            call da_transform_xtoseasfcwind_lin(xa, xb)
          end if
-         if ( Use_SsmiTbObs ) call da_transform_xtotb_lin (xa, xb)
+         if (Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
          ! Exchange XA halo region.
          call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
@@ -174,23 +175,21 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 
    ! Compute w increments using Richardson's eqn.
 
-   if ( Use_RadarObs ) then
-
-        call da_uvprho_to_w_lin( xb, xa, xp,                 &
+   if (Use_RadarObs) then
+      call da_uvprho_to_w_lin(xb, xa, xp,                 &
                                  ids,ide, jds,jde, kds,kde,  &
                                  ims,ime, jms,jme, kms,kme,  &
-                                 its,ite, jts,jte, kts,kte )
+                                 its,ite, jts,jte, kts,kte)
 
-         do k=xp%kts,xp%kte
-            do j=xp%jts,xp%jte
-               do i=xp%its,xp%ite
-                  xa%wh(i,j,k)=0.5*(xa%w(i,j,k)+xa%w(i,j,k+1))
-               end do
+      do k=xp%kts,xp%kte
+         do j=xp%jts,xp%jte
+            do i=xp%its,xp%ite
+               xa%wh(i,j,k)=0.5*(xa%w(i,j,k)+xa%w(i,j,k+1))
             end do
          end do
+      end do
 
-         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
-
+      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
    end if
 
    !---------------------------------------------------------------
@@ -202,45 +201,45 @@ subroutine da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
       call da_get_vpoles(xa%u,xa%v, &
             ids, ide, jds, jde, &
             ims, ime, jms, jme, kms, kme, &
-            its, ite, jts, jte, kts, kte   )
+            its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%t,             &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte   )
+            its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%p,             &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte   )
+            its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%q,             &
             ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte   )
+            its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%psfc,          &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme,   1,   1,  &
-            its, ite, jts, jte,   1,   1   )
+            its, ite, jts, jte,   1,   1  )
 #else
       call da_get_vpoles(xa%u(ims,jms,kms),          &
                          xa%v(ims,jms,kms),          &
                       ids, ide, jds, jde, &
                       ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte   )
+                      its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%t(ims,jms,kms),          &
                       ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte   )
+                      its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%p(ims,jms,kms),          &
                       ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte   )
+                      its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%q(ims,jms,kms),          &
                       ids, ide, jds, jde,   &
                       ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte   )
+                      its, ite, jts, jte, kts, kte  )
       call da_get_spoles(xa%psfc(ims,jms),           &
                       ids, ide, jds, jde, &
                       ims, ime, jms, jme,   1,   1,  &
-                      its, ite, jts, jte,   1,   1   )
+                      its, ite, jts, jte,   1,   1  )
 #endif
        call da_set_boundary_xa(xa, xb)
    end if   

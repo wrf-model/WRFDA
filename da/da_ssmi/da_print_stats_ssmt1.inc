@@ -1,5 +1,5 @@
-subroutine da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
-                                 average, rms_err )
+subroutine da_print_stats_ssmt1(stats_unit, nt, minimum, maximum, &
+                                 average, rms_err)
 
    implicit none
 
@@ -15,7 +15,7 @@ subroutine da_print_stats_ssmt1( stats_unit, nt, minimum, maximum, &
    write(unit=stats_unit, fmt='(a,i16,4i22)') &
         '  Number: ', nt
 
-   if(nt < 1) nt = 1
+   if (nt < 1) nt = 1
    
    write(unit=stats_unit, fmt='((a,f12.4,2i5))') &
         ' Minimum(n,k): ', minimum,    &

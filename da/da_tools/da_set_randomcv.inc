@@ -1,19 +1,19 @@
-subroutine da_set_randomcv( cv_size, rcv )
+subroutine da_set_randomcv(cv_size, rcv)
 
-   !------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
    ! PURPOSE: Allocate components of control variable.
    !
    ! METHOD:  Allocate component in turn.
-   !------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)                  :: cv_size
-   real, intent(inout)                  :: rcv(1:cv_size)     ! Control variable structure.
+   integer, intent(in) :: cv_size
+   real, intent(inout) :: rcv(1:cv_size)     ! Control variable structure.
 
-   integer                              :: i
-   real                                 :: mean_cv, rms_cv, std_dev_cv
-   real                                 :: sum_cv, sum_cv2
+   integer             :: i
+   real                :: mean_cv, rms_cv, std_dev_cv
+   real                :: sum_cv, sum_cv2
 
    ! [1] Initialize random number generator and scalars:
 
@@ -32,8 +32,8 @@ subroutine da_set_randomcv( cv_size, rcv )
    end do
 
    mean_cv = sum_cv / real(cv_size)
-   rms_cv = sqrt(sum_cv2 / real(cv_size) )
-   std_dev_cv = sqrt( rms_cv * rms_cv - mean_cv * mean_cv )
+   rms_cv = sqrt(sum_cv2 / real(cv_size))
+   std_dev_cv = sqrt(rms_cv * rms_cv - mean_cv * mean_cv)
 
    write(unit=stdout)
    write(unit=stdout,fmt='(a)')' Gaussian (Normal) noise statistics:'

@@ -1,4 +1,4 @@
-subroutine da_print_stats_profiler( stats_unit, nu, nv, Profiler )
+subroutine da_print_stats_profiler(stats_unit, nu, nv, Profiler)
 
    implicit none
 

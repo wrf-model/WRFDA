@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    !------------------------------------------------------------------------
    ! This subroutine is the adjoint of Doppler radar observation operators.
@@ -31,7 +31,7 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 
    ! W_HALF is vertical velocity at half-sigma levels.
 
-   if ( iv%num_Radar > 0 ) then
+   if (iv%num_Radar > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
          iv%ob_numb(iv%current_ob_time)%radar
          do k = 1, max_ob_levels
@@ -62,23 +62,23 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
             model_qrnb(k) = iv%Radar(n)%model_qrn(k)
             model_p(k)    = iv%Radar(n)%model_p(k)
 
-            if ( iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-                 iv % Radar(n) % height_qc(k) /= above_model_lid ) then
+            if (iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
+                 iv % Radar(n) % height_qc(k) /= above_model_lid) then
 
-               if ( use_Radar_rf ) then
-                  if ( iv % Radar(n) % rf(k) % qc >= obs_qc_pointer ) then
-                    call da_reflectivity_adj( jo_grad_y%Radar(n)%rf(k), &
-                         model_rho(k), model_qrn(k), model_qrnb(k) )
+               if (use_Radar_rf) then
+                  if (iv % Radar(n) % rf(k) % qc >= obs_qc_pointer) then
+                    call da_reflectivity_adj(jo_grad_y%Radar(n)%rf(k), &
+                         model_rho(k), model_qrn(k), model_qrnb(k))
                   end if
                end if
 
-               if ( use_Radar_rv ) then
-                  if ( iv % Radar(n) % rv(k) % qc >= obs_qc_pointer ) then
+               if (use_Radar_rv) then
+                  if (iv % Radar(n) % rv(k) % qc >= obs_qc_pointer) then
                      zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
 
-                     call da_radial_velocity_adj( jo_grad_y%Radar(n)%rv(k), &
+                     call da_radial_velocity_adj(jo_grad_y%Radar(n)%rv(k), &
                         model_p(k), model_u(k), model_v(k), model_w(k),  &
-                        model_qrn(k), model_ps, xr, yr, zr, model_qrnb(k) )
+                        model_qrn(k), model_ps, xr, yr, zr, model_qrnb(k))
                   end if
                end if
             end if
@@ -95,7 +95,7 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
          call da_interp_lin_3d_adj(jo_grad_x % wh, xp,   &
                              i, j, dx, dy, dxm, dym, &
                              model_w, num_levs, iv%Radar(n)%zk, &
-                             num_levs )
+                             num_levs)
          call da_interp_lin_3d_adj(jo_grad_x % qrn, xp, &
                              i, j, dx, dy, dxm, dym, &
                              model_qrn, num_levs, iv%Radar(n)%zk, &
@@ -107,10 +107,10 @@ subroutine da_transform_xtoy_radar_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
 #else
          call da_interp_lin_3d_adj(jo_grad_x % wh(xp%ims,xp%jms,xp%kms), &
             xp, i, j, dx, dy, dxm, dym, model_w(1), &
-            num_levs, iv%Radar(n)%zk(1), num_levs )
+            num_levs, iv%Radar(n)%zk(1), num_levs)
          call da_interp_lin_3d_adj(jo_grad_x%qrn(xp%ims,xp%jms,xp%kms), & 
                                  xp, i, j, dx, dy, dxm, dym, model_qrn(1), &
-                                 num_levs, iv%Radar(n)%zk(1), num_levs )
+                                 num_levs, iv%Radar(n)%zk(1), num_levs)
          call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
             i, j, dx, dy, dxm, dym, &
             model_v(1), num_levs, iv%Radar(n)%zk(1), &

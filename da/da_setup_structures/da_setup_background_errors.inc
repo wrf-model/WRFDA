@@ -1,6 +1,6 @@
-subroutine da_setup_background_errors( xb, xbx, be, xp, &
+subroutine da_setup_background_errors(xb, xbx, be, xp, &
                                        its, ite, jts, jte, kts, kte, &
-                                       ids, ide, jds, jde, kds, kde )
+                                       ids, ide, jds, jde, kds, kde)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define and allocate components of background errors.

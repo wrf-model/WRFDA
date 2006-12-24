@@ -1,7 +1,9 @@
 subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
            pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
-   ! This is the tangent-linear routine for Tv_profile
+   !--------------------------------------------------------------------------
+   ! Purpose: tangent-linear routine for da_tv_profile
+   !--------------------------------------------------------------------------
 
    implicit none
 
@@ -17,7 +19,8 @@ subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
    integer                        :: ii,jj,ks,ke
    real, dimension(2,2,xp%kts:xp%kte)       :: tv_m,TGL_tv_m
 
-   ks = xp%kts; ke = xp%kte
+   ks = xp%kts
+   ke = xp%kte
 
    do ii=i,i+1
       do jj=j,j+1

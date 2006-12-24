@@ -1,6 +1,6 @@
-subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
+subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam, &
 #include "em_dummy_new_args.inc"
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Convert WRFTL variables to analysis increments
@@ -44,12 +44,12 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_AD
-   call nl_set_dyn_opt ( 1 , DYN_EM_AD )
+   call nl_set_dyn_opt (1 , DYN_EM_AD)
 
-   call da_med_initialdata_input( grid , config_flags, filnam )
+   call da_med_initialdata_input(grid , config_flags, filnam)
 
    grid%dyn_opt = ndynopt
-   call nl_set_dyn_opt ( 1 , DYN_EM )
+   call nl_set_dyn_opt (1 , DYN_EM)
 
    !---------------------------------------------------------------------------
    ! [6.0] Adjoint of save OTHERinCREMENT
@@ -65,7 +65,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
-   if ( size(moist,dim=4) >= 4 ) then
+   if (size(moist,dim=4) >= 4) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -76,7 +76,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       end do
    end if
 
-   if ( size(moist,dim=4) >= 6 ) then
+   if (size(moist,dim=4) >= 6) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -87,7 +87,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       end do
    end if
 
-   if ( size(moist,dim=4) >= 7 ) then
+   if (size(moist,dim=4) >= 7) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
@@ -172,9 +172,9 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             rho_cgrid=-(grid%em_ph_2(i,j,k+1)-grid%em_ph_2(i,j,k))*grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
-            a_press(i,j,k  )=a_press(i,j,k  )+grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
+            a_press(i,j,k )=a_press(i,j,k )+grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
             a_press(i,j,k+1)=a_press(i,j,k+1)-grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
-            grid%em_a_ph_2(i,j,k  ) =grid%em_a_ph_2(i,j,k)   +grid%em_a_ph_2(i,j,k+1)
+            grid%em_a_ph_2(i,j,k ) =grid%em_a_ph_2(i,j,k)   +grid%em_a_ph_2(i,j,k+1)
             grid%xa%q(i,j,k)=-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*grid%xb%q(i,j,k))
             grid%xa%t(i,j,k)=-grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%t(i,j,k)
             grid%xa%p(i,j,k)= grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
@@ -199,7 +199,7 @@ subroutine da_transfer_xatowrftl_adj( grid, config_flags, filnam, &
       do j=js,je
          do i=is,ie
             a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
-            a_press(i,j,k  )=a_press(i,j,k  )+0.5*grid%xa%p(i,j,k)
+            a_press(i,j,k )=a_press(i,j,k )+0.5*grid%xa%p(i,j,k)
             grid%xa%p(i,j,k)=0.
             a_moist(i,j,k,P_QV)=a_moist(i,j,k,P_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
             grid%em_a_mu_2(i,j)=grid%em_a_mu_2(i,j)-a_press(i,j,k)*(1.0+moist(i,j,k,P_QV))*grid%em_dn(k)

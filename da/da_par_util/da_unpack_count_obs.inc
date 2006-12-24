@@ -1,10 +1,11 @@
-subroutine da_unpack_count_obs ( num_obs, offset, value )
+subroutine da_unpack_count_obs (num_obs, offset, value)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Unpack the 4 integer values starting at value(offset) into the
    !          num_obs structure.
-   !
    !---------------------------------------------------------------------------
+
+   implicit none
 
    type (count_obs_number_type), intent(out)    :: num_obs
    integer                     , intent(inout)  :: offset

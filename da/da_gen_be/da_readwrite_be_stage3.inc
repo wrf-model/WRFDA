@@ -1,4 +1,4 @@
-subroutine da_readwrite_be_stage3( outunit, nk, variable )
+subroutine da_readwrite_be_stage3(outunit, nk, variable)
 
    implicit none
 
@@ -23,19 +23,19 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable )
    filename = 'gen_be_stage3.'//trim(variable)//'.dat'
    open (iunit, file = filename, form='unformatted')
    read(iunit)vardum
-   if ( trim(vardum) /= trim(variable) ) then
+   if (trim(vardum) /= trim(variable)) then
      call da_error(__FILE__,__LINE__, &
        (/"Inconsistent variable name"/))
    end if
 
    read(iunit)nkdum, num_bins2d
-   if ( nkdum /= nk ) then
+   if (nkdum /= nk) then
      call da_error(__FILE__,__LINE__, &
        (/"Inconsistent nk between regression coefficients and vertical modes"/))
    end if
 
-   allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )
-   allocate( e_val_loc(1:nk,1:num_bins2d) )
+   allocate(e_vec_loc(1:nk,1:nk,1:num_bins2d))
+   allocate(e_val_loc(1:nk,1:num_bins2d))
 
    read(iunit)e_vec
    read(iunit)e_val
@@ -51,8 +51,8 @@ subroutine da_readwrite_be_stage3( outunit, nk, variable )
    write(outunit)e_vec_loc
    write(outunit)e_val_loc
 
-   deallocate( e_vec_loc )
-   deallocate( e_val_loc )
+   deallocate(e_vec_loc)
+   deallocate(e_val_loc)
 
 end subroutine da_readwrite_be_stage3
 

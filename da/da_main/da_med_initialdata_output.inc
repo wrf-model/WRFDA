@@ -11,7 +11,7 @@ subroutine da_med_initialdata_output (grid , config_flags, out_filename)
    ! Local
 
    integer                :: fid
-   character (LEN=80)     :: file_name
+   character (len=80)     :: file_name
 
    integer :: julyr, julday
    real    :: gmt

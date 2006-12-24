@@ -1,6 +1,6 @@
-subroutine da_transfer_kmatoxb( xbx, grid, &
+subroutine da_transfer_kmatoxb(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Transfers fields from KMA to first guess (xb) structure.
@@ -21,10 +21,13 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    real    :: tmpvar, tmpvar1, earth_radius_sq,conv
    real    :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
    real    :: ddx, ddy                                        
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: rgh_fac
+   real    :: rgh_fac(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)
    character(len=19) :: current_date
  
-   real, dimension(grid%xp%kms:grid%xp%kme) :: TV, ALPHA, PHALF, PHALFL                     
+   real :: TV(grid%xp%kms:grid%xp%kme)
+   real :: ALPHA(grid%xp%kms:grid%xp%kme)
+   real :: PHALF(grid%xp%kms:grid%xp%kme)
+   real :: PHALFL(grid%xp%kms:grid%xp%kme)                  
 
    real :: pu, pd, coef, delp, hydro, rgasg, shgt
 
@@ -34,8 +37,8 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
    if (trace_use) call da_trace_entry("da_transfer_kmatoxb")
 
-   conv = pi/180. 
-   earth_radius_sq = earth_radius*1000. * earth_radius*1000. * &
+   conv = pi/180.0
+   earth_radius_sq = earth_radius*1000.0 * earth_radius*1000.0 * &
                      conv*(360.0/(coarse_ix-1))*(180.0/(coarse_jy-2))*conv
    COEF=0.6080                                               
    RGASG = gas_constant/gravity                                            
@@ -55,7 +58,7 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    grid%xb % kma_a = grid%kma_a
    grid%xb % kma_b = grid%kma_b
 
-   if(print_detail_xb) then
+   if (print_detail_xb) then
      write(unit=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
 
@@ -116,13 +119,13 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
     call da_get_vpoles(grid%xb%u,grid%xb%v,          &
        grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
-       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
+       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte )
 #else
     call da_get_vpoles(grid%xb%u(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
                        grid%xb%v(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
        grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
-       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte  )
+       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte )
 
 #endif
    if (print_detail_xb) then
@@ -173,8 +176,8 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          grid%xb%u10(i,j) = grid%u10(i,j)
          grid%xb%v10(i,j) = grid%v10(i,j)
          grid%xb%tsk(i,j) = grid%tsk(i,j)
-! currently KMA guess have no SST, replaced by TSK
-!         grid%xb%tgrn(i,j) = grid%sst(i,j)
+         ! currently KMA guess have no SST, replaced by TSK
+         ! grid%xb%tgrn(i,j) = grid%sst(i,j)
          grid%xb%tgrn(i,j) = grid%tsk(i,j)
          grid%xb%landmask(i,j) = grid%landmask(i,j)
          grid%xb%xland(i,j) = grid%xland(i,j)
@@ -197,22 +200,22 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
          !                              
          !---------------------------------------------------------------------
 
-!#if 0
-!         grid%xb%tgrn(i,j) = grid%sst(i,j)
-!         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
-!         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
-!         grid%xb%landmask(i,j) = grid%landmask(i,j)
-!         grid%xb%xland(i,j) = grid%xland(i,j)
-!         grid%xb%snow(i,j)     = grid%snowc(i,j)
-!#endif 
+         !#if 0
+         !         grid%xb%tgrn(i,j) = grid%sst(i,j)
+         !         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
+         !         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
+         !         grid%xb%landmask(i,j) = grid%landmask(i,j)
+         !         grid%xb%xland(i,j) = grid%xland(i,j)
+         !         grid%xb%snow(i,j)     = grid%snowc(i,j)
+         !#endif 
 
          ! Since data is on full levels get full level pr & ht.
          ! Note p = A + B * Psfc formula needs Psfc to be in hPa 
 
          do K = ks,ke-1    
             PU  = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(i,j)/100.0
-            PD  = grid%xb%KMA_A(K  ) + grid%xb%KMA_B(K  )*grid%xb%psfc(i,j)/100.0
-            if (PU == PD )then
+            PD  = grid%xb%KMA_A(K ) + grid%xb%KMA_B(K )*grid%xb%psfc(i,j)/100.0
+            if (PU == PD)then
                message(1)='PU, PD equal and so denominator will be zero'
                write(unit=message(2),fmt='(A,3I5)') ' i, j, k = ',i,j,k
                write(unit=message(3),fmt='(A,2F10.2)') &
@@ -223,20 +226,20 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
                   ' psfc(Pa) = ',grid%xb%psfc(i,j)
                call da_error(__FILE__,__LINE__,message(1:5))
             end if
-            grid%xb%p(i,j,k)= 100.0 * exp ( ( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.0 )
+            grid%xb%p(i,j,k)= 100.0 * exp ((PD*LOG(PD)-PU*LOG(PU))/(PD-PU) -1.0)
          end do 
  
          grid%xb%p(i,j,ke) = 100.0*(grid%xb%KMA_A(ke)+grid%xb%KMA_B(ke)*grid%xb%psfc(i,j)/100.0)/2.0
 
          do k=ks,ke
-            if (grid%xb%t(i,j,k) <= 0.0 ) then
+            if (grid%xb%t(i,j,k) <= 0.0) then
                write(unit=message(1),fmt='(A,3I5,F10.2)') &
                   'Problem in  temp = ',i,j,k,grid%xb%t(i,j,k)   
                call da_error(__FILE__,__LINE__,message(1:1))
             end if
 
-            grid%xb%rho(i,j,k)=grid%xb%p(i,j,k)/( gas_constant*  &
-               (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K) )   
+            grid%xb%rho(i,j,k)=grid%xb%p(i,j,k)/(gas_constant*  &
+               (1.0+COEF*grid%xb%q(I,J,K))*grid%xb%t(I,J,K))   
          end do
 
          ! compute full level height
@@ -274,14 +277,14 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
    tmp_ps = sum(grid%xb%psfc(is:ie,js:je)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
 
-   tmpps = wrf_dm_sum_real( tmp_ps )
+   tmpps = wrf_dm_sum_real(tmp_ps)
 
    do k=ks,ke
       tmp_p = sum(grid%xb%p(is:ie,js:je,k)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
-      tmpp = wrf_dm_sum_real( tmp_p )
+      tmpp = wrf_dm_sum_real(tmp_p)
 
       ! 0.01 is added to see that sigmah should not become negative
-      grid%xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01 ) / (tmpps- ptop+0.01 ) 
+      grid%xb%sigmah(ke+ks-k) = (tmpp - ptop+0.01) / (tmpps- ptop+0.01) 
       if (grid%xb%sigmah(ke+ks-k) < 0.0) then
          write(unit=message(1),fmt='(A,F10.2)') &
             ' average surface pressure = ',tmpps  
@@ -345,34 +348,30 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
 
 #if 0
    ! Set proper value for "mminlu" if using KMA info
-!
-  xbx % mminlu = 'USGS'
-!------------------------------------------------------------------------------
-  call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
+
+   xbx % mminlu = 'USGS'
+   call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
 #ifdef DEREF_KLUDGE
-                            grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
+      grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
 #else
-                            grid%xb % lanu, grid%xb % rough)
+      grid%xb % lanu, grid%xb % rough)
 #endif
-!------------------------------------------------------------------------------
-!
+
 #endif
-!------------------------------------------------------------------------------
    do j=js,je
-   do i=is,ie
-      if( grid%xb%ztop < grid%xb%hf(i,j,ke+1) ) grid%xb%ztop = grid%xb%hf(i,j,ke+1)
-!------------------------------------------------------------------------------
-! Calculate grid_box area and vertical inner product for use in vertical transform:
-!------------------------------------------------------------------------------
-      grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
-   if ( vertical_ip == 1 ) then
+      do i=is,ie
+         if (grid%xb%ztop < grid%xb%hf(i,j,ke+1)) grid%xb%ztop = grid%xb%hf(i,j,ke+1)
+            ! Calculate grid_box area and vertical inner product for use in 
+            ! vertical transform:
+            grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
+            if (vertical_ip == 1) then
 
 !     Vertical inner product is sqrt(Delta p):
       do k=1,grid%xb%mkz
       grid%xb % vertical_inner_product(i,j,k) = sqrt(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
       end do
 
-   else if ( vertical_ip == 2 ) then
+   else if (vertical_ip == 2) then
 
 !     Vertical inner product is Delta p:
       do k=1,grid%xb%mkz
@@ -412,8 +411,8 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    do j=js,je
    do k=ks,ke
    do i=is,ie
-      call da_tpq_to_rh( grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
-                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k) )
+      call da_tpq_to_rh(grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
+                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k))
    end do
    end do
    end do
@@ -441,11 +440,11 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
       write (unit=stdout,fmt='(A)') ' '
    end if
 
-!------------------------------------------------------------------------------
-!--Sea level pressure and total precipitable water
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Sea level pressure and total precipitable water
+   !---------------------------------------------------------------------------
 
-   if(print_detail_xb) then
+   if (print_detail_xb) then
      write(unit=stdout, fmt='(3a, i8)') &
           'file:', __FILE__, ', line:', __LINE__
 
@@ -453,84 +452,70 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
           'Sea level pressure and total precipitable water'
    end if
 
-!------------------------------------------------------------------------------
-!  Syed RH Rizvi
-! 
-! Following code for calculating roughness length needs to be activated  
-! for calculating roughness length if sea level pressure is desired
-!
-#if 0
-   call da_wrf_tpq_2_slp ( grid%xb )
-!------------------------------------------------------------------------------
-!
-#endif
-!------------------------------------------------------------------------------
-   call da_integrat_dz( grid%xb )
-!------------------------------------------------------------------------------
-!  Syed RH Rizvi
-! 
-! Following code for calculating roughness length needs to be activated  
-! for surface wind speed for SFC_ASSIM_OPTIONS = 2 
-! 
-! It is not working because KMA terrain height output from wave to grid 
-! transform is negative at many grid points
-!
-#if 0
-!------------------------------------------------------------------------------
-   if(print_detail_xb) then
-     write(unit=stdout, fmt='(3a, i8)') &
-          'file:', __FILE__, ', line:', __LINE__
+   !---------------------------------------------------------------------------
+   !  Syed RH Rizvi
+   ! 
+   ! Following code for calculating roughness length needs to be activated  
+   ! for calculating roughness length if sea level pressure is desired
+   !---------------------------------------------------------------------------
 
-     write(unit=stdout, fmt='(a)') &
-          'Surface Wind speed'
-   end if
+   ! call da_wrf_tpq_2_slp (grid%xb)
 
-   tmpvar = log(10./0.0001)
-   do j=js,je
-   do i=is,ie
-      if(grid%xb%hf(i,j,ks) <= 0) then
-      print*,' zero hf at i/j ',i,j,' ks= ',ks
-      stop
-      end if
-      rgh_fac(i,j) = 1.0/log(grid%xb%hf(i,j,ks)/0.0001)
+   call da_integrat_dz(grid%xb)
+   !---------------------------------------------------------------------------
+   !  Syed RH Rizvi
+   ! 
+   ! Following code for calculating roughness length needs to be activated  
+   ! for surface wind speed for SFC_ASSIM_OPTIONS = 2 
+   ! 
+   ! It is not working because KMA terrain height output from wave to grid 
+   ! transform is negative at many grid points
+   !---------------------------------------------------------------------------
 
-      grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
-                         + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
-                    *tmpvar*rgh_fac(i,j)
-   end do
-   end do
-!------------------------------------------------------------------------------
-!
-#endif
-!------------------------------------------------------------------------------
-!------------------------------------------------------------------------------
-!------------------------------------------------------------------------------
-!  Syed RH Rizvi
-! 
-! Following code for calculating roughness length needs to be activated  
-! if SSMI brightness temperature are used
-! 
-#if 0
-!------------------------------------------------------------------------------
+   ! if (print_detail_xb) then
+   !    write(unit=stdout, fmt='(3a, i8)') &
+   !       'file:', __FILE__, ', line:', __LINE__ 
+   !   write(unit=stdout, fmt='(a)') &
+   !      'Surface Wind speed'
+   ! end if
 
-  if(print_detail_xb) then
-   write(unit=stdout, fmt='(3a, i8)') &
-   'file:', __FILE__, ', line:', __LINE__
+   ! tmpvar = log(10.0/0.0001)
+   ! do j=js,je
+   !    do i=is,ie
+   !       if (grid%xb%hf(i,j,ks) <= 0) then
+   !          write(unit=message(1), fmt=*) ' zero hf at i/j ',i,j,' ks= ',ks
+   !          call da_error(__FILE__,__LINE__,message(1:1))
+   !       end if
+   !       rgh_fac(i,j) = 1.0/log(grid%xb%hf(i,j,ks)/0.0001)
 
-    write(unit=stdout, fmt='(a)') &
-         'Brightness temperature'
- end if
-!
-  call da_transform_xtotb( xa )
-!------------------------------------------------------------------------------
-!
-#endif
-!------------------------------------------------------------------------------
+   !       grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
+   !          + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
+   !          *tmpvar*rgh_fac(i,j)
+   !    end do
+   ! end do
 
-!------------------------------------------------------------------------------
-!--Calculate means for later use in setting up background errors.
-!------------------------------------------------------------------------------
-   allocate ( xbx % latc_mean(grid%xp%jds:grid%xp%jde) )
+   !---------------------------------------------------------------------------
+   !  Syed RH Rizvi
+   ! 
+   ! Following code for calculating roughness length needs to be activated  
+   ! if SSMI brightness temperature are used
+   !---------------------------------------------------------------------------
+
+   ! if (print_detail_xb) then
+   !    write(unit=stdout, fmt='(3a, i8)') &
+   !       'file:', __FILE__, ', line:', __LINE__
+
+   !   write(unit=stdout, fmt='(a)') &
+   !      'Brightness temperature'
+   ! end if
+
+   ! call da_transform_xtotb(xa)
+
+   !---------------------------------------------------------------------------
+   ! Calculate means for later use in setting up background errors.
+   !---------------------------------------------------------------------------
+
+   allocate (xbx % latc_mean(grid%xp%jds:grid%xp%jde))
 
    tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
    loc_latc_mean(:) = 0.0
@@ -538,33 +523,35 @@ subroutine da_transfer_kmatoxb( xbx, grid, &
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .false. for a serial or 1-process MPI run.  
-   if ( testing_dm_exact ) then
-      allocate( arrayglobal( grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde ) )
-      call da_wv_patch_to_global( grid%xb%lat, arrayglobal, grid%xp%domdesc, &
-                               grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
-                               grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
-                               grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte )
+   if (testing_dm_exact) then
+      allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
+      call da_wv_patch_to_global(grid%xb%lat, arrayglobal, grid%xp%domdesc, &
+         grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
+         grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
+         grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte)
       do j=grid%xp%jds,grid%xp%jde
-         loc_latc_mean(j) = tmpvar*sum( arrayglobal(grid%xp%ids:grid%xp%ide, j) )
+         loc_latc_mean(j) = tmpvar*sum(arrayglobal(grid%xp%ids:grid%xp%ide, j))
       end do
-      deallocate( arrayglobal )
+      deallocate(arrayglobal)
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real( loc_latc_mean, (grid%xp%jde-grid%xp%jds+1) )
+      call wrf_dm_bcast_real(loc_latc_mean, (grid%xp%jde-grid%xp%jds+1))
       xbx % latc_mean = loc_latc_mean
    else
       do j=js,je
-         loc_latc_mean(j) = tmpvar*sum( grid%xb % lat(is:ie, j) )
+         loc_latc_mean(j) = tmpvar*sum(grid%xb % lat(is:ie, j))
       end do
-      call wrf_dm_sum_reals ( loc_latc_mean, xbx % latc_mean )
+      call wrf_dm_sum_reals (loc_latc_mean, xbx % latc_mean)
    end if
 
-!------------------------------------------------------------------------------
-    write(unit=stdout,fmt=*) 'js je is ie= ', js,je,is,ie
-!   do j=js,je
-!     do i=is,ie
-!       write(unit=stdout,fmt='(2i4,3f12.2,e12.4,2f12.2)') j,i,grid%xb%psfc(i,j),grid%xb%tsk(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
-!     end do
-!   end do
+   write(unit=stdout,fmt=*) 'js je is ie= ', js,je,is,ie
+
+   !  do j=js,je
+   !    do i=is,ie
+   !       write(unit=stdout,fmt='(2i4,3f12.2,e12.4,2f12.2)') &
+   !          j,i,grid%xb%psfc(i,j),grid%xb%tsk(i,j),grid%xb%t2(i,j), &
+   !          grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
+   !    end do
+   ! end do
 
    if (trace_use) call da_trace_exit("da_transfer_kmatoxb")
 

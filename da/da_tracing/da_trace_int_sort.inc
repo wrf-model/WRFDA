@@ -1,7 +1,11 @@
-subroutine da_trace_int_sort( &
+subroutine da_trace_int_sort(&
    key, &
    n, &
    index)
+
+   !----------------------------------------------------------------------
+   ! Purpose: sort integers for tracing
+   !----------------------------------------------------------------------
 
    implicit none
 

@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmt2 ( xa, iv, xp, y )
+subroutine da_transform_xtoy_ssmt2 (xa, iv, xp, y)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_ssmt2 ( xa, iv, xp, y )
    real                         :: dy, dym  !
    
 
-   if ( iv%num_ssmt2 > 0 ) then
+   if (iv%num_ssmt2 > 0) then
       do n=1, iv % num_ssmt2
          y%ssmt2(n)%rh(:) = 0.0
 

@@ -1,4 +1,4 @@
-subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
+subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
                      hs, roughness, xland, &
                      u10, v10, t2, q2, regime) 
 
@@ -94,11 +94,11 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    z0 = roughness
 
-   if ( z0 < 0.0001) z0 = 0.0001
+   if (z0 < 0.0001) z0 = 0.0001
 
    ! 1.2 Define the rouhgness length for moisture
 
-   if (xland .ge. 1.5 ) then
+   if (xland .ge. 1.5) then
       zq0 = z0
    else
       zq0 =  zint0
@@ -125,7 +125,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    ! 2.3 Convert ground virtual temperature assuming it's saturated
 
-   call da_tp_to_qs( tg, psfc, eg, qg )
+   call da_tp_to_qs(tg, psfc, eg, qg)
    tvg  = tg * (1. + 0.608 * qg)
 
    ! 3.  Compute the potential temperature
@@ -163,7 +163,7 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    !  
    !     Convective velocity:
 
-   if (thvg >= thvs ) then
+   if (thvg >= thvs) then
       Vc2 = 4. * (thvg - thvs)
    else
       Vc2 = 0.
@@ -196,9 +196,9 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       ! 6.2 Mechanically driven turbulence (REGIME 2)
 
       regime = 2.1
-      psim = ( -5. * rib ) * gzsoz0 / (1.1 - 5.*rib)
-      psimz = ( -5. * rib ) * gz10oz0 / (1.1 - 5.*rib)
-      psim2 = ( -5. * rib ) * gz2oz0 / (1.1 - 5.*rib)
+      psim = (-5. * rib) * gzsoz0 / (1.1 - 5.*rib)
+      psimz = (-5. * rib) * gz10oz0 / (1.1 - 5.*rib)
+      psim2 = (-5. * rib) * gz2oz0 / (1.1 - 5.*rib)
 
       psim = max(psim,-10.)
       psimz = max(psimz,-10.)
@@ -234,18 +234,18 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
       ! Friction speed
 
-      ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+      ust = k_kar * sqrt(v2) /(gzsoz0 - psim)
 
       ! Heat flux factor
  
-      mol = k_kar * (ths - thg )/( gzsoz0 - psih)
+      mol = k_kar * (ths - thg)/(gzsoz0 - psih)
 
       ! Ratio of PBL height to Monin-Obukhov length
 
-      if ( ust .LT. 0.01 ) then
+      if (ust .LT. 0.01) then
          hol = rib * gzsoz0
       else
-         hol = k_kar * gravity * hs * mol / ( ths * ust * ust )
+         hol = k_kar * gravity * hs * mol / (ths * ust * ust)
       end if
 
       ! 6.4.2  Calculate n, nz, R, Rz
@@ -264,10 +264,10 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       ! 6.4.3 Calculate Psim & psih
 
       !       Using the look-up table:
-      !          nn = int( -100. * hol )
-      !          rr = ( -100. * hol ) - nn
-      !          psim = psimtb(nn) + rr * ( psimtb(nn+1) - psimtb(nn))
-      !          psih = psihtb(nn) + rr * ( psihtb(nn+1) - psihtb(nn))
+      !          nn = int(-100. * hol)
+      !          rr = (-100. * hol) - nn
+      !          psim = psimtb(nn) + rr * (psimtb(nn+1) - psimtb(nn))
+      !          psih = psihtb(nn) + rr * (psihtb(nn+1) - psihtb(nn))
       !       Using the continuous function:
       xx = (1. - 16. * hol) ** 0.25
       yy = log((1.+xx*xx)/2.)
@@ -275,10 +275,10 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psih = 2. * yy
 
       !       Using the look-up table:
-      !          nz = int( -100. * holz )
-      !          rz = ( -100. * holz ) - nz
-      !          psimz = psimtb(nz) + rz * ( psimtb(nz+1) - psimtb(nz))
-      !          psihz = psihtb(nz) + rz * ( psihtb(nz+1) - psihtb(nz))
+      !          nz = int(-100. * holz)
+      !          rz = (-100. * holz) - nz
+      !          psimz = psimtb(nz) + rz * (psimtb(nz+1) - psimtb(nz))
+      !          psihz = psihtb(nz) + rz * (psihtb(nz+1) - psihtb(nz))
       !       Using the continuous function:
       xx = (1. - 16. * holz) ** 0.25
       yy = log((1.+xx*xx)/2.)
@@ -286,10 +286,10 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psihz = 2. * yy
 
       !       Using the look-up table:
-      !          n2 = int( -100. * hol2 )
-      !          r2 = ( -100. * hol2 ) - n2
-      !          psim2 = psimtb(n2) + r2 * ( psimtb(n2+1) - psimtb(n2))
-      !          psih2 = psihtb(n2) + r2 * ( psihtb(n2+1) - psihtb(n2))
+      !          n2 = int(-100. * hol2)
+      !          r2 = (-100. * hol2) - n2
+      !          psim2 = psimtb(n2) + r2 * (psimtb(n2+1) - psimtb(n2))
+      !          psih2 = psihtb(n2) + r2 * (psihtb(n2+1) - psihtb(n2))
       !       Using the continuous function:
       xx = (1. - 16. * hol2) ** 0.25
       yy = log((1.+xx*xx)/2.)
@@ -316,16 +316,16 @@ subroutine da_sfc_wtq ( psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    psit2 = gz2oz0 - psih2
 
    ! Friction speed
-   ust = k_kar * sqrt(v2) /( gzsoz0 - psim)
+   ust = k_kar * sqrt(v2) /(gzsoz0 - psim)
 
-   psiq  = log(k_kar*ust*hs/ka + hs / zq0 ) - psih
-   psiq2 = log(k_kar*ust*h2/ka + h2 / zq0 ) - psih2
+   psiq  = log(k_kar*ust*hs/ka + hs / zq0) - psih
+   psiq2 = log(k_kar*ust*h2/ka + h2 / zq0) - psih2
 
    ! 8.  CALCULATE 10M WinD, 2M TEMPERATURE AND MOISTURE
 
    u10 = us * psiz / psiw
    v10 = vs * psiz / psiw
-   t2 = ( thg + ( ths - thg )*psit2/psit)*((psfc/100.)/1000.)**rcp
+   t2 = (thg + (ths - thg)*psit2/psit)*((psfc/100.)/1000.)**rcp
    q2 = qg + (qs - qg)*psiq2/psiq 
 
 end subroutine da_sfc_wtq

@@ -1,10 +1,7 @@
-subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_bogus_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------
-   !  This subroutine is the adjoint of bogus observation operators.
-   !  It includes slp, winds.          Ying Zhang, September 2003.
-   !  Port the algorithm to WRF frame. Xiaoyan Zhang and Qingnong Xiao, February 2005.
-   !  Modified to be standard structure by Y.-R. Guo   06/21/2005
+   ! Purpose: the adjoint of bogus observation operators.
    !---------------------------------------------------------------------
 
    implicit none
@@ -26,14 +23,12 @@ subroutine da_transform_xtoy_bogus_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    real, dimension(xp%kms:xp%kme) :: model_p_c,pp
    real                           :: psfc_loc,terr_loc,ppsfc                     
 
-   if ( iv%num_bogus > 0 ) then
-!xyh      do n=1, iv % num_bogus
-
+   if (iv%num_bogus > 0) then
       do n= iv%ob_numb(iv%current_ob_time-1)%bogus+1, iv%ob_numb(iv%current_ob_time)%bogus
 
          num_levs = iv % bogus(n) % info % levels
 
-         if ( num_levs < 1 ) cycle
+         if (num_levs < 1) cycle
 
          ! [1.1] Get cross pt. horizontal interpolation weights:
 

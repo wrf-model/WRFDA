@@ -54,7 +54,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
       return
    end if
 
-   REWinD (unit = iunit)
+   rewind (unit = iunit)
 
    ! 2.  read HEADER
    ! ===============
@@ -147,21 +147,21 @@ subroutine da_scan_ssmi (ob, xp, filename)
       ob % total_obs = ob % total_obs + 1
 
       select case(fm)
-         case (125)    ;
-            ! read SURFACE WinD SPEED AND PRECIPITABLE WATER
-            read (unit=iunit, fmt = fmt_loc) speed, tpw
-         case (126)    ;
-            read (unit=iunit, fmt = fmt_loc) &
-               tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
-         case default;
-            write(unit=stdout, fmt='(/a/)') &
-                 'WARNinG   WARNinG   WARNinG   WARNinG   WARNinG :'
-            write(unit=stdout, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
-            write(unit=stdout, fmt='(a, 2f12.6)') &
-                 'info%(lon,lat)=', info%lon, info%lat
+      case (125)    ;
+         ! read SURFACE WinD SPEED AND PRECIPITABLE WATER
+         read (unit=iunit, fmt = fmt_loc) speed, tpw
+      case (126)    ;
+         read (unit=iunit, fmt = fmt_loc) &
+            tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
+      case default;
+         write(unit=stdout, fmt='(/a/)') &
+              'warning   warning   warning   warning   warning :'
+         write(unit=stdout, fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
+         write(unit=stdout, fmt='(a, 2f12.6)') &
+              'info%(lon,lat)=', info%lon, info%lat
       end select
 
-      ! CHECK if OBS IS in HORIZONTAL doMAin
+      ! check if obs is in horizontal domain
       ! ====================================
 
       ! Compute the model horizontal coordinate x, y
@@ -169,65 +169,62 @@ subroutine da_scan_ssmi (ob, xp, filename)
 
       call da_ll_to_xy (info, loc, xp, outside)
 
-      if ( outside ) cycle reports
+      if (outside) cycle reports
 
       select case(fm)
-         case (125) ;
-            if ( .not. Use_SsmiRetrievalObs ) cycle reports
+      case (125) ;
+         if (.not. Use_SsmiRetrievalObs) cycle reports
 
-            ! Check if at least one field is present
-            if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
-               cycle reports
-            end if
+         ! Check if at least one field is present
+         if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
+            cycle reports
+         end if
 
-            ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
+         ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
 
-         case (126) ;
-            if ( .not. Use_SsmiTbObs ) cycle reports
+      case (126) ;
+         if (.not. Use_SsmiTbObs) cycle reports
 
-            ! Check if at least one field is present
+         ! Check if at least one field is present
 
-            if ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
-                (tb22v % qc == missing)                                .AND. &
-                (tb37v % qc == missing) .AND. (tb37h % qc == missing)  .AND. &
-                (tb85v % qc == missing) .AND. (tb85h % qc == missing)) then
-                 cycle reports
-            end if
+         if ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
+             (tb22v % qc == missing)                                .AND. &
+             (tb37v % qc == missing) .AND. (tb37h % qc == missing)  .AND. &
+             (tb85v % qc == missing) .AND. (tb85h % qc == missing)) then
+              cycle reports
+         end if
 
-           ! FILTER RAin PIXELS
-           ! ====================================
+        ! FILTER RAin PIXELS
+        ! ====================================
 
-             if (isfilter) then
+          if (isfilter) then
 
-               ipass = .false.
-               iprecip = 0
-                call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
-                            tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
-                            info%lat)
-               if (iprecip == 1) then
-                   irain = irain + 1
-                   cycle reports
-                end if
+            ipass = .false.
+            iprecip = 0
+             call filter(tb19v%inv, tb19h%inv, tb22v%inv, tb37v%inv, &
+                         tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
+                         info%lat)
+            if (iprecip == 1) then
+                irain = irain + 1
+                cycle reports
              end if
+          end if
 
-            ob % num_ssmi_tb = ob % num_ssmi_tb + 1
+         ob % num_ssmi_tb = ob % num_ssmi_tb + 1
 
-         case default;
-            !---------Do nothing.
+      case default;
+         ! Do nothing.
       end select
 
    end do reports
 
    close(unit=iunit)
    call da_free_unit(iunit)
-   
-   ! PRinT out
-   ! =========
  
    write(unit=stdout, fmt='(5x,a,i6,a)') &
-        'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-        'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
-        'Read:  ', ob % total_obs, ' Total Observations.'
+      'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
+      'Read:  ', ob % num_ssmi_tb ,        ' SSMI_Tb reports,', &
+      'Read:  ', ob % total_obs, ' Total Observations.'
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') &
       '** Rain contaminated SSMI_Tb =', irain

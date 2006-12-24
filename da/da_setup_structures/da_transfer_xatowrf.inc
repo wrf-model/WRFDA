@@ -1,7 +1,7 @@
-subroutine da_transfer_xatowrf( xbx, grid, &
+subroutine da_transfer_xatowrf(xbx, grid, &
 #include "em_dummy_new_args.inc"
 !
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Convert analysis increments into WRF increments
@@ -9,8 +9,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    implicit none
    
-   type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
-
+   type (xbx_type), intent(inout)     :: xbx     ! Header & non-gridded vars.
    type(domain), intent(inout)        :: grid
 
    ! Definitions of dummy arguments to solve
@@ -25,10 +24,11 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    ! arrays to hold wrf increments on the c-grid 
 
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: &
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme) :: &
       u_cgrid, v_cgrid, q_cgrid, ph_cgrid
 
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)               :: mu_cgrid
+   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme) :: mu_cgrid
 
    real    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
@@ -63,7 +63,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            if((grid%xb%q(i,j,k)+grid%xa%q(i,j,k)) < 0.0) then
+            if ((grid%xb%q(i,j,k)+grid%xa%q(i,j,k)) < 0.0) then
                q_cgrid(i,j,k) =-grid%xb%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
             else
                q_cgrid(i,j,k) = grid%xa%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
@@ -106,8 +106,8 @@ subroutine da_transfer_xatowrf( xbx, grid, &
          qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
          qvf1_b = qvf1_b*qvf2_b
          grid%xa%p(i,j,k) = (-0.5/grid%em_rdnw(k)) * &
-                    ( (mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
-                     -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
+                    ((mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
+                     -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b))
 
          do k = ke-1,1,-1
             qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
@@ -118,20 +118,20 @@ subroutine da_transfer_xatowrf( xbx, grid, &
             qvf1_b = qvf1_b*qvf2_b
             grid%xa%p(i,j,k) = grid%xa%p(i,j,k+1)  &
                        - (1./grid%em_rdn(k+1)) * &
-                       ( (mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
-                        -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b) )
+                       ((mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
+                        -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b))
          end do
       end do
    end do
 
    ! Adjust grid%xa%q to make grid%xb%q + grid%xa%q > 0.0
 
-   if ( check_rh == 2 ) then
+   if (check_rh == 2) then
       ! Shu-Hua~s TPW conservation:
-      call da_check_rh( grid%xb, grid%xa, grid%xp )
-   else if ( check_rh == 1 ) then
+      call da_check_rh(grid%xb, grid%xa, grid%xp)
+   else if (check_rh == 1) then
       ! Simple resetting to max/min values:
-      call da_check_rh_simple( grid%xb, grid%xa, grid%xp )
+      call da_check_rh_simple(grid%xb, grid%xa, grid%xp)
    end if
 
    do k=ks,ke
@@ -236,7 +236,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
 
    if (write_increments) then
       write(unit=stdout,fmt='(/"Write out increment for plotting......")')
-      call da_write_increments ( grid%xp, grid%xb, grid%xa, q_cgrid, mu_cgrid, ph_cgrid )
+      call da_write_increments (grid%xp, grid%xb, grid%xa, q_cgrid, mu_cgrid, ph_cgrid)
    end if
 
    ! CONVERT FROM A-GRID TO C-GRID
@@ -254,25 +254,25 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    ! Fill the boundary
 
    ! The southern boundary
-   if(js == grid%xp%jds) then
+   if (js == grid%xp%jds) then
       grid%xa%v(is:ie,js-1,ks:ke)=2.0*grid%xa%v(is:ie,js  ,ks:ke) &
                             -    grid%xa%v(is:ie,js+1,ks:ke)
    end if
 
    ! The northern boundary
-   if(je == grid%xp%jde) then
+   if (je == grid%xp%jde) then
       grid%xa%v(is:ie,je+1,ks:ke)=2.0*grid%xa%v(is:ie,je  ,ks:ke) &
                             -    grid%xa%v(is:ie,je-1,ks:ke)
    end if
 
    ! The western boundary
-   if(is == grid%xp%ids) then
+   if (is == grid%xp%ids) then
       grid%xa%u(is-1,js:je,ks:ke)=2.0*grid%xa%u(is  ,js:je,ks:ke) &
                             -    grid%xa%u(is+1,js:je,ks:ke)
    end if
 
    ! The eastern boundary
-   if(ie == grid%xp%ide) then
+   if (ie == grid%xp%ide) then
       grid%xa%u(ie+1,js:je,ks:ke)=2.0*grid%xa%u(ie  ,js:je,ks:ke) &
                             -    grid%xa%u(ie-1,js:je,ks:ke)
    end if
@@ -291,7 +291,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    !------------------------------------------------------------------------
 
    ! The northern boundary
-   if(je == grid%xp%jde) then
+   if (je == grid%xp%jde) then
       u_cgrid(is:ie+1,je+1,ks:ke)=0.0
    end if
 
@@ -318,32 +318,32 @@ subroutine da_transfer_xatowrf( xbx, grid, &
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)
             moist(i,j,k,P_QV) = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
             ! make sure qv is positive.
-            if(moist(i,j,k,P_QV) < 1.0e-6) moist(i,j,k,P_QV) = 1.0e-6
+            if (moist(i,j,k,P_QV) < 1.0e-6) moist(i,j,k,P_QV) = 1.0e-6
 
-            if ( size(moist,dim=4) >= 4 ) then
+            if (size(moist,dim=4) >= 4) then
                moist(i,j,k,p_qc) = moist(i,j,k,p_qc) + grid%xa%qcw(i,j,k)
                moist(i,j,k,p_qr) = moist(i,j,k,p_qr) + grid%xa%qrn(i,j,k)
-               if(moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
-               if(moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
+               if (moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
+               if (moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
             end if
 
-            if ( size(moist,dim=4) >= 6 ) then
+            if (size(moist,dim=4) >= 6) then
                moist(i,j,k,p_qi) = moist(i,j,k,p_qi) + grid%xa%qci(i,j,k)
                moist(i,j,k,p_qs) = moist(i,j,k,p_qs) + grid%xa%qsn(i,j,k)
-               if(moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
-               if(moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
+               if (moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
+               if (moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
             end if
 
-            if ( size(moist,dim=4) >= 7 ) then
+            if (size(moist,dim=4) >= 7) then
                moist(i,j,k,p_qg) = moist(i,j,k,p_qg) + grid%xa%qgr(i,j,k)
-               if(moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
+               if (moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
             end if
          end do
       end do
    end do
 
    ! The northern boundary
-   if(je == grid%xp%jde) then
+   if (je == grid%xp%jde) then
       j=je+1
       do k=ks,ke
          do i=is,ie
@@ -353,7 +353,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
    end if
 
    ! The eastern boundary
-   if(ie == grid%xp%ide) then
+   if (ie == grid%xp%ide) then
       i=ie+1
       do k=ks,ke
          do j=js,je
@@ -362,10 +362,10 @@ subroutine da_transfer_xatowrf( xbx, grid, &
       end do
    end if
 
-   if(print_detail_xa) then
+   if (print_detail_xa) then
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
-      if(ie == grid%xp%ide) then
+      if (ie == grid%xp%ide) then
          print *, ' '
 
          do k=ks+5,ke,10
@@ -378,7 +378,7 @@ subroutine da_transfer_xatowrf( xbx, grid, &
          end do
       end if
 
-      if(je == grid%xp%jde) then
+      if (je == grid%xp%jde) then
          write(unit=stdout, fmt=*) ' '
 
          do k=ks+5,ke,10

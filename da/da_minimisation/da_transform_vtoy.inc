@@ -1,8 +1,8 @@
-subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
+subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
                               xp, y, ids, ide, jds, jde, kds, kde,  &
                               ims, ime, jms, jme, kms, kme,  &
                               its, ite, jts, jte, kts, kte,  &
-                              grid, config_flags )
+                              grid, config_flags)
 
    !----------------------------------------------------------------------
    ! Purpose:  Does transform of control variable (V) to Obs-space (Y)
@@ -37,15 +37,15 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
    call da_trace_entry("da_transform_vtoy")
 
-   call da_transform_vtox( cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa,  &
+   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa,  &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
-                           its, ite, jts, jte, kts, kte )
+                           its, ite, jts, jte, kts, kte)
 
    if (var4d) then
-      call da_transfer_xatowrftl( grid, config_flags, 'tl01', &
+      call da_transfer_xatowrftl(grid, config_flags, 'tl01', &
 #include "em_actual_new_args.inc"
-                                 )
+                                )
 
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
@@ -56,7 +56,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
             call da_system("rm -rf tl/wrf_done")
             call da_system("touch tl/wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
-            do while ( .true. )
+            do while (.true.)
                open(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
                close(wrf_done_unit)
                exit
@@ -65,7 +65,7 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
             end do
             call da_free_unit(wrf_done_unit)
          end if
-         call mpi_barrier( comm, ierr )
+         call mpi_barrier(comm, ierr)
 
          call da_system_4dvar("da_run_wrfplus_tl.ksh post ")
       else
@@ -79,13 +79,13 @@ subroutine da_transform_vtoy( cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
       do nobwin=1, num_fgat_time
          iv%current_ob_time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
-         call da_transfer_wrftltoxa( grid, config_flags, filnam, &
+         call da_transfer_wrftltoxa(grid, config_flags, filnam, &
 #include "em_actual_new_args.inc"
-                                 )
-         call da_transform_xtoy( xb, iv, xa, xp, y )
+                                )
+         call da_transform_xtoy(xb, iv, xa, xp, y)
       end do
    else  ! not var4d
-      call da_transform_xtoy( xb, iv, xa, xp, y )
+      call da_transform_xtoy(xb, iv, xa, xp, y)
    end if ! var4d
 
    call da_trace_exit("da_transform_vtoy")

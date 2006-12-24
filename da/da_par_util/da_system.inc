@@ -1,6 +1,7 @@
 subroutine da_system(cmd)
 
    implicit none
+
    character (len=*) , intent(in) :: cmd
    integer :: ierr
 
@@ -8,7 +9,7 @@ subroutine da_system(cmd)
    call pxfsystem(cmd, len(cmd), ierr)
 #else
    call system(cmd)
-#endif
+#end if
 
 end subroutine da_system
 

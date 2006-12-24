@@ -1,8 +1,8 @@
-subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
+subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
                                 vp, vv, mz, &
                                 kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
+                                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Transform from fields on vertical levels to fields on vertical 
@@ -32,7 +32,7 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
    ! [1.0] Apply inner-product weighting if vertical_ip > 0:
    !------------------------------------------------------------------- 
 
-   if ( vertical_ip /= 0 ) then
+   if (vertical_ip /= 0) then
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) * &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)
    end if
@@ -44,7 +44,7 @@ subroutine da_transform_vptovv( evec, eval, vertical_wgt, &
    do m = 1, mz
       do j = jts, jte
          do i = its, ite
-            ETVp = sum( evec(j,kts:kte,m) * vp(i,j,kts:kte) )
+            ETVp = sum(evec(j,kts:kte,m) * vp(i,j,kts:kte))
             vv(i,j,m) = ETVp / eval(j,m)
          end do
       end do

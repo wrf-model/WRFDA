@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_synop ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_synop (xa, xb, iv, xp, y)
 
    implicit none
 
@@ -63,7 +63,7 @@ subroutine da_transform_xtoy_synop ( xa, xb, iv, xp, y )
          end do
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
-            call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n) )
+            call da_transform_xtopsfc(xb, xa, xp, iv%synop(n), y%synop(n))
          end do
       end if
    end if

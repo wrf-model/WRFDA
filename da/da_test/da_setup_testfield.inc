@@ -1,7 +1,7 @@
-subroutine da_setup_testfield( xb, xa, xp, &
+subroutine da_setup_testfield(xb, xa, xp, &
                               ids,ide, jds,jde, kds,kde, &
                               ims,ime, jms,jme, kms,kme, &
-                              its,ite, jts,jte, kts,kte )
+                              its,ite, jts,jte, kts,kte)
 
    !----------------------------------------------------------------------------
    ! PURPOSE: produce test increment field based on xb field.
@@ -60,16 +60,16 @@ subroutine da_setup_testfield( xb, xa, xp, &
    call da_set_tst_trnsf_fld(xp, xa%qcw(ims,jms,kms), xb%qcw(ims,jms,kms), typical_qcw_rms)
    call da_set_tst_trnsf_fld(xp, xa%qrn(ims,jms,kms), xb%qrn(ims,jms,kms), typical_qrn_rms)
 
-#endif
+#end if
 
    ! [2.5] get test density increment from linearised ideal gas law:
 
-   call da_pt_to_rho_lin( xb, xa, xp )
+   call da_pt_to_rho_lin(xb, xa, xp)
 
    xa%psfc(xp%its:xp%ite, xp%jts:xp%jte) = &
    xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
 
-   if(print_detail_testing) then
+   if (print_detail_testing) then
       write(unit=stdout, fmt='(2a,4x,a,i8)') &
          'file:', __FILE__, 'line:', __LINE__
 
@@ -78,7 +78,7 @@ subroutine da_setup_testfield( xb, xa, xp, &
    
       do j=xp%jts, xp%jte
          do i=xp%its, xp%ite
-            if(i == j) then
+            if (i == j) then
                write(unit=stdout, fmt='(2(a,i4),a,f14.6)') &
                   'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
             end if
@@ -86,30 +86,30 @@ subroutine da_setup_testfield( xb, xa, xp, &
       end do
    end if
 
-   !--Exchange XA halo region.
+   ! Exchange XA halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
 
    if (sfc_assi_options == 2) then
-      !-----Exchange XA (surface variable) halo region.
+      ! Exchange XA (surface variable) halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    end if
 
-   if ( use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
-        Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
+   if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
+        Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
 
-      !-----Now do something for PW
-      call da_transform_xtotpw( xa, xb )
+      ! Now do something for PW
+      call da_transform_xtotpw(xa, xb)
 
-      !--------GPS Refractivity:
-      if ( use_GpsrefObs ) &
+      ! GPS Refractivity:
+      if (use_GpsrefObs) &
          call da_transform_xtogpsref_lin(xa, xb, xp)
 
-      if ( use_ssmt1obs .or. use_ssmt2obs .or. &
-           Use_SsmiTbObs .or. Use_SsmiRetrievalObs ) then
-         call da_transform_xtoseasfcwind_lin( xa, xb )
+      if (use_ssmt1obs .or. use_ssmt2obs .or. &
+           Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
+         call da_transform_xtoseasfcwind_lin(xa, xb)
       end if
 
-      !-----Exchange XA halo region.
+      ! Exchange XA halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
    end if
 

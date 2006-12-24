@@ -1,11 +1,11 @@
-subroutine da_prho_to_t_adj( xb, xp, xa ) 
+subroutine da_prho_to_t_adj(xb, xp, xa) 
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint of da_prho_to_t.
    !
    !  METHOD:  Standard adjoint coding.
    !
-   !  ASsumPTIONS: 1) Model level stored top down.
+   !  ASSUMPTIONS: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -38,11 +38,11 @@ subroutine da_prho_to_t_adj( xb, xp, xa )
       ie = xb%ite+1
       je = xb%jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if (is < xb%ids) is = xb%ids
+      if (js < xb%jds) js = xb%jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if (ie > xb%ide) ie = xb%ide
+      if (je > xb%jde) je = xb%jde
    end if
 
    !---------------------------------------------------------------------------
@@ -50,7 +50,6 @@ subroutine da_prho_to_t_adj( xb, xp, xa )
    !---------------------------------------------------------------------------
 
    do k = ks, ke
-   
       temp(is:ie,js:je) = xa % t(is:ie,js:je,k) * xb % t(is:ie,js:je,k)
 
       xa % p(is:ie,js:je,k) = xa % p(is:ie,js:je,k) + &

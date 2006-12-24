@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_metar ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_metar (xa, xb, iv, xp, y)
 
    implicit none
 
@@ -15,7 +15,7 @@ subroutine da_transform_xtoy_metar ( xa, xb, iv, xp, y )
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_metar")
 
-   if ( iv%num_metar > 0 ) then
+   if (iv%num_metar > 0) then
 
       !xyh      y%metar(:)%u = 0.0
       !xyh      y%metar(:)%v = 0.0

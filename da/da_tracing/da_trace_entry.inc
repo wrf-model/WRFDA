@@ -1,21 +1,18 @@
-! Trace entry point to subroutine
-
-subroutine da_trace_entry( &
+subroutine da_trace_entry(&
    Name, &                       ! in
    Message, &                    ! in, optional
    Messages, &                   ! in, optional
    MaxNoCalls)                   ! in, optional
 
+   ! Trace entry point to subroutine
+
    implicit none
 
-   ! Arguments (order does not obey coding standard, special case)
-
-   character (LEN=*),           intent(in) :: Name         ! Routine name
-   character (LEN=*), optional, intent(in) :: Message      ! message
-   character (LEN=*), optional, intent(in) :: Messages(:)  ! message array
+   character (len=*),           intent(in) :: Name         ! Routine name
+   character (len=*), optional, intent(in) :: Message      ! message
+   character (len=*), optional, intent(in) :: Messages(:)  ! message array
    integer, optional,           intent(in) :: MaxNoCalls   ! max no calls to show
 
-   ! Local variables
 
    integer           :: IOStatus        ! I-O return code
    integer           :: Loop            ! General loop counter
@@ -28,15 +25,11 @@ subroutine da_trace_entry( &
    real              :: temp2
    logical           :: NewRoutine
 
-   !-----------------------------------------------------------------------
-   ! Start of code
-   !-----------------------------------------------------------------------
-
    ! Stop the clock
 
    call CPU_TIME(CPUTime1)
 
-   call SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK(&
       COUNT=Count)
 
    !-----------------------------------------------------------------------
@@ -93,7 +86,7 @@ subroutine da_trace_entry( &
 
    if (NewRoutine) then
       ! New subroutine entered
-      if( NoRoutines >= MaxNoRoutines )then ! too many to trace
+      if (NoRoutines >= MaxNoRoutines)then ! too many to trace
           call da_error(__FILE__,__LINE__, &
              (/"Too many routines. Not timing " // Name/))
 
@@ -118,7 +111,7 @@ subroutine da_trace_entry( &
    CalledBy(Pointer)=OldPointer
 
    if (trace_memory) then
-      call da_memory( &
+      call da_memory(&
          TotalSpace)
       EntryHeap(Pointer) = TotalSpace
       LastSpace = TotalSpace
@@ -129,7 +122,7 @@ subroutine da_trace_entry( &
       TotalSpace = 0
    end if
 
-   if (trace_write .AND. TraceDepth <= trace_max_depth ) then
+   if (trace_write .AND. TraceDepth <= trace_max_depth) then
 
       if (present(MaxNoCalls)) then
          LocalMaxNoCalls = MaxNoCalls
@@ -193,7 +186,7 @@ subroutine da_trace_entry( &
 
    TraceDepth=TraceDepth+1
 
-   call SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK(&
       COUNT=Count)
 
    call CPU_TIME(CPUTime1)

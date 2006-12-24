@@ -1,4 +1,4 @@
-subroutine da_read_filtered_rad( xp, iv )
+subroutine da_read_filtered_rad(xp, iv)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: read in QCed radiance data from separated PEs 
@@ -27,7 +27,7 @@ subroutine da_read_filtered_rad( xp, iv )
       write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin_', myproc
 #else
       write(filename, '(a)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
-#endif
+#end if
 
       if (print_detail_radiance) then
          write(unit=stdout,fmt=*) 'Reading in ', trim(filename) 
@@ -39,22 +39,22 @@ subroutine da_read_filtered_rad( xp, iv )
          write(unit=stdout,fmt=*) 'Can not open filtered radiance file ', filename
          iv%instid(n)%num_rad = 0
          cycle
-      endif
+      end if
 
-      read(UNIT=filtered_rad_unit) iv%instid(n)%num_rad
+      read(unit=filtered_rad_unit) iv%instid(n)%num_rad
       if (iv%instid(n)%num_rad < 1) cycle
       if (print_detail_radiance) then
          write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
                                n, iv%instid(n)%rttovid_string, iv%instid(n)%num_rad
       end if
-      allocate( iv%instid(n)%rad(1:iv%instid(n)%num_rad), stat = ierr )
+      allocate(iv%instid(n)%rad(1:iv%instid(n)%num_rad), stat = ierr)
       if (ierr /= 0) then
         call da_error(__FILE__,__LINE__, &
            (/"Canot allocate memory to iv%instid(i)%rad"/))
       end if
 
       do i =1,iv%instid(n)%num_rad
-         allocate ( iv%instid(n)%rad(i)%tb(1:iv%instid(n)%nchan) )
+         allocate (iv%instid(n)%rad(i)%tb(1:iv%instid(n)%nchan))
          read(unit=filtered_rad_unit) ndomain, &
                   iv%instid(n)%rad(i)%info%date_char, &
                   iv%instid(n)%rad(i)%scanpos       , &

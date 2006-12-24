@@ -28,12 +28,12 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
 
    iost = -99999
 
-   ! 1. open FILE
+   ! 1. open file
    !    ---------
 
-   if( use_ssmiretrievalobs .or. use_ssmitbobs .or. &
-       use_ssmt1obs .or. use_ssmt2obs ) then
-      open ( unit   = iunit,     &
+   if (use_ssmiretrievalobs .or. use_ssmitbobs .or. &
+       use_ssmt1obs .or. use_ssmt2obs) then
+      open (unit   = iunit,     &
            FORM   = 'FORMATTED',  &
            ACCESS = 'SEQUENTIAL', &
            iostat =  iost,     &
@@ -51,18 +51,18 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       return
    end if
 
-   REWinD (unit = iunit)
+   rewind (unit = iunit)
 
 
-   ! 2.  read HEADER
+   ! 2.  read header
    ! ===============
 
-   ! 2.1 read FIRST LINE
+   ! 2.1 read first line
    !     ---------------
 
-   read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
+   read (unit = iunit, fmt = '(a)', iostat = iost) char_ned
 
-   ! 2.2 PROCESS ERROR
+   ! 2.2 process error
    !     -------------
 
    if (iost /= 0) then
@@ -85,52 +85,50 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    !     ---------------------
 
    do
- 
       do i = 0, 120-14
-
-         select case ( char_ned (I+1:I+5) )
+         select case (char_ned (I+1:I+5))
          ! Number of observations
-            case ('SSMI ') ; 
-               if (Use_SsmiRetrievalObs) &
-                  read (char_ned (I+9:I+14),'(I6)', iostat = iost) &
-                     ob%num_ssmi_retrieval
-               if (Use_SsmiTbObs) then
-                  read (char_ned (I+9:I+14),'(I6)', iostat = iost) ob%num_ssmi_tb
-               end if
-            case ('OTHER') ; 
-               read (char_ned (I+9:I+14),'(I6)', iostat = iost) nothers
+         case ('SSMI ') ; 
+            if (Use_SsmiRetrievalObs) &
+               read (char_ned (I+9:I+14),'(I6)', iostat = iost) &
+                  ob%num_ssmi_retrieval
+            if (Use_SsmiTbObs) then
+               read (char_ned (I+9:I+14),'(I6)', iostat = iost) ob%num_ssmi_tb
+            end if
+         case ('OTHER') ; 
+            read (char_ned (I+9:I+14),'(I6)', iostat = iost) nothers
 
-               ! Geographic area and reference atmosphere definition
+            ! Geographic area and reference atmosphere definition
 
-            case ('MISS.') ; 
-                read (char_ned (I+8:I+15),'(F8.0)', iostat = iost) ob % missing
-            case ('PHIC ') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) phic
-            case ('XLONC') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) xlonc
-            case ('true1') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) truelat1_3dv
-            case ('true2') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) truelat2_3dv
-            case ('TS0  ') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) ts0
-            case ('TLP  ') ; 
-                read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) tlp
-            case ('PTOP ') ; 
-                read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ptop
-            case ('PS0  ') ; 
-                read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ps0
-            case ('IXC  ') ; 
-                read (char_ned (I+8:I+14),'(I7)', iostat = iost) ixc
-            case ('JXC  ') ; 
-                read (char_ned (I+8:I+14),'(I7)', iostat = iost) jxc
-            case ('IPROJ') ; 
-                read (char_ned (I+8:I+14),'(I7)', iostat = iost) iproj
-            case ('IDD  ') ; 
-                read (char_ned (I+8:I+14),'(I7)', iostat = iost) idd
-            case ('MAXNE') ; 
-                read (char_ned (I+8:I+14),'(I7)', iostat = iost) maxnes
-            case default ; read (char_ned (I+9:I+14),'(I6)', iostat = iost) nssmis
+         case ('MISS.') ; 
+             read (char_ned (I+8:I+15),'(F8.0)', iostat = iost) ob % missing
+         case ('PHIC ') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) phic
+         case ('XLONC') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) xlonc
+         case ('true1') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) truelat1_3dv
+         case ('true2') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) truelat2_3dv
+         case ('TS0  ') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) ts0
+         case ('TLP  ') ; 
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) tlp
+         case ('PTOP ') ; 
+             read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ptop
+         case ('PS0  ') ; 
+             read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ps0
+         case ('IXC  ') ; 
+             read (char_ned (I+8:I+14),'(I7)', iostat = iost) ixc
+         case ('JXC  ') ; 
+             read (char_ned (I+8:I+14),'(I7)', iostat = iost) jxc
+         case ('IPROJ') ; 
+             read (char_ned (I+8:I+14),'(I7)', iostat = iost) iproj
+         case ('IDD  ') ; 
+             read (char_ned (I+8:I+14),'(I7)', iostat = iost) idd
+         case ('MAXNE') ; 
+             read (char_ned (I+8:I+14),'(I7)', iostat = iost) maxnes
+         case default ; read (char_ned (I+9:I+14),'(I6)', iostat = iost) nssmis
          end select
       end do
 
@@ -153,27 +151,25 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    end do
 
    do
-      select case ( char_ned (1:6) )
+      select case (char_ned (1:6))
+      ! Model domains definition
 
-         ! Model domains definition
-
-         case ('NESTIX') ;
-            call da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
-         case ('NESTJX') ; 
-            call da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
-         case ('NUMC  ') ; 
-            call da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
-         case ('DIS   ') ; 
-            call da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
-         case ('NESTI ') ; 
-            call da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
-         case ('NESTJ ') ; 
-            call da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
+      case ('NESTIX') ;
+         call da_read_ssmi_integer_array(nestix, maxnes, 8, 9)
+      case ('NESTJX') ; 
+         call da_read_ssmi_integer_array(nestjx, maxnes, 8, 9)
+      case ('NUMC  ') ; 
+         call da_read_ssmi_integer_array(numnc , maxnes, 8, 9)
+      case ('DIS   ') ; 
+         call da_read_ssmi_real_array   (dis   , maxnes, 8, 9)
+      case ('NESTI ') ; 
+         call da_read_ssmi_integer_array(nesti , maxnes, 8, 9)
+      case ('NESTJ ') ; 
+         call da_read_ssmi_integer_array(nestj , maxnes, 8, 9)
       end select
 
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
       if (char_ned(1:6) == 'inFO  ') exit
-
    end do
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned

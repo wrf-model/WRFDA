@@ -36,7 +36,7 @@ subroutine da_rttov_init(iv,ob)
 !-------------------------------------
   integer, allocatable :: errorstatus(:)  ! return code
   integer              :: coef_errorstatus, i_amsua, i_amsub
-!  type( rttov_coef ), allocatable :: coefs(:)         ! coefficients
+!  type(rttov_coef), allocatable :: coefs(:)         ! coefficients
   integer     :: error
   integer , pointer   ::  nscan(:), nchanl(:)
 
@@ -103,34 +103,34 @@ subroutine da_rttov_init(iv,ob)
    iv%instid(n)%platform_id  = rtminit_platform(n)
    iv%instid(n)%satellite_id = rtminit_satid(n)
    iv%instid(n)%sensor_id    = rtminit_sensor(n)
- if ( rtminit_satid(n) < 10 ) then
+ if (rtminit_satid(n) < 10) then
    write(iv%instid(n)%rttovid_string, '(a,i1,a)')  &
-             trim( platform_name(rtminit_platform(n)) )//'-',  &
+             trim(platform_name(rtminit_platform(n)))//'-',  &
              rtminit_satid(n),     &
-             '-'//trim( inst_name(rtminit_sensor(n)) )
+             '-'//trim(inst_name(rtminit_sensor(n)))
  else
    write(iv%instid(n)%rttovid_string, '(a,i2.2,a)')  &
-             trim( platform_name(rtminit_platform(n)) )//'-',  &
+             trim(platform_name(rtminit_platform(n)))//'-',  &
              rtminit_satid(n),     &
-             '-'//trim( inst_name(rtminit_sensor(n)) )
+             '-'//trim(inst_name(rtminit_sensor(n)))
  end if
 
-   if ( trim( inst_name(rtminit_sensor(n))) == 'msu' ) then
+   if (trim(inst_name(rtminit_sensor(n))) == 'msu') then
       nchanl(n)  = 4
       nscan(n)   = 11
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'hirs' ) then
+   else if (trim(inst_name(rtminit_sensor(n))) == 'hirs') then
       nchanl(n)  = 19
       nscan(n)   = 56
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'amsua' ) then
+   else if (trim(inst_name(rtminit_sensor(n))) == 'amsua') then
       nchanl(n)  = 15
       nscan(n)   = 30
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'amsub' ) then
+   else if (trim(inst_name(rtminit_sensor(n))) == 'amsub') then
       nchanl(n)  = 5
       nscan(n)   = 90
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'airs' ) then
+   else if (trim(inst_name(rtminit_sensor(n))) == 'airs') then
       nchanl(n)  = 281
       nscan(n)   = 90
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'hsb' ) then
+   else if (trim(inst_name(rtminit_sensor(n))) == 'hsb') then
       nchanl(n)  = 4
       nscan(n)   = 90
    else
@@ -141,19 +141,19 @@ subroutine da_rttov_init(iv,ob)
       iv%instid(n)%nchan  = nchanl(n)
       ob%instid(n)%nchan  = nchanl(n)
 
-      allocate ( iv%instid(n)%ichan(1:nchanl(n)), stat = error )
-      if( error /= 0 ) then
-        Write( *, '( "mem allocation error to iv%instid(n)%ichan")' )
+      allocate (iv%instid(n)%ichan(1:nchanl(n)), stat = error)
+      if (error /= 0) then
+        Write(*, '("mem allocation error to iv%instid(n)%ichan")')
         Stop ' in da_rttov_init '
       end if
 
-      allocate ( ob%instid(n)%ichan(1:nchanl(n)), stat = error )
-      if( error /= 0 ) then
-        Write( *, '( "mem allocation error to ob%instid(n)%ichan")' )
+      allocate (ob%instid(n)%ichan(1:nchanl(n)), stat = error)
+      if (error /= 0) then
+        Write(*, '("mem allocation error to ob%instid(n)%ichan")')
         Stop ' in da_rttov_init '
       end if
 
-!     if (trim( inst_name(rtminit_sensor(n))) == 'airs') then
+!     if (trim(inst_name(rtminit_sensor(n))) == 'airs') then
 
       call da_get_unit(iunit)
       filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
@@ -165,10 +165,10 @@ subroutine da_rttov_init(iv,ob)
          call da_error(__FILE__,__LINE__,message(1:1))
       end if
 
-  allocate ( satinfo(n) % ichan(nchanl(n)) )
-  allocate ( satinfo(n) % iuse (nchanl(n)) )
-  allocate ( satinfo(n) % error(nchanl(n)) )
-  allocate ( satinfo(n) % polar(nchanl(n)) )
+  allocate (satinfo(n) % ichan(nchanl(n)))
+  allocate (satinfo(n) % iuse (nchanl(n)))
+  allocate (satinfo(n) % error(nchanl(n)))
+  allocate (satinfo(n) % polar(nchanl(n)))
 
   read(iunit,*)
   do j = 1, nchanl(n)
@@ -209,13 +209,13 @@ subroutine da_rttov_init(iv,ob)
       & verbosity_level,  &! in
       & nsensor,          &! in
       & coefs,            &! out
-      & sensor ) !,           &! in
-!      & coefs_channels )   ! in Optional not work with amsua+b
+      & sensor) !,           &! in
+!      & coefs_channels)   ! in Optional not work with amsua+b
 
-  if( any(errorstatus(:) /= errorstatus_success )) then
-     write ( 6, * ) 'rttov_setup fatal error'
+  if (any(errorstatus(:) /= errorstatus_success)) then
+     write (6, *) 'rttov_setup fatal error'
      stop ' in da_rttov_init '
-  endif
+  end if
 
 !-------------------------------------------------------------
 !  4.0 read coef file for cloud/rain absorption/scattering
@@ -224,58 +224,58 @@ subroutine da_rttov_init(iv,ob)
     i_amsua = 0
     i_amsub = 0
    do n=1,nsensor
-    if ( trim(inst_name(rtminit_sensor(n))) == 'amsua' ) &
+    if (trim(inst_name(rtminit_sensor(n))) == 'amsua') &
           i_amsua = n
-    if ( trim(inst_name(rtminit_sensor(n))) == 'amsub' ) &
+    if (trim(inst_name(rtminit_sensor(n))) == 'amsub') &
           i_amsub = n 
    end do
 
-   if ( i_amsua /= 0 .and. i_amsub == 0 ) then
+   if (i_amsua /= 0 .and. i_amsub == 0) then
      n_scatt_coef = 1
      allocate (coefs_scatt(n_scatt_coef))
      allocate (coefs_scatt_instname(n_scatt_coef))
      coefs_scatt_instname(1) = 'amsua'
      call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsua), &
                                 coefs_scatt(1))
-     if(coef_errorstatus /= errorstatus_success ) then
-        write ( 6, * ) 'rttov_readscattcoeffs fatal error'
+     if (coef_errorstatus /= errorstatus_success) then
+        write (6, *) 'rttov_readscattcoeffs fatal error'
         stop
-     endif
+     end if
    end if
-   if ( i_amsua == 0 .and. i_amsub /= 0 ) then
+   if (i_amsua == 0 .and. i_amsub /= 0) then
       n_scatt_coef = 1
       allocate (coefs_scatt(n_scatt_coef))
       allocate (coefs_scatt_instname(n_scatt_coef))
       coefs_scatt_instname(1) = 'amsub'
       call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsub), &
                                  coefs_scatt(1))
-      if(coef_errorstatus /= errorstatus_success ) then
-        write ( 6, * ) 'rttov_readscattcoeffs fatal error'
+      if (coef_errorstatus /= errorstatus_success) then
+        write (6, *) 'rttov_readscattcoeffs fatal error'
         stop
-      endif      
+      end if      
    end if
 
-   if ( i_amsua /= 0 .and. i_amsub /= 0 ) then
+   if (i_amsua /= 0 .and. i_amsub /= 0) then
     n_scatt_coef = 2
     allocate (coefs_scatt(n_scatt_coef))
     allocate (coefs_scatt_instname(n_scatt_coef))
     coefs_scatt_instname(1) = 'amsua'
     call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsua), &
                                coefs_scatt(1))
-    if(coef_errorstatus /= errorstatus_success ) then
-       write ( 6, * ) 'rttov_readscattcoeffs fatal error'
+    if (coef_errorstatus /= errorstatus_success) then
+       write (6, *) 'rttov_readscattcoeffs fatal error'
        stop
-    endif
+    end if
     coefs_scatt_instname(2) = 'amsub'
     call rttov_readscattcoeffs(coef_errorstatus, coefs(i_amsub), &
                                coefs_scatt(2))
-    if(coef_errorstatus /= errorstatus_success ) then
-       write ( 6, * ) 'rttov_readscattcoeffs fatal error'
+    if (coef_errorstatus /= errorstatus_success) then
+       write (6, *) 'rttov_readscattcoeffs fatal error'
        stop
-    endif
+    end if
    end if
 
-  if ( i_amsua == 0 .and. i_amsub == 0 ) n_scatt_coef = 0
+  if (i_amsua == 0 .and. i_amsub == 0) n_scatt_coef = 0
 
  end if
 
@@ -297,19 +297,19 @@ subroutine da_rttov_init(iv,ob)
                         'nchanl=',nchanl(n), 'nscan=',nscan(n)
 
  call rttov_setupchan(nprofiles, nchanl(n), coefs(n), &    ! in
-                  nfrequencies, nchannels, nbtout )        ! out
+                  nfrequencies, nchannels, nbtout)        ! out
 
-  Allocate ( lprofiles(nfrequencies) )
-  Allocate ( channels (nfrequencies) )
-  Allocate ( polarisations(nchannels, 3) )
-  Allocate ( emissivity( nchannels ) )
-  Allocate ( surfem ( nchannels ) )
+  Allocate (lprofiles(nfrequencies))
+  Allocate (channels (nfrequencies))
+  Allocate (polarisations(nchannels, 3))
+  Allocate (emissivity(nchannels))
+  Allocate (surfem (nchannels))
   surfem(:) = 0.
 
  call rttov_setupindex(nchanl(n), nprofiles, nfrequencies, &    ! in
                   nchannels, nbtout, coefs(n), surfem,  &    ! in
                   lprofiles, channels, polarisations,     &    ! out
-                  emissivity  )
+                  emissivity )
 
      write (*,*) 'nprofiles = ', nprofiles, '  nchanl = ', nchanl(n), &
                  ' nfrequencies = ', nfrequencies, &
@@ -322,11 +322,11 @@ subroutine da_rttov_init(iv,ob)
 !     write (*,*) 'polarisations(:,3)= ', polarisations(:,3)
 
 
-     deallocate ( lprofiles )
-     deallocate ( channels  )
-     deallocate ( polarisations )
-     deallocate ( emissivity )
-     deallocate ( surfem )
+     deallocate (lprofiles)
+     deallocate (channels )
+     deallocate (polarisations)
+     deallocate (emissivity)
+     deallocate (surfem)
 
 !-------------------------------------------------------
 !  6.0 read bias correction coefs files
@@ -342,10 +342,10 @@ subroutine da_rttov_init(iv,ob)
                (/"Cannot open radiance biascorr file "//adjustl(filename)/))
          end if
 
-  allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
-  allocate ( satinfo(n) % std(nscan(n)+1,nchanl(n)) )
-  allocate ( satinfo(n) %   a(nscan(n)+1,nchanl(n)) )
-  allocate ( satinfo(n) %   b(nscan(n)+1,nchanl(n)) )
+  allocate (satinfo(n) % rms(nscan(n)+1,nchanl(n)))
+  allocate (satinfo(n) % std(nscan(n)+1,nchanl(n)))
+  allocate (satinfo(n) %   a(nscan(n)+1,nchanl(n)))
+  allocate (satinfo(n) %   b(nscan(n)+1,nchanl(n)))
 
    read(bunit,*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
    read(bunit,*)  !trim(cdate)
@@ -382,7 +382,7 @@ subroutine da_rttov_init(iv,ob)
  if (use_error_factor_rad) then
 
     do n=1,rtminit_nsensor
-       allocate ( satinfo(n)%error_factor(1:nchanl(n)) )
+       allocate (satinfo(n)%error_factor(1:nchanl(n)))
        satinfo(n)%error_factor(:) = 1.0
     end do
 
@@ -400,9 +400,9 @@ subroutine da_rttov_init(iv,ob)
     do 
       read(unit_factor_rad,fmt='(a15,i3,i8,3f15.5,f8.3)',iostat=iost)   &
           rttovid_string, ichan, num_tot, joa,jo,trace,factor 
-      if ( iost == 0 ) then
+      if (iost == 0) then
         do n=1,rtminit_nsensor
-          if ( trim(rttovid_string)== trim(iv%instid(n)%rttovid_string) ) then
+          if (trim(rttovid_string)== trim(iv%instid(n)%rttovid_string)) then
              satinfo(n)%error_factor(ichan) = factor
              if (print_detail_obs)  &
                 write(6,'(a,i5,a,f10.3)') trim(rttovid_string)//' Channel ', ichan, ' Error Factor = ', factor
@@ -421,13 +421,13 @@ subroutine da_rttov_init(iv,ob)
   deallocate(nscan)
   deallocate(nchanl)
 
-  allocate ( time_slots(0:num_fgat_time) )
+  allocate (time_slots(0:num_fgat_time))
   call da_get_time_slots(num_fgat_time,time_window_min,analysis_date, &
                          time_window_max, time_slots)
 
   return
 
 end subroutine da_rttov_init
-#endif
+#end if
 
 

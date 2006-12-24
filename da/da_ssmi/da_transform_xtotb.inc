@@ -1,4 +1,8 @@
-subroutine da_transform_xtotb( xb )
+subroutine da_transform_xtotb(xb)
+
+   !----------------------------------------------------------------------
+   ! Purpose: TBD
+   !----------------------------------------------------------------------
 
    implicit none
 

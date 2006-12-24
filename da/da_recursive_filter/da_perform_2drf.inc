@@ -1,4 +1,4 @@
-subroutine da_perform_2drf( ni, nj, num_passes, rf_scale, field )
+subroutine da_perform_2drf(ni, nj, num_passes, rf_scale, field)
 
    implicit none
 
@@ -12,23 +12,21 @@ subroutine da_perform_2drf( ni, nj, num_passes, rf_scale, field )
    real                  :: e, alpha         ! Recursive filter parameters.
    real                  :: mean_field       ! Mean field.
 
-   e = 0.25 * num_passes / ( rf_scale * rf_scale )
-   alpha = 1 + e - sqrt( e * ( e + 2.0 ) )
+   e = 0.25 * num_passes / (rf_scale * rf_scale)
+   alpha = 1 + e - sqrt(e * (e + 2.0))
 
    mean_field = sum(field(1:ni,1:nj)) / real(ni*nj)
 
    do pass = 1, num_passes
-
       ! Perform filter in I-direction:
       do j = 1, nj
-         call da_recursive_filter_1d( pass, alpha, field(1:ni,j), ni )
+         call da_recursive_filter_1d(pass, alpha, field(1:ni,j), ni)
       end do
 
       ! Perform filter in J-direction:
       do i = 1, ni
-         call da_recursive_filter_1d( pass, alpha, field(i,1:nj), nj )
+         call da_recursive_filter_1d(pass, alpha, field(i,1:nj), nj)
       end do
-
    end do
 
 end subroutine da_perform_2drf

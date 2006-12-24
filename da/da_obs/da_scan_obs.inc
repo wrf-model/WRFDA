@@ -72,7 +72,7 @@ subroutine da_scan_obs (ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! open FILE
+   ! open file
    ! ---------
    call da_get_unit(iunit)
    open(unit   = iunit,     &
@@ -248,14 +248,14 @@ subroutine da_scan_obs (ob, xp, filename)
       end if
 
       call da_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, outside_all )
+                        xp, outside, outside_all)
 
-      if(outside) then
+      if (outside) then
          cycle reports
       end if
 
       if (platform%info%levels < 1) then
-         if ( fm /= 111 ) then
+         if (fm /= 111) then
             cycle reports
          end if
       end if
@@ -279,7 +279,7 @@ subroutine da_scan_obs (ob, xp, filename)
             num_ships  = num_ships  + 1
 
          case (15:16) ;
-            if(.not.use_MetarObs) cycle reports
+            if (.not.use_MetarObs) cycle reports
             num_metar = num_metar + 1
 
          case (32:34) ;
@@ -303,7 +303,7 @@ subroutine da_scan_obs (ob, xp, filename)
          case (88)    ;
             ! Geostationary or Polar orbitting Satellite AMVs:
             if (index(platform%info%name, 'MODIS') > 0 .or. &
-                index(platform%info%name, 'modis') > 0 )  then
+                index(platform%info%name, 'modis') > 0)  then
                if (.not.use_PolarAMVObs) cycle reports
                num_polaramv = num_polaramv + 1
             else
@@ -320,10 +320,10 @@ subroutine da_scan_obs (ob, xp, filename)
             num_gpspw = num_gpspw + 1
 
          case (116) ;
-            if (.not.use_GpsrefObs) cycle reports
-            num_gpsref = num_gpsref + 1
+         if (.not.use_GpsrefObs) cycle reports
+         num_gpsref = num_gpsref + 1
 
-         case (121) ;
+          case (121) ;
             ! SSM/T1 temperatures
             if (.not.use_ssmt1obs) cycle reports
             num_ssmt1 = num_ssmt1 + 1
@@ -445,6 +445,7 @@ subroutine da_scan_obs (ob, xp, filename)
            'Scan:  ', num_ssmt2, ' SSMT2 reports.', &
            'Scan:  ', num_airsr, ' AIRS retrieval reports'
 
+      ! WHY
       ! write(unit=stdout, fmt='(5x,a,i6,a)') &
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'

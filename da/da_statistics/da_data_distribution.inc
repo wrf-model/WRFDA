@@ -7,7 +7,7 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
 
    implicit none
    
-   character (LEN=*), intent(in)    :: ob_name       ! Data description.
+   character (len=*), intent(in)    :: ob_name       ! Data description.
    integer, intent(in)              :: num_obs       ! Number of obs.
    real, intent(in)                 :: min_val       ! Minimum bin value.
    real, intent(in)                 :: max_val       ! Maximum bin value.

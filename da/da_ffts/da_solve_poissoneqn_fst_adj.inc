@@ -1,8 +1,8 @@
 subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
                                     ims,ime, jms,jme, kms,kme, &
-                                    its,ite, jts,jte, kts,kte )
+                                    its,ite, jts,jte, kts,kte)
 
-   !------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
    !  PURPOSE: Solve Del**2 B = A for B with zero field boundary conditions.
    !
    !  METHOD:  1) Compute spectral del2b using double forward FST.
@@ -10,7 +10,7 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
    !           3) Reform gridpt. b using inverse double FST.
    !           Note no mean removed (would make b.ne.0 at boundaries) so
    !           arbitrary constant still present.
-   !------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
 
    implicit none
    
@@ -33,31 +33,31 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
 
    real, allocatable        :: work_1d(:)    ! FFT work array for x dir.
 
-!------------------------------------------------------------------------------
-!  [1.0] Initialise:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [1.0] Initialise:
+   !---------------------------------------------------------------------------
 
-!  Calculate work space needed.
+   ! Calculate work space needed.
 
    n = max(xbx%fft_ix*(xp%jtex-xp%jtsx+1), &
            xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
 
-!  Allocate work arrays.
-   allocate( work_1d(1:n) )
+   ! Allocate work arrays.
+   allocate(work_1d(1:n))
 
-!  Copy b for transpose.
+   ! Copy b for transpose.
 
    xp%v1z(its:ite,jts:jte,kts:kte) = b(its:ite,jts:jte,kts:kte)
 
-!------------------------------------------------------------------------------
-!  [2.0] Perform forward FFT in x direction:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [2.0] Perform forward FFT in x direction:
+   !---------------------------------------------------------------------------
 
-!  [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
+   ! [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x ( xp )
+   call da_transpose_z2x (xp)
 
-!  [2.2] Set up FFT parameters:
+   ! [2.2] Set up FFT parameters:
    
    idim = xbx%fft_ix
    jdim = xp%jtex - xp%jtsx + 1
@@ -70,7 +70,7 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
 
    work_area   = (vector_size+1)*num_vectors
 
-!  [2.3] Perform forward FFT:
+   ! [2.3] Perform forward FFT:
 
    do k = xp%ktsx, xp%ktex
       ij = 0
@@ -86,10 +86,10 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
          end do
       end do
 
-      call fft661( Forward_FFT, vector_inc, vector_jump, &
+      call fft661(Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
@@ -105,17 +105,17 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
       end do
    end do
 
-!------------------------------------------------------------------------------
-!  [3.0] For each k-level, perform forward FFT in y direction, apply spectral 
-!        Poisson equation, and then perform inverse FFT in x direction:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [3.0] For each k-level, perform forward FFT in y direction, apply spectral 
+   !       Poisson equation, and then perform inverse FFT in x direction:
+   !---------------------------------------------------------------------------
 
-!  [3.1] Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
+   ! [3.1] Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y ( xp )
-   call da_transpose_x2y_v2 ( xp )
+   call da_transpose_x2y (xp)
+   call da_transpose_x2y_v2 (xp)
 
-!  [3.2] Set up FFT parameters:
+   ! [3.2] Set up FFT parameters:
 
    idim = xp%itey - xp%itsy + 1 + xbx%pad_num
    jdim = xbx%fft_jy
@@ -149,14 +149,14 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
       end do
       end do
 
-      call fft661( Forward_FFT, vector_inc, vector_jump, &
+      call fft661(Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
 
-!------------------------------------------------------------------------------
-!  [4.0] Solve spectral Poisson equation:
-!------------------------------------------------------------------------------
+      !------------------------------------------------------------------------
+      ! [4.0] Solve spectral Poisson equation:
+      !------------------------------------------------------------------------
 
       ij = 0
       do j=xp%jds, xbx%fft_jy
@@ -171,12 +171,12 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
          end do
       end do
 
-!     Reform gridpt. b using inverse double FST in i.
+      ! Reform gridpt. b using inverse double FST in i.
 
-      call fft661( Inverse_FFT, vector_inc, vector_jump, &
+      call fft661(Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
       ij = 0
       do j=xp%jds, xp%jde
          do i=xp%itsy, xp%itey
@@ -192,16 +192,16 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
       end do
    end do
 
-!------------------------------------------------------------------------------
-!  Perform inverse FFT in x direction:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Perform inverse FFT in x direction:
+   !---------------------------------------------------------------------------
 
-!  Apply (i',j,k' -> i,j',k') transpose ( v1y -> v1x ).
+   ! Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
-   call da_transpose_y2x ( xp )
-   call da_transpose_y2x_v2 ( xp )
+   call da_transpose_y2x (xp)
+   call da_transpose_y2x_v2 (xp)
 
-!  Set up FFT parameters:
+   ! Set up FFT parameters:
 
    idim = xbx%fft_ix
    jdim = xp%jtex - xp%jtsx + 1
@@ -214,7 +214,7 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
 
    work_area   = (vector_size+1)*num_vectors
 
-!  [2.3] Perform forward FFT:
+   ! [2.3] Perform forward FFT:
 
    do k = xp%ktsx, xp%ktex
       ij = 0
@@ -231,10 +231,10 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
          end do
       end do
 
-      call fft661( Inverse_FFT, vector_inc, vector_jump, &
+      call fft661(Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
@@ -246,21 +246,21 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
       end do
    end do
 
-!  Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
+   ! Apply (i,j',k') -> i',j',k) transpose to restore v1z.
    
-   call da_transpose_x2z ( xp )
+   call da_transpose_x2z (xp)
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id2)
 
-!  [2.5] Write data array into del2b:
+   ! [2.5] Write data array into del2b:
 
    del2b(ims:ime,jms:jme,kms:kme) = xp%v1z(ims:ime,jms:jme,kms:kme)
 
-!------------------------------------------------------------------------------
-!  [5.0] Tidy up:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [5.0] Tidy up:
+   !---------------------------------------------------------------------------
 
-   if(allocated( work_1d )) deallocate( work_1d )
+   if (allocated(work_1d)) deallocate(work_1d)
 
 end subroutine da_solve_poissoneqn_fst_adj
 

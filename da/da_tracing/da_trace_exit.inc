@@ -1,19 +1,19 @@
-subroutine da_trace_exit( &
+subroutine da_trace_exit(&
    Name, &               ! in
    Message, &            ! in, optional
    Messages, &           ! in, optional
    MaxNoCalls)           ! in, optional
 
+   !-----------------------------------------------------------------------
+   ! Purpose: Trace exit from subroutine
+   !-----------------------------------------------------------------------
+
    implicit none
 
-   ! Arguments
-
-   character (LEN=*), intent(in)           :: Name         ! subroutine name
-   character (LEN=*), optional, intent(in) :: Message      ! text to trace
-   character (LEN=*), optional, intent(in) :: Messages(:)  ! text to trace
+   character (len=*), intent(in)           :: Name         ! subroutine name
+   character (len=*), optional, intent(in) :: Message      ! text to trace
+   character (len=*), optional, intent(in) :: Messages(:)  ! text to trace
    integer, optional, intent(in)           :: MaxNoCalls   ! max no calls to show
-
-   ! Local variables
 
    integer                         :: IOStatus        ! I-O return code 
    integer                         :: Loop            ! General loop counter
@@ -24,17 +24,13 @@ subroutine da_trace_exit( &
    real                            :: temp_CPUTime
    real                            :: temp1
    real                            :: temp2
-   character(LEN=25)               :: Change
-
-   !======================================================================
-   ! Start of code
-   !======================================================================
+   character(len=25)               :: Change
 
    ! stop the clock
 
    call CPU_TIME(temp_CPUTime)
 
-   call SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK(&
       COUNT=Count)
 
    !======================================================================
@@ -85,7 +81,7 @@ subroutine da_trace_exit( &
    Change = ""
 
    if (trace_memory) then
-      call da_memory( &
+      call da_memory(&
          TotalSpace)
       if (EntryHeap(Pointer) < TotalSpace) then
          write(Change,"(A9,I12)")", BIGGER", TotalSpace - EntryHeap(Pointer)
@@ -99,7 +95,7 @@ subroutine da_trace_exit( &
       TotalSpace = 0
    end if
 
-   if (trace_write .AND. TraceDepth <= trace_max_depth ) then
+   if (trace_write .AND. TraceDepth <= trace_max_depth) then
 
       if (present(MaxNoCalls)) then
          LocalMaxNoCalls = MaxNoCalls
@@ -178,13 +174,13 @@ subroutine da_trace_exit( &
 
    ! note local time
 
-   call SYSTEM_CLOCK( &
-     COUNT=Count)
+   call system_clock(&
+     count=count)
 
-   ElapsedTimeLocalStart = real(Count-BaseElapsedTime)
-   call CPU_TIME(CPUTimeLocalStart)
+   elapsedtimelocalstart = real(count-baseelapsedtime)
+   call cpu_time(cputimelocalstart)
 
-   ! call FLUSH(trace_unit)
+   ! call flush(trace_unit)
 
 end subroutine da_trace_exit
 

@@ -1,15 +1,15 @@
-subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
+subroutine da_psichi_to_uv(psi, chi, coefx,coefy, u, v,&
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculate wind components u and v from psi and chi.
    !
-   !  METHOD:  u = coefx * ( -dpsi/dy + dchi/dx )
-   !           v = coefy * (  dpsi/dx + dchi/dy )
+   !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
+   !           v = coefy * ( dpsi/dx + dchi/dy)
    !
-   !  ASsumPTIONS: Unstaggered grid.
+   !  ASSUMPTIONS: Unstaggered grid.
    !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
    !               grid size may or may not be equal
    !----------------------------------------------------------------------------
@@ -41,21 +41,21 @@ subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
    ie = ite
    js = jts
    je = jte
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (jts == jds) js = jds+1
+   if (jte == jde) je = jde-1
 
-   if( global ) then  
+   if (global) then  
       call da_set_boundary_3d(psi, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
       call da_set_boundary_3d(chi, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
    else
-      if(its == ids) is = ids+1
-      if(ite == ide) ie = ide-1
+      if (its == ids) is = ids+1
+      if (ite == ide) ie = ide-1
    end if
 
    do k = kts, kte
@@ -65,68 +65,68 @@ subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
 
       do j = js, je
          do i = is, ie
-            u(i,j,k) = -coefy(i,j)*( psi(i  ,j+1,k) - psi(i  ,j-1,k) ) + &
-                        coefx(i,j)*( chi(i+1,j  ,k) - chi(i-1,j  ,k) ) 
+            u(i,j,k) = -coefy(i,j)*(psi(i  ,j+1,k) - psi(i  ,j-1,k)) + &
+                        coefx(i,j)*(chi(i+1,j  ,k) - chi(i-1,j  ,k)) 
 
-            v(i,j,k) = coefx(i,j)*( psi(i+1,j  ,k) - psi(i-1,j  ,k) )  + &
-                       coefy(i,j)*( chi(i  ,j+1,k) - chi(i  ,j-1,k) ) 
+            v(i,j,k) = coefx(i,j)*(psi(i+1,j  ,k) - psi(i-1,j  ,k))  + &
+                       coefy(i,j)*(chi(i  ,j+1,k) - chi(i  ,j-1,k)) 
          end do
       end do
 
-      if ( global ) cycle
+      if (global) cycle
       !------------------------------------------------------------------------
       ! [3.0] Compute u, v at domain boundaries:
       !------------------------------------------------------------------------
 
       ! [3.1] Western boundaries:
 
-      if ( its == ids ) then
+      if (its == ids) then
          i = its
          do j = js, je
-            u(i,j,k) = -coefy(i,j)*( psi(i  ,j+1,k) - psi(i,j-1,k) ) + &
-                        coefx(i,j)*( chi(i+2,j  ,k) - chi(i,j  ,k) )  
+            u(i,j,k) = -coefy(i,j)*(psi(i  ,j+1,k) - psi(i,j-1,k)) + &
+                        coefx(i,j)*(chi(i+2,j  ,k) - chi(i,j  ,k))  
 
-            v(i,j,k) = coefx(i,j)*( psi(i+2,j  ,k) - psi(i,j  ,k) )  + &
-                       coefy(i,j)*( chi(i  ,j+1,k) - chi(i,j-1,k) ) 
+            v(i,j,k) = coefx(i,j)*(psi(i+2,j  ,k) - psi(i,j  ,k))  + &
+                       coefy(i,j)*(chi(i  ,j+1,k) - chi(i,j-1,k)) 
          end do
       end if
 
       ! [3.2] Eastern boundaries:
 
-      if ( ite == ide ) then
+      if (ite == ide) then
          i = ite
          do j = js, je
-            u(i,j,k) = -coefy(i,j)*( psi(i,j+1,k) - psi(i  ,j-1,k) ) + &
-                        coefx(i,j)*( chi(i,j  ,k) - chi(i-2,j  ,k) ) 
+            u(i,j,k) = -coefy(i,j)*(psi(i,j+1,k) - psi(i  ,j-1,k)) + &
+                        coefx(i,j)*(chi(i,j  ,k) - chi(i-2,j  ,k)) 
 
-            v(i,j,k) = coefx(i,j)*( psi(i,j  ,k) - psi(i-2,j  ,k) )+ &
-                       coefy(i,j)*( chi(i,j+1,k) - chi(i  ,j-1,k) ) 
+            v(i,j,k) = coefx(i,j)*(psi(i,j  ,k) - psi(i-2,j  ,k))+ &
+                       coefy(i,j)*(chi(i,j+1,k) - chi(i  ,j-1,k)) 
          end do
       end if
 
       ! [3.3] Southern boundaries:
 
-      if ( jts == jds ) then
+      if (jts == jds) then
          j = jts
          do i = is, ie
-            u(i,j,k) = -coefy(i,j)*( psi(i  ,j+2,k) - psi(i  ,j,k) ) + &
-                        coefx(i,j)*( chi(i+1,j  ,k) - chi(i-1,j,k) )  
+            u(i,j,k) = -coefy(i,j)*(psi(i  ,j+2,k) - psi(i  ,j,k)) + &
+                        coefx(i,j)*(chi(i+1,j  ,k) - chi(i-1,j,k))  
 
-            v(i,j,k) = coefx(i,j)*( psi(i+1,j  ,k) - psi(i-1,j,k) ) + &
-                       coefy(i,j)*( chi(i  ,j+2,k) - chi(i  ,j,k) ) 
+            v(i,j,k) = coefx(i,j)*(psi(i+1,j  ,k) - psi(i-1,j,k)) + &
+                       coefy(i,j)*(chi(i  ,j+2,k) - chi(i  ,j,k)) 
          end do
       end if
 
       ! [3.4] Northern boundaries:
 
-      if ( jte == jde ) then
+      if (jte == jde) then
          j = jte
          do i = is, ie
-            u(i,j,k) = -coefy(i,j)*( psi(i  ,j,k) - psi(i  ,j-2,k) ) + &
-                        coefx(i,j)*( chi(i+1,j,k) - chi(i-1,j  ,k) )  
+            u(i,j,k) = -coefy(i,j)*(psi(i  ,j,k) - psi(i  ,j-2,k)) + &
+                        coefx(i,j)*(chi(i+1,j,k) - chi(i-1,j  ,k))  
 
-            v(i,j,k) = coefx(i,j)*( psi(i+1,j,k) - psi(i-1,j  ,k) )+ &
-                       coefy(i,j)*( chi(i  ,j,k) - chi(i  ,j-2,k) ) 
+            v(i,j,k) = coefx(i,j)*(psi(i+1,j,k) - psi(i-1,j  ,k))+ &
+                       coefy(i,j)*(chi(i  ,j,k) - chi(i  ,j-2,k)) 
          end do
       end if
 
@@ -136,30 +136,30 @@ subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
 
       ! [4.1] Bottom-left point:
 
-      if ( its == ids .AND. jts == jds ) then
-         u(its,jts,k) = 0.5 * ( u(its+1,jts,k) + u(its,jts+1,k) )
-         v(its,jts,k) = 0.5 * ( v(its+1,jts,k) + v(its,jts+1,k) )
+      if (its == ids .AND. jts == jds) then
+         u(its,jts,k) = 0.5 * (u(its+1,jts,k) + u(its,jts+1,k))
+         v(its,jts,k) = 0.5 * (v(its+1,jts,k) + v(its,jts+1,k))
       end if
 
       ! [4.2] Top-left point:
 
-      if ( ite == ide .AND. jts == jds ) then
-         u(ite,jts,k) = 0.5 * ( u(ite-1,jts,k) + u(ite,jts+1,k) )
-         v(ite,jts,k) = 0.5 * ( v(ite-1,jts,k) + v(ite,jts+1,k) )
+      if (ite == ide .AND. jts == jds) then
+         u(ite,jts,k) = 0.5 * (u(ite-1,jts,k) + u(ite,jts+1,k))
+         v(ite,jts,k) = 0.5 * (v(ite-1,jts,k) + v(ite,jts+1,k))
       end if
 
       ! [4.3] Bottom-right point:
 
-      if ( its == ids .AND. jte == jde ) then
-         u(its,jte,k) = 0.5 * ( u(its+1,jte,k) + u(its,jte-1,k) )
-         v(its,jte,k) = 0.5 * ( v(its+1,jte,k) + v(its,jte-1,k) )
+      if (its == ids .AND. jte == jde) then
+         u(its,jte,k) = 0.5 * (u(its+1,jte,k) + u(its,jte-1,k))
+         v(its,jte,k) = 0.5 * (v(its+1,jte,k) + v(its,jte-1,k))
       end if
 
       ! [4.4] Top-right point:
 
-      if ( ite == ide .AND. jte == jde ) then
-         u(ite,jte,k) = 0.5 * ( u(ite-1,jte,k) + u(ite,jte-1,k) )
-         v(ite,jte,k) = 0.5 * ( v(ite-1,jte,k) + v(ite,jte-1,k) )
+      if (ite == ide .AND. jte == jde) then
+         u(ite,jte,k) = 0.5 * (u(ite-1,jte,k) + u(ite,jte-1,k))
+         v(ite,jte,k) = 0.5 * (v(ite-1,jte,k) + v(ite,jte-1,k))
       end if
    end do
 
@@ -167,15 +167,15 @@ subroutine da_psichi_to_uv( psi, chi, coefx,coefy, u, v,&
    ! [5.0] For Global application, set Wast-Eest Periodic boundary
    !---------------------------------------------------------------------------
 
-   if( global ) then
-       call da_set_boundary_3d(u, &
+   if (global) then
+      call da_set_boundary_3d(u, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
-       call da_set_boundary_3d(v, &
+                            its,ite, jts,jte, kts,kte)
+      call da_set_boundary_3d(v, &
                             ids,ide,   &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
    end if
 
 end subroutine da_psichi_to_uv

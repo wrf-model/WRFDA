@@ -1,5 +1,11 @@
 subroutine da_transform_xtogpsref(xb, xp)
 
+   !-------------------------------------------------------------------
+   ! Purpose : TBD
+   !-------------------------------------------------------------------
+
+   implicit none
+
    ! input : xb%q, xb%p, xb%t, and xp
    ! output: xb%ref
 
@@ -25,7 +31,7 @@ subroutine da_transform_xtogpsref(xb, xp)
             partone  = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
 
             !  2, (Wet part) / (hydrostatic part):
-            !     Note: xb%q is the specific humidity --- an analysis variable. 
+            !     Note: xb%q is the specific humidity --- an analysis variable
 
             dividnd  = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
             parttwo  = 1.0+coeff*xb%q(i,j,k)/dividnd

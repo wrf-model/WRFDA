@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
+subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
 
    implicit none
 
@@ -27,7 +27,7 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
    ADJ_tv1 = 0.
    ADJ_tv2 = 0.
 
-   if ( iv%num_satem > 0 ) then
+   if (iv%num_satem > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
          num_levs = iv % satem(n) % info % levels
@@ -54,7 +54,7 @@ subroutine da_transform_xtoy_satem_adj( iv, xp, jo_grad_y, jo_grad_x, xb)
          ! [4.0] Adjoint calculation of Satem thickness
 
          do k=1, num_levs
-            if ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) then
+            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.) then
                call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
                  ks,ke)
 

@@ -1,14 +1,7 @@
-subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
 
    !----------------------------------------------------------------
-   !  HISTORY
-   !
-   !    Modified: 2004-05-10 by S. R. H. Rizvi and H. Kusaka
-   !    Purpose:  Considering the difference in the elevation 
-   !              between model surface and GPS site
-   !
-   !    Reviewed and corrected the part of adjoint code by Y.-R. Guo
-   !    because the original adjoint code is wrong.      07/16/2004
+   ! Purpose: Calculate the difference in the elevation between model surface and GPS site
    !----------------------------------------------------------------
 
    implicit none
@@ -34,8 +27,7 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
    real,dimension(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
    real,dimension(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
 
-   if ( oi%num_Gpspw > 0 ) then
-!xyh      do n=1, oi % num_Gpspw
+   if (oi%num_Gpspw > 0) then
       do n=oi%ob_numb(oi%current_ob_time-1)%gpspw + 1, oi%ob_numb(oi%current_ob_time)%gpspw
          i = oi%gpspw(n)%loc%i
          dy = oi%gpspw(n)%loc%dy
@@ -57,16 +49,16 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 
          dpw =       0.1 *jo_grad_y%gpspw(n)%tpw
 
-         jo_grad_x%tpw(i  ,j  ) = jo_grad_x%tpw(i  ,j  ) &
+         jo_grad_x%tpw(i  ,j ) = jo_grad_x%tpw(i  ,j ) &
                                 + dxm*dym*jo_grad_y%gpspw(n)%tpw
-         jo_grad_x%tpw(i+1,j  ) = jo_grad_x%tpw(i+1,j  ) &
+         jo_grad_x%tpw(i+1,j ) = jo_grad_x%tpw(i+1,j ) &
                                 + dym*dx *jo_grad_y%gpspw(n)%tpw
          jo_grad_x%tpw(i  ,j+1) = jo_grad_x%tpw(i  ,j+1) &
                                 + dxm *dy*jo_grad_y%gpspw(n)%tpw
          jo_grad_x%tpw(i+1,j+1) = jo_grad_x%tpw(i+1,j+1) &
                                 + dx *dy *jo_grad_y%gpspw(n)%tpw
 
-         if ( obs_terr <= model_terr ) then 
+         if (obs_terr <= model_terr) then 
            model_q(1)   = dym*(dxm*xb%q(i,j,1)   + dx*xb%q(i+1,j,1)) + &
                           dy *(dxm*xb%q(i,j+1,1) + dx*xb%q(i+1,j+1,1))
            model_rho(1) = dym*(dxm*xb%rho(i,j,1)   + dx*xb%rho(i+1,j,1)) + &
@@ -89,7 +81,7 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
                         dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
 
            do k = xp%kts, xp%kte
-             if ( model_z(k) >= obs_terr ) exit
+             if (model_z(k) >= obs_terr) exit
 
              model_z(k+1) = dym*(dxm*xb%hf(i,j,k+1)   + dx*xb%hf(i+1,j,k+1)) + &
                             dy *(dxm*xb%hf(i,j+1,k+1) + dx*xb%hf(i+1,j+1,k+1))
@@ -100,7 +92,7 @@ subroutine da_transform_xtoy_gpspw_adj( xb, oi, xp, jo_grad_y, jo_grad_x )
 
              ddpw = dpw
 
-             if ( model_z(k+1) <= obs_terr ) then
+             if (model_z(k+1) <= obs_terr) then
                model_dq  (k) = model_rho(k) *(model_z(k+1) - model_z(k))*ddpw 
                model_drho(k) = model_q(k)   *(model_z(k+1) - model_z(k))*ddpw 
              else

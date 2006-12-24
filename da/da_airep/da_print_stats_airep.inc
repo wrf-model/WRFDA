@@ -1,4 +1,4 @@
-subroutine da_print_stats_airep( stats_unit, nu, nv, nt, Airep )
+subroutine da_print_stats_airep(stats_unit, nu, nv, nt, Airep)
 
     implicit none
 
@@ -15,9 +15,9 @@ subroutine da_print_stats_airep( stats_unit, nu, nv, nt, Airep )
     write(unit=stats_unit, fmt='(a,i16,3i22)') &
        '  Number: ', nu, nv, nt
 
-    if(nu < 1) nu = 1
-    if(nv < 1) nv = 1
-    if(nt < 1) nt = 1
+    if (nu < 1) nu = 1
+    if (nv < 1) nv = 1
+    if (nt < 1) nt = 1
 
     write(unit=stats_unit, fmt='((a,3(f12.4,2i5)))') &
        ' Minimum(n,k): ', Airep%minimum%u, Airep%minimum%v, Airep%minimum%t, &

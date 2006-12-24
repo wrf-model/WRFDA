@@ -1,7 +1,7 @@
-subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
+subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Transforms analysis to control variables (Vp-type)
@@ -30,7 +30,7 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
    ! [1.0] Perform transform v = U^{-1} x
    !----------------------------------------------------------------      
 
-   call da_zero_vp_type ( vp )
+   call da_zero_vp_type (vp)
 
    ! [2.2] Transform u, v to streamfunction via vorticity:
 
@@ -38,21 +38,21 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
 #ifndef DEREF_KLUDGE
-   call da_uv_to_vorticity( xb, xa % u, xa % v, vor, &
+   call da_uv_to_vorticity(xb, xa % u, xa % v, vor, &
 #else
-   call da_uv_to_vorticity( xb, xa % u(ims,jms,kms), &
+   call da_uv_to_vorticity(xb, xa % u(ims,jms,kms), &
                             xa % v(ims,jms,kms), &
                             vor(ims,jms,kms), &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
 
    ! Convert vorticity to Del**2 psi:
-   if(.not. global ) then               
+   if (.not. global) then               
       if (fg_format == fg_format_wrf) then
-         one_over_m2(its:ite,jts:jte) = 1.0 / ( xb % map_factor(its:ite,jts:jte) * &
-                                        xb % map_factor(its:ite,jts:jte) )
+         one_over_m2(its:ite,jts:jte) = 1.0 / (xb % map_factor(its:ite,jts:jte) * &
+                                        xb % map_factor(its:ite,jts:jte))
          do k = kts, kte
             vor(its:ite,jts:jte,k) = &
               one_over_m2(its:ite,jts:jte)*vor(its:ite,jts:jte,k)
@@ -80,10 +80,10 @@ subroutine da_transform_xtovp( xb, xbx, xa, xp, vp, be, &
 #endif
                             ids,ide, jds,jde, kds,kde,  &
                             ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte )
+                            its,ite, jts,jte, kts,kte)
 
    ! Convert divergence to Del**2 chi:
-   if(.not. global )  then              
+   if (.not. global)  then              
       if (fg_format == fg_format_wrf) then
          do k = kts, kte
             div(its:ite,jts:jte,k) = &

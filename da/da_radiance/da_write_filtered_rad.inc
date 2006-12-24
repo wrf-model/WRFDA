@@ -23,31 +23,31 @@ subroutine da_write_filtered_rad(ob, iv)
       if (iv%instid(n)%num_rad < 1) cycle
 
 #ifdef DM_PARALLEL
-      write(UNIT=stdout,FMT='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
+      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
 #else
-      write(UNIT=stdout,FMT='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
+      write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
 #endif
 
 #ifdef DM_PARALLEL
-      write(UNIT=filename, FMT='(a,i2.2)') &
+      write(unit=filename, fmt='(a,i2.2)') &
          'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin_', myproc
 #else
-      write(UNIT=filename, FMT='(a)') &
+      write(unit=filename, fmt='(a)') &
          'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
 #endif
       
       call da_get_unit(filtered_rad_unit)
-      open(UNIT=filtered_rad_unit,file=trim(filename), &
+      open(unit=filtered_rad_unit,file=trim(filename), &
          form='unformatted',iostat=ios)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open filtered radiance file"//filename/))
       Endif
 
-      write(UNIT=filtered_rad_unit) iv%instid(n)%num_rad
+      write(unit=filtered_rad_unit) iv%instid(n)%num_rad
 
       do i =1,iv%instid(n)%num_rad
-         write(UNIT=filtered_rad_unit) i, &
+         write(unit=filtered_rad_unit) i, &
                    iv%instid(n)%rad(i)%info%date_char, &
                    iv%instid(n)%rad(i)%scanpos       , &
                    iv%instid(n)%rad(i)%ifgat         , &
@@ -62,7 +62,7 @@ subroutine da_write_filtered_rad(ob, iv)
                    iv%instid(n)%rad(i)%tb(:)%qc
 
       end do     ! end do pixels
-      close(UNIT=filtered_rad_unit)
+      close(unit=filtered_rad_unit)
       call da_free_unit(filtered_rad_unit)
    end do    !! end do instruments
 

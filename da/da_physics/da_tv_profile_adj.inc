@@ -1,7 +1,9 @@
 subroutine da_tv_profile_adj(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
 
-   ! This is the adjoint routine for Tv_profile
+   !-----------------------------------------------------------------------
+   ! Purpose: adjoint routine for da_tv_profile
+   !-----------------------------------------------------------------------
 
    implicit none
 

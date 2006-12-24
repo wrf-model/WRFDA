@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_rv( xb, oi, xa, y )
+subroutine da_transform_xtoy_ssmi_rv(xb, oi, xa, y)
 
    implicit none
    type (xb_type), intent(in)   :: xb       ! first guess state.

@@ -1,4 +1,4 @@
-subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
+subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
 
    use da_tools
 
@@ -10,7 +10,7 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
    real,    intent(in)  :: int_wgts(1:nj)  ! Integration weights.
    real,    intent(in)  :: alp(1:alp_size) ! Associated Legendre Polynomials.
 
-   real, parameter :: tolerance = 1.0e-6  ! Warning if normalization error exceeds.
+   real, parameter :: tolerance = 1.0e-6  ! warn if normalization error exceeds
 
    integer :: m, l1, l2, j, j1    ! Loop counters.
    integer :: max_j               ! Maximum j for ALP etc.
@@ -26,26 +26,27 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
    call da_get_unit(spec_unit)
    open(unit=spec_unit,file="spec_pol",status="replace")
 
-   if ( (nj+1) / 2 == nj/2 + 1 ) then
+   if ((nj+1) / 2 == nj/2 + 1) then
       eq_coeff = 1.0 ! Odd latitudes
    else
       eq_coeff = 0.0 ! Even latitudes
       eq_term  = 0.0
    end if
 
-   ! Test 0.5 * integral_-1^1 alp(j,l1,m) * alp(j,l2,m) = 1 if l1=l2, 0 otherwise:
+   ! Test 0.5 * integral_-1^1 alp(j,l1,m) * alp(j,l2,m) = 1 if l1=l2, 
+   ! 0 otherwise:
 
    do m = 0, max_wavenumber
-      index_m = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+      index_m = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
       do l1 = m, max_wavenumber
          do l2 = m, max_wavenumber
 
-            sign_switch1 = (-1)**( l1 + m )
-            sign_switch2 = (-1)**( l2 + m )
+            sign_switch1 = (-1)**(l1 + m)
+            sign_switch2 = (-1)**(l2 + m)
 
             alp_norm_test = 0.0
             do j = 1, nj / 2
-               index_j = ( j - 1 ) * (max_wavenumber+1) * ( max_wavenumber+2) /2
+               index_j = (j - 1) * (max_wavenumber+1) * (max_wavenumber+2) /2
                index1 = index_j + index_m + l1
                index2 = index_j + index_m + l2
 
@@ -59,30 +60,30 @@ subroutine da_setlegpol_test ( nj, max_wavenumber, alp_size, int_wgts, alp )
                   sign_switch1 * alp(index1) * sign_switch2 * alp(index2)
             end do
 
-            if( eq_coeff > 0.0 ) then   
+            if (eq_coeff > 0.0) then   
                ! Skip this step for even lats       R! Syed RH Rizvi! S
                ! Add equator term (wrong if even nj, but then eq_coeff = 0.0 
                ! so OK):
                j = nj/2 + 1
-               index_j = ( j - 1 ) * (max_wavenumber+1 ) * (max_wavenumber+2) /2
+               index_j = (j - 1) * (max_wavenumber+1) * (max_wavenumber+2) /2
                index1 = index_j + index_m + l1
                index2 = index_j + index_m + l2
 
                eq_term = int_wgts(j) * alp(index1) * alp(index2)
             end if
-            alp_norm_test = 0.5 * ( alp_norm_test + eq_coeff * eq_term )
+            alp_norm_test = 0.5 * (alp_norm_test + eq_coeff * eq_term)
 
-            ! if ( l1 /= l2 .and. abs(alp_norm_test) >= tolerance ) then
+            ! if (l1 /= l2 .and. abs(alp_norm_test) >= tolerance) then
             !    write(unit=stdout,fmt='(a,3i6,f15.10,a,f15.10)')
-            !      ' WARNinG: ALP normalization error (m, l1, l2) = ', !&
+            !      ' warning: ALP normalization error (m, l1, l2) = ', !&
             !                                      m, l1, l2, alp_norm_test, &
             !                                      ', > tolerance = ', tolerance
             !            end if
-            if ( l1 == l2 .and. abs(alp_norm_test-1.0) >= tolerance ) then
+            if (l1 == l2 .and. abs(alp_norm_test-1.0) >= tolerance) then
                write(unit=spec_unit,fmt='(a,3i6,f15.10,a,f15.10)') &
-                 ' WARNinG: ALP normalization error (m, l1, l2) = ', &
-                                                 m, l1, l2, alp_norm_test - 1.0, &
-                                                 ', > tolerance = ', tolerance
+                 ' warning: ALP normalization error (m, l1, l2) = ', &
+                 m, l1, l2, alp_norm_test - 1.0, &
+                 ', > tolerance = ', tolerance
 
             end if
          end do

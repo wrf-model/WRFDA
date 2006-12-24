@@ -1,8 +1,10 @@
-subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
+subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Perform one pass of recursive filter on 1D array - adjoint.
    !---------------------------------------------------------------------------
+
+   implicit none
 
    integer, intent(in)    :: pass           ! Current pass of filter.
    real, intent(in)       :: alpha          ! Alpha coefficient for RF.
@@ -43,10 +45,10 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
    ! use turning conditions as in the appendix of Hayden & Purser (1995):
 
    if (pass == 1) then
-      b(n) = b(n) + c(n) / ( 1.0 + alpha )
+      b(n) = b(n) + c(n) / (1.0 + alpha)
    else
-      b(n) = b(n) + one_alpha * c(n) / ( 1.0 - alpha**2)**2
-      b(n-1) = b(n-1) - one_alpha * alpha**3 * c(n) / ( 1.0 - alpha**2)**2
+      b(n) = b(n) + one_alpha * c(n) / (1.0 - alpha**2)**2
+      b(n-1) = b(n-1) - one_alpha * alpha**3 * c(n) / (1.0 - alpha**2)**2
    end if
 
    !-------------------------------------------------------------------------
@@ -67,10 +69,10 @@ subroutine da_recursive_filter_1d_adj( pass, alpha, field, n )
    if (pass == 1) then
       a(1) = a(1) + one_alpha * b(1)
    else if (pass == 2) then
-      a(1) = a(1) + b(1) / ( 1.0 + alpha )
+      a(1) = a(1) + b(1) / (1.0 + alpha)
    else
-      a(1) = a(1) + one_alpha * b(1) / ( 1.0 - alpha**2)**2
-      a(2) = a(2) - one_alpha * alpha**3 * b(1) / ( 1.0 - alpha**2)**2
+      a(1) = a(1) + one_alpha * b(1) / (1.0 - alpha**2)**2
+      a(2) = a(2) - one_alpha * alpha**3 * b(1) / (1.0 - alpha**2)**2
    end if
 
    field(1:n) = a(1:n)

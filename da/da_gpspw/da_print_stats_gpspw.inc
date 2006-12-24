@@ -1,4 +1,4 @@
-subroutine da_print_stats_gpspw( stats_unit, ntpw, Gpspw )
+subroutine da_print_stats_gpspw(stats_unit, ntpw, Gpspw)
 
    implicit none
 

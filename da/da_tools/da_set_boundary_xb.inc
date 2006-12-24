@@ -1,9 +1,9 @@
 subroutine da_set_boundary_xb(xb)
 
    !------------------------------------------------------------------------
-   !  Purpose:  
+   ! Purpose:  
    !
-   !  Merge East-West boundary values for the desired Xb-type variables 
+   ! Merge East-West boundary values for the desired Xb-type variables 
    !------------------------------------------------------------------------
 
    implicit none
@@ -12,9 +12,9 @@ subroutine da_set_boundary_xb(xb)
 
    integer :: n, j, k
 
-   if((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
+   if ((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
 
-   !--2d
+   ! 2d
    k = xb%kte + 1
    do j=xb%jms, xb%jme
       do n=1,bdyzone
@@ -62,7 +62,7 @@ subroutine da_set_boundary_xb(xb)
       end do
    end do
 
-   !--3d
+   ! 3d
    do k=xb%kts, xb%kte
       do j=xb%jms, xb%jme
          do n=1,bdyzone

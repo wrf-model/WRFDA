@@ -1,13 +1,12 @@
+subroutine da_transform_xtotb_lin(xa, xb)
+   !-------------------------------------------------------------------------
+   ! Purpose: TBD
+   !-------------------------------------------------------------------------
 
-!============================================================================
-subroutine da_transform_xtotb_lin( xa, xb )
-!----------------------------------------------------------------------------
    implicit none
-!----------------------------------------------------------------------------
+
    type (xb_type), intent(in)   :: xb       ! first guess state.
    type (x_type),  intent(inout):: xa       ! gridded analysis increment.
-
-!  LOCAL VARS
 
    integer                      :: n        ! loop counter.
    integer                      :: ks,ke    ! Range of 3rd dimension of arrays.
@@ -18,78 +17,78 @@ subroutine da_transform_xtotb_lin( xa, xb )
    real                         :: TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,TGL_tpw
    real                         :: TGL_htpw,TGL_speed,TGL_alw,TGL_zcld         
 
-!----------------------------------------------------------------------------
-
    ks = xb%kts
    ke = xb%kte
 
-!  call da_transform_xtotpw( xa, xb)
+   ! WHY
+   ! call da_transform_xtotpw(xa, xb)
 
    do j=xb%jts,xb%jte
-   do i=xb%its,xb%ite
-    
-! surface pressure (mb) (940 -1030)
+      do i=xb%its,xb%ite
+         ! surface pressure (mb) (940 -1030)
 
-      psfc     =  0.01*xb%psfc(i,j)
-      TGL_psfc =  0.01*xa%psfc(i,j)
+         psfc     =  0.01*xb%psfc(i,j)
+         TGL_psfc =  0.01*xa%psfc(i,j)
 
-! sea surface temperature (k) (273 - 303) (doesnot change) 
+         ! sea surface temperature (k) (273 - 303) (doesnot change) 
 
-      sst      = xb%tgrn(i,j)
-!     TGL_sst  = xa%tgrn(1,1)
-      TGL_sst  = 0.
+         sst      = xb%tgrn(i,j)
+         ! TGL_sst  = xa%tgrn(1,1)
+         TGL_sst  = 0.0
 
-! effective surface air temperature (263 - 303)
+         ! effective surface air temperature (263 - 303)
 
-      ta          = xb%tgrn(i,j) + &
-                    (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
+         ta          = xb%tgrn(i,j) + &
+                    (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2.0/0.0001)/ &
                     log(xb%h(i,j,ks)/0.0001)
 
-      TGL_ta      = (xa%t(i,j,ks)-0.)*log(2./0.0001)/ &
+         TGL_ta      = (xa%t(i,j,ks)-0.)*log(2.0/0.0001)/ &
                     log(xb%h(i,j,ks)/0.0001)
 
-! gamma is an emperical formula and zcld is given for now
+         ! gamma is an emperical formula and zcld is given for now
 
-      gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
-      zcld       = 1                           ! effective cloud height (km)
+         gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate (km) (4.0 - 6.5)
+         zcld       = 1                           ! effective cloud height (km)
                                                  ! = 1 if no cloud infomation
-      TGL_gamma = TGL_ta*0.023
-      TGL_zcld  = 0.
+         TGL_gamma = TGL_ta*0.023
+         TGL_zcld  = 0.0
      
 
-! total precipitable water in (kg/m**2) (0 - 70)
+         ! total precipitable water in (kg/m**2) (0 - 70)
 
-      tpw     = xb%tpw(i,j)*10.
-      TGL_tpw = xa%tpw(i,j)*10.
+         tpw     = xb%tpw(i,j)*10.0
+         TGL_tpw = xa%tpw(i,j)*10.0
 
-! speed, surface wind speed (m/sec)    (0 - 30) , take 10 m wind
+         ! speed, surface wind speed (m/sec)    (0 - 30) , take 10 m wind
 
-      speed     = xb%speed(i,j)
-      TGL_speed = xa%speed(i,j)
+         speed     = xb%speed(i,j)
+         TGL_speed = xa%speed(i,j)
 
-! Column liquid water (kg/m**2)   (0 - 0.5) (no data now. So, do it later.)
+         ! Column liquid water (kg/m**2)   (0 - 0.5) (no data now. So, do it later.)
 
-      alw     = 0.
-      TGL_alw = 0.
+         alw     = 0.0
+         TGL_alw = 0.0
 
-! Column height weighted moisture density on the grid locally 
+         ! Column height weighted moisture density on the grid locally 
 
-      zrhom = 0.0
-      do k=ks,ke
-         zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)*xb%rho(i,j,k)
+         zrhom = 0.0
+         do k=ks,ke
+            zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
+               xb%q(i,j,k)*xb%rho(i,j,k)
+         end do
+
+         TGL_zrhom = 0.0
+         do k = ks,ke
+            TGL_zrhom = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
+               (xb%q(i,j,k)*xa%rho(i,j,k) + &
+               xa%q(i,j,k)*xb%rho(i,j,k)) + TGL_zrhom
       end do
 
-      TGL_zrhom = 0.
-      do k = ks,ke
-         TGL_zrhom = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*(xb%q(i,j,k)*xa%rho(i,j,k) + &
-                                            xa%q(i,j,k)*xb%rho(i,j,k)   &
-                                           ) + TGL_zrhom
-      end do
+      ! WHY
+      ! call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
+      ! call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
 
-!     call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
-!     call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
-
-! Column moisture density on the grid locally
+      ! Column moisture density on the grid locally
 
       htpw     = zrhom/tpw/1000.
       TGL_htpw = TGL_zrhom/tpw/1000. &
@@ -99,312 +98,308 @@ subroutine da_transform_xtotb_lin( xa, xb )
                   xb%tb19v(i,j),xb%tb19h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
-                  TGL_zcld,xa%tb19v(i,j),xa%tb19h(i,j)              )
+                  TGL_zcld,xa%tb19v(i,j),xa%tb19h(i,j)             )
 
       call da_tb_tl(2,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb22v(i,j),dum1,                               &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
-                  TGL_zcld,xa%tb22v(i,j),dum2                       )
+                  TGL_zcld,xa%tb22v(i,j),dum2                      )
 
       call da_tb_tl(3,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb37v(i,j),xb%tb37h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
-                  TGL_zcld,xa%tb37v(i,j),xa%tb37h(i,j)              )
+                  TGL_zcld,xa%tb37v(i,j),xa%tb37h(i,j)             )
 
-      call da_tb_tl(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+         call da_tb_tl(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb85v(i,j),xb%tb85h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
-                  TGL_zcld,xa%tb85v(i,j),xa%tb85h(i,j)              )
-   end do
+                  TGL_zcld,xa%tb85v(i,j),xa%tb85h(i,j)             )
+      end do
    end do
 
 end subroutine da_transform_xtotb_lin
 
-!============================================================================
+
 subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                   tbv,tbh,                                                  &
                   TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
-                  TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh            )
-! ---------------------------------------------------------------------------
-  implicit none
-! ---------------------------------------------------------------------------
-!
-! Input  : TGL_p0,  TGL_ta,   TGL_gamma, TGL_sst, TGL_wv, TGL_hwv, TGL_u
-!          TGL_alw, TGL_zcld
-! Output : TGL_tbv, TGL_tbh,  tbv,  tbh
-! ---------------------------------------------------------------------------
-      integer, intent(in   ) :: ifreq
-      real   , intent(in   ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
-      real   , intent(in   ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
-                                TGL_hwv,TGL_u,TGL_alw,TGL_zcld
-      real   , intent(in   ) :: tbv,tbh
-      real   , intent(  out) :: TGL_tbv,TGL_tbh 
+                  TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh           )\
 
-      real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
+   !---------------------------------------------------------------------------
+   ! Purpose: TBD
+   ! Input  : TGL_p0,  TGL_ta,   TGL_gamma, TGL_sst, TGL_wv, TGL_hwv, TGL_u
+   !          TGL_alw, TGL_zcld
+   ! Output : TGL_tbv, TGL_tbh,  tbv,  tbh
+   ! ---------------------------------------------------------------------------
 
-      real :: f,costhet,gx2,tbup,tbdn,tauatm,sigma,remv,remh
-      real :: effangv,effangh,tbdnv,dum,foam,emissv,emissh 
-      real :: refv,refh,semv,semh,scatv,scath,tbdnh
-      real :: TGL_gx2,TGL_tbup,TGL_tbdn,TGL_tauatm,TGL_sigma
-      real :: TGL_tremv,TGL_remh,TGL_effangv,TGL_effangh
-      real :: TGL_tbdnh,TGL_dum,TGL_foam,TGL_emissv
-      real :: TGL_emissh,TGL_refv,TGL_refh,TGL_semv
-      real :: TGL_semh,TGL_scatv,TGL_scath,TGL_remv,TGL_tbdnv
-      real :: TGL_theta
+   implicit none
 
-      real :: fem
+   integer, intent(in  ) :: ifreq
+   real   , intent(in  ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
+   real   , intent(in  ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
+                             TGL_hwv,TGL_u,TGL_alw,TGL_zcld
+   real   , intent(in  ) :: tbv,tbh
+   real   , intent( out) :: TGL_tbv,TGL_tbh 
 
-      data freq/19.35,22.235,37.0,85.5/
+   real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
-! empirical bias corrections for surface emissivity
+   real :: f,costhet,gx2,tbup,tbdn,tauatm,sigma,remv,remh
+   real :: effangv,effangh,tbdnv,dum,foam,emissv,emissh 
+   real :: refv,refh,semv,semh,scatv,scath,tbdnh
+   real :: TGL_gx2,TGL_tbup,TGL_tbdn,TGL_tauatm,TGL_sigma
+   real :: TGL_tremv,TGL_remh,TGL_effangv,TGL_effangh
+   real :: TGL_tbdnh,TGL_dum,TGL_foam,TGL_emissv
+   real :: TGL_emissh,TGL_refv,TGL_refh,TGL_semv
+   real :: TGL_semh,TGL_scatv,TGL_scath,TGL_remv,TGL_tbdnv
+   real :: TGL_theta
 
-!
-      data ebiasv/0.0095, 0.005,-0.014, -0.0010/
-      data ebiash/0.004,   0.0,-0.023, 0.043/
+   real :: fem
 
+   data freq/19.35,22.235,37.0,85.5/
 
-      data cf1/0.0015,0.004,0.0027,0.005/
-      data cg/4.50e-3, 5.200e-3, 5.5e-3, 7.2e-3 /
+   ! empirical bias corrections for surface emissivity
 
-      data cf2/0.0023,0.000,0.0002,-0.006/
+   data ebiasv/0.0095, 0.005,-0.014, -0.0010/
+   data ebiash/0.004,   0.0,-0.023, 0.043/
 
-! 'foam' emissivity
-      data fem /1.0/
-!
-      f = freq(ifreq)
-      costhet = cos(theta*0.017453)
+   data cf1/0.0015,0.004,0.0027,0.005/
+   data cg/4.50e-3, 5.200e-3, 5.5e-3, 7.2e-3 /
 
-! effective surface slope variance
+   data cf2/0.0023,0.000,0.0002,-0.006/
 
-          gx2 = cg(ifreq)*    u
-      TGL_gx2 = cg(ifreq)*TGL_u
+   ! 'foam' emissivity
+   data fem /1.0/
 
-! get upwelling atmospheric brightness temperature
+   f = freq(ifreq)
+   costhet = cos(theta*0.017453)
 
-      TGL_theta=0.
-      call da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
+   ! effective surface slope variance
+
+   gx2 = cg(ifreq)*    u
+   TGL_gx2 = cg(ifreq)*TGL_u
+
+   ! get upwelling atmospheric brightness temperature
+
+   TGL_theta=0.
+   call da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
                        TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,  &
                        TGL_alw,TGL_zcld,TGL_tbup,TGL_tbdn,      &
-                       TGL_tauatm                               )
+                       TGL_tauatm                              )
 
-! convert transmittance to optical depth
+   ! convert transmittance to optical depth
 
-          sigma = -alog(tauatm)*costhet
-      TGL_sigma = -costhet*TGL_tauatm/tauatm
+   sigma = -alog(tauatm)*costhet
+   TGL_sigma = -costhet*TGL_tauatm/tauatm
 
-! get rough surface emissivity
+   ! get rough surface emissivity
 
-      call da_roughem_tl(ifreq,gx2,sst,theta,remv,remh,         &
-                       TGL_gx2,TGL_sst,TGL_remv,TGL_remh      )
+   call da_roughem_tl(ifreq,gx2,sst,theta,remv,remh,         &
+                       TGL_gx2,TGL_sst,TGL_remv,TGL_remh     )
 
-! get effective zenith angles for scattered radiation at surface
+   ! get effective zenith angles for scattered radiation at surface
 
-      call da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,    &
-                      TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh )
+   call da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,    &
+                      TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh)
 
-! get effective sky brightness temperatures for scattered radiation
+   ! get effective sky brightness temperatures for scattered radiation
 
-      call da_tbatmos_tl(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
+   call da_tbatmos_tl(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnv,dum,                      &
                        TGL_effangv,TGL_p0,TGL_wv,TGL_hwv,       &
                        TGL_ta,TGL_gamma,TGL_alw,TGL_zcld,       & 
-                       TGL_dum,TGL_tbdnv,TGL_dum                )
+                       TGL_dum,TGL_tbdnv,TGL_dum               )
 
-      call da_tbatmos_tl(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
+   call da_tbatmos_tl(ifreq,effangh,p0,wv,hwv,ta,gamma,alw,    &
                        zcld,dum,tbdnh,dum,                      &
                        TGL_effangh,TGL_p0,TGL_wv,TGL_hwv,       &
                        TGL_ta,TGL_gamma,TGL_alw,TGL_zcld,       &
-                       TGL_dum,TGL_tbdnh,TGL_dum                )
+                       TGL_dum,TGL_tbdnh,TGL_dum               )
 
-! compute 'foam' coverage
+   ! compute 'foam' coverage
 
-          foam = cf1(ifreq)*    u
-      TGL_foam = cf1(ifreq)*TGL_u
+   foam = cf1(ifreq)*    u
+   TGL_foam = cf1(ifreq)*TGL_u
 
-      if (u .gt. 5.0) then
-        TGL_foam = TGL_foam + cf2(ifreq)*TGL_u
-            foam =     foam + cf2(ifreq)*(   u-5.0)
-      end if
+   if (u .gt. 5.0) then
+      TGL_foam = TGL_foam + cf2(ifreq)*TGL_u
+      foam =     foam + cf2(ifreq)*(  u-5.0)
+   end if
 
-! compute surface emissivities and reflectivity
+   ! compute surface emissivities and reflectivity
 
-          emissv =     foam*fem + (1.0 - foam)*(remv + ebiasv(ifreq))
-      TGL_emissv = TGL_foam*fem - TGL_foam*(remv + ebiasv(ifreq)) &
+   emissv     =     foam*fem + (1.0 - foam)*(remv + ebiasv(ifreq))
+   TGL_emissv = TGL_foam*fem - TGL_foam*(remv + ebiasv(ifreq)) &
                                 + (1.0 - foam)*TGL_remv
-          emissh =     foam*fem + (1.0 - foam)*(remh + ebiash(ifreq))
-      TGL_emissh = TGL_foam*fem - TGL_foam*(remh + ebiash(ifreq)) &
+   emissh     =     foam*fem + (1.0 - foam)*(remh + ebiash(ifreq))
+   TGL_emissh = TGL_foam*fem - TGL_foam*(remh + ebiash(ifreq)) &
                                 + (1.0 - foam)*TGL_remh
-          refv =   1.0 - emissv
-      TGL_refv = - TGL_emissv
-          refh =   1.0 - emissh
-      TGL_refh = - TGL_emissh
+   refv     =   1.0 - emissv
+   TGL_refv = - TGL_emissv
+   refh     =   1.0 - emissh
+   TGL_refh = - TGL_emissh
 
-! compute surface emission term
+   ! compute surface emission term
 
-          semv = sst*emissv
-      TGL_semv = TGL_sst*emissv + sst*TGL_emissv
-          semh = sst*emissh
-      TGL_semh = TGL_sst*emissh + sst*TGL_emissh
+   semv     = sst*emissv
+   TGL_semv = TGL_sst*emissv + sst*TGL_emissv
+   semh     = sst*emissh
+   TGL_semh = TGL_sst*emissh + sst*TGL_emissh
 
-! compute surface scattering term
+   ! compute surface scattering term
 
-          scatv = refv*tbdnv
-      TGL_scatv = TGL_refv*tbdnv + refv*TGL_tbdnv
-          scath = refh*tbdnh
-      TGL_scath = TGL_refh*tbdnh + refh*TGL_tbdnh
+   scatv     = refv*tbdnv
+   TGL_scatv = TGL_refv*tbdnv + refv*TGL_tbdnv
+   scath     = refh*tbdnh
+   TGL_scath = TGL_refh*tbdnh + refh*TGL_tbdnh
 
-! combine to get space-observed brightness temperature
+   ! combine to get space-observed brightness temperature
 
-!         tbv =     tbup + tauatm*(semv + scatv)
-      TGL_tbv = TGL_tbup + TGL_tauatm*(semv + scatv)   &
+   ! tbv     =     tbup + tauatm*(semv + scatv)
+   TGL_tbv = TGL_tbup + TGL_tauatm*(semv + scatv)   &
                          + tauatm*(TGL_semv + TGL_scatv)
-!         tbh =     tbup + tauatm*(semh + scath)
-      TGL_tbh = TGL_tbup + TGL_tauatm*(semh + scath)   &
+   ! tbh     =     tbup + tauatm*(semh + scath)
+   TGL_tbh = TGL_tbup + TGL_tauatm*(semh + scath)   &
                          + tauatm*(TGL_semh + TGL_scath)
 
- end subroutine da_tb_tl
+end subroutine da_tb_tl
 
-!============================================================================
+
 subroutine da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_sigma_v)
-! ---------------------------------------------------------------------------
-implicit none
-! ---------------------------------------------------------------------------
-!
-!Input             : TGL_p0, TGL_wv, TGL_hwv, TGL_ta, TGL_gamma
-!Output            : TGL_sigma_v
-!Output base field : sigma_v
-! ---------------------------------------------------------------------------
 
+   !---------------------------------------------------------------------------
+   ! Purpose : TBD
+   ! Input             : TGL_p0, TGL_wv, TGL_hwv, TGL_ta, TGL_gamma
+   ! Output            : TGL_sigma_v
+   ! Output base field : sigma_v
+   !---------------------------------------------------------------------------
 
-      integer, intent(in) :: ifreq
-      real, intent(in   ):: p0,wv,hwv,ta,gamma  ! base field
-      real, intent(in   ):: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma
-      real, intent(out  ):: TGL_sigma_v,sigma_v
-!
-      real wvc, wvcor(4)
-      real TGL_wvc
-!
-      real voh1,otbar1,pbar1
-      real term21,term31,term41,term51,term61
-      real a11,a21,a31,a41,a51,a61
-      real TGL_voh1,TGL_otbar1,TGL_pbar1
-      real TGL_term21,TGL_term31,TGL_term41,TGL_term51,TGL_term61
-!
-      real voh2,otbar2,pbar2
-      real term22,term32,term42,term52,term62
-      real a12,a22,a32,a42,a52,a62
-      real TGL_voh2,TGL_otbar2,TGL_pbar2
-      real TGL_term22,TGL_term32,TGL_term42,TGL_term52,TGL_term62
-!
-      real voh3,otbar3,pbar3
-      real term23,term33,term43,term53,term63
-      real a13,a23,a33,a43,a53,a63
-      real TGL_voh3,TGL_otbar3,TGL_pbar3
-      real TGL_term23,TGL_term33,TGL_term43,TGL_term53,TGL_term63
-!
-      real voh4,otbar4,pbar4
-      real term24,term34,term44,term54,term64
-      real a14,a24,a34,a44,a54,a64
-      real TGL_voh4,TGL_otbar4,TGL_pbar4
-      real TGL_term24,TGL_term34,TGL_term44,TGL_term54,TGL_term64
-!
-      real const1,const2,const3,const4
-      real h1,h2,h3,h4
+   implicit none
 
-      real sigv, TGL_sigv
-!
-      data const1,const2,const3,const4/0.6,2.8,0.2,0.2/
-      data h1,h2,h3,h4/5.0,4.9,6.8,6.4/
-!
-      data a11,a21,a31,a41,a51,a61/-.13747e-2,-.43061e-4, .14618e+1,  &
-        .25101e-3, .14635e-1,-.18588e+3/
-      data a12,a22,a32,a42,a52,a62/ .22176e-1,-.32367e-4,-.10840e-4,  &
-        -.63578e-1, .16988e-7,-.29824e+2/
-      data a13,a23,a33,a43,a53,a63/-.10566e-2,-.12906e-3, .56975e+0,  &
-         .10828e-8,-.17551e-7, .48601e-1/
-      data a14,a24,a34,a44,a54,a64/-.60808e-2,-.70936e-3, .28721e+1,  &
-         .42636e-8,-.82910e-7, .26166e+0/
-!
-!     data wvcor/1.01,0.95,1.06,0.92/
-      data wvcor/1.02,0.98,1.02,0.88/
-! use modified water vapor value to correct for errors in theoretical absorption
-!
+   integer, intent(in) :: ifreq
+   real, intent(in  ):: p0,wv,hwv,ta,gamma  ! base field
+   real, intent(in  ):: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma
+   real, intent(out ):: TGL_sigma_v,sigma_v
 
-          wvc =     wv*wvcor(ifreq)
-      TGL_wvc = TGL_wv*wvcor(ifreq)
+   real wvc, wvcor(4)
+   real TGL_wvc
 
-      if (ifreq.eq.1) then
+   real voh1,otbar1,pbar1
+   real term21,term31,term41,term51,term61
+   real a11,a21,a31,a41,a51,a61
+   real TGL_voh1,TGL_otbar1,TGL_pbar1
+   real TGL_term21,TGL_term31,TGL_term41,TGL_term51,TGL_term61
 
-             pbar1 = p0/(1.0 + hwv/h1)
-         TGL_pbar1 = TGL_p0/(1.0 + hwv/h1)-pbar1*TGL_hwv/(h1*(1.0 + hwv/h1))
-              voh1 = wv/hwv
-          TGL_voh1 = TGL_wv/hwv-voh1*TGL_hwv/hwv
-            term21 = a21*voh1
-        TGL_term21 = a21*TGL_voh1
-            otbar1 =  1.0/(ta - const1*gamma*hwv)
-        TGL_otbar1 = -otbar1*otbar1*(TGL_ta-const1*gamma*TGL_hwv &
-                                           -const1*TGL_gamma*hwv )
-            term31 = a31*otbar1
-        TGL_term31 = a31*TGL_otbar1
-            term61 = a61*otbar1*otbar1
-        TGL_term61 = 2.*a61*otbar1*TGL_otbar1
-            term41 = a41*pbar1*otbar1
-        TGL_term41 = a41*(TGL_pbar1*otbar1+pbar1*TGL_otbar1)
-            term51 = a51*voh1*otbar1
-        TGL_term51 = a51*(TGL_voh1*otbar1+voh1*TGL_otbar1)
-              sigv = a11 + term21 + term31 + term41 + term51 + term61
-          TGL_sigv = TGL_term21+TGL_term31+TGL_term41+TGL_term51+TGL_term61
+   real voh2,otbar2,pbar2
+   real term22,term32,term42,term52,term62
+   real a12,a22,a32,a42,a52,a62
+   real TGL_voh2,TGL_otbar2,TGL_pbar2
+   real TGL_term22,TGL_term32,TGL_term42,TGL_term52,TGL_term62
 
-      else if (ifreq.eq.2) then
+   real voh3,otbar3,pbar3
+   real term23,term33,term43,term53,term63
+   real a13,a23,a33,a43,a53,a63
+   real TGL_voh3,TGL_otbar3,TGL_pbar3
+   real TGL_term23,TGL_term33,TGL_term43,TGL_term53,TGL_term63
 
-            pbar2  = p0/(1.0 + hwv/h2)
-        TGL_pbar2  = TGL_p0/(1.0 + hwv/h2)-pbar2*TGL_hwv/h2/(1.0 + hwv/h2)
-            term22 = a22*pbar2
-        TGL_term22 = a22*TGL_pbar2
-            term52 = a52*pbar2*pbar2
-        TGL_term52 = 2.*a52*pbar2*TGL_pbar2
-              voh2 = wv/hwv
-          TGL_voh2 = TGL_wv/hwv-voh2*TGL_hwv/hwv
-            term32 = a32*voh2
-        TGL_term32 = a32*TGL_voh2
-            otbar2 = 1.0/(ta - const2*gamma*hwv)
-        TGL_otbar2 = -otbar2*otbar2*(TGL_ta-const2*gamma*TGL_hwv &
-                                           -const2*TGL_gamma*hwv )
-            term42 = a42*otbar2
-        TGL_term42 = a42*TGL_otbar2
-            term62 = a62*otbar2*otbar2
-        TGL_term62 = 2.*a62*otbar2*TGL_otbar2
-              sigv = a12 + term22 + term32 + term42 + term52 + term62
-          TGL_sigv = TGL_term22 + TGL_term32 + TGL_term42 + TGL_term52 + TGL_term62
+   real voh4,otbar4,pbar4
+   real term24,term34,term44,term54,term64
+   real a14,a24,a34,a44,a54,a64
+   real TGL_voh4,TGL_otbar4,TGL_pbar4
+   real TGL_term24,TGL_term34,TGL_term44,TGL_term54,TGL_term64
 
-      else if (ifreq.eq.3) then
+   real const1,const2,const3,const4
+   real h1,h2,h3,h4
 
-             pbar3 = p0/(1.0 + hwv/h3)
-         TGL_pbar3 = TGL_p0/(1.0 + hwv/h3)-pbar3*TGL_hwv/h3/(1.0 + hwv/h3)
-            term43 = a43*pbar3*pbar3
-        TGL_term43 = 2.*a43*pbar3*TGL_pbar3
-              voh3 = wv/hwv
-          TGL_voh3 = TGL_wv/hwv-voh3*TGL_hwv/hwv
-            term23 = a23*voh3
-        TGL_term23 = a23*TGL_voh3
-            otbar3 = 1.0/(ta - const3*gamma*hwv)
-        TGL_otbar3 = -otbar3*otbar3*(TGL_ta-const3*gamma*TGL_hwv &
-                                           -const3*TGL_gamma*hwv )
-            term33 = a33*otbar3
-        TGL_term33 = a33*TGL_otbar3
-            term53 = a53*pbar3*voh3
-        TGL_term53 = a53*(TGL_pbar3*voh3+pbar3*TGL_voh3)
-            term63 = a63*otbar3*voh3
-        TGL_term63 = a63*(TGL_otbar3*voh3+otbar3*TGL_voh3)
-              sigv = a13 + term23 + term33 + term43 + term53 + term63
-          TGL_sigv = TGL_term23 + TGL_term33 + TGL_term43 + TGL_term53 + TGL_term63
+   real sigv, TGL_sigv
 
-      else if (ifreq.eq.4) then
+   data const1,const2,const3,const4/0.6,2.8,0.2,0.2/
+   data h1,h2,h3,h4/5.0,4.9,6.8,6.4/
+
+   data a11,a21,a31,a41,a51,a61/-.13747e-2,-.43061e-4, .14618e+1,  &
+     .25101e-3, .14635e-1,-.18588e+3/
+   data a12,a22,a32,a42,a52,a62/ .22176e-1,-.32367e-4,-.10840e-4,  &
+     -.63578e-1, .16988e-7,-.29824e+2/
+   data a13,a23,a33,a43,a53,a63/-.10566e-2,-.12906e-3, .56975e+0,  &
+      .10828e-8,-.17551e-7, .48601e-1/
+   data a14,a24,a34,a44,a54,a64/-.60808e-2,-.70936e-3, .28721e+1,  &
+      .42636e-8,-.82910e-7, .26166e+0/
+
+   ! data wvcor/1.01,0.95,1.06,0.92/
+   data wvcor/1.02,0.98,1.02,0.88/
+   ! use modified water vapor value to correct for errors in theoretical absorption
+
+   wvc     =     wv*wvcor(ifreq)
+   TGL_wvc = TGL_wv*wvcor(ifreq)
+
+   if (ifreq.eq.1) then
+      pbar1 = p0/(1.0 + hwv/h1)
+      TGL_pbar1  = TGL_p0/(1.0 + hwv/h1)-pbar1*TGL_hwv/(h1*(1.0 + hwv/h1))
+      voh1       = wv/hwv
+      TGL_voh1   = TGL_wv/hwv-voh1*TGL_hwv/hwv
+      term21     = a21*voh1
+      TGL_term21 = a21*TGL_voh1
+      otbar1     =  1.0/(ta - const1*gamma*hwv)
+      TGL_otbar1 = -otbar1*otbar1*(TGL_ta-const1*gamma*TGL_hwv &
+                                        -const1*TGL_gamma*hwv)
+      term31     = a31*otbar1
+      TGL_term31 = a31*TGL_otbar1
+      term61     = a61*otbar1*otbar1
+      TGL_term61 = 2.*a61*otbar1*TGL_otbar1
+      term41     = a41*pbar1*otbar1
+      TGL_term41 = a41*(TGL_pbar1*otbar1+pbar1*TGL_otbar1)
+      term51     = a51*voh1*otbar1
+      TGL_term51 = a51*(TGL_voh1*otbar1+voh1*TGL_otbar1)
+      sigv       = a11 + term21 + term31 + term41 + term51 + term61
+      TGL_sigv   = TGL_term21+TGL_term31+TGL_term41+TGL_term51+TGL_term61
+
+   else if (ifreq.eq.2) then
+      pbar2      = p0/(1.0 + hwv/h2)
+      TGL_pbar2  = TGL_p0/(1.0 + hwv/h2)-pbar2*TGL_hwv/h2/(1.0 + hwv/h2)
+      term22     = a22*pbar2
+      TGL_term22 = a22*TGL_pbar2
+      term52     = a52*pbar2*pbar2
+      TGL_term52 = 2.*a52*pbar2*TGL_pbar2
+      voh2       = wv/hwv
+      TGL_voh2   = TGL_wv/hwv-voh2*TGL_hwv/hwv
+      term32     = a32*voh2
+      TGL_term32 = a32*TGL_voh2
+      otbar2     = 1.0/(ta - const2*gamma*hwv)
+      TGL_otbar2 = -otbar2*otbar2*(TGL_ta-const2*gamma*TGL_hwv &
+                                           -const2*TGL_gamma*hwv)
+      term42     = a42*otbar2
+      TGL_term42 = a42*TGL_otbar2
+      term62     = a62*otbar2*otbar2
+      TGL_term62 = 2.*a62*otbar2*TGL_otbar2
+      sigv       = a12 + term22 + term32 + term42 + term52 + term62
+      TGL_sigv   = TGL_term22 + TGL_term32 + TGL_term42 + TGL_term52 + TGL_term62
+
+   else if (ifreq.eq.3) then
+      pbar3      = p0/(1.0 + hwv/h3)
+      TGL_pbar3  = TGL_p0/(1.0 + hwv/h3)-pbar3*TGL_hwv/h3/(1.0 + hwv/h3)
+      term43     = a43*pbar3*pbar3
+      TGL_term43 = 2.*a43*pbar3*TGL_pbar3
+      voh3       = wv/hwv
+      TGL_voh3   = TGL_wv/hwv-voh3*TGL_hwv/hwv
+      term23     = a23*voh3
+      TGL_term23 = a23*TGL_voh3
+      otbar3     = 1.0/(ta - const3*gamma*hwv)
+      TGL_otbar3 = -otbar3*otbar3*(TGL_ta-const3*gamma*TGL_hwv &
+                                        -const3*TGL_gamma*hwv)
+      term33     = a33*otbar3
+      TGL_term33 = a33*TGL_otbar3
+      term53     = a53*pbar3*voh3
+      TGL_term53 = a53*(TGL_pbar3*voh3+pbar3*TGL_voh3)
+      term63     = a63*otbar3*voh3
+      TGL_term63 = a63*(TGL_otbar3*voh3+otbar3*TGL_voh3)
+      sigv       = a13 + term23 + term33 + term43 + term53 + term63
+      TGL_sigv   = TGL_term23 + TGL_term33 + TGL_term43 + TGL_term53 + TGL_term63
+
+   else if (ifreq.eq.4) then
 
              pbar4 = p0/(1.0 + hwv/h4)
          TGL_pbar4 = TGL_p0/(1.0 + hwv/h4)-pbar4*TGL_hwv/h4/(1.0 + hwv/h4)
@@ -416,7 +411,7 @@ implicit none
         TGL_term24 = a24*TGL_voh4
             otbar4 = 1.0/(ta - const4*gamma*hwv)
         TGL_otbar4 = -otbar4*otbar4*(TGL_ta-const4*gamma*TGL_hwv &
-                                           -const4*TGL_gamma*hwv )
+                                           -const4*TGL_gamma*hwv)
             term34 = a34*otbar4
         TGL_term34 = a34*TGL_otbar4
             term54 = a54*pbar4*voh4
@@ -440,7 +435,7 @@ end subroutine da_cal_sigma_v_tl
 !====================================================================
 subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
                      TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_mu,        &
-                     TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf )
+                     TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf)
 !--------------------------------------------------------------------
 implicit none
 !--------------------------------------------------------------------
@@ -450,11 +445,11 @@ implicit none
 !         TGL_hdninf, hdninf, TGL_hupinf, hupinf
 !--------------------------------------------------------------------
 
-      real,   intent(in   ) :: ho,hv,sigo,sigv,mu,zcld
-      real,   intent(in   ) :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, &
+      real,   intent(in  ) :: ho,hv,sigo,sigv,mu,zcld
+      real,   intent(in  ) :: TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_zcld, &
                                TGL_mu
-      real,   intent(  out) :: hdn,hup,hdninf,hupinf
-      real,   intent(  out) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
+      real,   intent( out) :: hdn,hup,hdninf,hupinf
+      real,   intent( out) :: TGL_hdn,TGL_hup,TGL_hdninf,TGL_hupinf
 
       real :: gint,zgint,hint,zhint
       real :: ginf,zginf,hinf,zhinf
@@ -654,13 +649,13 @@ implicit none
       TGL_tprim  = TGL_ezhoo*ho*chioo +ezhoo*TGL_ho*chioo + ezhoo*ho*TGL_chioo + &
                    4.0d0*(TGL_ezhov*newh11*chiov +    &
                           ezhov*TGL_newh11*chiov +    &
-                          ezhov*newh11*TGL_chiov  ) + &
+                          ezhov*newh11*TGL_chiov ) + &
                    TGL_ezhvv*hv*chivv + ezhvv*TGL_hv*chivv + ezhvv*hv*TGL_chivv
 
           u      = sigooo*ho + 9.0d0*(sigovv*h21+sigoov*h12) + sigvvv*hv
       TGL_u      = TGL_sigooo*ho + sigooo*TGL_ho + &
                    9.0d0*(TGL_sigovv*h21 + sigovv*TGL_h21 +    &
-                          TGL_sigoov*h12 + sigoov*TGL_h12  ) + &
+                          TGL_sigoov*h12 + sigoov*TGL_h12 ) + &
                    TGL_sigvvv*hv + sigvvv*TGL_hv
 
           uprim  = ezhvvv*hv*chivvv +  &
@@ -672,7 +667,7 @@ implicit none
                            ezhovv*h21*TGL_chiovv +     &
                            TGL_ezhoov*h12*chioov +     &
                            ezhoov*TGL_h12*chioov +     &
-                           ezhoov*h12*TGL_chioov   ) + &
+                           ezhoov*h12*TGL_chioov  ) + &
                     TGL_ezhooo*ho*chiooo + ezhooo*TGL_ho*chiooo + ezhooo*ho*TGL_chiooo
 !
           term1  =     s -     sprim
@@ -681,7 +676,7 @@ implicit none
           term2  = quartmu*(t - tprim)
       TGL_term2  = TGL_quartmu*(t - tprim) + quartmu*(TGL_t - TGL_tprim) 
 
-          term3  = etnthmu2*(    u -     uprim)
+          term3  = etnthmu2*(   u -     uprim)
       TGL_term3  = TGL_etnthmu2*(u - uprim) + etnthmu2*(TGL_u - TGL_uprim)
 
           zgint  = dmin*term1 +  cmin*term2 + term3
@@ -709,10 +704,10 @@ implicit none
           term1  =     alpha -     beta
       TGL_term1  = TGL_alpha - TGL_beta
 
-          term2  = halfmu*(    alph2 -     beta2)
+          term2  = halfmu*(   alph2 -     beta2)
       TGL_term2  = TGL_halfmu*(alph2 - beta2) + halfmu*(TGL_alph2 - TGL_beta2)
 
-          term3  = sixthmu2*(    alph3 -     beta3)
+          term3  = sixthmu2*(   alph3 -     beta3)
       TGL_term3  = TGL_sixthmu2*(alph3 - beta3) + sixthmu2*(TGL_alph3 - TGL_beta3)
 
           gint   = dmin*term1 +  cmin*term2 + term3
@@ -753,7 +748,7 @@ end subroutine da_effht_tl
 
 !============================================================================
 subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
-                      TGL_t, TGL_epsr, TGL_epsi                             )
+                      TGL_t, TGL_epsr, TGL_epsi                            )
 ! ---------------------------------------------------------------------------
 implicit none
 ! ---------------------------------------------------------------------------
@@ -770,9 +765,9 @@ implicit none
 !             ssw = salinity (permil) (if ssw < 0, ssw = 32.54)
 !     Output  epsr,epsi  = real and imaginary parts of dielectric constant
 !
-      real, intent(in   ) :: f, t, TGL_t
+      real, intent(in  ) :: f, t, TGL_t
       real, intent(inout) :: ssw
-      real, intent(  out) :: TGL_epsr, TGL_epsi, epsr, epsi
+      real, intent( out) :: TGL_epsr, TGL_epsi, epsr, epsi
 
       complex :: cdum1,cdum2,cdum3
       complex :: TGL_cdum1,TGL_cdum2,TGL_cdum3
@@ -840,7 +835,7 @@ end subroutine da_epsalt_tl
 
 !---------------------------------------------------------------------------
 subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
-                       TGL_tk,TGL_ev,TGL_eh                                )
+                       TGL_tk,TGL_ev,TGL_eh                               )
 !---------------------------------------------------------------------------
 implicit none
 !---------------------------------------------------------------------------
@@ -854,9 +849,9 @@ implicit none
 !     Returned values verified against data in Klein and Swift (1977) and
 !     against Table 3.8 in Olson (1987, Ph.D. Thesis)
 !
-      real, intent(in   ) :: f, tk, theta, TGL_tk
+      real, intent(in  ) :: f, tk, theta, TGL_tk
       real, intent(inout) :: ssw
-      real, intent(  out) :: TGL_ev, TGL_eh, ev, eh
+      real, intent( out) :: TGL_ev, TGL_eh, ev, eh
 
       real   epsr,epsi,TGL_epsr,TGL_epsi
 !
@@ -874,7 +869,7 @@ implicit none
       TGL_tc      =  TGL_tk
 
       call da_epsalt_tl(f,tc,ssw,epsr,epsi,         &
-                      TGL_tc, TGL_epsr, TGL_epsi  )
+                      TGL_tc, TGL_epsr, TGL_epsi )
 
           eps     =  cmplx(epsr,epsi)
       TGL_eps     =  cmplx(TGL_epsr,TGL_epsi)
@@ -903,14 +898,14 @@ implicit none
 ! Wei's Comment
 !     It is not a standard fortran if statement here.
 
-!     if(0) then
+!     if (0) then
 !               tmp0r   =  real(epsnew)
 !           TGL_tmp0r   =  real(TGL_epsnew)
 !               tmp0i   = -aimag(epsnew)
 !           TGL_tmp0i   = -aimag(TGL_epsnew)
 !               rnorm   =  sqrt(tmp0r*tmp0r+tmp0i*tmp0i)
 !               uniti   =  (0,1)
-!           if(rnorm .gt. 0.) then
+!           if (rnorm .gt. 0.) then
 !             if (abs(tmp0i) .gt. 0.) then
 !                TGL_rnorm =  (tmp0r*TGL_tmp0r + tmp0i*TGL_tmp0i)/rnorm
 !                TGL_cterm2=  cterm2*0.5*(TGL_rnorm/rnorm  &
@@ -956,7 +951,7 @@ end subroutine da_spemiss_tl
                         tbup,tbdn,tauatm,                         &
                         TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,   &
                         TGL_lw,TGL_zcld,TGL_tbup,TGL_tbdn,        &
-                        TGL_tauatm                                )
+                        TGL_tauatm                               )
 ! -----------------------------------------------------------------
   implicit none
 ! -----------------------------------------------------------------
@@ -965,11 +960,11 @@ end subroutine da_spemiss_tl
 !          TGL_theta (somtime theta is a variable)
 ! Output : TGL_tbup,TGL_tbdn,TGL_tauatm,tbup,tbdn,tauatm
 ! -----------------------------------------------------------------
-      integer,intent(in   ) :: ifreq
-      real   ,intent(in   ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
-      real   ,intent(in   ) :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,       &
+      integer,intent(in  ) :: ifreq
+      real   ,intent(in  ) :: theta,p0,wv,hwv,ta,gamma,lw,zcld
+      real   ,intent(in  ) :: TGL_p0,TGL_wv,TGL_hwv,TGL_ta,       &
                                TGL_gamma,TGL_lw,TGL_zcld,TGL_theta
-      real   ,intent(  out) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, &
+      real   ,intent( out) :: tbup,tbdn,tauatm,TGL_tbup,TGL_tbdn, &
                                TGL_tauatm
 
       real :: mu,hdn,hup,hdninf,hupinf,TGL_mu
@@ -1013,7 +1008,7 @@ end subroutine da_spemiss_tl
 
       call da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,    &
-                           TGL_gamma,TGL_sigv               )
+                           TGL_gamma,TGL_sigv              )
 
 ! otbar = one over "mean" temperature
 
@@ -1035,12 +1030,12 @@ end subroutine da_spemiss_tl
        TGL_tc2   = 2.*tc*TGL_tc
            tc3   = tc2*tc
        TGL_tc3   = TGL_tc2*tc + tc2*TGL_tc
-          sigcld =  ( kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &
-                      tc3*kw3(ifreq) )*lw
-      TGL_sigcld =  ( TGL_tc *kw1(ifreq) + TGL_tc2*kw2(ifreq) +  &
-                      TGL_tc3*kw3(ifreq) )*lw &
-                  + ( kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &
-                      tc3*kw3(ifreq) )*TGL_lw
+          sigcld =  (kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &
+                      tc3*kw3(ifreq))*lw
+      TGL_sigcld =  (TGL_tc *kw1(ifreq) + TGL_tc2*kw2(ifreq) +  &
+                      TGL_tc3*kw3(ifreq))*lw &
+                  + (kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &
+                      tc3*kw3(ifreq))*TGL_lw
 
           taucld =   exp(-mu*sigcld)
       TGL_taucld = - (TGL_mu*sigcld + mu*TGL_sigcld)*taucld
@@ -1060,7 +1055,7 @@ end subroutine da_spemiss_tl
                      hdninf,hupinf,                          &
                      TGL_ho,TGL_hv,TGL_sigo,TGL_sigv,TGL_mu, &
                      TGL_zcld,TGL_hdn,TGL_hup,TGL_hdninf,    &
-                     TGL_hupinf                              )
+                     TGL_hupinf                             )
 
 ! atmospheric transmittances in layer one and two, and combined
 
@@ -1140,7 +1135,7 @@ end subroutine da_tbatmos_tl
 
 !=================================================================
 subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
-                      TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh  )
+                      TGL_gx2,TGL_sigma,TGL_effangv,TGL_effangh )
 ! ----------------------------------------------------------------
   implicit none
 ! ----------------------------------------------------------------
@@ -1153,9 +1148,9 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
 ! Calculated the effective zenith angle of reflected microwave radiation
 ! at SSM/I frequencies for vertical and horizontal polarization
 !
-      integer, intent(in   ) :: ifreq
-      real   , intent(in   ) :: theta,gx2,sigma,TGL_gx2, TGL_sigma
-      real   , intent(  out) :: TGL_effangv,TGL_effangh,effangv,effangh
+      integer, intent(in  ) :: ifreq
+      real   , intent(in  ) :: theta,gx2,sigma,TGL_gx2, TGL_sigma
+      real   , intent( out) :: TGL_effangv,TGL_effangh,effangv,effangh
 !
       real c19v,c19h,c22v,c22h,c37v,c37h,c85v,c85h
       real s19v(6),s19h(6),s22v(6),s22h(6), &
@@ -1403,84 +1398,83 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
 
 end subroutine da_effang_tl
 
-!=================================================================
-subroutine da_roughem_tl(ifreq,gx2,tk,theta,remv,remh,             &
-                       TGL_gx2,TGL_tk,TGL_remv,TGL_remh          )
-! ----------------------------------------------------------------
-implicit none
-! ----------------------------------------------------------------
-!
-! Input  :: TGL_tk, TGL_gx2
-! Output :: TGL_remv,TGL_remh, remv,remh
-!
-! Calculates rough-surface emissivity of ocean surface at SSM/I
-! frequencies.
-!
-      integer, intent(in   ) :: ifreq
-      real   , intent(in   ) :: tk, theta, gx2, TGL_tk,TGL_gx2
-      real   , intent(  out) :: TGL_remv,TGL_remh, remv,remh
-      real a19v(4),a22v(4),a37v(4),a85v(4)
-      real a19h(4),a22h(4),a37h(4),a85h(4)
-      real f(4)
-      real semv,semh,TGL_semv,TGL_semh,ssw
-      real :: tp,g,x1,x2,x3,x4,dtheta
-      real :: TGL_tp,TGL_g,TGL_x1,TGL_x2,TGL_x3,TGL_x4
-!
-      data a19v/  -0.111E+01,   0.713E+00,  -0.624E-01,   0.212E-01 /
-      data a19h/   0.812E+00,  -0.215E+00,   0.255E-01,   0.305E-02 /
-      data a22v/  -0.134E+01,   0.911E+00,  -0.893E-01,   0.463E-01 /
-      data a22h/   0.958E+00,  -0.350E+00,   0.566E-01,  -0.262E-01 /
-      data a37v/  -0.162E+01,   0.110E+01,  -0.730E-01,   0.298E-01 /
-      data a37h/   0.947E+00,  -0.320E+00,   0.624E-01,  -0.300E-01 /
-      data a85v/  -0.145E+01,   0.808E+00,  -0.147E-01,  -0.252E-01 /
-      data a85h/   0.717E+00,  -0.702E-01,   0.617E-01,  -0.243E-01 /
-!
-      data f/ 19.35, 22.235, 37.0, 85.5 /
-!
-          tp =     tk/273.0
-      TGL_tp = TGL_tk/273.0
-      dtheta = theta-53.0
-          g =  0.5*    gx2
-      TGL_g =  0.5*TGL_gx2
-          x1 =     g
-      TGL_x1 = TGL_g
-          x2 = tp*g
-      TGL_x2 = TGL_tp*g + tp*TGL_g
-          x3 = dtheta*    g
-      TGL_x3 = dtheta*TGL_g
-          x4 = tp*x3
-      TGL_x4 = TGL_tp*x3 + tp*TGL_x3
-!
-      if (ifreq .eq. 1) then
-             remv =     x1*a19v(1) +     x2*a19v(2) +     x3*a19v(3) +     x4*a19v(4)
-         TGL_remv = TGL_x1*a19v(1) + TGL_x2*a19v(2) + TGL_x3*a19v(3) + TGL_x4*a19v(4)
-             remh =     x1*a19h(1) +     x2*a19h(2) +     x3*a19h(3) +     x4*a19h(4)
-         TGL_remh = TGL_x1*a19h(1) + TGL_x2*a19h(2) + TGL_x3*a19h(3) + TGL_x4*a19h(4)
-      else if (ifreq .eq. 2) then
-             remv =     x1*a22v(1) +     x2*a22v(2) +     x3*a22v(3) +     x4*a22v(4)
-         TGL_remv = TGL_x1*a22v(1) + TGL_x2*a22v(2) + TGL_x3*a22v(3) + TGL_x4*a22v(4)
-             remh =     x1*a22h(1) +     x2*a22h(2) +     x3*a22h(3) +     x4*a22h(4)
-         TGL_remh = TGL_x1*a22h(1) + TGL_x2*a22h(2) + TGL_x3*a22h(3) + TGL_x4*a22h(4)
-      else if (ifreq .eq. 3) then
-             remv =     x1*a37v(1) +     x2*a37v(2) +     x3*a37v(3) +     x4*a37v(4)
-         TGL_remv = TGL_x1*a37v(1) + TGL_x2*a37v(2) + TGL_x3*a37v(3) + TGL_x4*a37v(4)
-             remh =     x1*a37h(1) +     x2*a37h(2) +     x3*a37h(3) +     x4*a37h(4)
-         TGL_remh = TGL_x1*a37h(1) + TGL_x2*a37h(2) + TGL_x3*a37h(3) + TGL_x4*a37h(4)
-      else if (ifreq .eq. 4) then
-             remv =     x1*a85v(1) +     x2*a85v(2) +     x3*a85v(3) +     x4*a85v(4)
-         TGL_remv = TGL_x1*a85v(1) + TGL_x2*a85v(2) + TGL_x3*a85v(3) + TGL_x4*a85v(4)
-             remh =     x1*a85h(1) +     x2*a85h(2) +     x3*a85h(3) +     x4*a85h(4)
-         TGL_remh = TGL_x1*a85h(1) + TGL_x2*a85h(2) + TGL_x3*a85h(3) + TGL_x4*a85h(4)
-      end if
 
-      ssw=36.5
-      call da_spemiss_tl(f(ifreq),tk,theta,ssw,semv,semh,  &
-                       TGL_tk,TGL_semv,TGL_semh           )
-      TGL_remv = TGL_remv + TGL_semv
-          remv =     remv +     semv
-      TGL_remh = TGL_remh + TGL_semh
-          remh =     remh +     semh
-      
+subroutine da_roughem_tl(ifreq,gx2,tk,theta,remv,remh,             &
+                       TGL_gx2,TGL_tk,TGL_remv,TGL_remh         )
+
+   !----------------------------------------------------------------
+   ! Purpose: Calculates rough-surface emissivity of ocean surface at SSM/I frequencies.
+   ! Input  : TGL_tk, TGL_gx2
+   ! Output : TGL_remv,TGL_remh, remv,remh
+   !----------------------------------------------------------------
+
+   implicit none
+
+   integer, intent(in  ) :: ifreq
+   real   , intent(in  ) :: tk, theta, gx2, TGL_tk,TGL_gx2
+   real   , intent( out) :: TGL_remv,TGL_remh, remv,remh
+   real a19v(4),a22v(4),a37v(4),a85v(4)
+   real a19h(4),a22h(4),a37h(4),a85h(4)
+   real f(4)
+   real semv,semh,TGL_semv,TGL_semh,ssw
+   real :: tp,g,x1,x2,x3,x4,dtheta
+   real :: TGL_tp,TGL_g,TGL_x1,TGL_x2,TGL_x3,TGL_x4
+
+   data a19v/  -0.111E+01,   0.713E+00,  -0.624E-01,   0.212E-01 /
+   data a19h/   0.812E+00,  -0.215E+00,   0.255E-01,   0.305E-02 /
+   data a22v/  -0.134E+01,   0.911E+00,  -0.893E-01,   0.463E-01 /
+   data a22h/   0.958E+00,  -0.350E+00,   0.566E-01,  -0.262E-01 /
+   data a37v/  -0.162E+01,   0.110E+01,  -0.730E-01,   0.298E-01 /
+   data a37h/   0.947E+00,  -0.320E+00,   0.624E-01,  -0.300E-01 /
+   data a85v/  -0.145E+01,   0.808E+00,  -0.147E-01,  -0.252E-01 /
+   data a85h/   0.717E+00,  -0.702E-01,   0.617E-01,  -0.243E-01 /
+
+   data f/ 19.35, 22.235, 37.0, 85.5 /
+
+       tp =     tk/273.0
+   TGL_tp = TGL_tk/273.0
+   dtheta = theta-53.0
+       g =  0.5*    gx2
+   TGL_g =  0.5*TGL_gx2
+       x1 =     g
+   TGL_x1 = TGL_g
+       x2 = tp*g
+   TGL_x2 = TGL_tp*g + tp*TGL_g
+       x3 = dtheta*    g
+   TGL_x3 = dtheta*TGL_g
+       x4 = tp*x3
+   TGL_x4 = TGL_tp*x3 + tp*TGL_x3
+
+   if (ifreq .eq. 1) then
+          remv =     x1*a19v(1) +     x2*a19v(2) +     x3*a19v(3) +     x4*a19v(4)
+      TGL_remv = TGL_x1*a19v(1) + TGL_x2*a19v(2) + TGL_x3*a19v(3) + TGL_x4*a19v(4)
+          remh =     x1*a19h(1) +     x2*a19h(2) +     x3*a19h(3) +     x4*a19h(4)
+      TGL_remh = TGL_x1*a19h(1) + TGL_x2*a19h(2) + TGL_x3*a19h(3) + TGL_x4*a19h(4)
+   else if (ifreq .eq. 2) then
+          remv =     x1*a22v(1) +     x2*a22v(2) +     x3*a22v(3) +     x4*a22v(4)
+      TGL_remv = TGL_x1*a22v(1) + TGL_x2*a22v(2) + TGL_x3*a22v(3) + TGL_x4*a22v(4)
+          remh =     x1*a22h(1) +     x2*a22h(2) +     x3*a22h(3) +     x4*a22h(4)
+      TGL_remh = TGL_x1*a22h(1) + TGL_x2*a22h(2) + TGL_x3*a22h(3) + TGL_x4*a22h(4)
+   else if (ifreq .eq. 3) then
+          remv =     x1*a37v(1) +     x2*a37v(2) +     x3*a37v(3) +     x4*a37v(4)
+      TGL_remv = TGL_x1*a37v(1) + TGL_x2*a37v(2) + TGL_x3*a37v(3) + TGL_x4*a37v(4)
+          remh =     x1*a37h(1) +     x2*a37h(2) +     x3*a37h(3) +     x4*a37h(4)
+      TGL_remh = TGL_x1*a37h(1) + TGL_x2*a37h(2) + TGL_x3*a37h(3) + TGL_x4*a37h(4)
+   else if (ifreq .eq. 4) then
+          remv =     x1*a85v(1) +     x2*a85v(2) +     x3*a85v(3) +     x4*a85v(4)
+      TGL_remv = TGL_x1*a85v(1) + TGL_x2*a85v(2) + TGL_x3*a85v(3) + TGL_x4*a85v(4)
+          remh =     x1*a85h(1) +     x2*a85h(2) +     x3*a85h(3) +     x4*a85h(4)
+      TGL_remh = TGL_x1*a85h(1) + TGL_x2*a85h(2) + TGL_x3*a85h(3) + TGL_x4*a85h(4)
+   end if
+
+   ssw=36.5
+   call da_spemiss_tl(f(ifreq),tk,theta,ssw,semv,semh,  &
+                    TGL_tk,TGL_semv,TGL_semh          )
+   TGL_remv = TGL_remv + TGL_semv
+       remv =     remv +     semv
+   TGL_remh = TGL_remh + TGL_semh
+       remh =     remh +     semh
+   
 end subroutine da_roughem_tl
 
 

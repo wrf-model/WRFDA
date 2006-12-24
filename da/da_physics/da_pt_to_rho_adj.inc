@@ -1,9 +1,9 @@
-subroutine da_pt_to_rho_adj( xb, xa ) 
+subroutine da_pt_to_rho_adj(xb, xa) 
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint of da_pt_to_rho.
    !
-   !  ASsumPTIONS: 1) Model level stored top down
+   !  ASSUMPTIONS: 1) Model level stored top down
    !---------------------------------------------------------------------------
 
    implicit none
@@ -30,11 +30,11 @@ subroutine da_pt_to_rho_adj( xb, xa )
       ie = xb%ite+1
       je = xb%jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if (is < xb%ids) is = xb%ids
+      if (js < xb%jds) js = xb%jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if (ie > xb%ide) ie = xb%ide
+      if (je > xb%jde) je = xb%jde
    end if
 
    !---------------------------------------------------------------------------

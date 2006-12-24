@@ -13,7 +13,7 @@ subroutine da_trh_to_td (RH, T, TD, xp)
    !   ------
    !     inVERT THE RELATION
    !
-   !     RH = 100. * EXP ( L_over_Rv * (1./T - 1./TD) )
+   !     RH = 100. * EXP (L_over_Rv * (1./T - 1./TD))
    !
    !   inPUT:
    !   -----
@@ -74,7 +74,7 @@ subroutine da_trh_to_td (RH, T, TD, xp)
          do i=is,ie
             if (RH(i,j,k) < 10.0) then
                RH(i,j,k) = 10.0
-            else if(RH(i,j,k) > 105.0) then
+            else if (RH(i,j,k) > 105.0) then
                RH(i,j,k) = 105.0
             end if
 

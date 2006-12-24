@@ -1,12 +1,16 @@
-subroutine da_trace_real_sort( &
+subroutine da_trace_real_sort(&
    key, &
    n, &
    index)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: Sort reals for tracing
+   !-----------------------------------------------------------------------
+
    implicit none
 
-   integer, intent(in)          :: n      ! The number of items to be sorted. 
-   real, intent(in)             :: key(:)
+   integer, intent(in)  :: n      ! The number of items to be sorted. 
+   real,    intent(in)  :: key(:)
    integer, intent(out) :: index(:)
 
    integer :: head       ! heaps are tree structures: head and child refer

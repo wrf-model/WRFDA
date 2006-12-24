@@ -1,8 +1,7 @@
-subroutine da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_geoamv_adj (iv, xp, jo_grad_y, jo_grad_x)
 
    !-------------------------------------------------------------------------
-   ! Purpose: X to Y Transpose operator for Geo. AMV's
-   !
+   ! Purpose: X to Y Transpose operator for Geo. AMVs
    !-------------------------------------------------------------------------
 
    implicit none
@@ -17,13 +16,12 @@ subroutine da_transform_xtoy_geoamv_adj ( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_geoamv > 0 ) then
-!xyh      do n=1, iv % num_geoamv
+   if (iv%num_geoamv > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%geoamv+1, iv%ob_numb(iv%current_ob_time)%geoamv
 
          k = iv % geoamv(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
 
          i = iv%geoamv(n)%loc%i
          dy = iv%geoamv(n)%loc%dy

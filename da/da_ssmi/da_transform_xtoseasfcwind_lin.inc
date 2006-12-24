@@ -1,7 +1,7 @@
-subroutine da_transform_xtoseasfcwind_lin( xa, xb )
+subroutine da_transform_xtoseasfcwind_lin(xa, xb)
 
    !----------------------------------------------------------------------------
-   ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
+   ! Purpose: Convert (U-V in m/s) components into wind speed (Speed in m/s)
    !----------------------------------------------------------------------------
 
    implicit none

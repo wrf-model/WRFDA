@@ -1,6 +1,6 @@
 subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
-   !  input: xb%q, xb%p, xb%t, xa%ref, and xp
+   ! input: xb%q, xb%p, xb%t, xa%ref, and xp
    ! output: xa%q, xa%p, xa%t
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
@@ -11,7 +11,6 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
    real    :: partone, parttwo, dividnd
    real    :: partone9,parttwo9,dividnd9
 
-
    if (trace_use) call da_trace_entry("da_transform_xtogpsref_adj")
 
    ! 1.0 Get the range for a tile
@@ -20,18 +19,18 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte      
 
-   if ( Testing_WRFVAR ) then
+   if (Testing_WRFVAR) then
       is = xb%its-1
       js = xb%jts-1
 
       ie = xb%ite+1
       je = xb%jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if (is < xb%ids) is = xb%ids
+      if (js < xb%jds) js = xb%jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if (ie > xb%ide) ie = xb%ide
+      if (je > xb%jde) je = xb%jde
    end if
 
    !------------------------------------------------------------------------------

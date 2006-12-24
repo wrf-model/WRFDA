@@ -1,4 +1,4 @@
-subroutine da_print_stats_satem( stats_unit, nthickness, Satem )
+subroutine da_print_stats_satem(stats_unit, nthickness, Satem)
 
    implicit none
 

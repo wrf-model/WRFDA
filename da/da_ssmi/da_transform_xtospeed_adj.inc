@@ -1,14 +1,14 @@
 subroutine da_transform_xtospeed_adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
 
    !----------------------------------------------------------------------------
-   ! Convert (U-V in m/s) components into wind speed (Speed in m/s)
+   ! Purpose: Convert (U-V in m/s) components into wind speed (Speed in m/s)
    !----------------------------------------------------------------------------
 
    implicit none
 
    integer                :: i, j
-   real,   intent (in   ) :: ADJ_speed
-   real,   intent (in   ) :: U, V
+   real,   intent (in  ) :: ADJ_speed
+   real,   intent (in  ) :: U, V
    real,   intent (inout) :: ADJ_u, ADJ_v
    real                   :: speed
 

@@ -1,6 +1,6 @@
-subroutine da_setup_firstguess_kma( xbx, grid, &
+subroutine da_setup_firstguess_kma(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                              )
+                           )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define/allocate components of WRF model state.
@@ -67,11 +67,11 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    end do
 
    ! Avoid assigning -90,90 value                                           
-   if(grid%xb%jts == grid%xb%jds) then
+   if (grid%xb%jts == grid%xb%jds) then
       grid%xlat(is:ie,j) = -89.9                               
    end if
 
-   if(grid%xb%jte == grid%xb%jde) then
+   if (grid%xb%jte == grid%xb%jde) then
       grid%xlat(is:ie,j) = 89.9                               
    end if
 
@@ -84,13 +84,13 @@ subroutine da_setup_firstguess_kma( xbx, grid, &
    xbx%nj  = grid%e_sn - grid%s_sn
    xbx%nk  = grid%e_vert - 1
    xbx% lenwrk    = xbx%ni
-   xbx% lenr           = xbx%inc * (xbx%ni - 1 ) + 1
+   xbx% lenr           = xbx%inc * (xbx%ni - 1) + 1
    max_wavenumber = xbx%ni/2-1
    xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 
-   call da_transfer_kmatoxb( xbx, grid, &
+   call da_transfer_kmatoxb(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                             )
+                           )
 
    if (trace_use) call da_trace_exit("da_setup_firstguess_kma")
 

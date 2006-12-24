@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_synop_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_synop_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_synop > 0 ) then
+   if (iv%num_synop > 0) then
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
 

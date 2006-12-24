@@ -1,4 +1,4 @@
-subroutine da_proc_maxmin_combine( n, max, min )
+subroutine da_proc_maxmin_combine(n, max, min)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Do MPI reduction operations across processors to get the minimum
@@ -28,7 +28,7 @@ subroutine da_proc_maxmin_combine( n, max, min )
 #ifdef DM_PARALLEL
 
    if (rootproc) root = myproc
-   call wrf_dm_bcast_integer ( root, 1 )
+   call wrf_dm_bcast_integer (root, 1)
 
    ! Get minimum value and associated processor index.
    do i = 1, n
@@ -37,7 +37,7 @@ subroutine da_proc_maxmin_combine( n, max, min )
    end do
 
    call mpi_reduce(in, out, n, mpi_2double_precision, mpi_minloc, &
-                                     root, comm, ierr )
+                                     root, comm, ierr)
 
    if (rootproc) then
       do i = 1, n
@@ -46,21 +46,21 @@ subroutine da_proc_maxmin_combine( n, max, min )
       end do
    end if
 
-   call wrf_dm_bcast_integer ( proc_id, n )
+   call wrf_dm_bcast_integer (proc_id, n)
 
    ! Get i and j where minimum occurs.
    do i = 1, n
       if (proc_id(i) .ne. root) then
          if (rootproc) then
-            call mpi_recv( min(i)%i, 1, mpi_integer, proc_id(i), &
-                           10, comm, STATUS, ierr )
-            call mpi_recv( min(i)%j, 1, mpi_integer, proc_id(i), &
-                           11, comm, STATUS, ierr )
-          else if (myproc .eq. proc_id(i)) then
-             call mpi_send( min(i)%i, 1, mpi_integer, root, &
-                             10, comm, ierr )
-            call mpi_send( min(i)%j, 1, mpi_integer, root, &
-                             11, comm, ierr )
+            call mpi_recv(min(i)%i, 1, mpi_integer, proc_id(i), &
+                           10, comm, STATUS, ierr)
+            call mpi_recv(min(i)%j, 1, mpi_integer, proc_id(i), &
+                           11, comm, STATUS, ierr)
+          else if (myproc == proc_id(i)) then
+             call mpi_send(min(i)%i, 1, mpi_integer, root, &
+                             10, comm, ierr)
+            call mpi_send(min(i)%j, 1, mpi_integer, root, &
+                             11, comm, ierr)
          end if
       end if
    end do
@@ -71,7 +71,7 @@ subroutine da_proc_maxmin_combine( n, max, min )
       in(2,i) = myproc
    end do
    call mpi_reduce(in, out, n, mpi_2double_precision, mpi_maxloc, &
-                                     root, comm, ierr )
+                                     root, comm, ierr)
 
    if (rootproc) then
       do i = 1, n
@@ -80,21 +80,21 @@ subroutine da_proc_maxmin_combine( n, max, min )
       end do
    end if
 
-   call wrf_dm_bcast_integer ( proc_id, n )
+   call wrf_dm_bcast_integer (proc_id, n)
 
    ! Get i and j where maximum occurs.
    do i = 1, n
       if (proc_id(i) .ne. root) then
          if (rootproc) then
-            call mpi_recv( max(i)%i, 1, mpi_integer, proc_id(i), &
-                           10, comm, STATUS, ierr )
-            call mpi_recv( max(i)%j, 1, mpi_integer, proc_id(i), &
-                           11, comm, STATUS, ierr )
-         else if (myproc .eq. proc_id(i) ) then
-            call mpi_send( max(i)%i, 1, mpi_integer, root, &
-                             10, comm, ierr )
-            call mpi_send( max(i)%j, 1, mpi_integer, root, &
-                             11, comm, ierr )
+            call mpi_recv(max(i)%i, 1, mpi_integer, proc_id(i), &
+                           10, comm, STATUS, ierr)
+            call mpi_recv(max(i)%j, 1, mpi_integer, proc_id(i), &
+                           11, comm, STATUS, ierr)
+         else if (myproc == proc_id(i)) then
+            call mpi_send(max(i)%i, 1, mpi_integer, root, &
+                             10, comm, ierr)
+            call mpi_send(max(i)%j, 1, mpi_integer, root, &
+                             11, comm, ierr)
          end if
       end if
    end do

@@ -1,6 +1,6 @@
-subroutine da_transfer_xatokma( xbx, grid, &
+subroutine da_transfer_xatokma(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                              )
+                             )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Convert analysis increments into KMA increments 
@@ -8,9 +8,8 @@ subroutine da_transfer_xatokma( xbx, grid, &
 
    implicit none
    
-   type (xbx_type), intent(inout)     :: xbx       ! Header & non-gridded vars.
-
-   type(domain), intent(inout)        :: grid
+   type (xbx_type), intent(inout) :: xbx       ! Header & non-gridded vars.
+   type(domain),    intent(inout) :: grid
 
    ! Definitions of dummy arguments to solve
 
@@ -52,12 +51,17 @@ subroutine da_transfer_xatokma( xbx, grid, &
             ! compute pressure increments at KMA full levels
             ! Note: Psfc is in hPa in  P = A + B * Psfc 
             if (k == ke) then
-               coeff = grid%xb%KMA_B(K)/(grid%xb%KMA_A(K)+grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0)
+               coeff = grid%xb%KMA_B(K)/ &
+                  (grid%xb%KMA_A(K)+grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0)
             else
-               PU = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(I,J)/100.0
-               PD = grid%xb%KMA_A(K  ) + grid%xb%KMA_B(K  )*grid%xb%psfc(I,J)/100.0
-               coeff=grid%xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU) &
-                  + grid%xb%KMA_B(K+1)*1.0/(PD-PU)**2*( PD*(LOG(PD)-LOG(PU))-PD+PU)
+               PU = grid%xb%KMA_A(K+1) + &
+                  grid%xb%KMA_B(K+1)*grid%xb%psfc(I,J)/100.0
+               PD = grid%xb%KMA_A(K ) + &
+                  grid%xb%KMA_B(K )*grid%xb%psfc(I,J)/100.0
+               coeff=grid%xb%KMA_B(K) * &
+                  1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU))+PD-PU) &
+                  + grid%xb%KMA_B(K+1)* &
+                  1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
             end if
             grid%xa%p(i,j,k) = grid%xa%psfc(i,j) * coeff
             grid%xa%p(i,j,k) = grid%xb%psfc(i,j)*grid%xa%psfc(i,j)

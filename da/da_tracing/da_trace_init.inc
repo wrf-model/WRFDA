@@ -2,17 +2,15 @@ subroutine da_trace_init
 
    implicit none
 
-   ! Local variables
+   !--------------------------------------------------------------------
+   ! Purpose: Initialise tracing
+   !--------------------------------------------------------------------
 
    integer :: IOStatus             ! I/O return code
    integer :: Loop1
-   character (LEN=200) :: TraceFile
+   character (len=200) :: TraceFile
    character(len=200) :: csvname
-   character (LEN=10)  :: temp
-
-   !===========================================================================
-
-   ! Start of code
+   character (len=10)  :: temp
 
    IOStatus = 0
 
@@ -28,20 +26,20 @@ subroutine da_trace_init
       if (use_html) then
          write(unit=temp,fmt='(I10)') myproc
          TraceFile="trace/"//trim(adjustl(temp))//".html"
-         OPEN ( &
-            unit=trace_unit, &   ! I:
-            file=trim(TraceFile), &   ! I:
-            STATUS="REPLACE", & ! I:
-            ACTION="write", &   ! I:
-            iostat=IOStatus)    ! O:
+         open (&
+            unit=trace_unit, &   ! i:
+            file=trim(tracefile), &   ! i:
+            status="replace", & ! i:
+            action="write", &   ! i:
+            iostat=iostatus)    ! o:
       else   
-         write(unit=temp,fmt='(I10)') myproc
-         TraceFile="trace/"//trim(adjustl(temp))//".txt"
-         OPEN ( &
-            unit=trace_unit, &   ! I:
-            file=trim(TraceFile), &   ! I:
-            STATUS="REPLACE", & ! I:
-            ACTION="write", &   ! I:
+         write(unit=temp,fmt='(i10)') myproc
+         tracefile="trace/"//trim(adjustl(temp))//".txt"
+         open (&
+            unit=trace_unit, &   ! i:
+            file=trim(tracefile), &   ! i:
+            status="replace", & ! i:
+            action="write", &   ! i:
             iostat=IOStatus)    ! O:
       end if
 
@@ -87,7 +85,7 @@ subroutine da_trace_init
    Pointer     = 0
    NoRoutines  = 0
 
-   call SYSTEM_CLOCK( &
+   call SYSTEM_CLOCK(&
       COUNT=BaseElapsedTime)
 
    call CPU_TIME(BaseCPUTime)

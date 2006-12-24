@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ships ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_ships (xa, xb, iv, xp, y)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_ships ( xa, xb, iv, xp, y )
    real                         :: dx, dxm  ! 
    real                         :: dy, dym  !
 
-   if ( iv%num_ships > 0 ) then
+   if (iv%num_ships > 0) then
       !xyh y%ships(:)%u = 0.0
       !xyh y%ships(:)%v = 0.0
       !xyh y%ships(:)%t = 0.0

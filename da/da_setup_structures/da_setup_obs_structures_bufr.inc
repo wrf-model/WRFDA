@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures_bufr( xp, ob, iv )
+subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define, allocate and read observation structure.
@@ -7,7 +7,7 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    implicit none
    
    type (xpose_type), intent(in) :: xp         ! Domain decomposition vars.
-   type ( y_type), intent(out)  :: ob          ! Observation structure.
+   type (y_type), intent(out)  :: ob          ! Observation structure.
    type (ob_type), intent(out)  :: iv          ! O-B structure.
 
    character(len=120)           :: filename
@@ -97,7 +97,7 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
       call da_scan_bufr_obs(iv, xp, filename)
 
       ! scan MAin BODY OF Radar OBSERVATION FILE
-      ! if(Use_RadarObs) &
+      ! if (Use_RadarObs) &
       ! call da_scan_bufr_radar(iv, xp,'radar.dat')
    end if
 
@@ -105,53 +105,52 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    ! Safety guard.
    !-----------------------------------------------------------------
 
-   if(iv%num_sound > max_sound_input ) &
+   if (iv%num_sound > max_sound_input) &
       iv%num_sound = max_sound_input
-
-   if(iv%num_synop > max_synop_input ) &
+   if (iv%num_synop > max_synop_input) &
       iv%num_synop = max_synop_input
-   if(iv%num_pilot > max_pilot_input ) &
+   if (iv%num_pilot > max_pilot_input) &
       iv%num_pilot = max_pilot_input
-   if(iv%num_geoamv > max_geoamv_input ) &
+   if (iv%num_geoamv > max_geoamv_input) &
       iv%num_geoamv = max_geoamv_input
-   if(iv%num_polaramv > max_polaramv_input ) &
+   if (iv%num_polaramv > max_polaramv_input) &
       iv%num_polaramv = max_polaramv_input
-   if(iv%num_satem > max_satem_input ) &
+   if (iv%num_satem > max_satem_input) &
       iv%num_satem = max_satem_input
-   if(iv%num_airep > max_airep_input ) &
+   if (iv%num_airep > max_airep_input) &
       iv%num_airep = max_airep_input
-   if(iv%num_metar > max_metar_input ) &
+   if (iv%num_metar > max_metar_input) &
       iv%num_metar = max_metar_input
-   if(iv%num_ships > max_ships_input ) &
+   if (iv%num_ships > max_ships_input) &
       iv%num_ships = max_ships_input
-   if(iv%num_gpspw > max_gpspw_input ) &
+   if (iv%num_gpspw > max_gpspw_input) &
       iv%num_gpspw = max_gpspw_input
-   if(iv%num_gpsref > max_gpsref_input ) &
+   if (iv%num_gpsref > max_gpsref_input) &
       iv%num_gpsref = max_gpsref_input
-   if(iv%num_ssmi_retrieval > max_ssmi_ret_input ) &
+   if (iv%num_ssmi_retrieval > max_ssmi_ret_input) &
       iv%num_ssmi_retrieval = max_ssmi_ret_input
-   if(iv%num_ssmi_tb > max_ssmi_tb_input ) &
+   if (iv%num_ssmi_tb > max_ssmi_tb_input) &
       iv%num_ssmi_tb = max_ssmi_tb_input
-   if(iv%num_ssmt1 > max_ssmt1_input ) &
+   if (iv%num_ssmt1 > max_ssmt1_input) &
       iv%num_ssmt1 = max_ssmt1_input
-   if(iv%num_ssmt2 > max_ssmt2_input ) &
+   if (iv%num_ssmt2 > max_ssmt2_input) &
       iv%num_ssmt2 = max_ssmt2_input
-   if(iv%num_profiler > max_profiler_input ) &
+   if (iv%num_profiler > max_profiler_input) &
       iv%num_profiler = max_profiler_input
-   if(iv%num_buoy > max_buoy_input ) &
+   if (iv%num_buoy > max_buoy_input) &
       iv%num_buoy = max_buoy_input
-   if(iv%num_radar > max_radar_input ) &
+   if (iv%num_radar > max_radar_input) &
       iv%num_radar = max_radar_input
-   if(iv%num_bogus > max_bogus_input ) &
+   if (iv%num_bogus > max_bogus_input) &
       iv%num_bogus = max_bogus_input
-   if(iv%num_airsr > max_airsret_input ) &
+   if (iv%num_airsr > max_airsret_input) &
       iv%num_airsr = max_airsret_input
 
    !-------------------------------------------------------------------------
    ! Allocate the ob based on inputed number of obs:
    !--------------------------------------------------------------------------
 
-   call da_allocate_observations ( iv )
+   call da_allocate_observations (iv)
 
    iv%total_obs = 0
    iv%num_sound = 0
@@ -209,7 +208,7 @@ subroutine da_setup_obs_structures_bufr( xp, ob, iv )
    ! [3.0] Calculate innovation vector (O-B) and create (smaller) ob structure:
    !--------------------------------------------------------------------------
 
-   call da_fill_obs_structures(xp, iv, ob )
+   call da_fill_obs_structures(xp, iv, ob)
 
    iv%current_ob_time = 1
 

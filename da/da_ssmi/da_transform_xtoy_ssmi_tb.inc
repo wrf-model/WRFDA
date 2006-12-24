@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
+subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    implicit none
 
@@ -36,7 +36,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
 
    ! total precipitable water in cm
 
-   ! call da_transform_xtotpw( xa, xb)
+   ! call da_transform_xtotpw(xa, xb)
 
    ! do j=1,mjy-1
    !    do i=1,mix-1
@@ -110,28 +110,28 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    !                 xb%tb19v(i,j),xb%tb19h(i,j),                           &
    !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !                 TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
-   !                 TGL_zcld(i,j),TGL_tb19v(i,j),TGL_tb19h(i,j)            )
+   !                 TGL_zcld(i,j),TGL_tb19v(i,j),TGL_tb19h(i,j)           )
 
    !       call TGL_tb(2,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !                 htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
    !                 xb%tb22v(i,j),dum1,                                    &
    !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !                 TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
-   !                 TGL_zcld(i,j),TGL_tb22v(i,j),dum2                      )
+   !                 TGL_zcld(i,j),TGL_tb22v(i,j),dum2                     )
 
    !       call TGL_tb(3,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !                 htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
    !                 xb%tb37v(i,j),xb%tb37h(i,j),                           &
    !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !                 TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
-   !                 TGL_zcld(i,j),TGL_tb37v(i,j),TGL_tb37h(i,j)            )
+   !                 TGL_zcld(i,j),TGL_tb37v(i,j),TGL_tb37h(i,j)           )
 
    !       call TGL_tb(4,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !                 htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
    !                 xb%tb85v(i,j),xb%tb85h(i,j),                           &
    !                 TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !                 TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
-   !                 TGL_zcld(i,j),TGL_tb85v(i,j),TGL_tb85h(i,j)            )
+   !                 TGL_zcld(i,j),TGL_tb85v(i,j),TGL_tb85h(i,j)           )
    !    end do
    ! end do
 
@@ -146,7 +146,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
       ! Interpolating from 4 grid points to obs location
 
 #ifndef DEREF_KLUDGE
-      ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
+      ! if (xb%landmask(i,j ) .eq. 0 .and. xb%landmask(i+1,j ) .eq. 0 .and. &
       !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then       
       !    ! only calculate over water
 
@@ -166,7 +166,7 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
       ! end if
 #else
-      ! if (xb%landmask(i,j  ) .eq. 0 .and. xb%landmask(i+1,j  ) .eq. 0 .and. &
+      ! if (xb%landmask(i,j ) .eq. 0 .and. xb%landmask(i+1,j ) .eq. 0 .and. &
       !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then
       !    ! only calculate over water
 
@@ -189,32 +189,32 @@ subroutine da_transform_xtoy_ssmi_tb( xb, oi, xa, y )
    end do
     
         ! y%ssmi_tb(n)%tb19v = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb19v(i,j  ),TGL_tb19v(i+1,j  ), &
-        !                                 TGL_tb19v(i,j+1),TGL_tb19v(i+1,j+1)  )
+        !                                 TGL_tb19v(i,j ),TGL_tb19v(i+1,j ), &
+        !                                 TGL_tb19v(i,j+1),TGL_tb19v(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb19h = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb19h(i,j  ),TGL_tb19h(i+1,j  ), &
-        !                                 TGL_tb19h(i,j+1),TGL_tb19h(i+1,j+1)  )
+        !                                 TGL_tb19h(i,j ),TGL_tb19h(i+1,j ), &
+        !                                 TGL_tb19h(i,j+1),TGL_tb19h(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb22v = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb22v(i,j  ),TGL_tb22v(i+1,j  ), &
-        !                                 TGL_tb22v(i,j+1),TGL_tb22v(i+1,j+1)  )
+        !                                 TGL_tb22v(i,j ),TGL_tb22v(i+1,j ), &
+        !                                 TGL_tb22v(i,j+1),TGL_tb22v(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb37v = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb37v(i,j  ),TGL_tb37v(i+1,j  ), &
-        !                                 TGL_tb37v(i,j+1),TGL_tb37v(i+1,j+1)  )
+        !                                 TGL_tb37v(i,j ),TGL_tb37v(i+1,j ), &
+        !                                 TGL_tb37v(i,j+1),TGL_tb37v(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb37h = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb37h(i,j  ),TGL_tb37h(i+1,j  ), &
-        !                                 TGL_tb37h(i,j+1),TGL_tb37h(i+1,j+1)  )
+        !                                 TGL_tb37h(i,j ),TGL_tb37h(i+1,j ), &
+        !                                 TGL_tb37h(i,j+1),TGL_tb37h(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb85v = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb85v(i,j  ),TGL_tb85v(i+1,j  ), &
-        !                                 TGL_tb85v(i,j+1),TGL_tb85v(i+1,j+1)  )
+        !                                 TGL_tb85v(i,j ),TGL_tb85v(i+1,j ), &
+        !                                 TGL_tb85v(i,j+1),TGL_tb85v(i+1,j+1) )
 
         ! y%ssmi_tb(n)%tb85h = hor_interp(dxm,dx,dym,dy, &
-        !                                 TGL_tb85h(i,j  ),TGL_tb85h(i+1,j  ), &
-        !                                 TGL_tb85h(i,j+1),TGL_tb85h(i+1,j+1)  )
+        !                                 TGL_tb85h(i,j ),TGL_tb85h(i+1,j ), &
+        !                                 TGL_tb85h(i,j+1),TGL_tb85h(i+1,j+1) )
         !     end if
         !    end if
 

@@ -17,7 +17,7 @@ subroutine da_set_boundary_3d(var, &
 
    integer :: n, j, k
 
-   if((its /= ids) .or. (ite /= ide)) return
+   if ((its /= ids) .or. (ite /= ide)) return
 
    do k=kts, kte
       do j=jts, jte

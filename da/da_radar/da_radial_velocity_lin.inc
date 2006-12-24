@@ -12,7 +12,7 @@ subroutine da_radial_velocity_lin(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
    r=sqrt(x*x+y*y+z*z)
    alpha=(ps0/p)**0.4
 
-   if(qrn9 <= 0.) then
+   if (qrn9 <= 0.) then
       vt=0.
    end if
 

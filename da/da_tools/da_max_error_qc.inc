@@ -9,7 +9,7 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
    real             ,   intent(in)    :: max_error
    integer          ,   intent(inout) :: ix, ixf
    integer          ,   intent(in)    :: iunit
-   character (LEN=*),   intent(in)    :: var
+   character (len=*),   intent(in)    :: var
    logical          ,   intent(out)   :: failed
    logical          ,   intent(in)    :: print
 

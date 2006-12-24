@@ -106,33 +106,33 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    amsua=     obstype == 'amsua'
    amsub=     obstype == 'amsub'
 
-   if ( hirs2 ) then
+   if (hirs2) then
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
       nchan=19
       subfgn='NC021021'
       rato=1.1363987_r_kind
-   else if ( hirs3 ) then 
+   else if (hirs3) then 
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
       nchan=19
       subfgn='NC021025'
-   else if ( msu ) then
+   else if (msu) then
       sensor_id    =  1
       step   = 9.474_r_kind
       start  = -47.37_r_kind
       nchan=4
       subfgn='NC021022'
       rato=1.1363987_r_kind
-   else if ( amsua ) then
+   else if (amsua) then
       sensor_id    =  3
       step   = three + one/three
       start  = -48.33_r_kind
       nchan=15
       subfgn='NC021023'
-   else if ( amsub )  then
+   else if (amsub)  then
       sensor_id    =  4
       step   = 1.1_r_kind
       start  = -48.95_r_kind
@@ -140,7 +140,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       subfgn='NC021024'
    end if
 
-   allocate ( tb(nchan) )
+   allocate (tb(nchan))
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -157,11 +157,11 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    call datelen(10)
    call readmg(lnbufr,subset,idate,iret)
    if (subset /= subfgn) then
-      write(UNIT=stderr,FMT=*) 'da_read_bufrtovs:  *** WARNING: ',&
+      write(unit=stderr,fmt=*) 'da_read_bufrtovs:  *** WARNING: ',&
          'THE FILE TITLE NOT MATCH DATA SUBSET'
-      write(UNIT=stderr,FMT=*) '  infile=', lnbufr, infile,' subset=',&
+      write(unit=stderr,fmt=*) '  infile=', lnbufr, infile,' subset=',&
          subset, ' subfgn=',subfgn
-      write(UNIT=stderr,FMT=*) 'SKIP PROCESSING OF THIS 1B FILE'
+      write(unit=stderr,fmt=*) 'SKIP PROCESSING OF THIS 1B FILE'
       call closbf(lnbufr)
       call da_trace_exit("da_read_bufrtovs")
       return
@@ -171,17 +171,17 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    im=0
    idd=0
    ihh=0
-   write(UNIT=date,FMT='( i10)') idate
-   read(UNIT=date,FMT='(i4,3i2)') iy,im,idd,ihh
-   write(UNIT=stdout,FMT=*) &
+   write(unit=date,fmt='(i10)') idate
+   read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
+   write(unit=stdout,fmt=*) &
       'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
 
    ! Loop to read bufr file and assign information to a sequential structure
    !-------------------------------------------------------------------------
 
    allocate (head)
-   !  allocate ( head % rad % tb (1:nchan) )
-   nullify  ( head % next )
+   !  allocate (head % rad % tb (1:nchan))
+   nullify  (head % next)
    p => head
 
    num_tovs_local=0
@@ -230,7 +230,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          minute = bfr1bhdr(7) !minute
          second = bfr1bhdr(8) !second
 
-         write(UNIT=info%date_char, FMT='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
+         write(unit=info%date_char, fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             year, '-', month, '-', day, '_', hour, ':', minute, ':', second
 
          !  QC3: time consistency check with the background date
@@ -240,17 +240,17 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
                year = year + 2000
             ELSE
                year = year + 1900
-            ENDIF
-         ENDIF
+            end if
+         end if
 
          call da_get_julian_time(year,month,day,hour,minute,obs_time)
 
-         if ( obs_time < time_slots(0) .or.  &
-            obs_time >= time_slots(num_fgat_time) ) cycle
+         if (obs_time < time_slots(0) .or.  &
+            obs_time >= time_slots(num_fgat_time)) cycle
 
 
          ! 3.3 Find wrfvar instrument index from RTTOV instrument triplet
-         !     go to next data if id is not in the lists
+         !     goto next data if id is not in the lists
    
          do inst = 1, rtminit_nsensor
             if (platform_id  == rtminit_platform(inst) &
@@ -269,8 +269,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          ! 3.2.1 determine FGAT index ifgat
    
          do ifgat=1,num_fgat_time
-            if ( obs_time >= time_slots(ifgat-1) .and.  &
-                 obs_time  < time_slots(ifgat) ) exit
+            if (obs_time >= time_slots(ifgat-1) .and.  &
+                 obs_time  < time_slots(ifgat)) exit
          end do
 
          ! 3.4 extract satellite and solor angle
@@ -304,13 +304,13 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    
          tb(1:nchan) = data1b8(1:nchan)
          do k = 1, nchan
-            if ( tb(k) < tbmin .or. tb(k) > tbmax) &
+            if (tb(k) < tbmin .or. tb(k) > tbmax) &
                tb(k) = missing_r
          end do
 
          !  4.0   assign information to sequential radiance structure
          !--------------------------------------------------------------------------
-         allocate ( p % rad % tb (1:nchan) )
+         allocate (p % rad % tb (1:nchan))
          p%rad%info             = info
          p%rad%loc              = loc
          p%rad%landsea_mask     = landsea_mask
@@ -326,20 +326,21 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
          !   print *, num_tovs_local,year,month,day,hour,minute,second,obs_time,ifgat
 
-         allocate ( p%next, stat=error)   ! add next data
-         if (error /= 0 ) then
+         allocate (p%next, stat=error)   ! add next data
+         if (error /= 0) then
             call da_error(__FILE__,__LINE__, &
                (/"Cannot allocate radiance structure"/))
          end if
 
          p => p%next
          nullify (p%next)
-!         if (num_tovs_local == max_num_rad) then
-!            write(unit=errmsg(1),fmt='(A,I10)') &
-!               "Reached maximum number of obs", max_num_rad
-!            call da_warning(__FILE__,__LINE__,errmsg(1:1))
-!            exit obs
-!         end if
+         ! WHY
+         ! if (num_tovs_local == max_num_rad) then
+         !    write(unit=errmsg(1),fmt='(A,I10)') &
+         !       "Reached maximum number of obs", max_num_rad
+         !    call da_warning(__FILE__,__LINE__,errmsg(1:1))
+         !    exit obs
+         ! end if
       end do
    end do obs
 
@@ -354,12 +355,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------
    do i = 1, iv%num_inst
-      if ( nread(i) < 1 ) cycle
+      if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread (i)
-      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+      write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)') &
          ' allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
-      allocate( iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error )
+      allocate(iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error)
       if (error /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"mem allocation error to iv%instid(i)%rad"/))
@@ -370,7 +371,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !-------------------------------------------------------------
    nread(1:rtminit_nsensor) = 0 
    p => head
-   ! do while ( associated(p) )
+   ! do while (associated(p))
 
    do i = 1, num_tovs_local
       inst = p%sensor_index
@@ -387,22 +388,21 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(inst)%rad(nread(inst))%solzen       = p%rad%solzen
       !   iv%instid(inst)%rad(nread(inst))%solazi
       iv%instid(inst)%rad(nread(inst))%solazi = 0.0
-      allocate ( iv%instid(inst)%rad(nread(inst))%cloud_flag(1:nchan))
+      allocate (iv%instid(inst)%rad(nread(inst))%cloud_flag(1:nchan))
       iv%instid(inst)%rad(nread(inst))%cloud_flag(:) = 1
-      allocate ( iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error )
-      IF (error /= 0) THEN
-         call da_error(__FILE__,__LINE__, &
+      allocate (iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error)
+      if (error /= 0) then
+         call da_error(__file__,__LINE__, &
             (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
-      END IF
+      end if
       iv%instid(inst)%rad(nread(inst))%tb(1:nchan)%inv = p%rad%tb(1:nchan)%inv
 
       current => p
       p => p%next
 
       ! free current data
-      deallocate ( current % rad % tb )
-      deallocate ( current )
-
+      deallocate (current % rad % tb)
+      deallocate (current)
    end do
 
    deallocate (nread)

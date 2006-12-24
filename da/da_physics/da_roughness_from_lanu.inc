@@ -25,11 +25,11 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
    Isn = 1
    if (JULDAY < 105 .OR. JULDAY > 288) Isn=2
 
-   inquire (file = 'LANDUSE.TBL', exist = exist )
+   inquire (file = 'LANDUSE.TBL', exist = exist)
 
    if (exist) then
       open (unit = ltbl, file = 'LANDUSE.TBL', form='formatted', &
-                     action = 'read', iostat = io_error )
+                     action = 'read', iostat = io_error)
    else
       call da_error(__FILE__,__LINE__,&
          (/"Cannot open file LANDUSE.TBL for conversion of roughness"/))
@@ -42,7 +42,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
       if (io_error /= 0) exit
       read (unit=ltbl,fmt=*, iostat=io_error) lucats,luseas
 
-      if(lutype == mminlu) lumatch=1 
+      if (lutype == mminlu) lumatch=1 
 
       do LS=1,LuseAS 
          read (unit=ltbl,fmt=*)  

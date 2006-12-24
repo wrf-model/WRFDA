@@ -45,7 +45,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
            xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
 
    ! Allocate work arrays.
-   allocate( work_1d(1:n) )
+   allocate(work_1d(1:n))
 
    ! Remove mean b (set arbitrary constant to zero):
 
@@ -55,7 +55,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
       local_mean(k) = sum(b(xp%its:xp%ite,xp%jts:xp%jte,k))*rij
    end do
 
-   call wrf_dm_sum_reals ( local_mean, global_mean )
+   call wrf_dm_sum_reals (local_mean, global_mean)
    do k=xp%kts,xp%kte
       PRinT *, &
          'TEST_COVERAGE_da_solve_poissoneqn_fct_adj:  global_mean(',k,') = ', &
@@ -75,7 +75,7 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    ! [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x ( xp )
+   call da_transpose_z2x (xp)
 
    ! [2.2] Set up FFT parameters:
   
@@ -106,10 +106,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call fft551( Forward_FFT, vector_inc, vector_jump, &
+      call fft551(Forward_FFT, vector_inc, vector_jump, &
                                      num_vectors, vector_size, &
                                      xbx % fft_factors_x, xbx % trig_functs_x, &
-                                     work_1d(1), work_area )
+                                     work_1d(1), work_area)
       ij = 0
       do j=xp%jtsx, xp%jtex
          do i=xp%ids, xp%ide
@@ -130,10 +130,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
    !       Poisson equation, and then perform inverse FFT in x direction:
    !------------------------------------------------------------------------------
 
-   ! [3.1] Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
+   ! [3.1] Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y ( xp )
-   call da_transpose_x2y_v2 ( xp )
+   call da_transpose_x2y (xp)
+   call da_transpose_x2y_v2 (xp)
 
    ! [3.2] Set up FFT parameters:
 
@@ -169,10 +169,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call fft551( Forward_FFT, vector_inc, vector_jump, &
+      call fft551(Forward_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
 
       !------------------------------------------------------------------------
       ! [4.0] Solve spectral Poisson equation:
@@ -193,10 +193,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
       ! Reform gridpt. b using inverse double FST in i.
 
-      call fft551( Inverse_FFT, vector_inc, vector_jump, &
+      call fft551(Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
       ij = 0
       do j=xp%jds, xp%jde
          do i=xp%itsy, xp%itey
@@ -216,10 +216,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
    ! Perform inverse FFT in x direction:
    !---------------------------------------------------------------------------
 
-   ! Apply (i',j,k' -> i,j',k') transpose ( v1y -> v1x ).
+   ! Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
-   call da_transpose_y2x ( xp )
-   call da_transpose_y2x_v2 ( xp )
+   call da_transpose_y2x (xp)
+   call da_transpose_y2x_v2 (xp)
 
    ! Set up FFT parameters:
 
@@ -251,10 +251,10 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
          end do
       end do
 
-      call fft551( Inverse_FFT, vector_inc, vector_jump, &
+      call fft551(Inverse_FFT, vector_inc, vector_jump, &
                                    num_vectors, vector_size, &
                                    xbx % fft_factors_x, xbx % trig_functs_x, &
-                                   work_1d(1), work_area )
+                                   work_1d(1), work_area)
 
       ij = 0
       do j=xp%jtsx, xp%jtex
@@ -267,9 +267,9 @@ subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
       end do
    end do
 
-   ! Apply (i,j',k') -> i',j',k ) transpose to restore v1z.
+   ! Apply (i,j',k') -> i',j',k) transpose to restore v1z.
 
-   call da_transpose_x2z ( xp )
+   call da_transpose_x2z (xp)
 
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id2)
 

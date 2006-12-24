@@ -1,5 +1,5 @@
-subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
-                               nobs_min, nobs_max, klev_min, klev_max )
+subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
+                               nobs_min, nobs_max, klev_min, klev_max)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Do MPI reduction operations across processors to get the average, 
@@ -30,13 +30,13 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 #ifdef DM_PARALLEL
 
    if (rootproc) root = myproc
-   call wrf_dm_bcast_integer ( root, 1 )
+   call wrf_dm_bcast_integer (root, 1)
 
    ! Sum average and rms error over all processors and store on monitor processor.
-   call mpi_reduce(proc_ave, average, 1, true_mpi_real, mpi_sum, root, comm, ierr )
-   call mpi_reduce(proc_err, rms_err, 1, true_mpi_real, mpi_sum, root, comm, ierr )
+   call mpi_reduce(proc_ave, average, 1, true_mpi_real, mpi_sum, root, comm, ierr)
+   call mpi_reduce(proc_err, rms_err, 1, true_mpi_real, mpi_sum, root, comm, ierr)
 
-   if ( rootproc ) then
+   if (rootproc) then
       proc_ave = average
       proc_err = rms_err
    end if
@@ -44,22 +44,22 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    ! Get minimum value and associated processor index.
    in(1) = proc_min
    in(2) = myproc
-   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_minloc, root, comm, ierr )
+   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_minloc, root, comm, ierr)
 
-   if (myproc .eq. root) then
+   if (myproc == root) then
       proc_min = out(1)
       proc_id = inT(out(2))
    end if
-   call wrf_dm_bcast_integer ( proc_id, 1 )
+   call wrf_dm_bcast_integer (proc_id, 1)
 
    ! Get obs number and k-level where minimum occurs.
    if (proc_id .ne. root) then
-      if (myproc .eq. root) then
-         call mpi_recv( nobs_min, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr )
-         call mpi_recv( klev_min, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr )
-      else if (myproc .eq. proc_id) then
-         call mpi_send( nobs_min, 1, mpi_integer, root, 10, comm, ierr )
-         call mpi_send( klev_min, 1, mpi_integer, root, 11, comm, ierr )
+      if (myproc == root) then
+         call mpi_recv(nobs_min, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr)
+         call mpi_recv(klev_min, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr)
+      else if (myproc == proc_id) then
+         call mpi_send(nobs_min, 1, mpi_integer, root, 10, comm, ierr)
+         call mpi_send(klev_min, 1, mpi_integer, root, 11, comm, ierr)
       end if
    end if
 
@@ -67,23 +67,23 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
    in(1) = proc_max
    in(2) = myproc
 
-   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_maxloc, root, comm, ierr )
+   call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_maxloc, root, comm, ierr)
 
-   if (myproc .eq. root) then
+   if (myproc == root) then
       proc_max = out(1)
       proc_id = inT(out(2))
    end if
 
-   call wrf_dm_bcast_integer ( proc_id, 1 )
+   call wrf_dm_bcast_integer (proc_id, 1)
 
    ! Get obs number and k-level where maximum occurs.
    if (proc_id .ne. root) then
-      if (myproc .eq. root) then
-         call mpi_recv( nobs_max, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr )
-         call mpi_recv( klev_max, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr )
-      else if( myproc .eq. proc_id ) then
-         call mpi_send( nobs_max, 1, mpi_integer, root, 10, comm, ierr )
-         call mpi_send( klev_max, 1, mpi_integer, root, 11, comm, ierr )
+      if (myproc == root) then
+         call mpi_recv(nobs_max, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr)
+         call mpi_recv(klev_max, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr)
+      else if (myproc == proc_id) then
+         call mpi_send(nobs_max, 1, mpi_integer, root, 10, comm, ierr)
+         call mpi_send(klev_max, 1, mpi_integer, root, 11, comm, ierr)
       end if
    end if
 #endif

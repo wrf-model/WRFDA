@@ -1,6 +1,8 @@
-subroutine da_stats_calculate( n, k, qc_flag, x, nn, &
+subroutine da_stats_calculate(n, k, qc_flag, x, nn, &
                             minimum, maximum, &
-                            average, rms_err )
+                            average, rms_err)
+
+   implicit none
 
    integer, intent(in)    :: n             ! Number of obs.
    integer, intent(in)    :: k             ! Level.
@@ -10,16 +12,16 @@ subroutine da_stats_calculate( n, k, qc_flag, x, nn, &
    type (maxmin_type), intent(inout) :: minimum, maximum
    real, intent(inout)    :: average, rms_err
 
-   if ( qc_flag >= obs_qc_pointer ) then
+   if (qc_flag >= obs_qc_pointer) then
       nn = nn + 1
 
-      if ( x < minimum%value) then
+      if (x < minimum%value) then
          minimum%value = x
          minimum%n     = n
          minimum%l     = k
       end if
 
-      if ( x > maximum%value) then
+      if (x > maximum%value) then
          maximum%value = x
          maximum%n     = n
          maximum%l     = k

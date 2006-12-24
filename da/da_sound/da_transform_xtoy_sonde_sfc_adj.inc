@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_sonde_sfc_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_sonde_sfc_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_sonde_sfc_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_sound > 0 ) then
+   if (iv%num_sound > 0) then
       if (sfc_assi_options == 1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, &
             iv%ob_numb(iv%current_ob_time)%sound
@@ -41,16 +41,16 @@ subroutine da_transform_xtoy_sonde_sfc_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
                xp%jms, xp%jme, i, j, dx, dy, dxm, dym, &
                jo_grad_y%sonde_sfc(n)%p)
 #else
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%u, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%v, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%t, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj( &
+            call da_interp_obs_lin_2d_adj(&
                jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%q, iv%sonde_sfc(n)%zk)
 

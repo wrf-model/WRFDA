@@ -29,10 +29,10 @@ subroutine da_sort_rad (iv)
 
   do inst=1,rtminit_nsensor
      iv%ob_numb(:)%radiance(inst) = 0
-     if ( iv%instid(inst)%num_rad < 1) cycle
+     if (iv%instid(inst)%num_rad < 1) cycle
 
-     allocate( rad(iv%instid(inst)%num_rad), stat=error )
-     if (error /= 0 ) then
+     allocate(rad(iv%instid(inst)%num_rad), stat=error)
+     if (error /= 0) then
        call da_error(__FILE__,__LINE__, &
          (/"Cannot allocate memory to rad"/))
      end if
@@ -50,8 +50,8 @@ subroutine da_sort_rad (iv)
           rad(j)%satzen      =iv%instid(inst)%rad(n)%satzen 
           rad(j)%satazi      =iv%instid(inst)%rad(n)%satazi
           rad(j)%solzen      =iv%instid(inst)%rad(n)%solzen
-          allocate ( rad(j)%tb(iv%instid(inst)%nchan), stat=error )
-          if (error /= 0 ) then
+          allocate (rad(j)%tb(iv%instid(inst)%nchan), stat=error)
+          if (error /= 0) then
              call da_error(__FILE__,__LINE__, &
                (/"Cannot allocate memory to rad(j)%tb"/))
           end if
@@ -60,7 +60,7 @@ subroutine da_sort_rad (iv)
           iv%ob_numb(i)%radiance(inst) = j
   end do
 
-   write(UNIT=stdout,FMT='(a,2x,a,2x,10i7)') &
+   write(unit=stdout,fmt='(a,2x,a,2x,10i7)') &
       ' FGAT: ',iv%instid(inst)%rttovid_string, iv%ob_numb(1:num_fgat_time)%radiance(inst)
 
   do n = 1,iv%instid(inst)%num_rad
@@ -74,9 +74,9 @@ subroutine da_sort_rad (iv)
        iv%instid(inst)%rad(n)%solzen = rad(n)%solzen
        iv%instid(inst)%rad(n)%tb(1:iv%instid(inst)%nchan)%inv = &
                        rad(n)%tb(1:iv%instid(inst)%nchan)%inv
-       deallocate( rad(n)%tb )
+       deallocate(rad(n)%tb)
   end do
-       deallocate( rad )
+       deallocate(rad)
   end do
 
 end subroutine da_sort_rad

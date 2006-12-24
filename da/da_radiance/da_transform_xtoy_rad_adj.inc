@@ -1,9 +1,9 @@
-subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: transform gradient from obs space to model grid space.
    !
-   ! METHOD:  jo_grad_x = H^T jo_grad_y =  - H^T R^-1 ( d - H delta_x )
+   ! METHOD:  jo_grad_x = H^T jo_grad_y =  - H^T R^-1 (d - H delta_x)
    !           1. input gradient in obs space and reference state of RTTOV
    !           2. call adjoint of RTM
    !           3. adjoint of interpolation from model grid to obs loc
@@ -55,14 +55,14 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
     call da_error(__FILE__,__LINE__, &
        (/"Must compile with $RTTOV option for radiances"/))
 #else
-   IF ( iv%num_inst < 1 ) return
+   IF (iv%num_inst < 1) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_rad_adj")
 
    alloc_status (:) = 0
 
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if ( iv%instid(inst)%num_rad < 1 ) cycle
+      if (iv%instid(inst)%num_rad < 1) cycle
       num_rad = iv%instid(inst)%num_rad
       nlevels  = iv%instid(inst)%nlevels
       nchan    = iv%instid(inst)%nchan
@@ -74,7 +74,7 @@ use da_interpolation, only : da_interp_lin_3d_adj_new
       allocate (con_vars_ad(num_rad), stat= alloc_status(6))
       allocate (aux_vars(num_rad), stat= alloc_status(7))
 
-      if ( any(alloc_status /= 0) ) then
+      if (any(alloc_status /= 0)) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot allocate memory to con_vars"/))
       end if
@@ -194,15 +194,15 @@ if (.false.) then
                do j=1,len
                   temp_t(:,j)=con_vars(s+j-1) % t(:)
                end do
-               call MPI_SEND( temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+1, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+1, MPI_COMM_WORLD, IERR)
 
                allocate(temp_q(nlevels,len))
                do j=1,len
                   temp_q(:,j)=con_vars(s+j-1) % q(:)
                end do
-               call MPI_SEND( temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+2, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+2, MPI_COMM_WORLD, IERR)
   
-               call MPI_SEND( tb(s:e,:),len*nchan, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+3, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(tb(s:e,:),len*nchan, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+3, MPI_COMM_WORLD, IERR)
 
                allocate (rtemp(len,8))
                rtemp(:,1)= con_vars(s:e) % ps
@@ -213,12 +213,12 @@ if (.false.) then
                rtemp(:,6)= aux_vars(s:e) % surft
                rtemp(:,7)= aux_vars(s:e) % satzen
                rtemp(:,8)= aux_vars(s:e) % satazi
-               call MPI_SEND(rtemp,len*8, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+4, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(rtemp,len*8, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*8+4, MPI_COMM_WORLD, IERR)
 
                allocate (itemp(len,2))
                itemp(:,1)= con_vars(s:e) % nlevels
                itemp(:,2)= aux_vars(s:e) % surftype
-               call MPI_SEND(itemp,len*2, MPI_INTEGER, tovs_recv_pe(inst,i), i*8+5, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(itemp,len*2, MPI_INTEGER, tovs_recv_pe(inst,i), i*8+5, MPI_COMM_WORLD, IERR)
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -232,24 +232,24 @@ if (.false.) then
                nl=len*nlevels
                allocate(temp_t(nlevels,len))
                call MPI_RECV(temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
-                  i*8+1, MPI_COMM_WORLD, status, IERR )
+                  i*8+1, MPI_COMM_WORLD, status, IERR)
                do j=1,len
                   d_con_vars(s+j-1) % t(:)=temp_t(:,j)
                end do
 
                allocate(temp_q(nlevels,len))
                call MPI_RECV(temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
-                  i*8+2, MPI_COMM_WORLD, status, IERR )
+                  i*8+2, MPI_COMM_WORLD, status, IERR)
                do j=1,len
                   d_con_vars(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                call MPI_RECV(d_tb(s:e,:),len*nchan, TRUE_MPI_REAL, &
-                  tovs_send_pe(inst,i), i*8+3, MPI_COMM_WORLD, status, IERR )
+                  tovs_send_pe(inst,i), i*8+3, MPI_COMM_WORLD, status, IERR)
 
                allocate (rtemp(len,8))
                call MPI_RECV(rtemp,len*8, TRUE_MPI_REAL, &
-                  tovs_send_pe(inst,i), i*8+4, MPI_COMM_WORLD, status, IERR )
+                  tovs_send_pe(inst,i), i*8+4, MPI_COMM_WORLD, status, IERR)
                d_con_vars(s:e) % ps       = rtemp(:,1)
                d_aux_vars(s:e) % t2m      = rtemp(:,2)
                d_aux_vars(s:e) % q2m      = rtemp(:,3)
@@ -261,7 +261,7 @@ if (.false.) then
 
                allocate (itemp(len,2))
                call MPI_RECV(itemp,len*2, MPI_INTEGER, &
-                  tovs_send_pe(inst,i), i*8+5, MPI_COMM_WORLD, status, IERR )
+                  tovs_send_pe(inst,i), i*8+5, MPI_COMM_WORLD, status, IERR)
                d_con_vars(s:e) % nlevels  = itemp(:,1)
                d_aux_vars(s:e) % surftype = itemp(:,2)
 
@@ -298,7 +298,7 @@ if (.false.) then
 !write (0,*) "d_aux_vars(d_num_rad) % satazi",d_aux_vars(d_num_rad)%satazi
 
          call da_rttov_ad (inst, nchan, d_num_rad, d_con_vars, &
-                           d_aux_vars, d_con_vars_ad, d_tb )
+                           d_aux_vars, d_con_vars_ad, d_tb)
 
          ! Transfer data back
 
@@ -324,17 +324,17 @@ if (.false.) then
                do j=1,len
                   temp_t(:,j)=d_con_vars_ad(s+j-1) % t(:)
                end do
-               call MPI_SEND( temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+6, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+6, MPI_COMM_WORLD, IERR)
 
                allocate(temp_q(nlevels,len))
                do j=1,len
                   temp_q(:,j)=d_con_vars_ad(s+j-1) % q(:)
                end do
-               call MPI_SEND( temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+7, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+7, MPI_COMM_WORLD, IERR)
 
                allocate(rtemp(len,1))
                rtemp(:,1) = d_con_vars_ad(s:e) % ps
-               call MPI_SEND(rtemp,len, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+8, MPI_COMM_WORLD, IERR )
+               call MPI_SEND(rtemp,len, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*8+8, MPI_COMM_WORLD, IERR)
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -347,21 +347,21 @@ if (.false.) then
                nl=len*nlevels
                allocate(temp_t(nlevels,len))
                call MPI_RECV(temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
-               i*8+6, MPI_COMM_WORLD, status, IERR )
+               i*8+6, MPI_COMM_WORLD, status, IERR)
                do j=1,len
                   con_vars_ad(s+j-1) % t(:)=temp_t(:,j)
                end do
 
                allocate(temp_q(nlevels,len))
                call MPI_RECV(temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
-                  i*8+7, MPI_COMM_WORLD, status, IERR )
+                  i*8+7, MPI_COMM_WORLD, status, IERR)
                do j=1,len
                   con_vars_ad(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                allocate(rtemp(len,1))
                call MPI_RECV(rtemp,len, TRUE_MPI_REAL, tovs_recv_pe(inst,i), &
-                  i*8+8, MPI_COMM_WORLD, status, IERR )
+                  i*8+8, MPI_COMM_WORLD, status, IERR)
                con_vars_ad(s:e) % ps=rtemp(:,1)
                deallocate (temp_t)
                deallocate (temp_q)
@@ -391,7 +391,7 @@ if (.false.) then
 !write (0,*) "aux_vars(:) % satzen",aux_vars(:) % satzen
 !write (0,*) "aux_vars(:) % satazi",aux_vars(:) % satazi
          call da_rttov_ad (inst, nchan, num_rad, con_vars, &
-                           aux_vars, con_vars_ad, tb )
+                           aux_vars, con_vars_ad, tb)
       end if
 !write (0,*) "con_vars_ad(1) % t(:)",con_vars_ad(1) % t(:)
 !write (0,*) "con_vars_ad(1) % q(:)",con_vars_ad(1) % q(:)
@@ -418,7 +418,7 @@ if (.false.) then
          do k=1, nlevels
             model_mr(k) = con_vars_ad(n) % q(k)
 
-            IF ( iv%instid(inst)%rad(n)%zk(k) <= 0.0 ) THEN
+            IF (iv%instid(inst)%rad(n)%zk(k) <= 0.0) THEN
                con_vars_ad(n)%t(k)  = 0.0  !coefs(inst) % ref_prfl_t(k,gas_id_watervapour)
                con_vars_ad(n)%q(k)  = 0.0  !coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
@@ -430,7 +430,7 @@ if (.false.) then
                !    model_mr(k),        &! in
                !    gas_id_watervapour, &! in
                !    model_mr(k),        &! in
-               !    con_vars_ad(n)%q(k)     )    ! inout
+               !    con_vars_ad(n)%q(k)    )    ! inout
             END IF
          end do
       end do
@@ -442,7 +442,7 @@ if (.false.) then
          do n=1,num_rad
             temp_t(:,n) = con_vars_ad(n)% t(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%t, xp, &
+         call da_interp_lin_3d_adj_new(jo_grad_x%t, xp, &
             iv%instid(inst)%loc_i, &
             iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_k, &
@@ -452,14 +452,14 @@ if (.false.) then
             iv%instid(inst)%loc_dxm, &
             iv%instid(inst)%loc_dym, &
             iv%instid(inst)%loc_dzm, &
-            temp_t, nlevels,num_rad )
+            temp_t, nlevels,num_rad)
          deallocate(temp_t)
 
          allocate(temp_q(nlevels,num_rad))
          do n=1,num_rad
             temp_q(:,n) = con_vars_ad(n)% q(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%q, xp, &
+         call da_interp_lin_3d_adj_new(jo_grad_x%q, xp, &
             iv%instid(inst)%loc_i, &
             iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_k, &
@@ -469,7 +469,7 @@ if (.false.) then
             iv%instid(inst)%loc_dxm, &
             iv%instid(inst)%loc_dym, &
             iv%instid(inst)%loc_dzm, &
-            temp_q, nlevels,num_rad )
+            temp_q, nlevels,num_rad)
          deallocate(temp_q)
 
          allocate(temp_ps(num_rad))
@@ -500,11 +500,11 @@ if (.false.) then
             dym = iv%instid(inst)%rad(n)%loc%dym
 
             ! [4.3] Interpolate horizontally from ob to grid:
-            call da_interp_lin_3d_adj( jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
-               con_vars_ad(n)% t,  max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+            call da_interp_lin_3d_adj(jo_grad_x%t, xp, i, j, dx, dy, dxm, dym, &
+               con_vars_ad(n)% t,  max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels)
 
-            call da_interp_lin_3d_adj( jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
-               con_vars_ad(n)% q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels )
+            call da_interp_lin_3d_adj(jo_grad_x%q, xp, i, j, dx, dy, dxm, dym, &
+               con_vars_ad(n)% q, max_ob_levels, iv%instid(inst)%rad(n)%zk, nlevels)
 
             call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
                xp%jme, i, j, dx, dy, dxm, dym, con_vars_ad(n)% ps)

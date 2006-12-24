@@ -1,5 +1,9 @@
 subroutine da_transform_xtotb_adj (xa, xb)
 
+   !----------------------------------------------------------------------
+   ! Purpose: TBD
+   !----------------------------------------------------------------------
+
    implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.
@@ -16,9 +20,24 @@ subroutine da_transform_xtotb_adj (xa, xb)
    real                          :: ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_tpw
    real                          :: ADJ_htpw,ADJ_speed,ADJ_alw,ADJ_zcld         
 
-   psfc=0.;ta=0.;gamma=0.;sst=0.;htpw=0.;speed=0.;alw=0.;zcld=0.;tpw=0
-   dx=0.; dy=0.; dxm=0.; dym=0.; zhmkz=0.
-   dum1=0.; dum2=0.; zrhom=0.; ADJ_zrhom=0.
+   psfc=0.0
+   ta=0.0
+   gamma=0.0
+   sst=0.0
+   htpw=0.0
+   speed=0.0
+   alw=0.0
+   zcld=0.0
+   tpw=0.0
+   dx=0.0
+   dy=0.0
+   dxm=0.0
+   dym=0.0
+   zhmkz=0.0
+   dum1=0.0
+   dum2=0.0
+   zrhom=0.0
+   ADJ_zrhom=0.0
 
    is = xb%its
    js = xb%jts
@@ -27,18 +46,19 @@ subroutine da_transform_xtotb_adj (xa, xb)
    ie = xb%ite
    je = xb%jte
    ke = xb%kte
-   if ( Testing_WRFVAR ) then
+
+   if (Testing_WRFVAR) then
       is = xb%its-1
       js = xb%jts-1
 
       ie = xb%ite+1
       je = xb%jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if (is < xb%ids) is = xb%ids
+      if (js < xb%jds) js = xb%jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if (ie > xb%ide) ie = xb%ide
+      if (je > xb%jde) je = xb%jde
    end if
 
    ! Mean fields
@@ -89,28 +109,28 @@ subroutine da_transform_xtotb_adj (xa, xb)
                      xb%tb19v(i,j),xb%tb19h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)     )
+                     ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)    )
 
          call da_tb_adj(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
                      xb%tb22v(i,j),dum1,                        &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb22v(i,j),dum2               )
+                     ADJ_zcld,xa%tb22v(i,j),dum2              )
 
          call da_tb_adj(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
                      xb%tb37v(i,j),xb%tb37h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb37v(i,j),xa%tb37h(i,j)     )
+                     ADJ_zcld,xa%tb37v(i,j),xa%tb37h(i,j)    )
 
          call da_tb_adj(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
                      xb%tb85v(i,j),xb%tb85h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb85v(i,j),xa%tb85h(i,j)     )
+                     ADJ_zcld,xa%tb85v(i,j),xa%tb85h(i,j)    )
 
          ADJ_zrhom    = ADJ_htpw/tpw/1000.
          ADJ_tpw      = ADJ_tpw - ADJ_htpw/tpw*htpw

@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmt1_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_ssmt1_adj(iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -16,7 +16,7 @@ subroutine da_transform_xtoy_ssmt1_adj( iv, xp, jo_grad_y, jo_grad_x )
       do n=1, iv % num_ssmt1
          k = iv % ssmt1(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
       
          ! [1.1] Get horizontal interpolation weights:
 

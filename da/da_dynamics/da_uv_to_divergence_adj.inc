@@ -1,7 +1,7 @@
-subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
+subroutine da_uv_to_divergence_adj(xp, xb, u, v, div, &
                                ids,ide, jds,jde, kds,kde,  &
                                ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte )
+                               its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Adjoint of the subroutine da_uv_to_divergence
@@ -36,7 +36,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
 
-   if ( .not. global ) then
+   if (.not. global) then
       um(ims:ime,jms:jme) = 0.
       vm(ims:ime,jms:jme) = 0.
       inv_2ds = 0.5 / xb%ds
@@ -50,28 +50,28 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
       is = its - 1; ie = ite + 1; js = jts - 1; je = jte + 1
    end if
 
-   if ( .not. global .and. its == ids ) is = ids+1
-   if ( .not. global .and. ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1; if ( jte == jde ) je = jde-1
+   if (.not. global .and. its == ids) is = ids+1
+   if (.not. global .and. ite == ide) ie = ide-1
+   if (jts == jds) js = jds+1; if (jte == jde) je = jde-1
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate divergence:
    !---------------------------------------------------------------------------
 
-   if( global ) then
+   if (global) then
       call da_set_boundary_3d(div, &
                               ids,ide,   &
                               ims,ime, jms,jme, kms,kme,  &
-                              its,ite, jts,jte, kts,kte )
+                              its,ite, jts,jte, kts,kte)
    end if
 
    do k =kds, kde
-      if( .not. global ) then
+      if (.not. global) then
          ! [2.2] Impose zero divergence gradient condition at boundaries:
 
          ! [2.2.4] Right boundaries:
 
-         if ( jte == jde ) then
+         if (jte == jde) then
             j = jte
             do i = its, ite    ! This is different to original
                div(i,j-1,k)=div(i,j-1,k)+div(i,j,k)*one_third*4.0
@@ -82,7 +82,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
 
          ! [2.2.3] Left boundaries:
 
-         if ( jts == jds ) then
+         if (jts == jds) then
             j = jts
             do i = its, ite    ! This is different to original
                div(i,j+1,k)=div(i,j+1,k)+div(i,j,k)*one_third*4.0
@@ -93,7 +93,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
 
          ! [2.2.2] Top boundaries:
 
-         if ( ite == ide ) then
+         if (ite == ide) then
             i = ite
             do j = jts, jte
                div(i-1,j,k)=div(i-1,j,k)+div(i,j,k)*one_third*4.0
@@ -104,7 +104,7 @@ subroutine da_uv_to_divergence_adj( xp, xb, u, v, div, &
 
          ! [2.2.1] Bottom boundaries:
 
-         if ( its == ids ) then
+         if (its == ids) then
             i = its 
             do j = jts, jte
                div(i+1,j,k)=div(i+1,j,k)+div(i,j,k)*one_third*4.0

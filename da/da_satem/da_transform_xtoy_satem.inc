@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
+subroutine da_transform_xtoy_satem (xa, xb, iv, xp, y)
 
    implicit none
 
@@ -22,7 +22,7 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
    real, dimension(xp%kts-1:xp%kte+1)   :: TGL_pre_ma,TGL_tv_ma
    real                         :: TGL_tv1,TGL_tv2
 
-   if ( iv%num_satem > 0 ) then
+   if (iv%num_satem > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
          iv%ob_numb(iv%current_ob_time)%satem
 
@@ -54,7 +54,7 @@ subroutine da_transform_xtoy_satem ( xa, xb, iv, xp, y )
          ! [4.0] Thickness calculation
 
          do k=1, num_levs
-            if ( ABS( iv % satem(n) %p (k) - missing_r) > 1. ) then
+            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.) then
 
                call da_find_layer_tl(layer1,tv1,iv%satem(n)%p(k),            &
                   pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)

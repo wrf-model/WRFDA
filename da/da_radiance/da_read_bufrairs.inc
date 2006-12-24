@@ -171,9 +171,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    channame = trim(senname)//'CHAN'
 
    do inst = 1, rtminit_nsensor
-      if (   platform_id  == rtminit_platform(inst) &
+      if (  platform_id  == rtminit_platform(inst) &
         .and. satellite_id == rtminit_satid(inst)    &
-        .and. sensor_id    == rtminit_sensor(inst)   ) then
+        .and. sensor_id    == rtminit_sensor(inst)  ) then
          exit
       end if
    end do
@@ -181,7 +181,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    if (inst == rtminit_nsensor .and.           &
        platform_id  /= rtminit_platform(inst)  &
         .or. satellite_id /= rtminit_satid(inst) &
-        .or. sensor_id /= rtminit_sensor(inst) ) return
+        .or. sensor_id /= rtminit_sensor(inst)) return
 
    !    1.0  Open BUFR table and BUFR file
 
@@ -224,7 +224,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    ihh = 0
    if (iret /= 0) goto 1000     ! no data?
 
-   write(unit=date,fmt='( i10)') idate
+   write(unit=date,fmt='(i10)') idate
    read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
    if (print_detail_radiance) then
        write(unit=stdout,fmt=*) 'da_read_bufrairs:     bufr file date is ', &
@@ -355,10 +355,10 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       end if
 
       ! Retrieve observing info
-      ifov = int( airsspot%fovn + POINT001)
+      ifov = int(airsspot%fovn + POINT001)
       sza  = abs(airsspot%saza)
       ! if (((airs .or. hsb) .and. ifov <= 45) .or. &
-      !     ( eos_amsua     .and. ifov <= 15)) then
+      !     (eos_amsua     .and. ifov <= 15)) then
       !    sza = - sza
       ! end if
 

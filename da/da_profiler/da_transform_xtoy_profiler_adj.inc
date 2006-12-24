@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_profiler_adj(iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
@@ -12,11 +12,11 @@ subroutine da_transform_xtoy_profiler_adj( iv, xp, jo_grad_y, jo_grad_x )
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 
-   if ( iv%num_profiler > 0 ) then
+   if (iv%num_profiler > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
          k = iv % profiler(n) % info % levels
 
-         if ( k < 1 ) cycle
+         if (k < 1) cycle
       
          ! [1.3] Get horizontal interpolation weights:
 

@@ -1,6 +1,6 @@
-subroutine da_setup_firstguess( xbx, grid, &
+subroutine da_setup_firstguess(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                              )
+                            )
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate and read in components of first guess state.
    !---------------------------------------------------------------------------
@@ -51,18 +51,18 @@ subroutine da_setup_firstguess( xbx, grid, &
    ! [1.0] Setup and read in fields from first guess:
    !---------------------------------------------------------------------------      
 
-   if ( fg_format == fg_format_wrf ) then
+   if (fg_format == fg_format_wrf) then
 
       ! First guess is a WRF C-grid format file:
 
-      call da_setup_firstguess_wrf( xbx, grid, &
+      call da_setup_firstguess_wrf(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                                 )
-   else if ( fg_format == fg_format_kma ) then
+                               )
+   else if (fg_format == fg_format_kma) then
       ! First guess is an KMA format file:
-      call da_setup_firstguess_kma( xbx, grid, &
+      call da_setup_firstguess_kma(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                                 )
+                               )
    end if
 
    !---------------------------------------------------------------------------
@@ -77,7 +77,7 @@ subroutine da_setup_firstguess( xbx, grid, &
    else if (fg_format == fg_format_kma) then
       ! Calculate multiplicative constants for PsiChi_TO_UV 
       ddx =  earth_radius*1000 * 2.0 * pi / (grid%xb%ide-grid%xb%ids+1)
-      ddy =  earth_radius*1000       * pi / (grid%xb%jde-grid%xb%jds  )
+      ddy =  earth_radius*1000       * pi / (grid%xb%jde-grid%xb%jds)
       grid%xb% coefx(is:ie,js:je) = 0.5 / (ddx * cos(grid%xlat(is:ie,js:je)*pi/180.))
       grid%xb% coefy(is:ie,js:je) = 0.5 /  ddy
    else
@@ -100,7 +100,7 @@ subroutine da_setup_firstguess( xbx, grid, &
 
    ! [2.1] Set up fast Fourier & Legendre transform constants:
 
-   call da_setup_runconstants( grid%xp, grid%xb, xbx)
+   call da_setup_runconstants(grid%xp, grid%xb, xbx)
 
    if (trace_use) call da_trace_exit("da_setup_firstguess")
 

@@ -1,7 +1,7 @@
-subroutine da_solve_init( grid, &
+subroutine da_solve_init(grid, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
+                          ips, ipe, jps, jpe, kps, kpe)
 
    implicit none
 
@@ -15,27 +15,27 @@ subroutine da_solve_init( grid, &
 
    integer :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
 
-!if ( dwordsize != rwordsize )
+   ! if (dwordsize != rwordsize)
 #define true_MSG_XPOSE add_msg_xpose_real
-!else
-!define true_MSG_XPOSE add_msg_xpose_doubleprecision
-!endif
+   ! else
+   !    define true_MSG_XPOSE add_msg_xpose_doubleprecision
+   ! end if
 
    if (trace_use) call da_trace_entry("da_solve_init")
 
    ! De-reference dimension information stored in the grid data structure.
 
-   call da_copy_dims( grid, &
+   call da_copy_dims(grid, &
                    ids, ide, jds, jde, kds, kde, &
                    ims, ime, jms, jme, kms, kme, &
-                   ips, ipe, jps, jpe, kps, kpe  )
+                   ips, ipe, jps, jpe, kps, kpe)
 
    ! Compute these starting and stopping locations for each tile and number 
    ! of tiles.
 
-   call set_tiles ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )
+   call set_tiles (grid , ids , ide , jds , jde , ips , ipe , jps , jpe)
 
-   call da_copy_tile_dims( grid, its, ite, jts, jte, kts, kte )
+   call da_copy_tile_dims(grid, its, ite, jts, jte, kts, kte)
 
    sm31             = grid%sm31
    sm32             = grid%sm32
@@ -55,31 +55,31 @@ subroutine da_solve_init( grid, &
 #define REGISTER_I1
 #include "em_data_calls.inc"
    ! XPOSE_V1
-   if ( grid%comms( XPOSE_V1 ) == invalid_message_value ) then
-      call setup_xpose_rsl( grid )
+   if (grid%comms(XPOSE_V1) == invalid_message_value) then
+      call setup_xpose_rsl(grid)
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call true_MSG_XPOSE ( grid%xp%v1z, grid%xp%v1x, grid%xp%v1y, 3 )
+      call true_MSG_XPOSE (grid%xp%v1z, grid%xp%v1x, grid%xp%v1y, 3)
 #else
-      call true_MSG_XPOSE ( grid%xp%v1z(ims,jms,kms), &
+      call true_MSG_XPOSE (grid%xp%v1z(ims,jms,kms), &
                          grid%xp%v1x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
-                         grid%xp%v1y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3 )
-#endif
-      call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V1 ) )
+                         grid%xp%v1y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3)
+#end if
+      call define_xpose (grid%domdesc , grid%comms (XPOSE_V1))
    end if
 
    ! XPOSE_V2
-   if ( grid%comms( XPOSE_V2 ) == invalid_message_value ) then
-      call setup_xpose_rsl( grid )
+   if (grid%comms(XPOSE_V2) == invalid_message_value) then
+      call setup_xpose_rsl(grid)
       call reset_msgs_xpose
 #ifndef DEREF_KLUDGE
-      call true_MSG_XPOSE ( grid%xp%v2z, grid%xp%v2x, grid%xp%v2y, 3 )
+      call true_MSG_XPOSE (grid%xp%v2z, grid%xp%v2x, grid%xp%v2y, 3)
 #else
-      call true_MSG_XPOSE ( grid%xp%v2z(ims,jms,kms), &
+      call true_MSG_XPOSE (grid%xp%v2z(ims,jms,kms), &
                          grid%xp%v2x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
-                         grid%xp%v2y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3 )
-#endif
-      call define_xpose ( grid%domdesc , grid%comms ( XPOSE_V2 ) )
+                         grid%xp%v2y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3)
+#end if
+      call define_xpose (grid%domdesc , grid%comms (XPOSE_V2))
    end if
 
    if (trace_use) call da_trace("da_solve_init", &
@@ -143,7 +143,7 @@ subroutine da_solve_init( grid, &
 
    grid%xp%xpose_id1 = XPOSE_V1
    grid%xp%xpose_id2 = XPOSE_V2
-#endif
+#end if
 
    ! Fill background scalars:
 

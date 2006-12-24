@@ -9,7 +9,7 @@ subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff)
    integer                                :: iunit ! Output unit.
    integer                                :: k
 
-   character (LEN=80)                     :: filename
+   character (len=80)                     :: filename
    integer                                :: io_error
    logical                                :: print ! Output if .true.
    logical                                :: connected

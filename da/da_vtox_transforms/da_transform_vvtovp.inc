@@ -1,8 +1,8 @@
-subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
+subroutine da_transform_vvtovp(evec, eval, vertical_wgt, &
                                 vv, vp, mz, &
                                 ids,ide, jds,jde, kds,kde,  &
                                 ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
+                                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Transform from fields on vertical EOFS to fields on vertical 
@@ -50,7 +50,7 @@ subroutine da_transform_vvtovp( evec, eval, vertical_wgt, &
    ! [2.0] Apply inner-product weighting if vertical_ip > 0:
    !------------------------------------------------------------------- 
 
-   if ( vertical_ip /= 0 ) then
+   if (vertical_ip /= 0) then
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)                          
    end if

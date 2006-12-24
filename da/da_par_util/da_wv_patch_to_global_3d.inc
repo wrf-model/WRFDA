@@ -22,7 +22,7 @@ subroutine da_wv_patch_to_global_3d( vlocal, vglobal,         &
                                        ips, ipe, jps, jpe, kps
 #ifdef DM_PARALLEL
    ! Local declarations
-   character(LEN=3) :: ordering, stagger
+   character(len=3) :: ordering, stagger
    integer :: kde, kme, kpe
    stagger = 'xyz'  ! This hack will keep wrf_patch_to_global_*() from
                     ! increasing DE[123].  Recall that wrfvar arrays are 

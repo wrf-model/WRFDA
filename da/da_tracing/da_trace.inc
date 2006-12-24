@@ -1,6 +1,4 @@
-! General trace within a subroutine
-
-subroutine da_trace( &
+subroutine da_trace(&
    Name,     &           ! in
    Message,  &           ! in, optional
    Messages,  &          ! in, optional
@@ -8,24 +6,20 @@ subroutine da_trace( &
 
    implicit none
 
-   ! Arguments
+   !--------------------------------------------------------------------
+   ! Purpose: General trace within a subroutine
+   !--------------------------------------------------------------------
 
-   character (LEN=*), intent(in)           :: Name         ! Subroutine name
-   character (LEN=*), optional, intent(in) :: Message      ! Text to trace
-   character (LEN=*), optional, intent(in) :: Messages(:)  ! Text to trace
+   character (len=*), intent(in)           :: Name         ! Subroutine name
+   character (len=*), optional, intent(in) :: Message      ! Text to trace
+   character (len=*), optional, intent(in) :: Messages(:)  ! Text to trace
    integer, optional, intent(in)           :: MaxNoCalls   ! max no calls to show
-
-   ! Local variables
 
    integer           :: IOStatus     ! I-O return code
    integer           :: Loop         ! General loop counter
    integer           :: TotalSpace
    integer           :: LocalMaxNoCalls
-   character(LEN=25) :: Change
-
-   !-----------------------------------------------------------------------
-   ! Start of code
-   !-----------------------------------------------------------------------
+   character(len=25) :: Change
 
    !-----------------------------------------------------------------------
    ! Check whether trace active and depth of trace
@@ -47,7 +41,7 @@ subroutine da_trace( &
    Change = ""
 
    if (trace_memory) then
-      call da_memory( &
+      call da_memory(&
          TotalSpace)
       if (LastSpace < TotalSpace) then
          write(Change,"(A9,I12)")", bigger", TotalSpace - LastSpace

@@ -1,4 +1,8 @@
-subroutine da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_gpsref_adj(iv, xp, jo_grad_y, jo_grad_x)
+
+   !-------------------------------------------------------------------------
+   ! Purpose: TBD
+   !-------------------------------------------------------------------------
 
    implicit none
 
@@ -13,7 +17,7 @@ subroutine da_transform_xtoy_gpsref_adj( iv, xp, jo_grad_y, jo_grad_x)
    real                          :: dy, dym  !
    integer                       :: num_levs ! obs vertical levels
 
-   if ( iv%num_gpsref < 1 ) return
+   if (iv%num_gpsref < 1) return
 
    do n=iv%ob_numb(iv%current_ob_time-1)%gpsref + 1, &
       iv%ob_numb(iv%current_ob_time)%gpsref

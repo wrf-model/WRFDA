@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures( xp, ob, iv )
+subroutine da_setup_obs_structures(xp, ob, iv)
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Allocate and read in components of observation structure.
@@ -7,7 +7,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
    implicit none
    
    type (xpose_type), intent(in):: xp          ! Domain decomposition vars. 
-   type ( y_type), intent(out)  :: ob          ! Observation structure.
+   type (y_type), intent(out)  :: ob          ! Observation structure.
    type (ob_type), intent(out)  :: iv          ! O-B structure.
 
    integer :: iost, ssmi_unit
@@ -116,7 +116,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
       Use_Radiance         = .false.
    end if
 
-   if ( sfc_assi_options < 1 .OR. sfc_assi_options > 2 ) then
+   if (sfc_assi_options < 1 .OR. sfc_assi_options > 2) then
       write(unit=message(1),fmt='(A,I3)') &
          'Invalid sfc_assi_option = ', sfc_assi_options
       call da_error(__FILE__,__LINE__,message(1:1))
@@ -124,7 +124,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
 
    if (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) then
       call da_get_unit(ssmi_unit)
-      open ( unit   = ssmi_unit,     &
+      open (unit   = ssmi_unit,     &
              FORM   = 'FORMATTED',  &
              ACCESS = 'SEQUENTIAL', &
              iostat =  iost,     &
@@ -227,13 +227,13 @@ subroutine da_setup_obs_structures( xp, ob, iv )
 
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
-      if ( ob_format == ob_format_bufr ) then
+      if (ob_format == ob_format_bufr) then
          call da_message((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
-            call da_setup_obs_structures_bufr( xp, ob, iv )
-      else if ( ob_format == ob_format_ascii ) then
+            call da_setup_obs_structures_bufr(xp, ob, iv)
+      else if (ob_format == ob_format_ascii) then
          ! [1.2] GTS observation input file:
-         call da_setup_obs_structures_ascii( xp, ob, iv )
+         call da_setup_obs_structures_ascii(xp, ob, iv)
       end if
    end if
 
@@ -246,9 +246,9 @@ subroutine da_setup_obs_structures( xp, ob, iv )
       ! can compile without the RTTOV library
       call da_error(__FILE__,__LINE__, &
          (/"Cannot run radiance code if compile directive RTTOV false"/))
-#endif
+#end if
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
-      call da_setup_bufrtovs_structures( xp, ob, iv )
+      call da_setup_bufrtovs_structures(xp, ob, iv)
 
       ! These are per processor, so uninteresting
       ! write (unit=stderr,fmt=*) ' iv%total_rad_channel = ', iv%total_rad_channel
@@ -257,7 +257,7 @@ subroutine da_setup_obs_structures( xp, ob, iv )
 
    ! Get horizontal interpolation weights.
 
-   call da_setup_obs_interp_wts( xp, iv ) 
+   call da_setup_obs_interp_wts(xp, iv) 
 
    if (trace_use) call da_trace_exit("da_setup_obs_structures")    
 

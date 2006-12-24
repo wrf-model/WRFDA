@@ -1,4 +1,4 @@
-subroutine da_setup_runconstants( xp, xb, xbx)
+subroutine da_setup_runconstants(xp, xb, xbx)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Define constants used.
@@ -38,13 +38,13 @@ subroutine da_setup_runconstants( xp, xb, xbx)
 
    nx = xp%ide - xp%ids
 
-   allocate( xbx % fft_factors_x(num_fft_factors) )
+   allocate(xbx % fft_factors_x(num_fft_factors))
 
    do n = nx, nx+nrange
-      call da_find_fft_factors(n, found_magic, xbx % fft_factors_x )
+      call da_find_fft_factors(n, found_magic, xbx % fft_factors_x)
 
-      if ( found_magic ) then
-         if ( mod(n, 2) == 0 ) then
+      if (found_magic) then
+         if (mod(n, 2) == 0) then
             fft_size_i = n
             xbx % fft_pad_i = n - nx
             exit
@@ -52,26 +52,26 @@ subroutine da_setup_runconstants( xp, xb, xbx)
       end if
    end do
 
-   if ( .NOT. found_magic ) then
+   if (.NOT. found_magic) then
      call da_error(__FILE__,__LINE__, &
        (/"No factor found"/))
    end if
 
-   allocate( xbx % trig_functs_x(1:3*fft_size_i) )  
+   allocate(xbx % trig_functs_x(1:3*fft_size_i))  
 
-   call da_find_fft_trig_funcs( fft_size_i, xbx % trig_functs_x(:) )
+   call da_find_fft_trig_funcs(fft_size_i, xbx % trig_functs_x(:))
 
    ! [1.2] In y direction:
 
    ny = xp%jde - xp%jds
 
-   allocate( xbx % fft_factors_y(num_fft_factors) )
+   allocate(xbx % fft_factors_y(num_fft_factors))
 
    do n = ny, ny+nrange
-      call da_find_fft_factors(n, found_magic, xbx % fft_factors_y )
+      call da_find_fft_factors(n, found_magic, xbx % fft_factors_y)
 
-      if ( found_magic ) then
-         if ( mod(n, 2) == 0 ) then
+      if (found_magic) then
+         if (mod(n, 2) == 0) then
             fft_size_j = n
             xbx % fft_pad_j = n - ny
             exit
@@ -79,14 +79,14 @@ subroutine da_setup_runconstants( xp, xb, xbx)
       end if
    end do
       
-   if ( .NOT. found_magic ) then
+   if (.NOT. found_magic) then
      call da_error(__FILE__,__LINE__, &
        (/"No factor found"/))
    end if
 
-   allocate( xbx % trig_functs_y(1:3*fft_size_j) )  
+   allocate(xbx % trig_functs_y(1:3*fft_size_j))  
 
-   call da_find_fft_trig_funcs( fft_size_j, xbx % trig_functs_y(:) )
+   call da_find_fft_trig_funcs(fft_size_j, xbx % trig_functs_y(:))
 
    !-----Multiplicative coefficent for solution of spectral Poission eqn:
 
@@ -97,28 +97,28 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    nx = xp%ide - xp%ids + xbx%fft_pad_i
    ny = xp%jde - xp%jds + xbx%fft_pad_j
    ! YRG: A-grid:
-   coeff_nx = 2.0 * pi / real( nx )
-   coeff_ny = 2.0 * pi / real( ny )
+   coeff_nx = 2.0 * pi / real(nx)
+   coeff_ny = 2.0 * pi / real(ny)
 
    ! YRG: B-grid::
-   ! coeff_nx = pi / real( nx )
-   ! coeff_ny = pi / real( ny )
+   ! coeff_nx = pi / real(nx)
+   ! coeff_ny = pi / real(ny)
 
    xbx%fft_ix = nx + 1
    xbx%fft_jy = ny + 1
 
-   allocate( xbx%fft_coeffs(1:xbx%fft_ix,1:xbx%fft_jy) )
+   allocate(xbx%fft_coeffs(1:xbx%fft_ix,1:xbx%fft_jy))
 
    do j = 2, ny
       cos_coeff_ny = COS(coeff_ny * real(j-1))
       do i = 2, nx
          cos_coeff_nx = COS(coeff_nx * real(i-1))
          !mslee.Bgrid
-         ! xbx%fft_coeffs(i,j) = const / ( 1.0 - cos_coeff_nx * cos_coeff_ny)
+         ! xbx%fft_coeffs(i,j) = const / (1.0 - cos_coeff_nx * cos_coeff_ny)
          if (cos_coeff_nx.eq.1.and.cos_coeff_ny.eq.1) then
             xbx%fft_coeffs(i,j) = 0.0
          else
-            xbx%fft_coeffs(i,j) = const / ( 2.0 - cos_coeff_nx - cos_coeff_ny)
+            xbx%fft_coeffs(i,j) = const / (2.0 - cos_coeff_nx - cos_coeff_ny)
          end if
       end do
    end do
@@ -131,16 +131,16 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    !mslee      xbx%fft_coeffs(1:xbx%fft_ix,xbx%fft_jy) = 0.0
    !mslee. we need to check the following
 
-   xbx%fft_adjoint_factor = 4.0 / real( nx * ny )
+   xbx%fft_adjoint_factor = 4.0 / real(nx * ny)
 
    !---------------------------------------------------------------------------
 
    ! Calculate i increment for distributing pad region across processors.
 
    need_pad = .true.
-   if(xbx%fft_pad_i <= 0) then
+   if (xbx%fft_pad_i <= 0) then
       need_pad = .false.
-   else if(xbx%fft_pad_i > (xp%ide-xp%ids+1)) then
+   else if (xbx%fft_pad_i > (xp%ide-xp%ids+1)) then
       write(unit=message(1), fmt='(a)') &
        'FFT xbx%fft_pad_i is too large!'
       write(unit=message(2), fmt='(2x,a,i4)') &
@@ -155,15 +155,15 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    ! Need to save xbx%pad_num, xbx%pad_inc, and xbx%pad_loc
 
    xbx%pad_num = 0
-   if(need_pad) then
+   if (need_pad) then
       do n=1, xbx%fft_pad_i
          i = (n-1)*xbx%pad_inc + 1
-         if((i >= xp%itsy) .and. (i <= xp%itey)) then
+         if ((i >= xp%itsy) .and. (i <= xp%itey)) then
             xbx%pad_num = xbx%pad_num + 1
          end if
       end do
 
-      if(xbx%pad_num > 0) then
+      if (xbx%pad_num > 0) then
          allocate(xbx%pad_loc(1:xbx%pad_num))
          allocate(xbx%pad_pos(1:xbx%pad_num))
       end if
@@ -171,7 +171,7 @@ subroutine da_setup_runconstants( xp, xb, xbx)
       xbx%pad_num = 0
       do n=1, xbx%fft_pad_i
          i = (n-1)*xbx%pad_inc + 1
-         if((i >= xp%itsy) .and. (i <= xp%itey)) then
+         if ((i >= xp%itsy) .and. (i <= xp%itey)) then
             xbx%pad_num = xbx%pad_num + 1
             xbx%pad_loc(xbx%pad_num) = i
             xbx%pad_pos(xbx%pad_num) = xp%ide + n
@@ -181,18 +181,18 @@ subroutine da_setup_runconstants( xp, xb, xbx)
    
    !---------------------------------------------------------------------------
 
-   if ( global ) then
+   if (global) then
       ! Set up Spectral transform constants:
       xbx%inc    = 1
       xbx%ni     = xp%ide-xp%ids+1
       xbx%nj     = xp%jde-xp%jds+1
-      xbx%lenr   = xbx%inc * (xbx%ni - 1 ) + 1
+      xbx%lenr   = xbx%inc * (xbx%ni - 1) + 1
       xbx%lensav = xbx%ni + int(log(real(xbx%ni))) + 4
       xbx%lenwrk = xbx%ni
       xbx%max_wavenumber = xbx%ni/2 -1
       xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/4
 
-      if(print_detail_spectral) then
+      if (print_detail_spectral) then
          write(unit=stdout, fmt='(a, i6)') &
             'inc   =', xbx%inc   , &
             'ni    =', xbx%ni    , &
@@ -204,19 +204,19 @@ subroutine da_setup_runconstants( xp, xb, xbx)
             'alp_size      =', xbx%alp_size
       end if
 
-      allocate( xbx%coslat(1:xbx%nj) )
-      allocate( xbx%sinlat(1:xbx%nj) )
-      allocate( xbx%coslon(1:xbx%ni) )
-      allocate( xbx%sinlon(1:xbx%ni) )
-      allocate( xbx%int_wgts(1:xbx%nj) )      ! Interpolation weights
-      allocate( xbx%alp( 1:xbx%alp_size) )
-      allocate( xbx%wsave( 1:xbx%lensav) )
+      allocate(xbx%coslat(1:xbx%nj))
+      allocate(xbx%sinlat(1:xbx%nj))
+      allocate(xbx%coslon(1:xbx%ni))
+      allocate(xbx%sinlon(1:xbx%ni))
+      allocate(xbx%int_wgts(1:xbx%nj))      ! Interpolation weights
+      allocate(xbx%alp(1:xbx%alp_size))
+      allocate(xbx%wsave(1:xbx%lensav))
 
-      call da_initialize_h( xbx%ni, xbx%nj, xbx%max_wavenumber, &
+      call da_initialize_h(xbx%ni, xbx%nj, xbx%max_wavenumber, &
                            xbx%lensav, xbx%alp_size,           &
                            xbx%wsave, xb%lon, xbx%sinlon,      &
                            xbx%coslon, xb%lat, xbx%sinlat,     &
-                           xbx%coslat, xbx%int_wgts, xbx%alp )
+                           xbx%coslat, xbx%int_wgts, xbx%alp)
 
 
    end if

@@ -1,6 +1,6 @@
-subroutine da_setup_firstguess_wrf( xbx, grid, &
+subroutine da_setup_firstguess_wrf(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                              )
+                            )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Define/allocate components of WRF model state.
@@ -8,9 +8,9 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
 
    implicit none
 
-   type (xbx_type),intent(out)         :: xbx    ! Header & non-gridded vars.
+   type (xbx_type), intent(out)         :: xbx    ! Header & non-gridded vars.
 
-   type(domain), intent(inout)         :: grid
+   type (domain), intent(inout)         :: grid
 
 #include "em_dummy_new_decl.inc"
 
@@ -75,14 +75,14 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    ! Setup map utility
    !------------------------------------------------------------------------
 
-   call nl_get_map_proj     ( grid%id , grid%map_proj )
-   call nl_get_truelat1     ( grid%id , grid%truelat1 )
-   call nl_get_truelat2     ( grid%id , grid%truelat2 )
-   call nl_get_dx           ( grid%id , grid%dx )
-   call nl_get_cen_lat      ( grid%id , grid%cen_lat )
-   call nl_get_cen_lon      ( grid%id , grid%cen_lon )
-   call nl_get_moad_cen_lat ( grid%id , grid%moad_cen_lat )
-   call nl_get_stand_lon    ( grid%id , grid%stand_lon )
+   call nl_get_map_proj     (grid%id , grid%map_proj)
+   call nl_get_truelat1     (grid%id , grid%truelat1)
+   call nl_get_truelat2     (grid%id , grid%truelat2)
+   call nl_get_dx           (grid%id , grid%dx)
+   call nl_get_cen_lat      (grid%id , grid%cen_lat)
+   call nl_get_cen_lon      (grid%id , grid%cen_lon)
+   call nl_get_moad_cen_lat (grid%id , grid%moad_cen_lat)
+   call nl_get_stand_lon    (grid%id , grid%stand_lon)
 
    phic = grid%moad_cen_lat
    xlonc = grid%stand_lon
@@ -94,7 +94,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
 
    map_util_project = grid%map_proj
 
-   if(print_detail_map) then
+   if (print_detail_map) then
       write(unit=stdout, fmt='(a, i6)') &
            'map_proj =', grid%map_proj
 
@@ -111,13 +111,13 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    ! Set map projection in WRFSI world.
    map_util_project = PROJ_LC
 
-   if(grid%map_proj == 0) then
+   if (grid%map_proj == 0) then
       map_util_project = PROJ_LATLON
-   else if(grid%map_proj == 1) then
+   else if (grid%map_proj == 1) then
       map_util_project = PROJ_LC
-   else if(grid%map_proj == 2) then
+   else if (grid%map_proj == 2) then
       map_util_project = PROJ_PS
-   else if(grid%map_proj == 3) then
+   else if (grid%map_proj == 3) then
       map_util_project = PROJ_MERC
    end if
 
@@ -155,18 +155,21 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
          grid%cen_lat, grid%cen_lon
 
       ! Low-left corner:
-      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ids,grid%xp%jds), grid%xlong(grid%xp%ids,grid%xp%jds), &
-                                                            start_x, start_y)
+      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ids,grid%xp%jds), &
+         grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y)
       write(unit=message(4), &
          fmt='("Low-left: lat,lon,x,y,grid%xp%ids,grid%xp%jds:",4f10.3,2i6)') &
-                grid%xlat(grid%xp%ids,grid%xp%jds),  grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y, &
-                                                             grid%xp%ids, grid%xp%jds
+         grid%xlat(grid%xp%ids,grid%xp%jds), &
+         grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y, &
+         grid%xp%ids, grid%xp%jds
       ! Upper-right corner:
-      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ide,grid%xp%jde), grid%xlong(grid%xp%ide,grid%xp%jde),&
-                                                            start_x, start_y)
+      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ide,grid%xp%jde), &
+        grid%xlong(grid%xp%ide,grid%xp%jde),&
+        start_x, start_y)
       write(unit=message(5), &
          fmt='("Upper-right: lat,lon,x,y,grid%xp%ide,grid%xp%jde:",4f10.3,2i6)') &
-         grid%xlat(grid%xp%ide,grid%xp%jde),  grid%xlong(grid%xp%ide,grid%xp%jde), start_x, start_y, &
+         grid%xlat(grid%xp%ide,grid%xp%jde), &
+         grid%xlong(grid%xp%ide,grid%xp%jde), start_x, start_y, &
          grid%xp%ide, grid%xp%jde
       call da_message(message(1:5))
    end if
@@ -183,12 +186,12 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    yyc = real(coarse_jy)/2.0
 
    ! Warn if grid centres differ by more than .1%
-   if (ABS(grid%cen_lon-grid%stand_lon)/grid%cen_lon > 0.001 .or. &
-       ABS(grid%cen_lat-grid%moad_cen_lat)/grid%cen_lat > 0.001) then
+   if (abs(grid%cen_lon-grid%stand_lon)/grid%cen_lon > 0.001 .or. &
+       abs(grid%cen_lat-grid%moad_cen_lat)/grid%cen_lat > 0.001) then
 
       write(unit=message(1),fmt='(a,2e20.12)')'grid%cen_lon  , grid%cen_lat     :', &
                            grid%cen_lon, grid%cen_lat
-      write(unit=message(2),fmt='( a,2e20.12)')'grid%stand_lon, grid%moad_cen_lat:', &
+      write(unit=message(2),fmt='(a,2e20.12)')'grid%stand_lon, grid%moad_cen_lat:', &
                            grid%stand_lon, grid%moad_cen_lat
       write(unit=message(3),fmt='(a)')  &
          '## Compute the coarse_ix, coarse_jy, start_x, and start_y: ##'
@@ -215,7 +218,7 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
 
    call da_set_map_para ! set up the map background parameters
 
-   ! call da_llxy( PHIC,XLONC,X,Y )
+   ! call da_llxy(PHIC,XLONC,X,Y)
    call da_llxy(grid%cen_lat,grid%cen_lon,x,y)
 
    !--------------------------------------------------------------------------
@@ -233,9 +236,9 @@ subroutine da_setup_firstguess_wrf( xbx, grid, &
    mjy = grid%xb % mjy
    mkz = grid%xb % mkz
    
-   call da_transfer_wrftoxb( xbx, grid, &
+   call da_transfer_wrftoxb(xbx, grid, &
 #include "em_dummy_new_args.inc"
-                           )
+                         )
    if (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
 
 end subroutine da_setup_firstguess_wrf

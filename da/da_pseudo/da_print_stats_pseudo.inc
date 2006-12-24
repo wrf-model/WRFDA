@@ -1,4 +1,4 @@
-subroutine da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
+subroutine da_print_stats_pseudo(stats_unit, nu, nv, nt, np, nq, pseudo)
 
    implicit none
 
@@ -17,11 +17,11 @@ subroutine da_print_stats_pseudo( stats_unit, nu, nv, nt, np, nq, pseudo )
    write(unit=stats_unit, fmt='(a,i16,4i22)') &
         '  Number: ', nu, nv, nt, np, nq
 
-   if(nu < 1) nu = 1
-   if(nv < 1) nv = 1
-   if(nt < 1) nt = 1
-   if(np < 1) np = 1
-   if(nq < 1) nq = 1
+   if (nu < 1) nu = 1
+   if (nv < 1) nv = 1
+   if (nt < 1) nt = 1
+   if (np < 1) np = 1
+   if (nq < 1) nq = 1
    
    write(unit=stats_unit, fmt='((a,4(f12.4,2i5),e12.4,2i5))') &
         ' Minimum(n,k): ', pseudo%minimum%u, pseudo%minimum%v, pseudo%minimum%t, &

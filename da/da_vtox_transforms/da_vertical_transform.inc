@@ -9,7 +9,7 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
    integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
    integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
-   character (LEN=*), intent(in) :: string      ! Character operation
+   character (len=*), intent(in) :: string      ! Character operation
    type (be_type), intent(in)    :: be          ! Background error structure.
    real, intent(in)      :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
    type (vp_type), intent(inout) :: vv          ! CV in gridpt/EOF space.

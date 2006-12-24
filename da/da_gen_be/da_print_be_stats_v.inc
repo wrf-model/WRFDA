@@ -1,23 +1,25 @@
-subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
-                                e_vec, e_val, e_vec_loc, e_val_loc )
-!----------------------------------------------------------------------------------------
-! Purpose : To print out the first global and local eigenvector and eigenvalus
-!           for 'variable'.
-!
-! Input   : outunit    --- output unit
-!           variable   --- variable name: psi, chi_u, t_u, rh
-!           nk         --- the number of vertical modes or levels
-!           num_bins2d --- the number of the 2d bins
-!           e_vec, e_val         --- global eigenvector and eigenvalues
-!           e_vec_loc, e_val_loc --- local eigenvectors and eigenvalues
-!
-! Output  : fort.174,178,182,186,(190) --- The first 5 global eigenvectors
-!           fort.175,179,183,187,(191) --- The global eigenvalues
-!           fort.176,180,184,188,(192) --- The first 5 local eigenvectors
-!           fort.177,181,185,189,(193) --- The first 5 local eigenvalues
-!      
-!          * in parenthisis, the units for 2d fields ps_u (ps).
-!--------------------------------------------------------------------------------------- 
+subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
+                                e_vec, e_val, e_vec_loc, e_val_loc)
+
+   !----------------------------------------------------------------------------
+   ! Purpose : To print out the first global and local eigenvector and 
+   !           eigenvalues for 'variable'.
+   !
+   ! Input   : outunit    --- output unit
+   !           variable   --- variable name: psi, chi_u, t_u, rh
+   !           nk         --- the number of vertical modes or levels
+   !           num_bins2d --- the number of the 2d bins
+   !           e_vec, e_val         --- global eigenvector and eigenvalues
+   !           e_vec_loc, e_val_loc --- local eigenvectors and eigenvalues
+   !
+   ! Output  : fort.174,178,182,186,(190) --- The first 5 global eigenvectors
+   !           fort.175,179,183,187,(191) --- The global eigenvalues
+   !           fort.176,180,184,188,(192) --- The first 5 local eigenvectors
+   !           fort.177,181,185,189,(193) --- The first 5 local eigenvalues
+   !      
+   !          * in parenthisis, the units for 2d fields ps_u (ps).
+   !----------------------------------------------------------------------------
+
    implicit none
 
    integer, intent(inout)   :: outunit                    ! Output file unit.
@@ -31,26 +33,26 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
 
    integer                  :: k, m, b, mn                ! Loop counters.
 
-   if (nk > 5 ) then
+   if (nk > 5) then
       mn = 5
    else
       mn = nk
    end if
 
-! 1, Global vectors:
+   ! 1, Global vectors:
    write(unit=6,fmt='(3a,i5)')' First 5 Global eigenvectors for variable ', trim(variable), &
                      ' in unit ', outunit
 
    open(unit=outunit)
    do k = 1, nk
-      write(unit=outunit,fmt='(i4,5f15.8)') k, ( e_vec(k,m), m = 1, mn )
+      write(unit=outunit,fmt='(i4,5f15.8)') k, (e_vec(k,m), m = 1, mn)
    end do
    close(unit=outunit)
 
-! 2, Global values:
+   ! 2, Global values:
    outunit = outunit + 1
 
-   write(unit=6,fmt='(3a,i5)')' Global eigenvalues for variable ', trim(variable), &
+   write(unit=stdout,fmt='(3a,i5)')' Global eigenvalues for variable ', trim(variable), &
                      ' in unit ', outunit
 
    open(unit=outunit)
@@ -59,23 +61,23 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
    end do
    close(unit=outunit)
 
-! 3, Local vectors:
+   ! 3, Local vectors:
 
    outunit = outunit + 1
 
-   write(unit=6,fmt='(3a,i5)')' First 5 local eigenvectors for variable ', trim(variable), &
+   write(unit=stdout,fmt='(3a,i5)')' First 5 local eigenvectors for variable ', trim(variable), &
                      ' in unit ', outunit
 
    open(unit=outunit)
    do b = 1, num_bins2d
      write(unit=outunit,fmt='(/"bin =",i6)') b
      do k = 1, nk
-       write(unit=outunit,fmt='(i4,5f15.8)') k, ( e_vec_loc(k,m,b), m = 1, mn )
+       write(unit=outunit,fmt='(i4,5f15.8)') k, (e_vec_loc(k,m,b), m = 1, mn)
      end do
    end do
    close(unit=outunit)
 
-! 4. Local values:
+   ! 4. Local values:
 
    outunit = outunit + 1
 
@@ -84,12 +86,12 @@ subroutine da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
 
    open(unit=outunit)
    do b = 1, num_bins2d
-      write(unit=outunit,fmt='(i4,5(1pe18.5))') b, ( e_val_loc(m,b), m = 1, mn )
+      write(unit=outunit,fmt='(i4,5(1pe18.5))') b, (e_val_loc(m,b), m = 1, mn)
    end do
    close(unit=outunit)
 
    outunit = outunit + 1 
-   write(unit=6,fmt=*) ' '
+   write(unit=stdout,fmt=*) ' '
 
 end subroutine da_print_be_stats_v
 
