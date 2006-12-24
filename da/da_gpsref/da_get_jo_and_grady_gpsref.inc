@@ -1,11 +1,11 @@
-subroutine da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    !----------------------------------------------------------------------
-   ! Called by da_minimisation/da_calculate_jo_and_grady.inc
+   ! Called by da_minimisation/da_jo_and_grady.inc
    !----------------------------------------------------------------------
 
    implicit none
@@ -39,6 +39,6 @@ subroutine da_get_jo_and_grady_gpsref( iv, re, jo, jo_grad_y)
       
    end if
 
-end subroutine da_get_jo_and_grady_gpsref
+end subroutine da_jo_and_grady_gpsref
 
 

@@ -56,8 +56,8 @@ subroutine da_moist_phys_adj(xb, xa, xp,    &
 
    !  Constants
 
-   G3PB=da_gamma(3.+BVT)
-   G5PB=da_gamma(0.5*(5.+BVT))
+   G3PB=gamma(3.+BVT)
+   G5PB=gamma(0.5*(5.+BVT))
    PRAC=pi*N0R*AVT*G3PB*0.25
    PREC1=2.*pi*N0R*0.78
    PREC2=2.*pi*N0R*0.32*AVT**0.5*G5PB

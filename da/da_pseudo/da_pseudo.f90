@@ -28,8 +28,8 @@ module da_pseudo
 
 contains
 
-#include "da_cal_jo_and_grady_pseudo.inc"
-#include "da_calculate_residual_pseudo.inc"
+#include "da_jo_and_grady_pseudo.inc.inc"
+#include "da_residual_pseudo.inc"
 #include "da_get_innov_vector_pseudo.inc"
 #include "da_ao_stats_pseudo.inc"
 #include "da_oi_stats_pseudo.inc"

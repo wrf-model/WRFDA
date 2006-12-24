@@ -1,4 +1,4 @@
-subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -43,6 +43,6 @@ subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
       
    end if
 
-end subroutine da_get_jo_and_grady_profiler
+end subroutine da_jo_and_grady_profiler
 
 

@@ -29,9 +29,9 @@ module da_synop
 contains
 
 #include "da_ao_stats_synop.inc"
-#include "da_calculate_jo_and_grady_synop.inc"
-#include "da_compute_jo_synop_uvtq.inc"
-#include "da_calculate_residual_synop.inc"
+#include "da_jo_and_grady_synop.inc"
+#include "da_jo_synop_uvtq.inc"
+#include "da_residual_synop.inc"
 #include "da_oi_stats_synop.inc"
 #include "da_print_stats_synop.inc"
 #include "da_transform_xtoy_synop.inc"

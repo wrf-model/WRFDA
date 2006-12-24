@@ -201,8 +201,8 @@ module da_radiance
 
 CONTAINS
 
-#include "da_calculate_jo_and_grady_rad.inc"
-#include "da_calculate_residual_rad.inc"
+#include "da_jo_and_grady_rad.inc"
+#include "da_residual_rad.inc"
 #include "da_biascorr_rad.inc"
 #include "da_biasprep.inc"
 #include "da_write_biasprep.inc"

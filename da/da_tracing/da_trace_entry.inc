@@ -31,7 +31,7 @@ subroutine da_trace_entry(&
 
    call CPU_TIME(CPUTime1)
 
-   call SYSTEM_CLOCK(&
+   call system_clock(&
       COUNT=Count)
 
    !-----------------------------------------------------------------------
@@ -188,7 +188,7 @@ subroutine da_trace_entry(&
 
    TraceDepth=TraceDepth+1
 
-   call SYSTEM_CLOCK(&
+   call system_clock(&
       COUNT=Count)
 
    call CPU_TIME(CPUTime1)

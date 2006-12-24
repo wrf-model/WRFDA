@@ -1,4 +1,4 @@
-subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -50,12 +50,12 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
       call da_to_global_sonde_sfc( iv,      re,      jo_grad_y, &
                            iv_glob, re_glob, jo_grad_y_glob)
       ! perform remaining computations
-      call da_compute_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
+      call da_jo_sonde_sfc_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
       ! free global objects
-      call da_free_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob)
+      call da_deallocate_global_sonde_sfc( iv_glob, re_glob, jo_grad_y_glob)
    else
       ! perform remaining computations
-      call da_compute_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo)
+      call da_jo_sonde_sfc_uvtq( iv, re, jo_grad_y, jo)
    end if
 
    jo % sonde_sfc_u = 0.5 * jo % sonde_sfc_u
@@ -66,6 +66,6 @@ subroutine da_get_jo_and_grady_sonde_sfc( iv, re, jo, jo_grad_y)
 
    return
 
-end subroutine da_get_jo_and_grady_sonde_sfc
+end subroutine da_jo_and_grady_sonde_sfc
 
 

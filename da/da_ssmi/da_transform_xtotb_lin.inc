@@ -268,7 +268,7 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 end subroutine da_tb_tl
 
 
-subroutine da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
+subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,TGL_sigma_v)
 
    !---------------------------------------------------------------------------
@@ -430,7 +430,7 @@ subroutine da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
            sigma_v = sigv*wvc
        TGL_sigma_v = TGL_sigv*wvc+sigv*TGL_wvc
 
-end subroutine da_cal_sigma_v_tl
+end subroutine da_sigma_v_tl
 
 !====================================================================
 subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
@@ -1006,7 +1006,7 @@ end subroutine da_spemiss_tl
 ! get water vapor optical depth
 !=====
 
-      call da_cal_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
+      call da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                            TGL_p0,TGL_wv,TGL_hwv,TGL_ta,    &
                            TGL_gamma,TGL_sigv              )
 

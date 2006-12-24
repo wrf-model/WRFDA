@@ -26,9 +26,9 @@ module da_airsr
 contains
 
 #include "da_ao_stats_airsr.inc"
-#include "da_calculate_jo_and_grady_airsr.inc"
-#include "da_compute_jo_airsr_tq.inc"
-#include "da_calculate_residual_airsr.inc"
+#include "da_jo_and_grady_airsr.inc"
+#include "da_jo_airsr_tq.inc"
+#include "da_residual_airsr.inc"
 #include "da_oi_stats_airsr.inc"
 #include "da_print_stats_airsr.inc"
 #include "da_transform_xtoy_airsr.inc"

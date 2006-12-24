@@ -26,8 +26,8 @@ module da_profiler
 contains
 
 #include "da_ao_stats_profiler.inc"
-#include "da_get_jo_and_grady_profiler.inc"
-#include "da_calculate_residual_profiler.inc"
+#include "da_jo_and_grady_profiler.inc"
+#include "da_residual_profiler.inc"
 #include "da_oi_stats_profiler.inc"
 #include "da_print_stats_profiler.inc"
 #include "da_transform_xtoy_profiler.inc"

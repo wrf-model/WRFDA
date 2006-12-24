@@ -29,8 +29,8 @@ module da_buoy
 contains
 
 #include "da_ao_stats_buoy.inc"
-#include "da_calculate_jo_and_grady_buoy.inc"
-#include "da_calculate_residual_buoy.inc"
+#include "da_jo_and_grady_buoy.inc"
+#include "da_residual_buoy.inc"
 #include "da_oi_stats_buoy.inc"
 #include "da_print_stats_buoy.inc"
 #include "da_transform_xtoy_buoy.inc"

@@ -85,7 +85,7 @@ subroutine da_trace_init
    Pointer     = 0
    NoRoutines  = 0
 
-   call SYSTEM_CLOCK(&
+   call system_clock(&
       COUNT=BaseElapsedTime)
 
    call CPU_TIME(BaseCPUTime)

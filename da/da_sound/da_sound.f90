@@ -47,9 +47,9 @@ module da_sound
 contains
 
 #include "da_ao_stats_sound.inc"
-#include "da_calculate_jo_and_grady_sound.inc"
-#include "da_compute_jo_sound_uvtq.inc"
-#include "da_calculate_residual_sound.inc"
+#include "da_jo_and_grady_sound.inc"
+#include "da_jo_sound_uvtq.inc"
+#include "da_residual_sound.inc"
 #include "da_oi_stats_sound.inc"
 #include "da_print_stats_sound.inc"
 #include "da_transform_xtoy_sound.inc"
@@ -60,9 +60,9 @@ contains
 #include "da_calculate_grady_sound.inc"
 
 #include "da_ao_stats_sonde_sfc.inc"
-#include "da_get_jo_and_grady_sonde_sfc.inc"
-#include "da_compute_jo_sonde_sfc_uvtq.inc"
-#include "da_calculate_residual_sonde_sfc.inc"
+#include "da_jo_and_grady_sonde_sfc.inc"
+#include "da_jo_sonde_sfc_uvtq.inc"
+#include "da_residual_sonde_sfc.inc"
 #include "da_oi_stats_sonde_sfc.inc"
 #include "da_print_stats_sonde_sfc.inc"
 #include "da_transform_xtoy_sonde_sfc.inc"

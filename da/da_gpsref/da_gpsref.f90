@@ -29,8 +29,8 @@ contains
 
 #include "da_ao_stats_gpsref.inc"
 #include "da_calculate_grady_gpsref.inc"
-#include "da_get_jo_and_grady_gpsref.inc"
-#include "da_calculate_residual_gpsref.inc"
+#include "da_jo_and_grady_gpsref.inc"
+#include "da_residual_gpsref.inc"
 #include "da_oi_stats_gpsref.inc"
 #include "da_print_stats_gpsref.inc"
 #include "da_transform_xtoy_gpsref.inc"

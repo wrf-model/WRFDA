@@ -26,8 +26,8 @@ module da_radar
 contains
 
 #include "da_ao_stats_radar.inc"
-#include "da_calculate_jo_and_grady_radar.inc"
-#include "da_calculate_residual_radar.inc"
+#include "da_jo_and_grady_radar.inc"
+#include "da_residual_radar.inc"
 #include "da_oi_stats_radar.inc"
 #include "da_print_stats_radar.inc"
 #include "da_transform_xtoy_radar.inc"

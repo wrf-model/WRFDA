@@ -19,7 +19,23 @@ module da_tools
 
 contains
 
-#include "da_map_utils.inc"
+#include "da_ijll_lc.inc"
+#include "da_llij_lc.inc"
+#include "da_set_lc.inc"
+#include "da_ijll_ps.inc"
+#include "da_llij_ps.inc"
+#include "da_set_ps.inc"
+#include "da_map_init.inc"
+#include "da_llij_latlon.inc"
+#include "da_ijll_latlon.inc"
+#include "da_latlon_to_ij.inc"
+#include "da_ij_to_latlon.inc"
+#include "da_map_set.inc"
+#include "da_ijll_merc.inc"
+#include "da_llij_merc.inc"
+#include "da_set_merc.inc"
+#include "da_lc_cone.inc"
+
 #include "da_1d_eigendecomposition.inc"
 #include "da_obs_sfc_correction.inc"
 #include "da_sfcprs.inc"

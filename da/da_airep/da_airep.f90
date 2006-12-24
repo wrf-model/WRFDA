@@ -27,8 +27,8 @@ module da_airep
 contains
 
 #include "da_ao_stats_airep.inc"
-#include "da_calculate_jo_and_grady_airep.inc"
-#include "da_calculate_residual_airep.inc"
+#include "da_jo_and_grady_airep.inc"
+#include "da_residual_airep.inc"
 #include "da_oi_stats_airep.inc"
 #include "da_print_stats_airep.inc"
 #include "da_transform_xtoy_airep.inc"

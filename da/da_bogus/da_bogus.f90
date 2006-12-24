@@ -29,8 +29,8 @@ module da_bogus
 contains
 
 #include "da_ao_stats_bogus.inc"
-#include "da_calculate_jo_and_grady_bogus.inc"
-#include "da_calculate_residual_bogus.inc"
+#include "da_jo_and_grady_bogus.inc"
+#include "da_residual_bogus.inc"
 #include "da_oi_stats_bogus.inc"
 #include "da_print_stats_bogus.inc"
 #include "da_transform_xtoy_bogus.inc"

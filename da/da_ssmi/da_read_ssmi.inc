@@ -296,9 +296,6 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    close(iunit)
    call da_free_unit(iunit)
-
-   ! PRinT out
-   ! =========
  
    write(unit=stdout, fmt='(5x,a,i6,a)') &
       'Read:  ', ob % num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
@@ -320,7 +317,7 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
-end subroutine da_read_ssmi
+contains
 
 subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                      tb37h, tb85v, tb85h, ipass, iprecip, xlat )
@@ -1146,5 +1143,7 @@ subroutine ualg(ia,theta,sst,tb,u)
    end if
 
 end subroutine ualg
+
+end subroutine da_read_ssmi
 
 

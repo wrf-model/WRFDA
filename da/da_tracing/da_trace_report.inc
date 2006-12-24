@@ -48,7 +48,7 @@ subroutine da_trace_report
       return
    end if
 
-   call SYSTEM_CLOCK (COUNT=temp)
+   call system_clock (COUNT=temp)
 
    TotalElapsedTime=temp-BaseElapsedTime ! on PE 0
 
@@ -56,7 +56,7 @@ subroutine da_trace_report
 
    TotalCPUTime(1) = TempCpuTime - BaseCPUTime
 
-   call SYSTEM_CLOCK(&
+   call system_clock(&
       COUNT_RATE=CountRate)
 
    ! Ensure the lists from each PE match. use the routine list from the 

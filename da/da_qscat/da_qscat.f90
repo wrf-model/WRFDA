@@ -25,8 +25,8 @@ module da_qscat
 
 contains
 
-#include "da_calculate_jo_and_grady_qscat.inc"
-#include "da_calculate_residual_qscat.inc"
+#include "da_jo_and_grady_qscat.inc"
+#include "da_residual_qscat.inc"
 #include "da_check_max_iv_qscat.inc"
 #include "da_get_innov_vector_qscat.inc"
 #include "da_ao_stats_qscat.inc"

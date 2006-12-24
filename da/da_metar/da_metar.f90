@@ -30,8 +30,8 @@ module da_metar
 contains
 
 #include "da_ao_stats_metar.inc"
-#include "da_calculate_jo_and_grady_metar.inc"
-#include "da_calculate_residual_metar.inc"
+#include "da_jo_and_grady_metar.inc"
+#include "da_residual_metar.inc"
 #include "da_oi_stats_metar.inc"
 #include "da_print_stats_metar.inc"
 #include "da_transform_xtoy_metar.inc"

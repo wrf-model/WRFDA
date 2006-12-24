@@ -550,6 +550,7 @@ contains
 #include "da_change_date.inc"
 #include "da_find_fft_factors.inc"
 #include "da_find_fft_trig_funcs.inc"
-#include "da_gamma.inc"
+
+#include "gamma.inc"
 
 end module da_control

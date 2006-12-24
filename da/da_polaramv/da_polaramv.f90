@@ -27,8 +27,8 @@ module da_polaramv
 contains
 
 #include "da_ao_stats_polaramv.inc"
-#include "da_get_jo_and_grady_polaramv.inc"
-#include "da_calculate_residual_polaramv.inc"
+#include "da_jo_and_grady_polaramv.inc"
+#include "da_residual_polaramv.inc"
 #include "da_oi_stats_polaramv.inc"
 #include "da_print_stats_polaramv.inc"
 #include "da_transform_xtoy_polaramv.inc"

@@ -83,7 +83,7 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 ! get water vapor optical depth
 !=====
 
-      call da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      call da_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 
 ! otbar = one over "mean" temperature
 
@@ -286,7 +286,7 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
        ADJ_ta    = - otbar*otbar*ADJ_otbar + ADJ_ta
        ADJ_gamma =   otbar*otbar*ADJ_otbar*zeta(ifreq) + ADJ_gamma
 
-       call da_cal_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
+       call da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,   &
                             ADJ_p0,ADJ_wv,ADJ_hwv,ADJ_ta,    &
                             ADJ_gamma,ADJ_sigv               )
 

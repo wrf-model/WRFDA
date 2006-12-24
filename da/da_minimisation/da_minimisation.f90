@@ -54,7 +54,7 @@ module da_minimisation
 contains
       
 #include "da_calculate_j.inc"
-#include "da_calculate_jo_and_grady.inc"
+#include "da_jo_and_grady.inc"
 #include "da_calculate_residual.inc"
 #include "da_get_var_diagnostics.inc"
 #include "da_get_innov_vector.inc"
