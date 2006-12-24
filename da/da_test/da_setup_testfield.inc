@@ -4,7 +4,7 @@ subroutine da_setup_testfield(xb, xa, xp, &
                               its,ite, jts,jte, kts,kte)
 
    !----------------------------------------------------------------------------
-   ! PURPOSE: produce test increment field based on xb field.
+   ! Purpose: produce test increment field based on xb field.
    !
    ! METHOD:  pass through x=uv transfom to ensure satisfies boundary conditions
    !----------------------------------------------------------------------------

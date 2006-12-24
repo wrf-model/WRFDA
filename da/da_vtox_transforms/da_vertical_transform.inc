@@ -1,7 +1,11 @@
-subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
+subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp, &
                                   ids,ide, jds,jde, kds,kde,  &
                                   ims,ime, jms,jme, kms,kme,  &
-                                  its,ite, jts,jte, kts,kte )
+                                  its,ite, jts,jte, kts,kte)
+
+   !---------------------------------------------------------------------
+   ! Purpose: TBD
+   !---------------------------------------------------------------------
 
    implicit none   
 
@@ -20,16 +24,16 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 
    if (trace_use) call da_trace_entry("da_vertical_transform")
 
-   select case( string )
+   select case(string)
       
-   case ( 'u' );
+   case ('u');
       
       !-------------------------------------------------------------------
       ! [1.0] Perform vp(i,j,k) = E L^{1/2} vv(i,j,m) transform:
       !------------------------------------------------------------------- 
 
-      if ( be % v1 % mz > 0 ) then
-         call da_transform_vvtovp( &
+      if (be % v1 % mz > 0) then
+         call da_transform_vvtovp(&
 #ifndef DEREF_KLUDGE
                                    be % v1 % evec, &
                                    be % v1 % val, &
@@ -44,13 +48,13 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v1 % mz, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       else
          vp % v1(its:ite,jts:jte,kts:kte) = 0.0
       end if
 
-      if ( be % v2 % mz > 0 ) then
-         call da_transform_vvtovp( &
+      if (be % v2 % mz > 0) then
+         call da_transform_vvtovp(&
 #ifndef DEREF_KLUDGE
                                    be % v2 % evec, &
                                    be % v2 % val, &
@@ -65,13 +69,13 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v2 % mz, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       else
          vp % v2(its:ite,jts:jte,kts:kte) = 0.0
       end if
 
-      if ( be % v3 % mz > 0 ) then
-         call da_transform_vvtovp( & 
+      if (be % v3 % mz > 0) then
+         call da_transform_vvtovp(& 
 #ifndef DEREF_KLUDGE
                                    be % v3 % evec, &
                                    be % v3 % val, &
@@ -86,13 +90,13 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v3 % mz, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       else
          vp % v3(its:ite,jts:jte,kts:kte) = 0.0
       end if
 
-      if ( be % v4 % mz > 0 ) then
-         call da_transform_vvtovp( &
+      if (be % v4 % mz > 0) then
+         call da_transform_vvtovp(&
 #ifndef DEREF_KLUDGE
                                    be % v4 % evec, &
                                    be % v4 % val, &
@@ -107,16 +111,16 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v4 % mz, &
                                    ids,ide, jds,jde, kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       else
          vp % v4(its:ite,jts:jte,kts:kte) = 0.0
       end if
 
-      if ( be % v5 % mz > 0 ) then
+      if (be % v5 % mz > 0) then
          if (global) then
             vp % v5(its:ite,jts:jte,1) = vv % v5(its:ite,jts:jte,1)
          else 
-            call da_transform_vvtovp( &
+            call da_transform_vvtovp(&
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
                                    be % v5 % val, &
@@ -145,14 +149,14 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
          end do
       end if
 
-   case ( 'u_inv');
+   case ('u_inv');
      
       !------------------------------------------------------------------- 
       ! [2.0] Perform vv(i,j,m) = L^{-1/2} E^T vp(i,j,k) transform:
       !------------------------------------------------------------------- 
 
-      if ( be % v1 % mz > 0 ) then
-         call da_transform_vptovv( &
+      if (be % v1 % mz > 0) then
+         call da_transform_vptovv(&
 #ifndef DEREF_KLUDGE
                                    be % v1 % evec, &
                                    be % v1 % val, &
@@ -167,11 +171,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v1 % mz, &
                                    kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v2 % mz > 0 ) then
-         call da_transform_vptovv( &
+      if (be % v2 % mz > 0) then
+         call da_transform_vptovv(&
 #ifndef DEREF_KLUDGE
                                    be % v2 % evec, &
                                    be % v2 % val, &
@@ -186,11 +190,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v2 % mz, &
                                    kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v3 % mz > 0 ) then
-         call da_transform_vptovv( &
+      if (be % v3 % mz > 0) then
+         call da_transform_vptovv(&
 #ifndef DEREF_KLUDGE
                                    be % v3 % evec, &
                                    be % v3 % val, &
@@ -205,11 +209,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v3 % mz, &
                                    kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v4 % mz > 0 ) then
-         call da_transform_vptovv( &
+      if (be % v4 % mz > 0) then
+         call da_transform_vptovv(&
 #ifndef DEREF_KLUDGE
                                    be % v4 % evec, &
                                    be % v4 % val, &
@@ -224,14 +228,14 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v4 % mz, &
                                    kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte )
+                                   its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v5 % mz > 0 ) then
-        if( global ) then
+      if (be % v5 % mz > 0) then
+        if(global) then
          vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
         else
-         call da_transform_vptovv( &
+         call da_transform_vptovv(&
 #ifndef DEREF_KLUDGE
                                    be % v5 % evec, &
                                    be % v5 % val, &
@@ -246,11 +250,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
                                    be % v5 % mz, &
                                    kds,kde,  &
                                    ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts, kts )
+                                   its,ite, jts,jte, kts, kts)
         end if
       end if
 
-      if ( be % ne > 0 ) then
+      if (be % ne > 0) then
          do m = 1, be % ne
             do j = jts, jte
                alpha_stddev_inv = 1.0 / be % alpha % val(j,m)
@@ -265,8 +269,8 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
       ! [3.0] Perform vv_adj = U_{v}^{T} vp_adj transform:
       !------------------------------------------------------------------- 
 
-      if ( be % v1 % mz > 0 ) then
-         call da_transform_vvtovp_adj( &
+      if (be % v1 % mz > 0) then
+         call da_transform_vvtovp_adj(&
 #ifndef DEREF_KLUDGE
                                        be % v1 % evec, &
                                        be % v1 % val, &
@@ -282,11 +286,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 #endif
                                        jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts,kte )
+                                       its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v2 % mz > 0 ) then
-         call da_transform_vvtovp_adj( &
+      if (be % v2 % mz > 0) then
+         call da_transform_vvtovp_adj(&
 #ifndef DEREF_KLUDGE
                                        be % v2 % evec, &
                                        be % v2 % val, &
@@ -302,11 +306,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 #endif
                                        jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts,kte )
+                                       its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v3 % mz > 0 ) then
-         call da_transform_vvtovp_adj( &
+      if (be % v3 % mz > 0) then
+         call da_transform_vvtovp_adj(&
 #ifndef DEREF_KLUDGE
                                        be % v3 % evec, &
                                        be % v3 % val, &
@@ -322,11 +326,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 #endif
                                        jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts,kte )
+                                       its,ite, jts,jte, kts,kte)
       end if
 
-      if ( be % v4 % mz > 0 ) then
-         call da_transform_vvtovp_adj( &
+      if (be % v4 % mz > 0) then
+         call da_transform_vvtovp_adj(&
 #ifndef DEREF_KLUDGE
                                        be % v4 % evec, &
                                        be % v4 % val, &
@@ -342,14 +346,14 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 #endif
                                        jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts,kte )
+                                       its,ite, jts,jte, kts,kte)
       end if
 
       if (be % v5 % mz > 0) then
          if (global) then
             vv % v5(its:ite,jts:jte,1) = vp % v5(its:ite,jts:jte,1)
          else
-            call da_transform_vvtovp_adj( &
+            call da_transform_vvtovp_adj(&
 #ifndef DEREF_KLUDGE
                                        be % v5 % evec, &
                                        be % v5 % val, &
@@ -365,11 +369,11 @@ subroutine da_vertical_transform( string, be, vertical_wgt, vv, vp, &
 #endif
                                        jds,jde, kds,kde,  &
                                        ims,ime, jms,jme, kms,kme,  &
-                                       its,ite, jts,jte, kts, kts )
+                                       its,ite, jts,jte, kts, kts)
          end if
       end if
 
-      if ( be % ne > 0 ) then
+      if (be % ne > 0) then
          do m = 1, be % ne
             do j = jts, jte
                vv % alpha(its:ite,j,m) = vp % alpha(its:ite,j,m) * be % alpha % val(j,m)

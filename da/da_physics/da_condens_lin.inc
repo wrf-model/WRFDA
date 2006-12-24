@@ -3,7 +3,9 @@ subroutine da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
                    SCR319,SCR429,SCR719,DUM319,PRD9,  &
                    QVT9,QCT9,QRT9,TTT9,P_A,T_A,QV_A,QCW_A,QRN_A,kts,kte)
 
-   ! Condensation
+   !-----------------------------------------------------------------------
+   ! Purpose: Condensation
+   !-----------------------------------------------------------------------
 
    implicit none
 

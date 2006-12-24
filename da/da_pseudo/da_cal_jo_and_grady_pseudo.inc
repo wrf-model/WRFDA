@@ -1,4 +1,8 @@
-subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
+subroutine da_cal_jo_and_grady_pseudo(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -15,19 +19,19 @@ subroutine da_cal_jo_and_grady_pseudo( iv, re, jo, jo_grad_y )
    jo % pseudo_p = 0.0
    jo % pseudo_q = 0.0
 
-   if ( iv%num_pseudo > 0 ) then
+   if (iv%num_pseudo > 0) then
       do n=1, iv%num_pseudo
 
          jo_grad_y%pseudo(n)%u = -re%pseudo(n)%u / &
-                                ( iv%pseudo(n)%u%error * iv%pseudo(n)%u%error)
+                                (iv%pseudo(n)%u%error * iv%pseudo(n)%u%error)
          jo_grad_y%pseudo(n)%v = -re%pseudo(n)%v / &
-                                ( iv%pseudo(n)%v%error * iv%pseudo(n)%v%error)
+                                (iv%pseudo(n)%v%error * iv%pseudo(n)%v%error)
          jo_grad_y%pseudo(n)%t = -re%pseudo(n)%t / &
-                                ( iv%pseudo(n)%t%error * iv%pseudo(n)%t%error)
+                                (iv%pseudo(n)%t%error * iv%pseudo(n)%t%error)
          jo_grad_y%pseudo(n)%p = -re%pseudo(n)%p / &
-                                ( iv%pseudo(n)%p%error * iv%pseudo(n)%p%error)
+                                (iv%pseudo(n)%p%error * iv%pseudo(n)%p%error)
          jo_grad_y%pseudo(n)%q = -re%pseudo(n)%q / &
-                                ( iv%pseudo(n)%q%error * iv%pseudo(n)%q%error)
+                                (iv%pseudo(n)%q%error * iv%pseudo(n)%q%error)
 
          if (iv%pseudo(n)%loc%proc_domain) then
             jo % pseudo_u = jo % pseudo_u - re%pseudo(n)%u * jo_grad_y%pseudo(n)%u

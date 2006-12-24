@@ -3,7 +3,7 @@ subroutine da_interpolate_regcoeff(iy, iys, kz, kzs, meanl_stats, &
                                     pb_vert_reg_stats, pb_vert_reg)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Interpolate statistical regression coefficient to new domain.
+   ! Purpose: Interpolate statistical regression coefficient to new domain.
    !
    ! METHOD:  i,k,k Interpolation.
    !---------------------------------------------------------------------------

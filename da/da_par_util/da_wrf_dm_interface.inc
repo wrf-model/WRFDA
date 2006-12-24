@@ -1,10 +1,12 @@
 subroutine da_local_to_global(xp, x, xg, dim)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from
+   ! Purpose: Make xg global-grid array by gathering the subdomain arrays x from
    !          each processor. The global array xg is stored only on the monitor
    !          processor (typically, processor 0).
    !---------------------------------------------------------------------------
+
+   implicit none
 
    type (XPOSE_type), intent(in):: xp                                    ! Domain decomposition vars.
    real,  intent(in)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.
@@ -35,10 +37,10 @@ subroutine da_local_to_global(xp, x, xg, dim)
 
 end subroutine da_local_to_global
 
-subroutine da_proc_sum_count_obs ( count_obs )
+subroutine da_proc_sum_count_obs (count_obs)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Do MPI sum operation across processors to get the global sum of
+   ! Purpose: Do MPI sum operation across processors to get the global sum of
    !          count_obs. The sum is returned only on the root processor,
    !          i.e., processor 0. (In this way, we do not have to do all-to-all 
    !          communication.)
@@ -53,11 +55,11 @@ subroutine da_proc_sum_count_obs ( count_obs )
 
 end subroutine da_proc_sum_count_obs
 
-subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
-                               nobs_min, nobs_max, klev_min, klev_max )
+subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
+                               nobs_min, nobs_max, klev_min, klev_max)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI reduction operations across processors to get the average, 
+   !  Purpose: Do MPI reduction operations across processors to get the average, 
    !           rms error, minimum, and maximum values for an observation field.
    !           These are stored only on the root processor, i.e., processor 0.
    !           (In this way, we do not have to do all-to-all communication.)
@@ -75,10 +77,10 @@ subroutine da_proc_stats_combine( proc_ave, proc_err, proc_min, proc_max, &
 
 end subroutine da_proc_stats_combine
 
-subroutine da_proc_maxmin_combine( n, max, min )
+subroutine da_proc_maxmin_combine(n, max, min)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI reduction operations across processors to get the minimum
+   !  Purpose: Do MPI reduction operations across processors to get the minimum
    !           and maximum values for an observation field of length n. The
    !           i, j location of the minimum and maximum, for each n, is also
    !           communicated.
@@ -94,10 +96,10 @@ subroutine da_proc_maxmin_combine( n, max, min )
 
 end subroutine da_proc_maxmin_combine
 
-subroutine da_proc_diagnostics_collect(num_sound, iv, re )
+subroutine da_proc_diagnostics_collect(num_sound, iv, re)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI reduction operations across processors to get values needed
+   !  Purpose: Do MPI reduction operations across processors to get values needed
    !           for diagnostics output. These are stored only on the root processor, 
    !           i.e., processor 0. (In this way, we do not have to do all-to-all 
    !           communication.)

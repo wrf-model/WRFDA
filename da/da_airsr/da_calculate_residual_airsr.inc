@@ -1,4 +1,4 @@
-subroutine da_calculate_residual_airsr( oi, y, re,                        &
+subroutine da_calculate_residual_airsr(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
 
@@ -26,9 +26,9 @@ subroutine da_calculate_residual_airsr( oi, y, re,                        &
          do k=1, oi%airsr(n)%info%levels
            np_available = np_available + 4
 
-           re%airsr(n)%t(k) = da_residual( n, k, y%airsr(n)%t(k), &
+           re%airsr(n)%t(k) = da_residual(n, k, y%airsr(n)%t(k), &
                                       oi%airsr(n)%t(k), n_obs_bad % t)
-           re%airsr(n)%q(k) = da_residual( n, k, y%airsr(n)%q(k), &
+           re%airsr(n)%q(k) = da_residual(n, k, y%airsr(n)%q(k), &
                                       oi%airsr(n)%q(k), n_obs_bad % q)
          end do
       end do

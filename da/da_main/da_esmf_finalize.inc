@@ -1,5 +1,17 @@
 subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
 
+   !-----------------------------------------------------------------------
+   ! Purpose: WRFVAR finalize routine.
+   !
+   !     The arguments are:
+   !       gcomp           Component
+   !       importState     Importstate
+   !       exportState     Exportstate
+   !       clock           External clock
+   !       rc              Return code; equals ESMF_SUCCESS if there are no
+   !                       errors, otherwise ESMF_FAILURE
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(ESMF_GridComp), intent(inout) :: gcomp
@@ -7,19 +19,7 @@ subroutine da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
    type(ESMF_Clock),    intent(inout) :: clock
    integer,             intent(out)   :: rc
 
-   !<DESCRIPTION>
-   !     WRFVAR finalize routine.
-   !
-   !     The arguments are:
-   !       gcomp           Component
-   !       importState     Importstate
-   !       exportState     Exportstate
-   !       clock           External clock
-   !       rc              Return code; equals ESMF_SUCCESS if there are no errors,
-   !                       otherwise ESMF_FAILURE.
-   !</DESCRIPTION>
-
-   !--output wrfvar analysis
+   ! output wrfvar analysis
 
    if ((config_flags%real_data_init_type == 1) .OR. &
        (config_flags%real_data_init_type == 3)) then

@@ -3,7 +3,7 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
                      u10, v10, t2, q2, regime) 
 
    !---------------------------------------------------------------------------
-   ! Calculate the  10m wind, 2m temperature and moisture based on the
+   ! Purpose: Calculate the  10m wind, 2m temperature and moisture based on the
    ! similarity theory/
    !
    !  The unit for pressure   : psfc, ps, ps2     is Pa.

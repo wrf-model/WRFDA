@@ -1,5 +1,9 @@
 subroutine da_print_stats_pilot(stats_unit, nu, nv, Pilot)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

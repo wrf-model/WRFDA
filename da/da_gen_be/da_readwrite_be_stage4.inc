@@ -1,5 +1,9 @@
 subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    real, parameter          :: spike_tolerance = 1.5      ! Threshold for detecting spikes in data. 

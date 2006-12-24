@@ -1,4 +1,8 @@
-subroutine da_check_xtoy_adjoint_radar( oi, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_radar(oi, y, adjtest_lhs, pertile_lhs)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -13,15 +17,15 @@ subroutine da_check_xtoy_adjoint_radar( oi, y, adjtest_lhs, pertile_lhs)
          if (oi%Radar(n)%loc%proc_domain) then
             do k=1, oi%Radar(n)%info%levels
                adjtest_lhs = adjtest_lhs + &
-                             ( y%Radar(n)%rv(k)/typical_rv_rms)**2 + &
-                             ( y%Radar(n)%rf(k)/typical_rf_rms)**2
+                             (y%Radar(n)%rv(k)/typical_rv_rms)**2 + &
+                             (y%Radar(n)%rf(k)/typical_rf_rms)**2
             end do
          end if
 
          do k=1, oi%Radar(n)%info%levels
             pertile_lhs = pertile_lhs + &
-                         ( y%Radar(n)%rv(k)/typical_rv_rms)**2 + &
-                         ( y%Radar(n)%rf(k)/typical_rf_rms)**2
+                         (y%Radar(n)%rv(k)/typical_rv_rms)**2 + &
+                         (y%Radar(n)%rf(k)/typical_rf_rms)**2
 
             y%Radar(n)%rv(k)= y%Radar(n)%rv(k) / typical_rv_rms ** 2
             y%Radar(n)%rf(k)= y%Radar(n)%rf(k) / typical_rf_rms ** 2

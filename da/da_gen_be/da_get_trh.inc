@@ -1,7 +1,7 @@
 subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculates T, RH from input WRF file.
+   ! Purpose: Calculates T, RH from input WRF file.
    !---------------------------------------------------------------------------
 
    implicit none

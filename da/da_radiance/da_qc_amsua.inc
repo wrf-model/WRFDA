@@ -1,10 +1,10 @@
 subroutine da_qc_amsua ( inst, nchan, ob, iv )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: perform quality control for amsua data.
+   ! Purpose: perform quality control for amsua data.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    INTEGER, INTENT(IN)             :: inst       ! sensor index.
    INTEGER, INTENT(IN)             :: nchan      ! number of channel

@@ -1,13 +1,7 @@
 real function da_gaus_noise(KDUM)
 
    !---------------------------------------------------------------------
-   !
-   !                       routine gaus_noise
-   !                     *********************
-   !
-   !  purpose :
-   !  -------
-   !     return a normally(gaussian) distributed random variable ctions
+   ! Purpose: return a normally(gaussian) distributed random variable ctions
    !     with 0 mean and 1 standard deviation
    !
    !   method :

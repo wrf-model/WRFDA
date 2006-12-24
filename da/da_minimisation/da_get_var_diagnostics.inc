@@ -1,5 +1,9 @@
 subroutine da_get_var_diagnostics( iv, j)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(ob_type), intent(inout):: iv      ! innovation vector.

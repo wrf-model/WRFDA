@@ -1,10 +1,7 @@
-subroutine da_wrfvar_run( )
+subroutine da_wrfvar_run()
 
-   !<DESCRIPTION>
-   !     WRF run routine.
-   !</DESCRIPTION>
-
-   !<DESCRIPTION>
+   !-------------------------------------------------------------------------
+   ! Purpose: run wrfvar
    ! Once the top-level domain has been allocated, configured, and
    ! initialized, the model time integration is ready to proceed.  The start
    ! and stop times for the domain are set to the start and stop time of the
@@ -19,15 +16,15 @@ subroutine da_wrfvar_run( )
    ! including shutting down the communications (for example, most comm
    ! layers would call mpi_finalize at this point if they are using MPI).
    ! 
-   !</DESCRIPTION>
-
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
+   !-------------------------------------------------------------------------
 
-   !--do wrfvar
+   implicit none
+
    if (trace_use) call da_trace_entry("da_wrfvar_run")
 
-   call da_wrfvar_interface ( head_grid, config_flags )
+   call da_wrfvar_interface (head_grid, config_flags)
 
    if (trace_use) call da_trace_exit("da_wrfvar_run")
 

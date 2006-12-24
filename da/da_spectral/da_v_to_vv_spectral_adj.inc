@@ -1,11 +1,11 @@
-subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav, inc, &
+subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, inc, &
                                     alp_size, alp, wsave, power, rcv, field, &
                                     ids, ide, jds, jde, &
                                     ims, ime, jms, jme, &
-                                    its, ite, jts, jte )
+                                    its, ite, jts, jte)
 
    !----------------------------------------------------------------------
-   ! Performs Adjoint of spectral to grid transformation on a sphere.
+   ! Purpose: Performs Adjoint of spectral to grid transformation on a sphere.
    !----------------------------------------------------------------------
 
    implicit none
@@ -53,7 +53,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    v_fou = 0.
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
-      call rfft1f( ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr )
+      call rfft1f(ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
 
       !----------------------------------------------------------------------
       ! Adjust the output for adjoint test
@@ -65,7 +65,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
       ! make r_fou(ide) zero as there is no power computed for this wavenumber
       r_fou(ite) = 0.
 
-      v_fou(j,0) = CMPLX( r_fou(its), r_fou(ite) )
+      v_fou(j,0) = CMPLX(r_fou(its), r_fou(ite))
 
       do m = 1, max_wavenumber
          index_r = 2 * m
@@ -81,9 +81,9 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    ccv_local(:) = 0.0
 
    do m = 0, max_wavenumber
-      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 +1
+      index_start = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 +1
 
-      index_m     = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+      index_m     = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1 - m
 
       jc = (jde-jds+1)/2
 
@@ -99,18 +99,18 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
 
          if (mod(l+m,2) == 1) then
             do j = js, jte
-               index_j = ( jds+jde - j - 1 ) * temp
+               index_j = (jds+jde - j - 1) * temp
                sum_legtra = sum_legtra - v_fou(j,m) * alp(index_j + index_m + l)
             end do
          else
             do j = js, jte
-               index_j = ( jds+jde - j - 1 ) * temp
+               index_j = (jds+jde - j - 1) * temp
                sum_legtra = sum_legtra + v_fou(j,m) * alp(index_j + index_m + l)
             end do
          end if
 
          do j = jts, je
-            index_j = ( j - 1 ) * temp
+            index_j = (j - 1) * temp
             sum_legtra = sum_legtra + v_fou(j,m) * alp(index_j + index_m + l) 
          end do
    
@@ -121,7 +121,7 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
 #ifdef DM_PARALLEL
    index_start = 1
    index_end   = max_wavenumber + &
-      max_wavenumber * ( max_wavenumber + 1 ) / 2 + 1
+      max_wavenumber * (max_wavenumber + 1) / 2 + 1
 
    n = index_end - index_start + 1
    call mpi_allreduce(ccv_local(index_start:index_end), &
@@ -136,8 +136,8 @@ subroutine da_v_to_vv_spectral_adj( max_wavenumber, sizec, lenr, lenwrk, lensav,
    if (.not. test_transforms) call da_apply_power(power, max_wavenumber, ccv, sizec)
 
    do n = 1, sizec
-      rcv(2*n - 1 ) = real ( ccv(n) )
-      rcv(2*n     ) = aimag( ccv(n) )
+      rcv(2*n - 1) = real (ccv(n))
+      rcv(2*n    ) = aimag(ccv(n))
    end do 
 
    if (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")

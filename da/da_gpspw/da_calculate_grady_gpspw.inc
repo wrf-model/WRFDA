@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y)
+subroutine da_calculate_grady_gpspw(iv, re, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -20,7 +20,7 @@ subroutine da_calculate_grady_gpspw( iv, re, jo_grad_y)
          end if
 
          jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
-                                    ( iv%Gpspw(n)%tpw%error * &
+                                    (iv%Gpspw(n)%tpw%error * &
                                       iv%Gpspw(n)%tpw%error)
       end do
    end if

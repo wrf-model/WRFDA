@@ -1,5 +1,9 @@
 subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: it      ! External iteration.

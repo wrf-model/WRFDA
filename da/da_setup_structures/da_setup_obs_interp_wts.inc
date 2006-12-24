@@ -1,5 +1,9 @@
 subroutine da_setup_obs_interp_wts (xp, iv)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type), intent(in)  :: xp         ! Domain decomposition vars.

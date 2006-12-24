@@ -4,7 +4,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
                                            its, ite, jts, jte, kts, kte)
 
    !--------------------------------------------------------------------------
-   ! Purpose   : Control variable transform for global WRF-Var 
+   ! Purpose: Control variable transform for global WRF-Var 
    !--------------------------------------------------------------------------
 
    implicit none

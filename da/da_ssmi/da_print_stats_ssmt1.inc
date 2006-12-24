@@ -1,6 +1,10 @@
 subroutine da_print_stats_ssmt1(stats_unit, nt, minimum, maximum, &
                                  average, rms_err)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

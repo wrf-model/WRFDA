@@ -1,4 +1,4 @@
-subroutine da_final_write_obs( ob, iv, re)
+subroutine da_final_write_obs(ob, iv, re)
 
    !-------------------------------------------------------------------------
    ! Purpose: Writes full diagnostics for O, (O-B) & OMA togather
@@ -23,7 +23,7 @@ subroutine da_final_write_obs( ob, iv, re)
 
    if (rootproc) then
       call da_get_unit(iunit)
-      allocate ( filename(0:num_procs-1))
+      allocate (filename(0:num_procs-1))
       do k = 0,num_procs-1
          write(unit=filename(k),fmt ='(a,i3.3)')'gts_omb_oma.',k
       end do 

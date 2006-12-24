@@ -1,15 +1,17 @@
 subroutine da_tpq_to_slp ( T, Q, P, TERR, PSFC, SLP, xp )
 
-   ! PURPOSE  COMPUTES SEA LEVEL PRESSURE FROM THE RULE                
-   !              T1/T2=(P1/P2)**(GAMMA*R/G).                              
+   !-----------------------------------------------------------------------
+   ! Purpose:  computes sea level pressure from the rule                
+   !              t1/t2=(p1/p2)**(gamma*r/g).                              
    !                                                                       
-   !     inPUT       T        TEMPERATURE
-   !                 Q        MIXinG RATIO
-   !                 P        PRESSURE
-   !                 TERR     TERRAin
-   !                 PSFC     SURFACE PRESSURE
+   !     input       t        temperature
+   !                 q        mixing ratio
+   !                 p        pressure
+   !                 terr     terrain
+   !                 psfc     surface pressure
    !                                                                       
-   !     outPUT      SLP      SEA LEVEL PRESSURE            
+   !     output      slp      sea level pressure    
+   !-----------------------------------------------------------------------        
 
    implicit none
 

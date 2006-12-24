@@ -1,6 +1,13 @@
 subroutine da_write_biasprep(radbias)
 
+   !------------------------------------------------------------------------
+   ! Purpose: TBD
+   !------------------------------------------------------------------------
+
+   implicit none
+
    type(bias), intent(in)  :: radbias
+
    write(unit=biasprep_unit) radbias%nchan,radbias%npred
    write(unit=biasprep_unit) radbias%platform_id , &
                              radbias%satellite_id, &

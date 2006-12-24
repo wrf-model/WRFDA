@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_profiler( oi, y, re,                        &
+subroutine da_calculate_residual_profiler(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for profilers
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -25,9 +29,9 @@ subroutine da_calculate_residual_profiler( oi, y, re,                        &
 
             np_available = np_available + 2
 
-            re%Profiler(n)%u(k) = da_residual( n, k, y%Profiler(n)%u(k), &
+            re%Profiler(n)%u(k) = da_residual(n, k, y%Profiler(n)%u(k), &
                                       oi%Profiler(n)%u(k), n_obs_bad % u)
-            re%Profiler(n)%v(k) = da_residual( n, k, y%Profiler(n)%v(k), &
+            re%Profiler(n)%v(k) = da_residual(n, k, y%Profiler(n)%v(k), &
                                       oi%Profiler(n)%v(k), n_obs_bad % v)
          end do
       end do

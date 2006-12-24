@@ -1,9 +1,9 @@
-subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
+subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y, &
                                  ims,ime, jms,jme, kms,kme, &
                                  its,ite, jts,jte, kts,kte)
    
    !--------------------------------------------------------------------------
-   ! PURPOSE: Test observation operator transform and adjoint for compatibility.
+   ! Purpose: Test observation operator transform and adjoint for compatibility.
    !
    ! METHOD:  Standard adjoint test: < y, y > = < x, x_adj >.
    !---------------------------------------------------------------------------
@@ -66,10 +66,10 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    xa2_qcw(ims:ime, jms:jme, kms:kme) = xa%qcw(ims:ime, jms:jme, kms:kme)
    xa2_qrn(ims:ime, jms:jme, kms:kme) = xa%qrn(ims:ime, jms:jme, kms:kme)
 
-   call da_pt_to_rho_lin( xb, xa, xp)
+   call da_pt_to_rho_lin(xb, xa, xp)
 
    if (sfc_assi_options == 2) then
-      call da_transform_xtowtq ( xp, xb, xa)
+      call da_transform_xtowtq (xp, xb, xa)
       ! Exchange XA (surface variable: u10, v10, t2, q2) halo region.
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
    end if
@@ -79,7 +79,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
        use_SsmiTbObs .or. use_SsmiRetrievalObs) then
 
       ! Now do something for PW
-      call da_transform_xtotpw( xa, xb)
+      call da_transform_xtotpw(xa, xb)
 
       ! GPS Refractivity:
       if (use_gpsrefobs) then
@@ -92,7 +92,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
            call da_error(__FILE__,__LINE__, &
              (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
          end if
-         call da_transform_xtoseasfcwind_lin( xa, xb)
+         call da_transform_xtoseasfcwind_lin(xa, xb)
       end if
 
       if (use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
@@ -105,7 +105,7 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    ! [2.0] Perform y = Hx transform:
    !----------------------------------------------------------------------
    
-   call da_transform_xtoy( xb, iv, xa, xp, y)
+   call da_transform_xtoy(xb, iv, xa, xp, y)
 
    !----------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation and
@@ -116,66 +116,66 @@ subroutine da_check_xtoy_adjoint( xb, xa, iv, xp, y, &
    pertile_lhs = 0.0
 
    if (use_SoundObs) then
-      call da_check_xtoy_adjoint_sound( iv, y, partial_lhs, pertile_lhs)
-      call da_check_xtoy_adjoint_sonde_sfc( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_sound(iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_sonde_sfc(iv, y, partial_lhs, pertile_lhs)
    end if
 
    if (use_SynopObs) &
-      call da_check_xtoy_adjoint_synop( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_synop(iv, y, partial_lhs, pertile_lhs)
 
    if (use_GeoAMVObs) &
-      call da_check_xtoy_adjoint_geoamv( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_geoamv(iv, y, partial_lhs, pertile_lhs)
 
    if (use_PolarAMVObs) &
-      call da_check_xtoy_adjoint_polaramv( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_polaramv(iv, y, partial_lhs, pertile_lhs)
 
    if (use_AirepObs) &
-      call da_check_xtoy_adjoint_airep( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_airep(iv, y, partial_lhs, pertile_lhs)
 
    if (use_PilotObs) &
-      call da_check_xtoy_adjoint_pilot( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_pilot(iv, y, partial_lhs, pertile_lhs)
 
    if (use_RadarObs) &
-      call da_check_xtoy_adjoint_radar( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_radar(iv, y, partial_lhs, pertile_lhs)
 
    if (use_SatemObs) &
-      call da_check_xtoy_adjoint_satem( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_satem(iv, y, partial_lhs, pertile_lhs)
 
    if (use_MetarObs) &
-      call da_check_xtoy_adjoint_metar( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_metar(iv, y, partial_lhs, pertile_lhs)
  
    if (use_ShipsObs) &
-      call da_check_xtoy_adjoint_ships( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_ships(iv, y, partial_lhs, pertile_lhs)
 
    if (use_GpspwObs) &
-      call da_check_xtoy_adjoint_gpspw( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_gpspw(iv, y, partial_lhs, pertile_lhs)
 
    if (use_GpsrefObs) &
-      call da_check_xtoy_adjoint_gpsref( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_gpsref(iv, y, partial_lhs, pertile_lhs)
    
    if (use_SsmiTbObs .or. Use_SsmiRetrievalObs) &
-      call da_check_xtoy_adjoint_ssmi ( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_ssmi (iv, y, partial_lhs, pertile_lhs)
 
    if (use_ssmt1obs) &
-      call da_check_xtoy_adjoint_ssmt1( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_ssmt1(iv, y, partial_lhs, pertile_lhs)
 
    if (use_ssmt2obs) &
-      call da_check_xtoy_adjoint_ssmt2( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_ssmt2(iv, y, partial_lhs, pertile_lhs)
 
    if (use_qscatobs) &
-      call da_check_xtoy_adjoint_qscat( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_qscat(iv, y, partial_lhs, pertile_lhs)
 
    if (use_ProfilerObs) &
-   call da_check_xtoy_adjoint_profiler( iv, y, partial_lhs, pertile_lhs)
+   call da_check_xtoy_adjoint_profiler(iv, y, partial_lhs, pertile_lhs)
 
    if (use_BuoyObs) &
-      call da_check_xtoy_adjoint_buoy( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_buoy(iv, y, partial_lhs, pertile_lhs)
 
    if (use_BogusObs) &
-      call da_check_xtoy_adjoint_bogus( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_bogus(iv, y, partial_lhs, pertile_lhs)
 
    if (use_Radiance) &
-      call da_check_xtoy_adjoint_rad( iv, y, partial_lhs, pertile_lhs)
+      call da_check_xtoy_adjoint_rad(iv, y, partial_lhs, pertile_lhs)
 
    !----------------------------------------------------------------------
    ! [5.0] Perform adjoint operation:

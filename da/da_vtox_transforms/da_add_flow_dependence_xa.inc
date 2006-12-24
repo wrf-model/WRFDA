@@ -2,7 +2,7 @@ subroutine da_add_flow_dependence_xa (ne, ep, vp, xa, &
                                       its,ite, jts,jte, kts,kte)
 
    !-----------------------------------------------------------------------
-   ! Purpose : Add flow-dependent increments in model space (xa).
+   ! Purpose: Add flow-dependent increments in model space (xa).
    !-----------------------------------------------------------------------
                                       
    implicit none

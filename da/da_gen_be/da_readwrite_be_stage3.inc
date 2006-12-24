@@ -1,5 +1,9 @@
 subroutine da_readwrite_be_stage3(outunit, nk, variable)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)      :: outunit                    ! Output unit number.

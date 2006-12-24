@@ -2,7 +2,7 @@ subroutine da_tp_to_qs_adj1( t, p, es, t_prime, p_prime, &
                              qs_prime_over_qs )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of da_tp_to_qs_lin.
+   !  Purpose: Adjoint of da_tp_to_qs_lin.
    !---------------------------------------------------------------------------
 
    implicit none

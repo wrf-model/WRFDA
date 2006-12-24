@@ -1,5 +1,9 @@
 subroutine da_sum_reals(n, val1, val2, val3, val4, val5, val6, val7)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)             :: n

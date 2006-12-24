@@ -1,6 +1,9 @@
 subroutine da_oi(str,line)
 
-   ! quick way of showing location
+   !-----------------------------------------------------------------------
+   ! Purpose: quick way of showing location
+   !-----------------------------------------------------------------------
+
    implicit none
    character*(*), intent(in) :: str
    integer, intent(in) :: line

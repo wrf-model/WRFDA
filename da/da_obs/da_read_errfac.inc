@@ -1,5 +1,9 @@
 subroutine da_read_errfac(ob_name, f1, f2, f3, f4, f5)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    
    character (len=5), intent(in) :: ob_name

@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_gpspw( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_gpspw(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -14,7 +18,7 @@ subroutine da_calculate_jo_and_grady_gpspw( iv, re, jo, jo_grad_y)
    if (iv%num_Gpspw > 0) then
       do n=1, iv%num_Gpspw
          jo_grad_y%Gpspw(n)%tpw = -re%Gpspw(n)%tpw / &
-                                   ( iv%Gpspw(n)%tpw%error * &
+                                   (iv%Gpspw(n)%tpw%error * &
                                      iv%Gpspw(n)%tpw%error)
 
          if (iv%gpspw(n)%loc%proc_domain) then

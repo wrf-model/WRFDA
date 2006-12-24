@@ -1,6 +1,8 @@
 subroutine da_accre(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,kts,kte)
 
-   ! Accretion (Collection)
+   !-----------------------------------------------------------------------
+   ! Purpose: Accretion (Collection)
+   !-----------------------------------------------------------------------
 
    implicit none
 

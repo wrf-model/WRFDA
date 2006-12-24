@@ -1,7 +1,9 @@
 subroutine da_evapo(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV,  &
                  PREC1,PREC2,PRE,kts,kte)
 
-   ! Rainwater evaporation
+   !-----------------------------------------------------------------------
+   ! Purpose: Rainwater evaporation
+   !-----------------------------------------------------------------------
 
    implicit none
 

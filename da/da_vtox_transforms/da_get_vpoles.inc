@@ -4,7 +4,7 @@ subroutine da_get_vpoles(u,v,        &
           its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Treatment for Polar winds  
+   !  Purpose: Treatment for Polar winds  
    !---------------------------------------------------------------------------
    
    implicit none

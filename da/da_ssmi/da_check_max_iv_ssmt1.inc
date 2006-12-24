@@ -1,5 +1,9 @@
 subroutine da_check_max_iv_ssmt1(it, ssmt1, itt,ittf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    integer,           intent (in)         ::  it      ! outer iteration
    integer,           intent (inout)      ::  itt, ittf                

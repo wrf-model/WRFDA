@@ -1,7 +1,7 @@
 subroutine da_allocate_observations  (ob)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate components of observation structure.
+   ! Purpose: Allocate components of observation structure.
    !---------------------------------------------------------------------------
 
    implicit none

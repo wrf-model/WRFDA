@@ -1,6 +1,10 @@
 subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
                          failed, print)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer          ,   intent (in)   :: it

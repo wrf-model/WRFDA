@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_metar( oi, y, re,                        &
+subroutine da_calculate_residual_metar(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for metars
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -26,15 +30,15 @@ subroutine da_calculate_residual_metar( oi, y, re,                        &
       do n=1, oi%num_metar
          np_available = np_available + 5
 
-         re%metar(n)%u = da_residual( n, 0, y%metar(n)%u, &
+         re%metar(n)%u = da_residual(n, 0, y%metar(n)%u, &
                                      oi%metar(n)%u, n_obs_bad % u)
-         re%metar(n)%v = da_residual( n, 0, y%metar(n)%v, &
+         re%metar(n)%v = da_residual(n, 0, y%metar(n)%v, &
                                   oi%metar(n)%v, n_obs_bad % v)
-         re%metar(n)%t = da_residual( n, 0, y%metar(n)%t, &
+         re%metar(n)%t = da_residual(n, 0, y%metar(n)%t, &
                                   oi%metar(n)%t, n_obs_bad % t)
-         re%metar(n)%p = da_residual( n, 0, y%metar(n)%p, &
+         re%metar(n)%p = da_residual(n, 0, y%metar(n)%p, &
                                   oi%metar(n)%p, n_obs_bad % p)
-         re%metar(n)%q = da_residual( n, 0, y%metar(n)%q, &
+         re%metar(n)%q = da_residual(n, 0, y%metar(n)%q, &
                                   oi%metar(n)%q, n_obs_bad % q)
       end do
 

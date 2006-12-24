@@ -1,7 +1,7 @@
-subroutine da_check_eof_decomposition( be_eigenval, be_eigenvec, name)
+subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Check eigenvectors E of vertical covariance matrix B_{x} which 
+   ! Purpose: Check eigenvectors E of vertical covariance matrix B_{x} which 
    ! have been read in from NMC-statistics file.
    !
    ! METHOD:  E and L (eigenvalues) are computed using LAPACK/BLAS software in 
@@ -37,7 +37,7 @@ subroutine da_check_eof_decomposition( be_eigenval, be_eigenvec, name)
    !----------------------------------------------------------------------  
 
    cum_variance = 0.0
-   tot_variance = sum( be_eigenval(1:kz))
+   tot_variance = sum(be_eigenval(1:kz))
 
    write(unit=stdout,fmt='(A)')' Name Mode  Eigenvalue Normalised Variance'
    do k = 1, kz
@@ -57,22 +57,22 @@ subroutine da_check_eof_decomposition( be_eigenval, be_eigenvec, name)
    write(unit=stdout,fmt='(3A)') ' da_check_eof_decomposition:', &
                    ' Domain eigenvectors for ', trim(name)
 
-   write(unit=stdout,fmt='(50i13)')( m, m=1,kz)
+   write(unit=stdout,fmt='(50i13)')(m, m=1,kz)
    do k = 1, kz      
-      write(unit=stdout,fmt='(I3,50e13.5)')k, ( be_eigenvec(k,m), m=1,kz)
+      write(unit=stdout,fmt='(I3,50e13.5)')k, (be_eigenvec(k,m), m=1,kz)
    end do
 
    ! [2.2]: Test eigenvector orthogonality: sum_k (e_m(k) e_n(k)) = delta_mn:
 
-   allocate( array_mask(1:kz))
-   allocate( matrix2(1:kz,1:kz))
+   allocate(array_mask(1:kz))
+   allocate(matrix2(1:kz,1:kz))
       
    write(unit=stdout,fmt='(2A)') &
       ' Eigenvector orthogonality check for ', trim(name)
    write(unit=stdout,fmt='(A)')' Mode     Diagonal         Maximum off-diagonal'
    do k1 = 1, kz
       do k2 = 1, kz
-         matrix2(k1,k2) = sum( be_eigenvec(:,k1) * be_eigenvec(:,k2))
+         matrix2(k1,k2) = sum(be_eigenvec(:,k1) * be_eigenvec(:,k2))
       end do
          
       array_mask(1:kz) =.true.
@@ -105,8 +105,8 @@ subroutine da_check_eof_decomposition( be_eigenval, be_eigenvec, name)
    ! [3.0]: Tidy up:
    !-------------------------------------------------------------------------  
 
-   deallocate( matrix2)
-   deallocate( array_mask)
+   deallocate(matrix2)
+   deallocate(array_mask)
 
    if (trace_use) call da_trace_exit("da_check_eof_decomposition")
        

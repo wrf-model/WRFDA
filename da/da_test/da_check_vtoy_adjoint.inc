@@ -2,10 +2,10 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
                                   xb, xbx, xp, be, ep, xa, iv, y,&
                                   ids,ide, jds,jde, kds,kde, &
                                   ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte )
+                                  its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Perform V To Y Adjoint transform test                             
+   !  Purpose: Perform V To Y Adjoint transform test                             
    !
    !  METHOD:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.!
    !---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    !        Rescale input to adjoint routine :
    !-------------------------------------------------------------------------
 
-   call da_get_y_lhs_value( iv, y, partial_lhs, pertile_lhs, adj_sum_lhs)
+   call da_get_y_lhs_value(iv, y, partial_lhs, pertile_lhs, adj_sum_lhs)
 
 
    cv = 0.
@@ -85,7 +85,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
                                  its, ite, jts, jte, kts, kte,     &
                                  grid, config_flags, cg_jcdf)
 
-   adj_rhs = sum( cv(1:cv_size) * cv_2(1:cv_size))
+   adj_rhs = sum(cv(1:cv_size) * cv_2(1:cv_size))
 
    !-------------------------------------------------------------------------
    !      Print output:
@@ -95,7 +95,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    if (global) then
       adj_sum_rhs = adj_rhs
    else
-      call mpi_allreduce( adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
+      call mpi_allreduce(adj_rhs, adj_sum_rhs, 1, true_mpi_real, mpi_sum, &
                        comm, ierr)
    end if
 #else

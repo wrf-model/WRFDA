@@ -1,7 +1,7 @@
 subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Collect a local y_facade_type object into a global y_facade_type 
+   ! Purpose:  Collect a local y_facade_type object into a global y_facade_type 
    !           object while preserving serial-code storage order.  This is 
    !           used to perform bitwise-exact floating-point summations in 
    !           serial-code-order during bitwise-exact testing of 

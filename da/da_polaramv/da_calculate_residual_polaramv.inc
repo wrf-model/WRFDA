@@ -1,4 +1,4 @@
-subroutine da_calculate_residual_polaramv( oi, y, re,                        &
+subroutine da_calculate_residual_polaramv(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
    !-------------------------------------------------------------------------
@@ -26,9 +26,9 @@ subroutine da_calculate_residual_polaramv( oi, y, re,                        &
          do k=1, oi%polaramv(n)%info%levels
             np_available = np_available + 2
 
-            re%polaramv(n)%u(k) = da_residual( n, 0, y%polaramv(n)%u(k), &
+            re%polaramv(n)%u(k) = da_residual(n, 0, y%polaramv(n)%u(k), &
                                       oi%polaramv(n)%u(k), n_obs_bad % u)
-            re%polaramv(n)%v (k)= da_residual( n, 0, y%polaramv(n)%v(k), &
+            re%polaramv(n)%v (k)= da_residual(n, 0, y%polaramv(n)%v(k), &
                                    oi%polaramv(n)%v(k), n_obs_bad % v)            
         end do
      end do

@@ -1,7 +1,7 @@
 subroutine da_hydrostaticp_to_rho_adj( xb, xp, rho, p ) 
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of da_hydrostaticp_to_rho.
+   !  Purpose: Adjoint of da_hydrostaticp_to_rho.
    !
    !  METHOD:  Standard adjoint coding.
    !

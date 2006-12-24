@@ -1,8 +1,8 @@
-subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
+subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
                                 alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field)
 
    !-------------------------------------------------------------------------
-   ! Performs gridpoint to spectral transformation on a sphere.
+   ! Purpose: Performs gridpoint to spectral transformation on a sphere.
    ! Note: Routine works for both regular and Gaussian latitude (latitude 
    ! integration weights contain necessary info).
    !-------------------------------------------------------------------------
@@ -38,7 +38,7 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
    sizec = 0.5 * r_cvsize
    allocate (ccv(1:sizec))
 
-   if ( (ni+1) / 2 == ni/2 + 1 ) then  ! Odd number of longitudes:
+   if ((ni+1) / 2 == ni/2 + 1) then  ! Odd number of longitudes:
       odd_longitudes = .true.
    else                                ! Even number of longitudes:
       odd_longitudes = .false.
@@ -48,7 +48,7 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
    !-------------------------------------------------------------------------
  
-   if ( (ni+1) / 2 == ni/2 + 1 ) then  ! Odd number of longitudes:
+   if ((ni+1) / 2 == ni/2 + 1) then  ! Odd number of longitudes:
       odd_longitudes = .true.
    else                                ! Even number of longitudes:
       odd_longitudes = .false.
@@ -58,36 +58,36 @@ subroutine da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwr
 
    do j = 1, nj
       r_fou(1:ni) = field(1:ni,j)
-      call rfft1f( ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr )
+      call rfft1f(ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
 
-      if ( odd_longitudes ) then
-         v_fou(j,0) = CMPLX( r_fou(1), 0.0 ) ! m = 0 is real.
+      if (odd_longitudes) then
+         v_fou(j,0) = CMPLX(r_fou(1), 0.0) ! m = 0 is real.
       else
          ! m = 0 is real, but pack R(NI/2) in imag m = 0:
-         v_fou(j,0) = CMPLX( r_fou(1), r_fou(ni) )
+         v_fou(j,0) = CMPLX(r_fou(1), r_fou(ni))
       end if
 
       do m = 1, max_wavenumber
          index_r = 2 * m
          index_c = 2 * m + 1
-         v_fou(j,m) = CMPLX( r_fou(index_r), r_fou(index_c) ) ! 2.0 * Fourier mode.
+         v_fou(j,m) = CMPLX(r_fou(index_r), r_fou(index_c)) ! 2.0 * Fourier mode.
       end do
    end do
 
    ! [2] Perform Legendre decomposition in N-S direction:
 
    do m = 0, max_wavenumber
-      index_start = m * ( max_wavenumber + 1 - m ) + m * ( m + 1 ) / 2 + 1
+      index_start = m * (max_wavenumber + 1 - m) + m * (m + 1) / 2 + 1
       index_end   = index_start + max_wavenumber - m
       r_leg(1:nj) = v_fou(1:nj,m)
-      call da_legtra ( nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
-                        ccv(index_start:index_end) )
+      call da_legtra (nj, max_wavenumber, alp_size, m, int_wgts, alp, r_leg, &
+                        ccv(index_start:index_end))
    end do
 
    do i=1,sizec
       mm = 2*i - 1
-      rcv(mm  ) = real ( ccv(i) )
-      rcv(mm+1) = aimag( ccv(i) )
+      rcv(mm ) = real (ccv(i))
+      rcv(mm+1) = aimag(ccv(i))
    end do
    deallocate (ccv)
 

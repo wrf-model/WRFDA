@@ -4,7 +4,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
                                   its, ite, jts, jte, kts, kte)
 
    !--------------------------------------------------------------------------
-   ! Purpose   : Control variable transform Adjoint
+   ! Purpose: Control variable transform Adjoint
    !--------------------------------------------------------------------------
 
    implicit none

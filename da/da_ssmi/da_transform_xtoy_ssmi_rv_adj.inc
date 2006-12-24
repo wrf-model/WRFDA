@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_ssmi_rv_adj(xb, oi, jo_grad_y, jo_grad_x)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xb_type), intent(in)       :: xb          ! first guess.

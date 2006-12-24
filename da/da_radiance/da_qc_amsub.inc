@@ -1,10 +1,10 @@
 subroutine da_qc_amsub ( inst, nchan, ob, iv )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: perform quality control for amsub data.
+   ! Purpose: perform quality control for amsub data.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    INTEGER, INTENT(IN)             :: inst       ! sensor index.
    INTEGER, INTENT(IN)             :: nchan      ! number of channel

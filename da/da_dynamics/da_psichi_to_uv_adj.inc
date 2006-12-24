@@ -4,7 +4,7 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
                                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint code of da_psichi_to_uv  
+   !  Purpose: Adjoint code of da_psichi_to_uv  
    !
    !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
    !           v = coefy * ( dpsi/dx + dchi/dy)

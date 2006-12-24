@@ -1,7 +1,7 @@
 subroutine da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Convert es/p/es_prime to saturation specific humidity increment.
+!  Purpose: Convert es/p/es_prime to saturation specific humidity increment.
 !
 !  METHOD: qs~ = qs * ( p es'/es - p' ) / ( p - (1-rd_over_rv) es ).
 !          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) ).

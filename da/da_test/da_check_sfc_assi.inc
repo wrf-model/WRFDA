@@ -1,7 +1,11 @@
-subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
+subroutine da_check_sfc_assi(xb, xa, iv, xp, y, &
                            ids,ide, jds,jde, kds,kde, &
                            ims,ime, jms,jme, kms,kme, &
                            its,ite, jts,jte, kts,kte)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
    
    implicit none
   
@@ -57,14 +61,14 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
    xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
 
-   ! call check_psfc( xb, xa, iv, xp, y, &
+   ! call check_psfc(xb, xa, iv, xp, y, &
    !                  ids,ide, jds,jde, kds,kde, &
    !                  ims,ime, jms,jme, kms,kme, &
    !                  its,ite, jts,jte, kts,kte)
 
    ! call wrf_shutdown
 
-   call da_transform_xtowtq ( xp, xb, xa)
+   call da_transform_xtowtq (xp, xb, xa)
 
    ! Exchange XA(SURFACE) halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
@@ -74,7 +78,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
-      call da_transform_xtopsfc( xb, xa, xp, iv%synop(n), y%synop(n))
+      call da_transform_xtopsfc(xb, xa, xp, iv%synop(n), y%synop(n))
 
 
       pertile_lhs = pertile_lhs &
@@ -84,7 +88,7 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
                   + y%synop(n)%p * y%synop(n)%p &
                   + y%synop(n)%q * y%synop(n)%q
 
-      if(iv%synop(n)%loc%proc_domain) then
+      if (iv%synop(n)%loc%proc_domain) then
          partial_lhs = partial_lhs &
                      + y%synop(n)%u * y%synop(n)%u &
                      + y%synop(n)%v * y%synop(n)%v &
@@ -98,25 +102,25 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
    ! [5.0] Perform adjoint operation:
    !----------------------------------------------------------------------
 
-   call da_zero_x( xa)
+   call da_zero_x(xa)
 
    do n=1, iv%num_synop
       call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
    end do
 
-   call da_transform_xtowtq_adj ( xp, xb, xa)
+   call da_transform_xtowtq_adj (xp, xb, xa)
    
-   pertile_rhs = sum( xa%u(ims:ime, jms:jme, kms:kme) * &
+   pertile_rhs = sum(xa%u(ims:ime, jms:jme, kms:kme) * &
       xa2_u(ims:ime, jms:jme, kms:kme)) + &
-                 sum( xa%v(ims:ime, jms:jme, kms:kme) * &
+                 sum(xa%v(ims:ime, jms:jme, kms:kme) * &
       xa2_v(ims:ime, jms:jme, kms:kme)) + &
-                 sum( xa%t(ims:ime, jms:jme, kms:kme) * &
+                 sum(xa%t(ims:ime, jms:jme, kms:kme) * &
       xa2_t(ims:ime, jms:jme, kms:kme)) + &
-                 sum( xa%p(ims:ime, jms:jme, kms:kme) * &
+                 sum(xa%p(ims:ime, jms:jme, kms:kme) * &
       xa2_p(ims:ime, jms:jme, kms:kme)) + &
-                 sum( xa%q(ims:ime, jms:jme, kms:kme) * &
+                 sum(xa%q(ims:ime, jms:jme, kms:kme) * &
       xa2_q(ims:ime, jms:jme, kms:kme)) + &
-                 sum( xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
+                 sum(xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjivnt test equation:
@@ -138,8 +142,8 @@ subroutine da_check_sfc_assi( xb, xa, iv, xp, y, &
         ' Tile < y, y     > = ', pertile_lhs, &
         ' Tile < x, x_adj > = ', pertile_rhs
 
-   adj_ttl_lhs = wrf_dm_sum_real( partial_lhs)
-   adj_ttl_rhs = wrf_dm_sum_real( partial_rhs)
+   adj_ttl_lhs = wrf_dm_sum_real(partial_lhs)
+   adj_ttl_rhs = wrf_dm_sum_real(partial_rhs)
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_check_sfc_assi_A:  adj_ttl_lhs,adj_ttl_rhs = ', &
       adj_ttl_lhs,adj_ttl_rhs

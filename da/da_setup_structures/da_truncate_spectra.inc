@@ -1,6 +1,10 @@
 subroutine da_truncate_spectra(max_wave, nw, power_trunc, power, &
    max_wave_trunc)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)  :: max_wave         ! Smallest wave for domain.

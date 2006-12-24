@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
+subroutine da_calculate_residual_sonde_sfc(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for sonde surface obs
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -25,15 +29,15 @@ subroutine da_calculate_residual_sonde_sfc( oi, y, re,                        &
    do n=1, oi%num_sound
       np_available = np_available + 5
 
-      re%sonde_sfc(n)%u = da_residual( n, 0, y%sonde_sfc(n)%u, &
+      re%sonde_sfc(n)%u = da_residual(n, 0, y%sonde_sfc(n)%u, &
                                     oi%sonde_sfc(n)%u, n_obs_bad % u)
-      re%sonde_sfc(n)%v = da_residual( n, 0, y%sonde_sfc(n)%v, &
+      re%sonde_sfc(n)%v = da_residual(n, 0, y%sonde_sfc(n)%v, &
                                  oi%sonde_sfc(n)%v, n_obs_bad % v)
-      re%sonde_sfc(n)%t = da_residual( n, 0, y%sonde_sfc(n)%t, &
+      re%sonde_sfc(n)%t = da_residual(n, 0, y%sonde_sfc(n)%t, &
                                  oi%sonde_sfc(n)%t, n_obs_bad % t)
-      re%sonde_sfc(n)%p = da_residual( n, 0, y%sonde_sfc(n)%p, &
+      re%sonde_sfc(n)%p = da_residual(n, 0, y%sonde_sfc(n)%p, &
                                  oi%sonde_sfc(n)%p, n_obs_bad % p)
-      re%sonde_sfc(n)%q = da_residual( n, 0, y%sonde_sfc(n)%q, &
+      re%sonde_sfc(n)%q = da_residual(n, 0, y%sonde_sfc(n)%q, &
                                  oi%sonde_sfc(n)%q, n_obs_bad % q)
    end do
 

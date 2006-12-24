@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_synop(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -28,15 +32,15 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y)
    do n=1, iv%num_synop
 
          jo_grad_y%synop(n)%u = -re%synop(n)%u / &
-                               ( iv%synop(n)%u%error * iv%synop(n)%u%error)
+                               (iv%synop(n)%u%error * iv%synop(n)%u%error)
          jo_grad_y%synop(n)%v = -re%synop(n)%v / &
-                               ( iv%synop(n)%v%error * iv%synop(n)%v%error)
+                               (iv%synop(n)%v%error * iv%synop(n)%v%error)
          jo_grad_y%synop(n)%t = -re%synop(n)%t / &
-                               ( iv%synop(n)%t%error * iv%synop(n)%t%error)
+                               (iv%synop(n)%t%error * iv%synop(n)%t%error)
          jo_grad_y%synop(n)%p = -re%synop(n)%p / &
-                               ( iv%synop(n)%p%error * iv%synop(n)%p%error)
+                               (iv%synop(n)%p%error * iv%synop(n)%p%error)
          jo_grad_y%synop(n)%q = -re%synop(n)%q / &
-                               ( iv%synop(n)%q%error * iv%synop(n)%q%error)
+                               (iv%synop(n)%q%error * iv%synop(n)%q%error)
    end do
 
    ! Bitwise-exact reduction preserves operation order of serial code for
@@ -44,15 +48,15 @@ subroutine da_calculate_jo_and_grady_synop( iv, re, jo, jo_grad_y)
    ! testing.  This will always be .false. for a serial run.
    if (testing_dm_exact) then
       ! collect all obs in serial order and allocate global objects
-      call da_to_global_synop( iv,      re,      jo_grad_y, &
+      call da_to_global_synop(iv,      re,      jo_grad_y, &
                            iv_glob, re_glob, jo_grad_y_glob)
       ! perform remaining computations
-      call da_compute_jo_synop_uvtq( iv_glob, re_glob, jo_grad_y_glob, jo)
+      call da_compute_jo_synop_uvtq(iv_glob, re_glob, jo_grad_y_glob, jo)
       ! free global objects
-      call da_free_global_synop( iv_glob, re_glob, jo_grad_y_glob)
+      call da_free_global_synop(iv_glob, re_glob, jo_grad_y_glob)
    else
       ! perform remaining computations
-      call da_compute_jo_synop_uvtq( iv, re, jo_grad_y, jo)
+      call da_compute_jo_synop_uvtq(iv, re, jo_grad_y, jo)
    end if
 
    jo % synop_u = 0.5 * jo % synop_u

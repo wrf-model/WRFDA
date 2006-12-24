@@ -2,6 +2,10 @@ subroutine da_stats_calculate(n, k, qc_flag, x, nn, &
                             minimum, maximum, &
                             average, rms_err)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)    :: n             ! Number of obs.

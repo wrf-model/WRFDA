@@ -1,5 +1,9 @@
 subroutine da_predictor(pred,npred,temp,hum,t_skin)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    ! temp - 43 level temperatures

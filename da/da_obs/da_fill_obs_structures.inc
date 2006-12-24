@@ -1,4 +1,4 @@
-subroutine da_fill_obs_structures(xp, iv, ob )
+subroutine da_fill_obs_structures(xp, iv, ob)
 
    !----------------------------------------------------------------------------   
    ! Purpose: Allocates observation structure and fills it from iv.
@@ -100,7 +100,7 @@ subroutine da_fill_obs_structures(xp, iv, ob )
    !---------------------------------------------------------------------------
    ! [1.0] Allocate innovation vector and observation structures:
    !---------------------------------------------------------------------------
-   call da_allocate_y( iv, ob )
+   call da_allocate_y(iv, ob)
 
    !----------------------------------------------------------------------
    ! [2.0] Transfer observations:
@@ -126,11 +126,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
          !    (iv % synop(n) % p % qc >= obs_qc_pointer) .and. &
          !    (iv % synop(n) % t % qc >= obs_qc_pointer) .and. &
          !    (iv % synop(n) % q % qc >= obs_qc_pointer)) then
-         call da_get_q_error( ob % synop(n) % p, &
+         call da_get_q_error(ob % synop(n) % p, &
                               ob % synop(n) % t, &
                               ob % synop(n) % q, &
                               iv % synop(n) % t % error, &
-                              rh_error, iv % synop(n) % q % error )
+                              rh_error, iv % synop(n) % q % error)
          if (iv%synop(n)% q % error == missing_r) iv%synop(n)% q % qc = missing_data
 
          ! end if
@@ -150,11 +150,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
          ! Calculate q error from rh error:
 
          rh_error = iv%metar(n)%q%error ! q error is rh at this stage!
-         call da_get_q_error( iv % metar(n) % p % inv, &
+         call da_get_q_error(iv % metar(n) % p % inv, &
                               ob % metar(n) % t, &
                               ob % metar(n) % q, &
                               iv % metar(n) % t % error, &
-                              rh_error, q_error )
+                              rh_error, q_error)
          iv % metar(n) % q % error = q_error
          if (iv%metar(n)% q % error == missing_r) &
             iv%metar(n)% q % qc = missing_data
@@ -174,11 +174,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
          ! Calculate q error from rh error:
 
          rh_error = iv%ships(n)%q%error ! q error is rh at this stage!
-         call da_get_q_error( iv % ships(n) % p % inv, &
+         call da_get_q_error(iv % ships(n) % p % inv, &
                               ob % ships(n) % t, &
                               ob % ships(n) % q, &
                               iv % ships(n) % t % error, &
-                              rh_error, q_error )
+                              rh_error, q_error)
          iv % ships(n) % q % error = q_error
 
          if(iv%ships(n)% q % error == missing_r) iv%ships(n)% q % qc = missing_data
@@ -243,11 +243,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
             ! Calculate q error from rh error:
 
             rh_error = iv%sound(n)%q(k)%error ! q error is rh at this stage!
-            call da_get_q_error( iv % sound(n) % p(k), &
+            call da_get_q_error(iv % sound(n) % p(k), &
                                  ob % sound(n) % t(k), &
                                  ob % sound(n) % q(k), &
                                  iv % sound(n) % t(k) % error, &
-                                 rh_error, q_error )
+                                 rh_error, q_error)
 
             iv % sound(n) % q(k) % error = q_error
          if (iv%sound(n)% q(k) % error == missing_r) &
@@ -262,11 +262,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
          ! Calculate q error from rh error:
 
          rh_error = iv%sonde_sfc(n)%q%error ! q error is rh at this stage!
-         call da_get_q_error( iv % sonde_sfc(n) % p % inv, &
+         call da_get_q_error(iv % sonde_sfc(n) % p % inv, &
                               ob % sonde_sfc(n) % t, &
                               ob % sonde_sfc(n) % q, &
                               iv % sonde_sfc(n) % t % error, &
-                              rh_error, iv % sonde_sfc(n) % q % error )
+                              rh_error, iv % sonde_sfc(n) % q % error)
          if (iv%sonde_sfc(n)% q % error == missing_r) &
             iv%sonde_sfc(n)% q % qc = missing_data
       end do
@@ -349,7 +349,7 @@ subroutine da_fill_obs_structures(xp, iv, ob )
    
    ! [2.14] Setup pseudo observations:
 
-   if (num_pseudo > 0 ) call da_setup_pseudo_obs(xp, iv, ob )
+   if (num_pseudo > 0) call da_setup_pseudo_obs(xp, iv, ob)
 
    ! [2.15] Transfer scatterometer obs:
 
@@ -386,11 +386,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
          ! Calculate q error from rh error:
 
          rh_error = iv%buoy(n)%q%error ! q error is rh at this stage!
-         call da_get_q_error( iv % buoy(n) % p % inv, &
+         call da_get_q_error(iv % buoy(n) % p % inv, &
                               ob % buoy(n) % t, &
                               ob % buoy(n) % q, &
                               iv % buoy(n) % t % error, &
-                              rh_error, q_error )
+                              rh_error, q_error)
          iv % buoy(n) % q % error = q_error
 
          if(iv%buoy (n)% q % error == missing_r) iv%buoy (n)% q % qc = missing_data
@@ -425,11 +425,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
             ! Calculate q error from rh error:
 
             rh_error = iv%bogus(n)%q(k)%error ! q error is rh at this stage!
-            call da_get_q_error( iv % bogus(n) % p(k), &
+            call da_get_q_error(iv % bogus(n) % p(k), &
                                  ob % bogus(n) % t(k), &
                                  ob % bogus(n) % q(k), &
                                  iv % bogus(n) % t(k) % error, &
-                                 rh_error, q_error )
+                                 rh_error, q_error)
 
             iv % bogus(n) % q(k) % error = q_error
             if (iv%bogus(n)% q(k) % error == missing_r) &
@@ -453,11 +453,11 @@ subroutine da_fill_obs_structures(xp, iv, ob )
             ! Calculate q error from rh error:
 
             rh_error = iv%airsr(n)%q(k)%error ! q error is rh at this stage!
-            call da_get_q_error( iv % airsr(n) % p(k), &
+            call da_get_q_error(iv % airsr(n) % p(k), &
                                  ob % airsr(n) % t(k), &
                                  ob % airsr(n) % q(k), &
                                  iv % airsr(n) % t(k) % error, &
-                                 rh_error, q_error )
+                                 rh_error, q_error)
 
             iv % airsr(n) % q(k) % error = q_error
             if (iv%airsr(n)% q(k) % error == missing_r) &

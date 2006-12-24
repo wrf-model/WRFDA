@@ -1,5 +1,9 @@
 subroutine da_print_sub_header(sub_header)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (sub_record_header), intent(in) :: sub_header

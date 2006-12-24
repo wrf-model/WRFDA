@@ -3,6 +3,10 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
                              ims, ime, jms, jme, &
                              its, ite, jts, jte )
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)        :: max_wave ! Maximum wavenumber.

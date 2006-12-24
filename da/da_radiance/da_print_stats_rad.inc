@@ -1,7 +1,7 @@
 subroutine da_print_stats_rad(stats_unit, nchan, rad)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: print out statistics of omb, oma for radiance data.
+   !  Purpose: print out statistics of omb, oma for radiance data.
    !
    !  METHOD:  print out average, rms, minimum, maximum of iv, re
    !---------------------------------------------------------------------------

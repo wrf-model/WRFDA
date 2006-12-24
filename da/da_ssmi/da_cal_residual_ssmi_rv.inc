@@ -1,6 +1,10 @@
-subroutine da_cal_residual_ssmi_rv( oi, y, re, &
+subroutine da_cal_residual_ssmi_rv(oi, y, re, &
                                                   np_missing, np_bad_data, &
-                                                  np_obs_used, np_available )
+                                                  np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,9 +25,9 @@ subroutine da_cal_residual_ssmi_rv( oi, y, re, &
       np_available = np_available + 2
 
       re%ssmi_retrieval(n)%Speed = da_residual(n, 0, y%ssmi_retrieval(n)%Speed, &
-                               oi%ssmi_retrieval(n)%Speed, n_obs_bad % Speed )
+                               oi%ssmi_retrieval(n)%Speed, n_obs_bad % Speed)
       re%ssmi_retrieval(n)%tpw   = da_residual(n, 0, y%ssmi_retrieval(n)%tpw,   &
-                               oi%ssmi_retrieval(n)%tpw, n_obs_bad % q       )
+                               oi%ssmi_retrieval(n)%tpw, n_obs_bad % q      )
    end do
 
    np_missing  = np_missing + n_obs_bad % Speed % num % miss    &

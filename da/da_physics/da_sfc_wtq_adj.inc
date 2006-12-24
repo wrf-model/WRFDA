@@ -4,7 +4,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
                        u10_prime, v10_prime, t2_prime, q2_prime) 
 
    !---------------------------------------------------------------------------
-   ! Calculate the  10m wind, 2m temperature and moisture based on the
+   ! Purpose: Calculate the  10m wind, 2m temperature and moisture based on the
    ! similarity theory
    !
    ! Reference:

@@ -1,4 +1,4 @@
-subroutine da_calculate_jo_and_grady_airsr( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_airsr(iv, re, jo, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates cost function and its gradient at all AIRS 
@@ -7,8 +7,8 @@ subroutine da_calculate_jo_and_grady_airsr( iv, re, jo, jo_grad_y)
 
    implicit none
 
-   type (ob_type), intent(in  ) :: iv         ! Innovation vector.
-   type (y_type),  intent(in  ) :: re         ! Residual vector.
+   type (ob_type), intent(in ) :: iv         ! Innovation vector.
+   type (y_type),  intent(in ) :: re         ! Residual vector.
    type (y_type),  intent(inout) :: jo_grad_y  ! Grad_y(Jo)
    type (jo_type), intent(inout) :: jo         ! Obs cost function.
 
@@ -26,10 +26,10 @@ subroutine da_calculate_jo_and_grady_airsr( iv, re, jo, jo_grad_y)
    do n=1, iv%num_airsr
       do k=1, iv%airsr(n)%info%levels
          jo_grad_y%airsr(n)%t(k) = -re%airsr(n)%t(k) / &
-                                    ( iv%airsr(n)%t(k)%error * &
+                                    (iv%airsr(n)%t(k)%error * &
                                       iv%airsr(n)%t(k)%error)
          jo_grad_y%airsr(n)%q(k) = -re%airsr(n)%q(k) / &
-                                    ( iv%airsr(n)%q(k)%error * &
+                                    (iv%airsr(n)%q(k)%error * &
                                       iv%airsr(n)%q(k)%error)
       end do
 

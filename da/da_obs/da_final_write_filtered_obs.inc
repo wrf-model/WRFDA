@@ -103,7 +103,7 @@ subroutine da_final_write_filtered_obs
                  platform%each (i)%rh
          end do
       end do reports                  !  Loop over reports              
-      close ( iunit )
+      close (iunit)
    end do !  Loop over all data files
 
    call da_free_unit (iunit)

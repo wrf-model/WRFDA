@@ -1,10 +1,10 @@
-subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y) 
+subroutine da_calculate_jo_and_grady_rad(iv, re, jo, jo_grad_y) 
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculate Gradient_y i and cost function Jo for radiance data.
+   ! Purpose: Calculate Gradient_y i and cost function Jo for radiance data.
    !
-   ! METHOD:  grad_y = -R^-1 ( d - H delta_x)
-   !              Jo = -( d - H delta_x) grad_y
+   ! METHOD:  grad_y = -R^-1 (d - H delta_x)
+   !              Jo = -(d - H delta_x) grad_y
    !---------------------------------------------------------------------------
 
    implicit none
@@ -20,7 +20,7 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y)
 
    if (trace_use) call da_trace_entry("da_calculate_jo_and_grady_rad")
 
-   allocate ( jo % rad(1:iv%num_inst))
+   allocate (jo % rad(1:iv%num_inst))
 
    do i =1, iv%num_inst
       allocate (jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
@@ -34,7 +34,7 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y)
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
-                                    ( iv%instid(i)%rad(n)%tb(k)%error * &
+                                    (iv%instid(i)%rad(n)%tb(k)%error * &
                                       iv%instid(i)%rad(n)%tb(k)%error)
          end do
          IF (iv%instid(i)%rad(n)%loc%proc_domain) THEN

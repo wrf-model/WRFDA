@@ -1,7 +1,7 @@
 subroutine da_scan_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Read the header of a GTS observation file
+   ! Purpose: Read the header of a GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none

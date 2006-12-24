@@ -1,7 +1,7 @@
 subroutine da_read_ssmi (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Read the header of a SSMI 2.0 GTS observation file
+   ! Purpose: Read the header of a SSMI 2.0 GTS observation file
    !---------------------------------------------------------------------------
 
    implicit none
@@ -446,7 +446,7 @@ end subroutine filter
    ! Permission is granted to all scientific users to utilize
    ! and/or test this set of algorithms without restriction, provided only
    ! that
-   !       (1) they are not used for commercial purposes without the
+   !       (1) they are not used for commercial Purposes without the
    !          author's permission
    ! 
    !       (2) the author is given due credit for their development

@@ -1,7 +1,7 @@
-subroutine da_check_balance( phi, phi_u)
+subroutine da_check_balance(phi, phi_u)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Compare balanced mass (phi_b - function of wind) and actual phi.
+   ! Purpose: Compare balanced mass (phi_b - function of wind) and actual phi.
    !
    ! METHOD:  Calculate correlation between balanced and actual phi.
    !---------------------------------------------------------------------------
@@ -62,14 +62,14 @@ subroutine da_check_balance( phi, phi_u)
 
          phi_b1(2:jx-1) = phi(i,2:jx-1,k) - phi_u(i,2:jx-1,k)
             
-         call da_correlation_coeff1d( phi_b1(2:jx-1), phi(i,2:jx-1,k), &
+         call da_correlation_coeff1d(phi_b1(2:jx-1), phi(i,2:jx-1,k), &
                                       corr_coeff(k,i), accuracy(k,i))
      
          ! write(58,*) corr_coeff(k,i), accuracy(k,i)
       end do
          
       phi_b2(2:iy-1,2:jx-1) = phi(2:iy-1,2:jx-1,k) - phi_u(2:iy-1,2:jx-1,k)
-      call da_correlation_coeff2d( phi_b2(2:iy-1,2:jx-1), &
+      call da_correlation_coeff2d(phi_b2(2:iy-1,2:jx-1), &
                                    phi(2:iy-1,2:jx-1,k), &
                                    corr_coef, accurac)
 

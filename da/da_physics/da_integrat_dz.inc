@@ -4,7 +4,7 @@ subroutine da_integrat_dz(xb)
    ! Non-linear PW forward operator.
    ! ===============================
    !
-   ! PURPOSE: To calculate the IWV from the model QV and PP, TT.
+   ! Purpose: To calculate the IWV from the model QV and PP, TT.
    !
    ! METHOD:  IWV = sum {QV * RHO * dZ}
    !

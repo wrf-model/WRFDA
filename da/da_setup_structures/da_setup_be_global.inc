@@ -1,7 +1,7 @@
 subroutine da_setup_be_global (ide, jde, kde, be)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Define and allocate components of background errors
+   ! Purpose: Define and allocate components of background errors
    !---------------------------------------------------------------------------
 
    implicit none

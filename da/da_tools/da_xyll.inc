@@ -1,14 +1,16 @@
 subroutine da_xyll(XX,YY,XLAT,XLON)
 
-   ! PURPOSE      : CALCULATES THE LATITUDES AND LONGITUDES FROM THE
-   !                  (X,Y) LOCATION (doT) in THE MESOSCALE GRIDS.
-   ! ON ENTRY     :   
-   ! X            : THE COORDinATE in X (J)-DIRECTION.
-   ! Y            : THE COORDinATE in Y (I)-DIRECTION.
+   !-----------------------------------------------------------------------
+   ! Purpose: calculates the latitudes and longitudes from the
+   !                  (x,y) location (dot) in the mesoscale grids.
+   ! on entry     :   
+   ! x            : the coordinate in x (j)-direction.
+   ! y            : the coordinate in y (i)-direction.
    !
-   ! ON exit      :                      
-   ! XLAT         : LATITUDES 
-   ! XLON         : LONGITUDES 
+   ! on exit      :                      
+   ! xlat         : latitudes 
+   ! xlon         : longitudes 
+   !-----------------------------------------------------------------------
 
    implicit none
 

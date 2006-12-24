@@ -1,5 +1,9 @@
 subroutine da_interp_obs_lin_2d(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type),     intent(in)  :: xp      ! Dimensions and xpose buffers.

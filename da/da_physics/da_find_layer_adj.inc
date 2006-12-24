@@ -1,7 +1,9 @@
 subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           ADJ_tv,ADJ_pre_ma,ADJ_tv_ma)
 
-   ! This is the adjoint routine for find_layer
+   !-----------------------------------------------------------------------
+   ! Purpose: adjoint routine for da_find_layer
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -16,7 +18,7 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
    real                      :: alpha, coef1, coef2
    real                      :: ADJ_alpha
 
-   if ( pre >= pre_ma(ks) ) then
+   if (pre >= pre_ma(ks)) then
 
       layer = ks
       coef1=log(pre/pre_ma(ks+1))/(pre_ma(ks)*     &
@@ -33,7 +35,7 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
       ADJ_pre_ma(ks)    = ADJ_pre_ma(ks) + coef1 * ADJ_alpha
       ADJ_pre_ma(ks+1)  = ADJ_pre_ma(ks+1) + coef2 * ADJ_alpha
 
-   else if (pre <= pre_ma(ke) ) then
+   else if (pre <= pre_ma(ke)) then
 
       layer = ke+1
       coef1=log(pre/pre_ma(ke))/(pre_ma(ke-1)*           &
@@ -53,7 +55,7 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
    else
 
       do k=ks,ke-1
-         if ( pre>=pre_ma(k+1) .and. pre<pre_ma(k) ) then
+         if (pre>=pre_ma(k+1) .and. pre<pre_ma(k)) then
             layer = k+1
             coef1=log(pre/pre_ma(k+1))/(pre_ma(k)*   &
                   (log(pre_ma(k)/pre_ma(k+1)))**2)

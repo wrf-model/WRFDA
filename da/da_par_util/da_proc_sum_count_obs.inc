@@ -1,7 +1,7 @@
 subroutine da_proc_sum_count_obs (count_obs)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI sum operation across processors to get the global sum of
+   !  Purpose: Do MPI sum operation across processors to get the global sum of
    !           count_obs. The sum is returned only on the root processor,
    !           i.e., processor 0. (In this way, we do not have to do all-to-all 
    !           communication.)

@@ -1,5 +1,9 @@
 subroutine da_radial_velocity_adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    real, intent(in)  :: x, y, z

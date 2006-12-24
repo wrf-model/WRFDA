@@ -1,6 +1,10 @@
 subroutine da_legtra_inv(jds, jde, jts, jte, max_wavenumber, alp_size, m, &
    alp, v, r_leg)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)  :: jds, jde            ! Number of latitudes.

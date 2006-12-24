@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_gpspw( oi, y, re,                        &
+subroutine da_calculate_residual_gpspw(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 

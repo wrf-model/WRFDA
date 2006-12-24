@@ -2,7 +2,7 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
                                nobs_min, nobs_max, klev_min, klev_max)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI reduction operations across processors to get the average, 
+   !  Purpose: Do MPI reduction operations across processors to get the average, 
    !           rms error, minimum, and maximum values for an observation field.
    !           These are stored only on the root processor, i.e., processor 0.
    !           (In this way, we do not have to do all-to-all communication.)

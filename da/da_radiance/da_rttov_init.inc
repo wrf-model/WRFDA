@@ -1,7 +1,7 @@
 #ifdef RTTOV
 subroutine da_rttov_init(iv,ob)
 !------------------------------------------------------------------------------
-!  PURPOSE: interface to the initialization subroutine of RTTOV8_5.
+!  Purpose: interface to the initialization subroutine of RTTOV8_5.
 !
 !  METHOD:  1. read RTTOV coefs files; 2. allocate radiance structure
 !

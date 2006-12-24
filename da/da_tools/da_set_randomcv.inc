@@ -1,7 +1,7 @@
 subroutine da_set_randomcv(cv_size, rcv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate components of control variable.
+   ! Purpose: Allocate components of control variable.
    !
    ! METHOD:  Allocate component in turn.
    !---------------------------------------------------------------------------

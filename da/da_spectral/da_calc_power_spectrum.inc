@@ -1,4 +1,8 @@
-subroutine da_calc_power_spectrum( max_wave, power)
+subroutine da_calc_power_spectrum(max_wave, power)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate power spectrum
+   !-----------------------------------------------------------------------
     
    implicit none
     
@@ -29,10 +33,10 @@ subroutine da_calc_power_spectrum( max_wave, power)
    !-----------------------------------------------------------------------------
 
    max_wave_nj = nj / 2 - 1
-   allocate( alp(1:nj,0:max_wave_nj))
-   allocate( power_nj(0:max_wave_nj))
+   allocate(alp(1:nj,0:max_wave_nj))
+   allocate(power_nj(0:max_wave_nj))
 
-   call da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
+   call da_get_gausslats(nj, glats, gwgts, sinlat, coslat)
    glats = glats + 0.5 * pi
 
    ! Get m=0 Associated Legendre Polynomials:
@@ -42,7 +46,7 @@ subroutine da_calc_power_spectrum( max_wave, power)
       if (real(int(0.5 * real(l))) /= 0.5 * l) odd = .true.
 
       do j = 1, nj
-         call da_asslegpol( l, 0, sinlat(j), coslat(j), alp(j,l))
+         call da_asslegpol(l, 0, sinlat(j), coslat(j), alp(j,l))
          ! Reverse order of alps to account for latitude/angle difference:
          if (odd) alp(j,l) = -alp(j,l)
       end do
@@ -60,12 +64,12 @@ subroutine da_calc_power_spectrum( max_wave, power)
       d(j) = glats(j) * corr_scale_inv
 
       if (alpha_corr_type == 1) then ! Exponential.
-         corr(j) = exp( -d(j))
+         corr(j) = exp(-d(j))
       else if (alpha_corr_type == 2) then ! SOAR
          d(j) = 2.0 * d(j)
-         corr(j) = ( 1.0 + d(j)) * exp( -d(j))
+         corr(j) = (1.0 + d(j)) * exp(-d(j))
       else if (alpha_corr_type == 3) then ! Gaussian
-         corr(j) = exp( -d(j) * d(j))
+         corr(j) = exp(-d(j) * d(j))
       end if
    end do
 
@@ -85,7 +89,7 @@ subroutine da_calc_power_spectrum( max_wave, power)
    power_nj(:) = 0.0
    do l = 0, max_wave_nj
       power_nj(l) = 0.5 * sqrt(2.0 * real(l) + 1.0) * &
-                    sum( gwgts(1:nj) * corr(1:nj) * alp(1:nj,l))
+                    sum(gwgts(1:nj) * corr(1:nj) * alp(1:nj,l))
 
       if (power_nj(l) < 0.0) power_nj(l) = 0.0
    end do
@@ -110,8 +114,8 @@ subroutine da_calc_power_spectrum( max_wave, power)
 
    ! Add compactly supported correlation from calc_globalspectral later?
 
-   deallocate( alp)
-   deallocate( power_nj)
+   deallocate(alp)
+   deallocate(power_nj)
 
 end subroutine da_calc_power_spectrum
 

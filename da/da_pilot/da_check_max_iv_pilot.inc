@@ -1,5 +1,9 @@
 subroutine da_check_max_iv_pilot(it, pilot, itu,ituf,itvv,itvvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it      ! Outer iteration

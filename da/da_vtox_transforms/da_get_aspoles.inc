@@ -4,7 +4,7 @@ subroutine da_get_aspoles(x,              &
           its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Treatment for Adjoint of Scalar field at Poles
+   ! Purpose: Treatment for Adjoint of Scalar field at Poles
    !---------------------------------------------------------------------------
 
    implicit none

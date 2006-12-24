@@ -4,7 +4,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
                                     its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Adjoint of da_balance_equation
+   ! Purpose: Adjoint of da_balance_equation
    !---------------------------------------------------------------------------
 
    implicit none

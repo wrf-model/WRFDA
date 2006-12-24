@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_pilot_adj(iv, xp, jo_grad_y, jo_grad_x)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).

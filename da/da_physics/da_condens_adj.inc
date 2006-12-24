@@ -3,7 +3,9 @@ subroutine da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
                    SCR319,SCR429,SCR719,DUM319,PRD9,  &
                    QVT9,QCT9,QRT9,TTT9,P_A,T_A,QV_A,QCW_A,QRN_A,kts,kte)
 
-   ! Condensation
+   !-----------------------------------------------------------------------
+   ! Purpose: Condensation
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -53,7 +55,7 @@ subroutine da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
                  (SCR71(K)*SCR71(K)))
 
          DUM115(K)=SCR31(K)+SCR8(K)
-         if(DUM115(K) >= 0.)then
+         if (DUM115(K) >= 0.)then
             SCR61(K)=SCR8(K)/DT(k)
          else
             SCR61(K)=-SCR31(K)/DT(k)

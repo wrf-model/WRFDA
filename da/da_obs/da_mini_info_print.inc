@@ -1,5 +1,9 @@
 subroutine da_mini_info_print(print_unit, oi_each, re_each, gr_each, k)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (each_level_type), intent(in) :: oi_each

@@ -2,7 +2,7 @@ subroutine da_add_flow_dependence_vp_adj (ne, ep, vp, &
                                           its,ite, jts,jte, kts,kte)
 
    !-----------------------------------------------------------------------
-   ! Purpose : Add flow-dependent increments in control variable space (vp).
+   ! Purpose: Add flow-dependent increments in control variable space (vp).
    !-----------------------------------------------------------------------
                                       
    implicit none

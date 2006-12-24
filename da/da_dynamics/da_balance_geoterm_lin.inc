@@ -3,7 +3,7 @@ subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
                                    its,ite, jts,jte )
 
    !---------------------------------------------------------------------------
-   !  purpose: calculates linearised geostrophic term in balance equation.
+   !  Purpose: calculates linearised geostrophic term in balance equation.
    !
    !  method:  term is k x rho f u on a single level.
    !

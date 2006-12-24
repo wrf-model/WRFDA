@@ -1,7 +1,7 @@
 subroutine da_setup_runconstants(xp, xb, xbx)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Define constants used.
+   !  Purpose: Define constants used.
    !---------------------------------------------------------------------------
 
    implicit none

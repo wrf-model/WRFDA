@@ -2,6 +2,10 @@ subroutine da_interp_lin_3d_adj(fm3d, xp, &
                              i, j, dx, dy, dxm, dym, &
                              fo3d, ml, zk, nl)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type),      intent(in)    :: xp  ! Dimensions and xpose buffers.

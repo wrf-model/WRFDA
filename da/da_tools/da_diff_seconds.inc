@@ -1,5 +1,9 @@
 real function da_diff_seconds(date_char_1, date_char_2)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    character(len=24), intent(in) :: date_char_1, date_char_2

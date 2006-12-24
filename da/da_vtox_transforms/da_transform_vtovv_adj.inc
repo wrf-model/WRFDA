@@ -3,6 +3,10 @@ subroutine da_transform_vtovv_adj(cv_size, xb, be, cv, vv, xp, &
                                       ims,ime, jms,jme, kms,kme,  &
                                       its,ite, jts,jte, kts,kte)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)              :: cv_size ! Size of cv array.

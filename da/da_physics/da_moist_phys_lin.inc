@@ -4,7 +4,7 @@ subroutine da_moist_phys_lin(xb, xa, xp,  &
                 its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Partition of the hydrometeors via the moist explicit scheme.
+   !  Purpose: Partition of the hydrometeors via the moist explicit scheme.
    !           A warm rain process is used in this subroutine.
    !           This is the tangent linear code of the scheme.
    !

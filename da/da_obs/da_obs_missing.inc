@@ -1,5 +1,9 @@
 subroutine da_obs_missing (obs, miss)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(multi_level_type),    intent(inout) :: obs

@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_ships( oi, y, re,                        &
+subroutine da_calculate_residual_ships(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for ship obs
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -24,15 +28,15 @@ subroutine da_calculate_residual_ships( oi, y, re,                        &
       do n=1, oi%num_ships
          np_available = np_available + 5
 
-         re%ships(n)%u = da_residual( n, 0, y%ships(n)%u, &
+         re%ships(n)%u = da_residual(n, 0, y%ships(n)%u, &
                                       oi%ships(n)%u, n_obs_bad % u)
-         re%ships(n)%v = da_residual( n, 0, y%ships(n)%v, &
+         re%ships(n)%v = da_residual(n, 0, y%ships(n)%v, &
                                    oi%ships(n)%v, n_obs_bad % v)
-         re%ships(n)%t = da_residual( n, 0, y%ships(n)%t, &
+         re%ships(n)%t = da_residual(n, 0, y%ships(n)%t, &
                                    oi%ships(n)%t, n_obs_bad % t)
-         re%ships(n)%p = da_residual( n, 0, y%ships(n)%p, &
+         re%ships(n)%p = da_residual(n, 0, y%ships(n)%p, &
                                    oi%ships(n)%p, n_obs_bad % p)
-         re%ships(n)%q = da_residual( n, 0, y%ships(n)%q, &
+         re%ships(n)%q = da_residual(n, 0, y%ships(n)%q, &
                                    oi%ships(n)%q, n_obs_bad % q)
       end do
 

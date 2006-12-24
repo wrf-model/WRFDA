@@ -1,5 +1,9 @@
 subroutine da_get_jo_and_grady_profiler( iv, re, jo, jo_grad_y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(ob_type), intent(in)   :: iv          ! Innovation vector.

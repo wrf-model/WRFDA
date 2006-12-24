@@ -1,7 +1,7 @@
 subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
 
-   !---------------------------------------------------------------------
-   ! This subroutine is to calculate the Doppler radial velocity and 
+   !-----------------------------------------------------------------------
+   ! Purpose: calculate the Doppler radial velocity and 
    ! reflectivity at the observation location from the first guess.
    ! It is linearized. 
    !---------------------------------------------------------------------

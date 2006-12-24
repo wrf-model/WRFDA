@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_metar (xa, xb, iv, xp, y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.

@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_pilot( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_pilot(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -17,10 +21,10 @@ subroutine da_calculate_jo_and_grady_pilot( iv, re, jo, jo_grad_y)
       do n=1, iv%num_pilot
          do k=1, iv%pilot(n)%info%levels
             jo_grad_y%pilot(n)%u(k) = -re%pilot(n)%u(k) / &
-                                    ( iv%pilot(n)%u(k)%error * &
+                                    (iv%pilot(n)%u(k)%error * &
                                       iv%pilot(n)%u(k)%error)
             jo_grad_y%pilot(n)%v(k) = -re%pilot(n)%v(k) / &
-                                    ( iv%pilot(n)%v(k)%error * &
+                                    (iv%pilot(n)%v(k)%error * &
                                       iv%pilot(n)%v(k)%error)
          end do
 

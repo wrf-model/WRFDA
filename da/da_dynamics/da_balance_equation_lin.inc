@@ -4,7 +4,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
                                     its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculates balanced mass increment phi_b from wind increments.
+   !  Purpose: Calculates balanced mass increment phi_b from wind increments.
    !
    !  METHOD:  Solve grad**2 Phi_b = - div[ k x rho f u + rho (u.grad ) u ] by
    !           1) Calculate RHS of balance equation in gridpt space.

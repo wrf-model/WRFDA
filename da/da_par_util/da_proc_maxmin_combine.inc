@@ -1,7 +1,7 @@
 subroutine da_proc_maxmin_combine(n, max, min)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Do MPI reduction operations across processors to get the minimum
+   !  Purpose: Do MPI reduction operations across processors to get the minimum
    !           and maximum values for an observation field of length n. The
    !           i, j location of the minimum and maximum, for each n, is also
    !           communicated.

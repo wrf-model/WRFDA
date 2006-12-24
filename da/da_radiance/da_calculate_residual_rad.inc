@@ -1,4 +1,4 @@
-subroutine da_calculate_residual_rad( iv, y, re,                 &
+subroutine da_calculate_residual_rad(iv, y, re,                 &
                                         np_missing, np_bad_data, &
                                         np_obs_used, np_available)
 
@@ -33,7 +33,7 @@ subroutine da_calculate_residual_rad( iv, y, re,                 &
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             np_available = np_available + iv%instid(i)%nchan
-            re%instid(i)%rad(n)%tb(k) = da_residual( n, k, &
+            re%instid(i)%rad(n)%tb(k) = da_residual(n, k, &
                y%instid(i)%rad(n)%tb(k), &
                iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad)
          end do

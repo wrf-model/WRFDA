@@ -1,5 +1,9 @@
 subroutine da_oi_stats_ssmi_rv(stats_unit, oi)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.

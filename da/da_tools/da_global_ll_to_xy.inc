@@ -1,7 +1,7 @@
 subroutine da_global_ll_to_xy(lat,lon,x,y)
 
    !----------------------------------------------------------------------------
-   ! PURPOSE:  calculates the(x,y) location(dot) in the global grids
+   ! Purpose:  calculates the(x,y) location(dot) in the global grids
    !           from latitudes and longitudes
    !----------------------------------------------------------------------------
    

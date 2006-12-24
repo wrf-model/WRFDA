@@ -4,7 +4,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
                                its,ite, jts,jte, kts,kte)
 
    !-----------------------------------------------------------------------
-   ! Purpose : Physical transform of analysis increment variables.
+   ! Purpose: Physical transform of analysis increment variables.
    !-----------------------------------------------------------------------
 
    implicit none

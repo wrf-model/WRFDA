@@ -1,5 +1,9 @@
 subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    real, intent(in)          :: p        ! Observed pressure.

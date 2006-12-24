@@ -1,5 +1,9 @@
 subroutine da_obs_diagnostics(num_sound, ob, iv, re)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                    intent(in) :: num_sound

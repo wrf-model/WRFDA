@@ -1,33 +1,32 @@
 subroutine da_wdt(H,W,TERR,DT,kts,kte)
 
-   !  Calculate DT
+   !----------------------------------------------------------------------
+   ! Purpose: Calculate DT
+   !----------------------------------------------------------------------
 
    implicit none
 
-   integer,intent(in)                      :: kts, kte
-   real, dimension(kts:kte),intent(in)     :: H
-   real, dimension(kts:kte),intent(out)  :: DT
-   real, dimension(kts:kte+1),intent(in)   :: W
-   real,intent(in)                         :: TERR
+   integer,intent(in)                    :: kts, kte
+   real, dimension(kts:kte),intent(in)   :: h
+   real, dimension(kts:kte),intent(out)  :: dt
+   real, dimension(kts:kte+1),intent(in) :: w
+   real,intent(in)                       :: terr
 
    integer                     :: k
 
    do k=kte,kts+1,-1
-
-      if (W(k) >= 0.1) then
-         DT(k)=(H(k)-H(k-1))/W(k)
+      if (w(k) >= 0.1) then
+         dt(k)=(h(k)-h(k-1))/w(k)
       else
-         DT(k)=0.
+         dt(k)=0.
       end if
-
    end do
 
-   if (W(kts) >= 0.1) then
-      DT(kts)=(H(kts)-TERR)/W(kts)
+   if (w(kts) >= 0.1) then
+      dt(kts)=(h(kts)-terr)/w(kts)
    else
-      DT(kts)=0.
+      dt(kts)=0.0
    end if
-
 
 end subroutine da_wdt
 

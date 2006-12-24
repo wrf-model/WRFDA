@@ -73,7 +73,7 @@ subroutine da_count_filtered_obs(&
 file_number: do files = 0, num_procs-1
    write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.',files  
    open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
-   if(iost /= 0) &
+   if (iost /= 0) &
    call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
 !  LOOP OVER RECORDS
@@ -136,57 +136,57 @@ loop_level: do i = 1, platform%info%levels
 
       end do loop_level
 
-      if( platform%info%levels < 1) then
-         if ( fm /= 111 ) then
+      if (platform%info%levels < 1) then
+         if (fm /= 111) then
             cycle reports
          end if
       end if
       select case(fm)
 
-!        if(index(platform%info%source, 'SYNOP') > 0) then
+!        if (index(platform%info%source, 'SYNOP') > 0) then
 
          case (12) ;
 
-            if(.not.use_SynopObs) cycle reports
+            if (.not.use_SynopObs) cycle reports
             num_synop = num_synop + 1
 
-!        else if(index(platform%info%source, 'SHIP') > 0 .or. &
+!        else if (index(platform%info%source, 'SHIP') > 0 .or. &
 !                index(platform%info%source, 'BOUY') > 0) then
 
          case (13, 17) ;                  ! ships          
 
-            if(.not.use_ShipsObs) cycle reports
+            if (.not.use_ShipsObs) cycle reports
             num_ships  = num_ships  + 1
 
-!        else if(index(platform%info%source, 'METAR') > 0) then
+!        else if (index(platform%info%source, 'METAR') > 0) then
 
          case (15:16) ;
 
-            if(.not.use_MetarObs) cycle reports
+            if (.not.use_MetarObs) cycle reports
             num_metar = num_metar + 1
 
-!        else if(index(platform%info%source, 'PILOT') > 0) then
+!        else if (index(platform%info%source, 'PILOT') > 0) then
 
          case (32:34) ;
 
-            if(.not.use_PilotObs) cycle reports
+            if (.not.use_PilotObs) cycle reports
             num_pilot = num_pilot + 1
 
-!        else if(index(platform%info%source, 'FM-35 TEMP') > 0) then
+!        else if (index(platform%info%source, 'FM-35 TEMP') > 0) then
 
          case (35:38) ;
-            if(.not.use_SoundObs) cycle reports
+            if (.not.use_SoundObs) cycle reports
             num_sound = num_sound + 1
 
-!        else if(index(platform%info%source, 'SATEM') > 0) then
+!        else if (index(platform%info%source, 'SATEM') > 0) then
 
          case (86) ;
 
-            if(.not.use_SatemObs) cycle reports
+            if (.not.use_SatemObs) cycle reports
 
 !-----------Reject cloudy Satem obs.
  
-            if(platform%loc%pw%inv > 10.) then
+            if (platform%loc%pw%inv > 10.) then
                cycle reports
             end if
 
@@ -197,72 +197,72 @@ loop_level: do i = 1, platform%info%levels
 
          case (88)    ;
 
-      if(index(platform%info%name, 'MODIS') > 0 .or. &
-         index(platform%info%name, 'modis') > 0 )  then
-         if(.not.use_PolarAMVObs) cycle reports
+      if (index(platform%info%name, 'MODIS') > 0 .or. &
+         index(platform%info%name, 'modis') > 0)  then
+         if (.not.use_PolarAMVObs) cycle reports
          num_polaramv = num_polaramv + 1
       else
-         if(.not.use_GeoAMVObs) cycle reports 
+         if (.not.use_GeoAMVObs) cycle reports 
          num_geoamv = num_geoamv + 1
       end if
 
-!        else if(index(platform%info%source, 'AIREP') > 0) then
+!        else if (index(platform%info%source, 'AIREP') > 0) then
 
          case (42,96:97) ;
 
-            if(.not.use_AirepObs) cycle reports
+            if (.not.use_AirepObs) cycle reports
             num_airep = num_airep + 1
 
-!        else if(index(platform%info%source, 'GPSPW') > 0) then
+!        else if (index(platform%info%source, 'GPSPW') > 0) then
 
          case (111) ;
          
-            if(.not.use_GpspwObs) cycle reports
+            if (.not.use_GpspwObs) cycle reports
             num_gpspw = num_gpspw + 1
 
-!        else if(index(platform%info%source, 'GPSRF') > 0) then
+!        else if (index(platform%info%source, 'GPSRF') > 0) then
 
          case (116) ;
          
-            if(.not.use_GpsrefObs) cycle reports
+            if (.not.use_GpsrefObs) cycle reports
             num_gpsref = num_gpsref + 1
 
 !        SSM/T1 temperatures:
          case (121) ;
 
-            if(.not.use_ssmt1obs) cycle reports
+            if (.not.use_ssmt1obs) cycle reports
             num_ssmt1 = num_ssmt1 + 1
 
 !        SSM/T2 relative humidities:
          case (122) ;
 
-            if(.not.use_ssmt2obs) cycle reports
+            if (.not.use_ssmt2obs) cycle reports
             num_ssmt2 = num_ssmt2 + 1
 
 !        Scatterometer:
 
          case (281)    ;
 
-            if(.not.use_qscatobs) cycle reports
+            if (.not.use_qscatobs) cycle reports
             num_qscat  = num_qscat  + 1
 
          case (132) ;
 
-            if(.not.use_ProfilerObs) cycle reports
+            if (.not.use_ProfilerObs) cycle reports
             num_profiler = num_profiler + 1
 
          case (135) ;
 
-            if(.not.use_BogusObs) cycle reports
+            if (.not.use_BogusObs) cycle reports
             num_bogus = num_bogus + 1
 
          case (18,19) ;             ! bouy
 
-            if(.not.use_BuoyObs) cycle reports
+            if (.not.use_BuoyObs) cycle reports
             num_buoy  = num_buoy  + 1
 
          case (133) ;      !  AIRS retrievals
-            if(.not.use_AIRSRETObs) cycle reports
+            if (.not.use_AIRSRETObs) cycle reports
             num_airsr = num_airsr + 1
 
          case default;
@@ -280,7 +280,7 @@ loop_level: do i = 1, platform%info%levels
 
       end select
    end do reports                  !  Loop over reports              
-   close ( iunit )
+   close (iunit)
    end do file_number              !  Loop over all data files
    call da_free_unit (iunit)
 !-------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ loop_level: do i = 1, platform%info%levels
 
 ! Write other counts       
 ! -------------------
-      write  (unit = filtered_obs_unit, fmt = '(6(A,I7,A))' )    &
+      write  (unit = filtered_obs_unit, fmt = '(6(A,I7,A))')    &
       "SYNOP =",num_synop,", ", &
       "METAR =",num_metar,", ", &
       "SHIP  =",num_ships,", ", &
@@ -333,7 +333,7 @@ loop_level: do i = 1, platform%info%levels
 !  Hard wire Following variabless
       maxnes = 1 ; numc = 1 ;  idd = 1
       nesti = 1 ; nestj = 1
-        write (unit = filtered_obs_unit, fmt = '(5(A,I7),A)' ) &
+        write (unit = filtered_obs_unit, fmt = '(5(A,I7),A)') &
         "IXC   =", ide   ,", JXC   =", jde   ,", IPROJ =", map,&
         ", IDD   =", idd,", MAXNES=",maxnes,","
         write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
@@ -353,19 +353,19 @@ loop_level: do i = 1, platform%info%levels
 ! Write Variable names and Unit
 ! -------------------------------
 
-       write (unit = filtered_obs_unit, fmt = '(A)' ) &
+       write (unit = filtered_obs_unit, fmt = '(A)') &
       "inFO  = PLATFORM, DATE, NAME, LEVELS, LATITUDE, LONGITUDE, ELEVATION, ID."
-       write (unit = filtered_obs_unit, fmt = '(A)' ) &
+       write (unit = filtered_obs_unit, fmt = '(A)') &
       "SRFC  = SLP, PW (DATA,QC,ERROR)."
-       write (unit = filtered_obs_unit, fmt = '(A)' ) &
+       write (unit = filtered_obs_unit, fmt = '(A)') &
       "EACH  = PRES, SPEED, DIR, HEIGHT, TEMP, DEW PT, HUMID (DATA,QC,ERROR)*LEVELS."
 
 ! Write Format Info
 ! ------------------
 
-      write (unit = filtered_obs_unit, fmt = '(2A)' ) 'inFO_fmt = ', trim (fmt_info)
-      write (unit = filtered_obs_unit, fmt = '(2A)' ) 'SRFC_fmt = ', trim (fmt_srfc)
-      write (unit = filtered_obs_unit, fmt = '(2A)' ) 'EACH_fmt = ', trim (fmt_each)
+      write (unit = filtered_obs_unit, fmt = '(2A)') 'inFO_fmt = ', trim (fmt_info)
+      write (unit = filtered_obs_unit, fmt = '(2A)') 'SRFC_fmt = ', trim (fmt_srfc)
+      write (unit = filtered_obs_unit, fmt = '(2A)') 'EACH_fmt = ', trim (fmt_each)
 
 ! Write End of header record
 ! ---------------------------

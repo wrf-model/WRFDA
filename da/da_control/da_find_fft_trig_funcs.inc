@@ -1,7 +1,7 @@
-subroutine da_find_fft_trig_funcs( n, trig_functs )
+subroutine da_find_fft_trig_funcs(n, trig_functs)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Set up constants required for Fourier, sine and cosine transforms
+   ! Purpose: Set up constants required for Fourier, sine and cosine transforms
    !---------------------------------------------------------------------------
 
    implicit none

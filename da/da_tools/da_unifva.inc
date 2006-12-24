@@ -1,15 +1,15 @@
 real function da_unifva (kdum) 
 
    !--------------------------------------------------------------------
-   !  PURPOSE : Minimal random number generator of Park and Miller with 
-   !  Bays-Durham shuffle and added safeguards.
-   !  Returns a uniform random deviate between 0.0. and 1.0 (exclusive 
-   !  of the endpoint values). Call with kdum a negative integer to 
-   !  initialize; thereafter, do not alter kdum between successive 
-   !  deviates in sequence. rnmx should approximate the largest 
-   !  floating value less than 1. 
+   ! Purpose: Minimal random number generator of Park and Miller with 
+   ! Bays-Durham shuffle and added safeguards.
+   ! Returns a uniform random deviate between 0.0. and 1.0 (exclusive 
+   ! of the endpoint values). Call with kdum a negative integer to 
+   ! initialize; thereafter, do not alter kdum between successive 
+   ! deviates in sequence. rnmx should approximate the largest 
+   ! floating value less than 1. 
    !
-   !  See descripiton of function 'ran1', pg. 271.
+   ! See descripiton of function 'ran1', pg. 271.
    !--------------------------------------------------------------------
  
    implicit none

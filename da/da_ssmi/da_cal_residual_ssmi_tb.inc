@@ -1,6 +1,10 @@
-subroutine da_cal_residual_ssmi_tb( oi, y, re, &
+subroutine da_cal_residual_ssmi_tb(oi, y, re, &
                                           np_missing, np_bad_data, &
-                                          np_obs_used, np_available )
+                                          np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,19 +25,19 @@ subroutine da_cal_residual_ssmi_tb( oi, y, re, &
       np_available = np_available + 7
 
       re%ssmi_tb(n)%tb19v = da_residual(n, 0, y%ssmi_tb(n)%tb19v, &
-                            oi%ssmi_tb(n)%tb19v, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb19v, n_obs_bad % t)
       re%ssmi_tb(n)%tb19h = da_residual(n, 0, y%ssmi_tb(n)%tb19h, &
-                            oi%ssmi_tb(n)%tb19h, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb19h, n_obs_bad % t)
       re%ssmi_tb(n)%tb22v = da_residual(n, 0, y%ssmi_tb(n)%tb22v, &
-                            oi%ssmi_tb(n)%tb22v, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb22v, n_obs_bad % t)
       re%ssmi_tb(n)%tb37v = da_residual(n, 0, y%ssmi_tb(n)%tb37v, &
-                            oi%ssmi_tb(n)%tb37v, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb37v, n_obs_bad % t)
       re%ssmi_tb(n)%tb37h = da_residual(n, 0, y%ssmi_tb(n)%tb37h, &
-                            oi%ssmi_tb(n)%tb37h, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb37h, n_obs_bad % t)
       re%ssmi_tb(n)%tb85v = da_residual(n, 0, y%ssmi_tb(n)%tb85v, &
-                            oi%ssmi_tb(n)%tb85v, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb85v, n_obs_bad % t)
       re%ssmi_tb(n)%tb85h = da_residual(n, 0, y%ssmi_tb(n)%tb85h, &
-                            oi%ssmi_tb(n)%tb85h, n_obs_bad % t )
+                            oi%ssmi_tb(n)%tb85h, n_obs_bad % t)
    end do
 
    np_missing  = np_missing  + n_obs_bad % t % num % miss  

@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_sonde_sfc (xa, xb, iv, xp, y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (x_type),     intent(inoUT) :: xa       ! gridded analysis increment.

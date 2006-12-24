@@ -1,7 +1,9 @@
 subroutine da_togrid_new (x, ib, ie, i, dx, dxm)
-   
-   ! Transfer obs. x to grid i and calculate its
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Transfer obs. x to grid i and calculate its
    ! distance to grid i and i+1
+   !-----------------------------------------------------------------------
 
    implicit none
 

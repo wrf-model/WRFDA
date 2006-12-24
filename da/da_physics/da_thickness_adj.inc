@@ -1,7 +1,9 @@
 subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,   &
                          ADJ_pre_ma,ADJ_tv_ma,ADJ_tv1,ADJ_tv2,ADJ_thk)
 
-   ! This is the adjoint routine for thickness
+   !-----------------------------------------------------------------------
+   ! Purpose: adjoint routine for thickness
+   !-----------------------------------------------------------------------
 
    implicit none
 

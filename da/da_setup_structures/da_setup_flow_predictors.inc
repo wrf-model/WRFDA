@@ -1,7 +1,7 @@
 subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
 
    !------------------------------------------------------------------------------
-   ! PURPOSE: Setup structures for flow-dependent information and read it in.
+   ! Purpose: Setup structures for flow-dependent information and read it in.
    !------------------------------------------------------------------------------
 
    implicit none

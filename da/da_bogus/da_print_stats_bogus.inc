@@ -1,5 +1,9 @@
 subroutine da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, Bogus)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                 intent(in)       :: stats_unit

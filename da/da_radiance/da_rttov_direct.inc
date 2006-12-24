@@ -5,7 +5,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
                           tb, calcemis_out, emisv, emish, emissivity_out)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: interface to the forward subroutine of RTTOV8_5
+   !  Purpose: interface to the forward subroutine of RTTOV8_5
    !---------------------------------------------------------------------------
 
    implicit none

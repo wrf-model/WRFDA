@@ -1,7 +1,9 @@
 subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                           TGL_tv,TGL_pre_ma,TGL_tv_ma)
 
-   !  This is the tangent-linear routine for find_layer
+   !-----------------------------------------------------------------------
+   ! Purpose: tangent-linear routine for da_find_layer
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,7 +23,7 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    ! coef1, coef2 are temporarily used in this routine
 
-   if ( pre >= pre_ma(ks) ) then
+   if (pre >= pre_ma(ks)) then
 
       ! Below model bottom
       layer = ks
@@ -39,7 +41,7 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
       tv = tv_ma(ks) * (1.-alpha) + tv_ma(ks+1) * alpha
       pre_ma(ks-1) = pre
 
-   else if (pre <= pre_ma(ke) ) then
+   else if (pre <= pre_ma(ke)) then
 
       ! Above model top
       layer = ke+1
@@ -61,7 +63,7 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
       ! Between model layers
       do k=ks,ke-1
-         if ( pre>=pre_ma(k+1) .and. pre<pre_ma(k) ) then
+         if (pre>=pre_ma(k+1) .and. pre<pre_ma(k)) then
             layer = k+1
             coef1=log(pre/pre_ma(k+1))/(pre_ma(k)*   &
                   (log(pre_ma(k)/pre_ma(k+1)))**2)

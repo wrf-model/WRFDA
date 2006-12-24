@@ -3,7 +3,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
                       aux_vars, con_vars_ad, tb)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: interface to the adjoint subroutine of RTTOV8_5
+   ! Purpose: interface to the adjoint subroutine of RTTOV8_5
    !---------------------------------------------------------------------------
 
    implicit none

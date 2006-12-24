@@ -1,7 +1,7 @@
 subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculate time slots for FGAT option.!
+   ! Purpose: Calculate time slots for FGAT option.!
    !---------------------------------------------------------------------------
 
    implicit none

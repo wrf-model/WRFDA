@@ -1,6 +1,10 @@
 subroutine da_ll_to_xy (info, loc, xp, &
                         outside, outside_all)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    ! This routine converts (lat, lon) into (x,y) coordinates
 
    implicit none

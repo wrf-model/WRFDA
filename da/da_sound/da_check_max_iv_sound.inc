@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_sound(it, sound,  &
                 itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it      ! Outer iteration

@@ -1,6 +1,8 @@
 subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
 
-   ! Auto-conversion
+   !-----------------------------------------------------------------------
+   ! Purpose: Auto-conversion
+   !-----------------------------------------------------------------------
 
    implicit none
 

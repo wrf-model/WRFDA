@@ -1,7 +1,7 @@
 subroutine da_get_julian_time(year,month,day,hour,minute,gstime)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculate Julian time from year/month/day/hour/minute.
+   ! Purpose: Calculate Julian time from year/month/day/hour/minute.
    !---------------------------------------------------------------------------
 
    implicit none

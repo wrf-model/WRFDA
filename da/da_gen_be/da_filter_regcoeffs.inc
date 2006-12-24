@@ -1,5 +1,9 @@
-subroutine da_filter_regcoeffs( ni, nj, nk, num_bins, num_bins2d, num_passes, rf_scale, bin, &
-                                regcoeff1, regcoeff2, regcoeff3 )
+subroutine da_filter_regcoeffs(ni, nj, nk, num_bins, num_bins2d, num_passes, rf_scale, bin, &
+                                regcoeff1, regcoeff2, regcoeff3)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -30,7 +34,7 @@ subroutine da_filter_regcoeffs( ni, nj, nk, num_bins, num_bins2d, num_passes, rf
          end do
       end do
 
-      call da_perform_2drf( ni, nj, num_passes, rf_scale, field )
+      call da_perform_2drf(ni, nj, num_passes, rf_scale, field)
 
       do j = 1, nj
          do i = 1, ni

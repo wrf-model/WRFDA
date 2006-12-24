@@ -2,6 +2,10 @@ subroutine da_make_large(sub_header_small, sub_header_large, &
                       data_small, iy, jx, iy_large, jx_large, &
                       lliy, lljx, output_unit)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (sub_record_header),         intent(inout) :: sub_header_large, &

@@ -1,5 +1,9 @@
 subroutine da_perform_2drf(ni, nj, num_passes, rf_scale, field)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)   :: ni               ! Array dimension 1.

@@ -1,9 +1,12 @@
 subroutine da_system_4dvar(cmd_line_in)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
    ! Not sure if this should go here, but here it goes for now.
    ! This is a wrapper around the "system" call.  Will compile
    ! to just system for single processor. On DM_PARALLEL compiles,
    ! it will call system only on the 0th processor.
+   !-----------------------------------------------------------------------
 
    implicit none
 

@@ -1,4 +1,8 @@
-subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
+subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
+
+   !----------------------------------------------------------------------
+   ! Purpose: Write analysis increments
+   !----------------------------------------------------------------------
 
    implicit none
 
@@ -38,114 +42,114 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
  
    ! 3-d and 2-d increments:
 
-   allocate (    p_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (    t_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (    q_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (    u_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (    v_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (    w_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate (   ph_global (1:ix+1,1:jy+1,1:kz+1) )
-   allocate ( psfc_global (1:ix+1,1:jy+1) )
-   allocate (   mu_global (1:ix+1,1:jy+1) )
-   call da_local_to_global( xp, xa % p, gbuf, 3 ) 
-   if ( rootproc ) then 
+   allocate (   p_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (   t_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (   q_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (   u_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (   v_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (   w_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (  ph_global (1:ix+1,1:jy+1,1:kz+1))
+   allocate (psfc_global (1:ix+1,1:jy+1))
+   allocate (  mu_global (1:ix+1,1:jy+1))
+   call da_local_to_global(xp, xa % p, gbuf, 3) 
+   if (rootproc) then 
       p_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global( xp, xa % t, gbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xa % t, gbuf, 3) 
+   if (rootproc) then 
       t_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global( xp, q_cgrid, gbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, q_cgrid, gbuf, 3) 
+   if (rootproc) then 
       q_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global( xp, xa % u, gbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xa % u, gbuf, 3) 
+   if (rootproc) then 
       u_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global( xp, xa % v, gbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xa % v, gbuf, 3) 
+   if (rootproc) then 
       v_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if
 
    ! One more level for w and ph:
    xp%kde = xp%kde+1
-   call da_local_to_global( xp, xa % w, wgbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xa % w, wgbuf, 3) 
+   if (rootproc) then 
       w_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
    end if 
-   call da_local_to_global( xp, ph_cgrid, wgbuf, 3 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, ph_cgrid, wgbuf, 3) 
+   if (rootproc) then 
       ph_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
    end if 
    xp%kde = xp%kde-1
  
-   call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xa % psfc, gbuf_2d, 2) 
+   if (rootproc) then 
       psfc_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
-   call da_local_to_global( xp, mu_cgrid, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, mu_cgrid, gbuf_2d, 2) 
+   if (rootproc) then 
       mu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
 
    ! 2d constant fields:
 
-   allocate (       psac_global (1:ix+1,1:jy+1) )
-   allocate (       tgrn_global (1:ix+1,1:jy+1) )
-   allocate (       terr_global (1:ix+1,1:jy+1) )
-   allocate (       snow_global (1:ix+1,1:jy+1) )
-   allocate (        lat_global (1:ix+1,1:jy+1) )
-   allocate (        lon_global (1:ix+1,1:jy+1) )
-   allocate (       lanu_global (1:ix+1,1:jy+1) )
-   allocate ( map_factor_global (1:ix+1,1:jy+1) )
-   allocate (       cori_global (1:ix+1,1:jy+1) )
-   allocate (   landmask_global (1:ix+1,1:jy+1) )
+   allocate (      psac_global (1:ix+1,1:jy+1))
+   allocate (      tgrn_global (1:ix+1,1:jy+1))
+   allocate (      terr_global (1:ix+1,1:jy+1))
+   allocate (      snow_global (1:ix+1,1:jy+1))
+   allocate (       lat_global (1:ix+1,1:jy+1))
+   allocate (       lon_global (1:ix+1,1:jy+1))
+   allocate (      lanu_global (1:ix+1,1:jy+1))
+   allocate (map_factor_global (1:ix+1,1:jy+1))
+   allocate (      cori_global (1:ix+1,1:jy+1))
+   allocate (  landmask_global (1:ix+1,1:jy+1))
 
-   call da_local_to_global( xp, xb%psac, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%psac, gbuf_2d, 2) 
+   if (rootproc) then 
       psac_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%tgrn, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%tgrn, gbuf_2d, 2) 
+   if (rootproc) then 
       tgrn_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%terr, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%terr, gbuf_2d, 2) 
+   if (rootproc) then 
       terr_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%snow, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%snow, gbuf_2d, 2) 
+   if (rootproc) then 
       snow_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%lat , gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%lat , gbuf_2d, 2) 
+   if (rootproc) then 
       lat_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%lon , gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%lon , gbuf_2d, 2) 
+   if (rootproc) then 
       lon_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%lanu, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%lanu, gbuf_2d, 2) 
+   if (rootproc) then 
       lanu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%map_factor, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%map_factor, gbuf_2d, 2) 
+   if (rootproc) then 
       map_factor_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global( xp, xb%cori, gbuf_2dd, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%cori, gbuf_2dd, 2) 
+   if (rootproc) then 
       cori_global(1:ix+1,1:jy+1) = gbuf_2dd(1:ix+1,1:jy+1) 
    end if
-   call da_local_to_global( xp, xb%landmask, gbuf_2d, 2 ) 
-   if ( rootproc ) then 
+   call da_local_to_global(xp, xb%landmask, gbuf_2d, 2) 
+   if (rootproc) then 
       landmask_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
 
-#endif
+#end if
 
-   if ( rootproc ) then
+   if (rootproc) then
       call da_get_unit(anl_inc_unit)
       open(unit=anl_inc_unit, file='ANALYSIS_INCREMENT', form='unformatted')
 
@@ -200,7 +204,7 @@ subroutine da_write_increments ( xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid )
                     xb%landmask(1:ix+1,1:jy+1)
       close(anl_inc_unit)
       call da_free_unit(anl_inc_unit)
-#endif
+#end if
 
    end if
 

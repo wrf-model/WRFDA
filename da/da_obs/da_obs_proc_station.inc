@@ -1,10 +1,12 @@
 subroutine da_obs_proc_station(obs)
 
-   ! Processing obs data read in at a station: 
+   !-----------------------------------------------------------------------
+   ! Purpose: Processing obs data read in at a station: 
    !
    ! (1) Surface correction
    ! (2) Vertical checks
    ! (3) Missing data check
+   !-----------------------------------------------------------------------
 
    implicit none
                              

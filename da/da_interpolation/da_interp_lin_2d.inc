@@ -2,6 +2,10 @@ subroutine da_interp_lin_2d(fm2d, is, ie, js, je, &
                          i, j, dx, dy, dxm, dym, &
                          fo2d)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                intent(in)  :: is, ie, js, je

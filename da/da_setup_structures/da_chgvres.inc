@@ -3,7 +3,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
    corz_kz, cord_kz, corh_kz, corq_kz, hwll_kz, vztdq_kz, agv_kz, bv_kz, wgv_kz)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Change vertical resolution of background stats for cv_options=3
+   ! Purpose: Change vertical resolution of background stats for cv_options=3
    !---------------------------------------------------------------------------
 
    implicit none
@@ -70,7 +70,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
          do m=1,nsig
             m1=m+1
             if ((rsig(k).le.rsigo(m))   .and.  &
-                (rsig(k).gt.rsigo(m1))     )then
+                (rsig(k).gt.rsigo(m1))    )then
                lsig(k)=m
                go to 2345
             end if

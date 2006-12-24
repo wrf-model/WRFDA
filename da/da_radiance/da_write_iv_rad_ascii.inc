@@ -1,10 +1,10 @@
-subroutine da_write_iv_rad_ascii ( xp, ob, iv )
+subroutine da_write_iv_rad_ascii (xp, ob, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: write out innovation vector structure for radiance data.
+   ! Purpose: write out innovation vector structure for radiance data.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
    TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.
@@ -36,20 +36,20 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
       write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
 #else
       write(unit=stdout,fmt='(a,i7)') 'number of obs ', ndomain
-#endif
+#end if
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
 #else
       write(unit=filename, fmt='(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
-#endif
+#end if
 
       call da_get_unit(innov_rad_unit)
       open(unit=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0 ) Then
+      if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open innovation radiance file"//filename/))
-      Endif
+      end if
       write(unit=innov_rad_unit,fmt='(a,a,i7,a,i5,a)') trim(iv%instid(n)%rttovid_string), &
                         ' number-of-pixels : ', ndomain, &
                         ' channel-number-of-each-pixel : ', iv%instid(n)%nchan, &
@@ -261,7 +261,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
 
    if (trace_use) call da_trace_exit("da_write_iv_rad_ascii")
 
-#endif
+#end if
 
 end subroutine da_write_iv_rad_ascii
 

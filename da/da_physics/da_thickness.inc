@@ -1,8 +1,10 @@
 subroutine da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,thk)
 
-   !  This routine calculates the thickness between two layers 
-   !  using vertical integration of virtual temperatures.
-   !  pre1 and pre2 are two pressures for the two layers
+   !-----------------------------------------------------------------------
+   ! Purpose: calculates the thickness between two layers 
+   ! using vertical integration of virtual temperatures.
+   ! pre1 and pre2 are two pressures for the two layers
+   !-----------------------------------------------------------------------
 
    implicit none
 

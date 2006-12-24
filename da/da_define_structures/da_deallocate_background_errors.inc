@@ -1,7 +1,7 @@
 subroutine da_deallocate_background_errors (be)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Deallocate components of wrfvar background errors.
+   ! Purpose: Deallocate components of wrfvar background errors.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -61,7 +61,7 @@ subroutine da_deallocate_background_errors (be)
    ! Deallocate control variable errors (in future uncomment use these to allow 
    ! eg NMC error correlations).
 
-   ! deallocate ( be % cv % val )
+   ! deallocate (be % cv % val)
 
    if (trace_use) call da_trace_exit("da_deallocate_background_errors")
 

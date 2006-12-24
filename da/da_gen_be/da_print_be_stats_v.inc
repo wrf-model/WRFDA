@@ -2,7 +2,7 @@ subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
                                 e_vec, e_val, e_vec_loc, e_val_loc)
 
    !----------------------------------------------------------------------------
-   ! Purpose : To print out the first global and local eigenvector and 
+   ! Purpose: To print out the first global and local eigenvector and 
    !           eigenvalues for 'variable'.
    !
    ! Input   : outunit    --- output unit

@@ -1,5 +1,9 @@
 subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    use da_tools
 
    implicit none

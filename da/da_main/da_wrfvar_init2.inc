@@ -1,8 +1,8 @@
 subroutine da_wrfvar_init2
 
-   !<DESCRIPTION>
-   !     WRF initialization routine, part 2
-   !</DESCRIPTION>
+   !-------------------------------------------------------------------------
+   ! Purpose: WRFVAR initialization routine, part 2
+   !-------------------------------------------------------------------------
 
    implicit none
 
@@ -41,10 +41,10 @@ subroutine da_wrfvar_init2
    ! 
    !</DESCRIPTION>
 
-   call nl_get_debug_level ( 1, debug_level )
-   call set_wrf_debug_level ( debug_level )
+   call nl_get_debug_level (1, debug_level)
+   call set_wrf_debug_level (debug_level)
 
-   nullify( null_domain )
+   nullify(null_domain)
 
    !<DESCRIPTION>
    ! RSL is required for WRF nesting options.
@@ -55,11 +55,11 @@ subroutine da_wrfvar_init2
    ! run option or we are on an acceptable machine.
    !</DESCRIPTION>
 
-   if ( max_dom > 1 ) then
+   if (max_dom > 1) then
 #if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
       call da_error(__FILE__,__LINE__, &
          (/'nesting requires either an MPI build or use of the -DSTUBMPI option'/)) 
-#endif
+#end if
    end if
 
    !<DESCRIPTION>
@@ -81,27 +81,27 @@ subroutine da_wrfvar_init2
 
    call da_message ((/program_name//" "//subversion_version/))
    call da_trace("da_wrfvar_init2",message="calling alloc_and_configure_domain")
-   call alloc_and_configure_domain ( domain_id  = 1 ,                  &
+   call alloc_and_configure_domain (domain_id  = 1 ,                  &
                                      grid       = head_grid ,          &
                                      parent     = null_domain ,        &
-                                     kid        = -1                   )
+                                     kid        = -1                  )
 
    call da_trace("da_wrfvar_init2",message="calling model_to_grid_config_rec")
-   call model_to_grid_config_rec ( head_grid%id , model_config_rec , config_flags )
+   call model_to_grid_config_rec (head_grid%id , model_config_rec , config_flags)
 
    call da_trace("da_wrfvar_init2",message="calling set_scalar_indices_from_config")
-   call set_scalar_indices_from_config ( head_grid%id , idum1, idum2 )
+   call set_scalar_indices_from_config (head_grid%id , idum1, idum2)
 
    call da_trace("da_wrfvar_init2",message="calling init_wrfio")
    call init_wrfio
 
 #ifdef DM_PARALLEL
-   call get_config_as_buffer( configbuf, configbuflen, nbytes )
-   call wrf_dm_bcast_bytes( configbuf, nbytes )
-   call set_config_as_buffer( configbuf, configbuflen )
-#endif
+   call get_config_as_buffer(configbuf, configbuflen, nbytes)
+   call wrf_dm_bcast_bytes(configbuf, nbytes)
+   call set_config_as_buffer(configbuf, configbuflen)
+#end if
 
-   call Setup_Timekeeping (head_grid)
+   call setup_timekeeping (head_grid)
 
    !<DESCRIPTION>
    ! The head grid is initialized with read-in data through the call to <a
@@ -124,17 +124,17 @@ subroutine da_wrfvar_init2
    ! 
    !</DESCRIPTION>
 
-   ! call med_initialdata_input( head_grid , config_flags,'fg01' )
+   ! call med_initialdata_input(head_grid , config_flags,'fg01')
 
    if ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) then
-      call da_med_initialdata_input( head_grid , config_flags,'fg01')
+      call da_med_initialdata_input(head_grid , config_flags,'fg01')
    end if
 
    ! JRB
-!   call da_warning(__FILE__,__LINE__,(/"Fix me"/))
-   !  head_grid%start_subtime = head_grid%start_time
-   !  head_grid%stop_subtime = head_grid%stop_time
+   ! call da_warning(__FILE__,__LINE__,(/"Fix me"/))
+   ! head_grid%start_subtime = head_grid%start_time
+   ! head_grid%stop_subtime = head_grid%stop_time
 
    if (rootproc) then
       call da_get_unit(cost_unit)

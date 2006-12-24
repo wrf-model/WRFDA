@@ -1,5 +1,9 @@
 subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)    :: nj             ! Number of latitudes

@@ -1,8 +1,8 @@
-subroutine da_wrfvar_init1( no_init1 )
+subroutine da_wrfvar_init1(no_init1)
 
-   !<DESCRIPTION>
-   !     WRF initialization routine, part 1
-   !</DESCRIPTION>
+   !-----------------------------------------------------------------------
+   ! Purpose: WRFVAR initialization routine, part 1
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -53,12 +53,12 @@ subroutine da_wrfvar_init1( no_init1 )
 #ifdef DM_PARALLEL
    call wrf_get_dm_communicator (comm)
    call mpi_comm_size(comm, num_procs, ierr)
-   call mpi_comm_rank(comm, myproc, ierr )
+   call mpi_comm_rank(comm, myproc, ierr)
 #else
    num_procs = 1
    myproc = 0
    comm = 0
-#endif
+#end if
 
    if (myproc==0) then
       rootproc=.true.
@@ -70,13 +70,13 @@ subroutine da_wrfvar_init1( no_init1 )
    if (rootproc) then
       call initial_config
    end if
-   call get_config_as_buffer( configbuf, configbuflen, nbytes )
-   call wrf_dm_bcast_bytes( configbuf, nbytes )
-   call set_config_as_buffer( configbuf, configbuflen )
+   call get_config_as_buffer(configbuf, configbuflen, nbytes)
+   call wrf_dm_bcast_bytes(configbuf, nbytes)
+   call set_config_as_buffer(configbuf, configbuflen)
    call wrf_dm_initialize
 #else
    call initial_config
-#endif
+#end if
 
    ! Copy namelist variables to da_control
 

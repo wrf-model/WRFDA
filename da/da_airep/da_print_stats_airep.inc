@@ -1,5 +1,9 @@
 subroutine da_print_stats_airep(stats_unit, nu, nv, nt, Airep)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
     implicit none
 
     integer,           intent(in)    :: stats_unit

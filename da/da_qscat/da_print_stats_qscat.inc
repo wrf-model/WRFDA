@@ -1,5 +1,9 @@
 subroutine da_print_stats_qscat(stats_unit, nu, nv, qscat)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

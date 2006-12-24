@@ -1,12 +1,12 @@
 subroutine da_qc_rad (ob, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: perform quality control for radiance data.
+   ! Purpose: perform quality control for radiance data.
    !
    ! METHOD:  seperated QC for each sensor
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    TYPE (y_type),  INTENT(IN)      :: ob         ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)   :: iv         ! O-B structure.

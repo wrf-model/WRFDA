@@ -1,7 +1,7 @@
 subroutine da_write_kma_increments(xp, xb, xa)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Gathers KMA analysis increments and writes 
+   ! Purpose: Gathers KMA analysis increments and writes 
    !           on i"anl_inc_unit" unit 
    !---------------------------------------------------------------------------
 
@@ -32,43 +32,43 @@ subroutine da_write_kma_increments(xp, xb, xa)
  
    ! 3-d and 2-d increments:
 
-   allocate ( psfc_g (1:ix,1:jy) )
-   allocate (    u_g (1:ix,1:jy,1:kz) )
-   allocate (    v_g (1:ix,1:jy,1:kz) )
-   allocate (    t_g (1:ix,1:jy,1:kz) )
-   allocate (    q_g (1:ix,1:jy,1:kz) )
-   allocate (    p_g (1:ix,1:jy,1:kz) )
+   allocate (psfc_g (1:ix,1:jy))
+   allocate (   u_g (1:ix,1:jy,1:kz))
+   allocate (   v_g (1:ix,1:jy,1:kz))
+   allocate (   t_g (1:ix,1:jy,1:kz))
+   allocate (   q_g (1:ix,1:jy,1:kz))
+   allocate (   p_g (1:ix,1:jy,1:kz))
 
-   call da_local_to_global( xp, xa % psfc, gbuf_2d, 2 ) 
+   call da_local_to_global(xp, xa % psfc, gbuf_2d, 2) 
    if (rootproc) then 
       psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
 
-   call da_local_to_global( xp, xa % u, gbuf, 3 ) 
+   call da_local_to_global(xp, xa % u, gbuf, 3) 
    if (rootproc) then 
       u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global( xp, xa % v, gbuf, 3 ) 
+   call da_local_to_global(xp, xa % v, gbuf, 3) 
    if (rootproc) then 
       v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global( xp, xa % t, gbuf, 3 ) 
+   call da_local_to_global(xp, xa % t, gbuf, 3) 
    if (rootproc) then 
       t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global( xp, xa % q, gbuf, 3 ) 
+   call da_local_to_global(xp, xa % q, gbuf, 3) 
    if (rootproc) then 
       q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global( xp, xa % p, gbuf, 3 ) 
+   call da_local_to_global(xp, xa % p, gbuf, 3) 
    if (rootproc) then 
       p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-#endif
+#end if
 
    if (rootproc) then
 
@@ -134,7 +134,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
          (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
       write(unit=stdout,fmt='(10e15.7)') &
          (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-#endif
+#end if
       close(anl_inc_unit)
       call da_free_unit(anl_inc_unit)
 

@@ -3,7 +3,7 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
                              )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Transfers fields from KMA to first guess (xb) structure.
+   ! Purpose: Transfers fields from KMA to first guess (xb) structure.
    !---------------------------------------------------------------------------
 
    implicit none

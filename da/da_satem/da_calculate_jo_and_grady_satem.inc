@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_satem( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_satem(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -15,7 +19,7 @@ subroutine da_calculate_jo_and_grady_satem( iv, re, jo, jo_grad_y)
       do n=1, iv%num_Satem
          do k=1, iv%satem(n)%info%levels
             jo_grad_y%Satem(n)%thickness(k) = -re%Satem(n)%thickness(k) / &
-                                        ( iv%Satem(n)%thickness(k)%error * &
+                                        (iv%Satem(n)%thickness(k)%error * &
                                           iv%Satem(n)%thickness(k)%error)
          end do
 

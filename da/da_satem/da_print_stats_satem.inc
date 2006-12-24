@@ -1,5 +1,9 @@
 subroutine da_print_stats_satem(stats_unit, nthickness, Satem)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                 intent(in)    :: stats_unit

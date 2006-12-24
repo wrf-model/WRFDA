@@ -1,8 +1,9 @@
 subroutine da_julian_day(NY,NM,ND,JD,METHOD) 
-  
+
    !-----------------------------------------------------------------------
-   ! METHOD = 1: inPUT ---- NY, NM, ND.  outPUT ---- JD                 C        
-   ! METHOD = 2: inPUT ---- NY, JD.      outPUT ---- NM, ND             C 
+   ! Purpose: TBD
+   ! method = 1: input ---- ny, nm, nd.  output ---- jd                         
+   ! method = 2: input ---- ny, jd.      output ---- nm, nd            
    !----------------------------------------------------------------------- 
     
    implicit none

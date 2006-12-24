@@ -1,5 +1,9 @@
 subroutine da_check_max_iv_satem(it, satem,ith,ithf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)            :: it       ! External iteration.

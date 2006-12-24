@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_radar( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_radar(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -18,13 +22,13 @@ subroutine da_calculate_jo_and_grady_radar( iv, re, jo, jo_grad_y)
       do k=1, iv%Radar(n)%info%levels
          if (use_Radar_rv) then
             jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                    ( iv%Radar(n)%rv(k)%error * &
+                                    (iv%Radar(n)%rv(k)%error * &
                                       iv%Radar(n)%rv(k)%error)
          end if
 
          if (use_Radar_rf) then
             jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                    ( iv%Radar(n)%rf(k)%error * &
+                                    (iv%Radar(n)%rf(k)%error * &
                                       iv%Radar(n)%rf(k)%error)
          end if
       end do

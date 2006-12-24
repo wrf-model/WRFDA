@@ -1,7 +1,7 @@
 subroutine da_apply_power (power, max_wavenumber, ccv, c_cvsize) 
 
    !-------------------------------------------------------------------------
-   ! Adjust power spectrum for the control variable
+   ! Purpose: Adjust power spectrum for the control variable
    !-------------------------------------------------------------------------
 
    implicit none

@@ -5,7 +5,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
                                     its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Adjoint of da_transform_vvtovp.
+   ! Purpose: Adjoint of da_transform_vvtovp.
    !---------------------------------------------------------------------------
 
    implicit none

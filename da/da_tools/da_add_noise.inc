@@ -1,5 +1,9 @@
 subroutine da_add_noise (fld, yo, z)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (field_type), intent(inout) :: fld     ! O-B sub-type.

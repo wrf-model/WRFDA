@@ -1,5 +1,9 @@
 subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it

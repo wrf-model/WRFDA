@@ -1,5 +1,9 @@
 subroutine da_ao_stats_ssmt1 (stats_unit, iv, re)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.

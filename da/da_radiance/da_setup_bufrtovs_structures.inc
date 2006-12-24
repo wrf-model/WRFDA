@@ -1,7 +1,7 @@
 SUBROUTINE da_setup_bufrtovs_structures(xp, ob, iv)
 
 !------------------------------------------------------------------------------
-! PURPOSE: Define, allocate and read of tovs raidance observation structure.
+! Purpose: Define, allocate and read of tovs raidance observation structure.
 !
 ! METHOD:  Define, allocate and read of tovs radiance observation structure.
 !
@@ -9,7 +9,7 @@ SUBROUTINE da_setup_bufrtovs_structures(xp, ob, iv)
 !
 !------------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    TYPE (xpose_type), INTENT(IN)   :: xp         ! Domain decomposition vars.
    TYPE (y_type), INTENT(INOUT)   :: ob         ! Observation structure.

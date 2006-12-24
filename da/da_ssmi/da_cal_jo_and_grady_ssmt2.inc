@@ -1,4 +1,8 @@
-subroutine da_cal_jo_and_grady_ssmt2( iv, re, jo, jo_grad_y )
+subroutine da_cal_jo_and_grady_ssmt2(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -11,14 +15,14 @@ subroutine da_cal_jo_and_grady_ssmt2( iv, re, jo, jo_grad_y )
 
    jo % ssmt2_rh = 0.0
 
-   if ( iv%num_ssmt2 > 0 ) then
+   if (iv%num_ssmt2 > 0) then
    
       do n=1, iv%num_ssmt2
          do k=1, iv%ssmt2(n)%info%levels
 
             jo_grad_y%ssmt2(n)%rh(k) = -re%ssmt2(n)%rh(k) / &
-                                      ( iv%ssmt2(n)%rh(k)%error * &
-                                        iv%ssmt2(n)%rh(k)%error )
+                                      (iv%ssmt2(n)%rh(k)%error * &
+                                        iv%ssmt2(n)%rh(k)%error)
 
             jo % ssmt2_rh = jo % ssmt2_rh - &
                             re%ssmt2(n)%rh(k) * jo_grad_y%ssmt2(n)%rh(k)

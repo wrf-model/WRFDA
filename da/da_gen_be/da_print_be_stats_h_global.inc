@@ -1,4 +1,9 @@
-subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, total_power)
+subroutine da_print_be_stats_h_global(outunit, variable, k, max_wavenumber, &
+  total_power)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none 
 

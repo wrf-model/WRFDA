@@ -1,5 +1,9 @@
 subroutine da_to_zk(obs_v, mdl_v, xp, v_interp_optn, zk)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                        intent(in)  :: v_interp_optn

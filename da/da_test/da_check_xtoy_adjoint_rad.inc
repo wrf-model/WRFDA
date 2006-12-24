@@ -1,7 +1,7 @@
-subroutine da_check_xtoy_adjoint_rad( iv, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_rad(iv, y, adjtest_lhs, pertile_lhs)
 
    !------------------------------------------------------------------------------
-   ! PURPOSE: Calculate innovation vector for radiance data.
+   ! Purpose: Calculate innovation vector for radiance data.
    !------------------------------------------------------------------------------
 
    implicit none

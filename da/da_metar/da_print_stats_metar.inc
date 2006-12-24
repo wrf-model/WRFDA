@@ -1,5 +1,9 @@
 subroutine da_print_stats_metar(stats_unit, nu, nv, nt, np, nq, metar)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

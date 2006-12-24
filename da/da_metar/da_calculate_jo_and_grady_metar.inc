@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_metar( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_metar(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,15 +25,15 @@ subroutine da_calculate_jo_and_grady_metar( iv, re, jo, jo_grad_y)
    if (iv%num_metar > 0) then
       do n=1, iv%num_metar
          jo_grad_y%metar(n)%u = -re%metar(n)%u / &
-                              ( iv%metar(n)%u%error * iv%metar(n)%u%error)
+                              (iv%metar(n)%u%error * iv%metar(n)%u%error)
          jo_grad_y%metar(n)%v = -re%metar(n)%v / &
-                              ( iv%metar(n)%v%error * iv%metar(n)%v%error)
+                              (iv%metar(n)%v%error * iv%metar(n)%v%error)
          jo_grad_y%metar(n)%t = -re%metar(n)%t / &
-                              ( iv%metar(n)%t%error * iv%metar(n)%t%error)
+                              (iv%metar(n)%t%error * iv%metar(n)%t%error)
          jo_grad_y%metar(n)%p = -re%metar(n)%p / &
-                              ( iv%metar(n)%p%error * iv%metar(n)%p%error)
+                              (iv%metar(n)%p%error * iv%metar(n)%p%error)
          jo_grad_y%metar(n)%q = -re%metar(n)%q / &
-                              ( iv%metar(n)%q%error * iv%metar(n)%q%error)
+                              (iv%metar(n)%q%error * iv%metar(n)%q%error)
 
          if (iv%metar(n)%loc%proc_domain) then
             jo % metar_u = jo % metar_u - re%metar(n)%u * jo_grad_y%metar(n)%u

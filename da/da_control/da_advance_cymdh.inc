@@ -1,5 +1,9 @@
 subroutine da_advance_cymdh (start_date, dh, end_date)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    character (len=10), intent(in)  :: start_date ! In date (ccyymmddhh).

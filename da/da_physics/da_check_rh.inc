@@ -1,7 +1,7 @@
-subroutine da_check_rh( xb, xa, xp)
+subroutine da_check_rh(xb, xa, xp)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Remove RH over 100% or under 10%
+   ! Purpose: Remove RH over 100% or under 10%
    !          Made the modification to those levels, which RH are less than 95%
    !---------------------------------------------------------------------------
 
@@ -55,11 +55,11 @@ subroutine da_check_rh( xb, xa, xp)
                ! modify xa%rh
                xa%rh(i,j,k) = maximum_rh - xb%rh(i,j,k)
 
-               call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
+               call da_tp_to_qs(xb%t(i,j,k)+xa%t(i,j,k), &
                   xb%p(i,j,k)+xa%p(i,j,k), es, x_qs(k))
 
                ! calculate xa%q
-               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), &
+               call da_tprh_to_q_lin1(xb%t(i,j,k), xb%p(i,j,k), &
                   xb%es(i,j,k), xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k), &
                   xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k))
 
@@ -71,10 +71,10 @@ subroutine da_check_rh( xb, xa, xp)
             if (rhtol(k) .lt. minimum_rh) then
                oldrha           = xa%rh(i,j,k)
                xa%rh(i,j,k)     = minimum_rh - xb%rh(i,j,k)
-               call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
+               call da_tp_to_qs(xb%t(i,j,k)+xa%t(i,j,k), &
                   xb%p(i,j,k)+xa%p(i,j,k), es, x_qs(k))
 
-               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), &
+               call da_tprh_to_q_lin1(xb%t(i,j,k), xb%p(i,j,k), &
                   xb%es(i,j,k), xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k), &
                   xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k))
 
@@ -88,7 +88,7 @@ subroutine da_check_rh( xb, xa, xp)
          if (tol_adjust_moist .gt. 0.0) then
             do k=ks,ke
                if (rhtol(k) .lt. upper_modify_rh .and. imod(k) .eq. 0) then
-                  call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
+                  call da_tp_to_qs(xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k),es,x_qs(k))
 
                   each_moist   = rhtol(k)*x_qs(k)* &
@@ -102,7 +102,7 @@ subroutine da_check_rh( xb, xa, xp)
          if (tol_adjust_moist .lt. 0.0) then
             do k=ks,ke
                if (rhtol(k) .gt. lower_modify_rh .and. imod(k) .eq. 0) then
-                  call da_tp_to_qs( xb%t(i,j,k)+xa%t(i,j,k), &
+                  call da_tp_to_qs(xb%t(i,j,k)+xa%t(i,j,k), &
                                     xb%p(i,j,k)+xa%p(i,j,k), es, x_qs(k))
 
                   each_moist   = rhtol(k)*x_qs(k)* &
@@ -118,7 +118,7 @@ subroutine da_check_rh( xb, xa, xp)
            do k=ks,ke
              if (imod(k) .eq. 1) then
                xa%rh(i,j,k) = xa%rh(i,j,k)+(xb%rh(i,j,k)+xa%rh(i,j,k))*weight
-               call da_tprh_to_q_lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k), &
+               call da_tprh_to_q_lin1(xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k), &
                                       xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k), &
                                       xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k))
 

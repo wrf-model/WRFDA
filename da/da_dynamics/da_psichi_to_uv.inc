@@ -4,7 +4,7 @@ subroutine da_psichi_to_uv(psi, chi, coefx,coefy, u, v,&
                             its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculate wind components u and v from psi and chi.
+   !  Purpose: Calculate wind components u and v from psi and chi.
    !
    !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
    !           v = coefy * ( dpsi/dx + dchi/dy)

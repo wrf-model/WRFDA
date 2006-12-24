@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_sonde_sfc(it, sonde_sfc, &
              itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    integer,           intent (in)         :: it      ! Outer iteration
    type (synop_type), intent(inout)       :: sonde_sfc

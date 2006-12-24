@@ -4,7 +4,7 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
                                    its,ite, jts,jte, kts,kte)
 
    !--------------------------------------------------------------------------
-   ! Purpose : Adjoint for Physical transform of variables 
+   ! Purpose: Adjoint for Physical transform of variables 
    !--------------------------------------------------------------------------
 
    implicit none

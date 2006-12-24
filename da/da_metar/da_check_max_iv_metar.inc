@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_metar(it, metar, &
              itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)                    :: it    ! outer iteration

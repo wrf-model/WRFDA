@@ -1,5 +1,9 @@
 subroutine da_read_ssmi_integer_array(aa,nn,i0,i_step)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                 intent(in) :: nn, i0, i_step

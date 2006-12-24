@@ -1,4 +1,8 @@
-subroutine da_check_xtoy_adjoint_qscat( iv, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_qscat(iv, y, adjtest_lhs, pertile_lhs)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -12,13 +16,13 @@ subroutine da_check_xtoy_adjoint_qscat( iv, y, adjtest_lhs, pertile_lhs)
       do n=1, iv%num_qscat
          if (iv%qscat(n)%loc%proc_domain) then
             adjtest_lhs = adjtest_lhs + &
-                     ( y%qscat(n)%u/typical_u_rms)**2 + &
-                     ( y%qscat(n)%v/typical_v_rms)**2
+                     (y%qscat(n)%u/typical_u_rms)**2 + &
+                     (y%qscat(n)%v/typical_v_rms)**2
          end if
 
          pertile_lhs = pertile_lhs + &
-                  ( y%qscat(n)%u/typical_u_rms)**2 + &
-                  ( y%qscat(n)%v/typical_v_rms)**2
+                  (y%qscat(n)%u/typical_u_rms)**2 + &
+                  (y%qscat(n)%v/typical_v_rms)**2
 
          y%qscat (n)%u = y%qscat (n)%u/typical_u_rms ** 2
          y%qscat (n)%v = y%qscat (n)%v/typical_v_rms ** 2

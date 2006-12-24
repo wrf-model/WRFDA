@@ -1,5 +1,9 @@
 subroutine da_print_stats_gpspw(stats_unit, ntpw, Gpspw)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

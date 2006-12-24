@@ -1,7 +1,7 @@
 subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
    !--------------------------------------------------------
-   !  PURPOSE: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
+   !  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
    !            to innovation structure
    !
    !   METHOD: use F90 sequential data structure to avoid read file twice

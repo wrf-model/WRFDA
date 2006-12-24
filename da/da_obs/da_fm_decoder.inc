@@ -4,8 +4,8 @@ subroutine da_fm_decoder (fm, platform, synop, ship,  metar, pilot, sound,   &
                                       qscat,profiler, buoy, other)
 
    !---------------------------------------------------------------------------  
-   ! Given the WMO code fm, return the observation platform type and increment
-   ! the corresponding counter if present.
+   ! Purpose: Given the WMO code fm, return the observation platform type and 
+   ! increment the corresponding counter if present.
    !
    ! Returned platforms are reduced to 10 output classes:
    !

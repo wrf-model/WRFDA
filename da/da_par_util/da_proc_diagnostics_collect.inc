@@ -1,7 +1,7 @@
 subroutine da_proc_diagnostics_collect(num_sound, iv, re)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Do MPI reduction operations across processors to get values needed
+   ! Purpose: Do MPI reduction operations across processors to get values needed
    !          for diagnostics output. These are stored only on the root processor, 
    !          i.e., processor 0. (In this way, we do not have to do all-to-all 
    !          communication.)

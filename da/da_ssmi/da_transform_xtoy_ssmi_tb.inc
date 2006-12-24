@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xb_type), intent(in)   :: xb       ! first guess state.

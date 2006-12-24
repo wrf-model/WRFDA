@@ -1,7 +1,12 @@
 subroutine da_transform_xtogpsref_adj(xa, xb, xp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
    ! input: xb%q, xb%p, xb%t, xa%ref, and xp
    ! output: xa%q, xa%p, xa%t
+   !-----------------------------------------------------------------------
+
+   implicit none
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)    :: xb       ! first guess state.

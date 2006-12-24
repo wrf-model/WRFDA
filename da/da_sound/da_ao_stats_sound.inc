@@ -1,8 +1,7 @@
 subroutine da_ao_stats_sound (stats_unit, oi, re)
 
    !-------------------------------------------------------------
-   !  Updates:       
-   !     Bug fix for num_sound_tot   Syed RH Rizvi   07/28/2006    
+   ! Purpose: TBD   
    !-------------------------------------------------------------
 
    implicit none

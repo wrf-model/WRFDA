@@ -1,5 +1,9 @@
 subroutine da_ao_stats_sonde_sfc (stats_unit, oi, re)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.

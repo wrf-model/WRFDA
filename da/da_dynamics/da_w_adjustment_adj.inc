@@ -1,13 +1,12 @@
 subroutine da_w_adjustment_adj(xb,WZ_a,                      &
                       ids,ide, jds,jde, kds,kde, &
                       ims,ime, jms,jme, kms,kme, &
-                      its,ite, jts,jte, kts,kte )
+                      its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjust vertical velocity increments
+   ! Purpose: Adjust vertical velocity increments
    !
-   !  ASsumPTIONS: 1) Model level stored top down.
-   !
+   ! Assumptions: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -30,7 +29,7 @@ subroutine da_w_adjustment_adj(xb,WZ_a,                      &
    call da_wz_base(xb,WZ_b,                    &
                 ids,ide, jds,jde, kds,kde,  &
                 ims,ime, jms,jme, kms,kme,  &
-                its,ite, jts,jte, kts,kte )
+                its,ite, jts,jte, kts,kte)
 
    do J=jts,jte
       do I=its,ite

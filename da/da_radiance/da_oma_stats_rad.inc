@@ -1,7 +1,7 @@
 subroutine da_oma_stats_rad(stats_unit, iv, re)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculate statistics of obs minus analysis for radiance data.
+   ! Purpose: Calculate statistics of obs minus analysis for radiance data.
    !
    ! METHOD:  average, rms, minimum, maximum of re
    !---------------------------------------------------------------------------

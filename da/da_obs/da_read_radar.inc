@@ -1,15 +1,8 @@
 subroutine da_read_radar (ob, xp, filename)
 
-!----------------------------------------------------------------------------------------!
-! Read the Radar observation file
-! Written by Qingnong Xiao, September 2002
-!   History of the radial velocity with respect to 
-!              the WRF space, April 2004, Jianfeng Gu
-!   History of the reflectivity with respect to 
-!              the WRF space, July 2004, Jianfeng Gu
-!   History of multi Radar Obs., 29 September 2004, Jianfeng Gu
-!              Finalized on February 03, 2005, Qingnong Xiao
-!----------------------------------------------------------------------------------------!
+   !-----------------------------------------------------------------------
+   ! Purpose: Read the Radar observation file
+   !----------------------------------------------------------------------------------------!
 
    implicit none
 

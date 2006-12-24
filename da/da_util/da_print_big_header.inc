@@ -1,5 +1,9 @@
 subroutine da_print_big_header(bhi, bhr, bhic, bhrc)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           dimension(50,20), intent(in) :: bhi

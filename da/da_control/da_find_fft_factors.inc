@@ -1,7 +1,7 @@
-subroutine da_find_fft_factors( n, n_ok, fft_factors )
+subroutine da_find_fft_factors(n, n_ok, fft_factors)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculates prime factors of input number.
+   ! Purpose: Calculates prime factors of input number.
    !---------------------------------------------------------------------------
 
    implicit none

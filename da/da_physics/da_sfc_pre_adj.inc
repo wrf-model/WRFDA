@@ -1,6 +1,10 @@
 subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
                                         psm, tsm, qsm, hsm, ho, to, qvo)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    !---------------------------------------------------------------------------
    !
    ! Correct pressure between two levels. 

@@ -1,5 +1,9 @@
 subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    !  Method:

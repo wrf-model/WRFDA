@@ -4,7 +4,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
                               its, ite, jts, jte, kts, kte)
 
    !--------------------------------------------------------------------------
-   ! Purpose   : Control variable transform x' = Uv. 
+   ! Purpose: Control variable transform x' = Uv. 
    !--------------------------------------------------------------------------
 
    implicit none

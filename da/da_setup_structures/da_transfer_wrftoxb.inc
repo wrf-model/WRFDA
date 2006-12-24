@@ -3,7 +3,7 @@ subroutine da_transfer_wrftoxb(xbx, grid, &
                              )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Transfers fields from WRF to first guess structure.
+   ! Purpose: Transfers fields from WRF to first guess structure.
    !---------------------------------------------------------------------------
 
    implicit none

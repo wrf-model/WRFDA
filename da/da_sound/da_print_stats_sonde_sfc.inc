@@ -1,5 +1,9 @@
 subroutine da_print_stats_sonde_sfc(stats_unit, nu, nv, nt, np, nq, sonde_sfc)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                     intent(in)    :: stats_unit

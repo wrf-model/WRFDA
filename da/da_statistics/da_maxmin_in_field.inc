@@ -1,5 +1,9 @@
 subroutine da_maxmin_in_field(field, max, min)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    real, intent(in)         :: field(is:ie,js:je,ks:ke)

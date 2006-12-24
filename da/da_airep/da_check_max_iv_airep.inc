@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_airep(it, airep , &
                   itu,ituf,itvv,itvvf,itt,ittf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it      ! Outer iteration

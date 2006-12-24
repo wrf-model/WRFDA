@@ -1,7 +1,7 @@
-subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
+subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, &
                            bin, bin2d, &
                            lat_min, lat_max, binwidth_lat, &
-                           hgt_min, hgt_max, binwidth_hgt, latitude, height )
+                           hgt_min, hgt_max, binwidth_hgt, latitude, height)
 !----------------------------------------------------------------------------------------
 !
 ! Purpose: To create the bins for calculation of statistics.
@@ -54,7 +54,7 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
    real, allocatable        :: binstart_lat(:)            ! Used if bin_type = 2 (degrees).
    real, allocatable        :: binstart_hgt(:)            ! Used if bin_type = 2 (degrees).
 
-   if ( bin_type == 0 ) then         ! No averaging in space
+   if (bin_type == 0) then         ! No averaging in space
 
       num_bins = nk * nj * ni
       num_bins2d = nj * ni    ! Equals number of horizontal points.
@@ -70,7 +70,7 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       end do
       bin2d(:,:) = bin(:,:,1)
 
-   else if ( bin_type == 1 ) then    ! Average over x-direction.
+   else if (bin_type == 1) then    ! Average over x-direction.
 
       num_bins = nj * nk
       num_bins2d = nj
@@ -84,16 +84,16 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       end do
       bin2d(:,:) = bin(:,:,1)
 
-   else if ( bin_type == 2 ) then    ! Global latitude/height bins:
+   else if (bin_type == 2) then    ! Global latitude/height bins:
 
 !     Setup latitude bins:
       write(unit=6,fmt='(/a,f12.5)')'   Minimum latitude = ', lat_min
       write(unit=6,fmt='(a,f12.5)')'    Maximum latitude = ', lat_max
       write(unit=6,fmt='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
-      num_bins_lat = nint( ( lat_max - lat_min ) / binwidth_lat)
+      num_bins_lat = nint((lat_max - lat_min) / binwidth_lat)
       write(unit=6,fmt='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
    
-      allocate( binstart_lat(1:num_bins_lat) )
+      allocate(binstart_lat(1:num_bins_lat))
       do b = 1, num_bins_lat ! Assume south to north (as in WRF).
          binstart_lat(b) = lat_min + real(b-1) * binwidth_lat
 !         write(unit=6,fmt='(i4,f15.5)')b, binstart_lat(b)
@@ -103,10 +103,10 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       write(unit=6,fmt='(/a,f12.5)')'    Minimum height = ', hgt_min
       write(unit=6,fmt='(a,f12.5)')'    Maximum height = ', hgt_max
       write(unit=6,fmt='(a,f12.5)')'    Height bin width = ', binwidth_hgt
-      num_bins_hgt = nint( ( hgt_max - hgt_min ) / binwidth_hgt)
+      num_bins_hgt = nint((hgt_max - hgt_min) / binwidth_hgt)
       write(unit=6,fmt='(a,i8)')'    Number of height bins = ', num_bins_hgt
 
-      allocate( binstart_hgt(1:num_bins_hgt) )
+      allocate(binstart_hgt(1:num_bins_hgt))
       do b = 1, num_bins_hgt
          binstart_hgt(b) = hgt_min + real(b-1) * binwidth_hgt
 !         write(unit=6,fmt='(i4,f15.5)')b, binstart_hgt(b)
@@ -119,14 +119,14 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       do j = 1, nj
          do i = 1, ni
             do k = 1, nk
-               if ( height(i,j,k) < binstart_hgt(1) ) then 
+               if (height(i,j,k) < binstart_hgt(1)) then 
                   bin_hgt = 1 ! In first bin.
-               else if ( height(i,j,k) >= binstart_hgt(num_bins_hgt) ) then
+               else if (height(i,j,k) >= binstart_hgt(num_bins_hgt)) then
                   bin_hgt = num_bins_hgt ! In final bin.
                else 
                   do b = 1, num_bins_hgt-1
-                     if ( height(i,j,k) >= binstart_hgt(b) .and. &
-                          height(i,j,k) <  binstart_hgt(b+1) ) then
+                     if (height(i,j,k) >= binstart_hgt(b) .and. &
+                          height(i,j,k) <  binstart_hgt(b+1)) then
                         bin_hgt = b
                         exit
                      end if
@@ -134,37 +134,37 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
                end if
 
 !              Select latitude bin that point falls in:
-               if ( k == 1 ) then
+               if (k == 1) then
                   do b = 1, num_bins_lat-1
-                     if ( latitude(i,j) >= binstart_lat(b) .and. &
-                        latitude(i,j) < binstart_lat(b+1) ) then
+                     if (latitude(i,j) >= binstart_lat(b) .and. &
+                        latitude(i,j) < binstart_lat(b+1)) then
                         bin_lat = b
                         exit
                      end if
                   end do
-                  if ( latitude(i,j) >= binstart_lat(num_bins_lat) ) then ! In final bin.
+                  if (latitude(i,j) >= binstart_lat(num_bins_lat)) then ! In final bin.
                      bin_lat = num_bins_lat
                   end if
                   bin2d(i,j) = bin_lat
                end if
-               bin(i,j,k) = bin_lat + num_bins_lat * ( bin_hgt - 1 )
+               bin(i,j,k) = bin_lat + num_bins_lat * (bin_hgt - 1)
             end do
          end do
       end do
 
-      deallocate( binstart_lat )
-      deallocate( binstart_hgt )
+      deallocate(binstart_lat)
+      deallocate(binstart_hgt)
 
-   else if ( bin_type == 3 ) then    ! Latitude/nk bins:
+   else if (bin_type == 3) then    ! Latitude/nk bins:
 
 !     Setup latitude bins:
       write(unit=6,fmt='(/a,f12.5)')'   Minimum latitude = ', lat_min
       write(unit=6,fmt='(a,f12.5)')'    Maximum latitude = ', lat_max
       write(unit=6,fmt='(a,f12.5)')'    Latitude bin width = ', binwidth_lat
-      num_bins_lat = nint( ( lat_max - lat_min ) / binwidth_lat)
+      num_bins_lat = nint((lat_max - lat_min) / binwidth_lat)
       write(unit=6,fmt='(a,i8)')   '    Number of latitude bins = ', num_bins_lat
    
-      allocate( binstart_lat(1:num_bins_lat) )
+      allocate(binstart_lat(1:num_bins_lat))
       do b = 1, num_bins_lat ! Assume south to north (as in WRF).
          binstart_lat(b) = lat_min + real(b-1) * binwidth_lat
 !         write(unit=6,fmt='(i4,f15.5)')b, binstart_lat(b)
@@ -179,59 +179,59 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
             do k = 1, nk
 
 !              Select latitude bin that point falls in:
-               if ( k == 1 ) then
+               if (k == 1) then
                   do b = 1, num_bins_lat-1
-                     if ( latitude(i,j) >= binstart_lat(b) .and. &
-                        latitude(i,j) < binstart_lat(b+1) ) then
+                     if (latitude(i,j) >= binstart_lat(b) .and. &
+                        latitude(i,j) < binstart_lat(b+1)) then
                         bin_lat = b
                         exit
                      end if
                   end do
-                  if ( latitude(i,j) >= binstart_lat(num_bins_lat) ) then ! In final bin.
+                  if (latitude(i,j) >= binstart_lat(num_bins_lat)) then ! In final bin.
                      bin_lat = num_bins_lat
                   end if
                   bin2d(i,j) = bin_lat
                end if
-               bin(i,j,k) = bin_lat + num_bins_lat * ( k - 1 )
+               bin(i,j,k) = bin_lat + num_bins_lat * (k - 1)
             end do
          end do
       end do
 
-      deallocate( binstart_lat )
+      deallocate(binstart_lat)
 
-   else if ( bin_type == 4 ) then    ! binwidth_lat/nk bins:
+   else if (bin_type == 4) then    ! binwidth_lat/nk bins:
 
 !     Setup horizontal bins:
       write(unit=6,fmt='(/a,f12.5)')'   Number of grid-cells to average over = ', binwidth_lat
 !     use binwidth_lat, but actually an integer number of points.
  
-      num_bins_j = int( real(nj) / real(binwidth_lat) )
+      num_bins_j = int(real(nj) / real(binwidth_lat))
       njj = int(binwidth_lat) * num_bins_j
       do j = 1, njj
-         bin_j(j) = 1 + int( real(j-1) / binwidth_lat)
+         bin_j(j) = 1 + int(real(j-1) / binwidth_lat)
       end do
-      if ( nj > njj ) bin_j(njj+1:nj) = bin_j(njj)
+      if (nj > njj) bin_j(njj+1:nj) = bin_j(njj)
 
-      num_bins_i = int( real(ni) / real(binwidth_lat) )
+      num_bins_i = int(real(ni) / real(binwidth_lat))
       nii = int(binwidth_lat) * num_bins_i
       do i = 1, nii
-         bin_i(i) = 1 + int( real(i-1) / binwidth_lat )
+         bin_i(i) = 1 + int(real(i-1) / binwidth_lat)
       end do
-      if ( ni > nii ) bin_i(nii+1:ni) = bin_i(nii)
+      if (ni > nii) bin_i(nii+1:ni) = bin_i(nii)
 
       num_bins2d = num_bins_i * num_bins_j
       num_bins = num_bins2d * nk
 
       do j = 1, nj
          do i = 1, ni
-            bin2d(i,j) = bin_i(i) + ( bin_j(j) - 1 ) * num_bins_i
+            bin2d(i,j) = bin_i(i) + (bin_j(j) - 1) * num_bins_i
             do k = 1, nk
                bin(i,j,k) = bin2d(i,j) + (k - 1) * num_bins2d
             end do
          end do
       end do
 
-   else if ( bin_type == 5 ) then    ! Average over all horizontal points.
+   else if (bin_type == 5) then    ! Average over all horizontal points.
 
       num_bins = nk
       num_bins2d = 1
@@ -241,7 +241,7 @@ subroutine da_create_bins( ni, nj, nk, bin_type, num_bins, num_bins2d, &
       end do
       bin2d(:,:) = 1
 
-   else if ( bin_type == 6 ) then    ! Average over all points.
+   else if (bin_type == 6) then    ! Average over all points.
 
       num_bins = 1
       num_bins2d = 1

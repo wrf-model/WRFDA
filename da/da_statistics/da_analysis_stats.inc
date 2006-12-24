@@ -1,7 +1,7 @@
 subroutine da_analysis_stats  (stats_unit, xp, xa)
    
    !------------------------------------------------------------------------
-   ! PURPOSE: Calculate min, max, mean and RMS of input 1d field.
+   ! Purpose: Calculate min, max, mean and RMS of input 1d field.
    !------------------------------------------------------------------------
 
    implicit none

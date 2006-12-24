@@ -2,7 +2,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
                   evec_loc, eval_loc, max_vert_var, var_scaling, be_sub)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Extracts Eigen vectors/values info from bins
+   !  Purpose: Extracts Eigen vectors/values info from bins
    !           and builds up background error structure 
    !---------------------------------------------------------------------------
 

@@ -1,13 +1,7 @@
 subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
 
    !------------------------------------------------------------------------
-   !
-   !                       routine openfile
-   !                     ********************
-   !
-   !  purpose:
-   !  -------
-   !     open an file and rewind
+   ! Purpose: open an file and rewind
    !
    !   method:
    !   ------
@@ -36,6 +30,8 @@ subroutine da_openfile (kunit, cdfile, cdaccess, cdstatus, cdform)
    !       original :  98-07 (f. vandenberghe)
    !       additions : 98-11 norm doctor (f. vandenberghe)
    !--------------------------------------------------------------------------
+
+   implicit none
 
    integer, intent(in) :: Kunit
    character*(*), intent(in) :: CDFILE, CDACCESS, CDSTATUS, CDFORM

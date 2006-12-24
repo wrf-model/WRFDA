@@ -1,5 +1,9 @@
 subroutine da_asslegpol (l, m, sinlat, coslat, alp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)            :: l       ! Legendre wavenumber.

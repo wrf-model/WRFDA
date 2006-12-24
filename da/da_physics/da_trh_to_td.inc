@@ -5,7 +5,7 @@ subroutine da_trh_to_td (RH, T, TD, xp)
    !                       function F_TD_FROM_RH
    !                     **************************
    !
-   !  PURPOSE:
+   !  Purpose:
    !  -------
    !     COMPUTE DEW POinT FROM TEMPERATURE AND RELATIVE HUMIDITY
    !

@@ -1,7 +1,7 @@
 subroutine da_1d_eigendecomposition( bx, e, l )
 
    !------------------------------------------------------------------------------
-   !  PURPOSE: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
+   !  Purpose: Compute eigenvectors E and eigenvalues L of vertical covariance matrix
    !           B_{x} defined by equation:  E^{T} B_{x} E = L, given input 3D field of
    !           errors (sum over all horizontal locations).
    !------------------------------------------------------------------------------

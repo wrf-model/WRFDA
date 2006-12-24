@@ -5,7 +5,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
                                 its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Perform inverse/adjoint tests on control variable transform.
+   ! Purpose: Perform inverse/adjoint tests on control variable transform.
    !
    ! METHOD:  1) Test inverse and adjoint of physical variable transform.
    !          2) Test inverse and adjoint of vertical transform.

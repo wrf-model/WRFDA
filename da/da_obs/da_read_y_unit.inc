@@ -1,7 +1,7 @@
 subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
 
    !-------------------------------------------------------------------------  
-   ! Program to read diagnostics written on yp_unit or y_unit by WRF-Var
+   ! Purpose: read diagnostics written on yp_unit or y_unit by WRF-Var
    !-------------------------------------------------------------------------   
 
    implicit none

@@ -1,4 +1,4 @@
-subroutine da_write_obs( ob, iv, re)
+subroutine da_write_obs(ob, iv, re)
 
    !-------------------------------------------------------------------------
    ! Purpose: Writes out components of iv=O-B structure.
@@ -26,7 +26,7 @@ subroutine da_write_obs( ob, iv, re)
     write(unit=filename, fmt='(a,i3.3)') 'gts_omb_oma.', myproc
 #else
     write(unit=filename, fmt='(a)') 'gts_omb_oma.000'
-#endif
+#end if
 
    open (unit=ounit,file=trim(filename),form='formatted',status='replace', &
       iostat=ios)

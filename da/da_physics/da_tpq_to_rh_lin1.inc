@@ -2,7 +2,7 @@ subroutine da_tpq_to_rh_lin1( t, p, es, rh, &
                               t_prime, p_prime, q_prime, rh_prime )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Convert T/pressure/q to relative humidity increments.
+   !  Purpose: Convert T/pressure/q to relative humidity increments.
    !
    !  METHOD: r~ = r (q~/q - qs~/qs).
    !

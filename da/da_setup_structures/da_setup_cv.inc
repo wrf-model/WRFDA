@@ -2,8 +2,10 @@ subroutine da_setup_cv(its, ite, jts, jte, &
                         ids, ide, jds, jde, be)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculate the size of the 1-dimensional control variable array.        
+   ! Purpose: Calculate the size of the 1-dimensional control variable array.        
    !---------------------------------------------------------------------------
+
+   implicit none
 
    integer, intent(in)           :: its, ite ! Tile dims.
    integer, intent(in)           :: jts, jte ! Tile dims.

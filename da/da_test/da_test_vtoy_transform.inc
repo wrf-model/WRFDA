@@ -5,7 +5,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
                                   its,ite, jts,jte, kts,kte  )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Perform V To Y Adjoint transform test                             
+!  Purpose: Perform V To Y Adjoint transform test                             
 !
 !  METHOD:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.
 !

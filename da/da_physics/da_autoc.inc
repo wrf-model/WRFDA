@@ -1,6 +1,8 @@
 subroutine da_autoc(DT,SCR2,PRC,kts,kte)
 
-   !  Auto-conversion
+   !-----------------------------------------------------------------------
+   ! Purpose: Auto-conversion
+   !-----------------------------------------------------------------------
 
    implicit none
 

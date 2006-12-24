@@ -1,7 +1,7 @@
 subroutine da_setup_obs_structures_ascii(xp, ob, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Define, allocate and read of observation structure.
+   ! Purpose: Define, allocate and read of observation structure.
    !---------------------------------------------------------------------------
 
    implicit none

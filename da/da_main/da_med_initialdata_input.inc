@@ -1,5 +1,9 @@
 subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(domain), intent(inout)                :: grid

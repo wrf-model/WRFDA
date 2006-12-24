@@ -1,7 +1,7 @@
 subroutine da_ref_height(pres, ref_height)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: To calculate the height from the reference pressure
+   ! Purpose: To calculate the height from the reference pressure
    !---------------------------------------------------------------------------
 
    implicit none

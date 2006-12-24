@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_satem( oi, y, re,                        &
+subroutine da_calculate_residual_satem(oi, y, re,                        &
                                          np_missing, np_bad_data,          &
                                          np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for satem obs
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -20,7 +24,7 @@ subroutine da_calculate_residual_satem( oi, y, re,                        &
       do n=1, oi%num_Satem
           do k=1, oi%satem(n)%info%levels
              np_available = np_available + 1
-             re%Satem(n)%thickness(k) = da_residual( n, k, y%Satem(n)%thickness(k), &
+             re%Satem(n)%thickness(k) = da_residual(n, k, y%Satem(n)%thickness(k), &
                               oi%Satem(n)%thickness(k), n_obs_bad % thickness)
           end do
       end do

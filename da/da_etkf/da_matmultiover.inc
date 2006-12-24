@@ -1,5 +1,9 @@
 subroutine da_matmultiover(mata,matb,ni,nj)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in) :: ni, nj

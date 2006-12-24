@@ -4,8 +4,9 @@ subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
    implicit none
 
    !---------------------------------------------------------------------------
-   ! Output  : ADJ_t      (ssw is treated as a constant now)
-   ! Input   : ADJ_epsr, ADJ_epsi, epsr, epsi
+   ! Purpose: TBD
+   ! Output: ADJ_t      (ssw is treated as a constant now)
+   ! Input: ADJ_epsr, ADJ_epsi, epsr, epsi
    !---------------------------------------------------------------------------
 
    real, intent(in   ) :: f, t

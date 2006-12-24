@@ -1,14 +1,7 @@
 subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
-   implicit none
-
-   type(ESMF_GridComp), intent(inout) :: gcomp
-   type(ESMF_State),    intent(inout) :: importState, exportState
-   type(ESMF_Clock),    intent(inout) :: clock
-   integer,             intent(out)   :: rc
-
-   !<DESCRIPTION>
-   !     WRFVAR init routine.
+   !-----------------------------------------------------------------------
+   ! Purpose: WRFVAR init routine.
    !
    !     The arguments are:
    !       gcomp           Component
@@ -17,9 +10,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !       clock           External clock
    !       rc              Return code; equals ESMF_SUCCESS if there are no
    !                       errors, otherwise ESMF_FAILURE.
-   !</DESCRIPTION>
-
-   !<DESCRIPTION>
+   !
    ! Program_name, a global variable defined in frame/module_domain.F, is
    ! set, then a routine <a href=init_modules.html>init_modules</a> is
    ! called. This calls all the init programs that are provided by the
@@ -29,8 +20,14 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! in the compile: setting up I/O quilt processes to act as I/O servers
    ! and dividing up MPI communicators among those as well as initializing
    ! external communication packages such as RSL or RSL_LITE.
-   !
-   !</DESCRIPTION>
+   !-----------------------------------------------------------------------
+
+   implicit none
+
+   type(ESMF_GridComp), intent(inout) :: gcomp
+   type(ESMF_State),    intent(inout) :: importState, exportState
+   type(ESMF_Clock),    intent(inout) :: clock
+   integer,             intent(out)   :: rc
 
    program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
 
@@ -116,7 +113,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! on this configuration information, and it must occur after the second
    ! broadcast of the configuration information.
    ! 
-!</DESCRIPTION>
+   !</DESCRIPTION>
    call       da_message ((/program_name/))
 
    call da_trace("da_esmf_init",message="calling alloc_and_configure_domain")
@@ -189,10 +186,10 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
 
-! JRB
+   ! JRB
    call da_warning(__FILE__,__LINE__,(/"Fix me"/))
-!   head_grid%start_subtime = head_grid%start_time
-!   head_grid%stop_subtime = head_grid%stop_time
+   !   head_grid%start_subtime = head_grid%start_time
+   !   head_grid%stop_subtime = head_grid%stop_time
 
    ! return success status
    rc = ESMF_SUCCESS

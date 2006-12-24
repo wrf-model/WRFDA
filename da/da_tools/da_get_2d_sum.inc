@@ -3,7 +3,12 @@ subroutine da_get_2d_sum(var, name, &
                       ims, ime, jms, jme, &
                       its, ite, jts, jte)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
+
    integer, intent(in) :: ids, ide, jds, jde, &
                           ims, ime, jms, jme, &
                           its, ite, jts, jte

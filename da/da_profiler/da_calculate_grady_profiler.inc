@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_profiler( iv, re, jo_grad_y)
+subroutine da_calculate_grady_profiler(iv, re, jo_grad_y)
 
    !---------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -23,10 +23,10 @@ subroutine da_calculate_grady_profiler( iv, re, jo_grad_y)
             end if
 
             jo_grad_y%profiler(n)%u(k) = -re%profiler(n)%u(k) / &
-                                      ( iv%profiler(n)%u(k)%error * &
+                                      (iv%profiler(n)%u(k)%error * &
                                         iv%profiler(n)%u(k)%error)
             jo_grad_y%profiler(n)%v(k) = -re%profiler(n)%v(k) / &
-                                      ( iv%profiler(n)%v(k)%error * &
+                                      (iv%profiler(n)%v(k)%error * &
                                         iv%profiler(n)%v(k)%error)
          end do
       end do    

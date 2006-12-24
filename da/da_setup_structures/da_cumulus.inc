@@ -1,5 +1,9 @@
-subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
-                     Z, T, Q, LCB, LCT, PCT, ZCT, kts, kte )
+subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
+                     Z, T, Q, LCB, LCT, PCT, ZCT, kts, kte)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -32,12 +36,12 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
 
    NCB=kts
 
-   if ( PK(kte) > PCB ) then
+   if (PK(kte) > PCB) then
       NCB=kte
    end if
 
    do L=kte-1,kts,-1
-      if ( PK(L) > PCB ) then
+      if (PK(L) > PCB) then
          NCB=L+1
          exit
       end if
@@ -46,7 +50,7 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
    do L=NCB,kte
       P=PK(L)
       do K=1,IA
-         if ( L == NCB ) then
+         if (L == NCB) then
             TLL=TCB
             QLL=QCB
             PLL=PCB
@@ -60,7 +64,7 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
 
          T(L)=TLL-(K*DT)
 
-         call da_qfrmrh( P, T(L), 100., Q(L) )
+         call da_qfrmrh(P, T(L), 100., Q(L))
 
          TBAR=0.5*(T(L)+TLL)
          QBAR=0.5*(Q(L)+QLL)
@@ -88,7 +92,7 @@ subroutine da_cumulus ( ZCB, TCB, QCB, PCB, PK, TE,                &
 
    do K=NCB,kte
       DDT=T(K)-TE(K)
-      if ( DDT >= 0. ) then
+      if (DDT >= 0.) then
          LCB=K
          exit
       end if

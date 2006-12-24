@@ -1,6 +1,7 @@
 subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
-   !----------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
+   ! Purpose: TBD
    ! When ID =  1
    ! Convert wind speed (F in m/s) and direction (D in degree 0-360) into
    ! wind (U-V in m/s) components
@@ -16,7 +17,7 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
    ! XN:    Cone projection
    ! CONV:  180/Pi
    !
-   !----------------------------------------------------------------------------
+   !-------------------------------------------------------------------------
 
    implicit none
 
@@ -104,10 +105,10 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
          else
             AEARTH = ATAN (UEARTH/VEARTH)*CONV
 
-            if (UEARTH .LE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH
-            if (UEARTH .LE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
-            if (UEARTH .GE. 0.0 .AND. VEARTH .GE. 0.0 ) D = AEARTH + 180.0
-            if (UEARTH .GE. 0.0 .AND. VEARTH .LE. 0.0 ) D = AEARTH + 360.0
+            if (UEARTH .LE. 0.0 .AND. VEARTH .LE. 0.0) D = AEARTH
+            if (UEARTH .LE. 0.0 .AND. VEARTH .GE. 0.0) D = AEARTH + 180.0
+            if (UEARTH .GE. 0.0 .AND. VEARTH .GE. 0.0) D = AEARTH + 180.0
+            if (UEARTH .GE. 0.0 .AND. VEARTH .LE. 0.0) D = AEARTH + 360.0
 
          end if
 

@@ -1,13 +1,13 @@
-subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
+subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
                            xbx, be, iv, xhat, cv, &
                            re, y, j, j_grad,            &
                            ids, ide, jds, jde, kds, kde,            &
                            ims, ime, jms, jme, kms, kme,            &
                            its, ite, jts, jte, kts, kte,            &
-                           grid, config_flags                      )
+                           grid, config_flags                     )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Initialises the Y-array
+   ! Purpose: Initialises the Y-array
    !---------------------------------------------------------------------------
 
    implicit none
@@ -57,7 +57,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    je_start = cv_size_jb + 1
    je_end = cv_size_jb + cv_size_je
 
-   call da_allocate_y( iv, jo_grad_y)
+   call da_allocate_y(iv, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! [1.0] calculate jo:
@@ -66,26 +66,26 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [1.1] transform from control variable to model grid space:
 
    if (iter > 0) &
-      call da_transform_vtoy( cv_size, be, grid%ep, xhat, iv, grid%vp, grid%vv,&
+      call da_transform_vtoy(cv_size, be, grid%ep, xhat, iv, grid%vp, grid%vv,&
                               grid%xa, grid%xb, xbx, grid%xp, y, &
                               ids, ide, jds, jde, kds, kde,             &
                               ims, ime, jms, jme, kms, kme,             &
                               its, ite, jts, jte, kts, kte,             &
-                              grid, config_flags                       )
+                              grid, config_flags                      )
 
    ! [1.2] compute residual (o-a) = (o-b) - h x~
 
-   call da_calculate_residual( iv, y, re)
+   call da_calculate_residual(iv, y, re)
 
    ! [1.3] calculate jo:
 
-   call da_calculate_jo_and_grady( iv, re, jo_partial, j % jo, jo_grad_y)
+   call da_calculate_jo_and_grady(iv, re, jo_partial, j % jo, jo_grad_y)
 
    if (testing_dm_exact) then
       ! jo_partial has been already summed at lower level
       j % jo % total = jo_partial
    else
-      j % jo % total = wrf_dm_sum_real( jo_partial)
+      j % jo % total = wrf_dm_sum_real(jo_partial)
    end if
 
    ! [1.4] calculate jc-dfi:
@@ -96,18 +96,18 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
-      call nl_set_dyn_opt ( 1 , DYN_EM_TL)
+      call nl_set_dyn_opt (1 , DYN_EM_TL)
 
-      call da_med_initialdata_input( grid , config_flags, 'tldf')
+      call da_med_initialdata_input(grid , config_flags, 'tldf')
 
       grid%dyn_opt = ndynopt
-      call nl_set_dyn_opt ( 1 , DYN_EM)
+      call nl_set_dyn_opt (1 , DYN_EM)
 
-      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_u_2), grid%em_g_u_2 , grid%em_g_u_2)
-      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
-      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_t_2), grid%em_g_t_2 , grid%em_g_t_2)
-      j % jc = j % jc + 0.5*da_dot( size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
-      j % jc = j % jc + 0.5*da_dot( size(grid%g_moist),  grid%g_moist,   grid%g_moist)
+      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_u_2), grid%em_g_u_2 , grid%em_g_u_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_t_2), grid%em_g_t_2 , grid%em_g_t_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
+      j % jc = j % jc + 0.5*da_dot(size(grid%g_moist),  grid%g_moist,   grid%g_moist)
 
    end if
 
@@ -118,7 +118,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    cv_jb(1:cv_size_jb) = cv (1:cv_size_jb)
    xhat_jb(1:cv_size_jb) = xhat (1:cv_size_jb)
 
-   j % jb = 0.5 * da_dot_cv( cv_size_jb, cv_size_domain_jb, &
+   j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
        cv_jb + xhat_jb, cv_jb + xhat_jb, grid%xp, &
        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
@@ -132,7 +132,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    if (be % ne > 0) then
       cv_je(1:cv_size_je) = cv(je_start:je_end)
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
-      j % je = 0.5 * da_dot_cv( cv_size_je, cv_size_domain_je, &
+      j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
           cv_je + xhat_je, cv_je + xhat_je, grid%xp, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    end if
@@ -164,14 +164,14 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [5.0] calculate grad_v (jo):
    !-------------------------------------------------------------------------
 
-   call da_transform_vtoy_adj( iter, cv_size, be, grid%ep, j_grad, iv, &
+   call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, j_grad, iv, &
                                grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
                                ids, ide, jds, jde, kds, kde,     &
                                ims, ime, jms, jme, kms, kme,     &
                                its, ite, jts, jte, kts, kte,     &
                                grid, config_flags, cg_jcdf)
 
-   call da_deallocate_y( jo_grad_y)
+   call da_deallocate_y(jo_grad_y)
 
    if (print_detail_grad) then
       write(unit=stdout, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
@@ -187,24 +187,24 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
    ! [6.0] calculate grad_v (j) = grad_v (jb) + grad_v (jo) + grad_v (je):
    !-------------------------------------------------------------------------
 
-   gnorm_jo = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
+   gnorm_jo = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    ! Add Del_v (Jb)
    j_grad(1:cv_size_jb) =  jb_factor * &
-                           ( cv(1:cv_size_jb) + xhat(1:cv_size_jb)) + &
+                           (cv(1:cv_size_jb) + xhat(1:cv_size_jb)) + &
                            j_grad(1:cv_size_jb)
 
    ! Add Del_v (Je)
    if (cv_size_je > 0) then
       j_grad(je_start:je_end) = je_factor * &
-                                ( cv(je_start:je_end) + xhat(je_start:je_end)) + &
+                                (cv(je_start:je_end) + xhat(je_start:je_end)) + &
                                 j_grad(je_start:je_end)
    end if
-   gnorm_jb = da_dot_cv( cv_size_jb, cv_size_domain_jb, &
+   gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
                          cv_jb + xhat_jb , cv_jb + xhat_jb, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-   gnorm_je = da_dot_cv( cv_size_je, cv_size_domain_je, &
+   gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
                          cv_je + xhat_je , cv_je + xhat_je, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
@@ -222,7 +222,7 @@ subroutine da_calculate_j( it, iter, cv_size, cv_size_jb, cv_size_je, &
                                        j_grad(1:cv_size))
    end if
 
-   gnorm_j = da_dot_cv( cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
+   gnorm_j = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    gnorm_jo= sqrt(gnorm_jo)

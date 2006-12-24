@@ -4,7 +4,9 @@
 
 subroutine da_map_init(proj)
 
-   ! Initializes the map projection structure to missing values
+   !-----------------------------------------------------------------------
+   ! Purpose: Initializes the map projection structure to missing values
+   !-----------------------------------------------------------------------
 
    implicit none
 

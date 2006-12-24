@@ -4,12 +4,12 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
    implicit none
 
    !-----------------------------------------------------------------
-   ! Output :: ADJ_gx2, ADJ_sigma
-   ! Input  :: ADJ_effangv,ADJ_effangh,effangv,effangh
+   ! Purpose: Calculate the effective zenith angle of reflected microwave
+   ! radiation at SSM/I frequencies for vertical and horizontal polarization
+   !
+   ! Output: ADJ_gx2, ADJ_sigma
+   ! Input: ADJ_effangv,ADJ_effangh,effangv,effangh
    !-----------------------------------------------------------------
-
-   ! Calculated the effective zenith angle of reflected microwave radiation
-   ! at SSM/I frequencies for vertical and horizontal polarization
  
    integer, intent(in   ) :: ifreq
    real   , intent(in   ) :: theta,gx2,sigma

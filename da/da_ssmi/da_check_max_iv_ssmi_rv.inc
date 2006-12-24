@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_ssmi_rv(it, ssmi_retrieval, &
                      itpw, itpwf, ispeed, ispeedf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,    intent (in)                :: it ! Outer loop 

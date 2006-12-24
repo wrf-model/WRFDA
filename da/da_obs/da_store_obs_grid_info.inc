@@ -1,5 +1,9 @@
 subroutine da_store_obs_grid_info (xp, loc)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type),     intent(in)    :: xp     ! Domain decomposition vars.

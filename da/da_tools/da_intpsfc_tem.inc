@@ -1,7 +1,7 @@
 subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
-   !----------------------------------------------------------------------------
-   ! Correct temperature between two levels.
+   !-----------------------------------------------------------------------
+   ! Purpose: Correct temperature between two levels.
    !
    ! Reference: 
    ! ---------

@@ -1,10 +1,10 @@
 subroutine da_biasprep(inst,ob,iv)
 
-   implicit none
+   !-----------------------------------------------------------------------
+   ! Purpose: Output information files for bias correction progs
+   !-----------------------------------------------------------------------
 
-   !-----------------------------------------------------------------------
-   ! Output information files for bias correction progs
-   !-----------------------------------------------------------------------
+   implicit none
 
    integer       ,  intent(in)      :: inst
    type (y_type),  intent(in)       :: ob         ! o structure.

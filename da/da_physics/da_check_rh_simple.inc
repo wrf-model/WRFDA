@@ -1,4 +1,8 @@
-subroutine da_check_rh_simple( xb, xa, xp)
+subroutine da_check_rh_simple(xb, xa, xp)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,7 +25,7 @@ subroutine da_check_rh_simple( xb, xa, xp)
             p_new  = xb % p(i,j,k) + xa %  p(i,j,k)
             t_new  = xb % t(i,j,k) + xa %  t(i,j,k)
 
-            call da_tp_to_qs( t_new, p_new, es, q_new)
+            call da_tp_to_qs(t_new, p_new, es, q_new)
             dqmax=q_new*ramax - xb % q(i,j,k)        
             dqmin=q_new*ramin - xb % q(i,j,k)        
             xa % q(i,j,k)=min(max(xa % q(i,j,k),dqmin),dqmax)

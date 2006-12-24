@@ -1,7 +1,7 @@
 subroutine da_eof_decomposition_test( kz, bx, e, l )
    
    !------------------------------------------------------------------------------
-   ! PURPOSE: 
+   ! Purpose: 
    ! [1] Print eigenvalues:
    ! [2] Test orthogonality of eigenvectors - sum_k (e_m(k) e_n(k)) = delta_mn:
    ! [3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2:

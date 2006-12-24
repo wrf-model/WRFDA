@@ -1,5 +1,9 @@
 subroutine da_print_stats_geoamv(stats_unit, nu, nv, geoamv)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

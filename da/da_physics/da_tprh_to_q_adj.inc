@@ -1,7 +1,7 @@
 subroutine da_tprh_to_q_adj( xb, xp, xa )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of da_tprh_to_q_adj.
+   !  Purpose: Adjoint of da_tprh_to_q_adj.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -65,7 +65,7 @@ end subroutine da_tprh_to_q_adj
 !                             t_prime, p_prime, rh_prime, q_prime, n )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of da_tprh_to_q_adj.
+!  Purpose: Adjoint of da_tprh_to_q_adj.
 !------------------------------------------------------------------------------
 
 !   implicit none

@@ -5,6 +5,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    implicit none
 
    !--------------------------------------------------------------------
+   ! Purpose: TBD
    ! Output  : ADJ_ho, ADJ_hv, ADJ_sigo, ADJ_sigv, ADJ_zcld, ADJ_mu
    ! Input   : ADJ_hdn, ADJ_hup, ADJ_hdninf, ADJ_hupinf
    !--------------------------------------------------------------------

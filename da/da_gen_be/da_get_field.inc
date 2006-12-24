@@ -1,4 +1,8 @@
-subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field)
+subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3,k,field)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 

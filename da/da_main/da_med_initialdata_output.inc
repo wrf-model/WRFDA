@@ -1,14 +1,14 @@
 subroutine da_med_initialdata_output (grid , config_flags, out_filename)
 
-   implicit none
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
-   ! Arguments
+   implicit none
 
    type(domain), intent(in)                   :: grid
    type (grid_config_rec_type) , intent(inout) :: config_flags       
    character(*),  intent (in),  optional       :: out_filename
-
-   ! Local
 
    integer                :: fid
    character (len=80)     :: file_name

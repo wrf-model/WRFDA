@@ -32,7 +32,7 @@
    !dis    AND ARE FURNISHED "AS IS."  THE AUTHORS, THE unitED STATES
    !dis    GOVERNMENT, ITS inSTRUMENTALITIES, OFFICERS, EMPLOYEES, AND
    !dis    AGENTS MAKE NO WARRANTY, EXPRESS OR IMPLIED, AS TO THE useFULNESS
-   !dis    OF THE SOFTWARE AND doCUMENTATION FOR ANY PURPOSE.  THEY ASsumE
+   !dis    OF THE SOFTWARE AND doCUMENTATION FOR ANY Purpose.  THEY ASsumE
    !dis    NO RESPONSIBILITY (1) FOR THE use OF THE SOFTWARE AND
    !dis    doCUMENTATION; OR (2) TO PROVIDE TECHNICAL SUPPORT TO useRS.
    !dis   
@@ -61,7 +61,7 @@
    ! Additionally, coding was improved to F90 standards and the routines were
    ! combined into this module.  
    !
-   ! ASsumPTIONS
+   ! Assumptions
    ! -----------
    !  Grid Definition:
    !    For mercator, lambert conformal, and polar-stereographic projections,

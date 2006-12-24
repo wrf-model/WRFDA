@@ -1,7 +1,7 @@
 subroutine da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: transform gradient from obs space to model grid space.
+   ! Purpose: transform gradient from obs space to model grid space.
    !
    ! METHOD:  jo_grad_x = H^T jo_grad_y =  - H^T R^-1 (d - H delta_x)
    !           1. input gradient in obs space and reference state of RTTOV
@@ -9,7 +9,9 @@ subroutine da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
    !           3. adjoint of interpolation from model grid to obs loc
    !---------------------------------------------------------------------------
 
-use da_interpolation, only : da_interp_lin_3d_adj_new
+   implicit none
+
+   use da_interpolation, only : da_interp_lin_3d_adj_new
 
    IMPLICIT NONE
 

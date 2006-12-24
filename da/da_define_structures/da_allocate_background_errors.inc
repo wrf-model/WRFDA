@@ -2,7 +2,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
                                            be_evec_loc, be_sub)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate components of wrfvar background errors.
+   ! Purpose: Allocate components of wrfvar background errors.
    !---------------------------------------------------------------------------
 
    implicit none

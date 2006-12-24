@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_profiler(it, profiler , &
                         itu,ituf,itvv,itvvf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it      ! Outer iteration 

@@ -3,7 +3,7 @@ subroutine da_setup_background_errors(xb, xbx, be, xp, &
                                        ids, ide, jds, jde, kds, kde)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Define and allocate components of background errors.
+   ! Purpose: Define and allocate components of background errors.
    !          Wrapper subroutine.
    !---------------------------------------------------------------------------
 

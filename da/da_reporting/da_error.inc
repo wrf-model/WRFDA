@@ -1,5 +1,9 @@
 subroutine da_error( file_str, line, errors)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: Standardised error reporting
+   !-----------------------------------------------------------------------
+
    implicit none
 
    character(len=*), intent(in) :: file_str

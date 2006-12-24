@@ -3,7 +3,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam, &
                              )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Convert analysis increments into WRFAD increments 
+   ! Purpose: Convert analysis increments into WRFAD increments 
    !          (following xatowrf, but only keep the increments)
    !---------------------------------------------------------------------------
 

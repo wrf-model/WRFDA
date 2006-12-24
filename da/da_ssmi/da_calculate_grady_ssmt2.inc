@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_ssmt2( iv, re, jo_grad_y)
+subroutine da_calculate_grady_ssmt2(iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -15,10 +15,10 @@ subroutine da_calculate_grady_ssmt2( iv, re, jo_grad_y)
    if (iv%num_ssmt2 > 0) then  
       do n=1, iv%num_ssmt2
          do k=1, iv%ssmt2(n)%info%levels
-            if(iv%ssmt2(n)%rh(k)%qc < obs_qc_pointer) re%ssmt2(n)%rh(k) = 0.0
+            if (iv%ssmt2(n)%rh(k)%qc < obs_qc_pointer) re%ssmt2(n)%rh(k) = 0.0
 
             jo_grad_y%ssmt2(n)%rh(k) = -re%ssmt2(n)%rh(k) / &
-                                      ( iv%ssmt2(n)%rh(k)%error * &
+                                      (iv%ssmt2(n)%rh(k)%error * &
                                         iv%ssmt2(n)%rh(k)%error)
 
          end do

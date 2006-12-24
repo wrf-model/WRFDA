@@ -1,7 +1,7 @@
 subroutine da_ao_stats_gpsref (stats_unit, oi, re)
 
    !--------------------------------------------------------------------
-   ! Called by da_minimisation/da_write_diagnostics.inc.
+   ! Purpose: Called by da_minimisation/da_write_diagnostics.inc.
    !--------------------------------------------------------------------
 
    implicit none

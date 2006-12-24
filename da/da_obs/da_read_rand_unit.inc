@@ -1,7 +1,7 @@
 subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
 
    !----------------------------------------------------------------------------   
-   ! Program to read diagnostics written on rand_unit by WRF-Var
+   ! Purpose: Program to read diagnostics written on rand_unit by WRF-Var
    !----------------------------------------------------------------------------   
 
    implicit none

@@ -1,5 +1,9 @@
 subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer             ,   intent(in)    :: ltbl

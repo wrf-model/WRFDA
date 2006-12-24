@@ -1,7 +1,7 @@
 subroutine da_prho_to_t_adj(xb, xp, xa) 
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of da_prho_to_t.
+   !  Purpose: Adjoint of da_prho_to_t.
    !
    !  METHOD:  Standard adjoint coding.
    !

@@ -1,20 +1,20 @@
 subroutine da_write_filtered_rad(ob, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: write out QCed radiance data.
+   ! Purpose: write out QCed radiance data.
    !
-   !  METHOD: write out for separate PEs 
+   ! METHOD: write out for separate PEs 
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (y_type),     INTENT(IN)  :: ob       ! Observation structure.
-   TYPE (ob_type),    INTENT(IN)  :: iv       ! O-B structure.
+   type (y_type),     intent(in)  :: ob       ! observation structure.
+   type (ob_type),    intent(in)  :: iv       ! o-b structure.
 
-   INTEGER                        :: n        ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
+   integer                        :: n        ! loop counter.
+   integer                        :: i, j, k  ! index dimension.
 
-   INTEGER            :: ios, filtered_rad_unit
+   integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename
 
    if (trace_use) call da_trace_entry("da_write_filtered_rad")
@@ -26,7 +26,7 @@ subroutine da_write_filtered_rad(ob, iv)
       write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
 #else
       write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
-#endif
+#end if
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') &
@@ -34,7 +34,7 @@ subroutine da_write_filtered_rad(ob, iv)
 #else
       write(unit=filename, fmt='(a)') &
          'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
-#endif
+#end if
       
       call da_get_unit(filtered_rad_unit)
       open(unit=filtered_rad_unit,file=trim(filename), &
@@ -42,7 +42,7 @@ subroutine da_write_filtered_rad(ob, iv)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open filtered radiance file"//filename/))
-      Endif
+      end if
 
       write(unit=filtered_rad_unit) iv%instid(n)%num_rad
 

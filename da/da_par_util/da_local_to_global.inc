@@ -1,10 +1,12 @@
 subroutine da_local_to_global(xp, x, xg, dim)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Make xg global-grid array by gathering the subdomain arrays x from 
+   ! Purpose: Make xg global-grid array by gathering the subdomain arrays x from 
    !           each processor. The global array xg is stored only on the monitor
    !           processor (typically, processor 0). 
    !---------------------------------------------------------------------------
+
+   implicit none
 
    type (XPOSE_type), intent(in):: xp                                    ! Domain decomposition vars.
    real,  intent(in)   :: x (xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)  ! Local-grid input array.

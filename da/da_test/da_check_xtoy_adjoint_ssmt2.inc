@@ -1,4 +1,8 @@
-subroutine da_check_xtoy_adjoint_ssmt2( iv, y, adjtest_lhs, pertile_lhs)
+subroutine da_check_xtoy_adjoint_ssmt2(iv, y, adjtest_lhs, pertile_lhs)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -12,12 +16,12 @@ subroutine da_check_xtoy_adjoint_ssmt2( iv, y, adjtest_lhs, pertile_lhs)
       do n=1, iv%num_ssmt2
          if (iv%ssmt2(n)%loc%proc_domain) then
             do k=1, iv%ssmt2(n)%info%levels
-               adjtest_lhs = adjtest_lhs + ( y%ssmt2(n)%rh(k)/typical_rh_rms)**2
+               adjtest_lhs = adjtest_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
             end do
          end if
 
          do k=1, iv%ssmt2(n)%info%levels
-            pertile_lhs = pertile_lhs + ( y%ssmt2(n)%rh(k)/typical_rh_rms)**2
+            pertile_lhs = pertile_lhs + (y%ssmt2(n)%rh(k)/typical_rh_rms)**2
 
             y%ssmt2(n)%rh(k) = y%ssmt2(n)%rh(k) / typical_rh_rms ** 2
          end do

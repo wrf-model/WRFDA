@@ -1,7 +1,7 @@
 subroutine da_scan_radar (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Scan the Radar observation file
+   ! Purpose: Scan the Radar observation file
    !---------------------------------------------------------------------------
 
    implicit none

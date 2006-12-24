@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_satem (xa, xb, iv, xp, y)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (x_type),  intent(in)   :: xa       ! gridded analysis increment.

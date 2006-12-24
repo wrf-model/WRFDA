@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_polaramv( iv, re, jo_grad_y)
+subroutine da_calculate_grady_polaramv(iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Calculates Gradient of Polar AMVs  Obs.          
@@ -24,10 +24,10 @@ subroutine da_calculate_grady_polaramv( iv, re, jo_grad_y)
             end if
 
             jo_grad_y%polaramv(n)%u(k) = -re%polaramv(n)%u(k) / &
-                                    ( iv%polaramv(n)%u(k)%error * &
+                                    (iv%polaramv(n)%u(k)%error * &
                                       iv%polaramv(n)%u(k)%error)
             jo_grad_y%polaramv(n)%v(k) = -re%polaramv(n)%v(k) / &
-                                    ( iv%polaramv(n)%v(k)%error * &
+                                    (iv%polaramv(n)%v(k)%error * &
                                       iv%polaramv(n)%v(k)%error)
          end do
       end do

@@ -1,7 +1,7 @@
 subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Perform one pass of recursive filter on 1D array - adjoint.
+   ! Purpose: Perform one pass of recursive filter on 1D array - adjoint.
    !---------------------------------------------------------------------------
 
    implicit none

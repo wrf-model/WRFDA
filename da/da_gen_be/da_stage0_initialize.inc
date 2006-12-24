@@ -1,5 +1,9 @@
 subroutine da_stage0_initialize(input_file, var, dim1, dim2, dim3, ds)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
 #include <netcdf.inc>

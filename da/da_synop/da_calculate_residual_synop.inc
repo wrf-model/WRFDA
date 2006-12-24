@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_synop( oi, y, re,                        &
+subroutine da_calculate_residual_synop(oi, y, re,                        &
                                          np_missing, np_bad_data,          &
                                          np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for synop obs
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -24,15 +28,15 @@ subroutine da_calculate_residual_synop( oi, y, re,                        &
       do n=1, oi%num_synop
          np_available = np_available + 5
 
-         re%synop(n)%u = da_residual( n, 0, y%synop(n)%u, &
+         re%synop(n)%u = da_residual(n, 0, y%synop(n)%u, &
                                       oi%synop(n)%u, n_obs_bad % u)
-         re%synop(n)%v = da_residual( n, 0, y%synop(n)%v, &
+         re%synop(n)%v = da_residual(n, 0, y%synop(n)%v, &
                                    oi%synop(n)%v, n_obs_bad % v)
-         re%synop(n)%t = da_residual( n, 0, y%synop(n)%t, &
+         re%synop(n)%t = da_residual(n, 0, y%synop(n)%t, &
                                    oi%synop(n)%t, n_obs_bad % t)
-         re%synop(n)%p = da_residual( n, 0, y%synop(n)%p, &
+         re%synop(n)%p = da_residual(n, 0, y%synop(n)%p, &
                                    oi%synop(n)%p, n_obs_bad % p)
-         re%synop(n)%q = da_residual( n, 0, y%synop(n)%q, &
+         re%synop(n)%q = da_residual(n, 0, y%synop(n)%q, &
                                    oi%synop(n)%q, n_obs_bad % q)
       end do
 

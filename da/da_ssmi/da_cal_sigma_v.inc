@@ -1,5 +1,9 @@
 subroutine da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigma_v)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,intent(in) :: ifreq

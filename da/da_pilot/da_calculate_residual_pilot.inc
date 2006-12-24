@@ -1,6 +1,10 @@
-subroutine da_calculate_residual_pilot( oi, y, re,                        &
+subroutine da_calculate_residual_pilot(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Calculate residuals for pilots
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -21,9 +25,9 @@ subroutine da_calculate_residual_pilot( oi, y, re,                        &
       do n=1, oi%num_Pilot
          do k=1, oi%Pilot(n)%info%levels
             np_available = np_available + 2
-            re%Pilot(n)%u(k) = da_residual( n, k, y%Pilot(n)%u(k), &
+            re%Pilot(n)%u(k) = da_residual(n, k, y%Pilot(n)%u(k), &
                                   oi%Pilot(n)%u(k), n_obs_bad % u)
-            re%Pilot(n)%v(k) = da_residual( n, k, y%Pilot(n)%v(k), &
+            re%Pilot(n)%v(k) = da_residual(n, k, y%Pilot(n)%v(k), &
                                   oi%Pilot(n)%v(k), n_obs_bad % v)
          end do
       end do

@@ -1,7 +1,7 @@
 subroutine da_pack_count_obs (num_obs, offset, value)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Pack the 4 integer num_obs values into value(offset) to 
+   ! Purpose: Pack the 4 integer num_obs values into value(offset) to 
    !          value(offset+3).
    !---------------------------------------------------------------------------
 

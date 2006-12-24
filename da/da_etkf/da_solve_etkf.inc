@@ -1,30 +1,32 @@
 subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! subroutine for ETKF perturbation updates 
-! Xuguang Wang, Jan. 2006
-!
-! references:
-! Bishop et al 2001 MWR, 
-! Wang and Bishop 2003 MWR, 
-! Wang et al. 2004, MWR
-! Wang et al. 2006, MWR
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   !-----------------------------------------------------------------------
+   ! Purpose: ETKF perturbation updates 
+   ! Xuguang Wang, Jan. 2006
+   !
+   ! references:
+   ! Bishop et al 2001 MWR, 
+   ! Wang and Bishop 2003 MWR, 
+   ! Wang et al. 2004, MWR
+   ! Wang et al. 2006, MWR
+   !
+   !1) nanals, ensemble size
+   !2) ndim, dimension of the perturbation vector that needs to be updated
+   !3) nobs, number of observations assimilated
+   !4) ens, array of perturbations before (Xf') and after (Xa') ETKF update
+   !5) ens_ob, array of HXf
+   !6) oberrvar, observation error variance, listed in the same sequence as HXf
+   !7) obs, observations assimilated
+   !8) naccumt1, number of previous cycles immediately before the current cycle, which is needed for calculating adaptive inflation factor. naccumt1 < 0 for pre-specified inflation
+   !9) naccumt2, number of previous cycles immediately before the current cycle, which is needed for calculating the rho factor in the latest version of ETKF. naccumt2 < 0 for using the older version of the ETKF. naccumt2 = 0 for using pre-specified rho factor
+   !10) nstartaccum1, the cycle from which the accumulation of previous naccumt1 cycles in 8) starts
+   !11) nstartaccum2, the cycle from which the accumulation of previous naccumt2 in 9) starts
+   !12) tainflatinput, pre-specified inflation, if not using adaptive inflation
+   !13) rhoinput, pre-specified rho factor, if not using adaptively determined rho factor
+   !14) nout, record number for output squared innovations and the forecast error variance 
+   !-----------------------------------------------------------------------projected onto ensemble subspace, which is related to 8) and 9) 
 
-!1) nanals, ensemble size
-!2) ndim, dimension of the perturbation vector that needs to be updated
-!3) nobs, number of observations assimilated
-!4) ens, array of perturbations before (Xf') and after (Xa') ETKF update
-!5) ens_ob, array of HXf
-!6) oberrvar, observation error variance, listed in the same sequence as HXf
-!7) obs, observations assimilated
-!8) naccumt1, number of previous cycles immediately before the current cycle, which is needed for calculating adaptive inflation factor. naccumt1 < 0 for pre-specified inflation
-!9) naccumt2, number of previous cycles immediately before the current cycle, which is needed for calculating the rho factor in the latest version of ETKF. naccumt2 < 0 for using the older version of the ETKF. naccumt2 = 0 for using pre-specified rho factor
-!10) nstartaccum1, the cycle from which the accumulation of previous naccumt1 cycles in 8) starts
-!11) nstartaccum2, the cycle from which the accumulation of previous naccumt2 in 9) starts
-!12) tainflatinput, pre-specified inflation, if not using adaptive inflation
-!13) rhoinput, pre-specified rho factor, if not using adaptively determined rho factor
-!14) nout, record number for output squared innovations and the forecast error variance projected onto ensemble subspace, which is related to 8) and 9) 
+   implicit none
 
  integer, intent(in) :: nanals,ndim,nobs
  real, intent(inout), dimension(ndim,nanals) :: ens

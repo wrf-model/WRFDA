@@ -1,8 +1,10 @@
-subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
+subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Fill (local) vv arrays from 1D (local) cv array.
+   ! Purpose: Fill (local) vv arrays from 1D (local) cv array.
    !---------------------------------------------------------------------------
+
+   implicit none
 
    integer,        intent(in)    :: cv_size     ! Length of CV array.
    real,           intent(in)    :: rcv(1:cv_size) ! Control variables v.
@@ -31,47 +33,47 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
 
    ! Fill v1
    mz = mzs(1)
-   if ( mz > 0 ) then
+   if (mz > 0) then
       ijm = ix * jy * mz
       cv_s = cv_e + 1
       cv_e = cv_s + ijm - 1
-      vv % v1(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      vv % v1(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
 
    ! Fill v2
    mz = mzs(2)
-   if ( mz > 0 ) then
+   if (mz > 0) then
       ijm = ix * jy * mz
       cv_s = cv_e + 1
       cv_e = cv_s + ijm - 1
-      vv % v2(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      vv % v2(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
 
    ! Fill v3
    mz = mzs(3)
-   if ( mz > 0 ) then
+   if (mz > 0) then
       ijm = ix * jy * mz
       cv_s = cv_e + 1
       cv_e = cv_s + ijm - 1
-      vv % v3(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      vv % v3(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
 
    ! Fill v4
    mz = mzs(4)
-   if ( mz > 0 ) then
+   if (mz > 0) then
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v4(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+     vv % v4(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
 
    ! Fill v5
    mz = mzs(5)
-   if ( mz == 1 ) then ! Can only be 0 or 1 (2D ps_u field)
+   if (mz == 1) then ! Can only be 0 or 1 (2D ps_u field)
      ijm = ix * jy * mz
      cv_s = cv_e + 1
      cv_e = cv_s + ijm - 1
-     vv % v5(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy,mz/) )
+     vv % v5(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy,mz/))
    end if
 
    !--------------------------------------------------------------------------
@@ -79,11 +81,11 @@ subroutine da_cv_to_vv ( cv_size, rcv, xp, mzs, vv )
    !--------------------------------------------------------------------------
 
    mz = mzs(6)
-   if ( mz > 0 ) then
+   if (mz > 0) then
       ijm = ix * jy * mz
       cv_s = cv_e + 1
       cv_e = cv_s + ijm - 1
-      vv % alpha(is:ie,js:je,1:mz) = RESHAPE( rcv(cv_s:cv_e),(/ix, jy, mz/) )
+      vv % alpha(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
 
 end subroutine da_cv_to_vv

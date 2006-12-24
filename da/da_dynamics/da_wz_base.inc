@@ -1,7 +1,11 @@
 subroutine da_wz_base(xb,WZ_b,                       &
                       ids,ide, jds,jde, kds,kde,  &
                       ims,ime, jms,jme, kms,kme,  &
-                      its,ite, jts,jte, kts,kte )
+                      its,ite, jts,jte, kts,kte)
+
+   !--------------------------------------------------------------------
+   ! Purpose: TBD
+   !--------------------------------------------------------------------
 
    implicit none
 
@@ -30,10 +34,10 @@ subroutine da_wz_base(xb,WZ_b,                       &
    ie = ite
    js = jts
    je = jte
-   if ( its == ids ) is = ids+1
-   if ( ite == ide ) ie = ide-1
-   if ( jts == jds ) js = jds+1
-   if ( jte == jde ) je = jde-1
+   if (its == ids) is = ids+1
+   if (ite == ide) ie = ide-1
+   if (jts == jds) js = jds+1
+   if (jte == jde) je = jde-1
 
 
    do K=kts,kte
@@ -50,7 +54,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
       end do
    end do
 
-   if ( its == ids ) then
+   if (its == ids) then
       i = its
       do K=kts,kte
          do J=js,je
@@ -59,7 +63,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
       end do
    end if
 
-   if ( ite == ide ) then
+   if (ite == ide) then
       i = ite
       do K=kts,kte
          do J=js,je
@@ -68,7 +72,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
       end do
    end if
 
-   if ( jts == jds ) then
+   if (jts == jds) then
       j = jts
       do K=kts,kte
          do I=its, ite
@@ -77,7 +81,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
       end do
    end if
 
-   if ( jte == jde ) then
+   if (jte == jde) then
       j = jte
       do K=kts,kte
          do I=its, ite
@@ -103,8 +107,8 @@ subroutine da_wz_base(xb,WZ_b,                       &
 
    ! Computation to check for edge of domain:
    is = its-1; ie = ite+1; js = jts-1; je = jte+1
-   if ( its == ids ) is = ids; if ( ite == ide ) ie = ide
-   if ( jts == jds ) js = jds; if ( jte == jde ) je = jde
+   if (its == ids) is = ids; if (ite == ide) ie = ide
+   if (jts == jds) js = jds; if (jte == jde) je = jde
 
    do K=kts,kte
       do J=js,je

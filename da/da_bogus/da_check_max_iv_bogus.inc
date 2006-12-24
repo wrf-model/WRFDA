@@ -1,6 +1,10 @@
 subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
                                   itt,ittf,itqv,itqvf,itslp,itslpf)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent (in)         :: it      ! Outer iteration
@@ -60,7 +64,7 @@ subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
 
    ! Sea Level Pressure
 
-   call da_max_error_qc( it, bogus % info, bogus %slp,  &
+   call da_max_error_qc(it, bogus % info, bogus %slp,  &
                          max_error_slp, itslp, itslpf,iunit,  &
                          'SLP  ', failed, print)
 

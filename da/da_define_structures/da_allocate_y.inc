@@ -1,7 +1,7 @@
 subroutine da_allocate_y (iv, y)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate arrays used in y and residual obs structures.
+   ! Purpose: Allocate arrays used in y and residual obs structures.
    !---------------------------------------------------------------------------
 
    implicit none

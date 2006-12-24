@@ -1,7 +1,7 @@
 subroutine da_initialize_cv(cv_size, cv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Initialize components of control variable.
+   ! Purpose: Initialize components of control variable.
    !---------------------------------------------------------------------------
 
    implicit none

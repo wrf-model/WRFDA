@@ -1,6 +1,10 @@
-subroutine da_cal_residual_ssmi( oi, y, re,                           &
+subroutine da_cal_residual_ssmi(oi, y, re,                           &
                                        np_missing, np_bad_data,             &
-                                       np_obs_used, np_available            )
+                                       np_obs_used, np_available           )
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -11,17 +15,17 @@ subroutine da_cal_residual_ssmi( oi, y, re,                           &
    integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
-   if ( oi%num_ssmi_tb .gt. 0 ) then
+   if (oi%num_ssmi_tb .gt. 0) then
 
-      call da_cal_residual_ssmi_tb( oi, y, re,  &
+      call da_cal_residual_ssmi_tb(oi, y, re,  &
                                          np_missing, np_bad_data, &
-                                         np_obs_used, np_available )
+                                         np_obs_used, np_available)
 
-   else if ( oi%num_ssmi_retrieval .gt. 0) then
+   else if (oi%num_ssmi_retrieval .gt. 0) then
 
-      call da_cal_residual_ssmi_rv( oi, y, re,  &
+      call da_cal_residual_ssmi_rv(oi, y, re,  &
                                          np_missing, np_bad_data, &
-                                         np_obs_used, np_available )
+                                         np_obs_used, np_available)
    end if
 
 end subroutine da_cal_residual_ssmi

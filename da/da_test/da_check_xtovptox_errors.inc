@@ -1,4 +1,4 @@
-subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+subroutine da_check_xtovptox_errors(xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                      xa2_p, xa2_q, xa2_rho, &
                                      xa2_qt, xa2_qcw, xa2_qrn, &
                                      ids,ide, jds,jde, kds,kde, &
@@ -6,7 +6,7 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                      its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Test invertibility of v = U^{-1} x followed by x = Uv.
+   ! Purpose: Test invertibility of v = U^{-1} x followed by x = Uv.
    !
    !  METHOD:  Perform statistics on differences in initial and final x.
    !---------------------------------------------------------------------------
@@ -46,9 +46,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_u(its:ite, jts:jte, kts:kte) &
                                    - xa% u(its:ite, jts:jte, kts:kte)
    
-   rms_fild = sqrt( sum( xa % u(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % u(its:ite, jts:jte, kts:kte) &
                        * xa % u(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
      
    if (rms_fild == 0.0) then
@@ -67,9 +67,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_v(its:ite, jts:jte, kts:kte) &
                                    - xa% v(its:ite, jts:jte, kts:kte)
    
-   rms_fild = sqrt( sum( xa % v(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % v(its:ite, jts:jte, kts:kte) &
                        * xa % v(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
      
    if (rms_fild == 0.0) then
@@ -88,9 +88,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_t(its:ite, jts:jte, kts:kte) &
                                    - xa% t(its:ite, jts:jte, kts:kte)
 
-   rms_fild = sqrt( sum( xa % t(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % t(its:ite, jts:jte, kts:kte) &
                        * xa % t(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
 
    if (rms_fild == 0.0) then
@@ -109,9 +109,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_p(its:ite, jts:jte, kts:kte) &
                                    - xa% p(its:ite, jts:jte, kts:kte)
 
-   rms_fild = sqrt( sum( xa % p(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % p(its:ite, jts:jte, kts:kte) &
                        * xa % p(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
 
    if (rms_fild == 0.0) then
@@ -130,9 +130,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_q(its:ite, jts:jte, kts:kte) &
                                    - xa% q(its:ite, jts:jte, kts:kte)
 
-   rms_fild = sqrt( sum( xa % q(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % q(its:ite, jts:jte, kts:kte) &
                        * xa % q(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
 
    if (rms_fild == 0.0) then
@@ -151,9 +151,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte) = xa2_rho(its:ite, jts:jte, kts:kte) &
                                    - xa% rho(its:ite, jts:jte, kts:kte)
 
-   rms_fild = sqrt( sum( xa % rho(its:ite, jts:jte, kts:kte) &
+   rms_fild = sqrt(sum(xa % rho(its:ite, jts:jte, kts:kte) &
                        * xa % rho(its:ite, jts:jte, kts:kte)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                        * diff(its:ite, jts:jte, kts:kte)))
 
    if (rms_fild == 0.0) then
@@ -172,9 +172,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    diff(its:ite, jts:jte, kts:kte+1) = xa2_w(its:ite, jts:jte, kts:kte+1) &
                                      - xa% w(its:ite, jts:jte, kts:kte+1)
 
-   rms_fild = sqrt( sum( xa % w(its:ite, jts:jte, kts:kte+1) &
+   rms_fild = sqrt(sum(xa % w(its:ite, jts:jte, kts:kte+1) &
                        * xa % w(its:ite, jts:jte, kts:kte+1)))
-   rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte+1) &
+   rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte+1) &
                        * diff(its:ite, jts:jte, kts:kte+1)))
 
    if (rms_fild == 0.0) then
@@ -194,9 +194,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
       diff(its:ite, jts:jte, kts:kte) = xa2_qt(its:ite, jts:jte, kts:kte) &
                                       - xa% qt(its:ite, jts:jte, kts:kte)
 
-      rms_fild = sqrt( sum( xa % qt(its:ite, jts:jte, kts:kte) &
+      rms_fild = sqrt(sum(xa % qt(its:ite, jts:jte, kts:kte) &
                           * xa % qt(its:ite, jts:jte, kts:kte)))
-      rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+      rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                           * diff(its:ite, jts:jte, kts:kte)))
 
       if (rms_fild == 0.0) then
@@ -215,9 +215,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
       diff(its:ite, jts:jte, kts:kte) = xa2_qcw(its:ite, jts:jte, kts:kte) &
                                       - xa% qcw(its:ite, jts:jte, kts:kte)
 
-      rms_fild = sqrt( sum( xa % qcw(its:ite, jts:jte, kts:kte) &
+      rms_fild = sqrt(sum(xa % qcw(its:ite, jts:jte, kts:kte) &
                           * xa % qcw(its:ite, jts:jte, kts:kte)))
-      rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+      rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                           * diff(its:ite, jts:jte, kts:kte)))
 
       if (rms_fild == 0.0) then
@@ -236,9 +236,9 @@ subroutine da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
       diff(its:ite, jts:jte, kts:kte) = xa2_qrn(its:ite, jts:jte, kts:kte) &
                                       - xa% qrn(its:ite, jts:jte, kts:kte)
 
-      rms_fild = sqrt( sum( xa % qrn(its:ite, jts:jte, kts:kte) &
+      rms_fild = sqrt(sum(xa % qrn(its:ite, jts:jte, kts:kte) &
                           * xa % qrn(its:ite, jts:jte, kts:kte)))
-      rms_diff = sqrt( sum( diff(its:ite, jts:jte, kts:kte) &
+      rms_diff = sqrt(sum(diff(its:ite, jts:jte, kts:kte) &
                           * diff(its:ite, jts:jte, kts:kte)))
 
       if (rms_fild == 0.0) then

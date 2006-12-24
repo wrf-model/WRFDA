@@ -2,7 +2,11 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
                                    itb19v, itb19vf, itb19h, itb19hf, &
                                    itb22v, itb22vf,                  &
                                    itb37v, itb37vf, itb37h, itb37hf, &
-                                   itb85v, itb85vf, itb85h, itb85hf )
+                                   itb85v, itb85vf, itb85h, itb85hf)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -17,9 +21,9 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    integer                                :: iunit ! Output unit.
    logical                                :: failed, print
 
-!-----------------------------------------------------------------------------!
-!  [1.0] Open diagnostic file:
-!-----------------------------------------------------------------------------!
+   !-----------------------------------------------------------------------------!
+   ! [1.0] Open diagnostic file:
+   !-----------------------------------------------------------------------------!
 
    iunit = check_max_iv_unit
    print = check_max_iv_print

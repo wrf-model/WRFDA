@@ -5,7 +5,7 @@ subroutine da_balance_cycloterm_adj( rho, ub, vb, u, v, coefx,   &
                                      its,ite, jts,jte, kts,kte )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Adjoint of da_balance_cycloterm
+   ! Purpose: Adjoint of da_balance_cycloterm
    !---------------------------------------------------------------------------
 
    implicit none

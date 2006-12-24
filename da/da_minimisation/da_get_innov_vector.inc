@@ -2,6 +2,11 @@ subroutine da_get_innov_vector( it, ob, iv, &
                                 grid, config_flags, &
 #include "em_dummy_new_args.inc"
                 )
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,        intent(in)    :: it

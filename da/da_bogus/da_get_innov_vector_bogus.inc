@@ -1,7 +1,7 @@
 subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
 
    !------------------------------------------------------------------------------
-   !  This subroutine is to calculate the innovations for the bogus data.
+   ! Purpose: calculate the innovations for the bogus data.
    !------------------------------------------------------------------------------
 
    implicit none

@@ -1,5 +1,9 @@
 subroutine da_matmulti(mata,matb,matc,ni,nj,nab)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in) :: ni, nj, nab

@@ -1,7 +1,7 @@
 subroutine da_read_filtered_rad(xp, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: read in QCed radiance data from separated PEs 
+   ! Purpose: read in QCed radiance data from separated PEs 
    !---------------------------------------------------------------------------
 
    implicit none

@@ -1,7 +1,7 @@
 subroutine da_allocate_cv (cv_size, cv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate components of control variable.
+   ! Purpose: Allocate components of control variable.
    !---------------------------------------------------------------------------
 
    implicit none

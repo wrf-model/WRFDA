@@ -1,5 +1,9 @@
 subroutine da_array_print(direction, a, ch)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, intent(in)            :: direction

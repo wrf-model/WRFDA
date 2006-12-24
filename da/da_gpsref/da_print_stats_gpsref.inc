@@ -1,5 +1,9 @@
 subroutine da_print_stats_gpsref(stats_unit, ngpsref, GPSRef)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)    :: stats_unit

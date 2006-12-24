@@ -1,7 +1,7 @@
 subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Adjoint of da_tp_to_qs_lin
+   ! Purpose: Adjoint of da_tp_to_qs_lin
    !---------------------------------------------------------------------------
 
    implicit none
@@ -73,7 +73,7 @@ end subroutine da_tp_to_qs_adj
 !                            qs_prime_over_qs, n )
 
 !------------------------------------------------------------------------------
-!  PURPOSE: Adjoint of da_tp_to_qs_lin.
+!  Purpose: Adjoint of da_tp_to_qs_lin.
 !
 !  METHOD: Standard adjoint coding.
 !

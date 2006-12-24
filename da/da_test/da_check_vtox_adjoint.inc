@@ -1,11 +1,11 @@
-subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
+subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
                                   xa, &
                                   ids, ide, jds, jde, kds, kde,      &
                                   ims, ime, jms, jme, kms, kme,      &
                                   its, ite, jts, jte, kts, kte)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Test V to X routine and adjoint for compatibility.
+   ! Purpose: Test V to X routine and adjoint for compatibility.
    !
    ! METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
    !---------------------------------------------------------------------------
@@ -49,9 +49,9 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [2.0] Perform x = U v transform:
    !----------------------------------------------------------------------
 
-   call da_zero_x ( xa)
+   call da_zero_x (xa)
 
-   call da_transform_vtox( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
+   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
                            ids, ide, jds, jde, kds, kde,      &
                            ims, ime, jms, jme, kms, kme,      &
                            its, ite, jts, jte, kts, kte)
@@ -70,23 +70,23 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
 
    if (cv_options_hum == 2) then
       adj_par_lhs = adj_par_lhs &
-              + sum( xa % rh(its:ite, jts:jte, kts:kte)**2) / typical_rh_rms**2
+              + sum(xa % rh(its:ite, jts:jte, kts:kte)**2) / typical_rh_rms**2
    end if
 
    if (cv_options_hum == 3) then
       adj_par_lhs = adj_par_lhs &
-             + sum( xa % qcw(its:ite, jts:jte, kts:kte)**2)/typical_qcw_rms**2 &
-             + sum( xa % qrn(its:ite, jts:jte, kts:kte)**2)/typical_qrn_rms**2
+             + sum(xa % qcw(its:ite, jts:jte, kts:kte)**2)/typical_qcw_rms**2 &
+             + sum(xa % qrn(its:ite, jts:jte, kts:kte)**2)/typical_qrn_rms**2
       adj_par_lhs = adj_par_lhs &
-             + sum( xa % qt (its:ite, jts:jte, kts:kte)**2)/typical_q_rms**2
+             + sum(xa % qt (its:ite, jts:jte, kts:kte)**2)/typical_q_rms**2
    end if
 
    if (Use_RadarObs) then
       adj_par_lhs = adj_par_lhs &
-         + sum( xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+         + sum(xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
       adj_par_lhs = adj_par_lhs &
-         + sum( xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+         + sum(xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    end if
 
    !-------------------------------------------------------------------------
@@ -123,7 +123,7 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
-   call da_transform_vtox_adj( cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2, &
+   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2, &
                                ids, ide, jds, jde, kds, kde,      &
                                ims, ime, jms, jme, kms, kme,      &
                                its, ite, jts, jte, kts, kte)
@@ -132,18 +132,18 @@ subroutine da_check_vtox_adjoint( cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [6.0] Calculate RHS of adjoint test equation:
    !-------------------------------------------------------------------------
 
-   adj_par_rhs = sum( cv1(1:cv_size) * cv2(1:cv_size))
+   adj_par_rhs = sum(cv1(1:cv_size) * cv2(1:cv_size))
 
    !-------------------------------------------------------------------------
    ! [7.0] Print output:
    !-------------------------------------------------------------------------
 
-   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs)
+   adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
 
    if (global) then
       adj_sum_rhs = adj_par_rhs
    else
-      adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs)
+      adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    end if
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &

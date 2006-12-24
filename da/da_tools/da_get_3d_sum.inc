@@ -3,7 +3,12 @@ subroutine da_get_3d_sum(var, name, &
                       ims, ime, jms, jme, kms, kme, &
                       its, ite, jts, jte, kts, kte)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
+
    integer, intent(in) :: ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           its, ite, jts, jte, kts, kte

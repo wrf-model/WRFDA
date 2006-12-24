@@ -1,5 +1,9 @@
 subroutine da_get_gausslats( nj, glats, gwgts, sinlat, coslat)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    !  Calculates nj Gaussian latitudes i.e. latitudes at which the Legendre

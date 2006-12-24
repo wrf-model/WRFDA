@@ -1,4 +1,8 @@
-subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
+subroutine da_cal_jo_and_grady_ssmi_rv(oi, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -14,12 +18,12 @@ subroutine da_cal_jo_and_grady_ssmi_rv( oi, re, jo, jo_grad_y )
 
    do n=1, oi%num_ssmi_retrieval
       jo_grad_y%ssmi_retrieval(n)%Speed = - re%ssmi_retrieval(n)%Speed / &
-                                           ( oi%ssmi_retrieval(n)%Speed%error * &
-                                             oi%ssmi_retrieval(n)%Speed%error )
+                                           (oi%ssmi_retrieval(n)%Speed%error * &
+                                             oi%ssmi_retrieval(n)%Speed%error)
 
       jo_grad_y%ssmi_retrieval(n)%tpw = -re%ssmi_retrieval(n)%tpw / &
-                                         ( oi%ssmi_retrieval(n)%tpw%error * &
-                                           oi%ssmi_retrieval(n)%tpw%error )
+                                         (oi%ssmi_retrieval(n)%tpw%error * &
+                                           oi%ssmi_retrieval(n)%tpw%error)
 
       if (oi%ssmi_retrieval(n)%loc%proc_domain) then
 

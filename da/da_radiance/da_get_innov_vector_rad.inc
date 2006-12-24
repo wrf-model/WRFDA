@@ -1,7 +1,7 @@
 subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Calculate innovation vector for radiance data.
+   !  Purpose: Calculate innovation vector for radiance data.
    !
    !  METHOD:  d = y - H(x)
    !       1. interpolate xb to obs location

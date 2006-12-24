@@ -2,7 +2,7 @@ subroutine da_print_be_stats_p(outunit, ni, nj, nk, num_bins, num_bins2d, bin, &
    bin2d, regcoeff1, regcoeff2, regcoeff3)
 
    !----------------------------------------------------------------------------
-   ! Purpose : To print out the regression coefficients for the physical
+   ! Purpose: To print out the regression coefficients for the physical
    !           transform.
    !
    ! Input   : outunit              --- Fortran unit for writing out

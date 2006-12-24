@@ -1,11 +1,11 @@
-subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
+subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
                                 alp_size, alp, wsave, power, rcv, field, &
                                 ids, ide, jds, jde, &
                                 ims, ime, jms, jme, &
-                                its, ite, jts, jte )
+                                its, ite, jts, jte)
 
    !-------------------------------------------------------------------------
-   ! Performs spectral to gridpoint transformation on a sphere.
+   ! Purpose: Performs spectral to gridpoint transformation on a sphere.
    !----------------------------------------------------------------------
 
    implicit none
@@ -49,24 +49,24 @@ subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
 
    v_fou = 0.0
    do n = 1, sizec
-      ccv(n)  = CMPLX( rcv(2*n-1), rcv(2*n) )
+      ccv(n)  = CMPLX(rcv(2*n-1), rcv(2*n))
    end do
 
    !----------------------------------------------------------------------------
    ! [2]  Apply power spectrum
    !----------------------------------------------------------------------------
 
-   if ( .not. test_transforms) call da_apply_power(power, max_wave, ccv, sizec)
+   if (.not. test_transforms) call da_apply_power(power, max_wave, ccv, sizec)
 
    !----------------------------------------------------------------------------
    ! [3] Perform inverse Legendre decomposition in N-S direction:
    !----------------------------------------------------------------------------
 
    do m = 0, max_wave
-      index_start = m * ( max_wave + 1 - m ) + m * ( m + 1 ) / 2 + 1
+      index_start = m * (max_wave + 1 - m) + m * (m + 1) / 2 + 1
       index_end   = index_start + max_wave - m
 
-      index_m = m * ( max_wave + 1 - m ) + m * ( m + 1 ) / 2 + 1 - m
+      index_m = m * (max_wave + 1 - m) + m * (m + 1) / 2 + 1 - m
 
       jc = (jde-jds+1)/2
 
@@ -75,7 +75,7 @@ subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
       je = min(jc+iequator, jte)
 
       do j = jts, je
-         index_j = ( j - 1 ) * ( max_wave + 1 ) * ( max_wave + 2 ) / 2
+         index_j = (j - 1) * (max_wave + 1) * (max_wave + 2) / 2
 
          v_fou(j,m) = sum(ccv(index_start:index_start-m+max_wave) * &
             alp(index_j+index_m+m:index_j+index_m+max_wave))
@@ -84,7 +84,7 @@ subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
       js = max(jts, jc+iequator+1)
 
       do j = js, jte
-         index_j = ( jds+jde - j - 1 ) * ( max_wave + 1 ) * ( max_wave + 2 ) / 2
+         index_j = (jds+jde - j - 1) * (max_wave + 1) * (max_wave + 2) / 2
 
          sum_legtra = da_zero_complex
          do l = m, max_wave
@@ -104,7 +104,7 @@ subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
    !----------------------------------------------------------------------------
 
    do j = jts, jte
-      r_fou(its) =  real(v_fou(j,0 ))  ! R(m=0) is real.
+      r_fou(its) =  real(v_fou(j,0))  ! R(m=0) is real.
       ! r_fou(ite) = aimag(v_fou(j,0)) ! R(m=NI/2) is real, but packed in imag m = 0)
       ! make r_fou(ide) zero as there is no power computed corresponding to this wavenumber
       r_fou(ite) = 0.0      
@@ -116,7 +116,7 @@ subroutine da_v_to_vv_spectral( max_wave, sizec, lenr, lenwrk, lensav, inc, &
          r_fou(index_c) = aimag(v_fou(j,m))
       end do
 
-      call rfft1b( ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr )
+      call rfft1b(ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
       field(its:ite,j) = r_fou(its:ite)
    end do
 

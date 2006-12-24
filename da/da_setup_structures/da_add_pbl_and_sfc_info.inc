@@ -1,7 +1,7 @@
 subroutine da_add_pbl_and_sfc_info (xp, xb, xbx)
 
    !------------------------------------------------------------------------------
-   !  PURPOSE: Updates PBL and Surface parameters information for background field 
+   !  Purpose: Updates PBL and Surface parameters information for background field 
    !------------------------------------------------------------------------------
 
    implicit none

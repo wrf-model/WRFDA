@@ -1,5 +1,9 @@
 subroutine da_print_stats_radar(stats_unit, nrv, nrf, Radar)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                 intent(in)    :: stats_unit

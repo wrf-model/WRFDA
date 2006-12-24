@@ -4,7 +4,7 @@ subroutine da_transfer_xatowrf(xbx, grid, &
                              )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Convert analysis increments into WRF increments
+   !  Purpose: Convert analysis increments into WRF increments
    !---------------------------------------------------------------------------
 
    implicit none
@@ -287,7 +287,7 @@ subroutine da_transfer_xatowrf(xbx, grid, &
    end do
 
    !------------------------------------------------------------------------
-   ! For later plot and comparation purpose only, zero out the unused var.
+   ! For later plot and comparation Purpose only, zero out the unused var.
    !------------------------------------------------------------------------
 
    ! The northern boundary

@@ -1,7 +1,7 @@
 subroutine da_pt_to_rho_adj(xb, xa) 
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of da_pt_to_rho.
+   !  Purpose: Adjoint of da_pt_to_rho.
    !
    !  ASSUMPTIONS: 1) Model level stored top down
    !---------------------------------------------------------------------------

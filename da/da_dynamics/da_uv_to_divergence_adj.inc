@@ -4,7 +4,7 @@ subroutine da_uv_to_divergence_adj(xp, xb, u, v, div, &
                                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Adjoint of the subroutine da_uv_to_divergence
+   !  Purpose: Adjoint of the subroutine da_uv_to_divergence
    !                        d   U      d   V
    !           Div = m^2 *[---(---) + ---(---) ] 
    !                        dx  m      dy  M

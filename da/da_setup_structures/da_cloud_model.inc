@@ -1,7 +1,7 @@
-subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
+subroutine da_cloud_model (TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte)
 
    !-----------------------------------------------------------------
-   ! PURPOSE: Calculate DT (=dz/w) using cumulus parameterization 
+   ! Purpose: Calculate DT (=dz/w) using cumulus parameterization 
    !          of a one-dimensional cloud model.
    !-----------------------------------------------------------------
 
@@ -45,20 +45,20 @@ subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    Z0 = ZB(kts)
    T0 = MAX(TB(kts),303.)
 
-   call da_qfrmrh ( P0, T0, 95., Q0 )
+   call da_qfrmrh (P0, T0, 95., Q0)
 
-   call da_lcl ( P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL )
+   call da_lcl (P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
 
-   call da_qfrmrh ( PLCL, TLCL, 95., QLCL )
+   call da_qfrmrh (PLCL, TLCL, 95., QLCL)
 
-   call da_cumulus ( ZLCL, TLCL, QLCL, PLCL, PP, TB,            &
-                  ZC, TC, QC, KCB, KCT, PCT, ZCT, kts, kte )
+   call da_cumulus (ZLCL, TLCL, QLCL, PLCL, PP, TB,            &
+                  ZC, TC, QC, KCB, KCT, PCT, ZCT, kts, kte)
 
    do k = KCB, KCT
-      TCV(k) = TC(k) * ( 1. + 0.608 * QC(k) )
-      TBV(k) = TB(k) * ( 1. + 0.608 * QB(k) )
+      TCV(k) = TC(k) * (1. + 0.608 * QC(k))
+      TBV(k) = TB(k) * (1. + 0.608 * QB(k))
    
-      B(k) = ( TCV(k)-TBV(k) ) / TBV(k)
+      B(k) = (TCV(k)-TBV(k)) / TBV(k)
 
       QT(k) = QC(k) + QCWB(k) + QRNB(k)
    end do
@@ -66,19 +66,19 @@ subroutine da_cloud_model ( TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte )
    W0(KCB) = 0.0
    do k = KCB+1, KCT+1
       XX = 1.0+2.0*MU*(ZFB(k)-ZFB(k-1))
-      YY = 2.0*G*( B(k-1)/(1.+ALPHA) - QT(k-1) ) * ( ZFB(k)-ZFB(k-1) )
-      W0(k) =  ( W0(k-1)+YY ) / XX
+      YY = 2.0*G*(B(k-1)/(1.+ALPHA) - QT(k-1)) * (ZFB(k)-ZFB(k-1))
+      W0(k) =  (W0(k-1)+YY) / XX
    end do
      
    do k = KCB, KCT+1
-      if ( W0(k) >= 0. ) then
-         W(k) = sqrt( W0(k) )
+      if (W0(k) >= 0.) then
+         W(k) = sqrt(W0(k))
       end if
    end do
 
 
    do k = KCT, KCB+1, -1
-      if ( W(k) >= 0.01 ) then
+      if (W(k) >= 0.01) then
          DT(k) = (ZB(k)-ZB(k-1))/W(k)
       else
          DT(k) = 0.0

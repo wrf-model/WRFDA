@@ -2,7 +2,7 @@ subroutine da_setup_firstguess(xbx, grid, &
 #include "em_dummy_new_args.inc"
                             )
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate and read in components of first guess state.
+   ! Purpose: Allocate and read in components of first guess state.
    !---------------------------------------------------------------------------
 
    implicit none

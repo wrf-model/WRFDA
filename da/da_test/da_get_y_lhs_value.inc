@@ -1,5 +1,9 @@
 subroutine da_get_y_lhs_value( iv, y, &
                                partial_lhs, pertile_lhs, adj_ttl_lhs) 
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
     
    implicit none
    

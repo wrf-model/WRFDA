@@ -1,5 +1,9 @@
 subroutine da_transpose_z2x (xp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.

@@ -3,7 +3,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid, &
                             )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Define/allocate components of WRF model state.
+   ! Purpose: Define/allocate components of WRF model state.
    !---------------------------------------------------------------------------
 
    implicit none

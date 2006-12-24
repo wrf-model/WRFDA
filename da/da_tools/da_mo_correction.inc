@@ -3,14 +3,13 @@ function da_mo_correction (ho, po, to, qo, &
                         roughness)   RESULT (correc)
 
    !----------------------------------------------------------------------------
-   ! Compute the correction factor to convert surface wind into 40m wind
-   ! using similarity laws.
+   ! Purpose: Compute the correction factor to convert surface wind into 40m 
+   ! wind using similarity laws.
    !
    ! Reference:
    ! ---------
    !  A description of the fifth generation Penn State/NCAR Mesoscale Model
    !  Grell et al. 1994, page 29-30 and 80-83.
-   !  
    !----------------------------------------------------------------------------
 
    implicit none

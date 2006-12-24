@@ -1,5 +1,9 @@
 subroutine da_filter(var, xp)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    
    type (xpose_type), intent(inout) :: xp      ! Transpose variables.
@@ -20,7 +24,7 @@ subroutine da_filter(var, xp)
 
    ! Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x ( xp )
+   call da_transpose_z2x (xp)
 
    ! Perform x-direction filter:
 
@@ -41,9 +45,9 @@ subroutine da_filter(var, xp)
    end do
 
 
-   ! Apply (i,j',k' -> i',j,k') transpose ( v1x -> v1y ).
+   ! Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y ( xp )
+   call da_transpose_x2y (xp)
 
    ! Perform y-direction filter:
 
@@ -63,9 +67,9 @@ subroutine da_filter(var, xp)
       end do
    end do
 
-   ! Apply (i',j,k' -> i',j',k) transpose ( v1y -> v1z ).
+   ! Apply (i',j,k' -> i',j',k) transpose (v1y -> v1z).
 
-   call da_transpose_y2z ( xp )
+   call da_transpose_y2z (xp)
 
    var(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
       xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)

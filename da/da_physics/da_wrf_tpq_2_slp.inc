@@ -1,18 +1,19 @@
-subroutine da_wrf_tpq_2_slp ( xb )
+subroutine da_wrf_tpq_2_slp (xb)
 
-  implicit none
+   !---------------------------------------------------------------------
+   ! Purpose: computes sea level pressure from the rule                
+   !          t1/t2=(p1/p2)**(gamma*r/g).                              
+   !                                                                     
+   ! input       t        temperature                cross    3d       
+   !             q        mixing ratio               cross    2d       
+   !             p        pressure perturbation      cross    2d       
+   !             terr     terrain                    cross    2d       
+   !             psfc     surface pressure           cross    2d       
+   !                                                                       
+   ! output      slp      sea level pressure         cross    2d    
+   !---------------------------------------------------------------------
 
-   !     SECTION  DIAGNOSTIC                                               
-   !     PURPOSE  COMPUTES SEA LEVEL PRESSURE FROM THE RULE                
-   !              T1/T2=(P1/P2)**(GAMMA*R/G).                              
-   !                                                                       
-   !     inPUT       T        TEMPERATURE                CROSS    3D       
-   !                 Q        MIXinG RATIO               CROSS    2D       
-   !                 P        PRESSURE PERTURBATION      CROSS    2D       
-   !                 TERR     TERRAin                    CROSS    2D       
-   !                 PSFC     SURFACE PRESSURE           CROSS    2D       
-   !                                                                       
-   !     outPUT      SLP      SEA LEVEL PRESSURE         CROSS    2D       
+   implicit none   
               
 
    type (xb_type), intent(inout) :: xb    ! first guess (local).
@@ -28,13 +29,13 @@ subroutine da_wrf_tpq_2_slp ( xb )
 
    if (trace_use) call da_trace_entry("da_wrf_tpq_2_slp")
 
-   !                                                                       
-   !     ... SEA LEVEL PRESSURE                                            
-   !                                                                       
-      XTERM=GAMMA* gas_constant / gravity                                                   
-   !                                                                       
-   !     ... COMPUTE PRESSURE AT PCONST MB ABOVE SURFACE (PL)              
-   !                                                                       
+                                                                     
+   ! sea level pressure                                            
+                                                                         
+   xterm=gamma* gas_constant / gravity                                                   
+                                                                       
+   ! compute pressure at pconst mb above surface (pl)              
+                                                                          
 
    j_loop: do j=xb%jts, xb%jte
       i_loop: do i=xb%its, xb%ite
@@ -58,33 +59,33 @@ subroutine da_wrf_tpq_2_slp ( xb )
 
          if (klo < 1) then                                      
             write(unit=message(1),fmt='(A,F11.3,A)') &
-               'ERROR FinDinG PRESSURE LEVEL ',PCONST,' MB ABOVE THE SURFACE'
+               'Cannot find pressure levelL ',PCONST,' mb above the surface'
             write(unit=message(2),fmt='(A,F11.3,2X,A,F11.3)') &
                'PL=',PL,'  PSFC=',xb%psfc(i,j)
             call da_error(__FILE__,__LINE__,message(1:2))                                               
          end if                                                         
 
-         ! GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     
-         ! AND T AT SEA LEVEL (T0) WITH 6.5 K/KM LAPSE RATE              
+         ! get temperature at pl (tl), extrapolate t at surface (ts)     
+         ! and t at sea level (t0) with 6.5 k/km lapse rate              
 
-         TLO=xb%t(i,j,KLO) * (EPS+xb%q(i,j,KLO))/(EPS*(1.+xb%q(i,j,KLO)))
-         THI=xb%t(i,j,KHI) * (EPS+xb%q(i,j,KHI))/(EPS*(1.+xb%q(i,j,KHI)))
-         TL=THI-(THI-TLO)*LOG(PL/xb%p(i,j,KHI)) &
-                      /LOG(xb%p(i,j,KLO)/xb%p(i,j,KHI))               
-         TS=TL*(xb%psfc(i,j)/PL)**XTERM                           
-         T0=TS +GAMMA*xb%terr(i,j)
+         tlo=xb%t(i,j,klo) * (eps+xb%q(i,j,klo))/(eps*(1.+xb%q(i,j,klo)))
+         thi=xb%t(i,j,khi) * (eps+xb%q(i,j,khi))/(eps*(1.+xb%q(i,j,khi)))
+         tl=thi-(thi-tlo)*log(pl/xb%p(i,j,khi)) &
+                      /log(xb%p(i,j,klo)/xb%p(i,j,khi))               
+         ts=tl*(xb%psfc(i,j)/pl)**xterm                           
+         t0=ts +gamma*xb%terr(i,j)
 
-         ! CORRECT SEA LEVEL TEMPERATURE if TOO HOT                      
+         ! correct sea level temperature if too hot                      
 
-         if ( t0 >= tc ) then
-            if ( ts <= tc ) then
+         if (t0 >= tc) then
+            if (ts <= tc) then
                t0 = tc
             else
                t0 = tc-0.005*(ts-tc)**2
             end if
          end if
 
-         ! COMPUTE SEA LEVEL PRESSURE                                    
+         ! compute sea level pressure                                    
 
          xb%slp(i,j)=xb%psfc(i,j)*EXP(2.*gravity*xb%terr(i,j)/ &
             (gas_constant*(TS+T0)))

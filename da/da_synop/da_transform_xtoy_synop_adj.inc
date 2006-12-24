@@ -1,5 +1,9 @@
 subroutine da_transform_xtoy_synop_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xb_type), intent(in)    :: xb          ! first guess state.

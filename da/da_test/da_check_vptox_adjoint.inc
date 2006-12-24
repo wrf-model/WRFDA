@@ -1,10 +1,10 @@
-subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
+subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
                                    ids, ide, jds, jde, kds, kde, &
                                    ims, ime, jms, jme, kms, kme, &
                                    its, ite, jts, jte, kts, kte)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Test Vp to X routine and adjoint for compatibility.
+   ! Purpose: Test Vp to X routine and adjoint for compatibility.
    !
    ! METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
    !---------------------------------------------------------------------------
@@ -40,7 +40,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
 
    write(unit=*, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
-   call da_zero_x( xa)
+   call da_zero_x(xa)
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
@@ -51,8 +51,8 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
                         ims,ime, jms,jme, kms,kme, &
                         its,ite, jts,jte, kts,kte)
 
-   adj_par_lhs = sum( xa % u(its:ite,jts:jte,:)**2) / typical_u_rms**2
-   adj_par_lhs = sum( xa % v(its:ite,jts:jte,:)**2) / typical_v_rms**2 + &
+   adj_par_lhs = sum(xa % u(its:ite,jts:jte,:)**2) / typical_u_rms**2
+   adj_par_lhs = sum(xa % v(its:ite,jts:jte,:)**2) / typical_v_rms**2 + &
       adj_par_lhs
 
    xa % u(:,:,:) = xa % u(:,:,:) / typical_u_rms**2
@@ -61,7 +61,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    vp%v1(:,:,:)=0.
    vp%v2(:,:,:)=0.
 
-   call da_psichi_to_uv_adj( xa % u, xa % v, xb % coefx,   &
+   call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
                              xb % coefy, vp % v1, vp % v2, &
                              ids,ide, jds,jde, kds,kde,    &
                              ims,ime, jms,jme, kms,kme,    &
@@ -71,8 +71,8 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    adj_par_rhs = sum(vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:)) + &
       adj_par_rhs
 
-   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs)
-   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs)
+   adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
+   adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    write(unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_da_check_vptox_adjoint A:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
@@ -90,7 +90,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    vp%v1(:,:,:) = vp2_v1(:,:,:)
    vp%v2(:,:,:) = vp2_v2(:,:,:)
 
-   call da_zero_x( xa)
+   call da_zero_x(xa)
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
@@ -103,7 +103,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    ! [2.0] Perform x = U vp transform:
    !-------------------------------------------------------------------------
 
-   call da_transform_vptox( xb, vp, xp, xa, be, ep, &
+   call da_transform_vptox(xb, vp, xp, xa, be, ep, &
                             ids,ide, jds,jde, kds,kde,   &
                             ims,ime, jms,jme, kms,kme,   &
                             its,ite, jts,jte, kts,kte)
@@ -139,23 +139,23 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
 
    if (Use_RadarObs) then
       adj_par_lhs = adj_par_lhs &
-                + sum( xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+                + sum(xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
       adj_par_lhs = adj_par_lhs &
-                + sum( xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+                + sum(xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    end if
 
    if (cv_options_hum == 2) then
-      adj_par_lhs = sum( xa % rh(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(xa % rh(its:ite,jts:jte,:)**2) / &
          typical_rh_rms**2 + adj_par_lhs
    end if
 
    if (cv_options_hum == 3) then
-      adj_par_lhs = sum( xa % qcw(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(xa % qcw(its:ite,jts:jte,:)**2) / &
          typical_qcw_rms**2 + adj_par_lhs
-      adj_par_lhs = sum( xa % qrn(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(xa % qrn(its:ite,jts:jte,:)**2) / &
          typical_qrn_rms**2 + adj_par_lhs
-      adj_par_lhs = sum( xa % qt (its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(xa % qt (its:ite,jts:jte,:)**2) / &
          typical_q_rms**2 + adj_par_lhs
    end if
 
@@ -193,9 +193,9 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
-   call da_zero_vp_type ( vp)
+   call da_zero_vp_type (vp)
 
-   call da_transform_vptox_adj( xb, xbx, xa, vp, be, ep, xp, &
+   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
                                 ids,ide, jds,jde, kds,kde,   &
                                 ims,ime, jms,jme, kms,kme,   &
                                 its,ite, jts,jte, kts,kte)
@@ -215,7 +215,7 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
       adj_par_rhs
 
    if (be % ne > 0) then
-      adj_par_rhs = sum( vp % alpha(its:ite,jts:jte,:) * &
+      adj_par_rhs = sum(vp % alpha(its:ite,jts:jte,:) * &
          vp2_alpha(its:ite,jts:jte,:)) + adj_par_rhs
    end if
 
@@ -223,8 +223,8 @@ subroutine da_check_vptox_adjoint( ne, xb, xbx, be, ep, xp, vp, xa, &
    ! [7.0] Print output:
    !-------------------------------------------------------------------------
 
-   adj_sum_lhs = wrf_dm_sum_real( adj_par_lhs)
-   adj_sum_rhs = wrf_dm_sum_real( adj_par_rhs)
+   adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
+   adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    write (unit=stdout,fmt='(A,2F10.2)') &
       'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs

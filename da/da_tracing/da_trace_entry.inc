@@ -4,7 +4,9 @@ subroutine da_trace_entry(&
    Messages, &                   ! in, optional
    MaxNoCalls)                   ! in, optional
 
-   ! Trace entry point to subroutine
+   !-----------------------------------------------------------------------
+   ! Purpose: Trace entry point to subroutine
+   !-----------------------------------------------------------------------
 
    implicit none
 

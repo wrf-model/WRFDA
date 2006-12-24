@@ -1,11 +1,13 @@
-real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
+real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
 
-   ! Forms the dot product of two vectors that are organized in the 
+   !-----------------------------------------------------------------------
+   ! Purpose: Forms the dot product of two vectors that are organized in the 
    ! format of a "cv_type".  
    !
    ! Capable of producing bitwise-exact results for distributed-memory 
    ! parallel runs for testing.  This feature is very slow and consumes 
    ! lots of memory. 
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -39,25 +41,25 @@ real function da_dot_cv( cv_size, cv_size_domain, x, y, xp, mzs )
          allocate(yg(1:cv_size_domain))
       end if
 
-      call da_cv_to_global( cv_size, cv_size_domain, x, xp, mzs, xg )
-      call da_cv_to_global( cv_size, cv_size_domain, y, xp, mzs, yg )
+      call da_cv_to_global(cv_size, cv_size_domain, x, xp, mzs, xg)
+      call da_cv_to_global(cv_size, cv_size_domain, y, xp, mzs, yg)
 
-      if ( rootproc ) then
-         dtemp1 = da_dot( cv_size_domain, xg, yg )
-         deallocate( xg, yg )
+      if (rootproc) then
+         dtemp1 = da_dot(cv_size_domain, xg, yg)
+         deallocate(xg, yg)
       end if
 
       ! Broadcast result from monitor to other tasks.  
-      call wrf_dm_bcast_real( dtemp1, 1 )
+      call wrf_dm_bcast_real(dtemp1, 1)
 
    else
 
-      dtemp1 = da_dot( cv_size, x, y )
+      dtemp1 = da_dot(cv_size, x, y)
 
-      if ( .not. global ) then
+      if (.not. global) then
          dtemp1x = dtemp1
          ! summation across processors:
-         dtemp1 = wrf_dm_sum_real( dtemp1x )
+         dtemp1 = wrf_dm_sum_real(dtemp1x)
       end if
 
    end if

@@ -4,7 +4,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
                                its,ite, jts,jte, kts,kte)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Transforms analysis to control variables (Vp-type)
+   ! Purpose: Transforms analysis to control variables (Vp-type)
    !---------------------------------------------------------------------------
 
    implicit none

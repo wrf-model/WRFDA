@@ -1,5 +1,9 @@
 subroutine da_check_max_iv_radar(it, Radar, irv, irf, irvf, irff)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,           intent(in)          :: it    

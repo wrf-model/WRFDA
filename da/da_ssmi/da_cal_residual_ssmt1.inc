@@ -1,6 +1,10 @@
-subroutine da_cal_residual_ssmt1( iv, y, re,                        &
+subroutine da_cal_residual_ssmt1(iv, y, re,                        &
                                   np_missing, np_bad_data,          &
-                                  np_obs_used, np_available )
+                                  np_obs_used, np_available)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -14,7 +18,7 @@ subroutine da_cal_residual_ssmt1( iv, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if ( iv%num_ssmt1 > 0 ) then
+   if (iv%num_ssmt1 > 0) then
 
       n_obs_bad % t % num = number(0, 0, 0)
 
@@ -22,8 +26,8 @@ subroutine da_cal_residual_ssmt1( iv, y, re,                        &
          do k=1, iv%ssmt1(n)%info%levels
             np_available = np_available + 1
 
-            re%ssmt1(n)%t(k) = da_residual( n, k, y%ssmt1(n)%t(k), &
-                                         iv%ssmt1(n)%t(k), n_obs_bad % t )
+            re%ssmt1(n)%t(k) = da_residual(n, k, y%ssmt1(n)%t(k), &
+                                         iv%ssmt1(n)%t(k), n_obs_bad % t)
          end do
       end do
 

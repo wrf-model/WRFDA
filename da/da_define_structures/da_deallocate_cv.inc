@@ -1,7 +1,7 @@
-subroutine da_deallocate_cv( cv )
+subroutine da_deallocate_cv(cv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate components of control variable.
+   ! Purpose: Allocate components of control variable.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -14,7 +14,7 @@ subroutine da_deallocate_cv( cv )
    ! [1.0] Deallocate arrays:
    !---------------------------------------------------------------------------
 
-   deallocate ( cv % array )
+   deallocate (cv % array)
 
    if (trace_use) call da_trace_exit("da_deallocate_cv")
    

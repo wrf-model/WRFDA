@@ -1,4 +1,4 @@
-subroutine da_calculate_residual_geoamv( oi, y, re,                        &
+subroutine da_calculate_residual_geoamv(oi, y, re,                        &
                                         np_missing, np_bad_data,          &
                                         np_obs_used, np_available)
 
@@ -28,9 +28,9 @@ subroutine da_calculate_residual_geoamv( oi, y, re,                        &
          do k=1, oi%geoamv(n)%info%levels
             np_available = np_available + 2
 
-            re%geoamv(n)%u(k) = da_residual( n, 0, y%geoamv(n)%u(k), &
+            re%geoamv(n)%u(k) = da_residual(n, 0, y%geoamv(n)%u(k), &
                                           oi%geoamv(n)%u(k), n_obs_bad % u)
-            re%geoamv(n)%v (k)= da_residual( n, 0, y%geoamv(n)%v(k), &
+            re%geoamv(n)%v (k)= da_residual(n, 0, y%geoamv(n)%v(k), &
                                        oi%geoamv(n)%v(k), n_obs_bad % v)
          end do
       end do

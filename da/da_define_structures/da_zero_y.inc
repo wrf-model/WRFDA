@@ -1,7 +1,7 @@
 subroutine da_zero_y( iv, y )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Initialises the Y-array
+   ! Purpose: Initialises the Y-array
    !---------------------------------------------------------------------------
 
    implicit none

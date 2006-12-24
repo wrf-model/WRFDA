@@ -1,14 +1,7 @@
-subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
+subroutine da_esmf_run( gcomp, importState, exportState, clock, rc )
 
-   implicit none
-
-   type(ESMF_GridComp), intent(inout) :: gcomp
-   type(ESMF_State),    intent(inout) :: importState, exportState
-   type(ESMF_Clock),    intent(inout) :: clock
-   integer,             intent(out)   :: rc
-
-   !<DESCRIPTION>
-   !     WRFVAR run routine.
+   !-----------------------------------------------------------------------
+   ! Purpose: WRFVAR run routine.
    !
    !     The arguments are:
    !       gcomp           Component
@@ -17,15 +10,20 @@ subroutine da_wrfvar_run( gcomp, importState, exportState, clock, rc )
    !       clock           External clock
    !       rc              Return code; equals ESMF_SUCCESS if there are no
    !                       errors, otherwise ESMF_FAILURE.
-   !</DESCRIPTION>
+   !-----------------------------------------------------------------------
 
-   !--do wrfvar
+   implicit none
+
+   type(ESMF_GridComp), intent(inout) :: gcomp
+   type(ESMF_State),    intent(inout) :: importState, exportState
+   type(ESMF_Clock),    intent(inout) :: clock
+   integer,             intent(out)   :: rc
 
    call da_wrfvar_interface ( head_grid, config_flags )
 
    ! return success status
    rc = ESMF_SUCCESS
 
-end subroutine da_wrfvar_run
+end subroutine da_esmf_run
 
 

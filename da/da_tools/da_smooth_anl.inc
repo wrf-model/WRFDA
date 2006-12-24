@@ -1,8 +1,9 @@
-subroutine da_smooth_anl(SLAB,IMX,JMX,KX,NPASS,ICRSdoT)
- 
-   ! SECTION  TOOLS
-   ! PURPOSE  SPATIALLY SMOOTH (USUALLY SLAB) TO REMOVE HIGH
-   ! FREQUENCY WAVES
+subroutine da_smooth_anl(slab,imx,jmx,kx,npass,icrsdot)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: spatially smooth (usually slab) to remove high
+   ! frequency waves
+   !-----------------------------------------------------------------------
 
    implicit none
    

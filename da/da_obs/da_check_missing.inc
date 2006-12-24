@@ -1,4 +1,8 @@
-subroutine da_check_missing( qc_flag, y_in, y_out)
+subroutine da_check_missing(qc_flag, y_in, y_out)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
    

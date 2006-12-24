@@ -1,5 +1,9 @@
 subroutine da_print_stats_profiler(stats_unit, nu, nv, Profiler)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer,                    intent(in)    :: stats_unit

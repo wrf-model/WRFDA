@@ -1,9 +1,9 @@
-subroutine da_calculate_residual_gpsref( oi, y, re,               &
+subroutine da_calculate_residual_gpsref(oi, y, re,               &
                                         np_missing, np_bad_data,  &
                                         np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
-   ! Called by da_minimisation/da_calculate_residual.inc
+   ! Purpose: Calculate residiual for gpsref obs
    !-----------------------------------------------------------------------
 
    implicit none
@@ -25,7 +25,7 @@ subroutine da_calculate_residual_gpsref( oi, y, re,               &
    do n=1, oi%num_GPSRef
       do k=1, oi%gpsref(n)%info%levels
          np_available = np_available + 1
-         re%GPSRef(n)%ref(k) = da_residual( n, k, y%GPSRef(n)%ref(k), &
+         re%GPSRef(n)%ref(k) = da_residual(n, k, y%GPSRef(n)%ref(k), &
                                   oi%GPSRef(n)%ref(k), n_obs_bad%gpsref)
       end do
    end do

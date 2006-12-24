@@ -3,7 +3,7 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags ,&
                           )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Transfer xb and xa (increments) to analysis.
+   ! Purpose: Transfer xb and xa (increments) to analysis.
    !---------------------------------------------------------------------------
 
    use da_wrfvar_io

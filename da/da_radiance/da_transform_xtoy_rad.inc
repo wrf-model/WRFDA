@@ -1,7 +1,7 @@
 subroutine da_transform_xtoy_rad (xa, iv, xp, y)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: transform from analysis increment to 
+   !  Purpose: transform from analysis increment to 
    !                          pertubation radiance.
    !
    !  METHOD:  delta_y = H delta_x
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_rad (xa, iv, xp, y)
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
    !#include "rttov_q2v.interface"
 

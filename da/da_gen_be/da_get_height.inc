@@ -1,7 +1,7 @@
 subroutine da_get_height( input_file, dim1, dim2, dim3, height)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculates T, RH from input WRF file.
+   ! Purpose: Calculates T, RH from input WRF file.
    !---------------------------------------------------------------------------
    
    implicit none

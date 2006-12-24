@@ -4,7 +4,7 @@ subroutine da_get_spoles(x,              &
           its, ite, jts, jte, kts, kte  )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Treatment for Scalar field at Poles
+   ! Purpose: Treatment for Scalar field at Poles
    !---------------------------------------------------------------------------
 
    implicit none

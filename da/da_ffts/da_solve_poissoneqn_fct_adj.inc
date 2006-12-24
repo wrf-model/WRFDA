@@ -1,7 +1,7 @@
 subroutine da_solve_poissoneqn_fct_adj(xbx, b, del2b, xp)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Solve Del**2 B = A for B with zero gradient boundary conditions.
+   !  Purpose: Solve Del**2 B = A for B with zero gradient boundary conditions.
    !
    !  METHOD:  1) Compute spectral del2b using double forward FCT.
    !           2) Calculate spectral b.

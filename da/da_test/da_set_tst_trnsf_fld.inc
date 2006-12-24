@@ -1,5 +1,9 @@
 subroutine da_set_tst_trnsf_fld(xp, va, vb, typical_rms)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.

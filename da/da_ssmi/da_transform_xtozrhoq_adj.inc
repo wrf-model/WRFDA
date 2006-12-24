@@ -1,5 +1,9 @@
 subroutine da_transform_xtozrhoq_adj(xb, xa, i, j, zh, zf, adj_zrhom)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    
    integer,        intent(in)      :: i, j

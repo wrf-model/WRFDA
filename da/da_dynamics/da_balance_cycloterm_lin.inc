@@ -5,7 +5,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
                                      its,ite, jts,jte, kts,kte )
                                      
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculates linearised cyclostrophic term in balance equation.
+   ! Purpose: Calculates linearised cyclostrophic term in balance equation.
    !
    ! METHOD:  Term is rho (u.grad ) u on a single level.
    !---------------------------------------------------------------------------

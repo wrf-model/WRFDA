@@ -1,4 +1,4 @@
-subroutine da_calculate_grady_radar( iv, re, jo_grad_y)
+subroutine da_calculate_grady_radar(iv, re, jo_grad_y)
 
    !-------------------------------------------------------------------------
    ! Purpose: Applies obs inverse on re-vector
@@ -21,7 +21,7 @@ subroutine da_calculate_grady_radar( iv, re, jo_grad_y)
                end if
 
                jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                      ( iv%Radar(n)%rv(k)%error * &
+                                      (iv%Radar(n)%rv(k)%error * &
                                         iv%Radar(n)%rv(k)%error)
             end if
 
@@ -30,7 +30,7 @@ subroutine da_calculate_grady_radar( iv, re, jo_grad_y)
                   re%Radar(n)%rf(k) = 0.0
                end if
                jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                      ( iv%Radar(n)%rf(k)%error * &
+                                      (iv%Radar(n)%rf(k)%error * &
                                         iv%Radar(n)%rf(k)%error)
             end if
          end do

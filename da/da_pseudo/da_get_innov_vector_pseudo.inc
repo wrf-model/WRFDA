@@ -1,5 +1,9 @@
 subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    
    type(xb_type), intent(in)   :: xb          ! Background structure 

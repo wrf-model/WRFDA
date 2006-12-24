@@ -1,7 +1,7 @@
 subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    !---------------------------------------------------------------------------
-   ! Convert earth wind to model wind.
+   ! Purpose: Convert earth wind to model wind.
    !
    ! Need map projection parameters.
    !
@@ -10,7 +10,6 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
    ! XLONC: Central longitude
    ! XN:    Cone projection
    ! CONV:  180/Pi
-   !
    !---------------------------------------------------------------------------
 
    implicit none

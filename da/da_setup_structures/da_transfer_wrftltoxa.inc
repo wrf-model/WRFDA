@@ -3,7 +3,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam, &
                              )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Convert WRFTL variables to analysis increments
+   ! Purpose: Convert WRFTL variables to analysis increments
    !           (inverse of the incremental part of xatowrf)
    !---------------------------------------------------------------------------
 

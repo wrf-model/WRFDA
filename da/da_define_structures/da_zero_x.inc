@@ -1,5 +1,9 @@
 subroutine da_zero_x ( x )
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type (x_type), intent(inout)        :: x      ! Analysis incrs structure.

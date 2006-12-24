@@ -1,7 +1,7 @@
 subroutine da_setup_obs_structures(xp, ob, iv)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Allocate and read in components of observation structure.
+   ! Purpose: Allocate and read in components of observation structure.
    !---------------------------------------------------------------------------
 
    implicit none

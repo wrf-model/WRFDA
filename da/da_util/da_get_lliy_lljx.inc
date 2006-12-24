@@ -1,6 +1,10 @@
 subroutine da_get_lliy_lljx(big_header_CAA_domain, big_header_current, &
                          lliy, lljx)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    type(big_record_header), intent(in)  :: big_header_CAA_domain, big_header_current

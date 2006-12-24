@@ -1,7 +1,7 @@
 subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: read in NCEP bufr tovs 1b data to innovation structure
+   !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
    !
    !   METHOD: use F90 sequential data structure to avoid reading file twice  
    !            so that da_scan_bufrtovs is not necessary any more.

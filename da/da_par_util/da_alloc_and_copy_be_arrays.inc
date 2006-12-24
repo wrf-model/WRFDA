@@ -1,5 +1,11 @@
 subroutine da_alloc_and_copy_be_arrays (vg , v, jts,jte, kts,kte)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
+   implicit none
+
    type (be_subtype), intent(inout) :: vg       ! Global backgrd error struct.
    type (be_subtype), intent(inout) :: v        ! Local backgrd error struct.
    integer, intent(in)              :: jts,jte  ! Tile dimension.

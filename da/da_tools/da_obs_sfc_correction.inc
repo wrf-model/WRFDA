@@ -1,7 +1,7 @@
 subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    !--------------------------------------------------------------------
-   ! This subroutine is used to correct the surface measurements (wind, 
+   ! Purpose: correct the surface measurements (wind, 
    ! temperature, and pressure) from the observed height to the WRF     
    ! model's lowest half-zeta level before going to the minimization.   
    !                                                                    

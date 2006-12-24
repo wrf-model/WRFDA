@@ -1,5 +1,9 @@
 subroutine da_print_be_stats_h_regional(outunit, variable, nk, scale_length)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none 
 
    integer, intent(inout)   :: outunit            ! Output file unit.

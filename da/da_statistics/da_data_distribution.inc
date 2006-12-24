@@ -1,8 +1,8 @@
-subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
-                                 bin_width, ob )
+subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, &
+                                 bin_width, ob)
    
    !---------------------------------------------------------------------------
-   ! PURPOSE: Bin ob data to get distribution.
+   ! Purpose: Bin ob data to get distribution.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -27,19 +27,19 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    ! [1.0] Initialise bins:
    !---------------------------------------------------------------------------
 
-   num_bins = inT( ( max_val - min_val ) / bin_width ) + 1
+   num_bins = inT((max_val - min_val) / bin_width) + 1
 
-   allocate( bin_val(1:num_bins) )
+   allocate(bin_val(1:num_bins))
    bin_val(1) = min_val
    do bin = 2, num_bins
       bin_val(bin) = bin_val(bin-1) + bin_width
    end do
    
-   allocate( bin_min(1:num_bins+1) )
+   allocate(bin_min(1:num_bins+1))
    bin_min(1:num_bins) = bin_val(1:num_bins) - 0.5 * bin_width
    bin_min(num_bins+1) = bin_val(num_bins) + 0.5 * bin_width
 
-   allocate( num_in_bin(0:num_bins+1) )
+   allocate(num_in_bin(0:num_bins+1))
    num_in_bin(0:num_bins+1) = 0
    num_missing = 0
    
@@ -48,15 +48,15 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    !---------------------------------------------------------------------------
    
    do n = 1, num_obs
-      if ( ob(n) == missing_r ) then
+      if (ob(n) == missing_r) then
          num_missing = num_missing + 1
-      else if ( ob(n) < bin_min(1) .AND. ob(n) /= missing_r ) then
+      else if (ob(n) < bin_min(1) .AND. ob(n) /= missing_r) then
          num_in_bin(0) = num_in_bin(0) + 1
-      else if ( ob(n) >= bin_min(num_bins+1) ) then
+      else if (ob(n) >= bin_min(num_bins+1)) then
          num_in_bin(num_bins+1) = num_in_bin(num_bins+1) + 1
       else
          do bin = 1, num_bins
-            if ( ob(n) >= bin_min(bin) .AND. ob(n) < bin_min(bin+1) ) then
+            if (ob(n) >= bin_min(bin) .AND. ob(n) < bin_min(bin+1)) then
                  num_in_bin(bin) = num_in_bin(bin) + 1
                exit
             end if
@@ -68,7 +68,7 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    ! [3.0] Output statistics:
    !---------------------------------------------------------------------------
    
-   write(unit=stderr,fmt='(A,A,A,I8)')' Number of ', trim( ob_name ), &
+   write(unit=stderr,fmt='(A,A,A,I8)')' Number of ', trim(ob_name), &
       ' obs = ', num_obs
    write(unit=stderr,fmt='(A,I8)')' Number with missing data indicator = ', &
       num_missing
@@ -84,9 +84,9 @@ subroutine da_data_distribution( ob_name, num_obs, min_val, max_val, &
    ! [4.0] Tidy up:
    !---------------------------------------------------------------------------
 
-   deallocate( bin_val )
-   deallocate( bin_min )
-   deallocate( num_in_bin )
+   deallocate(bin_val)
+   deallocate(bin_min)
+   deallocate(num_in_bin)
 
 end subroutine da_data_distribution
 

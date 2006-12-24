@@ -2,7 +2,7 @@ subroutine da_res_generic_set_info( res_generic, proc_domain, &
                                       obs_global_index)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Eliminate redundant code for many obs types.  
+   ! Purpose:  Eliminate redundant code for many obs types.  
    !
    ! METHOD:   Set common fields in res_generic.
    !---------------------------------------------------------------------------
@@ -21,7 +21,7 @@ end subroutine da_res_generic_set_info
 subroutine da_res_sound_create_template( template)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Return storage template for specific type stored as 
+   ! Purpose:  Return storage template for specific type stored as 
    !           residual_generic_type.
    !---------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ subroutine da_res_sound_to_generic( res_specific, iv_num_levels, &
                                       res_generic)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Eliminate redundant code for many obs types.  
+   ! Purpose:  Eliminate redundant code for many obs types.  
    !
    ! METHOD:   Specific type res_specific is translated to generic type 
    !           res_generic.  Pointer manipulation is used for vector data, no 
@@ -86,7 +86,7 @@ end subroutine da_res_sound_to_generic
 subroutine da_res_sound_from_generic( res_generic, res_specific)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Eliminate redundant code for many obs types.  
+   ! Purpose:  Eliminate redundant code for many obs types.  
    !
    ! METHOD:   Generic type res_generic is translated to specific type 
    !           res_specific.  Pointer manipulation is used for vector data, no 
@@ -111,7 +111,7 @@ end subroutine da_res_sound_from_generic
 subroutine da_res_synop_create_template( template)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Return storage template for specific type stored as 
+   ! Purpose:  Return storage template for specific type stored as 
    !           residual_generic_type.  
    !---------------------------------------------------------------------------
 
@@ -130,7 +130,7 @@ subroutine da_res_synop_to_generic( res_specific, iv_num_levels, &
                                       res_generic)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Eliminate redundant code for many obs types.  
+   ! Purpose:  Eliminate redundant code for many obs types.  
    !
    ! METHOD:   Specific type res_specific is translated to generic type 
    !           res_generic.  Pointer manipulation is used for vector data, no 
@@ -170,7 +170,7 @@ end subroutine da_res_synop_to_generic
 subroutine da_res_synop_from_generic( res_generic, res_specific)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Eliminate redundant code for many obs types.  
+   ! Purpose:  Eliminate redundant code for many obs types.  
    !
    ! METHOD:   Generic type res_generic is translated to specific type 
    !           res_specific.  Pointer manipulation is used for vector data, no 
@@ -196,7 +196,7 @@ end subroutine da_res_synop_from_generic
 subroutine da_y_facade_create( slice, num_obs, num_obs_glo, template)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Create a y_facade_type containing specified number of 
+   ! Purpose:  Create a y_facade_type containing specified number of 
    !           residual_generic_type objects.  
    !
    ! METHOD:   Allocate memory and call residual_generic_create.  
@@ -230,7 +230,7 @@ end subroutine da_y_facade_create
 subroutine da_res_generic_create( res_generic, template)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Create a residual_generic_type object.  This must be called 
+   ! Purpose:  Create a residual_generic_type object.  This must be called 
    !           before any other operation is performed on a 
    !           residual_generic_type object.  Do not pass an already-allocated 
    !           object into this routine as res_generic or you will cause a 
@@ -268,7 +268,7 @@ subroutine da_res_generic_alloc_and_set( res_generic, val_index, values)
 
    ! TOdo:  replace this with a full-blown copy-constructor!  
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Allocates and initializes one of the values(either scalar or 
+   ! Purpose:  Allocates and initializes one of the values(either scalar or 
    !           vector) in an already-created residual_generic_type object.  
    !
    ! METHOD:   Allocate pointer and copy data from values.  Note that a call
@@ -301,7 +301,7 @@ end subroutine da_res_generic_alloc_and_set
 logical function da_res_generic_has_vector( res_generic)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Returns .true. iff res_generic stores vector values
+   ! Purpose:  Returns .true. iff res_generic stores vector values
    !---------------------------------------------------------------------------
 
    implicit none
@@ -315,7 +315,7 @@ end function da_res_generic_has_vector
 logical function da_res_generic_has_scalar( res_generic)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Returns .true. iff res_generic stores scalar values. 
+   ! Purpose:  Returns .true. iff res_generic stores scalar values. 
    !---------------------------------------------------------------------------
 
    implicit none
@@ -329,7 +329,7 @@ end function da_res_generic_has_scalar
 subroutine da_res_generic_free( res_generic)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Free memory for residual_generic_type object.  
+   ! Purpose:  Free memory for residual_generic_type object.  
    !
    ! METHOD: pointers to vector values are assumed to point to memory allocated 
    !         by others and are not deallocated.  
@@ -362,7 +362,7 @@ end subroutine da_res_generic_free
 subroutine da_y_facade_free( slice)
 
    !---------------------------------------------------------------------------
-   ! PURPOSE:  Free memory for y_facade_type object.  
+   ! Purpose:  Free memory for y_facade_type object.  
    !
    ! METHOD:   Brute force.  May want to make this smarter... 
    !---------------------------------------------------------------------------

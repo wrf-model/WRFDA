@@ -1,5 +1,9 @@
 subroutine da_random_omb(std_dev, yo, qc_flag, omb)
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
    
    real, intent(in)     :: std_dev      ! Standard deviation scaling.

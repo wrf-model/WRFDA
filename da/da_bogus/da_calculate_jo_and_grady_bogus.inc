@@ -1,4 +1,8 @@
-subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y)
+subroutine da_calculate_jo_and_grady_bogus(iv, re, jo, jo_grad_y)
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    implicit none
 
@@ -18,20 +22,20 @@ subroutine da_calculate_jo_and_grady_bogus( iv, re, jo, jo_grad_y)
    if (iv%num_Bogus > 0) then
       do n=1, iv%num_Bogus
          jo_grad_y%Bogus(n)%slp = -re%Bogus(n)%slp /  &
-                                  ( iv%Bogus(n)%slp%error * &
+                                  (iv%Bogus(n)%slp%error * &
                                     iv%Bogus(n)%slp%error)
          do k=1, iv%bogus(n)%info%levels
             jo_grad_y%Bogus(n)%u(k) = -re%Bogus(n)%u(k) / &
-                                       ( iv%Bogus(n)%u(k)%error * &
+                                       (iv%Bogus(n)%u(k)%error * &
                                          iv%Bogus(n)%u(k)%error)
             jo_grad_y%Bogus(n)%v(k) = -re%Bogus(n)%v(k) / &
-                                       ( iv%Bogus(n)%v(k)%error * &
+                                       (iv%Bogus(n)%v(k)%error * &
                                          iv%Bogus(n)%v(k)%error)
             jo_grad_y%Bogus(n)%t(k) = -re%Bogus(n)%t(k) / &
-                                       ( iv%Bogus(n)%t(k)%error * &
+                                       (iv%Bogus(n)%t(k)%error * &
                                          iv%Bogus(n)%t(k)%error)
             jo_grad_y%Bogus(n)%q(k) = -re%Bogus(n)%q(k) / &
-                                       ( iv%Bogus(n)%q(k)%error * &
+                                       (iv%Bogus(n)%q(k)%error * &
                                          iv%Bogus(n)%q(k)%error)
          end do
 

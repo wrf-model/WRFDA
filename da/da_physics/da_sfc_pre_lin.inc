@@ -2,7 +2,7 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
                                         psm, tsm, qsm, hsm, ho, to, qvo)
 
    !---------------------------------------------------------------------------
-   ! Correct pressure between two levels. 
+   ! Purpose: Correct pressure between two levels. 
    !
    ! Reference: make use of the hydrosatic equation:
    !
