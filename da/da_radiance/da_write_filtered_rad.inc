@@ -26,7 +26,7 @@ subroutine da_write_filtered_rad(ob, iv)
       write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
 #else
       write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
-#end if
+#endif
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') &
@@ -34,7 +34,7 @@ subroutine da_write_filtered_rad(ob, iv)
 #else
       write(unit=filename, fmt='(a)') &
          'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
-#end if
+#endif
       
       call da_get_unit(filtered_rad_unit)
       open(unit=filtered_rad_unit,file=trim(filename), &

@@ -40,8 +40,6 @@ subroutine da_trace_report
 
    character (len=TraceNameLen) :: MasterTimerNames(MaxNoRoutines)
 
-   integer :: iost
-
    if (.not. use_html) then
       write (unit=trace_unit, fmt='(A)') &
          "Report only available if use_html is true"

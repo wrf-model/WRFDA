@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_pseudo.inc(iv, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_pseudo(iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -50,6 +50,6 @@ subroutine da_jo_and_grady_pseudo.inc(iv, re, jo, jo_grad_y)
       
    end if
   
-end subroutine da_jo_and_grady_pseudo.inc
+end subroutine da_jo_and_grady_pseudo
 
 

@@ -74,7 +74,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.', myproc
 #else
    write(unit=filename, fmt='(a)') 'filtered_obs.000'
-#end if
+#endif
    open(unit=ounit,file=trim(filename),form='formatted',status='replace', &
       iostat=iost)
    if (iost /= 0) then
@@ -1355,7 +1355,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    call da_free_unit(ounit)
 #ifdef DM_PARALLEL
    call mpi_barrier(comm, ierr)
-#end if
+#endif
    if (rootproc) then
       call da_get_unit(filtered_obs_unit)
       open (unit=filtered_obs_unit, &

@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_ssmt1.inc(iv, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_ssmt1(iv, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -33,6 +33,6 @@ subroutine da_jo_and_grady_ssmt1.inc(iv, re, jo, jo_grad_y)
 
    end if
 
-end subroutine da_jo_and_grady_ssmt1.inc
+end subroutine da_jo_and_grady_ssmt1
 
 

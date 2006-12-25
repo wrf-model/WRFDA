@@ -52,7 +52,7 @@ subroutine da_warning(file_str, line, warnings)
       end if
       call da_message2(warnings)
       call wrf_message2('-------------------------------------------')
-#end if
+#endif
    end if
 
 end subroutine da_warning

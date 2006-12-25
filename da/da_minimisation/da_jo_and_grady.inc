@@ -133,16 +133,16 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
    ! SSMI:
 
-   call da_jo_and_grady_ssmi.inc(iv, re, jo, jo_ssmi, jo_grad_y) 
+   call da_jo_and_grady_ssmi(iv, re, jo, jo_ssmi, jo_grad_y) 
 
    ! SSMT1:
 
-   call da_jo_and_grady_ssmt1.inc(iv, re, jo, jo_grad_y)
+   call da_jo_and_grady_ssmt1(iv, re, jo, jo_grad_y)
    jo_ssmt1 = jo % ssmt1_t
 
    ! SSMT2:
 
-   call da_jo_and_grady_ssmt2.inc(iv, re, jo, jo_grad_y)  
+   call da_jo_and_grady_ssmt2(iv, re, jo, jo_grad_y)  
    jo_ssmt2 = jo % ssmt2_rh
 
    ! Radar obs:
@@ -152,7 +152,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
    ! Pseudo obs:
 
-   call da_jo_and_grady_pseudo.inc(iv, re, jo, jo_grad_y)    
+   call da_jo_and_grady_pseudo(iv, re, jo, jo_grad_y)    
    jo_pseudo = jo % pseudo_u + jo % pseudo_v + jo % pseudo_t + &
                jo % pseudo_p + jo % pseudo_q
 

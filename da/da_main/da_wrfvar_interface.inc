@@ -22,12 +22,6 @@ subroutine da_wrfvar_interface (grid, config_flags)
       ! Model layer modules
       use module_model_constants
 
-      use da_control
-      use da_define_structures
-      use da_setup_structures
-      use da_test
-      use da_minimisation
-
       !--Input data.
 
       type(domain),                intent(inout) :: grid
@@ -37,7 +31,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
       end subroutine da_solve
    end interface
-#end if
+#endif
 
    type(domain),                intent(inout) :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
@@ -45,7 +39,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
 #ifdef DEREF_KLUDGE
    integer     :: sm31 , em31 , sm32 , em32 , sm33 , em33
-#end if
+#endif
 
    call da_trace_entry("da_wrfvar_interface")
 
@@ -64,7 +58,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
    em32             = grid%em32
    sm33             = grid%sm33
    em33             = grid%em33
-#end if
+#endif
 
    call da_solve (grid , config_flags , &
 #include "em_actual_new_args.inc"

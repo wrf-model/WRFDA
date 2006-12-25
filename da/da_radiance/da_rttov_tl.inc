@@ -135,7 +135,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
                      nfrequencies, nchannels, nbtout)       ! out
-#end if
+#endif
 
 
    Allocate (lprofiles(nfrequencies), stat = alloc_status(31))
@@ -205,7 +205,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
                 emissivity )                                ! out                       
-#end if
+#endif
 
    nc = nchannels/nprofiles
 
@@ -248,7 +248,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
       & transmission_tl, &! inout
       & radiance,    &! inout
       & radiance_tl) ! inout
-#end if
+#endif
 
    if (any(errorstatus(:) /= 0)) then
        write (errmsg(1),*)  'rttov_direct error code = ', errorstatus(:)
@@ -360,6 +360,6 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
    call da_trace_exit("da_rttov_tl")
 
 end subroutine da_rttov_tl
-#end if
+#endif
 
 

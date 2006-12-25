@@ -9,7 +9,6 @@ subroutine da_transform_xtotb_adj (xa, xb)
    type (xb_type), intent(in)    :: xb          ! first guess state.
    type (x_type) , intent(inout) :: xa          ! grad_x(jo)
 
-   integer                       :: n                ! loop counter.
    integer                       :: i,j,k
    integer                       :: is, js, ie, je, ks, ke
 

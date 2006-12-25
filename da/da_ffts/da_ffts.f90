@@ -4,8 +4,9 @@ module da_ffts
    ! PURPOSE: Routines to perform Fourier transforms.
    !---------------------------------------------------------------------------
 
-   use da_define_structures
+   use da_define_structures, only : xbx_type
    use da_par_util
+   use module_dm, only : wrf_dm_sum_reals
 
    implicit none
 

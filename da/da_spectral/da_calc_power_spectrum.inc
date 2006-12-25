@@ -20,7 +20,6 @@ subroutine da_calc_power_spectrum(max_wave, power)
    integer             :: j, l              ! Loop counters.
    real                :: corr_scale        ! Correlation scale.
    real                :: corr_scale_inv    ! 1/corr_scale
-   real                :: temp              ! Temporary variable.
    real                :: variance          ! Variance = sum(power).
    real                :: d(1:nj)           ! Temp array.
    real                :: corr(1:nj)        ! Correlation function.

@@ -129,7 +129,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
                      nfrequencies, nchannels, nbtout)       ! out
-#end if
+#endif
 
    allocate (lprofiles(nfrequencies), stat = alloc_status(31))
    allocate (channels (nfrequencies), stat = alloc_status(32))
@@ -222,7 +222,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
                 emissivity )                                ! out                       
-#end if
+#endif
 
    nc = nchannels/nprofiles
 
@@ -266,7 +266,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
       & transmission_ad, &! inout  adjoint input
       & radiance,    &! inout  direct model   (input due to pointers alloc)
       & radiance_ad) ! inout  adjoint input  (output if converstion Bt -> rad)
-#end if
+#endif
 
    if (any(errorstatus(:) /= 0)) then
        write (errmsg(1),*) 'rttov_direct error code = ', errorstatus(:)
@@ -387,6 +387,6 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
    call da_trace_exit("da_rttov_ad")
 
 end subroutine da_rttov_ad
-#end if
+#endif
 
 

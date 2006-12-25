@@ -24,7 +24,7 @@ subroutine da_local_to_global(xp, x, xg, dim)
    if (dim .eq. 2) then
       glen(3) = 1
       llen(3) = 1
-      call rsl_write(xg,IO2D_IJ_inTERNAL,x,0,true_RSL_real,glen,llen)
+      call rsl_write(xg,IO2D_IJ_INTERNAL,x,0,true_RSL_real,glen,llen)
    elseif (dim.eq.3) then
       glen(3) = xp%kde-xp%kds+1
       llen(3) = xp%kme-xp%kms+1

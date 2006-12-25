@@ -5,11 +5,11 @@ module da_dynamics
    !---------------------------------------------------------------------------
 
    use da_control
-   use da_define_structures
-   use da_ffts
-   use da_statistics
+   use module_domain, only : xb_type
+   use da_define_structures, only : xbx_type
    use da_interpolation
-   use da_tools    
+   use da_tools, only : message    
+   use da_ffts
 
    implicit none
 

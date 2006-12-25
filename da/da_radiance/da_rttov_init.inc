@@ -428,6 +428,6 @@ subroutine da_rttov_init(iv,ob)
   return
 
 end subroutine da_rttov_init
-#end if
+#endif
 
 

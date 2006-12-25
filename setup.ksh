@@ -102,6 +102,7 @@ if test $MACHINE = "gold.us.cray.com"; then
 fi
 
 export MPIHOME=$MPICH
+export LINUX_MPIHOME=$MPIHOME
 export PATH=$MPICH/bin:$MAKEDEPF90:$PATH
 export MANPATH=$MPICH/man:$MANPATH
 

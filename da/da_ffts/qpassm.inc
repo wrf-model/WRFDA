@@ -38,7 +38,8 @@
       REAL    :: sin45, zsin36, zsin72, zqrt5, zsin60, zsin45, z
       REAL    :: a0, a1, a2, a3, a4, a5, a6, a10, a11, a20, a21
       REAL    :: b0, b1, b2, b3, b4, b5, b6, b10, b11, b20, b21
-      REAL    :: c0, c1, c2, c3, c4, c5
+!      REAL    :: c0, c1, c2, c3, c4, c5
+      REAL    :: c1, c2, c3, c4, c5
       INTEGER :: i, ijk, l, k, kb, m, iink, jink, ijump, kstop
       INTEGER :: ibad, igo, ia, ie, je, ibase, jbase, ja, jb, j, ic
       INTEGER :: if, jf, kf, ib, jc, kc, id, jd, kd, ke, ig, ih

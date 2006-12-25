@@ -23,7 +23,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    real, dimension(1:2*sizec)    :: rcv     ! Spectral modes.
    real, dimension(1:2*sizec)    :: rcv_out ! Spectral modes.
 
-   integer             :: m,mm, i, j, k, index_start, index_end
+   integer             :: m,mm, index_start, index_end
 
    complex             :: r_leg(1:jde)     
    complex, dimension(1:sizec) :: ccv, ccv1    ! Spectral modes.

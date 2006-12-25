@@ -1,7 +1,6 @@
 module da_define_structures
 
-    use module_domain   ! for typedefs (vp_type, xb_type, xpose_type)
-    use module_dm       ! for rsl definitions
+    use module_domain, only: vp_type, x_type
     use da_tracing
     use da_reporting
 
@@ -608,27 +607,27 @@ module da_define_structures
       integer                    :: use
    END TYPE number
 
-   TYPE bad_info
+   TYPE bad_info_type
       type (number)              :: num
       integer, dimension(100000) :: nn
       integer, dimension(100000) :: kk
-   END TYPE bad_info
+   END TYPE bad_info_type
 
    TYPE  bad_data_type
-      type (bad_info)       :: u
-      type (bad_info)       :: v
-      type (bad_info)       :: t
-      type (bad_info)       :: p
-      type (bad_info)       :: q
-      type (bad_info)       :: tpw
-      type (bad_info)       :: Speed
-      type (bad_info)       :: gpsref
-      type (bad_info)       :: thickness
-      type (bad_info)       :: rh
-      type (bad_info)       :: rv
-      type (bad_info)       :: rf
-      type (bad_info)       :: slp
-      type (bad_info)       :: rad
+      type (bad_info_type)       :: u
+      type (bad_info_type)       :: v
+      type (bad_info_type)       :: t
+      type (bad_info_type)       :: p
+      type (bad_info_type)       :: q
+      type (bad_info_type)       :: tpw
+      type (bad_info_type)       :: Speed
+      type (bad_info_type)       :: gpsref
+      type (bad_info_type)       :: thickness
+      type (bad_info_type)       :: rh
+      type (bad_info_type)       :: rv
+      type (bad_info_type)       :: rf
+      type (bad_info_type)       :: slp
+      type (bad_info_type)       :: rad
    END TYPE bad_data_type
 
    TYPE count_obs_number_type

@@ -16,6 +16,11 @@ module da_wrfvar_top
    use da_tracing
    use da_tools
    use da_radiance
+   use da_control
+   use da_define_structures
+   use da_setup_structures
+   use da_test
+   use da_minimisation
 
 #ifdef DM_PARALLEL
    use module_dm

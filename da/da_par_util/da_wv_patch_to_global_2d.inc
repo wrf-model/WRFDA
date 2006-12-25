@@ -40,7 +40,7 @@ subroutine da_wv_patch_to_global_2d(vlocal, vglobal,    &
       vglobal(:,:) = vglobal3d(:,:,1)
    end if
    deallocate(vlocal3d, vglobal3d)
-#end if
+#endif
 
 end subroutine da_wv_patch_to_global_2d
 

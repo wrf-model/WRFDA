@@ -4,11 +4,15 @@ module da_tools
    ! PURPOSE: Contains general tools.
    !---------------------------------------------------------------------------
    
-   use module_bc
+   use module_bc, only : bdyzone
 
    use da_control
-   use da_define_structures
+   use module_dm, only : wrf_dm_sum_real
+   use da_define_structures, only : info_type, field_type, x_type,  &
+      model_loc_type, synop_type, bad_info_type, da_gauss_noise
+   use module_domain, only : xb_type, xpose_type
    use lapack
+   use da_tracing
    use da_reporting
    use da_tools1
    

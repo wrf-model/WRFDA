@@ -9,7 +9,7 @@ function da_residual(n, k, yy, ox, n_bad) result (rr)
    integer          ,    intent(in) :: n, k
    type (field_type),    intent(in) :: ox
    real             ,    intent(in) :: yy
-   type (bad_info)  , intent(inout) :: n_bad
+   type (bad_info_type)  , intent(inout) :: n_bad
    real                             :: rr
 
    ! JRB use variable to stop compiler whinge

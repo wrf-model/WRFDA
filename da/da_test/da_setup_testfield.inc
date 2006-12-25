@@ -60,7 +60,7 @@ subroutine da_setup_testfield(xb, xa, xp, &
    call da_set_tst_trnsf_fld(xp, xa%qcw(ims,jms,kms), xb%qcw(ims,jms,kms), typical_qcw_rms)
    call da_set_tst_trnsf_fld(xp, xa%qrn(ims,jms,kms), xb%qrn(ims,jms,kms), typical_qrn_rms)
 
-#end if
+#endif
 
    ! [2.5] get test density increment from linearised ideal gas law:
 

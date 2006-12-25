@@ -80,8 +80,8 @@ contains
   integer, intent(out) :: ndims
 
   integer cdfid, rcode, id_time
-  character (len=80) :: varnam, time1
-  integer :: natts, istart(10),iend(10), dimids(10)
+  character (len=80) :: varnam
+  integer :: natts, dimids(10)
   integer :: i, ivtype
 
   cdfid = ncopn(file, NCNOWRIT, rcode )
@@ -208,7 +208,7 @@ contains
   real, dimension(i1,i2,i3), intent(out) :: data
   real(kind=8), dimension(i1,i2,i3) :: tmp
 
-  character (len=80) :: varnam, time1
+  character (len=80) :: varnam
 
   integer :: cdfid, rcode, id_data
   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
@@ -303,7 +303,7 @@ contains
   real(kind=8), dimension(i1,i2) :: tmp
 
   integer cdfid, rcode, id_data
-  character (len=80) :: varnam, time1
+  character (len=80) :: varnam
   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
   integer :: i, ivtype
 
@@ -393,7 +393,7 @@ contains
   real(kind=8), dimension(i1,i2,i3) :: tmp
 
   integer cdfid, rcode, id_data
-  character (len=80) :: varnam, time1
+  character (len=80) :: varnam
   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
   integer :: i, ivtype
 
@@ -480,7 +480,7 @@ contains
     real(kind=8), dimension(i1,i2) :: tmp
 
     integer :: cdfid, rcode, id_data
-    character (len=80) :: varnam, time1
+    character (len=80) :: varnam
     integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
     integer :: i, ivtype
 
@@ -560,7 +560,7 @@ contains
   integer, dimension(i1,i2), intent(out) :: data
 
   integer cdfid, rcode, id_data
-  character (len=80) :: varnam, time1
+  character (len=80) :: varnam
   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
   integer :: i, ivtype
 

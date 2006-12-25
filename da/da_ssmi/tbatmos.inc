@@ -166,7 +166,7 @@
       mu = 1.0/cos(theta*0.0174533)
 ! get water vapor optical depth
 !=====
-      call da_cal_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
+      call da_sigma_v(ifreq,p0,wv,hwv,ta,gamma,sigv)
 ! otbar = one over "mean" temperature
       otbar = 1.0/(ta - gamma*zeta(ifreq))
 ! sigo = dry air optical depth

@@ -877,7 +877,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             case default
                write(unit=message(1), fmt='(a, i12)') &
                   'unsaved obs found with type: ',kx
-               call da_warning(__FILE__,__LINE,message(1:1))
+               call da_warning(__FILE__,__LINE__,message(1:1))
             end select
          end select
 

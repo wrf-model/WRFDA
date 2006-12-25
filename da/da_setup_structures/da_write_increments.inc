@@ -147,7 +147,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
       landmask_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
 
-#end if
+#endif
 
    if (rootproc) then
       call da_get_unit(anl_inc_unit)
@@ -204,7 +204,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
                     xb%landmask(1:ix+1,1:jy+1)
       close(anl_inc_unit)
       call da_free_unit(anl_inc_unit)
-#end if
+#endif
 
    end if
 

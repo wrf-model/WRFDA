@@ -12,9 +12,9 @@ subroutine da_asslegpol (l, m, sinlat, coslat, alp)
    real,    intent(in)            :: coslat  ! cos(latitude).
    real,    intent(out)           :: alp     ! Associated Legendre Polynomial.
 
-   integer                        :: mm, i, loop
+   integer                        :: i, loop
    real                           :: half_co
-   real                           :: s, normconst, alp1, alp2
+   real                           :: alp1, alp2
 
    half_co = 0.5 * coslat
 

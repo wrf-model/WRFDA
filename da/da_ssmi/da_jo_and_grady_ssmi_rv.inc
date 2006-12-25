@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_ssmi.inc_rv(oi, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_ssmi_rv(oi, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -40,6 +40,6 @@ subroutine da_jo_and_grady_ssmi.inc_rv(oi, re, jo, jo_grad_y)
    jo % ssmir_Speed = 0.5 * jo % ssmir_Speed
    jo % ssmir_tpw   = 0.5 * jo % ssmir_tpw
 
-end subroutine da_jo_and_grady_ssmi.inc_rv
+end subroutine da_jo_and_grady_ssmi_rv
 
 

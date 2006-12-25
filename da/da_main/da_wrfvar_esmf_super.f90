@@ -26,6 +26,11 @@ module da_wrfvar_esmf_super
    use da_wrfvar_io
 
    use da_control
+   use da_define_structures
+   use da_setup_structures
+   use da_test
+   use da_minimisation
+
 
    implicit none
 

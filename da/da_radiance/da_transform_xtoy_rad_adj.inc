@@ -11,10 +11,6 @@ subroutine da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   use da_interpolation, only : da_interp_lin_3d_adj_new
-
-   IMPLICIT NONE
-
 !#include "rttov_v2q.interface"
 
    TYPE (x_type), INTENT(INOUT)   :: jo_grad_x ! 

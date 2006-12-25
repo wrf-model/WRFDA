@@ -10,8 +10,6 @@ subroutine da_proc_maxmin_combine(n, max, min)
    !           communication.)
    !---------------------------------------------------------------------------
    
-   use da_tools
-
    implicit none
 
    integer,   intent(in)                    :: n       ! Length of input fields.

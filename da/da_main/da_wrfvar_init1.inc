@@ -58,7 +58,7 @@ subroutine da_wrfvar_init1(no_init1)
    num_procs = 1
    myproc = 0
    comm = 0
-#end if
+#endif
 
    if (myproc==0) then
       rootproc=.true.
@@ -76,7 +76,7 @@ subroutine da_wrfvar_init1(no_init1)
    call wrf_dm_initialize
 #else
    call initial_config
-#end if
+#endif
 
    ! Copy namelist variables to da_control
 

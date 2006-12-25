@@ -36,13 +36,13 @@ subroutine da_write_iv_rad_ascii (xp, ob, iv)
       write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
 #else
       write(unit=stdout,fmt='(a,i7)') 'number of obs ', ndomain
-#end if
+#endif
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_', myproc
 #else
       write(unit=filename, fmt='(a)') trim(iv%instid(n)%rttovid_string)//'.inv'
-#end if
+#endif
 
       call da_get_unit(innov_rad_unit)
       open(unit=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
@@ -261,7 +261,7 @@ subroutine da_write_iv_rad_ascii (xp, ob, iv)
 
    if (trace_use) call da_trace_exit("da_write_iv_rad_ascii")
 
-#end if
+#endif
 
 end subroutine da_write_iv_rad_ascii
 

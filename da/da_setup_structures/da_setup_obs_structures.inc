@@ -246,7 +246,7 @@ subroutine da_setup_obs_structures(xp, ob, iv)
       ! can compile without the RTTOV library
       call da_error(__FILE__,__LINE__, &
          (/"Cannot run radiance code if compile directive RTTOV false"/))
-#end if
+#endif
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
       call da_setup_bufrtovs_structures(xp, ob, iv)
 

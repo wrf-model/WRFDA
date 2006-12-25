@@ -24,11 +24,10 @@ subroutine da_setlegpol(nj, max_wavenumber, alp_size, sinlat, coslat, alp)
    integer              :: index_j, index_m, index    ! Indexing counters for ALP array.
    integer              :: index_m2, index_l2m2       ! Indexing counters for ALP array.
    integer              :: index_l1m2, index_l1m      ! Indexing counters for ALP array.
-   real                 :: product, s
+   real                 :: s
    real                 :: c(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
    real                 :: d(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
    real                 :: e(2:max_wavenumber,2:max_wavenumber) ! Recursion coefficient.
-   real                 :: factorial(0:2*max_wavenumber)
 
    alp(:) = 0.0
 

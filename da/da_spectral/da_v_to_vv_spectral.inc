@@ -26,15 +26,13 @@ subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
                           ims, ime, jms, jme, &
                           its, ite, jts, jte
 
-   integer :: j, l,m, n                  ! Loop counters.
-   integer :: index_start, index_end   ! Position markers in cv.
-   integer :: index                    ! Position markers in rcv.
+   integer :: j, l,m, n                ! Loop counters.
+   integer :: index_start              ! Position markers in cv.
    integer :: index_r, index_c         ! Array index for complex v_fou.
 
    real    :: r_fou(1:lenr)            ! FFT array.
    real    :: work(1:lenwrk)           ! FFT work array. 
    complex :: v_fou(its:ite,0:max_wave)! Intermediate Fourier state.
-   complex :: r_leg(jts:jte)           ! Leg Tra. array.
    complex :: ccv(1:sizec)             ! Spectral modes.  
    integer              :: index_m, index_j
    integer              :: jc, js, je, iequator
@@ -64,7 +62,6 @@ subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
 
    do m = 0, max_wave
       index_start = m * (max_wave + 1 - m) + m * (m + 1) / 2 + 1
-      index_end   = index_start + max_wave - m
 
       index_m = m * (max_wave + 1 - m) + m * (m + 1) / 2 + 1 - m
 

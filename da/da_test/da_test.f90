@@ -1,14 +1,13 @@
 module da_test
 
 !------------------------------------------------------------------------------
-!     PURPOSE: Collection of routines associated with minimisation.
+! PURPOSE: Collection of routines associated with minimisation.
 !
-!     METHOD:  Straightforward definitions.
-!
-!     HISTORY: 01/07/2000 - Creation.              Dale Barker
+! METHOD:  Straightforward definitions.
 !------------------------------------------------------------------------------
 
    use da_control
+   use da_ffts
    use da_define_structures
    use da_physics
    use da_vtox_transforms

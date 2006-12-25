@@ -317,7 +317,8 @@ subroutine da_read_ssmi (ob, xp, filename)
 
    write(unit=stdout, fmt='(/,5x,a,i6/)') '** Rain contaminated SSMI_Tb =', irain
 
-contains
+end subroutine da_read_ssmi
+
 
 subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
                      tb37h, tb85v, tb85h, ipass, iprecip, xlat )
@@ -411,7 +412,6 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
    end if
 
    ! write(unit=stdout,*) 'pass=',ipass1,ipass2,iprecip,ipass
-
 
 end subroutine filter
 
@@ -1144,6 +1144,5 @@ subroutine ualg(ia,theta,sst,tb,u)
 
 end subroutine ualg
 
-end subroutine da_read_ssmi
 
 

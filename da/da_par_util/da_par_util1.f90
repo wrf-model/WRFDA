@@ -7,7 +7,7 @@
 module da_par_util1
 
    use da_control
-   use module_dm
+   use module_dm, only : RSL_DOUBLE
 
    !---------------------------------------------------------------------------
    ! PURPOSE: Routines for local-to-global and global-to-local grid operations.

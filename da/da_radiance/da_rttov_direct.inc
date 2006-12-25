@@ -117,7 +117,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
    !#ifdef RTTOV
    ! call rttov_setupchan(nprofiles, nchan, coef, &             ! in
    !                    nfrequencies, nchannels, nbtout)       ! out
-   !#end if
+   !#endif
 
    Allocate (lprofiles(nfrequencies), stat = alloc_status(31))
    Allocate (channels (nfrequencies), stat = alloc_status(32))
@@ -161,7 +161,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
                 emissivity )                                ! out                       
-#end if
+#endif
 
    !  surface emissivity scheme
    !----------------------------------------------------------
@@ -260,7 +260,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
       & emissivity,      &! inout
       & transmission,    &! inout
       & radiance)        ! inout
-#end if
+#endif
 
    if (any(errorstatus(:) /= 0)) then
       !WRITE (unit=stderr,fmt=*) 'rttov_direct error code = ', errorstatus(:)
@@ -342,6 +342,6 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
    call da_trace_exit("da_rttov_direct")
 
 end subroutine da_rttov_direct
-#end if
+#endif
 
 

@@ -15,13 +15,12 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
    integer,          intent(in)  :: nlevels
 
    integer                :: k,n,kk
-   real    :: r_kts, r_ktsplus, r_kteminus
+   real    :: r_ktsplus, r_kteminus
 
    if (trace_use) call da_trace_entry("da_to_zk_new")
 
    zk(:,:) = missing_r
 
-   r_kts      = real(xp%kts)
    r_ktsplus  = real(xp%kts+1)
    r_kteminus = real(xp%kte-1)
 

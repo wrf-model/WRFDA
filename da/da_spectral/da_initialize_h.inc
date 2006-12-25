@@ -6,8 +6,6 @@ subroutine da_initialize_h(ni, nj, max_wavenumber, lensav, alp_size, &
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
-   use da_control
-
    implicit none
 
    integer, intent(in) :: ni                         ! Number of longitudes.

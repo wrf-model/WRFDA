@@ -1,9 +1,11 @@
 module da_spectral
 
    use da_control
-   use da_define_structures
+   use da_define_structures, only : xbx_type
    use fftpack5
    use da_tools
+   use da_par_util1, only : true_mpi_complex
+   use da_tracing
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform

@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_ssmi.inc(oi, re, jo, jo_ssmi, jo_grad_y)
+subroutine da_jo_and_grady_ssmi(oi, re, jo, jo_ssmi, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -25,18 +25,18 @@ subroutine da_jo_and_grady_ssmi.inc(oi, re, jo, jo_ssmi, jo_grad_y)
 
    if (oi%num_ssmi_tb .gt. 0) then
 
-      call da_jo_and_grady_ssmi.inc_tb(oi, re, jo, jo_grad_y)
+      call da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
       jo_ssmi = jo % ssmi_tb19v + jo % ssmi_tb19h + jo % ssmi_tb22v + &
                 jo % ssmi_tb37v + jo % ssmi_tb37h + jo % ssmi_tb85v + &
                 jo % ssmi_tb85h 
                 
    else if (oi%num_ssmi_retrieval .gt. 0) then
 
-      call da_jo_and_grady_ssmi.inc_rv(oi, re, jo, jo_grad_y)
+      call da_jo_and_grady_ssmi_rv(oi, re, jo, jo_grad_y)
       jo_ssmi = jo % ssmir_speed + jo % ssmir_tpw
 
    end if
 
-end subroutine da_jo_and_grady_ssmi.inc
+end subroutine da_jo_and_grady_ssmi
 
 

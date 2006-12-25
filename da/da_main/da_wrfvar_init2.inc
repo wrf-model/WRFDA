@@ -59,7 +59,7 @@ subroutine da_wrfvar_init2
 #if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
       call da_error(__FILE__,__LINE__, &
          (/'nesting requires either an MPI build or use of the -DSTUBMPI option'/)) 
-#end if
+#endif
    end if
 
    !<DESCRIPTION>
@@ -99,7 +99,7 @@ subroutine da_wrfvar_init2
    call get_config_as_buffer(configbuf, configbuflen, nbytes)
    call wrf_dm_bcast_bytes(configbuf, nbytes)
    call set_config_as_buffer(configbuf, configbuflen)
-#end if
+#endif
 
    call setup_timekeeping (head_grid)
 

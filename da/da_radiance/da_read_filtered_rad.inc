@@ -27,7 +27,7 @@ subroutine da_read_filtered_rad(xp, iv)
       write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin_', myproc
 #else
       write(filename, '(a)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
-#end if
+#endif
 
       if (print_detail_radiance) then
          write(unit=stdout,fmt=*) 'Reading in ', trim(filename) 

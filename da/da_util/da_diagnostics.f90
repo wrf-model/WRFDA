@@ -20,7 +20,7 @@ program da_diagnostics
    real, parameter               :: missing_r = -888888.0
 
    character*200                 :: filename
-   integer                       :: n, k, ounit, current_time
+   integer                       :: n, k, current_time
 
    type info_type
       character*5                :: id

@@ -68,7 +68,7 @@ subroutine da_solve_init(grid, &
       call true_MSG_XPOSE (grid%xp%v1z(ims,jms,kms), &
                          grid%xp%v1x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
                          grid%xp%v1y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3)
-#end if
+#endif
       call define_xpose (grid%domdesc , grid%comms (XPOSE_V1))
    end if
 
@@ -82,7 +82,7 @@ subroutine da_solve_init(grid, &
       call true_MSG_XPOSE (grid%xp%v2z(ims,jms,kms), &
                          grid%xp%v2x(grid%xp%imsx,grid%xp%jmsx,grid%xp%kmsx), &
                          grid%xp%v2y(grid%xp%imsy,grid%xp%jmsy,grid%xp%kmsy), 3)
-#end if
+#endif
       call define_xpose (grid%domdesc , grid%comms (XPOSE_V2))
    end if
 
@@ -147,7 +147,7 @@ subroutine da_solve_init(grid, &
 
    grid%xp%xpose_id1 = XPOSE_V1
    grid%xp%xpose_id2 = XPOSE_V2
-#end if
+#endif
 
    ! Fill background scalars:
 

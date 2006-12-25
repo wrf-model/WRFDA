@@ -1,8 +1,10 @@
 module da_interpolation
 
-   use da_control
-   use da_define_structures
    use da_tools
+   use da_control
+   use module_domain, only : xpose_type
+   use da_tracing
+   use da_define_structures, only : da_gauss_noise
 
    implicit none
 

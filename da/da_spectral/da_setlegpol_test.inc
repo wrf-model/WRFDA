@@ -4,8 +4,6 @@ subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
-   use da_tools
-
    implicit none
 
    integer, intent(in)  :: nj              ! Number of latitudes.
@@ -17,7 +15,6 @@ subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
    real, parameter :: tolerance = 1.0e-6  ! warn if normalization error exceeds
 
    integer :: m, l1, l2, j, j1    ! Loop counters.
-   integer :: max_j               ! Maximum j for ALP etc.
    integer :: index_m, index_j    ! Markers.
    integer :: index1, index2      ! Markers.
    integer :: sign_switch1        ! Defined to make use of symmetry of ALPs.

@@ -6,8 +6,6 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags ,&
    ! Purpose: Transfer xb and xa (increments) to analysis.
    !---------------------------------------------------------------------------
 
-   use da_wrfvar_io
-
    implicit none
 
    integer,         intent(in)    :: it    ! outer-loop index

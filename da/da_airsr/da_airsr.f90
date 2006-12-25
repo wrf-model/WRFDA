@@ -6,6 +6,8 @@ module da_airsr
    use da_statistics
    use da_tools
    use da_physics
+   use da_par_util1
+   use da_par_util
 
    ! The "stats_airsr_type" is ONLY used locally in da_airsr:
 

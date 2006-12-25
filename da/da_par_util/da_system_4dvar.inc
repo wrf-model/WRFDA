@@ -22,11 +22,11 @@ subroutine da_system_4dvar(cmd_line_in)
    call mpi_barrier (comm, ierr)
 #else
    cmd_line = cmd_line_in // " other"
-#end if
+#endif
    call da_system(cmd_line)
 #ifdef DM_PARALLEL
    call mpi_barrier (comm, ierr)
-#end if
+#endif
 
 end subroutine da_system_4dvar
 

@@ -4,8 +4,6 @@ subroutine da_message(strs)
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
-   use da_control
-
    implicit none
 
    character(len=*), intent(in) :: strs(:)

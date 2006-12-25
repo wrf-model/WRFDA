@@ -32,7 +32,7 @@ subroutine da_write_y (iv, y)
     write (unit=filename, fmt='(a,i3.3)') trim(file_prefix), myproc
 #else
     write (unit=filename, fmt='(a)') trim(file_prefix)//'000'
-#end if
+#endif
 
    call da_get_unit(ounit)
    open (unit=ounit,file=trim(filename),form='formatted',iostat=ios)

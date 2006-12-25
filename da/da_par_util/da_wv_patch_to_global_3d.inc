@@ -40,7 +40,7 @@ subroutine da_wv_patch_to_global_3d(vlocal, vglobal,         &
                                     ims, ime, jms, jme, kms, kme,  &
                                     ips, ipe, jps, jpe, kps, kpe)
    end if
-#end if
+#endif
 
 end subroutine da_wv_patch_to_global_3d
 

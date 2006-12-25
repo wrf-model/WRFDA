@@ -68,7 +68,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
    if (rootproc) then 
       p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-#end if
+#endif
 
    if (rootproc) then
 
@@ -134,7 +134,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
          (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
       write(unit=stdout,fmt='(10e15.7)') &
          (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-#end if
+#endif
       close(anl_inc_unit)
       call da_free_unit(anl_inc_unit)
 

@@ -11,8 +11,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !               and deallocate sequential data structure
    !---------------------------------------------------------------------------
 
-   use da_control
-
    implicit none
 
    character(5)      ,  intent (in)  :: obstype
@@ -392,7 +390,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(inst)%rad(nread(inst))%cloud_flag(:) = 1
       allocate (iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error)
       if (error /= 0) then
-         call da_error(__file__,__LINE__, &
+         call da_error(__FILE__,__LINE__, &
             (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
       end if
       iv%instid(inst)%rad(nread(inst))%tb(1:nchan)%inv = p%rad%tb(1:nchan)%inv

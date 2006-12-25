@@ -1,4 +1,4 @@
-subroutine da_jo_and_grady_ssmi.inc_tb(oi, re, jo, jo_grad_y)
+subroutine da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -84,6 +84,6 @@ subroutine da_jo_and_grady_ssmi.inc_tb(oi, re, jo, jo_grad_y)
    jo % ssmi_tb85h = 0.5 * jo % ssmi_tb85h
    jo % ssmi_tb85v = 0.5 * jo % ssmi_tb85v
 
-end subroutine da_jo_and_grady_ssmi.inc_tb
+end subroutine da_jo_and_grady_ssmi_tb
 
 

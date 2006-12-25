@@ -128,6 +128,7 @@ if ( $MACHINE == "gold.us.cray.com" ) then
 endif
 
 setenv MPIHOME $MPICH
+setenv LINUX_MPIHOME $MPICH
 setenv PATH $MPICH/bin:$PATH
 if ($?MAKEDEPF90) then
    setenv PATH $MPICH/bin\:$MAKEDEPF90\:$PATH

@@ -551,6 +551,6 @@ contains
 #include "da_find_fft_factors.inc"
 #include "da_find_fft_trig_funcs.inc"
 
-#include "gamma.inc"
+#include "gamma1.inc"
 
 end module da_control

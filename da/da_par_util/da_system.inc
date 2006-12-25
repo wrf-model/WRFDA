@@ -7,13 +7,14 @@ subroutine da_system(cmd)
    implicit none
 
    character (len=*) , intent(in) :: cmd
-   integer :: ierr
 
 #ifdef crayx1
+   integer :: ierr
+
    call pxfsystem(cmd, len(cmd), ierr)
 #else
    call system(cmd)
-#end if
+#endif
 
 end subroutine da_system
 

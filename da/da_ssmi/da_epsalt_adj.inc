@@ -79,7 +79,7 @@ subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
    delt2  = delt*delt
    beta   =   2.033e-2 + 1.266e-4*delt      + 2.464e-6*delt2       &
             - ssw*(1.849e-5 - 2.551e-7*delt + 2.551e-8*delt2)
-   ignew  =   sig*exp(-beta*delt)
+   signew  =   sig*exp(-beta*delt)
 
    om  = 2.0e9*pi*f
    cdum1  = cmplx(0.0,om*taunew)

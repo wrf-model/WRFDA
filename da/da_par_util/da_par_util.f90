@@ -12,8 +12,15 @@ module da_par_util
    ! METHOD:  RSL/MPI.
    !---------------------------------------------------------------------------
 
-   use da_define_structures   ! For xb_, cv_, xp_, be_, x_type definitions.
+   use module_domain, only : domain, xpose_type
+   use module_dm, only : io2d_ij_internal, io3d_ijk_internal
+   use da_define_structures, only : be_subtype, &
+      x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
+      y_type, count_obs_number_type, count_obs_type, maxmin_field_type
    use da_par_util1
+   use da_tools, only : message
+   use da_reporting, only : da_error
+   use da_tracing
 
    implicit none
 

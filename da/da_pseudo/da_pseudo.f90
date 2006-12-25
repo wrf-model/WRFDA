@@ -7,7 +7,7 @@ module da_pseudo
    use da_tools
    use da_par_util
 
-! The "stats_pseudo_type" is ONLY used locally in da_pseudo:
+   ! The "stats_pseudo_type" is ONLY used locally in da_pseudo:
 
    type residual_pseudo1_type
       real          :: u                        ! u-wind.
@@ -28,7 +28,7 @@ module da_pseudo
 
 contains
 
-#include "da_jo_and_grady_pseudo.inc.inc"
+#include "da_jo_and_grady_pseudo.inc"
 #include "da_residual_pseudo.inc"
 #include "da_get_innov_vector_pseudo.inc"
 #include "da_ao_stats_pseudo.inc"
