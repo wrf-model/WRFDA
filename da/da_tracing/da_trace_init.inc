@@ -88,7 +88,7 @@ subroutine da_trace_init
    call system_clock(&
       COUNT=BaseElapsedTime)
 
-   call CPU_TIME(BaseCPUTime)
+   call cpu_time(BaseCPUTime)
 
    ! start trace output here so memory calculations are not distorted
    ! by IO buffer being grabbed later

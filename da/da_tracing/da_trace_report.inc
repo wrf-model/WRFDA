@@ -50,7 +50,7 @@ subroutine da_trace_report
 
    TotalElapsedTime=temp-BaseElapsedTime ! on PE 0
 
-   call CPU_TIME(TempCpuTime)
+   call cpu_time(TempCpuTime)
 
    TotalCPUTime(1) = TempCpuTime - BaseCPUTime
 
@@ -72,12 +72,9 @@ subroutine da_trace_report
    call da_proc_sum_int(MasterNoRoutines)
    ! only PE 0 knows the result
 
-   call MPI_BCAST(MasterTimerNames(1:MaxNoRoutines), &
+   call mpi_bcast(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
                   MPI_character,trace_pe, mpi_comm_world,istat)
-
-!   call GC_CBCAST(1001,TraceNameLen*MasterNoRoutines,0,num_procs,istat, &
-!      MasterTimerNames(1:MasterNoRoutines))  
 #endif
 
    MasterElapsedTime(:,:)=0.0

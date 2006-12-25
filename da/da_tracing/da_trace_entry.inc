@@ -29,7 +29,7 @@ subroutine da_trace_entry(&
 
    ! Stop the clock
 
-   call CPU_TIME(CPUTime1)
+   call cpu_time(CPUTime1)
 
    call system_clock(&
       COUNT=Count)
@@ -191,7 +191,7 @@ subroutine da_trace_entry(&
    call system_clock(&
       COUNT=Count)
 
-   call CPU_TIME(CPUTime1)
+   call cpu_time(CPUTime1)
 
    ! set the start elapsed and CPU time both locally and generally
 
@@ -201,7 +201,7 @@ subroutine da_trace_entry(&
    CPUTimeStart(Pointer) = CPUTime1
    CPUTimeLocalStart     = CPUTime1
 
-   ! call FLUSH(trace_unit)
+   ! call flush(trace_unit)
 
    return
 end subroutine da_trace_entry

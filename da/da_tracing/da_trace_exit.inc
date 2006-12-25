@@ -28,7 +28,7 @@ subroutine da_trace_exit(&
 
    ! stop the clock
 
-   call CPU_TIME(temp_CPUTime)
+   call cpu_time(temp_CPUTime)
 
    call system_clock(&
       COUNT=Count)
