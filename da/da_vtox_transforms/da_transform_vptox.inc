@@ -1,7 +1,4 @@
-subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
-                               ids,ide, jds,jde, kds,kde,   &
-                               ims,ime, jms,jme, kms,kme,   &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
 
    !-----------------------------------------------------------------------
    ! Purpose: Physical transform of analysis increment variables.
@@ -15,10 +12,6 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
    type (x_type), intent(out)           :: xa  ! Analysis increments.
    type (be_type), intent(in), optional :: be  ! Background errors.
    type (ep_type), intent(in), optional :: ep  ! Ensemble perturbations.
-
-   integer, intent(in)  :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    integer              :: k, j, k1            ! Loop counters.
 
@@ -60,7 +53,8 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
    xa%psfc(its:ite,jts:jte) = vp%v5(its:ite,jts:jte,1) 
    do k = kts,kte
       do j = jts,jte
-         xa%psfc(its:ite,j) = xa%psfc(its:ite,j) + be%reg_ps(j,k)*vp%v1(its:ite,j,k)
+         xa%psfc(its:ite,j) = xa%psfc(its:ite,j) + &
+            be%reg_ps(j,k)*vp%v1(its:ite,j,k)
       end do
    end do
 
@@ -74,10 +68,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep, &
    ! Psi and chi to u and v:
 
    call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
-                         xb % coefy , xa % u, xa % v, &
-                         ids,ide, jds,jde, kds,kde, &
-                         ims,ime, jms,jme, kms,kme, &
-                         its,ite, jts,jte, kts,kte)
+                         xb % coefy , xa % u, xa % v)
 
    ! Pseudo RH --> Specific humidity:
    xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &

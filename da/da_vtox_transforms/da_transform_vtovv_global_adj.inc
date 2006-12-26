@@ -1,7 +1,4 @@
-subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
-                                           ids, ide, jds, jde, &
-                                           ims, ime, jms, jme, &
-                                           its, ite, jts, jte, kts, kte)
+subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform for global WRF-Var 
@@ -15,9 +12,6 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
    type (be_type), intent(in) :: be   ! background errors.
    real, intent(out)          :: cv(1:cv_size) ! control variables.
    type (vp_type),intent(in)  :: vv   ! grdipt/eof cv (local).
-   integer, intent(in)        :: ids,ide, jds,jde ! domain dims.
-   integer, intent(in)        :: ims,ime, jms,jme ! memory dims.
-   integer, intent(in)        :: its,ite, jts,jte, kts,kte ! tile   dims
 
    integer                    :: k, m ! Loop counters.
    integer                    :: cv_s ! Counter.
@@ -36,10 +30,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v1%power(0:be % v1 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v1(its:ite,jts:jte,k), &
-         ids, ide, jds, jde, &
-         ims, ime, jms, jme, &
-         its, ite, jts, jte)
+         cv(cv_s:cv_e), vv%v1(its:ite,jts:jte,k))
       cv_s = cv_e + 1
    end do
 
@@ -49,10 +40,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v2%power(0:be % v2 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v2(its:ite,jts:jte,k), &
-         ids, ide, jds, jde, &
-         ims, ime, jms, jme, &
-         its, ite, jts, jte)
+         cv(cv_s:cv_e), vv%v2(its:ite,jts:jte,k))
       cv_s = cv_e + 1
    end do
 
@@ -62,10 +50,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v3%power(0:be % v3 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v3(its:ite,jts:jte,k), &
-         ids, ide, jds, jde, &
-         ims, ime, jms, jme, &
-         its, ite, jts, jte)
+         cv(cv_s:cv_e), vv%v3(its:ite,jts:jte,k))
       cv_s = cv_e + 1
    end do
 
@@ -75,10 +60,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v4%power(0:be % v4 % max_wave,k), &
-         cv(cv_s:cv_e), vv%v4(its:ite,jts:jte,k), &
-         ids, ide, jds, jde, &
-         ims, ime, jms, jme, &
-         its, ite, jts, jte)
+         cv(cv_s:cv_e), vv%v4(its:ite,jts:jte,k))
       cv_s = cv_e + 1
    end do
 
@@ -88,10 +70,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
         xbx % lenr, xbx % lenwrk, xbx % lensav, &
         xbx % inc, xbx % alp_size, xbx % alp, &
         xbx % wsave, be%v5%power(0:be % v5 % max_wave,k), &
-        cv(cv_s:cv_e), vv%v5(its:ite,jts:jte,kts:kte), &
-        ids, ide, jds, jde, &
-        ims, ime, jms, jme, &
-        its, ite, jts, jte)
+        cv(cv_s:cv_e), vv%v5(its:ite,jts:jte,kts:kte))
      cv_s = cv_e + 1
    end do
 
@@ -105,10 +84,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be % alpha % power(0:be%alpha%max_wave,1), &
-         cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m), &
-         ids, ide, jds, jde, &
-         ims, ime, jms, jme, &
-         its, ite, jts, jte)
+         cv(cv_s:cv_e), vv%alpha(its:ite,jts:jte,m))
       cv_s = cv_e + 1
    end do
 

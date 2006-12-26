@@ -823,18 +823,11 @@ contains
   
    integer                :: ccyy,mo,dd,hh,mi,ss,i
    integer, dimension(12) :: mmday
-
-   character(len=1)       :: dash, underscore, colon
-  
+ 
    mmday=(/31,28,31,30,31,30,31,31,30,31,30,31/)
   
-   read(date_char(1:19),'(i4,a,4(i2,a),i2)') &
-        ccyy, dash, &
-          mo, dash, &
-          dd, underscore, &
-          hh, colon, &
-          mi, colon, &
-          ss
+   read(date_char(1:19),'(i4,1x,4(i2,1x),i2)') &
+        ccyy, mo, dd, hh, mi, ss
   
    if(mod(ccyy,4) == 0) then
       mmday(2) = 29

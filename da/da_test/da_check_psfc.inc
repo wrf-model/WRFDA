@@ -1,7 +1,4 @@
-subroutine da_check_psfc(xb, xa, iv, xp, y, &
-                       ids,ide, jds,jde, kds,kde, &
-                       ims,ime, jms,jme, kms,kme, &
-                       its,ite, jts,jte, kts,kte)
+subroutine da_check_psfc(xb, xa, iv, xp, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -14,10 +11,6 @@ subroutine da_check_psfc(xb, xa, iv, xp, y, &
    type (ob_type), intent(inout)     :: iv  ! ob. increment vector.
    type (xpose_type), intent(inout)  :: xp  ! Dimensions and xpose buffers(be).
    type (y_type),  intent(inout)     :: y   ! residual
-
-   integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                           :: adj_ttl_lhs   ! < y, y >
    real                           :: adj_ttl_rhs   ! < x, x_adj >

@@ -42,10 +42,6 @@ subroutine da_solve ( grid , config_flags , &
    integer                      :: it          ! External loop counter.
    type (j_type)                :: j           ! Cost function.
 
-   integer                      :: ide , jds , jde , kds , kde , &
-                                   ims , ime , jms , jme , kms , kme , &
-                                   its , ite , jts , jte , kts , kte
-
    integer                      :: cv_size, i
    real                         :: j_grad_norm_target ! TArget j norm.
    integer                      :: wrf_done_unit
@@ -96,10 +92,7 @@ subroutine da_solve ( grid , config_flags , &
    ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
-   call da_solve_init( grid, &
-                       ids, ide, jds, jde, kds, kde, &
-                       ims, ime, jms, jme, kms, kme, &
-                       its, ite, jts, jte, kts, kte )
+   call da_solve_init(grid)
 
    !---------------------------------------------------------------------------
    ! [3.0] Set up first guess field (grid%xb):
@@ -119,9 +112,7 @@ subroutine da_solve ( grid , config_flags , &
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
 
-   call da_setup_background_errors( grid%xb, xbx, be, grid%xp, &
-                                    its, ite, jts, jte, kts, kte, &
-                                    ids, ide, jds, jde, kds, kde )
+   call da_setup_background_errors( grid%xb, xbx, be, grid%xp)
    cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
@@ -196,19 +187,13 @@ subroutine da_solve ( grid , config_flags , &
 
       if (test_transforms) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
-                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
-                        ids, ide, jds, jde, kds, kde, &
-                        ims, ime, jms, jme, kms, kme, &
-                        its, ite, jts, jte, kts, kte )
+                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y)
          call wrf_shutdown
       end if
 
       if (testing_wrfvar) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
-                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y, &
-                        ids, ide, jds, jde, kds, kde, &
-                        ims, ime, jms, jme, kms, kme, &
-                        its, ite, jts, jte, kts, kte )
+                        grid%xa, grid%vv, grid%vp, grid%xp, ob, y)
          call wrf_shutdown
       end if
 
@@ -234,28 +219,20 @@ subroutine da_solve ( grid , config_flags , &
                            it, be % cv % size, & 
                            xbx, be, iv, &
                            j_grad_norm_target, xhat, cvt, &
-                           re, y, j,    &
-                           ids, ide, jds, jde, kds, kde,        &
-                           ims, ime, jms, jme, kms, kme,        &
-                           its, ite, jts, jte, kts, kte         )
+                           re, y, j)
 
       !------------------------------------------------------------------------
 
       ! [8.5] Update latest analysis solution:
 
-      call da_transform_vtox( cv_size, grid%xb, xbx, be, grid%ep, xhat, grid%vv, grid%vp, grid%xp, grid%xa,  &
-                              ids, ide, jds, jde, kds, kde,             &
-                              ims, ime, jms, jme, kms, kme,             &
-                              its, ite, jts, jte, kts, kte )
+      call da_transform_vtox( cv_size, grid%xb, xbx, be, grid%ep, xhat, &
+         grid%vv, grid%vp, grid%xp, grid%xa)
 
       ! [8.6] Only when use_RadarObs = .false. and w_increments =.true.,
       !       the w_increment need to be diagnosed:
 
       if (w_increments .and. .not. use_RadarObs) then
-         call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp,                 &
-                                  ids,ide, jds,jde, kds,kde,  &
-                                  ims,ime, jms,jme, kms,kme,  &
-                                  its,ite, jts,jte, kts, kte )
+         call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
 
          call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id13)
       end if

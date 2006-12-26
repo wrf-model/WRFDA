@@ -1,7 +1,4 @@
-subroutine da_moist_phys_adj(xb, xa, xp,    &
-                ids,ide, jds,jde, kds,kde,  &
-                ims,ime, jms,jme, kms,kme,  &
-                its,ite, jts,jte, kts,kte)
+subroutine da_moist_phys_adj(xb, xa, xp)
 
    !---------------------------------------------------------------------------
    !  Purpose: Partition of the hydrometeors via the moist explicit scheme.
@@ -19,10 +16,6 @@ subroutine da_moist_phys_adj(xb, xa, xp,    &
    type (xb_type), intent(in)    :: xb           ! First guess structure.
    type (x_type), intent(inout)  :: xa           ! Increment structure.
    type (xpose_type), intent(inout) :: xp        ! Dimensions and xpose buffers.
-
-   integer         :: ids,ide, jds,jde, kds,kde
-   integer         :: ims,ime, jms,jme, kms,kme
-   integer         :: its,ite, jts,jte, kts,kte
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
    real, dimension(ims:ime,jms:jme,kms:kme) :: Q_OLD,Q_NEW
@@ -105,7 +98,7 @@ subroutine da_moist_phys_adj(xb, xa, xp,    &
                DT(k) = xb%delt(i,j,k)
             end do
          else
-            call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT,kts,kte)
+            call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT)
          end if
 
          do K=kts,kte

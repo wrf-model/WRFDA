@@ -1,8 +1,5 @@
 subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
-                                  xb, xbx, xp, be, xa, iv, y,&
-                                  ids,ide, jds,jde, kds,kde, &
-                                  ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte  )
+                                  xb, xbx, xp, be, xa, iv, y)
 
 !------------------------------------------------------------------------------
 !  Purpose: Perform V To Y Adjoint transform test                             
@@ -28,22 +25,15 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    type (y_type),     intent(inout)     :: y     ! y = h (xa)
 
 
-   integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
-!-------------------------------------------------------------------------
-
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
    real, dimension(1:cv_size)        :: cv_2
 
    real, dimension(ims:ime, jms:jme) :: field
-!-------------------------------------------------------------------------
-!-------------------------------------------------------------------------
+
    real                           :: adj_sum_lhs               ! < y, y >
    real                           :: adj_rhs,adj_sum_rhs       ! < v, v_adj >
    real                           :: partial_lhs   ! < y, y >
    real                           :: pertile_lhs   ! < y, y >
-!-------------------------------------------------------------------------
 
    write(unit=*, fmt='(/a/a)') &
         '       da_test_vtoy_transform:',&
@@ -60,9 +50,6 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    call da_zero_vp_type(vv)
 
    call da_transform_vtoy(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                             ids, ide, jds, jde, kds, kde,  &
-                             ims, ime, jms, jme, kms, kme,  &
-                             its, ite, jts, jte, kts, kte,  &
                              grid, config_flags )
 
 !-------------------------------------------------------------------------
@@ -81,9 +68,6 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 !   call da_zero_x(xa)      
 !
    call da_transform_vtoy_adj(be, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                                 ids, ide, jds, jde, kds, kde,     &
-                                 ims, ime, jms, jme, kms, kme,     &
-                                 its, ite, jts, jte, kts, kte,     &
                                  grid, config_flags )
 
    adj_rhs = sum( cv(1:cv_size) * cv_2(1:cv_size) )

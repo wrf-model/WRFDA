@@ -1,4 +1,4 @@
-subroutine da_copy_tile_dims(grid, its, ite, jts, jte, kts, kte)
+subroutine da_copy_tile_dims(grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Copy tile dimensions from grid structure.
@@ -7,7 +7,6 @@ subroutine da_copy_tile_dims(grid, its, ite, jts, jte, kts, kte)
    implicit none
 
    type(domain), intent(inout)         :: grid
-   integer,      intent(out)        :: its,ite, jts,jte, kts,kte ! tile dims.
 
    integer                  :: ij   ! Loop counter
 

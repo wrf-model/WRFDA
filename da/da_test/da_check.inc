@@ -1,8 +1,5 @@
 subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
-                     xa, vv, vp, xp, ob, y, &
-                     ids, ide, jds, jde, kds, kde, &
-                     ims, ime, jms, jme, kms, kme, &
-                     its, ite, jts, jte, kts, kte)
+                     xa, vv, vp, xp, ob, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -22,10 +19,6 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    type (xpose_type), intent(inout) :: xp    ! Dimensions and xpose buffers. 
    type (y_type),     intent(inout) :: ob            ! yo
    type (y_type),     intent(inout) :: y             ! y = h (xa)
-
-   integer, intent(in) :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in) :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in) :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    integer :: sizec
    real    :: cvtest(1:cv_size)    ! background error structure.
@@ -52,38 +45,26 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
 
    ! v_to_vv adjoint test:
 
-   call da_check_cvtovv_adjoint(cv_size, xb, xbx,xp, be, cvtest, vv, &
-                                 ids, ide, jds, jde, kds, kde,      &
-                                 ims, ime, jms, jme, kms, kme,      &
-                                 its, ite, jts, jte, kts, kte)
+   call da_check_cvtovv_adjoint(cv_size, xb, xbx,xp, be, cvtest, vv)
 
    !-------------------------------------------------------------------------
    ! vv_to_vp adjoint test:
    !-------------------------------------------------------------------------
 
-   call da_check_vvtovp_adjoint(be % ne, xb, be, vv, vp, &
-                                 ids,ide, jds,jde, kds,kde, &
-                                 ims,ime, jms,jme, kms,kme, &
-                                 its,ite, jts,jte, kts,kte)
+   call da_check_vvtovp_adjoint(be % ne, xb, be, vv, vp)
 
    !-------------------------------------------------------------------------
    ! vptox adjoint test:
    !-------------------------------------------------------------------------
 
-   call da_check_vptox_adjoint(be % ne, xb, xbx, be, ep, xp, vp, xa, &
-                                ids, ide, jds, jde, kds, kde,    &
-                                ims, ime, jms, jme, kms, kme,    &
-                                its, ite, jts, jte, kts, kte)
+   call da_check_vptox_adjoint(be % ne, xb, xbx, be, ep, xp, vp, xa)
 
    !-------------------------------------------------------------------------
    ! vtox adjoint test: <x,x> = <v_adj,v>
    !-------------------------------------------------------------------------
 
    call da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, &
-                               xa, &
-                               ids, ide, jds, jde, kds, kde,      &
-                               ims, ime, jms, jme, kms, kme,      &
-                               its, ite, jts, jte, kts, kte)
+                               xa)
 
    !----------------------------------------------------------------------------
    ! [2] Perform xtoy adjoint tests:
@@ -95,10 +76,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    call da_zero_x(xa)
 
 #if 1
-   call da_setup_testfield(xb, xa, xp, &
-                               ids,ide, jds,jde, kds,kde, &
-                               ims,ime, jms,jme, kms,kme, &
-                               its,ite, jts,jte, kts,kte)
+   call da_setup_testfield(xb, xa, xp)
 #else
 
    ! Make cv_array random.
@@ -106,15 +84,10 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    call random_number(cvtest(1:cv_size))
    cvtest(1:cv_size) = cvtest(1:cv_size) - 0.5
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa, &
-                              ids, ide, jds, jde, kds, kde,           &
-                              ims, ime, jms, jme, kms, kme,           &
-                              its, ite, jts, jte, kts, kte)
+   call da_transform_vtox(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa)
 #endif
 
-   call da_check_xtoy_adjoint(xb, xa, iv, xp, y, &
-                               ims,ime, jms,jme, kms,kme, &
-                               its,ite, jts,jte, kts,kte)
+   call da_check_xtoy_adjoint(xb, xa, iv, xp, y)
 
    call da_deallocate_y(y)
 
@@ -130,10 +103,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
       field(:,:) = field(:,:) - 0.5
 
       sizec = (be % max_wave+1) * (be % max_wave+2)/2
-      call da_test_spectral(be % max_wave, sizec, xbx, field, &
-                             ids, ide, jds, jde, &
-                             ims, ime, jms, jme, &
-                             its, ite, jts, jte)
+      call da_test_spectral(be % max_wave, sizec, xbx, field)
 
    end if
 

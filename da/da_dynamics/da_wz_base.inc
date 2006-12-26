@@ -1,7 +1,4 @@
-subroutine da_wz_base(xb,WZ_b,                       &
-                      ids,ide, jds,jde, kds,kde,  &
-                      ims,ime, jms,jme, kms,kme,  &
-                      its,ite, jts,jte, kts,kte)
+subroutine da_wz_base(xb,WZ_b)
 
    !--------------------------------------------------------------------
    ! Purpose: TBD
@@ -10,10 +7,6 @@ subroutine da_wz_base(xb,WZ_b,                       &
    implicit none
 
    type (xb_type), intent(in)    :: xb                ! First guess structure.
-
-   integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
 
    real, dimension(ims:ime,jms:jme,kms:kme), intent(inout) :: WZ_b
 
@@ -91,10 +84,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
    end if
 
 
-   call da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, xb%u,xb%v, DIV)
 
    do K=kts,kte
       do J=jts,jte
@@ -119,10 +109,7 @@ subroutine da_wz_base(xb,WZ_b,                       &
       end do
    end do
 
-   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV)
 
    do J=jts,jte
       do I=its,ite

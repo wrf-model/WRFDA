@@ -1,7 +1,4 @@
-subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transforms analysis to control variables (Vp-type)
@@ -15,9 +12,6 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
    type (xpose_type), intent(inout)     :: xp         ! Dimensions and xpose buffers. 
    type (vp_type), intent(out)          :: vp         ! CV on grid structure.
    type (be_type), intent(in), optional :: be         ! Background errors.
-   integer, intent(in)  :: ids,ide, jds,jde, kds,kde  ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme, kms,kme  ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte, kts,kte  ! tile   dims.
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: vor, & ! Vorticity.
                                                div    ! Divergence.
@@ -38,15 +32,12 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
 #ifndef DEREF_KLUDGE
-   call da_uv_to_vorticity(xb, xa % u, xa % v, vor, &
+   call da_uv_to_vorticity(xb, xa % u, xa % v, vor)
 #else
    call da_uv_to_vorticity(xb, xa % u(ims,jms,kms), &
                             xa % v(ims,jms,kms), &
-                            vor(ims,jms,kms), &
+                            vor(ims,jms,kms))
 #endif
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte)
 
    ! Convert vorticity to Del**2 psi:
    if (.not. global) then               
@@ -72,15 +63,12 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be, &
 
    call da_message((/'calling UV_To_Divergence'/))
 #ifndef DEREF_KLUDGE
-   call da_uv_to_divergence(xb, xa % u, xa % v, div, &
+   call da_uv_to_divergence(xb, xa % u, xa % v, div)
 #else
    call da_uv_to_divergence(xb, xa % u(ims,jms,kms), &
                                 xa % v(ims,jms,kms), &
-                            div(ims,jms,kms), &
+                            div(ims,jms,kms))
 #endif
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte)
 
    ! Convert divergence to Del**2 chi:
    if (.not. global)  then              

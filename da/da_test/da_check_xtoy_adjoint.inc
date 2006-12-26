@@ -1,6 +1,4 @@
-subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y, &
-                                 ims,ime, jms,jme, kms,kme, &
-                                 its,ite, jts,jte, kts,kte)
+subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    
    !--------------------------------------------------------------------------
    ! Purpose: Test observation operator transform and adjoint for compatibility.
@@ -15,9 +13,6 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y, &
    type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
    type (xpose_type), intent(in)    :: xp    ! Dimensions and xpose buffers(be).
    TYPE (y_type),     intent(inout) :: y     ! y = h (xa)
-
-   integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                           :: adj_ttl_lhs   ! < y, y >
    real                           :: adj_ttl_rhs   ! < x, x_adj >

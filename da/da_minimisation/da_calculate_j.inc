@@ -1,9 +1,6 @@
 subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
                            xbx, be, iv, xhat, cv, &
                            re, y, j, j_grad,            &
-                           ids, ide, jds, jde, kds, kde,            &
-                           ims, ime, jms, jme, kms, kme,            &
-                           its, ite, jts, jte, kts, kte,            &
                            grid, config_flags                     )
 
    !---------------------------------------------------------------------------
@@ -26,10 +23,6 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    type (y_type) , intent(inout)      :: y      ! y = H(x_inc).
    real, intent(out)                  :: j_grad(1:cv_size) ! control variables.
    type (j_type) , intent(out)        :: j      ! cost function j
-
-   integer   , intent(in)       :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer   , intent(in)       :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer   , intent(in)       :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    type(domain), intent(inout)  :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
@@ -68,9 +61,6 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    if (iter > 0) &
       call da_transform_vtoy(cv_size, be, grid%ep, xhat, iv, grid%vp, grid%vv,&
                               grid%xa, grid%xb, xbx, grid%xp, y, &
-                              ids, ide, jds, jde, kds, kde,             &
-                              ims, ime, jms, jme, kms, kme,             &
-                              its, ite, jts, jte, kts, kte,             &
                               grid, config_flags                      )
 
    ! [1.2] compute residual (o-a) = (o-b) - h x~
@@ -165,11 +155,8 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    !-------------------------------------------------------------------------
 
    call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, j_grad, iv, &
-                               grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
-                               ids, ide, jds, jde, kds, kde,     &
-                               ims, ime, jms, jme, kms, kme,     &
-                               its, ite, jts, jte, kts, kte,     &
-                               grid, config_flags, cg_jcdf)
+      grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
+      grid, config_flags, cg_jcdf)
 
    call da_deallocate_y(jo_grad_y)
 

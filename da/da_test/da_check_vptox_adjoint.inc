@@ -1,7 +1,4 @@
-subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
-                                   ids, ide, jds, jde, kds, kde, &
-                                   ims, ime, jms, jme, kms, kme, &
-                                   its, ite, jts, jte, kts, kte)
+subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test Vp to X routine and adjoint for compatibility.
@@ -19,9 +16,6 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
    type (vp_type),intent(inout)     :: vp   ! grdipt/level cv (local).
    type (x_type), intent(inout)     :: xa   ! grad_x(jo)
-   integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
    real                             :: adj_par_lhs ! < x, x >
    real                             :: adj_par_rhs ! < v_adj, v >
@@ -46,10 +40,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
    vp2_v2(:,:,:) = vp % v2(:,:,:)
 
    call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
-                        xb % coefy , xa % u, xa % v, &
-                        ids,ide, jds,jde, kds,kde, &
-                        ims,ime, jms,jme, kms,kme, &
-                        its,ite, jts,jte, kts,kte)
+                        xb % coefy , xa % u, xa % v)
 
    adj_par_lhs = sum(xa % u(its:ite,jts:jte,:)**2) / typical_u_rms**2
    adj_par_lhs = sum(xa % v(its:ite,jts:jte,:)**2) / typical_v_rms**2 + &
@@ -62,10 +53,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
    vp%v2(:,:,:)=0.
 
    call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
-                             xb % coefy, vp % v1, vp % v2, &
-                             ids,ide, jds,jde, kds,kde,    &
-                             ims,ime, jms,jme, kms,kme,    &
-                             its,ite, jts,jte, kts,kte)
+                             xb % coefy, vp % v1, vp % v2)
 
    adj_par_rhs = sum(vp % v1(its:ite,jts:jte,:) * vp2_v1(its:ite,jts:jte,:))
    adj_par_rhs = sum(vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:)) + &
@@ -103,10 +91,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
    ! [2.0] Perform x = U vp transform:
    !-------------------------------------------------------------------------
 
-   call da_transform_vptox(xb, vp, xp, xa, be, ep, &
-                            ids,ide, jds,jde, kds,kde,   &
-                            ims,ime, jms,jme, kms,kme,   &
-                            its,ite, jts,jte, kts,kte)
+   call da_transform_vptox(xb, vp, xp, xa, be, ep)
 
    !-------------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation:
@@ -195,10 +180,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa, &
 
    call da_zero_vp_type (vp)
 
-   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
-                                ids,ide, jds,jde, kds,kde,   &
-                                ims,ime, jms,jme, kms,kme,   &
-                                its,ite, jts,jte, kts,kte)
+   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

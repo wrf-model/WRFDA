@@ -1,7 +1,4 @@
-subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
-                                   ids, ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte)
+subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
 
    !--------------------------------------------------------------------------
    ! Purpose: Adjoint for Physical transform of variables 
@@ -16,9 +13,6 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbation.
    type (be_type), intent(in), optional :: be  ! Background errors.
    type (xpose_type), intent(inout)     :: xp  ! Transpose variables.
-   integer, intent(in)             :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)             :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)             :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    integer         :: n, k, j, k1              ! Loop counters.
 
@@ -29,8 +23,7 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
    !---------------------------------------------------------------------------
       
    if (be % ne > 0 .and. alphacv_method == 2) then
-      call da_add_flow_dependence_xa_adj(be % ne, ep, xa, vp, &
-                                          its,ite, jts,jte, kts,kte)
+      call da_add_flow_dependence_xa_adj(be % ne, ep, xa, vp)
    end if
 
    !--------------------------------------------------------------------------
@@ -46,10 +39,7 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
 
    ! Transform psi and chi to u and v:
    call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
-                             xb % coefy, vp % v1, vp % v2, &
-                             ids,ide, jds,jde, kds,kde,    &
-                             ims,ime, jms,jme, kms,kme,    &
-                             its,ite, jts,jte, kts,kte)
+                             xb % coefy, vp % v1, vp % v2)
 
    !--------------------------------------------------------------------------
    ! [2] Impose statistical balance constraints:
@@ -89,8 +79,7 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
    !---------------------------------------------------------------------------
    
    if (be % ne > 0 .and. alphacv_method == 1) then
-      call da_add_flow_dependence_vp_adj(be % ne, ep, vp, &
-                                          its,ite, jts,jte, kts,kte)
+      call da_add_flow_dependence_vp_adj(be % ne, ep, vp)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vptox_adj")

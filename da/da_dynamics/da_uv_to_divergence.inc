@@ -1,7 +1,4 @@
-subroutine da_uv_to_divergence(xb, u, v, div, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_uv_to_divergence(xb, u, v, div)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculate divergence on a co-ordinate surface, given an input
@@ -13,10 +10,6 @@ subroutine da_uv_to_divergence(xb, u, v, div, &
    !---------------------------------------------------------------------------
 
    implicit none
-
-   integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims
 
    type (xb_type), intent(in)           :: xb         ! First guess structure.
    real, intent(in)   :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
@@ -121,10 +114,7 @@ subroutine da_uv_to_divergence(xb, u, v, div, &
    end do
 
    if (global) then
-      call da_set_boundary_3d(div, &
-                              ids,ide,   &
-                              ims,ime, jms,jme, kms,kme,  &
-                              its,ite, jts,jte, kts,kte)
+      call da_set_boundary_3d(div)
    end if
 
 end subroutine da_uv_to_divergence

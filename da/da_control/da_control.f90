@@ -541,7 +541,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer :: ierr ! General error code
    integer :: comm ! MPI communicator
 
-   integer :: ids
+   integer :: ids,ide,jds,jde,kds,kde
+   integer :: ims,ime,jms,jme,kms,kme
+   integer :: its,ite,jts,jte,kts,kte
+   integer :: ips,ipe,jps,jpe,kps,kpe
 
 contains
 

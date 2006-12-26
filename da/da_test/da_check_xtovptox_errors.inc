@@ -1,9 +1,6 @@
 subroutine da_check_xtovptox_errors(xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                      xa2_p, xa2_q, xa2_rho, &
-                                     xa2_qt, xa2_qcw, xa2_qrn, &
-                                     ids,ide, jds,jde, kds,kde, &
-                                     ims,ime, jms,jme, kms,kme, &
-                                     its,ite, jts,jte, kts,kte)
+                                     xa2_qt, xa2_qcw, xa2_qrn)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test invertibility of v = U^{-1} x followed by x = Uv.
@@ -14,10 +11,6 @@ subroutine da_check_xtovptox_errors(xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    implicit none
       
    type (x_type), intent(in)      :: xa          ! Test input
-
-   integer, intent(in)            :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)            :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)            :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real, dimension(ims:ime, jms:jme, kms:kme), &
                  intent(in)      :: xa2_u, xa2_v, xa2_t, &

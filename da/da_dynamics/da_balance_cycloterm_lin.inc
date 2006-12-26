@@ -1,8 +1,5 @@
 subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
-                                     coefy, term_x, term_y,     &
-                                     ids,ide, jds,jde, kds,kde, &
-                                     ims,ime, jms,jme, kms,kme, &
-                                     its,ite, jts,jte, kts,kte )
+                                     coefy, term_x, term_y)
                                      
    !---------------------------------------------------------------------------
    ! Purpose: Calculates linearised cyclostrophic term in balance equation.
@@ -12,10 +9,6 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
 
    implicit none
    
-   integer, intent(in)  :: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte, kts,kte    ! tile   dims.
-
    real, dimension(ims:ime,jms:jme), intent(in) :: rho, &   ! Density.
                                                    ub, &    ! Background u wind
                                                    vb, &    ! Background u wind

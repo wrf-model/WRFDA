@@ -1,7 +1,4 @@
-subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp, &
-                                    ids,ide, jds,jde, kds,kde, &
-                                    ims,ime, jms,jme, kms,kme, &
-                                    its,ite, jts,jte, kts,kte)
+subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test Vv to Vp routine and adjoint for compatibility.
@@ -16,10 +13,6 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp, &
    type (be_type), intent(in)        :: be    ! background error structure.
    type (vp_type), intent(inout)     :: vv    ! CV(i,j,m).
    type (vp_type), intent(inout)     :: vp    ! CV(i,j,k)
-
-   integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                              :: adj_par_lhs ! < x, x >
    real                              :: adj_par_rhs ! < v_adj, v >
@@ -49,10 +42,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp, &
 #else
                                xb % vertical_inner_product(ims,jms,kms), &
 #endif
-                               vv, vp,  &
-                               ids,ide, jds,jde, kds,kde, &
-                               ims,ime, jms,jme, kms,kme, &
-                               its,ite, jts,jte, kts,kte)
+                               vv, vp)
 
    !----------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation:
@@ -109,10 +99,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp, &
 #else
                                xb % vertical_inner_product(ims,jms,kms), &
 #endif
-                               vv, vp,  &
-                               ids,ide, jds,jde, kds,kde, &
-                               ims,ime, jms,jme, kms,kme, &
-                               its,ite, jts,jte, kts,kte)
+                               vv, vp)
 
    !----------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

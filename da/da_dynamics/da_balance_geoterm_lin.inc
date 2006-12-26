@@ -1,6 +1,4 @@
-subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
-                                   ids,ide, jds,jde, ims,ime, jms,jme, &
-                                   its,ite, jts,jte )
+subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y)
 
    !---------------------------------------------------------------------------
    !  Purpose: calculates linearised geostrophic term in balance equation.
@@ -12,10 +10,6 @@ subroutine da_balance_geoterm_lin( cori, rho, u, v, term_x, term_y, &
 
    implicit none
    
-   integer, intent(in)  :: ids,ide, jds,jde             ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme             ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte             ! tile   dims.
-
    real, dimension(ims:ime,jms:jme), intent(in)  :: cori, &  ! Coriolis factor.
                                                     rho, &   ! Density
                                                     u, &     ! u wind increment

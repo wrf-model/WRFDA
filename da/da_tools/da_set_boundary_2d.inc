@@ -1,17 +1,10 @@
-subroutine da_set_boundary_2d(var, &
-                              ids, ide, jds, jde, &
-                              ims, ime, jms, jme, &
-                              its, ite, jts, jte)
+subroutine da_set_boundary_2d(var)
 
    !------------------------------------------------------------------------
    ! Purpose: Merge East-West boundary values for input 3d-array (var)   
    !------------------------------------------------------------------------
 
    implicit none
-
-   integer, intent(in) :: ids, ide, jds, jde, &
-                          ims, ime, jms, jme, &
-                          its, ite, jts, jte
    real, dimension(ims:ime, jms:jme) :: var
 
    integer :: n, j

@@ -1,17 +1,10 @@
-subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
-                                    ids,ide, jds,jde, kds,kde,  &
-                                    ims,ime, jms,jme, kms,kme,  &
-                                    its,ite, jts,jte, kts,kte )
+subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_balance_equation
    !---------------------------------------------------------------------------
 
    implicit none
-   
-   integer, intent(in):: ids,ide, jds,jde, kds,kde! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte! tile   dims.
 
    type (xb_type), intent(in) :: xb               ! First guess structure.
    type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
@@ -63,9 +56,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
    !---------------------------------------------------------------------------
 
    call da_solve_poissoneqn_fst_adj(xbx, xp, phi_b, &
-                                 del2phi_b, &
-                                 ims,ime, jms,jme, kms,kme,      &
-                                 its,ite, jts,jte, kts,kte )
+                                 del2phi_b)
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate RHS of balance equation in gridpt space:
@@ -98,10 +89,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
          call da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:),&
-                                        term_x(:,:), term_y(:,:), &
-                                        ids,ide, jds,jde, kds,kde,  &
-                                        ims,ime, jms,jme, kms,kme,  &
-                                        its,ite, jts,jte, kts,kte )
+                                        term_x(:,:), term_y(:,:))
       end if
 
       
@@ -111,8 +99,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v, &
            balance_type == balance_geocyc ) then
          call da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
                                       term_x, term_y, &
-                                      u(:,:,k), v(:,:,k), &
-                                      ims,ime, jms,jme, its,ite, jts,jte )
+                                      u(:,:,k), v(:,:,k))
       end if
    end do
 

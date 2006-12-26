@@ -1,7 +1,4 @@
-subroutine da_solve_init(grid, &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe)
+subroutine da_solve_init(grid)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -10,10 +7,6 @@ subroutine da_solve_init(grid, &
    implicit none
 
    type(domain), intent(inout)      :: grid
-
-   integer,      intent(out)        :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   integer,      intent(out)        :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   integer,      intent(out)        :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
    integer :: ii
 
@@ -29,17 +22,14 @@ subroutine da_solve_init(grid, &
 
    ! De-reference dimension information stored in the grid data structure.
 
-   call da_copy_dims(grid, &
-                   ids, ide, jds, jde, kds, kde, &
-                   ims, ime, jms, jme, kms, kme, &
-                   ips, ipe, jps, jpe, kps, kpe)
+   call da_copy_dims(grid)
 
    ! Compute these starting and stopping locations for each tile and number 
    ! of tiles.
 
    call set_tiles (grid , ids , ide , jds , jde , ips , ipe , jps , jpe)
 
-   call da_copy_tile_dims(grid, its, ite, jts, jte, kts, kte)
+   call da_copy_tile_dims(grid)
 
    sm31             = grid%sm31
    sm32             = grid%sm32

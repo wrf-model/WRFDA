@@ -1,7 +1,4 @@
-subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv, &
-                                    ids,ide, jds,jde, kds,kde, &
-                                    ims,ime, jms,jme, kms,kme, &
-                                    its,ite, jts,jte, kts,kte)
+subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test vtovv routine and adjoint for compatibility.
@@ -18,10 +15,6 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv, &
    type (be_type), intent(in)        :: be    ! background error structure.
    real, intent(in)                  :: cv(1:cv_size) ! control variable.
    type (vp_type), intent(inout)     :: vv    ! CV(i,j,m).
-
-   integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                              :: adj_par_lhs ! < Vv, Vv >
    real                              :: adj_par_rhs ! < cv_adj, cv >
@@ -42,15 +35,9 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv, &
    !-------------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv, &
-                                      ids, ide, jds, jde, &
-                                      ims, ime, jms, jme, &
-                                      its, ite, jts, jte, kts, kte)
+      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv)
    else
-      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp,         &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp)
    end if
 
    !----------------------------------------------------------------------
@@ -72,15 +59,9 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv, &
    !----------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv2, vv, &
-                                           ids, ide, jds, jde, &
-                                           ims, ime, jms, jme, &
-                                           its, ite, jts, jte, kts, kte)
+      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv2, vv)
    else
-      call da_transform_vtovv_adj(cv_size, xb, be, cv2, vv, xp, &
-                                   ids,ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte)
+      call da_transform_vtovv_adj(cv_size, xb, be, cv2, vv, xp)
    end if
 
    adj_par_rhs = sum(cv(1:cv_size) * cv2(1:cv_size))

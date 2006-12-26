@@ -1,7 +1,4 @@
-subroutine da_copy_dims(grid, &
-                     ids, ide, jds, jde, kds, kde, &
-                     ims, ime, jms, jme, kms, kme, &
-                     ips, ipe, jps, jpe, kps, kpe)
+subroutine da_copy_dims(grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Copy dimensioning information from grid structure.
@@ -10,10 +7,6 @@ subroutine da_copy_dims(grid, &
    implicit none
 
    type(domain), intent(inout)         :: grid
-
-   integer,      intent(out) :: ids,ide, jds,jde, kds,kde   ! domain dims.
-   integer,      intent(out) :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   integer,      intent(out) :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
 
    if (trace_use) call da_trace_entry("da_copy_dims")
 

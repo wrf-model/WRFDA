@@ -16,5 +16,3 @@ else
   make clean > /dev/null
 endif
 
-rm -f ../main/*exe
-

@@ -1,6 +1,4 @@
-subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
-                                    ims,ime, jms,jme, kms,kme, &
-                                    its,ite, jts,jte, kts,kte)
+subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Solve Del**2 B = A for B with zero field boundary conditions.
@@ -16,8 +14,6 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b, &
    
    type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
    type (xpose_type),intent(inout)  :: xp      ! Dimensions and xpose buffers. 
-   integer   , intent(in)     :: ims,ime, jms,jme, kms,kme   ! memory dims.
-   integer   , intent(in)     :: its,ite, jts,jte, kts,kte   ! tile   dims.
    real, intent(in)           :: b(ims:ime,jms:jme,kms:kme)      ! B.
    real, intent(out)          :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
    

@@ -1,5 +1,4 @@
-subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
-                                   ims,ime, jms,jme, its,ite, jts,jte )
+subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v)
  
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_balance_geoterm.
@@ -7,9 +6,6 @@ subroutine da_balance_geoterm_adj( cori, rho, term_x, term_y, u, v, &
 
    implicit none
    
-   integer, intent(in)  :: ims,ime, jms,jme             ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte             ! tile   dims.
-
    real, dimension(ims:ime,jms:jme),intent(in):: cori, &  ! Coriolis factor.
                                                  rho, &   ! Density
                                                  term_x,& ! x component of term.

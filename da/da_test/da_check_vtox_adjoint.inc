@@ -1,8 +1,5 @@
 subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
-                                  xa, &
-                                  ids, ide, jds, jde, kds, kde,      &
-                                  ims, ime, jms, jme, kms, kme,      &
-                                  its, ite, jts, jte, kts, kte)
+                                  xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test V to X routine and adjoint for compatibility.
@@ -22,11 +19,6 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    type (vp_type), intent(inout)   :: vp     ! Grdipt/level CV.
    type (xpose_type), intent(inout):: xp     ! Domain decomposition vars.
    type (x_type) , intent(inout)   :: xa     ! gridded analy. incs. (local)
-
-      
-   integer, intent(in)    :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)    :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)    :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real                   :: cv2(1:cv_size)    ! control variable (local).
    real                   :: adj_par_lhs ! < x, x >
@@ -51,10 +43,7 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
 
    call da_zero_x (xa)
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa, &
-                           ids, ide, jds, jde, kds, kde,      &
-                           ims, ime, jms, jme, kms, kme,      &
-                           its, ite, jts, jte, kts, kte)
+   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa)
 
    !----------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation: 
@@ -123,10 +112,7 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
-   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2, &
-                               ids, ide, jds, jde, kds, kde,      &
-                               ims, ime, jms, jme, kms, kme,      &
-                               its, ite, jts, jte, kts, kte)
+   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

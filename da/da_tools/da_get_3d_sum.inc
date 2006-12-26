@@ -1,7 +1,4 @@
-subroutine da_get_3d_sum(var, name, &
-                      ids, ide, jds, jde, kds, kde, &
-                      ims, ime, jms, jme, kms, kme, &
-                      its, ite, jts, jte, kts, kte)
+subroutine da_get_3d_sum(var, name)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,18 +6,10 @@ subroutine da_get_3d_sum(var, name, &
 
    implicit none
 
-   integer, intent(in) :: ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          its, ite, jts, jte, kts, kte
    real, dimension(ims:ime, jms:jme, kms:kme), intent(in) :: var
    character(len=*), intent(in) :: name
 
    real :: partial, total
-
-   ! JRB use variables to stop compiler complaining
-   if (ids == 1 .OR. ide == 1 .OR. jds == 1 .OR. jde == 1 .OR. &
-       kds == 1 .OR. kde == 1) then
-   end if
 
    partial = sum(var(its:ite,jts:jte,kts:kte)*var(its:ite,jts:jte,kts:kte))
 

@@ -1,7 +1,4 @@
-subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi)
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint code of da_psichi_to_uv  
@@ -16,10 +13,6 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
    !---------------------------------------------------------------------------
 
    implicit none
-
-   integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
    
    real, intent(inout):: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(inout):: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
@@ -37,14 +30,8 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
    !---------------------------------------------------------------------------
 
    if (global) then
-      call da_set_boundary_3d(u, &
-                            ids,ide,   & 
-                            ims,ime, jms,jme, kms,kme,  & 
-                            its,ite, jts,jte, kts,kte) 
-      call da_set_boundary_3d(v, &
-                            ids,ide,  & 
-                            ims,ime, jms,jme, kms,kme,  & 
-                            its,ite, jts,jte, kts,kte) 
+      call da_set_boundary_3d(u) 
+      call da_set_boundary_3d(v) 
    end if
 
    !---------------------------------------------------------------------------
@@ -208,14 +195,8 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi, &
    !---------------------------------------------------------------------------
 
    if (global) then
-       call da_set_boundary_3d(psi, &
-                            ids,ide,   &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte)
-       call da_set_boundary_3d(chi, &
-                            ids,ide,   &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte)
+       call da_set_boundary_3d(psi)
+       call da_set_boundary_3d(chi)
    end if
 
 end subroutine da_psichi_to_uv_adj

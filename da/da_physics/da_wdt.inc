@@ -1,4 +1,4 @@
-subroutine da_wdt(H,W,TERR,DT,kts,kte)
+subroutine da_wdt(H,W,TERR,DT)
 
    !----------------------------------------------------------------------
    ! Purpose: Calculate DT
@@ -6,7 +6,6 @@ subroutine da_wdt(H,W,TERR,DT,kts,kte)
 
    implicit none
 
-   integer,intent(in)                    :: kts, kte
    real, dimension(kts:kte),intent(in)   :: h
    real, dimension(kts:kte),intent(out)  :: dt
    real, dimension(kts:kte+1),intent(in) :: w

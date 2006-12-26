@@ -1,4 +1,4 @@
-subroutine da_setup_be_global (ide, jde, kde, be)
+subroutine da_setup_be_global (be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define and allocate components of background errors
@@ -6,7 +6,6 @@ subroutine da_setup_be_global (ide, jde, kde, be)
 
    implicit none
 
-   integer, intent(in)         :: ide, jde, kde      ! Domain dimensions
    type (be_type), intent(out) :: be                 ! Back. errors structure
 
    integer                     :: nrec

@@ -1,7 +1,4 @@
-subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte )
+subroutine da_balance_cycloterm( xb, k, term_x, term_y)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculates cyclostrophic term in balance equation.
@@ -15,10 +12,6 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y, &
    integer, intent(in)        :: k            ! Model level.
    real, intent(inout)        :: term_x(:,:)  ! x component of term.
    real, intent(inout)        :: term_y(:,:)  ! y component of term.
-
-   integer, intent(in)  :: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte, kts,kte    ! tile   dims.
 
    integer              :: i, j                         ! Loop counters.
    integer              :: is, ie                       ! 1st dim. end points.

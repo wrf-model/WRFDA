@@ -1,8 +1,5 @@
 subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
-                                  xb, xbx, xp, be, ep, xa, iv, y,&
-                                  ids,ide, jds,jde, kds,kde, &
-                                  ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte)
+                                  xb, xbx, xp, be, ep, xa, iv, y)
 
    !---------------------------------------------------------------------------
    !  Purpose: Perform V To Y Adjoint transform test                             
@@ -27,11 +24,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    type (x_type),     intent(out)   :: xa    ! analysis increments (local).
    type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
    type (y_type),     intent(inout) :: y     ! y = h (xa)
-
-
-   integer, intent(in)               :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)               :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)               :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real, dimension(1:cv_size)        :: cv          ! Test control variable.
    real, dimension(1:cv_size)        :: cv_2
@@ -58,9 +50,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    call da_zero_vp_type(vv)
 
    call da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                             ids, ide, jds, jde, kds, kde,  &
-                             ims, ime, jms, jme, kms, kme,  &
-                             its, ite, jts, jte, kts, kte,  &
                              grid, config_flags)
 
    !-------------------------------------------------------------------------
@@ -80,9 +69,6 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    call da_transform_vtoy_adj(0,cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
                                  xp, y, &
-                                 ids, ide, jds, jde, kds, kde,     &
-                                 ims, ime, jms, jme, kms, kme,     &
-                                 its, ite, jts, jte, kts, kte,     &
                                  grid, config_flags, cg_jcdf)
 
    adj_rhs = sum(cv(1:cv_size) * cv_2(1:cv_size))

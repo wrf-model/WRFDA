@@ -1,8 +1,5 @@
 subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
-                                alp_size, alp, wsave, power, rcv, field, &
-                                ids, ide, jds, jde, &
-                                ims, ime, jms, jme, &
-                                its, ite, jts, jte)
+                                alp_size, alp, wsave, power, rcv, field)
 
    !-------------------------------------------------------------------------
    ! Purpose: Performs spectral to gridpoint transformation on a sphere.
@@ -22,9 +19,6 @@ subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
    real, intent(in)    :: power(0:max_wave)        ! Power spectrum 
    real, intent(in)    :: rcv(1:2*sizec)           ! Spectral modes.
    real, intent(out)   :: field(its:ite,jts:jte)   ! Gridpoint field.
-   integer, intent(in) :: ids, ide, jds, jde, &
-                          ims, ime, jms, jme, &
-                          its, ite, jts, jte
 
    integer :: j, l,m, n                ! Loop counters.
    integer :: index_start              ! Position markers in cv.

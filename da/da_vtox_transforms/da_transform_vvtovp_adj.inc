@@ -1,8 +1,5 @@
 subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
-                                    vp, vv, mz, &
-                                    jds,jde, kds,kde,  &
-                                    ims,ime, jms,jme, kms,kme,  &
-                                    its,ite, jts,jte, kts,kte)
+                                    vp, vv, mz)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_transform_vvtovp.
@@ -11,9 +8,6 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
    implicit none
    
    integer, intent(in)   :: mz                         ! # vertical modes.
-   integer, intent(in)   :: jds,jde, kds,kde  ! domain dims.
-   integer, intent(in)   :: ims,ime, jms,jme, kms,kme  ! memory dims.
-   integer, intent(in)   :: its,ite, jts,jte, kts,kte  ! tile   dims
 
    real, intent(in)      :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
    real, intent(in)      :: eval(jds:jde,1:mz)         ! Eigenvalues.

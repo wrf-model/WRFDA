@@ -1,5 +1,4 @@
-subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp, &
-                                          its,ite, jts,jte, kts,kte)
+subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp)
 
    !-----------------------------------------------------------------------
    ! Purpose: Add flow-dependent increments in model space (xa).
@@ -11,7 +10,6 @@ subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp, &
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
    type (x_type), intent(in)            :: xa  ! Analysis increments.
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
-   integer, intent(in)                  :: its, ite, jts, jte, kts, kte
    
    integer                              :: n, k! Loop counters.
 

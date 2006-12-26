@@ -1,8 +1,5 @@
 subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
-                                        xp, field, &
-                                        ids,ide, jds,jde, kds,kde,  &
-                                        ims,ime, jms,jme, kms,kme,  &
-                                        its,ite, jts,jte, kts,kte)
+                                        xp, field)
 
    !---------------------------------------------------------------------------
    ! Purpose: Control variable transform through the recursive filter.
@@ -17,9 +14,6 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    implicit none
 
    integer, intent(in) :: mz                ! Vertical truncation.
-   integer, intent(in) :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in) :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in) :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    real, intent(in)    :: grid_box_area(ims:ime,jms:jme) ! From first guess. 
    real, intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 

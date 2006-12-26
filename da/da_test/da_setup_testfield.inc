@@ -1,7 +1,4 @@
-subroutine da_setup_testfield(xb, xa, xp, &
-                              ids,ide, jds,jde, kds,kde, &
-                              ims,ime, jms,jme, kms,kme, &
-                              its,ite, jts,jte, kts,kte)
+subroutine da_setup_testfield(xb, xa, xp)
 
    !----------------------------------------------------------------------------
    ! Purpose: produce test increment field based on xb field.
@@ -15,18 +12,7 @@ subroutine da_setup_testfield(xb, xa, xp, &
    type (x_type) ,    intent(out) :: xa  ! gridded analy. incs. (local)
    type (xpose_type), intent(in)  :: xp  ! Transpose variables.
 
-   integer, intent(in)  :: ids,ide, jds,jde, kds,kde  ! domain dims.
-   integer, intent(in)  :: ims,ime, jms,jme, kms,kme  ! memory dims.
-   integer, intent(in)  :: its,ite, jts,jte, kts,kte  ! tile   dims.
-
    integer :: i, j
-
-   ! JRB Stop compiler whinging
-
-   if (kms==0 .OR. ite==0 .OR. ime==0 .OR. ide==0 .OR. ids==0 .OR. kde==0 .OR. &
-       its==0 .OR. ims==0 .OR. jds==0 .OR. jde==0 .OR. jts==0 .OR. jme==0 .OR. &
-       jte==0 .OR. jms==0 .OR. kds==0 .OR. kme==0 .OR. kts==0 .OR. kte==0) then
-   end if
 
    !-------------------------------------------------------------------------
    ! [1.0]: initialise:

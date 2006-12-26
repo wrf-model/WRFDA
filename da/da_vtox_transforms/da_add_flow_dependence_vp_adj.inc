@@ -1,5 +1,4 @@
-subroutine da_add_flow_dependence_vp_adj (ne, ep, vp, &
-                                          its,ite, jts,jte, kts,kte)
+subroutine da_add_flow_dependence_vp_adj (ne, ep, vp)
 
    !-----------------------------------------------------------------------
    ! Purpose: Add flow-dependent increments in control variable space (vp).
@@ -10,7 +9,6 @@ subroutine da_add_flow_dependence_vp_adj (ne, ep, vp, &
    integer, intent(in)                  :: ne  ! Ensemble size.
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
-   integer, intent(in)                  :: its, ite, jts, jte, kts, kte
    
    integer                              :: n, k! Loop counters.
 

@@ -1,7 +1,4 @@
-subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
-                                    ids,ide, jds,jde, kds,kde,  &
-                                    ims,ime, jms,jme, kms,kme,  &
-                                    its,ite, jts,jte, kts,kte )
+subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculates balanced mass increment phi_b from wind increments.
@@ -13,10 +10,6 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    !---------------------------------------------------------------------------
 
    implicit none
-   
-   integer, intent(in):: ids,ide, jds,jde, kds,kde! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte! tile   dims.
 
    type (xb_type), intent(in) :: xb               ! First guess structure.
    type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
@@ -76,8 +69,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
            balance_type == balance_geocyc ) then
          call da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
                                       u(:,:,k), v(:,:,k), &
-                                      term_x, term_y, ids,ide, jds,jde, &
-                                      ims,ime, jms,jme, its,ite, jts,jte )
+                                      term_x, term_y)
       end if
       
       ! [2.2] Include cyclostrophic terms in balance eqn if requested:
@@ -87,10 +79,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
          call da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
                                         xb % v(:,:,k), u(:,:,k), v(:,:,k),&
                                         xb % coefx(:,:), xb % coefy(:,:), &
-                                        term_x(:,:), term_y(:,:),   &
-                                        ids,ide, jds,jde, kds,kde,  &
-                                        ims,ime, jms,jme, kms,kme,  &
-                                        its,ite, jts,jte, kts,kte )
+                                        term_x(:,:), term_y(:,:))
       end if
       
       ! [2.3] Take divergence to get Del**2 phi_b/M**2:
@@ -120,10 +109,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b,   &
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !------------------------------------------------------------------------------
 
-   call da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b,  &
-                                 ide, jde,      &
-                                 ims,ime, jms,jme, kms,kme,      &
-                                 its,ite, jts,jte, kts,kte ) 
+   call da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b) 
 
 end subroutine da_balance_equation_lin
 

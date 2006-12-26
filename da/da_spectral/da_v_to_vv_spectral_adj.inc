@@ -1,8 +1,5 @@
 subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, inc, &
-                                    alp_size, alp, wsave, power, rcv, field, &
-                                    ids, ide, jds, jde, &
-                                    ims, ime, jms, jme, &
-                                    its, ite, jts, jte)
+                                    alp_size, alp, wsave, power, rcv, field)
 
    !----------------------------------------------------------------------
    ! Purpose: Performs Adjoint of spectral to grid transformation on a sphere.
@@ -22,9 +19,6 @@ subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, 
    real, intent(in)    :: power(0:max_wavenumber)    ! Power spectrum
    real, intent(out)   :: rcv(1:2*sizec)             ! Spectral modes.
    real, intent(in)    :: field(its:ite,jts:jte)     ! Gridpoint field.
-   integer, intent(in) :: ids, ide, jds, jde, &
-                          ims, ime, jms, jme, &
-                          its, ite, jts, jte
 
    integer             :: j, m, n                    ! Loop counters.
    integer             :: index_start, index_end     ! Position markers in cv.

@@ -1,7 +1,4 @@
-subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
-                                  ids, ide, jds, jde, kds, kde,           &
-                                  ims, ime, jms, jme, kms, kme,           &
-                                  its, ite, jts, jte, kts, kte)
+subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform Adjoint
@@ -19,9 +16,6 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
    type (vp_type),intent(out)       :: vp   ! grdipt/level cv (local).
    type (vp_type),intent(out)       :: vv   ! grdipt/eof cv (local).
    real, intent(inout)              :: cv(1:cv_size) ! control variables.
-   integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
 
    integer                          :: i, j, k
    real :: sdmd, s1md, mu
@@ -95,10 +89,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
          end do
       end do
 
-     call da_uvprho_to_w_adj(xb, xa, xp,                 &
-                              ids,ide, jds,jde, kds,kde,  &
-                              ims,ime, jms,jme, kms,kme,  &
-                              its,ite, jts,jte, kts,kte)
+     call da_uvprho_to_w_adj(xb, xa, xp)
 
    end if
 
@@ -192,10 +183,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
    !-------------------------------------------------------------------------
 
    call da_zero_vp_type (vp)
-   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp, &
-                                ids,ide, jds,jde, kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte)
+   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
@@ -216,10 +204,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
 #else
                                   xb % vertical_inner_product(ims,jms,kms), &
 #endif
-                                  vv, vp, &
-                                  ids,ide, jds,jde, kds,kde, &
-                                  ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte)
+                                  vv, vp)
    else
       vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)
       vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)
@@ -233,15 +218,9 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
    !-------------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv, vv, &
-                                          ids,ide, jds,jde,  &
-                                          ims,ime, jms,jme,  &
-                                          its,ite, jts,jte, kts,kte)
+      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv, vv)
    else
-      call da_transform_vtovv_adj(cv_size, xb, be, cv, vv, xp, &
-                                   ids,ide, jds,jde, kds,kde,  &
-                                   ims,ime, jms,jme, kms,kme,  &
-                                   its,ite, jts,jte, kts,kte)
+      call da_transform_vtovv_adj(cv_size, xb, be, cv, vv, xp)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vtox_adj")

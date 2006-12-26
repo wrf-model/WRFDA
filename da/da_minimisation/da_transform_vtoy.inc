@@ -1,7 +1,5 @@
 subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
-                              xp, y, ids, ide, jds, jde, kds, kde,  &
-                              ims, ime, jms, jme, kms, kme,  &
-                              its, ite, jts, jte, kts, kte,  &
+                              xp, y, &
                               grid, config_flags)
 
    !----------------------------------------------------------------------
@@ -23,10 +21,6 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    type (xpose_type), intent(inout)   :: xp     ! Domain decomposition vars.
    type (y_type) , intent(inout)      :: y      ! y = H(x_inc).
 
-   integer, intent(in)           :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
-
    type(domain), intent(inout)           :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
 
@@ -37,10 +31,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
    call da_trace_entry("da_transform_vtoy")
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa,  &
-                           ids, ide, jds, jde, kds, kde,     &
-                           ims, ime, jms, jme, kms, kme,     &
-                           its, ite, jts, jte, kts, kte)
+   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01', &

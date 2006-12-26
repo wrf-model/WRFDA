@@ -1,7 +1,4 @@
-subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_uvprho_to_w_lin(xb, xa, xp)
 
    !------------------------------------------------------------------------------
    !  Purpose: Calculates vertical velocity increments from Richardson's Eq.
@@ -18,10 +15,6 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
-
-   integer                       :: ids,ide, jds,jde, kds,kde
-   integer                       :: ims,ime, jms,jme, kms,kme
-   integer                       :: its,ite, jts,jte, kts,kte
 
    integer                       :: I,J,K
 
@@ -107,10 +100,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
 
    ! Term 2.1: Divergence term from perturbed wind
 
-   call da_uv_to_divergence(xb, xa%u, xa%v, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, xa%u, xa%v, DIV)
 
    do K=kts,kte  
       do J=jts,jte
@@ -122,10 +112,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
 
    ! Term 2.2: Divergence term from basic wind
 
-   call da_uv_to_divergence(xb, xb%u, xb%v, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, xb%u, xb%v, DIV)
 
    do K=kts,kte
       do J=jts,jte
@@ -151,10 +138,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
       end do
    end do
 
-   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV)
 
    do J=jts,jte
       do I=its,ite
@@ -179,10 +163,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
       end do
    end do
 
-   call da_uv_to_divergence(xb, URHO, VRHO, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, URHO, VRHO, DIV)
 
    do J=jts,jte
       do I=its,ite
@@ -219,10 +200,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp,                 &
 
    ! Integration to calculate the vertical velocity 
 
-   call da_w_adjustment_lin(xb,xa%w,WZ,                  &
-                ids,ide, jds,jde, kds,kde,   &
-                ims,ime, jms,jme, kms,kme,   &
-                its,ite, jts,jte, kts,kte)
+   call da_w_adjustment_lin(xb,xa%w,WZ)
 
    do J=jts,jte
       do I=its,ite

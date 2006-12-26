@@ -1,7 +1,4 @@
-subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+subroutine da_uvprho_to_w_adj(xb, xa, xp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculates vertical velocity increments from Richardson's Eq.
@@ -18,10 +15,6 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
-
-   integer                       :: ids,ide, jds,jde, kds,kde
-   integer                       :: ims,ime, jms,jme, kms,kme
-   integer                       :: its,ite, jts,jte, kts,kte
 
    integer                       :: I,J,K
 
@@ -50,10 +43,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
       end do
    end do
 
-   call da_w_adjustment_adj(xb,WZ,                     &
-                ids,ide, jds,jde, kds,kde, &
-                ims,ime, jms,jme, kms,kme, &
-                its,ite, jts,jte, kts,kte)
+   call da_w_adjustment_adj(xb,WZ)
 
    ! Divide by constant
 
@@ -92,10 +82,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
-                                ids,ide, jds,jde, kds,kde,         &
-                                ims,ime, jms,jme, kms,kme,         &
-                                its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV)
 
    ! Computation to check for edge of domain:
    if (Testing_WRFVAR) then
@@ -136,10 +123,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV, &
-                                ids,ide, jds,jde, kds,kde,         &
-                                ims,ime, jms,jme, kms,kme,         &
-                                its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV)
 
    do K=kts,kte
       do J=js,je
@@ -155,10 +139,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
 
    ! Term 2.2: Divergence term from basic wind
 
-   call da_uv_to_divergence(xb, xb%u,xb%v, DIV, &
-                            ids,ide, jds,jde, kds,kde,         &
-                            ims,ime, jms,jme, kms,kme,         &
-                            its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence(xb, xb%u,xb%v, DIV)
 
    do K=kts,kte
       do J=jts,jte
@@ -178,10 +159,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp,                 &
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV, &
-                                ids,ide, jds,jde, kds,kde,         &
-                                ims,ime, jms,jme, kms,kme,         &
-                                its,ite, jts,jte, kts,kte)
+   call da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV)
 
    ! Computation to check for edge of domain:
    is = its

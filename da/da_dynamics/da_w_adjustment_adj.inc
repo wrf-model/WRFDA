@@ -1,7 +1,4 @@
-subroutine da_w_adjustment_adj(xb,WZ_a,                      &
-                      ids,ide, jds,jde, kds,kde, &
-                      ims,ime, jms,jme, kms,kme, &
-                      its,ite, jts,jte, kts,kte)
+subroutine da_w_adjustment_adj(xb,WZ_a)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjust vertical velocity increments
@@ -13,10 +10,6 @@ subroutine da_w_adjustment_adj(xb,WZ_a,                      &
 
    type (xb_type), intent(in)    :: xb                ! First guess structure.
 
-   integer, intent(in):: ids,ide, jds,jde, kds,kde    ! domain dims.
-   integer, intent(in):: ims,ime, jms,jme, kms,kme    ! memory dims.
-   integer, intent(in):: its,ite, jts,jte, kts,kte    ! tile   dims.
-
    real, dimension(ims:ime,jms:jme,kms:kme), intent(inout) :: WZ_a
 
    integer :: I,J,K
@@ -26,10 +19,7 @@ subroutine da_w_adjustment_adj(xb,WZ_a,                      &
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29
 
-   call da_wz_base(xb,WZ_b,                    &
-                ids,ide, jds,jde, kds,kde,  &
-                ims,ime, jms,jme, kms,kme,  &
-                its,ite, jts,jte, kts,kte)
+   call da_wz_base(xb,WZ_b)
 
    do J=jts,jte
       do I=its,ite

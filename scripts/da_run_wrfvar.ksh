@@ -456,7 +456,7 @@ if test ! -f $DA_ANALYSIS; then
    unset NL_NESTED
    unset NL_REAL_DATA_INIT_TYPE
 
-   . $WRFVAR_DIR/inc/namelist_script.inc
+   . $WRFVAR_DIR/build/inc/namelist_script.inc
 
    if test -f namelist.input; then
      cp namelist.input $RUN_DIR

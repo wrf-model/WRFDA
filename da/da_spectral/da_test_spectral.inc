@@ -1,7 +1,4 @@
-subroutine da_test_spectral( max_wave, sizec, xbx, field, &
-                             ids, ide, jds, jde, &
-                             ims, ime, jms, jme, &
-                             its, ite, jts, jte )
+subroutine da_test_spectral( max_wave, sizec, xbx, field)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -12,9 +9,6 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    integer, intent(in)        :: max_wave ! Maximum wavenumber.
    integer, intent(in)        :: sizec    ! Size of complex cv.
    type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
-   integer,        intent(in) :: ids, ide, jds, jde, &
-                                 ims, ime, jms, jme, &
-                                 its, ite, jts, jte
 
    real, dimension(its:ite,jts:jte), intent(in) :: field    ! Gridpoint field.
 
@@ -49,10 +43,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    call da_v_to_vv_spectral( max_wave, sizec, &
                              xbx % lenr, xbx % lenwrk, xbx % lensav, &
                              xbx % inc, xbx % alp_size, xbx % alp, &
-                             xbx % wsave, power, rcv, field_out, &
-                             ids, ide, jds, jde, &
-                             ims, ime, jms, jme, &
-                             its, ite, jts, jte )
+                             xbx % wsave, power, rcv, field_out)
 
    write(unit=stdout,fmt='(1x,a,e30.10)') &
       'Domain-Averaged (Grid->Spectral->Grid) Error = ', &
@@ -75,10 +66,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field, &
    call da_v_to_vv_spectral_adj( max_wave, sizec, &
                                  xbx % lenr, xbx % lenwrk, xbx % lensav, &
                                  xbx % inc, xbx % alp_size, xbx % alp, &
-                                 xbx % wsave, power, rcv_out, field_out, &
-                                 ids, ide, jds, jde, &
-                                 ims, ime, jms, jme, &
-                                 its, ite, jts, jte )
+                                 xbx % wsave, power, rcv_out, field_out)
 
    write(unit=stdout,fmt='(A)') ' Adjoint test result for  Spectral -> Grid : '
    write(unit=stdout,fmt='(1x,a,e30.10)') &

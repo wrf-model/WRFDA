@@ -1,8 +1,5 @@
 subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
                                   xbx, xp, y, &
-                                  ids, ide, jds, jde, kds, kde,     &
-                                  ims, ime, jms, jme, kms, kme,     &
-                                  its, ite, jts, jte, kts, kte,     &
                                   grid, config_flags, cg_jcdf)
 
    !-------------------------------------------------------------------------
@@ -24,10 +21,6 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    type (xbx_type),intent(in)       :: xbx    ! For header & non-grid arrays.
    type (xpose_type), intent(inout) :: xp     ! Domain decomposition vars.
    type (y_type) , intent(inout)    :: y      ! y = H(x_inc).
-
-   integer, intent(in)           :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)           :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)           :: its,ite, jts,jte, kts,kte ! tile   dims.
 
    type(domain), intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
@@ -112,10 +105,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    end if ! var4d
 
    cv = 0.0
-   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv, &
-                               ids, ide, jds, jde, kds, kde,       &
-                               ims, ime, jms, jme, kms, kme,       &
-                               its, ite, jts, jte, kts, kte)
+   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
 
    call da_trace_exit("da_transform_vtoy_adj")
 

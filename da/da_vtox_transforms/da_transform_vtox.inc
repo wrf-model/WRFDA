@@ -1,7 +1,4 @@
-subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
-                              ids, ide, jds, jde, kds, kde,           &
-                              ims, ime, jms, jme, kms, kme,           &
-                              its, ite, jts, jte, kts, kte)
+subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform x' = Uv. 
@@ -20,10 +17,6 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    type (xpose_type), intent(inout)     :: xp   ! Dimensions and xpose buffers. 
    type (x_type), intent(out)           :: xa   ! model space analysis (local).
 
-   integer, intent(in)              :: ids,ide, jds,jde, kds,kde ! domain dims.
-   integer, intent(in)              :: ims,ime, jms,jme, kms,kme ! memory dims.
-   integer, intent(in)              :: its,ite, jts,jte, kts,kte ! tile   dims
-
    integer                              :: i, j, k
 
    real :: sdmd, s1md, mu
@@ -39,15 +32,9 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    !----------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv, &
-                                      ids,ide, jds,jde,   &
-                                      ims,ime, jms,jme,   &
-                                      its,ite, jts,jte, kts,kte) 
+      call da_transform_vtovv_global(cv_size, xbx, be, cv, vv) 
    else
-      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp,         &
-                               ids,ide, jds,jde, kds,kde,  &
-                               ims,ime, jms,jme, kms,kme,  &
-                               its,ite, jts,jte, kts,kte)
+      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp)
    end if
 
    !----------------------------------------------------------------------
@@ -61,10 +48,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
 #else
                                   xb % vertical_inner_product(ims,jms,kms), &
 #endif
-                                  vv, vp,  &
-                                  ids,ide, jds,jde, kds,kde, &
-                                  ims,ime, jms,jme, kms,kme, &
-                                  its,ite, jts,jte, kts,kte)
+                                  vv, vp)
 
    else
       vp % v1(its:ite,jts:jte,kts:kte) = vv % v1(its:ite,jts:jte,kts:kte)
@@ -83,10 +67,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    ! [3.0]: Perform x = u_p vp transform::
    !----------------------------------------------------------------------
 
-   call da_transform_vptox(xb, vp, xp, xa, be, ep,   &
-                            ids,ide, jds,jde, kds,kde,  &
-                            ims,ime, jms,jme, kms,kme,  &
-                            its,ite, jts,jte, kts,kte)
+   call da_transform_vptox(xb, vp, xp, xa, be, ep)
 
    !----------------------------------------------------------------------
    ! [4.0]: Move the following:
@@ -176,10 +157,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa, &
    ! Compute w increments using Richardson's eqn.
 
    if (Use_RadarObs) then
-      call da_uvprho_to_w_lin(xb, xa, xp,                 &
-                                 ids,ide, jds,jde, kds,kde,  &
-                                 ims,ime, jms,jme, kms,kme,  &
-                                 its,ite, jts,jte, kts,kte)
+      call da_uvprho_to_w_lin(xb, xa, xp)
 
       do k=xp%kts,xp%kte
          do j=xp%jts,xp%jte

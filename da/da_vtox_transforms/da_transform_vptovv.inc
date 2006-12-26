@@ -1,8 +1,5 @@
 subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
-                                vp, vv, mz, &
-                                kds,kde,  &
-                                ims,ime, jms,jme, kms,kme,  &
-                                its,ite, jts,jte, kts,kte)
+                                vp, vv, mz)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transform from fields on vertical levels to fields on vertical 
@@ -14,9 +11,6 @@ subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
    implicit none
 
    integer, intent(in)   :: mz                         ! # vertical modes.
-   integer, intent(in)   :: kds,kde  ! domain dims.
-   integer, intent(in)   :: ims,ime, jms,jme, kms,kme  ! memory dims.
-   integer, intent(in)   :: its,ite, jts,jte, kts,kte  ! tile   dims
    real, intent(in)      :: evec(jts:jte,kds:kde,1:mz) ! Eigenvectors.
    real, intent(in)      :: eval(jts:jte,1:mz)         ! Eigenvalues.
    real, intent(in)      :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
