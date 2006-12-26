@@ -75,17 +75,15 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    call da_allocate_y(iv, y)
    call da_zero_x(xa)
 
-#if 1
    call da_setup_testfield(xb, xa, xp)
-#else
 
+   ! WHY
    ! Make cv_array random.
 
-   call random_number(cvtest(1:cv_size))
-   cvtest(1:cv_size) = cvtest(1:cv_size) - 0.5
+   ! call random_number(cvtest(1:cv_size))
+   ! cvtest(1:cv_size) = cvtest(1:cv_size) - 0.5
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa)
-#endif
+   ! call da_transform_vtox(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa)
 
    call da_check_xtoy_adjoint(xb, xa, iv, xp, y)
 

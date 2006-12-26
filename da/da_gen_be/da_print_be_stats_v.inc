@@ -40,7 +40,7 @@ subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
    end if
 
    ! 1, Global vectors:
-   write(unit=6,fmt='(3a,i5)')' First 5 Global eigenvectors for variable ', trim(variable), &
+   write(unit=stdout,fmt='(3a,i5)')' First 5 Global eigenvectors for variable ', trim(variable), &
                      ' in unit ', outunit
 
    open(unit=outunit)
@@ -81,7 +81,7 @@ subroutine da_print_be_stats_v(outunit, variable, nk, num_bins2d, &
 
    outunit = outunit + 1
 
-   write(unit=6,fmt='(3a,i5)')' First 5 local eigenvalues for variable ', trim(variable), &
+   write(unit=stdout,fmt='(3a,i5)')' First 5 local eigenvalues for variable ', trim(variable), &
                      ' in unit ', outunit
 
    open(unit=outunit)

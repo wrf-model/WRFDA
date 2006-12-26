@@ -1,8 +1,10 @@
-!MEDIATION_LAYER:SOLVE_DA
-
 subroutine da_solve ( grid , config_flags , &
 #include "em_dummy_new_args.inc"
                  )
+
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
 
    ! Driver layer modules
    use module_domain

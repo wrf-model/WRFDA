@@ -1,7 +1,7 @@
 module da_statistics
    
    !---------------------------------------------------------------------------
-   ! PURPOSE: Contains routines used to calculates statistical quantities.
+   ! Purpose: Contains routines used to calculates statistical quantities.
    !---------------------------------------------------------------------------
    
    use module_domain, only : xpose_type

@@ -60,10 +60,10 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
          if (first_time) then
             if (.not. data_on_levels) then
                if (use_global_eofs) then
-                  write(unit=6,fmt='(a)') &
+                  write(unit=stdout,fmt='(a)') &
                      ' Power spectra calculated for 2D field projected onto global EOFs.'
                else
-                  write(unit=6,fmt='(a)') &
+                  write(unit=stdout,fmt='(a)') &
                      ' Power spectra calculated for 2D field projected onto local EOFs.'
                end if
             end if

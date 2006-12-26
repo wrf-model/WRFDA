@@ -1,0 +1,64 @@
+subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
+
+   implicit none
+
+#include "netcdf.inc"
+
+   integer,           intent(in) :: max_times
+   logical,           intent(in) :: debug
+   character(len=80), intent(in) :: file
+   character(len=*),  intent(in) :: time_flag
+   character(len=80), intent(out) :: bdytimestr(max_times)
+
+   character(len=80) :: varnam, time1
+
+   integer :: cdfid, rcode, id_time
+   integer :: ndims, natts, idims(10), istart(10),iend(10), dimids(10)
+   integer :: i, ivtype
+
+   cdfid = ncopn(file, NCNOWRIT, rcode)
+
+   if (rcode == 0) then
+      if (debug) write(6,*) ' open netcdf file ', trim(file)
+   else
+      write(6,*) ' error openiing netcdf file ', trim(file)
+      stop
+   end if
+
+   varnam = 'md___' // trim(time_flag) // 'e_x_t_d_o_m_a_i_n_m_e_t_a_data_'
+
+   id_time = ncvid(cdfid, varnam, rcode)
+
+   rcode = nf_inq_var(cdfid, id_time, varnam, ivtype, ndims, dimids, natts)
+
+   if (debug) then
+     write(6,*) ' number of dims for bdytime ',ndims
+   end if
+
+   do i=1,ndims
+      rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
+      if (debug) write(6,*) ' dimension ',i,idims(i)
+   end do
+
+   ! get the bdytime
+
+   do i=1,idims(2)
+      istart(1) = 1
+      iend(1) = idims(1)
+      istart(2) = i
+      iend(2) = 1
+
+      rcode = NF_GET_VARA_TEXT  (cdfid, id_time,  &
+                                 istart, iend,    &
+                                 bdytimestr(i))
+      time1 = bdytimestr(i)
+
+      if (debug) write(6,*) trim(file), time1(1:19)
+      bdytimestr(i) = time1(1:19)
+   end do
+
+   call ncclos(cdfid,rcode)
+
+end subroutine da_get_bdytimestr_cdf
+
+

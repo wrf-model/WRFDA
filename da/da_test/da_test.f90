@@ -1,10 +1,8 @@
 module da_test
 
-!------------------------------------------------------------------------------
-! PURPOSE: Collection of routines associated with minimisation.
-!
-! METHOD:  Straightforward definitions.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Collection of routines associated with minimisation.
+   !---------------------------------------------------------------------------
 
    use da_control
    use da_ffts
@@ -65,7 +63,6 @@ contains
 #include "da_check_xtoy_adjoint_sonde_sfc.inc"
 #include "da_check_xtoy_adjoint_synop.inc"
 #include "da_check_xtoy_adjoint_rad.inc"
-!#include "da_test_vxtransform.inc"
 #include "da_transform_xtovp.inc"
 #include "da_check.inc"
 #include "da_check_xtoy_adjoint_pseudo.inc"

@@ -21,11 +21,6 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y)
 
    real                 :: varb
 
-   ! JRB stop compiling whinging
-   if (kte == 0 .OR. kms == 0 .OR. kds == 0 .OR. kde == 0 .OR. kme == 0 &
-      .OR. kts == 0) then
-   end if
-
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------

@@ -1,41 +1,32 @@
-!WRF:DRIVER_LAYER:MAIN
-!
+program da_wrfvar_esmf
 
-PROGRAM da_wrfvar_esmf
+   use da_wrfvar_esmf_super
 
-   USE da_wrfvar_esmf_super
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !----------------------------------------------------------------------
 
-!<DESCRIPTION>
-! Main program of WRF model.  Responsible for starting up the model, reading in (and
-! broadcasting for distributed memory) configuration data, defining and initializing
-! the top-level domain, either from initial or restart data, setting up time-keeping, and
-! then calling the <a href=integrate.html>integrate</a> routine to advance the domain
-! to the ending time of the simulation. After the integration is completed, the model
-! is properly shut down.
-!
-!</DESCRIPTION>
+   implicit none
 
-   IMPLICIT NONE
+   type(esmf_gridcomp) :: gcomp
+   type(esmf_state)    :: importstate, exportstate
+   type(esmf_clock)    :: clock
+   type(esmf_vm)       :: vm   
+   integer :: rc
 
-   TYPE(ESMF_GridComp) :: gcomp
-   TYPE(ESMF_State)    :: importState, exportState
-   TYPE(ESMF_Clock)    :: clock
-   TYPE(ESMF_VM)       :: vm   
-   INTEGER :: rc
-
-   ! This call includes everything that must be done before ESMF_Initialize() 
+   ! this call includes everything that must be done before esmf_initialize() 
    ! is called.  
-   CALL init_modules(1)   ! Phase 1 returns after MPI_INIT() (if it is called)
+   call init_modules(1)   ! phase 1 returns after mpi_init() (if it is called)
 
-   CALL ESMF_Initialize( vm=vm, defaultCalendar=ESMF_CAL_GREGORIAN, rc=rc )
+   call esmf_initialize( vm=vm, defaultcalendar=esmf_cal_gregorian, rc=rc )
 
-   CALL da_wrfvar_init( gcomp, importState, exportState, clock, rc )
+   call da_wrfvar_init( gcomp, importstate, exportstate, clock, rc )
 
-   CALL da_wrfvar_run( gcomp, importState, exportState, clock, rc )
+   call da_wrfvar_run( gcomp, importstate, exportstate, clock, rc )
 
-   CALL da_wrfvar_finalize( gcomp, importState, exportState, clock, rc )
+   call da_wrfvar_finalize( gcomp, importstate, exportstate, clock, rc )
 
-   CALL ESMF_Finalize( rc=rc )
+   call esmf_finalize( rc=rc )
 
-END PROGRAM da_wrfvar_esmf
+end program da_wrfvar_esmf
 

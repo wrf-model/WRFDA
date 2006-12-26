@@ -64,9 +64,13 @@ subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
       read(unit=ep_unit) ni, nj, nk
 
       if (ni /= ix .or. nj /= jy .or. nk /= kz) then
-         write(unit=stdout,fmt='(a)')' da_setup_flow_predictors: Inconsistent grid dimensions. Stop.'
-         write(unit=stdout,fmt='(a,3i6)')' Grid dims for analysis grid: ', ix, jy
-         write(unit=stdout,fmt='(a,3i6)')' Grid dims for flow predictors: ', ni, nj
+         write(unit=message(1),fmt='(a)') &
+            'Inconsistent grid dimensions'
+         write(unit=message(2),fmt='(a,3i6)') &
+            ' Grid dims for analysis grid: ', ix, jy
+         write(unit=message(3),fmt='(a,3i6)') &
+            ' Grid dims for flow predictors: ', ni, nj
+         call da_warning(__FILE__,__LINE__,message(1:3))
       end if
 
       read(unit=ep_unit) temp3d(1:ix,1:jy,1:kz)

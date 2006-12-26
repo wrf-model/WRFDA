@@ -1,7 +1,7 @@
 module da_tools1
    
    !---------------------------------------------------------------------------
-   ! PURPOSE: Contains general tools.
+   ! Purpose: Contains general tools.
    !---------------------------------------------------------------------------
       
    use da_control

@@ -12,7 +12,7 @@ module be_spectral
 
    implicit none
 
-   contains
+contains
 
 #include "da_asslegpol.inc"
 #include "da_calc_power.inc"
@@ -26,7 +26,6 @@ module be_spectral
 #include "da_vv_to_v_spectral.inc"
 #include "da_legtra_inv_adj.inc"
 #include "da_apply_power.inc"
-!include "da_test_spectral.inc"
 
 end module be_spectral
 

@@ -1,7 +1,7 @@
 module da_radiance
 
 !------------------------------------------------------------------------------
-!  PURPOSE: module for radiance data assimilation.
+!  Purpose: module for radiance data assimilation.
 !
 !  METHOD:  radiance for all sensor are defined in a common data structure 
 !

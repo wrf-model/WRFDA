@@ -1,7 +1,7 @@
 module da_tools
    
    !---------------------------------------------------------------------------
-   ! PURPOSE: Contains general tools.
+   ! Purpose: Contains general tools.
    !---------------------------------------------------------------------------
    
    use module_bc, only : bdyzone

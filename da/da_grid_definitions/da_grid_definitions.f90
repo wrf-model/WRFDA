@@ -1,7 +1,7 @@
 module da_grid_definitions
    
    !---------------------------------------------------------------------------
-   ! PURPOSE: Calculation of analysis grid variables:
+   ! Purpose: Calculation of analysis grid variables:
    !---------------------------------------------------------------------------
    
    use da_control

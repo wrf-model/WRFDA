@@ -27,17 +27,12 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
                                         xa2_q2, xa2_psfc
 
    if (trace_use) call da_trace_entry("da_check_psfc")
-
-   ! JRB Stop compiler whinging
-   if (ids == 0 .OR. ide == 0 .OR. kme == 0 .OR. jde == 0 .OR. jds == 0 .OR. &
-      kde == 0 .OR. kds == 0 .OR. kte == 0 .OR. kms == 0) then
-   end if
    
    write(unit=stdout, fmt='(/3a,i6/a)') &
         'File: ', __FILE__, ', line:', __LINE__, &
         'Adjoint Test Results:'
 
-   !--save input
+   ! save input
 
    xa2_psfc(ims:ime, jms:jme) = xa%p   (ims:ime, jms:jme, kts)
    xa2_u10 (ims:ime, jms:jme) = xa%u10 (ims:ime, jms:jme)

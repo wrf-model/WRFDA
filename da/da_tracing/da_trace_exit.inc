@@ -26,8 +26,6 @@ subroutine da_trace_exit(&
    real                            :: temp2
    character(len=25)               :: Change
 
-   ! stop the clock
-
    call cpu_time(temp_CPUTime)
 
    call system_clock(&

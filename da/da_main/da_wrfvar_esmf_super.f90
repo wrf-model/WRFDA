@@ -1,15 +1,13 @@
-!WRFVAR:DRIVER_LAYER:ESMF
-!
-
 module da_wrfvar_esmf_super
-   !<DESCRIPTION>
-   ! This module defines wrfvar_init(), wrfvar_run(), and wrfvar_finalize() 
+
+   !-----------------------------------------------------------------------
+   ! Purpose: defines wrfvar_init(), wrfvar_run(), and wrfvar_finalize() 
    ! routines for use by ESMF superstructure.  
    ! WRFVAR can be built with either ESMF_Mod (from an installed ESMF library) 
    ! or with built-in wrf_esmf_mod.  The choice is made at configure time 
    ! via cpp token WRF_ESMF_MOD.  
    ! Note that WRF_ESMF_MOD is used by module_domain.  
-   !</DESCRIPTION>
+   !------------------------------------------------------------------------
 
    use module_machine
    use module_domain

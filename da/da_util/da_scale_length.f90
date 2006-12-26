@@ -1,5 +1,9 @@
 program da_scale_length
 
+   !-----------------------------------------------------------------------
+   ! Purpose: TBD
+   !-----------------------------------------------------------------------
+
    implicit none
 
    integer, parameter :: plot_style =  1, &
@@ -23,28 +27,25 @@ program da_scale_length
    namelist /control_param/ varname, resolution_km, cut_dist_km
    integer                   :: dgrid
 
-!----------------------------------------------------------------------
-
    call opngks
 
    call da_setup_color_table
 
-!  set background white
+   ! set background white
 
    call gscr(1, 0, 1.00, 1.00, 1.00)
 
-!----------------------------------------------------------------------
    open(unit=nmlst_uint, file='namelist.input', status='old')
    read(unit=nmlst_uint, nml=control_param, iostat=ier)
    print*,' Doing job for : ',varname
    print*,' Cut off Grids : ',dgrid
-   if(ier /= 0) stop 'Wrong namelist.input.'
+   if (ier /= 0) stop 'Wrong namelist.input.'
    close(unit=nmlst_uint)
    dgrid = cut_dist_km/resolution_km
 
    read(input_unit, iostat=ier) iy, jx, kz
    read(input_scnd, iostat=ier) iy, jx, kz
-   if(ier /= 0) stop 'Wrong input file.'
+   if (ier /= 0) stop 'Wrong input file.'
 
    allocate(var(1:iy, 1:jx, 1:kz, 1:nt))
    allocate(tmp(1:iy, 1:jx, 1:kz))
@@ -58,22 +59,22 @@ program da_scale_length
       write(unit=*, fmt='(a, 4i6)') &
             'iy, jx, kz, num=', iy, jx, kz, num
 
-      if(varname(1:3) == 'PSI' .or. varname(1:3) == 'psi') then
+      if (varname(1:3) == 'PSI' .or. varname(1:3) == 'psi') then
          read(input_unit) var(:,:,:,num)
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
-      else if(varname(1:3) == 'CHI' .or. varname(1:3) == 'chi') then
+      else if (varname(1:3) == 'CHI' .or. varname(1:3) == 'chi') then
          read(input_unit) tmp(:,:,:)
          read(input_unit) var(:,:,:,num)
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
-      else if(varname(1:3) == 'P_U' .or. varname(1:3) == 'p_u') then
+      else if (varname(1:3) == 'P_U' .or. varname(1:3) == 'p_u') then
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
          read(input_unit) var(:,:,:,num)
          read(input_unit) tmp(:,:,:)
-      else if(varname(1:3) == 'Q_M' .or. varname(1:3) == 'q_m') then
+      else if (varname(1:3) == 'Q_M' .or. varname(1:3) == 'q_m') then
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
          read(input_unit) tmp(:,:,:)
@@ -83,25 +84,25 @@ program da_scale_length
          read(input_unit) tmp(:,:,:)
          end do
       end if
-!
-      if(varname(1:3) == 'RHM' .or. varname(1:3) == 'rhm') then
+
+      if (varname(1:3) == 'RHM' .or. varname(1:3) == 'rhm') then
          read(input_scnd) tmp(:,:,:)
          read(input_scnd) tmp(:,:,:)
          read(input_scnd) tmp(:,:,:)
          read(input_scnd) var(:,:,:,num)
        else
          do n =1,4
-         read(input_scnd) tmp(:,:,:)
+            read(input_scnd) tmp(:,:,:)
          end do
        end if   
          do n = 1,6
-         read(input_unit) tmp(:,:,:)
-         read(input_scnd) tmp(:,:,:)
+            read(input_unit) tmp(:,:,:)
+            read(input_scnd) tmp(:,:,:)
          end do
       read(input_unit, iostat=ier) iy, jx, kz
       read(input_scnd, iostat=ier) iy, jx, kz
 
-      if(ier /= 0) exit
+      if (ier /= 0) exit
    end do
 
    close(input_unit)
@@ -114,559 +115,557 @@ program da_scale_length
 
 contains
 
-   subroutine da_process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
+subroutine da_process_single_variable(var,varname,dgrid,num,iy,jx,kz,nt)
 
-      implicit none
+   implicit none
 
-      integer,                      intent(in) :: dgrid, num,iy,jx,kz,nt
-      real, dimension(iy,jx,kz,nt), intent(in) :: var
-      character(len=7),             intent(in) :: varname
+   integer,                      intent(in) :: dgrid, num,iy,jx,kz,nt
+   real, dimension(iy,jx,kz,nt), intent(in) :: var
+   character(len=7),             intent(in) :: varname
 
-      real, dimension(iy,jx,nt) :: plt
+   real, dimension(iy,jx,nt) :: plt
 
-      integer :: i, j, k, n, output_unit
+   integer :: i, j, k, n, output_unit
 
-      character(len=12) :: flnm
+   character(len=12) :: flnm
 
-      output_unit = 20
+   output_unit = 20
 
-      write(flnm(1:12), fmt='(a,a)') 'sl_print.', varname(5:7)
+   write(flnm(1:12), fmt='(a,a)') 'sl_print.', varname(5:7)
 
-      open(unit=output_unit, &
-           file=flnm, &
-           form='formatted', &
-         action='write', &
-         access='sequential', &
-!      position='rewind', &
-         status='replace')
+   open(unit=output_unit, &
+        file=flnm, &
+        form='formatted', &
+      action='write', &
+      access='sequential', &
+      ! position='rewind', &
+      status='replace')
 
-      write(unit=output_unit, fmt='(2a/a)') &
-            varname(1:3), ' scale length', &
-           ' Lvl            m            scale-length'
+   write(unit=output_unit, fmt='(2a/a)') &
+         varname(1:3), ' scale length', &
+        ' Lvl            m            scale-length'
 
-      do k=1,kz
-         do n=1,num
+   do k=1,kz
+      do n=1,num
          do j=1,jx
-         do i=1,iy
-            plt(i,j,n)=var(i,j,k,n)
+            do i=1,iy
+               plt(i,j,n)=var(i,j,k,n)
+            end do
          end do
-         end do
-         end do
-
-         call da_make_scale_length(plt,num,k,varname, dgrid, &
-                                iy,jx,nt,output_unit)
-
-       call plot_it(plt,num,k,varname,iy,jx,nt)
       end do
 
-      close(unit=output_unit, status='keep')
+      call da_make_scale_length(plt,num,k,varname, dgrid, &
+                             iy,jx,nt,output_unit)
 
-   end subroutine da_process_single_variable
+      call plot_it(plt,num,k,varname,iy,jx,nt)
+   end do
 
-   subroutine da_make_scale_length(plt,num,k,varname,dgrid, nx,ny,nt,output_unit)
+   close(unit=output_unit, status='keep')
 
-      implicit none
+end subroutine da_process_single_variable
 
-      integer,                   intent(in)    :: dgrid, num,k,nx,ny,nt, &
-                                                  output_unit
-      real, dimension(nx,ny,nt), intent(inout) :: plt
-      character(len=7),          intent(in)    :: varname
+subroutine da_make_scale_length(plt,num,k,varname,dgrid, nx,ny,nt,output_unit)
 
-      real :: radius, value, tinv, rmax, rmin, valmin,valmax
+   implicit none
 
-      integer :: i, j, ib, jb, ie, je, m, n, nn, nl, nnn
+   integer,                   intent(in)    :: dgrid, num,k,nx,ny,nt, &
+                                               output_unit
+   real, dimension(nx,ny,nt), intent(inout) :: plt
+   character(len=7),          intent(in)    :: varname
 
-!-----Steps of fitting Gaussian Distribution:
+   real :: radius, value, tinv, rmax, rmin, valmin,valmax
 
-!     B(r) = B(0) exp(-r**2/(8*s**2)      (1)
+   integer :: i, j, ib, jb, ie, je, m, n, nn, nl, nnn
 
-!     Log at both side of (1):
+   ! Steps of fitting Gaussian Distribution:
 
-!        ln[B(0)/B(r)] = r**2/(8*s**2)   (2)
+   ! B(r) = B(0) exp(-r**2/(8*s**2)      (1)
+   ! Log at both side of (1):
+   ! ln[B(0)/B(r)] = r**2/(8*s**2)   (2)
+   ! {8*ln[B(0)/B(r)]}**0.5 = r/s = m * r
 
-!        {8*ln[B(0)/B(r)]}**0.5 = r/s = m * r
-
-!     Let:
-
-!        y(r) = {8*ln[B(0)/B(r)]}**0.5
-
-!        m = sum[r * y(r)]/sum[r*r]
-
+   ! Let:
+   ! y(r) = {8*ln[B(0)/B(r)]}**0.5
+   ! m = sum[r * y(r)]/sum[r*r]
 
 
-      real(kind=8), dimension(:), allocatable ::  yr
-      real(kind=8), dimension(:), allocatable :: nr, r, bb
 
-      real(kind=8) :: criteria, ml, sl, cl, a, b, c, d, e
+   real(kind=8), dimension(:), allocatable ::  yr
+   real(kind=8), dimension(:), allocatable :: nr, r, bb
 
-      call da_zero_mean(plt, nx, ny, nt, num)
-      
-      nn=nx+ny
-      allocate( yr(0:nn))
-!
-      allocate(nr(0:nn))
-      allocate(r(0:nn))
-      allocate(bb(0:nn))
-!
-      yr = 0.0
-!
-      nr = 0.0
-      r = 0.0
-      bb = 0.0
+   real(kind=8) :: criteria, ml, sl, cl, a, b, c, d, e
 
-      ib = 4 ; jb = 6 ; ie = nx - 4; je= ny - 6
-! start of the time loop
+   call da_zero_mean(plt, nx, ny, nt, num)
 
-      j_loop: do j=jb,je
+   nn=nx+ny
+   allocate( yr(0:nn))
+
+   allocate(nr(0:nn))
+   allocate(r(0:nn))
+   allocate(bb(0:nn))
+
+   yr = 0.0
+
+   nr = 0.0
+   r = 0.0
+   bb = 0.0
+
+   ib = 4
+   jb = 6
+   ie = nx - 4
+   je= ny - 6
+   ! start of the time loop
+
+   j_loop: do j=jb,je
       i_loop: do i=ib,ie
          n_loop: do n=jb, min((j+dgrid),je)
-         m_loop: do m=ib, min((i+dgrid),ie)
-            radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
-            if(radius == 0) then
-            nl = 0
-            else
-            nl = int(radius + 0.5)
-            end if
-             t_loop: do nn=1,num
-               value = plt(m,n,nn)*plt(i,j,nn)
-               bb(nl)=bb(nl) + value
-               nr(nl)=nr(nl) + 1.0
-                r(nl)= r(nl) + radius
-              end do t_loop
-         end do m_loop
+            m_loop: do m=ib, min((i+dgrid),ie)
+               radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
+               if (radius == 0) then
+                  nl = 0
+               else
+                  nl = int(radius + 0.5)
+               end if
+               t_loop: do nn=1,num
+                  value = plt(m,n,nn)*plt(i,j,nn)
+                  bb(nl)=bb(nl) + value
+                  nr(nl)=nr(nl) + 1.0
+                  r(nl)= r(nl) + radius
+               end do t_loop
+            end do m_loop
          end do n_loop
       end do i_loop
-      end do j_loop
-      nn=nx+ny
-      
-      write(unit=*, fmt='(2a/)') varname(1:3), &
-           ' dist       points           radius               y(r)'
-      r(0)=0.0
-      nl = 0
-      bb(0)=bb(0)/nr(0)
-      do n=1,nn
-         if(nr(n) < 1.0) exit
-         if(bb(n) <= 0.0 ) then
-!          print*,n,' ---> -ve corr bb= ',bb(n),' nr= ',nr(n) 
-!         if( n ==  1) cycle
-         exit
-         end if
-         radius=r(n)/nr(n)
-!
-         nl=nl+1
-         bb(nl)=bb(n)/nr(n)
-         r(nl)=radius
-         if(bb(nl) < bb(0)) then
-            yr(nl)=sqrt(8.0*(log(bb(0)/bb(nl))))
-         else
-            yr(nl)=0.0
-         end if
+   end do j_loop
+   nn=nx+ny
 
-!         r(n)=radius
-!         nl=nl+1
+   write(unit=*, fmt='(2a/)') varname(1:3), &
+        ' dist       points           radius               y(r)'
+   r(0)=0.0
+   nl = 0
+   bb(0)=bb(0)/nr(0)
+   do n=1,nn
+      if (nr(n) < 1.0) exit
+      if (bb(n) <= 0.0 ) then
+         ! print*,n,' ---> -ve corr bb= ',bb(n),' nr= ',nr(n) 
+         ! if ( n ==  1) cycle
+      exit
+      end if
+      radius=r(n)/nr(n)
 
-         write(unit=*, fmt='(i4,f12.0,f20.4,e20.8)') &
-               nl, nr(n), radius, yr(nl)
+      nl=nl+1
+      bb(nl)=bb(n)/nr(n)
+      r(nl)=radius
+      if (bb(nl) < bb(0)) then
+         yr(nl)=sqrt(8.0*(log(bb(0)/bb(nl))))
+      else
+         yr(nl)=0.0
+      end if
 
-!        if(nl > 1 .and. yr(n) > 5.0) exit
-         if(nl > 1 .and. yr(nl) > 3.0) exit
-      end do
+      ! r(n)=radius
+      ! nl=nl+1
 
-!      a=nr(0)
-!      b=0.0
-!      c=0.0
-      d=0.0
-      e=0.0
-      if( nl == 0 ) stop ' Did not get any point with +ve corr'
-      do n=1,nl
-!         a=a+nr(n)
-!         b=b+nr(n)*yr(n)
-!         c=c+nr(n)* r(n)
-         d=d+nr(n)* r(n)*yr(n)
-         e=e+nr(n)* r(n)* r(n)
-      end do
+      write(unit=*, fmt='(i4,f12.0,f20.4,e20.8)') &
+            nl, nr(n), radius, yr(nl)
 
-!     ml=(a*d-c*b)/(a*e-c*c)
-!     cl=(b*e-d*c)/(a*e-c*c)
-      print*,' ml num= ',d,'  ml denom= ',e
-      ml=d/e
-      print*,'inverse of scale length = ',ml    
-!      cl=0.0
+      ! if (nl > 1 .and. yr(n) > 5.0) exit
+      if (nl > 1 .and. yr(nl) > 3.0) exit
+   end do
 
-      sl=1.0/ml
+   ! a=nr(0)
+   ! b=0.0
+   ! c=0.0
+   d=0.0
+   e=0.0
+   if ( nl == 0 ) stop ' Did not get any point with +ve corr'
+   do n=1,nl
+      ! a=a+nr(n)
+      ! b=b+nr(n)*yr(n)
+      ! c=c+nr(n)* r(n)
+      d=d+nr(n)* r(n)*yr(n)
+      e=e+nr(n)* r(n)* r(n)
+   end do
 
-      write(unit=*,  fmt='(/2a,i4,3e30.8/)') varname(1:3), &
-           ' scale-length at mode:', k, ml, sl
+   ! ml=(a*d-c*b)/(a*e-c*c)
+   ! cl=(b*e-d*c)/(a*e-c*c)
+   print*,' ml num= ',d,'  ml denom= ',e
+   ml=d/e
+   print*,'inverse of scale length = ',ml    
+   ! cl=0.0
 
-      write(unit=output_unit, fmt='(i4,2e20.8)') k, ml, sl
+   sl=1.0/ml
 
-      if(nl > 1) &
-         call plot_sl(yr,r,nl,nn,ml,cl,k,varname)
+   write(unit=*,  fmt='(/2a,i4,3e30.8/)') varname(1:3), &
+        ' scale-length at mode:', k, ml, sl
 
-   end subroutine da_make_scale_length
+   write(unit=output_unit, fmt='(i4,2e20.8)') k, ml, sl
 
-   subroutine da_zero_mean(a, nx, ny, nt, nm)
+   if (nl > 1) &
+      call plot_sl(yr,r,nl,nn,ml,cl,k,varname)
 
-      implicit none
-  
-      integer,                   intent(in)    :: nx, ny, nt, nm
-      real, dimension(nx,ny,nt), intent(inout) :: a
+end subroutine da_make_scale_length
 
-      real :: sum
+subroutine da_zero_mean(a, nx, ny, nt, nm)
 
-      integer :: i, j, n
+   implicit none
 
-      do n=1,nm
-         sum = 0.0
+   integer,                   intent(in)    :: nx, ny, nt, nm
+   real, dimension(nx,ny,nt), intent(inout) :: a
 
-         do j=1,ny
+   real :: sum
+
+   integer :: i, j, n
+
+   do n=1,nm
+      sum = 0.0
+
+      do j=1,ny
          do i=1,nx
             sum=sum+a(i,j,n)
          end do
-         end do
+      end do
 
-         sum = sum/real(nx*ny)
+      sum = sum/real(nx*ny)
 
-         do j=1,ny
+      do j=1,ny
          do i=1,nx
             a(i,j,n)=a(i,j,n)-sum
          end do
-         end do
       end do
+   end do
 
-   end subroutine da_zero_mean
+end subroutine da_zero_mean
 
 end program da_scale_length
 
-   subroutine da_plot_it(plt,num,k,varname,nx,ny,nt,plot_switch)
-      
-      implicit none
+subroutine da_plot_it(plt,num,k,varname,nx,ny,nt,plot_switch)
 
-      integer,                   intent(in)    :: num,k,nx,ny,nt, plot_switch
-      real, dimension(nx,ny,nt), intent(inout) :: plt
-      character(len=7),          intent(in)    :: varname
+   implicit none
 
-      real :: radius, value, xpb, xpe, ypb, ype
+   integer,                   intent(in)    :: num,k,nx,ny,nt, plot_switch
+   real, dimension(nx,ny,nt), intent(inout) :: plt
+   character(len=7),          intent(in)    :: varname
 
-      integer :: i, j, ib, jb, ie, je, m, n, mm, nn
+   real :: radius, value, xpb, xpe, ypb, ype
 
-      real, dimension(nx,ny,nt) :: pltsqr
+   integer :: i, j, ib, jb, ie, je, m, n, mm, nn
 
-      ! JRB hack. I don't know what I'm doing
-      real :: xwb, xwe, ywb, ywe,xlb,ylb
-      integer :: plot_style
-      real :: red
-      ! JRB
+   real, dimension(nx,ny,nt) :: pltsqr
 
-      character(len=20) :: pltlab
+   ! JRB hack. I don't know what I'm doing
+   real :: xwb, xwe, ywb, ywe,xlb,ylb
+   integer :: plot_style
+   real :: red
+   ! JRB
 
-      ib=4
-      jb=6
+   character(len=20) :: pltlab
 
-      ie=nx-4
-      je=ny-6
+   ib=4
+   jb=6
 
-      write(pltlab(1:20),fmt='(2a,i5)') &
-            varname(1:3), ' FOR MODE : ', k
+   ie=nx-4
+   je=ny-6
 
-      write(unit=*, fmt='(a)') pltlab
+   write(pltlab(1:20),fmt='(2a,i5)') &
+         varname(1:3), ' FOR MODE : ', k
 
-      call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
+   write(unit=*, fmt='(a)') pltlab
 
-      call gsplci(red)
-      call gspmci(red)
-      call gstxci(red)
+   call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
 
-      call pwritx(xlb,ylb,pltlab,20,1,0,0)
+   call gsplci(red)
+   call gspmci(red)
+   call gstxci(red)
 
-      xpb=0.0
-      xpe=sqrt(real((nx-1)*(nx-1)+(ny-1)*(ny-1)))
+   call pwritx(xlb,ylb,pltlab,20,1,0,0)
 
-      if(plot_switch > 0) then
-         call da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
-                             xpb,xpe,ypb,ype)
-      else
-         call da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
-                            xpb,xpe,ypb,ype)
-      end if
+   xpb=0.0
+   xpe=sqrt(real((nx-1)*(nx-1)+(ny-1)*(ny-1)))
 
-      call gsplci(red)
-      call gspmci(red)
-      call gstxci(red)
+   if (plot_switch > 0) then
+      call da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+                          xpb,xpe,ypb,ype)
+   else
+      call da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+                         xpb,xpe,ypb,ype)
+   end if
 
-      call line(xpb,0.0,xpe,0.0)
+   call gsplci(red)
+   call gspmci(red)
+   call gstxci(red)
 
-      call frame
+   call line(xpb,0.0,xpe,0.0)
 
-   end subroutine da_plot_it
+   call frame
 
-   subroutine da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
-                             xpb,xpe,ypb,ype)
-      
-      implicit none
+end subroutine da_plot_it
 
-      integer,                   intent(in)  :: num,nx,ny,nt, &
-                                                ib,jb,ie,je
-      real, dimension(nx,ny,nt), intent(in)  :: plt
-      real,                      intent(in)  :: xpb,xpe
-      real,                      intent(out) :: ypb,ype
+subroutine da_point_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+                          xpb,xpe,ypb,ype)
+
+   implicit none
+
+   integer,                   intent(in)  :: num,nx,ny,nt, &
+                                             ib,jb,ie,je
+   real, dimension(nx,ny,nt), intent(in)  :: plt
+   real,                      intent(in)  :: xpb,xpe
+   real,                      intent(out) :: ypb,ype
 
 
-      real :: radius, value
+   real :: radius, value
 
-      integer :: i, j, m, n, mm, nn
+   integer :: i, j, m, n, mm, nn
 
-      real, dimension(nx,ny,nt) :: pltsqr
+   real, dimension(nx,ny,nt) :: pltsqr
 
-      character(len=1), parameter :: symbol='.'
+   character(len=1), parameter :: symbol='.'
 
-      ! JRB hack
-      real :: xfb,xfe,yfb,yfe,blue
-      integer :: plot_style
-      ! JRB
+   ! JRB hack
+   real :: xfb,xfe,yfb,yfe,blue
+   integer :: plot_style
+   ! JRB
 
-      do n=1,num
+   do n=1,num
       do j=1,ny
-      do i=1,nx
-         pltsqr(i,j,n)=plt(i,j,n)*plt(i,j,n)
+         do i=1,nx
+            pltsqr(i,j,n)=plt(i,j,n)*plt(i,j,n)
+         end do   
       end do
-      end do
-      end do
+   end do
 
-      ype=maxval(pltsqr(ib:ie, jb:je, 1:num))*1.25
-      ypb=-ype
+   ype=maxval(pltsqr(ib:ie, jb:je, 1:num))*1.25
+   ypb=-ype
 
-      if(abs(ype - ypb) < 1.0e-5) then 
-         call frame
-         stop 'ype - ypb is too small.'
-      end if
-      
-      call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
+   if (abs(ype - ypb) < 1.0e-5) then 
+      call frame
+      stop 'ype - ypb is too small.'
+   end if
 
-      call line(xpb,ypb,xpe,ypb)
- 
-      call line(xpb,ypb,xpb,ype)
+   call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
 
-      i=int(xpe) + 1
-      j=2
+   call line(xpb,ypb,xpe,ypb)
 
-      m=int(ype-ypb) + 1
-      n=m/10
+   call line(xpb,ypb,xpb,ype)
 
-!     call perim(i,j,m,m)
-      
-      value = ypb+0.02*(ype-ypb)
+   i=int(xpe) + 1
+   j=2
 
-      do m=2,i,2
-         radius=real(m)
-         call line(radius,ypb,radius,value)
-      end do
+   m=int(ype-ypb) + 1
+   n=m/10
 
-      call gsplci(blue)
-      call gspmci(blue)
-      call gstxci(blue)
+   ! call perim(i,j,m,m)
 
-      do j=jb,je,2
+   value = ypb+0.02*(ype-ypb)
+
+   do m=2,i,2
+      radius=real(m)
+      call line(radius,ypb,radius,value)
+   end do
+
+   call gsplci(blue)
+   call gspmci(blue)
+   call gstxci(blue)
+
+   do j=jb,je,2
       do i=ib,ie,2
          do n=j,je,2
-         do m=i,ie,2
-            radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
+            do m=i,ie,2
+               radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
 
-            do nn=1,num
-               value=plt(m,n,nn)*plt(i,j,nn)
+               do nn=1,num
+                  value=plt(m,n,nn)*plt(i,j,nn)
 
-               call pwritx(radius,value,symbol,1,1,0,0)
+                  call pwritx(radius,value,symbol,1,1,0,0)
+               end do
             end do
          end do
-         end do
       end do
-      end do
+   end do
 
-   end subroutine da_point_plot
+end subroutine da_point_plot
 
-   subroutine da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
-                          xpb,xpe,ypb,ype)
-      
-      implicit none
+subroutine da_line_plot(plt,num,nx,ny,nt,ib,jb,ie,je, &
+                       xpb,xpe,ypb,ype)
 
-      integer,                   intent(in)  :: num,nx,ny,nt, &
-                                                ib,jb,ie,je
-      real, dimension(nx,ny,nt), intent(in)  :: plt
-      real,                      intent(in)  :: xpb,xpe
-      real,                      intent(out) :: ypb,ype
+   implicit none
 
-      real, dimension(nx+ny) :: avg, sum
+   integer,                   intent(in)  :: num,nx,ny,nt, &
+                                             ib,jb,ie,je
+   real, dimension(nx,ny,nt), intent(in)  :: plt
+   real,                      intent(in)  :: xpb,xpe
+   real,                      intent(out) :: ypb,ype
 
-      real :: radius, value
+   real, dimension(nx+ny) :: avg, sum
 
-      integer :: i, j, m, n, mm, nn
+   real :: radius, value
 
-      ! JRB hack
-      real :: xfb,xfe,yfb,yfe,blue
-      integer :: plot_style
-      ! JRB
+   integer :: i, j, m, n, mm, nn
 
-
-      sum = 0.0
-      avg = 0.0
+   ! JRB hack
+   real :: xfb,xfe,yfb,yfe,blue
+   integer :: plot_style
+   ! JRB
 
 
-      do j=jb,je
+   sum = 0.0
+   avg = 0.0
+
+
+   do j=jb,je
       do i=ib,ie
          do n=j,je
-         do m=i,ie
-            radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
-            mm=int(radius+0.5) + 1
+            do m=i,ie
+               radius=sqrt(real((m-i)*(m-i)+(n-j)*(n-j)))
+               mm=int(radius+0.5) + 1
 
-            do nn=1,num
-               value=plt(m,n,nn)*plt(i,j,nn)
+               do nn=1,num
+                  value=plt(m,n,nn)*plt(i,j,nn)
 
-               avg(mm)=avg(mm)+value
-               sum(mm)=sum(mm)+1.0
+                  avg(mm)=avg(mm)+value
+                  sum(mm)=sum(mm)+1.0
+               end do
             end do
          end do
-         end do
       end do
-      end do
+   end do
 
-      n = 0
+   n = 0
 
-      do i=1,nx+ny
-         if(sum(i) < 0.5) exit
+   do i=1,nx+ny
+      if (sum(i) < 0.5) exit
 
-         avg(i)=avg(i)/sum(i)
-         n=i
-      end do
-         
-      ypb=minval(avg)*1.25
-      ype=maxval(avg)*1.25
+      avg(i)=avg(i)/sum(i)
+      n=i
+   end do
 
-      call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
+   ypb=minval(avg)*1.25
+   ype=maxval(avg)*1.25
 
-      call line(xpb,ypb,xpe,ypb)
- 
-      call line(xpb,ypb,xpb,ype)
+   call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
 
-      i=int(xpe) + 1
-      j=2
+   call line(xpb,ypb,xpe,ypb)
 
-      m=int(ype-ypb) + 1
-      n=m/10
+   call line(xpb,ypb,xpb,ype)
 
-      value = ypb+0.02*(ype-ypb)
+   i=int(xpe) + 1
+   j=2
 
-      do m=2,i,2
-         radius=real(m)
-         call line(radius,ypb,radius,value)
-      end do
+   m=int(ype-ypb) + 1
+   n=m/10
 
-      call gsplci(blue)
-      call gspmci(blue)
-      call gstxci(blue)
+   value = ypb+0.02*(ype-ypb)
 
-      do i=2,nx+ny
-         if(sum(i) < 0.5) exit
+   do m=2,i,2
+      radius=real(m)
+      call line(radius,ypb,radius,value)
+   end do
 
-         call line(real(i-2), avg(i-1), real(i-1), avg(i))
-      end do
+   call gsplci(blue)
+   call gspmci(blue)
+   call gstxci(blue)
 
-   end subroutine da_line_plot
+   do i=2,nx+ny
+      if (sum(i) < 0.5) exit
 
-   subroutine da_plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
-      
-      implicit none
+      call line(real(i-2), avg(i-1), real(i-1), avg(i))
+   end do
 
-      integer,                       intent(in) :: nm,nn,k
-      real(kind=8), dimension(0:nn), intent(in) :: yr,r
-      real(kind=8),                  intent(in) :: slnt,cnst
-      character(len=7),              intent(in) :: varname
+end subroutine da_line_plot
 
-      real :: x,y,xpb,xpe,ypb,ype
+subroutine da_plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
 
-      integer :: i
+   implicit none
 
-      character(len=1), parameter :: symbol='.'
-      character(len=9)            :: label
+   integer,                       intent(in) :: nm,nn,k
+   real(kind=8), dimension(0:nn), intent(in) :: yr,r
+   real(kind=8),                  intent(in) :: slnt,cnst
+   character(len=7),              intent(in) :: varname
 
-      ! JRB hack
-      real :: xfb,xfe,yfb,yfe,red,xwb,xwe,ywb,ywe,xlb,ylb,blue
-      integer :: plot_style
-      ! JRB
+   real :: x,y,xpb,xpe,ypb,ype
 
-      call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
+   integer :: i
 
-      call gsplci(red)
-      call gspmci(red)
-      call gstxci(red)
+   character(len=1), parameter :: symbol='.'
+   character(len=9)            :: label
 
-      write(label(1:9), fmt='(2a, i3)') varname(1:3), ' M=', k
+   ! JRB hack
+   real :: xfb,xfe,yfb,yfe,red,xwb,xwe,ywb,ywe,xlb,ylb,blue
+   integer :: plot_style
+   ! JRB
 
-      call pwritx(xlb,ylb,label,9,1,0,0)
+   call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
 
-      xpb=0.0
-      xpe=r(nm)*1.05
+   call gsplci(red)
+   call gspmci(red)
+   call gstxci(red)
 
-      write(unit=*, fmt='(a, i5, f18.8)') &
-           'nm,r(nm)=', nm,r(nm)
+   write(label(1:9), fmt='(2a, i3)') varname(1:3), ' M=', k
 
-      ype=maxval(yr(0:nm))*1.05
-      ypb=0.0
+   call pwritx(xlb,ylb,label,9,1,0,0)
+
+   xpb=0.0
+   xpe=r(nm)*1.05
+
+   write(unit=*, fmt='(a, i5, f18.8)') &
+        'nm,r(nm)=', nm,r(nm)
+
+   ype=maxval(yr(0:nm))*1.05
+   ypb=0.0
 
 
-      write(unit=*, fmt='(a, 2f18.8)') &
-           'xpe,ype=',xpe,ype
+   write(unit=*, fmt='(a, 2f18.8)') &
+        'xpe,ype=',xpe,ype
 
-      call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
+   call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
 
-      call line(xpb,ypb,xpe,ypb)
- 
-      call line(xpb,ypb,xpb,ype)
+   call line(xpb,ypb,xpe,ypb)
 
-      y = ypb+0.02*(ype-ypb)
+   call line(xpb,ypb,xpb,ype)
 
-      do i=2,nm,2
-         x=real(i)
-         call line(x,ypb,x,y)
-      end do
+   y = ypb+0.02*(ype-ypb)
 
-      x = xpb+0.02*(xpe-xpb)
+   do i=2,nm,2
+      x=real(i)
+      call line(x,ypb,x,y)
+   end do
 
-      y=0.0
+   x = xpb+0.02*(xpe-xpb)
 
-      do
-         y=y+1.0
-         if(y > ype) exit
-         call line(xpb,y,x,y)
-      end do
+   y=0.0
 
-      call gsplci(blue)
-      call gspmci(blue)
-      call gstxci(blue)
+   do
+      y=y+1.0
+      if (y > ype) exit
+      call line(xpb,y,x,y)
+   end do
 
-      do i=1,nm
-         x= r(i)
-         y=yr(i)
-         call pwritx(x,y,symbol,1,1,0,0)
+   call gsplci(blue)
+   call gspmci(blue)
+   call gstxci(blue)
 
-         write(unit=*, fmt='(a,i3,2(f8.4,f18.8))') &
-              'i,x,y,r,yr=',i,x,y,r(i),yr(i)
-      end do
+   do i=1,nm
+      x= r(i)
+      y=yr(i)
+      call pwritx(x,y,symbol,1,1,0,0)
 
-      xpb=0.0
-      ypb=cnst
+      write(unit=*, fmt='(a,i3,2(f8.4,f18.8))') &
+           'i,x,y,r,yr=',i,x,y,r(i),yr(i)
+   end do
 
-      do i=1,nm
-         x=real(i)
-         y=slnt*x+cnst
+   xpb=0.0
+   ypb=cnst
 
-         if(y   > ype) exit
+   do i=1,nm
+      x=real(i)
+      y=slnt*x+cnst
 
-         call line(xpb,ypb,x,y)
+      if (y   > ype) exit
 
-         xpb=x
-         ypb=y
-      end do
+      call line(xpb,ypb,x,y)
 
-      call frame
+      xpb=x
+      ypb=y
+   end do
 
-   end subroutine da_plot_sl
+   call frame
+
+end subroutine da_plot_sl

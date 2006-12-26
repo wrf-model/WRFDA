@@ -23,7 +23,8 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
    real    :: sdmd, s1md
    real    :: rho_cgrid
 
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: g_press
+   real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
 
    integer ndynopt
 
@@ -65,7 +66,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
    end do
 
    !---------------------------------------------------------------------------
-   ! [3.0] COMPUTE pressure increments (for computing theta increments)
+   ! [3.0] compute pressure increments (for computing theta increments)
    !---------------------------------------------------------------------------
 
    do j=js,je
@@ -73,22 +74,24 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
          g_press(i,j,ke+1)=0.0
          do k=ke,ks,-1
             g_press(i,j,k)=g_press(i,j,k+1) &
-                    -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
-                    +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_moist(i,j,k,P_QV))*grid%em_dn(k)
+               -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
+               +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_moist(i,j,k,P_QV))* &
+               grid%em_dn(k)
             grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do
       end do
    end do
 
    !---------------------------------------------------------------------------
-   ! [4.0] CONVERT TEMPERATURE inCREMENTS inTO THETA inCREMENTS
-   !       EVALUATE ALSO THE inCREMENTS OF (1/rho) AND GEOPOTENTIAL
+   ! [4.0] convert temperature increments into theta increments
+   !       evaluate also the increments of (1/rho) and geopotential
    !---------------------------------------------------------------------------
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%em_g_t_2(i,j,k)=(300.0+grid%em_t_2(i,j,k))*(grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
+            grid%em_g_t_2(i,j,k)=(300.0+grid%em_t_2(i,j,k))* &
+               (grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
                         -kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
          end do
       end do
@@ -102,16 +105,15 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
                       -grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
                       -0.61*grid%xa%q(i,j,k)/(1.+0.61*grid%xb%q(i,j,k)))
             grid%em_g_ph_2(i,j,k+1)=grid%em_g_ph_2(i,j,k) &
-                           -(g_press(i,j,k+1)-g_press(i,j,k) &
-                           +(grid%em_ph_2(i,j,k+1)-grid%em_ph_2(i,j,k))*rho_cgrid) &
-                           /grid%xb%rho(i,j,k)
+               -(g_press(i,j,k+1)-g_press(i,j,k) &
+               +(grid%em_ph_2(i,j,k+1)-grid%em_ph_2(i,j,k))*rho_cgrid) &
+               /grid%xb%rho(i,j,k)
          end do
       end do
    end do
 
-
    !---------------------------------------------------------------------------
-   ! [5.0] CONVERT FROM A-GRID TO C-GRID
+   ! [5.0] convert from a-grid to c-grid
    !---------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
@@ -239,9 +241,9 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
 
 #endif
 
-!------------------------------------------------------------------------------
-!  [7.0] outPUT
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! [7.0] output
+   !---------------------------------------------------------------------------
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL

@@ -22,7 +22,8 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam, &
    integer :: is, ie, js, je, ks, ke
 
    real    :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: g_press
+   real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
 
    if (trace_use) call da_trace_entry("da_transfer_wrftltoxa_adj")
 
@@ -82,9 +83,9 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam, &
 #endif
 
 
-! ----------------------------------------------------------------------------
-![5.0] CONVERT FROM C-GRID TO A-GRID
-! ----------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [5.0] convert from c-grid to a-grid
+   ! ----------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
    ! Fill the halo region for u and v.

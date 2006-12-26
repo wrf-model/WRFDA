@@ -1,12 +1,11 @@
 program da_diagnostics
-!-----------------------------------------------------------
-! Abstract:
-!    Purpose: Preparing necessary diagnostic output for 
-!             Observation error tuning  (Hollingsworh method)
-!        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
-!    Updates:
-!               07/05/2007     Syed RH Rizvi
-!-----------------------------------------------------------
+
+   !-----------------------------------------------------------
+   ! Purpose: Preparing necessary diagnostic output for 
+   !          Observation error tuning  (Hollingsworh method)
+   !     Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
+   !-----------------------------------------------------------
+
    implicit none
 
    integer, parameter            :: y_unit = 50

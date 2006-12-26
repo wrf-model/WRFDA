@@ -1,7 +1,7 @@
 module da_minimisation
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Collection of routines associated with minimisation. 
+   ! Purpose: Collection of routines associated with minimisation. 
    !---------------------------------------------------------------------------
 
    use da_control

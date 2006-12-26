@@ -1,7 +1,7 @@
 module da_control
 
    !--------------------------------------------------------------------------
-   ! PURPOSE: Common reference point for WRFVAR control.
+   ! Purpose: Common reference point for WRFVAR control.
    !--------------------------------------------------------------------------
 
    use module_driver_constants
@@ -62,7 +62,7 @@ module da_control
    ! GPS Refractivity constant  
    real, parameter    :: coeff = 3.73e5 / 77.6
 
-#if RWORDsize==8
+#if RWORDSIZE==8
    real, parameter :: da_zero = 0D0
 #else
    real, parameter :: da_zero = 0.0

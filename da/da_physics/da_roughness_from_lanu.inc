@@ -53,7 +53,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
          do lc=1,lucats 
             if (lutype == mminlu) then 
                read (unit=ltbl,fmt=*) li, albd, slmo, sfem, sfz0(lc,ls)
-               ! JRB stop compiler whinge
+               ! prevent compiler whinge
                if (albd == 0.0 .or. sfem == 0.0 .or. slmo == 0.0) then
                end if
                if (LC /= LI) then

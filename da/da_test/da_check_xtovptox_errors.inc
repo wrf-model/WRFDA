@@ -25,11 +25,6 @@ subroutine da_check_xtovptox_errors(xa, xa2_u, xa2_v, xa2_w, xa2_t, &
 
    real, dimension(ims:ime, jms:jme, kms:kme) :: diff ! Difference
 
-   ! JRB Stop compiler whinging
-   if (ids==0 .OR. ide==0 .OR. jds==0 .OR. jde==0 .OR. kde==0 .OR. &
-       kds==0) then
-   end if
-
    if (trace_use) call da_trace_entry("da_check_xtovpx_errors")
 
    !----------------------------------------------------------------------

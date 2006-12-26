@@ -1,7 +1,7 @@
 module da_physics
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Contains routines to calculate physical quantities.
+   !  Purpose: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
    use da_control

@@ -1,12 +1,9 @@
 module da_gen_be
 
-!------------------------------------------------------------------------------
-!  PURPOSE: Collection of routines required by gen_be BE stats calculation code.
-!
-!  METHOD:  Varied.
-!
-!  HISTORY: 11/21/2004 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------- 
+   ! Purpose: Collection of routines required by gen_be BE stats calculation 
+   ! code.
+   !----------------------------------------------------------------------------
 
    use da_control
    use lapack
@@ -32,7 +29,7 @@ contains
 #include "da_readwrite_be_stage4.inc"
 #include "da_stage0_initialize.inc"
 
-!Files from other modules:
+   ! Files from other modules:
 #include "da_transform_vptovv.inc"
 #include "da_eof_decomposition.inc"
 #include "da_eof_decomposition_test.inc"
@@ -42,5 +39,5 @@ contains
 end module da_gen_be
 
 subroutine wrf_abort
-  STOP
+   stop
 end subroutine wrf_abort

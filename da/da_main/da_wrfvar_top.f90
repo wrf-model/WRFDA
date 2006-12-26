@@ -1,11 +1,9 @@
-!WRFVAR:DRIVER_LAYER:TOP
-!
-
 module da_wrfvar_top
-   !<DESCRIPTION>
-   ! This module defines top-level wrfvar_init(), wrfvar_run(), and wrfvar_finalize() 
-   ! routines.  
-   !</DESCRIPTION>
+
+   !-----------------------------------------------------------------------
+   ! Purpose: Defines top-level wrfvar_init(), wrfvar_run(), and 
+   ! wrfvar_finalize() routines.  
+   !-----------------------------------------------------------------------
 
    use module_machine
    use module_domain
@@ -49,8 +47,8 @@ module da_wrfvar_top
 
    character (LEN=80)      :: rstname
 
-!JRB fix for WRF compilation system later
-!   character (LEN=40)      :: subversion_version=SVN_REV
+   ! JRB fix for WRF compilation system later
+   ! character (LEN=40)      :: subversion_version=SVN_REV
    character (LEN=40)      :: subversion_version="TBD"
 
    interface 

@@ -1,24 +1,18 @@
-!WRF:MODEL_LAYER:PAR_UTIL
-!
-
-! Utility subroutines for parallel WRFVAR.
-!---------------------------------------------------------------------------
-
 module da_par_util1
 
    use da_control
    use module_dm, only : RSL_DOUBLE
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
+   ! Purpose: Routines for local-to-global and global-to-local grid operations.
    !
-   ! METHOD:  RSL/MPI.!
+   ! METHOD:  RSL/MPI
    !---------------------------------------------------------------------------
 
    implicit none
 
 #ifdef DM_PARALLEL
-#if ( DWORDsize != RWORDsize )
+#if ( DWORDSIZE != RWORDSIZE )
    integer, parameter :: true_mpi_real    = MPI_real
    integer, parameter :: true_mpi_complex = MPI_COMPLEX
    integer, parameter :: true_rsl_real    = RSL_real

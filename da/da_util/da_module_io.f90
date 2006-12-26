@@ -6,7 +6,6 @@ module da_module_io
 
 contains
 
-!#include "da_clean_rows.inc"
 #include "da_crs_2_dot.inc"
 #include "da_print_big_header.inc"
 #include "da_print_sub_header.inc"

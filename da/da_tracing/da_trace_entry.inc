@@ -27,8 +27,6 @@ subroutine da_trace_entry(&
    real              :: temp2
    logical           :: NewRoutine
 
-   ! Stop the clock
-
    call cpu_time(CPUTime1)
 
    call system_clock(&

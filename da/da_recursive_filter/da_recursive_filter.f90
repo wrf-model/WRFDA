@@ -1,7 +1,7 @@
 module da_recursive_filter
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Jim Pursers recursive filter routines.
+   ! Purpose: Jim Pursers recursive filter routines.
    !---------------------------------------------------------------------------
 
    use da_control

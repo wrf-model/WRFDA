@@ -5,7 +5,7 @@ module da_define_structures
     use da_reporting
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Collection of routines to define and allocate structures.
+   ! Purpose: Collection of routines to define and allocate structures.
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
@@ -946,7 +946,6 @@ CONTAINS
 #include "da_deallocate_observations.inc"
 #include "da_deallocate_y.inc"
 #include "da_zero_x.inc"
-!#include "da_zero_y.inc"
 #include "da_zero_vp_type.inc"
 #include "da_initialize_cv.inc"
 #include "da_gauss_noise.inc"

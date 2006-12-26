@@ -1,13 +1,7 @@
-!WRF:MODEL_LAYER:PAR_UTIL
-!
-
-! Utility subroutines for parallel WRFVAR.
-!---------------------------------------------------------------------------
-
 module da_par_util
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Routines for local-to-global and global-to-local grid operations.
+   ! Purpose: Routines for local-to-global and global-to-local grid operations.
    !
    ! METHOD:  RSL/MPI.
    !---------------------------------------------------------------------------
@@ -27,8 +21,8 @@ module da_par_util
 #include "da_generic_typedefs.inc"
 
    interface da_wv_patch_to_global
-      module PROCEDURE da_wv_patch_to_global_2d
-      module PROCEDURE da_wv_patch_to_global_3d
+      module procedure da_wv_patch_to_global_2d
+      module procedure da_wv_patch_to_global_3d
    end interface
 
    contains

@@ -1,7 +1,7 @@
 module da_setup_structures
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Sets up various structures.
+   ! Purpose: Sets up various structures.
    !---------------------------------------------------------------------------
 
    use module_state_description

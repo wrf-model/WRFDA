@@ -42,14 +42,13 @@ subroutine da_initialize_cv(cv_size, cv)
          mean_cv = sum_cv / real(count)
          rms_cv = sqrt(sum_cv2 / real(count))
          std_dev_cv = sqrt(rms_cv * rms_cv - mean_cv * mean_cv)
-
       end do
 
-      write(6,*)
-      write(6,'(a)')' Gaussian (Normal) noise statistics:'
-      write(6,'(a,f15.5)')' Mean = ',mean_cv
-      write(6,'(a,f15.5)')' RMS = ', rms_cv
-      write(6,'(a,f15.5)')' STD DEV = ', std_dev_cv
+      write(unit=stdout,fmt=*)
+      write(unit=stdout,fmt='(a)')' Gaussian (Normal) noise statistics:'
+      write(unit=stdout,fmt='(a,f15.5)')' Mean = ',mean_cv
+      write(unit=stdout,fmt='(a,f15.5)')' RMS = ', rms_cv
+      write(unit=stdout,fmt='(a,f15.5)')' STD DEV = ', std_dev_cv
    else
       cv = 0.0
    end if

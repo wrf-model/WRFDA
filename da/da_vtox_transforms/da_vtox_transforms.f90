@@ -1,7 +1,7 @@
 module da_vtox_transforms
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: Contains routines used to transform control variable V to model
+   ! Purpose: Contains routines used to transform control variable V to model
    !          variables X.
    !---------------------------------------------------------------------------
 

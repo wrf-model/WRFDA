@@ -1,7 +1,7 @@
 module da_dynamics
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: Contains routines to calculate dynamical quantities.
+   !  Purpose: Contains routines to calculate dynamical quantities.
    !---------------------------------------------------------------------------
 
    use da_control
@@ -20,7 +20,6 @@ module da_dynamics
 #include "da_balance_cycloterm_lin.inc"
 #include "da_balance_equation_adj.inc"
 #include "da_balance_equation_lin.inc"
-!include "da_balance_geoterm.inc"
 #include "da_balance_geoterm_adj.inc"
 #include "da_balance_geoterm_lin.inc"
 #include "da_hydrostaticp_to_rho_adj.inc"
