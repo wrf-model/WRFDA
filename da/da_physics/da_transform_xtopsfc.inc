@@ -32,7 +32,6 @@ subroutine da_transform_xtopsfc(xb, xa, xp, synop, y_synop)
 
    ! 2.0 Surface assimilation approach 2 (2-m t and q, 10-m u and v)
 
-#ifndef DEREF_KLUDGE
    call da_interp_lin_2d(xa%u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%u)
    call da_interp_lin_2d(xa%v10, xp%ims, xp%ime, xp%jms, xp%jme, &
@@ -43,23 +42,6 @@ subroutine da_transform_xtopsfc(xb, xa, xp, synop, y_synop)
                       i, j, dx, dy, dxm, dym, y_synop%t)
    call da_interp_lin_2d(xa%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                       i, j, dx, dy, dxm, dym, y_synop%q)
-#else
-   call da_interp_lin_2d(xa%u10(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, y_synop%u)
-   call da_interp_lin_2d(xa%v10(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, y_synop%v)
-   call da_interp_lin_2d(xa%psfc(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, psm_prime)
-   call da_interp_lin_2d(xa%t2(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, y_synop%t)
-   call da_interp_lin_2d(xa%q2(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, y_synop%q)
-#endif
    if (synop%p%qc < 0) then
        y_synop%p = 0.0
        return
@@ -76,7 +58,6 @@ subroutine da_transform_xtopsfc(xb, xa, xp, synop, y_synop)
 
    ! 3.2 model background surface p, t, q, h at observed site:
 
-#ifndef DEREF_KLUDGE
    call da_interp_lin_2d(xb%terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, hsm)
    call da_interp_lin_2d(xb%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
@@ -85,20 +66,6 @@ subroutine da_transform_xtopsfc(xb, xa, xp, synop, y_synop)
                        i, j, dx, dy, dxm, dym, qsm)
    call da_interp_lin_2d(xb%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                        i, j, dx, dy, dxm, dym, psm)
-#else
-   call da_interp_lin_2d(xb%terr(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, hsm)
-   call da_interp_lin_2d(xb%t2(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, tsm)
-   call da_interp_lin_2d(xb%q2(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, qsm)
-   call da_interp_lin_2d(xb%psfc(xp%ims,xp%jms), &
-                      xp%ims, xp%ime, xp%jms, xp%jme, &
-                      i, j, dx, dy, dxm, dym, psm)
-#endif
 
    ! 3.3 perturbations t, q, p at the model surface:
 

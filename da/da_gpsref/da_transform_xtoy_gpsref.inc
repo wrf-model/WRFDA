@@ -32,14 +32,8 @@ subroutine da_transform_xtoy_gpsref (xa, iv, xp, y)
       dxm = iv%gpsref(n)%loc%dxm
       dym = iv%gpsref(n)%loc%dym
 
-#ifndef DEREF_KLUDGE
       call da_interp_lin_3d(xa%ref, xp, i, j, dx, dy, dxm, dym, &
          y%gpsref(n)%ref, num_levs, iv%gpsref(n)%zk, num_levs)
-#else
-      call da_interp_lin_3d(xa%ref(xp%ims,xp%jms,xp%kms), xp, i, j, &
-         dx, dy, dxm, dym, &
-         y%gpsref(n)%ref(1), num_levs, iv%gpsref(n)%zk(1), num_levs)
-#endif
    end do
 
 end subroutine da_transform_xtoy_gpsref

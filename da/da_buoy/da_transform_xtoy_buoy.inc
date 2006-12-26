@@ -40,7 +40,6 @@ subroutine da_transform_xtoy_buoy (xa, xb, iv, xp, y)
             dxm = iv%buoy(n)%loc%dxm
 
             ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
             call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                   y%buoy(n)%u, iv%buoy(n)%zk)
             call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
@@ -53,19 +52,6 @@ subroutine da_transform_xtoy_buoy (xa, xb, iv, xp, y)
             call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                               i, j, dx, dy, dxm, dym, &
                               y%buoy(n)%p)
-#else
-            call da_interp_obs_lin_2d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, &
-               dx, dy, dxm, dym, y%buoy(n)%u, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, &
-               dx, dy, dxm, dym, y%buoy(n)%v, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, &
-               dx, dy, dxm, dym, y%buoy(n)%t, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, &
-               dx, dy, dxm, dym, y%buoy(n)%q, iv%buoy(n)%zk)
-
-            call da_interp_lin_2d(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
-                              i, j, dx, dy, dxm, dym, y%buoy(n)%p)
-#endif
          end do
       else if (sfc_assi_options == 2) then
          ! [2.0] Surface assimilation approach 2

@@ -41,7 +41,6 @@ subroutine da_transform_xtoy_bogus_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
          ! [1.1] Adjoint feedback from Y to X for u and v:
 
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%u, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
@@ -54,24 +53,6 @@ subroutine da_transform_xtoy_bogus_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
          call da_interp_lin_3d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%bogus(n)%q, num_levs,            &
                                iv%bogus(n)%zk, num_levs)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
-                               xp, i, j, dx, dy, dxm, dym, &
-                               jo_grad_y%bogus(n)%u(1), num_levs, &
-                               iv%bogus(n)%zk(1), num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
-                               xp, i, j, dx, dy, dxm, dym, &
-                               jo_grad_y%bogus(n)%v(1), num_levs, &
-                               iv%bogus(n)%zk(1), num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), &
-                               xp, i, j, dx, dy, dxm, dym, &
-                               jo_grad_y%bogus(n)%t(1), num_levs, &
-                               iv%bogus(n)%zk(1), num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), &
-                               xp, i, j, dx, dy, dxm, dym, &
-                               jo_grad_y%bogus(n)%q(1), num_levs, &
-                               iv%bogus(n)%zk(1), num_levs)
-#endif
 
          ! [1.2] Compute the feedback from SLP to t and q:
 

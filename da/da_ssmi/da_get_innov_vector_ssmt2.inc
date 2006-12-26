@@ -75,28 +75,23 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
          end do
 
          iv % ssmt2(n) % info % levels = num_levs
+ 
+         ! [1.2] Interpolate horizontally to ob:
 
-!        [1.2] Interpolate horizontally to ob:
-
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % rh, xp, i, j, dx, dy, dxm, dym, &
                              model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
-#else
-         call da_interp_lin_3d( xb % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
-#endif
 
-!------------------------------------------------------------------------
-!        [2.0] Initialise components of innovation vector:
-!------------------------------------------------------------------------
+         !--------------------------------------------------------------------
+         ! [2.0] Initialise components of innovation vector:
+         !--------------------------------------------------------------------
 
          do k = 1, iv % ssmt2(n) % info % levels
 
             iv % ssmt2(n) % rh(k) % inv = 0.0
 
-!------------------------------------------------------------------------
-!           [3.0] Interpolation:
-!------------------------------------------------------------------------
+            !-----------------------------------------------------------------
+            ! [3.0] Interpolation:
+            !-----------------------------------------------------------------
 
             if (ob % ssmt2(n) % rh(k) > missing_r .AND. &
                iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer) then
@@ -105,10 +100,10 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
                                             model_rh(k)
             end if
             
-!           write(122,'(2i4,i8,5f15.5)')n, k, iv%ssmt2(n)%height_qc(k), &
-!           iv%ssmt2(n)%info%lat, iv%ssmt2(n)%info%lon, &
-!           iv%ssmt2(n)%h(k), &
-!           ob % ssmt2(n) % rh(k), model_rh(k)
+            ! write(122,'(2i4,i8,5f15.5)')n, k, iv%ssmt2(n)%height_qc(k), &
+            ! iv%ssmt2(n)%info%lat, iv%ssmt2(n)%info%lon, &
+            ! iv%ssmt2(n)%h(k), &
+            ! ob % ssmt2(n) % rh(k), model_rh(k)
 
          end do
 

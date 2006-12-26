@@ -37,7 +37,6 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
               'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                  model_u, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
@@ -48,18 +47,7 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
                                  model_p, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
                                  model_q, iv%pseudo(n)%zk)
-#else
-         call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_u, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_v, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_t, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_p, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 model_q, iv%pseudo(n)%zk)
-#endif
+
 !------------------------------------------------------------------------
 !        [3.0] Calculate observation O = B +(O-B):
 !------------------------------------------------------------------------

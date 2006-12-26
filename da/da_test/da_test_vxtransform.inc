@@ -115,11 +115,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    if ( vert_corr == 2 ) then
       ! perform vv = u_v^{-1} vp transform:
       call da_vertical_transform( 'u_inv', be, &
-#ifndef DEREF_KLUDGE
                             xb % vertical_inner_product, &
-#else
-                            xb % vertical_inner_product(ims,jms,kms), &
-#endif
                             vv, vp)
    else
       vv % v1(its:ite,jts:jte,1:kz_vv(1)) = vp % v1(its:ite,jts:jte,1:kz_vp(1))
@@ -141,11 +137,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    if ( vert_corr == 2 ) then
       ! perform vp = u_v (vv) transform:
       call da_vertical_transform( 'u', be, &
-#ifndef DEREF_KLUDGE
                             xb % vertical_inner_product, &
-#else
-                            xb % vertical_inner_product(ims,jms,kms), &
-#endif
                             vv, vp)
    else
 

@@ -37,11 +37,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    !----------------------------------------------------------------------
 
    call da_vertical_transform('u', be, &
-#ifndef DEREF_KLUDGE
-                               xb % vertical_inner_product, &
-#else
                                xb % vertical_inner_product(ims,jms,kms), &
-#endif
                                vv, vp)
 
    !----------------------------------------------------------------------
@@ -94,11 +90,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    end if      
 
    call da_vertical_transform('u_adj', be, &
-#ifndef DEREF_KLUDGE
                                xb % vertical_inner_product, &
-#else
-                               xb % vertical_inner_product(ims,jms,kms), &
-#endif
                                vv, vp)
 
    !----------------------------------------------------------------------

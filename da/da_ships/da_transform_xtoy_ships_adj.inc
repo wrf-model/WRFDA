@@ -33,7 +33,6 @@ subroutine da_transform_xtoy_ships_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
             dxm = iv%ships(n)%loc%dxm
 
             ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
             call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
                dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
             call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
@@ -45,24 +44,6 @@ subroutine da_transform_xtoy_ships_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
             call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
                xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
-#else
-            call da_interp_obs_lin_2d_adj(&
-               jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, jo_grad_y%ships(n)%u, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d_adj(&
-               jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, jo_grad_y%ships(n)%v, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d_adj(&
-               jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, jo_grad_y%ships(n)%t, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d_adj(&
-               jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-               dxm, dym, jo_grad_y%ships(n)%q, iv%ships(n)%zk)
-
-            call da_interp_lin_2d_adj(jo_grad_x % psfc(xp%ims,xp%jms), &
-               xp%ims, xp%ime, xp%jms, xp%jme, &
-               i, j, dx, dy, dxm, dym, jo_grad_y%ships(n)%p)
-#endif
          end do
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, &

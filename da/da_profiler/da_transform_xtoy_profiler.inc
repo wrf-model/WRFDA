@@ -17,9 +17,11 @@ subroutine da_transform_xtoy_profiler (xa, iv, xp, y)
    real                         :: dy, dym  !
    
    if (iv%num_profiler > 0) then
-      do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, iv%ob_numb(iv%current_ob_time)%profiler
-         !xyh y%profiler(n)%u(:) = 0.0
-         !xyh y%profiler(n)%v(:) = 0.0
+      do n=iv%ob_numb(iv%current_ob_time-1)%profiler + 1, &
+         iv%ob_numb(iv%current_ob_time)%profiler
+         ! xyh
+         ! y%profiler(n)%u(:) = 0.0
+         ! y%profiler(n)%v(:) = 0.0
 
          k = iv % profiler(n) % info % levels
  
@@ -35,17 +37,10 @@ subroutine da_transform_xtoy_profiler (xa, iv, xp, y)
          dxm = iv%profiler(n)%loc%dxm
 
          ! [1.4] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             y%profiler(n)%u, k, iv%profiler(n)%zk, k)
          call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                             y%profiler(n)%v, k, iv%profiler(n)%zk, k)
-#else
-         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%profiler(n)%u(1), k, iv%profiler(n)%zk(1), k)
-         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%profiler(n)%v(1), k, iv%profiler(n)%zk(1), k)
-#endif
       end do
    end if
 

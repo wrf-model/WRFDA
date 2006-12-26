@@ -34,7 +34,6 @@ subroutine da_transform_xtoy_sound_adj(iv, xp, jo_grad_y, jo_grad_x)
          if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                  jo_grad_y%sound(n)%u, k, iv%sound(n)%zk, k)
          call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
@@ -43,16 +42,6 @@ subroutine da_transform_xtoy_sound_adj(iv, xp, jo_grad_y, jo_grad_x)
                                  jo_grad_y%sound(n)%q, k, iv%sound(n)%zk, k)
          call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                  jo_grad_y%sound(n)%t, k, iv%sound(n)%zk, k)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 jo_grad_y%sound(n)%u(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 jo_grad_y%sound(n)%v(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 jo_grad_y%sound(n)%q(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                 jo_grad_y%sound(n)%t(1), k, iv%sound(n)%zk(1), k)
-#endif
       end do
    end if
 

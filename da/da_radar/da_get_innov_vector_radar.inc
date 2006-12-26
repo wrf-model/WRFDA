@@ -81,8 +81,6 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
       ! [2.0] Interpolate horizontally to ob points:
 
-#ifndef DEREF_KLUDGE
-
       call da_interp_lin_3d(xb % p, xp, i, j, dx, dy, dxm, dym, &
                          model_p, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
@@ -100,28 +98,6 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
       call da_interp_lin_3d(xb % qrn, xp, i, j, dx, dy, dxm, dym, &
                          model_qrn, max_ob_levels, iv%Radar(n)%zk, num_levs)
-
-#else
-
-      call da_interp_lin_3d(xb%p(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_p(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-      call da_interp_lin_3d(xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_u(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-      call da_interp_lin_3d(xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_v(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-      call da_interp_lin_3d(xb%wh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_w(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-      call da_interp_lin_3d(xb%rho(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_rho(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-      call da_interp_lin_3d(xb%qrn(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_qrn(1), max_ob_levels, iv%Radar(n)%zk(1), num_levs)
-
-#endif
 
       ! Test 5.E-5 as critical value. It can not be smaller.
 

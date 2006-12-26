@@ -22,19 +22,10 @@ subroutine da_transform_xtoy_ssmi_rv_adj(xb, oi, jo_grad_y, jo_grad_x)
       dxm = oi%ssmi_retrieval(n)%loc%dxm
       dym = oi%ssmi_retrieval(n)%loc%dym
 
-#ifndef DEREF_KLUDGE
-      call da_interp_lin_2d_adj(jo_grad_x%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
-                             i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d_adj(jo_grad_x%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
-                             i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%speed)
-#else
-      call da_interp_lin_2d_adj(jo_grad_x%tpw(xb%ims,xb%jms), &
-                             xb%ims, xb%ime, xb%jms, xb%jme, &
-                             i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d_adj(jo_grad_x%speed(xb%ims,xb%jms), &
-                             xb%ims, xb%ime, xb%jms, xb%jme, &
-                             i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%speed)
-#endif
+      call da_interp_lin_2d_adj(jo_grad_x%tpw, xb%ims, xb%ime, xb%jms, &
+         xb%jme, i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%tpw)
+      call da_interp_lin_2d_adj(jo_grad_x%speed, xb%ims, xb%ime, xb%jms, &
+         xb%jme, i, j, dx, dy, dxm, dym, jo_grad_y%ssmi_retrieval(n)%speed)
    end do
 
 end subroutine da_transform_xtoy_ssmi_rv_adj

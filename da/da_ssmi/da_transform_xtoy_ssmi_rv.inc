@@ -27,18 +27,10 @@ subroutine da_transform_xtoy_ssmi_rv(xb, oi, xa, y)
 
       ! Interpolating from 4 grid points to obs location
 
-#ifndef DEREF_KLUDGE
       call da_interp_lin_2d(xa%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
       call da_interp_lin_2d(xa%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)
-#else
-      call da_interp_lin_2d(xa%tpw(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                           i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d(xa%speed(xb%ims,xb%jms), xb%ims, xb%ime, xb%jms, xb%jme, &
-                            i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)
-#endif
-      
+                            i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)      
    end do
 
 end subroutine da_transform_xtoy_ssmi_rv

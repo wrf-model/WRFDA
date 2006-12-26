@@ -52,7 +52,6 @@ subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
          model_ps   = iv%Radar(n)%model_ps
 
          ! [1.4] Interpolate horizontally from dot points:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             model_u, num_levs, iv%Radar(n)%zk, &
                             num_levs)
@@ -67,24 +66,6 @@ subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
                             i, j, dx, dy, dxm, dym, &
                             model_w, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-#else
-         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_u(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs)
-         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_v(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs)
-         call da_interp_lin_3d(xa % qrn(xp%ims,xp%jms,xp%kms), xp, &
-                            i, j, dx, dy, dxm, dym, &
-                            model_qrn(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs)
-         call da_interp_lin_3d(xa%wh(xp%ims,xp%jms,xp%kms), xp,   &
-                            i, j, dx, dy, dxm, dym, &
-                            model_w(1), num_levs, iv%Radar(n)%zk(1), &
-                            num_levs)
-#endif
 
          ! [1.7] Calculate rv and rf at OBS location
 

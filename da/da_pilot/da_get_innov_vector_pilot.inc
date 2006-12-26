@@ -70,17 +70,11 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
          end do
 
          ! [1.4] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                             model_u, max_ob_levels, iv%pilot(n)%zk, num_levs)
          call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                             model_v, max_ob_levels, iv%pilot(n)%zk, num_levs)
-#else
-         call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            model_u(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs)
-         call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            model_v(1), max_ob_levels, iv%pilot(n)%zk(1), num_levs)
-#endif
+
          !------------------------------------------------------------------------
          ! [2.0] Initialise components of innovation vector:
          !------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
 
    !-------------------------------------------------------------------------
-   ! Purpose: TBD   !
+   ! Purpose: TBD   
    !-------------------------------------------------------------------------
 
    implicit none
@@ -116,7 +116,6 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
            iv % metar(n) % p % qc = missing
          else
            !------------[1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
            call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                     model_u, iv%metar(n)%zk)
            call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
@@ -127,18 +126,6 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
                                     model_q, iv%metar(n)%zk)
            call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
                                     model_p, iv%metar(n)%zk)
-#else
-           call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
-                                    model_u, iv%metar(n)%zk)
-           call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
-                                    model_v, iv%metar(n)%zk)
-           call da_interp_obs_lin_2d( xb % t(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
-                                    model_t, iv%metar(n)%zk)
-           call da_interp_obs_lin_2d( xb % q(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
-                                    model_q, iv%metar(n)%zk)
-           call da_interp_obs_lin_2d( xb % p(xp%ims,xp%jms,xb%kms), xp, i, j, dx, dy, dxm, dym, &
-                                    model_p, iv%metar(n)%zk)
-#endif
          end if
       else if (sfc_assi_options == 2) then
          ! 1.2.1 Surface assimilation approach 2 

@@ -32,14 +32,8 @@ subroutine da_transform_xtoy_ssmt1_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%ssmt1(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
-#endif
-
       end do  
    end if
 

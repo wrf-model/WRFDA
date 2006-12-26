@@ -36,17 +36,10 @@ subroutine da_transform_xtoy_pilot (xa, iv, xp, y)
          dxm = iv%pilot(n)%loc%dxm
 
          ! [1.4] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                            y%pilot(n)%u, k, iv%pilot(n)%zk, k)
          call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                            y%pilot(n)%v, k, iv%pilot(n)%zk, k)
-#else
-         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                           y%pilot(n)%u(1), k, iv%pilot(n)%zk(1), k)
-         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                           y%pilot(n)%v(1), k, iv%pilot(n)%zk(1), k)
-#endif
       end do
    end if
 

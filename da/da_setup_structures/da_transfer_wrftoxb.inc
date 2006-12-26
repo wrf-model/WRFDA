@@ -464,11 +464,7 @@ subroutine da_transfer_wrftoxb(xbx, grid, &
    xbx % mminlu = 'USGS'
 
    call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
-#ifdef DEREF_KLUDGE
-      grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
-#else
       grid%xb % lanu, grid%xb % rough)
-#endif
 
    !---------------------------------------------------------------------------
    ! Calculate 1/grid box areas:
@@ -521,13 +517,7 @@ subroutine da_transfer_wrftoxb(xbx, grid, &
    ! Calculate dew point temperature:
    !---------------------------------------------------------------------------
 
-#ifdef DEREF_KLUDGE
-   call da_trh_to_td(grid%xb % rh(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
-                     grid%xb %  t(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
-                     grid%xb % td(grid%xp%ims,grid%xp%jms,grid%xp%kms), grid%xp)
-#else
    call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
-#endif
 
    if (print_detail_xb) then
       i=is; j=js; k=ks

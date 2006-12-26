@@ -36,7 +36,6 @@ subroutine da_transform_xtoy_ships (xa, xb, iv, xp, y)
             dxm = iv%ships(n)%loc%dxm
 
             ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
             call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                    y%ships(n)%u, iv%ships(n)%zk)
             call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
@@ -49,23 +48,6 @@ subroutine da_transform_xtoy_ships (xa, xb, iv, xp, y)
             call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                                i, j, dx, dy, dxm, dym, &
                                y%ships(n)%p)
-#else
-            call da_interp_obs_lin_2d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, &
-                                   dx, dy, dxm, dym, &
-                                   y%ships(n)%u, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, &
-                                   dx, dy, dxm, dym, &
-                                   y%ships(n)%v, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, &
-                                   dx, dy, dxm, dym, &
-                                   y%ships(n)%t, iv%ships(n)%zk)
-            call da_interp_obs_lin_2d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, &
-                                   dx, dy, dxm, dym, &
-                                   y%ships(n)%q, iv%ships(n)%zk)
-
-            call da_interp_lin_2d(xa % psfc(xp%ims,xp%jms), xp%ims, xp%ime, xp%jms, xp%jme, &
-                               i, j, dx, dy, dxm, dym, y%ships(n)%p)
-#endif
          end do
       else if (sfc_assi_options == 2) then
           ! [2.0] Surface assimilation approach 2

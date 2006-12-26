@@ -31,13 +31,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    ! Communicate halo region.
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
-#ifndef DEREF_KLUDGE
    call da_uv_to_vorticity(xb, xa % u, xa % v, vor)
-#else
-   call da_uv_to_vorticity(xb, xa % u(ims,jms,kms), &
-                            xa % v(ims,jms,kms), &
-                            vor(ims,jms,kms))
-#endif
 
    ! Convert vorticity to Del**2 psi:
    if (.not. global) then               
@@ -62,13 +56,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    ! [2.3] Transform u, v to velocity potential via divergence:
 
    call da_message((/'calling UV_To_Divergence'/))
-#ifndef DEREF_KLUDGE
    call da_uv_to_divergence(xb, xa % u, xa % v, div)
-#else
-   call da_uv_to_divergence(xb, xa % u(ims,jms,kms), &
-                                xa % v(ims,jms,kms), &
-                            div(ims,jms,kms))
-#endif
 
    ! Convert divergence to Del**2 chi:
    if (.not. global)  then              

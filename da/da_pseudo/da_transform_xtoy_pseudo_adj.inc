@@ -19,8 +19,8 @@ subroutine da_transform_xtoy_pseudo_adj(iv, xp, jo_grad_y, jo_grad_x)
    if (trace_use) call da_trace_entry("da_transform_xtoy_pseudo_adj")
 
    if (iv%num_pseudo > 0) then
-!xyh      do n=1, iv % num_pseudo
-      do n=iv%ob_numb(iv%current_ob_time-1)%pseudo + 1, iv%ob_numb(iv%current_ob_time)%pseudo
+      do n=iv%ob_numb(iv%current_ob_time-1)%pseudo + 1, &
+         iv%ob_numb(iv%current_ob_time)%pseudo
          ! [1.1] Get horizontal interpolation weights:
 
          i = iv%pseudo(n)%loc%i
@@ -31,7 +31,6 @@ subroutine da_transform_xtoy_pseudo_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%pseudo(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
@@ -42,23 +41,6 @@ subroutine da_transform_xtoy_pseudo_adj(iv, xp, jo_grad_y, jo_grad_x)
                                     jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
          call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
-#else
-         call da_interp_obs_lin_2d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % p(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, &
-                                    jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, &
-                                 jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
-#endif
       end do
    end if
 

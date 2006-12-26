@@ -39,12 +39,6 @@ module da_minimisation
            finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
            stmin,stmax,width,width1,xtrapf
 
-   ! These are used if -DDEREF_KLUDGE is compiled
-   ! see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
-   integer     :: sm31  , em31  , sm32  , em32  , sm33  , em33
-   integer     :: sm31x , em31x , sm32x , em32x , sm33x , em33x
-   integer     :: sm31y , em31y , sm32y , em32y , sm33y , em33y
-
    private :: da_dot, da_dot_cv
    private :: infoc, brackt, stage1
    private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &

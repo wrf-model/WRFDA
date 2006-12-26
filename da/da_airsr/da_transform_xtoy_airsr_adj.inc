@@ -33,17 +33,10 @@ subroutine da_transform_xtoy_airsr_adj(iv, xp, jo_grad_y, jo_grad_x)
          if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%airsr(n)%t, k, iv%airsr(n)%zk, k)
          call da_interp_lin_3d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%airsr(n)%q, k, iv%airsr(n)%zk, k)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%airsr(n)%q(1), k, iv%airsr(n)%zk(1), k)
-         call da_interp_lin_3d_adj(jo_grad_x % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                jo_grad_y%airsr(n)%t(1), k, iv%airsr(n)%zk(1), k)
-#endif
       end do
    end if
 

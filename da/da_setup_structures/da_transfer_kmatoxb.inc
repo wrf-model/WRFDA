@@ -59,12 +59,12 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
    grid%xb % kma_b = grid%kma_b
 
    if (print_detail_xb) then
-     write(unit=stdout, fmt='(/a/)') &
+       write(unit=stdout, fmt='(/a/)') &
           'lvl         kma_a                 kma_b'
 
-     do k=ks,ke
-        write(unit=stdout, fmt='(i3,8e20.12)') k, grid%xb%kma_a(k), grid%xb%kma_b(k)
-     end do
+       do k=ks,ke
+          write(unit=stdout, fmt='(i3,8e20.12)') k, grid%xb%kma_a(k), grid%xb%kma_b(k)
+      end do
    end if
 
    grid%xb % mix = grid%xp % ide - grid%xp % ids + 1
@@ -115,19 +115,11 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
    ! Fix wind at Poles
    !---------------------------------------------------------------------------
 
-#ifndef DEREF_KLUDGE
     call da_get_vpoles(grid%xb%u,grid%xb%v,          &
        grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte )
-#else
-    call da_get_vpoles(grid%xb%u(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
-                       grid%xb%v(grid%xp%ims,grid%xp%jms,grid%xb%kms),&
-       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
-       grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
-       grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte )
 
-#endif
    if (print_detail_xb) then
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
@@ -200,14 +192,12 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
          !                              
          !---------------------------------------------------------------------
 
-         !#if 0
-         !         grid%xb%tgrn(i,j) = grid%sst(i,j)
-         !         if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
-         !         grid%xb%lanu(i,j)     = grid%lu_index(i,j)
-         !         grid%xb%landmask(i,j) = grid%landmask(i,j)
-         !         grid%xb%xland(i,j) = grid%xland(i,j)
-         !         grid%xb%snow(i,j)     = grid%snowc(i,j)
-         !#endif 
+         ! grid%xb%tgrn(i,j) = grid%sst(i,j)
+         ! if (grid%xb%tgrn(i,j) < 100.0) grid%xb%tgrn(i,j) = tmn(i,j)
+         ! grid%xb%lanu(i,j)     = grid%lu_index(i,j)
+         ! grid%xb%landmask(i,j) = grid%landmask(i,j)
+         ! grid%xb%xland(i,j) = grid%xland(i,j)
+         ! grid%xb%snow(i,j)     = grid%snowc(i,j)
 
          ! Since data is on full levels get full level pr & ht.
          ! Note p = A + B * Psfc formula needs Psfc to be in hPa 
@@ -346,88 +336,77 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
    ! after getting land use data for KMA grid 
    !---------------------------------------------------------------------------
 
-#if 0
+   !
    ! Set proper value for "mminlu" if using KMA info
 
-   xbx % mminlu = 'USGS'
-   call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
-#ifdef DEREF_KLUDGE
-      grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
-#else
-      grid%xb % lanu, grid%xb % rough)
-#endif
+   !xbx % mminlu = 'USGS'
+   !call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
+   !   grid%xb % lanu(grid%xp%ims,grid%xp%jms), grid%xb % rough(grid%xp%ims,grid%xp%jms))
 
-#endif
    do j=js,je
       do i=is,ie
          if (grid%xb%ztop < grid%xb%hf(i,j,ke+1)) grid%xb%ztop = grid%xb%hf(i,j,ke+1)
-            ! Calculate grid_box area and vertical inner product for use in 
-            ! vertical transform:
-            grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
-            if (vertical_ip == 1) then
+         ! Calculate grid_box area and vertical inner product for use in 
+         ! vertical transform:
+         grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
 
-!     Vertical inner product is sqrt(Delta p):
-      do k=1,grid%xb%mkz
-      grid%xb % vertical_inner_product(i,j,k) = sqrt(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
+         if (vertical_ip == 1) then
+            ! Vertical inner product is sqrt(Delta p):
+            do k=1,grid%xb%mkz
+               grid%xb % vertical_inner_product(i,j,k) = &
+                  sqrt(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
+            end do
+         else if (vertical_ip == 2) then
+            ! Vertical inner product is Delta p:
+            do k=1,grid%xb%mkz
+            grid%xb % vertical_inner_product(i,j,k) = grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1)
+            end do
+         end if
+
+         !------------------------------------------------------------------------------
+         !  Syed RH Rizvi
+         ! 
+         ! Following code for calculating roughness length needs to be activated  
+         ! to calculate surface variables (10-m wind, and 2-m T, Q) , 
+         ! After testing KMA-WRFVAR for SFC_ASSIM_OPTIONS = 2
+         !
+         !------------------------------------------------------------------------------
+
+         ! call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
+         !    grid%xb%p(i,j,ks), grid%xb%t(i,j,ks), grid%xb%q(i,j,ks), &
+         !    grid%xb%u(i,j,ks), grid%xb%v(i,j,ks), &
+         !    grid%xb%p(i,j,ks+1), grid%xb%t(i,j,ks+1), grid%xb%q(i,j,ks+1), &
+         !    grid%xb%h(i,j,ks), grid%xb%rough(i,j),grid%xb%landmask(i,j), &
+         !    grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
+         !    grid%xb%regime(i,j))
+
+         ! write (unit=stdout,fmt='(7I5)') &
+         !    i,j,grid%xb%psfc(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j), &
+         !    grid%xb%u10(i,j),grid%xb%v10(i,j)
+         ! ------------------------------------------------------------------------------
+
       end do
-
-   else if (vertical_ip == 2) then
-
-!     Vertical inner product is Delta p:
-      do k=1,grid%xb%mkz
-      grid%xb % vertical_inner_product(i,j,k) = grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1)
-      end do
-
-   end if
-!------------------------------------------------------------------------------
-!  Syed RH Rizvi
-! 
-! Following code for calculating roughness length needs to be activated  
-! to calculate surface variables (10-m wind, and 2-m T, Q) , 
-! After testing KMA-WRFVAR for SFC_ASSIM_OPTIONS = 2
-!
-#if 0
-!------------------------------------------------------------------------------
-
-      call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
-                   grid%xb%p(i,j,ks), grid%xb%t(i,j,ks), grid%xb%q(i,j,ks), &
-                   grid%xb%u(i,j,ks), grid%xb%v(i,j,ks), &
-                   grid%xb%p(i,j,ks+1), grid%xb%t(i,j,ks+1), grid%xb%q(i,j,ks+1), &
-                   grid%xb%h(i,j,ks), grid%xb%rough(i,j),grid%xb%landmask(i,j), &
-                   grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
-                   grid%xb%regime(i,j))
-
-      write (unit=stdout,fmt='(7I5)') &
-         i,j,grid%xb%psfc(i,j),grid%xb%t2(i,j),grid%xb%q2(i,j),grid%xb%u10(i,j),grid%xb%v10(i,j)
-!------------------------------------------------------------------------------
-!
-#endif
-!------------------------------------------------------------------------------
    end do
-   end do
-!------------------------------------------------------------------------------
-!--Calculate saturation vapour pressure and relative humidity:
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   ! Calculate saturation vapour pressure and relative humidity:
+   !---------------------------------------------------------------------------
+
    do j=js,je
-   do k=ks,ke
-   do i=is,ie
-      call da_tpq_to_rh(grid%xb % t(i,j,k), grid%xb % p(i,j,k), grid%xb % q(i,j,k), &
-                         grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k))
-   end do
-   end do
+      do k=ks,ke
+         do i=is,ie
+            call da_tpq_to_rh(grid%xb % t(i,j,k), grid%xb % p(i,j,k), &
+               grid%xb % q(i,j,k), &
+               grid%xb %es(i,j,k), grid%xb %qs(i,j,k), grid%xb %rh(i,j,k))
+         end do
+      end do
    end do
 
-!------------------------------------------------------------------------------
-!--Calculate dew point temperature:
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Calculate dew point temperature:
+   !---------------------------------------------------------------------------
 
-#ifdef DEREF_KLUDGE
-   call da_trh_to_td(grid%xb % rh(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
-                     grid%xb %  t(grid%xp%ims,grid%xp%jms,grid%xp%kms), &
-                     grid%xb % td(grid%xp%ims,grid%xp%jms,grid%xp%kms), grid%xp)
-#else
    call da_trh_to_td(grid%xb % rh, grid%xb % t, grid%xb % td, grid%xp)
-#endif
 
    if (print_detail_xb) then
       i=is; j=js; k=ks

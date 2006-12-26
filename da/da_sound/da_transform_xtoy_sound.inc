@@ -39,7 +39,6 @@ subroutine da_transform_xtoy_sound (xa, iv, xp, y)
          if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%u, k, iv%sound(n)%zk, k)
          call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
@@ -48,16 +47,6 @@ subroutine da_transform_xtoy_sound (xa, iv, xp, y)
                             y%sound(n)%t, k, iv%sound(n)%zk, k)
          call da_interp_lin_3d(xa % q, xp, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%q, k, iv%sound(n)%zk, k)
-#else
-         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%sound(n)%u(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%sound(n)%v(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%sound(n)%t(1), k, iv%sound(n)%zk(1), k)
-         call da_interp_lin_3d(xa % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%sound(n)%q(1), k, iv%sound(n)%zk(1), k)
-#endif
       end do
    end if
 

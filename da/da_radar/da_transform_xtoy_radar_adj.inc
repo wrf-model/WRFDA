@@ -92,10 +92,8 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
          end do
 
-
          ! [1.6] Interpolate horizontally from crs points:
 
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % wh, xp,   &
                              i, j, dx, dy, dxm, dym, &
                              model_w, num_levs, iv%Radar(n)%zk, &
@@ -108,21 +106,6 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
             dxm, dym, model_v, num_levs, iv%Radar(n)%zk, num_levs)
          call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
             dxm, dym, model_u, num_levs, iv%Radar(n)%zk, num_levs)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % wh(xp%ims,xp%jms,xp%kms), &
-            xp, i, j, dx, dy, dxm, dym, model_w(1), &
-            num_levs, iv%Radar(n)%zk(1), num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x%qrn(xp%ims,xp%jms,xp%kms), & 
-                                 xp, i, j, dx, dy, dxm, dym, model_qrn(1), &
-                                 num_levs, iv%Radar(n)%zk(1), num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
-            i, j, dx, dy, dxm, dym, &
-            model_v(1), num_levs, iv%Radar(n)%zk(1), &
-            num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, &
-            i, j, dx, dy, dxm, dym, &
-            model_u(1), num_levs, iv%Radar(n)%zk(1), num_levs)
-#endif
       end do
    end if
 

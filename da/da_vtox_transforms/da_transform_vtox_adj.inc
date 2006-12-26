@@ -30,7 +30,6 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
 
    if (global) then     
       ! Poles treatment for global WRFVAR
-#ifndef DEREF_KLUDGE
       call da_get_avpoles(xa%u,xa%v,&
             ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
@@ -51,29 +50,6 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
             ids, ide, jds, jde,  &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1  )
-#else
-      call da_get_avpoles(xa%u(ims,jms,kms),         &
-                          xa%v(ims,jms,kms),         &
-                      ids, ide, jds, jde,  &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(xa%t(ims,jms,kms),         &
-                      ids, ide, jds, jde,   &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(xa%p(ims,jms,kms),         &
-                      ids, ide, jds, jde,  &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(xa%q(ims,jms,kms),         &
-                      ids, ide, jds, jde,  &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(xa%psfc(ims,jms),          &
-                      ids, ide, jds, jde,  &
-                      ims, ime, jms, jme,   1,   1,  &
-                      its, ite, jts, jte,   1,   1  )
-#endif
    end if     
 
    ! Compute w increments using Richardson's eqn.
@@ -199,11 +175,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
 
    if (vert_corr == 2) then      
       call da_vertical_transform('u_adj', be, &
-#ifndef DEREF_KLUDGE
                                   xb % vertical_inner_product, &
-#else
-                                  xb % vertical_inner_product(ims,jms,kms), &
-#endif
                                   vv, vp)
    else
       vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)

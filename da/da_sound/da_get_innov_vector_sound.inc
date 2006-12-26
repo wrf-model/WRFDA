@@ -85,7 +85,6 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-#ifndef DEREF_KLUDGE
       call da_interp_lin_3d( xb%u, xp, i, j, dx, dy, dxm, dym, &
                            model_u, max_ob_levels, iv%sound(n)%zk, num_levs)
       call da_interp_lin_3d( xb%v, xp, i, j, dx, dy, dxm, dym, &
@@ -97,19 +96,6 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
       ! call da_interp_lin_3d( xb%h, xp, i, j, dx, dy, dxm, dym, &
       !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs)
-#else
-      call da_interp_lin_3d( xb%u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_u(1), max_ob_levels, iv%sound(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb%v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_v(1), max_ob_levels, iv%sound(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb%t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_t(1), max_ob_levels, iv%sound(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb%q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, &
-         dxm, dym, model_q(1), max_ob_levels, iv%sound(n)%zk(1), num_levs)
-
-      ! call da_interp_lin_3d( xb%h(xp%ims,xp%jms,xp%kms), xp, i, j, dx,dy,&
-      !   dxm, dym, model_h(1), max_ob_levels, iv%sound(n)%zk(1), num_levs)
-#endif
 
       !----------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:

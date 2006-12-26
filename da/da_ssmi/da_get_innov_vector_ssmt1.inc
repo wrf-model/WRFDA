@@ -76,27 +76,22 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
 
          iv % ssmt1(n) % info % levels = num_levs
 
-!        [1.2] Interpolate horizontally to ob:
+         ! [1.2] Interpolate horizontally to ob:
 
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d( xb % t, xp, i, j, dx, dy, dxm, dym, &
                              model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
-#else
-         call da_interp_lin_3d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                             model_t, max_ob_levels, iv%ssmt1(n)%zk, num_levs)
-#endif
 
-!------------------------------------------------------------------------
-!        [2.0] Initialise components of innovation vector:
-!------------------------------------------------------------------------
+         !---------------------------------------------------------------------
+         ! [2.0] Initialise components of innovation vector:
+         !---------------------------------------------------------------------
 
          do k = 1, iv % ssmt1(n) % info % levels
 
             iv % ssmt1(n) % t(k) % inv = 0.0
 
-!------------------------------------------------------------------------
-!           [3.0] Interpolation:
-!------------------------------------------------------------------------
+            !----------------------------------------------------------------
+            ! [3.0] Interpolation:
+            !----------------------------------------------------------------
 
             if (ob % ssmt1(n) % t(k) > missing_r .AND. &
                iv % ssmt1(n) % t(k) % qc >= obs_qc_pointer) then
@@ -106,9 +101,9 @@ subroutine da_get_innov_vector_ssmt1( it, xb, xp, ob, iv)
             end if
          end do
 
-!------------------------------------------------------------------------
-!        [5.0] Perform optional maximum error check:
-!------------------------------------------------------------------------
+         !------------------------------------------------------------------
+         ! [5.0] Perform optional maximum error check:
+         !------------------------------------------------------------------
 
          if (check_max_iv) call da_check_max_iv_ssmt1(it,iv%ssmt1(n),itt,ittf)
       end do

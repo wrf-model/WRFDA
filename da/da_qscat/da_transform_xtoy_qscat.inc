@@ -31,17 +31,10 @@ subroutine da_transform_xtoy_qscat(xa, iv, xp, y)
          dxm = iv%qscat(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                                 y%qscat(n)%u, iv%qscat(n)%zk)
          call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
                                 y%qscat(n)%v, iv%qscat(n)%zk)
-#else
-         call da_interp_obs_lin_2d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                y%qscat(n)%u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                y%qscat(n)%v, iv%qscat(n)%zk)
-#endif
       end do
    end if
 

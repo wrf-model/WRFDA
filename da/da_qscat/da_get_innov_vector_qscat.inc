@@ -68,17 +68,10 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
          else
 
             ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
             call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                                     model_u, iv%qscat(n)%zk)
             call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
                                     model_v, iv%qscat(n)%zk)
-#else
-            call da_interp_obs_lin_2d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                           model_u, iv%qscat(n)%zk)
-            call da_interp_obs_lin_2d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                                           model_v, iv%qscat(n)%zk)
-#endif
 
             !------------------------------------------------------------------------
             ! [2.0] Initialise components of innovation vector:

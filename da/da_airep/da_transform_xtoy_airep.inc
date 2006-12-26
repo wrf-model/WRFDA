@@ -35,7 +35,6 @@ subroutine da_transform_xtoy_airep (xa, iv, xp, y)
          dxm = iv%airep(n)%loc%dxm
 
          ![1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%u, k, iv%airep(n)%zk, k)
 
@@ -44,18 +43,6 @@ subroutine da_transform_xtoy_airep (xa, iv, xp, y)
 
          call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
                            y%airep(n)%t, k, iv%airep(n)%zk, k)
-
-#else
-         call da_interp_lin_3d(xa % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%u(1), k, iv%airep(n)%zk(1), k)
-
-         call da_interp_lin_3d(xa % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%v(1), k, iv%airep(n)%zk(1), k)
-
-         call da_interp_lin_3d(xa % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%t(1), k, iv%airep(n)%zk(1), k)
-
-#endif
       end do
    end if
 

@@ -43,11 +43,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (vert_corr == 2) then      
       call da_vertical_transform('u', be, &
-#ifndef DEREF_KLUDGE
                                   xb % vertical_inner_product, &
-#else
-                                  xb % vertical_inner_product(ims,jms,kms), &
-#endif
                                   vv, vp)
 
    else
@@ -175,7 +171,6 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    !---------------------------------------------------------------
 
    if (global)  then   
-#ifndef DEREF_KLUDGE
       call da_get_vpoles(xa%u,xa%v, &
             ids, ide, jds, jde, &
             ims, ime, jms, jme, kms, kme, &
@@ -196,29 +191,6 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
             ids, ide, jds, jde,   &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1  )
-#else
-      call da_get_vpoles(xa%u(ims,jms,kms),          &
-                         xa%v(ims,jms,kms),          &
-                      ids, ide, jds, jde, &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%t(ims,jms,kms),          &
-                      ids, ide, jds, jde,   &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%p(ims,jms,kms),          &
-                      ids, ide, jds, jde,   &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%q(ims,jms,kms),          &
-                      ids, ide, jds, jde,   &
-                      ims, ime, jms, jme, kms, kme,  &
-                      its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%psfc(ims,jms),           &
-                      ids, ide, jds, jde, &
-                      ims, ime, jms, jme,   1,   1,  &
-                      its, ite, jts, jte,   1,   1  )
-#endif
        call da_set_boundary_xa(xa, xb)
    end if   
 

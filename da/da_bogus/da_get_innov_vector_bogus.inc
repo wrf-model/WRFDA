@@ -76,7 +76,6 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
       end do
 
       ! [1.4] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
       call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
                          model_u, max_ob_levels, iv%bogus(n)%zk, num_levs)
       call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
@@ -85,16 +84,6 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
                          model_t, max_ob_levels, iv%bogus(n)%zk, num_levs)
       call da_interp_lin_3d( xb % q, xp, i, j, dx, dy, dxm, dym, &
                          model_q, max_ob_levels, iv%bogus(n)%zk, num_levs)
-#else
-      call da_interp_lin_3d( xb % u(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                         model_u(1), max_ob_levels, iv%bogus(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb % v(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                         model_v(1), max_ob_levels, iv%bogus(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb % t(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                         model_t(1), max_ob_levels, iv%bogus(n)%zk(1), num_levs)
-      call da_interp_lin_3d( xb % q(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                         model_q(1), max_ob_levels, iv%bogus(n)%zk(1), num_levs)
-#endif
 
       model_slp = dym*(dxm*xb%slp(i,j)   + dx*xb%slp(i+1,j)) &
                     + dy *(dxm*xb%slp(i,j+1) + dx*xb%slp(i+1,j+1))

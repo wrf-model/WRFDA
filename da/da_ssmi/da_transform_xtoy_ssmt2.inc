@@ -33,13 +33,8 @@ subroutine da_transform_xtoy_ssmt2 (xa, iv, xp, y)
          dxm = iv%ssmt2(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d(xa % rh, xp, i, j, dx, dy, dxm, dym, &
                             y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
-#else
-         call da_interp_lin_3d(xa % rh(xp%ims,xp%jms,xp%kms), xp, i, j, dx, dy, dxm, dym, &
-                            y%ssmt2(n)%rh, k, iv%ssmt2(n)%zk, k)
-#endif
        end do
    end if
 

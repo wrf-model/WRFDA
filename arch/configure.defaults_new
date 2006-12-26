@@ -311,7 +311,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = # -O3 -xW
 FCDEBUG         = # -g -C
@@ -342,7 +342,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DDEREF_KLUDGE -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -388,7 +388,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DDEREF_KLUDGE -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -680,8 +680,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DLINUX \
-                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = #-O3 -xW
 FCDEBUG         = # -g -C
@@ -763,8 +762,7 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DDEREF_KLUDGE -DIO_DEREF_KLUDGE -DLINUX \
-                    -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL

@@ -30,21 +30,10 @@ subroutine da_transform_xtoy_geoamv_adj (iv, xp, jo_grad_y, jo_grad_x)
          dx = iv%geoamv(n)%loc%dx
          dxm = iv%geoamv(n)%loc%dxm
 
-#ifndef DEREF_KLUDGE
          call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
                                    jo_grad_y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
          call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
                                    jo_grad_y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
-#else
-         call da_interp_lin_3d_adj(jo_grad_x % u(xp%ims,xp%jms,xp%kms), xp, &
-                                   i, j, dx, dy, dxm, dym, &
-                                   jo_grad_y%geoamv(n)%u(1), k, &
-                                   iv%geoamv(n)%zk(1), k)
-         call da_interp_lin_3d_adj(jo_grad_x % v(xp%ims,xp%jms,xp%kms), xp, &
-                                   i, j, dx, dy, dxm, dym, &
-                                   jo_grad_y%geoamv(n)%v(1), k, &
-                                   iv%geoamv(n)%zk(1), k)
-#endif
       end do
    end if
 
