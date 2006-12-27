@@ -16,22 +16,19 @@ subroutine da_stage0_initialize(input_file, var, dim1, dim2, dim3, ds)
    real, intent(out)              :: ds               ! Grid resolution.
 
    character (len=80)             :: att_name         ! Attribute name.
-   integer                        :: i, att           ! Loop counters.
+   integer                        :: i                ! Loop counters.
    integer                        :: attlen           ! Length of attribute.
    integer                        :: cdfid            ! NETCDF file id.
    integer                        :: rcode            ! Return code (0=ok).
    integer                        :: length           ! Length of filename.
    integer                        :: id_var           ! NETCDF variable ID. 
    integer                        :: ivtype           ! 4=integer, 5=real, 6=d.p.
-   integer                        :: nvars            !
    integer                        :: ndims            !
    integer                        :: natts            ! Number of attributes.
-   integer                        :: unlimdimid       ! Number of attributes.
 
    integer                        :: dimids(10)       !
    integer                        :: dims(1:4)        ! Dimensions of field. 
    real (kind=4), allocatable     :: value_real(:)    ! real attribute value. 
-   character (len=80)             :: value_chr        ! Character.
 
    ! Check file exists:
    length = len_trim(input_file)

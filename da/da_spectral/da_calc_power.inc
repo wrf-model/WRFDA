@@ -6,7 +6,7 @@ subroutine da_calc_power(max_wavenumber, r_cvsize, rcv, power)
 
    implicit none
 
-   integer, intent(in) :: max_wavenumber         ! Smallest scale required (ni/2 - 1).
+   integer, intent(in) :: max_wavenumber ! Smallest scale required (ni/2 - 1)
    integer, intent(in) :: r_cvsize               ! Size of rcv vector.
    real, intent(in)    :: rcv(1:r_cvsize)        ! Spectral modes.
    real, intent(out)   :: power(0:max_wavenumber)! Power spectrum.
@@ -14,7 +14,6 @@ subroutine da_calc_power(max_wavenumber, r_cvsize, rcv, power)
    integer             :: n, m                   ! Loop counters.
    integer             :: index, indexx          ! Position markers in cv.
    integer             :: cv_size                ! Complex cv size.
-   real                :: accum_power            ! Power for given total wavenumber n.
    complex, allocatable:: ccv(:)                 ! Complex control variable.
 
    ! Create complex array:

@@ -45,8 +45,11 @@ subroutine da_solve ( grid , config_flags , &
    type (j_type)                :: j           ! Cost function.
 
    integer                      :: cv_size, i
-   real                         :: j_grad_norm_target ! TArget j norm.
+   real                         :: j_grad_norm_target ! Target j norm.
+
+#ifdef DM_PARALLEL
    integer                      :: wrf_done_unit
+#endif
 
    if (trace_use) call da_trace_entry("da_solve")
 

@@ -15,11 +15,12 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
 
    ! Arrays for write out increments:
    integer                                          :: ix, jy, kz
+#ifdef DM_PARALLEL
    real, dimension(1:xb%mix,1:xb%mjy)               ::     gbuf_2d
    real, dimension(1:xb%mix+1,1:xb%mjy+1)           ::     gbuf_2dd
    real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz)      ::     gbuf
-   real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz+1)    ::    wgbuf
 
+   real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz+1)    ::    wgbuf
    real, dimension(:,:,:), allocatable :: u_global, v_global, w_global, &
                                           p_global, t_global, q_global, &
                                          ph_global
@@ -27,6 +28,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
                        psac_global, tgrn_global, terr_global, snow_global,&
                         lat_global,  lon_global, lanu_global,             &
                  map_factor_global, cori_global, landmask_global
+#endif
 
    integer :: anl_inc_unit
 

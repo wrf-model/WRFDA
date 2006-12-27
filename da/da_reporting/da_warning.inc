@@ -11,7 +11,9 @@ subroutine da_warning(file_str, line, warnings)
    character(len=*), intent(in) :: warnings(:)
    character*256 :: line_str
    character*256 :: html_file
+#if defined(DM_PARALLEL) && ! defined(STUBMPI)
    integer :: i
+#endif
 
    if (warnings_are_fatal) then
       call da_error(file_str, line, warnings)

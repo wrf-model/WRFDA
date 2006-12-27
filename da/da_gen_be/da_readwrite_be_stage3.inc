@@ -14,7 +14,6 @@ subroutine da_readwrite_be_stage3(outunit, nk, variable)
    character*10             :: vardum                     ! Dummy variable name.
 
    integer                  :: num_bins2d                 ! Number of Eigenvector bins.
-   integer                  :: k, m, b                    ! Loop counters.
    integer                  :: nkdum                      ! Dummy nk variable.
    real                     :: e_vec(1:nk,1:nk)           ! Domain-averaged eigenvectors.
    real                     :: e_val(1:nk)                ! Domain-averaged eigenvalues.  

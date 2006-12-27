@@ -1,11 +1,12 @@
 subroutine da_proc_sum_real (n, value)
 
    !---------------------------------------------------------------------------
-   !  Purpose: Do MPI reduction operation across processors to sum a real vector.  
-   !           On return, each of the N components of the vector "value" represents
-   !           the sum of parts from each processor. The result is stored only on 
-   !           the root processor, i.e., processor 0. (In this way, we do not have 
-   !           to do all-to-all communication.)
+   ! Purpose: Do MPI reduction operation across processors to sum a real 
+   ! vector.  
+   ! On return, each of the N components of the vector "value" represents
+   ! the sum of parts from each processor. The result is stored only on 
+   ! the root processor, i.e., processor 0. (In this way, we do not have 
+   ! to do all-to-all communication.)
    !---------------------------------------------------------------------------
 
    implicit none
@@ -13,10 +14,9 @@ subroutine da_proc_sum_real (n, value)
    integer, intent(in)         :: n        ! Length of value array. 
    real,    intent(inout)      :: value(n) ! Array to be summed componentwise.
 
+#ifdef DM_PARALLEL
    real              :: apsum(n)             ! Sum across processors.
    integer           :: root               ! Monitor processor.
-
-#ifdef DM_PARALLEL
 
    if (rootproc) root = myproc
    call wrf_dm_bcast_integer (root, 1)

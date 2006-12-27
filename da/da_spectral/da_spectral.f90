@@ -4,8 +4,10 @@ module da_spectral
    use da_define_structures, only : xbx_type
    use fftpack5
    use da_tools
-   use da_par_util1, only : true_mpi_complex
    use da_tracing
+#ifdef DM_PARALLEL
+   use da_par_util1, only : true_mpi_complex
+#endif
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform
@@ -14,7 +16,7 @@ module da_spectral
 
    implicit none
 
-   contains
+contains
 
 #include "da_asslegpol.inc"
 #include "da_calc_power_spectrum.inc"

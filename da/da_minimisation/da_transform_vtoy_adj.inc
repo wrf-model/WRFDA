@@ -27,7 +27,9 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    integer, intent(in) :: cg_jcdf
 
    integer :: nobwin,ndynopt
+#ifdef DM_PARALLEL
    integer :: wrf_done_unit
+#endif
 
    character(len=4) :: filnam
 

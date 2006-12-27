@@ -21,7 +21,10 @@ subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, 
    real, intent(in)    :: field(its:ite,jts:jte)     ! Gridpoint field.
 
    integer             :: j, m, n                    ! Loop counters.
-   integer             :: index_start, index_end     ! Position markers in cv.
+   integer             :: index_start                ! Position markers in cv.
+#ifdef DM_PARALLEL
+   integer             :: index_end                  ! Position markers in cv.
+#endif
    integer             :: index_r, index_c           ! Array index for complex v_fou.
 
    real                :: r_fou(1:lenr)              ! FFT array.

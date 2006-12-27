@@ -2,13 +2,12 @@ subroutine da_write_noise_to_ob (iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Write consolidated obs noise created in da_add_noise_to_ob
-   !-------------------------------------------------------------------------   
+   !-------------------------------------------------------------------------
 
    implicit none
 
    type (ob_type), intent(in)    :: iv   ! Obs and header structure.
    integer                       :: n, k,kk,inst, iunit
-   integer                       :: ierr,ios  ! Error code from MPI routines.
    integer                       :: num_obs
    character*20, allocatable     :: filename(:)   
    character*20                  :: ob_name   
@@ -24,8 +23,10 @@ subroutine da_write_noise_to_ob (iv)
       write(unit=filename(k), fmt='(a,i3.3)')'rand_obs_error.',k
    end do
    if (rootproc) then
-      open(unit=rand_unit,file='rand_obs_error',form='formatted',iostat=ios,status='new')
-      if (ios /= 0) call da_error(__FILE__,__LINE__, (/"Cannot open file rand_obs_error"/))
+      open(unit=rand_unit,file='rand_obs_error',form='formatted', &
+         iostat=ierr,status='new')
+      if (ierr /= 0) &
+         call da_error(__FILE__,__LINE__, (/"Cannot open file rand_obs_error"/))
    end if
 
    num_obs = 0

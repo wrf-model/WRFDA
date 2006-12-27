@@ -7,10 +7,13 @@ module da_par_util
    !---------------------------------------------------------------------------
 
    use module_domain, only : domain, xpose_type
+#ifdef DM_PARALLEL
    use module_dm, only : io2d_ij_internal, io3d_ijk_internal
+#endif
    use da_define_structures, only : be_subtype, &
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
-      y_type, count_obs_number_type, count_obs_type, maxmin_field_type
+      y_type, count_obs_number_type, count_obs_type, maxmin_field_type, &
+      sound_type
    use da_par_util1
    use da_tools, only : message
    use da_reporting, only : da_error

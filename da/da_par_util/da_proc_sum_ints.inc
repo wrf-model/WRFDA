@@ -11,10 +11,10 @@ subroutine da_proc_sum_ints (values)
 
    integer,   intent(inout)      :: values(:) ! Values
 
+#ifdef DM_PARALLEL
    integer, allocatable :: sums(:) ! Sum across processors.
    integer           :: root                  ! Monitor processor.
 
-#ifdef DM_PARALLEL
    if (rootproc) root = myproc
    call wrf_dm_bcast_integer (root, 1)
    allocate (sums(size(values)))

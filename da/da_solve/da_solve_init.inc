@@ -8,7 +8,9 @@ subroutine da_solve_init(grid)
 
    type(domain), intent(inout)      :: grid
 
+#ifdef DM_PARALLEL
    integer :: ii
+#endif
 
    integer :: sm31,sm32,sm33,sm31x,sm32x,sm33x,sm31y,sm32y,sm33y
 

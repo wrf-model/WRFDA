@@ -13,11 +13,13 @@ subroutine da_write_kma_increments(xp, xb, xa)
 
    ! Arrays for write out increments:
    integer                                     :: ix, jy, kz
+
+#ifdef DM_PARALLEL
    real, dimension(1:xb%mix,1:xb%mjy)          :: gbuf_2d
    real, dimension(1:xb%mix,1:xb%mjy,1:xb%mkz) :: gbuf
-
    real, dimension(:,:)  , allocatable :: psfc_g
    real, dimension(:,:,:), allocatable :: u_g, v_g, t_g, q_g, p_g
+#endif
 
    integer                                     :: i, j, k,anl_inc_unit
 

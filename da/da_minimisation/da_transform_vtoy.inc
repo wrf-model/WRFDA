@@ -25,7 +25,9 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer :: nobwin
+#ifdef DM_PARALLEL
    integer :: wrf_done_unit
+#endif
 
    character(len=4) :: filnam
 

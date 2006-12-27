@@ -6,13 +6,10 @@ subroutine da_trace_report
 
    implicit none
 
-   integer :: Loop1                        ! loop counter
-   integer :: Loop2                        ! loop counter
-   integer :: i
-   integer :: j
+   integer :: i                        ! loop counter
+   integer :: j                        ! loop counter
    integer :: CountRate
    integer :: MasterNoRoutines
-   integer :: istat
    integer :: temp
    integer :: MinElapsedPos
    integer :: MaxElapsedPos
@@ -74,7 +71,7 @@ subroutine da_trace_report
 
    call mpi_bcast(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
-                  MPI_character,trace_pe, mpi_comm_world,istat)
+                  MPI_character,trace_pe, mpi_comm_world,ierr)
 #endif
 
    MasterElapsedTime(:,:)=0.0
@@ -84,15 +81,15 @@ subroutine da_trace_report
    MasterNoCalls(:,:)=0
    MasterMaxHeap(:,:)=0
 
-   do Loop1=1,MaxNoRoutines
-      do Loop2=1,NoRoutines
-         if (TimerNames(Loop2) == MasterTimerNames(Loop1)) then
-            MasterElapsedTime(myproc,Loop1)=ElapsedTime(Loop2)
-            MasterCPUTime(myproc,Loop1)=CPUTime(Loop2)
-            MasterElapsedTimeLocal(myproc,Loop1)=ElapsedTimeLocal(Loop2)
-            MasterCPUTimeLocal(myproc,Loop1)=CPUTimeLocal(Loop2)
-            MasterNoCalls(myproc,Loop1)=NoCalls(Loop2)
-            MasterMaxHeap(myproc,Loop1)=MaxHeap(Loop2)
+   do i=1,MaxNoRoutines
+      do j=1,NoRoutines
+         if (TimerNames(j) == MasterTimerNames(i)) then
+            MasterElapsedTime(myproc,i)=ElapsedTime(j)
+            MasterCPUTime(myproc,i)=CPUTime(j)
+            MasterElapsedTimeLocal(myproc,i)=ElapsedTimeLocal(j)
+            MasterCPUTimeLocal(myproc,i)=CPUTimeLocal(j)
+            MasterNoCalls(myproc,i)=NoCalls(j)
+            MasterMaxHeap(myproc,i)=MaxHeap(j)
             cycle
          end if
       end do
@@ -161,8 +158,8 @@ subroutine da_trace_report
       write(unit=trace_unit, &
          fmt='("<TH>",I4," PE")') num_procs
 
-      do loop1=MasterNoRoutines,1,-1
-         Pointer=index(loop1)    
+      do i=MasterNoRoutines,1,-1
+         Pointer=index(i)    
 
          if (TotalCPUTime(1) > 0.0) then
             PercentCPUTime=100.0 * OverallCPUTime(Pointer)/TotalCPUTime(1)
@@ -290,8 +287,8 @@ subroutine da_trace_report
       write(unit=trace_unit, &
          fmt='("<TH>",I4," PE")') num_procs
 
-      do loop1=MasterNoRoutines,1,-1
-         Pointer=index(loop1)    
+      do i=MasterNoRoutines,1,-1
+         Pointer=index(i)    
 
          if (TotalCPUTime(1) > 0.0) then
             PercentCPUTime=100.0 * OverallCPUTime(Pointer)/TotalCPUTime(1)
@@ -416,8 +413,8 @@ subroutine da_trace_report
          write (unit=trace_unit,fmt='("<TR><TH>Routine<TH>Max in any PE (kbytes)")')
          write (unit=trace_unit,fmt='("<TH>Overall (bytes)<TH>Average per PE (kbytes)")')
 
-         do loop1=MasterNoRoutines,1,-1
-            Pointer=index(loop1)
+         do i=MasterNoRoutines,1,-1
+            Pointer=index(i)
             write (unit=trace_unit, &
                fmt='("<TR><TD><a href=",A,"/",A,".html>",A,"</a><TD>",I15,"<TD>",I15,"<TD>",I15)') &
                trim(Documentation_url),trim(TimerNames(Pointer)),trim(TimerNames(Pointer)), &

@@ -11,10 +11,10 @@ subroutine da_proc_sum_int (value)
 
    integer,   intent(inout)      :: value     ! Value on processor.
 
+#ifdef DM_PARALLEL
    integer           :: sum                   ! Sum across processors.
    integer           :: root                  ! Monitor processor.
 
-#ifdef DM_PARALLEL
    if (rootproc) root = myproc
    call wrf_dm_bcast_integer (root, 1)
    sum=0
