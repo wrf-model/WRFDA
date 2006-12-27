@@ -10,7 +10,7 @@ subroutine da_check_max_iv_airsr(it, airsr,itt,ittf,itqv,itqvf)
    type (airsr_type), intent(inout)       :: airsr
    integer, intent(inout)                 :: itt,ittf,itqv,itqvf
 
-   integer                                :: i, k
+   integer                                :: k
    logical                                :: failed
 
    !---------------------------------------------------------------------------

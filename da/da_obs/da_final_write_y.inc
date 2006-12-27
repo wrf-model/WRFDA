@@ -9,9 +9,7 @@ subroutine da_final_write_y(iv, y)
    type (ob_type), intent(in)    :: iv   ! O-B structure.
    type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
       
-   integer                       :: n, k,kk,inst, ounit, iunit
-   integer                       :: root      ! Monitor processor.
-   integer                       :: ierr      ! Error code from MPI routines.
+   integer                       :: n, k,kk,inst, ounit
    integer                       :: sound_num_obs, num_obs, ios
    character*20, allocatable     :: filename(:)
    character*20                  :: ob_name, file_prefix  

@@ -13,7 +13,6 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
    type (multi_level_type)      :: platform
    logical                      :: outside, outside_all
-   real                         :: height_error
    integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -34,15 +33,14 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                                    num_profiler, num_buoy, num_bogus
 
    character(len=40)     :: obstr,drift,hdstr,qmstr,oestr
-   character(len=10)     :: date
-   character(len=8)     :: subset, c8id
+   character(len=8)      :: subset, c8id
    real,dimension(7)     :: hdr
    real,dimension(2,1)   :: pmo
-   real,dimension(9,255) :: drf,obs,qms,oes
+   ! real,dimension(9,255) :: drf
+   real,dimension(9,255) :: obs,qms,oes
    real                  :: time,woe,qob,toe,qoe,poe,pob,tob,zob,rob,roe
 
    integer               :: iost, ndup, n, i, j, k, surface_level, report
-   integer               :: year, month, day,hour
    integer               :: iret, idate, kx, nlevels, nrecs,miscd, t29, jx, ix
    integer               :: cat,zqm,pqm,qqm,tqm,wqm,pwq,pmq,rqm
    integer               :: iunit

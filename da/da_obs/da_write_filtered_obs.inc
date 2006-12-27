@@ -45,16 +45,13 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    type (xb_type),    intent(in)  :: xb      ! First guess structure.
    real, intent(in)               :: phic, xlonc, truelat1, truelat2
 
-   character (LEN =  10)        :: info_fmt_name,srfc_fmt_name,each_fmt_name
-   character (LEN =  80)        :: blank                                         
-   integer                      :: i, j, iost, nlevels, fm
-   type (multi_level_type)      :: platform
+   integer                      :: i, j, iost, nlevels
 
-   integer            :: n1, n2, n, k, zero , ships_elv_qual
+   integer            :: n, zero
    real               :: es, qs, speed, dir, rh, rh_error, uu, vv
    real               :: xmiss, height, height_error, pr_error, slp_error
    real               :: thick, thick_error,dir_error,speed_error
-   real               :: td, td_error , elv_error,ships_elv, ships_pr_error
+   real               :: td, td_error , elv_error, ships_pr_error
 
    real               :: slp_inv,speed_err,dir_err, p,p_err
    real               :: t, t_err,ref, ref_err
@@ -62,7 +59,6 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    integer            :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 
    integer            :: ounit, nz, mnz
-   integer            :: root      ! Monitor processor.
    character*20       :: filename
 
    if (trace_use) call da_trace_entry("da_write_filtered_obs")
@@ -101,8 +97,6 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    elv_error = 6.0
    dir_error = 5.0
    dir_err   = 5.0
-   ships_elv = 0.0
-   ships_elv_qual = 0 
 
    !--------------------------------------------------------------------------
    !  Write Synop:
@@ -1364,7 +1358,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
          call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
       call da_count_filtered_obs(&
          xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
-         xp%ide, xp%jde, phic, xlonc, truelat1, truelat2)
+         phic, xlonc, truelat1, truelat2)
       call da_final_write_filtered_obs
       close (filtered_obs_unit)
       call da_free_unit(filtered_obs_unit)

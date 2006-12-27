@@ -11,9 +11,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    type (xbx_type),intent(in)  :: xbx                   ! Header non-grid info 
    type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.
 
-   integer                     :: nrec, max_wavenumber  ! Scalar.
-   integer                     :: i, j, k, m, ic, jc       ! Loop counters.
-   real, allocatable   :: height(:,:,:)      ! Height field.
+   integer                     :: i, j, k, m       ! Loop counters.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point
    integer             :: bin_type           ! Type of bin to average over.
@@ -21,9 +19,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    integer             :: num_bins2d         ! Number of bins (3D fields).
    real    :: lat_min, lat_max, binwidth_lat ! Used if bin_type = 2 (degrees)..
    real    :: hgt_min, hgt_max, binwidth_hgt ! Used if bin_type = 2 (m). .
-   integer :: num_bins_lat, num_bins_hgt     ! Used if bin_type = 2.
 
-   logical  :: use_global_eofs               ! True if projected data uses global EOFs
    real, allocatable           :: be1_eval_loc(:,:)     ! Temp arrays.
    real, allocatable           :: be2_eval_loc(:,:)     ! Temp arrays.
    real, allocatable           :: be3_eval_loc(:,:)     ! Temp arrays.
@@ -59,7 +55,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    real, allocatable           :: eval_loc(:,:)          ! Latitudinally varying eigenvalues.
 
    character*10                :: variable
-   integer                     :: ni, nj, nk, nk_2d, b, nlev           
+   integer                     :: ni, nj, nk, nk_2d, b         
    integer                     :: ix, jy, kz
    real, allocatable           :: regcoeff1(:)
    real, allocatable           :: regcoeff2(:,:)

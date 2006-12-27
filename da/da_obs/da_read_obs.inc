@@ -68,7 +68,6 @@ subroutine da_read_obs (ob, xp, filename)
                                    num_airsr,num_buoy, num_bogus
 
    integer                        :: ndup, n, report
-   logical                        :: surface_sound
 
    if (trace_use) call da_trace_entry("da_read_obs")
 

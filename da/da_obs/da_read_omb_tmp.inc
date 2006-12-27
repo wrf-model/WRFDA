@@ -16,12 +16,11 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    integer      ,intent (in)    :: nc      
 
    integer      :: num_obs, ios 
-   character*9  :: dummy_c
    character*20 :: ob_type               
    logical   :: if_write
    
    character*5  :: stn_id               
-   integer      :: i,n, k, kk, l, levels, dummy_i
+   integer      :: n, k, kk, l, levels, dummy_i
    real         :: lat, lon, press, dummy           
    real         :: tpw_obs, tpw_inv, tpw_err, tpw_inc
    real         :: u_obs, u_inv, u_error, u_inc, & 
@@ -30,7 +29,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
                    p_obs, p_inv, p_error, p_inc, &
                    q_obs, q_inv, q_error, q_inc, &
                    spd_obs, spd_inv, spd_err, spd_inc
-   integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, npr
+   integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc
 
    if (trace_use) call da_trace_entry("da_read_omb_tmp")
 
@@ -143,9 +142,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 30 continue      !    Gpspw  
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -171,9 +168,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 40 continue      !    Sound 
-!----------------------------------------------------------------------------   
 
    !  [6] Transfer sonde obs:
 
@@ -206,9 +201,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 50 continue      !    Airep  
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -238,9 +231,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 60 continue      !    Pilot & Profiler  
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -267,9 +258,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 70 continue      !  SSMI Radiance
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -295,9 +284,8 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
+   
 80 continue      !  SSMI radiance   
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -334,9 +322,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 90 continue      !  SATEM           
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -362,9 +348,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 100  continue      !  SSMT1 & 2           
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -390,9 +374,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
 110  continue      !  Scatrometer winds   
-!----------------------------------------------------------------------------   
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -420,13 +402,10 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
-120  continue      !  TC bogus data           
-! Note:      Syed  RH Rizvi   06/26/2006   
-! TC Bogus data is written in two records
-! 1st record holds info about surface level
-! 2nd is for upper air
-!----------------------------------------------------------------------------   
+120  continue      !  TC bogus data        
+   ! TC Bogus data is written in two records
+   ! 1st record holds info about surface level
+   ! 2nd is for upper air
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -470,9 +449,7 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-!----------------------------------------------------------------------------   
-130  continue      !  AIRS  retrievals        
-!----------------------------------------------------------------------------   
+130 continue      !  AIRS  retrievals        
 
    if (num_obs > 0) then
       do n = 1, num_obs    
@@ -497,8 +474,6 @@ subroutine da_read_omb_tmp(filename,unit_in,num,obs_type_in, nc)
 
    if (if_write) goto 999
    goto 1
-
-!--------------------------------------------------------------
 
 999 continue
    close (unit_in)

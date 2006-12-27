@@ -28,9 +28,6 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
    real, dimension(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
    real, dimension(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
 
-   real                         :: model_p  ! Model value p at oblocation.
-   real                         :: model_h  ! Model value h at oblocation.
-
    integer                      :: itt,ittf,itqv,itqvf
 
    if (iv%num_airsr < 1) return

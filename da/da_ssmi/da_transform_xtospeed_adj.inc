@@ -6,7 +6,6 @@ subroutine da_transform_xtospeed_adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
 
    implicit none
 
-   integer                :: i, j
    real,   intent (in  ) :: ADJ_speed
    real,   intent (in  ) :: U, V
    real,   intent (inout) :: ADJ_u, ADJ_v

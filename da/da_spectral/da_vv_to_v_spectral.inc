@@ -9,27 +9,27 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
 
    implicit none
 
-   integer, intent(in) :: ni                         ! Number of longitudes.
-   integer, intent(in) :: nj                         ! Number of latitudes.
-   integer, intent(in) :: r_cvsize                   ! Size of real control cv-array.
-   integer, intent(in) :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
-   integer, intent(in) :: inc                        ! Jump between elements of vector in array.
-   integer, intent(in) :: lenr                       ! FFT array dimension (at least inc*(n-1)+1).
-   real, intent(in)    :: field(1:ni,1:nj)           ! Gridpoint field.
-   real, intent(out)   :: rcv(1:r_cvsize)            ! Spectral modes.
-   integer, intent(in) :: lensav                     ! wsave dimension (n+int(log(real(ni)))+4).
-   integer, intent(in) :: lenwrk                     ! Dimension of work array.
-   integer, intent(in) :: alp_size                   ! Size of ALP vector.
-   real, intent(in)    :: alp(1:alp_size)            ! Associated Legendre Polynomials.
-   real, intent(in)    :: wsave(1:lensav)            ! Primes for FFT.
-   real, intent(in)    :: int_wgts(1:nj)             ! Legendre integration weights.
+   integer, intent(in) :: ni               ! Number of longitudes.
+   integer, intent(in) :: nj               ! Number of latitudes.
+   integer, intent(in) :: r_cvsize         ! Size of real control cv-array.
+   integer, intent(in) :: max_wavenumber   ! Smallest scale required (ni/2 - 1).
+   integer, intent(in) :: inc              ! Jump between elements of vector in array.
+   integer, intent(in) :: lenr             ! FFT array dimension (at least inc*(n-1)+1).
+   real, intent(in)    :: field(1:ni,1:nj) ! Gridpoint field.
+   real, intent(out)   :: rcv(1:r_cvsize)  ! Spectral modes.
+   integer, intent(in) :: lensav           ! wsave dimension (n+int(log(real(ni)))+4).
+   integer, intent(in) :: lenwrk           ! Dimension of work array.
+   integer, intent(in) :: alp_size         ! Size of ALP vector.
+   real, intent(in)    :: alp(1:alp_size)  ! Associated Legendre Polynomials.
+   real, intent(in)    :: wsave(1:lensav)  ! Primes for FFT.
+   real, intent(in)    :: int_wgts(1:nj)   ! Legendre integration weights.
 
-   integer             :: i, j, k, m, mm             ! Loop counters.
-   integer             :: sizec                      ! Size of complex cv-array
-   integer             :: index_r, index_c           ! Array index for complex v_fou.
-   integer             :: index_start, index_end     ! Position markers in cv.
-   real                :: r_fou(1:lenr)              ! FFT array.
-   real                :: work(1:lenwrk)             ! FFT work array. 
+   integer             :: i, j, m, mm            ! Loop counters.
+   integer             :: sizec                  ! Size of complex cv-array
+   integer             :: index_r, index_c       ! Array index for complex v_fou
+   integer             :: index_start, index_end ! Position markers in cv.
+   real                :: r_fou(1:lenr)          ! FFT array.
+   real                :: work(1:lenwrk)         ! FFT work array. 
    logical             :: odd_longitudes
    complex             :: v_fou(1:nj,0:max_wavenumber)! Intermediate Fourier state.
    complex             :: r_leg(1:nj)                 ! Intermediate Fourier state.

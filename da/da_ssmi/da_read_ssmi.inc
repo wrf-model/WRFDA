@@ -331,7 +331,7 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
    integer ,  intent (inout):: iprecip
 
    integer                 :: ipass1, ipass2
-   real                    :: rc, sst, dsst
+   real                    :: sst, dsst
    real                    :: theta,tc,wv,u,alw19,alw37,alw85
 
    !  print*,'tbdata',tb19v, tb19h, tb22v, tb37v,tb37h, tb85v, tb85h

@@ -48,9 +48,9 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
          call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
                                  model_q, iv%pseudo(n)%zk)
 
-!------------------------------------------------------------------------
-!        [3.0] Calculate observation O = B +(O-B):
-!------------------------------------------------------------------------
+         !---------------------------------------------------------------
+         ! [3.0] Calculate observation O = B +(O-B):
+         !---------------------------------------------------------------
 
          if (pseudo_var(1:1) == 'u' .or.  pseudo_var(1:1) == 'U') then
             ob % pseudo(n) % u = model_u + iv % pseudo(n) % u % inv

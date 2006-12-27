@@ -13,10 +13,6 @@ subroutine da_jo_and_grady_airsr(iv, re, jo, jo_grad_y)
    type (jo_type), intent(inout) :: jo         ! Obs cost function.
 
    integer                      :: n, k
-   ! the following "global" objects are used only when testing
-   type (ob_type) :: iv_glob         ! Global Innovation vector (O-B).
-   type (y_type)  :: re_glob         ! Global Residual vector (O-A).
-   type (y_type)  :: jo_grad_y_glob  ! Global Grad_y(Jo)
 
    jo % airsr_t = 0.0
    jo % airsr_q = 0.0

@@ -6,7 +6,6 @@ module da_physics
 
    use da_control
    use da_par_util
-!   use da_define_structures
    use da_grid_definitions
    use da_interpolation
    use da_dynamics

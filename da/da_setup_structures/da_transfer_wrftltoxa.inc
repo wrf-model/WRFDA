@@ -18,10 +18,10 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer :: i, j, k, n
+   integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
 
-   real :: sdmd, s1md, qvf1, qvf2, qvf1_b, qvf2_b
+   real :: sdmd, s1md
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
 

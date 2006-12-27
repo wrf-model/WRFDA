@@ -26,7 +26,6 @@ subroutine da_setup_runconstants(xp, xb, xbx)
    real                     :: coeff_ny      ! Multiplicative coefficients.
    real                     :: cos_coeff_nx  ! Multiplicative coefficients.
    real                     :: cos_coeff_ny  ! Multiplicative coefficients.
-   real                     :: delta_phi 
 
    if (trace_use) call da_trace_entry("da_setup_runconstants")
 

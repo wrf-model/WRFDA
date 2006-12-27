@@ -28,8 +28,6 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer          :: je_start, je_end             ! Start/end indices of Je.
-   real             :: jb                           ! jb
-   real             :: jo                           ! jo
    real             :: jo_partial                   ! jo for this processor
    real             :: gnorm_jb, gnorm_jo, gnorm_j, gnorm_je 
    type (y_type)    :: jo_grad_y ! Grad_y(jo)
@@ -38,8 +36,6 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    real             :: cv_je(1:cv_size_je)          ! Je control variable.
    real             :: xhat_je(1:cv_size_je)        ! Je control variable.
    integer          :: ndynopt
-
-   character(len=4) :: filnam
 
    integer          :: cg_jcdf
 

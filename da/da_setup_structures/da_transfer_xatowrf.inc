@@ -15,7 +15,7 @@ subroutine da_transfer_xatowrf(xbx, grid, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer :: i, j, k, n
+   integer :: i, j, k
 
    integer :: is, ie, js, je, ks, ke
 

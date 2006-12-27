@@ -16,14 +16,11 @@ subroutine da_transfer_wrftoxb(xbx, grid, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer :: i, j, k, n
+   integer :: i, j, k
 
    integer :: is, ie, js, je, ks, ke
 
-   real    :: theta, tmpvar, zrhom
-
-   real    :: ssmi_psfc, ssmi_ta,  ssmi_gamma, zcld, &
-              ssmi_tpw,  ssmi_alw, ssmi_dum,   ssmi_htpw 
+   real    :: theta, tmpvar
 
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme) :: rgh_fac
 

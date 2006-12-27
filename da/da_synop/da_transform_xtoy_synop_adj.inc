@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_synop_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
    integer                       :: n        ! Loop counter.
-   integer                       :: i, j, kz ! Index dimension.
+   integer                       :: i, j     ! Index dimension.
    real                          :: dx, dxm  ! 
    real                          :: dy, dym  !
 

@@ -23,10 +23,10 @@ subroutine da_biasprep(inst,ob,iv)
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
 
-   if (num_rad < 1 ) return
+   if (num_rad < 1) return
 
 #ifdef DM_PARALLEL
-   call mpi_comm_rank( mpi_comm_world, myproc, ierr )
+   call mpi_comm_rank( mpi_comm_world, myproc, ierr)
    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
 #else
    write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
@@ -35,7 +35,6 @@ subroutine da_biasprep(inst,ob,iv)
    call da_get_unit(biasprep_unit)
    open (unit=biasprep_unit,FILE=filename,FORM='unformatted')
 
-   !---------------------------------------------------------------------------
    npred = 4
    nchan = iv%instid(inst)%nchan 
 
@@ -68,7 +67,7 @@ subroutine da_biasprep(inst,ob,iv)
          !   write(unit=stdout,fmt=*) iv%instid(inst)%rad(j)%info%date_char
          !   write(unit=stdout,fmt=*) radbias%year, radbias%month, radbias%day, &
          !      radbias%hour, radbias%min, radbias%sec
-         !endif
+         !end if
 
          radbias%scanline     = iv%instid(inst)%rad(j)%scanline    ! not available
          radbias%scanpos      = iv%instid(inst)%rad(j)%scanpos

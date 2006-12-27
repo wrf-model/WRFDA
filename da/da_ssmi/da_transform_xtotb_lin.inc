@@ -9,7 +9,6 @@ subroutine da_transform_xtotb_lin(xa, xb)
    type (xb_type), intent(in)   :: xb       ! first guess state.
    type (x_type),  intent(inout):: xa       ! gridded analysis increment.
 
-   integer                      :: n        ! loop counter.
    integer                      :: ks,ke    ! Range of 3rd dimension of arrays.
    integer                      :: i,j,k
    real                         :: dum1, dum2, zrhom, TGL_zrhom

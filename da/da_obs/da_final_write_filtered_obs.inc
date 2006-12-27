@@ -6,7 +6,7 @@ subroutine da_final_write_filtered_obs
    !---------------------------------------------------------------------------
    implicit none        
 
-   integer                    :: i,k, iost,iunit, files, total_obs     
+   integer                    :: i,iost,iunit, files     
    type (multi_level_type)    :: platform
    real                       :: height_error
    character*20               :: filename

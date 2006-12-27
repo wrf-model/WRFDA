@@ -21,14 +21,13 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
    real                         :: model_t  ! Model value t at oblocation.
    real                         :: model_p  ! Model value p at oblocation.
    real                         :: model_q  ! Model value q at oblocation.
-   real                         :: model_h  ! Model value h at oblocation.
 
    real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. loc
    real, dimension(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. loc
 
    real :: hd, psfcm
 
-   real :: tsm , qsm , psm , hsm , ho, to, qo
+   real :: hsm , ho, to, qo
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 

@@ -12,7 +12,6 @@ subroutine da_add_noise_to_ob (iv, ob)
 
    real                          :: z1, z2, z3, z4, z5, z6, z7, dum ! Random numbers.
    integer                       :: n, k, inst     ! Loop counters.
-   integer                       :: ierr      ! Error code from MPI routines.
    integer                       :: ounit     ! Output unit
    integer                       :: num_obs, ios                 
    character(len=20)             :: ob_name, filename

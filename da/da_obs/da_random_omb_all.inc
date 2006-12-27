@@ -211,7 +211,7 @@ subroutine da_random_omb_all(iv, ob)
       end do
    end if
 
-!  [2.10] Transfer satem obs:
+   ! [2.10] Transfer satem obs:
 
    if (iv % num_satem > 0) then
       do n = 1, iv % num_satem
@@ -224,7 +224,7 @@ subroutine da_random_omb_all(iv, ob)
       end do
    end if
    
-!  [2.11] Transfer ssmt1 obs:
+   ! [2.11] Transfer ssmt1 obs:
 
    if (iv % num_ssmt1 > 0) then
       do n = 1, iv % num_ssmt1
@@ -237,7 +237,7 @@ subroutine da_random_omb_all(iv, ob)
       end do
    end if
 
-!  [2.12] Transfer ssmt2 obs:
+   ! [2.12] Transfer ssmt2 obs:
 
    if (iv % num_ssmt2 > 0) then
       do n = 1, iv % num_ssmt2
@@ -250,7 +250,7 @@ subroutine da_random_omb_all(iv, ob)
       end do
    end if
    
-!  [2.13] Transfer scatterometer obs:
+   ! [2.13] Transfer scatterometer obs:
 
    if (iv % num_qscat > 0) then
       do n = 1, iv % num_qscat
@@ -261,7 +261,7 @@ subroutine da_random_omb_all(iv, ob)
       end do
    end if
 
-!  [2.14] Transfer buoy obs:
+   ! [2.14] Transfer buoy obs:
 
    if (iv % num_buoy > 0) then
       do n = 1, iv % num_buoy

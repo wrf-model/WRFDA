@@ -18,7 +18,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer :: i, j, k, n
+   integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
    real    :: sdmd, s1md
    real    :: rho_cgrid

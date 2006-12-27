@@ -28,8 +28,7 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
    integer :: i,j,k,m,l,l1,m1,n
    real    :: rsigo(nsig),rsig(kz)
    real    :: coef1(kz),coef2(kz)
-   integer ::  lsig(kz)
-   real    :: clat_avn(1:2*nlath)
+   integer :: lsig(kz)
 
    if (trace_use) call da_trace_entry("da_chgvres")
 

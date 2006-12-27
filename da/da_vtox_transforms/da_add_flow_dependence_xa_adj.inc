@@ -16,8 +16,7 @@ subroutine da_add_flow_dependence_xa_adj (ne, ep, xa, vp)
    vp % alpha(:,:,:) = 0.0
 
    do n = ne, 1, -1
-
-!     ps:
+      ! ps:
       vp % alpha(its:ite,jts:jte,n) = vp % alpha(its:ite,jts:jte,n) + &
                                       ep % v5(its:ite,jts:jte,1,n) * & ! v5 = ps
                                       xa % psfc(its:ite,jts:jte)

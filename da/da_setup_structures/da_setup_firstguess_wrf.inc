@@ -14,17 +14,13 @@ subroutine da_setup_firstguess_wrf(xbx, grid, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer           :: ier    ! error index
-
-   integer           :: i, j, map_util_project
-   integer           :: wrf_dim1, wrf_dim2, wrf_dim3
+   integer           :: map_util_project
    real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
   
-   real              :: theta1, theta2, conv
+   real              :: conv
 
    character(len=24) :: xb_date, an_date
-   integer(kind=4)   :: flag
-   integer           :: len, index, seconds, i_grid,  j_grid, m_expand
+   integer           :: len, seconds, i_grid,  j_grid, m_expand
 
    if (trace_use) call da_trace_entry("da_setup_firstguess_wrf")
 

@@ -19,7 +19,7 @@ subroutine da_scan_obs (ob, xp, filename)
                                    fmt_loc, & 
                                    fmt_each
 
-   integer                      :: i, j, iost, fm, report,iunit
+   integer                      :: i, iost, fm, report,iunit
 
    type (multi_level_type)      :: platform
 

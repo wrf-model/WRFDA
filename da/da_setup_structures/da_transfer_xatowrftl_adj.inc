@@ -20,7 +20,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam, &
 
    ! Local variables
 
-   integer :: i, j, k, n
+   integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
    real    :: sdmd, s1md
    real    :: rho_cgrid

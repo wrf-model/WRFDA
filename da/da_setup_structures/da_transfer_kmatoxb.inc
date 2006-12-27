@@ -16,12 +16,11 @@ subroutine da_transfer_kmatoxb(xbx, grid, &
 
 #include "em_dummy_new_decl.inc"
 
-   integer :: i, j, k, n
+   integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
-   real    :: tmpvar, tmpvar1, earth_radius_sq,conv
-   real    :: tmpu,tmp_u,tmpv,tmp_v,tmpp,tmp_p,tmpps,tmp_ps
-   real    :: ddx, ddy                                        
-   real    :: rgh_fac(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)
+   real    :: tmpvar, earth_radius_sq,conv
+   real    :: tmpp,tmp_p,tmpps,tmp_ps
+   ! real    :: rgh_fac(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)
    character(len=19) :: current_date
  
    real :: TV(grid%xp%kms:grid%xp%kme)

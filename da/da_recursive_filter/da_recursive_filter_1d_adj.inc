@@ -11,7 +11,7 @@ subroutine da_recursive_filter_1d_adj(pass, alpha, field, n)
    real, intent(inout)    :: field(:)       ! Array to be filtered.
    integer, intent(in)    :: n              ! Size of field array.
    
-   integer                :: j, p           ! Loop counter.
+   integer                :: j              ! Loop counter.
    real                   :: one_alpha      ! 1 - alpha.
    real                   :: a(1:n)         ! Input field.
    real                   :: b(1:n)         ! Field after left-right pass.

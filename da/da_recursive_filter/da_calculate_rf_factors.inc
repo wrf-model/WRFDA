@@ -17,11 +17,13 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
    integer, parameter :: n = 500                ! 2n +1 = # pts in delta func.
    integer            :: kz                     ! 3rd array dimension.
    integer            :: pass                   ! Pass of recursive filter.
-   integer            :: k, nn                  ! Loop counters.
+   integer            :: k                      ! Loop counter
+   ! integer          :: nn                       ! Loop counter
       
    real               :: rf_e                   ! RF E factor.      
 
-   real, dimension(-n:n) :: field_in, field_out, field_out1  ! Working field.
+   real, dimension(-n:n) :: field_in, field_out  ! Working field.
+   ! real, dimension(-n:n) :: field_out1  ! Working field.
 
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:
@@ -63,7 +65,8 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
       rf_scale_factor(k) = 1.0 / field_out(0)
 
       ! Uncomment the following to test equivalence of UU^T and RF:
-      ! write(unit=stderr,fmt='(A,f15.5)')' RF Scaling Factor = ', 1.0 / field_out(0)
+      ! write(unit=stderr,fmt='(A,f15.5)') &
+      !    ' RF Scaling Factor = ', 1.0 / field_out(0)
       ! field_out1(-n:n) = field_in(-n:n)
       ! do pass = 1, rf_passes
       !    call da_recursive_filter_1d(pass, rf_alpha(k), field_out1, 2*n+1)

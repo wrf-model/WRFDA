@@ -6,7 +6,7 @@ subroutine da_wrfvar_finalize
 
    implicit none
 
-   integer :: i, err
+   integer :: i
    type(domain), pointer :: grid
 
    if (trace_use) call da_trace_entry ("da_wrfvar_finalize")

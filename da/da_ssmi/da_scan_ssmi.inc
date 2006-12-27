@@ -14,11 +14,9 @@ subroutine da_scan_ssmi (ob, xp, filename)
 
    character (LEN = 160)        :: fmt_info,    &
                                    fmt_loc
-   character (LEN = 40)         :: obs_platform
    character (LEN = 120)        :: char_ned
 
-   integer                      :: i, j, k, i1, j1, k1, iost, fm,iunit
-   real                         :: dx, dxm, dy, dym, dz, dzm
+   integer                      :: iost, fm,iunit
 
    type (model_loc_type)        :: loc
    type (info_type)             :: info

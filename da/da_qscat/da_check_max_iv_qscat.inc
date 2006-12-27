@@ -11,9 +11,6 @@ subroutine da_check_max_iv_qscat(it, qscat, itu, itvv, ituf, itvvf)
    type (qscat_type), intent(inout)       :: qscat
 
    integer                                :: iunit ! Output unit.
-   integer                                :: iu, ivv
-   integer                                :: iuf, ivf
-   integer                                :: i
    logical                                :: failed, print
 
    !---------------------------------------------------------------------------

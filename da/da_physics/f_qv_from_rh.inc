@@ -54,7 +54,8 @@
 
       REAL T_K , RH , QV_KG
       REAL P_PA0, T_K0, RH0
-      REAL P_MB , ES , QS , W_KG
+      ! REAL P_MB, W_KG
+      REAL ES , QS
       REAL P_MB0, ES0, QS0, QV_KG0
 !------------------------------------------------------------------------------C
 

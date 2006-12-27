@@ -14,7 +14,7 @@ subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
    character*200               :: filename              ! Input filename.
    character*10                :: var(1:5)              ! Variable name.
    integer                     :: ni, nj, nk            ! Grid dimensions.
-   integer                     :: e, i, j               ! Loop counters.
+   integer                     :: e                     ! Loop counter
    logical                     :: ldum1, ldum2,nkdum    ! Dummy.
    real                        :: temp3d(1:ix,1:jy,1:kz)! Temporary, real*4 array.
    real                        :: temp2d(1:ix,1:jy)     ! Temporary, real*4 array.

@@ -23,7 +23,6 @@ subroutine da_interpolate_regcoeff(iy, iys, kz, kzs, meanl_stats, &
      
    integer             :: i, is, i_south           ! Loop counters.
    integer             :: k1, k2, k, ks            ! Loop counters.
-   integer             :: itrap_min, itrap_max     ! Max/min limits of xb rows.
    integer             :: k1s, k2s
    real                :: lat_wgt
 

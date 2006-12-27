@@ -13,7 +13,6 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    integer      ,intent (in)    :: nc      
 
    integer      :: num_obs 
-   character*9  :: dummy_c
    character*20 :: ob_type               
    logical   :: if_write
    

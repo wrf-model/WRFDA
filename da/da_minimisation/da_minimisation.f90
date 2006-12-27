@@ -33,17 +33,7 @@ module da_minimisation
 
    implicit none
 
-   integer :: infoc
-   logical :: brackt,stage1
-   real :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
-           finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
-           stmin,stmax,width,width1,xtrapf
-
    private :: da_dot, da_dot_cv
-   private :: infoc, brackt, stage1
-   private :: dg,dgm,dginit,dgtest,dgx,dgxm,dgy,dgym, &
-              finit,ftest1,fm,fx,fxm,fy,fym,p5,p66,stx,sty, &
-              stmin,stmax,width,width1,xtrapf,zero
 
 contains
       

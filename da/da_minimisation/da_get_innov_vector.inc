@@ -155,11 +155,11 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
    if (omb_add_noise) then
       call da_add_noise_to_ob( iv, ob)
-!#ifdef DM_PARALLEL
-!      if ((num_procs > 1) .and.(.not. use_radiance)) call da_write_noise_to_ob(iv)
-!      if ((.not. use_radiance)) call da_write_noise_to_ob(iv)
+   !#ifdef DM_PARALLEL
+   !      if ((num_procs > 1) .and.(.not. use_radiance)) call da_write_noise_to_ob(iv)
+   !      if ((.not. use_radiance)) call da_write_noise_to_ob(iv)
       call da_write_noise_to_ob(iv)
-!#endif
+   !#endif
    end if
 
    !----------------------------------------------

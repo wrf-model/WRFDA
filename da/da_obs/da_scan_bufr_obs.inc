@@ -12,8 +12,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    character(*),   intent (in)   :: filename
 
    type (multi_level_type)      :: platform
-   logical                      :: outside, cycle_report
-   real                         :: height_error
+   logical                      :: outside
    integer                      :: total_obs, &
                                    num_sound, &
                                    num_synop, &
@@ -40,7 +39,6 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    integer           :: iost, ndup, n, report
    integer           :: year,month, day,hour
    integer           :: iret,idate, kx, nrecs,miscd, t29
-   logical           :: exist
    integer           :: iunit
 
    ! default value

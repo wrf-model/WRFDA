@@ -14,7 +14,7 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
    type (be_type), intent(in), optional :: be  ! Background errors.
    type (xpose_type), intent(inout)     :: xp  ! Transpose variables.
 
-   integer         :: n, k, j, k1              ! Loop counters.
+   integer         :: k, j, k1              ! Loop counters.
 
    if (trace_use) call da_trace_entry("da_transform_vptox_adj")
 

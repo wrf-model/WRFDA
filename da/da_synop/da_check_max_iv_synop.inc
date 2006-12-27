@@ -10,7 +10,6 @@ subroutine da_check_max_iv_synop(it, synop, &
   type (synop_type), intent(inout)       :: synop
   integer, intent(inout) :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
-  integer                                :: i
   logical                                :: failed
 
   !---------------------------------------------------------------------------

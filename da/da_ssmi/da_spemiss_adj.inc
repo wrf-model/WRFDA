@@ -23,7 +23,6 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
    complex   etav,etah,eps,cterm1v,cterm1h,cterm2,cterm3v,cterm3h,epsnew
    complex   ADJ_etav,ADJ_eps,ADJ_cterm1v,ADJ_cterm2,ADJ_cterm3v
    complex   ADJ_cterm3h,ADJ_epsnew
-   complex   uniti
    real      tmp1r,tmp1i,tmp2r,tmp2i,tmp0r,tmp0i,rnorm
    real      ADJ_tc,ADJ_tmp0r,ADJ_tmp0i,ADJ_rnorm,ADJ_tmp1r
    real      ADJ_tmp1i,ADJ_tmp2r,ADJ_tmp2i

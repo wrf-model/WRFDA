@@ -41,7 +41,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
 
    type (y_type)                     :: jo_grad_y        ! Grad_y(Jo)
 
-   integer                           :: ndynopt, cg_jcdf
+   integer                           :: cg_jcdf
 
    if (trace_use) call da_trace_entry("da_minimise_cg")
 

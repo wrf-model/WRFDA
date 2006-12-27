@@ -10,7 +10,7 @@ subroutine da_setup_be_global (be)
 
    integer                     :: nrec
    integer                     :: max_wave_in        ! Dimension of input power
-   integer                     :: i, j, k, ic, jc, n ! Loop counters
+   integer                     :: i, j, k, n ! Loop counters
    ! real, allocatable   :: height(:,:,:)      ! Height field.
    integer, allocatable:: bin(:,:,:)      ! Bin assigned to each 3D point
    integer, allocatable:: bin2d(:,:)      ! Bin assigned to each 2D point
@@ -19,14 +19,13 @@ subroutine da_setup_be_global (be)
    integer             :: num_bins2d      ! Number of bins (3D fields).
    logical             :: use_global_eofs ! True if projected data uses global EOFs
 
-   integer             :: num_bins_hgt       ! Used if bin_type = 2. 
    real                :: binwidth_lat       ! Used if bin_type = 2 (degrees) 
    real                :: binwidth_hgt       ! Used if bin_type = 2 (m)
    real                :: hgt_min, hgt_max   ! Used if bin_type = 2 (m)
    real                :: lat_min, lat_max   ! Used if bin_type = 2 (degrees)
 
    character*10         :: variable
-   integer              :: ni, nj, nk, b, nlev , be_unit
+   integer              :: ni, nj, nk, b, be_unit
    integer, allocatable :: max_wave(:)
    real, allocatable    :: evec_g(:,:)
    real, allocatable    :: eval_g(:)  

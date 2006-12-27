@@ -12,7 +12,6 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    integer      ,intent (in)    :: nc      
 
    integer      :: num_obs , unit_in, ios
-   character*9  :: dummy_c
    character*20 :: ob_type               
    logical      :: if_write
    

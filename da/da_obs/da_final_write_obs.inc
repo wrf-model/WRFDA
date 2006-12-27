@@ -10,7 +10,7 @@ subroutine da_final_write_obs(ob, iv, re)
    type (ob_type), intent(in)    :: iv      ! O-B structure.
    type (y_type), intent(inout)  :: re      ! residual vector.
  
-   integer                       :: n, k,kk, iunit
+   integer                       :: n, k, iunit
    integer                       :: ios  ! Error code from MPI routines.
    integer                       :: num_obs, num_sound_obs
    character*20, allocatable     :: filename(:)
