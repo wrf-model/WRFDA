@@ -3,7 +3,7 @@ subroutine da_tp_to_qs( t, p, es, qs)
    !---------------------------------------------------------------------------
    ! Purpose: Convert T/p to saturation specific humidity.
    !
-   !  METHOD: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
+   !  Method: qs = es_alpha * es / ( p - ( 1 - rd_over_rv ) * es ).
    !          use Rogers & Yau (1989) formula: es = a exp( bTc / (T_c + c) )
    !--------------------------------------------------------------------------
 

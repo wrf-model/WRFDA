@@ -3,7 +3,7 @@ subroutine da_balance_cycloterm( xb, k, term_x, term_y)
    !---------------------------------------------------------------------------
    !  Purpose: Calculates cyclostrophic term in balance equation.
    !
-   !  METHOD:  Term is rho (u.grad ) u on a single level.
+   !  Method:  Term is rho (u.grad ) u on a single level.
    !---------------------------------------------------------------------------
 
    implicit none

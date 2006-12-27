@@ -4,7 +4,7 @@ subroutine da_transform_xtoy_rad (xa, iv, xp, y)
    !  Purpose: transform from analysis increment to 
    !                          pertubation radiance.
    !
-   !  METHOD:  delta_y = H delta_x
+   !  Method:  delta_y = H delta_x
    !           1. input reference state of RTTOV_TL
    !           2. interpolate analysis increment to obs location
    !           3. Call RTTOV_TL

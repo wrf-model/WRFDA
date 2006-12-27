@@ -3,9 +3,9 @@ subroutine da_prho_to_t_adj(xb, xp, xa)
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of da_prho_to_t.
    !
-   !  METHOD:  Standard adjoint coding.
+   !  Method:  Standard adjoint coding.
    !
-   !  ASSUMPTIONS: 1) Model level stored top down.
+   !  Assumptions: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none

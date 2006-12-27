@@ -3,7 +3,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    !--------------------------------------------------------------------------
    ! Purpose: Test observation operator transform and adjoint for compatibility.
    !
-   ! METHOD:  Standard adjoint test: < y, y > = < x, x_adj >.
+   ! Method:  Standard adjoint test: < y, y > = < x, x_adj >.
    !---------------------------------------------------------------------------
    
    implicit none

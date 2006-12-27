@@ -3,7 +3,7 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
    !---------------------------------------------------------------------------
    ! Purpose: Calculate Gradient_y i and cost function Jo for radiance data.
    !
-   ! METHOD:  grad_y = -R^-1 (d - H delta_x)
+   ! Method:  grad_y = -R^-1 (d - H delta_x)
    !              Jo = -(d - H delta_x) grad_y
    !---------------------------------------------------------------------------
 

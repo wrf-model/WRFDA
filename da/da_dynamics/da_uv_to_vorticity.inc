@@ -4,7 +4,7 @@ subroutine da_uv_to_vorticity(xb , u, v, vor)
    !  Purpose: Calculate vorticity on a co-ordinate surface, given an input 
    !           wind field.
    !
-   !  METHOD:  vor = m**2 (d(v/m)/dx - d(u/m)/dy)
+   !  Method:  vor = m**2 (d(v/m)/dx - d(u/m)/dy)
    !---------------------------------------------------------------------------
 
    implicit none

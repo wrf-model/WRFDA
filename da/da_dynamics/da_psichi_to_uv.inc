@@ -3,10 +3,10 @@ subroutine da_psichi_to_uv(psi, chi, coefx,coefy, u, v)
    !---------------------------------------------------------------------------
    !  Purpose: Calculate wind components u and v from psi and chi.
    !
-   !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
+   !  Method:  u = coefx * (-dpsi/dy + dchi/dx)
    !           v = coefy * ( dpsi/dx + dchi/dy)
    !
-   !  ASSUMPTIONS: Unstaggered grid.
+   !  Assumptions: Unstaggered grid.
    !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
    !               grid size may or may not be equal
    !----------------------------------------------------------------------------

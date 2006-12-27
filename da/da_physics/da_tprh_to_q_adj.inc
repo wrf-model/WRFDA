@@ -61,47 +61,47 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
 
 end subroutine da_tprh_to_q_adj
 
-!subroutine da_tprh_to_q_adj( t, p, es, q, rh, &
-!                             t_prime, p_prime, rh_prime, q_prime, n )
+   !subroutine da_tprh_to_q_adj( t, p, es, q, rh, &
+   !                             t_prime, p_prime, rh_prime, q_prime, n )
 
-!------------------------------------------------------------------------------
-!  Purpose: Adjoint of da_tprh_to_q_adj.
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   !  Purpose: Adjoint of da_tprh_to_q_adj.
+   !---------------------------------------------------------------------------
 
-!   implicit none
+   !   implicit none
 
-!   integer        i, n
-!   real           t, es, p, q, rh,t_prime, p_prime, rh_prime, q_prime  
-!   dimension      t       (n) ! Temperature.
-!   dimension      es      (n) ! Saturation vapour pressure.
-!   dimension      p       (n) ! Pressure.
-!   dimension      q       (n) ! Specific humidity.
-!   dimension      rh      (n) ! Relative Humidity.
-!   dimension      t_prime (n) ! Temperature increment.
-!   dimension      p_prime (n) ! Pressure increment.
-!   dimension      rh_prime(n) ! Pressure increment.
-!   dimension      q_prime (n) ! Pressure increment.
-   
-!   real        temp, qs_prime_over_qs  ! Temporary storage.
-!   dimension   qs_prime_over_qs(n)     ! qs~/qs.
+   !   integer        i, n
+   !   real           t, es, p, q, rh,t_prime, p_prime, rh_prime, q_prime  
+   !   dimension      t       (n) ! Temperature.
+   !   dimension      es      (n) ! Saturation vapour pressure.
+   !   dimension      p       (n) ! Pressure.
+   !   dimension      q       (n) ! Specific humidity.
+   !   dimension      rh      (n) ! Relative Humidity.
+   !   dimension      t_prime (n) ! Temperature increment.
+   !   dimension      p_prime (n) ! Pressure increment.
+   !   dimension      rh_prime(n) ! Pressure increment.
+   !   dimension      q_prime (n) ! Pressure increment.
 
-!   do i = 1,n
-!   temp = q(i) * q_prime(i)
+   !   real        temp, qs_prime_over_qs  ! Temporary storage.
+   !   dimension   qs_prime_over_qs(n)     ! qs~/qs.
 
-!------------------------------------------------------------------------------
-!  [2.0] Calculate relative humidity increment:
-!------------------------------------------------------------------------------
+   !   do i = 1,n
+   !   temp = q(i) * q_prime(i)
 
-!   rh_prime(i) = rh_prime(i) + temp / rh(i)
-!   qs_prime_over_qs(i) = temp
-!   end do
+   !---------------------------------------------------------------------------
+   !  [2.0] Calculate relative humidity increment:
+   !---------------------------------------------------------------------------
 
-!------------------------------------------------------------------------------
-!  [1.0] Calculate saturation specific humidity ratio qs~/qs:
-!------------------------------------------------------------------------------
+   !   rh_prime(i) = rh_prime(i) + temp / rh(i)
+   !   qs_prime_over_qs(i) = temp
+   !   end do
 
-!   call da_tp_to_qs_adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
+   !---------------------------------------------------------------------------
+   !  [1.0] Calculate saturation specific humidity ratio qs~/qs:
+   !---------------------------------------------------------------------------
 
-!end subroutine da_tprh_to_q_adj
+   !   call da_tp_to_qs_adj( t, p, es, t_prime, p_prime, qs_prime_over_qs, n )
+
+   !end subroutine da_tprh_to_q_adj
 
 

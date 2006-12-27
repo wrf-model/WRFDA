@@ -2,7 +2,7 @@ subroutine da_sort_rad (iv)
 !------------------------------------------------------------------------------
 !  Purpose: sorting radiance innovation to FGAT time bins
 !
-!   METHOD: using a temporary radaince variable  
+!   Method: using a temporary radaince variable  
 !
 !  HISTORY: 04/26/2006 - Creation            Zhiquan Liu
 !

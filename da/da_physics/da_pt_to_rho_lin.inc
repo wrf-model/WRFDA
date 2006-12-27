@@ -3,9 +3,9 @@ subroutine da_pt_to_rho_lin(xb, xa, xp)
    !---------------------------------------------------------------------------
    ! Purpose: Calculates density increments from pressure/temperature increments
    !
-   ! METHOD:  Linearised ideal gas law: rho~/rho = p'/p - T'/T
+   ! Method:  Linearised ideal gas law: rho~/rho = p'/p - T'/T
    !
-   ! ASSUMPTIONS: 1) Model level stored top down.
+   ! Assumptions: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none

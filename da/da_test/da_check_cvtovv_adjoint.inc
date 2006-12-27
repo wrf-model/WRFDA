@@ -3,7 +3,7 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv)
    !---------------------------------------------------------------------------
    ! Purpose: Test vtovv routine and adjoint for compatibility.
    !
-   ! METHOD:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
+   ! Method:  Standard adjoint test: < vv, vv > = < cv_adj, cv >.
    !---------------------------------------------------------------------------
 
    implicit none

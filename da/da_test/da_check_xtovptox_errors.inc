@@ -5,7 +5,7 @@ subroutine da_check_xtovptox_errors(xa, xa2_u, xa2_v, xa2_w, xa2_t, &
    !---------------------------------------------------------------------------
    ! Purpose: Test invertibility of v = U^{-1} x followed by x = Uv.
    !
-   !  METHOD:  Perform statistics on differences in initial and final x.
+   !  Method:  Perform statistics on differences in initial and final x.
    !---------------------------------------------------------------------------
 
    implicit none

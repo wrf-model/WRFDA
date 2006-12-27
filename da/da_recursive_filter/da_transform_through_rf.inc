@@ -4,7 +4,7 @@ subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
    !---------------------------------------------------------------------------
    ! Purpose: Control variable transform through the recursive filter.  
    !
-   ! METHOD: 1) Transform to nondimensional v_hat space.
+   ! Method: 1) Transform to nondimensional v_hat space.
    !         2) Perform recursive filter in non-dimensional space (ds = 1).
    !         3) Scale recursive filter output.
    !         4) Transform filtered field to dimensional space.

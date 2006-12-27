@@ -3,7 +3,7 @@ subroutine da_check_balance(phi, phi_u)
    !---------------------------------------------------------------------------
    ! Purpose: Compare balanced mass (phi_b - function of wind) and actual phi.
    !
-   ! METHOD:  Calculate correlation between balanced and actual phi.
+   ! Method:  Calculate correlation between balanced and actual phi.
    !---------------------------------------------------------------------------
 
    implicit none

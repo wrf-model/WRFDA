@@ -3,7 +3,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
    !
-   !   METHOD: use F90 sequential data structure to avoid reading file twice  
+   !   Method: use F90 sequential data structure to avoid reading file twice  
    !            so that da_scan_bufrtovs is not necessary any more.
    !            1. read file radiance data in sequential data structure
    !            2. do gross QC check

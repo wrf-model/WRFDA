@@ -3,7 +3,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    !---------------------------------------------------------------------------
    ! Purpose: read in kma 1dvar innovation output to innovation and obs structure
    !
-   ! METHOD: use F90 sequantial data structure to avoid read file twice  
+   ! Method: use F90 sequantial data structure to avoid read file twice  
    !          so that da_scan_bufrtovs is not necessary any more.
    !          1. read radiance data in sequential data structure
    !          2. assign sequential data structure to innovation structure

@@ -3,7 +3,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa)
    !---------------------------------------------------------------------------
    ! Purpose: Test Vp to X routine and adjoint for compatibility.
    !
-   ! METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
+   ! Method:  Standard adjoint test: < x, x > = < v_adj, v >.
    !---------------------------------------------------------------------------
 
    implicit none

@@ -3,7 +3,7 @@ subroutine da_calculate_grady_rad(iv, re, jo_grad_y)
    !------------------------------------------------------------------------------
    !  Purpose: Calculate Gradient_y for radiance data.
    !
-   !  METHOD:  grad_y = -R^-1 (d - H delta_x).
+   !  Method:  grad_y = -R^-1 (d - H delta_x).
    !------------------------------------------------------------------------------
 
    implicit none

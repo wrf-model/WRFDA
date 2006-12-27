@@ -1,6 +1,5 @@
 subroutine da_transfer_xatowrf(xbx, grid, &
 #include "em_dummy_new_args.inc"
-!
                              )
 
    !---------------------------------------------------------------------------
@@ -220,7 +219,7 @@ subroutine da_transfer_xatowrf(xbx, grid, &
       end do
    end do
 
-   ! .. To compute the geopotential height increment:
+   ! To compute the geopotential height increment:
 
    do k=ks, ke+1
      do j=js,je

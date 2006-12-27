@@ -4,7 +4,7 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
    ! Purpose: Check eigenvectors E of vertical covariance matrix B_{x} which 
    ! have been read in from NMC-statistics file.
    !
-   ! METHOD:  E and L (eigenvalues) are computed using LAPACK/BLAS software in 
+   ! Method:  E and L (eigenvalues) are computed using LAPACK/BLAS software in 
    ! the NMC code using the definition E^{T} B_{x} E = L. This routine checks 
    ! for eigenvector orthogonality and completeness as defined below.
    !---------------------------------------------------------------------------

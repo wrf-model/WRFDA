@@ -3,7 +3,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: write out innovation vector structure for radiance data.
    !
-   ! METHOD: write out for separated PEs 
+   ! Method: write out for separated PEs 
    !---------------------------------------------------------------------------
 
    implicit none

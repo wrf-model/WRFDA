@@ -4,7 +4,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    !---------------------------------------------------------------------------
    !  Purpose: Perform V To Y Adjoint transform test                             
    !
-   !  METHOD:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.!
+   !  Method:  Perform adjoint test on complete transform: <y,y> = <v_adj,v>.!
    !---------------------------------------------------------------------------
 
    implicit none

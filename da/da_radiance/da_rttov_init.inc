@@ -3,7 +3,7 @@ subroutine da_rttov_init(iv,ob)
 !------------------------------------------------------------------------------
 !  Purpose: interface to the initialization subroutine of RTTOV8_5.
 !
-!  METHOD:  1. read RTTOV coefs files; 2. allocate radiance structure
+!  Method:  1. read RTTOV coefs files; 2. allocate radiance structure
 !
 !  HISTORY: 07/28/2005 - Creation                               Zhiquan Liu
 !           03/22/2006   add error tuning factor read in        Zhiquan Liu

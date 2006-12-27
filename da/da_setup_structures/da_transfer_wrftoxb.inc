@@ -1,5 +1,5 @@
 subroutine da_transfer_wrftoxb(xbx, grid, &
-#include <em_dummy_new_args.inc>
+#include "em_dummy_new_args.inc"
                              )
 
    !---------------------------------------------------------------------------
@@ -14,7 +14,7 @@ subroutine da_transfer_wrftoxb(xbx, grid, &
 
    ! Definitions of dummy arguments to solve
 
-#include <em_dummy_new_decl.inc>
+#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k, n
 

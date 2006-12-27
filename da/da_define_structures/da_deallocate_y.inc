@@ -3,7 +3,7 @@ subroutine da_deallocate_y(y)
    !---------------------------------------------------------------------------
    ! Purpose: Deallocate arrays used in y and residual obs structures.
    !
-   ! METHOD:  Deallocate component in turn.
+   ! Method:  Deallocate component in turn.
    !---------------------------------------------------------------------------
 
    implicit none

@@ -9,7 +9,7 @@ subroutine da_trh_to_td (RH, T, TD, xp)
    !  -------
    !     COMPUTE DEW POinT FROM TEMPERATURE AND RELATIVE HUMIDITY
    !
-   !   METHOD:
+   !   Method:
    !   ------
    !     inVERT THE RELATION
    !

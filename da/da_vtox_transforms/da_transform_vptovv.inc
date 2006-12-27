@@ -5,7 +5,7 @@ subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
    ! Purpose: Transform from fields on vertical levels to fields on vertical 
    ! EOFS.
    !
-   !  METHOD:  Perform vv(i,j,m) = L^{-1/2} E^{T} vp(i,j,k) transform.
+   !  Method:  Perform vv(i,j,m) = L^{-1/2} E^{T} vp(i,j,k) transform.
    !---------------------------------------------------------------------------
 
    implicit none

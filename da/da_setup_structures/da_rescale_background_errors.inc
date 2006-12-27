@@ -4,7 +4,7 @@ subroutine da_rescale_background_errors (ix, jy, var_scaling, len_scaling, &
    !---------------------------------------------------------------------------
    ! Purpose: Rescale wrfvar background errors.
    !
-   ! METHOD:  Empirical scaling and inclusion of recursive filter rescaling.
+   ! Method:  Empirical scaling and inclusion of recursive filter rescaling.
    !---------------------------------------------------------------------------
 
    implicit none

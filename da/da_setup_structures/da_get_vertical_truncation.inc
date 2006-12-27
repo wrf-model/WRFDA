@@ -3,7 +3,7 @@ subroutine da_get_vertical_truncation( max_vert_var, eigenval, be_sub)
    !---------------------------------------------------------------------------
    !  Purpose: Calculate vertical mode truncation from explained variance.
    !
-   !  METHOD:  Calculate cumulative variance and compare with limit.
+   !  Method:  Calculate cumulative variance and compare with limit.
    !---------------------------------------------------------------------------
 
    implicit none

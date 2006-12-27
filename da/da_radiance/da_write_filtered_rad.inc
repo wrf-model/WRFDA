@@ -3,7 +3,7 @@ subroutine da_write_filtered_rad(ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: write out QCed radiance data.
    !
-   ! METHOD: write out for separate PEs 
+   ! Method: write out for separate PEs 
    !---------------------------------------------------------------------------
 
    implicit none

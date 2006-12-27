@@ -6,7 +6,7 @@ subroutine da_integrat_dz(xb)
    !
    ! Purpose: To calculate the IWV from the model QV and PP, TT.
    !
-   ! METHOD:  IWV = sum {QV * RHO * dZ}
+   ! Method:  IWV = sum {QV * RHO * dZ}
    !
    !           Unit: Qv (Kg/Kg), RHO(Kg/M^3), dZ(M)
    !                 PW (cm)

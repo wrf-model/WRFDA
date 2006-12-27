@@ -3,7 +3,7 @@ subroutine da_pt_to_rho_adj(xb, xa)
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of da_pt_to_rho.
    !
-   !  ASSUMPTIONS: 1) Model level stored top down
+   !  Assumptions: 1) Model level stored top down
    !---------------------------------------------------------------------------
 
    implicit none

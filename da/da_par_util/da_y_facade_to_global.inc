@@ -7,7 +7,7 @@ subroutine da_y_facade_to_global( re_slice, template, re_glob_slice )
    !           serial-code-order during bitwise-exact testing of 
    !           distributed-memory parallel configurations.  
    !
-   ! METHOD:   Indices stowed away during Read_Obs() are used to restore serial 
+   ! Method:   Indices stowed away during Read_Obs() are used to restore serial 
    !           storage order.  Memory for global objects is allocated here.  
    !           Global objects are minimally allocated to save memory.  
    !           Memory must be deallocated by the caller via a call to 

@@ -4,7 +4,7 @@ subroutine da_check_vp_errors(vp1, vp2, ne, &
    !---------------------------------------------------------------------------
    ! Purpose: Test invertibility of transform to/from Vp or Vv
    !
-   ! METHOD:  Perform statistics on differences in initial and final Vv or Vp
+   ! Method:  Perform statistics on differences in initial and final Vv or Vp
    !---------------------------------------------------------------------------
 
    implicit none

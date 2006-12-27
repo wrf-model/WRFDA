@@ -5,10 +5,10 @@ subroutine da_moist_phys_adj(xb, xa, xp)
    !           A warm rain process is used in this subroutine. 
    !           This is the adjoint code of the scheme.
    !
-   !  METHOD: The warm rain process is according to Hsie and Anthes (1984)
+   !  Method: The warm rain process is according to Hsie and Anthes (1984)
    !          and Dudhia (1989)
    !
-   !  ASSUMPTIONS: 1) Model level stored top down.
+   !  Assumptions: 1) Model level stored top down.
    !---------------------------------------------------------------------------
 
    implicit none

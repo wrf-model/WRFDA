@@ -3,7 +3,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    !---------------------------------------------------------------------------
    ! Purpose: Test Vv to Vp routine and adjoint for compatibility.
    !
-   ! METHOD:  Standard adjoint test: < Vp, Vp > = < Vv_adj, Vv >.
+   ! Method:  Standard adjoint test: < Vp, Vp > = < Vv_adj, Vv >.
    !---------------------------------------------------------------------------
 
    implicit none

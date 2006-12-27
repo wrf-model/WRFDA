@@ -3,7 +3,7 @@ subroutine da_omb_stats_rad (stats_unit, iv)
    !---------------------------------------------------------------------------
    ! Purpose: Calculate statistics of obs minus background for radiance data.
    !
-   ! METHOD:  average, rms, minimum, maximum of iv
+   ! Method:  average, rms, minimum, maximum of iv
    !---------------------------------------------------------------------------
 
    implicit none

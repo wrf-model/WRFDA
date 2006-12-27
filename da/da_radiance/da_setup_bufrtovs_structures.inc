@@ -3,7 +3,7 @@ SUBROUTINE da_setup_bufrtovs_structures(xp, ob, iv)
 !------------------------------------------------------------------------------
 ! Purpose: Define, allocate and read of tovs raidance observation structure.
 !
-! METHOD:  Define, allocate and read of tovs radiance observation structure.
+! Method:  Define, allocate and read of tovs radiance observation structure.
 !
 !   20/07/2005 -     Creation        Zhiquan Liu 
 !

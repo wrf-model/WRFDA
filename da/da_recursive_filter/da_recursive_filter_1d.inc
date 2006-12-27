@@ -3,7 +3,7 @@ subroutine da_recursive_filter_1d(pass, alpha, field, n)
    !---------------------------------------------------------------------------
    ! Purpose: Perform one pass of recursive filter on 1D array.
    !
-   ! METHOD:  Perform right-moving filter followed by left-moving filter.
+   ! Method:  Perform right-moving filter followed by left-moving filter.
    !---------------------------------------------------------------------------
 
    implicit none

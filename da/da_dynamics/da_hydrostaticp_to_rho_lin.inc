@@ -3,7 +3,7 @@ subroutine da_hydrostaticp_to_rho_lin( xb, xp, p, rho )
    !---------------------------------------------------------------------------
    !  Purpose: Calculates density increment from pressure increment field.
    !
-   !  METHOD:  Hydrostatic eqn => rho~ = -dP~/dz / g.
+   !  Method:  Hydrostatic eqn => rho~ = -dP~/dz / g.
    !
    !  Assumptions: 1) Hydrostatic pressure.
    !               2) Model level stored top down.

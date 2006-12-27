@@ -4,7 +4,7 @@ subroutine da_balance_cycloterm_lin( rho, ub, vb, u, v, coefx,  &
    !---------------------------------------------------------------------------
    ! Purpose: Calculates linearised cyclostrophic term in balance equation.
    !
-   ! METHOD:  Term is rho (u.grad) u on a single level.
+   ! Method:  Term is rho (u.grad) u on a single level.
    !---------------------------------------------------------------------------
 
    implicit none

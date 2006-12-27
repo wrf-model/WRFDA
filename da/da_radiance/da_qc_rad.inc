@@ -3,7 +3,7 @@ subroutine da_qc_rad (ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for radiance data.
    !
-   ! METHOD:  seperated QC for each sensor
+   ! Method:  seperated QC for each sensor
    !---------------------------------------------------------------------------
 
    implicit none

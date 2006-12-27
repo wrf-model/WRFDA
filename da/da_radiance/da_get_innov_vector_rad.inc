@@ -3,7 +3,7 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
    !---------------------------------------------------------------------------
    !  Purpose: Calculate innovation vector for radiance data.
    !
-   !  METHOD:  d = y - H(x)
+   !  Method:  d = y - H(x)
    !       1. interpolate xb to obs location
    !       2. call foreward RTM to get simulated bright temperature 
    !       3. obs BT - simulated BT

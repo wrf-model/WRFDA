@@ -4,7 +4,7 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    !---------------------------------------------------------------------------
    ! Purpose: Test V to X routine and adjoint for compatibility.
    !
-   ! METHOD:  Standard adjoint test: < x, x > = < v_adj, v >.
+   ! Method:  Standard adjoint test: < x, x > = < v_adj, v >.
    !---------------------------------------------------------------------------
 
    implicit none

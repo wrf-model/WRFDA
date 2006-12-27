@@ -3,7 +3,7 @@ subroutine da_solve_poissoneqn_fst(xbx, xp, del2b, b)
    !--------------------------------------------------------------------------
    !  Purpose: Solve Del**2 B = A for B with zero field boundary conditions.
    !
-   !  METHOD:  1) Compute spectral del2b using double forward FST.
+   !  Method:  1) Compute spectral del2b using double forward FST.
    !           2) Calculate spectral b.
    !           3) Reform gridpt. b using inverse double FST.
    !           Note no mean removed (would make b.ne.0 at boundaries) so

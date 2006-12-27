@@ -6,7 +6,7 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    !---------------------------------------------------------------------------
    ! Purpose: determine surface type at obs locations.
    !
-   ! METHOD: using the background information 
+   ! Method: using the background information 
    !      1. get the background landmask/snow/sea-ice
    !      2. calculate percentage of sea/ice/land/snow
    !      3. determine surface type at obs location

@@ -3,10 +3,10 @@ subroutine da_psichi_to_uv_adj(u, v, coefx, coefy, psi, chi)
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint code of da_psichi_to_uv  
    !
-   !  METHOD:  u = coefx * (-dpsi/dy + dchi/dx)
+   !  Method:  u = coefx * (-dpsi/dy + dchi/dx)
    !           v = coefy * ( dpsi/dx + dchi/dy)
    !
-   !  ASSUMPTIONS: Unstaggered grid.
+   !  Assumptions: Unstaggered grid.
    !               Lateral boundary conditions - dpsi/dn, dchi/dn = 0 (FCT)
    !               grid size may or may not be equal
    !

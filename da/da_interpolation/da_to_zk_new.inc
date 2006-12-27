@@ -28,7 +28,6 @@ subroutine da_to_zk_new(obs_v, mdl_v, xp, v_interp_optn, zk,num,nlevels)
       if (anal_type_verify) then
          do n=1,num
             do k=1,nlevels
-!write(0,*) n,k,"obs_v(k),mdl_v(xp%kts,n)",obs_v(k),mdl_v(xp%kts,n)
                if (obs_v(k) > mdl_v(xp%kts,n)) then
                   ! below the lowest level:
                   zk(k,n) = r_ktsplus - &

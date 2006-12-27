@@ -69,51 +69,47 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
 end subroutine da_tp_to_qs_adj
 
-!subroutine da_tp_to_qs_adj( t, p, es, t_prime, p_prime, &
-!                            qs_prime_over_qs, n )
+   !subroutine da_tp_to_qs_adj( t, p, es, t_prime, p_prime, &
+   !                            qs_prime_over_qs, n )
 
-!------------------------------------------------------------------------------
-!  Purpose: Adjoint of da_tp_to_qs_lin.
-!
-!  METHOD: Standard adjoint coding.
-!
-!  HISTORY: 10/03/2000 - Creation of F90 version.           Dale Barker
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Adjoint of da_tp_to_qs_lin
+   !---------------------------------------------------------------------------
 
-!   implicit none
+   ! implicit none
 
-!   integer      i, n
-!   real         t, p, es, t_prime, p_prime, qs_prime_over_qs
-!   dimension    t               (n) ! Temperature.
-!   dimension    p               (n) ! Pressure.
-!   dimension    es              (n) ! Sat. vapour pressure.
-!   dimension    t_prime         (n) ! Temperature increment.
-!   dimension    p_prime         (n) ! Pressure increment.
-!   dimension    qs_prime_over_qs(n) ! qs~/qs.
-   
-!   real         temp             ! Temporary storage.
-!   real         es_prime_over_es ! es~/es
-!      
-!   do i = 1,n
-!------------------------------------------------------------------------------
-!  [3.0] Calculate saturation specific humidity increment:
-!------------------------------------------------------------------------------
+   ! integer      i, n
+   ! real         t, p, es, t_prime, p_prime, qs_prime_over_qs
+   ! dimension    t               (n) ! Temperature.
+   ! dimension    p               (n) ! Pressure.
+   ! dimension    es              (n) ! Sat. vapour pressure.
+   ! dimension    t_prime         (n) ! Temperature increment.
+   ! dimension    p_prime         (n) ! Pressure increment.
+   ! dimension    qs_prime_over_qs(n) ! qs~/qs.
 
-!   temp = qs_prime_over_qs(i) / ( p(i) - rd_over_rv1 * es(i) )
-  ! 
-!   es_prime_over_es = temp * p(i)
+   ! real         temp             ! Temporary storage.
+   ! real         es_prime_over_es ! es~/es
+   !    
+   ! do i = 1,n
+      !------------------------------------------------------------------------
+      !    [3.0] Calculate saturation specific humidity increment:
+      !------------------------------------------------------------------------
 
-!   p_prime(i) = p_prime(i) - temp
-   
-!------------------------------------------------------------------------------
-!  [2.0] Calculate saturation vapour pressure increment:
-!------------------------------------------------------------------------------
+      ! temp = qs_prime_over_qs(i) / ( p(i) - rd_over_rv1 * es(i) )
 
-!   temp = t(i) + es_gammakelvin
+      ! es_prime_over_es = temp * p(i)
 
-!   t_prime(i) = t_prime(i) + es_gammabeta * es_prime_over_es / ( temp * temp )
-!   end do
+      ! p_prime(i) = p_prime(i) - temp
 
-!end subroutine da_tp_to_qs_adj
+      !------------------------------------------------------------------------
+      ! [2.0] Calculate saturation vapour pressure increment:
+      !------------------------------------------------------------------------
+
+      ! temp = t(i) + es_gammakelvin
+
+      ! t_prime(i) = t_prime(i) + es_gammabeta * es_prime_over_es / ( temp * temp )
+   ! end do
+
+   ! end subroutine da_tp_to_qs_adj
 
 

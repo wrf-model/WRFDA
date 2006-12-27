@@ -3,7 +3,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    !------------------------------------------------------------------------------
    !  Purpose: Calculates vertical velocity increments from Richardson's Eq.
    !
-   !  METHOD: Richardson's Eq., which
+   !  Method: Richardson's Eq., which
    !          combines continuity Eq., thermodynamic Eq. and hrdrostatic Eq.
    !------------------------------------------------------------------------------
 

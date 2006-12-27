@@ -4,7 +4,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    !  Purpose: read in NCEP bufr eos AIRS/AMSUA/HSB 1b data 
    !            to innovation structure
    !
-   !   METHOD: use F90 sequential data structure to avoid read file twice
+   !   Method: use F90 sequential data structure to avoid read file twice
    !            so that da_scan_bufrairs is not necessary any more.
    !            1. read file radiance data in sequential data structure
    !            2. do gross QC check
