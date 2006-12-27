@@ -37,7 +37,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    !----------------------------------------------------------------------
 
    call da_vertical_transform('u', be, &
-                               xb % vertical_inner_product(ims,jms,kms), &
+                               xb % vertical_inner_product, &
                                vv, vp)
 
    !----------------------------------------------------------------------
