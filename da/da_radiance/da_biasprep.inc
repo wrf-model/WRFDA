@@ -12,7 +12,7 @@ subroutine da_biasprep(inst,ob,iv)
 
    ! Initialize constants and variables.
 
-   integer  :: j,jx,npred,nchan,myproc,ierr,num_rad
+   integer  :: j,jx,npred,nchan,num_rad
    character(len=80)  :: filename
    character(len=1)   :: s1
    real        :: pred(6), q(43)
@@ -26,7 +26,6 @@ subroutine da_biasprep(inst,ob,iv)
    if (num_rad < 1) return
 
 #ifdef DM_PARALLEL
-   call mpi_comm_rank( mpi_comm_world, myproc, ierr)
    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
 #else
    write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'

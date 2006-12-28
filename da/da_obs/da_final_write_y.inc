@@ -17,7 +17,7 @@ subroutine da_final_write_y(iv, y)
    if (trace_use) call da_trace_entry("da_final_write_y")
 
 #ifdef DM_PARALLEL
-   call mpi_barrier(mpi_comm_world, ierr)
+   call mpi_barrier(comm, ierr)
 #endif
 
    if (omb_add_noise) then

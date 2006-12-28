@@ -208,7 +208,13 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          info%lat  =  bfr1bhdr(9)  ! rlat
          info%lon  =  bfr1bhdr(10) ! rlon
          call da_ll_to_xy (info, loc, xp, outside, inside_halo)
-         if (outside) cycle
+!         if (outside) cycle
+         if (outside) then
+!write (0,*) info%lat,info%lon,"outside"
+cycle
+end if
+!write (0,*) info%lat,info%lon,"inside"
+
 
          !  3.0     Extract other information
          !------------------------------------------------------

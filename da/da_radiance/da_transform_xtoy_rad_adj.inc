@@ -192,15 +192,15 @@ if (.false.) then
                do j=1,len
                   temp_t(:,j)=con_vars(s+j-1) % t(:)
                end do
-               call mpi_send(temp_t,nl, true_mpi_real, tovs_recv_pe(inst,i), i*8+1, mpi_comm_world, IERR)
+               call mpi_send(temp_t,nl, true_mpi_real, tovs_recv_pe(inst,i), i*8+1, comm, ierr)
 
                allocate(temp_q(nlevels,len))
                do j=1,len
                   temp_q(:,j)=con_vars(s+j-1) % q(:)
                end do
-               call mpi_send(temp_q,nl, true_mpi_real, tovs_recv_pe(inst,i), i*8+2, mpi_comm_world, IERR)
+               call mpi_send(temp_q,nl, true_mpi_real, tovs_recv_pe(inst,i), i*8+2, comm, ierr)
   
-               call mpi_send(tb(s:e,:),len*nchan, true_mpi_real, tovs_recv_pe(inst,i), i*8+3, mpi_comm_world, IERR)
+               call mpi_send(tb(s:e,:),len*nchan, true_mpi_real, tovs_recv_pe(inst,i), i*8+3, comm, ierr)
 
                allocate (rtemp(len,8))
                rtemp(:,1)= con_vars(s:e) % ps
@@ -211,12 +211,12 @@ if (.false.) then
                rtemp(:,6)= aux_vars(s:e) % surft
                rtemp(:,7)= aux_vars(s:e) % satzen
                rtemp(:,8)= aux_vars(s:e) % satazi
-               call mpi_send(rtemp,len*8, true_mpi_real, tovs_recv_pe(inst,i), i*8+4, mpi_comm_world, IERR)
+               call mpi_send(rtemp,len*8, true_mpi_real, tovs_recv_pe(inst,i), i*8+4, comm, ierr)
 
                allocate (itemp(len,2))
                itemp(:,1)= con_vars(s:e) % nlevels
                itemp(:,2)= aux_vars(s:e) % surftype
-               call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(inst,i), i*8+5, mpi_comm_world, IERR)
+               call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(inst,i), i*8+5, comm, ierr)
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -230,24 +230,24 @@ if (.false.) then
                nl=len*nlevels
                allocate(temp_t(nlevels,len))
                call mpi_recv(temp_t,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*8+1, mpi_comm_world, status, IERR)
+                  i*8+1, comm, status, ierr)
                do j=1,len
                   d_con_vars(s+j-1) % t(:)=temp_t(:,j)
                end do
 
                allocate(temp_q(nlevels,len))
                call mpi_recv(temp_q,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*8+2, mpi_comm_world, status, IERR)
+                  i*8+2, comm, status, ierr)
                do j=1,len
                   d_con_vars(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                call mpi_recv(d_tb(s:e,:),len*nchan, true_mpi_real, &
-                  tovs_send_pe(inst,i), i*8+3, mpi_comm_world, status, IERR)
+                  tovs_send_pe(inst,i), i*8+3, comm, status, ierr)
 
                allocate (rtemp(len,8))
                call mpi_recv(rtemp,len*8, true_mpi_real, &
-                  tovs_send_pe(inst,i), i*8+4, mpi_comm_world, status, IERR)
+                  tovs_send_pe(inst,i), i*8+4, comm, status, ierr)
                d_con_vars(s:e) % ps       = rtemp(:,1)
                d_aux_vars(s:e) % t2m      = rtemp(:,2)
                d_aux_vars(s:e) % q2m      = rtemp(:,3)
@@ -259,7 +259,7 @@ if (.false.) then
 
                allocate (itemp(len,2))
                call mpi_recv(itemp,len*2, mpi_integer, &
-                  tovs_send_pe(inst,i), i*8+5, mpi_comm_world, status, IERR)
+                  tovs_send_pe(inst,i), i*8+5, comm, status, ierr)
                d_con_vars(s:e) % nlevels  = itemp(:,1)
                d_aux_vars(s:e) % surftype = itemp(:,2)
 
@@ -268,7 +268,7 @@ if (.false.) then
                deallocate (rtemp)
                deallocate (itemp)
             end if
-            call mpi_barrier(mpi_comm_world, IERR)
+            call mpi_barrier(comm, ierr)
          end do
 
 !write (0,*) "d_tb(1,:)",d_tb(1,:)
@@ -322,17 +322,17 @@ if (.false.) then
                do j=1,len
                   temp_t(:,j)=d_con_vars_ad(s+j-1) % t(:)
                end do
-               call mpi_send(temp_t,nl, true_mpi_real, tovs_send_pe(inst,i), i*8+6, mpi_comm_world, IERR)
+               call mpi_send(temp_t,nl, true_mpi_real, tovs_send_pe(inst,i), i*8+6, comm, ierr)
 
                allocate(temp_q(nlevels,len))
                do j=1,len
                   temp_q(:,j)=d_con_vars_ad(s+j-1) % q(:)
                end do
-               call mpi_send(temp_q,nl, true_mpi_real, tovs_send_pe(inst,i), i*8+7, mpi_comm_world, IERR)
+               call mpi_send(temp_q,nl, true_mpi_real, tovs_send_pe(inst,i), i*8+7, comm, ierr)
 
                allocate(rtemp(len,1))
                rtemp(:,1) = d_con_vars_ad(s:e) % ps
-               call mpi_send(rtemp,len, true_mpi_real, tovs_send_pe(inst,i), i*8+8, mpi_comm_world, IERR)
+               call mpi_send(rtemp,len, true_mpi_real, tovs_send_pe(inst,i), i*8+8, comm, ierr)
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -345,27 +345,27 @@ if (.false.) then
                nl=len*nlevels
                allocate(temp_t(nlevels,len))
                call mpi_recv(temp_t,nl, true_mpi_real, tovs_recv_pe(inst,i), &
-               i*8+6, mpi_comm_world, status, IERR)
+               i*8+6, comm, status, ierr)
                do j=1,len
                   con_vars_ad(s+j-1) % t(:)=temp_t(:,j)
                end do
 
                allocate(temp_q(nlevels,len))
                call mpi_recv(temp_q,nl, true_mpi_real, tovs_recv_pe(inst,i), &
-                  i*8+7, mpi_comm_world, status, IERR)
+                  i*8+7, comm, status, ierr)
                do j=1,len
                   con_vars_ad(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                allocate(rtemp(len,1))
                call mpi_recv(rtemp,len, true_mpi_real, tovs_recv_pe(inst,i), &
-                  i*8+8, mpi_comm_world, status, IERR)
+                  i*8+8, comm, status, ierr)
                con_vars_ad(s:e) % ps=rtemp(:,1)
                deallocate (temp_t)
                deallocate (temp_q)
                deallocate (rtemp)
             end if
-            call mpi_barrier(mpi_comm_world, IERR)
+            call mpi_barrier(comm, ierr)
          end do
          do n=1,d_num_rad
             deallocate (d_con_vars(n) % t)

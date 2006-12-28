@@ -71,7 +71,7 @@ subroutine da_trace_report
 
    call mpi_bcast(MasterTimerNames(1:MaxNoRoutines), &
                   TraceNameLen*MaxNoRoutines, &
-                  MPI_character,trace_pe, mpi_comm_world,ierr)
+                  MPI_character,trace_pe, comm,ierr)
 #endif
 
    MasterElapsedTime(:,:)=0.0

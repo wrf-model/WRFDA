@@ -1267,8 +1267,9 @@ MODULE module_wrf_quilt
         OPEN ( unit=27, file="namelist.input", form="formatted", status="old" )
         nio_groups = 1
         nio_tasks_per_group  = 0
-        ! Not finding the namelist should not be an error. This will go when
-        ! this namelist is folded into Registry by the WRF team
+        ! Not finding the namelist should not be an error. Hopes of folding this
+        ! namelist into the Registry are complicated because this information is needed
+        ! before MPI is fully set up.
         READ ( 27 , NML = namelist_quilt, IOSTAT=io_status )
         CLOSE ( 27 )
       ENDIF

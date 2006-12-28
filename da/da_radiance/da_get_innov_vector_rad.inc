@@ -296,10 +296,13 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 
             vtm(k) =(1.+0.608*model_qm(k))*model_tm(k)  ! virtual T
             ! convert kg/kg to g/m3
-            ! clw(k) = model_qcw(k)*v_p(k)*100.*0.0289644/8.31451/model_tm(k)
-            clw(k) = 0.34836*model_qcw(k)*v_p(k)/model_tm(k)
-            if (v_p(k)<100.) clw(k) = 0.
-
+            ! clw (k) = model_qcw(k)*v_p(k)*100.*0.0289644/8.31451/model_tm(k)
+if (model_tm(k) < 0.001) then
+   write (0,*)  n,k, "model_tm(k)",model_tm(k)
+   model_tm(k) = 0.001
+end if
+            clw (k) = 0.34836*model_qcw(k)*v_p(k)/model_tm(k)
+            if ( v_p(k)<100. ) clw (k) = 0.
          enddo
 
          model_psfc = 0.01*model_psfc           ! convert to hPa 
@@ -311,6 +314,11 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
          do k = 2,xp%kte
             ! pf(k) = 100.*(v_p(k-1)+v_p(k))*0.5  ! full level pressure
             pf(k) = 50.*(v_p(k-1)+v_p(k))
+if (pf(k) < 0.001) then
+   write (0,*)  n,k, "pf(k)",pf(k)
+   pf(k) = 0.001
+end if
+
          end do
          ! pf(xp%kte+1)= 100.*v_p(xp%kte)*0.5
          pf(xp%kte+1)= 50.*v_p(xp%kte)
@@ -318,8 +326,17 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
          clwp = 0.
          do k = xp%kts,xp%kte
             dlnpf(k) = log(pf(k)) - log(pf(k+1))
-            ! clw (k) = clw(k)*vtm(k)*287.05/9.80665*dlnpf(k)
-            clw (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
+if (dlnpf(k) < 0.001) then
+   write (0,*) "i, j, dx, dy, dxm, dym", i, j, dx, dy, dxm, dym
+   write (0,*)  n,k, "dlnpf(k)",dlnpf(k)
+   dlnpf(k) = 0.001
+end if
+if (vtm(k) < 0.001) then
+   write (0,*)  n,k, "vtm(k)",vtm(k)
+   vtm(k) = 0.001
+end if
+            ! clw  (k) = clw(k)*vtm(k)*287.05/9.80665*dlnpf(k)
+            clw  (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
             clwp  = clwp + clw(k)
          end do
          ! clwp = 0.001*clwp   ! kg/m2 = mm

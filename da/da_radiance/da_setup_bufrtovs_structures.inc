@@ -19,8 +19,6 @@ SUBROUTINE da_setup_bufrtovs_structures(xp, ob, iv)
    integer                     :: i, j, n, ios, alloc_status
    logical                     :: lprinttovs 
    
-   integer                     :: myproc, ierr
-
    if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
 
 !-------------------------------------------------------------------

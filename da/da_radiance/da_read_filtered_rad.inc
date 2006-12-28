@@ -14,7 +14,7 @@ subroutine da_read_filtered_rad(xp, iv)
 
    integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename
-   integer            :: ierr, ndomain
+   integer            :: ndomain
    logical            :: outside
 
    if (trace_use) call da_trace_entry("da_read_filtered_rad")

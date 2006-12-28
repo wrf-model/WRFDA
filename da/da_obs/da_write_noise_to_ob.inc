@@ -15,7 +15,7 @@ subroutine da_write_noise_to_ob (iv)
    call da_trace_entry("da_write_noise_to_ob")
 
 #ifdef DM_PARALLEL
-   call mpi_barrier(mpi_comm_world, ierr)
+   call mpi_barrier(comm, ierr)
 #endif
    call da_get_unit (iunit)
    allocate (filename(0:num_procs-1))

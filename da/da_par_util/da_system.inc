@@ -9,8 +9,6 @@ subroutine da_system(cmd)
    character (len=*) , intent(in) :: cmd
 
 #ifdef crayx1
-   integer :: ierr
-
    call pxfsystem(cmd, len(cmd), ierr)
 #else
    call system(cmd)

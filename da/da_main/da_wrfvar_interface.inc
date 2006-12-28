@@ -21,7 +21,13 @@ subroutine da_wrfvar_interface (grid, config_flags)
       ! Model layer modules
       use module_model_constants
 
-      ! Input data.
+      use da_control
+      use da_define_structures
+      use da_setup_structures
+      use da_test
+      use da_minimisation
+
+      !--Input data.
 
       type(domain),                intent(inout) :: grid
       type (grid_config_rec_type), intent(inout) :: config_flags
