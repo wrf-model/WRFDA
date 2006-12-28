@@ -11,7 +11,7 @@ subroutine da_pt_to_rho_lin(xb, xa, xp)
    implicit none
    
    type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (x_type), intent(inout)  :: xa           ! increment structure.
    type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
 
    integer                       :: is, ie       ! 1st dim. end points.
@@ -19,7 +19,7 @@ subroutine da_pt_to_rho_lin(xb, xa, xp)
    integer                       :: ks, ke       ! 3rd dim. end points.
 
    !---------------------------------------------------------------------------
-   ! [1.0] Initialise:
+   ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
    is = xp%its

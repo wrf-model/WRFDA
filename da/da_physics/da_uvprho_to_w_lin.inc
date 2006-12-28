@@ -10,8 +10,8 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    implicit none
 
    type (xb_type), intent(in)       :: xb        ! First guess structure.
-   type (x_type), intent(inout)     :: xa        ! Increment structure.
-   type (xpose_type), intent(inout) :: xp        ! Domain decomposition vars.
+   type (x_type), intent(inout)     :: xa        ! increment structure.
+   type (xpose_type), intent(inout) :: xp        ! domain decomposition vars.
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -198,7 +198,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
       end do
    end do
 
-   ! Integration to calculate the vertical velocity 
+   ! integration to calculate the vertical velocity 
 
    call da_w_adjustment_lin(xb,xa%w,WZ)
 

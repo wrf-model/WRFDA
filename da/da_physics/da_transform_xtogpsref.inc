@@ -10,7 +10,7 @@ subroutine da_transform_xtogpsref(xb, xp)
    ! output: xb%ref
 
    type (xb_type), intent(inout) :: xb      ! First guess structure.
-   type(xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
+   type(xpose_type), intent(in)  :: xp      ! domain decomposition vars.
    
    integer :: i, j, k, is, ie, js, je, ks, ke
    real    :: partone, parttwo, dividnd

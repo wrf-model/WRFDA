@@ -9,7 +9,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
    integer             ,   intent(in)    :: ltbl
    character (len=4)   ,   intent(in)    :: mminlu
    character (len=19)  ,   intent(in)    :: date
-   type (xpose_type),      intent(in)    :: xp  ! Domain decomposition vars.
+   type (xpose_type),      intent(in)    :: xp  ! domain decomposition vars.
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(in)    :: lanu 
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(out)   :: rough 
 

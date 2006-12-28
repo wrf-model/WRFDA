@@ -239,6 +239,9 @@ subroutine da_read_radar (ob, xp, filename)
        select case (fm)
  
           case (128)
+!clq
+          if( ndup==1) ob%num_Radar_glo = ob%num_Radar_glo + 1
+!clq
 
           num_Radar = num_Radar + 1
    
@@ -247,6 +250,9 @@ subroutine da_read_radar (ob, xp, filename)
               "Radar #= ",ob % num_Radar, " > max_Radar = ", max_Radar
             call da_error(__FILE__,__LINE__,message(1:1))
           end if
+!clq
+          platform % loc%obs_global_index = ob%num_Radar_glo
+!clq
 
           ob % Radar (num_Radar) % stn_loc % lon = platform % stn % lon
           ob % Radar (num_Radar) % stn_loc % lat = platform % stn % lat

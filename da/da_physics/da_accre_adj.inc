@@ -1,5 +1,4 @@
-subroutine da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
-                  SCR29,SCR79,PRA9,kts,kte)
+subroutine da_accre_adj(DT,SCR2,SCR3,PRA,SCR29,SCR39,PRA9,kts,kte,kms,kme)
 
    !-----------------------------------------------------------------------
    ! Purpose: Accretion (Collection)
@@ -7,24 +6,29 @@ subroutine da_accre_adj(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
 
    implicit none
 
-   integer, intent(in)       :: kts, kte
-   real, dimension(kts:kte), intent(in)  :: DT,SCR2,SCR3,SCR7
-   real, dimension(kts:kte), intent(in)  :: PRA
-   real, dimension(kts:kte), intent(out) :: SCR29,SCR79
-   real, dimension(kts:kte), intent(in)  :: PRA9
-   real, intent(in)                      :: PRAC,BVT3
+   integer, intent(in)                     :: kts, kte, kms, kme
+   real, dimension(kms:kme), intent(in)    :: DT, SCR2, SCR3
+   real, dimension(kms:kme), intent(in)    :: PRA, PRA9
+   real, dimension(kms:kme), intent(inout) :: SCR29, SCR39
 
-   integer       :: k
+   !  local
+   integer   :: k
+   real      :: gamma, QRTH
 
-   do K=kts, kte
-      if (DT(k) <= 0.) cycle
+   gamma = 0.002
+   QRTH = 1.e-6
 
-      if (SCR3(k) > 0.) then
-         SCR79(K)=SCR79(K)+PRAC*BVT3*SCR7(K)**(BVT3-1.)*SCR2(K)*PRA9(K)
-         SCR29(K)=SCR29(K)+ PRAC*SCR7(K)**BVT3*PRA9(K)
+   do K = kts, kte
+
+      if ( DT(k) <= 0. ) cycle
+
+      if ( SCR2(k) > 0. .and. SCR3(k) > QRTH ) then
+         SCR39(K) = SCR39(K) + gamma * 0.875 * SCR2(k) * (SCR3(K)*1.e3)**(-0.125 ) * 1.e3 * PRA9(K)
+         SCR29(K) = SCR29(K) + gamma * (SCR3(K)*1.e3)**0.875 * PRA9(K)
+      else if (SCR2(k) > 0. .and. SCR3(k) <= QRTH ) then
+         SCR29(k) = SCR29(k) + gamma * (QRTH*1.e3)**0.875 * PRA9(k)
       end if
+
    end do
 
 end subroutine da_accre_adj
-
-

@@ -16,7 +16,7 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    ! Reference:
    ! ---------
    !
-   !  Input Variables:
+   !  input Variables:
    ! 
    !   psfc, tg               : surface pressure and ground temperature
    !   ps, ts, qs, us, vs, hs : model variable at lowlest half sigma level
@@ -30,7 +30,7 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    !   roughness              : roughness
    !   xland                  : land-water-mask (=2 water, =1 land)
    !
-   !  Output Variables:
+   !  output Variables:
    !
    !   regime                 : PBL regime
    !   u10, v10               : 10-m high observed wind components

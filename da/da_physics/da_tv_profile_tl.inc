@@ -11,8 +11,8 @@ subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
    type (xb_type),  intent(in)    :: xb       ! first guess state.
    type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
    integer, intent(in)            :: i, j     ! OBS location
-   real, intent(in)               :: dx, dxm  ! Interpolation weights.
-   real, intent(in)               :: dy, dym  ! Interpolation weights.
+   real, intent(in)               :: dx, dxm  ! interpolation weights.
+   real, intent(in)               :: dy, dym  ! interpolation weights.
    real, dimension(xp%kts-1:xp%kte+1),intent(out)      :: TGL_pre_ma,TGL_tv_ma
    real, dimension(xp%kts-1:xp%kte+1),intent(out)      :: pre_ma,tv_ma
 

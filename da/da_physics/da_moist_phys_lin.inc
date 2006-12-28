@@ -14,7 +14,7 @@ subroutine da_moist_phys_lin(xb, xa, xp)
    implicit none
 
    type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (x_type), intent(inout)  :: xa           ! increment structure.
    type (xpose_type), intent(inout) :: xp        ! Dimensions and xpose buffers.
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: T_OLD,T_NEW
@@ -28,32 +28,23 @@ subroutine da_moist_phys_lin(xb, xa, xp)
    real, dimension(kms:kme)                   :: DT
    real, dimension(kms:kme)                   :: QVT,QCT,QRT,TTT
    real, dimension(kms:kme)                   :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6,SCR7
-   real, dimension(kms:kme) :: DUM11,DUM21,DUM31,DUM41
+   real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6
+   real, dimension(kms:kme) :: DUM31
    real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
-   real, dimension(kms:kme) :: SCR31,SCR41,SCR42,SCR71
-   real, dimension(kms:kme) :: DUM111,DUM112,DUM113,DUM211,DUM411
-   real, dimension(kms:kme) :: PRA1,PRC1,PRE1
+   real, dimension(kms:kme) :: SCR31,SCR42,SCR71
+   real, dimension(kms:kme) :: DUM112,DUM113,DUM211,DUM411
 
-   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69,SCR79
-   real, dimension(kms:kme) :: DUM119,DUM219,DUM319,DUM419
+   real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69
+   real, dimension(kms:kme) :: DUM319
    real, dimension(kms:kme) :: PRA9,PRC9,PRD9,PRE9
-   real, dimension(kms:kme) :: SCR319,SCR419,SCR429,SCR719
-   real, dimension(kms:kme) :: DUM1119,DUM1129,DUM1139,DUM2119,DUM4119
-   real, dimension(kms:kme) :: PRA19,PRC19,PRE19
+   real, dimension(kms:kme) :: SCR319,SCR429,SCR719
+   real, dimension(kms:kme) :: DUM1129,DUM1139,DUM2119,DUM4119
    real, dimension(kms:kme) :: TMP
 
+   real, dimension(ims:ime,jms:jme) :: z_LCL
+   real          :: lh_rate
+
    integer :: i, j, k
-   real    :: G3PB,G5PB
-   real    :: PRAC,PREC1,PREC2
-
-   !  Constants
-
-   G3PB=gamma1(3.+BVT)
-   G5PB=gamma1(0.5*(5.+BVT))
-   PRAC=pi*N0R*AVT*G3PB*0.25
-   PREC1=2.*pi*N0R*0.78
-   PREC2=2.*pi*N0R*0.32*AVT**0.5*G5PB
 
    do k=kts,kte
       do j=jts,jte
@@ -69,25 +60,21 @@ subroutine da_moist_phys_lin(xb, xa, xp)
    do j=jts,jte
       do i=its,ite
 
-         !  Preparation
+      !  Preparation
 
          do K=kts,kte
-           xa % q(i,j,k) =xa % qt(i,j,k) - xa % qcw(i,j,k) - xa %qrn(i,j,k)
+            xa % q(i,j,k) =xa % qt(i,j,k) - xa % qcw(i,j,k) - xa %qrn(i,j,k)
          end do
 
-         if (DT_cloud_model) then
-            do K=kts,kte
-               DT(k) = xb%delt(i,j,k)
-            end do
-         else
-            call da_wdt(xb%h(I,J,:),xb%w(I,J,:),xb%terr(I,J),DT)
-         end if
+         do K=kts,kte
+            DT(k) = xb%delt(i,j,k)
+         end do
 
          do K=kts,kte
 
             if (DT(k) <= 0.) cycle
 
-            if (xb%t(I,J,K) > TO)then
+            if ( xb%t(I,J,K) > TO )then
                EES(K)=SVP1*EXP(SVP2*(xb%t(I,J,K)-SVPT0)/(xb%t(I,J,K)-SVP3))
                EES9(K)=EES(K)*SVP2*(SVPT0-SVP3)/((xb%t(I,J,K)-SVP3)*  &
                        (xb%t(I,J,K)-SVP3))*xa%t(I,J,K)
@@ -131,67 +118,18 @@ subroutine da_moist_phys_lin(xb, xa, xp)
                      (gas_constant*xb%t(I,J,K)**2)*xa%t(I,J,K)
             SCR6(K)=xb%p(I,J,K)/(gas_constant*xb%t(I,J,K))
 
-
-            if (xb%t(I,J,K) > TO) then
-               TMP(K)=0.25*PPI*0.001/(SCR6(K)*SCR3(K)*PPI*0.001)**0.75
-               SCR79(K)=TMP(K)*SCR3(K)*SCR69(K)+TMP(K)*SCR6(K)*SCR39(K)
-               SCR7(K)=(SCR6(K)*SCR3(K)*PPI*0.001)**0.25
-            else
-               TMP(K)=0.25*PPIS*0.001/(SCR6(K)*SCR3(K)*PPIS*0.001)**0.75
-               SCR79(K)=TMP(K)*SCR3(K)*SCR69(K)+TMP(K)*SCR6(K)*SCR39(K)
-               SCR7(K)=(SCR6(K)*SCR3(K)*PPIS*0.001)**0.25
-            end if
-
-            DUM119(K)=8.794E-5*1.81*xb%t(I,J,K)**0.81/xb%p(I,J,K)     &
-                      *xa%t(I,J,K)-8.794E-5*xb%t(I,J,K)**1.81/        &
-                      xb%p(I,J,K)**2*xa%p(I,j,K)
-            DUM11(K)=8.794E-5*xb%t(I,J,K)**1.81/xb%p(I,J,K)
-
-
-            DUM219(K)=(1.496E-6*1.5*xb%t(I,J,K)**0.5/(xb%t(I,J,K)+120.)   &
-                      -1.496E-6*xb%t(I,J,K)**1.5/(xb%t(I,J,K)+120.)**2)   &
-                      *xa%t(I,J,K)
-            DUM21(K)=1.496E-6*xb%t(I,J,K)**1.5/(xb%t(I,J,K)+120.)
             DUM319(K)=-XLV1*xa%t(I,J,K) 
             DUM31(K)=3.1484E6-XLV1*xb%t(I,J,K)
-            SCR419(K)=1.414E3*DUM219(K)
-            SCR41(K)=1.414E3*DUM21(K)
-            if (xb%t(I,J,K) > TO)then
-               PRA19(K)=DUM319(K)
-               PRA1(K)=DUM31(K)
-            else
-               PRA19(K)=0.
-               PRA1(K)=XLS
-            end if
-            TMP(K)=SCR41(K)*gas_constant_v*xb%t(I,J,K)*xb%t(I,J,K)
-            DUM419(K)=PRA1(K)*PRA1(K)/TMP(K)*SCR69(K)  &
-                     +2.*SCR6(K)*PRA1(K)/TMP(K)*PRA19(K)  &
-                     -SCR6(K)*PRA1(K)*PRA1(K)*2.*SCR41(K)*  &
-                        gas_constant_v*xb%t(I,J,K)  &
-                        /TMP(K)**2*xa%t(I,J,K)  &
-                     -SCR6(K)*PRA1(K)*PRA1(K)*gas_constant_v*xb%t(I,J,K)**2  &
-                        /TMP(K)**2*SCR419(K)  &
-                     -DUM119(K)/(DUM11(K)*DUM11(K)*SCR5(K))  &
-                     -SCR59(K)/(DUM11(K)*SCR5(K)*SCR5(K))
-            DUM41(K)=SCR6(K)*PRA1(K)*PRA1(K)/(SCR41(K)*gas_constant_v*  &
-                     xb%t(I,J,K)*xb%t(I,J,K))+1./(SCR5(K)*DUM11(K))
-            PRE19(K)=DUM219(K)/SCR6(K)-DUM21(K)/(SCR6(K)*SCR6(K))*SCR69(K)
-            PRE1(K)=DUM21(K)/SCR6(K)
-            PRC19(K)=PRE19(K)/DUM11(K)-PRE1(K)/(DUM11(K)*DUM11(K))*DUM119(K)
-            PRC1(K)=PRE1(K)/DUM11(K)
-            DUM1119(K)=.3333/(PRC1(K)**.6667*PRE1(K)**.5)*PRC19(K)  &
-                      -0.5*PRC1(K)**0.3333/PRE1(K)**1.5*PRE19(K)
-            DUM111(K)=PRC1(K)**.3333/PRE1(K)**.5
+
          end do
 
-         call da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte)
+         call da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
 
-         call da_accre_lin(DT,SCR2,SCR3,SCR7,PRAC,BVT3,PRA,  &
-                     SCR29,SCR79,PRA9,kts,kte)
+         call da_accre_lin(DT,SCR2,SCR3,PRA,SCR29,SCR39,PRA9,kts,kte,kms,kme)
 
-         call da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,xb%q(I,J,:),  &
-                    PREC1,PREC2,PRE,  &
-                    SCR39,SCR59,SCR79,DUM1119,DUM419,xa%q(I,J,:),PRE9,kts,kte)
+         call da_evapo_lin(DT,SCR3,SCR5,xb%q(I,J,:),PRE,SCR6,  &
+                           SCR39,SCR59,xa%q(I,J,:),PRE9,SCR69, &
+                           kts,kte,kms,kme)
 
          do K=kts, kte
 
@@ -233,7 +171,7 @@ subroutine da_moist_phys_lin(xb, xa, xp)
 
             DUM1139(K)=xa%q(I,J,K)+DT(K)*QVT9(K)
             DUM113(K)=xb%q(I,J,K)+DT(K)*QVT(K)
-            if (DUM113(K) > 1.E-12) then
+            if (DUM113(K) > 1.E-12 ) then
                SCR429(K)=DUM1139(K)
                SCR42(K)=DUM113(K)
             else
@@ -261,8 +199,6 @@ subroutine da_moist_phys_lin(xb, xa, xp)
                              QVT9,QCT9,QRT9,TTT9,                    &
                              xa%p(I,J,:),xa%t(I,J,:),xa%q(I,J,:),    &
                              xa%qcw(I,J,:),xa%qrn(I,J,:),kts,kte)
-
-
       end do
    end do
 

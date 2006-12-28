@@ -8,7 +8,7 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
    type (xb_type), intent(in)    :: xb           ! First guess structure.
    type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (x_type), intent(inout)  :: xa           ! increment structure.
    real, intent(in) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
 
    integer                       :: is, ie       ! 1st dim. end points.
@@ -19,7 +19,7 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
    real                          :: es_prime_over_es ! Sat Vap pressure ratio.
 
    !---------------------------------------------------------------------------
-   ! [1.0] Initialise:
+   ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
    is = xp%its; ie = xp%ite

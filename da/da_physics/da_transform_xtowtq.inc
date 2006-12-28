@@ -8,7 +8,7 @@ subroutine da_transform_xtowtq (xp, xb, xa)
 
    type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
    type (xb_type), intent(in)    :: xb       ! first guess state.
-   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+   type (xpose_type), intent(in) :: xp       ! domain decomposition vars.
 
    integer                      :: i, j, kz
 

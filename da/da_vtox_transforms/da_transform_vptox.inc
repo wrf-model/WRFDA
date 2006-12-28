@@ -15,7 +15,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
 
    integer              :: k, j, k1            ! Loop counters.
 
-   if (trace_use) call da_trace_entry("da_transform_vptox") 
+   IF (trace_use) call da_trace_entry("da_transform_vptox") 
 
    !---------------------------------------------------------------------------
    !  [1] Add flow-dependent increments in control variable space (vp):
@@ -70,9 +70,20 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
    call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
                          xb % coefy , xa % u, xa % v)
 
-   ! Pseudo RH --> Specific humidity:
-   xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
-                                     xb%qs(its:ite,jts:jte,kts:kte)
+   if (use_radarobs .and. use_radar_rf) then
+
+   ! Pseudo RH --> Total water mixing ratio:
+
+      xa % qt(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
+                                         xb%qs(its:ite,jts:jte,kts:kte)
+
+   else
+
+   ! Pseudo RH --> Water vapor mixing ratio:
+
+      xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
+                                        xb%qs(its:ite,jts:jte,kts:kte)
+   endif
 
    !---------------------------------------------------------------------------
    !  [4] Add flow-dependent increments in model space (xa):
@@ -83,8 +94,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
                                       its,ite, jts,jte, kts,kte)
    end if
 
-   if (trace_use) call da_trace_exit("da_transform_vptox") 
+   IF (trace_use) call da_trace_exit("da_transform_vptox") 
  
 end subroutine da_transform_vptox
-
 

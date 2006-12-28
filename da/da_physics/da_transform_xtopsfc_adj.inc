@@ -7,13 +7,13 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x)
    implicit none
 
    type (xb_type),    intent(in) :: xb       ! first guess state.
-   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+   type (xpose_type), intent(in) :: xp       ! domain decomposition vars.
 
    type (synop_type),          intent(in)    :: synop
    type (residual_synop_type), intent(inout) :: j_synop_y   ! grad_y(jo)
    type (x_type),              intent(inout) :: jo_grad_x   ! grad_x(jo)
    
-   integer                :: i, j     ! Index dimension.
+   integer                :: i, j     ! index dimension.
    real                   :: dx, dxm  ! 
    real                   :: dy, dym  !
 

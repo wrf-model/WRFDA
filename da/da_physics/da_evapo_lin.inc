@@ -1,6 +1,6 @@
-subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
-                 PREC1,PREC2,PRE,  &
-                 SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A,PRE9,kts,kte)
+subroutine da_evapo_lin(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
+                        SCR39,SCR59,QV_A,PRE9,SCR69, &
+                        kts,kte,kms,kme)
 
    !-----------------------------------------------------------------------
    ! Purpose: Rainwater evaporation
@@ -8,43 +8,45 @@ subroutine da_evapo_lin(DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B,  &
 
    implicit none
 
-   integer, intent(in)                   :: kts, kte
-   real, intent(in)                      :: PREC1, PREC2
-   real, dimension(kts:kte), intent(in)  :: DT,SCR3,SCR5,SCR7,DUM111,DUM41,QV_B
-   real, dimension(kts:kte), intent(out)  :: PRE
-   real, dimension(kts:kte), intent(in)  :: SCR39,SCR59,SCR79,DUM1119,DUM419,QV_A
-   real, dimension(kts:kte), intent(out) :: PRE9
+   integer, intent(in)                   :: kts, kte, kms, kme
+   real, dimension(kms:kme), intent(in)  :: DT, SCR3, SCR5, SCR6, QV_B
+   real, dimension(kms:kme), intent(out) :: PRE, PRE9
+   real, dimension(kms:kme), intent(in)  :: SCR39, SCR59, SCR69, QV_A
 
-   integer                   :: k
-   real, dimension(kts:kte)  :: TMP
+   integer           :: k
+   real              :: beta, QRTH
+   real              :: TMP, TMP2
 
-   do K=kts, kte
+   QRTH = 1.e-6
+   beta = 0.0486   ! original
+
+   do K = kts, kte
+
       if (DT(k) <= 0.) cycle
 
-      if (SCR3(K) > 0.) then
-         TMP(K)=(PREC1*SCR7(K)*SCR7(K)+  &
-                   PREC2*DUM111(K)*SCR7(K)**BVT2)/DUM41(K)
-         PRE9(K)=TMP(K)/SCR5(K)*QV_A(K)  &
-                   -TMP(K)*QV_B(K)/SCR5(K)**2*SCR59(K)  &
-                   +(QV_B(k)/SCR5(K)-1.)/DUM41(K)*(2.*PREC1*SCR7(K)+  &
-                      PREC2*DUM111(K)*BVT2*SCR7(K)**(BVT2-1.))*SCR79(K)  &
-                   +(QV_B(k)/SCR5(K)-1.)/DUM41(K)*  &
-                      PREC2*SCR7(K)**BVT2*DUM1119(K)  &
-                   -(QV_B(k)/SCR5(K)-1.)/DUM41(K)*TMP(K)*DUM419(K)
-         PRE(k)=(QV_B(K)/SCR5(K)-1.)*(PREC1*SCR7(K)*SCR7(K)+   &
-                 PREC2*DUM111(K)*SCR7(K)**BVT2)/DUM41(K)
+      if ( SCR3(k) > QRTH .and. QV_B(k) < SCR5(k) ) then
+         TMP  = beta * ( QV_B(k)-SCR5(k) )* 0.65 * ( SCR6(k)*SCR3(k) )**(-0.35)
+         TMP2 = beta * ( SCR6(k)*SCR3(k) )**0.65
+         PRE9(k) = TMP * ( SCR69(k)*SCR3(k)+SCR6(k)*SCR39(k) ) + &
+                   TMP2 * ( QV_A(k)-SCR59(k) )
+         PRE(k)  = beta * ( QV_B(k)-SCR5(k) ) * ( SCR6(k)*SCR3(k) )**0.65
+      else if ( SCR3(k) <= QRTH .and. SCR3(k) > 0. .and. QV_B(k) < SCR5(k) ) then
+         TMP  = beta * ( QV_B(k)-SCR5(k) ) * 0.65 * ( SCR6(k)*QRTH )**(-0.35)
+         TMP2 = beta * ( SCR6(k)*QRTH )**0.65
+         PRE9(k) = TMP * ( SCR69(k)*QRTH ) + &
+                   TMP2 * ( QV_A(k)-SCR59(k) )
+         PRE(k)  = beta * ( QV_B(k)-SCR5(k) ) * ( SCR6(k)*QRTH )**0.65
       else
-         PRE9(K) = 0.
-         PRE(k)=0.
+         PRE9(k) = 0.
+         PRE(k) = 0.
       end if
 
-      if (PRE(K) < -SCR3(K)/DT(K) ) then
-         PRE9(K)=-SCR39(K)/DT(K)
-         PRE(k)=-SCR3(K)/DT(K)
+      if ( PRE(k) < -SCR3(k)/DT(k) ) then
+         PRE9(k) = -SCR39(k) / DT(k)
+         PRE(k)  = -SCR3(k) / DT(k)
       end if
 
    end do
 
 end subroutine da_evapo_lin
-
 

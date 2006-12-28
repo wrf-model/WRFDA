@@ -66,6 +66,14 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
       end do
 
      call da_uvprho_to_w_adj(xb, xa, xp)
+ 
+     if (use_radarobs .and. Use_Radar_rf) then
+
+      ! Partition of hydrometeor increments via warm rain process
+
+         call da_moist_phys_adj( xb, xa, xp)
+
+      endif
 
    end if
 

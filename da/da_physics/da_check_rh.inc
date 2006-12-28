@@ -9,7 +9,7 @@ subroutine da_check_rh(xb, xa, xp)
 
    type (xb_type), intent(in)           :: xb    ! First guess state
    type (x_type),  intent(inout)        :: xa    ! Analysis increment
-   type (xpose_type), intent(in)        :: xp    ! Domain decomposition vars.
+   type (xpose_type), intent(in)        :: xp    ! domain decomposition vars.
 
    integer   :: imod(xp%kts:xp%kte)
    real      :: rhtol(xp%kts:xp%kte)

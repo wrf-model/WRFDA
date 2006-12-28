@@ -11,9 +11,9 @@ subroutine da_integrat_dz(xb)
    !           Unit: Qv (Kg/Kg), RHO(Kg/M^3), dZ(M)
    !                 PW (cm)
    !
-   ! Input     : QV, PP, TT
+   ! input     : QV, PP, TT
    !
-   ! Output    : PW
+   ! output    : PW
    !
    !---------------------------------------------------------------------------
 

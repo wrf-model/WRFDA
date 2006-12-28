@@ -9,7 +9,7 @@ subroutine da_pt_to_rho_adj(xb, xa)
    implicit none
    
    type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (x_type),  intent(inout) :: xa           ! Increment structure.
+   type (x_type),  intent(inout) :: xa           ! increment structure.
 
    integer                       :: i,j,k        ! Loop counter.
 

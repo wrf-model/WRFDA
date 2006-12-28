@@ -8,12 +8,12 @@ subroutine da_transform_xtopsfc(xb, xa, xp, synop, y_synop)
 
    type (x_type),     intent(in) :: xa       ! gridded analysis increment.
    type (xb_type),    intent(in) :: xb       ! first guess state.
-   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
+   type (xpose_type), intent(in) :: xp       ! domain decomposition vars.
 
    type (synop_type),          intent(in)  :: synop
    type (residual_synop_type), intent(out) :: y_synop
 
-   integer                :: i, j     ! Index dimension.
+   integer                :: i, j     ! index dimension.
    real                   :: dx, dxm  ! 
    real                   :: dy, dym  !
 

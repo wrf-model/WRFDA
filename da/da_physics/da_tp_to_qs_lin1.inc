@@ -21,7 +21,7 @@ subroutine da_tp_to_qs_lin1( t, p, es, t_prime, p_prime, &
    real                          :: es_prime_over_es ! es~/es
 
    !---------------------------------------------------------------------------
-   ! [1.0] Initialise:
+   ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
    temp = t + es_gammakelvin

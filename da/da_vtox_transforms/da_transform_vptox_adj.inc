@@ -29,12 +29,25 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
    !--------------------------------------------------------------------------
    ! [3] Transform to model variable space:
    !--------------------------------------------------------------------------
- 
-   ! Pseudo RH --> Specific humidity:
-   vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
-                                     xa%q (its:ite,jts:jte,kts:kte) * &
-                                     xb%qs(its:ite,jts:jte,kts:kte)
-                                   
+
+   if (use_radarobs .and. use_radar_rf) then
+
+      ! Pseudo RH --> Total water mixing ratio:
+
+      vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
+                                        xa%qt(its:ite,jts:jte,kts:kte) * &
+                                        xb%qs(its:ite,jts:jte,kts:kte)
+
+   else 
+
+   ! Pseudo RH --> Water vapor mixing ratio:
+
+      vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
+                                        xa%q (its:ite,jts:jte,kts:kte) * &
+                                        xb%qs(its:ite,jts:jte,kts:kte)
+
+   endif
+
    call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
 
    ! Transform psi and chi to u and v:

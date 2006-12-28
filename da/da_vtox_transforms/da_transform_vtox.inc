@@ -164,6 +164,13 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
       end do
 
       call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
+ 
+      if (use_radarobs .and. Use_Radar_rf) then
+         ! Partition of hydrometeor increments via warm rain process
+
+         call da_moist_phys_lin( xb, xa, xp)
+
+      endif
    end if
 
    !---------------------------------------------------------------

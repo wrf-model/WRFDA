@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures(xp, ob, iv)
+subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 
    !---------------------------------------------------------------------------
    ! Purpose: Allocate and read in components of observation structure.
@@ -9,6 +9,7 @@ subroutine da_setup_obs_structures(xp, ob, iv)
    type (xpose_type), intent(in):: xp          ! Domain decomposition vars. 
    type (y_type), intent(out)  :: ob          ! Observation structure.
    type (ob_type), intent(out)  :: iv          ! O-B structure.
+   TYPE (xb_type)               :: xb          ! First guess structure.
 
    integer :: iost, ssmi_unit
 
@@ -233,7 +234,7 @@ subroutine da_setup_obs_structures(xp, ob, iv)
             call da_setup_obs_structures_bufr(xp, ob, iv)
       else if (ob_format == ob_format_ascii) then
          ! [1.2] GTS observation input file:
-         call da_setup_obs_structures_ascii(xp, ob, iv)
+         call da_setup_obs_structures_ascii( xp, ob, iv, xb )
       end if
    end if
 

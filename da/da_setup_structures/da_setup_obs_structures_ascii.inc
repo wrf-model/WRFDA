@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures_ascii(xp, ob, iv)
+subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of observation structure.
@@ -9,9 +9,11 @@ subroutine da_setup_obs_structures_ascii(xp, ob, iv)
    type (xpose_type), intent(in) :: xp         ! Domain decomposition vars.
    type (y_type), intent(out)  :: ob          ! Observation structure.
    type (ob_type), intent(out)  :: iv          ! O-B structure.
+   TYPE (xb_type)                :: xb         ! First guess structure
 
    character(len=120)           :: filename
    integer                      :: n
+   integer                      :: i, j, k
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures_ascii")
    
@@ -248,6 +250,40 @@ subroutine da_setup_obs_structures_ascii(xp, ob, iv)
       if (Use_RadarObs) then
          ! read radar observation file
          call da_read_radar(iv, xp,'radar01.dat')
+      end if
+   end if
+
+   ! Calculate DT for RF DA
+
+   if (use_radarobs .and. use_radar_rf) then
+      if (.not. DT_cloud_model) then
+         do j = xp%jts, xp%jte
+            do i = xp%its, xp%ite
+               do k = xp%kts, xp%kte
+                   xb%delt(i,j,k) = 0.0
+               end do
+            end do
+        end do
+
+        do n = 1, iv % num_Radar
+           do i=int(iv%Radar(n)%loc%i), int(iv%Radar(n)%loc%i)+1
+              do j=int(iv%Radar(n)%loc%j), int(iv%Radar(n)%loc%j)+1
+                 do k=xp%kts, xp%kte
+                    xb%delt(i,j,k) = 1800.0
+                    xb%qrn(i,j,k) = amax1(5.E-5, xb%qrn(i,j,k))
+                    xb%qcw(i,j,k) = amax1(5.E-12, xb%qcw(i,j,k))
+                  end do
+                  ! do k=xp%kts, xp%kte
+                  !    v_h(k)=xb%h(i,j  ,k)
+                  ! end do
+                  ! do k = 1, iv % Radar(n) % info % levels
+                  !    call zk(iv%Radar(n)%height(k), v_h, xp, zkk)
+                  !    xb%delt(i,j,int(zkk))=1800.
+                  !    xb%delt(i,j,int(zkk)+1)=1800.
+                  ! end do
+               end do
+            end do
+         end do
       end if
    end if
 

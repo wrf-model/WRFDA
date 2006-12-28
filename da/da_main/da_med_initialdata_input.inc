@@ -91,9 +91,10 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    call ext_ncd_ioclose(fid, ierr)
 
-   call da_trace("da_med_initialdata_input",message="open_r_dataset for "//trim(filename))
+   call da_trace("da_med_initialdata_input", &
+       message="open_r_dataset for "//trim(filename))
    call open_r_dataset (fid, trim(filename), grid , config_flags , &
-      "DATASET=inPUT", ierr)
+      "DATASET=INPUT", ierr)
 
    if (ierr .NE. 0) then
       write(unit=message(1),fmt='(A,A,A,I5)') 'Error opening ', &
@@ -111,7 +112,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
 
    call input_model_input (fid ,   grid , config_flags , ierr)
 
-   call close_dataset (fid , config_flags , "DATASET=inPUT")
+   call close_dataset (fid , config_flags , "DATASET=INPUT")
 
    if (trace_use) call da_trace_exit("da_med_initialdata_input")
 

@@ -45,7 +45,7 @@ subroutine da_trh_to_td (RH, T, TD, xp)
 
    implicit none
 
-   type (xpose_type), intent(in)      :: xp    ! Domain decomposition vars.
+   type (xpose_type), intent(in)      :: xp    ! domain decomposition vars.
 
    real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
       intent(inout) :: rh ! Relative Humidity.

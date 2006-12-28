@@ -11,11 +11,11 @@ subroutine da_tv_profile(xp, xb, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
    type (xb_type), intent(in)     :: xb       ! first guess state.
    type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
    integer, intent(in)            :: i, j     ! OBS location
-   real, intent(in)               :: dx, dxm  ! Interpolation weights.
-   real, intent(in)               :: dy, dym  ! Interpolation weights.
+   real, intent(in)               :: dx, dxm  ! interpolation weights.
+   real, intent(in)               :: dy, dym  ! interpolation weights.
    real, dimension(xp%kts-1:xp%kte+1), intent(out)   :: pre_ma,tv_ma
                           
-   integer                        :: ii,jj,ks,ke    ! Index dimension.
+   integer                        :: ii,jj,ks,ke    ! index dimension.
    real, dimension(2,2,xp%kts:xp%kte)   :: tv_m     ! Virtual temperatures
 
    ks = xp%kts; ke = xp%kte

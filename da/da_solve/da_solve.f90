@@ -111,7 +111,7 @@ subroutine da_solve ( grid , config_flags , &
    ! [4.0] Set up observations (ob):
    !---------------------------------------------------------------------------
 
-   call da_setup_obs_structures( grid%xp, ob, iv )
+   call da_setup_obs_structures( grid%xp, ob, iv, grid%xb )
 
    !---------------------------------------------------------------------------
    ! [5.0] Set up background errors (be):

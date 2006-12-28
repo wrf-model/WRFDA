@@ -18,7 +18,7 @@ subroutine da_tpq_to_rh_lin( xb, xp, xa )
    
    type (xb_type), intent(in)    :: xb           ! First guess structure.
    type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (x_type), intent(inout)  :: xa           ! increment structure.
    
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -27,7 +27,7 @@ subroutine da_tpq_to_rh_lin( xb, xp, xa )
                                                        qs_prime_over_qs
 
    !---------------------------------------------------------------------------
-   ! [1.0] Initialise:
+   ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
    is = xp%its; ie = xp%ite

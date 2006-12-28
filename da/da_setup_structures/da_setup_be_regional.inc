@@ -73,6 +73,11 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    be % v3 % name = 't_u'             ! Unbalanced temperature.
    be % v4 % name = 'q/qsg'
    be % v5 % name = 'psfc'            ! surface pressure
+!clq
+   if(use_radarobs .and. use_radar_rf) then
+   be % v4 % name = 'qt   '
+   endif
+!clq end
 
    write (unit=message(2),fmt='(3x,A,7A)') 'WRF-Var dry control variables are:', &
       trim(be % v1 % name), ', ', trim(be % v2 % name), ', ', &

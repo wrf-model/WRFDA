@@ -12,7 +12,7 @@ subroutine da_prho_to_t_adj(xb, xp, xa)
    
    type (xb_type), intent(in)    :: xb           ! First guess structure.
    type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! Increment structure.
+   type (x_type), intent(inout)  :: xa           ! increment structure.
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -21,7 +21,7 @@ subroutine da_prho_to_t_adj(xb, xp, xa)
    real                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
 
    !---------------------------------------------------------------------------
-   !  [1.0] Initialise:
+   !  [1.0] initialise:
    !---------------------------------------------------------------------------
 
    is = xp%its
