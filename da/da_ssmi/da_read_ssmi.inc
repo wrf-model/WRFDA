@@ -236,7 +236,7 @@ subroutine da_read_ssmi (ob, xp, filename)
                 (tb85v % qc == missing) .AND. (tb85h % qc == missing)) then
                count_obs_ssmit % num_missing = &
                count_obs_ssmit % num_missing + 1
-               ! print*,'missing data'
+               ! write (unit=stdout,fmt=*) 'missing data'
                cycle reports
             end if
 
@@ -334,7 +334,7 @@ subroutine filter(tb19v, tb19h, tb22v, tb37v,          &
    real                    :: sst, dsst
    real                    :: theta,tc,wv,u,alw19,alw37,alw85
 
-   !  print*,'tbdata',tb19v, tb19h, tb22v, tb37v,tb37h, tb85v, tb85h
+   !  write (unit=stdout,fmt=*) 'tbdata',tb19v, tb19h, tb22v, tb37v,tb37h, tb85v, tb85h
    ! tc : cloud top temperature (C)
 
    theta = 53.1
@@ -531,9 +531,9 @@ subroutine pettyalgos(tb,theta,tc,sst,dsst, &
    integer iprecip
 
    ! get water vapor
-   !     print*,'tb=',tb
+   !     write (unit=stdout,fmt=*) 'tb=',tb
    call pettyvapor(tb,wv)
-   !     print*,'wv=',wv
+   !     write (unit=stdout,fmt=*) 'wv=',wv
 
    ! get surface wind speed
    call pettywind(tb,theta,sst,dsst,u)
@@ -543,7 +543,7 @@ subroutine pettyalgos(tb,theta,tc,sst,dsst, &
    call pettylwp(tb,theta,2,tc,alw37,iprecip,xlat)
    call pettylwp(tb,theta,3,tc,alw85,iprecip,xlat)
    if (alw19 .eq. BAD .or. alw19 .eq. BAD .or. alw85 .eq. BAD) iprecip=1
-   !     if (iprecip .eq. 1) print*,'iprecip B=',iprecip,'alw=',alw19,alw37,alw85
+   !     if (iprecip .eq. 1) write (unit=stdout,fmt=*) 'iprecip B=',iprecip,'alw=',alw19,alw37,alw85
 
 end subroutine pettyalgos
 
@@ -666,7 +666,7 @@ subroutine p2lwp(ifreq,p,tc,theta,alw,xlat)
 
    ! check for precipitation
    threshhold=0.5
-   !     print*,'xlat=',xlat
+   !     write (unit=stdout,fmt=*) 'xlat=',xlat
    if (xlat .gt. 20) threshhold=0.3
    if (xlat .gt. 30) threshhold=0.1
    !     if (xlat .gt. 40) threshhold=0.25

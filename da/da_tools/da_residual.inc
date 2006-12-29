@@ -12,7 +12,7 @@ function da_residual(n, k, yy, ox, n_bad) result (rr)
    type (bad_info_type)  , intent(inout) :: n_bad
    real                             :: rr
 
-   ! JRB use variable to stop compiler whinge
+   ! WHY
    if (k ==0 .OR. n==0) then
    end if
 

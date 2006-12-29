@@ -145,13 +145,13 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
  write(99,rec=nout) squareinno 
  
- print *, "nout=", nout
+ write (unit=stdout,fmt=*)  "nout=", nout
 
  if (naccumt1 .gt. 0) then
  squareinnosum = squareinno
 
  if (nout.ge.nstartaccum1) then
- print *, "OK"
+ write (unit=stdout,fmt=*)  "OK"
  squareinnosum = 0.
  do nt = nout-naccumt1+1, nout 
  read(99,rec=nt) squareinnosum1
@@ -181,7 +181,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  else
 ! this is for pre-specified inflation factor
  tainflat = tainflatinput
- print *, "tainflat=", tainflat
+ write (unit=stdout,fmt=*)  "tainflat=", tainflat
  write(109, rec=(nout-1)*3+2) tainflat
  end if
 
@@ -235,7 +235,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
   if (nout.ge.nstartaccum2) then
 
-  print *, "OK"
+  write (unit=stdout,fmt=*)  "OK"
   squareinnosum = 0.
   do nt = nout-naccumt2+1, nout 
   read(99,rec=nt) squareinnosum1
@@ -290,7 +290,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 !---------------- calculate the ETKF initial perturbations
 
  call cpu_time(tb)
- print *, "total cpu time =", tb-ta
+ write (unit=stdout,fmt=*)  "total cpu time =", tb-ta
 
 end subroutine da_solve_etkf
 

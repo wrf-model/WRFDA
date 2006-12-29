@@ -365,7 +365,7 @@ subroutine da_transfer_xatowrf(xbx, grid, &
       write(unit=stdout, fmt='(/5a/)') ' simple variables:'
 
       if (ie == grid%xp%ide) then
-         print *, ' '
+         write (unit=stdout,fmt=*)  ' '
 
          do k=ks+5,ke,10
             do j=js,je,10

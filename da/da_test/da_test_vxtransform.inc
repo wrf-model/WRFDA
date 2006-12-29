@@ -217,7 +217,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
    if (global) then   
 #ifdef DM_PARALLEL
-    print*, &
+    write (unit=stdout,fmt=*)  &
        ' Inverse tests for spectral transforms will not be done as it is MPP run'
 #else
       call random_number(field(:,:) )

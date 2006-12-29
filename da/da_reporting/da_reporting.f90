@@ -6,7 +6,6 @@ module da_reporting
    implicit none
 
    character(len=300) :: message(100)
-   character(len=300) :: errmsg(100) ! JRB obsolete
 
 contains
 

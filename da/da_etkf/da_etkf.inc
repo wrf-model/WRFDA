@@ -129,7 +129,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
 
    write(119,rec=nout) eignv 
 
-   print *, "eignv=",eignv
+   write (unit=stdout,fmt=*) "eignv=",eignv
 
    ! note eigenvectors output from SSYEV are stored in columns !!!
    do i = 1, nanals
@@ -155,26 +155,26 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
 
    write(99,rec=nout) squareinno 
 
-   print *, "squareinno=", squareinno
-   print *, "nout=", nout
-   print *, "nstartaccum1=", nstartaccum1
-   print *, "tracehpfht=",tracehpfht
-   print *, "nobs=",nobs
+   write (unit=stdout,fmt=*) "squareinno=", squareinno
+   write (unit=stdout,fmt=*) "nout=", nout
+   write (unit=stdout,fmt=*) "nstartaccum1=", nstartaccum1
+   write (unit=stdout,fmt=*) "tracehpfht=",tracehpfht
+   write (unit=stdout,fmt=*) "nobs=",nobs
 
    if (naccumt1 .gt. 0) then
       squareinnosum = squareinno
 
       if (nout.ge.nstartaccum1) then
-         print *, "OK"
+         write (unit=stdout,fmt=*) "OK"
          squareinnosum = 0.
          do nt = nout-naccumt1+1, nout 
             read(99,rec=nt) squareinnosum1
-            print *, "squareinnosum1=", squareinnosum1
+            write (unit=stdout,fmt=*) "squareinnosum1=", squareinnosum1
             squareinnosum = squareinnosum + squareinnosum1/float(naccumt1)
          end do
       end if
 
-      print *, "squareinnosum=",squareinnosum
+      write (unit=stdout,fmt=*) "squareinnosum=",squareinnosum
 
       ainflat = (squareinnosum-float(nobs))/tracehpfht
       if (ainflat .le. 0) then
@@ -193,13 +193,13 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
       write(109, rec=(nout-1)*3+1) ainflat
       write(109, rec=(nout-1)*3+2) tainflat
 
-      print *, "tainflat=", tainflat
-      print *, "ainflat=", ainflat
+      write (unit=stdout,fmt=*) "tainflat=", tainflat
+      write (unit=stdout,fmt=*) "ainflat=", ainflat
 
    else
       ! this is for pre-specified inflation factor
       tainflat = tainflatinput
-      print *, "tainflat=", tainflat
+      write (unit=stdout,fmt=*) "tainflat=", tainflat
       write(109, rec=(nout-1)*3+2) tainflat
    end if
 
@@ -252,16 +252,16 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
       squareinnosum = squareinno
 
      if (nout.ge.nstartaccum2) then
-        print *, "OK"
+        write (unit=stdout,fmt=*) "OK"
         squareinnosum = 0.0
         do nt = nout-naccumt2+1, nout 
            read(99,rec=nt) squareinnosum1
-           print *, "squareinnosum1=", squareinnosum1
+           write (unit=stdout,fmt=*) "squareinnosum1=", squareinnosum1
            squareinnosum = squareinnosum + squareinnosum1/float(naccumt2)
         end do
      end if
 
-     print *, "squareinnosum=",squareinnosum
+     write (unit=stdout,fmt=*) "squareinnosum=",squareinnosum
 
      rho = (proj2sum-(float(nanals-1)))/(squareinnosum-float(nobs))
      if (rho .le. 0) then
@@ -278,8 +278,8 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
       rho = rhoinput
    end if
 
-   print *, "rho=",rho
-   print *, "proj2sum=",proj2sum
+   write (unit=stdout,fmt=*) "rho=",rho
+   write (unit=stdout,fmt=*) "proj2sum=",proj2sum
 
    ! calculate the grand transformation matrix following Wang et al 2005
    ! TR = C*(rho*gamma+I)^(-1/2)*C^T
@@ -299,37 +299,37 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
    ! apply ainflat
    TR = sqrt(tainflat)*TR  
 
-   print *, "ens"
-   print *, maxval(ens)
-   print *, minval(ens)
-   print *, "eigen/(eigen*rho+1)"
-   print *, eignv/(eignv*rho+1.)
+   write (unit=stdout,fmt=*) "ens"
+   write (unit=stdout,fmt=*) maxval(ens)
+   write (unit=stdout,fmt=*) minval(ens)
+   write (unit=stdout,fmt=*) "eigen/(eigen*rho+1)"
+   write (unit=stdout,fmt=*) eignv/(eignv*rho+1.)
    sum_eignv = 0.
    aftersum_eignv = 0.
    do i = 1, nanals
       sum_eignv = sum_eignv + eignv(i)
       aftersum_eignv = aftersum_eignv + eignv(i)/(eignv(i)*rho+1.)
    end do
-   print *, "sum_eignv=", sum_eignv
-   print *, "sum_aftereignv=", aftersum_eignv
+   write (unit=stdout,fmt=*) "sum_eignv=", sum_eignv
+   write (unit=stdout,fmt=*) "sum_aftereignv=", aftersum_eignv
 
 
-   print *, "avg_ens=",sum(ens)/float(ndim*nanals)
-   print *, "std_ens=",sum(ens*ens)/float(ndim*nanals)
+   write (unit=stdout,fmt=*) "avg_ens=",sum(ens)/float(ndim*nanals)
+   write (unit=stdout,fmt=*) "std_ens=",sum(ens*ens)/float(ndim*nanals)
 
    ! calculate the ETKF initial perturbations
    call matmultiover(ens,TR,ndim,nanals)
-   print *, "ens"
-   print *, maxval(ens)
-   print *, minval(ens)
-   print *, "afteravg_ens=",sum(ens)/float(ndim*nanals)
-   print *, "afterstd_ens=",sum(ens*ens)/float(ndim*nanals)
+   write (unit=stdout,fmt=*) "ens"
+   write (unit=stdout,fmt=*) maxval(ens)
+   write (unit=stdout,fmt=*) minval(ens)
+   write (unit=stdout,fmt=*) "afteravg_ens=",sum(ens)/float(ndim*nanals)
+   write (unit=stdout,fmt=*) "afterstd_ens=",sum(ens*ens)/float(ndim*nanals)
 
    ! calculate the ETKF initial perturbations
 
    call cpu_time(tb)
-   print *, "total cpu time =", tb-ta
-   print *, "total cpu time tb =", tb
+   write (unit=stdout,fmt=*) "total cpu time =", tb-ta
+   write (unit=stdout,fmt=*) "total cpu time tb =", tb
 
 end subroutine da_etkf
 

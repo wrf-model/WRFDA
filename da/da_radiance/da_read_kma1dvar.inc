@@ -218,7 +218,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    !
    ! p => head
    ! do i = 1, size
-   !    print *, i, p%tb(1:nchanl)%inv
+   !    write (unit=stdout,fmt=*)  i, p%tb(1:nchanl)%inv
    !    p => p%next
    ! end do
 

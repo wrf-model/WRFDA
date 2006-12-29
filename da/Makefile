@@ -159,8 +159,8 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_setup_structures.o		\
 			da_radiance.o \
 			da_calculate_j.inc \
-			da_calculate_jo_and_grady.inc \
-			da_calculate_residual.inc \
+			da_jo_and_grady.inc \
+			da_residual.inc \
 			da_get_var_diagnostics.inc \
 			da_get_innov_vector.inc \
 			da_dot.inc \
@@ -316,8 +316,8 @@ da_pseudo.o:		da_pseudo.f90 \
 			da_interpolation.o \
 			da_statistics.o \
 			da_tools.o \
-			da_cal_jo_and_grady_pseudo.inc \
-			da_calculate_residual_pseudo.inc \
+			da_jo_and_grady_pseudo.inc \
+			da_residual_pseudo.inc \
 			da_get_innov_vector_pseudo.inc \
 			da_oa_stats_pseudo.inc \
 			da_ob_stats_pseudo.inc \
@@ -337,8 +337,8 @@ da_metar.o:		da_metar.f90 \
 			da_tools.o \
 			da_physics.o \
 			da_ao_stats_metar.inc \
-			da_calculate_jo_and_grady_metar.inc \
-			da_calculate_residual_metar.inc \
+			da_jo_and_grady_metar.inc \
+			da_residual_metar.inc \
 			da_oi_stats_metar.inc \
 			da_print_stats_metar.inc \
 			da_transform_xtoy_metar.inc \
@@ -357,8 +357,8 @@ da_geoamv.o:		da_geoamv.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_geoamv.inc \
-			da_get_jo_and_grady_geoamv.inc \
-			da_calculate_residual_geoamv.inc \
+			da_jo_and_grady_geoamv.inc \
+			da_residual_geoamv.inc \
 			da_oi_stats_geoamv.inc \
 			da_print_stats_geoamv.inc \
 			da_transform_xtoy_geoamv.inc \
@@ -377,8 +377,8 @@ da_polaramv.o:		da_polaramv.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_polaramv.inc \
-			da_get_jo_and_grady_polaramv.inc \
-			da_calculate_residual_polaramv.inc \
+			da_jo_and_grady_polaramv.inc \
+			da_residual_polaramv.inc \
 			da_oi_stats_polaramv.inc \
 			da_print_stats_polaramv.inc \
 			da_transform_xtoy_polaramv.inc \
@@ -397,8 +397,8 @@ da_satem.o:		da_satem.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_satem.inc \
-			da_calculate_jo_and_grady_satem.inc \
-			da_calculate_residual_satem.inc \
+			da_jo_and_grady_satem.inc \
+			da_residual_satem.inc \
 			da_oi_stats_satem.inc \
 			da_print_stats_satem.inc \
 			da_transform_xtoy_satem.inc \
@@ -418,8 +418,8 @@ da_ships.o:		da_ships.f90 \
 			da_tools.o \
 			da_physics.o \
 			da_ao_stats_ships.inc \
-			da_calculate_jo_and_grady_ships.inc \
-			da_calculate_residual_ships.inc \
+			da_jo_and_grady_ships.inc \
+			da_residual_ships.inc \
 			da_oi_stats_ships.inc \
 			da_print_stats_ships.inc \
 			da_transform_xtoy_ships.inc \
@@ -441,9 +441,9 @@ da_synop.o:		da_synop.f90 \
 			da_check_max_iv_synop.inc \
 			da_get_innov_vector_synop.inc \
 			da_ao_stats_synop.inc \
-			da_calculate_jo_and_grady_synop.inc \
-			da_compute_jo_synop_uvtq.inc \
-			da_calculate_residual_synop.inc \
+			da_jo_and_grady_synop.inc \
+			da_jo_synop_uvtq.inc \
+			da_residual_synop.inc \
 			da_oi_stats_synop.inc \
 			da_print_stats_synop.inc \
 			da_transform_xtoy_synop.inc \
@@ -460,9 +460,9 @@ da_sound.o:		da_sound.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_sound.inc \
-			da_calculate_jo_and_grady_sound.inc \
-			da_compute_jo_sound_uvtq.inc \
-			da_calculate_residual_sound.inc \
+			da_jo_and_grady_sound.inc \
+			da_jo_sound_uvtq.inc \
+			da_residual_sound.inc \
 			da_oi_stats_sound.inc \
 			da_print_stats_sound.inc \
 			da_transform_xtoy_sound.inc \
@@ -471,9 +471,9 @@ da_sound.o:		da_sound.f90 \
 			da_get_innov_vector_sound.inc \
 			da_obs_diagnostics.inc \
 			da_ao_stats_sonde_sfc.inc \
-			da_get_jo_and_grady_sonde_sfc.inc \
-			da_compute_jo_sonde_sfc_uvtq.inc \
-			da_calculate_residual_sonde_sfc.inc \
+			da_jo_and_grady_sonde_sfc.inc \
+			da_jo_sonde_sfc_uvtq.inc \
+			da_residual_sonde_sfc.inc \
 			da_oi_stats_sonde_sfc.inc \
 			da_print_stats_sonde_sfc.inc \
 			da_transform_xtoy_sonde_sfc.inc \
@@ -493,8 +493,8 @@ da_airep.o:		da_airep.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_airep.inc \
-			da_calculate_jo_and_grady_airep.inc \
-			da_calculate_residual_airep.inc \
+			da_jo_and_grady_airep.inc \
+			da_residual_airep.inc \
 			da_oi_stats_airep.inc \
 			da_print_stats_airep.inc \
 			da_transform_xtoy_airep.inc \
@@ -513,8 +513,8 @@ da_pilot.o:		da_pilot.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_ao_stats_pilot.inc \
-			da_calculate_jo_and_grady_pilot.inc \
-			da_calculate_residual_pilot.inc \
+			da_jo_and_grady_pilot.inc \
+			da_residual_pilot.inc \
 			da_oi_stats_pilot.inc \
 			da_print_stats_pilot.inc \
 			da_transform_xtoy_pilot.inc \
@@ -534,8 +534,8 @@ da_bogus.o:		da_bogus.f90 \
 			da_tools.o \
 			da_physics.o \
 			da_ao_stats_bogus.inc \
-			da_calculate_jo_and_grady_bogus.inc \
-			da_calculate_residual_bogus.inc \
+			da_jo_and_grady_bogus.inc \
+			da_residual_bogus.inc \
 			da_oi_stats_bogus.inc \
 			da_print_stats_bogus.inc \
 			da_transform_xtoy_bogus.inc \
@@ -555,8 +555,8 @@ da_radar.o:		da_radar.f90 \
 			da_tools.o \
 			da_ao_stats_radar.inc \
 			da_calculate_grady_radar.inc \
-			da_calculate_jo_and_grady_radar.inc \
-			da_calculate_residual_radar.inc \
+			da_jo_and_grady_radar.inc \
+			da_residual_radar.inc \
 			da_oi_stats_radar.inc \
 			da_print_stats_radar.inc \
 			da_transform_xtoy_radar.inc \
@@ -583,8 +583,8 @@ da_gpspw.o:		da_gpspw.f90 \
 			da_physics.o \
 			da_tools.o \
 			da_ao_stats_gpspw.inc \
-			da_calculate_jo_and_grady_gpspw.inc \
-			da_calculate_residual_gpspw.inc \
+			da_jo_and_grady_gpspw.inc \
+			da_residual_gpspw.inc \
 			da_oi_stats_gpspw.inc \
 			da_print_stats_gpspw.inc \
 			da_check_max_iv_gpspw.inc \
@@ -604,8 +604,8 @@ da_gpsref.o:		da_gpsref.f90 \
 			da_tools.o \
 			da_ao_stats_gpsref.inc \
 			da_calculate_grady_gpsref.inc \
-			da_get_jo_and_grady_gpsref.inc \
-			da_calculate_residual_gpsref.inc \
+			da_jo_and_grady_gpsref.inc \
+			da_residual_gpsref.inc \
 			da_oi_stats_gpsref.inc \
 			da_print_stats_gpsref.inc \
 			da_transform_xtoy_gpsref.inc \
@@ -630,12 +630,12 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_ao_stats_ssmi_tb.inc \
 			da_read_ssmi.inc \
 			da_scan_ssmi.inc \
-			da_cal_jo_and_grady_ssmi.inc \
-			da_cal_jo_and_grady_ssmi_rv.inc \
-			da_cal_jo_and_grady_ssmi_tb.inc \
-			da_cal_residual_ssmi.inc \
-			da_cal_residual_ssmi_rv.inc \
-			da_cal_residual_ssmi_tb.inc \
+			da_jo_and_grady_ssmi.inc \
+			da_jo_and_grady_ssmi_rv.inc \
+			da_jo_and_grady_ssmi_tb.inc \
+			da_residual_ssmi.inc \
+			da_residual_ssmi_rv.inc \
+			da_residual_ssmi_tb.inc \
 			da_oi_stats_ssmi.inc \
 			da_oi_stats_ssmi_rv.inc \
 			da_oi_stats_ssmi_tb.inc \
@@ -657,11 +657,11 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_transform_xtozrhoq.inc \
 			da_transform_xtozrhoq_lin.inc \
 			da_transform_xtozrhoq_adj.inc \
-			da_cal_sigma_v.inc \
-			da_cal_jo_and_grady_ssmt1.inc \
-			da_cal_jo_and_grady_ssmt2.inc \
-			da_cal_residual_ssmt1.inc \
-			da_cal_residual_ssmt2.inc \
+			da_sigma_v.inc \
+			da_jo_and_grady_ssmt1.inc \
+			da_jo_and_grady_ssmt2.inc \
+			da_residual_ssmt1.inc \
+			da_residual_ssmt2.inc \
 			da_check_max_iv_ssmi_rv.inc \
 			da_check_max_iv_ssmi_tb.inc \
 			da_check_max_iv_ssmt1.inc \
@@ -688,8 +688,8 @@ da_qscat.o:		da_qscat.f90 \
 			da_statistics.o \
 			da_tools.o \
 			da_par_util.o \
-			da_calculate_jo_and_grady_qscat.inc \
-			da_calculate_residual_qscat.inc \
+			da_jo_and_grady_qscat.inc \
+			da_residual_qscat.inc \
 			da_check_max_iv_qscat.inc \
 			da_get_innov_vector_qscat.inc \
 			da_oa_stats_qscat.inc \
@@ -704,10 +704,10 @@ da_qscat.o:		da_qscat.f90 \
 da_airsr.o:		da_airsr.f90 \
                         da_ao_stats_airsr.inc \
                         da_calculate_grady_airsr.inc \
-                        da_calculate_jo_and_grady_airsr.inc \
-                        da_calculate_residual_airsr.inc \
+                        da_jo_and_grady_airsr.inc \
+                        da_residual_airsr.inc \
                         da_check_max_iv_airsr.inc \
-                        da_compute_jo_airsr_tq.inc \
+                        da_jo_airsr_tq.inc \
                         da_get_innov_vector_airsr.inc \
                         da_oi_stats_airsr.inc \
                         da_print_stats_airsr.inc \
@@ -726,8 +726,8 @@ da_profiler.o:		da_profiler.f90 \
 			da_tools.o \
 			da_profiler.f90 \
 			da_ao_stats_profiler.inc \
-			da_get_jo_and_grady_profiler.inc \
-			da_calculate_residual_profiler.inc \
+			da_jo_and_grady_profiler.inc \
+			da_residual_profiler.inc \
 			da_oi_stats_profiler.inc \
 			da_print_stats_profiler.inc \
 			da_transform_xtoy_profiler.inc \
@@ -748,8 +748,8 @@ da_buoy.o:		da_buoy.f90 \
 			da_tools.o \
 			da_physics.o \
 			da_ao_stats_buoy.inc \
-			da_calculate_jo_and_grady_buoy.inc \
-			da_calculate_residual_buoy.inc \
+			da_jo_and_grady_buoy.inc \
+			da_residual_buoy.inc \
 			da_oi_stats_buoy.inc \
 			da_print_stats_buoy.inc \
 			da_transform_xtoy_buoy.inc \
@@ -1178,8 +1178,8 @@ da_radiance.o:		da_radiance.f90 \
 			da_rtm_tl.inc \
 			da_rtm_ad.inc \
 			da_calculate_grady_rad.inc \
-			da_calculate_jo_and_grady_rad.inc \
-			da_calculate_residual_rad.inc \
+			da_jo_and_grady_rad.inc \
+			da_residual_rad.inc \
 			da_transform_xtoy_rad.inc \
 			da_transform_xtoy_rad_adj.inc \
 			da_get_innov_vector_rad.inc \

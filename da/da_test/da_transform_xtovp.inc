@@ -50,7 +50,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    end if
 
    ! Calculate psi:
-   print*,' calling Solve_PoissonEquation for Psi'
+   write (unit=stdout,fmt=*) ' calling Solve_PoissonEquation for Psi'
    call da_solve_poissoneqn_fct(xbx, vor, vp%v1, xp)
 
    ! [2.3] Transform u, v to velocity potential via divergence:

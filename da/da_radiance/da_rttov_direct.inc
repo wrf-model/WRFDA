@@ -185,7 +185,7 @@ call da_oi(__FILE__,__LINE__)
       !
       !  1.0 over sea
       !
-      !  print *, 'mw_emis_sea=', mw_emis_sea
+      !  write (unit=stdout,fmt=*)  'mw_emis_sea=', mw_emis_sea
       if ( profiles(1) % skin % surftype == 1) then 
          if (mw_emis_sea == 0) then
             calcemis  (1:nchannels) = .true.

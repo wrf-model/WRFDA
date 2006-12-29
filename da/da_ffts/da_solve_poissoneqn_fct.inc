@@ -271,7 +271,7 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
    call wrf_dm_sum_reals (local_mean, global_mean)
 
    do k=xp%kts,xp%kte
-      PRinT *,'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT:  global_mean(', &
+      write (unit=stdout,fmt=*) 'TEST_COVERAGE_DA_Solve_PoissonEqn_FCT:  global_mean(', &
          k,') = ', global_mean(k)
    end do
 

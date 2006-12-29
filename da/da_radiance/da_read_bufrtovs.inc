@@ -518,7 +518,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !
    ! p => head
    ! do i = 1, num_rad_used
-   !    print *, i, p%tb_inv(1:nchan)
+   !    write (unit=stdout,fmt=*)  i, p%tb_inv(1:nchan)
    !    p => p%next
    ! end do
 
