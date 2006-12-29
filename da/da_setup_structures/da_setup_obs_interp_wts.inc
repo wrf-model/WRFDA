@@ -9,7 +9,7 @@ subroutine da_setup_obs_interp_wts (xp, iv)
    type (xpose_type), intent(in)  :: xp         ! Domain decomposition vars.
    type (ob_type), intent(inout)  :: iv         ! Innovation vector (O-B).
 
-   integer                        :: inst, n          ! Loop counter.
+   integer                        :: i, n          ! Loop counter.
 
    if (trace_use) call da_trace_entry("da_setup_obs_interp_wts")
 
@@ -102,10 +102,10 @@ subroutine da_setup_obs_interp_wts (xp, iv)
       call da_store_obs_grid_info (xp, iv%airsr(n)%loc)
    end do
 
-   do inst = 1, iv % num_inst
-      if (iv % instid(inst) % num_rad < 1) cycle
-      do n=1, iv % instid(inst) % num_rad
-         call da_store_obs_grid_info (xp, iv % instid(inst) % rad(n)%loc)
+   do i = 1, iv % num_inst
+      if (iv % instid(i) % num_rad < 1) cycle
+      do n=1, iv % instid(i) % num_rad
+         call da_store_obs_grid_info (xp, iv % instid(i) % loc(n))
       end do
    end do
 

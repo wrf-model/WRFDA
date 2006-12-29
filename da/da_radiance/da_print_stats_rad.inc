@@ -1,7 +1,7 @@
 subroutine da_print_stats_rad(stats_unit, nchan, rad)
 
    !---------------------------------------------------------------------------
-   !  Purpose: print out statistics of omb, oma for radiance data.
+   ! Purpose: print out statistics of omb, oma for radiance data.
    !
    !  Method:  print out average, rms, minimum, maximum of iv, re
    !---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ subroutine da_print_stats_rad(stats_unit, nchan, rad)
    if (trace_use) call da_trace_entry("da_print_stats_rad")
 
    used_nchan = 0
-   do k=1, nchan                  !! loop for channels
+   do k=1, nchan                  ! loop for channels
       if (rad%ichan(k)%num > 1) used_nchan = used_nchan + 1
    end do
    write(unit=stats_unit, fmt='((a,i5))')  ' used_nchan: ', used_nchan 
@@ -35,7 +35,7 @@ subroutine da_print_stats_rad(stats_unit, nchan, rad)
          n    = rad%ichan(k)%num
          nmin = rad%ichan(k)%minimum%n
          nmax = rad%ichan(k)%maximum%n
-     
+
          write(unit=stats_unit, fmt='((i3,i7,4f8.2))') &
             k, rad%ichan(k)%num, rad%ichan(k)%ave/real(n), sqrt(rad%ichan(k)%rms/real(n)), &
             rad%ichan(k)%minimum%value, rad%ichan(k)%maximum%value

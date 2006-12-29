@@ -1,10 +1,10 @@
-subroutine da_transform_xtoy_rad (xa, iv, xp, y)
+subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
    !---------------------------------------------------------------------------
-   !  Purpose: transform from analysis increment to 
+   !  PURPOSE: transform from analysis increment to 
    !                          pertubation radiance.
    !
-   !  Method:  delta_y = H delta_x
+   !  METHOD:  delta_y = H delta_x
    !           1. input reference state of RTTOV_TL
    !           2. interpolate analysis increment to obs location
    !           3. Call RTTOV_TL
@@ -13,7 +13,7 @@ subroutine da_transform_xtoy_rad (xa, iv, xp, y)
    !
    !---------------------------------------------------------------------------
 
-   implicit none
+   IMPLICIT NONE
 
    !#include "rttov_q2v.interface"
 
@@ -59,25 +59,25 @@ subroutine da_transform_xtoy_rad (xa, iv, xp, y)
        (/"Must compile with $RTTOV option for radiances"/))
 #else
 
-   IF (iv%num_inst < 1) return
+   IF ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
 
    alloc_status(:) = 0
 
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if (iv%instid(inst)%num_rad < 1) cycle
+      if ( iv%instid(inst)%num_rad < 1 ) cycle
       num_rad   = iv%instid(inst)%num_rad
       nlevels   = iv%instid(inst)%nlevels
       nchan     = iv%instid(inst)%nchan
 
-      allocate (pres(1:nlevels), stat= alloc_status(2))
-      allocate (tb(num_rad,nchan), stat= alloc_status(3))
-      allocate (con_vars(num_rad), stat= alloc_status(4))
-      allocate (con_vars_tl(num_rad), stat= alloc_status(5))
-      allocate (aux_vars(num_rad), stat= alloc_status(6))
-      allocate (aux_vars_tl(num_rad), stat= alloc_status(7))
-      if (any(alloc_status /= 0)) then
+      allocate (pres(1:nlevels), stat= alloc_status(2) )
+      allocate (tb(num_rad,nchan), stat= alloc_status(3) )
+      allocate (con_vars(num_rad), stat= alloc_status(4) )
+      allocate (con_vars_tl(num_rad), stat= alloc_status(5) )
+      allocate (aux_vars(num_rad), stat= alloc_status(6) )
+      allocate (aux_vars_tl(num_rad), stat= alloc_status(7) )
+      if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot allocate memory to con_vars"/))
       end if
@@ -95,7 +95,7 @@ subroutine da_transform_xtoy_rad (xa, iv, xp, y)
 
 !      if (interp_new) then
 if (.false.) then
-         call da_interp_lin_3d_new(xa%t, xp, &
+         call da_interp_lin_3d_new( xa%t, xp, &
            iv%instid(inst)%loc_i, &
            iv%instid(inst)%loc_j, &
            iv%instid(inst)%loc_k, &
@@ -107,7 +107,7 @@ if (.false.) then
            iv%instid(inst)%loc_dzm, &
            model_t, nlevels, num_rad)
 
-         call da_interp_lin_3d_new(xa%q, xp, &
+         call da_interp_lin_3d_new( xa%q, xp, &
            iv%instid(inst)%loc_i, &
            iv%instid(inst)%loc_j, &
            iv%instid(inst)%loc_k, &
@@ -117,13 +117,13 @@ if (.false.) then
            iv%instid(inst)%loc_dxm, &
            iv%instid(inst)%loc_dym, &
            iv%instid(inst)%loc_dzm, &
-           model_q, nlevels, num_rad)
+           model_q, nlevels, num_rad )
 
-         call da_interp_lin_2d_new(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
             iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
             iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-            model_psfc,num_rad)
+            model_psfc,num_rad )
       else
          do n= 1, num_rad           ! loop for pixel
             
@@ -138,13 +138,13 @@ if (.false.) then
 
             ! [1.2] Interpolate horizontally to ob:
 
-            call da_interp_lin_3d(xa%t, xp, i, j, dx, dy, dxm, dym, &
-                              model_t(:,n), nlevels, iv%instid(inst)%rad(n)%zk, nlevels)
-            call da_interp_lin_3d(xa%q, xp, i, j, dx, dy, dxm, dym, &
-                              model_q(:,n), nlevels, iv%instid(inst)%rad(n)%zk, nlevels)
-            call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+            call da_interp_lin_3d( xa%t, xp, i, j, dx, dy, dxm, dym, &
+                              model_t(:,n), nlevels, iv%instid(inst)%rad(n)%zk, nlevels )
+            call da_interp_lin_3d( xa%q, xp, i, j, dx, dy, dxm, dym, &
+                              model_q(:,n), nlevels, iv%instid(inst)%rad(n)%zk, nlevels )
+            call da_interp_lin_2d( xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_psfc(n))
+                             model_psfc(n) )
          end do
       end if
 !write (0,*) "model_t(:,:)",model_t(:,:)
@@ -164,18 +164,18 @@ if (.false.) then
 
       do n=1,num_rad
          do k=1, nlevels
-            IF (iv%instid(inst)%rad(n)%zk(k) <= 0.0) THEN
+            IF ( iv%instid(inst)%rad(n)%zk(k) <= 0.0 ) THEN
                model_t(k,n)  = 0.0  !coefs(inst) % ref_prfl_t(k,gas_id_watervapour)
                model_mr(k,n) = 0.0  !coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
                ! model_mr(k,n) = model_q(k,n) * 1.60771704e+6 ! convert q(kg/kg) to ppmv 
                model_mr(k,n) = model_q(k,n) * q2ppmv
-               ! call rttov_q2v (&
+               ! call rttov_q2v ( &
                !    gas_unit_specconc,  &! in
                !    model_q(k,n),         &! in
                !    gas_id_watervapour, &! in
                !    model_q(k,n),         &! in
-               !    model_mr(k,n)    )    ! inout
+               !    model_mr(k,n)     )    ! inout
             END IF
          end do
 
@@ -282,25 +282,25 @@ if (.false.) then
                do j=1,len
                   temp_t(:,j)=con_vars(s+j-1) % t(:)
                end do
-               call mpi_send(temp_t,nl, true_mpi_real, tovs_recv_pe(inst,i), i*7+1, comm, ierr)
+               call MPI_SEND( temp_t,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*7+1, MPI_COMM_WORLD, IERR )
 
                allocate(temp_t_tl(nlevels,len))
                do j=1,len
                   temp_t_tl(:,j)=con_vars_tl(s+j-1) % t(:)
                end do
-               call mpi_send(temp_t_tl,nl, true_mpi_real, tovs_recv_pe(inst,i), i*7+2, comm, ierr)
+               call MPI_SEND( temp_t_tl,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*7+2, MPI_COMM_WORLD, IERR )
 
                allocate(temp_q(nlevels,len))
                do j=1,len
                   temp_q(:,j)=con_vars(s+j-1) % q(:)
                end do
-               call mpi_send(temp_q,nl, true_mpi_real, tovs_recv_pe(inst,i), i*7+3, comm, ierr)
+               call MPI_SEND( temp_q,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*7+3, MPI_COMM_WORLD, IERR )
 
                allocate(temp_q_tl(nlevels,len))
                do j=1,len
                   temp_q_tl(:,j)=con_vars_tl(s+j-1) % q(:)
                end do
-               call mpi_send(temp_q_tl,nl, true_mpi_real, tovs_recv_pe(inst,i), i*7+4, comm, ierr)
+               call MPI_SEND( temp_q_tl,nl, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*7+4, MPI_COMM_WORLD, IERR )
 
                allocate (rtemp(len,16))
                rtemp(:,1)= con_vars(s:e) % ps
@@ -319,12 +319,12 @@ if (.false.) then
                rtemp(:,14)= aux_vars_tl(s:e) % surft
                rtemp(:,15)= aux_vars_tl(s:e) % satzen
                rtemp(:,16)= aux_vars_tl(s:e) % satazi
-               call mpi_send(rtemp,len*16, true_mpi_real, tovs_recv_pe(inst,i), i*7+5, comm, ierr)
+               call MPI_SEND(rtemp,len*16, TRUE_MPI_REAL, tovs_recv_pe(inst,i), i*7+5, MPI_COMM_WORLD, IERR )
 
                allocate (itemp(len,2))
                itemp(:,1)= con_vars(s:e) % nlevels  ! aux_vars_tl version identical
                itemp(:,2)= aux_vars(s:e) % surftype ! aux_vars_tl version identical
-               call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(inst,i), i*7+6, comm, ierr)
+               call MPI_SEND(itemp,len*2, MPI_INTEGER, tovs_recv_pe(inst,i), i*7+6, MPI_COMM_WORLD, IERR )
 
                deallocate (temp_t)
                deallocate (temp_q)
@@ -340,36 +340,36 @@ if (.false.) then
                nl=len*nlevels
 
                allocate(temp_t(nlevels,len))
-               call mpi_recv(temp_t,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*7+1, comm, status, ierr)
+               call MPI_RECV(temp_t,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
+                  i*7+1, MPI_COMM_WORLD, status, IERR )
                do j=1,len
                   d_con_vars(s+j-1) % t(:)=temp_t(:,j)
                end do
 
                allocate(temp_t_tl(nlevels,len))
-               call mpi_recv(temp_t_tl,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*7+2, comm, status, ierr)
+               call MPI_RECV(temp_t_tl,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
+                  i*7+2, MPI_COMM_WORLD, status, IERR )
                do j=1,len
                   d_con_vars_tl(s+j-1) % t(:)=temp_t_tl(:,j)
                end do
 
                allocate(temp_q(nlevels,len))
-               call mpi_recv(temp_q,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*7+3, comm, status, ierr)
+               call MPI_RECV(temp_q,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
+                  i*7+3, MPI_COMM_WORLD, status, IERR )
                do j=1,len
                   d_con_vars(s+j-1) % q(:)=temp_q(:,j)
                end do
 
                allocate(temp_q_tl(nlevels,len))
-               call mpi_recv(temp_q_tl,nl, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*7+4, comm, status, ierr)
+               call MPI_RECV(temp_q_tl,nl, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
+                  i*7+4, MPI_COMM_WORLD, status, IERR )
                do j=1,len
                   d_con_vars_tl(s+j-1) % q(:)=temp_q_tl(:,j)
                end do
 
                allocate (rtemp(len,16))
-               call mpi_recv(rtemp,len*16, true_mpi_real, tovs_send_pe(inst,i), &
-                  i*7+5, comm, status, ierr)
+               call MPI_RECV(rtemp,len*16, TRUE_MPI_REAL, tovs_send_pe(inst,i), &
+                  i*7+5, MPI_COMM_WORLD, status, IERR )
                d_con_vars(s:e) % ps          = rtemp(:,1)
                d_con_vars_tl(s:e) % ps       = rtemp(:,2)
                d_aux_vars(s:e) % t2m         = rtemp(:,3)
@@ -388,8 +388,8 @@ if (.false.) then
                d_aux_vars_tl(s:e) % satazi   = rtemp(:,16)
 
                allocate (itemp(len,2))
-               call mpi_recv(itemp,len*2, mpi_integer, tovs_send_pe(inst,i), &
-                  i*7+6, comm, status, ierr)
+               call MPI_RECV(itemp,len*2, MPI_INTEGER, tovs_send_pe(inst,i), &
+                  i*7+6, MPI_COMM_WORLD, status, IERR )
                d_con_vars(s:e) % nlevels     = itemp(:,1)
                d_aux_vars(s:e) % surftype    = itemp(:,2)
 
@@ -407,7 +407,7 @@ if (.false.) then
 
 
          call da_rttov_tl (inst, nchan, d_num_rad, d_con_vars, &
-                           d_aux_vars, d_con_vars_tl, d_aux_vars_tl, d_tb)
+                           d_aux_vars, d_con_vars_tl, d_aux_vars_tl, d_tb )
 
          ! Transfer data back
 
@@ -424,15 +424,15 @@ if (.false.) then
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*nlevels
-               call mpi_send(d_tb(s:e,:),len*nchan, true_mpi_real, tovs_send_pe(inst,i), i*7+7, comm, ierr)
+               call MPI_SEND(d_tb(s:e,:),len*nchan, TRUE_MPI_REAL, tovs_send_pe(inst,i), i*7+7, MPI_COMM_WORLD, IERR )
             end if
             if (tovs_send_pe(inst,i)==myproc) then
                s=tovs_send_start(inst,i)
                len=tovs_send_count(inst,i)
                e=s+len-1
                nl=len*nlevels
-               call mpi_recv(tb(s:e,:),len*nchan, true_mpi_real, &
-                  tovs_recv_pe(inst,i), i*7+7, comm, status, ierr)
+               call MPI_RECV(tb(s:e,:),len*nchan, TRUE_MPI_REAL, &
+                  tovs_recv_pe(inst,i), i*7+7, MPI_COMM_WORLD, status, IERR )
             end if
          end do
          do n=1,d_num_rad
@@ -444,7 +444,7 @@ if (.false.) then
 #endif
       else
          call da_rttov_tl (inst, nchan, num_rad, con_vars, aux_vars, &
-                                  con_vars_tl, aux_vars_tl, tb)
+                                  con_vars_tl, aux_vars_tl, tb )
       end if
 
       do n = 1, num_rad
@@ -453,6 +453,7 @@ if (.false.) then
          deallocate (con_vars_tl(n) % t)
          deallocate (con_vars_tl(n) % q)
          y%instid(inst)%rad(n)%tb(:) = tb(n,:)
+write (0,*) inst,n,"SUM(y%instid(inst)%rad(n)%tb))",SUM(y%instid(inst)%rad(n)%tb(:))
       end do
       !-------------------------------------------------------------------
       ! [2.0] assign Hdx :
@@ -482,5 +483,4 @@ if (.false.) then
 #endif
 
 end subroutine da_transform_xtoy_rad
-
 

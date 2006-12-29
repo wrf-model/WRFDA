@@ -1,4 +1,4 @@
-subroutine da_qc_amsub ( inst, nchan, ob, iv )
+subroutine da_qc_amsub (i, nchan, ob, iv)
 
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for amsub data.
@@ -6,10 +6,10 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
 
    implicit none
 
-   INTEGER, INTENT(IN)             :: inst       ! sensor index.
-   INTEGER, INTENT(IN)             :: nchan      ! number of channel
-   TYPE (y_type),  INTENT(IN)      :: ob         ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)   :: iv         ! O-B structure.
+   integer, intent(in)             :: i          ! sensor index.
+   integer, intent(in)             :: nchan      ! number of channel
+   type (y_type),  intent(in)      :: ob         ! Observation structure.
+   type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
    ! local variables
    integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
@@ -34,168 +34,163 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
    nrej_si         = 0
    nrej_clw        = 0
    nrej_topo       = 0
-   num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
-                         iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
-   ! num_rad        = iv%instid(inst)%num_rad 
+   num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
+                         iv%ob_numb(iv%current_ob_time-1)%radiance(i)
 
    if (num_rad > 0) then
-      ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, iv%ob_numb(iv%current_ob_time)%radiance(inst)
+      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, iv%ob_numb(iv%current_ob_time)%radiance(i)
 
+         ! 0.0  initialise QC flags by assuming good obs
+         !---------------------------------------------
+         iv%instid(i)%tb_qc(:,n) = qc_good
 
-            ! 0.0  initialise QC flags by assuming good obs
-            !---------------------------------------------
-            iv%instid(inst)%rad(n)%tb(:)%qc = 1
+         ! a.  reject all channels over mixture surface type
+         !------------------------------------------------------
+         isflg = iv%instid(i)%isflg(n)
+         lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
+         if (lmix) then 
+            iv%instid(i)%tb_qc(:,n)  =  qc_bad
+            if (iv%instid(i)%proc_domain(n)) &
+               nrej_mixsurface = nrej_mixsurface + 1
+         end if
 
-            ! a.  reject all channels over mixture surface type
-            !------------------------------------------------------
-            isflg = iv%instid(inst)%rad(n)%isflg 
-            lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
-            if (lmix) then 
-               iv%instid(inst)%rad(n)%tb(:)%qc  =  -1
-               if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                  nrej_mixsurface = nrej_mixsurface + 1
+         !  b.  reject channels 1~2 over land/sea-ice/snow
+         !------------------------------------------------------
+         if (isflg > 0) then
+            iv%instid(i)%tb_qc(1:2,n)    = qc_bad
+            if (iv%instid(i)%proc_domain(n)) &
+               nrej_windowchanl = nrej_windowchanl + 1
+         end if
+
+         ! reject limb obs 
+         !------------------------------------------------------
+         scanpos = iv%instid(i)%scanpos(n)
+         ! if (scanpos <= 8 .or. scanpos >= 83) &
+         !    iv%instid(i)%tb_qc(:,n)  =  qc_bad
+
+         ! satzen  = rad%satzen
+         ! if (abs(satzen) > 45.0) &
+         !    iv%instid(i)%tb_qc(:,n)  =  qc_bad
+
+         !  d. check cloud/precipitation 
+         !-----------------------------------------------------------
+         if (ob%instid(i)%tb(1,n) > 0.0 .and. &
+              ob%instid(i)%tb(2,n) > 0.0) then
+            si = ob%instid(i)%tb(1,n) - ob%instid(i)%tb(2,n)
+            if (si >= 3.0) then
+               iv%instid(i)%tb_qc(:,n) = qc_bad
+               iv%instid(i)%cloud_flag(:,n) = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_si = nrej_si + 1
+            end if
+         end if
+
+         if (iv%instid(i)%clwp(n) >= 0.2) then
+            iv%instid(i)%tb_qc(:,n) = qc_bad
+            iv%instid(i)%cloud_flag(:,n) = qc_bad
+            if (iv%instid(i)%proc_domain(n)) &
+               nrej_clw = nrej_clw + 1
+         end if
+
+         !  e. check surface height/pressure
+         !------------------------------------------------------
+         ! sfchgt = ivrad%info(n)%elv
+         ! if (sfchgt >=) then
+         !
+         ! else 
+         ! end if
+
+         if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 800.0)) then
+            iv%instid(i)%tb_qc(5,n)  = qc_bad
+            if (iv%instid(i)%proc_domain(n)) &
+               nrej_topo = nrej_topo + 1
+         end if
+
+         !  f. check innovation
+         !-----------------------------------------------------------
+         do k = 1, nchan
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
+               iv%instid(i)%tb_qc(k,n)  = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_omb_abs(k) = nrej_omb_abs(k) + 1
             end if
 
-            !  b.  reject channels 1~2 over land/sea-ice/snow
-            !------------------------------------------------------
-            if (isflg > 0) then
-               iv%instid(inst)%rad(n)%tb(1:2)%qc    = -1
-               if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                  nrej_windowchanl = nrej_windowchanl + 1
-            end if
-
-            ! reject limb obs 
-            !------------------------------------------------------
-            scanpos = iv%instid(inst)%rad(n)%scanpos
-            ! if (scanpos <= 8 .or. scanpos >= 83) &
-            !    iv%instid(inst)%rad(n)%tb(:)%qc  =  -1
-
-            ! satzen  = rad%satzen
-            ! if (abs(satzen) > 45.) &
-            !    iv%instid(inst)%rad(n)%tb(:)%qc  =  -1
-
-            !  d. check cloud/precipitation 
-            !-----------------------------------------------------------
-            if ( ob%instid(inst)%rad(n)%tb(1) > 0. .and. &
-                 ob%instid(inst)%rad(n)%tb(2) > 0.) then
-               si = ob%instid(inst)%rad(n)%tb(1) - &
-                   ob%instid(inst)%rad(n)%tb(2)
-               if (si >= 3.) then
-                  iv%instid(inst)%rad(n)%tb(:)%qc = -1 
-                  iv%instid(inst)%rad(n)%cloud_flag(:) = -1
-                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                     nrej_si = nrej_si + 1
+            if (biascorr) then
+               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(scanpos+1,k)) then
+               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(1,k)) then
+                  iv%instid(i)%tb_qc(k,n)  = qc_bad
+                  if (iv%instid(i)%proc_domain(n)) &
+                     nrej_omb_std(k) = nrej_omb_std(k) + 1
+               end if
+            else
+               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k)) then
+               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k)) then
+                  iv%instid(i)%tb_qc(k,n)  = qc_bad
+                  if (iv%instid(i)%proc_domain(n)) &
+                     nrej_omb_rms(k) = nrej_omb_rms(k) + 1
                end if
             end if
 
-            if (iv%instid(inst)%rad(n)%clwp >= 0.2) then
-               iv%instid(inst)%rad(n)%tb(:)%qc = -1
-               iv%instid(inst)%rad(n)%cloud_flag(:) = -1
-               if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                  nrej_clw = nrej_clw + 1
-            end if
-
-            !  e. check surface height/pressure
-            !------------------------------------------------------
-            ! sfchgt = ivrad%rad(i)%info%elv
-            ! if ( sfchgt >= ) then
-            !
-            ! else 
-            ! end if
-
-            if ((isflg .ne. 0) .and. &
-                (iv%instid(inst)%rad(n)%ps < 800.)) then
-               iv%instid(inst)%rad(n)%tb(5)%qc  = -1
-               if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                  nrej_topo = nrej_topo + 1
-            end if
-
-            !  f. check innovation
-            !-----------------------------------------------------------
-            do k = 1, nchan
-               if ( abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 15. ) then
-                  iv%instid(inst)%rad(n)%tb(k)%qc  = -1
-                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                     nrej_omb_abs(k) = nrej_omb_abs(k) + 1
-               end if
-
+            if (iv%instid(i)%tb_qc(k,n) == qc_bad) then
+               iv%instid(i)%tb_error(k,n) = 500.0
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej(k) = nrej(k) + 1
+            else
+               if (iv%instid(i)%proc_domain(n)) &
+                  ngood(k) = ngood(k) + 1
                if (biascorr) then
-                  ! if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(scanpos+1,k)) then
-                  if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%std(1,k)) then
-                     iv%instid(inst)%rad(n)%tb(k)%qc  = -1
-                     if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                        nrej_omb_std(k) = nrej_omb_std(k) + 1
-                  end if
-               else
-                  ! if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%rms(scanpos+1,k) ) then
-                  if (abs(iv%instid(inst)%rad(n)%tb(k)%inv) > 3.*satinfo(inst)%rms(1,k)) then
-                     iv%instid(inst)%rad(n)%tb(k)%qc  = -1
-                     if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                        nrej_omb_rms(k) = nrej_omb_rms(k) + 1
-                  end if
-               end if
-
-               if (iv%instid(inst)%rad(n)%tb(k)%qc == -1) then
-                  iv%instid(inst)%rad(n)%tb(k)%error = 500.0
-                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                     nrej(k) = nrej(k) + 1
-               else
-                  if (iv%instid(inst)%rad(n)%loc%proc_domain) &
-                     ngood(k) = ngood(k) + 1
-                  if (biascorr) then
-                     ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(scanpos+1,k)
-                     if (use_error_factor_rad) then
-                        iv%instid(inst)%rad(n)%tb(k)%error =  &
-                           satinfo(inst)%std(1,k)*satinfo(inst)%error_factor(k)
-                     else
-                        iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%std(1,k)
-                     end if
+                  ! iv%instid(i)%tb_error(k,n) = satinfo(i)%std(scanpos+1,k)
+                  if (use_error_factor_rad) then
+                     iv%instid(i)%tb_error(k,n) =  &
+                        satinfo(i)%std(1,k)*satinfo(i)%error_factor(k)
                   else
-                     ! iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%rms(scanpos+1,k)
-                     if (use_error_factor_rad) then
-                        iv%instid(inst)%rad(n)%tb(k)%error =  &
-                           satinfo(inst)%rms(1,k)*satinfo(inst)%error_factor(k)
-                     else
-                        iv%instid(inst)%rad(n)%tb(k)%error = satinfo(inst)%rms(1,k)
-                     end if
+                     iv%instid(i)%tb_error(k,n) = satinfo(i)%std(1,k)
+                  end if
+               else
+                  ! iv%instid(i)%tb_error(k,n) = satinfo(i)%rms(scanpos+1,k)
+                  if (use_error_factor_rad) then
+                     iv%instid(i)%tb_error(k,n) =  &
+                        satinfo(i)%rms(1,k)*satinfo(i)%error_factor(k)
+                  else
+                     iv%instid(i)%tb_error(k,n) = satinfo(i)%rms(1,k)
                   end if
                end if
-            end do ! chan
+            end if
+         end do ! chan
       end do ! end loop pixel
    end if
 
    ! Do inter-processor communication to gather statistics.
 
-   call da_proc_sum_int ( num_rad )
-   call da_proc_sum_int ( nrej_mixsurface )
-   call da_proc_sum_int ( nrej_windowchanl)
-   call da_proc_sum_int ( nrej_si   )
-   call da_proc_sum_int ( nrej_clw  )
-   call da_proc_sum_int ( nrej_topo )
+   call da_proc_sum_int (num_rad)
+   call da_proc_sum_int (nrej_mixsurface)
+   call da_proc_sum_int (nrej_windowchanl)
+   call da_proc_sum_int (nrej_si)
+   call da_proc_sum_int (nrej_clw)
+   call da_proc_sum_int (nrej_topo)
    do k = 1, nchan
-      call da_proc_sum_int ( nrej_omb_abs(k) )
-      call da_proc_sum_int ( nrej_omb_std(k) )
-      call da_proc_sum_int ( nrej_omb_rms(k) )
-      call da_proc_sum_int ( nrej(k)  )
-      call da_proc_sum_int ( ngood(k) )
+      call da_proc_sum_int (nrej_omb_abs(k))
+      call da_proc_sum_int (nrej_omb_std(k))
+      call da_proc_sum_int (nrej_omb_rms(k))
+      call da_proc_sum_int (nrej(k))
+      call da_proc_sum_int (ngood(k))
    end do
 
-   IF ( rootproc ) THEN
+   if (rootproc) then
       if (num_fgat_time > 1) then
-        write(filename,'(a,i2.2)') trim(iv%instid(inst)%rttovid_string)//'.QCSTAT',iv%current_ob_time
+         write(filename,'(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.QCSTAT',iv%current_ob_time
       else
-        filename = trim(iv%instid(inst)%rttovid_string)//'.QCSTAT'
-      endif
+         filename = trim(iv%instid(i)%rttovid_string)//'.QCSTAT'
+      end if
       call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0) Then
-         Write(unit=errmsg(1),fmt='(A,A)') 'error opening the output file ', filename
-         call da_error(__FILE__,__LINE__,errmsg(1:1))
-      Endif
+      if (ios /= 0) then
+         write(unit=message(1),fmt='(A,A)') 'error opening the output file ', filename
+         call da_error(__FILE__,__LINE__,message(1:1))
+      end if
 
       write(fgat_rad_unit, fmt='(/a/)') &
-         ' Quality Control Statistics for '//iv%instid(inst)%rttovid_string
+         'Quality Control Statistics for '//iv%instid(i)%rttovid_string
       write(fgat_rad_unit,'(a20,i7)') ' num_rad          = ', num_rad
       write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
@@ -215,7 +210,7 @@ subroutine da_qc_amsub ( inst, nchan, ob, iv )
 
       close(fgat_rad_unit)
       call da_free_unit(fgat_rad_unit)
-   End if
+   end if
 
    if (trace_use) call da_trace_exit("da_qc_amsub")
 

@@ -3,23 +3,22 @@ subroutine da_residual_rad(iv, y, re,                 &
                                         np_obs_used, np_available)
 
   !---------------------------------------------------------------------------
-  ! Purpose: calculate obs residual and counting obs number.
+  ! Purpose: Calculate Obs Residual and counting obs number.
   !
-  ! Method:  re = (d - h delta_x)
+  ! Method:  re = (d - H delta_x)
   !---------------------------------------------------------------------------
 
    implicit none
 
-
-   type (ob_type), intent(in)        :: iv     ! innovation vector (o-b).
-   type (y_type) , intent(in)        :: y      ! y = h (xa)
-   type (y_type) , intent(inout)     :: re     ! residual structure.
+   type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)        :: y      ! y = H (xa)
+   type (y_type) , intent(inout)     :: re     ! Residual structure.
 
    integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
-   integer                           :: n, k, i
+   integer                           :: i
 
    if (iv%num_inst < 1) return
 
@@ -29,15 +28,9 @@ subroutine da_residual_rad(iv, y, re,                 &
       if (iv%instid(i)%num_rad < 1) cycle
 
       n_obs_bad % rad % num = number(0, 0, 0)
-
-      do n=1, iv%instid(i)%num_rad
-         do k=1, iv%instid(i)%nchan
-            np_available = np_available + iv%instid(i)%nchan
-            re%instid(i)%rad(n)%tb(k) = da_residual(n, k, &
-               y%instid(i)%rad(n)%tb(k), &
-               iv%instid(i)%rad(n)%tb(k), n_obs_bad % rad)
-         end do
-      end do
+      call da_residual_new(y%instid(i)%tb(:,:), iv%instid(i)%tb_qc(:,:), &
+         iv%instid(i)%tb_inv(:,:), re%instid(i)%tb(:,:))
+      np_available = iv%instid(i)%nchan*iv%instid(i)%num_rad
    end do
 
    np_missing  = np_missing  + n_obs_bad % rad % num % miss

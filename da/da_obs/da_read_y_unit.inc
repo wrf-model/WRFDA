@@ -23,6 +23,7 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    call da_get_unit(unit_in)
    open(unit=unit_in,file=trim(filename),form='formatted',iostat=ios,status='old')
    if (ios /= 0) Then
+write (0,*) "filename", filename
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open random observation error file"//trim(filename)/))
    end if
@@ -61,14 +62,13 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    if (if_write) goto 999
    goto 1
 
-999  continue
-   close (unit_in)
-   call da_free_unit(unit_in)
-   return
 1000  continue 
    write(unit=message(1), fmt='(a,i3,a,a)') &
       'read error on unit: ',unit_in, ' for ob_type', trim(ob_type)
-   call da_warning(__FILE__,__LINE__,message(1:1))
+!   call da_warning(__FILE__,__LINE__,message(1:1))
+999  continue
+   close (unit_in)
+   call da_free_unit(unit_in)
 
 end subroutine da_read_y_unit
 

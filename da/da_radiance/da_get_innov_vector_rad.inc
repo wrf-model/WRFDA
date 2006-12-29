@@ -1,9 +1,9 @@
-subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_rad ( it, xb, xp, ob, iv )
 
    !---------------------------------------------------------------------------
-   !  Purpose: Calculate innovation vector for radiance data.
+   !  PURPOSE: Calculate innovation vector for radiance data.
    !
-   !  Method:  d = y - H(x)
+   !  METHOD:  d = y - H(x)
    !       1. interpolate xb to obs location
    !       2. call foreward RTM to get simulated bright temperature 
    !       3. obs BT - simulated BT
@@ -14,10 +14,10 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 !#include "rttov_q2v.interface"
 
    INTEGER, INTENT(IN)            :: it       ! External iteration.
-   TYPE(xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE(xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE(y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
-   TYPE(ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
+   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
+   TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
+   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
 
    INTEGER                        :: n        ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
@@ -65,18 +65,18 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
    REAL, dimension(xp%kms:xp%kme+1)   :: pf
    REAL                               :: clwp
 
-   alloc_status(:) = 0
+   alloc_status (:) = 0
 
-   if (iv%num_inst < 1) return
+   IF ( iv%num_inst < 1 ) return
 
 #if !defined(RTTOV)
     call da_error(__FILE__,__LINE__, &
-      (/"Must compile with $RTTOV option for radiances"/))
+       (/"Must compile with $RTTOV option for radiances"/))
 #else
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_rad")
 
-   WRITE(unit=stdout,fmt='(A)') ' Computing Radiance Innovation------- '
+   WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation------- '
 
    !------------------------------------------------------
    ! [1.0] calculate the background bright temperature
@@ -84,44 +84,44 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 
    nprofiles = 1
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if (iv%instid(inst)%num_rad < 1) cycle
+      if ( iv%instid(inst)%num_rad < 1 ) cycle
       num_levs  = iv%instid(inst)%nlevels
       nchanl    = iv%instid(inst)%nchan
 
-      allocate(zk(1:num_levs), stat= alloc_status(1))
-      allocate(pres(1:num_levs), stat= alloc_status(2))
-      allocate(tb(nprofiles,nchanl), stat= alloc_status(3))
-      allocate(con_vars(nprofiles), stat= alloc_status(4))
-      allocate(aux_vars(nprofiles), stat= alloc_status(5))
-      allocate(zasat(nprofiles), stat= alloc_status(6))
-      allocate(zlsat(nprofiles), stat= alloc_status(7))
-      allocate(polar(nchanl), stat= alloc_status(8))
-      if (any(alloc_status /= 0)) then
+      allocate (zk(1:num_levs), stat= alloc_status(1) )
+      allocate (pres(1:num_levs), stat= alloc_status(2) )
+      allocate (tb(nprofiles,nchanl), stat= alloc_status(3) )
+      allocate (con_vars(nprofiles), stat= alloc_status(4) )
+      allocate (aux_vars(nprofiles), stat= alloc_status(5) )
+      allocate (zasat(nprofiles), stat= alloc_status(6) )
+      allocate (zlsat(nprofiles), stat= alloc_status(7) )
+      allocate (polar(nchanl), stat= alloc_status(8) )
+      if ( any(alloc_status /= 0) ) then
          call da_error(__FILE__,__LINE__, &
-           (/"Cannot Allocate mem zk, pres tb con_vars aux_vars"/))
+            (/"Cannot Allocate mem zk, pres tb con_vars aux_vars"/))
       end if
 
       pres(1:num_levs) = coefs(inst) % ref_prfl_p(1:num_levs)
 
       if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
-          iv%ob_numb(iv%current_ob_time-1)%radiance(inst)) cycle
+          iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
 
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
       do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
-         ! if (n > iv%instid(inst)%num_rad) exit
+         ! if ( n > iv%instid(inst)%num_rad ) exit
 
-         allocate(iv%instid(inst)%rad(n)%zk(1:num_levs), stat= alloc_status(6))
-         allocate(iv%instid(inst)%rad(n)%t(1:num_levs), stat= alloc_status(7))
-         allocate(iv%instid(inst)%rad(n)%mr(1:num_levs), stat= alloc_status(8))
-         allocate(iv%instid(inst)%rad(n)%tm(xp%kms:xp%kme), stat= alloc_status(9))
-         allocate(iv%instid(inst)%rad(n)%qm(xp%kms:xp%kme), stat= alloc_status(16))
-         allocate(iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), stat= alloc_status(10))
-         allocate(iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme), stat= alloc_status(11))
-         allocate(iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), stat= alloc_status(12))
-         allocate(iv%instid(inst)%rad(n)%qsn(xp%kms:xp%kme), stat= alloc_status(13))
-         allocate(iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), stat= alloc_status(14))
-         allocate(iv%instid(inst)%rad(n)%pm(xp%kms:xp%kme), stat= alloc_status(15))
+         allocate (iv%instid(inst)%rad(n)%zk(1:num_levs), stat= alloc_status(6) )
+         allocate (iv%instid(inst)%rad(n)%t(1:num_levs), stat= alloc_status(7) )
+         allocate (iv%instid(inst)%rad(n)%mr(1:num_levs), stat= alloc_status(8) )
+         allocate (iv%instid(inst)%rad(n)%tm(xp%kms:xp%kme), stat= alloc_status(9) )
+         allocate (iv%instid(inst)%rad(n)%qm(xp%kms:xp%kme), stat= alloc_status(16) )
+         allocate (iv%instid(inst)%rad(n)%qrn(xp%kms:xp%kme), stat= alloc_status(10) )
+         allocate (iv%instid(inst)%rad(n)%qcw(xp%kms:xp%kme), stat= alloc_status(11) )
+         allocate (iv%instid(inst)%rad(n)%qci(xp%kms:xp%kme), stat= alloc_status(12) )
+         allocate (iv%instid(inst)%rad(n)%qsn(xp%kms:xp%kme), stat= alloc_status(13) )
+         allocate (iv%instid(inst)%rad(n)%qgr(xp%kms:xp%kme), stat= alloc_status(14) )
+         allocate (iv%instid(inst)%rad(n)%pm(xp%kms:xp%kme), stat= alloc_status(15) )
 
          iv%instid(inst)%rad(n)%zk = 0.0
          iv%instid(inst)%rad(n)%t = 0.0
@@ -135,9 +135,9 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
          iv%instid(inst)%rad(n)%qgr = 0.0
          iv%instid(inst)%rad(n)%pm  = 0.0
 
-         if (any(alloc_status /= 0)) then
+         if ( any(alloc_status /= 0) ) then
             call da_error(__FILE__,__LINE__, &
-              (/"Cannot Allocate mem iv%zk, t, mr"/))
+               (/"Cannot Allocate mem iv%zk, t, mr"/))
          end if
 
          model_t(:) = 0.0
@@ -170,7 +170,7 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 
          do k=1, num_levs
             zk(k)=missing_r
-            if (pres(k) >= v_p(xp%kte) .and. pres(k) <= v_p(xp%kts)) then
+            IF ( pres(k) >= v_p (xp%kte) .and. pres(k) <= v_p (xp%kts) ) THEN
                call da_to_zk(pres(k), v_p, xp, v_interp_p, zk(k))
             END IF
             iv%instid(inst)%rad(n)%zk(k) = zk(k)
@@ -179,22 +179,22 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
          ! [1.2] Interpolate horizontally to ob:
 
          call da_interp_lin_3D( xb%t, xp, i, j, dx, dy, dxm, dym, &      ! temperature
-                           model_t, max_ob_levels, zk, num_levs)
+                           model_t, max_ob_levels, zk, num_levs )
          call da_interp_lin_3D( xb%q, xp, i, j, dx, dy, dxm, dym, &      ! specific humidity
-                           model_q, max_ob_levels, zk, num_levs)
+                           model_q, max_ob_levels, zk, num_levs )
 
          do k=1, num_levs
-            if (zk(k) <= 0.0) then
+            IF ( zk(k) <= 0.0 ) THEN
                model_t(k) = coefs(inst) % ref_prfl_t(k,gas_id_watervapour)  ! outside model level
                model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             ELSE
                model_mr(k) = model_q(k) * q2ppmv
-               ! call rttov_q2v(&
+               ! call rttov_q2v (&
                !    gas_unit_specconc,  &! in
                !    model_q(k),         &! in
                !    gas_id_watervapour, &! in
                !    model_q(k),         &! in
-               !    model_mr(k)    )    ! inout
+               !    model_mr(k)     )    ! inout
             END IF
             if (pres(k) < 100.) model_mr(k) = coefs(inst) % ref_prfl_mr(k,gas_id_watervapour)
             iv%instid(inst)%rad(n)%t(k)  = model_t(k)
@@ -207,53 +207,53 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
                             xb%ivgtyp, xb%isltyp, &
                             xp%ims, xp%ime, xp%jms, xp%jme, &
                             i, j, dx, dy, dxm, dym, &
-                            model_isflg(1),model_vegtyp(1), model_soiltyp(1))
+                            model_isflg(1),model_vegtyp(1), model_soiltyp(1) )
 
 
          call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_u10(1))
+                             model_u10(1) )
          call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_v10(1))
+                             model_v10(1) )
          call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_t2m)
+                             model_t2m )
          call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_q2m)
+                             model_q2m )
          call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_psfc)
+                             model_psfc )
 
-         if (model_isflg(1) == 0) then   ! over sea using SST
+         if ( model_isflg(1) == 0 ) then   ! over sea using SST
              call da_interp_lin_2d( xb % tgrn, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_ts(1))
+                             model_ts(1) )
          else
              call da_interp_lin_2d( xb % tsk, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_ts(1))
+                             model_ts(1) )
          end if
 
          call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_elv)
+                             model_elv )
 
          ! variables for emissivity calculations
          !---------------------------------------- 
          call da_interp_lin_2d( xb % smois, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_smois(1))
+                             model_smois(1) )
          call da_interp_lin_2d( xb % tslb, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_tslb(1))
+                             model_tslb(1) )
          call da_interp_lin_2d( xb % snowh, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_snowh(1))
+                             model_snowh(1) )
          call da_interp_lin_2d( xb % vegfra, xp%ims, xp%ime, xp%jms, xp%jme, &
                              i, j, dx, dy, dxm, dym, &
-                             model_vegfra(1))
+                             model_vegfra(1) )
 
          ! model_snowh(1) = model_snowh(1)*100.0   ! convert from m to mm
          model_vegfra(1) = 0.01*model_vegfra(1)  ! convert range to 0~1
@@ -263,25 +263,25 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
          do k=xp%kts,xp%kte
             call da_interp_lin_2d( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! temperature at model level
-                                model_tm(k))
+                                model_tm(k) )
             call da_interp_lin_2d( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! temperature at model level
-                                model_qm(k))
+                                model_qm(k) )
             call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! rain
-                                model_qrn(k))
+                                model_qrn(k) )
             call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! cloud water
-                                model_qcw(k))
+                                model_qcw(k) )
             call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! cloud ice
-                                model_qci(k))
+                                model_qci(k) )
             call da_interp_lin_2d( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! snow
-                                model_qsn(k))
+                                model_qsn(k) )
             call da_interp_lin_2d( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! granpul
-                                model_qgr(k))
+                                model_qgr(k) )
 
             iv%instid(inst)%rad(n)%pm(k)  = v_p(k)
             iv%instid(inst)%rad(n)%tm(k)  = model_tm(k)
@@ -294,31 +294,23 @@ subroutine da_get_innov_vector_rad( it, xb, xp, ob, iv)
 
             ! ADD for computing cloud liquid water path
 
-            vtm(k) =(1.+0.608*model_qm(k))*model_tm(k)  ! virtual T
+            vtm (k) = (1.+0.608*model_qm(k))*model_tm(k)  ! virtual T
             ! convert kg/kg to g/m3
             ! clw (k) = model_qcw(k)*v_p(k)*100.*0.0289644/8.31451/model_tm(k)
-if (model_tm(k) < 0.001) then
-   write (0,*)  n,k, "model_tm(k)",model_tm(k)
-   model_tm(k) = 0.001
-end if
             clw (k) = 0.34836*model_qcw(k)*v_p(k)/model_tm(k)
             if ( v_p(k)<100. ) clw (k) = 0.
+
          enddo
 
          model_psfc = 0.01*model_psfc           ! convert to hPa 
          model_mr2m = model_q2m * q2ppmv
 
-         ! ADD for computing cloud liquid water path(mm) from guess
+         ! ADD for computing cloud liquid water path (mm) from guess
 
          pf(xp%kts) = 100.*model_psfc
          do k = 2,xp%kte
             ! pf(k) = 100.*(v_p(k-1)+v_p(k))*0.5  ! full level pressure
             pf(k) = 50.*(v_p(k-1)+v_p(k))
-if (pf(k) < 0.001) then
-   write (0,*)  n,k, "pf(k)",pf(k)
-   pf(k) = 0.001
-end if
-
          end do
          ! pf(xp%kte+1)= 100.*v_p(xp%kte)*0.5
          pf(xp%kte+1)= 50.*v_p(xp%kte)
@@ -326,27 +318,18 @@ end if
          clwp = 0.
          do k = xp%kts,xp%kte
             dlnpf(k) = log(pf(k)) - log(pf(k+1))
-if (dlnpf(k) < 0.001) then
-   write (0,*) "i, j, dx, dy, dxm, dym", i, j, dx, dy, dxm, dym
-   write (0,*)  n,k, "dlnpf(k)",dlnpf(k)
-   dlnpf(k) = 0.001
-end if
-if (vtm(k) < 0.001) then
-   write (0,*)  n,k, "vtm(k)",vtm(k)
-   vtm(k) = 0.001
-end if
             ! clw  (k) = clw(k)*vtm(k)*287.05/9.80665*dlnpf(k)
             clw  (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
             clwp  = clwp + clw(k)
          end do
          ! clwp = 0.001*clwp   ! kg/m2 = mm
 
-         ! call rttov_q2v(&
+         ! call rttov_q2v (&
          !    gas_unit_specconc,  &! in
          !    model_q2m,          &! in
          !    gas_id_watervapour, &! in
          !    model_q2m,          &! in
-         !    model_mr2m     )    ! inout
+         !    model_mr2m      )    ! inout
 
          iv%instid(inst)%rad(n)%u10  = model_u10(1)
          iv%instid(inst)%rad(n)%v10  = model_v10(1)
@@ -369,21 +352,21 @@ end if
 
          knchpf = nprofiles*nchanl
 
-         Allocate( knchan(nprofiles), stat = alloc_status(1))
-         Allocate( kprof (knchpf), stat = alloc_status(2))
-         Allocate( kchan (knchpf), stat = alloc_status(3))
-         Allocate( kochan(knchpf), stat = alloc_status(4))
-         Allocate( indexn(1:nchanl,1:nprofiles), stat = alloc_status(5))
-         Allocate( pemsv (knchpf), stat = alloc_status(7))
-         Allocate( pemsh (knchpf), stat = alloc_status(9))
-         Allocate( pems5 (knchpf), stat = alloc_status(11))
-         Allocate( calcemis(knchpf), stat = alloc_status(8))
-         Allocate( iv%instid(inst)%rad(n)%tb_xb(nchanl), stat = alloc_status(10))
-         ! Allocate( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10))
+         Allocate ( knchan (nprofiles), stat = alloc_status(1) )
+         Allocate ( kprof  (knchpf), stat = alloc_status(2) )
+         Allocate ( kchan  (knchpf), stat = alloc_status(3) )
+         Allocate ( kochan (knchpf), stat = alloc_status(4) )
+         Allocate ( indexn (1:nchanl,1:nprofiles), stat = alloc_status(5) )
+         Allocate ( pemsv  (knchpf), stat = alloc_status(7) )
+         Allocate ( pemsh  (knchpf), stat = alloc_status(9) )
+         Allocate ( pems5  (knchpf), stat = alloc_status(11) )
+         Allocate ( calcemis(knchpf), stat = alloc_status(8) )
+         Allocate ( iv%instid(inst)%rad(n)%tb_xb(nchanl), stat = alloc_status(10) )
+         ! Allocate ( iv%instid(inst)%rad(n)%calcemis(knchpf), stat = alloc_status(10) )
 
-         if (any(alloc_status /= 0)) then
+         if ( any(alloc_status /= 0) ) then
             call da_error(__FILE__,__LINE__, &
-              (/"Cannot allocate mem before emiss"/))
+               (/"Cannot allocate mem before emiss"/))
          end if
 
          sensor_type  = coefs(inst)%id_sensor - 1  ! 0:IR 1:MW
@@ -394,7 +377,7 @@ end if
                kprof((ip-1)*nchanl+kn)  = ip
                kchan((ip-1)*nchanl+kn)  = kn
                kochan((ip-1)*nchanl+kn) = kn
-               indexn(kn,ip) =(ip-1)*nchanl+kn 
+               indexn(kn,ip) = (ip-1)*nchanl+kn 
             end do
          end do
          amsua = trim( inst_name(rtminit_sensor(inst))) == 'amsua'
@@ -407,10 +390,10 @@ end if
 
 #ifdef RTTOV
          call rttov_setupchan(nprofiles, nchanl, coefs(inst), &   ! in
-            nfrequencies, nchannels, nbtout)      ! out
+            nfrequencies, nchannels, nbtout )      ! out
 #endif
-         Allocate( emissivity(nchannels))
-         Allocate( iv%instid(inst)%rad(n)%emiss(nchannels))
+         Allocate ( emissivity(nchannels))
+         Allocate ( iv%instid(inst)%rad(n)%emiss(nchannels))
 
          pemsv(:)    = 0.0
          pemsh(:)    = 0.0
@@ -438,10 +421,10 @@ end if
 
          do iprof = 1, nprofiles
             con_vars(iprof) % nlevels = num_levs 
-            allocate(con_vars(iprof) % t(num_levs))
-            allocate(con_vars(iprof) % q(num_levs))
-            con_vars(iprof) % t(1:num_levs) = model_t (1:num_levs)
-            con_vars(iprof) % q(1:num_levs) = model_mr(1:num_levs)
+            allocate (con_vars(iprof) % t(num_levs))
+            allocate (con_vars(iprof) % q(num_levs))
+            con_vars(iprof) % t(1:num_levs) = model_t  (1:num_levs)
+            con_vars(iprof) % q(1:num_levs) = model_mr (1:num_levs)
             con_vars(iprof) % ps  = model_psfc
 
             aux_vars(iprof) % t2m = model_t2m
@@ -458,14 +441,14 @@ end if
 
          ! [1.3] Call RTM foreward model
 
-         call da_rttov_direct(inst, model_isflg(1), nchanl, nprofiles, &
+         call da_rttov_direct (inst, model_isflg(1), nchanl, nprofiles, &
                           nfrequencies, nchannels, nbtout, &
                           con_vars, aux_vars, &
-                          tb, calcemis, pemsv, pemsh, emissivity)
+                          tb, calcemis, pemsv, pemsh, emissivity )
 
          do iprof = 1, nprofiles
-            deallocate(con_vars(iprof) % t)
-            deallocate(con_vars(iprof) % q)
+            deallocate (con_vars(iprof) % t)
+            deallocate (con_vars(iprof) % q)
          end do
 
          !----------------------------------------------------------------
@@ -473,7 +456,7 @@ end if
          !----------------------------------------------------------------
 
          do k = 1, nchanl
-            if (iv%instid(inst)%rad(n)%tb(k)%inv /= missing_r) then 
+            if ( iv%instid(inst)%rad(n)%tb(k)%inv /= missing_r ) then 
                iv%instid(inst)%rad(n)%tb_xb(k)  = tb(nprofiles,k)
                iv%instid(inst)%rad(n)%tb(k)%inv = &
                ob%instid(inst)%rad(n)%tb(k) - tb(nprofiles,k)
@@ -500,26 +483,26 @@ end if
          if (biascorr) then
             call da_biascorr_rad(inst,nchanl,  &
                               ob%instid(inst)%rad(n)%tb, &
-                              iv%instid(inst)%rad(n))
+                              iv%instid(inst)%rad(n) )
          end if
       end do       !  end loop for pixels
 
-      deallocate(zk)
-      deallocate(pres)
-      deallocate(tb)
-      deallocate(con_vars)
-      deallocate(aux_vars)
-      deallocate(zasat)
-      deallocate(zlsat)
-      deallocate(polar)
-      deallocate(knchan)
-      deallocate(kprof)
-      deallocate(kchan)
-      deallocate(kochan)
-      deallocate(indexn)
-      deallocate(pemsv)
-      deallocate(pemsh) 
-      deallocate(pems5)
+      deallocate (zk)
+      deallocate (pres)
+      deallocate (tb)
+      deallocate (con_vars)
+      deallocate (aux_vars)
+      deallocate (zasat)
+      deallocate (zlsat)
+      deallocate (polar)
+      deallocate (knchan)
+      deallocate (kprof)
+      deallocate (kchan)
+      deallocate (kochan)
+      deallocate (indexn)
+      deallocate (pemsv)
+      deallocate (pemsh) 
+      deallocate (pems5)
    end do        ! end loop for sensor
 
    !------------------------------------------------------------------------
@@ -536,7 +519,7 @@ end if
 
    if (biasprep) then
       do inst = 1, iv%num_inst
-         write(unit=stdout,fmt='(A,A)') 'Preparing bias statistics files for ', &
+         WRITE(UNIT=stdout,FMT='(A,A)') 'Preparing bias statistics files for ', &
                             trim(iv%instid(inst)%rttovid_string)
          call da_biasprep(inst,ob,iv)
       end do
@@ -548,5 +531,4 @@ end if
 #endif
  
 end subroutine da_get_innov_vector_rad
-
 

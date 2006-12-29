@@ -8,49 +8,49 @@ module da_define_structures
    ! Purpose: Collection of routines to define and allocate structures.
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
    
    !--------------------------------------------------------------------------
    ! [2.0] Background field structure definition:
    !--------------------------------------------------------------------------
 
-   TYPE xbx_type
+   type xbx_type
 
-      CHARACTER (len=4):: mminlu
+      character (len=4):: mminlu
 
-      INTEGER          :: fft_pad_i          ! Padding to get 2**p 3**q 5**r. (p>=1)
-      INTEGER          :: fft_pad_j          ! Padding to get 2**p 3**q 5**r.
+      integer          :: fft_pad_i          ! Padding to get 2**p 3**q 5**r. (p>=1)
+      integer          :: fft_pad_j          ! Padding to get 2**p 3**q 5**r.
 
-      INTEGER          :: pad_num            ! Splitted fft_pad_i on this processor.
-      INTEGER          :: pad_inc            ! Pad increment (split over v2y).
-      INTEGER, POINTER :: pad_loc(:)         ! pad location on this processor.
-      INTEGER, POINTER :: pad_pos(:)         ! pad position beyond ide for this processor.
+      integer          :: pad_num            ! Splitted fft_pad_i on this processor.
+      integer          :: pad_inc            ! Pad increment (split over v2y).
+      integer, pointer :: pad_loc(:)         ! pad location on this processor.
+      integer, pointer :: pad_pos(:)         ! pad position beyond ide for this processor.
 
-      INTEGER          :: fft_ix             ! x-direction FFT number, in 2**p 3**q 5**r.
-      INTEGER          :: fft_jy             ! y-direction FFT number, in 2**p 3**q 5**r.
+      integer          :: fft_ix             ! x-direction FFT number, in 2**p 3**q 5**r.
+      integer          :: fft_jy             ! y-direction FFT number, in 2**p 3**q 5**r.
 
-      INTEGER, POINTER :: fft_factors_x(:)   ! FFT factors in x direction.
-      INTEGER, POINTER :: fft_factors_y(:)   ! FFT factors in y direction.
+      integer, pointer :: fft_factors_x(:)   ! FFT factors in x direction.
+      integer, pointer :: fft_factors_y(:)   ! FFT factors in y direction.
 
-      REAL, POINTER    :: trig_functs_x(:)   ! Trig functions in x direction.
-      REAL, POINTER    :: trig_functs_y(:)   ! Trig functions in y direction.
+      real, pointer    :: trig_functs_x(:)   ! Trig functions in x direction.
+      real, pointer    :: trig_functs_y(:)   ! Trig functions in y direction.
 
-      REAL             :: psac_mean          ! Mean pressure.
-      REAL, POINTER    :: latc_mean(:)       ! Mean latitude.
+      real             :: psac_mean          ! Mean pressure.
+      real, pointer    :: latc_mean(:)       ! Mean latitude.
 
-      REAL, POINTER    :: fft_coeffs(:,:)    ! FFT Coefficients
+      real, pointer    :: fft_coeffs(:,:)    ! FFT Coefficients
 
-      REAL             :: fft_adjoint_factor ! FFT Adjoint factor
+      real             :: fft_adjoint_factor ! FFT Adjoint factor
       ! spectral transform related variables
-      INTEGER          :: inc                ! Vector array increment 
-      INTEGER          :: ni
-      INTEGER          :: nj
-      INTEGER          :: nk
-      INTEGER          :: max_wavenumber
-      INTEGER          :: lenr
-      INTEGER          :: lensav
-      INTEGER          :: lenwrk
-      INTEGER          :: alp_size
+      integer          :: inc                ! Vector array increment 
+      integer          :: ni
+      integer          :: nj
+      integer          :: nk
+      integer          :: max_wavenumber
+      integer          :: lenr
+      integer          :: lensav
+      integer          :: lenwrk
+      integer          :: alp_size
       real, pointer       :: wsave(:)          ! Primes for FFT.
       real, pointer       :: lon(:)            ! Longitude (radians).
       real, pointer       :: sinlon(:)         ! sine(longitude).
@@ -60,7 +60,7 @@ module da_define_structures
       real, pointer       :: coslat(:)         ! cosine(latitude).
       real, pointer       :: int_wgts(:)       ! Legendre integration weights.
       real, pointer       :: alp(:)            ! Associated Legendre Polynomial.
-   END TYPE xbx_type
+   end type xbx_type
 
    !--------------------------------------------------------------------------
    ! [3.0] Innovation vector structure definition:
@@ -68,17 +68,17 @@ module da_define_structures
 
    ! [3.1] Generic sub-structures used in ob_type:
 
-   TYPE field_type
-      REAL                   :: inv             ! Innovation vector
-      INTEGER                :: qc              ! Observation QC
-      REAL                   :: error           ! Observational error
-   END TYPE field_type
+   type field_type
+      real                   :: inv             ! Innovation vector
+      integer                :: qc              ! Observation QC
+      real                   :: error           ! Observational error
+   end type field_type
 
-   TYPE model_loc_type
-      TYPE (field_type)       :: slp            ! Pressure in Pa
-      ! TYPE (field_type)       :: psfc           ! Pressure in Pa
+   type model_loc_type
+      type (field_type)       :: slp            ! Pressure in Pa
+      ! type (field_type)       :: psfc           ! Pressure in Pa
       ! Remove the following in future (needed now for obs i/o only):
-      TYPE (field_type)       :: pw             ! Toatl precipitable water cm
+      type (field_type)       :: pw             ! Toatl precipitable water cm
 
       real                    :: x
       real                    :: y
@@ -101,353 +101,332 @@ module da_define_structures
                                                 ! 1, vertical interpolate in pressure
                                                 ! 2, vertical interpolate in height
 
-   END TYPE model_loc_type
+   end type model_loc_type
 
-   TYPE each_level_type
-      REAL                    :: height         ! Height in m
-      INTEGER                 :: height_qc      ! Height QC
+   type each_level_type
+      real                    :: height         ! Height in m
+      integer                 :: height_qc      ! Height QC
       real                    :: zk             ! k-coordinates
-      TYPE (field_type)       :: u              ! Wind x-component in m/s
-      TYPE (field_type)       :: v              ! Wind y-component in m/s
-      TYPE (field_type)       :: p              ! Pressure in Pa
-      TYPE (field_type)       :: t              ! Temperature in K
-      TYPE (field_type)       :: q              ! Mixing ratio (kg/kg).
-      TYPE (field_type)       :: rh             ! Relative humidity (%).
-      TYPE (field_type)       :: td             ! dew-point in K
-      TYPE (field_type)       :: Speed          ! Wind speed m/s
-   END TYPE each_level_type
+      type (field_type)       :: u              ! Wind x-component in m/s
+      type (field_type)       :: v              ! Wind y-component in m/s
+      type (field_type)       :: p              ! Pressure in Pa
+      type (field_type)       :: t              ! Temperature in K
+      type (field_type)       :: q              ! Mixing ratio (kg/kg).
+      type (field_type)       :: rh             ! Relative humidity (%).
+      type (field_type)       :: td             ! dew-point in K
+      type (field_type)       :: Speed          ! Wind speed m/s
+   end type each_level_type
 
-   TYPE Radar_each_level_type
-        REAL                   :: height         ! Height in m
-        INTEGER                :: height_qc      ! Height QC
-        real                   :: zk             ! MM5 k-coordinates
-        TYPE (field_type)      :: rv
-        TYPE (field_type)      :: rf
-   END TYPE Radar_each_level_type
+   type radar_each_level_type
+      real                   :: height         ! Height in m
+      integer                :: height_qc      ! Height QC
+      real                   :: zk             ! MM5 k-coordinates
+      type (field_type)      :: rv
+      type (field_type)      :: rf
+   end type radar_each_level_type
 
-   TYPE info_type
-        CHARACTER (LEN = 40)   :: name          ! Station name
-        CHARACTER (LEN = 12)   :: platform      ! Instrument platform
-        CHARACTER (LEN =  5)   :: id            ! 5 digit station identifer
-        CHARACTER (LEN = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
-        INTEGER                :: levels        ! number of levels
-        REAL                   :: lat           ! Latitude in degree
-        REAL                   :: lon           ! Longitude in degree
-        REAL                   :: elv           ! Elevation in m
-        real                   :: pstar         ! Surface pressure
-   END TYPE info_type
+   type info_type
+      character (len = 40)   :: name          ! Station name
+      character (len = 12)   :: platform      ! Instrument platform
+      character (len =  5)   :: id            ! 5 digit station identifer
+      character (len = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
+      integer                :: levels        ! number of levels
+      real                   :: lat           ! Latitude in degree
+      real                   :: lon           ! Longitude in degree
+      real                   :: elv           ! Elevation in m
+      real                   :: pstar         ! Surface pressure
+   end type info_type
 
-   TYPE stn_loc_type
-      REAL                    :: lon                  ! Radar site loc
-      REAL                    :: lat                  ! Radar site loc
-      REAL                    :: elv                  ! Radar site loc
-      REAL                    :: x                    ! Radar site loc
-      REAL                    :: y                    ! Radar site loc
-      REAL                    :: zk                   ! Radar site loc
-   END TYPE stn_loc_type
+   type stn_loc_type
+      real                    :: lon                  ! Radar site loc
+      real                    :: lat                  ! Radar site loc
+      real                    :: elv                  ! Radar site loc
+      real                    :: x                    ! Radar site loc
+      real                    :: y                    ! Radar site loc
+      real                    :: zk                   ! Radar site loc
+   end type stn_loc_type
  
-   TYPE Radar_type
-      TYPE (stn_loc_type)     :: stn_loc
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type radar_type
+      type (stn_loc_type)     :: stn_loc
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-      REAL                    :: model_p(max_ob_levels)
-      REAL                    :: model_rho(max_ob_levels)
-      REAL                    :: model_qrn(max_ob_levels)
-      REAL                    :: model_ps
+      real                    :: model_p(max_ob_levels)
+      real                    :: model_rho(max_ob_levels)
+      real                    :: model_qrn(max_ob_levels)
+      real                    :: model_ps
 
-      REAL                  , pointer :: height   (:) ! Height in m
-      INTEGER               , pointer :: height_qc(:) ! Height QC
-      REAL                  , pointer :: zk       (:) ! MM5 k-coordinates
+      real                  , pointer :: height   (:) ! Height in m
+      integer               , pointer :: height_qc(:) ! Height QC
+      real                  , pointer :: zk       (:) ! MM5 k-coordinates
 
-      TYPE (field_type)     , pointer :: rv       (:) ! Radial Velocity
-      TYPE (field_type)     , pointer :: rf       (:) ! Reflectivity
-   END TYPE Radar_type
+      type (field_type)     , pointer :: rv       (:) ! Radial Velocity
+      type (field_type)     , pointer :: rf       (:) ! Reflectivity
+   end type radar_type
 
-   TYPE multi_level_type
-      TYPE (info_type)                        :: info
-      TYPE (model_loc_type)                   :: loc
-      TYPE (each_level_type), &
-         DIMENSION (max_ob_levels)         :: each
-   END TYPE multi_level_type
+   type multi_level_type
+      type (info_type)                        :: info
+      type (model_loc_type)                   :: loc
+      type (each_level_type)                  :: each(max_ob_levels)
+   end type multi_level_type
 
-   TYPE Radar_stn_type
-      CHARACTER (LEN = 5)    :: platform      ! Data type
-      CHARACTER (LEN = 12)   :: name          ! Station name
-      CHARACTER (LEN = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
-      INTEGER                :: numObs        ! number of Obs
-      INTEGER                :: levels        ! number of levels
-      REAL                   :: lat           ! Latitude in degree
-      REAL                   :: lon           ! Longitude in degree
-      REAL                   :: elv           ! Elevation in m
-   END TYPE Radar_stn_type
+   type radar_stn_type
+      character (len = 5)    :: platform      ! Data type
+      character (len = 12)   :: name          ! Station name
+      character (len = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
+      integer                :: numObs        ! number of Obs
+      integer                :: levels        ! number of levels
+      real                   :: lat           ! Latitude in degree
+      real                   :: lon           ! Longitude in degree
+      real                   :: elv           ! Elevation in m
+   end type radar_stn_type
 
-   TYPE Radar_multi_level_type
-      TYPE (Radar_stn_type)                   :: stn
-      TYPE (info_type)                        :: info
-      TYPE (model_loc_type)                   :: loc
-      TYPE (Radar_each_level_type), &
-         DIMENSION (max_ob_levels)         :: each
-   END TYPE Radar_multi_level_type
+   type radar_multi_level_type
+      type (radar_stn_type)                   :: stn
+      type (info_type)                        :: info
+      type (model_loc_type)                   :: loc
+      type (radar_each_level_type)            :: each(max_ob_levels)
+   end type radar_multi_level_type
 
    ! [3.2] Innovation vector structure:
 
-   TYPE airep_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type airep_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-      REAL                  , pointer :: h        (:) ! Height in m
-      REAL                  , pointer :: p        (:) ! Height QC
-      REAL                  , pointer :: zk       (:) ! k-coordinates
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! Height QC
+      real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-      TYPE (field_type)     , pointer :: t        (:) ! temperature.
-   END TYPE airep_type
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+      type (field_type)     , pointer :: t        (:) ! temperature.
+   end type airep_type
 
-   TYPE pilot_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type pilot_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-      REAL                  , pointer :: p        (:) ! Height in m
-      REAL                  , pointer :: zk       (:) ! k-coordinates
+      real                  , pointer :: p        (:) ! Height in m
+      real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-   END TYPE pilot_type
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+   end type pilot_type
 
-   TYPE bogus_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL                  , pointer :: h        (:) ! Height in m
-      REAL                  , pointer :: p        (:) ! pressure.
-      REAL                  , pointer :: zk       (:) ! k-coordinates
-
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-      TYPE (field_type)     , pointer :: t        (:) ! temperature.
-      TYPE (field_type)     , pointer :: q        (:) ! q.
-      TYPE (field_type)               :: slp          ! sea level pressure.
-   END TYPE bogus_type
-
-   TYPE satem_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL                            :: ref_p        ! Reference pressure
-      REAL                  , pointer :: p        (:) ! Multi-level pressure
-
-      TYPE (field_type)     , pointer :: thickness(:)     ! Thickness.
-      TYPE (field_type)     , pointer :: org_thickness(:) ! To store original Thickness info.
-   END TYPE satem_type
-
-   TYPE geoamv_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL                  , pointer :: p        (:) ! Height in Pa
-      REAL                  , pointer :: zk       (:) ! k-coordinates
-
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-   END TYPE geoamv_type
-
-   TYPE polaramv_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL                  , pointer :: p        (:) ! Height in Pa
-      REAL                  , pointer :: zk       (:) ! k-coordinates
-
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-   END TYPE polaramv_type
-
-   TYPE gpsref_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL             , pointer :: h  (:)      ! Multi-level height
-      REAL             , pointer :: zk (:)      ! k-coordinates
-
-      TYPE (field_type), pointer :: ref(:)      ! GPS Refractivity
-      TYPE (field_type), pointer :: p  (:)      ! Retrieved P from Ref.
-      TYPE (field_type), pointer :: t  (:)      ! Retrieved T from Ref.
-      TYPE (field_type), pointer :: q  (:)      ! From NCEP analysis.
-   END TYPE gpsref_type
-
-   ! TYPE metar_type
-   !    TYPE (info_type)        :: info
-   !    TYPE (model_loc_type)   :: loc
-
-   !    REAL                    :: h              ! Height in m
-   !    REAL                    :: zk             ! k-coordinates
-
-   !    TYPE (field_type)       :: u              ! u-wind.
-   !    TYPE (field_type)       :: v              ! v-wind.
-   !    TYPE (field_type)       :: t              ! temperature.
-   !    TYPE (field_type)       :: p              ! pressure.
-   !    TYPE (field_type)       :: q              ! q.
-   ! END TYPE metar_type
-
-   ! TYPE ships_type
-   !    TYPE (info_type)        :: info
-   !    TYPE (model_loc_type)   :: loc
-
-   !    REAL                    :: h              ! Height in m
-   !    REAL                    :: zk             ! k-coordinates
-
-   !    TYPE (field_type)       :: u              ! u-wind.
-   !    TYPE (field_type)       :: v              ! v-wind.
-   !    TYPE (field_type)       :: t              ! temperature.
-   !    TYPE (field_type)       :: p              ! pressure.
-   !    TYPE (field_type)       :: q              ! q.
-   ! END TYPE ships_type
-
-   TYPE synop_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-      REAL                    :: h              ! Height in m
-      REAL                    :: zk             ! k-coordinates
-
-      TYPE (field_type)       :: u              ! u-wind.
-      TYPE (field_type)       :: v              ! v-wind.
-      TYPE (field_type)       :: t              ! temperature.
-      TYPE (field_type)       :: p              ! pressure.
-      TYPE (field_type)       :: q              ! q.
-   END TYPE synop_type
-
-   TYPE sound_type
-      TYPE (info_type)      :: info
-      TYPE (model_loc_type) :: loc
+   type bogus_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! pressure.
       real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: u        (:) ! u-wind.
-      TYPE (field_type)     , pointer :: v        (:) ! v-wind.
-      TYPE (field_type)     , pointer :: t        (:) ! temperature.
-      TYPE (field_type)     , pointer :: q        (:) ! q.
-   END TYPE sound_type
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+      type (field_type)     , pointer :: t        (:) ! temperature.
+      type (field_type)     , pointer :: q        (:) ! q.
+      type (field_type)               :: slp          ! sea level pressure.
+   end type bogus_type
 
-   TYPE airsr_type
-      TYPE (info_type)      :: info
-      TYPE (model_loc_type) :: loc
+   type satem_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      real                            :: ref_p        ! Reference pressure
+      real                  , pointer :: p        (:) ! Multi-level pressure
+
+      type (field_type)     , pointer :: thickness(:)     ! Thickness.
+      type (field_type)     , pointer :: org_thickness(:) ! To store original Thickness info.
+   end type satem_type
+
+   type geoamv_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      real                  , pointer :: p        (:) ! Height in Pa
+      real                  , pointer :: zk       (:) ! k-coordinates
+
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+   end type geoamv_type
+
+   type polaramv_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      real                  , pointer :: p        (:) ! Height in Pa
+      real                  , pointer :: zk       (:) ! k-coordinates
+
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+   end type polaramv_type
+
+   type gpsref_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      real             , pointer :: h  (:)      ! Multi-level height
+      real             , pointer :: zk (:)      ! k-coordinates
+
+      type (field_type), pointer :: ref(:)      ! GPS Refractivity
+      type (field_type), pointer :: p  (:)      ! Retrieved P from Ref.
+      type (field_type), pointer :: t  (:)      ! Retrieved T from Ref.
+      type (field_type), pointer :: q  (:)      ! From NCEP analysis.
+   end type gpsref_type
+
+   ! type metar_type
+   !    type (info_type)        :: info
+   !    type (model_loc_type)   :: loc
+
+   !    real                    :: h              ! Height in m
+   !    real                    :: zk             ! k-coordinates
+
+   !    type (field_type)       :: u              ! u-wind.
+   !    type (field_type)       :: v              ! v-wind.
+   !    type (field_type)       :: t              ! temperature.
+   !    type (field_type)       :: p              ! pressure.
+   !    type (field_type)       :: q              ! q.
+   ! end type metar_type
+
+   ! type ships_type
+   !    type (info_type)        :: info
+   !    type (model_loc_type)   :: loc
+
+   !    real                    :: h              ! Height in m
+   !    real                    :: zk             ! k-coordinates
+
+   !    type (field_type)       :: u              ! u-wind.
+   !    type (field_type)       :: v              ! v-wind.
+   !    type (field_type)       :: t              ! temperature.
+   !    type (field_type)       :: p              ! pressure.
+   !    type (field_type)       :: q              ! q.
+   ! end type ships_type
+
+   type synop_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      real                    :: h              ! Height in m
+      real                    :: zk             ! k-coordinates
+
+      type (field_type)       :: u              ! u-wind.
+      type (field_type)       :: v              ! v-wind.
+      type (field_type)       :: t              ! temperature.
+      type (field_type)       :: p              ! pressure.
+      type (field_type)       :: q              ! q.
+   end type synop_type
+
+   type sound_type
+      type (info_type)      :: info
+      type (model_loc_type) :: loc
 
       real                  , pointer :: h        (:) ! Height in m
       real                  , pointer :: p        (:) ! pressure.
       real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: t        (:) ! temperature.
-      TYPE (field_type)     , pointer :: q        (:) ! q.
-   END TYPE airsr_type
+      type (field_type)     , pointer :: u        (:) ! u-wind.
+      type (field_type)     , pointer :: v        (:) ! v-wind.
+      type (field_type)     , pointer :: t        (:) ! temperature.
+      type (field_type)     , pointer :: q        (:) ! q.
+   end type sound_type
 
-   TYPE gpspw_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type airsr_type
+      type (info_type)      :: info
+      type (model_loc_type) :: loc
 
-      TYPE (field_type)       :: tpw  ! Toatl precipitable water cm from GPS
-   END TYPE gpspw_type
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! pressure.
+      real                  , pointer :: zk       (:) ! k-coordinates
 
-   TYPE ssmi_retrieval_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+      type (field_type)     , pointer :: t        (:) ! temperature.
+      type (field_type)     , pointer :: q        (:) ! q.
+   end type airsr_type
 
-      TYPE (field_type)       :: Speed          ! Wind speed in m/s
-      TYPE (field_type)       :: tpw            ! Toatl precipitable water cm
-   END TYPE ssmi_retrieval_type
+   type gpspw_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-   TYPE ssmi_tb_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+      type (field_type)       :: tpw  ! Toatl precipitable water cm from GPS
+   end type gpspw_type
 
-      TYPE (field_type)       :: tb19v          ! Brightness T (k) 19V
-      TYPE (field_type)       :: tb19h          ! Brightness T (k) 19H
-      TYPE (field_type)       :: tb22v          ! Brightness T (k) 22V
-      TYPE (field_type)       :: tb37v          ! Brightness T (k) 37V
-      TYPE (field_type)       :: tb37h          ! Brightness T (k) 37H
-      TYPE (field_type)       :: tb85v          ! Brightness T (k) 85V
-      TYPE (field_type)       :: tb85h          ! Brightness T (k) 85H
-   END TYPE ssmi_tb_type
+   type ssmi_retrieval_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      type (field_type)       :: Speed          ! Wind speed in m/s
+      type (field_type)       :: tpw            ! Toatl precipitable water cm
+   end type ssmi_retrieval_type
+
+   type ssmi_tb_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+      type (field_type)       :: tb19v          ! Brightness T (k) 19V
+      type (field_type)       :: tb19h          ! Brightness T (k) 19H
+      type (field_type)       :: tb22v          ! Brightness T (k) 22V
+      type (field_type)       :: tb37v          ! Brightness T (k) 37V
+      type (field_type)       :: tb37h          ! Brightness T (k) 37H
+      type (field_type)       :: tb85v          ! Brightness T (k) 85V
+      type (field_type)       :: tb85h          ! Brightness T (k) 85H
+   end type ssmi_tb_type
    
-   TYPE ssmt1_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type ssmt1_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
       
-      REAL                  , pointer :: h        (:) ! Height in m
-      REAL                  , pointer :: p        (:) ! Pressure in Pa.
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! Pressure in Pa.
       real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: t        (:) ! temperature.
-   END TYPE ssmt1_type
+      type (field_type)     , pointer :: t        (:) ! temperature.
+   end type ssmt1_type
 
-   TYPE ssmt2_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type ssmt2_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
       
-      REAL                  , pointer :: h        (:) ! Height in m
-      REAL                  , pointer :: p        (:) ! Pressure in Pa.
+      real                  , pointer :: h        (:) ! Height in m
+      real                  , pointer :: p        (:) ! Pressure in Pa.
       real                  , pointer :: zk       (:) ! k-coordinates
 
-      TYPE (field_type)     , pointer :: rh       (:) ! Relative humidity.
-   END TYPE ssmt2_type
+      type (field_type)     , pointer :: rh       (:) ! Relative humidity.
+   end type ssmt2_type
 
-   TYPE pseudo_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type pseudo_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-      ! REAL                    :: h              ! Height in m
-      REAL                    :: zk             ! k-coordinates
+      ! real                    :: h              ! Height in m
+      real                    :: zk             ! k-coordinates
 
-      TYPE (field_type)       :: u              ! u-wind.
-      TYPE (field_type)       :: v              ! v-wind.
-      TYPE (field_type)       :: t              ! Temperature.
-      TYPE (field_type)       :: p              ! Pressure.
-      TYPE (field_type)       :: q              ! Specific Humidity.
-   END TYPE pseudo_type
+      type (field_type)       :: u              ! u-wind.
+      type (field_type)       :: v              ! v-wind.
+      type (field_type)       :: t              ! Temperature.
+      type (field_type)       :: p              ! Pressure.
+      type (field_type)       :: q              ! Specific Humidity.
+   end type pseudo_type
 
-   TYPE qscat_type
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
+   type qscat_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
 
-      REAL                    :: h              ! Height in m
-      REAL                    :: zk             ! k-coordinates
+      real                    :: h              ! Height in m
+      real                    :: zk             ! k-coordinates
 
-      TYPE (field_type)       :: u              ! u-wind.
-      TYPE (field_type)       :: v              ! v-wind.
-   END TYPE qscat_type
+      type (field_type)       :: u              ! u-wind.
+      type (field_type)       :: v              ! v-wind.
+   end type qscat_type
 
-   TYPE rad_type
-
-      TYPE (info_type)        :: info
-      TYPE (model_loc_type)   :: loc
-
-        integer   ::  ifgat, landsea_mask
-        integer   ::  scanline, scanpos
-        real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
-        ! channels' bright temperature
-        type(field_type), pointer   ::   tb(:)         
-        real,    pointer   ::   emiss(:), tb_xb(:)    !  guess bright temperatures
-        ! logical, pointer   ::   calcemis(:)
-        integer, pointer   ::   cloud_flag(:)
-        real,    pointer   ::   t(:), mr(:), zk(:)
-        real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
-        real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
-        real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
-        integer            ::   isflg
-
-   END TYPE rad_type
-
-   TYPE instid_type
+   type instid_type
       ! Instrument triplet, follow the convension of RTTOV
-      INTEGER              :: platform_id, satellite_id, sensor_id
-      CHARACTER(LEN=20)    :: rttovid_string
-      INTEGER              :: num_rad, nchan, nlevels
-      INTEGER, pointer     :: ichan(:)
-      INTEGER, pointer     :: proc_domain(:)
+      integer              :: platform_id, satellite_id, sensor_id
+      character(len=20)    :: rttovid_string
+      integer              :: num_rad, nchan, nlevels
+      integer              :: nchannels, nfrequencies,nbtout
+      integer              :: num_rad_glo
+      integer, pointer     :: ichan(:)
+      logical, pointer     :: proc_domain(:)
       integer, pointer     :: loc_i(:)
       integer, pointer     :: loc_j(:)
       integer, pointer     :: loc_k(:,:)
@@ -458,12 +437,17 @@ module da_define_structures
       real,    pointer     :: loc_dym(:) 
       real,    pointer     :: loc_dzm(:,:) 
       real,    pointer     :: zk(:,:) 
-      real,    pointer     :: tb(:,:)
       real,    pointer     :: tb_inv(:,:)
+      integer, pointer     :: tb_qc(:,:)
+      real,    pointer     :: tb_error(:,:)
       real,    pointer     :: tb_xb(:,:) 
       integer, pointer     :: scanpos(:)
+      integer, pointer     :: scanline(:)
+      integer, pointer     :: cloud_flag(:,:)
       real,    pointer     :: satzen(:) 
       real,    pointer     :: satazi(:) 
+      real,    pointer     :: solzen(:) 
+      real,    pointer     :: solazi(:) 
       real,    pointer     :: t(:,:)
       real,    pointer     :: q(:,:)
       real,    pointer     :: mr(:,:)
@@ -482,22 +466,25 @@ module da_define_structures
       real,    pointer     :: q2m(:)
       real,    pointer     :: mr2m(:)
       real,    pointer     :: psfc(:)
+      real,    pointer     :: ps(:)
       real,    pointer     :: ts(:)
       real,    pointer     :: smois(:)
       real,    pointer     :: tslb(:)
       real,    pointer     :: snowh(:)
       integer, pointer     :: isflg(:)
+      integer, pointer     :: ifgat(:)
       integer, pointer     :: landsea_mask(:)
-      real,    pointer     :: elv(:)
+      real,    pointer     :: elevation(:)
       real,    pointer     :: soiltyp(:)
       real,    pointer     :: vegtyp(:)
       real,    pointer     :: vegfra(:)
       real,    pointer     :: clwp(:)
-      TYPE (rad_type)    , pointer   :: rad(:)  ! radiance type
-   END TYPE instid_type
+      type (info_type), pointer   :: info(:)
+      type (model_loc_type), pointer   :: loc(:)
+   end type instid_type
 
-   TYPE ob_numb_type
-      INTEGER :: total, &
+   type ob_numb_type
+      integer :: total, &
                  synop, & 
                  sound, &
                  geoamv,&
@@ -521,14 +508,14 @@ module da_define_structures
                  Radar, &
                  radiance(maxsensor), &
                  airsr
-   END TYPE ob_numb_type
+   end type ob_numb_type
 
-   TYPE ob_type
-      TYPE(ob_numb_type), DIMENSION(0:max_fgat_time) :: ob_numb
+   type ob_type
+      type(ob_numb_type) :: ob_numb(0:max_fgat_time)
 
-      INTEGER :: current_ob_time
+      integer :: current_ob_time
 
-      INTEGER :: total_obs, num_synop, num_airsr, &
+      integer :: total_obs, num_synop, num_airsr, &
                  num_sound, num_geoamv, num_polaramv, &
                  num_pilot, num_satem, &
                  num_airep, num_metar, &
@@ -539,7 +526,7 @@ module da_define_structures
                  num_Radar, num_gpsref, num_bogus, &
                  num_inst, total_rad_pixel, total_rad_channel
 
-      INTEGER :: num_synop_glo, num_airsr_glo, &
+      integer :: num_synop_glo, num_airsr_glo, &
                  num_sound_glo, num_geoamv_glo, num_polaramv_glo, &
                  num_pilot_glo, num_satem_glo, &
                  num_airep_glo, num_metar_glo, &
@@ -569,51 +556,51 @@ module da_define_structures
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
       real    :: airsr_ef_t,  airsr_ef_q
 
-      TYPE (airsr_type)         , pointer :: airsr(:)
-      TYPE (sound_type)         , pointer :: sound(:)
-      TYPE (synop_type)         , pointer :: sonde_sfc(:)
-      TYPE (airep_type)         , pointer :: airep(:)
-      TYPE (pilot_type)         , pointer :: pilot(:)
-      TYPE (satem_type)         , pointer :: satem(:)
-      TYPE (geoamv_type)        , pointer :: geoamv(:)
-      TYPE (polaramv_type)        , pointer :: polaramv(:)
-      TYPE (synop_type)         , pointer :: synop(:)
-      TYPE (synop_type)         , pointer :: metar(:)
-      TYPE (synop_type)         , pointer :: ships(:)
-      TYPE (gpspw_type)         , pointer :: gpspw(:)
-      TYPE (gpsref_type)        , pointer :: gpsref(:)
-      TYPE (ssmi_tb_type)       , pointer :: ssmi_tb(:)
-      TYPE (ssmi_retrieval_type), pointer :: ssmi_retrieval(:)
-      TYPE (ssmt1_type)         , pointer :: ssmt1(:)
-      TYPE (ssmt2_type)         , pointer :: ssmt2(:)
-      TYPE (pseudo_type)        , pointer :: pseudo(:)
-      TYPE (qscat_type)         , pointer :: qscat(:)
-      TYPE (synop_type)         , pointer :: buoy(:)
-      TYPE (pilot_type)         , pointer :: profiler(:)
-      TYPE (bogus_type)         , pointer :: bogus(:)
-      TYPE (Radar_type)         , pointer :: Radar(:)
-      TYPE (instid_type)        , pointer :: instid(:)
+      type (airsr_type)         , pointer :: airsr(:)
+      type (sound_type)         , pointer :: sound(:)
+      type (synop_type)         , pointer :: sonde_sfc(:)
+      type (airep_type)         , pointer :: airep(:)
+      type (pilot_type)         , pointer :: pilot(:)
+      type (satem_type)         , pointer :: satem(:)
+      type (geoamv_type)        , pointer :: geoamv(:)
+      type (polaramv_type)        , pointer :: polaramv(:)
+      type (synop_type)         , pointer :: synop(:)
+      type (synop_type)         , pointer :: metar(:)
+      type (synop_type)         , pointer :: ships(:)
+      type (gpspw_type)         , pointer :: gpspw(:)
+      type (gpsref_type)        , pointer :: gpsref(:)
+      type (ssmi_tb_type)       , pointer :: ssmi_tb(:)
+      type (ssmi_retrieval_type), pointer :: ssmi_retrieval(:)
+      type (ssmt1_type)         , pointer :: ssmt1(:)
+      type (ssmt2_type)         , pointer :: ssmt2(:)
+      type (pseudo_type)        , pointer :: pseudo(:)
+      type (qscat_type)         , pointer :: qscat(:)
+      type (synop_type)         , pointer :: buoy(:)
+      type (pilot_type)         , pointer :: profiler(:)
+      type (bogus_type)         , pointer :: bogus(:)
+      type (Radar_type)         , pointer :: Radar(:)
+      type (instid_type)        , pointer :: instid(:)
 
-      REAL :: missing
-      REAL :: ptop
+      real :: missing
+      real :: ptop
 
-   END TYPE ob_type
+   end type ob_type
 
    ! [3.3] Where are these used:?
 
-   TYPE number
+   type number
       integer                    :: bad
       integer                    :: miss
       integer                    :: use
-   END TYPE number
+   end type number
 
    TYPE bad_info_type
       type (number)              :: num
-      integer, dimension(100000) :: nn
-      integer, dimension(100000) :: kk
+      integer                    :: nn(100000)
+      integer                    :: kk(100000)
    END TYPE bad_info_type
 
-   TYPE  bad_data_type
+   type  bad_data_type
       type (bad_info_type)       :: u
       type (bad_info_type)       :: v
       type (bad_info_type)       :: t
@@ -628,18 +615,18 @@ module da_define_structures
       type (bad_info_type)       :: rf
       type (bad_info_type)       :: slp
       type (bad_info_type)       :: rad
-   END TYPE bad_data_type
+   end type bad_data_type
 
-   TYPE count_obs_number_type
+   type count_obs_number_type
         integer                                 :: num_used
         integer                                 :: num_outside_iyjx
         integer                                 :: num_max_err_chk
         integer                                 :: num_missing
-   END TYPE count_obs_number_type
+   end type count_obs_number_type
  
-   TYPE count_obs_type
+   type count_obs_type
 
-        TYPE (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
+        type (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
                                          num_sound, num_geoamv, num_polaramv,&
                                          num_pilot, num_satem, &
                                          num_airep, num_metar, &
@@ -654,168 +641,167 @@ module da_define_structures
                                          num_Radar, num_bogus, &
                                          num_other  
 
-   END TYPE count_obs_type
+   end type count_obs_type
 
    !--------------------------------------------------------------------------
    ! [3.0] Observation/residual structure definition:
    !--------------------------------------------------------------------------
 
-   TYPE residual_synop_type
-      REAL :: u                                 ! u-wind.
-      REAL :: v                                 ! v-wind.
-      REAL :: t                                 ! temperature.
-      REAL :: p                                 ! pressure.
-      REAL :: q                                 ! q.
-   END TYPE residual_synop_type
+   type residual_synop_type
+      real :: u                                 ! u-wind.
+      real :: v                                 ! v-wind.
+      real :: t                                 ! temperature.
+      real :: p                                 ! pressure.
+      real :: q                                 ! q.
+   end type residual_synop_type
 
-   TYPE residual_qscat_type
-      REAL :: u                                 ! u-wind.
-      REAL :: v                                 ! v-wind.
-   END TYPE residual_qscat_type
+   type residual_qscat_type
+      real :: u                                 ! u-wind.
+      real :: v                                 ! v-wind.
+   end type residual_qscat_type
 
-   TYPE residual_geoamv_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-   END TYPE residual_geoamv_type
+   type residual_geoamv_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+   end type residual_geoamv_type
 
-   TYPE residual_polaramv_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-   END TYPE residual_polaramv_type
+   type residual_polaramv_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+   end type residual_polaramv_type
 
-   TYPE residual_gpspw_type
-      REAL :: tpw                               ! Total precipitable water.
-   END TYPE residual_gpspw_type
+   type residual_gpspw_type
+      real :: tpw                               ! Total precipitable water.
+   end type residual_gpspw_type
 
-   TYPE residual_sound_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-      REAL, POINTER :: t(:)                     ! temperature.
-      REAL, POINTER :: q(:)                     ! specific humidity.
-   END TYPE residual_sound_type
+   type residual_sound_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+      real, pointer :: t(:)                     ! temperature.
+      real, pointer :: q(:)                     ! specific humidity.
+   end type residual_sound_type
 
-   TYPE residual_airsr_type
-      REAL, POINTER :: t(:)                     ! temperature.
-      REAL, POINTER :: q(:)                     ! specific humidity.
-   END TYPE residual_airsr_type
+   type residual_airsr_type
+      real, pointer :: t(:)                     ! temperature.
+      real, pointer :: q(:)                     ! specific humidity.
+   end type residual_airsr_type
 
-   TYPE residual_airep_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-      REAL, POINTER :: t(:)                     ! temperature.
-   END TYPE residual_airep_type
+   type residual_airep_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+      real, pointer :: t(:)                     ! temperature.
+   end type residual_airep_type
 
-   TYPE residual_pilot_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-   END TYPE residual_pilot_type
+   type residual_pilot_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+   end type residual_pilot_type
 
-   TYPE residual_bogus_type
-      REAL, POINTER :: u(:)                     ! u-wind.
-      REAL, POINTER :: v(:)                     ! v-wind.
-      REAL, POINTER :: t(:)                     ! temperature.
-      REAL, POINTER :: q(:)                     ! specific humidity.
-      REAL          :: slp                      ! sea-level pressure.
-   END TYPE residual_bogus_type
+   type residual_bogus_type
+      real, pointer :: u(:)                     ! u-wind.
+      real, pointer :: v(:)                     ! v-wind.
+      real, pointer :: t(:)                     ! temperature.
+      real, pointer :: q(:)                     ! specific humidity.
+      real          :: slp                      ! sea-level pressure.
+   end type residual_bogus_type
 
-   TYPE residual_satem_type
-      REAL, POINTER :: thickness(:)             ! Thickness.
-   END TYPE residual_satem_type
+   type residual_satem_type
+      real, pointer :: thickness(:)             ! Thickness.
+   end type residual_satem_type
 
-   TYPE residual_gpsref_type
-      REAL, POINTER :: ref(:)         ! GPS Refractivity
-      REAL, POINTER :: p  (:)         ! GPS Retrived p from Refractivity
-      REAL, POINTER :: t  (:)         ! GPS Retrived t from Refractivity
-      REAL, POINTER :: q  (:)         ! q from NCEP used by CDAAC in retrieval
-   END TYPE residual_gpsref_type
+   type residual_gpsref_type
+      real, pointer :: ref(:)         ! GPS Refractivity
+      real, pointer :: p  (:)         ! GPS Retrived p from Refractivity
+      real, pointer :: t  (:)         ! GPS Retrived t from Refractivity
+      real, pointer :: q  (:)         ! q from NCEP used by CDAAC in retrieval
+   end type residual_gpsref_type
 
-   TYPE residual_ssmi_retrieval_type
-        REAL                    :: tpw      ! Toatl precipitable water cm
-        REAL                    :: Speed    ! Wind speed m/s
-   END TYPE residual_ssmi_retrieval_type
+   type residual_ssmi_retrieval_type
+        real                    :: tpw      ! Toatl precipitable water cm
+        real                    :: Speed    ! Wind speed m/s
+   end type residual_ssmi_retrieval_type
 
-   TYPE residual_ssmi_tb_type
-        REAL                    :: tb19v          ! Brightness T (k) 19V
-        REAL                    :: tb19h          ! Brightness T (k) 19H
-        REAL                    :: tb22v          ! Brightness T (k) 22V
-        REAL                    :: tb37v          ! Brightness T (k) 37V
-        REAL                    :: tb37h          ! Brightness T (k) 37H
-        REAL                    :: tb85v          ! Brightness T (k) 85V
-        REAL                    :: tb85h          ! Brightness T (k) 85H
-   END TYPE residual_ssmi_tb_type
+   type residual_ssmi_tb_type
+        real                    :: tb19v          ! Brightness T (k) 19V
+        real                    :: tb19h          ! Brightness T (k) 19H
+        real                    :: tb22v          ! Brightness T (k) 22V
+        real                    :: tb37v          ! Brightness T (k) 37V
+        real                    :: tb37h          ! Brightness T (k) 37H
+        real                    :: tb85v          ! Brightness T (k) 85V
+        real                    :: tb85h          ! Brightness T (k) 85H
+   end type residual_ssmi_tb_type
    
-   TYPE residual_ssmt1_type
-      REAL, POINTER :: t(:)                       ! temperature.
-   END TYPE residual_ssmt1_type
+   type residual_ssmt1_type
+      real, pointer :: t(:)                       ! temperature.
+   end type residual_ssmt1_type
    
-   TYPE residual_ssmt2_type
-      REAL, POINTER :: rh(:)                      ! Relative Humidity.
-   END TYPE residual_ssmt2_type
+   type residual_ssmt2_type
+      real, pointer :: rh(:)                      ! Relative Humidity.
+   end type residual_ssmt2_type
 
-   TYPE residual_pseudo_type
-      REAL :: u                                   ! u-wind.
-      REAL :: v                                   ! v-wind.
-      REAL :: t                                   ! temperature.
-      REAL :: p                                   ! pressure.
-      REAL :: q                                   ! specific humidity.
-   END TYPE residual_pseudo_type
+   type residual_pseudo_type
+      real :: u                                   ! u-wind.
+      real :: v                                   ! v-wind.
+      real :: t                                   ! temperature.
+      real :: p                                   ! pressure.
+      real :: q                                   ! specific humidity.
+   end type residual_pseudo_type
 
-   TYPE residual_Radar_type
-      REAL, POINTER :: rv(:)                    ! rv
-      REAL, POINTER :: rf(:)                    ! rf
-   END TYPE residual_Radar_type
+   type residual_Radar_type
+      real, pointer :: rv(:)                    ! rv
+      real, pointer :: rf(:)                    ! rf
+   end type residual_Radar_type
 
-   TYPE residual_rad_type
-      real    , POINTER :: tb(:)
-   END TYPE residual_rad_type
+!   type residual_rad_type
+!      real    , pointer :: tb(:)
+!   end type residual_rad_type
 
-   TYPE residual_instid_type
-      integer                          :: num_rad
-      integer                          :: nchan
-      integer ,  pointer               :: ichan (:)
-      real, pointer                    :: tb(:,:)
-      type(residual_rad_type), POINTER :: rad(:)
-   END TYPE residual_instid_type
+   type residual_instid_type
+     integer                          :: num_rad
+     integer                          :: nchan
+     integer ,  pointer               :: ichan (:)
+     real, pointer                    :: tb(:,:)
+   end type residual_instid_type
 
-   TYPE y_type
-        TYPE(ob_numb_type) :: ob_numb
+   type y_type
+      type(ob_numb_type) :: ob_numb
 
-        INTEGER :: total_obs, num_synop, num_airsr, &
-                   num_sound, num_geoamv, num_polaramv, &
-                   num_pilot, num_satem, &
-                   num_airep, num_metar, &
-                   num_ships, num_gpspw, &
-                   num_ssmi_tb, num_ssmi_retrieval, &
-                   num_ssmt1, num_ssmt2, num_pseudo, &
-                   num_qscat, num_profiler, num_buoy, &
-                   num_Radar, num_gpsref, num_bogus, &
-                   num_inst
+      integer :: total_obs, num_synop, num_airsr, &
+                 num_sound, num_geoamv, num_polaramv, &
+                 num_pilot, num_satem, &
+                 num_airep, num_metar, &
+                 num_ships, num_gpspw, &
+                 num_ssmi_tb, num_ssmi_retrieval, &
+                 num_ssmt1, num_ssmt2, num_pseudo, &
+                 num_qscat, num_profiler, num_buoy, &
+                 num_Radar, num_gpsref, num_bogus, &
+                 num_inst
 
-        TYPE (residual_synop_type), POINTER :: synop(:)
-        TYPE (residual_synop_type), POINTER :: metar(:) ! Same as synop type
-        TYPE (residual_synop_type), POINTER :: ships(:) ! Same as synop type
-        TYPE (residual_geoamv_type), POINTER :: geoamv(:)
-        TYPE (residual_polaramv_type), POINTER :: polaramv(:)
-        TYPE (residual_gpspw_type ), POINTER :: gpspw (:)
-        TYPE (residual_gpsref_type), POINTER :: gpsref(:)
-        TYPE (residual_sound_type), POINTER :: sound(:)
-        TYPE (residual_airsr_type), POINTER :: airsr(:)
-        TYPE (residual_bogus_type), POINTER :: bogus(:)
-        TYPE (residual_synop_type), POINTER :: sonde_sfc(:) ! Same as synop type
-        TYPE (residual_airep_type), POINTER :: airep(:)
-        TYPE (residual_pilot_type), POINTER :: pilot(:)
-        TYPE (residual_satem_type), POINTER :: satem(:)
-        TYPE (residual_ssmi_tb_type), POINTER        :: ssmi_tb(:)
-        TYPE (residual_ssmi_retrieval_type), POINTER :: ssmi_retrieval(:)
-        TYPE (residual_ssmt1_type), POINTER :: ssmt1(:)
-        TYPE (residual_ssmt2_type), POINTER :: ssmt2(:)
-        TYPE (residual_pseudo_type), POINTER:: pseudo(:)
-        TYPE (residual_qscat_type), POINTER :: qscat(:)
-        TYPE (residual_synop_type),  POINTER :: buoy(:) ! Same as synop type
-        TYPE (residual_pilot_type), POINTER :: profiler(:) ! Same as pilot type
-        TYPE (residual_Radar_type), POINTER :: Radar(:)
-        TYPE (residual_instid_type), POINTER :: instid(:)
-   END TYPE y_type
+      type (residual_synop_type), pointer :: synop(:)
+      type (residual_synop_type), pointer :: metar(:) ! Same as synop type
+      type (residual_synop_type), pointer :: ships(:) ! Same as synop type
+      type (residual_geoamv_type), pointer :: geoamv(:)
+      type (residual_polaramv_type), pointer :: polaramv(:)
+      type (residual_gpspw_type ), pointer :: gpspw (:)
+      type (residual_gpsref_type), pointer :: gpsref(:)
+      type (residual_sound_type), pointer :: sound(:)
+      type (residual_airsr_type), pointer :: airsr(:)
+      type (residual_bogus_type), pointer :: bogus(:)
+      type (residual_synop_type), pointer :: sonde_sfc(:) ! Same as synop type
+      type (residual_airep_type), pointer :: airep(:)
+      type (residual_pilot_type), pointer :: pilot(:)
+      type (residual_satem_type), pointer :: satem(:)
+      type (residual_ssmi_tb_type), pointer        :: ssmi_tb(:)
+      type (residual_ssmi_retrieval_type), pointer :: ssmi_retrieval(:)
+      type (residual_ssmt1_type), pointer :: ssmt1(:)
+      type (residual_ssmt2_type), pointer :: ssmt2(:)
+      type (residual_pseudo_type), pointer:: pseudo(:)
+      type (residual_qscat_type), pointer :: qscat(:)
+      type (residual_synop_type),  pointer :: buoy(:) ! Same as synop type
+      type (residual_pilot_type), pointer :: profiler(:) ! Same as pilot type
+      type (residual_Radar_type), pointer :: Radar(:)
+      type (residual_instid_type), pointer :: instid(:)
+   end type y_type
 
    !--------------------------------------------------------------------------
    ! [4.0] Control variable structure:
@@ -823,10 +809,10 @@ module da_define_structures
 
    ! Max/Min type:
 
-   TYPE maxmin_type
-        REAL                       :: value
-        INTEGER                    :: n, l
-   END TYPE maxmin_type
+   type maxmin_type
+        real                       :: value
+        integer                    :: n, l
+   end type maxmin_type
 
    !--------------------------------------------------------------------------
    ! [5.0] Control variable structure:
@@ -872,62 +858,62 @@ module da_define_structures
       type (jo_type)   :: jo
    end type j_type
 
-   TYPE cv_type
-      INTEGER :: size        ! Total size of control variable.
-      INTEGER :: size_jb     ! Size of CV array for Jb term.
-      INTEGER :: size_je     ! Size of CV array for Je term.
-      INTEGER :: size1c      ! Complex size of CV array of 1st variable error.
-      INTEGER :: size2c      ! Complex size of CV array of 2nd variable error.
-      INTEGER :: size3c      ! Complex size of CV array of 3rd variable error.
-      INTEGER :: size4c      ! Complex size of CV array of 4th variable error.
-      INTEGER :: size5c      ! Complex size of CV array of 5th variable error.
+   type cv_type
+      integer :: size        ! Total size of control variable.
+      integer :: size_jb     ! Size of CV array for Jb term.
+      integer :: size_je     ! Size of CV array for Je term.
+      integer :: size1c      ! Complex size of CV array of 1st variable error.
+      integer :: size2c      ! Complex size of CV array of 2nd variable error.
+      integer :: size3c      ! Complex size of CV array of 3rd variable error.
+      integer :: size4c      ! Complex size of CV array of 4th variable error.
+      integer :: size5c      ! Complex size of CV array of 5th variable error.
       integer :: size_alphac ! Size of alpha control variable (complex).
-      INTEGER :: size1       ! Size of CV array of 1st variable error.
-      INTEGER :: size2       ! Size of CV array of 2nd variable error.
-      INTEGER :: size3       ! Size of CV array of 3rd variable error.
-      INTEGER :: size4       ! Size of CV array of 4th variable error.
-      INTEGER :: size5       ! Size of CV array of 5th variable error.
-   END TYPE cv_type
+      integer :: size1       ! Size of CV array of 1st variable error.
+      integer :: size2       ! Size of CV array of 2nd variable error.
+      integer :: size3       ! Size of CV array of 3rd variable error.
+      integer :: size4       ! Size of CV array of 4th variable error.
+      integer :: size5       ! Size of CV array of 5th variable error.
+   end type cv_type
 
-   TYPE be_subtype
-      INTEGER           :: mz          ! Vertical truncation of errors.
+   type be_subtype
+      integer           :: mz          ! Vertical truncation of errors.
       integer           :: max_wave    ! Global only - horizontal spectral truncation.
-      CHARACTER*5       :: name        ! Variable name.
-      REAL, POINTER     :: rf_alpha(:) ! RF scale length.
-      REAL, POINTER     :: val(:,:)    ! Local Standard dev./sqrt(eigenvalue).
-      REAL, POINTER     :: evec(:,:,:) ! Local Vertical eigenvectors.
-      REAL, POINTER     :: val_g(:)    ! Global Standard dev./sqrt(eigenvalue).
-      REAL, POINTER     :: evec_g(:,:) ! Global Vertical eigenvectors.
-      REAL, POINTER     :: power(:,:)  ! Power spectrum
-   END TYPE be_subtype
+      character*5       :: name        ! Variable name.
+      real, pointer     :: rf_alpha(:) ! RF scale length.
+      real, pointer     :: val(:,:)    ! Local Standard dev./sqrt(eigenvalue).
+      real, pointer     :: evec(:,:,:) ! Local Vertical eigenvectors.
+      real, pointer     :: val_g(:)    ! Global Standard dev./sqrt(eigenvalue).
+      real, pointer     :: evec_g(:,:) ! Global Vertical eigenvectors.
+      real, pointer     :: power(:,:)  ! Power spectrum
+   end type be_subtype
 
-   TYPE be_type
+   type be_type
       integer           :: ne
       integer           :: max_wave           ! Smallest spectral mode (global).
-      INTEGER           :: mix
-      INTEGER           :: mjy
-      TYPE (be_subtype) :: v1
-      TYPE (be_subtype) :: v2
-      TYPE (be_subtype) :: v3
-      TYPE (be_subtype) :: v4
-      TYPE (be_subtype) :: v5
+      integer           :: mix
+      integer           :: mjy
+      type (be_subtype) :: v1
+      type (be_subtype) :: v2
+      type (be_subtype) :: v3
+      type (be_subtype) :: v4
+      type (be_subtype) :: v5
       type (be_subtype) :: alpha
-      REAL, POINTER     :: pb_vert_reg(:,:,:)
+      real, pointer     :: pb_vert_reg(:,:,:)
 
       ! Control variable space errors:
-      TYPE (cv_type)    :: cv
+      type (cv_type)    :: cv
 
-      REAL, POINTER     :: reg_chi(:,:)
-      REAL, POINTER     :: reg_t  (:,:,:)
-      REAL, POINTER     :: reg_ps (:,:)
-   END TYPE be_type
+      real, pointer     :: reg_chi(:,:)
+      real, pointer     :: reg_t  (:,:,:)
+      real, pointer     :: reg_ps (:,:)
+   end type be_type
 
    ! Analysis_Stats maximum-minumum structure.
 
-   TYPE maxmin_field_type
-      REAL                         :: value
-      INTEGER                      :: i, j
-   END TYPE maxmin_field_type
+   type maxmin_field_type
+      real                         :: value
+      integer                      :: i, j
+   end type maxmin_field_type
 
 
    ! vp_type is defined in the Registry
@@ -937,7 +923,7 @@ module da_define_structures
    ! The framework (de)allocates the vv structure.
    ! The framework (de)allocates the vp structure.
 
-CONTAINS
+contains
 
 #include "da_allocate_background_errors.inc"
 #include "da_allocate_observations.inc"

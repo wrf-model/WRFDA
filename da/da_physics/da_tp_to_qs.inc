@@ -14,10 +14,12 @@ subroutine da_tp_to_qs( t, p, es, qs)
    
    real              :: t_c              ! T in degreesC.
 
+   if (trace_use_frequent) call da_trace_entry("da_tp_to_qs")
+
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
    !---------------------------------------------------------------------------
-
+   
    t_c = t - t_kelvin
    
    !---------------------------------------------------------------------------
@@ -31,6 +33,8 @@ subroutine da_tp_to_qs( t, p, es, qs)
    !---------------------------------------------------------------------------
 
    qs = rd_over_rv * es / ( p - rd_over_rv1 * es )
+
+   if (trace_use_frequent) call da_trace_exit("da_tp_to_qs")
 
 end subroutine da_tp_to_qs
 

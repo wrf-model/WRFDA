@@ -20,6 +20,8 @@ subroutine da_check_rh(xb, xa, xp)
    real    :: tol_adjust_moist, tol_moist, oldrha, each_moist, es, weight
    real    :: upper_modify_rh, lower_modify_rh
 
+   if (trace_use) call da_trace_entry("da_check_rh")
+
    is = xp % its
    ie = xp % ite
    js = xp % jts
@@ -130,6 +132,8 @@ write (0,*) "maxval(xa%t),maxval(xb%t),maxval(xa%p),maxval(xb%p)",maxval(xa%t),m
          end if
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_check_rh")
 
 end subroutine da_check_rh
 

@@ -145,10 +145,7 @@ subroutine da_deallocate_y(y)
       do i = 1,  y % num_inst
         if (y % instid(i) % num_rad < 1) cycle
         ! deallocate (y % instid(i) % ichan)
-        do j = 1, y % instid(i) % num_rad
-           deallocate (y % instid(i) % rad(j) % tb)
-        end do
-        deallocate (y % instid(i) % rad)
+        deallocate ( y % instid(i) % tb )
       end do
       deallocate (y % instid)
    end if

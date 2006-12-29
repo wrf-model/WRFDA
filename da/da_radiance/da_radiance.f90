@@ -14,9 +14,8 @@ module da_radiance
    use da_interpolation
    use da_statistics
    use da_tools
-!   use da_obs
    use da_par_util
-   USE da_reporting
+   use da_reporting
 
 #ifdef RTTOV
    use rttov_const,  only : &
@@ -34,7 +33,7 @@ module da_radiance
                             one, three, zero, half, &
                             one_tenth, two, four
 
-!   use irsse_model, only: forward_irsse
+   ! use irsse_model, only: forward_irsse
    implicit none
    
    real, parameter             :: q2ppmv = 1.60771704e+6
@@ -42,25 +41,43 @@ module da_radiance
    character(len=5), pointer   :: coefs_scatt_instname(:)
    real,             pointer   :: time_slots(:)
 #ifdef RTTOV
-   TYPE( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
-   TYPE( rttov_scatt_coef ), pointer :: coefs_scatt(:)
+   type( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
+   type( rttov_scatt_coef ), pointer :: coefs_scatt(:)
 #endif
 
-   TYPE datalink
-     type (rad_type)           :: rad
-     type (residual_rad_type)  :: rad_ob
-     integer                   :: sensor_index,ifgat
-     type (datalink), pointer  :: next ! pointer to next data
-   END TYPE datalink
+   type datalink
 
-   TYPE con_vars_type
+      type (info_type)        :: info
+      type (model_loc_type)   :: loc
+
+        integer   ::  ifgat, landsea_mask
+        integer   ::  scanline, scanpos
+        real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
+        ! channels' bright temperature
+        real,    pointer   ::   emiss(:), tb_xb(:)    !  guess bright temperatures
+        ! logical, pointer   ::   calcemis(:)
+        integer, pointer   ::   cloud_flag(:)
+        real,    pointer   ::   t(:), mr(:), zk(:)
+        real,    pointer   ::   pm(:), tm(:), qm(:), qrn(:), qcw(:),qci(:),qsn(:),qgr(:)
+        real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
+        real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
+        integer            ::   isflg
+     real, pointer             :: tb(:)
+     real, pointer             :: tb_inv(:)
+     real, pointer             :: tb_qc(:)
+     real, pointer             :: tb_error(:)
+     integer                   :: sensor_index
+     type (datalink), pointer  :: next ! pointer to next data
+   end type datalink
+
+   type con_vars_type
      integer            ::  nlevels
      real   ,  pointer  ::  t(:)
      real   ,  pointer  ::  q(:)
      real               ::  ps
-   END TYPE con_vars_type
+   END type con_vars_type
 
-   TYPE con_cld_vars_type
+   type con_cld_vars_type
      integer            ::  nwp_levels
      real   ,  pointer  ::  p(:)
      real   ,  pointer  ::  ph(:)
@@ -70,97 +87,97 @@ module da_radiance
      real   ,  pointer  ::  ciw(:)   ! kg/kg
      real   ,  pointer  ::  rain(:)  ! kg/m2/s
      real   ,  pointer  ::  sp(:)    ! kg/m2/s
-   END TYPE con_cld_vars_type
+   END type con_cld_vars_type
 
-   TYPE aux_vars_type
+   type aux_vars_type
      integer            ::  surftype
      real               ::  surft, t2m, q2m, u10, v10
      real               ::  satzen, satazi  !!, fastem(5)
-   END TYPE aux_vars_type
+   END type aux_vars_type
 
-   TYPE maxmin_rad_stats_type
-        TYPE (maxmin_type)         :: maximum, minimum
-        REAL                       :: ave, rms
-        INTEGER                    :: num
-   END TYPE maxmin_rad_stats_type
+   type maxmin_rad_stats_type
+        type (maxmin_type)         :: maximum, minimum
+        real                       :: ave, rms
+        integer                    :: num
+   END type maxmin_rad_stats_type
 
-   TYPE stats_rad_type
-        TYPE (maxmin_rad_stats_type), pointer  :: ichan(:)
-   END TYPE stats_rad_type
+   type stats_rad_type
+        type (maxmin_rad_stats_type), pointer  :: ichan(:)
+   END type stats_rad_type
 
-   TYPE rad_header_type                       ! innovation file header
-      CHARACTER (LEN = 19) :: date_char       ! YYYY-MM-DD-HH (assimilation window date)
-      INTEGER              :: assim_win       ! assimilation window hours, e.g., 6 hours
-      CHARACTER(LEN=20)    :: rttovid_string  ! e.g., noaa-16-amsua 
-      INTEGER              :: platform_id     ! e.g., 1  for noaa (see RTTOV UG)
-      INTEGER              :: satellite_id    ! e.g., 16 for noaa-16
-      INTEGER              :: sensor_id       ! e.g., 3  for amsua
-      INTEGER              :: num_rad         ! pixel number in file
-      INTEGER              :: nchan           ! channel number of each pixel
-      INTEGER ,  pointer   :: ichan(:)        ! index of nchan channels
-      INTEGER              :: nemis           ! emissivity number of each pixel
+   type rad_header_type                       ! innovation file header
+      character (LEN = 19) :: date_char       ! YYYY-MM-DD-HH (assimilation window date)
+      integer              :: assim_win       ! assimilation window hours, e.g., 6 hours
+      character(LEN=20)    :: rttovid_string  ! e.g., noaa-16-amsua 
+      integer              :: platform_id     ! e.g., 1  for noaa (see RTTOV UG)
+      integer              :: satellite_id    ! e.g., 16 for noaa-16
+      integer              :: sensor_id       ! e.g., 3  for amsua
+      integer              :: num_rad         ! pixel number in file
+      integer              :: nchan           ! channel number of each pixel
+      integer ,  pointer   :: ichan(:)        ! index of nchan channels
+      integer              :: nemis           ! emissivity number of each pixel
                                               ! may be different with nchan
                                               ! due to polarisation in microwave
-      INTEGER              :: nlevel_fix      ! fixed pressure level number for RTM 
+      integer              :: nlevel_fix      ! fixed pressure level number for RTM 
                                               ! e.g., 43 for RTTOV8_5 
-      REAL   ,   pointer   :: pres(:)         ! pressure with nlevel_fix
-      INTEGER              :: nlevel_cld      ! cloud profile level number for RTM
-   END TYPE rad_header_type
+      real   ,   pointer   :: pres(:)         ! pressure with nlevel_fix
+      integer              :: nlevel_cld      ! cloud profile level number for RTM
+   END type rad_header_type
 
-   TYPE rad_data_type                       ! innovation file pixel data
+   type rad_data_type                       ! innovation file pixel data
 
-!  part from Observation
-!---------------------------
-        integer            :: landmask      ! 1:land; 0:sea
-        integer            :: scanline      ! number of scan line
-        integer            :: scanpos       ! number of scan position
-        REAL               :: lat           ! Latitude in degree
-        REAL               :: lon           ! Longitude in degree
-        REAL               :: elv           ! Elevation in m
-        real               :: satzen        ! satellite zenith angle in degree
-        real               :: satazi        ! satellite azimuth angle in degree
-        real               :: solzen        ! solar zenith angle in degree
-        real               :: solazi        ! solar azimuth angle in degree
-        real,    pointer   :: tb(:)         ! observed brightness temperatures in Kelvin
-        real,    pointer   :: inv(:)        ! innovation (obs - background) in Kelvin
-        real,    pointer   :: bias(:)       ! bias correction values in Kelvin
-        real,    pointer   :: err(:)        ! std of observation error in Kelvin
-        real,    pointer   :: qc(:)         ! quality control flag
-                                            ! 0:good; <0:rejected; other:suspected
-        real,    pointer   :: emiss(:)      ! surface emissivity
+      ! part from Observation
+      !---------------------------
+   integer            :: landmask      ! 1:land; 0:sea
+       integer            :: scanline      ! number of scan line
+       integer            :: scanpos       ! number of scan position
+       real               :: lat           ! Latitude in degree
+       real               :: lon           ! Longitude in degree
+       real               :: elv           ! Elevation in m
+       real               :: satzen        ! satellite zenith angle in degree
+       real               :: satazi        ! satellite azimuth angle in degree
+       real               :: solzen        ! solar zenith angle in degree
+       real               :: solazi        ! solar azimuth angle in degree
+       real,    pointer   :: tb(:)         ! observed brightness temperatures in Kelvin
+       real,    pointer   :: inv(:)        ! innovation (obs - background) in Kelvin
+       real,    pointer   :: bias(:)       ! bias correction values in Kelvin
+       real,    pointer   :: err(:)        ! std of observation error in Kelvin
+       real,    pointer   :: qc(:)         ! quality control flag
+                                           ! 0:good; <0:rejected; other:suspected
+       real,    pointer   :: emiss(:)      ! surface emissivity
 
-!  part from background field
-!-------------------------------
-        integer            :: surftype      ! surface type
-                                            ! 0:sea     1:sea-ice     2:land     3:snow
-                                            ! 4:mix-sea 5:mix-sea-ice 6:mix-land 7:mix-snow
-        integer            :: terrain       ! model terrain in m
-        integer            :: soiltyp       ! soil type (MM5/WRF USGS 24 catagories)
-        integer            :: vegtyp        ! vegetation type (MM5/WRF 16 catagories)
-        real               :: vegfra        ! vegetation fraction
-        real               :: soilm         ! soil moisture
-        real               :: soilt         ! soil temperature
-        real               :: snowh         ! snow depth
-        real               :: ps            ! surface pressure in hPa
-        real               :: ts            ! surface skin temperature in Kelvin
-        real               :: t2m           ! T in Kelvin at 2m 
-        real               :: mr2m          ! volume mixture ratio in ppmv at 2m
-        real               :: u10,v10       ! u/v wind in m/s at 10m
-        real,    pointer   :: t(:)          ! temperatures at fixed pressure levels
-        real,    pointer   :: mr(:)         ! volume mixture ratio in ppmv at fixed pressure levels
-        real,    pointer   :: zk(:)         ! vertical interpolation weight from model level to fixed pressure levels
-        real,    pointer   :: pm(:)         ! full-level pressure at model levels
-        real,    pointer   :: phm(:)        ! half-level pressure at model levels
-        real,    pointer   :: tm(:)         ! temperatures at model levels
-        real,    pointer   :: cc(:)         ! cloud cover at model levels
-        real,    pointer   :: rain(:)       ! rainfall rate in kg/m2/s
-        real,    pointer   :: solidp(:)     ! solid precipitation rate in kg/m2/s
-        real,    pointer   :: clw(:)        ! cloud liquid water (kg/kg)
-        real,    pointer   :: ciw(:)        ! cloud ice water    (kg/kg)
+       !  part from background field
+       !-------------------------------
+       integer            :: surftype      ! surface type
+                                           ! 0:sea     1:sea-ice     2:land     3:snow
+                                           ! 4:mix-sea 5:mix-sea-ice 6:mix-land 7:mix-snow
+       integer            :: terrain       ! model terrain in m
+       integer            :: soiltyp       ! soil type (MM5/WRF USGS 24 catagories)
+       integer            :: vegtyp        ! vegetation type (MM5/WRF 16 catagories)
+       real               :: vegfra        ! vegetation fraction
+       real               :: soilm         ! soil moisture
+       real               :: soilt         ! soil temperature
+       real               :: snowh         ! snow depth
+       real               :: ps            ! surface pressure in hPa
+       real               :: ts            ! surface skin temperature in Kelvin
+       real               :: t2m           ! T in Kelvin at 2m 
+       real               :: mr2m          ! volume mixture ratio in ppmv at 2m
+       real               :: u10,v10       ! u/v wind in m/s at 10m
+       real,    pointer   :: t(:)          ! temperatures at fixed pressure levels
+       real,    pointer   :: mr(:)         ! volume mixture ratio in ppmv at fixed pressure levels
+       real,    pointer   :: zk(:)         ! vertical interpolation weight from model level to fixed pressure levels
+       real,    pointer   :: pm(:)         ! full-level pressure at model levels
+       real,    pointer   :: phm(:)        ! half-level pressure at model levels
+       real,    pointer   :: tm(:)         ! temperatures at model levels
+       real,    pointer   :: cc(:)         ! cloud cover at model levels
+       real,    pointer   :: rain(:)       ! rainfall rate in kg/m2/s
+       real,    pointer   :: solidp(:)     ! solid precipitation rate in kg/m2/s
+       real,    pointer   :: clw(:)        ! cloud liquid water (kg/kg)
+       real,    pointer   :: ciw(:)        ! cloud ice water    (kg/kg)
 
-   END TYPE rad_data_type
+   END type rad_data_type
 
-   TYPE satinfo_type
+   type satinfo_type
         integer, pointer   :: ichan(:)      ! channel index
         integer, pointer   :: iuse (:)      ! usage flag (-1: not use)
         real   , pointer   :: error(:)      ! error Standard Deviation
@@ -170,24 +187,24 @@ module da_radiance
         real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
         real   , pointer   :: b(:,:)        ! bias corr coef b
         real   , pointer   :: error_factor(:) ! error tuning factor
-   END TYPE satinfo_type
+   END type satinfo_type
    
-   TYPE (satinfo_type), pointer :: satinfo(:)
+   type (satinfo_type), pointer :: satinfo(:)
 
-   TYPE BIAS
-      INTEGER :: nchan     ! number of channels
-      INTEGER :: npred     ! number of predictors
-      INTEGER :: platform_id,satellite_id,sensor_id
-      INTEGER :: year, month, day, hour, min, sec
-      INTEGER :: scanline,scanpos
-      INTEGER :: landmask
-      INTEGER, pointer :: qc_flag(:) ! 1/0:good/bad
-      INTEGER, pointer :: cloud_flag(:) ! 1/0:no-cloud/cloud
-      INTEGER :: surf_flag  ! surface type
-      REAL    :: elevation,lat,lon,ps, t2m, q2m, tsk, clwp
-      REAL, pointer  :: tb(:), omb(:), bias(:)
-      REAL, pointer  :: pred(:)
-   END TYPE BIAS
+   type BIAS
+      integer :: nchan     ! number of channels
+      integer :: npred     ! number of predictors
+      integer :: platform_id,satellite_id,sensor_id
+      integer :: year, month, day, hour, min, sec
+      integer :: scanline,scanpos
+      integer :: landmask
+      integer, pointer :: qc_flag(:) ! 1/0:good/bad
+      integer, pointer :: cloud_flag(:) ! 1/0:no-cloud/cloud
+      integer :: surf_flag  ! surface type
+      real    :: elevation,lat,lon,ps, t2m, q2m, tsk, clwp
+      real, pointer  :: tb(:), omb(:), bias(:)
+      real, pointer  :: pred(:)
+   END type BIAS
 
    integer, allocatable :: num_tovs_before(:,:)
    integer, allocatable :: num_tovs_after(:,:)
@@ -198,8 +215,7 @@ module da_radiance
    integer, allocatable :: tovs_recv_start(:,:)
    integer, allocatable :: tovs_copy_count(:)
 
-
-CONTAINS
+contains
 
 #include "da_jo_and_grady_rad.inc"
 #include "da_residual_rad.inc"

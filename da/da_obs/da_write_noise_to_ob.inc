@@ -7,7 +7,7 @@ subroutine da_write_noise_to_ob (iv)
    implicit none
 
    type (ob_type), intent(in)    :: iv   ! Obs and header structure.
-   integer                       :: n, k,kk,inst, iunit
+   integer                       :: n, k,kk,i, iunit
    integer                       :: num_obs
    character*20, allocatable     :: filename(:)   
    character*20                  :: ob_name   
@@ -397,21 +397,21 @@ subroutine da_write_noise_to_ob (iv)
    !------------------------------------------------------------------
 
    if (iv%num_inst > 0) then
-      do inst = 1, iv%num_inst                 ! loop for sensor
-         if (iv%instid(inst)%num_rad < 1) cycle
-         do k = 1,iv%instid(inst)%nchan        ! loop for channel
+      do i = 1, iv%num_inst                 ! loop for sensor
+         if (iv%instid(i)%num_rad < 1) cycle
+         do k = 1,iv%instid(i)%nchan        ! loop for channel
             ! Counting number of obs for channle k
             num_obs = 0
-            do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
-               if (iv%instid(inst)%rad(n)%loc%proc_domain .and. &
-                  (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+            do n = 1,iv%instid(i)%num_rad      ! loop for pixel
+               if (iv%instid(i)%loc(n)%proc_domain .and. &
+                  (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                   num_obs = num_obs + 1
                end if
             end do                                ! end loop for pixel
             call da_proc_sum_int(num_obs)
             if (rootproc .and. num_obs > 0) then
                write (ob_name,'(a,a,i2.2)') &
-                  trim(iv%instid(inst)%rttovid_string),'-',k
+                  trim(iv%instid(i)%rttovid_string),'-',k
                write (rand_unit,'(a20,i8)')  ob_name,num_obs
                num_obs = 0
                do kk = 0,num_procs-1

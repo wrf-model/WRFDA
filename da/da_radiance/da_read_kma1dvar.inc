@@ -12,17 +12,14 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
    implicit none
 
-   ! subroutine argument
    integer           ,  intent (in)    :: inst
    character(20)     ,  intent (in)    :: infile
    type (xpose_type) ,  intent (in)    :: xp
    type (y_type)     ,  intent (inout) :: ob
    type (ob_type)    ,  intent (inout) :: iv
 
-   ! local variables
-   integer          :: iost, i, j,inunit
+   integer          :: iost, n, i, j,inunit
 
-   ! Declare local variables
    logical outside,inside_halo
    character(20)  :: instrument
 
@@ -46,7 +43,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    type(info_type)                ::  info
    type(model_loc_type)           ::  loc
 
-   if (trace_use) call da_trace_entry("da_readkma1dvar")
+   if (trace_use) call da_trace_entry("da_read_kma1dvar")
 
    !**************************************************************************
    ! Initialize variables
@@ -72,7 +69,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
        iostat = iost, status = 'old')
    if (iost /= 0) then
       call da_error(__FILE__,__LINE__,&
-         (/"Cannot open file "//TRIM(infile)/))
+         (/"Cannot open file "//trim(infile)/))
    end if
 
    read(unit=inunit,fmt='(A,I10,I12)') instrument,idate,npass
@@ -85,7 +82,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    p => head
    size = 0
 
-   DO j=1,npass
+   do j=1,npass
       read(inunit,'(2F12.4)')    rlat,rlon
       read(inunit,'(I5,20I5)')   knchan,(kchan(i),i=1,knchan)
       ! landsea_mask: 0:land ; 1:sea (same as RTTOV)
@@ -111,30 +108,33 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       tb(1:nchanl) = missing_r
       inv(1:nchanl) = missing_r
       err(1:nchanl) = missing_r
-      qc(1:nchanl) = -1
+      qc(1:nchanl) = qc_bad
+
       do i=1,knchan
          tb(kchan(i)) = otb(i)
          inv(kchan(i)) = inov(i)
          err(kchan(i)) = oerr(i)
-         qc(kchan(i)) = 1
+         qc(kchan(i)) = qc_good
       end do 
 
       !  2.0   assign information to sequential radiance structure
       !--------------------------------------------------------------------
 
-      allocate (p % rad % tb (1:nchanl))
-      allocate (p % rad_ob % tb (1:nchanl))
-      p%rad%info             = info
-      p%rad%loc              = loc
-      p%rad%landsea_mask     = landsea_mask
-      p%rad%scanpos          = scanpos
-      p%rad%satzen           = satzen
-      p%rad%satazi           = missing_r
-      p%rad%solzen           = missing_r
-      p%rad%tb(1:nchanl)%inv = inv(1:nchanl)
-      p%rad%tb(1:nchanl)%error = err(1:nchanl)
-      p%rad%tb(1:nchanl)%qc  = qc(1:nchanl)
-      p%rad_ob%tb(1:nchanl)  = tb(1:nchanl)
+      allocate (p % tb_inv (1:nchanl))
+      allocate (p % tb_error (1:nchanl))
+      allocate (p % tb_qc (1:nchanl))
+      allocate (p % tb (1:nchanl))
+      p%info             = info
+      p%loc              = loc
+      p%landsea_mask     = landsea_mask
+      p%scanpos          = scanpos
+      p%satzen           = satzen
+      p%satazi           = missing_r
+      p%solzen           = missing_r
+      p%tb_inv(1:nchanl)     = inv(1:nchanl)
+      p%tb_error(1:nchanl)   = err(1:nchanl)
+      p%tb_qc(1:nchanl)      = qc(1:nchanl)
+      p%tb(1:nchanl)         = tb(1:nchanl)
       p%sensor_index         = inst
 
       size = size + 1
@@ -146,7 +146,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
       p => p%next
       nullify (p%next)
-   ENDDO
+   end do
    
    iv%total_obs = iv%total_obs + size
    iv%total_rad_pixel   = iv%total_rad_pixel + size
@@ -173,53 +173,41 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       
    write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
                              i, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
-   allocate(iv%instid(inst)%rad(1:iv%instid(inst)%num_rad), stat = error)
-   If (error /= 0) Then
-      call da_error(__FILE__,__LINE__, &
-         (/"mem allocation error to iv%instid(inst)%rad"/))
-   End If
-
-   allocate(ob%instid(inst)%rad(1:ob%instid(inst)%num_rad), stat = error)
-   If (error /= 0) Then
-      call da_error(__FILE__,__LINE__, &
-         (/"mem allocation error to ob%instid(inst)%rad"/))
-    End If
 
    !  4.0 assign sequential structure to innovation structure
    !-------------------------------------------------------------
    p => head
-   do i = 1, size
-      iv%instid(inst)%rad(i)%info   =  p%rad%info
-      iv%instid(inst)%rad(i)%loc    =  p%rad%loc
+   allocate (iv%instid(inst)%tb_inv(1:nchanl,size))
+   allocate (iv%instid(inst)%tb_error(1:nchanl,size))
+   allocate (iv%instid(inst)%tb_qc(1:nchanl,size))
+   allocate (ob%instid(inst)%tb(1:nchanl,size))
+   do n = 1, size
+      iv%instid(inst)%info(n)   =  p%info
+      iv%instid(inst)%loc_i(n)        = p%loc%i
+      iv%instid(inst)%loc_j(n)        = p%loc%j
+      iv%instid(inst)%loc_dx(n)       = p%loc%dx
+      iv%instid(inst)%loc_dy(n)       = p%loc%dy
+      iv%instid(inst)%loc_dxm(n)      = p%loc%dxm
+      iv%instid(inst)%loc_dym(n)      = p%loc%dym
+      iv%instid(inst)%landsea_mask(n) = p%landsea_mask
+      iv%instid(inst)%scanpos(n)      = p%scanpos
+      iv%instid(inst)%satzen(n) = p%satzen
+      iv%instid(inst)%satazi(n) = p%satazi
+      iv%instid(inst)%solzen(n) = p%solzen
+      iv%instid(inst)%tb_inv(1:nchanl,n)   = p%tb_inv(1:nchanl)
+      iv%instid(inst)%tb_error(1:nchanl,n) = p%tb_error(1:nchanl)
+      iv%instid(inst)%tb_qc(1:nchanl,n)    = p%tb_qc(1:nchanl)
+      ob%instid(inst)%tb(1:nchanl,n)   = p%tb(1:nchanl)
 
-      iv%instid(inst)%rad(i)%landsea_mask = p%rad%landsea_mask
-      iv%instid(inst)%rad(i)%scanpos      = p%rad%scanpos
-      iv%instid(inst)%rad(i)%satzen = p%rad%satzen
-      iv%instid(inst)%rad(i)%satazi = p%rad%satazi
-      iv%instid(inst)%rad(i)%solzen = p%rad%solzen
-      allocate (iv%instid(inst)%rad(i)%tb(1:nchanl), stat = error)
-      if (error /= 0) Then
-         call da_error(__FILE__,__LINE__, &
-            (/"mem allocation error to iv%instid(inst)%rad(i)%tb"/))
-      end if
-      iv%instid(inst)%rad(i)%tb(1:nchanl)%inv   = p%rad%tb(1:nchanl)%inv
-      iv%instid(inst)%rad(i)%tb(1:nchanl)%error = p%rad%tb(1:nchanl)%error
-      iv%instid(inst)%rad(i)%tb(1:nchanl)%qc    = p%rad%tb(1:nchanl)%qc
-
-      allocate (ob%instid(inst)%rad(i)%tb(1:nchanl), stat = error)
-      if (error /= 0) Then
-         call da_error(__FILE__,__LINE__, &
-            (/"mem allocation error to ob%instid(inst)%rad(i)%tb"/))
-      end if
-      ob%instid(inst)%rad(i)%tb(1:nchanl) = p%rad_ob%tb(1:nchanl)
-
-      ! WRITE(unit=stdout,*) inst, nread, iv%instid(inst)%rad(i)%tb(1:nchanl)%inv
+      ! write(unit=stdout,*) inst, nread, iv%instid(inst)%tb_inv(1:nchanl,n)
       current => p
       p => p%next
 
       ! free current data
-      deallocate (current % rad % tb)
-      deallocate (current % rad_ob % tb)
+      deallocate (current % tb)
+      deallocate (current % tb_inv)
+      deallocate (current % tb_error)
+      deallocate (current % tb_qc)
       deallocate (current)
    end do
 
@@ -227,7 +215,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    !
    ! p => head
    ! do i = 1, size
-   !    print *, i, p%rad%tb(1:nchanl)%inv
+   !    print *, i, p%tb(1:nchanl)%inv
    !    p => p%next
    ! end do
 

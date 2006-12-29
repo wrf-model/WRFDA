@@ -1,7 +1,7 @@
 subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    !---------------------------------------------------------------------------
-   !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
+   ! Purpose: read in NCEP bufr tovs 1b data to innovation structure
    !
    !   Method: use F90 sequential data structure to avoid reading file twice  
    !            so that da_scan_bufrtovs is not necessary any more.
@@ -26,7 +26,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    integer(i_kind),parameter:: maxchanl=100
 
    logical hirs2,hirs3,msu,amsua,amsub
-   logical outside,inside_halo, iuse
+   logical outside, outside_all
+   integer :: inst
 
    character(10) date
    character(8) subset,subfgn
@@ -67,12 +68,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    integer   ::  landsea_mask
    real      ::  srf_height
    ! channels' bright temperature
-   real , allocatable ::   tb(:)                    !  bright temperatures
+   real , allocatable ::   tb_inv(:)                    !  bright temperatures
    !  end type bright_temperature
 
    type (datalink), pointer    :: head, p, current
 
-   integer                        ::  inst, error, ifgat
+   integer                        ::  error, ifgat
    type(info_type)                ::  info
    type(model_loc_type)           ::  loc
 
@@ -80,7 +81,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  data hdr1b /'FOVN YEAR MNTH DAYS HOUR MINU SECO CLAT CLON SAZA SOZA HOLS LSQL SLNM BEARAZ'/
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
-   integer :: num_tovs_local
+   integer :: num_tovs_local, num_tovs_global, num_tovs_file
    integer :: lnbufr
    integer :: n
 
@@ -108,27 +109,27 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
-      nchan=19
+      nchan=nchan_hirs2
       subfgn='NC021021'
       rato=1.1363987_r_kind
    else if (hirs3) then 
       sensor_id    =  0
       step   = 1.80_r_kind
       start  = -49.5_r_kind
-      nchan=19
+      nchan=nchan_hirs3
       subfgn='NC021025'
    else if (msu) then
       sensor_id    =  1
       step   = 9.474_r_kind
       start  = -47.37_r_kind
-      nchan=4
+      nchan=nchan_amsua
       subfgn='NC021022'
       rato=1.1363987_r_kind
    else if (amsua) then
       sensor_id    =  3
       step   = three + one/three
       start  = -48.33_r_kind
-      nchan=15
+      nchan=nchan_amsua
       subfgn='NC021023'
    else if (amsub)  then
       sensor_id    =  4
@@ -138,7 +139,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       subfgn='NC021024'
    end if
 
-   allocate (tb(nchan))
+   allocate (tb_inv(nchan))
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -148,18 +149,18 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iostat = iost, status = 'old')
    if (iost /= 0) then
       call da_error(__FILE__,__LINE__, &
-         (/"Cannot open file "//TRIM(infile)/))
+         (/"Cannot open file "//trim(infile)/))
    end if
 
    call openbf(lnbufr,'IN',lnbufr)
    call datelen(10)
    call readmg(lnbufr,subset,idate,iret)
    if (subset /= subfgn) then
-      write(unit=stderr,fmt=*) 'da_read_bufrtovs:  *** WARNING: ',&
-         'THE FILE TITLE NOT MATCH DATA SUBSET'
-      write(unit=stderr,fmt=*) '  infile=', lnbufr, infile,' subset=',&
-         subset, ' subfgn=',subfgn
-      write(unit=stderr,fmt=*) 'SKIP PROCESSING OF THIS 1B FILE'
+      message(1)='The file title not match data subset'
+      write(unit=message(2),fmt=*) &
+         'infile=', lnbufr, infile,' subset=', subset, ' subfgn=',subfgn
+      message(3)='Skip processing of this 1b file'
+      call da_warning(__FILE__,__LINE__,message(1:3))
       call closbf(lnbufr)
       call da_trace_exit("da_read_bufrtovs")
       return
@@ -172,25 +173,26 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    write(unit=date,fmt='(i10)') idate
    read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
    write(unit=stdout,fmt=*) &
-      'da_read_bufrtovs: bufr file date is ',iy,im,idd,ihh,infile
+      '  Bufr file date is ',iy,im,idd,ihh,infile
 
    ! Loop to read bufr file and assign information to a sequential structure
    !-------------------------------------------------------------------------
 
    allocate (head)
-   !  allocate (head % rad % tb (1:nchan))
+   !  allocate (head % tb_inv (1:nchan))
    nullify  (head % next)
    p => head
 
-   num_tovs_local=0
+   num_tovs_global = 0
+   num_tovs_local = 0
+   num_tovs_file  = 0
 
-   obs: do while (IREADMG(lnbufr,subset,idate)==0 .and. subset==subfgn)
-      do while (IREADSB(lnbufr)==0)
+   if (tovs_start > 1) then
+      write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
+   end if
 
-         ! open(15, file='bufr.out')
-         ! call ufbdmp(lnbufr, 6)
-         ! close(15)
-
+   obs: do while (ireadmg(lnbufr,subset,idate)==0 .and. subset==subfgn)
+      do while (ireadsb(lnbufr)==0)
 
          ! 1.0     Read header record and data record
 
@@ -198,51 +200,60 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          call ufbrep(lnbufr,data1b8,1,nchan,iret,'TMBR')
          ! call ufbrep(lnbufr,data1b8,1,1,iret,'BEARAZ')
 
+         ! check if observation outside range
+
+         num_tovs_file = num_tovs_file + 1
+
+         if (num_tovs_file < tovs_start) then
+            cycle
+         end if
+
+         if (num_tovs_file > tovs_end) then
+            write (unit=stdout,fmt='(A,I6)') "   Skipping radiance obs after", tovs_end
+            num_tovs_file = num_tovs_file - 1
+            exit obs
+         end if
+
          ! 2.0     Extract observation location and other required information
          !     QC1:  judge if data is in the domain, read next record if not
          !------------------------------------------------------------------------
-         ! rlat = bfr1bhdr(9)
-         ! rlon = bfr1bhdr(10)
+         ! rlat = bfr1bhdr(bufr_lat)
+         ! rlon = bfr1bhdr(bufr_lat)
          ! if (rlon < 0.0) rlon = rlon+360.0
 
-         info%lat  =  bfr1bhdr(9)  ! rlat
-         info%lon  =  bfr1bhdr(10) ! rlon
-         call da_ll_to_xy (info, loc, xp, outside, inside_halo)
-!         if (outside) cycle
-         if (outside) then
-!write (0,*) info%lat,info%lon,"outside"
-cycle
-end if
-!write (0,*) info%lat,info%lon,"inside"
+         info%lat  =  bfr1bhdr(bufr_lat)
+         info%lon  =  bfr1bhdr(bufr_lon)
+         call da_ll_to_xy (info, loc, xp, outside, outside_all)
 
+         if (outside_all) cycle
 
          !  3.0     Extract other information
          !------------------------------------------------------
          !  3.1     Extract satellite id and scan position. 
    
-         satellite_id = nint(bfr1bhdr(1))-191
-         ifov = nint(bfr1bhdr(2))    
+         satellite_id = nint(bfr1bhdr(bufr_satellite_id))-191
+         ifov = nint(bfr1bhdr(bufr_ifov))    
 
          !  QC2:  limb pixel rejected (not implemented)
 
          !  3.2     Extract date information.
     
-         year   = bfr1bhdr(3) !year
-         month  = bfr1bhdr(4) !month
-         day    = bfr1bhdr(5) !day
-         hour   = bfr1bhdr(6) !hour
-         minute = bfr1bhdr(7) !minute
-         second = bfr1bhdr(8) !second
+         year   = bfr1bhdr(bufr_year)   
+         month  = bfr1bhdr(bufr_month)  
+         day    = bfr1bhdr(bufr_day)    
+         hour   = bfr1bhdr(bufr_hour)   
+         minute = bfr1bhdr(bufr_minute) 
+         second = bfr1bhdr(bufr_second) 
 
          write(unit=info%date_char, fmt='(i4,a,i2.2,a,i2.2,a,i2.2,a,i2.2,a,i2.2)')  &
             year, '-', month, '-', day, '_', hour, ':', minute, ':', second
 
          !  QC3: time consistency check with the background date
 
-         IF (year .LE. 99) THEN
-            IF (year .LT. 78) THEN
+         if (year <= 99) then
+            if (year < 78) then
                year = year + 2000
-            ELSE
+            else
                year = year + 1900
             end if
          end if
@@ -252,39 +263,48 @@ end if
          if (obs_time < time_slots(0) .or.  &
             obs_time >= time_slots(num_fgat_time)) cycle
 
-
-         ! 3.3 Find wrfvar instrument index from RTTOV instrument triplet
-         !     goto next data if id is not in the lists
-   
-         do inst = 1, rtminit_nsensor
-            if (platform_id  == rtminit_platform(inst) &
-               .and. satellite_id == rtminit_satid(inst)    &
-               .and. sensor_id    == rtminit_sensor(inst)) then
-               nread (inst) = nread (inst) + 1
-               exit
-            end if
-         end do
-
-         if (inst == rtminit_nsensor .and.           &
-            platform_id  /= rtminit_platform(inst)  &
-            .or. satellite_id /= rtminit_satid(inst) &
-            .or. sensor_id /= rtminit_sensor(inst)) cycle
-
          ! 3.2.1 determine FGAT index ifgat
    
          do ifgat=1,num_fgat_time
             if (obs_time >= time_slots(ifgat-1) .and.  &
-                 obs_time  < time_slots(ifgat)) exit
+                obs_time  < time_slots(ifgat)) exit
          end do
 
-         ! 3.4 extract satellite and solor angle
+         ! 3.3 Find wrfvar instrument index from RTTOV instrument triplet
+         !     go to next data if id is not in the lists
+
+         inst = 0
+         do i = 1, rtminit_nsensor
+            if (platform_id  == rtminit_platform(i) &
+               .and. satellite_id == rtminit_satid(i)    &
+               .and. sensor_id    == rtminit_sensor(i)) then
+               inst = i
+               exit
+            end if
+         end do
+         if (inst == 0) cycle
+
+         num_tovs_global = num_tovs_global+1
+         if (num_tovs_global > max_tovs_input) then
+            write(unit=message(1),fmt='(A,I6,A)') &
+               "Max number of tovs",max_tovs_input," reached"
+            call da_warning(__FILE__,__LINE__,message(1:1))
+            num_tovs_global = num_tovs_global-1
+            exit obs
+         end if
+         if (outside) cycle ! No good for this PE
+
+         num_tovs_local = num_tovs_local + 1
+         nread(inst) = nread(inst) + 1
+
+         ! 3.4 extract satellite and solar angle
    
          panglr=(start+float(ifov-1)*step)*deg2rad
          if (hirs2 .or. msu) then
             satzen = asin(rato*sin(panglr))*rad2deg
             satzen = abs(satzen)
          else
-            satzen = bfr1bhdr(11) !*deg2rad   ! local zenith angle
+            satzen = bfr1bhdr(bufr_satzen) !*deg2rad   ! local zenith angle
             satzen = abs(satzen)
             ! if (amsua .and. ifov .le. 15) satzen=-satzen
             ! if (amsub .and. ifov .le. 45) satzen=-satzen
@@ -292,120 +312,201 @@ end if
          end if
          satazi = panglr*rad2deg            ! look angle
          ! if (satazi<0.0) satazi = satazi+360.0
-         solzen = bfr1bhdr(12)              ! solar zenith angle
+         solzen = bfr1bhdr(bufr_solzen)              ! solar zenith angle
 
          ! 3.5 extract surface information
    
-         srf_height = bfr1bhdr(13)          ! station height
-         landsea_mask = nint(bfr1bhdr(14))  ! 0:land ; 1:sea (same as RTTOV)
+         srf_height = bfr1bhdr(bufr_station_height)          ! station height
+         landsea_mask = nint(bfr1bhdr(bufr_landsea_mask))  ! 0:land ; 1:sea (same as RTTOV)
          ! rmask=one                          ! land
-         ! if (nint(bfr1bhdr(14))==1) rmask=0.0_r_kind   ! reverse the land/sea mask in bufr
+         ! if (nint(bfr1bhdr(bufr_landsea_mask))==1) rmask=0.0_r_kind   ! reverse the land/sea mask in bufr
          ! landsea_mask = rmask+.001_r_kind             ! land sea mask
 
          info%elv = srf_height
 
          ! 3.6 extract channel bright temperature
    
-         tb(1:nchan) = data1b8(1:nchan)
+         tb_inv(1:nchan) = data1b8(1:nchan)
          do k = 1, nchan
-            if (tb(k) < tbmin .or. tb(k) > tbmax) &
-               tb(k) = missing_r
+            if (tb_inv(k) < tbmin .or. tb_inv(k) > tbmax) &
+               tb_inv(k) = missing_r
          end do
 
          !  4.0   assign information to sequential radiance structure
          !--------------------------------------------------------------------------
-         allocate (p % rad % tb (1:nchan))
-         p%rad%info             = info
-         p%rad%loc              = loc
-         p%rad%landsea_mask     = landsea_mask
-         p%rad%scanpos          = ifov
-         p%rad%satzen           = satzen
-         p%rad%satazi           = satazi
-         p%rad%solzen           = solzen
-         p%rad%tb(1:nchan)%inv = tb(1:nchan)
-         p%sensor_index         = inst
-         p%ifgat                = ifgat
+         allocate (p % tb_inv (1:nchan))
+         p%info             = info
+         p%loc              = loc
+         p%landsea_mask     = landsea_mask
+         p%scanpos          = ifov
+         p%satzen           = satzen
+         p%satazi           = satazi
+         p%solzen           = solzen
+         p%tb_inv(1:nchan)  = tb_inv(1:nchan)
+         p%sensor_index     = inst
+         p%ifgat            = ifgat
 
-         num_tovs_local = num_tovs_local + 1
-
-         !   print *, num_tovs_local,year,month,day,hour,minute,second,obs_time,ifgat
-
-         allocate (p%next, stat=error)   ! add next data
-         if (error /= 0) then
-            call da_error(__FILE__,__LINE__, &
-               (/"Cannot allocate radiance structure"/))
-         end if
+         allocate (p%next)   ! add next data
 
          p => p%next
          nullify (p%next)
-         ! WHY
-         ! if (num_tovs_local == max_num_rad) then
-         !    write(unit=errmsg(1),fmt='(A,I10)') &
-         !       "Reached maximum number of obs", max_num_rad
-         !    call da_warning(__FILE__,__LINE__,errmsg(1:1))
-         !    exit obs
-         ! end if
       end do
    end do obs
 
-   iv%total_obs = iv%total_obs + num_tovs_local
-   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_local
-   iv%total_rad_channel = iv%total_rad_channel + num_tovs_local*nchan
+   iv%total_obs         = iv%total_obs + num_tovs_global
+   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_global
+   iv%total_rad_channel = iv%total_rad_channel + num_tovs_global*nchan
 
-   deallocate(tb)  
+   deallocate(tb_inv)  
    call closbf(lnbufr)
    call da_free_unit(lnbufr)
 
    !  5.0 allocate innovation radiance structure
-   !----------------------------------------------------------------
+   !----------------------------------------------------------------  
+   
+   iv%instid(:)%num_rad = 0
+
    do i = 1, iv%num_inst
       if (nread(i) < 1) cycle
-      iv%instid(i)%num_rad = nread (i)
-      write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)') &
-         ' allocating space for radiance innov structure', &
-         i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
-      allocate(iv%instid(i)%rad(1:iv%instid(i)%num_rad), stat = error)
-      if (error /= 0) then
-         call da_error(__FILE__,__LINE__, &
-            (/"mem allocation error to iv%instid(i)%rad"/))
-      end if
+      iv%instid(i)%num_rad = nread(i)
    end do
+   
+   do i = 1, iv%num_inst
+#ifdef RTTOV
+      call rttov_setupchan(1, nchan, coefs(i), &   ! in
+         iv%instid(i)%nfrequencies,iv%instid(i)%nchannels, &
+         iv%instid(i)%nbtout)      ! out
+#endif
 
+      allocate (iv%instid(i)%info(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_i(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_j(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_k(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dx(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dy(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dz(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dxm(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dym(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dzm(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%zk(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%t(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%mr(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tm(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qm(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qrn(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qcw(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qci(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qsn(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%qgr(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%pm(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%u10(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%v10(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%t2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%q2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%mr2m(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%psfc(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%ts(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%smois(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tslb(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%snowh(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%isflg(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%soiltyp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%landsea_mask(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%elevation(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%vegfra(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%vegtyp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%soiltyp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%clwp(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%ps(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_xb(nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_qc(nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_inv(nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_error(nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%emiss(iv%instid(i)%nchannels,iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%scanpos(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%scanline(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%ifgat(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%cloud_flag(nchan,iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%satzen(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%satazi(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%solzen(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%solazi(iv%instid(i)%num_rad))
+      allocate(iv%instid(i)%proc_domain(iv%instid(i)%num_rad))
+   end do
+   
    !  6.0 assign sequential structure to innovation structure
    !-------------------------------------------------------------
    nread(1:rtminit_nsensor) = 0 
    p => head
    ! do while (associated(p))
 
-   do i = 1, num_tovs_local
-      inst = p%sensor_index
-      nread(inst) = nread(inst) + 1
-
-      iv%instid(inst)%rad(nread(inst))%info = p%rad%info
-      iv%instid(inst)%rad(nread(inst))%loc  = p%rad%loc
-      iv%instid(inst)%rad(nread(inst))%ifgat  =  p%ifgat
-      iv%instid(inst)%rad(nread(inst))%landsea_mask = p%rad%landsea_mask
-      !   iv%instid(inst)%rad(nread(inst))%scanline
-      iv%instid(inst)%rad(nread(inst))%scanpos      = p%rad%scanpos
-      iv%instid(inst)%rad(nread(inst))%satzen       = p%rad%satzen
-      iv%instid(inst)%rad(nread(inst))%satazi       = p%rad%satazi
-      iv%instid(inst)%rad(nread(inst))%solzen       = p%rad%solzen
-      !   iv%instid(inst)%rad(nread(inst))%solazi
-      iv%instid(inst)%rad(nread(inst))%solazi = 0.0
-      allocate (iv%instid(inst)%rad(nread(inst))%cloud_flag(1:nchan))
-      iv%instid(inst)%rad(nread(inst))%cloud_flag(:) = 1
-      allocate (iv%instid(inst)%rad(nread(inst))%tb(1:nchan), stat = error)
-      if (error /= 0) then
-         call da_error(__FILE__,__LINE__, &
-            (/"mem allocation error to iv%instid(inst)%rad(nread(inst))%tb"/))
-      end if
-      iv%instid(inst)%rad(nread(inst))%tb(1:nchan)%inv = p%rad%tb(1:nchan)%inv
+   do n = 1, num_tovs_local
+      i = p%sensor_index
+      nread(i) = nread(i) + 1
+      iv%instid(i)%info(nread(i))         = p%info
+      iv%instid(i)%loc(nread(i))          = p%loc
+      iv%instid(i)%loc_i(nread(i))        = p%loc%i
+      iv%instid(i)%loc_j(nread(i))        = p%loc%j
+      iv%instid(i)%loc_k(:,nread(i))      = 0
+      iv%instid(i)%loc_dx(nread(i))       = p%loc%dx
+      iv%instid(i)%loc_dy(nread(i))       = p%loc%dy
+      iv%instid(i)%loc_dz(:,nread(i))     = 0.0
+      iv%instid(i)%loc_dxm(nread(i))      = p%loc%dxm
+      iv%instid(i)%loc_dym(nread(i))      = p%loc%dym
+      iv%instid(i)%loc_dzm(:,nread(i))    = 0.0
+      ! z done in da_get_innov_vector_rad
+      iv%instid(i)%t(:,nread(i))          = 0.0
+      iv%instid(i)%mr(:,nread(i))         = 0.0
+      iv%instid(i)%tm(:,nread(i))         = 0.0
+      iv%instid(i)%qm(:,nread(i))         = 0.0
+      iv%instid(i)%qrn(:,nread(i))        = 0.0
+      iv%instid(i)%qcw(:,nread(i))        = 0.0
+      iv%instid(i)%qci(:,nread(i))        = 0.0
+      iv%instid(i)%qsn(:,nread(i))        = 0.0
+      iv%instid(i)%qgr(:,nread(i))        = 0.0
+      iv%instid(i)%pm(:,nread(i))         = 0.0
+      iv%instid(i)%u10(nread(i))          = 0.0
+      iv%instid(i)%v10(nread(i))          = 0.0
+      iv%instid(i)%t2m(nread(i))          = 0.0
+      iv%instid(i)%q2m(nread(i))          = 0.0
+      iv%instid(i)%mr2m(nread(i))         = 0.0
+      iv%instid(i)%psfc(nread(i))         = 0.0
+      iv%instid(i)%ts(nread(i))           = 0.0
+      iv%instid(i)%smois(nread(i))        = 0.0
+      iv%instid(i)%tslb(nread(i))         = 0.0
+      iv%instid(i)%snowh(nread(i))        = 0.0
+      iv%instid(i)%isflg(nread(i))        = 0
+      iv%instid(i)%soiltyp(nread(i))      = 0.0
+      iv%instid(i)%landsea_mask(nread(i)) = p%landsea_mask
+      iv%instid(i)%elevation(nread(i))    = 0.0
+      iv%instid(i)%vegfra(nread(i))       = 0.0
+      iv%instid(i)%vegtyp(nread(i))       = 0.0
+      iv%instid(i)%soiltyp(nread(i))       = 0
+      iv%instid(i)%clwp(nread(i))         = 0.0
+      iv%instid(i)%ps(nread(i))           = 0.0
+      iv%instid(i)%tb_xb(:,nread(i))      = 0
+      iv%instid(i)%tb_inv(:,nread(i))     = p%tb_inv(:) 
+      iv%instid(i)%tb_qc(:,nread(i))      = 0
+      iv%instid(i)%tb_error(:,nread(i))   = 0.0
+      iv%instid(i)%emiss(:,nread(i))      = 0.0
+      iv%instid(i)%scanpos(nread(i))      = p%scanpos 
+      ! iv%instid(i)%scanline(nread(i)    = p%scanline
+      iv%instid(i)%scanline(nread(i))     = 0
+      iv%instid(i)%ifgat(nread(i))        = p%ifgat
+      iv%instid(i)%cloud_flag(:,nread(i)) = 1        ! no cloud
+      iv%instid(i)%satzen(nread(i))       = p%satzen  
+      iv%instid(i)%satazi(nread(i))       = p%satazi  
+      iv%instid(i)%solzen(nread(i))       = p%solzen  
+      ! iv%instid(i)%solazi(nread(i))     = p%solazi  
+      iv%instid(i)%solazi(nread(i))       = 0.0
+      iv%instid(i)%proc_domain(nread(i))  = .false.
 
       current => p
       p => p%next
 
       ! free current data
-      deallocate (current % rad % tb)
+      deallocate (current % tb_inv)
       deallocate (current)
    end do
 
@@ -413,11 +514,11 @@ end if
 
    ! check if sequential structure has been freed
    !
-   !  p => head
-   !  do i = 1, num_tovs_local
-   !   print *, i, p%rad%tb(1:nchan)%inv
-   !   p => p%next
-   !  end do
+   ! p => head
+   ! do i = 1, num_rad_used
+   !    print *, i, p%tb_inv(1:nchan)
+   !    p => p%next
+   ! end do
 
    close(lnbufr)
    call da_free_unit(lnbufr)

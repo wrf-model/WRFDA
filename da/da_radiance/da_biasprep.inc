@@ -1,10 +1,10 @@
 subroutine da_biasprep(inst,ob,iv)
 
-   !-----------------------------------------------------------------------
-   ! Purpose: Output information files for bias correction progs
-   !-----------------------------------------------------------------------
-
    implicit none
+
+   !-----------------------------------------------------------------------
+   ! Output information files for bias correction progs
+   !-----------------------------------------------------------------------
 
    integer       ,  intent(in)      :: inst
    type (y_type),  intent(in)       :: ob         ! o structure.
@@ -28,7 +28,7 @@ subroutine da_biasprep(inst,ob,iv)
 #ifdef DM_PARALLEL
    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
 #else
-   write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
+    write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
 #endif
 
    call da_get_unit(biasprep_unit)
@@ -46,51 +46,51 @@ subroutine da_biasprep(inst,ob,iv)
 
    do j= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
       iv%ob_numb(iv%current_ob_time)%radiance(inst)
-      if (iv%instid(inst)%rad(j)%loc%proc_domain) then 
-         q(1:43) = iv%instid(inst)%rad(j)%mr(1:43)/q2ppmv
+      if (iv%instid(inst)%loc(j)%proc_domain) then 
+         q(1:43) = iv%instid(inst)%mr(1:43,j)/q2ppmv
 
          call da_predictor(pred(1:npred), npred, &
-            iv%instid(inst)%rad(j)%t(1:43), q(1:43), iv%instid(inst)%rad(j)%ts)
+            iv%instid(inst)%t(1:43,j), q(1:43), iv%instid(inst)%ts(j))
 
-         ! iv%instid(inst)%rad(j)%pred(1:npred)=pred(1:npred)
+         ! iv%instid(inst)%pred(1:npred,j)=pred(1:npred)
 
          ! transfer information to bias structure
          radbias%platform_id  = iv%instid(inst)%platform_id
          radbias%satellite_id = iv%instid(inst)%satellite_id
          radbias%sensor_id    = iv%instid(inst)%sensor_id
 
-         read (iv%instid(inst)%rad(j)%info%date_char,'(i4,5(a1,i2))') &
+         read (iv%instid(inst)%info(j)%date_char,'(i4,5(a1,i2))') &
                                    radbias%year,s1, radbias%month,s1, radbias%day, &
                                    s1,radbias%hour, s1,radbias%min, s1,radbias%sec
          !if (j < 10 .and. print_detail_radiance) then
-         !   write(unit=stdout,fmt=*) iv%instid(inst)%rad(j)%info%date_char
-         !   write(unit=stdout,fmt=*) radbias%year, radbias%month, radbias%day, &
+         !   write(UNIT=stdout,FMT=*) iv%instid(inst)%info(j)%date_char
+         !   write(UNIT=stdout,FMT=*) radbias%year, radbias%month, radbias%day, &
          !      radbias%hour, radbias%min, radbias%sec
          !end if
 
-         radbias%scanline     = iv%instid(inst)%rad(j)%scanline    ! not available
-         radbias%scanpos      = iv%instid(inst)%rad(j)%scanpos
-         radbias%landmask     = iv%instid(inst)%rad(j)%landsea_mask
-         radbias%elevation    = iv%instid(inst)%rad(j)%info%elv
-         radbias%lat          = iv%instid(inst)%rad(j)%info%lat
-         radbias%lon          = iv%instid(inst)%rad(j)%info%lon
-         radbias%surf_flag    = iv%instid(inst)%rad(j)%isflg
-         radbias%ps           = iv%instid(inst)%rad(j)%ps
-         radbias%t2m          = iv%instid(inst)%rad(j)%t2m
-         radbias%q2m          = iv%instid(inst)%rad(j)%mr2m/q2ppmv
-         radbias%tsk          = iv%instid(inst)%rad(j)%ts
-         radbias%clwp         = iv%instid(inst)%rad(j)%clwp  ! in mm
+         radbias%scanline     = iv%instid(inst)%scanline(j)    ! not available
+         radbias%scanpos      = iv%instid(inst)%scanpos(j)
+         radbias%landmask     = iv%instid(inst)%landsea_mask(j)
+         radbias%elevation    = iv%instid(inst)%info(j)%elv
+         radbias%lat          = iv%instid(inst)%info(j)%lat
+         radbias%lon          = iv%instid(inst)%info(j)%lon
+         radbias%surf_flag    = iv%instid(inst)%isflg(j)
+         radbias%ps           = iv%instid(inst)%ps(j)
+         radbias%t2m          = iv%instid(inst)%t2m(j)
+         radbias%q2m          = iv%instid(inst)%mr2m(j)/q2ppmv
+         radbias%tsk          = iv%instid(inst)%ts(j)
+         radbias%clwp         = iv%instid(inst)%clwp(j)  ! in mm
 
          radbias%nchan        = nchan 
-         radbias%tb(1:nchan)  = ob%instid(inst)%rad(j)%tb(1:nchan)
-         radbias%omb(1:nchan) = iv%instid(inst)%rad(j)%tb(1:nchan)%inv
+         radbias%tb(1:nchan)  = ob%instid(inst)%tb(1:nchan,j)
+         radbias%omb(1:nchan) = iv%instid(inst)%tb_inv(1:nchan,j)
          radbias%bias(1:nchan) = 0.
 
          radbias%npred         = npred
          radbias%pred(1:npred) = pred(1:npred)
 
-         radbias%qc_flag(1:nchan)= iv%instid(inst)%rad(j)%tb(1:nchan)%qc
-         radbias%cloud_flag(1:nchan)= iv%instid(inst)%rad(j)%cloud_flag(1:nchan)
+         radbias%qc_flag(1:nchan)= iv%instid(inst)%tb_qc(1:nchan,j)
+         radbias%cloud_flag(1:nchan)= iv%instid(inst)%cloud_flag(1:nchan,j)
 
          ! set missing data and bad data to missing
          do jx=1,nchan   

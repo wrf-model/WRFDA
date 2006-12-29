@@ -1,20 +1,20 @@
 subroutine da_calculate_grady_rad(iv, re, jo_grad_y) 
 
-   !------------------------------------------------------------------------------
-   !  Purpose: Calculate Gradient_y for radiance data.
+   !---------------------------------------------------------------------------
+   ! Purpose: Calculate Gradient_y for radiance data.
    !
    !  Method:  grad_y = -R^-1 (d - H delta_x).
    !------------------------------------------------------------------------------
 
    implicit none
 
-   type (ob_type), intent(in)    :: iv          ! innovation vector.
-   type (y_type) , intent(in)    :: re          ! residual vector.
-   type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
+   type (ob_type), intent(in)    :: iv          ! Innovation vector.
+   type (y_type) , intent(in)    :: re          ! Residual vector.
+   type (y_type) , intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
    integer                       :: n, k, i
 
-   if (iv%num_inst < 1) return
+   if (iv%num_inst < 1) RETURN
 
    if (trace_use) call da_trace_entry("da_calculate_grady_rad")
 
@@ -22,9 +22,9 @@ subroutine da_calculate_grady_rad(iv, re, jo_grad_y)
       if (iv%instid(i)%num_rad < 1) cycle
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
-            jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
-                                      (iv%instid(i)%rad(n)%tb(k)%error * &
-                                        iv%instid(i)%rad(n)%tb(k)%error)
+            jo_grad_y%instid(i)%tb(k,n) = -re%instid(i)%tb(k,n) / &
+                                      (iv%instid(i)%tb_error(k,n) * &
+                                        iv%instid(i)%tb_error(k,n))
          end do
       end do
    end do

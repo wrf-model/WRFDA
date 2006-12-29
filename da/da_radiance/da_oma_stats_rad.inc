@@ -12,7 +12,7 @@ subroutine da_oma_stats_rad(stats_unit, iv, re)
    type(ob_type), intent(in)      :: iv            ! Innovation
    type(y_type),  intent(in)      :: re            ! o-a
 
-   type(stats_rad_type),    pointer  :: rad(:)
+   type (stats_rad_type),    pointer  :: rad(:)
    integer                          :: n, k, i
 
    num_radiance_tot = 0
@@ -21,7 +21,7 @@ subroutine da_oma_stats_rad(stats_unit, iv, re)
 
    if (trace_use) call da_trace_entry("da_oma_stats_rad")
 
-   allocate(rad(1:iv%num_inst))
+   allocate (rad(1:iv%num_inst))
 
    do i = 1, iv%num_inst                          ! loop for sensors
       allocate(rad(i)%ichan(1:iv%instid(i)%nchan))
@@ -39,13 +39,13 @@ subroutine da_oma_stats_rad(stats_unit, iv, re)
 
       if (iv%instid(i)%num_rad < 1) cycle
 
-      do k=1, iv%instid(i)%nchan               !! loop for channels
-         do n=1, iv%instid(i)%num_rad              !! loop for pixels
-            if (iv%instid(i)%rad(n)%loc%proc_domain) then
-               call da_stats_calculate(n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
-                  re%instid(i)%rad(n)%tb(k), rad(i)%ichan(k)%num, &
-                  rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
-                  rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
+      do k=1, iv%instid(i)%nchan               ! loop for channels
+         do n=1, iv%instid(i)%num_rad              ! loop for pixels
+            if (iv%instid(i)%proc_domain(n)) then
+               call da_stats_calculate(n,k,iv%instid(i)%tb_qc(k,n), &
+                                 re%instid(i)%tb(k,n), rad(i)%ichan(k)%num, &
+                                 rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
+                                 rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
 
             end if          ! end if (oi%sound(n)%loc%proc_domain)
          end do                                 !! end loop for pixels
@@ -66,9 +66,7 @@ subroutine da_oma_stats_rad(stats_unit, iv, re)
 
       if (rootproc) then
          if (any(rad(i)%ichan(:)%num /= 0)) then
-            write(unit=stats_unit, fmt='(/a/)') &
-               ' Diagnostics of AO for Radiance         '//&
-               iv%instid(i)%rttovid_string 
+            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Radiance         '//iv%instid(i)%rttovid_string
             call da_print_stats_rad(stats_unit, iv%instid(i)%nchan, rad(i))
          end if
       end if
@@ -78,7 +76,7 @@ subroutine da_oma_stats_rad(stats_unit, iv, re)
       deallocate(rad(i)%ichan)
    end do
 
-   deallocate(rad)
+   deallocate (rad)
 
    if (trace_use) call da_trace_exit("da_oma_stats_rad")
 

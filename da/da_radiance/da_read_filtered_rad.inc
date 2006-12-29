@@ -6,8 +6,8 @@ subroutine da_read_filtered_rad(xp, iv)
 
    implicit none
 
-   TYPE (xpose_type), intent(in)     :: xp       ! Domain decomposition vars.
-   TYPE (ob_type),    intent(inout)  :: iv       ! O-B structure.
+   type (xpose_type), intent(in)     :: xp       ! Domain decomposition vars.
+   type (ob_type),    intent(inout)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
    integer                        :: i, j, k  ! Index dimension.
@@ -21,12 +21,12 @@ subroutine da_read_filtered_rad(xp, iv)
 
    call init_constants_derived
 
-   do n = 1, iv%num_inst
+   do i = 1, iv%num_inst
 
 #ifdef DM_PARALLEL
-      write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin_', myproc
+      write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin_', myproc
 #else
-      write(filename, '(a)') 'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
+      write(filename, '(a)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin'
 #endif
 
       if (print_detail_radiance) then
@@ -37,40 +37,37 @@ subroutine da_read_filtered_rad(xp, iv)
       open(unit=filtered_rad_unit,file=trim(filename),form='unformatted',status='old',iostat=ios)
       if (ios /= 0) then
          write(unit=stdout,fmt=*) 'Can not open filtered radiance file ', filename
-         iv%instid(n)%num_rad = 0
+         iv%instid(i)%num_rad = 0
          cycle
       end if
 
-      read(unit=filtered_rad_unit) iv%instid(n)%num_rad
-      if (iv%instid(n)%num_rad < 1) cycle
+      read(unit=filtered_rad_unit) iv%instid(i)%num_rad
+      if (iv%instid(i)%num_rad < 1) cycle
       if (print_detail_radiance) then
          write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
-                               n, iv%instid(n)%rttovid_string, iv%instid(n)%num_rad
-      end if
-      allocate(iv%instid(n)%rad(1:iv%instid(n)%num_rad), stat = ierr)
-      if (ierr /= 0) then
-        call da_error(__FILE__,__LINE__, &
-           (/"Canot allocate memory to iv%instid(i)%rad"/))
+                               n, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       end if
 
-      do i =1,iv%instid(n)%num_rad
-         allocate (iv%instid(n)%rad(i)%tb(1:iv%instid(n)%nchan))
+      allocate (iv%instid(i)%tb_inv(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_qc(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%tb_error(1:iv%instid(i)%nchan,iv%instid(i)%num_rad))
+      do n=1,iv%instid(i)%num_rad
          read(unit=filtered_rad_unit) ndomain, &
-                  iv%instid(n)%rad(i)%info%date_char, &
-                  iv%instid(n)%rad(i)%scanpos       , &
-                  iv%instid(n)%rad(i)%ifgat         , &
-                  iv%instid(n)%rad(i)%landsea_mask  , &
-                  iv%instid(n)%rad(i)%info%elv      , &
-                  iv%instid(n)%rad(i)%info%lat      , &
-                  iv%instid(n)%rad(i)%info%lon      , &
-                  iv%instid(n)%rad(i)%satzen        , &
-                  iv%instid(n)%rad(i)%satazi        , &
-                  iv%instid(n)%rad(i)%tb(:)%inv     , &
-                  iv%instid(n)%rad(i)%tb(:)%error   , &
-                  iv%instid(n)%rad(i)%tb(:)%qc
+                  iv%instid(i)%info(n)%date_char, &
+                  iv%instid(i)%scanpos(n)       , &
+                  iv%instid(i)%ifgat(n)         , &
+                  iv%instid(i)%landsea_mask(n)  , &
+                  iv%instid(i)%info(n)%elv      , &
+                  iv%instid(i)%info(n)%lat      , &
+                  iv%instid(i)%info(n)%lon      , &
+                  iv%instid(i)%satzen(n)        , &
+                  iv%instid(i)%satazi(n)        , &
+                  iv%instid(i)%tb_inv(:,n)      , &
+                  iv%instid(i)%tb_error(:,n)    , &
+                  iv%instid(i)%tb_qc(:,n)
 
-         call da_ll_to_xy (iv%instid(n)%rad(i)%info, &
-                            iv%instid(n)%rad(i)%loc,  &
+         call da_ll_to_xy (iv%instid(i)%info(n), &
+                            iv%instid(i)%loc(n),  &
                             xp, outside)
          ! if (outside) cycle
 
@@ -78,9 +75,9 @@ subroutine da_read_filtered_rad(xp, iv)
       close(filtered_rad_unit)
       call da_free_unit(filtered_rad_unit)
 
-      iv%total_obs = iv%total_obs + iv%instid(n)%num_rad
-      iv%total_rad_pixel   = iv%total_rad_pixel + iv%instid(n)%num_rad
-      iv%total_rad_channel = iv%total_rad_channel + iv%instid(n)%num_rad*iv%instid(n)%nchan
+      iv%total_obs = iv%total_obs + iv%instid(i)%num_rad
+      iv%total_rad_pixel   = iv%total_rad_pixel + iv%instid(i)%num_rad
+      iv%total_rad_channel = iv%total_rad_channel + iv%instid(i)%num_rad*iv%instid(i)%nchan
    end do      ! end do instruments
 
    if (trace_use) call da_trace_exit("da_read_filtered_rad")

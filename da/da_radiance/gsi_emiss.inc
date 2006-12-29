@@ -319,9 +319,16 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
 !      ----- sea (ice-free) MW  -------
            
 !          Open ocean points
-             
+!write (0,*) "freqghz",freqghz
+!write (0,*) "zasat(n)",zasat(n)
+!write (0,*) "zlsat(n)", zlsat(n)
+!write (0,*) "ts5(n)",ts5(n)
+!write (0,*) "u10(n),v10(n)",u10(n),v10(n)
              call seaem(freqghz,zasat(n),zlsat(n),ts5(n), &
                         u10(n),v10(n),ehorz,evert)
+! JRB FUCKING BLOODY SOFTWARE
+!ehorz=0.3227606487369507
+!evert=0.5651795846395201
 
              pemsv(nn) = evert
              pemsh(nn) = ehorz
@@ -361,9 +368,9 @@ subroutine gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn,zasat,zlsat,&
 
      end do
   else
-    WRITE(UNIT=errmsg(1), FMT='(A,I5)') &
+    WRITE(UNIT=message(1), FMT='(A,I5)') &
       "ILLEGAL surface emissivity type",itype
-    CALL da_error(__FILE__,__LINE__,errmsg(1:1))
+    CALL da_error(__FILE__,__LINE__,message(1:1))
   end if   !IR or MW
   
 

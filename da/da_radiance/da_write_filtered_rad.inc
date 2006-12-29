@@ -8,32 +8,32 @@ subroutine da_write_filtered_rad(ob, iv)
 
    implicit none
 
-   type (y_type),     intent(in)  :: ob       ! observation structure.
-   type (ob_type),    intent(in)  :: iv       ! o-b structure.
+   type (y_type),     intent(in)  :: ob       ! Observation structure.
+   type (ob_type),    intent(in)  :: iv       ! O-B structure.
 
-   integer                        :: n        ! loop counter.
-   integer                        :: i, j, k  ! index dimension.
+   integer                        :: n        ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
 
    integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename
 
    if (trace_use) call da_trace_entry("da_write_filtered_rad")
 
-   do n = 1, iv%num_inst
-      if (iv%instid(n)%num_rad < 1) cycle
+   do i = 1, iv%num_inst
+      if (iv%instid(i)%num_rad < 1) cycle
 
 #ifdef DM_PARALLEL
-      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(n)%num_rad
+      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(i)%num_rad
 #else
-      write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(n)%num_rad
+      write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(i)%num_rad
 #endif
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') &
-         'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin_', myproc
+         'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin_', myproc
 #else
       write(unit=filename, fmt='(a)') &
-         'filtered_'//trim(iv%instid(n)%rttovid_string)//'.bin'
+         'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin'
 #endif
       
       call da_get_unit(filtered_rad_unit)
@@ -42,24 +42,24 @@ subroutine da_write_filtered_rad(ob, iv)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open filtered radiance file"//filename/))
-      end if
+      Endif
 
-      write(unit=filtered_rad_unit) iv%instid(n)%num_rad
+      write(unit=filtered_rad_unit) iv%instid(i)%num_rad
 
-      do i =1,iv%instid(n)%num_rad
-         write(unit=filtered_rad_unit) i, &
-                   iv%instid(n)%rad(i)%info%date_char, &
-                   iv%instid(n)%rad(i)%scanpos       , &
-                   iv%instid(n)%rad(i)%ifgat         , &
-                   iv%instid(n)%rad(i)%landsea_mask  , &
-                   iv%instid(n)%rad(i)%info%elv      , &
-                   iv%instid(n)%rad(i)%info%lat      , &
-                   iv%instid(n)%rad(i)%info%lon      , &
-                   iv%instid(n)%rad(i)%satzen        , &
-                   iv%instid(n)%rad(i)%satazi        , &
-                   ob%instid(n)%rad(i)%tb(:)         , &
-                   iv%instid(n)%rad(i)%tb(:)%error   , &
-                   iv%instid(n)%rad(i)%tb(:)%qc
+      do n =1,iv%instid(i)%num_rad
+         write(unit=filtered_rad_unit) n, &
+                   iv%instid(i)%info(n)%date_char, &
+                   iv%instid(i)%scanpos(n)       , &
+                   iv%instid(i)%ifgat(n)         , &
+                   iv%instid(i)%landsea_mask(n)  , &
+                   iv%instid(i)%info(n)%elv      , &
+                   iv%instid(i)%info(n)%lat      , &
+                   iv%instid(i)%info(n)%lon      , &
+                   iv%instid(i)%satzen(n)        , &
+                   iv%instid(i)%satazi(n)        , &
+                   ob%instid(i)%tb(:,n)         , &
+                   iv%instid(i)%tb_error(:,n)   , &
+                   iv%instid(i)%tb_qc(:,n)
 
       end do     ! end do pixels
       close(unit=filtered_rad_unit)

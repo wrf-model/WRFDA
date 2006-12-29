@@ -38,14 +38,13 @@ subroutine da_omb_stats_rad (stats_unit, iv)
       if (iv%instid(i)%num_rad < 1) cycle
       do k=1, iv%instid(i)%nchan               !! loop for channels
          do n=1, iv%instid(i)%num_rad              !! loop for pixels
-            if (iv%instid(i)%rad(n)%loc%proc_domain) then
-               CALL da_stats_calculate(n,k,iv%instid(i)%rad(n)%tb(k)%qc, &
-                                  iv%instid(i)%rad(n)%tb(k)%inv, rad(i)%ichan(k)%num, &
+            if (iv%instid(i)%proc_domain(n)) then
+               call da_stats_calculate(n,k,iv%instid(i)%tb_qc(k,n), &
+                                  iv%instid(i)%tb_inv(k,n), rad(i)%ichan(k)%num, &
                                   rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
                                   rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
-
             end if          ! end if (oi%sound(n)%loc%proc_domain)
-         end do                                 !! end loop for pixels
+         end do 
       end do                        !  end loop for channels
    end do                         !  end loop for sensor
 
@@ -62,7 +61,8 @@ subroutine da_omb_stats_rad (stats_unit, iv)
 
       if (rootproc) then
          if (any(rad(i)%ichan(:)%num /= 0)) then
-            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Radiance         '//iv%instid(i)%rttovid_string 
+            write(unit=stats_unit, fmt='(/a/)') &
+               ' Diagnostics of OI for Radiance         '//iv%instid(i)%rttovid_string 
             call da_print_stats_rad(stats_unit, iv%instid(i)%nchan, rad(i))
          end if
       end if

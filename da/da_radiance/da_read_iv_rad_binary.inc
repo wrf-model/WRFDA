@@ -22,68 +22,68 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
 
    if (trace_use) call da_trace_entry("da_read_iv_rad_binary")
 
-   do n = 1, iv%num_inst
+   do i = 1, iv%num_inst
 
 #ifdef DM_PARALLEL
-      write(filename, '(a,i2.2)') trim(iv%instid(n)%rttovid_string)//'.inv_bin_', myproc
+      write(filename, '(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.inv_bin_', myproc
 #else
-      write(filename, '(a)') trim(iv%instid(n)%rttovid_string)//'.inv_bin'
+      write(filename, '(a)') trim(iv%instid(i)%rttovid_string)//'.inv_bin'
 #endif
       call da_get_unit(iv_rad_binary_unit)
       open(iv_rad_binary_unit,file=trim(filename),form='unformatted',iostat=ios)
       if (ios /= 0) Then
-         call da_warning(__FILE__,__LINE__,(/"cannot open the file "//TRIM(filename)/))
-         iv%instid(n)%num_rad = 0
+         call da_warning(__FILE__,__LINE__,(/"cannot open the file "//trim(filename)/))
+         iv%instid(i)%num_rad = 0
          cycle
       end if
 
-      read(iv_rad_binary_unit) iv%instid(n)%num_rad, iv%instid(n)%nchan,iv%instid(n)%ichan
-      do i =1,iv%instid(n)%num_rad
+      read(iv_rad_binary_unit) iv%instid(i)%num_rad, iv%instid(i)%nchan,iv%instid(i)%ichan
+      do n =1,iv%instid(i)%num_rad
             read(iv_rad_binary_unit) ndomain, &
-                                iv%instid(n)%rad(i)%info%date_char, &
-                                iv%instid(n)%rad(i)%scanpos,   &
-                                iv%instid(n)%rad(i)%landsea_mask, &
-                                iv%instid(n)%rad(i)%info%elv,  &
-                                iv%instid(n)%rad(i)%info%lat,  &
-                                iv%instid(n)%rad(i)%info%lon, &
-                                iv%instid(n)%rad(i)%satzen,    &
-                                iv%instid(n)%rad(i)%satazi
+                                iv%instid(i)%rad(n)%info%date_char, &
+                                iv%instid(i)%rad(n)%scanpos,   &
+                                iv%instid(i)%rad(n)%landsea_mask, &
+                                iv%instid(i)%rad(n)%info%elv,  &
+                                iv%instid(i)%rad(n)%info%lat,  &
+                                iv%instid(i)%rad(n)%info%lon, &
+                                iv%instid(i)%rad(n)%satzen,    &
+                                iv%instid(i)%rad(n)%satazi
             read(iv_rad_binary_unit) &
-                                iv%instid(n)%rad(i)%t2m, &
-                                iv%instid(n)%rad(i)%mr2m,   &
-                                iv%instid(n)%rad(i)%u10, &
-                                iv%instid(n)%rad(i)%v10,  &
-                                iv%instid(n)%rad(i)%ps,  &
-                                iv%instid(n)%rad(i)%ts,  &
-                                iv%instid(n)%rad(i)%smois,  &
-                                iv%instid(n)%rad(i)%tslb,  &
-                                iv%instid(n)%rad(i)%snowh, &
-                                iv%instid(n)%rad(i)%isflg, &
-                                nint(iv%instid(n)%rad(i)%soiltyp), &
-                                nint(iv%instid(n)%rad(i)%vegtyp), &
-                                iv%instid(n)%rad(i)%vegfra, &
-                                iv%instid(n)%rad(i)%elevation, &
-                                iv%instid(n)%rad(i)%clwp
+                                iv%instid(i)%rad(n)%t2m, &
+                                iv%instid(i)%rad(n)%mr2m,   &
+                                iv%instid(i)%rad(n)%u10, &
+                                iv%instid(i)%rad(n)%v10,  &
+                                iv%instid(i)%rad(n)%ps,  &
+                                iv%instid(i)%rad(n)%ts,  &
+                                iv%instid(i)%rad(n)%smois,  &
+                                iv%instid(i)%rad(n)%tslb,  &
+                                iv%instid(i)%rad(n)%snowh, &
+                                iv%instid(i)%rad(n)%isflg, &
+                                nint(iv%instid(i)%rad(n)%soiltyp), &
+                                nint(iv%instid(i)%rad(n)%vegtyp), &
+                                iv%instid(i)%rad(n)%vegfra, &
+                                iv%instid(i)%rad(n)%elevation, &
+                                iv%instid(i)%rad(n)%clwp
 
-            read(iv_rad_binary_unit)  ob%instid(n)%rad(i)%tb(:)
-            read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%tb(:)%inv
-            read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%emiss(1:iv%instid(n)%nchan)
+            read(iv_rad_binary_unit)  ob%instid(i)%rad(n)%tb(:)
+            read(iv_rad_binary_unit)  iv%instid(i)%rad(n)%tb(:)%inv
+            read(iv_rad_binary_unit)  iv%instid(i)%rad(n)%emiss(1:iv%instid(i)%nchan)
 
-            read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%tb(:)%error
-            read(iv_rad_binary_unit)  iv%instid(n)%rad(i)%tb(:)%qc
+            read(iv_rad_binary_unit)  iv%instid(i)%rad(n)%tb(:)%error
+            read(iv_rad_binary_unit)  iv%instid(i)%rad(n)%tb(:)%qc
 
             if (write_profile) then
                read(iv_rad_binary_unit) num_levs, &
-                  coefs(n) % ref_prfl_p(1:num_levs) , &
-                  iv%instid(n)%rad(i)%t(1:num_levs) , &
-                  iv%instid(n)%rad(i)%mr(1:num_levs)
+                  coefs(i) % ref_prfl_p(1:num_levs) , &
+                  iv%instid(i)%rad(n)%t(1:num_levs) , &
+                  iv%instid(i)%rad(n)%mr(1:num_levs)
 
                read(iv_rad_binary_unit) num_model_levs, &
-                  iv%instid(n)%rad(i)%pm(xp%kts:xp%kte) , &
-                  iv%instid(n)%rad(i)%tm(xp%kts:xp%kte) , &
-                  iv%instid(n)%rad(i)%qm(xp%kts:xp%kte) , &
-                  iv%instid(n)%rad(i)%qcw(xp%kts:xp%kte), &
-                  iv%instid(n)%rad(i)%qrn(xp%kts:xp%kte)
+                  iv%instid(i)%rad(n)%pm(xp%kts:xp%kte) , &
+                  iv%instid(i)%rad(n)%tm(xp%kts:xp%kte) , &
+                  iv%instid(i)%rad(n)%qm(xp%kts:xp%kte) , &
+                  iv%instid(i)%rad(n)%qcw(xp%kts:xp%kte), &
+                  iv%instid(i)%rad(n)%qrn(xp%kts:xp%kte)
             end if   ! end if write_profile
          end if    ! end if proc_domain
       end do     ! end do pixels

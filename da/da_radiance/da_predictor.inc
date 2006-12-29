@@ -2,20 +2,19 @@ subroutine da_predictor(pred,npred,temp,hum,t_skin)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
-   !-----------------------------------------------------------------------
-
-   implicit none
-
    ! temp - 43 level temperatures
    ! hum  - 43 level moistures
    ! t-skin - model skin temperature
-
+   !
    ! pred(1) - 1000-300 thickness 43 1005.43-521.46 thickness
    ! pred(2) - 200-50 thickness   43  194.36-56.73  thickness
    ! pred(3) - T_skin
    ! pred(4) - total column precipitable water
    ! pred(5) - 10 -2 thickness    43  10.37-2.61 thickness
    ! pred(6) - 50 -10thickness    43  45.29-10.37 thickness
+   !-----------------------------------------------------------------------
+
+   implicit none
 
    integer, parameter :: jprtlev = 43
 

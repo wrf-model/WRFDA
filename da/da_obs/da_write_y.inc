@@ -10,7 +10,7 @@ subroutine da_write_y (iv, y)
    type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
 
    integer                       :: ounit ! Output file unit.
-   integer                       :: n, k, num_obs, inst, ios
+   integer                       :: n, k, num_obs, i, ios
    real                          :: f1, f2, f3, f4, f5, f6, f7, dum
    character(len=20)             :: ob_name, filename, file_prefix
 
@@ -560,28 +560,28 @@ subroutine da_write_y (iv, y)
    ! [18] Transfer Radiance obs:
 
    if (iv%num_inst > 0) then
-      do inst = 1, iv%num_inst                 ! loop for sensor
-         if (iv%instid(inst)%num_rad < 1) cycle
-         do k = 1,iv%instid(inst)%nchan        ! loop for channel
+      do i = 1, iv%num_inst                 ! loop for sensor
+         if (iv%instid(i)%num_rad < 1) cycle
+         do k = 1,iv%instid(i)%nchan        ! loop for channel
             ! Counting number of obs for channel k
             num_obs = 0
-            do n = 1,iv%instid(inst)%num_rad      ! loop for pixel
-               if (iv%instid(inst)%rad(n)%loc%proc_domain .and. &
-                  (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+            do n = 1,iv%instid(i)%num_rad      ! loop for pixel
+               if (iv%instid(i)%loc(n)%proc_domain .and. &
+                  (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                   num_obs = num_obs + 1
                end if
             end do                                ! end loop for pixel
             if (num_obs < 1) cycle
 
-            write(ob_name,'(a,a,i2.2)') trim(iv%instid(inst)%rttovid_string),'-',k
+            write(ob_name,'(a,a,i2.2)') trim(iv%instid(i)%rttovid_string),'-',k
             write(ounit,'(a20,i8)')  ob_name,num_obs
 
             num_obs = 0
-            do n= 1, iv%instid(inst)%num_rad      ! loop for pixel
-              if(iv%instid(inst)%rad(n)%loc%proc_domain .and. &
-                 (iv%instid(inst)%rad(n)%tb(k)%qc >= obs_qc_pointer)) then
+            do n= 1, iv%instid(i)%num_rad      ! loop for pixel
+              if(iv%instid(i)%loc(n)%proc_domain .and. &
+                 (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                     num_obs = num_obs + 1
-                    write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(inst)%rad(n)%tb(k)
+                    write(ounit,'(2i8,e15.7)')num_obs, 1, y%instid(i)%tb(k,n)
               end if
             end do                                ! end loop for pixel
          end do                                ! end loop for channel

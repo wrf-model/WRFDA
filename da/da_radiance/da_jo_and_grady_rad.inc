@@ -33,15 +33,15 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
 
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
-            jo_grad_y%instid(i)%rad(n)%tb(k) = -re%instid(i)%rad(n)%tb(k) / &
-                                    (iv%instid(i)%rad(n)%tb(k)%error * &
-                                      iv%instid(i)%rad(n)%tb(k)%error)
+            jo_grad_y%instid(i)%tb(k,n) = -re%instid(i)%tb(k,n) / &
+                                    (iv%instid(i)%tb_error(k,n) * &
+                                      iv%instid(i)%tb_error(k,n))
          end do
-         IF (iv%instid(i)%rad(n)%loc%proc_domain) THEN
+         if (iv%instid(i)%proc_domain(n)) then
             do k=1, iv%instid(i)%nchan
-               IF (iv%instid(i)%rad(n)%tb(k)%qc >= obs_qc_pointer) THEN
+               if (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer) then
                   jo % rad(i) % jo_ichan(k) = jo % rad(i) % jo_ichan(k) - &
-                     re%instid(i)%rad(n)%tb(k) * jo_grad_y%instid(i)%rad(n)%tb(k)
+                     re%instid(i)%tb(k,n) * jo_grad_y%instid(i)%tb(k,n)
                   jo % rad(i) % num_ichan(k) = jo % rad(i) % num_ichan(k) + 1
                end if
             end do
