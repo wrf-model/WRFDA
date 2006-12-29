@@ -59,8 +59,8 @@ endif
 if (-d ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}) then
    setenv CRTM ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
-   setenv MPICH ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
+   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}
 endif
 if (-d ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}) then
    setenv BLAS ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}
@@ -82,33 +82,33 @@ endif
 
 # mpich2
 
-#if ( -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#if ( -d ${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}) then
 
 # mpich2
 
-#if ( -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
-#   setenv MPICH ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if ( -d ${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
-#if ( -d ~${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}) then
-#   setenv MPICH ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if ( -d ~${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}) then
+#   setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}
 #endif
 
 if (-d /usr/lpp/ppe.poe) then
-   setenv MPICH /usr/lpp/ppe.poe
+   setenv MPIHOME /usr/lpp/ppe.poe
 endif
 
 # Lightning
 
 if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then 
    if ( $FC == "pathscale" ) then
-      setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
+      setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
    if ( $FC == "pgi" ) then
-      setenv MPICH /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+      setenv MPIHOME /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    endif
    if ( $FC == "ifort" ) then
       source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
-      setenv MPICH /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
+      setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    endif
 endif
 
@@ -122,16 +122,15 @@ if ( $MACHINE == "gold.us.cray.com" ) then
       setenv NETCDF /ptmp/pjj/netcdf-3.5.1-x1
       setenv RTTOV ~n12138/rttov/rttov85_crayx1
       setenv CRTM ~n12138/crtm/crtm_crayx1
-      setenv MPICH /opt/cpkg/v4/mpich2/1.0
+      setenv MPIHOME /opt/cpkg/v4/mpich2/1.0
       setenv WRF_OS crayx1
    endif
 endif
 
-setenv MPIHOME $MPICH
-setenv LINUX_MPIHOME $MPICH
-setenv PATH $MPICH/bin:$PATH
+setenv LINUX_MPIHOME $MPIHOME
+setenv PATH $MPIHOME/bin:$PATH
 if ($?MAKEDEPF90) then
-   setenv PATH $MPICH/bin\:$MAKEDEPF90\:$PATH
+   setenv PATH $MPIHOME/bin\:$MAKEDEPF90\:$PATH
 endif
 
 if ($FC == "g95" ) then
@@ -149,8 +148,8 @@ if ($FC == "g95" ) then
 endif
 
 echo
-if ($?MPICH) then
-   echo "MPICH       " $MPICH
+if ($?MPIHOME) then
+   echo "MPIHOME     " $MPIHOME
 endif
 if ($?RTTOV) then
    echo "RTTOV       " $RTTOV

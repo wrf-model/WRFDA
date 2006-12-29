@@ -1,4 +1,4 @@
-subroutine da_write_oa_rad_ascii (xp, ob, iv, re)
+subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
 
    !---------------------------------------------------------------------------
    ! Purpose: write out OMB and OMA vector structure for radiance data.
@@ -46,15 +46,14 @@ subroutine da_write_oa_rad_ascii (xp, ob, iv, re)
 #endif
       call da_get_unit(oma_rad_unit)
       open(unit=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0) then
+      if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open oma radiance file"//filename/))
-      end if
+      Endif
       write(unit=oma_rad_unit,fmt='(a,a,i7,a,i5,a)') trim(iv%instid(i)%rttovid_string), &
                            ' number-of-pixels : ', ndomain, &
                            ' channel-number-of-each-pixel : ', iv%instid(i)%nchan, &
                            ' index-of-channels : '
-
       write(unit=oma_rad_unit,fmt='(10i5)') iv%instid(i)%ichan
       write(unit=oma_rad_unit,fmt= *) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
       write(unit=oma_rad_unit,fmt= *) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
@@ -208,7 +207,6 @@ subroutine da_write_oa_rad_ascii (xp, ob, iv, re)
                                    iv%instid(i)%vegfra(n), &
                                    iv%instid(i)%elevation(n), &
                                    iv%instid(i)%clwp(n)
-
             end if
 
             write(unit=oma_rad_unit,fmt='(a)') 'OBS  : '
@@ -261,7 +259,7 @@ subroutine da_write_oa_rad_ascii (xp, ob, iv, re)
       end do     ! end do pixels
       close(unit=oma_rad_unit)
       call da_free_unit(oma_rad_unit)
-   end do    ! end do instruments
+   end do    !! end do instruments
 
    if (trace_use) call da_trace_exit("da_write_oa_rad_ascii")
 #endif

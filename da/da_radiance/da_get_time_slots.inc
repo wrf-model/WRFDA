@@ -24,10 +24,8 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
    read(unit=tmax,fmt='(i4,5(a1,i2))') max_yyyy,s,max_mm,s,max_dd,s,max_hh,s,max_mn,s,max_ss
 
    if (print_detail_radiance) then
-      write(unit=stdout,fmt='(3X,A,I4,5(1X,I2))') 'Start julian time : ', &
-         min_yyyy,min_mm,min_dd,min_hh,min_mn,min_ss
-      write(unit=stdout,fmt='(3X,A,I4,5(1X,I2))') 'End julian time   : ', &
-         max_yyyy,max_mm,max_dd,max_hh,max_mn,max_ss
+      write(unit=stdout,fmt='(3X,A,I4,5(1X,I2))') 'Start julian time : ',min_yyyy,min_mm,min_dd,min_hh,min_mn,min_ss
+      write(unit=stdout,fmt='(3X,A,I4,5(1X,I2))') 'End julian time   : ',max_yyyy,max_mm,max_dd,max_hh,max_mn,max_ss
    end if
 
    call da_get_julian_time(min_yyyy,min_mm,min_dd,min_hh,min_mn,time_slots(0))
@@ -48,5 +46,3 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
    if (trace_use) call da_trace_exit("da_get_time_slots")
 
 end subroutine da_get_time_slots
-
-

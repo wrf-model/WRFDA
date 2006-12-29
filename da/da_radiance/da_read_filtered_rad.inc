@@ -1,4 +1,4 @@
-subroutine da_read_filtered_rad(xp, iv)
+subroutine da_read_filtered_rad( xp, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: read in QCed radiance data from separated PEs 
@@ -83,5 +83,4 @@ subroutine da_read_filtered_rad(xp, iv)
    if (trace_use) call da_trace_exit("da_read_filtered_rad")
  
 end subroutine da_read_filtered_rad
-
 

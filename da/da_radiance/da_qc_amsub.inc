@@ -1,4 +1,4 @@
-subroutine da_qc_amsub (i, nchan, ob, iv)
+subroutine da_qc_amsub ( i, nchan, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for amsub data.
@@ -74,7 +74,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
 
          !  d. check cloud/precipitation 
          !-----------------------------------------------------------
-         if (ob%instid(i)%tb(1,n) > 0.0 .and. &
+         if ( ob%instid(i)%tb(1,n) > 0.0 .and. &
               ob%instid(i)%tb(2,n) > 0.0) then
             si = ob%instid(i)%tb(1,n) - ob%instid(i)%tb(2,n)
             if (si >= 3.0) then
@@ -95,7 +95,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
          !  e. check surface height/pressure
          !------------------------------------------------------
          ! sfchgt = ivrad%info(n)%elv
-         ! if (sfchgt >=) then
+         ! if ( sfchgt >= ) then
          !
          ! else 
          ! end if
@@ -123,7 +123,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
                      nrej_omb_std(k) = nrej_omb_std(k) + 1
                end if
             else
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k)) then
+               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k) ) then
                if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k)) then
                   iv%instid(i)%tb_qc(k,n)  = qc_bad
                   if (iv%instid(i)%proc_domain(n)) &
@@ -215,5 +215,3 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    if (trace_use) call da_trace_exit("da_qc_amsub")
 
 end subroutine da_qc_amsub
-
-

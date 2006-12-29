@@ -1,9 +1,9 @@
-subroutine da_biascorr_rad (i, ob, iv)
+subroutine da_biascorr_rad ( i, ob, iv)
 
    !---------------------------------------------------------------------------
    ! Purpose: perform bias correction for radiance data.
    !
-   ! Method:  Tb*(xb)=a+b*Tb(xb)
+   ! METHOD:  Tb*(xb)=a+b*Tb(xb)
    !---------------------------------------------------------------------------
 
    implicit none

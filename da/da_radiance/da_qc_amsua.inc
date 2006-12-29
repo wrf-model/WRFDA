@@ -1,4 +1,4 @@
-subroutine da_qc_amsua (i, nchan, ob, iv)
+subroutine da_qc_amsua ( i, nchan, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for amsua data.
@@ -11,6 +11,8 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    type (y_type),  intent(in)      :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
+
+   ! local variables
    integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
    logical   :: lmix
    real      :: satzen,si
@@ -37,11 +39,10 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
                       iv%ob_numb(iv%current_ob_time-1)%radiance(i)
    ! num_rad        = iv%instid(i)%num_rad
 
-   if (num_rad > 0) then
+   if ( num_rad > 0 ) then
 
       ! do n= 1, iv%instid(i)%num_rad           ! loop for pixel
-      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, &
-         iv%ob_numb(iv%current_ob_time)%radiance(i)
+      do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, iv%ob_numb(iv%current_ob_time)%radiance(i)
 
          !  0.0  initialise QC by flags assuming good obs
          !---------------------------------------------
@@ -58,7 +59,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          end if
          !  b.  reject channels 1~4 over land/sea-ice/snow
          !------------------------------------------------------
-         if (isflg > 0) then 
+         if ( isflg > 0 ) then 
             iv%instid(i)%tb_qc(1:4,n)  = qc_bad
             if (iv%instid(i)%proc_domain(n)) &
                nrej_windowchanl = nrej_windowchanl + 1
@@ -71,11 +72,11 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          !    reject limb obs 
          !------------------------------------------------------
          scanpos = iv%instid(i)%scanpos(n)
-         if (scanpos <= 3 .or. scanpos >= 28) &
+         if (scanpos <= 3 .or. scanpos >= 28 ) &
             iv%instid(i)%tb_qc(:,n)  =  qc_bad
 
          ! satzen  = rad%satzen
-         ! if (abs(satzen) > 45.) iv%instid(i)%tb_qc(:,n)  =  qc_bad
+         ! if ( abs(satzen) > 45. ) iv%instid(i)%tb_qc(:,n)  =  qc_bad
 
          !  d. check precipitation 
          !-----------------------------------------------------------
@@ -98,7 +99,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          end if
 
          !   3.1 Estimate Cloud Liquid Water (CLW) in mm over sea
-         !       (Grody etal. 2001, JGR, Equation 5b,7c,7d,9)
+         !       ( Grody etal. 2001, JGR, Equation 5b,7c,7d,9 )
          !---------------------------------------------------------
          ! if (isflg == 0) then
          !    coszen =  cos(iv%instid(i)%satzen(n))
@@ -116,7 +117,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          !  e. check surface height/pressure
          !-----------------------------------------------------------
          ! sfchgt = ivrad%info(n)%elv
-         ! if (sfchgt >=) then
+         ! if ( sfchgt >= ) then
          ! else 
          ! end if
 
@@ -129,29 +130,29 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          !  g. check iuse
          !-----------------------------------------------------------
          do k = 1, nchan
-            if (satinfo(i)%iuse(k) .eq. -1) &
+            if (satinfo(i)%iuse(k) .eq. -1 ) &
                iv%instid(i)%tb_qc(k,n)  = qc_bad
          end do
 
          !  f. check innovation
          !-----------------------------------------------------------
          do k = 1, nchan
-            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.) then
+            if ( abs(iv%instid(i)%tb_inv(k,n)) > 15. ) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1
             end if
 
             if (biascorr) then
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(scanpos+1,k)) then
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(1,k)) then
+               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(scanpos+1,k) ) then
+               if ( abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(1,k) ) then
                   iv%instid(i)%tb_qc(k,n)  = qc_bad
                   if (iv%instid(i)%proc_domain(n)) &
                      nrej_omb_std(k) = nrej_omb_std(k) + 1
                end if
             else
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k)) then
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k)) then
+               ! if ( abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k) ) then
+               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k) ) then
                   iv%instid(i)%tb_qc(k,n)  = qc_bad
                   if (iv%instid(i)%proc_domain(n)) &
                      nrej_omb_rms(k) = nrej_omb_rms(k) + 1
@@ -189,18 +190,18 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    end if
  
    ! Do inter-processor communication to gather statistics.
-   call da_proc_sum_int (num_rad)
-   call da_proc_sum_int (nrej_mixsurface)
-   call da_proc_sum_int (nrej_windowchanl)
-   call da_proc_sum_int (nrej_si  )
-   call da_proc_sum_int (nrej_clw )
-   call da_proc_sum_int (nrej_topo)
+   call da_proc_sum_int ( num_rad )
+   call da_proc_sum_int ( nrej_mixsurface )
+   call da_proc_sum_int ( nrej_windowchanl)
+   call da_proc_sum_int ( nrej_si   )
+   call da_proc_sum_int ( nrej_clw  )
+   call da_proc_sum_int ( nrej_topo )
    do k = 1, nchan
-      call da_proc_sum_int (nrej_omb_abs(k))
-      call da_proc_sum_int (nrej_omb_std(k))
-      call da_proc_sum_int (nrej_omb_rms(k))
-      call da_proc_sum_int (nrej(k) )
-      call da_proc_sum_int (ngood(k))
+      call da_proc_sum_int ( nrej_omb_abs(k) )
+      call da_proc_sum_int ( nrej_omb_std(k) )
+      call da_proc_sum_int ( nrej_omb_rms(k) )
+      call da_proc_sum_int ( nrej(k)  )
+      call da_proc_sum_int ( ngood(k) )
    end do
 
    if (rootproc) then

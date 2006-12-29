@@ -1,10 +1,10 @@
 #ifdef RTTOV
-subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
+subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
                           con_vars, aux_vars, &
-                          tb, emisv, emish, emissivity_out)
+                          tb, emisv, emish, emissivity_out )
 
    !---------------------------------------------------------------------------
-   ! Purpose: interface to the forward subroutine of RTTOV8_5
+   !  Purpose: interface to the forward subroutine of RTTOV8_5
    !---------------------------------------------------------------------------
 
    implicit none
@@ -19,6 +19,7 @@ subroutine da_rttov_direct(inst, isflg, nchanl, nprofiles, &
    real             ,  intent    (in) :: emish(nprofiles*nchanl)
    real             ,  intent   (out) :: emissivity_out(:,:)
 
+   ! local variables
    integer             :: n, nc, ios, ich, i, ichannel, pol_id
    Integer             :: emis_scheme
 
@@ -107,7 +108,7 @@ call da_oi(__FILE__,__LINE__)
 
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
-                       nfrequencies, nchannels, nbtout)       ! out
+                       nfrequencies, nchannels, nbtout )       ! out
 #endif
 
 write (0,*) "nprofiles",nprofiles
@@ -116,9 +117,9 @@ write (0,*) "nfrequencies, nchannels, nbtout",nfrequencies, nchannels, nbtout
    allocate (lprofiles(nfrequencies))
    allocate (channels (nfrequencies))
    allocate (polarisations(nchannels, 3))
-   allocate (emissivity(nchannels))
-   allocate (calcemis(nchannels))
-   allocate (surfem(nchannels))
+   allocate (emissivity( nchannels))
+   allocate (calcemis( nchannels))
+   allocate (surfem( nchannels))
 call da_oi(__FILE__,__LINE__)
 
    ! allocate transmittance structure
@@ -150,7 +151,7 @@ call da_oi(__FILE__,__LINE__)
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
-                emissivity )                                ! out                       
+                emissivity  )                                ! out                       
 
    !  surface emissivity scheme
    !----------------------------------------------------------
@@ -185,7 +186,7 @@ call da_oi(__FILE__,__LINE__)
       !  1.0 over sea
       !
       !  print *, 'mw_emis_sea=', mw_emis_sea
-      if (profiles(1) % skin % surftype == 1) then 
+      if ( profiles(1) % skin % surftype == 1) then 
          if (mw_emis_sea == 0) then
             calcemis  (1:nchannels) = .true.
             emissivity(1:nchannels) = -1.   ! RTTOV fastem-2
@@ -236,7 +237,7 @@ call da_oi(__FILE__,__LINE__)
    !  calling RTTOV forward model
    !----------------------------------
 
-   call rttov_direct(&
+   call rttov_direct( &
       & errorstatus,     &! out
       & nfrequencies,    &! in
       & nchannels,       &! in
@@ -251,10 +252,10 @@ call da_oi(__FILE__,__LINE__)
       & calcemis,        &! in
       & emissivity,      &! inout
       & transmission,    &! inout
-      & radiance)        ! inout
+      & radiance )        ! inout
 call da_oi(__FILE__,__LINE__)
 
-   if (any(errorstatus(:) /= 0)) then
+   if ( any(errorstatus(:) /= 0 )) then
       !write (unit=stderr,fmt=*) 'rttov_direct error code = ', errorstatus(:)
       !write (unit=stderr,fmt=*) 'nfrequencies = ', nfrequencies
       !write (unit=stderr,fmt=*) 'nchannels    = ', nchannels
@@ -290,47 +291,46 @@ call da_oi(__FILE__,__LINE__)
       emissivity_out(:,n) = emissivity((n-1)*nc+1:n*nc)
    end do
 
-   deallocate (lprofiles)
-   deallocate (channels)
-   deallocate (polarisations)
-   deallocate (emissivity)
-   deallocate (calcemis)
-   deallocate (surfem)
+   deallocate (lprofiles )
+   deallocate (channels )
+   deallocate (polarisations )
+   deallocate (emissivity )
+   deallocate (calcemis )
+   deallocate (surfem )
    do n = 1, nprofiles 
-      deallocate (profiles(n)%p)
-      deallocate (profiles(n)%t)
-      deallocate (profiles(n)%q)
-      deallocate (profiles(n)%o3)
-      deallocate (profiles(n)%co2)
-      deallocate (profiles(n)%clw)
+      deallocate (profiles(n)%p )
+      deallocate (profiles(n)%t )
+      deallocate (profiles(n)%q )
+      deallocate (profiles(n)%o3 )
+      deallocate (profiles(n)%co2 )
+      deallocate (profiles(n)%clw )
    end do
 
    ! deallocate transmittance structure
-   deallocate (transmission % tau_surf)
-   deallocate (transmission % tau_layer)
-   deallocate (transmission % od_singlelayer)
+   Deallocate (transmission % tau_surf)
+   Deallocate (transmission % tau_layer)
+   Deallocate (transmission % od_singlelayer)
 
    ! deallocate radiance results arrays with number of channels
-   deallocate (radiance % clear)
-   deallocate (radiance % cloudy)
-   deallocate (radiance % total)
-   deallocate (radiance % bt)
-   deallocate (radiance % bt_clear)
-   deallocate (radiance % upclear)
-   deallocate (radiance % dnclear)
-   deallocate (radiance % reflclear)
-   deallocate (radiance % overcast)
-   deallocate (radiance % downcld)
-   deallocate (radiance % out)
-   deallocate (radiance % out_clear)
-   deallocate (radiance % total_out)
-   deallocate (radiance % clear_out)
+   Deallocate (radiance % clear)
+   Deallocate (radiance % cloudy)
+   Deallocate (radiance % total)
+   Deallocate (radiance % bt)
+   Deallocate (radiance % bt_clear)
+   Deallocate (radiance % upclear)
+   Deallocate (radiance % dnclear)
+   Deallocate (radiance % reflclear)
+   Deallocate (radiance % overcast)
+   Deallocate (radiance % downcld)
+   Deallocate (radiance % out)
+   Deallocate (radiance % out_clear)
+   Deallocate (radiance % total_out)
+   Deallocate (radiance % clear_out)
 call da_oi(__FILE__,__LINE__)
 
    call da_trace_exit("da_rttov_direct")
 
 end subroutine da_rttov_direct
-
 
 
 #endif

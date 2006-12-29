@@ -3,7 +3,7 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: write out innovation vector structure for radiance data.
    !
-   ! Method: write out for separated PEs 
+   ! METHOD: write out for separated PEs 
    !---------------------------------------------------------------------------
 
    implicit none
@@ -31,11 +31,11 @@ subroutine da_read_iv_rad_binary (xp, ob, iv)
 #endif
       call da_get_unit(iv_rad_binary_unit)
       open(iv_rad_binary_unit,file=trim(filename),form='unformatted',iostat=ios)
-      if (ios /= 0) Then
+      if (ios /= 0 ) Then
          call da_warning(__FILE__,__LINE__,(/"cannot open the file "//trim(filename)/))
          iv%instid(i)%num_rad = 0
          cycle
-      end if
+      Endif
 
       read(iv_rad_binary_unit) iv%instid(i)%num_rad, iv%instid(i)%nchan,iv%instid(i)%ichan
       do n =1,iv%instid(i)%num_rad

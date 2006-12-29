@@ -3,7 +3,7 @@ subroutine da_qc_rad (ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for radiance data.
    !
-   ! Method:  seperated QC for each sensor
+   ! METHOD:  seperated QC for each sensor
    !---------------------------------------------------------------------------
 
    implicit none
@@ -62,12 +62,12 @@ subroutine da_qc_rad (ob, iv)
       else if (airs) then
          ! call da_qc_airs(i,nchan,ob,iv)
          write(unit=stderr,fmt='(A)') 'QC Not implemented for AIRS'
-      else if (hsb) then
+      else if ( hsb ) then
          ! call da_qc_hsb(i,nchan,ob,iv)
          write(unit=stderr,fmt='(A)') 'QC Not implemented for HSB'
       else if (amsua) then
          call da_qc_amsua(i,nchan,ob,iv)
-      else if (amsub) then
+      else if ( amsub ) then
          call da_qc_amsub(i,nchan,ob,iv)
       else if (msu) then
          ! call da_qc_msu(i,nchan, ob,iv)
@@ -127,7 +127,7 @@ subroutine da_qc_rad (ob, iv)
          do p=1,num_procs
             if (spare_count(p) > tovs_min_transfer) then
                do j=num_procs,1,-1
-                  if (excess_count(j) > tovs_min_transfer) then
+                  if (excess_count(j) > tovs_min_transfer ) then
                      copy_found = .true.
                      tovs_copy_count(i)=tovs_copy_count(i)+1
                      tovs_send_pe(i,tovs_copy_count(i)) = index(j)-1
@@ -151,11 +151,11 @@ subroutine da_qc_rad (ob, iv)
       end do   
 
       if (print_detail_radiance) then
-         !         do p=1,tovs_copy_count(i)
-         !            write (unit=stdout,fmt='(3X,5(A,I5))') "Sending ",tovs_send_count(i,p), &
-         !               " from ",tovs_send_pe(i,p),":",tovs_send_start(i,p)," to ", &
-         !               tovs_recv_pe(i,p),":",tovs_recv_start(i,p)
-         !         end do
+!         do p=1,tovs_copy_count(i)
+!            write (unit=stdout,fmt='(3X,5(A,I5))') "Sending ",tovs_send_count(i,p), &
+!               " from ",tovs_send_pe(i,p),":",tovs_send_start(i,p)," to ", &
+!               tovs_recv_pe(i,p),":",tovs_recv_start(i,p)
+!         end do
 
          write(unit=message(1),fmt='(A,I1,A)') "Instrument ",i," final tovs distribution"
          write(unit=message(2),fmt=*) num_tovs_after(i,:)

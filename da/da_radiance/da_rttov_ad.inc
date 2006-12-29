@@ -1,6 +1,6 @@
 #ifdef RTTOV
-subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
-                      aux_vars, con_vars_ad, tb)
+subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
+                      aux_vars, con_vars_ad, tb )
 
    !---------------------------------------------------------------------------
    ! Purpose: interface to the adjoint subroutine of RTTOV8_5
@@ -116,7 +116,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
    end do
 
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
-                     nfrequencies, nchannels, nbtout)       ! out
+                     nfrequencies, nchannels, nbtout )       ! out
 
    allocate (lprofiles(nfrequencies))
    allocate (channels(nfrequencies))
@@ -202,7 +202,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
-                emissivity )                                ! out                       
+                emissivity  )                                ! out                       
 
    nc = nchannels/nprofiles
 
@@ -212,7 +212,7 @@ subroutine da_rttov_ad(inst, nchanl, nprofiles, con_vars, &
       emissivity_ad (1:nchannels) = 0.0
    else if (coef%id_sensor == 2)  then   ! microwave sensor
       do n = 1, nprofiles
-         if (profiles(n) % skin % surftype == 1) then  ! sea  
+         if ( profiles(n) % skin % surftype == 1) then  ! sea  
             calcemis ((n-1)*nc+1:n*nc) = .true.
             emissivity ((n-1)*nc+1:n*nc) = 0.0
             emissivity_ad ((n-1)*nc+1:n*nc) = 0.0
@@ -235,7 +235,7 @@ goto 100
        write (0,*) 'sum(lprofiles)         = ', sum(lprofiles)
        write (0,*) 'addcloud               = ', addcloud
        write (0,*) 'switchrad              = ', switchrad
-       ! write (0,*) 'calcemis               = ', calcemis
+!       write (0,*) 'calcemis               = ', calcemis
        write (0,*) 'profiles%s2m           = ', profiles(1)%s2m
        write (0,*) 'profiles%skin          = ', profiles(1)%skin
        write (0,*) 'profiles%zenangle      = ', profiles(1)%zenangle
@@ -284,7 +284,7 @@ goto 100
        write (0,*) 'profiles_ad%clw        = ', profiles_ad(nprofiles)%clw
 100 continue
 
-   call rttov_ad(& 
+   call rttov_ad( & 
       & errorstatus,     &! out
       & nfrequencies,    &! in
       & nchannels,       &! in
@@ -304,7 +304,7 @@ goto 100
       & transmission,    &! inout  direct model
       & transmission_ad, &! inout  adjoint input
       & radiance,    &! inout  direct model   (input due to pointers alloc)
-      & radiance_ad) ! inout  adjoint input  (output if converstion Bt -> rad)
+      & radiance_ad ) ! inout  adjoint input  (output if converstion Bt -> rad)
 
    if (any(errorstatus(:) /= 0)) then
        write (message(1),*) 'rttov_direct error code = ', errorstatus(:)
@@ -353,27 +353,27 @@ goto 100
       con_vars_ad(n)%ps           = profiles_ad(n) % s2m  % p
    end do
 
-   deallocate (lprofiles)
-   deallocate (channels)
-   deallocate (polarisations)
-   deallocate (emissivity)
-   deallocate (emissivity_ad)
-   deallocate (calcemis)
+   deallocate (lprofiles )
+   deallocate (channels )
+   deallocate (polarisations )
+   deallocate (emissivity )
+   deallocate (emissivity_ad )
+   deallocate (calcemis )
 
    do n = 1, nprofiles 
-      deallocate (profiles(n)%p)
-      deallocate (profiles(n)%t)
-      deallocate (profiles(n)%q)
-      deallocate (profiles(n)%o3)
-      deallocate (profiles(n)%co2)
-      deallocate (profiles(n)%clw)
+      deallocate (profiles(n)%p )
+      deallocate (profiles(n)%t )
+      deallocate (profiles(n)%q )
+      deallocate (profiles(n)%o3 )
+      deallocate (profiles(n)%co2 )
+      deallocate (profiles(n)%clw )
 
-      deallocate (profiles_ad(n)%p)
-      deallocate (profiles_ad(n)%t)
-      deallocate (profiles_ad(n)%q)
-      deallocate (profiles_ad(n)%o3)
-      deallocate (profiles_ad(n)%co2)
-      deallocate (profiles_ad(n)%clw)
+      deallocate (profiles_ad(n)%p )
+      deallocate (profiles_ad(n)%t )
+      deallocate (profiles_ad(n)%q )
+      deallocate (profiles_ad(n)%o3 )
+      deallocate (profiles_ad(n)%co2 )
+      deallocate (profiles_ad(n)%clw )
    end do
 
    ! deallocate transmittance structure

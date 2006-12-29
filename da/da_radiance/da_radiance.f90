@@ -1,13 +1,8 @@
 module da_radiance
 
-!------------------------------------------------------------------------------
-!  Purpose: module for radiance data assimilation.
-!
-!  METHOD:  radiance for all sensor are defined in a common data structure 
-!
-!  HISTORY: 07/2005 - Creation            Zhiquan Liu
-!
-!------------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: module for radiance data assimilation. 
+   !---------------------------------------------------------------------------
 
    use da_control
    use da_define_structures
@@ -146,8 +141,8 @@ module da_radiance
                                            ! 0:good; <0:rejected; other:suspected
        real,    pointer   :: emiss(:)      ! surface emissivity
 
-       !  part from background field
-       !-------------------------------
+!  part from background field
+!-------------------------------
        integer            :: surftype      ! surface type
                                            ! 0:sea     1:sea-ice     2:land     3:snow
                                            ! 4:mix-sea 5:mix-sea-ice 6:mix-land 7:mix-snow

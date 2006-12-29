@@ -45,7 +45,7 @@ subroutine  snwem_amsu(theta,frequency,snow_depth,ts,tba,tbb,esh,esv)
 !               sem_BTs and sem_amsub, which are empirically derived from satellite
 !               retrievals and ground-based measurements, are called to simuate snow
 !               emissivity; when no AMSU measurements are avalaiable, the subroutine
-!               ALANDEM_Snow is called where the results over snow conditions in beta
+!               ALandEM_Snow is called where the results over snow conditions in beta
 !               version are adjusted with a bias correction that is obtained using a
 !               statistical algorithm. Thus, LandEM 3.0 significantly enhances the
 !               flexibility/performance of LandEM 2.0 in smulating emissivity over snow
@@ -102,7 +102,7 @@ subroutine  snwem_amsu(theta,frequency,snow_depth,ts,tba,tbb,esh,esv)
 !       INDATA(4) = AMSUA  :  call sem_amsua
 !       INDATA(5) = BTs    :  call sem_BTs
 !       INDATA(6) = AMSUB  :  call sem_amsub
-!       INDATA(7) = MODL   :  call ALANDEM_Snow
+!       INDATA(7) = MODL   :  call ALandEM_Snow
 !       input_type     -  specific option index
 !       tb[1] ~ tb[5]  -  Tb at five AMSU-A & B window channels:
 !                              tb[1] = tba[1]
@@ -196,7 +196,7 @@ subroutine  snwem_amsu(theta,frequency,snow_depth,ts,tba,tbb,esh,esv)
   CASE(6)
      call sem_amsub(theta,frequency,tbb,snow_type,em_vector)
   CASE(7)
-     call ALANDEM_Snow(theta,frequency,snow_depth,ts,snow_type,em_vector)
+     call ALandEM_Snow(theta,frequency,snow_depth,ts,snow_type,em_vector)
   END SELECT GET_option
   
   esv = em_vector(1)
@@ -1520,7 +1520,7 @@ end subroutine sem_amsub
 
 
 !---------------------------------------------------------------------!
-subroutine ALANDEM_Snow(theta,frequency,snow_depth,t_skin,snow_type,em_vector)
+subroutine ALandEM_Snow(theta,frequency,snow_depth,t_skin,snow_type,em_vector)
 
 
 !$$$  subprogram documentation block
@@ -1596,7 +1596,7 @@ subroutine ALANDEM_Snow(theta,frequency,snow_depth,t_skin,snow_type,em_vector)
   call ems_adjust(theta,frequency,snow_depth,t_skin,esv_3w,esh_3w,em_vector,snow_type)
   
   return
-end subroutine ALANDEM_Snow
+end subroutine ALandEM_Snow
 
 
 !---------------------------------------------------------------------!

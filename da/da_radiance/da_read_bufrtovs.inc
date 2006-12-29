@@ -1,15 +1,17 @@
 subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    !---------------------------------------------------------------------------
-   ! Purpose: read in NCEP bufr tovs 1b data to innovation structure
+   !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
    !
-   !   Method: use F90 sequential data structure to avoid reading file twice  
+   !   METHOD: use F90 sequential data structure to avoid reading file twice  
    !            so that da_scan_bufrtovs is not necessary any more.
    !            1. read file radiance data in sequential data structure
    !            2. do gross QC check
    !            3. assign sequential data structure to innovation structure
    !               and deallocate sequential data structure
    !---------------------------------------------------------------------------
+
+   use da_control
 
    implicit none
 
@@ -170,7 +172,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    im=0
    idd=0
    ihh=0
-   write(unit=date,fmt='(i10)') idate
+   write(unit=date,fmt='( i10)') idate
    read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
    write(unit=stdout,fmt=*) &
       '  Bufr file date is ',iy,im,idd,ihh,infile
@@ -179,8 +181,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !-------------------------------------------------------------------------
 
    allocate (head)
-   !  allocate (head % tb_inv (1:nchan))
-   nullify  (head % next)
+   !  allocate ( head % tb_inv (1:nchan) )
+   nullify  ( head % next )
    p => head
 
    num_tovs_global = 0
@@ -328,7 +330,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    
          tb_inv(1:nchan) = data1b8(1:nchan)
          do k = 1, nchan
-            if (tb_inv(k) < tbmin .or. tb_inv(k) > tbmax) &
+            if ( tb_inv(k) < tbmin .or. tb_inv(k) > tbmax) &
                tb_inv(k) = missing_r
          end do
 
@@ -439,7 +441,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !-------------------------------------------------------------
    nread(1:rtminit_nsensor) = 0 
    p => head
-   ! do while (associated(p))
+   ! do while ( associated(p) )
 
    do n = 1, num_tovs_local
       i = p%sensor_index
@@ -506,8 +508,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       p => p%next
 
       ! free current data
-      deallocate (current % tb_inv)
-      deallocate (current)
+      deallocate ( current % tb_inv )
+      deallocate ( current )
    end do
 
    deallocate (nread)

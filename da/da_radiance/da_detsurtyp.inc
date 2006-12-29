@@ -6,7 +6,7 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    !---------------------------------------------------------------------------
    ! Purpose: determine surface type at obs locations.
    !
-   ! Method: using the background information 
+   ! METHOD: using the background information 
    !      1. get the background landmask/snow/sea-ice
    !      2. calculate percentage of sea/ice/land/snow
    !      3. determine surface type at obs location
@@ -45,25 +45,25 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
 
    ! 1.0 determine surface type of xb at 4 location around obs
    !-------------------------------------------------------
-   if (nint(landsea(i  ,j )) == 0) xbflag(1) = 0 ! sea
-   if (nint(landsea(i+1,j )) == 0) xbflag(2) = 0 ! sea
-   if (nint(landsea(i  ,j+1)) == 0) xbflag(3) = 0 ! sea
-   if (nint(landsea(i+1,j+1)) == 0) xbflag(4) = 0 ! sea
+   if ( nint(landsea(i  ,j  )) == 0 ) xbflag(1) = 0 ! sea
+   if ( nint(landsea(i+1,j  )) == 0 ) xbflag(2) = 0 ! sea
+   if ( nint(landsea(i  ,j+1)) == 0 ) xbflag(3) = 0 ! sea
+   if ( nint(landsea(i+1,j+1)) == 0 ) xbflag(4) = 0 ! sea
 
-   if (nint(landsea(i  ,j )) == 1) xbflag(1) = 2 ! land/snow/sea-ice
-   if (nint(landsea(i+1,j )) == 1) xbflag(2) = 2 ! land/snow/sea-ice
-   if (nint(landsea(i  ,j+1)) == 1) xbflag(3) = 2 ! land/snow/sea-ice
-   if (nint(landsea(i+1,j+1)) == 1) xbflag(4) = 2 ! land/snow/sea-ice
+   if ( nint(landsea(i  ,j  )) == 1 ) xbflag(1) = 2 ! land/snow/sea-ice
+   if ( nint(landsea(i+1,j  )) == 1 ) xbflag(2) = 2 ! land/snow/sea-ice
+   if ( nint(landsea(i  ,j+1)) == 1 ) xbflag(3) = 2 ! land/snow/sea-ice
+   if ( nint(landsea(i+1,j+1)) == 1 ) xbflag(4) = 2 ! land/snow/sea-ice
 
-   if (nint(snow(i  ,j )) == 1) xbflag(1) = 3 ! snow
-   if (nint(snow(i+1,j )) == 1) xbflag(2) = 3 ! snow
-   if (nint(snow(i  ,j+1)) == 1) xbflag(3) = 3 ! snow
-   if (nint(snow(i+1,j+1)) == 1) xbflag(4) = 3 ! snow
+   if ( nint(snow(i  ,j  )) == 1 ) xbflag(1) = 3 ! snow
+   if ( nint(snow(i+1,j  )) == 1 ) xbflag(2) = 3 ! snow
+   if ( nint(snow(i  ,j+1)) == 1 ) xbflag(3) = 3 ! snow
+   if ( nint(snow(i+1,j+1)) == 1 ) xbflag(4) = 3 ! snow
 
-   if (nint(ice(i  ,j )) == 1) xbflag(1) = 1 ! sea-ice
-   if (nint(ice(i+1,j )) == 1) xbflag(2) = 1 ! sea-ice
-   if (nint(ice(i  ,j+1)) == 1) xbflag(3) = 1 ! sea-ice
-   if (nint(ice(i+1,j+1)) == 1) xbflag(4) = 1 ! sea-ice 
+   if ( nint(ice(i  ,j  )) == 1 ) xbflag(1) = 1 ! sea-ice
+   if ( nint(ice(i+1,j  )) == 1 ) xbflag(2) = 1 ! sea-ice
+   if ( nint(ice(i  ,j+1)) == 1 ) xbflag(3) = 1 ! sea-ice
+   if ( nint(ice(i+1,j+1)) == 1 ) xbflag(4) = 1 ! sea-ice 
 
    ! 2.0 determine surface type percentage at obs location
    !------------------------------------------------------
@@ -96,7 +96,7 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
       if (xbflag(n) == 3) snop = snop+w(n)
    end do
 
-   ! fo2d   = dym*(dxm*fm2d(i,j ) + dx*fm2d(i+1,j )) &
+   ! fo2d   = dym*(dxm*fm2d(i,j  ) + dx*fm2d(i+1,j  )) &
    !         + dy *(dxm*fm2d(i,j+1) + dx*fm2d(i+1,j+1))
 
    ! 3.0 determine final surface flag at obs location
@@ -105,10 +105,10 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    if (icep >= 0.99) isflg = 1
    if (lndp >= 0.99) isflg = 2
    if (snop >= 0.99) isflg = 3
-   if (.not. (seap >= 0.99) .and. &
+   if ( .not. (seap >= 0.99) .and. &
         .not. (icep >= 0.99) .and. &
         .not. (lndp >= 0.99) .and. &
-        .not. (snop >= 0.99)) then
+        .not. (snop >= 0.99) ) then
       if (seap > lndp) then
          if (seap > icep) then
             if (seap > snop) then
@@ -161,5 +161,4 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    return
 
 end subroutine da_detsurtyp
-
 

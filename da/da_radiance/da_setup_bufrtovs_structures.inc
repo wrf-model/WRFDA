@@ -1,4 +1,4 @@
-subroutine da_setup_bufrtovs_structures(xp, ob, iv)
+subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of tovs raidance observation structure.
@@ -7,7 +7,7 @@ subroutine da_setup_bufrtovs_structures(xp, ob, iv)
    implicit none
 
    type (xpose_type), intent(in)   :: xp         ! Domain decomposition vars.
-   type (y_type), intent(inout)   :: ob         ! Observation structure.
+   type ( y_type), intent(inout)   :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
    character(len=200)           :: filename
@@ -122,5 +122,4 @@ subroutine da_setup_bufrtovs_structures(xp, ob, iv)
    if (trace_use) call da_trace_exit("da_setup_bufrtovs_structures")
 
 end subroutine da_setup_bufrtovs_structures
-
 

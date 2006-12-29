@@ -302,8 +302,8 @@ else
   echo "Will configure for use without NetCDF"
 fi
 
-if [ -n "$MPICH" ] ; then
-  echo "Will use MPICH in dir: $MPICH"
+if [ -n "$MPIHOME" ] ; then
+  echo "Will use MPI in dir: $MPIHOME"
 fi
 
 if [ -n "$PHDF5" ] ; then

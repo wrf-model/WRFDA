@@ -40,8 +40,8 @@ fi
 if test -d ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}; then
    export CRTM=${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}; then
-   export MPICH=${EXT_DIR}/mpich/mpich-1.2.7p1_${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}; then
+   export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}
 fi
 if test -d ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}; then
    export BLAS=${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}
@@ -63,26 +63,26 @@ fi
 
 # mpich2
 
-#if test -d ${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}; then
-#   export MPICH=${EXT_DIR}/mpich/mpich2-1.0.3_${FC}_${PROCESSOR}
+#if test -d ${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}; then
+#   export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.3_${FC}_${PROCESSOR}
 #fi
 
 if test -d /usr/lpp/ppe.poe; then
-   export MPICH=/usr/lpp/ppe.poe
+   export MPIHOME=/usr/lpp/ppe.poe
 fi
 
 # Lightning
 
 if test $MACHINE = "ln0126en" -o $MACHINE = "ln0127en"; then 
    if test $FC = pathscale; then
-      export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
+      export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
    if test $FC = pgi; then
-      export MPICH=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+      export MPIHOME=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
    fi
    if test $FC = ifort; then
       . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh
-      export MPICH=/contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
+      export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    fi
 fi
 
@@ -96,15 +96,14 @@ if test $MACHINE = "gold.us.cray.com"; then
       export NETCDF=/ptmp/pjj/netcdf-3.5.1-x1
       export RTTOV=~n12138/rttov/rttov85_crayx1
       export CRTM=~n12138/crtm/crtm_crayx1
-      export MPICH=/opt/cpkg/v4/mpich2/1.0
+      export MPIHOME=/opt/cpkg/v4/mpich2/1.0
       export WRF_OS=crayx1
    fi
 fi
 
-export MPIHOME=$MPICH
 export LINUX_MPIHOME=$MPIHOME
-export PATH=$MPICH/bin:$MAKEDEPF90:$PATH
-export MANPATH=$MPICH/man:$MANPATH
+export PATH=$MPIHOME/bin:$MAKEDEPF90:$PATH
+export MANPATH=$MPIHOME/man:$MANPATH
 
 if test $FC = 'g95'; then
    export G95_ENDIAN=BIG
@@ -120,7 +119,7 @@ if test $FC = 'g95'; then
    export G95_MEM_SEGMENTS=0
 fi
 
-#ls -l $MPICH/lib/*.a
+#ls -l $MPIHOME/lib/*.a
 #ls -l $RTTOV/lib/*.a
 #ls -l $CRTM/lib/*.a
 #ls -l $NETCDF/lib/*.a
@@ -130,7 +129,7 @@ fi
 #ls -l $BUFR/*.a
 #ls -l $MAKEDEPF90/makedepf90
 #echo
-echo "MPICH       " $MPICH
+echo "MPIHOME     " $MPIHOME
 echo "RTTOV       " $RTTOV
 echo "CRTM        " $CRTM
 echo "NETCDF      " $NETCDF

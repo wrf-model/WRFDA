@@ -3,7 +3,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    !---------------------------------------------------------------------------
    ! Purpose: read in kma 1dvar innovation output to innovation and obs structure
    !
-   ! Method: use F90 sequantial data structure to avoid read file twice  
+   ! METHOD: use F90 sequantial data structure to avoid read file twice  
    !          so that da_scan_bufrtovs is not necessary any more.
    !          1. read radiance data in sequential data structure
    !          2. assign sequential data structure to innovation structure
@@ -12,14 +12,17 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
    implicit none
 
+   ! subroutine argument
    integer           ,  intent (in)    :: inst
    character(20)     ,  intent (in)    :: infile
    type (xpose_type) ,  intent (in)    :: xp
    type (y_type)     ,  intent (inout) :: ob
    type (ob_type)    ,  intent (inout) :: iv
 
+   ! local variables
    integer          :: iost, n, i, j,inunit
 
+   ! Declare local variables
    logical outside,inside_halo
    character(20)  :: instrument
 
@@ -50,16 +53,16 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
    nchanl = iv%instid(inst)%nchan
 
-   allocate (kchan(nchanl))
-   allocate (otb(nchanl))
-   allocate (oerr(nchanl))
-   allocate (inov(nchanl))
-   allocate (emiss(nchanl))
+   allocate ( kchan(nchanl) )
+   allocate ( otb(nchanl) )
+   allocate ( oerr(nchanl) )
+   allocate ( inov(nchanl) )
+   allocate ( emiss(nchanl) )
 
-   allocate (tb(nchanl))
-   allocate (inv(nchanl))
-   allocate (err(nchanl))
-   allocate (qc(nchanl))
+   allocate ( tb(nchanl) )
+   allocate ( inv(nchanl) )
+   allocate ( err(nchanl) )
+   allocate ( qc(nchanl) )
 
    ! 0.0  Open unit for kma 1dvar file and read file header
    !--------------------------------------------------------------
@@ -77,8 +80,8 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
    ! Loop to read pixel and assign information to a sequential structure
    !-------------------------------------------------------------------------
 
-   allocate (head)
-   nullify  (head % next)
+   allocate ( head )
+   nullify  ( head % next )
    p => head
    size = 0
 
@@ -99,7 +102,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
 
       info%lat  =  rlat
       info%lon  =  rlon
-      call da_ll_to_xy (info, loc, xp, outside, inside_halo)
+      call da_ll_to_xy (info, loc, xp, outside, inside_halo )
       if (outside) cycle
 
       info%elv = srf_height
@@ -138,8 +141,8 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       p%sensor_index         = inst
 
       size = size + 1
-      allocate (p%next, stat=error)   ! add next data
-      if (error /= 0) then
+      allocate ( p%next, stat=error)   ! add next data
+      if (error /= 0 ) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot allocate radiance structure"/))
       end if

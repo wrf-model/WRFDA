@@ -1,6 +1,6 @@
 #ifdef RTTOV
-subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
-                      con_vars_tl, aux_vars_tl, tb)
+subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
+                      con_vars_tl, aux_vars_tl, tb )
 
    !---------------------------------------------------------------------------
    !  Purpose: interface to the tangent linear subroutine of RTTOV8_5
@@ -17,6 +17,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
    type (aux_vars_type),  intent (in) :: aux_vars_tl (nprofiles)
    real                , intent (out) :: tb(nchanl,nprofiles)
 
+   ! local variables
    integer             :: n, nc, ios
 
    ! RTTOV input parameters
@@ -121,7 +122,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
 
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
-                     nfrequencies, nchannels, nbtout)       ! out
+                     nfrequencies, nchannels, nbtout )       ! out
 #endif
 
 
@@ -186,7 +187,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
-                emissivity )                                ! out                       
+                emissivity  )                                ! out                       
 #endif
 
    nc = nchannels/nprofiles
@@ -197,7 +198,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
       emissivity_tl (1:nchannels) = 0.
    else if (coef%id_sensor == 2)  then   ! microwave sensor
       do n = 1, nprofiles
-         if (profiles(n) % skin % surftype == 1) then  ! sea  
+         if ( profiles(n) % skin % surftype == 1) then  ! sea  
             calcemis ((n-1)*nc+1:n*nc) = .true.
             emissivity ((n-1)*nc+1:n*nc) = 0.
             emissivity_tl ((n-1)*nc+1:n*nc) = 0.
@@ -210,7 +211,7 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
    end if
 
 #ifdef RTTOV
-   call rttov_tl(& 
+   call rttov_tl( & 
       & errorstatus,   &! out
       & nfrequencies,  &! in
       & nchannels,     &! in
@@ -229,10 +230,10 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
       & transmission,    &! inout
       & transmission_tl, &! inout
       & radiance,    &! inout
-      & radiance_tl) ! inout
+      & radiance_tl ) ! inout
 #endif
 
-   if (any(errorstatus(:) /= 0)) then
+   if ( any(errorstatus(:) /= 0 )) then
        write (message(1),*)  'rttov_direct error code = ', errorstatus(:)
        write (message(2),*)  'nfrequencies            = ', nfrequencies
        write (message(3),*)  'nchannels               = ', nchannels
@@ -269,13 +270,13 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
       tb(1:nc,n) = radiance_tl % out_clear((n-1)*nc+1:n*nc)
    end do
 
-   deallocate (lprofiles)
-   deallocate (channels)
-   deallocate (polarisations)
-   deallocate (emissivity)
-   deallocate (emissivity_tl)
-   deallocate (calcemis)
-   deallocate (surfem)
+   deallocate ( lprofiles )
+   deallocate ( channels )
+   deallocate ( polarisations )
+   deallocate ( emissivity )
+   deallocate ( emissivity_tl )
+   deallocate ( calcemis )
+   deallocate ( surfem )
    do n = 1, nprofiles 
       deallocate (profiles(n)%p)
       deallocate (profiles(n)%t)
@@ -293,45 +294,45 @@ subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
    end do
 
    ! deallocate transmittance structure
-   deallocate (transmission % tau_surf)
-   deallocate (transmission % tau_layer)
-   deallocate (transmission % od_singlelayer)
+   Deallocate (transmission % tau_surf)
+   Deallocate (transmission % tau_layer)
+   Deallocate (transmission % od_singlelayer)
 
    ! deallocate transmittance structure
-   deallocate (transmission_tl % tau_surf)
-   deallocate (transmission_tl % tau_layer)
-   deallocate (transmission_tl % od_singlelayer)
+   Deallocate (transmission_tl % tau_surf)
+   Deallocate (transmission_tl % tau_layer)
+   Deallocate (transmission_tl % od_singlelayer)
 
    ! deallocate radiance results arrays with number of channels
-   deallocate (radiance % clear)
-   deallocate (radiance % cloudy)
-   deallocate (radiance % total)
-   deallocate (radiance % bt)
-   deallocate (radiance % bt_clear)
-   deallocate (radiance % upclear)
-   deallocate (radiance % dnclear)
-   deallocate (radiance % reflclear)
-   deallocate (radiance % overcast)
-   deallocate (radiance % downcld)
-   deallocate (radiance % out)
-   deallocate (radiance % out_clear)
-   deallocate (radiance % total_out)
-   deallocate (radiance % clear_out)
+   Deallocate (radiance % clear)
+   Deallocate (radiance % cloudy)
+   Deallocate (radiance % total)
+   Deallocate (radiance % bt)
+   Deallocate (radiance % bt_clear)
+   Deallocate (radiance % upclear)
+   Deallocate (radiance % dnclear)
+   Deallocate (radiance % reflclear)
+   Deallocate (radiance % overcast)
+   Deallocate (radiance % downcld)
+   Deallocate (radiance % out)
+   Deallocate (radiance % out_clear)
+   Deallocate (radiance % total_out)
+   Deallocate (radiance % clear_out)
 
-   deallocate (radiance_tl % clear)
-   deallocate (radiance_tl % cloudy)
-   deallocate (radiance_tl % total)
-   deallocate (radiance_tl % bt)
-   deallocate (radiance_tl % bt_clear)
-   deallocate (radiance_tl % upclear)
-   deallocate (radiance_tl % dnclear)
-   deallocate (radiance_tl % reflclear)
-   deallocate (radiance_tl % overcast)
-   deallocate (radiance_tl % downcld)
-   deallocate (radiance_tl % out)
-   deallocate (radiance_tl % out_clear)
-   deallocate (radiance_tl % total_out)
-   deallocate (radiance_tl % clear_out)
+   Deallocate (radiance_tl % clear)
+   Deallocate (radiance_tl % cloudy)
+   Deallocate (radiance_tl % total)
+   Deallocate (radiance_tl % bt)
+   Deallocate (radiance_tl % bt_clear)
+   Deallocate (radiance_tl % upclear)
+   Deallocate (radiance_tl % dnclear)
+   Deallocate (radiance_tl % reflclear)
+   Deallocate (radiance_tl % overcast)
+   Deallocate (radiance_tl % downcld)
+   Deallocate (radiance_tl % out)
+   Deallocate (radiance_tl % out_clear)
+   Deallocate (radiance_tl % total_out)
+   Deallocate (radiance_tl % clear_out)
 
    call da_trace_exit("da_rttov_tl")
 
