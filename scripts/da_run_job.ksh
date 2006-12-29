@@ -26,7 +26,7 @@ export LL_NODE_USAGE=${LL_NODE_USAGE:-not_shared}
 export LL_PTILE=${LL_PTILE:-8}
 export LL_CLASS=${LL_CLASS:-com_rg8}
 export QUEUE=${QUEUE:-regular}
-export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
+export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-YES}
 export HOSTS=${HOSTS:-$PWD/hosts}
 
 mkdir -p $RUN_DIR

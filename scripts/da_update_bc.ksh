@@ -55,13 +55,13 @@ echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
 cp $BDYIN wrfbdy_d$DOMAIN
 ln -sf $DA_ANALYSIS wrfvar_output
-ln -sf $DA_FIRST_GUESS wrfvar_input
+ln -sf $DA_FIRST_GUESS wrf_input
 
 cat > parame.in << EOF
 &control_param
- wrf_3dvar_output_file = 'wrfvar_output'
- wrf_bdy_file          = 'wrfbdy_d${DOMAIN}'
- wrf_input_from_si     = 'wrfvar_input'
+ wrfvar_output_file = 'wrfvar_output'
+ wrf_bdy_file       = 'wrfbdy_d${DOMAIN}'
+ wrf_input          = 'wrf_input'
 
  cycling = .${CYCLING}.
  debug   = .true.

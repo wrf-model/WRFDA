@@ -49,11 +49,11 @@ subroutine da_get_var_2d_int_cdf(file, var, data, i1, i2, time, debug)
        (i2 /= idims(2)) .or.  &
        (time > idims(3))    )  then
 
-      write(6,*) ' error in 2d_var_real read, dimension problem '
-      write(6,*) i1, idims(1)
-      write(6,*) i2, idims(2)
-      write(6,*) time, idims(4)
-      write(6,*) ' error stop '
+      write(unit=stdout,fmt=*) ' error in 2d_var_real read, dimension problem '
+      write(unit=stdout,fmt=*) i1, idims(1)
+      write(unit=stdout,fmt=*) i2, idims(2)
+      write(unit=stdout,fmt=*) time, idims(4)
+      write(unit=stdout,fmt=*) ' error stop '
       stop
 
    end if

@@ -22,9 +22,9 @@ subroutine da_get_dims_cdf(file, var, dims, ndims, debug)
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode == 0) then
-      if (debug) write(6,*) ' open netcdf file ', trim(file)
+      if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-      write(6,*) ' error openiing netcdf file ', trim(file)
+      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
       stop
    end if
 
@@ -32,11 +32,11 @@ subroutine da_get_dims_cdf(file, var, dims, ndims, debug)
 
    rcode = nf_inq_var(cdfid, id_time, varnam, ivtype, ndims, dimids, natts)
    if (debug) then
-      write(6,*) ' number of dims for ',var,' ',ndims
+      write(unit=stdout,fmt=*) ' number of dims for ',var,' ',ndims
    end if
    do i=1,ndims
       rcode = nf_inq_dimlen(cdfid, dimids(i), dims(i))
-      if (debug) write(6,*) ' dimension ',i,dims(i)
+      if (debug) write(unit=stdout,fmt=*) ' dimension ',i,dims(i)
    end do
 
    call ncclos(cdfid,rcode)

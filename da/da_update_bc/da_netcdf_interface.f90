@@ -1,5 +1,8 @@
 module da_netcdf_interface
 
+integer, parameter :: stderr = 0
+integer, parameter :: stdout = 6
+
 contains
 
 #include "da_get_times_cdf.inc"

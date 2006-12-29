@@ -20,9 +20,9 @@ subroutine da_get_att_cdf(file, var, debug)
    status = NF_inQ_VARID(cdfid, var, varid)
 
    if (status == 0) then
-      if (debug) write(6,*) ' open netcdf file ', trim(file)
+      if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-      write(6,*) ' error openiing netcdf file ', trim(file)
+      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
       stop
    end if
 

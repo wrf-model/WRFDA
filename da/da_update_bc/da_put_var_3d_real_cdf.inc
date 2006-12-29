@@ -38,7 +38,7 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
 
    do i=1,ndims
       rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
-      if (debug) write(6,*) ' dimension ',i,idims(i)
+      if (debug) write(unit=stdout,fmt=*) ' dimension ',i,idims(i)
    end do
 
    ! check the dimensions
@@ -48,12 +48,12 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
        (i3 /= idims(3)) .or.  &
        (time > idims(4))    )  then
 
-      write(6,*) ' error in 3d_var_real read, dimension problem '
-      write(6,*) i1, idims(1)
-      write(6,*) i2, idims(2)
-      write(6,*) i3, idims(3)
-      write(6,*) time, idims(4)
-      write(6,*) ' error stop '
+      write(unit=stdout,fmt=*) ' error in 3d_var_real read, dimension problem '
+      write(unit=stdout,fmt=*) i1, idims(1)
+      write(unit=stdout,fmt=*) i2, idims(2)
+      write(unit=stdout,fmt=*) i3, idims(3)
+      write(unit=stdout,fmt=*) time, idims(4)
+      write(unit=stdout,fmt=*) ' error stop '
       stop
    end if
 

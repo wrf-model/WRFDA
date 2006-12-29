@@ -19,9 +19,9 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode == 0) then
-     if (debug) write(6,*) ' open netcdf file ', trim(file)
+     if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-     write(6,*) ' error openiing netcdf file ', trim(file)
+     write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
      stop
    end if
 
@@ -48,7 +48,7 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
 
    call ncclos(cdfid,rcode)
 
-   if (debug) write(6,*) ' global attribute ',att_name,' is ',value
+   if (debug) write(unit=stdout,fmt=*) ' global attribute ',att_name,' is ',value
 
 end subroutine da_get_gl_att_real_cdf
 

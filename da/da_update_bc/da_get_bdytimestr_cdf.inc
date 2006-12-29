@@ -19,9 +19,9 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode == 0) then
-      if (debug) write(6,*) ' open netcdf file ', trim(file)
+      if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-      write(6,*) ' error openiing netcdf file ', trim(file)
+      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
       stop
    end if
 
@@ -32,12 +32,12 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
    rcode = nf_inq_var(cdfid, id_time, varnam, ivtype, ndims, dimids, natts)
 
    if (debug) then
-     write(6,*) ' number of dims for bdytime ',ndims
+     write(unit=stdout,fmt=*) ' number of dims for bdytime ',ndims
    end if
 
    do i=1,ndims
       rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
-      if (debug) write(6,*) ' dimension ',i,idims(i)
+      if (debug) write(unit=stdout,fmt=*) ' dimension ',i,idims(i)
    end do
 
    ! get the bdytime
@@ -53,7 +53,7 @@ subroutine da_get_bdytimestr_cdf(file, time_flag, bdytimestr, max_times, debug)
                                  bdytimestr(i))
       time1 = bdytimestr(i)
 
-      if (debug) write(6,*) trim(file), time1(1:19)
+      if (debug) write(unit=stdout,fmt=*) trim(file), time1(1:19)
       bdytimestr(i) = time1(1:19)
    end do
 

@@ -24,9 +24,9 @@ subroutine da_put_var_2d_real_cdf(file, var, data, &
    cdfid = ncopn(file, NCWRITE, rcode)
 
    if (rcode == 0) then
-      if (debug) write(6,*) ' open netcdf file ', trim(file)
+      if (debug) write(unit=stdout,fmt=*) ' open netcdf file ', trim(file)
    else
-      write(6,*) ' error openiing netcdf file ', trim(file)
+      write(unit=stdout,fmt=*) ' error openiing netcdf file ', trim(file)
       stop
    end if
 
@@ -34,11 +34,11 @@ subroutine da_put_var_2d_real_cdf(file, var, data, &
 
    rcode = nf_inq_var(cdfid, id_data, varnam, ivtype, ndims, dimids, natts)
    if (debug) then
-      write(6,*) ' number of dims for ',var,' ',ndims
+      write(unit=stdout,fmt=*) ' number of dims for ',var,' ',ndims
    end if
    do i=1,ndims
       rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
-      if (debug) write(6,*) ' dimension ',i,idims(i)
+      if (debug) write(unit=stdout,fmt=*) ' dimension ',i,idims(i)
    end do
 
    ! check the dimensions
@@ -47,11 +47,11 @@ subroutine da_put_var_2d_real_cdf(file, var, data, &
       (i2 /= idims(2)) .or.  &
       (time > idims(3))    )  then
 
-      write(6,*) ' error in 3d_var_real read, dimension problem '
-      write(6,*) i1, idims(1)
-      write(6,*) i2, idims(2)
-      write(6,*) time, idims(3)
-      write(6,*) ' error stop '
+      write(unit=stdout,fmt=*) ' error in 3d_var_real read, dimension problem '
+      write(unit=stdout,fmt=*) i1, idims(1)
+      write(unit=stdout,fmt=*) i2, idims(2)
+      write(unit=stdout,fmt=*) time, idims(3)
+      write(unit=stdout,fmt=*) ' error stop '
       stop
    end if
 

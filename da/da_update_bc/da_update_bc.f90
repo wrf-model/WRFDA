@@ -13,9 +13,9 @@ program da_update_bc
    integer, parameter :: max_3d_variables = 20, &
                          max_2d_variables = 20
  
-   character(len=512) :: wrf_3dvar_output_file, &
+   character(len=512) :: wrfvar_output_file, &
                          wrf_bdy_file, &
-                         wrf_input_from_si
+                         wrf_input
  
    character(len=20) :: var_pref, var_name, vbt_name
 
@@ -38,7 +38,7 @@ program da_update_bc
    real, allocatable, dimension(:,  :) :: mu, mub, msfu, msfv, msfm, &
                                           tend2d, scnd2d, frst2d, full2d
 
-   real, allocatable, dimension(:,  :) :: tsk, tsk_3dvar
+   real, allocatable, dimension(:,  :) :: tsk, tsk_wrfvar
 
    integer, allocatable, dimension(:,:) :: ivgtyp
 
@@ -55,14 +55,14 @@ program da_update_bc
                          ori_unit = 11, &
                          new_unit = 12
 
-   namelist /control_param/ wrf_3dvar_output_file, &
+   namelist /control_param/ wrfvar_output_file, &
                             wrf_bdy_file, &
-                            wrf_input_from_si, &
+                            wrf_input, &
                             cycling, debug, low_bdy_only
 
-   wrf_3dvar_output_file = 'wrf_3dvar_output'
-   wrf_bdy_file          = 'wrfbdy_d01'
-   wrf_input_from_si     = 'wrfnput_d01'
+   wrfvar_output_file = 'wrfvar_output'
+   wrf_bdy_file       = 'wrfbdy_d01'
+   wrf_input          = 'wrfinput_d01'
 
    cycling = .false.
    debug   = .false. 
@@ -89,9 +89,9 @@ program da_update_bc
       end if
 
       WRITE(unit=*, fmt='(2a)') &
-           'wrf_3dvar_output_file = ', trim(wrf_3dvar_output_file), &
+           'wrfvar_output_file = ', trim(wrfvar_output_file), &
            'wrf_bdy_file          = ', trim(wrf_bdy_file), &
-           'wrf_input_from_si     = ', trim(wrf_input_from_si)
+           'wrf_input     = ', trim(wrf_input)
 
       WRITE(unit=*, fmt='(a, L10)') &
            'cycling = ', cycling
@@ -165,7 +165,7 @@ program da_update_bc
    ! Get mu, mub, msfu, and msfv
 
    do n=1,num2d
-      call da_get_dims_cdf( wrf_3dvar_output_file, trim(var2d(n)), dims, &
+      call da_get_dims_cdf( wrfvar_output_file, trim(var2d(n)), dims, &
          ndims, debug)
 
       select case(trim(var2d(n)))
@@ -174,7 +174,7 @@ program da_update_bc
 
          allocate(mu(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, &
             trim(var2d(n)), mu, dims(1), dims(2), 1, debug)
 
          east_end=dims(1)+1
@@ -184,65 +184,65 @@ program da_update_bc
 
          allocate(mub(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), mub, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), mub, &
                                    dims(1), dims(2), 1, debug)
       case ('MAPFAC_U') ;
          if (low_bdy_only) cycle
 
          allocate(msfu(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), msfu, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), msfu, &
                                    dims(1), dims(2), 1, debug)
       case ('MAPFAC_V') ;
          if (low_bdy_only) cycle
 
          allocate(msfv(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), msfv, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), msfv, &
                                    dims(1), dims(2), 1, debug)
       case ('MAPFAC_M') ;
          if (low_bdy_only) cycle
 
          allocate(msfm(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), msfm, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), msfm, &
                                    dims(1), dims(2), 1, debug)
       case ('TSK') ;
          if (.not. cycling) cycle
 
          allocate(tsk(dims(1), dims(2)))
-         allocate(tsk_3dvar(dims(1), dims(2)))
+         allocate(tsk_wrfvar(dims(1), dims(2)))
          allocate(ivgtyp(dims(1), dims(2)))
 
-         call da_get_var_2d_real_cdf( wrf_input_from_si, trim(var2d(n)), tsk, &
+         call da_get_var_2d_real_cdf( wrf_input, trim(var2d(n)), tsk, &
                                    dims(1), dims(2), 1, debug)
-         call da_get_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), tsk_3dvar, &
+         call da_get_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), tsk_wrfvar, &
                                    dims(1), dims(2), 1, debug)
-         call da_get_var_2d_int_cdf( wrf_3dvar_output_file, 'IVGTYP', ivgtyp, &
+         call da_get_var_2d_int_cdf( wrfvar_output_file, 'IVGTYP', ivgtyp, &
                                    dims(1), dims(2), 1, debug)
 
          ! update TSK.
          do j=1,dims(2)
          do i=1,dims(1)
                if (ivgtyp(i,j) /= 16) &
-                  tsk(i,j)=tsk_3dvar(i,j)
+                  tsk(i,j)=tsk_wrfvar(i,j)
             end do
             end do
 
-            call da_put_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), tsk, &
+            call da_put_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), tsk, &
                                       dims(1), dims(2), 1, debug)
             deallocate(tsk)
             deallocate(ivgtyp)
-            deallocate(tsk_3dvar)
+            deallocate(tsk_wrfvar)
          case ('TMN', 'SST', 'VEGFRA', 'ALBBCK') ;
             if (.not. cycling) cycle
 
             allocate(full2d(dims(1), dims(2)))
 
-            call da_get_var_2d_real_cdf( wrf_input_from_si, trim(var2d(n)), full2d, &
+            call da_get_var_2d_real_cdf( wrf_input, trim(var2d(n)), full2d, &
                                       dims(1), dims(2), 1, debug)
 
-            call da_put_var_2d_real_cdf( wrf_3dvar_output_file, trim(var2d(n)), full2d, &
+            call da_put_var_2d_real_cdf( wrfvar_output_file, trim(var2d(n)), full2d, &
                                       dims(1), dims(2), 1, debug)
             deallocate(full2d)
          case default ;
@@ -384,9 +384,9 @@ program da_update_bc
    ! For 3D variables
 
    ! Get U
-   call da_get_dims_cdf( wrf_3dvar_output_file, 'U', dims, ndims, debug)
+   call da_get_dims_cdf( wrfvar_output_file, 'U', dims, ndims, debug)
 
-   ! call da_get_att_cdf( wrf_3dvar_output_file, 'U', debug)
+   ! call da_get_att_cdf( wrfvar_output_file, 'U', debug)
 
    allocate(u(dims(1), dims(2), dims(3)))
 
@@ -397,7 +397,7 @@ program da_update_bc
    kds=1
    kde=dims(3)
 
-   call da_get_var_3d_real_cdf( wrf_3dvar_output_file, 'U', u, &
+   call da_get_var_3d_real_cdf( wrfvar_output_file, 'U', u, &
                              dims(1), dims(2), dims(3), 1, debug)
 
    ! do j=1,dims(2)
@@ -406,13 +406,13 @@ program da_update_bc
    ! end do
 
    ! Get V
-   call da_get_dims_cdf( wrf_3dvar_output_file, 'V', dims, ndims, debug)
+   call da_get_dims_cdf( wrfvar_output_file, 'V', dims, ndims, debug)
 
-   ! call da_get_att_cdf( wrf_3dvar_output_file, 'V', debug)
+   ! call da_get_att_cdf( wrfvar_output_file, 'V', debug)
 
    allocate(v(dims(1), dims(2), dims(3)))
 
-   call da_get_var_3d_real_cdf( wrf_3dvar_output_file, 'V', v, &
+   call da_get_var_3d_real_cdf( wrfvar_output_file, 'V', v, &
                              dims(1), dims(2), dims(3), 1, debug)
 
    ! do i=1,dims(1)
@@ -442,7 +442,7 @@ program da_update_bc
    do n=1,num3d
       write(unit=*, fmt='(a, i3, 2a)') 'Processing: var3d(', n, ')=', trim(var3d(n))
 
-      call da_get_dims_cdf( wrf_3dvar_output_file, trim(var3d(n)), dims, ndims, debug)
+      call da_get_dims_cdf( wrfvar_output_file, trim(var3d(n)), dims, ndims, debug)
 
       allocate(full3d(dims(1), dims(2), dims(3)))
 
@@ -462,7 +462,7 @@ program da_update_bc
          ! var_pref = 'R' // trim(var3d(n))
          var_pref = trim(var3d(n))
 
-         call da_get_var_3d_real_cdf( wrf_3dvar_output_file, trim(var3d(n)), &
+         call da_get_var_3d_real_cdf( wrfvar_output_file, trim(var3d(n)), &
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
@@ -487,7 +487,7 @@ program da_update_bc
       case ('T', 'PH') ;
          var_pref=trim(var3d(n))
  
-         call da_get_var_3d_real_cdf( wrf_3dvar_output_file, trim(var3d(n)), &
+         call da_get_var_3d_real_cdf( wrfvar_output_file, trim(var3d(n)), &
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
@@ -514,7 +514,7 @@ program da_update_bc
          ! var_pref=var3d(n)(1:2)
          var_pref=var3d(n)
  
-         call da_get_var_3d_real_cdf( wrf_3dvar_output_file, trim(var3d(n)), &
+         call da_get_var_3d_real_cdf( wrfvar_output_file, trim(var3d(n)), &
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
