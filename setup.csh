@@ -16,8 +16,11 @@ if (! $?PROCESSOR) then
       # Thanks Linux for either reporting nothing with -n,
       # or different values for ksh and bash, FFS
       setenv PROCESSOR `uname -m`
+      if ("$PROCESSOR" == "Power Macintosh") then
+         setenv PROCESSOR powerpc
+      endif
    endif
-endif
+endif 
 
 if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 

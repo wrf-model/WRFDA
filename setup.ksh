@@ -20,6 +20,10 @@ else
    # or different values for ksh and bash, FFS
    export PROCESSOR=${PROCESSOR:-`uname -m`}
 fi
+echo PROCESSOR $PROCESSOR
+if test "$PROCESSOR" == "Power Macintosh"; then
+   export PROCESSOR=powerpc
+fi
 
 export EXT_DIR=${EXT_DIR:-~wrfhelp/external}
 
