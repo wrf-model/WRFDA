@@ -2,7 +2,23 @@ MACHINE=`uname -n`
 FC=${1:-g95}
 CC=${2:-gcc}
 
-PROCESSOR=`uname -p`
+# Bloody Unix people can't even report processor class properly
+# across different machines or between ksh/bash on Linux
+# They all need their heads banged together
+# This kludge should give powerpc/i686
+
+if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en" \
+     -o $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
+     -o $HOSTNAME = "bv1103en.ucar.edu" \
+     -o $HOSTNAME = "bv1203en.ucar.edu" ; then
+   # Thanks Aix for reporting a hex string with -m, when
+   # all I wanted was powerpc
+   export PROCESSOR=${PROCESSOR:-`uname -p`}
+else
+   # Thanks Linux for either reporting nothing with -n,
+   # or different values for ksh and bash, FFS
+   export PROCESSOR=${PROCESSOR:-`uname -m`}
+fi
 
 export EXT_DIR=${EXT_DIR:-~wrfhelp/external}
 

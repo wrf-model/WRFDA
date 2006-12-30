@@ -1,5 +1,23 @@
 setenv MACHINE `uname -n`
-setenv PROCESSOR `uname -p`
+
+if (! $?PROCESSOR) then
+   # Bloody Unix people can't even report processor class properly
+   # across different machines or between ksh/bash on Linux
+   # They all need their heads banged together
+   # This kludge should give powerpc/i686
+   if ( $HOSTNAME == "bs1101en" || $HOSATNAME == "bs1201en" \
+        || $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" \
+        || $HOSTNAME == "bv1103en.ucar.edu" \
+        || $HOSTNAME == "bv1203en.ucar.edu" )
+      # Thanks Aix for reporting a hex string with -m, when
+      # all I wanted was powerpc
+      setenv PROCESSOR 'uname -p`
+   else
+      # Thanks Linux for either reporting nothing with -n,
+      # or different values for ksh and bash, FFS
+      setenv PROCESSOR `uname -m`
+   endif
+endif
 
 if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
