@@ -1,4 +1,5 @@
-MACHINE=`uname -n`
+HOSTNAME=`uname -n`
+
 FC=${1:-g95}
 CC=${2:-gcc}
 
@@ -89,7 +90,7 @@ fi
 
 # Lightning
 
-if test $MACHINE = "ln0126en" -o $MACHINE = "ln0127en"; then 
+if test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en"; then 
    if test $FC = pathscale; then
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
@@ -104,7 +105,7 @@ fi
 
 # Crayx1
 
-if test $MACHINE = "gold.us.cray.com"; then 
+if test $HOSTNAME = "gold.us.cray.com"; then 
    if test $FC = crayx1; then
       module use /opt/ctl/modulefiles /opt/PE/modulefiles
       module load PrgEnv.56.newest

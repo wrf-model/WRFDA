@@ -1,17 +1,17 @@
-setenv MACHINE `uname -n`
+setenv HOSTNAME `uname -n`
 
 if (! $?PROCESSOR) then
    # Bloody Unix people can't even report processor class properly
    # across different machines or between ksh/bash on Linux
    # They all need their heads banged together
    # This kludge should give powerpc/i686
-   if ( $HOSTNAME == "bs1101en" || $HOSATNAME == "bs1201en" \
+   if ( $HOSTNAME == "bs1101en" || $HOSTNAME == "bs1201en" \
         || $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" \
         || $HOSTNAME == "bv1103en.ucar.edu" \
-        || $HOSTNAME == "bv1203en.ucar.edu" )
+        || $HOSTNAME == "bv1203en.ucar.edu" ) then
       # Thanks Aix for reporting a hex string with -m, when
       # all I wanted was powerpc
-      setenv PROCESSOR 'uname -p`
+      setenv PROCESSOR `uname -p`
    else
       # Thanks Linux for either reporting nothing with -n,
       # or different values for ksh and bash, FFS
@@ -117,7 +117,7 @@ endif
 
 # Lightning
 
-if ( $MACHINE == "ln0126en" || $MACHINE == "ln0127en" ) then 
+if ( $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" ) then 
    if ( $FC == "pathscale" ) then
       setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
@@ -132,7 +132,7 @@ endif
 
 # Crayx1
 
-if ( $MACHINE == "gold.us.cray.com" ) then
+if ( $HOSTNAME == "gold.us.cray.com" ) then
    if ( $FC == "crayx1" ) then
       module use /opt/ctl/modulefiles /opt/PE/modulefiles
       module load PrgEnv.56.newest
