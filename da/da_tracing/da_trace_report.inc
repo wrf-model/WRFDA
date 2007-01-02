@@ -97,10 +97,10 @@ subroutine da_trace_report
 
 #ifdef DM_PARALLEL
    do i=0,num_procs-1
-      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTime(i,:))
-      call da_proc_sum_real(MaxNoRoutines,MasterCPUTime(i,:))
-      call da_proc_sum_real(MaxNoRoutines,MasterElapsedTimeLocal(i,:))
-      call da_proc_sum_real(MaxNoRoutines,MasterCPUTimeLocal(i,:))
+      call da_proc_sum_real(MasterElapsedTime(i,:))
+      call da_proc_sum_real(MasterCPUTime(i,:))
+      call da_proc_sum_real(MasterElapsedTimeLocal(i,:))
+      call da_proc_sum_real(MasterCPUTimeLocal(i,:))
       call da_proc_sum_ints(MasterNoCalls(i,:))
       call da_proc_sum_ints(MasterMaxHeap(i,:))
    end do
@@ -394,10 +394,8 @@ subroutine da_trace_report
    if (trace_memory) then
 
 #ifdef DM_PARALLEL
-      do i=0,num_procs-1
-         do j=1,MaxNoRoutines
-            call da_proc_sum_int(MasterMaxHeap(i,j))
-         end do
+      do j=1,MaxNoRoutines
+         call da_proc_sum_ints(MasterMaxHeap(:,j))
       end do
 #endif
 

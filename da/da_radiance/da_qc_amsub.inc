@@ -1,4 +1,4 @@
-subroutine da_qc_amsub ( i, nchan, ob, iv )
+subroutine da_qc_amsub (i, nchan, ob, iv)
 
    !---------------------------------------------------------------------------
    ! Purpose: perform quality control for amsub data.
@@ -74,7 +74,7 @@ subroutine da_qc_amsub ( i, nchan, ob, iv )
 
          !  d. check cloud/precipitation 
          !-----------------------------------------------------------
-         if ( ob%instid(i)%tb(1,n) > 0.0 .and. &
+         if (ob%instid(i)%tb(1,n) > 0.0 .and. &
               ob%instid(i)%tb(2,n) > 0.0) then
             si = ob%instid(i)%tb(1,n) - ob%instid(i)%tb(2,n)
             if (si >= 3.0) then
@@ -95,7 +95,7 @@ subroutine da_qc_amsub ( i, nchan, ob, iv )
          !  e. check surface height/pressure
          !------------------------------------------------------
          ! sfchgt = ivrad%info(n)%elv
-         ! if ( sfchgt >= ) then
+         ! if (sfchgt >=) then
          !
          ! else 
          ! end if
@@ -123,7 +123,7 @@ subroutine da_qc_amsub ( i, nchan, ob, iv )
                      nrej_omb_std(k) = nrej_omb_std(k) + 1
                end if
             else
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k) ) then
+               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k)) then
                if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k)) then
                   iv%instid(i)%tb_qc(k,n)  = qc_bad
                   if (iv%instid(i)%proc_domain(n)) &
@@ -168,13 +168,11 @@ subroutine da_qc_amsub ( i, nchan, ob, iv )
    call da_proc_sum_int (nrej_si)
    call da_proc_sum_int (nrej_clw)
    call da_proc_sum_int (nrej_topo)
-   do k = 1, nchan
-      call da_proc_sum_int (nrej_omb_abs(k))
-      call da_proc_sum_int (nrej_omb_std(k))
-      call da_proc_sum_int (nrej_omb_rms(k))
-      call da_proc_sum_int (nrej(k))
-      call da_proc_sum_int (ngood(k))
-   end do
+   call da_proc_sum_ints (nrej_omb_abs(:))
+   call da_proc_sum_ints (nrej_omb_std(:))
+   call da_proc_sum_ints (nrej_omb_rms(:))
+   call da_proc_sum_ints (nrej(:))
+   call da_proc_sum_ints (ngood(:))
 
    if (rootproc) then
       if (num_fgat_time > 1) then

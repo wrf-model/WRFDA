@@ -13,6 +13,7 @@ subroutine da_get_var_diagnostics( iv, j)
    real                         :: dum1, dum2, dum3, dum4, dum5, dum6
    integer                      :: i,k
    real                         :: jo_radiance
+   real                         :: temp(63)
 
    if (trace_use) call da_trace_entry("da_get_var_diagnostics")
 
@@ -28,67 +29,142 @@ subroutine da_get_var_diagnostics( iv, j)
                  num_buoy_tot + num_gpsref_tot + num_bogus_tot   + &
                  num_radiance_tot + num_airsr_tot
 
-   call da_sum_reals( 5, j % jo % synop_u, j % jo % synop_v, &
-                      j % jo % synop_t, j % jo % synop_p, j % jo % synop_q,&
-                                                                dum1, dum2)
-   call da_sum_reals( 5, j % jo % metar_u, j % jo % metar_v, &
-                      j % jo % metar_t, j % jo % metar_p, j % jo % metar_q,&
-                                                                dum1, dum2)
-   call da_sum_reals( 5, j % jo % ships_u, j % jo % ships_v, &
-                      j % jo % ships_t, j % jo % ships_p, j % jo % ships_q,&
-                                                                dum1, dum2)
-   call da_sum_reals( 2, j % jo % geoamv_u, j % jo % geoamv_v, dum1, dum2,   &
-                                                          dum3, dum4, dum5)
-   call da_sum_reals( 2, j % jo % polaramv_u, j % jo % polaramv_v, dum1, dum2,   &
-                                                          dum3, dum4, dum5)
-   call da_sum_reals( 1, j % jo % gpspw_tpw, dum1, dum2, dum3, dum4, dum5, &
-                                                                      dum6)
-   call da_sum_reals( 1, j % jo % gpsref_ref, dum1, dum2, dum3, dum4, dum5, &
-                                                                      dum6)
-   call da_sum_reals( 4, j % jo % sound_u, j % jo % sound_v, &
-                         j % jo % sound_t, j % jo % sound_q, dum1, dum2,   &
-                                                                      dum3)
-   call da_sum_reals( 5, j % jo % sonde_sfc_u, j % jo % sonde_sfc_v, &
-                         j % jo % sonde_sfc_t, j % jo % sonde_sfc_p, &
-                         j % jo % sonde_sfc_q, dum1, dum2)
-   call da_sum_reals( 3, j % jo % airep_u, j % jo % airep_v, &
-                      j % jo % airep_t, dum1, dum2, dum3, dum4)
-   call da_sum_reals( 2, j % jo % pilot_u, j % jo % pilot_v, dum1, dum2,   &
-                                                          dum3, dum4, dum5)
-   call da_sum_reals( 5, j % jo % bogus_u, j % jo % bogus_v, &
-                         j % jo % bogus_t, j % jo % bogus_q, &
-                         j % jo % bogus_slp, dum1, dum2)
-   call da_sum_reals( 2, j % jo % ssmir_speed, j % jo % ssmir_tpw, &
-                      dum1, dum2, dum3, dum4, dum5)
-   call da_sum_reals( 7, j % jo % ssmi_tb19v, j % jo % ssmi_tb19h, &
-                         j % jo % ssmi_tb22v, j % jo % ssmi_tb37v, &
-                         j % jo % ssmi_tb37h, j % jo % ssmi_tb85v, &
-                         j % jo % ssmi_tb85h)
-   call da_sum_reals( 1, j % jo % satem_thickness, dum1, dum2, dum3, dum4, &
-                                                                dum5, dum6)
-   call da_sum_reals( 1, j % jo % ssmt1_t, dum1, dum2, dum3, dum4, dum5,   &
-                                                                      dum6)
-   call da_sum_reals( 1, j % jo % ssmt2_rh, dum1, dum2, dum3, dum4, dum5,  &
-                                                                      dum6)
-   call da_sum_reals( 2, j % jo % qscat_u, j % jo % qscat_v, dum1, dum2,   &
-                                                          dum3, dum4, dum5)
-   call da_sum_reals( 2, j % jo % profiler_u, j % jo % profiler_v, dum1,   &
-                                                    dum2, dum3, dum4, dum5)
-   call da_sum_reals( 5, j % jo % buoy_u, j % jo % buoy_v, &
-                      j % jo % buoy_t, j % jo % buoy_p, j % jo % buoy_q,   &
-                                                                dum1, dum2)
-   call da_sum_reals( 2, j % jo % airsr_t, j % jo % airsr_q, &
-                         dum1, dum2,dum3, dum4, dum5)
+   temp(1)  = j % jo % synop_u
+   temp(2)  = j % jo % synop_v
+   temp(3)  = j % jo % synop_t
+   temp(4)  = j % jo % synop_p
+   temp(5)  = j % jo % synop_q
+   temp(6)  = j % jo % metar_u
+   temp(7)  = j % jo % metar_v
+   temp(8)  = j % jo % metar_t
+   temp(9)  = j % jo % metar_p
+   temp(10) = j % jo % metar_q
+   temp(11) = j % jo % ships_u
+   temp(12) = j % jo % ships_v
+   temp(13) = j % jo % ships_t
+   temp(14) = j % jo % ships_p
+   temp(15) = j % jo % ships_q
+   temp(16) = j % jo % geoamv_u
+   temp(17) = j % jo % geoamv_v
+   temp(18) = j % jo % polaramv_u
+   temp(19) = j % jo % polaramv_v      
+   temp(20) = j % jo % gpspw_tpw       
+   temp(21) = j % jo % gpsref_ref      
+   temp(22) = j % jo % sound_u         
+   temp(23) = j % jo % sound_v         
+   temp(24) = j % jo % sound_t         
+   temp(25) = j % jo % sound_q         
+   temp(26) = j % jo % sonde_sfc_u     
+   temp(27) = j % jo % sonde_sfc_v     
+   temp(28) = j % jo % sonde_sfc_t     
+   temp(29) = j % jo % sonde_sfc_p     
+   temp(30) = j % jo % sonde_sfc_q     
+   temp(31) = j % jo % airep_u         
+   temp(32) = j % jo % airep_v         
+   temp(33) = j % jo % airep_t         
+   temp(34) = j % jo % pilot_u         
+   temp(35) = j % jo % pilot_v         
+   temp(36) = j % jo % bogus_u         
+   temp(37) = j % jo % bogus_v         
+   temp(38) = j % jo % bogus_t         
+   temp(39) = j % jo % bogus_q         
+   temp(40) = j % jo % bogus_slp       
+   temp(41) = j % jo % ssmir_speed     
+   temp(42) = j % jo % ssmir_tpw       
+   temp(43) = j % jo % ssmi_tb19v      
+   temp(44) = j % jo % ssmi_tb19h      
+   temp(45) = j % jo % ssmi_tb22v      
+   temp(46) = j % jo % ssmi_tb37v      
+   temp(47) = j % jo % ssmi_tb37h      
+   temp(48) = j % jo % ssmi_tb85v      
+   temp(49) = j % jo % ssmi_tb85h      
+   temp(50) = j % jo % satem_thickness 
+   temp(51) = j % jo % ssmt1_t         
+   temp(52) = j % jo % ssmt2_rh        
+   temp(53) = j % jo % qscat_u         
+   temp(54) = j % jo % qscat_v         
+   temp(55) = j % jo % profiler_u      
+   temp(56) = j % jo % profiler_v      
+   temp(57) = j % jo % buoy_u          
+   temp(58) = j % jo % buoy_v          
+   temp(59) = j % jo % buoy_t          
+   temp(60) = j % jo % buoy_p          
+   temp(61) = j % jo % buoy_q          
+   temp(62) = j % jo % airsr_t         
+   temp(63) = j % jo % airsr_q         
+
+   call da_proc_sum_real(temp(:))
+
+   j % jo % synop_u         = temp(1)  
+   j % jo % synop_v         = temp(2)  
+   j % jo % synop_t         = temp(3)  
+   j % jo % synop_p         = temp(4)  
+   j % jo % synop_q         = temp(5)  
+   j % jo % metar_u         = temp(6)  
+   j % jo % metar_v         = temp(7)  
+   j % jo % metar_t         = temp(8)  
+   j % jo % metar_p         = temp(9)  
+   j % jo % metar_q         = temp(10) 
+   j % jo % ships_u         = temp(11) 
+   j % jo % ships_v         = temp(12) 
+   j % jo % ships_t         = temp(13) 
+   j % jo % ships_p         = temp(14) 
+   j % jo % ships_q         = temp(15) 
+   j % jo % geoamv_u        = temp(16) 
+   j % jo % geoamv_v        = temp(17) 
+   j % jo % polaramv_u      = temp(18) 
+   j % jo % polaramv_v      = temp(19) 
+   j % jo % gpspw_tpw       = temp(20) 
+   j % jo % gpsref_ref      = temp(21) 
+   j % jo % sound_u         = temp(22) 
+   j % jo % sound_v         = temp(23) 
+   j % jo % sound_t         = temp(24) 
+   j % jo % sound_q         = temp(25) 
+   j % jo % sonde_sfc_u     = temp(26) 
+   j % jo % sonde_sfc_v     = temp(27) 
+   j % jo % sonde_sfc_t     = temp(28) 
+   j % jo % sonde_sfc_p     = temp(29) 
+   j % jo % sonde_sfc_q     = temp(30) 
+   j % jo % airep_u         = temp(31) 
+   j % jo % airep_v         = temp(32) 
+   j % jo % airep_t         = temp(33) 
+   j % jo % pilot_u         = temp(34) 
+   j % jo % pilot_v         = temp(35) 
+   j % jo % bogus_u         = temp(36) 
+   j % jo % bogus_v         = temp(37) 
+   j % jo % bogus_t         = temp(38) 
+   j % jo % bogus_q         = temp(39) 
+   j % jo % bogus_slp       = temp(40) 
+   j % jo % ssmir_speed     = temp(41) 
+   j % jo % ssmir_tpw       = temp(42) 
+   j % jo % ssmi_tb19v      = temp(43) 
+   j % jo % ssmi_tb19h      = temp(44) 
+   j % jo % ssmi_tb22v      = temp(45) 
+   j % jo % ssmi_tb37v      = temp(46) 
+   j % jo % ssmi_tb37h      = temp(47) 
+   j % jo % ssmi_tb85v      = temp(48) 
+   j % jo % ssmi_tb85h      = temp(49) 
+   j % jo % satem_thickness = temp(50) 
+   j % jo % ssmt1_t         = temp(51) 
+   j % jo % ssmt2_rh        = temp(52) 
+   j % jo % qscat_u         = temp(53) 
+   j % jo % qscat_v         = temp(54) 
+   j % jo % profiler_u      = temp(55) 
+   j % jo % profiler_v      = temp(56) 
+   j % jo % buoy_u          = temp(57) 
+   j % jo % buoy_v          = temp(58) 
+   j % jo % buoy_t          = temp(59) 
+   j % jo % buoy_p          = temp(60) 
+   j % jo % buoy_q          = temp(61) 
+   j % jo % airsr_t         = temp(62) 
+   j % jo % airsr_q         = temp(63) 
 
    if (use_radiance) then
-      jo_radiance = 0.
+      jo_radiance = 0.0
       do i = 1, iv%num_inst                 ! loop for sensor
-         do k = 1, iv%instid(i)%nchan          ! loop for channels
-            call da_proc_sum_int( j % jo % rad(i)% num_ichan(k))
-            call da_sum_reals( 1, j % jo % rad(i) % jo_ichan(k),  &
-               dum1, dum2, dum3, dum4, dum5, dum6)
-            jo_radiance = jo_radiance + j % jo % rad(i) % jo_ichan(k)
-         end do
+         call da_proc_sum_ints(j % jo % rad(i)% num_ichan(:))
+         call da_proc_sum_real(j % jo % rad(i) % jo_ichan(:))
+         jo_radiance = jo_radiance + sum(j % jo % rad(i) % jo_ichan(:))
       end do
    end if
 

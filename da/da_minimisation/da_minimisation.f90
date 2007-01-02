@@ -42,7 +42,6 @@ contains
 #include "da_calculate_residual.inc"
 #include "da_get_var_diagnostics.inc"
 #include "da_get_innov_vector.inc"
-#include "da_sum_reals.inc"
 #include "da_dot.inc"
 #include "da_dot_cv.inc"
 #include "da_write_diagnostics.inc"

@@ -144,11 +144,11 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
       qv(k) = sum(xa%q(is:ie,js:je,k))
    end do
 
-   call da_proc_sum_real  (kdim, uv)
-   call da_proc_sum_real  (kdim, vv)
-   call da_proc_sum_real  (kdim, tv)
-   call da_proc_sum_real  (kdim, pv)
-   call da_proc_sum_real  (kdim, qv)
+   call da_proc_sum_real  (uv)
+   call da_proc_sum_real  (vv)
+   call da_proc_sum_real  (tv)
+   call da_proc_sum_real  (pv)
+   call da_proc_sum_real  (qv)
 
    if (rootproc) then
       do k = ks, ke
@@ -197,11 +197,11 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
       end do
    end do
 
-   call da_proc_sum_real  (kdim, uv)
-   call da_proc_sum_real  (kdim, vv)
-   call da_proc_sum_real  (kdim, tv)
-   call da_proc_sum_real  (kdim, pv)
-   call da_proc_sum_real  (kdim, qv)
+   call da_proc_sum_real  (uv)
+   call da_proc_sum_real  (vv)
+   call da_proc_sum_real  (tv)
+   call da_proc_sum_real  (pv)
+   call da_proc_sum_real  (qv)
 
    if (rootproc) then
       do k = ks, ke
