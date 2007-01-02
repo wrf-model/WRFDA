@@ -95,7 +95,7 @@ program gen_be_ensrf
    integer, pointer      :: xstart(:)                 ! Starting position of variable..
 
    real, pointer         :: x(:,:), xf(:,:)
-   real, pointer         :: xf_cif(:,:)
+   ! real, pointer         :: xf_cif(:,:)
    real, pointer         :: h(:), h_devn(:)
    real, pointer         :: x_devn(:)
 
@@ -157,7 +157,7 @@ print *, ni, nj, nk, nv, nij, nijk, nv3d, nv2d, nijkv
    allocate ( xstart(1:nv) )
    allocate( x(1:nijkv,1:num_members) )
    allocate( xf(1:nijkv,1:num_members) )
-!   allocate( xf_cif(1:nijkv,1:num_members) )
+   ! allocate( xf_cif(1:nijkv,1:num_members) )
    allocate( h(1:num_members) )
    allocate( h_devn(1:num_members) )
    allocate( x_devn(1:num_members) )

@@ -520,8 +520,6 @@ subroutine da_fft_initialize2( n1, n2, ds, trigs1, trigs2, fft_coeffs )
    real, intent(out)  :: trigs2(1:3*n2)               ! FFT trig functions.
    real, intent(out)  :: fft_coeffs(1:n1+1,1:n2+1)    ! FFT coefficients.
 
-   integer            :: n                            ! n+1 is the length of the data.
-   integer            :: fft_pad1, fft_pad2           ! Range to search for efficient FFT.
    integer            :: i, j                         ! Loop counters.
    real               :: const                        ! Multiplicative constant.
    real               :: coeff_nx                     ! Multiplicative constant.
@@ -645,21 +643,21 @@ subroutine da_uv_to_vor_c( dim1, dim2, ds, &
 
    implicit none
 
-   integer, intent(in):: dim1, dim2                   ! Dimensions.
-   real, intent(in)   :: ds                           ! Resolution.
-   real, intent(in)   :: mapfac_m(1:dim1,1:dim2)      ! Map factor - mass pts.
-   real, intent(in)   :: mapfac_u(1:dim1+1,1:dim2)    ! Map factor - u points.
-   real, intent(in)   :: mapfac_v(1:dim1,1:dim2+1)    ! Map factor - u points.
-   real, intent(in)   :: u(1:dim1+1,1:dim2)           ! v wind.
-   real, intent(in)   :: v(1:dim1,1:dim2+1)           ! v wind.
-   real, intent(out)  :: vor(1:dim1+1,1:dim2+1)       ! Vorticity.
+   integer, intent(in):: dim1, dim2                ! Dimensions.
+   real, intent(in)   :: ds                        ! Resolution.
+   real, intent(in)   :: mapfac_m(1:dim1,1:dim2)   ! Map factor - mass pts.
+   real, intent(in)   :: mapfac_u(1:dim1+1,1:dim2) ! Map factor - u points.
+   real, intent(in)   :: mapfac_v(1:dim1,1:dim2+1) ! Map factor - u points.
+   real, intent(in)   :: u(1:dim1+1,1:dim2)        ! v wind.
+   real, intent(in)   :: v(1:dim1,1:dim2+1)        ! v wind.
+   real, intent(out)  :: vor(1:dim1+1,1:dim2+1)    ! Vorticity.
 
-   integer            :: i, j                         ! Loop counters.
-   real               :: ds_inv                       ! 1/ds.
-   real               :: mapfac_vor                   ! Map factor (vorticity pts).
-   real               :: coeff(1:dim1,1:dim2)         ! Coefficient.
-   real               :: um(1:dim1+1,1:dim2)          ! u-wind copy.
-   real               :: vm(1:dim1,1:dim2+1)          ! v-wind copy. 
+   integer            :: i, j                      ! Loop counters.
+   real               :: ds_inv                    ! 1/ds.
+   ! real               :: mapfac_vor               ! Map factor (vorticity pts)
+   real               :: coeff(1:dim1,1:dim2)      ! Coefficient.
+   real               :: um(1:dim1+1,1:dim2)       ! u-wind copy.
+   real               :: vm(1:dim1,1:dim2+1)       ! v-wind copy. 
 
 !------------------------------------------------------------------------------
 !  [1.0] Initialise:

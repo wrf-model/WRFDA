@@ -12,7 +12,7 @@ program gen_be_cov2d
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
-   integer             :: i, j, k, member, k2, m     ! Loop counters.
+   integer             :: i, j, member               ! Loop counters.
    integer             :: b                          ! Bin marker.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Period between dates (hours).

@@ -5,35 +5,34 @@ program gen_be_diags_read
 
    implicit none
 
-   character*10        :: variable                   ! Variable name
-   character*8         :: uh_method                  ! Uh_method (power, scale)
-   character*80        :: filename                   ! Input filename.
-   integer             :: outunit                    ! Output unit for diagnostics.
-   integer             :: ni, nj, nk, nk_3d          ! Dimensions read in.
-   integer             :: bin_type                   ! Type of bin to average over. !!!DALE ADD.
-   integer             :: num_bins_hgt               ! Used if bin_type = 2. !!!DALE ADD..
-   integer             :: num_bins                   ! Number of 3D bins.
-   integer             :: num_bins2d                 ! Number of 2D bins.
-   integer             :: k                          ! Loop counter.
-   integer             :: kdum                       ! Dummy vertical index.
-   integer             :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
-   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
-   real                :: binwidth_lat               ! Used if bin_type = 2 (degrees). !!!DALE ADD..
-   real                :: binwidth_hgt               ! Used if bin_type = 2 (m). !!!DALE ADD..
-   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
-   real                :: scale_length_ps_u          ! Scale length for scalar ps_u.
+   character*10        :: variable          ! Variable name
+   character*8         :: uh_method         ! Uh_method (power, scale)
+   character*80        :: filename          ! Input filename.
+   integer             :: outunit           ! Output unit for diagnostics.
+   integer             :: ni, nj, nk, nk_3d ! Dimensions read in.
+   integer             :: bin_type          ! Type of bin to average over. !!!DALE ADD.
+   integer             :: num_bins          ! Number of 3D bins.
+   integer             :: num_bins2d        ! Number of 2D bins.
+   integer             :: k                 ! Loop counter.
+   integer             :: kdum              ! Dummy vertical index.
+   integer             :: max_wavenumber    ! Smallest scale required (ni/2 - 1).
+   real                :: lat_min, lat_max  ! Used if bin_type = 2 (degrees).
+   real                :: binwidth_lat      ! Used if bin_type = 2 (degrees). !!!DALE ADD..
+   real                :: binwidth_hgt      ! Used if bin_type = 2 (m). !!!DALE ADD..
+   real                :: hgt_min, hgt_max  ! Used if bin_type = 2 (m).
+   real                :: scale_length_ps_u ! Scale length for scalar ps_u.
 
-   integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
-   integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   real, allocatable   :: regcoeff1(:)               ! psi/chi regression cooefficient.
-   real, allocatable   :: regcoeff2(:,:)             ! psi/ps regression cooefficient.
-   real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
-   real, allocatable   :: e_vec(:,:)                 ! Domain-averaged eigenvectors.
-   real, allocatable   :: e_val(:)                   ! Domain-averaged eigenvalues.  
-   real, allocatable   :: e_vec_loc(:,:,:)           ! Latitudinally varying eigenvectors.
-   real, allocatable   :: e_val_loc(:,:)             ! Latitudinally varying eigenvalues.
-   real, allocatable   :: total_power(:)             ! Total Power spectrum.
-   real, allocatable   :: scale_length(:)            ! Scale length for regional application.
+   integer, allocatable:: bin(:,:,:)        ! Bin assigned to each 3D point.
+   integer, allocatable:: bin2d(:,:)        ! Bin assigned to each 2D point.
+   real, allocatable   :: regcoeff1(:)      ! psi/chi regression cooefficient.
+   real, allocatable   :: regcoeff2(:,:)    ! psi/ps regression cooefficient.
+   real, allocatable   :: regcoeff3(:,:,:)  ! psi/T regression cooefficient.
+   real, allocatable   :: e_vec(:,:)        ! Domain-averaged eigenvectors.
+   real, allocatable   :: e_val(:)          ! Domain-averaged eigenvalues.  
+   real, allocatable   :: e_vec_loc(:,:,:)  ! Latitudinally varying eigenvectors.
+   real, allocatable   :: e_val_loc(:,:)    ! Latitudinally varying eigenvalues.
+   real, allocatable   :: total_power(:)    ! Total Power spectrum.
+   real, allocatable   :: scale_length(:)   ! Scale length for regional application.
 
    namelist / gen_be_diags_nl / uh_method
 

@@ -16,7 +16,7 @@ program gen_be_stage3
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Period between dates (hours).
    integer             :: ne                         ! Number of ensemble members.
-   integer             :: i, j, k, k1, k2, b, m, member ! Loop counters.
+   integer             :: i, j, k, k1, k2, b, member ! Loop counters.
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (2D fields).

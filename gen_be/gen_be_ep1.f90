@@ -12,12 +12,11 @@ program gen_be_ep1
    character*80        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
-   integer             :: i, j, k, member, k2, k3, m ! Loop counters.
+   integer             :: i, j, k, member            ! Loop counters.
    integer             :: b                          ! Bin marker.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Period between dates (hours).
    integer             :: ne                         ! Number of ensemble members.
-   integer             :: mmax                       ! Maximum mode (after variance truncation)..
    integer             :: bin_type                   ! Type of bin to average over.
    integer             :: num_bins                   ! Number of bins (3D fields).
    integer             :: num_bins2d                 ! Number of bins (2D fields).
@@ -27,15 +26,8 @@ program gen_be_ep1
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: total_variance             ! Total variance of <psi psi> matrix.
-   real                :: cumul_variance             ! Cumulative variance of <psi psi> matrix.
-   real                :: summ                       ! Summation dummy.
    real                :: rf_scale                   ! Recursive filter scale.
    real                :: count_inv                  ! 1 / count.
-   logical             :: first_time                 ! True if first file.
-
-   real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
-   real, allocatable   :: height(:,:,:)              ! Height field.
 
    real, allocatable   :: psi(:,:,:)                 ! psi.
    real, allocatable   :: chi(:,:,:)                 ! chi.
@@ -47,29 +39,20 @@ program gen_be_ep1
    real, allocatable   :: ps_u(:,:)                  ! Surface pressure.
 
    real, allocatable   :: psi_mnsq(:,:,:)            ! psi.
-   real, allocatable   :: chi_mnsq(:,:,:)            ! chi.
-   real, allocatable   :: temp_mnsq(:,:,:)           ! Temperature.
-   real, allocatable   :: rh_mnsq(:,:,:)             ! Relative humidity.
-   real, allocatable   :: ps_mnsq(:,:)               ! Surface pressure.
-   real, allocatable   :: chi_u_mnsq(:,:,:)          ! chi.
-   real, allocatable   :: temp_u_mnsq(:,:,:)         ! Temperature.
-   real, allocatable   :: ps_u_mnsq(:,:)             ! Surface pressure.
+   real, allocatable   :: chi_mnsq(:,:,:)    ! chi.
+   real, allocatable   :: temp_mnsq(:,:,:)   ! Temperature.
+   real, allocatable   :: rh_mnsq(:,:,:)     ! Relative humidity.
+   real, allocatable   :: ps_mnsq(:,:)       ! Surface pressure.
+   real, allocatable   :: chi_u_mnsq(:,:,:)  ! chi.
+   real, allocatable   :: temp_u_mnsq(:,:,:) ! Temperature.
+   real, allocatable   :: ps_u_mnsq(:,:)     ! Surface pressure.
 
-   integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
-   integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   real, allocatable   :: covar1(:)                  ! Covariance between input fields.
-   real, allocatable   :: covar2(:,:)                ! Covariance between input fields.
-   real, allocatable   :: covar3(:,:,:)              ! Covariance between input fields.
-   real, allocatable   :: var1(:)                    ! Autocovariance of field.
-   real, allocatable   :: var2(:,:,:)                ! Autocovariance of field.
+   integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point.
+   integer, allocatable:: bin2d(:,:)         ! Bin assigned to each 2D point.
 
-   real, allocatable   :: work(:,:)                  ! EOF work array.
-   real, allocatable   :: evec(:,:)                  ! Gridpoint eigenvectors.
-   real, allocatable   :: eval(:)                    ! Gridpoint sqrt(eigenvalues).
-   real, allocatable   :: LamInvET(:,:)              ! ET/sqrt(Eigenvalue).
-   real, allocatable   :: regcoeff1(:)               ! psi/chi regression cooefficient.
-   real, allocatable   :: regcoeff2(:,:)             ! psi/ps regression cooefficient.
-   real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
+   real, allocatable   :: regcoeff1(:)       ! psi/chi regression cooefficient.
+   real, allocatable   :: regcoeff2(:,:)     ! psi/ps regression cooefficient.
+   real, allocatable   :: regcoeff3(:,:,:)   ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
                                   ne, num_passes, rf_scale 

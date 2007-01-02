@@ -30,7 +30,7 @@ program gen_be_stage2_1dvar
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
    integer             :: nk1                        ! nk + 1.
    integer             :: nkbe                       ! 2*nk1 + 3.
-   integer             :: i, j, k, member, k2, m     ! Loop counters.
+   integer             :: i, j, k, member, k2        ! Loop counters.
    integer             :: kbe, k2be                  ! Loop counters.
    integer             :: b                          ! Bin marker.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.

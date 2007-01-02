@@ -25,7 +25,7 @@ program gen_be_stage1
    character*80        :: filename                   ! Input filename.
    integer             :: count                      ! Counter.
    integer             :: ni, nj, nk                 ! Dimensions read in.
-   integer             :: member, i, j, k            ! Loop counters.
+   integer             :: member                     ! Loop counter
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Interval between file times (hours).
    integer             :: ne                         ! Number of ensemble members.

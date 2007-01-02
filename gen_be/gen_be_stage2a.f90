@@ -6,53 +6,37 @@ program gen_be_stage2a
 
    implicit none
 
-   character*10        :: start_date, end_date       ! Starting and ending dates.
-   character*10        :: date, new_date             ! Current date (ccyymmddhh).
-   character*10        :: variable                   ! Variable name
-   character*80        :: filename                   ! Input filename.
-   character*3         :: ce                         ! Member index -> character.
-   integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
-   integer             :: i, j, k, member, k2, k3, m ! Loop counters.
-   integer             :: b                          ! Bin marker.
-   integer             :: sdate, cdate, edate        ! Starting, current ending dates.
-   integer             :: interval                   ! Period between dates (hours).
-   integer             :: ne                         ! Number of ensemble members.
-   integer             :: mmax                       ! Maximum mode (after variance truncation)..
-   integer             :: bin_type                   ! Type of bin to average over.
-   integer             :: num_bins                   ! Number of bins (3D fields).
-   integer             :: num_bins2d                 ! Number of bins (2D fields).
-   integer             :: num_passes                 ! Recursive filter passes.
-   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
-   real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
-   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
-   real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: total_variance             ! Total variance of <psi psi> matrix.
-   real                :: cumul_variance             ! Cumulative variance of <psi psi> matrix.
-   real                :: summ                       ! Summation dummy.
-   real                :: rf_scale                   ! Recursive filter scale.
-   logical             :: first_time                 ! True if first file.
+   character*10        :: start_date, end_date ! Starting and ending dates.
+   character*10        :: date, new_date       ! Current date (ccyymmddhh).
+   character*10        :: variable             ! Variable name
+   character*80        :: filename             ! Input filename.
+   character*3         :: ce                   ! Member index -> character.
+   integer             :: ni, nj, nk, nkdum    ! Grid dimensions.
+   integer             :: i, j, k, member      ! Loop counters.
+   integer             :: b                    ! Bin marker.
+   integer             :: sdate, cdate, edate  ! Starting, current ending dates.
+   integer             :: interval             ! Period between dates (hours).
+   integer             :: ne                   ! Number of ensemble members.
+   integer             :: bin_type             ! Type of bin to average over.
+   integer             :: num_bins             ! Number of bins (3D fields).
+   integer             :: num_bins2d           ! Number of bins (2D fields).
+   integer             :: num_passes           ! Recursive filter passes.
+   real                :: lat_min, lat_max     ! Used if bin_type = 2 (degrees).
+   real                :: binwidth_lat         ! Used if bin_type = 2 (degrees).
+   real                :: hgt_min, hgt_max     ! Used if bin_type = 2 (m).
+   real                :: binwidth_hgt         ! Used if bin_type = 2 (m).
+   real                :: rf_scale             ! Recursive filter scale.
 
-   real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
-   real, allocatable   :: height(:,:,:)              ! Height field.
-   real, allocatable   :: psi(:,:,:)                 ! psi.
-   real, allocatable   :: chi(:,:,:)                 ! chi.
-   real, allocatable   :: temp(:,:,:)                ! Temperature.
-   real, allocatable   :: ps(:,:)                    ! Surface pressure.
-   integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
-   integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   real, allocatable   :: covar1(:)                  ! Covariance between input fields.
-   real, allocatable   :: covar2(:,:)                ! Covariance between input fields.
-   real, allocatable   :: covar3(:,:,:)              ! Covariance between input fields.
-   real, allocatable   :: var1(:)                    ! Autocovariance of field.
-   real, allocatable   :: var2(:,:,:)                ! Autocovariance of field.
+   real, allocatable   :: psi(:,:,:)           ! psi.
+   real, allocatable   :: chi(:,:,:)           ! chi.
+   real, allocatable   :: temp(:,:,:)          ! Temperature.
+   real, allocatable   :: ps(:,:)              ! Surface pressure.
+   integer, allocatable:: bin(:,:,:)           ! Bin assigned to each 3D point.
+   integer, allocatable:: bin2d(:,:)           ! Bin assigned to each 2D point.
 
-   real, allocatable   :: work(:,:)                  ! EOF work array.
-   real, allocatable   :: evec(:,:)                  ! Gridpoint eigenvectors.
-   real, allocatable   :: eval(:)                    ! Gridpoint sqrt(eigenvalues).
-   real, allocatable   :: LamInvET(:,:)              ! ET/sqrt(Eigenvalue).
-   real, allocatable   :: regcoeff1(:)               ! psi/chi regression cooefficient.
-   real, allocatable   :: regcoeff2(:,:)             ! psi/ps regression cooefficient.
-   real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
+   real, allocatable   :: regcoeff1(:)         ! psi/chi regression cooefficient
+   real, allocatable   :: regcoeff2(:,:)       ! psi/ps regression cooefficient.
+   real, allocatable   :: regcoeff3(:,:,:)     ! psi/T regression cooefficient.
 
    namelist / gen_be_stage2a_nl / start_date, end_date, interval, &
                                   ne, num_passes, rf_scale

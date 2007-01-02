@@ -10,7 +10,6 @@ program gen_be_diags
    integer             :: n_smth_sl                  ! Number of smoothing for scale-length
    character*80        :: filename                   ! Input filename.
    integer             :: nk,nk_3d                   ! Dimensions read in.
-   integer             :: num_bins                   ! Number of bins (3D).
 
    namelist / gen_be_diags_nl / uh_method, n_smth_sl
 

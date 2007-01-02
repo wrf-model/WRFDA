@@ -45,7 +45,6 @@ program gen_be_stage1_1dvar
    real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
    real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
    real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: dphi                       ! Latitude interval (not used).
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    logical             :: first_time                 ! True if first file.
    logical             :: remove_mean                ! Remove time/ensemble/area mean.

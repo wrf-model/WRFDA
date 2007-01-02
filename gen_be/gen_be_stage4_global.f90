@@ -17,27 +17,23 @@ program gen_be_stage4_global
    integer             :: num_states                 ! Number of data times.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
    integer             :: interval                   ! Period between dates (hours).
-   integer             :: i, j, k, member, n         ! Loop counters.
+   integer             :: k, member, n               ! Loop counters.
    integer             :: ne                         ! Number of ensemble members.
    integer             :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
    integer             :: inc                        ! Jump between elements of vector in array.
    integer             :: lenr                       ! FFT array dimension (at least inc*(n-1)+1).
    integer             :: lensav                     ! wsave dimension (n+int(log(real(ni)))+4).
    integer             :: lenwrk                     ! Dimension of work array.
-   integer             :: ier                        ! FFT error flag.
-   integer             :: count                      ! Counter
    integer             :: alp_size                   ! Ass. Leg. Pol. array size.
    integer             :: r_cvsize                   ! Real control variable array size.
 
    logical             :: first_time                 ! True if first time through loop.
    logical             :: testing_spectral           ! True if testing spectral transforms.
    real                :: pi_over_180                ! pi / 180
-   real                :: diff_rms                   ! RMS error measure.
    real                :: coeffa, coeffb             ! Accumulating mean coefficients.
    real                :: variance                   ! Variance (sum of power spectra) .
 
    real, allocatable   :: field(:,:)                 ! Gridpoint field to be decomposed.
-   real, allocatable   :: field_out(:,:)             ! Output test field.
 
    real, allocatable   :: lat(:)                     ! Latitude (radians).
    real, allocatable   :: sinlat(:)                  ! sine(latitude).
