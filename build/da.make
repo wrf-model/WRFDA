@@ -72,6 +72,7 @@ WRFVAR_OBJS        =	da_par_util.o \
                         mediation_force_domain.o \
                         mediation_interp_domain.o \
                         nest_init_utils.o \
+                        wrf_fddaobs_in.o \
                         landread.o \
                         wrf_io.o \
                         io_int.o \
