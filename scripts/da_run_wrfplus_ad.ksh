@@ -8,12 +8,8 @@
 # WRF produces gradient file wrfvar_input_d${DOMAIN}_2000-01-25_00:00:00 which
 # is renamed gr00 for VAR
 
-arg1=$1
-arg2=$2
-
-cd $WORK_DIR/ad
-
 if test $NUM_PROCS=1; then
+   cd $WORK_DIR/ad
    ./wrfplus.exe > wrf_ad.out 2>wrf_ad.error
 fi
 

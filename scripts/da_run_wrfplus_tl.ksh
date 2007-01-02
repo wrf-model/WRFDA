@@ -9,13 +9,7 @@
 # 2000-01-25 by the namelist file, renamed to tl01 to tl03 for
 # use by VAR
 
-#set -x
-
-arg1=$1
-arg2=$2
-
-cd $WORK_DIR/tl
-
 if test $NUM_PROCS=1; then
+   cd $WORK_DIR/tl
    ./wrfplus.exe > wrf_tl.out 2>wrf_tl.error
 fi

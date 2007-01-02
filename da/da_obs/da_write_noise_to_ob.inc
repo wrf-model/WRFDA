@@ -15,6 +15,7 @@ subroutine da_write_noise_to_ob (iv)
    call da_trace_entry("da_write_noise_to_ob")
 
 #ifdef DM_PARALLEL
+   ! Ensure other processors have written their temporary files
    call mpi_barrier(comm, ierr)
 #endif
    call da_get_unit (iunit)

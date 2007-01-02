@@ -72,7 +72,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
 
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
-         call da_system_4dvar("da_run_wrfplus_ad.ksh pre ")
+         call da_system("da_run_wrfplus_ad.ksh")
 
          if (rootproc) then
             call da_system("rm -rf ad/wrf_done")
@@ -87,9 +87,8 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
             end do
             call da_free_unit(wrf_done_unit)
          end if
+         ! Wait until PE 0 agrees that AD finished
          call mpi_barrier(comm, ierr)
-
-         call da_system_4dvar("da_run_wrfplus_ad.ksh post ")
       else
          call da_system("da_run_wrfplus_ad.ksh")
       end if

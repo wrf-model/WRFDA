@@ -1,7 +1,7 @@
 #!/bin/ksh
 
 ######################################################################################
-# GENERAL USERS SHOULD NOT EDIT THIS SCRIPT, INSTEAD COPY ~/bray/data/con200/test.ksh,
+# GENERAL USERS SHOULD NOT EDIT THIS SCRIPT, INSTEAD COPY ~wrfhelp/data/con200/test.ksh,
 # WHICH IS AN EXAMPLE CONUS200 CASE, AND WILL SET UP THE ENVIRONMENT BEFORE SUBMITTING
 # A JOB TO THE CORRECT QUEUING SYSTEM
 ######################################################################################

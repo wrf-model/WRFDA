@@ -17,6 +17,7 @@ subroutine da_final_write_y(iv, y)
    if (trace_use) call da_trace_entry("da_final_write_y")
 
 #ifdef DM_PARALLEL
+   ! Ensure other processors have written their temporary files
    call mpi_barrier(comm, ierr)
 #endif
 

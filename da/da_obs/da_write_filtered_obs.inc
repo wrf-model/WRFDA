@@ -1348,6 +1348,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    close(ounit)
    call da_free_unit(ounit)
 #ifdef DM_PARALLEL
+   ! Ensure other processors have written their temporary files
    call mpi_barrier(comm, ierr)
 #endif
    if (rootproc) then
