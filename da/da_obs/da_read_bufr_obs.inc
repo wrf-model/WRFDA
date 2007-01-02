@@ -388,10 +388,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
       if (nlevels > max_ob_levels) then
          nlevels = max_ob_levels
 
-         write(unit=stdout, fmt='(/a/)') &
-               'WARNinG: Too many levels.'
+         write(unit=stderr, fmt='(/a/)') &
+               'Warning: Too many levels.'
 
-          write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+          write(unit=stderr, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &
@@ -400,10 +400,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                'level: ', platform%info%levels, &
                'kx:    ', kx
       else if ((nlevels < 1) .and. ((kx /= 164) .or. (kx /= 174))) then
-         write(unit=stdout, fmt='(/a/)') &
-               'WARNinG: Too few levels.'
+         write(unit=stderr, fmt='(/a/)') &
+               'Warning: Too few levels.'
   
-         write(unit=stdout, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
+         write(unit=stderr, fmt='(/2a/2a/2x,a,2f8.2,2(2x,a,f9.2)/2(2x,a,i4)/)') &
                'Subset:   ', platform%info%name(1:8), &
                'Platfrom: ', trim(platform%info%platform), &
                'Loc(lat, lon): ', platform%info%lat, platform%info%lon, &

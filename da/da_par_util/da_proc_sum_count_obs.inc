@@ -5,17 +5,11 @@ subroutine da_proc_sum_count_obs (count_obs)
    !           count_obs. The sum is returned only on the root processor,
    !           i.e., processor 0. (In this way, we do not have to do all-to-all 
    !           communication.)
-   !
-   !  IMPORTANT!!!
-   !           The length of sumval and procval arrays are currently 100. 
-   !           This number will work till the obs types does not exceed 25  
-   !           which is currently 16. This length should be changed accordingly 
-   !           if more observation types are added.
    !----------------------------------------------------------------------------
 
    implicit none
    
-   integer, parameter:: numvals = 100
+   integer, parameter:: numvals = num_ob_indexes*4
 
    type (count_obs_type), intent(inout)     :: count_obs
 

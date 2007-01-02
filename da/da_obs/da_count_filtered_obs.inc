@@ -240,18 +240,13 @@ subroutine da_count_filtered_obs(&
             num_airsr = num_airsr + 1
 
          case default;
-             num_others = num_others + 1
-            write(unit=*, fmt='(/a/)') &
-                 'WARNinG   WARNinG   WARNinG   WARNinG   WARNinG :'
-
-            write(unit=*, fmt='(a)') 'unsaved obs found:'
-
-            write(unit=*, fmt='(2a)') &
-                 'platform%info%platform=', platform%info%platform
- 
-            write(unit=*, fmt='(a, i3)') &
-                 'platform%info%levels=', platform%info%levels
-
+            num_others = num_others + 1
+            write(unit=message(1), fmt='(a)') 'unsaved obs found:'
+            write(unit=message(2), fmt='(2a)') &
+               'platform%info%platform=', platform%info%platform
+            write(unit=message(3), fmt='(a, i3)') &
+               'platform%info%levels=', platform%info%levels
+            call da_warning(__FILE__,__LINE__,message(1:3))
          end select
       end do reports                  !  Loop over reports              
       close (iunit)
@@ -294,12 +289,12 @@ subroutine da_count_filtered_obs(&
 
    ! write reference state info
 
-     write (unit = filtered_obs_unit, fmt = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
-        "PHIC  =", phic,", XLONC =", xlonc,", true1 =", truelat1,&
-        ", true2 =",truelat2                                                      
-     write (unit = filtered_obs_unit, fmt = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
-        "TS0   =",  ts0, ", TLP   =", tlp, &
-        ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
+   write (unit = filtered_obs_unit, fmt = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
+      "PHIC  =", phic,", XLONC =", xlonc,", true1 =", truelat1,&
+      ", true2 =",truelat2                                                      
+   write (unit = filtered_obs_unit, fmt = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
+      "TS0   =",  ts0, ", TLP   =", tlp, &
+      ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
 
    ! write domain info 
 

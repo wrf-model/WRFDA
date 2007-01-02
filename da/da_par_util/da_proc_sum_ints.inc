@@ -4,7 +4,9 @@ subroutine da_proc_sum_ints (values)
    !  Purpose: Do MPI sum operation across processors to get the global sum of
    !           an integer array. The sum is returned only on the root processor,
    !           i.e., processor 0. (In this way, we do not have to do all-to-all 
-   !           communication.)
+   !           communication, unlike wrf_dm_sum_ints, which does)
+   !
+   ! The routine generates a MPI barrier
    !---------------------------------------------------------------------------
 
    implicit none

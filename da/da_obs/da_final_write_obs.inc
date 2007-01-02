@@ -18,6 +18,7 @@ subroutine da_final_write_obs(ob, iv, re)
    if (trace_use) call da_trace_entry("da_final_write_obs")
 
 #ifdef DM_PARALLEL
+   ! Wait to ensure all temporary files have been written
    call mpi_barrier(comm, ierr)
 #endif
 

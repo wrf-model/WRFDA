@@ -6,7 +6,9 @@ subroutine da_proc_sum_real (n, value)
    ! On return, each of the N components of the vector "value" represents
    ! the sum of parts from each processor. The result is stored only on 
    ! the root processor, i.e., processor 0. (In this way, we do not have 
-   ! to do all-to-all communication.)
+   ! to do all-to-all communication, unlike wrf_dm_sum_real, which does)
+   !
+   ! The routine generates a MPI barrier
    !---------------------------------------------------------------------------
 
    implicit none
