@@ -13,14 +13,9 @@
 #
 # The other input files for VAR are the T+1,T+2,T+3 dumps
 
-arg1=$1
-arg2=$2
-
-cd $WORK_DIR/nl
-
-export G95_UNIT_ENDIAN_98=BIG
-
 if test $NUM_PROCS=1; then
+   cd $WORK_DIR/nl
+   export G95_UNIT_ENDIAN_98=BIG
    $RUN_CMD ./wrf.exe > wrf_nl.out 2>wrf_nl.error
 fi
 
