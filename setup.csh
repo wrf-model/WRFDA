@@ -7,8 +7,7 @@ if (! $?PROCESSOR) then
    # This kludge should give powerpc/i686
    if ( $HOSTNAME == "bs1101en" || $HOSTNAME == "bs1201en" \
         || $HOSTNAME == "ln0126en" || $HOSTNAME == "ln0127en" \
-        || $HOSTNAME == "bv1103en.ucar.edu" \
-        || $HOSTNAME == "bv1203en.ucar.edu" ) then
+        || $HOSTNAME == "bv1103en" || $HOSTNAME == "bv1203en" ) then
       # Thanks Aix for reporting a hex string with -m, when
       # all I wanted was powerpc
       setenv PROCESSOR `uname -p`
@@ -21,6 +20,8 @@ if (! $?PROCESSOR) then
       endif
    endif
 endif 
+
+echo PROCESSOR $PROCESSOR
 
 if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
