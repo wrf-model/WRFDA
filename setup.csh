@@ -29,13 +29,13 @@ if ( ( `hostname | cut -c 1-2` == bv ) ||  ( `hostname | cut -c 1-2` == bs ) ) t
    setenv FC xlf
    setenv CC xlc
 else
-   if ($?1) then
+   if ("$?1" == "") then
       setenv FC $1
    else
       setenv FC g95
    endif
 
-   if ($?2) then
+   if ("$?2" == "") then
       setenv CC $2
    else
       setenv CC gcc
