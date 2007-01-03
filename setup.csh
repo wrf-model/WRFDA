@@ -65,7 +65,7 @@ if ($CC == xlc) then
 endif
 
 if ($FC == g95) then
-   if (-d ${EXT_DIR}/g95/g95) then
+   if (-d ${EXT_DIR}/g95/g95_${PROCESSOR}) then
       setenv PATH ${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
    endif
 endif
