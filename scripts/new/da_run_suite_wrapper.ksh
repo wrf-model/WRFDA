@@ -29,25 +29,23 @@
 #export RUN_WPS=true
 #export RUN_REAL=true
 #export RUN_OBSPROC=true
-#export RUN_WRFVAR=true
-#export RUN_UPDATE_BC=true
-#export RUN_WRF=true
+export RUN_WRFVAR=true
+export RUN_UPDATE_BC=true
+export RUN_WRF=true
 
 #Experiment details:
 #export DUMMY=${DUMMY:-true}
 export EXPT=cy1
-export RUN_CMD=" "
 #export CLEAN=${CLEAN:-true}
+export NUM_PROCS=2
+export RUN_CMD="mpirun -np $NUM_PROCS"
 export CYCLING=${CYCLING:-true}
-export CYCLE_PERIOD=6
-#export NUM_PROCS=4
-export FIRST=false
+export CYCLE_PERIOD=12
+export FIRST=true
 
 #Time info:
-export INITIAL_DATE=2003010112
-export FINAL_DATE=2003010112
-export INITIAL_DATE=2006100100
-export FINAL_DATE=2006110100
+export INITIAL_DATE=2003010100
+export FINAL_DATE=2003012800
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=24
 export LONG_FCST_TIME_2=12
@@ -57,18 +55,32 @@ export LONG_FCST_RANGE_2=24
 export REL_DIR=/data1/$USER/code/trunk
 export WRF_BC_DIR=/data1/dmbarker/code/WRF_BC
 export DAT_DIR=/data3/$USER/data
-export WRFVAR_DIR=$REL_DIR/wrfvar
+export WRFVAR_DIR=$REL_DIR/WRFVAR
+export WPS_DIR=$REL_DIR/WPS
 #export EXP_DIR=$HOME/data/con200/noda
 
 #From WPS (namelist.wps):
-export RUN_GEOGRID=false
+#export RUN_GEOGRID=true
 export WPS_GEOG_DIR=/data1/dmbarker/data/geog
+#export GEOG_DATA_RES=10m
 
 #WRF:
-export NL_CU_PHYSICS=2
+#export NL_CU_PHYSICS=2
+export NL_DAMPCOEF=0.2
+export NL_MP_ZERO_OUT=2
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=.false.
+export DA_BACK_ERRORS=/palm2/hclin/data/BES/con200_gen_be.ENS.dat
+export NL_USE_AIRSRETOBS=.false.
+export NL_TRACE_USE=.false.
+export NL_QC_RAD=.false.
+export NL_TRACE_MEMORY=.false.
+export NL_LEN_SCALING1=1.0
+export NL_LEN_SCALING2=1.0
+export NL_LEN_SCALING3=1.0
+export NL_LEN_SCALING4=1.0
+export NL_LEN_SCALING5=1.0
 
 ${WRFVAR_DIR}/scripts/new/da_run_suite.ksh
 
