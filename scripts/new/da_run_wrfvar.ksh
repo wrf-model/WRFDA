@@ -471,7 +471,7 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_LEN_SCALING3=0.5
       export NL_LEN_SCALING4=0.5
       export NL_LEN_SCALING5=0.5
-   . $WRFVAR_DIR/inc/namelist_script.inc
+   . $WRFVAR_DIR/build/inc/namelist_script.inc
 
    if test -f namelist.input; then
      cp namelist.input $RUN_DIR
