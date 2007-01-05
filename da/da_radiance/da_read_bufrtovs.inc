@@ -73,7 +73,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    real , allocatable ::   tb_inv(:)                    !  bright temperatures
    !  end type bright_temperature
 
-   type (datalink), pointer    :: head, p, current
+   type (datalink_type), pointer    :: head, p, current
 
    integer                        ::  error, ifgat
    type(info_type)                ::  info

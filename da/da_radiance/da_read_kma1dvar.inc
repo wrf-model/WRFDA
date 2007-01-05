@@ -40,7 +40,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
                          tb(:), inv(:),err(:)
    integer, allocatable :: kchan(:),qc(:)
 
-   type (datalink), pointer    :: head, p, current
+   type (datalink_type), pointer    :: head, p, current
 
    integer                        ::  size, error
    type(info_type)                ::  info

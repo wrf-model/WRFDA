@@ -25,9 +25,9 @@ SUBROUTINE da_y_type_ex_$1( iv, re, slice )
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
-   TYPE (ob_type),       INTENT(IN   ) :: iv     ! Innovation vector
-   TYPE (y_type),        INTENT(IN   ) :: re     ! all residual obs
-   TYPE (y_facade_type), INTENT(INOUT) :: slice  ! selected residual obs
+   type (ob_type),       INTENT(IN   ) :: iv     ! Innovation vector
+   type (y_type),        INTENT(IN   ) :: re     ! all residual obs
+   type (y_facade_type), INTENT(INOUT) :: slice  ! selected residual obs
    ! Local declarations
    INTEGER :: n
 
@@ -61,8 +61,8 @@ SUBROUTINE da_y_type_ins_$1_global( slice_glob, re_glob )
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
-   TYPE (y_facade_type), INTENT(INOUT) :: slice_glob ! generic
-   TYPE (y_type),        INTENT(INOUT) :: re_glob    ! selected residual obs
+   type (y_facade_type), INTENT(INOUT) :: slice_glob ! generic
+   type (y_type),        INTENT(INOUT) :: re_glob    ! selected residual obs
    ! Local declarations
    INTEGER :: n
 
@@ -94,8 +94,8 @@ SUBROUTINE da_iv_type_ins_$1_global( slice_glob, iv_glob )
 !------------------------------------------------------------------------------
    IMPLICIT NONE
 
-   TYPE (y_facade_type), INTENT(IN   ) :: slice_glob ! selected residual obs
-   TYPE (ob_type),       INTENT(INOUT) :: iv_glob    ! partial Innovation vector
+   type (y_facade_type), INTENT(IN   ) :: slice_glob ! selected residual obs
+   type (ob_type),       INTENT(INOUT) :: iv_glob    ! partial Innovation vector
    ! Local declarations
    INTEGER :: n
 
@@ -137,18 +137,18 @@ define( macro_to_global,
     IMPLICIT NONE
 
     ! task-local objects
-    TYPE (ob_type), INTENT( IN) :: iv             ! Innovation vector
-    TYPE (y_type),  INTENT( IN) :: re             ! residual vector
-    TYPE (y_type),  INTENT( IN) :: jo_grad_y      ! Grad_y(Jo)
+    type (ob_type), INTENT( IN) :: iv             ! Innovation vector
+    type (y_type),  INTENT( IN) :: re             ! residual vector
+    type (y_type),  INTENT( IN) :: jo_grad_y      ! Grad_y(Jo)
     ! task-global objects
-    TYPE (ob_type), INTENT(OUT) :: iv_glob        ! Innovation vector
-    TYPE (y_type),  INTENT(OUT) :: re_glob        ! residual vector
-    TYPE (y_type),  INTENT(OUT) :: jo_grad_y_glob ! Grad_y(Jo)
+    type (ob_type), INTENT(OUT) :: iv_glob        ! Innovation vector
+    type (y_type),  INTENT(OUT) :: re_glob        ! residual vector
+    type (y_type),  INTENT(OUT) :: jo_grad_y_glob ! Grad_y(Jo)
 
     ! Local declarations
-    TYPE (y_facade_type) :: re_slice, re_glob_slice
-    TYPE (y_facade_type) :: jo_grad_y_slice, jo_grad_y_glob_slice
-    TYPE (residual_template_type) :: template  ! allocation info
+    type (y_facade_type) :: re_slice, re_glob_slice
+    type (y_facade_type) :: jo_grad_y_slice, jo_grad_y_glob_slice
+    type (residual_template_type) :: template  ! allocation info
 
     ! create process-local generic objects from specific objects
     CALL da_y_type_ex_$1( iv, re,        re_slice )

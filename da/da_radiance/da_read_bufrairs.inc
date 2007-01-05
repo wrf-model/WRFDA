@@ -131,7 +131,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   logical           :: airs, eos_amsua, hsb, airstab
   type(info_type)            :: info
   type(model_loc_type)       :: loc
-  type (datalink), pointer   :: head, p, current
+  type (datalink_type), pointer   :: head, p, current
 
    if (trace_use) call da_trace_entry("da_read_bufrairs")
 

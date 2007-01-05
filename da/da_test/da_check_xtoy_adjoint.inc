@@ -12,7 +12,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    type (x_type),     intent(inout) :: xa    ! analysis increments (local).
    type (ob_type),    intent(in)    :: iv    ! ob. increment vector.
    type (xpose_type), intent(in)    :: xp    ! Dimensions and xpose buffers(be).
-   TYPE (y_type),     intent(inout) :: y     ! y = h (xa)
+   type (y_type),     intent(inout) :: y     ! y = h (xa)
 
    real                           :: adj_ttl_lhs   ! < y, y >
    real                           :: adj_ttl_rhs   ! < x, x_adj >

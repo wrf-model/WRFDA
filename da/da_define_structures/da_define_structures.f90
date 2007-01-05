@@ -594,11 +594,11 @@ module da_define_structures
       integer                    :: use
    end type number
 
-   TYPE bad_info_type
+   type bad_info_type
       type (number)              :: num
       integer                    :: nn(100000)
       integer                    :: kk(100000)
-   END TYPE bad_info_type
+   END type bad_info_type
 
    type  bad_data_type
       type (bad_info_type)       :: u

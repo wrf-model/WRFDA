@@ -2,7 +2,7 @@ subroutine da_write_biasprep(radbias)
 
    implicit none
 
-   type(bias), intent(in)  :: radbias
+   type (bias_type), intent(in)  :: radbias
 
    if (trace_use) call da_trace_entry("da_write_biasprep")
 
