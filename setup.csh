@@ -49,13 +49,13 @@ if ( `uname` == "AIX" ) then
    setenv FC xlf
    setenv CC gcc
 else
-   if ("$?1" == "") then
+   if ("$1" != "") then
       setenv FC $1
    else
       setenv FC g95
    endif
 
-   if ("$?2" == "") then
+   if ("$2" != "") then
       setenv CC $2
    else
       setenv CC gcc
@@ -68,17 +68,7 @@ if ($FC == g95) then
    if (-d ${EXT_DIR}/g95/g95_${PROCESSOR}) then
       setenv PATH ${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
    endif
-   setenv G95_ENDIAN         BIG
-   setenv G95_FPU_INVALID    T
-   setenv G95_FPU_ZERODIV    T
-   setenv G95_FPU_OVERFLOW   F
-   setenv G95_FPU_UNDERFLOW  F
-   setenv G95_FPU_INEXACT    F
-   setenv G95_FPU_EXCEPTIONS F
-   setenv G95_UNBUFFERED_ALL T
-   setenv G95_MEM_INIT       0x00
-   setenv G95_MEM_MAXALLOC   F
-   setenv G95_MEM_SEGEMENTS  0
+   setenv G95_ENDIAN=BIG
 endif
 
 # List options in order of increasing preference

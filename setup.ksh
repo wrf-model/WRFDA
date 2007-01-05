@@ -54,16 +54,6 @@ if test $FC = g95; then
       export PATH=${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
    fi
    export G95_ENDIAN=BIG
-   export G95_FPU_INVALID=${G95_FPU_INVALID:-T}
-   export G95_FPU_ZERODIV=${G95_FPU_ZERODIV:-T}
-   export G95_FPU_OVERFLOW=${G95_FPU_OVERFLOW:-F}
-   export G95_FPU_UNDERFLOW=${G95_FPU_UNDERFLOW:-F}
-   export G95_FPU_INEXACT=${G95_FPU_INEXACT:-F}
-   export G95_FPU_EXCEPTIONS=${G95_FPU_EXCEPTIONS:-F}
-   export G95_UNBUFFERED_ALL=${G95_UNBUFFERED_ALL:-T}
-   export G95_MEM_INIT=${G95_MEM_INIT:-0x00}
-   export G95_MEM_MAXALLOC=${G95_MEM_MAXALLOC:-F}
-   export G95_MEM_SEGMENTS=0
 fi
 
 if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}; then
