@@ -86,12 +86,11 @@ export RUN_WRF=${RUN_WRF:-false}                   # Run if true.
 
 export CYCLING=${CYCLING:-false}                    # Cold start (false), cycle (true).
 export EXPT=${EXPT:-test}                             # Experiment name.
-export HOSTNAME=${HOSTNAME:-`hostname`}
+export MACHINE=${MACHINE:-`uname -n`}
 
 # Directories:
 export TMP_DIR=${TMP_DIR:-/var/tmp/$USER}  # Temporary directory.
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}     # Observation directory.

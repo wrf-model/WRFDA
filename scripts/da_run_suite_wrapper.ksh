@@ -123,9 +123,6 @@ export NL_USE_QSCATOBS=true
 # WRF:
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND=6}
 
-export HOSTS=~bray/data/hosts/`hostname`.hosts
-export HOSTS=`eval echo $HOSTS`
-
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
 

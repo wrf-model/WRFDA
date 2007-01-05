@@ -8,8 +8,6 @@
 
 DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
-export HOSTS=${HOSTS:-$PWD/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 
 #-----------------------------------------------------------------------
 # [1.0] Specify default environment variables:
@@ -32,7 +30,6 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXPT=${EXPT:-test}
 export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
-export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfvar}
@@ -475,7 +472,7 @@ if test ! -f $DA_ANALYSIS; then
       RC=0
    else
       if $NL_VAR4D; then
-         if $POE && test $NUM_PROCS -gt 1; then
+         if test $SUBMIT = LoadLeveller -a $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
             export MP_CMDFILE=poe.cmdfile

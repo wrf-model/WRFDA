@@ -12,11 +12,11 @@ export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
 export WORK_DIR=$RUN_DIR/working
 export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
-export POE=false
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
+export SUBMIT=${SUBMIT:-none}
+export CHECK_SVNVERSION=${CHECK_SVNVERSION:-false}
 
 export PLATFORM=`uname`
-export HOSTNAME=`hostname`
+export MACHINE=${MACHINE:-`hostname`}
 export NUM_PROCS=${NUM_PROCS:-1}
 
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
@@ -27,18 +27,15 @@ export LL_PTILE=${LL_PTILE:-8}
 export LL_CLASS=${LL_CLASS:-com_rg8}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-YES}
-export HOSTS=${HOSTS:-$PWD/hosts}
+export RUN_CMD=`eval echo $RUN_CMD`
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
-   # bluesky uses loadleveller
-
+if test $SUBMIT = LoadLeveller; then 
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
    let NODES=$TEMP/8+1
-   export POE=true
 
    cat > job.ksh <<EOF
 #!/bin/ksh
@@ -61,14 +58,12 @@ $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
 # @ queue            = $QUEUE
 
-export RUN_CMD="$DEBUGGER " # Space important
+export RUN_CMD="$DEBUGGER "
+
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-   -o $HOSTNAME = "bv1103en.ucar.edu" \
-   -o $HOSTNAME = "bv1203en.ucar.edu" ; then 
-   # lightning and bluesky use lsf
 
+elif test $SUBMIT = LSF; then
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -87,35 +82,19 @@ $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
 
+export RUN_CMD=mpirun.lsf
 
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun.lsf"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
-elif test $HOSTNAME = willow -o $HOSTNAME = hazel -o $HOSTNAME = goldenrain ; then
-   cat > job.ksh <<EOF
-#!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT=" "
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
-EOF
-elif test $HOSTNAME = ocotillo -o $HOSTNAME = snowdrift ; then
-   cat > job.ksh <<EOF
-#!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
-EOF
 else
+   if test $HOSTS'.' != '.'; then
+      RUN_CMD="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
+   else
+      RUN_CMD="mpirun -v -np $NUM_PROCS -all-local"
+   fi
    cat > job.ksh <<EOF
 #!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 fi
@@ -139,14 +118,10 @@ EOF
 chmod +x job.ksh
 
 echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
-if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
+if test $SUBMIT = LoadLeveller; then
    llsubmit job.ksh
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-     -o $HOSTNAME = "bv1103en.ucar.edu" \
-     -o $HOSTNAME = "bv1203en.ucar.edu"; then 
+elif test $SUBMIT = LSF; then
    bsub -q $QUEUE -n $NUM_PROCS < $PWD/job.ksh
-elif test $HOSTNAME = ocotillo; then
-   ./job.ksh
 else
    ./job.ksh
 fi

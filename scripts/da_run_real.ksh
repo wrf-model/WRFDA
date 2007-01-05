@@ -63,7 +63,8 @@ if test ! -f $RC_DIR/$DATE/wrfinput_d${DOMAIN}; then
       # echo Dummy real > wrflowinp_d${DOMAIN}
    else
       ln -fs $RC_DIR/$DATE/met_em.d* .
-      $RUN_CMD ${WRF_DIR}/main/real.exe
+      cp ${WRF_DIR}/main/real.exe .
+      $RUN_CMD ./real.exe
       RC=$?
 
       if test -f fort.9; then

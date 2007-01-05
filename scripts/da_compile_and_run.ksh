@@ -7,12 +7,12 @@ export RUN=${RUN:-true}
 # Need a cleaner mapping between compiler and configure options.
 # Assuming option 2 is pgi mpi is a hack
 
-export ID=${ID:-trunk}
+export TYPE=${TYPE:-trunk}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
 
-echo "ID        $ID"
+echo "TYPE      $TYPE"
 echo "COMPILE   $COMPILE"
 echo "FULL      $FULL"
 echo "RUN       $RUN"
@@ -30,14 +30,12 @@ let COUNT=1
 export TARGET=wrfvar
 
 for COMPILER in $COMPILERS; do
-   export BUILD=${ID}_${COMPILER}_${MACHINE}
+   export ID=${TYPE}_${COMPILER}_${MACHINE}
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
 
-      . ~/setup_$COMPILER
-
-      echo "Compiling ${BUILD}/$TARGET"
-      cd ~bray/${BUILD}/$TARGET
+      echo "Compiling ${ID}/$TARGET"
+      cd $HOME/${ID}/$TARGET
       . ./setup.ksh $COMPILER >/dev/null
       svn update #>/dev/null 2>&1
       svn status
@@ -45,25 +43,18 @@ for COMPILER in $COMPILERS; do
       echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
       rm -f build/links
       ./compile_new $TARGET > compile.out 2>&1
-      ls -l build/wrfvar.exe
+      ls -l build/$TARGET.exe
       let COUNT=$COUNT+1
    fi
    if $RUN; then
       for REGION in $REGIONS; do
          for NUM_PROCS in $PROCS; do
             export NUM_PROCS
-            cd ~bray/data/$REGION
-            . $HOME/$BUILD/wrfvar/setup.ksh $COMPILER >/dev/null
-            echo "Testing $BUILD $TARGET on $REGION"
+            cd $DAT_DIR/$REGION
+            . $HOME/$ID/wrfvar/setup.ksh $COMPILER >/dev/null
+            echo "Testing $ID $TARGET on $REGION"
             ./test.ksh
          done
       done
    fi
 done
-
-#ls -lrt ~bray/*/*/build/*.exe
-#ls -lrt ~bray/data/*/*/cost_fn
-
-
-
-

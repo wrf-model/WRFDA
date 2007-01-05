@@ -20,15 +20,12 @@ export REGION=${REGION:-con200}                        # Region name.
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export DUMMY=${DUMMY:-false}
-export HOSTS=${HOSTS:-$PWD/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 
 export EXPT=${EXPT:-test}                             # Experiment name.
-export HOSTNAME=${HOSTNAME:-`hostname`}
+export MACHINE=${MACHINE:-`uname -n`}
 
 # Directories:
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrf} #Run directory.
