@@ -1,4 +1,4 @@
-if ("$?MACHINE" == "") then
+if (! $?MACHINE) then
    setenv MACHINE `uname -n`
 endif
 
