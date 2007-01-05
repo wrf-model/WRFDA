@@ -58,7 +58,7 @@ subroutine da_ao_stats_profiler (stats_unit, oi, re)
    
    if (rootproc) then 
       if (nu /= 0 .or. nv /= 0) then 
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Profiler'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for profiler'
          call da_print_stats_profiler(stats_unit, nu, nv, Profiler)
       end if 
    end if

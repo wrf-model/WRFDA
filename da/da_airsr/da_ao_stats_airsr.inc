@@ -57,7 +57,7 @@ subroutine da_ao_stats_airsr (stats_unit, oi, re)
 
    if (rootproc) then
       if (nt /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for AIRS retrievals'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for airs retrievals'
          call da_print_stats_airsr(stats_unit, nt, nq, airsr)
       end if
    end if

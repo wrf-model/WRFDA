@@ -61,7 +61,7 @@ subroutine da_ao_stats_geoamv (stats_unit, oi, re)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Geoamv'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for geoamv'
          call da_print_stats_geoamv (stats_unit, nu, nv, geoamv)
       end if
    end if

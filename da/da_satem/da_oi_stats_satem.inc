@@ -44,7 +44,7 @@ subroutine da_oi_stats_satem (stats_unit, oi)
 
    if (rootproc) then
       if (nthickness /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Satem'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for satem'
          call da_print_stats_satem(stats_unit, nthickness, Satem)
       end if
    end if

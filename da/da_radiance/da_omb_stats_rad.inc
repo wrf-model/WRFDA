@@ -62,7 +62,7 @@ subroutine da_omb_stats_rad ( stats_unit, iv )
 
       if (rootproc) then
          if ( any( rad(i)%ichan(:)%num /= 0 ) ) then
-            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Radiance         '//iv%instid(i)%rttovid_string 
+            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for radiance         '//iv%instid(i)%rttovid_string 
             call da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )
          end if
       end if

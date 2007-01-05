@@ -93,7 +93,7 @@ subroutine da_ao_stats_buoy (stats_unit, oi, re)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. np /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Buoy'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for buoy'
          call da_print_stats_buoy(stats_unit, nu, nv, nt, np, nq, Buoy)
       end if
    end if

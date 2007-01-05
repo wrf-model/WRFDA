@@ -95,7 +95,7 @@ subroutine da_ao_stats_bogus (stats_unit, oi, re)
 
    if (rootproc) then
      if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0 .or. nslp /= 0) then
-       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Bogus'
+       write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for bogus'
        call da_print_stats_bogus(stats_unit, nu, nv, nt, nq, nslp, Bogus)
      end if
    end if

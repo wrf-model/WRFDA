@@ -67,7 +67,7 @@ subroutine da_ao_stats_radar (stats_unit, oi, re)
 
    if (rootproc) then
       if (nrv /= 0 .or. nrf /= 0) then 
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Radar'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for radar'
          call da_print_stats_radar(stats_unit, nrv, nrf, Radar)
       end if
    end if

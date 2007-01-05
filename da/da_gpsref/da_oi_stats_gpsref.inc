@@ -43,7 +43,7 @@ subroutine da_oi_stats_gpsref (stats_unit, oi)
              GPSRef%minimum%ref%l, GPSRef%maximum%ref%l)
    
    if (rootproc .and. (ngpsref > 0)) then
-      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for GPSRef'
+      write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for gpsref'
    
       call da_print_stats_gpsref(stats_unit, ngpsref, GPSRef)
    end if

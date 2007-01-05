@@ -57,7 +57,7 @@ subroutine da_oi_stats_pilot (stats_unit, oi)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for Pilot'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for pilot'
          call da_print_stats_pilot(stats_unit, nu, nv, Pilot)
       end if
    end if

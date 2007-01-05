@@ -84,7 +84,7 @@ subroutine da_ao_stats_gpsref (stats_unit, oi, re)
    
    if (rootproc) then
       if (ngpsref > 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for GPSRef'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for gpsref'
    
          call da_print_stats_gpsref(stats_unit, ngpsref, GPSRef)
       end if

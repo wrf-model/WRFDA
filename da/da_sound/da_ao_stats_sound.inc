@@ -83,7 +83,7 @@ subroutine da_ao_stats_sound (stats_unit, oi, re)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0 .or. nq /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Sound'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for sound'
          call da_print_stats_sound(stats_unit, nu, nv, nt, nq, Sound)
       end if
    end if

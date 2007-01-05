@@ -71,7 +71,7 @@ subroutine da_ao_stats_airep (stats_unit, oi, re)
 
    if (rootproc) then
       if (nu /= 0 .or. nv /= 0 .or. nt /= 0) then
-         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for Airep'
+         write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for airep'
          call da_print_stats_airep(stats_unit, nu, nv, nt, Airep)
       end if
    end if
