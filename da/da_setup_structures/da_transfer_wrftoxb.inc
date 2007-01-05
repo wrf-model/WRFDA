@@ -1,4 +1,4 @@
-subroutine da_transfer_wrftoxb(xbx, grid, &
+subroutine da_transfer_wrftoxb(xbx, grid &
 #include "em_dummy_new_args.inc"
                              )
 

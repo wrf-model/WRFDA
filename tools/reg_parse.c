@@ -81,6 +81,7 @@
 
 static int ntracers = 0 ;
 static char tracers[1000][100] ;
+
 int
 pre_parse( char * dir, FILE * infile, FILE * outfile )
 {

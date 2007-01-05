@@ -1,6 +1,6 @@
 !WRF:MEDIATION_LAYER:SOLVER
 
-SUBROUTINE solve_em ( grid , config_flags , &
+SUBROUTINE solve_em ( grid , config_flags  &
 ! Actual arguments generated from Registry
 #include "em_dummy_new_args.inc"
 !
@@ -479,7 +479,8 @@ BENCH_START(phy_prep_tim)
 #endif
          CALL wrf_debug ( 200 , ' call phy_prep' )
          CALL phy_prep ( config_flags,                           &
-                         grid%em_mut, grid%em_u_2, grid%em_v_2, grid%em_p, grid%em_pb, grid%em_alt,              &
+                         grid%em_mut, grid%em_muu, grid%em_muv, grid%em_u_2, &
+                         grid%em_v_2, grid%em_p, grid%em_pb, grid%em_alt,              &
                          grid%em_ph_2, grid%em_phb, grid%em_t_2, grid%tsk, moist, num_3d_m,   &
                          mu_3d, rho,                             &
                          th_phy, p_phy, pi_phy, u_phy, v_phy,    &
@@ -491,6 +492,8 @@ BENCH_START(phy_prep_tim)
                          grid%rthcuten, grid%rqvcuten, grid%rqccuten,           &
                          grid%rqrcuten, grid%rqicuten, grid%rqscuten,           &
                          grid%rthften,  grid%rqvften,                      &
+                         grid%RUNDGDTEN, grid%RVNDGDTEN, grid%RTHNDGDTEN,       &
+                         grid%RQVNDGDTEN, grid%RMUNDGDTEN,                 &
                          ids, ide, jds, jde, kds, kde,           &
                          ims, ime, jms, jme, kms, kme,           &
                          grid%i_start(ij), grid%i_end(ij),       &
@@ -560,9 +563,9 @@ BENCH_START(rad_driver_tim)
      &        , PB=grid%em_pb                                                     &
      &        , F_ICE_PHY=grid%f_ice_phy,F_RAIN_PHY=grid%f_rain_phy                 &
      &        , QV=moist(ims,kms,jms,P_QV), F_QV=F_QV                     &
-     &        , QC=moist(ims,kms,jms,P_QC), F_QC=F_QC                     &
+     &        , QC=moist(ims,kms,jms,P_QC), F_QC=F_QC                                        &
      &        , QR=moist(ims,kms,jms,P_QR), F_QR=F_QR                     &
-     &        , QI=moist(ims,kms,jms,P_QI), F_QI=F_QI                     &
+     &        , QI=moist(ims,kms,jms,P_QI), F_QI=F_QI                                        &
      &        , QS=moist(ims,kms,jms,P_QS), F_QS=F_QS                     &
      &        , QG=moist(ims,kms,jms,P_QG), F_QG=F_QG                     &
 #ifdef ACFLUX
@@ -1133,7 +1136,8 @@ BENCH_START(tke_rhs_tim)
                           grid%em_tke_2,grid%em_mut,                     &
                           th_phy,p_phy,p8w,t8w,grid%em_z,grid%em_fnm,grid%em_fnp,             &
                           grid%cf1,grid%cf2,grid%cf3,grid%msft,grid%xkmh,grid%xkmv,grid%xkhv,grid%rdx,grid%rdy,    &
-                          grid%dx,grid%dy,grid%dt,grid%em_zx,grid%em_zy,grid%em_rdz,grid%em_rdzw,grid%em_dn,grid%em_dnw,config_flags%mix_cr_len,  &
+                          grid%dx,grid%dy,grid%dt,grid%em_zx,grid%em_zy,grid%em_rdz,grid%em_rdzw,grid%em_dn,       &
+                          grid%em_dnw,config_flags%mix_cr_len,  &
                           ids, ide, jds, jde, kds, kde,               &
                           ims, ime, jms, jme, kms, kme,               &
                           grid%i_start(ij), grid%i_end(ij),           &
@@ -1277,6 +1281,8 @@ BENCH_END(hor_diff_tim)
                   k_start    , min(k_end,kde-1)                     )
 
       ENDDO
+
+     !$OMP END PARALLEL DO
 ! 
 !***********************************************************************
 
@@ -1331,7 +1337,7 @@ BENCH_START(rk_tend_tim)
                          grid%msfu, grid%msfv, grid%msft, grid%f, grid%e, grid%sina, grid%cosa,              &
                          grid%em_fnm, grid%em_fnp, grid%em_rdn, grid%em_rdnw,                             &
                          grid%dt, grid%rdx, grid%rdy, grid%khdif, grid%kvdif, grid%xkmhd,               &
-                         grid%diff_6th_opt, grid%diff_6th_rate,           &
+                         grid%diff_6th_opt, grid%diff_6th_factor,           &
                          grid%dampcoef,grid%zdamp,config_flags%damp_opt,                         &
                          grid%cf1, grid%cf2, grid%cf3, grid%cfn, grid%cfn1, num_3d_m,              &
                          config_flags%non_hydrostatic,                    &
@@ -2540,7 +2546,7 @@ BENCH_END(small_step_finish_tim)
 
    moist_variable_loop: do im = PARAM_FIRST_SCALAR, num_3d_m
 
-   if (grid%adv_moist_cond .or. (im==p_qv) ) then
+   if (grid%adv_moist_cond .or. im==p_qv ) then
 
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij )
@@ -2576,7 +2582,9 @@ BENCH_START(rk_scalar_tend_tim)
        CALL rk_scalar_tend (  im, im, config_flags,                                      &
                               rk_step, dt_rk,                                            &
                               grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,                  &
-                              grid%em_mut, grid%em_alt,                                  &
+                              grid%em_mut, grid%em_mub, grid%em_mu_1,                    &
+                              grid%em_alt,                                               &
+                              moist_old(ims,kms,jms,im),                                 &
                               moist(ims,kms,jms,im),                                     &
                               moist_tend(ims,kms,jms,im),                                &
                               advect_tend,grid%rqvften,                                  &
@@ -2584,7 +2592,8 @@ BENCH_START(rk_scalar_tend_tim)
                               grid%msfu, grid%msfv, grid%msft,                           &
                               grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw, grid%khdif, &
                               grid%kvdif, grid%xkmhd,                                    &
-                              grid%diff_6th_opt, grid%diff_6th_rate,                     &
+                              grid%diff_6th_opt, grid%diff_6th_factor,                   &
+                              config_flags%pd_moist,            &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2677,7 +2686,7 @@ BENCH_START(update_scal_tim)
                               advect_tend, grid%msft,                &
                               grid%em_mu_1, grid%em_mu_2, grid%em_mub,                  &
                               rk_step, dt_rk, grid%spec_zone,        &
-                              config_flags,                     &
+                              config_flags,     &
                               ids, ide, jds, jde, kds, kde,     &
                               ims, ime, jms, jme, kms, kme,     &
                               grid%i_start(ij), grid%i_end(ij), &
@@ -2704,7 +2713,7 @@ BENCH_END(flow_depbdy_tim)
    ENDDO moist_tile_loop_2
    !$OMP END PARALLEL DO
 
-     ENDIF  !-- if (grid%adv_moist_cond .or. (im==p_qv) ) then
+     ENDIF  !-- if (grid%adv_moist_cond .or. im==p_qv ) then
 
    ENDDO moist_variable_loop
 
@@ -2733,7 +2742,9 @@ BENCH_START(tke_adv_tim)
      CALL rk_scalar_tend ( 1, 1, config_flags,                                        &
                            rk_step, dt_rk,                                            &
                            grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,                  &
-                           grid%em_mut, grid%em_alt,                                  &
+                           grid%em_mut, grid%em_mub, grid%em_mu_1,                    &
+                           grid%em_alt,                                               &
+                           grid%em_tke_1,                                             &
                            grid%em_tke_2,                                             &
                            tke_tend(ims,kms,jms),                                     &
                            advect_tend,grid%rqvften,                                  &
@@ -2741,7 +2752,8 @@ BENCH_START(tke_adv_tim)
                            grid%msfu, grid%msfv, grid%msft,                           &
                            grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw, grid%khdif, &
                            grid%kvdif, grid%xkmhd,                                    &
-                           grid%diff_6th_opt, grid%diff_6th_rate,                     &
+                           grid%diff_6th_opt, grid%diff_6th_factor,                   &
+                           config_flags%pd_tke,              &
                            ids, ide, jds, jde, kds, kde,     &
                            ims, ime, jms, jme, kms, kme,     &
                            grid%i_start(ij), grid%i_end(ij), &
@@ -2813,7 +2825,9 @@ BENCH_START(chem_adv_tim)
        CALL rk_scalar_tend ( ic, ic, config_flags,                            &
                              rk_step, dt_rk,                                  &
                              grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,        &
-                             grid%em_mut, grid%em_alt,                        &
+                             grid%em_mut, grid%em_mub, grid%em_mu_1,          &
+                             grid%em_alt,                                     &
+                             chem_old(ims,kms,jms,ic),                        &
                              chem(ims,kms,jms,ic),                            &
                              chem_tend(ims,kms,jms,ic),                       &
                              advect_tend,grid%rqvften,                        &
@@ -2821,7 +2835,8 @@ BENCH_START(chem_adv_tim)
                              grid%msfu, grid%msfv, grid%msft,                 &
                              grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw,   &
                              grid%khdif, grid%kvdif, grid%xkmhd,              &
-                             grid%diff_6th_opt, grid%diff_6th_rate,           &
+                             grid%diff_6th_opt, grid%diff_6th_factor,         &
+                             config_flags%pd_chem,             &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &
@@ -2943,7 +2958,9 @@ BENCH_END(chem_adv_tim)
        CALL rk_scalar_tend ( is, is, config_flags,                            &
                              rk_step, dt_rk,                                  &
                              grid%em_ru_m, grid%em_rv_m, grid%em_ww_m,        &
-                             grid%em_mut, grid%em_alt,                        &
+                             grid%em_mut, grid%em_mub, grid%em_mu_1,          &
+                             grid%em_alt,                                     &
+                             scalar_old(ims,kms,jms,is),                      &
                              scalar(ims,kms,jms,is),                          &
                              scalar_tend(ims,kms,jms,is),                     &
                              advect_tend,grid%rqvften,                        &
@@ -2951,7 +2968,8 @@ BENCH_END(chem_adv_tim)
                              grid%msfu, grid%msfv, grid%msft,                 &
                              grid%rdx, grid%rdy, grid%em_rdn, grid%em_rdnw,   &
                              grid%khdif, grid%kvdif, grid%xkmhd,              &
-                             grid%diff_6th_opt, grid%diff_6th_rate,           &
+                             grid%diff_6th_opt, grid%diff_6th_factor,         &
+                             config_flags%pd_scalar,           &
                              ids, ide, jds, jde, kds, kde,     &
                              ims, ime, jms, jme, kms, kme,     &
                              grid%i_start(ij), grid%i_end(ij), &

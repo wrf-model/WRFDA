@@ -21,7 +21,7 @@ gen_state_struct ( char * dirname )
   if ( strlen(dirname) > 0 ) { sprintf(fname,"%s/%s",dirname,fn) ; }
   if ((fp = fopen( fname , "w" )) == NULL ) return(1) ;
   print_warning(fp,fname) ;
-  gen_decls ( fp , "", &Domain , COLON_RANGE , POINTERDECL , FIELD | RCONFIG | FOURD , DRIVER_LAYER,"" ) ;
+  gen_decls ( fp , "", &Domain , COLON_RANGE , POINTERDECL , FIELD | RCONFIG | FOURD , DRIVER_LAYER ) ;
   close_the_file( fp ) ;
   return(0) ;
 }
@@ -61,9 +61,9 @@ gen_dummy_decls ( char * dn )
     if ((fp = fopen( fname , "w" )) == NULL ) continue ;
     print_warning(fp,fname) ;
 #if 0
-    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | RCONFIG | FOURD , MEDIATION_LAYER,"" ) ;
+    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | RCONFIG | FOURD , MEDIATION_LAYER ) ;
 #else
-    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | FOURD , MEDIATION_LAYER,"" ) ;
+    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FIELD | FOURD , MEDIATION_LAYER ) ;
 #endif
     fprintf(fp,"#undef COPY_IN\n") ;
     fprintf(fp,"#undef COPY_OUT\n") ;
@@ -89,7 +89,7 @@ gen_dummy_decls_new ( char * dn )
     else                  { sprintf(fname,"%s%s",corename,fn) ; }
     if ((fp = fopen( fname , "w" )) == NULL ) continue ;
     print_warning(fp,fname) ;
-    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FOURD | FIELD | BDYONLY , MEDIATION_LAYER,",intent(inout)" ) ;
+    gen_decls ( fp, corename, &Domain , GRIDREF , NOPOINTERDECL , FOURD | FIELD | BDYONLY , MEDIATION_LAYER ) ;
     fprintf(fp,"#undef COPY_IN\n") ;
     fprintf(fp,"#undef COPY_OUT\n") ;
     close_the_file( fp ) ;
@@ -117,7 +117,7 @@ gen_i1_decls ( char * dn )
     else                  { sprintf(fname,"%s%s",corename,fn) ; }
     if ((fp = fopen( fname , "w" )) == NULL ) continue ;
     print_warning(fp,fname) ;
-    gen_decls ( fp , corename, &Domain , GRIDREF , NOPOINTERDECL , I1 , MEDIATION_LAYER,"" ) ;
+    gen_decls ( fp , corename, &Domain , GRIDREF , NOPOINTERDECL , I1 , MEDIATION_LAYER ) ;
 
     /* now generate tendencies for 4d vars if specified  */
     for ( p = FourD ; p != NULL ; p = p->next )
@@ -153,7 +153,7 @@ gen_i1_decls ( char * dn )
 }
 
 int
-gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_point , int mask , int layer, char * intent )
+gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_point , int mask , int layer )
 {
   node_t * p ; 
   int tag, ipass ;
@@ -217,7 +217,7 @@ gen_decls ( FILE * fp , char * corename , node_t * node , int sw_ranges, int sw_
         fprintf(fp, "%-10s%-20s%-10s :: %s\n",
                     field_type( t1, p ) ,
                     dimspec ,
-                    (sw_point==POINTERDECL)?declare_array_as_pointer(t3,p):intent ,
+                    (sw_point==POINTERDECL)?declare_array_as_pointer(t3,p):"" ,
                     fname ) ;
       }
     }
@@ -253,7 +253,7 @@ gen_state_subtypes1 ( FILE * fp , node_t * node , int sw_ranges , int sw_point ,
           add_typedef_name ( tempname ) ;
           gen_state_subtypes1 ( fp , p->type , sw_ranges , sw_point , mask ) ;
           fprintf(fp,"TYPE %s\n",p->type->name) ;
-          gen_decls ( fp , "", p->type , sw_ranges , sw_point , mask , DRIVER_LAYER,"") ;
+          gen_decls ( fp , "", p->type , sw_ranges , sw_point , mask , DRIVER_LAYER ) ;
           fprintf(fp,"END TYPE %s\n",p->type->name) ;
         }
       }
@@ -276,7 +276,7 @@ gen_state_subtypes1 ( FILE * fp , node_t * node , int sw_ranges , int sw_point ,
       {
         gen_state_subtypes1 ( fp , p->type , sw_ranges , sw_point , mask ) ;
         fprintf(fp,"TYPE %s\n",p->type->name) ;
-        gen_decls ( fp , "", p->type , sw_ranges , sw_point , mask , DRIVER_LAYER,"" ) ;
+        gen_decls ( fp , "", p->type , sw_ranges , sw_point , mask , DRIVER_LAYER ) ;
         fprintf(fp,"END TYPE %s\n",p->type->name) ;
       }
   }

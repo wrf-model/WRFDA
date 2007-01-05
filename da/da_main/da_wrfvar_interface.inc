@@ -7,7 +7,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
    implicit none
 
    interface
-      subroutine da_solve (grid , config_flags , &
+      subroutine da_solve (grid , config_flags &
 #include "em_dummy_new_args.inc"
      )
 
@@ -51,7 +51,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
    grid%itimestep = 1
 
-   call da_solve (grid , config_flags , &
+   call da_solve (grid , config_flags &
 #include "em_actual_new_args.inc"
    )
 

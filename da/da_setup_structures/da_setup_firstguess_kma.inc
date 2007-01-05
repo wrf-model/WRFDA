@@ -1,4 +1,4 @@
-subroutine da_setup_firstguess_kma(xbx, grid, &
+subroutine da_setup_firstguess_kma(xbx, grid &
 #include "em_dummy_new_args.inc"
                            )
 
@@ -88,7 +88,7 @@ subroutine da_setup_firstguess_kma(xbx, grid, &
    max_wavenumber = xbx%ni/2-1
    xbx % alp_size = (xbx%nj+1)*(max_wavenumber+1)*(max_wavenumber+2)/4
 
-   call da_transfer_kmatoxb(xbx, grid, &
+   call da_transfer_kmatoxb(xbx, grid &
 #include "em_dummy_new_args.inc"
                            )
 

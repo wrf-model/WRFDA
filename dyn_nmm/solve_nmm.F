@@ -7,7 +7,7 @@
 #include "nmm_loop_macros.h"
 !-----------------------------------------------------------------------
 !
-      SUBROUTINE SOLVE_NMM(GRID,CONFIG_FLAGS,                           &
+      SUBROUTINE SOLVE_NMM(GRID,CONFIG_FLAGS                           &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -1303,9 +1303,7 @@
 #endif
 !
 #ifdef DM_PARALLEL
-      IF(CONFIG_FLAGS%MP_PHYSICS/=ETAMPNEW)THEN
 #    include "HALO_NMM_L_3.inc"
-      ENDIF
 #endif
 !
 #ifdef WRF_CHEM
@@ -2169,3 +2167,9 @@
 !----------------------------------------------------------------------
       END SUBROUTINE FIELD_STATS
 !----------------------------------------------------------------------
+      FUNCTION TIMEF()
+      REAL*8 TIMEF
+      INTEGER IC, IR
+      CALL SYSTEM_CLOCK(COUNT=IC, COUNT_RATE=IR)
+      TIMEF=REAL(IC)/REAL(IR) * 1000.0
+      END

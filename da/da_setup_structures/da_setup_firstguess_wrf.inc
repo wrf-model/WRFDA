@@ -1,4 +1,4 @@
-subroutine da_setup_firstguess_wrf(xbx, grid, &
+subroutine da_setup_firstguess_wrf(xbx, grid &
 #include "em_dummy_new_args.inc"
                             )
 
@@ -232,7 +232,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid, &
    mjy = grid%xb % mjy
    mkz = grid%xb % mkz
    
-   call da_transfer_wrftoxb(xbx, grid, &
+   call da_transfer_wrftoxb(xbx, grid &
 #include "em_dummy_new_args.inc"
                          )
    if (trace_use) call da_trace_exit("da_setup_firstguess_wrf")

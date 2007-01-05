@@ -3980,7 +3980,7 @@ SUBROUTINE zero_tend ( tendency,                     &
 !======================================================================
 
    SUBROUTINE phy_prep ( config_flags,                                &  ! input
-                         mu, u, v, p, pb, alt, ph,                    &  ! input
+                         mu, muu, muv, u, v, p, pb, alt, ph,          &  ! input
                          phb, t, tsk, moist, n_moist,                 &  ! input
                          mu_3d, rho, th_phy, p_phy , pi_phy ,         &  ! output
                          u_phy, v_phy, p8w, t_phy, t8w,               &  ! output
@@ -3992,6 +3992,8 @@ SUBROUTINE zero_tend ( tendency,                     &
                          RTHCUTEN, RQVCUTEN, RQCCUTEN,                &
                          RQRCUTEN, RQICUTEN, RQSCUTEN,                &
                          RTHFTEN,  RQVFTEN,                           &
+                         RUNDGDTEN, RVNDGDTEN, RTHNDGDTEN,            &
+                         RQVNDGDTEN, RMUNDGDTEN,                      &
                          ids, ide, jds, jde, kds, kde,                &
                          ims, ime, jms, jme, kms, kme,                &
                          its, ite, jts, jte, kts, kte                )
@@ -4009,7 +4011,7 @@ SUBROUTINE zero_tend ( tendency,                     &
    REAL, DIMENSION( ims:ime, kms:kme , jms:jme , n_moist ), INTENT(IN) :: moist
 
 
-   REAL , DIMENSION( ims:ime, jms:jme ), INTENT(IN   )   ::     TSK, mu
+   REAL , DIMENSION( ims:ime, jms:jme ), INTENT(IN   )   ::     TSK, mu, muu, muv
 
    REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) ,                 &
           INTENT(  OUT)                                  ::   u_phy, &
@@ -4063,7 +4065,14 @@ SUBROUTINE zero_tend ( tendency,                     &
           INTENT(INOUT)   ::                                RTHFTEN, &
                                                             RQVFTEN
 
-   INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
+   REAL,  DIMENSION( ims:ime, kms:kme, jms:jme )                   , &
+          INTENT(INOUT)   ::                                RUNDGDTEN, &
+                                                            RVNDGDTEN, &
+                                                           RTHNDGDTEN, &
+                                                           RQVNDGDTEN, &
+                                                           RMUNDGDTEN
+
+   INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end, i_startu, j_startv
    INTEGER :: i, j, k
    REAL    :: w1, w2, z0, z1, z2
 
@@ -4327,6 +4336,49 @@ SUBROUTINE zero_tend ( tendency,                     &
       ENDIF
 
    END IF
+
+! fdda
+! note fdda u and v tendencies are staggered, also only interior points have muu/muv,
+!   so only decouple those
+
+   IF (config_flags%grid_fdda .gt. 0) THEN
+
+      i_startu=MAX(its,ids+1)
+      j_startv=MAX(jts,jds+1)
+
+      DO J=j_start,j_end
+      DO K=k_start,k_end
+      DO I=i_startu,i_end
+         RUNDGDTEN(I,K,J) =RUNDGDTEN(I,K,J)/muu(I,J)
+      ENDDO
+      ENDDO
+      ENDDO
+      DO J=j_startv,j_end
+      DO K=k_start,k_end
+      DO I=i_start,i_end
+         RVNDGDTEN(I,K,J) =RVNDGDTEN(I,K,J)/muv(I,J)
+      ENDDO
+      ENDDO
+      ENDDO
+      DO J=j_start,j_end
+      DO K=k_start,k_end
+      DO I=i_start,i_end
+         RTHNDGDTEN(I,K,J)=RTHNDGDTEN(I,K,J)/mu(I,J)
+!        RMUNDGDTEN(I,J) - no coupling
+      ENDDO
+      ENDDO
+      ENDDO
+      IF (P_QV .ge. PARAM_FIRST_SCALAR) THEN
+         DO J=j_start,j_end
+         DO K=k_start,k_end
+         DO I=i_start,i_end
+            RQVNDGDTEN(I,K,J)=RQVNDGDTEN(I,K,J)/mu(I,J)
+         ENDDO
+         ENDDO
+         ENDDO
+      ENDIF
+
+    ENDIF
 
 END SUBROUTINE phy_prep
 
@@ -4889,12 +4941,13 @@ END SUBROUTINE set_tend
                                                                                 
       SUBROUTINE sixth_order_diffusion( name, field, tendency, mu, dt,  &
                                         config_flags,                   &
-                                        diff_6th_opt, diff_6th_rate,    &
+                                        diff_6th_opt, diff_6th_factor,  &
                                         ids, ide, jds, jde, kds, kde,   &
                                         ims, ime, jms, jme, kms, kme,   &
                                         its, ite, jts, jte, kts, kte )
                                                                                 
-! History:       07 Jun 2006   Revised and generalized by Jason Knievel  
+! History:       14 Nov 2006   Name of variable changed by Jason Knievel
+!                07 Jun 2006   Revised and generalized by Jason Knievel  
 !                25 Apr 2005   Original code by Jason Knievel, NCAR
                                                                                 
 ! Purpose:       Apply 6th-order, monotonic (flux-limited), numerical
@@ -4930,7 +4983,7 @@ END SUBROUTINE set_tend
     :: dt
 
     REAL, INTENT(IN)  &
-    :: diff_6th_rate
+    :: diff_6th_factor
 
     INTEGER, INTENT(IN)  &
     :: diff_6th_opt
@@ -4959,16 +5012,16 @@ END SUBROUTINE set_tend
 !------------------------------------------------------------------------------
 
 !------------------------------------------------------------------------------
-! Begin: Translate the diffusion rate into a diffusion coefficient.  See
+! Begin: Translate the diffusion factor into a diffusion coefficient.  See
 ! Durran's text, section 2.4.3, then adjust for sixth-order diffusion (not
 ! fourth) and for diffusion in two dimensions (not one).  For reference, a
-! rate of 1.0 would mean complete diffusion of a 2dx wave in one time step,
+! factor of 1.0 would mean complete diffusion of a 2dx wave in one time step,
 ! although application of the flux limiter reduces somewhat the effects of
 ! diffusion for a given coefficient.
 
-    diff_6th_coef = diff_6th_rate * 0.015625 / ( 2.0 * dt )  
+    diff_6th_coef = diff_6th_factor * 0.015625 / ( 2.0 * dt )  
 
-! End: Translate diffusion rate.
+! End: Translate diffusion factor.
 !------------------------------------------------------------------------------
 
 !------------------------------------------------------------------------------

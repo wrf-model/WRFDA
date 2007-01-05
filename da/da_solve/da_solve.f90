@@ -1,4 +1,4 @@
-subroutine da_solve ( grid , config_flags , &
+subroutine da_solve ( grid , config_flags &
 #include "em_dummy_new_args.inc"
                  )
 
@@ -103,7 +103,7 @@ subroutine da_solve ( grid , config_flags , &
    ! [3.0] Set up first guess field (grid%xb):
    !---------------------------------------------------------------------------
 
-   call da_setup_firstguess( xbx, grid, &
+   call da_setup_firstguess( xbx, grid &
 #include "em_dummy_new_args.inc"
                            )
 
@@ -185,7 +185,7 @@ subroutine da_solve ( grid , config_flags , &
       ! [8.2] Calculate innovation vector (O-B):
 
       call da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags , &
+                                grid , config_flags &
 #include "em_dummy_new_args.inc"
                  )
 
@@ -256,7 +256,7 @@ subroutine da_solve ( grid , config_flags , &
       ! [8.0] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
 
-      call da_transfer_xatoanalysis( it, xbx, grid, config_flags ,&
+      call da_transfer_xatoanalysis( it, xbx, grid, config_flags &
 #include "em_dummy_new_args.inc"
          )
    end do

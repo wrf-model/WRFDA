@@ -169,7 +169,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                          msfu, msfv, msft, f, e, sina, cosa,              &
                          fnm, fnp, rdn, rdnw,                             &
                          dt, rdx, rdy, khdif, kvdif, xkmhd,               &
-                         diff_6th_opt, diff_6th_rate,                     &
+                         diff_6th_opt, diff_6th_factor,                   &
                          dampcoef,zdamp,damp_opt,                         &
                          cf1, cf2, cf3, cfn, cfn1, n_moist,               &
                          non_hydrostatic,                                 &
@@ -271,7 +271,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                                                 khdif,   &
                                                                 kvdif
    INTEGER, INTENT( IN ) :: diff_6th_opt
-   REAL,    INTENT( IN ) :: diff_6th_rate
+   REAL,    INTENT( IN ) :: diff_6th_factor
 
    INTEGER, INTENT( IN ) :: damp_opt
 
@@ -554,14 +554,14 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
       CALL sixth_order_diffusion( 'u', u, ru_tendf, mut, dt,          &
                                        config_flags,                  &
-                                       diff_6th_opt, diff_6th_rate,   &
+                                       diff_6th_opt, diff_6th_factor, &
                                        ids, ide, jds, jde, kds, kde,  &
                                        ims, ime, jms, jme, kms, kme,  &
                                        its, ite, jts, jte, kts, kte )
 
       CALL sixth_order_diffusion( 'v', v, rv_tendf, mut, dt,          &
                                        config_flags,                  &
-                                       diff_6th_opt, diff_6th_rate,   &
+                                       diff_6th_opt, diff_6th_factor, &
                                        ids, ide, jds, jde, kds, kde,  &
                                        ims, ime, jms, jme, kms, kme,  &
                                        its, ite, jts, jte, kts, kte )
@@ -569,14 +569,14 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
       IF (non_hydrostatic)                                            & 
       CALL sixth_order_diffusion( 'w', w, rw_tendf, mut, dt,          &
                                        config_flags,                  &
-                                       diff_6th_opt, diff_6th_rate,   &
+                                       diff_6th_opt, diff_6th_factor, &
                                        ids, ide, jds, jde, kds, kde,  &
                                        ims, ime, jms, jme, kms, kme,  &
                                        its, ite, jts, jte, kts, kte )
 
       CALL sixth_order_diffusion( 'm', t,  t_tendf, mut, dt,          &
                                        config_flags,                  &
-                                       diff_6th_opt, diff_6th_rate,   &
+                                       diff_6th_opt, diff_6th_factor, &
                                        ids, ide, jds, jde, kds, kde,  &
                                        ims, ime, jms, jme, kms, kme,  &
                                        its, ite, jts, jte, kts, kte )
@@ -724,15 +724,17 @@ END SUBROUTINE rk_addtend_dry
 
 SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                             rk_step, dt,                  &
-                            ru, rv, ww, mut, alt,         &
-                            scalar,                       &
+                            ru, rv, ww, mut, mub, mu_old, &
+                            alt,                          &
+                            scalar_old, scalar,           &
                             scalar_tends, advect_tend,    &
                             RQVFTEN,                      &
                             base, moist_step, fnm, fnp,   &
                             msfu, msfv, msft,             &
                             rdx, rdy, rdn, rdnw,          &
                             khdif, kvdif, xkmhd,          &
-                            diff_6th_opt, diff_6th_rate,  &
+                            diff_6th_opt, diff_6th_factor,&
+                            pd_advection,                 &
                             ids, ide, jds, jde, kds, kde, &
                             ims, ime, jms, jme, kms, kme, &
                             its, ite, jts, jte, kts, kte )
@@ -751,7 +753,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
    LOGICAL , INTENT(IN   ) :: moist_step
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                &
-                                         INTENT(INOUT)  :: scalar
+                                         INTENT(INOUT)  :: scalar, scalar_old
 
    REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                      &
                                          INTENT(INOUT)  :: scalar_tends
@@ -776,8 +778,9 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
    REAL , DIMENSION( ims:ime , jms:jme ) ,       INTENT(IN   ) :: msfu,    &
                                                                   msfv,    &
                                                                   msft,    &
-                                                                  mut
-
+                                                                  mub,     &
+                                                                  mut,     &
+                                                                  mu_old
 
    REAL ,                                        INTENT(IN   ) :: rdx,     &
                                                                   rdy,     &
@@ -785,10 +788,11 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                                                                   kvdif
 
    INTEGER, INTENT( IN ) :: diff_6th_opt
-   REAL,    INTENT( IN ) :: diff_6th_rate
+   REAL,    INTENT( IN ) :: diff_6th_factor
 
    REAL ,                                        INTENT(IN   ) :: dt
 
+   LOGICAL, INTENT(IN   ) :: pd_advection
 
    ! Local data
   
@@ -814,16 +818,31 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
                       ims, ime, jms, jme, kms, kme, &
                       its, ite, jts, jte, kts, kte )
 
-     CALL advect_scalar     ( scalar(ims,kms,jms,im),        &
-                              scalar(ims,kms,jms,im),        &
-                              advect_tend(ims,kms,jms),      &
-                              ru, rv, ww, mut, config_flags, &
-                              msfu, msfv, msft, fnm, fnp,    &
-                              rdx, rdy, rdnw,                &
-                              ids, ide, jds, jde, kds, kde,  &
-                              ims, ime, jms, jme, kms, kme,  &
-                              its, ite, jts, jte, kts, kte  )
+      IF( (rk_step == 3) .and. pd_advection ) THEN
 
+       CALL advect_scalar_pd       ( scalar(ims,kms,jms,im),             &
+                                     scalar_old(ims,kms,jms,im),         &
+                                     advect_tend(ims,kms,jms),           &
+                                     ru, rv, ww, mut, mub, mu_old,       &
+                                     config_flags,                       &
+                                     msfu, msfv, msft, fnm, fnp,         &
+                                     rdx, rdy, rdnw,dt,                  &
+                                     ids, ide, jds, jde, kds, kde,       &
+                                     ims, ime, jms, jme, kms, kme,       &
+                                     its, ite, jts, jte, kts, kte     )
+
+      ELSE
+
+       CALL advect_scalar     ( scalar(ims,kms,jms,im),        &
+                                scalar(ims,kms,jms,im),        &
+                                advect_tend(ims,kms,jms),      &
+                                ru, rv, ww, mut, config_flags, &
+                                msfu, msfv, msft, fnm, fnp,    &
+                                rdx, rdy, rdnw,                &
+                                ids, ide, jds, jde, kds, kde,  &
+                                ims, ime, jms, jme, kms, kme,  &
+                                its, ite, jts, jte, kts, kte  )
+      END IF
 
      IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN
 
@@ -877,7 +896,7 @@ SUBROUTINE rk_scalar_tend ( scs, sce, config_flags,       &
       CALL sixth_order_diffusion( 'm', scalar(ims,kms,jms,im),        &
                                        scalar_tends(ims,kms,jms,im),  &
                                        mut, dt, config_flags,         &
-                                       diff_6th_opt, diff_6th_rate,   &
+                                       diff_6th_opt, diff_6th_factor, &
                                        ids, ide, jds, jde, kds, kde,  &
                                        ims, ime, jms, jme, kms, kme,  &
                                        its, ite, jts, jte, kts, kte )

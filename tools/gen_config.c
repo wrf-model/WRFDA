@@ -6,7 +6,6 @@
 #include "data.h"
 #include <string.h>
 #include <strings.h>
-#include <ctype.h>
 #include "sym.h"
 
 int
@@ -225,7 +224,7 @@ gen_get_nl_config ( char * dirname )
         fprintf(fp,"  USE module_configure\n") ;
       }
       fprintf(fp,"  %s , INTENT(%s) :: %s\n",p->type->name,intnt,p->name) ;
-      fprintf(fp,"  INTEGER, INTENT(in) :: id_id\n") ;
+      fprintf(fp,"  INTEGER id_id\n") ;
       fprintf(fp,"  CHARACTER*80 emess\n") ;
       if ( sw == 0 ) /* get */
       {
@@ -404,7 +403,7 @@ gen_config_reads ( char * dirname )
           fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
           fprintf(fp," END IF\n") ;
           fprintf(fp,"#ifndef NO_NAMELIST_PRINT\n") ;
-          fprintf(fp," WRITE ( UNIT = NAMELIST_WRITE_UNIT, NML = %s )\n",p2) ;
+          fprintf(fp," WRITE ( UNIT = *                  , NML = %s )\n",p2) ;
           fprintf(fp,"#endif\n") ;
 	  sym_add(p2) ;
 	}

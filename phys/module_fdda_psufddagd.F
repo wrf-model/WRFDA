@@ -3,6 +3,9 @@
 !
 !
 MODULE module_fdda_psufddagd
+
+  USE module_dm
+
 CONTAINS
 !
 !-------------------------------------------------------------------
@@ -111,35 +114,89 @@ CONTAINS
 
    REAL,     DIMENSION( ims:ime, kms:kme, jms:jme ), &
              INTENT(IN)   ::                    u3d, &
-                                                   v3d
+                                                v3d
 
    REAL,  DIMENSION( ims:ime, jms:jme ), INTENT(IN) :: pblh, &
-                                                            ht
+                                                         ht
 
    REAL, INTENT(IN)    :: guv, gt, gq
 
-   INTEGER             :: i, j, k, itsu, jtsv, itf, jtf, ktf
+   INTEGER             :: i, j, k, itsu, jtsv, itf, jtf, ktf, i0, k0, j0
    REAL                :: xtime_old, xtime_new, coef, val_analysis
-   INTEGER             :: kpbl
+   INTEGER             :: kpbl, dbg_level
 
    REAL                :: zpbl, zagl, zagl_bot, zagl_top, tfac, actual_end_fdda_min
    REAL, DIMENSION( its:ite, kts:kte, jts:jte, 4 ) :: wpbl  ! 1: u, 2: v, 3: t, 4: q
    REAL, DIMENSION( kts:kte, 4 )                   :: wzfac ! 1: u, 2: v, 3: t, 4: q
 
+   LOGICAL , EXTERNAL  :: wrf_dm_on_monitor
+
+   CHARACTER (LEN=256) :: message
+
    xtime_old = FLOOR(xtime/analysis_interval) * analysis_interval * 1.0
    xtime_new = xtime_old + analysis_interval
    coef = (xtime-xtime_old)/(xtime_new-xtime_old)
 
-   IF( xtime-xtime_old < 0.5*dt/60.0 ) THEN
-!       WRITE(wrf_err_message,'(a,f10.3,a)') &
-        WRITE(*,'(a,i1,a,f10.3,a)') &
-           'D0',id,' Analysis nudging read in new data at time = ', xtime, ' min.'
-!       CALL wrf_debug(0, wrf_err_message)
-!       WRITE(wrf_err_message,'(a,f10.4,a,f10.4)') &
-        WRITE(*,'(a,i1,a,f10.4,a,f10.4)') &
-           '    D0',id,' Sample values:   u_ndg_old(5,5,5)=', u_ndg_old(5,5,5), &
-           '     u_ndg_new(5,5,5)=', u_ndg_new(5,5,5)
-!       CALL wrf_debug(100, wrf_err_message)
+
+   IF ( wrf_dm_on_monitor()) THEN
+
+     CALL get_wrf_debug_level( dbg_level )
+
+     IF( xtime-xtime_old < 0.5*dt/60.0 ) THEN
+
+       IF( xtime < end_fdda_hour*60.0 ) THEN
+         WRITE(message,'(a,i1,a,f10.3,a)') &
+          'D0',id,' Analysis nudging read in new data at time = ', xtime, ' min.'
+         CALL wrf_message( TRIM(message) )
+         WRITE(message,'(a,i1,a,2f8.2,a)') &
+          'D0',id,' Analysis nudging bracketing times = ', xtime_old, xtime_new, ' min.'
+         CALL wrf_message( TRIM(message) )
+       ENDIF
+
+       actual_end_fdda_min = end_fdda_hour*60.0
+       IF( if_ramping == 1 .AND. dtramp_min > 0.0 ) &
+           actual_end_fdda_min = end_fdda_hour*60.0 + ABS(dtramp_min)
+
+       IF( dbg_level .GE. 10 .AND. xtime <= actual_end_fdda_min ) THEN
+!        Find the mid point of the tile and print out the sample values
+         i0 = (ite-its)/2+its
+         j0 = (jte-jts)/2+jts 
+
+         IF( guv > 0.0 ) THEN
+           DO k = kts, kte
+             WRITE(message,'(a,i1,a,3i4,a,f10.4,a,f10.4)') &
+               '    D0',id,' sample analysis values at i,k,j=', i0, k, j0, &
+               ' u_ndg_old=', u_ndg_old(i0,k,j0), ' u_ndg_new=', u_ndg_new(i0,k,j0)
+             CALL wrf_message( TRIM(message) )
+           ENDDO
+           DO k = kts, kte
+             WRITE(message,'(a,i1,a,3i4,a,f10.4,a,f10.4)') &
+               '    D0',id,' sample analysis values at i,k,j=', i0, k, j0, &
+               ' v_ndg_old=', v_ndg_old(i0,k,j0), ' v_ndg_new=', v_ndg_new(i0,k,j0)
+             CALL wrf_message( TRIM(message) )
+           ENDDO
+         ENDIF
+
+         IF( gt > 0.0 ) THEN
+           DO k = kts, kte
+             WRITE(message,'(a,i1,a,3i4,a,f10.4,a,f10.4)') &
+               '    D0',id,' sample analysis values at i,k,j=', i0, k, j0, &
+               ' t_ndg_old=', t_ndg_old(i0,k,j0), ' t_ndg_new=', t_ndg_new(i0,k,j0)
+             CALL wrf_message( TRIM(message) )
+           ENDDO
+         ENDIF
+
+         IF( gq > 0.0 ) THEN
+           DO k = kts, kte
+             WRITE(message,'(a,i1,a,3i4,a,f10.4,a,f10.4)') &
+               '    D0',id,' sample analysis values at i,k,j=', i0, k, j0, &
+               ' q_ndg_old=', q_ndg_old(i0,k,j0), ' q_ndg_new=', q_ndg_new(i0,k,j0)
+             CALL wrf_message( TRIM(message) )
+           ENDDO
+         ENDIF
+
+       ENDIF
+     ENDIF
    ENDIF
 
    jtsv=MAX0(jts,jds+1)
@@ -318,18 +375,17 @@ CONTAINS
 
    ENDIF
 !
-! If if_ramping and dtramp_min are defined by user, comput a time weighting function, tfac,
-! for analysis nudging so that at the end of the nudging period (which has to be at a
+! If if_ramping and dtramp_min are defined by user, comput a time weighting function, tfac, 
+! for analysis nudging so that at the end of the nudging period (which has to be at a 
 ! analysis time) we ramp down the nudging coefficient, based on the use-defined sign of dtramp_min.
 !
-! When dtramp_min is negative, ramping ends at end_fdda_hour and starts at
-! end_fdda_hour-ABS(dtramp_min).
+! When dtramp_min is negative, ramping ends at end_fdda_hour and starts at 
+! end_fdda_hour-ABS(dtramp_min).  
 !
-! When dtramp_min is positive, ramping starts at end_fdda_hour and ends at
-! end_fdda_hour+ABS(dtramp_min). In this case, the obs values are extrapolated using
-! the obs tendency saved from the previous FDDA wondow.  More specifically for extrapolation,
+! When dtramp_min is positive, ramping starts at end_fdda_hour and ends at 
+! end_fdda_hour+ABS(dtramp_min). In this case, the obs values are extrapolated using 
+! the obs tendency saved from the previous FDDA wondow.  More specifically for extrapolation, 
 ! coef (see codes below) is recalculated to reflect extrapolation during the ramping period.
-!
 !
    tfac = 1.0
 
@@ -341,7 +397,7 @@ CONTAINS
        actual_end_fdda_min = end_fdda_hour*60.0 + dtramp_min
      ENDIF
 
-     IF( xtime < actual_end_fdda_min-ABS(dtramp_min) )THEN
+     IF( xtime < actual_end_fdda_min-ABS(dtramp_min) )THEN 
        tfac = 1.0
      ELSEIF( xtime >= actual_end_fdda_min-ABS(dtramp_min) .AND. xtime <= actual_end_fdda_min )THEN
        tfac = ( actual_end_fdda_min - xtime ) / ABS(dtramp_min)
@@ -421,41 +477,110 @@ CONTAINS
    INTEGER,  INTENT(IN)   ::      k_zfac_uv,  k_zfac_t,  k_zfac_q
    INTEGER,  INTENT(IN)   ::      if_ramping
    REAL,     INTENT(IN)   ::      dtramp_min
-   REAL, INTENT(IN)       :: guv, gt, gq
-   REAL                   :: actual_end_fdda_min
+   REAL, INTENT(IN)       ::      guv, gt, gq
+   REAL                   ::      actual_end_fdda_min
 
    REAL, DIMENSION( ims:ime , jms:jme ), INTENT(OUT) :: rmundgdten
    INTEGER :: i, j, k
 
-   WRITE(*,'(a,i1,a,3e12.4)') &
-         'D0',id,' Analysis nudging is on and Guv, Gt, Gq = ', guv, gt, gq
-   IF( if_no_pbl_nudging_uv == 1 ) WRITE(*,'(a,i1,a)') &
-         'D0',id,' Analysis nudging for wind is turned off within the PBL.'
-   IF( if_no_pbl_nudging_t == 1 ) WRITE(*,'(a,i1,a)') &
-         'D0',id,' Analysis nudging for temperature is turned off within the PBL.'
-   IF( if_no_pbl_nudging_q == 1 ) WRITE(*,'(a,i1,a)') &
-         'D0',id,' Analysis nudging for water vapor mixing ratio is turned off within the PBL.'
-   IF( if_zfac_uv == 1 ) WRITE(*,'(a,i1,a,i3)') &
-         'D0',id,' Analysis nudging for wind is turned off below layer', k_zfac_uv
-   IF( if_zfac_t == 1 ) WRITE(*,'(a,i1,a,i3)') &
-         'D0',id,' Analysis nudging for temperature is turned off below layer', k_zfac_t
-   IF( if_zfac_q == 1 ) WRITE(*,'(a,i1,a,i3)') &
-         'D0',id,' Analysis nudging for water vapor mixing ratio is turned off below layer', &
-         k_zfac_q
-   IF( if_ramping == 1 .AND. ABS(dtramp_min) > 0.0 ) THEN
-     IF( dtramp_min <= 0.0 ) THEN
-       actual_end_fdda_min = end_fdda_hour*60.0
-     ELSE
-       actual_end_fdda_min = end_fdda_hour*60.0 + ABS(dtramp_min)
+   LOGICAL , EXTERNAL     ::      wrf_dm_on_monitor
+
+   CHARACTER (LEN=256) :: message
+
+   IF ( wrf_dm_on_monitor() ) THEN  
+
+     IF( guv > 0.0 ) THEN
+       WRITE(message,'(a,i1,a,e12.4)') &
+           'D0',id,' Analysis nudging for wind is turned on and Guv= ', guv
+       CALL wrf_message(TRIM(message))
+     ELSE IF( guv < 0.0 ) THEN
+       CALL wrf_error_fatal('In grid FDDA, Guv must be positive.')
+     ELSE 
+       WRITE(message,'(a,i1,a,e12.4)') &
+           'D0',id,' Analysis nudging for wind is turned off and Guv= ', guv
+       CALL wrf_message(TRIM(message))
      ENDIF
 
-     IF( actual_end_fdda_min < run_hours*60. ) THEN
-        WRITE(*,'(a,i1,a)') &
-           'D0',id,' Analysis nudging is ramped down near the end of the nudging period,'
-        WRITE(*,'(a,f6.2,a,f6.2,a)') &
-           '      starting at ', (actual_end_fdda_min - ABS(dtramp_min))/60.0, &
-           'h, ending at ', actual_end_fdda_min/60.0,'h.'
+     IF( gt > 0.0 ) THEN
+       WRITE(message,'(a,i1,a,e12.4)') &
+           'D0',id,' Analysis nudging for temperature is turned on and Gt= ', gt
+       CALL wrf_message(TRIM(message))
+     ELSE IF( gt < 0.0 ) THEN
+       CALL wrf_error_fatal('In grid FDDA, Gt must be positive.')
+     ELSE 
+       WRITE(message,'(a,i1,a,e12.4)') &
+           'D0',id,' Analysis nudging for temperature is turned off and Gt= ', gt
+       CALL wrf_message(TRIM(message))
      ENDIF
+
+     IF( gq > 0.0 ) THEN
+       WRITE(message,'(a,i1,a,e12.4)') &
+         'D0',id,' Analysis nudging for water vapor mixing ratio is turned on and Gq= ', gq
+       CALL wrf_message(TRIM(message))
+     ELSE IF( gq < 0.0 ) THEN
+       CALL wrf_error_fatal('In grid FDDA, Gq must be positive.')
+     ELSE
+       WRITE(message,'(a,i1,a,e12.4)') &
+         'D0',id,' Analysis nudging for water vapor mixing ratio is turned off and Gq= ', gq
+       CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( guv > 0.0 .AND. if_no_pbl_nudging_uv == 1 ) THEN
+        WRITE(message,'(a,i1,a)') &
+           'D0',id,' Analysis nudging for wind is turned off within the PBL.'
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( gt > 0.0 .AND. if_no_pbl_nudging_t == 1 ) THEN
+        WRITE(message,'(a,i1,a)') &
+           'D0',id,' Analysis nudging for temperature is turned off within the PBL.'
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( gq > 0.0 .AND. if_no_pbl_nudging_q == 1 ) THEN
+        WRITE(message,'(a,i1,a)') &
+         'D0',id,' Analysis nudging for water vapor mixing ratio is turned off within the PBL.'
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( guv > 0.0 .AND. if_zfac_uv == 1 ) THEN
+        WRITE(message,'(a,i1,a,i3)') &
+           'D0',id,' Analysis nudging for wind is turned off below layer', k_zfac_uv
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( gt > 0.0 .AND. if_zfac_t == 1 ) THEN
+        WRITE(message,'(a,i1,a,i3)') &
+           'D0',id,' Analysis nudging for temperature is turned off below layer', k_zfac_t
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( gq > 0.0 .AND. if_zfac_q == 1 ) THEN
+        WRITE(message,'(a,i1,a,i3)') &
+          'D0',id,' Analysis nudging for water vapor mixing ratio is turned off below layer', &
+           k_zfac_q
+        CALL wrf_message(TRIM(message))
+     ENDIF
+
+     IF( if_ramping == 1 .AND. ABS(dtramp_min) > 0.0 ) THEN
+       IF( dtramp_min <= 0.0 ) THEN
+         actual_end_fdda_min = end_fdda_hour*60.0
+       ELSE
+         actual_end_fdda_min = end_fdda_hour*60.0 + ABS(dtramp_min)
+       ENDIF
+
+       IF( actual_end_fdda_min <= run_hours*60. ) THEN
+          WRITE(message,'(a,i1,a)') &
+            'D0',id,' Analysis nudging is ramped down near the end of the nudging period,'
+          CALL wrf_message(TRIM(message))
+
+          WRITE(message,'(a,f6.2,a,f6.2,a)') &
+             '      starting at ', (actual_end_fdda_min - ABS(dtramp_min))/60.0, &
+             'h, ending at ', actual_end_fdda_min/60.0,'h.'
+          CALL wrf_message(TRIM(message))
+       ENDIF
+     ENDIF
+
    ENDIF
 
    IF(.not.restart) THEN
@@ -475,4 +600,3 @@ CONTAINS
    END SUBROUTINE fddagdinit
 !-------------------------------------------------------------------
 END MODULE module_fdda_psufddagd
-

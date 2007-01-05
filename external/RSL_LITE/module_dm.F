@@ -2255,7 +2255,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE force_domain_em_part2 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE force_domain_em_part2 ( grid, ngrid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2268,8 +2268,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
-#include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2312,7 +2310,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, ngrid, config_flags ,  &
+   SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, ngrid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2327,7 +2325,6 @@ END
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       INTEGER iparstrt,jparstrt,sw
@@ -2383,7 +2380,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE interp_domain_em_part2 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE interp_domain_em_part2 ( grid, ngrid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2396,8 +2393,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
-#include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2441,7 +2436,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE feedback_nest_prep ( grid, config_flags ,  &
+   SUBROUTINE feedback_nest_prep ( grid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2457,7 +2452,6 @@ END
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
 
       INTEGER       ::          ids, ide, jds, jde, kds, kde,    &
                                 ims, ime, jms, jme, kms, kme,    &
@@ -2479,7 +2473,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE feedback_domain_em_part1 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE feedback_domain_em_part1 ( grid, ngrid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2492,7 +2486,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE(domain), POINTER :: xgrid
@@ -2507,7 +2500,7 @@ END
       INTEGER local_comm, myproc, nproc, idum1, idum2
 
       INTERFACE
-          SUBROUTINE feedback_nest_prep ( grid, config_flags ,  &
+          SUBROUTINE feedback_nest_prep ( grid, config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2520,7 +2513,6 @@ END
              TYPE (grid_config_rec_type)            :: config_flags
              TYPE(domain), TARGET                   :: grid
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
           END SUBROUTINE feedback_nest_prep
       END INTERFACE
 !
@@ -2560,7 +2552,7 @@ END
       xgrid => grid
       grid => ngrid
 
-      CALL feedback_nest_prep ( grid, nconfig_flags ,  &
+      CALL feedback_nest_prep ( grid, nconfig_flags    &
 !
 #include "em_actual_new_args.inc"
 !
@@ -2580,7 +2572,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid, ngrid , config_flags ,  &
+   SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid, ngrid , config_flags    &
 !
 #include "em_dummy_new_args.inc"
 !
@@ -2597,8 +2589,6 @@ END
       TYPE(domain), POINTER :: ngrid
 
 #include <em_dummy_new_decl.inc>
-#include "namelist_defines2.inc"
-#include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2697,7 +2687,7 @@ END
 ! NMM nesting infrastructure extended from EM core. This is gopal's doing.
 !==============================================================================
 
-   SUBROUTINE interp_domain_nmm_part1 ( grid, intermediate_grid, ngrid, config_flags ,  &
+   SUBROUTINE interp_domain_nmm_part1 ( grid, intermediate_grid, ngrid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -2712,7 +2702,6 @@ END
       TYPE(domain), POINTER :: intermediate_grid
       TYPE(domain), POINTER :: ngrid
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       INTEGER iparstrt,jparstrt,sw
@@ -2773,7 +2762,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE interp_domain_nmm_part2 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE interp_domain_nmm_part2 ( grid, ngrid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -2786,8 +2775,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
-!#include <em_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2844,7 +2831,7 @@ END
 
 !------------------------------------------------------------------
 
-   SUBROUTINE force_domain_nmm_part1 ( grid, intermediate_grid, config_flags ,  &
+   SUBROUTINE force_domain_nmm_part1 ( grid, intermediate_grid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -2857,7 +2844,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: intermediate_grid
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2894,7 +2880,7 @@ END
 
 !==============================================================================================
 
-   SUBROUTINE force_domain_nmm_part2 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE force_domain_nmm_part2 ( grid, ngrid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -2907,8 +2893,6 @@ END
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
-!#include <nmm_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags
@@ -2975,7 +2959,7 @@ integer myproc
 ! em_nest_feedbackup_interp.inc will work correctly on multi-p. JM 20040308
 !
 
-   SUBROUTINE feedback_nest_prep_nmm ( grid, config_flags ,  &
+   SUBROUTINE feedback_nest_prep_nmm ( grid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -2991,7 +2975,6 @@ integer myproc
                                                   ! soil temp, moisture, etc., has vertical dim
                                                   ! of soil categories
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
 
       INTEGER       ::          ids, ide, jds, jde, kds, kde,    &
                                 ims, ime, jms, jme, kms, kme,    &
@@ -3027,7 +3010,7 @@ integer myproc
 
 !------------------------------------------------------------------
 
-   SUBROUTINE feedback_domain_nmm_part1 ( grid, ngrid, config_flags ,  &
+   SUBROUTINE feedback_domain_nmm_part1 ( grid, ngrid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -3040,7 +3023,6 @@ integer myproc
       TYPE(domain), POINTER :: grid          ! name of the grid being dereferenced (must be "grid")
       TYPE(domain), POINTER :: ngrid
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE(domain), POINTER :: xgrid
@@ -3062,7 +3044,7 @@ integer myproc
 #endif
 
       INTERFACE
-          SUBROUTINE feedback_nest_prep_nmm ( grid, config_flags ,  &
+          SUBROUTINE feedback_nest_prep_nmm ( grid, config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -3117,7 +3099,7 @@ integer myproc
       xgrid => grid
       grid => ngrid
 #include "deref_kludge.h"
-      CALL feedback_nest_prep_nmm ( grid, config_flags ,  &
+      CALL feedback_nest_prep_nmm ( grid, config_flags    &
 !
 #include "nmm_actual_args.inc"
 !
@@ -3139,7 +3121,7 @@ integer myproc
 
 !------------------------------------------------------------------
 
-   SUBROUTINE feedback_domain_nmm_part2 ( grid, intermediate_grid, ngrid , config_flags ,  &
+   SUBROUTINE feedback_domain_nmm_part2 ( grid, intermediate_grid, ngrid , config_flags    &
 !
 #include "nmm_dummy_args.inc"
 !
@@ -3156,8 +3138,6 @@ integer myproc
       TYPE(domain), POINTER :: ngrid
 
 #include <nmm_dummy_decl.inc>
-#include "namelist_defines2.inc"
-!#include <nmm_i1_decl.inc>
       INTEGER nlev, msize
       INTEGER i,j,pig,pjg,cm,cn,nig,njg,retval,k
       TYPE (grid_config_rec_type)            :: config_flags

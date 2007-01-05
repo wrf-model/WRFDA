@@ -319,11 +319,6 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
         TYPE(domain) , POINTER                 :: parent , nest
      END SUBROUTINE med_interp_domain
 
-     SUBROUTINE med_init_domain_constants ( parent , nest )
-        USE module_domain
-        TYPE(domain) , POINTER                 :: parent , nest
-     END SUBROUTINE med_init_domain_constants
-
      SUBROUTINE med_initialdata_input_ptr( nest , config_flags )
         USE module_domain
         USE module_configure
@@ -633,7 +628,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 
      SUBROUTINE BASE_STATE_PARENT ( Z3d,Q3d,T3d,PSTD,        &
                                     PINT,T,Q,CWM,            &
-                                    FIS,QS,PD,PDTOP,PTOP,    &
+                                    FIS,QSH,PD,PDTOP,PTOP,   &
                                     ETA1,ETA2,               &
                                     DETA1,DETA2,             &
                                     IDS,IDE,JDS,JDE,KDS,KDE, &
@@ -648,7 +643,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
          INTEGER,    INTENT(IN   )                            :: ITS,ITE,JTS,JTE,KTS,KTE
          REAL,       INTENT(IN   )                            :: PDTOP,PTOP
          REAL, DIMENSION(KMS:KME),                 INTENT(IN) :: ETA1,ETA2,DETA1,DETA2
-         REAL, DIMENSION(IMS:IME,JMS:JME),         INTENT(IN) :: FIS,PD,QS
+         REAL, DIMENSION(IMS:IME,JMS:JME),         INTENT(IN) :: FIS,PD,QSH
          REAL, DIMENSION(IMS:IME,KMS:KME,JMS:JME), INTENT(IN) :: PINT,T,Q,CWM
          REAL, DIMENSION(KMS:KME)                , INTENT(OUT):: PSTD
          REAL, DIMENSION(IMS:IME,KMS:KME,JMS:JME), INTENT(OUT):: Z3d,Q3d,T3d
@@ -723,7 +718,7 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 
     CALL BASE_STATE_PARENT ( parent%nmm_Z3d,parent%nmm_Q3d,parent%nmm_T3d,parent%nmm_PSTD,  &
                              parent%nmm_PINT,parent%nmm_T,parent%nmm_Q,parent%nmm_CWM,      &
-                             parent%nmm_FIS,parent%nmm_QS,parent%nmm_PD,parent%nmm_pdtop,parent%nmm_pt,   &
+                             parent%nmm_FIS,parent%nmm_QSH,parent%nmm_PD,parent%nmm_pdtop,parent%nmm_pt,   &
                              parent%nmm_ETA1,parent%nmm_ETA2,                               &
                              parent%nmm_DETA1,parent%nmm_DETA2,                             &
                              IDS,IDE,JDS,JDE,KDS,KDE,                                       &
@@ -806,13 +801,7 @@ SUBROUTINE init_domain_constants ( parent , nest )
    USE module_domain
    IMPLICIT NONE
    TYPE(domain) :: parent , nest
-#if (EM_CORE == 1 && DA_CORE == 0)
-   INTERFACE 
-     SUBROUTINE med_init_domain_constants ( parent , nest )
-        USE module_domain
-        TYPE(domain), POINTER :: parent , nest
-     END SUBROUTINE med_init_domain_constants
-   END INTERFACE 
+#if (EM_CORE == 1) && (DA_CORE == 0)
    CALL init_domain_constants_em ( parent, nest )
 #endif
 END SUBROUTINE init_domain_constants
@@ -856,7 +845,7 @@ SUBROUTINE med_nest_force ( parent , nest )
 
      SUBROUTINE BASE_STATE_PARENT ( Z3d,Q3d,T3d,PSTD,        &
                                     PINT,T,Q,CWM,            &
-                                    FIS,QS,PD,PDTOP,PTOP,    &
+                                    FIS,QSH,PD,PDTOP,PTOP,   &
                                     ETA1,ETA2,               &
                                     DETA1,DETA2,             &
                                     IDS,IDE,JDS,JDE,KDS,KDE, &
@@ -871,7 +860,7 @@ SUBROUTINE med_nest_force ( parent , nest )
          INTEGER,    INTENT(IN   )                            :: ITS,ITE,JTS,JTE,KTS,KTE
          REAL,       INTENT(IN   )                            :: PDTOP,PTOP
          REAL, DIMENSION(KMS:KME),                 INTENT(IN) :: ETA1,ETA2,DETA1,DETA2
-         REAL, DIMENSION(IMS:IME,JMS:JME),         INTENT(IN) :: FIS,PD,QS
+         REAL, DIMENSION(IMS:IME,JMS:JME),         INTENT(IN) :: FIS,PD,QSH
          REAL, DIMENSION(IMS:IME,KMS:KME,JMS:JME), INTENT(IN) :: PINT,T,Q,CWM
          REAL, DIMENSION(KMS:KME)                , INTENT(OUT):: PSTD
          REAL, DIMENSION(IMS:IME,KMS:KME,JMS:JME), INTENT(OUT):: Z3d,Q3d,T3d
@@ -909,7 +898,7 @@ SUBROUTINE med_nest_force ( parent , nest )
 
     CALL BASE_STATE_PARENT ( parent%nmm_Z3d,parent%nmm_Q3d,parent%nmm_T3d,parent%nmm_PSTD, &
                              parent%nmm_PINT,parent%nmm_T,parent%nmm_Q,parent%nmm_CWM,     &
-                             parent%nmm_FIS,parent%nmm_QS,parent%nmm_PD,parent%nmm_pdtop,parent%nmm_pt,  &
+                             parent%nmm_FIS,parent%nmm_QSH,parent%nmm_PD,parent%nmm_pdtop,parent%nmm_pt,  &
                              parent%nmm_ETA1,parent%nmm_ETA2,                              &
                              parent%nmm_DETA1,parent%nmm_DETA2,                            &
                              IDS,IDE,JDS,JDE,KDS,KDE,                                      &
@@ -1217,7 +1206,7 @@ SUBROUTINE med_hist_out ( grid , stream, config_flags )
      ELSE
        WRITE(n2,'("DATASET=AUXHIST",I1)')stream  ! may be overwritten, below, if stream is 0
      ENDIF
-     WRITE ( message , '("med_hist_out : opening ",A," for writing. ",I3)') TRIM ( fname ), ierr
+     WRITE ( message , '("med_hist_out : opening ",A," for writing. ")') TRIM ( fname )
      CALL wrf_debug( 1, message )
      SELECT CASE( stream )
        CASE ( 0 )
@@ -1258,6 +1247,7 @@ SUBROUTINE med_hist_out ( grid , stream, config_flags )
                                config_flags , output_aux_hist11 , n2, ierr )
      END SELECT
      IF ( ierr .NE. 0 ) THEN
+       WRITE ( message , '("med_hist_out : error opening ",A," for writing. ",I3)') TRIM ( fname ), ierr
        CALL wrf_message( message )
      ENDIF
    END IF
@@ -1722,7 +1712,7 @@ SUBROUTINE med_auxinput_in ( grid , stream, config_flags )
        CALL construct_filename2a ( auxname , config_flags%auxinput9_inname , grid%id , 2 , timestr )
      CASE ( 10 )
        IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXINPUT10_ALARM ), CT, ST, timestr )
-       CALL construct_filename2a ( auxname , config_flags%auxinput10_inname , grid%id , 2 , timestr )
+       CALL construct_filename2a ( auxname , config_flags%gfdda_inname , grid%id , 2 , timestr )
      CASE ( 11 )
        IF ( adjust ) CALL adjust_io_timestr( grid%io_intervals( AUXINPUT11_ALARM ), CT, ST, timestr )
        CALL construct_filename2a ( auxname , config_flags%auxinput11_inname , grid%id , 2 , timestr )
@@ -1917,7 +1907,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
 
 #include <wrf_io_flags.h>
 
-   CALL wrf_debug ( 1 , 'in med_latbound_in' )
+   CALL wrf_debug ( 200 , 'in med_latbound_in' )
 
    IF ( grid%id .EQ. 1 .AND. config_flags%specified .AND. config_flags%io_form_boundary .GT. 0 ) THEN
 
@@ -1932,7 +1922,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
        CALL wrf_debug( 100 , 'med_latbound_in: Skipping attempt to read lateral boundary file during last time step ' )
 
      ELSE IF ( WRFU_AlarmIsRinging( grid%alarms( BOUNDARY_ALARM ), rc=rc ) ) THEN
-       CALL wrf_debug ( 1 , 'in med_latbound_in preparing to read' )
+       CALL wrf_debug ( 100 , 'in med_latbound_in preparing to read' )
        CALL WRFU_AlarmRingerOff( grid%alarms( BOUNDARY_ALARM ), rc=rc )
        IF ( wrf_dm_on_monitor() ) CALL start_timing
 

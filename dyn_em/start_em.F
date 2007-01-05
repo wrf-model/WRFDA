@@ -1,6 +1,6 @@
 !-------------------------------------------------------------------
 
-   SUBROUTINE start_domain_em ( grid, allowed_to_read , &
+   SUBROUTINE start_domain_em ( grid, allowed_to_read  &
 ! Actual arguments generated from Registry
 # include "em_dummy_new_args.inc"
 !
@@ -15,7 +15,6 @@
    USE module_bc_em
 !  USE module_timing
    USE module_configure
-   USE module_date_time
    USE module_tiles
 
    USE module_physics_init
@@ -40,7 +39,6 @@
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
 # include "em_dummy_new_decl.inc"
-#include "namelist_defines2.inc"
 
    !  Structure that contains run-time configuration (namelist) data for domain
    TYPE (grid_config_rec_type)              :: config_flags
@@ -54,7 +52,6 @@
                                   ij,i,j,k,ii,jj,kk,loop,error,l
 
    INTEGER     :: i_m
-   INTEGER     :: hr, mn, sec, ms, rc
 
    REAL        :: p00, t00, a, p_surf, pd_surf
 #ifdef WRF_CHEM
@@ -74,7 +71,6 @@
    REAL :: lon1 , lon2 , lon3 , lon4
    INTEGER :: num_points_lat_lon , iloc , jloc
    CHARACTER (LEN=132) :: message
-   TYPE(WRFU_Time) :: CurrTime
 
 ! Needed by some comm layers, grid%e.g. RSL. If needed, nmm_data_calls.inc is
 ! generated from the registry.  The definition of REGISTER_I1 allows
@@ -651,13 +647,15 @@
 
    IF ( .not. config_flags%restart ) THEN 
    CALL set_w_surface(  config_flags,                                      &
-                        grid%em_w_1, grid%ht, grid%em_u_1, grid%em_v_1, grid%cf1, grid%cf2, grid%cf3, grid%rdx, grid%rdy, grid%msft,  &
+                        grid%em_w_1, grid%ht, grid%em_u_1, grid%em_v_1, grid%cf1, &
+                        grid%cf2, grid%cf3, grid%rdx, grid%rdy, grid%msft,        &
                         ids, ide, jds, jde, kds, kde,                      &
                         ips, ipe, jps, jpe, kps, kpe,                      &
                         its, ite, jts, jte, kts, kte,                      &
                         ims, ime, jms, jme, kms, kme                      )
    CALL set_w_surface(  config_flags,                                      &
-                        grid%em_w_2, grid%ht, grid%em_u_2, grid%em_v_2, grid%cf1, grid%cf2, grid%cf3, grid%rdx, grid%rdy, grid%msft,  &
+                        grid%em_w_2, grid%ht, grid%em_u_2, grid%em_v_2, grid%cf1, &
+                        grid%cf2, grid%cf3, grid%rdx, grid%rdy, grid%msft,        &
                         ids, ide, jds, jde, kds, kde,                      &
                         ips, ipe, jps, jpe, kps, kpe,                      &
                         its, ite, jts, jte, kts, kte,                      &

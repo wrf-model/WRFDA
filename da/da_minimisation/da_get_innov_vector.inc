@@ -1,5 +1,5 @@
 subroutine da_get_innov_vector( it, ob, iv, &
-                                grid, config_flags, &
+                                grid, config_flags &
 #include "em_dummy_new_args.inc"
                 )
 
@@ -39,7 +39,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
          call da_med_initialdata_input( grid , config_flags, &
             filename)
-         call da_setup_firstguess( xbx, grid, &
+         call da_setup_firstguess( xbx, grid &
 #include "em_dummy_new_args.inc"
                           )
       end if
@@ -181,7 +181,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
    if (num_fgat_time > 1) then
       call da_med_initialdata_input( grid , config_flags, 'fg01')
-      call da_setup_firstguess( xbx, grid, &
+      call da_setup_firstguess( xbx, grid &
 #include "em_dummy_new_args.inc"
                             )
    end if

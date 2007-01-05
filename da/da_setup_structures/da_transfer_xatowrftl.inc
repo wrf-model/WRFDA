@@ -1,4 +1,4 @@
-subroutine da_transfer_xatowrftl(grid, config_flags, filnam, &
+subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
 #include "em_dummy_new_args.inc"
                              )
 

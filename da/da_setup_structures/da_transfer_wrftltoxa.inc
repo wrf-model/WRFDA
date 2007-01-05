@@ -1,4 +1,4 @@
-subroutine da_transfer_wrftltoxa(grid, config_flags, filnam, &
+subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
 #include "em_dummy_new_args.inc"
                              )
 

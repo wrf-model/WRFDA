@@ -1,4 +1,4 @@
-subroutine da_setup_firstguess(xbx, grid, &
+subroutine da_setup_firstguess(xbx, grid &
 #include "em_dummy_new_args.inc"
                             )
    !---------------------------------------------------------------------------
@@ -55,12 +55,12 @@ subroutine da_setup_firstguess(xbx, grid, &
 
       ! First guess is a WRF C-grid format file:
 
-      call da_setup_firstguess_wrf(xbx, grid, &
+      call da_setup_firstguess_wrf(xbx, grid &
 #include "em_dummy_new_args.inc"
                                )
    else if (fg_format == fg_format_kma) then
       ! First guess is an KMA format file:
-      call da_setup_firstguess_kma(xbx, grid, &
+      call da_setup_firstguess_kma(xbx, grid &
 #include "em_dummy_new_args.inc"
                                )
    end if

@@ -1,4 +1,4 @@
-subroutine da_transfer_kmatoxb(xbx, grid, &
+subroutine da_transfer_kmatoxb(xbx, grid &
 #include "em_dummy_new_args.inc"
                              )
 

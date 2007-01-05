@@ -1,4 +1,4 @@
-subroutine da_transfer_xatowrf(xbx, grid, &
+subroutine da_transfer_xatowrf(xbx, grid &
 #include "em_dummy_new_args.inc"
                              )
 
