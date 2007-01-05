@@ -36,6 +36,7 @@ WRFVAR_OBJS        =	da_par_util.o \
 			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
+			da_radiance1.o		\
                         da_tracing.o            \
 			gsi_kinds.o		\
 			gsi_constants.o		\
