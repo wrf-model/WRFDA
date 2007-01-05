@@ -63,7 +63,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_retrieval'
          write(unit=stats_unit, fmt='(a/)') '   var           tpw(cm)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntpw
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i7)') &
                        ' Minimum(n): ', ssmi_retrieval%minimum%tpw%value, &
                                         ssmi_retrieval%minimum%tpw%n    , &
                        ' Maximum(n): ', ssmi_retrieval%maximum%tpw%value, &
@@ -77,7 +77,7 @@ subroutine da_oi_stats_ssmi_rv(stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_retrieval'
          write(unit=stats_unit, fmt='(a/)') '   var           speed(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', nspeed
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i7)') &
                        ' Minimum(n): ', ssmi_retrieval%minimum%speed%value, &
                                         ssmi_retrieval%minimum%speed%n    , &
                        ' Maximum(n): ', ssmi_retrieval%maximum%speed%value, &

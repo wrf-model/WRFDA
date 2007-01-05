@@ -11,8 +11,6 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
    type (ob_type), intent(out)  :: iv          ! O-B structure.
    type (xb_type)               :: xb          ! First guess structure.
 
-   integer :: iost, ssmi_unit
-
    if (trace_use) call da_trace_entry("da_setup_obs_structures")
 
    call da_message((/'Set up observations (ob)'/))
@@ -122,25 +120,6 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
          'Invalid sfc_assi_option = ', sfc_assi_options
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
-
-   if (Use_SsmiRetrievalObs .OR. Use_SsmiTbObs) then
-      call da_get_unit(ssmi_unit)
-      open (unit   = ssmi_unit,     &
-             FORM   = 'FORMATTED',  &
-             ACCESS = 'SEQUENTIAL', &
-             iostat =  iost,     &
-             STATUS = 'OLD')
-
-      if (iost /= 0) then
-         call da_warning(__FILE__,__LINE__, &
-            (/"Cannot open ssmi file"/))
-         Use_SsmiRetrievalObs=.false.
-         Use_SsmiTbObs=.false.
-         close(unit=ssmi_unit)
-         call da_free_unit(ssmi_unit)
-      end if 
-   end if 
-
 
    !---------------------------------------------------------------------------      
    ! [1.0] Setup and read in fields from first guess:

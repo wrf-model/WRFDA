@@ -32,9 +32,6 @@ subroutine da_check_rh(xb, xa, xp)
    upper_modify_rh = 95.0
    lower_modify_rh = 11.0
 
-write (0,*) "minval(xa%t),minval(xb%t),minval(xa%p),minval(xb%p)",minval(xa%t),minval(xb%t),minval(xa%p),minval(xb%p)
-write (0,*) "maxval(xa%t),maxval(xb%t),maxval(xa%p),maxval(xb%p)",maxval(xa%t),maxval(xb%t),maxval(xa%p),maxval(xb%p)
-
    do i=is,ie
       do j=js,je
 
