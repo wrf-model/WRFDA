@@ -53,7 +53,8 @@ subroutine da_find_fft_factors(n, n_ok, fft_factors)
    if (ifAC .GT. 1) goto 20
 
    ! Illegal factors:
-   ! write (unit=stderr,fmt='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
+   ! write (unit=message(1),fmt='(a,i4,a)') 'N = ', N, ' contains illegal factors.'
+   ! call da_warning(__FILE__,__LINE__,message(1:1))
    
    goto 9
 

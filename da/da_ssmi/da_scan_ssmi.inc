@@ -45,10 +45,8 @@ subroutine da_scan_ssmi (ob, xp, filename)
         STATUS = 'OLD')
 
    if (iost /= 0) then
-      write(unit=stdout, fmt='(/A,I3,3(2X,A)/)') &
-           'ERROR in SSMI inPUT FILE unit ',iunit, &
-           'SSMI FILENAME:', trim(filename), &
-           'FOR SSMI CANNOT BE FOUND OR CANNOT BE openED'
+      call da_warning(__FILE__,__LINE__, &
+         (/"Cannot open SSMI file "//trim(filename)/))
       return
    end if
 
@@ -66,11 +64,8 @@ subroutine da_scan_ssmi (ob, xp, filename)
    !     -------------
 
    if (iost /= 0) then
-      write(unit=stderr, fmt='(/a,i3/)') &
-           'ERROR readinG FILE unit:', iunit, &
-           'ERROR CODE:', iost
-
-      return
+      call da_error(__FILE__,__LINE__, &
+         (/"Cannot read SSMI file "//trim(filename)/))
    else
       write(unit=stdout, fmt='(/2a/)') &
            'in da_scan_ssmi.inc, char_ned=', trim(char_ned)
@@ -83,11 +78,8 @@ subroutine da_scan_ssmi (ob, xp, filename)
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
       if (iost /= 0) then
-         write(unit=stderr, fmt='(/a,i3/)') &
-              'ERROR readinG FILE unit:', iunit, &
-              'ERROR CODE:', iost
-
-         return
+         call da_error(__FILE__,__LINE__, &
+            (/"Cannot read SSMI file "//trim(filename)/))
       end if
 
       if (char_ned(1:6) == 'NESTIX') exit
@@ -95,7 +87,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
 
    do
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
-      if (char_ned(1:6) == 'inFO  ') exit
+      if (char_ned(1:6) == 'INFO  ') exit
    end do
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
@@ -118,12 +110,12 @@ subroutine da_scan_ssmi (ob, xp, filename)
    !     'Error max test ratio for PW  = ',max_error_tb
 
 
-   ! LOOP OVER RECORDS
+   ! loop over records
    ! -----------------
 
    reports: do
 
-      ! read STATION GENERAL inFO
+      ! read station general info
       ! =========================
 
       read (unit=iunit, fmt = fmt_info, iostat = iost) &

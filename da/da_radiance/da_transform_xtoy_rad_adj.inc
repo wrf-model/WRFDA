@@ -246,7 +246,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
             deallocate (rtemp)
             deallocate (itemp)
          end if
-         call mpi_barrier(comm, ierr)
       end do
 #endif
 
@@ -328,7 +327,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
             deallocate (temp_q)
             deallocate (rtemp)
          end if
-         call mpi_barrier(comm, ierr)
       end do
 #endif
       do n=1,d_num_rad

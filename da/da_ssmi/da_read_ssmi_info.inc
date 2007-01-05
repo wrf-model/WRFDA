@@ -70,15 +70,13 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       Use_SsmiTbObs  = .false.
       use_ssmt1obs   = .false.
       use_ssmt2obs   = .false.
-
-      write(unit=stderr, fmt='(/a,i3/)') &
-           'ERROR readinG FILE unit:', iunit, &
-           'ERROR CODE:', iost
+      call da_warning(__FILE__,__LINE__, &
+         (/"Cannot read SSMI file"/))
 
       return
    else
       write(unit=stdout, fmt='(/2a/)') &
-           'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
+         'in da_read_ssmi_info.inc, char_ned=', trim(char_ned)
    end if
 
    ! 2.3 read NUMBER OF REPORTS
@@ -139,11 +137,8 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
          Use_SsmiTbObs  = .false.
          use_ssmt1obs   = .false.
          use_ssmt2obs   = .false.
-
-         write(unit=stderr, fmt='(/a,i3/)') &
-            'ERROR readinG FILE unit:', iunit, &
-            'ERROR CODE:', iost
-
+         call da_warning(__FILE__,__LINE__, &
+            (/"Cannot read SSMI file"/))
          return
       end if
       if (char_ned(1:6) == 'NESTIX') exit
@@ -169,7 +164,7 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       end select
 
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
-      if (char_ned(1:6) == 'inFO  ') exit
+      if (char_ned(1:6) == 'INFO  ') exit
    end do
 
    read (unit = iunit, fmt = '(A)', iostat = iost) char_ned

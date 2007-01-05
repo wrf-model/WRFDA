@@ -25,10 +25,10 @@ subroutine da_final_write_filtered_obs
       if(iost /= 0) &
       call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
-      !  LOOP OVER RECORDS
+      !  loop over records
       !  -----------------
       reports: do
-         !     read STATION GENERAL inFO
+         !     read station general info
          !     =============================
          read (iunit, fmt = fmt_info, iostat = iost) &
                       platform%info%platform,    &

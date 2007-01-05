@@ -69,6 +69,7 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
+   ! WHY
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
@@ -111,8 +112,7 @@ subroutine da_scan_obs (ob, xp, filename)
    num_bogus = 0
    num_airsr = 0
 
-   ! read HEADER
-   ! ===========
+   ! read header
 
    head_info: do
       read (unit = iunit, fmt = '(A)', iostat = iost) info_string
@@ -125,8 +125,7 @@ subroutine da_scan_obs (ob, xp, filename)
       if (info_string(1:6) == 'EACH  ') exit
    end do head_info
 
-   ! read FORMATS
-   ! ------------
+   ! read formats
 
    read (iunit, fmt = '(A,1X,A)', iostat = iost) &
        fmt_name, fmt_info, &
@@ -140,13 +139,10 @@ subroutine da_scan_obs (ob, xp, filename)
       return
    end if
 
-   ! SKIP unitS
-   ! ----------
-
+   ! skip units
    read (iunit, fmt = '(A)') fmt_name
 
-   ! LOOP OVER RECORDS
-   ! -----------------
+   ! loop over records
 
    report = 0 ! report number in file
 
@@ -155,8 +151,7 @@ subroutine da_scan_obs (ob, xp, filename)
 
       report = report+1
 
-      ! read STATION GENERAL inFO
-      ! =============================
+      ! read station general info
 
       read (iunit, fmt = fmt_info, iostat = iost) &
                    platform%info%platform,    &
@@ -169,7 +164,7 @@ subroutine da_scan_obs (ob, xp, filename)
                    platform%info%id
 
       if (iost /= 0) then
-         ! This is expected, but its unclear how we handle failure
+         ! JRB This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
          exit reports
@@ -188,16 +183,15 @@ subroutine da_scan_obs (ob, xp, filename)
       end if
 
       if (platform%info%lon == 180.0) platform%info%lon =-180.000
+      ! WHY
       ! Fix funny wind direction at South Poles
       ! if (platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999) then
       !    platform%info%lon = 0.0
       ! end if
 
-      read(platform%info%platform(4:6), '(I3)') fm
+      read (platform%info%platform(4:6), '(I3)') fm
 
-      ! read MODEL LOCATION
-      ! =========================
-
+      ! read model location
       read (iunit, fmt = fmt_loc) platform%loc%slp, platform%loc%pw
 
       total_obs = total_obs + 1
@@ -209,11 +203,9 @@ subroutine da_scan_obs (ob, xp, filename)
          cycle reports
       end if
 
-      ! read EACH LEVELS
-      ! ----------------
+      ! read each level
 
-      loop_level: do i = 1, platform%info%levels
-
+      do i = 1, platform%info%levels
          platform%each (i) = each_level_type(missing_r, missing, -1.0, & ! height
             field_type(missing_r, missing, missing_r), & ! u
             field_type(missing_r, missing, missing_r), & ! v
@@ -227,7 +219,7 @@ subroutine da_scan_obs (ob, xp, filename)
          read (unit = iunit, fmt = trim (fmt_each)) &
             platform%each (i)%p,            &
             platform%each (i)%speed,        &
-         ! Here the 'direction' is stored in platform%each (i)%v:
+            ! Here the 'direction' is stored in platform%each (i)%v:
             platform%each (i)%v,            &
             platform%each (i)%height,       &
             platform%each (i)%height_qc,    &
@@ -235,7 +227,7 @@ subroutine da_scan_obs (ob, xp, filename)
             platform%each (i)%t,            &
             platform%each (i)%td,           &
             platform%each (i)%rh
-      end do loop_level
+      end do
 
       ! Restrict to a range of reports, useful for debugging
 
@@ -415,11 +407,11 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
 
+   ! WHY
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! PRinT out
-   ! =============
+   ! print out
 
    if (print_detail_obs) then
       write(unit=stdout, fmt='(a)')  ' '

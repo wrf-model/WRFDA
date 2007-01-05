@@ -20,9 +20,9 @@ subroutine da_status_rad(iv,str,line)
    rsum(6) = -1.0
    rsum(7) = -1.0
 
-   write (unit=stderr,fmt='(A,I6)') str,line
+   write (unit=stdout,fmt='(A,I6)') str,line
    do i=1,rtminit_nsensor
-      write (unit=stderr,fmt='(A,I2)') "For instrument ",i 
+      write (unit=stdout,fmt='(A,I2)') "For instrument ",i 
       isum(1) = sum(iv%instid(i)%loc_i(:))
       isum(2) = sum(iv%instid(i)%loc_j(:))
       ! isum(3) = sum(iv%instid(i)%loc_k(:))
@@ -73,15 +73,15 @@ subroutine da_status_rad(iv,str,line)
       rsum(39) = sum(iv%instid(i)%tb_inv(:,:))
       rsum(40) = sum(iv%instid(i)%tb_error(:,:))
 
-      write(unit=stderr,fmt='(A,10I7)')         "1:10 ",isum(1:10)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "1:5  ",rsum(1:5)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "6:10 ",rsum(6:10)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "11:15",rsum(11:15)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "16:20",rsum(16:20)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "21:25",rsum(21:25)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "26:30",rsum(26:30)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "31:35",rsum(31:35)
-      write(unit=stderr,fmt='(A,10(1X,E12.6))') "36:40",rsum(36:40)
+      write(unit=stdout,fmt='(A,10I7)')         "1:10 ",isum(1:10)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "1:5  ",rsum(1:5)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "6:10 ",rsum(6:10)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "11:15",rsum(11:15)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "16:20",rsum(16:20)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "21:25",rsum(21:25)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "26:30",rsum(26:30)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "31:35",rsum(31:35)
+      write(unit=stdout,fmt='(A,10(1X,E12.6))') "36:40",rsum(36:40)
    end do
 
    if (trace_use) call da_trace_exit("da_status_rad")

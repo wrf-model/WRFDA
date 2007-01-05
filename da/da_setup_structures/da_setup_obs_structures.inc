@@ -130,15 +130,14 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
              ACCESS = 'SEQUENTIAL', &
              iostat =  iost,     &
              STATUS = 'OLD')
-      close(unit=ssmi_unit)
-      call da_free_unit(ssmi_unit)
 
       if (iost /= 0) then
-         write (unit=stderr,fmt='(/,A,I3,A,/)') &
-            ' inPUT FILE unit ',ssmi_unit, &
-            ' FOR SSMI OBSERVATIONS CANNOT BE FOUND OR CANNOT BE openED'
+         call da_warning(__FILE__,__LINE__, &
+            (/"Cannot open ssmi file"/))
          Use_SsmiRetrievalObs=.false.
          Use_SsmiTbObs=.false.
+         close(unit=ssmi_unit)
+         call da_free_unit(ssmi_unit)
       end if 
    end if 
 
@@ -250,10 +249,6 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 #endif
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
       call da_setup_bufrtovs_structures(xp, ob, iv)
-
-      ! These are per processor, so uninteresting
-      ! write (unit=stderr,fmt=*) ' iv%total_rad_channel = ', iv%total_rad_channel
-      ! write (unit=stderr,fmt=*) ' iv%total_rad_pixel   = ', iv%total_rad_pixel
    end if
 
    ! Get horizontal interpolation weights.

@@ -329,7 +329,7 @@ subroutine da_count_filtered_obs(&
 
    ! write format info
  
-   write (unit = filtered_obs_unit, fmt = '(2A)') 'inFO_fmt = ', trim (fmt_info)
+   write (unit = filtered_obs_unit, fmt = '(2A)') 'INFO_fmt = ', trim (fmt_info)
    write (unit = filtered_obs_unit, fmt = '(2A)') 'SRFC_fmt = ', trim (fmt_srfc)
    write (unit = filtered_obs_unit, fmt = '(2A)') 'EACH_fmt = ', trim (fmt_each)
 

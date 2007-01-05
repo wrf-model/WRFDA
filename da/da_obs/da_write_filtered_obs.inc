@@ -616,7 +616,6 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
             ' writing filtered obs for sound  ',iv%num_sound 
       end if
       mnz = 0
-      ! write(999 ,'(5X,a,i4/)') "Sound out unit =", ounit
 
       do i = 1, iv % num_sound               
          if (.not. iv%sound(i)%loc%proc_domain) cycle

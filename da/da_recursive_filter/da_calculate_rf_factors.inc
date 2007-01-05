@@ -65,7 +65,7 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
       rf_scale_factor(k) = 1.0 / field_out(0)
 
       ! Uncomment the following to test equivalence of UU^T and RF:
-      ! write(unit=stderr,fmt='(A,f15.5)') &
+      ! write(unit=stdout,fmt='(A,f15.5)') &
       !    ' RF Scaling Factor = ', 1.0 / field_out(0)
       ! field_out1(-n:n) = field_in(-n:n)
       ! do pass = 1, rf_passes
@@ -73,7 +73,7 @@ subroutine da_calculate_rf_factors(rf_lengthscale, rf_alpha, rf_scale_factor)
       ! end do
 
       ! do nn = -n, n
-      !    write(unit=stderr,fmt='(2i5,4f12.5)')k, nn, field_in(nn), &
+      !    write(unit=stdout,fmt='(2i5,4f12.5)')k, nn, field_in(nn), &
       !                             field_out(nn) / field_out(0), &
       !                             field_out1(nn) / field_out1(0), &
       !                             exp(-0.125*(real(nn)/rf_lengthscale(k))**2)

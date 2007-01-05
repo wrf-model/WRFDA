@@ -14,8 +14,6 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
    integer                          :: n
    type (stats_ssmi_tb_type)        :: ssmi_tb
 
-   write(unit=stderr,fmt='(A)')'da_oi_stats_ssmi_tb. '
-
    ntb19v = 0
    ntb19h = 0
    ntb22v = 0

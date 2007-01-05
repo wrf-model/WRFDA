@@ -68,16 +68,16 @@ subroutine da_data_distribution(ob_name, num_obs, min_val, max_val, &
    ! [3.0] Output statistics:
    !---------------------------------------------------------------------------
    
-   write(unit=stderr,fmt='(A,A,A,I8)')' Number of ', trim(ob_name), &
+   write(unit=stdout,fmt='(A,A,A,I8)')' Number of ', trim(ob_name), &
       ' obs = ', num_obs
-   write(unit=stderr,fmt='(A,I8)')' Number with missing data indicator = ', &
+   write(unit=stdout,fmt='(A,I8)')' Number with missing data indicator = ', &
       num_missing
-   write(unit=stderr,fmt='(A,f12.5,A,I8)')' Number below minimum O-B(', &
+   write(unit=stdout,fmt='(A,f12.5,A,I8)')' Number below minimum O-B(', &
       min_val-0.5*bin_width, ') = ', num_in_bin(0)
    do bin = 1, num_bins
-      write(unit=stderr,fmt='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
+      write(unit=stdout,fmt='(I4,f12.5,I8)')bin, bin_val(bin), num_in_bin(bin)
    end do
-   write(unit=stderr,fmt='(A,f12.5,A,I8)')' Number above maximum O-B(', &
+   write(unit=stdout,fmt='(A,f12.5,A,I8)')' Number above maximum O-B(', &
       max_val+0.5*bin_width, ') = ', num_in_bin(num_bins+1)
                                
    !---------------------------------------------------------------------------
