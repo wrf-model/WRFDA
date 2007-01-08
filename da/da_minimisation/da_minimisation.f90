@@ -8,6 +8,7 @@ module da_minimisation
    use da_define_structures
    use da_vtox_transforms
    use da_obs
+   use da_obs_io
    use da_metar
    use da_geoamv
    use da_polaramv
@@ -25,6 +26,7 @@ module da_minimisation
    use da_profiler
    use da_buoy 
    use da_setup_structures
+   use da_transfer_model
    use da_qscat
    use da_radiance
    use da_airsr     

@@ -4,6 +4,8 @@ subroutine da_wrfvar_finalize
    ! Purpose: Tidy up at the end
    !-------------------------------------------------------------------------
 
+   use da_wrfvar_top
+
    implicit none
 
    integer :: i

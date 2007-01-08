@@ -47,8 +47,10 @@ subroutine da_read_errfac(ob_name, f1, f2, f3, f4, f5)
 
             exit
          else if (ob_name1 == 'Total') then
-            write(unit=message(1),fmt='(a,a)')' No Tuning Error factors for ', ob_name
-            write(unit=message(2),fmt='(a)')' So setting to 1.0 i.e. default errors.'  
+            write(unit=message(1),fmt='(a,a)') &
+               ' No Tuning Error factors for ', ob_name
+            write(unit=message(2),fmt='(a)') &
+               ' So setting to 1.0 i.e. default errors.'  
             call da_warning(__FILE__,__LINE__,message(1:2))
             exit
          end if

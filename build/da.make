@@ -1,9 +1,11 @@
 WRFVAR_OBJS        =	da_par_util.o \
 			da_par_util1.o \
 			da_setup_structures.o \
+			da_transfer_model.o \
 			da_minimisation.o \
 			da_vtox_transforms.o	\
 			da_obs.o		\
+			da_obs_io.o		\
 			da_metar.o		\
 			da_geoamv.o	        \
 			da_polaramv.o	        \
@@ -43,6 +45,7 @@ WRFVAR_OBJS        =	da_par_util.o \
                         da_wrfvar_io.o      \
                         da_airsr.o          \
 	   		da_wrfvar_top.o     \
+	   		da_wrfvar_finalize.o     \
                         da_reporting.o \
                         module_wrf_error.o \
                         module_configure.o \
