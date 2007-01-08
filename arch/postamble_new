@@ -22,27 +22,29 @@ WRFVAR_LIBS  = libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a 
 
 GEN_BE_LIBS  = blas lapack fftpack5
 
-WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
-                 $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)
+WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a \
+                  $(IO_GRIB_SHARE)/libio_grib_share.a \
+                  $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)
 
 WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
-               $(IO_GRIB1)/libio_grib1.a $(IO_GRIB_SHARE)/libio_grib_share.a $(MPI_LIBS)
+               $(IO_GRIB1)/libio_grib1.a $(IO_GRIB_SHARE)/libio_grib_share.a \
+                  $(MPI_LIBS)
 
 WRFVAR_LIB  = -L. -L$(LAPACK) -lwrfvar $(NETCDF_LIB)  \
                $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(ESMF_TIME_LIB) \
                -llapack $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
-               $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB) $(EXTRA_LIBS)
+               $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB)
 
 WRF_LIB     = -L. -lwrflib \
-              $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
-              $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
+              $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(NETCDF_LIB) \
+                 $(MPI_LIB)
 
 WRFPLUS_LIB = -L. $(NETCDF_LIB) -lwrflib -lwrfplus \
-              $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
-              $(NETCDF_LIB) $(MPI_LIB) $(EXTRA_LIBS)
+              $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(NETCDF_LIB) \
+                 $(MPI_LIB)
 
 GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK5_LIB) \
-                $(EXTRA_LIBS)
+                 $(LOCAL_LIB)
                   
 
 # compile these without high optimization to speed compile

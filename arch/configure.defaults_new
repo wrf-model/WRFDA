@@ -32,7 +32,7 @@ CCFLAGS_RSL     =
 
 # Libraries
 
-LOCAL_LIB       =  -L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 # Architecture
@@ -234,7 +234,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       =  -L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -280,7 +280,7 @@ CCOPTIM         = -O2
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       =  -L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -358,7 +358,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       =  -L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -404,7 +404,7 @@ FCFLAGS_RSL     = $(FCENDIAN)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LOCAL_LIB       =  -L/usr/local/lib
+LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB		= -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1208,7 +1208,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     =
 
-EXTRA_LIBS      = -lSystemStubs
+LOCAL_LIB       = -lSystemStubs
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1248,7 +1248,7 @@ CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB		= -L$(RSL)/RSL -lrsl
-EXTRA_LIBS      = -lSystemStubs
+LOCAL_LIB       = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
@@ -1296,7 +1296,7 @@ CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB		= -L$(RSL)/RSL -lrsl
-EXTRA_LIBS      = -lSystemStubs
+LOCAL_LIB       = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
