@@ -19,8 +19,8 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
-FCOPTIM         = #-fast
-FCDEBUG         = -g -C
+FCOPTIM         = # O2
+FCDEBUG         = # -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -53,7 +53,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (Single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, PGI              (Single-threaded)
 #
 FC              = pgf90
 FFC             = $(FC)
@@ -66,7 +66,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -178,7 +178,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (Single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, g95              (Single-threaded)
 #
 FC              = g95
 FFC             = $(FC)
@@ -191,7 +191,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 
 FCOPTIM         = 
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wunused-vars
+FCDEBUG         = 
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -Wno=101,112,139,155,158 -fno-second-underscore
@@ -299,7 +299,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, debug     (single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, ifort            (single-threaded)
 #
 
 M4              = m4 -B12000
@@ -314,7 +314,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         = 
-FCDEBUG         = -g -C
+FCDEBUG         =
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
@@ -424,7 +424,7 @@ arch_superclean :
 
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, PGI, debug               (Single-threaded)
+#ARCH Settings for PC Linux x86_64, PGI                      (Single-threaded)
 #
 FC              = pgf90
 FFC             = $(FC)
@@ -437,7 +437,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
@@ -546,7 +546,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, debug         (Single-threaded)
+#ARCH Settings for PC Linux x86_64, Pathscale                (Single-threaded)
 #
 FC              = pathf90
 FFC             = $(FC)
@@ -559,7 +559,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 
 FCOPTIM         =
-FCDEBUG         = -g
+FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
@@ -669,7 +669,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, debug             (Single-threaded)
+#ARCH Settings for PC Linux x86_64, ifort                    (Single-threaded)
 #
 M4              = m4 -B12000
 FC              = ifort
@@ -683,7 +683,7 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
 
 FCOPTIM         =
-FCDEBUG         = -g -C
+FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
@@ -882,7 +882,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for NEC, debug, untested                      (single-threaded)
+#ARCH Settings for NEC, untested                             (single-threaded)
 #
 CPP             = /usr/lib0/cpp
 M4              = m4 -B12000
@@ -900,7 +900,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM
                     
 FCOPTIM         =
-FCDEBUG         = -g
+FCDEBUG         =
 FCTYPE          =
 FCFREE          = -f4
 FCENDIAN        =
@@ -917,7 +917,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf, debug                           (single-threaded)
+#ARCH Settings for AIX, xlf                                  (single-threaded)
 #
 M4              = m4 -B24000
 FC              = xlf90_r
@@ -931,9 +931,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DNATIVE_MASSV -DNONSTANDARD_SYSTEM                    
 
 FCOPTIM         =
-FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
-                  -qsuppress=1514-008
-
+FCDEBUG         = 
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
@@ -1091,7 +1089,7 @@ couple_or_uncouple_em.o :
 
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (Single-threaded) 
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1                  (Single-threaded) 
 
 SED_FTN		= sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1108,7 +1106,7 @@ TRADFLAG        = -traditional-cpp
 FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
                     
 FCOPTIM         =
-FCDEBUG         = -g
+FCDEBUG         =
 #FCTYPE         = -sinteger32 -e m -sreal64 -dp
 FCTYPE          = -e m -sreal64 -dp
 FCFREE          = -f free -N 255
@@ -1126,6 +1124,60 @@ arch :
 arch_clean :
 
 arch_superclean :
+
+###########################################################
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI, RSL IO)
+
+SED_FTN		= sed -f ../arch/cray_csd.sed
+M4              = m4 -B12000
+FC              = ftn
+SFC             = ftn
+FFC             = $(FC)
+CC              = cc
+# Do not use cross-compiler for tools
+CC_TOOLS        = gcc
+RANLIB          = echo
+LD              = $(FC)
+
+TRADFLAG        = -traditional-cpp
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+#FCOPTIM        = -Ofp3 -O3
+# needed for OpenMP
+#FCOPTIM         = -Ofp2 -O1 -Ogen_private_callee
+#FCOPTIM         = -Ofp2 -O0 -Ovector0 -Ostream0 -Oscalar1
+FCOPTIM         = -O0
+FCDEBUG         = 
+#FCTYPE         = -sinteger32 -e m -sreal64 -dp
+FCTYPE          = -e m -sreal64 -dp
+FCFREE          = -f free -N 255
+FCENDIAN        =
+FCBASE          = -p$(BLAS) -p$(LAPACK) -p$(FFTPACK5)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
+
+LOCAL_LIB       = 
+MPI_LIB		= -L$(RSL)/RSL -lrsl
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+	     MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+             LEARN_BCAST=-DLEARN_BCAST crayx1 )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
 #ARCH Settings for crayx1 UNICOS/mp CRAY X1, optimised       (RSL, Cray MPI, RSL IO)
@@ -1182,7 +1234,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95, debug 		             (single-threaded)
+#ARCH Settings for Darwin, g95 		                     (single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1197,7 +1249,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE                   
 
 FCOPTIM         = 
-FCDEBUG         = -g -C
+FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
