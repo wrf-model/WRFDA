@@ -403,7 +403,7 @@ gen_config_reads ( char * dirname )
           fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
           fprintf(fp," END IF\n") ;
           fprintf(fp,"#ifndef NO_NAMELIST_PRINT\n") ;
-          fprintf(fp," WRITE ( UNIT = *                  , NML = %s )\n",p2) ;
+          fprintf(fp," WRITE ( UNIT = NAMELIST_WRITE_UNIT, NML = %s )\n",p2) ;
           fprintf(fp,"#endif\n") ;
 	  sym_add(p2) ;
 	}
