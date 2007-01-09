@@ -8,9 +8,9 @@ export EXP_CORE=0
 export HDF=${HDF:-}
 export HDFEOS=${HDFEOS:-}  
 export compileflags=""
-option=$1
+export REGISTRY=Registry.wrfvar
 
-echo option = $option
+option=$1
 
 if [ "$option" = "wrf" ] ; then
     REGISTRY=Registry.EM
@@ -39,11 +39,11 @@ elif [ "$option" = "be" ] ; then
     REGISTRY=Registry.wrfvar
     DA_CORE=1
     EM_CORE=1
-else
-   echo "Please type : <configure_new wrfvar> to configure wrfvar (includes convertor and be)."
+#else
+#   echo "Please type : <configure_new wrfvar> to configure wrfvar (includes convertor and be)."
 #   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
 #   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
-   exit
+#   exit
 fi
 
 # lifted from the configure file for mpich; 00/03/10 jm
