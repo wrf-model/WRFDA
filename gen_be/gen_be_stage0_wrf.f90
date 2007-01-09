@@ -96,9 +96,11 @@ program gen_be_stage0_wrf
    real, allocatable     :: rh_mean(:,:,:)            ! Relative humidity.
    real, allocatable     :: psfc_mean(:,:)            ! Surface pressure.
 
-!---------------------------------------------------------------------------------------------
+
+   stderr = 0
+   stdout = 6
+
    write(6,'(/a)')' [1] Initialize information.'
-!---------------------------------------------------------------------------------------------
 
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage0_wrf")

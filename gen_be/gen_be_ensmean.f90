@@ -52,6 +52,9 @@ program gen_be_ensmean
  
    namelist / gen_be_ensmean_nl / filestub, num_members, nv, cvar
 
+   stderr = 0
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------

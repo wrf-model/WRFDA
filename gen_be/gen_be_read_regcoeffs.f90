@@ -29,6 +29,9 @@ program gen_be_read_regcoeffs
    real, allocatable   :: regcoeff2(:,:)             ! psi/ps regression cooefficient.
    real, allocatable   :: regcoeff3(:,:,:)           ! psi/T regression cooefficient.
 
+   stderr = 0
+   stdout = 6
+
    be_method = "ENS" ! Hardwired for now!
 
 !----------------------------------------------------------------------------

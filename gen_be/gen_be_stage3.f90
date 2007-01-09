@@ -58,7 +58,8 @@ program gen_be_stage3
 
    integer :: ounit,iunit,namelist_unit
 
-    stdout = 6
+   stderr = 0
+   stdout = 6
 
 
    if (trace_use) call da_trace_init

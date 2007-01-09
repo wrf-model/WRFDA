@@ -54,6 +54,9 @@ program gen_be_stage4_global
 
    integer :: ounit,iunit,namelist_unit
 
+   stderr = 0
+   stdout = 6
+
    if (trace_use) call da_trace_init
    if (trace_use) call da_trace_entry("gen_be_stage4_global")
 

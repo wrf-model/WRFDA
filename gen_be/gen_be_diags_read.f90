@@ -38,6 +38,9 @@ program gen_be_diags_read
 
    integer :: ounit,iunit,namelist_unit
 
+   stderr = 0
+   stdout = 6
+
    call da_get_unit(ounit)
    call da_get_unit(iunit)
    call da_get_unit(namelist_unit)

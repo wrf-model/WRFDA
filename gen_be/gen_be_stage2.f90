@@ -65,6 +65,7 @@ program gen_be_stage2
    integer :: ounit,iunit,namelist_unit
 
 
+   stderr = 0
    stdout = 6
 
 !---------------------------------------------------------------------------------------------

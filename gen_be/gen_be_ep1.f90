@@ -59,6 +59,9 @@ program gen_be_ep1
 
    integer :: ounit, gen_be_ounit, namelist_unit, iunit
 
+   stderr = 0
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------

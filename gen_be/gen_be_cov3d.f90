@@ -41,6 +41,9 @@ program gen_be_cov3d
 
    integer :: ounit,iunit,namelist_unit
 
+   stderr = 0
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------

@@ -110,6 +110,9 @@ program gen_be_ensrf
    namelist / gen_be_ensrf_nl / filestub, num_members, &
                                 cov_inf_fac, cov_loc_rad_m
 
+   stderr = 0
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------

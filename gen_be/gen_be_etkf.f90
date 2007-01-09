@@ -71,6 +71,9 @@ program gen_be_etkf
                                naccumt1, naccumt2, nstartaccum1, nstartaccum2, &
                                tainflatinput, rhoinput, nout
 
+   stderr = 0
+   stdout = 6
+
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
