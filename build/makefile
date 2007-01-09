@@ -1,5 +1,7 @@
 include configure.wrfvar
 
+all: wrfvar be convertor
+
 setup : depend
 
 links : 

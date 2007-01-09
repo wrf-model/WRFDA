@@ -40,11 +40,9 @@ elif [ "$option" = "be" ] ; then
     DA_CORE=1
     EM_CORE=1
 else
-   echo "Please type : <configure_new wrfvar> to compile wrfvar."
-   echo "    or type : <configure_new be> to compile be."
-   echo "    or type : <configure_new wrf|wrf_em|wrf_em_chem|wrf_nmm> to compile WRF,"
-   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
-   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
+   echo "Please type : <configure_new wrfvar> to configure wrfvar (includes convertor and be)."
+#   echo "    or type : <configure_new wrf_em_nl> to compile non-linear wrf for 4DVAR."
+#   echo "    or type : <configure_new wrfplus> to compile wrf TL/AD for 4DVAR."
    exit
 fi
 
@@ -134,7 +132,7 @@ if test -n "$PERL" ; then
 
     # Should do a test first for ch_p4 etc.
     if test "$perlversion" -lt 5 ; then
-        echo "WRF build requires perl version 5, which configure_new did not find."
+        echo "Build requires perl version 5, which configure_new did not find."
         echo "You can set the environment variable PERL to contain the "
         echo "location of perl version 5."
         echo "Configure_new believes that $PERL is version $perlversion ."
@@ -309,21 +307,21 @@ fi
 if [ -n "$PHDF5" ] ; then
   echo "Will use PHDF5 in dir: $PHDF5"
 else
-  echo "PHDF5 not set in environment. Will configure WRF for use without."
+  echo "PHDF5 not set in environment. Will configure for use without."
 fi
 
 if [ -n "$HDF" ] ; then
   echo "Will use HDF in dir: $HDF"
 #else
   # No-one cares
-  # echo "HDF not set in environment. Will configure WRF for use without."
+  # echo "HDF not set in environment. Will configure for use without."
 fi
 
 if [ -n "$HDFEOS" ] ; then
   echo "Will use HDFEOS in dir: $HDFEOS"
 #else
   # No-one cares
-  # echo "HDFEOS not set in environment. Will configure WRF for use without."
+  # echo "HDFEOS not set in environment. Will configure for use without."
 fi
 
 if [ "$option" = "wrfvar" ] ; then
@@ -375,11 +373,11 @@ fi
 # set and $WRF_MACH is not set, then $WRF_MACH defaults to "ARCH".  
 # If $WRF_OS is not set then $WRF_MACH is ignored.  
 if [ -n "$WRF_OS" ] ; then
-  echo "${0}:  WRF operating system set to \"${WRF_OS}\" via environment variable \$WRF_OS"
+  echo "${0}:  Target operating system set to \"${WRF_OS}\" via environment variable \$WRF_OS"
   os=$WRF_OS
   mach="ARCH"
   if [ -n "$WRF_MACH" ] ; then
-    echo "${0}:  WRF machine set to \"${WRF_MACH}\" via environment variable \$WRF_MACH"
+    echo "${0}:  Target machine set to \"${WRF_MACH}\" via environment variable \$WRF_MACH"
     mach=$WRF_MACH
   fi
 else
