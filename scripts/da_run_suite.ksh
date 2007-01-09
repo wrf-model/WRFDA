@@ -102,7 +102,7 @@ export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
 
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}                
+export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC}                
 
 export OK='<FONT COLOR="green">'
 export ERR='<FONT COLOR="red">'
@@ -170,7 +170,7 @@ export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
 export NL_KM_OPT=${NL_KM_OPT:-1}               #
 export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}
-export NL_DAMPCOEF=${NL_DAMPCOEF:-0.0}
+export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 #&bdy_control:
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
