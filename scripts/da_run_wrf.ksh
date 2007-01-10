@@ -70,7 +70,7 @@ export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 
 export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
-export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-0}
+export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 #&dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
@@ -124,6 +124,7 @@ ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
+cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2004.inc $WRF_DIR/inc/namelist_script.inc
 if test $WRF_NAMELIST'.' != '.'; then
    ln -fs $WRF_NAMELIST namelist.input
 elif test -f $WRF_DIR/inc/namelist_script.inc; then
