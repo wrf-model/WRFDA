@@ -20,8 +20,6 @@ CPP     = /lib/cpp
 
 .SUFFIXES: .f90 .F90 .F .i .o .f .c
 
-SVNDEF = -DSVN_REV='"$(shell svnversion -n .)"'
-
 #### Single location for defining total number of domains.  You need
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
 #### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
@@ -57,8 +55,7 @@ FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
               -DGRIB1 CONFIGURE_GRIB2_FLAG \
 	      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
               -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
-              -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-              $(SVNDEF)
+              -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) 
 CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
               -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1

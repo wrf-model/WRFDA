@@ -47,10 +47,6 @@ module da_wrfvar_top
 
    character (LEN=80)      :: rstname
 
-   ! JRB fix for WRF compilation system later
-   ! character (LEN=40)      :: subversion_version=SVN_REV
-   character (LEN=40)      :: subversion_version="TBD"
-
    interface 
       subroutine setup_timekeeping( grid )
         use module_domain
