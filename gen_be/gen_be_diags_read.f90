@@ -36,12 +36,15 @@ program gen_be_diags_read
 
    namelist / gen_be_diags_nl / uh_method
 
-   integer :: ounit,iunit,namelist_unit
+   integer :: iunit,namelist_unit
+
+   ! Hardwire because of complicated incrementing of unit numbers writing a file
+   ! each time 
+   integer, parameter :: ounit = 71
 
    stderr = 0
    stdout = 6
 
-   call da_get_unit(ounit)
    call da_get_unit(iunit)
    call da_get_unit(namelist_unit)
 
