@@ -640,7 +640,7 @@ FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
-FCOPTIM         = -O2 -fastsse
+FCOPTIM         = -O2
 FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -freeform
