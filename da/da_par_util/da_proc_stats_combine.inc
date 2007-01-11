@@ -50,6 +50,7 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
 
    buf(1) = proc_id
    call wrf_dm_bcast_integer (buf, 1)
+   proc_id=buf(1)
 
    ! Get obs number and k-level where minimum occurs.
    if (proc_id .ne. root) then
@@ -75,6 +76,7 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
 
    buf(1) = proc_id
    call wrf_dm_bcast_integer (buf, 1)
+   proc_id=buf(1)
 
    ! Get obs number and k-level where maximum occurs.
    if (proc_id .ne. root) then
