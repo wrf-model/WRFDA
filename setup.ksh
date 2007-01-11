@@ -41,12 +41,6 @@ if test "$PROCESSOR" = "Power Macintosh"; then
    export PROCESSOR=powerpc
 fi
 
-export EXT_DIR=${EXT_DIR:-~wrfhelp/external}
-
-if ! test -d $EXT_DIR; then
-   echo "No directory EXT_DIR=$EXT_DIR"
-fi
-
 # Only hunt for compilers we supply
 
 if test $FC = g95; then

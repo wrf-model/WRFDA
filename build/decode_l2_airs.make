@@ -12,4 +12,4 @@ HDFEOS_INC  = $(HOME)/hdfeos/hdfeos_g95/include
 decode_airs : decode_airs.o $(DECODE_L2_AIRS_MODULES) $(DECODE_L2_AIRS_OBJS)
 	$(FC) -o $@.exe decode_airs.o $(DECODE_L2_AIRS_MODULES) $(DECODE_L2_AIRS_OBJS) \
  -L$(HDFEOS_LIB) -L$(HDF_LIB) -I$(HDFEOS_INC) -I$(HDF_INC) -lhdfeos -lGctp -lmfhdf -ldf \
- -L$(ZLIB_LIB) -lz -L$(JPEG_LIB) -ljpeg -lm $(EXTRA_LIBS)
+ -L$(ZLIB_LIB) -lz -L$(JPEG_LIB) -ljpeg -lm $(LOCAL_LIBS)

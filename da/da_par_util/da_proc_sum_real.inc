@@ -17,14 +17,12 @@ subroutine da_proc_sum_real (value)
 
 #ifdef DM_PARALLEL
    real              :: apsum(size(value))             ! Sum across processors.
-   integer           :: root               ! Monitor processor.
 
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
    apsum(:)=0
-   call mpi_reduce(value, apsum, SIZE(value), true_mpi_real, mpi_sum, root, comm, ierr)
+   call mpi_reduce(value, apsum, SIZE(value), true_mpi_real, mpi_sum, root, &
+      comm, ierr)
 
-   if (myproc == root) value = apsum
+   if (rootproc) value = apsum
 #endif
 
 end subroutine da_proc_sum_real

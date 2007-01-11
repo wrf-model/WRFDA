@@ -5,6 +5,7 @@ subroutine da_wrfvar_finalize
    !-------------------------------------------------------------------------
 
    use da_wrfvar_top
+   use da_reporting
 
    implicit none
 

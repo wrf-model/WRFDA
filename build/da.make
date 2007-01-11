@@ -19,6 +19,7 @@ WRFVAR_OBJS        =	da_par_util.o \
 			da_gpspw.o		\
 			da_gpsref.o		\
 			da_ssmi.o		\
+			module_ssmi.o		\
 			da_satem.o		\
 			da_qscat.o		\
 			da_pseudo.o		\
@@ -26,7 +27,9 @@ WRFVAR_OBJS        =	da_par_util.o \
 			da_buoy.o   		\
 			da_dynamics.o		\
 			da_physics.o		\
+                        f_qv_from_rh.o          \
 			da_ffts.o		\
+			module_ffts.o		\
 			da_test.o		\
 			da_tools.o		\
 			da_tools1.o		\
@@ -36,9 +39,10 @@ WRFVAR_OBJS        =	da_par_util.o \
 			da_statistics.o		\
 			da_define_structures.o	\
 			da_control.o		\
+                        gamma1.o                \
 			da_spectral.o           \
 			da_radiance.o		\
-			da_radiance1.o		\
+			module_radiance.o	\
                         da_tracing.o            \
 			gsi_kinds.o		\
 			gsi_constants.o		\
@@ -222,7 +226,7 @@ da_update_bc : da_update_bc.exe
 da_update_bc.exe : da_update_bc.o
 	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
-           da_module_couple_uv.o $(NETCDF_LIB) $(EXTRA_LIBS)
+           da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIBS)
 
 da_write_sl_2_be: da_write_sl_2_be.o
 	$(LD) -o $@.exe $@.o da_module_io.o  da_module_trans.o \

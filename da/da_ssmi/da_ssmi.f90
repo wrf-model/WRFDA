@@ -9,6 +9,8 @@ module da_ssmi
    use da_tools
    use module_dm
 
+   use module_ssmi
+
    ! The "stats_ssmi_rv_type" is ONLY used locally in da_ssmi_rv:
 
    type maxmin_ssmi_rv_stats_type
@@ -99,7 +101,7 @@ contains
 #include "da_calculate_grady_ssmi.inc"
 #include "da_calculate_grady_ssmt1.inc"
 #include "da_calculate_grady_ssmt2.inc"
-#include "da_sigma_v.inc"
+
 #include "da_tb_adj.inc"
 #include "da_sigma_v_adj.inc"
 #include "da_effang_adj.inc"
@@ -117,16 +119,6 @@ contains
 #include "da_effang_tl.inc"
 #include "da_epsalt_tl.inc"
 #include "da_sigma_v_tl.inc"
-
-
-#include "epsalt.inc"
-#include "spemiss.inc"
-#include "tb.inc"
-#include "tbatmos.inc"
-#include "effht.inc"
-#include "effang.inc"
-#include "roughem.inc"
-
    
 end module da_ssmi
 

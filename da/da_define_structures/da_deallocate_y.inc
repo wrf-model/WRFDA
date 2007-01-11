@@ -9,7 +9,7 @@ subroutine da_deallocate_y(y)
    implicit none
    
    type (y_type), intent(inout)          :: y      ! residual type structure.
-   integer                               :: n,i,j  ! Loop counter.
+   integer                               :: n,i  ! Loop counter.
 
 
    if (trace_use) call da_trace_entry("da_deallocate_y")

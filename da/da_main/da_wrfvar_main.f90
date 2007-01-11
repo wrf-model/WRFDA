@@ -1,6 +1,7 @@
 program da_wrfvar_main
 
-  use da_wrfvar_top
+   use da_wrfvar_top
+   use da_reporting
 
    !-----------------------------------------------------------------------
    ! Purpose: Main program of WRFVAR.  Responsible for starting up, reading 

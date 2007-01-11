@@ -16,22 +16,18 @@ subroutine da_proc_maxmin_combine(n, max, min)
    type (maxmin_field_type), intent(inout)  :: max(n)  ! Max values over proc.
    type (maxmin_field_type), intent(inout)  :: min(n)  ! Min values over proc.
 
-   real    :: in(2,n)            ! mpi_reduce input value with processor rank.
-   real    :: out(2,n)           ! mpi_reduce output min/max with associated processor.
+   real    :: in(2*n)            ! mpi_reduce input value with processor rank.
+   real    :: out(2*n)           ! mpi_reduce output min/max with associated processor.
    integer :: i                  ! Loop counter.
    integer :: proc_id(n)         ! Id of processor with max or min value.
-   integer :: root               ! Monitor processor.
    integer :: status(mpi_status_size) ! MPI status.
 
 #ifdef DM_PARALLEL
 
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
-
    ! Get minimum value and associated processor index.
    do i = 1, n
-      in(1,i) = min(i)%value
-      in(2,i) = myproc
+      in(2*i-1) = min(i)%value
+      in(2*i) = myproc
    end do
 
    call mpi_reduce(in, out, n, mpi_2double_precision, mpi_minloc, &
@@ -39,8 +35,8 @@ subroutine da_proc_maxmin_combine(n, max, min)
 
    if (rootproc) then
       do i = 1, n
-         min(i)%value = out(1,i)
-         proc_id(i) = inT(out(2,i))
+         min(i)%value = out(2*i-1)
+         proc_id(i) = INT(out(2*i))
       end do
    end if
 
@@ -48,7 +44,7 @@ subroutine da_proc_maxmin_combine(n, max, min)
 
    ! Get i and j where minimum occurs.
    do i = 1, n
-      if (proc_id(i) .ne. root) then
+      if (proc_id(i) .ne. 0) then
          if (rootproc) then
             call mpi_recv(min(i)%i, 1, mpi_integer, proc_id(i), &
                            10, comm, STATUS, ierr)
@@ -65,16 +61,16 @@ subroutine da_proc_maxmin_combine(n, max, min)
 
    ! Get maximum value and associated processor index.
    do i = 1, n
-      in(1,i) = max(i)%value
-      in(2,i) = myproc
+      in(2*i-1) = max(i)%value
+      in(2*i) = myproc
    end do
    call mpi_reduce(in, out, n, mpi_2double_precision, mpi_maxloc, &
                                      root, comm, ierr)
 
    if (rootproc) then
       do i = 1, n
-         max(i)%value = out(1,i)
-         proc_id(i) = inT(out(2,i))
+         max(i)%value = out(2*i-1)
+         proc_id(i) = INT(out(2*i))
       end do
    end if
 

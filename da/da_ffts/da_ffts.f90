@@ -7,14 +7,12 @@ module da_ffts
    use da_define_structures, only : xbx_type
    use da_par_util
    use module_dm, only : wrf_dm_sum_reals
+   use module_ffts
 
    implicit none
 
    contains
 
-#include "fft551.inc"
-#include "fft661.inc"
-#include "qpassm.inc"
 #include "da_solve_poissoneqn_fct.inc"
 #include "da_solve_poissoneqn_fct_adj.inc"
 #include "da_solve_poissoneqn_fst.inc"

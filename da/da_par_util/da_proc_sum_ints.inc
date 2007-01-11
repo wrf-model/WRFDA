@@ -15,13 +15,11 @@ subroutine da_proc_sum_ints (values)
 
 #ifdef DM_PARALLEL
    integer, allocatable :: sums(:) ! Sum across processors.
-   integer           :: root                  ! Monitor processor.
 
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
    allocate (sums(size(values)))
    sums(:)=0
-   call mpi_reduce(values(:), sums(:), size(values), mpi_integer, mpi_sum, root, comm, ierr)
+   call mpi_reduce(values(:), sums(:), size(values), mpi_integer, mpi_sum, &
+      root, comm, ierr)
 
    if (rootproc) values(:) = sums(:)
    deallocate(sums)

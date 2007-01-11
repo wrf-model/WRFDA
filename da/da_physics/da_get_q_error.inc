@@ -17,6 +17,9 @@ subroutine da_get_q_error( p, t, q, t_error, rh_error, q_error)
    real                      :: qs    ! Saturation specific humidity.
    real                      :: rh    ! Relative humidity.
 
+   real :: f_qv_from_rh
+   external f_qv_from_rh
+
    if (ABS(p - missing_r) > 1.0 .AND. ABS(t - missing_r) > 1.0 .AND. &
         ABS(q - missing_r) > 1) then
 

@@ -15,13 +15,9 @@ subroutine da_proc_sum_count_obs (count_obs)
 
    integer           :: sumval(1:numvals)     ! Sum across processors.
    integer           :: procval(1:numvals)    ! Partial values on processor to sum.
-   integer           :: root                  ! Monitor processor.
    integer           :: offset                ! Index into procval and sumval arrays.
 
 #ifdef DM_PARALLEL
-
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
 
    offset = 1
    call da_pack_count_obs(count_obs % num_synop, offset, procval)

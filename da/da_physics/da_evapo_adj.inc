@@ -11,7 +11,7 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
 
    integer, intent(in)                     :: kts, kte, kms, kme
    real, dimension(kms:kme), intent(in)    :: DT, SCR3, SCR5, SCR6, QV_B
-   real, dimension(kms:kme)    :: PRE, PRE9
+   real, dimension(kms:kme), intent(inout) :: PRE, PRE9
    real, dimension(kms:kme), intent(inout) :: QV_A
    real, dimension(kms:kme), intent(out)   :: SCR39, SCR59, SCR69
 

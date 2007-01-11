@@ -227,15 +227,15 @@ CHARACTER (LEN=*), PARAMETER :: RoutineName = "Var_FFT551"
   500 CONTINUE
       GO TO (510,530,550) IERR
   510 CONTINUE
-      WRITE(UNIT=stderr,FMT='(A,I4,A)') &
+      WRITE(UNIT=0,FMT='(A,I4,A)') &
         'VECTOR LENGTH =',NVEX,', GREATER THAN VectorLength'
       GO TO 570
   530 CONTINUE
-      WRITE(UNIT=stderr,FMT='(A,I3,A)') &
+      WRITE(UNIT=0,FMT='(A,I3,A)') &
         'FACTOR =',IFAC,', NOT CATERED FOR'
       GO TO 570
   550 CONTINUE
-      WRITE(UNIT=stderr,FMT='(A,I3,A)') &
+      WRITE(UNIT=0,FMT='(A,I3,A)') &
         'FACTOR =',IFAC,', ONLY CATERED FOR IF LA*IFAC=N'
   570 CONTINUE
 

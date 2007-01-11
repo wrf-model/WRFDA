@@ -15,14 +15,12 @@ subroutine da_proc_sum_int (value)
 
 #ifdef DM_PARALLEL
    integer           :: sum                   ! Sum across processors.
-   integer           :: root                  ! Monitor processor.
 
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
    sum=0
-   call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, comm, ierr)
+   call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, &
+      comm, ierr)
 
-   if (myproc == root) value = sum
+   if (rootproc) value = sum
 #endif
 
 end subroutine da_proc_sum_int

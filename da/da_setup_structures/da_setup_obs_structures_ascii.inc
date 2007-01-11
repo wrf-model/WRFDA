@@ -6,10 +6,10 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
    implicit none
 
-   type (xpose_type), intent(in) :: xp         ! Domain decomposition vars.
-   type (y_type), intent(out)  :: ob          ! Observation structure.
-   type (ob_type), intent(out)  :: iv          ! O-B structure.
-   type (xb_type)                :: xb         ! First guess structure
+   type (xpose_type), intent(in)    :: xp  ! Domain decomposition vars.
+   type (y_type),     intent(out)   :: ob  ! Observation structure.
+   type (ob_type),    intent(out)   :: iv  ! O-B structure.
+   type (xb_type),    intent(inout) :: xb  ! First guess structure
 
    character(len=120)           :: filename
    integer                      :: n

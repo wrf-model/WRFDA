@@ -9,7 +9,7 @@ subroutine da_allocate_y (iv, y)
    type (ob_type), intent(in)            :: iv      ! Ob type input.
    type (y_type), intent(inout)          :: y       ! Residual type structure.
 
-   integer                               :: n, i, j ! Loop counter.
+   integer                               :: n, i    ! Loop counter.
    integer                               :: nlevels ! Number of levels.
 
    !---------------------------------------------------------------------------

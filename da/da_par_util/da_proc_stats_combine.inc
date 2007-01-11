@@ -24,13 +24,10 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
    real    :: in(2)              ! mpi_reduce input value with processor rank.
    real    :: out(2)             ! mpi_reduce output min/max with associated processor.
    integer :: proc_id            ! Id of processor with max or min value.
-   integer :: root               ! Monitor processor.
    integer :: status(mpi_status_size) ! MPI status.
+   integer :: buf(1)
 
 #ifdef DM_PARALLEL
-
-   if (rootproc) root = myproc
-   call wrf_dm_bcast_integer (root, 1)
 
    ! Sum average and rms error over all processors and store on monitor processor.
    call mpi_reduce(proc_ave, average, 1, true_mpi_real, mpi_sum, root, comm, ierr)
@@ -50,7 +47,9 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
       proc_min = out(1)
       proc_id = inT(out(2))
    end if
-   call wrf_dm_bcast_integer (proc_id, 1)
+
+   buf(1) = proc_id
+   call wrf_dm_bcast_integer (buf, 1)
 
    ! Get obs number and k-level where minimum occurs.
    if (proc_id .ne. root) then
@@ -74,7 +73,8 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
       proc_id = inT(out(2))
    end if
 
-   call wrf_dm_bcast_integer (proc_id, 1)
+   buf(1) = proc_id
+   call wrf_dm_bcast_integer (buf, 1)
 
    ! Get obs number and k-level where maximum occurs.
    if (proc_id .ne. root) then

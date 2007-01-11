@@ -6,13 +6,14 @@ module da_control
 
    use module_driver_constants
 
+#ifdef DM_PARALLEL
+   use mpi
+#endif
+
    implicit none
 
 #include "namelist_defines.inc"
 
-#ifdef DM_PARALLEL
-   include "mpif.h"
-#endif
 
    !---------------------------------------------------------------------------
    ! [1.0] Physical parameter constants (all NIST standard values):
@@ -396,6 +397,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    integer                :: num_procs            ! Number of total processors.
    integer                :: myproc               ! My processor ID.
+   integer, parameter     :: root = 0             ! Number of root processor
    logical                :: rootproc             ! Am I the root processor
 
    integer, parameter :: var4d_coupling_disk_linear = 1
@@ -553,7 +555,5 @@ contains
 #include "da_change_date.inc"
 #include "da_find_fft_factors.inc"
 #include "da_find_fft_trig_funcs.inc"
-
-#include "gamma1.inc"
 
 end module da_control

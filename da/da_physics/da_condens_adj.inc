@@ -9,18 +9,21 @@ subroutine da_condens_adj(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
 
    implicit none
 
-   integer                   :: kts, kte, k
-   real, dimension(kts:kte)  :: DT,SCR31,SCR42,SCR71,PRD,DUM31
-   real, dimension(kts:kte)  :: P_B,T_B,QV_B,QCW_B,QRN_B
-   real, dimension(kts:kte)  :: SCR319,SCR429,SCR719,PRD9,DUM319
-   real, dimension(kts:kte)  :: P_A,T_A,QV_A,QCW_A,QRN_A
+   integer, intent(in)                     :: kts, kte
+   real, dimension(kts:kte), intent(in)    :: DT,SCR31,SCR42,SCR71,PRD,DUM31
+   real, dimension(kts:kte), intent(in)    :: P_B,T_B,QV_B,QCW_B,QRN_B
+   real, dimension(kts:kte), intent(inout) :: SCR319,SCR429,SCR719,PRD9
+   real, dimension(kts:kte), intent(inout) :: P_A,T_A,QV_A,QCW_A,QRN_A,DUM319
 
-   real, dimension(kts:kte)  :: DUM114,DUM115,DUM212,DUM213,PRC5,  &
-                                SCR61,SCR8,QVT,QCT,QRT,TTT
-   real, dimension(kts:kte)  :: DUM1149,DUM1159,DUM2129,DUM2139,PRC59,  &
-                                SCR619,SCR89
-   real, dimension(kts:kte)  :: QVT9,QCT9,QRT9,TTT9
-   real, dimension(kts:kte)  :: TMP
+   real, dimension(kts:kte), intent(in)    :: QVT,QCT,QRT,TTT
+   real, dimension(kts:kte), intent(inout) :: QRT9,QCT9,QVT9
+
+
+   real, dimension(kts:kte)  :: DUM1159,DUM2139
+   real, dimension(kts:kte)  :: TMP,DUM114,DUM2129,SCR89,DUM212,DUM115
+   real, dimension(kts:kte)  :: PRC5,PRC59,DUM1149,SCR61,SCR8,DUM213,TTT9
+   real, dimension(kts:kte)  :: SCR619
+   integer                   :: k
 
    !  initilization
 
