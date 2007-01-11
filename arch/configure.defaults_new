@@ -929,7 +929,7 @@ CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHPE -DNONSTANDARD_SYSTEM                    
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHPE -DNONSTANDARD_SYSTEM
 
 FCOPTIM         =
 FCDEBUG         = 
@@ -1226,7 +1226,7 @@ CC_TOOLS        = cc
 LD              = $(FC)
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE                   
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -1234,10 +1234,8 @@ FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -Wno=101,155,158 -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
 
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
-CCFLAGS_RSL     =
 
 LOCAL_LIB       = -lSystemStubs
 
@@ -1257,9 +1255,9 @@ M4              = m4 -B12000
 FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
-LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
+LD              = $(FC)
 
 TRADFLAG        =
 FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
@@ -1270,9 +1268,9 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wall -Wextra
 FCTYPE          = -r8
-FCFREE          = -ffree-form  -ffree-line-length-huge
+FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,102,112,136,155,159,161 -fno-second-underscore \
+FCBASE          = -cpp -fno-second-underscore -Wno=101,102,112,136,155,159,161 \
                     -ftrace=full -finteger=-9999 -freal=nan
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -1323,9 +1321,9 @@ FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCOPTIM         = -O2
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs

@@ -15,7 +15,7 @@ MV      = /bin/mv -f
 CP      = /bin/cp -f
 AR      = ar ru
 M4      = m4
-RANLIB	= ranlib
+RANLIB  = ranlib
 CPP     = /lib/cpp
 
 .SUFFIXES: .f90 .F90 .F .i .o .f .c
@@ -24,8 +24,8 @@ CPP     = /lib/cpp
 #### at least 1 + 2*(number of total nests).  For example, 1 coarse
 #### grid + three fine grids = 1 + 2(3) = 7, so MAX_DOMAINS=7.
 
-MAX_DOMAINS	=	1
-MAX_PROC	=	1024
+MAX_DOMAINS = 1
+MAX_PROC    = 1024
 
 # Substituted by Config_new.pl
 
@@ -50,17 +50,15 @@ NMM_CORE    = CONFIGURE_NMM_CORE
 COAMPS_CORE = CONFIGURE_COAMPS_CORE
 EXP_CORE    = CONFIGURE_EXP_CORE
 FPPFLAGS1   = CONFIGURE_NETCDF_FLAG CONFIGURE_RTTOV_FLAG \
-              CONFIGURE_CRTM_FLAG $(WORDSIZE_DEF) \
-              -DLIMIT_ARGS -DPROMOTE_FLOAT -DINTIO \
-              -DGRIB1 CONFIGURE_GRIB2_FLAG \
-	      -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
-              -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
-              -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
-CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) \
-              -DLANDREAD_STUB
+    CONFIGURE_CRTM_FLAG $(WORDSIZE_DEF) \
+    -DLIMIT_ARGS -DPROMOTE_FLOAT -DINTIO \
+    -DGRIB1 CONFIGURE_GRIB2_FLAG \
+    -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
+    -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
+    -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC)
+CCFLAGS1    = -DMAXDOM_MAKE=$(MAX_DOMAINS) -DMAXPROC_MAKE=$(MAX_PROC) -DLANDREAD_STUB
 WRFIO       = CONFIGURE_WRFIO_NF wrfio_int wrfio_grib1
-INCS        = -I. -I./inc CONFIGURE_RTTOV_INC CONFIGURE_CRTM_INC \
-                -I$(NETCDF_PATH)/include
+INCS        = -I. -I./inc CONFIGURE_RTTOV_INC CONFIGURE_CRTM_INC -I$(NETCDF_PATH)/include
 LDFLAGS1    = CONFIGURE_LDFLAGS
 
 # switch to use separately installed ESMF library for coupling:  1==true
@@ -128,30 +126,27 @@ GRIB2_LIB       = -L$(IO_GRIB2) -lio_grib2
 #### Get core settings from environment (set in compile script)
 #### Note to add a core, this has to be added to.
 
-COREDEFS = -DEM_CORE=$(EM_CORE)         \
-           -DDA_CORE=$(DA_CORE)         \
-           -DNMM_CORE=$(NMM_CORE)       \
-           -DCOAMPS_CORE=$(COAMPS_CORE) \
-           -DEXP_CORE=$(EXP_CORE)
+COREDEFS = -DEM_CORE=$(EM_CORE) -DDA_CORE=$(DA_CORE) -DNMM_CORE=$(NMM_CORE) \
+   -DCOAMPS_CORE=$(COAMPS_CORE) -DEXP_CORE=$(EXP_CORE)
 
 #### For wrfvar, always use RWORDSIZE 8
 
-RWORDSIZE	=	8
+RWORDSIZE       = 8
 
-DWORDSIZE	=	8
-WORDSIZE_DEF	=	-DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
+DWORDSIZE       = 8
+WORDSIZE_DEF    = -DIWORDSIZE=4 -DDWORDSIZE=$(DWORDSIZE) -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4
 
 #### DM buffer length for the configuration flags.
 
-CONFIG_BUF_LEN	=	8192
+CONFIG_BUF_LEN = 8192
 
 # defaults for occasional architecture specific settings
 
 SED_FTN         = sed -f standard.sed
 OMP             =
 OMPCPP          =
-MPI_LIB		=
-DM_CPPFLAGS	=
-DM_FPPFLAGS	=
+MPI_LIB         =
+DM_CPPFLAGS     =
+DM_FPPFLAGS     =
 #### Architecture specific settings ####
 

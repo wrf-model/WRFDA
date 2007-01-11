@@ -8,7 +8,7 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
 
    implicit none
 
-   character(len=*), intent(in)           :: str(:)
+   character(len=*), intent(in)           :: str
    integer,          intent(in)           :: line
    type(y_type),     intent(in), optional :: y1
    type(y_type),     intent(in), optional :: y2

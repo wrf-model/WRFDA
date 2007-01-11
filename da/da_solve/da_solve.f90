@@ -69,7 +69,7 @@ subroutine da_solve ( grid , config_flags &
    if (cv_options_hum < 1 .or. cv_options_hum > 3) then
       write(unit=message(1),fmt='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
-      call wrf_error_fatal(message(1))
+      call wrf_error_fatal(message(1:1))
    end if
 
    if (vert_corr == 2) then
