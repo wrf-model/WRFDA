@@ -23,6 +23,7 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
    integer                        :: k  ! Index dimension.
    integer                        :: nlevels ! Number of obs levels.
 
+   real                             :: seap, icep, lndp, snop
    real, allocatable :: v_p(:,:)
 
    integer            :: inst, nchan
@@ -172,7 +173,8 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
             iv%instid(inst)%loc_i(n), iv%instid(inst)%loc_j(n), &
             iv%instid(inst)%loc_dx(n), iv%instid(inst)%loc_dy(n), &
             iv%instid(inst)%loc_dxm(n), iv%instid(inst)%loc_dym(n), &
-            iv%instid(inst)%isflg(n),iv%instid(inst)%vegtyp(n), iv%instid(inst)%soiltyp(n))
+            iv%instid(inst)%isflg(n),iv%instid(inst)%vegtyp(n), iv%instid(inst)%soiltyp(n), &
+            seap, icep, lndp, snop )
       end do
 
       call da_interp_lin_2d_new (xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &

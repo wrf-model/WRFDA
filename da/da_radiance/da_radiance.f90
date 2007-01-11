@@ -184,6 +184,10 @@ module da_radiance
    integer, allocatable :: tovs_recv_start(:,:)
    integer, allocatable :: tovs_copy_count(:)
 
+#ifdef RTTOV
+   CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
+#endif
+
 contains
 
 #include "da_jo_and_grady_rad.inc"
@@ -221,6 +225,21 @@ contains
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
 #include "da_status_rad.inc"
+
+#include "da_transform_xtoy_rad_crtmk.inc"
+#include "da_transform_xtoy_rad_crtmk_fast.inc"
+#include "da_transform_xtoy_rad_crtmk_fast_adj.inc"
+#include "da_transform_xtoy_rad_crtmk_adj.inc"
+#include "da_transform_xtoy_rad_crtm.inc"
+#include "da_transform_xtoy_rad_crtm_adj.inc"
+#include "da_get_innov_vector_rad_crtmk.inc"
+#include "da_get_innov_vector_rad_crtm.inc"
+#include "da_crtm_tl.inc"
+#include "da_crtm_sensor_descriptor.inc"
+#include "da_crtm_k.inc"
+#include "da_crtm_init.inc"
+#include "da_crtm_direct.inc"
+#include "da_crtm_ad.inc"
 
 end module da_radiance
 

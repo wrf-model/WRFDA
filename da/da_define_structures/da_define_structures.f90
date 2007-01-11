@@ -479,6 +479,15 @@ module da_define_structures
       real,    pointer     :: vegtyp(:)
       real,    pointer     :: vegfra(:)
       real,    pointer     :: clwp(:)
+      real,    pointer     :: ps_jacobian(:,:)
+      real,    pointer     :: t_jacobian(:,:,:)
+      real,    pointer     :: q_jacobian(:,:,:)
+      real,    pointer     :: water_coverage(:)
+      real,    pointer     :: land_coverage(:)
+      real,    pointer     :: ice_coverage(:)
+      real,    pointer     :: snow_coverage(:)
+
+
       type (info_type), pointer   :: info(:)
       type (model_loc_type), pointer   :: loc(:)
    end type instid_type

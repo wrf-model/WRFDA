@@ -23,6 +23,9 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 #ifdef RTTOV
     call da_rttov_init(iv,ob)
 #endif
+#ifdef CRTM
+    call da_crtm_init(iv,ob)
+#endif
 
    !-------------------------------------------------------------------
    ! [2.0] Read NCEP bufr tovs data in radiance innovations vector
