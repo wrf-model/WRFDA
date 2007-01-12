@@ -1,4 +1,3 @@
-#ifdef CRTM
 subroutine da_crtm_init(iv,ob)
 !------------------------------------------------------------------------------
 !  PURPOSE: interface to the initialization subroutine of RTTOV8_5.
@@ -13,6 +12,8 @@ subroutine da_crtm_init(iv,ob)
 
  type (ob_type), intent (inout) :: iv
  type (y_type) , intent (inout) :: ob
+
+#ifdef CRTM
 ! CRTM TYPE 
     TYPE (CRTM_ChannelInfo_type) :: ChannelInfo
 
@@ -334,6 +335,5 @@ subroutine da_crtm_init(iv,ob)
   deallocate(nchanl)
 
   call da_trace_exit("da_crtm_init")
-
-end subroutine da_crtm_init
 #endif
+end subroutine da_crtm_init

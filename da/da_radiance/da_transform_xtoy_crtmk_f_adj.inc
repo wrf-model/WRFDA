@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_rad_crtmk_fast_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_crtmk_f_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: transform gradient from obs space to model grid space.
@@ -37,7 +37,7 @@ subroutine da_transform_xtoy_rad_crtmk_fast_adj ( iv, xp, jo_grad_y, jo_grad_x )
 #else
    IF ( iv%num_inst < 1 ) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_crtmk_fast_adj")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_crtmk_f_adj")
 
 !-------------------------------------------------------------------------------
 
@@ -124,8 +124,8 @@ subroutine da_transform_xtoy_rad_crtmk_fast_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    end do        ! end loop for sensor
 
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_crtmk_fast_adj")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_crtmk_f_adj")
 #endif
  
-end subroutine da_transform_xtoy_rad_crtmk_fast_adj
+end subroutine da_transform_xtoy_crtmk_f_adj
 

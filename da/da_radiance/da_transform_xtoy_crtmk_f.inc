@@ -1,9 +1,9 @@
-subroutine da_transform_xtoy_rad_crtmk_fast ( xa, iv, xp, y )
+subroutine da_transform_xtoy_crtmk_f ( xa, iv, xp, y )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: transform from analysis increment to
    !                          pertubation radiance.
-   !           K-Matrix vesion of da_transform_xtoy_rad_crtm
+   !           K-Matrix vesion of da_transform_xtoy_crtm
    !           use stored Jacobian to directly multi (no need re-call K-matrix)
    !
    !  METHOD:  delta_y = H delta_x
@@ -40,7 +40,7 @@ subroutine da_transform_xtoy_rad_crtmk_fast ( xa, iv, xp, y )
 #else
    IF ( iv%num_inst < 1 ) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_crtmk_fast")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_crtmk_f")
 
 !-------------------------------------------------------------------------------
 
@@ -116,8 +116,8 @@ subroutine da_transform_xtoy_rad_crtmk_fast ( xa, iv, xp, y )
 
    end do        ! end loop for sensor
 
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_crtmk_fast")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_crtmk_f")
 #endif
  
-end subroutine da_transform_xtoy_rad_crtmk_fast
+end subroutine da_transform_xtoy_crtmk_f
 

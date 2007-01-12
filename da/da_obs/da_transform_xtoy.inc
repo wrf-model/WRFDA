@@ -149,7 +149,7 @@ subroutine da_transform_xtoy(xb, iv, xa, xp, y)
       if (use_crtm_kmatrix) then
          call da_transform_xtoy_rad_crtmk (xa, iv, xp, y)
       else if (use_crtm_kmatrix_fast) then
-         call da_transform_xtoy_rad_crtmk_fast (xa, iv, xp, y)
+         call da_transform_xtoy_crtmk_f (xa, iv, xp, y)
       else
          call da_transform_xtoy_rad_crtm (xa, iv, xp, y)
       end if

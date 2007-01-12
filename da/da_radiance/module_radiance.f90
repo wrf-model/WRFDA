@@ -25,7 +25,15 @@ module module_radiance
    !USE CRTM_Utility
 
   ! -- CRTM RT_models modules
-   USE CRTM_Module   ! include 12 modules
+   USE CRTM_Module, only : graupel_cloud, rain_cloud, snow_cloud,crtm_adjoint, &
+      crtm_allocate_atmosphere, crtm_allocate_surface, crtm_assign_atmosphere, &
+      crtm_assign_surface,crtm_destroy_atmosphere,crtm_destroy_surface, &
+      crtm_forward,crtm_init,crtm_k_matrix,crtm_set_channelinfo, &
+      crtm_tangent_linear, grass_soil, h2o_id,hail_cloud,ice_cloud,new_snow, &
+      o3_id, water_cloud, crtm_rtsolution_type, crtm_channelinfo_type, &
+      crtm_atmosphere_type, crtm_surface_type, crtm_geometryinfo_type, &
+      crtm_zero_surface, crtm_zero_atmosphere
+
    USE CRTM_SensorInfo
 #endif
 
@@ -63,6 +71,24 @@ module module_radiance
 #ifdef RTTOV
    type( rttov_coef ), pointer :: coefs(:)         ! RTTOV8_5 coefficients
    type( rttov_scatt_coef ), pointer :: coefs_scatt(:)
+#endif
+
+   type satinfo_type
+      integer, pointer   :: ichan(:)      ! channel index
+      integer, pointer   :: iuse (:)      ! usage flag (-1: not use)
+      real   , pointer   :: error(:)      ! error Standard Deviation
+      real   , pointer   :: polar(:)      ! polarisation (0:vertical; 1:horizontal)
+      real   , pointer   :: rms(:,:)      ! rms of bias corr file
+      real   , pointer   :: std(:,:)      ! std of bias corr file
+      real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
+      real   , pointer   :: b(:,:)        ! bias corr coef b
+      real   , pointer   :: error_factor(:) ! error tuning factor
+   end type satinfo_type
+
+   type (satinfo_type), pointer :: satinfo(:)
+
+#ifdef RTTOV
+   CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
 #endif
 
 contains

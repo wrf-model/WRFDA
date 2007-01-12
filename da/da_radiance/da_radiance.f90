@@ -146,20 +146,6 @@ module da_radiance
 
    end type rad_data_type
 
-   type satinfo_type
-      integer, pointer   :: ichan(:)      ! channel index
-      integer, pointer   :: iuse (:)      ! usage flag (-1: not use)
-      real   , pointer   :: error(:)      ! error Standard Deviation
-      real   , pointer   :: polar(:)      ! polarisation (0:vertical; 1:horizontal)
-      real   , pointer   :: rms(:,:)      ! rms of bias corr file
-      real   , pointer   :: std(:,:)      ! std of bias corr file
-      real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
-      real   , pointer   :: b(:,:)        ! bias corr coef b
-      real   , pointer   :: error_factor(:) ! error tuning factor
-   end type satinfo_type
-   
-   type (satinfo_type), pointer :: satinfo(:)
-
    type bias_type
       integer :: nchan     ! number of channels
       integer :: npred     ! number of predictors
@@ -183,10 +169,6 @@ module da_radiance
    integer, allocatable :: tovs_recv_pe(:,:)
    integer, allocatable :: tovs_recv_start(:,:)
    integer, allocatable :: tovs_copy_count(:)
-
-#ifdef RTTOV
-   CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
-#endif
 
 contains
 
@@ -226,20 +208,10 @@ contains
 #include "da_setup_bufrtovs_structures.inc"
 #include "da_status_rad.inc"
 
-#include "da_transform_xtoy_rad_crtmk.inc"
-#include "da_transform_xtoy_rad_crtmk_fast.inc"
-#include "da_transform_xtoy_rad_crtmk_fast_adj.inc"
-#include "da_transform_xtoy_rad_crtmk_adj.inc"
-#include "da_transform_xtoy_rad_crtm.inc"
-#include "da_transform_xtoy_rad_crtm_adj.inc"
-#include "da_get_innov_vector_rad_crtmk.inc"
-#include "da_get_innov_vector_rad_crtm.inc"
-#include "da_crtm_tl.inc"
-#include "da_crtm_sensor_descriptor.inc"
-#include "da_crtm_k.inc"
+! This CRTM file has to be in da_radiance to avoid a circular dependancy
+
 #include "da_crtm_init.inc"
-#include "da_crtm_direct.inc"
-#include "da_crtm_ad.inc"
+#include "da_crtm_sensor_descriptor.inc"
 
 end module da_radiance
 

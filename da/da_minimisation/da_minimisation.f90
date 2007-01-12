@@ -29,6 +29,7 @@ module da_minimisation
    use da_transfer_model
    use da_qscat
    use da_radiance
+   use da_crtm
    use da_airsr     
    use module_get_file_names ! for system call on cray
    use da_wrfvar_io
