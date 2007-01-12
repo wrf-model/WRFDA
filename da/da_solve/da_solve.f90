@@ -90,7 +90,7 @@ subroutine da_solve ( grid , config_flags &
 
    if (anal_type_randomcv) then
       ntmax = 0
-      write(unit=stdout)' Resetting ntmax = 0 for analysis_type = randomcv' 
+      write(unit=stdout,fmt='(a)')' Resetting ntmax = 0 for analysis_type = randomcv' 
    end if
 
    !---------------------------------------------------------------------------

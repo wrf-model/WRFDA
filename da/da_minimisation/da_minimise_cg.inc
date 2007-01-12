@@ -56,7 +56,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
    write(unit=stdout,fmt=*) ' '
 
    ! Initialize temporary cv structures:
-   xhat = 0.0
+   if ( .not. anal_type_randomcv ) xhat = 0.0
    j_grad = 0.0
    fhat = 0.0
 
