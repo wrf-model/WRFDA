@@ -133,7 +133,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb19v(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb19v
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb19v%value, &
                                           ssmi_tb%minimum%tb19v%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb19v%value, &
@@ -147,7 +147,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb19h(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb19h
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb19h%value, &
                                           ssmi_tb%minimum%tb19h%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb19h%value, &
@@ -161,7 +161,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb22v(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb22v
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb22v%value, &
                                           ssmi_tb%minimum%tb22v%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb22v%value, &
@@ -175,7 +175,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb37v(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb37v
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb37v%value, &
                                           ssmi_tb%minimum%tb37v%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb37v%value, &
@@ -189,7 +189,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb37h(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb37h
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb37h%value, &
                                           ssmi_tb%minimum%tb37h%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb37h%value, &
@@ -203,7 +203,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb85v(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb85v
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb85v%value, &
                                           ssmi_tb%minimum%tb85v%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb85v%value, &
@@ -217,7 +217,7 @@ subroutine da_oi_stats_ssmi_tb (stats_unit, oi)
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for ssmi_tb'
          write(unit=stats_unit, fmt='(a/)') '   var           tb85h(m/s)     n'
          write(unit=stats_unit, fmt='(a,i14)') '  Number: ', ntb85h
-         write(unit=stats_unit, fmt='(a, f12.4,i5)') &
+         write(unit=stats_unit, fmt='(a, f12.4,i9)') &
                          ' Minimum(n): ', ssmi_tb%minimum%tb85h%value, &
                                           ssmi_tb%minimum%tb85h%n    , &
                          ' Maximum(n): ', ssmi_tb%maximum%tb85h%value, &
