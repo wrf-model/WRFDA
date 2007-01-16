@@ -31,7 +31,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
             be % v1 % val, &
             vertical_wgt, &
             vv % v1, vp % v1, &
-            be % v1 % mz)
+            be % v1 % mz, kte)
       else
          vp % v1(its:ite,jts:jte,kts:kte) = 0.0
       end if
@@ -42,7 +42,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
             be % v2 % val, &
             vertical_wgt, &
             vv % v2, vp % v2, &
-            be % v2 % mz)
+            be % v2 % mz, kte)
       else
          vp % v2(its:ite,jts:jte,kts:kte) = 0.0
       end if
@@ -53,7 +53,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
             be % v3 % val, &
             vertical_wgt, &
             vv % v3, vp % v3, &
-            be % v3 % mz)
+            be % v3 % mz, kte)
       else
          vp % v3(its:ite,jts:jte,kts:kte) = 0.0
       end if
@@ -64,7 +64,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
             be % v4 % val, &
             vertical_wgt, &
             vv % v4, vp % v4, &
-            be % v4 % mz)
+            be % v4 % mz, kte)
       else
          vp % v4(its:ite,jts:jte,kts:kte) = 0.0
       end if
@@ -78,10 +78,10 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                be % v5 % val, &
                vertical_wgt, & 
                vv % v5, vp % v5, &
-               be % v5 % mz)    
+               be % v5 % mz, kts)    
          end if
       else
-         vp % v5(its:ite,jts:jte,kts:kte) = 0.0
+         vp % v5(its:ite,jts:jte,kts:kts) = 0.0
       end if
 
       if (be % ne > 0) then
@@ -183,7 +183,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                                        be % v1 % val, &
                                        vertical_wgt, &
                                        vp % v1, &
-                                       vv % v1, be % v1 % mz)
+                                       vv % v1, be % v1 % mz, kte)
       end if
 
       if (be % v2 % mz > 0) then
@@ -192,7 +192,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                                        be % v2 % val, &
                                        vertical_wgt, &
                                        vp % v2, &
-                                       vv % v2, be % v2 % mz)
+                                       vv % v2, be % v2 % mz, kte)
       end if
 
       if (be % v3 % mz > 0) then
@@ -201,7 +201,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                                        be % v3 % val, &
                                        vertical_wgt, &
                                        vp % v3, &
-                                       vv % v3, be % v3 % mz)
+                                       vv % v3, be % v3 % mz, kte)
       end if
 
       if (be % v4 % mz > 0) then
@@ -210,7 +210,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                                        be % v4 % val, &
                                        vertical_wgt, &
                                        vp % v4, &
-                                       vv % v4, be % v4 % mz)
+                                       vv % v4, be % v4 % mz, kte)
       end if
 
       if (be % v5 % mz > 0) then
@@ -222,7 +222,7 @@ subroutine da_vertical_transform(string, be, vertical_wgt, vv, vp)
                                        be % v5 % val, &
                                        vertical_wgt, &
                                        vp % v5, &
-                                       vv % v5, be % v5 % mz)
+                                       vv % v5, be % v5 % mz, kts)
          end if
       end if
 

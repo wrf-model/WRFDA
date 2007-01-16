@@ -1,5 +1,5 @@
 subroutine da_transform_vvtovp(evec, eval, vertical_wgt, &
-                                vv, vp, mz)
+                                vv, vp, mz, levels)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transform from fields on vertical EOFS to fields on vertical 
@@ -11,6 +11,7 @@ subroutine da_transform_vvtovp(evec, eval, vertical_wgt, &
    implicit none
    
    integer, intent(in)   :: mz                         ! # vertical modes.
+   integer, intent(in)   :: levels                     ! # no. of levels  
 
    real, intent(in)      :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
    real, intent(in)      :: eval(jds:jde,1:mz)         ! Eigenvalues.
@@ -28,7 +29,7 @@ subroutine da_transform_vvtovp(evec, eval, vertical_wgt, &
    !------------------------------------------------------------------- 
 
    vp = 0.0
-   do k = kts, kte
+   do k = kts, levels
       do m = 1, mz
          do j = jts, jte
             temp = evec(j,k,m) * eval(j,m)
@@ -45,8 +46,8 @@ subroutine da_transform_vvtovp(evec, eval, vertical_wgt, &
    !------------------------------------------------------------------- 
 
    if (vertical_ip /= 0) then
-      vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
-                                    vertical_wgt(its:ite,jts:jte,kts:kte)                          
+      vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
+                                    vertical_wgt(its:ite,jts:jte,kts:levels)                          
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vvtovp")

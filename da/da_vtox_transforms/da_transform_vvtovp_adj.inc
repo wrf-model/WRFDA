@@ -1,5 +1,5 @@
 subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
-                                    vp, vv, mz)
+                                    vp, vv, mz, levels)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_transform_vvtovp.
@@ -8,6 +8,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
    implicit none
    
    integer, intent(in)   :: mz                         ! # vertical modes.
+   integer, intent(in)   :: levels                     ! no. of vertical levels
 
    real, intent(in)      :: evec(jds:jde,kds:kde,1:mz) ! Eigenvectors.
    real, intent(in)      :: eval(jds:jde,1:mz)         ! Eigenvalues.
@@ -25,8 +26,8 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
    !------------------------------------------------------------------- 
 
    if (vertical_ip /= 0) then
-      vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) / &
-                                    vertical_wgt(its:ite,jts:jte,kts:kte)
+      vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
+                                    vertical_wgt(its:ite,jts:jte,kts:levels)
    end if
 
    !-------------------------------------------------------------------
@@ -35,7 +36,7 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
 
    vv = 0.0
    do m = 1, mz
-      do k = kts, kte
+      do k = kts, levels
          do j = jts, jte
             temp = evec(j,k,m) * eval(j,m)
 
