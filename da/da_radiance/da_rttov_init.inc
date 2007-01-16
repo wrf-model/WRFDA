@@ -1,4 +1,3 @@
-#ifdef RTTOV
 subroutine da_rttov_init(iv,ob)
 
    !---------------------------------------------------------------------------
@@ -13,11 +12,12 @@ subroutine da_rttov_init(iv,ob)
 
    implicit none 
 
-#include "rttov_setup.interface"
-#include "rttov_readscattcoeffs.interface"
- 
    type (ob_type), intent (inout) :: iv
    type (y_type) , intent (inout) :: ob
+
+#ifdef RTTOV
+#include "rttov_setup.interface"
+#include "rttov_readscattcoeffs.interface"
 
    !  local arguments
    !------------------- 
@@ -419,7 +419,6 @@ subroutine da_rttov_init(iv,ob)
 
    if (trace_use) call da_trace_exit("da_rttov_init")
 
-end subroutine da_rttov_init
-
-
 #endif
+
+end subroutine da_rttov_init

@@ -403,6 +403,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: var4d_coupling_disk_linear = 1
    integer, parameter :: var4d_coupling_disk_simul  = 2
 
+   integer, parameter :: rtm_option_rttov = 1
+   integer, parameter :: rtm_option_crtm = 2
+
    ! RTM_inIT setup parameter
 
    integer, parameter            :: maxsensor = 30

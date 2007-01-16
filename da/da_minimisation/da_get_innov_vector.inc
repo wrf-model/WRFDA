@@ -123,9 +123,9 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
       ! Radiance:
 
-      if (rtm_option == 1) then
+      if (rtm_option == rtm_option_rttov) then
          call da_get_innov_vector_rad( it, grid%xb, grid%xp, ob, iv )
-      elseif (rtm_option == 2) then
+      elseif (rtm_option == rtm_option_crtm) then
         if (use_crtm_kmatrix_fast) then
          call da_get_innov_vector_rad_crtmk( it, grid%xb, grid%xp, ob, iv )
         else
