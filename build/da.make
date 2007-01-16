@@ -236,3 +236,12 @@ da_write_sl_2_be: da_write_sl_2_be.o
 grabbufr: grabbufr.o
 	$(LD) -o $@.exe $@.o
 
+# Don't optimise these big routines
+
+da_wrfvar_finalise.o da_netcdf_interface.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOOPT) $*.f
+

@@ -36,3 +36,13 @@ module_state_description.F : registry ../Registry/$(REGISTRY)
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc
+
+# Don't optimise these big routines
+
+module_configure.o module_io.o module_domain.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOOPT) $*.f
+

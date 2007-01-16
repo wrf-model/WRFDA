@@ -1051,23 +1051,6 @@ arch_clean :
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
-# Switch off optimisation for these bloated modules
-
-nest_init_utils.o : 
-	@ $(RM) $@
-	@ $(SED_FTN) nest_init_utils.F > nest_init_utils.b
-	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) nest_init_utils.b  > nest_init_utils.f
-	@ $(RM) nest_init_utils.b
-	  $(FC) -c $(FCFLAGS_NOOPT) nest_init_utils.f
-
-couple_or_uncouple_em.o : 
-	@ $(RM) $@
-	@ $(SED_FTN) couple_or_uncouple_em.F > couple_or_uncouple_em.b
-	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) couple_or_uncouple_em.b  > couple_or_uncouple_em.f
-	@ $(RM) couple_or_uncouple_em.b
-	  $(FC) -c $(FCFLAGS_NOOPT) couple_or_uncouple_em.f
-
-
 ###########################################################
 #ARCH Settings for crayx1 UNICOS/mp CRAY X1                  (Single-threaded) 
 

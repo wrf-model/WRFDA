@@ -88,6 +88,15 @@ SHARE_OBJS    = 		\
 
 SHARE_OBJS_WRFPLUS =
 
+# Don't optimise these big routines
+
+couple_or_uncouple_em.o start_domain.o solve_interface.o module_io_wrf.o : 
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F > $*.b 
+	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOOPT) $*.f
+
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 # DO NOT DELETE

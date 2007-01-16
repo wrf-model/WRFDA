@@ -52,6 +52,7 @@ include io_netcdf.make
 include io_grib.make
 include ioapi_share.make
 include main.make
+include RSL.make
 
 # makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
 # which is wrong, try to encourage it to use the correct one, but note that brain
