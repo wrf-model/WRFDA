@@ -3,7 +3,8 @@
 cd ..
 svn update
 ./clean_new -a
-echo 1 | ./configure_new wrfvar
+. ./setup.ksh g95
+echo 4 | ./configure_new wrfvar
 cd build
 make -r setup
 ln -fs inc/* .
