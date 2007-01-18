@@ -56,7 +56,7 @@ subroutine da_rttov_init(iv,ob)
    character(len=20)   ::  rttovid_string
    integer             ::  num_tot
    real                ::  joa, jo, trace, factor 
-   character(len=80)   :: filename
+   character(len=filename_len)   :: filename
 
    if (trace_use) call da_trace_entry("da_rttov_init")
 

@@ -58,6 +58,8 @@ subroutine da_crtm_init(iv,ob)
  integer , pointer   :: channels (:), polarisations(:,:)
  integer             :: mxchn
  integer             :: idum, wmo_sensor_id, sensor_type, iost
+ integer             :: iunit
+ character(len=filename_len)  :: filename
 
 ! local variables for tuning error factor
  character(len=20)   ::  rttovid_string
@@ -145,13 +147,12 @@ subroutine da_crtm_init(iv,ob)
         Stop ' in da_crtm_init '
    end if
 
-   open(109,file=trim(iv%instid(n)%rttovid_string)//'.info', &
-           form='formatted',iostat = iost, status='old')
-
+   call da_get_unit(iunit)
+   filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+   open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
-         write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance Info FILE ', trim(iv%instid(n)%rttovid_string)//'.info'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_crtm_init '
+      message(1)="Cannot open radiance info file "//adjustl(filename)
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    allocate ( satinfo(n) % ichan(nchanl(n)) )
@@ -159,9 +160,9 @@ subroutine da_crtm_init(iv,ob)
    allocate ( satinfo(n) % error(nchanl(n)) )
    allocate ( satinfo(n) % polar(nchanl(n)) )
 
-   read(109,*)
+   read(iunit,*)
    do j = 1, nchanl(n)
-     read(109,'(1x,5i5,2e18.10)')    &
+     read(iunit,'(1x,5i5,2e18.10)')    &
                      wmo_sensor_id, &
                satinfo(n)%ichan(j), &
                        sensor_type, &
@@ -172,6 +173,7 @@ subroutine da_crtm_init(iv,ob)
      iv%instid(n)%ichan(j) = satinfo(n)%ichan(j)
      ob%instid(n)%ichan(j) = satinfo(n)%ichan(j)
    end do
+   call da_free_unit(iunit)
 
   end do loop_sensor
 

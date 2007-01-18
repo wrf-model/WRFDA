@@ -87,7 +87,7 @@ if $NL_VAR4D; then
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
-echo "DA_BOUNDARIES          $DA_BOUNDARIES"
+echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
@@ -135,8 +135,6 @@ echo "WINDOW_END            $WINDOW_END"
    export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
 
    export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00.0000}
-# JRB are these duplicates?
-   export NL_TIME_ANALYSIS=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00.0000
    export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
 
    #-----------------------------------------------------------------------
@@ -166,14 +164,11 @@ echo "WINDOW_END            $WINDOW_END"
       ln -s $DA_RTTOV_COEFFS/* .
    fi
 
-   cp $WRFVAR_DIR/run/gribmap.txt .
-   cp $WRFVAR_DIR/run/LANDUSE.TBL .
-   cp $WRFVAR_DIR/run/GENPARM.TBL .
-   cp $WRFVAR_DIR/run/VEGPARM.TBL .
-   cp $WRFVAR_DIR/run/SOILPARM.TBL .
-   cp $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
-   cp $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   ln -s $WRFVAR_DIR/build/wrfvar.exe .
+   ln -sf $WRFVAR_DIR/run/gribmap.txt .
+   ln -sf $WRFVAR_DIR/run/*.TBL .
+   ln -sf $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -sf $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
+   ln -sf $WRFVAR_DIR/build/wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
    ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
@@ -193,11 +188,7 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    done
 
-   for FILE in $WRFVAR_DIR/run/*.info; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
+   ln -s $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
       # More than one observation file of each type
@@ -483,6 +474,13 @@ echo "WINDOW_END            $WINDOW_END"
       if test -f grad_fn; then
          cp grad_fn $RUN_DIR/grad_fn
       fi
+
+      # remove intermediate output files
+
+      rm -f unpert_obs.*
+      rm -f pert_obs.*
+      rm -f rand_obs_error.*
+      rm -f gts_omb_oma.*
 
       if test -f wrfvar_output; then
          if test $DA_ANALYSIS != wrfvar_output; then 

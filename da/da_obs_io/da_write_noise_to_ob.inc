@@ -19,6 +19,7 @@ subroutine da_write_noise_to_ob (iv)
    call mpi_barrier(comm, ierr)
 #endif
    call da_get_unit (iunit)
+   call da_get_unit (rand_unit)
    allocate (filename(0:num_procs-1))
    do k = 0,num_procs-1
       write(unit=filename(k), fmt='(a,i3.3)')'rand_obs_error.',k
@@ -425,6 +426,7 @@ subroutine da_write_noise_to_ob (iv)
    end if
 
    call da_free_unit (iunit)
+   call da_free_unit (rand_unit)
    deallocate (filename)
    call da_trace_exit("da_write_noise_to_ob")
    

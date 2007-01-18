@@ -199,6 +199,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer :: check_max_iv_unit, rand_unit, omb_unit, filtered_obs_unit
    integer :: biasprep_unit
 
+   integer,parameter :: filename_len = 200
+
    integer, parameter :: num_alpha_corr_types = 3
    integer, parameter :: num_sound_diag = 4 
 

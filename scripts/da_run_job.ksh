@@ -44,8 +44,8 @@ if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then
 # @ job_type         = parallel
 # @ environment      = COPY_ALL
 # @ job_name         = $EXPT
-# @ output           = $EXPT.e\$(jobid)
-# @ error            = $EXPT.o\$(jobid)
+# @ output           = job.output
+# @ error            = job.error
 # @ node             = $NODES
 # @ notification     = never
 # @ network.MPI      = css0,shared,ip
@@ -78,8 +78,8 @@ elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
 #BSUB -a mpich_gm      
 #BSUB -n $NUM_PROCS              
 #BSUB -J $EXPT                   
-#BSUB -o $EXPT.out               
-#BSUB -e $EXPT.err               
+#BSUB -o job.output               
+#BSUB -e job.error               
 #BSUB -q $QUEUE 
 #BSUB -W $LSF_MAX_RUNTIME
 #BSUB -R "span[ptile=$LL_PTILE]"
