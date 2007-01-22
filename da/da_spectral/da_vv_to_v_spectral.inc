@@ -35,7 +35,7 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
    complex             :: r_leg(1:nj)                 ! Intermediate Fourier state.
    complex, allocatable:: ccv(:)                      ! Spectral modes.
 
-   sizec = 0.5 * r_cvsize
+   sizec = INT(0.5 * r_cvsize)
    allocate (ccv(1:sizec))
 
    if ((ni+1) / 2 == ni/2 + 1) then  ! Odd number of longitudes:

@@ -21,7 +21,7 @@ subroutine da_setlegpol_test (nj, max_wavenumber, alp_size, int_wgts, alp)
    integer :: sign_switch2        ! Defined to make use of symmetry of ALPs.
    real    :: eq_coeff            ! 1 if equator point, 0 otherwise.
    real    :: alp_norm_test       ! Summation scalar.
-   complex :: eq_term             ! Summation scalar.
+   real    :: eq_term             ! Summation scalar.
    integer :: spec_unit
 
    call da_get_unit(spec_unit)
