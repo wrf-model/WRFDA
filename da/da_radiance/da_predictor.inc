@@ -38,8 +38,6 @@ implicit none
 
   real, SAVE :: DLP(JPRTLEV-1), DP(JPRTLEV-1)
 
-  integer :: IST, ILAY, I
-
 ! If first time compute log P(i)/P(i-1) and P(i)-P(i-1)
   if (FIRST) then
     DLP(1:JPRTLEV-1) = LOG(PLEVS(2:JPRTLEV)) - LOG(PLEVS(1:JPRTLEV-1))
@@ -66,3 +64,5 @@ implicit none
 
   RETURN
   end subroutine da_predictor
+
+

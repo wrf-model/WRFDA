@@ -9,7 +9,7 @@ subroutine da_final_write_y(iv, y)
    type (ob_type), intent(in)    :: iv   ! O-B structure.
    type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
       
-   integer                       :: n, k,kk,i, ounit, iunit
+   integer                       :: n, k,kk,i, ounit
    integer                       :: sound_num_obs, num_obs, ios
    character*20, allocatable     :: filename(:)
    character*20                  :: ob_name, file_prefix  

@@ -12,7 +12,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    type (y_type),     intent(in)  :: re       ! O-A structure.
 
    integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: i, k     ! Index dimension.
    integer                        :: nlevelss ! Number of obs levels.
 
    integer            :: ios, oma_rad_unit

@@ -14,7 +14,8 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    ! local variables
    integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
    logical   :: lmix
-   real      :: satzen,si
+   real      :: si
+   ! real     :: satzen
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),nrej_omb_rms(nchan),      &
                 nrej_mixsurface,nrej_windowchanl, nrej_si,    &
@@ -213,3 +214,5 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    if (trace_use) call da_trace_exit("da_qc_amsub")
 
 end subroutine da_qc_amsub
+
+

@@ -13,7 +13,7 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
    integer,           intent(in)    :: stats_unit, nchan
    type (stats_rad_type), intent(in)    :: rad
    
-   integer    :: i, k, n, nmin, nmax
+   integer    :: k, n, nmin, nmax
    integer    :: used_nchan 
 
    if (trace_use) call da_trace_entry("da_print_stats_rad")
