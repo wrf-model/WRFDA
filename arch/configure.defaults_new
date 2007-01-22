@@ -838,7 +838,6 @@ arch_superclean :
 ###########################################################
 #ARCH Settings for SGI O2K DM IRIX64, optimised, untestested (RSL, SGI-MPI, RSL IO)
 #
-LIBINCLUDE      = /tea2/huangwei/mpich-1.2.4/include
 M4              = m4 -B12000
 FC              = mpif90
 FFC             = $(FC)
@@ -861,7 +860,64 @@ FCENDIAN        =
 FCBASE          = -64 -mips4 -w
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 -DIRIX -I$(RSL)/RSL -I/tea2/huangwei/mpich-1.2.4/include
+CCFLAGS2        = -w -64 -mips4 -DIRIX -I$(RSL)/RSL
+CCFLAGS_RSL     =
+
+LOCAL_LIB       = 
+MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST o2k )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, ifort, optimised, untestested (RSL, SGI-MPI, RSL IO)
+#
+# Process pinning should be used -- set the environment
+#  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
+#  running through the cpuset command, or when using a batch
+#  scheduler that has dynamic cpuset support enabled.  In
+#  other cases, if specific processors are known to be free,
+#  the environment variable MPI_DSM_CPULIST may be used
+#  (details in 'man mpi').
+
+# Draft version to be reviewed by Gerardo Cisneros <gerardo@sgi.com>
+
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = $(FC)
+CC              = mpicc
+CC_TOOLS        = cc
+RANLIB          = echo
+LD              = $(FC)
+
+TRADFLAG        =
+FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+FCOPTIM         = -O3
+FCDEBUG         = # -g
+FCTYPE          = -r8
+FCFREE          = -freeform
+FCENDIAN        =
+FCBASE          = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
+                     -align all -IPF_fp_relaxed
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -w -O3 -ip -tpp2 -c -ftz -no-gcc -I$(RSL)/RSL 
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = 
