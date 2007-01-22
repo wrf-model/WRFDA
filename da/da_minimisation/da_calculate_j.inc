@@ -142,7 +142,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    end if
 
    if (rootproc) then
-      write(unit=cost_unit,fmt='(2x,i2,1x,1pe10.4,2x,i4,5(1x,f10.3))') &
+      write(unit=cost_unit,fmt='(2x,i2,1x,e10.3,2x,i4,5(1x,f10.3))') &
          it, EPS(it), iter, j % total, j % jb, j % jo % total, j % jc, j % je
    end if
 
@@ -214,7 +214,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    gnorm_j = sqrt(gnorm_j)
 
    if (rootproc) then
-      write(grad_unit,fmt='(2x,i2,1x,1pe10.4,2x,i4,5(1x,f10.3))') & 
+      write(grad_unit,fmt='(2x,i2,1x,e10.3,2x,i4,5(1x,f10.3))') & 
          it, eps(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
    end if
 
