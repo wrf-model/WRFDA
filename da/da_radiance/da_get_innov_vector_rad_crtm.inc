@@ -26,8 +26,6 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: alloc_status(40)
 
-   REAL                             :: model_t2m
-   REAL                             :: model_q2m, model_mr2m
    REAL                             :: model_u10, model_v10
    REAL                             :: model_psfc, model_ptop
    REAL                             :: model_ts, model_elv
@@ -35,17 +33,16 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
    REAL                             :: model_isltyp, model_ivgtyp, model_vegfra
    INTEGER                          :: model_isflg
 
-   REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, model_tm, &     ! Model value p at ob hor. location.
-                                       model_qcw, &
-                                       model_qm
+   REAL, DIMENSION(xp%kms:xp%kme)   :: v_p, &     ! Model value p at ob hor. location.
+                                       model_qcw
+
+   ! REAL, DIMENSION(xp%kms:xp%kme)   :: model_tm
 
    INTEGER            :: inst, nchanl
    INTEGER            :: nchan_emis
-   integer            :: sensor_type
 
    ! variables for computing clwp
    REAL, dimension(xp%kms:xp%kme)     :: vtm, clw, dlnpf
-   REAL, dimension(xp%kms:xp%kme+1)   :: pf
    REAL                               :: clwp
 
 #if defined(CRTM)

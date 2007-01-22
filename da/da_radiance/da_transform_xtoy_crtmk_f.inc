@@ -26,7 +26,7 @@ subroutine da_transform_xtoy_crtmk_f ( xa, iv, xp, y )
    INTEGER                        :: num_rad  ! Number of radiance obs
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
-   INTEGER                        :: inst, nchanl, n
+   INTEGER                        :: inst, n
    REAL, pointer                  :: q_tl(:),t_tl(:)
    REAL                           :: ps_tl
 

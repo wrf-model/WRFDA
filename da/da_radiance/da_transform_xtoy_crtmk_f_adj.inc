@@ -23,8 +23,8 @@ subroutine da_transform_xtoy_crtmk_f_adj ( iv, xp, jo_grad_y, jo_grad_x )
    INTEGER                        :: num_rad  ! Number of radiance obs
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
-   INTEGER                        :: inst, nchanl, n
-   REAL, pointer                  :: q_ad(:),t_ad(:)
+   INTEGER                        :: inst, n
+   REAL, allocatable              :: q_ad(:),t_ad(:)
    REAL                           :: ps_ad
 
    ! CRTM local varaibles and types
@@ -46,13 +46,8 @@ subroutine da_transform_xtoy_crtmk_f_adj ( iv, xp, jo_grad_y, jo_grad_x )
       num_rad = iv%instid(inst)%num_rad
 
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( t_ad     ( xp%kte-xp%kts+1 ), &
-                q_ad     ( xp%kte-xp%kts+1 ), &
-                STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-         call da_error(__FILE__,__LINE__, &
-          (/"Error in allocatting t_ad q_ad"/))                                                                                   
-      END IF
+      ALLOCATE (t_ad(xp%kte-xp%kts+1))
+      ALLOCATE (q_ad(xp%kte-xp%kts+1))
 
 !----------------------------------------------------------------------------
       do n=1,num_rad

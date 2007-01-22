@@ -24,7 +24,7 @@ subroutine da_transform_xtoy_rad_crtmk_adj ( iv, xp, jo_grad_y, jo_grad_x )
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: inst, nchanl, n
-   REAL, pointer                  :: q_k(:),t_k(:)
+   REAL, allocatable              :: q_k(:),t_k(:)
    REAL                           :: ps_k
 
 #if defined(CRTM)
@@ -64,17 +64,12 @@ subroutine da_transform_xtoy_rad_crtmk_adj ( iv, xp, jo_grad_y, jo_grad_x )
       nchanl    = ChannelInfo%n_channels
  
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
-                RTSolution_K( ChannelInfo%n_Channels ), &
-                Atmosphere_K( ChannelInfo%n_Channels ), &
-                Surface_K( ChannelInfo%n_Channels ), &
-                t_k     ( xp%kte-xp%kts+1 ), &
-                q_k     ( xp%kte-xp%kts+1 ), &
-                STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-         call da_error(__FILE__,__LINE__, &
-          (/"Error in allocatting Atmosphere_K"/))                                                                                   
-      END IF
+      ALLOCATE (RTSolution(ChannelInfo%n_Channels))
+      ALLOCATE (RTSolution_K(ChannelInfo%n_Channels))
+      ALLOCATE (Atmosphere_K(ChannelInfo%n_Channels))
+      ALLOCATE (Surface_K(ChannelInfo%n_Channels))
+      ALLOCATE (t_k(xp%kte-xp%kts+1))
+      ALLOCATE (q_k(xp%kte-xp%kts+1))
 
 !----------------------------------------------------------------------------
 ! CRTM Atmosphere structure
