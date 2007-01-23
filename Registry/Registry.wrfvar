@@ -93,7 +93,6 @@ state    real   xlat_gc        ij       dyn_em      1        -     i1  "XLAT_M" 
 state    real   xlong_gc       ij       dyn_em      1        -     i1  "XLONG_M" "longitude, positive east" "degrees"
 state    real   ht_gc          ij       dyn_em      1        -     i1  "HGT_M" "topography elevation" "m"
 state    real   tsk_gc         ij       dyn_em      1        -     i1  "SKINTEMP"  "skin temperature"  "K"
-#state    real   tavgsfc        ij       dyn_em      1        -     i1  "TAVGSFC"  "daily mean of surface air temperature"  "K"
 state    real   tmn_gc         ij       dyn_em      1        -     i1  "SOILTEMP"  "annual mean deep soil temperature"  "K"
 state    real   pslv_gc        ij       dyn_em      1        -     i1  "PMSL"  "sea level pressure"  "Pa"
 state    real   greenfrac      imj      dyn_em      1        -     i1  "GREENFRAC" "monthly greenness fraction" "0 - 1 fraction"
@@ -102,11 +101,6 @@ state    real   pd_gc          igj      dyn_em      1        -     -   "PD"    "
 state    real   qv_gc          igj      dyn_em      1        -     i1   "QV"     "mixing ratio"        "kg kg-1"
 state    real   intq_gc        ij       dyn_em      1        -     -   "INTQ"  "integrated mixing ratio" "Pa"
 state    real   pdhs           ij       dyn_em      1        -     -   "PDHS"  "hydrostatic dry surface pressure" "Pa"
-#state    real   qr_gc          igj      dyn_em      1        -     i1  "QR"    "rain water mixing ratio"   "kg kg-1"
-#state    real   qc_gc          igj      dyn_em      1        -     i1  "QC"    "cloud water mixing ratio"   "kg kg-1"
-#state    real   qs_gc          igj      dyn_em      1        -     i1  "QS"    "snow mixing ratio"   "kg kg-1"
-#state    real   qi_gc          igj      dyn_em      1        -     i1  "QI"    "cloud ice mixing ratio"   "kg kg-1"
-#state    real   qg_gc          igj      dyn_em      1        -     i1  "QG"    "graupel mixing ratio"   "kg kg-1"
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #                                               
@@ -395,27 +389,12 @@ state   integer itimestep      -        -          -         -     rh         "i
 state   real    xtime          -        -          -         -     rh         "xtime"                 "minutes since simulation start"         ""      
 state   real    julian         -        -          -         -     -          "julian"                "day of year"         ""      
 
-# for noise diagnoses
-
-#state    real   dpsdt           ij     misc      1          -     h        "dpsdt" "surface pressure tendency" "hPa/3h"
-#state    real   dmudt           ij     misc      1          -     h        "dmudt" "mu tendency" "hPa/3h"
-#state    real   psfcm           ij     misc      1          -     h        "psfcm" "surface pressure at previous step" "Pa"
-#state    real   avg_abs_dpsdt   -      misc      -          -     h        "avg_abs_dpsdt" "average absolute surface pressure (psfc) tendency" "hPa/3h"
-#state    real   avg_abs_dmudt   -      misc      -          -     h        "avg_abs_dmudt" "average absolute mu tendency" "hPa/3h"
-
-# for moisture convergences
-
-#state    real   q_conve_3d      ikj    misc      1          -     h         "q_conve_3d" "Water vapour convergence (3d)"   "(g/kg)/3h"
-#state    real   q_conve_2d      ij     misc      1          -     h         "q_conve_2d" "Water vapour convergence (2d)"   "(g/kg)/s"
-
 # input file descriptor for lbcs on parent domain                                               
 state   integer lbc_fid        -        -          -         -     -         "lbc_fid"               ""         ""      
 # indicates if tiling has been computed                                         
 state   logical tiled          -        -          -         -     -         "tiled"                 ""         ""      
 # indicates if patches have been computed                                               
 state   logical patched        -        -          -         -     -         "patched"               ""         ""      
-# indicates whether to read input from file or generate                                         
-#state   logical input_from_file        -        -          -         -     -         "input_from_file"         ""         ""    
 
 # Mask for moving nest interpolations
 state    integer imask_nostag         ij      misc     1     -
@@ -517,32 +496,7 @@ state    real   SST              ij     misc        1         -     i0125rhd=(in
 # gfdl (eta) radiation State Variables
 state    real    HTOP            ij     misc        1         -      r        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
 state    real    HBOT            ij     misc        1         -      r        "HBOT"                 "BOT OF CONVECTION LELVEL"         ""
-#state    real    HTOPR           ij     misc        1         -      r        "HTOPR"                "TOP OF CONVECTION LEVEL FOR RADIATION"    ""
-#state    real    HBOTR           ij     misc        1         -      r        "HBOTR"                "BOT OF CONVECTION LEVEL FOR RADIATION"    ""
-#state    real    CUTOP           ij     misc        1         -      r        "CUTOP"                "TOP OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
-#state    real    CUBOT           ij     misc        1         -      r        "CUBOT"                "BOT OF CONVECTION LEVEL FROM CUMULUS PAR"    ""
 state    REAL      CUPPT         ij     misc        1         -      r        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINC LAST CALL TO THE RADIATION"         ""
-#state  real   totswdn   ij    misc        1    -    i
-#state  real   totlwdn   ij    misc        1    -    i
-#state  real   rswtoa    ij    misc        1    -    i
-#state  real   rlwtoa    ij    misc        1    -    i
-#state  real   czmean    ij    misc      1    -     i
-#state  real   cfracl    ij    misc      1    -     i
-#state  real   cfracm    ij    misc      1    -     i
-#state  real   cfrach    ij    misc      1    -     i
-#state  real   acfrst    ij    misc        1    -    i
-#state integer ncfrst    ij    misc        1    -    i
-#state  real   acfrcv    ij    misc        1    -    i
-#state integer ncfrcv    ij    misc        1    -    i
-
-# cam radiation variables
-#state  real    -       iqjf ozmixm      1    -   -     -
-#state  real    -       idjf aerosolc    2    -   -       -
-
-# new eta microphpysics State Variables
-#state    real    F_ICE_PHY       ijk    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
-#state    real    F_RAIN_PHY      ijk    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
-#state    real    F_RIMEF_PHY     ijk    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ijk     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
@@ -753,18 +707,8 @@ i1       real  REGIME           ij      misc        1         -
 state    real  SNOWC            ij      misc        1         -     irhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)      "SNOWC"                 "FLAG INDICATING SNOW COVERAGE (1 FOR SNOW COVER)"         ""
 state    real  MAVAIL           ij      misc        1         -      r        "MAVAIL"                "SURFACE MOISTURE AVAILABILITY"                ""
                                                 
-#state   real   tkesfcf          ij      misc        1         -      r        "tkesfcf"               "TKE AT THE SURFACE"                           "m2 s-2"      
-                                                
 state integer  STEPBL          -        misc        1         -      r        "STEPBL"                "NUMBER OF FUNDAMENTAL TIMESTEPS BETWEEN PBL CALLS" ""      
-#state    real  taucldi         ijk      misc        1         -      r        "TAUCLDI"               "CLOUD OPTICAL THICKNESS FOR ICE"              ""
-#state    real  taucldc         ijk      misc        1         -      r        "TAUCLDC"               "CLOUD OPTICAL THICKNESS FOR WATER"            ""
-                                                
-#state   real  defor11          ijk      misc        1         -     -         "defor11"               "DEFORMATION 11"              "s-1"      
-#state   real  defor22          ijk      misc        1         -     -         "defor22"               "DEFORMATION 22"              "s-1"      
-#state   real  defor12          ijk      misc        1         -     -         "defor12"               "DEFORMATION 12"              "s-1"      
-#state   real  defor33          ijk      misc        1         z     -         "defor33"               "DEFORMATION 33"              "s-1"      
-#state   real  defor13          ijk      misc        1         z     -         "defor13"               "DEFORMATION 13"              "s-1"      
-#state   real  defor23          ijk      misc        1         z     -         "defor23"               "DEFORMATION 23"              "s-1"      
+                                               
 state   real   xkmv            ijk      misc        1         -     -         "xkmv"                  "VERTICAL EDDY VISCOSITY"     "m2 s-1"      
 state   real   xkmh            ijk      misc        1         -     -         "xkmh"                  "HORIZONTAL EDDY VISCOSITY"   "m2 s-1"      
 state   real   xkmhd           ijk      misc        1         -     -         "xkmhd"                 "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
@@ -772,15 +716,8 @@ state   real   a_xkmhd         ijk      misc        1         -     -         "a
 state   real   g_xkmhd         ijk      misc        1         -     -         "g_xkmhd"               "VERTICAL EDDY DIFFUSIVITY OF HEAT (FOR UPPER DAMPING LAYER)"     "m2 s-1"      
 state   real   xkhv            ijk      misc        1         -     -         "xkhv"                  "VERTICAL EDDY DIFFUSIVITY OF HEAT"                               "m2 s-1"      
 state   real   xkhh            ijk      misc        1         -     -         "xkhh"                  "HORIZONTAL EDDY DIFFUSIVITY OF HEAT"                             "m2 s-1"      
-#state   real    div            ijk      misc        1         -     -         "div"                   "DIVERGENCE"                                                      "s-1"
-#state   real    BN2            ijk      misc        1         -     -         "BN2"                   "BRUNT-VAISALA FREQUENCY"                                         "s-2"
 state  logical warm_rain        -       misc        1         -     -         "warm_rain"              "WARM_RAIN_LOGICAL"
 state  logical adv_moist_cond   -       misc        1         -     -         "adv_moist_cond"         "ADVECT MOIST CONDENSATES LOGICAL"
-
-## FDDA variables
-
-#state    real    -               ikjf     fdda3d      1         -     -    -
-#state    real    -               ivjf     fdda2d      1         Z     -    -
 
 # flag for nest movement
 state  logical moved            -       misc        1         -     -          
@@ -1337,12 +1274,10 @@ package   ncepcloud5    mp_physics==99               -             moist:qv,qc,q
 package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
 
 package   rrtmscheme    ra_lw_physics==1             -             -
-#package   camlwscheme   ra_lw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
 package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi
 
 package   swradscheme   ra_sw_physics==1             -             -
 package   gsfcswscheme  ra_sw_physics==2             -             -
-#package   camswscheme   ra_sw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
 package   gfdlswscheme  ra_sw_physics==99            -             -
 
 package   sfclayscheme   sf_sfclay_physics==1        -             -
@@ -1394,15 +1329,12 @@ halo      HALO_EM_VINTERP_UV_1 dyn_em 8:pd_gc,pb
 halo      HALO_EM_A dyn_em  8:ru,rv,rw,ww,php,alt,al,p,muu,muv,mut
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
 halo      HALO_EM_PHYS_PBL dyn_em        4:rublten,rvblten
-#halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:defor11,defor22,defor12,defor13,defor23,div,xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
 halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
 halo      HALO_EM_TKE_ADVECT_3 dyn_em 24:tke_2
 halo      HALO_EM_TKE_ADVECT_5 dyn_em 48:tke_2
 halo      HALO_EM_TKE_A dyn_em 4:ph_2,phb
 halo      HALO_EM_TKE_B dyn_em 4:z,rdz,rdzw,zx,zy
 halo      HALO_EM_TKE_C dyn_em 8:u_2,v_2,z,zx,zy,rdz,rdzw
-#halo      HALO_EM_TKE_D dyn_em 8:defor11,defor22,defor33,defor12,defor13,defor23,div
-#halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,moist
 halo      HALO_EM_TKE_E dyn_em 8:xkmv,xkmh,xkmhd,xkhv,xkhh,moist
 halo      HALO_EM_TKE_3 dyn_em   24:tke_1,tke_2
 halo      HALO_EM_TKE_5 dyn_em   48:tke_1,tke_2
@@ -1442,7 +1374,6 @@ period    PERIOD_BDY_EM_MOIST dyn_em 3:moist
 period    PERIOD_BDY_EM_SCALAR dyn_em 3:scalar
 period    PERIOD_BDY_EM_A dyn_em 2:ru,rv,rw,ww,php,alt,p,muu,muv,mut,ph_2
 period    PERIOD_BDY_EM_A1  dyn_em 3:rdzw,rdz,z,zx,zy
-#period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,div,defor11,defor22,defor12,defor13,defor23,defor33,tke_2
 period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,tke_2
 period    PERIOD_BDY_EM_B dyn_em 2:ru_tend,rv_tend,ph_2,al,p,t_1,t_save,u_save,v_save,mu_1,mu_2,mudf,php,alt,pb
 period    PERIOD_BDY_EM_B3 dyn_em 2:ph_2,al,p,mu_2,muts,mudf
@@ -1483,8 +1414,6 @@ typedef vp_type real    alpha                   ijr      -         1        -   
 
 # BEGIN EP_TYPE DEFINITION:
 #      <Table>  <Type>  <Sym>                <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
-#typedef ep_sub_type character name
-#typedef ep_sub_type integer   nk
 typedef ep_type integer ne
 typedef ep_type real    v1                      ijkr     -         1        -       -
 typedef ep_type real    v2                      ijkr     -         1        -       -
