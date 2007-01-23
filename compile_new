@@ -6,6 +6,11 @@ set compare_var = 0
 setenv WRF_EM_CORE 1
 setenv WRF_DA_CORE 0
 
+if (! $?COMPILE_PROCS) then
+   setenv COMPILE_PROCS 1
+endif
+
+
 if ( !  -e configure.wrfvar  ) then
   echo "You need to configure the code first."
   echo "Please do ./configure_new and then ./compile_new."
@@ -127,7 +132,7 @@ else
   # seperate setup stage for make programs that don't update include
   # files before using them. gnu make good. Aix make bad
   make -r setup
-  make -r $arglist A2DCASE="$A2DCASE"
+  make -r -j$COMPILE_PROCS $arglist A2DCASE="$A2DCASE"
 
 endif
 

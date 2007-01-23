@@ -41,12 +41,7 @@ if test "$PROCESSOR" = "Power Macintosh"; then
    export PROCESSOR=powerpc
 fi
 
-# Only hunt for compilers we supply
-
 if test $FC = g95; then
-   if test -d ${EXT_DIR}/g95/g95_${PROCESSOR}; then
-      export PATH=${EXT_DIR}/g95/g95_${PROCESSOR}:$PATH
-   fi
    export G95_ENDIAN=BIG
 fi
 

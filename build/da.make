@@ -33,8 +33,8 @@ WRFVAR_OBJS = da_par_util.o \
    da_test.o \
    da_tools.o \
    da_tools1.o \
-   da_rsl_interfaces.o \
    da_wrf_interfaces.o \
+   da_rsl_interfaces.o \
    da_recursive_filter.o \
    da_interpolation.o \
    da_grid_definitions.o \
@@ -239,12 +239,61 @@ da_write_sl_2_be: da_write_sl_2_be.o
 grabbufr: grabbufr.o
 	$(LD) -o $@.exe $@.o
 
-# Don't optimise these big routines
+# Special cases, either needing special include files or too big to 
+# optimise/debug
 
-da_wrfvar_finalise.o da_netcdf_interface.o :
+da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
-	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS_NOOPT) $*.f
+	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
 
+da_netcdf_interface.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
+
+da_gen_be.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(LAPACK_INC) $*.f
+
+da_etkf.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(LAPACK_INC) $*.f
+
+gen_be_ensmean.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) $*.f
+
+da_tools.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(LAPACK_INC) -I$(BLAS_INC) $*.f
+
+module_radiance.o da_radiance.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(RTTOV_INC) -I$(CRTM_INC) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(RTTOV_INC) -I$(CRTM_INC) $*.f
+
+da_spectral.o da_be_spectral.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(FFTPACK5_INC) $*.f

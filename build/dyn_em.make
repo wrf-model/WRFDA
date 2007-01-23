@@ -48,15 +48,6 @@ DYN_OBJS    = 		        \
         nest_init_utils.o	\
         interp_domain_em.o
 
-# Switch off optimisation, as too big
-
-nest_init_utils.o : 
-	@ $(RM) $@
-	@ $(SED_FTN) $*.F > $*.b
-	  $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS_NOOPT) $*.f
-
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 # DO NOT DELETE

@@ -281,24 +281,24 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_RTTOV_PATH:$sw_rttov_path:g ;
     $_ =~ s:CONFIGURE_RTTOV_FLAG:-DRTTOV: ;
     $_ =~ s:CONFIGURE_RTTOV_LIB:-L$sw_rttov_path/lib -lrttov: ;
-    $_ =~ s:CONFIGURE_RTTOV_INC:-I$sw_rttov_path/src: ;
+    $_ =~ s:CONFIGURE_RTTOV_INC:$sw_rttov_path/src: ;
   } else {
     $_ =~ s:CONFIGURE_RTTOV_PATH::g ;
     $_ =~ s:CONFIGURE_RTTOV_FLAG::g ;
     $_ =~ s:CONFIGURE_RTTOV_LIB::g ;
-    $_ =~ s:CONFIGURE_RTTOV_INC::g ;
+    $_ =~ s:CONFIGURE_RTTOV_INC:.:g ;
   }
 
   if ( $sw_crtm_path ) {
     $_ =~ s:CONFIGURE_CRTM_PATH:$sw_crtm_path:g ;
     $_ =~ s:CONFIGURE_CRTM_FLAG:-DCRTM: ;
     $_ =~ s:CONFIGURE_CRTM_LIB:-L$sw_crtm_path/lib -lcrtm: ;
-    $_ =~ s:CONFIGURE_CRTM_INC:-I$sw_crtm_path/src: ;
+    $_ =~ s:CONFIGURE_CRTM_INC:$sw_crtm_path/src: ;
   } else {
     $_ =~ s:CONFIGURE_CRTM_PATH::g ;
     $_ =~ s:CONFIGURE_CRTM_FLAG::g ;
     $_ =~ s:CONFIGURE_CRTM_LIB::g ;
-    $_ =~ s:CONFIGURE_CRTM_INC::g ;
+    $_ =~ s:CONFIGURE_CRTM_INC:.:g ;
   }
 
   # always defined

@@ -66,7 +66,7 @@ real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
 
 depend : arch links registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
-	makedepf90 $(FPPFLAGS) \
+	makedepf90 -free $(FPPFLAGS) \
            *.F *.f90 *.F90 2>/dev/null > depend.txt
 	touch depend
 	
