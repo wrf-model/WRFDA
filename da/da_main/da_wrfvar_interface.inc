@@ -7,9 +7,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
    implicit none
 
    interface
-      subroutine da_solve (grid , config_flags &
-#include "em_dummy_new_args.inc"
-     )
+      subroutine da_solve (grid , config_flags)
 
       ! Driver layer modules
       use module_domain
@@ -27,12 +25,10 @@ subroutine da_wrfvar_interface (grid, config_flags)
       use da_test
       use da_minimisation
 
-      !--Input data.
+      ! Input data.
 
       type(domain),                intent(inout) :: grid
       type (grid_config_rec_type), intent(inout) :: config_flags
-
-#include "em_dummy_new_decl.inc"
 
       end subroutine da_solve
    end interface
@@ -51,9 +47,7 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
    grid%itimestep = 1
 
-   call da_solve (grid , config_flags &
-#include "em_actual_new_args.inc"
-   )
+   call da_solve (grid , config_flags)
 
    call da_trace_exit("da_wrfvar_interface")
 

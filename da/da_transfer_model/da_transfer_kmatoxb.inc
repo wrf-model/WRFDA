@@ -1,6 +1,4 @@
-subroutine da_transfer_kmatoxb(xbx, grid &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_kmatoxb(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transfers fields from KMA to first guess (xb) structure.
@@ -11,10 +9,6 @@ subroutine da_transfer_kmatoxb(xbx, grid &
    type (xbx_type), intent(inout)     :: xbx          ! Header & non-gridded vars.
 
    type(domain), intent(inout)        :: grid
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
@@ -105,7 +99,7 @@ subroutine da_transfer_kmatoxb(xbx, grid &
             grid%xb%u(i,j,k) = grid%em_u_2(i,j,k)
             grid%xb%v(i,j,k) = grid%em_v_2(i,j,k)
             grid%xb%t(i,j,k) = grid%em_t_2(i,j,k)
-            grid%xb%q(i,j,k) = moist(i,j,k,P_QV)
+            grid%xb%q(i,j,k) = grid%moist(i,j,k,P_QV)
          end do
       end do
    end do

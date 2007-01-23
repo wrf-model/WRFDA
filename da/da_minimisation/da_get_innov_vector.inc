@@ -1,7 +1,4 @@
-subroutine da_get_innov_vector( it, ob, iv, &
-                                grid, config_flags &
-#include "em_dummy_new_args.inc"
-                )
+subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -14,9 +11,6 @@ subroutine da_get_innov_vector( it, ob, iv, &
    type(ob_type), intent(inout) :: iv           ! Innovation vector(O-B).
    type(domain) ,  intent(inout) :: grid
    type(grid_config_rec_type), intent(inout)   :: config_flags
-
-   ! Definitions of dummy arguments to solve
-#include "em_dummy_new_decl.inc"
 
    type(xbx_type)     :: xbx          ! Header & non-gridded vars.
 
@@ -39,9 +33,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
          call da_med_initialdata_input( grid , config_flags, &
             filename)
-         call da_setup_firstguess( xbx, grid &
-#include "em_dummy_new_args.inc"
-                          )
+         call da_setup_firstguess( xbx, grid)
       end if
 
       ! Radiosonde:
@@ -191,9 +183,7 @@ subroutine da_get_innov_vector( it, ob, iv, &
 
    if (num_fgat_time > 1) then
       call da_med_initialdata_input( grid , config_flags, 'fg01')
-      call da_setup_firstguess( xbx, grid &
-#include "em_dummy_new_args.inc"
-                            )
+      call da_setup_firstguess( xbx, grid)
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector")

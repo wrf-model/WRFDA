@@ -1,6 +1,4 @@
-subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysis increments into WRFTL increments 
@@ -13,10 +11,6 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    character*4, intent(in) :: filnam
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
@@ -44,7 +38,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            g_moist(i,j,k,P_QV)=grid%xa%q(i,j,k)/(1.0-grid%xb%q(i,j,k))**2
+            grid%g_moist(i,j,k,P_QV)=grid%xa%q(i,j,k)/(1.0-grid%xb%q(i,j,k))**2
          end do
       end do
    end do
@@ -58,8 +52,8 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
          sdmd=0.0
          s1md=0.0
          do k=ks,ke
-            sdmd=sdmd+g_moist(i,j,k,P_QV)*grid%em_dnw(k)
-            s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
+            sdmd=sdmd+grid%g_moist(i,j,k,P_QV)*grid%em_dnw(k)
+            s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
          grid%em_g_mu_2(i,j)=-(grid%xa%psfc(i,j)+grid%xb%psac(i,j)*sdmd)/s1md
       end do
@@ -74,8 +68,8 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam &
          g_press(i,j,ke+1)=0.0
          do k=ke,ks,-1
             g_press(i,j,k)=g_press(i,j,k+1) &
-               -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
-               +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_moist(i,j,k,P_QV))* &
+               -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
+               +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*grid%g_moist(i,j,k,P_QV))* &
                grid%em_dn(k)
             grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do

@@ -1,4 +1,6 @@
-subroutine da_solve_init(grid)
+subroutine da_solve_init(grid &
+#include "em_dummy_new_args.inc"
+)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,6 +9,8 @@ subroutine da_solve_init(grid)
    implicit none
 
    type(domain), intent(inout)      :: grid
+
+#include "em_dummy_new_decl.inc"
 
 #ifdef DM_PARALLEL
    integer :: ii

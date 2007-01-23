@@ -1,6 +1,4 @@
-subroutine da_transfer_xatowrf(xbx, grid &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_xatowrf(xbx, grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysis increments into WRF increments
@@ -10,10 +8,6 @@ subroutine da_transfer_xatowrf(xbx, grid &
    
    type (xbx_type), intent(inout)     :: xbx     ! Header & non-gridded vars.
    type(domain), intent(inout)        :: grid
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
 
@@ -81,7 +75,7 @@ subroutine da_transfer_xatowrf(xbx, grid &
          s1md=0.0
          do k=ks,ke
             sdmd=sdmd+q_cgrid(i,j,k)*grid%em_dnw(k)
-            s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
+            s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
 
          mu_cgrid(i,j)=-(grid%xa%psfc(i,j)+grid%xb%psac(i,j)*sdmd)/s1md
@@ -99,7 +93,7 @@ subroutine da_transfer_xatowrf(xbx, grid &
       do i=is,ie
          k = ke
          qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k))
-         qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k,P_QV))
+         qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k,P_QV))
          qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
          qvf2_b = 1./(1.+qvf1)
          qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -110,7 +104,7 @@ subroutine da_transfer_xatowrf(xbx, grid &
 
          do k = ke-1,1,-1
             qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
-            qvf1_b = 0.5*(moist(i,j,k,P_QV)+moist(i,j,k+1,P_QV))
+            qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
             qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
             qvf2_b = 1./(1.+qvf1_b)
             qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
@@ -195,7 +189,7 @@ subroutine da_transfer_xatowrf(xbx, grid &
             ! To obtain all of the full fields: t, p, q(mixing ratio), rho
             t_full   = grid%xa%t(i,j,k) + grid%xb%t(i,j,k)
             p_full   = grid%xa%p(i,j,k) + grid%xb%p(i,j,k)
-            q_full   = moist(i,j,k,P_QV) + q_cgrid(i,j,k)
+            q_full   = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
 
             ! Note: According to WRF, this is the dry air density used to
             !       compute the geopotential height: 
@@ -315,27 +309,27 @@ subroutine da_transfer_xatowrf(xbx, grid &
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + u_cgrid(i,j,k)
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + v_cgrid(i,j,k)
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)
-            moist(i,j,k,P_QV) = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
+            grid%moist(i,j,k,P_QV) = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
             ! make sure qv is positive.
-            if (moist(i,j,k,P_QV) < 1.0e-6) moist(i,j,k,P_QV) = 1.0e-6
+            if (grid%moist(i,j,k,P_QV) < 1.0e-6) grid%moist(i,j,k,P_QV) = 1.0e-6
 
-            if (size(moist,dim=4) >= 4) then
-               moist(i,j,k,p_qc) = moist(i,j,k,p_qc) + grid%xa%qcw(i,j,k)
-               moist(i,j,k,p_qr) = moist(i,j,k,p_qr) + grid%xa%qrn(i,j,k)
-               if (moist(i,j,k,p_qc) < 0.0) moist(i,j,k,p_qc) = 0.0
-               if (moist(i,j,k,p_qr) < 0.0) moist(i,j,k,p_qr) = 0.0
+            if (size(grid%moist,dim=4) >= 4) then
+               grid%moist(i,j,k,p_qc) = grid%moist(i,j,k,p_qc) + grid%xa%qcw(i,j,k)
+               grid%moist(i,j,k,p_qr) = grid%moist(i,j,k,p_qr) + grid%xa%qrn(i,j,k)
+               if (grid%moist(i,j,k,p_qc) < 0.0) grid%moist(i,j,k,p_qc) = 0.0
+               if (grid%moist(i,j,k,p_qr) < 0.0) grid%moist(i,j,k,p_qr) = 0.0
             end if
 
-            if (size(moist,dim=4) >= 6) then
-               moist(i,j,k,p_qi) = moist(i,j,k,p_qi) + grid%xa%qci(i,j,k)
-               moist(i,j,k,p_qs) = moist(i,j,k,p_qs) + grid%xa%qsn(i,j,k)
-               if (moist(i,j,k,p_qi) < 0.0) moist(i,j,k,p_qi) = 0.0
-               if (moist(i,j,k,p_qs) < 0.0) moist(i,j,k,p_qs) = 0.0
+            if (size(grid%moist,dim=4) >= 6) then
+               grid%moist(i,j,k,p_qi) = grid%moist(i,j,k,p_qi) + grid%xa%qci(i,j,k)
+               grid%moist(i,j,k,p_qs) = grid%moist(i,j,k,p_qs) + grid%xa%qsn(i,j,k)
+               if (grid%moist(i,j,k,p_qi) < 0.0) grid%moist(i,j,k,p_qi) = 0.0
+               if (grid%moist(i,j,k,p_qs) < 0.0) grid%moist(i,j,k,p_qs) = 0.0
             end if
 
-            if (size(moist,dim=4) >= 7) then
-               moist(i,j,k,p_qg) = moist(i,j,k,p_qg) + grid%xa%qgr(i,j,k)
-               if (moist(i,j,k,p_qg) < 0.0) moist(i,j,k,p_qg) = 0.0
+            if (size(grid%moist,dim=4) >= 7) then
+               grid%moist(i,j,k,p_qg) = grid%moist(i,j,k,p_qg) + grid%xa%qgr(i,j,k)
+               if (grid%moist(i,j,k,p_qg) < 0.0) grid%moist(i,j,k,p_qg) = 0.0
             end if
          end do
       end do

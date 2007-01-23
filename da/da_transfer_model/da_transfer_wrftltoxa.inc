@@ -1,6 +1,4 @@
-subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
 
    !---------------------------------------------------------------------------
    ! Purpose: Convert WRFTL variables to analysis increments
@@ -13,10 +11,6 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
    type(grid_config_rec_type), intent(inout) :: config_flags
 
    character*4,                intent(in)    :: filnam
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
@@ -56,7 +50,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%xa%q(i,j,k)=g_moist(i,j,k,P_QV)*(1.0-grid%xb%q(i,j,k))**2
+            grid%xa%q(i,j,k)=grid%g_moist(i,j,k,P_QV)*(1.0-grid%xb%q(i,j,k))**2
          end do
       end do
    end do
@@ -70,8 +64,8 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
          sdmd=0.0
          s1md=0.0
          do k=ks,ke
-            sdmd=sdmd+g_moist(i,j,k,P_QV)*grid%em_dnw(k)
-            s1md=s1md+(1.0+moist(i,j,k,P_QV))*grid%em_dnw(k)
+            sdmd=sdmd+grid%g_moist(i,j,k,P_QV)*grid%em_dnw(k)
+            s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
          grid%xa%psfc(i,j)=-grid%xb%psac(i,j)*sdmd-grid%em_g_mu_2(i,j)*s1md
       end do
@@ -86,9 +80,9 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
          g_press(i,j,ke+1)=0.0
          do k=ke,ks,-1
             g_press(i,j,k)=g_press(i,j,k+1) &
-               -(grid%em_g_mu_2(i,j)*(1.0+moist(i,j,k,P_QV)) &
+               -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
                +(grid%em_mu_2(i,j)+grid%em_mub(i,j))* &
-               g_moist(i,j,k,P_QV))*grid%em_dn(k)
+               grid%g_moist(i,j,k,P_QV))*grid%em_dn(k)
             grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do
       end do
@@ -141,33 +135,33 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam &
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
-   if (size(moist,dim=4) >= 4) then
+   if (size(grid%moist,dim=4) >= 4) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               grid%xa%qcw(i,j,k)=g_moist(i,j,k,p_qcw)
-               grid%xa%qrn(i,j,k)=g_moist(i,j,k,p_qrn)
+               grid%xa%qcw(i,j,k)=grid%g_moist(i,j,k,p_qcw)
+               grid%xa%qrn(i,j,k)=grid%g_moist(i,j,k,p_qrn)
             end do
          end do
       end do
    end if
 
-   if (size(moist,dim=4) >= 6) then
+   if (size(grid%moist,dim=4) >= 6) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               grid%xa%qci(i,j,k)=g_moist(i,j,k,p_qci)
-               grid%xa%qsn(i,j,k)=g_moist(i,j,k,p_qsn)
+               grid%xa%qci(i,j,k)=grid%g_moist(i,j,k,p_qci)
+               grid%xa%qsn(i,j,k)=grid%g_moist(i,j,k,p_qsn)
             end do
          end do
       end do
    end if
 
-   if (size(moist_2,dim=4) >= 7) then
+   if (size(grid%moist_2,dim=4) >= 7) then
       do k=ks,ke
          do j=js,je
             do i=is,ie
-               grid%xa%qgr(i,j,k)=g_moist(i,j,k,p_qgr) 
+               grid%xa%qgr(i,j,k)=grid%g_moist(i,j,k,p_qgr) 
             end do
          end do
       end do

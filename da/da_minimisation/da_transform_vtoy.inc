@@ -36,9 +36,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    call da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (var4d) then
-      call da_transfer_xatowrftl(grid, config_flags, 'tl01' &
-#include "em_actual_new_args.inc"
-                                )
+      call da_transfer_xatowrftl(grid, config_flags, 'tl01')
 
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
@@ -71,9 +69,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
       do nobwin=1, num_fgat_time
          iv%current_ob_time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
-         call da_transfer_wrftltoxa(grid, config_flags, filnam &
-#include "em_actual_new_args.inc"
-                                )
+         call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoy(xb, iv, xa, xp, y)
       end do
    else  ! not var4d

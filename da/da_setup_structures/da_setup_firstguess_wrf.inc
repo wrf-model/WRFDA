@@ -1,6 +1,4 @@
-subroutine da_setup_firstguess_wrf(xbx, grid &
-#include "em_dummy_new_args.inc"
-                            )
+subroutine da_setup_firstguess_wrf(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define/allocate components of WRF model state.
@@ -11,8 +9,6 @@ subroutine da_setup_firstguess_wrf(xbx, grid &
    type (xbx_type), intent(out)         :: xbx    ! Header & non-gridded vars.
 
    type (domain), intent(inout)         :: grid
-
-#include "em_dummy_new_decl.inc"
 
    integer           :: map_util_project
    real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
@@ -232,9 +228,8 @@ subroutine da_setup_firstguess_wrf(xbx, grid &
    mjy = grid%xb % mjy
    mkz = grid%xb % mkz
    
-   call da_transfer_wrftoxb(xbx, grid &
-#include "em_dummy_new_args.inc"
-                         )
+   call da_transfer_wrftoxb(xbx, grid)
+
    if (trace_use) call da_trace_exit("da_setup_firstguess_wrf")
 
 end subroutine da_setup_firstguess_wrf

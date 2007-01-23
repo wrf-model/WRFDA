@@ -1,6 +1,5 @@
-subroutine da_setup_firstguess(xbx, grid &
-#include "em_dummy_new_args.inc"
-                            )
+subroutine da_setup_firstguess(xbx, grid)
+
    !---------------------------------------------------------------------------
    ! Purpose: Allocate and read in components of first guess state.
    !---------------------------------------------------------------------------
@@ -10,9 +9,6 @@ subroutine da_setup_firstguess(xbx, grid &
    type (xbx_type),intent(out)  :: xbx   ! Header & non-gridded vars.
 
    type(domain),intent(inout)   :: grid
-
-   ! Definitions of dummy arguments to solve
-#include "em_dummy_new_decl.inc"
 
    integer :: is, ie, js, je
    real    :: ddx , ddy    
@@ -55,14 +51,10 @@ subroutine da_setup_firstguess(xbx, grid &
 
       ! First guess is a WRF C-grid format file:
 
-      call da_setup_firstguess_wrf(xbx, grid &
-#include "em_dummy_new_args.inc"
-                               )
+      call da_setup_firstguess_wrf(xbx, grid)
    else if (fg_format == fg_format_kma) then
       ! First guess is an KMA format file:
-      call da_setup_firstguess_kma(xbx, grid &
-#include "em_dummy_new_args.inc"
-                               )
+      call da_setup_firstguess_kma(xbx, grid)
    end if
 
    !---------------------------------------------------------------------------

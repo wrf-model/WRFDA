@@ -42,9 +42,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
          call da_transform_xtoy_adj(xb, iv, xp, y, xa)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
 
-         call da_transfer_wrftltoxa_adj(grid, config_flags, filnam &
-#include "em_actual_new_args.inc"
-                             )
+         call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
       end do
 
       ndynopt      = grid%dyn_opt
@@ -97,9 +95,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
 #endif
       call da_trace("da_transform_vtoy_adj","Finished da_run_wrfplus_ad.ksh")
 
-      call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01' &
-#include "em_actual_new_args.inc"
-                             )
+      call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01')
    else  ! var4d
       call da_zero_x(xa)
       call da_transform_xtoy_adj(xb, iv, xp, y, xa)

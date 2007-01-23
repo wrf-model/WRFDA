@@ -1,6 +1,4 @@
-subroutine da_solve ( grid , config_flags &
-#include "em_dummy_new_args.inc"
-                 )
+subroutine da_solve ( grid , config_flags)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -31,9 +29,6 @@ subroutine da_solve ( grid , config_flags &
 
    type (domain),               intent(inout) :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
-
-   ! Definitions of dummy arguments to solve
-#include "em_dummy_new_decl.inc"
 
    type (xbx_type)              :: xbx         ! For header & non-grid arrays.
    type (be_type)               :: be          ! Background error structure.
@@ -99,15 +94,15 @@ subroutine da_solve ( grid , config_flags &
    ! [2.0] Initialise wrfvar parameters:
    !---------------------------------------------------------------------------
 
-   call da_solve_init(grid)
+   call da_solve_init(grid &
+#include "em_actual_new_args.inc"
+)
 
    !---------------------------------------------------------------------------
    ! [3.0] Set up first guess field (grid%xb):
    !---------------------------------------------------------------------------
 
-   call da_setup_firstguess( xbx, grid &
-#include "em_dummy_new_args.inc"
-                           )
+   call da_setup_firstguess( xbx, grid)
 
    !---------------------------------------------------------------------------
    ! [4.0] Set up observations (ob):
@@ -186,10 +181,7 @@ subroutine da_solve ( grid , config_flags &
 
       ! [8.2] Calculate innovation vector (O-B):
 
-      call da_get_innov_vector( it, ob, iv, &
-                                grid , config_flags &
-#include "em_dummy_new_args.inc"
-                 )
+      call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
       if (test_transforms) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
@@ -258,9 +250,7 @@ subroutine da_solve ( grid , config_flags &
       ! [8.0] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
 
-      call da_transfer_xatoanalysis( it, xbx, grid, config_flags &
-#include "em_dummy_new_args.inc"
-         )
+      call da_transfer_xatoanalysis( it, xbx, grid, config_flags)
    end do
 
    !---------------------------------------------------------------------------

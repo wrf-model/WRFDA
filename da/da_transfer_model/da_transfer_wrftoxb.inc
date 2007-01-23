@@ -1,6 +1,4 @@
-subroutine da_transfer_wrftoxb(xbx, grid &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_wrftoxb(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transfers fields from WRF to first guess structure.
@@ -11,10 +9,6 @@ subroutine da_transfer_wrftoxb(xbx, grid &
    type (xbx_type), intent(inout)     :: xbx        ! Header & non-gridded vars.
 
    type(domain), intent(inout)        :: grid
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
 
@@ -190,7 +184,7 @@ subroutine da_transfer_wrftoxb(xbx, grid &
       write(unit=stdout, fmt=*) 'num_moist=', num_moist
       write(unit=stdout, fmt=*) 'P_QV=', P_QV
 
-      write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', moist(is,js,ks,2)
+      write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', grid%moist(is,js,ks,2)
       write(unit=stdout, fmt=*) ' '
    end if
 
@@ -299,7 +293,7 @@ subroutine da_transfer_wrftoxb(xbx, grid &
       !       grid%mub(i,j))/grid%em_rdnw(k)/qvf2
 
       !    do k = ke-1,1,-1
-      !       qvf1 = 0.5*(moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
+      !       qvf1 = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
       !       qvf2 = 1./(1.+qvf1)
       !       qvf1 = qvf1*qvf2
       !       grid%p(i,j,k) = grid%p(i,j,k+1) - &
@@ -320,7 +314,7 @@ subroutine da_transfer_wrftoxb(xbx, grid &
             ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
             albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
 
-            qvf1 = 1. + moist(i,j,k,P_QV) / rd_over_rv
+            qvf1 = 1. + grid%moist(i,j,k,P_QV) / rd_over_rv
             aln  = -1. / (grid%em_mub(i,j)+grid%em_mu_2(i,j)) * (albn*grid%em_mu_2(i,j) &
                 + grid%em_rdnw(k) *(grid%em_ph_2(i,j,k+1) - grid%em_ph_2(i,j,k)))
             ! total pressure:
@@ -348,7 +342,7 @@ subroutine da_transfer_wrftoxb(xbx, grid &
             grid%xb%wh(i,j,k)= 0.5*(grid%xb%w(i,j,k)+grid%xb%w(i,j,k+1))
             grid%xb%h(i,j,k) = 0.5*(grid%xb%hf(i,j,k)+grid%xb%hf(i,j,k+1))
 
-            grid%xb%q(i,j,k) = moist(i,j,k,P_QV)
+            grid%xb%q(i,j,k) = grid%moist(i,j,k,P_QV)
 
             theta = ts0 + grid%em_t_2(i,j,k)
             grid%xb%t(i,j,k) = theta*(grid%xb%p(i,j,k)/ps0)**kappa
@@ -361,19 +355,19 @@ subroutine da_transfer_wrftoxb(xbx, grid &
    
             ! Background qrn needed for Radar Radial velocity assimilation:
 
-            if (size(moist,dim=4) >= 4) then
-               grid%xb%qcw(i,j,k) = moist(i,j,k,p_qc)
-               grid%xb%qrn(i,j,k) = moist(i,j,k,p_qr)
+            if (size(grid%moist,dim=4) >= 4) then
+               grid%xb%qcw(i,j,k) = grid%moist(i,j,k,p_qc)
+               grid%xb%qrn(i,j,k) = grid%moist(i,j,k,p_qr)
                grid%xb%qt (i,j,k) = grid%xb%q(i,j,k) + grid%xb%qcw(i,j,k) + grid%xb%qrn(i,j,k)
             end if
 
-            if (size(moist,dim=4) >= 6) then
-               grid%xb%qci(i,j,k) = moist(i,j,k,p_qi)
-               grid%xb%qsn(i,j,k) = moist(i,j,k,p_qs)
+            if (size(grid%moist,dim=4) >= 6) then
+               grid%xb%qci(i,j,k) = grid%moist(i,j,k,p_qi)
+               grid%xb%qsn(i,j,k) = grid%moist(i,j,k,p_qs)
             end if
 
-            if (size(moist,dim=4) >= 7) then
-               grid%xb%qgr(i,j,k) = moist(i,j,k,p_qg)
+            if (size(grid%moist,dim=4) >= 7) then
+               grid%xb%qgr(i,j,k) = grid%moist(i,j,k,p_qg)
             end if
          end do
       end do

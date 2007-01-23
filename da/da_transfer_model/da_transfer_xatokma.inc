@@ -1,6 +1,4 @@
-subroutine da_transfer_xatokma(xbx, grid &
-#include "em_dummy_new_args.inc"
-                             )
+subroutine da_transfer_xatokma(xbx, grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysis increments into KMA increments 
@@ -10,10 +8,6 @@ subroutine da_transfer_xatokma(xbx, grid &
    
    type (xbx_type), intent(inout) :: xbx       ! Header & non-gridded vars.
    type(domain),    intent(inout) :: grid
-
-   ! Definitions of dummy arguments to solve
-
-#include "em_dummy_new_decl.inc"
 
    integer :: i, j, k
    integer :: is, ie, js, je, ks, ke
@@ -85,7 +79,7 @@ subroutine da_transfer_xatokma(xbx, grid &
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + grid%xa%u(i,j,k)
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + grid%xa%v(i,j,k)
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)
-            moist(i,j,k,P_QV) = moist(i,j,k,P_QV) + grid%xa%q(i,j,k)
+            grid%moist(i,j,k,P_QV) = grid%moist(i,j,k,P_QV) + grid%xa%q(i,j,k)
          end do
       end do
    end do
