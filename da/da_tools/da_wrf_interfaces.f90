@@ -82,11 +82,6 @@ module da_wrf_interfaces
       end subroutine wrf_abort
    end interface 
 
-   interface
-      subroutine da_wrfvar_finalize
-      end subroutine da_wrfvar_finalize
-   end interface
-
    interface 
       subroutine wrf_shutdown
       end subroutine wrf_shutdown
