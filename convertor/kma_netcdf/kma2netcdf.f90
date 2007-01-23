@@ -34,13 +34,6 @@ PROGRAM kma2netcdf
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
-   INTERFACE
-     SUBROUTINE Setup_Timekeeping( grid )
-      USE module_domain
-      TYPE(domain), POINTER :: grid
-     END SUBROUTINE Setup_Timekeeping
-   END INTERFACE
-
 !  Definitions of dummy arguments to solve
 
 !--Define the name of this program (program_name defined in module_domain)

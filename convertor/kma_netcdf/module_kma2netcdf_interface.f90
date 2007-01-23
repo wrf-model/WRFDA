@@ -30,7 +30,7 @@ SUBROUTINE kma2netcdf_interface ( grid, config_flags)
    em33             = grid%em33
 #endif
 
-   call kma2netcdf_solver( grid, config_flags, &
+   call kma2netcdf_solver( grid, config_flags &
 
 #include "em_actual_args.inc"
 
@@ -39,7 +39,7 @@ SUBROUTINE kma2netcdf_interface ( grid, config_flags)
 end SUBROUTINE kma2netcdf_interface
 
 
-SUBROUTINE kma2netcdf_solver( grid, config_flags, &
+SUBROUTINE kma2netcdf_solver( grid, config_flags &
 #include "em_dummy_args.inc"
                  )
 

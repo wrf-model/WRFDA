@@ -27,7 +27,7 @@ module da_wrf_interfaces
 
    interface
       subroutine wrf_debug(level , str) 
-         character(len=*), intent(in) :: str(:)
+         character*(*), intent(in) :: str
          integer,          intent(in) :: level 
       end subroutine wrf_debug
    end interface
@@ -55,7 +55,7 @@ module da_wrf_interfaces
 
    interface
       subroutine wrf_error_fatal (str)
-        character(len=*), intent(in) :: str(:)
+         character*(*), intent(in) :: str
       end subroutine wrf_error_fatal
    end interface
 

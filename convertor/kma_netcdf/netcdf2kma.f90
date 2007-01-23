@@ -34,14 +34,6 @@ PROGRAM netcdf2kma
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
-   INTERFACE
-     SUBROUTINE Setup_Timekeeping( grid )
-      USE module_domain
-      TYPE(domain), POINTER :: grid
-     END SUBROUTINE Setup_Timekeeping
-   END INTERFACE
-
-
 !--Define the name of this program (program_name defined in module_domain)
 
    program_name = "NETCDF2KMA"
