@@ -1,4 +1,7 @@
-      SUBROUTINE PREGSM1(PS,GT,GU,GV,GQ,PSB,GTB,GUB,GVB,GQB)   !shc start
+      SUBROUTINE PREGSM1(PS,GT,GU,GV,GQ,PSB,GTB,GUB,GVB,GQB,
+     &          IMAXE,JMAXE,ISST,JSST,MAXJZ,IVAR,
+     &          IMAX,JMAX,KMAX,IDIM,JDIM,MEND1,NEMD1,JEND1,
+     &          ISNW,JSNW,JMAXHF,MNWAV,IMX)   !shc start
       INTEGER IDATE(5), IDGES(5), IDSST(5)                                      
       CHARACTER*8 FILE, MODEL, RESL                                             
       CHARACTER*80 CINF(10)                                                     
@@ -7,6 +10,10 @@
       CHARACTER*32 TITLE                                                        
       CHARACTER*16 UNIT                                                         
       CHARACTER*8 MDLINF(4)                                                     
+! modified by shc p1 start
+      CHARACTER*80 CINF_X(10),CINF_temp
+      CHARACTER*4 VCODD_X, VCODM_X                
+! modified by shc p1 end
       REAL        DTHPRO(7)                                                     
       INTEGER ITYP(2)                                                           
       CHARACTER*48 LABEL                                                        
@@ -18,7 +25,6 @@ C
       DIMENSION AGD(KMAX+1), BGD(KMAX+1), AGM(KMAX+1), BGM(KMAX+1)              
       DIMENSION GPHIS(IMAX*JMAX)                                                
       REAL, DIMENSION(IMAX,JMAX)    :: GAU
-      REAL, DIMENSION(JMAX)         :: SINCLT,COSCLT,GW,DGW,DCOSCL,COLRAD,DY
       DIMENSION  PS  (IMAX,JMAX),  GRH (IMAX,JMAX,KMAX),  !shc 
      1       GZ  (IMAX,JMAX,KMAX), GT  (IMAX,JMAX,KMAX),                        
      2       GU  (IMAX,JMAX,KMAX), GV  (IMAX,JMAX,KMAX),                        
@@ -36,7 +42,10 @@ C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),
       DIMENSION WRK3(IMAX,JMAX,KMAX), WRK4(IMAX,JMAX,KMAX),                     
      2          WRK5(IMAX,JMAX,KMAX), WRK6(IMAX,JMAX,KMAX)                      
       CHARACTER*4 ALVL                                                          
-      INTEGER*2 I2(IDIM*JDIM)                                                   
+!modified by shc I2 start
+c     INTEGER*2 I2(IDIM*JDIM)     !shc-rizvi
+      INTEGER   I2(IDIM*JDIM/2)   !shc-rizvi
+!modified by shc I2 end
       REAL*8    WRK(IDIM,JDIM)                                                  
       DIMENSION SSTA(ISST*JSST), SEWA(ISNW,JSNW)                                
       DIMENSION COLRAD(JMAX), DY(JMAX), LY(JMAX)                                
@@ -47,6 +56,9 @@ C     DIMENSION WRK1(IMAX,JMAX,KMAX), WRK2(IMAX,JMAX,KMAX),
       COMMON/DTETEN/DTABLE(25000)                                               
       REAL*8 TABLE,DTABLE,RGSA,G                                                       
       real   rdum (imax,jmax,kmax)      !shcimsi
+!modified by shc AB start
+      INTEGER MMM0(5)
+!modified by shc AB end
       DIMENSION RLAT(MAXJZ), ZDAT(MAXJZ,KMAX)                                   
 C                                                                               
       NAMELIST /NAMFIL/ NALFL,NVPFL,NGSFL,NSSTFL,NSNWFL,NINFL,
@@ -70,28 +82,14 @@ C
      1    /     1,     2,    -1,    -1,    11,    21,   12,   -1/                           
       DATA KTLAG / 6/                                                           
       DATA IDCHCK/ 1/                                                           
-      DATA A/0.00000000000D+00,0.00000000000D+00,0.00000000000D+00,
-     &       0.00000000000D+00,1.546082500000000,5.614406590000000,
-     &       12.42546270000000,21.63197330000000,32.59785460000000,
-     &       44.61235050000000,57.01704410000000,69.26280210000000,
-     &       80.92097470000000,91.66931150000001,101.2670900000000,
-     &       109.5278170000000,116.2947540000000,121.4214780000000,
-     &       124.7591550000000,126.1514430000000,125.4377290000000,
-     &       122.4657440000000,117.1135710000000,109.3194430000000,
-     &       99.11479190000000,86.65005490000000,72.19601440000000,
-     &       56.09729000000000,38.66041560000000,19.99998470000000,
-     &       0.00000000000D+00/
-      DATA B/1.0000000000000,0.9889042970000000,0.9682830569999999,
-     &       0.9399999980000000,0.9042294030000000,0.8613848090000000,
-     &       0.8124753240000000,0.7589231130000000,0.7022829060000000,
-     &       0.6440208549999999,0.5853865740000000,0.5273658630000000,
-     &       0.4706876280000000,0.4158638720000000,0.3632441160000000,
-     &       0.3130739930000000,0.2655510310000000,0.2208738920000000,
-     &       0.1792818900000000,0.1410827640000000,0.1066635850000000,
-     &       7.647979300000D-02,5.101471400000D-02,3.070007300000D-02,
-     &       1.579232499999D-02,6.205350000000D-03,1.324939000000D-03,
-     &       0.000000000000D+00,0.000000000000D+00,0.000000000000D+00,
-     &       0.000000000000D+00/
+!modified by shc AB start
+c  The definition A and B by 'DATA' was removed
+!modified by shc AB end
+!modified by shc AB start
+      READ(115) MMM0,MMM1,MMM2,FFF1,MMM3,MMM4,   
+     1                      (A(K),K=1,MMM4),(B(K),K=1,MMM4)
+      A(KMAX+1)=0.0; B(KMAX+1)=0.0
+!modified by shc AB end
 C                                                                               
 C   =================================================================           
 C   >>>   READ ANAL TIME                                          <<<         
@@ -102,9 +100,12 @@ C   =================================================================
 C   >>>   NAMELIST (NAMFIL)                                       <<<           
 C   =================================================================           
       READ(95,NAMFIL) 
-C     READ(95,HEADIN)
+c     READ(95,HEADIN)
       WRITE(6,NAMFIL)                                                           
-C     WRITE(6,HEADIN)                                                           
+c     WRITE(6,HEADIN)                                                           
+!modified by shc p1 start
+      LARHM=20
+!modified by shc p1 end
 C   =================================================================
 C   >>>   Select Input Source                                     <<<
 C   =================================================================
@@ -124,15 +125,6 @@ C   =================================================================
       DO 800 J=1,JMAX                                                           
       COLRAD(J)=ACOS(GAUL(J))                                                   
   800 CONTINUE                                                                  
-      DO J=1,JMAXHF
-*vdir nodep
-        GW    (       J)=0.5*DGW   (J)
-        GW    (JMAX+1-J)=0.5*DGW   (J)
-        COSCLT(       J)=     DCOSCL(J)
-        COSCLT(JMAX+1-J)=    -DCOSCL(J)
-        SINCLT(       J)=SQRT(1.0-DCOSCL(J)**2)
-        SINCLT(JMAX+1-J)=SQRT(1.0-DCOSCL(J)**2)
-      END DO
       CALL ZMNLAT( RLAT, MAXJZ, COLRAD, JMAX )                                  
 C                                                                               
 C   =================================================================           
@@ -151,7 +143,7 @@ c         go to 33333   ! shc For T63 only
  			WRITE(*,*)' TOPO DIM DOES NOT MATCH'
  			WRITE(*,*)'IMAX=',IMAX,' IGRD=',IGRD
  			WRITE(*,*)'JMAX=',JMAX,' JGRD=',JGRD
- 			STOP 9988
+                        STOP 9988
  	  	END IF
  	  	READ(NTPFL)
  	  	READ(NTPFL)
@@ -197,9 +189,6 @@ C   =================================================================
             AANAL        = AGES + 0.5*RES + AA*ATAN(XN/AA)
           ENDIF
         ENDIF
-! JRB
-!        AANAL        = DMAX1( AANAL, 1.0D-6 )  ! \215\305\217I\222\262\220\256
-!        AANAL        = DMIN1( AANAL, 1.0D0  )
         AANAL        = MAX( AANAL, 1.0E-6 )  ! \215\305\217I\222\262\220\256
         AANAL        = MIN( AANAL, 1.0E0  )
         GRH(I,J,K) = AANAL
@@ -278,6 +267,9 @@ C   =================================================================
      O IDGES ,AGD   ,BGD   ,AGM   ,BGM   ,GCWC  ,GCVR  ,GUMB  ,
      W I2    ,IDSST )
       ENDIF
+!modified by shc ZT start
+      goto 7700
+!modified by shc ZT end
 C   =================================================================           
 C   >>>   Z -> TV                                                 <<<           
 C   =================================================================           
@@ -326,7 +318,136 @@ C        do j=1,jmax
 C          write(99,FMT='(10F12.5,1x)') (GT(I,J,K),I=1,IMAX)
 C        enddo
 C       enddo
+!modified by shc ZT start
+7700   continue
+!modified by shc ZT end
 
+!modified by shc q0 start
+      DO I=1,IMAX
+      DO J=1,JMAX
+      DO K=1,KMAX
+        IF (GQ(I,J,K).LT.0.00) GQ(I,J,K)=1.E-06
+      ENDDO
+      ENDDO
+      ENDDO
+      print *, 'shcimsi q0=',1.E-06
+!modified by shc q0 end
+     
+!modified by shc p1 start
+      NANFL=151
+      KT=0
+      DO i=1,80
+        CINF_temp(i:i)=' '
+      ENDDO
+      DO j=1,10
+        CINF_X(j)=CINF_temp
+      ENDDO
+      VCODD_X='    '
+      VCODM_X='    '
+      CALL WRTHED                                      
+     I(NANFL ,                             
+     I 'GVS1',IDATE ,'ANALETA ','GANL9603','T213L30L',                            
+     I 'R03 ','HOUR',1     ,0     ,0     ,
+     I IMAX  ,JMAX  ,'GAUS', 0.0 , 0.0,
+     I 0.0   ,0.0, 0.0   ,0.0   ,                           
+     I VCODD_X,KMAX  ,A     ,B     ,                                  
+     I IMAX  ,JMAX  ,'GAUS', 0.0 , 0.0,                  
+     I 0.0   ,0.0, 0.0   ,0.0   ,
+     I VCODM_X,KMAX  ,A     ,B     ,      
+     I CINF_X ) 
+
+      GPHIS(:)=GPHIS(:)/G
+      CALL MOVERD(GPHIS, WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'TOPO',
+     2 'GEOPOTENTIAL HEIGHT             ', 'M               ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      CALL MOVERD(PS, WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'P   ',
+     2 'SURFACE PRESSURE                ', 'HPA             ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      CALL MOVERD(GU(1,1,1), WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'U   ',
+     2 'SURFACE U                       ', 'M/S             ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      CALL MOVERD(GV(1,1,1), WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'V   ',
+     2 'SURFACE V                       ', 'M/S             ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      CALL MOVERD(GT(1,1,1), WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'T   ',
+     2 'SURFACE T                       ', 'K               ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      CALL MOVERD(GRH(1,1,1), WRK, IMAX*JMAX)
+      CALL WRTDAT
+     1(NANFL , IDATE , KT    , 'SURF', 'RH  ',
+     2 'SURFACE RELATIVE HUMIDITY       ', '0-1             ',
+     3 0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+
+      DO K=1,KMAX
+        CALL MOVERD(GU(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'U   ',
+     2   'U                               ', 'M/S             ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+
+      DO K=1,KMAX
+        CALL MOVERD(GV(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'V   ',
+     2   'V                               ', 'M/S             ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+
+      DO K=1,KMAX
+        CALL MOVERD(GZ(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'Z   ',
+     2   'GEOPOTENTIAL HEIGHT             ', 'M               ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+
+      DO K=1,KMAX
+        CALL MOVERD(GT(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'T   ',
+     2   'TEMPERATURE                     ', 'K               ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+
+      DO K=1, LARHM-1
+        CALL MOVERD(GRH(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'RH  ',
+     2   'RELATIVE HUMIDITY               ', '0-1             ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+
+      DO K=LARHM,KMAX
+        CALL MOVERD(GQ(1,1,K), WRK, IMAX*JMAX)
+        WRITE(ALVL(1:4), '(I4)') K
+        CALL WRTDAT
+     1  (NANFL , IDATE , KT    ,  ALVL, 'Q   ',
+     2   'SPECIFIC HUMIDITY               ', 'KG/KG           ',
+     3   0     , 0     ,WRK  , IMAX  , JMAX  , I2    )
+      ENDDO
+      WRITE(NANFL) IDATE,KT,0,'    ','    '
+!modified by shc p1 end
 C   *****************************************************************           
 C   >>>   OUTPUT INITIAL VALUE                                    <<<           
 C   *****************************************************************           
@@ -575,28 +696,7 @@ C   =================================================================
 C   >>>   EOF                                                     <<<           
 C   =================================================================           
       WRITE(6,*) '## PREGSM IS NORMAL ENDED'
-9001  format(10e15.7)     !shcimsi start
-      rdum=0.0
-      write(904,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
-      write(904,9001) ((PS(i,j),i=1,imax),j=1,jmax)
-      write(904,9001) ((rdum(i,j,1),i=1,imax),j=1,jmax)
-      do k=1,kmax
-       write(904,9001) ((GT(i,j,k),i=1,imax),j=1,jmax)
-      enddo
-      do k=1,kmax
-       write(904,9001) ((GU(i,j,k),i=1,imax),j=1,jmax)
-      enddo
-      do k=1,kmax
-       write(904,9001) ((GV(i,j,k),i=1,imax),j=1,jmax)
-      enddo
-      do k=1,kmax
-       write(904,9001) ((GQ(i,j,k),i=1,imax),j=1,jmax)
-      enddo
-      do k=1,kmax
-       write(904,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)
-      enddo
-      do k=1,kmax
-       write(904,9001) ((rdum(i,j,k),i=1,imax),j=1,jmax)
-      enddo                                              !shcimsi end
+!modified shc nk start
+!modified shc nk end
 C                                                                               
       END SUBROUTINE PREGSM1      !shc end

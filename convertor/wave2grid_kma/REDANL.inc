@@ -13,7 +13,8 @@ C
      2          GT(IMAX*JMAX,KMAX)
       CHARACTER*80 CINF(10)                                                     
       DIMENSION AAD(KMAX+1), AAM(KMAX+1), BBD(KMAX+1), BBM(KMAX+1)              
-      INTEGER*2 IDA(IMAX*JMAX)                                                  
+c     INTEGER*2 IDA(IMAX*JMAX)    !shc-rizvi
+      INTEGER   IDA(IMAX*JMAX/2)    !shc-rizvi
 C                                                                               
       CHARACTER*4 TYPE, EXPR, KTUNIT, NPROD, NPROM, VCODD, VCODM                
       CHARACTER*8 FILE, MODEL, RESL                                             

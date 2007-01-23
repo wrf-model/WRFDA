@@ -1,7 +1,8 @@
          SUBROUTINE Einc_to_Ganl        !shc start
      1   (DPSE,DUE,DVE,DTE,DQE,    
      2     PSB, UB, VB, TB, QB,
-     3     PSG, UG, VG, TG, QG)
+     3     PSG, UG, VG, TG, QG,
+     4     IMAX,JMAX,IMAXE,JMAXE,KMAX,MAXJZ)
       INTEGER IDATE(5), IDGES(5), IDSST(5)                                      
       CHARACTER*8 FILE, MODEL, RESL                                             
       CHARACTER*80 CINF(10)                                                     
@@ -19,7 +20,6 @@
 C                                                                               
       DIMENSION GPHIS(IMAX*JMAX)                                                
       REAL, DIMENSION(IMAX,JMAX)    :: GAU
-      REAL, DIMENSION(JMAX)         :: SINCLT,COSCLT,GW,DGW,DCOSCL,COLRAD,DY
 
       DIMENSION DPSE (IMAXE,JMAXE), 
      1       DUE (IMAXE,JMAXE,KMAX), DVE  (IMAXE,JMAXE,KMAX),
@@ -44,15 +44,6 @@ C   =================================================================
       DO 800 J=1,JMAX                                                           
       COLRAD(J)=ACOS(GAUL(J))                                                   
   800 CONTINUE                                                                  
-      DO J=1,JMAXHF
-*vdir nodep
-        GW    (       J)=0.5*DGW   (J)
-        GW    (JMAX+1-J)=0.5*DGW   (J)
-        COSCLT(       J)=     DCOSCL(J)
-        COSCLT(JMAX+1-J)=    -DCOSCL(J)
-        SINCLT(       J)=SQRT(1.0-DCOSCL(J)**2)
-        SINCLT(JMAX+1-J)=SQRT(1.0-DCOSCL(J)**2)
-      END DO
       CALL ZMNLAT( RLAT, MAXJZ, COLRAD, JMAX )                                  
 C                                                                               
 C---------------------------------------------------------------------

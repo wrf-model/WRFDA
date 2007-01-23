@@ -127,8 +127,8 @@ C*********************************************************************
 Crizvi      REAL*4    RDATA(LM)                                                       
       REAL    RDATA(LM)                                                       
 cshc-rizvi start
-c     INTEGER*4 IDATA(*)                                                        
-      INTEGER*2 IDATA(*)                                                        
+      INTEGER*4 IDATA(*)                                                        
+c     INTEGER*2 IDATA(*)                                                        
 cshc-rizvi end
       INTEGER*2 HWORK                                                           
 C      INTEGER HWORK                                                           

@@ -10,7 +10,8 @@ C
       CHARACTER*32 TITLE                                                        
       CHARACTER*16 UNIT                                                         
       REAL*8    DATA(IDIM*JDIM) ! <<<--- WARNING!!! THIS IS REAL*8              
-      INTEGER*2 IDA(IDIM*JDIM)                                                  
+c     INTEGER*2 IDA(IDIM*JDIM)    !shc-rizvi
+      INTEGER   IDA(IDIM*JDIM/2)    !shc-rizvi
 C                                                                               
       NELM=1                                                                    
       WRITE(NFL) IDATE, KT, NELM, LEVEL, ELEM                                   

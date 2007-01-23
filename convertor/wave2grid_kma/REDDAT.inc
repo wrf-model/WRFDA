@@ -12,7 +12,8 @@ C
       CHARACTER*16 UNIT                                                         
       INTEGER KTSD, KTSA                                                        
       DIMENSION DATA(IDIM*JDIM)                                                 
-      INTEGER*2 IDA(IDIM*JDIM)                                                  
+c     INTEGER*2 IDA(IDIM*JDIM)    !shc-rizvi
+      INTEGER   IDA(IDIM*JDIM/2)  !shc-rizvi
 C                                                                               
       INTEGER IDNEXT(5)                                                         
 C                                                                               

@@ -30,9 +30,10 @@ C...CONVERSION TO PSI & CHI
       AN  =N+M-2
       FNN1=-ERSQ/( AN*(AN+1.0) )
 *vdir loopcnt=200
-      DO 220  K=1,KMAX*2
-      QROT(K,1,L+N)=FNN1*QROT(K,1,L+N)
-      QDIV(K,1,L+N)=FNN1*QDIV(K,1,L+N)
+      DO 220  K=1,2
+      DO 220  K1=1,KMAX
+      QROT(K,K1,L+N)=FNN1*QROT(K,K1,L+N)
+      QDIV(K,K1,L+N)=FNN1*QDIV(K,K1,L+N)
   220 CONTINUE
       L=L+NMAX
   200 CONTINUE

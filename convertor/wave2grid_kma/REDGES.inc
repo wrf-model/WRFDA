@@ -7,7 +7,8 @@ C
       DIMENSION GCWC(IMAX*JMAX,KMAX), GCVR(IMAX*JMAX,KMAX),                     
      1          GUMB(IMAX*JMAX,KMAX)                                            
       DIMENSION AGD(KMAX+1), BGD(KMAX+1), AGM(KMAX+1), BGM(KMAX+1)              
-      INTEGER*2 IDA(IMAX*JMAX)                                                  
+c     INTEGER*2 IDA(IMAX*JMAX)    !shc-rizvi
+      INTEGER   IDA(IMAX*JMAX/2)    !shc-rizvi
 C                                                                               
       CHARACTER*4 TYPE, EXPR, KTUNIT, NPROD, NPROM, VCODD, VCODM                
       CHARACTER*8 FILE, MODEL, RESL                                             

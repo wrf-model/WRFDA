@@ -10,8 +10,8 @@
 ************************************************************************        
 *                                                                               
       REAL*8    RDATA(LM),RMAX,RMIN,DIST,DBASE,EXPV                             
-Crizvi      INTEGER*4 IDATA(*)                                                        
-      INTEGER*2 IDATA(*)                                                        
+      INTEGER*4 IDATA(*)     !shc-rizvi
+c     INTEGER*2 IDATA(*)     !shc-rizvi
       REAL*8    DVAL/32760.D0/                                                  
       INTEGER*2 HZERO/0/,HWORK                                                  
 *                                                                               

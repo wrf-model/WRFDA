@@ -100,6 +100,7 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
 C  +++ SET UP FFT COEFFICIENTS +++
 C-----------------------------------------------------------------------
+      TRIGS(:) = 0.
       CALL RFFTIM(IMAX,TRIGS,IFAX)
 C-----------------------------------------------------------------------
 C  +++ SETUP GAUSSIAN LATITUDES +++
@@ -146,7 +147,6 @@ C
      I      IFAX ,TRIGS,PNM  ,QPHIS,
      O      EDAT1,
      W      EDAT2)
-          print*,'1. Done  Wave to grid transform for Topo'
 !shc-rizvi end
 C
         ELSE

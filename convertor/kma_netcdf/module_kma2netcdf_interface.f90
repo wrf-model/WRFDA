@@ -30,7 +30,7 @@ SUBROUTINE kma2netcdf_interface ( grid, config_flags)
    em33             = grid%em33
 #endif
 
-   call kma2netcdf_solver( grid, config_flags &
+   call kma2netcdf_solver( grid, config_flags  &
 
 #include "em_actual_args.inc"
 
@@ -51,7 +51,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
 !  Definitions of dummy arguments to solve
 
 #include "em_dummy_decl.inc"
-!include 'mpif.h'
+!    INCLUDE 'mpif.h'
     real, allocatable      :: q(:,:,:) 
     Integer                :: my_proc_id, ierr 
     Integer                :: ii, jj,landmask_T213(428,215)  
@@ -61,11 +61,10 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
    INTEGER  :: ips,ipe, jps,jpe, kps,kpe   ! patch  dims.
    INTEGER  :: its,ite, jts,jte, kts,kte   ! Tile   dims.
    INTEGER  :: i
+   INTEGER  :: IGRD, JGRD, KGRD, JCAP, KMAX, INTVL                           
 !rizvi add ------------------------------------------------------------------
    NAMELIST /kma2netcdf_parm/ IGRD, JGRD, KGRD, JCAP, KMAX, INTVL                           
 !
-      open( UNIT = 111, file= 'namelist.kma2netcdf', status= 'old')   
-
       READ  (111, NML = kma2netcdf_parm, ERR = 8000)
       close (111)
       print*,' kma2netcdf_parm namelist data read are as follows:'
@@ -145,13 +144,12 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
    deallocate (q)                 
 ! Load landmask from KMA-original land mask for T213
     if( JCAP == 213 ) then
-      open( UNIT = 111, file= 'KMA_landmask_428_215', status= 'old')   
-
+     open( UNIT = 151, file= 'KMA_landmask_428_215', status= 'old')
        do jj=1,215
-        read(111,'(428i1)', err=9000) (landmask_T213(ii,jj),ii=1,428)
+        read(151,'(428i1)', err=9000) (landmask_T213(ii,jj),ii=1,428)
         landmask(its:ite,215-jj+1) = landmask_T213(its:ite,jj)
        enddo
-       close (111) 
+       close (151) 
     else
     print*,' Land mask is not available for this truncation T',JCAP
     endif

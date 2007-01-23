@@ -13,17 +13,11 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    USE module_configure
 
 !  IMPLICIT NONE
-   real    :: DPSE(imaxe,jmaxe)
-   real    :: DUE(imaxe,jmaxe,kmax),DVE(imaxe,jmaxe,kmax)
-   real    :: DTE(imaxe,jmaxe,kmax),DQE(imaxe,jmaxe,kmax)
-   real    :: PSB(imax,jmax)
-   real    :: UB(imax,jmax,kmax),VB(imax,jmax,kmax)
-   real    :: TB(imax,jmax,kmax),QB(imax,jmax,kmax)
-   real    :: PSG(imax,jmax)
-   real    :: UG(imax,jmax,kmax),VG(imax,jmax,kmax)
-   real    :: TG(imax,jmax,kmax),QG(imax,jmax,kmax)
+   real,allocatable    :: DPSE(:,:),DUE(:,:,:),DVE(:,:,:),DTE(:,:,:),DQE(:,:,:)
+   real,allocatable    :: PSB (:,:), UB(:,:,:), VB(:,:,:), TB(:,:,:), QB(:,:,:)
+   real,allocatable    :: PSG (:,:), UG(:,:,:), VG(:,:,:), TG(:,:,:), QG(:,:,:)
    integer :: i,j,k      !shcimsi
-   real    :: dum(imax,jmax,kmax)  !shcimsi
+   real,allocatable    :: dum(:,:,:)  !shcimsi
 
 !--Input data.
 
@@ -31,11 +25,43 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    TYPE (grid_config_rec_type)   :: config_flags
    integer                       :: USE_INCREMENT      !shc
    integer     :: incre,back,ID(5),KT,IM,JM,KM         !shc
+   integer     :: IMAXE,JMAXE,IMAX,JMAX,KMAX,IDIM,JDIM,MEND1,ISST,JSST,ISNW,JSNW,MAXJZ,IVAR
+   integer :: JMAXHF, MNWAV, IMX
+
 ! we have to convert in equal lat/lon data 
 !           to Gaussian latitude
 !
 !   First the Equal lat/lon data
 ! set Field as per KMA order (North top South and 0 to 360 east)
+
+   NAMELIST /netcdf2kma_parm/ IMAXE,JMAXE,IMAX,JMAX,KMAX,IDIM,JDIM,MEND1,ISST,JSST,ISNW,JSNW,MAXJZ,IVAR
+!
+      READ  (111, NML = netcdf2kma_parm, ERR = 8000)
+      close (111)
+      print*,' netcdf2kma_parm namelist data read are as follows:'
+      print*,' IMAXE= ',IMAXE
+      print*,' JMAXE= ',JMAXE
+      print*,' MEND1= ',MEND1
+      print*,' ISST = ',ISST
+      print*,' JSST = ',JSST
+      print*,' MAXJZ= ',MAXJZ
+      print*,' IVAR = ',IVAR
+
+      JMAXHF=JMAX/2
+      MNWAV=MEND1*(MEND1+1)/2
+      IMX=IMAX+2
+
+   allocate(DPSE(imaxe,jmaxe))
+   allocate(DUE(imaxe,jmaxe,kmax),DVE(imaxe,jmaxe,kmax))
+   allocate(DTE(imaxe,jmaxe,kmax),DQE(imaxe,jmaxe,kmax))
+   allocate(PSB(imax,jmax))
+   allocate(UB(imax,jmax,kmax),VB(imax,jmax,kmax))
+   allocate(TB(imax,jmax,kmax),QB(imax,jmax,kmax))
+   allocate(PSG(imax,jmax))
+   allocate(UG(imax,jmax,kmax),VG(imax,jmax,kmax))
+   allocate(TG(imax,jmax,kmax),QG(imax,jmax,kmax))
+   allocate(dum(imax,jmax,kmax))  !shcimsi
+
 !shc-wei start
 !  back = 102                    !shc start
    back = 48                     !shc start
@@ -74,31 +100,14 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
    DPSE=DPSE*0.01                              !shchPa 
    call Einc_to_Ganl(DPSE,DUE,DVE,DTE,DQE,&    !shc start
                       PSB, UB, VB, TB, QB,&
-                      PSG, UG, VG, TG, QG)             
+                      PSG, UG, VG, TG, QG,&
+                      IMAX,JMAX,IMAXE,JMAXE,KMAX,MAXJZ)             
 9001 format(10e15.7)     !shcimsi start
-   dum = 0.0
-   write(901,9001) ((dum(i,j,1),i=1,imax),j=1,jmax)
-   write(901,9001) ((PSG(i,j),i=1,imax),j=1,jmax)
-   write(901,9001) ((dum(i,j,1),i=1,imax),j=1,jmax)
-   do k=1,kmax
-   write(901,9001) ((TG(i,j,k),i=1,imax),j=1,jmax)
-   enddo
-   do k=1,kmax
-   write(901,9001) ((UG(i,j,k),i=1,imax),j=1,jmax)
-   enddo
-   do k=1,kmax
-   write(901,9001) ((VG(i,j,k),i=1,imax),j=1,jmax)
-   enddo
-   do k=1,kmax
-   write(901,9001) ((QG(i,j,k),i=1,imax),j=1,jmax)
-   enddo
-   do k=1,kmax
-   write(901,9001) ((dum(i,j,k),i=1,imax),j=1,jmax)
-   enddo
-   do k=1,kmax
-   write(901,9001) ((dum(i,j,k),i=1,imax),j=1,jmax)   !shcimsi end
-   enddo
-   call PREGSM1(PSG,TG,UG,VG,QG,PSB,TB,UB,VB,QB) !shc end
+!modified by shc nk start
+!modified by shc nk end
+
+   call PREGSM1(PSG,TG,UG,VG,QG,PSB,TB,UB,VB,QB,IMAXE,JMAXE,ISST,JSST,MAXJZ,IVAR, &
+                IMAX,JMAX,KMAX,IDIM,JDIM,MEND1,MEND1,MEND1,ISNW,JSNW,JMAXHF,MNWAV,IMX ) !shc end
 
    else          !shc
 
@@ -135,10 +144,17 @@ SUBROUTINE netcdf2kma_interface ( grid, config_flags )
         grid%em_u_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1),&
         grid%em_v_2(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1),&
     grid%moist(grid%sd31:grid%ed31-1,grid%sd32:grid%ed32-1,grid%sd33:grid%ed33-1,P_qv),&                   !shc
-    PSB,TB,UB,VB,QB)         !shc
+    PSB,TB,UB,VB,QB,IMAXE,JMAXE,ISST,JSST,MAXJZ,IVAR, &
+                IMAX,JMAX,KMAX,IDIM,JDIM,MEND1,MEND1,MEND1,ISNW,JSNW,JMAXHF,MNWAV,IMX)         !shc
 
     endif         !shc
 
+   deallocate(DPSE,DUE,DVE,DTE,DQE)
+   deallocate(PSB , UB, VB, TB, QB)
+   deallocate(PSG , UG, VG, TG, QG, dum)
+
+8000  print*,' read error on namelist unit 111'
+      stop
     
 END SUBROUTINE netcdf2kma_interface
 
