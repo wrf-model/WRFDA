@@ -92,7 +92,7 @@ subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
    ! epsi   = -aimag(cdum3)
 
    ADJ_cdum3  = ADJ_epsr + ADJ_epsi *(0.,1.)
-   ADJ_esnew  =   ADJ_cdum3/(1.0 + cdum1)
+   ADJ_esnew  =   REAL(ADJ_cdum3/((1.0,0.0) + cdum1))
    ADJ_cdum1  = - ADJ_cdum3*(esnew-4.9)/((1.0 + cdum1)*(1.0 + cdum1))
    ADJ_cdum2  = - ADJ_cdum3
 

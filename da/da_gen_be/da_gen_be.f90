@@ -6,8 +6,7 @@ module da_gen_be
    !----------------------------------------------------------------------------
 
    use da_control
-   use lapack
-   use blas
+   use lapack, only : dsyev
    use da_tracing
    use da_tools1
 

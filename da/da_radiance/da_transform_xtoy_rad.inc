@@ -27,19 +27,15 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
    real, allocatable :: model_mr(:,:) ! Model value mr(ppmv) at ob location.
    real, allocatable :: model_psfc(:)
 
-   real, dimension(xp%kms:xp%kme)   :: v_p ! Model value p at ob hor. location.
+   integer            :: num_rad, nchan, n
 
-   integer            :: num_rad, nchan, unit, n, ios
-   real,    pointer   :: pres(:)
-   character(len=30)  :: filename
-
-   type(con_vars_type),  pointer  :: con_vars(:), con_vars_tl(:)
-   type(aux_vars_type),  pointer  :: aux_vars(:), aux_vars_tl(:)
+   type(con_vars_type),  allocatable :: con_vars(:), con_vars_tl(:)
+   type(aux_vars_type),  allocatable :: aux_vars(:), aux_vars_tl(:)
 
    ! evenly distributed versions
-   type(con_vars_type),  pointer  :: d_con_vars(:), d_con_vars_tl(:)
-   type(aux_vars_type),  pointer  :: d_aux_vars(:), d_aux_vars_tl(:)
-   real,    pointer   :: d_tb(:,:)
+   type(con_vars_type),  allocatable :: d_con_vars(:), d_con_vars_tl(:)
+   type(aux_vars_type),  allocatable :: d_aux_vars(:), d_aux_vars_tl(:)
+   real, allocatable :: d_tb(:,:)
 
    integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:)
@@ -66,9 +62,6 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
       num_rad   = iv%instid(i)%num_rad
       nlevels   = iv%instid(i)%nlevels
       nchan     = iv%instid(i)%nchan
-
-      allocate (pres(1:nlevels))
-      pres(1:nlevels) = coefs(i) % ref_prfl_p(1:nlevels)
 
       if (num_rad > 0) then
          allocate (con_vars(num_rad))
@@ -441,8 +434,6 @@ end do
       !-------------------------------------------------------------------
       ! [2.0] assign Hdx :
       !-------------------------------------------------------------------
-
-      deallocate (pres)
 
       if (num_rad > 0) then
          deallocate (con_vars)

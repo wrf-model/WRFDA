@@ -94,6 +94,8 @@ subroutine da_transform_xtotb_lin(xa, xb)
       TGL_htpw = TGL_zrhom/tpw/1000. &
                - TGL_tpw/tpw*htpw
 
+      dum1 = 0.0
+
       call da_tb_tl(1,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
                   xb%tb19v(i,j),xb%tb19h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &

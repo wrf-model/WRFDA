@@ -1,5 +1,6 @@
 module da_par_util1
 
+   use da_wrf_interfaces
    use da_control
 #ifdef DM_PARALLEL
    use module_dm
@@ -12,14 +13,6 @@ module da_par_util1
    !---------------------------------------------------------------------------
 
    implicit none
-
-   interface
-      subroutine wrf_dm_bcast_integer( buf, n1 )
-         implicit none
-         integer, intent(in)    ::  n1
-         integer, intent(inout) :: buf(:)
-      end subroutine wrf_dm_bcast_integer
-   end interface
 
 #ifdef DM_PARALLEL
 #if ( DWORDSIZE != RWORDSIZE )

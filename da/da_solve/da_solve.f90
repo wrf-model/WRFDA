@@ -24,6 +24,8 @@ subroutine da_solve ( grid , config_flags &
    use da_tracing
    use da_reporting
    use module_get_file_names ! for system interface on cray
+   use module_radiance
+!   use da_rsl_interfaces
 
    implicit none
 

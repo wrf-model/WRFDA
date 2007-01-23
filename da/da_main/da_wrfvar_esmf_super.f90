@@ -28,7 +28,7 @@ module da_wrfvar_esmf_super
    use da_setup_structures
    use da_test
    use da_minimisation
-
+   use da_wrf_interfaces
 
    implicit none
 
@@ -51,13 +51,6 @@ module da_wrfvar_esmf_super
 
    character (LEN=80)      :: rstname
    character (LEN=80)      :: message
-
-   interface 
-      subroutine setup_timekeeping( grid )
-         use module_domain
-         type(domain), pointer :: grid
-      end subroutine setup_timekeeping
-   end interface
 
 contains
 

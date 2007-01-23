@@ -41,9 +41,6 @@ subroutine da_moist_phys_lin(xb, xa, xp)
    real, dimension(kms:kme) :: DUM1129,DUM1139,DUM2119,DUM4119
    real, dimension(kms:kme) :: TMP
 
-   real, dimension(ims:ime,jms:jme) :: z_LCL
-   real          :: lh_rate
-
    integer :: i, j, k
 
    do k=kts,kte

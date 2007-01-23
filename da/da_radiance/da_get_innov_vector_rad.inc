@@ -27,17 +27,18 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
    real, allocatable :: v_p(:,:)
 
    integer            :: inst, nchan
-   real,    pointer   :: polar(:)
-   real,    pointer   :: pres(:)
-   logical            :: amsua, amsub, mhs, ssmi
+   real,    allocatable   :: polar(:)
+   real,    allocatable   :: pres(:)
+   logical            :: amsua, amsub, ssmi
+   ! logical            :: mhs
 
-   integer            :: ip,kn,knchpf,sensor_type,n1,n2,n1n2
-   integer, pointer   :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
-   real   , pointer   :: pemsv(:), pemsh(:), pems5(:)
-   real   , pointer   :: zasat(:), zlsat(:)
+   integer            :: kn,knchpf,sensor_type,n1,n2,n1n2
+   integer, allocatable :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
+   real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
+   real   , allocatable :: zasat(:), zlsat(:)
 
-   type(con_vars_type),  pointer  :: con_vars(:)
-   type(aux_vars_type),  pointer  :: aux_vars(:)
+   type(con_vars_type),  allocatable :: con_vars(:)
+   type(aux_vars_type),  allocatable :: aux_vars(:)
 
    ! variables for computing clwp
    real, allocatable :: vtm(:,:), dlnpf(:,:), clw(:,:), pf(:,:)

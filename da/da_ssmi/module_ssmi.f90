@@ -10,6 +10,7 @@ contains
 #include "effht.inc"
 #include "effang.inc"
 #include "roughem.inc"
+#include "read_ssmi.inc"
    
 end module module_ssmi
 

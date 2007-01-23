@@ -31,20 +31,16 @@ subroutine da_moist_phys_adj(xb, xa, xp)
    real, dimension(kms:kme) :: SCR2,SCR3,SCR4,SCR5,SCR6
    real, dimension(kms:kme) :: DUM31
    real, dimension(kms:kme) :: PRA,PRC,PRD,PRE
-   real, dimension(kms:kme) :: SCR31,SCR41,SCR42,SCR71
+   real, dimension(kms:kme) :: SCR31,SCR42,SCR71
    real, dimension(kms:kme) :: DUM112,DUM113,DUM211,DUM411
-   real, dimension(kms:kme) :: PRA1,PRC1,PRE1,PRA2,PRC2
+   real, dimension(kms:kme) :: PRA2,PRC2
 
    real, dimension(kms:kme) :: SCR29,SCR39,SCR49,SCR59,SCR69
    real, dimension(kms:kme) :: DUM319
    real, dimension(kms:kme) :: PRA9,PRC9,PRD9,PRE9
-   real, dimension(kms:kme) :: SCR319,SCR419,SCR429,SCR719
+   real, dimension(kms:kme) :: SCR319,SCR429,SCR719
    real, dimension(kms:kme) :: DUM1129,DUM1139,DUM2119,DUM4119
-   real, dimension(kms:kme) :: PRA19,PRC19,PRE19
    real, dimension(kms:kme) :: TMP
-
-   real, dimension(ims:ime,jms:jme) :: z_LCL
-   real          :: lh_rate
 
    integer :: i, j, k
 

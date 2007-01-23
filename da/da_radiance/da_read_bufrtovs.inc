@@ -35,24 +35,13 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    character(8) subset,subfgn
    character(80) hdr1b
 
-   integer(i_kind) ihh,i,j,k,ifov,idd,jdate,ireadmg,ireadsb
-   integer(i_kind) iret,idate,im,iy,iyr,nchan,klatp1,klonp1
-   integer(i_kind) ich1,ich2,ich8,ich10,ich15,klon1,kidsat,klat1
-   integer(i_kind) nmind,iobs,jlat,jlon,itx,nk,itt,iobsout
-   integer(i_kind) chan1,iskip,ichan10,ichan2,ichan1,ichan15
-   integer(i_kind) ksatid,ichan8,ityp,ityp2
+   integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
+   integer(i_kind) iret,idate,im,iy,nchan
 
-   real(r_kind) w00,w10,w01,w11,dx1,dy1,cosza
-   real(r_kind) ch1,ch2,ch8,ch10,ch8ch10,d0,d1,d2,sval,ch15,qval
-   real(r_kind) ch1flg
-
-   real(r_kind) pred,tbmin,tbmax, tbbad
-   real(r_kind) rsat,dlat,panglr,dlon,rato,sstime,rmask
-   real(r_kind) dlon_earth,dlat_earth
-   real(r_kind) crit1,step,start,ch8flg,sstx,each
-   real(r_kind) terrain,timedif
-   real(r_kind),dimension(4):: a0,a1,a2,a3
-   real(r_kind),dimension(19):: rlndsea
+   real(r_kind) tbmin,tbmax, tbbad
+   real(r_kind) panglr,rato
+   ! real(r_kind) rmask
+   real(r_kind) step,start
 
    real(r_double),dimension(maxinfo+maxchanl):: data1b8
    real(r_double),dimension(n1bhdr):: bfr1bhdr
@@ -64,9 +53,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    ! pixel information
    integer   ::  year,month,day,hour,minute,second  ! observation time
    real      ::  obs_time
-   integer   ::  scanline, scanpos
-   real      ::  rlat, rlon                         !  lat/lon in degrees   for Anfovs
-   real      ::  satzen, satazi, solzen, solazi     !  scan angles for Anfovs
+   ! real      ::  rlat, rlon                         !  lat/lon in degrees   for Anfovs
+   real      ::  satzen, satazi, solzen     !  scan angles for Anfovs
    integer   ::  landsea_mask
    real      ::  srf_height
    ! channels' bright temperature
@@ -75,7 +63,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    type (datalink_type), pointer    :: head, p, current
 
-   integer                        ::  error, ifgat
+   integer                        ::  ifgat
    type(info_type)                ::  info
    type(model_loc_type)           ::  loc
 

@@ -10,7 +10,7 @@ subroutine da_read_filtered_rad( xp, iv )
    type (ob_type),    intent(inout)  :: iv       ! O-B structure.
 
    integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: i        ! Index dimension.
 
    integer            :: ios, filtered_rad_unit
    character(len=50)  :: filename

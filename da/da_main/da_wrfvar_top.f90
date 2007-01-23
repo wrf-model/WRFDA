@@ -19,6 +19,7 @@ module da_wrfvar_top
    use da_setup_structures
    use da_test
    use da_minimisation
+   use da_wrf_interfaces
 
 #ifdef DM_PARALLEL
    use module_dm
@@ -46,14 +47,6 @@ module da_wrfvar_top
 #endif
 
    character (LEN=80)      :: rstname
-
-   interface 
-      subroutine setup_timekeeping( grid )
-        use module_domain
-        type(domain), pointer :: grid
-      end subroutine setup_timekeeping
-   end interface
-
 
 contains
 

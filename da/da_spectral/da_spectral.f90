@@ -2,7 +2,7 @@ module da_spectral
 
    use da_control
    use da_define_structures, only : xbx_type
-   use fftpack5
+   use fftpack5, only : rfft1f,rfft1b,rfft1i
    use da_tools
    use da_tracing
 #ifdef DM_PARALLEL

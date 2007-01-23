@@ -33,6 +33,8 @@ WRFVAR_OBJS = da_par_util.o \
    da_test.o \
    da_tools.o \
    da_tools1.o \
+   da_rsl_interfaces.o \
+   da_wrf_interfaces.o \
    da_recursive_filter.o \
    da_interpolation.o \
    da_grid_definitions.o \

@@ -18,24 +18,24 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
    real                , intent (out) :: tb(nchanl,nprofiles)
 
    ! local variables
-   integer             :: n, nc, ios
+   integer             :: n, nc
 
    ! RTTOV input parameters
    integer             :: nfrequencies, nchannels, nbtout
    integer             :: nchan(nprofiles)
-   integer , pointer   :: lprofiles(:)
+   integer, allocatable :: lprofiles(:)
    type(rttov_coef)    :: coef
    type(profile_type)  :: profiles(nprofiles), profiles_tl(nprofiles) 
    logical             :: addcloud
-   real , pointer      :: surfem(:)
-   integer , pointer   :: channels (:), polarisations(:,:)
-   logical , pointer   :: calcemis (:)
+   real , allocatable   :: surfem(:)
+   integer, allocatable :: channels (:), polarisations(:,:)
+   logical, allocatable :: calcemis (:)
 
    ! RTTOV out parameters
    integer             :: errorstatus(nprofiles)
 
    ! RTTOV inout parameters
-   real    , pointer        :: emissivity (:), emissivity_tl (:)
+   real    , allocatable        :: emissivity (:), emissivity_tl (:)
    type (radiance_type)     :: radiance, radiance_tl
    type (transmission_type) :: transmission, transmission_tl
 

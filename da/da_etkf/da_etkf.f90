@@ -8,7 +8,7 @@ module da_etkf
 
    use da_control
    use da_tracing
-   use lapack
+   use lapack, only : dsyev
 
    implicit none
 

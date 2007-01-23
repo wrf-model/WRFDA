@@ -22,7 +22,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, &
    real, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
    real, dimension(xp%kms:xp%kme), intent(in)    :: T9, Q9, P9
    ! real                                          :: SLP
-   real                                          :: SLP9
+   real, intent(out)                             :: SLP9
 
    integer              :: K, KLO, KHI
    real                 :: PL, T0, TS, XTERM,    &

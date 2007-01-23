@@ -25,21 +25,18 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
    integer :: status(mpi_status_size) ! MPI status.
 #endif
 
-   real, pointer                  :: model_mr(:)
+   real, allocatable              :: model_mr(:)
  
-   real, dimension(xp%kms:xp%kme)   :: v_p ! Model value p at ob hor. location.
 
-   integer            :: nchan, unit, n, ios
-   real,    pointer   :: pres(:)
-   character(len=30)  :: filename
+   integer            :: nchan, n
 
-   type(con_vars_type),  pointer  :: con_vars(:), con_vars_ad(:)
-   type(aux_vars_type),  pointer  :: aux_vars(:)
+   type(con_vars_type),  allocatable :: con_vars(:), con_vars_ad(:)
+   type(aux_vars_type),  allocatable :: aux_vars(:)
 
    ! evenly distributed versions
-   type(con_vars_type),  pointer  :: d_con_vars(:), d_con_vars_ad(:)
-   type(aux_vars_type),  pointer  :: d_aux_vars(:)
-   real,    pointer   :: d_tb(:,:)
+   type(con_vars_type),  allocatable  :: d_con_vars(:), d_con_vars_ad(:)
+   type(aux_vars_type),  allocatable  :: d_aux_vars(:)
+   real,    allocatable :: d_tb(:,:)
    integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:), temp_ps(:), rtemp(:,:)
    integer, allocatable :: itemp(:,:)
@@ -60,14 +57,11 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       nlevels  = iv%instid(i)%nlevels
       nchan    = iv%instid(i)%nchan
 
-      allocate (pres(1:nlevels))
       allocate (model_mr(1:nlevels))
 
       allocate (con_vars(num_rad))
       allocate (con_vars_ad(num_rad))
       allocate (aux_vars(num_rad))
-
-      pres(1:nlevels) = coefs(i) % ref_prfl_p(1:nlevels)
 
       !---------------------------------------------------------------
       ! [1.0] assign tb = R^-1 Re :
@@ -425,7 +419,6 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       deallocate (d_aux_vars)
       deallocate (d_con_vars_ad)
 
-      deallocate (pres)
       deallocate (model_mr)
    end do        ! end loop for sensor
 

@@ -15,6 +15,7 @@ module da_setup_structures
    use da_wrfvar_io
    use da_radiance
    use da_reporting
+   use da_tools
 
    implicit none
 

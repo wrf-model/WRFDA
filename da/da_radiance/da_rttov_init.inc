@@ -38,17 +38,16 @@ subroutine da_rttov_init(iv,ob)
    integer, allocatable :: errorstatus(:)  ! return code
    integer              :: coef_errorstatus, i_amsua, i_amsub
    !  type( rttov_coef ), allocatable :: coefs(:)         ! coefficients
-   integer     :: error
-   integer , pointer   ::  nscan(:), nchan(:)
+   integer , allocatable ::  nscan(:), nchan(:)
 
    ! local variables
    !----------------
    integer             :: nprofiles, nfrequencies, nchannels, nbtout
-   integer , pointer   :: lprofiles(:)
-   real    , pointer   :: surfem(:), emissivity(:)
-   integer , pointer   :: channels (:), polarisations(:,:)
+   integer , allocatable :: lprofiles(:)
+   real    , allocatable :: surfem(:), emissivity(:)
+   integer , allocatable :: channels (:), polarisations(:,:)
    integer             :: mxchn
-   integer , pointer   :: coefs_channels (:,:)
+   integer , allocatable :: coefs_channels (:,:)
  
    integer             :: idum, wmo_sensor_id, sensor_type, iost, iunit
 

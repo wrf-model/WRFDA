@@ -7,7 +7,9 @@ module da_control
    use module_driver_constants
 
 #ifdef DM_PARALLEL
-   use mpi
+   use mpi, only : mpi_real8, mpi_double_complex, mpi_sum, &
+      mpi_integer, mpi_character,mpi_maxloc,mpi_minloc, &
+      mpi_status_size,mpi_2double_precision
 #endif
 
    implicit none

@@ -11,7 +11,7 @@ module da_tools
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise
    use module_domain, only : xb_type, xpose_type
-   use lapack
+   use lapack, only : dsyev
    use da_tracing
    use da_reporting
    use da_tools1
