@@ -41,7 +41,7 @@ program gen_be_ensmean
    integer               :: natts                     ! Number of field attributes.
    real                  :: member_inv                ! 1 / ensemble size.
 
-   character(len=10)     :: cvar(1:max_num_vars)      ! Default array of variable names.
+   character(len=10)     :: cv(1:max_num_vars)        ! Default array of variable names.
    integer               :: dimids(1:10)              ! Array of dimension IDs.
    integer               :: dims(1:max_num_dims)      ! Array of dimensions.
    integer               :: istart(1:max_num_dims)    ! Array of dimension starts.
@@ -50,7 +50,7 @@ program gen_be_ensmean
    real (kind=4), allocatable     :: data_r(:,:,:)             ! Data array.
    real (kind=4), allocatable     :: data_r_mean(:,:,:)        ! Data array mean.
  
-   namelist / gen_be_ensmean_nl / filestub, num_members, nv, cvar
+   namelist / gen_be_ensmean_nl / filestub, num_members, nv, cv
 
    stderr = 0
    stdout = 6
@@ -65,7 +65,7 @@ program gen_be_ensmean
    filestub = 'test'
    num_members = 56
    nv = 1
-   cvar = "U"
+   cv = "U"
 
    open(unit=unit, file='gen_be_ensmean_nl.nl', &
         form='formatted', status='old', action='read')
@@ -75,7 +75,7 @@ program gen_be_ensmean
    write(6,'(a,a)')'   Filestub = ', trim(filestub)
    write(6,'(a,i4)')'   Number of ensemble members = ', num_members
    write(6,'(a,i4)')'   Number of variables to average = ', nv
-   write(6,'(50a)')'   List of variables to average = ', cvar(1:nv)
+   write(6,'(50a)')'   List of variables to average = ', cv(1:nv)
 
 !  Open template ensemble mean with write access:
    length = len_trim(filestub)
@@ -91,7 +91,7 @@ program gen_be_ensmean
 !---------------------------------------------------------------------------------------------
 
    do v = 1, nv ! Loop over variables to average:
-      var = cvar(v)
+      var = cv(v)
       write(6,'(2a)')' Computing ensemble mean for variable ', var
 
       do member = 1, num_members
