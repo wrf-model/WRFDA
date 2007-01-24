@@ -32,7 +32,7 @@ foreach a ( $argv )
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1
     else if ( "$a" == "wrfvar" || "$a" == "convertor" || "$a" == "be" \
-           || "$a" == "all" ) then
+          || "$a" == "utils"  || "$a" == "all" ) then
       set compare_wrf = 1
       set compare_var = 1
     endif

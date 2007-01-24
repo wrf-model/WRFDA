@@ -177,6 +177,8 @@ inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
 	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
+utils : da_utils
+
 da_utils : da_diagnostics \
            da_ominusb \
            da_tune \
