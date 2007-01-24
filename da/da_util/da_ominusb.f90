@@ -568,7 +568,7 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs, obs_er
       end if
 
       if (obs % cov(b) /= 0.0 ) then
-         write(0,'(i5,i7,3e14.6,l,e13.6)')b, sum_obs(b), avg_dis(b), &
+         write(0,'(i5,i7,3e14.6,l1,e13.6)')b, sum_obs(b), avg_dis(b), &
                                         obs % cov(b), &
                                         coverr(b), bin_pass(b), gaussian
          if (obs % cov(b) /= 0.0 .and. bin_pass(b) ) & 
