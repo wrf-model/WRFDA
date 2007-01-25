@@ -68,6 +68,7 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE module_cumulus_driver
    USE module_microphysics_driver
    USE module_pbl_driver
+   USE module_mp_nconvp   !Xiaoyan Zhang
 #ifdef WRF_CHEM
    USE module_input_chem_data
 #endif
@@ -314,6 +315,16 @@ real rv_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real ru_tendfz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)
 !----------------------------------------
+
+!Xiaoyan Zhang add
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_rainnc
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_rainncv
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_h_diabatic
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_pb
+   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_alb
+!
+!
+
 
 #ifdef DEREF_KLUDGE
    INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33
@@ -1008,25 +1019,81 @@ if (config_flags%mp_physics .ne. 0) then
     sz = 0
   endif
 ! recompute : sz
-#ifdef REMOVED_BY_JM
-    its = max(grid%i_start(ij),ids+sz)
-! recompute : its
-    ite = min(grid%i_end(ij),ide-1-sz)
-! recompute : ite
-    jts = max(grid%j_start(ij),jds+sz)
-! recompute : jts
-    jte = min(grid%j_end(ij),jde-1-sz)
-! recompute : jte
-#else
-! in case of parallel, we want the computation to go out one cell 
-! onto halo this ignores tiling; multi-threading is disabled above
-! this should also work for non-parallel
+!------XZHANG ---------------------------------------
+!!   scalar_tile_loop_1aa: DO ij = 1 , grid%num_tiles
+    DO ij = 1 , grid%num_tiles
 
-    its = max(ips-1,ids+sz)
-    ite = min(ipe+1,ide-1-sz)
-    jts = max(jps-1,jds+sz)
-    jte = min(jpe+1,jde-1-sz)
-#endif
+       its = max(grid%i_start(ij),ids+sz)
+       ite = min(grid%i_end(ij),ide-1-sz)
+       jts = max(grid%j_start(ij),jds+sz)
+       jte = min(grid%j_end(ij),jde-1-sz)
+
+BENCH_START(moist_physics_prep_tim)
+       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+                                   al, alb, p, p8w, p0, pb,          &
+                                   ph_2, phb, pi_phy, p_phy,         &
+                                   z, z_at_w, dz8w,                  &
+                                   dtm, h_diabatic,                  &
+                                   config_flags,fnm, fnp,            &
+                                   ids, ide, jds, jde, kds, kde,     &
+                                   ims, ime, jms, jme, kms, kme,     &
+                                   its, ite, jts, jte,               &
+                                   k_start    , k_end               )
+BENCH_END(moist_physics_prep_tim)
+
+        CALL lscond(t_2, p_phy                                         &
+                    ,moist_2(ims,kms,jms,P_QV)                         &
+                    ,rho, pi_phy,r_v, xlv, cp                          &
+                    ,ep_2, svp1, svp2                                  &
+                    ,svp3, svpt0                                       &
+                    ,dz8w                                              &
+                    ,rainnc, rainncv                                   &
+                    ,ids, ide, jds, jde, kds, kde                      &
+                    ,ims, ime, jms, jme, kms, kme                      &
+                    ,its, ite, jts, jte                                &
+                    ,k_start, min(k_end,kde-1)                         )
+   END DO  !!scalar_tile_loop_1aa
+!goto 6776
+
+BENCH_START(micro_driver_tim)
+       sr = 0.
+BENCH_END(micro_driver_tim)
+
+!------XZHANG ---------------------------------------
+  do ij = 1, grid%num_tiles
+    its = max(grid%i_start(ij),ids+sz)
+    ite = min(grid%i_end(ij),ide-1-sz)
+    jts = max(grid%j_start(ij),jds+sz)
+    jte = min(grid%j_end(ij),jde-1-sz)
+
+!------XZHANG ---------------------------------------
+       CALL moist_physics_finish_em( t_2, t_1, t0, muts,               &
+                                     h_diabatic, dtm, config_flags,    &
+                                     ids, ide, jds, jde, kds, kde,     &
+                                     ims, ime, jms, jme, kms, kme,     &
+                                     its, ite, jts, jte,               &
+                                     k_start    , k_end               )
+!------XZHANG ---------------------------------------
+
+!xzhang#ifdef REMOVED_BY_JM
+!xzhang    its = max(grid%i_start(ij),ids+sz)
+!xzhang! recompute : its
+!xzhang    ite = min(grid%i_end(ij),ide-1-sz)
+!xzhang! recompute : ite
+!xzhang    jts = max(grid%j_start(ij),jds+sz)
+!xzhang! recompute : jts
+!xzhang    jte = min(grid%j_end(ij),jde-1-sz)
+!xzhang! recompute : jte
+!xzhang#else
+!xzhang! in case of parallel, we want the computation to go out one cell 
+!xzhang! onto halo this ignores tiling; multi-threading is disabled above
+!xzhang! this should also work for non-parallel
+
+!xzhang    its = max(ips-1,ids+sz)
+!xzhang    ite = min(ipe+1,ide-1-sz)
+!xzhang    jts = max(jps-1,jds+sz)
+!xzhang    jte = min(jpe+1,jde-1-sz)
+!xzhang#endif
     if ( .not. non_hydrostatic) then
 
 BENCH_START(exch13)
@@ -1056,6 +1123,50 @@ BENCH_START(comp14)
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde),k_start,k_end )
 BENCH_END(comp14)
+
+         call a_moist_physics_finish_em( t_2, a_t_2, t_1, a_t_1, t0, muts, &
+                   a_muts, h_diabatic, a_h_diabatic, dtm, ide, jde, kde, &
+&ims, ime, jms, jme, kms, kme, its, ite, jts, jte, k_start, k_end )
+
+  end do
+!------------Xiaoyan Zhang add here ---------------
+
+!6776 continue
+!   scalar_tile_loop_1a: DO ij = 1 , grid%num_tiles
+    DO ij = 1 , grid%num_tiles
+
+       its = max(grid%i_start(ij),ids+sz)
+       ite = min(grid%i_end(ij),ide-1-sz)
+       jts = max(grid%j_start(ij),jds+sz)
+       jte = min(grid%j_end(ij),jde-1-sz)
+
+!------XZHANG ---------------------------------------
+       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
+                                   al, alb, p, p8w, p0, pb,          &
+                                   ph_2, phb, pi_phy, p_phy,         &
+                                   z, z_at_w, dz8w,                  &
+                                   dtm, h_diabatic,                  &
+                                   config_flags,fnm, fnp,            &
+                                   ids, ide, jds, jde, kds, kde,     &
+                                   ims, ime, jms, jme, kms, kme,     &
+                                   its, ite, jts, jte,               &
+                                   k_start    , k_end               )
+!------XZHANG ---------------------------------------
+
+
+  CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV),a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
+  pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
+  rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,min(k_end,kde-1) )
+
+!------------ End of lscond ---------------
+     call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, al, a_al, alb, a_alb, p, a_p, p8w, a_p8w, p0, &
+&pb, a_pb, ph_2, a_ph_2, phb, a_phb, pi_phy, a_pi_phy, p_phy, a_p_phy, z, a_z, z_at_w, a_z_at_w, dz8w, a_dz8w, h_diabatic, a_h_diabatic, fnm, fnp, &
+&ide, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, k_start, k_end )
+
+   ENDDO !scalar_tile_loop_1a
+
+
+
 
 endif
 
@@ -4535,6 +4646,23 @@ lineno = __LINE__
 BENCH_END(exch106)
 
 BENCH_START(comp112)
+!---------------------------------------------------------------------------------------------
+!Zhang Xiaoyan add the AD of surface_drag on 12/05/2006
+!---------------------------------------------------------------------------------------------
+  IF (rk_step == 1 ) then
+
+ print *, 'xyz---check ad of sfc drag'
+ call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u_2, a_u_2, v_2, a_v_2, xland, muu, a_muu, muv, a_muv, z, &
+&a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme,&
+  grid%i_start(ij), grid%i_end(ij),                &
+  grid%j_start(ij), grid%j_end(ij),                &
+  k_start, k_end                                  )
+  ENDIF
+
+!---------------------------------------------------------------------------------------------
+!                 END
+!---------------------------------------------------------------------------------------------
+
     call a_rk_tendency1( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf,&
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&

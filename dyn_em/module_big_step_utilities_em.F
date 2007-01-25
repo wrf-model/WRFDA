@@ -4542,5 +4542,124 @@ SUBROUTINE set_tend ( field, field_adv_tend, msf,       &
       ENDDO
 
 END SUBROUTINE set_tend
+!------------------------------------------------------------------------------------
+!Xiaoyan Zhang ------ add vertical diffusion here 10/11/2006    --------------------
+!==============================================================================
+!x   SUBROUTINE surface_drag (config_flags, rk_step,                   &
+     SUBROUTINE surface_drag (ru_tendf, rv_tendf, u, v, xland,             &
+                         muu, muv, z, z_at_w,                   &
+                         ids, ide, jds, jde, kds, kde,                &
+                         ims, ime, jms, jme, kms, kme,                &
+                         its, ite, jts, jte, kts, kte   )
+
+    IMPLICIT NONE
+
+!   TYPE(grid_config_rec_type),    INTENT(IN   )    :: config_flags
+   INTEGER ,               INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
+                                            ims, ime, jms, jme, kms, kme, &
+                                            its, ite, jts, jte, kts, kte
+
+!   INTEGER ,       INTENT(IN   ) :: rk_step
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) ,               &
+                                        INTENT(INOUT) :: ru_tendf, &
+                                                         rv_tendf
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) ,               &
+                                        INTENT(IN   ) :: u, &
+                                                         v, &
+                                                         z, z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  ), INTENT(IN) :: muu,muv,xland
+
+! Local
+   REAL :: V0_u, V0_v, tao_xz, tao_yz, cd, zu, zv, zwt
+   INTEGER :: i, j, i_start, i_end, i_endu, j_start, j_end, j_endv, k
+
+! End declarations.
+!-----------------------------------------------------------------------
+
+   i_start = its
+   i_end   = MIN(ite,ide-1)
+   i_endu  = ite
+   j_start = jts
+   j_end   = MIN(jte,jde-1)
+   j_endv  = jte
+
+    DO j = j_start, j_end
+    DO i = i_start, i_endu
+       V0_u=    sqrt((u(i,kts,j)**2) +         &
+                        (((v(i  ,kts,j  )+          &
+                           v(i  ,kts,j+1)+          &
+                           v(i-1,kts,j  )+          &
+                           v(i-1,kts,j+1))/4)**2))+epsilon
+       if(xland(i,j) .eq. xland(i-1,j))then
+         if(xland(i,j) .lt. 1.5)then
+! land
+           Cd=0.01
+         else
+! water
+           Cd=0.001
+           Cd=max(Cd, 1.e-4 * V0_u)
+           Cd=min(Cd, 0.003)
+
+         endif
+       else
+! coast
+         Cd=0.003
+       endif
+       tao_xz=Cd*V0_u*u(i,kts,j)
+      DO k = kts, kte
+        zu = 0.5*(z(i,k,j)+z(i-1,k,j)-z_at_w(i,kts,j)-z_at_w(i-1,kts,j))
+        IF(zu .LT. 1000.)THEN
+          zwt = 2. * (1000.-zu) / 1000.
+          ru_tendf(i,k,j)=ru_tendf(i,k,j)            &
+                          -zwt*0.5*muu(i,j)*tao_xz/1000.
+        ENDIF
+
+      ENDDO
+    ENDDO
+    ENDDO
+
+!
+    DO j = j_start, j_endv
+    DO i = i_start, i_end
+       V0_v=    sqrt((v(i,kts,j)**2) +         &
+                        (((u(i  ,kts,j  )+          &
+                           u(i  ,kts,j-1)+          &
+                           u(i+1,kts,j  )+          &
+                           u(i+1,kts,j-1))/4)**2))+epsilon
+       if(xland(i,j) .eq. xland(i,j-1))then
+         if(xland(i,j) .lt. 1.5)then
+! land
+           Cd=0.01
+         else
+! water
+           Cd=0.001
+           Cd=max(Cd, 1.e-4 * V0_v)
+           Cd=min(Cd, 0.003)
+
+         endif
+       else
+! coast
+         Cd=0.003
+       endif
+      tao_yz=Cd*V0_v*v(i,kts,j)
+      DO k = kts, kte
+        zv = 0.5*(z(i,k,j)+z(i,k,j-1)-z_at_w(i,kts,j)-z_at_w(i,kts,j-1))
+        IF(zv .LT. 1000.)THEN
+          zwt = 2. * (1000.-zv) / 1000.
+          rv_tendf(i,k,j)=rv_tendf(i,k,j)            &
+                          -zwt*0.5*muv(i,j)*tao_yz/1000.
+
+        ENDIF
+
+      ENDDO
+    ENDDO
+    ENDDO
+
+
+   END SUBROUTINE surface_drag
+
+
+!==============================================================================
+
 
 END MODULE module_big_step_utilities_em

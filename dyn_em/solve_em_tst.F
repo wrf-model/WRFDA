@@ -31,6 +31,7 @@ SUBROUTINE solve_em_tst ( grid , config_flags , &
    USE module_cumulus_driver
    USE module_microphysics_driver
    USE module_pbl_driver
+   USE module_mp_nconvp !Xiaoyan Zhang
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -1171,6 +1172,32 @@ BENCH_START(rk_tend_tim)
                          grid%i_start(ij), grid%i_end(ij),                &
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
+
+!Xiaoyan Zhang added 11/29/2006
+
+         IF (rk_step == 1 ) then
+  print *, 'xyz-----, in solve_em_tst,rk_step ==', rk_step
+      if(TEST_surface_drag) &
+        CALL t_surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+                                muu, muv,z,z_at_w,&
+                         ids, ide, jds, jde, kds, kde,                    &
+                         ims, ime, jms, jme, kms, kme,                    &
+                         grid%i_start(ij), grid%i_end(ij),                &
+                         grid%j_start(ij), grid%j_end(ij),                &
+                         k_start, k_end                                  )
+!         Stop ! xyz
+           CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+                         muu, muv,z,z_at_w,&
+                         ids, ide, jds, jde, kds, kde,                    &
+                         ims, ime, jms, jme, kms, kme,                    &
+                         grid%i_start(ij), grid%i_end(ij),                &
+                         grid%j_start(ij), grid%j_end(ij),                &
+                         k_start, k_end                                  )
+
+  ENDIF
+
+!Xiaoyan Zhang added--    End      ----------------------------------------
+!--------------------------------------------------------------------------
 
 !Xiao added
     if(TEST_advect_scalar) &
@@ -2972,7 +2999,8 @@ BENCH_END(advance_ppt_tim)
      sz = 0
    ENDIF
 
-   if(dyn_opt == DYN_EM) then
+!xzhang   if(dyn_opt == DYN_EM) then
+   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij, its, ite, jts, jte )
 
@@ -2995,6 +3023,42 @@ BENCH_START(moist_physics_prep_tim)
                                    ims, ime, jms, jme, kms, kme,     &
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!Xiaoyan Zhang Add Large-Scale Condensation call at 11/20/2006 !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    print *, 'xyz---- call lscond TST'
+
+    IF (TEST_lscond)   &
+    CALL t_lscond(t_2, p_phy                                     &
+                ,moist_2(ims,kms,jms,P_QV)                           &
+                 ,rho, pi_phy,r_v, xlv, cp                    &
+                 ,ep_2, svp1, svp2                                  &
+                 ,svp3, svpt0                                       &
+                 ,dz8w                                              &
+                 ,rainnc, rainncv                                   &
+                 ,ids, ide, jds, jde, kds, kde,              &
+                 ims, ime, jms, jme, kms, kme,              &
+                 its, ite, jts, jte,               &
+                 k_start, min(k_end,kde-1)         &
+                 , 'solve_em 1')
+
+
+     Stop !xyz
+      CALL lscond(t_2, p_phy                                         &
+                    ,moist_2(ims,kms,jms,P_QV)                         &
+                    ,rho, pi_phy,r_v, xlv, cp                          &
+                    ,ep_2, svp1, svp2                                  &
+                    ,svp3, svpt0                                       &
+                    ,dz8w                                              &
+                    ,rainnc, rainncv                                   &
+                    ,ids, ide, jds, jde, kds, kde                      &
+                    ,ims, ime, jms, jme, kms, kme                      &
+                    ,its, ite, jts, jte                                &
+                    ,k_start, min(k_end,kde-1)                         )
+
+
+
 BENCH_END(moist_physics_prep_tim)
    END DO scalar_tile_loop_1a
    !$OMP END PARALLEL DO

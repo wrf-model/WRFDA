@@ -46,7 +46,7 @@ write(0,*)'********* ********* *********'
 
 #ifdef DM_PARALLEL
    DO WHILE ( await_next() )
-call system("echo -n model_start ; date")
+     call system("echo -n model_start ; date")
 #endif
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
      CALL wrf_run( gcomp, importState, exportState, clock, rc )
@@ -55,7 +55,7 @@ call system("echo -n model_start ; date")
      IF ( wrf_dm_on_monitor() ) THEN
        CALL system("touch wrf_done")
      ENDIF
-call system("echo -n model_end ; date")
+     call system("echo -n model_end ; date")
    ENDDO
 #endif
 

@@ -1085,7 +1085,21 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 
 !  ADJ
 
-   CALL a_rk_tendency( config_flags, rk_step, P_ru_tend, P_rv_tend, P_rw_tend, P_ph_tend, P_t_tend, P_ru_tendf, P_rv_tendf, &
+   CALL a_rk_tendency1( config_flags, rk_step, P_ru_tend, P_rv_tend, P_rw_tend, P_ph_tend, P_t_tend, P_ru_tendf, P_rv_tendf, &
+&P_rw_tendf, P_t_tendf, P_mu_tend, P_u_save, P_v_save, P_w_save, P_ph_save, P_t_save, ru, P_ru, rv, P_rv, rw, P_rw, ww, P_ww, u, &
+&P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, phb, &
+&t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, P_cqv, &
+&K_cqw, P_cqw, u_base, v_base, z_base, msfu, msfv, msft, f, e, sina, cosa, fnm, fnp, rdn, rdnw, dt, rdx, rdy, kvdif, xkmhd, P_xkmhd, &
+&cf1, cf2, cf3, cfn, cfn1, non_hydrostatic, leapfrog, ids, ide, jds, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, &
+&kts, kte )
+
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#    include "HALO_3803.inc"
+
+#endif
+
+   CALL a_rk_tendency2( config_flags, rk_step, P_ru_tend, P_rv_tend, P_rw_tend, P_ph_tend, P_t_tend, P_ru_tendf, P_rv_tendf, &
 &P_rw_tendf, P_t_tendf, P_mu_tend, P_u_save, P_v_save, P_w_save, P_ph_save, P_t_save, ru, P_ru, rv, P_rv, rw, P_rw, ww, P_ww, u, &
 &P_u, v, P_v, w, P_w, t, P_t, ph, P_ph, u_old, P_u_old, v_old, P_v_old, w_old, P_w_old, t_old, P_t_old, ph_old, P_ph_old, phb, &
 &t_init, mu, P_mu, mut, P_mut, muu, P_muu, muv, P_muv, mub, al, P_al, alt, P_alt, p, P_p, pb, php, P_php, cqu, P_cqu, cqv, P_cqv, &
@@ -12107,5 +12121,726 @@ SUBROUTINE t_spec_bdyupdate(  field,      &
 
 END SUBROUTINE t_spec_bdyupdate
 !-----------------------------------------------------------------------------------------------
+!==============================================================================
+!Zhang Xiaoyan 11/02/2006
+
+
+   SUBROUTINE t_surface_drag ( ru_tendf, rv_tendf, u, v, xland,             &
+                         muu, muv, z, z_at_w,                   &
+                         ids, ide, jds, jde, kds, kde,                &
+                         ims, ime, jms, jme, kms, kme,                &
+                         its, ite, jts, jte, kts, kte   )
+   
+   USE module_big_step_utilities_em
+   implicit none
+
+   INTEGER ,               INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &
+                                            ims, ime, jms, jme, kms, kme, &
+                                            its, ite, jts, jte, kts, kte
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )  :: ru_tendf, rv_tendf
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  )  :: u, v, z,  z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  ) :: muu,muv,xland
+! Local
+   REAL :: V0_u, V0_v, tao_xz, tao_yz, cd, zu, zv, zwt
+   INTEGER :: i, j, i_start, i_end, i_endu, j_start, j_end, j_endv, k
+
+   REAL :: SAVE_L, ALPHA, FACTOR, VAL_N, VAL_L, COEF,VAL_A
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: K_ru_tendf,K_rv_tendf
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: g_ru_tendf,g_rv_tendf, g_u,g_v, g_z,g_z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  )          :: g_muu, g_muv
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: P_ru_tendf,P_rv_tendf, P_u,P_v, P_z,P_z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  )          :: P_muu, P_muv
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: S_ru_tendf,S_rv_tendf, S_u,S_v, S_z,S_z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  )          :: S_muu, S_muv
+
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) :: B_ru_tendf,B_rv_tendf, B_u,B_v, B_z,B_z_at_w
+   REAL , DIMENSION( ims:ime , jms:jme  )          :: B_muu, B_muv
+    INTEGER:: NT
+
+! End declarations.
+!-----------------------------------------------------------------------
+
+   K_ru_tendf=ru_tendf
+   K_rv_tendf=rv_tendf
+
+   g_ru_tendf=ru_tendf
+   g_rv_tendf=rv_tendf
+   g_u=u
+   g_v=v
+   g_muu=muu
+   g_muv=muv
+   g_z=z
+   g_z_at_w=z_at_w
+
+   S_ru_tendf=ru_tendf
+   S_rv_tendf=rv_tendf
+   S_u=u
+   S_v=v
+   S_muu=muu
+   S_muv=muv
+   S_z=z
+   S_z_at_w=z_at_w
+
+!call FWD
+  call   surface_drag( ru_tendf, rv_tendf, u, v, xland,             &
+                         muu, muv, z, z_at_w,                   &
+                         ids, ide, jds, jde, kds, kde,                &
+                         ims, ime, jms, jme, kms, kme,                &
+                         its, ite, jts, jte, kts, kte)
+
+        B_ru_tendf=ru_tendf
+        B_rv_tendf=rv_tendf
+
+!call TL
+  call   g_surface_drag( K_ru_tendf, g_ru_tendf, K_rv_tendf, g_rv_tendf, u, g_u, v, g_v, xland, muu, g_muu, muv, &
+  &g_muv, z, g_z, z_at_w, g_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts , jte, kts, kte )
+
+      SAVE_L=0.
+      SAVE_L=sum(g_ru_tendf**2)+sum(g_rv_tendf**2)
+
+
+ ALPHA=1.
+  DO NT=1,11
+    ALPHA=0.1*ALPHA
+    FACTOR=1.+ALPHA
+
+    P_ru_tendf(:,:,:) = FACTOR * S_ru_tendf(:,:,:)
+    P_rv_tendf(:,:,:) = FACTOR * S_rv_tendf(:,:,:)
+    P_u(:,:,:) = FACTOR * S_u(:,:,:)
+    P_v(:,:,:) = FACTOR * S_v(:,:,:)
+    P_muu(:,:) = FACTOR *S_muu(:,:)
+    P_muv(:,:) = FACTOR *S_muv (:,:)
+    P_z(:,:,:)   = FACTOR *S_z(:,:,:)
+    P_z_at_w(:,:,:) = FACTOR * S_z_at_w(:,:,:)
+
+    call  surface_drag( P_ru_tendf, P_rv_tendf, P_u, P_v, xland,             &
+                         P_muu, P_muv, P_z, P_z_at_w,                   &
+                         ids, ide, jds, jde, kds, kde,                &
+                         ims, ime, jms, jme, kms, kme,                &
+                         its, ite, jts, jte, kts, kte   )
+    VAL_N=0.
+    VAL_N= sum ((P_ru_tendf-B_ru_tendf)**2)&
+          +sum ((P_rv_tendf-B_rv_tendf)**2)
+
+    VAL_L=SAVE_L*ALPHA**2
+    COEF=VAL_N/VAL_L
+    
+    WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+         'g_mod_sfcdiffs: ALPHA=',ALPHA,'  COEF=',COEF, &
+         '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+
+    ENDDO
+
+! ADJ Test
+
+   FACTOR=0.01
+   ru_tendf=S_ru_tendf
+   rv_tendf=S_rv_tendf
+   u=S_u
+   v=S_v
+   muu=S_muu
+   muv=S_muv
+   z=S_z
+   z_at_w=S_z_at_w
+
+   P_ru_tendf=FACTOR*S_ru_tendf
+   P_rv_tendf=FACTOR*S_rv_tendf
+   P_u=FACTOR*S_u
+   P_v=FACTOR*S_v
+   P_muu=FACTOR*S_muu
+   P_muv=FACTOR*S_muv
+   P_z=FACTOR*S_z
+   P_z_at_w=FACTOR*S_z_at_w
+
+   B_ru_tendf=P_ru_tendf
+   B_rv_tendf=P_rv_tendf
+   B_u=P_u
+   B_v=P_v
+   B_muu=P_muu
+   B_muv=P_muv
+   B_z=P_z
+   B_z_at_w=P_z_at_w
+   
+  call   g_surface_drag( ru_tendf, P_ru_tendf, rv_tendf, P_rv_tendf, u, P_u, v, P_v, xland, muu, P_muu, muv, &
+  &P_muv,z,P_z, z_at_w, P_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts , jte, kts, kte )
+
+   VAL_L=0.0
+   VAL_L=sum(P_ru_tendf**2) + sum(P_rv_tendf**2)
+   
+   P_u=0.0
+   P_v=0.0
+   P_muu=0.0
+   P_muv=0.0
+   P_z=0.0
+   P_z_at_w=0.0
+   ru_tendf=S_ru_tendf
+   rv_tendf=S_rv_tendf
+
+   call a_surface_drag(ru_tendf, P_ru_tendf, rv_tendf, P_rv_tendf, u, P_u, v, P_v, xland, muu, P_muu, muv, P_muv, z, &
+&P_z, z_at_w, P_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+
+    VAL_A=0.0
+    VAL_A= sum(P_ru_tendf*B_ru_tendf) +sum(P_rv_tendf*B_rv_tendf) &
+          +sum(P_u*B_u) +sum(P_v*B_v) +sum(P_muu*B_muu) +sum(P_muv*B_muv) &
+          +sum(P_z*B_z) +sum(P_z_at_w*B_z_at_w)
+
+   print*, '                '
+   write(6,*) 'a_surface_drag: '
+   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
+   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A
+
+! RECOVER
+
+   ru_tendf=S_ru_tendf
+   rv_tendf=S_rv_tendf
+   u=S_u
+   v=S_v
+   muu=S_muu
+   muv=S_muv
+   z=S_z
+   z_at_w=S_z_at_w
+END SUBROUTINE t_surface_drag
+
+!=======================================================================================================
+    
+
+
+!============================================================================================================
+!Zhang Xiaoyan 12/15/2006
+
+  SUBROUTINE t_lscond( th_in,p,qv_in,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC_in,RAINNCV_in, &
+  ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte,caller )
+
+   USE module_mp_nconvp    !Xiaoyan Zhang 11/20/2006
+!   USE module_mp_nconvp_tl !Xiaoyan Zhang 11/20/2006
+!   USE module_mp_nconvp_ad !Xiaoyan Zhang 11/20/2006
+   IMPLICIT NONE
+  
+  ! Declare dummy arguments
+    INTEGER, INTENT(IN) :: ids
+    INTEGER, INTENT(IN) :: ide
+    INTEGER, INTENT(IN) :: jds
+    INTEGER, INTENT(IN) :: jde
+    INTEGER, INTENT(IN) :: kds
+    INTEGER, INTENT(IN) :: kde
+    INTEGER, INTENT(IN) :: ims
+    INTEGER, INTENT(IN) :: ime
+    INTEGER, INTENT(IN) :: jms
+    INTEGER, INTENT(IN) :: jme
+    INTEGER, INTENT(IN) :: kms
+    INTEGER, INTENT(IN) :: kme
+    INTEGER, INTENT(IN) :: its
+    INTEGER, INTENT(IN) :: ite
+    INTEGER, INTENT(IN) :: jts
+    INTEGER, INTENT(IN) :: jte
+    INTEGER, INTENT(IN) :: kts
+    INTEGER, INTENT(IN) :: kte
+    REAL, INTENT(IN) :: th_in(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: p(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: qv_in(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: rho(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: pii(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: r_v
+    REAL, INTENT(IN) :: xlv
+    REAL, INTENT(IN) :: cp
+    REAL, INTENT(IN) :: EP2
+    REAL, INTENT(IN) :: SVP1
+    REAL, INTENT(IN) :: SVP2
+    REAL, INTENT(IN) :: SVP3
+    REAL, INTENT(IN) :: SVPT0
+    REAL, INTENT(IN) :: dz8w(ims:ime,kms:kme,jms:jme)
+    REAL, INTENT(IN) :: RAINNC_in(ims:ime,jms:jme)
+    REAL, INTENT(IN) :: RAINNCV_in(ims:ime,jms:jme)
+
+    CHARACTER*(*), INTENT(IN) :: caller
+
+  ! Declare local variables
+    REAL :: th(ims:ime,kms:kme,jms:jme)
+    REAL :: qv(ims:ime,kms:kme,jms:jme)
+    REAL :: RAINNC(ims:ime,jms:jme)
+    REAL :: RAINNCV(ims:ime,jms:jme)
+
+  ! IN variables
+    REAL :: S_p(ims:ime,kms:kme,jms:jme)
+    REAL :: P_p(ims:ime,kms:kme,jms:jme)
+    REAL :: B_p(ims:ime,kms:kme,jms:jme)
+    REAL :: S_rho(ims:ime,kms:kme,jms:jme)
+    REAL :: P_rho(ims:ime,kms:kme,jms:jme)
+    REAL :: B_rho(ims:ime,kms:kme,jms:jme)
+    REAL :: S_pii(ims:ime,kms:kme,jms:jme)
+    REAL :: P_pii(ims:ime,kms:kme,jms:jme)
+    REAL :: B_pii(ims:ime,kms:kme,jms:jme)
+    REAL :: S_dz8w(ims:ime,kms:kme,jms:jme)
+    REAL :: P_dz8w(ims:ime,kms:kme,jms:jme)
+    REAL :: B_dz8w(ims:ime,kms:kme,jms:jme)
+
+  ! INOUT variables
+    REAL :: S_th(ims:ime,kms:kme,jms:jme)
+    REAL :: P_th(ims:ime,kms:kme,jms:jme)
+    REAL :: B_th(ims:ime,kms:kme,jms:jme)
+    REAL :: S_qv(ims:ime,kms:kme,jms:jme)
+    REAL :: P_qv(ims:ime,kms:kme,jms:jme)
+    REAL :: B_qv(ims:ime,kms:kme,jms:jme)
+    REAL :: S_RAINNC(ims:ime,jms:jme)
+    REAL :: P_RAINNC(ims:ime,jms:jme)
+    REAL :: B_RAINNC(ims:ime,jms:jme)
+    REAL :: S_RAINNCV(ims:ime,jms:jme)
+    REAL :: P_RAINNCV(ims:ime,jms:jme)
+    REAL :: B_RAINNCV(ims:ime,jms:jme)
+
+  ! OUT variables
+
+  ! Other local declarations
+
+    REAL :: SAVE_L, COEF_TST, ALPHA_TST, FACTOR_TST, VAL_N, VAL_L, VAL_A
+    INTEGER :: NT
+    INTEGER :: i, j, k, n, s
+    INTEGER :: i1, i2, i3, i4, i5, i6, i7
+
+  ! Begin executable code
+
+  ! Copy intent(out) and intent(inout) args
+
+    th = th_in
+    qv = qv_in
+    RAINNC = RAINNC_in
+    RAINNCV = RAINNCV_in
+
+! TGL test
+
+    S_p = p
+    P_p = p
+    S_rho = rho
+    P_rho = rho
+    S_pii = pii
+    P_pii = pii
+    S_dz8w = dz8w
+    P_dz8w = dz8w
+    S_th = th
+    P_th = th
+    S_qv = qv
+    P_qv = qv
+    S_RAINNC = RAINNC
+    P_RAINNC = RAINNC
+    S_RAINNCV = RAINNCV
+    P_RAINNCV = RAINNCV
+
+! NLM
+
+  CALL lscond ( th,p,qv,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC,RAINNCV,ids,ide,jds,jde,kds, &
+  kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+    B_p(its:ite,kts:kte,jts:jte) = p(its:ite,kts:kte,jts:jte)
+    B_rho(its:ite,kts:kte,jts:jte) = rho(its:ite,kts:kte,jts:jte)
+    B_pii(its:ite,kts:kte,jts:jte) = pii(its:ite,kts:kte,jts:jte)
+    B_dz8w(its:ite,kts:kte,jts:jte) = dz8w(its:ite,kts:kte,jts:jte)
+    B_th(its:ite,kts:kte,jts:jte) = th(its:ite,kts:kte,jts:jte)
+    B_qv(its:ite,kts:kte,jts:jte) = qv(its:ite,kts:kte,jts:jte)
+    B_RAINNC(its:ite,jts:jte) = RAINNC(its:ite,jts:jte)
+    B_RAINNCV(its:ite,jts:jte) = RAINNCV(its:ite,jts:jte)
+
+! TL
+
+    th = S_th
+    qv = S_qv
+    RAINNC = S_RAINNC
+    RAINNCV = S_RAINNCV
+  CALL g_lscond ( th,P_th,p,P_p,qv,P_qv,rho,P_rho,pii,P_pii,r_v,xlv,cp,ep2,svp1,svp2,svp3,svpt0,dz8w,P_dz8w, &
+  rainnc,P_rainnc,rainncv,P_rainncv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte  &
+  )
+
+    SAVE_L=0.
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_th(i,k,j) * P_th(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_p(i,k,j) * P_p(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_qv(i,k,j) * P_qv(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_rho(i,k,j) * P_rho(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_pii(i,k,j) * P_pii(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_dz8w(i,k,j) * P_dz8w(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_rainnc(i,j) * P_rainnc(i,j))
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      SAVE_L = SAVE_L + (P_rainncv(i,j) * P_rainncv(i,j))
+    ENDDO
+    ENDDO
+
+    ALPHA_TST=1.
+    DO NT=1,11
+      ALPHA_TST=0.1*ALPHA_TST
+      FACTOR_TST=1.+ALPHA_TST
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_th(i,k,j) = FACTOR_TST * S_th(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_p(i,k,j) = FACTOR_TST * S_p(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_qv(i,k,j) = FACTOR_TST * S_qv(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_rho(i,k,j) = FACTOR_TST * S_rho(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_pii(i,k,j) = FACTOR_TST * S_pii(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_dz8w(i,k,j) = FACTOR_TST * S_dz8w(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      P_rainnc(i,j) = FACTOR_TST * S_rainnc(i,j)
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      P_rainncv(i,j) = FACTOR_TST * S_rainncv(i,j)
+    ENDDO
+    ENDDO
+
+  CALL lscond ( P_th,P_p,P_qv,P_rho,P_pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,P_dz8w,RAINNC,RAINNCV,ids,ide, &
+  jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
+
+    VAL_N=0.
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_th(i,k,j) - B_th(i,k,j)) * (P_th(i,k,j) - B_th(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_p(i,k,j) - B_p(i,k,j)) * (P_p(i,k,j) - B_p(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_qv(i,k,j) - B_qv(i,k,j)) * (P_qv(i,k,j) - B_qv(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_rho(i,k,j) - B_rho(i,k,j)) * (P_rho(i,k,j) - B_rho(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_pii(i,k,j) - B_pii(i,k,j)) * (P_pii(i,k,j) - B_pii(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_dz8w(i,k,j) - B_dz8w(i,k,j)) * (P_dz8w(i,k,j) - B_dz8w(i,k,j)))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_rainnc(i,j) - B_rainnc(i,j)) * (P_rainnc(i,j) - B_rainnc(i,j)))
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_N = VAL_N + ((P_rainncv(i,j) - B_rainncv(i,j)) * (P_rainncv(i,j) - B_rainncv(i,j)))
+    ENDDO
+    ENDDO
+
+      VAL_L=SAVE_L*ALPHA_TST**2
+      IF (VAL_N .EQ. VAL_L) THEN
+        COEF_TST=1.0   ! handle case where VAL_N==VAL_L==0.0
+      ELSE
+        COEF_TST=VAL_N/VAL_L
+      ENDIF
+      WRITE(6, fmt='(3A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+         'lscond_tl from ',TRIM(caller),': ALPHA=',ALPHA_TST,'  COEF=',COEF_TST, &
+         '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+    ENDDO
+
+! ADJ test
+
+  FACTOR_TST = 0.1
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      th(i,k,j)=S_th(i,k,j)
+      P_th(i,k,j)=FACTOR_TST*S_th(i,k,j)
+      B_th(i,k,j)=P_th(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_p(i,k,j)=FACTOR_TST*S_p(i,k,j)
+      B_p(i,k,j)=P_p(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      qv(i,k,j)=S_qv(i,k,j)
+      P_qv(i,k,j)=FACTOR_TST*S_qv(i,k,j)
+      B_qv(i,k,j)=P_qv(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_rho(i,k,j)=FACTOR_TST*S_rho(i,k,j)
+      B_rho(i,k,j)=P_rho(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_pii(i,k,j)=FACTOR_TST*S_pii(i,k,j)
+      B_pii(i,k,j)=P_pii(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      P_dz8w(i,k,j)=FACTOR_TST*S_dz8w(i,k,j)
+      B_dz8w(i,k,j)=P_dz8w(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      rainnc(i,j)=S_rainnc(i,j)
+      P_rainnc(i,j)=FACTOR_TST*S_rainnc(i,j)
+      B_rainnc(i,j)=P_rainnc(i,j)
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      rainncv(i,j)=S_rainncv(i,j)
+      P_rainncv(i,j)=FACTOR_TST*S_rainncv(i,j)
+      B_rainncv(i,j)=P_rainncv(i,j)
+    ENDDO
+    ENDDO
+! TL
+
+  CALL g_lscond ( th,P_th,p,P_p,qv,P_qv,rho,P_rho,pii,P_pii,r_v,xlv,cp,ep2,svp1,svp2,svp3,svpt0,dz8w,P_dz8w, &
+  rainnc,P_rainnc,rainncv,P_rainncv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte  &
+  )
+
+    VAL_L=0.
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_th(i,k,j) * P_th(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_p(i,k,j) * P_p(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_qv(i,k,j) * P_qv(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_rho(i,k,j) * P_rho(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_pii(i,k,j) * P_pii(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_dz8w(i,k,j) * P_dz8w(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_rainnc(i,j) * P_rainnc(i,j))
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_L = VAL_L + (P_rainncv(i,j) * P_rainncv(i,j))
+    ENDDO
+    ENDDO
+!----------xzhang -----------
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      th(i,k,j)=S_th(i,k,j)
+      qv(i,k,j)=S_qv(i,k,j)
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      rainnc(i,j)=S_rainnc(i,j)
+      rainncv(i,j)=S_rainncv(i,j)
+    ENDDO
+    ENDDO
+!----------xzhang -----------
+
+
+! ADJ
+
+  CALL a_lscond ( th,P_th,p,P_p,qv,P_qv,rho,P_rho,pii,P_pii,r_v,xlv,cp,ep2,svp1,svp2,svp3,svpt0,dz8w,P_dz8w, &
+  rainnc,P_rainnc,rainncv,P_rainncv,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kte )
+
+    VAL_A=0.
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_th(i,k,j) * B_th(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_p(i,k,j) * B_p(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_qv(i,k,j) * B_qv(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_rho(i,k,j) * B_rho(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_pii(i,k,j) * B_pii(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO k = kts,kte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_dz8w(i,k,j) * B_dz8w(i,k,j))
+    ENDDO
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_rainnc(i,j) * B_rainnc(i,j))
+    ENDDO
+    ENDDO
+    DO j = jts,jte
+    DO i = its,ite
+      VAL_A = VAL_A + (P_rainncv(i,j) * B_rainncv(i,j))
+    ENDDO
+    ENDDO
+
+   WRITE(6,FMT='(3A,E22.13)') 'lscond_ad from ',TRIM(caller),' VAL_TL: ', VAL_L
+   WRITE(6,FMT='(3A,E22.13)') 'lscond_ad from ',TRIM(caller),' VAL_AD: ', VAL_A
+
+  END SUBROUTINE t_lscond
+
+!============================================================================================================
 
 END MODULE module_check

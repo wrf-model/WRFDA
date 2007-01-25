@@ -14,7 +14,6 @@ SUBROUTINE solve_interface_tst ( grid )
    INTERFACE
 #if (EM_CORE == 1 && DA_CORE != 1)
 # include  <solve_em_tst.int>
-# include  <test_solve_em.int>
 #endif
 #if (NMM_CORE == 1)
 # include  <solve_nmm.int>
@@ -56,9 +55,9 @@ SUBROUTINE solve_interface_tst ( grid )
 
 ! zz: test individual subroutines below solve_em -------------------------
 
-!    CALL solve_em_tst ( grid , config_flags , &
-!# include <em_actual_args.inc>
-!               )
+     CALL solve_em_tst ( grid , config_flags , &
+# include <em_actual_args.inc>
+                )
 
 ! zz ----------------------------------------------------------------------
 
@@ -117,3 +116,4 @@ SUBROUTINE solve_interface_tst ( grid )
 
 END SUBROUTINE solve_interface_tst
 
+# include  <test_solve_em.int>

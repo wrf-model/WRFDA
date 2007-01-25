@@ -40,14 +40,14 @@ MODULES =                 		\
 #	module_initialize_lsm_x.o  \
 #	module_initialize_squall2d_x.o  \
 #	module_initialize_squall2d_y.o 
-#	solve_em_tst.o          \
+#	test_solve_em.o          \
 
 OBJS    = 		        \
 	init_modules_em.o       \
 	solve_em.o              \
 	solve_em_ad.o           \
 	solve_em_tl.o           \
-	test_solve_em.o          \
+ 	solve_em_tst.o          \
         start_em.o              \
         couple_or_uncouple_em.o \
         nest_init_utils.o	\

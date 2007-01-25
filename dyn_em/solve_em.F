@@ -31,6 +31,7 @@ SUBROUTINE solve_em ( grid , config_flags , &
    USE module_cumulus_driver
    USE module_microphysics_driver
    USE module_pbl_driver
+   USE module_mp_nconvp    !Xiaoyan Zhang 11/20/2006 for Large Scale Condensation
 #ifdef WRF_CHEM
    USE module_input_chem_data
    USE module_chem_utilities
@@ -1043,6 +1044,25 @@ BENCH_START(rk_tend_tim)
                          grid%i_start(ij), grid%i_end(ij),                &
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
+!--------------------------------------------------------------------------
+!Xiaoyan Zhang---  add vertical diffusion here 12/06/2006  !
+
+  IF (rk_step == 1 ) then
+
+
+     CALL surface_drag (ru_tendf, rv_tendf, u_2, v_2, xland,             &
+                         muu, muv,z,z_at_w,&
+                         ids, ide, jds, jde, kds, kde,                    &
+                         ims, ime, jms, jme, kms, kme,                    &
+                         grid%i_start(ij), grid%i_end(ij),                &
+                         grid%j_start(ij), grid%j_end(ij),                &
+                         k_start, k_end                                  )
+
+  ENDIF
+
+!Xiaoyan Zhang--------------    End      ----------------------------------------
+!--------------------------------------------------------------------------
+
    END DO
    !$OMP END PARALLEL DO
 BENCH_END(rk_tend_tim)
@@ -2413,6 +2433,26 @@ BENCH_START(moist_physics_prep_tim)
                                    ims, ime, jms, jme, kms, kme,     &
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
+        
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!Xiaoyan Zhang Add Large-Scale Condensation call at 11/20/2006 !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        CALL lscond(t_2, p_phy                                         &
+                    ,moist_2(ims,kms,jms,P_QV)                         &
+                    ,rho, pi_phy,r_v, xlv, cp                          &
+                    ,ep_2, svp1, svp2                                  &
+                    ,svp3, svpt0                                       &
+                    ,dz8w                                              &
+                    ,rainnc, rainncv                                   &
+                    ,ids, ide, jds, jde, kds, kde                      &
+                    ,ims, ime, jms, jme, kms, kme                      &
+                    ,its, ite, jts, jte                                &
+                    ,k_start, min(k_end,kde-1)                         )
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 BENCH_END(moist_physics_prep_tim)
    END DO scalar_tile_loop_1a
    !$OMP END PARALLEL DO
@@ -2421,19 +2461,19 @@ BENCH_END(moist_physics_prep_tim)
 
 BENCH_START(micro_driver_tim)
        sr = 0.
-       CALL microphysics_driver(t_2,moist_2, moist_1, w_2,                  &
-                                rho, pi_phy, p_phy, RAINNC, RAINNCV,        &
-                                z, ht, dz8w, p8w, dtm, dx, dy,              &
-                                config_flags, spec_zone,                    &
-                                num_3d_m, warm_rain,                        &
-                                XLAND,itimestep,                            & 
-                                F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &
-                                LOWLYR,SR,                                  &
-                                ids, ide, jds, jde, kds, kde,               &
-                                ims, ime, jms, jme, kms, kme,               &
-                                grid%i_start, min(grid%i_end, ide-1),       &
-                                grid%j_start, min(grid%j_end, jde-1),       &
-                                k_start    , min(k_end,kde-1) , grid%num_tiles )
+!xzhang       CALL microphysics_driver(t_2,moist_2, moist_1, w_2,                  &
+!xzhang                                rho, pi_phy, p_phy, RAINNC, RAINNCV,        &
+!xzhang                               z, ht, dz8w, p8w, dtm, dx, dy,              &
+!xzhang                                config_flags, spec_zone,                    &
+!xzhang                                num_3d_m, warm_rain,                        &
+!xzhang                                XLAND,itimestep,                            & 
+!xzhang                                F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &
+!xzhang                                LOWLYR,SR,                                  &
+!xzhang                                ids, ide, jds, jde, kds, kde,               &
+!xzhang                                ims, ime, jms, jme, kms, kme,               &
+!xzhang                                grid%i_start, min(grid%i_end, ide-1),       &
+!xzhang                                grid%j_start, min(grid%j_end, jde-1),       &
+!xzhang                                k_start    , min(k_end,kde-1) , grid%num_tiles )
 BENCH_END(micro_driver_tim)
    endif
 
