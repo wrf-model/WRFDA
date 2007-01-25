@@ -1,5 +1,5 @@
 program gen_be_etkf
-!
+
 !---------------------------------------------------------------------- 
 !  Purpose : Perform an Ensemble Transform Kalman Filter (ETKF) rescaling
 !  of WRF ensemble forecast data.
@@ -64,11 +64,10 @@ program gen_be_etkf
    integer               :: dim_prod(1:max_num_dims)  ! Product of array dimensions.
 
    real (kind=4), allocatable     :: data_r(:,:,:)             ! Data array.
-   real (kind=4), allocatable     :: data_r_mean(:,:,:)        ! Data array mean.
 
    real, pointer         :: xf(:,:)                   ! Ensemble perturbations.
    real, pointer         :: xf_mean(:)                ! Ensemble perturbation mean.
-   real, pointer         :: xf_stdv(:)                ! Ensemble perturbation std. dev.
+   real, pointer         :: xf_vari(:)                ! Ensemble perturbation variance.
    real, pointer         :: y(:,:)                    ! H(xf).
    real, pointer         :: sigma_o2(:)               ! Ob error variance.
    real, pointer         :: yo(:)                     ! Observation.
@@ -138,6 +137,8 @@ program gen_be_etkf
          read(unit,'(3f17.7)')yo(o), y(o,member), sigma_o2(o)
 !        Convert yo-H(xb) to H(xb):
          y(o,member) = yo(o) - y(o,member)
+!        Convert ob error standard deviation to variance:
+         sigma_o2(o) = sigma_o2(o) * sigma_o2(o)
       end do
    end do
 
@@ -146,7 +147,7 @@ program gen_be_etkf
 !-----------------------------------------------------------------------------------------
 
 !  Open mean:
-   input_file = trim(filestub)//'.e000'
+   input_file = trim(filestub)
    length = len_trim(input_file)
    rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
 
@@ -208,7 +209,7 @@ program gen_be_etkf
 !-----------------------------------------------------------------------------------------
 
    allocate( xf(1:nijkv,1:num_members) )
-   allocate( xf_stdv(1:nijkv) )
+   allocate( xf_vari(1:nijkv) )
 
    do member = 1, num_members
       write(UNIT=ce,FMT='(i3.3)')member
@@ -241,22 +242,15 @@ program gen_be_etkf
 !  Convert ensemble forecasts to perturbations:
    do ijkv = 1, nijkv
       xf(ijkv,1:num_members) = xf(ijkv,1:num_members) - xf_mean(ijkv)
-      xf_stdv(ijkv) = sqrt(sum(xf(ijkv,1:num_members)**2)) * num_members_inv
+      xf_vari(ijkv) = sum(xf(ijkv,1:num_members)**2) * num_members_inv
    end do
 
-!  Output prior mean, ensemble standard deviation:
+!  Print prior mean, ensemble standard deviation:
    do v = 1, nv
       iend = istart(v) + product(dims(v,1:ndims(v)-1)) - 1
-      output_file = trim(cv(v))//'.prior.stdv'
-      open(unit, file = output_file, form='unformatted')
-      write(unit)dims(v,1), dims(v,2), dims(v,3)
-      write(unit)xf_stdv(istart(v):iend)
-      close(unit)
-      output_file = trim(cv(v))//'.prior.mean'
-      open(unit, file = output_file, form='unformatted')
-      write(unit)dims(v,1), dims(v,2), dims(v,3)
-      write(unit)xf_mean(istart(v):iend)
-      close(unit)
+      write(stdout,'(i4,1x,a10,2f15.5)')v, cv(v), &
+      sum(xf_mean(istart(v):iend)) / real(iend - istart(v) + 1), &
+      sqrt(sum(xf_vari(istart(v):iend)) / real(iend - istart(v) + 1))
    end do
 
 !-----------------------------------------------------------------------------------------
@@ -269,29 +263,33 @@ program gen_be_etkf
 
 !  Calculate posterior ensemble standard deviation and output:
    do ijkv = 1, nijkv
-      xf_stdv(ijkv) = sqrt(sum(xf(ijkv,1:num_members)**2)) * num_members_inv
+      xf_vari(ijkv) = sum(xf(ijkv,1:num_members)**2) * num_members_inv
    end do
 
+!  Print posterior mean, ensemble standard deviation:
    do v = 1, nv
       iend = istart(v) + product(dims(v,1:ndims(v)-1)) - 1
-      output_file = trim(cv(v))//'.posterior.stdv'
-      open(unit, file = output_file, form='unformatted')
-      write(unit)dims(v,1), dims(v,2), dims(v,3)
-      write(unit)xf_stdv(istart(v):iend)
-      close(unit)
+      write(stdout,'(i4,1x,a10,2f15.5)')v, cv(v), &
+      sum(xf_mean(istart(v):iend)) / real(iend - istart(v) + 1), &
+      sqrt(sum(xf_vari(istart(v):iend)) / real(iend - istart(v) + 1))
    end do
 
 !-----------------------------------------------------------------------------------------
-   write(stdout,'(/a)')' [7] Output EnSRF analysis ensemble:'
+   write(stdout,'(/a)')' [7] Output ETKF analysis ensemble:'
 !-----------------------------------------------------------------------------------------
 
    do member = 1, num_members
       write(UNIT=ce,FMT='(i3.3)')member
 
 !     Open file:
-      input_file = trim(filestub)//'a.e'//ce
+      input_file = 'analysis.e'//ce
       length = len_trim(input_file)
       rcode = nf_open( input_file(1:length), NF_WRITE, cdfid )
+      if ( rcode /= 0 ) then
+         write(UNIT=message(1),FMT='(A,A)') &
+            ' Error opening netcdf file ', input_file(1:length)
+         call da_error(__FILE__,__LINE__,message(1:1))
+      end if
 
       do v = 1, nv
          allocate( data_r(dims(v,1),dims(v,2),dims(v,3)))
@@ -306,9 +304,8 @@ program gen_be_etkf
                end do
             end do
          end do
-
          call ncvpt( cdfid, id_var(v), one, dims(v,:), data_r, rcode)
-
+         deallocate( data_r )
       end do ! v
       rcode = nf_close( cdfid )
    end do !member

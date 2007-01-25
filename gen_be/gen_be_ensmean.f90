@@ -101,6 +101,7 @@ program gen_be_ensmean
          input_file = trim(filestub)//'.e'//ce  
          length = len_trim(input_file)
          rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
+
          if ( member == 1 ) then
 !           Get variable ID:
             rcode = nf_inq_varid ( cdfid, var, id_var )
