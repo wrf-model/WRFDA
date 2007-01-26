@@ -1554,6 +1554,7 @@ rconfig   integer   tovs_min_transfer     namelist,record14        1            
 rconfig   integer   tovs_max_transfer     namelist,record14        1              10           -   "tovs_max_transfer" "Maximum number of tovs in a transfer" "n/a"
 rconfig   logical   tovs_use_array        namelist,record14        1              .false.      -   "tovs_use_array" "TBD"              "TBD"
 rconfig   integer   rtm_option            namelist,record14        1              1            -   "TBD"             "TBD"              "TBD"
+rconfig   logical   crtm_cloud      namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   use_crtm_kmatrix      namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 rconfig   logical   use_crtm_kmatrix_fast  namelist,record14        1              .false.      -   "TBD"              "TBD"              "TBD"
 #rconfig   character spccoeff_file         namelist,record14        1  "CRTM_SpcCoeff.bin"      -   "TBD"             "TBD"              "TBD"
