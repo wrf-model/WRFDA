@@ -132,8 +132,11 @@ subroutine da_transform_xtoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
    if (rtm_option == 1) then
+#ifdef RTTOV
       call da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
+#endif
    elseif (rtm_option == 2) then
+#ifdef CRTM
      if (use_crtm_kmatrix) then
        call da_transform_xtoy_rad_crtmk_adj ( iv, xp, jo_grad_y, jo_grad_x )
      else if (use_crtm_kmatrix_fast) then
@@ -141,6 +144,7 @@ subroutine da_transform_xtoy_adj( xb, iv, xp, jo_grad_y, jo_grad_x )
      else
        call da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
      end if
+#endif
    else
       write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_transform_xtoy_adj'
    endif

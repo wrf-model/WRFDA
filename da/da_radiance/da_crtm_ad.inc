@@ -1,3 +1,4 @@
+#ifdef CRTM
 subroutine da_crtm_ad(  nchan, Atmosphere,   &
                             Surface,      &
                             RTSolution_AD, &
@@ -38,3 +39,4 @@ subroutine da_crtm_ad(  nchan, Atmosphere,   &
    if (trace_use) call da_trace_exit("da_crtm_ad")
 
 end subroutine da_crtm_ad
+#endif
