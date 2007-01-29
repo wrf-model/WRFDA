@@ -32,13 +32,18 @@ module da_radiance
 
 #ifdef CRTM
   ! -- Modules to define CRTM constants etc.
-   USE CRTM_Parameters
-   !USE Type_Kinds
-   !USE Error_Handler
-   !USE CRTM_Utility
+   USE CRTM_Parameters, only : INVALID_WMO_SENSOR_ID
 
   ! -- CRTM RT_models modules
-   USE CRTM_Module   ! include 12 modules
+   USE CRTM_Module, only : graupel_cloud, rain_cloud, snow_cloud,crtm_adjoint, &
+      crtm_allocate_atmosphere, crtm_allocate_surface, crtm_assign_atmosphere, &
+      crtm_assign_surface,crtm_destroy_atmosphere,crtm_destroy_surface, &
+      crtm_forward,crtm_init,crtm_k_matrix,crtm_set_channelinfo, &
+      crtm_tangent_linear, grass_soil, h2o_id,hail_cloud,ice_cloud,new_snow, &
+      o3_id, water_cloud, crtm_rtsolution_type, crtm_channelinfo_type, &
+      crtm_atmosphere_type, crtm_surface_type, crtm_geometryinfo_type, &
+      crtm_zero_surface, crtm_zero_atmosphere   ! include 12 modules
+
    USE CRTM_SensorInfo
 #endif
 
