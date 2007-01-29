@@ -15,9 +15,9 @@ export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
 export POE=false
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
-export PLATFORM=`uname`
-export HOSTNAME=`hostname`
+export SUBMIT=${SUBMIT:-LSF}
 export NUM_PROCS=${NUM_PROCS:-1}
+export HOSTS=${HOSTS:-$HOME/hosts}
 
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
@@ -26,14 +26,11 @@ export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
 export LL_PTILE=${LL_PTILE:-8}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
-export HOSTS=${HOSTS:-$PWD/hosts}
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
-   # bluesky uses loadleveller
-
+if test $SUBMIT = "LoadLeveller"; then 
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
    let NODES=$TEMP/8+1
@@ -64,11 +61,7 @@ $SUBMIT_OPTIONS3
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-   -o $HOSTNAME = "bv1103en.ucar.edu" \
-   -o $HOSTNAME = "bv1203en.ucar.edu" ; then 
-   # lightning and bluesky use lsf
-
+elif test $SUBMIT = "LSF"; then 
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -94,27 +87,16 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
-elif test $HOSTNAME = willow -o $HOSTNAME = hazel -o $HOSTNAME = goldenrain ; then
+elif test $SUBMIT = none; then
+   if test -f $HOSTS; then
+      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
+   else
+      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local"
+   fi
    cat > job.ksh <<EOF
 #!/bin/ksh
 # Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT=" "
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
-EOF
-elif test $HOSTNAME = ocotillo -o $HOSTNAME = snowdrift ; then
-   cat > job.ksh <<EOF
-#!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
-export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-$SCRIPT > $EXP_DIR/index.html 2>&1
-EOF
-else
-   cat > job.ksh <<EOF
-#!/bin/ksh
-# Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local -machinefile $HOSTS"
+export RUN_CMD_DEFAULT="$RUN_CMD_DEFAULT"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
@@ -139,14 +121,10 @@ EOF
 chmod +x job.ksh
 
 echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
-if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then 
+if test $SUBMIT = "LoadLeveller"; then 
    llsubmit job.ksh
-elif test $HOSTNAME = "ln0126en" -o $HOSTNAME = "ln0127en" \
-     -o $HOSTNAME = "bv1103en.ucar.edu" \
-     -o $HOSTNAME = "bv1203en.ucar.edu"; then 
+elif test $SUBMIT = "LSF"; then 
    bsub -q $QUEUE -n $NUM_PROCS < $PWD/job.ksh
-elif test $HOSTNAME = ocotillo; then
-   ./job.ksh
 else
    ./job.ksh
 fi

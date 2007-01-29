@@ -66,7 +66,11 @@ export EXPT=${EXPT:-test}                              # Experiment name.
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export HOSTS=${HOSTS:-${HOME}/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
+fi
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).

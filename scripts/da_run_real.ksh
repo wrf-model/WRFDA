@@ -22,7 +22,11 @@ export EXPT=${EXPT:-test}
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
+fi
 export CLEAN=${CLEAN:-false}
 
 # Directories:

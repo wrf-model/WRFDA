@@ -1,8 +1,12 @@
 #!/bin/ksh
 DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
-export HOSTS=${HOSTS:-$PWD/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+export HOSTS=${HOSTS:-$HOME/hosts}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
+fi
 
 #-----------------------------------------------------------------------
 # [1.0] Specify default environment variables:
@@ -26,7 +30,6 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXPT=${EXPT:-test}
 export DOMAIN=${DOMAIN:-01}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
-export HOSTS=${HOSTS:-$DAT_DIR/hosts/$HOSTNAME.hosts}
 
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfvar}

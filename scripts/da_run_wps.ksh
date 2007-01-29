@@ -15,7 +15,12 @@ export DUMMY=${DUMMY:-false}
 export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}
 export EXPT=${EXPT:-test}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+export HOSTS=${HOSTS:-$HOME/hosts}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
+fi
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
 
