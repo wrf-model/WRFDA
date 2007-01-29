@@ -1,4 +1,4 @@
-subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
+subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
 
    !-----------------------------------------------------------------------
    ! Purpose: ETKF perturbation updates 
@@ -28,6 +28,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
    implicit none
 
+ character (len=*), intent(in) :: directory
  integer, intent(in) :: nanals,ndim,nobs
  real, intent(inout), dimension(ndim,nanals) :: ens
  real, intent(inout), dimension(nobs,nanals) :: ens_ob
@@ -62,22 +63,22 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  real :: proj2, proj2sum, proj2sum1
  real :: squareinnosum, squareinno, squareinnosum1
 
- filename_factor = "factor.dat"
- filename_eignv = "eignv.dat"
- filename_inno2 = "inno2.dat"
- filename_proj2 = "proj2.dat"
+ filename_factor = trim(directory)//"/factor.dat"
+ filename_eignv =  trim(directory)//"/eignv.dat"
+ filename_inno2 =  trim(directory)//"/inno2.dat"
+ filename_proj2 =  trim(directory)//"/proj2.dat"
 
 ! open file for output factors ainflat, tainflat, rho 
-  open(109,form="unformatted",file=filename_factor,access="direct",recl=4)
+  open(109,form="unformatted",file=filename_factor,access="direct",recl=8)
  
 ! open file for output eigenvalues  
-  open(119,form="unformatted",file=filename_eignv,access="direct",recl=4*nanals)
+  open(119,form="unformatted",file=filename_eignv,access="direct",recl=8*nanals)
  
 ! open file for    
-  open(99,form="unformatted",file=filename_inno2,access="direct",recl=4)
+  open(99,form="unformatted",file=filename_inno2,access="direct",recl=8)
 
 ! open file for    
-  open(89,form="unformatted",file=filename_proj2,access="direct",recl=4)
+  open(89,form="unformatted",file=filename_proj2,access="direct",recl=8)
 
 !------------- compute ensemble mean.
 ! do ij=1,ndim
@@ -118,7 +119,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
     eignv(i) = eignv1(nanals-i+1)
  end do
 
-!!!DALE  write(119,rec=nout) eignv 
+ write(119,rec=nout) eignv 
 
 ! note eigenvectors output from SSYEV are stored in columns !!!
  do i = 1, nanals
@@ -139,7 +140,7 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
     squareinno = squareinno + obsinc(i)*obsinc(i)/oberrvar(i)   
  end do
 
-!!!DALE write(99,rec=nout) squareinno 
+ write(99,rec=nout) squareinno 
  
  write (unit=stdout,fmt=*)  "nout=", nout
 
@@ -176,8 +177,11 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 !   this is for pre-specified inflation factor
     tainflat = tainflatinput
     write (unit=stdout,fmt=*)  "tainflat=", tainflat
-!!!DALE    write(109, rec=(nout-1)*3+2) tainflat
+    write(109, rec=(nout-1)*3+1) ainflat
+    write(109, rec=(nout-1)*3+2) tainflat
  end if
+ write (unit=stdout,fmt=*)  "ainflat=", ainflat
+ write (unit=stdout,fmt=*)  "tainflat=", tainflat
 
 !--------------- calculate the rho factor following Wang et al 2006
  if (naccumt2 .gt. 0) then
