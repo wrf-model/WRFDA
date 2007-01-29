@@ -9,6 +9,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
 ! ---------------------------------------------------------------------------
 
    integer :: i, j, kz, is, js, ie, je
+   real    :: height
 ! ---------------------------------------------------------------------------
 
    kz = xp%kts
@@ -41,6 +42,12 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
    do j=js, je
    do i=is, ie
       jo_grad_x%tgrn(i,j)=0.0
+
+! Use the height above the ground instead of the height above the sea surface
+! YRG 01/29/2007:
+
+      height = xb%h(i,j,kz) - xb%terr(i,j)
+
       call sfc_wtq_Adj(xb%psfc(i,j), xb%tgrn(i,j), &
                        xb%p(i,j,kz), xb%t(i,j,kz), xb%q(i,j,kz), &
                        xb%u(i,j,kz), xb%v(i,j,kz), &
@@ -48,7 +55,7 @@ Subroutine DA_Transform_XToWTQ_adj ( xp, xb, jo_grad_x )
                        jo_grad_x%psfc(i,j), jo_grad_x%tgrn(i,j), &
                        jo_grad_x%p(i,j,kz), jo_grad_x%t(i,j,kz), jo_grad_x%q(i,j,kz), &
                        jo_grad_x%u(i,j,kz), jo_grad_x%v(i,j,kz), &
-                       xb%h(i,j,kz), xb%rough(i,j), xb%xland(i,j), &
+                       height             , xb%rough(i,j), xb%xland(i,j), &
                        jo_grad_x%u10(i,j),jo_grad_x%v10(i,j), &
                        jo_grad_x%t2 (i,j),jo_grad_x%q2 (i,j))
     

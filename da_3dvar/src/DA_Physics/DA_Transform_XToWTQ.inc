@@ -7,6 +7,7 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
    TYPE (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
 
    integer                      :: i, j, kz
+   real                         :: height
 
 ! --------------------------------------------------------------------------
 !  [1.0] Calculate surface variable(1-m wind, 2-m moisture and temperature)
@@ -22,6 +23,11 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
    do i=xp%its, xp%ite
       xa%tgrn(i,j) = 0.0
 
+! Use the height above the ground instead of the height above the sea surface:
+! YRG 01/29/2007:
+
+      height = xb%h(i,j,kz) - xb%terr(i,j)
+
       call sfc_wtq_Lin(xb%psfc(i,j), xb%tgrn(i,j), &
                        xb%p(i,j,kz), xb%t(i,j,kz), xb%q(i,j,kz), &
                        xb%u(i,j,kz), xb%v(i,j,kz), &
@@ -29,7 +35,7 @@ Subroutine DA_Transform_XToWTQ ( xp, xb, xa )
                        xa%psfc(i,j), xa%tgrn(i,j), &
                        xa%p(i,j,kz), xa%t(i,j,kz), xa%q(i,j,kz), &
                        xa%u(i,j,kz), xa%v(i,j,kz), &
-                       xb%h(i,j,kz), xb%rough(i,j), xb%xland(i,j), &
+                       height      , xb%rough(i,j), xb%xland(i,j), &
                        xa%u10(i,j), xa%v10(i,j), &
                        xa%t2(i,j),  xa%q2(i,j))
    enddo

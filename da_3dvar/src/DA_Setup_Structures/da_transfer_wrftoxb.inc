@@ -51,7 +51,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
    real, dimension(xp%kms:xp%kme) :: DDT
 !------------------------------------------------------------------------------
 
-   REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
+   REAL   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln, height
 
 !---------------------------------------------------------------------------
 !--Set xb array range indices for processor subdomain.
@@ -394,7 +394,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
        xb%psfc(i,j) = mub(i,j)+p(i,j,ks)+grid%p_top
 
        if(xb%tgrn(i,j) < 100.0) &
-          xb%tgrn(i,j) = xb%t(i,j,ks)+0.0065*(xb%h(i,j,ks+1)-xb%hf(i,j,ks))
+          xb%tgrn(i,j) = xb%t(i,j,ks)+0.0065*(xb%h(i,j,ks)-xb%hf(i,j,ks))
      enddo
    enddo
 
@@ -504,6 +504,11 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
       xb % grid_box_area(i,j) = tmpvar*tmpvar
 
+! Use the height above the ground instead of the height above the sea surface.
+! YRG 01/29/2007:
+
+      height = xb%h(i,j,ks) - xb%terr(i,j)
+
 !-----Calculate surface variable(wind, moisture, temperature)
 !-----sfc variables: 10-m wind, and 2-m T, Q, at cross points
 
@@ -511,7 +516,7 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
                    xb%p(i,j,ks), xb%t(i,j,ks), xb%q(i,j,ks), &
                    xb%u(i,j,ks), xb%v(i,j,ks), &
                    xb%p(i,j,ks+1), xb%t(i,j,ks+1), xb%q(i,j,ks+1), &
-                   xb%h(i,j,ks), xb%rough(i,j),xb%xland(i,j), &
+                   height, xb%rough(i,j),xb%xland(i,j), &
                    xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
                    xb%regime(i,j))
    enddo

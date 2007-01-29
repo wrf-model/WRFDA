@@ -1,0 +1,52 @@
+Change Log for update to WRF-Var (RB_V21) code
+---------------------------------------
+
+Author  : Yong-Run Guo
+Reviewer: 
+Date: 01/29/2007
+
+Reason for changes 
+-------------------
+
+1, Bug fix for U10, V10, T2, and Q2 calculation with the negative height
+   (e.g. below sea surface)
+
+2, bug fix in BE tuning utility:
+
+   wrfvar_2.1/da_3dvar/utl/daprog_diagnostics.f90
+
+Files removed:
+--------------
+None
+
+Files added:
+------------
+
+    wrfvar/da_3dvar/changes/change_20070129.yrg
+
+Files modified:
+---------------
+
+   wrfvar_2.1/da_3dvar/utl/daprog_diagnostics.f90
+
+   wrfvar_2.1/da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
+   wrfvar_2.1/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ.inc
+   wrfvar_2.1/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ_Adj.inc
+
+Expected Differences
+--------------------
+
+
+Accuracy: 
+
+CPU:
+
+No changes are expected.
+
+memory:
+
+No changes are expected.
+
+Test results (run on mac machines?)
+------------------------------------------------------
+
