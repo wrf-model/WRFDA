@@ -1,4 +1,4 @@
-subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
+subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
 
    !-----------------------------------------------------------------------
    ! Purpose: ETKF perturbation updates 
@@ -28,16 +28,20 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
 
    implicit none
 
- integer, intent(in) :: nanals,ndim,nobs
- real, intent(inout), dimension(ndim,nanals) :: ens
- real, intent(inout), dimension(nobs,nanals) :: ens_ob
- real, intent(in), dimension(nobs) :: oberrvar
- real, intent(in), dimension(nobs) :: obs
- real, intent(in) :: tainflatinput,rhoinput
- integer, intent(in) :: nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2
+   character (len=*), intent(in) :: directory
+   integer, intent(in) :: nanals,ndim,nobs
+   real, intent(inout), dimension(ndim,nanals) :: ens
+   real, intent(inout), dimension(nobs,nanals) :: ens_ob
+   real, intent(in), dimension(nobs) :: oberrvar
+   real, intent(in), dimension(nobs) :: obs
+   real, intent(in) :: tainflatinput,rhoinput
+   integer, intent(in) :: nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2
 
+   integer                :: n                          ! Loop counters.
+   integer                :: nmin                       ! Minimum nout value to use.
+   real                   :: nanals_inv                 ! 1 / nanals.
+   real                   :: ainflat_mean               ! Rolling mean inflation factor.
 
- real, dimension(ndim) :: ensmean
  real, dimension(nobs) :: ensmean_ob
  real, dimension(nobs) :: obsinc
  integer :: ij, nanal, nt, i, j, k               ! Loop counters.
@@ -62,236 +66,112 @@ subroutine da_solve_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,
  real :: proj2, proj2sum, proj2sum1
  real :: squareinnosum, squareinno, squareinnosum1
 
- filename_factor = "factor.dat"
- filename_eignv = "eignv.dat"
- filename_inno2 = "inno2.dat"
- filename_proj2 = "proj2.dat"
-
-! open file for output factors ainflat, tainflat, rho 
-  open(109,form="unformatted",file=filename_factor,access="direct",recl=4)
+   filename_factor = trim(directory)//"/inflation_factor.dat"
+   open(109,form="unformatted",file=filename_factor,access="direct",recl=8)
  
-! open file for output eigenvalues  
-  open(119,form="unformatted",file=filename_eignv,access="direct",recl=4*nanals)
- 
-! open file for    
-  open(99,form="unformatted",file=filename_inno2,access="direct",recl=4)
+!------------------------------------------------------------------------------
+!  [1] Compute mean(H(xf)) and H(xf)'.
+!------------------------------------------------------------------------------
 
-! open file for    
-  open(89,form="unformatted",file=filename_proj2,access="direct",recl=4)
-
- call cpu_time(ta)
-
-!------------- compute ensemble mean.
- do ij=1,ndim
-    ensmean(ij) = sum(ens(ij,:))/float(nanals)
- end do
-
- do ij=1,nobs
-    ensmean_ob(ij) = sum(ens_ob(ij,:))/float(nanals)
- end do
-
-!------------- remove ens mean to get ensemble perturbations
-
- do nanal=1,nanals
-    ens(:,nanal) = ens(:,nanal)-ensmean(:)
-    ens_ob(:,nanal) = ens_ob(:,nanal)-ensmean_ob(:)
- end do
-
-!------------- calculate HZTHZ in Bishop et al. 2001
- do i = 1, nobs
- enspert_ob_tmp(i,:) = ens_ob(i,:)/sqrt(oberrvar(i))
- end do
-
- call da_innerprod(enspert_ob_tmp,hzthz,nobs,nanals) 
- hzthz = hzthz/float(nanals-1)
-
-!------------- calculate C and Gamma in Bishop et al. 2001
-! in outputs, hzthz contains C, eignv contains gamma  
- call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, workt, -1, info)
- lwork = int(workt(1))
- allocate (work(lwork))
- call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, work, lwork, info)
- deallocate(work)
-
-! note eignv1 output from SSYEV is in ascending order !!!
-! re-order both eigenvalues and eigenvectors first
-
- do i = 1, nanals
- eignv(i) = eignv1(nanals-i+1)
- end do
-
- write(119,rec=nout) eignv 
-
-
-! note eigenvectors output from SSYEV are stored in columns !!!
- do i = 1, nanals
- C(:,i) = hzthz(:,nanals-i+1)
- end do
-
-
-!------------ calculate the inflation factor used to inflate the ETKF initial perts by ainflat = (obsinc*obsinc/oberrvar-nobs)/trace(pfht_ob/oberrvar), tainflate = ainflate1*ainflat2*.... in Wang and Bishop 2003
-
- tracehpfht = 0.
- do i = 1, nanals-1
- tracehpfht = tracehpfht + eignv(i)
- end do
-
- obsinc = ensmean_ob - obs
-
- squareinno = 0.
- do i = 1, nobs
- squareinno = squareinno + obsinc(i)*obsinc(i)/oberrvar(i)   
- end do
-
- write(99,rec=nout) squareinno 
- 
- write (unit=stdout,fmt=*)  "nout=", nout
-
- if (naccumt1 .gt. 0) then
- squareinnosum = squareinno
-
- if (nout.ge.nstartaccum1) then
- write (unit=stdout,fmt=*)  "OK"
- squareinnosum = 0.
- do nt = nout-naccumt1+1, nout 
- read(99,rec=nt) squareinnosum1
- squareinnosum = squareinnosum + squareinnosum1/float(naccumt1)
- end do
- end if
-
-
- ainflat = (squareinnosum-float(nobs))/tracehpfht
- if (ainflat .le. 0) then
- ainflat = 1.
- end if
-
- if (nout .le. nstartaccum1) then
- tainflat = ainflat
- end if
-
- if (nout .gt. nstartaccum1) then
- read(109, rec=(nout-2)*3+2) tainflat
- tainflat = tainflat*ainflat
- end if
-
- write(109, rec=(nout-1)*3+1) ainflat
- write(109, rec=(nout-1)*3+2) tainflat
-
-
- else
-! this is for pre-specified inflation factor
- tainflat = tainflatinput
- write (unit=stdout,fmt=*)  "tainflat=", tainflat
- write(109, rec=(nout-1)*3+2) tainflat
- end if
-
-
-!--------------- calculate the rho factor following Wang et al 2006
- if (naccumt2 .gt. 0) then
-! calculate E, the ensemble subspace eign vectors in Bishop et al. (2001)
-! E=R(-1/2)HZCgamma^(-1/2)
-
- do i = 1, nanals 
-   do j = 1, nanals-1
-       cgamma(i,j) = C(i,j)*sqrt(1./eignv(j)) 
+   nanals_inv = 1.0 / real(nanals)
+   do ij = 1, nobs
+      ensmean_ob(ij) = sum(ens_ob(ij,:)) * nanals_inv
    end do
- end do
 
-! R(-1/2)HZ
- do i = 1, nobs
- enspert_ob_tmp(i,:) = ens_ob(i,:)/sqrt(oberrvar(i))/sqrt(float(nanals-1))
- end do
+   do nanal = 1, nanals
+      ens_ob(:,nanal) = ens_ob(:,nanal) - ensmean_ob(:)
+   end do
 
- call da_matmulti(enspert_ob_tmp,cgamma,E,nobs,nanals-1,nanals) 
+!------------------------------------------------------------------------------
+!  [2] Calculate HZTHZ in Bishop et al. 2001
+!------------------------------------------------------------------------------
 
-! project normalized (divided by oberrstdev) innovation vector onto E
-  proj = 0.
-  do i = 1, nanals-1 
-     do k = 1, nobs 
-     proj(i) = proj(i) + obsinc(k)/sqrt(oberrvar(k))*E(k,i) 
-     end do
-  end do
+   do i = 1, nobs
+      enspert_ob_tmp(i,:) = ens_ob(i,:)/sqrt(oberrvar(i))
+   end do
 
-! get rho = (sum(proj*proj)-dim. of proj))/(normalized innovation^2-nobs)  
-! since nanals is relatively small, need follow wang et al (2006) for accumulation
-! relative error = sqrt(2/(dim of proj)) = e.g., sqrt(2/207)=10%
-! e.g., 50mem 2wks = sqrt(2/(14*49)) = 5% = e.g. 3wks sqrt(2/(21*49))=4%
+   call da_innerprod(enspert_ob_tmp,hzthz,nobs,nanals) 
+   hzthz = hzthz/float(nanals-1)
 
-  proj2 = sum(proj*proj)
+!------------------------------------------------------------------------------
+!  [3] Calculate C and Gamma in Bishop et al. 2001
+!------------------------------------------------------------------------------
+!  in outputs, hzthz contains C, eignv contains gamma  
+   call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, workt, -1, info)
+   lwork = int(workt(1))
+   allocate (work(lwork))
+   call dsyev('V', 'L', nanals , hzthz, nanals, eignv1, work, lwork, info)
+   deallocate(work)
 
-  write(89,rec=nout) proj2
+!  note eignv1 output from SSYEV is in ascending order !!!
+!  re-order both eigenvalues and eigenvectors first
 
-  proj2sum = proj2
+   do i = 1, nanals
+      eignv(i) = eignv1(nanals-i+1)
+   end do
 
-  if (nout .ge. nstartaccum2) then 
-  proj2sum = 0.
-  do nt = nout-naccumt2+1,nout
-  read(89,rec=nt) proj2sum1
-  proj2sum = proj2sum + proj2sum1/float(naccumt2)
-  end do
-  end if
+!  note eigenvectors output from SSYEV are stored in columns !!!
+   do i = 1, nanals
+      C(:,i) = hzthz(:,nanals-i+1)
+   end do
 
-  squareinnosum = squareinno
+!------------------------------------------------------------------------------
+!  [4] Calculate inflation factor:
+!------------------------------------------------------------------------------
 
-  if (nout.ge.nstartaccum2) then
+   if ( naccumt1 > 0 ) then
 
-  write (unit=stdout,fmt=*)  "OK"
-  squareinnosum = 0.
-  do nt = nout-naccumt2+1, nout 
-  read(99,rec=nt) squareinnosum1
-  squareinnosum = squareinnosum + squareinnosum1/float(naccumt2)
-  end do
-  end if
+      tracehpfht = 0.0
+      do i = 1, nanals-1
+         tracehpfht = tracehpfht + eignv(i)
+      end do
 
+      obsinc(:) = ensmean_ob(:) - obs(:)
+      squareinno = sum( obsinc(:) * obsinc(:) / oberrvar(:) )
+      ainflat = ( squareinno - real(nobs) ) / tracehpfht
+      write(109,rec=nout) ainflat
 
-  rho = (proj2sum-(float(nanals-1)))/(squareinnosum-float(nobs))
-  if (rho .le. 0) then
-  rho = 1.
-  end if
+!     Calculate running mean inflation factor:
+      nmin = max( 1, nout - naccumt1 + 1 )
+      ainflat_mean = 0.0
+      do n = nmin, nout
+         read(109,rec=n) ainflat
+         ainflat_mean = ainflat_mean + ainflat
+      end do
+      ainflat_mean = ainflat_mean / real( nout - nmin + 1 )
+      write (unit=stdout,fmt='(a,i6,2f15.5)')  "nout, ainflat, ainflat_mean = ", &
+                                            nout, ainflat, ainflat_mean
+    else
+!      This is for pre-specified inflation factor
+       ainflat = tainflatinput
+    end if
 
-  write(109, rec=(nout-1)*3+3) rho
- else if (naccumt2 .lt. 0.) then
-! this is for the old formulation of ETKF in Bishop et al 2001 and Wang and Bishop 2003
-  rho = 1.
- else
-! this if for pre-specified rho factor
-  rho = rhoinput
- end if
+!------------------------------------------------------------------------------
+!  [5] Calculate the grand transformation matrix:
+!------------------------------------------------------------------------------
 
-
-!----------- calculate the grand transformation matrix following Wang et al 2006
-! TR = C*(rho*gamma+I)^(-1/2)*C^T
-  do i = 1, nanals
-    do j = 1, nanals-1
-       T(i,j) = C(i,j)*sqrt(1./(rho*eignv(j)+1.)) 
-    end do
-  end do
+   do i = 1, nanals
+      do j = 1, nanals-1
+         T(i,j) = C(i,j)*sqrt(1./(eignv(j)+1.)) 
+      end do
+   end do
  
-  do i = 1, nanals-1
-    do j = 1, nanals 
-      CT(i,j) = C(j,i) 
-    end do
-  end do
+   do i = 1, nanals-1
+      do j = 1, nanals 
+         CT(i,j) = C(j,i) 
+      end do
+   end do
 
-  call da_matmulti(T,CT,TR,nanals,nanals,nanals-1) 
-! apply ainflat
-  TR = sqrt(tainflat)*TR  
+   call da_matmulti(T,CT,TR,nanals,nanals,nanals-1) 
+
+!  Apply inflation:
+   tr = sqrt(ainflat_mean) * tr
   
-  sum_eignv = 0.
-  aftersum_eignv = 0.
-  do i = 1, nanals
-  sum_eignv = sum_eignv + eignv(i)
-  aftersum_eignv = aftersum_eignv + eignv(i)/(eignv(i)*rho+1.)
-  end do
- 
-!---------------- calculate the ETKF initial perturbations
-  call da_matmultiover(ens,TR,ndim,nanals)
+!------------------------------------------------------------------------------
+!  [4] Calculate the ETKF initial perturbations
+!------------------------------------------------------------------------------
 
-!---------------- calculate the ETKF initial perturbations
-
- call cpu_time(tb)
- write (unit=stdout,fmt=*)  "total cpu time =", tb-ta
+   call da_matmultiover(ens, tr, ndim, nanals)
 
 end subroutine da_solve_etkf
-
 
