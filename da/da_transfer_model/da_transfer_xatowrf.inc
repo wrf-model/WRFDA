@@ -1,4 +1,4 @@
-subroutine da_transfer_xatowrf(xbx, grid)
+subroutine da_transfer_xatowrf(grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysis increments into WRF increments
@@ -6,7 +6,6 @@ subroutine da_transfer_xatowrf(xbx, grid)
 
    implicit none
    
-   type (xbx_type), intent(inout)     :: xbx     ! Header & non-gridded vars.
    type(domain), intent(inout)        :: grid
 
    integer :: i, j, k

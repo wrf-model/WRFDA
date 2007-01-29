@@ -1,4 +1,4 @@
-subroutine da_transfer_xatokma(xbx, grid)
+subroutine da_transfer_xatokma(grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysis increments into KMA increments 
@@ -6,7 +6,6 @@ subroutine da_transfer_xatokma(xbx, grid)
 
    implicit none
    
-   type (xbx_type), intent(inout) :: xbx       ! Header & non-gridded vars.
    type(domain),    intent(inout) :: grid
 
    integer :: i, j, k

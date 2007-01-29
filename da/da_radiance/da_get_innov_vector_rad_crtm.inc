@@ -56,6 +56,9 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 #endif
 !---------------------------------------------------------
 
+   !JRB use argument it
+   if (it==0) then; print *,"why have argument it to"//__FILE__; end if
+
    alloc_status (:) = 0
 
    IF ( iv%num_inst < 1 ) return

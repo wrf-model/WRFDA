@@ -20,11 +20,11 @@ subroutine da_residual_sonde_sfc(oi, y, re,                        &
 
    if (oi%num_sound < 1) return
 
-   n_obs_bad % u % num = number(0, 0, 0)
-   n_obs_bad % v % num = number(0, 0, 0)
-   n_obs_bad % t % num = number(0, 0, 0)
-   n_obs_bad % p % num = number(0, 0, 0)
-   n_obs_bad % q % num = number(0, 0, 0)
+   n_obs_bad % u % num = number_type(0, 0, 0)
+   n_obs_bad % v % num = number_type(0, 0, 0)
+   n_obs_bad % t % num = number_type(0, 0, 0)
+   n_obs_bad % p % num = number_type(0, 0, 0)
+   n_obs_bad % q % num = number_type(0, 0, 0)
 
    do n=1, oi%num_sound
       np_available = np_available + 5

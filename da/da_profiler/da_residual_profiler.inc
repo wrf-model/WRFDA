@@ -20,8 +20,8 @@ subroutine da_residual_profiler(oi, y, re,                        &
 
    if (oi%num_Profiler > 0) then
 
-      n_obs_bad % u % num = number(0, 0, 0)
-      n_obs_bad % v % num = number(0, 0, 0)
+      n_obs_bad % u % num = number_type(0, 0, 0)
+      n_obs_bad % v % num = number_type(0, 0, 0)
 
       do n=1, oi%num_Profiler
 

@@ -20,7 +20,7 @@ subroutine da_residual_ssmt2(iv, y, re,                        &
 
    if (iv%num_ssmt2 > 0) then
 
-      n_obs_bad % rh % num = number(0, 0, 0)
+      n_obs_bad % rh % num = number_type(0, 0, 0)
 
       do n=1, iv%num_ssmt2
          do k=1, iv%ssmt2(n)%info%levels

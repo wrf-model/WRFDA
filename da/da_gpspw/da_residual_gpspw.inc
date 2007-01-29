@@ -19,7 +19,7 @@ subroutine da_residual_gpspw(oi, y, re,                        &
    integer                           :: n
 
    if (oi%num_Gpspw > 0) then
-      n_obs_bad % q % num = number(0, 0, 0)
+      n_obs_bad % q % num = number_type(0, 0, 0)
       do n=1, oi%num_Gpspw
          np_available = np_available + 1
          re%gpspw(n)%tpw = da_residual(n, 0, y%gpspw(n)%tpw, &

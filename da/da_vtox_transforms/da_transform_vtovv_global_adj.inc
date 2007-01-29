@@ -1,4 +1,4 @@
-subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv)
+subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform for global WRF-Var 
@@ -7,7 +7,6 @@ subroutine da_transform_vtovv_global_adj (cv_size, xb, xbx, be, cv, vv)
    implicit none
 
    integer, intent(in)        :: cv_size ! Size of cv array.
-   type (xb_type), intent(in) :: xb   ! first guess.
    type (xbx_type),intent(in) :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in) :: be   ! background errors.
    real, intent(out)          :: cv(1:cv_size) ! control variables.

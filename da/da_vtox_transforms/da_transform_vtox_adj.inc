@@ -167,7 +167,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
    !-------------------------------------------------------------------------
 
    call da_zero_vp_type (vp)
-   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
+   call da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
@@ -198,7 +198,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
    !-------------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv, vv)
+      call da_transform_vtovv_global_adj(cv_size, xbx, be, cv, vv)
    else
       call da_transform_vtovv_adj(cv_size, xb, be, cv, vv, xp)
    end if

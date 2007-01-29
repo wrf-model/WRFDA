@@ -1,5 +1,5 @@
 subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
-                     xa, vv, vp, xp, ob, y)
+                     xa, vv, vp, xp, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -17,7 +17,6 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    type (vp_type),    intent(inout) :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout) :: vp    ! Grdipt/level CV.
    type (xpose_type), intent(inout) :: xp    ! Dimensions and xpose buffers. 
-   type (y_type),     intent(inout) :: ob            ! yo
    type (y_type),     intent(inout) :: y             ! y = h (xa)
 
    integer :: sizec
@@ -57,7 +56,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    ! vptox adjoint test:
    !-------------------------------------------------------------------------
 
-   call da_check_vptox_adjoint(be % ne, xb, xbx, be, ep, xp, vp, xa)
+   call da_check_vptox_adjoint(be % ne, xb, be, ep, xp, vp, xa)
 
    !-------------------------------------------------------------------------
    ! vtox adjoint test: <x,x> = <v_adj,v>

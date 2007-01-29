@@ -1,4 +1,4 @@
-subroutine da_final_write_obs(ob, iv, re)
+subroutine da_final_write_obs(iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: Writes full diagnostics for O, (O-B) & OMA togather
@@ -6,9 +6,7 @@ subroutine da_final_write_obs(ob, iv, re)
 
    implicit none
 
-   type (y_type), intent(in)     :: ob      ! Observation structure.
    type (ob_type), intent(in)    :: iv      ! O-B structure.
-   type (y_type), intent(inout)  :: re      ! residual vector.
  
    integer                       :: n, k, iunit
    integer                       :: ios  ! Error code from MPI routines.

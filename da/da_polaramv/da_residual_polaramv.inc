@@ -19,8 +19,8 @@ subroutine da_residual_polaramv(oi, y, re,                        &
 
    if (oi%num_polaramv > 0) then
 
-      n_obs_bad % u % num = number(0, 0, 0)
-      n_obs_bad % v % num = number(0, 0, 0)
+      n_obs_bad % u % num = number_type(0, 0, 0)
+      n_obs_bad % v % num = number_type(0, 0, 0)
 
       do n=1, oi%num_polaramv
          do k=1, oi%polaramv(n)%info%levels

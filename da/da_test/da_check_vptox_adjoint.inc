@@ -1,4 +1,4 @@
-subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa)
+subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test Vp to X routine and adjoint for compatibility.
@@ -10,7 +10,6 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa)
 
    integer, intent(in)              :: ne   ! Ensemble size.
    type (xb_type), intent(in)       :: xb   ! first guess.
-   type (xbx_type),intent(in)       :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)       :: be   ! background errors.
    type (ep_type), intent(in)       :: ep   ! Ensemble perturbation type.
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
@@ -180,7 +179,7 @@ subroutine da_check_vptox_adjoint(ne, xb, xbx, be, ep, xp, vp, xa)
 
    call da_zero_vp_type (vp)
 
-   call da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
+   call da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

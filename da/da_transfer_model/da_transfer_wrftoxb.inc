@@ -30,12 +30,15 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    real   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
    real, allocatable :: arrayglobal(:,:)
+   real   :: buf(1)
 
    !---------------------------------------------------------------------------
    ! Set xb array range indices for processor subdomain.
    !---------------------------------------------------------------------------
 
    if (trace_use) call da_trace_entry("da_transfer_wrftoxb")
+
+call da_oi(__FILE__,__LINE__)
 
    is = grid%xp % its
    ie = grid%xp % ite
@@ -56,6 +59,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    !rizvi   xbx%big_header%bhi(6,5) = grid%start_month
    !rizvi   xbx%big_header%bhi(7,5) = grid%start_day
    !rizvi   xbx%big_header%bhi(8,5) = grid%start_hour
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! WRF-specific fields:
@@ -81,16 +85,19 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       grid%xb%dn(k)  = grid%em_dn(k)
       grid%xb%dnw(k) = grid%em_dnw(k)
    end do
+call da_oi(__FILE__,__LINE__)
 
    grid%xb % ptop = ptop
    grid%xb % ps0  = ps0
    grid%xb % ts0  = ts0
    grid%xb % tlp  = tlp
+call da_oi(__FILE__,__LINE__)
       
    !---------------------------------------------------------------------------
    ! Convert WRF fields to xb:
    !---------------------------------------------------------------------------
 
+call da_oi(__FILE__,__LINE__)
    if (print_detail_xb) then
       write(unit=stdout, fmt='(3a, i8)') &
          'file:', __FILE__, ', line:', __LINE__
@@ -187,6 +194,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', grid%moist(is,js,ks,2)
       write(unit=stdout, fmt=*) ' '
    end if
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------
    ! Need this to exchange values in the halo region.
@@ -205,6 +213,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          end do
       end do
    end do
+call da_oi(__FILE__,__LINE__)
 
    do j=js,je+1
       do k=ks,ke
@@ -213,13 +222,16 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          end do
       end do
    end do
+call da_oi(__FILE__,__LINE__)
 
    ! Fill the halo region for u and v.
 
    call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+call da_oi(__FILE__,__LINE__)
 
 
    if (print_detail_xb) then
+call da_oi(__FILE__,__LINE__)
       write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
       write(unit=stdout, fmt=*) 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
       write(unit=stdout, fmt=*) 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
@@ -231,6 +243,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
       write(unit=stdout, fmt=*) 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
 
+call da_oi(__FILE__,__LINE__)
       write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
       write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
@@ -238,6 +251,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
 
+call da_oi(__FILE__,__LINE__)
       write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
       write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
@@ -245,6 +259,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
 
+call da_oi(__FILE__,__LINE__)
       write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
       write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
@@ -252,6 +267,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
       write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
    end if
+call da_oi(__FILE__,__LINE__)
 
    do j=js,je
       k = ke+1
@@ -280,6 +296,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          ! convert snow water equivalent kg/m2 to snow depth mm
          grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
       end do
+call da_oi(__FILE__,__LINE__)
 
       ! WHY
       ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
@@ -326,6 +343,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
             grid%em_p(i,j,k) = grid%xb%p(i,j,k) - ppb
          end do
       end do
+call da_oi(__FILE__,__LINE__)
 
       do k=ks,ke+1
          do i=is,ie
@@ -371,6 +389,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
             end if
          end do
       end do
+call da_oi(__FILE__,__LINE__)
 
       do i=is,ie
          grid%xb%psac(i,j) = grid%em_mub(i,j)+grid%em_mu_2(i,j)
@@ -382,6 +401,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    end do
 
    grid%xb%ztop = grid%xb%hf(is,js,ke+1)
+call da_oi(__FILE__,__LINE__)
 
    if (print_detail_xb) then
       write(unit=stdout, fmt=*) ' '
@@ -394,6 +414,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
                grid%xb%h(is,js,k), grid%xb%p(is,js,k), grid%xb%t(is,js,k)
          end do
       end if
+call da_oi(__FILE__,__LINE__)
 
       write(unit=stdout, fmt=*) ' '
       write(unit=stdout, fmt=*) 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
@@ -418,6 +439,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'grid%xb%lon(ie,je)=', grid%xb%lon(ie,je)     !hcl
       write(unit=stdout, fmt=*) ' '
    end if
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate vertical inner product for use in vertical transform:
@@ -437,6 +459,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid % xb % psac(is:ie,js:je) * grid%xb%sigmah(k)
       end do
    end if
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Roughness
@@ -456,6 +479,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
       grid%xb % lanu, grid%xb % rough)
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Calculate 1/grid box areas:
@@ -468,6 +492,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt='(a, e24.16/)') &
            'grid%xb % map_factor(is,js)=', grid%xb % map_factor(is,js)
    end if
+call da_oi(__FILE__,__LINE__)
 
    do j=js,je
       do i=is,ie
@@ -490,6 +515,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
                       grid%xb%regime(i,j))
       end do
    end do
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Calculate saturation vapour pressure and relative humidity:
@@ -503,6 +529,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          end do
       end do
    end do
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Calculate dew point temperature:
@@ -520,6 +547,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt=*) 'grid%xb % qs(i,j,k)=', grid%xb % qs(i,j,k)
       write(unit=stdout, fmt=*) ' '
    end if
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Sea level pressure and total precipitable water
@@ -534,6 +562,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    end if
 
    call da_wrf_tpq_2_slp (grid%xb)
+call da_oi(__FILE__,__LINE__)
 
    ! WHY
    ! do j = js,je
@@ -545,6 +574,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! end do
 
    call da_integrat_dz(grid%xb)
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Surface wind speed
@@ -569,6 +599,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
                     *tmpvar*rgh_fac(i,j)
       end do
    end do
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Brightness temperature SH Chen
@@ -581,6 +612,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       write(unit=stdout, fmt='(a)') &
           'Brightness temperature'
    end if
+call da_oi(__FILE__,__LINE__)
 
    if (Use_SsmiTbObs)   &
       call da_transform_xtotb(grid%xb)
@@ -598,6 +630,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    end if
 
    call da_transform_xtogpsref(grid%xb, grid%xp)
+call da_oi(__FILE__,__LINE__)
 
    !---------------------------------------------------------------------------
    ! Ground-based GPS ZTD must follow the GPS Refractivity calculation.
@@ -634,6 +667,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    else
       loc_psac_mean = tmpvar*sum(grid%xb % psac(grid%xp%its:grid%xp%ite,grid%xp%jts:grid%xp%jte))
    end if
+call da_oi(__FILE__,__LINE__)
 
    tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
@@ -655,15 +689,20 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    if (testing_dm_exact) then
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_psac_mean, 1)
+      buf(1)=loc_psac_mean
+      call wrf_dm_bcast_real(buf, 1)
+      loc_psac_mean=buf(1)
       xbx % psac_mean = loc_psac_mean
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_latc_mean, (grid%xp%jde-grid%xp%jds+1))
+      buf(1)=loc_psac_mean
+      call wrf_dm_bcast_real(buf, (grid%xp%jde-grid%xp%jds+1))
+      loc_psac_mean=buf(1)
       xbx % latc_mean = loc_latc_mean
    else
       xbx % psac_mean = wrf_dm_sum_real(loc_psac_mean)
       call wrf_dm_sum_reals(loc_latc_mean, xbx % latc_mean)
    end if
+call da_oi(__FILE__,__LINE__)
 
    if (print_detail_xb) then
       ! write(unit=stdout, fmt=*) 'loc_psac_mean  =', loc_psac_mean
@@ -672,6 +711,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       ! write(unit=stdout, fmt=*) 'loc_latc_mean  =', loc_latc_mean(js)
       write(unit=stdout, fmt=*) 'xbx % latc_mean=', xbx % latc_mean(js)
    end if
+call da_oi(__FILE__,__LINE__)
 
    ! Calculate time step from one dimensional cloud model parameterization
 

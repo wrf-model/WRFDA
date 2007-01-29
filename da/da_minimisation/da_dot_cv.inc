@@ -21,9 +21,9 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
 
    real, pointer                :: xg(:), yg(:)      ! Serial data arrays.
 
-   real                         :: dtemp1, dtemp1x   ! Temporary.
+   real                         :: dtemp1(1), dtemp1x   ! Temporary.
 
-   dtemp1 = 0.0
+   dtemp1(1) = 0.0
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
@@ -45,7 +45,7 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
       call da_cv_to_global(cv_size, cv_size_domain, y, xp, mzs, yg)
 
       if (rootproc) then
-         dtemp1 = da_dot(cv_size_domain, xg, yg)
+         dtemp1(1) = da_dot(cv_size_domain, xg, yg)
          deallocate(xg, yg)
       end if
 
@@ -54,17 +54,17 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
 
    else
 
-      dtemp1 = da_dot(cv_size, x, y)
+      dtemp1(1) = da_dot(cv_size, x, y)
 
       if (.not. global) then
-         dtemp1x = dtemp1
+         dtemp1x = dtemp1(1)
          ! summation across processors:
-         dtemp1 = wrf_dm_sum_real(dtemp1x)
+         dtemp1(1) = wrf_dm_sum_real(dtemp1x)
       end if
 
    end if
 
-   da_dot_cv = dtemp1
+   da_dot_cv = dtemp1(1)
 
 end function da_dot_cv
 

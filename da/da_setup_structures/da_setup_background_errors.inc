@@ -1,4 +1,4 @@
-subroutine da_setup_background_errors(xb, xbx, be, xp)
+subroutine da_setup_background_errors(xb, be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define and allocate components of background errors.
@@ -8,9 +8,7 @@ subroutine da_setup_background_errors(xb, xbx, be, xp)
    implicit none
 
    type (xb_type), intent(in)  :: xb       ! First guess structure.
-   type (xbx_type),intent(in)  :: xbx      ! Header & non-gridded vars.
    type (be_type), intent(out) :: be       ! Back. errors structure.
-   type (xpose_type), intent(inout) :: xp  ! Dimensions and xpose buffers.
 
    if (trace_use) call da_trace_entry("da_setup_background_errors")
 
@@ -25,7 +23,7 @@ subroutine da_setup_background_errors(xb, xbx, be, xp)
    if (global) then
       call da_setup_be_global (be)
    else
-      call da_setup_be_regional (xb, be, xbx, xp)
+      call da_setup_be_regional (xb, be)
    end if
 
    call da_setup_cv (be)

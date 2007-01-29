@@ -1,4 +1,4 @@
-subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
+subroutine da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
 
    !--------------------------------------------------------------------------
    ! Purpose: Adjoint for Physical transform of variables 
@@ -7,7 +7,6 @@ subroutine da_transform_vptox_adj(xb, xbx, xa, vp, be, ep, xp)
    implicit none
 
    type (xb_type), intent(in)           :: xb  ! First guess structure.
-   type (xbx_type),intent(in)           :: xbx ! Header & non-gridded vars.
    type (x_type), intent(inout)         :: xa  ! Grad_x(Jo)
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbation.

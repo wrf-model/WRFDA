@@ -27,7 +27,7 @@ subroutine da_residual_rad(iv, y, re,                 &
    do i = 1, iv%num_inst
       if (iv%instid(i)%num_rad < 1) cycle
 
-      n_obs_bad % rad % num = number(0, 0, 0)
+      n_obs_bad % rad % num = number_type(0, 0, 0)
       call da_residual_new(y%instid(i)%tb(:,:), iv%instid(i)%tb_qc(:,:), &
          iv%instid(i)%tb_inv(:,:), re%instid(i)%tb(:,:))
       np_available = iv%instid(i)%nchan*iv%instid(i)%num_rad

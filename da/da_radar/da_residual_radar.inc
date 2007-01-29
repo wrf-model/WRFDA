@@ -20,8 +20,8 @@ subroutine da_residual_radar(oi, y, re,                        &
 
    if (oi%num_Radar > 0) then
 
-      n_obs_bad % rv % num = number(0, 0, 0)
-      n_obs_bad % rf % num = number(0, 0, 0)
+      n_obs_bad % rv % num = number_type(0, 0, 0)
+      n_obs_bad % rf % num = number_type(0, 0, 0)
 
       do n=1, oi%num_Radar
 

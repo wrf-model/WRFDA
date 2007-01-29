@@ -18,8 +18,8 @@ subroutine da_residual_ssmi_rv(oi, y, re, &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   n_obs_bad % Speed % num = number(0, 0, 0)
-   n_obs_bad % q % num     = number(0, 0, 0)
+   n_obs_bad % Speed % num = number_type(0, 0, 0)
+   n_obs_bad % q % num     = number_type(0, 0, 0)
 
    do n=1, oi%num_ssmi_retrieval
       np_available = np_available + 2

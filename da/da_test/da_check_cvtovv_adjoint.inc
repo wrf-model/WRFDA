@@ -59,7 +59,7 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv)
    !----------------------------------------------------------------------
 
    if (global) then
-      call da_transform_vtovv_global_adj(cv_size, xb, xbx, be, cv2, vv)
+      call da_transform_vtovv_global_adj(cv_size, xbx, be, cv2, vv)
    else
       call da_transform_vtovv_adj(cv_size, xb, be, cv2, vv, xp)
    end if

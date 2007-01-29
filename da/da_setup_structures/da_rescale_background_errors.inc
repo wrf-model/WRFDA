@@ -1,4 +1,4 @@
-subroutine da_rescale_background_errors (ix, jy, var_scaling, len_scaling, &
+subroutine da_rescale_background_errors (var_scaling, len_scaling, &
                                           ds, s, be_sub)
 
    !---------------------------------------------------------------------------
@@ -9,8 +9,6 @@ subroutine da_rescale_background_errors (ix, jy, var_scaling, len_scaling, &
 
    implicit none
 
-   integer, intent(in)              :: ix                ! I dimension of grid.
-   integer, intent(in)              :: jy                ! J dimension of grid.
    real, intent(in)                 :: var_scaling       ! Variance factor.
    real, intent(in)                 :: len_scaling       ! Lengthscale factor.
    real, intent(in)                 :: ds                ! Resolution (m)

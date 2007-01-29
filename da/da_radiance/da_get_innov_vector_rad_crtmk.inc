@@ -61,6 +61,9 @@ subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
 #endif
 !---------------------------------------------------------
 
+   !JRB use argument it
+   if (it==0) then; print *,"why have argument it to "//__FILE__; end if
+
 #if !defined(CRTM)
    IF ( iv%num_inst < 1 ) return
 
@@ -202,10 +205,10 @@ subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
 
          ! [1.2] Interpolate horizontally to ob:
          do k=xp%kts,xp%kte ! from bottem to top
-             call da_interp_lin_2D( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+             call da_interp_lin_2d( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                     i, j, dx, dy, dxm, dym, &      ! temperature (in K)
                                     Atmosphere%Temperature(xp%kte-k+1) )
-             call da_interp_lin_2D( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+             call da_interp_lin_2d( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                     i, j, dx, dy, dxm, dym, &      ! specific humidity (in kg/kg)
                                     Atmosphere%Absorber(xp%kte-k+1,1) ) 
              Atmosphere%Absorber(xp%kte-k+1,1) = 1000.*Atmosphere%Absorber(xp%kte-k+1,1) ! in g/kg

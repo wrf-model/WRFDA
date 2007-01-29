@@ -200,7 +200,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    ! [6.0] Perform Vp -> X  adjoint tests: 
    !----------------------------------------------------------------------
 
-   call da_check_vptox_adjoint( xb, xbx, be, xa, xp, vp)
+   call da_check_vptox_adjoint( xb, be, xa, xp, vp)
 
 #endif
 1111 continue

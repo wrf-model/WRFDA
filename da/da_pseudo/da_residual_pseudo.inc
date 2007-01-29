@@ -20,11 +20,11 @@ subroutine da_residual_pseudo(oi, y, re,                        &
 
    if (oi%num_pseudo > 0) then
 
-      n_obs_bad % u % num = number(0, 0, 0)
-      n_obs_bad % v % num = number(0, 0, 0)
-      n_obs_bad % t % num = number(0, 0, 0)
-      n_obs_bad % p % num = number(0, 0, 0)
-      n_obs_bad % q % num = number(0, 0, 0)
+      n_obs_bad % u % num = number_type(0, 0, 0)
+      n_obs_bad % v % num = number_type(0, 0, 0)
+      n_obs_bad % t % num = number_type(0, 0, 0)
+      n_obs_bad % p % num = number_type(0, 0, 0)
+      n_obs_bad % q % num = number_type(0, 0, 0)
 
       do n=1, oi%num_pseudo
 

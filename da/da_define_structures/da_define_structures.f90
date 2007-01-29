@@ -597,14 +597,14 @@ module da_define_structures
 
    ! [3.3] Where are these used:?
 
-   type number
+   type number_type
       integer                    :: bad
       integer                    :: miss
       integer                    :: use
-   end type number
+   end type number_type
 
    type bad_info_type
-      type (number)              :: num
+      type (number_type)         :: num
       integer                    :: nn(100000)
       integer                    :: kk(100000)
    END type bad_info_type

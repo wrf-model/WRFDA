@@ -18,7 +18,7 @@ subroutine da_residual_ssmi_tb(oi, y, re, &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
 
-   n_obs_bad % t % num = number(0, 0, 0)
+   n_obs_bad % t % num = number_type(0, 0, 0)
 
    do n=1, oi%num_ssmi_tb
 

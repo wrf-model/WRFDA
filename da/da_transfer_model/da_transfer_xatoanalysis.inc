@@ -26,7 +26,7 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
          call da_transfer_xatowrftl(grid, config_flags, filnam)
       end if
 
-      call da_transfer_xatowrf(xbx, grid)
+      call da_transfer_xatowrf(grid)
 
       if (it < max_ext_its) then
          if (var4d) then
@@ -36,7 +36,7 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
          call da_transfer_wrftoxb(xbx, grid)
       end if
    else if (fg_format == fg_format_kma) then
-      call da_transfer_xatokma(xbx, grid)
+      call da_transfer_xatokma(grid)
       if (it < max_ext_its) then
          call da_transfer_kmatoxb(xbx, grid)
       end if

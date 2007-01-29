@@ -21,8 +21,8 @@ subroutine da_residual_geoamv(oi, y, re,                        &
 
    if (oi%num_geoamv > 0) then
 
-      n_obs_bad % u % num = number(0, 0, 0)
-      n_obs_bad % v % num = number(0, 0, 0)
+      n_obs_bad % u % num = number_type(0, 0, 0)
+      n_obs_bad % v % num = number_type(0, 0, 0)
 
       do n=1, oi%num_geoamv
          do k=1, oi%geoamv(n)%info%levels

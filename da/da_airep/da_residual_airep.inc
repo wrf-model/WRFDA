@@ -19,9 +19,9 @@ subroutine da_residual_airep(oi, y, re,                        &
    integer                           :: n, k
 
    if (oi%num_Airep > 0) then
-      n_obs_bad % u % num = number(0, 0, 0)
-      n_obs_bad % v % num = number(0, 0, 0)
-      n_obs_bad % t % num = number(0, 0, 0)
+      n_obs_bad % u % num = number_type(0, 0, 0)
+      n_obs_bad % v % num = number_type(0, 0, 0)
+      n_obs_bad % t % num = number_type(0, 0, 0)
 
       do n=1, oi%num_Airep
          do k=1, oi%Airep(n)%info%levels

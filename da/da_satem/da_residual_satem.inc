@@ -19,7 +19,7 @@ subroutine da_residual_satem(oi, y, re,                        &
    integer                           :: n, k
 
    if (oi%num_Satem > 0) then
-      n_obs_bad % thickness % num = number(0, 0, 0)
+      n_obs_bad % thickness % num = number_type(0, 0, 0)
 
       do n=1, oi%num_Satem
           do k=1, oi%satem(n)%info%levels

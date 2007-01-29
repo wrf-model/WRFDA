@@ -4,8 +4,6 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
    ! Purpose: quick way of showing location
    !-----------------------------------------------------------------------
 
-   use da_define_structures
-
    implicit none
 
    character(len=*), intent(in)           :: str

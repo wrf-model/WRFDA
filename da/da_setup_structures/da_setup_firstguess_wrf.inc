@@ -14,6 +14,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    real              :: x, y, xxc, yyc, xxx, yyy, lat_cen, lon_cen
   
    real              :: conv
+   real              :: buf(2)
 
    character(len=24) :: xb_date, an_date
    integer           :: len, seconds, i_grid,  j_grid, m_expand
@@ -33,7 +34,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
 
       write(unit=an_date(1:len), fmt='(a)') trim(ANALYSIS_DATE)
 
-      seconds = da_diff_seconds(an_date, xb_date)
+      seconds = int(da_diff_seconds(an_date, xb_date))
 
       if (seconds > ANALYSIS_ACCU) then
          write(unit=message(1),fmt='(A,A,A,A)') &
@@ -60,8 +61,11 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
       start_lon = grid%xlong(grid%xp%its, grid%xp%jts)
    end if
 
-   call wrf_dm_bcast_real(start_lat, 1)
-   call wrf_dm_bcast_real(start_lon, 1)
+   buf(1)=start_lat
+   buf(2)=start_lon
+   call wrf_dm_bcast_real(buf, 2)
+   start_lat=buf(1)
+   start_lon=buf(2)
 
    !------------------------------------------------------------------------
    ! Setup map utility

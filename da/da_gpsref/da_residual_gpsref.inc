@@ -20,7 +20,7 @@ subroutine da_residual_gpsref(oi, y, re,               &
 
    if (oi%num_GPSRef < 1) return
 
-   n_obs_bad % gpsref % num = number(0, 0, 0)
+   n_obs_bad % gpsref % num = number_type(0, 0, 0)
 
    do n=1, oi%num_GPSRef
       do k=1, oi%gpsref(n)%info%levels

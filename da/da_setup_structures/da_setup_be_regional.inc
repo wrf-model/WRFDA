@@ -1,4 +1,4 @@
-subroutine da_setup_be_regional(xb, be, xbx, xp)
+subroutine da_setup_be_regional(xb, be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Define and allocate components of background errors
@@ -8,8 +8,6 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
 
    type (xb_type), intent(in)  :: xb                    ! First guess structure.
    type (be_type), intent(out) :: be                    ! Back. errors structure.
-   type (xbx_type),intent(in)  :: xbx                   ! Header non-grid info 
-   type (xpose_type), intent(in) :: xp   ! Dimensions and xpose buffers.
 
    integer                     :: i, j, k, m       ! Loop counters.
    integer, allocatable:: bin(:,:,:)         ! Bin assigned to each 3D point
@@ -453,15 +451,15 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
    ! 7.0 Apply empirical and recursive filter rescaling factor:
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   call da_rescale_background_errors(ix, jy, var_scaling1, len_scaling1, &
+   call da_rescale_background_errors(var_scaling1, len_scaling1, &
                                       xb % ds, be1_rf_lengthscale, be % v1)
-   call da_rescale_background_errors(ix, jy, var_scaling2, len_scaling2, &
+   call da_rescale_background_errors(var_scaling2, len_scaling2, &
                                       xb % ds, be2_rf_lengthscale, be % v2)
-   call da_rescale_background_errors(ix, jy, var_scaling3, len_scaling3, &
+   call da_rescale_background_errors(var_scaling3, len_scaling3, &
                                       xb % ds, be3_rf_lengthscale, be % v3)
-   call da_rescale_background_errors(ix, jy, var_scaling4, len_scaling4, &
+   call da_rescale_background_errors(var_scaling4, len_scaling4, &
                                       xb % ds, be4_rf_lengthscale, be % v4)
-   call da_rescale_background_errors(ix, jy, var_scaling5, len_scaling5, &
+   call da_rescale_background_errors(var_scaling5, len_scaling5, &
                                       xb % ds, be5_rf_lengthscale, be % v5)
 
    ! 8.0 deallocate input model state:
@@ -519,7 +517,7 @@ subroutine da_setup_be_regional(xb, be, xbx, xp)
       allocate (alpha_rf_lengthscale(1:be % ne))
       alpha_rf_lengthscale(:) = 1000.0 * alpha_corr_scale ! Convert km to m.
 
-      call da_rescale_background_errors(ix, jy, 1.0, 1.0, &
+      call da_rescale_background_errors(1.0, 1.0, &
          xb % ds, alpha_rf_lengthscale, be % alpha)
    else
       be % alpha % mz = 0
