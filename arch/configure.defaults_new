@@ -396,6 +396,51 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95              (RSL_LITE, MPI, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+                    
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         =
+FCDEBUG         = 
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159 
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
+
+CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB         = -L$(RSL_LITE) -lrsl
+
+arch : 
+	$(LN) $(RSL_LITE)/*.c .
+	$(LN) $(RSL_LITE)/*.F .
+	( cd $(RSL_LITE) ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST all )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, ifort            (single-threaded)
 #
 

@@ -1,7 +1,7 @@
-OBJSL   = c_code.o buf_for_proc.o rsl_malloc.o rsl_bcast.o task_for_point.o period.o swap.o cycle.o f_pack.o
+OBJSL   = c_code.o buf_for_proc.o rsl_malloc.o rsl_bcast.o task_for_point.o period.o swap.o cycle.o f_pack.o f_xpose.o
 OBJS    = $(OBJSL)
 OPTS    =
-FFLAGS  =  $(OPTS) -w
+FFLAGS  =  $(OPTS)
 LIBS    = 
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
@@ -42,8 +42,11 @@ buf_for_proc.o:	        buf_for_proc.c
 f_pack.o:	        f_pack.F
 			$(FC) $(FFLAGS) -c f_pack.F
 
+f_xpose.o:	        f_xpose.F f_pack.o
+			$(FC) $(FFLAGS) -c f_xpose.F
+
 clean : 
-			@ /bin/rm -f *.f *.o
+			/bin/rm -f *.f *.o *.mod
 
 superclean : clean
-			@ /bin/rm -f *.a
+			/bin/rm -f *.a
