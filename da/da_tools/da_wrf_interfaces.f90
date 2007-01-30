@@ -27,14 +27,6 @@ module da_wrf_interfaces
    end interface
 
    interface
-      subroutine wrf_dm_halo (domdesc , comms , stencil_id)
-         integer, intent(in) :: domdesc
-         integer, intent(in) :: comms(:)
-         integer, intent(in) :: stencil_id
-      end subroutine wrf_dm_halo
-   end interface
-
-   interface
       subroutine wrf_patch_to_global_real (buf,globbuf,domdesc,stagger, &
          ordering,&
          ds1,de1,ds2,de2,ds3,de3,&

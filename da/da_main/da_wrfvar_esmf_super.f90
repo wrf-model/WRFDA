@@ -9,26 +9,26 @@ module da_wrfvar_esmf_super
    ! Note that WRF_ESMF_MOD is used by module_domain.  
    !------------------------------------------------------------------------
 
-   use module_machine
-   use module_domain
-   use module_integrate
-   use module_driver_constants
-   use module_configure
+!   use module_machine
+!   use module_domain
+!   use module_integrate
+!   use module_driver_constants
+!   use module_configure
 
-   use module_timing
+!   use module_timing
 
 #ifdef DM_PARALLEL
-   use module_dm
+!   use module_dm
 #endif
 
-   use da_wrfvar_io
+!   use da_wrfvar_io
 
-   use da_control
-   use da_define_structures
-   use da_setup_structures
-   use da_test
-   use da_minimisation
-   use da_wrf_interfaces
+!   use da_control
+!   use da_define_structures
+!   use da_setup_structures
+!   use da_test
+!   use da_minimisation
+!   use da_wrf_interfaces
 
    implicit none
 

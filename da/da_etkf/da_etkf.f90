@@ -6,8 +6,9 @@ module da_etkf
 !  HISTORY: 11/21/2004 - Xuguang Wang's routines included in WRF-Var.Dale Barker
 !------------------------------------------------------------------------------
 
-   use da_control
-   use da_tracing
+   use da_control, only : trace_use, stdout
+   use da_reporting, only : da_error, message
+   use da_tracing, only : da_trace_entry, da_trace_exit
    use lapack, only : dsyev
 
    implicit none

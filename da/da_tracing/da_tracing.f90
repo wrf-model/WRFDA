@@ -1,15 +1,14 @@
 module da_tracing
 
+#ifdef DM_PARALLEL
+   use mpi, only : mpi_character
+#endif
+
    use da_control, only : num_procs, documentation_url, use_html, ierr, &
       trace_pe, trace_memory, trace_unit, trace_csv_unit, &
       trace_csv, myproc, comm, rootproc, trace_max_depth, &
       trace_repeat_head, trace_repeat_body, trace_start_points, trace_all_pes
-
-#ifdef DM_PARALLEL
    use da_par_util1, only : da_proc_sum_ints, da_proc_sum_real, da_proc_sum_int
-   use mpi, only : mpi_character
-#endif
-
    use da_reporting, only : da_error
 
    interface

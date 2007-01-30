@@ -9,11 +9,20 @@ program da_wrfvar_main
    ! the model is properly shut down.
    !-----------------------------------------------------------------------
 
-   use da_wrfvar_top
-   use da_reporting
-   use da_wrf_interfaces
+   use module_symbols_util, only : wrfu_finalize
+
+   use da_control, only : trace_use
+   use da_tracing, only : da_trace_init, da_trace_report, da_trace_entry, &
+      da_trace_exit
+   use da_wrf_interfaces, only : wrf_shutdown, wrf_message
+   use da_wrfvar_top, only : da_wrfvar_init1,da_wrfvar_init2,da_wrfvar_run
 
    implicit none
+
+   interface
+      subroutine da_wrfvar_finalize
+      end subroutine da_wrfvar_finalize
+   end interface
 
    ! Split initialisation into 2 parts so we can start and stop trace here
 

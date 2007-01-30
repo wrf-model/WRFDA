@@ -1,10 +1,10 @@
 module da_interpolation
 
-   use da_tools
-   use da_control
+   use da_tools, only : da_togrid
+   use da_control, only : trace_use, trace_use_frequent, missing_r, &
+      anal_type_verify, v_interp_h, v_interp_p
    use module_domain, only : xpose_type
-   use da_tracing
-   use da_define_structures, only : da_gauss_noise
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    implicit none
 

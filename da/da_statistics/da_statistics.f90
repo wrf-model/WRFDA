@@ -5,11 +5,12 @@ module da_statistics
    !---------------------------------------------------------------------------
    
    use module_domain, only : xpose_type
-   use da_control
+   use da_control, only : obs_qc_pointer,stdout, missing_r, &
+      rootproc, mjy, mix, mkz
    use da_define_structures, only : maxmin_type, x_type, maxmin_field_type
-   use da_par_util1
-   use da_par_util
-   use da_tracing
+   use da_par_util1, only : da_proc_sum_real
+   use da_par_util, only : da_proc_maxmin_combine
+   use da_tracing, only : da_trace_entry, da_trace_exit
    
    implicit none
    

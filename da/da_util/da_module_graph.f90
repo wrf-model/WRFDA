@@ -1,7 +1,7 @@
 module da_module_graph
 
-   use da_color_table
-   use da_plot_parameters
+!   use da_color_table
+!   use da_plot_parameters
 
    implicit none
 

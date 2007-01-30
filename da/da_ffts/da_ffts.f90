@@ -13,7 +13,6 @@ module da_ffts
       da_transpose_x2y_v2
    use module_dm, only : wrf_dm_sum_reals
    use module_ffts, only : fft661, fft551
-   use da_wrf_interfaces, only : wrf_dm_halo
 
    implicit none
 

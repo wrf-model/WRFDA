@@ -4,9 +4,13 @@ module da_recursive_filter
    ! Purpose: Jim Pursers recursive filter routines.
    !---------------------------------------------------------------------------
 
-   use da_control
-   use da_define_structures
-   use da_par_util
+   use module_domain, only : xpose_type
+  
+   use da_control, only : ims,ime,jms,jme,kms,kme,jds,jde, &
+      rf_passes, its,ite,jts,jte,vert_corr
+   use da_par_util, only : da_transpose_z2y, da_transpose_x2y, &
+      da_transpose_y2z, da_transpose_y2x, da_transpose_x2z, &
+      da_transpose_z2x
 
    implicit none
 

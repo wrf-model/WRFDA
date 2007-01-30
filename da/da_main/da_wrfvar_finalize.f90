@@ -4,8 +4,21 @@ subroutine da_wrfvar_finalize
    ! Purpose: Tidy up at the end
    !-------------------------------------------------------------------------
 
-   use da_wrfvar_top
-   use da_reporting
+   use module_domain, only : domain, head_grid
+   use da_control, only : trace_use, cost_unit, &
+      check_max_iv_unit,grad_unit,ierr,num_alpha_corr_types, &
+      num_sound_diag,rootproc,stats_unit, unit_start, &
+      unit_end, jo_unit, unit_used,alpha_corr_unit1, alpha_corr_unit2, &
+      sound_diag_unit
+   use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
+      tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
+      tovs_send_start
+   use da_wrfvar_io, only : da_med_initialdata_output
+   use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_wrfvar_top, only : config_flags
+   use da_tools1, only : da_free_unit
+   use da_wrf_interfaces, only : wrf_error_fatal,med_shutdown_io
+   use da_reporting, only : da_message
 
    implicit none
 

@@ -4,13 +4,21 @@ module da_physics
    !  Purpose: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   use da_control
-   use da_par_util
-   use da_grid_definitions
-   use da_interpolation
-   use da_dynamics
-   use da_reporting
-   use module_wrf_error
+   use module_domain, only : xb_type, xpose_type, x_type
+   use da_define_structures, only : synop_type, residual_synop_type
+   use da_control, only : gas_constant, gravity,kts,kte, svp3,svpt0, &
+      gas_constant_v, svp1, to, xls, svp2,its,ite,jts,jte,kts,kte, &
+      ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, testing_wrfvar, &
+      trace_use, missing_r, maximum_rh, minimum_rh,coeff,l_over_rv, &
+      es_gammakelvin, es_gammabeta, rd_over_rv1,t_kelvin, es_alpha, es_gamma, &
+      es_beta, rd_over_rv, trace_use_frequent,gamma
+   use da_par_util, only : da_transpose_z2y, da_transpose_y2x, &
+      da_transpose_x2z, da_transpose_z2x, da_transpose_x2y, da_transpose_y2z
+   use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_interpolation, only : da_interp_lin_2d, da_interp_lin_2d_adj
+   use da_dynamics, only : da_w_adjustment_adj, da_uv_to_divergence_adj, &
+      da_w_adjustment_lin, da_uv_to_divergence
+   use da_reporting, only : da_error, message
 
    implicit none
 

@@ -4,29 +4,32 @@ module da_vtox_transforms
    ! Purpose: Contains routines used to transform control variable V to model
    !          variables X.
    !---------------------------------------------------------------------------
+  
+   use module_dm, only : wrf_dm_sum_real,wrf_dm_sum_reals
+   use module_domain, only : ep_type, vp_type, x_type, xb_type, xpose_type
 
-   ! Driver layer modules
-   use module_domain
-   use module_configure
-   use module_driver_constants
-   use module_machine
-   use module_tiles
-   use module_dm
-   use da_tracing
-   use module_wrf_error
-
-   ! Registry generated module
-   use module_state_description
-
-   use da_define_structures
-   use da_tools
-   use da_recursive_filter
-   use da_dynamics
-   use da_physics
-   use da_control
-   use da_par_util
-   use da_ssmi
-   use da_spectral
+   use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
+      its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
+      vertical_ip,alphacv_method,use_radarobs,use_radar_rf,Use_SsmiTbObs, &
+      Use_SsmiRetrievalObs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
+      use_gpsrefobs,sfc_assi_options, testing_wrfvar, vert_corr, fg_format, &
+      fg_format_kma, fg_format_wrf, ids,ide, stdout
+   use da_define_structures, only : be_type, xbx_type,da_zero_vp_type,da_zero_x
+   use da_dynamics, only : da_psichi_to_uv,da_psichi_to_uv_adj
+   use da_physics, only : da_uvprho_to_w_lin,da_uvprho_to_w_adj, &
+      da_pt_to_rho_adj, da_pt_to_rho_lin,da_moist_phys_lin, &
+      da_moist_phys_adj, da_transform_xtogpsref_lin, da_transform_xtotpw, &
+      da_transform_xtowtq, da_transform_xtotpw_adj, &
+      da_transform_xtogpsref_adj, da_transform_xtowtq_adj
+   use da_par_util, only : da_vv_to_cv,da_cv_to_vv
+   use da_recursive_filter, only : da_transform_through_rf, &
+      da_transform_through_rf_adj
+   use da_reporting, only : da_error
+   use da_spectral, only : da_v_to_vv_spectral,da_v_to_vv_spectral_adj
+   use da_ssmi, only : da_transform_xtoseasfcwind_lin,da_transform_xtotb_adj, &
+      da_transform_xtoseasfcwind_adj, da_transform_xtotb_lin
+   use da_tools, only : da_set_boundary_xa
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    implicit none
 

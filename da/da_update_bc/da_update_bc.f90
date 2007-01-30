@@ -5,8 +5,12 @@ program da_update_bc
    ! current version reads only wrf-netcdf file format
    !-----------------------------------------------------------------------
 
-   use da_netcdf_interface
-   use da_module_couple_uv
+   use da_netcdf_interface, only : da_get_var_3d_real_cdf, &
+      da_put_var_3d_real_cdf, da_get_dims_cdf, da_put_var_2d_real_cdf, &
+      da_get_var_2d_real_cdf, da_get_var_2d_int_cdf, da_get_bdytimestr_cdf, &
+      da_get_times_cdf, da_get_bdyfrq
+
+   use da_module_couple_uv, only : da_couple_uv
 
    implicit none
 
