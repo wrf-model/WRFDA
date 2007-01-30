@@ -17,7 +17,7 @@ SUBROUTINE DA_Transform_XToTb_Lin( xa, xb )
    real                         :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
    real                         :: TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,TGL_tpw
    real                         :: TGL_htpw,TGL_speed,TGL_alw,TGL_zcld         
-
+   real                         :: height
 !----------------------------------------------------------------------------
 
    ks = xb%kts
@@ -40,13 +40,13 @@ SUBROUTINE DA_Transform_XToTb_Lin( xa, xb )
       TGL_sst  = 0.
 
 ! effective surface air temperature (263 - 303)
-
+      height = xb%h(i,j,ks) - xb%terr(i,j)
       ta          = xb%tgrn(i,j) + &
                     (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                    log(xb%h(i,j,ks)/0.0001)
+                    log(height/0.0001)
 
       TGL_ta      = (xa%t(i,j,ks)-0.)*log(2./0.0001)/ &
-                    log(xb%h(i,j,ks)/0.0001)
+                    log(height/0.0001)
 
 ! gamma is an emperical formula and zcld is given for now
 

@@ -20,6 +20,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
    real                          :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
    real                          :: ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_tpw
    real                          :: ADJ_htpw,ADJ_speed,ADJ_alw,ADJ_zcld         
+   real                          :: height
 !----------------------------------------------------------------------------
 
    psfc=0.;ta=0.;gamma=0.;sst=0.;htpw=0.;speed=0.;alw=0.;zcld=0.;tpw=0
@@ -55,9 +56,11 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
 
       psfc  = 0.01*xb%psfc(i,j)
 !     sst   = xb%tgrn(i,j)
+
+      height = xb%h(i,j,ks) - xb%terr(i,j)
       ta    = xb%tgrn(i,j) + &
               (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-              log(xb%h(i,j,ks)/0.0001)
+              log(height/0.0001)
 
       gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
       zcld  = 1                      ! effective cloud height (km)
@@ -183,7 +186,7 @@ SUBROUTINE DA_Transform_XToTb_Adj (xa, xb)
       ADJ_ta  = ADJ_ta + ADJ_gamma*0.023
 
       xa%t(i,j,ks) = xa%t(i,j,ks) + ADJ_ta* &
-                                    log(2./0.0001)/log(xb%h(i,j,ks)/0.0001)
+                                    log(2./0.0001)/log(height/0.0001)
       ADJ_sst = 0.
 
       xa%psfc(i,j) = xa%psfc(i,j) + ADJ_psfc*0.01 

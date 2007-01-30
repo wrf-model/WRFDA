@@ -8,8 +8,16 @@ Date: 01/29/2007
 Reason for changes 
 -------------------
 
-1, Bug fix for U10, V10, T2, and Q2 calculation with the negative height
-   (e.g. below sea surface)
+1, Bug fix for calculation of log(xb%h(i,j,ks)/...) with the negative height
+   (e.g. below sea surface). The height above the sea sutface should be
+   the height above the ground, i.e.
+
+   log(xb%h(i,j,ks)/...)
+
+   to become
+
+   height = xb%h(i,j,ks) - xb%terr(i,j)
+   log(height/...)
 
 2, bug fix in BE tuning utility:
 
@@ -32,6 +40,12 @@ Files modified:
    wrfvar_2.1/da_3dvar/src/DA_Setup_Structures/da_transfer_wrftoxb.inc
    wrfvar_2.1/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ.inc
    wrfvar_2.1/da_3dvar/src/DA_Physics/DA_Transform_XToWTQ_Adj.inc
+   wrfvar_2.1/da_3dvar/src/DA_Setup_Structures/DA_Add_PBL_And_SFC_Info.inc
+   wrfvar_2.1/da_3dvar/src/DA_SSMI/DA_Transform_XToSeaSfcWind_Adj.inc
+   wrfvar_2.1/da_3dvar/src/DA_SSMI/DA_Transform_XToSeaSfcWind_Lin.inc
+   wrfvar_2.1/da_3dvar/src/DA_SSMI/DA_Transform_XToTb_Adj.inc
+   wrfvar_2.1/da_3dvar/src/DA_SSMI/DA_Transform_XToTb.inc
+   wrfvar_2.1/da_3dvar/src/DA_SSMI/DA_Transform_XToTb_Lin.inc
 
 Expected Differences
 --------------------

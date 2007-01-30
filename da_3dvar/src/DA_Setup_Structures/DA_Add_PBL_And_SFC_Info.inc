@@ -22,7 +22,7 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
 
    REAL                               :: ta,gamma,zcld
    REAL                               :: tpw,alw,zrhom,htpw
-   REAL                               :: dum1
+   REAL                               :: dum1, height
 
 ! Set xb array range indices for processor subdomain.
    is = xp%its
@@ -93,8 +93,13 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
 
    do j=js,je
    do i=is,ie
+         height = xb%h(i,j,ks) - xb%terr(i,j)
+         if( height <= 0.) then
+         print*,i,j,' ht = ',xb%h(i,j,ks) ,' terr =  ',xb%terr(i,j)
+         stop
+         endif
       CALL DA_Transform_XToSeaSfcWind( xb%u(i,j,ks),xb%v(i,j,ks), &
-                                       xb%speed(i,j),xb%h(i,j,ks)  )
+                                       xb%speed(i,j),height  )
    enddo
    enddo
 
@@ -109,9 +114,14 @@ SUBROUTINE DA_Add_PBL_And_SFC_Info( xp, xb, xbx )
    alw   = 0.
    do j=js,je
    do i=is,ie
+      height = xb%h(i,j,ks) - xb%terr(i,j)
+      if( height <= 0.) then
+         print*,i,j,' ht = ',xb%h(i,j,ks) ,' terr =  ',xb%terr(i,j)
+         stop
+      endif
       ta    = xb%tgrn(i,j) + &
               (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-              log(xb%h(i,j,ks)/0.0001)
+              log(height/0.0001)
 
       gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0 - 6.5)
       tpw   = xb%tpw(i,j) * 10.

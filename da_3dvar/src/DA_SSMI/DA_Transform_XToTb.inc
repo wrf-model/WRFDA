@@ -11,6 +11,7 @@ SUBROUTINE DA_Transform_XToTb( xb )
    integer            :: i,j,k,ks,ke 
 
    real               :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw,dum1,zrhom
+   real               :: height
 !----------------------------------------------------------------------------
 
    ks = xb%kts
@@ -30,9 +31,10 @@ SUBROUTINE DA_Transform_XToTb( xb )
 
 ! effective surface air temperature (263 - 303)
 
+      height = xb%h(i,j,ks) - xb%terr(i,j)
       ta          = xb%tgrn(i,j) + &
                     (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                    log(xb%h(i,j,ks)/0.0001)
+                    log(height/0.0001)
 
 ! gamma is an emperical formula and zcld is given for now
 
