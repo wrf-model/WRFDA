@@ -4,7 +4,8 @@ module module_radiance
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use da_reporting
+   use da_control, only : pi, use_landem
+   use da_reporting, only : da_error,message
 
 #ifdef RTTOV
    use rttov_const,  only : &

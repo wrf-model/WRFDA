@@ -13,14 +13,16 @@ program gen_be_etkf
 #define iargc ipxfargc
 #endif
 
-   use da_control
-   use da_gen_be
-   use da_etkf
-   use da_tracing
+   use da_control, only : trace_use, stdout
+!   use da_gen_be
+   use da_etkf, only : da_solve_etkf
+   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
+      da_trace_report
+   use da_reporting, only : da_error, message
 
    implicit none
 
-#include <netcdf.inc>
+#include "netcdf.inc"
 
    integer, parameter    :: max_num_vars = 50         ! Maximum number of variables.
    integer, parameter    :: max_num_dims = 20         ! Maximum number of dimensions.

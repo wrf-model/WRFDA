@@ -1,10 +1,32 @@
 module da_transfer_model
+use da_tools1
 
    !---------------------------------------------------------------------------
    ! Purpose: Transfer model states between different models
    !---------------------------------------------------------------------------
 
+   use module_domain
    use da_setup_structures
+   use module_configure
+   use module_state_description
+
+#ifdef DM_PARALLEL
+   use module_dm
+#endif
+
+   use da_control
+   use da_define_structures
+   use da_grid_definitions
+   use da_par_util
+   use da_physics
+   use da_reporting
+   use da_setup_structures
+   use da_ssmi
+   use da_tools
+   use da_tracing
+   use da_vtox_transforms
+!   use da_wrf_interfaces
+   use da_wrfvar_io
 
    implicit none
 

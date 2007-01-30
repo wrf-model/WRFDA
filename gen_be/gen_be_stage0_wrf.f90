@@ -17,10 +17,11 @@ program gen_be_stage0_wrf
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : num_fft_factors, pi, stdout, stderr
+   use da_control, only : num_fft_factors, pi, stdout, stderr, trace_use, &
+      da_find_fft_factors,da_find_fft_trig_funcs
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
-   use da_tracing, only : trace_use, da_trace_entry, da_trace_exit, &
+   use da_tracing, only : da_trace_entry, da_trace_exit, &
       da_trace_report, da_trace_init
    use da_tools1
 

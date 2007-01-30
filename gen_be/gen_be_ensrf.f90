@@ -13,9 +13,10 @@ program gen_be_ensrf
 #define iargc ipxfargc
 #endif
 
-   use da_control
-   use da_gen_be
-   use da_tracing
+   use da_control, only : trace_use, stdout,stderr
+   use da_gen_be, only : da_stage0_initialize, da_get_field, da_get_trh
+   use da_tracing, only : da_trace_init,da_trace_entry,da_trace_exit, &
+      da_trace_report
 
    implicit none
 

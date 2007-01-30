@@ -4,19 +4,52 @@ module da_setup_structures
    ! Purpose: Sets up various structures.
    !---------------------------------------------------------------------------
 
-   use module_state_description
-   use da_define_structures
-   use da_grid_definitions
-   use da_obs
-   use da_obs_io
-   use da_ssmi
-   use da_vtox_transforms
-   use da_spectral
-   use da_wrfvar_io
-   use da_radiance
-   use da_reporting
-   use da_tools
-
+   use module_domain, only : xb_type, xpose_type, ep_type, x_type
+   use da_define_structures, only : xbx_type,be_subtype, be_type, y_type, &
+      ob_type,da_allocate_background_errors,da_allocate_observations
+   use da_control, only : trace_use,vert_evalue,stdout,rootproc, &
+      analysis_date,coarse_ix,coarse_ds,map_projection,coarse_jy, c2,dsm,phic, &
+      pole, cone_factor, start_x,ps0,ptop,psi1,start_y, tlp,tis0,truelat2_3dv, &
+      truelat1_3dv,xlonc,ts0,num_fft_factors,pi,print_detail_spectral, global, &
+      da_find_fft_factors,da_find_fft_trig_funcs, use_radar_rf, &
+      max_fgat_time, num_fgat_time, max_airep_input, max_bogus_input, &
+      max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &
+      max_airsret_input, max_polaramv_input, max_radar_input, &
+      max_profiler_input,max_ssmi_ret_input, max_sound_input, max_ships_input, &
+      max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
+      max_synop_input,max_ssmt2_input, max_ssmi_tb_input,dt_cloud_model, &
+      use_ssmiretrievalobs,use_radarobs,use_ssmitbobs,use_qscatobs, num_procs, &
+      num_pseudo, missing, ob_format, ob_format_bufr,ob_format_ascii, &
+      use_airepobs, testing_dm_exact, use_amsuaobs, use_amsubobs, &
+      use_airsobs, use_bogusobs, sfc_assi_options, use_eos_amsuaobs, &
+      use_filtered_rad, use_eos_radobs, use_gpsrefobs, use_hirs2obs, &
+      use_hsbobs,use_hirs3obs, use_gpspwobs, use_metarobs, use_msuobs, &
+      use_kma1dvar,use_pilotobs, use_polaramvobs, use_radiance, use_soundobs, &
+      use_ssmt1obs,use_ssmt2obs, use_shipsobs, use_satemobs, use_synopobs, &
+      use_radar_rv,use_profilerobs, use_obsgts, use_geoamvobs, use_buoyobs, &
+      alphacv_method,its,ite,jts,jte,cv_size_domain_jb, &
+      cv_size_domain_je, cv_size_domain,ids,ide,jds,jde,kde,ensdim_alpha, &
+      lat_stats_option,alpha_std_dev,alpha_corr_scale,len_scaling1, &
+      len_scaling2,len_scaling3,len_scaling4,len_scaling5,max_vert_var1, &
+      max_vert_var2,max_vert_var3,max_vert_var4,print_detail_be, &
+      test_statistics, var_scaling1,var_scaling2,var_scaling3,var_scaling4, &
+      var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
+      print_detail_regression,gas_constant,da_array_print     
+   use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_recursive_filter, only : da_calculate_rf_factors
+   use da_par_util, only : da_local_to_global
+   use da_tools1, only : da_get_unit, da_free_unit
+   use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures
+   use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &
+      da_scan_radar,da_scan_obs,da_read_obs
+   use da_ssmi, only : da_read_ssmi,da_scan_ssmi,da_transform_xtoseasfcwind
+   use da_vtox_transforms, only : da_check_eof_decomposition
+   use da_spectral, only : da_initialize_h,da_calc_power_spectrum
+   use da_radiance, only : da_setup_bufrtovs_structures
+   use da_reporting, only : da_error,message, da_warning, da_message
+   use da_physics, only : da_tpq_to_rh,da_sfc_wtq,da_trh_to_td, &
+      da_integrat_dz, da_roughness_from_lanu,da_integrat_dz,da_wrf_tpq_2_slp
+   use module_ssmi, only : tb
    implicit none
 
    contains

@@ -1,6 +1,105 @@
 module da_wrf_interfaces
 
    interface
+      subroutine wrf_dm_bcast_real (buf, n1)
+         integer, intent(in) :: n1
+         real, intent(inout) :: buf(:)
+      end subroutine wrf_dm_bcast_real
+   end interface 
+
+   interface
+      subroutine wrf_dm_sum_reals (inval, retval)
+         real, intent(in)  :: inval(:)
+         real, intent(out) :: retval(:)
+      end subroutine wrf_dm_sum_reals
+   end interface
+
+   interface
+      real function wrf_dm_sum_real (inval)
+         real, intent(in) :: inval
+      end function wrf_dm_sum_real
+   end interface
+
+   interface
+      integer function wrf_dm_sum_integer (inval)
+         integer, intent(in) :: inval
+      end function wrf_dm_sum_integer
+   end interface
+
+   interface
+      subroutine wrf_dm_halo (domdesc , comms , stencil_id)
+         integer, intent(in) :: domdesc
+         integer, intent(in) :: comms(:)
+         integer, intent(in) :: stencil_id
+      end subroutine wrf_dm_halo
+   end interface
+
+   interface
+      subroutine wrf_patch_to_global_real (buf,globbuf,domdesc,stagger, &
+         ordering,&
+         ds1,de1,ds2,de2,ds3,de3,&
+         ms1,me1,ms2,me2,ms3,me3,&
+         ps1,pe1,ps2,pe2,ps3,pe3 )
+
+         integer, intent(in) ::         ds1,de1,ds2,de2,ds3,de3,&
+                                          ms1,me1,ms2,me2,ms3,me3,&
+                                          ps1,pe1,ps2,pe2,ps3,pe3
+         character *(*), intent(in) :: stagger,ordering
+         integer, intent(in) :: domdesc
+         real, intent(inout) :: globbuf(*)
+         real, intent(in) :: buf(*)
+      end subroutine wrf_patch_to_global_real 
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_z2y (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_z2y
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_y2z (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_y2z
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_y2x (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_y2x
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_x2y (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_x2y
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_x2z (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_x2z
+   end interface
+
+   interface
+      subroutine wrf_dm_xpose_z2x (domdesc , comms , xpose_id)
+         integer, intent(inout) :: domdesc
+         integer, intent(inout) :: comms(*)
+         integer, intent(inout) :: xpose_id
+      end subroutine wrf_dm_xpose_z2x
+   end interface
+
+   interface
       subroutine set_scalar_indices_from_config (idomain, dummy2, dummy1)
         integer, intent(in) :: idomain
         integer, intent(in) :: dummy1
@@ -42,7 +141,7 @@ module da_wrf_interfaces
 
    interface 
       subroutine setup_timekeeping(grid)
-        use module_domain
+        use module_domain, only : domain
         type(domain), pointer :: grid
       end subroutine setup_timekeeping
    end interface
@@ -89,9 +188,8 @@ module da_wrf_interfaces
 
    interface 
       subroutine med_shutdown_io (grid , config_flags)
-         use module_domain
-         use module_io_domain
-         use module_configure
+         use module_domain, only : domain
+         use module_configure, only : grid_config_rec_type
          type (domain),               intent(in) :: grid
          type (grid_config_rec_type), intent(in) :: config_flags
       end subroutine med_shutdown_io

@@ -4,11 +4,16 @@ module da_tools1
    ! Purpose: Contains general tools.
    !---------------------------------------------------------------------------
       
-   use da_control
-   use da_reporting
+   use da_control, only : unit_used,use_radiance, stderr, oi_use, unit_end, &
+      unit_start
+   
+   use da_reporting, only : da_error
    use da_define_structures
 
+   use da_define_structures, only: ob_type, y_type
+
    implicit none
+
 contains
 
 #include "da_get_unit.inc"

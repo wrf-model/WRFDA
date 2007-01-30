@@ -244,14 +244,14 @@ grabbufr: grabbufr.o
 # Special cases, either needing special include files or too big to 
 # optimise/debug
 
-da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o :
+da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
 
-da_netcdf_interface.o :
+da_netcdf_interface.o gen_be_etkf.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
@@ -291,7 +291,7 @@ module_radiance.o da_radiance.o :
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(RTTOV_INC) -I$(CRTM_INC) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) -I$(RTTOV_INC) -I$(CRTM_INC) $*.f
+	  $(FC) -c $(FCFLAGS_SIMPLE) -I$(RTTOV_INC) -I$(CRTM_INC) $*.f
 
 da_spectral.o da_be_spectral.o :
 	@ $(RM) $@

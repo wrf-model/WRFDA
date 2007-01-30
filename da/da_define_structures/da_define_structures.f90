@@ -1,8 +1,14 @@
 module da_define_structures
 
     use module_domain, only: vp_type, x_type
-    use da_tracing
-    use da_reporting
+
+    use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
+       vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
+       max_ob_levels,da_array_print, trace_use
+
+    use da_tracing, only : da_trace_entry, da_trace_exit
+
+    use da_reporting, only : da_error, message
 
    !---------------------------------------------------------------------------
    ! Purpose: Collection of routines to define and allocate structures.
@@ -761,6 +767,7 @@ module da_define_structures
       real, pointer :: rf(:)                    ! rf
    end type residual_Radar_type
 
+! JRB
 !   type residual_rad_type
 !      real    , pointer :: tb(:)
 !   end type residual_rad_type

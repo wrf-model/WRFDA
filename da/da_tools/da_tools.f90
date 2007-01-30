@@ -5,16 +5,25 @@ module da_tools
    !---------------------------------------------------------------------------
    
    use module_bc, only : bdyzone
-
-   use da_control
    use module_dm, only : wrf_dm_sum_real
+   use module_domain, only : xb_type, xpose_type
+
+   use lapack, only : dsyev
+
+   use da_control, only : pi, gravity, gas_constant, ims, ime, jms,jme, &
+      kms,kme,its,ite,jts,jte,kts,kte,ids,ide,stdout, &
+      trace_use, da_array_print, fg_format_kma, coarse_ds, coarse_ix, &
+      coarse_jy, fg_format, c2, cone_factor, earth_radius, dsm, &
+      map_projection, psi1, pole, start_x, phic, start_y, xlonc, ycntr, &
+      put_rand_seed, seed_array1, seed_array2, obs_qc_pointer, &
+      set_omb_rand_fac, fails_error_max, missing_r,x_start_sub_domain, global, &
+      fg_format_wrf, x_end_sub_domain, y_end_sub_domain, def_sub_domain, &
+      y_start_sub_domain, start_lat, delt_lat, delt_lon, start_lon, cp, &
+      missing, surface_correction,print_detail_map
    use da_define_structures, only : info_type, field_type, x_type,  &
       model_loc_type, synop_type, bad_info_type, da_gauss_noise
-   use module_domain, only : xb_type, xpose_type
-   use lapack, only : dsyev
-   use da_tracing
-   use da_reporting
-   use da_tools1
+   use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_reporting, only : da_error, message, da_warning
    
    implicit none
    

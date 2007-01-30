@@ -8,16 +8,29 @@ module da_par_util
 
    use module_domain, only : domain, xpose_type
 #ifdef DM_PARALLEL
-   use module_dm, only : io2d_ij_internal, io3d_ijk_internal
+   use module_dm, only : io2d_ij_internal, io3d_ijk_internal 
+   use mpi, only : mpi_2double_precision, mpi_status_size, &
+      mpi_integer, mpi_maxloc, mpi_status_size, &
+      mpi_minloc, mpi_sum
 #endif
    use da_define_structures, only : be_subtype, &
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
       y_type, count_obs_number_type, count_obs_type, maxmin_field_type, &
       sound_type
-   use da_par_util1
+#ifdef DM_PARALLEL
+   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real, &
+      true_mpi_real, true_mpi_complex, true_rsl_real
+#endif
+   use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &
+      rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &
+      kts,kte,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe, &
+      kps, kpe
    use da_tools, only : message
    use da_reporting, only : da_error
-   use da_tracing
+   use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_wrf_interfaces, only : wrf_dm_bcast_integer, &
+      wrf_dm_xpose_z2x,wrf_dm_xpose_x2y, wrf_dm_xpose_y2x, wrf_dm_xpose_x2z, &
+      wrf_dm_xpose_z2y, wrf_dm_xpose_y2z, wrf_patch_to_global_real
 
    implicit none
 

@@ -1,11 +1,27 @@
 module da_sound
 
-   use da_control
-   use da_define_structures
-   use da_interpolation
-   use da_statistics
-   use da_tools
-   use da_physics
+   use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
+      check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
+      check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
+      num_sound_tot, max_error_p,max_error_q, sfc_assi_options, &
+      max_stheight_diff,testing_dm_exact, trace_use
+   use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
+      bad_data_type, x_type, sound_type, number_type, bad_data_type, &
+      residual_sound_type,synop_type
+   use module_domain, only : xpose_type, xb_type
+   use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
+      da_interp_lin_3d_adj,da_interp_obs_lin_2d,da_interp_obs_lin_2d_adj, &
+      da_interp_lin_2d, da_interp_lin_2d_adj
+   use da_statistics, only : da_stats_calculate
+   use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction
+   use da_tools1, only : da_get_unit, da_free_unit
+   use da_par_util, only : da_proc_stats_combine, &
+      da_deallocate_global_sound, da_to_global_sound, da_to_global_sonde_sfc, &
+      da_deallocate_global_sonde_sfc
+   use da_par_util1, only : da_proc_sum_int
+   use da_physics, only : da_sfc_pre, da_transform_xtopsfc, &
+      da_transform_xtopsfc_adj
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_sound_type" is ONLY used locally in da_sound:
 

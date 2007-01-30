@@ -1,13 +1,21 @@
 module da_spectral
 
-   use da_control
-   use da_define_structures, only : xbx_type
    use fftpack5, only : rfft1f,rfft1b,rfft1i
-   use da_tools
-   use da_tracing
+#ifdef DM_PARALLEL
+   use mpi, only : mpi_sum
+#endif
+
+   use da_control, only : trace_use, its,ite,jts,jte, trace_use_frequent, &
+      da_zero_complex, ide,jds,jde,comm,ierr,test_transforms, stdout, pi, &
+      gaussian_lats, earth_radius, alpha_corr_type, alpha_corr_scale, &
+      alpha_corr_unit1, alpha_corr_unit2
+   use da_define_structures, only : xbx_type
 #ifdef DM_PARALLEL
    use da_par_util1, only : true_mpi_complex
 #endif
+   use da_reporting, only : da_error, message
+   use da_tools1, only : da_get_unit, da_free_unit
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    !-----------------------------------------------------------------------
    ! Contains all necessary routines to perform global spectral transform

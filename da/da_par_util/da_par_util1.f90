@@ -1,9 +1,11 @@
 module da_par_util1
 
-   use da_wrf_interfaces
-   use da_control
+   use da_control, only : rootproc, ierr, comm, root
+
 #ifdef DM_PARALLEL
-   use module_dm
+   use module_dm, only : rsl_double
+   use mpi, only : mpi_double_complex, mpi_real8, mpi_sum, &
+      mpi_integer
 #endif
 
    !---------------------------------------------------------------------------

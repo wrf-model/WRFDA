@@ -3,8 +3,11 @@
 
 PROGRAM kma2netcdf
 
+   use module_configure, only : grid_config_rec_type
+   use module_domain, only : domain
+   use da_control, only : debug_level
+
    USE module_machine
-   USE module_domain
    USE module_driver_constants
    USE module_configure
 

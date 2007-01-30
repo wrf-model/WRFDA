@@ -4,13 +4,16 @@ module da_control
    ! Purpose: Common reference point for WRFVAR control.
    !--------------------------------------------------------------------------
 
-   use module_driver_constants
+   use module_driver_constants, only : max_domains,max_eta, max_moves
 
-#ifdef DM_PARALLEL
-   use mpi, only : mpi_real8, mpi_double_complex, mpi_sum, &
-      mpi_integer, mpi_character,mpi_maxloc,mpi_minloc, &
-      mpi_status_size,mpi_2double_precision
-#endif
+!JRB
+!#ifdef DM_PARALLEL
+!   use mpi, only : mpi_real8, mpi_double_complex, mpi_sum, &
+!      mpi_integer, mpi_character,mpi_maxloc,mpi_minloc, &
+!      mpi_status_size,mpi_2double_precision, &
+!
+!      mpi_allgather, mpi_send, mpi_recv, mpi_bcast, mpi_reduce
+!#endif
 
    implicit none
 

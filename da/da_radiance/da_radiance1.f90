@@ -4,15 +4,22 @@ module da_radiance1
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_radiance
+   use module_radiance, only : satinfo,coefs,q2ppmv
 
-   use da_control
-   use da_define_structures
-   use da_interpolation
-   use da_statistics
-   use da_tools
-   use da_par_util
-   use da_reporting
+   use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
+      stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &
+      use_error_factor_rad,biasprep_unit,obs_qc_pointer
+   use da_tracing, only : da_trace_entry, da_trace_exit
+
+   use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
+      ob_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
+   use module_domain, only : xpose_type
+   use da_par_util, only : da_proc_stats_combine
+   use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
+   use da_statistics, only : da_stats_calculate
+   use da_tools, only : da_residual_new
+   use da_tools1, only : da_free_unit, da_get_unit
+   use da_reporting, only : da_error, message
 
    implicit none
    
