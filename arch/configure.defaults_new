@@ -70,7 +70,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS_RSL     =
@@ -106,7 +107,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -152,7 +154,8 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -200,7 +203,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -629,7 +633,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 
 CCFLAGS_RSL     =
 
@@ -664,7 +669,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = 
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -709,7 +715,8 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = 
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -756,7 +763,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = 
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL
@@ -814,7 +822,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale,               (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale                (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
