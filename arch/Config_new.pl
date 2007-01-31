@@ -304,7 +304,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   if ( $sw_bufr_path ) {
     $_ =~ s:CONFIGURE_BUFR_PATH:$sw_bufr_path:g ;
     $_ =~ s:CONFIGURE_BUFR_FLAG:-DBUFR: ;
-    $_ =~ s:CONFIGURE_BUFR_LIB:-L$sw_bufr_path/lib -lbufr: ;
+    $_ =~ s:CONFIGURE_BUFR_LIB:-L$sw_bufr_path -lbufr: ;
     $_ =~ s:CONFIGURE_BUFR_INC:$sw_bufr_path/src: ;
   } else {
     $_ =~ s:CONFIGURE_BUFR_PATH::g ;
