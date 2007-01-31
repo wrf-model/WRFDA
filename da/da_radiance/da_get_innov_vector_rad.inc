@@ -411,49 +411,49 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
       zasat(n1:n2) = iv%instid(inst)%satzen(n1:n2) * deg2rad
       zlsat(n1:n2) = iv%instid(inst)%satazi(n1:n2) * deg2rad
 
-!      do n=n1,n2
-         do i = n1,n2
-            knchan(i) = nchan
-            do kn=1,nchan 
-               kprof((i-1)*nchan+kn)  = i
-               kchan((i-1)*nchan+kn)  = kn
-               kochan((i-1)*nchan+kn) = kn
-               indexn(kn,i) = (-1)*nchan+kn 
-            end do
+      do i = n1,n2
+         knchan(i) = nchan
+         do kn=1,nchan 
+            kprof((i-1)*nchan+kn)  = i
+            kchan((i-1)*nchan+kn)  = kn
+            kochan((i-1)*nchan+kn) = kn
+            indexn(kn,i) = (-1)*nchan+kn 
          end do
+      end do
 
-         pemsv(:)    = 0.0
-         pemsh(:)    = 0.0
+      pemsv(:)    = 0.0
+      pemsh(:)    = 0.0
 
-         if (amsua) then
-            polar(1:4) = 0.0  ! polarizition: 0:vertical; 1:horizontal
-            polar(5:6) = 1.0
-            polar(7)   = 0.0
-            polar(8:14)= 1.0
-            polar(15)  = 0.0
-         end if
-         if (amsub) then
-            polar(1:5) = 0.0
-         end if
+      if (amsua) then
+         polar(1:4) = 0.0  ! polarizition: 0:vertical; 1:horizontal
+         polar(5:6) = 1.0
+         polar(7)   = 0.0
+         polar(8:14)= 1.0
+         polar(15)  = 0.0
+      end if
+      if (amsub) then
+         polar(1:5) = 0.0
+      end if
 
-         if (coefs(inst)%id_sensor == 2) then ! microwave
-            call da_trace("da_get_innov_vector_rad",message="Calling gsi_emiss")
-            call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
-                 iv%instid(inst)%satzen(n1:n2) * deg2rad, &
-                 iv%instid(inst)%satazi(n1:n2) * deg2rad, polar, &
-                 iv%instid(inst)%isflg(n1:n2),pemsv,pemsh,pems5, &
-                 iv%instid(inst)%ts(n1:n2), &
-                 iv%instid(inst)%soiltyp(n1:n2), &
-                 iv%instid(inst)%tslb(n1:n2), &
-                 iv%instid(inst)%smois(n1:n2), &
-                 iv%instid(inst)%vegtyp(n1:n2), &
-                 iv%instid(inst)%vegfra(n1:n2), &
-                 iv%instid(inst)%snowh(n1:n2), &
-                 sensor_type,n1n2,nchan, &
-                 iv%instid(inst)%tb_inv(:,n1:n2),amsua,amsub,ssmi, &
-                 iv%instid(inst)%u10(n1:n2), &
-                 iv%instid(inst)%v10(n1:n2))
-         end if
+      if (coefs(inst)%id_sensor == 2) then ! microwave
+         call da_trace("da_get_innov_vector_rad",message="Calling gsi_emiss")
+         call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
+              iv%instid(inst)%satzen(n1:n2) * deg2rad, &
+              iv%instid(inst)%satazi(n1:n2) * deg2rad, polar, &
+              iv%instid(inst)%isflg(n1:n2),pemsv,pemsh,pems5, &
+              iv%instid(inst)%ts(n1:n2), &
+              iv%instid(inst)%soiltyp(n1:n2), &
+              iv%instid(inst)%tslb(n1:n2), &
+              iv%instid(inst)%smois(n1:n2), &
+              iv%instid(inst)%vegtyp(n1:n2), &
+              iv%instid(inst)%vegfra(n1:n2), &
+              iv%instid(inst)%snowh(n1:n2), &
+              sensor_type,n1n2,nchan, &
+              iv%instid(inst)%tb_inv(:,n1:n2),amsua,amsub,ssmi, &
+              iv%instid(inst)%u10(n1:n2), &
+              iv%instid(inst)%v10(n1:n2))
+      end if
+
       do n=n1,n2
 
          con_vars(n) % nlevels = nlevels 
@@ -529,6 +529,14 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
       deallocate (zasat)
       deallocate (zlsat)
       deallocate (polar)
+      deallocate (knchan)
+      deallocate (kprof)
+      deallocate (kchan)
+      deallocate (kochan)
+      deallocate (indexn)
+      deallocate (pemsv)
+      deallocate (pemsh)
+      deallocate (pems5)
    end do        ! end loop for sensor
 
    !------------------------------------------------------------------------
