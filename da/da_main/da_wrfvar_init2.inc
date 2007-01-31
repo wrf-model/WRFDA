@@ -1,7 +1,5 @@
 subroutine da_wrfvar_init2
 
-use da_tools1
-
    !-------------------------------------------------------------------------
    ! Purpose: WRFVAR initialization routine, part 2
    !-------------------------------------------------------------------------
@@ -93,25 +91,16 @@ use da_tools1
    call da_trace("da_wrfvar_init2",message="calling set_scalar_indices_from_config")
    call set_scalar_indices_from_config (head_grid%id , idum1, idum2)
 
-call da_oi(__FILE__,__LINE__)
    call da_trace("da_wrfvar_init2",message="calling init_wrfio")
-call da_oi(__FILE__,__LINE__)
    call init_wrfio
-call da_oi(__FILE__,__LINE__)
 
 #ifdef DM_PARALLEL
-call da_oi(__FILE__,__LINE__)
    call get_config_as_buffer(configbuf, configbuflen, nbytes)
-call da_oi(__FILE__,__LINE__)
    call wrf_dm_bcast_bytes(configbuf, nbytes)
-call da_oi(__FILE__,__LINE__)
    call set_config_as_buffer(configbuf, configbuflen)
-call da_oi(__FILE__,__LINE__)
 #endif
 
-call da_oi(__FILE__,__LINE__)
    call setup_timekeeping (head_grid)
-call da_oi(__FILE__,__LINE__)
 
    !<DESCRIPTION>
    ! The head grid is initialized with read-in data through the call to <a
@@ -136,13 +125,10 @@ call da_oi(__FILE__,__LINE__)
 
    ! call med_initialdata_input(head_grid , config_flags,'fg01')
 
-call da_oi(__FILE__,__LINE__)
    if ((config_flags%real_data_init_type == 1) .or. &
        (config_flags%real_data_init_type == 3)) then
-call da_oi(__FILE__,__LINE__)
       call da_med_initialdata_input(head_grid , config_flags,'fg01')
    end if
-call da_oi(__FILE__,__LINE__)
 
    ! JRB
    ! call da_warning(__FILE__,__LINE__,(/"Fix me"/))
@@ -150,20 +136,17 @@ call da_oi(__FILE__,__LINE__)
    ! head_grid%stop_subtime = head_grid%stop_time
 
    if (rootproc) then
-call da_oi(__FILE__,__LINE__)
       call da_get_unit(cost_unit)
       call da_get_unit(grad_unit)
       call da_get_unit(stats_unit)
       call da_get_unit(jo_unit)
       call da_get_unit(check_max_iv_unit)
-call da_oi(__FILE__,__LINE__)
       open(unit=cost_unit,file="cost_fn",status="replace")
       open(unit=grad_unit,file="grad_fn",status="replace")
       open(unit=stats_unit,file="statistics",status="replace")
       open(unit=jo_unit,file="jo",status="replace")
       open(unit=check_max_iv_unit,file="check_max_iv",status="replace")
 
-call da_oi(__FILE__,__LINE__)
       do i=1,num_alpha_corr_types
          call da_get_unit(alpha_corr_unit1(i))
          call da_get_unit(alpha_corr_unit2(i))
@@ -172,7 +155,6 @@ call da_oi(__FILE__,__LINE__)
          write (unit=filename,fmt='(A,I1)') "alpha_corr2_",i
          open(unit=alpha_corr_unit2(i),file=filename,status="replace")
       end do
-call da_oi(__FILE__,__LINE__)
 
       do i=1,num_sound_diag
          call da_get_unit(sound_diag_unit(i))
@@ -180,7 +162,6 @@ call da_oi(__FILE__,__LINE__)
          open(unit=sound_diag_unit(i),file=filename,status="replace")
       end do
    end if
-call da_oi(__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_wrfvar_init2")
 

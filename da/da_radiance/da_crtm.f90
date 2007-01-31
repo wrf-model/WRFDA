@@ -4,6 +4,8 @@ module da_crtm
    ! Purpose: module for CRTM radiance data assimilation. 
    !---------------------------------------------------------------------------
 
+   use module_domain, only : xpose_type, x_type, xb_type
+#ifdef CRTM
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &
       CRTM_Atmosphere_type, CRTM_Surface_type,CRTM_GeometryInfo_type, &
       CRTM_Adjoint,CRTM_Forward,CRTM_K_Matrix,CRTM_Tangent_Linear, &
@@ -13,15 +15,16 @@ module da_crtm
       crtm_destroy_atmosphere,crtm_set_channelinfo,crtm_sensor_name, &
       crtm_allocate_surface,crtm_destroy_surface,crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere
-   use module_domain, only : xpose_type, x_type, xb_type
-   use da_define_structures, only : y_type, ob_type
+#endif
+
    use da_control, only : trace_use, crtm_cloud, gravity,stdout, biascorr, &
       biasprep, qc_rad,missing_r,rtminit_sensor
-   use da_tracing, only : da_trace_entry, da_trace_exit
-   use da_reporting, only : da_error
+   use da_define_structures, only : y_type, ob_type
    use da_interpolation, only : da_interp_lin_2d,da_interp_lin_2d_adj
    use da_radiance, only : da_qc_rad
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr_rad
+   use da_reporting, only : da_error
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
 contains
 

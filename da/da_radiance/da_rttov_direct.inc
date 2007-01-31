@@ -103,8 +103,6 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       profiles(n) % cfraction   = 0.
    end do
 
-call da_oi(__FILE__,__LINE__)
-
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
                        nfrequencies, nchannels, nbtout )       ! out
@@ -119,7 +117,6 @@ write (0,*) "nfrequencies, nchannels, nbtout",nfrequencies, nchannels, nbtout
    allocate (emissivity( nchannels))
    allocate (calcemis( nchannels))
    allocate (surfem( nchannels))
-call da_oi(__FILE__,__LINE__)
 
    ! allocate transmittance structure
    allocate (transmission % tau_surf      (nchannels))
@@ -144,7 +141,6 @@ call da_oi(__FILE__,__LINE__)
    allocate (radiance % out_clear(nbtout))
    allocate (radiance % total_out(nbtout))
    allocate (radiance % clear_out(nbtout))
-call da_oi(__FILE__,__LINE__)
 
    surfem (:) = 0.
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
@@ -155,7 +151,6 @@ call da_oi(__FILE__,__LINE__)
    !  surface emissivity scheme
    !----------------------------------------------------------
 
-call da_oi(__FILE__,__LINE__)
    !  For Infrared sensors
    !-----------------------------
    if (coef%id_sensor == 1 .or. coef%id_sensor == 3)  then 
@@ -176,7 +171,6 @@ call da_oi(__FILE__,__LINE__)
          end if
       end if
    end if
-call da_oi(__FILE__,__LINE__)
 
    !  For Microwave sensors
    !-----------------------------
@@ -230,7 +224,6 @@ call da_oi(__FILE__,__LINE__)
          end do
       end if
    end if
-call da_oi(__FILE__,__LINE__)
 
    !-----------------------------------
    !  calling RTTOV forward model
@@ -252,7 +245,6 @@ call da_oi(__FILE__,__LINE__)
       & emissivity,      &! inout
       & transmission,    &! inout
       & radiance )        ! inout
-call da_oi(__FILE__,__LINE__)
 
    if ( any(errorstatus(:) /= 0 )) then
       !write (unit=stderr,fmt=*) 'rttov_direct error code = ', errorstatus(:)
@@ -282,7 +274,6 @@ call da_oi(__FILE__,__LINE__)
       !write (unit=stderr,fmt=*) 'radiance = ', radiance%out_clear
       !call da_error(__FILE__,__LINE__,(/"Erk"/))
    end if
-call da_oi(__FILE__,__LINE__)
 
    nc = nbtout / nprofiles
    do n = 1, nprofiles
@@ -325,7 +316,6 @@ call da_oi(__FILE__,__LINE__)
    Deallocate (radiance % out_clear)
    Deallocate (radiance % total_out)
    Deallocate (radiance % clear_out)
-call da_oi(__FILE__,__LINE__)
 
    call da_trace_exit("da_rttov_direct")
 

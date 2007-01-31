@@ -4,7 +4,10 @@ module da_radiance1
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_radiance, only : satinfo,coefs,q2ppmv
+   use module_radiance, only : satinfo,q2ppmv
+#ifdef RTTOV
+   use module_radiance, only : coefs
+#endif
 
    use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
       stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &

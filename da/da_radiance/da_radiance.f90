@@ -5,13 +5,21 @@ module da_radiance
    !---------------------------------------------------------------------------
 
    use module_domain, only : xpose_type, xb_type
-   use module_radiance, only : coefs,satinfo, coefs_scatt_instname, &
-      coefs_scatt,profile_type,radiance_type,transmission_type,time_slots, &
-      rttov_coef,i_kind,r_kind, r_double, CRTM_ChannelInfo_type, &
-      Sensor_Descriptor,crtm_platform_name,crtm_sensor_name, platform_name, &
-      inst_name, crtm_init, one, zero, three,deg2rad,rad2deg, &
-      errorstatus_success, n_scatt_coef,q2ppmv,gas_id_watervapour, &
+   use module_radiance, only : satinfo, coefs_scatt_instname, &
+      time_slots, &
+      i_kind,r_kind, r_double, &
+       one, zero, three,deg2rad,rad2deg, &
+      n_scatt_coef,q2ppmv, &
       init_constants_derived, gsi_emiss
+#ifdef RTTOV
+   use module_radiance, only : coefs,coeffs_scatt,profile_type,radiance_type, &
+      rttov_coef,sensor_descriptor,platform_name,inst_name,transmission_type, &
+      errorstatus_success,gas_id_watervapour
+#endif
+#ifdef CRTM
+   use module_radiance, only : crtm_channelinfo_type, crtm_platform_name, &
+      crtm_sensor_name, crtm_init
+#endif
 
 #ifdef DM_PARALLEL
    use mpi, only : mpi_integer, mpi_status_size

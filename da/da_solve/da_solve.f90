@@ -7,7 +7,11 @@ subroutine da_solve ( grid , config_flags)
    use module_configure, only : grid_config_rec_type
    use module_domain, only : domain
    use module_driver_constants, only : max_comms
-   use module_radiance, only : satinfo,coefs
+   use module_radiance, only : satinfo
+#ifdef RTTOV
+   use module_radiance, only : coefs
+#endif
+
    use module_state_description, only : num_moist, num_a_moist, num_g_moist, &
       num_scalar, num_a_scalar, num_g_scalar
    use module_tiles, only : set_tiles
@@ -16,8 +20,6 @@ subroutine da_solve ( grid , config_flags)
    use module_dm, only : invalid_message_value, glen,setup_xpose_rsl, &
       add_msg_24pt_real,reset_msgs_24pt,stencil_24pt,setup_halo_rsl, &
       reset_msgs_xpose, add_msg_xpose_real, define_xpose, add_msg_24pt_integer
-      
-!   use mpi, only : mpi_barrier
 #endif
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &

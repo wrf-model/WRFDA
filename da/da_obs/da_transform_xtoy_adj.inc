@@ -137,19 +137,21 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   if (rtm_option == rtm_option_rttov) then
-      call da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
-   elseif (rtm_option == rtm_option_crtm) then
-      if (use_crtm_kmatrix) then
-         call da_transform_xtoy_rad_crtmk_adj (iv, xp, jo_grad_y, jo_grad_x)
-      else if (use_crtm_kmatrix_fast) then
-         call da_transform_xtoy_crtmk_f_adj (iv, xp, jo_grad_y, jo_grad_x)
+   if (use_radiance) then
+      if (rtm_option == rtm_option_rttov) then
+         call da_transform_xtoy_rad_adj (iv, xp, jo_grad_y, jo_grad_x)
+      elseif (rtm_option == rtm_option_crtm) then
+         if (use_crtm_kmatrix) then
+            call da_transform_xtoy_rad_crtmk_adj (iv, xp, jo_grad_y, jo_grad_x)
+         else if (use_crtm_kmatrix_fast) then
+            call da_transform_xtoy_crtmk_f_adj (iv, xp, jo_grad_y, jo_grad_x)
+         else
+            call da_transform_xtoy_rad_crtm_adj (iv, xp, jo_grad_y, jo_grad_x)
+         end if
       else
-         call da_transform_xtoy_rad_crtm_adj (iv, xp, jo_grad_y, jo_grad_x)
-      end if
-   else
-      call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
-   endif
+         call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))
+      endif
+   end if
 
    !---------------------------------------------------------------------------
    ! [21.0]  AIRS retrievals adjoint observation operator y = H(x):
