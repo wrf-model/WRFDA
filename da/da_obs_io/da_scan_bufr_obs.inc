@@ -11,6 +11,8 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
 
    character(*),   intent (in)   :: filename
 
+#ifdef BUFR
+
    type (multi_level_type)      :: platform
    logical                      :: outside
    integer                      :: total_obs, &
@@ -385,6 +387,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
 
    close(iunit)
    call da_free_unit(iunit)
+#endif
 
 end subroutine da_scan_bufr_obs
 

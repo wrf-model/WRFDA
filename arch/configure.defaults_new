@@ -336,10 +336,13 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wall -Wextra
+FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wall -Wextra \
+                     -Wunused-module-procs -Wunused-module-vars -Wunused-types \
+                     -Wunused-parameter
+                     
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,102,112,136,155,158,159,161,165 \
+FCBASE          = -cpp -Wno=101,112,136,155,158,159 \
                      -fno-second-underscore -ftrace=full -finteger=-9999 \
                      -freal=nan
 FCTYPE          = -r8
@@ -348,7 +351,7 @@ FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LDFLAGS2        = --version
+LDFLAGS2        =
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1817,18 +1820,20 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
-FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wall -Wextra
+FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C -Wall -Wextra \
+                     -Wunused-module-procs -Wunused-module-vars -Wunused-types \
+                     -Wunused-parameter
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore \
-                     -Wno=101,102,112,136,155,158,159,161,165
+                     -Wno=101,112,136,155,158,159
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
-LDFLAGS2        = --version
+LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs

@@ -104,18 +104,6 @@ fftpack5 : $(FFTPACK5)/libfftpack5.a
 
 bufr : $(BUFR)/libbufr.a
 
-$(BLAS)/libblas.a :
-	@ ( cd $(BLAS); make all )
-
-$(LAPACK)/liblapack.a :
-	@ ( cd $(LAPACK); make all )
-
-$(FFTPACK5)/libfftpack5.a :
-	( cd $(FFTPACK5); make all )
-
-$(BUFR)/libbufr.a :
-	( cd $(BUFR); make all )
-
 clean : arch_clean
 	@ rm -rf  *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
           Registry_tmp* module_state_description.f90 bufrlib.prm \

@@ -352,8 +352,7 @@ fi
 if [ -n "$BUFR" ] ; then
   echo "Will use BUFR in dir: $BUFR"
 else
-  echo "BUFR not set in environment"
-  exit 1
+  echo "Will configure for use without BUFR"
 fi
 
 # Users who are cross-compiling can set environment variable 

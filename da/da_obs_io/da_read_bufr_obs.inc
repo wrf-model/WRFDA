@@ -11,6 +11,8 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
    character(*),   intent (in), optional :: filename
 
+#ifdef BUFR
+
    type (multi_level_type)      :: platform
    logical                      :: outside, outside_all
    integer                      :: total_obs, &
@@ -1010,6 +1012,8 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
       call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
    end if
+
+#endif
 
 end subroutine da_read_bufr_obs
 

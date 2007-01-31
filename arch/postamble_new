@@ -14,7 +14,7 @@ FIXEDFLAGS_ENDIAN = $(FCTYPE) $(FCBASE)
 
 WRFVAR_LIBS  = libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
                  $(IO_GRIB1)/libio_grib1.a \
-                 lapack blas bufr fftpack5 \
+                 lapack blas fftpack5 \
                  libwrfvar.a $(MPI_LIBS)
 
 GEN_BE_LIBS  = blas lapack fftpack5

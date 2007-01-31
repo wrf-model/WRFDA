@@ -20,6 +20,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    type (xpose_type) ,  intent (in)  :: xp
    type (ob_type)    ,  intent (inout) :: iv
 
+#ifdef BUFR
+
    integer          :: iost
    integer(i_kind), allocatable :: nread(:)
 
@@ -514,6 +516,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    call da_free_unit(lnbufr)
 
    call da_trace_exit("da_read_bufrtovs")
+#endif
 
 end subroutine da_read_bufrtovs
 

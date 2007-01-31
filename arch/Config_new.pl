@@ -20,10 +20,10 @@ $sw_esmflib_path="";
 $sw_esmfinc_path="";
 $sw_rttov_path=""; 
 $sw_crtm_path=""; 
-$sw_blas_path="$(EXTERNAL)/blas"; 
-$sw_lapack_path="$(EXTERNAL)/lapack"; 
-$sw_fftpack5_path="$(EXTERNAL)/fftpack5"; 
-$sw_bufr_path="$(EXTERNAL)/bufr_ncep_nco"; 
+$sw_blas_path=""; 
+$sw_lapack_path=""; 
+$sw_fftpack5_path=""; 
+$sw_bufr_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
@@ -301,12 +301,23 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_CRTM_INC:.:g ;
   }
 
+  if ( $sw_bufr_path ) {
+    $_ =~ s:CONFIGURE_BUFR_PATH:$sw_bufr_path:g ;
+    $_ =~ s:CONFIGURE_BUFR_FLAG:-DBUFR: ;
+    $_ =~ s:CONFIGURE_BUFR_LIB:-L$sw_bufr_path/lib -lbufr: ;
+    $_ =~ s:CONFIGURE_BUFR_INC:$sw_bufr_path/src: ;
+  } else {
+    $_ =~ s:CONFIGURE_BUFR_PATH::g ;
+    $_ =~ s:CONFIGURE_BUFR_FLAG::g ;
+    $_ =~ s:CONFIGURE_BUFR_LIB::g ;
+    $_ =~ s:CONFIGURE_BUFR_INC:.:g ;
+  }
+
   # always defined
  
   $_ =~ s:CONFIGURE_BLAS:$sw_blas_path:g ;
   $_ =~ s:CONFIGURE_LAPACK:$sw_lapack_path:g ;
   $_ =~ s:CONFIGURE_FFTPACK5:$sw_fftpack5_path:g ;
-  $_ =~ s:CONFIGURE_BUFR:$sw_bufr_path:g ;
 
   @machopts1 = ( @machopts1, $_ ) ;
   if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )

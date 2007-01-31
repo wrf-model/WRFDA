@@ -14,6 +14,13 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 !
 !------------------------------------------------------------------------------
 
+  character(9)      ,  intent (in)  :: obstype
+  character(100)    ,  intent (in)  :: infile
+  type (xpose_type) ,  intent (in)  :: xp
+  type (ob_type)    ,intent (inout) :: iv
+
+#ifdef BUFR
+
   implicit none
 
 ! Number of channels for sensors in BUFR
@@ -68,13 +75,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
      real(r_double) :: tmbrst  ! Brightness temperature
   end type airschan_list
   
-
-! Input/Output variables
-  character(9)      ,  intent (in)  :: obstype
-  character(100)    ,  intent (in)  :: infile
-  type (xpose_type) ,  intent (in)  :: xp
-  type (ob_type)    ,intent (inout) :: iv
-
 
 ! BUFR talble file sequencial number
   character(len=512)  :: table_file
@@ -483,5 +483,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    end if
 
    if (trace_use) call da_trace_exit("da_read_bufrairs")
+#endif
 
 end subroutine da_read_bufrairs
