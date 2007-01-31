@@ -1,4 +1,4 @@
-subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
+subroutine da_epsalt_adj(f,t,ssw,                                    &
                       ADJ_t, ADJ_epsr, ADJ_epsi                             )
 
    implicit none
@@ -12,7 +12,7 @@ subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
    real, intent(in   ) :: f, t
    real, intent(inout) :: ADJ_t
    real, intent(inout) :: ssw
-   real, intent(in   ) :: ADJ_epsr, ADJ_epsi, epsr, epsi
+   real, intent(in   ) :: ADJ_epsr, ADJ_epsi
 
    complex :: cdum1,cdum2,cdum3
    complex :: ADJ_cdum1,ADJ_cdum2,ADJ_cdum3
@@ -86,10 +86,6 @@ subroutine da_epsalt_adj(f,t,ssw,epsr,epsi,                                    &
    cdum2  = cmplx(0.0,signew/(om*8.854e-12))
 
    cdum3  = 4.9 + (esnew-4.9)/(1.0 + cdum1) - cdum2
-
-   ! WHY
-   ! epsr   = real(cdum3)
-   ! epsi   = -aimag(cdum3)
 
    ADJ_cdum3  = ADJ_epsr + ADJ_epsi *(0.,1.)
    ADJ_esnew  =   REAL(ADJ_cdum3/((1.0,0.0) + cdum1))

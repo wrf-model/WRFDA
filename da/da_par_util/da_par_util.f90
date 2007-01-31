@@ -15,8 +15,7 @@ module da_par_util
 #endif
    use da_define_structures, only : be_subtype, &
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
-      y_type, count_obs_number_type, count_obs_type, maxmin_field_type, &
-      sound_type
+      y_type, count_obs_number_type, count_obs_type, maxmin_field_type
 #ifdef DM_PARALLEL
    use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real, &
       true_mpi_real, true_mpi_complex, true_rsl_real

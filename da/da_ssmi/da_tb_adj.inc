@@ -1,5 +1,4 @@
 subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
-                  tbv,tbh,                                                  &
                   ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
                   ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            )
 
@@ -7,7 +6,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ! Purpose: TBD
    ! Output : ADJ_p0,  ADJ_ta,   ADJ_gamma, ADJ_sst, ADJ_wv, ADJ_hwv, ADJ_u
    !          ADJ_alw, ADJ_zcld
-   ! Input  : ADJ_tbv, ADJ_tbh,  tbv,  tbh
+   ! Input  : ADJ_tbv, ADJ_tbh
    !-----------------------------------------------------------------------
 
    implicit none
@@ -17,7 +16,6 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    real   , intent(inout) :: ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,     &
                              ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld
    real   , intent(in   ) :: ADJ_tbv,ADJ_tbh 
-   real   , intent(in   ) :: tbv,tbh
 
    real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 
@@ -60,13 +58,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ADJ_foam=0.;ADJ_emissv=0.;ADJ_emissh=0.;ADJ_refv=0.
    ADJ_refh=0.;ADJ_semv=0.;ADJ_semh=0.;ADJ_scatv=0.
    ADJ_scath=0.;ADJ_remv=0.;ADJ_tbdnv=0.
-   ADJ_theta =0.
-
-
-   ! write (unit=stdout,fmt=*) 'ifreq',ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,          &
-   !              tbv,tbh,                                                  &
-   !              ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
-   !               ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
+   ADJ_theta =0.      
 
    f = freq(ifreq)
    costhet = cos(theta*0.017453)
@@ -128,15 +120,6 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    ! combine to get space-observed brightness temperature
 
-   ! tbv =     tbup + tauatm*(semv + scatv)
-   ! tbh =     tbup + tauatm*(semh + scath)
-
-
-   ! start
-   ! write (unit=stdout,fmt=*) 'ifreq 1',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
-   !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
-
-
    ADJ_tbup   = ADJ_tbh                    !!! first
    ADJ_tauatm = ADJ_tbh*(semh + scath)     !!! first
    ADJ_semh   = tauatm*ADJ_tbh             !!! first
@@ -181,10 +164,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                        ADJ_ta,ADJ_gamma,ADJ_alw,ADJ_zcld,       &
                        ADJ_dum,ADJ_tbdnh,ADJ_dum                )
    dum     = 0.0
-   ADJ_dum = 0.0
-
-   ! write (unit=stdout,fmt=*) 'ifreq 2',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
-   !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
+   ADJ_dum = 0.0           
 
    ADJ_effangv = 0.0
    call da_tbatmos_adj(ifreq,effangv,p0,wv,hwv,ta,gamma,alw,    &
@@ -194,9 +174,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
                        ADJ_dum,ADJ_tbdnv,ADJ_dum                )
 
    ADJ_gx2=0.0
-   ADJ_sigma=0.0
-   ! write (unit=stdout,fmt=*) 'ifreq 3',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
-   !                 ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
+   ADJ_sigma=0.0         
 
    call da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,    &
                       ADJ_gx2,ADJ_sigma,ADJ_effangv,ADJ_effangh )
@@ -204,11 +182,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    call da_roughem_adj(ifreq,gx2,sst,theta,remv,remh,         &
                        ADJ_gx2,ADJ_sst,ADJ_remv,ADJ_remh      )
 
-   ADJ_tauatm = - costhet*ADJ_sigma/tauatm + ADJ_tauatm
-
-
-   ! write (unit=stdout,fmt=*) 'ifreq 4',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
-   !              ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
+   ADJ_tauatm = - costhet*ADJ_sigma/tauatm + ADJ_tauatm         
 
    call da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
@@ -219,10 +193,6 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ADJ_theta=0.0   ! first
 
    ADJ_u = cg(ifreq)*ADJ_gx2 + ADJ_u
-
-   ! write (unit=stdout,fmt=*) 'ifreq 5',ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,  &
-   !              ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            
-   ! end
 
 end subroutine da_tb_adj
 

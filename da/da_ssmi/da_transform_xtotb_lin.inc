@@ -11,7 +11,8 @@ subroutine da_transform_xtotb_lin(xa, xb)
 
    integer                      :: ks,ke    ! Range of 3rd dimension of arrays.
    integer                      :: i,j,k
-   real                         :: dum1, dum2, zrhom, TGL_zrhom
+   ! real                       :: dum1
+   real                         :: dum2, zrhom, TGL_zrhom
 
    real                         :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
    real                         :: TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,TGL_tpw
@@ -94,28 +95,28 @@ subroutine da_transform_xtotb_lin(xa, xb)
       TGL_htpw = TGL_zrhom/tpw/1000. &
                - TGL_tpw/tpw*htpw
 
-      dum1 = 0.0
+!      dum1 = 0.0
 
       call da_tb_tl(1,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
-                  xb%tb19v(i,j),xb%tb19h(i,j),                      &
+!                  xb%tb19v(i,j),xb%tb19h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb19v(i,j),xa%tb19h(i,j)             )
 
       call da_tb_tl(2,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
-                  xb%tb22v(i,j),dum1,                               &
+!                  xb%tb22v(i,j),dum1,                               &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb22v(i,j),dum2                      )
 
       call da_tb_tl(3,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
-                  xb%tb37v(i,j),xb%tb37h(i,j),                      &
+!                  xb%tb37v(i,j),xb%tb37h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb37v(i,j),xa%tb37h(i,j)             )
 
          call da_tb_tl(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
-                  xb%tb85v(i,j),xb%tb85h(i,j),                      &
+!                  xb%tb85v(i,j),xb%tb85h(i,j),                      &
                   TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
                   TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
                   TGL_zcld,xa%tb85v(i,j),xa%tb85h(i,j)             )
