@@ -15,6 +15,7 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
    character (len=*), intent(in) :: var
    real, dimension(i1,i2), intent(out) :: data
    real(kind=8), dimension(i1,i2) :: tmp
+   real(kind=4), dimension(i1,i2) :: tmp4
 
    integer cdfid, rcode, id_data
    character (len=80) :: varnam
@@ -75,6 +76,9 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
    else if ((ivtype == NF_DOUBLE) .and. (kind(data) == 4)) then
       call ncvgt(cdfid,id_data,istart,iend,tmp,rcode)
       data = tmp
+   else if ((ivtype == NF_REAL) .and. (kind(data) == 8)) then
+      call ncvgt(cdfid,id_data,istart,iend,tmp4,rcode)
+      data = tmp4
    else
       write(unit=*, fmt='(a, i6)') &
          'Unrecognizable ivtype:', ivtype

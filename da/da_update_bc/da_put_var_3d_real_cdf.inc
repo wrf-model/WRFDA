@@ -15,6 +15,7 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
    character (len=*), intent(in) :: var
    real, dimension(i1,i2,i3), intent(in) :: data
    real(kind=8), dimension(i1,i2,i3) :: tmp
+   real(kind=4), dimension(i1,i2,i3) :: tmp4
 
    integer cdfid, rcode, id_data
    character (len=80) :: varnam
@@ -76,9 +77,12 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
    else if ((ivtype == NF_DOUBLE) .and. (kind(data) == 4)) then
       tmp = data
       call ncvpt(cdfid,id_data,istart,iend,tmp,rcode)
+   else if ((ivtype == NF_REAL) .and. (kind(data) == 8)) then
+      tmp4 = data
+      call ncvpt(cdfid,id_data,istart,iend,tmp4,rcode)
    else
-      write(unit=*, fmt='(a, i6)') &
-          'Unrecognizable ivtype:', ivtype
+      write(unit=*, fmt='(a, 4i6)') &
+         'Unrecognizable ivtype:', ivtype,nf_double,nf_real,kind(data)
       stop
    end if
 

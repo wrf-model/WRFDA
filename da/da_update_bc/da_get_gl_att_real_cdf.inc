@@ -13,6 +13,7 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
    logical, intent(in) :: debug
    real,    intent(out) :: value
    real(kind=8)         :: tmp
+   real(kind=4)         :: tmp4
 
    integer :: cdfid, rcode, ivtype
 
@@ -40,9 +41,12 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
       value = tmp
    else if ((ivtype == NF_DOUBLE) .and. (kind(value) == 8)) then
       rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, value)
+   else if ((ivtype == NF_REAL) .and. (kind(value) == 8)) then
+      rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, tmp4)
+      value = tmp4
    else
       write(unit=*, fmt='(a, i6)') &
-           'Unrecognizable ivtype:', ivtype
+         'Unrecognizable ivtype:', ivtype
       stop
    end if
 
