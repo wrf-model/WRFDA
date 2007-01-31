@@ -2284,6 +2284,16 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
                             PatchStart , PatchEnd ,                                      &
                             Status )
       DEALLOCATE(ICAST)
+#if (DA_CORE == 1)
+  ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
+    CALL wrf_write_field2 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
+                            Comm       , IOComm  ,                                       &
+                            DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
+                            DomainStart , DomainEnd ,                                    &
+                            MemoryStart , MemoryEnd ,                                    &
+                            PatchStart , PatchEnd ,                                      &
+                            Status )
+#endif
   ELSE
     CALL wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
                             Comm       , IOComm  ,                                       &
@@ -2294,6 +2304,64 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
                             Status )
   ENDIF
 END SUBROUTINE wrf_write_field
+
+#if (DA_CORE == 1)
+SUBROUTINE wrf_write_field2 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
+                             Comm       , IOComm  ,                                       &
+                             DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
+                             DomainStart , DomainEnd ,                                    &
+                             MemoryStart , MemoryEnd ,                                    &
+                             PatchStart , PatchEnd ,                                      &
+                             Status )
+!<DESCRIPTION>
+!<PRE>
+! Write the variable named VarName to the dataset pointed to by DataHandle.
+! This routine is a wrapper that ensures uniform treatment of logicals across 
+! platforms by converting to integer before writing.  
+!</PRE>
+!</DESCRIPTION>
+  USE module_state_description
+  USE module_configure
+  IMPLICIT NONE
+  INTEGER ,       INTENT(IN)    :: DataHandle
+  CHARACTER*(*) :: DateStr
+  CHARACTER*(*) :: VarName
+  REAL                          ,INTENT(IN)    :: Field(*)
+  INTEGER                       ,INTENT(IN)    :: FieldType
+  INTEGER                       ,INTENT(INOUT) :: Comm
+  INTEGER                       ,INTENT(INOUT) :: IOComm
+  INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)         ,INTENT(IN)    :: bdy_mask
+  CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
+  CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
+  CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
+  INTEGER ,dimension(*)         ,INTENT(IN)    :: DomainStart, DomainEnd
+  INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
+  INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
+  INTEGER                       ,INTENT(OUT)   :: Status
+#include "wrf_status_codes.h"
+#include "wrf_io_flags.h"
+  REAL (KIND= NATIVE_RWORDSIZE ), ALLOCATABLE, DIMENSION(:) :: rcast
+
+  ALLOCATE(rcast((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
+  rcast(1:(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)) = &
+       Field(1:(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1))
+
+#if (NATIVE_RWORDSIZE == 4)
+  CALL wrf_write_field1 ( DataHandle , DateStr , VarName , rcast , WRF_REAL ,          &
+#else
+  CALL wrf_write_field1 ( DataHandle , DateStr , VarName , rcast , WRF_DOUBLE ,        &
+#endif
+                          Comm       , IOComm  ,                                       &
+                          DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
+                          DomainStart , DomainEnd ,                                    &
+                          MemoryStart , MemoryEnd ,                                    &
+                          PatchStart , PatchEnd ,                                      &
+                          Status )
+  DEALLOCATE(rcast)
+
+END SUBROUTINE wrf_write_field2
+#endif
 
 SUBROUTINE wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
                              Comm       , IOComm  ,                                       &

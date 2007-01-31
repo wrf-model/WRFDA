@@ -12,9 +12,10 @@ CC_TOOLS        = gcc
 LD              = $(FC)
 
 # Flags (preprocessor, fortran, c, loader)
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -62,8 +63,10 @@ CC              = gcc
 CC_TOOLS        = $(CC)
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -96,8 +99,10 @@ CC              = mpicc -DMPI2_SUPPORT
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -143,8 +148,10 @@ CC              = mpicc -DMPI2_SUPPORT
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -192,8 +199,10 @@ CC              = mpicc -DMPI2_SUPPORT
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -239,8 +248,10 @@ CC              = gcc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         = 
@@ -269,8 +280,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -314,8 +327,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -363,8 +378,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -456,8 +473,10 @@ CC              = icc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -487,8 +506,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -533,8 +554,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -579,8 +602,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -625,8 +650,10 @@ CC              = gcc
 CC_TOOLS        = $(CC)
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -658,8 +685,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -704,8 +733,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -752,8 +783,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -798,8 +831,10 @@ CC              = gcc
 CC_TOOLS        = $(CC)
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -831,8 +866,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -876,8 +913,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -923,8 +962,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -969,8 +1010,10 @@ CC              = icc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -1004,8 +1047,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1050,8 +1095,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1097,8 +1144,10 @@ CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE
+FPPFLAGS2       = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1146,8 +1195,10 @@ CC_TOOLS        = $(CC)
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM                    
+FPPFLAGS2       = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = -O2
 FCDEBUG         = # -g
@@ -1182,8 +1233,10 @@ CC_TOOLS        = cc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1238,8 +1291,10 @@ CC_TOOLS        = cc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1286,10 +1341,12 @@ CC_TOOLS        = cc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 MAX_PROC        = 256
 
 TRADFLAG        =
-FPPFLAGS2       = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 FCOPTIM         =
 FCDEBUG         =
@@ -1319,8 +1376,10 @@ CC              = cc_r
 CC_TOOLS        = $(CC)
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHPE -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         = 
@@ -1355,8 +1414,10 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1403,8 +1464,10 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1453,8 +1516,10 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1504,8 +1569,10 @@ CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 FCOPTIM         =
 FCDEBUG         =
@@ -1542,8 +1609,10 @@ CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1599,8 +1668,10 @@ CC_TOOLS        = gcc
 RANLIB          = echo
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 8
+
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM
+FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1652,8 +1723,10 @@ CC              = cc
 CC_TOOLS        = cc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -1686,8 +1759,10 @@ CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1733,8 +1808,10 @@ CC              = mpicc
 CC_TOOLS        = cc
 LD              = $(FC)
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1783,8 +1860,10 @@ LD              = $(FC)
 CC              = mpicc
 CC_TOOLS        = cc
 
+NATIVE_RWORDSIZE	= 4
+
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE
+FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
