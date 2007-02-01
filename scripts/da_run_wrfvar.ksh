@@ -57,8 +57,8 @@ export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
 export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}    #DALE: Boundaries look wrong to me.
 if $CYCLING; then
-   export DA_BOUNDARIES=${DA_BOUNDARIES:-$FC_DIR/$DATE/wrfbdy_d$DOMAIN}    # wrfvar boundaries input.
    if ! $FIRST; then
+      export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
    fi
 fi
@@ -231,7 +231,7 @@ echo "WINDOW_END            $WINDOW_END"
       # nl
 
       # Inputs
-      export NL_AUXHIST2_INNAME='auxhist2_d<domain>_<date>'
+      export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
       export NL_DYN_OPT=2
       export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
       export NL_INPUTOUT_INTERVAL=60
@@ -306,7 +306,7 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_REAL_DATA_INIT_TYPE=1
       . $WRF_DIR/inc/namelist_script.inc
       export NL_DEBUG_LEVEL=0
-      unset NL_AUXHIST2_INNAME
+      unset NL_AUXHIST2_OUTNAME
       unset NL_AUXHIST2_INTERVAL
       unset NL_FRAMES_PER_AUXHIST2
       unset NL_MP_ZERO_OUT_THRESH
@@ -399,6 +399,20 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs ad/ad_d${DOMAIN}_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
 
       export NL_DYN_OPT=2
+      unset NL_MP_PHYSICS
+      unset NL_RA_LW_PHYSICS
+      unset NL_RA_SW_PHYSICS
+      unset NL_RADT
+      unset NL_SF_SFCLAY_PHYSICS
+      unset NL_SF_SURFACE_PHYSICS
+      unset NL_BL_PBL_PHYSICS
+      unset NL_BLDT
+      unset NL_CU_PHYSICS
+      unset NL_CUDT
+      unset NL_ISFFLX
+      unset NL_IFSNOW
+      unset NL_ICLOUD
+
    fi
 
    . $WRFVAR_DIR/build/inc/namelist_script.inc

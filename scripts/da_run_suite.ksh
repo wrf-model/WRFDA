@@ -194,6 +194,9 @@ export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.dat} # background errors.
 
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2} # Observation format: 1=BUFR, 2=ASCII "little_r"
+
+#From Update_BC:
+export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
 #------------------------------------------------------------------------------------------
 
 echo "<HTML><HEAD><TITLE>$EXPT</TITLE></HEAD><BODY><H1>$EXPT</H1><PRE>"
@@ -323,6 +326,29 @@ while test $DATE -le $FINAL_DATE; do
 
    export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 
+   if $NL_VAR4D; then
+     if $CYCLING; then
+       if ! $FIRST; then
+         if $RUN_UPDATE_BC; then
+           export RUN_DIR=$EXP_DIR/run/$DATE/update_bc_4dvar
+           export PHASE=true
+           mkdir -p $RUN_DIR
+
+           $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
+           $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
+           RC=$?
+           if test $? != 0; then
+              echo `date` "${ERR}Failed with error $RC$END"
+              exit 1
+           fi
+           export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
+         else
+           export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
+         fi 
+       fi
+      fi
+   fi
+
    if $RUN_WRFVAR; then
       export RUN_DIR=$EXP_DIR/run/$DATE/wrfvar
       mkdir -p $RUN_DIR
@@ -354,6 +380,7 @@ while test $DATE -le $FINAL_DATE; do
 
    if $RUN_UPDATE_BC; then
       export RUN_DIR=$EXP_DIR/run/$DATE/update_bc
+      export PHASE=false
       mkdir -p $RUN_DIR
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
