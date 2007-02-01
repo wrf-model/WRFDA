@@ -87,6 +87,23 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
+elif test $SUBMIT = "PBS"; then 
+   cat > job.ksh <<EOF
+#!/bin/ksh
+#
+# PBS batch script
+#
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
+
+# Options for Cray X1 
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="aprun -m exclusive -N$NUM_PROCS -n$NUM_PROCS"
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
+. $SCRIPT > $EXP_DIR/index.html 2>&1
+
+EOF
 elif test $SUBMIT = none; then
    if test -f $HOSTS; then
       export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
@@ -125,6 +142,8 @@ if test $SUBMIT = "LoadLeveller"; then
    llsubmit job.ksh
 elif test $SUBMIT = "LSF"; then 
    bsub -q $QUEUE -n $NUM_PROCS < $PWD/job.ksh
+elif test $SUBMIT = "PBS"; then 
+   qsub -q $QUEUE -V -l mppe=$NUM_PROCS $PWD/job.ksh
 else
    ./job.ksh
 fi

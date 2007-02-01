@@ -12,7 +12,7 @@ module da_radiance
       n_scatt_coef,q2ppmv, &
       init_constants_derived, gsi_emiss
 #ifdef RTTOV
-   use module_radiance, only : coefs,coeffs_scatt,profile_type,radiance_type, &
+   use module_radiance, only : coefs,coefs_scatt,profile_type,radiance_type, &
       rttov_coef,sensor_descriptor,platform_name,inst_name,transmission_type, &
       errorstatus_success,gas_id_watervapour
 #endif

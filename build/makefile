@@ -105,7 +105,7 @@ fftpack5 : $(FFTPACK5)/libfftpack5.a
 bufr : $(BUFR)/libbufr.a
 
 clean : arch_clean
-	@ rm -rf  *.exe *.o *.mod *.b *.a *.f inc/*.inc frame/*.f90 registry \
+	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
           inc/dm_comm_cpp_flags depend depend.txt
@@ -113,7 +113,7 @@ clean : arch_clean
 
 superclean : clean arch_superclean
 	@ ( cd ../external; make superclean )
-	@ rm -rf *.f90 *.F90 *.F *.inc *.int *.c *.h *.m4 *.code \
+	@ rm -rf *.exe *.f90 *.F90 *.F *.inc inc/*.inc *.int *.c *.h *.m4 *.code \
           bufrlib.param *.sed registry \
           convert_tool kma_wave2grid wave2grid_kma *.csh version_decl \
           *.bsh *.csh Utl* macros_utl module_dm_warning rsl_cpp_flags \

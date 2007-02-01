@@ -20,7 +20,12 @@ else
    if ($status == 0) then
       setenv SUBMIT LoadLeveller
    else
-      setenv SUBMIT none
+      qsub >& /dev/null
+      if ($status == 0) then
+         setenv SUBMIT PBS
+      else
+         setenv SUBMIT none
+      endif
    endif
 endif
 

@@ -19,7 +19,12 @@ else
    if test $? = 0 ; then
       export SUBMIT=LoadLeveller
    else
-      export SUBMIT=none
+      qsub >/dev/null 2>&1
+      if test $? = 0; then
+         export SUBMIT=PBS
+      else
+         export SUBMIT=none
+      fi
    fi
 fi
 
