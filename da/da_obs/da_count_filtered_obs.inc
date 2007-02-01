@@ -1,6 +1,7 @@
 subroutine da_count_filtered_obs(&
                     ts0, tlp, ptop, ps0, map, ds, &   
-                    phic, xlonc, truelat1, truelat2)
+                    phic, xlonc, truelat1, truelat2, &
+                    coarse_ix, coarse_jy, start_x, start_y)
 
    !---------------------------------------------------------------------------
    ! Purpose: Scans intermediate Filtered Obs file, 
@@ -11,6 +12,8 @@ subroutine da_count_filtered_obs(&
 
    real,              intent(in) :: ts0, tlp, ptop, ps0, ds
    real,              intent(in) :: phic, xlonc, truelat1, truelat2
+   integer,           intent(in) :: coarse_ix, coarse_jy
+   real,              intent(in) :: start_x, start_y
    integer,           intent(in) :: map
 
    integer                      :: i, iost, fm
@@ -37,7 +40,7 @@ subroutine da_count_filtered_obs(&
                                    num_others
 
    integer                        :: iunit, files, total_obs     
-   integer                        :: maxnes, numc, idd, nesti, nestj
+   integer                        :: maxnes, numc, idd
    character*20                   :: filename
 
 
@@ -68,8 +71,7 @@ subroutine da_count_filtered_obs(&
    ! Loop over all data files
    do files = 0, num_procs-1
       write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.',files  
-      open(unit=iunit, file= trim(filename), form='formatted',  & 
-        status='old', iostat=iost)
+      open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
       if (iost /= 0) &
       call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
@@ -275,24 +277,24 @@ subroutine da_count_filtered_obs(&
       "TEMP  =",num_sound,", ", &
       "AIREP =",num_airep,", ", &
       "PILOT =",num_pilot,", ", &
-      "GeoAMV =",num_geoamv,", ", &
-      "PolarAMV =",num_polaramv,", ", &
+      "GeAMV =",num_geoamv,", ", &
+      "PoAMV =",num_polaramv,", ", &
       "GPSPW =",num_gpspw,", ", &
-      "GPSPRF =",num_gpsref,", ", &
+      "GPSRF =",num_gpsref,", ", &
       "PROFL =",num_profiler,", ", &
       "QSCAT =",num_qscat,", ", &
       "SSMT1 =",num_ssmt1,", ", &
       "SSMT2 =",num_ssmt2,", ", &
       "SATEM =",num_satem, ", ", &
       "BOGUS =",num_bogus,", ", &
-      "AIRSRET =",num_airsr,", ", &
+      "AIRSR =",num_airsr,", ", &
       "OTHER =",num_others,", "
 
    ! write reference state info
 
    write (unit = filtered_obs_unit, fmt = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
       "PHIC  =", phic,", XLONC =", xlonc,", TRUE1 =", truelat1,&
-      ", TRUE2 =",truelat2                                                      
+      ", TRUE2 =",truelat2, ", XIM11 =", start_y, ", XJM11 =", start_x, ","
    write (unit = filtered_obs_unit, fmt = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
       "TS0   =",  ts0, ", TLP   =", tlp, &
       ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
@@ -300,24 +302,27 @@ subroutine da_count_filtered_obs(&
    ! write domain info 
 
    !  hardwire following variables
-   maxnes = 1 ; numc = 1 ;  idd = 1
-   nesti = 1 ; nestj = 1
+      maxnes = 2; numc = 1
+   if ( coarse_ix == ide+1 .and. coarse_jy == jde+1 ) then
+      idd = 2
+   else
+      idd = 1
+   endif
    write (unit = filtered_obs_unit, fmt = '(5(A,I7),A)') &
-      "IXC   =", ide   ,", JXC   =", jde   ,", IPROJ =", map,&
+      "IXC   =", coarse_jy   ,", JXC   =", coarse_ix   ,", IPROJ =", map,&
       ", IDD   =", idd,", MAXNES=",maxnes,","
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
-      !       "NESTIX=",(nestix (i),", ", i = 1, maxnes)
-      "NESTIX=",(ide+1    ,", ", i = 1, maxnes)
+      "NESTIX=", coarse_jy, ", ", jde+1, ", "
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
-      "NESTJX=",(jde+1       ,", ", i = 1, maxnes)
+      "NESTJX=", coarse_ix, ", ", ide+1, ", "
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
       "NUMC  =",(numc ,", ", i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,F7.2,A))')&
       "DIS   =",(ds/1000.,", ",i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
-      "NESTI =",(nesti     ,", ", i = 1, maxnes)
+      "NESTI=", 1, ", ", int(start_y), ", "
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
-      "NESTJ =",(nestj     ,", ", i = 1, maxnes)
+      "NESTJ=", 1, ", ", int(start_x), ", "
 
    ! write variable names and unit
 

@@ -221,10 +221,11 @@ subroutine da_solve ( grid , config_flags)
 
       ! Write "clean" QCed observations if requested:
       if (anal_type_qcobs) then
-         if (it == 1) then
-            call da_write_filtered_obs(ob, iv, grid%xb, &
+        if (it == 1) then
+        call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
                           grid%moad_cen_lat, grid%stand_lon,&
-                          grid%truelat1, grid%truelat2 )
+                          grid%truelat1, grid%truelat2,     &
+                          coarse_ix, coarse_jy, start_x, start_y)
          end if     
       end if
 

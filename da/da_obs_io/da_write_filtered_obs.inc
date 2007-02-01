@@ -1,5 +1,6 @@
 subroutine da_write_filtered_obs(ob, iv, xb, xp, & 
-   phic, xlonc, truelat1, truelat2)
+   phic, xlonc, truelat1, truelat2,              &
+   coarse_ix, coarse_jy, start_x, start_y)
 
    !------------------------------------------------------------------------
    ! Purpose: Writes filtered observations by WRFVAR
@@ -44,6 +45,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    type (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
    type (xb_type),    intent(in)  :: xb      ! First guess structure.
    real, intent(in)               :: phic, xlonc, truelat1, truelat2
+   integer, intent(in)            :: coarse_ix, coarse_jy
+   real, intent(in)               :: start_x, start_y
 
    integer                      :: i, j, iost, nlevels
 
@@ -1358,7 +1361,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
          call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
       call da_count_filtered_obs(&
          xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
-         phic, xlonc, truelat1, truelat2)
+         phic, xlonc, truelat1, truelat2,                 &
+         coarse_ix, coarse_jy, start_x, start_y)
       call da_final_write_filtered_obs
       close (filtered_obs_unit)
       call da_free_unit(filtered_obs_unit)
