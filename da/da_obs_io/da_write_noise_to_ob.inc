@@ -19,7 +19,6 @@ subroutine da_write_noise_to_ob (iv)
    call mpi_barrier(comm, ierr)
 #endif
    call da_get_unit (iunit)
-   call da_get_unit (rand_unit)
    allocate (filename(0:num_procs-1))
    do k = 0,num_procs-1
       write(unit=filename(k), fmt='(a,i3.3)')'rand_obs_error.',k
@@ -395,6 +394,26 @@ subroutine da_write_noise_to_ob (iv)
     end if
 
    !------------------------------------------------------------------
+   ! writing gpsref
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   if (iv % num_gpsref > 0) then
+      do n = 1, iv % num_gpsref
+         if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+   end if
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0 .and. rootproc) then
+      write(rand_unit,'(a20,20i8)')'gpsref', num_obs  
+      num_obs = 0
+      do k = 0,num_procs-1
+         call da_read_rand_unit(filename(k),iunit,num_obs,'gpsref',6)    
+      end do
+   end if
+
+
+   !------------------------------------------------------------------
    ! writing Radiance data:  
    !------------------------------------------------------------------
 
@@ -426,7 +445,6 @@ subroutine da_write_noise_to_ob (iv)
    end if
 
    call da_free_unit (iunit)
-   call da_free_unit (rand_unit)
    deallocate (filename)
    call da_trace_exit("da_write_noise_to_ob")
    

@@ -33,7 +33,7 @@
     character*10  :: date, new_date             ! Current date (ccyymmddhh).
     integer       :: sdate, cdate, edate        ! Starting, current ending dates.
     LOGICAL       :: if_write, is_file
-    CHARACTER(LEN=150)                           :: file_dir,filename
+    CHARACTER(LEN=190)                           :: file_dir,filename
 
 !----------------------------------------------------------------------------
   TYPE (surface_type)    :: surface

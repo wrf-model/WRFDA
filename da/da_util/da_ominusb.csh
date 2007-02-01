@@ -78,6 +78,7 @@ setenv VAR ( t_omb q_omb )
   mv fort.30     $FILENAME.sigma_o_b
   mv ominusb.out $FILENAME.out
  end
+ end
 #---------------------------------------------------
 setenv TYPE airep 
 setenv VAR ( u_omb v_omb t_omb ) 
@@ -91,6 +92,7 @@ setenv VAR ( u_omb v_omb t_omb )
   rm fort.35
   mv fort.30     $FILENAME.sigma_o_b
   mv ominusb.out $FILENAME.out
+ end
  end
 #---------------------------------------------------
  foreach TYPES ( geoamv polaramv pilot profiler )
@@ -107,9 +109,23 @@ setenv VAR ( u_omb v_omb t_omb )
   mv fort.30     $FILENAME.sigma_o_b
   mv ominusb.out $FILENAME.out
  end
-
  end
 #---------------------------------------------------
+ foreach TYPES ( gpsref )
+ setenv TYPE $TYPES
+ setenv VAR (ref_omb ) 
+#---------------------------------------------------
+ foreach OBS_VAR ( $VAR )
+  setenv FILENAME $TYPE${OBS_VAR}
+  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+
+     ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
+
+  rm fort.35
+  mv fort.30     $FILENAME.sigma_o_b
+  mv ominusb.out $FILENAME.out
+ end
+ end
 #---------------------------------------------------
  echo ""
   echo " da_ominusb.csh completed! for " $TYPE

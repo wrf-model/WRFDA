@@ -624,7 +624,7 @@ subroutine da_write_obs(ob, iv, re)
                      num_obs,k, iv % gpsref(n) % info % id, &  ! Station
                      iv % gpsref(n) % info % lat, &       ! Latitude
                      iv % gpsref(n) % info % lon, &       ! Longitude
-                     iv % gpsref(n) % p(k), &             ! Obs Pressiure
+                     iv % gpsref(n) % h(k), &             ! Obs Height    
                      ob%gpsref(n)%ref(k), iv%gpsref(n)%ref(k), re%gpsref(n)%ref(k) ! O, O-B, O-A ref
                end do
             end if

@@ -21,7 +21,8 @@ subroutine da_final_write_filtered_obs
    do files = 0, num_procs-1
 
       write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.',files      
-      open(unit=iunit, file= trim(filename),form='formatted',iostat=iost)
+      open(unit=iunit, file= trim(filename),form='formatted', &
+       status='old', iostat=iost)
       if(iost /= 0) &
       call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 

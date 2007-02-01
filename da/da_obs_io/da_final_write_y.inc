@@ -1,4 +1,4 @@
-subroutine da_final_write_y(iv)
+subroutine da_final_write_y(iv, y)
 
    !-------------------------------------------------------------------------   
    ! Purpose: Writes full diagnostics for y=H(x_inc)    
@@ -7,8 +7,9 @@ subroutine da_final_write_y(iv)
    implicit none
 
    type (ob_type), intent(in)    :: iv   ! O-B structure.
+   type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
       
-   integer                       :: n, k,kk,i, ounit
+   integer                       :: n, k,kk,i, ounit, iunit
    integer                       :: sound_num_obs, num_obs, ios
    character*20, allocatable     :: filename(:)
    character*20                  :: ob_name, file_prefix  
@@ -34,8 +35,8 @@ subroutine da_final_write_y(iv)
          write(unit=filename(k),fmt ='(a,a,i3.3)')trim(file_prefix),'.',k
       end do
       call da_get_unit(ounit)
-      open(unit=ounit,file=trim(file_prefix),form='formatted',iostat=ios, &
-         status='new')
+      open(unit=ounit,file=trim(file_prefix),form='formatted', &
+         status='replace' , iostat=ios)
       if (ios /= 0) call da_error(__FILE__,__LINE__, &
          (/"Cannot open random observation error file"//trim(file_prefix)/))
    end if
@@ -437,6 +438,26 @@ subroutine da_final_write_y(iv)
          end do                                  ! end loop for Channel 
       end do                                   ! end loop for sensor
    end if
+   !------------------------------------------------------------------
+   ! writing gpsref:
+   !------------------------------------------------------------------
+   
+   num_obs = 0
+   if (iv % num_gpsref > 0) then
+      do n = 1, iv % num_gpsref
+         if (iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+   end if
+   call da_proc_sum_int(num_obs)
+   if (rootproc .and. num_obs > 0) then
+      write(ounit,'(a20,i8)')'gpsref', num_obs  
+      num_obs = 0
+      do k = 0,num_procs-1
+         call da_read_y_unit(trim(filename(k)),ounit,num_obs,'gpsref',6)    
+      end do
+   end if
+
+   !------------------------------------------------------------------
 
    if (rootproc) then
       close(ounit)

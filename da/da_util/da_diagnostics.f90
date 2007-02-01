@@ -1,9 +1,12 @@
 program da_diagnostics
 
    !-----------------------------------------------------------
+   ! Author: Syed RH Rizvi   org: UCAR/NCAR/MMM
    ! Purpose: Preparing necessary diagnostic output for 
    !          Observation error tuning  (Hollingsworh method)
    !     Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
+   ! Update:
+   !    01/03/2007   GPS refractivity update      Syed RH Rizvi
    !-----------------------------------------------------------
 
    implicit none
@@ -147,12 +150,19 @@ program da_diagnostics
       type (field_type)          :: slp 
    end type bogus_type
 
+   type gpsref_type
+      type (info_type)           :: info
+      integer                    :: numlevs
+      real, pointer              :: pressure(:)
+      type (field_type), pointer :: ref(:)
+   end type gpsref_type
+
    type ob_type
       integer                    :: num_synop, num_metar, num_ships, &
                                     num_polaramv, num_qscat, num_geoamv, num_gpspw, num_sound, &
                                     num_airep, num_pilot, num_ssmir, num_airsret, &
                                     num_satem, num_ssmt1, num_ssmt2, &
-                                    num_sonde_sfc, num_buoy, num_profiler, num_bogus
+                                    num_sonde_sfc, num_buoy, num_profiler, num_bogus, num_gpsref
 
       type (surfc_type), pointer :: synop(:)
       type (surfc_type), pointer :: metar(:)
@@ -173,6 +183,7 @@ program da_diagnostics
       type (ssmt1_type), pointer :: ssmt1(:)
       type (ssmt2_type), pointer :: ssmt2(:)
       type (bogus_type), pointer :: bogus(:)
+      type (gpsref_type), pointer :: gpsref(:)
    end type ob_type
 
    type (ob_type)       :: ob
@@ -280,6 +291,7 @@ program da_diagnostics
    if ( ob % num_ssmt1 > 0 ) call da_calc_stats_ssmt1( ob % num_ssmt1, ob % ssmt1 )
    if ( ob % num_ssmt2 > 0 ) call da_calc_stats_ssmt2( ob % num_ssmt2, ob % ssmt2 )
    if ( ob % num_bogus > 0 ) call da_calc_stats_bogus( ob % num_bogus, ob % bogus )
+   if ( ob % num_gpsref > 0 ) call da_calc_stats_gpsref( ob % num_gpsref, ob % gpsref )
 
 !--------------------------------------------------------------------------
 !  [4.0] Write data for post-processing:
@@ -491,9 +503,9 @@ program da_diagnostics
    current_time = 1
    do n = 1, ob % num_profiler
       do k = 1, ob % profiler(n) % numlevs
-      call da_write_data( 1, current_time, unit1, ob % profiler(n) % info, &
+      call da_write_data( k, current_time, unit1, ob % profiler(n) % info, &
                           ob % profiler(n) % pressure(k), ob % profiler(n) % u(k) )
-      call da_write_data( 1, current_time, unit2, ob % profiler(n) % info, &
+      call da_write_data( k, current_time, unit2, ob % profiler(n) % info, &
                           ob % profiler(n) % pressure(k), ob % profiler(n) % v(k) )
       end do
       current_time = ob % profiler(n) % info % time
@@ -533,9 +545,9 @@ program da_diagnostics
    current_time = 1
    do n = 1, ob % num_pilot
       do k = 1, ob % pilot(n) % numlevs
-      call da_write_data( 1, current_time, unit1, ob % pilot(n) % info, &
+      call da_write_data( k, current_time, unit1, ob % pilot(n) % info, &
                           ob % pilot(n) % pressure(k), ob % pilot(n) % u(k) )
-      call da_write_data( 1, current_time, unit2, ob % pilot(n) % info, &
+      call da_write_data( k, current_time, unit2, ob % pilot(n) % info, &
                           ob % pilot(n) % pressure(k), ob % pilot(n) % v(k) )
       end do
       current_time = ob % pilot(n) % info % time
@@ -553,6 +565,7 @@ program da_diagnostics
    open( unit2, file = 'bogusv_omb.dat', status = 'unknown' )
    open( unit3, file = 'bogust_omb.dat', status = 'unknown' )
    open( unit4, file = 'bogusq_omb.dat', status = 'unknown' )
+   open( unit5, file = 'bogusslp_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_bogus
       do k = 1, ob % bogus(n) % numlevs
@@ -566,6 +579,8 @@ program da_diagnostics
                              ob % bogus(n) % pressure(k), ob % bogus(n) % q(k) )
 
       end do
+      call da_write_data( 1, current_time, unit5, ob % bogus(n) % info, &
+                          missing_r, ob % bogus(n) % slp )
       current_time = ob % bogus(n) % info % time
    end do
 
@@ -573,8 +588,9 @@ program da_diagnostics
    write(unit2,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
    write(unit3,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
    write(unit4,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+   write(unit5,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
 
-   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 )
+   close( unit1 ); close( unit2 ); close( unit3 ); close( unit4 ); close( unit5 )
 
  end if
 !--------------------------------------------------------------------------
@@ -603,6 +619,40 @@ program da_diagnostics
    close( unit1 ); close( unit2 ); close( unit3 )
 
  end if
+!  [4.12] gpsref    O-B:
+ if ( ob % num_gpsref  > 0 ) then
+   open( unit1, file = 'gpsrefref_omb.dat', status = 'unknown' )
+
+   current_time = 1
+   do n = 1, ob % num_gpsref   
+      do k = 1, ob % gpsref(n) % numlevs
+      call da_write_data( k, current_time, unit1, ob % gpsref(n) % info, &
+                          ob % gpsref(n) % pressure(k), ob % gpsref(n) % ref(k) )
+      end do
+      current_time = ob % gpsref(n) % info % time
+   end do
+
+   write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+   close( unit1 )
+ end if
+
+!  [4.13] Gpspw O-B:
+   if ( ob % num_gpspw > 0 ) then
+      open( unit1, file = 'gpspwtpw_omb.dat', status = 'unknown' )
+
+      current_time = 1
+      do n = 1, ob % num_gpspw
+         call da_write_data( 1, current_time, unit1, ob % gpspw(n) % info, &
+                             missing_r, ob % gpspw(n) % tpw )
+         current_time = ob % gpspw(n) % info % time
+      end do
+
+      write(unit1,'(a5,2f9.3,3f17.7,i8)')'*end*', 0., 0., 0., 0., 0., 0
+
+      close( unit1 )
+
+   endif
 contains
 
 subroutine da_write_data( lev, current_time, ounit, info, p, field )
@@ -660,6 +710,7 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_buoy = 0
    ob % num_profiler = 0
    ob % num_bogus = 0
+   ob % num_gpsref = 0
   
    num_times = 0
       
@@ -710,6 +761,8 @@ subroutine da_count_obs( y_unit, ob )
              ob % num_profiler = ob % num_profiler + num_obs
          else if ( index( ob_name,'bogus') > 0 ) then
              ob % num_bogus = ob % num_bogus + num_obs
+         else if ( index( ob_name,'gpsref') > 0 ) then
+             ob % num_gpsref = ob % num_gpsref + num_obs
          else
              print*,' unknown obs type: ',trim(ob_name),' found in diagnostics.in file ' 
          end if
@@ -826,6 +879,11 @@ subroutine da_count_obs( y_unit, ob )
       allocate( ob % profiler(1:ob % num_profiler) )
       write(6,'(a,i8)')' Number of profiler obs = ', ob % num_profiler
    end if
+   if ( ob % num_gpsref > 0 ) then
+      allocate( ob % gpsref(1:ob % num_gpsref) )
+      write(6,'(a,i8)')' Number of gpsref obs = ', ob % num_gpsref
+   end if
+   
    
    if ( ob % num_bogus > 0 ) then
       allocate( ob % bogus(1:ob % num_bogus) )
@@ -845,22 +903,22 @@ subroutine da_read_y( y_unit, ob )
    character*20         :: ob_name, dummy
    integer              :: n, ndum, k, kdum, num_obs, num_levs
    integer              :: num_obs_sonde_sfc, num_obs_buoy, num_obs_profiler, num_obs_bogus
-   integer              :: num_obs_synop, num_obs_metar, num_obs_ships
+   integer              :: num_obs_synop, num_obs_metar, num_obs_ships, num_obs_gpsref
    integer              :: num_obs_qscat,  num_obs_polaramv, num_obs_geoamv
    integer              :: num_obs_gpspw, num_obs_sound, num_obs_airsr, num_obs_airep, num_obs_pilot
    integer              :: num_obs_ssmir, num_obs_satem, num_obs_ssmt1, num_obs_ssmt2
    integer              :: synopt, metart, shipst, polaramvt, geoamvt, qscatt, gpspwt, soundt, airsrt
-   integer              :: sonde_sfct, buoyt, profilert, bogust
+   integer              :: sonde_sfct, buoyt, profilert, bogust, gpsreft
    integer              :: airept, pilott, ssmirt, satemt, ssmt1t, ssmt2t
    real                 :: rdum
 
    rewind (y_unit)
    num_obs_buoy = 0; num_obs_sonde_sfc = 0; num_obs_profiler = 0 ; num_obs_bogus = 0
-   num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0
+   num_obs_synop = 0; num_obs_metar = 0; num_obs_ships = 0 ; num_obs_gpsref = 0
    num_obs_polaramv = 0; num_obs_geoamv = 0; num_obs_qscat = 0
    num_obs_gpspw = 0; num_obs_sound = 0; num_obs_airsr = 0; num_obs_airep = 0; num_obs_pilot = 0
    num_obs_ssmir = 0; num_obs_satem = 0; num_obs_ssmt1 = 0; num_obs_ssmt2 = 0
-   buoyt = 0; sonde_sfct = 0; profilert = 0; bogust = 0
+   buoyt = 0; sonde_sfct = 0; profilert = 0; bogust = 0 ; gpsreft = 0
    synopt = 0; metart = 0; shipst = 0; polaramvt = 0; geoamvt = 0; qscatt = 0
    gpspwt = 0; soundt = 0; airsrt = 0; airept = 0; pilott = 0
    ssmirt = 0; satemt = 0; ssmt1t = 0; ssmt2t = 0
@@ -1272,6 +1330,26 @@ subroutine da_read_y( y_unit, ob )
             read(y_unit,'(i8)')num_levs
             read(y_unit,'(a)')dummy
          end do
+      elseif ( index( ob_name,'gpsref') > 0 ) then
+         gpsreft = gpsreft + 1
+         do n = num_obs_gpsref + 1, num_obs_gpsref + num_obs
+            read(y_unit,'(i8)')num_levs
+            ob % gpsref(n) % numlevs = num_levs
+            allocate( ob % gpsref(n) % pressure(1:num_levs) )
+            allocate( ob % gpsref(n) % ref(1:num_levs) )
+
+            do k = 1, num_levs
+               read(y_unit,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))') &
+               ndum, kdum, ob % gpsref(n) % info % id, &     ! Station
+                        ob % gpsref(n) % info % lat,   &     ! Latitude
+                        ob % gpsref(n) % info % lon,   &     ! Longitude
+                        ob % gpsref(n) % pressure(k),  &     ! Obs height
+                        ob % gpsref(n) % ref(k)              ! O, O-B, O-A
+            end do
+            ob % gpsref(n) % info % time = gpsreft
+         end do
+         num_obs_gpsref = num_obs_gpsref + num_obs
+
       else
       print*,' Got unknown obs_tye : ',trim(ob_name)
       stop
@@ -1506,6 +1584,17 @@ subroutine da_calc_stats_bogus( num_obs, bogus )
       write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus q  ', count, '/', count1, &
                                         '. O-B(m,s), O-A(m,s) =', &
                                         mean_omb, stdv_omb, mean_oma, stdv_oma
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         count1 = count1 + 1
+         call da_increment_stats( bogus(n) % slp, count, &
+                                  sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                  mean_omb, mean_oma, stdv_omb, stdv_oma  )
+      end do
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'bogus slp', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
       write(6,*)
 
    end if
@@ -1660,6 +1749,37 @@ subroutine da_calc_stats_profiler( num_obs, profiler )
 
    end if
 end subroutine da_calc_stats_profiler
+
+subroutine da_calc_stats_gpsref( num_obs, gpsref )
+
+   implicit none
+
+   integer, intent(in)           :: num_obs               ! Number of obs.
+   type (gpsref_type), intent(in) :: gpsref(1:num_obs)      ! Obs data.
+
+   integer                       :: n, k, count, count1
+   real                          :: sum_omb, sum_oma, sum_omb2, sum_oma2
+   real                          :: mean_omb, mean_oma, stdv_omb, stdv_oma
+
+   if ( num_obs > 0 ) then
+
+      count = 0; count1 = 0
+      sum_omb = 0.0; sum_oma = 0.0; sum_omb2 = 0.0; sum_oma2 = 0.0
+      do n = 1, num_obs
+         do k = 1, gpsref(n) % numlevs
+            count1 = count1 + 1
+            call da_increment_stats( gpsref(n) % ref(k), count, &
+                                     sum_omb, sum_oma, sum_omb2, sum_oma2, &
+                                     mean_omb, mean_oma, stdv_omb, stdv_oma  )
+         end do
+      end do
+      write(6,'(1x,a9,i10,a,i10,a,4f10.4)')'gpsref re', count, '/', count1, &
+                                        '. O-B(m,s), O-A(m,s) =', &
+                                        mean_omb, stdv_omb, mean_oma, stdv_oma
+      write(6,*)
+
+   end if
+end subroutine da_calc_stats_gpsref  
 
 subroutine da_calc_stats_satem( num_obs, satem )
 

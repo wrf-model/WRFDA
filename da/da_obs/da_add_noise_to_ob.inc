@@ -638,6 +638,32 @@ subroutine da_add_noise_to_ob( iv, ob )
       end do
    end if
 
+!  Transfer gpsref obs:
+
+   if ( iv % num_gpsref > 0 ) then
+      num_obs = 0
+      do n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+      write(ounit,'(a20,i8)')'gpsref', num_obs   
+      num_obs = 0 
+      do n = 1, iv % num_gpsref
+       if(iv%gpsref(n)%loc%proc_domain) then
+         num_obs = num_obs + 1
+         write(ounit,'(i8)')iv % gpsref(n) % info % levels
+         do k = 1, iv % gpsref(n) % info % levels
+!           Add random perturbation:
+            call da_add_noise( iv % gpsref(n) % ref(k), ob % gpsref(n) % ref(k), z1)
+!           Write out data:
+            write(ounit,'(2i8,10e15.7)')num_obs, k, &
+                               iv % gpsref(n) % ref(k) % error, z1, &
+                               dum, dum, dum, dum, dum, dum, dum, dum
+         end do
+       end if
+      end do
+   end if
+
+
 !
 !  Transfer Radiance obs:
 !
@@ -681,5 +707,3 @@ subroutine da_add_noise_to_ob( iv, ob )
   call da_free_unit(ounit)
 
 end subroutine da_add_noise_to_ob
-
-

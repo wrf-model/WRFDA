@@ -68,7 +68,8 @@ subroutine da_count_filtered_obs(&
    ! Loop over all data files
    do files = 0, num_procs-1
       write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.',files  
-      open(unit=iunit, file= trim(filename), form='formatted',iostat=iost)
+      open(unit=iunit, file= trim(filename), form='formatted',  & 
+        status='old', iostat=iost)
       if (iost /= 0) &
       call da_error(__FILE__,__LINE__, (/"Cannot open "//trim(filename)/))
 
@@ -290,8 +291,8 @@ subroutine da_count_filtered_obs(&
    ! write reference state info
 
    write (unit = filtered_obs_unit, fmt = '(A,F7.2,A,F7.2,4(A,F7.2),A)') &
-      "PHIC  =", phic,", XLONC =", xlonc,", true1 =", truelat1,&
-      ", true2 =",truelat2                                                      
+      "PHIC  =", phic,", XLONC =", xlonc,", TRUE1 =", truelat1,&
+      ", TRUE2 =",truelat2                                                      
    write (unit = filtered_obs_unit, fmt = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
       "TS0   =",  ts0, ", TLP   =", tlp, &
       ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
@@ -306,9 +307,9 @@ subroutine da_count_filtered_obs(&
       ", IDD   =", idd,", MAXNES=",maxnes,","
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
       !       "NESTIX=",(nestix (i),", ", i = 1, maxnes)
-      "NESTIX=",(ide    ,", ", i = 1, maxnes)
+      "NESTIX=",(ide+1    ,", ", i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
-      "NESTJX=",(jde       ,", ", i = 1, maxnes)
+      "NESTJX=",(jde+1       ,", ", i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
       "NUMC  =",(numc ,", ", i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,F7.2,A))')&

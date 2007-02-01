@@ -1,4 +1,4 @@
-subroutine da_write_filtered_obs(ob, iv, xb, & 
+subroutine da_write_filtered_obs(ob, iv, xb, xp, & 
    phic, xlonc, truelat1, truelat2)
 
    !------------------------------------------------------------------------
@@ -41,6 +41,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, &
 
    type (y_type),     intent(in)  :: ob      ! Observation structure.
    type (ob_type),    intent(inout) :: iv      ! O-B structure.
+   type (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
    type (xb_type),    intent(in)  :: xb      ! First guess structure.
    real, intent(in)               :: phic, xlonc, truelat1, truelat2
 
@@ -70,8 +71,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, &
 #else
    write(unit=filename, fmt='(a)') 'filtered_obs.000'
 #endif
-   open(unit=ounit,file=trim(filename),form='formatted',status='replace', &
-      iostat=iost)
+   open(unit=ounit,file=trim(filename),form='formatted', & 
+      status='replace', iostat=iost)
    if (iost /= 0) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open filtered observation file"//trim(filename)/))
@@ -1352,7 +1353,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, &
    if (rootproc) then
       call da_get_unit(filtered_obs_unit)
       open (unit=filtered_obs_unit, &
-         file= 'filtered_obs' ,form='formatted',iostat=iost)
+         file= 'filtered_obs' ,form='formatted', status='replace', iostat=iost)
       if (iost /= 0) &
          call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
       call da_count_filtered_obs(&

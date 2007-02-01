@@ -114,20 +114,10 @@ program daprog_ominusb
          ! if ( station_id(1:5) == station_chosen ) then
 
          p_ob = 0.01 * p_ob   ! Convert Pa to hPa
-         ! if ( p_ob > bin_start_p(2) ) then
-         if ( p_ob >= bin_start_p(1) ) then
-            bin = 1
-         ! else if ( p_ob <= bin_start_p(num_bins_p-1) ) then
-         else if ( p_ob <= bin_start_p(num_bins_p) ) then
-            bin = num_bins_p
-         else
-            do b = 2, num_bins_p-1
-               if ( p_ob < bin_start_p(b-1) .and. p_ob >= bin_start_p(b) ) then
-                  bin = b
-                  exit
-               end if
-            end do
-         end if
+
+         bin = int( (bottom_pressure - p_ob)/bin_width_p ) + 1
+         if (bin <= 0) bin = 1
+         if (bin > num_bins_p) bin = num_bins_p
 
          call da_store_ominusb( station_id, times, qc, lati, long, &
                                    p_ob, iv, error, obs(bin) )
@@ -345,13 +335,8 @@ subroutine da_obs_stats( num_times, obs )
          omb = obs % data(n) % ominusb(times)
      
          if ( obs % data(n) % qcflag(times) >= obs_qc_pointer ) then
-            do b = 1, num_bins
-               if ( omb > bin_start(b) .and. &
-                    omb < bin_start(b) + bin_width ) then
-                  bin_count(b) = bin_count(b) + 1
-                  exit
-               end if
-            end do
+           b = int( (omb-min_bin) / bin_width) + 1
+           if (b >= 1 .and. b <= num_bins) bin_count(b) = bin_count(b) + 1
          end if
       end do
    end do

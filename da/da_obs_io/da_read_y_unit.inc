@@ -28,8 +28,7 @@ write (0,*) "filename", filename
          (/"Cannot open random observation error file"//trim(filename)/))
    end if
 
-1  continue
-
+   reports: do
    read(unit_in,'(a20,i8)', end = 999, err = 1000) ob_type,num_obs                    
    
    if_write = .false.
@@ -59,14 +58,14 @@ write (0,*) "filename", filename
          end do
       end do
    end if
-   if (if_write) goto 999
-   goto 1
-
+   if (if_write) exit reports
+   cycle reports
 1000  continue 
    write(unit=message(1), fmt='(a,i3,a,a)') &
       'read error on unit: ',unit_in, ' for ob_type', trim(ob_type)
 !   call da_warning(__FILE__,__LINE__,message(1:1))
-999  continue
+   end do reports
+ 999  continue 
    close (unit_in)
    call da_free_unit(unit_in)
 

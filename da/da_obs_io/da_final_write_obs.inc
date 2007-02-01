@@ -1,4 +1,4 @@
-subroutine da_final_write_obs(iv)
+subroutine da_final_write_obs(ob, iv, re)
 
    !-------------------------------------------------------------------------
    ! Purpose: Writes full diagnostics for O, (O-B) & OMA togather
@@ -6,7 +6,9 @@ subroutine da_final_write_obs(iv)
 
    implicit none
 
+   type (y_type), intent(in)     :: ob      ! Observation structure.
    type (ob_type), intent(in)    :: iv      ! O-B structure.
+   type (y_type), intent(inout)  :: re      ! residual vector.
  
    integer                       :: n, k, iunit
    integer                       :: ios  ! Error code from MPI routines.
@@ -27,8 +29,8 @@ subroutine da_final_write_obs(iv)
          write(unit=filename(k),fmt ='(a,i3.3)')'gts_omb_oma.',k
       end do 
       call da_get_unit(omb_unit)
-      open(unit=omb_unit,file='gts_omb_oma',form='formatted',iostat=ios, &
-         status='replace')
+      open(unit=omb_unit,file='gts_omb_oma',form='formatted', &
+         status='replace', iostat=ios) 
       if (ios /= 0) call da_error(__FILE__,__LINE__, &
          (/"Cannot open file gts_omb_oma"/))
    end if
@@ -395,6 +397,25 @@ subroutine da_final_write_obs(iv)
       num_obs = 0
       do k = 0,num_procs-1
          call da_read_omb_tmp(filename(k),iunit,num_obs,'airsr',5)
+      end do
+   end if
+
+   !------------------------------------------------------------------
+   ! writing GPS refractivity
+   !------------------------------------------------------------------
+
+   num_obs = 0
+   if (iv % num_gpsref > 0) then
+      do n = 1, iv % num_gpsref
+         if(iv%gpsref(n)%loc%proc_domain) num_obs = num_obs + 1
+      end do
+   end if
+   call da_proc_sum_int(num_obs)
+   if (num_obs > 0 .and. rootproc) then
+      write(omb_unit,'(a20,i8)')'gpsref', num_obs  
+      num_obs = 0
+      do k = 0,num_procs-1
+         call da_read_omb_tmp(filename(k),iunit,num_obs,'gpsref',6)    
       end do
    end if
 

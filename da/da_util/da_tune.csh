@@ -67,53 +67,45 @@ while ( $START_DATE <= $END_DATE )
 
 echo $START_DATE
 
-# cat rand_obs_error.??? into fort.45 from different processors
 #-------------------------------------------------------------------------------------------
-   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error.000) then
-   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error.* >> $FILE_PERT        
-#   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error  >> $FILE_PERT        
+   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error) then
+   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/rand_obs_error  >> $FILE_PERT        
    else
    echo " Please check file (rand_obs) in " ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working
-#   exit 1             
+   exit 1             
    endif
 
-# cat pert_obs.??? into fort.46 from different processors
 #-------------------------------------------------------------------------------------------
-   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs.000) then                  
-   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs.*       >> $FILE_YP        
-#   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs       >> $FILE_YP        
+   if ( -s ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs) then                  
+   cat ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working/pert_obs       >> $FILE_YP        
    else
    echo " Please check file(pert_obs) in " ${DIR_PREFIX}/${DIR_YP}/${START_DATE}/wrfvar/working
-#   exit 2         
+   exit 2         
    endif
 
-# cat unpert_obs.??? into fort.47 from different processors
 #-------------------------------------------------------------------------------------------
-   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs.000) then
-   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs.*      >> $FILE_Y        
-#   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs      >> $FILE_Y        
+   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs) then
+   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/unpert_obs      >> $FILE_Y        
    else
    echo " Please check file(unpert_obs) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working
-#   exit 3          
+   exit 3          
    endif
 
-# cat fort.48  to $FILE_JO              
 #-------------------------------------------------------------------------------------------
-#   if( -s  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/fort.48 ) then
-   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/fort.48           >> $FILE_JO       
+   if( -s  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/jo      ) then
+   cat ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working/jo                >> $FILE_JO       
    else
    echo " Please check file (fort.48) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/working
-#   exit 4          
+   exit 4          
    endif
 #
-# cat rsl.out.0000.htms into fort.49
 #-------------------------------------------------------------------------------------------
 #
-#   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html ) then
+   if ( -s ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html ) then
    cat  ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar/rsl/rsl.out.0000.html      >> ${FILE_RSLOUT}
    else
    echo " Please check file (rsl.out.0000.html) in " ${DIR_PREFIX}/${DIR_Y}/${START_DATE}/wrfvar
-#   exit 5       
+   exit 5       
    endif
 
  setenv START_DATE `./advance_cymdh.exe $START_DATE $CYCLE_PERIOD`

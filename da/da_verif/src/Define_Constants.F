@@ -68,8 +68,8 @@ MODULE  Define_Constants
 
 ! record1
   INTEGER                               :: exp_num   ! number of experiments
-  CHARACTER(LEN=120)                    :: diag_dir   
-  CHARACTER(LEN=12), DIMENSION(maxnum)  :: exp_names
+  CHARACTER(LEN=130)                    :: diag_dir   
+  CHARACTER(LEN=30), DIMENSION(maxnum)  :: exp_names
 ! record2
   CHARACTER(LEN=10)      :: start_date
   CHARACTER(LEN=10)      :: end_date

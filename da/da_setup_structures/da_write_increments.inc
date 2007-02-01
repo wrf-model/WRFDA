@@ -160,8 +160,9 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
       write (unit=anl_inc_unit) 1, ix, 1, jy, 1, kz 
 
       ! Map projection information:
+      write (unit=anl_inc_unit) map_projection, coarse_ix, coarse_jy
       write (unit=anl_inc_unit) &
-         map_projection, coarse_ix, coarse_jy, coarse_ds, start_x, start_y, &
+         coarse_ds, start_x, start_y, &
          phic, xlonc, cone_factor, truelat1_3dv, truelat2_3dv, pole, dsm,   &
          psi1, c2, ptop, ps0, ts0, tlp, tis0
 

@@ -35,7 +35,8 @@ subroutine da_write_y (iv, y)
 #endif
 
    call da_get_unit(ounit)
-   open (unit=ounit,file=trim(filename),form='formatted',iostat=ios)
+   open (unit=ounit,file=trim(filename),form='formatted', &
+         status='replace', iostat=ios )
    if (ios /= 0) Then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open (un)perturbed observation file"//filename/))
