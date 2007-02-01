@@ -14,14 +14,14 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 !
 !------------------------------------------------------------------------------
 
+  implicit none
+
   character(9)      ,  intent (in)  :: obstype
   character(100)    ,  intent (in)  :: infile
   type (xpose_type) ,  intent (in)  :: xp
   type (ob_type)    ,intent (inout) :: iv
 
 #ifdef BUFR
-
-  implicit none
 
 ! Number of channels for sensors in BUFR
   integer(i_kind),parameter :: N_AIRSCHAN = 281	 !- 281 subset ch out of 2378 ch for AIRS

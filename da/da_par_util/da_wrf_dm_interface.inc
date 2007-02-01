@@ -96,20 +96,5 @@ subroutine da_proc_maxmin_combine(n, max, min)
 
 end subroutine da_proc_maxmin_combine
 
-subroutine da_proc_diagnostics_collect(num_sound, iv, re)
-
-   !---------------------------------------------------------------------------
-   !  Purpose: Do MPI reduction operations across processors to get values needed
-   !           for diagnostics output. These are stored only on the root processor, 
-   !           i.e., processor 0. (In this way, we do not have to do all-to-all 
-   !           communication.)
-   !
-   !---------------------------------------------------------------------------
-
-   integer, intent(in)                       :: num_sound
-   type (sound_type), intent(inout)          :: iv(:)
-   type (residual_sound_type), intent(inout) :: re(:)
-
-end subroutine da_proc_diagnostics_collect
 
 
