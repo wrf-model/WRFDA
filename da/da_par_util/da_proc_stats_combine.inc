@@ -25,7 +25,7 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
    real    :: out(2)             ! mpi_reduce output min/max with associated processor.
    integer :: proc_id            ! Id of processor with max or min value.
    integer :: status(mpi_status_size) ! MPI status.
-   integer :: buf(1)
+   real    :: buf(1)
 
 #ifdef DM_PARALLEL
 
@@ -48,13 +48,13 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
       proc_id = inT(out(2))
    end if
 
-   buf(1) = proc_id
-   call wrf_dm_bcast_integer (buf, 1)
-   proc_id=buf(1)
+   buf(1) = real(proc_id)
+   call wrf_dm_bcast_real (buf, 1)
+   proc_id=int(buf(1))
 
    ! Get obs number and k-level where minimum occurs.
    if (proc_id .ne. root) then
-      if (myproc == root) then
+      if (rootproc) then
          call mpi_recv(nobs_min, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr)
          call mpi_recv(klev_min, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr)
       else if (myproc == proc_id) then
@@ -69,18 +69,18 @@ subroutine da_proc_stats_combine(proc_ave, proc_err, proc_min, proc_max, &
 
    call mpi_reduce(in, out, 1, mpi_2double_precision, mpi_maxloc, root, comm, ierr)
 
-   if (myproc == root) then
+   if (rootproc) then
       proc_max = out(1)
-      proc_id = inT(out(2))
+      proc_id = int(out(2))
    end if
 
-   buf(1) = proc_id
-   call wrf_dm_bcast_integer (buf, 1)
-   proc_id=buf(1)
+   buf(1) = real(proc_id)
+   call wrf_dm_bcast_real (buf, 1)
+   proc_id=int(buf(1))
 
    ! Get obs number and k-level where maximum occurs.
    if (proc_id .ne. root) then
-      if (myproc == root) then
+      if (rootproc) then
          call mpi_recv(nobs_max, 1, mpi_integer, proc_id, 10, comm, STATUS, ierr)
          call mpi_recv(klev_max, 1, mpi_integer, proc_id, 11, comm, STATUS, ierr)
       else if (myproc == proc_id) then
