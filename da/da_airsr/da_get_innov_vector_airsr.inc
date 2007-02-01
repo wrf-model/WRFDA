@@ -5,6 +5,9 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
    !                   AIRS retrieval locations 
    !                b) Does quality control check on innovation vector
    !                   if required.
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !----------------------------------------------------------------------
 
    implicit none
@@ -69,7 +72,7 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
             call da_to_zk(iv%airsr(n)%h(k), v_h, xp, v_interp_h, iv%airsr(n)%zk(k))
          end if
 
-         if (iv%airsr(n)%zk(k) < 0.0) then
+         if (iv%airsr(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
             iv%airsr(n)%t(k)%qc = missing
             iv%airsr(n)%q(k)%qc = missing
          end if

@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -67,7 +70,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
             hd = v_h(xp%kts) - iv % sonde_sfc(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) then
+            if (abs(hd) <= Max_StHeight_Diff .or. anal_type_verify ) then
                if (iv % sonde_sfc(n) % h < v_h(xp%kts)) then
                   iv%sonde_sfc(n)%zk = 1.0+1.0e-6
                   call da_obs_sfc_correction(iv%sonde_sfc(n), xb)
@@ -95,7 +98,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
             call da_to_zk(ob % sonde_sfc(n) % p, v_p, xp, v_interp_p, iv%sonde_sfc(n)%zk)
 
-            if (iv%sonde_sfc(n)%zk < 0.0) then
+            if (iv%sonde_sfc(n)%zk < 0.0 .and. .not.anal_type_verify ) then
               iv % sonde_sfc(n) % p % inv = missing_r
               iv % sonde_sfc(n) % p % qc  = missing
               iv%sonde_sfc(n)%zk = 1.0+1.0e-6
@@ -106,7 +109,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
          ! [2.0] Initialise components of innovation vector:
          !------------------------------------------------------------------------
 
-         if (iv%sonde_sfc(n)%zk < 0.0) then
+         if (iv%sonde_sfc(n)%zk < 0.0 .and. .not.anal_type_verify ) then
             iv % sonde_sfc(n) % u % qc = missing
             iv % sonde_sfc(n) % v % qc = missing
             iv % sonde_sfc(n) % t % qc = missing

@@ -2,6 +2,9 @@ subroutine da_add_pbl_and_sfc_info (xp, xb, xbx)
 
    !------------------------------------------------------------------------------
    !  Purpose: Updates PBL and Surface parameters information for background field 
+   ! Update:
+   !   01/24/2007    Syed RH Rizvi
+   !   Bug fix for similarity theory
    !------------------------------------------------------------------------------
 
    implicit none
@@ -17,7 +20,7 @@ subroutine da_add_pbl_and_sfc_info (xp, xb, xbx)
 
    real                               :: ta,gamma,zcld
    real                               :: tpw,alw,zrhom,htpw
-   real                               :: dum1
+   real                               :: dum1, height
 
    if (trace_use) call da_trace_entry("da_add_pbl_and_sfc_info")
 
@@ -90,15 +93,15 @@ subroutine da_add_pbl_and_sfc_info (xp, xb, xbx)
 
    do j=js,je
       do i=is,ie
+         height = xb%h(i,j,ks) - xb%terr(i,j)
          call da_transform_xtoseasfcwind (xb%u(i,j,ks),xb%v(i,j,ks), &
-                                       xb%speed(i,j),xb%h(i,j,ks) )
+                                       xb%speed(i,j),height)        
       end do
    end do
 
    !---------------------------------------------------------------------------
    ! [7.0]  Brightness temperature SH Chen
    !---------------------------------------------------------------------------
-
 
    if (Use_SsmiTbObs) then
       zcld  = 1                           ! effective cloud height (km)
@@ -140,11 +143,12 @@ subroutine da_add_pbl_and_sfc_info (xp, xb, xbx)
 
    do j=js,je
       do i=is,ie
+         height = xb%h(i,j,ks) - xb%terr(i,j)
          call da_sfc_wtq(xb%psfc(i,j), xb%tgrn(i,j), &
                       xb%p(i,j,1), xb%t(i,j,1), xb%q(i,j,1), &
                       xb%u(i,j,1), xb%v(i,j,1), &
                       xb%p(i,j,2), xb%t(i,j,2), xb%q(i,j,2), &
-                      xb%h(i,j,1), xb%rough(i,j),xb%landmask(i,j), &
+                      height,xb%rough(i,j),xb%landmask(i,j), &
                       xb%u10(i,j), xb%v10(i,j), xb%t2(i,j), xb%q2(i,j), &
                       xb%regime(i,j))
       end do

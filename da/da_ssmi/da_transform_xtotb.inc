@@ -31,7 +31,7 @@ subroutine da_transform_xtotb(xb)
 
          ta          = xb%tgrn(i,j) + &
                        (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                       log(xb%h(i,j,ks)/0.0001)
+                       log((xb%h(i,j,ks) - xb%terr(i,j))/0.0001)
 
          ! gamma is an emperical formula and zcld is given for now
 

@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
 
    !-------------------------------------------------------------------------
    ! Purpose: TBD   
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-------------------------------------------------------------------------
 
    implicit none
@@ -69,7 +72,7 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
 
             hd = v_h(xp%kts) - iv % metar(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) then
+            if (abs(hd) <= Max_StHeight_Diff .or. anal_type_verify) then
                if (iv % metar(n) % h < v_h(xp%kts)) then
                   iv%metar(n)%zk = 1.0+1.0e-6
 
@@ -97,7 +100,7 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
 
             call da_to_zk(ob % metar(n) % p, v_p, xp, v_interp_p, iv%metar(n)%zk)
 
-            if (iv%metar(n)%zk < 0.0) then
+            if (iv%metar(n)%zk < 0.0 .and.  .not.anal_type_verify) then
                iv % metar(n) % p % inv = missing_r
                iv % metar(n) % p % qc  = missing
                iv%metar(n)%zk = 1.0+1.0e-6
@@ -108,7 +111,7 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
          ! [2.0] Initialise components of innovation vector:
          !------------------------------------------------------------------------
 
-         if (iv%metar(n)%zk < 0.0) then
+         if (iv%metar(n)%zk < 0.0 .and.  .not.anal_type_verify) then
            iv % metar(n) % u % qc = missing
            iv % metar(n) % v % qc = missing
            iv % metar(n) % t % qc = missing

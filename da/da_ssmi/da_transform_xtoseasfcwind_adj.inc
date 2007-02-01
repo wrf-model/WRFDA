@@ -9,7 +9,7 @@ subroutine da_transform_xtoseasfcwind_adj(xa, xb)
    type (x_type),  intent(inout) :: xa   ! model space analysis (local).
    type (xb_type), intent(in)    :: xb   ! first guess.
 
-   real :: const, rgh_fac, var
+   real :: const, rgh_fac, var, height
    integer :: i, j, k, is, js, ie, je
 
    if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind_adj")
@@ -40,7 +40,13 @@ subroutine da_transform_xtoseasfcwind_adj(xa, xb)
 
    do j=js, je
       do i=is, ie
-         rgh_fac = const/log(xb%h(i,j,k)/0.0001) ! roughness = 0.0001
+        height = xb%h(i,j,k) - xb%terr(i,j)
+         if( height <= 0.) then
+         print*,i,j,' ht = ',xb%h(i,j,k) ,' terr =  ',xb%terr(i,j)
+         stop
+         endif
+
+         rgh_fac = const/log(height/0.0001) ! roughness = 0.0001
 
          var = rgh_fac*rgh_fac/xb%speed(i,j)
 

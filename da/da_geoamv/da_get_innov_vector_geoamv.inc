@@ -3,6 +3,9 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
    !-------------------------------------------------------------------------
    ! Purpose: Calculates innovation vector does QC for  Geo. AMV's
    !               
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-------------------------------------------------------------------------
 
    implicit none
@@ -61,7 +64,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
                call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
             end if
 
-            if (iv%geoamv(n)%zk(k) < 0.0) then
+            if (iv%geoamv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
                iv % geoamv(n) % u(k) % qc = missing
                iv % geoamv(n) % v(k) % qc = missing
             end if

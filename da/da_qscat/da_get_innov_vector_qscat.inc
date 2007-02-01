@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -62,7 +65,7 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
          iv % qscat(n) % u % inv = 0.0
          iv % qscat(n) % v % inv = 0.0
 
-         if (zk < 0.0) then
+         if (zk < 0.0 .and.  .not.anal_type_verify) then
             iv % qscat(n) % u % qc = missing
             iv % qscat(n) % v % qc = missing
          else

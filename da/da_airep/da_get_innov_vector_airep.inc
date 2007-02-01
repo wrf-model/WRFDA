@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -67,7 +70,7 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
                   iv%airep(n)%zk(k))
             end if
 
-            if (iv%airep(n)%zk(k) < 0.0) then
+            if (iv%airep(n)%zk(k) < 0.0 .and. .not.anal_type_verify ) then
                iv % airep(n) % u(k) % qc = missing
                iv % airep(n) % v(k) % qc = missing
                iv % airep(n) % t(k) % qc = missing

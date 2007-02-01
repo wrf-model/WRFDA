@@ -28,9 +28,8 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    real, dimension(grid%xp%kms:grid%xp%kme) :: DDT
 
-   real   :: qvf1, cvpm, cpovcv, ppb, ttb, albn, aln
+   real   :: old, qvf1, cvpm, cpovcv, ppb, ttb, albn, aln, height
    real, allocatable :: arrayglobal(:,:)
-   real   :: buf(1)
 
    !---------------------------------------------------------------------------
    ! Set xb array range indices for processor subdomain.
@@ -377,8 +376,9 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid%xb%psac(i,j) = grid%em_mub(i,j)+grid%em_mu_2(i,j)
          grid%xb%psfc(i,j) = grid%em_mub(i,j)+grid%em_p(i,j,ks)+grid%p_top
 
-         if (grid%xb%tgrn(i,j) < 100.0) &
-            grid%xb%tgrn(i,j) = grid%xb%t(i,j,ks)+0.0065*(grid%xb%h(i,j,ks+1)-grid%xb%hf(i,j,ks))
+         if (grid%xb%tgrn(i,j) < 100.0) &    
+            grid%xb%tgrn(i,j) = grid%xb%t(i,j,ks)+0.0065*(grid%xb%h(i,j,ks)-grid%xb%hf(i,j,ks))
+     old =grid%xb%t(i,j,ks)+0.0065*(grid%xb%h(i,j,ks+1)-grid%xb%hf(i,j,ks))
       end do
    end do
 
@@ -479,14 +479,22 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
          grid%xb % grid_box_area(i,j) = tmpvar*tmpvar
 
+
          ! Calculate surface variable(wind, moisture, temperature)
          ! sfc variables: 10-m wind, and 2-m T, Q, at cross points
+
+         height = grid%xb%h(i,j,ks) - grid%xb%terr(i,j)
+         if( height <= 0.) then
+         print*,i,j,' ht = ',grid%xb%h(i,j,ks) ,' terr =  ',grid%xb%terr(i,j)
+         call da_error(__FILE__,__LINE__, &
+               (/"Negative height found "/))
+         endif
 
          call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
                       grid%xb%p(i,j,ks), grid%xb%t(i,j,ks), grid%xb%q(i,j,ks), &
                       grid%xb%u(i,j,ks), grid%xb%v(i,j,ks), &
                       grid%xb%p(i,j,ks+1), grid%xb%t(i,j,ks+1), grid%xb%q(i,j,ks+1), &
-                      grid%xb%h(i,j,ks), grid%xb%rough(i,j),grid%xb%xland(i,j), &
+                      height,  grid%xb%rough(i,j),grid%xb%xland(i,j), &
                       grid%xb%u10(i,j), grid%xb%v10(i,j), grid%xb%t2(i,j), grid%xb%q2(i,j), &
                       grid%xb%regime(i,j))
       end do
@@ -656,14 +664,10 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    if (testing_dm_exact) then
       ! Broadcast result from monitor to other tasks.
-      buf(1)=loc_psac_mean
-      call wrf_dm_bcast_real(buf, 1)
-      loc_psac_mean=buf(1)
+      call wrf_dm_bcast_real(loc_psac_mean, 1)
       xbx % psac_mean = loc_psac_mean
       ! Broadcast result from monitor to other tasks.
-      buf(1)=loc_psac_mean
-      call wrf_dm_bcast_real(buf, (grid%xp%jde-grid%xp%jds+1))
-      loc_psac_mean=buf(1)
+      call wrf_dm_bcast_real(loc_latc_mean, (grid%xp%jde-grid%xp%jds+1))
       xbx % latc_mean = loc_latc_mean
    else
       xbx % psac_mean = wrf_dm_sum_real(loc_psac_mean)
@@ -698,5 +702,4 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    if (trace_use) call da_trace_exit("da_transfer_wrftoxb")
 
 end subroutine da_transfer_wrftoxb
-
 

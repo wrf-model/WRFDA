@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -63,7 +66,7 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
              call da_to_zk(iv % pilot(n) % p(k), v_p, xp, v_interp_p, iv%pilot(n)%zk(k))
            end if
 
-           if (iv%pilot(n)%zk(k) < 0.0) then
+           if (iv%pilot(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
              iv % pilot(n) % u(k) % qc = missing
              iv % pilot(n) % v(k) % qc = missing
            end if

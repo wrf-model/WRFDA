@@ -67,7 +67,7 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
           call da_to_zk(iv % bogus(n) % h(k), v_h, xp, v_interp_h, iv%bogus(n)%zk(k))
         end if
 
-        if (iv%bogus(n)%zk(k) < 0.0) then
+        if (iv%bogus(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
           iv % bogus(n) % u(k) % qc = missing
           iv % bogus(n) % v(k) % qc = missing
           iv % bogus(n) % t(k) % qc = missing

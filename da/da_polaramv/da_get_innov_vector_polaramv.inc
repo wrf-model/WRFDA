@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
 
    !----------------------------------------------------------------------
    ! Purpose: Calculates innovation vector, does QC for  Polar AMV's             
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !----------------------------------------------------------------------
 
    implicit none
@@ -57,7 +60,7 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
                call da_to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
             end if
 
-            if (iv%polaramv(n)%zk(k) < 0.0) then
+            if (iv%polaramv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
                iv % polaramv(n) % u(k) % qc = missing
                iv % polaramv(n) % v(k) % qc = missing
             end if

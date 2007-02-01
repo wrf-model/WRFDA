@@ -13,8 +13,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
    integer                       :: is, js, ie, je, ks, ke
 
    real                          :: dx, dy, dxm, dym, zhmkz
-   ! real                        :: dum1
-   real                          :: dum2, zrhom, ADJ_zrhom
+   real                          :: dum1, dum2, zrhom, ADJ_zrhom
 
    real                          :: psfc,ta,gamma,sst,htpw,speed,alw,zcld,tpw
    real                          :: ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_tpw
@@ -34,7 +33,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
    dxm=0.0
    dym=0.0
    zhmkz=0.0
-   ! dum1=0.0
+   dum1=0.0
    dum2=0.0
    zrhom=0.0
    ADJ_zrhom=0.0
@@ -70,7 +69,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
          ! sst   = xb%tgrn(i,j)
          ta    = xb%tgrn(i,j) + &
                  (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                 log(xb%h(i,j,ks)/0.0001)
+                 log((xb%h(i,j,ks)- xb%terr(i,j))/0.0001)
 
          gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0-6.5)
          zcld  = 1                      ! effective cloud height (km)
@@ -90,7 +89,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
 
          htpw    = zrhom/tpw/1000.
 
-         ! dum1=0.0
+         dum1=0.
          dum2=0.
 
          ADJ_gamma    = 0.0
@@ -106,28 +105,28 @@ subroutine da_transform_xtotb_adj (xa, xb)
 
          call da_tb_adj(1,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb19v(i,j),xb%tb19h(i,j),               &
+                     xb%tb19v(i,j),xb%tb19h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)    )
 
          call da_tb_adj(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb22v(i,j),dum1,                        &
+                     xb%tb22v(i,j),dum1,                        &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb22v(i,j),dum2              )
 
          call da_tb_adj(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb37v(i,j),xb%tb37h(i,j),               &
+                     xb%tb37v(i,j),xb%tb37h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb37v(i,j),xa%tb37h(i,j)    )
 
          call da_tb_adj(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb85v(i,j),xb%tb85h(i,j),               &
+                     xb%tb85v(i,j),xb%tb85h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb85v(i,j),xa%tb85h(i,j)    )
@@ -154,7 +153,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
          ADJ_ta  = ADJ_ta + ADJ_gamma*0.023
 
          xa%t(i,j,ks) = xa%t(i,j,ks) + ADJ_ta* &
-                                       log(2./0.0001)/log(xb%h(i,j,ks)/0.0001)
+                   log(2./0.0001)/log((xb%h(i,j,ks)-xb%terr(i,j))/0.0001)
          ADJ_sst = 0.
 
          xa%psfc(i,j) = xa%psfc(i,j) + ADJ_psfc*0.01 
@@ -162,5 +161,3 @@ subroutine da_transform_xtotb_adj (xa, xb)
    end do
 
 end subroutine da_transform_xtotb_adj
-
-

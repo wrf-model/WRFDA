@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -68,7 +71,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
 
             hd = v_h(xp%kts) - iv % buoy(n) % h
 
-            if (abs(hd) <= Max_StHeight_Diff) then
+            if (abs(hd) <= Max_StHeight_Diff .or. anal_type_verify) then
                if (iv % buoy(n) % h < v_h(xp%kts)) then
                   iv%buoy(n)%zk = 1.0+1.0e-6
                   call da_obs_sfc_correction(iv%buoy(n), xb)
@@ -97,7 +100,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
             call da_to_zk(ob % buoy(n) % p, v_p, xp, v_interp_p, &
                iv%buoy(n)%zk)
 
-            if (iv%buoy(n)%zk < 0.0) then
+            if (iv%buoy(n)%zk < 0.0 .and.  .not.anal_type_verify) then
                iv % buoy(n) % p % inv = missing_r
                iv % buoy(n) % p % qc  = missing
 
@@ -109,7 +112,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
          ! [2.0] Initialise components of innovation vector:
          !------------------------------------------------------------------
 
-         if (iv%buoy(n)%zk < 0.0) then
+         if (iv%buoy(n)%zk < 0.0 .and.  .not.anal_type_verify) then
             iv % buoy(n) % u % qc = missing
             iv % buoy(n) % v % qc = missing
             iv % buoy(n) % t % qc = missing

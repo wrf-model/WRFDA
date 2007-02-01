@@ -23,7 +23,8 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
       Use_RadarObs .OR. Use_Radar_rv .OR. Use_Radar_rf .OR. Use_SatemObs .OR. &
       Use_GeoAMVObs .OR. Use_PolarAMVObs .OR. Use_AirepObs .OR. &
       Use_GpspwObs .OR. Use_GpsrefObs .OR. Use_SsmiRetrievalObs .OR. &
-      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs) then
+      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs .or. &
+      Use_AIRSRETObs ) then
  
       use_obsgts = .true.
    else
@@ -79,6 +80,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
       use_HsbObs           = .false.
       Use_Obsgts           = .false.
       Use_Radiance         = .false.
+      Use_AIRSRETObs       = .false.
    end if
     
    if (num_pseudo > 0) then
@@ -113,6 +115,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
       use_HsbObs           = .false.
       Use_Obsgts           = .true.
       Use_Radiance         = .false.
+      Use_AIRSRETObs       = .false.
    end if
 
    if (sfc_assi_options < 1 .OR. sfc_assi_options > 2) then

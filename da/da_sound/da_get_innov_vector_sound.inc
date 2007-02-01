@@ -2,6 +2,9 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
+   ! Update :
+   !     01/24/2007    Syed RH Rizvi
+   !     Updated for "VERIFY"       
    !-----------------------------------------------------------------------
 
    implicit none
@@ -75,7 +78,7 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
                iv%sound(n)%zk(k))
          end if
 
-         if (iv%sound(n)%zk(k) < 0.0) then
+         if (iv%sound(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
             iv%sound(n)%u(k)%qc = missing
             iv%sound(n)%v(k)%qc = missing
             iv%sound(n)%t(k)%qc = missing
