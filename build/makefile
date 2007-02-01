@@ -1,6 +1,6 @@
 include configure.wrfvar
 
-all: wrfvar be convertor
+all: wrfvar be
 
 setup : depend
 

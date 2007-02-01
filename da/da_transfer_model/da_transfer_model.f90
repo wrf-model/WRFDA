@@ -12,10 +12,7 @@ use da_tools1, only : da_oi
    use module_domain, only : domain
    use module_state_description, only : dyn_em_ad, dyn_em, p_qv,dyn_em_tl, &
       p_qr, p_qi,p_qs,p_qg,p_qc,num_moist
-
-#ifdef DM_PARALLEL
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals
-#endif
 
    use da_control, only : cos_xls, sin_xls, cos_xle, sin_xle, trace_use, &
       coarse_jy, coarse_ix, cone_factor, delt_lon, delt_lat, gas_constant, &
