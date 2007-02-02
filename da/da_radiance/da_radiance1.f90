@@ -35,7 +35,7 @@ module da_radiance1
       integer   ::  scanline, scanpos
       real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
       ! channels' bright temperature
-      real,    pointer   ::   emiss(:), tb_xb(:)    !  guess bright temperatures
+      real,    pointer   ::   emiss(:)
       ! logical, pointer   ::   calcemis(:)
       integer, pointer   ::   cloud_flag(:)
       real,    pointer   ::   t(:), mr(:), zk(:)
@@ -43,7 +43,8 @@ module da_radiance1
       real               ::   ps,ts,t2m,mr2m,u10,v10, clwp
       real               ::   smois, tslb, snowh, elevation,soiltyp,vegtyp,vegfra
       integer            ::   isflg
-      real, pointer             :: tb(:)
+!      real,    pointer   ::   tb_xb(:)
+      real, pointer             :: tb_ob(:)
       real, pointer             :: tb_inv(:)
       real, pointer             :: tb_qc(:)
       real, pointer             :: tb_error(:)

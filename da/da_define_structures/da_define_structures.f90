@@ -767,11 +767,6 @@ module da_define_structures
       real, pointer :: rf(:)                    ! rf
    end type residual_Radar_type
 
-! JRB
-!   type residual_rad_type
-!      real    , pointer :: tb(:)
-!   end type residual_rad_type
-
    type residual_instid_type
      integer                          :: num_rad
      integer                          :: nchan

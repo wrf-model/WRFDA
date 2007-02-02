@@ -126,7 +126,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       allocate (p % tb_inv (1:nchanl))
       allocate (p % tb_error (1:nchanl))
       allocate (p % tb_qc (1:nchanl))
-      allocate (p % tb (1:nchanl))
+      allocate (p % tb_ob (1:nchanl))
       p%info             = info
       p%loc              = loc
       p%landsea_mask     = landsea_mask
@@ -137,7 +137,7 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       p%tb_inv(1:nchanl)     = inv(1:nchanl)
       p%tb_error(1:nchanl)   = err(1:nchanl)
       p%tb_qc(1:nchanl)      = qc(1:nchanl)
-      p%tb(1:nchanl)         = tb(1:nchanl)
+      p%tb_ob(1:nchanl)      = tb(1:nchanl)
       p%sensor_index         = inst
 
       size = size + 1
@@ -200,14 +200,14 @@ subroutine da_read_kma1dvar (inst,iv, ob, xp, infile)
       iv%instid(inst)%tb_inv(1:nchanl,n)   = p%tb_inv(1:nchanl)
       iv%instid(inst)%tb_error(1:nchanl,n) = p%tb_error(1:nchanl)
       iv%instid(inst)%tb_qc(1:nchanl,n)    = p%tb_qc(1:nchanl)
-      ob%instid(inst)%tb(1:nchanl,n)   = p%tb(1:nchanl)
+      ob%instid(inst)%tb(1:nchanl,n)       = p%tb_ob(1:nchanl)
 
       ! write(unit=stdout,*) inst, nread, iv%instid(inst)%tb_inv(1:nchanl,n)
       current => p
       p => p%next
 
       ! free current data
-      deallocate (current % tb)
+      deallocate (current % tb_ob)
       deallocate (current % tb_inv)
       deallocate (current % tb_error)
       deallocate (current % tb_qc)

@@ -397,7 +397,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
 !  4.0   assign information to sequential radiance structure
 !--------------------------------------------------------------------------
-   allocate ( p % tb (1:nchan) )
+   allocate ( p % tb_inv (1:nchan) )
    p%info             = info
    p%loc              = loc
    p%landsea_mask     = POinT001
@@ -468,7 +468,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    p => p%next
 
 ! free current data
-   deallocate ( current % tb )
+   deallocate ( current % tb_inv )
    deallocate ( current )
 
  end do
