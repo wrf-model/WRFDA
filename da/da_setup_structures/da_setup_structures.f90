@@ -54,7 +54,6 @@ module da_setup_structures
 
    contains
 
-#include "da_add_pbl_and_sfc_info.inc"
 #include "da_get_vertical_truncation.inc"
 #include "da_interpolate_regcoeff.inc"
 !#include "da_interpolate_stats.inc"
