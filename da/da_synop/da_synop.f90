@@ -4,7 +4,7 @@ module da_synop
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       num_synop_tot, max_error_p,max_error_q, sfc_assi_options, &
-      max_stheight_diff,testing_dm_exact
+      max_stheight_diff,testing_dm_exact, anal_type_verify
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, synop_type, number_type, bad_data_type
    use module_domain, only : xpose_type, xb_type
