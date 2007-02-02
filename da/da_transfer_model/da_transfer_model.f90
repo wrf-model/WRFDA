@@ -39,7 +39,6 @@ use da_tools1, only : da_oi
       da_set_boundary_xb
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_vtox_transforms, only : da_get_vpoles
-   use da_wrf_interfaces, only : wrf_dm_bcast_real
    use da_wrfvar_io, only : da_med_initialdata_output,da_med_initialdata_input
 
    implicit none

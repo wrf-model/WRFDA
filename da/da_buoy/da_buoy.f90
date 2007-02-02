@@ -5,7 +5,7 @@ module da_buoy
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
       num_buoy_tot, max_error_p,max_error_q,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
-      max_error_bt, max_error_buv,sfc_assi_options
+      max_error_bt, max_error_buv,sfc_assi_options, anal_type_verify
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       synop_type

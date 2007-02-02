@@ -28,7 +28,7 @@ subroutine da_solve ( grid , config_flags)
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
-      max_ext_its,anal_type_verify
+      max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &

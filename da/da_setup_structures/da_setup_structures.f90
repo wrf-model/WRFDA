@@ -34,7 +34,7 @@ module da_setup_structures
       max_vert_var2,max_vert_var3,max_vert_var4,print_detail_be, &
       test_statistics, var_scaling1,var_scaling2,var_scaling3,var_scaling4, &
       var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
-      print_detail_regression,gas_constant,da_array_print     
+      print_detail_regression,gas_constant,da_array_print , use_airsretobs
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_par_util, only : da_local_to_global
