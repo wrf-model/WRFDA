@@ -15,5 +15,7 @@ cd $WORK_DIR/ad
 
 if test $NUM_PROCS=1; then
    ./wrfplus.exe > wrf_ad.out 2>wrf_ad.error
+else
+   $RUN_CMD ./wrfplus.exe > wrf_ad.out 2>wrf_ad.error
 fi
 

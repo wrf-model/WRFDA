@@ -18,4 +18,6 @@ cd $WORK_DIR/tl
 
 if test $NUM_PROCS=1; then
    ./wrfplus.exe > wrf_tl.out 2>wrf_tl.error
+else
+   $RUN_CMD ./wrfplus.exe > wrf_tl.out 2>wrf_tl.error
 fi
