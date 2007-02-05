@@ -15,12 +15,29 @@ endif
 bjobs >& /dev/null
 if ($status == 0) then
    setenv SUBMIT LSF
+   if (! $?LL_PTILE) then
+      setenv LL_PTILE 8
+   endif
+   setenv SUBMIT_OPTIONS1 "#BSUB -x" # exclusivity
+   setenv SUBMIT_OPTIONS2 "#BSUB -a mpich_gm"
+   setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LL_PTILE]"
+   setenv SUBMIT_OPTIONS4 "#BSUB -W 60"
+   setenv SUBMIT_OPTIONS5 "#BSUB -P $PROJECT"
 else
    llq >& /dev/null
    if ($status == 0) then
       setenv SUBMIT LoadLeveller
+      setenv SUBMIT_OPTIONS1 '# @ job_type         = parallel'
+      setenv SUBMIT_OPTIONS2 '# @ environment      = COPY_ALL'
+      setenv SUBMIT_OPTIONS3 '# @ notification     = never'
+      setenv SUBMIT_OPTIONS4 '# @ network.MPI      = css0,shared,ip'
+      setenv SUBMIT_OPTIONS5 '# @ checkpoint       = no'
+      setenv SUBMIT_OPTIONS6 '# @ wall_clock_limit = 01:00:00'
+      setenv SUBMIT_OPTIONS7 '# @ class            = share'
+      setenv SUBMIT_OPTIONS8 '# @ node_usage       = shared'
    else
       qsub >& /dev/null
+      # could be SGE of course, so might need better way to check
       if ($status == 0) then
          setenv SUBMIT PBS
       else
@@ -129,38 +146,71 @@ endif
 
 echo
 if ($?PROCESSOR) then
-   echo "PROCESSOR   " $PROCESSOR
+   echo "PROCESSOR       " $PROCESSOR
 endif
 if ($?SUBMIT) then
-   echo "SUBMIT      " $SUBMIT
+   echo "SUBMIT          " $SUBMIT
 endif
 if ($?RUN_CMD) then
-   echo "RUN_CMD     " $RUN_CMD
+   echo "RUN_CMD         " $RUN_CMD
 endif
 if ($?MPIHOME) then
-   echo "MPIHOME     " $MPIHOME
+   echo "MPIHOME         " $MPIHOME
 endif
 if ($?RTTOV) then
-   echo "RTTOV       " $RTTOV
+   echo "RTTOV           " $RTTOV
 endif
 if ($?CRTM) then
-   echo "CRTM        " $CRTM
+   echo "CRTM            " $CRTM
 endif
 if ($?NETCDF) then
-   echo "NETCDF      " $NETCDF
+   echo "NETCDF          " $NETCDF
 endif
 if ($?BLAS) then
-   echo "BLAS        " $BLAS
+   echo "BLAS            " $BLAS
 endif
 if ($?LAPACK) then
-   echo "LAPACK      " $LAPACK
+   echo "LAPACK          " $LAPACK
 endif
 if ($?FFTPACK5) then
-   echo "FFTPACK5    " $FFTPACK5
+   echo "FFTPACK5        " $FFTPACK5
 endif
 if ($?BUFR) then
-   echo "BUFR        " $BUFR
+   echo "BUFR            " $BUFR
 endif
 if ($?MAKEDEPF90) then
-   echo "MAKEDEPF90  " $MAKEDEPF90
+   echo "MAKEDEPF90      " $MAKEDEPF90
+endif
+if ($?SUBMIT) then
+   echo "SUBMIT          " $SUBMIT
+endif
+if ($?SUBMIT_OPTIONS1) then
+   echo "SUBMIT_OPTIONS1  $SUBMIT_OPTIONS1"
+endif
+if ($?SUBMIT_OPTIONS2) then
+   echo "SUBMIT_OPTIONS2  $SUBMIT_OPTIONS2"
+endif
+if ($?SUBMIT_OPTIONS3) then
+   echo "SUBMIT_OPTIONS3  $SUBMIT_OPTIONS3"
+endif
+if ($?SUBMIT_OPTIONS4) then
+   echo "SUBMIT_OPTIONS4  $SUBMIT_OPTIONS4"
+endif
+if ($?SUBMIT_OPTIONS5) then
+   echo "SUBMIT_OPTIONS5  $SUBMIT_OPTIONS5"
+endif
+if ($?SUBMIT_OPTIONS6) then
+   echo "SUBMIT_OPTIONS6  $SUBMIT_OPTIONS6"
+endif
+if ($?SUBMIT_OPTIONS7) then
+   echo "SUBMIT_OPTIONS7  $SUBMIT_OPTIONS7"
+endif
+if ($?SUBMIT_OPTIONS8) then
+   echo "SUBMIT_OPTIONS8  $SUBMIT_OPTIONS8"
+endif
+if ($?SUBMIT_OPTIONS9) then
+   echo "SUBMIT_OPTIONS9  $SUBMIT_OPTIONS9"
+endif
+if ($?SUBMIT_OPTIONS10) then
+   echo "SUBMIT_OPTIONS10 $SUBMIT_OPTIONS10"
 endif
