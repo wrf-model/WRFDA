@@ -14,12 +14,27 @@ CC=${2:-gcc}
 bjobs > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
+   export LL_PTILE=${LL_PTILE:-8}
+   export SUBMIT_OPTIONS1="#BSUB -x" # exclusivity
+   export SUBMIT_OPTIONS2="#BSUB -a mpich_gm"
+   export SUBMIT_OPTIONS3="#BSUB -R span[ptile=$LL_PTILE]"
+   export SUBMIT_OPTIONS4="#BSUB -W 60"
+   export SUBMIT_OPTIONS5="#BSUB -P $PROJECT"
 else
    llq > /dev/null 2>&1
    if test $? = 0 ; then
       export SUBMIT=LoadLeveller
+      export SUBMIT_OPTIONS1='# @ job_type         = parallel'
+      export SUBMIT_OPTIONS2='# @ environment      = COPY_ALL'
+      export SUBMIT_OPTIONS3='# @ notification     = never'
+      export SUBMIT_OPTIONS4='# @ network.MPI      = css0,shared,ip'
+      export SUBMIT_OPTIONS5='# @ checkpoint       = no'
+      export SUBMIT_OPTIONS6='# @ wall_clock_limit = 01:00:00'
+      export SUBMIT_OPTIONS7='# @ class            = share'
+      export SUBMIT_OPTIONS8='# @ node_usage       = shared'
    else
       qsub >/dev/null 2>&1
+      # could be SGE of course, so need better way to check
       if test $? = 0; then
          export SUBMIT=PBS
       else
@@ -101,14 +116,45 @@ export LINUX_MPIHOME=$MPIHOME
 export PATH=$MPIHOME/bin:$MAKEDEPF90:$PATH
 export MANPATH=$MPIHOME/man:$MANPATH
 
-echo "PROCESSOR   " $PROCESSOR
-echo "SUBMIT      " $SUBMIT
-echo "MPIHOME     " $MPIHOME
-echo "RTTOV       " $RTTOV
-echo "CRTM        " $CRTM
-echo "NETCDF      " $NETCDF
-echo "BLAS        " $BLAS
-echo "LAPACK      " $LAPACK
-echo "FFTPACK5    " $FFTPACK5
-echo "BUFR        " $BUFR
-echo "MAKEDEPF90  " $MAKEDEPF90
+echo "PROCESSOR       " $PROCESSOR
+echo "SUBMIT          " $SUBMIT
+echo "MPIHOME         " $MPIHOME
+echo "RTTOV           " $RTTOV
+echo "CRTM            " $CRTM
+echo "NETCDF          " $NETCDF
+echo "BLAS            " $BLAS
+echo "LAPACK          " $LAPACK
+echo "FFTPACK5        " $FFTPACK5
+echo "BUFR            " $BUFR
+echo "MAKEDEPF90      " $MAKEDEPF90
+echo "SUBMIT          " $SUBMIT
+if test "$SUBMIT_OPTIONS1." != '.'; then
+   echo "SUBMIT_OPTIONS1  $SUBMIT_OPTIONS1"
+fi
+if test "$SUBMIT_OPTIONS2." != '.'; then
+   echo "SUBMIT_OPTIONS2  $SUBMIT_OPTIONS2"
+fi
+if test "$SUBMIT_OPTIONS3." != '.'; then
+   echo "SUBMIT_OPTIONS3  $SUBMIT_OPTIONS3"
+fi
+if test "$SUBMIT_OPTIONS4." != '.'; then
+   echo "SUBMIT_OPTIONS4  $SUBMIT_OPTIONS4"
+fi
+if test "$SUBMIT_OPTIONS5." != '.'; then
+   echo "SUBMIT_OPTIONS5  $SUBMIT_OPTIONS5"
+fi
+if test "$SUBMIT_OPTIONS6." != '.'; then
+   echo "SUBMIT_OPTIONS6  $SUBMIT_OPTIONS6"
+fi
+if test "$SUBMIT_OPTIONS7." != '.'; then
+   echo "SUBMIT_OPTIONS7  $SUBMIT_OPTIONS7"
+fi
+if test "$SUBMIT_OPTIONS8." != '.'; then
+   echo "SUBMIT_OPTIONS8  $SUBMIT_OPTIONS8"
+fi
+if test "$SUBMIT_OPTIONS9." != '.'; then
+   echo "SUBMIT_OPTIONS9  $SUBMIT_OPTIONS9"
+fi
+if test "$SUBMIT_OPTIONS10." != '.'; then
+   echo "SUBMIT_OPTIONS10 $SUBMIT_OPTIONS10"
+fi

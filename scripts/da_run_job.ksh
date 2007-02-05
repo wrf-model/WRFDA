@@ -19,11 +19,6 @@ export SUBMIT=${SUBMIT:-LSF}
 export NUM_PROCS=${NUM_PROCS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
 
-export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-60} # minutes
-export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
-export LL_WALL_CLOCK_LIMIT=${LL_WALL_CLOCK_LIMIT:-01:30:00}
-export LL_NODE_USAGE=${LL_NODE_USAGE:-shared}
-export LL_PTILE=${LL_PTILE:-8}
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 
@@ -38,25 +33,22 @@ if test $SUBMIT = "LoadLeveller"; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_type         = parallel
-# @ environment      = COPY_ALL
 # @ job_name         = $EXPT
+# @ total_tasks      = $NUM_PROCS
+# @ node             = $NODES
 # @ output           = job.output
 # @ error            = job.error
-# @ node             = $NODES
-# @ notification     = never
-# @ network.MPI      = css0,shared,ip
-# @ total_tasks      = $NUM_PROCS
-# @ node_usage       = $LL_NODE_USAGE
-# @ checkpoint       = no
-# @ wall_clock_limit = $LL_WALL_CLOCK_LIMIT
-# NCEP IBM=dev
-# NCAR IBM(bluesky)=com_rg8:
-# @ class      =  share
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
-# @ queue
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
+# @ queue            = $QUEUE
 
 export RUN_CMD="$DEBUGGER " # Space important
 . $SCRIPT > $EXP_DIR/index.html 2>&1
@@ -67,19 +59,21 @@ elif test $SUBMIT = "LSF"; then
 #
 # LSF batch script
 #
-#BSUB $LSF_EXCLUSIVE     
-#BSUB -a mpich_gm      
-#BSUB -n $NUM_PROCS              
 #BSUB -J $EXPT                   
+#BSUB -q $QUEUE 
+#BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
 #BSUB -e job.error               
-#BSUB -q $QUEUE 
-#BSUB -W $LSF_MAX_RUNTIME
-#BSUB -R "span[ptile=$LL_PTILE]"
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
-
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
 
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
@@ -93,9 +87,22 @@ elif test $SUBMIT = "PBS"; then
 #
 # PBS batch script
 #
+##PBS -N $EXPT
+##PBS -q $QUEUE
+#PBS -l mppe=$NUM_PROCS
+#PBS -o job.output
+#PBS -e job.error
+#PBS -V
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
 
 # Options for Cray X1 
 # Cannot put - options inside default substitution
@@ -141,9 +148,10 @@ echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
 if test $SUBMIT = "LoadLeveller"; then 
    llsubmit job.ksh
 elif test $SUBMIT = "LSF"; then 
-   bsub -q $QUEUE -n $NUM_PROCS < $PWD/job.ksh
+   bsub < $PWD/job.ksh
 elif test $SUBMIT = "PBS"; then 
-   qsub -q $QUEUE -V -l mppe=$NUM_PROCS $PWD/job.ksh
+set -x
+   qsub $PWD/job.ksh
 else
    ./job.ksh
 fi
