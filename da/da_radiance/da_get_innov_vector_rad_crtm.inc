@@ -161,32 +161,6 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
-         Allocate ( iv%instid(inst)%tb_xb(nchanl,n), &
-                    iv%instid(inst)%emiss(nchanl,n), &
-                    iv%instid(inst)%tm(xp%kts:xp%kte,n), &
-                    iv%instid(inst)%qm(xp%kts:xp%kte,n), &
-                    iv%instid(inst)%qcw(xp%kts:xp%kte,n),  &
-                    iv%instid(inst)%pm(xp%kts:xp%kte,n),   &
-                    iv%instid(inst)%t(0:xp%kte,n),         &
-                    STAT = Allocate_Status )
-
-         IF ( Allocate_Status /= 0 ) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Error in allocatting innovation structure"/))
-         END IF
-
-         if (crtm_cloud) then
-          Allocate ( iv%instid(inst)%qrn(xp%kts:xp%kte,n), & ! rain (kg/kg)
-                     iv%instid(inst)%qci(xp%kts:xp%kte,n), & ! ice
-                     iv%instid(inst)%qsn(xp%kts:xp%kte,n), & ! snow
-                     iv%instid(inst)%qgr(xp%kts:xp%kte,n), & ! granple
-                     STAT = Allocate_Status )
-          IF ( Allocate_Status /= 0 ) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Error in allocatting innovation cloud structure"/))
-          END IF
-         end if
-
          model_ts   = 0.0
          model_u10  = 0.0
          model_v10  = 0.0
@@ -441,11 +415,11 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
          !----------------------------------------------------------------
          ! [3.0] store base state to innovation structure
          !----------------------------------------------------------------
-         ! temperarily using %t to save full level pressures
-            iv%instid(inst)%t(0,n)   = atmosphere%level_pressure(0)
+         ! full level pressures
+            iv%instid(inst)%pf(0,n)  = atmosphere%level_pressure(0)
          do k=1,atmosphere%n_layers
             iv%instid(inst)%pm(k,n)  = atmosphere%pressure(k)
-            iv%instid(inst)%t(k,n)   = atmosphere%level_pressure(k)
+            iv%instid(inst)%pf(k,n)  = atmosphere%level_pressure(k)
             iv%instid(inst)%tm(k,n)  = atmosphere%temperature(k)
             iv%instid(inst)%qm(k,n)  = atmosphere%absorber(k,1)
           if (crtm_cloud) then

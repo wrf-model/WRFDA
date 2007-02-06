@@ -465,6 +465,7 @@ module da_define_structures
       real,    pointer     :: qsn(:,:)
       real,    pointer     :: qgr(:,:)
       real,    pointer     :: pm(:,:)
+      real,    pointer     :: pf(:,:)  ! full level pressure for CRTM
       real,    pointer     :: emiss(:,:)
       real,    pointer     :: u10(:)
       real,    pointer     :: v10(:)

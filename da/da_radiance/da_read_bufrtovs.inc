@@ -361,6 +361,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    do i = 1, iv%num_inst
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
+      if (rtm_option == rtm_option_crtm) &
+          iv%instid(i)%nlevels = xp%kme-xp%kms+1
    end do
    
    do i = 1, iv%num_inst
@@ -374,16 +376,18 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       allocate (iv%instid(i)%loc(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_i(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_j(iv%instid(i)%num_rad))
+    !if (rtm_option == rtm_option_rttov) then
       allocate (iv%instid(i)%loc_k(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dx(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dy(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dz(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dxm(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%loc_dym(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dzm(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%zk(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%t(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%mr(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
+    !end if
+      allocate (iv%instid(i)%loc_dx(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dy(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dxm(iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%loc_dym(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%tm(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%qm(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%qrn(xp%kms:xp%kme,iv%instid(i)%num_rad))
@@ -392,6 +396,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       allocate (iv%instid(i)%qsn(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%qgr(xp%kms:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%pm(xp%kms:xp%kme,iv%instid(i)%num_rad))
+      allocate (iv%instid(i)%pf(0:xp%kme,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%u10(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%v10(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%t2m(iv%instid(i)%num_rad))
@@ -425,6 +430,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       allocate(iv%instid(i)%solzen(iv%instid(i)%num_rad))
       allocate(iv%instid(i)%solazi(iv%instid(i)%num_rad))
       allocate(iv%instid(i)%proc_domain(iv%instid(i)%num_rad))
+      if (rtm_option == rtm_option_crtm) then
+        allocate(iv%instid(i)%water_coverage(iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%land_coverage(iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%ice_coverage(iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%snow_coverage(iv%instid(i)%num_rad))
+      end if
    end do
    
    !  6.0 assign sequential structure to innovation structure
