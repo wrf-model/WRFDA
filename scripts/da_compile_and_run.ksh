@@ -36,13 +36,13 @@ for COMPILER in $COMPILERS; do
    export WRFVAR_DIR=$HOME/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
-      echo "Compiling $WRFVAR_DIR $TARGET"
+      echo "Compiling $WRFVAR_DIR $TARGET with option $OPTION"
       cd $WRFVAR_DIR
       . ./setup.ksh $COMPILER >/dev/null
       svn update #>/dev/null 2>&1
       svn status
       if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
-      echo $OPTION | ./configure_new $TARGET >/dev/null 2>&1
+      echo $OPTION | ./configure_new $TARGET >configure.out 2>&1
       rm -f build/links
       ./compile_new $TARGET > compile.out 2>&1
       ls -l build/wrfvar.exe
