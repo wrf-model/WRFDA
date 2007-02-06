@@ -334,8 +334,8 @@ while test $DATE -le $FINAL_DATE; do
            export PHASE=true
            mkdir -p $RUN_DIR
 
-           $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
-           $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
+           $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
+           $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
            RC=$?
            if test $? != 0; then
               echo `date` "${ERR}Failed with error $RC$END"
@@ -383,8 +383,8 @@ while test $DATE -le $FINAL_DATE; do
       export PHASE=false
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_update_bc $RUN_DIR
-      $WRFVAR_DIR/scripts/da_update_bc.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $? != 0; then
          echo `date` "${ERR}Failed with error $RC$END"

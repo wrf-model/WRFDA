@@ -1,6 +1,6 @@
 #!/bin/ksh
 #-----------------------------------------------------------------------
-# Script da_update_bc.ksh
+# Script da_run_update_bc.ksh
 #
 # Purpose: Update WRF lateral boundary conditions to be consistent with 
 # WRFVAR analysis.
