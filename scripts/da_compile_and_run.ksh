@@ -9,7 +9,7 @@ export RUN=${RUN:-true}
 # Need a cleaner mapping between compiler and configure options.
 # Assuming option 2 is pgi mpi is a hack
 
-export TYPE=${TYPE:-trunk}
+export TYPE=${TYPE:-simple}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
@@ -32,7 +32,7 @@ echo "TARGET    $TARGET"
 let COUNT=1
 
 for COMPILER in $COMPILERS; do
-   export ID=${TYPE}_${COMPILER}_${MACHINE}
+   export ID=${COMPILER}_${MACHINE}_${TYPE}
    export WRFVAR_DIR=$HOME/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
