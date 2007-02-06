@@ -10,7 +10,7 @@ subroutine da_readwrite_be_stage3(outunit, nk, variable)
    integer, intent(in)      :: nk                         ! Number of vertical levels/modes.
    character*10, intent(in) :: variable                   ! Variable name
 
-   character*80             :: filename                   ! Input filename.
+   character(len=filename_len) :: filename                   ! Input filename.
    character*10             :: vardum                     ! Dummy variable name.
 
    integer                  :: num_bins2d                 ! Number of Eigenvector bins.

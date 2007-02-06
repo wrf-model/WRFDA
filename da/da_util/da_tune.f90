@@ -11,6 +11,9 @@ program da_tune
    !        10/16/2006  Merged radiance tuning subroutines  Syed RH Rizvi
    !        01/03/2007  Update for GPS refractivity         Syed RH Rizvi
    !---------------------------------------------------------------------
+
+   use da_control, only : filename_len
+
    implicit none
 
    integer, parameter            :: rand_unit = 45
@@ -2648,7 +2651,7 @@ subroutine read_namelist_radiance
 
 !  Local scalars:
 
-   character*20              :: namelist_file      ! Input namelist filename.
+   character(len=filename_len) :: namelist_file      ! Input namelist filename.
    integer, parameter        :: namelist_unit = 7  ! Input namelist unit.
    integer                   :: iost               ! Error code.
 

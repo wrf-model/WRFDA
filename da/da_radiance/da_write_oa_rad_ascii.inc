@@ -16,7 +16,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    integer                        :: nlevelss ! Number of obs levels.
 
    integer            :: ios, oma_rad_unit
-   character(len=30)  :: filename
+   character(len=filename_len)  :: filename
    integer            :: ndomain
 
 #ifdef RTTOV

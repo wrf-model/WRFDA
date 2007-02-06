@@ -9,7 +9,7 @@ subroutine da_write_noise_to_ob (iv)
    type (ob_type), intent(in)    :: iv   ! Obs and header structure.
    integer                       :: n, k,kk,i, iunit
    integer                       :: num_obs
-   character*20, allocatable     :: filename(:)   
+   character(len=filename_len), allocatable     :: filename(:)   
    character*20                  :: ob_name   
 
    call da_trace_entry("da_write_noise_to_ob")

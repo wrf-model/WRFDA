@@ -41,7 +41,7 @@ subroutine da_count_filtered_obs(&
 
    integer                        :: iunit, files, total_obs     
    integer                        :: maxnes, numc, idd
-   character*20                   :: filename
+   character(len=filename_len)    :: filename
 
 
    if (trace_use) call da_trace_entry("da_count_filtered_obs")

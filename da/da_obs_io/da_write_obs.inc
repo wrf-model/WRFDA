@@ -12,7 +12,7 @@ subroutine da_write_obs(ob, iv, re)
       
    integer                       :: n, k, num_obs, ios
    integer                       :: ounit     ! Output unit           
-   character(len=20)             :: filename
+   character(len=filename_len)   :: filename
 
    if (trace_use) call da_trace_entry("da_write_obs")
 

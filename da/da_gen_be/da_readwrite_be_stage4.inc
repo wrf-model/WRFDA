@@ -14,7 +14,7 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
    character*5, intent(in)  :: uh_method
    character*10, intent(in) :: variable                   ! Variable name.
 
-   character*80             :: filename                   ! Input filename.
+   character(len=filename_len) :: filename                   ! Input filename.
    character*10             :: cvar                       ! Dummy variable name.
    character*2              :: ck                         ! Loop index -> character.
    integer                  :: k                          ! Loop counter.

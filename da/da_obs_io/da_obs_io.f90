@@ -12,9 +12,10 @@ module da_obs_io
       max_ob_levels, missing_data, max_bogus_input, myproc,convert_uv2fd, &
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &
       max_radar, print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
-      use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity
+      use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity, &
+      filename_len
    use da_define_structures, only : ob_type, multi_level_type, &
-      Radar_multi_level_type, y_type, field_type, each_level_type, &
+      radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type
    use da_grid_definitions, only : da_earth_2_model_wind,da_ffdduv
    use da_obs, only : da_count_filtered_obs,da_check_missing,da_obs_proc_station

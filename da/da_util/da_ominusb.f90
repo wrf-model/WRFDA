@@ -7,6 +7,8 @@ program daprog_ominusb
    !        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
    !-----------------------------------------------------------
 
+   use da_control, only : filename_len
+
    implicit none
    
    character*5, parameter    :: missing_c = '*****'
@@ -50,7 +52,7 @@ program daprog_ominusb
       type (sub_type)        :: data(1:max_stations)
    end type obs_type
 
-   character*80              :: filename
+   character(len=filename_len) :: filename
    character*5               :: station_chosen
    character*5               :: station_id
    integer                   :: times, n, n1, n2, b

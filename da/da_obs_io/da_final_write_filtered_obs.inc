@@ -9,7 +9,7 @@ subroutine da_final_write_filtered_obs
    integer                    :: i,iost,iunit, files     
    type (multi_level_type)    :: platform
    real                       :: height_error
-   character*20               :: filename
+   character(len=filename_len) :: filename
 
    if (trace_use) call da_trace_entry("da_final_write_filtered_obs")
 

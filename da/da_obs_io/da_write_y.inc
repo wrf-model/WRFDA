@@ -12,7 +12,7 @@ subroutine da_write_y (iv, y)
    integer                       :: ounit ! Output file unit.
    integer                       :: n, k, num_obs, i, ios
    real                          :: f1, f2, f3, f4, f5, f6, f7, dum
-   character(len=20)             :: ob_name, filename, file_prefix
+   character(len=filename_len)   :: ob_name, filename, file_prefix
 
    if (trace_use) call da_trace_entry("da_write_y")
 

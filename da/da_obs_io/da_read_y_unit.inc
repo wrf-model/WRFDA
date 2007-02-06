@@ -23,7 +23,6 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    call da_get_unit(unit_in)
    open(unit=unit_in,file=trim(filename),form='formatted',iostat=ios,status='old')
    if (ios /= 0) Then
-write (0,*) "filename", filename
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open random observation error file"//trim(filename)/))
    end if

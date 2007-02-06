@@ -9,6 +9,8 @@ program da_diagnostics
    !    01/03/2007   GPS refractivity update      Syed RH Rizvi
    !-----------------------------------------------------------
 
+   use da_control, only : filename_len
+
    implicit none
 
    integer, parameter            :: y_unit = 50
@@ -21,7 +23,7 @@ program da_diagnostics
    integer, parameter            :: obs_qc_pointer = 0   
    real, parameter               :: missing_r = -888888.0
 
-   character*200                 :: filename
+   character(len=filename_len)   :: filename
    integer                       :: n, k, current_time
 
    type info_type

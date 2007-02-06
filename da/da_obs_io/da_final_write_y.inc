@@ -11,8 +11,8 @@ subroutine da_final_write_y(iv, y)
       
    integer                       :: n, k,kk,i, ounit, iunit
    integer                       :: sound_num_obs, num_obs, ios
-   character*20, allocatable     :: filename(:)
-   character*20                  :: ob_name, file_prefix  
+   character(len=filename_len), allocatable     :: filename(:)
+   character(len=filename_len)                  :: ob_name, file_prefix  
 
    if (trace_use) call da_trace_entry("da_final_write_y")
 

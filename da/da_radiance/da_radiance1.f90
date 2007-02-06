@@ -11,7 +11,7 @@ module da_radiance1
 
    use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
       stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &
-      use_error_factor_rad,biasprep_unit,obs_qc_pointer
+      use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len
    use da_tracing, only : da_trace_entry, da_trace_exit
 
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &

@@ -3,6 +3,7 @@ module da_obs
    use da_define_structures, only : multi_level_type, y_type, ob_type, &
       model_loc_type, field_type, each_level_type,da_allocate_y
    use module_domain, only : xb_type, x_type, xpose_type
+
    use da_control, only : use_shipsobs, use_synopobs, use_ssmt2obs, &
       use_soundobs,use_satemobs, use_profilerobs, use_pilotobs, &
       use_qscatobs,use_metarobs, use_polaramvobs, use_geoamvobs, &
@@ -13,7 +14,7 @@ module da_obs
       pseudo_var, pseudo_val,stdout, num_pseudo, pseudo_y, pseudo_z, &
       pseudo_err,obs_qc_pointer,myproc,rtm_option,rtm_option_rttov, &
       use_crtm_kmatrix,use_crtm_kmatrix_fast, rtm_option_crtm,use_radiance, &
-      ob_format,ob_format_ascii
+      ob_format,ob_format_ascii,filename_len
    use da_tracing, only : da_trace_entry, da_trace_exit   
    use da_reporting, only : da_error, message, da_warning
    use da_radiance, only : da_transform_xtoy_rad,da_transform_xtoy_rad_adj

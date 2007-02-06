@@ -62,7 +62,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    integer            :: slp_qc, speed_qc, dir_qc,p_qc, ref_qc
 
    integer            :: ounit, nz, mnz
-   character*20       :: filename
+   character(len=filename_len)       :: filename
 
    if (trace_use) call da_trace_entry("da_write_filtered_obs")
 

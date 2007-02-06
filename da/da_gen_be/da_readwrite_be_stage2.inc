@@ -11,7 +11,7 @@ subroutine da_readwrite_be_stage2(outunit, nk)
    integer, intent(in)      :: outunit                    ! Output unit number.
    integer, intent(out)     :: nk                         ! Number of vertical levels/modes.
 
-   character*80             :: filename                   ! Input filename.
+   character(len=filename_len) :: filename                   ! Input filename.
 
    integer                  :: ni, nj                     ! Number of points in x/y direction.
    integer                  :: bin_type                   ! Type of bin to average over. !!!DALE ADD.

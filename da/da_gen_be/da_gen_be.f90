@@ -5,13 +5,14 @@ module da_gen_be
    ! code.
    !----------------------------------------------------------------------------
 
+   use lapack, only : dsyev
+
    use da_control, only : trace_use,stdout,vertical_ip, ts0,es_beta,es_alpha, &
       es_gamma,kappa,ps0_inv,rd_over_rv,rd_over_rv1,t_kelvin, gravity, &
-      da_array_print
-   use lapack, only : dsyev
-   use da_tracing, only : da_trace_entry, da_trace_exit
+      da_array_print, filename_len
    use da_reporting, only : da_error, message
    use da_tools1, only : da_get_unit, da_free_unit
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    implicit none
 

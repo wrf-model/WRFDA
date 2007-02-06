@@ -11,7 +11,7 @@ subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
    type (ep_type), intent(inout):: ep                   ! Flow-dependent info.
 
    character*10                :: ce                    ! Member index -> character.
-   character*200               :: filename              ! Input filename.
+   character(len=filename_len) :: filename              ! Input filename.
    character*10                :: var(1:5)              ! Variable name.
    integer                     :: ni, nj, nk            ! Grid dimensions.
    integer                     :: e                     ! Loop counter
