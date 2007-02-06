@@ -54,7 +54,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI              (Single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, serial      (Single-threaded)
 #
 FC              = pgf90
 FFC             = $(FC)
@@ -90,7 +90,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI              (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, simple      (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -239,7 +239,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95              (Single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, g95, serial      (Single-threaded)
 #
 FC              = g95
 FFC             = $(FC)
@@ -271,7 +271,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95              (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, simple      (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -420,7 +420,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95              (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, simple      (RSL_LITE, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -465,7 +465,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort            (single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, serial    (single-threaded)
 #
 
 M4              = m4 -B12000
@@ -499,7 +499,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort            (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, simple    (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -644,7 +644,7 @@ arch_superclean :
 
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, PGI                      (Single-threaded)
+#ARCH Settings for PC Linux x86_64, PGI, serial              (Single-threaded)
 #
 FC              = pgf90
 FFC             = $(FC)
@@ -679,7 +679,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, PGI                      (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, PGI, simple              (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -825,7 +825,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale                (Single-threaded)
+#ARCH Settings for PC Linux x86_64, Pathscale, serial        (Single-threaded)
 #
 FC              = pathf90
 FFC             = $(FC)
@@ -860,7 +860,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale                (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, simple        (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -1003,7 +1003,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort                    (Single-threaded)
+#ARCH Settings for PC Linux x86_64, ifort, serial            (Single-threaded)
 #
 M4              = m4 -B12000
 FC              = ifort
@@ -1040,7 +1040,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort,                   (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, simple            (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1186,7 +1186,7 @@ arch_superclean :
 
 ###########################################################
 
-#ARCH Settings for SGI 64 bit machine IRIX64, optimised, untestested (single-threaded)
+#ARCH Settings for SGI 64 bit machine IRIX64, optimised, untested (single-threaded)
 #
 
 M4              = m4 -B12000
@@ -1225,7 +1225,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for SGI O2K DM IRIX64, optimised, untestested (RSL, SGI-MPI, RSL IO)
+#ARCH Settings for SGI O2K DM IRIX64, optimised, untested    (RSL, SGI-MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1273,7 +1273,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, ifort, optimised, untestested (RSL, SGI-MPI, RSL IO)
+#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, ifort, optimised, untested (RSL, SGI-MPI, RSL IO)
 #
 # Process pinning should be used -- set the environment
 #  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
@@ -1332,7 +1332,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for NEC, untested                             (single-threaded)
+#ARCH Settings for NEC, untested, serial                     (single-threaded)
 #
 CPP             = /usr/lib0/cpp
 M4              = m4 -B12000
@@ -1369,7 +1369,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf                                  (single-threaded)
+#ARCH Settings for AIX, xlf, serial                          (single-threaded)
 #
 M4              = m4 -B24000
 FC              = xlf90_r
@@ -1407,7 +1407,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf                                  (RSL, IBM-MPI, RSL IO)
+#ARCH Settings for AIX, xlf, simple                          (RSL, IBM-MPI, RSL IO)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1559,7 +1559,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1                  (Single-threaded) 
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, serial          (Single-threaded) 
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1599,7 +1599,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1                  (RSL, Cray MPI, RSL IO)
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, simple          (RSL, Cray MPI, RSL IO)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1760,7 +1760,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95                               (single-threaded)
+#ARCH Settings for Darwin, g95, serial                       (single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1796,7 +1796,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, g95                               (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, simple                       (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
