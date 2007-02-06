@@ -258,9 +258,9 @@ state    real   U10              ij     misc        1         -     irh01d      
 state    real   V10              ij     misc        1         -     irh01d      "V10"                "V at 10 M"         "m s-1"
 
 # these next 4 are for observational nudging
-state    real   uratx           ij      misc        1         -     irh         "URATX"            "Ratio of U over U10 on mass points "         "dimensionless"
-state    real   vratx           ij      misc        1         -     irh         "VRATX"            "Ratio of V over V10 on mass points "         "dimensionless"
-state    real   tratx           ij      misc        1         -     irh         "TRATX"            "Ratio of T over TH2 on mass points "         "dimensionless"
+state    real   uratx           ij      misc        1         -     ir          "URATX"            "Ratio of U over U10 on mass points "         "dimensionless"
+state    real   vratx           ij      misc        1         -     ir          "VRATX"            "Ratio of V over V10 on mass points "         "dimensionless"
+state    real   tratx           ij      misc        1         -     ir          "TRATX"            "Ratio of T over TH2 on mass points "         "dimensionless"
 state    real   obs_savwt      hikj     dyn_em      1         X      -       "OBS_SAVWT"
 
 # Other
@@ -880,11 +880,12 @@ rconfig   integer end_minute              namelist,time_control		max_domains    
 rconfig   integer end_second              namelist,time_control		max_domains      00    irh   "end_second"            "2 DIGIT SECOND OF THE MINUTE OF END OF MODEL, 0-59" "SECONDS"
 rconfig   integer interval_seconds        namelist,time_control		1             43200    irh   "interval_seconds"      "SECONDS BETWEEN ANALYSIS AND BOUNDARY PERIODS" "SECONDS"
 rconfig   logical input_from_file         namelist,time_control		max_domains    .false. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
-rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 5, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
+rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 11, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
 rconfig   logical input_from_hires        namelist,time_control		max_domains    .false. irh    "input_from_hires"     "T/F INPUT FOR THIS DOMAIN FROM USGS HI RES TERRAIN"  ""
 rconfig   character rsmas_data_path       namelist,time_control		1              "."     -    "rsmas_data_path"      ""  ""
 
 include registry.io_boilerplate
+include registry.io_boilerplate_EM
 
 rconfig   integer JULYR                   namelist,time_control		max_domains    0       h    "JULYR"                 ""      ""
 rconfig   integer JULDAY                  namelist,time_control		max_domains    1       h    "JULDAY"                ""      ""
@@ -994,7 +995,7 @@ rconfig   real mp_zero_out_thresh         namelist,physics	1          1.e-8     
 rconfig   real    seaice_threshold        namelist,physics	1            271       h    "seaice_threshold"  "tsk below which which water points are set to sea ice for slab scheme"   "K"
 rconfig   integer sst_update              namelist,physics	1            0         h    "sst_update"  "update sst from wrflowinp file  0=no, 1=yes"   ""
 rconfig   integer ucmcall                 namelist,physics      1            0         h    "ucmcall"     "activate urban model  0=no, 1=yes"   ""
-rconfig   integer co2tf                   namelist,physics	1            0         -    "co2tf" "GFDL radiation co2 flag" ""
+rconfig   integer co2tf                   namelist,physics	1            1         -    "co2tf" "GFDL radiation co2 flag" ""
 rconfig   integer ra_call_offset          namelist,physics	1            0         -    "ra_call_offset" "radiation call offset in timesteps (-1=old, 0=new offset)" ""
 rconfig   real    cam_abs_freq_s          namelist,physics      1         21600.      -      "cam_abs_freq_s" "CAM radiation frequency for clear-sky longwave calculations" "s"
 rconfig   integer levsiz                  namelist,physics      1             1       -      "levsiz" "Number of ozone data levels for CAM radiation (59)"  ""
@@ -1023,8 +1024,8 @@ rconfig   integer if_ramping              namelist,fdda         1              0
 #Observational Nudging
 rconfig   integer     obs_nudge_opt       namelist,fdda            max_domains    0       rh       "obs_nudge_opt"     "Obs-nudging flag for domain"          ""
 rconfig   integer     max_obs             namelist,fdda            1              0       h        "max_obs"           "Maximum number of observations"       ""
-rconfig   integer     nobs_ndg_vars       namelist,fdda            1              0       h        "num_ndg_vars"      "Number of nudging variables"          ""
-rconfig   integer     nobs_err_flds       namelist,fdda            1              0       h        "num_err_flds"      "Number of error fields"               ""
+rconfig   integer     nobs_ndg_vars       namelist,fdda            1              5       h        "num_ndg_vars"      "Number of nudging variables"          ""
+rconfig   integer     nobs_err_flds       namelist,fdda            1              9       h        "num_err_flds"      "Number of error fields"               ""
 rconfig   real        fdda_start          namelist,fdda            max_domains    0       rh       "fdda_start"        "Nudging start time for domain"        "min"
 rconfig   real        fdda_end            namelist,fdda            max_domains    0       rh       "fdda_end"          "Nudging end time for domain"          "min"
 rconfig   integer     obs_nudge_wind      namelist,fdda            max_domains    0       rh       "obs_nudge_wind"    "Wind-nudging flag for domain"         ""
