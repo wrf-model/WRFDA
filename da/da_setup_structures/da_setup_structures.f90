@@ -56,7 +56,6 @@ module da_setup_structures
 
 #include "da_get_vertical_truncation.inc"
 #include "da_interpolate_regcoeff.inc"
-!#include "da_interpolate_stats.inc"
 #include "da_rescale_background_errors.inc"
 #include "da_setup_background_errors.inc"
 #include "da_setup_be_global.inc"

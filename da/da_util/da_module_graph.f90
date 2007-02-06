@@ -7,8 +7,6 @@ module da_module_graph
 
 contains
 
-#include "da_close_gks.inc"
-#include "da_open_gks.inc"
 #include "da_setup_color_table.inc"
 
 end module da_module_graph
