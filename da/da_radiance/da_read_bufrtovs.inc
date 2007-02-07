@@ -361,6 +361,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    do i = 1, iv%num_inst
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
+      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+        ' Allocating space for radiance innov structure', &
+         i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       if (rtm_option == rtm_option_crtm) &
           iv%instid(i)%nlevels = xp%kme-xp%kms+1
    end do
