@@ -38,7 +38,8 @@ module da_setup_structures
       var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
       print_detail_regression,gas_constant,da_array_print , use_airsretobs, &
       filename_len
-   use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures
+   use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
+      da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &
       da_scan_radar,da_scan_obs,da_read_obs
    use da_par_util, only : da_local_to_global
