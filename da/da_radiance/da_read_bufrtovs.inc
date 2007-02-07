@@ -435,6 +435,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
         allocate(iv%instid(i)%land_coverage(iv%instid(i)%num_rad))
         allocate(iv%instid(i)%ice_coverage(iv%instid(i)%num_rad))
         allocate(iv%instid(i)%snow_coverage(iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%ps_jacobian(nchan,iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%t_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
+        allocate(iv%instid(i)%q_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
       end if
    end do
    

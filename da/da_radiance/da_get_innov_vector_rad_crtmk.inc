@@ -157,28 +157,6 @@ subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
 
-         Allocate ( iv%instid(inst)%tb_xb(nchanl,n), &
-                    iv%instid(inst)%emiss(nchanl,n), &
-                    iv%instid(inst)%tm(xp%kts:xp%kte,n), &
-                    iv%instid(inst)%qm(xp%kts:xp%kte,n), &
-                    iv%instid(inst)%qcw(xp%kms:xp%kme,n),  &
-                    iv%instid(inst)%pm(xp%kts:xp%kte,n),   &
-                    iv%instid(inst)%t(0:xp%kte,n),         &  ! used as full level pressure
-                    iv%instid(inst)%ps_jacobian(nchanl,n), &
-                    iv%instid(inst)%t_jacobian(nchanl,xp%kte,n), &
-                    iv%instid(inst)%q_jacobian(nchanl,xp%kte,n), &
-                    STAT = Allocate_Status )
-
-!iv%instid(inst)%qrn(xp%kms:xp%kme,n), &
-!iv%instid(inst)%qci(xp%kms:xp%kme,n), &
-!iv%instid(inst)%qsn(xp%kms:xp%kme,n), &
-!iv%instid(inst)%qgr(xp%kms:xp%kme,n), &
-
-         IF ( Allocate_Status /= 0 ) THEN
-           call da_error(__FILE__,__LINE__, &
-             (/"Error in allocatting innovation structure"/))
-         END IF
-
          model_ts   = 0.0
          model_u10  = 0.0
          model_v10  = 0.0

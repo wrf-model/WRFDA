@@ -118,10 +118,10 @@ subroutine da_transform_xtoy_rad_crtmk_adj ( iv, xp, jo_grad_y, jo_grad_x )
       do n=1,num_rad
 
       ! [1.0] Extract base state Atmosphere variables
-            atmosphere%level_pressure(0) = iv%instid(inst)%t(0,n)
+            atmosphere%level_pressure(0) = iv%instid(inst)%pf(0,n)
            do k=1,atmosphere%n_layers
             atmosphere%pressure(k) = iv%instid(inst)%pm(k,n)
-            atmosphere%level_pressure(k) = iv%instid(inst)%t(k,n)
+            atmosphere%level_pressure(k) = iv%instid(inst)%pf(k,n)
             atmosphere%temperature(k) = iv%instid(inst)%tm(k,n)
             atmosphere%absorber(k,1) = iv%instid(inst)%qm(k,n)
            enddo
