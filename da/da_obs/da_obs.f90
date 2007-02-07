@@ -64,6 +64,7 @@ contains
 #include "da_random_omb_all.inc"
 #include "da_setup_pseudo_obs.inc"
 #include "da_store_obs_grid_info.inc"
+#include "da_store_obs_grid_info_new.inc"
 #include "da_count_filtered_obs.inc"
 
 end module da_obs
