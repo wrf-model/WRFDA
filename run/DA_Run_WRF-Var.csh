@@ -41,8 +41,6 @@
 #
 #-----------------------------------------------------------------------
 
-#set echo
-
  unlimit
 
  setenv MP_SHARED_MEMORY yes
@@ -539,9 +537,9 @@ endif
 
 if ( $PLATFORM == "AIX" ) then
   #IBM (llsubmit):
-  #poe ./wrfvar.exe
+  $RUN_CMD ./wrfvar.exe
   #mpirun -np ${NUM_PROCS} ./wrfvar.exe
-  ./wrfvar.exe >&! wrfvar.out
+  #./wrfvar.exe >&! wrfvar.out
 endif
 
 cp fort.12 DAProg_WRF-Var.statistics >&! /dev/null
