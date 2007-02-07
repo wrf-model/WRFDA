@@ -509,7 +509,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(i)%solzen(nread(i))       = p%solzen  
       ! iv%instid(i)%solazi(nread(i))     = p%solazi  
       iv%instid(i)%solazi(nread(i))       = 0.0
-      iv%instid(i)%proc_domain(nread(i))  = .false.
+      iv%instid(i)%proc_domain(nread(i))  = p%loc%proc_domain
+      write(*,*) nread(i), iv%instid(i)%proc_domain(nread(i))
 
       current => p
       p => p%next
