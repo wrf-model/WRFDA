@@ -68,6 +68,8 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar backgro
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
+export CRTM=${CRTM:-$HOME/crtm}
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/../crtm_coefs}
 
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
@@ -165,6 +167,10 @@ echo "WINDOW_END            $WINDOW_END"
 
    if test $DA_RTTOV_COEFFS'.' != '.'; then
       ln -s $DA_RTTOV_COEFFS/* .
+   fi
+
+   if test $DA_CRTM_COEFFS'.' != '.'; then
+      ln -s $DA_CRTM_COEFFS/* .
    fi
 
    ln -sf $WRFVAR_DIR/run/gribmap.txt .
