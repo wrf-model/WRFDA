@@ -17,13 +17,15 @@ subroutine da_deallocate_observations (ob)
 
    if (ob % num_sound > 0) then
       do n = 1, ob % num_sound
-         deallocate (ob % sound (n) % h)
-         deallocate (ob % sound (n) % p)
-         deallocate (ob % sound (n) % zk)
-         deallocate (ob % sound (n) % u)
-         deallocate (ob % sound (n) % v)
-         deallocate (ob % sound (n) % t)
-         deallocate (ob % sound (n) % q)
+         if (ob%sound(n)%info%levels > 0) then
+            deallocate (ob % sound (n) % h)
+            deallocate (ob % sound (n) % p)
+            deallocate (ob % sound (n) % zk)
+            deallocate (ob % sound (n) % u)
+            deallocate (ob % sound (n) % v)
+            deallocate (ob % sound (n) % t)
+            deallocate (ob % sound (n) % q)
+         end if
       end do
 
       deallocate (ob % sound)
