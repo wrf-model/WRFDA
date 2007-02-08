@@ -155,6 +155,9 @@ echo '<A HREF="namelist.input">Namelist input</a>'
          LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $LOCAL_DATE $NL_HISTORY_INTERVAL`
       done
    else
+      if  $NL_VAR4D && test $NUM_PROCS -gt 1; then
+         touch wrfnl_go_ahead
+      fi
       $RUN_CMD ./wrf.exe
       RC=$?
 

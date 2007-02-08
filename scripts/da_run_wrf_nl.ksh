@@ -20,10 +20,15 @@ cd $WORK_DIR/nl
 
 export G95_UNIT_ENDIAN_98=BIG
 
-if test $NUM_PROCS=1; then
+if test $NUM_PROCS = 1; then
    ./wrf.exe > wrf_nl.out 2>wrf_nl.error
 else
-   $RUN_CMD ./wrf.exe > wrf_nl.out 2>wrf_nl.error
+   if test $arg1 = pre; then
+      cp -f namelist.input ../.
+   fi
+   if test $arg1 = post; then
+      cp -f ../namelist.wrfvar ../namelist.input
+   fi
 fi
 
 exit 0

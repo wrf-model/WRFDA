@@ -13,9 +13,14 @@ arg2=$2
 
 cd $WORK_DIR/ad
 
-if test $NUM_PROCS=1; then
+if test $NUM_PROCS = 1; then
    ./wrfplus.exe > wrf_ad.out 2>wrf_ad.error
 else
-   $RUN_CMD ./wrfplus.exe > wrf_ad.out 2>wrf_ad.error
+   if test $arg1 = pre; then
+      cp -f namelist.input ../.
+   fi
+   if test $arg1 = post; then
+      cp -f ../namelist.wrfvar ../namelist.input
+   fi
 fi
 

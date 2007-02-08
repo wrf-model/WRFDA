@@ -41,14 +41,14 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
       call da_trace("da_transform_vtoy","Starting da_run_wrfplus_tl.ksh")
 #ifdef DM_PARALLEL
       if (var4d_coupling == var4d_coupling_disk_simul) then
-         call da_system("da_run_wrfplus_tl.ksh")
+         call da_system("da_run_wrfplus_tl.ksh pre")
 
          if (rootproc) then
-            call da_system("rm -rf tl/wrf_done")
-            call da_system("touch tl/wrf_go_ahead")
+            call da_system("rm -rf wrf_done")
+            call da_system("touch wrf_go_ahead")
             call da_get_unit(wrf_done_unit)
             do while (.true.)
-               open(wrf_done_unit,file="tl/wrf_done",status="old",err=303)
+               open(wrf_done_unit,file="wrf_done",status="old",err=303)
                close(wrf_done_unit)
                exit
 303            continue
@@ -57,9 +57,9 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
             call da_free_unit(wrf_done_unit)
          end if
          ! Wait until PE 0 agrees that TL finished
+         CALL wrf_get_dm_communicator ( comm )
          call mpi_barrier(comm, ierr)
-      else
-         call da_system("da_run_wrfplus_tl.ksh")
+         call da_system("da_run_wrfplus_tl.ksh post")
       end if
 #else
       call da_system("da_run_wrfplus_tl.ksh")

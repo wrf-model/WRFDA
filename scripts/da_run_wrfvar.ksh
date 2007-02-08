@@ -238,8 +238,14 @@ echo "WINDOW_END            $WINDOW_END"
 
       # Inputs
       export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
+      if test $NUM_PROCS -gt 1; then
+         export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
+      fi
       export NL_DYN_OPT=2
       export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
+      if test $NUM_PROCS -gt 1; then
+         export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
+      fi
       export NL_INPUTOUT_INTERVAL=60
       export NL_AUXHIST2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_FRAMES_PER_AUXHIST2=1
@@ -340,6 +346,10 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DYN_OPT=202
       export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      if test $NUM_PROCS -gt 1; then
+         export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      fi
       export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_MP_PHYSICS=0
       export NL_RA_LW_PHYSICS=0
@@ -380,8 +390,15 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DYN_OPT=302
       export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      if test $NUM_PROCS -gt 1; then
+         export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
+         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+      fi
       export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
+      if test $NUM_PROCS -gt 1; then
+         export NL_AUXINPUT3_INNAME='./ad/auxinput3_d<domain>_<date>'
+      fi
       export NL_AUXINPUT3_INTERVAL=60
       export NL_HISTORY_INTERVAL=9999
       export NL_AUXHIST3_INTERVAL=60
@@ -397,7 +414,7 @@ echo "WINDOW_END            $WINDOW_END"
       done
 # JRB
 #      if $NL_JCDFI_USE; then
-         ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_dfi
+         ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
 #      fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
 
@@ -424,6 +441,7 @@ echo "WINDOW_END            $WINDOW_END"
    . $WRFVAR_DIR/build/inc/namelist_script.inc
 
    if test -f namelist.input; then
+     cp -f namelist.input namelist.wrfvar
      cp namelist.input $RUN_DIR
    fi
 
@@ -458,18 +476,18 @@ echo "WINDOW_END            $WINDOW_END"
             rm -f $MP_CMDFILE
             let I=0
             while test $I -lt $NUM_PROCS_VAR; do
-               echo "env BIND_TASKS=no ./wrfvar.exe" >> $MP_CMDFILE
+               echo "wrfvar.exe" >> $MP_CMDFILE
                let I=$I+1
             done
             while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF; do
-               echo "env BIND_TASKS=no ./wrf.exe" >> $MP_CMDFILE
+               echo "./nl/wrf.exe" >> $MP_CMDFILE
                let I=$I+1
             done
             while test $I -lt $NUM_PROCS; do
-               echo "env BIND_TASKS=no ./wrfplus.exe" >> $MP_CMDFILE
+               echo "./ad/wrfplus.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            poe
+            mpirun.lsf -cmdfile poe.cmdfile
             RC=$?
          else
             $RUN_CMD ./wrfvar.exe
