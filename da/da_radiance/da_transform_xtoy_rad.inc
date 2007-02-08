@@ -436,6 +436,12 @@ end do
       !-------------------------------------------------------------------
 
       if (num_rad > 0) then
+         do n=1,d_num_rad
+            deallocate (con_vars(n) % t)
+            deallocate (con_vars(n) % q)
+            deallocate (con_vars_tl(n) % t)
+            deallocate (con_vars_tl(n) % q)
+         end do
          deallocate (con_vars)
          deallocate (aux_vars)
          deallocate (con_vars_tl)

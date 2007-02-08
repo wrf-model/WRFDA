@@ -98,6 +98,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       profiles_ad(n) % clw_Data   = .False.  ! no meaning
       profiles_ad(n) % co2    = 0.0
       profiles_ad(n) % zenangle   = -1       ! no meaning
+      profiles_ad(n) % azangle   = -1       ! no meaning
       profiles_ad(n) % p(:)   = 0. ! no AD on pressure levels
       profiles_ad(n) % t(:)   = 0. ! temperarure
       profiles_ad(n) % o3(:)  = 0. ! O3 ppmv
@@ -368,8 +369,6 @@ goto 100
    end if
 
    do n = 1, nprofiles
-      allocate(con_vars_ad(n)%t(size(profiles_ad(n) % t)))
-      allocate(con_vars_ad(n)%q(size(profiles_ad(n) % q)))
       con_vars_ad(n)%t(:)         = profiles_ad(n) % t(:)
       con_vars_ad(n)%q(:)         = profiles_ad(n) % q(:)
       con_vars_ad(n)%ps           = profiles_ad(n) % s2m  % p

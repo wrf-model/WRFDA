@@ -520,6 +520,8 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       deallocate ( current )
    end do
 
+   deallocate ( p )
+
    deallocate (nread)
 
    ! check if sequential structure has been freed

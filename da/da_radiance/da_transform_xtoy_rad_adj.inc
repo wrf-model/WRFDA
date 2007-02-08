@@ -111,13 +111,11 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       d_num_rad=num_tovs_after(i,myproc+1)
 
       if (d_num_rad > 0) then
-
          allocate (d_con_vars(d_num_rad))
          allocate (d_con_vars_ad(d_num_rad))
          allocate (d_aux_vars(d_num_rad))
          allocate (d_tb(nchan,d_num_rad))
          d_con_vars(:) % nlevels = nlevels
-
          do n = 1, d_num_rad
             allocate (d_con_vars(n) % t(nlevels))
             allocate (d_con_vars(n) % q(nlevels))

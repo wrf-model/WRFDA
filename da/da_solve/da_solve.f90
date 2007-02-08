@@ -7,7 +7,7 @@ subroutine da_solve ( grid , config_flags)
    use module_configure, only : grid_config_rec_type
    use module_domain, only : domain
    use module_driver_constants, only : max_comms
-   use module_radiance, only : satinfo
+   use module_radiance, only : satinfo, time_slots
 #ifdef RTTOV
    use module_radiance, only : coefs
 #endif
@@ -168,7 +168,7 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    j_grad_norm_target = 1.0
-
+write (0,*) __FILE__,__LINE__,"max_ext_its",max_ext_its
    DO it = 1, max_ext_its
 
       ! [8.1] Calculate nonlinear model trajectory 
@@ -238,6 +238,14 @@ subroutine da_solve ( grid , config_flags)
 
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
+
+      if (use_radiance) then
+         allocate (j % jo % rad(1:iv%num_inst))
+         do i=1,iv%num_inst
+            allocate (j % jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
+            allocate (j % jo % rad(i) % num_ichan(iv%instid(i)%nchan))
+         end do
+      end if
 
       call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
@@ -375,6 +383,8 @@ subroutine da_solve ( grid , config_flags)
       deallocate (iv%instid)
       deallocate (j % jo % rad)
       deallocate (satinfo)
+      deallocate (time_slots)
+      deallocate (coefs)
    end if
 
    call da_deallocate_observations(iv)
