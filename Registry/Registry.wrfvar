@@ -1262,19 +1262,19 @@ package   dyn_em_tst   dyn_opt==402                 -             -
 package   dyn_em_var   dyn_opt==502                 -             -
 
 package   passivec1     chem_opt==0                  -             
-package   passiveqv     mp_physics==0                -             moist:qv
-package   kesslerscheme mp_physics==1                -             moist:qv,qc,qr
-package   linscheme     mp_physics==2                -             moist:qv,qc,qr,qi,qs,qg
-package   wsm3scheme    mp_physics==3                -             moist:qv,qc,qr
-package   wsm5scheme    mp_physics==4                -             moist:qv,qc,qr,qi,qs
-package   etampnew      mp_physics==5                -             moist:qv,qc
-package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg
-package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr
-package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs
-package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
+package   passiveqv     mp_physics==0                -             moist:qv;a_moist:a_qv;g_moist:g_qv
+package   kesslerscheme mp_physics==1                -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   linscheme     mp_physics==2                -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg
+package   wsm3scheme    mp_physics==3                -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   wsm5scheme    mp_physics==4                -             moist:qv,qc,qr,qi,qs;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs
+package   etampnew      mp_physics==5                -             moist:qv,qc;a_moist:a_qv,a_qc;g_moist:g_qv,g_qc
+package   wsm6scheme    mp_physics==6                -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg
+package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr;a_moist:a_qv,a_qc,a_qr;g_moist:g_qv,g_qc,g_qr
+package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs
+package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg;scalar:qni
 
 package   rrtmscheme    ra_lw_physics==1             -             -
-package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi
+package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi;a_moist:a_qv,a_qc,a_qr,a_qi;g_moist:g_qv,g_qc,g_qr,g_qi
 
 package   swradscheme   ra_sw_physics==1             -             -
 package   gsfcswscheme  ra_sw_physics==2             -             -
