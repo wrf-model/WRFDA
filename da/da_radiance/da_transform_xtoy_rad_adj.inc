@@ -57,49 +57,52 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
       nlevels  = iv%instid(i)%nlevels
       nchan    = iv%instid(i)%nchan
 
-      allocate (model_mr(1:nlevels))
+      if (num_rad > 0) then
 
-      allocate (con_vars(num_rad))
-      allocate (con_vars_ad(num_rad))
-      allocate (aux_vars(num_rad))
+         allocate (model_mr(1:nlevels))
 
-      !---------------------------------------------------------------
-      ! [1.0] assign tb = R^-1 Re :
-      !---------------------------------------------------------------
+         allocate (con_vars(num_rad))
+         allocate (con_vars_ad(num_rad))
+         allocate (aux_vars(num_rad))
 
-      !---------------------------------------------
-      ! [2.0] get input of da_rttov_ad
-      !---------------------------------------------
+         !---------------------------------------------------------------
+         ! [1.0] assign tb = R^-1 Re :
+         !---------------------------------------------------------------
 
-      do n = 1, num_rad
-         con_vars(n) % nlevels = nlevels 
+         !---------------------------------------------
+         ! [2.0] get input of da_rttov_ad
+         !---------------------------------------------
 
-         allocate (con_vars(n)    % t(nlevels))
-         allocate (con_vars(n)    % q(nlevels))
-         allocate (con_vars_ad(n) % t(nlevels))
-         allocate (con_vars_ad(n) % q(nlevels))
+         do n = 1, num_rad
+            con_vars(n) % nlevels = nlevels 
 
-         con_vars(n)    % t(:) = 0.0
-         con_vars(n)    % q(:) = 0.0
-         con_vars_ad(n) % t(:) = 0.0
-         con_vars_ad(n) % q(:) = 0.0
+            allocate (con_vars(n)    % t(nlevels))
+            allocate (con_vars(n)    % q(nlevels))
+            allocate (con_vars_ad(n) % t(nlevels))
+            allocate (con_vars_ad(n) % q(nlevels))
 
-         con_vars(n) % t(:) = iv%instid(i)%t(:,n)
-         con_vars(n) % q(:) = iv%instid(i)%mr(:,n)
-         con_vars(n) % ps   = iv%instid(i)%ps(n)
+            con_vars(n)    % t(:) = 0.0
+            con_vars(n)    % q(:) = 0.0
+            con_vars_ad(n) % t(:) = 0.0
+            con_vars_ad(n) % q(:) = 0.0
 
-         aux_vars(n) % t2m = iv%instid(i)%t2m(n)
-         aux_vars(n) % q2m = iv%instid(i)%mr2m(n)
-         aux_vars(n) % u10 = iv%instid(i)%u10(n)
-         aux_vars(n) % v10 = iv%instid(i)%v10(n)
+            con_vars(n) % t(:) = iv%instid(i)%t(:,n)
+            con_vars(n) % q(:) = iv%instid(i)%mr(:,n)
+            con_vars(n) % ps   = iv%instid(i)%ps(n)
 
-         aux_vars(n) % surftype = iv%instid(i)%landsea_mask(n)
-         aux_vars(n) % surft    = iv%instid(i)%ts(n)
-         ! aux_vars(n) % fastem(:) = 0.0
+            aux_vars(n) % t2m = iv%instid(i)%t2m(n)
+            aux_vars(n) % q2m = iv%instid(i)%mr2m(n)
+            aux_vars(n) % u10 = iv%instid(i)%u10(n)
+            aux_vars(n) % v10 = iv%instid(i)%v10(n)
 
-         aux_vars(n) % satzen  = iv%instid(i)%satzen(n)
-         aux_vars(n) % satazi  = iv%instid(i)%satazi(n)
-      end do
+            aux_vars(n) % surftype = iv%instid(i)%landsea_mask(n)
+            aux_vars(n) % surft    = iv%instid(i)%ts(n)
+            ! aux_vars(n) % fastem(:) = 0.0
+
+            aux_vars(n) % satzen  = iv%instid(i)%satzen(n)
+            aux_vars(n) % satazi  = iv%instid(i)%satazi(n)
+         end do
+      end if
 
       !-------------------------------------------------
       ! [2.9] Distribute evenly across processors
@@ -107,158 +110,157 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
       d_num_rad=num_tovs_after(i,myproc+1)
 
-      allocate (d_con_vars(d_num_rad))
-      allocate (d_con_vars_ad(d_num_rad))
-      allocate (d_aux_vars(d_num_rad))
-      allocate (d_tb(nchan,d_num_rad))
       if (d_num_rad > 0) then
+
+         allocate (d_con_vars(d_num_rad))
+         allocate (d_con_vars_ad(d_num_rad))
+         allocate (d_aux_vars(d_num_rad))
+         allocate (d_tb(nchan,d_num_rad))
          d_con_vars(:) % nlevels = nlevels
-      end if
 
-      do n = 1, d_num_rad
-         allocate (d_con_vars(n) % t(nlevels))
-         allocate (d_con_vars(n) % q(nlevels))
-         allocate (d_con_vars_ad(n) % t(nlevels))
-         allocate (d_con_vars_ad(n) % q(nlevels))
-      end do
-
-      ! Fill up with data that stays local
-
-      l_num_rad=Min(num_rad,d_num_rad)
-
-      if (l_num_rad > 0) then
-         do n = 1, l_num_rad
-            d_con_vars(n) % t(:) = con_vars(n) % t(:) 
-            d_con_vars(n) % q(:) = con_vars(n) % q(:)
-            ! d_aux_vars(n) % fastem(:) = 0.
+         do n = 1, d_num_rad
+            allocate (d_con_vars(n) % t(nlevels))
+            allocate (d_con_vars(n) % q(nlevels))
+            allocate (d_con_vars_ad(n) % t(nlevels))
+            allocate (d_con_vars_ad(n) % q(nlevels))
          end do
-         d_con_vars(1:l_num_rad) % nlevels  = con_vars(1:l_num_rad) % nlevels
-         d_con_vars(1:l_num_rad) % ps       = con_vars(1:l_num_rad) % ps
-         d_aux_vars(1:l_num_rad) % t2m      = aux_vars(1:l_num_rad) % t2m
-         d_aux_vars(1:l_num_rad) % q2m      = aux_vars(1:l_num_rad) % q2m
-         d_aux_vars(1:l_num_rad) % u10      = aux_vars(1:l_num_rad) % u10
-         d_aux_vars(1:l_num_rad) % v10      = aux_vars(1:l_num_rad) % v10
-         d_aux_vars(1:l_num_rad) % surftype = aux_vars(1:l_num_rad) % surftype
-         d_aux_vars(1:l_num_rad) % surft    = aux_vars(1:l_num_rad) % surft
-         d_aux_vars(1:l_num_rad) % satzen   = aux_vars(1:l_num_rad) % satzen
-         d_aux_vars(1:l_num_rad) % satazi   = aux_vars(1:l_num_rad) % satazi
 
-         d_tb(:,1:l_num_rad) = jo_grad_y%instid(i)%tb(:,1:l_num_rad)
-      end if
+         ! Fill up with data that stays local
 
-      ! Get data from elsewhere
+         l_num_rad=min(num_rad,d_num_rad)
+
+         if (l_num_rad > 0) then
+            do n = 1, l_num_rad
+               d_con_vars(n) % t(:) = con_vars(n) % t(:) 
+               d_con_vars(n) % q(:) = con_vars(n) % q(:)
+               ! d_aux_vars(n) % fastem(:) = 0.
+            end do
+            d_con_vars(1:l_num_rad) % nlevels  = con_vars(1:l_num_rad) % nlevels
+            d_con_vars(1:l_num_rad) % ps       = con_vars(1:l_num_rad) % ps
+            d_aux_vars(1:l_num_rad) % t2m      = aux_vars(1:l_num_rad) % t2m
+            d_aux_vars(1:l_num_rad) % q2m      = aux_vars(1:l_num_rad) % q2m
+            d_aux_vars(1:l_num_rad) % u10      = aux_vars(1:l_num_rad) % u10
+            d_aux_vars(1:l_num_rad) % v10      = aux_vars(1:l_num_rad) % v10
+            d_aux_vars(1:l_num_rad) % surftype = aux_vars(1:l_num_rad) % surftype
+            d_aux_vars(1:l_num_rad) % surft    = aux_vars(1:l_num_rad) % surft
+            d_aux_vars(1:l_num_rad) % satzen   = aux_vars(1:l_num_rad) % satzen
+            d_aux_vars(1:l_num_rad) % satazi   = aux_vars(1:l_num_rad) % satazi
+
+            d_tb(:,1:l_num_rad) = jo_grad_y%instid(i)%tb(:,1:l_num_rad)
+         end if
+
+         ! Get data from elsewhere
 
 #ifdef DM_PARALLEL
-      do c=1,tovs_copy_count(i)
-         if (tovs_send_pe(i,c)==myproc) then
-            s=tovs_send_start(i,c)
-            len=tovs_send_count(i,c)
-            e=s+len-1
-            nl=len*nlevels
-            allocate(temp_t(nlevels,len))
-            do j=1,len
-               temp_t(:,j)=con_vars(s+j-1) % t(:)
-            end do
-            call mpi_send( temp_t,nl, true_mpi_real, tovs_recv_pe(i,c), &
-               c*8+1, comm, ierr)
+         do c=1,tovs_copy_count(i)
+            if (tovs_send_pe(i,c)==myproc) then
+               s=tovs_send_start(i,c)
+               len=tovs_send_count(i,c)
+               e=s+len-1
+               nl=len*nlevels
+               allocate(temp_t(nlevels,len))
+               do j=1,len
+                  temp_t(:,j)=con_vars(s+j-1) % t(:)
+               end do
+               call mpi_send( temp_t,nl, true_mpi_real, tovs_recv_pe(i,c), &
+                  c*8+1, comm, ierr)
 
-            allocate(temp_q(nlevels,len))
-            do j=1,len
-               temp_q(:,j)=con_vars(s+j-1) % q(:)
-            end do
-            call mpi_send (temp_q,nl, true_mpi_real, tovs_recv_pe(i,c), &
-               c*8+2, comm, ierr)
+               allocate(temp_q(nlevels,len))
+               do j=1,len
+                  temp_q(:,j)=con_vars(s+j-1) % q(:)
+               end do
+               call mpi_send (temp_q,nl, true_mpi_real, tovs_recv_pe(i,c), &
+                  c*8+2, comm, ierr)
 
-            call mpi_send (jo_grad_y%instid(i)%tb(:,s:e),len*nchan,  &
-               true_mpi_real, tovs_recv_pe(i,c), c*8+3, comm, ierr)
+               call mpi_send (jo_grad_y%instid(i)%tb(:,s:e),len*nchan,  &
+                  true_mpi_real, tovs_recv_pe(i,c), c*8+3, comm, ierr)
 
-            allocate (rtemp(len,8))
-            rtemp(:,1)= con_vars(s:e) % ps
-            rtemp(:,2)= aux_vars(s:e) % t2m
-            rtemp(:,3)= aux_vars(s:e) % q2m
-            rtemp(:,4)= aux_vars(s:e) % u10
-            rtemp(:,5)= aux_vars(s:e) % v10
-            rtemp(:,6)= aux_vars(s:e) % surft
-            rtemp(:,7)= aux_vars(s:e) % satzen
-            rtemp(:,8)= aux_vars(s:e) % satazi
-            call mpi_send(rtemp,len*8, true_mpi_real, tovs_recv_pe(i,c), &
-               c*8+4, comm, ierr)
+               allocate (rtemp(len,8))
+               rtemp(:,1)= con_vars(s:e) % ps
+               rtemp(:,2)= aux_vars(s:e) % t2m
+               rtemp(:,3)= aux_vars(s:e) % q2m
+               rtemp(:,4)= aux_vars(s:e) % u10
+               rtemp(:,5)= aux_vars(s:e) % v10
+               rtemp(:,6)= aux_vars(s:e) % surft
+               rtemp(:,7)= aux_vars(s:e) % satzen
+               rtemp(:,8)= aux_vars(s:e) % satazi
+               call mpi_send(rtemp,len*8, true_mpi_real, tovs_recv_pe(i,c), &
+                  c*8+4, comm, ierr)
 
-            allocate (itemp(len,2))
-            itemp(:,1)= con_vars(s:e) % nlevels
-            itemp(:,2)= aux_vars(s:e) % surftype
-            call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(i,c), &
-               c*8+5, comm, ierr)
+               allocate (itemp(len,2))
+               itemp(:,1)= con_vars(s:e) % nlevels
+               itemp(:,2)= aux_vars(s:e) % surftype
+               call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(i,c), &
+                  c*8+5, comm, ierr)
 
-            deallocate (temp_t)
-            deallocate (temp_q)
-            deallocate (itemp)
-            deallocate (rtemp)
-         end if
-         if (tovs_recv_pe(i,c)==myproc) then
-            s=tovs_recv_start(i,c)
-            len=tovs_send_count(i,c)
-            e=s+len-1
-            nl=len*nlevels
-            allocate(temp_t(nlevels,len))
-            call mpi_recv(temp_t,nl, true_mpi_real, tovs_send_pe(i,c), &
-               c*8+1, comm, status, ierr)
-            do j=1,len
-               d_con_vars(s+j-1) % t(:)=temp_t(:,j)
-            end do
+               deallocate (temp_t)
+               deallocate (temp_q)
+               deallocate (itemp)
+               deallocate (rtemp)
+            end if
+            if (tovs_recv_pe(i,c)==myproc) then
+               s=tovs_recv_start(i,c)
+               len=tovs_send_count(i,c)
+               e=s+len-1
+               nl=len*nlevels
+               allocate(temp_t(nlevels,len))
+               call mpi_recv(temp_t,nl, true_mpi_real, tovs_send_pe(i,c), &
+                  c*8+1, comm, status, ierr)
+               do j=1,len
+                  d_con_vars(s+j-1) % t(:)=temp_t(:,j)
+               end do
 
-            allocate(temp_q(nlevels,len))
-            call mpi_recv(temp_q,nl, true_mpi_real, tovs_send_pe(i,c), &
-               c*8+2, comm, status, ierr)
-            do j=1,len
-               d_con_vars(s+j-1) % q(:)=temp_q(:,j)
-            end do
+               allocate(temp_q(nlevels,len))
+               call mpi_recv(temp_q,nl, true_mpi_real, tovs_send_pe(i,c), &
+                  c*8+2, comm, status, ierr)
+               do j=1,len
+                  d_con_vars(s+j-1) % q(:)=temp_q(:,j)
+               end do
 
-            call mpi_recv(d_tb(:,s:e),len*nchan, true_mpi_real, &
-               tovs_send_pe(i,c), c*8+3, comm, status, ierr)
+               call mpi_recv(d_tb(:,s:e),len*nchan, true_mpi_real, &
+                  tovs_send_pe(i,c), c*8+3, comm, status, ierr)
 
-            allocate (rtemp(len,8))
-            call mpi_recv(rtemp,len*8, true_mpi_real, &
-               tovs_send_pe(i,c), c*8+4, comm, status, ierr)
-            d_con_vars(s:e) % ps       = rtemp(:,1)
-            d_aux_vars(s:e) % t2m      = rtemp(:,2)
-            d_aux_vars(s:e) % q2m      = rtemp(:,3)
-            d_aux_vars(s:e) % u10      = rtemp(:,4)
-            d_aux_vars(s:e) % v10      = rtemp(:,5)
-            d_aux_vars(s:e) % surft    = rtemp(:,6)
-            d_aux_vars(s:e) % satzen   = rtemp(:,7)
-            d_aux_vars(s:e) % satazi   = rtemp(:,8)
+               allocate (rtemp(len,8))
+               call mpi_recv(rtemp,len*8, true_mpi_real, &
+                  tovs_send_pe(i,c), c*8+4, comm, status, ierr)
+               d_con_vars(s:e) % ps       = rtemp(:,1)
+               d_aux_vars(s:e) % t2m      = rtemp(:,2)
+               d_aux_vars(s:e) % q2m      = rtemp(:,3)
+               d_aux_vars(s:e) % u10      = rtemp(:,4)
+               d_aux_vars(s:e) % v10      = rtemp(:,5)
+               d_aux_vars(s:e) % surft    = rtemp(:,6)
+               d_aux_vars(s:e) % satzen   = rtemp(:,7)
+               d_aux_vars(s:e) % satazi   = rtemp(:,8)
 
-            allocate (itemp(len,2))
-            call mpi_recv(itemp,len*2, mpi_integer, &
-               tovs_send_pe(i,c), c*8+5, comm, status, ierr)
-            d_con_vars(s:e) % nlevels  = itemp(:,1)
-            d_aux_vars(s:e) % surftype = itemp(:,2)
+               allocate (itemp(len,2))
+               call mpi_recv(itemp,len*2, mpi_integer, &
+                  tovs_send_pe(i,c), c*8+5, comm, status, ierr)
+               d_con_vars(s:e) % nlevels  = itemp(:,1)
+               d_aux_vars(s:e) % surftype = itemp(:,2)
 
-            deallocate (temp_t)
-            deallocate (temp_q)
-            deallocate (rtemp)
-            deallocate (itemp)
-         end if
-      end do
+               deallocate (temp_t)
+               deallocate (temp_q)
+               deallocate (rtemp)
+               deallocate (itemp)
+            end if
+         end do
 #endif
 
-      if (d_num_rad > 0) then
          call da_rttov_ad (i, nchan, d_num_rad, d_con_vars, &
             d_aux_vars, d_con_vars_ad, d_tb)
-      end if
 
-      ! Transfer data back
+         ! Transfer data back
 
-      ! Return the local data
-      if (l_num_rad > 0) then
-         do n = 1, l_num_rad
-            con_vars_ad(n) % t(:) = d_con_vars_ad(n) % t(:) 
-            con_vars_ad(n) % q(:) = d_con_vars_ad(n) % q(:)
-         end do
+         ! Return the local data
+         if (l_num_rad > 0) then
+            do n = 1, l_num_rad
+               con_vars_ad(n) % t(:) = d_con_vars_ad(n) % t(:) 
+               con_vars_ad(n) % q(:) = d_con_vars_ad(n) % q(:)
+            end do
 
-         con_vars_ad(1:l_num_rad) % ps = d_con_vars_ad(1:l_num_rad) % ps
-      end if
+            con_vars_ad(1:l_num_rad) % ps = d_con_vars_ad(1:l_num_rad) % ps
+         end if
+      end if ! d_num_rad > 0
 
       ! Return the data to other processors. Note the meaning of send_pe and
       ! recv_pe is swapped here
@@ -323,12 +325,20 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
          end if
       end do
 #endif
-      do n=1,d_num_rad
-         deallocate (d_con_vars(n) % t)
-         deallocate (d_con_vars(n) % q)
-         deallocate (d_con_vars_ad(n) % t)
-         deallocate (d_con_vars_ad(n) % q)
-      end do
+
+      if (d_num_rad > 0) then
+         do n=1,d_num_rad
+            deallocate (d_con_vars(n) % t)
+            deallocate (d_con_vars(n) % q)
+            deallocate (d_con_vars_ad(n) % t)
+            deallocate (d_con_vars_ad(n) % q)
+         end do
+
+         deallocate (d_tb)
+         deallocate (d_con_vars)
+         deallocate (d_aux_vars)
+         deallocate (d_con_vars_ad)
+      end if
 
       ! adjoint of convert to hPa
 
@@ -410,16 +420,19 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
          deallocate(temp_ps)
       end if
 
-      deallocate (con_vars)
-      deallocate (aux_vars)
-      deallocate (con_vars_ad)
+      if (num_rad > 0) then
+         do n = 1, num_rad
+            deallocate (con_vars(n)    % t)
+            deallocate (con_vars(n)    % q)
+            deallocate (con_vars_ad(n) % t)
+            deallocate (con_vars_ad(n) % q)
+         end do
 
-      deallocate (d_tb)
-      deallocate (d_con_vars)
-      deallocate (d_aux_vars)
-      deallocate (d_con_vars_ad)
-
-      deallocate (model_mr)
+         deallocate (con_vars)
+         deallocate (aux_vars)
+         deallocate (con_vars_ad)
+         deallocate (model_mr)
+      end if
    end do        ! end loop for sensor
 
    if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)

@@ -409,8 +409,11 @@ subroutine da_rttov_init(iv,ob)
       call da_free_unit(unit_factor_rad)
    end if
 
-   deallocate(nscan)
-   deallocate(nchan)
+   deallocate (errorstatus)
+   deallocate (sensor)
+   deallocate (coefs_channels)
+   deallocate (nscan)
+   deallocate (nchan)
 
    allocate (time_slots(0:num_fgat_time))
    call da_get_time_slots(num_fgat_time,time_window_min,analysis_date, &

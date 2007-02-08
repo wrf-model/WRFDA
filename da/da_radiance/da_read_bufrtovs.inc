@@ -414,7 +414,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       allocate (iv%instid(i)%tslb(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%snowh(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%isflg(iv%instid(i)%num_rad))
-      allocate (iv%instid(i)%soiltyp(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%landsea_mask(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%elevation(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%vegfra(iv%instid(i)%num_rad))
@@ -494,7 +493,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(i)%elevation(nread(i))    = 0.0
       iv%instid(i)%vegfra(nread(i))       = 0.0
       iv%instid(i)%vegtyp(nread(i))       = 0.0
-      iv%instid(i)%soiltyp(nread(i))       = 0
       iv%instid(i)%clwp(nread(i))         = 0.0
       iv%instid(i)%ps(nread(i))           = 0.0
       iv%instid(i)%tb_xb(:,nread(i))      = 0

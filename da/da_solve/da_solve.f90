@@ -28,7 +28,8 @@ subroutine da_solve ( grid , config_flags)
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
-      max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy
+      max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
+      rtm_option, rtm_option_crtm
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -298,12 +299,80 @@ subroutine da_solve ( grid , config_flags)
          deallocate (satinfo(i) % std)
          deallocate (satinfo(i) % a)
          deallocate (satinfo(i) % b)
-         deallocate (iv%instid(i) % ichan)
+
          deallocate (ob%instid(i) % ichan)
+
+         deallocate (iv%instid(i)%ichan)
+         deallocate (iv%instid(i)%info)
+         deallocate (iv%instid(i)%loc)
+         deallocate (iv%instid(i)%loc_i)
+         deallocate (iv%instid(i)%loc_j)
+         deallocate (iv%instid(i)%loc_k)
+         deallocate (iv%instid(i)%loc_dx)
+         deallocate (iv%instid(i)%loc_dy)
+         deallocate (iv%instid(i)%loc_dz)
+         deallocate (iv%instid(i)%loc_dxm)
+         deallocate (iv%instid(i)%loc_dym)
+         deallocate (iv%instid(i)%loc_dzm)
+         deallocate (iv%instid(i)%zk)
+         deallocate (iv%instid(i)%t)
+         deallocate (iv%instid(i)%mr)
+         deallocate (iv%instid(i)%tm)
+         deallocate (iv%instid(i)%qm)
+         deallocate (iv%instid(i)%qrn)
+         deallocate (iv%instid(i)%qcw)
+         deallocate (iv%instid(i)%qci)
+         deallocate (iv%instid(i)%qsn)
+         deallocate (iv%instid(i)%qgr)
+         deallocate (iv%instid(i)%pm)
+         deallocate (iv%instid(i)%pf)
+         deallocate (iv%instid(i)%u10)
+         deallocate (iv%instid(i)%v10)
+         deallocate (iv%instid(i)%t2m)
+         deallocate (iv%instid(i)%q2m)
+         deallocate (iv%instid(i)%mr2m)
+         deallocate (iv%instid(i)%psfc)
+         deallocate (iv%instid(i)%ts)
+         deallocate (iv%instid(i)%smois)
+         deallocate (iv%instid(i)%tslb)
+         deallocate (iv%instid(i)%snowh)
+         deallocate (iv%instid(i)%isflg)
+         deallocate (iv%instid(i)%soiltyp)
+         deallocate (iv%instid(i)%landsea_mask)
+         deallocate (iv%instid(i)%elevation)
+         deallocate (iv%instid(i)%vegfra)
+         deallocate (iv%instid(i)%vegtyp)
+         deallocate (iv%instid(i)%clwp)
+         deallocate (iv%instid(i)%ps)
+         deallocate (iv%instid(i)%tb_xb)
+         deallocate (iv%instid(i)%tb_qc)
+         deallocate (iv%instid(i)%tb_inv)
+         deallocate (iv%instid(i)%tb_error)
+         deallocate (iv%instid(i)%emiss)
+         deallocate (iv%instid(i)%scanpos)
+         deallocate (iv%instid(i)%scanline)
+         deallocate (iv%instid(i)%ifgat)
+         deallocate (iv%instid(i)%cloud_flag)
+         deallocate (iv%instid(i)%satzen)
+         deallocate (iv%instid(i)%satazi)
+         deallocate (iv%instid(i)%solzen)
+         deallocate (iv%instid(i)%solazi)
+         deallocate (iv%instid(i)%proc_domain)
+
+         if (rtm_option == rtm_option_crtm) then
+            deallocate(iv%instid(i)%water_coverage)
+            deallocate(iv%instid(i)%land_coverage)
+            deallocate(iv%instid(i)%ice_coverage)
+            deallocate(iv%instid(i)%snow_coverage)
+            deallocate(iv%instid(i)%ps_jacobian)
+            deallocate(iv%instid(i)%t_jacobian)
+            deallocate(iv%instid(i)%q_jacobian)
+         end if
 #ifdef RTTOV
          call rttov_dealloc_coef (ierr,coefs(i))
 #endif
       end do
+      deallocate (iv%instid)
       deallocate (j % jo % rad)
       deallocate (satinfo)
    end if

@@ -96,6 +96,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       profiles_ad(n) % ozone_Data = .False.  ! no meaning
       profiles_ad(n) % co2_Data   = .False.  ! no meaning
       profiles_ad(n) % clw_Data   = .False.  ! no meaning
+      profiles_ad(n) % co2    = 0.0
       profiles_ad(n) % zenangle   = -1       ! no meaning
       profiles_ad(n) % p(:)   = 0. ! no AD on pressure levels
       profiles_ad(n) % t(:)   = 0. ! temperarure
@@ -104,6 +105,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       profiles_ad(n) % q(:)   = 0. ! WV
       profiles_ad(n) % s2m % t = 0. ! temperarure
       profiles_ad(n) % s2m % q = 0      ! WV
+      profiles_ad(n) % s2m % o = 0.0
       profiles_ad(n) % s2m % p = 0. ! pressure
       profiles_ad(n) % s2m % u = 0. ! wind components
       profiles_ad(n) % s2m % v = 0. ! wind components
@@ -131,6 +133,10 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    allocate (transmission % tau_layer     (coef % nlevels, nchannels))
    allocate (transmission % od_singlelayer(coef % nlevels, nchannels))
 
+   transmission % tau_surf(:)         = 0.0
+   transmission % tau_layer(:,:)      = 0.0
+   transmission % od_singlelayer(:,:) = 0.0
+
    allocate (transmission_ad % tau_surf      (nchannels))
    allocate (transmission_ad % tau_layer     (coef % nlevels, nchannels))
    allocate (transmission_ad % od_singlelayer(coef % nlevels, nchannels))
@@ -149,10 +155,26 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    ! if not used
    allocate (radiance % downcld  (coef % nlevels, nchannels))
 
+   radiance % clear(:)      = 0.0
+   radiance % cloudy(:)     = 0.0
+   radiance % total(:)      = 0.0
+   radiance % bt(:)         = 0.0
+   radiance % bt_clear(:)   = 0.0
+   radiance % upclear(:)    = 0.0
+   radiance % dnclear(:)    = 0.0
+   radiance % reflclear(:)  = 0.0
+   radiance % overcast(:,:) = 0.0
+   radiance % downcld(:,:)  = 0.0
+
    allocate (radiance % out      (nbtout))
    allocate (radiance % out_clear(nbtout))
    allocate (radiance % total_out(nbtout))
    allocate (radiance % clear_out(nbtout))
+
+   radiance % out      (:) = 0.0
+   radiance % out_clear(:) = 0.0
+   radiance % total_out(:) = 0.0
+   radiance % clear_out(:) = 0.0
 
    ! allocate radiance results arrays with number of channels
    allocate (radiance_ad % clear    (nchannels))
