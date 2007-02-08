@@ -1257,7 +1257,7 @@ SUBROUTINE med_auxinputdfi_in ( grid , stream, config_flags )
      CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )
      CALL wrf_timetoa ( CurrTime, timestr )
      CALL construct_filename2a ( auxname , config_flags%auxinput3_inname , grid%id , 2 , timestr )
-     auxname = auxname(1:14)//'dfi'
+     auxname = TRIM(auxname)//'_dfi'
      WRITE ( message , '("build auxname <",A,"> for stream:",I3,", timestr <",A,">")') TRIM ( auxname ), stream, trim(timestr)
      CALL wrf_debug( 1, message )
      WRITE(n2,'("DATASET=AUXINPUT",I1)')stream

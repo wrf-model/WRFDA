@@ -833,11 +833,11 @@ write(0,*)'reordering mesh'
         ! initialized MPI, so just grab the communicator that
         ! should already be stored and use that.
         CALL mpi_init ( ierr )
+        CALL wrf_termio_dup ( mpi_comm_world )
         ! IBM specific, for use with -pgmmodel mpmd and -cmdfile
         ! color=1 means this is the communicator assigned to the DA processes
         CALL mpi_comm_split( MPI_COMM_WORLD , 1 , 1 , mpi_comm_local, ierr )
         CALL wrf_set_dm_communicator ( mpi_comm_local )
-        CALL wrf_termio_dup ( mpi_comm_local )
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
    END SUBROUTINE init_module_dm
