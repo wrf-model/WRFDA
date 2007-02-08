@@ -171,7 +171,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
          do i=is,ie
             g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
             g_press(i,j,k )=g_press(i,j,k )+0.5*grid%xa%p(i,j,k)
-            grid%g_moist(i,j,k,P_QV)=-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
+            grid%g_moist(i,j,k,P_G_QV)=-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
             grid%em_g_mu_2(i,j)=-g_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
             g_press(i,j,k+1)=g_press(i,j,k+1)+g_press(i,j,k)
          end do
@@ -191,7 +191,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
          grid%em_g_mu_2(i,j)=grid%em_g_mu_2(i,j)-grid%xa%psfc(i,j)*s1md
          sdmd=-grid%xb%psac(i,j)*grid%xa%psfc(i,j)
          do k=ks,ke
-            grid%g_moist(i,j,k,P_QV)=grid%g_moist(i,j,k,P_QV)+sdmd*grid%em_dnw(k)
+            grid%g_moist(i,j,k,P_G_QV)=grid%g_moist(i,j,k,P_G_QV)+sdmd*grid%em_dnw(k)
          end do
       end do
    end do
@@ -203,7 +203,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%g_moist(i,j,k,P_QV)=grid%g_moist(i,j,k,P_QV)+grid%xa%q(i,j,k)* &
+            grid%g_moist(i,j,k,P_G_QV)=grid%g_moist(i,j,k,P_G_QV)+grid%xa%q(i,j,k)* &
                (1.0-grid%xb%q(i,j,k))**2
          end do
       end do

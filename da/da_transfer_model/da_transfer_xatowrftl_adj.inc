@@ -195,7 +195,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
             a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
             a_press(i,j,k )=a_press(i,j,k )+0.5*grid%xa%p(i,j,k)
             grid%xa%p(i,j,k)=0.
-            grid%a_moist(i,j,k,P_QV)=grid%a_moist(i,j,k,P_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
+            grid%a_moist(i,j,k,P_A_QV)=grid%a_moist(i,j,k,P_A_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
             grid%em_a_mu_2(i,j)=grid%em_a_mu_2(i,j)-a_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
             a_press(i,j,k+1)=a_press(i,j,k+1)+a_press(i,j,k)
          end do
@@ -216,7 +216,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
          sdmd=sdmd-grid%xb%psac(i,j)*grid%em_a_mu_2(i,j)/s1md
          grid%xa%psfc(i,j)=-grid%em_a_mu_2(i,j)/s1md
          do k=ks,ke
-            grid%a_moist(i,j,k,P_QV)=grid%a_moist(i,j,k,P_QV)+sdmd*grid%em_dnw(k)
+            grid%a_moist(i,j,k,P_A_QV)=grid%a_moist(i,j,k,P_A_QV)+sdmd*grid%em_dnw(k)
          end do
       end do
    end do
@@ -228,7 +228,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%xa%q(i,j,k)=grid%xa%q(i,j,k)+grid%a_moist(i,j,k,P_QV)/(1.0-grid%xb%q(i,j,k))**2
+            grid%xa%q(i,j,k)=grid%xa%q(i,j,k)+grid%a_moist(i,j,k,P_A_QV)/(1.0-grid%xb%q(i,j,k))**2
          end do
       end do
    end do
