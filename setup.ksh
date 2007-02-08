@@ -117,7 +117,6 @@ export PATH=$MPIHOME/bin:$MAKEDEPF90:$PATH
 export MANPATH=$MPIHOME/man:$MANPATH
 
 echo "PROCESSOR       " $PROCESSOR
-echo "SUBMIT          " $SUBMIT
 echo "MPIHOME         " $MPIHOME
 echo "RTTOV           " $RTTOV
 echo "CRTM            " $CRTM
