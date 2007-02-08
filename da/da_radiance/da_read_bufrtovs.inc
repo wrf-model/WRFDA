@@ -73,7 +73,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  data hdr1b /'FOVN YEAR MNTH DAYS HOUR MINU SECO CLAT CLON SAZA SOZA HOLS LSQL SLNM BEARAZ'/
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
-   integer :: num_tovs_local, num_tovs_global, num_tovs_file
+   integer :: num_tovs_local, num_tovs_global, num_tovs_file, num_tovs_region
    integer :: lnbufr
    integer :: n
 
@@ -178,6 +178,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    num_tovs_global = 0
    num_tovs_local = 0
    num_tovs_file  = 0
+   num_tovs_region  = 0
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -196,16 +197,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
          num_tovs_file = num_tovs_file + 1
 
-         if (num_tovs_file < tovs_start) then
-            cycle
-         end if
-
-         if (num_tovs_file > tovs_end) then
-            write (unit=stdout,fmt='(A,I6)') "   Skipping radiance obs after", tovs_end
-            num_tovs_file = num_tovs_file - 1
-            exit obs
-         end if
-
          ! 2.0     Extract observation location and other required information
          !     QC1:  judge if data is in the domain, read next record if not
          !------------------------------------------------------------------------
@@ -218,6 +209,18 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          call da_ll_to_xy (info, loc, xp, outside, outside_all)
 
          if (outside_all) cycle
+
+         num_tovs_region = num_tovs_region + 1
+
+         if (num_tovs_region < tovs_start) then
+            cycle
+         end if
+
+         if (num_tovs_region > tovs_end) then
+            write (unit=stdout,fmt='(A,I6)') "   Skipping radiance obs after", tovs_end
+            exit obs
+         end if
+
 
          !  3.0     Extract other information
          !------------------------------------------------------
