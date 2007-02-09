@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
+subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
 
    !---------------------------------------------------------------------------
    !  Purpose: transform from analysis increment to 
@@ -53,7 +53,7 @@ subroutine da_transform_xtoy_rad ( xa, iv, xp, y )
 
    if (iv%num_inst < 1) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_rttov")
 
    do i= 1, iv%num_inst                 ! loop for sensor
 
@@ -451,9 +451,9 @@ end do
 
    if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_rttov")
 #endif
 
-end subroutine da_transform_xtoy_rad
+end subroutine da_transform_xtoy_rttov
 
 

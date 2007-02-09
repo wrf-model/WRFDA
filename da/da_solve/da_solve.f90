@@ -9,7 +9,7 @@ subroutine da_solve ( grid , config_flags)
    use module_driver_constants, only : max_comms
    use module_radiance, only : satinfo, time_slots
 #ifdef RTTOV
-   use module_radiance, only : coefs
+   use module_radiance, only : coefs, sensor_descriptor
 #endif
 
    use module_state_description, only : num_moist, num_a_moist, num_g_moist, &
@@ -382,18 +382,17 @@ subroutine da_solve ( grid , config_flags)
          if (rtm_option == rtm_option_rttov) then
             call rttov_dealloc_coef (ierr,coefs(i))
          end if
-         if (rtm_option == rtm_option_crtm) then
-            deallocate(Sensor_Descriptor)
-         end if
 #endif
       end do
       deallocate (iv%instid)
       deallocate (j % jo % rad)
       deallocate (satinfo)
       deallocate (time_slots)
+#ifdef RTTOV
       if (rtm_option == rtm_option_rttov) then
          deallocate (coefs)
       end if
+#endif
    end if
 
    call da_deallocate_observations(iv)

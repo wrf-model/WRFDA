@@ -45,6 +45,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_spectral.o \
    da_radiance.o \
    da_radiance1.o \
+   da_rttov.o \
    da_crtm.o \
    module_radiance.o \
    da_tracing.o \
@@ -262,6 +263,13 @@ module_radiance.o da_radiance.o :
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(RTTOV_INC) -I$(CRTM_INC) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS_SIMPLE) -I$(RTTOV_INC) -I$(CRTM_INC) $*.f
+
+da_rttov.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(RTTOV_INC) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS) -I$(RTTOV_INC) $*.f
 
 da_spectral.o da_be_spectral.o :
 	@ $(RM) $@

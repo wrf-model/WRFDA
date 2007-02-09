@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
    ! Purpose: transform gradient from obs space to model grid space.
@@ -47,7 +47,7 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 #else
    if (iv%num_inst < 1) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_adj")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_rttov_adj")
 
    do i = 1, iv%num_inst                 ! loop for sensor
 
@@ -435,8 +435,8 @@ subroutine da_transform_xtoy_rad_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_adj")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_rttov_adj")
 #endif
  
-end subroutine da_transform_xtoy_rad_adj
+end subroutine da_transform_xtoy_rttov_adj
 

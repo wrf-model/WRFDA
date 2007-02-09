@@ -39,6 +39,7 @@ module da_radiance
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr
+   use da_crtm, only : da_crtm_init
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       airsr_type,info_type, model_loc_type
@@ -59,8 +60,10 @@ module da_radiance
    use da_radiance1, only : num_tovs_before,num_tovs_after,tovs_copy_count, &
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, datalink_type,da_qc_amsub, &
-      da_qc_amsua,da_biascorr_rad, da_detsurtyp,da_biasprep
+      da_qc_amsua,da_biascorr_rad, da_detsurtyp,da_biasprep,da_get_time_slots, &
+      da_get_julian_time,da_qc_rad,da_status_rad
    use da_reporting, only : da_message, da_warning, message, da_error
+   use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_max_error_qc, da_residual, da_obs_sfc_correction, &
       da_ll_to_xy, da_togrid_new
@@ -72,32 +75,14 @@ module da_radiance
    
 contains
 
-#include "da_qc_rad.inc"
-#include "da_get_innov_vector_rad.inc"
-#include "da_transform_xtoy_rad.inc"
-#include "da_transform_xtoy_rad_adj.inc"
 #include "da_calculate_grady_rad.inc"
-
 #include "da_read_filtered_rad.inc"
 #include "da_write_filtered_rad.inc"
-#include "da_get_julian_time.inc"
-#include "da_get_time_slots.inc"
-
-#include "da_rttov_init.inc"
-#include "da_rttov_direct.inc"
-#include "da_rttov_tl.inc"
-#include "da_rttov_ad.inc"
 #include "da_read_bufrtovs.inc"
 #include "da_read_bufrairs.inc"
 #include "da_read_kma1dvar.inc"
 #include "da_sort_rad.inc"
 #include "da_setup_bufrtovs_structures.inc"
-#include "da_status_rad.inc"
-
-! This CRTM file has to be in da_radiance to avoid a circular dependancy
-
-#include "da_crtm_init.inc"
-#include "da_crtm_sensor_descriptor.inc"
 
 end module da_radiance
 

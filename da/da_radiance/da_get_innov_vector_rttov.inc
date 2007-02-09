@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculate innovation vector for radiance data.
@@ -50,7 +50,7 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
        (/"Must compile with $RTTOV option for radiances"/))
 #else
 
-   if (trace_use) call da_trace_entry("da_get_innov_vector_rad")
+   if (trace_use) call da_trace_entry("da_get_innov_vector_rttov")
 
    !------------------------------------------------------
    ! [1.0] calculate the background bright temperature
@@ -436,7 +436,7 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
       end if
 
       if (coefs(inst)%id_sensor == 2) then ! microwave
-         call da_trace("da_get_innov_vector_rad",message="Calling gsi_emiss")
+         call da_trace("da_get_innov_vector_rttov",message="Calling gsi_emiss")
          call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
               iv%instid(inst)%satzen(n1:n2) * deg2rad, &
               iv%instid(inst)%satazi(n1:n2) * deg2rad, polar, &
@@ -569,9 +569,9 @@ subroutine da_get_innov_vector_rad (it, xb, xp, ob, iv)
 
    if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
 
-   if (trace_use) call da_trace_exit("da_get_innov_vector_rad")
+   if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
 #endif
  
-end subroutine da_get_innov_vector_rad
+end subroutine da_get_innov_vector_rttov
 
 

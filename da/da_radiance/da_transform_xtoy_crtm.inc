@@ -1,38 +1,38 @@
-subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
 
    !---------------------------------------------------------------------------
-   ! PURPOSE: transform gradient from obs space to model grid space.
+   !  PURPOSE: transform from analysis increment to 
+   !                          pertubation radiance.
    !
-   ! METHOD:  jo_grad_x = H^T jo_grad_y =  - H^T R^-1 ( d - H delta_x )
-   !           1. input gradient in obs space and reference state of RTTOV
-   !           2. call adjoint of RTM
-   !           3. adjoint of interpolation from model grid to obs loc
+   !  METHOD:  delta_y = H delta_x
+   !           1. input reference state of CRTM_TL
+   !           2. interpolate analysis increment to obs location
+   !           3. Call CRTM_TL
    !
-   !  HISTORY: 11/19/2006 - Creation            Zhiquan Liu
+   !  HISTORY: 11/16/2006 - Creation            Zhiquan Liu
    !
    !---------------------------------------------------------------------------
 
    IMPLICIT NONE
 
-   TYPE (x_type), INTENT(INOUT)   :: jo_grad_x ! 
-   TYPE (xpose_type), INTENT(IN)  :: xp        ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(IN)     :: jo_grad_y ! H' delta_x
-   TYPE (ob_type), INTENT(IN)     :: iv        ! O-B structure.
+   TYPE (x_type), INTENT(IN)      :: xa       ! delta_x
+   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
+   TYPE (y_type),  INTENT(INOUT)  :: y        ! H' delta_x
+   TYPE (ob_type), INTENT(IN)     :: iv       ! O-B structure.
 
    INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_rad  ! Number of radiance obs
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
-   INTEGER                        :: inst, nchanl, n
-   REAL                           :: q_ad
+
+   INTEGER            :: inst, num_rad, nchanl, n
 
 #if defined(CRTM)
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id, nchan_emis, Error_Status, Allocate_Status
-   TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_AD(:)
+   TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
    TYPE (CRTM_ChannelInfo_type)   :: ChannelInfo
-   TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_AD
-   TYPE( CRTM_Surface_type )      :: Surface, Surface_AD
+   TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
+   TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
    !TYPE( CRTM_Options_type )      :: Options
 #endif
@@ -42,9 +42,10 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
     call da_error(__FILE__,__LINE__, &
        (/"Must compile with $CRTM option for radiances"/))
 #else
+
    IF ( iv%num_inst < 1 ) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_crtm_adj")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_crtm")
 
 !----------------------------------------------------------------------------
 ! CRTM allocation
@@ -54,8 +55,8 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
     Atmosphere%n_Absorbers=2
     Atmosphere%n_Clouds=0
     Atmosphere%n_Aerosols=0
-    if (crtm_cloud) Atmosphere%n_Clouds=6
- 
+    if (crtm_cloud) Atmosphere%n_Clouds=6                       
+
     Error_Status = CRTM_Allocate_Atmosphere( Atmosphere%n_Layers, &
                                              Atmosphere%n_Absorbers, &
                                              Atmosphere%n_Clouds, &
@@ -65,9 +66,10 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
        call da_error(__FILE__,__LINE__, &
          (/"Error in allocatting CRTM Atmosphere Structure"/))
     endif
+
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
- 
+
     if (crtm_cloud) then
        Atmosphere%Cloud(1)%Type=WATER_CLOUD
        Atmosphere%Cloud(2)%Type=ICE_CLOUD
@@ -81,7 +83,7 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    do inst = 1, iv%num_inst                 ! loop for sensor
       if ( iv%instid(inst)%num_rad < 1 ) cycle
-      num_rad = iv%instid(inst)%num_rad
+      num_rad   = iv%instid(inst)%num_rad
 
   ! CRTM channel information structure
       Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
@@ -90,16 +92,16 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
           (/"Error in calling CRTM_Set_ChannelInfo"/))
       endif
       nchanl    = ChannelInfo%n_channels
- 
+                                        
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( RTSolution( ChannelInfo%n_Channels )   , &
-                RTSolution_AD( ChannelInfo%n_Channels ), &
+      ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
+                RTSolution_TL( ChannelInfo%n_Channels ), &
                STAT = Allocate_Status )
       IF ( Allocate_Status /= 0 ) THEN
          call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting RTSolution"/))
       END IF
- 
+
   ! CRTM Surface Structure
       if (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsua') then
          nchan_emis=4
@@ -117,14 +119,14 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
          nchan_emis=0
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
       endif
- 
+
       Error_Status = CRTM_Allocate_Surface( nchan_emis,     &  ! Input
                                    Surface)  ! Output
       if ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting CRTM Surface Structure"/))
       endif
- 
+
   ! CRTM Options structure
       !Options%n_channels = nchanl
       !Error_Status = CRTM_Allocate_Options( nchanl,     &  ! Input
@@ -134,9 +136,18 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
 
-      do n=1,num_rad
+      do n= 1, num_rad           ! loop for pixel
+            
+      ! [1.1] Get horizontal interpolation weights:
 
-      ! [1.0] Extract base state Atmosphere variables
+            i = iv%instid(inst)%loc_i(n)
+            j = iv%instid(inst)%loc_j(n)
+            dx = iv%instid(inst)%loc_dx(n)
+            dy = iv%instid(inst)%loc_dy(n)
+            dxm = iv%instid(inst)%loc_dxm(n)
+            dym = iv%instid(inst)%loc_dym(n)
+
+      ! [1.3] Extract base state Atmosphere variables 
             atmosphere%level_pressure(0) = iv%instid(inst)%pf(0,n)
            do k=1,atmosphere%n_layers
             atmosphere%pressure(k) = iv%instid(inst)%pm(k,n)
@@ -159,14 +170,14 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
            end if
            enddo
 
-      ! [1.1] User-supplied emissivity
-          ! Options%emissivity_switch = 1
-          ! Options%emissivity(1:Options%n_channels) = &
-          !     iv%instid(inst)%emiss(1:Options%n_channels,n)
+      ! [1.4] User-supplied emissivity
+           !Options%emissivity_switch = 1
+           !Options%emissivity(1:Options%n_channels) = &
+           !    iv%instid(inst)%emiss(1:Options%n_channels,n)
 
-      ! [1.1] CRTM Surface parameter data
-     Surface%Land_Coverage=iv%instid(inst)%land_coverage(n)
-     Surface%Water_Coverage=iv%instid(inst)%water_coverage(n)
+      ! [1.4] CRTM Surface parameter data
+     Surface%Land_Coverage=iv%instid(inst)%land_coverage(n) 
+     Surface%Water_Coverage=iv%instid(inst)%water_coverage(n) 
      Surface%Snow_Coverage=iv%instid(inst)%snow_coverage(n)
      Surface%Ice_Coverage=iv%instid(inst)%ice_coverage(n)
 
@@ -203,30 +214,48 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
      Surface%SensorData%n_channels = nchan_emis
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
      Surface%SensorData%Tb(1:nchan_emis) = iv%instid(inst)%tb_inv(1:nchan_emis,n) + &
-                                          iv%instid(inst)%tb_xb(1:nchan_emis,n)
-     
-      ! -- Copy the adjoint atmosphere structure
-      Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_AD )
+                                           iv%instid(inst)%tb_xb(1:nchan_emis,n)
+
+      ! -- Copy the TL atmosphere structure
+      Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_TL )
 
       IF ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
-          (/"Error copying Atmosphere_AD structure"/))
+          (/"Error copying Atmosphere_TL structure"/))
       END IF
 
-      ! -- Copy the adjoint surface structure
-      Error_Status = CRTM_Assign_Surface( Surface, Surface_AD )
+      ! -- Copy the TL surface structure
+      Error_Status = CRTM_Assign_Surface( Surface, Surface_TL )
 
       IF ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
-          (/"Error copying Surface_AD structure"/))
+          (/"Error copying Surface_TL structure"/))
       END IF
 
-    ! -- Zero the Adjoint outputs 
+    ! -- Zero the TL outputs
     ! Important: adjoint variables must be initialized
-       CALL CRTM_Zero_Atmosphere( Atmosphere_AD )
-       CALL CRTM_Zero_Surface( Surface_AD )
+    CALL CRTM_Zero_Atmosphere( Atmosphere_TL )
+    CALL CRTM_Zero_Surface( Surface_TL )
 
-      ! [1.2] CRTM GeometryInfo Structure
+      ! [1.2] Interpolate horizontally Atmoshere_TL variables to ob:
+            do k=xp%kts,xp%kte ! from bottem to top
+              call da_interp_lin_2d( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                     i, j, dx, dy, dxm, dym, &  ! temperature (in K)
+                                     Atmosphere_TL%Temperature(xp%kte-k+1) )
+              call da_interp_lin_2d( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+                                     i, j, dx, dy, dxm, dym, &  ! specific humidity (in kg/kg)
+                                     Atmosphere_TL%Absorber(xp%kte-k+1,1) )
+              if (atmosphere%pressure(xp%kte-k+1) < 75.) Atmosphere_TL%Absorber(xp%kte-k+1,1) = 0.
+            end do
+              call da_interp_lin_2d( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+                                     i, j, dx, dy, dxm, dym, &  ! in Pa
+                                     Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers) )
+
+              Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)= &
+                         0.01*Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)
+              Atmosphere_TL%Absorber(:,1) = 1000.*Atmosphere_TL%Absorber(:,1) ! in g/kg
+
+      ! [1.5] CRTM GeometryInfo Structure
         GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
         GeometryInfo%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
    !     GeometryInfo%Satellite_Height=830.
@@ -235,112 +264,66 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
    !     GeometryInfo%Sensor_Scan_Angle=
    !     GeometryInfo%Source_Zenith_Angle=
 
+      ! [1.6] Call CRTM_TL model
 
-      ! [1.3] assign tb = R^-1 Re :
-
-         RTSolution_AD(:)%brightness_temperature = jo_grad_y%instid(inst)%tb(:,n)
-         RTSolution_AD(:)%radiance = 0. ! must assign zero, since each call of AD model will return non-zero value
-       !if (n <= 10) write(6,'(15f8.3)') RTSolution_AD(:)%brightness_temperature
-
-      ! [1.4] Call CRTM_AD model
-
-         call da_crtm_ad (nchanl,Atmosphere,   &
+         call da_crtm_tl (nchanl, Atmosphere,   &
                             Surface,      &
-                            RTSolution_AD,&
+                            Atmosphere_TL,&
+                            Surface_TL,   &
                             GeometryInfo, &
                             ChannelInfo,  &
-                            Atmosphere_AD,&
-                            Surface_AD,   &
-                            RTSolution) !,   &
-                            !Options = Options)
-
-         !Error_Status = CRTM_Adjoint(Atmosphere,   &
+                            RTSolution,   &
+                            RTSolution_TL)
+      
+         !Error_Status = CRTM_Tangent_Linear(Atmosphere,   &
          !                   Surface,      &
-         !                   RTSolution_AD,&
+         !                   Atmosphere_TL,&
+         !                   Surface_TL,   &
          !                   GeometryInfo, &
          !                   ChannelInfo,  &
-         !                   Atmosphere_AD,&
-         !                   Surface_AD,   &
-         !                   RTSolution) !,   &
+         !                   RTSolution,   &
+         !                   RTSolution_TL)  !,&
          !                   !Options = Options)
          !if ( Error_Status /= 0 ) THEN
          !     call da_error(__FILE__,__LINE__, &
-         !        (/"Error in calling CRTM_Adjoint"/))
+         !        (/"Error in calling CRTM_Tangent_Linear"/))
          !endif
 
-      ! [1.5] Scale transformation and fill zero for no-control variable
+      !-------------------------------------------------------------------
+      ! [1.7] assign Hdx :
+      !-------------------------------------------------------------------
+         y%instid(inst)%tb(:,n) = RTSolution_TL(:)%brightness_temperature
+         !if (n <= 10 ) write(6,'(15f8.3)') RTSolution_TL(:)%brightness_temperature
 
-         Atmosphere_AD%Level_Pressure(atmosphere%n_layers) = &
-                 Atmosphere_AD%Level_Pressure(atmosphere%n_layers)*0.01 
-         Atmosphere_AD%Absorber(:,1) = 1000.*Atmosphere_AD%Absorber(:,1) ! in g/kg
+         Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_TL )
+         if ( Error_Status /= 0 ) THEN
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Atmosphere_TL Structure"/))
+         endif
 
-            !-----------------------------------------------------
-            ! [1.6] Get horizontal interpolation weights:
-            !-----------------------------------------------------
+         Error_Status = CRTM_Destroy_Surface(Surface_TL)
+         if ( Error_Status /= 0 ) THEN
+            call da_error(__FILE__,__LINE__, &
+               (/"Error in deallocatting CRTM Surface_TL Structure"/))
+         endif
 
-            i = iv%instid(inst)%loc_i(n)
-            j = iv%instid(inst)%loc_j(n)
-            dx = iv%instid(inst)%loc_dx(n)
-            dy = iv%instid(inst)%loc_dy(n)
-            dxm = iv%instid(inst)%loc_dxm(n)
-            dym = iv%instid(inst)%loc_dym(n)
-
-            ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
-
-            do k=xp%kts,xp%kte ! from bottem to top
-               q_ad = Atmosphere_AD%Absorber(xp%kte-k+1,1)
-               if (atmosphere%pressure(xp%kte-k+1) < 75.) q_ad = 0.
-               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), xp%ims, xp%ime, xp%jms, &
-                                          xp%jme, i, j, dx, dy, dxm, dym, &
-                                          Atmosphere_AD%Temperature(xp%kte-k+1))
-
-               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), xp%ims, xp%ime, xp%jms, & 
-                                           xp%jme, i, j, dx, dy, dxm, dym, &
-                                           q_ad )
-            enddo
-
-               call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
-                                         xp%jme, i, j, dx, dy, dxm, dym,  &
-                                         Atmosphere_AD%Level_Pressure(atmosphere%n_layers) )
-
-               !if (n <=10 ) then
-               !   write(6,'(15f8.2)') rtsolution(:)%brightness_temperature
-               !   write(6,'(e15.5)') jo_grad_x% psfc(i,j)
-               !  do k=xp%kts,xp%kte
-               !   write(6,'(2e15.5)') jo_grad_x%t(i,j,k), jo_grad_x%q(i,j,k)
-               !  enddo
-               !endif
-
-            Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_AD )
-            if ( Error_Status /= 0 ) THEN
-              call da_error(__FILE__,__LINE__, &
-                 (/"Error in deallocatting CRTM Atmosphere_AD Structure"/))
-            endif
-
-            Error_Status = CRTM_Destroy_Surface(Surface_AD)
-            if ( Error_Status /= 0 ) THEN
-              call da_error(__FILE__,__LINE__, &
-                 (/"Error in deallocatting CRTM Surface_AD Structure"/))
-            endif
-
-         end do       !  end loop for pixels
-
+      end do  ! end loop for pixels                                                                                                                          
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures
       !-------------------------------------------------------------------
-         deallocate( rtsolution, rtsolution_ad, STAT = Allocate_Status )
+         deallocate( rtsolution, rtsolution_tl, STAT = Allocate_Status )
          IF ( Allocate_Status /= 0 ) THEN
             call da_error(__FILE__,__LINE__, &
               (/"Error in deallocatting RTSolution"/))
          END IF
-                                                                                                                          
+             
          Error_Status = CRTM_Destroy_Surface(Surface)
          if ( Error_Status /= 0 ) THEN
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Surface Structure"/))
          endif
-                                                                                                                          
-   end do        ! end loop for sensor
+
+   end do     ! end loop for sensor
 
       !-------------------------------------------------------------------
       ! [3.0] Deallocating CRTM Atmosphere structures
@@ -350,9 +333,9 @@ subroutine da_transform_xtoy_rad_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
        call da_error(__FILE__,__LINE__, &
          (/"Error in deallocatting CRTM Atmosphere Structure"/))
     endif
-       
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_crtm_adj")
+
+   if (trace_use) call da_trace_exit("da_transform_xtoy_crtm")
 #endif
- 
-end subroutine da_transform_xtoy_rad_crtm_adj
+
+end subroutine da_transform_xtoy_crtm
 

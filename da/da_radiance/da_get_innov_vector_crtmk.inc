@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
+subroutine da_get_innov_vector_crtmk ( it, xb, xp, ob, iv )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: Calculate innovation vector for radiance data.
@@ -71,7 +71,7 @@ subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
        (/"Must compile with $CRTM option for radiances"/))
 #else
 
-   if (trace_use) call da_trace_entry("da_get_innov_vector_rad_crtmk")
+   if (trace_use) call da_trace_entry("da_get_innov_vector_crtmk")
 
    WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation and Jacobians using CRTM_K------- '
 
@@ -508,8 +508,8 @@ subroutine da_get_innov_vector_rad_crtmk ( it, xb, xp, ob, iv )
          (/"Error in deallocatting CRTM Atmosphere Structure"/))
     endif   
 
-   if (trace_use) call da_trace_exit("da_get_innov_vector_rad_crtmk")
+   if (trace_use) call da_trace_exit("da_get_innov_vector_crtmk")
 #endif
  
-end subroutine da_get_innov_vector_rad_crtmk
+end subroutine da_get_innov_vector_crtmk
 

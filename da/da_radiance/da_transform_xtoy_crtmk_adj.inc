@@ -1,14 +1,12 @@
-subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
+subroutine da_transform_xtoy_crtmk_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
-   !  PURPOSE: transform from analysis increment to
-   !                          pertubation radiance.
-   !           K-Matrix vesion of da_transform_xtoy_rad_crtm
+   ! PURPOSE: transform gradient from obs space to model grid space.
    !
-   !  METHOD:  delta_y = H delta_x
-   !           1. input reference state of CRTM_TL
-   !           2. interpolate analysis increment to obs location
-   !           3. Call CRTM_TL
+   ! METHOD:  jo_grad_x = H^T jo_grad_y =  - H^T R^-1 ( d - H delta_x )
+   !           1. input gradient in obs space and reference state of RTTOV
+   !           2. call adjoint of RTM
+   !           3. adjoint of interpolation from model grid to obs loc
    !
    !  HISTORY: 11/16/2006 - Creation            Zhiquan Liu
    !
@@ -16,18 +14,18 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
 
    IMPLICIT NONE
 
-   TYPE (x_type), INTENT(IN)      :: xa       ! delta_x
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)  :: y        ! H' delta_x
-   TYPE (ob_type), INTENT(IN)     :: iv       ! O-B structure.
+   TYPE (x_type), INTENT(INOUT)   :: jo_grad_x ! 
+   TYPE (xpose_type), INTENT(IN)  :: xp        ! Domain decomposition vars.
+   TYPE (y_type),  INTENT(IN)     :: jo_grad_y ! H' delta_x
+   TYPE (ob_type), INTENT(IN)     :: iv        ! O-B structure.
 
    INTEGER                        :: l, i, j, k  ! Index dimension.
    INTEGER                        :: num_rad  ! Number of radiance obs
    REAL                           :: dx, dxm  ! Interpolation weights.
    REAL                           :: dy, dym  ! Interpolation weights.
    INTEGER                        :: inst, nchanl, n
-   REAL, pointer                  :: q_tl(:),t_tl(:)
-   REAL                           :: ps_tl
+   REAL, allocatable              :: q_k(:),t_k(:)
+   REAL                           :: ps_k
 
 #if defined(CRTM)
    ! CRTM local varaibles and types
@@ -49,7 +47,7 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
 #else
    IF ( iv%num_inst < 1 ) return
 
-   if (trace_use) call da_trace_entry("da_transform_xtoy_rad_crtmk")
+   if (trace_use) call da_trace_entry("da_transform_xtoy_crtmk_adj")
 
 !-------------------------------------------------------------------------------
 
@@ -66,17 +64,12 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
       nchanl    = ChannelInfo%n_channels
  
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
-                RTSolution_K( ChannelInfo%n_Channels ), &
-                Atmosphere_K( ChannelInfo%n_Channels ), &
-                Surface_K( ChannelInfo%n_Channels ), &
-                t_tl     ( xp%kte-xp%kts+1 ), &
-                q_tl     ( xp%kte-xp%kts+1 ), &
-                STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
-         call da_error(__FILE__,__LINE__, &
-          (/"Error in allocatting Atmosphere_K"/))                                                                                   
-      END IF
+      ALLOCATE (RTSolution(ChannelInfo%n_Channels))
+      ALLOCATE (RTSolution_K(ChannelInfo%n_Channels))
+      ALLOCATE (Atmosphere_K(ChannelInfo%n_Channels))
+      ALLOCATE (Surface_K(ChannelInfo%n_Channels))
+      ALLOCATE (t_k(xp%kte-xp%kts+1))
+      ALLOCATE (q_k(xp%kte-xp%kts+1))
 
 !----------------------------------------------------------------------------
 ! CRTM Atmosphere structure
@@ -197,7 +190,48 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
     CALL CRTM_Zero_Atmosphere( Atmosphere_K(:) )
     CALL CRTM_Zero_Surface( Surface_K(:) )
 
-      ! [1.2] Interpolate horizontally Atmoshere_TL variables to ob:
+      ! [1.2] CRTM GeometryInfo Structure
+        GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
+        GeometryInfo%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
+
+      ! [1.3] assign tb = R^-1 Re :
+
+         RTSolution_K(:)%brightness_temperature = jo_grad_y%instid(inst)%tb(:,n) 
+         RTSolution_K(:)%radiance = 0.
+
+      ! [1.4] Call CRTM_K model
+
+         Error_Status = CRTM_K_Matrix(Atmosphere,   &
+                            Surface,      &
+                            RTSolution_K,&
+                            GeometryInfo, &
+                            ChannelInfo,  &
+                            Atmosphere_K,&
+                            Surface_K,   &
+                            RTSolution) !,   &
+                            !Options = Options)
+         if ( Error_Status /= 0 ) THEN
+              call da_error(__FILE__,__LINE__, &
+                 (/"Error in calling CRTM_Adjoint"/))
+         endif
+
+      ! [1.5] Scale transformation and fill zero for no-control variable
+          ps_k = 0.
+         do l=1, ChannelInfo%n_Channels
+          ps_k = ps_k + Atmosphere_K(l)%Level_Pressure(atmosphere%n_layers)                    
+         end do
+          ps_k = ps_k*0.01
+
+         do k=1,atmosphere%n_layers
+          t_k(k) = 0.
+          q_k(k) = 0.
+         do l=1, ChannelInfo%n_Channels
+          t_k(k)  = t_k(k) + Atmosphere_K(l)%Temperature(k)
+          q_k(k)  = q_k(k) + Atmosphere_K(l)%Absorber(k,1)
+         end do
+          q_k(k) = 1000.*q_k(k)
+         end do
+          
             !-----------------------------------------------------
             ! [1.6] Get horizontal interpolation weights:
             !-----------------------------------------------------
@@ -209,79 +243,36 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
             dxm = iv%instid(inst)%loc_dxm(n)
             dym = iv%instid(inst)%loc_dym(n)
 
+            ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
+
             do k=xp%kts,xp%kte ! from bottem to top
-              call da_interp_lin_2d( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! temperature (in K)
-                                     t_tl(xp%kte-k+1) )
-              call da_interp_lin_2d( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! specific humidity (in kg/kg)
-                                     q_tl(xp%kte-k+1) )
-              if ( atmosphere%pressure(xp%kte-k+1) < 75. ) q_tl(xp%kte-k+1) = 0.
-            end do
-              call da_interp_lin_2d( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! in Pa
-                                     ps_tl )
-              ps_tl = ps_tl*0.01
-              q_tl(:)  = q_tl(:)*1000. ! in g/kg
+               if (atmosphere%pressure(xp%kte-k+1) < 75.) q_k(xp%kte-k+1) = 0.
+               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), xp%ims, xp%ime, xp%jms, &
+                                          xp%jme, i, j, dx, dy, dxm, dym, &
+                                          t_k(xp%kte-k+1))
 
-      ! [1.2] CRTM GeometryInfo Structure
-        GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
-        GeometryInfo%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
+               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), xp%ims, xp%ime, xp%jms, & 
+                                           xp%jme, i, j, dx, dy, dxm, dym, &
+                                           q_k(xp%kte-k+1) )
+            enddo
 
-      ! [1.3] assign tb = R^-1 Re :
+               call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
+                                         xp%jme, i, j, dx, dy, dxm, dym,  &
+                                         ps_k )
 
-         RTSolution_K(:)%brightness_temperature = 1.
-         RTSolution_K(:)%radiance = 0.
-
-      ! [1.4] Call CRTM_K model
-      ! put CRTM_K_Matrix into da_crtm_k for tracing
-
-         call da_crtm_k(nchanl, Atmosphere,   &
-                            Surface,      &
-                            RTSolution_K,&
-                            GeometryInfo, &
-                            ChannelInfo,  &
-                            Atmosphere_K,&
-                            Surface_K,   &
-                            RTSolution) !,   &
-                            !Options = Options)
-
-         !Error_Status = CRTM_K_Matrix(Atmosphere,   &
-         !                   Surface,      &
-         !                   RTSolution_K,&
-         !                   GeometryInfo, &
-         !                   ChannelInfo,  &
-         !                   Atmosphere_K,&
-         !                   Surface_K,   &
-         !                   RTSolution) !,   &
-         !                   !Options = Options)
-         !if ( Error_Status /= 0 ) THEN
-         !     call da_error(__FILE__,__LINE__, &
-         !        (/"Error in calling CRTM_Adjoint"/))
-         !endif
-
-      ! [1.5] Scale transformation and fill zero for no-control variable
-          y%instid(inst)%tb(:,n) = 0.
-         do l=1, ChannelInfo%n_Channels
-          y%instid(inst)%tb(l,n) = y%instid(inst)%tb(l,n) +  &
-                    Atmosphere_K(l)%Level_Pressure(atmosphere%n_layers)*ps_tl
-         do k=1,atmosphere%n_layers
-          y%instid(inst)%tb(l,n) = y%instid(inst)%tb(l,n) & 
-                               + Atmosphere_K(l)%Temperature(k)*t_tl(k)  &
-                               + Atmosphere_K(l)%Absorber(k,1)*q_tl(k)
-         end do
-         end do
-          
-         !if (n <=10 ) write(6,'(15f8.3)') y%instid(inst)%tb(:,n)
+               !if (n <=10 ) then
+               !   write(6,'(15f8.2)') rtsolution(:)%brightness_temperature
+               !   write(6,'(e15.5)') jo_grad_x% psfc(i,j)
+               !  do k=xp%kts,xp%kte
+               !   write(6,'(2e15.5)') jo_grad_x%t(i,j,k), jo_grad_x%q(i,j,k)
+               !  enddo
+               !endif
 
          end do       !  end loop for pixels
 
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures
       !-------------------------------------------------------------------
-         deallocate( RTSolution, RTSolution_K,  &
-                     STAT = Allocate_Status )
-
          Error_Status = CRTM_Destroy_Surface(Surface)
          if ( Error_Status /= 0 ) THEN
             call da_error(__FILE__,__LINE__, &
@@ -296,17 +287,17 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
 
          Error_Status = CRTM_Destroy_Surface(Surface_K)
          if ( Error_Status /= 0 ) THEN
-               call da_error(__FILE__,__LINE__, &
-                  (/"Error in deallocatting CRTM Surface_K Structure"/))
+             call da_error(__FILE__,__LINE__, &
+                (/"Error in deallocatting CRTM Surface_K Structure"/))
          endif
 
          Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_K )
          if ( Error_Status /= 0 ) THEN
-               call da_error(__FILE__,__LINE__, &
-                  (/"Error in deallocatting CRTM Atmosphere_K Structure"/))
+             call da_error(__FILE__,__LINE__, &
+                (/"Error in deallocatting CRTM Atmosphere_K Structure"/))
          endif
 
-         deallocate( Atmosphere_K, Surface_K, t_tl, q_tl, &
+         deallocate( RTSolution, RTSolution_K, Atmosphere_K, Surface_K, t_k, q_k, &
                      STAT = Allocate_Status )
          if ( Allocate_Status /= 0 ) THEN
               call da_error(__FILE__,__LINE__, &
@@ -315,8 +306,8 @@ subroutine da_transform_xtoy_rad_crtmk ( xa, iv, xp, y )
 
    end do        ! end loop for sensor
 
-   if (trace_use) call da_trace_exit("da_transform_xtoy_rad_crtmk")
+   if (trace_use) call da_trace_exit("da_transform_xtoy_crtmk_adj")
 #endif
  
-end subroutine da_transform_xtoy_rad_crtmk
+end subroutine da_transform_xtoy_crtmk_adj
 

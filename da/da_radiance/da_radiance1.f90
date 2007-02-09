@@ -4,25 +4,27 @@ module da_radiance1
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
+   use module_domain, only : xpose_type
    use module_radiance, only : satinfo,q2ppmv
 #ifdef RTTOV
-   use module_radiance, only : coefs
+   use module_radiance, only : coefs,inst_name
 #endif
 
    use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
       stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &
-      use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len
-   use da_tracing, only : da_trace_entry, da_trace_exit
-
+      use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
+      num_procs,print_detail_radiance,tovs_min_transfer, &
+      rtminit_sensor,rtminit_nsensor
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       ob_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
-   use module_domain, only : xpose_type
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
+   use da_reporting, only : da_error, message, da_warning, da_message
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_residual_new
    use da_tools1, only : da_free_unit, da_get_unit
-   use da_reporting, only : da_error, message
+   use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
+      da_trace_int_sort
 
    implicit none
    
@@ -197,6 +199,10 @@ contains
 #include "da_oma_stats_rad.inc"
 #include "da_omb_stats_rad.inc"
 #include "da_print_stats_rad.inc"
+#include "da_get_time_slots.inc"
+#include "da_qc_rad.inc"
+#include "da_status_rad.inc"
+#include "da_get_julian_time.inc"
 
 end module da_radiance1
 
