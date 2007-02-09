@@ -421,25 +421,20 @@ echo "WINDOW_END            $WINDOW_END"
       # Outputs
       ln -fs ad/ad_d${DOMAIN}_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
 
-      unset NL_DYN_OPT
+      export NL_DYN_OPT=2
+      unset NL_MP_PHYSICS
+      unset NL_RA_LW_PHYSICS
+      unset NL_RA_SW_PHYSICS
+      unset NL_RADT
+      unset NL_SF_SFCLAY_PHYSICS
+      unset NL_SF_SURFACE_PHYSICS
+      unset NL_BL_PBL_PHYSICS
       unset NL_BLDT
+      unset NL_CU_PHYSICS
+      unset NL_CUDT
       unset NL_ISFFLX
       unset NL_IFSNOW
       unset NL_ICLOUD
-      export NL_MP_PHYSICS=3
-      export NL_RA_LW_PHYSICS=1
-      export NL_RA_SW_PHYSICS=1
-      export NL_RADT=30
-      export NL_SF_SFCLAY_PHYSICS=1
-      export NL_SF_SURFACE_PHYSICS=1
-      export NL_BL_PBL_PHYSICS=1
-      export NL_CU_PHYSICS=5
-      export NL_CUDT=5
-      export NL_NUM_SOIL_LAYERS=5
-      export NL_MP_ZERO_OUT=0
-      export NL_INTERPOLATE_STATS=false
-      export NL_SFC_ASSI_OPTIONS=1
-      export NL_LAT_STATS_OPTION=false
 
    fi
 
