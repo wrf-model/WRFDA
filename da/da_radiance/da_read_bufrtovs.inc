@@ -367,29 +367,31 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
         ' Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
-      if (rtm_option == rtm_option_crtm) &
-          iv%instid(i)%nlevels = xp%kme-xp%kms+1
+      if (rtm_option == rtm_option_crtm) then
+         iv%instid(i)%nlevels = xp%kme-xp%kms+1
+         iv%instid(i)%nchannels=nchan
+      end if
    end do
    
    do i = 1, iv%num_inst
 #ifdef RTTOV
-      call rttov_setupchan(1, nchan, coefs(i), &   ! in
-         iv%instid(i)%nfrequencies,iv%instid(i)%nchannels, &
-         iv%instid(i)%nbtout)      ! out
+      if (rtm_option == rtm_option_rttov) then
+         call rttov_setupchan(1, nchan, coefs(i), &   ! in
+            iv%instid(i)%nfrequencies,iv%instid(i)%nchannels, &
+            iv%instid(i)%nbtout)      ! out
+      end if
 #endif
 
       allocate (iv%instid(i)%info(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_i(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_j(iv%instid(i)%num_rad))
-    !if (rtm_option == rtm_option_rttov) then
       allocate (iv%instid(i)%loc_k(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dz(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dzm(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%zk(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%t(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
       allocate (iv%instid(i)%mr(iv%instid(i)%nlevels,iv%instid(i)%num_rad))
-    !end if
       allocate (iv%instid(i)%loc_dx(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dy(iv%instid(i)%num_rad))
       allocate (iv%instid(i)%loc_dxm(iv%instid(i)%num_rad))

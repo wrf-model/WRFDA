@@ -29,7 +29,7 @@ subroutine da_solve ( grid , config_flags)
       sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
-      rtm_option, rtm_option_crtm
+      rtm_option, rtm_option_crtm, rtm_option_rttov
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -168,7 +168,6 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    j_grad_norm_target = 1.0
-write (0,*) __FILE__,__LINE__,"max_ext_its",max_ext_its
    DO it = 1, max_ext_its
 
       ! [8.1] Calculate nonlinear model trajectory 
@@ -291,7 +290,10 @@ write (0,*) __FILE__,__LINE__,"max_ext_its",max_ext_its
    ! [9.0] Tidy up:
    !---------------------------------------------------------------------------
 
-   call da_system("touch wrf_stop_now")
+   if (var4d) then
+      call da_system("touch wrf_stop_now")
+   end if
+
    deallocate (cvt)
    deallocate (xhat)
 
@@ -377,14 +379,21 @@ write (0,*) __FILE__,__LINE__,"max_ext_its",max_ext_its
             deallocate(iv%instid(i)%q_jacobian)
          end if
 #ifdef RTTOV
-         call rttov_dealloc_coef (ierr,coefs(i))
+         if (rtm_option == rtm_option_rttov) then
+            call rttov_dealloc_coef (ierr,coefs(i))
+         end if
+         if (rtm_option == rtm_option_crtm) then
+            deallocate(Sensor_Descriptor)
+         end if
 #endif
       end do
       deallocate (iv%instid)
       deallocate (j % jo % rad)
       deallocate (satinfo)
       deallocate (time_slots)
-      deallocate (coefs)
+      if (rtm_option == rtm_option_rttov) then
+         deallocate (coefs)
+      end if
    end if
 
    call da_deallocate_observations(iv)
