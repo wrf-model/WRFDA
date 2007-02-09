@@ -26,6 +26,8 @@ program da_wrfvar_main
 
    ! Split initialisation into 2 parts so we can start and stop trace here
 
+   call disable_quilting
+
    call da_wrfvar_init1
 
    if (trace_use) call da_trace_init

@@ -2956,7 +2956,8 @@ messages(120)=  s5e5
         ! should already be stored and use that.
         CALL mpi_init ( ierr )
         CALL wrf_termio_dup
-        CALL wrf_set_dm_communicator ( MPI_COMM_WORLD )
+        CALL mpi_comm_split( MPI_COMM_WORLD, 2 , 1 , mpi_comm_local, ierr )
+        CALL wrf_set_dm_communicator ( mpi_comm_local )
       ENDIF
       CALL wrf_get_dm_communicator( mpi_comm_local )
       CALL wrf_termio_dup
