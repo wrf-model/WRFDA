@@ -129,18 +129,28 @@ echo "WINDOW_END            $WINDOW_END"
    export DAY=`echo $DATE | cut -c7-8`
    export HOUR=`echo $DATE | cut -c9-10`
 
-   export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
-   export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
-   export NL_START_DAY=`echo $START_DATE | cut -c7-8`
-   export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
+   export NL_START_YEAR=$YEAR
+   export NL_START_MONTH=$MONTH
+   export NL_START_DAY=$DAY
+   export NL_START_HOUR=$HOUR
 
-   export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-   export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-   export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-   export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
+   export NL_END_YEAR=$YEAR
+   export NL_END_MONTH=$MONTH
+   export NL_END_DAY=$DAY
+   export NL_END_HOUR=$HOUR
 
-   export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00.0000}
-   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00.0000}
+   export START_YEAR=`echo $START_DATE | cut -c1-4`
+   export START_MONTH=`echo $START_DATE | cut -c5-6`
+   export START_DAY=`echo $START_DATE | cut -c7-8`
+   export START_HOUR=`echo $START_DATE | cut -c9-10`
+
+   export END_YEAR=`echo $END_DATE | cut -c1-4`
+   export END_MONTH=`echo $END_DATE | cut -c5-6`
+   export END_DAY=`echo $END_DATE | cut -c7-8`
+   export END_HOUR=`echo $END_DATE | cut -c9-10`
+
+   export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00.0000}
+   export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00.0000}
 
    #-----------------------------------------------------------------------
    # [2.0] Perform sanity checks:
