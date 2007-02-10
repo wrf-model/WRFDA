@@ -151,6 +151,20 @@ echo "WINDOW_END            $WINDOW_END"
 
    export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00.0000}
    export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00.0000}
+   
+   if $NL_VAR4D; then
+
+      export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
+      export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
+      export NL_START_DAY=`echo $START_DATE | cut -c7-8`
+      export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
+
+      export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
+      export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
+      export NL_END_DAY=`echo $END_DATE | cut -c7-8`
+      export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
+
+   fi
 
    #-----------------------------------------------------------------------
    # [2.0] Perform sanity checks:
