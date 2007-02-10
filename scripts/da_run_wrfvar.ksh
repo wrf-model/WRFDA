@@ -490,8 +490,8 @@ echo "WINDOW_END            $WINDOW_END"
                echo "Need at least 3 processors for 4dvar"
                exit 1
             fi
-            NUM_PROCS_VAR=1
-            NUM_PROCS_WRF=1
+            export NUM_PROCS_VAR=${NUM_PROCS_VAR:-2}
+            export NUM_PROCS_WRF=${NUM_PROCS_WRF:-2}
             let NUM_PROCS_WRFPLUS=$NUM_PROCS-$NUM_PROCS_VAR-$NUM_PROCS_WRF
             echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
             echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
