@@ -399,6 +399,7 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN tl
       ln -fs $WORK_DIR/tl01 tl/wrfinput_d${DOMAIN}
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe tl
+      mkdir tl/trace
 
       # Outputs
       for I in 02 03 04 05 06 07; do
@@ -441,6 +442,7 @@ echo "WINDOW_END            $WINDOW_END"
          ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
 #      fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
+      mkdir ad/trace
 
       # Outputs
       ln -fs ad/ad_d${DOMAIN}_${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00 gr01
