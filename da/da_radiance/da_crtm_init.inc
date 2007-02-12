@@ -46,8 +46,8 @@ subroutine da_crtm_init(iv,ob)
 !-------------------------------------
   integer, allocatable :: errorstatus(:)  ! return code
   integer              :: coef_errorstatus, i_amsua, i_amsub
-  integer     :: j, error
-  integer , pointer   ::  nscan(:), nchanl(:)
+  integer              :: error
+  integer , pointer    ::  nscan(:), nchanl(:)
 
 ! local variables
 !----------------
