@@ -500,7 +500,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       iv%instid(i)%tb_xb(:,nread(i))      = 0
       iv%instid(i)%tb_inv(:,nread(i))     = p%tb_inv(:) 
       iv%instid(i)%tb_qc(:,nread(i))      = 0
-      iv%instid(i)%tb_error(:,nread(i))   = 0.0
+      iv%instid(i)%tb_error(:,nread(i))   = 500.
       iv%instid(i)%emiss(:,nread(i))      = 0.0
       iv%instid(i)%scanpos(nread(i))      = p%scanpos 
       ! iv%instid(i)%scanline(nread(i)    = p%scanline
