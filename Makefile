@@ -50,6 +50,7 @@ wrf : configcheck
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" toolsdir
 	/bin/rm -f main/libwrflib.a
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" framework
+	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" tracing
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" shared
 	$(MAKE) MODULE_DIRS="$(ALL_MODULES)" physics
 	if [ $(WRF_CHEM) -eq 1 ]    ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" chemics ; fi
@@ -355,5 +356,34 @@ toolsdir :
 
 clean :
 		@ echo 'Use the clean script'
+
+tracing : da_control.o da_par_util1.o da_reporting.o da_tracing.o da_memory.o
+	$(AR) main/libwrflib.a da_control.o da_par_util1.o da_reporting.o da_tracing.o \
+	   da_memory.o
+	$(RANLIB) main/libwrflib.a
+
+da_control.o : da/da_control/da_control.f90
+	$(RM) $@
+	$(CPP) -Ida/da_control -I./inc $(CPPFLAGS) da/da_control/da_control.f90 > da_control.f
+	$(FC) -c $(FCFLAGS)  -I./frame $(MODULE_DIRS) da_control.f
+
+da_reporting.o : da/da_reporting/da_reporting.f90
+	$(RM) $@
+	$(CPP) -Ida/da_reporting -I./inc $(CPPFLAGS) da/da_reporting/da_reporting.f90 > da_reporting.f
+	$(FC) -c $(FCFLAGS)  -I./frame $(MODULE_DIRS) da_reporting.f
+
+da_par_util1.o : da/da_par_util/da_par_util1.f90
+	$(RM) $@
+	$(CPP) -Ida/da_par_util -I./inc $(CPPFLAGS) da/da_par_util/da_par_util1.f90 > da_par_util1.f
+	$(FC) -c $(FCFLAGS) -I./frame $(MODULE_DIRS) da_par_util1.f
+
+da_tracing.o : da/da_tracing/da_tracing.f90
+	$(RM) $@
+	$(CPP) -Ida/da_tracing -I./inc $(CPPFLAGS) da/da_tracing/da_tracing.f90 > da_tracing.f
+	$(FC) -c $(FCFLAGS) -I./frame $(MODULE_DIRS) da_tracing.f
+
+da_memory.o : da/da_tracing/da_memory.c
+	$(RM) $@
+	$(CC) -c $(CCFLAGS) -DNOUNDERSCORE da/da_tracing/da_memory.c
 
 # DO NOT DELETE

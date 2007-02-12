@@ -19,7 +19,7 @@ MV  	=   mv
 	$(SED_FTN) $*.F > $*.b
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) $*.f
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. $*.f
 
 .F.f:
 	$(RM) $@

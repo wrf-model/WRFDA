@@ -1206,6 +1206,22 @@ rconfig   integer isurban                 derived                  max_domains  
 rconfig   integer isoilwater              derived                  max_domains    0       -        "isoilwater"           "land use index of water for soil"        "index category"
 rconfig   integer map_proj                derived                  max_domains    0       -        "map_proj"             "domain map projection"      "0=none, 1=Lambert, 2=polar, 3=Mercator"
 
+rconfig   integer   stdout                  namelist,wrfvar9  1  6         - "stdout"                  ""  ""
+rconfig   integer   stderr                  namelist,wrfvar9  1  0         - "stderr"                  ""  ""
+rconfig   integer   trace_unit              namelist,wrfvar9  1  7         - "trace_unit"              ""  ""
+rconfig   integer   trace_pe                namelist,wrfvar9  1  0         - "trace_pe"                ""  ""
+rconfig   integer   trace_repeat_head       namelist,wrfvar9  1  10        - "trace_repeat_head"       ""  ""
+rconfig   integer   trace_repeat_body       namelist,wrfvar9  1  10        - "trace_repeat_body"       ""  ""
+rconfig   integer   trace_max_depth         namelist,wrfvar9  1  30        - "trace_max_depth"         ""  ""
+rconfig   logical   trace_use               namelist,wrfvar9  1  .true.    - "trace_use"               ""  ""
+rconfig   logical   trace_use_frequent      namelist,wrfvar9  1  .true.    - "trace_use_frequent"      ""  ""
+rconfig   logical   trace_memory            namelist,wrfvar9  1  .true.    - "trace_memory"            ""  ""
+rconfig   logical   trace_all_pes           namelist,wrfvar9  1  .false.   - "trace_all_pes"           ""  ""
+rconfig   logical   trace_csv               namelist,wrfvar9  1  .false.   - "trace_csv"               ""  ""
+rconfig   logical   use_html                namelist,wrfvar9  1  .true.    - "use_html"                ""  ""
+rconfig   logical   warnings_are_fatal      namelist,wrfvar9  1  .false.   - "warnings_are_fatal"      ""  ""
+rconfig   character documentation_url       namelist,wrfvar20  1  "unknown"                  -  "documentation_url"  ""  ""  
+
 #
 #---------------------------------------------------------------------------------------------------------------------------------------
 # Package Declarations

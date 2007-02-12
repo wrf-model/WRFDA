@@ -15,6 +15,9 @@ PROGRAM wrf
 !
 !</DESCRIPTION>
 
+   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
+      da_trace_report
+      
    IMPLICIT NONE
 
    TYPE(ESMF_GridComp) :: gcomp
@@ -49,7 +52,11 @@ write(0,*)'********* ********* *********'
      call system("echo -n model_start ; date")
 #endif
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
+   call da_trace_init
+   call da_trace_entry("wrf_init")
      CALL wrf_run( gcomp, importState, exportState, clock, rc )
+   call da_trace_exit("wrf_init")
+   call da_trace_report
      CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
 #ifdef DM_PARALLEL
      IF ( wrf_dm_on_monitor() ) THEN
