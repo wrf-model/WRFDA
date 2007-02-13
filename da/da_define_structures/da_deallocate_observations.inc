@@ -70,6 +70,8 @@ subroutine da_deallocate_observations (ob)
 
    if (ob % num_polaramv > 0) then
       do n = 1, ob % num_polaramv
+         deallocate (ob % polaramv(n) % p)
+         deallocate (ob % polaramv(n) % zk)
          deallocate (ob % polaramv(n) % u)
          deallocate (ob % polaramv(n) % v)
       end do
