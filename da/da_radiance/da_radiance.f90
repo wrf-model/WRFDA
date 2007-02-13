@@ -48,7 +48,7 @@ module da_radiance
       da_interp_lin_2d, da_interp_lin_2d_adj,da_interp_lin_2d_new, &
       da_interp_lin_3d_new, da_interp_lin_3d_adj_new, &
       da_to_zk_new, da_interp_lin_2d_adj_new
-   use da_tools1, only : da_get_unit, da_free_unit, da_oi
+   use da_tools1, only : da_get_unit, da_free_unit
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
 #ifdef DM_PARALLEL
    use da_par_util, only :  da_proc_stats_combine, true_mpi_real

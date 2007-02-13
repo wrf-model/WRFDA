@@ -1,7 +1,5 @@
 module da_transfer_model
 
-use da_tools1, only : da_oi
-
    !---------------------------------------------------------------------------
    ! Purpose: Transfer model states between different models
    !---------------------------------------------------------------------------
