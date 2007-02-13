@@ -108,9 +108,6 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
                        nfrequencies, nchannels, nbtout )       ! out
 #endif
 
-write (0,*) "nprofiles",nprofiles
-write (0,*) "nfrequencies, nchannels, nbtout",nfrequencies, nchannels, nbtout
-
    allocate (lprofiles(nfrequencies))
    allocate (channels (nfrequencies))
    allocate (polarisations(nchannels, 3))

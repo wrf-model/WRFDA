@@ -378,9 +378,6 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
          call da_rttov_tl (i, nchan, d_num_rad, d_con_vars, &
             d_aux_vars, d_con_vars_tl, d_aux_vars_tl, d_tb )
       end if
-do c=1,d_num_rad
-write (0,*) i,c,"SUM(d_tb(:,c))",SUM(d_tb(:,c))
-end do
 
       ! Transfer data back
 
@@ -412,12 +409,6 @@ end do
          end if
       end do
 #endif
-do c=1,l_num_rad
-write (0,*) i,c,"SUM(y%instid(i)%tb(:,c))",SUM(y%instid(i)%tb(:,c))
-end do
-do c=l_num_rad+1,num_rad
-write (0,*) i,c,"SUM(y%instid(i)%tb(:,c))",SUM(y%instid(i)%tb(:,c))
-end do
       do n=1,d_num_rad
          deallocate (d_con_vars(n) % t)
          deallocate (d_con_vars(n) % q)
