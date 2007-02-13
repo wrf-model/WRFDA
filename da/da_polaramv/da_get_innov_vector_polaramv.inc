@@ -99,7 +99,7 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
                                 itu,ituf,itvv,itvvf)
       end do
 
-      if (check_max_iv_print) then
+      if (rootproc .and. check_max_iv_print) then
          write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
             ', Total Rejections for Polar AMVs follows:'
          write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &

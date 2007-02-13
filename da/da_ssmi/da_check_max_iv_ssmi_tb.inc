@@ -18,21 +18,17 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    integer,    intent (inout)             :: itb19hf, itb19vf, itb22vf 
    integer,    intent (inout)             :: itb37hf, itb37vf, itb85hf, itb85vf
 
-   integer                                :: iunit ! Output unit.
-   logical                                :: failed, print
+   logical                                :: failed
 
    !-----------------------------------------------------------------------------!
    ! [1.0] Open diagnostic file:
    !-----------------------------------------------------------------------------!
 
-   iunit = check_max_iv_unit
-   print = check_max_iv_print
-
-   if (print) then
-      write (iunit,'(A)')  &
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
-      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for SSMI_tb_TB19h = ',max_error_tb, &
          'Error max test ratio for SSMI_tb_TB19v = ',max_error_tb, &
          'Error max test ratio for SSMI_tb_TB22v = ',max_error_tb, &
@@ -57,44 +53,44 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    ! Tb19h
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19h,                  &
-                            max_error_tb, itb19h, itb19hf, iunit, 'TB19h', &
-                            failed, print)
+                            max_error_tb, itb19h, itb19hf, check_max_iv_unit, 'TB19h', &
+                            failed, check_max_iv_print)
 
    ! Tb19v
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb19v,                  &
-                            max_error_tb, itb19v, itb19vf, iunit, 'TB19v', &
-                            failed, print)
+                            max_error_tb, itb19v, itb19vf, check_max_iv_unit, 'TB19v', &
+                            failed, check_max_iv_print)
 
    ! Tb22v
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb22v,                  &
-                            max_error_tb, itb22v, itb22vf, iunit, 'TB22v', &
-                            failed, print)
+                            max_error_tb, itb22v, itb22vf, check_max_iv_unit, 'TB22v', &
+                            failed, check_max_iv_print)
 
    ! Tb37h
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37h,                  &
-                            max_error_tb, itb37h, itb37hf, iunit, 'TB37h', &
-                            failed, print)
+                            max_error_tb, itb37h, itb37hf, check_max_iv_unit, 'TB37h', &
+                            failed, check_max_iv_print)
 
    ! Tb37v
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb37v,                  &
-                            max_error_tb, itb37v, itb37vf, iunit, 'TB37v', &
-                            failed, print)
+                            max_error_tb, itb37v, itb37vf, check_max_iv_unit, 'TB37v', &
+                            failed, check_max_iv_print)
 
    ! Tb85h
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85h,                  &
-                            max_error_tb, itb85h, itb85hf, iunit, 'TB85h', &
-                            failed, print)
+                            max_error_tb, itb85h, itb85hf, check_max_iv_unit, 'TB85h', &
+                            failed, check_max_iv_print)
 
    ! Tb85v
 
    call da_max_error_qc(it, ssmi_tb % info, ssmi_tb % tb85v,                  &
-                            max_error_tb, itb85v, itb85vf, iunit, 'TB85v', &
-                            failed, print)
+                            max_error_tb, itb85v, itb85vf, check_max_iv_unit, 'TB85v', &
+                            failed, check_max_iv_print)
 
 
 
@@ -102,8 +98,8 @@ subroutine da_check_max_iv_ssmi_tb(it, ssmi_tb, &
    ! [3.0] Output test failed results:
    !---------------------------------------------------------------------------
 
-   ! if (print .and. failed) then
-   !    write (unit = iunit, fmt = '(/,10(2(A,I6),/))') &
+   ! if (rootproc .and. check_max_iv_print .and. failed) then
+   !    write (unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
    !       'Number of failed ssmi tb19h observations:  ',itb19hf,' on ',itb19h, &
    !       'Number of failed ssmi tb19v observations:  ',itb19vf,' on ',itb19v, &
    !       'Number of failed ssmi tb22v observations:  ',itb22vf,' on ',itb22v, &

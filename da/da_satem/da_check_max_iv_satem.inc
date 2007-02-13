@@ -9,23 +9,19 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
    integer, intent(in)            :: it       ! External iteration.
    type (satem_type), intent(inout)       :: satem
    integer, intent(inout)                 :: ith,ithf
-   integer                                :: iunit ! Output unit.
    integer                                :: k
-   logical                                :: failed, print
+   logical                                :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   iunit = check_max_iv_unit
-   print = check_max_iv_print
-
-   if (print) then
-      write (iunit,'(A)')  &
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for Satem_thickness   = ',max_error_thickness
    end if
 
@@ -38,8 +34,8 @@ subroutine da_check_max_iv_satem(it, satem,ith,ithf)
    do k = 1, satem % info % levels
       ! Thickness
       call da_max_error_qc(it, satem % info, satem % thickness(k), &
-         max_error_thickness, ith, ithf, iunit, &
-         'Thickness    ', failed, print)
+         max_error_thickness, ith, ithf, check_max_iv_unit, &
+         'Thickness    ', failed, check_max_iv_print)
    end do
 
 end subroutine da_check_max_iv_satem

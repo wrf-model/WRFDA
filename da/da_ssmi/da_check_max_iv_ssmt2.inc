@@ -10,23 +10,19 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
    integer, intent(inout)                 :: irh, irhf
    type (ssmt2_type), intent(inout)       :: ssmt2
 
-   integer                                :: iunit ! Output unit.
    integer                                :: k
-   logical                                :: failed, print
+   logical                                :: failed
 
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   iunit = check_max_iv_unit
-   print = check_max_iv_print
-
-   if (print) then
-      write (iunit,'(A)')  &
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
-      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
 
-      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
          'Error max test ratio for SSMT2_RH  = ',max_error_rh
    end if
 
@@ -39,8 +35,8 @@ subroutine da_check_max_iv_ssmt2(it, ssmt2, irh,irhf)
    do k = 1, ssmt2 % info % levels
       ! Temperature
       call da_max_error_qc (it, ssmt2 % info, ssmt2 % rh(k),&
-                             max_error_t, irh, irhf, iunit, 'RH  ', &
-                             failed, print)
+                             max_error_t, irh, irhf, check_max_iv_unit, 'RH  ', &
+                             failed, check_max_iv_print)
    end do
 
 end subroutine da_check_max_iv_ssmt2

@@ -19,7 +19,7 @@ subroutine da_check_max_iv_airep(it, airep , &
    !---------------------------------------------------------------------------
 
 
-   if (check_max_iv_print) then
+   if (rootproc .and. check_max_iv_print) then
       write (check_max_iv_unit,'(A)')  &
          '----------------------------------------------------------------'
       write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'

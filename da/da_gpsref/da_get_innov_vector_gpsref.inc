@@ -253,12 +253,14 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
       end if
    end if  ! end of if verify check
 
-   write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &
-      'For outer iteration ',it, &
-      ', Total Rejections for GPSRef follows:'
-   write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
-      'Number of failed GPSRef observations:', &
-      fref, ' on ',pref
+   if (rootproc .and. check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(A,i5,A)') &
+         'For outer iteration ',it, &
+        ', Total Rejections for GPSRef follows:'
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         'Number of failed GPSRef observations:', &
+         fref, ' on ',pref
+   end if
 
 end subroutine da_get_innov_vector_gpsref
 

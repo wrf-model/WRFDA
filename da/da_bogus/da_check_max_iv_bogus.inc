@@ -14,21 +14,16 @@ subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
    integer                                :: k
    logical                                :: failed
 
-   integer                                :: iunit ! Output unit.
-   logical                                :: print ! Output if .true
-
    !---------------------------------------------------------------------------
    ! [1.0] Open diagnostic file:
    !---------------------------------------------------------------------------
 
-   iunit = check_max_iv_unit
-   print = check_max_iv_print
 
-   if (print) then
-      write (iunit,'(A)')  &
+   if (rootproc .and. check_max_iv_print) then
+      write (check_max_iv_unit,'(A)')  &
         '----------------------------------------------------------------'
-      write (unit = iunit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
-      write (unit = iunit, fmt = '(/,9(A,F3.0,/))')  &
+      write (unit = check_max_iv_unit, fmt = '(A,/)') 'MAX ERROR TEST QC:'
+      write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
         'Error max test ratio for Bogus_U   = ',max_error_buv, &
         'Error max test ratio for Bogus_V   = ',max_error_buv, &
         'Error max test ratio for Bogus_T   = ',max_error_bt , &
@@ -45,28 +40,28 @@ subroutine da_check_max_iv_bogus(it,bogus,itu,ituf,itvv,itvvf,  &
    do k = 1, bogus % info % levels
       ! U-wind
       call da_max_error_qc(it, bogus % info, bogus % u(k), &
-                             max_error_buv, itu, ituf, iunit, 'U    ', &
-                             failed, print)
+                             max_error_buv, itu, ituf, check_max_iv_unit, 'U    ', &
+                             failed, check_max_iv_print)
       ! V-wind
       call da_max_error_qc(it, bogus % info, bogus % v(k), &
-                             max_error_buv, itvv, itvvf, iunit, 'V    ', &
-                             failed, print)                           
+                             max_error_buv, itvv, itvvf, check_max_iv_unit, 'V    ', &
+                             failed, check_max_iv_print)                           
       ! Temperature
       call da_max_error_qc(it, bogus % info, bogus % t(k), &
-                             max_error_bt, itt, ittf, iunit, 'TEMP ', &
-                             failed, print)                           
+                             max_error_bt, itt, ittf, check_max_iv_unit, 'TEMP ', &
+                             failed, check_max_iv_print)                           
       ! Mixing ratio, same ratio as relative humidity
       call da_max_error_qc(it, bogus % info, bogus % q(k), &
-                             max_error_bq, itqv, itqvf, iunit, 'QV   ', &
-                             failed, print)                           
+                             max_error_bq, itqv, itqvf, check_max_iv_unit, 'QV   ', &
+                             failed, check_max_iv_print)                           
 
    end do
 
    ! Sea Level Pressure
 
    call da_max_error_qc(it, bogus % info, bogus %slp,  &
-                         max_error_slp, itslp, itslpf,iunit,  &
-                         'SLP  ', failed, print)
+                         max_error_slp, itslp, itslpf,check_max_iv_unit,  &
+                         'SLP  ', failed, check_max_iv_print)
 
 end subroutine da_check_max_iv_bogus
 

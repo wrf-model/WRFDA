@@ -229,7 +229,7 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
       end if
    end do
 
-   if (check_max_iv_print) then
+   if (rootproc .and. check_max_iv_print) then
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
          ', Total Rejections for Metar follows:'
 
