@@ -109,7 +109,7 @@ if ( $?RUN_GEN_BE_STAGE0 ) then
    set BEGIN_CPU = `date`
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $WRFVAR_DIR/run/gen_be/gen_be_stage0_wrf.csh
+   $WRFVAR_DIR/scripts/gen_be/gen_be_stage0_wrf.csh
 
    set RC = $status
    if ( $RC != 0 ) then
@@ -383,7 +383,7 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
    setenv VARIABLE1 chi_u
    setenv VARIABLE2 chi
 
-   $WRFVAR_DIR/run/gen_be/gen_be_cov3d.csh
+   $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.csh
 
    set RC = $status
    if ( $RC != 0 ) then
@@ -395,7 +395,7 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
    setenv VARIABLE1 t_u
    setenv VARIABLE2 t
 
-   $WRFVAR_DIR/run/gen_be/gen_be_cov3d.csh
+   $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.csh
 
    set RC = $status
    if ( $RC != 0 ) then
@@ -407,7 +407,7 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
    setenv VARIABLE1 ps_u
    setenv VARIABLE2 ps
 
-   $WRFVAR_DIR/run/gen_be/gen_be_cov2d.csh
+   $WRFVAR_DIR/scripts/gen_be/gen_be_cov2d.csh
 
    set RC = $status
    if ( $RC != 0 ) then
