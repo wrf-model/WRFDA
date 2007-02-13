@@ -455,3 +455,22 @@ if test ! -z "$NL_OPEN_YE"; then echo "open_ye=${NL_OPEN_YE}," >> namelist.input
 if test ! -z "$NL_NESTED"; then echo "nested=${NL_NESTED}," >> namelist.input;fi
 if test ! -z "$NL_REAL_DATA_INIT_TYPE"; then echo "real_data_init_type=${NL_REAL_DATA_INIT_TYPE}," >> namelist.input;fi
 echo / >> namelist.input
+
+echo \&wrfvar >> namelist.input
+if test ! -z "$NL_STDOUT"; then echo "stdout=${NL_STDOUT}," >> namelist.input;fi
+if test ! -z "$NL_STDERR"; then echo "stderr=${NL_STDERR}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_UNIT"; then echo "trace_unit=${NL_TRACE_UNIT}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_PE"; then echo "trace_pe=${NL_TRACE_PE}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_REPEAT_HEAD"; then echo "trace_repeat_head=${NL_TRACE_REPEAT_HEAD}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_REPEAT_BODY"; then echo "trace_repeat_body=${NL_TRACE_REPEAT_BODY}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_MAX_DEPTH"; then echo "trace_max_depth=${NL_TRACE_MAX_DEPTH}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_USE"; then echo "trace_use=${NL_TRACE_USE}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_USE_FREQUENT"; then echo "trace_use_frequent=${NL_TRACE_USE_FREQUENT}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_MEMORY"; then echo "trace_memory=${NL_TRACE_MEMORY}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_ALL_PES"; then echo "trace_all_pes=${NL_TRACE_ALL_PES}," >> namelist.input;fi
+if test ! -z "$NL_TRACE_CSV"; then echo "trace_csv=${NL_TRACE_CSV}," >> namelist.input;fi
+if test ! -z "$NL_USE_HTML"; then echo "use_html=${NL_USE_HTML}," >> namelist.input;fi
+if test ! -z "$NL_WARNINGS_ARE_FATAL"; then echo "warnings_are_fatal=${NL_WARNINGS_ARE_FATAL}," >> namelist.input;fi
+if test ! -z "$NL_DOCUMENTATION_URL"; then echo "documentation_url=\"${NL_DOCUMENTATION_URL}\"," >> namelist.input;fi
+echo / >> namelist.input
+
