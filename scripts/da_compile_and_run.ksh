@@ -41,10 +41,10 @@ for COMPILER in $COMPILERS; do
       . ./setup.ksh $COMPILER >/dev/null
       svn update #>/dev/null 2>&1
       svn status
-      if $FULL; then ./clean_new -a >/dev/null 2>&1; fi
-      echo $OPTION | ./configure_new $TARGET >configure.out 2>&1
+      if $FULL; then ./clean -a >/dev/null 2>&1; fi
+      echo $OPTION | ./configure $TARGET >configure.out 2>&1
       rm -f build/links
-      ./compile_new $TARGET > compile.out 2>&1
+      ./compile $TARGET > compile.out 2>&1
       ls -l build/wrfvar.exe
       let COUNT=$COUNT+1
    fi

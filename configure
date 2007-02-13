@@ -61,7 +61,7 @@ do
     ac_echo_test=`echo foo 1>&1`
     if test -z "$ac_echo_test" ; then
        print_error "Your sh shell does not handle the output redirection"
-       print_error "1>&1 correctly.  Configure_new will work around this problem,"
+       print_error "1>&1 correctly.  Configure will work around this problem,"
        print_error "but you should report the problem to your vendor."
     fi
   fi
@@ -124,10 +124,10 @@ if test -n "$PERL" ; then
 
     # Should do a test first for ch_p4 etc.
     if test "$perlversion" -lt 5 ; then
-        echo "Build requires perl version 5, which configure_new did not find."
+        echo "Build requires perl version 5, which configure did not find."
         echo "You can set the environment variable PERL to contain the "
         echo "location of perl version 5."
-        echo "Configure_new believes that $PERL is version $perlversion ."
+        echo "Configure believes that $PERL is version $perlversion ."
         PERL=""
     fi
     
@@ -403,7 +403,7 @@ if [ "$os" = "AIX" ] ; then
 fi
 
 # compile options that come from the environment, such as chemistry
-# the "!" is removed by Config_new.pl
+# the "!" is removed by Config.pl
 if [ -n "$WRF_CHEM" ] ; then
   if [ $WRF_CHEM = 1 ] ; then
     echo building WRF with chemistry option
@@ -413,7 +413,7 @@ fi
 
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
-  $PERL arch/Config_new.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
+  $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
      -hdfeos=$HDFEOS -rttov=$RTTOV -crtm=$CRTM -os=$os -mach=$mach \
      -ldflags=$ldflags \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
@@ -449,16 +449,16 @@ if test $NMM_CORE = 1; then
   grep -q DM_PARALLEL $CONFIG
   if test $status = 1; then
     echo NMM_CORE must be configured for DM parallel
-    echo Please rerun the configure_new script and chose a DM parallel option
+    echo Please rerun the configure script and chose a DM parallel option
     exit 3
   fi
   # integrity check for a kludge where a hard coded value in the 
-  # registry must match the same value in arch/preamble_new
+  # registry must match the same value in arch/preamble
   set registryvalue=`grep 'dimspec.* q ' Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
   set preamblevalue=`grep 'DNMM_MAX_DIM=.*' arch/preamble | sed -e 's/..*-DNMM_MAX_DIM=//' -e 's/ ..*$//'`
   if ( $registryvalue != $preamblevalue ) then
     echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"
-    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble_new ($preamblevalue)"
+    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble ($preamblevalue)"
     echo "Please fix and try again."
     exit 2
   fi

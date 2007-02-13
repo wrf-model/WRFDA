@@ -13,7 +13,7 @@ endif
 
 if ( !  -e configure.wrfvar  ) then
   echo "You need to configure the code first."
-  echo "Please do ./configure_new and then ./compile_new."
+  echo "Please do ./configure and then ./compile."
   exit 1
 endif
 
@@ -41,13 +41,13 @@ end
 
 if( $compare_wrf != 1 ) then
   echo "You need to compile corresponding to your configure option."
-#  echo "Type <compile_new wrf> to compile WRF model"
-#  echo "Type <compile_new wrfplus> to compile 4D-VAR WRF model"
-#  echo "Type <compile_new em_real> to compile WRF model and real"
-  echo "Type <compile_new wrfvar> to compile wrfvar (and WRF framework)"
-  echo "Type <compile_new be> to compile be"
-  echo "Type <compile_new convertor> to compile convertors for converting KMA data to and from NetCDF data format"
-  echo "Type <compile_new all> to compile everything (wrfvar, be, convertor)"
+#  echo "Type <compile wrf> to compile WRF model"
+#  echo "Type <compile wrfplus> to compile 4D-VAR WRF model"
+#  echo "Type <compile em_real> to compile WRF model and real"
+  echo "Type <compile wrfvar> to compile wrfvar (and WRF framework)"
+  echo "Type <compile be> to compile be"
+  echo "Type <compile convertor> to compile convertors for converting KMA data to and from NetCDF data format"
+  echo "Type <compile all> to compile everything (wrfvar, be, convertor)"
 
   exit 2
 endif
