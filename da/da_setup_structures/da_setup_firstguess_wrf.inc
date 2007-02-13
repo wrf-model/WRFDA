@@ -57,12 +57,10 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    !------------------------------------------------------------------------
 
    if ((grid%xp%its == grid%xp%ids) .and. (grid%xp%jts == grid%xp%jds)) then
-      start_lat = grid%xlat(grid%xp%its, grid%xp%jts)
-      start_lon = grid%xlong(grid%xp%its, grid%xp%jts)
+      buf(1) = grid%xlat(grid%xp%its, grid%xp%jts)
+      buf(2) = grid%xlong(grid%xp%its, grid%xp%jts)
    end if
-
-   buf(1)=start_lat
-   buf(2)=start_lon
+   
    call wrf_dm_bcast_real(buf, 2)
    start_lat=buf(1)
    start_lon=buf(2)
