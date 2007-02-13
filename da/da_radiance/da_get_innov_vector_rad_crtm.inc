@@ -223,35 +223,35 @@ subroutine da_get_innov_vector_rad_crtm ( it, xb, xp, ob, iv )
 
             call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &   ! cloud water
-                                model_qcw(xp%kte-xp%kts+1) )
+                                model_qcw(xp%kte-k+1) )
             
            if (crtm_cloud) then
-            Atmosphere%Cloud(1)%Effective_Radius(xp%kte-xp%kts+1)=10.
-            Atmosphere%Cloud(1)%Water_Content(xp%kte-xp%kts+1) = &
-                  model_qcw(xp%kte-xp%kts+1)
+            Atmosphere%Cloud(1)%Effective_Radius(xp%kte-k+1)=10.
+            Atmosphere%Cloud(1)%Water_Content(xp%kte-k+1) = &
+                  model_qcw(xp%kte-k+1)
 
-            Atmosphere%Cloud(2)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            Atmosphere%Cloud(2)%Effective_Radius(xp%kte-k+1)=200.
             call da_interp_lin_2d( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &  ! cloud ice
-                                Atmosphere%Cloud(2)%Water_Content(xp%kte-xp%kts+1) )
+                                Atmosphere%Cloud(2)%Water_Content(xp%kte-k+1) )
 
-            Atmosphere%Cloud(3)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            Atmosphere%Cloud(3)%Effective_Radius(xp%kte-k+1)=200.
             call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &  ! rain
-                                Atmosphere%Cloud(3)%Water_Content(xp%kte-xp%kts+1) )
+                                Atmosphere%Cloud(3)%Water_Content(xp%kte-k+1) )
 
-            Atmosphere%Cloud(4)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            Atmosphere%Cloud(4)%Effective_Radius(xp%kte-k+1)=200.
             call da_interp_lin_2d( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &  ! snow
-                                Atmosphere%Cloud(4)%Water_Content(xp%kte-xp%kts+1) )
+                                Atmosphere%Cloud(4)%Water_Content(xp%kte-k+1) )
 
-            Atmosphere%Cloud(5)%Effective_Radius(xp%kte-xp%kts+1)=200.
+            Atmosphere%Cloud(5)%Effective_Radius(xp%kte-k+1)=200.
             call da_interp_lin_2d( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &  ! grauple
-                                Atmosphere%Cloud(5)%Water_Content(xp%kte-xp%kts+1) )
+                                Atmosphere%Cloud(5)%Water_Content(xp%kte-k+1) )
  
-            Atmosphere%Cloud(6)%Effective_Radius(xp%kte-xp%kts+1)=200.
-            Atmosphere%Cloud(6)%Water_Content(xp%kte-xp%kts+1) = 0.
+            Atmosphere%Cloud(6)%Effective_Radius(xp%kte-k+1)=200.
+            Atmosphere%Cloud(6)%Water_Content(xp%kte-k+1) = 0.
 
             end if
          enddo
