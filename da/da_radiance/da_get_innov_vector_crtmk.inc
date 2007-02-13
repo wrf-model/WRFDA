@@ -263,7 +263,7 @@ subroutine da_get_innov_vector_crtmk ( it, xb, xp, ob, iv )
          do k=xp%kts,xp%kte
             call da_interp_lin_2d( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
                                 i, j, dx, dy, dxm, dym, &      ! cloud water
-                                model_qcw(xp%kte-xp%kts+1) )
+                                model_qcw(xp%kte-k+1) )
          !   call da_interp_lin_2d( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
          !                       i, j, dx, dy, dxm, dym, &      ! rain
          !                       model_qrn(k) )
@@ -290,7 +290,7 @@ subroutine da_get_innov_vector_crtmk ( it, xb, xp, ob, iv )
          ! ADD for computing cloud liquid water path (mm) from guess
          clwp = 0.
          do k = xp%kts,xp%kte ! from top to bottom
-            dlnpf(k) = log(atmosphere%level_pressure(k+1)) - log(atmosphere%level_pressure(k))
+            dlnpf(k) = log(atmosphere%level_pressure(k)) - log(atmosphere%level_pressure(k-1))
             clw  (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
             clwp  = clwp + clw(k)
          end do
