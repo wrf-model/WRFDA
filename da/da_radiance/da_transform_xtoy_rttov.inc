@@ -427,7 +427,7 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
       !-------------------------------------------------------------------
 
       if (num_rad > 0) then
-         do n=1,d_num_rad
+         do n=1,num_rad
             deallocate (con_vars(n) % t)
             deallocate (con_vars(n) % q)
             deallocate (con_vars_tl(n) % t)
