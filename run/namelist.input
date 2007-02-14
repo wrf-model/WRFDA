@@ -54,7 +54,7 @@
  TEST_init_zero_tendency    = .false.,
  TEST_phy_prep              = .false.
  TEST_calculate_km_kh       = .false.,
- TEST_rk_tendency           = .true.,
+ TEST_rk_tendency           = .false.,
  TEST_surface_drag          = .false.,
  TEST_lscond                = .false.,
  TEST_advect_scalar         = .false.,
