@@ -5,6 +5,7 @@ export DAT_DIR=${DAT_DIR:-~/data}
 export FULL=${FULL:-false}
 export COMPILE=${COMPILE:-true}
 export RUN=${RUN:-true}
+export CLEAN=${CLEAN:-true}
 
 # Need a cleaner mapping between compiler and configure options.
 # Assuming option 2 is pgi mpi is a hack
@@ -45,6 +46,7 @@ for COMPILER in $COMPILERS; do
       echo $OPTION | ./configure $TARGET >configure.out 2>&1
       rm -f build/links
       ./compile $TARGET > compile.out 2>&1
+      if $CLEAN; then ./clean > /dev/null 2>&1; fi
       ls -l build/wrfvar.exe
       let COUNT=$COUNT+1
    fi

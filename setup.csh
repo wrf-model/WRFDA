@@ -15,12 +15,12 @@ endif
 bjobs >& /dev/null
 if ($status == 0) then
    setenv SUBMIT LSF
-   if (! $?LL_PTILE) then
-      setenv LL_PTILE 8
+   if (! $?LSF_PTILE) then
+      setenv LSF_PTILE 8
    endif
    setenv SUBMIT_OPTIONS1 "#BSUB -x" # exclusivity
    setenv SUBMIT_OPTIONS2 "#BSUB -a mpich_gm"
-   setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LL_PTILE]"
+   setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LSF_PTILE]"
    setenv SUBMIT_OPTIONS4 "#BSUB -W 60"
    setenv SUBMIT_OPTIONS5 "#BSUB -P $PROJECT"
 else
