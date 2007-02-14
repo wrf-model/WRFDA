@@ -303,7 +303,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
+      ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_global.csh >&! gen_be_stage4_global.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 global failed with error" $RC
@@ -316,7 +316,7 @@ if ( $?RUN_GEN_BE_STAGE4 ) then
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/run/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
+      ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_regional.csh >&! gen_be_stage4_regional.log
       set RC = $status
       if ( $RC != 0 ) then
         echo "Stage 4 regional failed with error" $RC
