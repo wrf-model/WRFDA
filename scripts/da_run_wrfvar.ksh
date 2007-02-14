@@ -13,8 +13,8 @@ fi
 #-----------------------------------------------------------------------
 
 export DATE=${DATE:-2003010112}              # Analysis date.
-export WINDOW_START=${WINDOW_START:-0}
-export WINDOW_END=${WINDOW_END:-0}
+export WINDOW_START=${WINDOW_START:--3}
+export WINDOW_END=${WINDOW_END:-3}
 export NL_NUM_FGAT=${NL_NUM_FGAT_TIME:-1}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
 
@@ -97,6 +97,7 @@ echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
 echo 'RUN_DIR               <A HREF="'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
+echo 'WORK_DIR              <A HREF="'${WORK_DIR##$PWD}'">'$WORK_DIR'</a>'
 echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
