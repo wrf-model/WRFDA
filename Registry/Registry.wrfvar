@@ -209,7 +209,7 @@ state    real   a_t            ijkb     dyn_em      2         -     \
 state    real   g_t            ijkb     dyn_em      2         -     \
        i01rh03usdf=(bdy_interp:dt)   "g_t"      "perturbation potential temperature (theta-t0)" "K"
 
-state    real   t_init         ijk     dyn_em      1         -      r        "t_init" "initial potential temperature" "K"
+state    real   t_init         ijk     dyn_em      1         -      ir        "t_init" "initial potential temperature" "K"
 i1       real   t_tend         ijk     dyn_em      1         -  
 i1       real   a_t_tend       ijk     dyn_em      1         -  
 i1       real   g_t_tend       ijk     dyn_em      1         -  
@@ -335,7 +335,7 @@ i1       real   g_cqw          ijk     dyn_em      1         -     -
 i1       real   pm1            ijk     dyn_em      1         -     -
 i1       real   a_pm1          ijk     dyn_em      1         -     -
 i1       real   g_pm1          ijk     dyn_em      1         -     -
-i1       real   sr             ij      dyn_em      1         -     -   # dummy array for microphysics driver
+state    real   sr             ij      dyn_em      1         -      irh         "sr" "fraction of frozen precipitation"
 
 state    real    fnm            k       dyn_em      1         -     irh       "fnm"  "upper weight for vertical stretching"  ""
 state    real    fnp            k       dyn_em      1         -     irh       "fnp"  "lower weight for vertical stretching"  ""
@@ -371,6 +371,12 @@ state    real   PSFC             ij     misc        1         -     irh       "P
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
 state    real   U10              ij     misc        1         -     irh013      "U10"                "U at 10 M"         "m s-1"
 state    real   V10              ij     misc        1         -     irh013      "V10"                "V at 10 M"         "m s-1"
+
+# these next 4 are for observational nudging
+state    real   uratx           ij      misc        1         -     ir          "URATX"            "Ratio of U over U10 on mass points "         "dimensionless"
+state    real   vratx           ij      misc        1         -     ir          "VRATX"            "Ratio of V over V10 on mass points "         "dimensionless"   
+state    real   tratx           ij      misc        1         -     ir          "TRATX"            "Ratio of T over TH2 on mass points "         "dimensionless"   
+state    real   obs_savwt      hijk     dyn_em      1         X      -       "OBS_SAVWT"
 
 # Other
 state   real    rdx            -        misc      -         -     irh       "rdx"                   "INVERSE X GRID LENGTH"         ""      
@@ -464,6 +470,9 @@ state    real   dtbc            -        misc     -         -      ir       "dtb
 #-------------------------------------------------------------------------------------------------------------------------------------------
 
 state   real   landmask            ij    misc          1     -     i012rh03d=(interp_fcnm)u=(copy_fcnm)   "LANDMASK"      "LAND MASK (1 FOR LAND, 0 FOR WATER)"  ""
+state   real   shdmax              ij    misc          1     -     i012r   "SHDMAX"        "ANNUAL MAX VEG FRACTION" ""
+state   real   shdmin              ij    misc          1     -     i012r   "SHDMIN"        "ANNUAL MIN VEG FRACTION" ""
+state   real   snoalb              ij    misc          1     -     i012r   "SNOALB"        "ANNUAL MAX SNOW ALBEDO IN FRACTION" ""
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 # SI - end variables from netCDF format from Standard Initialization
@@ -478,6 +487,7 @@ state    real   DZS             l        misc      -         Z     irh       "DZ
 # lsm State Variables
 
 state    real   SMOIS            ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SMOIS"            "SOIL MOISTURE"     "m3 m-3"
+state    real   SH2O             ijl     -          1         Z     i02rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SH2O"             "SOIL LIQUID WATER" "m3 m-3"
 state    real   XICE             ij     misc        1         -     i012rhd=(interp_mask_water_field:lu_index)u=(copy_fcnm)  "XICE"             "SEA ICE FLAG"  ""
 
 state    real   SFCRUNOFF        ij     misc        1         -      rhd=(interp_mask_land_field:lu_index)      "SFROFF"           "SURFACE RUNOFF"     "mm"
@@ -491,12 +501,26 @@ state    real   ACSNOW           ij     misc        1         -      rd=(interp_
 state    real   ACSNOM           ij     misc        1         -      rd=(interp_mask_land_field:lu_index)u=(copy_fcnm)       "ACSNOM"           "ACCUMULATED MELTED SNOW"  "kg m-2"
 state    real   SNOW             ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOW"             "SNOW WATER EQUIVALENT"    "kg m-2"
 state    real   SNOWH            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "SNOWH"            "PHYSICAL SNOW DEPTH"      "m"
+state    real   RHOSN            ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "RHOSN"            " SNOW DENSITY"      "kg m-3" 
+state    real   CANWAT           ij     misc        1         -     i01rhd=(interp_mask_land_field:lu_index)u=(copy_fcnm)    "CANWAT"           "CANOPY WATER"             "kg m-2"
 state    real   SST              ij     misc        1         -     i0125rhd=(interp_mask_water_field:lu_index)   "SST"              "SEA SURFACE TEMPERATURE" "K"
+state  integer  IFNDSNOWH        -      misc        1         -     i         "FNDSNOWH" "SNOWH_LOGICAL"
+state  integer  IFNDSOILW        -      misc        1         -     i         "FNDSOILW" "SOILW_LOGICAL"
 
 # gfdl (eta) radiation State Variables
 state    real    HTOP            ij     misc        1         -      r        "HTOP"                 "TOP OF CONVECTION LELVEL"         ""
 state    real    HBOT            ij     misc        1         -      r        "HBOT"                 "BOT OF CONVECTION LELVEL"         ""
 state    REAL      CUPPT         ij     misc        1         -      r        "CUPPT"                "ACCUMULATED CONVECTIVE RAIN SINC LAST CALL TO THE RADIATION"         ""
+state  real   rswtoa    ij    misc        1    -    i
+state  real   rlwtoa    ij    misc        1    -    i
+state  real   czmean    ij    misc      1    -     i
+state  real   cfracl    ij    misc      1    -     i
+state  real   cfracm    ij    misc      1    -     i
+state  real   cfrach    ij    misc      1    -     i
+state  real   acfrst    ij    misc        1    -    i
+state integer ncfrst    ij    misc        1    -    i
+state  real   acfrcv    ij    misc        1    -    i
+state integer ncfrcv    ij    misc        1    -    i
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ijk     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
