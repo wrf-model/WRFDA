@@ -1,6 +1,6 @@
 program gen_be_stage4_regional
 
-   use da_control, only : trace_use,stderr,stdout,da_advance_cymdh
+   use da_control, only : trace_use,stderr,stdout,da_advance_cymdh, filename_len
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace_init, &
       da_trace_report
    use da_tools1, only : da_get_unit
@@ -10,8 +10,8 @@ program gen_be_stage4_regional
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*200       :: run_dir                    ! Run directory.
-   character*200       :: filename                   ! Input filename.
+   character(len=filename_len)       :: run_dir                    ! Run directory.
+   character(len=filename_len)       :: filename                   ! Input filename.
    character*1         :: k_label                    ! = 'k' if model level, 'm' if mode output.
    character*2         :: ck                         ! Level index -> character.
    character*3         :: ce                         ! Member index -> character.

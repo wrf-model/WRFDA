@@ -13,7 +13,7 @@ program gen_be_ensrf
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : trace_use, stdout,stderr
+   use da_control, only : trace_use, stdout,stderr,filename_len
    use da_gen_be, only : da_stage0_initialize, da_get_field, da_get_trh
    use da_tracing, only : da_trace_init,da_trace_entry,da_trace_exit, &
       da_trace_report
@@ -49,9 +49,9 @@ program gen_be_ensrf
    integer, parameter    :: nv2d = 1                  ! #2D variables (ps).
    integer, parameter    :: unit = 100                ! Unit number.
 
-   character (len=200)   :: filestub                  ! General filename stub.
-   character (len=200)   :: input_file                ! Input file. 
-   character (len=200)   :: output_file               ! Output file. 
+   character (len=filename_len)   :: filestub                  ! General filename stub.
+   character (len=filename_len)   :: input_file                ! Input file. 
+   character (len=filename_len)   :: output_file               ! Output file. 
    character (len=10)    :: var                       ! Variable to search for.
    character (len=3)     :: ce                        ! Member index -> character.
 

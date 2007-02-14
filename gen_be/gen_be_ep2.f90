@@ -20,9 +20,9 @@ program gen_be_ep2
 
    implicit none
 
-   character (len=200)   :: filestub                  ! General filename stub.
-   character (len=200)   :: input_file                ! Input file. 
-   character (len=200)   :: output_file               ! Output file. 
+   character (len=filename_len)   :: filestub                  ! General filename stub.
+   character (len=filename_len)   :: input_file                ! Input file. 
+   character (len=filename_len)   :: output_file               ! Output file. 
    character (len=10)    :: date                      ! Character date.
    character (len=10)    :: var                       ! Variable to search for.
    character (len=3)     :: cne                       ! Ensemble size.

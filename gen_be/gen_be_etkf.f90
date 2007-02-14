@@ -13,7 +13,7 @@ program gen_be_etkf
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : trace_use, stdout
+   use da_control, only : trace_use, stdout,filename_len
 !   use da_gen_be
    use da_etkf, only : da_solve_etkf
    use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
@@ -28,10 +28,10 @@ program gen_be_etkf
    integer, parameter    :: max_num_dims = 20         ! Maximum number of dimensions.
    integer, parameter    :: unit = 100                ! Unit number.
 
-   character (len=200)   :: directory                 ! Experiment directory.
-   character (len=200)   :: filestub                  ! General filename stub.
-   character (len=200)   :: input_file                ! Input file. 
-   character (len=200)   :: output_file               ! Output file. 
+   character (len=filename_len)   :: directory                 ! Experiment directory.
+   character (len=filename_len)   :: filestub                  ! General filename stub.
+   character (len=filename_len)   :: input_file                ! Input file. 
+   character (len=filename_len)   :: output_file               ! Output file. 
    character (len=3)     :: ce                        ! Member index -> character.
 
    integer               :: num_members               ! Ensemble size.

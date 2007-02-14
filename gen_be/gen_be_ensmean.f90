@@ -13,7 +13,7 @@ program gen_be_ensmean
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : trace_use, stdout, stderr
+   use da_control, only : trace_use, stdout, stderr,filename_len
    use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
       da_trace_report
    use da_reporting, only : da_error,message
@@ -26,8 +26,8 @@ program gen_be_ensmean
    integer, parameter    :: max_num_vars = 50         ! Maximum number of variables.
    integer, parameter    :: unit = 100                ! Unit number.
 
-   character (len=200)   :: filestub                  ! General filename stub.
-   character (len=200)   :: input_file                ! Input file. 
+   character (len=filename_len)   :: filestub                  ! General filename stub.
+   character (len=filename_len)   :: input_file                ! Input file. 
    character (len=10)    :: var                       ! Variable to search for.
    character (len=3)     :: ce                        ! Member index -> character.
 

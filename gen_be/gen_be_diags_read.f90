@@ -7,7 +7,7 @@ program gen_be_diags_read
 
    character*10        :: variable          ! Variable name
    character*8         :: uh_method         ! Uh_method (power, scale)
-   character*80        :: filename          ! Input filename.
+   character(len=filename_len)        :: filename          ! Input filename.
    integer             :: outunit           ! Output unit for diagnostics.
    integer             :: ni, nj, nk, nk_3d ! Dimensions read in.
    integer             :: bin_type          ! Type of bin to average over. !!!DALE ADD.

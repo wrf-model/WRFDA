@@ -10,7 +10,7 @@ program gen_be_stage4_global
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    character*2         :: ck                         ! Loop index -> character.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk                 ! Dimensions read in.

@@ -29,9 +29,9 @@ program gen_be_stage1_1dvar
    character*10        :: variable                   ! Variable name.
    character*3         :: be_method                  ! Be method (NMC, or ENS)
    character*3         :: ce                         ! Ensemble member index.
-   character*80        :: dat_dir                    ! Input data directory.
+   character(len=filename_len)        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    integer             :: ni, nj, nk                 ! Dimensions read in.
    integer             :: member, b, i, j, k         ! Loop counters.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.

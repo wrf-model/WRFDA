@@ -8,7 +8,7 @@ program gen_be_diags
    character*10        :: variable                   ! Variable name
    character*8         :: uh_method                  ! Uh_method (power, scale)
    integer             :: n_smth_sl                  ! Number of smoothing for scale-length
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    integer             :: nk,nk_3d                   ! Dimensions read in.
 
    namelist / gen_be_diags_nl / uh_method, n_smth_sl

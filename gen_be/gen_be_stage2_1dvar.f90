@@ -23,9 +23,9 @@ program gen_be_stage2_1dvar
    character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character*80        :: dat_dir                    ! Input data directory.
+   character(len=filename_len)        :: dat_dir                    ! Input data directory.
    character*80        :: expt                       ! Experiment ID.
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
    integer             :: nk1                        ! nk + 1.

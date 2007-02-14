@@ -9,8 +9,8 @@ program gen_be_cov3d
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable1                  ! Variable name
    character*10        :: variable2                  ! Variable name
-   character*80        :: dat_dir                    ! Input data directory.
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: dat_dir                    ! Input data directory.
+   character(len=filename_len)        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk                 ! Grid dimensions.
    integer             :: i, j, k, member            ! Loop counters.

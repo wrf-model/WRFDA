@@ -9,7 +9,7 @@ program gen_be_cov2d
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable1					 ! Variable name
    character*10        :: variable2					 ! Variable name
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    character*3         :: ce                         ! Member index -> character.
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
    integer             :: i, j, member               ! Loop counters.

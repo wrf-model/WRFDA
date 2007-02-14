@@ -18,7 +18,7 @@ program gen_be_stage0_wrf
 #endif
 
    use da_control, only : num_fft_factors, pi, stdout, stderr, trace_use, &
-      da_find_fft_factors,da_find_fft_trig_funcs
+      da_find_fft_factors,da_find_fft_trig_funcs,filename_len
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
    use da_tracing, only : da_trace_entry, da_trace_exit, &
@@ -31,9 +31,9 @@ program gen_be_stage0_wrf
 
    integer, parameter    :: nrange = 50               ! Range to search for efficient FFT.
 
-   character (len=200)   :: filestub                  ! General filename stub.
-   character (len=200)   :: input_file                ! Input file. 
-   character (len=200)   :: output_file               ! Output file. 
+   character (len=filename_len)   :: filestub                  ! General filename stub.
+   character (len=filename_len)   :: input_file                ! Input file. 
+   character (len=filename_len)   :: output_file               ! Output file. 
    character (len=10)    :: date                      ! Character date.
    character (len=10)    :: var                       ! Variable to search for.
    character (len=3)     :: be_method                 ! "NMC" or "ENS".

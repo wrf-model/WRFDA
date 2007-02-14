@@ -8,11 +8,13 @@ program gen_be_read_regcoeffs
 !
 !-------------------------------------------------------------------------------------------
 
+   usa da_control, only : filename_len
+
    implicit none
 
    integer, parameter  :: unit = 10                  ! I/O unit.
 
-   character*80        :: filename                   ! Input filename.
+   character(len=filename_len)        :: filename                   ! Input filename.
    character*3         :: be_method                  ! Be method ('NMC', or 'ENS')
    integer             :: ni, nj, nk                 ! Dimensions read in.
    integer             :: bin_type                   ! Type of bin to average over. !!!DALE ADD.

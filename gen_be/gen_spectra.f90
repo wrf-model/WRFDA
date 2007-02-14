@@ -10,7 +10,7 @@ program gen_spectra
 
    real, parameter     :: tolerance = 1.0e-6
 
-   character*40        :: filename 
+   character(len=filename_len)        :: filename 
    character*10        :: date, cvar, ctime
    integer             :: time, member               ! Loop counters.
    integer             :: i, j, k, n, m              ! Loop counters.
