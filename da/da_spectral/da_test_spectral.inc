@@ -40,7 +40,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
 
    field_out = 0.
    ! Spectral to gridpoint:
-   call da_v_to_vv_spectral( max_wave, sizec, &
+   call da_vtovv_spectral( max_wave, sizec, &
                              xbx % lenr, xbx % lenwrk, xbx % lensav, &
                              xbx % inc, xbx % alp_size, xbx % alp, &
                              xbx % wsave, power, rcv, field_out)
@@ -63,7 +63,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
 
    ! Adjoint test for Spectral Transform
    rcv_out = 0.0
-   call da_v_to_vv_spectral_adj( max_wave, sizec, &
+   call da_vtovv_spectral_adj( max_wave, sizec, &
                                  xbx % lenr, xbx % lenwrk, xbx % lensav, &
                                  xbx % inc, xbx % alp_size, xbx % alp, &
                                  xbx % wsave, power, rcv_out, field_out)

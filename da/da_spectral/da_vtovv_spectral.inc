@@ -1,4 +1,4 @@
-subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
+subroutine da_vtovv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
                                 alp_size, alp, wsave, power, rcv, field)
 
    !-------------------------------------------------------------------------
@@ -33,7 +33,7 @@ subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
    complex              :: sum_legtra          ! Summation scalars.
 
 
-   if (trace_use) call da_trace_entry("da_v_to_vv_spectral")
+   if (trace_use) call da_trace_entry("da_vtovv_spectral")
 
    !----------------------------------------------------------------------------
    ! [1] Create complex array from read array:
@@ -111,8 +111,8 @@ subroutine da_v_to_vv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
       field(its:ite,j) = r_fou(its:ite)
    end do
 
-   if (trace_use) call da_trace_exit("da_v_to_vv_spectral")
+   if (trace_use) call da_trace_exit("da_vtovv_spectral")
    
-end subroutine da_v_to_vv_spectral
+end subroutine da_vtovv_spectral
 
 

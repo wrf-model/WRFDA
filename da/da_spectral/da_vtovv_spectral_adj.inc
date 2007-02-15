@@ -1,4 +1,4 @@
-subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, inc, &
+subroutine da_vtovv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, inc, &
                                     alp_size, alp, wsave, power, rcv, field)
 
    !----------------------------------------------------------------------
@@ -39,7 +39,7 @@ subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, 
 
    integer              :: jc, iequator, temp
 
-   if (trace_use) call da_trace_entry("da_v_to_vv_spectral_adj")
+   if (trace_use) call da_trace_entry("da_vtovv_spectral_adj")
 
    !----------------------------------------------------------------------
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
@@ -137,8 +137,8 @@ subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, 
       rcv(2*n    ) = aimag(ccv(n))
    end do 
 
-   if (trace_use) call da_trace_exit("da_v_to_vv_spectral_adj")
+   if (trace_use) call da_trace_exit("da_vtovv_spectral_adj")
 
-end subroutine da_v_to_vv_spectral_adj
+end subroutine da_vtovv_spectral_adj
 
 

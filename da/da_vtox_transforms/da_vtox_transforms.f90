@@ -25,7 +25,7 @@ module da_vtox_transforms
    use da_recursive_filter, only : da_transform_through_rf, &
       da_transform_through_rf_adj
    use da_reporting, only : da_error
-   use da_spectral, only : da_v_to_vv_spectral,da_v_to_vv_spectral_adj
+   use da_spectral, only : da_vtovv_spectral,da_vtovv_spectral_adj
    use da_ssmi, only : da_transform_xtoseasfcwind_lin,da_transform_xtotb_adj, &
       da_transform_xtoseasfcwind_adj, da_transform_xtotb_lin
    use da_tools, only : da_set_boundary_xa

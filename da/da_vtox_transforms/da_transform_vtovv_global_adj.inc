@@ -25,7 +25,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
    cv_s = 1        
    do k = 1, be%v1%mz
       cv_e = cv_s + 2 * be % cv % size1c - 1
-      call da_v_to_vv_spectral_adj(be % v1 % max_wave, be % cv % size1c, &
+      call da_vtovv_spectral_adj(be % v1 % max_wave, be % cv % size1c, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v1%power(0:be % v1 % max_wave,k), &
@@ -35,7 +35,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    do k = 1, be%v2%mz
       cv_e = cv_s + 2 * be % cv % size2c - 1
-      call da_v_to_vv_spectral_adj(be % v2 % max_wave, be % cv % size2c, &
+      call da_vtovv_spectral_adj(be % v2 % max_wave, be % cv % size2c, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v2%power(0:be % v2 % max_wave,k), &
@@ -45,7 +45,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    do k = 1, be%v3%mz
       cv_e = cv_s + 2 * be % cv % size3c - 1
-      call da_v_to_vv_spectral_adj(be % v3 % max_wave, be % cv % size3c, &
+      call da_vtovv_spectral_adj(be % v3 % max_wave, be % cv % size3c, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v3%power(0:be % v3 % max_wave,k), &
@@ -55,7 +55,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    do k = 1, be%v4%mz
       cv_e = cv_s + 2 * be % cv % size4c - 1
-      call da_v_to_vv_spectral_adj(be % v4 % max_wave, be % cv % size4c, &
+      call da_vtovv_spectral_adj(be % v4 % max_wave, be % cv % size4c, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be%v4%power(0:be % v4 % max_wave,k), &
@@ -65,7 +65,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    do k = 1, be%v5%mz
      cv_e = cv_s + 2 * be % cv % size5c - 1 
-     call da_v_to_vv_spectral_adj(be % v5 % max_wave, be % cv % size5c, &
+     call da_vtovv_spectral_adj(be % v5 % max_wave, be % cv % size5c, &
         xbx % lenr, xbx % lenwrk, xbx % lensav, &
         xbx % inc, xbx % alp_size, xbx % alp, &
         xbx % wsave, be%v5%power(0:be % v5 % max_wave,k), &
@@ -79,7 +79,7 @@ subroutine da_transform_vtovv_global_adj (cv_size, xbx, be, cv, vv)
 
    do m = 1, be % ne
       cv_e = cv_s + 2 * be % cv % size_alphac - 1
-      call da_v_to_vv_spectral_adj(be % alpha % max_wave, be % cv % size_alphac, &
+      call da_vtovv_spectral_adj(be % alpha % max_wave, be % cv % size_alphac, &
          xbx % lenr, xbx % lenwrk, xbx % lensav, &
          xbx % inc, xbx % alp_size, xbx % alp, &
          xbx % wsave, be % alpha % power(0:be%alpha%max_wave,1), &

@@ -36,9 +36,9 @@ contains
 #include "da_setlegpol_test.inc"
 #include "da_setlegpol.inc"
 #include "da_test_spectral.inc"
-#include "da_v_to_vv_spectral.inc"
+#include "da_vtovv_spectral.inc"
 #include "da_vv_to_v_spectral.inc"
-#include "da_v_to_vv_spectral_adj.inc"
+#include "da_vtovv_spectral_adj.inc"
 #include "da_legtra_inv_adj.inc"
 #include "da_apply_power.inc"
 
