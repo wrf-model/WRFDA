@@ -58,7 +58,11 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
 
    do j = 1, nj
       r_fou(1:ni) = field(1:ni,j)
+#ifdef FFTPACK5
       call rfft1f(ni, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
+#else
+      call da_error(__FILE__,__LINE__,(/"Needs to be compiled with FFTPACK"/))
+#endif
 
       if (odd_longitudes) then
          v_fou(j,0) = CMPLX(r_fou(1), 0.0) ! m = 0 is real.

@@ -4,7 +4,6 @@ GEN_BE_OBJS = da_etkf.o da_gen_be.o da_control.o da_be_spectral.o module_wrf_err
   module_driver_constants.o da_tracing.o da_memory.o da_reporting.o da_tools1.o
 
 be :		setup                   \
-                $(GEN_BE_LIBS)          \
                 $(GEN_BE_OBJS)          \
                 gen_be_stage0_wrf	\
                 gen_be_ep1		\

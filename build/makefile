@@ -94,16 +94,6 @@ libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a
 
-# External libraries
-
-blas : $(BLAS)/libblas.a
-
-lapack : blas $(LAPACK)/liblapack.a
-
-fftpack5 : $(FFTPACK5)/libfftpack5.a
-
-bufr : $(BUFR)/libbufr.a
-
 clean : arch_clean
 	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \

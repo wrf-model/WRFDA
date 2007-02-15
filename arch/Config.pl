@@ -313,11 +313,22 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_BUFR_INC:.:g ;
   }
 
+  if ( $sw_fftpack5_path ) {
+    $_ =~ s:CONFIGURE_FFTPACK5_PATH:$sw_fftpack5_path:g ;
+    $_ =~ s:CONFIGURE_FFTPACK5_FLAG:-DFFTPACK5: ;
+    $_ =~ s:CONFIGURE_FFTPACK5_LIB:-L$sw_fftpack5_path -lfftpack5: ;
+    $_ =~ s:CONFIGURE_FFTPACK5_INC:$sw_fftpack5_path: ;
+  } else {
+    $_ =~ s:CONFIGURE_FFTPACK5_PATH::g ;
+    $_ =~ s:CONFIGURE_FFTPACK5_FLAG::g ;
+    $_ =~ s:CONFIGURE_FFTPACK5_LIB::g ;
+    $_ =~ s:CONFIGURE_FFTPACK5_INC:.:g ;
+  }
+
   # always defined
  
-  $_ =~ s:CONFIGURE_BLAS:$sw_blas_path:g ;
-  $_ =~ s:CONFIGURE_LAPACK:$sw_lapack_path:g ;
-  $_ =~ s:CONFIGURE_FFTPACK5:$sw_fftpack5_path:g ;
+  $_ =~ s:CONFIGURE_BLAS_PATH:$sw_blas_path:g ;
+  $_ =~ s:CONFIGURE_LAPACK_PATH:$sw_lapack_path:g ;
 
   @machopts1 = ( @machopts1, $_ ) ;
   if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )

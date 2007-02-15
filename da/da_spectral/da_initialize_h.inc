@@ -30,7 +30,11 @@ subroutine da_initialize_h(ni, nj, max_wavenumber, lensav, alp_size, &
    !----------------------------------------------------------------------------
 
    wsave(:) = 0.0
+#ifdef FFTPACK5
    call rfft1i(ni, wsave, lensav, ierr)
+#else
+   call da_error(__FILE__,__LINE__,(/"Needs to be compiled with FFTPACK"/))
+#endif
 
    if (ierr /= 0) then
      write(unit=message(1),fmt='(A,I4)') &

@@ -48,7 +48,11 @@ subroutine da_vtovv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, in
    v_fou = 0.
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
+#ifdef FFTPACK5
       call rfft1f(ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
+#else
+      call da_error(__FILE__,__LINE__,(/"Must compile with FFTPACK5"/))
+#endif
 
       !----------------------------------------------------------------------
       ! Adjust the output for adjoint test

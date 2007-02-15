@@ -1,6 +1,8 @@
 module da_spectral
 
+#ifdef FFTPACK5
    use fftpack5, only : rfft1f,rfft1b,rfft1i
+#endif
 #ifdef DM_PARALLEL
    use mpi, only : mpi_sum
 #endif

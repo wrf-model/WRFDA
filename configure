@@ -345,8 +345,7 @@ fi
 if [ -n "$FFTPACK5" ] ; then
   echo "Will use FFTPACK5 in dir: $FFTPACK5"
 else
-  echo "FFTPACK5 not set in environment"
-  exit 1
+  echo "Will configure for use without FFTPACK5"
 fi
 
 if [ -n "$BUFR" ] ; then

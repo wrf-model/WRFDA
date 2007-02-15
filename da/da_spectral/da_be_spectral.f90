@@ -4,7 +4,9 @@ module be_spectral
       pi,gaussian_lats
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error,message
+#ifdef FFTPACK5
    use fftpack5, only : rfft1f,rfft1i
+#endif
    use da_tools1, only : da_free_unit, da_get_unit
 
    !--------------------------------------------------------------------
