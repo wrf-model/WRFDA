@@ -122,6 +122,8 @@ subroutine da_v_to_vv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, 
    call mpi_allreduce(ccv_local(index_start:index_end), &
                       ccv(index_start:index_end), n, true_mpi_complex, mpi_sum, &
                       comm, ierr)
+#else
+   ccv(:) = ccv_local(:)		      
 #endif
 
    !----------------------------------------------------------------------
