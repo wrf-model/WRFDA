@@ -1390,7 +1390,7 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
-                    -qflttrap=zerodivide:invalid:enable -qsigtrap=xl__trce
+                    -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
 CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
 
@@ -1477,7 +1477,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = 
 FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
-                  -qsuppress=1514-008 -qflttrap=zerodivide:invalid:enable \
+                  -qsuppress=1514-008 -qflttrap=zerodivide:invalid:nanq:enable \
                   -qsigtrap=xl__trce
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
