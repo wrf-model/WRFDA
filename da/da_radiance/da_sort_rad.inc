@@ -53,7 +53,7 @@ subroutine da_sort_rad (iv)
       j = 0
       do t = 1,num_fgat_time
          do n = 1,iv%instid(i)%num_rad
-            if (iv%instid(i)%ifgat(n) /= i) cycle
+            if (iv%instid(i)%ifgat(n) /= t) cycle
             j = j + 1
             ifgat(j)        = iv%instid(i)%ifgat(n)
             info(j)         = iv%instid(i)%info(n)
