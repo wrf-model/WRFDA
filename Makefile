@@ -58,6 +58,7 @@ wrf : configcheck
 	if [ $(WRF_NMM_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" nmm_core ; fi
 	if [ $(WRF_EXP_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" exp_core ; fi
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
+	( $(RM) -f *.f *.mod *.o )
 	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
 
 var : 
@@ -384,6 +385,6 @@ da_tracing.o : da/da_tracing/da_tracing.f90
 
 da_memory.o : da/da_tracing/da_memory.c
 	$(RM) $@
-	$(CC) -c $(CCFLAGS) -DNOUNDERSCORE da/da_tracing/da_memory.c
+	$(CC) -c $(CCFLAGS) -DNOUNDERSCORE -DMACOS da/da_tracing/da_memory.c
 
 # DO NOT DELETE
