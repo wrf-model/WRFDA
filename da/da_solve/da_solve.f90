@@ -135,6 +135,14 @@ subroutine da_solve ( grid , config_flags)
 
    call da_setup_obs_structures( grid%xp, ob, iv, grid%xb )
 
+   if (use_radiance) then
+      allocate (j % jo % rad(1:iv%num_inst))
+      do i=1,iv%num_inst
+         allocate (j % jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
+         allocate (j % jo % rad(i) % num_ichan(iv%instid(i)%nchan))
+      end do
+   end if
+
    !---------------------------------------------------------------------------
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
@@ -229,22 +237,12 @@ subroutine da_solve ( grid , config_flags)
          end if     
       end if
 
-      if (monitoring) call wrf_shutdown
-
       ! [8.3] Interpolate x_g to low resolution grid
 
       ! [8.4] Minimize cost function:
 
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
-
-      if (use_radiance) then
-         allocate (j % jo % rad(1:iv%num_inst))
-         do i=1,iv%num_inst
-            allocate (j % jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
-            allocate (j % jo % rad(i) % num_ichan(iv%instid(i)%nchan))
-         end do
-      end if
 
       call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 

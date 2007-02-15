@@ -331,6 +331,7 @@ subroutine da_allocate_y (iv, y)
             cycle
          end if
          allocate (y % instid(i) % tb(1:y % instid(i) % nchan, y % instid(i) % num_rad))
+         y % instid(i) % tb(:,:) = 0.0
       end do
    end if
    ! Initialize AIRS retrievals:
