@@ -68,8 +68,8 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! KMA-specific fields:
    !---------------------------------------------------------------------------
 
-   ! Fix ptop as 10 hPa.
-   ptop = 1000.0     
+   ! Fix ptop as 0.4 hPa.
+   ptop = 40.0     
    ps0  = 100000.0
    tis0 = 0.0
    tlp  = 0.0
