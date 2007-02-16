@@ -250,7 +250,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
          end do                                                        
       end do
    end do
-                                                    
+
    !---------------------------------------------------------------------------
    ! Sigma values are needed for interpolating 
    ! background error statistics in vertical
@@ -271,14 +271,14 @@ subroutine da_transfer_kmatoxb(xbx, grid)
       if (grid%xb%sigmah(ke+ks-k) < 0.0) then
          write(unit=message(1),fmt='(A,F10.2)') &
             ' average surface pressure = ',tmpps  
-         write(unit=message(2),fmt='(A,I5,F10.2)') &
+         write(unit=message(2),fmt='(A,I5,A,F10.2)') &
             ' average pressure at this level= ',k,' = ',tmpp  
-         write(unit=message(3),fmt='(A,F10.2)') &
+         write(unit=message(3),fmt='(A,I5,A,F10.2)') &
             ' negative sigmah(',ke+ks-k,') = ',grid%xb%sigmah(ke+ks-k) 
          call da_error(__FILE__,__LINE__,message(1:3))
       end if
    end do
-   
+
    ! Fix ztop
    
    grid%xb%ztop = grid%xb%h(is,js,ke)
