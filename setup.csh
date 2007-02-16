@@ -36,7 +36,7 @@ else
       setenv SUBMIT_OPTIONS7 '# @ class            = share'
       setenv SUBMIT_OPTIONS8 '# @ node_usage       = shared'
    else
-      qsub >& /dev/null
+      which qsub >& /dev/null
       # could be SGE of course, so might need better way to check
       if ($status == 0) then
          setenv SUBMIT PBS
