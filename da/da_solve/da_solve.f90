@@ -46,7 +46,7 @@ subroutine da_solve ( grid , config_flags , &
                                    ims , ime , jms , jme , kms , kme , &
                                    its , ite , jts , jte , kts , kte
 
-   integer                      :: cv_size
+   integer                      :: cv_size, i
    real                         :: j_grad_norm_target ! TArget j norm.
 #ifdef DM_PARALLEL
    integer                      :: ierr,comm
@@ -112,6 +112,14 @@ subroutine da_solve ( grid , config_flags , &
    !---------------------------------------------------------------------------
 
    call da_setup_obs_structures( grid%xp, ob, iv )
+
+   if (use_radiance) then
+     allocate (j % jo % rad(1:iv%num_inst))
+     do i =1, iv%num_inst
+        allocate (j % jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
+        allocate (j % jo % rad(i) % num_ichan(iv%instid(i)%nchan))
+     end do
+   end if
 
    !---------------------------------------------------------------------------
    ! [5.0] Set up background errors (be):
