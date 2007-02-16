@@ -14,10 +14,11 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
 
 4, Install WRF_BC 
 
-4, Subsititue wrf/Registry/Registry.EM with wrfplus/parallel/wrf/Regisrty/Registry.EM
-   Subsititue wrf/external/RSL/module_dm.F with wrfplus/parallel/wrf/external/RSL/module_dm.F
-   Subsititue wrf/external/RSL_LITE/module_dm.F with wrfplus/parallel/wrf/external/RSL_LITE/module_dm.F
-   Subsititue wrf/main/wrf.F with wrfplus/parallel/main/wrf.F
+4, Copy the following files
+   cp wrfplus/parallel/wrf/Regisrty/Registry.EM wrf/Registry/Registry.EM 
+   cp wrfplus/parallel/wrf/external/RSL/module_dm.F wrf/external/RSL/module_dm.F
+   cp wrfplus/parallel/wrf/external/RSL_LITE/module_dm.F wrf/external/RSL_LITE/module_dm.F
+   cp wrfplus/parallel/wrf/main/wrf.F wrf/main/wrf.F
 
 5, Compile wrfvar trunk (use G95)
    cd  wrfvar
@@ -29,14 +30,14 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
    cd wrf
    ./configure (select 3)
    ./compile wrf
-   cp wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
+   cp ../wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
 
 7, Compile wrfplus (use xlf)
    cd wrfplus
    ./configure wrfplus (select 3)
    ./compile wrf
    If Sucessful, cd main; ln -sf wrf.exe wrfplus.exe
-   (note: make sure the namelist_script.inc is existed in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
+   (note: make sure the namelist_script.inc exists in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
    
 8, Run the testdata 
    the test script locate in wrfplus/scripts/da_run_suite_wrapper_test_npe.ksh
