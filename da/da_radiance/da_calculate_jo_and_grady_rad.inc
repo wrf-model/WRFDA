@@ -20,11 +20,7 @@ subroutine da_calculate_jo_and_grady_rad( iv, re, jo, jo_grad_y )
 
    if (trace_use) call da_trace_entry("da_calculate_jo_and_grady_rad")
 
-   allocate ( jo % rad(1:iv%num_inst) )
-
    do i =1, iv%num_inst
-      allocate (jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
-      allocate (jo % rad(i) % num_ichan(iv%instid(i)%nchan))
 
       jo % rad(i)%jo_ichan(:) = 0.0
       jo % rad(i)%num_ichan(:) = 0
