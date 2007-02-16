@@ -15,9 +15,9 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
 4, Install WRF_BC 
 
 4, Subsititue wrf/Registry/Registry.EM with wrfplus/parallel/wrf/Regisrty/Registry.EM
-   Subsititue wrf/external/RSL/module_dm.F with wrfplus/parallel/external/RSL/module_dm.F
-   Subsititue wrf/external/RSL_LITE/module_dm.F with wrfplus/parallel/external/RSL/_LITEmodule_dm.F
-   Subsititue wrf/main.F with wrfplus/parallel/main.F
+   Subsititue wrf/external/RSL/module_dm.F with wrfplus/parallel/wrf/external/RSL/module_dm.F
+   Subsititue wrf/external/RSL_LITE/module_dm.F with wrfplus/parallel/wrf/external/RSL_LITE/module_dm.F
+   Subsititue wrf/main/wrf.F with wrfplus/parallel/main/wrf.F
 
 5, Compile wrfvar trunk (use G95)
    cd  wrfvar
