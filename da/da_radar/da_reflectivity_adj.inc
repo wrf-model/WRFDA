@@ -1,4 +1,4 @@
-subroutine da_reflectivity_adj(rf, rho, qrn, qrn9)
+subroutine da_reflectivity_adj(rf, qrn, qrn9)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,8 @@ subroutine da_reflectivity_adj(rf, rho, qrn, qrn9)
 
    implicit none
 
-   real, intent(inout)  :: rho, qrn
+!   real, intent(inout)  :: rho
+   real, intent(inout)  :: qrn
    real, intent(in)     :: qrn9
    real, intent(inout)  :: rf
 

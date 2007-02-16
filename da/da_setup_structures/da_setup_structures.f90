@@ -5,7 +5,6 @@ module da_setup_structures
    !---------------------------------------------------------------------------
 
    use module_domain, only : xb_type, xpose_type, ep_type, x_type
-   use module_ssmi, only : tb
 
    use da_define_structures, only : xbx_type,be_subtype, be_type, y_type, &
       ob_type,da_allocate_background_errors,da_allocate_observations
@@ -43,13 +42,11 @@ module da_setup_structures
    use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &
       da_scan_radar,da_scan_obs,da_read_obs
    use da_par_util, only : da_local_to_global
-   use da_physics, only : da_tpq_to_rh,da_sfc_wtq,da_trh_to_td, &
-      da_integrat_dz, da_roughness_from_lanu,da_integrat_dz,da_wrf_tpq_2_slp
    use da_radiance, only : da_setup_bufrtovs_structures
    use da_reporting, only : da_error,message, da_warning, da_message
    use da_recursive_filter, only : da_calculate_rf_factors
    use da_spectral, only : da_initialize_h,da_calc_power_spectrum
-   use da_ssmi, only : da_read_ssmi,da_scan_ssmi,da_transform_xtoseasfcwind
+   use da_ssmi, only : da_read_ssmi,da_scan_ssmi
    use da_tools1, only : da_get_unit, da_free_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_vtox_transforms, only : da_check_eof_decomposition

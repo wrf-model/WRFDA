@@ -105,28 +105,28 @@ subroutine da_transform_xtotb_adj (xa, xb)
 
          call da_tb_adj(1,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-                     xb%tb19v(i,j),xb%tb19h(i,j),               &
+!                     xb%tb19v(i,j),xb%tb19h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)    )
 
          call da_tb_adj(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-                     xb%tb22v(i,j),dum1,                        &
+!                     xb%tb22v(i,j),dum1,                        &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb22v(i,j),dum2              )
 
          call da_tb_adj(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-                     xb%tb37v(i,j),xb%tb37h(i,j),               &
+!                     xb%tb37v(i,j),xb%tb37h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb37v(i,j),xa%tb37h(i,j)    )
 
          call da_tb_adj(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
                      htpw,xb%speed(i,j),alw,zcld,               &
-                     xb%tb85v(i,j),xb%tb85h(i,j),               &
+!                     xb%tb85v(i,j),xb%tb85h(i,j),               &
                      ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
                      ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
                      ADJ_zcld,xa%tb85v(i,j),xa%tb85h(i,j)    )

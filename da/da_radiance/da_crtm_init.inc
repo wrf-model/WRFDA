@@ -38,25 +38,28 @@ subroutine da_crtm_init(iv,ob)
 !----------------------------------------------------------------
 !  input parameters of RTTOV_SETUP
 !----------------------------------
-  integer :: err_unit        ! Logical error unit (<0 for default)
-  integer :: verbosity_level ! (<0 for default)
+!  integer :: err_unit        ! Logical error unit (<0 for default)
+!  integer :: verbosity_level ! (<0 for default)
   integer :: nsensor, unit_factor_rad
-  integer, allocatable :: sensor(:,:) ! instrument id
+!  integer, allocatable :: sensor(:,:) ! instrument id
 
 !  output parameters of RTTOV_SETUP
 !-------------------------------------
-  integer, allocatable :: errorstatus(:)  ! return code
-  integer              :: coef_errorstatus, i_amsua, i_amsub
+!  integer, allocatable :: errorstatus(:)  ! return code
+!  integer              :: coef_errorstatus
+!  integer              :: i_amsua, i_amsub
   integer     :: error
   integer , pointer   ::  nscan(:), nchanl(:)
 
 ! local variables
 !----------------
- integer             :: nprofiles, nfrequencies, nchannels, nbtout
- integer , pointer   :: lprofiles(:)
- real    , pointer   :: surfem(:), emissivity(:)
- integer , pointer   :: channels (:), polarisations(:,:)
- integer             :: mxchn
+! integer             :: nprofiles, nfrequencies, nchannels, nbtout
+! integer , pointer   :: lprofiles(:)
+! real    , pointer   :: surfem(:)
+! real    , pointer   :: emissivity(:)
+! integer , pointer   :: channels (:)
+! integer , pointer   :: polarisations(:,:)
+! integer             :: mxchn
  integer             :: idum, wmo_sensor_id, sensor_type, iost
  integer             :: iunit
  character(len=filename_len)  :: filename

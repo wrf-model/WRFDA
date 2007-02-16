@@ -1,5 +1,5 @@
 subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
-                  tbv,tbh,                                                  &
+!                  tbv,tbh,                                                  &
                   TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,                   &
                   TGL_hwv,TGL_u,TGL_alw,TGL_zcld,TGL_tbv,TGL_tbh           )\
 
@@ -16,7 +16,7 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    real   , intent(in  ) :: theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld
    real   , intent(in  ) :: TGL_p0,TGL_ta,TGL_gamma,TGL_sst,TGL_wv,     &
                              TGL_hwv,TGL_u,TGL_alw,TGL_zcld
-   real   , intent(in  ) :: tbv,tbh
+!   real   , intent(in  ) :: tbv,tbh
    real   , intent( out) :: TGL_tbv,TGL_tbh 
 
    real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)

@@ -14,7 +14,7 @@ program da_wrfvar_main
    use da_control, only : trace_use
    use da_tracing, only : da_trace_init, da_trace_report, da_trace_entry, &
       da_trace_exit
-   use da_wrf_interfaces, only : wrf_shutdown, wrf_message
+   use da_wrf_interfaces, only : wrf_shutdown, wrf_message, disable_quilting
    use da_wrfvar_top, only : da_wrfvar_init1,da_wrfvar_init2,da_wrfvar_run
 
    implicit none

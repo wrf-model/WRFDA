@@ -72,7 +72,7 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
                if (use_Radar_rf) then
                   if (iv % Radar(n) % rf(k) % qc >= obs_qc_pointer) then
                     call da_reflectivity_adj(jo_grad_y%Radar(n)%rf(k), &
-                         model_rho(k), model_qrn(k), model_qrnb(k))
+                       model_qrn(k), model_qrnb(k))
                   end if
                end if
 

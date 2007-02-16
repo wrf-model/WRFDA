@@ -1,4 +1,4 @@
-subroutine da_final_write_y(iv, y)
+subroutine da_final_write_y(iv)
 
    !-------------------------------------------------------------------------   
    ! Purpose: Writes full diagnostics for y=H(x_inc)    
@@ -7,9 +7,8 @@ subroutine da_final_write_y(iv, y)
    implicit none
 
    type (ob_type), intent(in)    :: iv   ! O-B structure.
-   type (y_type), intent(in)     :: y    ! y = H(x_inc) structure.
       
-   integer                       :: n, k,kk,i, ounit, iunit
+   integer                       :: n, k,kk,i, ounit
    integer                       :: sound_num_obs, num_obs, ios
    character(len=filename_len), allocatable     :: filename(:)
    character(len=filename_len)                  :: ob_name, file_prefix  

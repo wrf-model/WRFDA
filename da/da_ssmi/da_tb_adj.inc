@@ -1,5 +1,5 @@
 subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
-                  tbv,tbh,                                                  &
+!                  tbv,tbh,                                                  &
                   ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,                   &
                   ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld,ADJ_tbv,ADJ_tbh            )
 
@@ -17,7 +17,7 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    real   , intent(inout) :: ADJ_p0,ADJ_ta,ADJ_gamma,ADJ_sst,ADJ_wv,     &
                              ADJ_hwv,ADJ_u,ADJ_alw,ADJ_zcld
    real   , intent(in   ) :: ADJ_tbv,ADJ_tbh 
-   real   , intent(in   ) :: tbv,tbh
+!   real   , intent(in   ) :: tbv,tbh
 
    real :: freq(4),ebiasv(4),ebiash(4),cf1(4),cf2(4),cg(4)
 

@@ -1,4 +1,9 @@
 module da_wrf_interfaces
+   
+   interface
+      subroutine disable_quilting
+      end subroutine disable_quilting
+   end interface 
 
    interface
       subroutine wrf_dm_bcast_real (buf, n1)

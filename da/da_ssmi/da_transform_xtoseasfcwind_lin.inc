@@ -9,7 +9,7 @@ subroutine da_transform_xtoseasfcwind_lin(xa, xb)
    type (x_type),  intent(inout) :: xa   ! model space analysis (local).
    type (xb_type), intent(in)    :: xb   ! first guess.
 
-   real :: const, rgh_faca, rgh_fac, height
+   real :: const, rgh_fac, height
    integer :: i, j, k
 
    if (trace_use) call da_trace_entry("da_transform_xtoseasfcwind_lin")

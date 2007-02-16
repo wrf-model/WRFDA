@@ -219,11 +219,11 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
    !------------------------------------------------------------------------------
    call da_write_obs(ob, iv, re)
 
-   call da_final_write_obs(ob, iv, re)
+   call da_final_write_obs(iv)
 
    call da_write_y(iv, y)
 
-   call da_final_write_y(iv, y)
+   call da_final_write_y(iv)
 
    if (trace_use) call da_trace_exit("da_write_diagnostics")
 
