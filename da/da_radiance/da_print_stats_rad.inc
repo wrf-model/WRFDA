@@ -20,7 +20,7 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
 
     used_nchan = 0
     do k=1, nchan                  !! loop for channels
-       if(rad%ichan(k)%num > 1) used_nchan = used_nchan + 1
+       if(rad%ichan(k)%num > 0) used_nchan = used_nchan + 1
     end do
     write(unit=stats_unit, fmt='((a,i5))')  ' used_nchan: ', used_nchan 
 
