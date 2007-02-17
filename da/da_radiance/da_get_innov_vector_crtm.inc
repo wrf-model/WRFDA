@@ -479,7 +479,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    !------------------------------------------------------------------------
  
    if (qc_rad) then
-      call da_qc_rad(ob, iv)
+      call da_qc_crtm(ob, iv)
    end if
 
    !------------------------------------------

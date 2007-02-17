@@ -201,6 +201,7 @@ contains
 #include "da_print_stats_rad.inc"
 #include "da_get_time_slots.inc"
 #include "da_qc_rad.inc"
+#include "da_qc_crtm.inc"
 #include "da_status_rad.inc"
 #include "da_get_julian_time.inc"
 

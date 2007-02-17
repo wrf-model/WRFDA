@@ -20,7 +20,8 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),nrej_omb_rms(nchan),      &
                 nrej_mixsurface,nrej_windowchanl, nrej_si,    &
-                nrej_clw,nrej_topo,num_rad, num_proc_domain
+                nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
+                nrej_limb
 
    character(len=30)  :: filename
 
@@ -36,6 +37,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    nrej_si         = 0
    nrej_clw        = 0
    nrej_topo       = 0
+   nrej_limb       = 0
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(i)
    ! num_rad        = iv%instid(i)%num_rad
@@ -77,8 +79,11 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          !    reject limb obs 
          !------------------------------------------------------
          scanpos = iv%instid(i)%scanpos(n)
-         if (scanpos <= 3 .or. scanpos >= 28) &
+         if (scanpos <= 3 .or. scanpos >= 28) then
             iv%instid(i)%tb_qc(:,n)  =  qc_bad
+            if (iv%instid(i)%proc_domain(n)) &
+                  nrej_limb = nrej_limb + 1
+         end if
 
          ! satzen  = rad%satzen
          ! if (abs(satzen) > 45.) iv%instid(i)%tb_qc(:,n)  =  qc_bad
@@ -201,6 +206,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    call da_proc_sum_int (nrej_si )
    call da_proc_sum_int (nrej_clw)
    call da_proc_sum_int (nrej_topo)
+   call da_proc_sum_int (nrej_limb)
    call da_proc_sum_ints (nrej_omb_abs(:))
    call da_proc_sum_ints (nrej_omb_std(:))
    call da_proc_sum_ints (nrej_omb_rms(:))
@@ -228,6 +234,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
       write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
       write(fgat_rad_unit,'(a20,i7)') ' nrej_clw         = ', nrej_clw
       write(fgat_rad_unit,'(a20,i7)') ' nrej_topo        = ', nrej_topo
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb
       write(fgat_rad_unit,'(a20)')    ' nrej_omb_abs(:)  = '
       write(fgat_rad_unit,'(10i7)')     nrej_omb_abs(:)
       write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
