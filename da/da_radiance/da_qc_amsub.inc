@@ -19,7 +19,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),nrej_omb_rms(nchan),      &
                 nrej_mixsurface,nrej_windowchanl, nrej_si,    &
-                nrej_clw,nrej_topo,num_rad
+                nrej_clw,nrej_topo,num_rad, num_proc_domain
 
    character(len=30)  :: filename
 
@@ -38,8 +38,13 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
                          iv%ob_numb(iv%current_ob_time-1)%radiance(i)
 
+   num_proc_domain = 0
+
    if (num_rad > 0) then
       do n= iv%ob_numb(iv%current_ob_time-1)%radiance(i)+1, iv%ob_numb(iv%current_ob_time)%radiance(i)
+
+         if (iv%instid(i)%proc_domain(n)) &
+               num_proc_domain = num_proc_domain + 1
 
          ! 0.0  initialise QC flags by assuming good obs
          !---------------------------------------------
@@ -163,7 +168,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
 
    ! Do inter-processor communication to gather statistics.
 
-   call da_proc_sum_int (num_rad)
+   call da_proc_sum_int (num_proc_domain)
    call da_proc_sum_int (nrej_mixsurface)
    call da_proc_sum_int (nrej_windowchanl)
    call da_proc_sum_int (nrej_si)
@@ -190,7 +195,7 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
 
       write(fgat_rad_unit, fmt='(/a/)') &
          'Quality Control Statistics for '//iv%instid(i)%rttovid_string
-      write(fgat_rad_unit,'(a20,i7)') ' num_rad          = ', num_rad
+      write(fgat_rad_unit,'(a20,i7)') ' num_proc_domain  = ', num_proc_domain
       write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
       write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
       write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
