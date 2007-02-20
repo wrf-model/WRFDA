@@ -73,14 +73,11 @@ subroutine da_write_kma_increments(xp, xb, xa)
 #endif
 
    if (rootproc) then
-
-#ifdef DM_PARALLEL
-
       ! 3d- and 2d-increments:
 
       call da_get_unit(anl_inc_unit)
       open(unit=anl_inc_unit,file="ANALYSIS_INCREMEMTS_KMA",status="replace")
-
+#ifdef DM_PARALLEL
       write(anl_inc_unit) &
       ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
       write(anl_inc_unit) &
@@ -106,11 +103,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
          (((q_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
       write(unit=stdout,fmt='(10e15.7)') &
          (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-
 #else
-
-      ! 3d- and 2d-increments:
-
       write(anl_inc_unit) &
          ((xa%psfc(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
       write(anl_inc_unit) &
