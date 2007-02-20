@@ -122,6 +122,12 @@ program gen_be_stage0_wrf
         "Usage: gen_be_stage0_wrf be_method date ne <wrf_file_stub> Stop"
       stop
    end if
+   
+   ! Initialise to stop false Cray compiler warnings
+   be_method=""
+   date=""
+   cne=""
+   filestub=""
 
    call getarg( 1, be_method )
    call getarg( 2, date )
@@ -1153,48 +1159,49 @@ end subroutine da_test_inverse2
         mi = iter
          chimx = 0.0
 
-
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+! JRB Crayx1 compiler does not like these, so comment out 
+! for the present
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO i = ids+1, ide-1
             DO j = jds+1, jde-1
                chimx(i) = MAX(ABS(chi(i,j)),chimx(i))
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          epx = MAXVAL(chimx) * SMALLRES * 4.0 / alpha
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO j = jds+1, jde-1
             DO i = ids+1, ide-1
                rd(i,j) = chi(i+1,j+1) + chi(i-1,j+1) + chi(i+1,j-1) + chi(i-1,j-1) - 4.0 * chi(i,j) - ff(i,j)
                chi(i,j) = chi(i,j) + rd(i,j) * alphaov4
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO j = jde-1, jds+1, -1
             DO i = ide-1, ids+1, -1
                rd(i,j) = chi(i+1,j+1) + chi(i-1,j+1) + chi(i+1,j-1) + chi(i-1,j-1) - 4.0 * chi(i,j) - ff(i,j)
                chi(i,j) = chi(i,j) + rd(i,j) * alphaov4
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          rdmax = 0.0
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO i = ids+1, ide-1
             DO j = jds+1, jde-1
                rdmax(i) = MAX(ABS(rd(i,j)),rdmax(i))
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          IF (MAXVAL(rdmax) .lt. epx) THEN
             converged = .TRUE.
@@ -1266,47 +1273,47 @@ end subroutine da_test_inverse2
          chimx = 0.0
 
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO i = ids+1, ide-1
             DO j = jds+1, jde-1
                chimx(i) = MAX(ABS(chi(i,j)),chimx(i))
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          epx = MAXVAL(chimx) * SMALLRES * 4.0 / alpha
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO j = jds+1, jde-1
             DO i = ids+1, ide-1
                rd(i,j) = chi(i+1,j+1) + chi(i-1,j+1) + chi(i+1,j-1) + chi(i-1,j-1) - 4.0 * chi(i,j) - ff(i,j)
                chi(i,j) = chi(i,j) + rd(i,j) * alphaov4
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO j = jde-1, jds+1, -1
             DO i = ide-1, ids+1, -1
                rd(i,j) = chi(i+1,j+1) + chi(i-1,j+1) + chi(i+1,j-1) + chi(i-1,j-1) - 4.0 * chi(i,j) - ff(i,j)
                chi(i,j) = chi(i,j) + rd(i,j) * alphaov4
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          rdmax = 0.0
 
-!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
-!csd$ parallel do private(i,j)
+!!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
+!!csd$ parallel do private(i,j)
          DO i = ids+1, ide-1
             DO j = jds+1, jde-1
                rdmax(i) = MAX(ABS(rd(i,j)),rdmax(i))
             END DO
          END DO
-!csd$ end parallel do
+!!csd$ end parallel do
 
          IF (MAXVAL(rdmax) .lt. epx) THEN
             converged = .TRUE.
