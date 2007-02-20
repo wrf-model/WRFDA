@@ -33,7 +33,7 @@ else
       export SUBMIT_OPTIONS7='# @ class            = share'
       export SUBMIT_OPTIONS8='# @ node_usage       = shared'
    else
-      which qsub >/dev/null 2>&1
+      which qsub | grep -vEe '^no' >/dev/null 2>&1
       # could be SGE of course, so need better way to check
       if test $? = 0; then
          export SUBMIT=PBS
