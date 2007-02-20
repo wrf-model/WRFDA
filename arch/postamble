@@ -38,7 +38,8 @@ WRFPLUS_LIB = -L. $(NETCDF_LIB) -lwrflib -lwrfplus \
                  $(MPI_LIB)
 
 GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK5_LIB) \
-                 $(LOCAL_LIB)
+              $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+              $(LOCAL_GEN_BE_LIB)
                   
 
 # compile these simply (no debug or optimisation) to speed compile

@@ -86,6 +86,11 @@ program gen_be_ep2
       stop
    end if
 
+   ! Initialse to stop Cray compiler complaining
+   data=""
+   cne=""
+   filestub=""
+
    call getarg( 1, date )
    call getarg( 2, cne )
    read(cne,'(i3)')ne

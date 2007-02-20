@@ -1587,8 +1587,9 @@ FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
                      -p$(RTTOV_INC) -p$(CRTM_INC)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
-
+# Cray linker very fussy about availablity of modules, so give it a very wide scope
 LOCAL_LIB       = 
+LOCAL_GEN_BE_LIB = -lwrfvar 
 
 arch : 
 	$(LN) $(RSL_STUBS)/* .

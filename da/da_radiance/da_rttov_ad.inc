@@ -12,7 +12,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 
    integer             ,  intent (in) :: inst, nchanl, nprofiles
    type (con_vars_type),  intent (in) :: con_vars (nprofiles)
-   type (con_vars_type),  intent (out) :: con_vars_ad (nprofiles)
+   type (con_vars_type),  intent (inout) :: con_vars_ad (nprofiles)
    type (aux_vars_type),  intent (in) :: aux_vars (nprofiles)
    real                ,  intent (in) :: tb(nchanl,nprofiles)
 
@@ -246,66 +246,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
          end if
       end do
    end if
-
-goto 100
-       write (0,*) 'sum((errorstatus(:))   = ', sum(errorstatus(:))
-       write (0,*) 'nfrequencies           = ', nfrequencies
-       write (0,*) 'nchannels              = ', nchannels
-       write (0,*) 'nbtout                 = ', nbtout
-       write (0,*) 'nprofiles              = ', nprofiles
-       write (0,*) 'sum(channels)          = ', sum(channels)
-       write (0,*) 'sum(polarisations)     = ', sum(polarisations)
-       write (0,*) 'sum(lprofiles)         = ', sum(lprofiles)
-       write (0,*) 'addcloud               = ', addcloud
-       write (0,*) 'switchrad              = ', switchrad
-!       write (0,*) 'calcemis               = ', calcemis
-       write (0,*) 'profiles%s2m           = ', profiles(1)%s2m
-       write (0,*) 'profiles%skin          = ', profiles(1)%skin
-       write (0,*) 'profiles%zenangle      = ', profiles(1)%zenangle
-       write (0,*) 'profiles%azangle       = ', profiles(1)%azangle
-       write (0,*) 'profiles%p             = ', profiles(1)%p
-       write (0,*) 'profiles%t             = ', profiles(1)%t
-       write (0,*) 'profiles%q             = ', profiles(1)%q
-       write (0,*) 'profiles%o3            = ', profiles(1)%o3
-       write (0,*) 'profiles%co2           = ', profiles(1)%co2
-       write (0,*) 'profiles%clw           = ', profiles(1)%clw
-       write (0,*) 'sum(emissivity)        = ', sum(emissivity)
-       write (0,*) 'sum(radiance)          = ', sum(radiance%out_clear)
-       write (0,*) 'profiles_ad%s2m        = ', profiles_ad(1)%s2m
-       write (0,*) 'profiles_ad%skin       = ', profiles_ad(1)%skin
-       write (0,*) 'profiles_ad%zenangle   = ', profiles_ad(1)%zenangle
-       write (0,*) 'profiles_ad%azangle    = ', profiles_ad(1)%azangle
-       write (0,*) 'profiles_ad%p          = ', profiles_ad(1)%p
-       write (0,*) 'profiles_ad%t          = ', profiles_ad(1)%t
-       write (0,*) 'profiles_ad%q          = ', profiles_ad(1)%q
-       write (0,*) 'profiles_ad%o3         = ', profiles_ad(1)%o3
-       write (0,*) 'profiles_ad%co2        = ', profiles_ad(1)%co2
-       write (0,*) 'profiles_ad%clw        = ', profiles_ad(1)%clw
-       write (0,*) 'sum(emissivity_ad)     = ', sum(emissivity_ad)
-       write (0,*) 'sum(radiance_ad)       = ', sum(radiance_ad%out_clear)
-       write (0,*) 'profiles%s2m           = ', profiles(nprofiles)%s2m
-       write (0,*) 'profiles%skin          = ', profiles(nprofiles)%skin
-       write (0,*) 'profiles%zenangle      = ', profiles(nprofiles)%zenangle
-       write (0,*) 'profiles%azangle       = ', profiles(nprofiles)%azangle
-       write (0,*) 'profiles%p             = ', profiles(nprofiles)%p
-       write (0,*) 'profiles%t             = ', profiles(nprofiles)%t
-       write (0,*) 'profiles%q             = ', profiles(nprofiles)%q
-       write (0,*) 'profiles%o3            = ', profiles(nprofiles)%o3
-       write (0,*) 'profiles%co2           = ', profiles(nprofiles)%co2
-       write (0,*) 'profiles%clw           = ', profiles(nprofiles)%clw
-       write (0,*) 'sum(emissivity)        = ', sum(emissivity)
-       write (0,*) 'sum(radiance)          = ', sum(radiance%out_clear)
-       write (0,*) 'profiles_ad%s2m        = ', profiles_ad(nprofiles)%s2m
-       write (0,*) 'profiles_ad%skin       = ', profiles_ad(nprofiles)%skin
-       write (0,*) 'profiles_ad%zenangle   = ', profiles_ad(nprofiles)%zenangle
-       write (0,*) 'profiles_ad%azangle    = ', profiles_ad(nprofiles)%azangle
-       write (0,*) 'profiles_ad%p          = ', profiles_ad(nprofiles)%p
-       write (0,*) 'profiles_ad%t          = ', profiles_ad(nprofiles)%t
-       write (0,*) 'profiles_ad%q          = ', profiles_ad(nprofiles)%q
-       write (0,*) 'profiles_ad%o3         = ', profiles_ad(nprofiles)%o3
-       write (0,*) 'profiles_ad%co2        = ', profiles_ad(nprofiles)%co2
-       write (0,*) 'profiles_ad%clw        = ', profiles_ad(nprofiles)%clw
-100 continue
 
    call rttov_ad( & 
       & errorstatus,     &! out
