@@ -23,12 +23,6 @@ subroutine da_write_filtered_rad(ob, iv)
       if (iv%instid(i)%num_rad < 1) cycle
 
 #ifdef DM_PARALLEL
-      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', iv%instid(i)%num_rad
-#else
-      write(unit=stdout,fmt='(a,i7)') 'number of obs ', iv%instid(i)%num_rad
-#endif
-
-#ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') &
          'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin_', myproc
 #else

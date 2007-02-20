@@ -73,7 +73,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  data hdr1b /'FOVN YEAR MNTH DAYS HOUR MINU SECO CLAT CLON SAZA SOZA HOLS LSQL SLNM BEARAZ'/
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
-   integer :: num_tovs_local, num_tovs_global, num_tovs_file, num_tovs_region
+   integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_used
    integer :: lnbufr
    integer :: n
 
@@ -175,10 +175,10 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    nullify  ( head % next )
    p => head
 
+   num_tovs_local  = 0
+   num_tovs_file   = 0
    num_tovs_global = 0
-   num_tovs_local = 0
-   num_tovs_file  = 0
-   num_tovs_region  = 0
+   num_tovs_used = 0
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -209,18 +209,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          call da_ll_to_xy (info, loc, xp, outside, outside_all)
 
          if (outside_all) cycle
-
-         num_tovs_region = num_tovs_region + 1
-
-         if (num_tovs_region < tovs_start) then
-            cycle
-         end if
-
-         if (num_tovs_region > tovs_end) then
-            write (unit=stdout,fmt='(A,I6)') "   Skipping radiance obs after", tovs_end
-            exit obs
-         end if
-
 
          !  3.0     Extract other information
          !------------------------------------------------------
@@ -279,12 +267,24 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          end do
          if (inst == 0) cycle
 
-         num_tovs_global = num_tovs_global+1
-         if (num_tovs_global > max_tovs_input) then
+         num_tovs_global = num_tovs_global + 1
+
+         if (num_tovs_global < tovs_start) then
+            cycle
+         end if
+
+         if (num_tovs_global > tovs_end) then
+            write (unit=stdout,fmt='(A,I6)') "   Skipping radiance obs after", tovs_end
+            exit obs
+         end if
+
+         num_tovs_used = num_tovs_used + 1
+
+         if (num_tovs_used > max_tovs_input) then
             write(unit=message(1),fmt='(A,I6,A)') &
                "Max number of tovs",max_tovs_input," reached"
             call da_warning(__FILE__,__LINE__,message(1:1))
-            num_tovs_global = num_tovs_global-1
+            num_tovs_used = num_tovs_used-1
             exit obs
          end if
          if (outside) cycle ! No good for this PE
@@ -348,9 +348,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       end do
    end do obs
 
-   iv%total_obs         = iv%total_obs + num_tovs_global
-   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_global
-   iv%total_rad_channel = iv%total_rad_channel + num_tovs_global*nchan
+   iv%total_obs         = iv%total_obs + num_tovs_used
+   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
+   iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
 
    deallocate(tb_inv)  
    call closbf(lnbufr)

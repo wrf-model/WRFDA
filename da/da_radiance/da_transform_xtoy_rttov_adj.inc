@@ -243,9 +243,10 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
             end if
          end do
 #endif
-
-         call da_rttov_ad (i, nchan, d_num_rad, d_con_vars, &
-            d_aux_vars, d_con_vars_ad, d_tb)
+do n=1,d_num_rad
+         call da_rttov_ad (i, nchan, 1, d_con_vars(n:n), &
+            d_aux_vars(n:n), d_con_vars_ad(n:n), d_tb(:,n:n))
+end do
 
          ! Transfer data back
 

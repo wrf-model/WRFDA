@@ -32,11 +32,6 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
             ndomain = ndomain + 1
          end if
       end do
-#ifdef DM_PARALLEL
-      write(unit=stdout,fmt='(a,i3,a,i7)') 'number of obs in proc # ', myproc,' : ', ndomain
-#else
-      write(unit=stdout,fmt='(a,i7)') 'number of obs ', ndomain
-#endif
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.inv_', myproc

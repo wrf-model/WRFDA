@@ -37,6 +37,8 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
    real   , allocatable :: zasat(:), zlsat(:)
 
+real,allocatable :: fuckit(:)
+
    type(con_vars_type),  allocatable :: con_vars(:)
    type(aux_vars_type),  allocatable :: aux_vars(:)
 
@@ -411,15 +413,15 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
       zasat(n1:n2) = iv%instid(inst)%satzen(n1:n2) * deg2rad
       zlsat(n1:n2) = iv%instid(inst)%satazi(n1:n2) * deg2rad
 
-      do i = n1,n2
-         knchan(i) = nchan
-         do kn=1,nchan 
-            kprof((i-1)*nchan+kn)  = i
-            kchan((i-1)*nchan+kn)  = kn
-            kochan((i-1)*nchan+kn) = kn
-            indexn(kn,i) = (-1)*nchan+kn 
-         end do
-      end do
+!      do i = n1,n2
+!         knchan(i) = nchan
+!         do kn=1,nchan 
+!            kprof((i-1)*nchan+kn)  = i
+!            kchan((i-1)*nchan+kn)  = kn
+!            kochan((i-1)*nchan+kn) = kn
+!            indexn(kn,i) = (-1)*nchan+kn 
+!         end do
+!      end do
 
       pemsv(:)    = 0.0
       pemsh(:)    = 0.0
@@ -435,27 +437,36 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
          polar(1:5) = 0.0
       end if
 
+      do n=n1,n2
+         knchan(n) = nchan
+         do kn=1,nchan 
+            kprof((n-1)*nchan+kn)  = n
+            kchan((n-1)*nchan+kn)  = kn
+            kochan((n-1)*nchan+kn) = kn
+            indexn(kn,n) = (n-1)*nchan+kn 
+         end do
+      end do
+
       if (coefs(inst)%id_sensor == 2) then ! microwave
          call da_trace("da_get_innov_vector_rttov",message="Calling gsi_emiss")
          call gsi_emiss(inst,knchpf,kprof,kchan,knchan,indexn, &
-              iv%instid(inst)%satzen(n1:n2) * deg2rad, &
-              iv%instid(inst)%satazi(n1:n2) * deg2rad, polar, &
-              iv%instid(inst)%isflg(n1:n2),pemsv,pemsh,pems5, &
-              iv%instid(inst)%ts(n1:n2), &
-              iv%instid(inst)%soiltyp(n1:n2), &
-              iv%instid(inst)%tslb(n1:n2), &
-              iv%instid(inst)%smois(n1:n2), &
-              iv%instid(inst)%vegtyp(n1:n2), &
-              iv%instid(inst)%vegfra(n1:n2), &
-              iv%instid(inst)%snowh(n1:n2), &
-              sensor_type,n1n2,nchan, &
-              iv%instid(inst)%tb_inv(:,n1:n2),amsua,amsub,ssmi, &
-              iv%instid(inst)%u10(n1:n2), &
-              iv%instid(inst)%v10(n1:n2))
+              iv%instid(inst)%satzen * deg2rad, &
+              iv%instid(inst)%satazi * deg2rad, polar, &
+              iv%instid(inst)%isflg,pemsv,pemsh,pems5, &
+              iv%instid(inst)%ts, &
+              iv%instid(inst)%soiltyp, &
+              iv%instid(inst)%tslb, &
+              iv%instid(inst)%smois, &
+              iv%instid(inst)%vegtyp, &
+              iv%instid(inst)%vegfra, &
+              iv%instid(inst)%snowh, &
+              sensor_type,1,nchan, &
+              iv%instid(inst)%tb_inv(:,:),amsua,amsub,ssmi, &
+              iv%instid(inst)%u10, &
+              iv%instid(inst)%v10)
       end if
 
       do n=n1,n2
-
          con_vars(n) % nlevels = nlevels 
          allocate (con_vars(n) % t(nlevels))
          allocate (con_vars(n) % q(nlevels))
@@ -477,12 +488,20 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
 
          ! da_rttov_direct nominally an array version, but doesn't handle arrays
          ! of surface flags properly
-      end do
-
-      call da_rttov_direct (inst, iv%instid(inst)%isflg(n1:n2), nchan, n1n2, &
-         con_vars(n1:n2), aux_vars(n1:n2), &
-         iv%instid(inst)%tb_xb(:,n1:n2), pemsv, pemsh, &
-         iv%instid(inst)%emiss(:,n1:n2))
+allocate(fuckit(nchan))
+      call da_rttov_direct (inst, iv%instid(inst)%isflg(n), nchan, 1, &
+         con_vars(n:n), aux_vars(n:n), &
+!         iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
+         fuckit(:), pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
+         iv%instid(inst)%emiss(:,n))
+iv%instid(inst)%tb_xb(:,n)=fuckit(:)
+deallocate(fuckit)
+   do k=1,nchan
+!      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
+!         write (0,*) "n,k,tb,xb",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n)
+!      end if
+   end do
+end do
 
       if (iv%instid(inst)%nchannels > nchan) then
          iv%instid(inst)%emiss(nchan+1:iv%instid(inst)%nchannels,n1:n2) = 0.0
@@ -509,6 +528,13 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
       elsewhere
          iv%instid(inst)%tb_inv(1:nchan,n1:n2)   = missing_r
       endwhere
+!do n=n1,n2
+!   do k=1,nchan
+!      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
+!         write (0,*) "n,k,tb,xb,inv",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n),iv%instid(inst)%tb_inv(k,n)
+!      end if
+!   end do
+!end do
 
       !----------------------------------------------------------------
       ! [3.0] Apply Bias Correction 
