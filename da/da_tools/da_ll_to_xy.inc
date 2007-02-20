@@ -41,11 +41,15 @@ subroutine da_ll_to_xy (info, loc, xp, &
          if ((int(loc%x) < xp%ids) .or. (int(loc%x) >= xp%ide) .or. &
             (int(loc%y) < xp%jds) .or. (int(loc%y) >= xp%jde)) then
             outside_all = .true. 
+            outside = .true. 
+            return
          end if
          if (def_sub_domain) then
             if (x_start_sub_domain > loc%x .or. y_start_sub_domain > loc%y .or. &
                 x_end_sub_domain   < loc%x .or. y_end_sub_domain   < loc%y) then
                outside_all = .true.
+            outside = .true. 
+            return
             end if
          end if
       end if
