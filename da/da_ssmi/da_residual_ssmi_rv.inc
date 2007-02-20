@@ -10,7 +10,7 @@ subroutine da_residual_ssmi_rv(oi, y, re, &
 
    type (ob_type), intent(in)        :: oi     ! Obs increment vector (O-B).
    type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(out)       :: re     ! Residual structure.
+   type (y_type) , intent(inout)     :: re     ! Residual structure.
 
    integer       , intent(inout)     :: np_available, np_obs_used,          &
                                         np_missing  , np_bad_data

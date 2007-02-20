@@ -7,12 +7,12 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    implicit none
 
-   integer, intent(in)                   :: ks, ke
-   integer, intent(out)                   :: layer
-   real, dimension(ks-1:ke+1), intent(in)  :: pre_ma, tv_ma
-   real, dimension(ks-1:ke+1), intent(out)  :: ADJ_pre_ma, ADJ_tv_ma
-   real, intent(in)                      :: pre, tv
-   real, intent(inout)                      :: ADJ_tv
+   integer, intent(in)                       :: ks, ke
+   integer, intent(out)                      :: layer
+   real, dimension(ks-1:ke+1), intent(in)    :: pre_ma, tv_ma
+   real, dimension(ks-1:ke+1), intent(inout) :: ADJ_pre_ma, ADJ_tv_ma
+   real, intent(in)                          :: pre, tv
+   real, intent(inout)                       :: ADJ_tv
 
    integer                   :: k
    real                      :: alpha, coef1, coef2

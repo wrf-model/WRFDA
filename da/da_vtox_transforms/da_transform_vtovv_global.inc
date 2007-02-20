@@ -10,7 +10,7 @@ subroutine da_transform_vtovv_global (cv_size, xbx, be, cv, vv)
    type (xbx_type),intent(in)   :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)   :: be   ! background errors.
    real, intent(in)             :: cv(1:cv_size)   ! control variables.
-   type (vp_type),intent(out)   :: vv   ! grdipt/eof cv (local).
+   type (vp_type),intent(inout) :: vv   ! grdipt/eof cv (local).
 
    integer                      :: k, m ! Loop counters.
    integer                      :: cv_s ! Counter.

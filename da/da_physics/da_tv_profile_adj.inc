@@ -15,7 +15,7 @@ subroutine da_tv_profile_adj(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,    &
    real, intent(in)                           :: dy, dym   ! interpolation weights.
 
    real, dimension(xp%kts-1:xp%kte+1), intent(in)    :: pre_ma,tv_ma
-   real, dimension(xp%kts-1:xp%kte+1), intent(out)    :: ADJ_pre_ma,ADJ_tv_ma
+   real, dimension(xp%kts-1:xp%kte+1), intent(inout) :: ADJ_pre_ma,ADJ_tv_ma
 
    integer                        :: ii,jj,ks,ke
    real, dimension(2,2,xp%kts:xp%kte)    :: ADJ_tv_m

@@ -7,15 +7,15 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
 
    implicit none
 
-   integer,intent(in)                     :: ks, ke
-   integer,intent(out)                    :: layer
-   real, dimension(ks-1:ke+1),intent(in)  :: tv_ma
-   real, dimension(ks-1:ke+1),intent(out) :: pre_ma
-   real, dimension(ks-1:ke+1),intent(in)  :: TGL_tv_ma
-   real, dimension(ks-1:ke+1),intent(out) :: TGL_pre_ma
-   real,intent(in)                        :: pre
-   real,intent(out)                       :: tv
-   real,intent(out)                       :: TGL_tv
+   integer,intent(in)                       :: ks, ke
+   integer,intent(out)                      :: layer
+   real, dimension(ks-1:ke+1),intent(in)    :: tv_ma
+   real, dimension(ks-1:ke+1),intent(inout) :: pre_ma
+   real, dimension(ks-1:ke+1),intent(in)    :: TGL_tv_ma
+   real, dimension(ks-1:ke+1),intent(inout) :: TGL_pre_ma
+   real,intent(in)                          :: pre
+   real,intent(out)                         :: tv
+   real,intent(out)                         :: TGL_tv
 
    real                      :: TGL_alpha
    integer                   :: k

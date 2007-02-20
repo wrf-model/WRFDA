@@ -13,7 +13,7 @@ subroutine da_w_adjustment_lin(xb,W_a,WZ_a)
    integer :: I,J,K
 
    real, dimension(ims:ime,jms:jme,kms:kme), intent(out) :: W_a
-   real, dimension(ims:ime,jms:jme,kms:kme), intent(out) :: WZ_a
+   real, dimension(ims:ime,jms:jme,kms:kme), intent(inout) :: WZ_a
 
    real, dimension(ims:ime,jms:jme,kms:kme) :: WZ_b
 

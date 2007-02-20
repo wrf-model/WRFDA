@@ -9,7 +9,7 @@ subroutine da_setup_testfield(xb, xa, xp)
    implicit none
 
    type (xb_type),    intent(in)  :: xb  ! first guess (local).
-   type (x_type) ,    intent(out) :: xa  ! gridded analy. incs. (local)
+   type (x_type) ,    intent(inout) :: xa  ! gridded analy. incs. (local)
    type (xpose_type), intent(in)  :: xp  ! Transpose variables.
 
    integer :: i, j

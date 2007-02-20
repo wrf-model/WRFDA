@@ -10,12 +10,12 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
  
    implicit none
 
-   integer, intent(in)                     :: ks, ke
-   integer, intent(inout)                  :: layer
-   real, dimension(ks-1:ke+1), intent(out) :: pre_ma
-   real, dimension(ks-1:ke+1), intent(in)  :: tv_ma
-   real, intent(in)                        :: pre
-   real, intent(inout)                     :: tv
+   integer, intent(in)    :: ks, ke
+   integer, intent(inout) :: layer
+   real, intent(inout)    :: pre_ma(ks-1:ke+1)
+   real, intent(in)       :: tv_ma(ks-1:ke+1)
+   real, intent(in)       :: pre
+   real, intent(inout)    :: tv
 
    integer                     :: k
    real                     :: alpha

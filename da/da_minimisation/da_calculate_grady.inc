@@ -8,7 +8,7 @@ subroutine da_calculate_grady(iv, re, jo_grad_y)
 
    type (ob_type), intent(in)    :: iv          ! Innovation vector (O-B).
    type (y_type),  intent(inout) :: re          ! Residual vector (O-A).
-   type (y_type),  intent(out)   :: jo_grad_y   ! Grad_y(Jo)
+   type (y_type),  intent(inout) :: jo_grad_y   ! Grad_y(Jo)
 
    if (trace_use) call da_trace_entry("da_calculate_grady")
 

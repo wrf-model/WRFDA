@@ -13,7 +13,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    type (ep_type), intent(in)           :: ep   ! Ensemble perturbations.
    real, intent(in)                     :: cv(1:cv_size)   ! control variables.
    type (vp_type),intent(out)           :: vv   ! grdipt/eof cv (local).
-   type (vp_type),intent(out)           :: vp   ! grdipt/level cv (local).
+   type (vp_type),intent(inout)         :: vp   ! grdipt/level cv (local).
    type (xpose_type), intent(inout)     :: xp   ! Dimensions and xpose buffers. 
    type (x_type), intent(out)           :: xa   ! model space analysis (local).
 
