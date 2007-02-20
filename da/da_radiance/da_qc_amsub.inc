@@ -188,9 +188,9 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
 
    if (rootproc) then
       if (num_fgat_time > 1) then
-         write(filename,'(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.QCSTAT',iv%current_ob_time
+         write(filename,'(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.qcstat',iv%current_ob_time
       else
-         filename = trim(iv%instid(i)%rttovid_string)//'.QCSTAT'
+         filename = trim(iv%instid(i)%rttovid_string)//'.qcstat'
       end if
       call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
