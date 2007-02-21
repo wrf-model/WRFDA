@@ -173,23 +173,23 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
 
       d_num_rad=num_tovs_after(i,myproc+1)
 
-      allocate (d_con_vars(d_num_rad))
-      allocate (d_con_vars_tl(d_num_rad))
-      allocate (d_aux_vars(d_num_rad))
-      allocate (d_aux_vars_tl(d_num_rad))
-      allocate (d_tb(nchan,d_num_rad))
-
       if (d_num_rad > 0) then
+         allocate (d_con_vars(d_num_rad))
+         allocate (d_con_vars_tl(d_num_rad))
+         allocate (d_aux_vars(d_num_rad))
+         allocate (d_aux_vars_tl(d_num_rad))
+         allocate (d_tb(nchan,d_num_rad))
+
          d_con_vars(:) % nlevels = nlevels
+
+         do n = 1, d_num_rad
+            allocate (d_con_vars(n) % t(nlevels))
+            allocate (d_con_vars(n) % q(nlevels))
+
+            allocate (d_con_vars_tl(n) % t(nlevels))
+            allocate (d_con_vars_tl(n) % q(nlevels))
+         end do
       end if
-
-      do n = 1, d_num_rad
-         allocate (d_con_vars(n) % t(nlevels))
-         allocate (d_con_vars(n) % q(nlevels))
-
-         allocate (d_con_vars_tl(n) % t(nlevels))
-         allocate (d_con_vars_tl(n) % q(nlevels))
-      end do
 
       ! Fill up with data that stays local
       l_num_rad=Min(num_rad,d_num_rad)
@@ -410,18 +410,21 @@ end do
          end if
       end do
 #endif
-      do n=1,d_num_rad
-         deallocate (d_con_vars(n) % t)
-         deallocate (d_con_vars(n) % q)
-         deallocate (d_con_vars_tl(n) % t)
-         deallocate (d_con_vars_tl(n) % q)
-      end do
 
-      deallocate (d_tb)
-      deallocate (d_con_vars)
-      deallocate (d_aux_vars)
-      deallocate (d_aux_vars_tl)
-      deallocate (d_con_vars_tl)
+      if (d_num_rad > 0) then
+         do n=1,d_num_rad
+            deallocate (d_con_vars(n) % t)
+            deallocate (d_con_vars(n) % q)
+            deallocate (d_con_vars_tl(n) % t)
+            deallocate (d_con_vars_tl(n) % q)
+         end do
+
+         deallocate (d_tb)
+         deallocate (d_con_vars)
+         deallocate (d_aux_vars)
+         deallocate (d_aux_vars_tl)
+         deallocate (d_con_vars_tl)
+      end if
 
       !-------------------------------------------------------------------
       ! [2.0] assign Hdx :
