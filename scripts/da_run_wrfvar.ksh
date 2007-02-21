@@ -75,7 +75,6 @@ export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
-export NL_JCDFI_ONOFF=$NL_JCDFI_USE
 
 #=======================================================
 
