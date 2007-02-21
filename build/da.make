@@ -183,7 +183,8 @@ utils : da_utils
 da_utils : da_diagnostics \
            da_ominusb \
            da_tune \
-           da_update_bc
+           da_update_bc \
+           da_bufr_little_endian
 
 da_plots : da_scale_length
            
@@ -211,6 +212,15 @@ da_update_bc.exe : da_update_bc.o
 	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
+
+da_bufr_little_endian : da_bufr_little_endian.o
+	$(RM) $@
+	$(FFC) -o da_bufr_little_endian.exe da_bufr_little_endian.o $(BUFR_LIB)
+
+da_bufr_little_endian.o :
+	$(CPP) $(CPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
+	$(FFC) -c $(FIXEDFLAGS_ENDIAN) da_bufr_little_endian.f
+
 
 # Special cases, either needing special include files or too big to 
 # optimise/debug

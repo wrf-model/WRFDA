@@ -3,5 +3,5 @@
 # Argument is input big endian BUFR file
 # Output to little endian BUFR, for PC Linux etc
 
-./bufr_little_endian.exe $1 ${1}.little_endian
+../build/da_bufr_little_endian.exe $1 ${1}.little_endian
 

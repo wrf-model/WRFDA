@@ -1,4 +1,4 @@
-      program bufr_little_endian
+      program da_bufr_little_endian
 C$$$  MAIN PROGRAM DOCUMENTATION BLOCK
 C
 C MAIN PROGRAM:  grabbufr
