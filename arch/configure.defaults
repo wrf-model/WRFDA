@@ -1639,13 +1639,13 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch :
-        $(LN) $(RSL)/*.c .
-        $(LN) $(RSL)/*.F .
-        ( cd $(RSL)/RSL ; \
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST crayx1 )
-        @ touch arch
+	@ touch arch
 
 arch_clean :
 	( cd $(RSL)/RSL; make clean )
