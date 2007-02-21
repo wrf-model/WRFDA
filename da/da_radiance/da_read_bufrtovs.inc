@@ -148,14 +148,10 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    call datelen(10)
    call readmg(lnbufr,subset,idate,iret)
    if (subset /= subfgn) then
-      message(1)='The file title not match data subset'
+      message(1)='The file title does not match the data subset'
       write(unit=message(2),fmt=*) &
          'infile=', lnbufr, infile,' subset=', subset, ' subfgn=',subfgn
-      message(3)='Skip processing of this 1b file'
-      call da_warning(__FILE__,__LINE__,message(1:3))
-      call closbf(lnbufr)
-      call da_trace_exit("da_read_bufrtovs")
-      return
+      call da_error(__FILE__,__LINE__,message(1:2))
    end if
 
    iy=0
