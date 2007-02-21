@@ -36,7 +36,7 @@ subroutine da_read_filtered_rad( xp, iv )
       call da_get_unit(filtered_rad_unit)
       open(unit=filtered_rad_unit,file=trim(filename),form='unformatted',status='old',iostat=ios)
       if (ios /= 0) then
-         write(unit=stdout,fmt=*) 'Can not open filtered radiance file ', filename
+         write(unit=stdout,fmt=*) 'Cannot open filtered radiance file ', filename
          iv%instid(i)%num_rad = 0
          cycle
       end if

@@ -55,7 +55,7 @@ subroutine da_med_initialdata_input (grid, config_flags, filename, in_date)
       end do
 
       if (nsave < 0) then
-         call da_error(__FILE__,__LINE__,(/"Can not find the needed time"/))
+         call da_error(__FILE__,__LINE__,(/"Cannot find the needed time"/))
       end if
    else
       ! Set start_date to current_date.
