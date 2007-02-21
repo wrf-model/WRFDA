@@ -1,4 +1,10 @@
       program da_bufr_little_endian
+
+#ifdef crayx1
+#define iargc ipxfargc
+      external getarg
+#endif
+
 C$$$  MAIN PROGRAM DOCUMENTATION BLOCK
 C
 C MAIN PROGRAM:  grabbufr
@@ -55,7 +61,7 @@ C$$$
 C
 C  GET Filename ARGUMENTS
 C
-      NARG=IARGC()
+      NARG=iargc()
       IF(NARG.NE.2) THEN
         PRINT *,'grabbufr:  Incorrect usage'
         PRINT *,'Usage: grabbufr inputBUFRfile ouputBUFRfile'
@@ -68,6 +74,9 @@ C
 C
 C  Use STAT function to get size of input BUFR file
 C
+#ifdef crayx1
+      stop "no STAT function available on crayx1"
+#else
       IF (STAT(infile,JSTAT).NE.0) THEN
          PRINT *,'ERROR IN FUNCTION STAT GETTING FILE STATS'
          CALL EXIT(99)
@@ -76,6 +85,7 @@ c        KBYTES = JSTAT(8)
          KBYTES = JSTAT(12)
          PRINT *,'NUMBER OF BYTES IN INPUT BUFR FILE   = ',KBYTES
       ENDIF
+#endif
 C
 C  Allocate array cbuf to store input file in memory.
 C
@@ -370,12 +380,24 @@ C-----------------------------------------------------------------------
  
       IBIT = NOFF
       CALL PKB(IUNPKD,NBITS,IPACKD,IBIT)
- 
-      RETURN
+
       END
 
       SUBROUTINE wrf_abort
         STOP
       END SUBROUTINE wrf_abort
+
+#ifdef crayx1
+
+      subroutine getarg(i, harg)
+         implicit none
+         character(len=*) :: harg
+         integer :: ierr, ilen, i
+
+         call pxfgetarg(i, harg, ilen, ierr)
+      end subroutine getarg
+#endif
+ 
+
 
 

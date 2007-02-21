@@ -217,8 +217,8 @@ da_bufr_little_endian : da_bufr_little_endian.o
 	$(RM) $@
 	$(FFC) -o da_bufr_little_endian.exe da_bufr_little_endian.o $(BUFR_LIB)
 
-da_bufr_little_endian.o :
-	$(CPP) $(CPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
+da_bufr_little_endian.o : da_bufr_little_endian.f90
+	$(CPP) $(CPPFLAGS) $(FPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
 	$(FFC) -c $(FIXEDFLAGS_ENDIAN) da_bufr_little_endian.f
 
 
