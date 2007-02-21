@@ -92,7 +92,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
                xa%p(i,j,k)=0.5*(p(k)+p(k+1))
             end do
-         else if (fg_format == fg_format_kma) then
+         else if (fg_format == fg_format_kma_global) then
             do k=xb%kts,xb%kte
                if (k == xb%kte) then
                   coeff=xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)

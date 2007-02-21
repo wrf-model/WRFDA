@@ -35,7 +35,7 @@ subroutine da_transfer_xatoanalysis(it, xbx, grid, config_flags)
 
          call da_transfer_wrftoxb(xbx, grid)
       end if
-   else if (fg_format == fg_format_kma) then
+   else if (fg_format == fg_format_kma_global) then
       call da_transfer_xatokma(grid)
       if (it < max_ext_its) then
          call da_transfer_kmatoxb(xbx, grid)

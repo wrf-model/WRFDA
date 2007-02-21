@@ -52,7 +52,7 @@ subroutine da_setup_firstguess(xbx, grid)
       ! First guess is a WRF C-grid format file:
 
       call da_setup_firstguess_wrf(xbx, grid)
-   else if (fg_format == fg_format_kma) then
+   else if (fg_format == fg_format_kma_global) then
       ! First guess is an KMA format file:
       call da_setup_firstguess_kma(xbx, grid)
    end if
@@ -66,7 +66,7 @@ subroutine da_setup_firstguess(xbx, grid)
       grid%xb%coefx(is:ie,js:je) = 0.5 * grid%xb%map_factor(is:ie,js:je)/grid%xb%ds
       grid%xb%coefy(is:ie,js:je) = grid%xb%coefx(is:ie,js:je)
       grid%xb%coefz(is:ie,js:je) = 0.5 / (grid%xb%map_factor(is:ie,js:je)*grid%xb%ds)
-   else if (fg_format == fg_format_kma) then
+   else if (fg_format == fg_format_kma_global) then
       ! Calculate multiplicative constants for PsiChi_TO_UV 
       ddx =  earth_radius*1000 * 2.0 * pi / (grid%xb%ide-grid%xb%ids+1)
       ddy =  earth_radius*1000       * pi / (grid%xb%jde-grid%xb%jds)

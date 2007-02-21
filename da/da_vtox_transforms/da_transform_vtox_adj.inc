@@ -139,7 +139,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
                mr_a(k) = mr_a(k) + sdmd*xb%dnw(k)
                xa%q(i,j,k) = xa%q(i,j,k) + mr_a(k)/(1.0 - xb%q(i,j,k))**2
             end do
-         else if (fg_format == fg_format_kma)then
+         else if (fg_format == fg_format_kma_global)then
             do k=xb%kts,xb%kte
                if (k == xb%kte) then
                   coeff = xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)* &

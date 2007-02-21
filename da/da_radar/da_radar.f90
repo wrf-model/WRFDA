@@ -7,7 +7,7 @@ module da_radar
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, num_radar_tot,fails_error_max, &
       use_Radar_rv, use_Radar_rf,below_model_surface,mkz,above_model_lid,&
-      fg_format,fg_format_wrf,fg_format_kma,max_error_rv,max_error_rf, &
+      fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
       far_below_model_surface
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &

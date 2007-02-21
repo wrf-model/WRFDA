@@ -174,7 +174,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    character(len=*),parameter :: wrf_version    = "WRF V2.2"
 
    integer, parameter :: fg_format_wrf = 1
-   integer, parameter :: fg_format_kma = 3
+   integer, parameter :: fg_format_kma_global = 3
 
    integer, parameter :: ob_format_bufr = 1
    integer, parameter :: ob_format_ascii = 2

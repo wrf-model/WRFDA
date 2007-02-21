@@ -20,7 +20,7 @@ subroutine da_setup_pseudo_obs(xp, iv, ob)
    i = int(pseudo_x)
    j = int(pseudo_Y)
 
-   if (fg_format == fg_format_kma) then
+   if (fg_format == fg_format_kma_global) then
       if ((j < xp%jts-1) .or. (j > xp%jte)) outside = .true.
    else
 

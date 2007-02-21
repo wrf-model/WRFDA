@@ -41,7 +41,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b)
    if (.not.global .and. ite == ide ) ie = ide-1
    if (jts == jds ) js = jds+1; if (jte == jde ) je = jde-1
 
-   if( fg_format == fg_format_kma) then
+   if( fg_format == fg_format_kma_global) then
       coefx = xb%coefx
       coefy = xb%coefy
    else if( fg_format == fg_format_wrf) then

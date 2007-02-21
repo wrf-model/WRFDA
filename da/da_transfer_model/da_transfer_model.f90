@@ -16,7 +16,7 @@ module da_transfer_model
       coarse_jy, coarse_ix, cone_factor, delt_lon, delt_lat, gas_constant, &
       map_projection,earth_omega,mix,pi,phic,mkz,start_lon,start_lat, &
       start_x,xlonc,start_y,mjy, global, deg_to_rad, earth_radius, &
-      var4d,analysis_date,coarse_ds,analysis_accu,dsm,pole, fg_format_kma, &
+      var4d,analysis_date,coarse_ds,analysis_accu,dsm,pole, fg_format_kma_global, &
       print_detail_map,stdout,truelat1_3dv, fg_format_wrf, fg_format, ps0, &
       truelat2_3dv, periodic_x,write_increments,max_ext_its, gravity, &
       kappa, print_detail_xa,rd_over_rv,ts0, print_detail_xa, check_rh, &
