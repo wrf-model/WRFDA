@@ -36,9 +36,9 @@ else
       setenv SUBMIT_OPTIONS7 '# @ class            = share'
       setenv SUBMIT_OPTIONS8 '# @ node_usage       = shared'
    else
-      which qsub |& grep -vEe '^no' >& /dev/null
+      which qsub >& /dev/null
       # could be SGE of course, so might need better way to check
-      if ($status == 0) then
+      if ($? == 0) then
          setenv SUBMIT PBS
       else
          setenv SUBMIT none
@@ -147,9 +147,6 @@ endif
 echo
 if ($?PROCESSOR) then
    echo "PROCESSOR       " $PROCESSOR
-endif
-if ($?SUBMIT) then
-   echo "SUBMIT          " $SUBMIT
 endif
 if ($?RUN_CMD) then
    echo "RUN_CMD         " $RUN_CMD
