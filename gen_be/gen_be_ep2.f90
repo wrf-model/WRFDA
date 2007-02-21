@@ -87,7 +87,7 @@ program gen_be_ep2
    end if
 
    ! Initialse to stop Cray compiler complaining
-   data=""
+   date=""
    cne=""
    filestub=""
 
