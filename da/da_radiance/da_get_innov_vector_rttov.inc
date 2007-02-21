@@ -37,7 +37,7 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
    real   , allocatable :: zasat(:), zlsat(:)
 
-real,allocatable :: fuckit(:)
+real,allocatable :: temp(:)
 
    type(con_vars_type),  allocatable :: con_vars(:)
    type(aux_vars_type),  allocatable :: aux_vars(:)
@@ -460,7 +460,7 @@ real,allocatable :: fuckit(:)
               iv%instid(inst)%vegtyp, &
               iv%instid(inst)%vegfra, &
               iv%instid(inst)%snowh, &
-              sensor_type,1,nchan, &
+              sensor_type,n1n2,nchan, &
               iv%instid(inst)%tb_inv(:,:),amsua,amsub,ssmi, &
               iv%instid(inst)%u10, &
               iv%instid(inst)%v10)
@@ -488,14 +488,14 @@ real,allocatable :: fuckit(:)
 
          ! da_rttov_direct nominally an array version, but doesn't handle arrays
          ! of surface flags properly
-allocate(fuckit(nchan))
+allocate(temp(nchan))
       call da_rttov_direct (inst, iv%instid(inst)%isflg(n), nchan, 1, &
          con_vars(n:n), aux_vars(n:n), &
 !         iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
-         fuckit(:), pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
+         temp(:), pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
          iv%instid(inst)%emiss(:,n))
-iv%instid(inst)%tb_xb(:,n)=fuckit(:)
-deallocate(fuckit)
+iv%instid(inst)%tb_xb(:,n)=temp(:)
+deallocate(temp)
    do k=1,nchan
 !      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
 !         write (0,*) "n,k,tb,xb",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n)
