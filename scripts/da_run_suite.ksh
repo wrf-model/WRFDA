@@ -48,7 +48,7 @@
 #########################################################################
 
 #Decide which stages to run (run if true):
-export RUN_RESTORE_DATA_NCEP=${RUN_RESTORE_DATA_NCEP:-false}
+export RUN_RESTORE_DATA_GRIB=${RUN_RESTORE_DATA_GRIB:-false}
 export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}
 export RUN_WPS=${RUN_WPS:-false}
 export RUN_WRFSI=${RUN_WRFSI:-false}
@@ -96,8 +96,8 @@ export LONG_FCST_RANGE_4=${LONG_FCST_RANGE_4:-$CYCLE_PERIOD}
 export REL_DIR=${REL_DIR:-$HOME/trunk} 
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}        
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export MSS_NCEP_DIR=${MSS_NCEP_DIR:-mss:/DSS/DS083.2/data}
-export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     # NCEP dir
+export MSS_GRIB_DIR=${MSS_GRIB_DIR:-mss:/DSS/DS083.2/data}
+export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}     # GRIB data.
 export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
 export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs}     # Real-time observation directory.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
@@ -120,7 +120,8 @@ if test ! -d $EXP_DIR/run; then mkdir $EXP_DIR/run; fi
 #From WPS (namelist.wps):
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
-export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$NCEP_DIR}
+export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
+export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
@@ -221,7 +222,7 @@ echo "OBS_FREQ     $OBS_FREQ"
 echo "WINDOW_START $WINDOW_START"
 echo "WINDOW_END   $WINDOW_END"
 echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
-echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
+echo 'GRIB_DIR     <A HREF="file:'$GRIB_DIR'">'$GRIB_DIR'</a>'
 echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
@@ -245,12 +246,12 @@ while test $DATE -le $FINAL_DATE; do
    if test $HOUR = $LONG_FCST_TIME_3; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
    if test $HOUR = $LONG_FCST_TIME_4; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
 
-   if $RUN_RESTORE_DATA_NCEP; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_ncep
+   if $RUN_RESTORE_DATA_GRIB; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_grib
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_ncep $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_restore_data_ncep.ksh > $RUN_DIR/index.html 2>&1
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_grib $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_restore_data_grib.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if test $RC != 0; then
          echo `date` "${ERR}Failed with error$RC$END"

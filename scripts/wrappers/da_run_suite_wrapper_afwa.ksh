@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/ksh 
 #########################################################################
 # Script: da_run_suite_wrapper.ksh
 #
@@ -24,7 +24,7 @@
 #set echo 
 
 #Decide which stages to run (run if true):
-#export RUN_RESTORE_DATA_NCEP=true
+export RUN_RESTORE_DATA_GRIB=false
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
 #export RUN_WPS=true
@@ -38,50 +38,53 @@ export RUN_WRF=true
 #export DUMMY=${DUMMY:-true}
 export REGION=t44
 export EXPT=noda
-#export CLEAN=${CLEAN:-true}
+#export FCYCLE_HOUR=00
+export CLEAN=${CLEAN:-false}
 #export CYCLING=${CYCLING:-true}
 #export FIRST=false
 
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=16
+export NUM_PROCS=64
 export QUEUE=premium
-#export QUEUE=share
-export PROJECT_ID=68000001
+#export QUEUE=economy
+#export PROJECT_ID=68000001
 #export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=180
-export LSF_MAX_RUNTIME=60
-#export LSF_MAX_RUNTIME=10
+export LSF_MAX_RUNTIME=350
 export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
 #export RUN_CMD=mpirun.lsf
 
 #Time info:
-export INITIAL_DATE=2006100100
-export FINAL_DATE=2006100100
-#Uncomment for actual runs: export LBC_FREQ=03
+export INITIAL_DATE=2006102512
+export FINAL_DATE=2006102718
+export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00
-export LONG_FCST_RANGE_1=72
+export LONG_FCST_TIME_2=06
+export LONG_FCST_TIME_3=12
+export LONG_FCST_TIME_4=18
 export LONG_FCST_RANGE_1=24
-export LONG_FCST_TIME_2=12
 export LONG_FCST_RANGE_2=72
+export LONG_FCST_RANGE_3=24
+export LONG_FCST_RANGE_4=72
 
 #Directories:
 #bluevista:
-export REL_DIR=/mmm/users/dmbarker/code/trunk
-export DAT_DIR=/mmm/users/dmbarker/data
-#export NCEP_DIR=/mmm/users/dmbarker/data/ncep
-#export DAT_DIR=/ptmp/dmbarker/data
+export REL_DIR=/homebv/demirtas/trunk_rsl_xlf_bluevista
+export DAT_DIR=/rap/datc/data
+export NCEP_DIR=/rap/datc/data
 export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG
+
 #smoke:
-#export REL_DIR=/smoke/dmbarker/code/trunk
+#export REL_DIR=/smoke/dmbarker/code/trunk/Vtable.AGRWRF
 #export DAT_DIR=/smoke/dmbarker/data
 #export WPS_GEOG_DIR=/smoke/dmbarker/data/geog
 
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
 #From WPS (namelist.wps):
-#export RUN_GEOGRID=false
+export RUN_GEOGRID=false
+export DEBUG_LEVEL_UNGRIB=200
 export NL_E_WE=301
 export NL_E_SN=238
 export REF_LAT=31.4
@@ -91,7 +94,6 @@ export TRUELAT2=30.0
 export STAND_LON=52.55
 export NL_DX=15000
 export NL_DY=15000
-#export FG_TYPE=?
 
 #WRF:
 export NL_TIME_STEP=90
@@ -116,16 +118,18 @@ export NL_DIFF_OPT=1
 export NL_KM_OPT=4
 export NL_DAMPCOEF=0.01
 export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
+export NL_FEEDBACK=0 
+export NL_INPUTOUT_INTERVAL=180 
 
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
 
-export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
+export SCRIPT=$WRFVAR_DIR/scripts/new/da_run_suite.ksh
 export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/new/da_run_job.${MACHINE}.ksh
 
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/da_run_suite.ksh
+export RUN_CMD=" "
+$WRFVAR_DIR/scripts/new/da_run_suite.ksh
 
 exit 0
 

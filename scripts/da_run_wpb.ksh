@@ -38,14 +38,14 @@ export HOSTS=${HOSTS:-$HOME/hosts}
 export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
-
+export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}
 export WPB_DIR=${WPB_DIR:-$REL_DIR/wpb}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
-export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     # NCEP dir
+export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
@@ -54,7 +54,7 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wpb}
 
 #From WPS (namelist.wps):
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
-export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$NCEP_DIR}
+export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}

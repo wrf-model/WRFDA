@@ -1,8 +1,8 @@
 #!/bin/ksh
 #-----------------------------------------------------------------------
-# Script da_restore_data_ncep.ksh
+# Script da_restore_data_grib.ksh
 #
-# Purpose: Restore global analyses (NCEP/FNL - 1deg res.).
+# Purpose: Restore GRIB data for input into WPS (fnl 1 deg., gfs 1/2 deg. ).
 #
 #-----------------------------------------------------------------------
 
@@ -19,12 +19,12 @@ export LBC_FREQ=${LBC_FREQ:-6}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
-export MSS_NCEP_DIR=${MSS_NCEP_DIR:-mss:/DSS/DS083.2/data}
-export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     
-if test ! -d $NCEP_DIR; then mkdir $NCEP_DIR; fi
+export MSS_GRIB_DIR=${MSS_GRIB_DIR:-mss:/DSS/DS083.2/data} # Default is fnl. 
+export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}     
+if test ! -d $GRIB_DIR; then mkdir $GRIB_DIR; fi
 
-echo "<HTML><HEAD><TITLE>$EXPT restore_data_ncep</TITLE></HEAD><BODY>"
-echo "<H1>$EXPT restore_data_ncep</H1><PRE>"
+echo "<HTML><HEAD><TITLE>$EXPT restore_data_grib</TITLE></HEAD><BODY>"
+echo "<H1>$EXPT restore_data_grib</H1><PRE>"
 
 date
 
@@ -33,8 +33,8 @@ export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/nu
 echo "DATE         $DATE"
 echo "END_DATE     $END_DATE"
 echo "LBC_FREQ     $LBC_FREQ"
-echo "MSS_NCEP_DIR $MSS_NCEP_DIR"
-echo 'NCEP_DIR     <A HREF="file:'$NCEP_DIR'">'$NCEP_DIR'</a>'
+echo "MSS_GRIB_DIR $MSS_GRIB_DIR"
+echo 'GRIB_DIR     <A HREF="file:'$GRIB_DIR'">'$GRIB_DIR'</a>'
 
 LOCAL_DATE=$DATE
 
@@ -47,15 +47,15 @@ while test $LOCAL_DATE -le $END_DATE; do
    HOUR=`echo $LOCAL_DATE | cut -c9-10`
    
    FILE=fnl_${YY}${MONTH}${DAY}_${HOUR}_00
-   DIR=${NCEP_DIR}/$LOCAL_DATE
+   DIR=${GRIB_DIR}/$LOCAL_DATE
    mkdir -p ${DIR}
 
    if test ! -f $DIR/$FILE; then
-      echo "Retrieving $MSS_NCEP_DIR/$FILE to $DIR"
+      echo "Retrieving $MSS_GRIB_DIR/$FILE to $DIR"
       if $DUMMY; then
          echo Dummy restore data > $DIR/$FILE
       else
-         msrcp $MSS_NCEP_DIR/$FILE $DIR
+         msrcp $MSS_GRIB_DIR/$FILE $DIR
       fi
    else
       echo "File $DIR/$FILE exists, skipping"

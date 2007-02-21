@@ -23,12 +23,13 @@ else
 fi
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
+export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
-export NCEP_DIR=${NCEP_DIR:-$DAT_DIR/ncep}     # NCEP dir
+export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
@@ -37,7 +38,7 @@ export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wps}
 export WORK_DIR=$RUN_DIR/working
 
 #WPS:
-export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$NCEP_DIR}
+export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
@@ -167,25 +168,38 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       fi
 
 #     Run ungrib:
-      ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-      LOCAL_DATE=$DATE
-      FILES=''
-      while test $LOCAL_DATE -le $END_DATE; do
-         FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-         LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
-      done
-      $WPS_DIR/link_grib.csh $FILES
+      if $RUN_UNGRIB_AFWA; then
+         export RUN_DIR=$EXP_DIR/run/$DATE/wps
+         mkdir -p $RUN_DIR
 
-      cp $WPS_DIR/ungrib.exe .
-      ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
+         $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
+         ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
+         RC=$?
+         if test $RC != 0; then
+            echo `date` "${ERR}Failed with error $RC$END"
+            exit 1
+         fi
+      else
+         ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
+         LOCAL_DATE=$DATE
+         FILES=''
+         while test $LOCAL_DATE -le $END_DATE; do
+            FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
+            LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+         done
+         $WPS_DIR/link_grib.csh $FILES
 
-      RC=$?
-      cp ungrib.log $RUN_DIR
-      echo '<A HREF="ungrib.log">ungrib.log</a>'
+         cp $WPS_DIR/ungrib.exe .
+         ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
 
-      if test $RC != 0; then
-         echo ungrib failed with error $RC
-         exit $RC
+         RC=$?
+         cp ungrib.log $RUN_DIR
+         echo '<A HREF="ungrib.log">ungrib.log</a>'
+
+         if test $RC != 0; then
+            echo ungrib failed with error $RC
+            exit $RC
+         fi
       fi
 
 #     Run metgrid:

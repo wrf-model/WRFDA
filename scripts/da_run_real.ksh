@@ -28,6 +28,7 @@ else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
 fi
 export CLEAN=${CLEAN:-false}
+echo 'This is RUN_CMD:' $RUN_CMD
 
 # Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
