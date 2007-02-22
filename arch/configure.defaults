@@ -1787,6 +1787,7 @@ FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
+LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
