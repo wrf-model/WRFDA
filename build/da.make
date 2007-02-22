@@ -183,7 +183,7 @@ da_wrfvar_esmf.exe : $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
 
 da_advance_cymdh.exe : da_advance_cymdh.o
 	$(RM) $@
-	$(SFC) $(LDFLAGS) -o $@ $<
+	$(SFC) $(LDFLAGS) -o $@ da_advance_cymdh.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
@@ -200,28 +200,28 @@ da_utils : setup \
 da_plots : setup da_scale_length.exe
 
 da_be4_scale_length.exe: da_be4_scale_length.o
-	$(LD) -o $@ $<
+	$(LD) -o $@ da_be4_scale_length.o
 
 da_scale_length.exe: da_scale_length.o
-	$(LD) -o $@ $< da_control.o
+	$(LD) -o $@ da_scale_length.o da_control.o
 
 da_diagnostics.exe: da_diagnostics.o
-	$(LD) -o $@ $<
+	$(LD) -o $@ da_diagnostics.o
 
 da_ominusb.exe: da_ominusb.o
-	$(LD) -o $@ $<
+	$(LD) -o $@ da_ominusb.o
 
 da_tune.exe: da_tune.o
-	$(LD) -o $@ $<
+	$(LD) -o $@ da_tune.o
 
 da_update_bc.exe : da_update_bc.o
-	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ $< \
+	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
 
 da_bufr_little_endian.exe : da_bufr_little_endian.o
 	$(RM) $@
-	$(FFC) -o $@ $< $(BUFR_LIB) $(LOCAL_LIB)
+	$(FFC) -o $@ da_bufr_little_endian.o $(BUFR_LIB) $(LOCAL_LIB)
 
 da_bufr_little_endian.o : da_bufr_little_endian.f90
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
