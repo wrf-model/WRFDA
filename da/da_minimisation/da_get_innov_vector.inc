@@ -124,7 +124,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_get_innov_vector_crtm( it, grid%xb, grid%xp, ob, iv )
         end if
       else
-         write(6,'(a)') ' WARNING:  UNKNOWN Radiative Transfer Model in da_get_innov_vector'
+         call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
       endif
 
       ! Pseudo obs:
@@ -168,7 +168,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    ! [5]  write out radiance iv in ascii format
    !-----------------------------------------------
    if (write_iv_rad_ascii) then
-      write(unit=stdout,fmt=*)  ' writing radiance iv ascii'
+      write(unit=stdout,fmt='(A)')  'Writing radiance iv ascii'
       call da_write_iv_rad_ascii(grid%xp,ob,iv)
    end if
 
@@ -177,7 +177,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    !----------------------------------------------------------
 
    if (write_filtered_rad) then
-     write(unit=stdout,fmt=*) ' writing filtered radiance'
+     write(unit=stdout,fmt='(A)') 'Writing filtered radiance'
      call da_write_filtered_rad(ob,iv)
    end if
 

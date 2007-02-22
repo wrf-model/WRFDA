@@ -85,7 +85,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
           'For this outer iteration gradient target is ',1PD15.8,/,&
           'Starting cost function: ' ,1PD15.8,' gradient= ',1PD15.8)
    write(unit=stdout,fmt='(A)') &
-      ' ----------------------------------------------------------'
+      '----------------------------------------------------------'
    if (calculate_cg_cost_fn) then
       write(unit=stdout,fmt='(1x,/,A)') &
          'Iter    Cost Function         Gradient             Step'
@@ -174,7 +174,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
    end if
 1003 continue
    write(unit=stdout,fmt='(A)') &
-      ' ----------------------------------------------------------'
+      '----------------------------------------------------------'
    write(unit=stdout, &
       fmt='("Inner iteration stopped after ",i4," iterations")') iter
 
@@ -196,7 +196,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
     write(unit=stdout,fmt=15) iter, j%total , rrmnew_norm
 15  format('Final: ',I3,' iter, J=',1PD15.8,', g=',1PD15.8)
     write(unit=stdout,fmt='(A)') &
-      ' ----------------------------------------------------------'
+      '----------------------------------------------------------'
 1004 continue
 
    cv = cv + xhat

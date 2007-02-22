@@ -174,7 +174,7 @@ subroutine da_get_var_diagnostics( iv, j)
    if (rootproc) then
 
       write(unit=stdout,fmt=*) ' '
-      write(unit=stdout,fmt=*) 'Diagnostics'
+      write(unit=stdout,fmt='(A)') 'Diagnostics'
       write(unit=stdout,fmt='(A,F12.2)')   '   Final cost function J       = ', j % total
       write(unit=stdout,fmt=*) ' '
 
@@ -198,6 +198,7 @@ subroutine da_get_var_diagnostics( iv, j)
       if (use_radiance) then
          write(unit=stdout,fmt='(a,i8)')    '   Total number of radiances    = ', num_radiance_tot
          write(unit=stdout,fmt='(a,f15.5)') '   Cost function for radiances  = ', jo_radiance
+         write(unit=stdout,fmt=*) ' '
       end if
 
       ! [4.2] Output components of Jo:

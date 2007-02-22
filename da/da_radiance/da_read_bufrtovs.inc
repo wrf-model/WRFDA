@@ -161,7 +161,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    write(unit=date,fmt='( i10)') idate
    read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
    write(unit=stdout,fmt=*) &
-      '  Bufr file date is ',iy,im,idd,ihh,infile
+      'Bufr file date is ',iy,im,idd,ihh,infile
 
    ! Loop to read bufr file and assign information to a sequential structure
    !-------------------------------------------------------------------------
@@ -361,7 +361,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
       write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
-        ' Allocating space for radiance innov structure', &
+        'Allocating space for radiance innov structure', &
          i, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       if (rtm_option == rtm_option_crtm) then
          iv%instid(i)%nlevels = xp%kme-xp%kms+1

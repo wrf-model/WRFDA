@@ -82,7 +82,7 @@ module da_minimisation
    use da_radar, only :  da_calculate_grady_radar, da_ao_stats_radar, &
       da_oi_stats_radar, da_get_innov_vector_radar, da_residual_radar, &
       da_jo_and_grady_radar
-   use da_reporting, only : da_message
+   use da_reporting, only : da_message, da_warning
    use da_rttov, only : da_get_innov_vector_rttov
    use da_satem, only : da_calculate_grady_satem, da_ao_stats_satem, &
       da_oi_stats_satem, da_get_innov_vector_satem, da_residual_satem, &

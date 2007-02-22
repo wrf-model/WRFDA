@@ -273,7 +273,8 @@ subroutine da_solve ( grid , config_flags)
       ! [8.8] Write Ascii radiance OMB and OMA file
 
       if (write_oa_rad_ascii) then
-         write(unit=stdout,fmt=*)  ' writing radiance OMB and OMA ascii file'
+         write(unit=stdout,fmt='(A)')  'Writing radiance OMB and OMA ascii file'
+         write(unit=stdout,fmt=*)  " "
          call da_write_oa_rad_ascii (grid%xp,ob,iv,re)
       end if
 
