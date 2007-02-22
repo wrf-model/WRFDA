@@ -936,7 +936,7 @@ FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 CCFLAGS2        = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
-LDFLAGS2        = --version
+LDFLAGS2        =
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
