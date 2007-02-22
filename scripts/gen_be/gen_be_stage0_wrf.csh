@@ -49,8 +49,8 @@
 #OK, let's go!
 
 #Derive times of initial/final FCST_RANGE forecasts:
- setenv START_DATE_STAGE0 `${BUILD_DIR}/advance_cymdh.exe $START_DATE -$FCST_RANGE1`
- setenv END_DATE_STAGE0   `${BUILD_DIR}/advance_cymdh.exe $END_DATE   -$FCST_RANGE1`
+ setenv START_DATE_STAGE0 `${BUILD_DIR}/da_advance_cymdh.exe $START_DATE -$FCST_RANGE1`
+ setenv END_DATE_STAGE0   `${BUILD_DIR}/da_advance_cymdh.exe $END_DATE   -$FCST_RANGE1`
 
  setenv DATE $START_DATE_STAGE0
 
@@ -66,7 +66,7 @@
    end
 
 #  Create file dates:
-   setenv FCST_TIME `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE1`
+   setenv FCST_TIME `${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE1`
    echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
 
    set YYYY = `echo $FCST_TIME | cut -c1-4`
@@ -76,7 +76,7 @@
    set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
    set FILE = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
 
-   set NEXT_DATE = `${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE2`
+   set NEXT_DATE = `${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE2`
    if ( $BE_METHOD == NMC ) then
       ln -sf $FILE ${FILE}.e001
       ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002
@@ -92,7 +92,7 @@
    rm -rf $TMP_DIR >&! /dev/null
 
    echo $DATE $FILE ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
-   setenv DATE `${BUILD_DIR}/advance_cymdh.exe $DATE $INTERVAL`
+   setenv DATE `${BUILD_DIR}/da_advance_cymdh.exe $DATE $INTERVAL`
 
  end     # End loop over dates.
 

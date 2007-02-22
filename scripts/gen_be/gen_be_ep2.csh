@@ -63,7 +63,7 @@ setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar
  set HH = `echo $DATE | cut -c9-10`
  set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
 
- setenv PREV_DATE `${BUILD_DIR}/advance_cymdh.exe $DATE -$FCST_RANGE`
+ setenv PREV_DATE `${BUILD_DIR}/da_advance_cymdh.exe $DATE -$FCST_RANGE`
  set FILE = ${DAT_DIR}/${PREV_DATE}/wrfout_d01_${FILE_DATE}
 
 #Run:

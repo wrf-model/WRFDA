@@ -85,7 +85,7 @@ setenv OB_DIR /smoke/dmbarker/data/con200/get_obs # Alain's cleaned obs.
  if ( ! $?NOUT )          setenv NOUT          1          # ?
 
  if ( ! -d ${EXP_DIR}/${DATE} ) mkdir ${EXP_DIR}/${DATE}
- setenv PREV_DATE `${BUILD_DIR}/advance_cymdh.exe $DATE -$FCST_RANGE`
+ setenv PREV_DATE `${BUILD_DIR}/da_advance_cymdh.exe $DATE -$FCST_RANGE`
 
  set YYYY = `echo $DATE | cut -c1-4`
  set MM = `echo $DATE | cut -c5-6`

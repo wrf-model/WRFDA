@@ -40,7 +40,7 @@
 
  rm -rf $WORKDIR; mkdir $WORKDIR; cd $WORKDIR
  cp $WRFVAR_DIR/da/da_util/da_tune.f90  .
- cp $HOME/advance_cymdh.exe .
+ cp $HOME/da_advance_cymdh.exe .
  
 #-------------------------------------------------------------------------------------------
 cat > namelist.radiance << EOF
@@ -108,7 +108,7 @@ echo $START_DATE
    exit 5       
    endif
 
- setenv START_DATE `./advance_cymdh.exe $START_DATE $CYCLE_PERIOD`
+ setenv START_DATE `./da_advance_cymdh.exe $START_DATE $CYCLE_PERIOD`
 end
 
 #-------------------------------------------------------------------------------------------
