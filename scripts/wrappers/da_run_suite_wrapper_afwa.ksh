@@ -24,7 +24,7 @@
 #set echo 
 
 #Decide which stages to run (run if true):
-export RUN_RESTORE_DATA_GRIB=false
+#export RUN_RESTORE_DATA_GRIB=true
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
 #export RUN_WPS=true
@@ -37,26 +37,27 @@ export RUN_WRF=true
 #Experiment details:
 #export DUMMY=${DUMMY:-true}
 export REGION=t44
-export EXPT=noda
+export EXPT=noda.dale
 #export FCYCLE_HOUR=00
 export CLEAN=${CLEAN:-false}
 #export CYCLING=${CYCLING:-true}
 #export FIRST=false
 
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=64
-export QUEUE=premium
+export NUM_PROCS=16
+export QUEUE=share
+#export QUEUE=premium
 #export QUEUE=economy
-#export PROJECT_ID=68000001
+export PROJECT_ID=68000001
 #export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=350
+export LSF_MAX_RUNTIME=30
 export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
 #export RUN_CMD=mpirun.lsf
 
 #Time info:
-export INITIAL_DATE=2006102512
-export FINAL_DATE=2006102718
+export INITIAL_DATE=2006100100
+export FINAL_DATE=2006100100
 export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00
@@ -64,15 +65,15 @@ export LONG_FCST_TIME_2=06
 export LONG_FCST_TIME_3=12
 export LONG_FCST_TIME_4=18
 export LONG_FCST_RANGE_1=24
+export LONG_FCST_RANGE_1=12 # For case
 export LONG_FCST_RANGE_2=72
 export LONG_FCST_RANGE_3=24
 export LONG_FCST_RANGE_4=72
 
 #Directories:
 #bluevista:
-export REL_DIR=/homebv/demirtas/trunk_rsl_xlf_bluevista
+export REL_DIR=/mmm/users/dmbarker/code/trunk
 export DAT_DIR=/rap/datc/data
-export NCEP_DIR=/rap/datc/data
 export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG
 
 #smoke:
@@ -119,17 +120,17 @@ export NL_KM_OPT=4
 export NL_DAMPCOEF=0.01
 export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 export NL_FEEDBACK=0 
-export NL_INPUTOUT_INTERVAL=180 
+export NL_INPUTOUT_INTERVAL=60
 
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
 
-export SCRIPT=$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 export MACHINE=bluevista
-$WRFVAR_DIR/scripts/new/da_run_job.${MACHINE}.ksh
+$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
 
-export RUN_CMD=" "
-$WRFVAR_DIR/scripts/new/da_run_suite.ksh
+#export RUN_CMD=" "
+#$WRFVAR_DIR/scripts/new/da_run_suite.ksh
 
 exit 0
 
