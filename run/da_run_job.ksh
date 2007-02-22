@@ -1,63 +1,159 @@
 #!/bin/ksh
-
-export RELEASE=${RELEASE:-WRF_V2.1.2}
-export REL_DIR=${REL_DIR:-$HOME/code_development/$RELEASE}
-export DA_DIR=${DA_DIR:-$REL_DIR/wrfvar}
+export REL_DIR=${REL_DIR:-$HOME/trunk}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
+export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}
-export DAT_DIR=${DAT_DIR:-/data7/da/bray/data}
+export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
+export WORK_DIR=$RUN_DIR/working
+export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
+export POE=false
+export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 
-export PLATFORM=`uname`
-export HOSTNAME=`hostname`
+export SUBMIT=${SUBMIT:-LSF}
 export NUM_PROCS=${NUM_PROCS:-1}
+export HOSTS=${HOSTS:-$HOME/hosts}
 
-rm -rf $EXP_DIR
-mkdir $EXP_DIR
-cd $EXP_DIR
+export QUEUE=${QUEUE:-regular}
+export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 
-if test $HOSTNAME = "bs1101en" -o $HOSTNAME = "bs1201en"; then # bluesky
+mkdir -p $RUN_DIR
+cd $RUN_DIR
 
-  # Rather simplistic node calculation 
-  let TEMP=$NUM_PROCS-1
-  let NODES=$TEMP/8+1
+if test $SUBMIT = "LoadLeveller"; then 
+   # Rather simplistic node calculation 
+   let TEMP=$NUM_PROCS-1
+   let NODES=$TEMP/8+1
+   export POE=true
 
-  cat > job.ksh <<EOF
+   cat > job.ksh <<EOF
 #!/bin/ksh
-##@ network.MPI=csss,shared,us
-#IBM:
-# @ job_type   = parallel
-# @ environment = COPY_ALL
-# @ job_name   = $EXPT
-# @ output     = $EXPT.e\$(jobid)
-# @ error      = $EXPT.o\$(jobid)
-# @ node       = $NODES
-# @ notification = never
-## @ network.MPI    = css0,shared,us
-# @ network.MPI    = css0,shared,ip
-# @ total_tasks = $NUM_PROCS
-# @ node_usage = shared
-# @ checkpoint = no
-# @ wall_clock_limit = 01:30:00
-# NCEP IBM=dev
-# NCAR IBM(bluesky)=com_rg8:
-# NCAR IBM(blackforest)=com_reg:
-# NCAR IBM(blackforest_nighthawk)=com_nh:
-# @ class      =  share
-## @ class      =  com_rg8
-# @ queue
+# @ job_name         = $EXPT
+# @ total_tasks      = $NUM_PROCS
+# @ node             = $NODES
+# @ output           = job.output
+# @ error            = job.error
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
+# @ queue            = $QUEUE
+
+export RUN_CMD="$DEBUGGER " # Space important
+. $SCRIPT > $EXP_DIR/index.html 2>&1
+EOF
+elif test $SUBMIT = "LSF"; then 
+   cat > job.ksh <<EOF
+#!/bin/ksh
 #
-#FSL JET (Alpha/Linux):
-#PBS -V -A sfmlidar
-#PBS -lnodes=4:comp -lwalltime=1000
-#Uncomment for JET: source /usr/local/bin/setup-mpi.csh
-$DA_DIR/run/DA_Run_WRF-Var.csh
+# LSF batch script
+#
+#BSUB -J $EXPT                   
+#BSUB -q $QUEUE 
+#BSUB -n $NUM_PROCS              
+#BSUB -o job.output               
+#BSUB -e job.error               
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
+
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="mpirun.lsf"
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
+. $SCRIPT > $EXP_DIR/index.html 2>&1
+
+EOF
+elif test $SUBMIT = "PBS"; then 
+   cat > job.ksh <<EOF
+#!/bin/ksh
+#
+# PBS batch script
+#
+##PBS -N $EXPT
+##PBS -q $QUEUE
+#PBS -l mppe=$NUM_PROCS
+#PBS -o job.output
+#PBS -e job.error
+#PBS -V
+$SUBMIT_OPTIONS1
+$SUBMIT_OPTIONS2
+$SUBMIT_OPTIONS3
+$SUBMIT_OPTIONS4
+$SUBMIT_OPTIONS5
+$SUBMIT_OPTIONS6
+$SUBMIT_OPTIONS7
+$SUBMIT_OPTIONS8
+$SUBMIT_OPTIONS9
+$SUBMIT_OPTIONS10
+
+# Options for Cray X1 
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="aprun -m exclusive -N$NUM_PROCS -n$NUM_PROCS"
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
+. $SCRIPT > $EXP_DIR/index.html 2>&1
+
+EOF
+elif test $SUBMIT = none; then
+   if test -f $HOSTS; then
+      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -nolocal -machinefile $HOSTS"
+   else
+      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -all-local"
+   fi
+   cat > job.ksh <<EOF
+#!/bin/ksh
+# Cannot put - options inside default substitution
+export RUN_CMD_DEFAULT="$RUN_CMD_DEFAULT"
+export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
+$SCRIPT > $EXP_DIR/index.html 2>&1
+EOF
+fi
+
+if $CHECK_SVNVERSION; then
+   export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
+   export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
+   export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
+   export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`
+fi
+
+cat >> job.ksh <<EOF
+RC=\$?
+if test \$RC = 0; then
+   echo Succeeded
+else
+   echo Failed with error \$RC
+fi
 EOF
 
-  llsubmit job.ksh
+chmod +x job.ksh
+
+echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
+if test $SUBMIT = "LoadLeveller"; then 
+   llsubmit job.ksh
+elif test $SUBMIT = "LSF"; then 
+   bsub < $PWD/job.ksh
+elif test $SUBMIT = "PBS"; then 
+set -x
+   qsub $PWD/job.ksh
 else
-  $DA_DIR/run/DA_Run_WRF-Var.csh
+   ./job.ksh
 fi
 
 exit 0
