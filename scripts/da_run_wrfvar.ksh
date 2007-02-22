@@ -375,6 +375,7 @@ echo "WINDOW_END            $WINDOW_END"
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
       fi
       export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
+      export NL_INTERVAL_SECONDS=`expr $CYCLE_PERIOD \* 3600`
       export NL_MP_PHYSICS=0
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
@@ -405,9 +406,7 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 02 03 04 05 06 07; do
          ln -s tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
-      if $NL_JCDFI_USE; then
-         ln -s tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
-      fi
+      ln -s tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
 
       # ad
 
@@ -428,6 +427,7 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_HISTORY_INTERVAL=9999
       export NL_AUXHIST3_INTERVAL=60
       export NL_INPUTOUT_INTERVAL=60
+      export NL_INTERVAL_SECONDS=`expr $CYCLE_PERIOD \* 3600`
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input ad
       ln -fs $WORK_DIR/*.TBL ad
