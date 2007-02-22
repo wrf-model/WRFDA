@@ -420,7 +420,8 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, simple      (RSL_LITE, MPI, RSL IO)
+#Not working yet
+##ARCH Settings for PC Linux i486 i586 i686, g95, simple      (RSL_LITE, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)

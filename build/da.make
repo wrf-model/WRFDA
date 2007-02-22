@@ -166,54 +166,58 @@ WRFVAR_OBJS = da_par_util.o \
 
 var : wrfvar
 
-wrfvar  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_main.o
-	$(LD) -o wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+var_esmf : wrfvar_esmf
 
-wrfvar_esmf  : setup advance_cymdh.exe da_update_bc.exe $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
+wrfvar : da_wrfvar.exe da_advance_cymdh.exe da_update_bc.exe
+
+wrfvar_esmf : da_wrfvar_esmf.exe da_advance_cymdh.exe da_update_bc.exe
+
+da_wrfvar.exe : setup $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_main.o
+	$(LD) -o da_wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
+
+da_wrfvar_esmf.exe : setup $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
           da_wrfvar_esmf_super.o
-	$(LD) -o wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
+	$(LD) -o da_wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o
+
+da_advance_cymdh.exe : da_advance_cymdh.o
+	$(RM) $@
+	$(SFC) $(LDFLAGS) -o da_advance_cymdh.exe da_advance_cymdh.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
 	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
-utils : da_utils
+da_utils : da_diagnostics.exe \
+           da_ominusb.exe \
+           da_tune.exe \
+           da_update_bc.exe \
+           da_bufr_little_endian.exe \
+           da_advance_cymdh.exe
 
-da_utils : da_diagnostics \
-           da_ominusb \
-           da_tune \
-           da_update_bc \
-           da_bufr_little_endian
+da_plots : da_scale_length.exe
 
-da_plots : da_scale_length
-           
-
-da_be4_scale_length: da_be4_scale_length.o
+da_be4_scale_length.exe: setup da_be4_scale_length.o
 	$(LD) -o $@.exe $@.o
 
-da_scale_length: da_scale_length.o
+da_scale_length.exe: setup da_scale_length.o
 	$(LD) -o $@.exe $@.o da_control.o
 
-da_diagnostics: da_diagnostics.o
+da_diagnostics.exe: setup da_diagnostics.o
 	$(LD) -o $@.exe $@.o
 
-da_ominusb: da_ominusb.o
+da_ominusb.exe: setup da_ominusb.o
 	$(LD) -o $@.exe $@.o
 
-da_tune: da_tune.o
+da_tune.exe: setup da_tune.o
 	$(LD) -o $@.exe $@.o
 
-update_bc : da_update_bc
-
-da_update_bc : da_update_bc.exe
-
-da_update_bc.exe : da_update_bc.o
+da_update_bc.exe : setup da_update_bc.o
 	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o da_update_bc.exe da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
 
-da_bufr_little_endian : da_bufr_little_endian.o
+da_bufr_little_endian.exe : setup da_bufr_little_endian.o
 	$(RM) $@
 	$(FFC) -o da_bufr_little_endian.exe da_bufr_little_endian.o $(BUFR_LIB) $(LOCAL_LIB)
 

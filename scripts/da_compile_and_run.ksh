@@ -47,7 +47,7 @@ for COMPILER in $COMPILERS; do
       rm -f build/links
       ./compile $TARGET > compile.out 2>&1
       if $CLEAN; then ./clean > /dev/null 2>&1; fi
-      ls -l build/wrfvar.exe
+      ls -l build/da_wrfvar.exe
       let COUNT=$COUNT+1
    fi
    if $RUN; then

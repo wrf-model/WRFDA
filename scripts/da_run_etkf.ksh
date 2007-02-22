@@ -75,7 +75,7 @@ mkdir -p $ETKF_DIR
 mkdir -p $RUN_DIR
 export RUN_DIR_SAVE=$RUN_DIR
 
-export PREV_DATE=`${BUILD_DIR}/advance_cymdh.exe $DATE -$FCST_RANGE`
+export PREV_DATE=`${BUILD_DIR}/da_advance_cymdh.exe $DATE -$FCST_RANGE`
 export YYYY=`echo $DATE | cut -c1-4`
 export MM=`echo $DATE | cut -c5-6`
 export DD=`echo $DATE | cut -c7-8`

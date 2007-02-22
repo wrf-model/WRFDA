@@ -28,7 +28,7 @@ echo "<H1>$EXPT restore_data_grib</H1><PRE>"
 
 date
 
-export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
 
 echo "DATE         $DATE"
 echo "END_DATE     $END_DATE"
@@ -61,7 +61,7 @@ while test $LOCAL_DATE -le $END_DATE; do
       echo "File $DIR/$FILE exists, skipping"
    fi
 
-   LOCAL_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
+   LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 2>/dev/null`
 done
 
 date

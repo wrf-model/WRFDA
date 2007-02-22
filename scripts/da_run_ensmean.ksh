@@ -52,7 +52,7 @@ export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-export NEXT_DATE=`${BUILD_DIR}/advance_cymdh.exe $DATE $FCST_RANGE`
+export NEXT_DATE=`${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE`
 export YYYY=`echo $NEXT_DATE | cut -c1-4`
 export MM=`echo $NEXT_DATE | cut -c5-6`
 export DD=`echo $NEXT_DATE | cut -c7-8`

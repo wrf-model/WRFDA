@@ -128,7 +128,7 @@ export NL_ANALYSIS_TYPE_SAVE=$NL_ANALYSIS_TYPE
 export RUN_DIR_SAVE=$RUN_DIR
 
 #These are the local values:
-export END_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
 export FCST_RANGE=0
 export NL_RUN_HOURS=0
 export RC_DIR=$RUN_DIR_SAVE/rc
@@ -168,7 +168,7 @@ while test $DATE -le $END_DATE; do
       exit 1
    fi
 
-   export NEXT_DATE=`$WRFVAR_DIR/build/advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+   export NEXT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
    export DATE=$NEXT_DATE
 
 done

@@ -1,4 +1,4 @@
-program advance_cymdh
+program da_advance_cymdh
 
 #ifdef crayx1
 #define iargc ipxfargc
@@ -23,7 +23,7 @@ program advance_cymdh
 
    if(nargum /= 2) then
       write(unit=*, fmt='(a)') &
-           'Usage: advance_cymdh ccyymmddhh dh'
+           'Usage: da_advance_cymdh ccyymmddhh dh'
       stop 'try again.'
    endif
 
@@ -131,4 +131,4 @@ contains
    end subroutine getarg
 #endif
 
-end program advance_cymdh
+end program da_advance_cymdh
