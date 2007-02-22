@@ -37,6 +37,15 @@ PROGRAM kma2netcdf
    LOGICAL , EXTERNAL      :: wrf_dm_on_monitor
 #endif
 
+!--------------
+ INTERFACE 
+SUBROUTINE Setup_Timekeeping ( grid )
+   USE module_domain
+   TYPE(domain), POINTER :: grid
+END SUBROUTINE Setup_Timekeeping 
+END INTERFACE 
+!--------------
+
 !  Definitions of dummy arguments to solve
 
 !--Define the name of this program (program_name defined in module_domain)
@@ -51,7 +60,7 @@ PROGRAM kma2netcdf
       call wrfu_initialize(defaultCalendar=WRFU_CAL_GREGORIAN)
 !rizvi's add over
 
-#ifdef DM_PARALLEL
+#ifdef DM_PARALLEL IF ( wrf_dm_on_monitor() ) THEN
    IF ( wrf_dm_on_monitor() ) THEN
      CALL start_timing
      CALL initial_config

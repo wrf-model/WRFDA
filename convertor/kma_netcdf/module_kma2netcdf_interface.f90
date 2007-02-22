@@ -55,6 +55,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
     real, allocatable      :: q(:,:,:) 
     Integer                :: my_proc_id, ierr 
     Integer                :: ii, jj,landmask_T213(428,215)  
+    real                   :: sfc_T213(428,215)
 !---------------------------------------------------------------------------
    INTEGER  :: ids,ide, jds,jde, kds,kde   ! domain dims.
    INTEGER  :: ims,ime, jms,jme, kms,kme   ! memory dims.
@@ -67,14 +68,8 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
 !
       READ  (111, NML = kma2netcdf_parm, ERR = 8000)
       close (111)
-      print*,' kma2netcdf_parm namelist data read are as follows:'
-      print*,' IGRD= ',IGRD
-      print*,' JGRD= ',JGRD
-      print*,' KGRD= ',KGRD
-      print*,' JCAP =  ',JCAP
-      print*,' KMAX =  ',KMAX
-      print*,' INTVL=  ',INTVL
-
+      write(unit=*, fmt='(A,5(1x,/,5x,A,i6))')'kma2netcdf_parm namelist read: ',&
+      'IGRD= ',IGRD,'JGRD= ',JGRD,'KGRD= ',KGRD,'JCAP = ',JCAP,'KMAX= ',KMAX,'INTVL= ',INTVL
       DPHI=180./(JGRD-1)
       LMAX=KGRD-1
       KLMAX=KMAX
@@ -111,6 +106,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
 
    allocate (q(ims:ime,jms:jme,kms:kme))
     
+!   go to   100
 #ifndef DEREF_KLUDGE
      call W2GCONV(IGRD, JGRD, KGRD, JCAP, KMAX, INTVL , &
              DPHI, LMAX, KLMAX, MEND1, NEND1, JEND1, IMAXG, JMAXG, &
@@ -132,7 +128,7 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
 
 !  convert KMA pressure which is in hPa into Psacal in grid-array
     psfc(its:ite,jts:jte) = 100. * psfc(its:ite,jts:jte)
-
+100  continue
  my_proc_id = 0
 #ifdef DM_PARALLEL
    call MPI_COMM_RANK( MPI_COMM_WORLD, my_proc_id, ierr )
@@ -145,20 +141,64 @@ SUBROUTINE kma2netcdf_solver( grid, config_flags &
 ! Load landmask from KMA-original land mask for T213
     if( JCAP == 213 ) then
      open( UNIT = 151, file= 'KMA_landmask_428_215', status= 'old')
-       do jj=1,215
+       do jj=jds,jde
         read(151,'(428i1)', err=9000) (landmask_T213(ii,jj),ii=1,428)
-        landmask(its:ite,215-jj+1) = landmask_T213(its:ite,jj)
        enddo
+       do jj=jts,jte
+        landmask(its:ite,jj) = landmask_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully landmask'
        close (151) 
+! Load U10 at T213 (428x215) resolution                          
+     open( UNIT = 151, file= 'nwpgr_UUUU.2007020100', status= 'old')
+        read(151,'(10e20.10)', err=9000) sfc_T213                     
+       do jj=jts,jte
+        u10(its:ite,jj) = sfc_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully U10'
+       close (151) 
+! Load V10 at T213 (428x215) resolution                          
+     open( UNIT = 151, file= 'nwpgr_VVVV.2007020100', status= 'old')
+        read(151,'(10e20.10)', err=9000) sfc_T213                     
+       do jj=jts,jte
+        v10(its:ite,jj) = sfc_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully V10'
+       close (151) 
+! Load T2  at T213 (428x215) resolution                          
+     open( UNIT = 151, file= 'nwpgr_TTTT.2007020100', status= 'old')
+        read(151,'(10e20.10)', err=9000) sfc_T213                     
+       do jj=jts,jte
+         t2(its:ite,jj) = sfc_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully T2'
+       close (151) 
+! Load Q2  at T213 (428x215) resolution                          
+     open( UNIT = 151, file= 'nwpgr_QQQQ.2007020100', status= 'old')
+        read(151,'(10e20.10)', err=9000) sfc_T213                     
+       do jj=jts,jte
+         q2(its:ite,jj) = sfc_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully Q2'
+       close (151) 
+! Load SST at T213 (428x215) resolution                          
+     open( UNIT = 151, file= 'nwpgr_SSTT.2007020100', status= 'old')
+        read(151,'(10e20.10)', err=9000) sfc_T213                     
+       do jj=jts,jte
+         sst(its:ite,jj) = sfc_T213(its:ite,jde-jj+1)
+       enddo
+       write(unit=*, fmt='(A)')'read successfully SST'
+       close (151) 
+
     else
-    print*,' Land mask is not available for this truncation T',JCAP
+    write(unit=*, fmt='(A,i3)')'Surface data is not available for T',JCAP
     endif
 
-     print*,' job done for kma2netcdf_solver' 
-     return
-8000  print*,' read error on namelist unit 111'
+    write(unit=*, fmt='(A)')'Job done for kma2netcdf_solver' 
+    return
+8000 write(unit=*, fmt='(A)')'read error on namelist unit 111'
      stop
-9000  print*,' read error on landmask unit 111'
+9000 write(unit=*, fmt='(A)')'read error on unit 151'
      stop
 END SUBROUTINE kma2netcdf_solver
 

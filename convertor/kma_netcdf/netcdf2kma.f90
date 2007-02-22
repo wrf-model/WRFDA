@@ -29,6 +29,15 @@ PROGRAM netcdf2kma
 
    INTEGER :: domain_id , fid , oid , idum1 , idum2 
 
+!--------------
+ INTERFACE
+SUBROUTINE Setup_Timekeeping ( grid )
+   USE module_domain
+   TYPE(domain), POINTER :: grid
+END SUBROUTINE Setup_Timekeeping
+END INTERFACE
+!--------------
+
 #ifdef DM_PARALLEL
    INTEGER                 :: nbytes
    INTEGER, PARAMETER      :: configbuflen = 4*8192
