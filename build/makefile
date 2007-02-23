@@ -98,7 +98,7 @@ clean : arch_clean
 	@ rm -rf *.o *.mod *.b *.a *.f frame/*.f90 \
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
-          inc/dm_comm_cpp_flags depend depend.txt
+          inc/dm_comm_cpp_flags
 	@ ( cd ../external; make clean )
 
 superclean : clean arch_superclean
@@ -110,5 +110,6 @@ superclean : clean arch_superclean
           scl_plotting_routines configure.wrfvar ../configure.wrfvar \
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
           da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
-          landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3
+          landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \
+          depend depend.txt
     
