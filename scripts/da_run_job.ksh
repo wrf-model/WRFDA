@@ -82,6 +82,11 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 
 EOF
 elif test $SUBMIT = "PBS"; then 
+   # Rather simplistic node calculation
+   export TEMP=$NUM_PROCS
+   if test $TEMP -gt 4; then
+      TEMP=4
+   fi
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -106,7 +111,7 @@ $SUBMIT_OPTIONS10
 
 # Options for Cray X1 
 # Cannot put - options inside default substitution
-export RUN_CMD_DEFAULT="aprun -m exclusive -N$NUM_PROCS -n$NUM_PROCS"
+export RUN_CMD_DEFAULT="aprun -m exclusive -N$TEMP -n$NUM_PROCS"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
 
