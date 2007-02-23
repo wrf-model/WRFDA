@@ -279,7 +279,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
        write (message(26),*) 'profiles_tl%q           = ', profiles_tl(1)%q 
        write (message(27),*) 'emissivity_tl           = ', emissivity_tl    
        write (message(28),*) 'radiance_tl             = ', radiance_tl%out_clear
-       call da_error(__FILE__,__LINE__,message(1:28)) 
+       call da_warning(__FILE__,__LINE__,message(1:28)) 
    endif
 
    nc = nbtout / nprofiles

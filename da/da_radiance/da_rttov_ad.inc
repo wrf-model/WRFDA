@@ -304,7 +304,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
        write (message(33),*) 'profiles_ad%clw        = ', profiles_ad(1)%clw
        write (message(34),*) 'emissivity_ad          = ', emissivity_ad
        write (message(35),*) 'radiance_ad            = ', radiance_ad%out_clear
-       call da_error(__FILE__,__LINE__,message(1:35))
+       call da_warning(__FILE__,__LINE__,message(1:35))
    endif
 
    do n = 1, nprofiles

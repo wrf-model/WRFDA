@@ -7,7 +7,7 @@ module da_reporting
 
    implicit none
 
-   character(len=300) :: message(100)
+   character(len=10000) :: message(50)
 
 contains
 

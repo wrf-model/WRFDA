@@ -1,5 +1,7 @@
 module da_rttov
 
+use da_reporting, only : da_warning
+
    !---------------------------------------------------------------------------
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
@@ -43,7 +45,7 @@ module da_rttov
       tovs_recv_start,con_vars_type,aux_vars_type, &
       da_biascorr_rad, da_detsurtyp,da_biasprep,da_get_time_slots, &
       da_status_rad, da_qc_rad
-   use da_reporting, only : da_message, message, da_error
+   use da_reporting, only : da_message, message, da_error, da_warning
    use da_tools, only : da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
