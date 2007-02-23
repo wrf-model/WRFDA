@@ -37,16 +37,17 @@ export RUN_WRF=true
 #Experiment details:
 #export DUMMY=${DUMMY:-true}
 export REGION=t44
-export EXPT=noda.dale
+export EXPT=noda.dale.md
 #export FCYCLE_HOUR=00
 export CLEAN=${CLEAN:-false}
 #export CYCLING=${CYCLING:-true}
 #export FIRST=false
 
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=16
-export QUEUE=share
-#export QUEUE=premium
+export NUM_PROCS=32
+#export QUEUE=regular
+#export QUEUE=share
+export QUEUE=premium
 #export QUEUE=economy
 export PROJECT_ID=68000001
 #export PROJECT_ID=64000420
@@ -64,7 +65,7 @@ export LONG_FCST_TIME_1=00
 export LONG_FCST_TIME_2=06
 export LONG_FCST_TIME_3=12
 export LONG_FCST_TIME_4=18
-export LONG_FCST_RANGE_1=24
+#export LONG_FCST_RANGE_1=24
 export LONG_FCST_RANGE_1=12 # For case
 export LONG_FCST_RANGE_2=72
 export LONG_FCST_RANGE_3=24
@@ -72,8 +73,10 @@ export LONG_FCST_RANGE_4=72
 
 #Directories:
 #bluevista:
-export REL_DIR=/mmm/users/dmbarker/code/trunk
-export DAT_DIR=/rap/datc/data
+#export REL_DIR=/mmm/users/dmbarker/code/trunk
+export REL_DIR=/rap/datc/demirtas/code
+export DAT_DIR=/ptmp/demirtas/data
+#export DAT_DIR=/rap/datc/data
 export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG
 
 #smoke:
@@ -121,6 +124,8 @@ export NL_DAMPCOEF=0.01
 export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 export NL_FEEDBACK=0 
 export NL_INPUTOUT_INTERVAL=60
+export NL_INPUTOUT_BEGIN_H=3 	# Output input format start.
+export NL_INPUTOUT_END_H=9       # Output input format end.
 
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
