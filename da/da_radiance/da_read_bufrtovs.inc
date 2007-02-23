@@ -277,7 +277,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          num_tovs_used = num_tovs_used + 1
 
          if (num_tovs_used > max_tovs_input) then
-            write(unit=message(1),fmt='(A,I6,A)') &
+            write(unit=message(1),fmt='(A,I10,A)') &
                "Max number of tovs",max_tovs_input," reached"
             call da_warning(__FILE__,__LINE__,message(1:1))
             num_tovs_used = num_tovs_used-1

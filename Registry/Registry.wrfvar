@@ -858,7 +858,7 @@ rconfig   integer   max_ssmt2_input         namelist,wrfvar5  1  30000    - "max
 rconfig   integer   max_qscat_input         namelist,wrfvar5  1  50000    - "max_qscat_input"          ""  ""
 rconfig   integer   max_gpsref_input        namelist,wrfvar5  1  800000   - "max_gpsref_input"         ""  ""
 rconfig   integer   max_airsret_input       namelist,wrfvar5  1  100000   - "max_airsret_input"        ""  ""
-rconfig   integer   max_tovs_input          namelist,wrfvar5  1  100000   - "max_tovs_input"           ""  ""
+rconfig   integer   max_tovs_input          namelist,wrfvar5  1  10000000 - "max_tovs_input"           ""  ""
 rconfig   integer   report_start            namelist,wrfvar5  1  1        - "report_start"             ""  ""
 rconfig   integer   report_end              namelist,wrfvar5  1  10000000 - "report_end"               ""  ""
 rconfig   integer   tovs_start              namelist,wrfvar5  1  1        - "tovs_start"               ""  ""
