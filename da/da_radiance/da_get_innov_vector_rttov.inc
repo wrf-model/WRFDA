@@ -522,7 +522,7 @@ end do
       ! [2.0] calculate components of innovation vector:
       !----------------------------------------------------------------
 
-      where (iv%instid(inst)%tb_inv(1:nchan,n1:n2) /= missing_r)
+      where (iv%instid(inst)%tb_inv(1:nchan,n1:n2) > missing_r)
          iv%instid(inst)%tb_inv(1:nchan,n1:n2) = &
             ob%instid(inst)%tb(1:nchan,n1:n2) - iv%instid(inst)%tb_xb(1:nchan,n1:n2)
       elsewhere

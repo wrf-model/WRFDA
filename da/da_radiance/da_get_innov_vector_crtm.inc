@@ -401,7 +401,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          !----------------------------------------------------------------
 
          do k = 1, nchanl
-            if ( iv%instid(inst)%tb_inv(k,n) /= missing_r ) then 
+            if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
                iv%instid(inst)%tb_xb(k,n)  = rtsolution(k)%Brightness_Temperature
                iv%instid(inst)%tb_inv(k,n) = &
                ob%instid(inst)%tb(k,n) - rtsolution(k)%Brightness_Temperature
