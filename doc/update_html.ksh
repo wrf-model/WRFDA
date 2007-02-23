@@ -2,9 +2,9 @@
 # Assuming starting from wrfvar/doc directory
 cd ..
 svn update
-./clean_new -a
+./clean -a
 . ./setup.ksh g95
-echo 4 | ./configure_new wrfvar
+echo 4 | ./configure wrfvar
 cd build
 make -r setup
 ln -fs inc/* .
