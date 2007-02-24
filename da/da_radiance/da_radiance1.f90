@@ -196,6 +196,7 @@ contains
 #include "da_predictor.inc"
 #include "da_qc_amsua.inc"
 #include "da_qc_amsub.inc"
+#include "da_qc_airs.inc"
 #include "da_write_iv_rad_ascii.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_detsurtyp.inc"
