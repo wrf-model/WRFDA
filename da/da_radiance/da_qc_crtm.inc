@@ -19,12 +19,12 @@ subroutine da_qc_crtm (ob, iv)
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
 
-      amsua = trim(inst_name(rtminit_sensor(i))) == 'amsua'
-      amsub = trim(inst_name(rtminit_sensor(i))) == 'amsub'
-      hirs  = trim(inst_name(rtminit_sensor(i))) == 'hirs'
-      msu   = trim(inst_name(rtminit_sensor(i))) == 'msu'
-      airs  = trim(inst_name(rtminit_sensor(i))) == 'airs'
-      hsb   = trim(inst_name(rtminit_sensor(i))) == 'hsb'
+      amsua = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsua'
+      amsub = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsub'
+      hirs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'hirs'
+      msu   = trim(rttov_inst_name(rtminit_sensor(i))) == 'msu'
+      airs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'airs'
+      hsb   = trim(rttov_inst_name(rtminit_sensor(i))) == 'hsb'
 
       if (hirs) then
          ! 1.0 QC for HIRS

@@ -9,6 +9,9 @@ module da_radiance1
 #ifdef RTTOV
    use module_radiance, only : coefs,inst_name
 #endif
+#ifdef CRTM
+   use module_radiance, only : rttov_inst_name
+#endif
 
    use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
       stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &

@@ -147,7 +147,8 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
   icount=0
   if(airs)then
-     sensor_id = 11
+     if (rtm_option==rtm_option_rttov) sensor_id = 11
+     if (rtm_option==rtm_option_crtm)  sensor_id = 33
      step   = 1.1_r_kind
      start = -48.9_r_kind
      senname = 'AIRS'
@@ -210,9 +211,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
         (/"Cannot open file "//trim(infile)/))
   end if
   if ( airstab ) then
-     call openbf(lnbufr,'in',airs_table_unit)
+     call openbf(lnbufr,'IN',airs_table_unit)
   else
-     call openbf(lnbufr,'in',lnbufr)
+     call openbf(lnbufr,'IN',lnbufr)
   end if
   call datelen(10)
 
@@ -432,16 +433,94 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 !  do i = 1, iv%num_inst
    if ( nobs > 0 ) then
       iv%instid(inst)%num_rad = nobs
-   End If
+      write(UNIT=stdout,FMT='(a,i3,2x,a,3x,i10)') &
+        'Allocating space for radiance innov structure', &
+         inst, iv%instid(inst)%rttovid_string, iv%instid(inst)%num_rad
+      if (rtm_option == rtm_option_crtm) then
+         iv%instid(inst)%nlevels = xp%kme-xp%kms+1
+         iv%instid(inst)%nchannels=nchan
+      end if
+   end if
 !  end do
 
 !   6.0 assign sequential structure to innovation structure
 !-------------------------------------------------------------
+#ifdef RTTOV
+      if (rtm_option == rtm_option_rttov) then
+         call rttov_setupchan(1, nchan, coefs(inst), &   ! in
+            iv%instid(inst)%nfrequencies,iv%instid(inst)%nchannels, &
+            iv%instid(inst)%nbtout)      ! out
+      end if
+#endif
+
   n = 0
   p => head
-   allocate ( iv%instid(inst)%tb_qc(1:nchan,size) )
-   allocate ( iv%instid(inst)%tb_inv(1:nchan,size) )
-   allocate ( iv%instid(inst)%tb_error(1:nchan,size) )
+
+      allocate (iv%instid(inst)%info(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%zk(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%t(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%mr(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dx(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dy(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dxm(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%loc_dym(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tm(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qm(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qrn(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qcw(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qci(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qsn(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%qgr(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%pm(xp%kms:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%pf(0:xp%kme,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%u10(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%v10(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%t2m(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%q2m(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%mr2m(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%psfc(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%ts(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%smois(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tslb(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%snowh(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%isflg(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%landsea_mask(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%elevation(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%vegfra(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%vegtyp(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%soiltyp(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%clwp(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%ps(iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tb_xb(nchan,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tb_qc(nchan,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tb_inv(nchan,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%tb_error(nchan,iv%instid(inst)%num_rad))
+      allocate (iv%instid(inst)%emiss(iv%instid(inst)%nchannels,iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%scanpos(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%scanline(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%ifgat(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%cloud_flag(nchan,iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%satzen(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%satazi(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%solzen(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%solazi(iv%instid(inst)%num_rad))
+      allocate(iv%instid(inst)%proc_domain(iv%instid(inst)%num_rad))
+      if (rtm_option == rtm_option_crtm) then
+        allocate(iv%instid(inst)%water_coverage(iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%land_coverage(iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%ice_coverage(iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%snow_coverage(iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%ps_jacobian(nchan,iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%t_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
+        allocate(iv%instid(inst)%q_jacobian(nchan,xp%kte,iv%instid(inst)%num_rad))
+      end if
+
   do i = 1, size
 !   inst = p%sensor_index
    n = n + 1
@@ -449,20 +528,59 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
    iv%instid(inst)%info(n)   =  p%info
    iv%instid(inst)%loc_i(n)        = p%loc%i
    iv%instid(inst)%loc_j(n)        = p%loc%j
+   iv%instid(inst)%loc_k(:,n)      = 0
    iv%instid(inst)%loc_dx(n)       = p%loc%dx
    iv%instid(inst)%loc_dy(n)       = p%loc%dy
+   iv%instid(inst)%loc_dz(:,n)     = 0.0
    iv%instid(inst)%loc_dxm(n)      = p%loc%dxm
    iv%instid(inst)%loc_dym(n)      = p%loc%dym
+   iv%instid(inst)%loc_dzm(:,n)    = 0.0
 
-   iv%instid(inst)%ifgat(n)  =  p%ifgat
-   iv%instid(inst)%landsea_mask(n) = p%landsea_mask
-   iv%instid(inst)%scanline(n)     = p%scanline
-   iv%instid(inst)%scanpos(n)      = p%scanpos
-   iv%instid(inst)%satzen(n)       = p%satzen
-   iv%instid(inst)%satazi(n)       = p%satazi
-   iv%instid(inst)%solzen(n)       = p%solzen
-   iv%instid(inst)%solazi(n)       = p%solazi
-   iv%instid(inst)%tb_inv(1:nchan,n) = p%tb_inv(1:nchan)
+      ! z done in da_get_innov_vector_rad
+      iv%instid(inst)%t(:,n)          = 0.0
+      iv%instid(inst)%mr(:,n)         = 0.0
+      iv%instid(inst)%tm(:,n)         = 0.0
+      iv%instid(inst)%qm(:,n)         = 0.0
+      iv%instid(inst)%qrn(:,n)        = 0.0
+      iv%instid(inst)%qcw(:,n)        = 0.0
+      iv%instid(inst)%qci(:,n)        = 0.0
+      iv%instid(inst)%qsn(:,n)        = 0.0
+      iv%instid(inst)%qgr(:,n)        = 0.0
+      iv%instid(inst)%pm(:,n)         = 0.0
+      iv%instid(inst)%u10(n)          = 0.0
+      iv%instid(inst)%v10(n)          = 0.0
+      iv%instid(inst)%t2m(n)          = 0.0
+      iv%instid(inst)%q2m(n)          = 0.0
+      iv%instid(inst)%mr2m(n)         = 0.0
+      iv%instid(inst)%psfc(n)         = 0.0
+      iv%instid(inst)%ts(n)           = 0.0
+      iv%instid(inst)%smois(n)        = 0.0
+      iv%instid(inst)%tslb(n)         = 0.0
+      iv%instid(inst)%snowh(n)        = 0.0
+      iv%instid(inst)%isflg(n)        = 0
+      iv%instid(inst)%soiltyp(n)      = 0.0
+      iv%instid(inst)%landsea_mask(n) = p%landsea_mask
+      iv%instid(inst)%elevation(n)    = 0.0
+      iv%instid(inst)%vegfra(n)       = 0.0
+      iv%instid(inst)%vegtyp(n)       = 0.0
+      iv%instid(inst)%clwp(n)         = 0.0
+      iv%instid(inst)%ps(n)           = 0.0
+      iv%instid(inst)%tb_xb(:,n)      = 0
+      iv%instid(inst)%tb_inv(:,n)     = p%tb_inv(:)
+      iv%instid(inst)%tb_qc(:,n)      = 0
+      iv%instid(inst)%tb_error(:,n)   = 500.
+      iv%instid(inst)%emiss(:,n)      = 0.0
+      iv%instid(inst)%scanpos(n)      = p%scanpos
+      ! iv%instid(inst)%scanline(n)    = p%scanline
+      iv%instid(inst)%scanline(n)     = 0
+      iv%instid(inst)%ifgat(n)        = p%ifgat
+      iv%instid(inst)%cloud_flag(:,n) = 1        ! no cloud
+      iv%instid(inst)%satzen(n)       = p%satzen
+      iv%instid(inst)%satazi(n)       = p%satazi
+      iv%instid(inst)%solzen(n)       = p%solzen
+      ! iv%instid(inst)%solazi(n)     = p%solazi
+      iv%instid(inst)%solazi(n)       = 0.0
+      iv%instid(inst)%proc_domain(n)  = .false.
 
    current => p
    p => p%next
@@ -474,7 +592,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
  end do
 
 1000 continue
-  call closbf(lnbufr)
+   call closbf(lnbufr)
    close(lnbufr)
    call da_free_unit(lnbufr)
    if (airstab) then

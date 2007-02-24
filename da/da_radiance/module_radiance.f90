@@ -49,6 +49,22 @@ module module_radiance
    
    real, parameter             :: q2ppmv = 1.60771704e+6
 
+  Character (len=8), Parameter :: rttov_platform_name(1:20) = &
+       (/ 'noaa    ', 'dmsp    ', 'meteosat', 'goes    ', 'gms     ', &
+          'fy2     ', 'trmm    ', 'ers     ', 'eos     ', 'metop   ', &
+          'envisat ', 'msg     ', 'fy1     ', 'adeos   ', 'mtsat   ', &
+          'coriolis', 'npoess  ', 'gifts   ', 'xxxxxxxx', 'xxxxxxxx'/)
+
+  ! List of instruments  !!!! HIRS is number 0
+  Character (len=8), Dimension(0:34) :: rttov_inst_name  =                &
+       & (/ 'hirs    ', 'msu     ', 'ssu     ', 'amsua   ', 'amsub   ',  &
+       &    'avhrr   ', 'ssmi    ', 'vtpr1   ', 'vtpr2   ', 'tmi     ',  &
+       &    'ssmis   ', 'airs    ', 'hsb     ', 'modis   ', 'atsr    ',  &
+       &    'mhs     ', 'iasi    ', 'amsr    ', 'imager  ', 'atms    ',  &
+       &    'mviri   ', 'seviri  ', 'imager  ', 'sounder ', 'imager  ',  &
+       &    'vissr   ', 'mvisr   ', 'cris    ', 'cmis    ', 'viirs   ',  &
+       &    'windsat ', 'gifts   ', 'xxxxxxxx', 'airs    ', 'xxxxxxxx'   /)
+
 ! n=noaa; f=dmsp; g=goes; c=npoess; eos-1/2=aqua/terra;
    character(len=8), parameter :: crtm_platform_name(1:20) = &
        (/ 'n       ', 'f       ', 'meteosat', 'g       ', 'gms     ', &

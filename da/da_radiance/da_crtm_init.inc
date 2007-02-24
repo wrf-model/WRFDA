@@ -102,37 +102,40 @@ subroutine da_crtm_init(iv,ob)
    iv%instid(n)%sensor_id    = rtminit_sensor(n)
    if ( rtminit_satid(n) < 10 ) then
       write(iv%instid(n)%rttovid_string, '(a,i1,a)')  &
-             trim( platform_name(rtminit_platform(n)) )//'-',  &
+             trim( rttov_platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
-             '-'//trim( inst_name(rtminit_sensor(n)) )
+             '-'//trim( rttov_inst_name(rtminit_sensor(n)) )
    else
       write(iv%instid(n)%rttovid_string, '(a,i2.2,a)')  &
-             trim( platform_name(rtminit_platform(n)) )//'-',  &
+             trim( rttov_platform_name(rtminit_platform(n)) )//'-',  &
              rtminit_satid(n),     &
-             '-'//trim( inst_name(rtminit_sensor(n)) )
+             '-'//trim( rttov_inst_name(rtminit_sensor(n)) )
    end if
 
-   if ( trim( inst_name(rtminit_sensor(n))) == 'msu' ) then
+   if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'msu' ) then
       nchanl(n)  = 4
       nscan(n)   = 11
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'hirs' ) then
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hirs' ) then
       nchanl(n)  = 19
       nscan(n)   = 56
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'amsua' ) then
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'amsua' ) then
       nchanl(n)  = 15
       nscan(n)   = 30
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'amsub' ) then
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'amsub' ) then
       nchanl(n)  = 5
       nscan(n)   = 90
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'airs' ) then
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'airs' ) then
       nchanl(n)  = 281
       nscan(n)   = 90
-   else if ( trim( inst_name(rtminit_sensor(n))) == 'hsb' ) then
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'SUBSET' ) then
+      nchanl(n)  = 281
+      nscan(n)   = 90
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hsb' ) then
       nchanl(n)  = 4
       nscan(n)   = 90
    else
-      write(6,*) ' unrecorgnized instrument '
-      stop ' in da_crtm_init '
+      call da_error(__FILE__,__LINE__, &
+        (/"Unrecorgnized instrument"/))
    end if
 
    iv%instid(n)%nchan  = nchanl(n)
@@ -140,18 +143,19 @@ subroutine da_crtm_init(iv,ob)
 
    allocate ( iv%instid(n)%ichan(1:nchanl(n)), stat = error )
    if( error /= 0 ) then
-      Write( *, '( "mem allocation error to iv%instid(n)%ichan")' )
-      Stop ' in da_crtm_init '
+      call da_error(__FILE__,__LINE__, &
+         (/"Memory allocation error to iv%instid(n)%ichan"/))
    end if
 
    allocate ( ob%instid(n)%ichan(1:nchanl(n)), stat = error )
    if( error /= 0 ) then
-        Write( *, '( "mem allocation error to ob%instid(n)%ichan")' )
-        Stop ' in da_crtm_init '
+      call da_error(__FILE__,__LINE__, &                                                           
+         (/"Memory allocation error to ob%instid(n)%ichan"/))
    end if
 
    call da_get_unit(iunit)
-   filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+   !filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+   filename=adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
    open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
       message(1)="Cannot open radiance info file "//adjustl(filename)
@@ -245,9 +249,8 @@ subroutine da_crtm_init(iv,ob)
    open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
            form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
-      write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance biascorr FILE ', trim(iv%instid(n)%rttovid_string)//'.bias'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_crtm_init '
+       call da_error(__FILE__,__LINE__, &
+         (/"Cannot open radiance bias file: ', trim(iv%instid(n)%rttovid_string)//'.bias"/))
    end if
 
    allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
@@ -301,9 +304,8 @@ subroutine da_crtm_init(iv,ob)
          form='formatted',iostat = iost, status='old')
 
     if (iost /= 0) then
-     write(unit=*, fmt='(/A,A)') &
-         'ERROR IN OPEN Radiance Error Factor FILE : radiance_error.factor'
-          stop 'CANNOT BE FOUND OR CANNOT BE OPENED in da_crtm_init '
+       call da_error(__FILE__,__LINE__, &
+         (/"Cannot open radiance error factor file: radiance_error.factor"/))
     end if
 
     read(unit_factor_rad, *)

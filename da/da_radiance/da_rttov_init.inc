@@ -150,7 +150,8 @@ subroutine da_rttov_init(iv,ob)
       allocate (ob%instid(i)%ichan(1:nchan(i)))
 
       call da_get_unit(iunit)
-      filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.info'
+      !filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.info'
+      filename=adjustl(trim(iv%instid(i)%rttovid_string))//'.info'
       open(unit=iunit,file=filename, &
          form='formatted',iostat = iost, status='old')
 
@@ -325,7 +326,8 @@ subroutine da_rttov_init(iv,ob)
 
       if (read_biascoef) then
          call da_get_unit(bunit)
-         filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.bias'
+         !filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.bias'
+         filename=adjustl(trim(iv%instid(i)%rttovid_string))//'.bias'
          open(bunit,file=filename, &
             form='formatted',iostat = iost, status='old')
          if (iost /= 0) then

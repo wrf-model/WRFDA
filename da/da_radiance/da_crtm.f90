@@ -15,7 +15,8 @@ module da_crtm
       crtm_destroy_atmosphere,crtm_set_channelinfo,crtm_sensor_name, &
       crtm_allocate_surface,crtm_destroy_surface,crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere, satinfo, &
-      time_slots,crtm_platform_name, crtm_init,inst_name,platform_name
+      time_slots,crtm_platform_name, crtm_init,inst_name,platform_name, &
+      rttov_inst_name,rttov_platform_name
 #endif
 
    use da_control, only : trace_use, crtm_cloud, gravity,stdout, biascorr, &
