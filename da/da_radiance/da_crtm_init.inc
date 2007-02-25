@@ -154,8 +154,7 @@ subroutine da_crtm_init(iv,ob)
    end if
 
    call da_get_unit(iunit)
-   !filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
-   filename=adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+   filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
    open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
       message(1)="Cannot open radiance info file "//adjustl(filename)
@@ -246,11 +245,11 @@ subroutine da_crtm_init(iv,ob)
    loop_sensor2: do n = 1, nsensor
 
    call da_get_unit(bunit)
-   open(bunit,file=trim(iv%instid(n)%rttovid_string)//'.bias', &
-           form='formatted',iostat = iost, status='old')
+   filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.bias'
+   open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
-       call da_error(__FILE__,__LINE__, &
-         (/"Cannot open radiance bias file: ', trim(iv%instid(n)%rttovid_string)//'.bias"/))
+      message(1)="Cannot open radiance biascorr file "//adjustl(filename)
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
    allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )

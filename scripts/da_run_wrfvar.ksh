@@ -215,18 +215,6 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    done
 
-   for FILE in $WRFVAR_DIR/run/*.bias; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
-
-   for FILE in $WRFVAR_DIR/run/*.info; do
-      if test -f $FILE; then
-         ln -s $FILE .
-      fi
-   done
-
    ln -s $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
