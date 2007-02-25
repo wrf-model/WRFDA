@@ -21,7 +21,7 @@ subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
              trim( crtm_platform_name(platform_id) ),satellite_id
      endif
 
-     if ( trim(crtm_sensor_name(sensor_id)) == 'SUBSET' ) then
+     if ( trim(crtm_sensor_name(sensor_id)) == 'airs' ) then
         crtm_sensor='airs281SUBSET'
      elseif ( trim(crtm_sensor_name(sensor_id)) == 'hirs' ) then
         if (satellite_id <= 14) crtm_sensor='hirs2'

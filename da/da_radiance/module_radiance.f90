@@ -80,7 +80,7 @@ module module_radiance
        &    'mhs     ', 'iasi    ', 'amsre   ', 'imager  ', 'atms    ',  &
        &    'mviri   ', 'seviri  ', 'imgr    ', 'sndr    ', 'imager  ',  &
        &    'vissr   ', 'mvisr   ', 'cris    ', 'cmis    ', 'viirs   ',  &
-       &    'windsat ', 'gifts   ', 'amsre   ', 'SUBSET  ', 'xxxxxxxx'   /)
+       &    'windsat ', 'gifts   ', 'amsre   ', 'xxxxxxxx', 'xxxxxxxx'   /)
 
    integer                     :: n_scatt_coef
    character(len=5), pointer   :: coefs_scatt_instname(:)

@@ -127,9 +127,6 @@ subroutine da_crtm_init(iv,ob)
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'airs' ) then
       nchanl(n)  = 281
       nscan(n)   = 90
-   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'SUBSET' ) then
-      nchanl(n)  = 281
-      nscan(n)   = 90
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hsb' ) then
       nchanl(n)  = 4
       nscan(n)   = 90
@@ -243,6 +240,8 @@ subroutine da_crtm_init(iv,ob)
 
  if (read_biascoef) then
    loop_sensor2: do n = 1, nsensor
+
+   if ( trim(iv%instid(n)%rttovid_string)=='eos-2-airs' ) cycle
 
    call da_get_unit(bunit)
    filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.bias'

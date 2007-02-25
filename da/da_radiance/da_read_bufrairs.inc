@@ -147,8 +147,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
   icount=0
   if(airs)then
-     if (rtm_option==rtm_option_rttov) sensor_id = 11
-     if (rtm_option==rtm_option_crtm)  sensor_id = 33
+     sensor_id = 11
      step   = 1.1_r_kind
      start = -48.9_r_kind
      senname = 'AIRS'
