@@ -34,11 +34,17 @@ subroutine da_read_y_unit(filename,unit_out,num,obs_type_in, nc)
    if (index(ob_type,OBS_type_in(1:nc)) > 0) if_write = .true.
 
    ! If radiance data treat differently
-   if (index(ob_type,'noaa') > 0  .and. index(ob_type,'amsu') > 0) then             
+   if ( index(ob_type,'noaa') > 0 ) then             
       do n = 1, num_obs        
          if (if_write) num = num + 1
          read(unit_in,'(2i8,e15.7)')n1, n2, fld_rad                              
          if (if_write)write(unit_out,'(2i8,e15.7)')num,n2, fld_rad                              
+      end do
+   else if ( index(ob_type,'eos') > 0 ) then
+      do n = 1, num_obs
+         if (if_write) num = num + 1
+         read(unit_in,'(2i8,e15.7)')n1, n2, fld_rad
+         if (if_write)write(unit_out,'(2i8,e15.7)')num,n2, fld_rad
       end do
    else    
       do n = 1, num_obs        
