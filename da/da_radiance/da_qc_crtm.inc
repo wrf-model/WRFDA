@@ -15,6 +15,7 @@ subroutine da_qc_crtm (ob, iv)
    logical   :: amsua, amsub, hirs, msu,airs,hsb
 
    if (trace_use) call da_trace_entry("da_qc_crtm")
+#ifdef CRTM
 
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
@@ -50,6 +51,7 @@ subroutine da_qc_crtm (ob, iv)
       end if
 
    end do
+#endif
 
    if (trace_use) call da_trace_exit("da_qc_crtm")
 
