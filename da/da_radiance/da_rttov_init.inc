@@ -323,7 +323,9 @@ subroutine da_rttov_init(iv,ob)
       ! 6.0 read bias correction coefs files
       !-------------------------------------------------------
 
-      if ( read_biascoef .and. ( trim(iv%instid(i)%rttovid_string) /= 'eos-2-airs' ) ) then
+      if ( read_biascoef .and. &
+           ( trim(iv%instid(i)%rttovid_string) /= 'eos-2-airs' ) &
+             .and. index(iv%instid(i)%rttovid_string,'hirs') <= 0 ) then
 
          call da_get_unit(bunit)
          filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.bias'

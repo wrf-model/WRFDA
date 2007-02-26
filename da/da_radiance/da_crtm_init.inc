@@ -242,6 +242,7 @@ subroutine da_crtm_init(iv,ob)
    loop_sensor2: do n = 1, nsensor
 
    if ( trim(iv%instid(n)%rttovid_string)=='eos-2-airs' ) cycle
+   if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle
 
    call da_get_unit(bunit)
    filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.bias'

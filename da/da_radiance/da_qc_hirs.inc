@@ -1,7 +1,7 @@
-subroutine da_qc_airs (i, nchan, ob, iv)
+subroutine da_qc_hirs (i, nchan, ob, iv)
 
    !---------------------------------------------------------------------------
-   ! Purpose: perform quality control for AQUA/EOS-2-AIRS data.
+   ! Purpose: perform quality control for HIRS data.
    !---------------------------------------------------------------------------
 
    implicit none
@@ -25,7 +25,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
    character(len=30)  :: filename
 
-   if (trace_use) call da_trace_entry("da_qc_airs")
+   if (trace_use) call da_trace_entry("da_qc_hirs")
 
    ngood(:)        = 0
    nrej(:)         = 0
@@ -80,7 +80,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !    reject limb obs 
          !------------------------------------------------------
          scanpos = iv%instid(i)%scanpos(n)
-         if (scanpos <= 3 .or. scanpos >= 88) then
+         if (scanpos <= 3 .or. scanpos >= 54) then
             iv%instid(i)%tb_qc(:,n)  =  qc_bad
             if (iv%instid(i)%proc_domain(n)) &
                   nrej_limb = nrej_limb + 1
@@ -224,7 +224,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
       call da_free_unit(fgat_rad_unit)
    end if
 
-   if (trace_use) call da_trace_exit("da_qc_airs")
+   if (trace_use) call da_trace_exit("da_qc_hirs")
 
-end subroutine da_qc_airs
+end subroutine da_qc_hirs
 

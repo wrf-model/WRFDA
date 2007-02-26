@@ -29,8 +29,8 @@ subroutine da_qc_crtm (ob, iv)
 
       if (hirs) then
          ! 1.0 QC for HIRS
-         ! call da_qc_hirs(i,nchan,ob,iv)
-         call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HIRS'/))
+         call da_qc_hirs(i,nchan,ob,iv)
+         !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for HIRS'/))
       else if (airs) then
          call da_qc_airs(i,nchan,ob,iv)
          !call da_warning(__FILE__,__LINE__,(/'QC Not implemented for AIRS'/))
