@@ -498,7 +498,7 @@ subroutine da_get_innov_vector_crtmk ( it, xb, xp, ob, iv )
       do inst = 1, iv%num_inst
          WRITE(UNIT=stdout,FMT='(A,A)') 'Preparing bias statistics files for ', &
                             trim(iv%instid(inst)%rttovid_string)
-         call da_biasprep(inst,ob,iv)
+         call da_biasprep_crtm(inst,ob,iv)
       end do
    end if
 

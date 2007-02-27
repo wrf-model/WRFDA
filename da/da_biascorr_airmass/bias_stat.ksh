@@ -1,16 +1,26 @@
 #!/usr/bin/ksh
+###############################################
+#  Bias correction off-line statistics script
+#  Author: Zhiquan Liu NCAR/MMM 02/2007
+###############################################
+export USER=liuz
+export WRFVAR_DIR=/ptmp/${USER}/wrfvar/trunk
+#export DATA_DIR=/ptmp/hclin/exps/t44/test_gts_crtm/run
+export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2269_gts_crtm_8/run
+export BIN_DIR=${WRFVAR_DIR}/da/da_biascorr_airmass
+export WORKDIR=/ptmp/liuz/wrfvar/trunk/da/da_biascorr_airmass/work
 
-export DATA_DIR=/ptmp/liuz/wrf21out/katrina_48km/trunk_biasprep
-export START_DATE=2005080106
-export END_DATE=2005081518
-export CYCLE_PERIOD=6
+export START_DATE=2006100112
+export END_DATE=2006100200
+export CYCLE_PERIOD=12
 export PLATFORM=noaa
+export PLATFORM_ID=1
 export SATELLITE=16
 export SENSOR=amsua
-export BIN_DIR=$HOME/bias-on-cluster/src_new
-export WORKDIR=/ptmp/${USER}/bias_work
-export bias_stat=0  # 1/0 do/no-do statistics/
-export bias_veri=1  # 1/0 verif/no-verif
+export SENSOR_ID=3
+export NSCAN=30
+export bias_stat=1  # 1/0 do/no-do statistics/
+export bias_veri=0  # 1/0 verif/no-verif
 
  echo 'WORKING directory is $WORKDIR'
 
@@ -27,8 +37,8 @@ export bias_veri=1  # 1/0 verif/no-verif
 #------------------------------------
  while [[ $CDATE -le $END_DATE ]]; do
    echo $CDATE
-   cat ${DATA_DIR}/${CDATE}/biasprep_${PLATFORM}-${SATELLITE}-${SENSOR}.* >> biasprep_${sensor}
-   CDATE=`${BIN_DIR}/advance_cymdh.exe ${CDATE} ${CYCLE_PERIOD}`
+   cat ${DATA_DIR}/${CDATE}/wrfvar/working/biasprep_${PLATFORM}-${SATELLITE}-${SENSOR}.* >> biasprep_${sensor}
+   CDATE=`${WRFVAR_DIR}/build/da_advance_cymdh.exe ${CDATE} ${CYCLE_PERIOD}`
  done
 
 #--------------------------------------------------
@@ -39,11 +49,11 @@ export bias_veri=1  # 1/0 verif/no-verif
 echo 'Start da_sele_bias'  
 cat > nml_cycle_sele << EOF
  &INPUTS
-  platform_id  = 1,
-  satellite_id = $SATELLITE,
-  sensor_id    = 3, 
+  platform_id  = ${PLATFORM_ID},
+  satellite_id = ${SATELLITE},
+  sensor_id    = ${SENSOR_ID},
   isurf = 2,
-  nscan  = 30
+  nscan  = ${NSCAN}
  /
 EOF
  
@@ -61,7 +71,7 @@ echo '  End da_sele_bias'
 echo 'Start da_scan_bias'
 cat > nml_cycle_scan << EOF
  &INPUTS
-  kscan = 30,
+  kscan = ${NSCAN},
   FAC=2,
   sband=10,
   eband=14,
@@ -73,7 +83,7 @@ EOF
        ln -s biassele_${sensor}  fort.10  # input : fort.10
        $BIN_DIR/da_scan_bias.exe < nml_cycle_scan > da_scan_bias_${sensor}.log
        mv fort.11 scan_core_${sensor}     # output: fort.11, statistics not divided by nobs
-       mv fort.12 scan_bias_${sensor}      # scan bias both band/noband (no smoothing)
+       mv fort.12 scan_bias_${sensor}     # scan bias both band/noband (no smoothing)
        mv fort.112  scan_bias_smooth_${sensor}   # scan bias only band (smoothing)
 echo '  End da_scan_bias'
 
@@ -85,12 +95,12 @@ echo "Start da_airmass_bias"
 
 cat > nml_cycle_bias << EOF
  &INPUTS
-  platform_id  = 1,
+  platform_id  = ${PLATFORM_ID},
   satellite_id = $SATELLTE,
-  sensor_id    = 3,
+  sensor_id    = ${SENSOR_ID},
   global=.false.,
   lscan = .true.,
-  kscan = 30,
+  kscan = ${NSCAN},
   check_limb = .false.,
   check_mask = .false.,
   FAC=2,

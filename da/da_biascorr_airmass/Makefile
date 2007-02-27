@@ -13,7 +13,6 @@
 FC = xlf90 -qsuffix=f=F90 -qrealsize=8
 
 all:
-	@ ${FC} -o advance_cymdh.exe advance_cymdh.F90
 	@ ${FC} -o da_sele_bias.exe rad_bias.F90 da_sele_bias.F90
 	@ ${FC} -o da_scan_bias.exe rad_bias.F90 da_scan_bias.F90
 	@ ${FC} -o da_airmass_bias.exe rad_bias.F90 pythag.F90 tqli.F90 tred2.F90 regress_one.F90 da_airmass_bias.F90
