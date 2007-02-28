@@ -49,14 +49,14 @@ subroutine da_biasprep_crtm(inst,ob,iv)
       if (iv%instid(inst)%proc_domain(n)) then 
          !q(1:43) = iv%instid(inst)%mr(1:43,n)/q2ppmv ! to kg/kg
 
-         if (n==10) then
-          write(*,'(2f10.2)') iv%instid(inst)%ts(n),iv%instid(inst)%pf(0,n)
-          do jx=1,nlevels
-           write(*,'(i3,2f10.2,f8.2,f10.4)') jx, &
-                            iv%instid(inst)%pm(jx,n),iv%instid(inst)%pf(jx,n), &
-                            iv%instid(inst)%tm(jx,n),iv%instid(inst)%qm(jx,n)
-          end do
-         end if
+         !if (n==10) then
+         ! write(*,'(2f10.2)') iv%instid(inst)%ts(n),iv%instid(inst)%pf(0,n)
+         ! do jx=1,nlevels
+         !  write(*,'(i3,2f10.2,f8.2,f10.4)') jx, &
+         !                   iv%instid(inst)%pm(jx,n),iv%instid(inst)%pf(jx,n), &
+         !                   iv%instid(inst)%tm(jx,n),iv%instid(inst)%qm(jx,n)
+         ! end do
+         !end if
 
          call da_predictor_crtm(pred(1:npred), npred, nlevels,iv%instid(inst)%tm(1:nlevels,n), &
             iv%instid(inst)%qm(1:nlevels,n), iv%instid(inst)%ts(n), &
