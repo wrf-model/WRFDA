@@ -312,6 +312,8 @@ subroutine da_solve ( grid , config_flags)
          deallocate (ob%instid(i) % ichan)
 
          deallocate (iv%instid(i)%ichan)
+
+       if ( iv%instid(i)%num_rad > 0 ) then
          deallocate (iv%instid(i)%info)
          deallocate (iv%instid(i)%loc)
          deallocate (iv%instid(i)%loc_i)
@@ -377,6 +379,7 @@ subroutine da_solve ( grid , config_flags)
             deallocate(iv%instid(i)%t_jacobian)
             deallocate(iv%instid(i)%q_jacobian)
          end if
+        end if
 #ifdef RTTOV
          if (rtm_option == rtm_option_rttov) then
             call rttov_dealloc_coef (ierr,coefs(i))
