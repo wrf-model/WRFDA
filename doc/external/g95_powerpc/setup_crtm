@@ -1,0 +1,9 @@
+#!/bin/ksh
+export FC_EXTRA_FLAGS=-O2
+cd src
+make clean
+rm -f *.a
+make g95
+cp *.mod ../include
+ranlib libCRTM.a
+cp libCRTM.a ../lib/libcrtm.a

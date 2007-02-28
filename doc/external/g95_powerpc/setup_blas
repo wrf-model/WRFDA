@@ -1,5 +1,7 @@
 #!/bin/ksh
+export CPP=/usr/bin/cpp
 export FFC=g95
 export FFCFLAGS="-O2 -r8"
+rm *.a
 make clean
 make all
