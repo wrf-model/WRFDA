@@ -1,0 +1,10 @@
+#!/bin/ksh
+cd src
+# Edit makefile to have
+# FC=g95
+# FC77=g95
+# FFLAGS=-fno-second-underscore -r8 -O2
+make clean
+make all
+ranlib librttov8.5.a
+cp librttov8.5.a ../lib/librttov.a
