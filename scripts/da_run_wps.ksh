@@ -23,7 +23,6 @@ else
 fi
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
-export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
@@ -168,38 +167,26 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       fi
 
 #     Run ungrib:
-      if $RUN_UNGRIB_AFWA; then
-         export RUN_DIR=$EXP_DIR/run/$DATE/wps
-         mkdir -p $RUN_DIR
+      ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
+      LOCAL_DATE=$DATE
+      FILES=''
+      while test $LOCAL_DATE -le $END_DATE; do
+         FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
+         LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+      done
+      $WPS_DIR/link_grib.csh $FILES
 
-         $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
-         ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
-         RC=$?
-         if test $RC != 0; then
-            echo `date` "${ERR}Failed with error $RC$END"
-            exit 1
-         fi
-      else
-         ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-         LOCAL_DATE=$DATE
-         FILES=''
-         while test $LOCAL_DATE -le $END_DATE; do
-            FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-            LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
-         done
-         $WPS_DIR/link_grib.csh $FILES
+      cp $WPS_DIR/ungrib.exe .
+ls
+      ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
 
-         cp $WPS_DIR/ungrib.exe .
-         ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
+      RC=$?
+      cp ungrib.log $RUN_DIR
+      echo '<A HREF="ungrib.log">ungrib.log</a>'
 
-         RC=$?
-         cp ungrib.log $RUN_DIR
-         echo '<A HREF="ungrib.log">ungrib.log</a>'
-
-         if test $RC != 0; then
-            echo ungrib failed with error $RC
-            exit $RC
-         fi
+      if test $RC != 0; then
+         echo ungrib failed with error $RC
+         exit $RC
       fi
 
 #     Run metgrid:
