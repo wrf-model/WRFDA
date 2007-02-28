@@ -1,6 +1,6 @@
 include configure.wrfvar
 
-all: wrfvar be utils
+all: wrfvar be utils bias
 
 setup : depend
 

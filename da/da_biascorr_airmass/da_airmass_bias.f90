@@ -90,7 +90,7 @@ print * ,' '
 
   IF (lscan) OPEN(112,FORM='UNFORMATTED') ! Scan Biases with lat bands
   OPEN(UNIT=10,FORM='UNFORMATTED')        ! Input data from SELECT
-  OPEN(11,FORM='UNFORMATTED')             ! Output 'core' array file
+  OPEN(UNIT=11,FORM='UNFORMATTED')        ! Output core array file
 
 ! Read scan biases
 

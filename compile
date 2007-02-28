@@ -32,7 +32,7 @@ foreach a ( $argv )
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1
     else if ( "$a" == "wrfvar" || "$a" == "convertor" || "$a" == "be" \
-          || "$a" == "utils"  || "$a" == "all" ) then
+          || "$a" == "utils"  || "$a" == "biascorr" || "$a" == "all" ) then
       set compare_wrf = 1
       set compare_var = 1
     endif
@@ -47,6 +47,7 @@ if( $compare_wrf != 1 ) then
   echo "Type <compile wrfvar> to compile wrfvar (and WRF framework)"
   echo "Type <compile be> to compile be"
   echo "Type <compile convertor> to compile convertors for converting KMA data to and from NetCDF data format"
+  echo "Type <compile biascorr> to compile bias correction programs"
   echo "Type <compile all> to compile everything (wrfvar, be, convertor)"
 
   exit 2
