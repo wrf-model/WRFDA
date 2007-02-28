@@ -1,0 +1,4 @@
+#!/bin/ksh
+cd src
+make clean
+make all

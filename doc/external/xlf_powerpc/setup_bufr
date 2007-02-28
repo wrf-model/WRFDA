@@ -1,0 +1,7 @@
+#!/bin/ksh
+export CC=xlc
+export FFC=xlf_r
+export FFCFLAGS="-O2 -qmaxmem=32767"
+export CCFLAGS="-DNOUNDERSCORE"
+make clean
+make all
