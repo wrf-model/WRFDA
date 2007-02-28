@@ -1,0 +1,8 @@
+#!/bin/ksh
+export CPPFLAGS="-C -P -traditional"
+export BLAS=../../blas/blas_ifort_x86_64
+export FFCFLAGS="-O2 -r8"
+export FFC=ifort
+rm *.a
+make clean
+make

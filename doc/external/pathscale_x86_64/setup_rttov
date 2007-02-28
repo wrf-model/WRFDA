@@ -1,0 +1,6 @@
+#!/bin/ksh
+cd src
+# Uncomment the pathscale lines from Makefile
+make clean
+make all
+cp src/librttov8.5.a lib/librttov.a
