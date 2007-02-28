@@ -355,8 +355,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  
    
-   iv%instid(:)%num_rad = 0
-
    do i = 1, iv%num_inst
       if (nread(i) < 1) cycle
       iv%instid(i)%num_rad = nread(i)
@@ -367,9 +365,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          iv%instid(i)%nlevels = xp%kme-xp%kms+1
          iv%instid(i)%nchannels=nchan
       end if
-   end do
-   
-   do i = 1, iv%num_inst
+
 #ifdef RTTOV
       if (rtm_option == rtm_option_rttov) then
          call rttov_setupchan(1, nchan, coefs(i), &   ! in

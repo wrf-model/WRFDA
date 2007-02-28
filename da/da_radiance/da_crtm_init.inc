@@ -241,6 +241,16 @@ subroutine da_crtm_init(iv,ob)
  if (read_biascoef) then
    loop_sensor2: do n = 1, nsensor
 
+   allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
+   allocate ( satinfo(n) % std(nscan(n)+1,nchanl(n)) )
+   allocate ( satinfo(n) %   a(nscan(n)+1,nchanl(n)) )
+   allocate ( satinfo(n) %   b(nscan(n)+1,nchanl(n)) )
+
+   satinfo(n) % rms(:,:) = 500.
+   satinfo(n) % std(:,:) = 500.
+   satinfo(n) %   a(:,:) = 0.
+   satinfo(n) %   b(:,:) = 0.
+
    if ( trim(iv%instid(n)%rttovid_string)=='eos-2-airs' ) cycle
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle
 
@@ -251,11 +261,6 @@ subroutine da_crtm_init(iv,ob)
       message(1)="Cannot open radiance biascorr file "//adjustl(filename)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
-
-   allocate ( satinfo(n) % rms(nscan(n)+1,nchanl(n)) )
-   allocate ( satinfo(n) % std(nscan(n)+1,nchanl(n)) )
-   allocate ( satinfo(n) %   a(nscan(n)+1,nchanl(n)) )
-   allocate ( satinfo(n) %   b(nscan(n)+1,nchanl(n)) )
 
    read(bunit,*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
    read(bunit,*)  !trim(cdate)

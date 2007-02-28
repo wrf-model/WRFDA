@@ -20,6 +20,8 @@ subroutine da_qc_crtm (ob, iv)
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
 
+      write(UNIT=stdout,FMT='(A,A)') ' Performing QC : ', iv%instid(i)%rttovid_string
+
       amsua = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsua'
       amsub = trim(rttov_inst_name(rtminit_sensor(i))) == 'amsub'
       hirs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'hirs'

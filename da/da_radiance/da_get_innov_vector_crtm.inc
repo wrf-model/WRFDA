@@ -70,8 +70,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_crtm")
 
-   WRITE(UNIT=stdout,FMT='(A)') ' Computing Radiance Innovation------- '
-
 !----------------------------------------------------------------------------
 ! CRTM allocation
 !
@@ -107,11 +105,10 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    !------------------------------------------------------
    ! [1.0] calculate the background bright temperature
    !-------------------------------------------------------
-
    do inst = 1, iv%num_inst                 ! loop for sensor
       if ( iv%instid(inst)%num_rad < 1 ) cycle
+      write(UNIT=stdout,FMT='(A,A)') ' Computing Innovation : ',iv%instid(inst)%rttovid_string
       num_levs  = xp%kte-xp%kts+1 
-
   ! CRTM channel information structure
       Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(inst),ChannelInfo)
       if ( Error_Status /= 0) then
@@ -160,12 +157,10 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
       do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
          ! if ( n > iv%instid(inst)%num_rad ) exit
-
          model_ts   = 0.0
          model_u10  = 0.0
          model_v10  = 0.0
          model_psfc = 0.0
-
 
          ! [1.1] Get horizontal interpolation weights:
 
@@ -175,7 +170,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          dy = iv%instid(inst)%loc_dy(n)
          dxm = iv%instid(inst)%loc_dxm(n)
          dym = iv%instid(inst)%loc_dym(n)
-
          ! horizontal interpolate xb pressure to ob position for every xb layer
          ! get CRTM pressure Layers 
          do k=xp%kts,xp%kte ! from bottem to top
@@ -231,7 +225,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
             end if
          enddo
- 
 
          ! determine surface type of obs location
          !-----------------------------------------
@@ -364,12 +357,13 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
        !Surface%Ice_Density=0.9                ! g/cm**3
        !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
      endif
-     Surface%SensorData%n_channels = nchan_emis
-     Surface%SensorData%Sensor_ID  = wmo_sensor_id 
-     Surface%SensorData%Tb(1:nchan_emis) = ob%instid(inst)%tb(1:nchan_emis,n)
+     if (nchan_emis > 0) then
+       Surface%SensorData%n_channels = nchan_emis
+       Surface%SensorData%Sensor_ID  = wmo_sensor_id 
+       Surface%SensorData%Tb(1:nchan_emis) = ob%instid(inst)%tb(1:nchan_emis,n)
+     end if
 
          ! [1.3] Call RTM foreward model
-
           call da_crtm_direct(nchanl, Atmosphere,   &
                             Surface,      &
                             GeometryInfo, &
@@ -399,7 +393,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          !----------------------------------------------------------------
          ! [2.0] calculate components of innovation vector:
          !----------------------------------------------------------------
-
          do k = 1, nchanl
             if ( iv%instid(inst)%tb_inv(k,n) > missing_r ) then 
                iv%instid(inst)%tb_xb(k,n)  = rtsolution(k)%Brightness_Temperature
@@ -430,7 +423,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             iv%instid(inst)%qgr(k,n) = atmosphere%cloud(5)%water_content(k)
           end if
          enddo
-
          iv%instid(inst)%u10(n)  = model_u10
          iv%instid(inst)%v10(n)  = model_v10
          iv%instid(inst)%t2m(n)  = 0.01*missing_r !model_t2m
@@ -450,7 +442,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          iv%instid(inst)%land_coverage(n)=surface%land_coverage
          iv%instid(inst)%ice_coverage(n)=surface%ice_coverage                              
          iv%instid(inst)%snow_coverage(n)=surface%snow_coverage
-
          !----------------------------------------------------------------
          ! [4.0] Apply Bias Correction 
          !----------------------------------------------------------------
@@ -471,17 +462,14 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
         call da_error(__FILE__,__LINE__, &
           (/"Error in deallocatting CRTM Surface Structure"/))
       endif
-
    end do        ! end loop for sensor
 
    !------------------------------------------------------------------------
    ! [5.0] Perform QC check
    !------------------------------------------------------------------------
- 
    if (qc_rad) then
       call da_qc_crtm(ob, iv)
    end if
-
    !------------------------------------------
    ! 6.0 prepare bias statistics files
    !------------------------------------------
