@@ -48,7 +48,8 @@ if( $compare_wrf != 1 ) then
   echo "Type <compile be> to compile be"
   echo "Type <compile convertor> to compile convertors for converting KMA data to and from NetCDF data format"
   echo "Type <compile biascorr> to compile bias correction programs"
-  echo "Type <compile all> to compile everything (wrfvar, be, convertor)"
+  echo "Type <compile utils> to compile utilities"
+  echo "Type <compile all> to compile everything"
 
   exit 2
 endif
