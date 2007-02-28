@@ -5,7 +5,7 @@ module da_gen_be
    ! code.
    !----------------------------------------------------------------------------
 
-#ifdef crayx1
+#ifndef crayx1
 #ifndef crayx1
    use lapack, only : dsyev
 #endif
