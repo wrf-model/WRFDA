@@ -1580,8 +1580,8 @@ FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$
                     
 FCOPTIM         =
 FCDEBUG         =
-#FCTYPE         = -sinteger32 -e m -sreal64 -dp
-FCTYPE          = -e m -sreal64 -dp
+#FCTYPE         = -sinteger32 -e m -sreal64 -dp -eh
+FCTYPE          = -e m -sreal64 -dp -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1624,7 +1624,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -e m -sreal64 -dp
+FCTYPE          = -e m -sreal64 -dp -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1678,8 +1678,8 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
-FCDEBUG         = -g
-FCTYPE          = -e m -sreal64 -dp
+FCDEBUG         = -g 
+FCTYPE          = -e m -sreal64 -dp -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1733,7 +1733,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -Ofp3 -O3
 FCDEBUG         = 
-FCTYPE          = -e m -sreal64 -dp
+FCTYPE          = -e m -sreal64 -dp -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
