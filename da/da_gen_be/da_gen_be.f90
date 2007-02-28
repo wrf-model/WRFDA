@@ -6,7 +6,9 @@ module da_gen_be
    !----------------------------------------------------------------------------
 
 #ifdef crayx1
+#ifndef crayx1
    use lapack, only : dsyev
+#endif
 #endif
 
    use da_control, only : trace_use,stdout,vertical_ip, ts0,es_beta,es_alpha, &

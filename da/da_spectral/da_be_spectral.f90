@@ -5,7 +5,9 @@ module be_spectral
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_reporting, only : da_error,message
 #ifdef FFTPACK5
+#ifndef crayx1
    use fftpack5, only : rfft1f,rfft1i
+#endif
 #endif
    use da_tools1, only : da_free_unit, da_get_unit
 
