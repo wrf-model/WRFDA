@@ -10,8 +10,6 @@ subroutine da_free_unit(unit)
 
    unit_used(unit) = .false.
 
-write (0,*) __FILE__, unit
-
 end subroutine da_free_unit
 
 

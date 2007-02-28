@@ -111,7 +111,6 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
       d_num_rad=num_tovs_after(i,myproc+1)
 
       if (d_num_rad > 0) then
-write (0,*) __FILE__,__LINE__,"d_num_rad,size(d_con_vars)",d_num_rad,size(d_con_vars)
          allocate (d_con_vars(d_num_rad))
          allocate (d_con_vars_ad(d_num_rad))
          allocate (d_aux_vars(d_num_rad))
