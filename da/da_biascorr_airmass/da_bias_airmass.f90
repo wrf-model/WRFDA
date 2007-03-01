@@ -1,4 +1,4 @@
-  PROGRAM da_airmass_bias
+  PROGRAM da_bias_airmass
 
   USE RAD_BIAS
 
@@ -59,38 +59,30 @@
 
   INTEGER :: IR, ibin, I, iband, II, IV, ib, ierr
   INTEGER :: JS, J, JJ, JCOUNT, JBOX, JMINI, JSCAN, jv, IIV, JJV, sband
-  INTEGER :: ssel(5,3)
-  INTEGER :: lsel(5,3)
 
   REAL(KIND=LONG) :: xcorr(JPCHAN)
   REAL(KIND=LONG) :: coef_sat, coef_year, coef_month, coef_day, coef_time
   INTEGER :: CDATE = 1998010105                           ! Current Date
 
   INTEGER :: icount = 0
-  INTEGER :: platform_id,satellite_id,sensor_id          ! Namelist
   INTEGER :: KSCAN = JPSCAN
   LOGICAL :: check_limb=.false., check_mask=.false.
   REAL    :: FAC = 3.0      ! Number of SD' for QC
 
 
-  NAMELIST /INPUTS/ platform_id,satellite_id,sensor_id, &
-                    global, lscan, kscan, check_limb, check_mask, &
+  NAMELIST /INPUTS/ global, lscan, kscan, check_limb, check_mask, &
                     FAC,CDATE
 
 !------------------------------------------------------------------------------
 !        1.   SETUP.
 !             -----
-print * ,' '
-print * ,' start program da_airmass_bias '
-print * ,' '
 
   READ(5,INPUTS,END=100)
   100 CONTINUE
   WRITE(6,INPUTS)
 
-  IF (lscan) OPEN(112,FORM='UNFORMATTED') ! Scan Biases with lat bands
+  IF (lscan) OPEN(12,FORM='UNFORMATTED')  ! Scan Biases with lat bands
   OPEN(UNIT=10,FORM='UNFORMATTED')        ! Input data from SELECT
-  OPEN(UNIT=11,FORM='UNFORMATTED')        ! Output core array file
 
 ! Read scan biases
 
@@ -107,8 +99,6 @@ print * ,' '
 
   nobs(:)  = 0
   nsel(:)  = 0
-  ssel(:,:) = 0
-  lsel(:,:) = 0
   vmean_dep(:) = 0.0
   vmean_abs(:) = 0.0
   vstd_dep(:)  = 0.0
@@ -127,15 +117,17 @@ print * ,' '
   allocate(tovs%pred(tovs%npred))
 
   IF (lscan) THEN
-    DO J=1, tovs%nchan   ! get scan biases (global)
-        READ(112) JJ, vmnrl(J,1:KSCAN)
-    ENDDO
-
+   if (global) then
     DO J=1, tovs%nchan   ! get scan biases (latitude bands)
     DO sband=1,JBAND
-        READ(112) JJ, vmnrlb(J,1:KSCAN,sband)
+        READ(12) JJ, vmnrlb(J,1:KSCAN,sband)
     ENDDO
     ENDDO
+   else
+    DO J=1, tovs%nchan   ! get scan biases (no band dependence)
+        READ(12) JJ, vmnrl(J,1:KSCAN)
+    ENDDO
+   end if
   ENDIF
 
 loop1:&
@@ -256,8 +248,6 @@ loop1:&
   vmean_abs(:) = 0.0                                    ! Clear matrices
   nobs(:) = 0
   nsel(:) = 0
-  ssel(:,:) = 0
-  lsel(:,:) = 0
   nband(:) = 0
   nbandl(:,:) = 0
   nobsy(:) = 0
@@ -285,11 +275,15 @@ loop2:&
 ! latitude band
     iband = INT(tovs%lat/30.000001) + 3
     IF (lscan) THEN
-        JSCAN = tovs%scanpos
+       JSCAN = tovs%scanpos
+       if (global) then
         CALL GET_SCORR(JPCHAN,SCORR(1:JPCHAN),tovs%lat,vmnrlb,JSCAN)
+       else
+        SCORR(1:tovs%nchan) = vmnrl(1:tovs%nchan,JSCAN)
+       end if
     ELSE
-        JSCAN = KSCAN/2
-        SCORR(1:JPCHAN) = 0.0
+       JSCAN = KSCAN/2
+       SCORR(1:JPCHAN) = 0.0
     ENDIF
 
     vec_dep(1:JPCHAN) = tovs%omb(1:JPCHAN) - SCORR(1:JPCHAN)
@@ -329,20 +323,10 @@ loop2:&
       ENDIF
     ENDDO
 
-! Good data : count and use in the statistics
-
-    nbandl(iband,tovs%landmask) = nbandl(iband,tovs%landmask) + 1
-    nbandl(    6,tovs%landmask) = nbandl(    6,tovs%landmask) + 1
-
-    nband(iband) = nband(iband) + 1
-    nband(    6) = nband(    6) + 1
-
 ! mean/std statistics for relative scan-bias corrected values
     DO j=1, tovs%nchan           
       IF ( tovs%qc_flag(j) == 1 ) THEN
         jv = j
-        n_band_ch(iband,j,tovs%landmask) = n_band_ch(iband,J,tovs%landmask) + 1
-        n_band_ch(    6,j,tovs%landmask) = n_band_ch(    6,J,tovs%landmask) + 1
         nobs(j) = nobs(j) + 1
         vmean_dep(j) = vmean_dep(j) + vec_dep(j)
          vstd_dep(j) = vstd_dep(j) + vec_dep(j)*vec_dep(j)
@@ -375,24 +359,6 @@ loop2:&
   ENDDO loop2
 
   365 CONTINUE
-
-! Output arrays to bias 'core' file.
-
-  WRITE(11) nobs(:)
-  WRITE(11) vmean_dep(:)
-  WRITE(11) vstd_dep(:)
-  WRITE(11) vmean_abs(:)
-  WRITE(11) vstd_abs(:)
-
-  WRITE(11) nbandl(:,:)
-  WRITE(11) nband(:)
-  WRITE(11) n_band_ch(:,:,:)
-
-  WRITE(11) ybar(:)
-  WRITE(11) ycov(:)
-  WRITE(11) xbar(:,:)
-  WRITE(11) xycov(:,:)
-  WRITE(11) xcov(:,:,:)
 
 ! Calculate means, standard deviations and covariances
 
@@ -441,36 +407,22 @@ loop2:&
   ENDDO
   390 FORMAT (1X,I5,4F15.2)
 
-  WRITE(6,389) '(land)', (ib,ib=1,6)
-  DO J=1, tovs%nchan
-    jv = j
-    IF (MAXVAL(n_band_ch(1:6,j,0)) > 0) WRITE(6,392) jv, n_band_ch(1:6,j,0)
-  ENDDO
-
-  WRITE(6,389) '(sea)', (ib,ib=1,6)
-  DO J=1, tovs%nchan
-    jv = j
-    IF (MAXVAL(n_band_ch(1:6,j,1)) > 0) WRITE(6,392) jv, n_band_ch(1:6,j,1)
-  ENDDO
-
-  WRITE(6,391)  nband(1:6)
-
-  389 FORMAT(//1X,'Data distribution by latitude band ',A//,10X,6(I5,3X)/)
-  392 FORMAT(1X,I4,5X,6(I5,3X))
-  391 FORMAT(/1X,'Total',I15,5I18)
-
 !----------------------------------------------------------------------------
 !       4.   CALCULATE REGRESSION COEFFICIENTS.
 !            --------- ---------- ------------
 
     DO j=1, tovs%nchan
        jv = j
+      if ( nobs(j) >= 10 ) then
        PRINT *, 'REGRESSION : CHANNEL ', jv
        CALL REGRESS_ONE(tovs%npred,xbar(j,1:tovs%npred),ybar(j), &
                         xcov(j,1:tovs%npred,1:tovs%npred), &
                         ycov(j),xycov(j,1:tovs%npred), &
                         tovs%npred,coef(j,1:tovs%npred),coef0(j),reserr(j),&
                         rescov(j,j),xvec(j,1:tovs%npred,1:tovs%npred))
+      else
+       PRINT *, 'nobs < 10: ignoring REGRESSION : CHANNEL ', jv
+      end if
     ENDDO
 
     PRINT *, 'PREDICTOR EIGENVECTORS'
@@ -506,9 +458,9 @@ loop2:&
     coef_time  = REAL(MOD(CDATE,100))
 
     WRITE (6,*)
-    WRITE (6,502) platform_id,satellite_id,sensor_id, &
+    WRITE (6,502) &
                   coef_year, coef_month, coef_day,coef_time
-    502  FORMAT (/1X, 'SAT',3I7,'   YEAR',F5.0,'   MONTH',F5.0,'   DAY',F5.0,' TIME',F6.0,//&
+    502  FORMAT (/1X, '   YEAR',F5.0,'   MONTH',F5.0,'   DAY',F5.0,' TIME',F6.0,//&
                   1X,3X,' CH    MEAN  STDDEV  RES.SD  COEFFICIENTS')
 
     DO I=1, tovs%nchan
@@ -534,26 +486,6 @@ loop2:&
       WRITE (6,510) (rescov(I,J),I=1,tovs%nchan)
     ENDDO
 
-! 6.0 output of coefficients of calculated regression
-!   -------------------------------------------------------------
-      WRITE(111) platform_id,satellite_id,sensor_id, &
-                coef_year, coef_month, coef_day, coef_time, &
-                tovs%nchan, tovs%npred, KSCAN, JBAND, global
-      DO I=1, tovs%nchan
-        WRITE(111) I, vmean_dep(I), vstd_dep(I), xreser(I),  &
-                    (xcoef(I,J),J=1,tovs%npred), xcoef0(I)
-      ENDDO
-
-      DO J=1,tovs%nchan     ! write scan biases (global)
-        WRITE(111) J, VMNRL(J,1:KSCAN)
-      ENDDO
-
-      DO J=1,tovs%nchan     ! write scan biases (band)
-      DO SBAND=1,JBAND
-        WRITE(111) J, VMNRLB(J,1:KSCAN,SBAND)
-      ENDDO
-      ENDDO
-
 !----------------------------------------------------------------------------
 
    deallocate(tovs%tb)
@@ -563,10 +495,14 @@ loop2:&
    deallocate(tovs%pred)
 
   CLOSE(UNIT=10)
-  CLOSE(UNIT=11)
-  CLOSE(UNIT=111)
-  IF (lscan) CLOSE(UNIT=112)
+  IF (lscan) CLOSE(UNIT=12)
 
-  print * ,' end of program da_airmass_bias'
+! out coefs to ASCII file bcor.asc
+  call write_biascoef(tovs%nchan,kscan,jband,tovs%npred,global, &
+                      VMNRL(1:tovs%nchan,1:kscan),VMNRLB(1:tovs%nchan,1:kscan,1:jband), &
+                      xcoef(1:tovs%nchan,1:tovs%npred),xcoef0(1:tovs%nchan), &
+                      nobs(1:tovs%nchan),vmean_abs(1:tovs%nchan), &
+                      vstd_abs(1:tovs%nchan),vmean_dep(1:tovs%nchan), &
+                      vstd_dep(1:tovs%nchan) )
 
-  END PROGRAM da_airmass_bias
+  END PROGRAM da_bias_airmass

@@ -339,4 +339,141 @@
                                 radbias%surf_flag, radbias%clwp
     end subroutine da_write_biasprep
 
+    subroutine  write_biascoef(nchan,nscan,nband,npred,global, &
+                      scanbias,scanbias_b,coef,coef0, &
+                      nobs,vmean_abs,vstd_abs,vmean_dep,vstd_dep)
+
+    integer, intent(in) :: nchan,nscan,nband,npred,nobs(nchan)
+    logical, intent(in) :: global
+    real(KIND=LONG), intent(in) :: scanbias(nchan,nscan),  &
+                           scanbias_b(nchan,nscan,nband), &
+                           coef(nchan,npred),coef0(nchan), &
+                           vmean_abs(nchan), vstd_abs(nchan), &
+                           vmean_dep(nchan),vstd_dep(nchan)
+    integer :: iunit,j,i,stdout
+
+    iunit=99
+    stdout=6
+    open(UNIT=iunit,file='bcor.asc',form='formatted')
+
+    write (iunit,'(4i6)') nchan,nscan,nband,npred
+    do i=1, nchan
+      write (iunit,'(i5,i7,4F8.2)') i,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
+    end do
+
+    do i=1, nchan
+      write (iunit,'(i5,5F12.5)') i,(coef(i,j),j=1,npred),coef0(i)
+    end do 
+
+    if (global) then
+        if (nscan == 30) then ! amsua
+         write (iunit,'(a,/8X,30I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else if (nscan == 90) then ! amsub
+         write (iunit,'(a,/8X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else if (nscan == 56) then ! hirs
+         write (iunit,'(a,/8X,56I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+        end if
+      do j=1, nchan
+      do i=1, nband
+        if (nscan == 30) then ! amsua
+         write(iunit,'(i5,i3,30F7.2)') j,i, scanbias_b(j,1:nscan,i)
+        else if (nscan == 90) then ! amsub
+         write(iunit,'(i5,i3,90F7.2)') j,i, scanbias_b(j,1:nscan,i)
+        else if (nscan == 56) then ! hirs
+         write(iunit,'(i5,i3,56F7.2)') j,i, scanbias_b(j,1:nscan,i)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+        end if
+      end do
+      end do
+    else
+        if (nscan == 30) then ! amsua
+         write (iunit,'(a,/5X,30I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else if (nscan == 90) then ! amsub
+         write (iunit,'(a,/5X,90I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else if (nscan == 56) then ! hirs
+         write (iunit,'(a,/5X,56I7)') 'RELATIVE SCAN BIASES ',(j,j=1,nscan)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+        end if
+      do j=1, nchan
+        if (nscan == 30) then ! amsua
+         write(iunit,'(i5,30F7.2)') j, scanbias(j,1:nscan)
+        else if (nscan == 90) then ! amsub
+         write(iunit,'(i5,90F7.2)') j, scanbias(j,1:nscan)
+        else if (nscan == 56) then ! hirs
+         write(iunit,'(i5,56F7.2)') j, scanbias(j,1:nscan)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type' 
+        end if
+      end do
+    end if
+
+      close(iunit)
+    end subroutine write_biascoef
+
+    subroutine  read_biascoef(nchan,nscan,nband,npred,global, &
+                      scanbias,scanbias_b,coef,coef0, &
+                      nobs,vmean_abs,vstd_abs,vmean_dep,vstd_dep)
+
+    integer, intent(in) :: nchan,nscan,nband,npred
+    logical, intent(in) :: global
+    integer, intent(out) ::  nobs(nchan)
+    real(KIND=LONG), intent(out) :: scanbias(nchan,nscan),  &
+                           scanbias_b(nchan,nscan,nband), &
+                           coef(nchan,npred),coef0(nchan), &
+                           vmean_abs(nchan), vstd_abs(nchan), &
+                           vmean_dep(nchan),vstd_dep(nchan)
+
+    integer :: iunit,j,i,stdout, ii,jj
+
+    iunit=99
+    stdout=6
+    open(UNIT=iunit,file='bcor.asc',form='formatted')
+
+    !read (iunit,'(4i6)') nchan,nscan,nband,npred
+    read (iunit,'(4i6)')
+    do i=1, nchan
+      read (iunit,'(i5,i7,4F8.2)') ii,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
+    end do
+
+    do i=1, nchan
+      read (iunit,'(i5,5F12.5)') ii,(coef(i,j),j=1,npred),coef0(i)
+    end do
+
+        read (iunit,*)
+        read (iunit,*)
+    if (global) then
+      do j=1, nchan
+      do i=1, nband
+        if (nscan == 30) then ! amsua
+         read(iunit,'(i5,i3,30F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+        else if (nscan == 90) then ! amsub
+         read(iunit,'(i5,i3,90F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+        else if (nscan == 56) then ! hirs
+         read(iunit,'(i5,i3,56F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+        end if
+      end do
+      end do
+    else
+      do j=1, nchan
+        if (nscan == 30) then ! amsua
+         read(iunit,'(i5,30F7.2)') jj, scanbias(j,1:nscan)
+        else if (nscan == 90) then ! amsub
+         read(iunit,'(i5,90F7.2)') jj, scanbias(j,1:nscan)
+        else if (nscan == 56) then ! hirs
+         read(iunit,'(i5,56F7.2)') jj, scanbias(j,1:nscan)
+        else
+         write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
+        end if
+      end do
+    end if
+
+      close(iunit)
+    end subroutine read_biascoef
+
   END MODULE rad_bias

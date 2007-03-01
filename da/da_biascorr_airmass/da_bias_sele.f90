@@ -1,4 +1,4 @@
-  PROGRAM da_sele_bias
+  PROGRAM da_bias_sele
  
   USE RAD_BIAS
 
@@ -19,12 +19,12 @@
   INTEGER :: isurf,nscan,ierr 
 
   NAMELIST /INPUTS/ platform_id, satellite_id, sensor_id, &
-                    isurf, nscan           ! ISURF=1 : sea only
+                    nscan,isurf            ! ISURF=1 : sea only
                                            ! ISURF=2 : land + sea
                                            ! ISURF=3 : land only
 
 !  1. read and print namelist                                                  
-  print * ,' start da_sele_bias '
+
   READ(5,INPUTS,END=100)
   100  CONTINUE
   WRITE(6,INPUTS)
@@ -132,7 +132,4 @@ readloop:&
    write(6,'(a)')     'SENSOR_ID SCANPOS  SURFACE/HEIGHT  CLOUD/RAIN  SURF_FLAG'
    write(6,'(5i10)')  nreject   
    
-
-  print * ,' end   da_sele_bias '
-  STOP
-  END PROGRAM da_sele_bias
+  END PROGRAM da_bias_sele

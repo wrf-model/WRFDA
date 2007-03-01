@@ -1,4 +1,4 @@
-  PROGRAM da_scan_bias
+  PROGRAM da_bias_scan
 
   USE RAD_BIAS
 
@@ -46,24 +46,20 @@
 
   REAL(KIND=LONG) :: vmn0, vmn0b(JBAND), VDHL_WINDOW, VDLL_WINDOW
 
-  LOGICAL :: smoothing
+  LOGICAL :: global, smoothing
 
 ! definition of defaut namelist values
 !-----------------------------------------
-  INTEGER :: platform_id, satellite_id, sensor_id
   INTEGER :: sband =1
   INTEGER :: eband =18
-  INTEGER :: KSCAN =90
+  INTEGER :: kscan =90
   INTEGER :: ICOUNT = 0                              ! connter                                
-  REAL(KIND=LONG)   :: FAC = 3.0                                    ! Sdev factor
-  NAMELIST /INPUTS/ KSCAN,FAC,sband,eband,smoothing
+  REAL(KIND=LONG)   :: fac = 3.0                    ! Sdev factor
+  NAMELIST /INPUTS/ kscan,fac,global,sband,eband,smoothing
 
 !------------------------------------------------------------------------------
 !       1.   SETUP.
 !            -----
-  print * ,' '
-  print * ,' start program da_scan_bias '
-  print * ,' '
 
   READ(5,INPUTS,END=100)
 
@@ -73,6 +69,7 @@
 
   OPEN(UNIT=10,FORM='UNFORMATTED')       ! Open input file  : Input data from select
   OPEN(UNIT=11,FORM='UNFORMATTED')       ! Open output file : Scan mean core arrays
+  OPEN(UNIT=12,FORM='UNFORMATTED')       ! Open output file : Scan bias coef
 
 
 !------------------------------------------------------------------------------
@@ -338,24 +335,6 @@ loop2:&
 
   ENDDO
 
-! Write scan 'core' arrays NOTE: divided by nobs
-!------------------------------------------------------
-  WRITE(12) nobs(:)         ! statistics for channel
-  WRITE(12) vmean_dep(:)
-  WRITE(12) vstd_dep(:)
-  WRITE(12) vmean_abs(:)
-  WRITE(12) vstd_abs(:)
-
-  WRITE(12) nscanch(:,:)    ! statistics for channel + scan position
-  WRITE(12) vmnsc(:,:)
-  WRITE(12) vstdsc(:,:)
-
-  WRITE(12) nscanchb(:,:,:) ! statistics for channel + scan position + lat band
-  WRITE(12) vmnscb(:,:,:)
-  WRITE(12) vstdscb(:,:,:)
-
-  WRITE(12) vmnrl(:,:),vmnrlb(:,:,:) ! relative bias
-
 ! prinit output
 
 !------------------
@@ -392,16 +371,8 @@ loop2:&
   ENDDO
   396  FORMAT (1X,I3,30F7.2)
 
-!---------------------
-  WRITE (6,397) (js,js=1,KSCAN)
-  397 FORMAT (/1X,'RELATIVE BIASES FOR EACH SCAN ANGLE'/4X,30I7)
-  DO j=1, tovs%nchan
-      jv = j
-    WRITE (6,399) jv, vmnrl(j,1:KSCAN)
-  ENDDO
-  399 FORMAT (1X,I3,30F7.2)
-
 !----------------------
+  if (global) then
     WRITE(6,'(1x,a17,2i4)') 'SCAN COEFFICIENTS', jband,kscan
     DO j=1,tovs%nchan
       jv = j
@@ -410,35 +381,35 @@ loop2:&
       ENDDO
     ENDDO
 
- if (smoothing) then
+    if (smoothing) then
 
-  CLOSE(11)
+     CLOSE(11)
 
-  OPEN(11,FORM='UNFORMATTED')
+     OPEN(11,FORM='UNFORMATTED')
 
-  READ(11) nobs(:)
-  READ(11) vmean_dep(:)
-  READ(11) vstd_dep(:)
-  READ(11) vmean_abs(:)
-  READ(11) vstd_abs(:)
+     READ(11) nobs(:)
+     READ(11) vmean_dep(:)
+     READ(11) vstd_dep(:)
+     READ(11) vmean_abs(:)
+     READ(11) vstd_abs(:)
 
-  READ(11) nscanch(:,:)
-  READ(11) vmnsc(:,:)
-  READ(11) vstdsc(:,:)
+     READ(11) nscanch(:,:)
+     READ(11) vmnsc(:,:)
+     READ(11) vstdsc(:,:)
 
-  READ(11) nscanchb(:,:,:)
-  READ(11) vmnscb(:,:,:)
-  READ(11) vstdscb(:,:,:)
+     READ(11) nscanchb(:,:,:)
+     READ(11) vmnscb(:,:,:)
+     READ(11) vstdscb(:,:,:)
 
 ! Perform smoothing on banded corrections.
 ! for absolute bias/stdev
 
-  vmnscbt = 0.0
-  vstdscbt= 0.0
-  nscanchbt = 0
+     vmnscbt = 0.0
+     vstdscbt= 0.0
+     nscanchbt = 0
 
-  DO j=1, tovs%nchan
-    DO iband=1, JBAND
+     DO j=1, tovs%nchan
+      DO iband=1, JBAND
 
 !      IF (iband <= AVBAND) THEN
 !        aoff = AVBAND - iband + 1
@@ -466,15 +437,15 @@ loop2:&
         vmnscbt(j,1:KSCAN,iband) =  vmnscb(j,1:KSCAN,iband)
         vstdscbt(j,1:KSCAN,iband) = vstdscb(j,1:KSCAN,iband)
         nscanchbt(j,1:KSCAN,iband) = nscanchb(j,1:KSCAN,iband)
+      ENDDO
     ENDDO
-  ENDDO
  
-  DO j=1, tovs%nchan
-    WHERE (nscanchbt(j,1:KSCAN,:) /= 0)
-      vmnscbt(j,1:KSCAN,:) = vmnscbt(j,1:KSCAN,:)/nscanchbt(j,1:KSCAN,:)
-      vstdscbt(j,1:KSCAN,:) = vstdscbt(j,1:KSCAN,:)/nscanchbt(j,1:KSCAN,:) - vmnscbt(j,1:KSCAN,:)**2
-      vstdscbt(j,1:KSCAN,:) = SQRT(MAX(0.0,vstdscbt(j,1:KSCAN,:)))
-    END WHERE
+    DO j=1, tovs%nchan
+      WHERE (nscanchbt(j,1:KSCAN,:) /= 0)
+       vmnscbt(j,1:KSCAN,:) = vmnscbt(j,1:KSCAN,:)/nscanchbt(j,1:KSCAN,:)
+       vstdscbt(j,1:KSCAN,:) = vstdscbt(j,1:KSCAN,:)/nscanchbt(j,1:KSCAN,:) - vmnscbt(j,1:KSCAN,:)**2
+       vstdscbt(j,1:KSCAN,:) = SQRT(MAX(0.0,vstdscbt(j,1:KSCAN,:)))
+      END WHERE
 
 ! get bias at nadir
     IF (MOD(KSCAN,2) == 0 ) THEN  ! even scan number
@@ -549,12 +520,8 @@ loop2:&
 ! output relative bias
   DO j=1, tovs%nchan
      jv = j
-     WRITE(112) jv, vmnrl(j,1:KSCAN)
-  ENDDO
-  DO j=1, tovs%nchan
-     jv = j
     DO iband=1,JBAND
-      WRITE(112) jv, vmnrlbt(j,1:KSCAN,iband)
+      WRITE(12) jv, vmnrlbt(j,1:KSCAN,iband)
     ENDDO
   ENDDO
 
@@ -567,7 +534,25 @@ loop2:&
       ENDDO
     ENDDO
 
- end if
+ end if   ! end if smoothing
+
+ else  ! regional 
+!---------------------
+  WRITE (6,397) (js,js=1,KSCAN)
+  397 FORMAT (/1X,'RELATIVE BIASES FOR EACH SCAN ANGLE'/4X,30I7)
+  DO j=1, tovs%nchan
+      jv = j
+    WRITE (6,399) jv, vmnrl(j,1:KSCAN)
+  ENDDO
+  399 FORMAT (1X,I3,30F7.2)
+
+  DO j=1, tovs%nchan
+     jv = j
+     WRITE(12) jv, vmnrl(j,1:KSCAN)
+  ENDDO
+
+!----------------------
+ end if   ! global
 
    deallocate(tovs%tb)
    deallocate(tovs%omb)
@@ -580,8 +565,4 @@ loop2:&
   CLOSE(UNIT=11)
   CLOSE(UNIT=12)
 
-  print * ,' '
-  print * ,' end   program da_scan_bias '
-  print * ,' '
-
-  END PROGRAM da_scan_bias
+  END PROGRAM da_bias_scan

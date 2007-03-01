@@ -1,19 +1,11 @@
-  PROGRAM da_veri_bias
+  PROGRAM da_bias_verif
 
   USE RAD_BIAS
 
 ! PURPOSE.
 ! --------
-! To calculate spatially varying bias correction COEFFICIENTS
-! for TOVS using model bias predictors.
-
-! EXTERNALS.
-! ----------
-! REGRESS_ONE
-
-! REFERENCE.
-! ----------
-! Harris and Kelly 1998.
+! Apply bias correction to radiance data
+! to statistically verify algorithm
 
   IMPLICIT NONE
 
@@ -55,50 +47,37 @@
 
   INTEGER :: IR, ibin, I, iband, II, IV, ib, ierr
   INTEGER :: JS, J, JJ, JCOUNT, JBOX, JMINI, JSCAN, jv, IIV, JJV, sband
-  INTEGER :: ssel(5,3)
-  INTEGER :: lsel(5,3)
 
   REAL(KIND=LONG) :: xcorr(JPCHAN)
   REAL(KIND=LONG) :: coef_year, coef_month, coef_day, coef_time
 
   INTEGER :: icount = 0, kscanx, jbandx
-  INTEGER :: platform_id,satellite_id,sensor_id, nchan, npred 
   LOGICAL :: check_limb=.false., check_mask=.false., global
   REAL    :: FAC = 3.0      ! Number of SD' for QC
 
+  INTEGER :: nchan,nscan,nband,npred
 
-  NAMELIST /INPUTS/ lscan, check_limb, check_mask, FAC
+  NAMELIST /INPUTS/ global,lscan, check_limb, check_mask, FAC
 
 !------------------------------------------------------------------------------
 !        1.   SETUP.
 !             -----
-print * ,' '
-print * ,' start program da_veri_bias '
-print * ,' '
-
   READ(5,INPUTS,END=100)
   100 CONTINUE
   WRITE(6,INPUTS)
 
 ! 1.0 read bias correction coefficients
 !   -------------------------------------------------------------
-      read(111) platform_id,satellite_id,sensor_id, &
-                coef_year, coef_month, coef_day, coef_time, &
-                nchan, npred, kscanx, jbandx, global
-      DO I=1, nchan
-        read(111) II, vmn(I), vstd(I), xreser(I),  &
-                    (xcoef(I,J),J=1,npred), xcoef0(I)
-      ENDDO
+     open(UNIT=12,file='bcor.asc',form='formatted')
+     read (12,'(4i6)') nchan,nscan,nband,npred
+     close(12)
 
-      DO J=1,nchan     ! read global scan biases
-        read(111) JJ, vmnrl(J,1:KSCANX)                                                                                                                                  
-      ENDDO
-
-      DO J=1,nchan     ! read band scan biases
-      DO SBAND=1,JBAND
-        read(111) JJ, vmnrlb(J,1:KSCANX,SBAND)
-      ENDDO
-      ENDDO
+     call read_biascoef(nchan,nscan,nband,npred,global, &
+                      VMNRL(1:nchan,1:nscan),VMNRLB(1:nchan,1:nscan,1:nband), &
+                      xcoef(1:nchan,1:npred),xcoef0(1:nchan), &
+                      nobs(1:nchan),vmean_abs(1:nchan), &
+                      vstd_abs(1:nchan),vmean_dep(1:nchan), &
+                      vstd_dep(1:nchan) )
 
 !----------------------------------------------------------------------
 !        2.   READ IN DATA, Q.C., CALC MEANS AND VARIANCES.
@@ -190,9 +169,21 @@ loop2:&
     end do
 
     icount = icount + 1
-    write(11,'(15i15)') tovs%qc_flag(1:nchan)
-    write(11,'(15f15.3)') tovs%omb(1:nchan)
-    write(11,'(15f15.3)') vec_dep(1:nchan)
+    if (nchan == 15) then
+      write(11,'(15i15)') tovs%qc_flag(1:nchan)
+      write(11,'(15f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
+      write(11,'(15f15.3)') vec_dep(1:nchan)   ! omb with bias correction
+    else if(nchan==5) then
+      write(11,'(5i15)') tovs%qc_flag(1:nchan)
+      write(11,'(5f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
+      write(11,'(5f15.3)') vec_dep(1:nchan)   ! omb with bias correction
+    else if(nchan==19) then
+      write(11,'(19i15)') tovs%qc_flag(1:nchan)
+      write(11,'(19f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
+      write(11,'(19f15.3)') vec_dep(1:nchan)   ! omb with bias correction
+    else
+      write(*,*) 'Unknow sensor'
+    end if
 
   ENDDO loop2
 
@@ -206,6 +197,4 @@ loop2:&
    deallocate(tovs%cloud_flag)
    deallocate(tovs%pred)
 
-  print * ,' end of program da_veri_bias'
-
-  END PROGRAM da_veri_bias
+  END PROGRAM da_bias_verif
