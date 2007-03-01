@@ -11,9 +11,9 @@ export BUILD_DIR=${WRFVAR_DIR}/build
 export BIN_DIR=${WRFVAR_DIR}/da/da_biascorr_airmass
 export WORKDIR=/ptmp/liuz/wrfvar/trunk/da/da_biascorr_airmass/work
 
-export START_DATE=2006100112
-export END_DATE=2006100500
-export CYCLE_PERIOD=12
+export START_DATE=2006100106
+export END_DATE=2006101118
+export CYCLE_PERIOD=6
 export PLATFORM=noaa
 export PLATFORM_ID=1
 export SATELLITE=16
@@ -28,7 +28,7 @@ export NSCAN=30
 
  CDATE=$START_DATE
 
- export sensor=${PLATFORM}_${SATELLITE}_${SENSOR}
+ export sensor=${PLATFORM}-${SATELLITE}-${SENSOR}
  export sensor_date=${PLATFORM}_${SATELLITE}_${SENSOR}_${CDATE}
  \rm -f biasprep_${sensor}
 
@@ -107,7 +107,7 @@ EOF
        ln -s scan_bias_${sensor} fort.12
        ln -s biassele_${sensor}  fort.10
        $BIN_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
-       mv bcor.asc bcor_${sensor}.txt
+       mv bcor.asc ${sensor}.bcor
 
 echo "  End da_bias_airmass"
 
@@ -129,9 +129,10 @@ EOF
 
        \rm -f fort.*
        ln -s biassele_${sensor}    fort.10
-       ln -s bcor_${sensor}.txt    bcor.asc
+       ln -s ${sensor}.bcor    bcor.asc
        $BIN_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
        mv fort.11 bias_verif_${sensor}
+       rm bcor.asc
 
 echo "  End da_bias_verif"
 
