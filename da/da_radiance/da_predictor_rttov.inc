@@ -1,4 +1,4 @@
-  subroutine da_predictor(pred,npred,temp,hum,T_skin)
+  subroutine da_predictor_rttov(pred,npred,temp,hum,T_skin)
 
 implicit none
 
@@ -63,6 +63,6 @@ implicit none
   end if
 
   RETURN
-  end subroutine da_predictor
+  end subroutine da_predictor_rttov
 
 
