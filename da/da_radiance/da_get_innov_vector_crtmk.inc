@@ -102,7 +102,9 @@ subroutine da_get_innov_vector_crtmk ( it, xb, xp, ob, iv )
    !-------------------------------------------------------
 
    do inst = 1, iv%num_inst                 ! loop for sensor
-      if ( iv%instid(inst)%num_rad < 1 ) cycle
+!      if ( iv%instid(inst)%num_rad < 1 ) cycle
+      if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
+          iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
       num_levs  = xp%kte-xp%kts+1 
 
   ! CRTM channel information structure
