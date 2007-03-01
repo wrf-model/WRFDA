@@ -541,7 +541,7 @@ end do
       !----------------------------------------------------------------
 
       if (biascorr) then
-         call da_biascorr_rad(inst,ob,iv)
+         call da_biascorr(inst,ob,iv)
       end if
 
       deallocate (v_p)

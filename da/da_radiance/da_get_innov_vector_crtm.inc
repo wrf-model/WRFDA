@@ -449,7 +449,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          !----------------------------------------------------------------
 
          if (biascorr) then
-            call da_biascorr_rad(inst,ob,iv)
+            call da_biascorr(inst,ob,iv)
          end if
       end do       !  end loop for pixels
 

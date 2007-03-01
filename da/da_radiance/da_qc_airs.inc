@@ -130,18 +130,10 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !  2. check relative value of innovation
          !      and assign of the observation error (standard deviation)
          !------------------------------------------------------------------------
-            if (biascorr) then
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error(k)) then
-                  iv%instid(i)%tb_qc(k,n)  = qc_bad
-                  if (iv%instid(i)%proc_domain(n)) &
-                     nrej_omb_std(k) = nrej_omb_std(k) + 1
-               end if
-            else
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error(k)) then
-                  iv%instid(i)%tb_qc(k,n)  = qc_bad
-                  if (iv%instid(i)%proc_domain(n)) &
-                     nrej_omb_rms(k) = nrej_omb_rms(k) + 1
-               end if
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error(k)) then
+               iv%instid(i)%tb_qc(k,n)  = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_omb_std(k) = nrej_omb_std(k) + 1
             end if
 
            ! 3. Final QC decision
@@ -153,20 +145,11 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             else                                         ! good obs
                if (iv%instid(i)%proc_domain(n)) &
                   ngood(k) = ngood(k) + 1
-               if (biascorr) then                        ! if bias correction
-                  if (use_error_factor_rad) then         ! if use error tuning factor
-                     iv%instid(i)%tb_error(k,n) = &
-                        satinfo(i)%error(k)*satinfo(i)%error_factor(k)
-                  else
-                     iv%instid(i)%tb_error(k,n) = satinfo(i)%error(k)
-                  end if
+               if (use_error_factor_rad) then         ! if use error tuning factor
+                  iv%instid(i)%tb_error(k,n) = &
+                     satinfo(i)%error(k)*satinfo(i)%error_factor(k)
                else
-                  if (use_error_factor_rad) then
-                     iv%instid(i)%tb_error(k,n) =  &
-                        satinfo(i)%error(k)*satinfo(i)%error_factor(k)
-                  else
-                    iv%instid(i)%tb_error(k,n) = satinfo(i)%error(k)
-                  end if
+                  iv%instid(i)%tb_error(k,n) = satinfo(i)%error(k)
                end if
             end if
          end do ! chan

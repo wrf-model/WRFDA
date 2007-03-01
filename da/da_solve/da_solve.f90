@@ -29,7 +29,7 @@ subroutine da_solve ( grid , config_flags)
       sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
-      rtm_option, rtm_option_crtm, rtm_option_rttov
+      rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -304,13 +304,16 @@ subroutine da_solve ( grid , config_flags)
          deallocate (satinfo(i) % iuse)
          deallocate (satinfo(i) % error)
          deallocate (satinfo(i) % polar)
-         deallocate (satinfo(i) % rms)
-         deallocate (satinfo(i) % std)
-         deallocate (satinfo(i) % a)
-         deallocate (satinfo(i) % b)
+
+        if (read_biascoef) then
+         deallocate (satinfo(i) % scanbias)
+         deallocate (satinfo(i) % scanbias_b)
+         deallocate (satinfo(i) % bcoef)
+         deallocate (satinfo(i) % bcoef0)
+         deallocate (satinfo(i) % error_std)
+        end if
 
          deallocate (ob%instid(i) % ichan)
-
          deallocate (iv%instid(i)%ichan)
 
        if ( iv%instid(i)%num_rad > 0 ) then

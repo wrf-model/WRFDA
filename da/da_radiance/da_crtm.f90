@@ -23,11 +23,11 @@ module da_crtm
       biasprep, qc_rad,missing_r,rtminit_sensor,rtminit_nsensor, filename_len, &
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
       time_window_min,print_detail_obs,num_fgat_time,rtminit_platform, &
-      rtminit_satid
+      rtminit_satid, global
    use da_define_structures, only : y_type, ob_type
    use da_interpolation, only : da_interp_lin_2d,da_interp_lin_2d_adj
-   use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr_rad, &
-      da_qc_rad, da_qc_crtm, da_get_time_slots,da_biasprep
+   use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
+      da_qc_rad, da_qc_crtm, da_get_time_slots,da_biasprep,da_read_biascoef
 
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit

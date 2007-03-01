@@ -60,7 +60,7 @@ module da_radiance
    use da_radiance1, only : num_tovs_before,num_tovs_after,tovs_copy_count, &
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, datalink_type,da_qc_amsub, &
-      da_qc_amsua,da_biascorr_rad, da_detsurtyp,da_biasprep,da_get_time_slots, &
+      da_qc_amsua,da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
       da_get_julian_time,da_qc_rad,da_status_rad
    use da_reporting, only : da_message, da_warning, message, da_error
    use da_rttov, only : da_rttov_init

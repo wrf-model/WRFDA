@@ -147,28 +147,22 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
          !  f. check innovation
          !-----------------------------------------------------------
          do k = 1, nchan
+
+         ! absolute departure check
             if (abs(iv%instid(i)%tb_inv(k,n)) > 15.) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1
             end if
 
-            if (biascorr) then
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(scanpos+1,k)) then
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%std(1,k)) then
-                  iv%instid(i)%tb_qc(k,n)  = qc_bad
-                  if (iv%instid(i)%proc_domain(n)) &
-                     nrej_omb_std(k) = nrej_omb_std(k) + 1
-               end if
-            else
-               ! if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(scanpos+1,k)) then
-               if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%rms(1,k)) then
-                  iv%instid(i)%tb_qc(k,n)  = qc_bad
-                  if (iv%instid(i)%proc_domain(n)) &
-                     nrej_omb_rms(k) = nrej_omb_rms(k) + 1
-               end if
+         ! relative departure check
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error_std(k)) then
+                iv%instid(i)%tb_qc(k,n)  = qc_bad
+                if (iv%instid(i)%proc_domain(n)) &
+                   nrej_omb_std(k) = nrej_omb_std(k) + 1
             end if
 
+         ! final QC decsion
             if (iv%instid(i)%tb_qc(k,n) == qc_bad) then
                iv%instid(i)%tb_error(k,n) = 500.0
                if (iv%instid(i)%proc_domain(n)) &
@@ -176,26 +170,14 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
             else
                if (iv%instid(i)%proc_domain(n)) &
                   ngood(k) = ngood(k) + 1
-               if (biascorr) then
-                  ! iv%instid(i)%tb_error(k,n) = satinfo(i)%std(scanpos+1,k)
-                  if (use_error_factor_rad) then
-                     iv%instid(i)%tb_error(k,n) = &
-                        satinfo(i)%std(1,k)*satinfo(i)%error_factor(k)
-                  else
-                     iv%instid(i)%tb_error(k,n) = satinfo(i)%std(1,k)
-                  end if
+               if (use_error_factor_rad) then
+                  iv%instid(i)%tb_error(k,n) = &
+                     satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
                else
-                  ! iv%instid(i)%tb_error(k,n) = satinfo(i)%rms(scanpos+1,k)
-                  if (use_error_factor_rad) then
-                     iv%instid(i)%tb_error(k,n) =  &
-                        satinfo(i)%rms(1,k)*satinfo(i)%error_factor(k)
-                  else
-                    iv%instid(i)%tb_error(k,n) = satinfo(i)%rms(1,k)
-                  end if
+                  iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
                end if
             end if
          end do ! chan
-!write (0,*) i,n,"iv%instid(i)%tb_qc(:,n)",iv%instid(i)%tb_qc(:,n)
       end do ! end loop pixel
    end if
  

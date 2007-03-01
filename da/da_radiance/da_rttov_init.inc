@@ -327,47 +327,28 @@ subroutine da_rttov_init(iv,ob)
            ( trim(iv%instid(i)%rttovid_string) /= 'eos-2-airs' ) &
              .and. index(iv%instid(i)%rttovid_string,'hirs') <= 0 ) then
 
-         call da_get_unit(bunit)
-         filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.bias'
-         open(bunit,file=filename, &
-            form='formatted',iostat = iost, status='old')
-         if (iost /= 0) then
-            call da_error(__FILE__,__LINE__, &
-               (/"Cannot open radiance biascorr file "//adjustl(filename)/))
-         end if
+         allocate ( satinfo(i) % scanbias  (nchan(i),nscan(i)) )
+         allocate ( satinfo(i) % scanbias_b(nchan(i),nscan(i),18) )
+         allocate ( satinfo(i) % bcoef     (nchan(i),4) )
+         allocate ( satinfo(i) % bcoef0    (nchan(i)) )
+         allocate ( satinfo(i) % error_std (nchan(i)) )
 
-         allocate ( satinfo(i) % rms(nscan(i)+1,nchan(i)) )
-         allocate ( satinfo(i) % std(nscan(i)+1,nchan(i)) )
-         allocate ( satinfo(i) %   a(nscan(i)+1,nchan(i)) )
-         allocate ( satinfo(i) %   b(nscan(i)+1,nchan(i)) )
+         satinfo(i) % error_std(:) = 500.
+         satinfo(i) % scanbias(:,:) = 0.
+         satinfo(i) % scanbias_b(:,:,:) = 0.
+         satinfo(i) % bcoef(:,:) = 0.
+         satinfo(i) % bcoef0(:) = 0.
 
-         read(bunit,*)  !trim(platform),'-',trim(satid),'-',trim(instrument)
-         read(bunit,*)  !trim(cdate)
-         read(bunit,*)  !nchan, nscan
+  !  new bias coefs files
+  !----------------------------------
+    call da_read_biascoef(iv%instid(i)%rttovid_string, &
+                      nchan(i),nscan(i),18,4,global, &
+                      satinfo(i)%scanbias, &
+                      satinfo(i)%scanbias_b, &
+                      satinfo(i)%bcoef, &
+                      satinfo(i)%bcoef0, &
+                      satinfo(i)%error_std)
 
-         read(bunit,*) !  ' Number of    total obs                    = ', num_rad
-         read(bunit,*) !
-         read(bunit,*) !
-         read(bunit,*) !  ' Number of rejected obs by SI>3K           = ', nscat
-         read(bunit,*) !  ' Number of rejected obs by CLWP>0.2mm      = ', nclwp
-         read(bunit,*) !  ' Number of rejected obs by Mixture surface = ', nsurf
-         read(bunit,*) !  ' Number of rejected obs by abs(IV)>20      = ', ninv(:)
-         read(bunit,*) !  ' Number of rejected obs by abs(IV)>5*sigma = ', nerr(:)
-         read(bunit,*) !  ' Number of     good obs                    = ', ngood(:)
-
-         read(bunit,*) !  'scan  ', 'chan ', 'number ', 'average ', 'rms  std ', 'a ','b '
-
-         do k = 1,nscan(i)+1
-            do j = 1,nchan(i)
-               read(bunit,'(i3,i5,i8,3(2x,f8.3),2(2x,f11.3))') &
-                  iscan, ichan, npos,ave, &
-                  satinfo(i)%rms(k,j),satinfo(i)%std(k,j), &
-                  satinfo(i)%a(k,j),  satinfo(i)%b(k,j)
-            end do
-         end do
-
-         close(bunit)
-         call da_free_unit(bunit)
       end if
 
    end do loop_sensor2

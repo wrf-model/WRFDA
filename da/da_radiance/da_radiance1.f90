@@ -17,7 +17,8 @@ module da_radiance1
       stdout,write_profile,myproc,qc_good,num_fgat_time,biascorr,qc_bad, &
       use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
       num_procs,print_detail_radiance,tovs_min_transfer, rtm_option, &
-      rtminit_sensor,rtminit_nsensor,rtm_option_rttov,rtm_option_crtm
+      rtminit_sensor,rtminit_nsensor,rtm_option_rttov,rtm_option_crtm, &
+      global
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       ob_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
    use da_par_util, only : da_proc_stats_combine
@@ -190,7 +191,8 @@ contains
 
 #include "da_jo_and_grady_rad.inc"
 #include "da_residual_rad.inc"
-#include "da_biascorr_rad.inc"
+#include "da_biascorr.inc"
+#include "da_read_biascoef.inc"
 #include "da_biasprep.inc"
 #include "da_write_biasprep.inc"
 #include "da_predictor_rttov.inc"

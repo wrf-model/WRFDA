@@ -92,14 +92,16 @@ module module_radiance
 
    type satinfo_type
       integer, pointer   :: ichan(:)      ! channel index
-      integer, pointer   :: iuse (:)      ! usage flag (-1: not use)
-      real   , pointer   :: error(:)      ! error Standard Deviation
-      real   , pointer   :: polar(:)      ! polarisation (0:vertical; 1:horizontal)
-      real   , pointer   :: rms(:,:)      ! rms of bias corr file
-      real   , pointer   :: std(:,:)      ! std of bias corr file
-      real   , pointer   :: a(:,:)        ! bias corr coef a Tb*(xb)=a+b*Tb(xb)
-      real   , pointer   :: b(:,:)        ! bias corr coef b
-      real   , pointer   :: error_factor(:) ! error tuning factor
+      integer, pointer   :: iuse (:)      ! usage flag (-1: not use) from GSI info file
+      real   , pointer   :: error(:)      ! error Standard Deviation from GSI info file
+      real   , pointer   :: polar(:)      ! polarisation (0:ver; 1:hori) from GSI info file
+      real   , pointer   :: error_factor(:) ! error tuning factor ! from error tuning file
+     ! new air mass bias correction coefs.
+      real   , pointer   :: scanbias(:,:) ! scan bias without latitude band variation
+      real   , pointer   :: scanbias_b(:,:,:) ! scan bias with latitude band variation
+      real   , pointer   :: bcoef(:,:)   ! airmass predictor bias coefficients
+      real   , pointer   :: bcoef0(:)    ! airmass constant coefficient
+      real   , pointer   :: error_std(:) ! error standard deviation
    end type satinfo_type
 
    type (satinfo_type), pointer :: satinfo(:)
