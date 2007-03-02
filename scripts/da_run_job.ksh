@@ -51,7 +51,7 @@ $SUBMIT_OPTIONS10
 # @ queue            = $QUEUE
 
 export RUN_CMD="$DEBUGGER " # Space important
-. $SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 elif test $SUBMIT = "LSF"; then 
    cat > job.ksh <<EOF
@@ -78,7 +78,7 @@ $SUBMIT_OPTIONS10
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="mpirun.lsf"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-. $SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
 elif test $SUBMIT = "PBS"; then 
@@ -113,7 +113,7 @@ $SUBMIT_OPTIONS10
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="aprun -m exclusive -N$TEMP -n$NUM_PROCS"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
-. $SCRIPT > $EXP_DIR/index.html 2>&1
+$SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
 elif test $SUBMIT = none; then
