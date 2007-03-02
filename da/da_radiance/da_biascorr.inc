@@ -3,14 +3,14 @@ subroutine da_biascorr ( i, ob, iv)
    !---------------------------------------------------------------------------
    ! Purpose: perform bias correction for radiance data.
    !
-   ! METHOD:  Tb*(xb)=a+b*Tb(xb)
+   ! METHOD:  omb(corrected)=omb-scanbias-airbias
    !---------------------------------------------------------------------------
 
    implicit none
 
    integer,        intent(in)    :: i       ! sensor index.
-   type (y_type),  intent(in)    :: ob         ! Observation structure.
-   type (ob_type), intent(inout) :: iv         ! O-B structure.
+   type (y_type),  intent(in)    :: ob      ! Observation structure.
+   type (ob_type), intent(inout) :: iv      ! O-B structure.
 
    ! Local variables
    integer   :: k,iband,iscan, n1,n2,n,j,npred,nlevels
@@ -53,6 +53,10 @@ subroutine da_biascorr ( i, ob, iv)
           airbias= airbias + satinfo(i)%bcoef(k,j)*pred(j)
          end do
           iv%instid(i)%tb_inv(k,n) = iv%instid(i)%tb_inv(k,n)-airbias
+        !if (k==5) then
+        !  write(*,'(6f15.5)') satinfo(i)%scanbias(k,iscan), satinfo(i)%bcoef(k,1:npred),satinfo(i)%bcoef0(k)
+        !  write(*,'(5f15.5)') airbias,pred(1:npred)
+        !end if
       end do
    end do
 

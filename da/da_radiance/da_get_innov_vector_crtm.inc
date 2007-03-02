@@ -444,13 +444,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          iv%instid(inst)%land_coverage(n)=surface%land_coverage
          iv%instid(inst)%ice_coverage(n)=surface%ice_coverage                              
          iv%instid(inst)%snow_coverage(n)=surface%snow_coverage
-         !----------------------------------------------------------------
-         ! [4.0] Apply Bias Correction 
-         !----------------------------------------------------------------
 
-         if (biascorr) then
-            call da_biascorr(inst,ob,iv)
-         end if
       end do       !  end loop for pixels
 
       deallocate( rtsolution, STAT = Allocate_Status )
@@ -465,6 +459,18 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
           (/"Error in deallocatting CRTM Surface Structure"/))
       endif
    end do        ! end loop for sensor
+
+   !------------------------------------------
+   ! 4.0 perfoming bias correction files
+   !------------------------------------------
+
+   if (biascorr) then
+      do inst = 1, iv%num_inst
+         WRITE(UNIT=stdout,FMT='(A,A)') 'Performing bias correction for ', &
+                            trim(iv%instid(inst)%rttovid_string)
+         call da_biascorr(inst,ob,iv)
+      end do
+   end if
 
    !------------------------------------------------------------------------
    ! [5.0] Perform QC check

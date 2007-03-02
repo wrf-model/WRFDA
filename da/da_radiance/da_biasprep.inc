@@ -7,8 +7,8 @@ subroutine da_biasprep(inst,ob,iv)
    implicit none
 
    integer       ,  intent(in)      :: inst
-   type (y_type),  intent(in)       :: ob         ! O structure.
-   type (ob_type),  intent(inout)   :: iv         ! O-B structure.
+   type (y_type) ,  intent(in)      :: ob         ! O structure.
+   type (ob_type),  intent(in)      :: iv         ! O-B structure.
 
    integer  :: n,jx,npred,nchan,num_rad,nlevels
    character(len=80)  :: filename

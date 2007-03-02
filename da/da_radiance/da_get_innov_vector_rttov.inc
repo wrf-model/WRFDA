@@ -536,14 +536,6 @@ end do
 !   end do
 !end do
 
-      !----------------------------------------------------------------
-      ! [3.0] Apply Bias Correction 
-      !----------------------------------------------------------------
-
-      if (biascorr) then
-         call da_biascorr(inst,ob,iv)
-      end if
-
       deallocate (v_p)
       deallocate (vtm)
       deallocate (clw)
@@ -564,6 +556,20 @@ end do
       deallocate (pemsh)
       deallocate (pems5)
    end do        ! end loop for sensor
+
+
+   !------------------------------------------------------------------------
+   ! [3.0] Perform bias correction
+   !------------------------------------------------------------------------
+
+   if (biascorr) then
+      do inst = 1, iv%num_inst
+         write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
+            trim(iv%instid(inst)%rttovid_string)
+         call da_biascorr(inst,ob,iv)
+      end do
+   end if
+
 
    !------------------------------------------------------------------------
    ! [4.0] Perform QC check
