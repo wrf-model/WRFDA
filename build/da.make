@@ -236,8 +236,8 @@ da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regr
 da_bias_sele.exe : da_bias_sele.o rad_bias.o
 	$(FFC) -o da_bias_sele.exe da_bias_sele.o rad_bias.o
 
-da_bias_scan.exe : da_bias_scan.o
-	$(FFC) -o da_bias_scan.exe da_bias_scan.o
+da_bias_scan.exe : da_bias_scan.o rad_bias.o
+	$(FFC) -o da_bias_scan.exe da_bias_scan.o rad_bias.o
 
 da_bias_verif.exe : da_bias_verif.o rad_bias.o
 	$(FFC) -o da_bias_verif.exe da_bias_verif.o rad_bias.o
