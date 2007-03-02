@@ -1,8 +1,8 @@
 #!/bin/ksh
 export CPP=/opt/ctl/bin/cpp
 export CPPFLAGS="-C -P"
-export FFCFLAGS="-O0 -f fixed -sreal64 -dp"
-export FFLAGS="-O0 -f fixed -sreal64 -dp"
+export FFCFLAGS="-O0 -f fixed -sreal64 -dp -eh"
+export FFLAGS="-O0 -f fixed -sreal64 -dp -eh"
 export FC=ftn
 export FFC=ftn
 export LDFLAGS=

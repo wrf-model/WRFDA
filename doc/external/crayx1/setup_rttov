@@ -1,4 +1,7 @@
 #!/bin/ksh
+# edit src/Makefile and add around line 45 the lines
+# FC77=ftn
+# FFLAGS=-f free -sreal64 -dp -eh
 cd src
 make clean
 make 
