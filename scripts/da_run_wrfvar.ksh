@@ -218,24 +218,54 @@ echo "WINDOW_END            $WINDOW_END"
    ln -s $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
-      # More than one observation file of each type
-      ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
-      for I in 02 03 04 05 06; do
-         ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
-      done
-      ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
+      if $NL_VAR4D; then
+         # More than one observation file of each type
+         ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/ob.ascii ob${I}.ascii
+         done
+         ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-      ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
-      for I in 02 03 04 05 06; do
-         ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
-      done
-      ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
+         done
+         ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
 
-      ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
-      for I in 02 03 04 05 06; do
-         ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
-      done
-      ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+         ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
+         for I in 02 03 04 05 06; do
+            ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
+         done
+         ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
+      else
+         if [[ $DATE = $START_DATE ]]; then
+            ln -sf $OB_DIR/$DATE/ob.ascii+ ob01.ascii
+         else
+            ln -sf $OB_DIR/$DATE/ob.ascii  ob01.ascii
+         fi
+         typeset -i N
+         let N=1
+         FGAT_DATE=$START_DATE
+#         while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
+         until [[ $FGAT_DATE > $END_DATE ]]; do
+            if [[ $FGAT_DATE != $DATE ]]; then
+               let N=$N+1
+               if [[ $FGAT_DATE = $START_DATE ]]; then
+                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii+ ob0${N}.ascii
+               elif [[ $FGAT_DATE = $END_DATE ]]; then
+                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii- ob0${N}.ascii
+               else
+                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
+               fi
+               FYEAR=`echo ${FGAT_DATE} | cut -c1-4`
+               FMONTH=`echo ${FGAT_DATE} | cut -c5-6`
+               FDAY=`echo ${FGAT_DATE} | cut -c7-8`
+               FHOUR=`echo ${FGAT_DATE} | cut -c9-10`
+               ln -sf ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+            fi
+            FGAT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ`
+         done
+      fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
       ln -sf $OB_DIR/${DATE}/ssmi.dat  ssmi01.dat
