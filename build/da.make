@@ -228,22 +228,19 @@ da_bufr_little_endian.o : da_bufr_little_endian.f90
 	$(CPP) $(CPPFLAGS) $(FPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
 	$(FFC) -c $(FIXEDFLAGS_ENDIAN) da_bufr_little_endian.f
 
-da_biascorr : da_airmass_bias.exe da_sele_bias.exe da_scan_bias.exe da_conv_bias.exe da_veri_bias.exe
+da_biascorr : da_bias_airmass.exe da_bias_sele.exe da_bias_scan.exe da_bias_scan.exe da_bias_verif.exe
 
-da_airmass_bias.exe : da_airmass_bias.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
-	$(FFC) -o  da_airmass_bias.exe da_airmass_bias.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o
+da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
+	$(FFC) -o  da_bias_airmass.exe da_bias_airmass.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o
 
-da_sele_bias.exe : da_sele_bias.o rad_bias.o
-	$(FFC) -o da_sele_bias.exe da_sele_bias.o rad_bias.o
+da_bias_sele.exe : da_bias_sele.o rad_bias.o
+	$(FFC) -o da_bias_sele.exe da_bias_sele.o rad_bias.o
 
-da_conv_bias.exe : da_conv_bias.o
-	$(FFC) -o da_conv_bias.exe da_conv_bias.o
+da_bias_scan.exe : da_bias_scan.o
+	$(FFC) -o da_bias_scan.exe da_bias_scan.o
 
-da_veri_bias.exe : da_veri_bias.o rad_bias.o
-	$(FFC) -o da_veri_bias.exe da_veri_bias.o rad_bias.o
-
-da_scan_bias.exe : da_scan_bias.o rad_bias.o
-	$(FFC) -o da_scan_bias.exe da_scan_bias.o rad_bias.o
+da_bias_verif.exe : da_bias_verif.o rad_bias.o
+	$(FFC) -o da_bias_verif.exe da_bias_verif.o rad_bias.o
 
 
 # Special cases, either needing special include files or too big to 
