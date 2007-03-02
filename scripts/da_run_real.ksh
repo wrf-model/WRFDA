@@ -121,7 +121,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       # echo Dummy real > wrflowinp_d${DOMAIN}
    else
       ln -fs $RC_DIR/$DATE/met_em.d* .
-      cp ${WRF_DIR}/main/real.exe .
+      ln -fs ${WRF_DIR}/main/real.exe .
       $RUN_CMD ./real.exe
       RC=$?
 
