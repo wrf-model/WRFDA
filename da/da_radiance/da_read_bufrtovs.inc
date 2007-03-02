@@ -140,8 +140,9 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    open(unit=lnbufr,file=trim(infile),form='unformatted', &
       iostat = iost, status = 'old')
    if (iost /= 0) then
-      call da_error(__FILE__,__LINE__, &
+      call da_warning(__FILE__,__LINE__, &
          (/"Cannot open file "//trim(infile)/))
+      return
    end if
 
    call openbf(lnbufr,'IN',lnbufr)

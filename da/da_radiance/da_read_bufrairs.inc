@@ -206,8 +206,9 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   call da_get_unit(lnbufr)
   open(unit=lnbufr,file=trim(infile),form='unformatted',iostat = iost)
   if (iost /= 0) then
-     call da_error(__FILE__,__LINE__, &
+     call da_warning(__FILE__,__LINE__, &
         (/"Cannot open file "//trim(infile)/))
+     return
   end if
   if ( airstab ) then
      call openbf(lnbufr,'IN',airs_table_unit)
