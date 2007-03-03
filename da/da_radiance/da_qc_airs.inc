@@ -17,26 +17,46 @@ subroutine da_qc_airs (i, nchan, ob, iv)
    logical   :: lmix
    real      :: si
    ! real    :: satzen
+!!
+!! TV change: added new diagnostic local varaibles
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
-                nrej_omb_std(nchan),nrej_omb_rms(nchan),      &
-                nrej_mixsurface,nrej_windowchanl, nrej_si,    &
-                nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
-                nrej_limb
+                nrej_omb_std(nchan),nrej_limb,     &
+                nrej_landsurface,nrej_windowchshort,nrej_windowchlong, nrej_si,    &
+                nrej_clw,nrej_sst,nrej_topo,num_rad, num_proc_domain
+!
+!   integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
+!                nrej_omb_std(nchan),      &
+!                nrej_mixsurface,nrej_windowchanl, nrej_si,    &
+!                nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
+!                nrej_limb
+! 
+   real      :: SST_model, SST_airs, diffSST
+
+!! TV end change
+
 
    character(len=30)  :: filename
 
    if (trace_use) call da_trace_entry("da_qc_airs")
 
+!! TV change: new diagnosic locals
    ngood(:)        = 0
    nrej(:)         = 0
    nrej_omb_abs(:) = 0
    nrej_omb_std(:) = 0
-   nrej_omb_rms(:) = 0
-   nrej_mixsurface = 0
-   nrej_windowchanl= 0
-   nrej_si         = 0
+   nrej_landsurface = 0
+   nrej_windowchshort= 0
+   nrej_windowchlong= 0
+   nrej_sst= 0
+!   nrej_si         = 0
    nrej_clw        = 0
    nrej_topo       = 0
+
+!   nrej_mixsurface = 0
+!   nrej_windowchanl= 0
+
+!! TV end change
+
    nrej_limb       = 0
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(i)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(i)
@@ -55,45 +75,95 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !---------------------------------------------
          iv%instid(i)%tb_qc(:,n) = qc_good
 
-         !  a.  reject all channels over mixture surface type
-         !------------------------------------------------------
-         isflg = iv%instid(i)%isflg(n)
-         lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
-         if (lmix) then
-            iv%instid(i)%tb_qc(:,n)  =  qc_bad
-            if (iv%instid(i)%proc_domain(n)) &
-               nrej_mixsurface = nrej_mixsurface + 1
-         end if
+!! TV change: include sea locations only
+            !  a.  reject all channels over land and mixture 
+            !------------------------------------------------------
+            isflg = iv%instid(i)%isflg(n) 
+            if (isflg > 0) then
+               iv%instid(i)%tb_qc(:,n)  =  -1
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_landsurface = nrej_landsurface + 1
+            end if
 
-         !  b.  reject all channels over land/sea-ice/snow
-         !------------------------------------------------------
-         if (isflg > 0) then 
-            iv%instid(i)%tb_qc(:,n)  = qc_bad
-            if (iv%instid(i)%proc_domain(n)) &
-               nrej_windowchanl = nrej_windowchanl + 1
-         end if
+!         !  a.  reject all channels over mixture surface type
+!         !------------------------------------------------------
+!         isflg = iv%instid(i)%isflg(n)
+!         lmix  = (isflg==4) .or. (isflg==5) .or. (isflg==6) .or. (isflg==7)
+!         if (lmix) then
+!            iv%instid(i)%tb_qc(:,n)  =  qc_bad
+!            if (iv%instid(i)%proc_domain(n)) &
+!               nrej_mixsurface = nrej_mixsurface + 1
+!         end if
 
-         !  c.  reject channels 13,14(above top model 10mb),15 
-         !------------------------------------------------------
-         !iv%instid(i)%tb_qc(13:15,n)  = qc_bad
+!         !  b.  reject all channels over land/sea-ice/snow
+!         !------------------------------------------------------
+!         if (isflg > 0) then 
+!            iv%instid(i)%tb_qc(:,n)  = qc_bad
+!            if (iv%instid(i)%proc_domain(n)) &
+!               nrej_windowchanl = nrej_windowchanl + 1
+!         end if
+
+!! TV end change: include sea locations only
+
 
          !    reject limb obs 
          !------------------------------------------------------
-         scanpos = iv%instid(i)%scanpos(n)
-         if (scanpos <= 3 .or. scanpos >= 88) then
-            iv%instid(i)%tb_qc(:,n)  =  qc_bad
-            if (iv%instid(i)%proc_domain(n)) &
-                  nrej_limb = nrej_limb + 1
-         end if
+         !scanpos = iv%instid(i)%scanpos(n)
+         !if (scanpos <= 3 .or. scanpos >= 88) then
+         !   iv%instid(i)%tb_qc(:,n)  =  qc_bad
+         !   if (iv%instid(i)%proc_domain(n)) &
+         !         nrej_limb = nrej_limb + 1
+         !end if
 
-         !  d. cloud detection to be added
-         !-----------------------------------------------------------
-         if (iv%instid(i)%clwp(n) >= 0.2) then
-            iv%instid(i)%tb_qc(:,n) = qc_bad
-            iv%instid(i)%cloud_flag(:,n) = qc_bad
-            if (iv%instid(i)%proc_domain(n)) &
-               nrej_clw = nrej_clw + 1
-         end if
+
+!! TV change: QC for clouds
+
+            !  c. Check for model clouds!!!!!!
+            !-----------------------------------------------------------
+
+            if (iv%instid(i)%clwp(n) > 0.05) then
+               iv%instid(i)%tb_qc(:,n) = qc_bad
+               iv%instid(i)%cloud_flag(:,n) = -1
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_clw = nrej_clw + 1
+            end if
+
+            !  d. Crude check for clouds in obs (assuming obs are used over ocean only)
+            !   Use long wave window channel #914 - 10.662 nm (965.43 cm^-1)
+            !   should be warmer than freezing temperature of the sea  
+            !-----------------------------------------------------------
+            !
+            if(ob%instid(i)%tb(129,n) < 271.) then
+               iv%instid(i)%tb_qc(:,n)  = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_windowchlong = nrej_windowchlong + 1
+            end if
+
+            !  e. Check for contaminated obs in warmest near-infrared: Sun contamination during day 
+            !-----------------------------------------------------------
+            !
+            SST_airs=ob%instid(i)%tb(272,n)   !! short wave window channel #2328 - 3.882 nm (2616.38 cm^-1)
+            if(SST_airs > 307.) then
+               iv%instid(i)%tb_qc(257:281,n)  = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_windowchshort = nrej_windowchshort + 1
+            end if
+
+
+            !  f. Check for cloud free in obs (assuming obs are used over ocean only)
+            !  Criterion: model SST within 2 K of transparent (hottest) short wave window channel
+            !             includes check for contaminated near-infrared
+            !-----------------------------------------------------------
+!
+            SST_model=iv%instid(i)%ts(n)       !! SST in the model
+            diffSST=abs(SST_model-SST_airs)
+            if(SST_airs < 307 .and. diffSST > 2.) then
+               iv%instid(i)%tb_qc(:,n)  = qc_bad
+               if (iv%instid(i)%proc_domain(n)) &
+                  nrej_sst = nrej_sst + 1
+            end if
+
+!! TV change
 
          !  e. check surface height/pressure
          !-----------------------------------------------------------
@@ -110,10 +180,10 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
          !  g. check iuse from information file (channel selection)
          !-----------------------------------------------------------
-         do k = 1, nchan
-            if (satinfo(i)%iuse(k) .eq. -1) &
-               iv%instid(i)%tb_qc(k,n)  = qc_bad
-         end do
+         !do k = 1, nchan
+         !   if (satinfo(i)%iuse(k) .eq. -1) &
+         !      iv%instid(i)%tb_qc(k,n)  = qc_bad
+         !end do
 
          !  f. check innovation
          !-----------------------------------------------------------
@@ -158,15 +228,18 @@ subroutine da_qc_airs (i, nchan, ob, iv)
  
    ! Do inter-processor communication to gather statistics.
    call da_proc_sum_int (num_proc_domain)
-   call da_proc_sum_int (nrej_mixsurface)
-   call da_proc_sum_int (nrej_windowchanl)
-   call da_proc_sum_int (nrej_si )
-   call da_proc_sum_int (nrej_clw)
-   call da_proc_sum_int (nrej_topo)
+!! TV change
+   call da_proc_sum_int ( nrej_landsurface )
+   call da_proc_sum_int ( nrej_windowchlong)
+   call da_proc_sum_int ( nrej_windowchshort)
+   call da_proc_sum_int ( nrej_sst)
+!   call da_proc_sum_int ( nrej_si   )
+!! TV end change
+   call da_proc_sum_int ( nrej_clw  )
+   call da_proc_sum_int ( nrej_topo )
    call da_proc_sum_int (nrej_limb)
    call da_proc_sum_ints (nrej_omb_abs(:))
    call da_proc_sum_ints (nrej_omb_std(:))
-   call da_proc_sum_ints (nrej_omb_rms(:))
    call da_proc_sum_ints (nrej(:))
    call da_proc_sum_ints (ngood(:))
 
@@ -186,9 +259,15 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
       write(fgat_rad_unit, fmt='(/a/)') ' Quality Control Statistics for '//iv%instid(i)%rttovid_string
       write(fgat_rad_unit,'(a20,i7)') ' num_proc_domain  = ', num_proc_domain
-      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
-      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
-      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
+!!TV change
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_landsurface  = ', nrej_landsurface
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchlong = ', nrej_windowchlong
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchshort = ', nrej_windowchshort
+      write(fgat_rad_unit,'(a20,i7)') ' nrej_sst = ', nrej_sst
+!      write(fgat_rad_unit,'(a20,i7)') ' nrej_mixsurface  = ', nrej_mixsurface
+!      write(fgat_rad_unit,'(a20,i7)') ' nrej_windowchanl = ', nrej_windowchanl
+!      write(fgat_rad_unit,'(a20,i7)') ' nrej_si          = ', nrej_si
+!!TV end change
       write(fgat_rad_unit,'(a20,i7)') ' nrej_clw         = ', nrej_clw
       write(fgat_rad_unit,'(a20,i7)') ' nrej_topo        = ', nrej_topo
       write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb
@@ -196,8 +275,6 @@ subroutine da_qc_airs (i, nchan, ob, iv)
       write(fgat_rad_unit,'(10i7)')     nrej_omb_abs(:)
       write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
       write(fgat_rad_unit,'(10i7)')     nrej_omb_std(:)
-      write(fgat_rad_unit,'(a20)')    ' nrej_omb_rms(:)  = ' 
-      write(fgat_rad_unit,'(10i7)')     nrej_omb_rms(:)
       write(fgat_rad_unit,'(a20)')    ' nrej(:)          = '
       write(fgat_rad_unit,'(10i7)')     nrej(:)
       write(fgat_rad_unit,'(a20)')    ' ngood(:)         = '

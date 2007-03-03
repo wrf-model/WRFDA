@@ -18,7 +18,7 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    real      :: si
    ! real    :: satzen
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
-                nrej_omb_std(nchan),nrej_omb_rms(nchan),      &
+                nrej_omb_std(nchan),      &
                 nrej_mixsurface,nrej_windowchanl, nrej_si,    &
                 nrej_clw,nrej_topo,num_rad, num_proc_domain,  &
                 nrej_limb
@@ -31,7 +31,6 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    nrej(:)         = 0
    nrej_omb_abs(:) = 0
    nrej_omb_std(:) = 0
-   nrej_omb_rms(:) = 0
    nrej_mixsurface = 0
    nrej_windowchanl= 0
    nrej_si         = 0
@@ -191,7 +190,6 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
    call da_proc_sum_int (nrej_limb)
    call da_proc_sum_ints (nrej_omb_abs(:))
    call da_proc_sum_ints (nrej_omb_std(:))
-   call da_proc_sum_ints (nrej_omb_rms(:))
    call da_proc_sum_ints (nrej(:))
    call da_proc_sum_ints (ngood(:))
 
@@ -221,8 +219,6 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
       write(fgat_rad_unit,'(10i7)')     nrej_omb_abs(:)
       write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
       write(fgat_rad_unit,'(10i7)')     nrej_omb_std(:)
-      write(fgat_rad_unit,'(a20)')    ' nrej_omb_rms(:)  = ' 
-      write(fgat_rad_unit,'(10i7)')     nrej_omb_rms(:)
       write(fgat_rad_unit,'(a20)')    ' nrej(:)          = '
       write(fgat_rad_unit,'(10i7)')     nrej(:)
       write(fgat_rad_unit,'(a20)')    ' ngood(:)         = '
