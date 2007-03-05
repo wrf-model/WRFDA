@@ -99,13 +99,8 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
-<<<<<<< .mine
-    ln -sf $WRFVAR_DIR/build/da_update_bc.exe .
-    ./da_update_bc.exe
-=======
    ln -fs $WRF_BC_DIR/da_update_bc.exe .
    ./da_update_bc.exe
->>>>>>> .r2316
 
    RC=$?
    if test $RC != 0; then
