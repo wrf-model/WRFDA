@@ -616,12 +616,7 @@ echo "WINDOW_END            $WINDOW_END"
 
       cat $RUN_DIR/cost_fn
 
-      if test $RC = 0; then
-        echo `date` "${OK}Succeeded${END}"
-      else
-         echo `date` "${ERR}Failed${END} with error $RC"
-         exit 1
-      fi
+      echo `date` "Done $RC"
    fi
 
    # We never look at core files

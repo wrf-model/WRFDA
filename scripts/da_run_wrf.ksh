@@ -183,12 +183,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
-      if test $RC = 0; then
-         echo `date` "${OK}Succeeded${END}"
-      else
-         echo `date` "${ERR}Failed${END} with error $RC"
-         exit $RC
-      fi
+      echo `date` "Done $RC"
    fi
    mv wrfout* $FC_DIR/$DATE
    mv wrf_3dvar* $FC_DIR/$DATE

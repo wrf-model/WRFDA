@@ -188,11 +188,7 @@ EOF
       ln -fs $OBSPROC_DIR/prepbufr_table_filename .
       $OBSPROC_DIR/3dvar_obs.exe
       RC=$?
-      if test $RC = 0; then
-         echo "${OK}Suceeded${END}"
-      else
-         echo "${ERR}Failed${END} with error $RC"
-      fi
+      echo "Done %$RC"
    fi
    mv obs_gts.3dvar $OB_DIR/$DATE/ob.ascii
 

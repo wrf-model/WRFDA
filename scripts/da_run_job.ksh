@@ -140,11 +140,7 @@ fi
 
 cat >> job.ksh <<EOF
 RC=\$?
-if test \$RC = 0; then
-   echo Succeeded
-else
-   echo Failed with error \$RC
-fi
+echo `date` "Done $RC"
 EOF
 
 chmod +x job.ksh
