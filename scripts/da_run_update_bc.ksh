@@ -79,15 +79,16 @@ echo "DA_ANALYSIS    $DA_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
-cp $DA_REAL_OUTPUT real_output
+
+cp $DA_REAL_OUTPUT real_output 
 cp $BDYIN wrfbdy_d$DOMAIN
 cp $DA_ANALYSIS wrfvar_output
 
 cat > parame.in << EOF
 &control_param
- wrf_3dvar_output_file = 'wrfvar_output'
- wrf_bdy_file          = 'wrfbdy_d${DOMAIN}'
- wrf_input_from_si     = 'real_output'
+ wrfvar_output_file = 'wrfvar_output'
+ wrf_bdy_file       = 'wrfbdy_d${DOMAIN}'
+ wrf_input          = 'real_output'
 
  cycling = .${CYCLING}.
  debug   = .true.
@@ -98,8 +99,13 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
+<<<<<<< .mine
+    ln -sf $WRFVAR_DIR/build/da_update_bc.exe .
+    ./da_update_bc.exe
+=======
    ln -fs $WRF_BC_DIR/da_update_bc.exe .
    ./da_update_bc.exe
+>>>>>>> .r2316
 
    RC=$?
    if test $RC != 0; then
