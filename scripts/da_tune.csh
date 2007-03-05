@@ -40,7 +40,7 @@
 
  rm -rf $WORKDIR; mkdir $WORKDIR; cd $WORKDIR
  cp $WRFVAR_DIR/da/da_util/da_tune.f90  .
- cp $HOME/da_advance_cymdh.exe .
+ ln -fs $HOME/da_advance_cymdh.exe .
  
 #-------------------------------------------------------------------------------------------
 cat > namelist.radiance << EOF

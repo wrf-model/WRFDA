@@ -148,7 +148,7 @@ cat > gen_be_etkf_nl.nl << EOF
     rhoinput = ${RHOINPUT} /
 EOF
 
-cp ${BUILD_DIR}/gen_be_etkf.exe .
+ln -fs ${BUILD_DIR}/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
 #Move ensemble of analyses:

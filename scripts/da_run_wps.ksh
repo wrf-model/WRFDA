@@ -152,7 +152,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
    else
       if $RUN_GEOGRID; then
 #     Run geogrid:
-      cp $WPS_DIR/geogrid.exe .
+      ln -fs $WPS_DIR/geogrid.exe .
       ${RUN_CMD} ./geogrid.exe
 
       RC=$?
@@ -176,7 +176,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       done
       $WPS_DIR/link_grib.csh $FILES
 
-      cp $WPS_DIR/ungrib.exe .
+      ln -fs $WPS_DIR/ungrib.exe .
 ls
       ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
 
@@ -190,7 +190,7 @@ ls
       fi
 
 #     Run metgrid:
-      cp $WPS_DIR/metgrid.exe .
+      ln -fs $WPS_DIR/metgrid.exe .
       ${RUN_CMD} ./metgrid.exe
 
       RC=$?

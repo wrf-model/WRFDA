@@ -190,24 +190,24 @@ echo "WINDOW_END            $WINDOW_END"
    #-----------------------------------------------------------------------
 
    if test $DA_RTTOV_COEFFS'.' != '.'; then
-      ln -s $DA_RTTOV_COEFFS/* .
+      ln -fs $DA_RTTOV_COEFFS/* .
    fi
 
    if test $DA_CRTM_COEFFS'.' != '.'; then
-      ln -s $DA_CRTM_COEFFS/* .
+      ln -fs $DA_CRTM_COEFFS/* .
    fi
 
-   ln -sf $WRFVAR_DIR/run/gribmap.txt .
-   ln -sf $WRFVAR_DIR/run/*.TBL .
-   ln -sf $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
-   ln -sf $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
-   ln -sf $WRFVAR_DIR/build/da_wrfvar.exe .
+   ln -fs $WRFVAR_DIR/run/gribmap.txt .
+   ln -fs $WRFVAR_DIR/run/*.TBL .
+   ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
+   ln -fs $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
+   ln -fs $WRFVAR_DIR/build/da_wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
-   ln -sf $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
-   ln -sf $DA_FIRST_GUESS	 fg01
-   ln -sf $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
-   ln -sf $DA_BACK_ERRORS        be.dat
+   ln -fs $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
+   ln -fs $DA_FIRST_GUESS	 fg01
+   ln -fs $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
+   ln -fs $DA_BACK_ERRORS        be.dat
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then
@@ -215,7 +215,7 @@ echo "WINDOW_END            $WINDOW_END"
       fi
    done
 
-   ln -s $WRFVAR_DIR/run wrfvar_run
+   ln -fs $WRFVAR_DIR/run wrfvar_run
 
    if test $NL_NUM_FGAT -gt 1; then
       if $NL_VAR4D; then
@@ -239,9 +239,9 @@ echo "WINDOW_END            $WINDOW_END"
          ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
       else
          if [[ $DATE = $START_DATE ]]; then
-            ln -sf $OB_DIR/$DATE/ob.ascii+ ob01.ascii
+            ln -fs $OB_DIR/$DATE/ob.ascii+ ob01.ascii
          else
-            ln -sf $OB_DIR/$DATE/ob.ascii  ob01.ascii
+            ln -fs $OB_DIR/$DATE/ob.ascii  ob01.ascii
          fi
          typeset -i N
          let N=1
@@ -251,30 +251,30 @@ echo "WINDOW_END            $WINDOW_END"
             if [[ $FGAT_DATE != $DATE ]]; then
                let N=$N+1
                if [[ $FGAT_DATE = $START_DATE ]]; then
-                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii+ ob0${N}.ascii
+                  ln -fs $OB_DIR/$FGAT_DATE/ob.ascii+ ob0${N}.ascii
                elif [[ $FGAT_DATE = $END_DATE ]]; then
-                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii- ob0${N}.ascii
+                  ln -fs $OB_DIR/$FGAT_DATE/ob.ascii- ob0${N}.ascii
                else
-                  ln -sf $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
+                  ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
                fi
                FYEAR=`echo ${FGAT_DATE} | cut -c1-4`
                FMONTH=`echo ${FGAT_DATE} | cut -c5-6`
                FDAY=`echo ${FGAT_DATE} | cut -c7-8`
                FHOUR=`echo ${FGAT_DATE} | cut -c9-10`
-               ln -sf ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+               ln -fs ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
             fi
             FGAT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ`
          done
       fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      ln -sf $OB_DIR/${DATE}/ssmi.dat  ssmi01.dat
-      ln -sf $OB_DIR/${DATE}/radar.dat radar01.dat
+      ln -fs $OB_DIR/${DATE}/ssmi.dat  ssmi01.dat
+      ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
       if test -f $FILE; then
-         ln -s $FILE .
+         ln -fs $FILE .
       fi
    done
 
@@ -380,7 +380,7 @@ echo "WINDOW_END            $WINDOW_END"
 #      else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
 #      fi
-      ln -s $WRF_DIR/main/wrf.exe nl
+      ln -fs $WRF_DIR/main/wrf.exe nl
 
       # Outputs
       for I in 02 03 04 05 06 07; do
@@ -428,9 +428,9 @@ echo "WINDOW_END            $WINDOW_END"
 
       # Outputs
       for I in 02 03 04 05 06 07; do
-         ln -s tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
+         ln -fs tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
-      ln -s tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
+      ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
 
       # ad
 

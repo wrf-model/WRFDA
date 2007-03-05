@@ -72,7 +72,7 @@ cat > gen_be_ensmean_nl.nl << EOF
 EOF
 
 #Run:
-cp ${BUILD_DIR}/gen_be_ensmean.exe .
+ln -fs ${BUILD_DIR}/gen_be_ensmean.exe .
 ./gen_be_ensmean.exe > gen_be_ensmean.out 2>&1
 
 exit 0

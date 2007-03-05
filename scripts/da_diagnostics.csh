@@ -31,7 +31,7 @@
  echo "Running script da_diagnostics.csh for region: " ${REGION}
  echo ""
 
- cp ${DA_DIR}/build/da_diagnostics.exe .
+ ln -fs ${DA_DIR}/build/da_diagnostics.exe .
 
 
  setenv DIR_PREFIX  ${DAT_DIR}/mahua_mac_1

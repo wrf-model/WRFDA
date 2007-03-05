@@ -86,7 +86,7 @@ cd $WORK_DIR
 
    export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
-   ln -s $OB_DIR/$DATE/$OB_FILE .
+   ln -fs $OB_DIR/$DATE/$OB_FILE .
 
    if test -f $OB_DIR/$DATE/${OB_FILE}.gz; then
       # If compressed, unpack
@@ -184,8 +184,8 @@ EOF
       echo "Dummy obsproc"
       echo "Dummy obsproc" > obs_gts.3dvar
    else
-      ln -sf $OBSPROC_DIR/obserr.txt .
-      ln -sf $OBSPROC_DIR/prepbufr_table_filename .
+      ln -fs $OBSPROC_DIR/obserr.txt .
+      ln -fs $OBSPROC_DIR/prepbufr_table_filename .
       $OBSPROC_DIR/3dvar_obs.exe
       RC=$?
       if test $RC = 0; then

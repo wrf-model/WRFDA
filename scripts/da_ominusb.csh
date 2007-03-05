@@ -30,7 +30,7 @@
  echo ""
 
 
- cp ${DA_DIR}/build/da_ominusb.exe .
+ ln -fs ${DA_DIR}/build/da_ominusb.exe .
 
 #
 #---------------------------------------------------
@@ -39,7 +39,7 @@
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 
@@ -55,7 +55,7 @@ setenv VAR (u_omb v_omb t_omb q_omb )
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 
@@ -70,7 +70,7 @@ setenv VAR ( t_omb q_omb )
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 
@@ -85,7 +85,7 @@ setenv VAR ( u_omb v_omb t_omb )
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 
@@ -101,7 +101,7 @@ setenv VAR ( u_omb v_omb t_omb )
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 
@@ -117,7 +117,7 @@ setenv VAR ( u_omb v_omb t_omb )
 #---------------------------------------------------
  foreach OBS_VAR ( $VAR )
   setenv FILENAME $TYPE${OBS_VAR}
-  ln -sf ${RUN_DIR}/${FILENAME}.dat fort.35
+  ln -fs ${RUN_DIR}/${FILENAME}.dat fort.35
 
      ./da_ominusb.exe >&! da_ominusb_${FILENAME}.log
 

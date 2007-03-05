@@ -98,8 +98,8 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
-   cp $WRF_BC_DIR/update_wrf_bc.exe .
-   ./update_wrf_bc.exe
+   ln -fs $WRF_BC_DIR/da_update_bc.exe .
+   ./da_update_bc.exe
 
    RC=$?
    if test $RC != 0; then

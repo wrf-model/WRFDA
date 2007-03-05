@@ -58,7 +58,7 @@ EOF
 ### &END Linux namelist conversion
 
          \rm -f fort.*
-         ln -s biasprep_${sensor}  fort.10  # input: fort.10
+         ln -fs biasprep_${sensor}  fort.10  # input: fort.10
          $BIN_DIR/da_bias_sele.exe < nml_sele > da_bias_sele_${sensor}.log
          mv fort.11 biassele_${sensor}      # output fort.11
 echo '  End da_bias_sele'
@@ -79,7 +79,7 @@ cat > nml_scan << EOF
 EOF
 
        \rm -f fort.*
-       ln -s biassele_${sensor}  fort.10  # input : fort.10
+       ln -fs biassele_${sensor}  fort.10  # input : fort.10
        $BIN_DIR/da_bias_scan.exe < nml_scan > da_bias_scan_${sensor}.log
        mv fort.11 scan_core_${sensor}     # output: fort.11, statistics not divided by nobs
        mv fort.12 scan_bias_${sensor}     # scan bias both band/noband 
@@ -104,8 +104,8 @@ cat > nml_bias << EOF
 EOF
 
        \rm -f fort.*
-       ln -s scan_bias_${sensor} fort.12
-       ln -s biassele_${sensor}  fort.10
+       ln -fs scan_bias_${sensor} fort.12
+       ln -fs biassele_${sensor}  fort.10
        $BIN_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
        mv bcor.asc ${sensor}.bcor
 
@@ -128,8 +128,8 @@ cat > nml_verif << EOF
 EOF
 
        \rm -f fort.*
-       ln -s biassele_${sensor}    fort.10
-       ln -s ${sensor}.bcor    bcor.asc
+       ln -fs biassele_${sensor}    fort.10
+       ln -fs ${sensor}.bcor    bcor.asc
        $BIN_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
        mv fort.11 bias_verif_${sensor}
        rm bcor.asc

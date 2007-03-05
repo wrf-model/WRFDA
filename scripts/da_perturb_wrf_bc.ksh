@@ -149,11 +149,11 @@ mkdir -p $RUN_DIR
 cd $RUN_DIR
 
 cp ${RC_DIR_SAVE}/${DATE_SAVE}/wrfbdy_d01 wrfbdy_this
-ln -sf ${RC_DIR}/${DATE_SAVE}/wrfinput_d01.${CMEM} wrfinput_this
-ln -sf ${RC_DIR}/${END_DATE}/wrfinput_d01.${CMEM} wrfinput_next
-ln -sf ${WPB_DIR}/input.nml .
-ln -sf ${WPB_DIR}/namelist.input .
-ln -sf ${WPB_DIR}/pert_wrf_bc.mac pert_wrf_bc.exe
+ln -fs ${RC_DIR}/${DATE_SAVE}/wrfinput_d01.${CMEM} wrfinput_this
+ln -fs ${RC_DIR}/${END_DATE}/wrfinput_d01.${CMEM} wrfinput_next
+ln -fs ${WPB_DIR}/input.nml .
+ln -fs ${WPB_DIR}/namelist.input .
+ln -fs ${WPB_DIR}/pert_wrf_bc.mac pert_wrf_bc.exe
 ./pert_wrf_bc.exe > pert_wrf_bc.out.${CMEM} 2>&1
 
 mv wrfbdy_this ${RC_DIR_SAVE}/${DATE_SAVE}/wrfbdy_d01.${CMEM}

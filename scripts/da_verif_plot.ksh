@@ -39,7 +39,7 @@ EXP_DIR=$RUN_DIR/$expt
 mkdir -p $EXP_DIR 
 
 cd $EXP_DIR
-ln -sf ${SRC_DIR}/src/get_diag.exe .
+ln -fs ${SRC_DIR}/src/get_diag.exe .
 #--------------------------------------------------
 # Making record 4 of namelist
 #---------
