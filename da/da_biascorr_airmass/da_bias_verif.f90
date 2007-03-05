@@ -14,6 +14,9 @@
   REAL(KIND=LONG) :: vmean_dep(JPCHAN), vmean_abs(JPCHAN)
   REAL(KIND=LONG) :: vec_dep(JPCHAN), vec_abs(JPCHAN)
   REAL(KIND=LONG) :: vstd_dep(JPCHAN), vstd_abs(JPCHAN)
+  REAL(KIND=LONG) :: vmean_dep1(JPCHAN), vmean_abs1(JPCHAN)
+  REAL(KIND=LONG) :: vstd_dep1(JPCHAN), vstd_abs1(JPCHAN)
+
   REAL(KIND=LONG) :: vmn(JPCHAN), vstd(JPCHAN), airbias(JPCHAN)
 
   REAL :: pred(JPNX)
@@ -38,7 +41,7 @@
   REAL(KIND=LONG) :: SCORR(JPCHAN)
 
   INTEGER :: nsel(10)
-  INTEGER :: nobs(JPCHAN)
+  INTEGER :: nobs(JPCHAN),nobs1(JPCHAN)
   INTEGER :: nobsy(JPNY),lchan
 
   LOGICAL :: LMASK
@@ -51,7 +54,7 @@
   REAL(KIND=LONG) :: xcorr(JPCHAN)
   REAL(KIND=LONG) :: coef_year, coef_month, coef_day, coef_time
 
-  INTEGER :: icount = 0, kscanx, jbandx
+  INTEGER :: kscanx, jbandx
   LOGICAL :: check_limb=.false., check_mask=.false., global
   REAL    :: FAC = 3.0      ! Number of SD' for QC
 
@@ -68,7 +71,7 @@
 
 ! 1.0 read bias correction coefficients
 !   -------------------------------------------------------------
-     open(UNIT=12,file='bcor.asc',form='formatted')
+     open(UNIT=12,file='scor.asc',form='formatted')
      read (12,'(4i6)') nchan,nscan,nband,npred
      close(12)
 
@@ -83,6 +86,15 @@
 !        2.   READ IN DATA, Q.C., CALC MEANS AND VARIANCES.
 !             ---- -- ----- ----- ---- ----- --- ---------
 
+  nobs1(:)  = 0
+  nsel(:)  = 0
+  vmean_dep1(:) = 0.0
+  vmean_abs1(:) = 0.0
+  vstd_dep1(:)  = 0.0
+  vstd_abs1(:)  = 0.0
+
+  200  CONTINUE
+
   READ(UNIT=10,END=300)  tovs%nchan, tovs%npred    ! Read in data
   REWIND(UNIT=10)
 
@@ -95,7 +107,6 @@
 
   300 CONTINUE
 
-  icount = 0
 loop2:&
   DO
     call da_read_biasprep(tovs,10,ierr)
@@ -150,10 +161,10 @@ loop2:&
       ENDIF
     ENDIF
 
-! 3.5 Reject outliers : facx*sigma, sigma calculated in first pass : loop1
+! 3.5 Reject outliers : facx*sigma, 
 !--------------------------------------------------------------------------
     DO j=1, tovs%nchan
-      IF ( (ABS(vec_dep(j)-vmn(j)) > (vstd(j)*FAC)) ) THEN
+      IF ( (ABS(vec_dep(j)-vmean_dep(j)) > (vstd_dep(j)*FAC)) ) THEN
         tovs%qc_flag(j) = -1
       ENDIF
     ENDDO
@@ -168,7 +179,18 @@ loop2:&
       if ( tovs%omb(i) == -888888.00 ) vec_dep(i)=tovs%omb(i)
     end do
 
-    icount = icount + 1
+! mean/std statistics for scan/airmass-bias corrected values                      
+    DO j=1, nchan
+      IF ( tovs%qc_flag(j) == 1 ) THEN
+        jv = j
+        nobs1(j) = nobs1(j) + 1
+        vmean_dep1(j) = vmean_dep1(j) + vec_dep(j)
+         vstd_dep1(j) = vstd_dep1(j) + vec_dep(j)*vec_dep(j)
+        vmean_abs1(j) = vmean_abs1(j) + vec_abs(j)
+         vstd_abs1(j) = vstd_abs1(j) + vec_abs(j)*vec_abs(j)
+      ENDIF
+    ENDDO
+
     if (nchan == 15) then
       write(11,'(15i15)') tovs%qc_flag(1:nchan)
       write(11,'(15f15.3)') tovs%omb(1:nchan)  ! omb no-biascorrection
@@ -189,6 +211,17 @@ loop2:&
 
   365 CONTINUE
 
+! Calculate means, standard deviations and covariances
+
+  WHERE (nobs1(:) /= 0)
+    vmean_dep1(:) = vmean_dep1(:)/nobs1(:)
+    vstd_dep1(:)  = vstd_dep1(:)/nobs1(:) - vmean_dep1(:)**2
+    vstd_dep1(:)  = SQRT(MAX(0.0,vstd_dep1(:)))
+    vmean_abs1(:) = vmean_abs1(:)/nobs1(:)
+    vstd_abs1(:)  = vstd_abs1(:)/nobs1(:) - vmean_abs1(:)**2
+    vstd_abs1(:)  = SQRT(MAX(0.0,vstd_abs1(:)))
+  ENDWHERE
+
 !----------------------------------------------------------------------------
 
    deallocate(tovs%tb)
@@ -196,5 +229,13 @@ loop2:&
    deallocate(tovs%qc_flag)
    deallocate(tovs%cloud_flag)
    deallocate(tovs%pred)
+
+! out coefs to ASCII file bcor.asc
+  call write_biascoef(nchan,nscan,nband,npred,global, &
+                      VMNRL(1:nchan,1:nscan),VMNRLB(1:nchan,1:nscan,1:nband), &
+                      xcoef(1:nchan,1:npred),xcoef0(1:nchan), &
+                      nobs1(1:nchan),vmean_abs1(1:nchan), &
+                      vstd_abs1(1:nchan),vmean_dep1(1:nchan), &
+                      vstd_dep1(1:nchan) )
 
   END PROGRAM da_bias_verif

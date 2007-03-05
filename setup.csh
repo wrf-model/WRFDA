@@ -21,7 +21,7 @@ if ($status == 0) then
    setenv SUBMIT_OPTIONS1 "#BSUB -x" # exclusivity
    setenv SUBMIT_OPTIONS2 "#BSUB -a mpich_gm"
    setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LSF_PTILE]"
-   setenv SUBMIT_OPTIONS4 "#BSUB -W 60"
+   setenv SUBMIT_OPTIONS4 "#BSUB -W 360"
    setenv SUBMIT_OPTIONS5 "#BSUB -P $PROJECT"
 else
    llq >& /dev/null

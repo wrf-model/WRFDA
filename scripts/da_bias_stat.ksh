@@ -5,21 +5,23 @@
 ###############################################
 export USER=liuz
 export WRFVAR_DIR=/ptmp/${USER}/wrfvar/trunk
-#export DATA_DIR=/ptmp/hclin/exps/t44/test_gts_crtm/run
 export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2274_gts_crtm_mix_8/run
+#export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2299_gts_crtm_noaa18_8/run
 export BUILD_DIR=${WRFVAR_DIR}/build
 export BIN_DIR=${WRFVAR_DIR}/da/da_biascorr_airmass
-export WORKDIR=/ptmp/liuz/wrfvar/trunk/da/da_biascorr_airmass/work
+export WORKDIR=/ptmp/${USER}/wrfvar/trunk/scripts/work
 
-export START_DATE=2006100106
-export END_DATE=2006101118
+export START_DATE=2006100100
+export END_DATE=2006102818
 export CYCLE_PERIOD=6
+
 export PLATFORM=noaa
 export PLATFORM_ID=1
-export SATELLITE=16
-export SENSOR=amsua
-export SENSOR_ID=3
-export NSCAN=30
+export SENSOR=$1     # amsua,amsub
+export SATELLITE=$2  # 15,16,17,18
+export SENSOR_ID=$3   # 3 , 4
+export NSCAN=$4      # 30, 90
+
 
  echo 'WORKING directory is $WORKDIR'
 
@@ -29,7 +31,6 @@ export NSCAN=30
  CDATE=$START_DATE
 
  export sensor=${PLATFORM}-${SATELLITE}-${SENSOR}
- export sensor_date=${PLATFORM}_${SATELLITE}_${SENSOR}_${CDATE}
  \rm -f biasprep_${sensor}
 
 # 1.0 cat the data together
@@ -107,7 +108,7 @@ EOF
        ln -fs scan_bias_${sensor} fort.12
        ln -fs biassele_${sensor}  fort.10
        $BIN_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
-       mv bcor.asc ${sensor}.bcor
+       mv bcor.asc ${sensor}.scor
 
 echo "  End da_bias_airmass"
 
@@ -129,12 +130,14 @@ EOF
 
        \rm -f fort.*
        ln -fs biassele_${sensor}    fort.10
-       ln -fs ${sensor}.bcor    bcor.asc
+       ln -fs ${sensor}.scor    scor.asc
        $BIN_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
        mv fort.11 bias_verif_${sensor}
-       rm bcor.asc
+       mv bcor.asc ${sensor}.bcor
 
 echo "  End da_bias_verif"
 
   \rm -f fort*
+  \rm -f scor.asc 
+
 exit

@@ -431,7 +431,7 @@
 
     iunit=99
     stdout=6
-    open(UNIT=iunit,file='bcor.asc',form='formatted')
+    open(UNIT=iunit,file='scor.asc',form='formatted')
 
     !read (iunit,'(4i6)') nchan,nscan,nband,npred
     read (iunit,'(4i6)')
