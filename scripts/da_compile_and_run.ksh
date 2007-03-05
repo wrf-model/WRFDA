@@ -33,7 +33,7 @@ echo "TARGET    $TARGET"
 let COUNT=1
 
 for COMPILER in $COMPILERS; do
-   export ID=${COMPILER}_${MACHINE}_${TYPE}
+   export ID=${MACHINE}_${COMPILER}_${TYPE}
    export WRFVAR_DIR=$HOME/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
