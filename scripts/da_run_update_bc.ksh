@@ -79,10 +79,9 @@ echo "DA_ANALYSIS    $DA_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
-
-cp $DA_REAL_OUTPUT real_output 
-cp $BDYIN wrfbdy_d$DOMAIN
-cp $DA_ANALYSIS wrfvar_output
+ln -fs $DA_REAL_OUTPUT real_output 
+ln -fs $BDYIN wrfbdy_d$DOMAIN
+ln -fs $DA_ANALYSIS wrfvar_output
 
 cat > parame.in << EOF
 &control_param
@@ -99,6 +98,7 @@ if $DUMMY; then
    echo "Dummy update_bc"
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
+
    ln -fs $WRF_BC_DIR/da_update_bc.exe .
    ./da_update_bc.exe
 
@@ -106,10 +106,10 @@ else
    if test $RC != 0; then
       echo "Update_bc failed with error $RC"
       exit 1
+     else
+      cp wrfbdy_d${DOMAIN} $BDYOUT
    fi
 fi
-
-cp wrfbdy_d${DOMAIN} $BDYOUT
 
 if $CLEAN; then
    rm -rf ${WORK_DIR}
