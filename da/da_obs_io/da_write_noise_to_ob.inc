@@ -24,6 +24,7 @@ subroutine da_write_noise_to_ob (iv)
       write(unit=filename(k), fmt='(a,i3.3)')'rand_obs_error.',k
    end do
    if (rootproc) then
+      call da_get_unit (rand_unit)
       open(unit=rand_unit,file='rand_obs_error',form='formatted', &
          iostat=ierr,status='new')
       if (ierr /= 0) &
@@ -55,8 +56,11 @@ subroutine da_write_noise_to_ob (iv)
          if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
+   print*,' got Total metar num_obs = ',num_obs
    call da_proc_sum_int(num_obs)
+   print*,' got Total metar num_obs = ',num_obs
    if (num_obs > 0 .and. rootproc) then
+   print*,' Now writing on rand_unit ',rand_unit
       write(rand_unit,'(a20,20i8)')'metar', num_obs  
       num_obs = 0
       do k = 0,num_procs-1
@@ -445,6 +449,8 @@ subroutine da_write_noise_to_ob (iv)
    end if
 
    call da_free_unit (iunit)
+!rizvi   call da_free_unit (rand_unit)
+   if (rootproc ) call da_free_unit (rand_unit)
    deallocate (filename)
    call da_trace_exit("da_write_noise_to_ob")
    
