@@ -7,7 +7,7 @@ export COMPILE=${COMPILE:-true}
 export RUN=${RUN:-true}
 export CLEAN=${CLEAN:-true}
 
-# Need a cleaner mapping between compiler and configure options.
+# Need a cleaner mapping between compiler and configure options
 # Assuming option 2 is pgi mpi is a hack
 
 export TYPE=${TYPE:-simple}
