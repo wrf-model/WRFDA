@@ -11,7 +11,6 @@ program gen_be_stage2_1dvar
 
    use da_control
    use da_gen_be
-   use da_tracing
 
    implicit none
 
@@ -85,9 +84,6 @@ program gen_be_stage2_1dvar
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_stage2_1dvar")
 
    call da_get_unit(ounit)
    call da_get_unit(iunit)
@@ -531,9 +527,6 @@ program gen_be_stage2_1dvar
          end do
       end do
    end do
-
-   if (trace_use) call da_trace_exit("gen_be_stage2_1dvar")
-   if (trace_use) call da_trace_report
 
 contains
 

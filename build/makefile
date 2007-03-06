@@ -1,6 +1,8 @@
 include configure.wrfvar
 
-all: wrfvar be utils biascorr
+all: serial parallel
+serial: wrfvar be utils biascorr
+parallel : wrfvar
 
 setup : depend
 

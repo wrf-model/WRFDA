@@ -1,4 +1,4 @@
-module be_spectral
+module da_be_spectral
 
    use da_control, only : trace_use, trace_use_frequent,da_zero_complex,ierr, &
       pi,gaussian_lats
@@ -33,5 +33,5 @@ contains
 #include "da_legtra_inv_adj.inc"
 #include "da_apply_power.inc"
 
-end module be_spectral
+end module da_be_spectral
 

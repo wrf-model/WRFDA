@@ -16,7 +16,6 @@ program gen_be_ep2
 
    use da_control
    use da_gen_be
-   use da_tracing
 
    implicit none
 
@@ -70,9 +69,6 @@ program gen_be_ep2
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_ep2")
 
    call da_get_unit(gen_be_iunit)
    call da_get_unit(gen_be_ounit)
@@ -356,9 +352,6 @@ program gen_be_ep2
 
    call da_free_unit(gen_be_iunit)
    call da_free_unit(gen_be_ounit)
-
-   if (trace_use) call da_trace_exit("gen_be_ep2")
-   if (trace_use) call da_trace_report
 
 #ifdef crayx1
 contains

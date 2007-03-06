@@ -201,24 +201,27 @@ da_utils : setup \
 da_plots : setup da_scale_length.exe
 
 da_be4_scale_length.exe: da_be4_scale_length.o
-	$(LD) -o $@ da_be4_scale_length.o
+	$(SFC) -o $@ da_be4_scale_length.o
 
 da_scale_length.exe: da_scale_length.o
-	$(LD) -o $@ da_scale_length.o da_control.o
+	$(SFC) -o $@ da_scale_length.o da_control.o
 
 da_diagnostics.exe: da_diagnostics.o
-	$(LD) -o $@ da_diagnostics.o
+	$(SFC) -o $@ da_diagnostics.o
 
 da_ominusb.exe: da_ominusb.o
-	$(LD) -o $@ da_ominusb.o
+	$(SFC) -o $@ da_ominusb.o
 
 da_tune.exe: da_tune.o
-	$(LD) -o $@ da_tune.o
+	$(SFC) -o $@ da_tune.o
 
 da_update_bc.exe : da_update_bc.o
-	$(LD) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \
+	$(SFC) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
+
+da_update_bc.o : da_update_bc.f90 da_module_couple_uv.o da_netcdf_interface.o
+	$(SFC) -c $(FCFLAGS) -I$(NETCDF_INC) da_update_bc.f90
 
 da_bufr_little_endian.exe : da_bufr_little_endian.o
 	$(RM) $@
@@ -253,19 +256,19 @@ da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
 
-da_netcdf_interface.o gen_be_etkf.o :
+da_netcdf_interface.o da_module_couple_uv.o gen_be_etkf.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
+	  $(SFC) -c $(FCFLAGS_SIMPLE) $*.f
 
 da_gen_be.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) -I$(NETCDF_INC) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) -I$(LAPACK_INC) $*.f
+	  $(SFC) -c $(FCFLAGS) -I$(LAPACK_INC) $*.f
 
 da_etkf.o :
 	@ $(RM) $@

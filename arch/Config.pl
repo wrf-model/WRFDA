@@ -153,10 +153,6 @@ until ( $validresponse ) {
   printf "------------------------------------------------------------------------\n" ;
   printf "Please select from among the following supported platforms.\n\n" ;
 
-  printf "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n" ;
-  printf "Choose single-threaded options for be.\n" ;
-  printf "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n" ;
-
   $opt = 1 ;
   open CONFIGURE_DEFAULTS, "< ./arch/configure.defaults" 
       or die "Cannot open ./arch/configure.default for reading" ;

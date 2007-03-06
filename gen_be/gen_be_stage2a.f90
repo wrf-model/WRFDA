@@ -2,7 +2,6 @@ program gen_be_stage2a
 
    use da_control
    use da_gen_be
-   use da_tracing
 
    implicit none
 
@@ -49,9 +48,6 @@ program gen_be_stage2a
 !---------------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
 !---------------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_stage2a")
 
    call da_get_unit(ounit)
    call da_get_unit(iunit)
@@ -231,9 +227,6 @@ program gen_be_stage2a
       date = new_date
       read(date(1:10), fmt='(i10)')cdate
    end do     ! End loop over times.
-
-   if (trace_use) call da_trace_exit("gen_be_stage2a")
-   if (trace_use) call da_trace_report
 
 end program gen_be_stage2a
 

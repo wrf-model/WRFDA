@@ -13,9 +13,6 @@ subroutine da_apply_power (power, max_wavenumber, ccv, c_cvsize)
   
    integer             :: m, n, index
 
-
-   if (trace_use_frequent) call da_trace_entry("da_apply_power")
-
    ! Adjust Power spectrum
 
    do n =0, max_wavenumber
@@ -27,8 +24,6 @@ subroutine da_apply_power (power, max_wavenumber, ccv, c_cvsize)
          ccv(index) = ccv(index) * sqrt (power(n)/(2*n+1))
       end do
    end do
-
-   if (trace_use_frequent) call da_trace_exit("da_apply_power")
 
 end subroutine da_apply_power           
 

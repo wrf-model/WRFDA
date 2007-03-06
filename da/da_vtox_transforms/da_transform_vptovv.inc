@@ -26,7 +26,7 @@ subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
    integer               :: i, j, m                    ! Loop counters.
    real                  :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
 
-   if (trace_use) call da_trace_entry("da_transform_vptovv")
+   ! Do not add trace, as routine used by gen_be
    
    !-------------------------------------------------------------------
    ! [1.0] Apply inner-product weighting if vertical_ip > 0:
@@ -49,8 +49,6 @@ subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
          end do
       end do
    end do
-
-   if (trace_use) call da_trace_exit("da_transform_vptovv")
 
 end subroutine da_transform_vptovv
 

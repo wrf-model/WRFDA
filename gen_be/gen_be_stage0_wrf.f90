@@ -21,8 +21,6 @@ program gen_be_stage0_wrf
       da_find_fft_factors,da_find_fft_trig_funcs,filename_len
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
-   use da_tracing, only : da_trace_entry, da_trace_exit, &
-      da_trace_report, da_trace_init
    use da_tools1
 
    implicit none
@@ -104,9 +102,6 @@ program gen_be_stage0_wrf
    stdout = 6
 
    write(6,'(/a)')' [1] Initialize information.'
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_stage0_wrf")
 
    call da_get_unit(gen_be_iunit)
    call da_get_unit(gen_be_ounit)
@@ -469,9 +464,6 @@ program gen_be_stage0_wrf
    deallocate( temp_mean )
    deallocate( rh_mean )
    deallocate( psfc_mean )
-
-   if (trace_use) call da_trace_exit("gen_be_stage0_wrf")
-   if (trace_use) call da_trace_report
 
 CONTAINS
 

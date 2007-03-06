@@ -14,8 +14,6 @@ program gen_be_ensmean
 #endif
 
    use da_control, only : trace_use, stdout, stderr,filename_len
-   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
-      da_trace_report
    use da_reporting, only : da_error,message
 
    implicit none
@@ -60,9 +58,6 @@ program gen_be_ensmean
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_ensmean")
 
    filestub = 'test'
    num_members = 56
@@ -157,9 +152,6 @@ program gen_be_ensmean
    end do ! variable
 
    rcode = nf_close( cdfid_mean )
-
-   if (trace_use) call da_trace_exit("gen_be_ensmean")
-   if (trace_use) call da_trace_report
 
 end program gen_be_ensmean
 

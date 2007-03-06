@@ -16,8 +16,6 @@ program gen_be_etkf
    use da_control, only : trace_use, stdout,filename_len
 !   use da_gen_be
    use da_etkf, only : da_solve_etkf
-   use da_tracing, only : da_trace_init, da_trace_entry, da_trace_exit, &
-      da_trace_report
    use da_reporting, only : da_error, message
 
    implicit none
@@ -82,9 +80,6 @@ program gen_be_etkf
 !---------------------------------------------------------------------------------------------
    write(stdout,'(/a)')' [1] Initialize information.'
 !-----------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_etkf")
 
    directory = '.'
    filestub = 'test'
@@ -314,9 +309,6 @@ program gen_be_etkf
       end do ! v
       rcode = nf_close( cdfid )
    end do !member
-
-   if (trace_use) call da_trace_exit("gen_be_etkf")
-   if (trace_use) call da_trace_report
 
 end program gen_be_etkf
 

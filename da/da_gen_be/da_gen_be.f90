@@ -16,7 +16,6 @@ module da_gen_be
       da_array_print, filename_len
    use da_reporting, only : da_error, message
    use da_tools1, only : da_get_unit, da_free_unit
-   use da_tracing, only : da_trace_entry, da_trace_exit
 
    implicit none
 

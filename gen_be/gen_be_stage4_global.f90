@@ -1,9 +1,8 @@
 program gen_be_stage4_global
 
    use da_control
-   use be_spectral
-   use da_tracing
-   use da_tools
+   use da_be_spectral, only : da_vv_to_v_spectral, da_initialize_h, da_calc_power
+   use da_tools1, only : da_get_unit
 
    implicit none
 
@@ -56,9 +55,6 @@ program gen_be_stage4_global
 
    stderr = 0
    stdout = 6
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_stage4_global")
 
    call da_get_unit(ounit)
    call da_get_unit(iunit)
@@ -205,8 +201,5 @@ program gen_be_stage4_global
    write(ounit)variable
    write(ounit)max_wavenumber, k
    write(ounit)total_power
-
-   if (trace_use) call da_trace_exit("gen_be_stage4_global")
-   if (trace_use) call da_trace_report
 
 end program gen_be_stage4_global

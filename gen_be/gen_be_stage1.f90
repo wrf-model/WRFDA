@@ -12,7 +12,6 @@ program gen_be_stage1
 !
    use da_control
    use da_gen_be
-   use da_tracing
 
    implicit none
 
@@ -65,9 +64,6 @@ program gen_be_stage1
 
    write(unit=stdout,fmt='(a)') &
       ' [1] Initialize namelist variables and other scalars.'
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_stage1")
 
    call da_get_unit(ounit)
    call da_get_unit(iunit)
@@ -299,8 +295,5 @@ program gen_be_stage1
    write(ounit)bin(1:ni,1:nj,1:nk)
    write(ounit)bin2d(1:ni,1:nj)
    close(ounit)
-
-   if (trace_use) call da_trace_exit("gen_be_stage1")
-   if (trace_use) call da_trace_report
 
 end program gen_be_stage1

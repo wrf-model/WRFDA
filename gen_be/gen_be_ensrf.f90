@@ -15,8 +15,6 @@ program gen_be_ensrf
 
    use da_control, only : trace_use, stdout,stderr,filename_len
    use da_gen_be, only : da_stage0_initialize, da_get_field, da_get_trh
-   use da_tracing, only : da_trace_init,da_trace_entry,da_trace_exit, &
-      da_trace_report
 
    implicit none
 
@@ -117,9 +115,6 @@ program gen_be_ensrf
 !---------------------------------------------------------------------------------------------
    write(6,'(/a)')' [1] Initialize information.'
 !---------------------------------------------------------------------------------------------
-
-   if (trace_use) call da_trace_init
-   if (trace_use) call da_trace_entry("gen_be_ensrf")
 
    filestub = 'test'
    num_members = 56
@@ -469,9 +464,6 @@ print *, ni, nj, nk, nv, nij, nijk, nv3d, nv2d, nijkv
       write(unit)xa_mean(xstart(v):xend)
       close(unit)
    end do
-
-   if (trace_use) call da_trace_exit("gen_be_ensrf")
-   if (trace_use) call da_trace_report
 
    deallocate( ob )
 
