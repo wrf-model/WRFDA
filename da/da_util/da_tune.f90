@@ -12,10 +12,9 @@ program da_tune
    !        01/03/2007  Update for GPS refractivity         Syed RH Rizvi
    !---------------------------------------------------------------------
 
-   use da_control, only : filename_len
-
    implicit none
 
+   integer,parameter :: filename_len = 200
    integer, parameter            :: rand_unit = 45
    integer, parameter            :: yp_unit   = 46
    integer, parameter            :: y_unit    = 47
