@@ -14,7 +14,7 @@ export TYPE=${TYPE:-simple}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
-export TARGET=${TARGET:-wrfvar}
+export TARGET=${TARGET:-all}
 
 echo "TYPE      $TYPE"
 echo "COMPILE   $COMPILE"
