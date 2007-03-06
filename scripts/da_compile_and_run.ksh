@@ -34,7 +34,7 @@ let COUNT=1
 
 for COMPILER in $COMPILERS; do
    export ID=${MACHINE}_${COMPILER}_${TYPE}
-   export WRFVAR_DIR=$HOME/build/$ID/wrfvar
+   export WRFVAR_DIR=$HOME/code/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
       echo "Compiling $WRFVAR_DIR $TARGET with option $OPTION"
