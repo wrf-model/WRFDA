@@ -597,7 +597,8 @@ SUBROUTINE DA_Transfer_WRFToXb( xbx, grid, &
 
    do j=js,je
    do i=is,ie
-      rgh_fac(i,j) = 1.0/log(xb%h(i,j,ks)/0.0001)
+      height = xb%h(i,j,ks) - xb%terr(i,j)
+      rgh_fac(i,j) = 1.0/log(height/0.0001)
 
       xb%speed(i,j) = sqrt(xb%u(i,j,ks)*xb%u(i,j,ks) &
                          + xb%v(i,j,ks)*xb%v(i,j,ks) + 1.0e-6) &
