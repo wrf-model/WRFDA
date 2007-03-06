@@ -1637,6 +1637,7 @@ CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 LDFLAGS2        = -V
 
 LOCAL_LIB       =
+LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch :
@@ -1692,6 +1693,7 @@ CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 LDFLAGS2        = -V
 
 LOCAL_LIB       = 
+LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1744,6 +1746,7 @@ CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
 LOCAL_LIB       = 
+LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1831,6 +1834,7 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
+LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
@@ -1885,6 +1889,7 @@ LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
+LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
@@ -1935,6 +1940,7 @@ CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
+LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
