@@ -682,7 +682,7 @@ subroutine da_add_noise_to_ob( iv, ob )
          end do                                ! end loop for pixel
          if (num_obs < 1) cycle
 
-         write(ob_name,'(a,a,i2.2)') trim(iv%instid(i)%rttovid_string),'-',k
+         write(ob_name,'(a,a,i4.4)') trim(iv%instid(i)%rttovid_string),'-',k
          write(ounit,'(a20,i8)')  ob_name,num_obs
 
          num_obs = 0

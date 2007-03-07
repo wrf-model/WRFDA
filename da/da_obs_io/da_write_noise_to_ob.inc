@@ -423,19 +423,19 @@ subroutine da_write_noise_to_ob (iv)
 
    if (iv%num_inst > 0) then
       do i = 1, iv%num_inst                 ! loop for sensor
-         if (iv%instid(i)%num_rad < 1) cycle
+         !if (iv%instid(i)%num_rad < 1) cycle ! may broken da_proc_sum_int(num_obs) if some PE num_rad=0
          do k = 1,iv%instid(i)%nchan        ! loop for channel
             ! Counting number of obs for channle k
             num_obs = 0
             do n = 1,iv%instid(i)%num_rad      ! loop for pixel
-               if (iv%instid(i)%loc(n)%proc_domain .and. &
+               if (iv%instid(i)%proc_domain(n) .and. &
                   (iv%instid(i)%tb_qc(k,n) >= obs_qc_pointer)) then
                   num_obs = num_obs + 1
                end if
             end do                                ! end loop for pixel
             call da_proc_sum_int(num_obs)
             if (rootproc .and. num_obs > 0) then
-               write (ob_name,'(a,a,i2.2)') &
+               write (ob_name,'(a,a,i4.4)') &
                   trim(iv%instid(i)%rttovid_string),'-',k
                write (rand_unit,'(a20,i8)')  ob_name,num_obs
                num_obs = 0
