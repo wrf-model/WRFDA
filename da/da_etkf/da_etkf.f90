@@ -12,7 +12,6 @@ module da_etkf
 
    use da_control, only : trace_use, stdout
    use da_reporting, only : da_error, message
-   use da_tracing, only : da_trace_entry, da_trace_exit
 
    implicit none
 
