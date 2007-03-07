@@ -378,10 +378,9 @@ subroutine da_rttov_init(iv,ob)
             do i=1,rtminit_nsensor
                if ( trim(rttovid_string)== trim(iv%instid(i)%rttovid_string) ) then
                   satinfo(i)%error_factor(ichan) = factor
-                  if (print_detail_radiance)  &
-                     write(unit=stdout,fmt='(a,i5,a,f10.3)') &
-                        trim(rttovid_string)//' Channel ', ichan, &
-                        ' Error Factor = ', factor
+                  write(unit=stdout,fmt='(a,i5,a,f10.3)') &
+                      trim(rttovid_string)//' Channel ', ichan, &
+                      ' Error Factor = ', factor
                   exit
                end if
             end do

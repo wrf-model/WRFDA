@@ -280,7 +280,7 @@ subroutine da_crtm_init(iv,ob)
     end do
 
     call da_get_unit(unit_factor_rad)
-    open(unit_factor_rad, file='radiance_error.factor', &
+    open(unit_factor_rad, file='wrfvar_run/radiance_error.factor', &
          form='formatted',iostat = iost, status='old')
 
     if (iost /= 0) then
@@ -296,8 +296,7 @@ subroutine da_crtm_init(iv,ob)
         do n=1,rtminit_nsensor
           if ( trim(rttovid_string)== trim(iv%instid(n)%rttovid_string) ) then
              satinfo(n)%error_factor(ichan) = factor
-             if (print_detail_obs)  &
-                write(6,'(a,i5,a,f10.3)') trim(rttovid_string)//' Channel ', ichan, 'Error Factor = ', factor
+             write(6,'(a,i5,a,f10.3)') trim(rttovid_string)//' Channel ', ichan, 'Error Factor = ', factor
              exit
           end if
         end do
