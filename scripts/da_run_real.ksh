@@ -147,7 +147,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
 
-      echo `date` "Ended $RC"
+      echo `date +'%D %T'` "Ended $RC"
    fi
 
    mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$DATE

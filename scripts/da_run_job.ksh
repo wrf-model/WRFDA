@@ -140,7 +140,7 @@ fi
 
 cat >> job.ksh <<EOF
 RC=\$?
-echo `date` "Ended $RC"
+echo `date +'%D %T'` "Ended $RC"
 EOF
 
 chmod +x job.ksh
