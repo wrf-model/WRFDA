@@ -18,7 +18,8 @@ subroutine da_error( file_str, line, errors)
    html_file=file_str(1:LEN_trim(file_str)-4)//'.html'
    
 #if defined( DM_PARALLEL ) && ! defined( STUBMPI )
-   call wrf_message( '-------------- FATAL ERROR ----------------' )
+   call wrf_message( &
+      '---------------------------- FATAL ERROR -----------------------' )
    ! only print file and line if line is positive
    if (line > 0) then
       if (use_html) then
@@ -33,9 +34,11 @@ subroutine da_error( file_str, line, errors)
    do i=1,size(errors)
       call wrf_message(errors(i))
    end do
-   call wrf_message( '-------------------------------------------' )
+   call wrf_message( &
+      '----------------------------------------------------------------' )
 #else
-   call wrf_message2( '-------------- FATAL ERROR ----------------' )
+   call wrf_message2( &
+      '---------------------------- FATAL ERROR -----------------------' )
    ! only print file and line if line is positive
    if ( line > 0 ) then
       if (use_html) then
@@ -50,7 +53,8 @@ subroutine da_error( file_str, line, errors)
    do i=1,size(errors)
       call wrf_message(errors(i))
    end do
-   call wrf_message2( '-------------------------------------------' )
+   call wrf_message2( &
+      '----------------------------------------------------------------' )
 #endif
    call wrf_abort
 end subroutine da_error

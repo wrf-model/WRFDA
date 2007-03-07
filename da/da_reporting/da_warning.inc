@@ -23,7 +23,8 @@ subroutine da_warning(file_str, line, warnings)
       html_file=file_str(1:LEN_trim(file_str)-4)//'.html'
 
 #if defined(DM_PARALLEL) && ! defined(STUBMPI)
-      call wrf_message('-------------- WARNING      ---------------')
+      call wrf_message( &
+         '--------------------------- WARNING ---------------------------')
       ! only print file and line if line is positive
       if (line > 0) then
          if (use_html) then
@@ -38,9 +39,11 @@ subroutine da_warning(file_str, line, warnings)
       do i=1,size(warnings) 
          call wrf_message(warnings(i))
       end do
-      call wrf_message('-------------------------------------------')
+      call wrf_message( &
+         '---------------------------------------------------------------')
 #else
-      call wrf_message2('-------------- WARNING ---------------')
+      call wrf_message2( &
+         '---------------------------- WARNING --------------------------')
       ! only print file and line if line is positive
       if (line > 0) then
          if (use_html) then
@@ -53,7 +56,8 @@ subroutine da_warning(file_str, line, warnings)
          end if
       end if
       call da_message2(warnings)
-      call wrf_message2('-------------------------------------------')
+      call wrf_message2( &
+         '---------------------------------------------------------------')
 #endif
    end if
 
