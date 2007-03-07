@@ -34,6 +34,8 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
    integer                      :: itt,ittf,itqv,itqvf
 
    if (iv%num_airsr < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_airsr")
 
    itt  = 0; itqv  = 0;
    ittf = 0; itqvf = 0;
@@ -128,6 +130,8 @@ subroutine da_get_innov_vector_airsr( it, xb, xp, ob, iv)
          'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
          'Finally Total airsr rejections: ',ittf+itqvf,' on ',itt +itqv
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_airsr")
 
 end subroutine da_get_innov_vector_airsr
 

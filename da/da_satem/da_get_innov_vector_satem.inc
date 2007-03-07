@@ -24,88 +24,92 @@ subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
    integer                         :: layer1,layer2,ks,ke
    real                            :: tv1,tv2,pres2
 
-   if (iv % num_satem > 0) then
-      ithickness = 0 ; ithicknessf = 0
+   if (iv % num_satem < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_satem")
 
-      do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
-         num_levs = iv % satem(n) % info % levels
+   ithickness = 0 ; ithicknessf = 0
 
-         if (num_levs < 1) cycle
+   do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, iv%ob_numb(iv%current_ob_time)%satem
+      num_levs = iv % satem(n) % info % levels
 
-         model_thickness(:) = 0.0
+      if (num_levs < 1) cycle
 
-         ! [1.0] Get cross pt. horizontal interpolation weights:
+      model_thickness(:) = 0.0
 
-         i = iv%satem(n)%loc%i
-         dy = iv%satem(n)%loc%dy
-         dym = iv%satem(n)%loc%dym
-         j = iv%satem(n)%loc%j
-         dx = iv%satem(n)%loc%dx
-         dxm = iv%satem(n)%loc%dxm
-         ks = xp%kts; ke=xp%kte
+      ! [1.0] Get cross pt. horizontal interpolation weights:
 
-         !------------------------------------------------------------------------
+      i = iv%satem(n)%loc%i
+      dy = iv%satem(n)%loc%dy
+      dym = iv%satem(n)%loc%dym
+      j = iv%satem(n)%loc%j
+      dx = iv%satem(n)%loc%dx
+      dxm = iv%satem(n)%loc%dxm
+      ks = xp%kts; ke=xp%kte
 
-         ! [2.0] Calculate vertical profile of virtual temperature at obs pt.
+      !------------------------------------------------------------------------
 
-         call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
+      ! [2.0] Calculate vertical profile of virtual temperature at obs pt.
 
-         ! [3.0] Find model vertical position of pressure and do interp.
+      call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
 
-         call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
-         pres2 = iv%satem(n)%ref_p
+      ! [3.0] Find model vertical position of pressure and do interp.
 
-         ! [4.0] Thickness innovations calculation
+      call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
+      pres2 = iv%satem(n)%ref_p
 
-         do k = 1, num_levs
-            iv % satem(n) % thickness(k) % inv = 0.0
-            call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma,ks,ke)
-            call da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
-              iv%satem(n)%p(k),pres2,model_thickness(k))
+      ! [4.0] Thickness innovations calculation
 
-            if (ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
-                 iv % satem(n) % thickness(k)%qc /= missing_data) then
-              iv % satem(n) % thickness(k) % inv =     &
-                     ob % satem(n) % thickness(k) - model_thickness(k)
-              ! write(unit=stdout,fmt="(A, 2F10.3,F10.0,A,F5.0,A)") &
-              !   "observed, model_thickness, layer = ", &
-              !   ob%satem(n)%thickness(k), &
-              ! model_thickness(k), 0.01*pres2, " -", &
-              ! iv%satem(n)%p(k)*0.01,'hPa'
-            end if
+      do k = 1, num_levs
+         iv % satem(n) % thickness(k) % inv = 0.0
+         call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma,ks,ke)
+         call da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
+           iv%satem(n)%p(k),pres2,model_thickness(k))
 
-            pres2 = iv%satem(n)%p(k)
-            layer2 = layer1
-            tv2 = tv1
-         end do
-
-         !------------------------------------------------------------------------
-         ! [5.0] Perform optional maximum error check:
-         !------------------------------------------------------------------------
-
-         if (check_max_iv) then
-           call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf)
+         if (ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
+              iv % satem(n) % thickness(k)%qc /= missing_data) then
+           iv % satem(n) % thickness(k) % inv =     &
+                  ob % satem(n) % thickness(k) - model_thickness(k)
+           ! write(unit=stdout,fmt="(A, 2F10.3,F10.0,A,F5.0,A)") &
+           !   "observed, model_thickness, layer = ", &
+           !   ob%satem(n)%thickness(k), &
+           ! model_thickness(k), 0.01*pres2, " -", &
+           ! iv%satem(n)%p(k)*0.01,'hPa'
          end if
 
-         !------------------------------------------------------------------------
-         ! [6.0] Perform land/ocean check
-         !------------------------------------------------------------------------
-
-         if (xb%landmask(i,j ) /= 0. .or. xb%landmask(i+1,j ) /= 0. .or.  &
-             xb%landmask(i,j+1) /= 0. .or. xb%landmask(i+1,j+1) /= 0.) then
-            iv % satem(n) % thickness(1) % inv = 0.
-            ithicknessf = ithicknessf + 1
-         end if
+         pres2 = iv%satem(n)%p(k)
+         layer2 = layer1
+         tv2 = tv1
       end do
 
-      if (rootproc .and. check_max_iv_print) then
-         write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-            ', Total Rejections for Satem follows:'
-         write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
-            'Number of failed thicknesses observations:     ',&
-                      ithicknessf, ' on ',ithickness
+      !------------------------------------------------------------------------
+      ! [5.0] Perform optional maximum error check:
+      !------------------------------------------------------------------------
+
+      if (check_max_iv) then
+        call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf)
       end if
+
+      !------------------------------------------------------------------------
+      ! [6.0] Perform land/ocean check
+      !------------------------------------------------------------------------
+
+      if (xb%landmask(i,j ) /= 0. .or. xb%landmask(i+1,j ) /= 0. .or.  &
+          xb%landmask(i,j+1) /= 0. .or. xb%landmask(i+1,j+1) /= 0.) then
+         iv % satem(n) % thickness(1) % inv = 0.
+         ithicknessf = ithicknessf + 1
+      end if
+   end do
+
+   if (rootproc .and. check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Satem follows:'
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         'Number of failed thicknesses observations:     ',&
+                   ithicknessf, ' on ',ithickness
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_satem")
 
 end subroutine da_get_innov_vector_satem
 

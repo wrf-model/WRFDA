@@ -28,86 +28,90 @@ subroutine da_get_innov_vector_polaramv( it, xb, xp, ob, iv)
 
    integer           :: itu,ituf,itvv,itvvf
 
-   if (iv % num_polaramv > 0) then
-      itu   = 0; itvv    = 0;
-      ituf  = 0; itvvf   = 0;
+   if (iv % num_polaramv < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_polaramv")
 
-      do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
-         ! [1.3] Get horizontal interpolation weights:
+   itu   = 0; itvv    = 0;
+   ituf  = 0; itvvf   = 0;
 
-         num_levs = iv % polaramv(n) % info % levels
-         if (num_levs < 1) cycle
+   do n=iv%ob_numb(iv%current_ob_time-1)%polaramv + 1, iv%ob_numb(iv%current_ob_time)%polaramv
+      ! [1.3] Get horizontal interpolation weights:
 
-         model_u(:) = 0.0
-         model_v(:) = 0.0
+      num_levs = iv % polaramv(n) % info % levels
+      if (num_levs < 1) cycle
 
-         i = iv%polaramv(n)%loc%i
-         j = iv%polaramv(n)%loc%j
-         dx = iv%polaramv(n)%loc%dx
-         dy = iv%polaramv(n)%loc%dy
-         dxm = iv%polaramv(n)%loc%dxm
-         dym = iv%polaramv(n)%loc%dym
+      model_u(:) = 0.0
+      model_v(:) = 0.0
 
-         do k=xp%kts,xp%kte
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         end do
+      i = iv%polaramv(n)%loc%i
+      j = iv%polaramv(n)%loc%j
+      dx = iv%polaramv(n)%loc%dx
+      dy = iv%polaramv(n)%loc%dy
+      dxm = iv%polaramv(n)%loc%dxm
+      dym = iv%polaramv(n)%loc%dym
 
-         do k=1, iv % polaramv(n) % info % levels
-            iv%polaramv(n)%zk(k)=missing_r
-
-            if (iv % polaramv(n) % p(k) > 1.0) then
-               call da_to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
-            end if
-
-            if (iv%polaramv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
-               iv % polaramv(n) % u(k) % qc = missing
-               iv % polaramv(n) % v(k) % qc = missing
-            end if
-         end do
-
-         call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
-                             model_u, max_ob_levels, iv%polaramv(n)%zk, num_levs)
-         call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
-                             model_v, max_ob_levels, iv%polaramv(n)%zk, num_levs)
-
-         do k = 1, iv % polaramv(n) % info % levels
-            iv % polaramv(n) % u(k) % inv = 0.0
-            iv % polaramv(n) % v(k) % inv = 0.0
-
-
-            if (ob % polaramv(n) % u(k) > missing_r .AND. &
-                 iv % polaramv(n) % u(k) % qc >= obs_qc_pointer) then
-
-                 iv % polaramv(n) % u(k) % inv = ob % polaramv(n) % u(k) - &
-                                              model_u(k)
-            end if
-
-            if (ob % polaramv(n) % v(k) > missing_r .AND. &
-                 iv % polaramv(n) % v(k) % qc >= obs_qc_pointer) then
-
-                 iv % polaramv(n) % v(k) % inv = ob % polaramv(n) % v(k) - &
-                                              model_v(k)
-            end if
-         end do
-
-         !------------------------------------------------------------------------
-         ! Perform optional maximum error check:
-         !------------------------------------------------------------------------
-
-         if (check_max_iv) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
-                                itu,ituf,itvv,itvvf)
+      do k=xp%kts,xp%kte
+         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
       end do
 
-      if (rootproc .and. check_max_iv_print) then
-         write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-            ', Total Rejections for Polar AMVs follows:'
-         write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
-            'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-            'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-            'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
-      end if
+      do k=1, iv % polaramv(n) % info % levels
+         iv%polaramv(n)%zk(k)=missing_r
+
+         if (iv % polaramv(n) % p(k) > 1.0) then
+            call da_to_zk(iv % polaramv(n) % p(k), v_p, xp, v_interp_p, iv%polaramv(n)%zk(k))
+         end if
+
+         if (iv%polaramv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
+            iv % polaramv(n) % u(k) % qc = missing
+            iv % polaramv(n) % v(k) % qc = missing
+         end if
+      end do
+
+      call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+                          model_u, max_ob_levels, iv%polaramv(n)%zk, num_levs)
+      call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+                          model_v, max_ob_levels, iv%polaramv(n)%zk, num_levs)
+
+      do k = 1, iv % polaramv(n) % info % levels
+         iv % polaramv(n) % u(k) % inv = 0.0
+         iv % polaramv(n) % v(k) % inv = 0.0
+
+
+         if (ob % polaramv(n) % u(k) > missing_r .AND. &
+              iv % polaramv(n) % u(k) % qc >= obs_qc_pointer) then
+
+              iv % polaramv(n) % u(k) % inv = ob % polaramv(n) % u(k) - &
+                                           model_u(k)
+         end if
+
+         if (ob % polaramv(n) % v(k) > missing_r .AND. &
+              iv % polaramv(n) % v(k) % qc >= obs_qc_pointer) then
+
+              iv % polaramv(n) % v(k) % inv = ob % polaramv(n) % v(k) - &
+                                           model_v(k)
+         end if
+      end do
+
+      !------------------------------------------------------------------------
+      ! Perform optional maximum error check:
+      !------------------------------------------------------------------------
+
+      if (check_max_iv) call da_check_max_iv_polaramv(it, iv % polaramv(n), &
+                             itu,ituf,itvv,itvvf)
+   end do
+
+   if (rootproc .and. check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Polar AMVs follows:'
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Finally Total Polar AMVs rejections ',ituf+itvvf,' on ',itu+itvv
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_polaramv")
 
 end subroutine da_get_innov_vector_polaramv
 

@@ -29,85 +29,89 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
 
    integer           :: itu,ituf,itvv,itvvf
 
-   if (iv % num_geoamv > 0) then
-      itu   = 0
-      itvv  = 0
-      ituf  = 0
-      itvvf = 0
+   if (iv % num_geoamv < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_geoamv")
 
-      do n=iv%ob_numb(iv%current_ob_time-1)%geoamv + 1, iv%ob_numb(iv%current_ob_time)%geoamv
+   itu   = 0
+   itvv  = 0
+   ituf  = 0
+   itvvf = 0
 
-         ! [1.3] Get horizontal interpolation weights:
+   do n=iv%ob_numb(iv%current_ob_time-1)%geoamv + 1, iv%ob_numb(iv%current_ob_time)%geoamv
 
-         num_levs = iv % geoamv(n) % info % levels
-         if (num_levs < 1) cycle
+      ! [1.3] Get horizontal interpolation weights:
 
-         model_u(:) = 0.0
-         model_v(:) = 0.0
+      num_levs = iv % geoamv(n) % info % levels
+      if (num_levs < 1) cycle
 
-         i = iv%geoamv(n)%loc%i
-         j = iv%geoamv(n)%loc%j
-         dx = iv%geoamv(n)%loc%dx
-         dy = iv%geoamv(n)%loc%dy
-         dxm = iv%geoamv(n)%loc%dxm
-         dym = iv%geoamv(n)%loc%dym
+      model_u(:) = 0.0
+      model_v(:) = 0.0
 
-         do k=xp%kts,xp%kte
-            v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
-         end do
+      i = iv%geoamv(n)%loc%i
+      j = iv%geoamv(n)%loc%j
+      dx = iv%geoamv(n)%loc%dx
+      dy = iv%geoamv(n)%loc%dy
+      dxm = iv%geoamv(n)%loc%dxm
+      dym = iv%geoamv(n)%loc%dym
 
-         do k=1, iv % geoamv(n) % info % levels
-            iv%geoamv(n)%zk(k)=missing_r
+      do k=xp%kts,xp%kte
+         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
+                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+      end do
 
-            if (iv % geoamv(n) % p(k) > 1.0) then
-               call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
-            end if
+      do k=1, iv % geoamv(n) % info % levels
+         iv%geoamv(n)%zk(k)=missing_r
 
-            if (iv%geoamv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
-               iv % geoamv(n) % u(k) % qc = missing
-               iv % geoamv(n) % v(k) % qc = missing
-            end if
-         end do
+         if (iv % geoamv(n) % p(k) > 1.0) then
+            call da_to_zk(iv % geoamv(n) % p(k), v_p, xp, v_interp_p, iv%geoamv(n)%zk(k))
+         end if
 
-         call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
-                             model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-         call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
-                             model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-
-         do k = 1, iv % geoamv(n) % info % levels
-            iv % geoamv(n) % u(k) % inv = 0.0
-            iv % geoamv(n) % v(k) % inv = 0.0
-            if (ob % geoamv(n) % u(k) > missing_r .AND. &
-                 iv % geoamv(n) % u(k) % qc >= obs_qc_pointer) then
-               iv % geoamv(n) % u(k) % inv = ob % geoamv(n) % u(k) - model_u(k)
-            end if
-
-            if (ob % geoamv(n) % v(k) > missing_r .AND. &
-                 iv % geoamv(n) % v(k) % qc >= obs_qc_pointer) then
-               iv % geoamv(n) % v(k) % inv = ob % geoamv(n) % v(k) - model_v(k)
-            end if
-         end do
-
-         !------------------------------------------------------------------------
-         ! Perform optional maximum error check:
-         !------------------------------------------------------------------------
-
-         if (check_max_iv) then
-           call da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
+         if (iv%geoamv(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
+            iv % geoamv(n) % u(k) % qc = missing
+            iv % geoamv(n) % v(k) % qc = missing
          end if
       end do
 
-      if (rootproc .and. check_max_iv_print) then
-         write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-            ', Total Rejections for Geo. AMVs follows:'
-         write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
-            'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-            'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-            'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv
-      end if
-   end if
+      call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+                          model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
+      call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+                          model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
 
+      do k = 1, iv % geoamv(n) % info % levels
+         iv % geoamv(n) % u(k) % inv = 0.0
+         iv % geoamv(n) % v(k) % inv = 0.0
+         if (ob % geoamv(n) % u(k) > missing_r .AND. &
+              iv % geoamv(n) % u(k) % qc >= obs_qc_pointer) then
+            iv % geoamv(n) % u(k) % inv = ob % geoamv(n) % u(k) - model_u(k)
+         end if
+
+         if (ob % geoamv(n) % v(k) > missing_r .AND. &
+              iv % geoamv(n) % v(k) % qc >= obs_qc_pointer) then
+            iv % geoamv(n) % v(k) % inv = ob % geoamv(n) % v(k) - model_v(k)
+         end if
+      end do
+
+      !------------------------------------------------------------------------
+      ! Perform optional maximum error check:
+      !------------------------------------------------------------------------
+
+      if (check_max_iv) then
+        call da_check_max_iv_geoamv(it, iv % geoamv(n),itu,ituf,itvv,itvvf)
+      end if
+   end do
+
+   if (rootproc .and. check_max_iv_print) then
+      write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
+         ', Total Rejections for Geo. AMVs follows:'
+      write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Finally Total Geo. AMVs rejections ',ituf+itvvf,' on ',itu+itvv
+   end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_geoamv")
+   
 end subroutine da_get_innov_vector_geoamv
 
 

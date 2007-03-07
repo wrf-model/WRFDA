@@ -30,6 +30,8 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
    integer           :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf,itslp,itslpf
 
    if (iv % num_bogus < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_bogus")
 
    itu   = 0; itvv    = 0; itt  = 0; itqv  = 0; itslp  = 0;
    ituf  = 0; itvvf   = 0; ittf = 0; itqvf = 0; itslpf = 0;
@@ -167,6 +169,8 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
         'Finally Total Bogus rejections ',ituf+itvvf+ittf+itqvf+itslpf,' on ', &
                                          itu +itvv +itt +itqv +itslp
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_bogus")
 
 end subroutine da_get_innov_vector_bogus
 

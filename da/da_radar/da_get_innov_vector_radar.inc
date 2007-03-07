@@ -38,6 +38,8 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
 
    if (iv % num_Radar < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_radar")
 
    irv = 0; irvf = 0; irf = 0; irff = 0
 
@@ -194,6 +196,8 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
             'Number of failed rf observations:     ',irff, ' on ',irf
       end if
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_radar")
 
 end subroutine da_get_innov_vector_radar
 

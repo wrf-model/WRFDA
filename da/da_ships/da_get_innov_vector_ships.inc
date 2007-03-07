@@ -39,6 +39,8 @@ subroutine da_get_innov_vector_ships( it, xb, xp, ob, iv)
    !-------------------------------------------------------------------------
 
    if (iv % num_ships < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_ships")
 
    !-------------------------------------------------------------------------
 
@@ -251,6 +253,8 @@ subroutine da_get_innov_vector_ships( it, xb, xp, ob, iv)
          'Finally Total Ships rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                            itu +itvv +itp +itt +itqv
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_ships")
 
 end subroutine da_get_innov_vector_ships
 

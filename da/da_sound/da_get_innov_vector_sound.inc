@@ -35,6 +35,8 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
 
    if (iv%num_sound < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_sound")
 
    itu   = 0; itvv    = 0;  itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0;  ittf = 0; itqvf = 0;
@@ -158,6 +160,8 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
          'Finally Total Sound rejections: ',ituf+itvvf+ittf+itqvf,' on ',&
                                             itu +itvv+itt +itqv
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_sound")
 
 end subroutine da_get_innov_vector_sound
 

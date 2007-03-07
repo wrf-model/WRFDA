@@ -1,20 +1,22 @@
 module da_profiler
 
+   use module_domain, only : xpose_type, xb_type
+   
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       check_max_iv_print, check_max_iv_unit, v_interp_p, v_interp_h, &
       check_max_iv, missing, max_error_uv, max_error_t, rootproc, &
-      num_profiler_tot, max_error_p,max_error_q,  &
+      num_profiler_tot, max_error_p,max_error_q,  trace_use, &
       max_stheight_diff, anal_type_verify
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       pilot_type
-   use module_domain, only : xpose_type, xb_type
    use da_interpolation, only : da_interp_lin_3d, da_to_zk, &
       da_interp_lin_3d_adj
-   use da_statistics, only : da_stats_calculate
-   use da_tools, only : da_max_error_qc, da_residual
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int
+   use da_statistics, only : da_stats_calculate
+   use da_tools, only : da_max_error_qc, da_residual
+   use da_tracing, only : da_trace_entry, da_trace_exit
 
    ! The "stats_profiler_type" is ONLY used locally in da_profiler:
 

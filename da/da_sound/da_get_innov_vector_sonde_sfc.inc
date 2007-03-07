@@ -35,6 +35,8 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
 
    if (iv % num_sound < 1) return
+   
+   if (trace_use) call da_trace_entry("da_get_innov_vector_sonde_sfc")
 
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
@@ -244,6 +246,8 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
          'Finally Total Sonde_Sfc rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                            itu +itvv +itp +itt +itqv
    end if
+   
+   if (trace_use) call da_trace_exit("da_get_innov_vector_sonde_sfc")
 
 end subroutine da_get_innov_vector_sonde_sfc
 
