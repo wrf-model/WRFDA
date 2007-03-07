@@ -616,7 +616,7 @@ echo "WINDOW_END            $WINDOW_END"
 
       cat $RUN_DIR/cost_fn
 
-      echo `date` "Done $RC"
+      echo `date` "Ended $RC"
    fi
 
    # We never look at core files

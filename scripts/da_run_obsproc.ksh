@@ -188,7 +188,7 @@ EOF
       ln -fs $OBSPROC_DIR/prepbufr_table_filename .
       $OBSPROC_DIR/3dvar_obs.exe
       RC=$?
-      echo "Done %$RC"
+      echo "Ended %$RC"
    fi
    mv obs_gts.3dvar $OB_DIR/$DATE/ob.ascii
 
