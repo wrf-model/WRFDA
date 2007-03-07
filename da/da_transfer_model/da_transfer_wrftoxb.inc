@@ -2,6 +2,9 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transfers fields from WRF to first guess structure.
+   ! History:
+   !     03/06/2007   Syed  RH  Rizvi
+   !     Bug fix for computing roughness factor
    !---------------------------------------------------------------------------
 
    implicit none
@@ -571,7 +574,8 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    do j=js,je
       do i=is,ie
-         rgh_fac(i,j) = 1.0/log(grid%xb%h(i,j,ks)/0.0001)
+         height = grid%xb%h(i,j,ks) - grid%xb%terr(i,j)
+         rgh_fac(i,j) = 1.0/log(height/0.0001)
 
          grid%xb%speed(i,j) = sqrt(grid%xb%u(i,j,ks)*grid%xb%u(i,j,ks) &
                          + grid%xb%v(i,j,ks)*grid%xb%v(i,j,ks) + 1.0e-6) &
