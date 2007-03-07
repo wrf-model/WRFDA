@@ -33,7 +33,7 @@ if test $SUBMIT = "LoadLeveller"; then
 
    cat > job.ksh <<EOF
 #!/bin/ksh
-# @ job_name         = $EXPT
+# @ job_name         = ${REGION}_${EXPT}
 # @ total_tasks      = $NUM_PROCS
 # @ node             = $NODES
 # @ output           = job.output
@@ -59,7 +59,7 @@ elif test $SUBMIT = "LSF"; then
 #
 # LSF batch script
 #
-#BSUB -J $EXPT                   
+#BSUB -J ${REGION}_${EXPT}             
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
@@ -92,7 +92,7 @@ elif test $SUBMIT = "PBS"; then
 #
 # PBS batch script
 #
-##PBS -N $EXPT
+##PBS -N ${REGION}_${EXPT}
 ##PBS -q $QUEUE
 #PBS -l mppe=$NUM_PROCS
 #PBS -o job.output
