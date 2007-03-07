@@ -200,7 +200,14 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          !  2. check relative value of innovation
          !      and assign of the observation error (standard deviation)
          !------------------------------------------------------------------------
-            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error(k)) then
+            if (use_error_factor_rad) then         ! if use error tuning factor
+               iv%instid(i)%tb_error(k,n) = &
+                   satinfo(i)%error(k)*satinfo(i)%error_factor(k)
+            else
+               iv%instid(i)%tb_error(k,n) = satinfo(i)%error(k)
+            end if
+
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_omb_std(k) = nrej_omb_std(k) + 1
@@ -215,12 +222,6 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             else                                         ! good obs
                if (iv%instid(i)%proc_domain(n)) &
                   ngood(k) = ngood(k) + 1
-               if (use_error_factor_rad) then         ! if use error tuning factor
-                  iv%instid(i)%tb_error(k,n) = &
-                     satinfo(i)%error(k)*satinfo(i)%error_factor(k)
-               else
-                  iv%instid(i)%tb_error(k,n) = satinfo(i)%error(k)
-               end if
             end if
          end do ! chan
       end do ! end loop pixel

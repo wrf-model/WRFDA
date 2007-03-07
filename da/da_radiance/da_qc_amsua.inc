@@ -155,7 +155,14 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
             end if
 
          ! relative departure check
-            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*satinfo(i)%error_std(k)) then
+            if (use_error_factor_rad) then
+               iv%instid(i)%tb_error(k,n) = &
+                   satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
+            else
+               iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
+            end if
+
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
                 iv%instid(i)%tb_qc(k,n)  = qc_bad
                 if (iv%instid(i)%proc_domain(n)) &
                    nrej_omb_std(k) = nrej_omb_std(k) + 1
@@ -169,12 +176,6 @@ subroutine da_qc_amsua (i, nchan, ob, iv)
             else
                if (iv%instid(i)%proc_domain(n)) &
                   ngood(k) = ngood(k) + 1
-               if (use_error_factor_rad) then
-                  iv%instid(i)%tb_error(k,n) = &
-                     satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
-               else
-                  iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
-               end if
             end if
          end do ! chan
       end do ! end loop pixel
