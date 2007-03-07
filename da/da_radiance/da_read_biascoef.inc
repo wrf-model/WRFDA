@@ -38,19 +38,22 @@
 
         read (iunit,*)
         read (iunit,*)
-    if (global) then
+    if (global) then   ! global coefs not available now, use regional one
       do j=1, nchan
-      do i=1, nband
+      !do i=1, nband
         if (nscan == 30) then ! amsua
-         read(iunit,'(i5,i3,30F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         !read(iunit,'(i5,i3,30F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         read(iunit,'(i5,30F7.2)') jj, scanbias(j,1:nscan)
         else if (nscan == 90) then ! amsub
-         read(iunit,'(i5,i3,90F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         !read(iunit,'(i5,i3,90F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         read(iunit,'(i5,90F7.2)') jj, scanbias(j,1:nscan)
         else if (nscan == 56) then ! hirs
-         read(iunit,'(i5,i3,56F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         !read(iunit,'(i5,i3,56F7.2)') jj,ii, scanbias_b(j,1:nscan,i)
+         read(iunit,'(i5,56F7.2)') jj, scanbias(j,1:nscan)
         else
          write(UNIT=stdout,FMT=*) 'Unknown Sensor Type'
         end if
-      end do
+      !end do
       end do
     else
       do j=1, nchan
