@@ -425,7 +425,7 @@ subroutine da_count_obs( y_unit, ob )
 !--------------------------------------------------------------------
       else if ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
-         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
                platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
               sensor_id = 3
@@ -477,7 +477,7 @@ subroutine da_count_obs( y_unit, ob )
      do ichan=1,ob%rad(n)%nchan
       if ( ob%rad(n)%num_rad_tot(ichan) > 0 ) then
       allocate( ob % rad(n) % tb(ichan) % pixel(1:ob % rad(n) %num_rad_tot(ichan)) )
-      write(6,'(a,i4,a,i8)') ' Number of '//trim(ob%rad(n)%rttovid_string)//' channel ', ichan , ' = ', &
+      write(6,'(a,i5,a,i10)') ' Number of '//trim(ob%rad(n)%rttovid_string)//' channel ', ichan , ' = ', &
                         ob%rad(n)%num_rad_tot(ichan)
       end if
      end do
@@ -881,7 +881,7 @@ subroutine da_read_y( y_unit, ob )
 !--------------------------------------------------------------------
       else if ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
-         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
                platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
               sensor_id = 3
@@ -896,7 +896,7 @@ subroutine da_read_y( y_unit, ob )
              .and. sensor_id    == rtminit_sensor(n)    ) then
                 do k = 1,num_obs
                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
-                  read(y_unit,'(2i8,e15.7)') ipixel,kdum,   &
+                  read(y_unit,'(2i8,e15.7)') ipixel,kdum,  &
                         ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%y
                 end do
                 exit
@@ -1167,7 +1167,7 @@ subroutine da_read_yp( yp_unit, ob )
 !--------------------------------------------------------------------
       elseif ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
-         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
                platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
               sensor_id = 3
@@ -1182,7 +1182,7 @@ subroutine da_read_yp( yp_unit, ob )
              .and. sensor_id    == rtminit_sensor(n)    ) then
                 do k = 1,num_obs
                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
-                  read(yp_unit,'(2i8,e15.7)') ipixel, kdum,  &
+                  read(yp_unit,'(2i8,e15.7)') ipixel, kdum, &
                        ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%yp
                 end do
                 exit
@@ -1483,7 +1483,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
 !--------------------------------------------------------------------
       elseif ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
-         read (ob_name,'(a4,a1,i2,a1,a5,a1,i2)') &
+         read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
                platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
               sensor_id = 3
