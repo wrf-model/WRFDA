@@ -294,9 +294,9 @@ subroutine da_crtm_init(iv,ob)
           rttovid_string, ichan, num_tot, joa,jo,trace,factor
       if ( iost == 0 ) then
         do n=1,rtminit_nsensor
-          if ( trim(rttovid_string)== trim(iv%instid(n)%rttovid_string) ) then
+          if ( index(rttovid_string,trim(iv%instid(n)%rttovid_string))>0 ) then
              satinfo(n)%error_factor(ichan) = factor
-             write(6,'(a,i5,a,f10.3)') trim(rttovid_string)//' Channel ', ichan, 'Error Factor = ', factor
+             write(6,'(a,i5,a,f10.3)') trim(rttovid_string)//' Channel ', ichan, '  Error Factor = ', factor
              exit
           end if
         end do

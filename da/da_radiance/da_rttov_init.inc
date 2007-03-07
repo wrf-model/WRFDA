@@ -376,11 +376,11 @@ subroutine da_rttov_init(iv,ob)
             rttovid_string, ichan, num_tot, joa,jo,trace,factor 
          if ( iost == 0 ) then
             do i=1,rtminit_nsensor
-               if ( trim(rttovid_string)== trim(iv%instid(i)%rttovid_string) ) then
+               if ( index(rttovid_string,trim(iv%instid(i)%rttovid_string))>0 ) then
                   satinfo(i)%error_factor(ichan) = factor
                   write(unit=stdout,fmt='(a,i5,a,f10.3)') &
                       trim(rttovid_string)//' Channel ', ichan, &
-                      ' Error Factor = ', factor
+                      '  Error Factor = ', factor
                   exit
                end if
             end do
