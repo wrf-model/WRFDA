@@ -2991,7 +2991,7 @@ BENCH_END(advance_ppt_tim)
 !</pre>
 !</DESCRIPTION>
 
-  IF (config_flags%mp_physics /= 0)  then
+  IF (config_flags%mp_physics == 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -3013,6 +3013,18 @@ BENCH_END(advance_ppt_tim)
 
        CALL wrf_debug ( 200 , ' call moist_physics_prep' )
 BENCH_START(moist_physics_prep_tim)
+       if(TEST_moist_physics_prep_em) &
+       CALL t_moist_physics_prep_em( t_2, t_1, t0, rho,                &
+                                   al, alb, p, p8w, p0, pb,          &
+                                   ph_2, phb, pi_phy, p_phy,         &
+                                   z, z_at_w, dz8w,                  &
+                                   dtm, h_diabatic,                  &
+                                   config_flags,fnm, fnp,            &
+                                   ids, ide, jds, jde, kds, kde,     &
+                                   ims, ime, jms, jme, kms, kme,     &
+                                   its, ite, jts, jte,               &
+                                   k_start    , k_end               )
+
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &

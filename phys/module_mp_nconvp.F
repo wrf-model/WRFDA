@@ -62,7 +62,6 @@ CONTAINS
         TTEMP = TTEMP + XLV/CP*COND
         TH(I,K,J) = TTEMP/PII(I,K,J)
         RAINNC(I,J) = RAINNC(I,J) + RHO(I,K,J)*COND*DZ8W(I,K,J)
-        RAINNCV(I,J) = RHO(I,K,J)*COND*DZ8W(I,K,J)
       ENDIF
    ENDDO
    ENDDO
@@ -196,15 +195,11 @@ do j = jts, jte
         g_cond = g_dqv/r1-g_r1*(dqv/(r1*r1))
         cond = dqv/r1
         g_qv(i,k,j) = (-g_cond)+g_qv(i,k,j)
-!Z        qv(i,k,j) = qv(i,k,j)-cond
         g_ttemp = g_cond*(xlv/cp)+g_ttemp
         ttemp = ttemp+xlv/cp*cond
         g_th(i,k,j) = (-(g_pii(i,k,j)*(ttemp/(pii(i,k,j)*pii(i,k,j)))))+g_ttemp/pii(i,k,j)
-!Z        th(i,k,j) = ttemp/pii(i,k,j)
         g_rainnc(i,j) = g_cond*rho(i,k,j)*dz8w(i,k,j)+g_dz8w(i,k,j)*rho(i,k,j)*cond+g_rainnc(i,j)+g_rho(i,k,j)*cond*dz8w(i,k,j)
-!Z        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
-        g_rainncv(i,j) = g_cond*rho(i,k,j)*dz8w(i,k,j)+g_dz8w(i,k,j)*rho(i,k,j)*cond+g_rho(i,k,j)*cond*dz8w(i,k,j)
-        rainncv(i,j) = rho(i,k,j)*cond*dz8w(i,k,j)
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
       endif
     end do
   end do
@@ -345,11 +340,8 @@ do j = jts, jte
       if (dqv .gt. 0.) then
         r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)
         cond = dqv/r1
-!Z        qv(i,k,j) = qv(i,k,j)-cond
         ttemp = ttemp+xlv/cp*cond
-!Z        th(i,k,j) = ttemp/pii(i,k,j)
-!Z        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
-        rainncv(i,j) = rho(i,k,j)*cond*dz8w(i,k,j)
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
       endif
     end do
   end do
@@ -360,7 +352,6 @@ end do
 !----------------------------------------------
 thi(:,:,:) = th(:,:,:)
 qvi(:,:,:) = qv(:,:,:)
-
 !----------------------------------------------
 ! ADJOINT COMPUTATIONS
 !----------------------------------------------
@@ -420,10 +411,6 @@ do j = jts, jte
         ttemp = ttemp+xlv/cp*cond
 ! recompute : ttemp
 ! recompute : ttemp
-        a_cond = a_cond+a_rainncv(i,j)*rho(i,k,j)*dz8w(i,k,j)
-        a_dz8w(i,k,j) = a_dz8w(i,k,j)+a_rainncv(i,j)*rho(i,k,j)*cond
-        a_rho(i,k,j) = a_rho(i,k,j)+a_rainncv(i,j)*cond*dz8w(i,k,j)
-        a_rainncv(i,j) = 0.
         a_cond = a_cond+a_rainnc(i,j)*rho(i,k,j)*dz8w(i,k,j)
         a_dz8w(i,k,j) = a_dz8w(i,k,j)+a_rainnc(i,j)*rho(i,k,j)*cond
         a_rho(i,k,j) = a_rho(i,k,j)+a_rainnc(i,j)*cond*dz8w(i,k,j)

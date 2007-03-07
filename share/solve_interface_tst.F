@@ -1,7 +1,7 @@
 !WRF:MEDIATION_LAYER:ADT_BARRIER
 !
 
-SUBROUTINE solve_interface_tst ( grid ) 
+SUBROUTINE solve_interface_tst ( grid )
 
    USE module_domain
    USE module_timing
@@ -47,20 +47,20 @@ SUBROUTINE solve_interface_tst ( grid )
 #if (EM_CORE == 1 && DA_CORE != 1)
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
 
-! zz: test solve_em ------------------------------------------------------
-
      CALL test_solve_em ( grid , config_flags , &
+!
 # include <em_actual_args.inc>
+!
                )
 
-! zz: test individual subroutines below solve_em -------------------------
+ print *,'end solve_em'  !XIAO
+ stop !XIAO
 
      CALL solve_em_tst ( grid , config_flags , &
+
 # include <em_actual_args.inc>
-                )
 
-! zz ----------------------------------------------------------------------
-
+               )
 
 # ifdef WRF_CHEM
    IF ( config_flags%chem_opt == RADM2  ) THEN
@@ -111,9 +111,11 @@ SUBROUTINE solve_interface_tst ( grid )
 
      WRITE( wrf_err_message , * ) 'Invalid dynamics option: dyn_opt = ',config_flags%dyn_opt
      CALL wrf_error_fatal ( TRIM ( wrf_err_message ) )
-     
+
    END IF
 
 END SUBROUTINE solve_interface_tst
 
+
 # include  <test_solve_em.int>
+

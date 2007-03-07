@@ -57,6 +57,7 @@
  TEST_rk_tendency           = .false.,
  TEST_surface_drag          = .false.,
  TEST_lscond                = .false.,
+ TEST_moist_physics_prep_em = .false.,
  TEST_advect_scalar         = .false.,
  TEST_relax_bdy_dry         = .false.,
  TEST_rk_addtend_dry        = .false.,
@@ -148,3 +149,6 @@
  nio_tasks_per_group = 0,
  nio_groups = 1,
  /
+
+&wrfvar
+/

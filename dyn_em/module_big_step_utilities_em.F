@@ -4373,7 +4373,6 @@ END SUBROUTINE phy_prep
      DO k = k_start, k_end
      DO i = i_start, i_end
 
-       h_diabatic(i,k,j) = t_new(i,k,j)
        t_new(i,k,j) = t_new(i,k,j) + t0
        t_old(i,k,j) = t_old(i,k,j) + t0
        rho(i,k,j)  = 1./(al(i,k,j)+alb(i,k,j))
@@ -4384,44 +4383,6 @@ END SUBROUTINE phy_prep
      ENDDO
      ENDDO
      ENDDO
-
-!  interp t and p at w points
-
-    do j = j_start,j_end
-    do k = 2, k_end
-    do i = i_start, i_end
-      p8w(i,k,j) = fzm(k)*pf(i,k,j)+fzp(k)*pf(i,k-1,j)
-    enddo
-    enddo
-    enddo
-
-!  extrapolate p and t to surface and top.
-!  we'll use an extrapolation in z for now
-
-    do j = j_start,j_end
-    do i = i_start, i_end
-
-! bottom
-
-      z0 = z_at_w(i,1,j)
-      z1 = z(i,1,j)
-      z2 = z(i,2,j)
-      w1 = (z0 - z2)/(z1 - z2)
-      w2 = 1. - w1
-      p8w(i,1,j) = w1*pf(i,1,j)+w2*pf(i,2,j)
-
-! top
-
-      z0 = z_at_w(i,kte,j)
-      z1 = z(i,k_end,j)
-      z2 = z(i,k_end-1,j)
-      w1 = (z0 - z2)/(z1 - z2)
-      w2 = 1. - w1
-!      p8w(i,kde,j) = w1*pf(i,kde-1,j)+w2*pf(i,kde-2,j)
-      p8w(i,kde,j) = exp(w1*log(pf(i,kde-1,j))+w2*log(pf(i,kde-2,j)))
-
-    enddo
-    enddo
 
    END SUBROUTINE moist_physics_prep_em
 
@@ -4486,8 +4447,6 @@ END SUBROUTINE phy_prep
 
        t_new(i,k,j) = t_new(i,k,j) - t0
        t_old(i,k,j) = t_old(i,k,j) - t0
-       h_diabatic(i,k,j) = (t_new(i,k,j)-h_diabatic(i,k,j))/dt
-!       h_diabatic(i,k,j) = 0.
 
      ENDDO
      ENDDO

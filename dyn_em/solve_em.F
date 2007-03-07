@@ -1525,7 +1525,6 @@ BENCH_START(spec_bdynhyd_tim)
                                      grid%j_start(ij), grid%j_end(ij),         &
                                      k_start    , k_end             )
              IF( config_flags%specified ) THEN
-               if(dyn_opt == DYN_EM) then
                CALL zero_grad_bdy ( w_2,                        &
                                     'w'         , config_flags, &
                                     spec_zone,                  &
@@ -1535,7 +1534,6 @@ BENCH_START(spec_bdynhyd_tim)
                                     grid%i_start(ij), grid%i_end(ij),         &
                                     grid%j_start(ij), grid%j_end(ij),         &
                                     k_start    , k_end             )
-               endif
              ELSE
                CALL spec_bdyupdate   ( w_2, rw_tend, dts_rk,       &
                                        'h'         , config_flags, &
@@ -2402,7 +2400,7 @@ BENCH_END(advance_ppt_tim)
 !</pre>
 !</DESCRIPTION>
 
-  IF (config_flags%mp_physics /= 0)  then
+  IF (config_flags%mp_physics == 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2410,7 +2408,7 @@ BENCH_END(advance_ppt_tim)
      sz = 0
    ENDIF
 
-   if(dyn_opt == DYN_EM) then
+   if(dyn_opt == DYN_EM_TST) then
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij, its, ite, jts, jte )
 
@@ -2459,22 +2457,6 @@ BENCH_END(moist_physics_prep_tim)
 
        CALL wrf_debug ( 200 , ' call microphysics_driver' )
 
-BENCH_START(micro_driver_tim)
-       sr = 0.
-!xzhang       CALL microphysics_driver(t_2,moist_2, moist_1, w_2,                  &
-!xzhang                                rho, pi_phy, p_phy, RAINNC, RAINNCV,        &
-!xzhang                               z, ht, dz8w, p8w, dtm, dx, dy,              &
-!xzhang                                config_flags, spec_zone,                    &
-!xzhang                                num_3d_m, warm_rain,                        &
-!xzhang                                XLAND,itimestep,                            & 
-!xzhang                                F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &
-!xzhang                                LOWLYR,SR,                                  &
-!xzhang                                ids, ide, jds, jde, kds, kde,               &
-!xzhang                                ims, ime, jms, jme, kms, kme,               &
-!xzhang                                grid%i_start, min(grid%i_end, ide-1),       &
-!xzhang                                grid%j_start, min(grid%j_end, jde-1),       &
-!xzhang                                k_start    , min(k_end,kde-1) , grid%num_tiles )
-BENCH_END(micro_driver_tim)
    endif
 
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )

@@ -9428,8 +9428,8 @@ SUBROUTINE t_small_step_finish( u_2, u_1, v_2, v_1, w_2, w_1,    &
                               u_save, v_save, w_save,          &
                               t_save, ph_save, mu_save,        &
                               msfu, msfv, msft,                &
-                             h_diabatic,                      &
-                             number_of_small_timesteps,dts,   &
+                              h_diabatic,                      &
+                              number_of_small_timesteps,dts,   &
                               ids,ide, jds,jde, kds,kde,       &
                               ims,ime, jms,jme, kms,kme,       &
                               its,ite, jts,jte, kts,kte       )
@@ -12316,9 +12316,7 @@ END SUBROUTINE t_surface_drag
   SUBROUTINE t_lscond( th_in,p,qv_in,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC_in,RAINNCV_in, &
   ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte,caller )
 
-   USE module_mp_nconvp    !Xiaoyan Zhang 11/20/2006
-!   USE module_mp_nconvp_tl !Xiaoyan Zhang 11/20/2006
-!   USE module_mp_nconvp_ad !Xiaoyan Zhang 11/20/2006
+   USE module_mp_nconvp    
    IMPLICIT NONE
   
   ! Declare dummy arguments
@@ -12435,10 +12433,10 @@ END SUBROUTINE t_surface_drag
   CALL lscond ( th,p,qv,rho,pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,dz8w,RAINNC,RAINNCV,ids,ide,jds,jde,kds, &
   kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
-    B_p(its:ite,kts:kte,jts:jte) = p(its:ite,kts:kte,jts:jte)
-    B_rho(its:ite,kts:kte,jts:jte) = rho(its:ite,kts:kte,jts:jte)
-    B_pii(its:ite,kts:kte,jts:jte) = pii(its:ite,kts:kte,jts:jte)
-    B_dz8w(its:ite,kts:kte,jts:jte) = dz8w(its:ite,kts:kte,jts:jte)
+!   B_p(its:ite,kts:kte,jts:jte) = p(its:ite,kts:kte,jts:jte)
+!   B_rho(its:ite,kts:kte,jts:jte) = rho(its:ite,kts:kte,jts:jte)
+!   B_pii(its:ite,kts:kte,jts:jte) = pii(its:ite,kts:kte,jts:jte)
+!   B_dz8w(its:ite,kts:kte,jts:jte) = dz8w(its:ite,kts:kte,jts:jte)
     B_th(its:ite,kts:kte,jts:jte) = th(its:ite,kts:kte,jts:jte)
     B_qv(its:ite,kts:kte,jts:jte) = qv(its:ite,kts:kte,jts:jte)
     B_RAINNC(its:ite,jts:jte) = RAINNC(its:ite,jts:jte)
@@ -12462,13 +12460,13 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
     ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      SAVE_L = SAVE_L + (P_p(i,k,j) * P_p(i,k,j))
-    ENDDO
-    ENDDO
-    ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     SAVE_L = SAVE_L + (P_p(i,k,j) * P_p(i,k,j))
+!   ENDDO
+!   ENDDO
+!   ENDDO
     DO j = jts,jte
     DO k = kts,kte
     DO i = its,ite
@@ -12476,27 +12474,27 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
     ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      SAVE_L = SAVE_L + (P_rho(i,k,j) * P_rho(i,k,j))
-    ENDDO
-    ENDDO
-    ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      SAVE_L = SAVE_L + (P_pii(i,k,j) * P_pii(i,k,j))
-    ENDDO
-    ENDDO
-    ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      SAVE_L = SAVE_L + (P_dz8w(i,k,j) * P_dz8w(i,k,j))
-    ENDDO
-    ENDDO
-    ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     SAVE_L = SAVE_L + (P_rho(i,k,j) * P_rho(i,k,j))
+!   ENDDO
+!   ENDDO
+!   ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     SAVE_L = SAVE_L + (P_pii(i,k,j) * P_pii(i,k,j))
+!   ENDDO
+!   ENDDO
+!   ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     SAVE_L = SAVE_L + (P_dz8w(i,k,j) * P_dz8w(i,k,j))
+!   ENDDO
+!   ENDDO
+!   ENDDO
     DO j = jts,jte
     DO i = its,ite
       SAVE_L = SAVE_L + (P_rainnc(i,j) * P_rainnc(i,j))
@@ -12565,7 +12563,7 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
 
-  CALL lscond ( P_th,P_p,P_qv,P_rho,P_pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,P_dz8w,RAINNC,RAINNCV,ids,ide, &
+  CALL lscond ( P_th,P_p,P_qv,P_rho,P_pii,r_v,xlv,cp,EP2,SVP1,SVP2,SVP3,SVPT0,P_dz8w,P_RAINNC,P_RAINNCV,ids,ide, &
   jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
     VAL_N=0.
@@ -12576,13 +12574,13 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
     ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      VAL_N = VAL_N + ((P_p(i,k,j) - B_p(i,k,j)) * (P_p(i,k,j) - B_p(i,k,j)))
-    ENDDO
-    ENDDO
-    ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     VAL_N = VAL_N + ((P_p(i,k,j) - B_p(i,k,j)) * (P_p(i,k,j) - B_p(i,k,j)))
+!   ENDDO
+!   ENDDO
+!   ENDDO
     DO j = jts,jte
     DO k = kts,kte
     DO i = its,ite
@@ -12590,27 +12588,27 @@ END SUBROUTINE t_surface_drag
     ENDDO
     ENDDO
     ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      VAL_N = VAL_N + ((P_rho(i,k,j) - B_rho(i,k,j)) * (P_rho(i,k,j) - B_rho(i,k,j)))
-    ENDDO
-    ENDDO
-    ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      VAL_N = VAL_N + ((P_pii(i,k,j) - B_pii(i,k,j)) * (P_pii(i,k,j) - B_pii(i,k,j)))
-    ENDDO
-    ENDDO
-    ENDDO
-    DO j = jts,jte
-    DO k = kts,kte
-    DO i = its,ite
-      VAL_N = VAL_N + ((P_dz8w(i,k,j) - B_dz8w(i,k,j)) * (P_dz8w(i,k,j) - B_dz8w(i,k,j)))
-    ENDDO
-    ENDDO
-    ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     VAL_N = VAL_N + ((P_rho(i,k,j) - B_rho(i,k,j)) * (P_rho(i,k,j) - B_rho(i,k,j)))
+!   ENDDO
+!   ENDDO
+!   ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     VAL_N = VAL_N + ((P_pii(i,k,j) - B_pii(i,k,j)) * (P_pii(i,k,j) - B_pii(i,k,j)))
+!   ENDDO
+!   ENDDO
+!   ENDDO
+!   DO j = jts,jte
+!   DO k = kts,kte
+!   DO i = its,ite
+!     VAL_N = VAL_N + ((P_dz8w(i,k,j) - B_dz8w(i,k,j)) * (P_dz8w(i,k,j) - B_dz8w(i,k,j)))
+!   ENDDO
+!   ENDDO
+!   ENDDO
     DO j = jts,jte
     DO i = its,ite
       VAL_N = VAL_N + ((P_rainnc(i,j) - B_rainnc(i,j)) * (P_rainnc(i,j) - B_rainnc(i,j)))
@@ -12841,6 +12839,264 @@ END SUBROUTINE t_surface_drag
 
   END SUBROUTINE t_lscond
 
+!---------------------------------------------------------------------------------
+   SUBROUTINE t_moist_physics_prep_em( t_new, t_old, t0, rho, al, alb, &
+                                     p, p8w, p0, pb, ph, phb, pii, pf,    &
+                                     z, z_at_w, dz8w,                &
+                                     dt,h_diabatic,                  &
+                                     config_flags,fzm, fzp,          &
+                                     ids,ide, jds,jde, kds,kde,      &
+                                     ims,ime, jms,jme, kms,kme,      &
+                                     its,ite, jts,jte, kts,kte      )
+
+   IMPLICIT NONE
+
+! Here we construct full fields
+
+   TYPE(grid_config_rec_type),    INTENT(IN   )    :: config_flags
+
+   INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde
+   INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme
+   INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte
+
+   REAL, INTENT(IN   )  ::  dt
+
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ) :: al,  &
+                                                    alb, &
+                                                    p,   &
+                                                    pb,  &
+                                                    ph,  &
+                                                    phb
+
+
+   REAL , DIMENSION( kms:kme )                  ::   fzm, &
+                                                              fzp
+
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme )::rho,  &
+                                                  pii,  &
+                                                  pf,   &
+                                                    z,  &
+                                               z_at_w,  &
+                                                 dz8w,  &
+                                                  p8w
+! pjj/cray
+!                                                 p8w,  &
+!                                          h_diabatic
+
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ),       &
+         INTENT(INOUT) ::                         h_diabatic
+
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ),        &
+         INTENT(INOUT) ::                         t_new, &
+                                                  t_old
+
+   REAL, INTENT(IN   ) :: t0, p0
+   REAL                :: z0,z1,z2,w1,w2
+
+   INTEGER :: i_start, i_end, j_start, j_end, k_start, k_end
+   INTEGER :: i, j, k
+
+!  zzma: new definition
+
+!  IN variables
+   REAL,  DIMENSION(ims:ime,kms:kme,jms:jme) ::   S_al, S_p, S_ph
+   REAL,  DIMENSION(ims:ime,kms:kme,jms:jme) ::   P_al, P_p, P_ph
+   REAL,  DIMENSION(ims:ime,kms:kme,jms:jme) ::   B_al, B_p, B_ph
+
+
+!  OUT variables
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ) :: P_rho, P_pii, P_pf, P_z, P_z_at_w, P_dz8w, P_p8w
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme ) :: B_rho, B_pii, B_pf, B_z, B_z_at_w, B_dz8w, B_p8w
+
+! INOUT variables
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  ::  S_h_diabatic, S_t_new, S_t_old
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  ::  P_h_diabatic, P_t_new, P_t_old
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  ::  B_h_diabatic, B_t_new, B_t_old
+   REAL, DIMENSION( ims:ime , kms:kme, jms:jme )  ::  K_h_diabatic, K_t_new, K_t_old
+
+
+   REAL :: SAVE_L, COEF, ALPHA_TST, FACTOR, VAL_N, VAL_L, VAL_A
+   INTEGER :: NT,h
+
+    i_start = its
+    i_end   = min( ite,ide-1 )
+    j_start = jts
+    j_end   = min( jte,jde-1 )
+
+    k_start = kts
+    k_end = min( kte, kde-1 )
+
+ S_al  =al
+ S_p   =p
+ S_ph  =ph
+
+ P_al  =al
+ P_p   =p
+ P_ph  =ph
+
+ S_h_diabatic =h_diabatic
+ S_t_new =t_new
+ S_t_old =t_old
+
+ P_h_diabatic =h_diabatic
+ P_t_new =t_new
+ P_t_old =t_old
+
+ K_h_diabatic =h_diabatic
+ K_t_new =t_new
+ K_t_old =t_old
+
+!  NLM
+
+    CALL  moist_physics_prep_em( t_new, t_old, t0, rho, al, alb, &
+                                      p, p8w, p0, pb, ph, phb, pii, pf,    &
+                                      z, z_at_w, dz8w,                &
+                                      dt,h_diabatic,                  &
+                                      config_flags,fzm, fzp,          &
+                                      ids,ide, jds,jde, kds,kde,      &
+                                      ims,ime, jms,jme, kms,kme,      &
+                                      its,ite, jts,jte, kts,kte      )
+
+ B_rho =rho
+ B_pii =pii
+ B_pf  =pf
+ B_z   =z
+ B_z_at_w =z_at_w
+ B_dz8w   =dz8w
+
+ B_h_diabatic =h_diabatic
+ B_t_new =t_new
+ B_t_old =t_old
+!print*,'sum(B_rho**2)111=',sum(B_rho**2)
+
+  CALL  g_moist_physics_prep_em( K_t_new, P_t_new, K_t_old, P_t_old, t0, rho, P_rho, al, P_al, alb, p, P_p, p8w, P_p8w, p0, &
+&pb, ph, P_ph, phb, pii, P_pii, pf, P_pf, z, P_z, z_at_w, P_z_at_w, dz8w, P_dz8w, dt, K_h_diabatic, P_h_diabatic, &
+&config_flags, fzm, fzp, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+
+     SAVE_L=0.
+     DO j = j_start, j_end
+     DO k = k_start, kte
+     DO i = i_start, i_end
+       SAVE_L=SAVE_L+P_rho(i,k,j)**2+P_pii(i,k,j)**2+P_pf(i,k,j)**2+P_z(i,k,j)**2+  &
+              P_z_at_w(i,k,j)**2+P_dz8w(i,k,j)**2+P_t_new(i,k,j)**2+P_t_old(i,k,j)**2
+     ENDDO
+     ENDDO
+     ENDDO
+
+
+   ALPHA_TST=1.
+   DO NT=1,11
+      ALPHA_TST=0.1*ALPHA_TST
+      FACTOR=1.+ALPHA_TST
+      P_al  =FACTOR*S_al
+      P_p   =FACTOR*S_p
+      P_ph  =FACTOR*S_ph
+
+      P_h_diabatic =FACTOR*S_h_diabatic
+      P_t_new =FACTOR*S_t_new
+      P_t_old =FACTOR*S_t_old
+
+   CALL  moist_physics_prep_em( P_t_new, P_t_old, t0, P_rho, P_al, alb, &
+                                     P_p, P_p8w, p0, pb, P_ph, phb, P_pii, P_pf,    &
+                                     P_z, P_z_at_w, P_dz8w,                &
+                                     dt,P_h_diabatic,                  &
+                                     config_flags,fzm, fzp,          &
+                                     ids,ide, jds,jde, kds,kde,      &
+                                     ims,ime, jms,jme, kms,kme,      &
+                                     its,ite, jts,jte, kts,kte      )
+
+     VAL_N=0.
+     DO j = j_start, j_end
+     DO k = k_start, kte
+     DO i = i_start, i_end
+       VAL_N=VAL_N+(P_rho(i,k,j)-B_rho(i,k,j))**2+(P_pii(i,k,j)-B_pii(i,k,j))**2+(P_pf(i,k,j)-B_pf(i,k,j))**2+  &
+             (P_z(i,k,j)-B_z(i,k,j))**2+(P_z_at_w(i,k,j)-B_z_at_w(i,k,j))**2+(P_dz8w(i,k,j)-B_dz8w(i,k,j))**2+  &
+             (P_h_diabatic(i,k,j)-B_h_diabatic(i,k,j))**2+(P_t_new(i,k,j) -B_t_new(i,k,j))**2+  &
+             (P_t_old(i,k,j)-B_t_old(i,k,j))**2
+     ENDDO
+     ENDDO
+     ENDDO
+
+      VAL_L=SAVE_L*ALPHA_TST**2
+      COEF=VAL_N/VAL_L
+
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &
+         'g_prep_em: ALPHA=',ALPHA_TST,'  COEF=',COEF, &
+         '  VAL_N=',VAL_N,'  VAL_L=',VAL_L
+   ENDDO
+
+
+!  ADJ test
+
+   FACTOR=0.1
+ al  =S_al
+ p   =S_p
+ ph  =S_ph
+ h_diabatic =S_h_diabatic
+ t_new =S_t_new
+ t_old =S_t_old
+
+ P_al  =FACTOR*S_al
+ P_p   =FACTOR*S_p
+ P_ph  =FACTOR*S_ph
+ P_h_diabatic =FACTOR*S_h_diabatic
+ P_t_new =FACTOR*S_t_new
+ P_t_old =FACTOR*S_t_old
+
+ B_al  =P_al
+ B_p   =P_p
+ B_ph  =P_ph
+ B_h_diabatic =P_h_diabatic
+ B_t_new =P_t_new
+ B_t_old =P_t_old
+
+ K_h_diabatic =h_diabatic
+ K_t_new =t_new
+ K_t_old =t_old
+
+call g_moist_physics_prep_em( t_new, P_t_new, t_old, P_t_old, t0, rho, P_rho, al, P_al, alb, p, P_p, p8w, P_p8w, p0, &
+&pb, ph, P_ph, phb, pii, P_pii, pf, P_pf, z, P_z, z_at_w, P_z_at_w, dz8w, P_dz8w, dt, h_diabatic, P_h_diabatic, &
+&config_flags, fzm, fzp, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+
+     VAL_L=0.
+     DO j = j_start, j_end
+     DO k = k_start, kte
+     DO i = i_start, i_end
+       VAL_L=VAL_L+P_rho(i,k,j)**2+P_pii(i,k,j)**2+P_pf(i,k,j)**2+P_z(i,k,j)**2+  &
+              P_z_at_w(i,k,j)**2+P_dz8w(i,k,j)**2+P_h_diabatic(i,k,j)**2+  &
+              P_t_new(i,k,j)**2+P_t_old(i,k,j)**2
+     ENDDO
+     ENDDO
+     ENDDO
+
+
+ P_al  =0.0
+ P_p   =0.0
+ P_ph  =0.0
+
+call a_moist_physics_prep_em( K_t_new, P_t_new, K_t_old, P_t_old, t0, rho, P_rho, al, P_al, alb, p, P_p, p8w, P_p8w, p0, &
+&pb, ph, P_ph, phb, pii, P_pii, pf, P_pf, z, P_z, z_at_w, P_z_at_w, dz8w, P_dz8w, K_h_diabatic, P_h_diabatic, fzm, fzp, &
+&ide, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+
+     VAL_A=0.
+     DO j = j_start, j_end
+     DO k = k_start, kte
+     DO i = i_start, i_end
+       VAL_A=VAL_A+P_al(i,k,j)*B_al(i,k,j)+P_p(i,k,j)*B_p(i,k,j)+P_ph(i,k,j)*B_ph(i,k,j)+  &
+              P_h_diabatic(i,k,j)*B_h_diabatic(i,k,j)+P_t_new(i,k,j)*B_t_new(i,k,j)+  &
+              P_t_old(i,k,j)*B_t_old(i,k,j)
+     ENDDO
+     ENDDO
+     ENDDO
+
+   print*, '                '
+   write(6,*) 'a_prep_em: '
+   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L
+   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A
+
+END SUBROUTINE t_moist_physics_prep_em
+
+!---------------------------------------------------------------------------------
 !============================================================================================================
 
 END MODULE module_check

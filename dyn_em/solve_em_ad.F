@@ -320,8 +320,6 @@ real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_rainnc
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_rainncv
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_h_diabatic
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_pb
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_alb
 !
 !
 
@@ -686,13 +684,16 @@ BENCH_END(comp1)
 !------------------------------
 runge_kutta_looq: do rk_step = 1, rk_order
 BENCH_START(comp2)
+  dtm=dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm=2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm=dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -1011,89 +1012,14 @@ BENCH_END(exch12)
 
 end do runge_kutta_looq
 
-! recompute : dt_rk,moist_2,mu_2,muts,ph_2,ph_tend,t_2
-if (config_flags%mp_physics .ne. 0) then
+
+if (config_flags%mp_physics == 0) then
   if (config_flags%specified .or. config_flags%nested) then
     sz = spec_zone
   else
     sz = 0
   endif
-! recompute : sz
-!------XZHANG ---------------------------------------
-!!   scalar_tile_loop_1aa: DO ij = 1 , grid%num_tiles
-    DO ij = 1 , grid%num_tiles
 
-       its = max(grid%i_start(ij),ids+sz)
-       ite = min(grid%i_end(ij),ide-1-sz)
-       jts = max(grid%j_start(ij),jds+sz)
-       jte = min(grid%j_end(ij),jde-1-sz)
-
-BENCH_START(moist_physics_prep_tim)
-       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
-                                   al, alb, p, p8w, p0, pb,          &
-                                   ph_2, phb, pi_phy, p_phy,         &
-                                   z, z_at_w, dz8w,                  &
-                                   dtm, h_diabatic,                  &
-                                   config_flags,fnm, fnp,            &
-                                   ids, ide, jds, jde, kds, kde,     &
-                                   ims, ime, jms, jme, kms, kme,     &
-                                   its, ite, jts, jte,               &
-                                   k_start    , k_end               )
-BENCH_END(moist_physics_prep_tim)
-
-        CALL lscond(t_2, p_phy                                         &
-                    ,moist_2(ims,kms,jms,P_QV)                         &
-                    ,rho, pi_phy,r_v, xlv, cp                          &
-                    ,ep_2, svp1, svp2                                  &
-                    ,svp3, svpt0                                       &
-                    ,dz8w                                              &
-                    ,rainnc, rainncv                                   &
-                    ,ids, ide, jds, jde, kds, kde                      &
-                    ,ims, ime, jms, jme, kms, kme                      &
-                    ,its, ite, jts, jte                                &
-                    ,k_start, min(k_end,kde-1)                         )
-   END DO  !!scalar_tile_loop_1aa
-!goto 6776
-
-BENCH_START(micro_driver_tim)
-       sr = 0.
-BENCH_END(micro_driver_tim)
-
-!------XZHANG ---------------------------------------
-  do ij = 1, grid%num_tiles
-    its = max(grid%i_start(ij),ids+sz)
-    ite = min(grid%i_end(ij),ide-1-sz)
-    jts = max(grid%j_start(ij),jds+sz)
-    jte = min(grid%j_end(ij),jde-1-sz)
-
-!------XZHANG ---------------------------------------
-       CALL moist_physics_finish_em( t_2, t_1, t0, muts,               &
-                                     h_diabatic, dtm, config_flags,    &
-                                     ids, ide, jds, jde, kds, kde,     &
-                                     ims, ime, jms, jme, kms, kme,     &
-                                     its, ite, jts, jte,               &
-                                     k_start    , k_end               )
-!------XZHANG ---------------------------------------
-
-!xzhang#ifdef REMOVED_BY_JM
-!xzhang    its = max(grid%i_start(ij),ids+sz)
-!xzhang! recompute : its
-!xzhang    ite = min(grid%i_end(ij),ide-1-sz)
-!xzhang! recompute : ite
-!xzhang    jts = max(grid%j_start(ij),jds+sz)
-!xzhang! recompute : jts
-!xzhang    jte = min(grid%j_end(ij),jde-1-sz)
-!xzhang! recompute : jte
-!xzhang#else
-!xzhang! in case of parallel, we want the computation to go out one cell 
-!xzhang! onto halo this ignores tiling; multi-threading is disabled above
-!xzhang! this should also work for non-parallel
-
-!xzhang    its = max(ips-1,ids+sz)
-!xzhang    ite = min(ipe+1,ide-1-sz)
-!xzhang    jts = max(jps-1,jds+sz)
-!xzhang    jte = min(jpe+1,jde-1-sz)
-!xzhang#endif
     if ( .not. non_hydrostatic) then
 
 BENCH_START(exch13)
@@ -1107,10 +1033,10 @@ BENCH_END(exch13)
 BENCH_START(comp13)
       call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,a_w_2,muts,a_muts,dt_rk,a_u_2,a_v_2,ht,cf1,cf2,cf3,rdx,rdy,msft,ide,jde,&
 &ims,ime,jms,jme,kms,kme,&
-        max(grid%i_start(ij)-1,ids),  &
-        min(grid%i_end(ij)+1,ide),    &
-        max(grid%j_start(ij)-1,jds),  &
-        min(grid%j_end(ij)+1,jde),k_end )
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),k_end )
 BENCH_END(comp13)
 
     endif
@@ -1118,29 +1044,24 @@ BENCH_END(comp13)
 BENCH_START(comp14)
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
 &rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
-        max(grid%i_start(ij)-1,ids),  &
-        min(grid%i_end(ij)+1,ide),    &
-        max(grid%j_start(ij)-1,jds),  &
-        min(grid%j_end(ij)+1,jde),k_start,k_end )
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(comp14)
 
-         call a_moist_physics_finish_em( t_2, a_t_2, t_1, a_t_1, t0, muts, &
-                   a_muts, h_diabatic, a_h_diabatic, dtm, ide, jde, kde, &
-&ims, ime, jms, jme, kms, kme, its, ite, jts, jte, k_start, k_end )
+    call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
+                    a_h_diabatic, dtm, ide, jde, kde, &
+&ims, ime, jms, jme, kms, kme, &
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
-  end do
 !------------Xiaoyan Zhang add here ---------------
 
-!6776 continue
-!   scalar_tile_loop_1a: DO ij = 1 , grid%num_tiles
-    DO ij = 1 , grid%num_tiles
-
-       its = max(grid%i_start(ij),ids+sz)
-       ite = min(grid%i_end(ij),ide-1-sz)
-       jts = max(grid%j_start(ij),jds+sz)
-       jte = min(grid%j_end(ij),jde-1-sz)
-
-!------XZHANG ---------------------------------------
+BENCH_START(moist_physics_prep_tim)
+       if(dyn_opt == DYN_EM_tst) then
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &
@@ -1149,25 +1070,29 @@ BENCH_END(comp14)
                                    config_flags,fnm, fnp,            &
                                    ids, ide, jds, jde, kds, kde,     &
                                    ims, ime, jms, jme, kms, kme,     &
-                                   its, ite, jts, jte,               &
-                                   k_start    , k_end               )
-!------XZHANG ---------------------------------------
-
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+BENCH_END(moist_physics_prep_tim)
 
   CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV),a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
   pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
-  rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,min(k_end,kde-1) )
+  rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme, &
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
 
-!------------ End of lscond ---------------
-     call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, al, a_al, alb, a_alb, p, a_p, p8w, a_p8w, p0, &
-&pb, a_pb, ph_2, a_ph_2, phb, a_phb, pi_phy, a_pi_phy, p_phy, a_p_phy, z, a_z, z_at_w, a_z_at_w, dz8w, a_dz8w, h_diabatic, a_h_diabatic, fnm, fnp, &
-&ide, jde, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, k_start, k_end )
+     call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
+&pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, p_phy, a_p_phy, z, a_z, z_at_w, a_z_at_w, dz8w, a_dz8w, h_diabatic, a_h_diabatic, fnm, fnp, &
+&ide, jde, kde, ims, ime, jms, jme, kms, kme, &
+        max(grid%i_start(ij),ids+sz),  &
+        min(grid%i_end(ij),ide-1-sz),    &
+        max(grid%j_start(ij),jds+sz),  &
+        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
-   ENDDO !scalar_tile_loop_1a
-
-
-
-
+   endif
 endif
 
 !------------------------------
@@ -1242,13 +1167,16 @@ BENCH_START(comp15)
 #endif
 
   runge_kutta_loor: do rk_step1 = 1, rk_step-1
+    dtm = dt
     if (rk_order .eq. 1) then
       if (step_number .ne. 1) then
         number_of_small_timesteps = 2*time_step_sound
         dt_rk = dt
+        dtm = 2*dt
       else
         number_of_small_timesteps = time_step_sound
         dt_rk = dt/2.
+        dtm = dt
       endif
       dts_rk = dts
     else if (rk_order .eq. 2) then
@@ -1662,14 +1590,16 @@ BENCH_START(comp27)
 !----------------------------------------
 #endif
 
-
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -2098,14 +2028,16 @@ BENCH_START(comp38)
 !----------------------------------------
 #endif
 
-
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -2718,13 +2650,16 @@ BENCH_START(comp52)
  call fast_copy_lint(  mudf , mudf_ma, n2d_elem )
 !----------------------------------------
 #endif
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -3112,13 +3047,16 @@ BENCH_START(comp65)
 !----------------------------------------
   mudf(:,:) = mudf_ma(:,:)
 !----------------------------------------
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -3881,13 +3819,16 @@ BENCH_START(comp88)
   call fast_copy_lint(  mudf , mudf_ma , n2d_elem )
 !----------------------------------------
 #endif
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -4272,13 +4213,16 @@ BENCH_START(comp98)
 #endif
 !----------------------------------------
 !---------- added by zzma for recomputing basic states -------------
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+       dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -4521,13 +4465,16 @@ BENCH_START(comp107)
 #endif
 !----------------------------------------
 
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then
@@ -4752,13 +4699,16 @@ BENCH_START(comp113)
   call fast_copy_lint(  al , alh , n3d_elem )
 #endif
 !----------------------------------------
+  dtm = dt
   if (rk_order .eq. 1) then
     if (step_number .ne. 1) then
       number_of_small_timesteps = 2*time_step_sound
       dt_rk = dt
+      dtm = 2*dt
     else
       number_of_small_timesteps = time_step_sound
       dt_rk = dt/2.
+      dtm = dt
     endif
     dts_rk = dts
   else if (rk_order .eq. 2) then

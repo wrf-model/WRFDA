@@ -87,8 +87,6 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rainnc
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_rainncv
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_h_diabatic
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_pb
-   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_alb
 !
 
    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: g_z_at_wm
@@ -102,7 +100,7 @@ SUBROUTINE solve_em_tl ( grid , config_flags , &
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqs_btm
    real, DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)    :: g_rqg_btm
 
-!JM    real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: g_moist_tend
+!JM   real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist) :: g_moist_tend
 
 ! These are used if -DDEREF_KLUDGE is compiled
 !  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm
@@ -2670,7 +2668,9 @@ BENCH_END(advance_ppt_tim)
 !</pre>
 !</DESCRIPTION>
 
-  IF (config_flags%mp_physics /= 0)  then
+ij = 1
+
+  IF (config_flags%mp_physics == 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2678,139 +2678,58 @@ BENCH_END(advance_ppt_tim)
      sz = 0
    ENDIF
 
-   !$OMP PARALLEL DO   &
-   !$OMP PRIVATE ( ij, its, ite, jts, jte )
-
-   scalar_tile_loop_1a: DO ij = 1 , grid%num_tiles
-
-       its = max(grid%i_start(ij),ids+sz)
-       ite = min(grid%i_end(ij),ide-1-sz)
-       jts = max(grid%j_start(ij),jds+sz)
-       jte = min(grid%j_end(ij),jde-1-sz)
+   if(dyn_opt == DYN_EM_TST) then
 
        CALL wrf_debug ( 200 , ' call moist_physics_prep' )
+
 BENCH_START(moist_physics_prep_tim)
-
-#if 0  
-       CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
-                                   al, alb, p, p8w, p0, pb,          &
-                                   ph_2, phb, pi_phy, p_phy,         &
-                                   z, z_at_w, dz8w,                  &
-                                   dtm, h_diabatic,                  &
-                                   config_flags,fnm, fnp,            &
-                                   ids, ide, jds, jde, kds, kde,     &
-                                   ims, ime, jms, jme, kms, kme,     &
-                                   its, ite, jts, jte,               &
-                                   k_start    , k_end               )
-#endif  
-
-!Xiaoyan Zhang 1/17/2007
-
-      CALL g_moist_physics_prep_em( t_2, g_t_2, t_1, g_t_1, t0, rho, g_rho, al, g_al, alb, g_alb, p, g_p, p8w, g_p8w, p0, &
-&pb, g_pb, ph_2, g_ph_2, phb, g_phb, pi_phy, g_pi_phy, p_phy, g_p_phy, z, g_z, z_at_w, g_z_at_w, dz8w, g_dz8w, dtm, h_diabatic, g_h_diabatic, &
-&config_flags, fnm, fnp, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, k_start, k_end )
+       CALL g_moist_physics_prep_em( t_2, g_t_2, t_1, g_t_1, t0, rho, g_rho, al, g_al, alb, p, g_p, p8w, g_p8w, p0, &
+&pb, ph_2, g_ph_2, phb, pi_phy, g_pi_phy, p_phy, g_p_phy, z, g_z, z_at_w, g_z_at_w, dz8w, g_dz8w, dtm, h_diabatic, g_h_diabatic, &
+&config_flags, fnm, fnp, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, &
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 BENCH_END(moist_physics_prep_tim)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!Xiaoyan Zhang Add Large-Scale Condensation call at 11/20/2006 !!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
-#if 0
-        CALL lscond(t_2, p_phy                                         &
-                    ,moist_2(ims,kms,jms,P_QV)                         &
-                    ,rho, pi_phy,r_v, xlv, cp                          &
-                    ,ep_2, svp1, svp2                                  &
-                    ,svp3, svpt0                                       &
-                    ,dz8w                                              &
-                    ,rainnc, rainncv                                   &
-                    ,ids, ide, jds, jde, kds, kde                      &
-                    ,ims, ime, jms, jme, kms, kme                      &
-                    ,its, ite, jts, jte                                &
-                    ,k_start, min(k_end,kde-1)                         )
-#endif
-!call TL
     CALL g_lscond ( t_2,g_t_2,p_phy,g_p_phy,moist_2(ims,kms,jms,P_QV),g_moist_2(ims,kms,jms,P_QV),rho,g_rho,&
                     pi_phy,g_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,g_dz8w,rainnc,g_rainnc, &
-                    rainncv,g_rainncv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,&
-                    k_start, min(k_end,kde-1)                         )
-
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-   END DO scalar_tile_loop_1a
-   !$OMP END PARALLEL DO
-
-       CALL wrf_debug ( 200 , ' call microphysics_driver' )
-
-BENCH_START(micro_driver_tim)
-       sr = 0.
-!xzhang       CALL microphysics_driver(t_2,moist_2, moist_1, w_2,                  &
-!xzhang                                rho, pi_phy, p_phy, RAINNC, RAINNCV,        &
-!xzhang                                z, ht, dz8w, p8w, dtm, dx, dy,              &
-!xzhang                                config_flags, spec_zone,                    &
-!xzhang                                num_3d_m, warm_rain,                        &
-!xzhang                                XLAND,itimestep,                            & 
-!xzhang                                F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &
-!xzhang                                LOWLYR,SR,                                  &
-!xzhang                                ids, ide, jds, jde, kds, kde,               &
-!xzhang                                ims, ime, jms, jme, kms, kme,               &
-!xzhang                                grid%i_start, min(grid%i_end, ide-1),       &
-!xzhang                                grid%j_start, min(grid%j_end, jde-1),       &
-!xzhang                                k_start    , min(k_end,kde-1) , grid%num_tiles )
-BENCH_END(micro_driver_tim)
+                    rainncv,g_rainncv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,&
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , min(k_end,kde-1)    )
+   endif
 
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )
 BENCH_START(moist_phys_end_tim)
    !$OMP PARALLEL DO   &
    !$OMP PRIVATE ( ij, its, ite, jts, jte )
 
-   scalar_tile_loop_1b: DO ij = 1 , grid%num_tiles
-
-       its = max(grid%i_start(ij),ids+sz)
-       ite = min(grid%i_end(ij),ide-1-sz)
-       jts = max(grid%j_start(ij),jds+sz)
-       jte = min(grid%j_end(ij),jde-1-sz)
-
-#if 0 
-       CALL moist_physics_finish_em( t_2, t_1, t0, muts,               &
-                                     h_diabatic, dtm, config_flags,    &
-                                     ids, ide, jds, jde, kds, kde,     &
-                                     ims, ime, jms, jme, kms, kme,     &
-                                     its, ite, jts, jte,               &
-                                     k_start    , k_end               )
-#endif
-
             CALL  g_moist_physics_finish_em( t_2, g_t_2, t_1, g_t_1, t0, muts, g_muts, h_diabatic, g_h_diabatic, dtm, config_flags, &
-&ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, &
-jte, k_start, k_end )
+&ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, &
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 
-!Xiaoyan Zhang change end here
+    call g_calc_p_rho_phi( moist_2,g_moist_2,num_3d_m,al,g_al,alb,mu_2,g_mu_2,muts,g_muts,ph_2,g_ph_2,p,g_p,pb,t_2,g_t_2,p0,t0,dnw,&
+&rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz),k_start    , k_end               )
 
+      IF (.not. non_hydrostatic) THEN
+      call g_diagnose_w( ph_tend,g_ph_tend,ph_2,g_ph_2,ph_1,g_ph_1,w_2,g_w_2,muts,g_muts,dt_rk,u_2,g_u_2,v_2,g_v_2,ht,cf1,cf2,cf3,&
+&rdx,rdy,msft,ide,jde,ims,ime,jms,jme,kms,kme,&
+                                   max(grid%i_start(ij),ids+sz),          &
+                                   min(grid%i_end(ij),ide-1-sz),          &
+                                   max(grid%j_start(ij),jds+sz),          &
+                                   min(grid%j_end(ij),jde-1-sz), k_end               )
+      ENDIF
 
-       CALL calc_p_rho_phi( moist_2, num_3d_m,                &
-                            al, alb, mu_2, muts,              &
-                            ph_2, p, pb, t_2,                 &
-                            p0, t0, znu, dnw, rdnw,           &
-                            rdn, non_hydrostatic,             &
-                            ids, ide, jds, jde, kds, kde,     &
-                            ims, ime, jms, jme, kms, kme,     &
-                            its, ite, jts, jte,               &
-                            k_start    , k_end               )
-
-       IF (.not. non_hydrostatic)                               &
-       CALL diagnose_w( ph_tend, ph_2, ph_1, w_2, muts, dt_rk,  &
-                        u_2, v_2, ht,                           &
-                        cf1, cf2, cf3, rdx, rdy, msft,          &
-                        ids, ide, jds, jde, kds, kde,           &
-                        ims, ime, jms, jme, kms, kme,           &
-                        its, ite, jts, jte,                     &
-                        k_start    , k_end                     )
-
-   END DO scalar_tile_loop_1b
-   !$OMP END PARALLEL DO
 BENCH_END(moist_phys_end_tim)
 
   ENDIF

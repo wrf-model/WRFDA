@@ -4183,8 +4183,7 @@ do j = jts, jte
 end do
 
 end subroutine g_zero_tend
-
-!Zhang Xiaoyan 11/02/2006
+!Zhang Xiaoyan 11/02/2006 
 
 !=======================================================================================================
 subroutine g_surface_drag( ru_tendf, g_ru_tendf, rv_tendf, g_rv_tendf, u, g_u, v, g_v, xland, muu, g_muu, muv, &
@@ -4316,7 +4315,7 @@ do j = j_start, j_end
         zwt = 2.*(1000.-zu)/1000.
         g_ru_tendf(i,k,j) = (-(g_muu(i,j)*(0.5*zwt*tao_xz/1000.)))+g_ru_tendf(i,k,j)-g_tao_xz*(0.5*zwt*muu(i,j)/1000.)-g_zwt*(0.5*&
 &muu(i,j)*tao_xz/1000.)
-!xyz        ru_tendf(i,k,j) = ru_tendf(i,k,j)-zwt*0.5*muu(i,j)*tao_xz/1000.
+!X        ru_tendf(i,k,j) = ru_tendf(i,k,j)-zwt*0.5*muu(i,j)*tao_xz/1000.
       endif
     end do
   end do
@@ -4325,22 +4324,22 @@ do j = j_start, j_endv
   do i = i_start, i_end
     v0_vh = v(i,kts,j)**2+((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/4)**2
     g_v0_v = (2*g_u(i+1,kts,j-1)/float(4)*((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/float(4))+2*g_u(i,kts,j-1)/&
-&float(4)*((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/float(4))+2*g_u(i+1,kts,j)/float(4)*((u(i,kts,j)+u(i,kts,j-1)+&
-&u(i+1,kts,j)+u(i+1,kts,j-1))/float(4))+2*g_u(i,kts,j)/float(4)*((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/float(4)&
+&float(4)*((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/float(4))+2*g_u(i+1,kts,j)/float(4)*((u(i,kts,j)+u(i,kts,j-1)+& 
+&u(i+1,kts,j)+u(i+1,kts,j-1))/float(4))+2*g_u(i,kts,j)/float(4)*((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/float(4)& 
 &)+2*g_v(i,kts,j)*v(i,kts,j))*(1./(2.*sqrt(v0_vh)))
     v0_v = sqrt(v0_vh)+epsilon
     if (xland(i,j) .eq. xland(i,j-1)) then
       if (xland(i,j) .lt. 1.5) then
         g_cd = 0.
         cd = 0.01
-      else 
+      else
         g_cd = 0.
         cd = 0.001
         g_cd = g_cd*(0.5+sign(0.5,cd-0.0001*v0_v))+0.0001*g_v0_v*(0.5-sign(0.5,cd-0.0001*v0_v))
         cd = max(cd,0.0001*v0_v)
         g_cd = g_cd*(0.5+sign(0.5,0.003-cd))
         cd = min(cd,0.003)
-      endif
+      endif 
     else
       g_cd = 0.
       cd = 0.003
@@ -4353,10 +4352,10 @@ do j = j_start, j_endv
       if (zv .lt. 1000.) then
      g_zwt = (-0.002)*g_zv
         zwt = 2.*(1000.-zv)/1000.
-        g_rv_tendf(i,k,j) = (-(g_muv(i,j)*(0.5*zwt*tao_yz/1000.)))+g_rv_tendf(i,k,j)-g_tao_yz*(0.5*zwt*muv(i,j)/1000.)-g_zwt*(0.5*& 
+        g_rv_tendf(i,k,j) = (-(g_muv(i,j)*(0.5*zwt*tao_yz/1000.)))+g_rv_tendf(i,k,j)-g_tao_yz*(0.5*zwt*muv(i,j)/1000.)-g_zwt*(0.5*&
 &muv(i,j)*tao_yz/1000.)
-!xyz        rv_tendf(i,k,j) = rv_tendf(i,k,j)-zwt*0.5*muv(i,j)*tao_yz/1000.
-      endif 
+!X        rv_tendf(i,k,j) = rv_tendf(i,k,j)-zwt*0.5*muv(i,j)*tao_yz/1000.
+      endif
     end do
   end do
 end do
@@ -4386,8 +4385,8 @@ end subroutine g_surface_drag
 !   Schaeden  oder  Folgeschaeden  unabhaengig  von einer eventuellen
 !   Mitteilung darueber an FastOpt.
 !
-subroutine g_moist_physics_prep_em( t_new, g_t_new, t_old, g_t_old, t0, rho, g_rho, al, g_al, alb, g_alb, p, g_p, p8w, g_p8w, p0, &
-&pb, g_pb, ph, g_ph, phb, g_phb, pii, g_pii, pf, g_pf, z, g_z, z_at_w, g_z_at_w, dz8w, g_dz8w, dt, h_diabatic, g_h_diabatic, &
+subroutine g_moist_physics_prep_em( t_new, g_t_new, t_old, g_t_old, t0, rho, g_rho, al, g_al, alb, p, g_p, p8w, g_p8w, p0, &
+&pb, ph, g_ph, phb, pii, g_pii, pf, g_pf, z, g_z, z_at_w, g_z_at_w, dz8w, g_dz8w, dt, h_diabatic, g_h_diabatic, &
 &config_flags, fzm, fzp, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 !******************************************************************
 !******************************************************************
@@ -4417,15 +4416,15 @@ real, intent(out) :: dz8w(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: fzm(kms:kme)
 real, intent(in) :: fzp(kms:kme)
 real, intent(in) :: g_al(ims:ime,kms:kme,jms:jme)
-real, intent(in) :: g_alb(ims:ime,kms:kme,jms:jme)
+real             :: g_alb(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: g_dz8w(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: g_h_diabatic(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: g_p(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: g_p8w(ims:ime,kms:kme,jms:jme)
-real, intent(in) :: g_pb(ims:ime,kms:kme,jms:jme)
+real             :: g_pb(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: g_pf(ims:ime,kms:kme,jms:jme)
 real, intent(in) :: g_ph(ims:ime,kms:kme,jms:jme)
-real, intent(in) :: g_phb(ims:ime,kms:kme,jms:jme)
+real             :: g_phb(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: g_pii(ims:ime,kms:kme,jms:jme)
 real, intent(out) :: g_rho(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: g_t_new(ims:ime,kms:kme,jms:jme)
@@ -4486,6 +4485,10 @@ real z2
 !----------------------------------------------
 ! TANGENT LINEAR AND FUNCTION STATEMENTS
 !----------------------------------------------
+g_pb(:,:,:)=0.
+g_phb(:,:,:)=0.
+g_alb(:,:,:)=0.
+
 i_start = its
 i_end = min(ite,ide-1)
 j_start = jts
@@ -4517,8 +4520,6 @@ end do
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
-      g_h_diabatic(i,k,j) = g_t_new(i,k,j)
-      h_diabatic(i,k,j) = t_new(i,k,j)
       t_new(i,k,j) = t_new(i,k,j)+t0
       t_old(i,k,j) = t_old(i,k,j)+t0
       g_rho(i,k,j) = -(g_al(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+alb(i,k,j)))+g_alb(i,k,j)/((al(i,k,j)+alb(i,k,j))*(al(i,k,j)+&
@@ -4531,44 +4532,6 @@ do j = j_start, j_end
       g_pf(i,k,j) = g_p(i,k,j)+g_pb(i,k,j)
       pf(i,k,j) = p(i,k,j)+pb(i,k,j)
     end do
-  end do
-end do
-do j = j_start, j_end
-  do k = 2, k_end
-    do i = i_start, i_end
-      g_p8w(i,k,j) = g_pf(i,k-1,j)*fzp(k)+g_pf(i,k,j)*fzm(k)
-      p8w(i,k,j) = fzm(k)*pf(i,k,j)+fzp(k)*pf(i,k-1,j)
-    end do
-  end do
-end do
-do j = j_start, j_end
-  do i = i_start, i_end
-    g_z0 = g_z_at_w(i,1,j)
-    z0 = z_at_w(i,1,j)
-    g_z1 = g_z(i,1,j)
-    z1 = z(i,1,j)
-    g_z2 = g_z(i,2,j)
-    z2 = z(i,2,j)
-    g_w1 = g_z0/(z1-z2)-g_z1*((z0-z2)/((z1-z2)*(z1-z2)))+g_z2*((-1)/(z1-z2)+(z0-z2)/((z1-z2)*(z1-z2)))
-    w1 = (z0-z2)/(z1-z2)
-    g_w2 = -g_w1
-    w2 = 1.-w1
-    g_p8w(i,1,j) = g_pf(i,2,j)*w2+g_pf(i,1,j)*w1+g_w1*pf(i,1,j)+g_w2*pf(i,2,j)
-    p8w(i,1,j) = w1*pf(i,1,j)+w2*pf(i,2,j)
-    g_z0 = g_z_at_w(i,kte,j)
-    z0 = z_at_w(i,kte,j)
-    g_z1 = g_z(i,k_end,j)
-    z1 = z(i,k_end,j)
-    g_z2 = g_z(i,k_end-1,j)
-    z2 = z(i,k_end-1,j)
-    g_w1 = g_z0/(z1-z2)-g_z1*((z0-z2)/((z1-z2)*(z1-z2)))+g_z2*((-1)/(z1-z2)+(z0-z2)/((z1-z2)*(z1-z2)))
-    w1 = (z0-z2)/(z1-z2)
-    g_w2 = -g_w1
-    w2 = 1.-w1
-    g_p8w(i,kde,j) = (g_pf(i,kde-2,j)*w2*(1./pf(i,kde-2,j))+g_pf(i,kde-1,j)*w1*(1./pf(i,kde-1,j)))*exp(w1*log(pf(i,kde-1,j))+w2*&
-&log(pf(i,kde-2,j)))+g_w1*exp(w1*log(pf(i,kde-1,j))+w2*log(pf(i,kde-2,j)))*log(pf(i,kde-1,j))+g_w2*exp(w1*log(pf(i,kde-1,j))+&
-&w2*log(pf(i,kde-2,j)))*log(pf(i,kde-2,j))
-    p8w(i,kde,j) = exp(w1*log(pf(i,kde-1,j))+w2*log(pf(i,kde-2,j)))
   end do
 end do
 
@@ -4668,10 +4631,12 @@ k_end = min(kte,kde-1)
 do j = j_start, j_end
   do k = k_start, k_end
     do i = i_start, i_end
+      g_t_new(i,k,j) = g_t_new(i,k,j)
       t_new(i,k,j) = t_new(i,k,j)-t0
+
+      g_t_old(i,k,j) = g_t_old(i,k,j)
       t_old(i,k,j) = t_old(i,k,j)-t0
-      g_h_diabatic(i,k,j) = (-(g_h_diabatic(i,k,j)/dt))+g_t_new(i,k,j)/dt
-      h_diabatic(i,k,j) = (t_new(i,k,j)-h_diabatic(i,k,j))/dt
+
     end do
   end do
 end do

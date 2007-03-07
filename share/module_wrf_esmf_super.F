@@ -13,7 +13,7 @@ MODULE module_wrf_esmf_super
    USE module_integrate
    USE module_integrate_ad
    USE module_integrate_tl
-#if 0
+#if 1
    USE module_integrate_tst
 #endif
    USE module_driver_constants
@@ -340,7 +340,7 @@ write(0,*)'back from init_modules'
       CALL ESMF_ClockGetCurrTime( head_grid%domain_clock, currTime=head_grid%current_time, rc=rc )
 
       CALL integrate_ad ( head_grid, nl_date_string, nl_date_index, ad_date_string, ad_date_index )
-#if 0
+#if 1
    ELSE IF ( config_flags%dyn_opt == DYN_EM_TST ) THEN
       CALL integrate_tst ( head_grid )
 #endif
