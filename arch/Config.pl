@@ -321,10 +321,29 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_FFTPACK5_INC:.:g ;
   }
 
-  # always defined
- 
-  $_ =~ s:CONFIGURE_BLAS_PATH:$sw_blas_path:g ;
-  $_ =~ s:CONFIGURE_LAPACK_PATH:$sw_lapack_path:g ;
+  if ( $sw_blas_path ) {
+    $_ =~ s:CONFIGURE_BLAS_PATH:$sw_blas_path:g ;
+    $_ =~ s:CONFIGURE_BLAS_FLAG:-DBLAS: ;
+    $_ =~ s:CONFIGURE_BLAS_LIB:-L$sw_blas_path -lblas: ;
+    $_ =~ s:CONFIGURE_BLAS_INC:$sw_blas_path: ;
+  } else {
+    $_ =~ s:CONFIGURE_BLAS_PATH::g ;
+    $_ =~ s:CONFIGURE_BLAS_FLAG::g ;
+    $_ =~ s:CONFIGURE_BLAS_LIB::g ;
+    $_ =~ s:CONFIGURE_BLAS_INC:.:g ;
+  }
+
+  if ( $sw_lapack_path ) {
+    $_ =~ s:CONFIGURE_LAPACK_PATH:$sw_lapack_path:g ;
+    $_ =~ s:CONFIGURE_LAPACK_FLAG:-DLAPACK: ;
+    $_ =~ s:CONFIGURE_LAPACK_LIB:-L$sw_lapack_path -llapack: ;
+    $_ =~ s:CONFIGURE_LAPACK_INC:$sw_lapack_path: ;
+  } else {
+    $_ =~ s:CONFIGURE_LAPACK_PATH::g ;
+    $_ =~ s:CONFIGURE_LAPACK_FLAG::g ;
+    $_ =~ s:CONFIGURE_LAPACK_LIB::g ;
+    $_ =~ s:CONFIGURE_LAPACK_INC:.:g ;
+  }
 
   @machopts1 = ( @machopts1, $_ ) ;
   if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )

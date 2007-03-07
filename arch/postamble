@@ -24,9 +24,9 @@ WRFPLUS_LIBS = libwrflib.a libwrfplus.a libwrfio_nf.a libesmf_time.a \
                $(IO_GRIB1)/libio_grib1.a $(IO_GRIB_SHARE)/libio_grib_share.a \
                   $(MPI_LIBS)
 
-WRFVAR_LIB  = -L. -L$(LAPACK_PATH) -lwrfvar $(NETCDF_LIB)  \
+WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB)  \
                $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(ESMF_TIME_LIB) \
-               -llapack $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
+               $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK5_LIB) \
                $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB)
 
 WRF_LIB     = -L. -lwrflib \
@@ -38,7 +38,7 @@ WRFPLUS_LIB = -L. $(NETCDF_LIB) -lwrflib -lwrfplus \
                  $(MPI_LIB)
 
 GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK5_LIB) \
-              $(LOCAL_GEN_BE_LIB)
+              $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
                   
 
 # compile these simply (no debug or optimisation) to speed compile

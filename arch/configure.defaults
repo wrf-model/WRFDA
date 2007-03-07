@@ -1580,8 +1580,7 @@ FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$
                     
 FCOPTIM         =
 FCDEBUG         =
-#FCTYPE         = -sinteger32 -e m -sreal64 -dp -eh
-FCTYPE          = -e m -sreal64 -dp -eh
+FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1590,7 +1589,6 @@ FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
 CCFLAGS2        = -UCRAY -Dcrayx1
 # Cray linker very fussy about availablity of modules, so give it a very wide scope
 LOCAL_LIB       = 
-LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 
 arch : 
 	$(LN) $(RSL_STUBS)/* .
@@ -1624,7 +1622,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -e m -sreal64 -dp -eh
+FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1637,7 +1635,6 @@ CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 LDFLAGS2        = -V
 
 LOCAL_LIB       =
-LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch :
@@ -1680,7 +1677,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g 
-FCTYPE          = -e m -sreal64 -dp -eh
+FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
@@ -1693,7 +1690,6 @@ CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 LDFLAGS2        = -V
 
 LOCAL_LIB       = 
-LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1735,18 +1731,17 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -Ofp3 -O3
 FCDEBUG         = 
-FCTYPE          = -e m -sreal64 -dp -eh
+FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
-                     -p$(RTTOV_INC)  -p$(CRTM_INC)
+                    -p$(RTTOV_INC) -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
 LOCAL_LIB       = 
-LOCAL_GEN_BE_LIB = $(GRIB1_LIB) $(GRIB_SHARE_LIB) -lwrfvar 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1791,7 +1786,6 @@ FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
-LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1834,7 +1828,6 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
-LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
@@ -1889,7 +1882,6 @@ LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
-LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .
@@ -1940,7 +1932,6 @@ CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
-LOCAL_GEN_BE_LIB = -lSystemStubs
 
 arch : 
 	$(LN) $(RSL)/*.c .

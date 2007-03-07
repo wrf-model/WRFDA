@@ -331,15 +331,13 @@ fi
 if [ -n "$BLAS" ] ; then
   echo "Will use BLAS in dir: $BLAS"
 else
-  echo "BLAS not set in environment"
-  exit 1
+  echo "BLAS not set in environment, assume in standard libraries"
 fi
 
 if [ -n "$LAPACK" ] ; then
   echo "Will use LAPACK in dir: $LAPACK"
 else
-  echo "LAPACK not set in environment"
-  exit 1
+  echo "LAPACK not set in environment, assume in standard libraries"
 fi
 
 if [ -n "$FFTPACK5" ] ; then
