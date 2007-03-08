@@ -58,18 +58,19 @@ MODULE  Define_Constants
 
 ! namelist.varstats variables
 !
-  NAMELIST /Record1/ diag_dir, exp_names
+  NAMELIST /Record1/ exp_num, exp_dirs, out_dirs
   NAMELIST /Record2/ start_date, end_date, interval
   NAMELIST /Record3/ if_plot_rmse, if_plot_bias, if_plot_abias
   NAMELIST /Record4/ if_plot_synop, if_plot_sonde_sfc,if_plot_metar, &
                      if_plot_ships, if_plot_buoy , if_plot_qscat, &
                      if_plot_sound, if_plot_airep, if_plot_pilot, if_plot_profiler, &
-                     if_plot_geoamv, if_plot_polaramv, if_plot_gpspw, if_plot_gpsref
+                     if_plot_geoamv, if_plot_polaramv, if_plot_gpspw, if_plot_gpsref, &
+                     if_plot_airsret
+  NAMELIST /Record5/ file_path_string
 
 ! record1
   INTEGER                               :: exp_num   ! number of experiments
-  CHARACTER(LEN=130)                    :: diag_dir   
-  CHARACTER(LEN=30), DIMENSION(maxnum)  :: exp_names
+  CHARACTER(LEN=512),DIMENSION(maxnum)  :: exp_dirs, out_dirs   
 ! record2
   CHARACTER(LEN=10)      :: start_date
   CHARACTER(LEN=10)      :: end_date
@@ -103,6 +104,11 @@ MODULE  Define_Constants
 
   LOGICAL  :: if_plot_gpspw 
   LOGICAL  :: if_plot_gpsref
+  LOGICAL  :: if_plot_airsret 
+! record5
+  character (len=50)    :: file_path_string
+!
+! Namelist declaration over
 
-   integer      :: nml_unit, diag_unit_in, diag_unit_out, info_unit
+  integer      :: nml_unit, diag_unit_in, diag_unit_out, info_unit
 end MODULE Define_Constants

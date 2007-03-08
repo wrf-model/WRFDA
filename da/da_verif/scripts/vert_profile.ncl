@@ -14,17 +14,6 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;=============================================================;
 begin
 ;=============================================================;
-num_legend=dimsizes(exp_line_cols)
-legend_line_cols=new((/num_legend/),"string")
-legend_line_cols(0:num_legend-1)=exp_line_cols(0:num_legend-1)
-
-delete(num_legend)
-num_legend=dimsizes(exp_legends)
-new_legends=new((/num_legend/),"string")
-new_legends(0:num_legend-1)=exp_legends(0:num_legend-1)
-;----------------------------------------------------------
-num_d_scor=dimsizes(select_scores)
-;----------------------------------------------------------
 run_dir = run_dir+"/"
 plot_dir = run_dir
 read_headers = asciiread(run_dir+"header_main",-1,"string")
@@ -33,6 +22,17 @@ read_headers = asciiread(run_dir+"header_main",-1,"string")
  diag_var = read_headers(1)
  num_expt = stringtointeger(read_headers(2))
  pdat_dirs = (/read_headers(3 : 2+num_expt(0))/)
+;----------------------------------------------------------
+num_legend=num_expt
+legend_line_cols=new((/num_legend/),"string")
+legend_line_cols(0:num_legend-1)=exp_line_cols(0:num_legend-1)
+
+delete(num_legend)
+num_legend=num_expt
+new_legends=new((/num_legend/),"string")
+new_legends(0:num_legend-1)=exp_legends(0:num_legend-1)
+;----------------------------------------------------------
+num_d_scor=dimsizes(select_scores)
 ;----------------------------------------------------------
  num_obs = dimsizes(read_headers) - (num_expt + 3)
  fnames_obs = new((/num_obs/),"string")
@@ -131,10 +131,6 @@ pnumber = flt2string(ob_tot(iv-1,:))
 ;----------------------------------------------------------------------------------------
  res          = True                              ; plot mods desired
 ;----------------------------------------------------------------------------------------
- setvalues wks
- "wksForegroundColor":(/0.,0.,0./)
- "wksBackgroundColor":(/1.,1.,1./)
- end setvalues 
  res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,4.0,4.0,4.0,4.0/)            ; make 2nd lines thicker
  res@xyLineColors      = legend_line_cols                               ; change line color
  res@xyDashPatterns    = (/0,0,0,0,2,2,3,3,4,4/)                        ; choose dash patterns
@@ -177,7 +173,8 @@ pnumber = flt2string(ob_tot(iv-1,:))
  res@tiXAxisString   = varunits(iv-1)             ; Label for the Y axis
 ;----------------------------------------------
  res@gsnRightString = "Obs Num"
-
+ res@gsnRightStringParallelPosF = 1.15
+ res@gsnRightStringOrthogonalPosF = 0.03
  if ( iv .eq. nv ) then
   res@trYMaxF = q_level
  else
@@ -208,14 +205,14 @@ end do
   gsn_panel(wks,plts,(/nv-2,2/),resP)               ; now draw as one plot
 ;-------------------------------------------------------------------------------------
  legend = create "Legend" legendClass wks
-    "vpXF"                     : 0.25                    ; position on virtual page
-    "vpYF"                     : 0.19
-    "vpWidthF"                 : 0.5                     ; width
+    "vpXF"                     : 0.20                    ; position on virtual page
+    "vpYF"                     : 0.15
+    "vpWidthF"                 : 0.6                     ; width
     "vpHeightF"                : 0.1                     ; height
     "lgPerimOn"                : False                   ; no perimeter
     "lgItemCount"              : nexp                    ; how many
     "lgLabelsOn"               : False                   ; no default lables
-    "lgLineLabelFontHeightF"   : 0.015                   ; font height
+    "lgLineLabelFontHeightF"   : 0.012                   ; font height
     "lgMonoLineThickness"      : True
     "lgLineThicknessF"         : 2.0
     "lgDashIndexes"            : (/0,0,0,0,1/)             ; line paters

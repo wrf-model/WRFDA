@@ -17,20 +17,6 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/contributed.ncl"
 ;===========================================================================================;
 begin
 ;===========================================================================================;
-num_legend=dimsizes(exp_line_cols) + 1
-legend_line_cols=new((/num_legend/),"string")
-legend_line_cols(0:num_legend-2)=exp_line_cols(0:num_legend-2)
-legend_line_cols(num_legend-1)="black"
-
-delete(num_legend)
-num_legend=dimsizes(exp_legends) + 1
-new_legends=new((/num_legend/),"string")
-new_legends(0:num_legend-2)=exp_legends(0:num_legend-2)
-new_legends(num_legend-1)="Obs Num"
-;-----------------------------------------------------------
-num_d_levs=dimsizes(select_levs)
-num_d_scor=dimsizes(select_scores)
-;-----------------------------------------------------------
 ; open file and read in data
 ;-----------------------------------------------------------
 run_dir=run_dir+"/"
@@ -41,6 +27,20 @@ Xaxis_title = read_headers(0)
 diag_var = read_headers(1)
 num_expt = stringtointeger(read_headers(2))
 pdat_dirs = (/read_headers(3 : 2+num_expt(0))/)
+;-----------------------------------------------------------
+num_legend=num_expt + 1
+legend_line_cols=new((/num_legend/),"string")
+legend_line_cols(0:num_legend-2)=exp_line_cols(0:num_legend-2)
+legend_line_cols(num_legend-1)="black"
+
+delete(num_legend)
+num_legend=num_expt + 1
+new_legends=new((/num_legend/),"string")
+new_legends(0:num_legend-2)=exp_legends(0:num_legend-2)
+new_legends(num_legend-1)="Obs Num"
+;-----------------------------------------------------------
+num_d_levs=dimsizes(select_levs)
+num_d_scor=dimsizes(select_scores)
 ;-----------------------------------------------------------
 num_obs = dimsizes(read_headers) - (num_expt + 3)
 fnames_obs = new((/num_obs/),"string")
@@ -75,11 +75,11 @@ sfc_file="fnames_sfc"
 if ( fnames_obs(iob-1) .eq. sfc_file ) then
  nlev =1
  ifsfc = True
- out_name="Surface_"
+ out_name="Time_Series_SFC_"
 else
  nlev = 16
  ifsfc = False
- out_name="Upper-air_"
+ out_name="Time_Series_UPA_"
 end if
 ;--------------------------------------------
 q_levels = 9
@@ -165,14 +165,9 @@ end do
  y = smth9(y,0.50,0.25,False)
 ;----------------------------------------------------------
  res          = True                              ; plot mods desired
- setvalues wks 
- "wksForegroundColor":(/0.,0.,0./)
- "wksBackgroundColor":(/1.,1.,1./)
- end setvalues 
-
  res@gsnDraw               = False                ; (a) do not draw
  res@gsnFrame              = False                ; (b) do not advance 'frame'
- res@xyLineThicknesses = (/2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)    ; make lines thicker
+ res@xyLineThicknesses = (/1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.7/)    ; make lines thicker
  res@xyLineColors      = legend_line_cols                              ; change line color
  res@xyDashPatterns    = (/0,0,0,0,0,0,0,0,0,0/)                        ; choose dash patterns
  res@xyMarkers       = (/2,2,2,2,2,2,2,2,2,2/)                          ; (none, dot, asterisk)
@@ -195,14 +190,9 @@ end do
  res@tiXAxisString   = Xaxis_title                ; Label for the X axis
 ;----------------------------------------------------------
  resN          = True                              ; plot mods desired
- setvalues wks 
- "wksForegroundColor":(/0.,0.,0./)
- "wksBackgroundColor":(/1.,1.,1./)
- end setvalues 
-
  resN@gsnDraw               = False                ; (a) do not draw
  resN@gsnFrame              = False                ; (b) do not advance 'frame'
- resN@xyLineThicknesses = (/1.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0/)    ; make lines thicker
+ resN@xyLineThicknesses = (/1.0,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.7/)    ; make lines thicker
  resN@xyLineColors      = (/"black"/)                                    ; change line color
  resN@xyDashPatterns    = (/1,0,0,0,0,0,0,0,0,0/)                        ; choose dash patterns
  resN@xyMarkers       = (/2,2,2,2,2,2,2,2,2,2/)                          ; (none, dot, asterisk)
@@ -224,6 +214,10 @@ end do
  resN@tiYAxisFontAspectF     = 1.5
  resN@tiXAxisString   = Xaxis_title                ; Label for the X axis
 ;--------------------------------------------------------------------
+ res@trXMaxF = nrow
+ resN@trXMaxF = nrow
+ res@trXMinF = 1
+ resN@trXMinF = 1
 if (level .le. q_levels ) then
 do iv = 1, nv
 
@@ -263,16 +257,16 @@ end if
  gsn_panel(wks,plts,(/nv-2,2/),resP)                ; now draw as one plot
 ;-------------------------------------------------------------------------------------
  legend = create "Legend" legendClass wks
-    "vpXF"                     : 0.25                    ; position on virtual page
-    "vpYF"                     : 0.19
-    "vpWidthF"                 : 0.5                     ; width
+    "vpXF"                     : 0.20                    ; position on virtual page
+    "vpYF"                     : 0.15
+    "vpWidthF"                 : 0.6                     ; width
     "vpHeightF"                : 0.1                     ; height
     "lgPerimOn"                : False                   ; no perimeter
     "lgItemCount"              : (nexp +1)                 ; how many
     "lgLabelsOn"               : False                   ; no default lables
-    "lgLineLabelFontHeightF"   : 0.015                   ; font height
+    "lgLineLabelFontHeightF"   : 0.012                   ; font height
     "lgMonoLineThickness"      : True
-    "lgLineThicknessF"         : 2.0
+    "lgLineThicknessF"         : 1.7
     "lgDashIndexes"            : (/0,0,0,0,1/)             ; line paters
     "lgLineLabelStrings"       : new_legends
     "lgLineColors"             : legend_line_cols

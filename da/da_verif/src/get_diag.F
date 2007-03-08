@@ -29,11 +29,11 @@
    real         :: tpw_obs, tpw_inv, tpw_err, tpw_inc
    real         :: ref_obs, ref_inv, ref_err, ref_inc
     integer     :: u_qc, v_qc, t_qc, p_qc, q_qc, tpw_qc, spd_qc, ref_qc
-    integer     :: npr, ier, exp
+    integer     :: npr, ier, iexp
     character*10  :: date, new_date             ! Current date (ccyymmddhh).
     integer       :: sdate, cdate, edate        ! Starting, current ending dates.
     LOGICAL       :: if_write, is_file
-    CHARACTER(LEN=190)                           :: file_dir,filename
+    CHARACTER(LEN=512)                           :: out_dir,filename
 
 !----------------------------------------------------------------------------
   TYPE (surface_type)    :: surface
@@ -48,7 +48,8 @@
    info_unit     = 30
 !
   exp_num   = 0
-  exp_names = ''
+  exp_dirs = ''
+  out_dirs = ''
 !
   if_plot_rmse  = .FALSE.
   if_plot_bias  = .FALSE.
@@ -70,13 +71,15 @@
 
   if_plot_gpspw     = .FALSE.
   if_plot_gpsref    = .FALSE.
+  if_plot_airsret   = .FALSE.
 !
+  file_path_string = 'wrfvar/working/gts_omb_oma'
 
 ! Read in namelist information defined in module define_cons_types
 !
   OPEN ( UNIT=nml_unit, FILE='namelist.plot_diag', STATUS='OLD',  &
          FORM='FORMATTED' )
- READ ( UNIT=nml_unit, NML=record1, IOSTAT=ier )
+  READ ( UNIT=nml_unit, NML=record1, IOSTAT=ier )
   WRITE ( UNIT=*, NML = record1 )
   IF ( ier /= 0 ) THEN
      WRITE (*,*) 'Error in reading namelist record1'
@@ -84,14 +87,6 @@
   ENDIF
 
 !
-! find out how many experiments to be processed
-!
-  DO i = 1, maxnum
-     IF ( LEN_TRIM(exp_names(i)) /= 0 ) THEN
-        exp_num = exp_num + 1
-     ENDIF
-  ENDDO
-
   READ ( UNIT=nml_unit, NML=record2, IOSTAT=ier )
   WRITE ( UNIT=*, NML = record2 )
   IF ( ier /= 0 ) THEN
@@ -110,10 +105,16 @@
      WRITE (*,*) 'Error in reading namelist record4'
      STOP
   ENDIF
+  READ ( UNIT=nml_unit, NML=record5, IOSTAT=ier )
+  WRITE ( UNIT=*, NML = record5 )
+  IF ( ier /= 0 ) THEN
+     WRITE (*,*) 'Error in reading namelist record5'
+     STOP
+  ENDIF
   CLOSE(nml_unit)
 !----------------------------------------------------------------------------   
 !  Loop over experiments 
-  Do exp  =1,exp_num
+  Do iexp  =1,exp_num
 !----------------------------------------------------------------------------   
 !
     if_plot_surface = .false.
@@ -121,8 +122,9 @@
          if_plot_sonde_sfc .or. if_plot_qscat   ) if_plot_surface = .true.
 
     if_plot_upr = .false.
-    if( if_plot_sound .or. if_plot_pilot .or. if_plot_profiler .or. &
-        if_plot_geoamv .or. if_plot_polaramv  .or. if_plot_airep    &
+    if( if_plot_sound .or. if_plot_pilot .or. if_plot_profiler   .or.    &
+        if_plot_geoamv .or. if_plot_polaramv  .or. if_plot_airep .or.    &
+        if_plot_airsret                                                  &
        ) if_plot_upr= .true.
 
 !----------------------------------------------------------------------------   
@@ -146,13 +148,11 @@
 !----------------------------------------------------------------------------   
 ! construct file name
 !
-!           fname = TRIM(diag_dir)//TRIM(exp_names(nx))//cdate/'fort.50.'//init_dates(it_init)//'_'//valid_date
-           file_dir = TRIM(diag_dir)//'/'//TRIM(exp_names(exp))//'/'
-           filename = TRIM(file_dir)//date//'/wrfvar/working/gts_omb_oma'
+     filename = TRIM(exp_dirs(iexp))//'/'//date//'/'//trim(file_path_string)
 
 ! check if the file exists, then open the file
 
-  INQUIRE ( FILE=filename, EXIST=is_file) 
+  INQUIRE ( FILE=trim(filename), EXIST=is_file) 
   IF ( .not. is_file ) THEN
      WRITE(0,*) 'STOP!! can not find the file: ', TRIM(filename)
      STOP
@@ -227,6 +227,9 @@
    elseif( index( obs_type,'gpsref' ) > 0) then
    if( if_plot_gpsref ) if_write = .true.
     go to 120
+   elseif( index( obs_type,'airsr') > 0)  then
+    if( if_plot_airsret ) if_write = .true.
+    go to 130
    else
    print*,' Got unknown OBS_TYPE ',obs_type(1:20),' on unit ',diag_unit_in
    Stop    
@@ -379,6 +382,7 @@
          70 continue      !  SSMI Radiance
 !---------------------------------------------------------------------   
    IF ( num_obs > 0 ) THEN
+      read(diag_unit_in,'(i8)')levels
       DO n = 1, num_obs    
          read(diag_unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
                          k, l, stn_id, &          ! Station
@@ -476,33 +480,55 @@
       END DO
    ENDIF
    go to 1
+!---------------------------------------------------------------------   
+         130  continue      !  AIRSRET             
+!---------------------------------------------------------------------   
+   IF ( num_obs > 0 ) THEN
+      DO n = 1, num_obs    
+         read(diag_unit_in,'(i8)')levels
+         DO k = 1, levels
+            read(diag_unit_in,'(2i8,a5,2f9.2,f17.7,5(2f17.7,i8,2f17.7))', err= 1000)&
+                         kk,l, stn_id, &          ! Station
+                         lat, lon, press, &       ! Lat/lon, dummy    
+                         t_obs, t_inv, t_qc, t_error, t_inc, &
+                         q_obs, q_inv, q_qc, q_error, q_inc
+          if (if_write .and. press > 0 ) then
+            call get_std_pr_level(press, npr, stdp, nstd) 
+            if( t_qc >=  0) call update_stats(upr%tomb(npr),upr%toma(npr),t_inv,t_inc)
+            if( q_qc >=  0) call update_stats(upr%qomb(npr),upr%qoma(npr),q_inv,q_inc)
+          endif
+      END DO      !  loop over levels
+      END DO      !  loop over Obs    
+   ENDIF
+   go to 1
 !-----------------------------------------------------------------------
 ! Now process the diagnostics
 2000   continue
    close (diag_unit_in)
 !  Write output on outunit
+   out_dir=trim(out_dirs(iexp))
    if( if_plot_surface  )  then
-       call write_diag_single_level(diag_unit_out,date,'surface_u',surface%uomb,surface%uoma)     
-       call write_diag_single_level(diag_unit_out,date,'surface_v',surface%vomb,surface%voma)     
-       call write_diag_single_level(diag_unit_out,date,'surface_t',surface%tomb,surface%toma)     
-       call write_diag_single_level(diag_unit_out,date,'surface_p',surface%pomb,surface%poma)     
-       call write_diag_single_level(diag_unit_out,date,'surface_q',surface%qomb,surface%qoma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'surface_u',surface%uomb,surface%uoma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'surface_v',surface%vomb,surface%voma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'surface_t',surface%tomb,surface%toma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'surface_p',surface%pomb,surface%poma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'surface_q',surface%qomb,surface%qoma)     
    endif      
 !
 !
    if( if_plot_gpspw )  then
-       call write_diag_single_level(diag_unit_out,date,'gpspw_tpw',gpspw%tpwomb,gpspw%tpwoma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'gpspw_tpw',gpspw%tpwomb,gpspw%tpwoma)     
    endif
 !
    if( if_plot_gpsref  )  then
-       call write_diag_single_level(diag_unit_out,date,'gpsref_ref',gpsref%refomb,gpsref%refoma)     
+       call write_diag_single_level(out_dir,diag_unit_out,date,'gpsref_ref',gpsref%refomb,gpsref%refoma)     
    endif
 
    if( if_plot_upr ) then
-   call write_diag_multi_level(diag_unit_out,date,'upr_u',upr%uomb,upr%uoma)
-   call write_diag_multi_level(diag_unit_out,date,'upr_v',upr%vomb,upr%voma)
-   call write_diag_multi_level(diag_unit_out,date,'upr_t',upr%tomb,upr%toma)
-   call write_diag_multi_level(diag_unit_out,date,'upr_q',upr%qomb,upr%qoma)
+   call write_diag_multi_level(out_dir,diag_unit_out,date,'upr_u',upr%uomb,upr%uoma)
+   call write_diag_multi_level(out_dir,diag_unit_out,date,'upr_v',upr%vomb,upr%voma)
+   call write_diag_multi_level(out_dir,diag_unit_out,date,'upr_t',upr%tomb,upr%toma)
+   call write_diag_multi_level(out_dir,diag_unit_out,date,'upr_q',upr%qomb,upr%qoma)
    endif
 !     Calculate next date:
       call da_advance_cymdh( date, interval, new_date )
@@ -512,9 +538,9 @@
 
 !---------------------------------------------------------------------   
   ENDDO   ! Loop over experiments
-   stop
+  stop
 !---------------------------------------------------------------------   
-1000  print*,' Error while reading unit ',diag_unit_in,' for experiment ',exp_names(exp)   
+1000  print*,' Error while reading unit ',diag_unit_in,' for experiment ',exp_dirs(iexp)   
       stop
 CONTAINS
       subroutine get_std_pr_level(prs, npr, stdp, nstd) 
@@ -570,25 +596,26 @@ CONTAINS
 !     
      end subroutine update_stats 
 
-     subroutine write_diag_single_level(ounit,date,obs_type,omb,oma)     
+     subroutine write_diag_single_level(out_dir,ounit,date,obs_type,omb,oma)     
      implicit none
      integer, intent(in)            :: ounit
+     character*512,intent(in)       :: out_dir          
      character*10,intent(in)        :: date       
      character*(*),intent(in)       :: obs_type
      type (stats_value),intent(in)  :: omb
      type (stats_value),intent(in)  :: oma
 ! 
-     character*150                  :: filename         
+     character*512                  :: filename         
      integer                        :: ounit1, ounit2
      logical                        :: is_file
 
      ounit1 = ounit
      ounit2 = ounit + 1
      
-     filename = trim(obs_type)//'_omb.diag'
-     open (ounit1, file = filename, form='formatted',status='unknown',position='append')                         
-     filename = trim(obs_type)//'_oma.diag'
-     open (ounit2, file = filename, form='formatted',status='unknown',position='append')                         
+     filename = trim(out_dir)//'/'//trim(obs_type)//'_omb.diag'
+     open (ounit1, file = trim(filename), form='formatted',status='unknown',position='append')                         
+     filename = trim(out_dir)//'/'//trim(obs_type)//'_oma.diag'
+     open (ounit2, file = trim(filename), form='formatted',status='unknown',position='append')                         
 
      if ( omb%num == 0 ) then    
      write(ounit1,'(1x,a10,1x,i5,3(1x,f6.2))') date,num_miss, rmiss, rmiss, rmiss
@@ -618,15 +645,16 @@ CONTAINS
 !     
      end subroutine write_diag_single_level     
 !
-     subroutine write_diag_multi_level(ounit,date,obs_type,omb,oma)     
+     subroutine write_diag_multi_level(out_dir,ounit,date,obs_type,omb,oma)     
      implicit none
      integer, intent(in)            :: ounit
+     character*512,intent(in)       :: out_dir         
      character*10,intent(in)        :: date       
      character*(*),intent(in)       :: obs_type
      type (stats_value),intent(in)  :: omb(nstd)
      type (stats_value),intent(in)  :: oma(nstd)
 ! 
-     character*150                  :: filename         
+     character*512                  :: filename         
      integer                        :: k
      integer                        :: num(nstd)
      real, dimension(nstd)          :: rmse, bias, abias
@@ -637,10 +665,10 @@ CONTAINS
      ounit2 = ounit + 1
 !
 
-     filename = trim(obs_type)//'_omb.diag'
-     open (ounit1, file = filename, form='formatted',status='unknown',position='append')                         
-     filename = trim(obs_type)//'_oma.diag'
-     open (ounit2, file = filename, form='formatted',status='unknown',position='append')                         
+     filename = trim(out_dir)//'/'//trim(obs_type)//'_omb.diag'
+     open (ounit1, file = trim(filename), form='formatted',status='unknown',position='append')                         
+     filename = trim(out_dir)//'/'//trim(obs_type)//'_oma.diag'
+     open (ounit2, file = trim(filename), form='formatted',status='unknown',position='append')                         
 
      do k = 1, nstd
      num(k) = omb(k)%num
