@@ -12,30 +12,31 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
    svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrf
 
 4, Install WRF_BC 
+   Up to now, there is no a final release version of WRF_BC, so please use my copy which located at ~zhangxin/msswrf/release/@ willow
 
-4, Subsititue wrf/Registry/Registry.EM with wrfplus/parallel/wrf/Regisrty/Registry.EM
+5, Subsititue wrf/Registry/Registry.EM with wrfplus/Docs/parallel/wrf/Regisrty/Registry.EM
 
-5, Compile wrfvar trunk (use G95)
+6, Compile wrfvar trunk (use G95)
    cd  wrfvar
    source setup.csh g95
    ./configure wrfvar (select 1, if you like, you can change the optimization level to O2)
    ./compile wrfvar
 
-6, Compile wrf trunk (use xlf)
+7, Compile wrf trunk (use xlf)
    cd wrf
    ./configure (select 1)
    edit configure.wrf, add -lSystemStubs at the end of LIB
    ./compile wrf
    cp wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
 
-7, Compile wrfplus (use xlf)
+8, Compile wrfplus (use xlf)
    cd wrfplus
    ./configure wrfplus (select 1)
    ./compile wrf
    If Sucessful, cd main; ln -sf wrf.exe wrfplus.exe
    (note: make sure the namelist_script.inc is existed in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
    
-8, Run the testdata 
+9, Run the testdata 
    the test script locate in wrfplus/scripts/da_run_suite_wrapper_test_1pe.ksh
 
 Note: The WRF 4DVAR home directory is REL_DIR  

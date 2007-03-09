@@ -45,7 +45,7 @@ CONTAINS
    grid%em_a_v_2  = 0.0
    grid%em_a_t_2  = 0.0
    grid%em_a_mu_2 = 0.0
-   grid%a_moist_2 = 0.0
+!  grid%a_moist_2 = 0.0
 
 END SUBROUTINE jcdfi_zero_ad
 !
@@ -65,7 +65,7 @@ END SUBROUTINE jcdfi_zero_ad
    grid%em_a_v_2  = grid%em_a_v_2  + h(i)*grid%em_g_v_2
    grid%em_a_t_2  = grid%em_a_t_2  + h(i)*grid%em_g_t_2
    grid%em_a_mu_2 = grid%em_a_mu_2 + h(i)*grid%em_g_mu_2
-   grid%a_moist_2 = grid%a_moist_2 + h(i)*grid%g_moist_2
+!  grid%a_moist_2 = grid%a_moist_2 + h(i)*grid%g_moist_2
 
 END SUBROUTINE jcdfi_tl
 !
@@ -80,19 +80,19 @@ END SUBROUTINE jcdfi_tl
   real :: jc
 
    grid%em_g_u_1  = grid%em_g_u_2
-   grid%em_g_u_2  = sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_wind * grid%em_a_u_2
+   grid%em_g_u_2  = (1.0/grid%jcdfi_error_wind) * grid%em_a_u_2
 
    grid%em_g_v_1  = grid%em_g_v_2
-   grid%em_g_v_2  = sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_wind * grid%em_a_v_2
+   grid%em_g_v_2  = (1.0/grid%jcdfi_error_wind) * grid%em_a_v_2
 
    grid%em_g_t_1  = grid%em_g_t_2
-   grid%em_g_t_2  = sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_t * grid%em_a_t_2
+   grid%em_g_t_2  = (1.0/grid%jcdfi_error_t) * grid%em_a_t_2
 
    grid%em_g_mu_1 = grid%em_g_mu_2
-   grid%em_g_mu_2 = sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_mu * grid%em_a_mu_2
+   grid%em_g_mu_2 = (1.0/grid%jcdfi_error_mu) * grid%em_a_mu_2
 
-   grid%g_moist_1 = grid%g_moist_2 
-   grid%g_moist_2 = sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_q * grid%a_moist_2 
+!  grid%g_moist_1 = grid%g_moist_2 
+!  grid%g_moist_2 = (1.0/grid%jcdfi_error_q) * grid%a_moist_2 
 
    call med_hist_out ( grid , 3, config_flags )
 
@@ -118,7 +118,7 @@ END SUBROUTINE jcdfi_tl
    grid%em_g_v_2  = grid%em_g_v_1
    grid%em_g_t_2  = grid%em_g_t_1
    grid%em_g_mu_2 = grid%em_g_mu_1
-   grid%g_moist_2 = grid%g_moist_1 
+!  grid%g_moist_2 = grid%g_moist_1 
 
  END SUBROUTINE jcdfi_output_forcing
 !
@@ -130,15 +130,12 @@ END SUBROUTINE jcdfi_tl
 
   TYPE ( domain ) , intent(inout) :: grid
   integer , intent(in) :: i
-  integer :: jcdfi_flag
 
-   jcdfi_flag = 0
-   if ( grid%jcdfi_onoff ) jcdfi_flag = 1
-   grid%em_a_u_2  = grid%em_a_u_2  + jcdfi_flag * sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_u_1 
-   grid%em_a_v_2  = grid%em_a_v_2  + jcdfi_flag * sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_v_1
-   grid%em_a_t_2  = grid%em_a_t_2  + jcdfi_flag * sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_t * h(i) * grid%em_g_t_1 
-   grid%em_a_mu_2 = grid%em_a_mu_2 + jcdfi_flag * sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_mu * h(i) * grid%em_g_mu_1 
-   grid%a_moist_2 = grid%a_moist_2 + jcdfi_flag * sqrt(grid%jcdfi_gama) * 1.0/grid%jcdfi_error_q * h(i) * grid%g_moist_1 
+   grid%em_a_u_2  = grid%em_a_u_2  + grid%jcdfi_gama * (1.0/grid%jcdfi_error_wind) * h(i) * grid%em_g_u_1 
+   grid%em_a_v_2  = grid%em_a_v_2  + grid%jcdfi_gama * (1.0/grid%jcdfi_error_wind) * h(i) * grid%em_g_v_1
+   grid%em_a_t_2  = grid%em_a_t_2  + grid%jcdfi_gama * (1.0/grid%jcdfi_error_t) * h(i) * grid%em_g_t_1 
+   grid%em_a_mu_2 = grid%em_a_mu_2 + grid%jcdfi_gama * (1.0/grid%jcdfi_error_mu) * h(i) * grid%em_g_mu_1 
+!  grid%a_moist_2 = grid%a_moist_2 + grid%jcdfi_gama * (1.0/grid%jcdfi_error_q) * h(i) * grid%g_moist_1 
 
 
  END SUBROUTINE jcdfi_add_forcing
@@ -158,14 +155,14 @@ END SUBROUTINE jcdfi_tl
    grid%em_g_v_1  = grid%em_g_v_2
    grid%em_g_t_1  = grid%em_g_t_2
    grid%em_g_mu_1 = grid%em_g_mu_2
-   grid%g_moist_1 = grid%g_moist_2 
+!  grid%g_moist_1 = grid%g_moist_2 
 
 
    grid%em_g_u_2  = 0.0
    grid%em_g_v_2  = 0.0
    grid%em_g_t_2  = 0.0
    grid%em_g_mu_2 = 0.0
-   grid%g_moist_2 = 0.0
+!  grid%g_moist_2 = 0.0
 
  END SUBROUTINE jcdfi_input_forcing
 !
