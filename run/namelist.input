@@ -150,5 +150,5 @@
  nio_groups = 1,
  /
 
- $wrfvar
+ &wrfvar
  /
