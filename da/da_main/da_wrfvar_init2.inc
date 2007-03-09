@@ -146,21 +146,6 @@ subroutine da_wrfvar_init2
       open(unit=stats_unit,file="statistics",status="replace")
       open(unit=jo_unit,file="jo",status="replace")
       open(unit=check_max_iv_unit,file="check_max_iv",status="replace")
-
-      do i=1,num_alpha_corr_types
-         call da_get_unit(alpha_corr_unit1(i))
-         call da_get_unit(alpha_corr_unit2(i))
-         write (unit=filename,fmt='(A,I1)') "alpha_corr1_",i
-         open(unit=alpha_corr_unit1(i),file=filename,status="replace")
-         write (unit=filename,fmt='(A,I1)') "alpha_corr2_",i
-         open(unit=alpha_corr_unit2(i),file=filename,status="replace")
-      end do
-
-      do i=1,num_sound_diag
-         call da_get_unit(sound_diag_unit(i))
-         write (unit=filename,fmt='(A,I1)') "sound_diag_",i
-         open(unit=sound_diag_unit(i),file=filename,status="replace")
-      end do
    end if
 
    if (trace_use) call da_trace_exit("da_wrfvar_init2")

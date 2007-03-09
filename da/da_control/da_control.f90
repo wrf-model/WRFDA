@@ -198,11 +198,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer,parameter :: filename_len = 200
 
    integer, parameter :: num_alpha_corr_types = 3
-   integer, parameter :: num_sound_diag = 4 
 
    integer :: alpha_corr_unit1(num_alpha_corr_types)
    integer :: alpha_corr_unit2(num_alpha_corr_types)
-   integer :: sound_diag_unit(num_sound_diag)
 
    integer, parameter :: max_num_of_var = 200 ! Maximum # of stored fields.
 

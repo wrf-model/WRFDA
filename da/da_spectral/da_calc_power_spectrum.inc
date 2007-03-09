@@ -17,7 +17,7 @@ subroutine da_calc_power_spectrum(max_wave, power)
    real                :: coslat(1:nj)      ! cosine.
 
    integer             :: max_wave_nj       ! Maximum wavenumber.
-   integer             :: j, l              ! Loop counters.
+   integer             :: i,j, l            ! Loop counters.
    real                :: corr_scale        ! Correlation scale.
    real                :: corr_scale_inv    ! 1/corr_scale
    real                :: variance          ! Variance = sum(power).
@@ -26,6 +26,16 @@ subroutine da_calc_power_spectrum(max_wave, power)
    logical             :: odd               ! true if odd.
    real, allocatable   :: alp(:,:)          ! Associated Legendre Polynomials.
    real, allocatable   :: power_nj(:)       ! Power spectrum.
+   character (len=filename_len) :: filename
+   
+   do i=1,num_alpha_corr_types
+      call da_get_unit(alpha_corr_unit1(i))
+      call da_get_unit(alpha_corr_unit2(i))
+      write (unit=filename,fmt='(A,I1)') "alpha_corr1_",i
+      open(unit=alpha_corr_unit1(i),file=filename,status="replace")
+      write (unit=filename,fmt='(A,I1)') "alpha_corr2_",i
+      open(unit=alpha_corr_unit2(i),file=filename,status="replace")
+   end do
 
    !-----------------------------------------------------------------------------
    ! [1] Switch lats from -pi/2 to pi/2 to 0 to pi:
@@ -115,6 +125,13 @@ subroutine da_calc_power_spectrum(max_wave, power)
 
    deallocate(alp)
    deallocate(power_nj)
+   
+   do i=1,num_alpha_corr_types
+      close (alpha_corr_unit1(i))
+      close (alpha_corr_unit2(i))
+      call da_free_unit (alpha_corr_unit1(i))
+      call da_free_unit (alpha_corr_unit2(i))
+   end do
 
 end subroutine da_calc_power_spectrum
 

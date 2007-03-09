@@ -5,11 +5,10 @@ subroutine da_wrfvar_finalize
    !-------------------------------------------------------------------------
 
    use module_domain, only : domain, head_grid
-   use da_control, only : trace_use, cost_unit, &
+   use da_control, only : trace_use, cost_unit, stderr, &
       check_max_iv_unit,grad_unit,ierr,num_alpha_corr_types, &
-      num_sound_diag,rootproc,stats_unit, unit_start, &
-      unit_end, jo_unit, unit_used,alpha_corr_unit1, alpha_corr_unit2, &
-      sound_diag_unit
+      rootproc,stats_unit, unit_start, &
+      unit_end, jo_unit, unit_used,alpha_corr_unit1, alpha_corr_unit2      
    use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
       tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
       tovs_send_start
@@ -72,21 +71,11 @@ subroutine da_wrfvar_finalize
       call da_free_unit (stats_unit)
       call da_free_unit (jo_unit)
       call da_free_unit (check_max_iv_unit)
-
-      do i=1,num_alpha_corr_types
-         close (alpha_corr_unit1(i))
-         close (alpha_corr_unit2(i))
-         call da_free_unit (alpha_corr_unit1(i))
-         call da_free_unit (alpha_corr_unit2(i))
-      end do
-      do i=1,num_sound_diag
-         call da_free_unit (sound_diag_unit(i))
-      end do
    end if
 
    do i=unit_start,unit_end
       if (unit_used(i)) then
-         write(0,*) "unit",i,"still used"
+         write(unit=stderr,FMT=*) "unit",i,"still used"
       end if
    end do
 
