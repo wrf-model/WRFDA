@@ -29,7 +29,7 @@ subroutine da_read_filtered_rad( xp, iv )
       write(filename, '(a)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin'
 #endif
 
-      if (print_detail_radiance) then
+      if (print_detail_rad) then
          write(unit=stdout,fmt=*) 'Reading in ', trim(filename) 
       end if
 
@@ -43,7 +43,7 @@ subroutine da_read_filtered_rad( xp, iv )
 
       read(unit=filtered_rad_unit) iv%instid(i)%num_rad
       if (iv%instid(i)%num_rad < 1) cycle
-      if (print_detail_radiance) then
+      if (print_detail_rad) then
          write(unit=stdout,fmt='(a,i3,2x,a,3x,i10)')  ' allocating space for radiance innov structure', &
                                n, iv%instid(i)%rttovid_string, iv%instid(i)%num_rad
       end if

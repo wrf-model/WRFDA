@@ -28,7 +28,7 @@ use da_reporting, only : da_warning
       rtminit_nsensor,rtminit_sensor,filename_len,read_biascoef,analysis_date, &
       time_window_max,time_window_min, &
       rtm_option_rttov,rtm_option_crtm, &
-      print_detail_radiance,stderr, mw_emis_sea, &
+      print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
       qc_good, qc_bad,myproc,biascorr, global

@@ -143,7 +143,7 @@ subroutine da_transform_xtoy(xb, iv, xa, xp, y)
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   if (use_radiance) then
+   if (use_rad) then
       if (rtm_option == rtm_option_rttov) then
          call da_transform_xtoy_rttov (xa, iv, xp, y)
       elseif (rtm_option == rtm_option_crtm) then

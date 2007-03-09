@@ -35,7 +35,7 @@ module da_radiance
       time_window_max,time_window_min,print_detail_obs,use_hsbobs,use_msuobs, &
       use_amsubobs,use_eos_amsuaobs,use_amsuaobs,use_hirs2obs,rtm_option, &
       rtm_option_rttov,rtm_option_crtm,use_airsobs,use_kma1dvar,use_hirs3obs, &
-      use_filtered_rad,print_detail_radiance,stderr, mw_emis_sea, &
+      use_filtered_rad,print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr

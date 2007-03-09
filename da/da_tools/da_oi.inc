@@ -26,7 +26,7 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
 
    if (.not. oi_use) return
 
-   if (.not. use_radiance) goto 100
+   if (.not. use_rad) goto 100
 
    if (present(y1)) then
       sum_y1=0.0

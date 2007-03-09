@@ -116,6 +116,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          allocate (d_aux_vars(d_num_rad))
          allocate (d_tb(nchan,d_num_rad))
          d_con_vars(:) % nlevels = nlevels
+write (0,*) __FILE__,__LINE__,i,d_num_rad,"allocate d_con_vars_ad(n) % t"
          do n = 1, d_num_rad
             allocate (d_con_vars(n) % t(nlevels))
             allocate (d_con_vars(n) % q(nlevels))
@@ -326,6 +327,7 @@ end do
 #endif
 
       if (d_num_rad > 0) then
+write (0,*) __FILE__,__LINE__,i,d_num_rad,"deallocate  d_con_vars_ad(n) % t" 
          do n=1,d_num_rad
             deallocate (d_con_vars(n) % t)
             deallocate (d_con_vars(n) % q)
@@ -434,7 +436,7 @@ end do
       end if
    end do        ! end loop for sensor
 
-   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
+   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rttov_adj")
 #endif

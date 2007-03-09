@@ -169,7 +169,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    if (use_BogusObs) &
       call da_check_xtoy_adjoint_bogus(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_Radiance) &
+   if (use_rad) &
       call da_check_xtoy_adjoint_rad(iv, y, partial_lhs, pertile_lhs)
 
    !----------------------------------------------------------------------

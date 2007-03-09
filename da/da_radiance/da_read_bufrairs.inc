@@ -189,7 +189,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   table_file = 'gmao_airs_bufr.tbl'      ! make table file name
   inquire(file=table_file,exist=airstab)
   if (airstab) then
-      if (print_detail_radiance) then
+      if (print_detail_rad) then
          write(unit=message(1),fmt=*) &
             'Reading BUFR Table A file: ',trim(table_file)
          call da_warning(__FILE__,__LINE__,message(1:1))
@@ -230,7 +230,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 
   write(unit=date,fmt='( i10)') idate
   read(unit=date,fmt='(i4,3i2)') iy,im,idd,ihh
-   if (print_detail_radiance) then
+   if (print_detail_rad) then
       write(unit=message(1),fmt=*) 'Bufr file date is ', &
          iy,im,idd,ihh
       call da_message(message(1:1))
@@ -460,6 +460,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       allocate (iv%instid(inst)%loc(iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%loc_i(iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%loc_j(iv%instid(inst)%num_rad))
+
       allocate (iv%instid(inst)%loc_k(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%loc_dz(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))
       allocate (iv%instid(inst)%loc_dzm(iv%instid(inst)%nlevels,iv%instid(inst)%num_rad))

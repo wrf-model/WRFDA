@@ -158,7 +158,7 @@ subroutine da_get_var_diagnostics( iv, j)
    j % jo % airsr_t         = temp(62) 
    j % jo % airsr_q         = temp(63) 
 
-   if (use_radiance) then
+   if (use_rad) then
       jo_radiance = 0.0
       do i = 1, iv%num_inst                 ! loop for sensor
          call da_proc_sum_ints(j % jo % rad(i)% num_ichan(:))
@@ -195,7 +195,7 @@ subroutine da_get_var_diagnostics( iv, j)
       write(unit=stdout,fmt='(a,f15.5)') '   Je factor used              = ', je_factor
       write(unit=stdout,fmt=*) ' '
 
-      if (use_radiance) then
+      if (use_rad) then
          write(unit=stdout,fmt='(a,i8)')    '   Total number of radiances    = ', num_radiance_tot
          write(unit=stdout,fmt='(a,f15.5)') '   Cost function for radiances  = ', jo_radiance
          write(unit=stdout,fmt=*) ' '

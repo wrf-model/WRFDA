@@ -81,7 +81,7 @@ export NL_FG_FORMAT=3
 export NL_DYN_OPT=2
 
 #export NL_USE_AMSUAOBS=true
-#export NL_USE_RADIANCE=true
+#export NL_USE_RAD=true
 #export NL_USE_FILTERED_RAD=false
 #export NL_RTMINIT_NSENSOR=2
 #export NL_RTMINIT_PLATFORM=1,1

@@ -765,7 +765,7 @@ rconfig   logical   global                  namelist,wrfvar1  1  .false.  -  "gl
 rconfig   logical   oi_use                  namelist,wrfvar1  1  .true.   -  "oi_use"                  ""  ""
 rconfig   logical   print_detail_airep      namelist,wrfvar1  1  .false.  -  "print_detail_airep"      ""  ""
 rconfig   logical   print_detail_radar      namelist,wrfvar1  1  .false.  -  "print_detail_radar"      ""  ""
-rconfig   logical   print_detail_radiance   namelist,wrfvar1  1  .false.  -  "print_detail_radiance"   ""  ""
+rconfig   logical   print_detail_rad        namelist,wrfvar1  1  .false.  -  "print_detail_rad"        ""  ""
 rconfig   logical   print_detail_xa         namelist,wrfvar1  1  .false.  -  "print_detail_xa"         ""  ""
 rconfig   logical   print_detail_xb         namelist,wrfvar1  1  .false.  -  "print_detail_xb"         ""  ""
 rconfig   logical   print_detail_obs        namelist,wrfvar1  1  .false.  -  "print_detail_obs"        ""  ""
@@ -828,7 +828,7 @@ rconfig   logical   use_eos_radobs          namelist,wrfvar4  1  .false.  - "use
 rconfig   logical   use_hsbobs              namelist,wrfvar4  1  .false.  - "use_hsbobs"               ""  ""
 rconfig   logical   use_kma1dvar            namelist,wrfvar4  1  .false.  - "use_kma1dvar"             ""  ""
 rconfig   logical   use_filtered_rad        namelist,wrfvar4  1  .false.  - "use_filtered_rad"         ""  ""
-rconfig   logical   use_radiance            namelist,wrfvar4  1  .false.  - "use_radiance"             ""  ""
+rconfig   logical   use_rad                 namelist,wrfvar4  1  .false.  - "use_rad"                  ""  ""
 rconfig   logical   use_obsgts              namelist,wrfvar4  1  .false.  - "use_obsgts"               ""  ""
 rconfig   logical   use_obs_errfac          namelist,wrfvar4  1  .false.  - "use_obs_errfac"           ""  ""
 

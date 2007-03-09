@@ -80,7 +80,7 @@ subroutine da_rttov_init(iv,ob)
    sensor (3,1:nsensor)  = rtminit_sensor   (1:nsensor)
    coefs_channels(:,:)   = 0
 
-   if (print_detail_radiance) then
+   if (print_detail_rad) then
       write(unit=message(1),fmt='(A,I5)') 'err_unit             = ', err_unit
       write(unit=message(2),fmt='(A,I5)') 'verbosity_level      = ', verbosity_level
       write(unit=message(3),fmt='(A,I5)') 'nsensor              = ', nsensor

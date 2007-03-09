@@ -321,6 +321,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    deallocate (emissivity )
    deallocate (emissivity_ad )
    deallocate (calcemis )
+   deallocate (surfem)
 
    do n = 1, nprofiles 
       deallocate (profiles(n)%p )

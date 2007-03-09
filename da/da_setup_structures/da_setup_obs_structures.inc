@@ -34,9 +34,9 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
    if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
       use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) then
-      use_radiance = .true.
+      use_rad = .true.
    else
-      use_radiance = .false.
+      use_rad = .false.
    end if
 
    ! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
@@ -79,7 +79,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
       use_Eos_radObs       = .false.
       use_HsbObs           = .false.
       Use_Obsgts           = .false.
-      Use_Radiance         = .false.
+      use_rad         = .false.
       Use_AIRSRETObs       = .false.
    end if
     
@@ -114,7 +114,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
       use_Eos_radObs       = .false.
       use_HsbObs           = .false.
       Use_Obsgts           = .true.
-      Use_Radiance         = .false.
+      use_rad         = .false.
       Use_AIRSRETObs       = .false.
    end if
 
@@ -221,7 +221,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 
    ! Radiance files can only be in BUFR
 
-   if (use_radiance) then
+   if (use_rad) then
 #ifndef RTTOV
       ! Stop any radiance work if RTTOV not defined, as there are
       ! huge preprocessor defined holes in the subsequent code, made so people

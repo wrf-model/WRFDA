@@ -22,6 +22,7 @@ subroutine da_qc_rad (ob, iv)
    integer, allocatable :: spare_start(:)
    integer :: transfer
    logical :: copy_found
+   integer :: temp(num_procs)
 
 #ifdef RTTOV
    if (trace_use) call da_trace_entry("da_qc_rad")
@@ -82,16 +83,19 @@ subroutine da_qc_rad (ob, iv)
 
       num_tovs_before(i,:) = 0
       num_tovs_before(i,myproc+1)=iv%instid(i)%num_rad
-      call da_proc_sum_ints(num_tovs_before(i,:))
+      temp(:)= num_tovs_before(i,:)
+      call da_proc_sum_ints(temp(:))
 
 #ifdef DM_PARALLEL
-      call wrf_dm_bcast_integer(num_tovs_before(i,:),num_procs)
+      call wrf_dm_bcast_integer(temp(:),num_procs)
 #endif
+      num_tovs_before(i,:) = temp(:)
 
       num_tovs_after(i,:) = num_tovs_before(i,:)
 
-      if (rootproc .and. print_detail_radiance) then
-         write(unit=message(1),fmt='(A,I1,A)') "Instrument ",i," initial tovs distribution"
+      if (rootproc .and. print_detail_rad) then
+         write(unit=message(1),fmt='(A,I1,A)') "Instrument ",i, &
+            " initial tovs distribution"
          write(unit=message(2),fmt=*) num_tovs_before(i,:)
          call da_message(message(1:2))
       end if
@@ -108,15 +112,6 @@ subroutine da_qc_rad (ob, iv)
          excess_start(p)=num_tovs_avg+1
          spare_start(p)=num_tovs_before(i,index(p))+1
       end do
-
-      ! if (rootproc .and. print_detail_radiance) then
-      !    write(unit=stdout,fmt='(A)') "After sort, pe, num,excess, spare, excess_start, spare_start"
-      !    do p=1,num_procs
-      !       write(unit=stdout,fmt='(2I4,5I10)') p,index(p)-1, &
-      !          num_tovs_before(i,index(p)), excess_count(p),spare_count(p), &
-      !          excess_start(p),spare_start(p)
-      !    end do
-      ! end if
 
       tovs_copy_count(i) = 0
       tovs_send_start(i,:) = 0
@@ -150,13 +145,7 @@ subroutine da_qc_rad (ob, iv)
          if (.not. copy_found) exit
       end do   
 
-      if (print_detail_radiance) then
-!         do p=1,tovs_copy_count(i)
-!            write (unit=stdout,fmt='(3X,5(A,I5))') "Sending ",tovs_send_count(i,p), &
-!               " from ",tovs_send_pe(i,p),":",tovs_send_start(i,p)," to ", &
-!               tovs_recv_pe(i,p),":",tovs_recv_start(i,p)
-!         end do
-
+      if (print_detail_rad) then
          write(unit=message(1),fmt='(A,I1,A)') "Instrument ",i," final tovs distribution"
          write(unit=message(2),fmt=*) num_tovs_after(i,:)
          call da_message(message(1:2))
@@ -171,7 +160,7 @@ subroutine da_qc_rad (ob, iv)
    deallocate (spare_start)
    deallocate (spare_count)
 
-   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
+   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_qc_rad")
 #endif

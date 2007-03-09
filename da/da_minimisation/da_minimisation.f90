@@ -36,7 +36,7 @@ module da_minimisation
       num_buoy_tot,num_geoamv_tot,num_gpsref_tot,num_pilot_tot, &
       num_polaramv_tot,num_radiance_tot,num_qscat_tot,num_profiler_tot, &
       num_metar_tot,num_gpspw_tot,num_bogus_tot,num_sound_tot,num_ssmi_tot, &
-      num_ships_tot,num_ssmt2_tot,use_radiance,var_scaling2,var_scaling1, &
+      num_ships_tot,num_ssmt2_tot,use_rad,var_scaling2,var_scaling1, &
       num_synop_tot,var_scaling4,var_scaling5,var_scaling3,num_ssmt1_tot, &
       num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
       cv_size_domain_je,cv_size_domain_jb

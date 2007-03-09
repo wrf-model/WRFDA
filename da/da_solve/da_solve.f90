@@ -23,7 +23,7 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
-      ips,ipe, jps,jpe, vert_corr, sin_xle, testing_wrfvar, use_radiance, &
+      ips,ipe, jps,jpe, vert_corr, sin_xle, testing_wrfvar, use_rad, &
       w_increments, var4d_coupling_disk_simul, var4d_coupling, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
@@ -135,7 +135,7 @@ subroutine da_solve ( grid , config_flags)
 
    call da_setup_obs_structures( grid%xp, ob, iv, grid%xb )
 
-   if (use_radiance) then
+   if (use_rad) then
       allocate (j % jo % rad(1:iv%num_inst))
       do i=1,iv%num_inst
          allocate (j % jo % rad(i) % jo_ichan(iv%instid(i)%nchan))
@@ -296,7 +296,7 @@ subroutine da_solve ( grid , config_flags)
    deallocate (cvt)
    deallocate (xhat)
 
-   if (use_radiance) then
+   if (use_rad) then
       do i =1, iv%num_inst
          deallocate (j % jo % rad(i) % jo_ichan)
          deallocate (j % jo % rad(i) % num_ichan)

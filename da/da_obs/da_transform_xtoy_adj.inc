@@ -137,7 +137,7 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    ! [20.0] Radiance observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   if (use_radiance) then
+   if (use_rad) then
       if (rtm_option == rtm_option_rttov) then
          call da_transform_xtoy_rttov_adj (iv, xp, jo_grad_y, jo_grad_x)
       elseif (rtm_option == rtm_option_crtm) then

@@ -26,7 +26,7 @@ module da_test
       typical_thickness_rms, typical_tb19v_rms,typical_tb37h_rms, &
       typical_tb85h_rms,typical_tb37v_rms,typical_tb85v_rms,typical_tb22v_rms, &
       typical_tb19h_rms,typical_speed_rms,typical_tpw_rms,typical_ref_rms, &
-      use_Radiance,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
+      use_rad,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
       balance_geocyc

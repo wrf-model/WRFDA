@@ -555,22 +555,23 @@ end do
       deallocate (pemsv)
       deallocate (pemsh)
       deallocate (pems5)
-   end do        ! end loop for sensor
 
+      !------------------------------------------------------------------------
+      ! [3.0] Perform bias correction
+      !------------------------------------------------------------------------
 
-   !------------------------------------------------------------------------
-   ! [3.0] Perform bias correction
-   !------------------------------------------------------------------------
-
-   if (biascorr) then
-      do inst = 1, iv%num_inst
+      if (biascorr) then
          write(unit=stdout,fmt='(A,A)') 'Performing bias correction for ', &
             trim(iv%instid(inst)%rttovid_string)
          call da_biascorr(inst,ob,iv)
-      end do
-   end if
+      end if
 
-
+      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
+         iv%instid(inst)%loc_k(:,n1:n2), &
+         iv%instid(inst)%loc_dz(:,n1:n2), &
+         iv%instid(inst)%loc_dzm(:,n1:n2))
+   end do        ! end loop for sensor
+   
    !------------------------------------------------------------------------
    ! [4.0] Perform QC check
    !------------------------------------------------------------------------
@@ -578,14 +579,6 @@ end do
    if (qc_rad) then
       call da_qc_rad(ob, iv)
    end if
-
-   do inst = 1, iv%num_inst
-      if (iv%instid(inst)%num_rad < 1) cycle
-      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
-         iv%instid(inst)%loc_k(:,n1:n2), &
-         iv%instid(inst)%loc_dz(:,n1:n2), &
-         iv%instid(inst)%loc_dzm(:,n1:n2))
-   end do
 
    !------------------------------------------
    ! 5.0 prepare bias statistics files
@@ -599,7 +592,7 @@ end do
       end do
    end if
 
-   if (print_detail_radiance) call da_status_rad(iv,__FILE__,__LINE__)
+   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
 #endif
