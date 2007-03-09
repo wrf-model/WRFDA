@@ -24,7 +24,7 @@ export DATE=${DATE:-2003010100}
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}
+export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar/build}
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
