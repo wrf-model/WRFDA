@@ -15,11 +15,9 @@ bjobs > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
    export LSF_PTILE=${LSF_PTILE:-8}
-   export SUBMIT_OPTIONS1="#BSUB -x" # exclusivity
-   export SUBMIT_OPTIONS2="#BSUB -a mpich_gm"
+   export SUBMIT_OPTIONS1='#BSUB -x' # exclusivity
+   export SUBMIT_OPTIONS2='#BSUB -a mpich_gm'
    export SUBMIT_OPTIONS3="#BSUB -R span[ptile=$LSF_PTILE]"
-   export SUBMIT_OPTIONS4="#BSUB -W 60"
-   export SUBMIT_OPTIONS5="#BSUB -P $PROJECT"
 else
    llq > /dev/null 2>&1
    if test $? = 0 ; then
@@ -29,9 +27,8 @@ else
       export SUBMIT_OPTIONS3='# @ notification     = never'
       export SUBMIT_OPTIONS4='# @ network.MPI      = css0,shared,ip'
       export SUBMIT_OPTIONS5='# @ checkpoint       = no'
-      export SUBMIT_OPTIONS6='# @ wall_clock_limit = 01:00:00'
-      export SUBMIT_OPTIONS7='# @ class            = share'
-      export SUBMIT_OPTIONS8='# @ node_usage       = shared'
+      export SUBMIT_OPTIONS6='# @ class            = share'
+      export SUBMIT_OPTIONS7='# @ node_usage       = shared'
    else
       csh -c "which qsub" >/dev/null 2>&1
       # could be SGE of course, so need better way to check

@@ -38,6 +38,7 @@ if test $SUBMIT = "LoadLeveller"; then
 # @ node             = $NODES
 # @ output           = job.output
 # @ error            = job.error
+# @ wall_clock_limit = $WALLCLOCK
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
@@ -63,7 +64,9 @@ elif test $SUBMIT = "LSF"; then
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
 #BSUB -o job.output               
-#BSUB -e job.error               
+#BSUB -e job.error   
+#BSUB -W $WALLCLOCK       
+#BSUB -P $PROJECT        
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3

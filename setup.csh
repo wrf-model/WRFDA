@@ -18,11 +18,9 @@ if ($status == 0) then
    if (! $?LSF_PTILE) then
       setenv LSF_PTILE 8
    endif
-   setenv SUBMIT_OPTIONS1 "#BSUB -x" # exclusivity
-   setenv SUBMIT_OPTIONS2 "#BSUB -a mpich_gm"
+   setenv SUBMIT_OPTIONS1 '#BSUB -x' # exclusivity
+   setenv SUBMIT_OPTIONS2 '#BSUB -a mpich_gm'
    setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LSF_PTILE]"
-   setenv SUBMIT_OPTIONS4 "#BSUB -W 360"
-   setenv SUBMIT_OPTIONS5 "#BSUB -P $PROJECT"
 else
    llq >& /dev/null
    if ($status == 0) then
@@ -32,9 +30,8 @@ else
       setenv SUBMIT_OPTIONS3 '# @ notification     = never'
       setenv SUBMIT_OPTIONS4 '# @ network.MPI      = css0,shared,ip'
       setenv SUBMIT_OPTIONS5 '# @ checkpoint       = no'
-      setenv SUBMIT_OPTIONS6 '# @ wall_clock_limit = 01:00:00'
-      setenv SUBMIT_OPTIONS7 '# @ class            = share'
-      setenv SUBMIT_OPTIONS8 '# @ node_usage       = shared'
+      setenv SUBMIT_OPTIONS6 '# @ class            = share'
+      setenv SUBMIT_OPTIONS7 '# @ node_usage       = shared'
    else
       which qsub >& /dev/null
       # could be SGE of course, so might need better way to check
