@@ -160,7 +160,7 @@ subroutine da_qc_rad (ob, iv)
    deallocate (spare_start)
    deallocate (spare_count)
 
-   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
+!   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_qc_rad")
 #endif

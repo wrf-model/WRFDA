@@ -35,16 +35,16 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
       end do
 
 #ifdef DM_PARALLEL
-      write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.oma_', myproc
+      write(unit=filename, fmt='(a,i2.2)') 'oma_'//trim(iv%instid(i)%rttovid_string)//'.', myproc
 #else
-      write(unit=filename, fmt='(a)') trim(iv%instid(i)%rttovid_string)//'.oma'
+      write(unit=filename, fmt='(a)') 'oma_'//trim(iv%instid(i)%rttovid_string)
 #endif
       call da_get_unit(oma_rad_unit)
       open(unit=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
       if (ios /= 0) Then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open oma radiance file"//filename/))
-      Endif
+      endif
       write(unit=oma_rad_unit,fmt='(a,a,i7,a,i5,a)') trim(iv%instid(i)%rttovid_string), &
                            ' number-of-pixels : ', ndomain, &
                            ' channel-number-of-each-pixel : ', iv%instid(i)%nchan, &

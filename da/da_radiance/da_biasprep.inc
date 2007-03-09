@@ -26,7 +26,7 @@ subroutine da_biasprep(inst,ob,iv)
 #ifdef DM_PARALLEL
    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
 #else
-   write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.00'
+   write(filename, '(a)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)
 #endif
 
    call da_get_unit(biasprep_unit)

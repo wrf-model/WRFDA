@@ -34,9 +34,9 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
       end do
 
 #ifdef DM_PARALLEL
-      write(unit=filename, fmt='(a,i2.2)') trim(iv%instid(i)%rttovid_string)//'.inv_', myproc
+      write(unit=filename, fmt='(a,i2.2)') 'inv_'//trim(iv%instid(i)%rttovid_string)//'.', myproc
 #else
-      write(unit=filename, fmt='(a)') trim(iv%instid(i)%rttovid_string)//'.inv'
+      write(unit=filename, fmt='(a)') 'inv_'//trim(iv%instid(i)%rttovid_string)
 #endif
 
       call da_get_unit(innov_rad_unit)

@@ -592,7 +592,7 @@ end do
       end do
    end if
 
-   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
+!   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
 #endif

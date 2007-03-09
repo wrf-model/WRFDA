@@ -103,7 +103,7 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
 
    ! [1.20] Radiance:
 
-   call da_omb_stats_rad (stats_unit, iv)
+   call da_oi_stats_rad (stats_unit, iv)
 
    ! [1.21] AIRS retrievals:
 
@@ -196,7 +196,7 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
 
    ! [2.20] Radiance:
 
-   call da_oma_stats_rad (stats_unit, iv, re)
+   call da_ao_stats_rad (stats_unit, iv, re)
 
    ! [2.21] AIRS Retrieval:
 

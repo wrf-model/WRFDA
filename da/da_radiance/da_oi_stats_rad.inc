@@ -1,31 +1,28 @@
-subroutine da_oma_stats_rad ( stats_unit, iv, re )
+subroutine da_oi_stats_rad ( stats_unit, iv )
 
    !---------------------------------------------------------------------------
-   ! Purpose: Calculate statistics of obs minus analysis for radiance data.
+   ! Purpose: Calculate statistics of obs minus background for radiance data.
    !
-   ! METHOD:  average, rms, minimum, maximum of re
+   ! METHOD:  average, rms, minimum, maximum of iv
    !---------------------------------------------------------------------------
 
    implicit none
 
-   integer,        intent (in)      :: stats_unit    ! output unit for stats.
-   type (ob_type), intent (in)      :: iv            ! innovation
-   type (y_type),  intent (in)      :: re            ! o-a
+   integer,        intent (in)      :: stats_unit    ! Output unit for stats.
+   type (ob_type), intent (in)      :: iv            ! Innovation
 
    type (stats_rad_type),    pointer  :: rad(:)
    integer                          :: n, k, i
 
-   num_radiance_tot = 0
+   if ( iv%num_inst < 1 ) RETURN
 
-   if ( iv%num_inst < 1 ) return
+   if (trace_use) call da_trace_entry("da_oi_stats_rad")
 
-   if (trace_use) call da_trace_entry("da_oma_stats_rad")
-
-   allocate ( rad(1:iv%num_inst) )
+   Allocate ( rad(1:iv%num_inst) )
 
    do i = 1, iv%num_inst                          !! loop for sensors
 
-      allocate (rad(i)%ichan(1:iv%instid(i)%nchan))
+      Allocate ( rad(i)%ichan(1:iv%instid(i)%nchan) )
       rad(i)%ichan(1:iv%instid(i)%nchan)%num  = 0
       rad(i)%ichan(1:iv%instid(i)%nchan)%ave  = 0.0
       rad(i)%ichan(1:iv%instid(i)%nchan)%rms  = 0.0
@@ -39,14 +36,13 @@ subroutine da_oma_stats_rad ( stats_unit, iv, re )
       end do
 
       if (iv%instid(i)%num_rad < 1) cycle
-
       do k=1, iv%instid(i)%nchan               !! loop for channels
          do n=1, iv%instid(i)%num_rad              !! loop for pixels
             if (iv%instid(i)%proc_domain(n)) then
                call da_stats_calculate( n,k,iv%instid(i)%tb_qc(k,n), &
-                                 re%instid(i)%tb(k,n), rad(i)%ichan(k)%num, &
-                                 rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
-                                 rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
+                                  iv%instid(i)%tb_inv(k,n), rad(i)%ichan(k)%num, &
+                                  rad(i)%ichan(k)%minimum, rad(i)%ichan(k)%maximum, &
+                                  rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms)
 
             end if          ! end if( oi%sound(n)%loc%proc_domain )
          end do                                 !! end loop for pixels
@@ -55,33 +51,31 @@ subroutine da_oma_stats_rad ( stats_unit, iv, re )
 
    do i = 1, iv%num_inst                          !! loop for sensors
       do k=1, iv%instid(i)%nchan               !! loop for channels
-         ! JRB generate 1D array to allow a da_proc_sum_ints call here
          ! Do inter-processor communication to gather statistics.
          call da_proc_sum_int ( rad(i)%ichan(k)%num )
          call da_proc_stats_combine(rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms, &
                            rad(i)%ichan(k)%minimum%value, rad(i)%ichan(k)%maximum%value, &
                            rad(i)%ichan(k)%minimum%n, rad(i)%ichan(k)%maximum%n, &
                            rad(i)%ichan(k)%minimum%l, rad(i)%ichan(k)%maximum%l )
- 
-         num_radiance_tot = num_radiance_tot + rad(i)%ichan(k)%num
+
       end do                        !  end loop for channels
 
       if (rootproc) then
-         if (any(rad(i)%ichan(:)%num /= 0)) then
-            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of AO for radiance         '//iv%instid(i)%rttovid_string
+         if ( any( rad(i)%ichan(:)%num /= 0 ) ) then
+            write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for radiance         '//iv%instid(i)%rttovid_string 
             call da_print_stats_rad( stats_unit, iv%instid(i)%nchan, rad(i) )
          end if
       end if
    end do                         !  end loop for sensor
 
    do i = 1, iv%num_inst           ! loop for sensors
-      deallocate (rad(i)%ichan)
+      Deallocate ( rad(i)%ichan )
    end do
 
-   deallocate (rad)
+   Deallocate ( rad )
 
-   if (trace_use) call da_trace_exit("da_oma_stats_rad")
+   if (trace_use) call da_trace_exit("da_oi_stats_rad")
 
-end subroutine da_oma_stats_rad
+end subroutine da_oi_stats_rad
 
 

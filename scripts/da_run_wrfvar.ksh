@@ -562,15 +562,19 @@ echo "WINDOW_END            $WINDOW_END"
       fi
 
       if test -f statistics; then
-         cp statistics $RUN_DIR/statistics
+         cp statistics $RUN_DIR
       fi
 
       if test -f cost_fn; then 
-         cp cost_fn $RUN_DIR/cost_fn
+         cp cost_fn $RUN_DIR
       fi
 
       if test -f grad_fn; then
-         cp grad_fn $RUN_DIR/grad_fn
+         cp grad_fn $RUN_DIR
+      fi
+
+      if test -f check_max_iv; then
+         cp check_max_iv $RUN_DIR
       fi
 
       # remove intermediate output files
@@ -579,6 +583,11 @@ echo "WINDOW_END            $WINDOW_END"
       rm -f pert_obs.*
       rm -f rand_obs_error.*
       rm -f gts_omb_oma.*
+      rm -f qcstat_*.*
+      # No routine to merge these files across processors yet
+      # rm -f inv_*.*
+      # rm -f oma_*.*
+      # rm -f filtered_*.*
 
       if test -f wrfvar_output; then
          if test $DA_ANALYSIS != wrfvar_output; then 

@@ -24,9 +24,9 @@ subroutine da_read_filtered_rad( xp, iv )
    do i = 1, iv%num_inst
 
 #ifdef DM_PARALLEL
-      write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin_', myproc
+      write(filename, '(a,i2.2)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.', myproc
 #else
-      write(filename, '(a)') 'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin'
+      write(filename, '(a)') 'filtered_'//trim(iv%instid(i)%rttovid_string)
 #endif
 
       if (print_detail_rad) then

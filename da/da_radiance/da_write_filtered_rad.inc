@@ -24,10 +24,10 @@ subroutine da_write_filtered_rad(ob, iv)
 
 #ifdef DM_PARALLEL
       write(unit=filename, fmt='(a,i2.2)') &
-         'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin_', myproc
+         'filtered_'//trim(iv%instid(i)%rttovid_string)//'.', myproc
 #else
       write(unit=filename, fmt='(a)') &
-         'filtered_'//trim(iv%instid(i)%rttovid_string)//'.bin'
+         'filtered_'//trim(iv%instid(i)%rttovid_string)
 #endif
       
       call da_get_unit(filtered_rad_unit)

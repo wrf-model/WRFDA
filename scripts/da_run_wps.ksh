@@ -151,22 +151,26 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       done
    else
       if $RUN_GEOGRID; then
-#     Run geogrid:
-      ln -fs $WPS_DIR/geogrid.exe .
-      ${RUN_CMD} ./geogrid.exe
+         # Run geogrid:
+	 ln -fs $WPS_DIR/geogrid.exe .
+	 ${RUN_CMD} ./geogrid.exe
 
-      RC=$?
-      cp geogrid.log $RUN_DIR
-      echo '<A HREF="geogrid.log">geogrid.log</a>'
-  
-      if test $RC != 0; then
-         echo geogrid failed with error $RC
-         exit $RC
-      fi
-      cp $WORK_DIR/geo_em.d01.nc $RC_DIR
+	 RC=$?
+	 mv geogrid.log* $RUN_DIR
+	 if test -f $RUN_DIR/geogrid.log.0000; then
+            echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
+	 else
+            echo '<A HREF="geogrid.log">geogrid.log</a>'
+	 fi
+
+	 if test $RC != 0; then
+            echo geogrid failed with error $RC
+            exit $RC
+	 fi
+	 cp $WORK_DIR/geo_em.d01.nc $RC_DIR
       fi
 
-#     Run ungrib:
+      # Run ungrib:
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
       LOCAL_DATE=$DATE
       FILES=''
@@ -177,11 +181,11 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       $WPS_DIR/link_grib.csh $FILES
 
       ln -fs $WPS_DIR/ungrib.exe .
-ls
+
       ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
 
       RC=$?
-      cp ungrib.log $RUN_DIR
+      mv ungrib.log $RUN_DIR
       echo '<A HREF="ungrib.log">ungrib.log</a>'
 
       if test $RC != 0; then
@@ -189,14 +193,19 @@ ls
          exit $RC
       fi
 
-#     Run metgrid:
+      # Run metgrid:
       ln -fs $WPS_DIR/metgrid.exe .
       ${RUN_CMD} ./metgrid.exe
 
       RC=$?
-      cp metgrid.log $RUN_DIR
-      echo '<A HREF="metgrid.log">metgrid.log</a>'
-
+      
+      mv metgrid.log* $RUN_DIR
+      if test -f $RUN_DIR/metgrid.log.0000; then
+         echo '<A HREF="metgrid.log.0000">metgrid.log.0000</a>'
+      else
+         echo '<A HREF="metgrid.log">metgrid.log</a>'
+      fi
+      
       if test $RC != 0; then
          echo metgrid failed with error $RC
          exit $RC
