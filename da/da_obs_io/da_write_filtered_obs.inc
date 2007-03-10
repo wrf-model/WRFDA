@@ -1090,32 +1090,6 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
       end do 
    end if
 
-   !--------------------------------------------------------------------------
-   ! Write SSMI retrieval:
-   !--------------------------------------------------------------------------
-
-   if (iv % num_ssmi_retrieval > 0) then
-      if (print_detail_f_obs) then
-         write(unit=stdout,fmt='(A,I5)') &
-            ' writing filtered obs for ssmi retrieval  ', &
-            iv % num_ssmi_retrieval 
-      end if
-
-      do i = 1, iv % num_ssmi_retrieval
-         if (.not. iv%ssmi_retrieval(i)%loc%proc_domain) cycle
-         write(ounit, fmt = fmt_info, iostat = iost) &
-            iv%ssmi_retrieval(i)%info%platform,    &
-            iv%ssmi_retrieval(i)%info%date_char,   &
-            iv%ssmi_retrieval(i)%info%name,        &
-            iv%ssmi_retrieval(i)%info%levels,      &
-            iv%ssmi_retrieval(i)%info%lat,         &
-            iv%ssmi_retrieval(i)%info%lon,         &
-            iv%ssmi_retrieval(i)%info%elv,         &
-            iv%ssmi_retrieval(i)%info%id
-         write(ounit, fmt = fmt_srfc) &
-            iv%ssmi_retrieval(i)%loc%slp, iv%ssmi_retrieval(i)%loc%pw
-      end do    
-   end if
 
    ! [10] Write SSMT1:          
    if (iv % num_ssmt1 > 0) then
