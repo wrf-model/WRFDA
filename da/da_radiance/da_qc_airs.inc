@@ -180,10 +180,10 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
          !  g. check iuse from information file (channel selection)
          !-----------------------------------------------------------
-         !do k = 1, nchan
-         !   if (satinfo(i)%iuse(k) .eq. -1) &
-         !      iv%instid(i)%tb_qc(k,n)  = qc_bad
-         !end do
+         do k = 1, nchan
+            if (satinfo(i)%iuse(k) .eq. -1) &
+               iv%instid(i)%tb_qc(k,n)  = qc_bad
+         end do
 
          !  f. check innovation
          !-----------------------------------------------------------
