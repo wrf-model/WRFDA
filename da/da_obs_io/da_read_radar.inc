@@ -9,24 +9,24 @@ subroutine da_read_radar (ob, xp, filename)
    type (xpose_type), intent(in)   :: xp    ! Domain decomposition vars.
    type (ob_type), intent (inout)  :: ob
 
-   character(*), intent(in)        :: filename
+   character(len=*), intent(in)    :: filename
 
-   character (LEN = 120)         :: char_total_Radar
-   character (LEN = 120)         :: char_ned
+   character (len = 120)         :: char_total_radar
+   character (len = 120)         :: char_ned
 
    integer                       :: i, j, n, iost, nlevels, fm
 
-   type (Radar_multi_level_type) :: platform
+   type (radar_multi_level_type) :: platform
 
    logical                       :: outside
 
-   integer                       :: total_obs, num_Radar, total_Radar
+   integer                       :: total_obs, num_radar, total_radar
    integer                        ::n_dup, ndup, iunit
 
    if (trace_use) call da_trace_entry("da_read_radar")
 
    total_obs = ob%total_obs
-   num_Radar = ob%num_Radar
+   num_radar = ob%num_radar
 
    ! 1. open file
 
@@ -42,6 +42,7 @@ subroutine da_read_radar (ob, xp, filename)
       ! Missing file does not matter
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open radar file "//trim(filename)/))
+      call da_free_unit(iunit) 
       return
    end if
 
@@ -49,7 +50,7 @@ subroutine da_read_radar (ob, xp, filename)
 
    !  2.1 read first line
 
-   read (unit=iunit, fmt = '(A)', iostat = iost) char_total_Radar
+   read (unit=iunit, fmt = '(A)', iostat = iost) char_total_radar
 
    !  2.2 process error
 
@@ -60,10 +61,10 @@ subroutine da_read_radar (ob, xp, filename)
 
    !  2.3 total radar number
 
-   read (unit=char_total_Radar (15:17),fmt='(I3)', iostat = iost) total_Radar
+   read (unit=char_total_radar (15:17),fmt='(I3)', iostat = iost) total_radar
 
    if (print_detail_radar) write (unit=stdout,fmt='(/,A,I3,/)') &
-       ' TOTAL RADAR: ', total_Radar
+       ' TOTAL RADAR: ', total_radar
 
    !  2.4 skip one line
 
@@ -71,7 +72,7 @@ subroutine da_read_radar (ob, xp, filename)
 
    ! 3. read radar data
 
-   do n = 1, total_Radar
+   do n = 1, total_radar
 
       ! 3.1 skip one blank line
 
@@ -114,7 +115,7 @@ subroutine da_read_radar (ob, xp, filename)
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,I6)')   &
                            'Total number of Super-observations is ', &
-                           platform % stn % numObs
+                           platform % stn % numobs
 
       read (unit=char_ned (75:80),fmt='(I6)', iostat = iost) platform % stn % levels
 
@@ -129,7 +130,7 @@ subroutine da_read_radar (ob, xp, filename)
 
       ! 3.5 loop over records
 
-      reports: do j = 1, platform % stn % numObs
+      reports: do j = 1, platform % stn % numobs
 
          ! 3.5.1 read station general info
 
@@ -145,7 +146,6 @@ subroutine da_read_radar (ob, xp, filename)
          read(platform % info % platform (4:6), '(I3)') fm
 
          total_obs = total_obs + 1
-
 
          ! 3.5.2 read each level
 
@@ -210,36 +210,36 @@ subroutine da_read_radar (ob, xp, filename)
 
             case (128)
 
-               if (ndup==1) ob%num_Radar_glo = ob%num_Radar_glo + 1
+               if (ndup==1) ob%num_radar_glo = ob%num_radar_glo + 1
 
-               num_Radar = num_Radar + 1
+               num_radar = num_radar + 1
 
-               if (num_Radar > max_Radar) then
+               if (num_radar > max_radar) then
                  write(unit=message(1),fmt='(A,I6,A,I6)') &
-                   "Radar #= ",ob % num_Radar, " > max_Radar = ", max_Radar
+                   "Radar #= ",ob % num_radar, " > max_radar = ", max_radar
                  call da_error(__FILE__,__LINE__,message(1:1))
                end if
-               platform % loc%obs_global_index = ob%num_Radar_glo
+               platform % loc%obs_global_index = ob%num_radar_glo
 
-               ob % Radar (num_Radar) % stn_loc % lon = platform % stn % lon
-               ob % Radar (num_Radar) % stn_loc % lat = platform % stn % lat
-               ob % Radar (num_Radar) % stn_loc % elv = platform % stn % elv
+               ob % radar (num_radar) % stn_loc % lon = platform % stn % lon
+               ob % radar (num_radar) % stn_loc % lat = platform % stn % lat
+               ob % radar (num_radar) % stn_loc % elv = platform % stn % elv
 
-               ob % Radar (num_Radar) % info = platform % info
-               ob % Radar (num_Radar) % loc  = platform % loc
+               ob % radar (num_radar) % info = platform % info
+               ob % radar (num_radar) % loc  = platform % loc
 
-               allocate (ob % Radar (num_Radar) % height   (1:nlevels))
-               allocate (ob % Radar (num_Radar) % height_qc(1:nlevels))
-               allocate (ob % Radar (num_Radar) % zk       (1:nlevels))
-               allocate (ob % Radar (num_Radar) % rv       (1:nlevels))
-               allocate (ob % Radar (num_Radar) % rf       (1:nlevels))
+               allocate (ob % radar (num_radar) % height   (1:nlevels))
+               allocate (ob % radar (num_radar) % height_qc(1:nlevels))
+               allocate (ob % radar (num_radar) % zk       (1:nlevels))
+               allocate (ob % radar (num_radar) % rv       (1:nlevels))
+               allocate (ob % radar (num_radar) % rf       (1:nlevels))
 
                do i = 1, nlevels
-                  ob % Radar (num_Radar) % height(i)    = platform % each(i) % height
-                  ob % Radar (num_Radar) % height_qc(i) = platform % each(i) % height_qc
-                  ob % Radar (num_Radar) % zk(i)        = platform % each(i) % zk
-                  ob % Radar (num_Radar) % rv(i)        = platform % each(i) % rv
-                  ob % Radar (num_Radar) % rf(i)        = platform % each(i) % rf
+                  ob % radar (num_radar) % height(i)    = platform % each(i) % height
+                  ob % radar (num_radar) % height_qc(i) = platform % each(i) % height_qc
+                  ob % radar (num_radar) % zk(i)        = platform % each(i) % zk
+                  ob % radar (num_radar) % rv(i)        = platform % each(i) % rv
+                  ob % radar (num_radar) % rf(i)        = platform % each(i) % rf
                end do
 
             case default;
@@ -264,21 +264,21 @@ subroutine da_read_radar (ob, xp, filename)
       end do reports
    end do
 
-   ob % num_Radar = num_Radar
+   ob % num_radar = num_radar
 
    ! 4. print out
  
    if (print_detail_radar) then
       write(unit=stdout, fmt='(a)')  ' '
       write(unit=stdout, fmt='(5x,a,i6,a)') &
-         ' Read:  ', ob % num_Radar, ' Radar reports '
+         ' Read:  ', ob % num_radar, ' Radar reports '
    end if
 
-   if (ob%ob_numb(ob%current_ob_time)%Radar /= ob%num_Radar) then
+   if (ob%ob_numb(ob%current_ob_time)%radar /= ob%num_radar) then
       write(unit=message(1),fmt='(a, i6, 2x, a, i6)') &
-         'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%Radar=', &
-         ob%ob_numb(ob%current_ob_time)%Radar, &
-         'ob%num_Radar=', ob%num_Radar
+         'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%radar=', &
+         ob%ob_numb(ob%current_ob_time)%radar, &
+         'ob%num_radar=', ob%num_radar
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 

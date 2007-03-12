@@ -373,12 +373,18 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
          end if
       end do
 #endif
-do n=1,d_num_rad
       if (d_num_rad > 0) then
-         call da_rttov_tl (i, nchan, 1, d_con_vars(n:n), &
-            d_aux_vars(n:n), d_con_vars_tl(n:n), d_aux_vars_tl(n:n), d_tb(:,n:n) )
+         if (tovs_batch) then
+            call da_rttov_tl (i, nchan, d_num_rad, d_con_vars(:), &
+               d_aux_vars(:), d_con_vars_tl(:), d_aux_vars_tl(:), d_tb(:,:))
+         else
+            do n=1,d_num_rad
+               call da_rttov_tl (i, nchan, 1, d_con_vars(n:n), &
+                  d_aux_vars(n:n), d_con_vars_tl(n:n), d_aux_vars_tl(n:n), &
+                  d_tb(:,n:n))
+            end do
+         end if
       end if
-end do
 
       ! Transfer data back
 

@@ -15,7 +15,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
    type (con_vars_type),  intent (in) :: con_vars_tl (nprofiles)
    type (aux_vars_type),  intent (in) :: aux_vars (nprofiles)
    type (aux_vars_type),  intent (in) :: aux_vars_tl (nprofiles)
-   real                , intent (out) :: tb(nprofiles, nchanl)
+   real                , intent (out) :: tb(nchanl,nprofiles)
 
    ! local variables
    integer             :: n, nc, ios
@@ -284,7 +284,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
    nc = nbtout / nprofiles
    do n = 1, nprofiles
-      tb(n,1:nc) = radiance_tl % out_clear((n-1)*nc+1:n*nc)
+      tb(1:nc,n) = radiance_tl % out_clear((n-1)*nc+1:n*nc)
    end do
 
    deallocate ( lprofiles )

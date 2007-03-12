@@ -21,7 +21,7 @@ use da_reporting, only : da_warning
 #endif
 
    use da_control, only : max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, &
+      v_interp_p, v_interp_h, tovs_batch, &
       missing, max_error_uv, max_error_t, max_error_p,max_error_q,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, rtminit_platform,rtminit_satid, &

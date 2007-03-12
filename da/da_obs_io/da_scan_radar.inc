@@ -9,7 +9,7 @@ subroutine da_scan_radar (ob, xp, filename)
    type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
    type (ob_type), intent (inout) :: ob
 
-   character(*), intent(in)       :: filename
+   character(len=*), intent(in)   :: filename
 
    integer                       :: i, j, n, iost, nlevels, num_Radar, fm
    integer                       :: total_Radar
@@ -43,6 +43,7 @@ subroutine da_scan_radar (ob, xp, filename)
       ! Does not matter of radar file missing
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open radar file "//trim(filename)/))
+      call da_free_unit(iunit) 
       return
    end if
 
