@@ -133,8 +133,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   type(model_loc_type)       :: loc
   type (datalink_type), pointer   :: head, p, current
 
-   if (trace_use) call da_trace_entry("da_read_bufrairs")
-
 !  0.0  Initialize variables
 !-----------------------------------
   platform_id  = 9   ! eos series
@@ -601,7 +599,6 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       call da_free_unit(airs_table_unit)
    end if
 
-   if (trace_use) call da_trace_exit("da_read_bufrairs")
 #endif
 
 end subroutine da_read_bufrairs
