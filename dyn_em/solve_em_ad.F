@@ -1013,7 +1013,7 @@ BENCH_END(exch12)
 end do runge_kutta_looq
 
 
-if (config_flags%mp_physics == 0) then
+if (config_flags%mp_physics /= 0) then
   if (config_flags%specified .or. config_flags%nested) then
     sz = spec_zone
   else

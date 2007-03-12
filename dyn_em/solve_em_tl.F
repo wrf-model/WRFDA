@@ -2670,7 +2670,7 @@ BENCH_END(advance_ppt_tim)
 
 ij = 1
 
-  IF (config_flags%mp_physics == 0)  then
+  IF (config_flags%mp_physics /= 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
