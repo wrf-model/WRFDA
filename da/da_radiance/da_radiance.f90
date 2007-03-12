@@ -61,7 +61,7 @@ module da_radiance
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, datalink_type,da_qc_amsub, &
       da_qc_amsua,da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
-      da_get_julian_time,da_qc_rad,da_status_rad
+      da_get_julian_time,da_qc_rad
    use da_reporting, only : da_message, da_warning, message, da_error
    use da_rttov, only : da_rttov_init
    use da_statistics, only : da_stats_calculate

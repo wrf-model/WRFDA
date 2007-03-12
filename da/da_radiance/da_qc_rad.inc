@@ -17,9 +17,7 @@ subroutine da_qc_rad (ob, iv)
    integer, allocatable :: index(:)
    integer :: num_tovs_avg
    integer, allocatable :: excess_count(:)
-   integer, allocatable :: excess_start(:)
    integer, allocatable :: spare_count(:)
-   integer, allocatable :: spare_start(:)
    integer :: transfer
    logical :: copy_found
    integer :: temp(num_procs)
@@ -42,9 +40,7 @@ subroutine da_qc_rad (ob, iv)
 
    allocate (index(num_procs))
    allocate (excess_count(num_procs))
-   allocate (excess_start(num_procs))
    allocate (spare_count(num_procs))
-   allocate (spare_start(num_procs))
 
    do i = 1, iv%num_inst
       nchan    = iv%instid(i)%nchan
@@ -109,8 +105,6 @@ subroutine da_qc_rad (ob, iv)
       do p=1,num_procs
          excess_count(p)=num_tovs_before(i,index(p))-num_tovs_avg
          spare_count(p)=num_tovs_avg-num_tovs_before(i,index(p))
-         excess_start(p)=num_tovs_avg+1
-         spare_start(p)=num_tovs_before(i,index(p))+1
       end do
 
       tovs_copy_count(i) = 0
@@ -122,21 +116,19 @@ subroutine da_qc_rad (ob, iv)
          do p=1,num_procs
             if (spare_count(p) > tovs_min_transfer) then
                do j=num_procs,1,-1
-                  if (excess_count(j) > tovs_min_transfer ) then
+                  if (excess_count(j) > tovs_min_transfer) then
                      copy_found = .true.
                      tovs_copy_count(i)=tovs_copy_count(i)+1
                      tovs_send_pe(i,tovs_copy_count(i)) = index(j)-1
                      tovs_recv_pe(i,tovs_copy_count(i)) = index(p)-1
-                     tovs_send_start(i,tovs_copy_count(i)) = excess_start(j)
-                     tovs_recv_start(i,tovs_copy_count(i)) = spare_start(p)
                      transfer=min(spare_count(p),excess_count(j))
                      tovs_send_count(i,tovs_copy_count(i)) = transfer
+                     tovs_recv_start(i,tovs_copy_count(i)) = num_tovs_after(i,index(p))+1
                      num_tovs_after(i,index(p))=num_tovs_after(i,index(p))+transfer
                      num_tovs_after(i,index(j))=num_tovs_after(i,index(j))-transfer
+                     tovs_send_start(i,tovs_copy_count(i)) = num_tovs_after(i,index(j))+1
                      spare_count(p)=spare_count(p)-transfer
-                     spare_start(p)=spare_start(p)+transfer
                      excess_count(j)=excess_count(j)-transfer
-                     excess_start(j)=excess_start(j)+transfer
                      exit
                   end if   
                end do
@@ -155,12 +147,8 @@ subroutine da_qc_rad (ob, iv)
    end do
 
    deallocate (index)
-   deallocate (excess_start)
    deallocate (excess_count)
-   deallocate (spare_start)
    deallocate (spare_count)
-
-!   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_qc_rad")
 #endif

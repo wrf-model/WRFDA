@@ -44,7 +44,7 @@ use da_reporting, only : da_warning
       tovs_send_pe, tovs_recv_pe, tovs_send_start, tovs_send_count, &
       tovs_recv_start,con_vars_type,aux_vars_type, &
       da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
-      da_status_rad, da_qc_rad, da_read_biascoef
+      da_qc_rad, da_read_biascoef
    use da_reporting, only : da_message, message, da_error, da_warning
    use da_tools, only : da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace

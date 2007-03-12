@@ -39,6 +39,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
    real,    allocatable :: d_tb(:,:)
    integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:), temp_ps(:), rtemp(:,:)
+   real, allocatable :: temp_tb(:,:)
    integer, allocatable :: itemp(:,:)
 
 #if !defined(RTTOV)
@@ -115,12 +116,17 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          allocate (d_con_vars_ad(d_num_rad))
          allocate (d_aux_vars(d_num_rad))
          allocate (d_tb(nchan,d_num_rad))
+         d_tb(:,:) = 0.0
          d_con_vars(:) % nlevels = nlevels
          do n = 1, d_num_rad
             allocate (d_con_vars(n) % t(nlevels))
             allocate (d_con_vars(n) % q(nlevels))
+            d_con_vars(n) % t(:) = 0.0
+            d_con_vars(n) % q(:) = 0.0
             allocate (d_con_vars_ad(n) % t(nlevels))
             allocate (d_con_vars_ad(n) % q(nlevels))
+            d_con_vars_ad(n) % t(:) = 0.0
+            d_con_vars_ad(n) % q(:) = 0.0
          end do
 
          ! Fill up with data that stays local
@@ -148,7 +154,6 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          end if
 
          ! Get data from elsewhere
-
 #ifdef DM_PARALLEL
          do c=1,tovs_copy_count(i)
             if (tovs_send_pe(i,c)==myproc) then
@@ -169,8 +174,10 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
                end do
                call mpi_send (temp_q,nl, true_mpi_real, tovs_recv_pe(i,c), &
                   c*8+2, comm, ierr)
-
-               call mpi_send (jo_grad_y%instid(i)%tb(:,s:e),len*nchan,  &
+    
+               allocate (temp_tb(nchan,len))
+               temp_tb(:,:)=jo_grad_y%instid(i)%tb(:,s:e)
+               call mpi_send (temp_tb,len*nchan,  &
                   true_mpi_real, tovs_recv_pe(i,c), c*8+3, comm, ierr)
 
                allocate (rtemp(len,8))
@@ -190,12 +197,8 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
                itemp(:,2)= aux_vars(s:e) % surftype
                call mpi_send(itemp,len*2, mpi_integer, tovs_recv_pe(i,c), &
                   c*8+5, comm, ierr)
-
-               deallocate (temp_t)
-               deallocate (temp_q)
-               deallocate (itemp)
-               deallocate (rtemp)
             end if
+
             if (tovs_recv_pe(i,c)==myproc) then
                s=tovs_recv_start(i,c)
                len=tovs_send_count(i,c)
@@ -215,8 +218,10 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
                   d_con_vars(s+j-1) % q(:)=temp_q(:,j)
                end do
 
-               call mpi_recv(d_tb(:,s:e),len*nchan, true_mpi_real, &
+               allocate (temp_tb(nchan,len))
+               call mpi_recv(temp_tb,len*nchan, true_mpi_real, &
                   tovs_send_pe(i,c), c*8+3, comm, status, ierr)
+               d_tb(:,s:e)=temp_tb(:,:)
 
                allocate (rtemp(len,8))
                call mpi_recv(rtemp,len*8, true_mpi_real, &
@@ -236,6 +241,19 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
                d_con_vars(s:e) % nlevels  = itemp(:,1)
                d_aux_vars(s:e) % surftype = itemp(:,2)
 
+            end if
+
+            call mpi_barrier(comm,ierr)
+
+            if (tovs_send_pe(i,c)==myproc) then
+               deallocate (temp_tb)
+               deallocate (temp_t)
+               deallocate (temp_q)
+               deallocate (itemp)
+               deallocate (rtemp)
+            end if
+            if (tovs_recv_pe(i,c)==myproc) then
+               deallocate (temp_tb)
                deallocate (temp_t)
                deallocate (temp_q)
                deallocate (rtemp)
@@ -250,7 +268,7 @@ end do
 
          ! Transfer data back
 
-         ! Return the local data
+       
          if (l_num_rad > 0) then
             do n = 1, l_num_rad
                con_vars_ad(n) % t(:) = d_con_vars_ad(n) % t(:) 
@@ -290,11 +308,8 @@ end do
             rtemp(:,1) = d_con_vars_ad(s:e) % ps
             call mpi_send (rtemp,len, true_mpi_real, tovs_send_pe(i,c), &
                c*8+8, comm, ierr)
-
-            deallocate (temp_t)
-            deallocate (temp_q)
-            deallocate (rtemp)
          end if
+
          if (tovs_send_pe(i,c)==myproc) then
             s=tovs_send_start(i,c)
             len=tovs_send_count(i,c)
@@ -318,13 +333,22 @@ end do
             call mpi_recv (rtemp,len, true_mpi_real, tovs_recv_pe(i,c), &
                c*8+8, comm, status, ierr)
             con_vars_ad(s:e) % ps=rtemp(:,1)
+         end if
+
+         call mpi_barrier(comm,ierr)
+
+         if (tovs_recv_pe(i,c)==myproc) then
+            deallocate (temp_t)
+            deallocate (temp_q)
+            deallocate (rtemp)
+         end if
+         if (tovs_send_pe(i,c)==myproc) then
             deallocate (temp_t)
             deallocate (temp_q)
             deallocate (rtemp)
          end if
       end do
 #endif
-
       if (d_num_rad > 0) then
          do n=1,d_num_rad
             deallocate (d_con_vars(n) % t)
@@ -433,8 +457,6 @@ end do
          deallocate (model_mr)
       end if
    end do        ! end loop for sensor
-
-!   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rttov_adj")
 #endif

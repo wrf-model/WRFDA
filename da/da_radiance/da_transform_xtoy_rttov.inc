@@ -40,6 +40,7 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
    integer :: d_num_rad, l_num_rad,e,s,len,nl
    real, allocatable :: temp_t(:,:),temp_q(:,:)
    real, allocatable :: temp_t_tl(:,:),temp_q_tl(:,:),rtemp(:,:)
+   real, allocatable :: temp_tb(:,:)
    integer, allocatable :: itemp(:,:)
 
 #ifdef DM_PARALLEL
@@ -231,7 +232,6 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
       end if
 
       ! Get data from elsewhere
-
 #ifdef DM_PARALLEL
       do c=1,tovs_copy_count(i)
          if (tovs_send_pe(i,c)==myproc) then
@@ -398,15 +398,21 @@ end do
             len=tovs_send_count(i,c)
             e=s+len-1
             nl=len*nlevels
-            call mpi_send (d_tb(:,s:e),len*nchan, true_mpi_real, tovs_send_pe(i,c), c*7+7, comm, ierr)
+            allocate(temp_tb(nchan,len))
+            temp_tb(:,:) = d_tb(:,s:e)
+            call mpi_send (temp_tb,len*nchan, true_mpi_real, tovs_send_pe(i,c), c*7+7, comm, ierr)
+            deallocate(temp_tb)
          end if
          if (tovs_send_pe(i,c)==myproc) then
             s=tovs_send_start(i,c)
             len=tovs_send_count(i,c)
             e=s+len-1
             nl=len*nlevels
-            call mpi_recv (y%instid(i)%tb(:,s:e),len*nchan, true_mpi_real, &
+            allocate(temp_tb(nchan,len))
+            call mpi_recv (temp_tb,len*nchan, true_mpi_real, &
                tovs_recv_pe(i,c), c*7+7, comm, status, ierr)
+            y%instid(i)%tb(:,s:e)=temp_tb(:,:)
+            deallocate(temp_tb)
          end if
       end do
 #endif
@@ -443,8 +449,6 @@ end do
          deallocate (aux_vars_tl)
       end if
    end do        ! end loop for sensor
-
-!   if (print_detail_rad) call da_status_rad(iv,__FILE__,__LINE__)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rttov")
 #endif
