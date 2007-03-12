@@ -48,7 +48,7 @@ subroutine da_qc_crtm (ob, iv)
          call da_warning(__FILE__,__LINE__,(/'QC Not implemented for MSU'/))
       else
          write(unit=message(1),fmt='(A,A)') &
-            "Unrecognized instrument",trim(inst_name(rtminit_sensor(i)))
+            "Unrecognized instrument",trim(rttov_inst_name(rtminit_sensor(i)))
          call da_error(__FILE__,__LINE__,message(1:1))
       end if
 
