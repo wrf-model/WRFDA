@@ -313,7 +313,7 @@ subroutine da_get_var_diagnostics( iv, j)
       end if
 
       if (iv % num_ssmi_retrieval_glo > 0) then
-         write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'     ssmi  obs, Jo(actual) = ', &
+         write(unit=jo_unit,fmt='(a30,2i8,10f15.5)')'    ssmir obs, Jo(actual) = ', &
                                   iv % num_ssmi_retrieval_glo, num_ssmi_tot, &
                                   j % jo % ssmir_speed, iv % ssmir_ef_speed, &
                                   j % jo % ssmir_tpw, iv % ssmir_ef_tpw, &

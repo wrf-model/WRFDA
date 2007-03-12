@@ -72,7 +72,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
 #ifdef DM_PARALLEL
    write(unit=filename, fmt='(a,i3.3)') 'filtered_obs.', myproc
 #else
-   write(unit=filename, fmt='(a)') 'filtered_obs'
+   write(unit=filename, fmt='(a)') 'filtered_obs.000'
 #endif
    open(unit=ounit,file=trim(filename),form='formatted', & 
       status='replace', iostat=iost)

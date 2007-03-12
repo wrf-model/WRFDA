@@ -14,7 +14,7 @@ module da_ssmi
       max_error_bt, max_error_buv, max_error_thickness, mkz, &
       num_ssmt2_tot,num_ssmt1_tot,max_error_rh,max_error_tb, max_error_pw, &
       trace_use,Testing_WRFVAR,stdout, Use_SsmiRetrievalObs, Use_SsmiTbObs, &
-      num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot
+      num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot, global, print_detail_obs
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_retrieval_type, &

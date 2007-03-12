@@ -29,8 +29,9 @@ subroutine da_read_ssmi (ob, xp, filename)
    type (count_obs_number_type) :: count_obs_ssmit
 
    logical                      :: isfilter,ipass 
-   logical                      :: outside
+   logical                      :: outside, outside_all
    integer                      :: irain, iprecip
+   integer                      :: n, ndup
 
    count_obs_ssmir = count_obs_number_type(0, 0, 0, 0)
    count_obs_ssmit = count_obs_number_type(0, 0, 0, 0)
@@ -162,20 +163,57 @@ subroutine da_read_ssmi (ob, xp, filename)
       ! Compute the model horizontal coordinate x, y
       ! Check if obs is wihin horizontal domain
 
-      call da_ll_to_xy (info, loc, xp, outside)
+      call da_ll_to_xy (info, loc, xp, outside, outside_all)
 
-      if (outside) cycle reports
+      if (outside_all) cycle reports
 
       loc % pw  % inv = missing_r
-      loc % pw  % qc  = missing
+      loc % pw  % qc  = missing_data
       loc % slp = loc % pw
+
+      ! Loop over duplicating obs for global
+      ndup = 1
+      if (global .and. &
+         (loc%i < xp%ids .or. loc%i >= xp%ide)) ndup= 2
+
+      ! It is possible that logic for counting obs is incorrect for the
+      ! global case with >1 MPI tasks due to obs duplication, halo, etc.
+      ! TBH:  20050913
+
+      if (.not.outside) then
+         if (print_detail_obs .and. ndup > 1) then
+            write(unit=stdout, fmt = fmt_info) &
+               info%platform,    &
+               info%date_char,   &
+               info%name,        &
+               info%levels,      &
+               info%lat,         &
+               info%lon,         &
+               info%elv,         &
+               info%id
+
+            write(unit=stdout, fmt = '(a,2i5,4e20.10)') &
+               ' duplicating obs since loc% i,j,dx,dxm,dy & dym ', &
+               loc%i,  loc%j,   &
+               loc%dx, loc%dxm, &
+               loc%dy, loc%dym
+         end if
+      end if
+
+      dup_loop: do n = 1, ndup
 
       select case(fm)
          case (125) ;
+
+            if (n==1) ob%num_ssmi_retrieval_glo = ob%num_ssmi_retrieval_glo + 1
+            if (outside) then
+               cycle reports
+            end if
+
             if (.not. Use_SsmiRetrievalObs) cycle reports
 
             ! Check if at least one field is present
-            if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
+            if ((tpw % qc == missing_data) .AND. (speed % qc == missing_data)) then
                count_obs_ssmir % num_missing = &
                count_obs_ssmir % num_missing + 1
                cycle reports
@@ -185,6 +223,9 @@ subroutine da_read_ssmi (ob, xp, filename)
             ! ========================
 
             ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
+            ! Track serial obs index for reassembly of obs during bit-for-bit
+            ! tests with different numbers of MPI tasks.  
+            loc%obs_global_index = ob%num_ssmi_retrieval_glo
 
             !  One more data used
 
@@ -202,14 +243,20 @@ subroutine da_read_ssmi (ob, xp, filename)
             ob % ssmi_retrieval (ob%num_ssmi_retrieval) % tpw   = tpw
 
          case (126) ;
+
+            if (n==1) ob%num_ssmi_tb_glo = ob%num_ssmi_tb_glo + 1
+            if (outside) then
+               cycle reports
+            end if
+
             if (.not. Use_SsmiTbObs) cycle reports
 
             ! Check if at least one field is present
 
-            if ((tb19v % qc == missing) .AND. (tb19h % qc == missing)  .AND. &
-                (tb22v % qc == missing)                                .AND. &
-                (tb37v % qc == missing) .AND. (tb37h % qc == missing)  .AND. &
-                (tb85v % qc == missing) .AND. (tb85h % qc == missing)) then
+            if ((tb19v % qc == missing_data) .AND. (tb19h % qc == missing_data)  .AND. &
+                (tb22v % qc == missing_data)                                .AND. &
+                (tb37v % qc == missing_data) .AND. (tb37h % qc == missing_data)  .AND. &
+                (tb85v % qc == missing_data) .AND. (tb85h % qc == missing_data)) then
                count_obs_ssmit % num_missing = &
                count_obs_ssmit % num_missing + 1
                ! write (unit=stdout,fmt=*) 'missing data'
@@ -244,6 +291,9 @@ subroutine da_read_ssmi (ob, xp, filename)
             ! One more data read in
 
             ob % num_ssmi_tb = ob % num_ssmi_tb + 1
+            ! Track serial obs index for reassembly of obs during bit-for-bit
+            ! tests with different numbers of MPI tasks.  
+            loc%obs_global_index = ob%num_ssmi_tb_glo
 
             !  One more data used
 
@@ -268,6 +318,7 @@ subroutine da_read_ssmi (ob, xp, filename)
          case default;
             ! Do nothing.
       end select
+      end do dup_loop
    end do reports
 
    close(iunit)
