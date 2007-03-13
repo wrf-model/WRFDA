@@ -12,8 +12,8 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
 3, Check out wrf trunk
    svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrf
 
-4, Install WRF_BC 
-   Up to now, there is no a final release version of WRF_BC, so please use my copy which located at ~zhangxin/msswrf/release/@ willow
+4, Install WRF_BC (Currently version doesn't need sperately WRF_BC, you can skip this step) 
+   Up to now, there is no a final release version of WRF_BC, so please use my copy which located at ~xinzhang/msswrf/release/@ willow
 
 5, Subsititue wrf/Registry/Registry.EM with wrfplus/Docs/parallel/wrf/Regisrty/Registry.EM
    Subsititue wrf/external/RSL/module_dm.F with wrfplus/Docs/parallel/external/RSL/module_dm.F
