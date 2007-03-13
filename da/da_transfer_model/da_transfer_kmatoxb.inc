@@ -30,6 +30,11 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 
    if (trace_use) call da_trace_entry("da_transfer_kmatoxb")
 
+   if (use_ssmiretrievalobs) then
+      call da_error(__FILE__,__LINE__, &
+         (/"Cannot use ssmi obs with kma global runs"/))
+   end if
+
    conv = pi/180.0
    earth_radius_sq = earth_radius*1000.0 * earth_radius*1000.0 * &
                      conv*(360.0/(coarse_ix-1))*(180.0/(coarse_jy-2))*conv

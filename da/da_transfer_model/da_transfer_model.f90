@@ -21,7 +21,7 @@ module da_transfer_model
       truelat2_3dv, periodic_x,write_increments,max_ext_its, gravity, &
       kappa, print_detail_xa,rd_over_rv,ts0, print_detail_xa, check_rh, &
       print_detail_xb,testing_dm_exact,tlp,tis0,vertical_ip,ptop, &
-      use_ssmitbobs, dt_cloud_model, cp
+      use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs
    use da_define_structures, only : xbx_type
    use da_grid_definitions, only : da_set_map_para
    use da_par_util, only : da_wv_patch_to_global
