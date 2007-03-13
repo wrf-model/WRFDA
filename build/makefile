@@ -16,7 +16,6 @@ links :
 	@ $(LN) $(FRAME)/* .
 	@ $(LN) $(MAIN)/* .
 	@ $(LN) $(PHYS)/* .
-	@ $(LN) $(TOOLS)/*.f90 .
 	@ $(LN) $(TOOLS)/*.c .
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .

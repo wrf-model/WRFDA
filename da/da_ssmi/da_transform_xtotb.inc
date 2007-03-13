@@ -73,7 +73,7 @@ subroutine da_transform_xtotb(xb)
       end do
    end do
 
-   if (trace_use) call da_trace_entry("da_transform_xtotb")
+   if (trace_use) call da_trace_exit("da_transform_xtotb")
 
 end subroutine da_transform_xtotb
 

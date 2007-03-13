@@ -44,6 +44,7 @@ subroutine da_scan_radar (ob, xp, filename)
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open radar file "//trim(filename)/))
       call da_free_unit(iunit) 
+      if (trace_use) call da_trace_exit("da_scan_radar")
       return
    end if
 
