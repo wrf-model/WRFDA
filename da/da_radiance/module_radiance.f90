@@ -106,9 +106,7 @@ module module_radiance
 
    type (satinfo_type), pointer :: satinfo(:)
 
-#ifdef RTTOV
    CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
-#endif
 
 contains
 
