@@ -222,13 +222,6 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
    ! Radiance files can only be in BUFR
 
    if (use_rad) then
-#ifndef RTTOV
-      ! Stop any radiance work if RTTOV not defined, as there are
-      ! huge preprocessor defined holes in the subsequent code, made so people
-      ! can compile without the RTTOV library
-      call da_error(__FILE__,__LINE__, &
-         (/"Cannot run radiance code if compile directive RTTOV false"/))
-#endif
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
       call da_setup_bufrtovs_structures(xp, ob, iv)
    end if
