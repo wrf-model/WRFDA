@@ -40,7 +40,8 @@ export REGION=cwb
 export EXPT=test
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
-export NL_NTMAX=100
+export NL_INPUTOUT_BEGIN_H=0
+export NL_NTMAX=5
 export NL_VAR4D=true
 #export NL_TRACE_UNIT=0
 export NL_DEBUG_LEVEL=0
@@ -69,7 +70,7 @@ export RUN_CMD=" "
 
 #Time info:
 export INITIAL_DATE=2005071600
-export FINAL_DATE=2005071700
+export FINAL_DATE=2005071600
 #Uncomment for actual runs: export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00
@@ -83,12 +84,13 @@ export LONG_FCST_RANGE_4=06
 
 #Directories:
 #bluevista:
-export REL_DIR=$HOME/msswrf/release
+export REL_DIR=$HOME/release-mc
 export DAT_DIR=$REL_DIR/../case_data
-export EXP_DIR=~/willow/$REGION/$EXPT
+export EXP_DIR=/ptmp/xinzhang/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
+export WRF_BC_DIR=$WRFVAR_DIR/build
 export REG_DIR=$DAT_DIR/$REGION
 export OB_DIR=$REG_DIR/135km/ob
 export RC_DIR=$REG_DIR/135km/rc
