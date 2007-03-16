@@ -16,12 +16,12 @@ subroutine da_biasprep(inst,ob,iv)
    real               :: pred(6), q(43)
    type (bias_type)   :: radbias
 
-   if (trace_use) call da_trace_entry("da_biasprep")
-
    num_rad         = iv%ob_numb(iv%current_ob_time)%radiance(inst)- &
                       iv%ob_numb(iv%current_ob_time-1)%radiance(inst)
 
    if (num_rad < 1) return
+
+   if (trace_use) call da_trace_entry("da_biasprep")
 
 #ifdef DM_PARALLEL
    write(filename, '(a,i2.2)') 'biasprep_'//trim(iv%instid(inst)%rttovid_string)//'.', myproc
