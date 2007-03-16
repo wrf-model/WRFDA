@@ -79,9 +79,9 @@ echo "DA_ANALYSIS    $DA_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
-ln -fs $DA_REAL_OUTPUT real_output 
-ln -fs $BDYIN wrfbdy_d$DOMAIN
-ln -fs $DA_ANALYSIS wrfvar_output
+cp -f $DA_REAL_OUTPUT real_output 
+cp -f $BDYIN wrfbdy_d$DOMAIN
+cp -f $DA_ANALYSIS wrfvar_output
 
 cat > parame.in << EOF
 &control_param
