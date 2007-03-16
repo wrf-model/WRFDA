@@ -65,10 +65,12 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    !---------------------------------------------------------------------------
 
    ptop = grid%p_top
-   ps0  = 100000.0    ! Base sea level pressure
+
    ts0  = 300.0       ! Base potential temperature for all levels.
-   tis0 = 290.0       ! Base sea level temperature
-   tlp  = 50.0        ! temperature difference from 1000mb to 300mb
+   ptop = grid%p_top
+   ps0 = grid%base_pres  
+   tis0 = grid%base_temp  ! MSLP reference temperature
+   tlp  = grid%base_lapse  
 
    grid%xb%sigmaf(ke+1) = grid%em_znw(ke+1)
 
