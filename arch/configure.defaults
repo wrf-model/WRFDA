@@ -8393,7 +8393,7 @@ module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
 module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
 module_initialize_real.o module_dm.o \
 mediation_interp_domain.o \
-module_configure.o                                             \
+module_configure.o  solve_interface_tst.o                      \
 convert_nmm.o :
 	$(RM) $@
 	$(SED_FTN) $*.F > $*.b 
