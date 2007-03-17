@@ -8303,7 +8303,7 @@ SCC		=	$(CC)
 RWORDSIZE       =	8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE -DLANDREAD_STUB
-FCOPTIM         =       -O0 -qarch=auto #-qfloat=nomaf
+FCOPTIM         =       -O2 -qarch=auto #-qfloat=nomaf
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -w -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
