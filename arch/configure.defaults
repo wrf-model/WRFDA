@@ -1114,7 +1114,7 @@ SCC		=	$(CC)
 RWORDSIZE       =       8
 PROMOTION	=	-qrealsize=$(RWORDSIZE) -qintsize=4
 CFLAGS          =       -DNOUNDERSCORE
-FCOPTIM         =       -qarch=auto
+FCOPTIM         =       -O2 -qarch=auto
 FCDEBUG         =       # -qnoopt -qfullpath
 FCBASEOPTS      =       -qspill=20000 $(FCDEBUG) -qmaxmem=32767 -qinitauto=00 -w #-qflttrap=zerodivide:invalid:enable -qsigtrap
 FCFLAGS         =       $(FCOPTIM) $(FCBASEOPTS)
