@@ -20,7 +20,7 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
    Subsititue wrf/external/RSL_LITE/module_dm.F with wrfplus/Docs/parallel/wrf/external/RSL_LITE/module_dm.F
    Subsititue wrf/main/wrf.F with wrfplus/Docs/parallel/wrf/main/wrf.F
 
-6, Compile wrfvar trunk (use G95)
+6, Compile wrfvar trunk 
    cd  wrfvar
    source setup.csh xlf
    ./configure wrfvar (select 4)
@@ -35,8 +35,7 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
 8, Compile wrfplus (use xlf)
    cd wrfplus
    ./configure wrfplus (select 3)
-   ./compile wrf
-   If Sucessful, cd main; ln -sf wrf.exe wrfplus.exe
+   ./compile wrf (2 times)
    (note: make sure the namelist_script.inc exists in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
    
 9, Run the testdata 

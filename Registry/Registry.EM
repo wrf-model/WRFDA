@@ -82,7 +82,7 @@ state    real  LU_MASK          ij      misc        1         -     i3h1     "LU
 #
 # U Vel
 state    real   u              ikj     dyn_em      2       X     \
-     i0123rh023usdf=(bdy_interp:dt,u_b,u_bt)       "U"                      "x-wind component"   "m s-1"
+     i0123rh02usdf=(bdy_interp:dt,u_b,u_bt)       "U"                      "x-wind component"   "m s-1"
 state    real   ru             ikj     dyn_em      1       X      -        "MU_U"        "mu-coupled u"   "Pa m s-1"
 state    real   ru_m           ikj     dyn_em      1       X      -        "ru_m"        ""   ""
 state    real   ru_tend        ikj     dyn_em      1       X      -        "ru_tend"        ""   ""                                   
@@ -91,7 +91,7 @@ state    real   u_save         ikj     dyn_em      1       X      -        "u_sa
 #                                               
 # V Vel
 state    real   v              ikj     dyn_em      2       Y     \
-     i0123rh023usdf=(bdy_interp:dt,v_b,v_bt)        "V"                     "y-wind component"   "m s-1"
+     i0123rh02usdf=(bdy_interp:dt,v_b,v_bt)        "V"                     "y-wind component"   "m s-1"
 state    real   rv             ikj     dyn_em      1       Y      -        "MU_V"        "mu-coupled v"   "Pa m s-1"
 state    real   rv_m           ikj     dyn_em      1       Y      -        "rv_m"
 state    real   rv_tend        ikj     dyn_em      1       Y      -        "rv_tend"
@@ -100,7 +100,7 @@ state    real   v_save         ikj     dyn_em      1       Y      -        "v_sa
 #                                               
 # Vertical Vel                                          
 state    real   w              ikj     dyn_em      2       Z     \
-        i023rh023usdf=(bdy_interp:dt,w_b,w_bt)  "w"                          "z-wind component"   "m s-1"
+        i023rh02usdf=(bdy_interp:dt,w_b,w_bt)  "w"                          "z-wind component"   "m s-1"
 state    real   ww             ikj     dyn_em      1       Z      r         "ww"   "mu-coupled eta-dot"    "Pa s-1"
 state    real   rw             ikj     dyn_em      1       Z      -         "rw"   "mu-coupled w"          "Pa m s-1"
 i1       real   ww1            ikj     dyn_em      1       Z                                          
@@ -112,7 +112,7 @@ i1       real   w_save         ikj     dyn_em      1       Z
 
 # Geopotential
 state    real   ph             ikj     dyn_em      2       Z     \
-       i023rh023usdf=(bdy_interp:dt,ph_b,ph_bt)   "ph"   "perturbation geopotential"  "m2 s-2"
+       i023rh02usdf=(bdy_interp:dt,ph_b,ph_bt)   "ph"   "perturbation geopotential"  "m2 s-2"
 state    real   phb            ikj     dyn_em      1       Z     irhdus "phb"  "base-state geopotential"  "m2 s-2"
 state    real   phb_fine       ikj     dyn_em      1         Z      -     "phb_fine"  "for nesting, temp holding interpolated coarse grid phb"  "m2 s-2"
 state    real   ph0            ikj     dyn_em      1         Z      r     "ph0"  "initial geopotential"     "m2 s-2"
@@ -123,7 +123,7 @@ i1       real   ph_save        ikj     dyn_em      1       Z
 
 # Potential Temperature
 state    real   t              ikj     dyn_em      2       -     \
-       i0123rh023usdf=(bdy_interp:dt,t_b,t_bt)   "t"      "perturbation potential temperature (theta-t0)" "K"
+       i0123rh02usdf=(bdy_interp:dt,t_b,t_bt)   "t"      "perturbation potential temperature (theta-t0)" "K"
 
 state    real   t_init         ikj     dyn_em      1         -      r        "t_init" "initial potential temperature" "K"
 i1       real   t_tend         ikj     dyn_em      1       -  
@@ -136,10 +136,10 @@ state    real   t_save         ikj     dyn_em      1       -               "t_sa
 
 # Mass
 state    real   mu              ij     dyn_em      2       -     \
-     i023rh023usdf=(bdy_interp:dt,mu_b,mu_bt)   "mu"  "perturbation dry air mass in column" "Pa"
+     i023rh02usdf=(bdy_interp:dt,mu_b,mu_bt)   "mu"  "perturbation dry air mass in column" "Pa"
 state    real   mub             ij     dyn_em      1       -     irhdus       "mub" "base state dry air mass in column" "Pa"
 state    real   mub_fine        ij     dyn_em      1         -      -           "mub_fine" "nest temp, holds interpolated coarse grid mub" "Pa"
-state    real   mu0             ij     dyn_em      1         -     i0123h023rdu       "mu0" "initial dry mass in column" "Pa"
+state    real   mu0             ij     dyn_em      1         -     i0123h02rdu       "mu0" "initial dry mass in column" "Pa"
 state    real   mudf            ij     dyn_em      1       -      -           "mudf" "" ""
 state    real   muu             ij     dyn_em      1       -                 "muu"
 i1       real   muus            ij     dyn_em      1       -     
@@ -192,8 +192,8 @@ state    real    rdnw           k       dyn_em      1         -     irh02       
 state    real    rdn            k       dyn_em      1         -     irh02       "rdn"  "inverse d(eta) values between half (mass) levels"   ""
 state    real    dnw            k       dyn_em      1         -     irh02       "dnw" "d(eta) values between full (w) levels"   ""
 state    real    dn             k       dyn_em      1         -     irh02       "dn " "d(eta) values between half (mass) levels"   ""
-state    real    znu            k       dyn_em      1         -     irh023     "znu"  "eta values on half (mass) levels"  ""
-state    real    znw            k       dyn_em      1         Z     i0123rh023  "znw"  "eta values on full (w) levels"  ""
+state    real    znu            k       dyn_em      1         -     irh02     "znu"  "eta values on half (mass) levels"  ""
+state    real    znw            k       dyn_em      1         Z     i0123rh02  "znw"  "eta values on full (w) levels"  ""
 state    real    t_base         k       dyn_em      1         -     ir        "t_base"               "BASE STATET T IN IDEALIZED CASES"         "K"      
 state    real    z              ikj     dyn_em      1       Z     -         " " " " " "
 i1       real    mu_3d          ikj     dyn_em      1         -                                          
@@ -283,17 +283,17 @@ state    integer imask_xystag         ij      misc     1     XY
 #                                               
 state   real    -              ikjft   moist       2       -     -    -                                       
 state   real    qv             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqv_b,rqv_bt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqv_b,rqv_bt)  "QVAPOR"           "Water vapor mixing ratio"      "kg kg-1"
 state   real    qc             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqc_b,rqc_bt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqc_b,rqc_bt)  "QCLOUD"           "Cloud water mixing ratio"      "kg kg-1"
 state   real    qr             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqr_b,rqr_bt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqr_b,rqr_bt)  "QRAIN"            "Rain water mixing ratio"       "kg kg-1"
 state   real    qi             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqi_b,rqi_bt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqi_b,rqi_bt)  "QICE"             "Ice mixing ratio"              "kg kg-1"
 state   real    qs             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqs_b,rqs_bt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqs_b,rqs_bt)  "QSNOW"            "Snow mixing ratio"             "kg kg-1"
 state   real    qg             ikjft   moist       2       -     \
-   i0123rh023usdf=(bdy_interp:dt,rqg_b,rqg_bt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
+   i0123rh02usdf=(bdy_interp:dt,rqg_b,rqg_bt)  "QGRAUP"           "Graupel mixing ratio"          "kg kg-1"
 
 # Chem Scalars
 state   real    -              ikjft   chem        2         -     -    -                                       
@@ -375,7 +375,7 @@ state   real   soilt020            ij    misc          1     -     i1      "SOIL
 state   real   soilt040            ij    misc          1     -     i1      "SOILT040"      "LAYER SOIL TEMPERATURE" "K"
 state   real   soilt160            ij    misc          1     -     i1      "SOILT160"      "LAYER SOIL TEMPERATURE" "K"
 state   real   soilt300            ij    misc          1     -     i1      "SOILT300"      "LAYER SOIL TEMPERATURE" "K"
-state   real   landmask            ij    misc          1     -     i0123rh023d=(interp_fcnm)u=(copy_fcnm)   "LANDMASK"      "LAND MASK (1 FOR LAND, 0 FOR WATER)"  ""
+state   real   landmask            ij    misc          1     -     i0123rh02d=(interp_fcnm)u=(copy_fcnm)   "LANDMASK"      "LAND MASK (1 FOR LAND, 0 FOR WATER)"  ""
 state   real   topostdv            ij    misc          1     -     i1      "TOPOSTDV"      "ELEVATION STD DEV"  "m"
 state   real   toposlpx            ij    misc          1     -     i1      "TOPOSLPX"      "ELEVATION X SLOPE"  ""
 state   real   toposlpy            ij    misc          1     -     i1      "TOPOSLPY"      "ELEVATION Y SLOPE"  ""

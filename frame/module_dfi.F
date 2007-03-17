@@ -136,10 +136,10 @@ END SUBROUTINE jcdfi_tl
    grid%em_g_mu_1 = grid%em_g_mu_2
 
 
-   grid%em_g_u_2  = 0.0
-   grid%em_g_v_2  = 0.0
-   grid%em_g_t_2  = 0.0
-   grid%em_g_mu_2 = 0.0
+!  grid%em_g_u_2  = 0.0
+!  grid%em_g_v_2  = 0.0
+!  grid%em_g_t_2  = 0.0
+!  grid%em_g_mu_2 = 0.0
 
  END SUBROUTINE jcdfi_input_forcing
 !

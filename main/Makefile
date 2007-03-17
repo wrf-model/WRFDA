@@ -30,7 +30,7 @@ $(SOLVER) : $(SOLVER).o
 
 $(SOLVER)_wrf : wrf.o
 	$(RANLIB) libwrflib.a
-	$(LD) -o wrf.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
+	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a

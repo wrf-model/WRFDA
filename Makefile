@@ -59,7 +59,7 @@ wrf : configcheck
 	if [ $(WRF_EXP_CORE) -eq 1 ]   ; then $(MAKE) MODULE_DIRS="$(ALL_MODULES)" exp_core ; fi
 	( cd main ; $(MAKE) MODULE_DIRS="$(ALL_MODULES)" SOLVER=em em_wrf )
 	( $(RM) -f *.f *.mod *.o )
-	( cd run ; /bin/rm -f wrf.exe ; ln -s ../main/wrf.exe . )
+	( cd run ; /bin/rm -f wrfplus.exe ; ln -s ../main/wrfplus.exe . )
 
 var : 
 	/bin/rm -f main/libwrflib.a

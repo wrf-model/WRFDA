@@ -4,4 +4,4 @@
 
  2, compile wrfplus with serial configuration (1 cpu)
 
- 3, cd run, wrf.exe
+ 3, cd run, wrfplus.exe
