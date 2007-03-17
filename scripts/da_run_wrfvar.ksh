@@ -470,7 +470,7 @@ echo "WINDOW_END            $WINDOW_END"
       done
 # JRB
 #      if $NL_JCDFI_USE; then
-         ln -fs $WORK_DIR/afdf ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
+         ln -fs $WORK_DIR/auxhist3_d${DOMAIN}_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
 #      fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
       mkdir ad/trace

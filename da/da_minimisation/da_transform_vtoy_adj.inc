@@ -61,7 +61,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
          grid%g_moist = 0.0
       end if
 
-      call da_med_initialdata_output(grid , config_flags, 'afdf')
+      call med_hist_out(grid , 3 , config_flags)
 
       grid%dyn_opt = ndynopt
       call nl_set_dyn_opt (1 , DYN_EM)
