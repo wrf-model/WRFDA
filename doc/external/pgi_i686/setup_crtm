@@ -1,6 +1,10 @@
 cd src
 make clean
 rm -f *.a
+<<<<<<< .mine
+make pgi 
+=======
 make pgi
+>>>>>>> .r2388
 cp *.mod ../include
 ln -s libCRTM.a ../lib/libcrtm.a

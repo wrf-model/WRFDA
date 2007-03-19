@@ -1,7 +1,12 @@
 #!/bin/ksh
 export CC=gcc
+<<<<<<< .mine
+export FFC=pgf90
+export FFCFLAGS="-O2 -r8 -byteswapio"
+=======
 export FFC=pgf90
 export FFCFLAGS="-O2 -r8"
+>>>>>>> .r2388
 export CCFLAGS="-DUNDERSCORE"
 export CPPFLAGS="-C -P -traditional -DLINUX -Dlinux"
 rm *.a
