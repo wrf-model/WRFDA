@@ -213,7 +213,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 
    nc = nbtout / nprofiles
    do n = 1, nprofiles
-!      radiance_ad % out((n-1)*nc+1:n*nc) = tb(n,1:nc)
       radiance_ad % out((n-1)*nc+1:n*nc) = tb(1:nc,n)
    end do 
 

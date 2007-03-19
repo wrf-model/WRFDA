@@ -32,6 +32,8 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    ! [1.0]: Initialise:
    !-------------------------------------------------------------------------  
 
+   if (trace_use) call da_trace_entry("da_transform_through_rf_adj")
+
    rf_passes_over_two = rf_passes / 2
 
    ! [1.1] Define inner product (square root of grid box area):
@@ -122,6 +124,8 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
       field(its:ite,jts:jte,m) = xp % v1z(its:ite,jts:jte,m) / &
                                   p_x(its:ite,jts:jte)
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_through_rf_adj")
 
 end subroutine da_transform_through_rf_adj
 

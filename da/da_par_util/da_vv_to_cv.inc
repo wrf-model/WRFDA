@@ -23,6 +23,8 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv)
    integer   :: i,j,k,ijk
 #endif
 
+   if (trace_use) call da_trace_entry("da_vv_to_cv")
+
    is = xp % its
    ie = xp % ite
    js = xp % jts
@@ -152,6 +154,8 @@ subroutine da_vv_to_cv(vv, xp, mzs, cv_size, rcv)
       rcv(cv_s:cv_e) = RESHAPE(vv % alpha(is:ie,js:je,1:mz), (/ijm/))
 #endif
    end if
+
+   if (trace_use) call da_trace_exit("da_vv_to_cv")
 
 end subroutine da_vv_to_cv
 

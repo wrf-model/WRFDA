@@ -19,6 +19,8 @@ subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
    integer   :: cv_s,cv_e   ! Starting and ending indices into CV array.
    integer   :: ijm         ! Size of interior of v1 through v5 arrays.
 
+   if (trace_use) call da_trace_entry("da_cv_to_vv")
+
    is = xp % its
    ie = xp % ite
    js = xp % jts
@@ -87,6 +89,8 @@ subroutine da_cv_to_vv (cv_size, rcv, xp, mzs, vv)
       cv_e = cv_s + ijm - 1
       vv % alpha(is:ie,js:je,1:mz) = RESHAPE(rcv(cv_s:cv_e),(/ix, jy, mz/))
    end if
+
+   if (trace_use) call da_trace_exit("da_cv_to_vv")
 
 end subroutine da_cv_to_vv
 

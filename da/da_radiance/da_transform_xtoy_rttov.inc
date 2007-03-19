@@ -375,8 +375,8 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
 #endif
       if (d_num_rad > 0) then
          if (tovs_batch) then
-            call da_rttov_tl (i, nchan, d_num_rad, d_con_vars(:), &
-               d_aux_vars(:), d_con_vars_tl(:), d_aux_vars_tl(:), d_tb(:,:))
+            call da_rttov_tl (i, nchan, d_num_rad, d_con_vars, &
+               d_aux_vars, d_con_vars_tl, d_aux_vars_tl, d_tb)
          else
             do n=1,d_num_rad
                call da_rttov_tl (i, nchan, 1, d_con_vars(n:n), &
