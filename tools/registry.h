@@ -1,5 +1,5 @@
 #ifndef REGISTRY_H
-#define NAMELEN 8092
+#define NAMELEN 1024
 #define MAXDIMS 21
 #define MAX_DYNCORES 50   /* ha ha, just kidding */
 /* #define MAX_ARGLINE 175    WRF uses 128 by default, but the nested chem version hit the continuation line limit for efc so it had to be increased, wig 14-Oct-2004 */
