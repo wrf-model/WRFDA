@@ -1,4 +1,4 @@
-export BLAS=../../blas/blas_pgi_i686
+export BLAS=../../blas/blas_pgi_x86_64
 export FFCFLAGS="-O2 -r8"
 export FFC=pgf90
 rm *.a
