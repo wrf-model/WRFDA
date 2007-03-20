@@ -36,7 +36,7 @@ module da_setup_structures
       test_statistics, var_scaling1,var_scaling2,var_scaling3,var_scaling4, &
       var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
       print_detail_regression,gas_constant,da_array_print , use_airsretobs, &
-      filename_len
+      filename_len, max_ssmis_input, use_ssmisobs
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &

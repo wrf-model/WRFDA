@@ -33,7 +33,8 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 
    if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) then
+      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
+      use_ssmisobs ) then
       use_rad = .true.
    else
       use_rad = .false.

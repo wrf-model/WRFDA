@@ -88,6 +88,13 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
       call da_read_bufrairs ('hsb      ',iv, xp, filename)
    end if
 
+   if (use_ssmisobs) then
+      write(unit=stdout,fmt='(a)') 'Reading ssmis data from ssmis.bufr'
+      filename = ' '
+      write(filename(1:10), fmt='(a)') 'ssmis.bufr'
+      call da_read_bufrssmis ('ssmis',iv, xp, filename)
+   end if
+
    if (use_filtered_rad) then
       call da_read_filtered_rad (xp, iv)
    end if

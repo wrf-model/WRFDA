@@ -130,6 +130,9 @@ subroutine da_crtm_init(iv,ob)
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hsb' ) then
       nchanl(n)  = 4
       nscan(n)   = 90
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'ssmis' ) then
+      nchanl(n)  = 24
+      nscan(n)   = 180
    else
       call da_error(__FILE__,__LINE__, &
         (/"Unrecorgnized instrument"/))

@@ -1191,6 +1191,7 @@ da_radiance.o:		da_radiance.f90 \
 			da_qc_amsub.inc \
 			da_read_bufrtovs.inc \
 			da_read_bufrairs.inc \
+			da_read_bufrssmis.inc \
 			da_read_kma1dvar.inc \
 			da_setup_bufrtovs_structures.inc \
 			da_oma_stats_rad.inc  \

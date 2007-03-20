@@ -37,6 +37,7 @@ module da_radiance1
       type (info_type)        :: info
       type (model_loc_type)   :: loc
 
+      integer   ::  ssmis_subinst
       integer   ::  ifgat, landsea_mask
       integer   ::  scanline, scanpos
       real      ::  satzen, satazi, solzen, solazi  !  satellite and solar angles
@@ -201,6 +202,7 @@ contains
 #include "da_qc_amsub.inc"
 #include "da_qc_hirs.inc"
 #include "da_qc_airs.inc"
+#include "da_qc_ssmis.inc"
 #include "da_write_iv_rad_ascii.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_detsurtyp.inc"

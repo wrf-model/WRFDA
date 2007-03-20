@@ -431,6 +431,7 @@ module da_define_structures
       integer              :: num_rad, nchan, nlevels
       integer              :: nchannels, nfrequencies,nbtout
       integer              :: num_rad_glo
+      integer, pointer     :: ssmis_subinst(:)
       integer, pointer     :: ichan(:)
       logical, pointer     :: proc_domain(:)
       integer, pointer     :: loc_i(:)
