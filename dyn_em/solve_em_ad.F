@@ -1013,7 +1013,7 @@ BENCH_END(exch12)
 end do runge_kutta_looq
 
 
-if (config_flags%mp_physics /= 0) then
+if (config_flags%mp_physics == 0) then
   if (config_flags%specified .or. config_flags%nested) then
     sz = spec_zone
   else
@@ -1031,37 +1031,37 @@ lineno = __LINE__
 BENCH_END(exch13)
 
 BENCH_START(comp13)
-      call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,a_w_2,muts,a_muts,dt_rk,a_u_2,a_v_2,ht,cf1,cf2,cf3,rdx,rdy,msft,ide,jde,&
-&ims,ime,jms,jme,kms,kme,&
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),k_end )
+      call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,&
+                     a_w_2,muts,a_muts,dt_rk,a_u_2,a_v_2,ht,cf1,cf2,cf3,rdx,rdy,msft,ide,jde,&
+                     ims,ime,jms,jme,kms,kme,&
+                     max(grid%i_start(ij),ids+sz),  &
+                     min(grid%i_end(ij),ide-1-sz),    &
+                     max(grid%j_start(ij),jds+sz),  &
+                     min(grid%j_end(ij),jde-1-sz),k_end )
 BENCH_END(comp13)
 
     endif
 
 BENCH_START(comp14)
-    call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
-&rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+    call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,&
+                      a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
+                      rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
+                      max(grid%i_start(ij),ids+sz),  &
+                      min(grid%i_end(ij),ide-1-sz),    &
+                      max(grid%j_start(ij),jds+sz),  &
+                      min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(comp14)
 
     call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                     a_h_diabatic, dtm, ide, jde, kde, &
-&ims, ime, jms, jme, kms, kme, &
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+                    ims, ime, jms, jme, kms, kme, &
+                    max(grid%i_start(ij),ids+sz),  &
+                    min(grid%i_end(ij),ide-1-sz),    &
+                    max(grid%j_start(ij),jds+sz),  &
+                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
-!------------Xiaoyan Zhang add here ---------------
 
 BENCH_START(moist_physics_prep_tim)
-       if(dyn_opt == DYN_EM_tst) then
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &
@@ -1070,29 +1070,32 @@ BENCH_START(moist_physics_prep_tim)
                                    config_flags,fnm, fnp,            &
                                    ids, ide, jds, jde, kds, kde,     &
                                    ims, ime, jms, jme, kms, kme,     &
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+                                   max(grid%i_start(ij),ids+sz),  &
+                                   min(grid%i_end(ij),ide-1-sz),    &
+                                   max(grid%j_start(ij),jds+sz),  &
+                                   min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(moist_physics_prep_tim)
 
-  CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV),a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
-  pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
-  rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme, &
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
+       CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
+                       a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
+                       pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
+                       rainnc,a_rainnc,rainncv,a_rainncv,ims,ime,jms,jme,kms,kme, &
+                       max(grid%i_start(ij),ids+sz),  &
+                       min(grid%i_end(ij),ide-1-sz),    &
+                       max(grid%j_start(ij),jds+sz),  &
+                       min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
 
-     call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
-&pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, p_phy, a_p_phy, z, a_z, z_at_w, a_z_at_w, dz8w, a_dz8w, h_diabatic, a_h_diabatic, fnm, fnp, &
-&ide, jde, kde, ims, ime, jms, jme, kms, kme, &
-        max(grid%i_start(ij),ids+sz),  &
-        min(grid%i_end(ij),ide-1-sz),    &
-        max(grid%j_start(ij),jds+sz),  &
-        min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+       call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, &
+                                     al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
+                                     pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, &
+                                     p_phy, a_p_phy, z, a_z, z_at_w, a_z_at_w, &
+                                     dz8w, a_dz8w, h_diabatic, a_h_diabatic, fnm, fnp, &
+                                     ide, jde, kde, ims, ime, jms, jme, kms, kme, &
+                                     max(grid%i_start(ij),ids+sz),  &
+                                     min(grid%i_end(ij),ide-1-sz),    &
+                                     max(grid%j_start(ij),jds+sz),  &
+                                     min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 
-   endif
 endif
 
 !------------------------------
@@ -4598,7 +4601,6 @@ BENCH_START(comp112)
 !---------------------------------------------------------------------------------------------
   IF (rk_step == 1 ) then
 
- print *, 'xyz---check ad of sfc drag'
  call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u_2, a_u_2, v_2, a_v_2, xland, muu, a_muu, muv, a_muv, z, &
 &a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme,&
   grid%i_start(ij), grid%i_end(ij),                &

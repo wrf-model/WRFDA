@@ -2400,7 +2400,7 @@ BENCH_END(advance_ppt_tim)
 !</pre>
 !</DESCRIPTION>
 
-  IF (config_flags%mp_physics /= 0)  then
+  IF (config_flags%mp_physics == 0)  then
 
    IF( config_flags%specified .or. config_flags%nested ) THEN
      sz = spec_zone
@@ -2408,9 +2408,6 @@ BENCH_END(advance_ppt_tim)
      sz = 0
    ENDIF
 
-   if(dyn_opt == DYN_EM_TST) then
-   !$OMP PARALLEL DO   &
-   !$OMP PRIVATE ( ij, its, ite, jts, jte )
 
    scalar_tile_loop_1a: DO ij = 1 , grid%num_tiles
 
@@ -2432,10 +2429,6 @@ BENCH_START(moist_physics_prep_tim)
                                    its, ite, jts, jte,               &
                                    k_start    , k_end               )
         
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!Xiaoyan Zhang Add Large-Scale Condensation call at 11/20/2006 !!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
         CALL lscond(t_2, p_phy                                         &
                     ,moist_2(ims,kms,jms,P_QV)                         &
                     ,rho, pi_phy,r_v, xlv, cp                          &
@@ -2453,11 +2446,9 @@ BENCH_START(moist_physics_prep_tim)
 
 BENCH_END(moist_physics_prep_tim)
    END DO scalar_tile_loop_1a
-   !$OMP END PARALLEL DO
 
        CALL wrf_debug ( 200 , ' call microphysics_driver' )
 
-   endif
 
        CALL wrf_debug ( 200 , ' call moist_physics_finish' )
 BENCH_START(moist_phys_end_tim)

@@ -1,41 +1,38 @@
 From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrfplus. 
 
- To setup the system (on willow and goldenrain) :
+ To setup the system  :
 
-1, Check out wrfvar trunk
+1, Check out wrfvar trunk (version 2381)
    svn co https://svn-wrf-var.cgd.ucar.edu/trunk wrfvar
 
-2, Check out wrfplus 
+2, Check out wrfplus (version 2391)
    svn co https://svn-wrf-var.cgd.ucar.edu/branches/BR_2005workshop wrfplus
 
-3, Check out wrf trunk
+3, Check out wrf trunk (version 2266)
    svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrf
 
-4, Install WRF_BC (Currently version doesn't need sperately WRF_BC, you can skip this step) 
-   Up to now, there is no a final release version of WRF_BC, so please use my copy which located at ~xinzhang/msswrf/release/@ willow
+4, Subsititue wrf/Registry/Registry.EM with wrfplus/Docs/parallel/wrf/Registry/Registry.EM.r2266
 
-5, Subsititue wrf/Registry/Registry.EM with wrfplus/Docs/parallel/wrf/Registry/Registry.EM
-
-6, Compile wrfvar trunk 
+5, Compile wrfvar trunk 
    cd  wrfvar
    source setup.csh g95/xlf
    ./configure wrfvar (select 1, if you like, you can change the optimization level to O2)
    ./compile wrfvar
 
-7, Compile wrf trunk (use xlf)
+6, Compile wrf trunk (use xlf)
    cd wrf
    ./configure (select 1)
    edit configure.wrf, add -lSystemStubs at the end of LIB
    ./compile wrf
    cp wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
 
-8, Compile wrfplus (use xlf)
+7, Compile wrfplus (use xlf)
    cd wrfplus
    ./configure wrfplus (select 1)
    ./compile wrf (2 times)
    (note: make sure the namelist_script.inc is existed in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
    
-9, Run the testdata 
+8, Run the testdata 
    the test script locate in wrfplus/scripts/da_run_suite_wrapper_test_1pe.ksh
 
 Note: The WRF 4DVAR home directory is REL_DIR  
