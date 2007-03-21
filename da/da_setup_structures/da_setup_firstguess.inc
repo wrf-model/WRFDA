@@ -28,18 +28,18 @@ subroutine da_setup_firstguess(xbx, grid)
          allocate(cos_xls(grid%xp%its:grid%xp%ite))
          allocate(sin_xls(grid%xp%its:grid%xp%ite))
          cos_xls(grid%xp%its:grid%xp%ite) = & 
-            deg_to_rad*cos(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
+            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
          sin_xls(grid%xp%its:grid%xp%ite) = &
-            deg_to_rad*sin(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
+            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jts))
       end if
 
       if (grid%xp%jte == grid%xp%jde) then 
          allocate(cos_xle(grid%xp%its:grid%xp%ite))
          allocate(sin_xle(grid%xp%its:grid%xp%ite))
          cos_xle(grid%xp%its:grid%xp%ite) = &
-            deg_to_rad*cos(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
+            cos(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
          sin_xle(grid%xp%its:grid%xp%ite) = &
-            deg_to_rad*sin(grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
+            sin(deg_to_rad*grid%xlong(grid%xp%its:grid%xp%ite,grid%xp%jte))
       end if
    end if
 
