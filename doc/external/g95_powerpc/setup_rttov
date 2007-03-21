@@ -4,8 +4,9 @@ cd src
 # FC=g95
 # FC77=g95
 # FFLAGS=-O2 -fno-second-underscore
+# Edit Makefile_lib
+# comment out lapack.f from compiled routines
 make clean
-make
-make all
+make lib_basic lib_cld lib_scat
 ranlib librttov8.5.a
-cp librttov8.5.a ../lib/librttov.a
+cp librttov8.5.a ../librttov.a

@@ -6,4 +6,4 @@ rm -f *.a
 make g95
 cp *.mod ../include
 ranlib libCRTM.a
-cp libCRTM.a ../lib/libcrtm.a
+cp libCRTM.a ../libcrtm.a

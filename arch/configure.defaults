@@ -73,7 +73,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -112,7 +112,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -161,7 +161,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -212,7 +212,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -664,7 +664,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 
 CCFLAGS_RSL     =
@@ -702,7 +702,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -750,7 +750,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -800,7 +800,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK5_INC) \
+FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -1583,7 +1583,7 @@ FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
+FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC) -p$(CRTM_INC)
 
 CCFLAGS2        = -UCRAY -Dcrayx1
@@ -1625,7 +1625,7 @@ FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
+FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC)  -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -1680,7 +1680,7 @@ FCDEBUG         = -g
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
+FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC)  -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
@@ -1734,7 +1734,7 @@ FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK5_INC) \
+FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                     -p$(RTTOV_INC) -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 

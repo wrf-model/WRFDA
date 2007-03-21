@@ -3,4 +3,4 @@ cd src
 make clean
 make
 make all
-cp librttov8.5.a ../lib/librttov.a
+cp librttov8.5.a ../librttov.a

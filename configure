@@ -340,10 +340,10 @@ else
   echo "LAPACK not set in environment, assume in standard libraries"
 fi
 
-if [ -n "$FFTPACK5" ] ; then
-  echo "Will use FFTPACK5 in dir: $FFTPACK5"
+if [ -n "$FFTPACK" ] ; then
+  echo "Will use FFTPACK in dir: $FFTPACK"
 else
-  echo "Will configure for use without FFTPACK5"
+  echo "Will configure for use without FFTPACK"
 fi
 
 if [ -n "$BUFR" ] ; then
@@ -416,7 +416,7 @@ if test -n "$PERL" ; then
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE \
-     -lapack=$LAPACK -blas=$BLAS -fftpack5=$FFTPACK5 -bufr=$BUFR
+     -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR
 fi
 
 export CONFIG=configure.wrfvar

@@ -22,7 +22,7 @@ $sw_rttov_path="";
 $sw_crtm_path=""; 
 $sw_blas_path=""; 
 $sw_lapack_path=""; 
-$sw_fftpack5_path=""; 
+$sw_fftpack_path=""; 
 $sw_bufr_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
@@ -78,8 +78,8 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   if ( substr( $ARGV[0], 1, 7 ) eq "lapack=" ) {
     $sw_lapack_path = substr( $ARGV[0], 8 ) ;
   }
-  if ( substr( $ARGV[0], 1, 9 ) eq "fftpack5=" ) {
-    $sw_fftpack5_path = substr( $ARGV[0], 10 ) ;
+  if ( substr( $ARGV[0], 1, 9 ) eq "fftpack=" ) {
+    $sw_fftpack_path = substr( $ARGV[0], 10 ) ;
   }
   if ( substr( $ARGV[0], 1, 5 ) eq "bufr=" ) {
     $sw_bufr_path = substr( $ARGV[0], 6 ) ;
@@ -276,7 +276,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   if ( $sw_rttov_path ) {
     $_ =~ s:CONFIGURE_RTTOV_PATH:$sw_rttov_path:g ;
     $_ =~ s:CONFIGURE_RTTOV_FLAG:-DRTTOV: ;
-    $_ =~ s:CONFIGURE_RTTOV_LIB:-L$sw_rttov_path/lib -lrttov: ;
+    $_ =~ s:CONFIGURE_RTTOV_LIB:-L$sw_rttov_path -lrttov: ;
     $_ =~ s:CONFIGURE_RTTOV_INC:$sw_rttov_path/src: ;
   } else {
     $_ =~ s:CONFIGURE_RTTOV_PATH::g ;
@@ -288,7 +288,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   if ( $sw_crtm_path ) {
     $_ =~ s:CONFIGURE_CRTM_PATH:$sw_crtm_path:g ;
     $_ =~ s:CONFIGURE_CRTM_FLAG:-DCRTM: ;
-    $_ =~ s:CONFIGURE_CRTM_LIB:-L$sw_crtm_path/lib -lcrtm: ;
+    $_ =~ s:CONFIGURE_CRTM_LIB:-L$sw_crtm_path -lcrtm: ;
     $_ =~ s:CONFIGURE_CRTM_INC:$sw_crtm_path/src: ;
   } else {
     $_ =~ s:CONFIGURE_CRTM_PATH::g ;
@@ -309,16 +309,16 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_BUFR_INC:.:g ;
   }
 
-  if ( $sw_fftpack5_path ) {
-    $_ =~ s:CONFIGURE_FFTPACK5_PATH:$sw_fftpack5_path:g ;
-    $_ =~ s:CONFIGURE_FFTPACK5_FLAG:-DFFTPACK5: ;
-    $_ =~ s:CONFIGURE_FFTPACK5_LIB:-L$sw_fftpack5_path -lfftpack5: ;
-    $_ =~ s:CONFIGURE_FFTPACK5_INC:$sw_fftpack5_path: ;
+  if ( $sw_fftpack_path ) {
+    $_ =~ s:CONFIGURE_FFTPACK_PATH:$sw_fftpack_path:g ;
+    $_ =~ s:CONFIGURE_FFTPACK_FLAG:-DFFTPACK: ;
+    $_ =~ s:CONFIGURE_FFTPACK_LIB:-L$sw_fftpack_path -lfftpack: ;
+    $_ =~ s:CONFIGURE_FFTPACK_INC:$sw_fftpack_path: ;
   } else {
-    $_ =~ s:CONFIGURE_FFTPACK5_PATH::g ;
-    $_ =~ s:CONFIGURE_FFTPACK5_FLAG::g ;
-    $_ =~ s:CONFIGURE_FFTPACK5_LIB::g ;
-    $_ =~ s:CONFIGURE_FFTPACK5_INC:.:g ;
+    $_ =~ s:CONFIGURE_FFTPACK_PATH::g ;
+    $_ =~ s:CONFIGURE_FFTPACK_FLAG::g ;
+    $_ =~ s:CONFIGURE_FFTPACK_LIB::g ;
+    $_ =~ s:CONFIGURE_FFTPACK_INC:.:g ;
   }
 
   if ( $sw_blas_path ) {

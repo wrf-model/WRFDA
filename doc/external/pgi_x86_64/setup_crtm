@@ -3,4 +3,4 @@ make clean
 rm -f *.a
 make pgi
 cp *.mod ../include
-cp libCRTM.a ../lib/libcrtm.a
+cp libCRTM.a ../libcrtm.a

@@ -87,32 +87,32 @@ endif
 
 # List options in order of increasing preference
 
-if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}) then
-   setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}) then
+   setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}) then
-   setenv RTTOV ${EXT_DIR}/rttov/rttov85_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/rttov/rttov85/${FC}_${PROCESSOR}) then
+   setenv RTTOV ${EXT_DIR}/rttov/rttov85/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}) then
-   setenv CRTM ${EXT_DIR}/crtm/crtm_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/crtm/CRTM_6_28/${FC}_${PROCESSOR}) then
+   setenv CRTM ${EXT_DIR}/crtm/CRTM_6_28/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}) then
-   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}) then
+   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}) then
-   setenv BLAS ${EXT_DIR}/blas/blas_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}) then
+   setenv BLAS ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}) then
-   setenv LAPACK ${EXT_DIR}/lapack/lapack_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}) then
+   setenv LAPACK ${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}) then
-   setenv FFTPACK5 ${EXT_DIR}/fftpack5/fftpack5_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}) then
+   setenv FFTPACK ${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}) then
-   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco_${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}) then
+   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}) then
-   setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8_${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}) then
+   setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}
 endif
 
 if (-d /usr/lpp/ppe.poe) then
@@ -166,8 +166,8 @@ endif
 if ($?LAPACK) then
    echo "LAPACK          " $LAPACK
 endif
-if ($?FFTPACK5) then
-   echo "FFTPACK5        " $FFTPACK5
+if ($?FFTPACK) then
+   echo "FFTPACK         " $FFTPACK
 endif
 if ($?BUFR) then
    echo "BUFR            " $BUFR
