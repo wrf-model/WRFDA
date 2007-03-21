@@ -101,7 +101,7 @@ if test $MACHINE = "lightning"; then
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
    if test $FC = pgi; then
-      export MPIHOME=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+      export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pgi-6.2-64
    fi
    if test $FC = ifort; then
       . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh

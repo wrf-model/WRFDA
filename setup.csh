@@ -126,7 +126,7 @@ if ( $MACHINE == "lightning" ) then
       setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
    if ( $FC == "pgi" ) then
-      setenv MPIHOME /usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+      setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pgi-6.2-64
    endif
    if ( $FC == "ifort" ) then
       source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
