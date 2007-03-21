@@ -1,3 +1,4 @@
+#!/bin/ksh
 cd src
 make clean
 rm -f *.a

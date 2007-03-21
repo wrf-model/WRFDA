@@ -310,4 +310,4 @@ da_spectral.o da_be_spectral.o :
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) -I$(FFTPACK5_INC) $*.f
+	  $(FC) -c $(FCFLAGS) -I$(FFTPACK_INC) $*.f

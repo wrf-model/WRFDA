@@ -1,0 +1,4 @@
+#!/bin/ksh
+make clean
+make library FC=pathf90 LD=ar LDFLAGS=ru FFLAGS="-O3 -r8" TARGET="libfftpack.a"
+
