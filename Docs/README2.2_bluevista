@@ -9,7 +9,7 @@ From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrf
 2, Check out wrfplus  (version 2392)
    svn co https://svn-wrf-var.cgd.ucar.edu/branches/BR_2005workshop wrfplus
 
-3, Check out wrf trunk (version 2266)
+3, Check out wrf trunk (version 2252)
    svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrf
 
 4, Subsititue wrf/Registry/Registry.EM with wrfplus/Docs/parallel/wrf/Registry/Registry.EM.r2266
