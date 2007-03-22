@@ -128,18 +128,18 @@ subroutine da_qc_ssmis (i, nchan, ob, iv)
             end if
 
          ! relative departure check
-!            if (use_error_factor_rad) then
-!               iv%instid(i)%tb_error(k,n) = &
-!                   satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
-!            else
-!               iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
-!            end if
-!
-!            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
-!                iv%instid(i)%tb_qc(k,n)  = qc_bad
-!                if (iv%instid(i)%proc_domain(n)) &
-!                   nrej_omb_std(k) = nrej_omb_std(k) + 1
-!            end if
+            if (use_error_factor_rad) then
+               iv%instid(i)%tb_error(k,n) = &
+                   satinfo(i)%error_std(k)*satinfo(i)%error_factor(k)
+            else
+               iv%instid(i)%tb_error(k,n) = satinfo(i)%error_std(k)
+            end if
+
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 3.0*iv%instid(i)%tb_error(k,n)) then
+                iv%instid(i)%tb_qc(k,n)  = qc_bad
+                if (iv%instid(i)%proc_domain(n)) &
+                   nrej_omb_std(k) = nrej_omb_std(k) + 1
+            end if
 
          ! final QC decsion
             if (iv%instid(i)%tb_qc(k,n) == qc_bad) then
@@ -163,7 +163,7 @@ subroutine da_qc_ssmis (i, nchan, ob, iv)
 !   call da_proc_sum_int (nrej_topo)
 !   call da_proc_sum_int (nrej_limb)
    call da_proc_sum_ints (nrej_omb_abs(:))
-!   call da_proc_sum_ints (nrej_omb_std(:))
+   call da_proc_sum_ints (nrej_omb_std(:))
    call da_proc_sum_ints (nrej(:))
    call da_proc_sum_ints (ngood(:))
 
@@ -191,8 +191,8 @@ subroutine da_qc_ssmis (i, nchan, ob, iv)
 !      write(fgat_rad_unit,'(a20,i7)') ' nrej_limb        = ', nrej_limb
       write(fgat_rad_unit,'(a20)')    ' nrej_omb_abs(:)  = '
       write(fgat_rad_unit,'(10i7)')     nrej_omb_abs(:)
-!      write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
-!      write(fgat_rad_unit,'(10i7)')     nrej_omb_std(:)
+      write(fgat_rad_unit,'(a20)')    ' nrej_omb_std(:)  = '
+      write(fgat_rad_unit,'(10i7)')     nrej_omb_std(:)
       write(fgat_rad_unit,'(a20)')    ' nrej(:)          = '
       write(fgat_rad_unit,'(10i7)')     nrej(:)
       write(fgat_rad_unit,'(a20)')    ' ngood(:)         = '

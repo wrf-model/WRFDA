@@ -258,6 +258,7 @@ subroutine da_crtm_init(iv,ob)
 
    if ( trim(iv%instid(n)%rttovid_string)=='eos-2-airs' ) cycle ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
+   if ( index(iv%instid(n)%rttovid_string,'ssmis') > 0 ) cycle   ! not implemented
 
   !  new bias coefs files
   !----------------------------------

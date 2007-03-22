@@ -50,14 +50,30 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
                         ' channel-number-of-each-pixel : ', iv%instid(i)%nchan, &
                         ' index-of-channels : '
       write(unit=innov_rad_unit,fmt='(10i5)') iv%instid(i)%ichan
-      write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
+      if ( index(iv%instid(i)%rttovid_string,'ssmis') > 0 ) then
+         write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi ssmis_subinst'
+      else
+         write(unit=innov_rad_unit,fmt=*) ' pixel-info : i date scanpos landsea_mask  elv lat lon  satzen satazi '
+      end if
       write(unit=innov_rad_unit,fmt=*) ' xb-surf-info : i t2m mr2m(ppmv) u10 v10 ps ts smois tslb snowh isflg &
                     & soiltyp vegtyp vegfra elev clwp'
       ndomain = 0
       do n =1,iv%instid(i)%num_rad
          if (iv%instid(i)%proc_domain(n)) then
             ndomain=ndomain+1
-            write(unit=innov_rad_unit,fmt='(a,i7,2x,a,2i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
+            if ( index(iv%instid(i)%rttovid_string,'ssmis') > 0 ) then
+               write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2,i3)') 'INFO : ', ndomain, &
+                                iv%instid(i)%info(n)%date_char, &
+                                iv%instid(i)%scanpos(n),   &
+                                iv%instid(i)%landsea_mask(n), &
+                                iv%instid(i)%info(n)%elv,  &
+                                iv%instid(i)%info(n)%lat,  &
+                                iv%instid(i)%info(n)%lon, &
+                                iv%instid(i)%satzen(n),    &
+                                iv%instid(i)%satazi(n),    &
+                                iv%instid(i)%ssmis_subinst(n)
+            else
+               write(unit=innov_rad_unit,fmt='(a,i7,2x,a,i6,i3,f6.0,4f8.2)') 'INFO : ', ndomain, &
                                 iv%instid(i)%info(n)%date_char, &
                                 iv%instid(i)%scanpos(n),   &
                                 iv%instid(i)%landsea_mask(n), &
@@ -66,6 +82,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
                                 iv%instid(i)%info(n)%lon, &
                                 iv%instid(i)%satzen(n),    &
                                 iv%instid(i)%satazi(n)
+            end if
             if (iv%instid(i)%isflg(n)==0) then
                write(unit=innov_rad_unit,fmt='(a,i7,9f10.2,3i3,f8.3,f10.2,f8.3)') ' SEA : ', n, &
                                 iv%instid(i)%t2m(n), &
