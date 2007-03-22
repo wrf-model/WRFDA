@@ -3,7 +3,7 @@ cd src
 # edit Makefile to have
 # FC=g95
 # FC77=g95
-# FFLAGS=-O2 -fno-second-underscore
+# FFLAGS=-O3 -fno-second-underscore -ftrace=full
 # Edit Makefile_lib
 # comment out lapack.f from compiled routines
 make clean

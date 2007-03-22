@@ -1,3 +1,4 @@
 #!/bin/ksh
 make clean
-make library FC=g95 LD=ar LDFLAGS=ru FFLAGS="-O3 -r8 -fixed-form" TARGET="libfftpack.a"
+make library FC=g95 LD=ar LDFLAGS=ru FFLAGS="-O3 -r8 -ffixed-form" TARGET="libfftpack.a"
+rm *.o
