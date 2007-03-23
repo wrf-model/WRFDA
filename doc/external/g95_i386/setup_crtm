@@ -1,0 +1,8 @@
+#!/bin/ksh
+cd src
+make clean
+rm -f *.a
+make g95
+rm src/*.o
+cp *.mod ../include
+cp libCRTM.a ../libcrtm.a
