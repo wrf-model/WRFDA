@@ -78,8 +78,8 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   if ( substr( $ARGV[0], 1, 7 ) eq "lapack=" ) {
     $sw_lapack_path = substr( $ARGV[0], 8 ) ;
   }
-  if ( substr( $ARGV[0], 1, 9 ) eq "fftpack=" ) {
-    $sw_fftpack_path = substr( $ARGV[0], 10 ) ;
+  if ( substr( $ARGV[0], 1, 8 ) eq "fftpack=" ) {
+    $sw_fftpack_path = substr( $ARGV[0], 9 ) ;
   }
   if ( substr( $ARGV[0], 1, 5 ) eq "bufr=" ) {
     $sw_bufr_path = substr( $ARGV[0], 6 ) ;
