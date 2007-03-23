@@ -10,4 +10,7 @@ make clean
 ./configure
 make all
 make install
-ranlib ../lib/*.a
+rm *.o
+cd ..
+ranlib lib/*.a
+ln -fs lib/*.a .

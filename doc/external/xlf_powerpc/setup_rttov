@@ -3,4 +3,6 @@ cd src
 make clean
 make all
 ranlib librttov8.5.a
-cp librttov8.5.a ../librttov.a
+rm *.o
+cd ..
+ln -fs src/librttov8.5.a librttov.a
