@@ -4,6 +4,7 @@ cd src
 make clean
 rm -f *.a
 make g95
-cp *.mod ../include
 ranlib libCRTM.a
-cp libCRTM.a ../libcrtm.a
+rm *.o
+cd ..
+ln -fs src/libCRTM.a libcrtm.a
