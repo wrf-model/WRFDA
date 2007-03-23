@@ -2729,6 +2729,16 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                      &
                Status )
 
+  ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+
+     CALL collect_real_and_call_pkg ( fcn,                                        &
+               Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
+               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
+               DomainStart , DomainEnd ,                                    &
+               MemoryStart , MemoryEnd ,                                    &
+               PatchStart , PatchEnd ,                                      &
+               Status )
+
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
      CALL collect_int_and_call_pkg ( fcn,                                        &
