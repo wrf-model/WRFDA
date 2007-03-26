@@ -212,7 +212,7 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
             ifov = nint(bfr1bhdr(bufr_ifov)) - ifovoff
             if (ifov > nscan) then
                write(unit=message(1),fmt=*)  &
-                    'READ_SSMIS(',subinst,'): unreliable FOV number =',  &
+                    'READ_SSMIS(',subinst(k),'): unreliable FOV number =',  &
                     bfr1bhdr(bufr_ifov), ' ifov=',ifov
                call da_warning(__FILE__,__LINE__,message(1:1))
                cycle read_loop
@@ -279,29 +279,37 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
                bch = nint(bufrtbb(1,jch))     !ch index from bufr
                tb_inv(jch) = bufrtbb(2,jch)
                if (tb_inv(jch) < tbmin .or. tb_inv(jch) > tbmax .or. bch /= jch) then
-                   tb_inv(k) = missing_r
+                   tb_inv(jch) = missing_r
                end if
             end do
 
-            !  4.0   assign information to sequential radiance structure
-            !--------------------------------------------------------------------------
-            allocate (p % tb_inv (1:maxchanl))
-            p%info                = info
-            p%loc                 = loc
-            p%ssmis_subinst       = k
-!            p%landsea_mask        = landsea_mask
-            p%scanline            = slnm
-            p%scanpos             = ifov
-            p%satzen              = incangl
-!            p%satazi              = satazi
-!            p%solzen              = solzen
-            p%tb_inv(1:maxchanl)  = tb_inv(1:maxchanl)
-            p%sensor_index        = inst
-            p%ifgat               = ifgat
+            if ( maxval(tb_inv(:)) > missing_r ) then
 
-            allocate (p%next)   ! add next data
-            p => p%next
-            nullify (p%next)
+               !  4.0   assign information to sequential radiance structure
+               !--------------------------------------------------------------------------
+               allocate (p % tb_inv (1:maxchanl))
+               p%info                = info
+               p%loc                 = loc
+               p%ssmis_subinst       = k
+!               p%landsea_mask        = landsea_mask
+               p%scanline            = slnm
+               p%scanpos             = ifov
+               p%satzen              = incangl
+!               p%satazi              = satazi
+!               p%solzen              = solzen
+               p%tb_inv(1:maxchanl)  = tb_inv(1:maxchanl)
+               p%sensor_index        = inst
+               p%ifgat               = ifgat
+
+               allocate (p%next)   ! add next data
+               p => p%next
+               nullify (p%next)
+
+            else
+
+               num_ssmis_local = num_ssmis_local - 1
+
+            end if
 
          end do read_loop
 
