@@ -1,9 +1,12 @@
 #!/bin/ksh
+export AR="ar -ru"
+export FC=pgf90
 export CC=gcc
-export FFC=pgf90
-export FFCFLAGS="-O2 -r8"
-export CCFLAGS="-DUNDERSCORE"
-export CPPFLAGS="-C -P -traditional -DLINUX -Dlinux"
-rm *.a
-make clean
-make all
+export FCFLAGS="-O2 -r8"
+export CCFLAGS="-O2 -DUNDERSCORE"
+rm -f *.o *.a
+$FC -c $FCFLAGS *.f
+$CC -c $CCFLAGS *.c
+$AR libbufr.a *.o
+rm *.o
+

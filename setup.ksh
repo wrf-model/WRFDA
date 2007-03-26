@@ -40,10 +40,10 @@ else
    fi
 fi
 
-# Bloody Unix people can't even report processor class properly
+# Unix people can't report processor class properly
 # across different machines or between ksh/bash on Linux
 # They all need their heads banged together
-# This kludge should give powerpc/i686
+# This kludge should give powerpc/i686/i386(for intel Mac)
 
 if test `uname` = "AIX"; then
    # Thanks Aix for reporting a hex string with -m, when
@@ -101,7 +101,7 @@ if test $MACHINE = "lightning"; then
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
    if test $FC = pgi; then
-      export MPIHOME=/usr/local/mpich-gm/mpichgm-1.2.6..14a-64
+      export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pgi-6.2-64
    fi
    if test $FC = ifort; then
       . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh
