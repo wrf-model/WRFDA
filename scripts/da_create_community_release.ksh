@@ -12,4 +12,5 @@ cat > da/da_radiance/da_crtm.f90 <<EOF
 module da_crtm
 end module da_crtm
 EOF
+rm -rf run/*hirs* run/*eos-2* run/*airs* run/*amsub*
 
