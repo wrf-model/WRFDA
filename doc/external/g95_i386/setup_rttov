@@ -10,5 +10,5 @@ make clean
 make lib_basic lib_cld lib_scat
 ranlib librttov8.5.a
 rm *.o
-cd -
+cd ..
 ln -fs src/librttov8.5.a librttov.a
