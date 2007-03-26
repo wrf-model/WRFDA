@@ -77,12 +77,12 @@ export LONG_FCST_RANGE_4=72
 export REL_DIR=/rap/datc/demirtas/code
 export DAT_DIR=/ptmp/demirtas/data
 #export DAT_DIR=/rap/datc/data
-export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG
+export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 #smoke:
 #export REL_DIR=/smoke/dmbarker/code/trunk/Vtable.AGRWRF
 #export DAT_DIR=/smoke/dmbarker/data
-#export WPS_GEOG_DIR=/smoke/dmbarker/data/geog
+#export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
