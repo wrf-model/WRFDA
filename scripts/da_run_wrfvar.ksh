@@ -25,11 +25,11 @@ export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
+export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
 export EXPT=${EXPT:-test}
 export DOMAIN=${DOMAIN:-01}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
 
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/wrfvar}
