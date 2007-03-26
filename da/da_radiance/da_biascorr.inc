@@ -32,9 +32,11 @@ subroutine da_biascorr ( i, ob, iv)
          call da_predictor_rttov(pred(1:npred), npred, iv%instid(i)%t(1:43,n), &
             q(1:43), iv%instid(i)%ts(n))
         else if (rtm_option==rtm_option_crtm) then
+#ifdef CRTM
          call da_predictor_crtm(pred(1:npred), npred, nlevels,iv%instid(i)%tm(1:nlevels,n), &
             iv%instid(i)%qm(1:nlevels,n), iv%instid(i)%ts(n), &
             iv%instid(i)%pm(1:nlevels,n),iv%instid(i)%pf(0:nlevels,n))
+#endif
         end if
         iscan = iv%instid(i)%scanpos(n)
         iband = floor(iv%instid(i)%info(n)%lat/10.0001) + 10

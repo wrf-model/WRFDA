@@ -39,7 +39,9 @@ module da_radiance
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr
+#ifdef CRTM
    use da_crtm, only : da_crtm_init
+#endif
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       airsr_type,info_type, model_loc_type

@@ -25,7 +25,9 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
     end if
 
     if (rtm_option == rtm_option_crtm) then
+#ifdef CRTM
        call da_crtm_init(iv,ob)
+#endif
     end if
 
    !-------------------------------------------------------------------

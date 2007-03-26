@@ -196,7 +196,10 @@ contains
 #include "da_biasprep.inc"
 #include "da_write_biasprep.inc"
 #include "da_predictor_rttov.inc"
+#ifdef CRTM
 #include "da_predictor_crtm.inc"
+#include "da_qc_crtm.inc"
+#endif
 #include "da_qc_amsua.inc"
 #include "da_qc_amsub.inc"
 #include "da_qc_hirs.inc"
@@ -209,7 +212,6 @@ contains
 #include "da_print_stats_rad.inc"
 #include "da_get_time_slots.inc"
 #include "da_qc_rad.inc"
-#include "da_qc_crtm.inc"
 #include "da_get_julian_time.inc"
 
 end module da_radiance1

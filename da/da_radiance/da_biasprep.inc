@@ -53,9 +53,11 @@ subroutine da_biasprep(inst,ob,iv)
          call da_predictor_rttov(pred(1:npred), npred, iv%instid(inst)%t(1:43,n), &
             q(1:43), iv%instid(inst)%ts(n))
         else if (rtm_option==rtm_option_crtm) then
+#ifdef CRTM
          call da_predictor_crtm(pred(1:npred), npred, nlevels,iv%instid(inst)%tm(1:nlevels,n), &
             iv%instid(inst)%qm(1:nlevels,n), iv%instid(inst)%ts(n), &
             iv%instid(inst)%pm(1:nlevels,n),iv%instid(inst)%pf(0:nlevels,n))
+#endif
         end if
 
          ! transfer information to bias structure

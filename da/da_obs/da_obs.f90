@@ -19,9 +19,11 @@ module da_obs
       pseudo_err,obs_qc_pointer,myproc,rtm_option,rtm_option_rttov, &
       use_crtm_kmatrix,use_crtm_kmatrix_fast, rtm_option_crtm,use_rad, &
       ob_format,ob_format_ascii,filename_len  
+#ifdef CRTM
    use da_crtm, only : da_transform_xtoy_crtmk_f,da_transform_xtoy_crtm, &
       da_transform_xtoy_crtmk,da_transform_xtoy_crtm_adj, &
       da_transform_xtoy_crtmk_f_adj, da_transform_xtoy_crtmk_adj
+#endif
    use da_geoamv, only : da_transform_xtoy_geoamv, da_transform_xtoy_geoamv_adj
    use da_gpspw, only : da_transform_xtoy_gpspw,da_transform_xtoy_gpspw_adj
    use da_gpsref, only : da_transform_xtoy_gpsref,da_transform_xtoy_gpsref_adj
