@@ -1,7 +1,8 @@
 #!/bin/ksh
-export CPPFLAGS="-C -P -traditional"
-export FFC=ifort
-export FFCFLAGS="-O2 -r8"
-rm *.a
-make clean
-make all
+export AR="ar -ru"
+export FC=ifort
+export FCFLAGS="-O2 -r8"
+rm -f *.o *.a
+$FC -c $FCFLAGS *.f
+$AR libblas.a *.o
+

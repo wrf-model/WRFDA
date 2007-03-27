@@ -1,8 +1,12 @@
-export CPP=/usr/bin/cpp
-export BLAS=../../blas/blas_g95_powerpc
-export FFCFLAGS="-O2 -r8  -ffloat-store"
-export FFC=g95
-export FC=g95
-rm *.a
+#!/bin/ksh
+# cp INSTALL/make.inc.LINUX make.inc
+# Edit make.inc
+# Change FORTRAN and LOADER to 'g95'
+# Change OPTS to '-O2 -r8 -ffloat-store'
 make clean
-make
+make lib
+rm SRC/*.o
+ranlib lapack_LINUX.a
+ranlib tmglib_LINUX.a
+ln -fs lapack_LINUX.a liblapack.a
+ln -fs tmglib_LINUX.a libtmg.a

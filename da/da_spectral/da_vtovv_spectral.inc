@@ -107,10 +107,10 @@ subroutine da_vtovv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
          r_fou(index_c) = aimag(v_fou(j,m))
       end do
  
-#ifdef FFTPACK5
+#ifdef FFTPACK
       call rfft1b(ide, inc, r_fou, lenr, wsave, lensav, work, lenwrk, ierr)
 #else
-      call da_error(__FILE__,__LINE__,(/"Must compile with FFTPACK5"/))
+      call da_error(__FILE__,__LINE__,(/"Must compile with FFTPACK"/))
 #endif
       field(its:ite,j) = r_fou(its:ite)
    end do

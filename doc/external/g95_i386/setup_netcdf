@@ -9,9 +9,9 @@ export F90='g95'
 export FFLAGS='-O2 -fno-second-underscore'
 export F90FLAGS='-O2 -fno-second-underscore'
 
-make clean
+#make clean
 ./configure
-make
+make check
 make install
 cd ..
 ln -s lib/*.a .

@@ -289,7 +289,7 @@ da_tools.o :
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) -I$(LAPACK_INC) -I$(BLAS_INC) $*.f
+	  $(FC) -c $(FCFLAGS) $*.f
 
 module_radiance.o da_radiance.o :
 	@ $(RM) $@
@@ -310,4 +310,4 @@ da_spectral.o da_be_spectral.o :
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS) -I$(FFTPACK5_INC) $*.f
+	  $(FC) -c $(FCFLAGS) -I$(FFTPACK_INC) $*.f

@@ -1,6 +1,14 @@
-export BLAS=../../blas/blas_pgi_i686
-export FFCFLAGS="-O2 -r8"
-export FFC=pgf90
-rm *.a
+#!/bin/ksh
+# cp INSTALL/make.inc.LINUX make.inc
+# Edit make.inc
+# Change FORTRAN and LOADER to 'pgf90'
+# Change OPTS to '-O3 -r8'
 make clean
-make
+make lib
+rm SRC/*.o
+ranlib lapack_LINUX.a
+ranlib tmglib_LINUX.a
+ln -fs lapack_LINUX.a liblapack.a
+ln -fs tmglib_LINUX.a libtmg.a
+
+

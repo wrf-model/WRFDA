@@ -1,10 +1,11 @@
 #!/bin/ksh
-export CPP=/usr/bin/cpp
+export AR="ar -ru"
+export FC=g95
 export CC=gcc
-export FFC=g95
-export FFCFLAGS="-O2 -r8 -fno-second-underscore"
-export CCFLAGS="-DUNDERSCORE"
-export CPPFLAGS="-C -P -traditional -DLINUX -Dlinux"
-rm *.a
-make clean
-make all
+export FCFLAGS="-O3 -r8 -fno-second-underscore"
+export CCFLAGS="-O3 -DUNDERSCORE"
+rm -f *.o *.a
+$FC -c $FCFLAGS *.f
+$CC -c $CCFLAGS *.c
+$AR libbufr.a *.o
+rm -rf *.o

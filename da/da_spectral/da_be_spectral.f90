@@ -3,11 +3,6 @@ module da_be_spectral
    use da_control, only : trace_use, trace_use_frequent,da_zero_complex,ierr, &
       pi,gaussian_lats
    use da_reporting, only : da_error,message
-#ifdef FFTPACK5
-#ifndef crayx1
-   use fftpack5, only : rfft1f,rfft1i
-#endif
-#endif
    use da_tools1, only : da_free_unit, da_get_unit
 
    !--------------------------------------------------------------------

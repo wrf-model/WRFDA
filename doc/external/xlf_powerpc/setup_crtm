@@ -3,7 +3,8 @@ export FC_EXTRA_FLAGS=-O2
 cd src
 make clean
 rm -f *.a
-make g95
-cp *.mod ../include
+make ibm
+rm *.o
 ranlib libCRTM.a
-cp libCRTM.a ../lib/libcrtm.a
+cd ..
+ln -fs src/libCRTM.a libcrtm.a
