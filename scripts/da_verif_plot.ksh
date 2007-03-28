@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -x
 #===========================================
 RUN_DIR=/ptmp/rizvi/test_verif_plot
 DIAG_DIR=/ptmp/rizvi/data/t44    

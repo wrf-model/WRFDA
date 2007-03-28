@@ -15,8 +15,6 @@
 #
 #########################################################################
 
-set echo
-
 #########################################################################
 # Ideally, you should not need to change the code below, but if you 
 # think it necessary then please email wrfhelp@ucar.edu with details.
