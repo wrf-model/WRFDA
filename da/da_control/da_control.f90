@@ -100,9 +100,12 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: bufr_landsea_mask   = 14
 
    integer, parameter :: nchan_amsua = 15
+   integer, parameter :: nchan_amsub = 5
+   integer, parameter :: nchan_mhs = 5
    integer, parameter :: nchan_msu = 4
    integer, parameter :: nchan_hirs2 = 19
    integer, parameter :: nchan_hirs3 = 19
+   integer, parameter :: nchan_hirs4 = 19
 
    ! WRFVAR Minimisation:
 

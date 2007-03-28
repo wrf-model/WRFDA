@@ -114,7 +114,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       sensor_id    =  1
       step   = 9.474_r_kind
       start  = -47.37_r_kind
-      nchan=nchan_amsua
+      nchan=nchan_msu
       subfgn='NC021022'
       rato=1.1363987_r_kind
    else if (amsua) then
@@ -127,7 +127,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       sensor_id    =  4
       step   = 1.1_r_kind
       start  = -48.95_r_kind
-      nchan=5
+      nchan=nchan_amsub
       subfgn='NC021024'
    end if
 
@@ -142,6 +142,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    if (iost /= 0) then
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open file "//trim(infile)/))
+      call da_trace_exit("da_read_bufrtovs")
       return
    end if
 
