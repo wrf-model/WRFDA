@@ -1,9 +1,11 @@
 #!/bin/ksh
 # edit src/Makefile and add around line 45 the lines
 # FC77=ftn
-# FFLAGS=-f free -sreal64 -dp -eh
+# FFLAGS=-f free -sreal64 -dp -eh -O2
 cd src
 make clean
 make 
 make all
-cp librttov8.5.a ../librttov.a
+rm *.o
+cd ..
+ln -fs src/librttov8.5.a librttov.a

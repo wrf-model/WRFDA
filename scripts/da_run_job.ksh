@@ -90,14 +90,16 @@ elif test $SUBMIT = "PBS"; then
    if test $TEMP -gt 4; then
       TEMP=4
    fi
+   typeset -L15 JOBNAME=${REGION}_${EXPT}
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
 # PBS batch script
 #
-##PBS -N ${REGION}_${EXPT}
+#PBS -N JOBNAME
 ##PBS -q $QUEUE
 #PBS -l mppe=$NUM_PROCS
+#PBS -l walltime=$WALLCLOCK
 #PBS -o job.output
 #PBS -e job.error
 #PBS -V
@@ -127,7 +129,6 @@ elif test $SUBMIT = none; then
    fi
    cat > job.ksh <<EOF
 #!/bin/ksh
-set -x
 # Cannot put - options inside default substitution
 export RUN_CMD_DEFAULT="$RUN_CMD_DEFAULT"
 export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
@@ -155,7 +156,6 @@ if test $SUBMIT = "LoadLeveller"; then
 elif test $SUBMIT = "LSF"; then 
    bsub < $PWD/job.ksh
 elif test $SUBMIT = "PBS"; then 
-set -x
    qsub $PWD/job.ksh
 else
    ./job.ksh

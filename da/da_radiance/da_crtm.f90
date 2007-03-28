@@ -27,7 +27,10 @@ module da_crtm
    use da_define_structures, only : y_type, ob_type
    use da_interpolation, only : da_interp_lin_2d,da_interp_lin_2d_adj
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
-      da_qc_rad, da_qc_crtm, da_get_time_slots,da_biasprep,da_read_biascoef
+      da_qc_rad, da_get_time_slots,da_biasprep,da_read_biascoef
+#ifdef CRTM
+   use da_radiance1, only : da_qc_crtm
+#endif
 
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit
