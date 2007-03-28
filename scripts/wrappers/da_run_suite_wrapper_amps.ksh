@@ -46,15 +46,7 @@ export CLEAN=${CLEAN:-true}
 export LSF_EXCLUSIVE=" "
 export NUM_PROCS=1
 export NUM_PROCS=16
-export QUEUE=premium
-#export QUEUE=share
-export PROJECT_ID=68000001
-#export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=360
-#export LSF_MAX_RUNTIME=10
-export LL_PTILE=16
-#export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME" 
-#export RUN_CMD=mpirun.lsf
+export PROJECT=68000001
 
 #Time info:
 export INITIAL_DATE=2006101000

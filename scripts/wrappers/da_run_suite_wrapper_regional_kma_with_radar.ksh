@@ -17,11 +17,8 @@
 #[1] Decide Batch Job Specifications first
 #########################################################################
 export NUM_PROCS=18
-export QUEUE=regular
-export LSF_MAX_RUNTIME=15
-export SUBMIT_OPTIONS1="#BSUB -P 64000420"
-export SUBMIT_OPTIONS2="#BSUB -W ${LSF_MAX_RUNTIME}"
-export SUBMIT_OPTIONS3="#BSUB -q ${QUEUE}"
+export WALLCLOCK=15
+export PROJECT=64000420
 #-----------------------------------------------------------------------
 #  Here Fix the Dates
 #-----------------------------------------------------------------------

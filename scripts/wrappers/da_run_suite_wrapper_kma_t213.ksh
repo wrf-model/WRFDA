@@ -1,22 +1,17 @@
 #!/bin/ksh
 
 #########################################################################
-export SUBMIT_OPTIONS1="#BSUB -P 64000420"
-export SUBMIT_OPTIONS2="#BSUB -W 60"
-export SUBMIT_OPTIONS3="#BSUB -q share"
 
 export LSF_EXCLUSIVE="-x"
 export NUM_PROCS=8
-export QUEUE=premium
-#export QUEUE=regular
-export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=60
-export LL_PTILE=2
+export PROJECT=64000420
+export WALLCLOCK=60
+export LSF_PTILE=2
 
 
 export ID=${ID:-trunk_xlf_bluesky}
 
-export EXPT=run${LL_PTILE}_${NUM_PROCS}_kma_2007020100          
+export EXPT=run${LSF_PTILE}_${NUM_PROCS}_kma_2007020100          
 
 export REL_DIR=/mmm/users/rizvi/code
 export DAT_DIR=/ptmp/rizvi/data    
