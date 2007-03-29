@@ -12,7 +12,6 @@
 #export FCST_RANGE=12
 #export EXPT=noda
 #export NUM_MEMBERS=30
-#export RUN_CMD=" "
 #export REL_DIR=/smoke/dmbarker/code/trunk
 #export DAT_DIR=/smoke/dmbarker/data
 #export FILE_TYPE=wrf_3dvar_input
@@ -29,7 +28,11 @@ export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}                              # Experiment name.
 export NUM_MEMBERS=${NUM_MEMBERS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
+fi
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}

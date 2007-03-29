@@ -123,9 +123,9 @@ $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 elif test $SUBMIT = none; then
    if test -f $HOSTS; then
-      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS -machinefile $HOSTS"
+      export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS -machinefile $HOSTS"
    else
-      export RUN_CMD_DEFAULT="mpirun -v -np $NUM_PROCS"
+      export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS"
    fi
    cat > job.ksh <<EOF
 #!/bin/ksh

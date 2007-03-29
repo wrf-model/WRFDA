@@ -21,12 +21,11 @@ export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
 if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
 else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -all-local}
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
 fi
 export CLEAN=${CLEAN:-false}
-echo 'This is RUN_CMD:' $RUN_CMD
 
 # Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}

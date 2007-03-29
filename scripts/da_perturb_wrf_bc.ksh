@@ -29,7 +29,11 @@ export EXPT=${EXPT:-test}                              # Experiment name.
 export NUM_PROCS=${NUM_PROCS:-1}
 export MEM=${MEM:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
+fi
 export CLEAN=${CLEAN:-false}
 
 #Directories:

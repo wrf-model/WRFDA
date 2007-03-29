@@ -33,7 +33,11 @@ export NUM_PROCS=${NUM_PROCS:-1}
 export NUM_MEMBERS=${NUM_MEMBERS:-1}
 export NUM_JOBS=${NUM_JOBS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -nolocal -machinefile $HOSTS}
+if test -f $HOSTS; then
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
+else
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
+fi
 export CLEAN=${CLEAN:-false}
 export RUN_GEOGRID=${RUN_GEOGRID:-true}
 export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
