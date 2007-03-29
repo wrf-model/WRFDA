@@ -1,4 +1,4 @@
-subroutine da_read_bufrtovs (obstype,iv,xp,infile)
+subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
@@ -18,7 +18,10 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    character(5)      ,  intent (in)  :: obstype
    character(20)     ,  intent (in)  :: infile
    type (xpose_type) ,  intent (in)  :: xp
+   type (xb_type)    ,  intent (in)  :: xb
    type (ob_type)    ,  intent (inout) :: iv
+   type (domain)     ,  intent (inout) :: grid
+
 
 #ifdef BUFR
 
@@ -28,17 +31,22 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    integer(i_kind),parameter:: n1bhdr=14
    integer(i_kind),parameter:: maxinfo=12
    integer(i_kind),parameter:: maxchanl=100
+   real(r_kind),   parameter:: r360=360.0_r_kind
+   real(r_kind),   parameter:: r999=999.0_r_kind
 
-   logical hirs2,hirs3,msu,amsua,amsub
-   logical outside, outside_all
+   logical hirs2,hirs3,hirs4,msu,amsua,amsub,mhs
+   logical outside, outside_all, iuse
    integer :: inst
 
    character(10) date
    character(8) subset,subfgn
    character(80) hdr1b
-
    integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
    integer(i_kind) iret,idate,im,iy,nchan
+   integer(i_kind) istart,iend,jstart,jend,j
+   integer(i_kind) itt,ithin,itx
+   real(r_kind) terrain,timedif,crit,dist
+   real(r_kind) dlon_earth,dlat_earth
 
    real(r_kind) tbmin,tbmax, tbbad
    real(r_kind) panglr,rato
@@ -48,7 +56,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    real(r_double),dimension(maxinfo+maxchanl):: data1b8
    real(r_double),dimension(n1bhdr):: bfr1bhdr
 
-   !  type bright_temperature
    ! Instrument triplet, follow the convension of RTTOV 
    integer   :: platform_id, satellite_id, sensor_id
 
@@ -93,9 +100,11 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    hirs2=     obstype == 'hirs2'
    hirs3=     obstype == 'hirs3'
+   hirs4=     obstype == 'hirs4'
    msu=       obstype == 'msu  '
    amsua=     obstype == 'amsua'
    amsub=     obstype == 'amsub'
+   mhs=       obstype == 'mhs  '
 
    if (hirs2) then
       sensor_id    =  0
@@ -132,6 +141,33 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    end if
 
    allocate (tb_inv(nchan))
+
+   ! Make thinning grids
+   !----------------------
+   !call init_rad
+   !call radinfo_read
+
+   rlat_min =  r999
+   rlat_max = -r999
+   rlon_min =  r999
+   rlon_max = -r999
+
+   istart=grid%i_start(1)
+   iend  =grid%i_end  (1)
+   jstart=grid%j_start(1)
+   jend  =grid%j_end  (1)
+
+   do i = istart, iend
+      do j = jstart, jend
+       rlat_min=min(rlat_min, xb%lat(i,j))
+       rlon_min=min(rlon_min, xb%lon(i,j))
+       rlat_max=max(rlat_max, xb%lat(i,j))
+       rlon_max=max(rlon_max, xb%lon(i,j))
+      enddo
+   enddo
+
+   call makegvals (obstype,thinning_mesh)
+   call makegrids (thinning_mesh)
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -286,6 +322,30 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
             exit obs
          end if
          if (outside) cycle ! No good for this PE
+
+        !  Make Thinning
+        !  Map obs to thinning grid
+        !-------------------------------------------------------------------
+         dlat_earth = info%lat
+         dlon_earth = info%lon
+         if(dlon_earth<zero)  dlon_earth = dlon_earth+r360
+         if(dlon_earth>=r360) dlon_earth = dlon_earth-r360
+         dlat_earth = dlat_earth*deg2rad
+         dlon_earth = dlon_earth*deg2rad           
+         timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
+         terrain = 0.01_r_kind*abs(bfr1bhdr(13))
+         crit = 0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+         call map2tgrid(dlat_earth,dlon_earth,dist,crit,itx,ithin,itt,iuse)
+         if(.not. iuse)cycle
+        !  Determine surface properties based on
+        !  sst and land/sea/ice mask
+
+           !call deter_sfc(xb%snow,xb%xice,xb%tgrn,dlon,dlat, &
+           !iend-1,jend-1,isflg,sfcpct,sstx)
+           !crit1 = crit1 + rlndsea(isflg)
+
+           !call checkob(dist1,crit1,itx,iuse)
+           !if(.not. iuse)cycle
 
          num_tovs_local = num_tovs_local + 1
          nread(inst) = nread(inst) + 1

@@ -4,7 +4,7 @@ module da_radiance
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
    use module_radiance, only : satinfo, coefs_scatt_instname, &
       time_slots, &
       i_kind,r_kind, r_double, &
@@ -70,6 +70,8 @@ module da_radiance
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
+   use gsi_thinning
+   !use radinfo
 
    implicit none
    

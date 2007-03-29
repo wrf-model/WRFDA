@@ -1,4 +1,4 @@
-subroutine da_setup_bufrtovs_structures( xp, ob, iv )
+subroutine da_setup_bufrtovs_structures( xb, grid, xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of tovs raidance observation structure.
@@ -6,9 +6,11 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 
    implicit none
 
+   type (xb_type)   , intent (in)  :: xb
    type (xpose_type), intent(in)   :: xp         ! Domain decomposition vars.
    type ( y_type), intent(inout)   :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
+   type (domain) ,  intent (inout) :: grid
 
    character(len=200)           :: filename
    integer                     :: i, j, n, ios
@@ -36,35 +38,35 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
       write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs2.bufr'
       filename = ' '
       write(filename(1:10), fmt='(a)') 'hirs2.bufr'
-      call da_read_bufrtovs ('hirs2', iv, xp, filename)
+      call da_read_bufrtovs ('hirs2', iv, xb, grid, xp, filename)
    end if
 
    if (use_msuobs) then
       filename = ' '
       write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from msu.bufr'
       write(filename(1:8), fmt='(a)') 'msu.bufr'
-      call da_read_bufrtovs ('msu  ', iv, xp, filename)
+      call da_read_bufrtovs ('msu  ', iv, xb, grid, xp, filename)
    end if
 
    if (use_hirs3obs) then
       write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from hirs3.bufr'
       filename = ' '
       write(filename(1:10), fmt='(a)') 'hirs3.bufr'
-      call da_read_bufrtovs('hirs3', iv, xp, filename)
+      call da_read_bufrtovs('hirs3', iv, xb, grid, xp, filename)
    end if
 
    if (use_amsuaobs) then
       write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from amsua.bufr'
       filename = ' '
       write(filename(1:10), fmt='(a)') 'amsua.bufr'
-      call da_read_bufrtovs ('amsua', iv, xp, filename)
+      call da_read_bufrtovs ('amsua', iv, xb, grid, xp, filename)
    end if
 
    if (use_amsubobs) then
       write(unit=stdout,fmt='(a)') 'Reading radiance 1b data from amsub.bufr'
       filename = ' '
       write(filename(1:10), fmt='(a)') 'amsub.bufr'
-      call da_read_bufrtovs ('amsub', iv, xp, filename)
+      call da_read_bufrtovs ('amsub', iv, xb, grid, xp, filename)
    end if
 
    if (use_airsobs) then

@@ -4,7 +4,7 @@ module da_setup_structures
    ! Purpose: Sets up various structures.
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xb_type, xpose_type, ep_type, x_type
+   use module_domain, only : xb_type, xpose_type, ep_type, x_type, domain
 
    use da_define_structures, only : xbx_type,be_subtype, be_type, y_type, &
       ob_type,da_allocate_background_errors,da_allocate_observations
