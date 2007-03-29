@@ -144,6 +144,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
    ! Make thinning grids
    !----------------------
+  if (use_thinning) then
    !call init_rad
    !call radinfo_read
 
@@ -168,6 +169,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
    call makegvals (obstype,thinning_mesh)
    call makegrids (thinning_mesh)
+  end if
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -326,6 +328,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
         !  Make Thinning
         !  Map obs to thinning grid
         !-------------------------------------------------------------------
+        if (use_thinning) then
          dlat_earth = info%lat
          dlon_earth = info%lon
          if(dlon_earth<zero)  dlon_earth = dlon_earth+r360
@@ -346,6 +349,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
            !call checkob(dist1,crit1,itx,iuse)
            !if(.not. iuse)cycle
+        end if
 
          num_tovs_local = num_tovs_local + 1
          nread(inst) = nread(inst) + 1
