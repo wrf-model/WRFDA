@@ -17,6 +17,8 @@ export CPPFLAGS=
 
 export LD=mpif90
 export LDFLAGS=
+
+export RSHCOMMAND=ssh
 make clean
 ./configure
 make

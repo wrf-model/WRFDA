@@ -14,4 +14,4 @@ make clean
 make
 make install
 cd ..
-ln -s lib/*.a .
+ln -fs lib/*.a .

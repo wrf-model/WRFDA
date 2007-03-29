@@ -5,3 +5,4 @@ export FCFLAGS="-O2 -r8 -ffloat-store"
 rm -f *.o *.a
 $FC -c $FCFLAGS *.f
 $AR libblas.a *.o
+rm *.o

@@ -8,4 +8,5 @@ rm -f *.o *.a
 $FC -c $FCFLAGS *.f
 $CC -c $CCFLAGS *.c
 $AR libbufr.a *.o
+rm *.o
 
