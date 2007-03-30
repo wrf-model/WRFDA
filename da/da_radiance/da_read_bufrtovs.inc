@@ -142,6 +142,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    if (iost /= 0) then
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open file "//trim(infile)/))
+      call da_free_unit(lnbufr)
       call da_trace_exit("da_read_bufrtovs")
       return
    end if
@@ -527,9 +528,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !    write (unit=stdout,fmt=*)  i, p%tb_inv(1:nchan)
    !    p => p%next
    ! end do
-
-   close(lnbufr)
-   call da_free_unit(lnbufr)
 
    call da_trace_exit("da_read_bufrtovs")
 #endif
