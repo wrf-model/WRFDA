@@ -70,7 +70,9 @@ module da_radiance
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
-   use gsi_thinning
+   use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max, &
+                            makegvals,makegrids,map2tgrid
+                            
    !use radinfo
 
    implicit none

@@ -31,8 +31,6 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    integer(i_kind),parameter:: n1bhdr=14
    integer(i_kind),parameter:: maxinfo=12
    integer(i_kind),parameter:: maxchanl=100
-   real(r_kind),   parameter:: r360=360.0_r_kind
-   real(r_kind),   parameter:: r999=999.0_r_kind
 
    logical hirs2,hirs3,hirs4,msu,amsua,amsub,mhs
    logical outside, outside_all, iuse
@@ -43,6 +41,8 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    character(80) hdr1b
    integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
    integer(i_kind) iret,idate,im,iy,nchan
+
+! thinning variables
    integer(i_kind) istart,iend,jstart,jend,j
    integer(i_kind) itt,ithin,itx
    real(r_kind) terrain,timedif,crit,dist
@@ -166,6 +166,8 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
        rlon_max=max(rlon_max, xb%lon(i,j))
       enddo
    enddo
+   write(6,'(a,4i5)') 'istart iend jstart jend', istart,iend,jstart,jend
+   write(6,'(a,4f8.3)') 'rlat_min rlat_max rlon_min rlon_max', rlat_min, rlat_max, rlon_min, rlon_max
 
    call makegvals (obstype,thinning_mesh)
    call makegrids (thinning_mesh)
