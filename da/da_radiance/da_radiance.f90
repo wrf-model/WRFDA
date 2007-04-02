@@ -71,7 +71,7 @@ module da_radiance
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
    use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max, &
-                            makegvals,makegrids,map2tgrid
+                            makegvals,makegrids,map2tgrid,finalcheck,destroygrids
                             
    !use radinfo
 

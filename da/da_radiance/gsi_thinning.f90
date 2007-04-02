@@ -30,9 +30,10 @@ module gsi_thinning
 ! lat/lon range inside tile
   real(r_kind) rlat_min,rlat_max,rlon_min,rlon_max,dlat_grid,dlon_grid
 ! glat(mlat): lat #, glon(mlat,mlonx), hll(mlat,mlonx)
-  real(r_kind),allocatable,dimension(:):: glat
-  real(r_kind),allocatable,dimension(:,:):: glon,hll,sli,sno
-  real(r_kind),allocatable,dimension(:):: score_crit
+  integer(i_kind),allocatable,dimension(:,:) :: hll
+  real(r_kind),allocatable,dimension(:)   :: glat
+  real(r_kind),allocatable,dimension(:,:) :: glon,sli,sno
+  real(r_kind),allocatable,dimension(:)   :: score_crit
 
 contains
 
@@ -99,8 +100,8 @@ contains
              enddo
           enddo
       end do
-    print *, mlat,mlonx,dlat_grid,dlon_grid
-    print *, istart_val
+    !print *, mlat,mlonx,dlat_grid,dlon_grid
+    !print *, istart_val
     return
   end subroutine makegvals
 
@@ -149,8 +150,8 @@ contains
           glon(i,j) = glon(i,j)*deg2rad
           glon(i,j) = min(max(zero,glon(i,j)),twopi)
        enddo
-       write(6,'(f10.5,i8,2f10.2)') glat(j)*rad2deg, mlon(j),hll(1,j),hll(mlon(j),j)
-       write(6,'(10f8.3)')   (glon(i,j)*rad2deg,i=1,mlon(j))
+       !write(6,'(f10.5,i8,2i10)') glat(j)*rad2deg, mlon(j),hll(1,j),hll(mlon(j),j)
+       !write(6,'(10f8.3)')   (glon(i,j)*rad2deg,i=1,mlon(j))
 
     end do
 
@@ -164,6 +165,7 @@ contains
        ibest_obs(j)  = 0
        score_crit(j) = 9.99e6_r_kind
     end do
+    !write(6,'(10f12.2)') (score_crit(j),j=1,itxmax)
 
     return
   end subroutine makegrids
@@ -204,8 +206,8 @@ contains
     iuse=.true.
     if(dist1*crit1 > score_crit(itx) .and. icount(itx) == 0)iuse=.false.
 
-    write(6,'(a,3f10.3)') 'dlat_earth dlon_earth crit1 ',dlat_earth*rad2deg,dlon_earth*rad2deg,crit1
-    write(6,'(2i5,2f10.3,e12.5,2x,L5)') ix,iy,dx,dy,dist1,score_crit(itx),iuse
+    !write(6,'(a,3f10.3)') 'dlat_earth dlon_earth crit1 ',dlat_earth*rad2deg,dlon_earth*rad2deg,crit1
+    !write(6,'(2i5,3f10.3,i10,e12.5,2x,L)') ix,iy,dx,dy,dist1,itx,score_crit(itx),iuse
     return
   end subroutine map2tgrid
 

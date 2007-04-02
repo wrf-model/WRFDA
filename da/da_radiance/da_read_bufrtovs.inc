@@ -44,7 +44,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
 ! thinning variables
    integer(i_kind) istart,iend,jstart,jend,j
-   integer(i_kind) itt,ithin,itx
+   integer(i_kind) itt,ithin,itx,iobs,iout
    real(r_kind) terrain,timedif,crit,dist
    real(r_kind) dlon_earth,dlat_earth
 
@@ -81,6 +81,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_used
+   integer :: num_thinning
    integer :: lnbufr
    integer :: n
 
@@ -166,8 +167,8 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
        rlon_max=max(rlon_max, xb%lon(i,j))
       enddo
    enddo
-   write(6,'(a,4i5)') 'istart iend jstart jend', istart,iend,jstart,jend
-   write(6,'(a,4f8.3)') 'rlat_min rlat_max rlon_min rlon_max', rlat_min, rlat_max, rlon_min, rlon_max
+   !write(6,'(a,4i5)') 'istart iend jstart jend', istart,iend,jstart,jend
+   !write(6,'(a,4f8.3)') 'rlat_min rlat_max rlon_min rlon_max', rlat_min, rlat_max, rlon_min, rlon_max
 
    call makegvals (obstype,thinning_mesh)
    call makegrids (thinning_mesh)
@@ -217,6 +218,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    num_tovs_file   = 0
    num_tovs_global = 0
    num_tovs_used = 0
+   num_thinning  = 0
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -316,16 +318,17 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
             exit obs
          end if
 
-         num_tovs_used = num_tovs_used + 1
-
-         if (num_tovs_used > max_tovs_input) then
-            write(unit=message(1),fmt='(A,I10,A)') &
-               "Max number of tovs",max_tovs_input," reached"
-            call da_warning(__FILE__,__LINE__,message(1:1))
-            num_tovs_used = num_tovs_used-1
-            exit obs
-         end if
+         !num_tovs_used = num_tovs_used + 1
+ 
+         !if (num_tovs_used > max_tovs_input) then
+         !   write(unit=message(1),fmt='(A,I10,A)') &
+         !      "Max number of tovs",max_tovs_input," reached"
+         !   call da_warning(__FILE__,__LINE__,message(1:1))
+         !   num_tovs_used = num_tovs_used-1
+         !   exit obs
+         !end if
          if (outside) cycle ! No good for this PE
+         num_tovs_local = num_tovs_local + 1
 
         !  Make Thinning
         !  Map obs to thinning grid
@@ -341,7 +344,10 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
          terrain = 0.01_r_kind*abs(bfr1bhdr(13))
          crit = 0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
          call map2tgrid(dlat_earth,dlon_earth,dist,crit,itx,ithin,itt,iuse)
-         if(.not. iuse)cycle
+         if(.not. iuse) then
+             num_thinning=num_thinning+1
+             cycle
+         end if
         !  Determine surface properties based on
         !  sst and land/sea/ice mask
 
@@ -351,9 +357,17 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
            !call checkob(dist1,crit1,itx,iuse)
            !if(.not. iuse)cycle
+
+!          Compute "score" for observation.  All scores>=0.0.  Lowest score is "best"
+           !crit1 = crit1+pred
+           call finalcheck(dist,crit,iobs,itx,iout,iuse,iv%instid(inst)%rttovid_string)
+           if(.not. iuse) then
+              num_thinning=num_thinning+1
+              cycle
+           end if
         end if
 
-         num_tovs_local = num_tovs_local + 1
+         num_tovs_used = num_tovs_used + 1
          nread(inst) = nread(inst) + 1
 
          ! 3.4 extract satellite and solar angle
@@ -416,9 +430,13 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
    iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
 
+   write(UNIT=stdout,FMT='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_thinning'
+   write(UNIT=stdout,FMT='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_thinning
+
    deallocate(tb_inv)  
    call closbf(lnbufr)
    call da_free_unit(lnbufr)
+   call destroygrids
 
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  
@@ -514,7 +532,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    p => head
    ! do while ( associated(p) )
 
-   do n = 1, num_tovs_local
+   do n = 1, num_tovs_used
       i = p%sensor_index
       nread(i) = nread(i) + 1
       iv%instid(i)%info(nread(i))         = p%info
