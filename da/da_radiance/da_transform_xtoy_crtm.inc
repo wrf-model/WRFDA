@@ -30,7 +30,6 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id, nchan_emis, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
-   TYPE (CRTM_ChannelInfo_type)   :: ChannelInfo
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
    TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo

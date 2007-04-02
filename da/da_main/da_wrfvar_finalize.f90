@@ -7,7 +7,7 @@ subroutine da_wrfvar_finalize
    use module_domain, only : domain, head_grid
    use da_control, only : trace_use, cost_unit, stderr, &
       check_max_iv_unit,grad_unit,ierr,num_alpha_corr_types, &
-      rootproc,stats_unit, unit_start, &
+      rootproc,stats_unit, unit_start, rtm_option, rtm_option_crtm, use_rad, &
       unit_end, jo_unit, unit_used,alpha_corr_unit1, alpha_corr_unit2      
    use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
       tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
@@ -18,6 +18,10 @@ subroutine da_wrfvar_finalize
    use da_tools1, only : da_free_unit
    use da_wrf_interfaces, only : wrf_error_fatal,med_shutdown_io
    use da_reporting, only : da_message
+
+#ifdef CRTM
+   use da_crtm, only : channelinfo, crtm_destroy, sensor_descriptor
+#endif
 
    implicit none
 
@@ -72,6 +76,13 @@ subroutine da_wrfvar_finalize
       call da_free_unit (jo_unit)
       call da_free_unit (check_max_iv_unit)
    end if
+
+#ifdef CRTM
+   if (use_rad .and. rtm_option == rtm_option_crtm) then
+      ierr = CRTM_Destroy(ChannelInfo)
+      deallocate(Sensor_Descriptor)
+   end if
+#endif
 
    do i=unit_start,unit_end
       if (unit_used(i)) then

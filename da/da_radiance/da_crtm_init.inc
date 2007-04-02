@@ -14,8 +14,6 @@ subroutine da_crtm_init(iv,ob)
  type (y_type) , intent (inout) :: ob
 
 #ifdef CRTM
-! CRTM TYPE 
-    TYPE (CRTM_ChannelInfo_type) :: ChannelInfo
 
 !
 !  local arguments

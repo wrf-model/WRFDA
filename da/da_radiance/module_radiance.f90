@@ -33,7 +33,8 @@ module module_radiance
       crtm_tangent_linear, grass_soil, h2o_id,hail_cloud,ice_cloud,new_snow, &
       o3_id, water_cloud, crtm_rtsolution_type, crtm_channelinfo_type, &
       crtm_atmosphere_type, crtm_surface_type, crtm_geometryinfo_type, &
-      crtm_zero_surface, crtm_zero_atmosphere
+      crtm_zero_surface, crtm_zero_atmosphere, crtm_destroy, &
+      crtm_destroy_channelinfo
 
    USE CRTM_SensorInfo
 #endif

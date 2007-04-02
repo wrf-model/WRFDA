@@ -49,7 +49,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id,Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:)
-   TYPE (CRTM_ChannelInfo_type)   :: ChannelInfo
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere
    TYPE( CRTM_Surface_type )      :: Surface
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
@@ -151,10 +150,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
         call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting CRTM Surface Structure Structure"/))
       endif
-
-      if (iv%ob_numb(iv%current_ob_time)%radiance(inst) <= &
-          iv%ob_numb(iv%current_ob_time-1)%radiance(inst) ) cycle
-
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
       do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
          iv%ob_numb(iv%current_ob_time)%radiance(inst)

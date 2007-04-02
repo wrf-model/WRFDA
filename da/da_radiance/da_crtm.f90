@@ -15,7 +15,7 @@ module da_crtm
       crtm_destroy_atmosphere,crtm_set_channelinfo,crtm_sensor_name, &
       crtm_allocate_surface,crtm_destroy_surface,crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere, satinfo, &
-      time_slots,crtm_platform_name, crtm_init, &
+      time_slots,crtm_platform_name, crtm_init, crtm_destroy, &
       rttov_inst_name,rttov_platform_name
 #endif
 
@@ -35,6 +35,10 @@ module da_crtm
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
+
+#ifdef CRTM
+    TYPE (CRTM_ChannelInfo_type),save :: ChannelInfo
+#endif
 
 contains
 
