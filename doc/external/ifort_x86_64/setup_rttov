@@ -3,5 +3,7 @@ cd src
 # uncomment the ifort lines from Makefile
 make clean
 make
-make all
-cp librttov8.5.a ../librttov.a
+make lib_basic lib_cld lib_scat
+rm *.o
+cd ..
+ln -fs src/librttov*.a librttov.a

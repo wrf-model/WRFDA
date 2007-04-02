@@ -5,6 +5,8 @@ cd src
 # FC77=pgf77
 # FFLAGS=
 make clean
-make all
-ranlib librttov8.5.a
-cp librttov8.5.a ../librttov.a
+make lib_basic lib_cld lib_scat
+ranlib *.a
+rm *.o
+cd ..
+ln -fs src/librttov*.a librttov.a

@@ -5,7 +5,7 @@
 cd src
 make clean
 make 
-make all
+make lib_basic lib_cld lib_scat
 rm *.o
 cd ..
-ln -fs src/librttov8.5.a librttov.a
+ln -fs src/librttov*.a librttov.a

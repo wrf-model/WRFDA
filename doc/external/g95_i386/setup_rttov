@@ -8,7 +8,7 @@ cd src
 # comment out lapack.f from compiled routines
 make clean
 make lib_basic lib_cld lib_scat
-ranlib librttov8.5.a
+ranlib *.a
 rm *.o
 cd ..
-ln -fs src/librttov8.5.a librttov.a
+ln -fs src/librttov*.a librttov.a
