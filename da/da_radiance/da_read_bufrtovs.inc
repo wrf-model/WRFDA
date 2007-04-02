@@ -436,7 +436,8 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    deallocate(tb_inv)  
    call closbf(lnbufr)
    call da_free_unit(lnbufr)
-   call destroygrids
+
+   if(use_thinning) call destroygrids
 
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  
