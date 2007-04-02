@@ -69,7 +69,7 @@ export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar backgro
 export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export CRTM=${CRTM:-$HOME/crtm}
-export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/../crtm_coefs}
+export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coefs}
 
 # Error Tunning namelist parameters
 # Assign Random seeds
@@ -100,6 +100,12 @@ fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
+if test -d $DA_RTTOV_COEFFS; then
+   echo "DA_RTTOV_COEFFS       $DA_RTTOV_COEFFS"
+fi
+if test -d $DA_CRTM_COEFFS; then
+   echo "DA_CRTM_COEFFS        $DA_CRTM_COEFFS"
+fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
 echo 'RUN_DIR               <A HREF="file:'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
