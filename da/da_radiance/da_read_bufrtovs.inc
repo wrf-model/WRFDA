@@ -44,7 +44,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
 ! thinning variables
    integer(i_kind) istart,iend,jstart,jend,j
-   integer(i_kind) itt,ithin,itx,iobs,iout
+   integer(i_kind) itt,itx,iobs,iout
    real(r_kind) terrain,timedif,crit,dist
    real(r_kind) dlon_earth,dlat_earth
 
@@ -342,8 +342,9 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
          dlon_earth = dlon_earth*deg2rad           
          timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
          terrain = 0.01_r_kind*abs(bfr1bhdr(13))
-         crit = 0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
-         call map2tgrid(dlat_earth,dlon_earth,dist,crit,itx,ithin,itt,iuse)
+         crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+         !call map2tgrid(dlat_earth,dlon_earth,dist,crit,itx,dthin,itt,iuse)
+         call map2grids(dlat_earth,dlon_earth,crit,iobs,itx,dthin,itt,iout,iuse)
          if(.not. iuse) then
              num_thinning=num_thinning+1
              cycle
@@ -360,11 +361,11 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
 !          Compute "score" for observation.  All scores>=0.0.  Lowest score is "best"
            !crit1 = crit1+pred
-           call finalcheck(dist,crit,iobs,itx,iout,iuse,iv%instid(inst)%rttovid_string)
-           if(.not. iuse) then
-              num_thinning=num_thinning+1
-              cycle
-           end if
+           !call finalcheck(dist,crit,iobs,itx,iout,iuse,iv%instid(inst)%rttovid_string)
+           !if(.not. iuse) then
+           !   num_thinning=num_thinning+1
+           !   cycle
+           !end if
         end if
 
          num_tovs_used = num_tovs_used + 1

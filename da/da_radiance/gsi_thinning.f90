@@ -8,6 +8,27 @@ module gsi_thinning
 !   2006-10-28 Jianjun Xu, developed from GSI 
 !   2007-03-30 Zhiquan Liu, modify and add comments
 !
+!
+! Subroutines Included:
+!   sub makegvals      - set up for superob weighting
+!   sub makegrids      - set up thinning grids
+!   sub map2tgrids     - map observation to location on thinning grid
+!   sub destroygrids   - deallocate thinning grid arrays
+!   sub destroy_sfc    - deallocate full horizontal surface arrays
+!
+! Variable Definitions:
+!   def mlat           - number of latitudes in thinning grid
+!   def mlon           - number of longitudes in thinning grid
+!   def maxthin        - maximum number of obs to retain in thinning grid box
+!   def itxmax         - total number of points in thinning grid
+!   def istart_val     - starting location on thinning grid for superobs (not used)
+!   def icount         - observation counter
+!   def ibest_obs      - index of "best" quality obs in thinning grid box
+!   def glat           - latitudes on thinning grid
+!   def glon           - longitudes on thinning grid
+!   def hll            - (i,j) index of point on thinning grid
+!   def score_crit     - "best" quality obs score in thinning grid box
+!
 !$$$ end documentation block
   use gsi_kinds, only: r_kind,i_kind
   use gsi_constants, only: deg2rad,rearth_equator,zero,two,pi,half,one,quarter,&
@@ -53,13 +74,14 @@ contains
     real(r_kind) factor,factors,delon
     real(r_kind) rkm2dg,glatm,glatx
 
+! number of obs to retain per thinning grid box
     if (obstype == 'hirs2') dthin=1
     if (obstype == 'hirs3') dthin=1
     if (obstype == 'hirs4') dthin=1
-    if (obstype == 'msu  ') dthin=2
-    if (obstype == 'amsua') dthin=2
-    if (obstype == 'amsub') dthin=3
-    if (obstype == 'mhs  ') dthin=3
+    if (obstype == 'msu  ') dthin=1 !2
+    if (obstype == 'amsua') dthin=1 !2
+    if (obstype == 'amsub') dthin=1 !3
+    if (obstype == 'mhs  ') dthin=1 !3
 
 !   Initialize variables, set constants
     maxthin=dthin
@@ -108,6 +130,9 @@ contains
   subroutine makegrids(rmesh)
 ! making thinning box
 ! output: mlon(mlat),glat(mlat),glon(mlonx,mlat),hll(mlonx,mlat)
+!   input argument list:
+!     rmesh - mesh size (km) of thinning grid. 
+
 
     implicit none
     real(r_kind), intent(in) :: rmesh
@@ -165,12 +190,116 @@ contains
        ibest_obs(j)  = 0
        score_crit(j) = 9.99e6_r_kind
     end do
-    !write(6,'(10f12.2)') (score_crit(j),j=1,itxmax)
 
     return
   end subroutine makegrids
 
+  subroutine map2grids(dlat_earth,dlon_earth,crit1,iobs,itx,ithin,itt,iobsout,iuse)
+!$$$  subprogram documentation block
+!                .      .    .                                       .
+! subprogram:    map2grids
+!     prgmmr:    treadon     org: np23                date: 2002-10-17
+!
+! abstract:  This routine maps observations to the thinning grid.
+!
+! program history log:
+!   2002-10-17  treadon
+!   2004-06-22  treadon - update documentation
+!   2004-07-23  derber - modify code to thin obs as read in
+!   2004-12-08  li, xu - fix bug --> set iuse=.true. when use_all=.true.
+!   2005-10-14  treadon - variable name change (dlat0,dlon0) --> d*_earth
+!   2006-03-25  kistler - define iobsout for the case use_all=.true.
+!
+!   input argument list:
+!     dlat_earth - earth relative observation latitude (radians)
+!     dlon_earth - earth relative observation longitude (radians)
+!     crit1      - quality indicator for observation (smaller = better)
+!     ithin      - number of obs to retain per thinning grid box
+!
+!   output argument list:
+!     iobs  - observation counter
+!     itx   - combined (i,j) index of observation on thinning grid
+!     itt   - superobs thinning counter
+!     iobsout- location for observation to be put
+!     iuse  - .true. if observation should be used
+!
+    implicit none
+    logical, intent(out) :: iuse
+    integer(i_kind), intent(out) :: itt,itx
+    integer(i_kind), intent(in)  :: ithin
+    integer(i_kind), intent(inout) :: iobs,iobsout
+    real(r_kind),intent(in):: dlat_earth,dlon_earth,crit1
+
+    integer(i_kind) :: ix,iy
+    real(r_kind) dlat1,dlon1,dx,dy,dxx,dyy
+    real(r_kind) dist1,crit
+
+!   Compute (i,j) indices of coarse mesh grid (grid number 1) which 
+!   contains the current observation.
+    dlat1=dlat_earth
+    dlon1=dlon_earth
+
+    call grdcrd(dlat1,1,glat,mlat,1)
+    iy=int(dlat1)
+    dy=dlat1-iy
+    iy=max(1,min(iy,mlat))
+
+    call grdcrd(dlon1,1,glon(1,iy),mlon(iy),1)
+    ix=int(dlon1)
+    dx=dlon1-ix
+    ix=max(1,min(ix,mlon(iy)))
+
+    dxx=half-min(dx,one-dx)
+    dyy=half-min(dy,one-dy)
+    dist1=dxx*dxx+dyy*dyy+half
+    itx=hll(ix,iy)
+    itt=istart_val(ithin)+itx
+    if(ithin == 0) itt=0
+
+!   Increment obs counter on coarse mesh grid.  Also accumulate observation
+!   score and distance functions
+
+    icount(itx)=icount(itx)+1
+!   dist1=one - quarter*(dista + distb)  !dist1 is min at grid box center and 
+                                    !ranges from 1 (at corners)to 
+                                    !.5 (at center of box)
+    crit=crit1*dist1
+    iuse=.false.
+
+    if(icount(itx) == 1)then
+
+!   Increment obs counter
+
+      iuse=.true.
+      iobs=iobs+1
+      score_crit(itx)= crit
+      ibest_obs(itx) = iobs
+      iobsout=iobs
+
+    end if
+    if(crit < score_crit(itx) .and. icount(itx) > 1)then
+      iuse=.true.
+      score_crit(itx)= crit
+      iobsout=ibest_obs(itx)
+    end if
+
+    return
+  end subroutine map2grids
+
   subroutine map2tgrid(dlat_earth,dlon_earth,dist1,crit1,itx,ithin,itt,iuse)
+!   input argument list:
+!     dlat_earth - earth relative observation latitude (radians)
+!     dlon_earth - earth relative observation longitude (radians)
+!     crit1      - quality indicator for observation (smaller = better)
+!     ithin      - number of obs to retain per thinning grid box
+!
+!   output argument list:
+!     iobs  - observation counter
+!     itx   - combined (i,j) index of observation on thinning grid
+!     itt   - superobs thinning counter
+!     iobsout- location for observation to be put
+!     iuse  - .true. if observation should be used
+!     
     implicit none
     logical,intent(out):: iuse
     integer(i_kind),intent(in):: ithin
@@ -206,17 +335,18 @@ contains
     iuse=.true.
     if(dist1*crit1 > score_crit(itx) .and. icount(itx) == 0)iuse=.false.
 
-    !write(6,'(a,3f10.3)') 'dlat_earth dlon_earth crit1 ',dlat_earth*rad2deg,dlon_earth*rad2deg,crit1
-    !write(6,'(2i5,3f10.3,i10,e12.5,2x,L)') ix,iy,dx,dy,dist1,itx,score_crit(itx),iuse
+    write(6,'(a,3f10.3)') 'dlat_earth dlon_earth crit1 ',dlat_earth*rad2deg,dlon_earth*rad2deg,crit1
+    write(6,'(a,2i5,3f10.3,i10,e12.5,2x,L)') 'ix iy',ix,iy,dx,dy,dist1,itx,score_crit(itx),iuse
     return
   end subroutine map2tgrid
 
   subroutine grdcrd(d,nd,x,nx,flg)
   implicit none
-  integer(i_kind) nd,id,ix,nx
-  integer(i_kind),intent(in):: flg
-  real(r_kind) d
-  real(r_kind),dimension(nx):: x
+  integer(i_kind),intent(in) :: nd,nx,flg
+  real(r_kind),intent(inout) :: d
+  real(r_kind),dimension(nx), intent(in) :: x
+
+  integer(i_kind) :: id,ix
 ! Treat "normal" case in which nx>1
   if(nx>1) then
         if (flg.eq.1) then
@@ -249,6 +379,16 @@ contains
 end subroutine grdcrd 
 
   subroutine checkob(dist1,crit1,itx,iuse)
+!
+!   input argument list:
+!     dist1  - quality indicator for distance (smaller = better)
+!     crit1      - quality indicator for observation (smaller = better)
+!     itx   - combined (i,j) index of observation on thinning grid
+!     iuse  - .true. if observation should be used
+!
+!   output argument list:
+!     iuse  - .true. if observation should be used
+!
     implicit none
     logical,intent(inout):: iuse
     integer(i_kind),intent(in):: itx
@@ -262,6 +402,20 @@ end subroutine grdcrd
   end subroutine checkob
 
   subroutine finalcheck(dist1,crit1,iobs,itx,iobsout,iuse,sis)
+!
+!   input argument list:
+!     dist1  - quality indicator for distance (smaller = better)
+!     crit1  - quality indicator for observation (smaller = better)
+!     itx    - combined (i,j) index of observation on thinning grid
+!     iobs   - observation counter
+!     iuse   - .true. if observation should be used
+!     sis    - sensor/instrument/satellite 
+!
+!   output argument list:
+!     iobs   - observation counter
+!     iobsout- location for observation to be put
+!     iuse   - .true. if observation should be used
+!
     implicit none
     logical,intent(inout):: iuse
     integer(i_kind),intent(inout):: iobs,iobsout
