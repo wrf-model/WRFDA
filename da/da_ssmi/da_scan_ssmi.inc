@@ -47,6 +47,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
    if (iost /= 0) then
       call da_warning(__FILE__,__LINE__, &
          (/"Cannot open SSMI file "//trim(filename)/))
+      call da_free_unit(iunit)
       return
    end if
 
