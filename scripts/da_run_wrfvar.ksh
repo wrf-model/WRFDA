@@ -560,8 +560,7 @@ echo "WINDOW_END            $WINDOW_END"
             RC=$?
          fi
       else
-        # 3DVAR
-set -x
+         # 3DVAR
          $RUN_CMD ./da_wrfvar.exe
          RC=$?
       fi
