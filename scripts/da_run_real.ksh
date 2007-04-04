@@ -21,7 +21,7 @@ export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
 if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
+   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
 fi

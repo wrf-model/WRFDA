@@ -3,7 +3,7 @@ DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$HOME/hosts}
 if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
+   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
 fi
@@ -96,6 +96,9 @@ echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRF
 if $NL_VAR4D; then
    echo 'WRF_DIR               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
+fi
+if test -d $MPIHOME; then
+   echo "MPIHOME               $MPIHOME"
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BOUNDARIES         $DA_BOUNDARIES"
@@ -558,7 +561,7 @@ echo "WINDOW_END            $WINDOW_END"
          fi
       else
         # 3DVAR
-
+set -x
          $RUN_CMD ./da_wrfvar.exe
          RC=$?
       fi

@@ -123,7 +123,7 @@ $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 elif test $SUBMIT = none; then
    if test -f $HOSTS; then
-      export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS -machinefile $HOSTS"
+      export RUN_CMD_DEFAULT="mpirun -machinefile $HOSTS -np $NUM_PROCS"
    else
       export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS"
    fi

@@ -99,6 +99,9 @@ endif
 if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}) then
    setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}
 endif
+if (-d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}) then
+   setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}
+endif
 if (-d ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}) then
    setenv BLAS ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}
 endif
