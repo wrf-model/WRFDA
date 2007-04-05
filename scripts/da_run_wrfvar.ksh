@@ -205,11 +205,11 @@ echo "WINDOW_END            $WINDOW_END"
    # [3.0] Prepare for assimilation:
    #-----------------------------------------------------------------------
 
-   if test $DA_RTTOV_COEFFS'.' != '.'; then
+   if test -d $DA_RTTOV_COEFFS; then
       ln -fs $DA_RTTOV_COEFFS/* .
    fi
-
-   if test $DA_CRTM_COEFFS'.' != '.'; then
+ 
+   if test -d $DA_CRTM_COEFFS; then
       ln -fs $DA_CRTM_COEFFS/* .
    fi
 
