@@ -3,7 +3,7 @@ DIR=`dirname $0`
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$HOME/hosts}
 if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
+   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
 fi
@@ -97,9 +97,6 @@ if $NL_VAR4D; then
    echo 'WRF_DIR               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 fi
-if test -d $MPIHOME; then
-   echo "MPIHOME               $MPIHOME"
-fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
@@ -117,7 +114,7 @@ echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
 
-#if test ! -f $DA_ANALYSIS; then
+# if test ! -f $DA_ANALYSIS; then
 
    rm -rf ${WORK_DIR}
    mkdir -p ${WORK_DIR}
@@ -262,7 +259,7 @@ echo "WINDOW_END            $WINDOW_END"
          typeset -i N
          let N=1
          FGAT_DATE=$START_DATE
-#         while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
+         # while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
          until [[ $FGAT_DATE > $END_DATE ]]; do
             if [[ $FGAT_DATE != $DATE ]]; then
                let N=$N+1
@@ -391,11 +388,11 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
       ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
-#      if test -e $WORK_DIR/wrfvar_output; then
-#         ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
-#      else
+      # if test -e $WORK_DIR/wrfvar_output; then
+      #    ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
+      # else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
-#      fi
+      # fi
       ln -fs $WRF_DIR/main/wrf.exe nl
 
       # Outputs
@@ -477,10 +474,10 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 01 02 03 04 05 06 07; do
          ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
       done
-# JRB
-#      if $NL_JCDFI_USE; then
+      # JRB
+      # if $NL_JCDFI_USE; then
          ln -fs $WORK_DIR/auxhist3_d${DOMAIN}_${D_YEAR[01]}-${D_MONTH[01]}-${D_DAY[01]}_${D_HOUR[01]}:00:00 ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00_dfi
-#      fi   
+      # fi   
       ln -fs $WRFPLUS_DIR/main/wrfplus.exe ad
       mkdir ad/trace
 
@@ -610,13 +607,13 @@ echo "WINDOW_END            $WINDOW_END"
 
       rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
-      mv rsl* $RUN_DIR/rsl
       cd $RUN_DIR/rsl
-      for FILE in rsl*; do
-         echo "<HTML><HEAD><TITLE>$FILE</TITLE></HEAD>" > $FILE.html
-         echo "<H1>$FILE</H1><PRE>" >> $FILE.html
-         cat $FILE >> $FILE.html
-         echo "</PRE></BODY></HTML>" >> $FILE.html
+      for FILE in $WORK_DIR/rsl*; do
+         FILE1=`basename $FILE`
+         echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
+         echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
+         cat $FILE >> $FILE1.html
+         echo "</PRE></BODY></HTML>" >> $FILE1.html
          rm $FILE
       done
       cd $RUN_DIR
@@ -647,9 +644,9 @@ echo "WINDOW_END            $WINDOW_END"
    if $CLEAN; then
       rm -rf $WORK_DIR
    fi
-#else
-#   echo "$DA_ANALYSIS already exists, skipping"
-#fi
+# else
+#    echo "$DA_ANALYSIS already exists, skipping"
+# fi
 
 echo '</PRE></BODY></HTML>'
 
