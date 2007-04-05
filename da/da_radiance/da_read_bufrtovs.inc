@@ -43,7 +43,6 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    integer(i_kind) iret,idate,im,iy,nchan
 
 ! thinning variables
-   integer(i_kind) istart,iend,jstart,jend,j
    integer(i_kind) itt,itx,iobs,iout
    real(r_kind) terrain,timedif,crit,dist
    real(r_kind) dlon_earth,dlat_earth
@@ -95,7 +94,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
 
    ! Set various variables depending on type of data to be read
 
-   call init_constants_derived
+   !call init_constants_derived
 
    platform_id  = 1                 !! for NOAA series
 
@@ -142,37 +141,6 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    end if
 
    allocate (tb_inv(nchan))
-
-   ! Make thinning grids
-   !----------------------
-  if (use_thinning) then
-   !call init_rad
-   !call radinfo_read
-
-   rlat_min =  r999
-   rlat_max = -r999
-   rlon_min =  r999
-   rlon_max = -r999
-
-   istart=grid%i_start(1)
-   iend  =grid%i_end  (1)
-   jstart=grid%j_start(1)
-   jend  =grid%j_end  (1)
-
-   do i = istart, iend
-      do j = jstart, jend
-       rlat_min=min(rlat_min, xb%lat(i,j))
-       rlon_min=min(rlon_min, xb%lon(i,j))
-       rlat_max=max(rlat_max, xb%lat(i,j))
-       rlon_max=max(rlon_max, xb%lon(i,j))
-      enddo
-   enddo
-   !write(6,'(a,4i5)') 'istart iend jstart jend', istart,iend,jstart,jend
-   !write(6,'(a,4f8.3)') 'rlat_min rlat_max rlon_min rlon_max', rlat_min, rlat_max, rlon_min, rlon_max
-
-   call makegvals (obstype,thinning_mesh)
-   call makegrids (thinning_mesh)
-  end if
 
    ! 0.0  Open unit to satellite bufr file and read file header
    !--------------------------------------------------------------
@@ -343,8 +311,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
          timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
          terrain = 0.01_r_kind*abs(bfr1bhdr(13))
          crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
-         !call map2tgrid(dlat_earth,dlon_earth,dist,crit,itx,dthin,itt,iuse)
-         call map2grids(dlat_earth,dlon_earth,crit,iobs,itx,dthin,itt,iout,iuse)
+         call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
          if(.not. iuse) then
              num_thinning=num_thinning+1
              cycle
@@ -437,8 +404,6 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
    deallocate(tb_inv)  
    call closbf(lnbufr)
    call da_free_unit(lnbufr)
-
-   if(use_thinning) call destroygrids
 
    !  5.0 allocate innovation radiance structure
    !----------------------------------------------------------------  

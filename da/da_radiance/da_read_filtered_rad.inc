@@ -19,7 +19,7 @@ subroutine da_read_filtered_rad( xp, iv )
 
    if (trace_use) call da_trace_entry("da_read_filtered_rad")
 
-   call init_constants_derived
+   !call init_constants_derived
 
    do i = 1, iv%num_inst
 

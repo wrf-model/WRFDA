@@ -38,7 +38,7 @@ module da_radiance
       use_ssmisobs, use_filtered_rad,print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
-      qc_good, qc_bad,myproc,biascorr
+      qc_good, qc_bad,myproc,biascorr,use_thinning,thinning_mesh
    use da_crtm, only : da_crtm_init
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
@@ -70,8 +70,9 @@ module da_radiance
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
       da_trace_int_sort
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
-   use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max,dthin, &
-                            makegvals,makegrids,map2grids, map2tgrid,finalcheck, &
+   use gsi_thinning, only : r999,r360,rlat_min,rlat_max,rlon_min,rlon_max, &
+                            dlat_grid,dlon_grid,thinning_grid, &
+                            makegrids,map2grids, &
                             destroygrids
                             
    !use radinfo

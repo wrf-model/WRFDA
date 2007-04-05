@@ -75,7 +75,7 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
 
    ! Set various variables depending on type of data to be read
 
-   call init_constants_derived
+   !call init_constants_derived
 
    platform_id  = 2                 ! for DMSP series
    sensor_id    = 10                ! for SSMIS
