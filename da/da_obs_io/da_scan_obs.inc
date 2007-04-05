@@ -87,6 +87,7 @@ subroutine da_scan_obs (ob, xp, filename)
       write(unit=message(1),fmt='(A,I5,A)') &
          "Error",iost," opening gts obs file "//trim(filename)
       call da_warning(__FILE__,__LINE__,message(1:1))
+      call da_free_unit(iunit)
       return
    end if
 
