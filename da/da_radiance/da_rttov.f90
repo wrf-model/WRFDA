@@ -13,7 +13,7 @@ use da_reporting, only : da_warning
 #ifdef RTTOV
    use module_radiance, only : coefs,coefs_scatt,profile_type,radiance_type, &
       rttov_coef,platform_name,inst_name,transmission_type, &
-      errorstatus_success,gas_id_watervapour
+      errorstatus_success,gas_id_watervapour,errorstatus_fatal
 #endif
 
 #ifdef DM_PARALLEL

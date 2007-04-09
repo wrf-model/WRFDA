@@ -212,12 +212,6 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       end if
    end if
 
-!write (0,*) __FILE__,__LINE__,"sum(emissivity)",sum(emissivity)
-!write (0,*) __FILE__,__LINE__,"profiles(1) % skin % surftype",profiles(1) % skin % surftype
-!write (0,*) __FILE__,__LINE__,"mw_emis_sea,nchanl",mw_emis_sea,nchanl
-!write (0,*) __FILE__,__LINE__,"emisv",emisv
-!write (0,*) __FILE__,__LINE__,"emish",emish
-
    !  For Microwave sensors
    !-----------------------------
    if (coef%id_sensor == 2)  then
@@ -271,60 +265,10 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       end if
    end if
 
-!   write (0,*) "sum(emissivity)",sum(emissivity)
-!   write (0,*) "emissivity)",emissivity
-!   call da_error(__FILE__,__LINE__,(/"bugger"/))
-
    !-----------------------------------
    !  calling RTTOV forward model
    !----------------------------------
-goto 37
-write (0,*) __FILE__,__LINE__
-write (0,*) __FILE__,__LINE__,"sum(channels)",sum(channels)
-write (0,*) __FILE__,__LINE__,"sum(polarisations(:,1))",sum(polarisations(:,1))
-write (0,*) __FILE__,__LINE__,"sum(polarisations(:,2))",sum(polarisations(:,2))
-write (0,*) __FILE__,__LINE__,"sum(polarisations(:,3))",sum(polarisations(:,3))
-!write (0,*) __FILE__,__LINE__,"sum(polarisations((1:nc,1))",sum(polarisations(1:nc,1))
-!write (0,*) __FILE__,__LINE__,"sum(polarisations((1:nc,2))",sum(polarisations(1:nc,2))
-!write (0,*) __FILE__,__LINE__,"sum(polarisations((1:nc,3))",sum(polarisations(1:nc,3))
-write (0,*) __FILE__,__LINE__,"sum(emissivity)",sum(emissivity)
-write (0,*) __FILE__,__LINE__,"sum(transmission % tau_surf)",sum(transmission % tau_surf)
-write (0,*) __FILE__,__LINE__,"sum(transmission % tau_layer)",sum(transmission % tau_layer)
-write (0,*) __FILE__,__LINE__,"sum(transmission % od_singlelayer)",sum(transmission %od_singlelayer)
-write (0,*) __FILE__,__LINE__,"sum(radiance % clear)",sum(radiance % clear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % cloudy)",sum(radiance % cloudy)
-write (0,*) __FILE__,__LINE__,"sum(radiance % total)",sum(radiance % total)
-write (0,*) __FILE__,__LINE__,"sum(radiance % bt)",sum(radiance % bt)
-write (0,*) __FILE__,__LINE__,"sum(radiance % bt_clear)",sum(radiance % bt_clear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % upclear)",sum(radiance % upclear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % dnclear)",sum(radiance % dnclear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % reflclear)",sum(radiance % reflclear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % overcast)",sum(radiance % overcast)
-write (0,*) __FILE__,__LINE__,"sum(radiance % downcld)",sum(radiance % downcld)
-write (0,*) __FILE__,__LINE__,"sum(radiance % out)",sum(radiance % out)
-write (0,*) __FILE__,__LINE__,"sum(radiance % out_clear)",sum(radiance % out_clear)
-write (0,*) __FILE__,__LINE__,"sum(radiance % total_out)",sum(radiance % total_out)
-write (0,*) __FILE__,__LINE__,"sum(radiance % clear_out)",sum(radiance % clear_out)
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % p(:))", sum(profiles(1) % p(:))     
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % t(:)) ", sum(profiles(1) % t(:))     
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % q(:)) ", sum(profiles(1) % q(:))     
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % o3(:))", sum(profiles(1) % o3(:))     
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % co2(:))", sum(profiles(1) % co2(:))    
-write (0,*) __FILE__,__LINE__,"sum(profiles(1) % clw(:))", sum(profiles(1) % clw(:))    
-write (0,*) __FILE__,__LINE__,"profiles(1) % skin % surftype",profiles(1) % skin % surftype
-write (0,*) __FILE__,__LINE__,"profiles(1) % skin % t",profiles(1) % skin % t
-write (0,*) __FILE__,__LINE__,"profiles(1) % skin % fastem)", sum(profiles(1) % skin % fastem)
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % t)",profiles(1) % s2m  % t
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % q)",profiles(1) % s2m  % q
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % o)",profiles(1) % s2m  % o
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % p)",profiles(1) % s2m  % p
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % u)",profiles(1) % s2m  % u
-write (0,*) __FILE__,__LINE__,"profiles(1) % s2m  % v)",profiles(1) % s2m  % v
-write (0,*) __FILE__,__LINE__,"profiles(1) % zenangle)",profiles(1) % zenangle
-write (0,*) __FILE__,__LINE__,"profiles(1) % azangle)",profiles(1) % azangle
-write (0,*) __FILE__,__LINE__,"profiles(1) % ctp)",profiles(1) % ctp
-write (0,*) __FILE__,__LINE__,"profiles(1) % cfraction)",profiles(1) % cfraction
-37 continue
+
 #ifdef RTTOV
    call rttov_direct( &
       & errorstatus,     &! out
@@ -344,33 +288,38 @@ write (0,*) __FILE__,__LINE__,"profiles(1) % cfraction)",profiles(1) % cfraction
       & radiance )        ! inout
 #endif
 
-   if ( any(errorstatus(:) /= 0 )) then
-      !WRITE (UNIT=stderr,FMT=*) 'rttov_direct error code = ', errorstatus(:)
-      !WRITE (UNIT=stderr,FMT=*) 'nfrequencies = ', nfrequencies
-      !WRITE (UNIT=stderr,FMT=*) 'nchannels    = ', nchannels
-      !WRITE (UNIT=stderr,FMT=*) 'nbtout       = ', nbtout
-      !WRITE (UNIT=stderr,FMT=*) 'nprofiles    = ', nprofiles
-      !WRITE (UNIT=stderr,FMT=*) 'channels     = ', channels
-      !WRITE (UNIT=stderr,FMT=*) 'polarisations= ', polarisations
-      !WRITE (UNIT=stderr,FMT=*) 'lprofiles    = ', lprofiles
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%s2m   = ', profiles(1)%s2m
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%skin   = ', profiles(1)%skin
-      write(UNIT=stderr,FMT='(6f12.2)') &
-         profiles(1)%s2m%p,profiles(1)%skin%t,profiles(1)%s2m%t, &
-         profiles(1)%s2m%q,profiles(1)%s2m%u,profiles(1)%s2m%v
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%zenangle = ', profiles(1)%zenangle
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%azangle = ', profiles(1)%azangle
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%p   = ', profiles(1)%p
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%t   = ', profiles(1)%t
-      !WRITE (UNIT=stderr,FMT=*) 'profiles%q   = ', profiles(1)%q
-      !do i=coef%nlevels,1,-1
-      !  write(UNIT=stderr,FMT='(i4,3f12.2)') i, profiles(1)%p(i),profiles(1)%t(i),profiles(1)%q(i)
-      !end do
-      !WRITE (UNIT=stderr,FMT=*) 'addcloud     = ', addcloud
-      !WRITE (UNIT=stderr,FMT=*) 'calcemis     = ', calcemis
-      !WRITE (UNIT=stderr,FMT=*) 'emissivity   = ', emissivity
-      !WRITE (UNIT=stderr,FMT=*) 'radiance = ', radiance%out_clear
-      !call da_error(__FILE__,__LINE__,(/"Erk"/))
+   ! rttov87 generates warnings we want to ignore
+   if ( any(errorstatus(:) == errorstatus_fatal )) then
+      WRITE (UNIT=stderr,FMT=*) 'rttov_direct error code = ', errorstatus(:)
+      WRITE (UNIT=stderr,FMT=*) 'nfrequencies = ', nfrequencies
+      WRITE (UNIT=stderr,FMT=*) 'nchannels    = ', nchannels
+      WRITE (UNIT=stderr,FMT=*) 'nbtout       = ', nbtout
+      WRITE (UNIT=stderr,FMT=*) 'nprofiles    = ', nprofiles
+      WRITE (UNIT=stderr,FMT=*) 'channels     = ', channels
+      WRITE (UNIT=stderr,FMT=*) 'polarisations= ', polarisations
+      WRITE (UNIT=stderr,FMT=*) 'lprofiles    = ', lprofiles
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%t = ', profiles(1)%s2m%t
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%q = ', profiles(1)%s2m%q
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%o = ', profiles(1)%s2m%o
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%p = ', profiles(1)%s2m%p
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%u = ', profiles(1)%s2m%u
+      WRITE (UNIT=stderr,FMT=*) 'profiles%s2m%v = ', profiles(1)%s2m%v
+      WRITE (UNIT=stderr,FMT=*) 'profiles%skin%surftype = ', profiles(1)%skin%surftype
+      WRITE (UNIT=stderr,FMT=*) 'profiles%skin%t        = ', profiles(1)%skin%t
+      WRITE (UNIT=stderr,FMT=*) 'profiles%skin%fastem   = ', profiles(1)%skin%fastem
+      WRITE (UNIT=stderr,FMT=*) 'profiles%zenangle = ', profiles(1)%zenangle
+      WRITE (UNIT=stderr,FMT=*) 'profiles%azangle = ', profiles(1)%azangle
+      WRITE (UNIT=stderr,FMT=*) 'profiles%p   = ', profiles(1)%p
+      WRITE (UNIT=stderr,FMT=*) 'profiles%t   = ', profiles(1)%t
+      WRITE (UNIT=stderr,FMT=*) 'profiles%q   = ', profiles(1)%q
+      do i=coef%nlevels,1,-1
+         write(UNIT=stderr,FMT='(i4,3f12.2)') i, profiles(1)%p(i),profiles(1)%t(i),profiles(1)%q(i)
+      end do
+      WRITE (UNIT=stderr,FMT=*) 'addcloud     = ', addcloud
+      WRITE (UNIT=stderr,FMT=*) 'calcemis     = ', calcemis
+      WRITE (UNIT=stderr,FMT=*) 'emissivity   = ', emissivity
+      WRITE (UNIT=stderr,FMT=*) 'radiance = ', radiance%out_clear
+      call da_warning(__FILE__,__LINE__,(/"Problem in rttov_direct"/))
    endif
 
    nc = nbtout / nprofiles

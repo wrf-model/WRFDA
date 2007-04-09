@@ -10,6 +10,7 @@ module module_radiance
 #ifdef RTTOV
    use rttov_const,  only : &
             errorstatus_success, &
+            errorstatus_fatal,   &
             platform_name      , &
             inst_name          , &
             gas_id_watervapour  ,&

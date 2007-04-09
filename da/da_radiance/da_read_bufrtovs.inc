@@ -73,7 +73,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    !  data hdr1b /'FOVN YEAR MNTH DAYS HOUR MINU SECO CLAT CLON SAZA SOZA HOLS LSQL SLNM BEARAZ'/
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
-   integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_used
+   integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_selected
    integer :: lnbufr
    integer :: n
 
@@ -174,10 +174,10 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    nullify  ( head % next )
    p => head
 
-   num_tovs_local  = 0
-   num_tovs_file   = 0
-   num_tovs_global = 0
-   num_tovs_used = 0
+   num_tovs_local    = 0
+   num_tovs_file     = 0
+   num_tovs_global   = 0
+   num_tovs_selected = 0
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -277,15 +277,16 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
             exit obs
          end if
 
-         num_tovs_used = num_tovs_used + 1
+         num_tovs_selected = num_tovs_selected + 1
 
-         if (num_tovs_used > max_tovs_input) then
+         if (num_tovs_selected > max_tovs_input) then
             write(unit=message(1),fmt='(A,I10,A)') &
                "Max number of tovs",max_tovs_input," reached"
             call da_warning(__FILE__,__LINE__,message(1:1))
-            num_tovs_used = num_tovs_used-1
+            num_tovs_selected = num_tovs_selected-1
             exit obs
          end if
+
          if (outside) cycle ! No good for this PE
 
          num_tovs_local = num_tovs_local + 1
@@ -347,9 +348,10 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
       end do
    end do obs
 
-   iv%total_obs         = iv%total_obs + num_tovs_used
-   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
-   iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
+   ! These totals are before thinning, which will recalculate them
+   iv%total_obs         = iv%total_obs + num_tovs_selected
+   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_selected
+   iv%total_rad_channel = iv%total_rad_channel + num_tovs_selected*nchan
 
    deallocate(tb_inv)  
    call closbf(lnbufr)
@@ -524,7 +526,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    ! check if sequential structure has been freed
    !
    ! p => head
-   ! do i = 1, num_rad_used
+   ! do i = 1, num_rad_selected
    !    write (unit=stdout,fmt=*)  i, p%tb_inv(1:nchan)
    !    p => p%next
    ! end do

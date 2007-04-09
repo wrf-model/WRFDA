@@ -250,7 +250,8 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       & radiance_tl ) ! inout
 #endif
 
-   if ( any(errorstatus(:) /= 0 )) then
+   ! rttov87 generates warnings we want to ignore
+   if (any(errorstatus(:) == errorstatus_fatal)) then
        write (message(1),*)  'rttov_direct error code = ', errorstatus(:)
        write (message(2),*)  'nfrequencies            = ', nfrequencies
        write (message(3),*)  'nchannels               = ', nchannels

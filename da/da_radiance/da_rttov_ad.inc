@@ -46,7 +46,6 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    coef = coefs(inst)
    addcloud = .false. 
    switchrad = .TRUE.
-   errorstatus (:) = 0.0
    alloc_status (:) = 0.0
 
    do n = 1, nprofiles
@@ -268,7 +267,8 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       & radiance_ad ) ! inout  adjoint input  (output if converstion Bt -> rad)
 #endif
 
-   if ( any(errorstatus(:) /= 0 )) then
+   ! rttov87 generates warnings we want to ignore
+   if (any(errorstatus(:) == errorstatus_fatal)) then
        write (message(1),*) 'rttov_direct error code = ', errorstatus(:)
        write (message(2),*) 'nfrequencies            = ', nfrequencies
        write (message(3),*) 'nchannels               = ', nchannels
