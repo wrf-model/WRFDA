@@ -18,6 +18,12 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    real    :: sdmd, s1md
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
+   real :: press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: utmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: vtmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
 
    if (trace_use) call da_trace_entry("da_transfer_wrftltoxa_adj")
 
@@ -28,17 +34,27 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ks=grid%xp%kts
    ke=grid%xp%kte
 
+   grid%em_g_u_2 = 0.0
+   grid%em_g_v_2 = 0.0
+   grid%em_g_w_2 = 0.0
+   grid%em_g_t_2 = 0.0
+   grid%g_moist = 0.0
+   grid%em_g_mu_2 = 0.0
+   grid%em_g_ph_2 = 0.0
    !---------------------------------------------------------------------------
    ! [6.0] ALL THE SIMPLE ONES
    !---------------------------------------------------------------------------
 
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id4)
+
    do k=ks,ke+1
       do j=js,je
          do i=is,ie
-            grid%em_g_w_2(i,j,k)=grid%xa%w(i,j,k)
+            grid%em_g_w_2(i,j,k)=grid%em_g_w_2(i,j,k)+grid%xa%w(i,j,k)
          end do
       end do
    end do
+   grid%xa%w(is:ie,js:je,ks:ke+1) = 0.0
 
 #ifdef VAR4D_MICROPHYSICS
    ! New code needed once we introduce the microphysics to 4dvar in 2008
@@ -76,65 +92,69 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
 
 #endif
 
-
    !----------------------------------------------------------------------------
    ! [5.0] convert from c-grid to a-grid
    ! ----------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   ! Fill the halo region for u and v.
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+   utmp=grid%xa%u
+   vtmp=grid%xa%v
 
    ! The western boundary
-   if (is == grid%xp%ids) grid%xa%u(is-1,js:je,ks:ke)=0.
+   if (is == grid%xp%ids) utmp(is-1,js:je,ks:ke)=0.
 
    ! The southern boundary
-   if (js == grid%xp%jds) grid%xa%v(is:ie,js-1,ks:ke)=0.
+   if (js == grid%xp%jds) vtmp(is:ie,js-1,ks:ke)=0.
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%em_g_u_2(i,j,k)=0.5*(grid%xa%u(i-1,j  ,k)+grid%xa%u(i,j,k))
-           grid%em_g_v_2(i,j,k)=0.5*(grid%xa%v(i  ,j-1,k)+grid%xa%v(i,j,k))
+            grid%em_g_u_2(i,j,k)=grid%em_g_u_2(i,j,k)+0.5*(utmp(i-1,j  ,k)+utmp(i,j,k))
+            grid%em_g_v_2(i,j,k)=grid%em_g_v_2(i,j,k)+0.5*(vtmp(i  ,j-1,k)+vtmp(i,j,k))
          end do
       end do
    end do
 
    ! The eastern boundary
-   if (ie == grid%xp%ide) grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%xa%u(ie,js:je,ks:ke)/2.
+   if (ie == grid%xp%ide)  &
+       grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.
 
    ! The northern boundary
-   if (je == grid%xp%jde) grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%xa%v(is:ie,je,ks:ke)/2.
+   if (je == grid%xp%jde)  &
+       grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.
 
 #else
 
    do k=ks,ke
       do j=js,je
          do i=is+1,ie
-            grid%em_g_u_2(i,j,k)=0.5*(grid%xa%u(i-1,j,k)+grid%xa%u(i,j,k))
+            grid%em_g_u_2(i,j,k)=grid%em_g_u_2(i,j,k)+0.5*(grid%xa%u(i-1,j,k)+grid%xa%u(i,j,k))
          end do
       end do
       do j=js+1,je
          do i=is,ie
-            grid%em_g_v_2(i,j,k)=0.5*(grid%xa%v(i,j-1,k)+grid%xa%v(i,j,k))
+            grid%em_g_v_2(i,j,k)=grid%em_g_v_2(i,j,k)+0.5*(grid%xa%v(i,j-1,k)+grid%xa%v(i,j,k))
          end do
       end do
    end do
 
    ! The western boundary
-   grid%em_g_u_2(is,js:je,ks:ke)=grid%xa%u(is,js:je,ks:ke)/2.
+   grid%em_g_u_2(is,js:je,ks:ke)=grid%em_g_u_2(is,js:je,ks:ke)+grid%xa%u(is,js:je,ks:ke)/2.
 
    ! The eastern boundary
-   grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%xa%u(ie,js:je,ks:ke)/2.
+   grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.
 
    ! The southern boundary
-   grid%em_g_v_2(is:ie,js,ks:ke)=grid%xa%v(is:ie,js,ks:ke)/2.
+   grid%em_g_v_2(is:ie,js,ks:ke)=grid%em_g_v_2(is:ie,js,ks:ke)+grid%xa%v(is:ie,js,ks:ke)/2.
 
    ! The northern boundary
-   grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%xa%v(is:ie,je,ks:ke)/2.
+   grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.
+
 
 #endif
+   grid%xa%u(is:ie, js:je, ks:ke) = 0.0
+   grid%xa%v(is:ie, js:je, ks:ke) = 0.0
 
    !---------------------------------------------------------------------------
    ! [4.0] CONVERT THETA inCREMENTS TO T inCREMENTS
@@ -144,23 +164,19 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! However, in this adjoint problem, a_ph should be set to 0. Otherwise, a_ph 
    ! will be initialized randomly!
 
-   do k=ks,ke+1
-      do j=js,je
-         do i=is,ie
-            grid%em_g_ph_2(i,j,k)=0.
-         end do
-      end do
-   end do
+   grid%em_g_ph_2=0.
+   press = 0.0
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%xa%p(i,j,k)=grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
-            grid%em_g_t_2(i,j,k)=grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(300.0+grid%em_t_2(i,j,k))
+            press(i,j,k)=press(i,j,k)+grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
+            grid%em_g_t_2(i,j,k)=grid%em_g_t_2(i,j,k)+grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(300.0+grid%em_t_2(i,j,k))
          end do
       end do
    end do
 
+   grid%xa%t(is:ie, js:je, ks:ke) = 0.0
    !---------------------------------------------------------------------------
    ! [3.0] COMPUTE pressure increments 
    !---------------------------------------------------------------------------
@@ -169,10 +185,10 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
-            g_press(i,j,k )=g_press(i,j,k )+0.5*grid%xa%p(i,j,k)
-            grid%g_moist(i,j,k,P_G_QV)=-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
-            grid%em_g_mu_2(i,j)=-g_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
+            g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*press(i,j,k)
+            g_press(i,j,k )=g_press(i,j,k )+0.5*press(i,j,k)
+            grid%g_moist(i,j,k,P_G_QV)=grid%g_moist(i,j,k,P_G_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
+            grid%em_g_mu_2(i,j)=grid%em_g_mu_2(i,j)-g_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
             g_press(i,j,k+1)=g_press(i,j,k+1)+g_press(i,j,k)
          end do
       end do
@@ -184,22 +200,24 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
 
    do j=js,je
       do i=is,ie
+         sdmd=0.0
          s1md=0.0
          do k=ks,ke
             s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
          grid%em_g_mu_2(i,j)=grid%em_g_mu_2(i,j)-grid%xa%psfc(i,j)*s1md
-         sdmd=-grid%xb%psac(i,j)*grid%xa%psfc(i,j)
+         sdmd=sdmd-grid%xb%psac(i,j)*grid%xa%psfc(i,j)
          do k=ks,ke
             grid%g_moist(i,j,k,P_G_QV)=grid%g_moist(i,j,k,P_G_QV)+sdmd*grid%em_dnw(k)
          end do
       end do
    end do
 
+   grid%xa%psfc(is:ie, js:je) = 0.0
+
    !---------------------------------------------------------------------------
    ! [1.0] Get the specific humidity increments from mixing ratio increments
    !---------------------------------------------------------------------------
-   
    do k=ks,ke
       do j=js,je
          do i=is,ie
@@ -208,6 +226,8 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
          end do
       end do
    end do
+
+   grid%xa%q(is:ie, js:je, ks:ke)= 0.0
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL

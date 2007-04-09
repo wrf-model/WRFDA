@@ -19,6 +19,12 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
 
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
+   real :: press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: utmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: vtmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
 
    integer ndynopt
 
@@ -71,7 +77,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
                -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
                +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*grid%g_moist(i,j,k,P_G_QV))* &
                grid%em_dn(k)
-            grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+            press(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do
       end do
    end do
@@ -86,7 +92,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
          do i=is,ie
             grid%em_g_t_2(i,j,k)=(300.0+grid%em_t_2(i,j,k))* &
                (grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
-                        -kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
+                        -kappa*press(i,j,k)/grid%xb%p(i,j,k))
          end do
       end do
    end do
@@ -95,7 +101,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
          grid%em_g_ph_2(i,j,ks)=0.
          do k=ks,ke
             rho_cgrid=grid%xb%rho(i,j,k) &
-                      *(grid%xa%p(i,j,k)/grid%xb%p(i,j,k) &
+                      *(press(i,j,k)/grid%xb%p(i,j,k) &
                       -grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
                       -0.61*grid%xa%q(i,j,k)/(1.+0.61*grid%xb%q(i,j,k)))
             grid%em_g_ph_2(i,j,k+1)=grid%em_g_ph_2(i,j,k) &
@@ -111,42 +117,48 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
    !---------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-   ! Fill the halo region for u and v.
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
-
+   utmp = grid%xa%u
+   vtmp = grid%xa%v
    ! The southern boundary (fill A-GRID boundaries)
    ! To keep the gradient, A(0) = 2A(1)-A(2)
-   if (js == grid%xp%jds) &
-      grid%xa%v(is:ie,js-1,ks:ke)=2.0*grid%xa%v(is:ie,js,ks:ke)-grid%xa%v(is:ie,js+1,ks:ke)
+   if (js == grid%xp%jds) then
+      vtmp(is:ie,js-1,ks:ke)=2.0*grid%xa%v(is:ie,js  ,ks:ke) &
+                            -    grid%xa%v(is:ie,js+1,ks:ke)
+   end if
+
+   ! The northern boundary
+   if (je == grid%xp%jde) then
+      vtmp(is:ie,je+1,ks:ke)=2.0*grid%xa%v(is:ie,je  ,ks:ke) &
+                            -    grid%xa%v(is:ie,je-1,ks:ke)
+   end if
 
    ! The western boundary (fill A-GRID boundaries)
    ! To keep the gradient, A(0) = 2A(1)-A(2)
-   if (is == grid%xp%ids) &
-      grid%xa%u(is-1,js:je,ks:ke)=2.0*grid%xa%u(is,js:je,ks:ke)-grid%xa%u(is+1,js:je,ks:ke)
+   if (is == grid%xp%ids) then
+      utmp(is-1,js:je,ks:ke)=2.0*grid%xa%u(is  ,js:je,ks:ke) &
+                            -    grid%xa%u(is+1,js:je,ks:ke)
+   end if
+
+   ! The eastern boundary
+   if (ie == grid%xp%ide) then
+      utmp(ie+1,js:je,ks:ke)=2.0*grid%xa%u(ie  ,js:je,ks:ke) &
+                            -    grid%xa%u(ie-1,js:je,ks:ke)
+   end if
 
    do k=ks,ke
       do j=js,je
+         do i=is,ie+1
+            grid%em_g_u_2(i,j,k)=0.5*(utmp(i-1,j  ,k)+utmp(i,j,k))
+         end do
+      end do
+      do j=js,je+1
          do i=is,ie
-            grid%em_g_u_2(i,j,k)=0.5*(grid%xa%u(i-1,j  ,k)+grid%xa%u(i,j,k))
-            grid%em_g_v_2(i,j,k)=0.5*(grid%xa%v(i  ,j-1,k)+grid%xa%v(i,j,k))
+            grid%em_g_v_2(i,j,k)=0.5*(vtmp(i  ,j-1,k)+vtmp(i,j,k))
          end do
       end do
    end do
 
-   ! The northern boundary (compute C-GRID boundaries)
-   ! To keep the gradient, A(N+1) = 2A(N)-A(N-1)
-   ! and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
-   if (je == grid%xp%jde) &
-      grid%em_g_v_2(is:ie,je+1,ks:ke)=&
-         (3.0*grid%xa%v(is:ie,je,ks:ke)-grid%xa%v(is:ie,je-1,ks:ke))/2.
-
-   ! The eastern boundary (compute C-GRID boundaries)
-   ! To keep the gradient, A(N+1) = 2A(N)-A(N-1)
-   ! and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
-   if (ie == grid%xp%ide) &
-      grid%em_g_u_2(ie+1,js:je,ks:ke)=&
-         (3.0*grid%xa%u(ie,js:je,ks:ke)- grid%xa%u(ie-1,js:je,ks:ke))/2.
 
 #else
 

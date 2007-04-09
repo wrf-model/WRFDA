@@ -18,6 +18,13 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    real :: sdmd, s1md
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
+   real :: press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: utmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: vtmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
+      grid%xp%kms:grid%xp%kme)
+   real :: ptmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme)
 
    integer ndynopt
 
@@ -83,7 +90,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
                -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
                +(grid%em_mu_2(i,j)+grid%em_mub(i,j))* &
                grid%g_moist(i,j,k,P_G_QV))*grid%em_dn(k)
-            grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+            press(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do
       end do
    end do
@@ -97,7 +104,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
          do i=is,ie
             grid%xa%t(i,j,k)=grid%xb%t(i,j,k)*(grid%em_g_t_2(i,j,k)/ &
                (300.0+grid%em_t_2(i,j,k)) &
-               +kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
+               +kappa*press(i,j,k)/grid%xb%p(i,j,k))
          end do
       end do
    end do
@@ -108,9 +115,17 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    !-------------------------------------------------------------------------
    ! [5.0] convert from c-grid to a-grid
    !-------------------------------------------------------------------------
-
-   ! fill the halo region for u and v.
+   utmp=grid%xa%u
+   vtmp=grid%xa%v
+   ptmp=grid%xa%psfc
+   grid%xa%u=grid%em_a_u_2
+   grid%xa%v=grid%em_a_v_2
    call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+   grid%em_a_u_2=grid%xa%u
+   grid%em_a_v_2=grid%xa%v
+   grid%xa%u=utmp
+   grid%xa%v=vtmp
+   grid%xa%psfc=ptmp
 
    do k=ks,ke
       do j=js,je
@@ -120,6 +135,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
          end do
       end do
    end do
+
 
    !---------------------------------------------------------------------------
    ! [6.0] all the simple ones
@@ -167,6 +183,8 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
       end do
    end if
 #endif
+
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id4)
 
    if (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 
