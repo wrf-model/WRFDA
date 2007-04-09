@@ -52,7 +52,7 @@
  if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/${DATE}/ep1
 
  if ( ! -d ${DAT_DIR}/$DATE ) mkdir ${DAT_DIR}/$DATE
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
 
  setenv TMP_DIR $RUN_DIR/tmp
  rm -rf ${TMP_DIR}; mkdir $TMP_DIR >&! t

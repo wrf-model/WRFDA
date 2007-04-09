@@ -48,7 +48,7 @@ setenv OB_DIR /smoke/dmbarker/data/con200/get_obs # Alain's cleaned obs.
  if ( ! $?EXPT )          setenv EXPT       xwang
  if ( ! $?EXP_DIR )       setenv EXP_DIR    ${REG_DIR}/${EXPT}
  if ( ! $?RUN_DIR )       setenv RUN_DIR    ${EXP_DIR}/etkf
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
  cd $RUN_DIR
 
 #General parameters:
@@ -103,7 +103,10 @@ setenv OB_DIR /smoke/dmbarker/data/con200/get_obs # Alain's cleaned obs.
 
 #Copy first member as template for mean:
  setenv DA_FILE ${EXP_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${FILE_DATE}
- cp ${DA_FILE}.e001 ${DA_FILE}.e000
+ # ${DA_FILE}.e001 and ${DA_FILE} are identical, so no need to assume
+ # former exists
+ # cp ${DA_FILE}.e001 ${DA_FILE}.e000
+ cp ${DA_FILE} ${DA_FILE}.e000
 
 cat >! gen_be_ensmean_nl.nl << EOF
   &gen_be_ensmean_nl

@@ -41,7 +41,7 @@ setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar
  if ( ! $?EXPT )          setenv EXPT       xwang 
  if ( ! $?DAT_DIR )       setenv DAT_DIR    ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
  if ( ! $?RUN_DIR )       setenv RUN_DIR    ${DAT_DIR}/${DATE}/ep2
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
  cd $RUN_DIR
 
  if ( ! -d u ) mkdir u

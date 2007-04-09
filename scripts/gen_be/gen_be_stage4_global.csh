@@ -38,7 +38,7 @@
  if ( ! $?REGION )        setenv REGION katrina.12km
  if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${REGION}/noobs/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
 
  set CONTROL_VARIABLES = ( psi chi_u t_u rh ps_u ) 
 

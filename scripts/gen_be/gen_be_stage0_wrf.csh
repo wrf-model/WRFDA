@@ -43,8 +43,8 @@
  if ( ! $?MACHINES )      set MACHINES = ( node1 node1 node2 node2 node3 node3 node4 node4 \
                                            node5 node5 node6 node6 node7 node7 node8 node8 )  # For parallel runs.
 
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
- if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
+ if ( ! -d ${STAGE0_DIR} )  mkdir -p ${STAGE0_DIR}
 
 #OK, let's go!
 
@@ -75,15 +75,18 @@
    set HH = `echo $FCST_TIME | cut -c9-10`
    set FILE_DATE = ${YYYY}-${MM}-${DD}_${HH}:00:00
    set FILE = ${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
-
+   set FILE1 = wrfout_d01_${FILE_DATE}
+   set FILE2 = wrfout_d01_${FILE_DATE}.e001
+   set FILE3 = wrfout_d01_${FILE_DATE}.e002
    set NEXT_DATE = `${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE2`
    if ( $BE_METHOD == NMC ) then
-      ln -sf $FILE ${FILE}.e001
-      ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} ${FILE}.e002
+      ln -sf $FILE $FILE1
+      ln -sf $FILE $FILE2
+      ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} $FILE3
    endif
 
    ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
-   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE >&! gen_be_stage0_wrf.${FCST_TIME}.out
+   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE1 >&! gen_be_stage0_wrf.${FCST_TIME}.out
 
 #  Tidy:
    mv pert.${FCST_TIME}* ${STAGE0_DIR}

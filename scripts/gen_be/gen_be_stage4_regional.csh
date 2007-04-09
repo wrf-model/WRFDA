@@ -38,7 +38,7 @@
  if ( ! $?REGION )        setenv REGION katrina.12km
  if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${user}/data/${REGION}/noobs/gen_be
  if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/${ID} 
- if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
+ if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
  if ( ! $?LOCAL )         setenv LOCAL false            # True if local machine.
  if ( ! $?NUM_JOBS )      setenv NUM_JOBS    1            # Number of jobs to run.
  if ( ! $?MACHINES )      set MACHINES = ( node1 node1 node2 node2 node3 node3 node4 node4 \

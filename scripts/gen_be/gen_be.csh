@@ -70,8 +70,8 @@ if ( ! $?DAT_DIR )       setenv DAT_DIR ${DATA_DISK}/${USER}/data/${REGION}/${EX
 if ( ! $?RUN_DIR )       setenv RUN_DIR ${DAT_DIR}/$ID
 if ( ! $?STAGE0_DIR )    setenv STAGE0_DIR ${DAT_DIR}/stage0
 
-if ( ! -d ${RUN_DIR} )   mkdir ${RUN_DIR}
-if ( ! -d ${STAGE0_DIR} )  mkdir ${STAGE0_DIR}
+if ( ! -d ${RUN_DIR} )   mkdir -p ${RUN_DIR}
+if ( ! -d ${STAGE0_DIR} )  mkdir -p ${STAGE0_DIR}
 
 if ( $GLOBAL == true ) then
   setenv UH_METHOD power
