@@ -195,7 +195,6 @@ da_utils : setup \
            da_ominusb.exe \
            da_tune.exe \
            da_update_bc.exe \
-           da_bufr_little_endian.exe \
            da_advance_cymdh.exe
 
 da_plots : setup da_scale_length.exe
@@ -222,14 +221,6 @@ da_update_bc.exe : da_update_bc.o
 
 da_update_bc.o : da_update_bc.f90 da_module_couple_uv.o da_netcdf_interface.o
 	$(SFC) -c $(FCFLAGS) -I$(NETCDF_INC) da_update_bc.f90
-
-da_bufr_little_endian.exe : da_bufr_little_endian.o
-	$(RM) $@
-	$(FFC) -o $@ da_bufr_little_endian.o $(BUFR_LIB) $(LOCAL_LIB)
-
-da_bufr_little_endian.o : da_bufr_little_endian.f90
-	$(CPP) $(CPPFLAGS) $(FPPFLAGS) da_bufr_little_endian.f90 > da_bufr_little_endian.f
-	$(FFC) -c $(FIXEDFLAGS_ENDIAN) da_bufr_little_endian.f
 
 da_biascorr : da_bias_airmass.exe da_bias_sele.exe da_bias_scan.exe da_bias_scan.exe da_bias_verif.exe
 
