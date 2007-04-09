@@ -66,7 +66,7 @@ fi
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
 
-export RTTOV=${RTTOV:-$HOME/rttov/rttov85}                            # RTTOV
+export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
 export CRTM=${CRTM:-$HOME/crtm}
 export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coefs}
