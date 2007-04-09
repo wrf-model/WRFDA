@@ -25,6 +25,13 @@
       real    :: tol_adjust_moist, tol_moist, oldrha, each_moist, es, weight
       real    :: upper_modify_rh, lower_modify_rh
 
+! To get the xa%rh for the moisture adjustments (YRG, 04/02/2007):
+
+      if ( cv_options_hum == 1  ) then
+         write(6,'(/a,i2,a)')'cv_options_hum=',cv_options_hum,' to get xa%rh..'
+         call DA_TPQ_To_RH_Lin( xb, xp, xa )
+      endif
+
       is = xp % its
       ie = xp % ite
       js = xp % jts
@@ -34,21 +41,15 @@
 
       upper_modify_rh = 95.
       lower_modify_rh = 11.
-!
+
       DO i=is,ie
       DO j=js,je
 
          tol_adjust_moist = 0.
          tol_moist        = 0.
 
-         dz(1)             = xb%ztop-xb%hf(i,j,1)
-         imod(1)           = 0
-         x_qs(1)           = 0.
-         rhtol(1)          = xb%rh(i,j,1)+xa%rh(i,j,1)
-         oldq (1)          = xa%q(i,j,1)
-
-         DO k=ks+1,ke
-            dz(k)=xb%hf(i,j,k-1)-xb%hf(i,j,k)
+         DO k=ks,ke
+            dz(k)=xb%hf(i,j,k+1)-xb%hf(i,j,k)
 
             imod(k)           = 0
             x_qs(k)           = 0.
@@ -90,6 +91,7 @@
                                   dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                imod(k)=-1
             endif
+
          ENDDO
       
          if ( tol_adjust_moist .gt. 0. ) then
@@ -102,6 +104,7 @@
                                  dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                   tol_moist    = tol_moist + each_moist
                   imod(k)      = 1
+
                endif
             ENDDO
          endif
@@ -116,20 +119,22 @@
                                  dz(k)*(xb%rho(i,j,k)+xa%rho(i,j,k))
                   tol_moist    = tol_moist + each_moist
                   imod(k)      = 1
+
                endif
             ENDDO
          endif
 
          if (tol_moist > 0) then
-           weight       = tol_adjust_moist/tol_moist
+               weight       = tol_adjust_moist/tol_moist
            DO k=ks,ke
              if ( imod(k) .eq. 1) then
                xa%rh(i,j,k) = xa%rh(i,j,k)+(xb%rh(i,j,k)+xa%rh(i,j,k))*weight
                call DA_TPRH_To_Q_Lin1( xb%t(i,j,k), xb%p(i,j,k), xb%es(i,j,k),  &
                                       xb%q(i,j,k), xb%rh(i,j,k),  xa%t(i,j,k) , &
                                       xa%p(i,j,k), xa%rh(i,j,k), xa%q(i,j,k) )
-
+               
              endif
+
            ENDDO
          endif
 
