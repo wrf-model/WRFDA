@@ -32,24 +32,26 @@ subroutine da_check_rh(xb, xa, xp)
    upper_modify_rh = 95.0
    lower_modify_rh = 11.0
 
+! To get the xa%rh for the moisture adjustments (YRG, 04/02/2007):
+
+      if ( cv_options_hum == 1  ) then
+         write(6,'(/a,i2,a)')'cv_options_hum=',cv_options_hum,' to get xa%rh..'
+         call DA_TPQ_To_RH_Lin( xb, xp, xa )
+      endif
+
    do i=is,ie
       do j=js,je
 
          tol_adjust_moist = 0.0
          tol_moist        = 0.0
 
-         dz(1)             = xb%ztop-xb%hf(i,j,1)
-         imod(1)           = 0
-         x_qs(1)           = 0.0
-         rhtol(1)          = xb%rh(i,j,1)+xa%rh(i,j,1)
-
-         do k=ks+1,ke
-            dz(k)=xb%hf(i,j,k-1)-xb%hf(i,j,k)
+         DO k=ks,ke
+            dz(k)=xb%hf(i,j,k+1)-xb%hf(i,j,k)
 
             imod(k)           = 0
-            x_qs(k)           = 0.0
+            x_qs(k)           = 0.
             rhtol(k)          = xb%rh(i,j,k)+xa%rh(i,j,k)
-         end do
+         ENDDO
 
          do k=ks,ke
             if (rhtol(k) .gt. maximum_rh) then
