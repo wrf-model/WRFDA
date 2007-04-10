@@ -24,13 +24,6 @@
 #########################################################################
 #set echo 
 
-# 0 WRF-VAR tracing parameters
-#-----------------------------------
-export NL_TRACE_USE=.TRUE.
-export NL_TRACE_UNIT=0
-export NL_TRACE_ALL_PES=true
-export NL_TRACE_CSV=true
-
 # 1 Decide which stages to run (run if true):
 #--------------------------------------------
   # 1.0 retrieval data
@@ -43,19 +36,26 @@ export NL_TRACE_CSV=true
 #export RUN_WRFSI=true                # 
 export RUN_WPS=true
 export RUN_REAL=true
-export RUN_WRF=true
+#export RUN_WRF=true
 
   # 1.2 run WRF-Var components
   #----------------------------
-#export RUN_OBSPROC=true
-#export RUN_WRFVAR=true
+export RUN_OBSPROC=true
+export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
 
+# 2 Experiment details:
+#-----------------------------
+#export DUMMY=${DUMMY:-true}
+#export FCYCLE_HOUR=00
+export CLEAN=false
+#export CYCLING=true  # true: use wrf_3dvar_input as input
+#export FIRST=false   # if the first case, no wrf_3dvar_input file available
 
-# 2 Job detail
+# 3 Job detail
 #------------------------
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=64
+export NUM_PROCS=8
 export QUEUE=premium  # regular share economy
 export PROJECT=64000420 # 25000026
 #export LSF_MAX_RUNTIME=30
@@ -65,20 +65,10 @@ export WALLCLOCK=360
 #export RUN_CMD=mpirun.lsf
 #export RUN_CMD="mpirun -np $NUM_PROCS -machinefile /users/hclin/hosts"
 
-
-# 3 Experiment details: 
-#-----------------------------
-#export DUMMY=${DUMMY:-true}
-#export FCYCLE_HOUR=00
-export CLEAN=false
-export CYCLING=true  # true: use wrf_3dvar_input as input
-export FIRST=false   # if the first case, no wrf_3dvar_input file available
-
-
 # 4 Time info:
 #-------------------------------
-export INITIAL_DATE=2005082600
-export FINAL_DATE=2005082600
+export INITIAL_DATE=2005082000
+export FINAL_DATE=2005082000
 export LBC_FREQ=06
 export CYCLE_PERIOD=06
 export OBS_FREQ=06
@@ -102,6 +92,8 @@ export REL_DIR=/mmm/users/${USERNAME}/code_vista # TOP dir of code
 export WPS_DIR=$REL_DIR/WPS                      # WPS dir
 export WRF_DIR=$REL_DIR/WRFV2                    # WRF dir
 export WRFVAR_DIR=$REL_DIR/radiance_2007         # WRF-Var dir
+export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC        # OBSPROC dir
+export WRF_BC_DIR=$WRFVAR_DIR/build              # da_update_bc dir
 
   # 5.2 experiments output dir
   #------------------------
@@ -109,7 +101,7 @@ export DAT_DIR=/ptmp/${USERNAME}/exps            # TOP dir of data
 export RTOBS_DIR=${DAT_DIR}/rtobs                # global data
 export GRIB_DIR=${DAT_DIR}/fnl                   # fnl grib
 export REGION=katrina12                          # domain dir
-export EXPT=bluevista_rad07_noobs_$NUM_PROCS     # experiment dir under REGION
+export EXPT=bluevista_rad07_coefs_$NUM_PROCS     # experiment dir under REGION
 export OB_DIR=${DAT_DIR}/${REGION}/ob            # WRF-Var obs input dir
 export RC_DIR=${DAT_DIR}/${REGION}/$EXPT/rc      # WPS/REAL output dir
 export FC_DIR=${DAT_DIR}/${REGION}/$EXPT/fc      # WRF model output
@@ -188,6 +180,13 @@ export NL_TIME_STEP_SOUND=0    # number of sound steps per time-step
 
    # 6.3 namelist for WRF-Var:
    #----------------------------
+# tracing
+#-----------------------------------
+export NL_TRACE_USE=.TRUE.
+export NL_TRACE_UNIT=0
+export NL_TRACE_ALL_PES=true
+export NL_TRACE_CSV=true
+
 # for tuning poupose
 #export NL_OMB_ADD_NOISE=true
 #export NL_PUT_RAND_SEED=true
@@ -196,8 +195,9 @@ export NL_TIME_STEP_SOUND=0    # number of sound steps per time-step
 
 export NL_PRINT_DETAIL=999
 export NL_PRINT_DETAIL_GRAD=true
-#export NL_CHECK_MAX_IV=false
-export NL_NTMAX=1
+export NL_ANALYSIS_TYPE=QC_OBS # QC_OBS, 3DVAR, VERIFY
+export NL_CHECK_MAX_IV=true
+export NL_NTMAX=100
 export DA_BACK_ERRORS=$HOME/be/be.cv_5_12km
 export NL_VAR_SCALING4=0.01
 export NL_LEN_SCALING1=1.0
@@ -220,22 +220,22 @@ export NL_LEN_SCALING5=1.0
 #export NL_USE_QSCATOBS=false
 
 # satellite retrieval obs usage
-export NL_USE_GEOAMVOBS=true
+export NL_USE_GEOAMVOBS=false
 export NL_USE_POLARAMVOBS=false
 export NL_USE_SATEMOBS=false
 export NL_USE_AIRSRETOBS=false
 export NL_USE_SSMIRETRIEVALOBS=false
 
 # radiance obs usage
-export NL_USE_AMSUAOBS=true
-export NL_USE_AMSUBOBS=true
+#export NL_USE_AMSUAOBS=true
+#export NL_USE_AMSUBOBS=true
 #export NL_USE_HIRS3OBS=true
 
 # radiances assimilation control
 export NL_RTM_OPTION=2    # 1:rttov; 2:crtm
 #export NL_PRINT_DETAIL_RADIANCE=true
 export NL_NUM_FGAT_TIME=1
-export NL_RTMINIT_NSENSOR=6
+export NL_RTMINIT_NSENSOR=0
 export NL_RTMINIT_PLATFORM=1,1,1,1,1,1
 export NL_RTMINIT_SATID=15,16,18,15,16,17
 export NL_RTMINIT_SENSOR=3,3,3,4,4,4
