@@ -20,9 +20,9 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    real    :: rho_cgrid
 
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: a_press
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: press
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: utmp
    real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme,grid%xp%kms:grid%xp%kme) :: vtmp
+
 
    integer ndynopt
 
@@ -101,6 +101,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    ! [5.0] Adjoint of CONVERT FROM A-GRID TO C-GRID
    !---------------------------------------------------------------------------
 
+   ! Fill the halo region for a_u and a_v.
    utmp=grid%xa%u
    vtmp=grid%xa%v
    grid%xa%u=grid%em_a_u_2
@@ -164,7 +165,6 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    !---------------------------------------------------------------------------
 
    a_press(is:ie,js:je,ks:ke+1)=0.
-   press=0.
    do k=ke,ks,-1
       do j=js,je
          do i=is,ie
@@ -174,7 +174,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
             grid%em_a_ph_2(i,j,k ) =grid%em_a_ph_2(i,j,k)   +grid%em_a_ph_2(i,j,k+1)
             grid%xa%q(i,j,k)=grid%xa%q(i,j,k)-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*grid%xb%q(i,j,k))
             grid%xa%t(i,j,k)=grid%xa%t(i,j,k)-grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%t(i,j,k)
-            press(i,j,k)= press(i,j,k)+grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
+            grid%xa%p(i,j,k)= grid%xa%p(i,j,k)+grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
          end do
       end do
    end do
@@ -182,7 +182,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie 
-            press(i,j,k)=press(i,j,k)-(300.0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
+            grid%xa%p(i,j,k)=grid%xa%p(i,j,k)-(300.0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
             grid%xa%t(i,j,k)=grid%xa%t(i,j,k)+(300.0+grid%em_t_2(i,j,k))*grid%em_a_t_2(i,j,k)/grid%xb%t(i,j,k)
          end do
       end do
@@ -198,8 +198,9 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*press(i,j,k)
-            a_press(i,j,k )=a_press(i,j,k )+0.5*press(i,j,k)
+            a_press(i,j,k+1)=a_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
+            a_press(i,j,k )=a_press(i,j,k )+0.5*grid%xa%p(i,j,k)
+            grid%xa%p(i,j,k)=0.0
             grid%a_moist(i,j,k,P_A_QV)=grid%a_moist(i,j,k,P_A_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*a_press(i,j,k)*grid%em_dn(k)
             grid%em_a_mu_2(i,j)=grid%em_a_mu_2(i,j)-a_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
             a_press(i,j,k+1)=a_press(i,j,k+1)+a_press(i,j,k)

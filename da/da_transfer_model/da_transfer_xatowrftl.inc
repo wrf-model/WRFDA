@@ -77,7 +77,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
                -(grid%em_g_mu_2(i,j)*(1.0+grid%moist(i,j,k,P_QV)) &
                +(grid%em_mu_2(i,j)+grid%em_mub(i,j))*grid%g_moist(i,j,k,P_G_QV))* &
                grid%em_dn(k)
-            press(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
+            grid%xa%p(i,j,k)=0.5*(g_press(i,j,k)+g_press(i,j,k+1))
          end do
       end do
    end do
@@ -92,7 +92,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
          do i=is,ie
             grid%em_g_t_2(i,j,k)=(300.0+grid%em_t_2(i,j,k))* &
                (grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
-                        -kappa*press(i,j,k)/grid%xb%p(i,j,k))
+                        -kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
          end do
       end do
    end do
@@ -101,7 +101,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
          grid%em_g_ph_2(i,j,ks)=0.
          do k=ks,ke
             rho_cgrid=grid%xb%rho(i,j,k) &
-                      *(press(i,j,k)/grid%xb%p(i,j,k) &
+                      *(grid%xa%p(i,j,k)/grid%xb%p(i,j,k) &
                       -grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
                       -0.61*grid%xa%q(i,j,k)/(1.+0.61*grid%xb%q(i,j,k)))
             grid%em_g_ph_2(i,j,k+1)=grid%em_g_ph_2(i,j,k) &

@@ -18,8 +18,6 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    real    :: sdmd, s1md
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
-   real :: press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
-      grid%xp%kms:grid%xp%kme)
    real :: utmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
    real :: vtmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
@@ -97,7 +95,6 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! ----------------------------------------------------------------------------
 
 #ifdef DM_PARALLEL
-
    utmp=grid%xa%u
    vtmp=grid%xa%v
 
@@ -165,12 +162,11 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! will be initialized randomly!
 
    grid%em_g_ph_2=0.
-   press = 0.0
 
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            press(i,j,k)=press(i,j,k)+grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
+            grid%xa%p(i,j,k)=grid%xa%p(i,j,k)+grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
             grid%em_g_t_2(i,j,k)=grid%em_g_t_2(i,j,k)+grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(300.0+grid%em_t_2(i,j,k))
          end do
       end do
@@ -185,14 +181,16 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*press(i,j,k)
-            g_press(i,j,k )=g_press(i,j,k )+0.5*press(i,j,k)
+            g_press(i,j,k+1)=g_press(i,j,k+1)+0.5*grid%xa%p(i,j,k)
+            g_press(i,j,k )=g_press(i,j,k )+0.5*grid%xa%p(i,j,k)
             grid%g_moist(i,j,k,P_G_QV)=grid%g_moist(i,j,k,P_G_QV)-(grid%em_mu_2(i,j)+grid%em_mub(i,j))*g_press(i,j,k)*grid%em_dn(k)
             grid%em_g_mu_2(i,j)=grid%em_g_mu_2(i,j)-g_press(i,j,k)*(1.0+grid%moist(i,j,k,P_QV))*grid%em_dn(k)
             g_press(i,j,k+1)=g_press(i,j,k+1)+g_press(i,j,k)
          end do
       end do
    end do
+
+   grid%xa%p(is:ie, js:je, ks:ke) = 0.0
 
    !---------------------------------------------------------------------------
    ! [2.0] COMPUTE psfc increments from mu-increments
@@ -227,7 +225,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
       end do
    end do
 
-   grid%xa%q(is:ie, js:je, ks:ke)= 0.0
+   grid%xa%q(is:ie, js:je, ks:ke) = 0.0
 
    ndynopt      = grid%dyn_opt
    grid%dyn_opt = DYN_EM_TL
