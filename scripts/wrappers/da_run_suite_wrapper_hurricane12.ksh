@@ -34,13 +34,13 @@
   # 1.1 run WPS/SI/REAL/WRF
   #------------------------
 #export RUN_WRFSI=true                # 
-export RUN_WPS=true
-export RUN_REAL=true
+#export RUN_WPS=true
+#export RUN_REAL=true
 #export RUN_WRF=true
 
   # 1.2 run WRF-Var components
   #----------------------------
-export RUN_OBSPROC=true
+#export RUN_OBSPROC=true
 export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
 
@@ -55,11 +55,11 @@ export CLEAN=false
 # 3 Job detail
 #------------------------
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=8
-export QUEUE=premium  # regular share economy
+export NUM_PROCS=16
+export QUEUE=share # premium  # regular share economy
 export PROJECT=64000420 # 25000026
 #export LSF_MAX_RUNTIME=30
-export WALLCLOCK=360
+export WALLCLOCK=60
 #export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME"
 #export RUN_CMD=mpirun.lsf
@@ -76,9 +76,9 @@ export LONG_FCST_TIME_1=00
 export LONG_FCST_TIME_2=06
 export LONG_FCST_TIME_3=12
 export LONG_FCST_TIME_4=18
-export LONG_FCST_RANGE_1=120
+export LONG_FCST_RANGE_1=6
 export LONG_FCST_RANGE_2=6 #72
-export LONG_FCST_RANGE_3=120
+export LONG_FCST_RANGE_3=6
 export LONG_FCST_RANGE_4=6 #72
 
 # 5 Directories (bluevista/blueice):
@@ -177,6 +177,10 @@ export NL_DAMPCOEF=0.01
 export NL_TIME_STEP_SOUND=0    # number of sound steps per time-step 
                                # (if using a time_step much larger than 6*dx (in km), 
                                # increase number of sound steps). = 0: the value computed automatically
+
+   # 6.3 namelist for OBS_PROC:
+   #----------------------------
+export PTOP_PA=$NL_P_TOP_REQUESTED
 
    # 6.3 namelist for WRF-Var:
    #----------------------------
