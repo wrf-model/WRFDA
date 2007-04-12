@@ -31,23 +31,25 @@ export RUN_WPS=false
 export RUN_REAL=false
 export RUN_OBSPROC=false
 export RUN_WRFVAR=true
-export RUN_UPDATE_BC=true
-export RUN_WRF=true
+export RUN_UPDATE_BC=false
+export RUN_WRF=false
+export CHECK_SVNVERSION=false
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=cwb
-export EXPT=test
+export EXPT=4dvar
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
 export NL_INPUTOUT_BEGIN_H=0
-export NL_NTMAX=5
+export NL_NTMAX=100
 export NL_VAR4D=true
 #export NL_TRACE_UNIT=0
 export NL_DEBUG_LEVEL=0
 export NL_VAR4D_COUPLING=1 # disk linear
 export WINDOW_START=0
 export WINDOW_END=6
+export NL_RUN_HOURS=6
 if test $NL_VAR4D != true ; then
    export NL_NUM_FGAT_TIME=1
 else
@@ -58,13 +60,9 @@ fi
 export LSF_EXCLUSIVE=" "
 export NUM_PROCS=1
 export QUEUE=premium
-#export QUEUE=share
-#export PROJECT_ID=68000001
-export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=180
+export PROJECT=64000420
+export WALLCLOCK=180
 export LL_PTILE=16
-#export SUBMIT="LSF"
-#export RUN_CMD=mpirun.lsf
 export SUBMIT="none" 
 export RUN_CMD=" "
 
@@ -84,7 +82,7 @@ export LONG_FCST_RANGE_4=06
 
 #Directories:
 #bluevista:
-export REL_DIR=$HOME/release-mc
+export REL_DIR=$HOME/compare
 export DAT_DIR=$REL_DIR/../case_data
 export EXP_DIR=/ptmp/xinzhang/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
@@ -127,6 +125,8 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
+#export NL_TESTING_WRFVAR=true
+#export NL_TEST_TRANSFORMS=true
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
@@ -162,11 +162,6 @@ export NL_LEN_SCALING5=0.5
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
-#export MACHINE=bluevista
-#$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/da_run_suite.ksh
 
 exit 0
 

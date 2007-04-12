@@ -31,24 +31,25 @@ export RUN_WPS=false
 export RUN_REAL=false
 export RUN_OBSPROC=false
 export RUN_WRFVAR=true
-export RUN_UPDATE_BC=true
-export RUN_WRF=true
+export RUN_UPDATE_BC=false
+export RUN_WRF=false
+export CHECK_SVNVERSION=false
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=cwb
-export EXPT=test
+export EXPT=4dvar
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
 export NL_INPUTOUT_BEGIN_H=0
 export NL_NTMAX=100
 export NL_VAR4D=true
 #export NL_TRACE_UNIT=0
-#export NL_TRACE_USE=false
 export NL_DEBUG_LEVEL=0
 export NL_VAR4D_COUPLING=2 # disk linear
 export WINDOW_START=0
 export WINDOW_END=6
+export NL_RUN_HOURS=6
 if test $NL_VAR4D != true ; then
    export NL_NUM_FGAT_TIME=1
 else
@@ -56,22 +57,20 @@ else
 fi
 #export FIRST=false
 
-export LSF_EXCLUSIVE=" "
-export NUM_PROCS=32
-export NUM_PROCS_VAR=16
-export NUM_PROCS_WRF=16
-export PROJECT_ID=64000420
-export QUEUE=regular
 export LSF_EXCLUSIVE=-I
-export LSF_MAX_RUNTIME=10
-export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=360
+export NUM_PROCS=16
+export NUM_PROCS_VAR=4
+export NUM_PROCS_WRF=4
+export QUEUE=debug
+export PROJECT=64000420
+export WALLCLOCK=10
 export LL_PTILE=16
+export SUBMIT="LSF"
 export RUN_CMD=mpirun.lsf
 
 #Time info:
 export INITIAL_DATE=2005071600
-export FINAL_DATE=2005071700
+export FINAL_DATE=2005071600
 #Uncomment for actual runs: export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00
@@ -128,6 +127,8 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
+export NL_TESTING_WRFVAR=false
+export NL_TEST_TRANSFORMS=false
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
@@ -162,12 +163,7 @@ export NL_LEN_SCALING5=0.5
 
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-#$WRFVAR_DIR/scripts/da_run_job.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/da_run_suite.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 
