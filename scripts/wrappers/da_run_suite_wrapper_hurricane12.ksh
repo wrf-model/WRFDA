@@ -34,13 +34,13 @@
   # 1.1 run WPS/SI/REAL/WRF
   #------------------------
 #export RUN_WRFSI=true                # 
-#export RUN_WPS=true
-#export RUN_REAL=true
+export RUN_WPS=true
+export RUN_REAL=true
 #export RUN_WRF=true
 
   # 1.2 run WRF-Var components
   #----------------------------
-#export RUN_OBSPROC=true
+export RUN_OBSPROC=true
 export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
 
@@ -55,11 +55,11 @@ export CLEAN=false
 # 3 Job detail
 #------------------------
 export LSF_EXCLUSIVE=" "
-export NUM_PROCS=16
-export QUEUE=share # premium  # regular share economy
+export NUM_PROCS=32
+export QUEUE=premium  # regular share economy
 export PROJECT=64000420 # 25000026
 #export LSF_MAX_RUNTIME=30
-export WALLCLOCK=60
+export WALLCLOCK=360
 #export LL_PTILE=16
 #export SUBMIT="bsub -a mpich_gm -n $NUM_PROCS -o $EXPT.out -e $EXPT.err -q $JOB_QUEUE -P $PROJECT_ID -W $WALL_CLOCK_TIME"
 #export RUN_CMD=mpirun.lsf
@@ -68,7 +68,7 @@ export WALLCLOCK=60
 # 4 Time info:
 #-------------------------------
 export INITIAL_DATE=2005082000
-export FINAL_DATE=2005082000
+export FINAL_DATE=2005083118
 export LBC_FREQ=06
 export CYCLE_PERIOD=06
 export OBS_FREQ=06
@@ -77,9 +77,9 @@ export LONG_FCST_TIME_2=06
 export LONG_FCST_TIME_3=12
 export LONG_FCST_TIME_4=18
 export LONG_FCST_RANGE_1=6
-export LONG_FCST_RANGE_2=6 #72
+export LONG_FCST_RANGE_2=6
 export LONG_FCST_RANGE_3=6
-export LONG_FCST_RANGE_4=6 #72
+export LONG_FCST_RANGE_4=6
 
 # 5 Directories (bluevista/blueice):
 #------------------------------------
@@ -110,7 +110,7 @@ export FC_DIR=${DAT_DIR}/${REGION}/$EXPT/fc      # WRF model output
 #--------------------------
   # 6.1 for WPS (namelist.wps):
   #-----------------------------
-export RUN_GEOGRID=true
+export RUN_GEOGRID=false
 export DEBUG_LEVEL_UNGRIB=200
 export MAP_PROJ=mercator
 export NL_E_WE=460
@@ -142,8 +142,9 @@ export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.994, 0.986, 0.978, 0.968, 0.957
                                       " 0.0056, 0.000 "}
 export NL_SMOOTH_OPTION=0      # for nesting
 export NL_FEEDBACK=0           # for nesting
-export NL_NUM_METGRID_LEVELS=27  # number of vertical levels in the incoming data: 
+#export NL_NUM_METGRID_LEVELS=27  # number of vertical levels in the incoming data: 
                                # type nudump h to find out (WPS data only)
+                               # meet problem when set this
 export NL_P_TOP_REQUESTED=1000 # p_top to use in the model
 
 # physics
@@ -199,9 +200,9 @@ export NL_TRACE_CSV=true
 
 export NL_PRINT_DETAIL=999
 export NL_PRINT_DETAIL_GRAD=true
-export NL_ANALYSIS_TYPE=QC_OBS # QC_OBS, 3DVAR, VERIFY
+export NL_ANALYSIS_TYPE=QC-OBS # QC-OBS, 3DVAR, VERIFY, RANDOMCV
 export NL_CHECK_MAX_IV=true
-export NL_NTMAX=100
+export NL_NTMAX=1
 export DA_BACK_ERRORS=$HOME/be/be.cv_5_12km
 export NL_VAR_SCALING4=0.01
 export NL_LEN_SCALING1=1.0
@@ -231,32 +232,34 @@ export NL_USE_AIRSRETOBS=false
 export NL_USE_SSMIRETRIEVALOBS=false
 
 # radiance obs usage
-#export NL_USE_AMSUAOBS=true
-#export NL_USE_AMSUBOBS=true
-#export NL_USE_HIRS3OBS=true
+export NL_USE_AMSUAOBS=true
+export NL_USE_AMSUBOBS=true
+export NL_USE_HIRS3OBS=true
+export NL_USE_AIRSOBS=true
+export NL_USE_EOS_AMSUAOBS=true
 
 # radiances assimilation control
 export NL_RTM_OPTION=2    # 1:rttov; 2:crtm
 #export NL_PRINT_DETAIL_RADIANCE=true
 export NL_NUM_FGAT_TIME=1
-export NL_RTMINIT_NSENSOR=0
-export NL_RTMINIT_PLATFORM=1,1,1,1,1,1
-export NL_RTMINIT_SATID=15,16,18,15,16,17
-export NL_RTMINIT_SENSOR=3,3,3,4,4,4
+export NL_RTMINIT_NSENSOR=9
+export NL_RTMINIT_PLATFORM=1,1,1,1,1,1,1,9,9
+export NL_RTMINIT_SATID=15,16,15,16,17,16,17,2,2
+export NL_RTMINIT_SENSOR=3,3,4,4,4,0,0,3,11
 export NL_QC_RAD=true
 export NL_READ_BIASCOEF=true
-export NL_BIASCORR=true
+#export NL_BIASCORR=true
 export NL_BIASPREP=true
 export NL_WRITE_IV_RAD_ASCII=.TRUE.
-export NL_WRITE_OA_RAD_ASCII=.TRUE.
+#export NL_WRITE_OA_RAD_ASCII=.TRUE.
 export NL_WRITE_FILTERED_RAD=.TRUE.
-export NL_USE_THINNING=true
+#export NL_USE_THINNING=true
 #export NL_THINNING_MESH=60.0,60.0,60.0,60.0,60.0,60.0
-export NL_THINNING_MESH=120.0,120.0,120.0,120.0,120.0,120.0
+#export NL_THINNING_MESH=120.0,120.0,120.0,120.0,120.0,120.0
 export DA_RTTOV_COEFFS= #/homebv/wrfhelp/external/rttov/rtcoef_rttov7
 export DA_CRTM_COEFFS=/homebv/wrfhelp/external/crtm/crtm_coefs
-#export WINDOW_START=-3
-#export WINDOW_END=3
+export WINDOW_START=-2
+export WINDOW_END=2
 
 # 7 run dir
 #---------------------------------------

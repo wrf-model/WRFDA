@@ -129,16 +129,16 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
              
   ! CRTM Surface Structure
       if (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsua') then
-         nchan_emis=4
+         nchan_emis=nchanl
          wmo_sensor_id=WMO_AMSUA
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsub') then
-         nchan_emis=2
+         nchan_emis=nchanl
          wmo_sensor_id=WMO_AMSUB
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsre') then
-         nchan_emis=12
+         nchan_emis=nchanl
          wmo_sensor_id=WMO_AMSRE
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='ssmi') then
-         nchan_emis=7
+         nchan_emis=nchanl
          wmo_sensor_id=WMO_SSMI
       else
          nchan_emis=0

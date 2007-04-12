@@ -301,7 +301,7 @@ subroutine da_read_bufrtovs (obstype,iv, xb, grid, xp,infile)
         !  Make Thinning
         !  Map obs to thinning grid
         !-------------------------------------------------------------------
-        if (use_thinning) then
+        if (thinning) then
          dlat_earth = info%lat
          dlon_earth = info%lon
          if(dlon_earth<zero)  dlon_earth = dlon_earth+r360

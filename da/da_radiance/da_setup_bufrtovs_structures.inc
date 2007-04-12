@@ -38,7 +38,7 @@ subroutine da_setup_bufrtovs_structures( xb, grid, xp, ob, iv )
    !------------------------------
   call init_constants_derived
 
-  if (use_thinning) then
+  if (thinning) then
    !call init_rad
    !call radinfo_read
 
@@ -156,7 +156,7 @@ subroutine da_setup_bufrtovs_structures( xb, grid, xp, ob, iv )
       end do
    end if
 
-   if (use_thinning) then
+   if (thinning) then
       do n=1,iv%num_inst
         call destroygrids (n)
       end do
