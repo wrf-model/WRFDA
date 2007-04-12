@@ -21,6 +21,8 @@ export HOSTS=${HOSTS:-$HOME/hosts}
 
 export QUEUE=${QUEUE:-regular}
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
+export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
+export LL_PTILE=${LL_PTILE:-1}
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
@@ -60,6 +62,7 @@ elif test $SUBMIT = "LSF"; then
 #
 # LSF batch script
 #
+#BSUB $LSF_EXCLUSIVE
 #BSUB -J ${REGION}_${EXPT}             
 #BSUB -q $QUEUE 
 #BSUB -n $NUM_PROCS              
@@ -67,6 +70,7 @@ elif test $SUBMIT = "LSF"; then
 #BSUB -e job.error   
 #BSUB -W $WALLCLOCK       
 #BSUB -P $PROJECT        
+#BSUB -R "span[ptile=$LL_PTILE]"
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
