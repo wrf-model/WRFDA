@@ -443,11 +443,7 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 02 03 04 05 06 07; do
          ln -fs tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
-      if test $NUM_PROCS -gt 1; then
-         ln -fs auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
-      else
-         ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
-      fi
+      ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
 
       # ad
 
@@ -525,7 +521,7 @@ echo "WINDOW_END            $WINDOW_END"
       RC=0
    else
       if $NL_VAR4D; then
-         if test $NUM_PROCS -gt 1; then
+         if $POE && test $NUM_PROCS -gt 1; then
             # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
             export MP_CMDFILE=poe.cmdfile
