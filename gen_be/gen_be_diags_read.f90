@@ -53,7 +53,7 @@ program gen_be_diags_read
    read(namelist_unit, gen_be_diags_nl)
    close(namelist_unit)
 
-   filename = 'gen_be.dat'
+   filename = 'be.dat'
    print '("*** Unit=",i3,3X,"filename=",a40)',iunit, filename
    open (iunit, file = filename, form='unformatted')
 

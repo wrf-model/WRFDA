@@ -21,7 +21,7 @@
 
  setenv DATE 2003010212
  setenv WRFVAR_DIR /smoke/dmbarker/code/latest/wrfvar
- setenv BE_FILE /smoke/dmbarker/data/con200/noobs/gen_be.0200-2512/gen_be.NMC.dat
+ setenv BE_FILE /smoke/dmbarker/data/con200/noobs/gen_be.0200-2512/be.dat
 
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
@@ -48,7 +48,7 @@
  if ( ! $?REGION )        setenv REGION        con200
  if ( ! $?EXPT )          setenv EXPT          xwang  
  if ( ! $?DAT_DIR )       setenv DAT_DIR       ${DATA_DISK}/${USER}/data/${REGION}/${EXPT}
- if ( ! $?BE_FILE )       setenv BE_FILE       ${DAT_DIR}/be/gen_be.dat
+ if ( ! $?BE_FILE )       setenv BE_FILE       ${DAT_DIR}/be/be.dat
  if ( ! $?RUN_DIR )       setenv RUN_DIR       ${DAT_DIR}/${DATE}/ep1
 
  if ( ! -d ${DAT_DIR}/$DATE ) mkdir ${DAT_DIR}/$DATE
@@ -135,7 +135,7 @@ EOF
  set BEGIN_CPU = `date`
  echo "Beginning CPU time: ${BEGIN_CPU}"
 
- ln -sf ${BE_FILE} gen_be.dat
+ ln -sf ${BE_FILE} be.dat
  ln -sf ${BUILD_DIR}/gen_be_ep1.exe .
 
 cat >! gen_be_stage2a_nl.nl << EOF

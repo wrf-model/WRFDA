@@ -64,7 +64,7 @@ if $CYCLING; then
 fi
 
 export DA_ANALYSIS=${DA_ANALYSIS:-analysis}
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat} # wrfvar background errors.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # wrfvar background errors.
 
 export RTTOV=${RTTOV:-$HOME/rttov/rttov87}                            # RTTOV
 export DA_RTTOV_COEFFS=${DA_RTTOV_COEFFS:-$RTTOV/rtcoef_rttov7}
@@ -609,12 +609,14 @@ echo "WINDOW_END            $WINDOW_END"
       mkdir -p $RUN_DIR/rsl
       cd $RUN_DIR/rsl
       for FILE in $WORK_DIR/rsl*; do
-         FILE1=`basename $FILE`
-         echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
-         echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
-         cat $FILE >> $FILE1.html
-         echo "</PRE></BODY></HTML>" >> $FILE1.html
-         rm $FILE
+         if test -f $FILE; then
+            FILE1=`basename $FILE`
+            echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
+            echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
+            cat $FILE >> $FILE1.html
+            echo "</PRE></BODY></HTML>" >> $FILE1.html
+            rm $FILE
+         fi
       done
       cd $RUN_DIR
 

@@ -49,7 +49,7 @@ export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
 
 #WRF-Var parameters:
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.NMC.dat}
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat}
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export WINDOW_START=${WINDOW_START:-0}
 export WINDOW_END=${WINDOW_END:-0}

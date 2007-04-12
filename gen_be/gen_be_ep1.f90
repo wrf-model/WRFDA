@@ -96,7 +96,7 @@ program gen_be_ep1
    write(6,'(2a)')' [2] Read regression coefficients and bin information:'
 !--------------------------------------------------------------------------------------------- 
 
-   filename = 'gen_be.dat'
+   filename = 'be.dat'
    open (iunit, file = filename, form='unformatted')
 
    read(iunit)ni, nj, nk

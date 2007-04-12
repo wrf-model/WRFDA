@@ -25,9 +25,9 @@ setenv NUM_MEMBERS 12
 setenv OB_DIR /smoke/dmbarker/data/con200/obs_caya
 setenv OB_DIR /smoke/dmbarker/data/con200/get_obs # Alain's cleaned obs.
 
-#setenv DA_BACK_ERRORS /users/bray/data/con200/be/gen_be.NMC.dat
-#setenv DA_OBSERVATIONS /users/bray/data/con200/ob/2003010112/ob.ascii
-#setenv DA_FIRST_GUESS /users/bray/data/con200/rc/2003010112/wrfinput_d01
+#setenv DA_BACK_ERRORS ~wrfhelp/data/con200/be/be.dat
+#setenv DA_OBSERVATIONS ~wrfhelp/data/con200/ob/2003010112/ob.ascii
+#setenv DA_FIRST_GUESS ~wrfhelp/data/con200/rc/2003010112/wrfinput_d01
 #setenv NV 3
 #setenv CVAR "'T'"
 
@@ -63,7 +63,7 @@ setenv OB_DIR /smoke/dmbarker/data/con200/get_obs # Alain's cleaned obs.
 
 #WRF-Var parameters:
  if ( ! $?BE_DIR )        setenv BE_DIR ${REG_DIR}/be
- if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${BE_DIR}/gen_be.dat
+ if ( ! $?DA_BACK_ERRORS ) setenv DA_BACK_ERRORS ${BE_DIR}/be.dat
  if ( ! $?OB_DIR )        setenv OB_DIR ${REG_DIR}/ob
  if ( ! $?DA_OBSERVATIONS ) setenv DA_OBSERVATIONS ${OB_DIR}/obs_gts.3dvar.$DATE
  if ( ! $?WINDOW_START )  setenv WINDOW_START  -3         # Start of time window (hrs)

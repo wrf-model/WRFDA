@@ -30,7 +30,7 @@ program gen_be_diags
    read(namelist_unit, gen_be_diags_nl)
    close(namelist_unit)
 
-   filename = 'gen_be.dat'
+   filename = 'be.dat'
    open (ounit, file = filename, form='unformatted')
 !----------------------------------------------------------------------------
    write(6,'(/a)')' [1] Gather regression coefficients.'

@@ -115,7 +115,7 @@ export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 #From WRF-Var:
 export NL_VAR4D=${NL_VAR4D:-false}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/gen_be.dat} # background errors.
+export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # background errors.
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2} # Observation format: 1=BUFR, 2=ASCII "little_r"
 
 #------------------------------------------------------------------------------------------
