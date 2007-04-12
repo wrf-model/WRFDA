@@ -28,7 +28,7 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
 
 #if defined(CRTM)
    ! CRTM local varaibles and types
-   INTEGER :: wmo_sensor_id, nchan_emis, Error_Status, Allocate_Status
+   INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
    TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
@@ -103,23 +103,18 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
 
   ! CRTM Surface Structure
       if (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsua') then
-         nchan_emis=4
          wmo_sensor_id=WMO_AMSUA
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsub') then
-         nchan_emis=2
          wmo_sensor_id=WMO_AMSUB
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsre') then
-         nchan_emis=12
          wmo_sensor_id=WMO_AMSRE
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='ssmi') then
-         nchan_emis=7
          wmo_sensor_id=WMO_SSMI
       else
-         nchan_emis=0
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
       endif
 
-      Error_Status = CRTM_Allocate_Surface( nchan_emis,     &  ! Input
+      Error_Status = CRTM_Allocate_Surface( nchanl,     &  ! Input
                                    Surface)  ! Output
       if ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
@@ -210,10 +205,10 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
        !Surface%Ice_Density=0.9                ! g/cm**3
        !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
      endif
-     Surface%SensorData%n_channels = nchan_emis
+     Surface%SensorData%n_channels = nchanl
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
-     Surface%SensorData%Tb(1:nchan_emis) = iv%instid(inst)%tb_inv(1:nchan_emis,n) + &
-                                           iv%instid(inst)%tb_xb(1:nchan_emis,n)
+     Surface%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &
+                                           iv%instid(inst)%tb_xb(1:nchanl,n)
 
       ! -- Copy the TL atmosphere structure
       Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_TL )

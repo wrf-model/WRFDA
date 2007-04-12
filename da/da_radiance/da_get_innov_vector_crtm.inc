@@ -39,7 +39,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    ! REAL, DIMENSION(xp%kms:xp%kme)   :: model_tm
 
    INTEGER            :: inst, nchanl
-   INTEGER            :: nchan_emis
 
    ! variables for computing clwp
    REAL, dimension(xp%kms:xp%kme)     :: vtm, clw, dlnpf
@@ -128,23 +127,18 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
              
   ! CRTM Surface Structure
       if (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsua') then
-         nchan_emis=4
          wmo_sensor_id=WMO_AMSUA
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsub') then
-         nchan_emis=2
          wmo_sensor_id=WMO_AMSUB
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='amsre') then
-         nchan_emis=12
          wmo_sensor_id=WMO_AMSRE
       elseif (trim(crtm_sensor_name(rtminit_sensor(inst))) =='ssmi') then
-         nchan_emis=7
          wmo_sensor_id=WMO_SSMI
       else
-         nchan_emis=0
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
       endif
 
-      Error_Status = CRTM_Allocate_Surface( nchan_emis,     &  ! Input
+      Error_Status = CRTM_Allocate_Surface( nchanl,     &  ! Input
                                    Surface)  ! Output
       if ( Error_Status /= 0 ) THEN
         call da_error(__FILE__,__LINE__, &
@@ -354,10 +348,10 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
        !Surface%Ice_Density=0.9                ! g/cm**3
        !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
      endif
-     if (nchan_emis > 0) then
-       Surface%SensorData%n_channels = nchan_emis
+     if (nchanl > 0) then
+       Surface%SensorData%n_channels = nchanl
        Surface%SensorData%Sensor_ID  = wmo_sensor_id 
-       Surface%SensorData%Tb(1:nchan_emis) = ob%instid(inst)%tb(1:nchan_emis,n)
+       Surface%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)
      end if
 
          ! [1.3] Call RTM foreward model
