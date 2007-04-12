@@ -86,11 +86,12 @@ cd $WORK_DIR
 
    export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
-   ln -fs $OB_DIR/$DATE/$OB_FILE .
+   #ln -fs $OB_DIR/$DATE/$OB_FILE .
 
-   if test -f $OB_DIR/$DATE/${OB_FILE}.gz; then
+   if test -f $RTOBS_DIR/$DATE/${OB_FILE}.gz; then
       # If compressed, unpack
-      gunzip -f $OB_DIR/$DATE/${OB_FILE}.gz
+      cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
+      gunzip -f ${OB_FILE}.gz
    fi
 
    #Namelist notes:
@@ -177,7 +178,7 @@ EOF
 
    cp namelist.3dvar_obs $RUN_DIR
 
-   echo "Converting $OB_DIR/$DATE/$OB_FILE to"
+   echo "Converting $WORK_DIR/$OB_FILE to"
    echo "$OB_DIR/$DATE/ob.ascii"
    echo '<A HREF="namelist.3dvar_obs">Namelist input</a>'
    if $DUMMY; then
