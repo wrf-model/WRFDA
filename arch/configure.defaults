@@ -2017,7 +2017,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -2029,7 +2029,7 @@ arch :
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST pgi )
+            LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
 
 arch_clean :
@@ -2068,7 +2068,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -2082,7 +2082,7 @@ arch :
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST pgi )
+            LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
 
 arch_clean :
@@ -2121,7 +2121,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
 FCFLAGS_RSL     = $(FCENDIAN)
 
 CCFLAGS2        = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -2133,7 +2133,7 @@ arch :
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST pgi )
+            LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
 
 arch_clean :
