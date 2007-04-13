@@ -68,8 +68,8 @@ fi
 if test -d ${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}; then
    export RTTOV=${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/crtm/CRTM_6_28/${FC}_${PROCESSOR}; then
-   export CRTM=${EXT_DIR}/crtm/CRTM_6_28/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}; then
+   export CRTM=${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}
 fi
 if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}; then
    export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}
