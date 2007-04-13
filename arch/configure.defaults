@@ -419,6 +419,8 @@ arch_clean :
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
+
+
 ###########################################################
 #ARCH Settings for PC Linux i487 i587 i687, g95, simple      (RSL_LITE, MPI, RSL IO)
 #Not working yet
@@ -1760,15 +1762,15 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95, serial                       (single-threaded)
+#ARCH Settings for Darwin, i386, g95, serial                       (single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
 FC              = g95
 FFC             = $(FC)
 SFC             = $(FC)
-CC              = cc
-CC_TOOLS        = cc
+CC              = gcc
+CC_TOOLS        = $(CC)
 LD              = $(FC)
 
 NATIVE_RWORDSIZE	= 4
@@ -1796,7 +1798,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, g95, simple                       (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, simple                       (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1804,7 +1806,7 @@ FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
 CC              = mpicc
-CC_TOOLS        = cc
+CC_TOOLS        = gcc
 LD              = $(FC)
 
 NATIVE_RWORDSIZE	= 4
@@ -1845,7 +1847,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95, debug                        (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, debug                        (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1853,7 +1855,7 @@ FC              = mpif90
 FFC             = $(FC)
 SFC             = g95
 CC              = mpicc
-CC_TOOLS        = cc
+CC_TOOLS        = gcc
 LD              = $(FC)
 
 NATIVE_RWORDSIZE	= 4
@@ -1899,7 +1901,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95, optimised                    (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, optimised                    (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1908,7 +1910,7 @@ FFC             = $(FC)
 SFC             = g95
 LD              = $(FC)
 CC              = mpicc
-CC_TOOLS        = cc
+CC_TOOLS        = gcc
 
 NATIVE_RWORDSIZE	= 4
 
@@ -1940,6 +1942,198 @@ arch :
           $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for Darwin, i386, PGI, serial                       (Single-threaded)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = pgf90
+FFC             = $(FC)
+SFC             = $(FC)
+CC              = gcc
+CC_TOOLS        = $(CC)
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        =
+FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+
+FCOPTIM         =
+FCDEBUG         =
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+
+CCFLAGS2        = -DLANDREAD_STUB -DMACOS
+
+LOCAL_LIB       = -L/usr/local/lib
+
+arch : 
+		$(LN) $(RSL_STUBS)/* .
+		@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
+#ARCH Settings for Darwin, i386, PGI, simple                       (RSL, MPI, RSL IO)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc -DMPI2_SUPPORT
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = 
+FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         =
+FCDEBUG         = 
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL -DMACOS
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB         = -L$(RSL)/RSL -lrsl
+
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST pgi )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for Darwin, i386, PGI, debug                        (RSL, MPI, RSL IO)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc -DMPI2_SUPPORT
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = 
+FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         =
+FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL -DMACOS
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB         = -L$(RSL)/RSL -lrsl
+
+LDFLAGS2        = -V
+
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST pgi )
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL)/RSL; make clean )
+
+arch_superclean :
+	( cd $(RSL)/RSL; make superclean )
+
+###########################################################
+#ARCH Settings for Darwin, i386, PGI, optimised                    (RSL, MPI, RSL IO)
+#
+CPP             = /usr/bin/cpp
+M4              = m4 -B12000
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc -DMPI2_SUPPORT
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        =
+FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -fast
+FCDEBUG         =
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL)/RSL -DMACOS
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+MPI_LIB         = -L$(RSL)/RSL -lrsl
+
+
+arch : 
+	$(LN) $(RSL)/*.c .
+	$(LN) $(RSL)/*.F .
+	( cd $(RSL)/RSL ; \
+          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
+            LEARN_BCAST=-DLEARN_BCAST pgi )
 	@ touch arch
 
 arch_clean :

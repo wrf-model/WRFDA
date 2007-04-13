@@ -206,10 +206,10 @@ da_scale_length.exe: da_scale_length.o
 	$(SFC) -o $@ da_scale_length.o da_control.o
 
 da_diagnostics.exe: da_diagnostics.o
-	$(SFC) -o $@ da_diagnostics.o
+	$(SFC) -o $@ da_diagnostics.o da_control.o module_driver_constants.o
 
 da_ominusb.exe: da_ominusb.o
-	$(SFC) -o $@ da_ominusb.o
+	$(SFC) -o $@ da_ominusb.o da_control.o module_driver_constants.o
 
 da_tune.exe: da_tune.o
 	$(SFC) -o $@ da_tune.o
