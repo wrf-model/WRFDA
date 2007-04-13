@@ -147,25 +147,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
          fmt='("Center: X, Y, latc, lonc, phic, xlonc:",6f10.3)') &
          start_x, start_y, lat_cen, lon_cen,   &
          grid%cen_lat, grid%cen_lon
-
-      ! Low-left corner:
-      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ids,grid%xp%jds), &
-         grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y)
-      write(unit=message(4), &
-         fmt='("Low-left: lat,lon,x,y,grid%xp%ids,grid%xp%jds:",4f10.3,2i6)') &
-         grid%xlat(grid%xp%ids,grid%xp%jds), &
-         grid%xlong(grid%xp%ids,grid%xp%jds), start_x, start_y, &
-         grid%xp%ids, grid%xp%jds
-      ! Upper-right corner:
-      call da_latlon_to_ij(map_info, grid%xlat(grid%xp%ide,grid%xp%jde), &
-        grid%xlong(grid%xp%ide,grid%xp%jde),&
-        start_x, start_y)
-      write(unit=message(5), &
-         fmt='("Upper-right: lat,lon,x,y,grid%xp%ide,grid%xp%jde:",4f10.3,2i6)') &
-         grid%xlat(grid%xp%ide,grid%xp%jde), &
-         grid%xlong(grid%xp%ide,grid%xp%jde), start_x, start_y, &
-         grid%xp%ide, grid%xp%jde
-      call da_message(message(1:5))
+      call da_message(message(1:3))
    end if
 
    ! Setup the domain definition for use of the GRAPH:
