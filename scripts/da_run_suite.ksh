@@ -228,6 +228,7 @@ echo 'BE_DIR       <A HREF="file:'$BE_DIR'">'$BE_DIR'</a>'
 echo 'GRIB_DIR     <A HREF="file:'$GRIB_DIR'">'$GRIB_DIR'</a>'
 echo 'RC_DIR       <A HREF="file:'$RC_DIR'">'$RC_DIR'</a>'
 echo 'FC_DIR       <A HREF="file:'$FC_DIR'">'$FC_DIR'</a>'
+echo 'OB_DIR       <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE

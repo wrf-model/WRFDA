@@ -167,7 +167,6 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
             echo geogrid failed with error $RC
             exit $RC
 	 fi
-	 cp $WORK_DIR/geo_em.d01.nc $RC_DIR
       fi
 
       # Run ungrib:

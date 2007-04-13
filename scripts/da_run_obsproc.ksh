@@ -47,6 +47,7 @@ date
 
 echo 'REL_DIR      <A HREF="'$REL_DIR'">'$REL_DIR'</a>'
 echo 'OBSPROC_DIR  <A HREF="'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
+echo 'RTOBS_DIR    <A HREF="'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 echo 'OB_DIR       <A HREF="'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RUN_DIR      <A HREF="'$RUN_DIR'">'$RUN_DIR'</a>'
 echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
