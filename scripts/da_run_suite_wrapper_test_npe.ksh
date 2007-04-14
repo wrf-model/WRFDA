@@ -86,7 +86,7 @@ export LONG_FCST_RANGE_4=06
 #bluevista:
 export REL_DIR=$HOME/release
 export DAT_DIR=$REL_DIR/../case_data
-export EXP_DIR=/ptmp/xinzhang/$REGION/$EXPT
+export EXP_DIR=/ptmp/$USER/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
