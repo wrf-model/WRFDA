@@ -297,24 +297,24 @@ subroutine da_transfer_kmatoxb(xbx, grid)
             grid%xb%h(is,js,k), grid%xb%p(is,js,k), grid%xb%t(is,js,k)
       end do
 
-      write (unit=stdout,fmt='(A)') ' '
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%v(ie,js,ke)=', grid%xb%v(ie,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%w(is,js,ke)=', grid%xb%w(is,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%t(is,js,ke)=', grid%xb%t(is,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%p(is,js,ke)=', grid%xb%p(is,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%q(is,js,ke)=', grid%xb%q(is,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%hf(is,js,ke)=', grid%xb%hf(is,js,ke)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%map_factor(is,js)=', grid%xb%map_factor(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%cori(is,js)=', grid%xb%cori(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%tgrn(is,js)=', grid%xb%tgrn(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lat(is,js)=', grid%xb%lat(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lon(is,js)=', grid%xb%lon(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%terr(is,js)=', grid%xb%terr(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%snow(is,js)=', grid%xb%snow(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%lanu(is,js)=', grid%xb%lanu(is,js)
-      write (unit=stdout,fmt='(A,I5)') 'grid%xb%landmask(is,js)=', grid%xb%landmask(is,js)
-      write (unit=stdout,fmt='(A)') ' '
+      write (unit=stdout,fmt=*) ' '
+      write (unit=stdout,fmt=*) 'grid%xb%u(is,je,ke)=', grid%xb%u(is,je,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%v(ie,js,ke)=', grid%xb%v(ie,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%w(is,js,ke)=', grid%xb%w(is,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%t(is,js,ke)=', grid%xb%t(is,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%p(is,js,ke)=', grid%xb%p(is,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%q(is,js,ke)=', grid%xb%q(is,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%hf(is,js,ke)=', grid%xb%hf(is,js,ke)
+      write (unit=stdout,fmt=*) 'grid%xb%map_factor(is,js)=', grid%xb%map_factor(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%cori(is,js)=', grid%xb%cori(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%tgrn(is,js)=', grid%xb%tgrn(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%lat(is,js)=', grid%xb%lat(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%lon(is,js)=', grid%xb%lon(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%terr(is,js)=', grid%xb%terr(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%snow(is,js)=', grid%xb%snow(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%lanu(is,js)=', grid%xb%lanu(is,js)
+      write (unit=stdout,fmt=*) 'grid%xb%landmask(is,js)=', grid%xb%landmask(is,js)
+      write (unit=stdout,fmt=*) ' '
    end if
 
    write(current_date(1:19), fmt='(i4.4, 5(a1, i2.2))') &
