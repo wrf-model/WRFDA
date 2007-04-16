@@ -183,14 +183,6 @@ subroutine da_rttov_init(iv,ob)
       close(iunit)
       call da_free_unit(iunit)
 
-      ! else
-      !    do j = 1, nchan(i)
-      !       iv%instid(i)%ichan(j) = j
-      !       ob%instid(i)%ichan(j) = j
-      !       coefs_channels(j,n)   = j
-      !    end do
-      ! end if
-
    end do loop_sensor
 
    !-----------------------------------------------------------
@@ -323,9 +315,7 @@ subroutine da_rttov_init(iv,ob)
       ! 6.0 read bias correction coefs files
       !-------------------------------------------------------
 
-      if ( read_biascoef .and. &
-           ( trim(iv%instid(i)%rttovid_string) /= 'eos-2-airs' ) &
-             .and. index(iv%instid(i)%rttovid_string,'hirs') <= 0 ) then
+      if ( read_biascoef ) then
 
          allocate ( satinfo(i) % scanbias  (nchan(i),nscan(i)) )
          allocate ( satinfo(i) % scanbias_b(nchan(i),nscan(i),18) )
@@ -338,6 +328,10 @@ subroutine da_rttov_init(iv,ob)
          satinfo(i) % scanbias_b(:,:,:) = 0.
          satinfo(i) % bcoef(:,:) = 0.
          satinfo(i) % bcoef0(:) = 0.
+
+         if ( index(iv%instid(i)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented 
+         if ( index(iv%instid(i)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
+         if ( index(iv%instid(i)%rttovid_string,'ssmis') > 0) cycle   ! not implemented 
 
   !  new bias coefs files
   !----------------------------------
