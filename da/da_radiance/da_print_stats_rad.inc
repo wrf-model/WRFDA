@@ -1,12 +1,10 @@
 subroutine da_print_stats_rad( stats_unit, nchan, rad )
-!------------------------------------------------------------------------------
-!  Purpose: print out statistics of omb, oma for radiance data.
-!
-!  METHOD:  print out average, rms, minimum, maximum of iv, re
-!
-!  HISTORY: 08/2005 - Creation            Zhiquan Liu
-!
-!------------------------------------------------------------------------------
+
+   !---------------------------------------------------------------------------
+   !  Purpose: print out statistics of omb, oma for radiance data.
+   !
+   !  METHOD:  print out average, rms, minimum, maximum of iv, re
+   !---------------------------------------------------------------------------
 
    implicit none
 
@@ -18,13 +16,13 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
 
    if (trace_use) call da_trace_entry("da_print_stats_rad")
 
-    used_nchan = 0
-    do k=1, nchan                  !! loop for channels
-       if(rad%ichan(k)%num > 0) used_nchan = used_nchan + 1
-    end do
-    write(unit=stats_unit, fmt='((a,i5))')  ' used_nchan: ', used_nchan 
+   used_nchan = 0
+   do k=1, nchan                  !! loop for channels
+      if(rad%ichan(k)%num > 0) used_nchan = used_nchan + 1
+   end do
+   write(unit=stats_unit, fmt='((a,i5))')  ' used_nchan: ', used_nchan 
 
-    write(unit=stats_unit, fmt='(6a)') &
+   write(unit=stats_unit, fmt='(6a)') &
         ' Channel ', &
         ' num  ', &
         ' ave  ', &
@@ -32,21 +30,21 @@ subroutine da_print_stats_rad( stats_unit, nchan, rad )
         ' min  ', &
         ' max  '
 
-    do k=1, nchan                  !! loop for channels
+   do k=1, nchan                  !! loop for channels
+      if (rad%ichan(k)%num > 0) then
+         n    = rad%ichan(k)%num
+         nmin = rad%ichan(k)%minimum%n
+         nmax = rad%ichan(k)%maximum%n
 
-    if(rad%ichan(k)%num > 1) then
-      n    = rad%ichan(k)%num
-      nmin = rad%ichan(k)%minimum%n
-      nmax = rad%ichan(k)%maximum%n
-     
-      write(unit=stats_unit, fmt='((i3,i7,4f8.2))') &
-        k, rad%ichan(k)%num, rad%ichan(k)%ave/real(n), sqrt(rad%ichan(k)%rms/real(n)), &
-        rad%ichan(k)%minimum%value, rad%ichan(k)%maximum%value
-    end if
-    end do
+         write(unit=stats_unit, fmt='((i3,i7,4f8.2))') &
+            k, rad%ichan(k)%num, rad%ichan(k)%ave/real(n), &
+            sqrt(rad%ichan(k)%rms/real(n)), &
+            rad%ichan(k)%minimum%value, rad%ichan(k)%maximum%value
+      end if
+   end do
 
    if (trace_use) call da_trace_exit("da_print_stats_rad")
 
-
 end subroutine da_print_stats_rad
+
 

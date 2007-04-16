@@ -20,11 +20,12 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
    TYPE (y_type),  INTENT(INOUT)  :: y        ! H' delta_x
    TYPE (ob_type), INTENT(IN)     :: iv       ! O-B structure.
 
-   INTEGER                        :: i, j, k  ! Index dimension.
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
+   INTEGER                        :: k  ! Index dimension.
 
    INTEGER            :: inst, num_rad, nchanl, n
+   real, allocatable :: temperature(:,:)
+   real, allocatable :: absorber(:,:)
+   real, allocatable :: psfc(:)
 
 #if defined(CRTM)
    ! CRTM local varaibles and types
@@ -130,16 +131,36 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
 
+      allocate (temperature(atmosphere%n_layers, num_rad))
+      allocate (absorber(atmosphere%n_layers, num_rad))
+      allocate (psfc(num_rad))
+
+      do k=xp%kts,xp%kte ! from bottem to top
+         call da_interp_lin_2d_new( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+            iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
+            temperature(xp%kte-k+1,:), num_rad)
+
+         call da_interp_lin_2d_new( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+            iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
+            iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
+            iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
+            absorber(xp%kte-k+1,:), num_rad)
+
+         where (iv%instid(inst)%pm(xp%kte-k+1,:) < 75.0) &
+            absorber(xp%kte-k+1,:) = 0.0
+      end do
+
+      call da_interp_lin_2d_new( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
+         iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
+         iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
+         psfc(:), num_rad )
+
       do n= 1, num_rad           ! loop for pixel
             
       ! [1.1] Get horizontal interpolation weights:
-
-            i = iv%instid(inst)%loc_i(n)
-            j = iv%instid(inst)%loc_j(n)
-            dx = iv%instid(inst)%loc_dx(n)
-            dy = iv%instid(inst)%loc_dy(n)
-            dxm = iv%instid(inst)%loc_dxm(n)
-            dym = iv%instid(inst)%loc_dym(n)
 
       ! [1.3] Extract base state Atmosphere variables 
             atmosphere%level_pressure(0) = iv%instid(inst)%pf(0,n)
@@ -230,20 +251,10 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
     ! Important: adjoint variables must be initialized
     CALL CRTM_Zero_Atmosphere( Atmosphere_TL )
     CALL CRTM_Zero_Surface( Surface_TL )
-
-      ! [1.2] Interpolate horizontally Atmoshere_TL variables to ob:
-            do k=xp%kts,xp%kte ! from bottem to top
-              call da_interp_lin_2d( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! temperature (in K)
-                                     Atmosphere_TL%Temperature(xp%kte-k+1) )
-              call da_interp_lin_2d( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! specific humidity (in kg/kg)
-                                     Atmosphere_TL%Absorber(xp%kte-k+1,1) )
-              if (atmosphere%pressure(xp%kte-k+1) < 75.) Atmosphere_TL%Absorber(xp%kte-k+1,1) = 0.
-            end do
-              call da_interp_lin_2d( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                                     i, j, dx, dy, dxm, dym, &  ! in Pa
-                                     Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers) )
+       
+    Atmosphere_TL%Temperature(xp%kts:xp%kte)             = temperature(xp%kts:xp%kte,n)
+    Atmosphere_TL%Absorber(xp%kts:xp%kte,1)              = absorber(xp%kts:xp%kte,n)
+    Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers) = psfc(n)
 
               Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)= &
                          0.01*Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)
@@ -301,7 +312,12 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
                (/"Error in deallocatting CRTM Surface_TL Structure"/))
          endif
 
-      end do  ! end loop for pixels                                                                                                                          
+      end do  ! end loop for pixels 
+
+      deallocate (temperature)
+      deallocate (absorber)
+      deallocate (psfc)     
+                                                                                                                    
       !-------------------------------------------------------------------
       ! [2.0] Deallocating CRTM structures
       !-------------------------------------------------------------------
