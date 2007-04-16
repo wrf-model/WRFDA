@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures( xp, ob, iv ,xb)
+subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Allocate and read in components of observation structure.
@@ -10,6 +10,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
    type (y_type),     intent(out)   :: ob  ! Observation structure.
    type (ob_type),    intent(out)   :: iv  ! O-B structure.
    type (xb_type),    intent(inout) :: xb  ! First guess structure.
+   type (domain),     intent (inout)   :: grid
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures")
 
@@ -33,7 +34,8 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 
    if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad) then
+      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
+      use_ssmisobs ) then
       use_rad = .true.
    else
       use_rad = .false.
@@ -223,7 +225,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb)
 
    if (use_rad) then
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
-      call da_setup_bufrtovs_structures(xp, ob, iv)
+      call da_setup_bufrtovs_structures(xb, grid, xp, ob, iv)
    end if
 
    ! Get horizontal interpolation weights.

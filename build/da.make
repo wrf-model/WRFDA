@@ -51,6 +51,7 @@ WRFVAR_OBJS = da_par_util.o \
    da_tracing.o \
    gsi_kinds.o \
    gsi_constants.o \
+   gsi_thinning.o \
    da_wrfvar_io.o \
    da_airsr.o \
    da_wrfvar_top.o \

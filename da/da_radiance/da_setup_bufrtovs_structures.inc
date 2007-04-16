@@ -1,4 +1,4 @@
-subroutine da_setup_bufrtovs_structures( xp, ob, iv )
+subroutine da_setup_bufrtovs_structures( xb, grid, xp, ob, iv )
 
    !---------------------------------------------------------------------------
    ! Purpose: Define, allocate and read of tovs raidance observation structure.
@@ -6,13 +6,18 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
 
    implicit none
 
+   type (xb_type)   , intent (in)  :: xb
    type (xpose_type), intent(in)   :: xp         ! Domain decomposition vars.
    type ( y_type), intent(inout)   :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
+   type (domain) ,  intent (in)    :: grid
 
-   character(len=200)           :: filename
+   character(len=200)          :: filename
    integer                     :: i, j, n, ios
    logical                     :: lprinttovs 
+
+! thinning variables
+   integer  :: istart,iend,jstart,jend
    
    if (trace_use) call da_trace_entry("da_setup_bufrtovs_structures")
 
@@ -29,6 +34,47 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
        call da_crtm_init(iv,ob)
 #endif
     end if
+
+   !-------------------------------
+   ! 1.1 Make thinning grids
+   !------------------------------
+   call init_constants_derived
+
+   if (thinning) then
+
+    rlat_min =  r999
+    rlat_max = -r999
+    rlon_min =  r999
+    rlon_max = -r999
+
+    istart=grid%i_start(1)
+    iend  =grid%i_end  (1)
+    jstart=grid%j_start(1)
+    jend  =grid%j_end  (1)
+
+    do i = istart, iend
+       do j = jstart, jend
+        rlat_min=min(rlat_min, xb%lat(i,j))
+        rlon_min=min(rlon_min, xb%lon(i,j))
+        rlat_max=max(rlat_max, xb%lat(i,j))
+        rlon_max=max(rlon_max, xb%lon(i,j))
+       enddo
+    enddo
+
+    if (rlon_min < zero) rlon_min = rlon_min + r360
+    if (rlon_max < zero) rlon_max = rlon_max + r360
+
+    dlat_grid = rlat_max - rlat_min
+    dlon_grid = rlon_max - rlon_min
+
+   !write(6,'(a,4i5)') 'istart iend jstart jend', istart,iend,jstart,jend
+   !write(6,'(a,4f8.3)') 'rlat_min rlat_max rlon_min rlon_max', rlat_min, rlat_max, rlon_min, rlon_max
+
+     allocate(thinning_grid(iv%num_inst))
+     do n=1,iv%num_inst
+      call makegrids (n,thinning_mesh(n))
+     end do
+   end if
 
    !-------------------------------------------------------------------
    ! [2.0] Read NCEP bufr tovs data in radiance innovations vector
@@ -90,6 +136,13 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
       call da_read_bufrairs ('hsb      ',iv, xp, filename)
    end if
 
+   if (use_ssmisobs) then
+      write(unit=stdout,fmt='(a)') 'Reading ssmis data from ssmis.bufr'
+      filename = ' '
+      write(filename(1:10), fmt='(a)') 'ssmis.bufr'
+      call da_read_bufrssmis ('ssmis',iv, xp, filename)
+   end if
+
    if (use_filtered_rad) then
       call da_read_filtered_rad (xp, iv)
    end if
@@ -102,6 +155,13 @@ subroutine da_setup_bufrtovs_structures( xp, ob, iv )
          call da_read_kma1dvar (i,iv, ob, xp, filename)
       end do
    end if
+
+   if (thinning) then
+      do n=1,iv%num_inst
+        call destroygrids (n)
+      end do
+      deallocate(thinning_grid)
+    end if
 
    ! sorting obs into FGAT time bins
    call da_sort_rad(iv)

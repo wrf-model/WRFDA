@@ -133,7 +133,7 @@ subroutine da_solve ( grid , config_flags)
    ! [4.0] Set up observations (ob):
    !---------------------------------------------------------------------------
 
-   call da_setup_obs_structures( grid%xp, ob, iv, grid%xb )
+   call da_setup_obs_structures( grid%xp, ob, iv, grid%xb, grid )
 
    if (use_rad) then
       allocate (j % jo % rad(1:iv%num_inst))

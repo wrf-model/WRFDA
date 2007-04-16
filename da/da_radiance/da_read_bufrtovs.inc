@@ -1,4 +1,4 @@
-subroutine da_read_bufrtovs (obstype,iv,xp,infile)
+subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
    !---------------------------------------------------------------------------
    !  Purpose: read in NCEP bufr tovs 1b data to innovation structure
@@ -29,16 +29,20 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    integer(i_kind),parameter:: maxinfo=12
    integer(i_kind),parameter:: maxchanl=100
 
-   logical hirs2,hirs3,msu,amsua,amsub
-   logical outside, outside_all
+   logical hirs2,hirs3,hirs4,msu,amsua,amsub,mhs
+   logical outside, outside_all, iuse
    integer :: inst
 
    character(10) date
    character(8) subset,subfgn
    character(80) hdr1b
-
    integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
    integer(i_kind) iret,idate,im,iy,nchan
+
+! thinning variables
+   integer(i_kind) itt,itx,iobs,iout
+   real(r_kind) terrain,timedif,crit,dist
+   real(r_kind) dlon_earth,dlat_earth
 
    real(r_kind) tbmin,tbmax, tbbad
    real(r_kind) panglr,rato
@@ -48,7 +52,6 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    real(r_double),dimension(maxinfo+maxchanl):: data1b8
    real(r_double),dimension(n1bhdr):: bfr1bhdr
 
-   !  type bright_temperature
    ! Instrument triplet, follow the convension of RTTOV 
    integer   :: platform_id, satellite_id, sensor_id
 
@@ -74,6 +77,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_selected
+   integer :: num_tovs_thinning, num_tovs_used
    integer :: lnbufr
    integer :: n
 
@@ -87,15 +91,15 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
 
    ! Set various variables depending on type of data to be read
 
-   call init_constants_derived
-
    platform_id  = 1                 !! for NOAA series
 
    hirs2=     obstype == 'hirs2'
    hirs3=     obstype == 'hirs3'
+   hirs4=     obstype == 'hirs4'
    msu=       obstype == 'msu  '
    amsua=     obstype == 'amsua'
    amsub=     obstype == 'amsub'
+   mhs=       obstype == 'mhs  '
 
    if (hirs2) then
       sensor_id    =  0
@@ -174,10 +178,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    nullify  ( head % next )
    p => head
 
-   num_tovs_local    = 0
-   num_tovs_file     = 0
-   num_tovs_global   = 0
-   num_tovs_selected = 0
+   num_tovs_file     = 0    ! number of obs in file
+   num_tovs_global   = 0    ! number of obs within whole domain
+   num_tovs_local    = 0    ! number of obs within tile
+   num_tovs_thinning = 0    ! number of obs rejected by thinning
+   num_tovs_used     = 0    ! number of obs entered into innovation computation
+   num_tovs_selected = 0    ! number of obs limited for debuging
 
    if (tovs_start > 1) then
       write (unit=stdout,fmt='(A,I6)') "   Skipping tovs obs before", tovs_start
@@ -278,7 +284,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          end if
 
          num_tovs_selected = num_tovs_selected + 1
-
+ 
          if (num_tovs_selected > max_tovs_input) then
             write(unit=message(1),fmt='(A,I10,A)') &
                "Max number of tovs",max_tovs_input," reached"
@@ -288,8 +294,29 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
          end if
 
          if (outside) cycle ! No good for this PE
-
          num_tovs_local = num_tovs_local + 1
+
+        !  Make Thinning
+        !  Map obs to thinning grid
+        !-------------------------------------------------------------------
+        if (thinning) then
+         dlat_earth = info%lat
+         dlon_earth = info%lon
+         if(dlon_earth<zero)  dlon_earth = dlon_earth+r360
+         if(dlon_earth>=r360) dlon_earth = dlon_earth-r360
+         dlat_earth = dlat_earth*deg2rad
+         dlon_earth = dlon_earth*deg2rad           
+         timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
+         terrain = 0.01_r_kind*abs(bfr1bhdr(13))
+         crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+         call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
+         if(.not. iuse) then
+             num_tovs_thinning=num_tovs_thinning+1
+             cycle
+         end if
+        end if
+
+         num_tovs_used = num_tovs_used + 1
          nread(inst) = nread(inst) + 1
 
          ! 3.4 extract satellite and solar angle
@@ -349,9 +376,12 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    end do obs
 
    ! These totals are before thinning, which will recalculate them
-   iv%total_obs         = iv%total_obs + num_tovs_selected
-   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_selected
-   iv%total_rad_channel = iv%total_rad_channel + num_tovs_selected*nchan
+   iv%total_obs         = iv%total_obs + num_tovs_used
+   iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
+   iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
+
+   write(UNIT=stdout,FMT='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_tovs_thinning'
+   write(UNIT=stdout,FMT='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_tovs_thinning
 
    deallocate(tb_inv)  
    call closbf(lnbufr)
@@ -451,7 +481,7 @@ subroutine da_read_bufrtovs (obstype,iv,xp,infile)
    p => head
    ! do while ( associated(p) )
 
-   do n = 1, num_tovs_local
+   do n = 1, num_tovs_used
       i = p%sensor_index
       nread(i) = nread(i) + 1
       iv%instid(i)%info(nread(i))         = p%info
