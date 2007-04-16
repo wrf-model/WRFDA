@@ -116,6 +116,13 @@ subroutine da_qc_amsub (i, nchan, ob, iv)
                nrej_topo = nrej_topo + 1
          end if
 
+         !  g. check iuse (pre-rejected channels by .info files)
+         !------------------------------------------------------
+         do k = 1, nchan
+           if (satinfo(i)%iuse(k) .eq. -1) &
+                iv%instid(i)%tb_qc(k,n) = qc_bad
+         end do
+
          !  f. check innovation
          !-----------------------------------------------------------
          do k = 1, nchan

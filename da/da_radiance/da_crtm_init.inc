@@ -128,6 +128,9 @@ subroutine da_crtm_init(iv,ob)
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hsb' ) then
       nchanl(n)  = 4
       nscan(n)   = 90
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'ssmis' ) then
+      nchanl(n)  = 24
+      nscan(n)   = 180
    else
       call da_error(__FILE__,__LINE__, &
         (/"Unrecorgnized instrument"/))
@@ -251,8 +254,9 @@ subroutine da_crtm_init(iv,ob)
    satinfo(n) % bcoef(:,:) = 0.
    satinfo(n) % bcoef0(:) = 0.
 
-   if ( trim(iv%instid(n)%rttovid_string)=='eos-2-airs' ) cycle ! not implemented
+   if ( index(iv%instid(n)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
+   if ( index(iv%instid(n)%rttovid_string,'ssmis') > 0) cycle   ! not implemented
 
   !  new bias coefs files
   !----------------------------------
