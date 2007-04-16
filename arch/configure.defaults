@@ -468,7 +468,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, serial    (single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, serial, untested   (single-threaded)
 #
 
 M4              = m4 -B12000
@@ -502,7 +502,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, simple    (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, simple, untested   (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -550,7 +550,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, debug     (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, debug, untested    (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -598,7 +598,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, optimised (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, optimised, untested (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -828,7 +828,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, serial        (Single-threaded)
+#ARCH Settings for PC Linux x86_64, Pathscale, serial, untested    (Single-threaded)
 #
 FC              = pathf90
 FFC             = $(FC)
@@ -863,7 +863,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, simple        (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, simple, untested    (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -910,7 +910,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, debug         (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, debug, untested     (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -959,7 +959,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, optimised     (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, optimised, untested (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -1006,7 +1006,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, serial            (Single-threaded)
+#ARCH Settings for PC Linux x86_64, ifort, serial, untested     (Single-threaded)
 #
 M4              = m4 -B12000
 FC              = ifort
@@ -1043,7 +1043,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, simple            (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, simple, untested     (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1091,7 +1091,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, debug             (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, debug, untested      (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1140,7 +1140,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, optimised         (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, optimised, untested (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1335,7 +1335,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for NEC, untested, serial                     (single-threaded)
+#ARCH Settings for NEC, serial, untested                     (single-threaded)
 #
 CPP             = /usr/lib0/cpp
 M4              = m4 -B12000
@@ -1762,7 +1762,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, serial                       (single-threaded)
+#ARCH Settings for Darwin, i386, g95, serial                 (single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1798,7 +1798,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, simple                       (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, simple                 (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1847,7 +1847,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, debug                        (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, debug                  (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1901,7 +1901,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, optimised                    (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, g95, optimised              (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1951,7 +1951,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, serial                       (Single-threaded)
+#ARCH Settings for Darwin, i386, PGI, serial                 (Single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1988,7 +1988,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, simple                       (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, PGI, simple                 (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -2039,7 +2039,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, debug                        (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, PGI, debug                  (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -2092,7 +2092,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, optimised                    (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, i386, PGI, optimised              (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
