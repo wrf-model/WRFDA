@@ -41,7 +41,8 @@ module da_minimisation
       num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
       cv_size_domain_je,cv_size_domain_jb
 #ifdef CRTM
-   use da_crtm, only : da_get_innov_vector_crtmk, da_get_innov_vector_crtm
+   use da_crtm, only : da_get_innov_vector_crtm
+                       !da_get_innov_vector_crtmk
 #endif
    use da_define_structures, only : ob_type, y_type, j_type, be_type, &
       xbx_type, jo_type, da_allocate_y,da_zero_x,da_deallocate_y
