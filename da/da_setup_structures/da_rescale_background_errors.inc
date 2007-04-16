@@ -37,7 +37,7 @@ subroutine da_rescale_background_errors (var_scaling, len_scaling, &
       s(1:mz) = len_scaling * s(1:mz)
    
       if (print_detail_be) then
-         write(unit=stdout,fmt='(a,a)')trim(be_sub % name), 'Error Lengthscales (m):'
+         write(unit=stdout,fmt='(a,a)')trim(be_sub % name), ' Error Lengthscales (m):'
          do m = 1, mz
             write(unit=stdout,fmt='(a,i4,1pe13.5)')be_sub % name, m, s(m)
          end do

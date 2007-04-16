@@ -306,7 +306,7 @@ subroutine da_read_obs (ob, xp, filename)
       if (print_detail_obs) then
          ! Simplistic approach, could be improved to get it all done on PE 0
          if (.NOT. outside) then
-            write(unit=stdout,fmt='(A,I4,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
+            write(unit=stdout,fmt='(A,I5,A,F8.2,A,F8.2,A,I3,A,2F8.2)') &
                "Report",report," at",platform%info%lon,"E",platform%info%lat, &
                "N on processor", myproc,", position", platform%loc%x,platform%loc%y
          end if

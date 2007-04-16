@@ -128,16 +128,16 @@ subroutine da_transfer_wrftoxb(xbx, grid)
                grid%em_phb(is,js,k), grid%em_ph_2(is,js,k)
       end do
 
-      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
+      write(unit=stdout, fmt=*) 'simple variables:'
 
       if (je == grid%xp%jde) then
          write(unit=stdout, fmt=*) ' '
 
          do k=ks+5,ke,10
             do i=is,ie,10
-               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                    'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                     grid%em_v_2(i, grid%xp%jde+1,k)
+               write(unit=stdout, fmt=*) &
+                    '  grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
+                       grid%em_v_2(i, grid%xp%jde+1,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
@@ -148,48 +148,48 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
          do k=ks+5,ke,10
             do j=js,je,10
-               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                  'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
+               write(unit=stdout, fmt=*) &
+                  '  grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
                   grid%em_u_2(grid%xp%ide+1,j,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
       end if
 
-      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
+      write(unit=stdout, fmt=*) 'simple variables:'
 
-      write(unit=stdout, fmt=*) ' grid%em_u_1(is,js,ks)=',  grid%em_u_1(is,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_v_1(is,js,ks)=',  grid%em_v_1(is,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_w_1(is,js,ks)=',  grid%em_w_1(is,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_t_1(is,js,ks)=',  grid%em_t_1(is,js,ks)
-      write(unit=stdout, fmt=*) 'grid%em_ph_1(is,js,ks)=', grid%em_ph_1(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_u_1(is,js,ks)=',  grid%em_u_1(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_v_1(is,js,ks)=',  grid%em_v_1(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_w_1(is,js,ks)=',  grid%em_w_1(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_t_1(is,js,ks)=',  grid%em_t_1(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_ph_1(is,js,ks)=', grid%em_ph_1(is,js,ks)
 
 
-      write(unit=stdout, fmt=*) ' grid%em_u_2(is,je,ks)=',  grid%em_u_2(is,je,ks)
-      write(unit=stdout, fmt=*) ' grid%em_v_2(ie,js,ks)=',  grid%em_v_2(ie,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_w_2(is,js,ks)=',  grid%em_w_2(is,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_t_2(is,js,ks)=',  grid%em_t_2(is,js,ks)
-      write(unit=stdout, fmt=*) 'grid%em_ph_2(is,js,ks)=', grid%em_ph_2(is,js,ks)
-      write(unit=stdout, fmt=*) ' grid%em_phb(is,js,ks)=',  grid%em_phb(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_u_2(is,je,ks)=',  grid%em_u_2(is,je,ks)
+      write(unit=stdout, fmt=*) '  grid%em_v_2(ie,js,ks)=',  grid%em_v_2(ie,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_w_2(is,js,ks)=',  grid%em_w_2(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_t_2(is,js,ks)=',  grid%em_t_2(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_ph_2(is,js,ks)=', grid%em_ph_2(is,js,ks)
+      write(unit=stdout, fmt=*) '  grid%em_phb(is,js,ks)=',  grid%em_phb(is,js,ks)
 
       write(unit=stdout, fmt=*) &
-         'grid%sm31,grid%em31,grid%sm32,grid%em32, grid%sm33,grid%em33=', &
+         '  grid%sm31,grid%em31,grid%sm32,grid%em32, grid%sm33,grid%em33=', &
          grid%sm31,grid%em31,grid%sm32,grid%em32,grid%sm33,grid%em33
 
-      write(unit=stdout, fmt=*) 'grid%p_top=', grid%p_top
-      write(unit=stdout, fmt=*) 'grid%em_znu(ks)=', grid%em_znu(ks)
-      write(unit=stdout, fmt=*) 'grid%em_mu0(is,js)=', grid%em_mu0(is,js)
-      write(unit=stdout, fmt=*) 'grid%em_mub(is,js)=', grid%em_mub(is,js)
-      write(unit=stdout, fmt=*) 'grid%em_mu_2(is,js)=', grid%em_mu_2(is,js)
+      write(unit=stdout, fmt=*) '  grid%p_top=', grid%p_top
+      write(unit=stdout, fmt=*) '  grid%em_znu(ks)=', grid%em_znu(ks)
+      write(unit=stdout, fmt=*) '  grid%em_mu0(is,js)=', grid%em_mu0(is,js)
+      write(unit=stdout, fmt=*) '  grid%em_mub(is,js)=', grid%em_mub(is,js)
+      write(unit=stdout, fmt=*) '  grid%em_mu_2(is,js)=', grid%em_mu_2(is,js)
 
-      write(unit=stdout, fmt=*) 'hbot(is,js)=', grid%hbot(is,js)
-      write(unit=stdout, fmt=*) 'htop(is,js)=', grid%htop(is,js)
+      write(unit=stdout, fmt=*) '  hbot(is,js)=', grid%hbot(is,js)
+      write(unit=stdout, fmt=*) '  htop(is,js)=', grid%htop(is,js)
 
-      write(unit=stdout, fmt=*) 'grid%p_top=', grid%p_top
-      write(unit=stdout, fmt=*) 'num_moist=', num_moist
-      write(unit=stdout, fmt=*) 'P_QV=', P_QV
+      write(unit=stdout, fmt=*) '  grid%p_top=', grid%p_top
+      write(unit=stdout, fmt=*) '  num_moist=', num_moist
+      write(unit=stdout, fmt=*) '  P_QV=', P_QV
 
-      write(unit=stdout, fmt=*) 'moist(is,js,ks,2)=', grid%moist(is,js,ks,2)
+      write(unit=stdout, fmt=*) '  moist(is,js,ks,2)=', grid%moist(is,js,ks,2)
       write(unit=stdout, fmt=*) ' '
    end if
 
@@ -225,37 +225,37 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
 
    if (print_detail_xb) then
-      write(unit=stdout, fmt=*) 'is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
-      write(unit=stdout, fmt=*) 'grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
-      write(unit=stdout, fmt=*) 'grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
-      write(unit=stdout, fmt=*) 'grid%xp%kts, grid%xp%kte=', grid%xp%kts, grid%xp%kte
-      write(unit=stdout, fmt=*) 'grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
-      write(unit=stdout, fmt=*) 'grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
-      write(unit=stdout, fmt=*) 'grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
-      write(unit=stdout, fmt=*) 'grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
-      write(unit=stdout, fmt=*) 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
-      write(unit=stdout, fmt=*) 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
+      write(unit=stdout, fmt=*) ' is,ie,js,je,ks,ke=', is,ie,js,je,ks,ke
+      write(unit=stdout, fmt=*) ' grid%xp%its, grid%xp%ite=', grid%xp%its, grid%xp%ite
+      write(unit=stdout, fmt=*) ' grid%xp%jts, grid%xp%jte=', grid%xp%jts, grid%xp%jte
+      write(unit=stdout, fmt=*) ' grid%xp%kts, grid%xp%kte=', grid%xp%kts, grid%xp%kte
+      write(unit=stdout, fmt=*) ' grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
+      write(unit=stdout, fmt=*) ' grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
+      write(unit=stdout, fmt=*) ' grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
+      write(unit=stdout, fmt=*) ' grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
+      write(unit=stdout, fmt=*) ' grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
+      write(unit=stdout, fmt=*) ' grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
 
-      write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
-      write(unit=stdout, fmt=*) 'size(grid%xb%v, dim=1)=', size(grid%xb%v, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%xb%u, dim=2)=', size(grid%xb%u, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%xb%u, dim=3)=', size(grid%xb%u, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%xb%v, dim=1)=', size(grid%xb%v, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%xb%v, dim=2)=', size(grid%xb%v, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%xb%v, dim=3)=', size(grid%xb%v, dim=3)
 
-      write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
-      write(unit=stdout, fmt=*) 'size(grid%xa%v, dim=1)=', size(grid%xa%v, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%xa%u, dim=1)=', size(grid%xa%u, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%xa%u, dim=2)=', size(grid%xa%u, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%xa%u, dim=3)=', size(grid%xa%u, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%xa%v, dim=1)=', size(grid%xa%v, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%xa%v, dim=2)=', size(grid%xa%v, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%xa%v, dim=3)=', size(grid%xa%v, dim=3)
 
-      write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
-      write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
-      write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
-      write(unit=stdout, fmt=*) 'size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%em_u_2, dim=1)=', size(grid%em_u_2, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%em_u_2, dim=2)=', size(grid%em_u_2, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%em_u_2, dim=3)=', size(grid%em_u_2, dim=3)
+      write(unit=stdout, fmt=*) ' size(grid%em_v_2, dim=1)=', size(grid%em_v_2, dim=1)
+      write(unit=stdout, fmt=*) ' size(grid%em_v_2, dim=2)=', size(grid%em_v_2, dim=2)
+      write(unit=stdout, fmt=*) ' size(grid%em_v_2, dim=3)=', size(grid%em_v_2, dim=3)
    end if
 
    do j=js,je
@@ -539,14 +539,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! Sea level pressure and total precipitable water
    !---------------------------------------------------------------------------
 
-   if (print_detail_xb) then
-      write(unit=stdout, fmt='(3a, i8)') &
-         'file:', __FILE__, ', line:', __LINE__
-
-      write(unit=stdout, fmt='(a)') &
-         'Sea level pressure and total precipitable water'
-   end if
-
    call da_wrf_tpq_2_slp (grid%xb)
 
    ! WHY
@@ -563,14 +555,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    !---------------------------------------------------------------------------
    ! Surface wind speed
    !---------------------------------------------------------------------------
-
-   if (print_detail_xb) then
-      write(unit=stdout, fmt='(3a, i8)') &
-         'file:', __FILE__, ', line:', __LINE__
-
-      write(unit=stdout, fmt='(a)') &
-         'Surface Wind speed'
-   end if
 
    tmpvar = log(10./0.0001)
 
@@ -589,28 +573,12 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! Brightness temperature SH Chen
    !---------------------------------------------------------------------------
 
-   if (print_detail_xb) then
-      write(unit=stdout, fmt='(3a, i8)') &
-         'file:', __FILE__, ', line:', __LINE__
-
-      write(unit=stdout, fmt='(a)') &
-          'Brightness temperature'
-   end if
-
    if (Use_SsmiTbObs)   &
       call da_transform_xtotb(grid%xb)
 
    !---------------------------------------------------------------------------
    ! GPS Refractivity linked by Y.-R. Guo 05/28/2004
    !---------------------------------------------------------------------------
-
-   if (print_detail_xb) then
-      write(unit=stdout, fmt='(3a, i8)') &
-         'file:', __FILE__, ', line:', __LINE__
-
-      write(unit=stdout, fmt='(a)') &
-         'GPS Refractivity'
-   end if
 
    call da_transform_xtogpsref(grid%xb, grid%xp)
 

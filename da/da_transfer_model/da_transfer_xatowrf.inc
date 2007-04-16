@@ -355,16 +355,16 @@ subroutine da_transfer_xatowrf(grid)
    end if
 
    if (print_detail_xa) then
-      write(unit=stdout, fmt='(/5a/)') ' simple variables:'
+      write(unit=stdout, fmt=*) 'simple variables:'
 
       if (ie == grid%xp%ide) then
          write (unit=stdout,fmt=*)  ' '
 
          do k=ks+5,ke,10
             do j=js,je,10
-               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                    'grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
-                     grid%em_u_2(grid%xp%ide+1,j,k)
+               write(unit=stdout, fmt=*) &
+                    '  grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
+                       grid%em_u_2(grid%xp%ide+1,j,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
@@ -375,9 +375,9 @@ subroutine da_transfer_xatowrf(grid)
 
          do k=ks+5,ke,10
             do i=is,ie,10
-               write(unit=stdout, fmt='(3(a,i5),a,e20.12)') &
-                    'grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                     grid%em_v_2(i, grid%xp%jde+1,k)
+               write(unit=stdout, fmt=*) &
+                    '  grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
+                       grid%em_v_2(i, grid%xp%jde+1,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
