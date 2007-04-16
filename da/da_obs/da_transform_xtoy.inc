@@ -148,13 +148,13 @@ subroutine da_transform_xtoy(xb, iv, xa, xp, y)
          call da_transform_xtoy_rttov (xa, iv, xp, y)
       elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-         if (use_crtm_kmatrix) then
-            call da_transform_xtoy_crtmk (xa, iv, xp, y)
-         else if (use_crtm_kmatrix_fast) then
-            call da_transform_xtoy_crtmk_f (xa, iv, xp, y)
-         else
+         !if (use_crtm_kmatrix) then
+         !   call da_transform_xtoy_crtmk (xa, iv, xp, y)
+         !else if (use_crtm_kmatrix_fast) then
+         !   call da_transform_xtoy_crtmk_f (xa, iv, xp, y)
+         !else
             call da_transform_xtoy_crtm (xa, iv, xp, y)
-         end if
+         !end if
 #endif
        else
           call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))

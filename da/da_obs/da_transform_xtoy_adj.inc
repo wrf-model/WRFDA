@@ -142,13 +142,13 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
          call da_transform_xtoy_rttov_adj (iv, xp, jo_grad_y, jo_grad_x)
       elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-         if (use_crtm_kmatrix) then
-            call da_transform_xtoy_crtmk_adj (iv, xp, jo_grad_y, jo_grad_x)
-         else if (use_crtm_kmatrix_fast) then
-            call da_transform_xtoy_crtmk_f_adj (iv, xp, jo_grad_y, jo_grad_x)
-         else
+         !if (use_crtm_kmatrix) then
+         !   call da_transform_xtoy_crtmk_adj (iv, xp, jo_grad_y, jo_grad_x)
+         !else if (use_crtm_kmatrix_fast) then
+         !   call da_transform_xtoy_crtmk_f_adj (iv, xp, jo_grad_y, jo_grad_x)
+         !else
             call da_transform_xtoy_crtm_adj (iv, xp, jo_grad_y, jo_grad_x)
-         end if
+         !end if
 #endif
       else
          call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))

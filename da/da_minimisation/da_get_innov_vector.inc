@@ -119,11 +119,11 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_get_innov_vector_rttov( it, grid%xb, grid%xp, ob, iv )
       elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-        if (use_crtm_kmatrix_fast) then
-         call da_get_innov_vector_crtmk( it, grid%xb, grid%xp, ob, iv )
-        else
+        !if (use_crtm_kmatrix_fast) then
+        ! call da_get_innov_vector_crtmk( it, grid%xb, grid%xp, ob, iv )
+        !else
          call da_get_innov_vector_crtm( it, grid%xb, grid%xp, ob, iv )
-        end if
+        !end if
 #endif
       else
          call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
