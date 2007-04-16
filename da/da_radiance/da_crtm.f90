@@ -43,16 +43,16 @@ module da_crtm
 
 contains
 
-#include "da_transform_xtoy_crtmk.inc"
-#include "da_transform_xtoy_crtmk_f.inc"
-#include "da_transform_xtoy_crtmk_f_adj.inc"
-#include "da_transform_xtoy_crtmk_adj.inc"
+!#include "da_transform_xtoy_crtmk.inc"
+!#include "da_transform_xtoy_crtmk_f.inc"
+!#include "da_transform_xtoy_crtmk_f_adj.inc"
+!#include "da_transform_xtoy_crtmk_adj.inc"
 #include "da_transform_xtoy_crtm.inc"
 #include "da_transform_xtoy_crtm_adj.inc"
-#include "da_get_innov_vector_crtmk.inc"
+!#include "da_get_innov_vector_crtmk.inc"
 #include "da_get_innov_vector_crtm.inc"
 #include "da_crtm_tl.inc"
-#include "da_crtm_k.inc"
+!#include "da_crtm_k.inc"
 #include "da_crtm_direct.inc"
 #include "da_crtm_ad.inc"
 #include "da_crtm_init.inc"
