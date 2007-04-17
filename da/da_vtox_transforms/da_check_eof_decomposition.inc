@@ -81,7 +81,7 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
       write(unit=stdout,fmt='(I4,4x,1pe12.4,10x,1pe12.4)')k1, matrix2(k1,k1), &
          max_off_diag
    end do
-   write(unit=stdout)
+   write(unit=stdout,fmt=*) ' '
 
    ! [2.3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2
 
@@ -99,7 +99,7 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
       write(unit=stdout,fmt='(I4,4x,1pe12.4,10x,1pe12.4)')k1, matrix2(k1,k1), &
          max_off_diag
    end do
-   write(unit=stdout)
+   write(unit=stdout,fmt=*) ' '
 
    !-------------------------------------------------------------------------
    ! [3.0]: Tidy up:
