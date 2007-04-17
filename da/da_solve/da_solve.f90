@@ -28,7 +28,7 @@ subroutine da_solve ( grid , config_flags)
       ips,ipe, jps,jpe, vert_corr, sin_xle, testing_wrfvar, use_rad, &
       w_increments, var4d_coupling_disk_simul, var4d_coupling, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
-      sin_xls, rf_passes, ntmax, rootproc,monitoring,test_transforms,global, &
+      sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
       rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef

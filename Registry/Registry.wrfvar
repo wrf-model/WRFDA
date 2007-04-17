@@ -781,7 +781,6 @@ rconfig   logical   print_detail_timing     namelist,wrfvar1  1  .false.  -  "pr
 rconfig   logical   check_max_iv_print      namelist,wrfvar1  1  .true.   -  "check_max_iv_print"      ""  ""
 
 rconfig   integer   analysis_accu           namelist,wrfvar2  1  900      -  "analysis_accu"           ""  ""
-rconfig   logical   w_increments            namelist,wrfvar2  1  .false.  -  "w_increments"            ""  ""
 rconfig   logical   dt_cloud_model          namelist,wrfvar2  1  .false.  -  "dt_cloud_model"          ""  ""
 rconfig   logical   write_qcw               namelist,wrfvar2  1  .false.  -  "write_qcw"               ""  ""
 rconfig   logical   write_qrn               namelist,wrfvar2  1  .false.  -  "write_qrn"               ""  ""
@@ -869,7 +868,6 @@ rconfig   integer   tovs_end                namelist,wrfvar5  1  10000000 - "tov
 rconfig   integer   max_ext_its             namelist,wrfvar6  1  1        - "max_ext_its"              ""  ""
 rconfig   integer   ntmax                   namelist,wrfvar6  1  100      - "ntmax"                    ""  ""
 rconfig   integer   nsave                   namelist,wrfvar6  1  4        - "nsave"                    ""  ""
-rconfig   logical   write_switch            namelist,wrfvar6  1  .false.  - "write_switch"             ""  ""
 rconfig   integer   write_interval          namelist,wrfvar6  1  5        - "write_interval"           ""  ""
 rconfig   real      eps                     namelist,wrfvar6  10 0.01     - "eps"                      ""  ""
 
@@ -922,7 +920,6 @@ rconfig   integer   seed_array1             namelist,wrfvar11  1  0        - "se
 rconfig   integer   seed_array2             namelist,wrfvar11  1  0        - "seed_array2"             ""  ""  
 rconfig   integer   sfc_assi_options        namelist,wrfvar11  1  1        - "sfc_assi_options"        ""  ""  
 rconfig   logical   calculate_cg_cost_fn    namelist,wrfvar11  1  .false.  - "calculate_cg_cost_fn"    ""  ""  
-rconfig   logical   write_outer_loop        namelist,wrfvar11  1  .false.  - "write_outer_loop"        ""  ""  
 rconfig   logical   lat_stats_option        namelist,wrfvar11  1  .true.   - "lat_stats_option"        ""  ""  
 rconfig   real      as1                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as1"            ""  ""  
 rconfig   real      as2                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as2"            ""  ""  
@@ -952,7 +949,6 @@ rconfig   logical   read_biascoef           namelist,wrfvar14  1  .true.   - "re
 rconfig   logical   biascorr                namelist,wrfvar14  1  .false.  - "biascorr"                ""  ""   
 rconfig   logical   biasprep                namelist,wrfvar14  1  .false.  - "biasprep"                ""  ""   
 rconfig   logical   rttov_scatt             namelist,wrfvar14  1  .false.  - "rttov_scatt"             ""  ""   
-rconfig   logical   monitoring              namelist,wrfvar14  1  .false.  - "monitoring"              ""  ""   
 rconfig   logical   write_profile           namelist,wrfvar14  1  .false.  - "write_profile"           ""  ""   
 rconfig   logical   qc_rad                  namelist,wrfvar14  1  .true.   - "qc_rad"                  ""  ""   
 rconfig   logical   write_iv_rad_ascii      namelist,wrfvar14  1  .false.  - "write_iv_rad_ascii"      ""  ""   
