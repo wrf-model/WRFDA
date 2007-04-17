@@ -1,4 +1,4 @@
-subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
+subroutine da_setup_obs_structures( grid, ob, iv)
 
    !---------------------------------------------------------------------------
    ! Purpose: Allocate and read in components of observation structure.
@@ -6,11 +6,9 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
 
    implicit none
    
-   type (xpose_type), intent(in)    :: xp  ! Domain decomposition vars. 
+   type (domain),     intent(inout) :: grid ! Model data
    type (y_type),     intent(out)   :: ob  ! Observation structure.
    type (ob_type),    intent(out)   :: iv  ! O-B structure.
-   type (xb_type),    intent(inout) :: xb  ! First guess structure.
-   type (domain),     intent (inout)   :: grid
 
    if (trace_use) call da_trace_entry("da_setup_obs_structures")
 
@@ -87,37 +85,37 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
     
    if (num_pseudo > 0) then
       call da_message((/"Single OBS Test:: Turn off all the OBS switches ***"/))
-      Use_SynopObs         = .false.
-      Use_ShipsObs         = .false.
-      Use_MetarObs         = .false.
-      Use_SoundObs         = .false.
-      Use_BogusObs         = .false.
-      Use_PilotObs         = .false.
-      Use_AirepObs         = .false.
-      Use_GeoAMVObs        = .false.
-      Use_PolarAMVObs      = .false.
-      Use_BuoyObs          = .false.
-      Use_ProfilerObs      = .false.
-      Use_SatemObs         = .false.
-      Use_GpspwObs         = .false.
-      Use_GpsrefObs        = .false.
-      Use_SsmiRetrievalObs = .false.
-      Use_SsmiTbObs        = .false.
+      use_synopobs         = .false.
+      use_shipsobs         = .false.
+      use_metarobs         = .false.
+      use_soundobs         = .false.
+      use_bogusobs         = .false.
+      use_pilotobs         = .false.
+      use_airepobs         = .false.
+      use_geoamvobs        = .false.
+      use_polaramvobs      = .false.
+      use_buoyobs          = .false.
+      use_profilerobs      = .false.
+      use_satemobs         = .false.
+      use_gpspwobs         = .false.
+      use_gpsrefobs        = .false.
+      use_ssmiretrievalobs = .false.
+      use_ssmitbobs        = .false.
       use_ssmt1obs         = .false.
       use_ssmt2obs         = .false.
       use_qscatobs         = .false.
-      use_Hirs2Obs         = .false.
-      use_Hirs3Obs         = .false.
-      use_MsuObs           = .false.
-      use_AmsuaObs         = .false.
-      use_AmsubObs         = .false.
-      use_AirsObs          = .false.
-      use_Eos_AmsuaObs     = .false.
-      use_Eos_radObs       = .false.
-      use_HsbObs           = .false.
-      Use_Obsgts           = .true.
-      use_rad         = .false.
-      Use_AIRSRETObs       = .false.
+      use_hirs2obs         = .false.
+      use_hirs3obs         = .false.
+      use_msuobs           = .false.
+      use_amsuaobs         = .false.
+      use_amsubobs         = .false.
+      use_airsobs          = .false.
+      use_eos_amsuaobs     = .false.
+      use_eos_radobs       = .false.
+      use_hsbobs           = .false.
+      use_obsgts           = .true.
+      use_rad              = .false.
+      use_airsretobs       = .false.
    end if
 
    if (sfc_assi_options < 1 .OR. sfc_assi_options > 2) then
@@ -131,7 +129,7 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
    !----------------------------------------------------------------------------     
 
    iv%missing = missing
-   ! iv%ptop    = xb%ptop
+   ! iv%ptop    = grid%xb%ptop
 
    iv%total_obs         = 0
    iv%total_rad_pixel   = 0
@@ -214,10 +212,10 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
       if (ob_format == ob_format_bufr) then
          call da_message((/'Using BUFR format observation input'/))
          ! [1.1] BUFR observation input file:
-            call da_setup_obs_structures_bufr(xp, ob, iv)
+            call da_setup_obs_structures_bufr(grid%xp, ob, iv)
       else if (ob_format == ob_format_ascii) then
          ! [1.2] GTS observation input file:
-         call da_setup_obs_structures_ascii( xp, ob, iv, xb )
+         call da_setup_obs_structures_ascii( grid%xp, ob, iv, grid%xb )
       end if
    end if
 
@@ -225,12 +223,12 @@ subroutine da_setup_obs_structures( xp, ob, iv ,xb, grid)
 
    if (use_rad) then
       call da_message((/'Using NCEP BUFR radiance 1b input'/))
-      call da_setup_bufrtovs_structures(xb, grid, xp, ob, iv)
+      call da_setup_bufrtovs_structures(grid, ob, iv)
    end if
 
    ! Get horizontal interpolation weights.
 
-   call da_setup_obs_interp_wts(xp, iv) 
+   call da_setup_obs_interp_wts( grid%xp, iv) 
 
    if (trace_use) call da_trace_exit("da_setup_obs_structures")    
 

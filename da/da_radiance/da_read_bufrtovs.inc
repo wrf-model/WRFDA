@@ -39,7 +39,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
    integer(i_kind) ihh,i,k,ifov,idd,ireadmg,ireadsb
    integer(i_kind) iret,idate,im,iy,nchan
 
-! thinning variables
+   ! thinning variables
    integer(i_kind) itt,itx,iobs,iout
    real(r_kind) terrain,timedif,crit,dist
    real(r_kind) dlon_earth,dlat_earth
@@ -77,7 +77,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
 
    data tbmin,tbmax,tbbad / 50.0_r_kind, 550.0_r_kind, -9.99e11_r_kind /
    integer :: num_tovs_local, num_tovs_file, num_tovs_global, num_tovs_selected
-   integer :: num_tovs_thinning, num_tovs_used
+   integer :: num_tovs_thinned, num_tovs_used
    integer :: lnbufr
    integer :: n
 
@@ -181,7 +181,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
    num_tovs_file     = 0    ! number of obs in file
    num_tovs_global   = 0    ! number of obs within whole domain
    num_tovs_local    = 0    ! number of obs within tile
-   num_tovs_thinning = 0    ! number of obs rejected by thinning
+   num_tovs_thinned = 0    ! number of obs rejected by thinning
    num_tovs_used     = 0    ! number of obs entered into innovation computation
    num_tovs_selected = 0    ! number of obs limited for debuging
 
@@ -296,25 +296,25 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
          if (outside) cycle ! No good for this PE
          num_tovs_local = num_tovs_local + 1
 
-        !  Make Thinning
-        !  Map obs to thinning grid
-        !-------------------------------------------------------------------
-        if (thinning) then
-         dlat_earth = info%lat
-         dlon_earth = info%lon
-         if(dlon_earth<zero)  dlon_earth = dlon_earth+r360
-         if(dlon_earth>=r360) dlon_earth = dlon_earth-r360
-         dlat_earth = dlat_earth*deg2rad
-         dlon_earth = dlon_earth*deg2rad           
-         timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
-         terrain = 0.01_r_kind*abs(bfr1bhdr(13))
-         crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
-         call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
-         if(.not. iuse) then
-             num_tovs_thinning=num_tovs_thinning+1
-             cycle
+         !  Make Thinning
+         !  Map obs to thinning grid
+         !-------------------------------------------------------------------
+         if (thinning) then
+            dlat_earth = info%lat
+            dlon_earth = info%lon
+            if (dlon_earth<zero) dlon_earth = dlon_earth+r360
+            if (dlon_earth>=r360) dlon_earth = dlon_earth-r360
+            dlat_earth = dlat_earth*deg2rad
+            dlon_earth = dlon_earth*deg2rad           
+            timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
+            terrain = 0.01_r_kind*abs(bfr1bhdr(13))
+            crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+            call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
+            if (.not. iuse) then
+               num_tovs_thinned=num_tovs_thinned+1
+               cycle
+            end if
          end if
-        end if
 
          num_tovs_used = num_tovs_used + 1
          nread(inst) = nread(inst) + 1
@@ -375,13 +375,12 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       end do
    end do obs
 
-   ! These totals are before thinning, which will recalculate them
    iv%total_obs         = iv%total_obs + num_tovs_used
    iv%total_rad_pixel   = iv%total_rad_pixel + num_tovs_used
    iv%total_rad_channel = iv%total_rad_channel + num_tovs_used*nchan
 
-   write(UNIT=stdout,FMT='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_tovs_thinning'
-   write(UNIT=stdout,FMT='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_tovs_thinning
+   write(unit=stdout,fmt='(a)') 'num_tovs_file num_tovs_global num_tovs_local num_tovs_used num_tovs_thinned'
+   write(unit=stdout,fmt='(5i10)') num_tovs_file,num_tovs_global, num_tovs_local,num_tovs_used,num_tovs_thinned
 
    deallocate(tb_inv)  
    call closbf(lnbufr)
@@ -465,13 +464,13 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       allocate(iv%instid(i)%solazi(iv%instid(i)%num_rad))
       allocate(iv%instid(i)%proc_domain(iv%instid(i)%num_rad))
       if (rtm_option == rtm_option_crtm) then
-        allocate(iv%instid(i)%water_coverage(iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%land_coverage(iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%ice_coverage(iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%snow_coverage(iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%ps_jacobian(nchan,iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%t_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
-        allocate(iv%instid(i)%q_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%water_coverage(iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%land_coverage(iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%ice_coverage(iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%snow_coverage(iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%ps_jacobian(nchan,iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%t_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
+         allocate(iv%instid(i)%q_jacobian(nchan,xp%kte,iv%instid(i)%num_rad))
       end if
    end do
    
