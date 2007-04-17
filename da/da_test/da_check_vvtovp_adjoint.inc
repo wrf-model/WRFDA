@@ -26,6 +26,8 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    real                              :: vv2_v5(ims:ime,jms:jme,kms:kme)
    real                              :: vv2_alpha(ims:ime,jms:jme,1:ne)
 
+   if (trace_use) call da_trace_entry("da_check_vvtovp_adjoint")
+
    !----------------------------------------------------------------------
    ! [1.0] Initialise:
    !----------------------------------------------------------------------
@@ -150,6 +152,8 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    end if
 
    write(unit=stdout, fmt='(/a/)') 'da_check_vvtovp_adjoint: Test Finished.'
+
+   if (trace_use) call da_trace_exit("da_check_vvtovp_adjoint")
 
 end subroutine da_check_vvtovp_adjoint
 

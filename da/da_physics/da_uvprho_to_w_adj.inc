@@ -22,6 +22,8 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
    real, dimension(ims:ime,jms:jme,kms:kme) :: DIV, WZ
    real                                     :: TERM3
 
+   if (trace_use) call da_trace_entry("da_uvprho_to_w_adj")
+
    !initialize to zero for some variables because of the adjoint requirements.
 
    WZ(:,:,:)=0.
@@ -272,6 +274,8 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
    end do
 
    WZ(:,:,:) = 0.0
+
+   if (trace_use) call da_trace_exit("da_uvprho_to_w_adj")
 
 end subroutine da_uvprho_to_w_adj
 

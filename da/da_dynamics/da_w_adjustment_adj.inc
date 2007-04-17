@@ -19,6 +19,8 @@ subroutine da_w_adjustment_adj(xb,WZ_a)
    real :: EBXL1,EBXL2
    real :: EBXL19,EBXL29
 
+   if (trace_use) call da_trace_entry("da_w_adjustment_adj")
+
    call da_wz_base(xb,WZ_b)
 
    do J=jts,jte
@@ -49,6 +51,8 @@ subroutine da_w_adjustment_adj(xb,WZ_a)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_w_adjustment_adj")
 
 end subroutine da_w_adjustment_adj
 

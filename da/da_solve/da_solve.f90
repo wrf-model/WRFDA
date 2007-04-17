@@ -7,6 +7,8 @@ subroutine da_solve ( grid , config_flags)
    use module_configure, only : grid_config_rec_type
    use module_domain, only : domain
    use module_driver_constants, only : max_comms
+   use module_symbols_util, only : wrfu_finalize
+
    use module_radiance, only : satinfo, time_slots
 #ifdef RTTOV
    use module_radiance, only : coefs, sensor_descriptor
@@ -218,13 +220,17 @@ subroutine da_solve ( grid , config_flags)
       if (test_transforms) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, y)
+         call wrfu_finalize
          call wrf_shutdown
+         stop
       end if
 
       if (testing_wrfvar) then
          call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, y)
+         call wrfu_finalize
          call wrf_shutdown
+         stop
       end if
 
       ! Write "clean" QCed observations if requested:

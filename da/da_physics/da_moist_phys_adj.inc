@@ -44,6 +44,8 @@ subroutine da_moist_phys_adj(xb, xa, xp)
 
    integer :: i, j, k
 
+   if (trace_use) call da_trace_entry("da_moist_phys_adj")
+
    do k=kts,kte
       do j=jts,jte
          do i=its,ite
@@ -303,6 +305,8 @@ subroutine da_moist_phys_adj(xb, xa, xp)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_moist_phys_adj")
 
 end subroutine da_moist_phys_adj
 

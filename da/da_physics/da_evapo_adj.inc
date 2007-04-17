@@ -19,6 +19,8 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
    real                :: beta, QRTH
    real                :: TMP, TMP2
 
+   if (trace_use) call da_trace_entry("da_evapo_adj")
+
    QRTH = 1.e-6
    beta = 0.0486   ! original
 
@@ -67,5 +69,7 @@ subroutine da_evapo_adj(DT,SCR3,SCR5,QV_B,PRE,SCR6,  &
       end if
 
    end do
+
+   if (trace_use) call da_trace_exit("da_evapo_adj")
 
 end subroutine da_evapo_adj

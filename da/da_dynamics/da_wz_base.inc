@@ -20,6 +20,8 @@ subroutine da_wz_base(xb,WZ_b)
    real, dimension(ims:ime,jms:jme,kms:kme) :: URHO, VRHO
    real, dimension(ims:ime,jms:jme,kms:kme) :: DIV
 
+   if (trace_use) call da_trace_entry("da_wz_base")
+
 
    ! Computation to check for edge of domain:
 
@@ -131,6 +133,8 @@ subroutine da_wz_base(xb,WZ_b)
          end do
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_wz_base")
 
 end subroutine da_wz_base
 

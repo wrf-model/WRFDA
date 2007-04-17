@@ -16,6 +16,8 @@ subroutine da_pt_to_rho_adj(xb, xa)
    integer                       :: is, ie, js, je
 
    real                          :: temp
+
+   if (trace_use) call da_trace_entry("da_pt_to_rho_adj")
    
    is = xb%its
    js = xb%jts
@@ -54,6 +56,8 @@ subroutine da_pt_to_rho_adj(xb, xa)
          end do        
       end do        
    end do        
+
+   if (trace_use) call da_trace_exit("da_pt_to_rho_adj")
 
 end subroutine da_pt_to_rho_adj
 

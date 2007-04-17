@@ -25,6 +25,8 @@ subroutine da_uv_to_divergence(xb, u, v, div)
    real               :: um(ims:ime,jms:jme)          ! Temp. storage of u/m.
    real               :: vm(ims:ime,jms:jme)          ! Temp. storage of v/m.
 
+   if (trace_use) call da_trace_entry("da_uv_to_divergence")
+
    !---------------------------------------------------------------------------
    ! [1.0] Initialise:
    !---------------------------------------------------------------------------
@@ -116,6 +118,8 @@ subroutine da_uv_to_divergence(xb, u, v, div)
    if (global) then
       call da_set_boundary_3d(div)
    end if
+
+   if (trace_use) call da_trace_exit("da_uv_to_divergence")
 
 end subroutine da_uv_to_divergence
 

@@ -13,6 +13,8 @@ subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
    integer :: i, j, kz, is, js, ie, je
    real    :: height
 
+   if (trace_use) call da_trace_entry("da_transform_xtowtq_adj")
+
    kz = xp%kts
 
    is = xb%its
@@ -61,6 +63,8 @@ subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
          jo_grad_x%tgrn(i,j)=0.0
       end do
    end do
+
+   if (trace_use) call da_trace_exit("da_transform_xtowtq_adj")
 
 end subroutine da_transform_xtowtq_adj
 

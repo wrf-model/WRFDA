@@ -47,9 +47,8 @@ subroutine da_check_sfc_assi(xb, xa, iv, xp, y)
    xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
    xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
 
+   ! WHY?
    ! call check_psfc(xb, xa, iv, xp, y)
-
-   ! call wrf_shutdown
 
    call da_transform_xtowtq (xp, xb, xa)
 

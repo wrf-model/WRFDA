@@ -27,6 +27,8 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
    real                             :: vp2_v5(ims:ime,jms:jme,kms:kme)
    real                             :: vp2_alpha(ims:ime,jms:jme,1:ne)
 
+   if (trace_use) call da_trace_entry("da_check_vptox_adjoint")
+
    !-------------------------------------------------------------------------
    ! [1.0] Initialise:
    !-------------------------------------------------------------------------
@@ -226,6 +228,8 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
 
    write(unit=stdout, fmt='(/a/)') &
         'End of da_check_vptox_adjoint.'
+
+   if (trace_use) call da_trace_exit("da_check_vptox_adjoint")
       
 end subroutine da_check_vptox_adjoint
 

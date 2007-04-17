@@ -104,9 +104,6 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
 
    end if
 
-   !call wrf_shutdown
-   !call da_error(__FILE__,__LINE__,(/"wrf_shutdown failed"/))
-
    call da_trace_exit("da_check")
 
 end subroutine da_check
