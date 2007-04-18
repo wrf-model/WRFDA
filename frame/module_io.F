@@ -2284,16 +2284,6 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
                             PatchStart , PatchEnd ,                                      &
                             Status )
       DEALLOCATE(ICAST)
-#if (DA_CORE == 1)
-  ELSE IF ( FieldType .EQ. WRF_DOUBLE ) THEN
-    CALL wrf_write_field2 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
-                            Comm       , IOComm  ,                                       &
-                            DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
-                            DomainStart , DomainEnd ,                                    &
-                            MemoryStart , MemoryEnd ,                                    &
-                            PatchStart , PatchEnd ,                                      &
-                            Status )
-#endif
   ELSE
     CALL wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
                             Comm       , IOComm  ,                                       &
@@ -2305,63 +2295,6 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
   ENDIF
 END SUBROUTINE wrf_write_field
 
-#if (DA_CORE == 1)
-SUBROUTINE wrf_write_field2 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
-                             Comm       , IOComm  ,                                       &
-                             DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
-                             DomainStart , DomainEnd ,                                    &
-                             MemoryStart , MemoryEnd ,                                    &
-                             PatchStart , PatchEnd ,                                      &
-                             Status )
-!<DESCRIPTION>
-!<PRE>
-! Write the variable named VarName to the dataset pointed to by DataHandle.
-! This routine is a wrapper that ensures uniform treatment of logicals across 
-! platforms by converting to integer before writing.  
-!</PRE>
-!</DESCRIPTION>
-  USE module_state_description
-  USE module_configure
-  IMPLICIT NONE
-  INTEGER ,       INTENT(IN)    :: DataHandle
-  CHARACTER*(*) :: DateStr
-  CHARACTER*(*) :: VarName
-  REAL                          ,INTENT(IN)    :: Field(*)
-  INTEGER                       ,INTENT(IN)    :: FieldType
-  INTEGER                       ,INTENT(INOUT) :: Comm
-  INTEGER                       ,INTENT(INOUT) :: IOComm
-  INTEGER                       ,INTENT(IN)    :: DomainDesc
-  LOGICAL, DIMENSION(4)         ,INTENT(IN)    :: bdy_mask
-  CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
-  CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
-  CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
-  INTEGER ,dimension(*)         ,INTENT(IN)    :: DomainStart, DomainEnd
-  INTEGER ,dimension(*)         ,INTENT(IN)    :: MemoryStart, MemoryEnd
-  INTEGER ,dimension(*)         ,INTENT(IN)    :: PatchStart,  PatchEnd
-  INTEGER                       ,INTENT(OUT)   :: Status
-#include "wrf_status_codes.h"
-#include "wrf_io_flags.h"
-  REAL (KIND= NATIVE_RWORDSIZE ), ALLOCATABLE, DIMENSION(:) :: rcast
-
-  ALLOCATE(rcast((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
-  rcast(1:(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)) = &
-       Field(1:(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1))
-
-#if (NATIVE_RWORDSIZE == 4)
-  CALL wrf_write_field1 ( DataHandle , DateStr , VarName , rcast , WRF_REAL ,          &
-#else
-  CALL wrf_write_field1 ( DataHandle , DateStr , VarName , rcast , WRF_DOUBLE ,        &
-#endif
-                          Comm       , IOComm  ,                                       &
-                          DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,    &
-                          DomainStart , DomainEnd ,                                    &
-                          MemoryStart , MemoryEnd ,                                    &
-                          PatchStart , PatchEnd ,                                      &
-                          Status )
-  DEALLOCATE(rcast)
-
-END SUBROUTINE wrf_write_field2
-#endif
 
 SUBROUTINE wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
                              Comm       , IOComm  ,                                       &
@@ -2656,6 +2589,26 @@ INTEGER FUNCTION use_package ( io_form )
   use_package = MOD( io_form, 100 )
 END FUNCTION use_package
 
+#if (DA_CORE == 1)
+SUBROUTINE real8_to_real4(d, r, n)
+!<DESCRIPTION>
+!<PRE>
+! Casts an array of real*8 onto array of real*4
+!</PRE>
+!</DESCRIPTION>
+   
+   IMPLICIT NONE
+
+   ! Arguments
+   REAL (KIND=8), DIMENSION(*), INTENT(IN) :: d
+   REAL (KIND=4), DIMENSION(*), INTENT(OUT) :: r
+   INTEGER, INTENT(IN) :: n
+
+   r(1:n) = d(1:n)
+
+END SUBROUTINE real8_to_real4
+#endif
+
 
 SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                                       &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
@@ -2695,6 +2648,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
   INTEGER                       ,INTENT(OUT)   :: Status
   LOGICAL donotcollect
   INTEGER ndims, nproc
+  REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
 
   CALL dim_from_memorder( MemoryOrder , ndims)
   CALL wrf_get_nproc( nproc )
@@ -2702,12 +2656,28 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
 
   IF ( donotcollect ) THEN
 
+#if (DA_CORE == 1)
+    IF ( FieldType == WRF_DOUBLE) THEN
+       ALLOCATE(rcast((MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1)))
+       CALL real8_to_real4(Field,rcast,(MemoryEnd(1)-MemoryStart(1)+1)*(MemoryEnd(2)-MemoryStart(2)+1)*(MemoryEnd(3)-MemoryStart(3)+1))
+       CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
+                  DomainDesc , MemoryOrder , Stagger , DimNames ,                &
+                  DomainStart , DomainEnd ,                                      &
+                  MemoryStart , MemoryEnd ,                                      &
+                  PatchStart , PatchEnd ,                                        &
+                  Status )
+       DEALLOCATE(rcast)
+    ELSE
+#endif
     CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
                DomainDesc , MemoryOrder , Stagger , DimNames ,                &
                DomainStart , DomainEnd ,                                      &
                MemoryStart , MemoryEnd ,                                      &
                PatchStart , PatchEnd ,                                        &
                Status )
+#if (DA_CORE == 1)
+    END IF
+#endif
 
   ELSE IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
 
@@ -2936,6 +2906,7 @@ SUBROUTINE collect_double_and_call_pkg (   fcn,                                 
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
+
   DEALLOCATE ( globbuf )
   RETURN
 
@@ -3051,6 +3022,8 @@ include "mpif.h"
   LOGICAL, EXTERNAL         :: wrf_dm_on_monitor
   LOGICAL     distributed_field
   INTEGER i,j,k,idx,lx,idx2,lx2
+  INTEGER :: ii
+  REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
 
   CALL wrf_get_nproc( nproc )
   CALL wrf_get_dm_communicator ( communicator )
@@ -3098,6 +3071,11 @@ include "mpif.h"
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
       ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+        CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
+           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
+           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
+           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
+      ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
         CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
@@ -3163,6 +3141,17 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+
+             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+                             my_count ,                       &    ! sendcount
+                             globbuf, 1+idx2 ,                &    ! recvbuf
+                             counts                         , &    ! recvcounts
+                             displs                         , &    ! displs
+                             0                              , &    ! root
+                             communicator                   , &    ! communicator
+                             ierr )
+
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer ( Field, PatchStart(1)+idx , &
@@ -3213,6 +3202,17 @@ include "mpif.h"
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+
+             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+                             my_count ,                       &    ! sendcount
+                             globbuf, 1+idx2 ,                &    ! recvbuf
+                             counts                         , &    ! recvcounts
+                             displs                         , &    ! displs
+                             0                              , &    ! root
+                             communicator                   , &    ! communicator
+                             ierr )
+
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
                              my_count ,                       &    ! sendcount
@@ -3286,6 +3286,17 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+
+             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
+                             my_count                       , &    ! sendcount
+                             globbuf, 1+idx2                , &    ! recvbuf
+                             counts                         , &    ! recvcounts
+                             displs                         , &    ! displs
+                             0                              , &    ! root
+                             communicator                   , &    ! communicator
+                             ierr )
+
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer( Field, PatchStart(1)+idx ,      &    ! sendbuf
@@ -3347,6 +3358,17 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
+           ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
+
+             CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
+                             my_count                       , &    ! sendcount
+                             globbuf, 1+idx2                , &    ! recvbuf
+                             counts                         , &    ! recvcounts
+                             displs                         , &    ! displs
+                             0                              , &    ! root
+                             communicator                   , &    ! communicator
+                             ierr )
+
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer( Field, PatchStart(1)+idx ,      &    ! sendbuf
@@ -3368,19 +3390,51 @@ include "mpif.h"
   END SELECT
   IF ( wrf_dm_on_monitor() ) THEN
     IF ( distributed_field ) THEN
-      CALL fcn ( Hndl , DateStr , VarName , globbuf , FieldType , Comm , IOComm , &
-                 DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                 DomainStart , DomainEnd ,                                        &
-                 DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
-                 DomainStart , DomainEnd ,                                        &
-                 Status )
+#if (DA_CORE == 1)
+      IF (FieldType == WRF_DOUBLE) THEN
+        ALLOCATE(rcast((dom_end_rev(1)-domainstart(1)+1)*(dom_end_rev(2)-domainstart(2)+1)*(dom_end_rev(3)-domainstart(3)+1)))
+        CALL real8_to_real4(globbuf,rcast,(dom_end_rev(1)-domainstart(1)+1)*(dom_end_rev(2)-domainstart(2)+1)*(dom_end_rev(3)-domainstart(3)+1))
+        CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
+                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                   DomainStart , DomainEnd ,                                        &
+                   DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
+                   DomainStart , DomainEnd ,                                        &
+                   Status )
+        DEALLOCATE(rcast)
+      ELSE
+#endif
+        CALL fcn ( Hndl , DateStr , VarName , globbuf , FieldType , Comm , IOComm , &
+                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                   DomainStart , DomainEnd ,                                        &
+                   DomainStart , dom_end_rev ,                                      &  ! memory dims adjust out for unstag
+                   DomainStart , DomainEnd ,                                        &
+                   Status )
+#if (DA_CORE == 1)
+      ENDIF
+#endif
     ELSE
-      CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                 DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
-                 DomainStart , DomainEnd ,                                        &
-                 MemoryStart , MemoryEnd ,                                        &
-                 PatchStart  , PatchEnd  ,                                        &
-                 Status )
+#if (DA_CORE == 1)
+      IF (FieldType == WRF_DOUBLE) THEN
+        ALLOCATE(rcast((memoryend(1)-memorystart(1)+1)*(memoryend(2)-memorystart(2)+1)*(memoryend(3)-memorystart(3)+1)))
+        CALL real8_to_real4(Field,rcast,(memoryend(1)-memorystart(1)+1)*(memoryend(2)-memorystart(2)+1)*(memoryend(3)-memorystart(3)+1))
+        CALL fcn ( Hndl , DateStr , VarName , rcast , WRF_REAL , Comm , IOComm , &
+                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                   DomainStart , DomainEnd ,                                        &
+                   MemoryStart , MemoryEnd ,                                        &
+                   PatchStart  , PatchEnd  ,                                        &
+                   Status )
+        DEALLOCATE(rcast)
+      ELSE
+#endif
+        CALL fcn ( Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
+                   DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
+                   DomainStart , DomainEnd ,                                        &
+                   MemoryStart , MemoryEnd ,                                        &
+                   PatchStart  , PatchEnd  ,                                        &
+                   Status )
+#if (DA_CORE == 1)
+      ENDIF
+#endif
     ENDIF
   ENDIF
   CALL wrf_dm_bcast_bytes( Status , IWORDSIZE )
