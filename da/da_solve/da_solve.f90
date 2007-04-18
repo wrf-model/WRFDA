@@ -26,7 +26,7 @@ subroutine da_solve ( grid , config_flags)
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
       ips,ipe, jps,jpe, vert_corr, sin_xle, testing_wrfvar, use_rad, &
-      w_increments, var4d_coupling_disk_simul, var4d_coupling, &
+      write_increments, var4d_coupling_disk_simul, var4d_coupling, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
@@ -263,10 +263,10 @@ subroutine da_solve ( grid , config_flags)
       call da_transform_vtox( cv_size, grid%xb, xbx, be, grid%ep, xhat, &
          grid%vv, grid%vp, grid%xp, grid%xa)
 
-      ! [8.6] Only when use_RadarObs = .false. and w_increments =.true.,
-      !       the w_increment need to be diagnosed:
+      ! [8.6] Only when use_RadarObs = .false. and write_increments =.true.,
+      !       the write_increment need to be diagnosed:
 
-      if (w_increments .and. .not. use_RadarObs) then
+      if (write_increments .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
 
          call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id13)
