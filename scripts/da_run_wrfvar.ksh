@@ -582,10 +582,6 @@ echo "WINDOW_END            $WINDOW_END"
          cp grad_fn $RUN_DIR
       fi
 
-      if test -f check_max_iv; then
-         cp check_max_iv $RUN_DIR
-      fi
-
       # remove intermediate output files
 
       rm -f unpert_obs.*

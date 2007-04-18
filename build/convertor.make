@@ -14,12 +14,12 @@ n2k : netcdf2kma
 
 kma2netcdf :  setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) \
                  kma2netcdf.o
-	$(SFC) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
+	$(LD) -o kma2netcdf.exe $(LDFLAGS) kma2netcdf.o \
           $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
 netcdf2kma : setup $(WRFVAR_LIBS) $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) \
                 netcdf2kma.o
-	$(SFC) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o \
+	$(LD) -o netcdf2kma.exe $(LDFLAGS) netcdf2kma.o \
            $(CONVERTOR_MODULES) $(CONVERTOR_OBJS) $(WRFVAR_LIB)
 
 PREGSM : PREGSM.o  $(CONVERTOR_MODULES)

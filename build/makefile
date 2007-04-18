@@ -1,7 +1,7 @@
 include configure.wrfvar
 
 all: serial parallel
-serial: wrfvar be utils biascorr
+serial: wrfvar be utils biascorr convertor
 parallel : wrfvar
 
 setup : depend

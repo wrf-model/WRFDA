@@ -41,9 +41,9 @@ export RUN_WRF=true
 export INITIAL_DATE=2003010100
 export FINAL_DATE=2003010100
 
-#Directories (smoke):
-export REL_DIR=/smoke/dmbarker/code/trunk
-export DAT_DIR=/smoke/dmbarker/data
+#Directories:
+export REL_DIR=~/code/trunk
+export DAT_DIR=~/data
 export WRFVAR_DIR=$REL_DIR/wrfvar
 
 #From WPS (namelist.wps):
