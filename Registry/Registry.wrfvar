@@ -781,6 +781,7 @@ rconfig   logical   print_detail_timing     namelist,wrfvar1  1  .false.  -  "pr
 rconfig   logical   check_max_iv_print      namelist,wrfvar1  1  .true.   -  "check_max_iv_print"      ""  ""
 
 rconfig   integer   analysis_accu           namelist,wrfvar2  1  900      -  "analysis_accu"           ""  ""
+rconfig   logical   calc_w_increment        namelist,wrfvar2  1  .false.  -  "calc_w_increment"        ""  ""
 rconfig   logical   dt_cloud_model          namelist,wrfvar2  1  .false.  -  "dt_cloud_model"          ""  ""
 rconfig   logical   write_qcw               namelist,wrfvar2  1  .false.  -  "write_qcw"               ""  ""
 rconfig   logical   write_qrn               namelist,wrfvar2  1  .false.  -  "write_qrn"               ""  ""
