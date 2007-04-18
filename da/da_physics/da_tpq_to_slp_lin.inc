@@ -30,7 +30,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, &
    real                 :: PL9,T09,TS9,TLO9,THI9,TL9,COEF1,COEF2
 
    real, parameter      :: GAMMA = 6.5E-3,  &
-                       TC=273.15+17.5,  &
+                       TC=t_kelvin+17.5,  &
                        PCONST=10000. ,  &
                        EPS   = 0.622
                                                                           

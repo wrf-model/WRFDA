@@ -21,12 +21,11 @@ subroutine da_cloud_model (TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte)
    real                       :: PCT, ZCT
    real, dimension(kts:kte)   :: ZC, TC, QC, PP, QT
    real, dimension(kts:kte)   :: TCV, TBV, B
-   real                       :: G, ALPHA, RC, MU, XX, YY
+   real                       :: ALPHA, RC, MU, XX, YY
    real, dimension(kts:kte+1) :: W0, W
 
    if (trace_use) call da_trace_entry("da_cloud_model")
 
-   G=9.81
    ALPHA=0.5
    RC=100.0
    MU=0.183/RC
@@ -66,7 +65,7 @@ subroutine da_cloud_model (TB, PB, QB, QCWB, QRNB, ZB, ZFB, DT, kts, kte)
    W0(KCB) = 0.0
    do k = KCB+1, KCT+1
       XX = 1.0+2.0*MU*(ZFB(k)-ZFB(k-1))
-      YY = 2.0*G*(B(k-1)/(1.+ALPHA) - QT(k-1)) * (ZFB(k)-ZFB(k-1))
+      YY = 2.0*gravity*(B(k-1)/(1.+ALPHA) - QT(k-1)) * (ZFB(k)-ZFB(k-1))
       W0(k) =  (W0(k-1)+YY) / XX
    end do
      

@@ -384,7 +384,7 @@ subroutine soil_diel(freq,t_soil,vmc,rhob,rhos,sand,clay,esm)
   beta  = 1.09_r_kind - 0.11_r_kind*sand + 0.18_r_kind*clay
   ess = (1.01_r_kind + 0.44_r_kind*rhos)**2 - 0.062_r_kind                              !a2
   rhoef = -1.645_r_kind + 1.939_r_kind*rhob - 0.020213_r_kind*sand + 0.01594_r_kind*clay       !a4
-  t = t_soil - 273.0_r_kind
+  t = t_soil - t_landem
   f = freq*1.0e9_r_kind
 ! the permittivity at the high frequency limit
   eswi = 5.5_r_kind

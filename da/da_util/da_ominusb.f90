@@ -7,7 +7,7 @@ program daprog_ominusb
    !        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
    !-----------------------------------------------------------
 
-   use da_control, only : filename_len
+   use da_control, only : filename_len, earth_radius, pi
 
    implicit none
    
@@ -25,9 +25,6 @@ program daprog_ominusb
    real, parameter           :: bin_width_p = 100.0
    real, parameter           :: missing_r = -888888.0
    real, parameter           :: max_distance = 5000      ! km
-   real, parameter           :: pi = 3.1415926535897932346
-   ! real, parameter           :: earth_radius = 6378.1500 ! km
-   real, parameter           :: earth_radius = 6370.00   ! km, consistant with WRF
 
    type sub_type
       integer                :: qcflag(1:max_times)

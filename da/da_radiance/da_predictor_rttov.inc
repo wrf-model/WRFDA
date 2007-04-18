@@ -15,8 +15,8 @@ implicit none
 
   integer, parameter :: JPRTLEV = 43
 
-  real, parameter :: Kth = 287.0597*0.5/9.806650
-  real, parameter :: Kpc = 100.0*0.5/9.806650
+  real, parameter :: Kth = gas_constant*0.5/gravity
+  real, parameter :: Kpc = 100.0*0.5/gravity
 
   integer, intent(in)  :: npred
   real, intent(in)     :: temp(JPRTLEV), hum(JPRTLEV), T_skin

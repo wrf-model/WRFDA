@@ -24,7 +24,7 @@
 !
       data f/ 19.35, 22.235, 37.0, 85.5 /
 !
-      tp = tk/273.0
+      tp = tk/t_roughem
       dtheta = theta-53.0
       g =  0.5*gx2
       x1 = g

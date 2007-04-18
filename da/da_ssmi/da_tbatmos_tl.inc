@@ -76,7 +76,7 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 
        tcld   =     ta - gamma*zcld
    TGL_tcld   = TGL_ta - TGL_gamma*zcld - gamma*TGL_zcld
-         tc   =     tcld - 273.15
+         tc   =     tcld - t_kelvin
      TGL_tc   = TGL_tcld
         tc2   = tc*tc
     TGL_tc2   = 2.*tc*TGL_tc

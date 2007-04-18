@@ -40,7 +40,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    real                        :: TFIXED 
    real                        :: TSLV, TSFC  
 
-   TC   = 273.15 + 17.5
+   TC   = t_kelvin + 17.5
    PLMB = (/85000., 70000., 50000./)
 
    !  Find the locations of the 850, 700 and 500 mb levels.

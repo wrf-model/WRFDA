@@ -95,7 +95,7 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    ! cloud parameters
 
    tcld   =     ta - gamma*zcld
-   tc     =     tcld - 273.15
+   tc     =     tcld - t_kelvin
    tc2    =     tc*tc
    tc3    =     tc2*tc
    sigcld =  ( kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &

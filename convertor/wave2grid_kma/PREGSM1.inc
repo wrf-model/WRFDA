@@ -54,7 +54,7 @@ c     INTEGER*2 I2(IDIM*JDIM)     !shc-rizvi
       REAL*8    GAUL(JMAX),GAUW(JMAX),COCOT(JMAX)                               
       COMMON/CTETEN/TABLE(25000)                                                
       COMMON/DTETEN/DTABLE(25000)                                               
-      REAL*8 TABLE,DTABLE,RGSA,G                                                       
+      REAL*8 TABLE,DTABLE,RGSA                                                       
       real   rdum (imax,jmax,kmax)      !shcimsi
 !modified by shc AB start
       INTEGER MMM0(5)
@@ -75,7 +75,6 @@ C------------------------------------------------------------------------
       NAMELIST /NAMVER/ MODEL, RESL, EXPR, CINF                                 
 C                                                                               
       DATA RHMIN/1.0E-3/                             
-      DATA GRAV,ER,GASR,GAMMA/9.80665,6371.E3,287.04,0.0050/                    
       DATA TLAPS,QCONS,QMIN,KST,ITERMX/2.0E-3,2.5E-6,1.0E-10,10,3/              
 C                                                                               
       DATA NALFL ,NGSFL ,NSSTFL,NSNWFL,NINFL ,NVPFL ,NALOT,NRSFL
@@ -165,7 +164,7 @@ C   =================================================================
       CALL RELHUM                                 
      I  (GTB ,GQB ,PSB ,IMAX,JMAX,KMAX,A,B, 
      O   GRHB)                                   !shc end
-      PIHF = 3.141593*0.5                              !shc start
+      PIHF = pi*0.5                              !shc start
       DO 3739 K = 1,KMAX
       DO 3738 J = 1,JMAX
       DO 3737 I = 1,IMAX
@@ -199,10 +198,8 @@ C   =================================================================
 C   =================================================================           
 C   >>>   PS, TEMP, Q -> Z
 C   =================================================================           
-      RGAS = 287.04
-      G    = 9.80665
       CALL GPLHGT
-     I  (PS,GT,GQ,GPHIS,IMAX,JMAX,KMAX,RGAS,G,A,B,
+     I  (PS,GT,GQ,GPHIS,IMAX,JMAX,KMAX,gas_constant,gravity,A,B,
      I      1,JMAX,
      O   GZ)
 
@@ -309,7 +306,8 @@ C   =================================================================
       ENDDO
       ENDDO                    !shc end
       CALL CRH2SHA
-     I(IMAX*JMAX, KMAX, PS, A, B, GRAV,GASR,TLAPS,QCONS,QMIN,KST,ITERMX,
+     I(IMAX*JMAX, KMAX, PS, A, B, gravity,gas_constant,
+     I TLAPS,QCONS,QMIN,KST,ITERMX,
      I IDX, LARHM,
      O GQ, GT)
 C          write(99,*) ' after  RH, TV -> Q, T'

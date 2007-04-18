@@ -300,7 +300,7 @@ subroutine pettylwp(tb,theta,ifreq,tc,alw,iprecip,xlat)
       end if
      ich = 6 
      call tb_clear(ich,u,wv,v0)
-     s85 = p*v0 + (1.0-p)*273.0 - t85v 
+     s85 = p*v0 + (1.0-p)*t_kelvin - t85v 
      if (s85 .gt. 10.0 .or. (t85v-t85h) .lt. 5.0) p = MISSinG 
    end if
 
@@ -339,7 +339,7 @@ subroutine p2lwp(ifreq,p,tc,theta,alw,xlat)
    ext = alw_ext(ifreq,tc)
 
    ! compute colum cloud liquid water using Beer's Law
-   costheta = cos(theta*3.1416/180.0)
+   costheta = cos(theta*pi/180.0)
    alw = (-costheta/(alpha(ifreq)*ext))*log(p)
 
    ! check for precipitation

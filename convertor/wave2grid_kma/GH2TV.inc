@@ -13,10 +13,8 @@ C----------------------------------------------------------------------
       DIMENSION    PK(IMAX*JMAX,LMAX),PBETA(IMAX*JMAX,LMAX),                     
      1          ALPHA(IMAX*JMAX,LMAX), DPHI(IMAX*JMAX,LMAX)                      
 	  DIMENSION VMAX(LMAX),VMIN(LMAX)
-	  DATA GRAV /9.80665/
-	  DATA GASR /287.05/
            
-		Z=GZ*GRAV
+		Z=GZ*gravity
 C......... PK is pressure at half level
         DO L = 1, LMAX
         DO I = 1, IMAX*JMAX
@@ -66,12 +64,13 @@ C			WRITE(*,'(I3,2F13.8)')L,VMAX(L),VMIN(L)
 C		END DO
 C........ CACULATE Tv
 		DO I = 1, IMAX*JMAX
-			TV(I,1)=DPHI(I,1)/(ALPHA(I,1)*GASR)
+			TV(I,1)=DPHI(I,1)/(ALPHA(I,1)*gas_constant)
 		END DO
 		DO L = 2, LMAX
 		DO I = 1, IMAX*JMAX
-		  TV(I,L)=(DPHI(I,L)+GASR*TV(I,L-1)*(ALPHA(I,L-1)-PBETA(I,L-1)))/
-     1			  (ALPHA(I,L)*GASR)
+		  TV(I,L)=(DPHI(I,L)+gas_constant*TV(I,L-1)*
+     1                    (ALPHA(I,L-1)-PBETA(I,L-1)))/
+     1			  (ALPHA(I,L)*gas_constant)
 		END DO
 		END DO
 C

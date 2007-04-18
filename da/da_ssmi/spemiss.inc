@@ -13,7 +13,7 @@
       complex   etav,etah,eps,cterm1v,cterm1h,cterm2,cterm3v,cterm3h
 !
 
-      tc = tk - 273.15
+      tc = tk - t_kelvin
       call epsalt(f,tc,ssw,epsr,epsi)
       eps = cmplx(epsr,epsi)
       etav = eps

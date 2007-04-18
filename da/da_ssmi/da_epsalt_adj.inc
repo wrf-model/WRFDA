@@ -17,7 +17,6 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
    complex :: cdum1,cdum2,cdum3
    complex :: ADJ_cdum1,ADJ_cdum2,ADJ_cdum3
    real :: pi
-   parameter (pi = 3.14159265)
    real :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
    real :: delt,delt2,beta,signew,om,d1,d2
    real :: ADJ_t2,ADJ_t3,ADJ_es,ADJ_a,ADJ_esnew,ADJ_tau,ADJ_b,ADJ_taunew

@@ -16,12 +16,18 @@ module da_control
    !---------------------------------------------------------------------------
 
    ! Fundamental constants:
-   real, parameter    :: pi = 3.1415926535897932346
+   real, parameter    :: pi = 3.1415926          ! Value used in WRF.
    real, parameter    :: gas_constant = 287.     ! Value used in WRF.
    real, parameter    :: gas_constant_v = 461.6  ! Value used in WRF.
    real, parameter    :: cp = 7.*gas_constant/2. ! Value used in WRF.
    real, parameter    :: t_kelvin = 273.15
-   real, parameter       :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
+   real, parameter    :: t_triple = 273.16 ! triple point of water
+   ! The imported code for ssmi and radiance uses 273.0 in a way that suggests 
+   ! it may not be a lazy definition of the melting point of water, so keep the
+   ! value separate for the moment
+   real, parameter    :: t_roughem = 273.0
+   real, parameter    :: t_landem = 273.0
+   real, parameter    :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
    real, parameter    :: kappa = gas_constant / cp
    real, parameter    :: rd_over_rv = gas_constant / gas_constant_v
@@ -31,7 +37,7 @@ module da_control
    real, parameter    :: gamma = 1.4
 
    ! Earth constants:
-   real, parameter    :: gravity = 9.81        ! m/s - value used in MM5.
+   real, parameter    :: gravity = 9.81        ! m/s - value used in WRF.
    ! real, parameter    :: earth_radius = 6378.15
    real, parameter    :: earth_radius = 6370.0          ! Be consistant with WRF
    ! real, parameter    :: earth_omega  = 2.0*pi/86400.0  ! Omega
@@ -46,12 +52,12 @@ module da_control
 
    ! Explicit moist constants:
    real, parameter    :: SVP1=0.6112, SVP2=17.67, SVP3=29.65
-   real, parameter    :: SVPT0=273.15, TO=273.15
+   real, parameter    :: SVPT0=t_kelvin, TO=t_kelvin
    real, parameter    :: N0R=8.E6, N0S=2.E7, RHOS=0.1
    real, parameter    :: AVT=841.99667, BVT=0.8, BVT2=2.5+.5*BVT, BVT3=3.+BVT
    real, parameter    :: PPI=1./(pi*N0R), PPIS=1./(pi*N0S*RHOS)
    real, parameter    :: XLV1=2370., XLF0=.3337E6, XLV0=3.15E6
-   real, parameter    :: XLS=XLV0-XLV1*273.16+XLF0
+   real, parameter    :: XLS=XLV0-XLV1*t_triple+XLF0
 
    ! Planetary boundary physics constants
    real, parameter         :: k_kar = 0.4    ! Von Karman constant

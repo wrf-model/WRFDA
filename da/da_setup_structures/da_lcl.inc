@@ -22,7 +22,7 @@ subroutine da_lcl(P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
       EPS=QS-Q0
 
       if (EPS >= 0.) then
-         ZLCL=(1004./9.81)*(T0-TLCL)+Z0
+         ZLCL=(1004./gravity)*(T0-TLCL)+Z0
          QLCL=QS
          return
       else

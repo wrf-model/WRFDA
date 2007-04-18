@@ -13,7 +13,7 @@ C     IMPLICIT DOUBLE PRECISION (A-H,O-Z,\)
       DATA B,C,BI,CI,TSAT,TSATI/19.480254D0,4304.412D0,                         
      &                          23.684812D0,5803.3203D0,                        
      &                          29.55D0,7.85D0/                                 
-      TEMP0 = 273.15                                                            
+      TEMP0 = t_kelvin
 CBBK      TEMPI = 233.15                                                            
       TEMPI = 258.15                                                            
       DTEMP = TEMP0-TEMPI                                                       

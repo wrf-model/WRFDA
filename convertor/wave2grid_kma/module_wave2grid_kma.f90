@@ -1,4 +1,6 @@
       MODULE module_wave2grid_kma
+
+      use da_control, only : gravity, gas_constant
      
       PARAMETER (KMAX=30)
 C==== T213 (640*321)

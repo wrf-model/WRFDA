@@ -16,8 +16,8 @@ implicit none
 ! pred(5) - 10 -2 thickness    43  10.37-2.61 thickness
 ! pred(6) - 50 -10thickness    43  45.29-10.37 thickness
 
-  real, parameter :: Kth = 287.0597/9.806650
-  real, parameter :: Kpc = 100.0/9.806650
+  real, parameter :: Kth = gas_constant/gravity
+  real, parameter :: Kpc = 100.0/gravity
 
   integer, intent(in)  :: npred,nlevels
   real, intent(in)     :: temp(nlevels), hum(nlevels), T_skin

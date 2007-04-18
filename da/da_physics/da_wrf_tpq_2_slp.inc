@@ -23,7 +23,7 @@ subroutine da_wrf_tpq_2_slp (xb)
                           TLO, THI, TL
 
    real, parameter      :: GAMMA = 6.5E-3,  &
-                          TC=273.15+17.5,  &
+                          TC=t_kelvin+17.5,  &
                           PCONST=10000. ,  &
                           EPS   = 0.622
 

@@ -84,7 +84,7 @@ subroutine da_calc_power_spectrum(max_wave, power)
 
    do j = 1, nj
       write(unit=alpha_corr_unit1(alpha_corr_type),fmt='(i4,2f12.4)') &
-        j, 6371.0 * glats(j), corr(j)
+        j, earth_radius * glats(j), corr(j)
    end do
 
    !--------------------------------------------------------------------------

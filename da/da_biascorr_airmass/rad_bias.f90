@@ -19,7 +19,6 @@
   REAL,    PARAMETER :: BDIV = 180.0/JBAND + 0.0001
   INTEGER, PARAMETER :: AVBAND=2
 
-  REAL(KIND=LONG), PARAMETER :: PI = 3.141592654
   REAL(KIND=LONG), PARAMETER :: VMAX = 350.0, VMIN =  50.0, VDMAX = 20.0
   CHARACTER(LEN=10), PARAMETER :: labsel(10) = &
                                     (/' WRONG SAT','  PATH 2+3','      LAND', &

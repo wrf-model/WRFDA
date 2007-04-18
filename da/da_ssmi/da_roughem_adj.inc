@@ -60,7 +60,7 @@ subroutine da_roughem_adj(ifreq,gx2,tk,theta,remv,remh,             &
    ADJ_x3=0.0
    ADJ_x4=0.0
 
-   tp =  tk/273.0
+   tp =  tk/t_roughem
    dtheta =  theta-53.0
    g =  0.5* gx2
    x1 =  g
@@ -151,7 +151,7 @@ subroutine da_roughem_adj(ifreq,gx2,tk,theta,remv,remh,             &
    ADJ_g  = tp*ADJ_x2     + ADJ_g
    ADJ_g  = ADJ_x1        + ADJ_g
    ADJ_gx2= 0.5*ADJ_g     + ADJ_gx2
-   ADJ_tk = ADJ_tp/273.0  + ADJ_tk
+   ADJ_tk = ADJ_tp/t_roughem  + ADJ_tk
  
 end subroutine da_roughem_adj
 

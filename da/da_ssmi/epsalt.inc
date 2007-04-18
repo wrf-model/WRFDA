@@ -16,7 +16,6 @@
       real :: beta,sig,delt2,om
 
       complex cdum1,cdum2,cdum3
-      parameter (pi = 3.14159265)
 !
       if (ssw .lt. 0.0) ssw = 32.54
       ssw2 = ssw*ssw

@@ -167,7 +167,7 @@ subroutine seaem(freqghz,zasat,zlsat,ts5,u10,v10,ehorz,evert)
 !          to calculate xperm of saline water based on piom model.
 !          convert from kelvin to centigrate and define quadratic and
 !          cubic functions for later polynomials
-           tc=ts5-273.15_r_kind
+           tc=ts5-t_kelvin
            tcsq=tc*tc
            tccub=tcsq*tc
            

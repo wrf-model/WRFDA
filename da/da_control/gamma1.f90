@@ -1,5 +1,6 @@
 ! REV PROCESSED 213 LINES OF CODE. PROGRAM DONE.
 REAL FUNCTION GAMMA1(X)
+   use da_control, only : pi
 !D    DOUBLE PRECISION FUNCTION DGAMMA(X)
 !----------------------------------------------------------------------
 ! 
@@ -94,18 +95,16 @@ REAL FUNCTION GAMMA1(X)
       LOGICAL PARITY
 !D    DOUBLE PRECISION
       REAL :: &
-         C,CONV,EPS,FACT,HALF,ONE,P,PI,Q,RES,SQRTPI,SUM,TWELVE,  &
+         C,CONV,EPS,FACT,HALF,ONE,P,Q,RES,SQRTPI,SUM,TWELVE,  &
          TWO,X,XBIG,XDEN,XINF,XMININ,XNUM,Y,Y1,YSQ,Z,ZERO
       DIMENSION C(7),P(8),Q(8)
 !----------------------------------------------------------------------
 !  MATHEMATICAL CONSTANTS
 !----------------------------------------------------------------------
       DATA ONE,HALF,TWELVE,TWO,ZERO/1.0E0,0.5E0,12.0E0,2.0E0,0.0E0/,  &
-           SQRTPI/0.9189385332046727417803297E0/,  &
-           PI/3.1415926535897932384626434E0/
+           SQRTPI/0.9189385332046727417803297E0/
 !D    DATA ONE,HALF,TWELVE,TWO,ZERO/1.0D0,0.5D0,12.0D0,2.0D0,0.0D0/,
 !D   1     SQRTPI/0.9189385332046727417803297D0/,
-!D   2     PI/3.1415926535897932384626434D0/
 !----------------------------------------------------------------------
 !  MACHINE DEPENDENT PARAMETERS
 !----------------------------------------------------------------------

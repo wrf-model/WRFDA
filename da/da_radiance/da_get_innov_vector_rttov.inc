@@ -394,7 +394,7 @@ real,allocatable :: temp(:)
       iv%instid(inst)%clwp(n1:n2) = 0.0
       do k = xp%kts,xp%kte
          dlnpf(k,n1:n2) = log(pf(k,n1:n2)) - log(pf(k+1,n1:n2))
-         ! clw  (k,n1:n2) = clw(k,n1:n2)*vtm(k,n1:n2)*287.05/9.80665*dlnpf(k,n1:n2)
+         ! clw  (k,n1:n2) = clw(k,n1:n2)*vtm(k,n1:n2)*gas_constant/gravity*dlnpf(k,n1:n2)
          clw(k,n1:n2) = 29.27095*clw(k,n1:n2)*vtm(k,n1:n2)*dlnpf(k,n1:n2)
          iv%instid(inst)%clwp(n1:n2)  =iv%instid(inst)%clwp(n1:n2) + clw(k,n1:n2)
       end do

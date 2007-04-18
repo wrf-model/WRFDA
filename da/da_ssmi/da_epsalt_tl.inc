@@ -23,7 +23,6 @@ subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
    complex :: cdum1,cdum2,cdum3
    complex :: TGL_cdum1,TGL_cdum2,TGL_cdum3
    real :: pi
-   parameter (pi = 3.14159265)
    real :: ssw2,ssw3,t2,t3,es,a,esnew,tau,b,sig,taunew
    real :: delt,delt2,beta,signew,om
    real :: TGL_t2,TGL_t3,TGL_es,TGL_a,TGL_esnew,TGL_tau,TGL_b,TGL_taunew

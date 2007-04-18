@@ -173,7 +173,7 @@
       sigo = b1(ifreq) + b2(ifreq)*p0  + b3(ifreq)*otbar
 ! cloud parameters
       tcld   = ta - gamma*zcld
-      tc = tcld - 273.15
+      tc = tcld - t_kelvin
       tc2 = tc*tc
       tc3 = tc2*tc
       sigcld = (kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &

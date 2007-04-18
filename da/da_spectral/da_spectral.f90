@@ -7,7 +7,8 @@ module da_spectral
    use da_control, only : trace_use, its,ite,jts,jte, trace_use_frequent, &
       da_zero_complex, ide,jds,jde,comm,ierr,test_transforms, stdout, pi, &
       gaussian_lats, earth_radius, alpha_corr_type, alpha_corr_scale, &
-      alpha_corr_unit1, alpha_corr_unit2, filename_len, num_alpha_corr_types
+      alpha_corr_unit1, alpha_corr_unit2, filename_len, num_alpha_corr_types, &
+      earth_radius
    use da_define_structures, only : xbx_type
 #ifdef DM_PARALLEL
    use da_par_util1, only : true_mpi_complex

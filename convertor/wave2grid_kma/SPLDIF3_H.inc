@@ -9,7 +9,7 @@ C     INPUT / ZIN (L), PIN (L), LMXIN  : INPUT.DATA, PRES(LOG), NUMBER
 C     OUTPUT/ ZOUT(L), POUT(L), LMXOUT : OUTPUT-VAL, PRES(LOG), NUMBER
 
       LM1 = LMXIN-1
-      GR = -9.80665/287.04
+      GR = -gravity/gas_constant
 
       DO 110 L = 2, LMXIN
       DO 110 I = 1, IJMAX

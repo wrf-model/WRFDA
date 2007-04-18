@@ -53,7 +53,7 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
    ADJ_tmp2r=0.0
    ADJ_tmp2i=0.0
 
-   tc     =      tk - 273.15
+   tc     =      tk - t_kelvin
 
    call epsalt(f,tc,ssw,epsr,epsi)
 

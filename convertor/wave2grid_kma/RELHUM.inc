@@ -26,7 +26,7 @@ C
 C
       DIMENSION PFULL(IMAXD,KM)
       REAL*8    A(KMAX+1), B(KMAX+1)
-      PARAMETER( T0=273.15D0,E0C=6.11D0,AL=17.3D0,BL=237.3D0,
+      PARAMETER( E0C=6.11D0,AL=17.3D0,BL=237.3D0,
      .                                  AI=21.9D0,BI=265.3D0)
 C******************** PROCEDURE ****************************************
       IF (KMAX.GT.KM) THEN
@@ -60,7 +60,7 @@ C : フルレベル相対湿度(NON-UNIT)計算
           E = Q*P/(0.378D0*Q+0.622D0)
 C         CALL TETEN  (ES,T)
 C=====================================================
-      TC = T-T0
+      TC = T-t_kelvin
       IF (TC.GE.0.D0) THEN
         ES= E0C *  EXP(AL*TC/(BL+TC))
       ELSE IF (TC.LE.-15.D0) THEN

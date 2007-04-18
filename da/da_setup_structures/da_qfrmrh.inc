@@ -15,7 +15,7 @@ subroutine da_qfrmrh ( P, T, RH, Q )
    B=35.86
    if (T <= 263.) A=21.87
    if (T <= 263.) B= 7.66
-   E=6.11*EXP(A*(T-273.16)/(T-B))
+   E=6.11*EXP(A*(T-t_triple)/(T-B))
    QS=0.622*E/(P-0.378*E)
    Q=QS*RH/100.
 

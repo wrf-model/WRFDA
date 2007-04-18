@@ -11,10 +11,10 @@ C            PS : SURFACE PRESSURE(HPA)
 C     OUTPUT WV : SPECIFIC HUMIDITY( KG/KG ) ( FOR ALL LEVELS )                 
 C            T  : REAL TEMPERATURE(K)                                           
                                                                                 
-      EE = 1.D0/(0.608D0*273.2D0)                                               
+      EE = 1.D0/(0.608D0*t_kelvin)                                               
       FF = 1.D0/(0.608D0*35.9D0)                                                
       GG = 6.11D0*0.622D0                                                       
-      CC = 273.2D0/35.9D0*7.5D0*LOG(10.D0)                                      
+      CC = t_kelvin/35.9D0*7.5D0*LOG(10.D0)                                      
                                                                                 
       DO 100 IJ = 1, IJMAX                                                      
                                                                                 
@@ -32,7 +32,7 @@ C            T  : REAL TEMPERATURE(K)
           END IF                                                                
                                                                                 
           AA = GG*RH/PL                                                         
-          BB = EE*(VT-273.2)                                                    
+          BB = EE*(VT-t_kelvin)                                                    
           DD = FF*(VT-35.9)                                                     
           HH = CC*(BB-DD)                                                       
                                                                                 
@@ -174,7 +174,7 @@ C     INPUT / ZIN (L), PIN (L), LMXIN  : INPUT.DATA, PRES(LOG), NUMBER
 C     OUTPUT/ ZOUT(L), POUT(L), LMXOUT : OUTPUT-VAL, PRES(LOG), NUMBER          
                                                                                 
       LM1 = LMXIN-1                                                             
-      GR = -9.80665/287.04                                                      
+      GR = -gravity/gas_constant
                                                                                 
       DO 110 L = 2, LMXIN                                                       
         H(L) = PIN(L)-PIN(L-1)                                                  
@@ -256,7 +256,7 @@ C     INPUT / ZIN (L), PIN (L), LMXIN  : INPUT.DATA, PRES(LOG), NUMBER
 C     OUTPUT/ ZOUT(L), POUT(L), LMXOUT : OUTPUT-VAL, PRES(LOG), NUMBER          
                                                                                 
       LM1 = LMXIN-1                                                             
-      GR = -9.80665/287.04                                                      
+      GR = -gravity/gas_constant
                                                                                 
       DO 110 L = 2, LMXIN                                                       
       DO 110 I = 1, IJMAX                                                       
@@ -353,7 +353,7 @@ C      JMAXHF=JMAX/2
       DELX=360.0/FLOAT(IMAX)                                                    
       CALL GAUSS(DCOSCL,DGW,JMAX)                                               
 C                                                                               
-      R2D=180.0/3.1415926                                                       
+      R2D=180.0/pi
       DO 100 J=1,JMAXHF                                                         
       COCLT(       J)=      R2D*ACOS(DCOSCL(J))                                
       COCLT(JMAX+1-J)=180.0-R2D*ACOS(DCOSCL(J))                                

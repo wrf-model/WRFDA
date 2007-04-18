@@ -142,6 +142,7 @@ module gsi_constants
 
 contains
 #include "init_constants_derived.inc"
-#include "init_constants.inc"
+! Routine never used in wrfvar
+! #include "init_constants.inc"
 
 end module gsi_constants

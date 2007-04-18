@@ -33,7 +33,7 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    real      TGL_tmp1i,TGL_tmp2r,TGL_tmp2i
 
 
-   tc          =      tk - 273.15
+   tc          =      tk - t_kelvin
    TGL_tc      =  TGL_tk
 
    call da_epsalt_tl(f,tc,ssw,epsr,epsi,         &

@@ -3,7 +3,7 @@
      I  MAXJZ, COL, JMX )                                                       
       DIMENSION RLAT( MAXJZ ), COL( JMX )                                       
 C                                                                               
-      RADEG  =180.0D0/3.1415926D0                                               
+      RADEG  =180.0D0/pi
       CALL RESET( RLAT, MAXJZ )                                                 
       DO 10 J = 1, MAXJZ                                                        
         DO 20 I = 1, JMX/MAXJZ                                                  

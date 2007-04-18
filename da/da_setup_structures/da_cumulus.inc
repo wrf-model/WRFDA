@@ -15,11 +15,10 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
    real, intent(out)                        :: PCT, ZCT
 
    integer   :: k, IA, L, NCB
-   real      :: G, CP, R, HL, EM, ET, P
+   real      :: CP, R, HL, EM, ET, P
    real      :: TLL, QLL, PLL, ZLL, TBAR, PBAR, QBAR
    real      :: DP, DZ, DDT, DT
 
-   G=9.81
    CP=1004.
    R=2000./7.
    HL=2.49E06
@@ -32,7 +31,7 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
       Q(k) = 0.0
    end do
 
-   EM=G*ZCB+CP*TCB+HL*QCB
+   EM=gravity*ZCB+CP*TCB+HL*QCB
 
    NCB=kts
 
@@ -70,9 +69,9 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
          QBAR=0.5*(Q(L)+QLL)
          PBAR=0.5*(P+PLL)
          DP=PLL-P
-         DZ=(R*TBAR*(1.+0.61*QBAR)*DP)/(G*PBAR)
+         DZ=(R*TBAR*(1.+0.61*QBAR)*DP)/(gravity*PBAR)
          Z(L)=ZLL+DZ
-         ET=G*Z(L)+CP*T(L)+HL*Q(L)
+         ET=gravity*Z(L)+CP*T(L)+HL*Q(L)
          if ((ET-EM) <= 0.) exit
       end do
    end do

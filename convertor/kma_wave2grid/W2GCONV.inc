@@ -38,7 +38,6 @@ C
       DIMENSION KTOUT(82)
 C
       DATA IT,JT,BS,FM/4,4,0.0,1.0E10/
-      DATA ER,GASR,GRAV,GAMMA/6371.E03,287.04,9.8,5.0E-3/
       DATA ITSAV,IPSL/1,1/
       DATA RHMIN,TDMAX/1.0E-6,31.0/
       DATA KTOUT/82*999/
@@ -94,7 +93,7 @@ C------------------------------------------------------------------
       IJOUT=IOUT*JOUT
       IJMAX=IMAX*JOUT
       IJKOUT=IOUT*JOUT*KLMAX
-      GINV  =1./GRAV
+      GINV  =1./gravity
 C-----------------------------------------------------------------------
       CALL SETARY(LAG,MEND1,NEND1,JEND1)
 C-----------------------------------------------------------------------

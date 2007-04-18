@@ -9,7 +9,7 @@ C
       DIMENSION A(K),W(K)
 C
       ESP=1.E-14
-      C=(1.E0-(2.E0/3.14159265358979E0)**2)*0.25E0
+      C=(1.E0-(2.E0/pi)**2)*0.25E0
       FK=K
       KK=K/2
       CALL BSSLZ1(A,KK)

@@ -1,5 +1,7 @@
 module module_ssmi
 
+use da_control, only : t_kelvin,pi
+
 contains
 
 #include "cal_sigma_v.inc"
