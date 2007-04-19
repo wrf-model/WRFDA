@@ -58,7 +58,7 @@ if ($#files >= 0) {
       if ( ! $GEN_JAVASCRIPT == "" ) {
         print OUT "<SCRIPT TYPE=\"script/javascript\" LANGUAGE=\"JavaScript\" SRC=\"/$GEN_JAVASCRIPT\"></SCRIPT>\n" ;
       }
-      print OUT "<A HREF=\"Refs.$NAME.html\">References</A> to this file elsewhere.\n" ;
+      print OUT "<A HREF=\"xrefs.$NAME.html\">References</A> to this file elsewhere.\n" ;
       print OUT "<PRE>\n" ;
 
       $i=0;

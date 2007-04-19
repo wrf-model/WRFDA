@@ -7,7 +7,7 @@ DIR=${1:-$PWD}
 cd $DIR
 
 TEMP1=`mktemp`
-ls | grep -v -E -e '^Refs' > $TEMP1
+ls | grep -v -E -e '^xrefs' > $TEMP1
 
 TEMP2=`mktemp`
 
@@ -26,7 +26,7 @@ done <$TEMP1
 echo "href list produced"
 
 while IFS=" #" read FILE; do
-  OUT=Refs.$FILE
+  OUT=xrefs.$FILE
   OUT=${OUT%%.html}.html
 
   # Print header:
@@ -82,7 +82,7 @@ while IFS=" #" read FILE; do
   fi
 
   if [[ $NUMBERED_REFS = 'false' && $UNNUMBERED_REFS = 'false' ]]; then
-    echo '<b><font color="maroon">No References</font></b>' >> $OUT
+    echo '<b><font color="maroon">No references</font></b>' >> $OUT
   fi
 
   echo '</body></html>' >> $OUT
