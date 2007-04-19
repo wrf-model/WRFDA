@@ -309,6 +309,7 @@ real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: 
 real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: al_keep4
 !----------------------------------------------------------------------------------------
 integer :: iy
+integer :: field_id, rfield_id, num_fields_per_rk
 
 real ru_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real rv_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
@@ -377,6 +378,8 @@ real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num
 !</DESCRIPTION>
 
 #include <bench_solve_em_a_init.h>
+
+CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
 
 ! xyh
 !    return
@@ -682,6 +685,7 @@ endif
 BENCH_END(comp1)
 
 !------------------------------
+field_id = 0
 runge_kutta_looq: do rk_step = 1, rk_order
 BENCH_START(comp2)
   dtm=dt
@@ -1009,6 +1013,85 @@ lineno = __LINE__
 #endif
 BENCH_END(exch12)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Save fields re-computed later by runge_kutta_loor...  
+ store_runge_kutta_loor: if (config_flags%remove_runge_kutta_loor) then
+   if ( rk_step < rk_order ) then
+     WRITE(wrf_err_message,*)'DEBUG store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
+     CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+     ! store fields
+! TODO:  get rid of duplicated "field_id = field_id + 1"
+     field_id = field_id + 1
+     call store_field_lint( field_id , ww_m , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , rv_m , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , ru_m , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , a , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , alpha , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , gamma , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , xkmhd , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , w_2 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , w_1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , v_2 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , v_1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , u_2 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , u_1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , t_tendf , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , t_2 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , t_1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , rw_tendf , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , rv_tendf , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , ru_tendf , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , pm1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , ph_tendf , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , ph_2 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , ph_1 , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , p , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , mu_2 , n2d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , mu_1 , n2d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , moist_tend(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     field_id = field_id + 1
+     call store_field_lint( field_id , moist_2(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     field_id = field_id + 1
+     call store_field_lint( field_id , moist_1(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     field_id = field_id + 1
+     call store_field_lint( field_id , dnw , kme-kms+1 )
+     field_id = field_id + 1
+     call store_field_lint( field_id , al , n3d_elem )
+     field_id = field_id + 1
+     call store_field_lint( field_id , mudf , n2d_elem )
+     if ( rk_step == 1 ) then
+       num_fields_per_rk = field_id
+       WRITE(wrf_err_message,*)'DEBUG store_runge_kutta_loor:  num_fields_per_rk = ',num_fields_per_rk
+       CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+     endif
+   endif
+ endif store_runge_kutta_loor
 
 end do runge_kutta_looq
 
@@ -1105,6 +1188,8 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 BENCH_START(comp15)
 
+! TBH TODO:  Should be able to eliminate this copy when rk_step > 1 and 
+! TBH TODO:  config_flags%remove_runge_kutta_loor == .TRUE.
 #ifndef FAST_CPY
   a(:,:,:) = ah(:,:,:)
   al(:,:,:) = alj(:,:,:)
@@ -1168,6 +1253,9 @@ BENCH_START(comp15)
  call fast_copy_lint(  ww_m , ww_mh , n3d_elem )
  call fast_copy_lint(  xkmhd , xkmhdi , n3d_elem )
 #endif
+
+! TBH:  Trade redundant computation for memory.  
+ restore_runge_kutta_loor: if (.not. config_flags%remove_runge_kutta_loor) then
 
   runge_kutta_loor: do rk_step1 = 1, rk_step-1
     dtm = dt
@@ -1505,6 +1593,81 @@ lineno = __LINE__
 BENCH_END(exch25)
 
   end do runge_kutta_loor
+
+ else ! restore_runge_kutta_loor
+   if (rk_step > 1) then
+     rfield_id = (rk_step-2) * num_fields_per_rk
+     WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  rk_step-1, rfield_id = ',(rk_step-1),rfield_id
+     CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+     ! restore saved fields
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ww_m , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , rv_m , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ru_m , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , a , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , alpha , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , gamma , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , xkmhd , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , w_2 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , w_1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , v_2 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , v_1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , u_2 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , u_1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , t_tendf , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , t_2 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , t_1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , rw_tendf , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , rv_tendf , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ru_tendf , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , pm1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ph_tendf , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ph_2 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , ph_1 , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , p , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , mu_2 , n2d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , mu_1 , n2d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , moist_tend(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , moist_2(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , moist_1(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , dnw , kme-kms+1 )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , al , n3d_elem )
+     rfield_id = rfield_id + 1
+     call restore_field_lint( rfield_id , mudf , n2d_elem )
+     WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
+     CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   endif
+ endif restore_runge_kutta_loor
 
 BENCH_START(exch26)
 #ifdef DM_PARALLEL
@@ -4885,6 +5048,9 @@ end do a_runge_kutta_loop
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
 #endif
+
+CALL clear_field_buffer
+CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
 
 end subroutine solve_em_ad
 

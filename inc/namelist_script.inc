@@ -303,6 +303,7 @@ if test ! -z "$NL_RST_INNAME"; then echo "rst_inname=\"${NL_RST_INNAME}\"," >> n
 if test ! -z "$NL_RST_OUTNAME"; then echo "rst_outname=\"${NL_RST_OUTNAME}\"," >> namelist.input;fi
 if test ! -z "$NL_WRITE_INPUT"; then echo "write_input=${NL_WRITE_INPUT}," >> namelist.input;fi
 if test ! -z "$NL_WRITE_RESTART_AT_0H"; then echo "write_restart_at_0h=${NL_WRITE_RESTART_AT_0H}," >> namelist.input;fi
+if test ! -z "$NL_REMOVE_RUNGE_KUTTA_LOOR"; then echo "remove_runge_kutta_loor=${NL_REMOVE_RUNGE_KUTTA_LOOR}," >> namelist.input;fi
 echo / >> namelist.input
 echo \&domains >> namelist.input
 if test ! -z "$NL_TIME_STEP"; then echo "time_step=${NL_TIME_STEP}," >> namelist.input;fi

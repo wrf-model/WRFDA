@@ -57,10 +57,10 @@ fi
 
 export LSF_EXCLUSIVE=" "
 export NUM_PROCS=1
-export QUEUE=premium
-#export QUEUE=share
+#export QUEUE=premium
+export QUEUE=share
 #export PROJECT_ID=68000001
-export PROJECT_ID=64000420
+export PROJECT_ID=64000400
 export LSF_MAX_RUNTIME=180
 export LL_PTILE=16
 #export SUBMIT="LSF"
@@ -84,9 +84,9 @@ export LONG_FCST_RANGE_4=06
 
 #Directories:
 #bluevista:
-export REL_DIR=$HOME/release-mc
-export DAT_DIR=$REL_DIR/../case_data
-export EXP_DIR=/ptmp/xinzhang/$REGION/$EXPT
+export REL_DIR=$HOME/4DVAR_Optimization
+export DAT_DIR=/ptmp/hender/4DVAR_Optimization/case_data
+export EXP_DIR=/ptmp/hender/4DVAR_Optimization/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
@@ -127,6 +127,11 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
+
+#WRF-plus optimization:
+# TBH:  Hacking in new namelist settings here.
+# TBH:  "REMOVE_*" namelist variables are .FALSE. by default
+export NL_REMOVE_RUNGE_KUTTA_LOOR=true
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false

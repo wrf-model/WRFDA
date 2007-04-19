@@ -1029,6 +1029,9 @@ rconfig   character  rst_inname        namelist,time_control		1  "wrfrst_d<domai
 rconfig   character  rst_outname       namelist,time_control		1  "wrfrst_d<domain>_<date>"     -     "name of restrt outfile"   ""      ""
 rconfig   logical write_input             namelist,time_control		1             .false. -    "write input data for 3dvar etc."              ""      ""
 rconfig   logical write_restart_at_0h     namelist,time_control		1             .false. h    "write_restart_at_0h"              ""      ""
+# TBH:  Controls to trade off recomputation for memory in the adjoint.  
+# TBH:  Put this in a new namelist later...  
+rconfig   logical remove_runge_kutta_loor namelist,time_control	        1      .false. rh    "remove_runge_kutta_loor" ""    ""
 
 
 # Domains
