@@ -52,14 +52,16 @@ subroutine da_setup_bufrtovs_structures( grid, ob, iv )
       do i = istart, iend
          do j = jstart, jend
             rlat_min=min(rlat_min, grid%xb%lat(i,j))
-            rlon_min=min(rlon_min, grid%xb%lon(i,j))
             rlat_max=max(rlat_max, grid%xb%lat(i,j))
-            rlon_max=max(rlon_max, grid%xb%lon(i,j))
+            if( grid%xb%lon(i,j) < zero) then
+              rlon_min=min(rlon_min, (r360+grid%xb%lon(i,j)))
+              rlon_max=max(rlon_max, (r360+grid%xb%lon(i,j)))
+            else
+              rlon_min=min(rlon_min, grid%xb%lon(i,j))
+              rlon_max=max(rlon_max, grid%xb%lon(i,j))
+            endif
          enddo
       enddo
-
-      if (rlon_min < zero) rlon_min = rlon_min + r360
-      if (rlon_max < zero) rlon_max = rlon_max + r360
 
       dlat_grid = rlat_max - rlat_min
       dlon_grid = rlon_max - rlon_min
