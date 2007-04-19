@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/local/bin/perl
 
 $USAGE="generate_html.pl source_directory sink_directory";
 
