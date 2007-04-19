@@ -20,6 +20,7 @@ export EXPT=${EXPT:-test}
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export HOSTS=${HOSTS:-${HOME}/hosts}
+export NL_VAR4D=${NL_VAR4D:-false}
 if test -f $HOSTS; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
@@ -48,6 +49,9 @@ export NL_DY=${NL_DY:-200000}                # Resolution (m).
 #From WRF (namelist.input):
 #&time_control:
 export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
+if  $NL_VAR4D ; then
+    export NL_RUN_HOURS=$FCST_RANGE
+fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.} 
