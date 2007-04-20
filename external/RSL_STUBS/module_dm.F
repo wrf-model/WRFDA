@@ -312,4 +312,8 @@ SUBROUTINE wrf_global_to_patch_LOGICAL (globbuf,buf,domdesc,ndim,&
    RETURN
 END SUBROUTINE wrf_global_to_patch_LOGICAL
 
-
+INTEGER FUNCTION wrf_dm_monitor_rank()
+   IMPLICIT NONE
+   wrf_dm_monitor_rank = 0
+   RETURN
+END FUNCTION wrf_dm_monitor_rank

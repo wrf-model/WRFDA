@@ -107,6 +107,9 @@ fi
 if test -d $DA_CRTM_COEFFS; then
    echo "DA_CRTM_COEFFS        $DA_CRTM_COEFFS"
 fi
+if test -d $BIASCORR_DIR; then
+   echo "BIASCORR_DIR          $BIASCORR_DIR"
+fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
 echo 'RUN_DIR               <A HREF="file:'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
