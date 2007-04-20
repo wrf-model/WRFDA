@@ -49,6 +49,7 @@ subroutine da_set_boundary_xb(xb)
          xb%tsk(xb%ide+n,j) = xb%tsk(xb%ids-1+n,j)
          xb%tgrn(xb%ide+n,j) = xb%tgrn(xb%ids-1+n,j)
          xb%landmask(xb%ide+n,j) = xb%landmask(xb%ids-1+n,j)
+         xb%snow(xb%ide+n,j) = xb%snow(xb%ids-1+n,j)
          xb%xland(xb%ide+n,j) = xb%xland(xb%ids-1+n,j)
 
          xb%smois(xb%ide+n,j) = xb%smois(xb%ids-1+n,j)
