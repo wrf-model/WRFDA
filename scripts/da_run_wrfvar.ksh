@@ -39,6 +39,7 @@ export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export BE_DIR=${BE_DIR:-$REG_DIR/be}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export FC_DIR=${FC_DIR:-$REG_DIR/fc}
+export BIASCORR_DIR=${BIASCORR_DIR:-$WRFVAR_DIR/run/biascorr}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
@@ -227,6 +228,10 @@ echo "WINDOW_END            $WINDOW_END"
          ln -fs $FILE .
       fi
    done
+
+   if test -d $BIASCORR_DIR; then
+      ln -fs $BIASCORR_DIR biascorr
+   fi
 
    ln -fs $WRFVAR_DIR/run wrfvar_run
 
