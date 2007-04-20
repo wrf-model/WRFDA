@@ -143,6 +143,13 @@ Namelist variables specifically for the WPS input for real:
  interp_type                         = 1        ; vertical interpolation
                                                 ; 1 = linear in pressure
                                                 ; 2 = linear in log(pressure)
+ extrap_type                         = 2        ; vertical extrapolation
+                                                ; 1 = extrapolate using the two lowest levels
+                                                ; 2 = use lowest level as constant below ground
+ t_extrap_type                       = 1        ; vertical extrapolation for potential temperature
+                                                ; 1 = extrapolate using the two lowest levels
+                                                ; 2 = use lowest level as constant below ground
+                                                ; 3 = -6.5 K/km lapse rate
  lagrange_order                      = 1        ; vertical interpolation order
                                                 ; 1 = linear
                                                 ; 2 = quadratic
@@ -283,7 +290,7 @@ Namelist variables for controling the automatic moving nest:
  levsiz                              = 59 for CAM radiation input ozone levels
  paerlev                             = 29 for CAM radiation input aerosol levels
  cam_abs_dim1                        = 4 for CAM absorption save array
- cam_abs_dim2                        = e_vert for CAM 2nd absorption save array
+ cam_abs_dim2                        = value of e_vert for CAM 2nd absorption save array
 
  sf_sfclay_physics (max_dom)         surface-layer option (old bl_sfclay_physics option)
                                      = 0, no surface-layer

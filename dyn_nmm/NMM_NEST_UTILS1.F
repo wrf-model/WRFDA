@@ -1874,7 +1874,7 @@ SUBROUTINE NEST_TERRAIN ( nest, config_flags )
  character(len=128)                :: input_fname
  character (len=32)                :: cname
  integer                           :: ndim
- character (len=32)                :: memorder
+ character (len=3)                 :: memorder
  character (len=32)                :: stagger
  integer, dimension(3)             :: domain_start, domain_end
  integer                           :: wrftype
@@ -1970,10 +1970,10 @@ SUBROUTINE NEST_TERRAIN ( nest, config_flags )
 !
 
 #ifdef INTIO
-             if (io_form_input == IO_BIN) write(input_fname,"(A,I2.2,A)") "geo_nmm.n",level,".int"
+             if (io_form_input == IO_BIN) write(input_fname,"(A,I2.2,A)") "geo_nmm_nest.l",level,".int"
 #endif
 #ifdef NETCDF
-             if (io_form_input == IO_NET) write(input_fname,"(A,I2.2,A)") "geo_nmm.n",level,".nc"
+             if (io_form_input == IO_NET) write(input_fname,"(A,I2.2,A)") "geo_nmm_nest.l",level,".nc"
 #endif
 
              comm_1 = 1

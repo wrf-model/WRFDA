@@ -235,12 +235,14 @@ SUBROUTINE med_pre_nest_initial ( parent , newid , config_flags )
    INTEGER                :: itmp, fid, ierr, icnt
    CHARACTER*256          :: rstname, message, timestr
 
+   TYPE(WRFU_Time)        :: strt_time, cur_time
+
 #ifdef MOVE_NESTS
 
-   CALL domain_clock_get( parent, current_timestr=timestr )
+   CALL domain_clock_get( parent, current_timestr=timestr, start_time=strt_time, current_time=cur_time )
    CALL construct_filename2a ( rstname , config_flags%rst_inname , newid , 2 , timestr )
 
-   IF ( config_flags%restart ) THEN
+   IF ( config_flags%restart .AND. cur_time .EQ. strt_time ) THEN
      WRITE(message,*)'RESTART: nest, opening ',TRIM(rstname),' for reading header information only'
      CALL wrf_message ( message )
   ! note that the parent pointer is not strictly correct, but nest is not allocated yet and
@@ -313,6 +315,8 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
                                          ,save_sfcrunoff          &
                                          ,save_udrunoff
 
+   TYPE(WRFU_Time)        :: strt_time, cur_time
+
    INTERFACE
      SUBROUTINE med_interp_domain ( parent , nest )
         USE module_domain
@@ -374,7 +378,9 @@ SUBROUTINE med_nest_initial ( parent , nest , config_flags )
 
    END INTERFACE
 
-   IF ( .not. config_flags%restart ) THEN
+   CALL domain_clock_get( parent, start_time=strt_time, current_time=cur_time )
+
+   IF ( .not. ( config_flags%restart .AND. strt_time .EQ. cur_time ) ) THEN
      nest%first_force = .true.
 
 ! initialize nest with interpolated data from the parent
@@ -1905,6 +1911,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
    CHARACTER (LEN=80)                     :: bdyname
    Type (WRFU_Time )                      :: startTime, stopTime, currentTime
    Type (WRFU_TimeInterval )              :: stepTime
+integer myproc,i,j,k
 
 #include <wrf_io_flags.h>
 
@@ -1967,10 +1974,7 @@ SUBROUTINE med_latbound_in ( grid , config_flags )
          WRITE ( message , FMT = '("processing lateral boundary for domain ",I8)' ) grid%id
          CALL end_timing ( TRIM(message) )
        ENDIF
-
-!#if 0
      ENDIF
-!#endif
    ENDIF
    RETURN
 END SUBROUTINE med_latbound_in

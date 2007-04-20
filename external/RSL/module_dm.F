@@ -3883,6 +3883,15 @@ END
       RETURN
    END FUNCTION wrf_dm_on_monitor
 
+   INTEGER FUNCTION wrf_dm_monitor_rank()
+      USE module_dm
+      IMPLICIT NONE
+      INTEGER retval
+      CALL rsl_monitor_proc( retval ) 
+      wrf_dm_monitor_rank = retval 
+      RETURN
+   END FUNCTION wrf_dm_monitor_rank
+
    SUBROUTINE wrf_get_dm_communicator ( communicator )
       IMPLICIT NONE
       INTEGER , INTENT(OUT) :: communicator
@@ -4872,7 +4881,11 @@ END
    INTEGER field_ofst, glob_ofst
    INTEGER my_count, communicator, root, ierr
    INTEGER , DIMENSION(*) :: counts, displs
-   DOUBLE PRECISION, DIMENSION(*) :: Field, globbuf
+! this next declaration is REAL, not DOUBLE PRECISION because it will be autopromoted
+! to double precision by the compiler when WRF is compiled for 8 byte reals. Only reason
+! for having this separate routine is so we pass the correct MPI type to mpi_scatterv
+! if we were not indexing the globbuf and Field arrays it would not even matter
+   REAL, DIMENSION(*) :: Field, globbuf
 
            CALL mpi_gatherv( Field( field_ofst ),      &    ! sendbuf
                             my_count ,                       &    ! sendcount
@@ -4886,5 +4899,103 @@ END
                             ierr )
 
    END SUBROUTINE wrf_gatherv_double
+
+!new stuff 20070124
+   SUBROUTINE wrf_scatterv_real (                             &
+                                globbuf, glob_ofst ,          &    ! recvbuf
+                                counts                      , &    ! recvcounts
+                                Field, field_ofst,            &
+                                my_count ,                    &    ! sendcount
+                                displs                      , &    ! displs
+                                root                        , &    ! root
+                                communicator                , &    ! communicator
+                                ierr )
+   USE module_dm
+   IMPLICIT NONE
+   INCLUDE 'mpif.h'
+   INTEGER field_ofst, glob_ofst
+   INTEGER my_count, communicator, root, ierr
+   INTEGER , DIMENSION(*) :: counts, displs
+   REAL, DIMENSION(*) :: Field, globbuf
+
+           CALL mpi_scatterv(                                &
+                            globbuf( glob_ofst ) ,           &    ! recvbuf
+                            counts                         , &    ! recvcounts
+                            displs                         , &    ! displs
+                            getrealmpitype()               , &    ! recvtype
+                            Field( field_ofst ),             &    ! sendbuf
+                            my_count ,                       &    ! sendcount
+                            getrealmpitype() ,               &    ! sendtype
+                            root                           , &    ! root
+                            communicator                   , &    ! communicator
+                            ierr )
+
+   END SUBROUTINE wrf_scatterv_real
+
+   SUBROUTINE wrf_scatterv_double (                           &
+                                globbuf, glob_ofst ,          &    ! recvbuf
+                                counts                      , &    ! recvcounts
+                                Field, field_ofst,            &
+                                my_count ,                    &    ! sendcount
+                                displs                      , &    ! displs
+                                root                        , &    ! root
+                                communicator                , &    ! communicator
+                                ierr )
+   USE module_dm
+   IMPLICIT NONE
+   INCLUDE 'mpif.h'
+   INTEGER field_ofst, glob_ofst
+   INTEGER my_count, communicator, root, ierr
+   INTEGER , DIMENSION(*) :: counts, displs
+! this next declaration is REAL, not DOUBLE PRECISION because it will be autopromoted
+! to double precision by the compiler when WRF is compiled for 8 byte reals. Only reason
+! for having this separate routine is so we pass the correct MPI type to mpi_scatterv
+! if we were not indexing the globbuf and Field arrays it would not even matter
+   REAL, DIMENSION(*) :: Field, globbuf
+
+           CALL mpi_scatterv(                                &
+                            globbuf( glob_ofst ) ,           &    ! recvbuf
+                            counts                         , &    ! recvcounts
+                            displs                         , &    ! displs
+                            MPI_DOUBLE_PRECISION           , &    ! recvtype
+                            Field( field_ofst ),             &    ! sendbuf
+                            my_count ,                       &    ! sendcount
+                            MPI_DOUBLE_PRECISION         ,   &    ! sendtype
+                            root                           , &    ! root
+                            communicator                   , &    ! communicator
+                            ierr )
+
+   END SUBROUTINE wrf_scatterv_double
+
+   SUBROUTINE wrf_scatterv_integer (                          &
+                                globbuf, glob_ofst ,          &    ! recvbuf
+                                counts                      , &    ! recvcounts
+                                Field, field_ofst,            &
+                                my_count ,                    &    ! sendcount
+                                displs                      , &    ! displs
+                                root                        , &    ! root
+                                communicator                , &    ! communicator
+                                ierr )
+   IMPLICIT NONE
+   INCLUDE 'mpif.h'
+   INTEGER field_ofst, glob_ofst
+   INTEGER my_count, communicator, root, ierr
+   INTEGER , DIMENSION(*) :: counts, displs
+   INTEGER, DIMENSION(*) :: Field, globbuf
+
+           CALL mpi_scatterv(                                &
+                            globbuf( glob_ofst ) ,           &    ! recvbuf
+                            counts                         , &    ! recvcounts
+                            displs                         , &    ! displs
+                            MPI_INTEGER                    , &    ! recvtype
+                            Field( field_ofst ),             &    ! sendbuf
+                            my_count ,                       &    ! sendcount
+                            MPI_INTEGER         ,            &    ! sendtype
+                            root                           , &    ! root
+                            communicator                   , &    ! communicator
+                            ierr )
+
+   END SUBROUTINE wrf_scatterv_integer
+! end new stuff 20070124
 
 #endif

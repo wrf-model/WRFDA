@@ -33,6 +33,10 @@ MODULE module_io
   INTEGER :: wrf_io_handles(MAX_WRF_IO_HANDLE), how_opened(MAX_WRF_IO_HANDLE) 
   LOGICAL :: for_output(MAX_WRF_IO_HANDLE), first_operation(MAX_WRF_IO_HANDLE)
   INTEGER :: filtno = 0
+  LOGICAL, PRIVATE :: bdy_dist_flag = .TRUE.   ! false is old style undecomposed boundary data structs,
+                                                ! true is new style decomposed boundary data structs
+                                                ! are_bdys_distributed, bdys_are_distributed and
+                                                ! bdys_not_distributed routines access this flag
 
 !<DESCRIPTION>
 !<PRE>
@@ -1973,6 +1977,23 @@ SUBROUTINE init_module_io
 !</DESCRIPTION>
   CALL init_io_handles
 END SUBROUTINE init_module_io
+
+SUBROUTINE are_bdys_distributed( res )
+  IMPLICIT NONE
+  LOGICAL, INTENT(OUT) :: res
+  res = bdy_dist_flag
+END SUBROUTINE are_bdys_distributed
+
+SUBROUTINE bdys_not_distributed
+  IMPLICIT NONE
+  bdy_dist_flag = .FALSE.
+END SUBROUTINE bdys_not_distributed
+
+SUBROUTINE bdys_are_distributed
+  IMPLICIT NONE
+  bdy_dist_flag = .TRUE.
+END SUBROUTINE bdys_are_distributed
+
 END MODULE module_io
 
 
@@ -3016,18 +3037,25 @@ include "mpif.h"
   INTEGER ids, ide, jds, jde, kds, kde
   INTEGER ims, ime, jms, jme, kms, kme
   INTEGER ips, ipe, jps, jpe, kps, kpe
-  INTEGER nproc, communicator, displs(10*1024), mpi_bdyslice_type, ierr, my_displ, recv_count, root_proc, send_count, itype
-  INTEGER my_count, counts(10*1024)
+  INTEGER, ALLOCATABLE :: counts(:), displs(:)
+  INTEGER nproc, communicator, mpi_bdyslice_type, ierr, my_displ
+  INTEGER my_count
   INTEGER , dimension(3)                       :: dom_end_rev
   LOGICAL, EXTERNAL         :: wrf_dm_on_monitor
+  INTEGER, EXTERNAL         :: wrf_dm_monitor_rank
   LOGICAL     distributed_field
   INTEGER i,j,k,idx,lx,idx2,lx2
-  INTEGER :: ii
+  INTEGER collective_root
   REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
 
   CALL wrf_get_nproc( nproc )
   CALL wrf_get_dm_communicator ( communicator )
+
+  ALLOCATE( counts( nproc ) )
+  ALLOCATE( displs( nproc ) )
   CALL lower_case( MemoryOrder, MemOrd )
+
+  collective_root = wrf_dm_monitor_rank()
 
   dom_end_rev(1) = DomainEnd(1)
   dom_end_rev(2) = DomainEnd(2)
@@ -3111,8 +3139,8 @@ include "mpif.h"
           my_displ = 0
           my_count = 0
         ENDIF
-        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, 0, communicator, ierr )
-        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, 0, communicator, ierr )
+        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
         do i = DomainStart(3),DomainEnd(3)    ! bdy_width
         do k = DomainStart(2),DomainEnd(2)    ! levels
            lx   = MemoryEnd(1)-MemoryStart(1)+1
@@ -3121,23 +3149,23 @@ include "mpif.h"
            idx2 = lx2*((k-1)+(i-1)*(MemoryEnd(2)-MemoryStart(2)+1))
            IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
 
-             CALL wrf_gatherv_double ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_double ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
-             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3148,18 +3176,18 @@ include "mpif.h"
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
-             CALL wrf_gatherv_integer ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
            ENDIF
@@ -3183,8 +3211,8 @@ include "mpif.h"
           my_displ = 0
           my_count = 0
         ENDIF
-        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, 0, communicator, ierr )
-        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, 0, communicator, ierr )
+        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
         do i = DomainStart(2),DomainEnd(2)    ! bdy_width
            lx   = MemoryEnd(1)-MemoryStart(1)+1
            idx  = lx*(i-1)
@@ -3192,23 +3220,23 @@ include "mpif.h"
            idx2 = lx2*(i-1)
            IF ( FieldType .EQ. WRF_DOUBLE ) THEN
 
-             CALL wrf_gatherv_double ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_double ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
-             CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_real ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3219,18 +3247,18 @@ include "mpif.h"
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
-             CALL wrf_gatherv_integer ( Field, PatchStart(1)+idx , &
+             CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
                              my_count ,                       &    ! sendcount
                              globbuf, 1+idx2 ,                &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
            ENDIF
@@ -3255,8 +3283,8 @@ include "mpif.h"
           my_displ = 0
           my_count = 0
         ENDIF
-        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, 0, communicator, ierr )
-        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, 0, communicator, ierr )
+        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
         do j = DomainStart(3),DomainEnd(3)    ! bdy_width
         do k = DomainStart(2),DomainEnd(2)    ! levels
            lx   = MemoryEnd(1)-MemoryStart(1)+1
@@ -3266,12 +3294,12 @@ include "mpif.h"
 
            IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
 
-             CALL wrf_gatherv_double ( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_double ( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3282,7 +3310,7 @@ include "mpif.h"
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3293,18 +3321,18 @@ include "mpif.h"
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
-             CALL wrf_gatherv_integer( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_integer( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
            ENDIF
@@ -3328,8 +3356,8 @@ include "mpif.h"
           my_displ = 0
           my_count = 0
         ENDIF
-        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, 0, communicator, ierr )
-        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, 0, communicator, ierr )
+        CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+        CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
         do j = DomainStart(2),DomainEnd(2)    ! bdy_width
            lx   = MemoryEnd(1)-MemoryStart(1)+1
            idx  = lx*(j-1)
@@ -3338,12 +3366,12 @@ include "mpif.h"
 
            IF ( FieldType .EQ. WRF_DOUBLE ) THEN 
 
-             CALL wrf_gatherv_double( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_double( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3354,7 +3382,7 @@ include "mpif.h"
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
@@ -3365,18 +3393,18 @@ include "mpif.h"
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
 
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
-             CALL wrf_gatherv_integer( Field, PatchStart(1)+idx ,      &    ! sendbuf
+             CALL wrf_gatherv_integer( Field, PatchStart(1)-MemoryStart(1)+1+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
                              counts                         , &    ! recvcounts
                              displs                         , &    ! displs
-                             0                              , &    ! root
+                             collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
            ENDIF
@@ -3438,6 +3466,8 @@ include "mpif.h"
     ENDIF
   ENDIF
   CALL wrf_dm_bcast_bytes( Status , IWORDSIZE )
+  DEALLOCATE( counts )
+  DEALLOCATE( displs )
   RETURN
 END SUBROUTINE collect_generic_and_call_pkg
 
@@ -3496,7 +3526,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 
      CALL call_pkg_and_dist_double ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-               DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                DomainStart , DomainEnd ,                                    &
                MemoryStart , MemoryEnd ,                                    &
                PatchStart , PatchEnd ,                                      &
@@ -3506,7 +3536,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 
      CALL call_pkg_and_dist_real ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-               DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                DomainStart , DomainEnd ,                                    &
                MemoryStart , MemoryEnd ,                                    &
                PatchStart , PatchEnd ,                                      &
@@ -3516,7 +3546,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 
      CALL call_pkg_and_dist_int ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-               DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                DomainStart , DomainEnd ,                                    &
                MemoryStart , MemoryEnd ,                                    &
                PatchStart , PatchEnd ,                                      &
@@ -3526,7 +3556,7 @@ SUBROUTINE call_pkg_and_dist (       fcn, donotdist_arg, update_arg,            
 
      CALL call_pkg_and_dist_logical ( fcn, update_arg,                            &
                Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-               DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+               DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                DomainStart , DomainEnd ,                                    &
                MemoryStart , MemoryEnd ,                                    &
                PatchStart , PatchEnd ,                                      &
@@ -3538,7 +3568,7 @@ END SUBROUTINE call_pkg_and_dist
 
 SUBROUTINE call_pkg_and_dist_real (  fcn, update_arg,                                             &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3562,6 +3592,7 @@ SUBROUTINE call_pkg_and_dist_real (  fcn, update_arg,                           
   INTEGER                       ,INTENT(INOUT) :: Comm
   INTEGER                       ,INTENT(INOUT) :: IOComm
   INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)                        :: bdy_mask
   CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
   CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
   CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
@@ -3579,9 +3610,10 @@ SUBROUTINE call_pkg_and_dist_real (  fcn, update_arg,                           
   ENDIF
 
   globbuf = 0.
+
   CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg,                          &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3593,7 +3625,7 @@ END SUBROUTINE call_pkg_and_dist_real
 
 SUBROUTINE call_pkg_and_dist_double  (  fcn, update_arg ,                                            &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3617,6 +3649,7 @@ SUBROUTINE call_pkg_and_dist_double  (  fcn, update_arg ,                       
   INTEGER                       ,INTENT(INOUT) :: Comm
   INTEGER                       ,INTENT(INOUT) :: IOComm
   INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)                        :: bdy_mask
   CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
   CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
   CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
@@ -3637,7 +3670,7 @@ SUBROUTINE call_pkg_and_dist_double  (  fcn, update_arg ,                       
 
   CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                         &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3649,7 +3682,7 @@ END SUBROUTINE call_pkg_and_dist_double
 
 SUBROUTINE call_pkg_and_dist_int  (  fcn, update_arg ,                                            &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3673,6 +3706,7 @@ SUBROUTINE call_pkg_and_dist_int  (  fcn, update_arg ,                          
   INTEGER                       ,INTENT(INOUT) :: Comm
   INTEGER                       ,INTENT(INOUT) :: IOComm
   INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)                        :: bdy_mask
   CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
   CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
   CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
@@ -3693,7 +3727,7 @@ SUBROUTINE call_pkg_and_dist_int  (  fcn, update_arg ,                          
 
   CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                                  &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3705,7 +3739,7 @@ END SUBROUTINE call_pkg_and_dist_int
 
 SUBROUTINE call_pkg_and_dist_logical  (  fcn, update_arg ,                                            &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3729,6 +3763,7 @@ SUBROUTINE call_pkg_and_dist_logical  (  fcn, update_arg ,                      
   INTEGER                       ,INTENT(INOUT) :: Comm
   INTEGER                       ,INTENT(INOUT) :: IOComm
   INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)                        :: bdy_mask
   CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
   CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
   CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
@@ -3749,7 +3784,7 @@ SUBROUTINE call_pkg_and_dist_logical  (  fcn, update_arg ,                      
 
   CALL call_pkg_and_dist_generic (   fcn, globbuf FRSTELEM , update_arg ,                         &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3760,7 +3795,7 @@ END SUBROUTINE call_pkg_and_dist_logical
 
 SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,                                  &
                                      Hndl , DateStr , VarName , Field , FieldType , Comm , IOComm , &
-                                     DomainDesc , MemoryOrder , Stagger , DimNames ,              &
+                                     DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
                                      DomainStart , DomainEnd ,                                    &
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
@@ -3775,9 +3810,15 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
 ! array.  
 !</PRE>
 !</DESCRIPTION>
+  USE module_state_description
   USE module_driver_constants
+  USE module_io
   IMPLICIT NONE
 #include "wrf_io_flags.h"
+#if defined( DM_PARALLEL ) && ! defined(STUBMPI)
+include "mpif.h"
+#endif
+
   EXTERNAL fcn
   REAL, DIMENSION(*) ::  globbuf
   INTEGER ,       INTENT(IN)    :: Hndl
@@ -3789,6 +3830,7 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
   INTEGER                       ,INTENT(INOUT) :: Comm
   INTEGER                       ,INTENT(INOUT) :: IOComm
   INTEGER                       ,INTENT(IN)    :: DomainDesc
+  LOGICAL, DIMENSION(4)                        :: bdy_mask
   CHARACTER*(*)                 ,INTENT(IN)    :: MemoryOrder
   CHARACTER*(*)                 ,INTENT(IN)    :: Stagger
   CHARACTER*(*) , dimension (*) ,INTENT(IN)    :: DimNames
@@ -3804,9 +3846,25 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
   INTEGER , dimension(3)                       :: dom_end_rev
   INTEGER memsize
   LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+  INTEGER, EXTERNAL :: wrf_dm_monitor_rank
+
+  INTEGER lx, lx2, i,j,k ,idx,idx2
+  INTEGER my_count, nproc, communicator, ierr, my_displ
+
+  INTEGER, ALLOCATABLE :: counts(:), displs(:)
+
   LOGICAL distributed_field
+  INTEGER collective_root
 
   CALL lower_case( MemoryOrder, MemOrd )
+
+  collective_root = wrf_dm_monitor_rank()
+
+  CALL wrf_get_nproc( nproc )
+  CALL wrf_get_dm_communicator ( communicator )
+
+  ALLOCATE(displs( nproc ))
+  ALLOCATE(counts( nproc ))
 
   dom_end_rev(1) = DomainEnd(1)
   dom_end_rev(2) = DomainEnd(2)
@@ -3839,19 +3897,43 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
       ! do nothing; the boundary orders and others either dont care or set themselves
   END SELECT
 
+  data_ordering : SELECT CASE ( model_data_order )
+    CASE  ( DATA_ORDER_XYZ )
+       ids=DomainStart(1); ide=dom_end_rev(1); jds=DomainStart(2); jde=dom_end_rev(2); kds=DomainStart(3); kde=dom_end_rev(3);
+       ims=MemoryStart(1); ime=  MemoryEnd(1); jms=MemoryStart(2); jme=  MemoryEnd(2); kms=MemoryStart(3); kme=  MemoryEnd(3);
+       ips= PatchStart(1); ipe=   PatchEnd(1); jps= PatchStart(2); jpe=   PatchEnd(2); kps= PatchStart(3); kpe=   PatchEnd(3);
+    CASE  ( DATA_ORDER_YXZ )
+       ids=DomainStart(2); ide=dom_end_rev(2); jds=DomainStart(1); jde=dom_end_rev(1); kds=DomainStart(3); kde=dom_end_rev(3);
+       ims=MemoryStart(2); ime=  MemoryEnd(2); jms=MemoryStart(1); jme=  MemoryEnd(1); kms=MemoryStart(3); kme=  MemoryEnd(3);
+       ips= PatchStart(2); ipe=   PatchEnd(2); jps= PatchStart(1); jpe=   PatchEnd(1); kps= PatchStart(3); kpe=   PatchEnd(3);
+    CASE  ( DATA_ORDER_ZXY )
+       ids=DomainStart(2); ide=dom_end_rev(2); jds=DomainStart(3); jde=dom_end_rev(3); kds=DomainStart(1); kde=dom_end_rev(1);
+       ims=MemoryStart(2); ime=  MemoryEnd(2); jms=MemoryStart(3); jme=  MemoryEnd(3); kms=MemoryStart(1); kme=  MemoryEnd(1);
+       ips= PatchStart(2); ipe=   PatchEnd(2); jps= PatchStart(3); jpe=   PatchEnd(3); kps= PatchStart(1); kpe=   PatchEnd(1);
+    CASE  ( DATA_ORDER_ZYX )
+       ids=DomainStart(3); ide=dom_end_rev(3); jds=DomainStart(2); jde=dom_end_rev(2); kds=DomainStart(1); kde=dom_end_rev(1);
+       ims=MemoryStart(3); ime=  MemoryEnd(3); jms=MemoryStart(2); jme=  MemoryEnd(2); kms=MemoryStart(1); kme=  MemoryEnd(1);
+       ips= PatchStart(3); ipe=   PatchEnd(3); jps= PatchStart(2); jpe=   PatchEnd(2); kps= PatchStart(1); kpe=   PatchEnd(1);
+    CASE  ( DATA_ORDER_XZY )
+       ids=DomainStart(1); ide=dom_end_rev(1); jds=DomainStart(3); jde=dom_end_rev(3); kds=DomainStart(2); kde=dom_end_rev(2);
+       ims=MemoryStart(1); ime=  MemoryEnd(1); jms=MemoryStart(3); jme=  MemoryEnd(3); kms=MemoryStart(2); kme=  MemoryEnd(2);
+       ips= PatchStart(1); ipe=   PatchEnd(1); jps= PatchStart(3); jpe=   PatchEnd(3); kps= PatchStart(2); kpe=   PatchEnd(2);
+    CASE  ( DATA_ORDER_YZX )
+       ids=DomainStart(3); ide=dom_end_rev(3); jds=DomainStart(1); jde=dom_end_rev(1); kds=DomainStart(2); kde=dom_end_rev(2);
+       ims=MemoryStart(3); ime=  MemoryEnd(3); jms=MemoryStart(1); jme=  MemoryEnd(1); kms=MemoryStart(2); kme=  MemoryEnd(2);
+       ips= PatchStart(3); ipe=   PatchEnd(3); jps= PatchStart(1); jpe=   PatchEnd(1); kps= PatchStart(2); kpe=   PatchEnd(2);
+  END SELECT data_ordering
+
+
   SELECT CASE (MemOrd)
-    CASE ( 'xzy' )
+#ifndef STUBMPI
+    CASE ( 'xzy', 'yzx', 'xyz', 'yxz', 'zxy', 'zyx', 'xy', 'yx' )
       distributed_field = .TRUE.
-    CASE ( 'xyz' )
-      distributed_field = .TRUE.
-    CASE ( 'yxz' )
-      distributed_field = .TRUE.
-    CASE ( 'zxy' )
-      distributed_field = .TRUE.
-    CASE ( 'xy' )
-      distributed_field = .TRUE.
-    CASE ( 'yx' )
-      distributed_field = .TRUE.
+    CASE ( 'xsz', 'xez', 'xs', 'xe' )
+      CALL are_bdys_distributed( distributed_field )
+    CASE ( 'ysz', 'yez', 'ys', 'ye' )
+      CALL are_bdys_distributed( distributed_field )
+#endif
     CASE DEFAULT
       ! all other memory orders are replicated
       distributed_field = .FALSE.
@@ -3899,70 +3981,222 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     ENDIF
 
     CALL wrf_dm_bcast_bytes( Status, IWORDSIZE )
-  
+
     CALL lower_case( MemoryOrder, MemOrd )
-    IF ( FieldType .EQ. WRF_DOUBLE ) THEN
 
-      SELECT CASE (MemOrd)
-      CASE ( 'xzy','xyz','yxz','zxy' )
-        CALL wrf_global_to_patch_double (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
-      CASE ( 'xy','yx' )
-        CALL wrf_global_to_patch_double (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
-      END SELECT
+#if defined(DM_PARALLEL) && !defined(STUBMPI)
+! handle boundaries separately
+    IF ( TRIM(MemOrd) .EQ. 'xsz' .OR. TRIM(MemOrd) .EQ. 'xez' .OR. &
+         TRIM(MemOrd) .EQ. 'xs'  .OR. TRIM(MemOrd) .EQ. 'xe'  .OR. &
+         TRIM(MemOrd) .EQ. 'ysz' .OR. TRIM(MemOrd) .EQ. 'yez' .OR. &
+         TRIM(MemOrd) .EQ. 'ys'  .OR. TRIM(MemOrd) .EQ. 'ye'    ) THEN
 
-    ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+      IF ( TRIM(MemOrd) .EQ. 'xsz' .OR. TRIM(MemOrd) .EQ. 'xez' .OR. &
+           TRIM(MemOrd) .EQ. 'xs'  .OR. TRIM(MemOrd) .EQ. 'xe'    ) THEN
 
-      SELECT CASE (MemOrd)
-      CASE ( 'xzy','xyz','yxz','zxy' )
-        CALL wrf_global_to_patch_real (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
-      CASE ( 'xy','yx' )
-        CALL wrf_global_to_patch_real (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
-      END SELECT
+       jds=DomainStart(1); jde=dom_end_rev(1); ids=DomainStart(3); ide=dom_end_rev(3); kds=DomainStart(2); kde=dom_end_rev(2);
+       jms=MemoryStart(1); jme=  MemoryEnd(1); ims=MemoryStart(3); ime=  MemoryEnd(3); kms=MemoryStart(2); kme=  MemoryEnd(2);
+       jps= PatchStart(1); jpe=   PatchEnd(1); ips= PatchStart(3); ipe=   PatchEnd(3); kps= PatchStart(2); kpe=   PatchEnd(2);
 
-    ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
+        IF ( nproc .GT. 1 ) THEN
 
-      SELECT CASE (MemOrd)
-      CASE ( 'xzy','xyz','yxz','zxy' )
-        CALL wrf_global_to_patch_integer (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
-      CASE ( 'xy','yx' )
-        CALL wrf_global_to_patch_integer (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
-      END SELECT
+! Will assume that the i,j, and k dimensions correspond to the model_data_order specified by the registry -- 
+! eg. i is (1), j is (3), and k is (2) for XZY -- and that when these are passed in for xs/xe boundary arrays (left and right
+! sides of domain) the j is fully dimensioned, i is the bdy_width, and k is k. corresponding arrangement for ys/ye
+! boundaries (bottom and top).  Note, however, that for the boundary arrays themselves, the innermost dimension is always
+! the "full" dimension: for xs/xe, dimension 1 of the boundary arrays is j. For ys/ye, it's i. So there's a potential
+! for confusion between the MODEL storage order, and which of the sd31:ed31/sd32:ed32/sd33:ed33 framework dimensions
+! correspond to X/Y/Z as determined by the Registry dimespec definitions and what the storage order of the boundary
+! slab arrays are (which depends on which boundaries they represent).  The k memory and domain dimensions must be set
+! properly for 2d (ks=1, ke=1) versus 3d fields.
 
-    ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN
+          IF ( (MemOrd(1:2) .EQ. 'xs' .AND. bdy_mask( P_XSB )) .OR.     &
+               (MemOrd(1:2) .EQ. 'xe' .AND. bdy_mask( P_XEB ))       ) THEN
+            my_displ = jps-1         
+            my_count = jpe-jps+1
+          ELSE
+            my_displ = 0
+            my_count = 0
+          ENDIF
 
-      SELECT CASE (MemOrd)
-      CASE ( 'xzy','xyz','yxz','zxy' )
-        CALL wrf_global_to_patch_logical (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
-      CASE ( 'xy','yx' )
-        CALL wrf_global_to_patch_logical (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
-           DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
-           MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
-           PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
-      END SELECT
+          CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+          CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
 
+          do i = ips,ipe    ! bdy_width
+          do k = kds,kde    ! levels
+             lx   = jme-jms+1
+             lx2  = jde-jds+1
+             idx  = lx*((k-1)+(i-1)*(kme-kms+1))
+             idx2 = lx2*((k-1)+(i-1)*(kde-kds+1))
+             IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
+               CALL wrf_scatterv_double (                        &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, jps-jms+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+             ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+
+               CALL wrf_scatterv_real (                          &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, jps-jms+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+
+             ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
+               CALL wrf_scatterv_integer (                       &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, jps-jms+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+             ENDIF
+          enddo
+          enddo
+        ENDIF
+      ENDIF
+
+      IF ( TRIM(MemOrd) .EQ. 'ysz' .OR. TRIM(MemOrd) .EQ. 'yez' .OR. &
+           TRIM(MemOrd) .EQ. 'ys'  .OR. TRIM(MemOrd) .EQ. 'ye'    ) THEN
+
+       ids=DomainStart(1); ide=dom_end_rev(1); jds=DomainStart(3); jde=dom_end_rev(3); kds=DomainStart(2); kde=dom_end_rev(2);
+       ims=MemoryStart(1); ime=  MemoryEnd(1); jms=MemoryStart(3); jme=  MemoryEnd(3); kms=MemoryStart(2); kme=  MemoryEnd(2);
+       ips= PatchStart(1); ipe=   PatchEnd(1); jps= PatchStart(3); jpe=   PatchEnd(3); kps= PatchStart(2); kpe=   PatchEnd(2);
+
+        IF ( nproc .GT. 1 ) THEN
+          IF ( (MemOrd(1:2) .EQ. 'ys' .AND. bdy_mask( P_YSB )) .OR.     &
+               (MemOrd(1:2) .EQ. 'ye' .AND. bdy_mask( P_YEB ))       ) THEN
+            my_displ = ips-1
+            my_count = ipe-ips+1
+          ELSE
+            my_displ = 0
+            my_count = 0
+          ENDIF
+
+          CALL mpi_gather( my_displ, 1, MPI_INTEGER, displs, 1, MPI_INTEGER, collective_root, communicator, ierr )
+          CALL mpi_gather( my_count, 1, MPI_INTEGER, counts, 1, MPI_INTEGER, collective_root, communicator, ierr )
+
+          do j = jds,jde    ! bdy_width
+          do k = kds,kde    ! levels
+             lx   = ime-ims+1
+             lx2  = ide-ids+1
+             idx  = lx*((k-1)+(j-1)*(kme-kms+1))
+             idx2 = lx2*((k-1)+(j-1)*(kde-kds+1))
+
+             IF ( FieldType .EQ. WRF_DOUBLE  ) THEN
+               CALL wrf_scatterv_double (                        &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, ips-ims+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+             ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+               CALL wrf_scatterv_real (                          &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, ips-ims+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+             ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
+               CALL wrf_scatterv_integer (                       &
+                               globbuf, 1+idx2 ,                &    ! recvbuf
+                               counts                         , &    ! recvcounts
+                               Field, ips-ims+1+idx ,       &
+                               my_count ,                       &    ! sendcount
+                               displs                         , &    ! displs
+                               collective_root                , &    ! root
+                               communicator                   , &    ! communicator
+                               ierr )
+             ENDIF
+          enddo
+          enddo
+        ENDIF
+      ENDIF
+
+    ELSE  ! not a boundary 
+  
+      IF ( FieldType .EQ. WRF_DOUBLE ) THEN
+
+        SELECT CASE (MemOrd)
+        CASE ( 'xzy','xyz','yxz','zxy' )
+          CALL wrf_global_to_patch_double (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
+        CASE ( 'xy','yx' )
+          CALL wrf_global_to_patch_double (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
+        END SELECT
+
+      ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
+
+        SELECT CASE (MemOrd)
+        CASE ( 'xzy','xyz','yxz','zxy' )
+          CALL wrf_global_to_patch_real (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
+        CASE ( 'xy','yx' )
+          CALL wrf_global_to_patch_real (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
+        END SELECT
+
+      ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
+
+        SELECT CASE (MemOrd)
+        CASE ( 'xzy','xyz','yxz','zxy' )
+          CALL wrf_global_to_patch_integer (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
+        CASE ( 'xy','yx' )
+          CALL wrf_global_to_patch_integer (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
+        END SELECT
+
+      ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN
+
+        SELECT CASE (MemOrd)
+        CASE ( 'xzy','xyz','yxz','zxy' )
+          CALL wrf_global_to_patch_logical (  globbuf,  Field  , DomainDesc, Stagger, MemOrd ,    &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3)  )
+        CASE ( 'xy','yx' )
+          CALL wrf_global_to_patch_logical (  globbuf, Field ,  DomainDesc, Stagger, MemOrd ,  &
+             DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), 1            , 1 , &
+             MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), 1            , 1 , &
+             PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , 1            , 1   )
+        END SELECT
+
+      ENDIF
     ENDIF
-  ELSE
+#endif
+
+  ELSE ! not a distributed field
+
     IF ( wrf_dm_on_monitor()) THEN
       CALL fcn ( Hndl , DateStr , VarName , Field   , FieldType , Comm , IOComm , &
                  DomainDesc , MemoryOrder , Stagger , DimNames ,                  &
@@ -3982,9 +4216,11 @@ SUBROUTINE call_pkg_and_dist_generic (   fcn, globbuf , update_arg ,            
     ELSE IF ( FieldType .EQ. WRF_LOGICAL ) THEN
       CALL wrf_dm_bcast_bytes( Field , LWORDSIZE*memsize )
     ENDIF
+
   ENDIF
 
-
+  DEALLOCATE(displs)
+  DEALLOCATE(counts)
   RETURN
 END SUBROUTINE call_pkg_and_dist_generic
 

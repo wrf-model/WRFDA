@@ -67,6 +67,14 @@ dimspec    v      -     constant=1                z          one
 ################################################################################
 ################################################################################
 
+#state    real   floob       ikjb     dyn_em      1         -    
+#state    real   floob_x     ikjx     dyn_em      1         -     
+#state    real   floob_y     ikjy     dyn_em      1         - 
+#xpose FLOOB dyn_em floob,floob_x,floob_y
+
+#state real xxx ijk misc 2 - h6ud
+#halo  HALO_FLOOB dyn_em  4:xxx_2
+
 # Lines that start with the word 'state' form a table that is                                           
 # used by the script use_registry to generate module_state_descript.F                                           
 # and other files.  Also see documentation in use_registry.                                             
@@ -79,7 +87,7 @@ dimspec    v      -     constant=1                z          one
 # interpolated with a mask, as lu_index supplies that mask.
 # this next 1 is for the HFSoLE/PET demo; writing these to auxhist1 output over MCEL for coupling
 # with wave model, only if compiled with -DMCELIO, JM 2003/05/29
-state    real  LU_INDEX         ij      misc        1         -     i02rh0201d=(interp_fcnm)u=(copy_fcnm)   "LU_INDEX"              "LAND USE CATEGORY"         ""
+state    real  LU_INDEX         ij      misc        1         -     irh01d=(interp_fcnm)u=(copy_fcnm)   "LU_INDEX"              "LAND USE CATEGORY"         ""
 state    real  LU_MASK          ij      misc        1         -     i3h1     "LU_MASK"              "0 land 1 water"         ""
 
 #
@@ -115,6 +123,7 @@ state    real   qv_gc          igj      dyn_em      1        Z     i1  "QV"     
 #                                               
 # Variables for Eulerian mass coordinate dynamics                                            
 #                                               
+
 
 # Velocities
 #
@@ -476,6 +485,7 @@ state    real   COSZ_URB2D       ij     misc        1         -      r       "CO
 state    real   OMG_URB2D        ij     misc        1         -      r       "OMG_URB"   "SOLAR HOUR ANGLE"         "dimensionless"
 state    real   DECLIN_URB       -     misc        1         -       r       "DECLIN_URB"  "SOLAR DECLINATION"         "dimensionless"
 
+
 # RUC LSM
 state    real   SMFR3D           ilj    misc        1         Z      r        "SMFR3D"               "SOIL ICE" ""
 state    real   KEEPFR3DFLAG     ilj    misc        1         Z      r        "KEEPFR3DFLAG"          "FLAG - 1. FROZEN SOIL YES, 0 - NO"             ""
@@ -562,7 +572,7 @@ state  real   m_hybi    d     misc      1    -   -     "m_hybi"         "MATCH h
 state    real    F_ICE_PHY       ikj    misc        1         -      rdu      "F_ICE_PHY"            "FRACTION OF ICE"         ""
 state    real    F_RAIN_PHY      ikj    misc        1         -      rdu      "F_RAIN_PHY"           "FRACTION OF RAIN "         ""
 state    real    F_RIMEF_PHY     ikj    misc        1         -      rdu      "F_RIMEF_PHY"          "MASS RATIO OF RIMED ICE "         ""
-state    real    sr              ij     dyn_em      1         -      irh       "sr" "fraction of frozen precipitation" ""
+state    real    qndropsource    ikj    misc        1         -      h        "qndropsource"         "Droplet number source"   "#/kg/s"
 
 # Other Misc State Variables                                            
 state   real    h_diabatic     ikj     misc         1         -      r        "h_diabatic"            "PREVIOUS TIMESTEP CONDENSATIONAL HEATING"         ""      
@@ -843,7 +853,7 @@ state  real   emstot   ikj    misc      1    Z   -     ""   ""  " "
 # model diagnostics
 state   real  dpsdt            ij       misc        1         -     -         "dpsdt"           "surface pressure tendency"                         "Pa/sec"
 state   real  dmudt            ij       misc        1         -     -         "dmudt"           "mu tendency"                                       "Pa/sec"
-state   real  pk1m             ij       misc        1         -     -         "pk1m"            "surface pressure at previous step"                 "Pa" 
+state   real  pk1m             ij       misc        1         -     -         "pk1m"            "surface pressure at previous step"                 "Pa"
 state   real  mu_2m            ij       misc        1         -     -         "mu_2m"           "mu_2 at previous step"                             "Pa"
 
 #
@@ -876,7 +886,7 @@ rconfig   integer end_minute              namelist,time_control		max_domains    
 rconfig   integer end_second              namelist,time_control		max_domains      00    irh   "end_second"            "2 DIGIT SECOND OF THE MINUTE OF END OF MODEL, 0-59" "SECONDS"
 rconfig   integer interval_seconds        namelist,time_control		1             43200    irh   "interval_seconds"      "SECONDS BETWEEN ANALYSIS AND BOUNDARY PERIODS" "SECONDS"
 rconfig   logical input_from_file         namelist,time_control		max_domains    .false. irh    "input_from_file"      "T/F INPUT FOR THIS DOMAIN FROM A SEPARATE INPUT FILE"  ""
-rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 5, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
+rconfig   integer fine_input_stream       namelist,time_control		max_domains    0       irh    "fine_input_stream"      "0 THROUGH 11, WHAT INPUT STREAM IS FINE GRID IC FROM"  ""
 rconfig   logical input_from_hires        namelist,time_control		max_domains    .false. irh    "input_from_hires"     "T/F INPUT FOR THIS DOMAIN FROM USGS HI RES TERRAIN"  ""
 rconfig   character rsmas_data_path       namelist,time_control		1              "."     -    "rsmas_data_path"      ""  ""
 
@@ -912,7 +922,9 @@ rconfig   integer s_vert                  namelist,domains	max_domains    1     
 rconfig   integer e_vert                  namelist,domains	max_domains    31      irh    "e_vert"                ""      ""
 rconfig   integer num_metgrid_levels      namelist,domains	1              27      irh    "num_metgrid_levels"                ""      ""
 rconfig   real    p_top_requested         namelist,domains      1              5000    irh    "p_top_requested" "Pa"      ""
-rconfig   integer interp_type             namelist,domains	1              1       irh    "interp_type"  "1=interp in pressure, 2=interp in LOG pressure"      ""
+rconfig   integer interp_type             namelist,domains	1              1       irh    "interp_type"  "1=interp in pressure, 2=interp in LOG pressure"  ""
+rconfig   integer extrap_type             namelist,domains	1              2       irh    "extrap_type"  "1= use 2 lowest levels, 2=constant"  ""
+rconfig   integer t_extrap_type           namelist,domains	1              1       irh    "t_extrap_type"  "1= use 2 lowest levels, 2=constant, 3 = 6.5 K/km"   ""
 rconfig   logical lowest_lev_from_sfc     namelist,domains	1             .false.  irh    "lowest_lev_from_sfc"                ""      ""
 rconfig   integer lagrange_order          namelist,domains	1              1       irh    "lagrange_order"   "1=linear, 2=quadratic vertical interpolation"      ""
 rconfig   integer force_sfc_in_vinterp    namelist,domains	1              1       irh    "force_sfc_in_vinterp"   "number of eta levels forced to use sfc in vert interp"      ""
@@ -960,9 +972,11 @@ rconfig   real      max_dz          namelist,domains    1               1000.
 
 # Physics
 rconfig   integer     mp_physics          namelist,physics	max_domains    0       rh       "mp_physics"            ""      ""
+rconfig   integer     progn               namelist,physics      max_domains    0       rh       "progn"                 ""      ""
 rconfig   integer     ra_lw_physics       namelist,physics	max_domains    0       rh       "ra_lw_physics"         ""      ""
 rconfig   integer     ra_sw_physics       namelist,physics	max_domains    0       rh       "ra_sw_physics"         ""      ""
 rconfig   real    radt                    namelist,physics	max_domains    0       h    "RADT"          ""      ""
+rconfig   real    naer                    namelist,physics      max_domains    1e9     rh   "NAER"          ""      ""
 rconfig   integer     sf_sfclay_physics   namelist,physics	max_domains    0       rh       "sf_sfclay_physics"             ""      ""
 rconfig   integer     sf_surface_physics  namelist,physics	max_domains    0       rh       "sf_surface_physics"            ""      ""
 rconfig   integer     bl_pbl_physics      namelist,physics	max_domains    0       rh       "bl_pbl_physics"                ""      ""
@@ -990,14 +1004,14 @@ rconfig   real mp_zero_out_thresh         namelist,physics	1          1.e-8     
 rconfig   real    seaice_threshold        namelist,physics	1            271       h    "seaice_threshold"  "tsk below which which water points are set to sea ice for slab scheme"   "K"
 rconfig   integer sst_update              namelist,physics	1            0         h    "sst_update"  "update sst from wrflowinp file  0=no, 1=yes"   ""
 rconfig   integer ucmcall                 namelist,physics      1            0         h    "ucmcall"     "activate urban model  0=no, 1=yes"   ""
-rconfig   integer co2tf                   namelist,physics	1            0         -    "co2tf" "GFDL radiation co2 flag" ""
+rconfig   integer co2tf                   namelist,physics	1            1         -    "co2tf" "GFDL radiation co2 flag" ""
 rconfig   integer ra_call_offset          namelist,physics	1            0         -    "ra_call_offset" "radiation call offset in timesteps (-1=old, 0=new offset)" ""
 rconfig   real    cam_abs_freq_s          namelist,physics      1         21600.      -      "cam_abs_freq_s" "CAM radiation frequency for clear-sky longwave calculations" "s"
 rconfig   integer levsiz                  namelist,physics      1             1       -      "levsiz" "Number of ozone data levels for CAM radiation (59)"  ""
 rconfig   integer paerlev                 namelist,physics      1             1       -      "paerlev" "Number of aerosol data levels for CAM radiation (29)"  ""
 rconfig   integer cam_abs_dim1            namelist,physics      1             1       -      "cam_abs_dim1" "dimension for absnxt in CAM radiation"  ""
 rconfig   integer cam_abs_dim2            namelist,physics      1             1       -      "cam_abs_dim2" "dimension for abstot in CAM radiation"  ""
-rconfig   logical cu_rad_feedback             namelist.physics      max_domains   .false.  -     "feedback cumulus to radiation"
+rconfig   logical cu_rad_feedback         namelist,physics      max_domains   .false.  -     "feedback cumulus to radiation"  ""
 
 #FDDA namelist parameters
 rconfig   real    FGDT                    namelist,fdda         max_domains    0       h        "FGDT"          ""      ""
@@ -1020,8 +1034,8 @@ rconfig   integer if_ramping              namelist,fdda         1              0
 #Observational Nudging
 rconfig   integer     obs_nudge_opt       namelist,fdda            max_domains    0       rh       "obs_nudge_opt"     "Obs-nudging flag for domain"          ""
 rconfig   integer     max_obs             namelist,fdda            1              0       h        "max_obs"           "Maximum number of observations"       ""
-rconfig   integer     nobs_ndg_vars       namelist,fdda            1              0       h        "num_ndg_vars"      "Number of nudging variables"          ""
-rconfig   integer     nobs_err_flds       namelist,fdda            1              0       h        "num_err_flds"      "Number of error fields"               ""
+rconfig   integer     nobs_ndg_vars       namelist,fdda            1              5       h        "num_ndg_vars"      "Number of nudging variables"          ""
+rconfig   integer     nobs_err_flds       namelist,fdda            1              9       h        "num_err_flds"      "Number of error fields"               ""
 rconfig   real        fdda_start          namelist,fdda            max_domains    0       rh       "fdda_start"        "Nudging start time for domain"        "min"
 rconfig   real        fdda_end            namelist,fdda            max_domains    0       rh       "fdda_end"          "Nudging end time for domain"          "min"
 rconfig   integer     obs_nudge_wind      namelist,fdda            max_domains    0       rh       "obs_nudge_wind"    "Wind-nudging flag for domain"         ""
@@ -1162,6 +1176,9 @@ package   wsm6scheme    mp_physics==6                -             moist:qv,qc,q
 package   ncepcloud3    mp_physics==98               -             moist:qv,qc,qr
 package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs
 package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;scalar:qni
+
+package   noprogn       progn==0                     -             -
+package   progndrop     progn==1                     -             scalar:qndrop
 
 package   rrtmscheme    ra_lw_physics==1             -             -
 package   camlwscheme   ra_lw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
@@ -1323,15 +1340,15 @@ typedef fdob_type integer SN_MAXCG     # coarse domain grid dimension in south-n
 typedef fdob_type integer WE_MAXCG     # coarse domain grid dimension in west-east coordinate
 typedef fdob_type integer SN_END       # ending north-south grid index
 typedef fdob_type integer LEVIDN(max_domains)   # level of nest
-typedef fdob_type real    DS_CG        # coarse domain grid size
-typedef fdob_type real    WINDOW       # time window half-period for nudging (in minutes)
+typedef fdob_type real    DS_CG        # coarse domain grid size 
+typedef fdob_type real    WINDOW       # time window half-period for nudging (in minutes) 
 typedef fdob_type real    RTLAST       # time in hours of last obs used in current model step
 typedef fdob_type real    DATEND       # time in minutes after which data are asuumed to have ended
 typedef fdob_type real    RINFMN       # minimum radius of influence
 typedef fdob_type real    RINFMX       # maximum radius of influence
 typedef fdob_type real    PFREE        # pressure level (cb) where terrain effect becomes small
 typedef fdob_type real    DCON         # 1/DPSMX
-typedef fdob_type real    DPSMX        # max pres change (cb) allowed within infl range of surf obs
+typedef fdob_type real    DPSMX        # max pres change (cb) allowed within infl range of surf obs 
 typedef fdob_type real    TFACI        # scale factor used for ramp-down in dynamic initialization
 typedef fdob_type real    XN           # cone factor for Lambert projection
 

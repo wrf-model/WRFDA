@@ -882,7 +882,7 @@ CONTAINS
 
         write(message,*) 'revised sea ice on patch'
         CALL wrf_debug(100,message)
-        DO J=JTE,JTS,-JTE/25
+        DO J=JTE,JTS,-(((JTE-JTS)/25)+1)
           write(message,637) (SICE(I,J),I=ITS,ITE,ITE/20)
           CALL wrf_debug(100,message)
         END DO
@@ -1478,16 +1478,16 @@ CONTAINS
 
 !hardwire soil stuff for time being
 
-        RTDPTH=0.
-        RTDPTH(1)=0.1
-        RTDPTH(2)=0.3
-        RTDPTH(3)=0.6
+!       RTDPTH=0.
+!       RTDPTH(1)=0.1
+!       RTDPTH(2)=0.3
+!       RTDPTH(3)=0.6
 
-        SLDPTH=0.
-        SLDPTH(1)=0.1
-        SLDPTH(2)=0.3
-        SLDPTH(3)=0.6
-        SLDPTH(4)=1.0
+!       SLDPTH=0.
+!       SLDPTH(1)=0.1
+!       SLDPTH(2)=0.3
+!       SLDPTH(3)=0.6
+!       SLDPTH(4)=1.0
 
 !!! main body of nmm_specific starts here
 !
@@ -2095,7 +2095,7 @@ CONTAINS
        real :: dif1,dif2,dif3,dif4,dlnpdz,BOT_INPUT_HGT,BOT_INPUT_PRESS,dpdz,rhs
        real :: zin(generic),pin(generic)
 
-       character (len=132) :: message
+       character (len=256) :: message
 	
        logical :: DEFINED_PSFC(IMS:IME,JMS:JME), DEFINED_PSFCB(IMS:IME,JMS:JME)
 
@@ -2211,8 +2211,7 @@ CONTAINS
            END DO
          ENDIF
 
-!	do L=2,generic
-       DO L=generic,2,-1
+       DO L=2,generic-1
 
          IF ( PRESS3D_IN(i,j,L) .gt. PSFC_IN(I,J) .AND.  &
              Z3D_IN(I,J,L) .lt. TERRAIN_HGT_T(I,J) .AND. &
@@ -3224,19 +3223,19 @@ CONTAINS
 
       TYPE (domain)          :: grid 
 
+        integer :: IDS,IDE,JDS,JDE,KDS,KDE
+        integer :: IMS,IME,JMS,JME,KMS,KME
+        integer :: ITS,ITE,JTS,JTE,KTS,KTE
+        integer :: IPS,IPE,JPS,JPE,KPS,KPE
         integer:: ihw(JDS:JDE-1),ihe(JDS:JDE-1),nsmth,nrow
         real::    h(IMS:IME,JMS:JME),landmask(IMS:IME,JMS:JME)
         real ::   h_old(IMS:IME,JMS:JME)
         real ::   hbms(IDS:IDE-1,JDS:JDE-1)
         real ::   hse(IDS:IDE-1,JDS:JDE-1)
         real ::   hne(IDS:IDE-1,JDS:JDE-1)
-        integer :: IDS,IDE,JDS,JDE,KDS,KDE
-        integer :: IMS,IME,JMS,JME,KMS,KME
-        integer :: ITS,ITE,JTS,JTE,KTS,KTE
-        integer :: IPS,IPE,JPS,JPE,KPS,KPE
         integer :: ihl, ihh, m2l, ibas,jmelin
         integer :: I,J,KS,IOFFSET,JSTART,JEND
-        character (len=132) :: message
+        character (len=256) :: message
 
 	ips=its
         ipe=ite

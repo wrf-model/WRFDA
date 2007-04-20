@@ -17,7 +17,7 @@ gen_halos ( char * dirname , char * incname , node_t * halos )
   node_t * dimd ;
   char commname[NAMELEN] ;
   char fname[NAMELEN] ;
-  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char tmp[NAMELEN_LONG], tmp2[NAMELEN_LONG], tmp3[NAMELEN_LONG] ;
   char commuse[NAMELEN] ;
 #define MAX_VDIMS 100
   char vdims[MAX_VDIMS][2][80] ;
@@ -253,7 +253,7 @@ gen_packs ( FILE *fp , node_t *p, int shw, int xy /* 0=y,1=x */ , int pu /* 0=pa
   node_t * q ;
   node_t * dimd ;
   char fname[NAMELEN] ;
-  char tmp[NAMELEN], tmp2[NAMELEN], tmp3[NAMELEN] ;
+  char tmp[NAMELEN_LONG], tmp2[NAMELEN_LONG], tmp3[NAMELEN_LONG] ;
   char commuse[NAMELEN] ;
   int maxstenwidth, stenwidth ;
   char * t1, * t2 , *wordsize ;
@@ -934,7 +934,7 @@ gen_xposes ( char * dirname )
         if ( sw_deref_kludge &&  strchr (t2, '%') != NULLCHARPTR )
         {
           sprintf(post,")") ;
-          sprintf(indices_z, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
+          sprintf(indices_z, "%s",index_with_firstelem("(","",-1,tmp3,q,post)) ;
         }
 
 /* X array */
@@ -961,7 +961,7 @@ gen_xposes ( char * dirname )
         if ( sw_deref_kludge &&  strchr (t2, '%') != NULLCHARPTR )
         {
           sprintf(post,")") ;
-          sprintf(indices_x, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
+          sprintf(indices_x, "%s",index_with_firstelem("(","",-1,tmp3,q,post)) ;
         }
 
 /* Y array */
@@ -988,7 +988,7 @@ gen_xposes ( char * dirname )
         if ( sw_deref_kludge &&  strchr (t2, '%') != NULLCHARPTR )
         {
           sprintf(post,")") ;
-          sprintf(indices_y, "%s",index_with_firstelem("(","",tmp3,q,post)) ;
+          sprintf(indices_y, "%s",index_with_firstelem("(","",-1,tmp3,q,post)) ;
         }
         t1 = strtok_rentr( NULL , ";" , &pos1 ) ;
       }

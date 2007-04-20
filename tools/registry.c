@@ -36,6 +36,7 @@ main( int argc, char *argv[], char *env[] )
   sw_ifort_kludge          = 0 ;
   sw_dm_serial_in_only      = 0 ; /* input and bdy data set is distributed by node 0, 
                                      other data streams are written to file per process */
+  sw_new_bdys              = 0 ;
 
   strcpy( fname_in , "" ) ;
 
@@ -85,6 +86,12 @@ main( int argc, char *argv[], char *env[] )
       if (!strcmp(*argv,"-DDM_PARALLEL")) {
         sw_dm_parallel = 1 ;
       }
+      if (!strcmp(*argv,"-DNEW_BDYS")) {
+        sw_new_bdys = 1 ;
+      }
+      if (!strcmp(*argv,"-DNEW_WITH_OLD_BDYS")) {
+        sw_new_with_old_bdys = 1 ;
+      }
       if (!strcmp(*argv,"-DDISTRIB_IO_LAYER")) {
 #if 0
         sw_distrib_io_layer = 1 ;
@@ -131,7 +138,6 @@ main( int argc, char *argv[], char *env[] )
     strcpy( dir , fname_in ) ;
     if ( ( e = rindex ( dir , '/' ) ) != NULL ) { *e = '\0' ; } else { strcpy( dir, "." ) ; } 
   }
-
   if ( pre_parse( dir, fp_in, fp_tmp ) ) {
     fprintf(stderr,"Problem with Registry File %s\n", fname_in ) ;
     goto cleanup ;
