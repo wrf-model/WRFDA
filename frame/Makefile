@@ -31,6 +31,7 @@ OBJS    =       wrf_num_bytes_between.o    \
                 libmassv.o                 \
                 collect_on_comm.o          \
                 fast_copy.o                \
+                microclock.o               \
 		add_forcing_to_ad.o
 
 #compile as a .o but do not link into the main library

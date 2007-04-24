@@ -250,6 +250,13 @@ BENCH_DECL(comp116)
 BENCH_DECL(comp117)
 BENCH_DECL(comp118)
 
+BENCH_DECL(moist_physics_prep_tim)
+BENCH_DECL(a_moist_physics_finish_tim)
+BENCH_DECL(a_lscond_tim)
+BENCH_DECL(a_moist_physics_prep_tim)
+
+BENCH_DECL(store1)
+BENCH_DECL(restore1)
 #else
 #define SOLVE_START
 #define SOLVE_END

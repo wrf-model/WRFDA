@@ -236,4 +236,12 @@ BENCH_INIT(comp116)
 BENCH_INIT(comp117)
 BENCH_INIT(comp118)
 
+BENCH_INIT(moist_physics_prep_tim)
+BENCH_INIT(a_moist_physics_finish_tim)
+BENCH_INIT(a_lscond_tim)
+BENCH_INIT(a_moist_physics_prep_tim)
+
+BENCH_INIT(store1)
+BENCH_INIT(restore1)
+
 SOLVE_START

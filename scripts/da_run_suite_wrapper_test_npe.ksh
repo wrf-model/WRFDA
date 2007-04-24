@@ -129,7 +129,7 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
 
-#WRF-plus optimization:
+#WRF-plus adjoint optimization:
 # TBH:  Hacking in new namelist settings here.
 # TBH:  "REMOVE_*" namelist variables are .FALSE. by default
 export NL_REMOVE_RUNGE_KUTTA_LOOR=true

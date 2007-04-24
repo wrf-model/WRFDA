@@ -80,6 +80,8 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    USE a_module_bc_em
    USE a_module_diffusion_em
 
+   USE module_4dvaropt
+
    IMPLICIT NONE
 
    !  Input data.
@@ -380,6 +382,7 @@ real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num
 #include <bench_solve_em_a_init.h>
 
 CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
+CALL module_4dvaropt_start
 
 ! xyh
 !    return
@@ -1016,6 +1019,7 @@ BENCH_END(exch12)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields re-computed later by runge_kutta_loor...  
  store_runge_kutta_loor: if (config_flags%remove_runge_kutta_loor) then
+BENCH_START(store1)
    if ( rk_step < rk_order ) then
      WRITE(wrf_err_message,*)'DEBUG store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
@@ -1091,6 +1095,7 @@ BENCH_END(exch12)
        CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
      endif
    endif
+BENCH_END(store1)
  endif store_runge_kutta_loor
 
 end do runge_kutta_looq
@@ -1135,6 +1140,7 @@ BENCH_START(comp14)
                       min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(comp14)
 
+BENCH_START(a_moist_physics_finish_tim)
     call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                     a_h_diabatic, dtm, ide, jde, kde, &
                     ims, ime, jms, jme, kms, kme, &
@@ -1142,6 +1148,7 @@ BENCH_END(comp14)
                     min(grid%i_end(ij),ide-1-sz),    &
                     max(grid%j_start(ij),jds+sz),  &
                     min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+BENCH_END(a_moist_physics_finish_tim)
 
 
 BENCH_START(moist_physics_prep_tim)
@@ -1159,6 +1166,7 @@ BENCH_START(moist_physics_prep_tim)
                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(moist_physics_prep_tim)
 
+BENCH_START(a_lscond_tim)
        CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
                        a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
                        pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
@@ -1167,7 +1175,9 @@ BENCH_END(moist_physics_prep_tim)
                        min(grid%i_end(ij),ide-1-sz),    &
                        max(grid%j_start(ij),jds+sz),  &
                        min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
+BENCH_END(a_lscond_tim)
 
+BENCH_START(a_moist_physics_prep_tim)
        call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, &
                                      al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
                                      pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, &
@@ -1178,6 +1188,7 @@ BENCH_END(moist_physics_prep_tim)
                                      min(grid%i_end(ij),ide-1-sz),    &
                                      max(grid%j_start(ij),jds+sz),  &
                                      min(grid%j_end(ij),jde-1-sz),k_start,k_end )
+BENCH_END(a_moist_physics_prep_tim)
 
 endif
 
@@ -1257,6 +1268,7 @@ BENCH_START(comp15)
 ! TBH:  Trade redundant computation for memory.  
  restore_runge_kutta_loor: if (.not. config_flags%remove_runge_kutta_loor) then
 
+  CALL wrf_debug ( 10 , 'DEBUG:  begin runge_kutta_loor' )
   runge_kutta_loor: do rk_step1 = 1, rk_step-1
     dtm = dt
     if (rk_order .eq. 1) then
@@ -1592,9 +1604,11 @@ lineno = __LINE__
 #endif
 BENCH_END(exch25)
 
+  CALL wrf_debug ( 10 , 'DEBUG:  end runge_kutta_loor' )
   end do runge_kutta_loor
 
  else ! restore_runge_kutta_loor
+BENCH_START(restore1)
    if (rk_step > 1) then
      rfield_id = (rk_step-2) * num_fields_per_rk
      WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  rk_step-1, rfield_id = ',(rk_step-1),rfield_id
@@ -1667,6 +1681,7 @@ BENCH_END(exch25)
      WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    endif
+BENCH_END(restore1)
  endif restore_runge_kutta_loor
 
 BENCH_START(exch26)
@@ -5049,7 +5064,7 @@ end do a_runge_kutta_loop
 !----------------------------------------------
 #endif
 
-CALL clear_field_buffer
+CALL module_4dvaropt_end
 CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
 
 end subroutine solve_em_ad

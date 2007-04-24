@@ -236,3 +236,11 @@ BENCH_REPORT(comp115)
 BENCH_REPORT(comp116)
 BENCH_REPORT(comp117)
 BENCH_REPORT(comp118)
+
+BENCH_REPORT(moist_physics_prep_tim)
+BENCH_REPORT(a_moist_physics_finish_tim)
+BENCH_REPORT(a_lscond_tim)
+BENCH_REPORT(a_moist_physics_prep_tim)
+
+BENCH_REPORT(store1)
+BENCH_REPORT(restore1)

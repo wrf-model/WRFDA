@@ -1123,7 +1123,7 @@ INCLUDE_MODULES =       -I../external/io_netcdf -I../external/io_int  -I../exter
 EXTRAMODULES    =       
 ARCHFLAGS       =       -DYYY -DINTIO -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=$(RWORDSIZE) -DLWORDSIZE=4 \
                         CONFIGURE_NETCDF_FLAG -DTRIEDNTRUE   \
-			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV
+			-DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DBENCH
 PERL            =       CONFIGURE_PERL_PATH
 REGISTRY        =       Registry
 LIB             =       CONFIGURE_NETCDF_LIB_PATH -lmass -lmassv \
