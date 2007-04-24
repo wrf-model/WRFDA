@@ -811,12 +811,15 @@ lineno = __LINE__
 #endif
 BENCH_END(exch6)
 
+PRINT *,"TBH:  calling rk_tendency before_small_stepu, rk_step = ",rk_step
 BENCH_START(comp7)
+BENCH_START(comp7771)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7771)
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
 &w_b,mu_b,u_bt,v_bt,ph_bt,t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,&
@@ -850,6 +853,7 @@ lineno = __LINE__
 BENCH_END(exch7)
 
   small_stepu: do iteration = 1, number_of_small_timesteps
+PRINT *,"TBH:  begin small_stepu, iteration = ",iteration
 BENCH_START(comp8)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
 &emdiv,rdnw,config_flags,spec_zone,non_hydrostatic,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
@@ -1265,6 +1269,8 @@ BENCH_START(comp15)
  call fast_copy_lint(  xkmhd , xkmhdi , n3d_elem )
 #endif
 
+BENCH_END(comp15)
+
 ! TBH:  Trade redundant computation for memory.  
  restore_runge_kutta_loor: if (.not. config_flags%remove_runge_kutta_loor) then
 
@@ -1307,7 +1313,6 @@ BENCH_START(comp15)
         number_of_small_timesteps = time_step_sound
       endif
     endif
-BENCH_END(comp15)
 
 BENCH_START(exch14)
 #ifdef DM_PARALLEL
@@ -1385,12 +1390,15 @@ lineno = __LINE__
 #endif
 BENCH_END(exch18)
 
+PRINT *,"TBH:  calling rk_tendency before_small_stepzt, rk_step1 = ",rk_step1
 BENCH_START(comp20)
+BENCH_START(comp7772)
       call rk_tendency( config_flags,rk_step1,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,&
 &h_diabatic,phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,&
 &e,sina,cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,&
 &jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7772)
 
       if ((config_flags%specified .or. config_flags%nested) .and. rk_step1 .eq. 1) then
         call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
@@ -1427,6 +1435,7 @@ lineno = __LINE__
 BENCH_END(exch19)
 
     small_stepzt: do iteration = 1, number_of_small_timesteps
+PRINT *,"TBH:  begin small_stepzt, iteration = ",iteration
 
 BENCH_START(comp21)
         call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -1896,13 +1905,16 @@ lineno = __LINE__
 
 #endif
 BENCH_END(exch27)
+PRINT *,"TBH:  calling rk_tendency before_small_stepzq, rk_step = ",rk_step
 BENCH_START(comp32)
 
+BENCH_START(comp7773)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7773)
 !  end do
 
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -1944,6 +1956,7 @@ lineno = __LINE__
 BENCH_END(exch28)
 
   small_stepzq: do iteration = 1, number_of_small_timesteps
+PRINT *,"TBH:  begin small_stepzq, iteration = ",iteration
 
 BENCH_START(comp33)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -2331,12 +2344,15 @@ BENCH_END(exch38)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+PRINT *,"TBH:  calling rk_tendency before_small_stepzw, rk_step = ",rk_step
 BENCH_START(comp43)
+BENCH_START(comp7774)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7774)
 
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
@@ -2380,6 +2396,7 @@ BENCH_END(exch39)
 !------------------------------
 
   small_stepzw: do iteration = 1, number_of_small_timesteps
+PRINT *,"TBH:  begin small_stepzw, iteration = ",iteration
 
 BENCH_START(comp44)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -2399,9 +2416,11 @@ lineno = __LINE__
 #     include "HALO_1880.inc"
 #endif
 BENCH_END(exch40)
+BENCH_START(comp444)
       call advance_mu_t( ww,ww1,u_2,u_save,v_2,v_save,mu_2,mut,muave,muts,muu,muv,mudf,ru_m,rv_m,ww_m,t_2,t_save,t_2save,t_tend,&
 &mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw,msfu,msfv,msft,iteration,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp444)
 BENCH_START(exch41)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -2952,12 +2971,15 @@ BENCH_END(exch52)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+PRINT *,"TBH:  calling rk_tendency before_small_stepzz, rk_step = ",rk_step
 BENCH_START(comp57)
+BENCH_START(comp7775)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7775)
 
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
@@ -3006,6 +3028,7 @@ BENCH_END(exch53)
 !------------------------------
 
   small_stepzz: do iteration = 1, number_of_small_timesteps
+PRINT *,"TBH:  begin small_stepzz, iteration = ",iteration
 
 BENCH_START(comp58)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -3344,12 +3367,15 @@ lineno = __LINE__
 #endif
 BENCH_END(exch64)
 
+PRINT *,"TBH:  calling rk_tendency before_small_stepzr, rk_step = ",rk_step
 BENCH_START(comp70)
+BENCH_START(comp7776)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7776)
 
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
@@ -3385,6 +3411,7 @@ lineno = __LINE__
 BENCH_END(exch65)
 
     small_stepzr: do iteration1 = 1, iteration-1
+PRINT *,"TBH:  begin small_stepzr, iteration1 = ",iteration1
 
 BENCH_START(comp71)
         call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -4122,12 +4149,15 @@ BENCH_END(exch87)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+PRINT *,"TBH:  calling rk_tendency before_a_calc_coef_w, rk_step = ",rk_step
 BENCH_START(comp93)
+BENCH_START(comp7777)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7777)
 
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
@@ -4516,12 +4546,15 @@ BENCH_END(exch97)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+PRINT *,"TBH:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ",rk_step
 BENCH_START(comp103)
+BENCH_START(comp7778)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp7778)
 BENCH_END(comp103)
 
 !------------------------------
