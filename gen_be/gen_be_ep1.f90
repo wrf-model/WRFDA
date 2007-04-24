@@ -1,7 +1,9 @@
 program gen_be_ep1
 
-   use da_control
-   use da_gen_be
+   use da_control, only : stderr,stdout, &
+      filename_len, da_advance_cymdh
+   use da_gen_be, only : da_filter_regcoeffs
+   use da_tools1, only : da_get_unit, da_free_unit
 
    implicit none
 

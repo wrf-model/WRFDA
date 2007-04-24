@@ -10,8 +10,10 @@ program gen_be_stage1
 !
 !----------------------------------------------------------------------
 !
-   use da_control
-   use da_gen_be
+   use da_control, only : stderr, stdout, filename_len, &
+      da_advance_cymdh
+   use da_tools1, only : da_get_unit
+   use da_gen_be, only : da_create_bins
 
    implicit none
 

@@ -1,7 +1,7 @@
 program gen_be_cov3d
 
-   use da_control
-   use da_gen_be
+   use da_control, only : stderr, stdout, filename_len,da_advance_cymdh
+   use da_tools1, only : da_get_unit
 
    implicit none
 

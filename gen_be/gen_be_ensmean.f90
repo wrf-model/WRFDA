@@ -13,7 +13,7 @@ program gen_be_ensmean
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : trace_use, stdout, stderr,filename_len
+   use da_control, only : stdout, stderr,filename_len
    use da_reporting, only : da_error,message
 
    implicit none

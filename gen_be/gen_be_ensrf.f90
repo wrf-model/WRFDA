@@ -13,7 +13,7 @@ program gen_be_ensrf
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : trace_use, stdout,stderr,filename_len
+   use da_control, only : stdout,stderr,filename_len
    use da_gen_be, only : da_stage0_initialize, da_get_field, da_get_trh
 
    implicit none
@@ -89,22 +89,22 @@ program gen_be_ensrf
 
    type (ob_type),pointer:: ob(:)
 
-   character(len=10),pointer:: varr(:)                ! Variable name.
-   integer, pointer      :: nkk(:)                    ! Vertical dimension of field.
-   integer, pointer      :: xstart(:)                 ! Starting position of variable..
+   character(len=10),allocatable :: varr(:)          ! Variable name.
+   integer, allocatable  :: nkk(:)              ! Vertical dimension of field.
+   integer, allocatable  :: xstart(:)           ! Starting position of variable..
 
-   real, pointer         :: x(:,:), xf(:,:)
-   ! real, pointer         :: xf_cif(:,:)
-   real, pointer         :: h(:), h_devn(:)
-   real, pointer         :: x_devn(:)
+   real, allocatable     :: x(:,:), xf(:,:)
+   ! real, allocatable     :: xf_cif(:,:)
+   real, allocatable     :: h(:), h_devn(:)
+   real, allocatable     :: x_devn(:)
 
-   real, pointer         :: uc(:,:)                   ! u-wind (C grid).
-   real, pointer         :: vc(:,:)                   ! v-wind (C grid).
-   real, pointer         :: field(:,:)                ! Input field.
-   real, pointer         :: dummy(:,:)                ! Dummy.
-   real, pointer         :: corr(:,:)                 ! Correlation.
-   real, pointer         :: xf_mean(:)                ! Prior mean.
-   real, pointer         :: xa_mean(:)                ! Posterior mean.
+   real, allocatable	 :: uc(:,:)		      ! u-wind (C grid).
+   real, allocatable	 :: vc(:,:)		      ! v-wind (C grid).
+   real, allocatable	 :: field(:,:)  	      ! Input field.
+   real, allocatable	 :: dummy(:,:)  	      ! Dummy.
+   real, allocatable	 :: corr(:,:)		      ! Correlation.
+   real, allocatable     :: xf_mean(:)                ! Prior mean.
+   real, allocatable     :: xa_mean(:)                ! Posterior mean.
  
    namelist / gen_be_ensrf_nl / filestub, num_members, &
                                 cov_inf_fac, cov_loc_rad_m

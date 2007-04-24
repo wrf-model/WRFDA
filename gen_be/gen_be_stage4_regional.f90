@@ -1,6 +1,6 @@
 program gen_be_stage4_regional
 
-   use da_control, only : trace_use,stderr,stdout,da_advance_cymdh, filename_len
+   use da_control, only : stderr,stdout,da_advance_cymdh, filename_len
    use da_tools1, only : da_get_unit
 
    implicit none

@@ -1,7 +1,9 @@
 program gen_be_diags_read
 
-   use da_control
-   use da_gen_be
+   use da_control, only : stderr, stdout, filename_len
+   use da_tools1, only : da_get_unit
+   use da_gen_be, only : da_print_be_stats_h_regional, &
+      da_print_be_stats_h_global, da_print_be_stats_p, da_print_be_stats_v
 
    implicit none
 
