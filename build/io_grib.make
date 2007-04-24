@@ -32,7 +32,7 @@ $(IO_GRIB1)/libio_grib1.a:	$(IO_GRIB1_OBJS)
 
 io_grib1.o:     io_grib1.F 
 	$(CPP) $(IO_GRIB1_CPPFLAGS) io_grib1.F $(IO_GRIB_INCLUDEDIRS) | $(M4) $(IO_GRIB1_M4) - > io_grib1.f
-	$(FC) $(FCFLAGS) -I. -c io_grib1.f
+	$(FC) $(FCFLAGS_NOWARN) -I. -c io_grib1.f
 
 grib1_routines.o : grib1_routines.c
 	$(CC) -c $(CCFLAGS) $(IO_GRIB1_INCLUDEDIRS) grib1_routines.c
