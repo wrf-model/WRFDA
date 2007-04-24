@@ -4,7 +4,7 @@ subroutine seaem(freqghz,zasat,zlsat,ts5,u10,v10,ehorz,evert)
 !  PURPOSE: Calculate microwave surface emissivity over sea.
 !
 !  METHOD:  adopted from GSI code emiss
-!       out V and H polarized emissivitys for used in RTTOV8_5
+!       out V and H polarized emissivitys for used in RTTOV
 !
 !  HISTORY: 03/10/2005 - Creation            Zhiquan Liu
 !

@@ -13,16 +13,17 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
 
    ! local variables
-   integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
-   logical   :: lmix
-   real      :: si
+   integer   :: n,k,isflg,ios,fgat_rad_unit
+   ! integer :: scanpos
+   ! logical   :: lmix
    ! real    :: satzen
 !!
 !! TV change: added new diagnostic local varaibles
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),nrej_limb,     &
-                nrej_landsurface,nrej_windowchshort,nrej_windowchlong, nrej_si,    &
+                nrej_landsurface,nrej_windowchshort,nrej_windowchlong,    &
                 nrej_clw,nrej_sst,nrej_topo,num_rad, num_proc_domain
+   ! integer :: nrej_si
 !
 !   integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
 !                nrej_omb_std(nchan),      &

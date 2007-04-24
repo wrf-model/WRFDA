@@ -4,7 +4,7 @@ module da_tools1
    ! Purpose: Contains general tools.
    !---------------------------------------------------------------------------
       
-   use da_control, only : unit_used, stderr, unit_end, &
+   use da_control, only : unit_used, unit_end, &
       unit_start
    use da_reporting, only : da_error
 

@@ -26,7 +26,6 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    real, dimension(max_ob_levels)   :: model_u  ! Model value u at ob location.
    real, dimension(max_ob_levels)   :: model_v  ! Model value v at ob location.
    real, dimension(max_ob_levels)   :: model_w  ! Model value w at ob location.
-   real, dimension(max_ob_levels)   :: model_rho ! Model rho at ob location.
    real, dimension(max_ob_levels)   :: model_qrn ! Model qrn at ob location.
    real, dimension(max_ob_levels)   :: model_qrnb! Model qrn at ob location.
    real                             :: model_ps

@@ -1,4 +1,4 @@
-subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts)
+subroutine da_get_reglats( nj, lat, sinlat, coslat, int_wgts)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,6 @@ subroutine da_get_reglats( nj, pi, lat, sinlat, coslat, int_wgts)
    implicit none
 
    integer, intent(in)    :: nj             ! Number of latitudes
-   real,    intent(in)    :: pi             ! pi
    real,    intent(out)   :: lat(1:nj)      ! Latitude(radians, from south).
    real,    intent(out)   :: sinlat(1:nj)   ! sin(Latitude).
    real,    intent(out)   :: coslat(1:nj)   ! cos(Latitude).

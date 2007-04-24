@@ -49,7 +49,7 @@ subroutine da_initialize_h(ni, nj, max_wavenumber, lensav, alp_size, &
    if (gaussian_lats) then
       call da_get_gausslats(nj, lat, int_wgts, sinlat, coslat)
    else
-      call da_get_reglats(nj, pi, lat, sinlat, coslat, int_wgts)
+      call da_get_reglats(nj, lat, sinlat, coslat, int_wgts)
    end if
 
    do i = 1, ni

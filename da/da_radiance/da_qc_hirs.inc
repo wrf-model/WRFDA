@@ -15,7 +15,6 @@ subroutine da_qc_hirs (i, nchan, ob, iv)
    ! local variables
    integer   :: n,scanpos,k,isflg,ios,fgat_rad_unit
    logical   :: lmix
-   real      :: si
    ! real    :: satzen
    integer   :: ngood(nchan),nrej(nchan),nrej_omb_abs(nchan), &
                 nrej_omb_std(nchan),      &

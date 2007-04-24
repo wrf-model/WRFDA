@@ -11,7 +11,6 @@
       real, intent(in    ) :: f,t
       real, intent(inout ) :: ssw
       real, intent(out   ) :: epsr,epsi
-      real :: pi
       real :: ssw2,ssw3,t2,t3,es,a,tau,b,delt
       real :: beta,sig,delt2,om
 

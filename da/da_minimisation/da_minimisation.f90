@@ -31,7 +31,7 @@ module da_minimisation
       stdout, eps, stats_unit, testing_dm_exact, global, &
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
-      rtm_option,rtm_option_rttov, rtm_option_crtm, use_crtm_kmatrix_fast, &
+      rtm_option,rtm_option_rttov, rtm_option_crtm, &
       write_filtered_rad,omb_set_rand, num_airsr_tot,jo_unit,num_airep_tot, &
       num_buoy_tot,num_geoamv_tot,num_gpsref_tot,num_pilot_tot, &
       num_polaramv_tot,num_radiance_tot,num_qscat_tot,num_profiler_tot, &
@@ -115,7 +115,7 @@ module da_minimisation
       da_transfer_xatowrftl_adj,da_setup_firstguess,da_transfer_wrftltoxa_adj
    use da_vtox_transforms, only : da_transform_vtox,da_transform_vtox_adj
    use da_wrf_interfaces, only : wrf_dm_bcast_real
-   use da_wrfvar_io, only : da_med_initialdata_input,da_med_initialdata_output
+   use da_wrfvar_io, only : da_med_initialdata_input
 
    implicit none
 

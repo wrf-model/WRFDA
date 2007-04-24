@@ -19,8 +19,6 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
 
    real :: g_press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
-   real :: press(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
-      grid%xp%kms:grid%xp%kme)
    real :: utmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
       grid%xp%kms:grid%xp%kme)
    real :: vtmp(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &

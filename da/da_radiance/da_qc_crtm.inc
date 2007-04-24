@@ -11,7 +11,7 @@ subroutine da_qc_crtm (ob, iv)
    type (y_type),  intent(in)      :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
-   integer :: i, nchan,p,j
+   integer :: i, nchan
    logical   :: amsua, amsub, hirs, msu,airs,hsb, ssmis
 
    if (trace_use) call da_trace_entry("da_qc_crtm")

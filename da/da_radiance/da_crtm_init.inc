@@ -1,6 +1,6 @@
 subroutine da_crtm_init(iv,ob)
 !------------------------------------------------------------------------------
-!  PURPOSE: interface to the initialization subroutine of RTTOV8_5.
+!  PURPOSE: interface to the initialization subroutine of RTTOV.
 !
 !  METHOD:  1. read CRTM coefs files; 2. allocate radiance structure
 !
@@ -18,8 +18,7 @@ subroutine da_crtm_init(iv,ob)
 !
 !  local arguments
 !------------------- 
- integer   :: n, k,j,bunit, iscan,ichan,npos
- real      :: ave
+ integer   :: n, j, ichan
 
 !
 ! CRTM local ---------------------------------------------------
@@ -47,7 +46,7 @@ subroutine da_crtm_init(iv,ob)
 !  integer              :: coef_errorstatus
 !  integer              :: i_amsua, i_amsub
   integer     :: error
-  integer , pointer   ::  nscan(:), nchanl(:)
+  integer, allocatable   ::  nscan(:), nchanl(:)
 
 ! local variables
 !----------------

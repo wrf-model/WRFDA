@@ -17,8 +17,9 @@ module da_obs
       pseudo_x, fg_format, fg_format_kma_global, fg_format_wrf, missing_data, &
       pseudo_var, pseudo_val,stdout, num_pseudo, pseudo_y, pseudo_z, &
       pseudo_err,obs_qc_pointer,myproc,rtm_option,rtm_option_rttov, &
-      use_crtm_kmatrix,use_crtm_kmatrix_fast, rtm_option_crtm,use_rad, &
+      rtm_option_crtm,use_rad, &
       ob_format,ob_format_ascii,filename_len  
+   ! use_crtm_kmatrix,use_crtm_kmatrix_fast
 #ifdef CRTM
    use da_crtm, only : da_transform_xtoy_crtm, &
                        da_transform_xtoy_crtm_adj

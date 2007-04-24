@@ -8,7 +8,7 @@ module da_ssmi
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, t_roughem, t_kelvin, &
-      missing, max_error_uv, max_error_t, rootproc, &
+      missing, max_error_uv, max_error_t, rootproc, pi, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, max_error_thickness, mkz, &

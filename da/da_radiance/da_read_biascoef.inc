@@ -9,7 +9,7 @@
                            coef(nchan,npred),coef0(nchan), &
                            vstd_dep(nchan)
 
-    integer :: iunit,j,i,stdout, ii,jj, iost
+    integer :: iunit,j,i, ii,jj, iost
     integer ::  nobs(nchan)
     real    ::  vmean_abs(nchan), vstd_abs(nchan), &
                 vmean_dep(nchan)

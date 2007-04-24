@@ -15,20 +15,20 @@ module da_crtm
       crtm_destroy_atmosphere,crtm_set_channelinfo,crtm_sensor_name, &
       crtm_allocate_surface,crtm_destroy_surface,crtm_assign_atmosphere, &
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere, satinfo, &
-      time_slots,crtm_platform_name, crtm_init, crtm_destroy, &
+      time_slots,crtm_platform_name, crtm_init, &
       rttov_inst_name,rttov_platform_name
 #endif
 
    use da_control, only : trace_use, crtm_cloud, gravity,stdout, biascorr, &
       biasprep, qc_rad,missing_r,rtminit_sensor,rtminit_nsensor, filename_len, &
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
-      time_window_min,print_detail_obs,num_fgat_time,rtminit_platform, &
+      time_window_min,num_fgat_time,rtminit_platform, &
       rtminit_satid, global
    use da_define_structures, only : y_type, ob_type
-   use da_interpolation, only : da_interp_lin_2d_new, da_interp_lin_2d_adj_new, &
+   use da_interpolation, only : da_interp_lin_2d_new, &
       da_interp_lin_2d,da_interp_lin_2d_adj
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
-      da_qc_rad, da_get_time_slots,da_biasprep,da_read_biascoef
+      da_get_time_slots,da_biasprep,da_read_biascoef
 #ifdef CRTM
    use da_radiance1, only : da_qc_crtm
 #endif

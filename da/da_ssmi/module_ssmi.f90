@@ -1,6 +1,6 @@
 module module_ssmi
 
-use da_control, only : t_kelvin,pi
+use da_control, only : t_kelvin,pi, t_roughem
 
 contains
 

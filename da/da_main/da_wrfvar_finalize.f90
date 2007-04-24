@@ -5,10 +5,11 @@ subroutine da_wrfvar_finalize
    !-------------------------------------------------------------------------
 
    use module_domain, only : domain, head_grid
+
    use da_control, only : trace_use, cost_unit, stderr, &
       check_max_iv_unit,grad_unit,ierr,num_alpha_corr_types, &
       rootproc,stats_unit, unit_start, rtm_option, rtm_option_crtm, use_rad, &
-      unit_end, jo_unit, unit_used,alpha_corr_unit1, alpha_corr_unit2      
+      unit_end, jo_unit, unit_used
    use da_radiance1, only : num_tovs_before, tovs_recv_pe,tovs_copy_count, &
       tovs_send_pe,tovs_send_count,tovs_recv_start, num_tovs_after, &
       tovs_send_start
@@ -20,7 +21,8 @@ subroutine da_wrfvar_finalize
    use da_reporting, only : da_message
 
 #ifdef CRTM
-   use da_crtm, only : channelinfo, crtm_destroy, sensor_descriptor
+   use module_radiance, only : crtm_destroy
+   use da_crtm, only : channelinfo, sensor_descriptor
 #endif
 
    implicit none
