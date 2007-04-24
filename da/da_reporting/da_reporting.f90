@@ -2,6 +2,7 @@ module da_reporting
 
    use da_control, only : stdout, use_html, documentation_url, &
       warnings_are_fatal
+   use da_wrf_interfaces, only : wrf_message, wrf_abort
 
    implicit none
 

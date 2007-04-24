@@ -1,6 +1,7 @@
   PROGRAM da_bias_scan
 
-  USE RAD_BIAS
+  USE RAD_BIAS, only : long, bias, jpchan, jpscan, da_read_biasprep, print_bias, &
+     qc_amsua, qc_amsub, jband, boff, bdiv
 
 ! PURPOSE.
 ! -------
@@ -35,16 +36,22 @@
   REAL(KIND=LONG) :: vmnscbt(JPCHAN,JPSCAN,JBAND), vstdscbt(JPCHAN,JPSCAN,JBAND)
   REAL(KIND=LONG) :: vmnrlbt(JPCHAN,JPSCAN,JBAND)
 
-  INTEGER :: ibin, ierr, iscanm
+  ! INTEGER :: ibin
+  INTEGER :: ierr, iscanm
   INTEGER :: j, jv, jscan, js, k , l
-  INTEGER :: path, cloud_flag
+  ! INTEGER :: path
+  ! INTEGER :: cloud_flag
 
-  INTEGER :: iband, ia, iab, aoff
-  INTEGER :: avb 
+  INTEGER :: iband
+  ! INTEGER :: ia
+  ! INTEGER :: iab
+  ! INTEGER :: aoff
+  ! INTEGER :: avb 
 
-  CHARACTER(LEN=2) :: cchan
+  ! CHARACTER(LEN=2) :: cchan
 
-  REAL(KIND=LONG) :: vmn0, vmn0b(JBAND), VDHL_WINDOW, VDLL_WINDOW
+  REAL(KIND=LONG) :: vmn0, vmn0b(JBAND)
+  ! REAL(KIND=LONG) :: VDHL_WINDOW, VDLL_WINDOW
 
   LOGICAL :: global, smoothing
 
@@ -170,8 +177,6 @@ loop1:&
 !     3.   SECOND PASS THROUGH DATA, EXTRA Q.C.
 !          ------ ---- ------- ----- ----- ----
 
-  300 CONTINUE
-  
   REWIND(UNIT=10)
 
   vmean_dep = 0.0                                          ! Clear matrices
@@ -252,8 +257,6 @@ loop2:&
     ENDDO
 
   ENDDO loop2
-
-  990 CONTINUE
 
 ! Write scan 'core' arrays NOTE: not divided by nobs
 !------------------------------------------------------

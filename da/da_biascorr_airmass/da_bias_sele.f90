@@ -1,6 +1,7 @@
   PROGRAM da_bias_sele
  
-  USE RAD_BIAS
+  USE RAD_BIAS, only : bias, print_bias, da_read_biasprep, &
+     da_write_biasprep
 
 ! PURPOSE.
 ! --------

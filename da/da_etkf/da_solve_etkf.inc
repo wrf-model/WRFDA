@@ -44,27 +44,36 @@ subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,no
 
  real, dimension(nobs) :: ensmean_ob
  real, dimension(nobs) :: obsinc
- integer :: ij, nanal, nt, i, j, k               ! Loop counters.
+ integer :: ij, nanal, i, j               ! Loop counters.
  integer :: info, lwork
  real, allocatable, dimension(:) :: work
  real, dimension(1) :: workt
  real, dimension(nanals) :: eignv, eignv1
  real, dimension(nanals, nanals) :: hzthz, C, TR
  real, dimension(nanals-1, nanals) :: CT
- real, dimension(nanals, nanals-1) :: cgamma, T
- real, dimension(nobs,nanals-1) :: E
+ real, dimension(nanals, nanals-1) :: T
+ ! real, dimension(nanals, nanals-1) :: cgamma
+ ! real, dimension(nobs,nanals-1) :: E
  real, dimension(nobs,nanals) :: enspert_ob_tmp
 ! file for output eigen values filename_eignv
 ! file for output factors filename_factor
- character (len=150) :: filename_factor,filename_eignv
+ character (len=150) :: filename_factor
+ ! character (len=150) :: filename_eignv
 ! file for squared innovation vectors
 ! file for squared projection of fcst err variance onto ensemble subspace
- character (len=150) :: filename_inno2,filename_proj2
- real, dimension(nanals-1) :: proj
- real :: ta, tb, tracehpfht, aftersum_eignv, sum_eignv
- real :: ainflat, tainflat, rho
- real :: proj2, proj2sum, proj2sum1
- real :: squareinnosum, squareinno, squareinnosum1
+ ! character (len=150) :: filename_inno2
+ ! character (len=150) :: filename_proj2
+ ! real, dimension(nanals-1) :: proj
+ real :: tracehpfht
+ ! real :: ta, tb
+ ! real :: sum_eignv
+ ! real :: aftersum_eignv
+ real :: ainflat
+ ! real :: tainflat, rho
+ ! real :: proj2, proj2sum
+ ! real :: proj2sum1
+ ! real :: squareinnosum, squareinnosum1
+ real :: squareinno
 
    filename_factor = trim(directory)//"/inflation_factor.dat"
    open(109,form="unformatted",file=filename_factor,access="direct",recl=8)

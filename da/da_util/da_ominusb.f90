@@ -50,16 +50,15 @@ program daprog_ominusb
    end type obs_type
 
    character(len=filename_len) :: filename
-   character*5               :: station_chosen
+   ! character*5               :: station_chosen
    character*5               :: station_id
-   integer                   :: times, n, n1, n2, b
+   integer                   :: times, n, b
    integer                   :: bin
    integer                   :: num_times
    integer                   :: qc
    integer                   :: percent_reject
-   real                      :: target_p, p_ob
+   real                      :: p_ob
    real                      :: lati, long, iv, error
-   logical                   :: surface_obs
    ! type (obs_type)           :: obs(1:num_bins_p)
    type (obs_type),allocatable           :: obs(:)
 
@@ -389,7 +388,7 @@ subroutine da_get_distance( num_stations, lat, lon, dis )
    real, intent(in)          :: lon(1:num_stations)
    real, intent(out)         :: dis(1:num_stations,1:num_stations)
 
-   integer                   :: n1, n2, min_n1, min_n2
+   integer                   :: n1, n2
    real                      :: pi_over_2, colat1, colat2, londiff
    real                      :: dist
 

@@ -5,7 +5,7 @@ module da_gen_be
    ! code.
    !----------------------------------------------------------------------------
 
-   use da_control, only : trace_use,stdout,vertical_ip, ts0,es_beta,es_alpha, &
+   use da_control, only : stdout,vertical_ip, ts0,es_beta,es_alpha, &
       es_gamma,kappa,ps0_inv,rd_over_rv,rd_over_rv1,t_kelvin, gravity, &
       da_array_print, filename_len
    use da_reporting, only : da_error, message

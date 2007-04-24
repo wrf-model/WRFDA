@@ -38,6 +38,9 @@ module da_transfer_model
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_vtox_transforms, only : da_get_vpoles
    use da_wrfvar_io, only : da_med_initialdata_output,da_med_initialdata_input
+   ! Do not use line below, because it shows that we are passing a scalar to 
+   ! an array
+   ! use da_wrf_interfaces, only : wrf_dm_bcast_real
 
    implicit none
 
