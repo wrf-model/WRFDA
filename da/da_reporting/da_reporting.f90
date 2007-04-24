@@ -2,7 +2,9 @@ module da_reporting
 
    use da_control, only : stdout, use_html, documentation_url, &
       warnings_are_fatal
-   use da_wrf_interfaces, only : wrf_message, wrf_abort
+   ! Do not include the wrf_interfaces as it generates a cascade of
+   ! code required for gen_be
+   ! use da_wrf_interfaces, only : wrf_message, wrf_abort
 
    implicit none
 

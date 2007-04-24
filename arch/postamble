@@ -86,7 +86,7 @@ interp_fcn.o init_modules.o mediation_integrate.o \
    wrf_auxinput10out.o wrf_auxinput11out.o wrf_restartin.o \
    wrf_histin.o output_wrf.o wrf_restartout.o \
    wrf_ext_read_field.o wrf_ext_write_field.o \
-   f_qv_from_rh.o wrf_bdyout.o wrf_bdyin.o rad_bias.o :
+   wrf_bdyout.o wrf_bdyin.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b 
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
@@ -96,14 +96,15 @@ interp_fcn.o init_modules.o mediation_integrate.o \
 ESMF_Mod.o ESMF_Calendar.o ESMF_Stubs.o ESMF_BaseTime.o ESMF_Base.o \
    ESMF_TimeInterval.o ESMF_Time.o ESMF_Alarm.o ESMF_Clock.o \
    ESMF_AlarmClock.o Meat.o  module_utility.o \
-   module_symbols_util.o regress_one.o tred2.o tqli.o da_bias_airmass.o :
+   module_symbols_util.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F90 > $*.b 
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
 	  $(FC) -c $(FCFLAGS_NOWARN) $*.f
 
-module_ssmi.o module_ffts.o gsi_thinning.o :
+module_ssmi.o module_ffts.o gsi_thinning.o f_qv_from_rh.o rad_bias.o \
+   regress_one.o tred2.o tqli.o da_bias_airmass.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b 
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
