@@ -1166,8 +1166,10 @@ a_runge_kutta_loop: do rk_step = rk_order, 1, -1
 
 BENCH_START(comp15)
 
-! TBH TODO:  Should be able to eliminate this copy when rk_step > 1 and 
-! TBH TODO:  config_flags%remove_runge_kutta_loor == .TRUE.
+! TBH:  Eliminate this copy when rk_step > 1 and 
+! TBH:  config_flags%remove_runge_kutta_loor == .TRUE.
+if ( .not. ( config_flags%remove_runge_kutta_loor .and. &
+           ( rk_step > 1 ) ) ) then
 #ifndef FAST_CPY
   a(:,:,:) = ah(:,:,:)
   al(:,:,:) = alj(:,:,:)
@@ -1231,6 +1233,7 @@ BENCH_START(comp15)
  call fast_copy_lint(  ww_m , ww_mh , n3d_elem )
  call fast_copy_lint(  xkmhd , xkmhdi , n3d_elem )
 #endif
+endif
 
 BENCH_END(comp15)
 
