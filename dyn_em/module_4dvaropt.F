@@ -1,6 +1,7 @@
 
+! TBH:  TODO:  Wrap assertions in #ifdef DEBUG to speed up store/restore.  
+
 ! TBH:  TODO:  Improve very simple design if needed.  
-! TBH:  TODO:   - Handle multiple "frames" separately
 ! TBH:  TODO:   - Add erasure of fields
 ! TBH:  TODO:     - move to a dynamic set of buffers
 ! TBH:  These very simple routines are used to read/write 
@@ -13,7 +14,7 @@
 
         ! Maximum numbers of buffers, frames and, fields.  
         ! Note that all data is actually stored in a single 1D array which is 
-        ! addressed via (buffer_id, frame_number, field_id) for convenience.  
+        ! addressed via (field_id, frame_id, buffer_id) for convenience.  
         INTEGER, PARAMETER :: MAX_NUM_BUFFERS=10
 
         ! maximum number frames (groups of fields) in any buffer
@@ -31,20 +32,24 @@
           field_starts(0:MAX_NUM_FIELDS, MAX_NUM_FRAMES, MAX_NUM_BUFFERS)
 
         ! number of words in each stored field
-        ! NOTE:  field_starts(0,:,:) is only used for initialization.  
+        ! NOTE:  field_counts(0,:,:) is only used for initialization.  
         INTEGER, SAVE :: &
           field_counts(0:MAX_NUM_FIELDS, MAX_NUM_FRAMES, MAX_NUM_BUFFERS)
 
-        ! total number fields currently stored in each frame of each buffer
+        ! number fields currently stored in each frame of each buffer
         INTEGER, SAVE :: num_fields(MAX_NUM_FRAMES, MAX_NUM_BUFFERS)
 
+        ! index of current fields for reading each frame of each buffer
+        INTEGER, SAVE :: read_field_ids(MAX_NUM_FRAMES, MAX_NUM_BUFFERS)
+
         ! internal counters for storing/retrieving fields
-! TODO:  use later...
         INTEGER, SAVE :: current_buffer
         INTEGER, SAVE :: current_frame
 
         ! buffer
         INTEGER*8 :: buffer(MAX_NUM_WORDS)
+        ! points to next free spot in buffer
+        INTEGER, SAVE :: buffer_position
 
         ! debugging
         CHARACTER*256 :: msg
@@ -52,15 +57,30 @@
       CONTAINS
 
         SUBROUTINE module_4dvaropt_start
+          buffer_position = 1
           field_starts = 1
           field_counts = 0
           num_fields = 0
+          ! points by default to an "empty" field
+          read_field_ids = 0
           current_buffer = 1
           current_frame = 1
 ! TODO:  auto-init to NaN for debugging...  
 !         buffer = 0
           RETURN
         END SUBROUTINE module_4dvaropt_start
+
+
+        ! select specified frame of specified buffer for store or restore
+        ! position read_field_ids at the beginning of the frame for restore
+        SUBROUTINE select_frame( frame_id , buffer_id )
+          INTEGER, INTENT(IN) :: frame_id
+          INTEGER, INTENT(IN) :: buffer_id
+          current_frame = frame_id
+          current_buffer = buffer_id
+          read_field_ids(current_frame, current_buffer) = 1
+          RETURN
+        END SUBROUTINE select_frame
 
 
         SUBROUTINE module_4dvaropt_end
@@ -75,32 +95,34 @@
 
 ! TBH:  These routines are outside the module to avoid TKR match.  
 ! TBH:  TODO:  Overload interfaces and put back in module.  
-        SUBROUTINE store_field_lint ( field_id , inbuf , numwords )
+        ! Store field at the end of the current frame of the current buffer.  
+        SUBROUTINE store_field_lint ( inbuf , numwords )
           USE module_4dvaropt
           IMPLICIT NONE
-          INTEGER field_id, numwords
+          INTEGER numwords
           INTEGER*8 inbuf(*)
           ! Local
-          INTEGER newstart, numfields
-          WRITE(msg,'(A,I10)') 'DEBUG store_field_lint:  field_id = ',field_id
+          INTEGER newstart, field_id
+          WRITE(msg,'(A,I10,A,I10)') 'DEBUG store_field_lint:  current_frame,current_buffer = ',current_frame,",",current_buffer
           CALL wrf_debug( 10, TRIM(msg) )
           num_fields(current_frame,current_buffer) = &
             num_fields(current_frame,current_buffer) + 1
-          numfields = num_fields(current_frame,current_buffer)
-          IF ( numfields > MAX_NUM_FIELDS ) THEN
+          field_id = num_fields(current_frame,current_buffer)
+          WRITE(msg,'(A,I10)') 'DEBUG store_field_lint:  field_id = ',field_id
+          CALL wrf_debug( 10, TRIM(msg) )
+          IF ( field_id > MAX_NUM_FIELDS ) THEN
             CALL wrf_error_fatal( "Too many fields in store_field_lint" )
           ENDIF
-! TODO:  remove this when adding buffer_id and frame_number to interfaces
-          IF ( numfields .ne. field_id ) THEN
-            CALL wrf_error_fatal( "Must write fields in order in store_field_lint" )
-          ENDIF
-          newstart = field_starts(numfields-1,current_frame,current_buffer) + &
-                     field_counts(numfields-1,current_frame,current_buffer)
-          field_starts(numfields,current_frame,current_buffer) = newstart
-          field_counts(numfields,current_frame,current_buffer) = numwords
-          WRITE(msg,'(A,I10,A,I10)') 'DEBUG store_field_lint:  field_id = ',field_id,'  buffer end = ',(newstart+numwords-1)
+          newstart = buffer_position
+          field_starts(field_id,current_frame,current_buffer) = newstart
+          field_counts(field_id,current_frame,current_buffer) = numwords
+          WRITE(msg,'(A,I10,A,I10,A,I10)') &
+            'DEBUG store_field_lint:  field_id = ',field_id,&
+            '  buffer start = ',newstart,&
+            '  buffer end = ',(newstart+numwords-1)
           CALL wrf_debug( 10, TRIM(msg) )
-          IF ( newstart+numwords-1 > MAX_NUM_WORDS ) THEN
+          buffer_position = buffer_position + numwords
+          IF ( buffer_position-1 > MAX_NUM_WORDS ) THEN
             CALL wrf_error_fatal( "Ran out of memory in store_field_lint" )
           ENDIF
           CALL fast_copy_lint ( buffer(newstart), inbuf, numwords )
@@ -109,26 +131,37 @@
 
 
 
-        SUBROUTINE restore_field_lint ( field_id , outbuf , numwords )
+        ! Read current field from current frame of current buffer and 
+        ! increment current field id.  
+        SUBROUTINE restore_field_lint ( outbuf , numwords )
           USE module_4dvaropt
           IMPLICIT NONE
-          INTEGER field_id, numwords
+          INTEGER numwords
           INTEGER*8 outbuf(*)
           ! Local
-          INTEGER thisstart
+          INTEGER field_id, thisstart
+          WRITE(msg,'(A,I10,A,I10)') 'DEBUG restore_field_lint:  current_frame,current_buffer = ',current_frame,",",current_buffer
+          CALL wrf_debug( 10, TRIM(msg) )
+          field_id = read_field_ids(current_frame, current_buffer)
           WRITE(msg,'(A,I10)') 'DEBUG restore_field_lint:  field_id = ',field_id
           CALL wrf_debug( 10, TRIM(msg) )
+! TODO:  remove this assertion
           IF (( field_id > num_fields(current_frame,current_buffer) ) .OR. &
               ( field_id < 1 )) THEN
             CALL wrf_error_fatal( "Field ID out of range in restore_field_lint" )
           ENDIF
+          thisstart = field_starts(field_id,current_frame,current_buffer)
+          WRITE(msg,'(A,I10,A,I10,A,I10)') &
+            'DEBUG restore_field_lint:  field_id = ',field_id, &
+            '  buffer start = ',thisstart, &
+            '  buffer end = ',(thisstart+field_counts(field_id,current_frame,current_buffer)-1)
+          CALL wrf_debug( 10, TRIM(msg) )
           IF ( numwords .ne. field_counts(field_id,current_frame,current_buffer) ) THEN
             CALL wrf_error_fatal( "Incorrect count in restore_field_lint" )
           ENDIF
-          thisstart = field_starts(field_id,current_frame,current_buffer)
-          WRITE(msg,'(A,I10,A,I10)') 'DEBUG restore_field_lint:  field_id = ',field_id,'  buffer end = ',(thisstart+numwords-1)
-          CALL wrf_debug( 10, TRIM(msg) )
           CALL fast_copy_lint ( outbuf, buffer(thisstart), numwords )
+          ! increment field_id for reading
+          read_field_ids(current_frame, current_buffer) = field_id + 1
           RETURN
         END SUBROUTINE restore_field_lint
 
