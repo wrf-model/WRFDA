@@ -2,7 +2,7 @@ subroutine da_write_kma_increments(xp, xb, xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Gathers KMA analysis increments and writes 
-   !           on i"anl_inc_unit" unit 
+   !           on "anl_inc_unit" unit 
    !---------------------------------------------------------------------------
 
    implicit none
@@ -80,29 +80,16 @@ subroutine da_write_kma_increments(xp, xb, xa)
          form="unformatted")
 #ifdef DM_PARALLEL
       write(anl_inc_unit) &
-      ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
-      write(anl_inc_unit) &
-      (((u_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(anl_inc_unit) &
-      (((v_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(anl_inc_unit) &
-      (((t_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(anl_inc_unit) &
-      (((q_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(anl_inc_unit) &
-      (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-
-      write(unit=stdout,fmt='(10e15.7)') & 
          ((psfc_g(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
-      write(unit=stdout,fmt='(10e15.7)') &
+      write(anl_inc_unit) &
          (((u_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
+      write(anl_inc_unit) &
          (((v_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
+      write(anl_inc_unit) &
          (((t_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
+      write(anl_inc_unit) &
          (((q_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
+      write(anl_inc_unit) &
          (((p_g(i,j,k),i=xb%ids,xb%ide),j=xb%ids,xb%jde),k=xb%kds,xb%kde)
 #else
       write(anl_inc_unit) &
@@ -116,19 +103,6 @@ subroutine da_write_kma_increments(xp, xb, xa)
       write(anl_inc_unit) &
          (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
       write(anl_inc_unit) &
-         (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-
-      write(unit=stdout,fmt='(10e15.7)') &
-         ((xa%psfc(i,j),i=xb%ids,xb%ide),j=xb%jds,xb%jde)
-      write(unit=stdout,fmt='(10e15.7)') &
-         (((xa%u(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
-         (((xa%v(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
-         (((xa%t(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
-         (((xa%q(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
-      write(unit=stdout,fmt='(10e15.7)') &
          (((xa%p(i,j,k),i=xb%ids,xb%ide),j=xb%jds,xb%jde),k=xb%kds,xb%kde)
 #endif
       close(anl_inc_unit)
