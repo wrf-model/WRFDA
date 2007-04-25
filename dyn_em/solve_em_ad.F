@@ -811,7 +811,8 @@ lineno = __LINE__
 #endif
 BENCH_END(exch6)
 
-PRINT *,"TBH:  calling rk_tendency before_small_stepu, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepu, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp7)
 BENCH_START(comp7771)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -853,7 +854,8 @@ lineno = __LINE__
 BENCH_END(exch7)
 
   small_stepu: do iteration = 1, number_of_small_timesteps
-PRINT *,"TBH:  begin small_stepu, iteration = ",iteration
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepu, iteration = ',iteration
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp8)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
 &emdiv,rdnw,config_flags,spec_zone,non_hydrostatic,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
@@ -1025,7 +1027,7 @@ BENCH_END(exch12)
  store_runge_kutta_loor: if (config_flags%remove_runge_kutta_loor) then
 BENCH_START(store1)
    if ( rk_step < rk_order ) then
-     WRITE(wrf_err_message,*)'DEBUG store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
+     WRITE(wrf_err_message,*)'DEBUG:  store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
      ! store fields
      CALL select_frame(rk_step, BUF_RK_LOOR)
@@ -1356,7 +1358,8 @@ lineno = __LINE__
 #endif
 BENCH_END(exch18)
 
-PRINT *,"TBH:  calling rk_tendency before_small_stepzt, rk_step1 = ",rk_step1
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzt, rk_step1 = ',rk_step1
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp20)
 BENCH_START(comp7772)
       call rk_tendency( config_flags,rk_step1,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -1401,7 +1404,8 @@ lineno = __LINE__
 BENCH_END(exch19)
 
     small_stepzt: do iteration = 1, number_of_small_timesteps
-PRINT *,"TBH:  begin small_stepzt, iteration = ",iteration
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzt, iteration = ',iteration
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
 BENCH_START(comp21)
         call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -1585,7 +1589,7 @@ BENCH_END(exch25)
  else ! restore_runge_kutta_loor
 BENCH_START(restore1)
    if (rk_step > 1) then
-     WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
+     WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
      ! restore saved fields
      CALL select_frame(rk_step-1, BUF_RK_LOOR)
@@ -1621,7 +1625,7 @@ BENCH_START(restore1)
      call restore_field_lint( dnw , kme-kms+1 )
      call restore_field_lint( al , n3d_elem )
      call restore_field_lint( mudf , n2d_elem )
-     WRITE(wrf_err_message,*)'DEBUG restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
+     WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    endif
 BENCH_END(restore1)
@@ -1839,7 +1843,8 @@ lineno = __LINE__
 
 #endif
 BENCH_END(exch27)
-PRINT *,"TBH:  calling rk_tendency before_small_stepzq, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzq, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp32)
 
 BENCH_START(comp7773)
@@ -1890,7 +1895,8 @@ lineno = __LINE__
 BENCH_END(exch28)
 
   small_stepzq: do iteration = 1, number_of_small_timesteps
-PRINT *,"TBH:  begin small_stepzq, iteration = ",iteration
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzq, iteration = ',iteration
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
 BENCH_START(comp33)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -2278,7 +2284,8 @@ BENCH_END(exch38)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
-PRINT *,"TBH:  calling rk_tendency before_small_stepzw, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzw, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp43)
 BENCH_START(comp7774)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -2330,7 +2337,8 @@ BENCH_END(exch39)
 !------------------------------
 
   small_stepzw: do iteration = 1, number_of_small_timesteps
-PRINT *,"TBH:  begin small_stepzw, iteration = ",iteration
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzw, iteration = ',iteration
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
 BENCH_START(comp44)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -2905,7 +2913,8 @@ BENCH_END(exch52)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
-PRINT *,"TBH:  calling rk_tendency before_small_stepzz, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzz, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp57)
 BENCH_START(comp7775)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -2962,7 +2971,8 @@ BENCH_END(exch53)
 !------------------------------
 
   small_stepzz: do iteration = 1, number_of_small_timesteps
-PRINT *,"TBH:  begin small_stepzz, iteration = ",iteration
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzz, iteration = ',iteration
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
 BENCH_START(comp58)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -3301,7 +3311,8 @@ lineno = __LINE__
 #endif
 BENCH_END(exch64)
 
-PRINT *,"TBH:  calling rk_tendency before_small_stepzr, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzr, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp70)
 BENCH_START(comp7776)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -3345,7 +3356,8 @@ lineno = __LINE__
 BENCH_END(exch65)
 
     small_stepzr: do iteration1 = 1, iteration-1
-PRINT *,"TBH:  begin small_stepzr, iteration1 = ",iteration1
+WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzr, iteration1 = ',iteration1
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
 BENCH_START(comp71)
         call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
@@ -4083,7 +4095,8 @@ BENCH_END(exch87)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
-PRINT *,"TBH:  calling rk_tendency before_a_calc_coef_w, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_calc_coef_w, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp93)
 BENCH_START(comp7777)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -4480,7 +4493,8 @@ BENCH_END(exch97)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
-PRINT *,"TBH:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ",rk_step
+WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ',rk_step
+CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp103)
 BENCH_START(comp7778)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&

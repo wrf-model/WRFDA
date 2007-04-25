@@ -84,8 +84,10 @@
 
 
         SUBROUTINE module_4dvaropt_end
-! TODO:  print out actual number of words used at end
-          CALL module_4dvaropt_start
+          ! print out actual number of words used at end
+          WRITE(msg,'(A,I10,A)') 'Maximum buffer size = ',buffer_position-1, &
+                                 ' INTEGER*8 words'
+          CALL wrf_message( TRIM(msg) )
           RETURN
         END SUBROUTINE module_4dvaropt_end
 
