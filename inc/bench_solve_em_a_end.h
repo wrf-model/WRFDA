@@ -251,5 +251,9 @@ BENCH_REPORT(a_moist_physics_finish_tim)
 BENCH_REPORT(a_lscond_tim)
 BENCH_REPORT(a_moist_physics_prep_tim)
 
-BENCH_REPORT(store1)
-BENCH_REPORT(restore1)
+BENCH_REPORT(store_runge_kutta_loor_tim)
+BENCH_REPORT(restore_runge_kutta_loor_tim)
+BENCH_REPORT(store_small_step_tim)
+BENCH_REPORT(restore_small_step_tim)
+
+BENCH_REPORT(solve_em_ad_tim)

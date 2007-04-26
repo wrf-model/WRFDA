@@ -1032,6 +1032,7 @@ rconfig   logical write_restart_at_0h     namelist,time_control		1             .
 # TBH:  Controls to trade off recomputation for memory in the adjoint.  
 # TBH:  Put this in a new namelist later...  
 rconfig   logical remove_runge_kutta_loor namelist,time_control	        1      .false. rh    "remove_runge_kutta_loor" ""    ""
+rconfig   logical remove_small_step       namelist,time_control	        1      .false. rh    "remove_small_step"       ""    ""
 
 
 # Domains

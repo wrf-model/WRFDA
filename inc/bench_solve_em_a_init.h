@@ -250,7 +250,11 @@ BENCH_INIT(a_moist_physics_finish_tim)
 BENCH_INIT(a_lscond_tim)
 BENCH_INIT(a_moist_physics_prep_tim)
 
-BENCH_INIT(store1)
-BENCH_INIT(restore1)
+BENCH_INIT(store_runge_kutta_loor_tim)
+BENCH_INIT(restore_runge_kutta_loor_tim)
+BENCH_INIT(store_small_step_tim)
+BENCH_INIT(restore_small_step_tim)
+
+BENCH_INIT(solve_em_ad_tim)
 
 SOLVE_START

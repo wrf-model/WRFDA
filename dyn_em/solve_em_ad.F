@@ -313,6 +313,7 @@ real, DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33) :: 
 integer :: iy
 ! TBH:  Buffer IDs for store/restore
 INTEGER, PARAMETER :: BUF_RK_LOOR = 1
+INTEGER, PARAMETER :: BUF_SMALL_STEP = 2
 
 real ru_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real rv_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
@@ -382,6 +383,7 @@ real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num
 
 #include <bench_solve_em_a_init.h>
 
+BENCH_START(solve_em_ad_tim)
 CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
 CALL module_4dvaropt_start
 
@@ -935,6 +937,18 @@ BENCH_END(exch10)
 
   end do small_stepu
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Save fields re-computed later by small_step loops.  
+ store_small_step: if (config_flags%remove_small_step) then
+BENCH_START(store_small_step_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  store_small_step:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_SMALL_STEP)
+#include "store_small_step.inc"
+BENCH_END(store_small_step_tim)
+ endif store_small_step
+
 BENCH_START(comp11)
     call calc_mu_uv_1( config_flags,muts,muus,muvs,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),&
 &grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1025,46 +1039,15 @@ BENCH_END(exch12)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields re-computed later by runge_kutta_loor...  
  store_runge_kutta_loor: if (config_flags%remove_runge_kutta_loor) then
-BENCH_START(store1)
+BENCH_START(store_runge_kutta_loor_tim)
    if ( rk_step < rk_order ) then
      WRITE(wrf_err_message,*)'DEBUG:  store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
      ! store fields
      CALL select_frame(rk_step, BUF_RK_LOOR)
-     call store_field_lint( ww_m , n3d_elem )
-     call store_field_lint( rv_m , n3d_elem )
-     call store_field_lint( ru_m , n3d_elem )
-     call store_field_lint( a , n3d_elem )
-     call store_field_lint( alpha , n3d_elem )
-     call store_field_lint( gamma , n3d_elem )
-     call store_field_lint( xkmhd , n3d_elem )
-     call store_field_lint( w_2 , n3d_elem )
-     call store_field_lint( w_1 , n3d_elem )
-     call store_field_lint( v_2 , n3d_elem )
-     call store_field_lint( v_1 , n3d_elem )
-     call store_field_lint( u_2 , n3d_elem )
-     call store_field_lint( u_1 , n3d_elem )
-     call store_field_lint( t_tendf , n3d_elem )
-     call store_field_lint( t_2 , n3d_elem )
-     call store_field_lint( t_1 , n3d_elem )
-     call store_field_lint( rw_tendf , n3d_elem )
-     call store_field_lint( rv_tendf , n3d_elem )
-     call store_field_lint( ru_tendf , n3d_elem )
-     call store_field_lint( pm1 , n3d_elem )
-     call store_field_lint( ph_tendf , n3d_elem )
-     call store_field_lint( ph_2 , n3d_elem )
-     call store_field_lint( ph_1 , n3d_elem )
-     call store_field_lint( p , n3d_elem )
-     call store_field_lint( mu_2 , n2d_elem )
-     call store_field_lint( mu_1 , n2d_elem )
-     call store_field_lint( moist_tend(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call store_field_lint( moist_2(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call store_field_lint( moist_1(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call store_field_lint( dnw , kme-kms+1 )
-     call store_field_lint( al , n3d_elem )
-     call store_field_lint( mudf , n2d_elem )
+#include "store_runge_kutta_loor.h"
    endif
-BENCH_END(store1)
+BENCH_END(store_runge_kutta_loor_tim)
  endif store_runge_kutta_loor
 
 end do runge_kutta_looq
@@ -1587,48 +1570,17 @@ BENCH_END(exch25)
   end do runge_kutta_loor
 
  else ! restore_runge_kutta_loor
-BENCH_START(restore1)
+BENCH_START(restore_runge_kutta_loor_tim)
    if (rk_step > 1) then
      WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
      ! restore saved fields
      CALL select_frame(rk_step-1, BUF_RK_LOOR)
-     call restore_field_lint( ww_m , n3d_elem )
-     call restore_field_lint( rv_m , n3d_elem )
-     call restore_field_lint( ru_m , n3d_elem )
-     call restore_field_lint( a , n3d_elem )
-     call restore_field_lint( alpha , n3d_elem )
-     call restore_field_lint( gamma , n3d_elem )
-     call restore_field_lint( xkmhd , n3d_elem )
-     call restore_field_lint( w_2 , n3d_elem )
-     call restore_field_lint( w_1 , n3d_elem )
-     call restore_field_lint( v_2 , n3d_elem )
-     call restore_field_lint( v_1 , n3d_elem )
-     call restore_field_lint( u_2 , n3d_elem )
-     call restore_field_lint( u_1 , n3d_elem )
-     call restore_field_lint( t_tendf , n3d_elem )
-     call restore_field_lint( t_2 , n3d_elem )
-     call restore_field_lint( t_1 , n3d_elem )
-     call restore_field_lint( rw_tendf , n3d_elem )
-     call restore_field_lint( rv_tendf , n3d_elem )
-     call restore_field_lint( ru_tendf , n3d_elem )
-     call restore_field_lint( pm1 , n3d_elem )
-     call restore_field_lint( ph_tendf , n3d_elem )
-     call restore_field_lint( ph_2 , n3d_elem )
-     call restore_field_lint( ph_1 , n3d_elem )
-     call restore_field_lint( p , n3d_elem )
-     call restore_field_lint( mu_2 , n2d_elem )
-     call restore_field_lint( mu_1 , n2d_elem )
-     call restore_field_lint( moist_tend(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call restore_field_lint( moist_2(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call restore_field_lint( moist_1(ims,kms,jms,2) , n3d_elem * ( num_moist - 1 ) )
-     call restore_field_lint( dnw , kme-kms+1 )
-     call restore_field_lint( al , n3d_elem )
-     call restore_field_lint( mudf , n2d_elem )
+#include "restore_runge_kutta_loor.h"
      WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    endif
-BENCH_END(restore1)
+BENCH_END(restore_runge_kutta_loor_tim)
  endif restore_runge_kutta_loor
 
 BENCH_START(exch26)
@@ -1894,6 +1846,18 @@ lineno = __LINE__
 #endif
 BENCH_END(exch28)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by small_stepu loop.  
+ restore_small_stepzq: if (config_flags%remove_small_step) then
+BENCH_START(restore_small_step_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzq:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_SMALL_STEP)
+#include "restore_small_step.inc"
+BENCH_END(restore_small_step_tim)
+ else  ! restore_small_stepzq
+
   small_stepzq: do iteration = 1, number_of_small_timesteps
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzq, iteration = ',iteration
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -1976,6 +1940,9 @@ lineno = __LINE__
 BENCH_END(exch31)
 
   end do small_stepzq
+
+ endif restore_small_stepzq
+
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
 
 BENCH_START(comp36)
@@ -5047,6 +5014,7 @@ end do a_runge_kutta_loop
 
 CALL module_4dvaropt_end
 CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
+BENCH_END(solve_em_ad_tim)
 
 end subroutine solve_em_ad
 

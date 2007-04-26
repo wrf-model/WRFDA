@@ -264,8 +264,12 @@ BENCH_DECL(a_moist_physics_finish_tim)
 BENCH_DECL(a_lscond_tim)
 BENCH_DECL(a_moist_physics_prep_tim)
 
-BENCH_DECL(store1)
-BENCH_DECL(restore1)
+BENCH_DECL(store_runge_kutta_loor_tim)
+BENCH_DECL(restore_runge_kutta_loor_tim)
+BENCH_DECL(store_small_step_tim)
+BENCH_DECL(restore_small_step_tim)
+
+BENCH_DECL(solve_em_ad_tim)
 #else
 #define SOLVE_START
 #define SOLVE_END
