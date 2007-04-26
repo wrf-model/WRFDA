@@ -114,6 +114,18 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       start  = -49.5_r_kind
       nchan=nchan_hirs3
       subfgn='NC021025'
+   else if (hirs4) then 
+      sensor_id    =  0
+      step   = 1.80_r_kind
+      start  = -49.5_r_kind
+      nchan=nchan_hirs4
+      subfgn='NC021028'
+   else if (mhs) then 
+      sensor_id    =  15
+      step   = 10.0_r_kind/9.0_r_kind
+      start  = -445.0_r_kind/9.0_r_kind
+      nchan=nchan_mhs
+      subfgn='NC021027'
    else if (msu) then
       sensor_id    =  1
       step   = 9.474_r_kind

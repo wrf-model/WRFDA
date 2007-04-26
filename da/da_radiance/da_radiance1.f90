@@ -206,6 +206,7 @@ contains
 #include "da_qc_hirs.inc"
 #include "da_qc_airs.inc"
 #include "da_qc_ssmis.inc"
+#include "da_qc_mhs.inc"
 #include "da_write_iv_rad_ascii.inc"
 #include "da_write_oa_rad_ascii.inc"
 #include "da_detsurtyp.inc"

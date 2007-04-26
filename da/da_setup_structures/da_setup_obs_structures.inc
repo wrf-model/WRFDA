@@ -33,7 +33,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
       use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
       use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
-      use_ssmisobs ) then
+      use_ssmisobs .or. use_hirs4obs .or. use_mhsobs) then
       use_rad = .true.
    else
       use_rad = .false.
@@ -71,6 +71,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_qscatobs         = .false.
       use_Hirs2Obs         = .false.
       use_Hirs3Obs         = .false.
+      use_hirs4obs         = .false.
+      use_mhsobs           = .false.
       use_MsuObs           = .false.
       use_AmsuaObs         = .false.
       use_AmsubObs         = .false.
@@ -106,6 +108,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_qscatobs         = .false.
       use_hirs2obs         = .false.
       use_hirs3obs         = .false.
+      use_hirs4obs         = .false.
+      use_mhsobs           = .false.
       use_msuobs           = .false.
       use_amsuaobs         = .false.
       use_amsubobs         = .false.

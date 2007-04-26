@@ -127,6 +127,9 @@ subroutine da_crtm_init(iv,ob)
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'hsb' ) then
       nchanl(n)  = 4
       nscan(n)   = 90
+   else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'mhs' ) then
+      nchanl(n)  = 5
+      nscan(n)   = 90
    else if ( trim( crtm_sensor_name(rtminit_sensor(n))) == 'ssmis' ) then
       nchanl(n)  = 24
       nscan(n)   = 180
@@ -256,6 +259,7 @@ subroutine da_crtm_init(iv,ob)
    if ( index(iv%instid(n)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'ssmis') > 0) cycle   ! not implemented
+   if ( index(iv%instid(n)%rttovid_string,'mhs') > 0)   cycle   ! not implemented
 
   !  new bias coefs files
   !----------------------------------

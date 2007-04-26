@@ -12,7 +12,7 @@ subroutine da_qc_crtm (ob, iv)
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
    integer :: i, nchan
-   logical   :: amsua, amsub, hirs, msu,airs,hsb, ssmis
+   logical   :: amsua, amsub, hirs, msu,airs,hsb, ssmis, mhs
 
    if (trace_use) call da_trace_entry("da_qc_crtm")
 #ifdef CRTM
@@ -29,6 +29,7 @@ subroutine da_qc_crtm (ob, iv)
       airs  = trim(rttov_inst_name(rtminit_sensor(i))) == 'airs'
       hsb   = trim(rttov_inst_name(rtminit_sensor(i))) == 'hsb'
       ssmis = trim(rttov_inst_name(rtminit_sensor(i))) == 'ssmis'
+      mhs   = trim(rttov_inst_name(rtminit_sensor(i))) == 'mhs'
 
       if (hirs) then
          ! 1.0 QC for HIRS
@@ -50,6 +51,9 @@ subroutine da_qc_crtm (ob, iv)
       else if (ssmis) then
          call da_qc_ssmis(i,nchan,ob,iv)
 !         call da_warning(__FILE__,__LINE__,(/'QC Not implemented for SSMIS'/))
+      else if (mhs) then
+         call da_qc_mhs(i,nchan,ob,iv)
+!         call da_warning(__FILE__,__LINE__,(/'QC Not implemented for MHS'/))
       else
          write(unit=message(1),fmt='(A,A)') &
             "Unrecognized instrument",trim(rttov_inst_name(rtminit_sensor(i)))
