@@ -192,15 +192,17 @@ subroutine da_setup_runconstants(xp, xb, xbx)
       xbx%alp_size = (xbx%nj+ 1)*(xbx%max_wavenumber+1)*(xbx%max_wavenumber+2)/4
 
       if (print_detail_spectral) then
-         write(unit=stdout, fmt='(a, i6)') &
-            'inc   =', xbx%inc   , &
-            'ni    =', xbx%ni    , &
-            'nj    =', xbx%nj    , &
-            'lenr  =', xbx%lenr  , &
-            'lensav=', xbx%lensav, &
-            'lenwrk=', xbx%lenwrk, &
-            'max_wavenumber=', xbx%max_wavenumber, &
-            'alp_size      =', xbx%alp_size
+         write (unit=stdout,fmt='(a)') "Spectral transform constants"
+         write (unit=stdout, fmt='(a, i8)') &
+            '   inc            =', xbx%inc   , &
+            '   ni             =', xbx%ni    , &
+            '   nj             =', xbx%nj    , &
+            '   lenr           =', xbx%lenr  , &
+            '   lensav         =', xbx%lensav, &
+            '   lenwrk         =', xbx%lenwrk, &
+            '   max_wavenumber =', xbx%max_wavenumber, &
+            '   alp_size       =', xbx%alp_size
+         write (unit=stdout,fmt='(a)') " "
       end if
 
       allocate(xbx%coslat(1:xbx%nj))

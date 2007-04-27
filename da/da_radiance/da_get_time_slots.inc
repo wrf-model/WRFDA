@@ -41,6 +41,7 @@ subroutine da_get_time_slots(nt,tmin,tana,tmax,time_slots)
 
    if (print_detail_rad) then
       write(unit=stdout,fmt='(3x,a,12f10.0)') 'Time_slots ', time_slots(0:nt)
+      write (unit=stdout,fmt='(A)') " "
    end if
 
    if (trace_use) call da_trace_exit("da_get_time_slots")

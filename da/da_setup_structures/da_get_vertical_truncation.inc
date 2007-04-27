@@ -71,10 +71,11 @@ subroutine da_get_vertical_truncation( max_vert_var, eigenval, be_sub)
 
    end if
 
-   write(unit=stdout,fmt='(3X,A,A6,A3,I3,A1,f7.2,A2)') &
+   write(unit=stdout,fmt='(A,A6,A3,I3,A1,f7.2,A2)') &
       'Vertical truncation for ', name, &
       ' = ', be_sub % mz, '(', &
       max_vert_var, '%)'
+   write (unit=stdout,fmt='(A)') " "
 
    if (trace_use) call da_trace_exit("da_get_vertical_truncation")
                                        

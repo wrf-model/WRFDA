@@ -31,7 +31,7 @@ subroutine da_random_seed
    else                                 ! Random seed set "randomly"
       call random_seed
       call random_seed(get=seed_array(1:seed_size))
-      write(unit=stdout,fmt='(a,10i16)')' Random number seed array = ', seed_array
+      write(unit=stdout,fmt='(a,10i16)') 'Random number seed array = ', seed_array
    end if
    
    deallocate(seed_array)

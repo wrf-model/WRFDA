@@ -39,14 +39,15 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
    cum_variance = 0.0
    tot_variance = sum(be_eigenval(1:kz))
 
-   write(unit=stdout,fmt='(A)')' Name Mode  Eigenvalue Normalised Variance'
+   write(unit=stdout,fmt='(A)') 'Name Mode  Eigenvalue Normalised Variance'
    do k = 1, kz
       cum_variance =  be_eigenval(k) + cum_variance
       write(unit=stdout,fmt='(A,I4,e14.4,f10.4)') &
          trim(name), k, be_eigenval(k), cum_variance / tot_variance
    end do
    write(unit=stdout,fmt=*) ' '
-   write(unit=stdout,fmt='(A,e13.5)')' Total variance = Tr(Bv) = ', tot_variance
+   write(unit=stdout,fmt='(A,e13.5)') 'Total variance = Tr(Bv) = ', tot_variance
+   write(unit=stdout,fmt=*) ' '
 
    !--------------------------------------------------------------------------
    ! [2.0]: Test global eigenvectors:
@@ -54,13 +55,13 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
 
    ! [2.1] Print out global eigenvectors:
 
-   write(unit=stdout,fmt='(3A)') ' da_check_eof_decomposition:', &
-                   ' Domain eigenvectors for ', trim(name)
+   write(unit=stdout,fmt='(2A)') 'Domain eigenvectors for ', trim(name)
 
    write(unit=stdout,fmt='(50i13)')(m, m=1,kz)
    do k = 1, kz      
       write(unit=stdout,fmt='(I3,50e13.5)')k, (be_eigenvec(k,m), m=1,kz)
    end do
+   write(unit=stdout,fmt='(A)') " "
 
    ! [2.2]: Test eigenvector orthogonality: sum_k (e_m(k) e_n(k)) = delta_mn:
 
@@ -68,7 +69,7 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
    allocate(matrix2(1:kz,1:kz))
       
    write(unit=stdout,fmt='(2A)') &
-      ' Eigenvector orthogonality check for ', trim(name)
+      'Eigenvector orthogonality check for ', trim(name)
    write(unit=stdout,fmt='(A)')' Mode     Diagonal         Maximum off-diagonal'
    do k1 = 1, kz
       do k2 = 1, kz
@@ -86,7 +87,7 @@ subroutine da_check_eof_decomposition(be_eigenval, be_eigenvec, name)
    ! [2.3] Test eigenvectors completeness - sum_m (e_m(k1) e_m(k2)) = delta_k1k2
 
    write(unit=stdout,fmt='(2A)') &
-      ' Eigenvector completeness check for ', trim(name)
+      'Eigenvector completeness check for ', trim(name)
    write(unit=stdout,fmt='(A)')' Level    Diagonal         Maximum off-diagonal'
    do k1 = 1, kz
       do k2 = 1, kz

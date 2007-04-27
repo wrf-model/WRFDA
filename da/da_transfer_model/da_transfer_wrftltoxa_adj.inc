@@ -167,7 +167,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
       do j=js,je
          do i=is,ie
             grid%xa%p(i,j,k)=grid%xa%p(i,j,k)+grid%xb%t(i,j,k)*kappa*grid%xa%t(i,j,k)/grid%xb%p(i,j,k)
-            grid%em_g_t_2(i,j,k)=grid%em_g_t_2(i,j,k)+grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(300.0+grid%em_t_2(i,j,k))
+            grid%em_g_t_2(i,j,k)=grid%em_g_t_2(i,j,k)+grid%xb%t(i,j,k)*grid%xa%t(i,j,k)/(ts0+grid%em_t_2(i,j,k))
          end do
       end do
    end do

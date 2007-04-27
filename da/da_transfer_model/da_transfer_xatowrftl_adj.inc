@@ -182,8 +182,8 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie 
-            grid%xa%p(i,j,k)=grid%xa%p(i,j,k)-(300.0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
-            grid%xa%t(i,j,k)=grid%xa%t(i,j,k)+(300.0+grid%em_t_2(i,j,k))*grid%em_a_t_2(i,j,k)/grid%xb%t(i,j,k)
+            grid%xa%p(i,j,k)=grid%xa%p(i,j,k)-(ts0+grid%em_t_2(i,j,k))*kappa*grid%em_a_t_2(i,j,k)/grid%xb%p(i,j,k)
+            grid%xa%t(i,j,k)=grid%xa%t(i,j,k)+(ts0+grid%em_t_2(i,j,k))*grid%em_a_t_2(i,j,k)/grid%xb%t(i,j,k)
          end do
       end do
    end do

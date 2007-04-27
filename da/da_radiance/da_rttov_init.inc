@@ -275,7 +275,7 @@ subroutine da_rttov_init(iv,ob)
       !---------------------------------------------------
 
       nprofiles = 1
-      write(unit=message(1),fmt='(3x,2a,2x,a,i5,2x,a,i5)') "   ", &
+      write(unit=message(1),fmt='(2a,2x,a,i5,2x,a,i5)') "   ", &
          iv%instid(i)%rttovid_string, 'nchan=',nchan(i), 'nscan=',nscan(i)
 
       call rttov_setupchan(nprofiles, nchan(i), coefs(i), &    ! in
@@ -294,7 +294,7 @@ subroutine da_rttov_init(iv,ob)
                      emissivity  )
 
       write (unit=message(2),fmt=*) &
-          '   nprofiles = ', nprofiles, &
+          '  nprofiles = ', nprofiles, &
           'nchan = ', nchan(i), &
           'nfrequencies = ', nfrequencies, &
           'nchannels    = ', nchannels, &

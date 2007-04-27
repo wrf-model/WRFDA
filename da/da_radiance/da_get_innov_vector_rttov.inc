@@ -586,8 +586,6 @@ end do
 
    if (biasprep) then
       do inst = 1, iv%num_inst
-         write(unit=stdout,fmt='(A,A)') 'Preparing bias statistics files for ', &
-            trim(iv%instid(inst)%rttovid_string)
          call da_biasprep(inst,ob,iv)
       end do
    end if

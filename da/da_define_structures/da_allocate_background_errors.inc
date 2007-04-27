@@ -59,8 +59,8 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
          end if
  
          if (print_detail_be) then
-            write(unit=stdout,fmt='(/A,A)')' j*k Eigenvalues for ', be_sub % name
-            call da_array_print(2, be_sub % val(1:jy,1:mz), 'j*k Eigenvalues')
+            write(unit=message(1),fmt='(A,A)') 'j*k Eigenvalues for ', be_sub % name
+            call da_array_print(2, be_sub % val(1:jy,1:mz), message(1))
          end if
 
          !----------------------------------------------------------------------- 
@@ -80,13 +80,11 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
          end if
          
          if (print_detail_be) then      
-            write(unit=stdout,fmt='(/A,A)')' k*k Eigenvectors for j = 1', be_sub % name
-            call da_array_print (2, be_sub % evec(1,1:kz,1:mz), &
-                                 'Eigenvectors for j=1')
+            write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = 1 ', be_sub % name
+            call da_array_print (2, be_sub % evec(1,1:kz,1:mz), message(1))
          
-            write(unit=stdout,fmt='(/A,A)')' k*k Eigenvectors for j = jy', be_sub % name
-            call da_array_print (2, be_sub % evec(jy,1:kz,1:mz), &
-                                 'Eigenvectors for j=jy')
+            write(unit=message(1),fmt='(A,A)') 'k*k Eigenvectors for j = jy ', be_sub % name
+            call da_array_print (2, be_sub % evec(jy,1:kz,1:mz), message(1))
          end if
 
          allocate (be_sub%val_g(1:mz))

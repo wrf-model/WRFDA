@@ -56,9 +56,7 @@ subroutine da_write_noise_to_ob (iv)
          if (iv%metar(n)%loc%proc_domain) num_obs = num_obs + 1
       end do
    end if
-   print*,' got Total metar num_obs = ',num_obs
    call da_proc_sum_int(num_obs)
-   print*,' got Total metar num_obs = ',num_obs
    if (num_obs > 0 .and. rootproc) then
    print*,' Now writing on rand_unit ',rand_unit
       write(rand_unit,'(a20,20i8)')'metar', num_obs  

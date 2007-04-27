@@ -182,7 +182,7 @@ subroutine da_setup_be_global (be)
    end do
 
    be % v1 % max_wave = maxval(max_wave(1:nk))
-   write (unit=stdout,fmt='(/4x,3a,i6)') &
+   write (unit=stdout,fmt='(/3x,3a,i6)') &
       'Horizontal truncation for ', be % v1 % name, ' = ', be % v1 % max_wave
    allocate (be % v1 % power(0:be % v1 % max_wave,1:nk))
    be % v1 % power(0:be % v1 % max_wave,1:nk) = power2d(0:be % v1 % max_wave,1:nk)
@@ -201,7 +201,7 @@ subroutine da_setup_be_global (be)
    end do
 
    be % v2 % max_wave = maxval(max_wave(1:nk))
-   write (unit=stdout,fmt='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(3x,3a,i6)') &
       'Horizontal truncation for ', be % v2 % name, ' = ', be % v2 % max_wave
    allocate (be % v2 % power(0:be % v2 % max_wave,1:nk))
    be % v2 % power(0:be % v2 % max_wave,1:nk) = power2d(0:be % v2 % max_wave,1:nk)
@@ -220,7 +220,7 @@ subroutine da_setup_be_global (be)
    end do
 
    be % v3 % max_wave = maxval(max_wave(1:nk))
-   write(unit=stdout,fmt='(4x,3a,i6)') &
+   write(unit=stdout,fmt='(3x,3a,i6)') &
       'Horizontal truncation for ', be % v3 % name, ' = ', be % v3 % max_wave
    allocate (be % v3 % power(0:be % v3 % max_wave,1:nk))
    be % v3 % power(0:be % v3 % max_wave,1:nk) = power2d(0:be % v3 % max_wave,1:nk)
@@ -239,7 +239,7 @@ subroutine da_setup_be_global (be)
    end do
 
    be % v4 % max_wave = maxval(max_wave(1:nk))
-   write (unit=stdout,fmt='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(3x,3a,i6)') &
       'Horizontal truncation for ', be % v4 % name, ' = ', be % v4 % max_wave
    allocate (be % v4 % power(0:be % v4 % max_wave,1:nk))
    be % v4 % power(0:be % v4 % max_wave,1:nk) = power2d(0:be % v4 % max_wave,1:nk)
@@ -258,7 +258,7 @@ subroutine da_setup_be_global (be)
    call da_truncate_spectra (be % max_wave, max_wave_in, power_truncation, &
                              power, be % v5 % max_wave)
 
-   write (unit=stdout,fmt='(4x,3a,i6)') &
+   write (unit=stdout,fmt='(3x,3a,i6)') &
       'Horizontal truncation for ', be % v5 % name, ' = ', be % v5 % max_wave
    allocate (be % v5 % power(0:be % v5 % max_wave,1))
    be % v5 % power(0:be % v5 % max_wave,1) = power(0:be % v5 % max_wave)
@@ -290,7 +290,7 @@ subroutine da_setup_be_global (be)
       be % alpha % name = 'alpha'
       be % alpha % max_wave = alpha_truncation
       if (print_detail_be) then
-         write(unit=stdout,fmt='(4x,3a,i6)') &
+         write(unit=stdout,fmt='(3x,3a,i6)') &
             'Horizontal truncation for ', be % alpha % name, ' = ', &
             be % alpha % max_wave
       end if
@@ -304,6 +304,8 @@ subroutine da_setup_be_global (be)
    end if
 
    deallocate (max_wave)
+
+   write (unit=stdout,fmt='(A)') " "
 
    close (be_unit)
    call da_free_unit(be_unit)

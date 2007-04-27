@@ -66,7 +66,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    ptop = grid%p_top
 
-   ts0  = 300.0       ! Base potential temperature for all levels.
    ptop = grid%p_top
    ps0 = grid%base_pres  
    tis0 = grid%base_temp  ! MSLP reference temperature

@@ -153,7 +153,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
 
    if (rootproc) then
       call da_get_unit(anl_inc_unit)
-      open(unit=anl_inc_unit, file='ANALYSIS_INCREMENT', form='unformatted')
+      open(unit=anl_inc_unit, file='analysis_increment', form='unformatted')
 
       write (unit=anl_inc_unit) ANALYSIS_DATE
 
@@ -180,7 +180,8 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
       write (unit=anl_inc_unit) psac_global, tgrn_global, terr_global, &
          snow_global, lat_global, lon_global, lanu_global, map_factor_global, &
          cori_global, landmask_global
-
+      close(anl_inc_unit)
+      call da_free_unit(anl_inc_unit)
 #else
 
       ! 3d- and 2d-increments:

@@ -421,17 +421,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! Sea level pressure and total precipitable water
    !---------------------------------------------------------------------------
 
-   if (print_detail_xb) then
-     write(unit=stdout, fmt='(3a, i8)') &
-          'file:', __FILE__, ', line:', __LINE__
-
-     write(unit=stdout, fmt='(a)') &
-          'Sea level pressure and total precipitable water'
-   end if
-
    !---------------------------------------------------------------------------
-   !  Syed RH Rizvi
-   ! 
    ! Following code for calculating roughness length needs to be activated  
    ! for calculating roughness length if sea level pressure is desired
    !---------------------------------------------------------------------------
@@ -440,21 +430,12 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 
    call da_integrat_dz(grid%xb)
    !---------------------------------------------------------------------------
-   !  Syed RH Rizvi
-   ! 
    ! Following code for calculating roughness length needs to be activated  
    ! for surface wind speed for SFC_ASSIM_OPTIONS = 2 
    ! 
    ! It is not working because KMA terrain height output from wave to grid 
    ! transform is negative at many grid points
    !---------------------------------------------------------------------------
-
-   ! if (print_detail_xb) then
-   !    write(unit=stdout, fmt='(3a, i8)') &
-   !       'file:', __FILE__, ', line:', __LINE__ 
-   !   write(unit=stdout, fmt='(a)') &
-   !      'Surface Wind speed'
-   ! end if
 
    ! tmpvar = log(10.0/0.0001)
    ! do j=js,je
@@ -472,19 +453,9 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! end do
 
    !---------------------------------------------------------------------------
-   !  Syed RH Rizvi
-   ! 
    ! Following code for calculating roughness length needs to be activated  
    ! if SSMI brightness temperature are used
    !---------------------------------------------------------------------------
-
-   ! if (print_detail_xb) then
-   !    write(unit=stdout, fmt='(3a, i8)') &
-   !       'file:', __FILE__, ', line:', __LINE__
-
-   !   write(unit=stdout, fmt='(a)') &
-   !      'Brightness temperature'
-   ! end if
 
    ! call da_transform_xtotb(xa)
 
@@ -520,8 +491,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
       call wrf_dm_sum_reals (loc_latc_mean, xbx % latc_mean)
    end if
 
-   write(unit=stdout,fmt=*) 'js je is ie= ', js,je,is,ie
-
+   ! WHY
    !  do j=js,je
    !    do i=is,ie
    !       write(unit=stdout,fmt='(2i4,3f12.2,e12.4,2f12.2)') &

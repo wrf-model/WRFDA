@@ -24,6 +24,8 @@ subroutine da_get_unit(unit)
       call da_error(__FILE__,__LINE__,(/"No free units"/))
    end if
 
+write (0,*) unit,"allocated"
+
 end subroutine da_get_unit
 
 

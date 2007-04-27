@@ -22,14 +22,14 @@ subroutine da_array_print(direction, a, ch)
 
    ! Writes the scalar field a
 
-   write(unit=stdout,fmt='(A)') ch
+   write(unit=stdout,fmt='(A)') trim(ch)
 
    amax = MAXVAL(abs(a))
    write(unit=stdout, fmt='(a, 1pe15.8, 4i8)') &
-        'max(a)=', amax, shape(a)
+        '   max(a)=', amax, shape(a)
 
    write(unit=stdout,fmt='(a, 1pe15.8, a)') &
-        'max(a)=', amax, ', i down, j horiz.'
+        '   max(a)=', amax, ', i down, j horiz.'
 
    write(unit=stdout,fmt='(6x,288i3)') (i,i=1,len2)
 
@@ -51,6 +51,8 @@ subroutine da_array_print(direction, a, ch)
             j, (inT(a(j,i)/amax*99.),i=1,len2)
       end do
    end if
+
+   write (unit=stdout,fmt='(A)') " "
 
 end subroutine da_array_print
 
