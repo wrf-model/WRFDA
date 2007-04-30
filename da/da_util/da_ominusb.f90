@@ -311,7 +311,8 @@ subroutine da_obs_stats( num_times, obs )
          obs % mean_ominusb(n) = sum_station / real(nobs_station)
       end if
    end do
-   
+
+  
    ! Calculate basic statistics:
    if ( nobs > 0 ) then
       obs % mean_omb = sumobs1 / real(nobs)
@@ -322,7 +323,13 @@ subroutine da_obs_stats( num_times, obs )
    ! Get data distribution:
    max_bin = 5.0 * obs % stdv_omb
    min_bin = -max_bin
-   bin_width = 2.0 * max_bin / real(num_bins)
+   if (nobs > 1) then
+      bin_width = 2.0 * max_bin / real(num_bins)
+   else
+      write (0,*) "Cannot work with a single observation"
+      stop
+   end if
+         
    bin_count(:) = 0   
    do b = 1, num_bins
       bin_start(b) = min_bin + real(b-1) * bin_width
@@ -333,12 +340,14 @@ subroutine da_obs_stats( num_times, obs )
          omb = obs % data(n) % ominusb(times)
      
          if ( obs % data(n) % qcflag(times) >= obs_qc_pointer ) then
+
            b = int( (omb-min_bin) / bin_width) + 1
+
            if (b >= 1 .and. b <= num_bins) bin_count(b) = bin_count(b) + 1
          end if
       end do
    end do
-   
+  
    maxcount = maxval(bin_count(:))
    ! write(0,'(a,i8)')' Max count = ', maxcount
    ! write(0,'(a)')' Bin      x=O-B   z=(x-xm)/sd     Count   exp(-0.5*z*z)'
@@ -540,8 +549,6 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs, obs_er
 
    ! Print out covariance data:
 
-   if (bin_pass(b)) &
-      write(0,'(a)')' Bin  NumObs  Separation(km) Covariance      CovErr        GaussFit'
    gaussian = 0.0
    do b = 1, num_bins
       if (bin_pass(b)) &

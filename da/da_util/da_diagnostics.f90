@@ -194,7 +194,7 @@ program da_diagnostics
 !  [1.0] Count total number of observations and allocate arrays:
 !--------------------------------------------------------------------------
 
-   filename = 'da_diagnostics.in'
+   filename = 'diagnostics.in'
    open( y_unit, file = filename, status = 'unknown' )
 
    call da_count_obs( y_unit, ob )
@@ -228,11 +228,11 @@ program da_diagnostics
    end if
 
    if ( ob % num_sonde_sfc > 0 ) then
-      call da_calc_stats( 'sondsfc u', ob % num_sonde_sfc, ob % sonde_sfc % u )
-      call da_calc_stats( 'sondsfc v', ob % num_sonde_sfc, ob % sonde_sfc % v )
-      call da_calc_stats( 'sondsfc t', ob % num_sonde_sfc, ob % sonde_sfc % t )
-      call da_calc_stats( 'sondsfc p', ob % num_sonde_sfc, ob % sonde_sfc % p )
-      call da_calc_stats( 'sondsfc q', ob % num_sonde_sfc, ob % sonde_sfc % q )
+      call da_calc_stats( 'sonde_sfc u', ob % num_sonde_sfc, ob % sonde_sfc % u )
+      call da_calc_stats( 'sonde_sfc v', ob % num_sonde_sfc, ob % sonde_sfc % v )
+      call da_calc_stats( 'sonde_sfc t', ob % num_sonde_sfc, ob % sonde_sfc % t )
+      call da_calc_stats( 'sonde_sfc p', ob % num_sonde_sfc, ob % sonde_sfc % p )
+      call da_calc_stats( 'sonde_sfc q', ob % num_sonde_sfc, ob % sonde_sfc % q )
       write(6,*)
    end if
    
@@ -300,10 +300,10 @@ program da_diagnostics
 !--------------------------------------------------------------------------
 !  [4.1] Sonde O-B:
  if ( ob % num_sound > 0 ) then
-   open( unit1, file = 'soundu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'soundv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'soundt_omb.dat', status = 'unknown' )
-   open( unit4, file = 'soundq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'sound_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'sound_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'sound_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'sound_q_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_sound
       do k = 1, ob % sound(n) % numlevs
@@ -331,11 +331,11 @@ program da_diagnostics
 !  [4.2] Synop O-B:
    if ( ob % num_synop  > 0 ) then
 
-   open( unit1, file = 'synopu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'synopv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'synopt_omb.dat', status = 'unknown' )
-   open( unit4, file = 'synopp_omb.dat', status = 'unknown' )
-   open( unit5, file = 'synopq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'synop_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'synop_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'synop_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'synop_p_omb.dat', status = 'unknown' )
+   open( unit5, file = 'synop_q_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_synop
@@ -363,11 +363,11 @@ program da_diagnostics
 !  [4.3] Metar O-B:
  if ( ob % num_metar  > 0 ) then
 
-   open( unit1, file = 'metaru_omb.dat', status = 'unknown' )
-   open( unit2, file = 'metarv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'metart_omb.dat', status = 'unknown' )
-   open( unit4, file = 'metarp_omb.dat', status = 'unknown' )
-   open( unit5, file = 'metarq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'metar_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'metar_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'metar_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'metar_p_omb.dat', status = 'unknown' )
+   open( unit5, file = 'metar_q_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_metar
@@ -394,8 +394,8 @@ program da_diagnostics
  end if
 !  [4.4] Polar AMV O-B:
  if ( ob % num_polaramv  > 0 ) then
-   open( unit1, file = 'polaramvu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'polaramvv_omb.dat', status = 'unknown' )
+   open( unit1, file = 'polaramv_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'polaramv_v_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_polaramv
@@ -414,7 +414,7 @@ program da_diagnostics
 !  [4.5] Geo AMV O-B:
  if ( ob % num_geoamv  > 0 ) then
 
-   open( unit1, file = 'geoamvu_omb.dat', status = 'unknown' )
+   open( unit1, file = 'geoamv_u_omb.dat', status = 'unknown' )
    open( unit2, file = 'geoamvv_omb.dat', status = 'unknown' )
 
    current_time = 1
@@ -435,11 +435,11 @@ program da_diagnostics
 !  [4.6] Buoy  O-B:
 
  if ( ob % num_buoy > 0 ) then
-   open( unit1, file = 'buoyu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'buoyv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'buoyt_omb.dat', status = 'unknown' )
-   open( unit4, file = 'buoyp_omb.dat', status = 'unknown' )
-   open( unit5, file = 'buoyq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'buoy_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'buoy_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'buoy_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'buoy_p_omb.dat', status = 'unknown' )
+   open( unit5, file = 'buoy_q_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_buoy
@@ -468,11 +468,11 @@ program da_diagnostics
 !  [4.7] sonde_sfc  O-B:
 
  if ( ob % num_sonde_sfc > 0 ) then
-   open( unit1, file = 'sondsfcu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'sondsfcv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'sondsfct_omb.dat', status = 'unknown' )
-   open( unit4, file = 'sondsfcp_omb.dat', status = 'unknown' )
-   open( unit5, file = 'sondsfcq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'sonde_sfc_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'sonde_sfc_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'sonde_sfc_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'sonde_sfc_p_omb.dat', status = 'unknown' )
+   open( unit5, file = 'sonde_sfc_q_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_sonde_sfc
@@ -499,8 +499,8 @@ program da_diagnostics
  end if
 !  [4.8] Profiler  O-B:
  if ( ob % num_profiler  > 0 ) then
-   open( unit1, file = 'profileru_omb.dat', status = 'unknown' )
-   open( unit2, file = 'profilerv_omb.dat', status = 'unknown' )
+   open( unit1, file = 'profiler_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'profiler_v_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_profiler
@@ -520,8 +520,8 @@ program da_diagnostics
  end if
 !  [4.9] AIRS retrievals  O-B:
  if ( ob % num_airsret > 0 ) then
-   open( unit1, file = 'airsrt_omb.dat', status = 'unknown' )
-   open( unit2, file = 'airsrq_omb.dat', status = 'unknown' )
+   open( unit1, file = 'airsr_t_omb.dat', status = 'unknown' )
+   open( unit2, file = 'airsr_q_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_airsret
       do k = 1, ob % airsr(n) % numlevs
@@ -541,8 +541,8 @@ program da_diagnostics
  end if
 !  [4.10] Pilot  O-B:
  if ( ob % num_pilot  > 0 ) then
-   open( unit1, file = 'pilotu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'pilotv_omb.dat', status = 'unknown' )
+   open( unit1, file = 'pilot_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'pilot_v_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_pilot
@@ -563,11 +563,11 @@ program da_diagnostics
 !--------------------------------------------------------------------------
 !  [4.11] For Bogus O-B:
  if ( ob % num_bogus > 0 ) then
-   open( unit1, file = 'bogusu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'bogusv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'bogust_omb.dat', status = 'unknown' )
-   open( unit4, file = 'bogusq_omb.dat', status = 'unknown' )
-   open( unit5, file = 'bogusslp_omb.dat', status = 'unknown' )
+   open( unit1, file = 'bogus_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'bogus_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'bogus_t_omb.dat', status = 'unknown' )
+   open( unit4, file = 'bogus_q_omb.dat', status = 'unknown' )
+   open( unit5, file = 'bogus_slp_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_bogus
       do k = 1, ob % bogus(n) % numlevs
@@ -598,9 +598,9 @@ program da_diagnostics
 !--------------------------------------------------------------------------
 !  [4.11] For Airep O-B:
  if ( ob % num_airep > 0 ) then
-   open( unit1, file = 'airepu_omb.dat', status = 'unknown' )
-   open( unit2, file = 'airepv_omb.dat', status = 'unknown' )
-   open( unit3, file = 'airept_omb.dat', status = 'unknown' )
+   open( unit1, file = 'airep_u_omb.dat', status = 'unknown' )
+   open( unit2, file = 'airep_v_omb.dat', status = 'unknown' )
+   open( unit3, file = 'airep_t_omb.dat', status = 'unknown' )
    current_time = 1
    do n = 1, ob % num_airep
       do k = 1, ob % airep(n) % numlevs
@@ -623,7 +623,7 @@ program da_diagnostics
  end if
 !  [4.12] gpsref    O-B:
  if ( ob % num_gpsref  > 0 ) then
-   open( unit1, file = 'gpsrefref_omb.dat', status = 'unknown' )
+   open( unit1, file = 'gpsref_ref_omb.dat', status = 'unknown' )
 
    current_time = 1
    do n = 1, ob % num_gpsref   
@@ -641,7 +641,7 @@ program da_diagnostics
 
 !  [4.13] Gpspw O-B:
    if ( ob % num_gpspw > 0 ) then
-      open( unit1, file = 'gpspwtpw_omb.dat', status = 'unknown' )
+      open( unit1, file = 'gpspw_tpw_omb.dat', status = 'unknown' )
 
       current_time = 1
       do n = 1, ob % num_gpspw
