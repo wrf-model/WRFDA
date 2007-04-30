@@ -73,6 +73,7 @@ BENCH_INIT(exch68)
 BENCH_INIT(exch69)
 BENCH_INIT(exch70)
 BENCH_INIT(exch71)
+BENCH_INIT(exch71b)
 BENCH_INIT(exch72)
 BENCH_INIT(exch73)
 BENCH_INIT(exch74)
@@ -254,7 +255,5 @@ BENCH_INIT(store_runge_kutta_loor_tim)
 BENCH_INIT(restore_runge_kutta_loor_tim)
 BENCH_INIT(store_small_step_tim)
 BENCH_INIT(restore_small_step_tim)
-
-BENCH_INIT(solve_em_ad_tim)
 
 SOLVE_START

@@ -87,6 +87,7 @@ BENCH_DECL(exch68)
 BENCH_DECL(exch69)
 BENCH_DECL(exch70)
 BENCH_DECL(exch71)
+BENCH_DECL(exch71b)
 BENCH_DECL(exch72)
 BENCH_DECL(exch73)
 BENCH_DECL(exch74)
@@ -269,7 +270,6 @@ BENCH_DECL(restore_runge_kutta_loor_tim)
 BENCH_DECL(store_small_step_tim)
 BENCH_DECL(restore_small_step_tim)
 
-BENCH_DECL(solve_em_ad_tim)
 #else
 #define SOLVE_START
 #define SOLVE_END

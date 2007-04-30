@@ -383,7 +383,6 @@ real moist_tendz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num
 
 #include <bench_solve_em_a_init.h>
 
-BENCH_START(solve_em_ad_tim)
 CALL wrf_debug ( 10 , 'DEBUG:  begin solve_em_ad()' )
 CALL module_4dvaropt_start
 
@@ -815,7 +814,6 @@ BENCH_END(exch6)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepu, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp7)
 BENCH_START(comp7771)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -823,6 +821,7 @@ BENCH_START(comp7771)
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7771)
+BENCH_START(comp7)
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
 &w_b,mu_b,u_bt,v_bt,ph_bt,t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,&
@@ -1343,7 +1342,6 @@ BENCH_END(exch18)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzt, rk_step1 = ',rk_step1
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp20)
 BENCH_START(comp7772)
       call rk_tendency( config_flags,rk_step1,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,&
@@ -1351,6 +1349,7 @@ BENCH_START(comp7772)
 &e,sina,cosa,fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,&
 &jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7772)
+BENCH_START(comp20)
 
       if ((config_flags%specified .or. config_flags%nested) .and. rk_step1 .eq. 1) then
         call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
@@ -1797,7 +1796,6 @@ lineno = __LINE__
 BENCH_END(exch27)
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzq, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp32)
 
 BENCH_START(comp7773)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
@@ -1807,6 +1805,7 @@ BENCH_START(comp7773)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7773)
 !  end do
+BENCH_START(comp32)
 
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
@@ -2253,7 +2252,6 @@ BENCH_END(exch38)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzw, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp43)
 BENCH_START(comp7774)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -2262,6 +2260,7 @@ BENCH_START(comp7774)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7774)
 
+BENCH_START(comp43)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
 
@@ -2302,6 +2301,18 @@ BENCH_END(exch39)
 
 !------------------------------
 !------------------------------
+
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by small_stepu loop.  
+ restore_small_stepzw: if (config_flags%remove_small_step) then
+BENCH_START(restore_small_step_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzw:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_SMALL_STEP)
+#include "restore_small_step.h"
+BENCH_END(restore_small_step_tim)
+ else  ! restore_small_stepzw
 
   small_stepzw: do iteration = 1, number_of_small_timesteps
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzw, iteration = ',iteration
@@ -2382,6 +2393,9 @@ lineno = __LINE__
 BENCH_END(exch42)
 
   end do small_stepzw
+
+ endif restore_small_stepzw
+
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
 
 BENCH_START(exch43)
@@ -2882,7 +2896,6 @@ BENCH_END(exch52)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzz, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp57)
 BENCH_START(comp7775)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -2891,6 +2904,7 @@ BENCH_START(comp7775)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7775)
 
+BENCH_START(comp57)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
 
@@ -2936,6 +2950,18 @@ BENCH_END(exch53)
 
 !------------------------------
 !------------------------------
+
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by small_stepu loop.  
+ restore_small_stepzz: if (config_flags%remove_small_step) then
+BENCH_START(restore_small_step_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzz:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_SMALL_STEP)
+#include "restore_small_step.h"
+BENCH_END(restore_small_step_tim)
+ else  ! restore_small_stepzz
 
   small_stepzz: do iteration = 1, number_of_small_timesteps
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepzz, iteration = ',iteration
@@ -3022,6 +3048,8 @@ lineno = __LINE__
 BENCH_END(exch56)
 
   end do small_stepzz
+
+ endif restore_small_stepzz
 
 !------------------------------------------------------
 
@@ -3280,7 +3308,6 @@ BENCH_END(exch64)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzr, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp70)
 BENCH_START(comp7776)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -3289,6 +3316,7 @@ BENCH_START(comp7776)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7776)
 
+BENCH_START(comp70)
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
 &w_b,mu_b,u_bt,v_bt,ph_bt,t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,&
@@ -3464,6 +3492,7 @@ BENCH_START(exch71)
 lineno = __LINE__
 #       include "HALO_2802.inc"
 #endif
+BENCH_END(exch71)
 BENCH_START(comp76)
 #ifndef FAST_CPY
 wwr(:,:,:) = ww(:,:,:)
@@ -3476,11 +3505,12 @@ v_2r(:,:,:) = v_2(:,:,:)
 #endif
 BENCH_END(comp76)
 
+BENCH_START(exch71b)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2810.inc"
 #endif
-BENCH_END(exch71)
+BENCH_END(exch71b)
 
 BENCH_START(comp77)
       call advance_mu_t( ww,ww1,u_2,u_save,v_2,v_save,mu_2,mut,muave,muts,muu,muv,mudf,ru_m,rv_m,ww_m,t_2,t_save,t_2save,t_tend,&
@@ -4064,7 +4094,6 @@ BENCH_END(exch87)
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_calc_coef_w, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
-BENCH_START(comp93)
 BENCH_START(comp7777)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -4073,6 +4102,7 @@ BENCH_START(comp7777)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7777)
 
+BENCH_START(comp93)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
 ! endf,rw_tend,rw_tendf,t_save,t_tend,t_tendf,u_save,v_save,w_save
 
@@ -4463,13 +4493,11 @@ BENCH_END(exch97)
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp103)
-BENCH_START(comp7778)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
 &fnm,fnp,rdn,rdnw,dt,rdx,rdy,khdif,kvdif,xkmhd,cf1,cf2,cf3,cfn,cfn1,num_3d_m,non_hydrostatic,leapfrog,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
-BENCH_END(comp7778)
 BENCH_END(comp103)
 
 !------------------------------
@@ -5014,7 +5042,6 @@ end do a_runge_kutta_loop
 
 CALL module_4dvaropt_end
 CALL wrf_debug ( 10 , 'DEBUG:  end solve_em_ad()' )
-BENCH_END(solve_em_ad_tim)
 
 end subroutine solve_em_ad
 
