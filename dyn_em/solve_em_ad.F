@@ -945,7 +945,7 @@ BENCH_START(store_small_step_tim)
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
-#include "store_small_step.inc"
+#include "store_small_step.h"
 BENCH_END(store_small_step_tim)
  endif store_small_step
 
@@ -1854,7 +1854,7 @@ BENCH_START(restore_small_step_tim)
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
-#include "restore_small_step.inc"
+#include "restore_small_step.h"
 BENCH_END(restore_small_step_tim)
  else  ! restore_small_stepzq
 

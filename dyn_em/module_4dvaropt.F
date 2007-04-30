@@ -79,6 +79,10 @@
           current_frame = frame_id
           current_buffer = buffer_id
           read_field_ids(current_frame, current_buffer) = 1
+          WRITE(msg,'(A,I10,A,I10)') &
+            'select_frame:   current_frame, current_buffer = ', &
+            current_frame, " , ", current_buffer
+          CALL wrf_debug( 10, TRIM(msg) )
           RETURN
         END SUBROUTINE select_frame
 

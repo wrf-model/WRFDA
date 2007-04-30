@@ -132,6 +132,7 @@ export NL_CHECK_MAX_IV=true
 # TBH:  Hacking in new namelist settings here.
 # TBH:  "REMOVE_*" namelist variables are .FALSE. by default
 export NL_REMOVE_RUNGE_KUTTA_LOOR=true
+export NL_REMOVE_SMALL_STEP=true
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
