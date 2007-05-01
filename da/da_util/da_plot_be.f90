@@ -1,4 +1,4 @@
-program da_plot_gen_be
+program da_plot_be
 !--------------------------------------------------------------------------!
 ! Purpose: 1) Compute ratio of chi_b, temp_b and ps_b explained by psi to  !
 !             its full fields, and plot the global and local figures of    !
@@ -8,8 +8,7 @@ program da_plot_gen_be
 !             rh.                                                          !
 !          3) Plot the scale-lengths for psi, chi_u, t_u, rh, and ps_u.    !
 !                                                                          !  
-! Note: this program is working for gen_be.NMC.dat and gen_be.ENS.dat for  !
-!       for cv_options=5.                                                  !
+! Note: this program is working for be.dat for NMC and ENS, cv_options=5.  !
 !                                                                          !
 ! History:                                                                 !
 !   06/09/2005   Original developer.                     Yong-Run Guo      ! 
@@ -62,7 +61,7 @@ program da_plot_gen_be
    character(len=120)        :: main_title2
    character(len=  3)        :: be_method        ! Be method ('NMC', or 'ENS')
    character(len=  8)        :: uh_method        ! Uh_method (power, scale)
-   character(len= 80)        :: gen_be_dir
+   character(len= 80)        :: be_dir
    character(len=  8)        :: code_version
    integer                   :: stride           ! in s-N direction
    integer                   :: interval         ! file interval
@@ -73,7 +72,7 @@ program da_plot_gen_be
    namelist /plot_title/start_date, end_date, interval, &
                         main_title1, main_title2,       &
                         Resolution_km, stride, ne,      &
-                        be_method, Uh_method, gen_be_dir, &
+                        be_method, Uh_method, be_dir, &
                         code_version, domain_averaged
 
 ! working variables
@@ -137,7 +136,7 @@ program da_plot_gen_be
    be_method     = 'NMC'
    NE            = 1
    Uh_method     = 'scale'
-   gen_be_dir    = '.'
+   be_dir        = '.'
    code_version  = 'wrfvar'
 
    open(unit=5, file='namelist.title', status='old')
@@ -154,7 +153,7 @@ program da_plot_gen_be
 ! 3.0 Open the gen_be file and read in the information
 ! ----------------------------------------------------
 
-   filename = trim(gen_be_dir)//'/gen_be.'//trim(be_method)//'.dat'
+   filename = trim(be_dir)//'/be.dat'
    print '("*** Unit=",i3,3X,"filename=",a60)',input_unit, filename
    open (input_unit, file = filename, form='unformatted')
 
@@ -329,7 +328,7 @@ program da_plot_gen_be
 
 ! 4.2.1 Read psi (mean-removed):
          variable = 'psi'
-         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 !         print '("Read file:",a60)', filename
          open (iunit, file = filename, form='unformatted')
@@ -339,7 +338,7 @@ program da_plot_gen_be
 
 ! 4.2.2 Read chi (mean-removed):
          variable = 'chi'
-         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 !         print '("Read file:",a60)', filename
          open (iunit, file = filename, form='unformatted')
@@ -349,7 +348,7 @@ program da_plot_gen_be
 
 ! 4.2.2.1 Read chi_u (mean-removed):
 !         variable = 'chi_u'
-!         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+!         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
 !         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 !         print '("Read file:",a60)', filename
 !         open (iunit, file = filename, form='unformatted')
@@ -373,7 +372,7 @@ program da_plot_gen_be
     
 ! 4.2.3 Read ps (mean-removed):
          variable = 'ps'
-         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
 !         print '("Read file:",a60)', filename
          open (iunit, file = filename, form='unformatted')
@@ -384,7 +383,7 @@ program da_plot_gen_be
 
 ! 4.2.3.1 Read ps_u (mean-removed):
 !         variable = 'ps_u'
-!         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+!         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
 !         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
 !         print '("Read file:",a60)', filename
 !         open (iunit, file = filename, form='unformatted')
@@ -407,7 +406,7 @@ program da_plot_gen_be
     
 ! 4.2.4 Read t (mean-removed):
          variable = 't'
-         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
          filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 !         print '("Read file:",a60)', filename
          open (iunit, file = filename, form='unformatted')
@@ -417,7 +416,7 @@ program da_plot_gen_be
 
 ! 4.2.4.1 Read t_u (mean-removed):
 !         variable = 't_u'
-!         filename = trim(gen_be_dir)//'/'//trim(variable)//'/'//date(1:10)
+!         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
 !         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
 !         print '("Read file:",a60)', filename
 !         open (iunit, file = filename, form='unformatted')
@@ -1700,4 +1699,4 @@ contains
 
   end subroutine da_covariance_plot
 
-end program da_plot_gen_be
+end program da_plot_be

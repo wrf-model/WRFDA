@@ -1,4 +1,4 @@
-program da_scale_length
+program da_be_scale_length
 
 !   use da_control
 
@@ -116,4 +116,4 @@ program da_scale_length
       call da_merge_scale_length(variable, nk)
    end if
 
-end program da_scale_length
+end program da_be_scale_length

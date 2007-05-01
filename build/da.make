@@ -198,13 +198,13 @@ da_utils : setup \
            da_update_bc.exe \
            da_advance_cymdh.exe
 
-da_plots : setup da_scale_length.exe da_plot_gen_be.exe 
+da_plots : setup da_scale_length.exe da_be_scale_length.exe da_plot_be.exe 
 
-da_plot_gen_be.exe :  da_plot_gen_be.o da_module_graph.o
-	$(SFC) -o $@  da_plot_gen_be.o da_module_graph.o $(NCARG_LIB)
+da_plot_be.exe :  da_plot_be.o da_module_graph.o
+	$(SFC) -o $@  da_plot_be.o da_module_graph.o $(NCARG_LIB)
 
-da_be4_scale_length.exe: da_be4_scale_length.o
-	$(SFC) -o $@ da_be4_scale_length.o
+da_be_scale_length.exe: da_be_scale_length.o
+	$(SFC) -o $@ da_be_scale_length.o
 
 da_scale_length.exe: da_scale_length.o
 	$(SFC) -o $@ da_scale_length.o da_control.o
