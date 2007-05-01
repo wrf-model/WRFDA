@@ -39,7 +39,7 @@ export RUN_WRF=true
 
 #Time info:
 export INITIAL_DATE=2003010100
-export FINAL_DATE=2003010100
+export FINAL_DATE=2003010200
 
 #Directories:
 export REL_DIR=~/code/trunk

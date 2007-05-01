@@ -77,7 +77,7 @@ export FIRST=${FIRST:-true}                            # Cold start (false), cyc
 
 #Time info:
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}        # Start date of test period
-export FINAL_DATE=${FINAL_DATE:-2003012800}            # Final date of test period.
+export FINAL_DATE=${FINAL_DATE:-2003010200}            # Final date of test period.
 export LBC_FREQ=${LBC_FREQ:-06}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
 export OBS_FREQ=${OBS_FREQ:-12}
