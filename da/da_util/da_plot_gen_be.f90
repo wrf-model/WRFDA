@@ -146,7 +146,7 @@ program da_plot_gen_be
       print '(a,i2,a)','iostat=',ier,'  Error in Namelist file...'
       stop
    end if
-   print  plot_title
+   write (unit=6,nml=plot_title)
    close (5)
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date  (1:10), fmt='(i10)')edate

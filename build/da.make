@@ -198,7 +198,10 @@ da_utils : setup \
            da_update_bc.exe \
            da_advance_cymdh.exe
 
-da_plots : setup da_scale_length.exe
+da_plots : setup da_scale_length.exe da_plot_gen_be.exe 
+
+da_plot_gen_be.exe :  da_plot_gen_be.o da_module_graph.o
+	$(SFC) -o $@  da_plot_gen_be.o da_module_graph.o $(NCARG_LIB)
 
 da_be4_scale_length.exe: da_be4_scale_length.o
 	$(SFC) -o $@ da_be4_scale_length.o
@@ -240,6 +243,14 @@ da_bias_verif.exe : da_bias_verif.o rad_bias.o
 
 # Special cases, either needing special include files or too big to 
 # optimise/debug
+
+da_module_graph.o : da_module_graph.f90
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
+	
 
 da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $@

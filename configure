@@ -287,55 +287,55 @@ if test -z "$PDHF5" ; then
 fi
 
 if [ -n "$NETCDF" ] ; then
-  echo "Will use NETCDF in dir: $NETCDF"
+  echo "Will use NETCDF in dir:  $NETCDF"
 else
   echo "Will configure for use without NetCDF"
 fi
 
 if [ -n "$MPIHOME" ] ; then
-  echo "Will use MPI in dir: $MPIHOME"
+  echo "Will use MPI in dir:     $MPIHOME"
 fi
 
 if [ -n "$PHDF5" ] ; then
-  echo "Will use PHDF5 in dir: $PHDF5"
+  echo "Will use PHDF5 in dir:   $PHDF5"
 else
   echo "PHDF5 not set in environment. Will configure for use without."
 fi
 
 if [ -n "$HDF" ] ; then
-  echo "Will use HDF in dir: $HDF"
+  echo "Will use HDF in dir:     $HDF"
 #else
   # No-one cares
   # echo "HDF not set in environment. Will configure for use without."
 fi
 
 if [ -n "$HDFEOS" ] ; then
-  echo "Will use HDFEOS in dir: $HDFEOS"
+  echo "Will use HDFEOS in dir:  $HDFEOS"
 #else
   # No-one cares
   # echo "HDFEOS not set in environment. Will configure for use without."
 fi
 
 if [ -n "$RTTOV" ] ; then
-  echo "Will use RTTOV in dir: $RTTOV"
+  echo "Will use RTTOV in dir:   $RTTOV"
 else
   echo "Will configure for use without RTTOV"
 fi
 
 if [ -n "$CRTM" ] ; then
-  echo "Will use CRTM in dir: $CRTM"
+  echo "Will use CRTM in dir:    $CRTM"
 else
   echo "Will configure for use without CRTM"
 fi
 
 if [ -n "$BLAS" ] ; then
-  echo "Will use BLAS in dir: $BLAS"
+  echo "Will use BLAS in dir:    $BLAS"
 else
   echo "BLAS not set in environment, assume in standard libraries"
 fi
 
 if [ -n "$LAPACK" ] ; then
-  echo "Will use LAPACK in dir: $LAPACK"
+  echo "Will use LAPACK in dir:  $LAPACK"
 else
   echo "LAPACK not set in environment, assume in standard libraries"
 fi
@@ -347,7 +347,7 @@ else
 fi
 
 if [ -n "$BUFR" ] ; then
-  echo "Will use BUFR in dir: $BUFR"
+  echo "Will use BUFR in dir:    $BUFR"
 else
   echo "Will configure for use without BUFR"
 fi
