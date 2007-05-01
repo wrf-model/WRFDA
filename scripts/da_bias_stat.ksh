@@ -1,4 +1,4 @@
-#!/usr/bin/ksh
+#!/bin/ksh
 ###############################################
 #  Bias correction off-line statistics script
 #  Author: Zhiquan Liu NCAR/MMM 02/2007
@@ -11,8 +11,8 @@ export BUILD_DIR=${WRFVAR_DIR}/build
 export BIN_DIR=${WRFVAR_DIR}/da/da_biascorr_airmass
 export WORKDIR=/ptmp/${USER}/wrfvar/trunk/scripts/work
 
-export START_DATE=2006100100
-export END_DATE=2006102818
+export START_DATE=2003010100
+export END_DATE=2003010200
 export CYCLE_PERIOD=6
 
 export PLATFORM=noaa
