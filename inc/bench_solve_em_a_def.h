@@ -269,6 +269,8 @@ BENCH_DECL(store_runge_kutta_loor_tim)
 BENCH_DECL(restore_runge_kutta_loor_tim)
 BENCH_DECL(store_small_step_tim)
 BENCH_DECL(restore_small_step_tim)
+BENCH_DECL(store_rktend_thru_ss_tim)
+BENCH_DECL(restore_rktend_thru_ss_tim)
 
 #else
 #define SOLVE_START

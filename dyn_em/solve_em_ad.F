@@ -314,6 +314,7 @@ integer :: iy
 ! TBH:  Buffer IDs for store/restore
 INTEGER, PARAMETER :: BUF_RK_LOOR = 1
 INTEGER, PARAMETER :: BUF_SMALL_STEP = 2
+INTEGER, PARAMETER :: BUF_RKTEND_THRU_SS = 3
 
 real ru_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real rv_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
@@ -938,7 +939,8 @@ BENCH_END(exch10)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields re-computed later by small_step loops.  
- store_small_step: if (config_flags%remove_small_step) then
+ store_small_step: if ( config_flags%remove_small_step .and. &
+                ( .not. config_flags%remove_rktend_thru_ss ) ) then
 BENCH_START(store_small_step_tim)
    WRITE(wrf_err_message,*)'DEBUG:  store_small_step:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
@@ -947,6 +949,19 @@ BENCH_START(store_small_step_tim)
 #include "store_small_step.h"
 BENCH_END(store_small_step_tim)
  endif store_small_step
+
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Save fields computed between the call to rk_tendency and 
+! TBH:  the end of small_stepu loop.  
+ store_rktend_thru_ss: if ( config_flags%remove_rktend_thru_ss ) then
+BENCH_START(store_rktend_thru_ss_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  store_rktend_thru_ss:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
+#include "store_rktend_thru_ss.h"
+BENCH_END(store_rktend_thru_ss_tim)
+ endif store_rktend_thru_ss
 
 BENCH_START(comp11)
     call calc_mu_uv_1( config_flags,muts,muus,muvs,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),&
@@ -1797,6 +1812,19 @@ BENCH_END(exch27)
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzq, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier between the call to rk_tendency and 
+! TBH:  the end of small_stepu loop.  
+ restore_rktend_thru_sszq: if ( config_flags%remove_rktend_thru_ss ) then
+BENCH_START(restore_rktend_thru_ss_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszq:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
+#include "restore_rktend_thru_ss.h"
+BENCH_END(restore_rktend_thru_ss_tim)
+ else  ! restore_rktend_thru_sszq
+
 BENCH_START(comp7773)
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
@@ -1941,6 +1969,8 @@ BENCH_END(exch31)
   end do small_stepzq
 
  endif restore_small_stepzq
+
+ endif restore_rktend_thru_sszq
 
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
 
@@ -2250,6 +2280,19 @@ BENCH_END(exch38)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier between the call to rk_tendency and 
+! TBH:  the end of small_stepu loop.  
+ restore_rktend_thru_sszw: if ( config_flags%remove_rktend_thru_ss ) then
+BENCH_START(restore_rktend_thru_ss_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszw:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
+#include "restore_rktend_thru_ss.h"
+BENCH_END(restore_rktend_thru_ss_tim)
+ else  ! restore_rktend_thru_sszw
+
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzw, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp7774)
@@ -2395,6 +2438,8 @@ BENCH_END(exch42)
   end do small_stepzw
 
  endif restore_small_stepzw
+
+ endif restore_rktend_thru_sszw
 
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
 
@@ -2894,6 +2939,19 @@ BENCH_END(exch52)
 !  recompute : moist_tend,ph_tendf,ru_tendf,rv_tendf,rw_tendf,t_tendf,xk
 ! mhd
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier between the call to rk_tendency and 
+! TBH:  the end of small_stepu loop.  
+ restore_rktend_thru_sszz: if ( config_flags%remove_rktend_thru_ss ) then
+BENCH_START(restore_rktend_thru_ss_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszz:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
+#include "restore_rktend_thru_ss.h"
+BENCH_END(restore_rktend_thru_ss_tim)
+ else  ! restore_rktend_thru_sszz
+
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzz, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp7775)
@@ -3050,6 +3108,8 @@ BENCH_END(exch56)
   end do small_stepzz
 
  endif restore_small_stepzz
+
+ endif restore_rktend_thru_sszz
 
 !------------------------------------------------------
 

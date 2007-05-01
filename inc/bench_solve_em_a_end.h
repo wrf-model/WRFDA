@@ -256,6 +256,8 @@ BENCH_REPORT(store_runge_kutta_loor_tim)
 BENCH_REPORT(restore_runge_kutta_loor_tim)
 BENCH_REPORT(store_small_step_tim)
 BENCH_REPORT(restore_small_step_tim)
+BENCH_REPORT(store_rktend_thru_ss_tim)
+BENCH_REPORT(restore_rktend_thru_ss_tim)
 
 BENCH_REPORT(solve_tim)
 

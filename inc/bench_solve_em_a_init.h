@@ -255,5 +255,7 @@ BENCH_INIT(store_runge_kutta_loor_tim)
 BENCH_INIT(restore_runge_kutta_loor_tim)
 BENCH_INIT(store_small_step_tim)
 BENCH_INIT(restore_small_step_tim)
+BENCH_INIT(store_rktend_thru_ss_tim)
+BENCH_INIT(restore_rktend_thru_ss_tim)
 
 SOLVE_START
