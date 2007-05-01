@@ -516,7 +516,6 @@ echo "WINDOW_END            $WINDOW_END"
    . $WRFVAR_DIR/build/inc/namelist_script.inc
 
    if test -f namelist.input; then
-     cp -f namelist.input namelist.wrfvar
      cp namelist.input $RUN_DIR
    fi
 
@@ -575,7 +574,8 @@ echo "WINDOW_END            $WINDOW_END"
       fi
 
       if test -f fort.9; then
-        cp fort.9 $RUN_DIR/namelist.output
+        mv fort.9 namelist.output
+        cp namelist.output $RUN_DIR
       fi
 
       if test -f statistics; then
