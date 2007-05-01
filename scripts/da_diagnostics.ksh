@@ -21,7 +21,7 @@ export WORK_DIR=${WORK_DIR:-$REG_DIR/diagnostics}
 
 export START_DATE=${START_DATE:-2006100106}
 export END_DATE=${END_DATE:-2006100312}
-export CYCLE_PERIOD=6
+export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
 
 echo "WRFVAR_DIR    = $WRFVAR_DIR"
 echo "EXP_DIR       = $EXP_DIR"

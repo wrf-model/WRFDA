@@ -1416,6 +1416,8 @@ CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
 LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1458,6 +1460,8 @@ CCFLAGS_RSL     =
 LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1510,6 +1514,8 @@ CCFLAGS_RSL     =
 LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1560,6 +1566,8 @@ CCFLAGS_RSL     =
 LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
