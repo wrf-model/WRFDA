@@ -1786,7 +1786,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, serial                 (single-threaded)
+#ARCH Settings for Darwin, g95, serial                 (single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1812,6 +1812,8 @@ FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1822,7 +1824,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, simple                 (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, simple                 (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1853,6 +1855,8 @@ CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1871,7 +1875,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, debug                  (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, debug                  (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1907,6 +1911,8 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1925,7 +1931,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, g95, optimised              (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, optimised              (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1957,6 +1963,8 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1975,7 +1983,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, serial                 (Single-threaded)
+#ARCH Settings for Darwin, PGI, serial                 (Single-threaded)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -2012,7 +2020,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, simple                 (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, PGI, simple                 (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -2063,7 +2071,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, debug                  (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, PGI, debug                  (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -2116,7 +2124,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, i386, PGI, optimised              (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, PGI, optimised              (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
