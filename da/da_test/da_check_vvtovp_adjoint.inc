@@ -32,7 +32,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    ! [1.0] Initialise:
    !----------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') 'da_check_vvtovp_adjoint: Test Results:'
+   write(unit=stdout, fmt='(/a/)') 'da_check_vvtovp_adjoint: Test Results:'
       
    !----------------------------------------------------------------------
    ! [2.0] Perform Vp = U_v Vv transform:

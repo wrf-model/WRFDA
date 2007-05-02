@@ -33,7 +33,7 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
    ! [1.0] Initialise:
    !-------------------------------------------------------------------------
 
-   write(unit=*, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
+   write(unit=stdout, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
    call da_zero_x(xa)
 

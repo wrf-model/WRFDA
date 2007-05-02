@@ -77,7 +77,7 @@ subroutine da_put_var_2d_real_cdf(file, var, data, &
       tmp4 = data
       call ncvpt(cdfid,id_data,istart,iend,tmp4,rcode)
    else
-      write(unit=*, fmt='(a, 4i6)') &
+      write(unit=stdout, fmt='(a, 4i6)') &
          'Unrecognizable ivtype:', ivtype,nf_double,nf_real,kind(data)
       stop
    end if

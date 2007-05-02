@@ -25,7 +25,7 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
    cdfid = ncopn(file, NCWRITE, rcode)
 
    if (rcode /= 0) then
-      write(unit=*, fmt='(2a)') ' error openiing netcdf file ', trim(file)
+      write(unit=stdout, fmt='(2a)') ' error openiing netcdf file ', trim(file)
       stop
    end if
 
@@ -34,7 +34,7 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
    rcode = nf_inq_var(cdfid, id_data, varnam, ivtype, ndims, dimids, natts)
 
    if (debug) then
-      write(unit=*, fmt='(3a,i6)') ' put_var_3d_real_cdf: dims for ',var,' ',ndims
+      write(unit=stdout, fmt='(3a,i6)') ' put_var_3d_real_cdf: dims for ',var,' ',ndims
    end if
 
    do i=1,ndims
@@ -81,7 +81,7 @@ subroutine da_put_var_3d_real_cdf(file, var, data, &
       tmp4 = data
       call ncvpt(cdfid,id_data,istart,iend,tmp4,rcode)
    else
-      write(unit=*, fmt='(a, 4i6)') &
+      write(unit=stdout, fmt='(a, 4i6)') &
          'Unrecognizable ivtype:', ivtype,nf_double,nf_real,kind(data)
       stop
    end if

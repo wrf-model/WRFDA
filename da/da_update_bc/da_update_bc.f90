@@ -8,7 +8,7 @@ program da_update_bc
    use da_netcdf_interface, only : da_get_var_3d_real_cdf, &
       da_put_var_3d_real_cdf, da_get_dims_cdf, da_put_var_2d_real_cdf, &
       da_get_var_2d_real_cdf, da_get_var_2d_int_cdf, da_get_bdytimestr_cdf, &
-      da_get_times_cdf, da_get_bdyfrq
+      da_get_times_cdf, da_get_bdyfrq, stderr, stdout
 
    use da_module_couple_uv, only : da_couple_uv
 
@@ -82,22 +82,22 @@ program da_update_bc
           iostat = io_status)
 
    if (io_status /= 0) then
-      print *, 'Error to open namelist file: parame.in.'
-      print *, 'Will work for updating lateral boundary only.'
+      write(unit=stdout,fmt=*) 'Error to open namelist file: parame.in.'
+      write(unit=stdout,fmt=*) 'Will work for updating lateral boundary only.'
    else
       read(unit=namelist_unit, nml = control_param , iostat = io_status)
 
       if (io_status /= 0) then
-         print *, 'Error to read control_param. Stopped.'
+         write(unit=stdout,fmt=*) 'Error to read control_param. Stopped.'
          stop
       end if
 
-      WRITE(unit=*, fmt='(2a)') &
+      WRITE(unit=stdout, fmt='(2a)') &
            'wrfvar_output_file = ', trim(wrfvar_output_file), &
            'wrf_bdy_file          = ', trim(wrf_bdy_file), &
            'wrf_input     = ', trim(wrf_input)
 
-      WRITE(unit=*, fmt='(a, L10)') &
+      WRITE(unit=stdout, fmt='(a, L10)') &
            'cycling = ', cycling
 
       close(unit=namelist_unit)
@@ -129,14 +129,14 @@ program da_update_bc
    call da_get_dims_cdf(wrf_bdy_file, 'Times', dims, ndims, debug)
 
    if (debug) then
-      write(unit=*, fmt='(a,i2,2x,a,4i6)') &
+      write(unit=stdout, fmt='(a,i2,2x,a,4i6)') &
            'Times: ndims=', ndims, 'dims=', (dims(i), i=1,ndims)
    end if
 
    time_level = dims(2)
 
    if (time_level < 1) then
-      write(unit=*, fmt='(a,i2/a)') &
+      write(unit=stdout, fmt='(a,i2/a)') &
            'time_level = ', time_level, &
            'We need at least one time-level BDY.'
       stop 'Wrong BDY file.'
@@ -155,7 +155,7 @@ program da_update_bc
 
    if (debug) then
       do n=1, dims(2)
-         write(unit=*, fmt='(3(a, i2, 2a,2x))') &
+         write(unit=stdout, fmt='(3(a, i2, 2a,2x))') &
            '       times(', n, ')=', trim(times(n)), &
            'thisbdytime (', n, ')=', trim(thisbdytime(n)), &
            'nextbdytime (', n, ')=', trim(nextbdytime(n))
@@ -250,17 +250,17 @@ program da_update_bc
                                       dims(1), dims(2), 1, debug)
             deallocate(full2d)
          case default ;
-            print *, 'It is impossible here. var2d(n)=', trim(var2d(n))
+            write(unit=stdout,fmt=*) 'It is impossible here. var2d(n)=', trim(var2d(n))
       end select
    end do
   
    if (low_bdy_only) then
-      print *, 'only low boundary updated.'
+      write(unit=stdout,fmt=*) 'only low boundary updated.'
       stop 
    end if
 
    if (east_end < 1 .or. north_end < 1) then
-      write(unit=*, fmt='(a)') 'Wrong data for Boundary.'
+      write(unit=stdout, fmt='(a)') 'Wrong data for Boundary.'
       stop
    end if
 
@@ -348,7 +348,7 @@ program da_update_bc
             end do
          end do
       case default ;
-         print *, 'It is impossible here. mu, m=', m
+         write(unit=stdout,fmt=*) 'It is impossible here. mu, m=', m
       end select
 
       ! calculate new tendancy 
@@ -405,7 +405,7 @@ program da_update_bc
                              dims(1), dims(2), dims(3), 1, debug)
 
    ! do j=1,dims(2)
-   !    write(unit=*, fmt='(2(a,i5), a, f12.8)') &
+   !    write(unit=stdout, fmt='(2(a,i5), a, f12.8)') &
    !       'u(', dims(1), ',', j, ',1)=', u(dims(1),j,1)
    ! end do
 
@@ -420,12 +420,12 @@ program da_update_bc
                              dims(1), dims(2), dims(3), 1, debug)
 
    ! do i=1,dims(1)
-   !    write(unit=*, fmt='(2(a,i5), a, f12.8)') &
+   !    write(unit=stdout, fmt='(2(a,i5), a, f12.8)') &
    !       'v(', i, ',', dims(2), ',1)=', v(i,dims(2),1)
    ! end do
 
    if (debug) then
-      write(unit=*, fmt='(a,e20.12,4x)') &
+      write(unit=stdout, fmt='(a,e20.12,4x)') &
            'Before couple Sample u=', u(dims(1)/2,dims(2)/2,dims(3)/2), &
            'Before couple Sample v=', v(dims(1)/2,dims(2)/2,dims(3)/2)
    end if
@@ -435,7 +435,7 @@ program da_update_bc
    call da_couple_uv ( u, v, mu, mub, msfu, msfv, ids, ide, jds, jde, kds, kde)
 
    if (debug) then
-      write(unit=*, fmt='(a,e20.12,4x)') &
+      write(unit=stdout, fmt='(a,e20.12,4x)') &
            'After  couple Sample u=', u(dims(1)/2,dims(2)/2,dims(3)/2), &
            'After  couple Sample v=', v(dims(1)/2,dims(2)/2,dims(3)/2)
    end if
@@ -444,7 +444,7 @@ program da_update_bc
    !For 3D variables
 
    do n=1,num3d
-      write(unit=*, fmt='(a, i3, 2a)') 'Processing: var3d(', n, ')=', trim(var3d(n))
+      write(unit=stdout, fmt='(a, i3, 2a)') 'Processing: var3d(', n, ')=', trim(var3d(n))
 
       call da_get_dims_cdf( wrfvar_output_file, trim(var3d(n)), dims, ndims, debug)
 
@@ -470,7 +470,7 @@ program da_update_bc
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
-            write(unit=*, fmt='(3a,e20.12,4x)') &
+            write(unit=stdout, fmt='(3a,e20.12,4x)') &
                  'Before couple Sample ', trim(var3d(n)), &
                  '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
          end if
@@ -484,7 +484,7 @@ program da_update_bc
          end do
 
          if (debug) then
-            write(unit=*, fmt='(3a,e20.12,4x)') &
+            write(unit=stdout, fmt='(3a,e20.12,4x)') &
                  'After  couple Sample ', trim(var3d(n)), &
                  '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
          end if
@@ -495,7 +495,7 @@ program da_update_bc
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
-            write(unit=*, fmt='(3a,e20.12,4x)') &
+            write(unit=stdout, fmt='(3a,e20.12,4x)') &
                  'Before couple Sample ', trim(var3d(n)), &
                  '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
          end if
@@ -509,7 +509,7 @@ program da_update_bc
          end do
 
             if (debug) then
-               write(unit=*, fmt='(3a,e20.12,4x)') &
+               write(unit=stdout, fmt='(3a,e20.12,4x)') &
                     'After  couple Sample ', trim(var3d(n)), &
                     '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
             end if
@@ -522,7 +522,7 @@ program da_update_bc
             full3d, dims(1), dims(2), dims(3), 1, debug)
 
          if (debug) then
-            write(unit=*, fmt='(3a,e20.12,4x)') &
+            write(unit=stdout, fmt='(3a,e20.12,4x)') &
                  'Before couple Sample ', trim(var3d(n)), &
                  '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
          end if
@@ -536,19 +536,19 @@ program da_update_bc
          end do
 
          if (debug) then
-            write(unit=*, fmt='(3a,e20.12,4x)') &
+            write(unit=stdout, fmt='(3a,e20.12,4x)') &
                  'After  couple Sample ', trim(var3d(n)), &
                  '=', full3d(dims(1)/2,dims(2)/2,dims(3)/2)
          end if
       case default ;
-         print *, 'It is impossible here. var3d(', n, ')=', trim(var3d(n))
+         write(unit=stdout,fmt=*) 'It is impossible here. var3d(', n, ')=', trim(var3d(n))
       end select
 
       do m=1,4
          var_name=trim(var_pref) // trim(bdyname(m))
          vbt_name=trim(var_pref) // trim(tenname(m))
 
-         write(unit=*, fmt='(a, i3, 2a)') &
+         write(unit=stdout, fmt='(a, i3, 2a)') &
             'Processing: bdyname(', m, ')=', trim(var_name)
 
          call da_get_dims_cdf( wrf_bdy_file, trim(var_name), dims, ndims, debug)
@@ -626,12 +626,12 @@ program da_update_bc
             end do
             end do
          case default ;
-            print *, 'It is impossible here.'
-            print *, 'bdyname(', m, ')=', trim(bdyname(m))
+            write(unit=stdout,fmt=*) 'It is impossible here.'
+            write(unit=stdout,fmt=*) 'bdyname(', m, ')=', trim(bdyname(m))
             stop
          end select
 
-         write(unit=*, fmt='(a, i3, 2a)') &
+         write(unit=stdout, fmt='(a, i3, 2a)') &
             'cal. tend: bdyname(', m, ')=', trim(vbt_name)
 
          ! calculate new tendancy 
@@ -679,16 +679,16 @@ program da_update_bc
    deallocate(v)
 
    if (io_status /= 0) then
-      print *, 'only lateral boundary updated.'
+      write(unit=stdout,fmt=*) 'only lateral boundary updated.'
    else
       if (low_bdy_only) then
          if (cycling) then
-            print *, 'Both low boudary and lateral boundary updated.'
+            write(unit=stdout,fmt=*) 'Both low boudary and lateral boundary updated.'
          else
-            print *, 'only low boudary updated.'
+            write(unit=stdout,fmt=*) 'only low boudary updated.'
          end if
       else
-         print *, 'only lateral boundary updated.'
+         write(unit=stdout,fmt=*) 'only lateral boundary updated.'
       end if
    end if
 

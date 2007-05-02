@@ -32,7 +32,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    real                           :: partial_lhs   ! < y, y >
    real                           :: pertile_lhs   ! < y, y >
 
-   write(unit=*, fmt='(/a/a)') &
+   write(unit=stdout, fmt='(/a/a)') &
         '       da_test_vtoy_transform:',&
         '---------------------------------------'
 
@@ -85,15 +85,15 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
 
 #ifdef DM_PARALLEL
    if ( rootproc ) then
-      write(unit=*, fmt='(A,1pe22.14)') &
+      write(unit=stdout, fmt='(A,1pe22.14)') &
          'Whole Domain  < y, y     > = ', adj_sum_lhs
-      write(unit=*, fmt='(A,1pe22.14)') &
+      write(unit=stdout, fmt='(A,1pe22.14)') &
          'Whole Domain  < v, v_adj > = ', adj_sum_rhs
    end if
 #else
-   write(unit=*, fmt='(A,1pe22.14)') &
+   write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < y, y     > = ', adj_sum_lhs
-   write(unit=*, fmt='(A,1pe22.14)') &
+   write(unit=stdout, fmt='(A,1pe22.14)') &
       'Whole Domain  < v, v_adj > = ', adj_sum_rhs
 #endif
 

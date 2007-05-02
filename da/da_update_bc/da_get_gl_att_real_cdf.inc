@@ -28,7 +28,7 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
 
    rcode = NF_inQ_ATTtype(cdfid, nf_global, att_name, ivtype)
 
-   write(unit=*, fmt='(a, i6)') &
+   write(unit=stdout, fmt='(a, i6)') &
         'ivtype:', ivtype, &
         'NF_real=', NF_real, &
         'NF_DOUBLE=', NF_DOUBLE, &
@@ -45,7 +45,7 @@ subroutine da_get_gl_att_real_cdf(file, att_name, value, debug)
       rcode = NF_GET_ATT_real(cdfid, nf_global, att_name, tmp4)
       value = tmp4
    else
-      write(unit=*, fmt='(a, i6)') &
+      write(unit=stdout, fmt='(a, i6)') &
          'Unrecognizable ivtype:', ivtype
       stop
    end if

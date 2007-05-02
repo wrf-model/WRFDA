@@ -35,7 +35,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    
    integer                        :: cg_jcdf
 
-   write(unit=*, fmt='(/a/a)') &
+   write(unit=stdout, fmt='(/a/a)') &
         '       da_check_vtoy_adjoint:',&
         '---------------------------------------'
 

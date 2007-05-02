@@ -20,7 +20,7 @@ subroutine da_get_bdyfrq(this_datestr, next_datestr, bdyfrq, debug)
    bdyfrq = next_bdy_time - this_bdy_time
 
    if (debug) then
-      write(unit=*, fmt='(a, f20.1)') &
+      write(unit=stdout, fmt='(a, f20.1)') &
            'next_bdy_time=', next_bdy_time, &
            'this_bdy_time=', this_bdy_time, &
            'bdyfrq       =', bdyfrq

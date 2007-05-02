@@ -31,7 +31,7 @@ subroutine da_get_att_cdf(file, var, debug)
    do n=1, natts
       status = NF_inQ_ATTNAME(cdfid, varid, n, att_name)
 
-      write(unit=*, fmt='(a,i2,2a)') &
+      write(unit=stdout, fmt='(a,i2,2a)') &
         'att_name(',n,')=', trim(att_name)
    end do
 

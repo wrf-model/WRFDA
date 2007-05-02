@@ -25,7 +25,7 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
    cdfid = ncopn(file, NCNOWRIT, rcode)
 
    if (rcode /= 0) then
-      write(unit=*, fmt='(2a)') ' error openiing netcdf file ', trim(file)
+      write(unit=stdout, fmt='(2a)') ' error openiing netcdf file ', trim(file)
       stop
    end if
 
@@ -34,15 +34,15 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
    rcode = nf_inq_var(cdfid, id_data, varnam, ivtype, ndims, dimids, natts)
 
    if (debug) then
-      write(unit=*, fmt='(3a,i6)') ' get_var_2d_real_cdf: dims for ',var,' ',ndims
+      write(unit=stdout, fmt='(3a,i6)') ' get_var_2d_real_cdf: dims for ',var,' ',ndims
    end if
 
    do i=1,ndims
       rcode = nf_inq_dimlen(cdfid, dimids(i), idims(i))
       if (debug) then
-         write(unit=*, fmt='(a,2i6)') ' dimension ',i,idims(i)
-         write(unit=*, fmt='(a,i6)') ' ivtype=', ivtype
-         write(unit=*, fmt='(a, a)') ' varnam=', trim(varnam)
+         write(unit=stdout, fmt='(a,2i6)') ' dimension ',i,idims(i)
+         write(unit=stdout, fmt='(a,i6)') ' ivtype=', ivtype
+         write(unit=stdout, fmt='(a, a)') ' varnam=', trim(varnam)
       end if
    end do
 
@@ -80,13 +80,13 @@ subroutine da_get_var_2d_real_cdf(file, var, data, &
       call ncvgt(cdfid,id_data,istart,iend,tmp4,rcode)
       data = tmp4
    else
-      write(unit=*, fmt='(a, i6)') &
+      write(unit=stdout, fmt='(a, i6)') &
          'Unrecognizable ivtype:', ivtype
       stop
    end if
 
    if (debug) then
-      write(unit=*, fmt='(a,e24.12)') ' Sample data=', data(1,1)
+      write(unit=stdout, fmt='(a,e24.12)') ' Sample data=', data(1,1)
    end if
 
    call ncclos(cdfid,rcode)

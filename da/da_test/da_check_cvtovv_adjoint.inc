@@ -28,7 +28,7 @@ subroutine da_check_cvtovv_adjoint(cv_size, xb, xbx, xp, be, cv, vv)
 
    if (trace_use) call da_trace_entry("da_check_cvtovv_adjoint")
 
-   write(unit=*, fmt='(/a/)') 'da_check_cvtovv_adjoint: Test Results:'
+   write(unit=stdout, fmt='(/a/)') 'da_check_cvtovv_adjoint: Test Results:'
       
    !-------------------------------------------------------------------------
    ! [2.0] Perform Vp = U_v Vv transform:

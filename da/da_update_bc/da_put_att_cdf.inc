@@ -31,25 +31,25 @@ subroutine da_put_att_cdf(file, var, att_name, text, debug)
    do n=1, natts
       status = NF_inQ_ATTNAME(cdfid, varid, n, loc_att_name)
 
-      write(unit=*, fmt='(a,i2,2a)') &
+      write(unit=stdout, fmt='(a,i2,2a)') &
         'loc_att_name(',n,')=', trim(loc_att_name)
 
       if (trim(loc_att_name) == trim(att_name)) then
-         write(unit=*, fmt='(2a)') &
+         write(unit=stdout, fmt='(2a)') &
            'att_name=', trim(att_name)
 
          status = NF_PUT_ATT_TEXT(cdfid, varid, trim(att_name), len(text), trim(text))
 
          if (status == 0) then
             if (debug) then
-               write(unit=*, fmt='(4a)') &
+               write(unit=stdout, fmt='(4a)') &
                     'write ', trim(att_name), 'to netcdf file ', trim(file)
             end if
          else
-            write(unit=*, fmt='(a, i8)') &
+            write(unit=stdout, fmt='(a, i8)') &
                    'Status= ', status
 
-            write(unit=*, fmt='(4a)') &
+            write(unit=stdout, fmt='(4a)') &
                    'Failed to write ', trim(att_name), 'to netcdf file ', trim(file)
 
             ! if (status /= NF_NOERR) call handle_err(status)
