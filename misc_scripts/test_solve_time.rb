@@ -1,5 +1,9 @@
 #!/usr/bin/env ruby
 
+startdir = Dir.pwd
+
+Dir.chdir("test")
+
 outfile = "solve_tim_tst.out"
 outfileOK = "#{outfile}_OK"
 
@@ -9,4 +13,5 @@ File.delete(outfile) if (FileTest.file?(outfile))
 
 ` xxdiff #{outfileOK} #{outfile} `
 
+Dir.chdir(startdir)
 
