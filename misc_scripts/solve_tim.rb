@@ -27,29 +27,32 @@ class SolveTiming
 
   # SolveTiming.new
   def initialize
-    @filenames = []
-    @solve_tims = Hash.new
-    find_files
-    parse_timing
+    @filenames = find_files
+    @solve_tims = parse_timing
     check_timing
-    extract_times
-    compute_relative_times
+    @time_rows = extract_times
+    @relative_times = compute_relative_times
+    @relative_times_min = compute_relative_minimum_times
     print_report
   end
 
   def find_files
-#    Find.find(".") { |f| @filenames << f if ( f =~ /wrf_ad.*error/ ) }
-    ARGV.each { |f| @filenames << f }
+#    fnames = []
+#    Find.find(".") { |f| fnames << f if ( f =~ /wrf_ad.*error/ ) }
+#    fnames
+    ARGV
   end
 
   def parse_timing
     # read files
+    solve_times = Hash.new
     @filenames.each do |fname|
-      @solve_tims[fname] = []
+      solve_times[fname] = []
       IO.readlines(fname).each do |line|
-        @solve_tims[fname] << $'.to_i if (line =~ /solve_tim\s*=\s*/)
+        solve_times[fname] << $'.to_i if (line =~ /solve_tim\s*=\s*/)
       end
     end
+    solve_times
   end
 
   def check_timing
@@ -65,39 +68,65 @@ class SolveTiming
   end
 
   def extract_times
-    @time_rows = []
+    trows = []
     @filenames.each do |fname|
       @solve_tims[fname].each_with_index do |tim,indx|
-        @time_rows[indx] ||= []
-        @time_rows[indx] << tim
+        trows[indx] ||= []
+        trows[indx] << tim
       end
     end
+    trows
   end
 
   def compute_relative_times
-    @relative_times = []
+    time_ratios = []
     @time_rows.each_with_index do |row,indx|
 #      avg = 0; row.each { |tim| avg += tim }
 #      avg /= row.length
-      @relative_times[indx] ||= []
-      row.each { |tim| @relative_times[indx] << Float(tim) / Float(row.first) }
+      time_ratios[indx] ||= []
+      row.each { |tim| time_ratios[indx] << Float(tim) / Float(row.first) }
     end
+    time_ratios
+  end
+
+  # Find minimum solve_tim from each file and compute ratios relative to 
+  # baseline.  
+  def compute_relative_minimum_times
+    times_min = nil
+    @time_rows.each do |row|
+      times_min ||= row.collect {|tim| tim}  # "dup"
+      row.each_with_index do |tim,indx|
+        times_min[indx] = tim if (tim < times_min[indx])
+      end
+    end
+    times_min.collect { |tim| Float(tim) / Float(times_min.first) }
   end
 
   # TODO:  improve formatting
   def print_report
     header = ""
     @filenames.each { |f| header << " #{File.dirname(f)} " }
-    puts "========="
-    puts "RAW TIMES"
-    puts "========="
-    puts "#{header}"
-    @time_rows.each { |row| puts row.join("  ") }
-    puts "========================="
-    puts "TIMES RELATIVE TO #{@filenames.first}"
-    puts "========================="
-    puts "#{header}"
-    @relative_times.each { |relative_time| puts relative_time.join("  ") }
+    if (@time_rows) then
+      puts "========="
+      puts "RAW TIMES"
+      puts "========="
+      puts "#{header}"
+      @time_rows.each { |row| puts row.join("  ") }
+    end
+    if (@relative_times) then
+      puts "========================="
+      puts "TIMES RELATIVE TO #{@filenames.first}"
+      puts "========================="
+      puts "#{header}"
+      @relative_times.each { |tim| puts tim.join("  ") }
+    end
+    if (@relative_times_min) then
+      puts "========================="
+      puts "MINIMUM TIMES RELATIVE TO #{@filenames.first}"
+      puts "========================="
+      puts "#{header}"
+      puts @relative_times_min.join("  ")
+    end
   end
 
 end  # class SolveTiming
