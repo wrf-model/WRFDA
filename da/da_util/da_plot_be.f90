@@ -79,7 +79,7 @@ program da_plot_be
    integer :: i, j, k, n, m, b, member, n_times, ier
    integer :: sdate, cdate, edate        ! Starting, current ending dates.
    character(len= 10)        :: variable             ! Variable name
-   character(len= 80)        :: filename  
+   character(len= 200)       :: filename  
    character(len= 10)        :: date, new_date       ! Current date (ccyymmddhh).
    character(len=  3)        :: ce                   ! Member index -> characte
    character(len=  5)        :: cvv                  ! control variable name
@@ -154,7 +154,7 @@ program da_plot_be
 ! ----------------------------------------------------
 
    filename = trim(be_dir)//'/be.dat'
-   print '("*** Unit=",i3,3X,"filename=",a60)',input_unit, filename
+   print '("*** Unit=",i3,3X,"filename=",a)',input_unit, filename
    open (input_unit, file = filename, form='unformatted')
 
 ! 3.1 Read the domain size
@@ -329,9 +329,9 @@ program da_plot_be
 ! 4.2.1 Read psi (mean-removed):
          variable = 'psi'
          filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-!         print '("Read file:",a60)', filename
-         open (iunit, file = filename, form='unformatted')
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+         print '("Read file:",a)', filename
+         open (iunit, file = filename, form='unformatted',status='old')
          read(iunit)ni, nj, nk
          read(iunit)psi
          close(iunit)
@@ -339,9 +339,9 @@ program da_plot_be
 ! 4.2.2 Read chi (mean-removed):
          variable = 'chi'
          filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-!         print '("Read file:",a60)', filename
-         open (iunit, file = filename, form='unformatted')
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+         print '("Read file:",a)', filename
+         open (iunit, file = filename, form='unformatted',status='old')
          read(iunit)ni, nj, nk
          read(iunit)chi
          close(iunit)
@@ -349,9 +349,9 @@ program da_plot_be
 ! 4.2.2.1 Read chi_u (mean-removed):
 !         variable = 'chi_u'
 !         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-!         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-!         print '("Read file:",a60)', filename
-!         open (iunit, file = filename, form='unformatted')
+!         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+!         print '("Read file:",a)', filename
+!         open (iunit, file = filename, form='unformatted',status='old')
 !         read(iunit)ni, nj, nk
 !         read(iunit)chi_u
 !         close(iunit)
@@ -373,9 +373,9 @@ program da_plot_be
 ! 4.2.3 Read ps (mean-removed):
          variable = 'ps'
          filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-!         print '("Read file:",a60)', filename
-         open (iunit, file = filename, form='unformatted')
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+         print '("Read file:",a)', filename
+         open (iunit, file = filename, form='unformatted',status='old')
          read(iunit)ni, nj, nkdum
          read(iunit)ldum1, ldum2 ! Dummy logicals.
          read(iunit)ps
@@ -384,9 +384,9 @@ program da_plot_be
 ! 4.2.3.1 Read ps_u (mean-removed):
 !         variable = 'ps_u'
 !         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-!         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce//'.01'
-!         print '("Read file:",a60)', filename
-!         open (iunit, file = filename, form='unformatted')
+!         filename = trim(filename)//'.'//trim(variable)//'.e'//ce//'.01'
+!         print '("Read file:",a)', filename
+!         open (iunit, file = filename, form='unformatted',status='old')
 !         read(iunit)ni, nj, nkdum
 !         read(iunit)ldum1, ldum2 ! Dummy logicals.
 !         read(iunit)ps_u
@@ -407,9 +407,9 @@ program da_plot_be
 ! 4.2.4 Read t (mean-removed):
          variable = 't'
          filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-!         print '("Read file:",a60)', filename
-         open (iunit, file = filename, form='unformatted')
+         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+         print '("Read file:",a)', filename
+         open (iunit, file = filename, form='unformatted',status='old')
          read(iunit)ni, nj, nk
          read(iunit)temp
          close(iunit)
@@ -417,9 +417,9 @@ program da_plot_be
 ! 4.2.4.1 Read t_u (mean-removed):
 !         variable = 't_u'
 !         filename = trim(be_dir)//'/'//trim(variable)//'/'//date(1:10)
-!         filename = trim(filename)//'.'//trim(variable)//'.'//trim(be_method)//'.e'//ce
-!         print '("Read file:",a60)', filename
-!         open (iunit, file = filename, form='unformatted')
+!         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
+!         print '("Read file:",a)', filename
+!         open (iunit, file = filename, form='unformatted',status='old')
 !         read(iunit)ni, nj, nk
 !         read(iunit)t_u
 !         close(iunit)
