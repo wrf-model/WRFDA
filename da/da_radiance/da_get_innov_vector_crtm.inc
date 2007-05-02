@@ -54,8 +54,8 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 #endif
 !---------------------------------------------------------
 
-   !JRB use argument it
-   if (it==0) then; print *,"why have argument it to"//__FILE__; end if
+   ! WHY use argument it
+   if (it==0) then; write(unit=stdout,fmt='(A)') "why have argument it to"//__FILE__; end if
 
    alloc_status (:) = 0
 
@@ -459,6 +459,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
                             trim(iv%instid(inst)%rttovid_string)
          call da_biascorr(inst,ob,iv)
       end do
+      write(unit=stdout,fmt='(A)') " "
    end if
 
    !------------------------------------------------------------------------
@@ -477,6 +478,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
                             trim(iv%instid(inst)%rttovid_string)
          call da_biasprep(inst,ob,iv)
       end do
+      write(unit=stdout,fmt='(A)') " "
    end if
 
     Error_Status = CRTM_Destroy_Atmosphere( Atmosphere )

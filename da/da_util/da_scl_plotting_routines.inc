@@ -27,7 +27,7 @@ subroutine plot_it(plt,num,k,varname,nx,ny,nt)
    write(pltlab(1:20),fmt='(2a,i5)') &
          varname(1:3), ' FOR MODE : ', k
 
-   write(unit=*, fmt='(a)') pltlab
+   write(unit=stdout, fmt='(a)') pltlab
 
    call set(xwb,xwe,ywb,ywe,xwb,xwe,ywb,ywe,plot_style)
 
@@ -252,14 +252,14 @@ subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
    xpb=0.0
    xpe=r(nm)*1.05
 
-   write(unit=*, fmt='(a, i5, f18.8)') &
+   write(unit=stdout, fmt='(a, i5, f18.8)') &
         'nm,r(nm)=', nm,r(nm)
 
    ype=maxval(yr(0:nm))*1.05
    ypb=0.0
 
 
-   write(unit=*, fmt='(a, 2f18.8)') &
+   write(unit=stdout, fmt='(a, 2f18.8)') &
         'xpe,ype=',xpe,ype
 
    call set(xfb,xfe,yfb,yfe,xpb,xpe,ypb,ype,plot_style)
@@ -294,7 +294,7 @@ subroutine plot_sl(yr,r,nm,nn,slnt,cnst,k,varname)
       y=yr(i)
       call pwritx(x,y,symbol,1,1,0,0)
 
-      write(unit=*, fmt='(a,i3,2(f8.4,f18.8))') &
+      write(unit=stdout, fmt='(a,i3,2(f8.4,f18.8))') &
            'i,x,y,r,yr=',i,x,y,r(i),yr(i)
    end do
 

@@ -488,10 +488,11 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          ! sfc variables: 10-m wind, and 2-m T, Q, at cross points
 
          height = grid%xb%h(i,j,ks) - grid%xb%terr(i,j)
-         if( height <= 0.) then
-         print*,i,j,' ht = ',grid%xb%h(i,j,ks) ,' terr =  ',grid%xb%terr(i,j)
-         call da_error(__FILE__,__LINE__, &
-               (/"Negative height found "/))
+         if (height <= 0.0) then
+            message(1) = "Negative height found"
+            write (unit=message(2),FMT='(2I6,A,F10.2,A,F10.2)') &
+               i,j,' ht = ',grid%xb%h(i,j,ks) ,' terr =  ',grid%xb%terr(i,j)
+            call da_error(__FILE__,__LINE__, message(1:2))
          endif
 
          call da_sfc_wtq(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &

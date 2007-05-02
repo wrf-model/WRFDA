@@ -18,11 +18,13 @@ program da_advance_cymdh
    character(len=80), dimension(2) :: argum
 
    character(len=10) :: ccyymmddhh
+   
+   integer, parameter :: stdout=6
 
    nargum=iargc()
 
    if(nargum /= 2) then
-      write(unit=*, fmt='(a)') &
+      write(unit=stdout, fmt='(a)') &
            'Usage: da_advance_cymdh ccyymmddhh dh'
       stop 'try again.'
    endif
@@ -54,7 +56,7 @@ program da_advance_cymdh
 
    dh = sign * dh
 
-!  write(unit=*, fmt='(i4, 4i4)')  ccyy, mm, dd, hh, dh
+!  write(unit=stdout, fmt='(i4, 4i4)')  ccyy, mm, dd, hh, dh
 
    hh = hh + dh
 
@@ -69,7 +71,7 @@ program da_advance_cymdh
    end do
 
    write(ccyymmddhh(1:10), fmt='(i4, 3i2.2)')  ccyy, mm, dd, hh
-   write(unit=*, fmt='(a)') ccyymmddhh
+   write(unit=stdout, fmt='(a)') ccyymmddhh
 
 contains
 

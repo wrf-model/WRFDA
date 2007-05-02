@@ -87,12 +87,11 @@ subroutine da_minimise_cg(grid, config_flags,            &
    write(unit=stdout,fmt='(A)') &
       '----------------------------------------------------------'
    if (calculate_cg_cost_fn) then
-      write(unit=stdout,fmt='(1x,/,A)') &
+      write(unit=stdout,fmt='(A)') &
          'Iter    Cost Function         Gradient             Step'
    else
-      write(unit=stdout,fmt='(1x,/,A)')'Iter      Gradient             Step'
+      write(unit=stdout,fmt='(A)')'Iter      Gradient             Step'
    end if
-   write(unit=stdout,fmt=*) ' '
 
    !-------------------------------------------------------------------------
    ! [2.0] iteratively solve for minimum of cost function:
@@ -175,8 +174,10 @@ subroutine da_minimise_cg(grid, config_flags,            &
 1003 continue
    write(unit=stdout,fmt='(A)') &
       '----------------------------------------------------------'
+   write(unit=stdout,fmt='(A)') " "
    write(unit=stdout, &
       fmt='("Inner iteration stopped after ",i4," iterations")') iter
+   write(unit=stdout,fmt='(A)') " "
 
    if (calculate_cg_cost_fn) then 
       rrmnew_norm = ob_grad

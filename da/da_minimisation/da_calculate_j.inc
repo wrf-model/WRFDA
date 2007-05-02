@@ -157,13 +157,15 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    call da_deallocate_y(jo_grad_y)
 
    if (print_detail_grad) then
-      write(unit=stdout, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: cv_jb.cv_jb = ',sum(cv_jb(:) * cv_jb(:))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: cv_je.cv_je = ',sum(cv_je(:) * cv_je(:))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: xhat.xhat = ',sum(xhat(1:cv_size) * &
-                                            xhat(1:cv_size))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * &
-                                            j_grad(1:cv_size))
+      write(unit=stdout, fmt='(a,i6)') 'Calculate grad_v(jo) iter=', iter
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   cv_jb.cv_jb = ',sum(cv_jb(:) * cv_jb(:))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   cv_je.cv_je = ',sum(cv_je(:) * cv_je(:))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   xhat.xhat = ',sum(xhat(1:cv_size) * xhat(1:cv_size))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
    end if
 
    !-------------------------------------------------------------------------
@@ -192,17 +194,18 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    if (print_detail_grad) then
-      write(unit=stdout, fmt='(2a,2(2x,a,i6))') 'file:', __FILE__, 'line:', __LINE__, 'iter=', iter
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: cv_jb.cv_jb = ',&
-                                       sum(cv_jb(1:cv_size_jb) * cv_jb(1:cv_size_jb))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: cv_je.cv_je = ',&
-                                       sum(cv_je(1:cv_size_je) * cv_je(1:cv_size_je))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: xhat_jb.xhat_jb = ', &
-                                       sum(xhat_jb(1:cv_size_jb) * xhat_jb(1:cv_size_jb))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: xhat_je.xhat_je = ', &
-                                       sum(xhat_je(1:cv_size_je) * xhat_je(1:cv_size_je))
-      write(unit=stdout, fmt='(a, e24.14)') ' in da_calculate_j: j_grad.j_grad = ',sum(j_grad(1:cv_size) * &
-                                       j_grad(1:cv_size))
+      write(unit=stdout, fmt='(a,i6)') 'Calculate grad_v(j) iter=', iter
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   cv_jb.cv_jb = ', sum(cv_jb(1:cv_size_jb) * cv_jb(1:cv_size_jb))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '    cv_je.cv_je = ', sum(cv_je(1:cv_size_je) * cv_je(1:cv_size_je))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   xhat_jb.xhat_jb = ', sum(xhat_jb(1:cv_size_jb) * xhat_jb(1:cv_size_jb))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   xhat_je.xhat_je = ', sum(xhat_je(1:cv_size_je) * xhat_je(1:cv_size_je))
+      write(unit=stdout, fmt='(a, e24.14)') &
+         '   j_grad.j_grad = ',sum(j_grad(1:cv_size) * j_grad(1:cv_size))
+      write (unit=stdout,fmt='(A)') " " 
    end if
 
    gnorm_j = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &

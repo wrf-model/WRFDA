@@ -21,9 +21,11 @@ subroutine da_transform_xtoseasfcwind_lin(xa, xb)
       do i=xb%its,xb%ite
 
         height = xb%h(i,j,k) - xb%terr(i,j)
-         if( height <= 0.) then
-         print*,i,j,' ht = ',xb%h(i,j,k) ,' terr =  ',xb%terr(i,j)
-         stop
+         if (height <= 0.0) then
+            message(1) = "Negative height found"
+            write(unit=message(2),FMT='(2I6,A,F10.2,A,F10.2)') &
+               i,j,' ht = ',xb%h(i,j,k) ,' terr =  ',xb%terr(i,j)
+            call da_error(__FILE__,__LINE__,message(1:2))
          endif
 
          rgh_fac = const/log(height/0.0001) ! roughness = 0.0001

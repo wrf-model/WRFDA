@@ -351,7 +351,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
-   ! PRinT out
+   ! print out
    ! =============
 
    if (print_detail_obs) then
@@ -379,6 +379,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
          'Scan:  ', num_ssmt2,    ' SSMT2      reports.'    
       write(unit=stdout,fmt=*) ' '
 
+      ! WHY
       ! write(unit=stdout, fmt='(5x,a,i6,a)') &
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'

@@ -31,7 +31,7 @@ subroutine da_set_ps(proj)
    proj%polei = proj%knowni - proj%rsw * COS(alo1)
    proj%polej = proj%knownj - proj%hemi * proj%rsw * Sin(alo1)
    if (print_detail_map) then
-      print '(A,2F10.1)', 'Computed (I,J) of pole point: ',proj%polei,proj%polej
+      write(unit=stdout,fmt='(A,2F10.1)') 'Computed (I,J) of pole point: ',proj%polei,proj%polej
    end if
 
 end subroutine da_set_ps
