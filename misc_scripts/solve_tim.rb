@@ -32,6 +32,7 @@ class SolveTiming
     check_timing
     @time_rows = extract_times
     @relative_times = compute_relative_times
+    @times_min = extract_minimum_times
     @relative_times_min = compute_relative_minimum_times
     print_report
   end
@@ -89,17 +90,22 @@ class SolveTiming
     time_ratios
   end
 
-  # Find minimum solve_tim from each file and compute ratios relative to 
-  # baseline.  
-  def compute_relative_minimum_times
-    times_min = nil
+  # Find minimum solve_tim from each file.  
+  def extract_minimum_times
+    min_times = nil
     @time_rows.each do |row|
-      times_min ||= row.collect {|tim| tim}  # "dup"
+      min_times ||= row.collect {|tim| tim}  # "dup"
       row.each_with_index do |tim,indx|
-        times_min[indx] = tim if (tim < times_min[indx])
+        min_times[indx] = tim if (tim < min_times[indx])
       end
     end
-    times_min.collect { |tim| Float(tim) / Float(times_min.first) }
+    min_times
+  end
+
+  # Compute ratios relative to minimum baseline of minimum solve_tim from each 
+  # file
+  def compute_relative_minimum_times
+    @times_min.collect { |tim| Float(tim) / Float(@times_min.first) }
   end
 
   # TODO:  improve formatting
@@ -119,6 +125,13 @@ class SolveTiming
       puts "========================="
       puts "#{header}"
       @relative_times.each { |tim| puts tim.join("  ") }
+    end
+    if (@times_min) then
+      puts "================="
+      puts "MINIMUM RAW TIMES"
+      puts "================="
+      puts "#{header}"
+      puts @times_min.join("  ")
     end
     if (@relative_times_min) then
       puts "========================="
