@@ -81,6 +81,8 @@ else
    endif
 endif
 
+setenv COMPILER $FC
+
 if ($FC == g95) then
    setenv G95_ENDIAN BIG
 endif
@@ -147,6 +149,12 @@ endif
 echo
 if ($?PROCESSOR) then
    echo "PROCESSOR       " $PROCESSOR
+endif
+if ($?FC) then
+   echo "FC              " $FC       
+endif
+if ($?CC) then
+   echo "CC              " $CC       
 endif
 if ($?RUN_CMD) then
    echo "RUN_CMD         " $RUN_CMD

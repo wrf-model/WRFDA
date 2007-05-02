@@ -40,6 +40,8 @@ else
    fi
 fi
 
+export COMPILER=$FC
+
 # Unix people can't report processor class properly
 # across different machines or between ksh/bash on Linux
 # They all need their heads banged together
@@ -117,6 +119,8 @@ export PATH=$MPIHOME/bin:$MAKEDEPF90:$PATH
 export MANPATH=$MPIHOME/man:$MANPATH
 
 echo "PROCESSOR       " $PROCESSOR
+echo "FC              " $FC
+echo "CC              " $CC
 echo "MPIHOME         " $MPIHOME
 echo "RTTOV           " $RTTOV
 echo "CRTM            " $CRTM
