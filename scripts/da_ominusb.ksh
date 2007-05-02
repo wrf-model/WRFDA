@@ -16,11 +16,12 @@ export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} 
 export EXPT=${EXPT:-test}
 export INPUT_DIR=${INPUT_DIR:-$REG_DIR/diagnostics}
-export WORK_DIR=${WORK_DIR:-$REG_DIR/ominusb}
 
 export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010200}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
+
+export WORK_DIR=${WORK_DIR:-$PWD/ominusb}
 
 echo "WRFVAR_DIR    = $WRFVAR_DIR"
 echo "INPUT_DIR     = $INPUT_DIR"

@@ -196,7 +196,11 @@ da_utils : setup \
            da_ominusb.exe \
            da_tune.exe \
            da_update_bc.exe \
-           da_advance_cymdh.exe
+           da_advance_cymdh.exe \
+           da_verif.exe
+
+da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
+	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
 
 da_plots : setup da_scale_length.exe da_be_scale_length.exe da_plot_be.exe 
 
@@ -244,12 +248,12 @@ da_bias_verif.exe : da_bias_verif.o rad_bias.o
 # Special cases, either needing special include files or too big to 
 # optimise/debug
 
-da_module_graph.o : da_module_graph.f90
+da_module_graph.o da_plot_be.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
 	@ $(RM) $*.b
-	  $(FC) -c $(FCFLAGS_SIMPLE) $*.f
+	  $(FC) -c $(FCBASE) $(FCFREE) $*.f
 	
 
 da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :

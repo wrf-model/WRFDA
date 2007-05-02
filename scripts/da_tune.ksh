@@ -29,7 +29,7 @@ export WORK_DIR=${WORK_DIR:-$REG_DIR/tuning}
 
 export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010200}
-export CYCLE_PERIOD=6
+export CYCLE_PERIOD=${CYCLE_PERIOD:-6}
 
 export YP_DIR=${YP_DIR:-$REG_DIR/with_noise}      # perturbed run
 export Y_DIR=${Y_DIR:-$REG_DIR/no_noise}         # unperturbed run
