@@ -22,7 +22,7 @@ function ErrorExit {
 
 # parse command line
 numArgs=$#
-num_tasks=1
+num_tasks=1   # default for serial run
 if (( $numArgs == 2 )) ; then
   targetdir=$1 ; shift
   num_tasks=$1 ; shift
@@ -46,23 +46,25 @@ if [[ $testtype = "serial" ]] ; then
   outfile=$outfilescp
   errfile=$errfilescp
   testout=$testoutscp
+  jobscript="run_wrfplus.serial.ksh"
+  job_name="wrfplus.serial"
 else
   outfile="wrf_ad.${num_tasks}.out"
   errfile="wrf_ad.${num_tasks}.error"
   testout="compare_vs_baseline.${num_tasks}.out"
   jobscript="run_wrfplus.${num_tasks}.ksh"
+  job_name="wrfplus.${num_tasks}"
   parexechome="../../../../../../../../wrfplus_WORK_parallel/main/wrfplus.exe"
   parexeclocal="wrfplus_parallel.exe"
-  job_name="wrfplus.${num_tasks}"
-  class="share"
-  wall_clock_limit="00:08"
-  account="64000400"
 fi
+class="share"
+wall_clock_limit="00:08"
+account="64000400"
 
 # prepare for run
-/bin/rm -f $adout $wrfout $outfile $errfile $testout
+/bin/rm -f $adout $wrfout $outfile $errfile $testout $jobscript
 if [[ $testtype = "parallel" ]] ; then
-  /bin/rm -f rsl.out.???? rsl.error.???? $parexeclocal $jobscript
+  /bin/rm -f rsl.out.???? rsl.error.???? $parexeclocal
   # link in parallel executable
   if [[ -f $parexechome ]] ; then
     ln -s $parexechome $parexeclocal || \
@@ -70,7 +72,9 @@ if [[ $testtype = "parallel" ]] ; then
   else
     ErrorExit "cannot find parallel executable ${parexechome}"
   fi
-  # write LSF job script
+fi
+
+# write LSF job script
 cat >> $jobscript << EOF4
 #!/bin/ksh
 #
@@ -82,21 +86,20 @@ cat >> $jobscript << EOF4
 #BSUB -o ${outfile}
 #BSUB -e ${errfile}
 cd ${initdir}
-mpirun.lsf wrfplus_parallel.exe
 EOF4
-  chmod a+x ${jobscript} || ErrorExit "failed to chmod job script ${jobscript}"
+if [[ $testtype = "serial" ]] ; then
+  print "wrfplus.exe" >> $jobscript
+else
+  print "mpirun.lsf wrfplus_parallel.exe" >> $jobscript
 fi
+chmod a+x ${jobscript} || ErrorExit "failed to chmod job script ${jobscript}"
 
 # run wrfplus
-if [[ $testtype = "serial" ]] ; then
-  print "BEGIN wrfplus.exe at $( date )"
-  wrfplus.exe > $outfile 2> $errfile
-  print "END wrfplus.exe at $( date )"
-else
+if [[ $testtype = "parallel" ]] ; then
   touch wrf_go_ahead
   print "execute \"touch wrf_stop_now\" to stop wrfplus once it has finished"
-  bsub -K < ${jobscript}
 fi
+bsub -K < ${jobscript}
 
 # test
 cd ../../../../../../..
