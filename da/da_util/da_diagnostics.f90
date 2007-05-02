@@ -1901,6 +1901,10 @@ subroutine da_increment_stats( field, count, &
    if ( count > 0 ) then
       mean_omb = sum_omb / real(count)
       mean_oma = sum_oma / real(count)
+   end if
+
+   ! Cannot calculate standard deviations for first observation
+   if ( count > 1 ) then
       stdv_omb = sqrt( sum_omb2/ real(count) - mean_omb**2 )
       stdv_oma = sqrt( sum_oma2/ real(count) - mean_oma**2 )
    end if
