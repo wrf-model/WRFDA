@@ -32,6 +32,7 @@ class SolveTiming
     check_timing
     @time_rows = extract_times
     @relative_times = compute_relative_times
+    @best_relative_times = compute_best_relative_times
     @times_min, @times_max = extract_minmax_times
     @relative_times_min = compute_relative_minimum_times
     print_report
@@ -90,6 +91,17 @@ class SolveTiming
     time_ratios
   end
 
+  def compute_best_relative_times
+    best_rel_times = nil
+    @relative_times.each do |row|
+      best_rel_times ||= row.collect {|tim| tim}  # "dup"
+      row.each_with_index do |tim,indx|
+        best_rel_times[indx] = tim if (tim < best_rel_times[indx])
+      end
+    end
+    best_rel_times
+  end
+
   # Find minimum and maximum solve_tim from each file.  
   def extract_minmax_times
     min_times = max_times = nil
@@ -127,6 +139,13 @@ class SolveTiming
       puts "========================="
       puts "#{header}"
       @relative_times.each { |tim| puts tim.join("  ") }
+    end
+    if (@best_relative_times) then
+      puts "========================="
+      puts "BEST TIMES RELATIVE TO #{@filenames.first}"
+      puts "========================="
+      puts "#{header}"
+      puts @best_relative_times.join("  ")
     end
     if (@times_max) then
       puts "================="
