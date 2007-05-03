@@ -57,7 +57,7 @@ else
   parexechome="../../../../../../../../wrfplus_WORK_parallel/main/wrfplus.exe"
   parexeclocal="wrfplus_parallel.exe"
 fi
-class="share"
+class="regular"
 wall_clock_limit="00:08"
 account="64000400"
 
@@ -79,6 +79,7 @@ cat >> $jobscript << EOF4
 #!/bin/ksh
 #
 #BSUB -J ${job_name}
+#BSUB -x
 #BSUB -q ${class}
 #BSUB -n ${num_tasks}
 #BSUB -W ${wall_clock_limit}
