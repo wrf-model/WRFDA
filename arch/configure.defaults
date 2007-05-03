@@ -1813,7 +1813,7 @@ CCFLAGS2        = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
+                     -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1856,7 +1856,7 @@ CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
+                     -lX11
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1912,7 +1912,7 @@ LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
+                     -lX11
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1964,7 +1964,7 @@ CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
+                     -lX11
 LOCAL_LIB       = -lSystemStubs
 
 arch : 

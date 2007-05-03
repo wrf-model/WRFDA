@@ -205,7 +205,7 @@ da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
 da_plots : setup da_scale_length.exe da_be_scale_length.exe da_plot_be.exe 
 
 da_plot_be.exe :  da_plot_be.o da_module_graph.o
-	$(SFC) -o $@  da_plot_be.o da_module_graph.o $(NCARG_LIB)
+	$(SFC) -o $@  da_plot_be.o da_module_graph.o $(NCARG_LIB) $(LOCAL_LIB)
 
 da_be_scale_length.exe: da_be_scale_length.o
 	$(SFC) -o $@ da_be_scale_length.o
