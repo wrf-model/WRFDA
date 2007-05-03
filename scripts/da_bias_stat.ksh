@@ -8,7 +8,6 @@ export WRFVAR_DIR=/ptmp/${USER}/wrfvar/trunk
 export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2274_gts_crtm_mix_8/run
 #export DATA_DIR=/ptmp/${USER}/wrfvar/test/t44/bluevista_trunk2299_gts_crtm_noaa18_8/run
 export BUILD_DIR=${WRFVAR_DIR}/build
-export BIN_DIR=${WRFVAR_DIR}/da/da_biascorr_airmass
 export WORKDIR=/ptmp/${USER}/wrfvar/trunk/scripts/work
 
 export START_DATE=2003010100
@@ -26,7 +25,7 @@ export NSCAN=$4      # 30, 90
  echo 'WORKING directory is $WORKDIR'
 
  mkdir $WORKDIR; cd $WORKDIR
- cp $BIN_DIR/mask_asc $WORKDIR
+ cp $WRFVAR_DIR/run/mask_asc $WORKDIR
 
  CDATE=$START_DATE
 
@@ -60,7 +59,7 @@ EOF
 
          \rm -f fort.*
          ln -fs biasprep_${sensor}  fort.10  # input: fort.10
-         $BIN_DIR/da_bias_sele.exe < nml_sele > da_bias_sele_${sensor}.log
+         $BUILD_DIR/da_bias_sele.exe < nml_sele > da_bias_sele_${sensor}.log
          mv fort.11 biassele_${sensor}      # output fort.11
 echo '  End da_bias_sele'
 
@@ -81,7 +80,7 @@ EOF
 
        \rm -f fort.*
        ln -fs biassele_${sensor}  fort.10  # input : fort.10
-       $BIN_DIR/da_bias_scan.exe < nml_scan > da_bias_scan_${sensor}.log
+       $BUILD_DIR/da_bias_scan.exe < nml_scan > da_bias_scan_${sensor}.log
        mv fort.11 scan_core_${sensor}     # output: fort.11, statistics not divided by nobs
        mv fort.12 scan_bias_${sensor}     # scan bias both band/noband 
 echo '  End da_bias_scan'
@@ -107,7 +106,7 @@ EOF
        \rm -f fort.*
        ln -fs scan_bias_${sensor} fort.12
        ln -fs biassele_${sensor}  fort.10
-       $BIN_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
+       $BUILD_DIR/da_bias_airmass.exe < nml_bias > da_bias_airmass_${sensor}.log
        mv bcor.asc ${sensor}.scor
 
 echo "  End da_bias_airmass"
@@ -131,7 +130,7 @@ EOF
        \rm -f fort.*
        ln -fs biassele_${sensor}    fort.10
        ln -fs ${sensor}.scor    scor.asc
-       $BIN_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
+       $BUILD_DIR/da_bias_verif.exe < nml_verif > da_bias_verif_${sensor}.log
        mv fort.11 bias_verif_${sensor}
        mv bcor.asc ${sensor}.bcor
 

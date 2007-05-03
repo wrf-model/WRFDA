@@ -181,7 +181,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
 
       ln -fs $WPS_DIR/ungrib.exe .
 
-      ${RUN_CMD} ./ungrib.exe > ungrib.log 2>&1
+      ./ungrib.exe > ungrib.log 2>&1
 
       RC=$?
       mv ungrib.log $RUN_DIR

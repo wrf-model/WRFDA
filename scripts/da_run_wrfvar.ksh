@@ -56,10 +56,16 @@ export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
 export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
-export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}    #DALE: Boundaries look wrong to me.
+
+if $NL_VAR4D; then
+   export DA_BOUNDARIES=${DA_BOUNDARIES:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}
+   #DALE: Boundaries look wrong to me.
+fi
 if $CYCLING; then
    if ! $FIRST; then
-      export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
+      if $NL_VAR4D; then
+         export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
+      fi
       export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
    fi
 fi
@@ -74,7 +80,7 @@ export DA_CRTM_COEFFS=${DA_CRTM_COEFFS:-$CRTM/crtm_coefs}
 
 # Error Tunning namelist parameters
 # Assign Random seeds
-#-----------------------------
+
 export NL_SEED_ARRAY1=$DATE
 export NL_SEED_ARRAY2=$DATE
 
@@ -97,9 +103,9 @@ echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRF
 if $NL_VAR4D; then
    echo 'WRF_DIR               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
+   echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
-echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
 if test -d $DA_RTTOV_COEFFS; then
    echo "DA_RTTOV_COEFFS       $DA_RTTOV_COEFFS"
@@ -221,10 +227,12 @@ echo "WINDOW_END            $WINDOW_END"
    ln -fs $WRFVAR_DIR/build/da_wrfvar.exe .
    export PATH=$WRFVAR_DIR/scripts:$PATH
 
-   ln -fs $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
-   ln -fs $DA_FIRST_GUESS	 fg01
-   ln -fs $DA_FIRST_GUESS	 wrfinput_d$DOMAIN
-   ln -fs $DA_BACK_ERRORS        be.dat
+   if $NL_VAR4D; then
+      ln -fs $DA_BOUNDARIES wrfbdy_d$DOMAIN
+   fi
+   ln -fs $DA_FIRST_GUESS fg01
+   ln -fs $DA_FIRST_GUESS wrfinput_d$DOMAIN
+   ln -fs $DA_BACK_ERRORS be.dat
 
    for FILE in $DAT_DIR/*.inv; do
       if test -f $FILE; then
@@ -355,8 +363,8 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DIFF_OPT=1
       export NL_KM_OPT=4
       export NL_DAMP_OPT=0
-      export NL_BASE_TEMP=290.
-      export NL_ZDAMP=5000.
+      export NL_BASE_TEMP=290.0
+      export NL_ZDAMP=5000.0
       export NL_DAMPCOEF=0.0
       export NL_KHDIF=0
       export NL_KVDIF=0
