@@ -12,3 +12,6 @@ make clean
 ./configure
 make all
 make install
+rm *.o
+cd ..
+ln -fs lib/*.a .

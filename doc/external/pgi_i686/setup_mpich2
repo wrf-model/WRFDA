@@ -3,8 +3,8 @@ export SETUP=pgf90
 export FC=pgf90
 export F90=pgf90
 export F77=pgf90
-export CC=gcc
-export CXX=g++
+export CC=pgcc
+export CXX=pgCC
 export LOADER=pgf90
 
 export FFLAGS="-O2"
