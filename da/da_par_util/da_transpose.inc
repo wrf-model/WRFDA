@@ -11,7 +11,7 @@ subroutine da_transpose_z2x (xp)
    if (trace_use) call da_trace_entry("da_transpose_z2x")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_z2x(xp % domdesc, xp % comms, xp % xpose_id1)
+   call wrf_dm_xpose_z2x(xp % domdesc, xp % comms, XPOSE_V1)
 #else
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -30,7 +30,7 @@ subroutine da_transpose_x2y (xp)
    if (trace_use) call da_trace_entry("da_transpose_x2y")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_x2y(xp % domdesc, xp % comms, xp % xpose_id1)
+   call wrf_dm_xpose_x2y(xp % domdesc, xp % comms, XPOSE_V1)
 #else
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -49,7 +49,7 @@ subroutine da_transpose_x2y_v2(xp)
    if (trace_use) call da_trace_entry("da_transpose_x2y_v2")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_x2y(xp % domdesc, xp % comms, xp % xpose_id2)
+   call wrf_dm_xpose_x2y(xp % domdesc, xp % comms, XPOSE_V2)
 #else
    xp % v2y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v2x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -68,7 +68,7 @@ subroutine da_transpose_y2z (xp)
    if (trace_use) call da_trace_entry("da_transpose_y2z")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_y2z (xp%domdesc, xp%comms, xp%xpose_id1)
+   call wrf_dm_xpose_y2z (xp%domdesc, xp%comms, XPOSE_V1)
 #else
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -88,7 +88,7 @@ subroutine da_transpose_z2y (xp)
 
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_z2y (xp%domdesc, xp%comms, xp%xpose_id1)
+   call wrf_dm_xpose_z2y (xp%domdesc, xp%comms, XPOSE_V1)
 #else
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -107,7 +107,7 @@ subroutine da_transpose_y2x (xp)
    if (trace_use) call da_trace_entry("da_transpose_y2x")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_y2x(xp % domdesc, xp % comms, xp % xpose_id1)
+   call wrf_dm_xpose_y2x(xp % domdesc, xp % comms, XPOSE_V1)
 #else
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -126,7 +126,7 @@ subroutine da_transpose_y2x_v2(xp)
    if (trace_use) call da_trace_entry("da_transpose_y2x_v2")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_y2x(xp % domdesc, xp % comms, xp % xpose_id2)
+   call wrf_dm_xpose_y2x(xp % domdesc, xp % comms, XPOSE_V2)
 #else
    xp % v2x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v2y(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)
@@ -145,7 +145,7 @@ subroutine da_transpose_x2z (xp)
    if (trace_use) call da_trace_entry("da_transpose_x2z")
 
 #ifdef DM_PARALLEL
-   call wrf_dm_xpose_x2z(xp % domdesc , xp % comms, xp % xpose_id1)
+   call wrf_dm_xpose_x2z(xp % domdesc , xp % comms, XPOSE_V1)
 #else
    xp % v1z(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde) = &
    xp % v1x(xp%ids:xp%ide,xp%jds:xp%jde,xp%kds:xp%kde)

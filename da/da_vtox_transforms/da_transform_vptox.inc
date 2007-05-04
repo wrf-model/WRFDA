@@ -63,7 +63,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
    !--------------------------------------------------------------------------
 
    ! Communicate halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id1)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV)
 
    ! Psi and chi to u and v:
 

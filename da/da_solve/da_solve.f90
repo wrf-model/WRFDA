@@ -269,7 +269,7 @@ subroutine da_solve ( grid , config_flags)
       if (calc_w_increment .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
 
-         call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id13)
+         call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_RADAR_XA_W)
       end if
 
       ! [8.7] Write out diagnostics

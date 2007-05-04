@@ -92,13 +92,8 @@ subroutine da_solve_init(grid &
 #include "HALO_BAL_EQN_ADJ.inc"
 #include "HALO_PSICHI_UV_ADJ.inc"
 #include "HALO_XA.inc"
-#include "HALO_XB.inc"
 #include "HALO_SFC_XA.inc"
-#include "HALO_SFC_XB.inc"
 #include "HALO_SSMI_XA.inc"
-#include "HALO_SSMI_XB.inc"
-#include "HALO_RADAR_XB.inc"
-#include "HALO_RADAR_XB.inc"
 #include "HALO_2D_WORK.inc"
 #include "HALO_RADAR_XA_W.inc"
 
@@ -112,25 +107,6 @@ subroutine da_solve_init(grid &
      grid%xp%comms(ii) = grid%comms(ii)
    end do
 
-   ! Copy halo and transpose IDs.
-
-   grid%xp%halo_id0 = HALO_INIT
-   grid%xp%halo_id1 = HALO_PSICHI_UV
-   grid%xp%halo_id2 = HALO_BAL_EQN_ADJ
-   grid%xp%halo_id3 = HALO_PSICHI_UV_ADJ
-   grid%xp%halo_id4 = HALO_XA
-   grid%xp%halo_id5 = HALO_XB
-   grid%xp%halo_id6 = HALO_SFC_XA
-   grid%xp%halo_id7 = HALO_SFC_XB
-   grid%xp%halo_id8 = HALO_SSMI_XA
-   grid%xp%halo_id9 = HALO_SSMI_XB
-   grid%xp%halo_id10 = HALO_RADAR_XA
-   grid%xp%halo_id11 = HALO_RADAR_XB
-   grid%xp%halo_id12 = HALO_2D_WORK
-   grid%xp%halo_id13 = HALO_RADAR_XA_W
-
-   grid%xp%xpose_id1 = XPOSE_V1
-   grid%xp%xpose_id2 = XPOSE_V2
 #endif
 
    ! Fill background scalars:

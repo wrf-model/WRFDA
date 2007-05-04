@@ -61,11 +61,11 @@ subroutine da_setup_testfield(xb, xa, xp)
    end if
 
    ! Exchange XA halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_XA)
 
    if (sfc_assi_options == 2) then
       ! Exchange XA (surface variable) halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
    end if
 
    if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -84,7 +84,7 @@ subroutine da_setup_testfield(xb, xa, xp)
       end if
 
       ! Exchange XA halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
+      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SSMI_XA)
    end if
 
    write(unit=stdout, fmt='(/a/)') &

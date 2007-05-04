@@ -91,7 +91,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    grid%xb%lon(is:ie,js:je) = grid%xlong(is:ie,js:je)
 
    ! Fill halo region for u and v.
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_PSICHI_UV_ADJ)
    tmpvar  = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
    !---------------------------------------------------------------

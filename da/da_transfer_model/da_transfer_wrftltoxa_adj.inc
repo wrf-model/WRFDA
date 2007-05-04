@@ -43,7 +43,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! [6.0] ALL THE SIMPLE ONES
    !---------------------------------------------------------------------------
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id4)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_XA)
 
    do k=ks,ke+1
       do j=js,je

@@ -106,7 +106,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    vtmp=grid%xa%v
    grid%xa%u=grid%em_a_u_2
    grid%xa%v=grid%em_a_v_2
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id3)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_PSICHI_UV_ADJ)
    grid%em_a_u_2=grid%xa%u
    grid%em_a_v_2=grid%xa%v
    grid%xa%u=utmp

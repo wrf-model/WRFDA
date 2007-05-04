@@ -1418,13 +1418,8 @@ halo      HALO_PSICHI_UV     dyn_em 24:vp%v1,vp%v2,xb%cori,xb%rho,xa%u,xa%v,xa%p
 halo      HALO_BAL_EQN_ADJ   dyn_em 24:xp%v1z
 halo      HALO_PSICHI_UV_ADJ dyn_em 24:xa%u,xa%v,xa%psfc
 halo      HALO_XA            dyn_em 24:xa%u,xa%v,xa%q,xa%p,xa%t,xa%rho,xa%rh,xa%psfc,xa%qcw,xa%qrn,xa%qt
-halo      HALO_XB            dyn_em 24:xb%u,xb%v,xb%w,xb%wh,xb%q,xb%p,xb%t,xb%rho,xb%rh,xb%psfc,xb%qcw,xb%qrn,xb%qt,xb%slp
 halo      HALO_SFC_XA        dyn_em 24:xa%u10,xa%v10,xa%t2,xa%q2
-halo      HALO_SFC_XB        dyn_em 24:xb%u10,xb%v10,xb%t2,xb%q2
 halo      HALO_SSMI_XA       dyn_em 24:xa%tpw,xa%speed,xa%tb19v,xa%tb19h,xa%tb22v,xa%tb37v,xa%tb37h,xa%tb85v,xa%tb85h,xa%ref
-halo      HALO_SSMI_XB       dyn_em 24:xb%tpw,xb%speed,xb%tb19v,xb%tb19h,xb%tb22v,xb%tb37v,xb%tb37h,xb%tb85v,xb%tb85h,xb%ref
-halo      HALO_RADAR_XA      dyn_em 24:xa%w,xa%wh,xa%qcw,xa%qrn,xa%qt
-halo      HALO_RADAR_XB      dyn_em 24:xb%w,xb%wh,xb%qcw,xb%qrn,xb%qt
 halo      HALO_2D_WORK       dyn_em 24:xp%vxy
 halo      HALO_RADAR_XA_W    dyn_em 24:xa%w,xa%wh
 
@@ -1614,22 +1609,6 @@ typedef x_type real    tb85h                  ij       -         1        -     
 #
 typedef xpose_type integer    domdesc
 typedef xpose_type integer    comms(max_comms)
-typedef xpose_type integer    halo_id0
-typedef xpose_type integer    halo_id1
-typedef xpose_type integer    halo_id2
-typedef xpose_type integer    halo_id3
-typedef xpose_type integer    halo_id4
-typedef xpose_type integer    halo_id5
-typedef xpose_type integer    halo_id6
-typedef xpose_type integer    halo_id7
-typedef xpose_type integer    halo_id8
-typedef xpose_type integer    halo_id9
-typedef xpose_type integer    halo_id10
-typedef xpose_type integer    halo_id11
-typedef xpose_type integer    halo_id12
-typedef xpose_type integer    halo_id13
-typedef xpose_type integer    xpose_id1
-typedef xpose_type integer    xpose_id2
 #
 # For standard MN decomposition:
 typedef xpose_type integer    ids

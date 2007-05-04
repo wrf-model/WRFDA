@@ -110,7 +110,7 @@ subroutine da_uv_to_divergence_adj(xp, xb, u, v, div)
 
          if (.not. Testing_WRFVAR) then
             xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
-            call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id12)
+            call wrf_dm_halo(xp%domdesc,xp%comms,HALO_2D_WORK)
 
             div(is, js:je, k) = xp%vxy(is, js:je)
             div(ie, js:je, k) = xp%vxy(ie, js:je)

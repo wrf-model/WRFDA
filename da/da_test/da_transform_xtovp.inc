@@ -29,7 +29,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    ! [2.2] Transform u, v to streamfunction via vorticity:
 
    ! Communicate halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV_ADJ)
 
    call da_uv_to_vorticity(xb, xa % u, xa % v, vor)
 

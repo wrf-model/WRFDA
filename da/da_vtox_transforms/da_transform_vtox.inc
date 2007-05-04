@@ -117,12 +117,12 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (.not.testing_wrfvar) then
       ! Exchange XA halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id4)
+      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_XA)
 
       if (sfc_assi_options == 2) then
          call da_transform_xtowtq (xp, xb, xa)
          ! Exchange XA (surface variable) halo region.
-         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+         call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
       end if
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -146,7 +146,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          if (Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
          ! Exchange XA halo region.
-         call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id8)
+         call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SSMI_XA)
       end if
    end if
 
@@ -163,7 +163,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          end do
       end do
 
-      call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id13)
+      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_RADAR_XA_W)
  
       if (use_radarobs .and. Use_Radar_rf) then
          ! Partition of hydrometeor increments via warm rain process

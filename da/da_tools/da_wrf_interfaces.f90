@@ -52,7 +52,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_z2y (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_z2y
    end interface
 
@@ -60,7 +60,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_y2z (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_y2z
    end interface
 
@@ -68,7 +68,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_y2x (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_y2x
    end interface
 
@@ -76,7 +76,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_x2y (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_x2y
    end interface
 
@@ -84,7 +84,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_x2z (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_x2z
    end interface
 
@@ -92,7 +92,7 @@ module da_wrf_interfaces
       subroutine wrf_dm_xpose_z2x (domdesc , comms , xpose_id)
          integer, intent(inout) :: domdesc
          integer, intent(inout) :: comms(*)
-         integer, intent(inout) :: xpose_id
+         integer, intent(in) :: xpose_id
       end subroutine wrf_dm_xpose_z2x
    end interface
 

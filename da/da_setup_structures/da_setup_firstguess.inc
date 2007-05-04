@@ -78,7 +78,7 @@ subroutine da_setup_firstguess(xbx, grid)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,grid%xp%halo_id0)
+   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_INIT)
    periodic_x = grid%periodic_x
 
    if (global) then     

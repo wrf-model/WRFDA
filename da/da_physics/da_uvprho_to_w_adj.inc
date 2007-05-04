@@ -234,7 +234,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
 
    xp%v1z(its:ite, jts:jte, kts:kte) = wz(its:ite, jts:jte, kts:kte)
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id2)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_BAL_EQN_ADJ)
 
    if (its == ids) then
       is = ids+1

@@ -47,7 +47,7 @@ subroutine da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
 
    endif
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id3)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV_ADJ)
 
    ! Transform psi and chi to u and v:
    call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &

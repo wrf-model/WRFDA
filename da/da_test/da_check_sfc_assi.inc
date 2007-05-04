@@ -53,7 +53,7 @@ subroutine da_check_sfc_assi(xb, xa, iv, xp, y)
    call da_transform_xtowtq (xp, xb, xa)
 
    ! Exchange XA(SURFACE) halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id6)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
 
 
    partial_lhs = 0.0

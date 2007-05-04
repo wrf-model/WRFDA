@@ -246,7 +246,7 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
    
    call da_transpose_x2z (xp)
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,xp%halo_id2)
+   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_BAL_EQN_ADJ)
 
    ! [2.5] Write data array into del2b:
 
