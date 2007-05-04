@@ -1,6 +1,8 @@
 
-! TBH:  TODO:  Wrap assertions in #ifdef DEBUG to speed up store/restore.  
+#define ASSERT_4DVAR_OPT
+#undef DEBUG_4DVAR_OPT
 
+! TBH:  TODO:  Compile this module with "-O3 -qhot"
 ! TBH:  TODO:  Improve very simple design if needed.  
 ! TBH:  TODO:   - Add erasure of fields
 ! TBH:  TODO:     - move to a dynamic set of buffers
@@ -79,19 +81,25 @@
           current_frame = frame_id
           current_buffer = buffer_id
           read_field_ids(current_frame, current_buffer) = 1
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10,A,I10)') &
             'select_frame:   current_frame, current_buffer = ', &
             current_frame, " , ", current_buffer
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
           RETURN
         END SUBROUTINE select_frame
 
 
         SUBROUTINE module_4dvaropt_end
-          ! print out actual number of words used at end
-          WRITE(msg,'(A,I10,A)') 'Maximum buffer size = ',buffer_position-1, &
-                                 ' INTEGER*8 words'
-          CALL wrf_message( TRIM(msg) )
+          LOGICAL, SAVE :: first_call = .TRUE.
+          IF ( first_call ) THEN
+            ! print out actual number of words used at end
+            WRITE(msg,'(A,I10,A)') 'MODULE_4DVAROPT:  Maximum buffer size = ', &
+                                   buffer_position-1, ' INTEGER*8 words'
+            CALL wrf_message( TRIM(msg) )
+            first_call = .FALSE.
+          ENDIF
           RETURN
         END SUBROUTINE module_4dvaropt_end
 
@@ -109,28 +117,38 @@
           INTEGER*8 inbuf(*)
           ! Local
           INTEGER newstart, field_id
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10,A,I10)') 'DEBUG store_field_lint:  current_frame,current_buffer = ',current_frame,",",current_buffer
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
           num_fields(current_frame,current_buffer) = &
             num_fields(current_frame,current_buffer) + 1
           field_id = num_fields(current_frame,current_buffer)
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10)') 'DEBUG store_field_lint:  field_id = ',field_id
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
+#ifdef ASSERT_4DVAR_OPT
           IF ( field_id > MAX_NUM_FIELDS ) THEN
             CALL wrf_error_fatal( "Too many fields in store_field_lint" )
           ENDIF
+#endif
           newstart = buffer_position
           field_starts(field_id,current_frame,current_buffer) = newstart
           field_counts(field_id,current_frame,current_buffer) = numwords
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10,A,I10,A,I10)') &
             'DEBUG store_field_lint:  field_id = ',field_id,&
             '  buffer start = ',newstart,&
             '  buffer end = ',(newstart+numwords-1)
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
           buffer_position = buffer_position + numwords
+#ifdef ASSERT_4DVAR_OPT
           IF ( buffer_position-1 > MAX_NUM_WORDS ) THEN
             CALL wrf_error_fatal( "Ran out of memory in store_field_lint" )
           ENDIF
+#endif
           CALL fast_copy_lint ( buffer(newstart), inbuf, numwords )
           RETURN
         END SUBROUTINE store_field_lint
@@ -146,25 +164,35 @@
           INTEGER*8 outbuf(*)
           ! Local
           INTEGER field_id, thisstart
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10,A,I10)') 'DEBUG restore_field_lint:  current_frame,current_buffer = ',current_frame,",",current_buffer
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
           field_id = read_field_ids(current_frame, current_buffer)
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10)') 'DEBUG restore_field_lint:  field_id = ',field_id
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
+#ifdef ASSERT_4DVAR_OPT
 ! TODO:  remove this assertion
           IF (( field_id > num_fields(current_frame,current_buffer) ) .OR. &
               ( field_id < 1 )) THEN
             CALL wrf_error_fatal( "Field ID out of range in restore_field_lint" )
           ENDIF
+#endif
           thisstart = field_starts(field_id,current_frame,current_buffer)
+#ifdef DEBUG_4DVAR_OPT
           WRITE(msg,'(A,I10,A,I10,A,I10)') &
             'DEBUG restore_field_lint:  field_id = ',field_id, &
             '  buffer start = ',thisstart, &
             '  buffer end = ',(thisstart+field_counts(field_id,current_frame,current_buffer)-1)
           CALL wrf_debug( 10, TRIM(msg) )
+#endif
+#ifdef ASSERT_4DVAR_OPT
           IF ( numwords .ne. field_counts(field_id,current_frame,current_buffer) ) THEN
             CALL wrf_error_fatal( "Incorrect count in restore_field_lint" )
           ENDIF
+#endif
           CALL fast_copy_lint ( outbuf, buffer(thisstart), numwords )
           ! increment field_id for reading
           read_field_ids(current_frame, current_buffer) = field_id + 1

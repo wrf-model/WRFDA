@@ -41,7 +41,7 @@ export EXPT=test
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
 export NL_INPUTOUT_BEGIN_H=0
-export NL_NTMAX=100
+export NL_NTMAX=5
 export NL_VAR4D=true
 #export NL_TRACE_UNIT=0
 #export NL_TRACE_USE=false
@@ -56,22 +56,21 @@ else
 fi
 #export FIRST=false
 
-export LSF_EXCLUSIVE=" "
+#export LSF_EXCLUSIVE=" "
 export NUM_PROCS=32
 export NUM_PROCS_VAR=16
 export NUM_PROCS_WRF=16
-export PROJECT_ID=64000420
-export QUEUE=regular
+#export PROJECT_ID=64000420
+export PROJECT_ID=64000400
+export QUEUE=debug
 export LSF_EXCLUSIVE=-I
-export LSF_MAX_RUNTIME=10
-export PROJECT_ID=64000420
-export LSF_MAX_RUNTIME=360
+export LSF_MAX_RUNTIME=30
 export LL_PTILE=16
 export RUN_CMD=mpirun.lsf
 
 #Time info:
 export INITIAL_DATE=2005071600
-export FINAL_DATE=2005071700
+export FINAL_DATE=2005071600
 #Uncomment for actual runs: export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00
@@ -85,9 +84,9 @@ export LONG_FCST_RANGE_4=06
 
 #Directories:
 #bluevista:
-export REL_DIR=$HOME/release
-export DAT_DIR=$REL_DIR/../case_data
-export EXP_DIR=/ptmp/xinzhang/$REGION/$EXPT
+export REL_DIR=$HOME/4DVAR_Optimization
+export DAT_DIR=/ptmp/hender/4DVAR_Optimization/case_data
+export EXP_DIR=/ptmp/hender/4DVAR_Optimization/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
@@ -132,9 +131,9 @@ export NL_CHECK_MAX_IV=true
 #WRF-plus adjoint optimization:
 # TBH:  Hacking in new namelist settings here.
 # TBH:  "REMOVE_*" namelist variables are .FALSE. by default
-export NL_REMOVE_RUNGE_KUTTA_LOOR=true
-export NL_REMOVE_SMALL_STEP=true
-export NL_REMOVE_RKTEND_THRU_SS=true
+export NL_REMOVE_RUNGE_KUTTA_LOOR=false
+export NL_REMOVE_SMALL_STEP=false
+export NL_REMOVE_RKTEND_THRU_SS=false
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
