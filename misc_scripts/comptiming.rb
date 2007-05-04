@@ -32,7 +32,7 @@ class CompTiming
     # read file
     lines = IO.readlines(@filename)
     lines.each do |line|
-      if (line =~ /comp(\d*)\s*=\s*/) then
+      if (line =~ /comp(\w*)\s*=\s*/) then
         new_key = "comp" + $1.dup
         @comp_timing_results[new_key] = 0 unless (@comp_timing_results.has_key?(new_key))
         @comp_timing_results[new_key] += $'.to_i
