@@ -1,6 +1,6 @@
 #!/bin/ksh
-baseline_dir="cwb"
-dut_dir="cwb_BASELINE"
+baseline_dir="cwb_BASELINE"
+dut_dir="cwb"
 
 baseline_ad_dir="${baseline_dir}/test/run/2005071600/wrfvar/working/ad"
 dut_ad_dir="${dut_dir}/test/run/2005071600/wrfvar/working/ad"
@@ -23,6 +23,9 @@ print "=================="
 print "Diff stdout files:"
 print "=================="
 print "grep -v Timing ${baseline_ad_dir}/${ad_stdout} > $baseline_stdout"
+if [[ ! -f ${dut_ad_dir}/${ad_stdout} ]] ; then
+  sleep 3
+fi
 print "grep -v Timing ${dut_ad_dir}/${ad_stdout} > $dut_stdout"
 grep -v Timing ${baseline_ad_dir}/${ad_stdout} > $baseline_stdout
 grep -v Timing ${dut_ad_dir}/${ad_stdout} > $dut_stdout

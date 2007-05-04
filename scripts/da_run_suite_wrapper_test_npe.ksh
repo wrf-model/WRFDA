@@ -58,14 +58,14 @@ fi
 
 #export LSF_EXCLUSIVE=" "
 export NUM_PROCS=32
-export NUM_PROCS_VAR=16
-export NUM_PROCS_WRF=16
+export NUM_PROCS_VAR=8
+export NUM_PROCS_WRF=8
 #export PROJECT_ID=64000420
 export PROJECT_ID=64000400
 export QUEUE=debug
 export LSF_EXCLUSIVE=-I
 export LSF_MAX_RUNTIME=30
-export LL_PTILE=16
+export LL_PTILE=32
 export RUN_CMD=mpirun.lsf
 
 #Time info:
