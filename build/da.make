@@ -202,17 +202,6 @@ da_utils : setup \
 da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
 	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
 
-da_plots : setup da_scale_length.exe da_be_scale_length.exe da_plot_be.exe 
-
-da_plot_be.exe :  da_plot_be.o da_module_graph.o
-	$(SFC) -o $@  da_plot_be.o da_module_graph.o $(NCARG_LIB) $(LOCAL_LIB)
-
-da_be_scale_length.exe: da_be_scale_length.o
-	$(SFC) -o $@ da_be_scale_length.o
-
-da_scale_length.exe: da_scale_length.o
-	$(SFC) -o $@ da_scale_length.o da_control.o
-
 da_diagnostics.exe: da_diagnostics.o
 	$(SFC) -o $@ da_diagnostics.o da_control.o module_driver_constants.o
 
@@ -247,14 +236,6 @@ da_bias_verif.exe : da_bias_verif.o rad_bias.o
 
 # Special cases, either needing special include files or too big to 
 # optimise/debug
-
-da_module_graph.o da_plot_be.o :
-	@ $(RM) $@
-	@ $(SED_FTN) $*.f90 > $*.b
-	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
-	@ $(RM) $*.b
-	  $(FC) -c $(FCBASE) $(FCFREE) $*.f
-	
 
 da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $@
