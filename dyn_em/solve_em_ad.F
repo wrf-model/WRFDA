@@ -941,26 +941,26 @@ BENCH_END(exch10)
 ! TBH:  Save fields re-computed later by small_step loops.  
  store_small_step: if ( config_flags%remove_small_step .and. &
                 ( .not. config_flags%remove_rktend_thru_ss ) ) then
-BENCH_START(store_small_step_tim)
+BENCH_START(compstore_small_step_tim)
    WRITE(wrf_err_message,*)'DEBUG:  store_small_step:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
 #include "store_small_step.h"
-BENCH_END(store_small_step_tim)
+BENCH_END(compstore_small_step_tim)
  endif store_small_step
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields computed between the call to rk_tendency and 
 ! TBH:  the end of small_stepu loop.  
  store_rktend_thru_ss: if ( config_flags%remove_rktend_thru_ss ) then
-BENCH_START(store_rktend_thru_ss_tim)
+BENCH_START(compstore_rktend_thru_ss_tim)
    WRITE(wrf_err_message,*)'DEBUG:  store_rktend_thru_ss:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
 #include "store_rktend_thru_ss.h"
-BENCH_END(store_rktend_thru_ss_tim)
+BENCH_END(compstore_rktend_thru_ss_tim)
  endif store_rktend_thru_ss
 
 BENCH_START(comp11)
@@ -1053,7 +1053,7 @@ BENCH_END(exch12)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields re-computed later by runge_kutta_loor...  
  store_runge_kutta_loor: if (config_flags%remove_runge_kutta_loor) then
-BENCH_START(store_runge_kutta_loor_tim)
+BENCH_START(compstore_runge_kutta_loor_tim)
    if ( rk_step < rk_order ) then
      WRITE(wrf_err_message,*)'DEBUG:  store_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
@@ -1061,7 +1061,7 @@ BENCH_START(store_runge_kutta_loor_tim)
      CALL select_frame(rk_step, BUF_RK_LOOR)
 #include "store_runge_kutta_loor.h"
    endif
-BENCH_END(store_runge_kutta_loor_tim)
+BENCH_END(compstore_runge_kutta_loor_tim)
  endif store_runge_kutta_loor
 
 end do runge_kutta_looq
@@ -1106,7 +1106,7 @@ BENCH_START(comp14)
                       min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(comp14)
 
-BENCH_START(a_moist_physics_finish_tim)
+BENCH_START(compa_moist_physics_finish_tim)
     call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                     a_h_diabatic, dtm, ide, jde, kde, &
                     ims, ime, jms, jme, kms, kme, &
@@ -1114,10 +1114,10 @@ BENCH_START(a_moist_physics_finish_tim)
                     min(grid%i_end(ij),ide-1-sz),    &
                     max(grid%j_start(ij),jds+sz),  &
                     min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(a_moist_physics_finish_tim)
+BENCH_END(compa_moist_physics_finish_tim)
 
 
-BENCH_START(moist_physics_prep_tim)
+BENCH_START(compmoist_physics_prep_tim)
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &
@@ -1130,9 +1130,9 @@ BENCH_START(moist_physics_prep_tim)
                                    min(grid%i_end(ij),ide-1-sz),    &
                                    max(grid%j_start(ij),jds+sz),  &
                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(moist_physics_prep_tim)
+BENCH_END(compmoist_physics_prep_tim)
 
-BENCH_START(a_lscond_tim)
+BENCH_START(compa_lscond_tim)
        CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
                        a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
                        pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
@@ -1141,9 +1141,9 @@ BENCH_START(a_lscond_tim)
                        min(grid%i_end(ij),ide-1-sz),    &
                        max(grid%j_start(ij),jds+sz),  &
                        min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
-BENCH_END(a_lscond_tim)
+BENCH_END(compa_lscond_tim)
 
-BENCH_START(a_moist_physics_prep_tim)
+BENCH_START(compa_moist_physics_prep_tim)
        call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, &
                                      al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
                                      pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, &
@@ -1154,7 +1154,7 @@ BENCH_START(a_moist_physics_prep_tim)
                                      min(grid%i_end(ij),ide-1-sz),    &
                                      max(grid%j_start(ij),jds+sz),  &
                                      min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(a_moist_physics_prep_tim)
+BENCH_END(compa_moist_physics_prep_tim)
 
 endif
 
@@ -1584,7 +1584,7 @@ BENCH_END(exch25)
   end do runge_kutta_loor
 
  else ! restore_runge_kutta_loor
-BENCH_START(restore_runge_kutta_loor_tim)
+BENCH_START(comprestore_runge_kutta_loor_tim)
    if (rk_step > 1) then
      WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  rk_step, rk_order = ',rk_step,rk_order
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
@@ -1594,7 +1594,7 @@ BENCH_START(restore_runge_kutta_loor_tim)
      WRITE(wrf_err_message,*)'DEBUG:  restore_runge_kutta_loor:  done for rk_step-1 = ',(rk_step-1)
      CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    endif
-BENCH_END(restore_runge_kutta_loor_tim)
+BENCH_END(comprestore_runge_kutta_loor_tim)
  endif restore_runge_kutta_loor
 
 BENCH_START(exch26)
@@ -1816,13 +1816,13 @@ CALL wrf_debug( 10, TRIM(wrf_err_message) )
 ! TBH:  Restore fields computed earlier between the call to rk_tendency and 
 ! TBH:  the end of small_stepu loop.  
  restore_rktend_thru_sszq: if ( config_flags%remove_rktend_thru_ss ) then
-BENCH_START(restore_rktend_thru_ss_tim)
+BENCH_START(comprestore_rktend_thru_ss_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszq:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
 #include "restore_rktend_thru_ss.h"
-BENCH_END(restore_rktend_thru_ss_tim)
+BENCH_END(comprestore_rktend_thru_ss_tim)
  else  ! restore_rktend_thru_sszq
 
 BENCH_START(comp7773)
@@ -1876,13 +1876,13 @@ BENCH_END(exch28)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by small_stepu loop.  
  restore_small_stepzq: if (config_flags%remove_small_step) then
-BENCH_START(restore_small_step_tim)
+BENCH_START(comprestore_small_step_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzq:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
 #include "restore_small_step.h"
-BENCH_END(restore_small_step_tim)
+BENCH_END(comprestore_small_step_tim)
  else  ! restore_small_stepzq
 
   small_stepzq: do iteration = 1, number_of_small_timesteps
@@ -2284,13 +2284,13 @@ BENCH_END(exch38)
 ! TBH:  Restore fields computed earlier between the call to rk_tendency and 
 ! TBH:  the end of small_stepu loop.  
  restore_rktend_thru_sszw: if ( config_flags%remove_rktend_thru_ss ) then
-BENCH_START(restore_rktend_thru_ss_tim)
+BENCH_START(comprestore_rktend_thru_ss_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszw:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
 #include "restore_rktend_thru_ss.h"
-BENCH_END(restore_rktend_thru_ss_tim)
+BENCH_END(comprestore_rktend_thru_ss_tim)
  else  ! restore_rktend_thru_sszw
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzw, rk_step = ',rk_step
@@ -2348,13 +2348,13 @@ BENCH_END(exch39)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by small_stepu loop.  
  restore_small_stepzw: if (config_flags%remove_small_step) then
-BENCH_START(restore_small_step_tim)
+BENCH_START(comprestore_small_step_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzw:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
 #include "restore_small_step.h"
-BENCH_END(restore_small_step_tim)
+BENCH_END(comprestore_small_step_tim)
  else  ! restore_small_stepzw
 
   small_stepzw: do iteration = 1, number_of_small_timesteps
@@ -2943,13 +2943,13 @@ BENCH_END(exch52)
 ! TBH:  Restore fields computed earlier between the call to rk_tendency and 
 ! TBH:  the end of small_stepu loop.  
  restore_rktend_thru_sszz: if ( config_flags%remove_rktend_thru_ss ) then
-BENCH_START(restore_rktend_thru_ss_tim)
+BENCH_START(comprestore_rktend_thru_ss_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_rktend_thru_sszz:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND_THRU_SS)
 #include "restore_rktend_thru_ss.h"
-BENCH_END(restore_rktend_thru_ss_tim)
+BENCH_END(comprestore_rktend_thru_ss_tim)
  else  ! restore_rktend_thru_sszz
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzz, rk_step = ',rk_step
@@ -3012,13 +3012,13 @@ BENCH_END(exch53)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by small_stepu loop.  
  restore_small_stepzz: if (config_flags%remove_small_step) then
-BENCH_START(restore_small_step_tim)
+BENCH_START(comprestore_small_step_tim)
    WRITE(wrf_err_message,*)'DEBUG:  restore_small_stepzz:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_SMALL_STEP)
 #include "restore_small_step.h"
-BENCH_END(restore_small_step_tim)
+BENCH_END(comprestore_small_step_tim)
  else  ! restore_small_stepzz
 
   small_stepzz: do iteration = 1, number_of_small_timesteps

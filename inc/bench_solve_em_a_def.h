@@ -260,17 +260,17 @@ BENCH_DECL(comp7776)
 BENCH_DECL(comp7777)
 BENCH_DECL(comp7778)
 
-BENCH_DECL(moist_physics_prep_tim)
-BENCH_DECL(a_moist_physics_finish_tim)
-BENCH_DECL(a_lscond_tim)
-BENCH_DECL(a_moist_physics_prep_tim)
+BENCH_DECL(compmoist_physics_prep_tim)
+BENCH_DECL(compa_moist_physics_finish_tim)
+BENCH_DECL(compa_lscond_tim)
+BENCH_DECL(compa_moist_physics_prep_tim)
 
-BENCH_DECL(store_runge_kutta_loor_tim)
-BENCH_DECL(restore_runge_kutta_loor_tim)
-BENCH_DECL(store_small_step_tim)
-BENCH_DECL(restore_small_step_tim)
-BENCH_DECL(store_rktend_thru_ss_tim)
-BENCH_DECL(restore_rktend_thru_ss_tim)
+BENCH_DECL(compstore_runge_kutta_loor_tim)
+BENCH_DECL(comprestore_runge_kutta_loor_tim)
+BENCH_DECL(compstore_small_step_tim)
+BENCH_DECL(comprestore_small_step_tim)
+BENCH_DECL(compstore_rktend_thru_ss_tim)
+BENCH_DECL(comprestore_rktend_thru_ss_tim)
 
 #else
 #define SOLVE_START

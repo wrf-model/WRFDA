@@ -302,10 +302,8 @@ integer k
 integer k2
 real qs1
 real qvh(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))
-real qvi(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))
 real r1
 real thh(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))
-real thi(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))
 real ttemp
 
 !----------------------------------------------
@@ -327,36 +325,10 @@ a_ttemp = 0.
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
-!----------------------------------------------
-! FUNCTION AND TAPE COMPUTATIONS
-!----------------------------------------------
-do j = jts, jte
-  do k = 1, kte
-    do i = its, ite
-      ttemp = pii(i,k,j)*th(i,k,j)
-      es1 = 1000.*svp1*exp(svp2*(ttemp-svpt0)/(ttemp-svp3))
-      qs1 = ep2*es1/(p(i,k,j)-es1)
-      dqv = qv(i,k,j)-qs1
-      if (dqv .gt. 0.) then
-        r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)
-        cond = dqv/r1
-        ttemp = ttemp+xlv/cp*cond
-        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
-      endif
-    end do
-  end do
-end do
 
-!----------------------------------------------
-! SAVE DEPENDEND VARIABLES
-!----------------------------------------------
-thi(:,:,:) = th(:,:,:)
-qvi(:,:,:) = qv(:,:,:)
 !----------------------------------------------
 ! ADJOINT COMPUTATIONS
 !----------------------------------------------
-qv(:,:,:) = qvh(:,:,:)
-th(:,:,:) = thh(:,:,:)
 do j = jts, jte
   a_cond = 0.
   a_dqv = 0.
@@ -365,23 +337,6 @@ do j = jts, jte
   a_r1 = 0.
   a_ttemp = 0.
   do k = kte, 1, -1
-    qv(:,:,:) = qvh(:,:,:)
-    th(:,:,:) = thh(:,:,:)
-    do k2 = 1, k-1
-      do i = its, ite
-        ttemp = pii(i,k2,j)*th(i,k2,j)
-        es1 = 1000.*svp1*exp(svp2*(ttemp-svpt0)/(ttemp-svp3))
-        qs1 = ep2*es1/(p(i,k2,j)-es1)
-        dqv = qv(i,k2,j)-qs1
-        if (dqv .gt. 0.) then
-          r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)
-          cond = dqv/r1
-          qv(i,k2,j) = qv(i,k2,j)-cond
-          ttemp = ttemp+xlv/cp*cond
-          th(i,k2,j) = ttemp/pii(i,k2,j)
-        endif
-      end do
-    end do
     do i = its, ite
       a_cond = 0.
       a_dqv = 0.
@@ -409,6 +364,7 @@ do j = jts, jte
 ! recompute : cond
 ! recompute : cond
         ttemp = ttemp+xlv/cp*cond
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
 ! recompute : ttemp
 ! recompute : ttemp
         a_cond = a_cond+a_rainnc(i,j)*rho(i,k,j)*dz8w(i,k,j)
@@ -457,8 +413,8 @@ end do
 !----------------------------------------------
 ! GET DEPENDEND VARIABLES
 !----------------------------------------------
-qv(:,:,:) = qvi(:,:,:)
-th(:,:,:) = thi(:,:,:)
+qv(:,:,:) = qvh(:,:,:)
+th(:,:,:) = thh(:,:,:)
 
 
 !----------------------------------------------
