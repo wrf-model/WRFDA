@@ -18,7 +18,7 @@ subroutine da_find_fft_trig_funcs(n, trig_functs)
 
    trig_functs(:) = 0.0
 
-   DEL=4.0*ASin(1.0)/FLOAT(N)
+   DEL=4.0*(pi/2.0)/FLOAT(N)
    NIL=0
    NHL=(N/2)-1
 
