@@ -106,7 +106,7 @@ export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
 
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC}                
+export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}                
 
 export OK='<FONT COLOR="green">'
 export ERR='<FONT COLOR="red">'

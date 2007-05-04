@@ -24,7 +24,7 @@ export DATE=${DATE:-2003010100}
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar/build}
+export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}
 export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
@@ -99,7 +99,7 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
 
-   ln -fs $WRF_BC_DIR/da_update_bc.exe .
+   ln -fs $WRF_BC_DIR/build/da_update_bc.exe .
    ./da_update_bc.exe
 
    RC=$?

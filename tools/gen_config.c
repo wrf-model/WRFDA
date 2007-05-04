@@ -188,6 +188,9 @@ gen_namelist_script ( char * dirname )
       }
     }
   }
+  
+  fprintf(fp,"echo \\&namelist_quilt >> namelist.input\n");
+  fprintf(fp,"echo / >> namelist.input\n");
 
   fclose( fp ) ;
   return(0) ;

@@ -40,14 +40,14 @@ export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
 export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wrf}
 export WORK_DIR=$RUN_DIR/working
 
-#From WPS (namelist.wps):
+# From WPS (namelist.wps):
 export NL_E_WE=${NL_E_WE:-45}                          #
 export NL_E_SN=${NL_E_SN:-45}                          #
 export NL_DX=${NL_DX:-200000}                # Resolution (m).
 export NL_DY=${NL_DY:-200000}                # Resolution (m).
 
-#From WRF (namelist.input):
-#&time_control:
+# From WRF (namelist.input):
+# &time_control:
 export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
 if  $NL_VAR4D ; then
     export NL_RUN_HOURS=$FCST_RANGE
@@ -57,17 +57,18 @@ export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
 export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.} 
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
-#export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
+# WHY
+# export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
 export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
 export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
 export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
-#&domains:
+# &domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   #
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
 export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
-#&physics:
+# &physics:
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
@@ -78,15 +79,15 @@ export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
 export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
-#&dynamics:
+# &dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
 export NL_KM_OPT=${NL_KM_OPT:-1}               # 
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    # 
-#&bdy_control:
+# &bdy_control:
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
-#For WRF:
+# For WRF:
 export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
 export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
 
@@ -95,7 +96,7 @@ rm -rf $WORK_DIR
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
 
-#Get extra namelist variables:
+# Get extra namelist variables:
 . ${WRFVAR_DIR}/scripts/da_get_date_range.ksh
 
 echo "<HTML><HEAD><TITLE>$EXPT wrf</TITLE></HEAD><BODY>"
@@ -127,11 +128,17 @@ ln -fs ${WRF_DIR}/run/VEGPARM.TBL .
 ln -fs ${WRF_DIR}/run/gribmap.txt .
 ln -fs ${WRF_INPUT} wrfinput_d${DOMAIN}
 ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
-#cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
+# WHY
+# cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
-cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2004.inc $WRF_DIR/inc/namelist_script.inc
+
+if test ! -f $WRF_DIR/inc/namelist_script.inc; then
+   # No namelist_script logic introduced during build, so add manually
+   cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2004.inc $WRF_DIR/inc/namelist_script.inc
+fi
+
 if test $WRF_NAMELIST'.' != '.'; then
    ln -fs $WRF_NAMELIST namelist.input
 elif test -f $WRF_DIR/inc/namelist_script.inc; then
@@ -144,7 +151,8 @@ cp namelist.input $RUN_DIR
 
 echo '<A HREF="namelist.input">Namelist input</a>'
 
-#if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
+# WHY
+# if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
 
    if $DUMMY; then
       echo Dummy wrf
@@ -189,12 +197,13 @@ echo '<A HREF="namelist.input">Namelist input</a>'
    fi
    mv wrfout* $FC_DIR/$DATE
    mv wrf_3dvar* $FC_DIR/$DATE
-#else
-#   echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
-#fi
+# else
+#    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
+# fi
 
-#mkdir -p $FC_DIR/$END_DATE
-#ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
+# WHY
+# mkdir -p $FC_DIR/$END_DATE
+# ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
 #   $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
 
 if $CLEAN; then
