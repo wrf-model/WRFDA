@@ -58,15 +58,6 @@ MODULE da_verif_control
 
 ! namelist.varstats variables
 !
-  NAMELIST /Record1/ exp_num, exp_dirs, out_dirs
-  NAMELIST /Record2/ start_date, end_date, interval
-  NAMELIST /Record3/ if_plot_rmse, if_plot_bias, if_plot_abias
-  NAMELIST /Record4/ if_plot_synop, if_plot_sonde_sfc,if_plot_metar, &
-                     if_plot_ships, if_plot_buoy , if_plot_qscat, &
-                     if_plot_sound, if_plot_airep, if_plot_pilot, if_plot_profiler, &
-                     if_plot_geoamv, if_plot_polaramv, if_plot_gpspw, if_plot_gpsref, &
-                     if_plot_airsret
-  NAMELIST /Record5/ file_path_string
 
 ! record1
   INTEGER                               :: exp_num   ! number of experiments
@@ -107,6 +98,16 @@ MODULE da_verif_control
   LOGICAL  :: if_plot_airsret 
 ! record5
   character (len=50)    :: file_path_string
+
+  NAMELIST /Record1/ exp_num, exp_dirs, out_dirs
+  NAMELIST /Record2/ start_date, end_date, interval
+  NAMELIST /Record3/ if_plot_rmse, if_plot_bias, if_plot_abias
+  NAMELIST /Record4/ if_plot_synop, if_plot_sonde_sfc,if_plot_metar, &
+                     if_plot_ships, if_plot_buoy , if_plot_qscat, &
+                     if_plot_sound, if_plot_airep, if_plot_pilot, if_plot_profiler, &
+                     if_plot_geoamv, if_plot_polaramv, if_plot_gpspw, if_plot_gpsref, &
+                     if_plot_airsret
+  NAMELIST /Record5/ file_path_string
 !
 ! Namelist declaration over
 
