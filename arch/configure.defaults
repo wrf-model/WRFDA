@@ -92,57 +92,6 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, simple      (RSL, MPI, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCTYPE          = -r8
-FCFREE          = -Mfree
-FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL, MPI, RSL IO)
 #
 FC              = mpif90
@@ -281,55 +230,6 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, simple      (RSL, MPI, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = g95
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCFREE          = -ffree-form  -ffree-line-length-huge
-FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159 
-FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL, MPI, RSL IO)
 #
 FC              = mpif90
@@ -435,56 +335,8 @@ arch_clean :
 arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
-
-
 ###########################################################
-#ARCH Settings for PC Linux i487 i587 i687, g95, simple      (RSL_LITE, MPI, RSL IO)
-#Not working yet
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = g95
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM 
-                    
-DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCFREE          = -ffree-form  -ffree-line-length-huge
-FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159 
-FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -fno-second-underscore
-
-CCFLAGS2        = -I$(RSL_LITE)
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL_LITE) -lrsl
-
-arch : 
-	$(LN) $(RSL_LITE)/*.c .
-	$(LN) $(RSL_LITE)/*.F .
-	( cd $(RSL_LITE) ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST all )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, serial, untested   (single-threaded)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, serial, untested    (Single-threaded)
 #
 
 M4              = m4 -B12000
@@ -518,55 +370,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, simple, untested   (RSL, MPI, RSL IO)
-#
-M4              = m4 -B12000
-FC              = mpif90
-FFC             = $(FC)
-SFC             = ifort
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         = 
-FCDEBUG         = 
-FCFREE          = -FR -cm -w
-FCENDIAN        = -convert big_endian
-FCBASE          =
-FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, debug, untested    (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, debug, untested     (RSL, MPI, RSL IO)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -697,53 +501,6 @@ arch_clean :
 
 arch_superclean :
 
-###########################################################
-#ARCH Settings for PC Linux x86_64, PGI, simple              (RSL, MPI, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = pgf90
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 8
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCTYPE          = -r8
-FCFREE          = -Mfree
-FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, PGI, debug               (RSL, MPI, RSL IO)
@@ -844,7 +601,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, serial, untested    (Single-threaded)
+#ARCH Settings for PC Linux x86_64, Pathscale, serial, untested   (Single-threaded)
 #
 FC              = pathf90
 FFC             = $(FC)
@@ -879,54 +636,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, simple, untested    (RSL, MPI, RSL IO)
-#
-FC              = mpif90
-FFC             = $(FC)
-SFC             = pathf90
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 8
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCTYPE          = -r8
-FCFREE          = -freeform
-FCENDIAN        = -convert big_endian
-FCBASE          = -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-          MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-          LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, debug, untested     (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, debug, untested    (RSL, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -1057,54 +767,6 @@ arch :
 arch_clean :
 
 arch_superclean :
-
-###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, simple, untested     (RSL, MPI, RSL IO)
-#
-M4              = m4 -B12000
-FC              = mpif90
-FFC             = $(FC)
-SFC             = ifort
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 8
-
-TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         =
-FCTYPE          = -r8
-FCFREE          = -FR -cm -w
-FCENDIAN        = -convert big_endian
-FCBASE          = 
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
-
-CCFLAGS2        = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-          MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-          LEARN_BCAST=-DLEARN_BCAST linux )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
 #ARCH Settings for PC Linux x86_64, ifort, debug, untested      (RSL, MPI, RSL IO)
@@ -1428,58 +1090,6 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf, simple                          (RSL, IBM-MPI, RSL IO)
-#
-M4              = m4 -B24000
-FC              = mpxlf90_r
-FFC             = xlf_r
-SFC             = xlf90_r
-CC              = mpcc_r
-CC_TOOLS        = cc_r
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 8
-
-TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         = 
-FCDEBUG         = 
-FCTYPE          = -qrealsize=8
-FCFREE          = -qfree=f90
-FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
-CCFLAGS_RSL     =
-
-LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
-
-LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST sp2 )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
 #ARCH Settings for AIX, xlf, debug                           (RSL, IBM-MPI, RSL IO)
 #
 M4              = m4 -B24000
@@ -1623,61 +1233,6 @@ arch :
 arch_clean :
 
 arch_superclean :
-
-###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, simple          (RSL, Cray MPI, RSL IO)
-
-SED_FTN         = sed -f ../arch/cray_csd.sed
-M4              = m4 -B12000
-FC              = ftn
-SFC             = ftn
-FFC             = $(FC)
-CC              = cc
-# Do not use cross-compiler for tools
-CC_TOOLS        = gcc
-RANLIB          = echo
-LD              = $(FC)
-
-NATIVE_RWORDSIZE        = 8
-
-TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         =
-FCTYPE          = -sreal64 -dp -em -eh
-FCFREE          = -f free -N 255
-FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC)  -p$(CRTM_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
-CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
-
-LDFLAGS2        = -V
-
-LOCAL_LIB       =
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-arch :
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-             LEARN_BCAST=-DLEARN_BCAST crayx1 )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
 
 ###########################################################
 #ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI, RSL IO)
@@ -1824,57 +1379,6 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, g95, simple                 (RSL, MPI, RSL IO)
-#
-CPP             = /usr/bin/cpp
-M4              = m4 -B12000
-FC              = mpif90
-FFC             = $(FC)
-SFC             = g95
-CC              = mpicc
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCTYPE          = -r8
-FCFREE          = -ffree-form -ffree-line-length-huge
-FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
-
-CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
-
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11
-LOCAL_LIB       = -lSystemStubs
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST darwin )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
-
-###########################################################
 #ARCH Settings for Darwin, g95, debug                  (RSL, MPI, RSL IO)
 #
 CPP             = /usr/bin/cpp
@@ -2018,57 +1522,6 @@ arch :
 arch_clean :
 
 arch_superclean :
-
-###########################################################
-#ARCH Settings for Darwin, PGI, simple                 (RSL, MPI, RSL IO)
-#
-CPP             = /usr/bin/cpp
-M4              = m4 -B12000
-FC              = mpif90
-FFC             = $(FC)
-SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
-CC_TOOLS        = gcc
-LD              = $(FC)
-
-NATIVE_RWORDSIZE	= 4
-
-TRADFLAG        = 
-FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
-
-FCOPTIM         =
-FCDEBUG         = 
-FCTYPE          = -r8
-FCFREE          = -Mfree
-FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
-
-CCFLAGS2        = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
-
-LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
-
-
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST darwin )
-	@ touch arch
-
-arch_clean :
-	( cd $(RSL)/RSL; make clean )
-
-arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
 #ARCH Settings for Darwin, PGI, debug                  (RSL, MPI, RSL IO)
