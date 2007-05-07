@@ -258,6 +258,8 @@ BENCH_REPORT(compstore_small_step_tim)
 BENCH_REPORT(comprestore_small_step_tim)
 BENCH_REPORT(compstore_rktend_thru_ss_tim)
 BENCH_REPORT(comprestore_rktend_thru_ss_tim)
+BENCH_REPORT(compstore_rktend_tim)
+BENCH_REPORT(comprestore_rktend_tim)
 
 BENCH_REPORT(solve_tim)
 

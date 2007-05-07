@@ -134,6 +134,7 @@ export NL_CHECK_MAX_IV=true
 export NL_REMOVE_RUNGE_KUTTA_LOOR=true
 export NL_REMOVE_SMALL_STEP=true
 export NL_REMOVE_RKTEND_THRU_SS=true
+export NL_REMOVE_RKTEND=true
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false

@@ -257,5 +257,7 @@ BENCH_INIT(compstore_small_step_tim)
 BENCH_INIT(comprestore_small_step_tim)
 BENCH_INIT(compstore_rktend_thru_ss_tim)
 BENCH_INIT(comprestore_rktend_thru_ss_tim)
+BENCH_INIT(compstore_rktend_tim)
+BENCH_INIT(comprestore_rktend_tim)
 
 SOLVE_START

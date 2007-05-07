@@ -1034,6 +1034,7 @@ rconfig   logical write_restart_at_0h     namelist,time_control		1             .
 rconfig   logical remove_runge_kutta_loor namelist,time_control	        1      .false. rh    "remove_runge_kutta_loor" ""    ""
 rconfig   logical remove_small_step       namelist,time_control	        1      .false. rh    "remove_small_step"       ""    ""
 rconfig   logical remove_rktend_thru_ss   namelist,time_control	        1      .false. rh    "remove_rktend_thru_ss"   ""    ""
+rconfig   logical remove_rktend           namelist,time_control	        1      .false. rh    "remove_rktend"           ""    ""
 
 
 # Domains
