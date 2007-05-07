@@ -81,8 +81,6 @@ else
    endif
 endif
 
-setenv COMPILER $FC
-
 if ($FC == g95) then
    setenv G95_ENDIAN BIG
 endif

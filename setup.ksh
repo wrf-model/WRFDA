@@ -40,8 +40,6 @@ else
    fi
 fi
 
-export COMPILER=$FC
-
 # Unix people can't report processor class properly
 # across different machines or between ksh/bash on Linux
 # They all need their heads banged together
