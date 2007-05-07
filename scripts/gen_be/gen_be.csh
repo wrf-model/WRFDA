@@ -100,7 +100,7 @@ cd ${RUN_DIR}
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
 #------------------------------------------------------------------------
 
-echo "WRFVAR version" `svnversion $WRFVAR_DIR`
+echo "WRFVAR_DIR is" $WRFVAR_DIR `svnversion $WRFVAR_DIR`
 
 if ( $?RUN_GEN_BE_STAGE0 ) then
 
