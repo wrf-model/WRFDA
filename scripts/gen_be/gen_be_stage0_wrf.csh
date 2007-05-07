@@ -86,12 +86,12 @@
    endif
 
    ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
-   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE1 >&! gen_be_stage0_wrf.${FCST_TIME}.out
+   ./gen_be_stage0_wrf.exe ${BE_METHOD} ${FCST_TIME} $NE $FILE1 >&! gen_be_stage0_wrf.${FCST_TIME}.log
 
 #  Tidy:
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
 #   mv mean.${FCST_TIME}* ${STAGE0_DIR}
-   mv gen_be_stage0_wrf.${FCST_TIME}.out ${STAGE0_DIR}
+   mv gen_be_stage0_wrf.${FCST_TIME}.log ${STAGE0_DIR}
    rm -rf $TMP_DIR >&! /dev/null
 
    echo $DATE $FILE ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
