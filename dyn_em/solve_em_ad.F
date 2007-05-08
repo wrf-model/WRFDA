@@ -1122,7 +1122,7 @@ BENCH_START(comp14)
                       min(grid%j_end(ij),jde-1-sz),k_start,k_end )
 BENCH_END(comp14)
 
-BENCH_START(compa_moist_physics_finish_tim)
+BENCH_START(comp_a_moist_physics_finish_tim)
     call a_moist_physics_finish_em( a_t_2, a_t_1, t0, &
                     a_h_diabatic, dtm, ide, jde, kde, &
                     ims, ime, jms, jme, kms, kme, &
@@ -1130,10 +1130,10 @@ BENCH_START(compa_moist_physics_finish_tim)
                     min(grid%i_end(ij),ide-1-sz),    &
                     max(grid%j_start(ij),jds+sz),  &
                     min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(compa_moist_physics_finish_tim)
+BENCH_END(comp_a_moist_physics_finish_tim)
 
 
-BENCH_START(compmoist_physics_prep_tim)
+BENCH_START(comp_moist_physics_prep_tim)
        CALL moist_physics_prep_em( t_2, t_1, t0, rho,                &
                                    al, alb, p, p8w, p0, pb,          &
                                    ph_2, phb, pi_phy, p_phy,         &
@@ -1146,9 +1146,9 @@ BENCH_START(compmoist_physics_prep_tim)
                                    min(grid%i_end(ij),ide-1-sz),    &
                                    max(grid%j_start(ij),jds+sz),  &
                                    min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(compmoist_physics_prep_tim)
+BENCH_END(comp_moist_physics_prep_tim)
 
-BENCH_START(compa_lscond_tim)
+BENCH_START(comp_a_lscond_tim)
        CALL a_lscond ( t_2,a_t_2,p_phy,a_p_phy,moist_2(ims,kms,jms,P_QV), &
                        a_moist_2(ims,kms,jms,P_QV),rho,a_rho,&
                        pi_phy,a_pi_phy,r_v,xlv,cp,ep_2,svp1,svp2,svp3,svpt0,dz8w,a_dz8w, &
@@ -1157,9 +1157,9 @@ BENCH_START(compa_lscond_tim)
                        min(grid%i_end(ij),ide-1-sz),    &
                        max(grid%j_start(ij),jds+sz),  &
                        min(grid%j_end(ij),jde-1-sz),min(k_end,kde-1) )
-BENCH_END(compa_lscond_tim)
+BENCH_END(comp_a_lscond_tim)
 
-BENCH_START(compa_moist_physics_prep_tim)
+BENCH_START(comp_a_moist_physics_prep_tim)
        call a_moist_physics_prep_em( t_2, a_t_2, t_1, a_t_1, t0, rho, a_rho, &
                                      al, a_al, alb, p, a_p, p8w, a_p8w, p0, &
                                      pb, ph_2, a_ph_2, phb, pi_phy, a_pi_phy, &
@@ -1170,7 +1170,7 @@ BENCH_START(compa_moist_physics_prep_tim)
                                      min(grid%i_end(ij),ide-1-sz),    &
                                      max(grid%j_start(ij),jds+sz),  &
                                      min(grid%j_end(ij),jde-1-sz),k_start,k_end )
-BENCH_END(compa_moist_physics_prep_tim)
+BENCH_END(comp_a_moist_physics_prep_tim)
 
 endif
 
@@ -2076,21 +2076,27 @@ BENCH_START(comp37)
 
     end do moist_variable_loos
   endif moist_scalar_advanch
+BENCH_END(comp37)
 
 ! recompute : moist_2
 
+BENCH_START(comp37_calc_p_rho_phi)
     call calc_p_rho_phi( moist_2,num_3d_m,al,alb,mu_2,muts,ph_2,p,pb,t_2,p0,t0,znu,dnw,rdnw,rdn,non_hydrostatic,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp37_calc_p_rho_phi)
 
+BENCH_START(comp37_a_diagnose_w)
     if ( .not. non_hydrostatic) then
       call a_diagnose_w( ph_tend,a_ph_tend,a_ph_2,a_ph_1,a_w_2,muts,a_muts,dt_rk,a_u_2,a_v_2,ht,cf1,cf2,cf3,rdx,rdy,msft,ide,jde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_end )
     endif
+BENCH_END(comp37_a_diagnose_w)
 
+BENCH_START(comp37_a_calc_p_rho_phi)
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
 &rdnw,rdn,non_hydrostatic,ide,jde,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),&
 &k_start,k_end )
-BENCH_END(comp37)
+BENCH_END(comp37_a_calc_p_rho_phi)
 
 BENCH_START(exch33)
 #ifdef DM_PARALLEL
@@ -3449,31 +3455,41 @@ BENCH_END(comp7776)
 
  endif restore_rktendzr
 
-BENCH_START(comp70)
+BENCH_START(comp70_relax_bdy_dry)
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
 &w_b,mu_b,u_bt,v_bt,ph_bt,t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
+BENCH_END(comp70_relax_bdy_dry)
+BENCH_START(comp70_rk_addtend_dry)
     call rk_addtend_dry( ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,u_save,v_save,w_save,&
 &ph_save,t_save,rk_step,h_diabatic,mut,msft,msfu,msfv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,&
 &grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp70_rk_addtend_dry)
+BENCH_START(comp70_spec_bdy_dry)
     if (config_flags%specified .or. config_flags%nested) then
       call spec_bdy_dry( config_flags,ru_tend,rv_tend,ph_tend,t_tend,rw_tend,mu_tend,u_b,v_b,ph_b,t_b,w_b,mu_b,u_bt,v_bt,ph_bt,&
 &t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,&
 &grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
+BENCH_END(comp70_spec_bdy_dry)
 
+BENCH_START(comp70_small_step_prep)
     call small_step_prep( u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,mub,mu_1,mu_2,muu,muus,muv,muvs,mut,muts,mudf,u_save,v_save,&
 &w_save,t_save,ph_save,mu_save,ww,ww1,dnw,c2a,pb,p,alt,msfu,msfv,msft,rk_step,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp70_small_step_prep)
+BENCH_START(comp70_calc_p_rho)
     call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,0,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+BENCH_END(comp70_calc_p_rho)
+BENCH_START(comp70_calc_coef_w)
     if (non_hydrostatic) then
       call calc_coef_w( a,alpha,gamma,mut,cqw,rdn,rdnw,c2a,dts,g,epssm,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
-BENCH_END(comp70)
+BENCH_END(comp70_calc_coef_w)
 
 BENCH_START(exch65)
 #ifdef DM_PARALLEL
@@ -3932,7 +3948,7 @@ lineno = __LINE__
 #endif
 BENCH_END(exch80)
 
-BENCH_START(comp85)
+BENCH_START(comp85_a_advance_mu_t)
       call a_advance_mu_t( ww,a_ww,ww1,a_ww1,u_2,a_u_2,u_save,a_u_save,v_2,a_v_2,v_save,a_v_save,a_mu_2,a_mut,a_muave,a_muts,muu,&
 &a_muu,muv,a_muv,a_mudf,a_t_2,t_save,a_t_save,a_t_2save,a_t_tend,mu_tend,a_mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw,msfu,&
 &msfv,msft,config_flags,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme, &
@@ -3940,7 +3956,9 @@ BENCH_START(comp85)
         min(grid%i_end(ij)+2,ide),    &
         max(grid%j_start(ij)-2,jds),  &
         min(grid%j_end(ij)+2,jde),k_start,k_end )
+BENCH_END(comp85_a_advance_mu_t)
 
+BENCH_START(comp85)
 !----------------------------------------
 #ifndef FAST_CPY
     al(:,:,:) = alq(:,:,:)
@@ -4447,7 +4465,7 @@ lineno = __LINE__
 #endif
 BENCH_END(exch92)
 
-BENCH_START(comp98)
+BENCH_START(comp98_a_small_step_prep)
     call a_small_step_prep( u_1,a_u_1,u_2,a_u_2,v_1,a_v_1,v_2,a_v_2,w_1,a_w_1,w_2,a_w_2,t_1,a_t_1,t_2,a_t_2,a_ph_1,a_ph_2,mub,mu_1,&
 &a_mu_1,mu_2,a_mu_2,muu,a_muu,muus,a_muus,muv,a_muv,muvs,a_muvs,mut,a_mut,muts,a_muts,a_mudf,a_u_save,a_v_save,a_w_save,&
 &a_t_save,a_ph_save,a_mu_save,a_ww,a_ww1,a_c2a,pb,p,a_p,alt,a_alt,msfu,msfv,msft,rk_step,leapfrog,ide,jde,kde,ims,ime,jms,jme,&
@@ -4456,7 +4474,9 @@ BENCH_START(comp98)
         min(grid%i_end(ij)+1,ide),    &
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde),k_start,k_end )
+BENCH_END(comp98_a_small_step_prep)
 
+BENCH_START(comp98)
 !------------------------------
 !------------------------------
 
@@ -4910,7 +4930,7 @@ lineno = __LINE__
 #endif
 BENCH_END(exch106)
 
-BENCH_START(comp112)
+BENCH_START(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
 !Zhang Xiaoyan add the AD of surface_drag on 12/05/2006
 !---------------------------------------------------------------------------------------------
@@ -4922,11 +4942,13 @@ BENCH_START(comp112)
   grid%j_start(ij), grid%j_end(ij),                &
   k_start, k_end                                  )
   ENDIF
+BENCH_END(comp_a_surface_drag)
 
 !---------------------------------------------------------------------------------------------
 !                 END
 !---------------------------------------------------------------------------------------------
 
+BENCH_START(comp_a_rk_tendency1)
     call a_rk_tendency1( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf,&
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&
@@ -4937,7 +4959,7 @@ BENCH_START(comp112)
         min(grid%i_end(ij)+3,ide),    &
         max(grid%j_start(ij)-3,jds),  &
         min(grid%j_end(ij)+3,jde),k_start,k_end )
-BENCH_END(comp112)
+BENCH_END(comp_a_rk_tendency1)
 
 BENCH_START(exch107)
 #ifdef DM_PARALLEL
@@ -4947,7 +4969,7 @@ lineno = __LINE__
 #endif
 BENCH_END(exch107)
 
-BENCH_START(comp113)
+BENCH_START(comp_a_rk_tendency2)
     call a_rk_tendency2( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf,&
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&
@@ -4958,6 +4980,8 @@ BENCH_START(comp113)
         min(grid%i_end(ij)+3,ide),    &
         max(grid%j_start(ij)-3,jds),  &
         min(grid%j_end(ij)+3,jde),k_start,k_end )
+BENCH_END(comp_a_rk_tendency2)
+BENCH_START(comp113)
 
 !------------------------------
 !------------------------------

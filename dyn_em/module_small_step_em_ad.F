@@ -906,7 +906,7 @@ do j = j_start, j_end
       a_ph(i,k,j) = 0.
     end do
   end do
-#if 0
+#ifdef ADJOINT_NO_OPTIMIZE
 ! recdepend vars : cf1,cf2,cf3,ht,i_end,i_start,j,rdx,rdy,u,v
 ! recompute pos : DOLOOP_STMT module_small_step_em.f90:1361
 ! recompute vars : w
@@ -969,7 +969,7 @@ do j = j_start, j_end
       a_w(i,k+1,j) = a_w(i,k+1,j)-a_w(i,k,j)*gamma(i,k,j)
     end do
   end do
-#if 0
+#ifdef ADJOINT_NO_OPTIMIZE
 ! recdepend vars : cf1,cf2,cf3,ht,i_end,i_start,j,rdx,rdy,u,v
 ! recompute pos : DOLOOP_STMT module_small_step_em.f90:1361
 ! recompute vars : w
