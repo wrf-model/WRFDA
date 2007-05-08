@@ -137,10 +137,18 @@ EOF
 fi
 
 if $CHECK_SVNVERSION; then
-   export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
-   export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
-   export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
-   export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`
+   if test -d $WRF_DIR; then
+      export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
+   fi
+   if test -d $WRFVAR_DIR; then
+      export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
+   fi
+   if test -d $WRFPLUS_DIR; then
+      export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
+   fi
+   if test -d $WPS_DIR; then
+      export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`
+   fi
 fi
 
 cat >> job.ksh <<EOF
