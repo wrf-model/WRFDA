@@ -33,6 +33,7 @@ export RUN_OBSPROC=false
 export RUN_WRFVAR=true
 export RUN_UPDATE_BC=true
 export RUN_WRF=true
+export CHECK_SVNVERSION=false
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
@@ -48,6 +49,7 @@ export NL_DEBUG_LEVEL=0
 export NL_VAR4D_COUPLING=1 # disk linear
 export WINDOW_START=0
 export WINDOW_END=6
+export NL_RUN_HOURS=6
 if test $NL_VAR4D != true ; then
    export NL_NUM_FGAT_TIME=1
 else
@@ -63,8 +65,6 @@ export QUEUE=share
 export PROJECT_ID=64000400
 export LSF_MAX_RUNTIME=180
 export LL_PTILE=16
-#export SUBMIT="LSF"
-#export RUN_CMD=mpirun.lsf
 export SUBMIT="none" 
 export RUN_CMD=" "
 
@@ -127,6 +127,8 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
+#export NL_TESTING_WRFVAR=true
+#export NL_TEST_TRANSFORMS=true
 
 #WRF-plus adjoint optimization:
 # TBH:  Hacking in new namelist settings here.
@@ -170,11 +172,6 @@ export NL_LEN_SCALING5=0.5
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
-#export MACHINE=bluevista
-#$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/da_run_suite.ksh
 
 exit 0
 

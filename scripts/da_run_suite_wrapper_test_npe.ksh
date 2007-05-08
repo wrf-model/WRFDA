@@ -31,17 +31,18 @@ export RUN_WPS=false
 export RUN_REAL=false
 export RUN_OBSPROC=false
 export RUN_WRFVAR=true
-export RUN_UPDATE_BC=true
-export RUN_WRF=true
+export RUN_UPDATE_BC=false
+export RUN_WRF=false
+export CHECK_SVNVERSION=false
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=cwb
-export EXPT=test
+export EXPT="test"
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
 export NL_INPUTOUT_BEGIN_H=0
-export NL_NTMAX=5
+export NL_NTMAX=100
 export NL_VAR4D=true
 #export NL_TRACE_UNIT=0
 #export NL_TRACE_USE=false
@@ -49,6 +50,7 @@ export NL_DEBUG_LEVEL=0
 export NL_VAR4D_COUPLING=2 # disk linear
 export WINDOW_START=0
 export WINDOW_END=6
+export NL_RUN_HOURS=6
 if test $NL_VAR4D != true ; then
    export NL_NUM_FGAT_TIME=1
 else
@@ -56,16 +58,15 @@ else
 fi
 #export FIRST=false
 
-#export LSF_EXCLUSIVE=" "
-export NUM_PROCS=32
+export LSF_EXCLUSIVE=-I
+export NUM_PROCS=32 
 export NUM_PROCS_VAR=8
 export NUM_PROCS_WRF=8
-#export PROJECT_ID=64000420
-export PROJECT_ID=64000400
 export QUEUE=debug
-export LSF_EXCLUSIVE=-I
-export LSF_MAX_RUNTIME=30
+export PROJECT=64000400
+export WALLCLOCK=30
 export LL_PTILE=32
+export SUBMIT="LSF"
 export RUN_CMD=mpirun.lsf
 
 #Time info:
@@ -84,9 +85,9 @@ export LONG_FCST_RANGE_4=06
 
 #Directories:
 #bluevista:
-export REL_DIR=$HOME/4DVAR_Optimization
-export DAT_DIR=/ptmp/hender/4DVAR_Optimization/case_data
-export EXP_DIR=/ptmp/hender/4DVAR_Optimization/$REGION/$EXPT
+export REL_DIR=/home/blueice/hender/4DVAR_Optimization
+export DAT_DIR=/ptmp/$USER/4DVAR_Optimization/case_data
+export EXP_DIR=/ptmp/$USER/4DVAR_Optimization/$REGION/$EXPT
 export WRFVAR_DIR=$REL_DIR/wrfvar
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
@@ -127,14 +128,13 @@ export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
 
 #WRF-Var:
 export NL_CHECK_MAX_IV=true
+export NL_TESTING_WRFVAR=false
+export NL_TEST_TRANSFORMS=false
 
 #WRF-plus adjoint optimization:
 # TBH:  Hacking in new namelist settings here.
 # TBH:  "REMOVE_*" namelist variables are .FALSE. by default
-export NL_REMOVE_RUNGE_KUTTA_LOOR=false
-export NL_REMOVE_SMALL_STEP=false
-export NL_REMOVE_RKTEND_THRU_SS=false
-export NL_REMOVE_RKTEND=false
+#export NL_REMOVE_RUNGE_KUTTA_LOOR=false
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
@@ -167,14 +167,13 @@ export NL_LEN_SCALING3=0.5
 export NL_LEN_SCALING4=0.5
 export NL_LEN_SCALING5=0.5
 
-
+if test $SUBMIT = "LSF"; then
+  export SUBMIT_OPTIONS1="#BSUB -a poe"
+  export SUBMIT_OPTIONS2="#BSUB -I"
+  export SUBMIT_OPTIONS3="#BSUB -R \"span[ptile=$LL_PTILE]\""
+fi
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-#$WRFVAR_DIR/scripts/da_run_job.ksh
-export MACHINE=bluevista
-$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-
-#export RUN_CMD=" "
-#$WRFVAR_DIR/scripts/da_run_suite.ksh
+$WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
 

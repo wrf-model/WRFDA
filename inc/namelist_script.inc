@@ -306,6 +306,7 @@ if test ! -z "$NL_WRITE_RESTART_AT_0H"; then echo "write_restart_at_0h=${NL_WRIT
 if test ! -z "$NL_REMOVE_RUNGE_KUTTA_LOOR"; then echo "remove_runge_kutta_loor=${NL_REMOVE_RUNGE_KUTTA_LOOR}," >> namelist.input;fi
 if test ! -z "$NL_REMOVE_SMALL_STEP"; then echo "remove_small_step=${NL_REMOVE_SMALL_STEP}," >> namelist.input;fi
 if test ! -z "$NL_REMOVE_RKTEND_THRU_SS"; then echo "remove_rktend_thru_ss=${NL_REMOVE_RKTEND_THRU_SS}," >> namelist.input;fi
+if test ! -z "$NL_REMOVE_RKTEND"; then echo "remove_rktend=${NL_REMOVE_RKTEND}," >> namelist.input;fi
 echo / >> namelist.input
 echo \&domains >> namelist.input
 if test ! -z "$NL_TIME_STEP"; then echo "time_step=${NL_TIME_STEP}," >> namelist.input;fi
