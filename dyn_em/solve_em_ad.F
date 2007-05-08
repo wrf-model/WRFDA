@@ -2326,15 +2326,15 @@ BENCH_END(comprestore_rktend_thru_ss_tim)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
-! restore_rktendzw: if ( config_flags%remove_rktend ) then
-!BENCH_START(comprestore_rktend_tim)
-!   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzw:  rk_step, rk_order = ',rk_step,rk_order
-!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-!   ! store fields
-!   CALL select_frame(rk_step, BUF_RKTEND)
-!#include "restore_rktend.h"
-!BENCH_END(comprestore_rktend_tim)
-! else  ! restore_rktendzw
+ restore_rktendzw: if ( config_flags%remove_rktend ) then
+BENCH_START(comprestore_rktend_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzw:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND)
+#include "restore_rktend.h"
+BENCH_END(comprestore_rktend_tim)
+ else  ! restore_rktendzw
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzw, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -2346,7 +2346,7 @@ BENCH_START(comp7774)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7774)
 
-! endif restore_rktendzw
+ endif restore_rktendzw
 
 BENCH_START(comp43)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -2999,15 +2999,15 @@ BENCH_END(comprestore_rktend_thru_ss_tim)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
-! restore_rktendzz: if ( config_flags%remove_rktend ) then
-!BENCH_START(comprestore_rktend_tim)
-!   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzz:  rk_step, rk_order = ',rk_step,rk_order
-!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-!   ! store fields
-!   CALL select_frame(rk_step, BUF_RKTEND)
-!#include "restore_rktend.h"
-!BENCH_END(comprestore_rktend_tim)
-! else  ! restore_rktendzz
+ restore_rktendzz: if ( config_flags%remove_rktend ) then
+BENCH_START(comprestore_rktend_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzz:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND)
+#include "restore_rktend.h"
+BENCH_END(comprestore_rktend_tim)
+ else  ! restore_rktendzz
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzz, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -3019,7 +3019,7 @@ BENCH_START(comp7775)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7775)
 
-! endif restore_rktendzz
+ endif restore_rktendzz
 
 BENCH_START(comp57)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -3427,15 +3427,15 @@ BENCH_END(exch64)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
-! restore_rktendzr: if ( config_flags%remove_rktend ) then
-!BENCH_START(comprestore_rktend_tim)
-!   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzr:  rk_step, rk_order = ',rk_step,rk_order
-!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-!   ! store fields
-!   CALL select_frame(rk_step, BUF_RKTEND)
-!#include "restore_rktend.h"
-!BENCH_END(comprestore_rktend_tim)
-! else  ! restore_rktendzr
+ restore_rktendzr: if ( config_flags%remove_rktend ) then
+BENCH_START(comprestore_rktend_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendzr:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND)
+#include "restore_rktend.h"
+BENCH_END(comprestore_rktend_tim)
+ else  ! restore_rktendzr
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_small_stepzr, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -3447,7 +3447,7 @@ BENCH_START(comp7776)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7776)
 
-! endif restore_rktendzr
+ endif restore_rktendzr
 
 BENCH_START(comp70)
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
@@ -4227,15 +4227,15 @@ BENCH_END(exch87)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
-! restore_rktendacc: if ( config_flags%remove_rktend ) then
-!BENCH_START(comprestore_rktend_tim)
-!   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendacc:  rk_step, rk_order = ',rk_step,rk_order
-!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-!   ! store fields
-!   CALL select_frame(rk_step, BUF_RKTEND)
-!#include "restore_rktend.h"
-!BENCH_END(comprestore_rktend_tim)
-! else  ! restore_rktendacc
+ restore_rktendacc: if ( config_flags%remove_rktend ) then
+BENCH_START(comprestore_rktend_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendacc:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND)
+#include "restore_rktend.h"
+BENCH_END(comprestore_rktend_tim)
+ else  ! restore_rktendacc
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_calc_coef_w, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -4247,7 +4247,7 @@ BENCH_START(comp7777)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7777)
 
-! endif restore_rktendacc
+ endif restore_rktendacc
 
 BENCH_START(comp93)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -4639,15 +4639,15 @@ BENCH_END(exch97)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
-! restore_rktendasbd: if ( config_flags%remove_rktend ) then
-!BENCH_START(comprestore_rktend_tim)
-!   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendasbd:  rk_step, rk_order = ',rk_step,rk_order
-!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-!   ! store fields
-!   CALL select_frame(rk_step, BUF_RKTEND)
-!#include "restore_rktend.h"
-!BENCH_END(comprestore_rktend_tim)
-! else  ! restore_rktendasbd
+ restore_rktendasbd: if ( config_flags%remove_rktend ) then
+BENCH_START(comprestore_rktend_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendasbd:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RKTEND)
+#include "restore_rktend.h"
+BENCH_END(comprestore_rktend_tim)
+ else  ! restore_rktendasbd
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -4659,7 +4659,7 @@ BENCH_START(comp103)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp103)
 
-! endif restore_rktendasbd
+ endif restore_rktendasbd
 
 !------------------------------
 !------------------------------
