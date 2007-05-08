@@ -4,7 +4,7 @@ cd ..
 svn update
 ./clean -a
 . ./setup.ksh g95
-echo 4 | ./configure
+echo 3 | ./configure # optimised code
 cd build
 make -r setup
 ln -fs inc/* .

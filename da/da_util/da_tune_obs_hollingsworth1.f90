@@ -1,4 +1,4 @@
-program da_diagnostics
+program da_tune_obs_hollingsworth1
 
    !-----------------------------------------------------------
    ! Author: Syed RH Rizvi   org: UCAR/NCAR/MMM
@@ -194,8 +194,8 @@ program da_diagnostics
 !  [1.0] Count total number of observations and allocate arrays:
 !--------------------------------------------------------------------------
 
-   filename = 'diagnostics.in'
-   open( y_unit, file = filename, status = 'unknown' )
+   filename = 'hollingsworth1.in'
+   open( y_unit, file = filename, status = 'old' )
 
    call da_count_obs( y_unit, ob )
 
@@ -1911,4 +1911,4 @@ subroutine da_increment_stats( field, count, &
 
 end subroutine da_increment_stats
 
-end program da_diagnostics
+end program da_tune_obs_hollingsworth1

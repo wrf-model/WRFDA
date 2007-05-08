@@ -1,9 +1,9 @@
-program daprog_ominusb
+program da_tune_obs_hollingsworth2
 
    !-----------------------------------------------------------
    ! Abstract:
    !    Purpose: Program for tuning observation errors
-   !             (Hollingsworh method)
+   !             (Hollingsworth method)
    !        Ref: Tellus (1986) 38, pp.111-161 (Part I & II)
    !-----------------------------------------------------------
 
@@ -86,10 +86,10 @@ program daprog_ominusb
 
    times = 0
    ! station_chosen = "MOWV3"
-   ! filename = "daprog_ominusb_poamvu_"//station_chosen(1:5)//"_omb.out"
+   ! filename = "da_tune_obs_hollingsworth2_poamvu_"//station_chosen(1:5)//"_omb.out"
    ! station_chosen = "91652"
-   ! filename = "daprog_ominusb_soundt_"//station_chosen(1:5)//"_omb.out"
-   filename = "ominusb.out"
+   ! filename = "da_tune_obs_hollingsworth2_soundt_"//station_chosen(1:5)//"_omb.out"
+   filename = "hollingsworth2.out"
    open(ounit, file = filename, status = "unknown" )
 
    do ! Loop over time:
@@ -581,4 +581,4 @@ subroutine da_bin_covariance( num_stations, num_times, max_distance, obs, obs_er
 
 end subroutine da_bin_covariance
 
-end program daprog_ominusb
+end program da_tune_obs_hollingsworth2

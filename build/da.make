@@ -192,9 +192,9 @@ inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	  $(M4) da_generic_boilerplate.m4 > inc/da_generic_boilerplate.inc
 
 da_utils : setup \
-           da_diagnostics.exe \
-           da_ominusb.exe \
-           da_tune.exe \
+           da_tune_obs_hollingsworth1.exe \
+           da_tune_obs_hollingsworth2.exe \
+           da_tune_obs_desroziers.exe \
            da_update_bc.exe \
            da_advance_cymdh.exe \
            da_verif.exe
@@ -202,14 +202,16 @@ da_utils : setup \
 da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
 	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
 
-da_diagnostics.exe: da_diagnostics.o
-	$(SFC) -o $@ da_diagnostics.o da_control.o module_driver_constants.o
+da_tune_obs_hollingsworth1.exe: da_tune_obs_hollingsworth1.o
+	$(SFC) -o $@ da_tune_obs_hollingsworth1.o da_control.o \
+	   module_driver_constants.o
 
-da_ominusb.exe: da_ominusb.o
-	$(SFC) -o $@ da_ominusb.o da_control.o module_driver_constants.o
+da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.o
+	$(SFC) -o $@ da_tune_obs_hollingsworth2.o da_control.o \
+	    module_driver_constants.o
 
-da_tune.exe: da_tune.o
-	$(SFC) -o $@ da_tune.o
+da_tune_obs_desroziers.exe: da_tune_obs_desroziers.o
+	$(SFC) -o $@ da_tune_obs_desroziers.o
 
 da_update_bc.exe : da_update_bc.o
 	$(SFC) $(LDFLAGS) -L$(NETCDF_PATH)/lib -o $@ da_update_bc.o \

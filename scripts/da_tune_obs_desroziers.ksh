@@ -17,7 +17,7 @@
 #-------------------------------------------------------------------------------------------
 
 echo ""
-echo "Running script da_tune.ksh"
+echo "Running script da_tune_obs_desroziers.ksh"
 echo ""
 
 export REL_DIR=${REL_DIR:-$HOME/code/trunk}
@@ -25,7 +25,7 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
 export REGION=${REGION:-con200}
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export WORK_DIR=${WORK_DIR:-$REG_DIR/tuning}
+export WORK_DIR=${WORK_DIR:-$PWD/desroziers}
 
 export START_DATE=${START_DATE:-2003010100}
 export END_DATE=${END_DATE:-2003010200}
@@ -48,7 +48,7 @@ export NL_RTMINIT_NCHAN=${NL_RTMINIT_NCHAN:-15,15} # Not a Registry name
 
 rm -rf $WORK_DIR; mkdir $WORK_DIR; cd $WORK_DIR
 
-ln -fs $WRFVAR_DIR/build/da_tune.exe .
+ln -fs $WRFVAR_DIR/build/da_tune_obs_desroziers.exe .
 ln -fs $WRFVAR_DIR/build/da_advance_cymdh.exe .
  
 cat > namelist.radiance << EOF
@@ -65,9 +65,11 @@ touch fort.45 fort.46 fort.47 fort.48 fort.49
 
 export DATE=$START_DATE
 
+echo "Output to $WORK_DIR"
+
 while test $DATE -le $END_DATE; do
 
-   echo Processing $DATE
+   echo "   Processing $DATE"
 
    if test -f $YP_DIR/run/${DATE}/wrfvar/working/rand_obs_error; then
       cat $YP_DIR/run/${DATE}/wrfvar/working/rand_obs_error  >> $FILE_PERT        
@@ -114,9 +116,11 @@ echo "*****" >> ${FILE_Y}
 echo "*****" >> ${FILE_JO}
 echo "*****" >> ${FILE_RSLOUT}
 
-./da_tune.exe > errfac.dat           
+./da_tune_obs_desroziers.exe > errfac.dat           
 
-echo "da_tune.ksh completed"
+echo
+echo "da_tune_obs_desroziers.ksh completed"
+echo
 
 exit 0
 

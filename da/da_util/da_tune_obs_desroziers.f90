@@ -1,15 +1,9 @@
-program da_tune
+program da_tune_obs_desroziers
    !---------------------------------------------------------------------
-   ! Author: Syed RH Rizvi   org: UCAR/NCAR/MMM
-   !
    ! Abstract:
    !   Purpose: Observation error tuning  (Desroziers method)
    !       Ref: QJRMS (2001), 127, pp. 1433-1452   
    !            Gerald Desroziers and Serguei Ivanov
-   !  Updates: 
-   !        03/15/2006  ADD RADIANCE ERROR TUNinG           ZHIQUAN LIU
-   !        10/16/2006  Merged radiance tuning subroutines  Syed RH Rizvi
-   !        01/03/2007  Update for GPS refractivity         Syed RH Rizvi
    !---------------------------------------------------------------------
 
    implicit none
@@ -20,7 +14,7 @@ program da_tune
    integer, parameter            :: y_unit    = 47
    integer, parameter            :: jo_unit   = 48
    integer, parameter            :: in_unit   = 49
-   integer, parameter            :: ninst     = 35  ! max snesor number
+   integer, parameter            :: ninst     = 35  ! max sensor number
    integer, Parameter            :: nplatforms = 20
    real, parameter               :: missing_r = -888888.0
    ! below copy from RTTOV
@@ -2704,4 +2698,4 @@ subroutine read_namelist_radiance
 
 end subroutine read_namelist_radiance
 
-end program da_tune
+end program da_tune_obs_desroziers

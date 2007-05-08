@@ -26,7 +26,7 @@ subroutine da_read_errfac(ob_name, f1, f2, f3, f4, f5)
    f5 = 1.0
 
    call da_get_unit(fac_unit)
-   open(unit=fac_unit, status='old', file = 'wrfvar_run/errfac.dat', iostat=ierr)
+   open(unit=fac_unit, status='old', file = 'errfac.dat', iostat=ierr)
 
    if (ierr == 0) then
       do 

@@ -193,19 +193,19 @@ NCL_COMMAND_LINE="'wksdev=\"${PLOT_WKS}\"' 'run_dir=\"${WORK_DIR}\"' \
 
 echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/time_series.ncl" > run1
 chmod +x run1
-./run1
+./run1 > run1.log 2>&1
 
 echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/time_average.ncl" > run2
 chmod +x run2
-./run2
+./run2 > run2.log 2>&1
 
 echo "ncl ${NCL_COMMAND_LINE} ${WRFVAR_DIR}/graphics/ncl/vert_profile.ncl" > run3
 chmod +x run3
-./run3
+./run3 > run3.log 2>&1
 
 echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>" > index.html
 echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>" >> index.html
-for FILE in *.pdf; do
+for FILE in *.pdf *.log; do
    if test -f $FILE; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi

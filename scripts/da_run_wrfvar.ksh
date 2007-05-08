@@ -40,6 +40,7 @@ export BE_DIR=${BE_DIR:-$REG_DIR/be}
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}
 export FC_DIR=${FC_DIR:-$REG_DIR/fc}
 export BIASCORR_DIR=${BIASCORR_DIR:-$WRFVAR_DIR/run/biascorr}
+export OBS_TUNING_DIR=${OBS_TUNING_DIR:-$WRFVAR_DIR/run/obs_tuning}
 
 # Do we remove the WORK_DIR at the end to save space
 export CLEAN=${CLEAN:-false}
@@ -116,10 +117,13 @@ fi
 if test -d $BIASCORR_DIR; then
    echo "BIASCORR_DIR          $BIASCORR_DIR"
 fi
+if test -d $OBS_TUNING_DIR; then
+   echo "OBS_TUNING_DIR        $OBS_TUNING_DIR"
+fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
 echo "DA_ANALYSIS           $DA_ANALYSIS"
-echo 'RUN_DIR               <A HREF="file:'${RUN_DIR##$PWD}'">'$RUN_DIR'</a>'
-echo 'WORK_DIR              <A HREF="file:'${WORK_DIR##$PWD/}'">'$WORK_DIR'</a>'
+echo 'RUN_DIR               <A HREF="file:'${RUN_DIR##$RUN_DIR/}'">'$RUN_DIR'</a>'
+echo 'WORK_DIR              <A HREF="file:'${WORK_DIR##$RUN_DIR/}'">'$WORK_DIR'</a>'
 echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
@@ -242,6 +246,10 @@ echo "WINDOW_END            $WINDOW_END"
 
    if test -d $BIASCORR_DIR; then
       ln -fs $BIASCORR_DIR biascorr
+   fi
+
+   if test -d $OBS_TUNING_DIR; then
+      ln -fs $OBS_TUNING_DIR/* .
    fi
 
    ln -fs $WRFVAR_DIR/run wrfvar_run
