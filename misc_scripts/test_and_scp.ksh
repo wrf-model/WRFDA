@@ -54,8 +54,6 @@ else
   testout="compare_vs_baseline.${num_tasks}.out"
   jobscript="run_wrfplus.${num_tasks}.ksh"
   job_name="wrfplus.${num_tasks}"
-  parexechome="../../../../../../../../wrfplus_WORK_parallel/main/wrfplus.exe"
-  parexeclocal="wrfplus_parallel.exe"
 fi
 class="regular"
 wall_clock_limit="00:08"
@@ -64,14 +62,7 @@ account="64000400"
 # prepare for run
 /bin/rm -f $adout $wrfout $outfile $errfile $testout $jobscript
 if [[ $testtype = "parallel" ]] ; then
-  /bin/rm -f rsl.out.???? rsl.error.???? $parexeclocal
-  # link in parallel executable
-  if [[ -f $parexechome ]] ; then
-    ln -s $parexechome $parexeclocal || \
-      ErrorExit "failed to link parallel executable"
-  else
-    ErrorExit "cannot find parallel executable ${parexechome}"
-  fi
+  /bin/rm -f rsl.out.???? rsl.error.????
 fi
 
 # write LSF job script
@@ -91,21 +82,22 @@ EOF4
 if [[ $testtype = "serial" ]] ; then
   print "wrfplus.exe" >> $jobscript
 else
-  print "mpirun.lsf wrfplus_parallel.exe" >> $jobscript
+  print "mpirun.lsf wrfplus.exe" >> $jobscript
 fi
 chmod a+x ${jobscript} || ErrorExit "failed to chmod job script ${jobscript}"
 
 # run wrfplus
-if [[ $testtype = "parallel" ]] ; then
-  touch wrf_go_ahead
-  print "execute \"touch wrf_stop_now\" to stop wrfplus once it has finished"
-fi
 bsub -K < ${jobscript}
 
 # test
 cd ../../../../../../..
-compare_vs_baseline.ksh > ${initdir}/${testout} 2>&1 || \
-  ErrorExit "compare_vs_baseline.ksh failed"
+if [[ $testtype = "parallel" ]] ; then
+  compare_vs_baseline.ksh $num_tasks > ${initdir}/${testout} 2>&1 || \
+    ErrorExit "compare_vs_baseline.ksh failed"
+else
+  compare_vs_baseline.ksh > ${initdir}/${testout} 2>&1 || \
+    ErrorExit "compare_vs_baseline.ksh failed"
+fi
 cd $initdir
 
 # transfer ASCII output files
@@ -115,10 +107,14 @@ scp $outfile hender@loquat.mmm.ucar.edu:${targetdir}/${outfilescp} || \
   ErrorExit "failed to scp file ${outfile}"
 scp $testout hender@loquat.mmm.ucar.edu:${targetdir}/${testoutscp} || \
   ErrorExit "failed to scp file ${testout}"
-scp $namelist hender@loquat.mmm.ucar.edu:${targetdir}/${namelist} || \
+scp $namelist hender@loquat.mmm.ucar.edu:${targetdir} || \
   ErrorExit "failed to scp file ${namelist}"
 if [[ $testtype = "parallel" ]] ; then
-  scp $jobscript hender@loquat.mmm.ucar.edu:${targetdir}/${jobscript} || \
+  scp $jobscript hender@loquat.mmm.ucar.edu:${targetdir} || \
     ErrorExit "failed to scp file ${jobscript}"
+  scp rsl.out.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
+    ErrorExit "failed to scp file rsl.out.0000"
+  scp rsl.error.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
+    ErrorExit "failed to scp file rsl.error.0000"
 fi
 

@@ -48,8 +48,10 @@ write(0,*)'********* ********* *********'
 #endif
 
 #ifdef DM_PARALLEL
+#ifndef STAND_ALONE
    DO WHILE ( await_next() )
      call system("echo -n model_start ; date")
+#endif
 #endif
      CALL wrf_init( gcomp, importState, exportState, clock, rc )
    call da_trace_init
@@ -59,11 +61,13 @@ write(0,*)'********* ********* *********'
    call da_trace_report
      CALL wrf_finalize( gcomp, importState, exportState, clock, rc )
 #ifdef DM_PARALLEL
+#ifndef STAND_ALONE
      IF ( wrf_dm_on_monitor() ) THEN
        CALL system("touch wrf_done")
      ENDIF
      call system("echo -n model_end ; date")
    ENDDO
+#endif
 #endif
 
 #ifdef DM_PARALLEL
