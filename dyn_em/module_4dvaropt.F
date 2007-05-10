@@ -317,7 +317,7 @@
           arr3d_global = arr3d_local
 #endif
 
-          IF ( wrf_dm_on_monitor ) THEN
+          IF ( wrf_dm_on_monitor() ) THEN
             WRITE(FileName,FMT="(A,A,I4.4)") TRIM(arrname),'.',filecount
             OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
                    iostat=ierr )
