@@ -13,7 +13,7 @@
 # * Parsing output from DBENCH and extracting timing data for 
 #   various occurrences of "comp*" and a few others.  
 #
-# * Writing an ASCII.  
+# * Writing an ASCII report.  
 #
 
 class CompTiming
