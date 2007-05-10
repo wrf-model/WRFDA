@@ -270,9 +270,10 @@
           REAL, ALLOCATABLE :: arr3d_local(:,:,:)
           REAL, ALLOCATABLE :: arr3d_global(:,:,:)
           INTEGER :: ideL, jdeL, kdeL, ipeL, jpeL, kpeL
+          INTEGER :: i, j, k
           CHARACTER (LEN=200) :: FileName
-          ! a hack
           INTEGER, PARAMETER :: fileunit=83
+          LOGICAL :: fileinuse
           LOGICAL, EXTERNAL :: wrf_dm_on_monitor
 #ifdef DM_PARALLEL
           INCLUDE 'mpif.h'
@@ -280,8 +281,11 @@
 #endif
           ! adjust domain and patch
           ideL = ide-1
+          IF ( ideL < ids ) ideL = ids
           jdeL = jde-1
+          IF ( jdeL < jds ) jdeL = jds
           kdeL = kde-1
+          IF ( kdeL < kds ) kdeL = kds
           ipeL = ipe
           jpeL = jpe
           kpeL = kpe
@@ -319,10 +323,42 @@
 
           IF ( wrf_dm_on_monitor() ) THEN
             WRITE(FileName,FMT="(A,A,I4.4)") TRIM(arrname),'.',filecount
-            OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
-                   iostat=ierr )
-            WRITE( unit=fileunit ) ids,ideL,kds,kdeL,jds,jdeL
-            WRITE( unit=fileunit ) arr3d_global
+            INQUIRE ( UNIT=fileunit , OPENED = fileinuse )
+            IF ( fileinuse ) THEN
+              CALL wrf_error_fatal ( "write_field_global3d:  file unit in use" )
+            ENDIF
+!            OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
+!                   iostat=ierr )
+!            WRITE( unit=fileunit ) ids,ideL,kds,kdeL,jds,jdeL
+!            WRITE( unit=fileunit ) arr3d_global
+            OPEN( UNIT   = fileunit,       &
+                  FILE   = TRIM(FileName), &
+                  FORM   = 'FORMATTED',    &
+                  ACCESS = 'SEQUENTIAL',   &
+                  IOSTAT =  ierr )
+            WRITE ( fileunit,* ) ids
+            WRITE ( fileunit,* ) ideL
+            WRITE ( fileunit,* ) kds
+            WRITE ( fileunit,* ) kdeL
+            WRITE ( fileunit,* ) jds
+            WRITE ( fileunit,* ) jdeL
+            IF ( kds == kdeL ) THEN
+              DO j = jds, jdeL
+                DO i = ids, ideL
+                  WRITE ( fileunit,* ) TRIM(arrname), &
+                    '(',i,',',j,') = ', arr3d_global(i,kds,j)
+                ENDDO
+              ENDDO
+            ELSE
+              DO j = jds, jdeL
+                DO k = kds, kdeL
+                  DO i = ids, ideL
+                    WRITE ( fileunit,* ) TRIM(arrname), &
+                      '(',i,',',k,',',j,') = ', arr3d_global(i,k,j)
+                  ENDDO
+                ENDDO
+              ENDDO
+            ENDIF
             CLOSE ( fileunit )
           ENDIF
 
