@@ -5238,6 +5238,8 @@ end do a_runge_kutta_loop
 #ifndef NO_HALO_FIX
   filecount = 500
 #include <a_debug_halo.h>
+  call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
+  call wrf_shutdown
 #endif
 
 CALL module_4dvaropt_end
