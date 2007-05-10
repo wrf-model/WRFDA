@@ -110,6 +110,9 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER                         :: ijds, ijde
    INTEGER                         :: itmpstep
    INTEGER                         :: sz
+#ifndef NO_HALO_FIX
+   INTEGER                         :: filecount
+#endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
 #include <em_i1_decl.inc>
@@ -600,6 +603,12 @@ a_z_at_wh(:,:,:) = 0.
  call fast_zero_lint( a_ww1 , n3d_elem )
  call fast_zero_lint( a_ww_m , n3d_elem )
  call fast_zero_lint( a_z_at_wh , n3d_elem )
+#endif
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 0
+#include <a_debug_halo.h>
 #endif
 
 !----------------------------------------------
@@ -5223,6 +5232,12 @@ end do a_runge_kutta_loop
 !----------------------------------------------
 ! FREE DYNAMIC MEMORY
 !----------------------------------------------
+#endif
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 500
+#include <a_debug_halo.h>
 #endif
 
 CALL module_4dvaropt_end

@@ -238,3 +238,138 @@
 #endif
 
 
+
+        ! Write 3D array arr3d into file named "arrname.filecount" .  
+        ! Any points not used by this staggering are not written.  
+        ! Allowed valued for stagger are 'u', 'v', 'w', 'm'.  
+        ! File format is binary.  
+        ! MPI communication is used if needed to gather the array.  
+        ! The array must be of type REAL.  
+        !
+        ! The file is written in two records.  
+        ! The first record contains ids,ideL,kds,kdeL,jds,jdeL.  
+        ! The second record contains the array for the entire domain.  
+        !
+        ! NOTE:  This is a quick hack to make up for lack of SMS-style 
+        ! NOTE:  automatic debugging features.  
+        !
+        SUBROUTINE write_field_global3d ( arr3d,    &
+                     arrname, filecount, stagger,  &
+                     ids, ide, jds, jde, kds, kde, &
+                     ims, ime, jms, jme, kms, kme, &
+                     ips, ipe, jps, jpe, kps, kpe )
+          USE module_dm
+          IMPLICIT NONE
+          REAL,              INTENT(IN) :: arr3d( ims:ime , kms:kme, jms:jme )
+          CHARACTER (LEN=*), INTENT(IN) :: arrname
+          INTEGER,           INTENT(IN) :: filecount
+          CHARACTER (LEN=*), INTENT(IN) :: stagger
+          INTEGER,           INTENT(IN) :: ids, ide, jds, jde, kds, kde, &
+                                           ims, ime, jms, jme, kms, kme, &
+                                           ips, ipe, jps, jpe, kps, kpe
+          REAL, ALLOCATABLE :: arr3d_local(:,:,:)
+          REAL, ALLOCATABLE :: arr3d_global(:,:,:)
+          INTEGER :: ideL, jdeL, kdeL, ipeL, jpeL, kpeL
+          CHARACTER (LEN=200) :: FileName
+          ! a hack
+          INTEGER, PARAMETER :: fileunit=83
+          LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+#ifdef DM_PARALLEL
+          INCLUDE 'mpif.h'
+          INTEGER ierr, mpi_comm_local
+#endif
+          ! adjust domain and patch
+          ideL = ide-1
+          jdeL = jde-1
+          kdeL = kde-1
+          ipeL = ipe
+          jpeL = jpe
+          kpeL = kpe
+          IF (TRIM(stagger) == 'u') THEN
+            ideL = ide
+          ELSEIF (TRIM(stagger) == 'v') THEN
+            jdeL = jde
+          ELSEIF (TRIM(stagger) == 'w') THEN
+            kdeL = kde
+          ELSEIF (TRIM(stagger) /= 'm') THEN
+            CALL wrf_error_fatal ( "write_field_global3d:  unknown stagger" )
+          ENDIF
+          IF ( ipeL > ideL ) ipeL = ideL
+          IF ( jpeL > jdeL ) jpeL = jdeL
+          IF ( kpeL > kdeL ) kpeL = kdeL
+
+          ALLOCATE(arr3d_local(ids:ideL,kds:kdeL,jds:jdeL))
+          ALLOCATE(arr3d_global(ids:ideL,kds:kdeL,jds:jdeL))
+
+          ! yes, gather would be more efficient
+          arr3d_local(ids:ideL,kds:kdeL,jds:jdeL) = 0.
+          arr3d_local(ips:ipeL,kps:kpeL,jps:jpeL) = &
+                arr3d(ips:ipeL,kps:kpeL,jps:jpeL)
+
+#ifdef DM_PARALLEL
+          ! yes, reduction is a hack here
+          CALL wrf_get_dm_communicator( mpi_comm_local )
+          CALL mpi_allreduce ( arr3d_local, arr3d_global , &
+                               SIZE(arr3d_local), getrealmpitype(), MPI_SUM, &
+                               mpi_comm_local, ierr )
+#else
+          ! yes, this copy is not really necessary
+          arr3d_global = arr3d_local
+#endif
+
+          IF ( wrf_dm_on_monitor ) THEN
+            WRITE(FileName,FMT="(A,A,I4.4)") TRIM(arrname),'.',filecount
+            OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
+                   iostat=ierr )
+            WRITE( unit=fileunit ) ids,ideL,kds,kdeL,jds,jdeL
+            WRITE( unit=fileunit ) arr3d_global
+            CLOSE ( fileunit )
+          ENDIF
+
+          DEALLOCATE(arr3d_local)
+          DEALLOCATE(arr3d_global)
+
+        END SUBROUTINE write_field_global3d
+
+
+        ! Write 2D array arr2d into file named "arrname.filecount" .  
+        ! Any points not used by this staggering are not written.  
+        ! Allowed valued for stagger are 'u', 'v', 'w', 'm'.  
+        ! File format is binary.  
+        ! MPI communication is used if needed to gather the array.  
+        ! The array must be of type REAL.  
+        !
+        ! The file is written in two records.  
+        ! The first record contains ids,ideL,1,1,jds,jdeL.  
+        ! The second record contains the array for the entire domain.  
+        !
+        ! Note that arguments kds, kde, kms, kme, kps, kpe are not used.  
+        SUBROUTINE write_field_global2d ( arr2d,    &
+                     arrname, filecount, stagger,  &
+                     ids, ide, jds, jde, kds, kde, &
+                     ims, ime, jms, jme, kms, kme, &
+                     ips, ipe, jps, jpe, kps, kpe )
+          IMPLICIT NONE
+          REAL,              INTENT(IN) :: arr2d( ims:ime , jms:jme )
+          CHARACTER (LEN=*), INTENT(IN) :: arrname
+          INTEGER,           INTENT(IN) :: filecount
+          CHARACTER (LEN=*), INTENT(IN) :: stagger
+          INTEGER,           INTENT(IN) :: ids, ide, jds, jde, kds, kde, &
+                                           ims, ime, jms, jme, kms, kme, &
+                                           ips, ipe, jps, jpe, kps, kpe
+          INTEGER :: i, j
+          REAL :: arr3d_tmp(ims:ime,1:1,jms:jme)
+          DO j = jms, jme
+            DO i = ims, ime
+              arr3d_tmp(i,1,j) = arr2d(i,j)
+            ENDDO
+          ENDDO
+          CALL write_field_global3d ( arr3d_tmp,    &
+                     arrname, filecount, stagger,  &
+                     ids, ide, jds, jde, 1, 1, &
+                     ims, ime, jms, jme, 1, 1, &
+                     ips, ipe, jps, jpe, 1, 1 )
+
+        END SUBROUTINE write_field_global2d
+
+
