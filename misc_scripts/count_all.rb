@@ -33,6 +33,8 @@ class CountAll
     @fieldfiles2 = []
     Find.find(@dirname1){|f| @fieldfiles1 << File.basename(f) if (f=~/field\./)}
     Find.find(@dirname2){|f| @fieldfiles2 << File.basename(f) if (f=~/field\./)}
+    @fieldfiles1.sort!
+    @fieldfiles2.sort!
     raise "mismatched dirs" unless (@fieldfiles1 == @fieldfiles2)
     @fieldfiles1.each do |f|
       file1 = "#{@dirname1}/#{f}"

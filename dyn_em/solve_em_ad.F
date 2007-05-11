@@ -112,8 +112,10 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER                         :: sz
 #ifndef NO_HALO_FIX
    INTEGER                         :: filecount
-   INTEGER,PARAMETER               :: min_filecount=0
-   INTEGER,PARAMETER               :: max_filecount=1026
+!   INTEGER,PARAMETER               :: min_filecount=0
+!   INTEGER,PARAMETER               :: max_filecount=1026
+   INTEGER,PARAMETER               :: min_filecount=5000
+   INTEGER,PARAMETER               :: max_filecount=5999
 #endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
@@ -907,12 +909,22 @@ BENCH_END(exch7)
 #endif
 
   small_stepu: do iteration = 1, number_of_small_timesteps
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 0
+#include <a_debug_halo.h>
+#endif
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepu, iteration = ',iteration
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
 BENCH_START(comp8)
       call advance_uv( u_2,ru_tend,v_2,rv_tend,p,pb,ph_2,php,alt,al,mu_2,muu,cqu,muv,cqv,mudf,rdx,rdy,dts,cf1,cf2,cf3,fnm,fnp,&
 &emdiv,rdnw,config_flags,spec_zone,non_hydrostatic,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 1
+#include <a_debug_halo.h>
+#endif
       if (config_flags%specified .or. config_flags%nested) then
         call spec_bdyupdate( u_2,ru_tend,dts_rk,'u',config_flags,spec_zone,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,&
 &jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -920,6 +932,11 @@ BENCH_START(comp8)
 &jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       endif
 BENCH_END(comp8)
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 2
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch8)
 #ifdef DM_PARALLEL
@@ -933,6 +950,11 @@ BENCH_START(comp9)
 &mu_tend,rdx,rdy,dts,epssm,dnw,fnm,fnp,rdnw,msfu,msfv,msft,iteration,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp9)
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 3
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch9)
 #ifdef DM_PARALLEL
@@ -954,14 +976,29 @@ BENCH_START(comp10)
         call spec_bdyupdate( muts,mu_tend,dts_rk,'m',config_flags,spec_zone,ids,ide,jds,jde,1,1,ims,ime,jms,jme,1,1,ips,ipe,jps,&
 &jpe,1,1,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),1,1 )
       endif
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 4
+#include <a_debug_halo.h>
+#endif
 
       call sumflux( u_2,v_2,ww,u_save,v_save,ww1,muu,muv,ru_m,rv_m,ww_m,epssm,msfu,msfv,iteration,number_of_small_timesteps,ids,&
 &ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 5
+#include <a_debug_halo.h>
+#endif
       if (non_hydrostatic) then
         call advance_w( w_2,rw_tend,ww,u_2,v_2,mu_2,mut,muave,muts,t_2save,t_2,t_save,ph_2,ph_save,phb,ph_tend,ht,c2a,cqw,alt,alb,&
 &a,alpha,gamma,rdx,rdy,dts,t0,epssm,dnw,fnm,fnp,rdnw,rdn,cf1,cf2,cf3,msft,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,&
 &jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       endif
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 6
+#include <a_debug_halo.h>
+#endif
       if (config_flags%specified .or. config_flags%nested) then
         if (non_hydrostatic) then
           call spec_bdyupdate_ph( ph_save,ph_2,ph_tend,mu_tend,muts,dts_rk,'h',config_flags,spec_zone,ids,ide,jds,jde,kds,kde,ims,&
@@ -975,6 +1012,11 @@ BENCH_START(comp10)
           endif
         endif
       endif
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 7
+#include <a_debug_halo.h>
+#endif
       call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,iteration,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp10)
@@ -985,6 +1027,11 @@ lineno = __LINE__
 #      include "HALO_0790.inc"
 #endif
 BENCH_END(exch10)
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 5000 + (rk_step*100) + (iteration*10) + 8
+#include <a_debug_halo.h>
+#endif
 
   end do small_stepu
 
