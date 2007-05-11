@@ -239,10 +239,13 @@
 
 
 
-        ! Write 3D array arr3d into file named "arrname.filecount" .  
+        ! Write 3D array arr3d into file named "$arrname.$filecount" .  
         ! Any points not used by this staggering are not written.  
         ! Allowed valued for stagger are 'u', 'v', 'w', 'm'.  
         ! File format is binary.  
+! NOTE:  For now, file format is ASCII, all fields for a given 
+! NOTE:  filecount are stored in file "all.$filecount", and 
+! NOTE:  ids,ideL,kds,kdeL,jds,jdeL are NOT stored.  
         ! MPI communication is used if needed to gather the array.  
         ! The array must be of type REAL.  
         !
@@ -275,6 +278,7 @@
           INTEGER, PARAMETER :: fileunit=83
           LOGICAL :: fileinuse
           LOGICAL, EXTERNAL :: wrf_dm_on_monitor
+          LOGICAL, PARAMETER :: binary_output = .FALSE.
 #ifdef DM_PARALLEL
           INCLUDE 'mpif.h'
           INTEGER ierr, mpi_comm_local
@@ -322,43 +326,50 @@
 #endif
 
           IF ( wrf_dm_on_monitor() ) THEN
-            WRITE(FileName,FMT="(A,A,I4.4)") TRIM(arrname),'.',filecount
+            IF ( binary_output ) THEN
+              WRITE(FileName,FMT="(A,A,A,I4.4)") &
+                'field.',TRIM(arrname),'.',filecount
+            ELSE
+              WRITE(FileName,FMT="(A,I4.4)") 'field.all.',filecount
+            ENDIF
+PRINT *,'DEBUG:  FileName = ',TRIM(FileName)
             INQUIRE ( UNIT=fileunit , OPENED = fileinuse )
             IF ( fileinuse ) THEN
               CALL wrf_error_fatal ( "write_field_global3d:  file unit in use" )
             ENDIF
-!            OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
-!                   iostat=ierr )
-!            WRITE( unit=fileunit ) ids,ideL,kds,kdeL,jds,jdeL
-!            WRITE( unit=fileunit ) arr3d_global
-            OPEN( UNIT   = fileunit,       &
-                  FILE   = TRIM(FileName), &
-                  FORM   = 'FORMATTED',    &
-                  ACCESS = 'SEQUENTIAL',   &
-                  IOSTAT =  ierr )
-            WRITE ( fileunit,* ) ids
-            WRITE ( fileunit,* ) ideL
-            WRITE ( fileunit,* ) kds
-            WRITE ( fileunit,* ) kdeL
-            WRITE ( fileunit,* ) jds
-            WRITE ( fileunit,* ) jdeL
-            IF ( kds == kdeL ) THEN
-              DO j = jds, jdeL
-                DO i = ids, ideL
-                  WRITE ( fileunit,* ) TRIM(arrname), &
-                    '(',i,',',j,') = ', arr3d_global(i,kds,j)
-                ENDDO
-              ENDDO
+            IF ( binary_output ) THEN
+              OPEN ( unit=fileunit, file=TRIM(FileName), form='unformatted', &
+                     iostat=ierr )
+              WRITE( unit=fileunit ) ids,ideL,kds,kdeL,jds,jdeL
+              WRITE( unit=fileunit ) arr3d_global
             ELSE
-              DO j = jds, jdeL
-                DO k = kds, kdeL
+              OPEN( UNIT   = fileunit,       &
+                    FILE   = TRIM(FileName), &
+                    FORM   = 'FORMATTED',    &
+                    ACCESS = 'SEQUENTIAL',   &
+                    POSITION = 'APPEND',     &
+                    IOSTAT =  ierr )
+PRINT *,'DEBUG:  OPEN ',TRIM(FileName)," IOSTAT = ",ierr
+PRINT *,'DEBUG:  WRITE ',TRIM(arrname),' to ',TRIM(FileName)
+              IF ( kds == kdeL ) THEN
+                DO j = jds, jdeL
                   DO i = ids, ideL
                     WRITE ( fileunit,* ) TRIM(arrname), &
-                      '(',i,',',k,',',j,') = ', arr3d_global(i,k,j)
+                      '(',i,',',j,') = ', arr3d_global(i,kds,j)
                   ENDDO
                 ENDDO
-              ENDDO
+              ELSE
+                DO j = jds, jdeL
+                  DO k = kds, kdeL
+                    DO i = ids, ideL
+                      WRITE ( fileunit,* ) TRIM(arrname), &
+                        '(',i,',',k,',',j,') = ', arr3d_global(i,k,j)
+                    ENDDO
+                  ENDDO
+                ENDDO
+              ENDIF
             ENDIF
+PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
             CLOSE ( fileunit )
           ENDIF
 
