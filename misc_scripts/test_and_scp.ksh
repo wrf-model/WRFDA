@@ -15,8 +15,12 @@ set -u
 # set up functions
 function ErrorExit {
   typeset error_message=$1 ; shift
-  print "ERROR:  ${error_message}"
+  print "ERROR:  \"${error_message}\""
   exit 30
+}
+function ErrorNoExit {
+  typeset error_message=$1 ; shift
+  print "ERROR:  \"${error_message}\"  CONTINUING..."
 }
 
 
@@ -62,7 +66,7 @@ account="64000400"
 # prepare for run
 /bin/rm -f $adout $wrfout $outfile $errfile $testout $jobscript
 if [[ $testtype = "parallel" ]] ; then
-  /bin/rm -f rsl.out.???? rsl.error.????
+  /bin/rm -f rsl.out.???? rsl.error.???? field.*.*
 fi
 
 # write LSF job script
@@ -93,28 +97,32 @@ bsub -K < ${jobscript}
 cd ../../../../../../..
 if [[ $testtype = "parallel" ]] ; then
   compare_vs_baseline.ksh $num_tasks > ${initdir}/${testout} 2>&1 || \
-    ErrorExit "compare_vs_baseline.ksh failed"
+    ErrorNoExit "compare_vs_baseline.ksh failed"
 else
   compare_vs_baseline.ksh > ${initdir}/${testout} 2>&1 || \
-    ErrorExit "compare_vs_baseline.ksh failed"
+    ErrorNoExit "compare_vs_baseline.ksh failed"
 fi
 cd $initdir
 
 # transfer ASCII output files
 scp $errfile hender@loquat.mmm.ucar.edu:${targetdir}/${errfilescp} || \
-  ErrorExit "failed to scp file ${errfile}"
+  ErrorNoExit "failed to scp file ${errfile}"
 scp $outfile hender@loquat.mmm.ucar.edu:${targetdir}/${outfilescp} || \
-  ErrorExit "failed to scp file ${outfile}"
+  ErrorNoExit "failed to scp file ${outfile}"
 scp $testout hender@loquat.mmm.ucar.edu:${targetdir}/${testoutscp} || \
-  ErrorExit "failed to scp file ${testout}"
+  ErrorNoExit "failed to scp file ${testout}"
 scp $namelist hender@loquat.mmm.ucar.edu:${targetdir} || \
-  ErrorExit "failed to scp file ${namelist}"
+  ErrorNoExit "failed to scp file ${namelist}"
 if [[ $testtype = "parallel" ]] ; then
   scp $jobscript hender@loquat.mmm.ucar.edu:${targetdir} || \
-    ErrorExit "failed to scp file ${jobscript}"
+    ErrorNoExit "failed to scp file ${jobscript}"
   scp rsl.out.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
-    ErrorExit "failed to scp file rsl.out.0000"
+    ErrorNoExit "failed to scp file rsl.out.0000"
   scp rsl.error.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
-    ErrorExit "failed to scp file rsl.error.0000"
+    ErrorNoExit "failed to scp file rsl.error.0000"
+  for fieldfile in $( ls -1 field.* ) ; do
+    scp $fieldfile hender@loquat.mmm.ucar.edu:${targetdir} || \
+      ErrorNoExit "failed to scp file ${fieldfile}"
+  done
 fi
 

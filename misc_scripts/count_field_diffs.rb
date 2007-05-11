@@ -49,14 +49,14 @@ class CountFieldDiffs
         @allvarnames[varname] = nil
         if ( line == @lines2[indx] ) then
           # if lines match, check for zero value
-          if (line =~ /\)\s*=\s*(\w+)/) then
+          if (line =~ /\)\s*=\s*/) then
             begin
-              value = Float($1)
+              value = Float($'.dup.strip)
             rescue
               raise "failed to parse value in line \"#{line}\""
             end
             @allzeros[varname] ||= true
-            @allzeros = false if (value != 0.0)
+            @allzeros[varname] = false if (value != 0.0)
           else
             raise "bad value in line \"#{line}\""
           end
