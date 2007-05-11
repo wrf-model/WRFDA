@@ -1121,6 +1121,12 @@ BENCH_END(comp13)
 
     endif
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 13
+#include <a_debug_halo.h>
+#endif
+
 BENCH_START(comp14)
     call a_calc_p_rho_phi( moist_2,a_moist_2,num_3d_m,al,a_al,alb,mu_2,&
                       a_mu_2,muts,a_muts,ph_2,a_ph_2,p,a_p,pb,t_2,a_t_2,p0,t0,dnw,&
@@ -1629,6 +1635,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch26)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 26
+#include <a_debug_halo.h>
+#endif
+
 BENCH_START(comp27)
 
 #ifndef FAST_CPY
@@ -2012,6 +2024,12 @@ BENCH_END(exch31)
 
  endif restore_rktend_thru_sszq
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 35
+#include <a_debug_halo.h>
+#endif
+
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
 
 BENCH_START(comp36)
@@ -2123,6 +2141,12 @@ lineno = __LINE__
 #    include "HALO_1664.inc"
 #endif
 BENCH_END(exch33)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 37
+#include <a_debug_halo.h>
+#endif
 
 !------------------------------
 !------------------------------
@@ -2533,6 +2557,12 @@ BENCH_START(comp46)
                               k_start    , k_end               )
 BENCH_END(comp46)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 46
+#include <a_debug_halo.h>
+#endif
+
 ! recompute : mu_2,ph_2,t_2
 !---------------------------------------------------------------------------------
 
@@ -2796,6 +2826,12 @@ BENCH_END(comp51)
 
     end do
   endif a_moist_scalar_advance
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 51
+#include <a_debug_halo.h>
+#endif
 
 !------------------------------
 !------------------------------
@@ -3226,6 +3262,12 @@ BENCH_START(comp63)
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde) )
 BENCH_END(comp63)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 63
+#include <a_debug_halo.h>
+#endif
 
 !------------------------------
 !------------------------------
@@ -4051,6 +4093,12 @@ BENCH_END(comp87)
 
   end do a_small_steps
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 87
+#include <a_debug_halo.h>
+#endif
+
 !------------------------------
 !------------------------------
 
@@ -4295,6 +4343,12 @@ BENCH_START(comp93)
     endif
 BENCH_END(comp93)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 93
+#include <a_debug_halo.h>
+#endif
+
 !------------------------------
 !------------------------------
 
@@ -4393,6 +4447,12 @@ BENCH_START(comp96)
         min(grid%j_end(ij)+1,jde) )
     endif
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 96
+#include <a_debug_halo.h>
+#endif
+
 !----------------------------------------
 #ifndef FAST_CPY
 al(:,:,:) = alp(:,:,:)
@@ -4428,6 +4488,12 @@ BENCH_START(comp97)
         min(grid%i_end(ij)+1,ide),    &
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde),k_start,k_end )
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 97
+#include <a_debug_halo.h>
+#endif
 
 !----------------------------------------
 #ifndef FAST_CPY
@@ -4484,6 +4550,12 @@ BENCH_START(comp98_a_small_step_prep)
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde),k_start,k_end )
 BENCH_END(comp98_a_small_step_prep)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 98
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(comp98)
 !------------------------------
@@ -4753,6 +4825,12 @@ BENCH_START(comp106)
 BENCH_END(comp106)
     endif
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 106
+#include <a_debug_halo.h>
+#endif
+
 !------------------------------
 !------------------------------
 
@@ -4953,6 +5031,12 @@ BENCH_START(comp_a_surface_drag)
   ENDIF
 BENCH_END(comp_a_surface_drag)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 107
+#include <a_debug_halo.h>
+#endif
+
 !---------------------------------------------------------------------------------------------
 !                 END
 !---------------------------------------------------------------------------------------------
@@ -4969,6 +5053,12 @@ BENCH_START(comp_a_rk_tendency1)
         max(grid%j_start(ij)-3,jds),  &
         min(grid%j_end(ij)+3,jde),k_start,k_end )
 BENCH_END(comp_a_rk_tendency1)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 108
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch107)
 #ifdef DM_PARALLEL
@@ -4991,6 +5081,12 @@ BENCH_START(comp_a_rk_tendency2)
         min(grid%j_end(ij)+3,jde),k_start,k_end )
 BENCH_END(comp_a_rk_tendency2)
 BENCH_START(comp113)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 113
+#include <a_debug_halo.h>
+#endif
 
 !------------------------------
 !------------------------------
@@ -5183,6 +5279,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch112)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 116
+#include <a_debug_halo.h>
+#endif
+
 BENCH_START(comp117)
 #ifndef FAST_CPY
   dnw(:) = dnwh(:)
@@ -5225,6 +5327,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch114)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = ((rk_order-rk_step+1)*1000) + 118
+#include <a_debug_halo.h>
+#endif
+
 end do a_runge_kutta_loop
 
 #include <bench_solve_em_a_end.h>
@@ -5236,7 +5344,7 @@ end do a_runge_kutta_loop
 
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
-  filecount = 500
+  filecount = 9999
 #include <a_debug_halo.h>
   call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
   call wrf_shutdown

@@ -81,7 +81,9 @@ class CountFieldDiffs
     puts "FIELDS THAT DIFFER:"
     puts "==============================================="
     different_varnames.each do |vname|
-      puts "#{vname}\t\tNumber of differences = #{@diffcounts[vname]}"
+      pad = 19 - vname.length
+      pad = 1 if (pad < 1)
+      puts "#{vname}#{" "*pad}Number of differences = #{@diffcounts[vname]}"
     end
     puts "==============================================="
     puts "FIELDS THAT MATCH AND CONTAIN NON-ZERO VALUES:"
