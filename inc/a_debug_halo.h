@@ -56,6 +56,26 @@ CALL write_field_global3d ( a_gamma, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_al, &
+                          'a_al', filecount, 'm', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_alt, &
+                          'a_alt', filecount, 'm', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_moist_1(ims,kms,jms,2), &
+                          'a_moist_1', filecount, 'm', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_moist_2(ims,kms,jms,2), &
+                          'a_moist_2', filecount, 'm', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
 CALL write_field_global3d ( a_moist_tend(ims,kms,jms,2), &
                           'a_moist_tend', filecount, 'm', &
                           ids, ide, jds, jde, kds, kde, &
@@ -118,6 +138,11 @@ CALL write_field_global2d ( a_muv, &
                           ips, ipe, jps, jpe, kps, kpe )
 CALL write_field_global2d ( a_muvs, &
                           'a_muvs', filecount, 'm', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_p, &
+                          'a_p', filecount, 'w', &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
