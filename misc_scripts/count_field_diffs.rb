@@ -61,7 +61,7 @@ class CountFieldDiffs
             raise "bad value in line \"#{line}\""
           end
         else
-          @diffcounts[varname] ||= 1
+          @diffcounts[varname] ||= 0
           @diffcounts[varname] += 1
           @diffindxs[varname] ||= []
           @diffindxs[varname] << indx
@@ -80,7 +80,9 @@ class CountFieldDiffs
     puts "==============================================="
     puts "FIELDS THAT DIFFER:"
     puts "==============================================="
-    puts different_varnames.join("\n")
+    different_varnames.each do |vname|
+      puts "#{vname}\t\tNumber of differences = #{@diffcounts[vname]}"
+    end
     puts "==============================================="
     puts "FIELDS THAT MATCH AND CONTAIN NON-ZERO VALUES:"
     puts "==============================================="
