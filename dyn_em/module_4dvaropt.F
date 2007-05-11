@@ -246,6 +246,7 @@
 ! NOTE:  For now, file format is ASCII, all fields for a given 
 ! NOTE:  filecount are stored in file "all.$filecount", and 
 ! NOTE:  ids,ideL,kds,kdeL,jds,jdeL are NOT stored.  
+! NOTE:  Files are only written if min_filecount<=filecount<=max_filecount
         ! MPI communication is used if needed to gather the array.  
         ! The array must be of type REAL.  
         !
@@ -257,7 +258,7 @@
         ! NOTE:  automatic debugging features.  
         !
         SUBROUTINE write_field_global3d ( arr3d,    &
-                     arrname, filecount, stagger,  &
+                     arrname, filecount, min_filecount, max_filecount, stagger,  &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      ips, ipe, jps, jpe, kps, kpe )
@@ -266,6 +267,8 @@
           REAL,              INTENT(IN) :: arr3d( ims:ime , kms:kme, jms:jme )
           CHARACTER (LEN=*), INTENT(IN) :: arrname
           INTEGER,           INTENT(IN) :: filecount
+          INTEGER,           INTENT(IN) :: min_filecount
+          INTEGER,           INTENT(IN) :: max_filecount
           CHARACTER (LEN=*), INTENT(IN) :: stagger
           INTEGER,           INTENT(IN) :: ids, ide, jds, jde, kds, kde, &
                                            ims, ime, jms, jme, kms, kme, &
@@ -283,6 +286,8 @@
           INCLUDE 'mpif.h'
           INTEGER ierr, mpi_comm_local
 #endif
+        IF ( ( min_filecount <= filecount ) .AND. &
+             ( filecount <= max_filecount ) ) THEN
           ! adjust domain and patch
           ideL = ide-1
           IF ( ideL < ids ) ideL = ids
@@ -375,24 +380,17 @@ PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
 
           DEALLOCATE(arr3d_local)
           DEALLOCATE(arr3d_global)
+        ENDIF
 
         END SUBROUTINE write_field_global3d
 
 
         ! Write 2D array arr2d into file named "arrname.filecount" .  
-        ! Any points not used by this staggering are not written.  
-        ! Allowed valued for stagger are 'u', 'v', 'w', 'm'.  
-        ! File format is binary.  
-        ! MPI communication is used if needed to gather the array.  
-        ! The array must be of type REAL.  
-        !
-        ! The file is written in two records.  
-        ! The first record contains ids,ideL,1,1,jds,jdeL.  
-        ! The second record contains the array for the entire domain.  
+        ! Follow the method of write_field_global3d).  
         !
         ! Note that arguments kds, kde, kms, kme, kps, kpe are not used.  
         SUBROUTINE write_field_global2d ( arr2d,    &
-                     arrname, filecount, stagger,  &
+                     arrname, filecount, min_filecount, max_filecount, stagger,  &
                      ids, ide, jds, jde, kds, kde, &
                      ims, ime, jms, jme, kms, kme, &
                      ips, ipe, jps, jpe, kps, kpe )
@@ -400,6 +398,8 @@ PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
           REAL,              INTENT(IN) :: arr2d( ims:ime , jms:jme )
           CHARACTER (LEN=*), INTENT(IN) :: arrname
           INTEGER,           INTENT(IN) :: filecount
+          INTEGER,           INTENT(IN) :: min_filecount
+          INTEGER,           INTENT(IN) :: max_filecount
           CHARACTER (LEN=*), INTENT(IN) :: stagger
           INTEGER,           INTENT(IN) :: ids, ide, jds, jde, kds, kde, &
                                            ims, ime, jms, jme, kms, kme, &
@@ -412,7 +412,7 @@ PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
             ENDDO
           ENDDO
           CALL write_field_global3d ( arr3d_tmp,    &
-                     arrname, filecount, stagger,  &
+                     arrname, filecount, min_filecount, max_filecount, stagger,  &
                      ids, ide, jds, jde, 1, 1, &
                      ims, ime, jms, jme, 1, 1, &
                      ips, ipe, jps, jpe, 1, 1 )

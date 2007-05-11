@@ -112,6 +112,8 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER                         :: sz
 #ifndef NO_HALO_FIX
    INTEGER                         :: filecount
+   INTEGER,PARAMETER               :: min_filecount=0
+   INTEGER,PARAMETER               :: max_filecount=1026
 #endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
@@ -772,6 +774,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch3)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 3
+#include <a_debug_halo.h>
+#endif
+
   rk_step_is_ong: if (rk_step .eq. 1) then
 BENCH_START(comp4)
       call init_zero_tendency( ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend,num_3d_m,num_3d_c,rk_step,&
@@ -802,6 +810,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch5)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 5
+#include <a_debug_halo.h>
+#endif
+
 BENCH_START(comp6)
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
         call calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,xkmv,xkhh,xkhv,bn2,khdif,kvdif,div,defor11,&
@@ -812,6 +826,12 @@ BENCH_START(comp6)
 BENCH_END(comp6)
 
   endif rk_step_is_ong
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 6
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch6)
 #ifdef DM_PARALLEL
@@ -879,6 +899,12 @@ lineno = __LINE__
 #      include "HALO_0718.inc"
 #endif
 BENCH_END(exch7)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 7
+#include <a_debug_halo.h>
+#endif
 
   small_stepu: do iteration = 1, number_of_small_timesteps
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepu, iteration = ',iteration
@@ -962,6 +988,12 @@ BENCH_END(exch10)
 
   end do small_stepu
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 10
+#include <a_debug_halo.h>
+#endif
+
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Save fields re-computed later by small_step loops.  
  store_small_step: if ( config_flags%remove_small_step .and. &
@@ -1011,6 +1043,12 @@ BENCH_START(comp11)
                               grid%j_start(ij), grid%j_end(ij), &
                               k_start    , k_end               )
 BENCH_END(comp11)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 11
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch11)
 #ifdef DM_PARALLEL
@@ -1063,6 +1101,12 @@ BENCH_START(comp12)
 &jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
 BENCH_END(comp12)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = (rk_step*100) + 12
+#include <a_debug_halo.h>
+#endif
 
 BENCH_START(exch12)
 #ifdef DM_PARALLEL
