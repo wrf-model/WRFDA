@@ -612,7 +612,7 @@ a_z_at_wh(:,:,:) = 0.
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 0
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !----------------------------------------------
@@ -779,7 +779,7 @@ BENCH_END(exch3)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 3
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
   rk_step_is_ong: if (rk_step .eq. 1) then
@@ -815,7 +815,7 @@ BENCH_END(exch5)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 5
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(comp6)
@@ -832,7 +832,7 @@ BENCH_END(comp6)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 6
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(exch6)
@@ -905,14 +905,14 @@ BENCH_END(exch7)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 7
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
   small_stepu: do iteration = 1, number_of_small_timesteps
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 0
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 WRITE(wrf_err_message,*) 'DEBUG:  begin small_stepu, iteration = ',iteration
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -923,7 +923,7 @@ BENCH_START(comp8)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 1
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
       if (config_flags%specified .or. config_flags%nested) then
         call spec_bdyupdate( u_2,ru_tend,dts_rk,'u',config_flags,spec_zone,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,&
@@ -935,7 +935,7 @@ BENCH_END(comp8)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 2
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(exch8)
@@ -953,7 +953,7 @@ BENCH_END(comp9)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 3
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(exch9)
@@ -979,7 +979,7 @@ BENCH_START(comp10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 4
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
       call sumflux( u_2,v_2,ww,u_save,v_save,ww1,muu,muv,ru_m,rv_m,ww_m,epssm,msfu,msfv,iteration,number_of_small_timesteps,ids,&
@@ -987,7 +987,7 @@ BENCH_START(comp10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 5
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
       if (non_hydrostatic) then
         call advance_w( w_2,rw_tend,ww,u_2,v_2,mu_2,mut,muave,muts,t_2save,t_2,t_save,ph_2,ph_save,phb,ph_tend,ht,c2a,cqw,alt,alb,&
@@ -997,7 +997,7 @@ BENCH_START(comp10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 6
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
       if (config_flags%specified .or. config_flags%nested) then
         if (non_hydrostatic) then
@@ -1015,7 +1015,7 @@ BENCH_START(comp10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 7
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
       call calc_p_rho( al,p,ph_2,alt,t_2,t_save,c2a,pm1,mu_2,muts,znu,t0,rdnw,dnw,smdiv,non_hydrostatic,iteration,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1030,7 +1030,7 @@ BENCH_END(exch10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 5000 + (rk_step*100) + (iteration*10) + 8
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
   end do small_stepu
@@ -1038,7 +1038,7 @@ BENCH_END(exch10)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 10
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 ! TBH:  Trade redundant computation for memory.  
@@ -1094,7 +1094,7 @@ BENCH_END(comp11)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 11
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(exch11)
@@ -1152,7 +1152,7 @@ BENCH_END(comp12)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = (rk_step*100) + 12
-#include <a_debug_halo.h>
+#include <no_a_debug_halo.h>
 #endif
 
 BENCH_START(exch12)
@@ -1215,7 +1215,7 @@ BENCH_END(comp13)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 13
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 BENCH_START(comp14)
@@ -1729,7 +1729,7 @@ BENCH_END(exch26)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 26
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 BENCH_START(comp27)
@@ -2118,7 +2118,7 @@ BENCH_END(exch31)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 35
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 ! recompute : mu_2,mudf,muts,ph_2,pm1,ru_m,rv_m,t_2,u_2,v_2,w_2,ww_m
@@ -2236,7 +2236,7 @@ BENCH_END(exch33)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 37
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -2651,7 +2651,7 @@ BENCH_END(comp46)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 46
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 ! recompute : mu_2,ph_2,t_2
@@ -2921,7 +2921,7 @@ BENCH_END(comp51)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 51
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -3357,7 +3357,7 @@ BENCH_END(comp63)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 63
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -4187,7 +4187,7 @@ BENCH_END(comp87)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 87
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -4437,7 +4437,7 @@ BENCH_END(comp93)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 93
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -4541,7 +4541,7 @@ BENCH_START(comp96)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 96
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !----------------------------------------
@@ -4583,7 +4583,7 @@ BENCH_START(comp97)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 97
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !----------------------------------------
@@ -4645,7 +4645,7 @@ BENCH_END(comp98_a_small_step_prep)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 98
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 BENCH_START(comp98)
@@ -4919,7 +4919,7 @@ BENCH_END(comp106)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 106
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -5125,7 +5125,7 @@ BENCH_END(comp_a_surface_drag)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 107
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !---------------------------------------------------------------------------------------------
@@ -5148,7 +5148,7 @@ BENCH_END(comp_a_rk_tendency1)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 108
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 BENCH_START(exch107)
@@ -5176,7 +5176,7 @@ BENCH_START(comp113)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 113
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 !------------------------------
@@ -5373,7 +5373,7 @@ BENCH_END(exch112)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 116
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 BENCH_START(comp117)
@@ -5421,7 +5421,7 @@ BENCH_END(exch114)
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = ((rk_order-rk_step+1)*1000) + 118
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
 #endif
 
 end do a_runge_kutta_loop
@@ -5436,7 +5436,7 @@ end do a_runge_kutta_loop
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
   filecount = 9999
-#include <a_debug_halo.h>
+#include <all_debug_halo.h>
   call wrf_message ( 'DEBUG:  EARLY EXIT FOR HALO TESTS' )
   call wrf_shutdown
 #endif

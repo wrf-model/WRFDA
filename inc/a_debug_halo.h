@@ -1,45 +1,4 @@
 
-CALL write_field_global3d ( t_1, &
-                          't_1', filecount, min_filecount, max_filecount, 'm', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( t_2, &
-                          't_2', filecount, min_filecount, max_filecount, 'm', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( u_1, &
-                          'u_1', filecount, min_filecount, max_filecount, 'u', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( u_2, &
-                          'u_2', filecount, min_filecount, max_filecount, 'u', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( v_1, &
-                          'v_1', filecount, min_filecount, max_filecount, 'v', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( v_2, &
-                          'v_2', filecount, min_filecount, max_filecount, 'v', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( w_1, &
-                          'w_1', filecount, min_filecount, max_filecount, 'w', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-CALL write_field_global3d ( w_2, &
-                          'w_2', filecount, min_filecount, max_filecount, 'w', &
-                          ids, ide, jds, jde, kds, kde, &
-                          ims, ime, jms, jme, kms, kme, &
-                          ips, ipe, jps, jpe, kps, kpe )
-
 CALL write_field_global3d ( a_a, &
                           'a_a', filecount, min_filecount, max_filecount, 'm', &
                           ids, ide, jds, jde, kds, kde, &
