@@ -46,6 +46,7 @@ class CountFieldDiffs
     @lines1.each_with_index do |line, indx|
       if (line =~ /\s*(\w+)\s*\(/) then
         varname = $1.dup
+        @allzeros[varname] = true unless (@allzeros.has_key?(varname))
         @allvarnames[varname] = nil
         if ( line == @lines2[indx] ) then
           # if lines match, check for zero value
@@ -55,15 +56,15 @@ class CountFieldDiffs
             rescue
               raise "failed to parse value in line \"#{line}\""
             end
-            @allzeros[varname] ||= true
             @allzeros[varname] = false if (value != 0.0)
           else
             raise "bad value in line \"#{line}\""
           end
         else
-          @diffcounts[varname] ||= 0
+          @allzeros[varname] = false
+          @diffcounts[varname] = 0 unless (@diffcounts.has_key?(varname))
           @diffcounts[varname] += 1
-          @diffindxs[varname] ||= []
+          @diffindxs[varname] = [] unless (@diffindxs.has_key?(varname))
           @diffindxs[varname] << indx
         end
       else
