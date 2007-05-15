@@ -31,21 +31,17 @@ echo "EXP_DIR       = $EXP_DIR"
 echo "WORK_DIR      = $WORK_DIR"
 echo "START_DATE    = $START_DATE"
 echo "END_DATE      = $END_DATE"
-
-ln -fs ${WRFVAR_DIR}/build/da_tune_obs_hollingsworth1.exe .
-ln -fs ${WRFVAR_DIR}/build/da_tune_obs_hollingsworth2.exe .
-ln -fs ${WRFVAR_DIR}/build/da_advance_cymdh.exe .
   
 export DATE=$START_DATE
 
 while test $DATE -le $END_DATE; do
    cat ${EXP_DIR}/run/${DATE}/wrfvar/working/gts_omb_oma >> hollingsworth1.in
-   export DATE=`./da_advance_cymdh.exe $DATE $CYCLE_PERIOD`
+   export DATE=`${WRFVAR_DIR}/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD`
 done
 
 echo '*end*' >> hollingsworth1.in
 
-./da_tune_obs_hollingsworth1.exe > hollingsworth1.log 2>&1
+${WRFVAR_DIR}/build/da_tune_obs_hollingsworth1.exe > hollingsworth1.log 2>&1
 
 rm hollingsworth1.in
 
@@ -54,14 +50,14 @@ for FILE1 in *.dat; do
    FILE2=${FILE2%%.dat}
    ln -fs $FILE1 fort.35
 
-   ./da_tune_obs_hollingsworth2.exe > hollingsworth2_$FILE2.log 2>&1
+   ${WRFVAR_DIR}/build/da_tune_obs_hollingsworth2.exe > hollingsworth2_$FILE2.log 2>&1
    if test -f fort.30; then 
       mv fort.30     $FILE2.sigma_o_b
    fi
    mv hollingsworth2.out $FILE2.out
 done
 
-rm fort.35
+rm fort.35 *.dat
 
 exit 0
 echo ""
