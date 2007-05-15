@@ -18,7 +18,7 @@ program da_tune_obs_desroziers
    integer, Parameter            :: nplatforms = 20
    real, parameter               :: missing_r = -888888.0
    ! below copy from RTTOV
-   !platform names
+   ! platform names
    Character (len=8), Parameter :: platform_name(nplatforms) = &
        (/ 'noaa    ', 'dmsp    ', 'meteosat', 'goes    ', 'gms     ', &
           'fy2     ', 'trmm    ', 'ers     ', 'eos     ', 'metop   ', &
@@ -37,14 +37,14 @@ program da_tune_obs_desroziers
 
    integer                       :: n,k,ipixel
 
-   !  radiance namelist varibles
+   ! radiance namelist variables
 
    integer                       :: rtminit_nsensor
    integer, dimension(ninst)     :: rtminit_platform, &
                                     rtminit_satid,    &
                                     rtminit_sensor,   &
                                     rtminit_nchan
-   !  radiance relevant variables
+   ! radiance relevant variables
    character*1          :: str1,str2,str3
    character*4          :: platform
    character*5          :: sensor
@@ -88,6 +88,7 @@ program da_tune_obs_desroziers
       type (field_type), pointer :: t(:)
       type (field_type), pointer :: q(:)
    end type sound_type
+
    type airsr_type
       integer                    :: numlevs
       type (field_type), pointer :: t(:)
@@ -131,7 +132,8 @@ program da_tune_obs_desroziers
       type (field_type)          :: u
       type (field_type)          :: v
    end type qscat_type
-  type bogus_type
+
+   type bogus_type
       integer                    :: numlevs
       type (field_type)          :: slp
       type (field_type), pointer :: u(:)
@@ -141,7 +143,7 @@ program da_tune_obs_desroziers
    end type bogus_type
 
    type pixel_type
-      type (field_type), pointer :: pixel(:)                 ! dimension: num_rad_tot(ichan)
+      type (field_type), pointer :: pixel(:)   ! dimension: num_rad_tot(ichan)
    end type pixel_type
 
    type radiance_type
@@ -155,84 +157,88 @@ program da_tune_obs_desroziers
       type (pixel_type), pointer :: tb(:)                 ! dimension: nchan
    end type radiance_type
 
-  type gpsref_type
+   type gpsref_type
       integer                    :: numlevs
       type (field_type), pointer :: ref(:)      
    end type gpsref_type
 
 
    type ob_type
-      integer                    :: total_obs
-      integer                    :: num_synop, num_metar, num_ships, &
-                                    num_polaramv, num_geoamv,num_gpspw, num_sound, &
-                                    num_airep, num_pilot, num_ssmir, num_airsr, &
-                                    num_satem, num_ssmt1, num_ssmt2, num_gpsref, &
-                                    num_buoy, num_qscat, num_sonde_sfc, num_bogus, num_profiler
-      integer                    :: num_synop_tot, num_metar_tot, num_ships_tot, &
-                                    num_polaramv_tot, num_geoamv_tot, num_gpspw_tot, &
-                                    num_sound_tot, num_airsr_tot, &
-                                    num_airep_tot, num_pilot_tot, num_ssmir_tot, &
-                                    num_satem_tot, num_ssmt1_tot, num_ssmt2_tot, &
-                                    num_buoy_tot, num_qscat_tot, num_sonde_sfc_tot, num_bogus_tot, &
-                                    num_profiler_tot, num_gpsref_tot
+      integer :: total_obs
+      integer :: num_synop, num_metar, num_ships, &
+                 num_polaramv, num_geoamv,num_gpspw, num_sound, &
+                 num_airep, num_pilot, num_ssmir, num_airsr, &
+                 num_satem, num_ssmt1, num_ssmt2, num_gpsref, &
+                 num_buoy, num_qscat, num_sonde_sfc, num_bogus, num_profiler
+      integer :: num_synop_tot, num_metar_tot, num_ships_tot, &
+                 num_polaramv_tot, num_geoamv_tot, num_gpspw_tot, &
+                 num_sound_tot, num_airsr_tot, &
+                 num_airep_tot, num_pilot_tot, num_ssmir_tot, &
+                 num_satem_tot, num_ssmt1_tot, num_ssmt2_tot, &
+                 num_buoy_tot, num_qscat_tot, num_sonde_sfc_tot, num_bogus_tot, &
+                 num_profiler_tot, num_gpsref_tot
 
-      real                       :: trace_total
-      real                       :: trace_synop, trace_metar, trace_ships, &
-                                    trace_polaramv, trace_geoamv, trace_gpspw, trace_sound, &
-                                    trace_airep, trace_pilot, trace_ssmir, trace_airsr, &
-                                    trace_satem, trace_ssmt1, trace_ssmt2, &
-                                    trace_buoy, trace_qscat, trace_sonde_sfc, trace_bogus, &
-                                    trace_profiler, trace_gpsref
-      real                       :: jo_synop_u, jo_synop_v, jo_synop_t, jo_synop_p, jo_synop_q
-      real                       :: jo_metar_u, jo_metar_v, jo_metar_t, jo_metar_p, jo_metar_q
-      real                       :: jo_ships_u, jo_ships_v, jo_ships_t, jo_ships_p, jo_ships_q
-      real                       :: jo_polaramv_u, jo_polaramv_v, jo_geoamv_u, jo_geoamv_v, jo_gpspw_tpw
-      real                       :: jo_sound_u, jo_sound_v, jo_sound_t, jo_sound_q
-      real                       :: jo_gpsref_ref
-      real                       :: jo_airsr_t, jo_airsr_q
-      real                       :: jo_airep_u, jo_airep_v, jo_airep_t
-      real                       :: jo_pilot_u, jo_pilot_v
-      real                       :: jo_ssmir_speed, jo_ssmir_tpw, jo_satem_thickness
-      real                       :: jo_ssmt1_t, jo_ssmt2_rh
-      real                       :: jo_buoy_u, jo_buoy_v, jo_buoy_t, jo_buoy_p, jo_buoy_q
-      real                       :: jo_bogus_u, jo_bogus_v, jo_bogus_t, jo_bogus_q, jo_bogus_slp
-      real                       :: jo_qscat_u, jo_qscat_v
-      real                       :: jo_sonde_sfc_u, jo_sonde_sfc_v, jo_sonde_sfc_t, jo_sonde_sfc_p, jo_sonde_sfc_q
-      real                       :: jo_profiler_u, jo_profiler_v
+      real    :: trace_total
+      real    :: trace_synop, trace_metar, trace_ships, &
+                 trace_polaramv, trace_geoamv, trace_gpspw, trace_sound, &
+                 trace_airep, trace_pilot, trace_ssmir, trace_airsr, &
+                 trace_satem, trace_ssmt1, trace_ssmt2, &
+                 trace_buoy, trace_qscat, trace_sonde_sfc, trace_bogus, &
+                 trace_profiler, trace_gpsref
+      real    :: jo_synop_u, jo_synop_v, jo_synop_t, jo_synop_p, jo_synop_q
+      real    :: jo_metar_u, jo_metar_v, jo_metar_t, jo_metar_p, jo_metar_q
+      real    :: jo_ships_u, jo_ships_v, jo_ships_t, jo_ships_p, jo_ships_q
+      real    :: jo_polaramv_u, jo_polaramv_v, jo_geoamv_u, jo_geoamv_v, jo_gpspw_tpw
+      real    :: jo_sound_u, jo_sound_v, jo_sound_t, jo_sound_q
+      real    :: jo_gpsref_ref
+      real    :: jo_airsr_t, jo_airsr_q
+      real    :: jo_airep_u, jo_airep_v, jo_airep_t
+      real    :: jo_pilot_u, jo_pilot_v
+      real    :: jo_ssmir_speed, jo_ssmir_tpw, jo_satem_thickness
+      real    :: jo_ssmt1_t, jo_ssmt2_rh
+      real    :: jo_buoy_u, jo_buoy_v, jo_buoy_t, jo_buoy_p, jo_buoy_q
+      real    :: jo_bogus_u, jo_bogus_v, jo_bogus_t, jo_bogus_q, jo_bogus_slp
+      real    :: jo_qscat_u, jo_qscat_v
+      real    :: jo_sonde_sfc_u, jo_sonde_sfc_v, jo_sonde_sfc_t, jo_sonde_sfc_p, jo_sonde_sfc_q
+      real    :: jo_profiler_u, jo_profiler_v
       
-      real                       :: joa_synop_u, joa_synop_v, joa_synop_t, joa_synop_p, joa_synop_q
-      real                       :: joa_metar_u, joa_metar_v, joa_metar_t, joa_metar_p, joa_metar_q
-      real                       :: joa_ships_u, joa_ships_v, joa_ships_t, joa_ships_p, joa_ships_q
-      real                       :: joa_polaramv_u, joa_polaramv_v, joa_geoamv_u, joa_geoamv_v, joa_gpspw_tpw
-      real                       :: joa_sound_u, joa_sound_v, joa_sound_t, joa_sound_q
-      real                       :: joa_gpsref_ref
-      real                       :: joa_airsr_t, joa_airsr_q
-      real                       :: joa_airep_u, joa_airep_v, joa_airep_t
-      real                       :: joa_pilot_u, joa_pilot_v
-      real                       :: joa_ssmir_speed, joa_ssmir_tpw, joa_satem_thickness
-      real                       :: joa_ssmt1_t, joa_ssmt2_rh
-      real                       :: joa_buoy_u, joa_buoy_v, joa_buoy_t, joa_buoy_p, joa_buoy_q
-      real                       :: joa_bogus_u, joa_bogus_v, joa_bogus_t, joa_bogus_q, joa_bogus_slp
-      real                       :: joa_qscat_u, joa_qscat_v
-      real                       :: joa_sonde_sfc_u, joa_sonde_sfc_v, joa_sonde_sfc_t, joa_sonde_sfc_p, joa_sonde_sfc_q
-      real                       :: joa_profiler_u, joa_profiler_v
+      real    :: joa_synop_u, joa_synop_v, joa_synop_t, joa_synop_p, joa_synop_q
+      real    :: joa_metar_u, joa_metar_v, joa_metar_t, joa_metar_p, joa_metar_q
+      real    :: joa_ships_u, joa_ships_v, joa_ships_t, joa_ships_p, joa_ships_q
+      real    :: joa_polaramv_u, joa_polaramv_v, joa_geoamv_u, joa_geoamv_v
+      real    :: joa_gpspw_tpw
+      real    :: joa_sound_u, joa_sound_v, joa_sound_t, joa_sound_q
+      real    :: joa_gpsref_ref
+      real    :: joa_airsr_t, joa_airsr_q
+      real    :: joa_airep_u, joa_airep_v, joa_airep_t
+      real    :: joa_pilot_u, joa_pilot_v
+      real    :: joa_ssmir_speed, joa_ssmir_tpw, joa_satem_thickness
+      real    :: joa_ssmt1_t, joa_ssmt2_rh
+      real    :: joa_buoy_u, joa_buoy_v, joa_buoy_t, joa_buoy_p, joa_buoy_q
+      real    :: joa_bogus_u, joa_bogus_v, joa_bogus_t, joa_bogus_q, joa_bogus_slp
+      real    :: joa_qscat_u, joa_qscat_v
+      real    :: joa_sonde_sfc_u, joa_sonde_sfc_v, joa_sonde_sfc_t
+      real    :: joa_sonde_sfc_p, joa_sonde_sfc_q
+      real    :: joa_profiler_u, joa_profiler_v
 
-      real                       :: ef_synop_u, ef_synop_v, ef_synop_t, ef_synop_p, ef_synop_q
-      real                       :: ef_metar_u, ef_metar_v, ef_metar_t, ef_metar_p, ef_metar_q
-      real                       :: ef_ships_u, ef_ships_v, ef_ships_t, ef_ships_p, ef_ships_q
-      real                       :: ef_polaramv_u, ef_polaramv_v, ef_geoamv_u, ef_geoamv_v, ef_gpspw_tpw
-      real                       :: ef_sound_u, ef_sound_v, ef_sound_t, ef_sound_q
-      real                       :: ef_gpsref_ref
-      real                       :: ef_airsr_t, ef_airsr_q
-      real                       :: ef_airep_u, ef_airep_v, ef_airep_t
-      real                       :: ef_pilot_u, ef_pilot_v
-      real                       :: ef_ssmir_speed, ef_ssmir_tpw, ef_satem_thickness
-      real                       :: ef_ssmt1_t, ef_ssmt2_rh
-      real                       :: ef_buoy_u, ef_buoy_v, ef_buoy_t, ef_buoy_p, ef_buoy_q
-      real                       :: ef_bogus_u, ef_bogus_v, ef_bogus_t, ef_bogus_q, ef_bogus_slp
-      real                       :: ef_qscat_u, ef_qscat_v
-      real                       :: ef_sonde_sfc_u, ef_sonde_sfc_v, ef_sonde_sfc_t, ef_sonde_sfc_p, ef_sonde_sfc_q
-      real                       :: ef_profiler_u, ef_profiler_v
+      real    :: ef_synop_u, ef_synop_v, ef_synop_t, ef_synop_p, ef_synop_q
+      real    :: ef_metar_u, ef_metar_v, ef_metar_t, ef_metar_p, ef_metar_q
+      real    :: ef_ships_u, ef_ships_v, ef_ships_t, ef_ships_p, ef_ships_q
+      real    :: ef_polaramv_u, ef_polaramv_v, ef_geoamv_u, ef_geoamv_v
+      real    :: ef_gpspw_tpw
+      real    :: ef_sound_u, ef_sound_v, ef_sound_t, ef_sound_q
+      real    :: ef_gpsref_ref
+      real    :: ef_airsr_t, ef_airsr_q
+      real    :: ef_airep_u, ef_airep_v, ef_airep_t
+      real    :: ef_pilot_u, ef_pilot_v
+      real    :: ef_ssmir_speed, ef_ssmir_tpw, ef_satem_thickness
+      real    :: ef_ssmt1_t, ef_ssmt2_rh
+      real    :: ef_buoy_u, ef_buoy_v, ef_buoy_t, ef_buoy_p, ef_buoy_q
+      real    :: ef_bogus_u, ef_bogus_v, ef_bogus_t, ef_bogus_q, ef_bogus_slp
+      real    :: ef_qscat_u, ef_qscat_v
+      real    :: ef_sonde_sfc_u, ef_sonde_sfc_v, ef_sonde_sfc_t, ef_sonde_sfc_p
+      real    :: ef_sonde_sfc_q
+      real    :: ef_profiler_u, ef_profiler_v
 
       type (surfc_type), pointer :: synop(:)
       type (surfc_type), pointer :: metar(:)
@@ -259,78 +265,80 @@ program da_tune_obs_desroziers
       end type ob_type
    type (ob_type)       :: ob
    
-!--------------------------------------------------------------------------
-!  Initialise the counter
-!--------------------------------------------------------------------------
-!   ob % totla_obs         = 0
-!   ob % num_synop_tot     = 0
-!   ob % num_metar_tot     = 0
-!   ob % num_ships_tot     = 0
-!   ob % num_polaramv_tot  = 0 
-!   ob % num_geoamv_tot    = 0
-!   ob % num_gpspw_tot     = 0
-!   ob % num_sound_tot     = 0
-!   ob % num_airsr_tot     = 0
-!   ob % num_airep_tot     = 0
-!   ob % num_pilot_tot     = 0
-!   ob % num_ssmir_tot     = 0
-!   ob % num_satem_tot     = 0
-!   ob % num_ssmt1_tot     = 0
-!   ob % num_ssmt2_tot     = 0
-!   ob % num_buoy_tot      = 0
-!   ob % num_sonde_sfc_tot = 0
-!   ob % num_qscat_tot     = 0
-!   ob % num_profiler_tot  = 0
-!   ob% num_bogus_tot      = 0
-!--------------------------------------------------------------------------
-!  [1.0] Count total number of observations and allocate arrays:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! Initialise the counter
+   !--------------------------------------------------------------------------
+
+   ! ob % totla_obs         = 0
+   ! ob % num_synop_tot     = 0
+   ! ob % num_metar_tot     = 0
+   ! ob % num_ships_tot     = 0
+   ! ob % num_polaramv_tot  = 0 
+   ! ob % num_geoamv_tot    = 0
+   ! ob % num_gpspw_tot     = 0
+   ! ob % num_sound_tot     = 0
+   ! ob % num_airsr_tot     = 0
+   ! ob % num_airep_tot     = 0
+   ! ob % num_pilot_tot     = 0
+   ! ob % num_ssmir_tot     = 0
+   ! ob % num_satem_tot     = 0
+   ! ob % num_ssmt1_tot     = 0
+   ! ob % num_ssmt2_tot     = 0
+   ! ob % num_buoy_tot      = 0
+   ! ob % num_sonde_sfc_tot = 0
+   ! ob % num_qscat_tot     = 0
+   ! ob % num_profiler_tot  = 0
+   ! ob% num_bogus_tot      = 0
+
+   !--------------------------------------------------------------------------
+   ! [1.0] Count total number of observations and allocate arrays:
+   !--------------------------------------------------------------------------
+
    call da_count_obs( y_unit, ob )
 
-!--------------------------------------------------------------------------
-!  [2.0] Read in UNperturbed y = H(x_inc) from each ob type:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [2.0] Read in UNperturbed y = H(x_inc) from each ob type:
+   !--------------------------------------------------------------------------
 
    call da_read_y( y_unit, ob )
    
-!--------------------------------------------------------------------------
-!  [3.0] Read in perturbed yp = H(x_inc_p) from each ob type:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [3.0] Read in perturbed yp = H(x_inc_p) from each ob type:
+   !--------------------------------------------------------------------------
  
    call da_read_yp( yp_unit, ob )
 
-!--------------------------------------------------------------------------
-!  [4.0] Read in perturbations and errors from each ob type:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [4.0] Read in perturbations and errors from each ob type:
+   !--------------------------------------------------------------------------
 
    call da_read_obs_rand( rand_unit, ob )
 
-!--------------------------------------------------------------------------
-!  [5.0] Calculate expected cost function J values:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [5.0] Calculate expected cost function J values:
+   !--------------------------------------------------------------------------
 
    call da_calc_jo_expected( ob )
-!--------------------------------------------------------------------------
-!  [6.0] Read actual cost function J and error tuning factors used:
-!--------------------------------------------------------------------------
+
+   !--------------------------------------------------------------------------
+   ! [6.0] Read actual cost function J and error tuning factors used:
+   !--------------------------------------------------------------------------
 
    call da_read_jo_actual( ob )
 
-!--------------------------------------------------------------------------
-!  [7.0] Calculate observation error tuning factors:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [7.0] Calculate observation error tuning factors:
+   !--------------------------------------------------------------------------
 
    call da_calc_new_factors( ob )
 
-!--------------------------------------------------------------------------
-!  [8.0] Calculate observation error tuning factors:
-!--------------------------------------------------------------------------
+   !--------------------------------------------------------------------------
+   ! [8.0] Calculate observation error tuning factors:
+   !--------------------------------------------------------------------------
 
    call da_get_j( ob )
 
 contains
-
-!--------------------------------------------------------------------------
 
 subroutine da_count_obs( y_unit, ob )
 
@@ -342,7 +350,7 @@ subroutine da_count_obs( y_unit, ob )
    character*20         :: ob_name, dummy
    integer              :: times, num_obs, k, num_levs
 
-!  [1] Initialize ob numbers:
+   ! [1] Initialize ob numbers:
 
    ob % num_synop = 0
    ob % num_metar = 0
@@ -364,17 +372,17 @@ subroutine da_count_obs( y_unit, ob )
    ob % num_bogus = 0
    ob % num_qscat = 0
    ob % num_gpsref = 0
-!  [1.2] Initialize satellite instrument numbers
-!         and channel numbers for each instrument
+   ! [1.2] Initialize satellite instrument numbers
+   !       and channel numbers for each instrument
 
    call read_namelist_radiance
 
-     times = 0 
-!  [2] Loop through input file to count number of obs:
+   times = 0 
+   !  [2] Loop through input file to count number of obs:
 
-    do   
-         read(y_unit,'(a20,i8)', end = 1000)ob_name, num_obs
-         if( num_obs > 0) times = times + 1 
+   do   
+      read(y_unit,'(a20,i8)', end = 1000)ob_name, num_obs
+      if( num_obs > 0) times = times + 1 
       if ( index( ob_name,'synop') > 0 ) then
          ob % num_synop = ob % num_synop + num_obs
       elseif ( index( ob_name,'metar') > 0 ) then
@@ -415,69 +423,73 @@ subroutine da_count_obs( y_unit, ob )
           ob % num_bogus = ob % num_bogus + num_obs
       elseif ( index( ob_name,'gpsref') > 0 ) then
          ob % num_gpsref = ob % num_gpsref + num_obs
-!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
-!--------------------------------------------------------------------
+         ! Radiance obs: consistent with RTTOV triplet and WRF-VAR
+         !--------------------------------------------------------------------
       else if ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
          read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
-               platform, str1,satellite_id,str2,sensor,str3,ichan
+            platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
-              sensor_id = 3
+            sensor_id = 3
          else if ( sensor == 'amsub' )  then
-              sensor_id = 4
+            sensor_id = 4
          else
-          print*,' Unrecognized Sensor ',sensor
-
-          stop
+            print*,' Unrecognized Sensor ',sensor
+            stop
          end if
          do n = 1, rtminit_nsensor
-           if (    platform_id  == rtminit_platform(n) &
+            if (    platform_id  == rtminit_platform(n) &
              .and. satellite_id == rtminit_satid(n)    &
              .and. sensor_id    == rtminit_sensor(n)    ) then
-                ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
-                exit
-           end if
+                ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + &
+                   num_obs
+               exit
+            end if
          end do
-!---------------------------------------------------------------------
-!rizvi            read(y_unit,'(i8)')num_levs
-!rizvi            read(y_unit,'(a20)')dummy    
+
+         ! WHY 
+         ! read(y_unit,'(i8)')num_levs
+         ! read(y_unit,'(a20)')dummy    
       elseif ( index( ob_name,'*****') > 0 ) then 
-      print*,' scaned for time ', times
-      exit
+         print*,' scaned for time ', times
+         exit
       else
-        print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
+         print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
       end if
-!
-          if ( index( ob_name,'noaa') > 0 ) then
-              do k = 1, num_obs
-              read(y_unit,'(a20)')dummy              
-              end do
-         else
-          do n = 1, num_obs
+
+      if ( index( ob_name,'noaa') > 0 ) then
+         do k = 1, num_obs
+            read(y_unit,'(a20)')dummy              
+         end do
+      else
+         do n = 1, num_obs
             read(y_unit,'(i8)')num_levs
             do k = 1, num_levs 
-              read(y_unit,'(a20)')dummy              
+               read(y_unit,'(a20)')dummy              
             end do
-          end do
-         end if    
+         end do
+      end if    
    end do
 
-1000  print*,' end of file reached on unit ',y_unit
+1000 print*,' end of file reached on unit ',y_unit
 
-!  [3] Allocate ob structures where obs exist:
+   ! [3] Allocate ob structures where obs exist:
 
    if ( rtminit_nsensor > 0 ) then
-     do n=1,rtminit_nsensor
-     do ichan=1,ob%rad(n)%nchan
-      if ( ob%rad(n)%num_rad_tot(ichan) > 0 ) then
-      allocate( ob % rad(n) % tb(ichan) % pixel(1:ob % rad(n) %num_rad_tot(ichan)) )
-      write(6,'(a,i5,a,i10)') ' Number of '//trim(ob%rad(n)%rttovid_string)//' channel ', ichan , ' = ', &
-                        ob%rad(n)%num_rad_tot(ichan)
-      end if
-     end do
-     end do
+      do n=1,rtminit_nsensor
+         do ichan=1,ob%rad(n)%nchan
+            if ( ob%rad(n)%num_rad_tot(ichan) > 0 ) then
+               allocate(ob%rad(n)%tb(ichan)%pixel &
+                  (1:ob % rad(n)%num_rad_tot(ichan)))
+               write(6,'(a,i5,a,i10)') &
+                  ' Number of '//trim(ob%rad(n)%rttovid_string)//&
+                  ' channel ', ichan , ' = ', &
+                  ob%rad(n)%num_rad_tot(ichan)
+            end if
+         end do
+      end do
    end if
-!
+
    if ( ob % num_synop > 0 ) then
       allocate( ob % synop(1:ob % num_synop) )
       write(6,'(a,i8)')' Number of synop obs = ', ob % num_synop
@@ -573,8 +585,6 @@ subroutine da_count_obs( y_unit, ob )
    
 end subroutine da_count_obs
 
-!--------------------------------------------------------------------------
-
 subroutine da_read_y( y_unit, ob )
 
    implicit none
@@ -582,11 +592,11 @@ subroutine da_read_y( y_unit, ob )
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20         :: ob_name, dummy
-   integer              :: n, ndum, k, kdum, num_obs, num_levs   
-   integer              :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
-                           iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
-                           ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
+   character*20 :: ob_name, dummy
+   integer      :: n, ndum, k, kdum, num_obs, num_levs   
+   integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
+                   iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
+                   ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
 
    rewind (y_unit)
 
@@ -610,13 +620,12 @@ subroutine da_read_y( y_unit, ob )
    ibogus = 0 
    iprofiler = 0
    igpsref = 0
-  do n = 1,rtminit_nsensor
-    ob%rad(n)%num_rad_tot(:) = 0
+
+   do n = 1,rtminit_nsensor
+      ob%rad(n)%num_rad_tot(:) = 0
    end do
 
-
-   do
-   
+   do  
       read(y_unit,'(a20,i8)', end = 1000)ob_name, num_obs
       
       if ( index( ob_name,'synop') > 0 ) then
@@ -871,8 +880,8 @@ subroutine da_read_y( y_unit, ob )
                                            ob % gpsref(igpsref) % ref(k) % y
             end do
          end do
-!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
-!--------------------------------------------------------------------
+         ! Radiance obs: consistent with RTTOV triplet and WRF-VAR
+         !--------------------------------------------------------------------
       else if ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
          read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
@@ -896,19 +905,18 @@ subroutine da_read_y( y_unit, ob )
                 exit
            end if
          end do
-!---------------------------------------------------------------------
 
       elseif ( index( ob_name,'*****') > 0 ) then 
-        exit
+         exit
       else
-      print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
+         print*,' unknown obs type: ',trim(ob_name),' found on unit ',y_unit
       end if
    end do
-1000  print*,' end of file reached on unit ',y_unit
+1000 print*,' end of file reached on unit ',y_unit
    
 end subroutine da_read_y
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_read_yp( yp_unit, ob )
 
@@ -917,11 +925,11 @@ subroutine da_read_yp( yp_unit, ob )
    integer, intent(in)               :: yp_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20         :: ob_name, dummy
-   integer              :: n, ndum, k, kdum, num_obs, num_levs   
-   integer              :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
-                           iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
-                           ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
+   character*20 :: ob_name, dummy
+   integer      :: n, ndum, k, kdum, num_obs, num_levs   
+   integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
+                   iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
+                   ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
 
    rewind (yp_unit)
 
@@ -947,42 +955,43 @@ subroutine da_read_yp( yp_unit, ob )
    igpsref = 0
 
    do n = 1,rtminit_nsensor
-    ob%rad(n)%num_rad_tot(:) = 0
+      ob%rad(n)%num_rad_tot(:) = 0
    end do
 
-   do
-   
+   do 
       read(yp_unit,'(a20,i8)', end=1000)ob_name, num_obs
       
       if ( index( ob_name,'synop') > 0 ) then
          do n = 1, num_obs
             isynop = isynop + 1
             read(yp_unit,'(i8)')num_levs
-            read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % synop(isynop) % u % yp, &
-                                        ob % synop(isynop) % v % yp, &
-                                        ob % synop(isynop) % t % yp, &
-                                        ob % synop(isynop) % p % yp, &
-                                        ob % synop(isynop) % q % yp
+            read(yp_unit,'(2i8,7e15.7)') &
+               ndum, kdum, ob % synop(isynop) % u % yp, &
+               ob % synop(isynop) % v % yp, &
+               ob % synop(isynop) % t % yp, &
+               ob % synop(isynop) % p % yp, &
+               ob % synop(isynop) % q % yp
          end do
       elseif ( index( ob_name,'metar') > 0 ) then
          do n = 1, num_obs
             imetar = imetar + 1
             read(yp_unit,'(i8)')num_levs
-            read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % metar(imetar) % u % yp, &
-                                        ob % metar(imetar) % v % yp, &
-                                        ob % metar(imetar) % t % yp, &
-                                        ob % metar(imetar) % p % yp, &
-                                        ob % metar(imetar) % q % yp
+            read(yp_unit,'(2i8,7e15.7)') &
+               ndum, kdum, ob % metar(imetar) % u % yp, &
+               ob % metar(imetar) % v % yp, &
+               ob % metar(imetar) % t % yp, &
+               ob % metar(imetar) % p % yp, &
+               ob % metar(imetar) % q % yp
          end do
       elseif ( index( ob_name,'ships') > 0 ) then
          do n = 1, num_obs
             iships = iships + 1
             read(yp_unit,'(i8)')num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % ships(iships) % u % yp, &
-                                        ob % ships(iships) % v % yp, &
-                                        ob % ships(iships) % t % yp, &
-                                        ob % ships(iships) % p % yp, &
-                                        ob % ships(iships) % q % yp
+               ob % ships(iships) % v % yp, &
+               ob % ships(iships) % t % yp, &
+               ob % ships(iships) % p % yp, &
+               ob % ships(iships) % q % yp
          end do
 
       elseif ( index( ob_name,'geoamv') > 0 ) then
@@ -991,8 +1000,8 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                        ob % geoamv(igeoamv) % u(k) % yp, &
-                                        ob % geoamv(igeoamv) % v(k) % yp
+               ob % geoamv(igeoamv) % u(k) % yp, &
+               ob % geoamv(igeoamv) % v(k) % yp
            end do
          end do
 
@@ -1002,8 +1011,8 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                        ob % polaramv(ipolaramv) % u(k) % yp, &
-                                        ob % polaramv(ipolaramv) % v(k) % yp
+               ob % polaramv(ipolaramv) % u(k) % yp, &
+               ob % polaramv(ipolaramv) % v(k) % yp
            end do
          end do
 
@@ -1022,10 +1031,10 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % sound(isound) % u(k) % yp, &
-                                           ob % sound(isound) % v(k) % yp, &
-                                           ob % sound(isound) % t(k) % yp, &
-                                           ob % sound(isound) % q(k) % yp
+                  ob % sound(isound) % u(k) % yp, &
+                  ob % sound(isound) % v(k) % yp, &
+                  ob % sound(isound) % t(k) % yp, &
+                  ob % sound(isound) % q(k) % yp
             end do
          end do
          
@@ -1035,8 +1044,8 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % airsr(iairsr) % t(k) % yp, &
-                                           ob % airsr(iairsr) % q(k) % yp
+                  ob % airsr(iairsr) % t(k) % yp, &
+                  ob % airsr(iairsr) % q(k) % yp
             end do
          end do
       elseif ( index( ob_name,'airep') > 0 ) then
@@ -1045,9 +1054,9 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % airep(iairep) % u(k) % yp, &
-                                           ob % airep(iairep) % v(k) % yp, &
-                                           ob % airep(iairep) % t(k) % yp
+                  ob % airep(iairep) % u(k) % yp, &
+                  ob % airep(iairep) % v(k) % yp, &
+                  ob % airep(iairep) % t(k) % yp
             end do
          end do
       elseif ( index( ob_name,'pilot') > 0 ) then
@@ -1056,8 +1065,8 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % pilot(ipilot) % u(k) % yp, &
-                                           ob % pilot(ipilot) % v(k) % yp
+                  ob % pilot(ipilot) % u(k) % yp, &
+                  ob % pilot(ipilot) % v(k) % yp
             end do
          end do
       elseif ( index( ob_name,'ssmir') > 0 ) then
@@ -1065,8 +1074,8 @@ subroutine da_read_yp( yp_unit, ob )
             issmir = issmir + 1
             read(yp_unit,'(i8)')num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                        ob % ssmir(issmir) % speed % yp, &
-                                        ob % ssmir(issmir) % tpw % yp
+               ob % ssmir(issmir) % speed % yp, &
+               ob % ssmir(issmir) % tpw % yp
          end do
       elseif ( index( ob_name,'satem') > 0 ) then
          do n = 1, num_obs
@@ -1074,7 +1083,7 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % satem(isatem) % thickness(k) % yp
+                  ob % satem(isatem) % thickness(k) % yp
             end do
          end do
       elseif ( index( ob_name,'ssmt1') > 0 ) then
@@ -1083,7 +1092,7 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % ssmt1(issmt1) % t(k) % yp
+                  ob % ssmt1(issmt1) % t(k) % yp
             end do
          end do
       elseif ( index( ob_name,'ssmt2') > 0 ) then
@@ -1092,7 +1101,7 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % ssmt2(issmt2) % rh(k) % yp
+                  ob % ssmt2(issmt2) % rh(k) % yp
             end do
          end do
       elseif ( index( ob_name,'buoy') > 0 ) then
@@ -1100,20 +1109,20 @@ subroutine da_read_yp( yp_unit, ob )
             ibuoy = ibuoy + 1
             read(yp_unit,'(i8)')num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % buoy(ibuoy) % u % yp, &
-                                        ob % buoy(ibuoy) % v % yp, &
-                                        ob % buoy(ibuoy) % t % yp, &
-                                        ob % buoy(ibuoy) % p % yp, &
-                                        ob % buoy(ibuoy) % q % yp
+               ob % buoy(ibuoy) % v % yp, &
+               ob % buoy(ibuoy) % t % yp, &
+               ob % buoy(ibuoy) % p % yp, &
+               ob % buoy(ibuoy) % q % yp
          end do
       elseif ( index( ob_name,'sonde_sfc') > 0 ) then
          do n = 1, num_obs
             isonde_sfc = isonde_sfc + 1
             read(yp_unit,'(i8)')num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % sonde_sfc(isonde_sfc) % u % yp, &
-                                        ob % sonde_sfc(isonde_sfc) % v % yp, &
-                                        ob % sonde_sfc(isonde_sfc) % t % yp, &
-                                        ob % sonde_sfc(isonde_sfc) % p % yp, &
-                                        ob % sonde_sfc(isonde_sfc) % q % yp
+               ob % sonde_sfc(isonde_sfc) % v % yp, &
+               ob % sonde_sfc(isonde_sfc) % t % yp, &
+               ob % sonde_sfc(isonde_sfc) % p % yp, &
+               ob % sonde_sfc(isonde_sfc) % q % yp
          end do
 
       elseif ( index( ob_name,'qscat') > 0 ) then
@@ -1121,7 +1130,7 @@ subroutine da_read_yp( yp_unit, ob )
             iqscat = iqscat + 1
             read(yp_unit,'(i8)')num_levs
             read(yp_unit,'(2i8,7e15.7)')ndum, kdum, ob % qscat(iqscat) % u % yp, &
-                                        ob % qscat(iqscat) % v % yp
+               ob % qscat(iqscat) % v % yp
          end do
       elseif ( index( ob_name,'profiler') > 0 ) then
          do n = 1, num_obs
@@ -1130,8 +1139,8 @@ subroutine da_read_yp( yp_unit, ob )
             ob % profiler(iprofiler) % numlevs = num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % profiler(iprofiler) % u(k) % yp, &
-                                           ob % profiler(iprofiler) % v(k) % yp
+                  ob % profiler(iprofiler) % u(k) % yp, &
+                  ob % profiler(iprofiler) % v(k) % yp
             end do
          end do
       elseif ( index( ob_name,'bogus') > 0 ) then
@@ -1142,10 +1151,10 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,4e15.7)')ndum, kdum, &
-                                           ob % bogus(ibogus) % u(k) % yp, &
-                                           ob % bogus(ibogus) % v(k) % yp, &
-                                           ob % bogus(ibogus) % t(k) % yp, &
-                                           ob % bogus(ibogus) % q(k) % yp
+                  ob % bogus(ibogus) % u(k) % yp, &
+                  ob % bogus(ibogus) % v(k) % yp, &
+                  ob % bogus(ibogus) % t(k) % yp, &
+                  ob % bogus(ibogus) % q(k) % yp
             end do
          end do
       elseif ( index( ob_name,'gpsref') > 0 ) then
@@ -1154,11 +1163,11 @@ subroutine da_read_yp( yp_unit, ob )
             read(yp_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(yp_unit,'(2i8,7e15.7)')ndum, kdum, &
-                                           ob % gpsref(igpsref) % ref(k) % yp
+                  ob % gpsref(igpsref) % ref(k) % yp
             end do
          end do
-!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
-!--------------------------------------------------------------------
+         ! Radiance obs: consistent with RTTOV triplet and WRF-VAR
+         !--------------------------------------------------------------------
       elseif ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
          read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
@@ -1175,27 +1184,24 @@ subroutine da_read_yp( yp_unit, ob )
              .and. satellite_id == rtminit_satid(n)    &
              .and. sensor_id    == rtminit_sensor(n)    ) then
                 do k = 1,num_obs
-                  ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
+                  ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan)+1
                   read(yp_unit,'(2i8,e15.7)') ipixel, kdum, &
-                       ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%yp
+                     ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%yp
                 end do
                 exit
            end if
          end do
-!---------------------------------------------------------------------
-
-
       elseif ( index( ob_name,'*****') > 0 ) then 
-        exit
+         exit
       else
       print*,' unknown obs type: ',trim(ob_name),' found on unit ',yp_unit
       end if
    end do
-1000  print*,' end of file reached on unit ',yp_unit
+1000 print*,' end of file reached on unit ',yp_unit
    
 end subroutine da_read_yp
   
-!--------------------------------------------------------------------------
+
 
 subroutine da_read_obs_rand( rand_unit, ob )
 
@@ -1204,11 +1210,11 @@ subroutine da_read_obs_rand( rand_unit, ob )
    integer, intent(in)               :: rand_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20         :: ob_name, dummy
-   integer              :: n, ndum, k, kdum, num_obs, num_levs
-   integer              :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
-                           iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
-                           ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
+   character*20 :: ob_name, dummy
+   integer      :: n, ndum, k, kdum, num_obs, num_levs
+   integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
+                   iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
+                   ibuoy, isonde_sfc, iqscat, ibogus, iprofiler, igpsref
 
    isynop = 0
    imetar = 0
@@ -1231,13 +1237,12 @@ subroutine da_read_obs_rand( rand_unit, ob )
    iprofiler = 0
    igpsref = 0
    do n = 1,rtminit_nsensor
-    ob%rad(n)%num_rad_tot(:) = 0
+     ob%rad(n)%num_rad_tot(:) = 0
    end do
 
    rewind( rand_unit )
 
    do
-   
       read(rand_unit,'(a20,i8)',end=1000)ob_name, num_obs
       if ( index( ob_name,'synop') > 0 ) then
          do n = 1, num_obs
@@ -1294,9 +1299,11 @@ subroutine da_read_obs_rand( rand_unit, ob )
             ipolaramv = ipolaramv + 1
             read(rand_unit,'(i8)')num_levs
             do k = 1, num_levs
-            read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % polaramv(ipolaramv) % u(k) % error, ob % polaramv(ipolaramv) % u(k) % pert, &
-            ob % polaramv(ipolaramv) % v(k) % error, ob % polaramv(ipolaramv) % v(k) % pert
+               read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
+                  ob % polaramv(ipolaramv) % u(k) % error, &
+                  ob % polaramv(ipolaramv) % u(k) % pert, &
+                  ob % polaramv(ipolaramv) % v(k) % error, &
+                  ob % polaramv(ipolaramv) % v(k) % pert
             end do
          end do
 
@@ -1306,7 +1313,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
             igpspw = igpspw + 1
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % gpspw(igpspw) % tpw % error, ob % gpspw(igpspw) % tpw % pert
+               ob % gpspw(igpspw) % tpw % error, ob % gpspw(igpspw) % tpw % pert
          end do
 
       elseif ( index( ob_name,'sound') > 0 ) then
@@ -1317,10 +1324,14 @@ subroutine da_read_obs_rand( rand_unit, ob )
             
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % sound(isound) % u(k) % error, ob % sound(isound) % u(k) % pert, &
-               ob % sound(isound) % v(k) % error, ob % sound(isound) % v(k) % pert, &
-               ob % sound(isound) % t(k) % error, ob % sound(isound) % t(k) % pert, &
-               ob % sound(isound) % q(k) % error, ob % sound(isound) % q(k) % pert
+                  ob % sound(isound) % u(k) % error, &
+                  ob % sound(isound) % u(k) % pert, &
+                  ob % sound(isound) % v(k) % error, &
+                  ob % sound(isound) % v(k) % pert, &
+                  ob % sound(isound) % t(k) % error, &
+                  ob % sound(isound) % t(k) % pert, &
+                  ob % sound(isound) % q(k) % error, &
+                  ob % sound(isound) % q(k) % pert
             end do
          end do
 
@@ -1332,8 +1343,10 @@ subroutine da_read_obs_rand( rand_unit, ob )
             
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % airsr(iairsr) % t(k) % error, ob % airsr(iairsr) % t(k) % pert, &
-               ob % airsr(iairsr) % q(k) % error, ob % airsr(iairsr) % q(k) % pert
+                  ob % airsr(iairsr) % t(k) % error, &
+                  ob % airsr(iairsr) % t(k) % pert, &
+                  ob % airsr(iairsr) % q(k) % error, &
+                  ob % airsr(iairsr) % q(k) % pert
             end do
          end do
 
@@ -1345,9 +1358,12 @@ subroutine da_read_obs_rand( rand_unit, ob )
             
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % airep(iairep) % u(k) % error, ob % airep(iairep) % u(k) % pert, &
-               ob % airep(iairep) % v(k) % error, ob % airep(iairep) % v(k) % pert, &
-               ob % airep(iairep) % t(k) % error, ob % airep(iairep) % t(k) % pert
+                  ob % airep(iairep) % u(k) % error, &
+                  ob % airep(iairep) % u(k) % pert, &
+                  ob % airep(iairep) % v(k) % error, &
+                  ob % airep(iairep) % v(k) % pert, &
+                  ob % airep(iairep) % t(k) % error, &
+                  ob % airep(iairep) % t(k) % pert
             end do
          end do
 
@@ -1359,8 +1375,10 @@ subroutine da_read_obs_rand( rand_unit, ob )
             
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % pilot(ipilot) % u(k) % error, ob % pilot(ipilot) % u(k) % pert, &
-               ob % pilot(ipilot) % v(k) % error, ob % pilot(ipilot) % v(k) % pert
+                  ob % pilot(ipilot) % u(k) % error, &
+                  ob % pilot(ipilot) % u(k) % pert, &
+                  ob % pilot(ipilot) % v(k) % error, &
+                  ob % pilot(ipilot) % v(k) % pert
             end do
          end do
          
@@ -1370,8 +1388,10 @@ subroutine da_read_obs_rand( rand_unit, ob )
             issmir = issmir + 1
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % ssmir(issmir) % speed % error, ob % ssmir(issmir) % speed % pert, &
-            ob % ssmir(issmir) % tpw % error, ob % ssmir(issmir) % tpw % pert
+               ob % ssmir(issmir) % speed % error, &
+               ob % ssmir(issmir) % speed % pert, &
+               ob % ssmir(issmir) % tpw % error, &
+               ob % ssmir(issmir) % tpw % pert
          end do
       
       elseif ( index( ob_name,'satem') > 0 ) then
@@ -1382,7 +1402,8 @@ subroutine da_read_obs_rand( rand_unit, ob )
 
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % satem(isatem) % thickness(k) % error, ob % satem(isatem) % thickness(k) % pert
+                  ob % satem(isatem) % thickness(k) % error, &
+                  ob % satem(isatem) % thickness(k) % pert
             end do
          end do
          
@@ -1394,7 +1415,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
 
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % ssmt1(issmt1) % t % error, ob % ssmt1(issmt1) % t % pert
+                  ob % ssmt1(issmt1) % t % error, ob % ssmt1(issmt1) % t % pert
             end do
          end do
 
@@ -1406,7 +1427,8 @@ subroutine da_read_obs_rand( rand_unit, ob )
 
             do k = 1, num_levs
                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-               ob % ssmt2(issmt2) % rh % error, ob % ssmt2(issmt2) % rh % pert
+                  ob % ssmt2(issmt2) % rh % error, &
+                  ob % ssmt2(issmt2) % rh % pert
             end do
          end do
       elseif ( index( ob_name,'buoy') > 0 ) then
@@ -1414,22 +1436,27 @@ subroutine da_read_obs_rand( rand_unit, ob )
             ibuoy = ibuoy + 1
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % buoy(ibuoy) % u % error, ob % buoy(ibuoy) % u % pert, &
-            ob % buoy(ibuoy) % v % error, ob % buoy(ibuoy) % v % pert, &
-            ob % buoy(ibuoy) % t % error, ob % buoy(ibuoy) % t % pert, &
-            ob % buoy(ibuoy) % p % error, ob % buoy(ibuoy) % p % pert, &
-            ob % buoy(ibuoy) % q % error, ob % buoy(ibuoy) % q % pert
+               ob % buoy(ibuoy) % u % error, ob % buoy(ibuoy) % u % pert, &
+               ob % buoy(ibuoy) % v % error, ob % buoy(ibuoy) % v % pert, &
+               ob % buoy(ibuoy) % t % error, ob % buoy(ibuoy) % t % pert, &
+               ob % buoy(ibuoy) % p % error, ob % buoy(ibuoy) % p % pert, &
+               ob % buoy(ibuoy) % q % error, ob % buoy(ibuoy) % q % pert
          end do
       elseif ( index( ob_name,'sonde_sfc') > 0 ) then
          do n = 1, num_obs
             isonde_sfc = isonde_sfc + 1
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % sonde_sfc(isonde_sfc) % u % error, ob % sonde_sfc(isonde_sfc) % u % pert, &
-            ob % sonde_sfc(isonde_sfc) % v % error, ob % sonde_sfc(isonde_sfc) % v % pert, &
-            ob % sonde_sfc(isonde_sfc) % t % error, ob % sonde_sfc(isonde_sfc) % t % pert, &
-            ob % sonde_sfc(isonde_sfc) % p % error, ob % sonde_sfc(isonde_sfc) % p % pert, &
-            ob % sonde_sfc(isonde_sfc) % q % error, ob % sonde_sfc(isonde_sfc) % q % pert
+               ob % sonde_sfc(isonde_sfc) % u % error, &
+               ob % sonde_sfc(isonde_sfc) % u % pert, &
+               ob % sonde_sfc(isonde_sfc) % v % error, &
+               ob % sonde_sfc(isonde_sfc) % v % pert, &
+               ob % sonde_sfc(isonde_sfc) % t % error, &
+               ob % sonde_sfc(isonde_sfc) % t % pert, &
+               ob % sonde_sfc(isonde_sfc) % p % error, &
+               ob % sonde_sfc(isonde_sfc) % p % pert, &
+               ob % sonde_sfc(isonde_sfc) % q % error, &
+               ob % sonde_sfc(isonde_sfc) % q % pert
          end do
 
       elseif ( index( ob_name,'qscat') > 0 ) then
@@ -1437,17 +1464,19 @@ subroutine da_read_obs_rand( rand_unit, ob )
             iqscat = iqscat + 1
             read(rand_unit,'(i8)')num_levs
             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-            ob % qscat(iqscat) % u % error, ob % qscat(iqscat) % u % pert, &
-            ob % qscat(iqscat) % v % error, ob % qscat(iqscat) % v % pert
+               ob % qscat(iqscat) % u % error, ob % qscat(iqscat) % u % pert, &
+               ob % qscat(iqscat) % v % error, ob % qscat(iqscat) % v % pert
          end do
       elseif ( index( ob_name,'profiler') > 0 ) then
          do n = 1, num_obs
             iprofiler = iprofiler + 1
             read(rand_unit,'(i8)')num_levs
              do k = 1, num_levs
-             read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
-             ob % profiler(iprofiler) % u(k) % error, ob % profiler(iprofiler) % u(k) % pert, &
-             ob % profiler(iprofiler) % v(k) % error, ob % profiler(iprofiler) % v(k) % pert
+                read(rand_unit,'(2i8,10e15.7)')ndum, kdum, &
+                   ob % profiler(iprofiler) % u(k) % error, &
+                   ob % profiler(iprofiler) % u(k) % pert, &
+                   ob % profiler(iprofiler) % v(k) % error, &
+                   ob % profiler(iprofiler) % v(k) % pert
              end do
          end do
       elseif ( index( ob_name,'bogus') > 0 ) then
@@ -1456,13 +1485,17 @@ subroutine da_read_obs_rand( rand_unit, ob )
             read(rand_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(rand_unit,'(2i8,8e15.7)')ndum, kdum, &
-               ob % bogus(ibogus) % u(k) % error, ob % bogus(ibogus) % u(k) % pert, &
-               ob % bogus(ibogus) % v(k) % error, ob % bogus(ibogus) % v(k) % pert, &
-               ob % bogus(ibogus) % t(k) % error, ob % bogus(ibogus) % t(k) % pert, &
-               ob % bogus(ibogus) % q(k) % error, ob % bogus(ibogus) % q(k) % pert
+                  ob % bogus(ibogus) % u(k) % error, &
+                  ob % bogus(ibogus) % u(k) % pert, &
+                  ob % bogus(ibogus) % v(k) % error, &
+                  ob % bogus(ibogus) % v(k) % pert, &
+                  ob % bogus(ibogus) % t(k) % error, &
+                  ob % bogus(ibogus) % t(k) % pert, &
+                  ob % bogus(ibogus) % q(k) % error, &
+                  ob % bogus(ibogus) % q(k) % pert
             end do
             read(rand_unit,'(2i8,2e15.7)')ndum, kdum, &
-                 ob % bogus(ibogus) % slp % error, ob % bogus(ibogus) % slp % pert
+               ob % bogus(ibogus) % slp % error, ob % bogus(ibogus) % slp % pert
          end do
       elseif ( index( ob_name,'gpsref') > 0 ) then
          do n = 1, num_obs
@@ -1470,48 +1503,48 @@ subroutine da_read_obs_rand( rand_unit, ob )
             read(rand_unit,'(i8)')num_levs
             do k = 1, num_levs
                read(rand_unit,'(2i8,7e15.7)')ndum, kdum, &
-               ob % gpsref(igpsref) % ref(k) % error, ob % gpsref(igpsref) % ref(k) % pert
+                  ob % gpsref(igpsref) % ref(k) % error, &
+                  ob % gpsref(igpsref) % ref(k) % pert
             end do
          end do
-!  Radiance obs: consistent with RTTOV triplet and WRF-VAR
-!--------------------------------------------------------------------
+
+         ! Radiance obs: consistent with RTTOV triplet and WRF-VAR
+         !--------------------------------------------------------------------
       elseif ( index( ob_name,'noaa') > 0 ) then
          platform_id = 1
          read (ob_name,'(a4,a1,i2,a1,a5,a1,i4)') &
-               platform, str1,satellite_id,str2,sensor,str3,ichan
+            platform, str1,satellite_id,str2,sensor,str3,ichan
          if ( sensor == 'amsua' ) then
-              sensor_id = 3
+            sensor_id = 3
          else if ( sensor == 'amsub' )  then
-              sensor_id = 4
+            sensor_id = 4
          else
-              write(6,*) ' Unrecognized Sensor '
+            write(6,*) ' Unrecognized Sensor '
          end if
          do n = 1, rtminit_nsensor
-           if (    platform_id  == rtminit_platform(n) &
-             .and. satellite_id == rtminit_satid(n)    &
-             .and. sensor_id    == rtminit_sensor(n)    ) then
-                do k = 1,num_obs
+            if (    platform_id  == rtminit_platform(n) &
+               .and. satellite_id == rtminit_satid(n)    &
+               .and. sensor_id    == rtminit_sensor(n)    ) then
+               do k = 1,num_obs
                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + 1
                   read(rand_unit,'(2i8,f10.3,e15.7)') ipixel, kdum,     &
-                          ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%error, &
-                          ob%rad(n)%tb(ichan)%pixel(ob%rad(n)%num_rad_tot(ichan))%pert
-                end do
-                exit
-           end if
+                     ob%rad(n)%tb(ichan)%pixel( &
+                     ob%rad(n)%num_rad_tot(ichan))%error, &
+                     ob%rad(n)%tb(ichan)%pixel( &
+                     ob%rad(n)%num_rad_tot(ichan))%pert
+               end do
+               exit
+            end if
          end do
-!---------------------------------------------------------------------
-
       elseif ( index( ob_name,'*****') > 0 ) then 
-        exit
+         exit
       else
-      print*,' unknown obs type: ',trim(ob_name),' found on unit ',rand_unit
+         print*,' unknown obs type: ',trim(ob_name),' found on unit ',rand_unit
       end if
    end do
-1000  print*,' end of file reached on unit ',rand_unit
+1000 print*,' end of file reached on unit ',rand_unit
    
 end subroutine da_read_obs_rand
-
-!--------------------------------------------------------------------------
 
 subroutine da_calc_jo_expected( ob )
 
@@ -1576,7 +1609,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_metar   = trace1 + trace2 + trace3 + trace4 + trace5
 
       if ( ob % trace_metar < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_metar < 0 = ', ob % trace_metar
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_metar < 0 = ', ob % trace_metar
 
       ob % trace_total = ob % trace_total + ob % trace_metar
       ob % num_metar_tot = count1 + count2 + count3 + count4 + count5
@@ -1605,11 +1639,10 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_ships   = trace1 + trace2 + trace3 + trace4 + trace5
 
       if ( ob % trace_ships < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_ships < 0 = ', ob % trace_ships
-
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_ships < 0 = ', ob % trace_ships
       ob % trace_total = ob % trace_total + ob % trace_ships
       ob % num_ships_tot = count1 + count2 + count3 + count4 + count5
-
    end if
 
    ob % num_geoamv_tot = 0
@@ -1620,8 +1653,8 @@ subroutine da_calc_jo_expected( ob )
 
       do n = 1, ob % num_geoamv
          do k = 1, ob % geoamv(n) % numlevs
-         call da_calc_trace_single( ob % geoamv(n) % u(k), count1, trace1 )
-         call da_calc_trace_single( ob % geoamv(n) % v(k), count2, trace2 )
+            call da_calc_trace_single( ob % geoamv(n) % u(k), count1, trace1 )
+            call da_calc_trace_single( ob % geoamv(n) % v(k), count2, trace2 )
          end do
       end do
       
@@ -1630,11 +1663,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_geoamv   = trace1 + trace2
 
       if ( ob % trace_geoamv < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_geoamv < 0 = ', ob % trace_geoamv
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_geoamv < 0 = ', ob % trace_geoamv
 
       ob % trace_total = ob % trace_total + ob % trace_geoamv
       ob % num_geoamv_tot = count1 + count2
-
    end if
 
    ob % num_polaramv_tot = 0
@@ -1655,11 +1688,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_polaramv   = trace1 + trace2
 
       if ( ob % trace_polaramv < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_polaramv < 0 = ', ob % trace_polaramv
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_polaramv < 0 = ', ob % trace_polaramv
 
       ob % trace_total = ob % trace_total + ob % trace_polaramv
       ob % num_polaramv_tot = count1 + count2
-
    end if
 
    ob % num_gpspw_tot = 0
@@ -1676,11 +1709,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_gpspw = trace1
 
       if ( ob % trace_gpspw < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_gpspw < 0 = ', ob % trace_gpspw
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_gpspw < 0 = ', ob % trace_gpspw
 
       ob % trace_total = ob % trace_total + ob % trace_gpspw
       ob % num_gpspw_tot = count1
-
    end if
 
    ob % num_sound_tot = 0
@@ -1705,7 +1738,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_sound = trace1 + trace2 + trace3 + trace4 
 
       if ( ob % trace_sound < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_sound < 0 = ', ob % trace_sound
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_sound < 0 = ', ob % trace_sound
 
       ob % trace_total = ob % trace_total + ob % trace_sound
       ob % num_sound_tot = count1 + count2 + count3 + count4 
@@ -1730,12 +1764,12 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_airsr = trace1 + trace2
 
       if ( ob % trace_airsr < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_airsr < 0 = ', ob % trace_airsr
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_airsr < 0 = ', ob % trace_airsr
 
       ob % trace_total = ob % trace_total + ob % trace_airsr
       ob % num_airsr_tot = count1 + count2 
    end if
-
 
    ob % num_airep_tot = 0
    ob % trace_airep   = 0
@@ -1757,11 +1791,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_airep   = trace1 + trace2 + trace3
 
       if ( ob % trace_airep < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_airep < 0 = ', ob % trace_airep
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_airep < 0 = ', ob % trace_airep
 
       ob % trace_total = ob % trace_total + ob % trace_airep
       ob % num_airep_tot = count1 + count2 + count3
-
    end if
    
    ob % num_pilot_tot = 0
@@ -1782,7 +1816,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_pilot = trace1 + trace2
 
       if ( ob % trace_pilot < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_pilot < 0 = ', ob % trace_pilot
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_pilot < 0 = ', ob % trace_pilot
 
       ob % trace_total = ob % trace_total + ob % trace_pilot
       ob % num_pilot_tot = count1 + count2
@@ -1805,11 +1840,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_ssmir    = trace1 + trace2
 
       if ( ob % trace_ssmir < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_ssmir < 0 = ', ob % trace_ssmir
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_ssmir < 0 = ', ob % trace_ssmir
 
       ob % trace_total    = ob % trace_total + ob % trace_ssmir
       ob % num_ssmir_tot  = count1 + count2
-
    end if
    
    ob % num_satem_tot = 0
@@ -1828,11 +1863,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_satem = trace1
 
       if ( ob % trace_satem< 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_satem < 0 = ', ob % trace_satem
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_satem < 0 = ', ob % trace_satem
 
       ob % trace_total = ob % trace_total + ob % trace_satem
       ob % num_satem_tot = count1
-
    end if
    
    ob % num_ssmt1_tot = 0
@@ -1851,11 +1886,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_ssmt1 = trace1
 
       if ( ob % trace_ssmt1< 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_ssmt1 < 0 = ', ob % trace_ssmt1
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_ssmt1 < 0 = ', ob % trace_ssmt1
 
       ob % trace_total = ob % trace_total + ob % trace_ssmt1
       ob % num_ssmt1_tot = count1
-
    end if
    
    ob % num_ssmt2_tot = 0
@@ -1874,11 +1909,11 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_ssmt2    = trace1
 
       if ( ob % trace_ssmt2< 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_ssmt2 < 0 = ', ob % trace_ssmt2
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_ssmt2 < 0 = ', ob % trace_ssmt2
 
       ob % trace_total = ob % trace_total + ob % trace_ssmt2
       ob % num_ssmt2_tot = count1
-
    end if
    
    ob % num_buoy_tot = 0
@@ -1903,7 +1938,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_buoy   = trace1 + trace2 + trace3 + trace4 + trace5
 
       if ( ob % trace_buoy < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_buoy < 0 = ', ob % trace_buoy
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_buoy < 0 = ', ob % trace_buoy
 
       ob % trace_total   = ob % trace_total + ob % trace_buoy
       ob % num_buoy_tot = count1 + count2 + count3 + count4 + count5
@@ -1929,7 +1965,8 @@ subroutine da_calc_jo_expected( ob )
       ob % jo_sonde_sfc_q = 0.5 * ( count5 - trace5 )
       ob % trace_sonde_sfc   = trace1 + trace2 + trace3 + trace4 + trace5
       if ( ob % trace_sonde_sfc < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_sonde_sfc < 0 = ', ob % trace_sonde_sfc
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_sonde_sfc < 0 = ', ob % trace_sonde_sfc
       
       ob % trace_total   = ob % trace_total + ob % trace_sonde_sfc
       ob % num_sonde_sfc_tot = count1 + count2 + count3 + count4 + count5
@@ -1952,7 +1989,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_profiler = trace1 + trace2
 
       if ( ob % trace_profiler < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_profiler < 0 = ', ob % trace_profiler
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_profiler < 0 = ', ob % trace_profiler
 
       ob % trace_total = ob % trace_total + ob % trace_profiler
       ob % num_profiler_tot = count1 + count2
@@ -1965,8 +2003,8 @@ subroutine da_calc_jo_expected( ob )
       count1 = 0; count2 = 0
 
       do n = 1, ob % num_qscat
-            call da_calc_trace_single( ob % qscat(n) % u, count1, trace1 )
-            call da_calc_trace_single( ob % qscat(n) % v, count2, trace2 )
+         call da_calc_trace_single( ob % qscat(n) % u, count1, trace1 )
+         call da_calc_trace_single( ob % qscat(n) % v, count2, trace2 )
       end do
 
       ob % jo_qscat_u = 0.5 * ( count1 - trace1 )
@@ -1974,7 +2012,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_qscat = trace1 + trace2
 
       if ( ob % trace_qscat < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_qscat < 0 = ', ob % trace_qscat
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_qscat < 0 = ', ob % trace_qscat
 
       ob % trace_total = ob % trace_total + ob % trace_qscat
       ob % num_qscat_tot = count1 + count2
@@ -2005,7 +2044,8 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_bogus = trace1 + trace2 + trace3 + trace4 + trace5
 
       if ( ob % trace_bogus < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_bogus < 0 = ', ob % trace_bogus
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_bogus < 0 = ', ob % trace_bogus
 
       ob % trace_total = ob % trace_total + ob % trace_bogus
       ob % num_bogus_tot = count1 + count2 + count3 + count4 + count5
@@ -2027,46 +2067,49 @@ subroutine da_calc_jo_expected( ob )
       ob % trace_gpsref  = trace1 
 
       if ( ob % trace_gpsref < 0.0 ) &
-      write(6,'(a,f15.5)')' Warning: ob % trace_gpsref < 0 = ', ob % trace_gpsref
+         write(6,'(a,f15.5)') &
+            ' Warning: ob % trace_gpsref < 0 = ', ob % trace_gpsref
 
       ob % trace_total = ob % trace_total + ob % trace_gpsref
       ob % num_gpsref_tot = count1 
    end if
 
-    ob % total_obs = ob % num_synop_tot + ob % num_metar_tot + ob % num_ships_tot + &
-                    ob % num_polaramv_tot + ob % num_geoamv_tot + ob % num_gpspw_tot + &
-                    ob % num_sound_tot + ob % num_airep_tot + ob % num_pilot_tot + &
-                    ob % num_ssmir_tot + ob % num_satem_tot + ob % num_ssmt1_tot + ob % num_ssmt2_tot + &
-                    ob % num_buoy_tot + ob % num_sonde_sfc_tot + ob % num_qscat_tot + ob % num_profiler_tot + &
-                    ob% num_bogus_tot + ob% num_gpsref_tot
+   ob % total_obs = ob % num_synop_tot + ob % num_metar_tot + &
+      ob % num_ships_tot + ob % num_polaramv_tot + ob % num_geoamv_tot + &
+      ob % num_gpspw_tot + ob % num_sound_tot + ob % num_airep_tot + &
+      ob % num_pilot_tot + ob % num_ssmir_tot + ob % num_satem_tot + &
+      ob % num_ssmt1_tot + ob % num_ssmt2_tot + ob % num_buoy_tot + &
+      ob % num_sonde_sfc_tot + ob % num_qscat_tot + ob % num_profiler_tot + &
+      ob% num_bogus_tot + ob% num_gpsref_tot
 
-!  radiance part
+   !  radiance part
    if ( rtminit_nsensor > 0 ) then
 
       do n = 1, rtminit_nsensor
-      do ichan = 1, ob % rad(n) % nchan
-         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
-           trace1 = 0.0
-           count1 = 0
-           do k=1,ob % rad(n) % num_rad_tot(ichan)
-               call da_calc_trace_single( ob % rad(n) % tb(ichan)%pixel(k), count1, trace1 )
-           end do
-           ob % rad(n) % jo_rad(ichan)    = 0.5 * ( count1 - trace1 )
-           ob % rad(n) % trace_rad(ichan) = trace1
-           if ( ob % rad(n) % trace_rad(ichan) < 0.0 ) &
-              write(6,'(a,i3,a,f15.5)') ' Warning: '//trim(ob%rad(n)%rttovid_string), ichan, &
-                                        ' Trace(HK) < 0 = ', ob%rad(n)%trace_rad(ichan)
-           ob % trace_total = ob % trace_total + ob % rad(n) % trace_rad(ichan)
-           ob % total_obs   = ob % total_obs   + ob % rad(n) % num_rad_tot(ichan)
-         end if
+         do ichan = 1, ob % rad(n) % nchan
+            if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
+               trace1 = 0.0
+               count1 = 0
+               do k=1,ob % rad(n) % num_rad_tot(ichan)
+                  call da_calc_trace_single( &
+                     ob % rad(n) % tb(ichan)%pixel(k), count1, trace1 )
+               end do
+               ob % rad(n) % jo_rad(ichan)    = 0.5 * ( count1 - trace1 )
+               ob % rad(n) % trace_rad(ichan) = trace1
+               if ( ob % rad(n) % trace_rad(ichan) < 0.0 ) &
+                  write(6,'(a,i3,a,f15.5)') &
+                     ' Warning: '//trim(ob%rad(n)%rttovid_string), ichan, &
+                     ' Trace(HK) < 0 = ', ob%rad(n)%trace_rad(ichan)
+               ob % trace_total = ob % trace_total + ob%rad(n)%trace_rad(ichan)
+               ob % total_obs   = ob % total_obs + ob%rad(n)%num_rad_tot(ichan)
+            end if
+         end do
       end do
-      end do
-
    end if
 
 end subroutine da_calc_jo_expected
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_calc_trace_single( field, count, trace )
 
@@ -2082,6 +2125,8 @@ subroutine da_calc_trace_single( field, count, trace )
    end if
    
 end subroutine da_calc_trace_single
+
+
 
 subroutine da_read_jo_actual( ob )
 
@@ -2154,10 +2199,10 @@ subroutine da_read_jo_actual( ob )
    ob % joa_gpsref_ref = 0.0
 
    if ( rtminit_nsensor > 0 ) then   
-    do n = 1,rtminit_nsensor
-    ob%rad(n)%num_rad_tot(:) = 0
-    ob%rad(n)%joa_rad(:) = 0.
-    end do
+      do n = 1,rtminit_nsensor
+         ob%rad(n)%num_rad_tot(:) = 0
+         ob%rad(n)%joa_rad(:) = 0.
+      end do
    end if
 
    rewind(jo_unit)
@@ -2168,7 +2213,6 @@ subroutine da_read_jo_actual( ob )
       ob_name = adjustl(str)
 
       if ( ob_name == 'synop' .and. index(str,'actual') > 0 ) then
-
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                      str6, str7, str8, str9, str10, &
                                      ob % joa_synop_u, ob % joa_synop_v, &
@@ -2176,7 +2220,6 @@ subroutine da_read_jo_actual( ob )
                                      ob % joa_synop_q )
 
       else if ( ob_name == 'metar' .and. index(str,'actual') > 0 ) then
-
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                      str6, str7, str8, str9, str10, &
                                      ob % joa_metar_u, ob % joa_metar_v, &
@@ -2184,7 +2227,6 @@ subroutine da_read_jo_actual( ob )
                                      ob % joa_metar_q )
 
       else if ( ob_name == 'ships' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_ships_u, ob % joa_ships_v, &
@@ -2192,77 +2234,68 @@ subroutine da_read_jo_actual( ob )
                                   ob % joa_ships_q )
 
       else if ( ob_name == 'polar' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_polaramv_u, ob % joa_polaramv_v, &
                                   dum3, dum4, dum5 )
 
       else if ( ob_name == 'geoam' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_geoamv_u, ob % joa_geoamv_v, &
                                   dum3, dum4, dum5 )
 
       else if ( ob_name == 'gpspw' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_gpspw_tpw, dum2, dum3, dum4, dum5 )
 
       else if ( ob_name == 'sound' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
-                                  str6, str7, str8, str9, str10, &
-                                  ob % joa_sound_u, ob % joa_sound_v, ob % joa_sound_t, &
-                                  ob % joa_sound_q, dum1 )
-      else if ( ob_name == 'airsr' .and. index(str,'actual') > 0 ) then
+            str6, str7, str8, str9, str10, &
+            ob % joa_sound_u, ob % joa_sound_v, ob % joa_sound_t, &
+            ob % joa_sound_q, dum1 )
 
+      else if ( ob_name == 'airsr' .and. index(str,'actual') > 0 ) then
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_airsr_t, ob % joa_airsr_q,&
                                   dum1, dum2, dum3 )
 
       else if ( ob_name == 'airep' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_airep_u, ob % joa_airep_v, &
                                   ob % joa_airep_t, dum1, dum2 )
 
       else if ( ob_name == 'pilot' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_pilot_u, ob % joa_pilot_v, &
                                   dum1, dum2, dum3 )
 
       else if ( ob_name == 'ssmir' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_ssmir_speed, ob % joa_ssmir_tpw, &
                                   dum1, dum2, dum3 )
 
       else if ( ob_name == 'satem' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_satem_thickness, dum1, dum2, &
                                   dum3, dum4 )
 
       else if ( ob_name == 'ssmt1' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_ssmt1_t, dum1, dum2, dum3, dum4 )
 
       else if ( ob_name == 'ssmt2' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_ssmt2_rh, dum1, dum2, dum3, dum4 )
+
       else if ( ob_name == 'buoy ' .and. index(str,'actual') > 0 ) then
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                      str6, str7, str8, str9, str10, &
@@ -2270,59 +2303,57 @@ subroutine da_read_jo_actual( ob )
                                      ob % joa_buoy_t, ob % joa_buoy_p, &
                                      ob % joa_buoy_q )
       else if ( ob_name == 'sonde' .and. index(str,'actual') > 0 ) then
-
             call da_read_jo_actual1( str1, str2, str3, str4, str5, &
-                                     str6, str7, str8, str9, str10, &
-                                     ob % joa_sonde_sfc_u, ob % joa_sonde_sfc_v, &
-                                     ob % joa_sonde_sfc_t, ob % joa_sonde_sfc_p, &
-                                     ob % joa_sonde_sfc_q )
-      else if ( ob_name == 'profi' .and. index(str,'actual') > 0 ) then
+               str6, str7, str8, str9, str10, &
+               ob % joa_sonde_sfc_u, ob % joa_sonde_sfc_v, &
+               ob % joa_sonde_sfc_t, ob % joa_sonde_sfc_p, &
+               ob % joa_sonde_sfc_q )
 
+      else if ( ob_name == 'profi' .and. index(str,'actual') > 0 ) then
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_profiler_u, ob % joa_profiler_v, &
                                   dum1, dum2, dum3 )
-      else if ( ob_name == 'qscat' .and. index(str,'actual') > 0 ) then
 
+      else if ( ob_name == 'qscat' .and. index(str,'actual') > 0 ) then
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_qscat_u, ob % joa_qscat_v, &
                                   dum1, dum2, dum3 )
 
       else if ( ob_name == 'bogus' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_bogus_u, ob % joa_bogus_v, &
                                   ob % joa_bogus_t, ob % joa_bogus_q, &
                                   ob % joa_bogus_slp)
       else if ( ob_name == 'gpsre' .and. index(str,'actual') > 0 ) then
-
          call da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                   str6, str7, str8, str9, str10, &
                                   ob % joa_gpsref_ref, &
                                   dum1, dum2, dum3, dum4 )
       else if ( ob_name == 'radia' .and. index(str,'actual') > 0 ) then
          platform_id = 1
-      read (str,'(30x,a4,1x,i2,1x,a5)')platform, satellite_id,sensor
-      read (str1,'(i5,i10)')ichan, num_obs                     
-      read (str2,'(f15.5)')jo                                 
+         read (str,'(30x,a4,1x,i2,1x,a5)')platform, satellite_id,sensor
+         read (str1,'(i5,i10)')ichan, num_obs                     
+         read (str2,'(f15.5)')jo                                 
 
          if ( sensor == 'amsua' ) then
-              sensor_id = 3
+            sensor_id = 3
          else if ( sensor == 'amsub' )  then
-              sensor_id = 4
+            sensor_id = 4
          else
-              write(6,*) ' Unrecognized Sensor '
+            write(6,*) ' Unrecognized Sensor '
          end if
          do n = 1, rtminit_nsensor
-           if (    platform_id  == rtminit_platform(n) &
-             .and. satellite_id == rtminit_satid(n)    &
-             .and. sensor_id    == rtminit_sensor(n)    ) then
-                   ob%rad(n)%joa_rad(ichan) = ob%rad(n)%joa_rad(ichan) + jo
-                   ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + num_obs
-                exit
-           end if
+            if (    platform_id  == rtminit_platform(n) &
+                .and. satellite_id == rtminit_satid(n)    &
+                .and. sensor_id    == rtminit_sensor(n)    ) then
+               ob%rad(n)%joa_rad(ichan) = ob%rad(n)%joa_rad(ichan) + jo
+               ob%rad(n)%num_rad_tot(ichan) = ob%rad(n)%num_rad_tot(ichan) + &
+                  num_obs
+               exit
+            end if
          end do
       else if ( str(1:5) == '*****' ) then
          exit
@@ -2332,7 +2363,7 @@ subroutine da_read_jo_actual( ob )
                
 end subroutine da_read_jo_actual
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_read_jo_actual1( str1, str2, str3, str4, str5, &
                                str6, str7, str8, str9, str10, &
@@ -2358,7 +2389,7 @@ subroutine da_read_jo_actual1( str1, str2, str3, str4, str5, &
    read(str9,*)j5n
    read(str10,*)f5n
 
-!  Jo(actual) is scaled by the square of the input error factor used.
+   !  Jo(actual) is scaled by the square of the input error factor used.
 
    j1 = j1 + f1n**2 * j1n
    j2 = j2 + f2n**2 * j2n
@@ -2368,7 +2399,7 @@ subroutine da_read_jo_actual1( str1, str2, str3, str4, str5, &
 
 end subroutine da_read_jo_actual1
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_calc_new_factors( ob )
 
@@ -2381,150 +2412,166 @@ subroutine da_calc_new_factors( ob )
 
    if ( ob % num_synop > 0 ) then
       call da_calc_new_factors1( 'synop', ob % num_synop, ob % num_synop_tot, &
-                            ob % jo_synop_u, ob % jo_synop_v, ob % jo_synop_t, ob % jo_synop_p, ob % jo_synop_q, &
-                            ob % joa_synop_u, ob % joa_synop_v, ob % joa_synop_t, ob % joa_synop_p, ob % joa_synop_q )
+         ob % jo_synop_u, ob % jo_synop_v, ob % jo_synop_t, ob % jo_synop_p, &
+         ob % jo_synop_q, &
+         ob % joa_synop_u, ob % joa_synop_v, ob % joa_synop_t, &
+         ob % joa_synop_p, ob % joa_synop_q )
    end if
 
    if ( ob % num_metar > 0 ) then
       call da_calc_new_factors1( 'metar', ob % num_metar, ob % num_metar_tot, &
-                            ob % jo_metar_u, ob % jo_metar_v, ob % jo_metar_t, ob % jo_metar_p, ob % jo_metar_q, &
-                            ob % joa_metar_u, ob % joa_metar_v, ob % joa_metar_t, ob % joa_metar_p, ob % joa_metar_q )
-
+         ob % jo_metar_u, ob % jo_metar_v, ob % jo_metar_t, ob % jo_metar_p, &
+         ob % jo_metar_q, &
+         ob % joa_metar_u, ob % joa_metar_v, ob % joa_metar_t, &
+         ob % joa_metar_p, ob % joa_metar_q )
    end if
 
    if ( ob % num_ships > 0 ) then
       call da_calc_new_factors1( 'ships', ob % num_ships, ob % num_ships_tot, &
-                            ob % jo_ships_u, ob % jo_ships_v, ob % jo_ships_t, ob % jo_ships_p, ob % jo_ships_q, &
-                            ob % joa_ships_u, ob % joa_ships_v, ob % joa_ships_t, ob % joa_ships_p, ob % joa_ships_q )
-
+         ob % jo_ships_u, ob % jo_ships_v, ob % jo_ships_t, ob % jo_ships_p, &
+         ob % jo_ships_q, &
+         ob % joa_ships_u, ob % joa_ships_v, ob % joa_ships_t, &
+         ob % joa_ships_p, ob % joa_ships_q )
    end if
 
    if ( ob % num_geoamv > 0 ) then
-      call da_calc_new_factors1( 'geoamv', ob % num_geoamv, ob % num_geoamv_tot, &
-                            ob % jo_geoamv_u, ob % jo_geoamv_v, 0.0, 0.0, 0.0, &
-                            ob % joa_geoamv_u, ob % joa_geoamv_v, 0.0, 0.0, 0.0 )
-
+      call da_calc_new_factors1( 'geoamv', ob % num_geoamv, &
+         ob % num_geoamv_tot, &
+         ob % jo_geoamv_u, ob % jo_geoamv_v, 0.0, 0.0, 0.0, &
+         ob % joa_geoamv_u, ob % joa_geoamv_v, 0.0, 0.0, 0.0 )
    end if
 
    if ( ob % num_polaramv > 0 ) then
-      call da_calc_new_factors1( 'polaramv', ob % num_polaramv, ob % num_polaramv_tot, &
-                            ob % jo_polaramv_u, ob % jo_polaramv_v, 0.0, 0.0, 0.0, &
-                            ob % joa_polaramv_u, ob % joa_polaramv_v, 0.0, 0.0, 0.0 )
-
+      call da_calc_new_factors1( 'polaramv', ob % num_polaramv, &
+         ob % num_polaramv_tot, &
+         ob % jo_polaramv_u, ob % jo_polaramv_v, 0.0, 0.0, 0.0, &
+         ob % joa_polaramv_u, ob % joa_polaramv_v, 0.0, 0.0, 0.0 )
    end if
 
    if ( ob % num_gpspw > 0 ) then
       call da_calc_new_factors1( 'gpspw', ob % num_gpspw, ob % num_gpspw_tot, &
                             ob % jo_gpspw_tpw, 0.0, 0.0, 0.0, 0.0, &
                             ob % joa_gpspw_tpw, 0.0, 0.0, 0.0, 0.0 )
-
    end if
 
    if ( ob % num_sound > 0 ) then
       call da_calc_new_factors1( 'sound', ob % num_sound, ob % num_sound_tot, &
-             ob % jo_sound_u, ob % jo_sound_v, ob % jo_sound_t, ob % jo_sound_q, 0.0, &
-             ob % joa_sound_u, ob % joa_sound_v, ob % joa_sound_t, ob % joa_sound_q, 0.0)
-
+         ob % jo_sound_u, ob % jo_sound_v, ob % jo_sound_t, ob % jo_sound_q, &
+         0.0, &
+         ob % joa_sound_u, ob % joa_sound_v, ob % joa_sound_t, &
+         ob % joa_sound_q, 0.0)
    end if
    
    if ( ob % num_airep > 0 ) then
       call da_calc_new_factors1( 'airep', ob % num_airep, ob % num_airep_tot, &
-                            ob % jo_airep_u, ob % jo_airep_v, ob % jo_airep_t, 0.0, 0.0, &
-                            ob % joa_airep_u, ob % joa_airep_v, ob % joa_airep_t, 0.0, 0.0 )
-
+         ob % jo_airep_u, ob % jo_airep_v, ob % jo_airep_t, 0.0, 0.0, &
+         ob % joa_airep_u, ob % joa_airep_v, ob % joa_airep_t, 0.0, 0.0 )
    end if
    
    if ( ob % num_airsr > 0 ) then
       call da_calc_new_factors1( 'airsr', ob % num_airsr, ob % num_airsr_tot, &
-                            ob % jo_airsr_t, ob % jo_airsr_q, 0.0, 0.0, 0.0, &
-                            ob % joa_airsr_t, ob % joa_airsr_q, 0.0, 0.0, 0.0 )
+         ob % jo_airsr_t, ob % jo_airsr_q, 0.0, 0.0, 0.0, &
+         ob % joa_airsr_t, ob % joa_airsr_q, 0.0, 0.0, 0.0 )
    end if
 
    if ( ob % num_pilot > 0 ) then
       call da_calc_new_factors1( 'pilot', ob % num_pilot, ob % num_pilot_tot, &
-                            ob % jo_pilot_u, ob % jo_pilot_v, 0.0, 0.0, 0.0, &
-                            ob % joa_pilot_u, ob % joa_pilot_v, 0.0, 0.0, 0.0 )
+         ob % jo_pilot_u, ob % jo_pilot_v, 0.0, 0.0, 0.0, &
+         ob % joa_pilot_u, ob % joa_pilot_v, 0.0, 0.0, 0.0 )
    end if
    
    if ( ob % num_ssmir > 0 ) then
       call da_calc_new_factors1( 'ssmir', ob % num_ssmir, ob % num_ssmir_tot, &
-                            ob % jo_ssmir_speed, ob % jo_ssmir_tpw, 0.0, 0.0, 0.0, &
-                            ob % joa_ssmir_speed, ob % joa_ssmir_tpw, 0.0, 0.0, 0.0 )
-
+         ob % jo_ssmir_speed, ob % jo_ssmir_tpw, 0.0, 0.0, 0.0, &
+         ob % joa_ssmir_speed, ob % joa_ssmir_tpw, 0.0, 0.0, 0.0 )
    end if
    
    if ( ob % num_satem > 0 ) then
       call da_calc_new_factors1( 'satem', ob % num_satem, ob % num_satem_tot, &
-                            ob % jo_satem_thickness, 0.0, 0.0, 0.0, 0.0, &
-                            ob % joa_satem_thickness, 0.0, 0.0, 0.0, 0.0 )
-
+         ob % jo_satem_thickness, 0.0, 0.0, 0.0, 0.0, &
+         ob % joa_satem_thickness, 0.0, 0.0, 0.0, 0.0 )
    end if
    
    if ( ob % num_ssmt1 > 0 ) then
       call da_calc_new_factors1( 'ssmt1', ob % num_ssmt1, ob % num_ssmt1_tot, &
-                            ob % jo_ssmt1_t, 0.0, 0.0, 0.0, 0.0, &
-                            ob % joa_ssmt1_t, 0.0, 0.0, 0.0, 0.0 )
+         ob % jo_ssmt1_t, 0.0, 0.0, 0.0, 0.0, &
+         ob % joa_ssmt1_t, 0.0, 0.0, 0.0, 0.0 )
    end if
    
    if ( ob % num_ssmt2 > 0 ) then
       call da_calc_new_factors1( 'ssmt2', ob % num_ssmt2, ob % num_ssmt2_tot, &
-                            ob % jo_ssmt2_rh, 0.0, 0.0, 0.0, 0.0, &
-                            ob % joa_ssmt2_rh, 0.0, 0.0, 0.0, 0.0 )
+         ob % jo_ssmt2_rh, 0.0, 0.0, 0.0, 0.0, &
+         ob % joa_ssmt2_rh, 0.0, 0.0, 0.0, 0.0 )
    end if
+
    if ( ob % num_buoy > 0 ) then
       call da_calc_new_factors1( 'buoy ', ob % num_buoy, ob % num_buoy_tot, &
-                            ob % jo_buoy_u, ob % jo_buoy_v, ob % jo_buoy_t, ob % jo_buoy_p, ob % jo_buoy_q, &
-                            ob % joa_buoy_u, ob % joa_buoy_v, ob % joa_buoy_t, ob % joa_buoy_p, ob % joa_buoy_q )
+         ob % jo_buoy_u, ob % jo_buoy_v, ob % jo_buoy_t, ob % jo_buoy_p, &
+         ob % jo_buoy_q, &
+         ob % joa_buoy_u, ob % joa_buoy_v, ob % joa_buoy_t, ob % joa_buoy_p, &
+         ob % joa_buoy_q )
    end if
+
    if ( ob % num_sonde_sfc > 0 ) then
-      call da_calc_new_factors1( 'sonde', ob % num_sonde_sfc, ob % num_sonde_sfc_tot, &
-                            ob % jo_sonde_sfc_u, ob % jo_sonde_sfc_v, ob % jo_sonde_sfc_t, ob % jo_sonde_sfc_p, ob % jo_sonde_sfc_q, &
-                            ob % joa_sonde_sfc_u, ob % joa_sonde_sfc_v, ob % joa_sonde_sfc_t, ob % joa_sonde_sfc_p, ob % joa_sonde_sfc_q )
+      call da_calc_new_factors1( 'sonde', ob % num_sonde_sfc, &
+         ob % num_sonde_sfc_tot, &
+         ob % jo_sonde_sfc_u, ob % jo_sonde_sfc_v, ob % jo_sonde_sfc_t, &
+         ob % jo_sonde_sfc_p, ob % jo_sonde_sfc_q, &
+         ob % joa_sonde_sfc_u, ob % joa_sonde_sfc_v, ob % joa_sonde_sfc_t, &
+         ob % joa_sonde_sfc_p, ob % joa_sonde_sfc_q )
    end if
+
    if ( ob % num_profiler > 0 ) then
-      call da_calc_new_factors1( 'profi', ob % num_profiler, ob % num_profiler_tot, &
-                            ob % jo_profiler_u, ob % jo_profiler_v, 0.0, 0.0, 0.0, &
-                            ob % joa_profiler_u, ob % joa_profiler_v, 0.0, 0.0, 0.0 )
+      call da_calc_new_factors1( 'profi', ob % num_profiler, &
+         ob % num_profiler_tot, &
+         ob % jo_profiler_u, ob % jo_profiler_v, 0.0, 0.0, 0.0, &
+         ob % joa_profiler_u, ob % joa_profiler_v, 0.0, 0.0, 0.0 )
    end if
+
    if ( ob % num_qscat > 0 ) then
       call da_calc_new_factors1( 'qscat', ob % num_qscat, ob % num_qscat_tot, &
-                            ob % jo_qscat_u, ob % jo_qscat_v, 0.0, 0.0, 0.0, &
-                            ob % joa_qscat_u, ob % joa_qscat_v, 0.0, 0.0, 0.0 )
+         ob % jo_qscat_u, ob % jo_qscat_v, 0.0, 0.0, 0.0, &
+         ob % joa_qscat_u, ob % joa_qscat_v, 0.0, 0.0, 0.0 )
    end if
+
    if ( ob % num_bogus > 0 ) then
       call da_calc_new_factors1( 'bogus', ob % num_bogus, ob % num_bogus_tot, &
-                            ob % jo_bogus_u, ob % jo_bogus_v, ob % jo_bogus_t, ob % jo_bogus_q, ob % jo_bogus_slp, &
-                            ob % joa_bogus_u, ob % joa_bogus_v, ob % joa_bogus_t, ob % joa_bogus_q, ob % joa_bogus_slp )
+         ob % jo_bogus_u, ob % jo_bogus_v, ob % jo_bogus_t, ob % jo_bogus_q, &
+         ob % jo_bogus_slp, &
+         ob % joa_bogus_u, ob % joa_bogus_v, ob % joa_bogus_t, &
+         ob % joa_bogus_q, ob % joa_bogus_slp )
    end if
+
    if ( ob % num_gpsref > 0 ) then
       call da_calc_new_factors1( 'gpsre', ob % num_gpsref, ob % num_gpsref_tot, &
-                            ob % jo_gpsref_ref,   0.0, 0.0, 0.0, 0.0, &
-                            ob % joa_gpsref_ref, 0.0, 0.0, 0.0, 0.0 )
+         ob % jo_gpsref_ref,   0.0, 0.0, 0.0, 0.0, &
+         ob % joa_gpsref_ref, 0.0, 0.0, 0.0, 0.0 )
    end if
   
    if ( rtminit_nsensor > 0 ) then 
-    write(6,*) '     sensor    chan   num       Jo_mini         Jo_exp       trace(HK)  factor'
+      write(6,*) &
+         '     sensor    chan   num       Jo_mini         Jo_exp       trace(HK)  factor'
       do n = 1, rtminit_nsensor
-      do ichan = 1, ob % rad(n) % nchan
-         if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
-           ob % rad(n) % factor_rad(ichan) = &
-             sqrt( ob % rad(n) % joa_rad(ichan) / ob % rad(n) % jo_rad(ichan) )
-           write(6,'(a15,i3,i8,3f15.5,f8.3)')   &
-                       trim(ob%rad(n)%rttovid_string), &
-                       ichan,                        &
-                       ob%rad(n)%num_rad_tot(ichan), &
-                       ob%rad(n)%joa_rad(ichan),      &
-                       ob%rad(n)%jo_rad(ichan),     &
-                       ob%rad(n)%trace_rad(ichan),   &
-                       ob%rad(n)%factor_rad(ichan)
-         end if
-      end do
+         do ichan = 1, ob % rad(n) % nchan
+            if ( ob % rad(n) % num_rad_tot(ichan) > 0 ) then
+               ob % rad(n) % factor_rad(ichan) = &
+                  sqrt( ob % rad(n) % joa_rad(ichan) / ob % rad(n) % jo_rad(ichan) )
+               write(6,'(a15,i3,i8,3f15.5,f8.3)')   &
+                  trim(ob%rad(n)%rttovid_string), &
+                  ichan,                        &
+                  ob%rad(n)%num_rad_tot(ichan), &
+                  ob%rad(n)%joa_rad(ichan),      &
+                  ob%rad(n)%jo_rad(ichan),     &
+                  ob%rad(n)%trace_rad(ichan),   &
+                  ob%rad(n)%factor_rad(ichan)
+            end if
+         end do
       end do
    end if
 
 end subroutine da_calc_new_factors
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_calc_new_factors1( ob_name, ob_num, ob_num_tot, &
                                  j1e, j2e, j3e, j4e, j5e, &
@@ -2562,7 +2609,7 @@ subroutine da_calc_new_factors1( ob_name, ob_num, ob_num_tot, &
    
 end subroutine da_calc_new_factors1
 
-!--------------------------------------------------------------------------
+
 
 subroutine da_get_j( ob )
 
@@ -2583,26 +2630,23 @@ subroutine da_get_j( ob )
    jb_factor_new = 0
      
    do
-
-      read(in_unit,'(a80)')str
-      
-         if ( index(str,'Final value of J ') > 0 ) then
+      read(in_unit,'(a80)')str     
+      if ( index(str,'Final value of J ') > 0 ) then
          read(str(index(str,'=')+1:80),*)jn
          j = j + jn
-         else if ( index(str,'Final value of Jo') > 0 ) then
+      else if ( index(str,'Final value of Jo') > 0 ) then
          read(str(index(str,'=')+1:80),*)jon
          jo = jo + jon
-         else if ( index(str,'Final value of Jb') > 0 ) then
+      else if ( index(str,'Final value of Jb') > 0 ) then
          read(str(index(str,'=')+1:80),*)jbn
          jb = jb + jbn
-         else if ( index(str,'Jb factor used(1)') > 0 ) then
+      else if ( index(str,'Jb factor used(1)') > 0 ) then
          read(str(index(str,'=')+1:80),*)jb_factor_oldn
          jb_factor_old = jb_factor_old + jb_factor_oldn
          icount = icount + 1
       else if ( str(1:5) == '*****' ) then
          exit
-      end if
-      
+      end if     
    end do
 
    jb_factor_old = jb_factor_old / real(icount)
@@ -2635,67 +2679,63 @@ subroutine da_get_j( ob )
    write(6,*)
    
 end subroutine da_get_j
-!---------------------------------------------
-subroutine read_namelist_radiance
-!----------------------------------------------------------------------------
-!             03/15/2006   for radiance tuning setup        Zhiquan Liu
-!----------------------------------------------------------------------------
-   implicit none
 
-!  Local scalars:
+
+subroutine read_namelist_radiance
+
+   implicit none
 
    character(len=filename_len) :: namelist_file      ! Input namelist filename.
    integer, parameter        :: namelist_unit = 7  ! Input namelist unit.
    integer                   :: iost               ! Error code.
 
-!  Namelist contents :
-
-   NAMELIST /rtminit/  rtminit_nsensor, rtminit_platform, &
+   namelist /rtminit/  rtminit_nsensor, rtminit_platform, &
                        rtminit_satid, rtminit_sensor, rtminit_nchan
 
    namelist_file = 'namelist.radiance'
-   WRITE (6, '(3x,A,A)' ) ' radiance namelist file : ', namelist_file
-   IOST = 0
+   write (6, '(3x,a,a)' ) ' radiance namelist file : ', namelist_file
+   iost = 0
 
-   OPEN ( FILE   = trim(namelist_file), unit   = namelist_unit, &
-          STATUS = 'OLD' , ACCESS = 'SEQUENTIAL', &
-          FORM   = 'FORMATTED', ACTION = 'read', &
-          iostat = IOST )
-   IF ( IOST /= 0 ) stop ' Error in opening namelist file '
+   open ( file   = trim(namelist_file), unit   = namelist_unit, &
+          status = 'old' , access = 'sequential', &
+          form   = 'formatted', action = 'read', &
+          iostat = iost )
+   if ( iost /= 0 ) stop ' error in opening namelist file '
 
-   IOST = 0
+   iost = 0
 
-   read  ( unit = namelist_unit, NML = rtminit,  iostat = IOST)
-      WRITE(6,'(A,I4  )') ' rtminit_nsensor  = ', rtminit_nsensor
-      WRITE(6,'(A,10I4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
-      WRITE(6,'(A,10I4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
-      WRITE(6,'(A,10I4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
-      WRITE(6,'(A,10I4)') ' rtminit_nchan    = ', rtminit_nchan   (1:rtminit_nsensor)
+   read  ( unit = namelist_unit, nml = rtminit,  iostat = iost)
+      write(6,'(a,i4  )') ' rtminit_nsensor  = ', rtminit_nsensor
+      write(6,'(a,10i4)') ' rtminit_platform = ', rtminit_platform(1:rtminit_nsensor)
+      write(6,'(a,10i4)') ' rtminit_satid    = ', rtminit_satid   (1:rtminit_nsensor)
+      write(6,'(a,10i4)') ' rtminit_sensor   = ', rtminit_sensor  (1:rtminit_nsensor)
+      write(6,'(a,10i4)') ' rtminit_nchan    = ', rtminit_nchan   (1:rtminit_nsensor)
 
-   IF ( IOST /= 0 ) stop ' Error in reading naemlist file '
+   if ( iost /= 0 ) stop ' error in reading namelist file '
 
    close (namelist_unit)
 
    if ( rtminit_nsensor > 0 ) then
       allocate ( ob % rad(rtminit_nsensor) )
       do n = 1,rtminit_nsensor
-        ob % rad(n) % nchan = rtminit_nchan(n)
-        allocate ( ob % rad(n) % num_rad_tot(ob % rad(n) % nchan) )
-        allocate ( ob % rad(n) % jo_rad(ob % rad(n) % nchan) )
-        allocate ( ob % rad(n) % joa_rad(ob % rad(n) % nchan) )
-        allocate ( ob % rad(n) % factor_rad(ob % rad(n) % nchan) )
-        allocate ( ob % rad(n) % trace_rad(ob % rad(n) % nchan) )
-        allocate ( ob % rad(n) % tb(ob % rad(n) % nchan) )
-        ob % rad(n) % num_rad_tot(:) = 0
-        write(ob%rad(n)%rttovid_string, '(a,i2.2,a)')  &
-             trim( platform_name(rtminit_platform(n)) )//'-',  &
-             rtminit_satid(n),     &
-             '-'//trim( inst_name(rtminit_sensor(n)) )
-        write(6,*) 'Tuning Radiance Error For ', trim(ob%rad(n)%rttovid_string)
+         ob % rad(n) % nchan = rtminit_nchan(n)
+         allocate ( ob % rad(n) % num_rad_tot(ob % rad(n) % nchan) )
+         allocate ( ob % rad(n) % jo_rad(ob % rad(n) % nchan) )
+         allocate ( ob % rad(n) % joa_rad(ob % rad(n) % nchan) )
+         allocate ( ob % rad(n) % factor_rad(ob % rad(n) % nchan) )
+         allocate ( ob % rad(n) % trace_rad(ob % rad(n) % nchan) )
+         allocate ( ob % rad(n) % tb(ob % rad(n) % nchan) )
+         ob % rad(n) % num_rad_tot(:) = 0
+         write(ob%rad(n)%rttovid_string, '(a,i2.2,a)')  &
+            trim( platform_name(rtminit_platform(n)) )//'-',  &
+            rtminit_satid(n),     &
+            '-'//trim( inst_name(rtminit_sensor(n)) )
+         write(6,*) 'Tuning radiance error for ', trim(ob%rad(n)%rttovid_string)
       end do
    end if
-   return
 
 end subroutine read_namelist_radiance
 
 end program da_tune_obs_desroziers
+
+
