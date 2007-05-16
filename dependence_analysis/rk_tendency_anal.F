@@ -395,7 +395,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
   IF(config_flags%pert_coriolis) THEN
 
-! TBH:  OVERWRITE ru_tend,rv_tend
+! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend
 ! TBH:  HORIZONTAL DEPENDENCE:  p    ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  ph   ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  ru   ( [    i,i+1], [j-1,j    ] )
@@ -416,6 +416,14 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                  its, ite, jts, jte, kts, kte )
   ELSE
 
+! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend
+! TBH:  HORIZONTAL DEPENDENCE:  ru   ( [    i,i+1], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv   ( [i-1,i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  rw   ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  f    ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  e    ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  sina ( [    i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  cosa ( [i-1,i    ], [    j    ] )
     CALL coriolis ( ru, rv, rw,                   &
                     ru_tend,  rv_tend,  rw_tend,  &
                     config_flags,                 &
@@ -427,6 +435,14 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
    END IF
 
 
+! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend
+! TBH:  HORIZONTAL DEPENDENCE:  u    ( [i-1,i,i+1], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  ru   ( [    i,i+1], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu ( [i-1,i,i+1], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v    ( [i-1,i    ], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv   ( [i-1,i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv ( [i-1,i    ], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  rw   ( [i-1,i    ], [j-1,j    ] )
   CALL curvature ( ru, rv, rw, u, v, w,            &
                    ru_tend,  rv_tend,  rw_tend,    &
                    config_flags,                   &
@@ -448,6 +464,12 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
    
       leapfrog_test : IF( .not. leapfrog ) THEN
 
+! TBH:  OVERWRITE ru_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  u     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mut   ( [i-1,i    ], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu  ( [    i    ], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msft  ( [i-1,i    ], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd ( [i-1,i    ], [j-1,j,j+1] )
         CALL horizontal_diffusion ('u', u, ru_tendf, mut, config_flags, &
                                         msfu, msfv, msft,               &
                                         khdif, xkmhd, rdx, rdy,         &
@@ -455,6 +477,12 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         ims, ime, jms, jme, kms, kme,   &
                                         its, ite, jts, jte, kts, kte   )
 
+! TBH:  OVERWRITE rv_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  v     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mut   ( [    i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv  ( [i-1,i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msft  ( [    i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd ( [i-1,i,i+1], [j-1,j    ] )
         CALL horizontal_diffusion ('v', v, rv_tendf, mut, config_flags, &
                                         msfu, msfv, msft,               &
                                         khdif, xkmhd, rdx, rdy,         &
@@ -462,6 +490,11 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         ims, ime, jms, jme, kms, kme,   &
                                         its, ite, jts, jte, kts, kte   )
 
+! TBH:  OVERWRITE rw_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  w     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu  ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv  ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd ( [i-1,i,i+1], [j-1,j,j+1] )
         CALL horizontal_diffusion ('w', w, rw_tendf, mut, config_flags, &
                                         msfu, msfv, msft,               &
                                         khdif, xkmhd, rdx, rdy,         &
@@ -470,6 +503,12 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         its, ite, jts, jte, kts, kte   )
 
         khdq = 3.*khdif
+! TBH:  OVERWRITE t_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  t      ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  t_init ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu   ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv   ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd  ( [i-1,i,i+1], [j-1,j,j+1] )
         CALL horizontal_diffusion_3dmp ( 'm', t, t_tendf, mut,         &
                                          config_flags, t_init,         &
                                          msfu, msfv, msft,             &
@@ -480,6 +519,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
         pbl_test : IF (config_flags%bl_pbl_physics .eq. 0) THEN
 
+! TBH:  OVERWRITE ru_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  alt    ( [i-1,i    ], [    j    ] )
           CALL vertical_diffusion_u ( u, ru_tendf, config_flags,      &
                                       u_base,                         &
                                       alt, muu, rdn, rdnw, kvdif,     &
@@ -487,6 +528,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                       ims, ime, jms, jme, kms, kme,   &
                                       its, ite, jts, jte, kts, kte   )
 
+! TBH:  OVERWRITE rv_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  alt    ( [    i    ], [j-1,j    ] )
           CALL vertical_diffusion_v ( v, rv_tendf, config_flags,      &
                                       v_base,                         &
                                       alt, muv, rdn, rdnw, kvdif,     &
@@ -495,6 +538,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                       its, ite, jts, jte, kts, kte   )
 
           IF (non_hydrostatic)                                           &
+! TBH:  OVERWRITE rw_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
           CALL vertical_diffusion ( 'w', w, rw_tendf, config_flags,      &
                                     alt, mut, rdn, rdnw, kvdif,          &
                                     ids, ide, jds, jde, kds, kde,        &
@@ -502,6 +547,8 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                     its, ite, jts, jte, kts, kte        )
 
           kvdq = 3.*kvdif
+! TBH:  OVERWRITE t_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
           CALL vertical_diffusion_3dmp ( t, t_tendf, config_flags, t_init,     &
                                          alt, mut, rdn, rdnw, kvdq ,           &
                                          ids, ide, jds, jde, kds, kde,         &
@@ -514,6 +561,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
       ELSE ! leapfrog diffusion
 
+! TBH:  NOT CALLED
         CALL horizontal_diffusion ('u', u_old, ru_tendf, mut, config_flags, &
                                         msfu, msfv, msft,                   &
                                         khdif, xkmhd, rdx, rdy,                    &
@@ -521,6 +569,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         ims, ime, jms, jme, kms, kme,       &
                                         its, ite, jts, jte, kts, kte       )
 
+! TBH:  NOT CALLED
         CALL horizontal_diffusion ('v', v_old, rv_tendf, mut, config_flags, &
                                         msfu, msfv, msft,                   &
                                         khdif, xkmhd, rdx, rdy,                    &
@@ -529,6 +578,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         its, ite, jts, jte, kts, kte       )
 
         IF (non_hydrostatic)                                                &
+! TBH:  NOT CALLED
         CALL horizontal_diffusion ('w', w_old, rw_tendf, mut, config_flags, &
                                         msfu, msfv, msft,                   &
                                         khdif, xkmhd, rdx, rdy,                    &
@@ -537,6 +587,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                         its, ite, jts, jte, kts, kte       )
 
         khdq = 3.*khdif
+! TBH:  NOT CALLED
         CALL horizontal_diffusion_3dmp ( 'm', t_old, t_tendf, mut,     &
                                          config_flags, t_init,         &
                                          msfu, msfv, msft,             &
@@ -547,6 +598,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
 
         pbl_test_lf : IF (config_flags%bl_pbl_physics .eq. 0) THEN
 
+! TBH:  NOT CALLED
           CALL vertical_diffusion_u ( u_old, ru_tendf, config_flags,      &
                                       u_base,                             &
                                       alt, muu, rdn, rdnw, kvdif,         &
@@ -554,6 +606,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                       ims, ime, jms, jme, kms, kme,       &
                                       its, ite, jts, jte, kts, kte       )
 
+! TBH:  NOT CALLED
           CALL vertical_diffusion_v ( v_old, rv_tendf, config_flags,      &
                                       v_base,                             &
                                       alt, muv, rdn, rdnw, kvdif,         &
@@ -562,6 +615,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                       its, ite, jts, jte, kts, kte       )
 
           IF (non_hydrostatic)                                              &
+! TBH:  NOT CALLED
           CALL vertical_diffusion ( 'w', w_old, rw_tendf, config_flags,     &
                                     alt, mut, rdn, rdnw, kvdif,             &
                                     ids, ide, jds, jde, kds, kde,           &
@@ -569,6 +623,7 @@ SUBROUTINE rk_tendency ( config_flags, rk_step,                           &
                                     its, ite, jts, jte, kts, kte           )
 
           kvdq = 3.*kvdif
+! TBH:  NOT CALLED
           CALL vertical_diffusion_3dmp ( t_old, t_tendf, config_flags, t_init, &
                                          alt, mut, rdn, rdnw, kvdq ,           &
                                          ids, ide, jds, jde, kds, kde,         &
