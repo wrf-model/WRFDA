@@ -332,10 +332,10 @@
 
           IF ( wrf_dm_on_monitor() ) THEN
             IF ( binary_output ) THEN
-              WRITE(FileName,FMT="(A,A,A,I4.4)") &
+              WRITE(FileName,FMT="(A,A,A,I5.5)") &
                 'field.',TRIM(arrname),'.',filecount
             ELSE
-              WRITE(FileName,FMT="(A,I4.4)") 'field.all.',filecount
+              WRITE(FileName,FMT="(A,I5.5)") 'field.all.',filecount
             ENDIF
 PRINT *,'DEBUG:  FileName = ',TRIM(FileName)
             INQUIRE ( UNIT=fileunit , OPENED = fileinuse )

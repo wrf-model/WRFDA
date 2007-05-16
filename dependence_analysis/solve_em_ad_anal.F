@@ -49,6 +49,7 @@ BENCH_START(exch2)
 lineno = __LINE__
 #    include "HALO_0616.inc"  ! 48pt!  
 ! TBH:  OVERWRITE mut,muu,muv,ru,rv,rw
+! TBH:  $$$ Combine with HALO_0626
 
 
 
@@ -60,6 +61,16 @@ lineno = __LINE__
 lineno = __LINE__
 #    include "HALO_0626.inc"
 ! TBH:  OVERWRITE al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+! TBH:  $$$ why exchange ww here?  It is overwritten below
+! TBH:  $$$ why exchange alt here?  It is overwritten below
+! TBH:  $$$ why exchange muu here?  It is overwritten below
+! TBH:  $$$ why exchange muv here?  It is overwritten below
+! TBH:  $$$ why exchange mut here?  It is overwritten below
+! TBH:  $$$ why exchange php here?  It is overwritten below
+! TBH:  $$$ why exchange ru here?  It is overwritten below
+! TBH:  $$$ why exchange rv here?  It is overwritten below
+! TBH:  $$$ why exchange rw here?  It is overwritten below
+! TBH:  $$$ why exchange ww here?  It is overwritten below
 #endif
 BENCH_END(exch2)
 
@@ -79,7 +90,7 @@ BENCH_START(exch3)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_0637.inc"
-! TBH:  OVERWRITE mut,muu,muv,php,ru,rv,rw,ww
+! TBH:  OVERWRITE mut,muu,muv,php,ru,rv,rw,ww,alt
 #endif
 BENCH_END(exch3)
 
@@ -96,6 +107,8 @@ BENCH_START(exch4)
 lineno = __LINE__
 #     include "HALO_0648.inc"
 ! TBH:  OVERWRITE u_2,v_2
+! TBH:  $$$ why update u_2 8pt here?  it is already updated 48pt from HALO_0871?
+! TBH:  $$$ why update v_2 8pt here?  it is already updated 48pt from HALO_0871?
 #endif
 BENCH_END(exch4)
 
@@ -114,6 +127,7 @@ BENCH_START(exch5)
 lineno = __LINE__
 #     include "HALO_0660.inc"
 ! TBH:  OVERWRITE z
+! TBH:  $$$ why exchange z?  it is never used
 
 
 
@@ -132,6 +146,8 @@ BENCH_START(comp6)
 &kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
 BENCH_END(comp6)
+
+! TBH:  $$$ must exchange xkmhd here!!  
 
   endif rk_step_is_ong
 
@@ -230,6 +246,7 @@ BENCH_START(exch7)
 lineno = __LINE__
 #      include "HALO_0718.inc"
 ! TBH:  OVERWRITE al,mu_1,mu_2,p,pb,ph_2,php,t_1,t_save,u_save,v_save
+! TBH:  $$$ why exchange pb?  it is never set in this loop!
 #endif
 BENCH_END(exch7)
 
@@ -290,6 +307,8 @@ BENCH_START(exch9)
 lineno = __LINE__
 #include "HALO_0747.inc"  ! 48pt!  
 ! TBH:  OVERWRITE al,alt,moist_2,mu_1,mu_2,p,pb,ph_1,ph_2,php,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww
+! TBH:  $$$ why exchange pb?  it is never set in this loop!
+! TBH:  $$$ why exchange t_2 here?  it is exchanged again in HALO_0871
 
 
 

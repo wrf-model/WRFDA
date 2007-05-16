@@ -1667,7 +1667,7 @@ halo HALO_0376 dyn_em 48:a_al,a_moist_2,a_mu_2,a_p,a_ph_2,a_t_2,a_u_2,a_v_2,a_w_
 halo HALO_0394 dyn_em 48:a,alpha,gamma,moist_2,mu_2,ph_2,t_2,u_2,v_2,w_2
 halo HALO_0616 dyn_em 48:mut,muu,muv,ru,rv,rw
 halo HALO_0626 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_0637 dyn_em 8:mut,muu,muv,php,ru,rv,rw,ww
+halo HALO_0637 dyn_em 8:mut,muu,muv,php,ru,rv,rw,ww,alt
 halo HALO_0648 dyn_em 8:u_2,v_2
 halo HALO_0660 dyn_em 8:z
 halo HALO_0679 dyn_em 8:moist_2
