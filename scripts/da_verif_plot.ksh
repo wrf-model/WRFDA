@@ -211,6 +211,13 @@ for FILE in *.pdf *.log; do
    fi
 done
 
+echo "</UL>Output logs<UL>" >> index.html
+for FILE in *.log; do
+   if test -f $FILE; then
+      echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
+   fi
+done
+
 echo "</UL></BODY></HTML>" >> index.html
 
 if $CLEAN; then
