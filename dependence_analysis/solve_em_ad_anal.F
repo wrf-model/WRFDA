@@ -245,8 +245,9 @@ BENCH_START(exch7)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_0718.inc"
-! TBH:  OVERWRITE al,mu_1,mu_2,p,pb,ph_2,php,t_1,t_save,u_save,v_save
+! TBH:  OVERWRITE al,mu_1,mu_2,p,pb,ph_2,php,t_1,t_save,u_save,v_save,mudf,alt
 ! TBH:  $$$ why exchange pb?  it is never set in this loop!
+! TBH:  $$$ can alt be removed?  
 #endif
 BENCH_END(exch7)
 

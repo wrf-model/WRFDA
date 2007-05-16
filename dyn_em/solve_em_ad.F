@@ -114,8 +114,8 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER                         :: filecount
 !   INTEGER,PARAMETER               :: min_filecount=0
 !   INTEGER,PARAMETER               :: max_filecount=1026
-   INTEGER,PARAMETER               :: min_filecount=0
-   INTEGER,PARAMETER               :: max_filecount=7999
+   INTEGER,PARAMETER               :: min_filecount=7000
+   INTEGER,PARAMETER               :: max_filecount=99999
 #endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
