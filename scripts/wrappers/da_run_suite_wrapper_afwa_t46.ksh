@@ -81,7 +81,7 @@ export WRFVAR_DIR=$REL_DIR/wrfvar
 
 #From WPS (namelist.wps):
 #export RUN_GEOGRID=false
-export DEBUG_LEVEL_UNGRIB=200
+export DEBUG_LEVEL_UNGRIB=20
 export NL_E_WE=162
 export NL_E_SN=212
 export GEOG_DATA_RES=5m
@@ -94,6 +94,9 @@ export NL_DX=15000
 export NL_DY=15000
 
 #WRF:
+export NL_HISTORY_INTERVAL=720   # Every 12 hours to save disk space
+export NL_INPUTOUT_INTERVAL=360  # Every 6 hours to save disk space
+#export NL_INPUTOUT_END_H=6 
 export NL_TIME_STEP=90
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.995, 0.992, 0.983, 0.975, "\ 
                                       " 0.961, 0.949, 0.932, 0.917, 0.897, "\
@@ -109,19 +112,25 @@ export NL_SMOOTH_OPTION=0
 export NL_MP_PHYSICS=4
 export NL_SF_SURFACE_PHYSICS=2
 export NL_NUM_SOIL_LAYERS=4
+export NL_CU_PHYSICS=1
 export NL_MP_ZERO_OUT=2
 export NL_W_DAMPING=1
 export NL_DIFF_OPT=1
 export NL_KM_OPT=4
 export NL_DAMPCOEF=0.01
-export NL_TIME_STEP_SOUND=0 # What does this mean Jimy?
+export NL_TIME_STEP_SOUND=0  # Registry.EM default is set to 0, whereas Registry.wrefvar is set to 4.
 export NL_FEEDBACK=0 
-export NL_INPUTOUT_INTERVAL=60
-export NL_INPUTOUT_BEGIN_H=3 	# Output input format start.
-export NL_INPUTOUT_END_H=9       # Output input format end.
+#dampcoef  = 0.01,  # It is set to 0 in Registry.EM and Registry.wrfvar
+#specified = .true. # It is set to "false" in Registry.EM!
+#export NL_INPUTOUT_INTERVAL=60
+export NL_INPUTOUT_BEGIN_H=6   #our previous setting: 3      # Output input format start.
+export NL_INPUTOUT_END_H=6     #our previous setting: 9       # Output input format end.
 
 #WRF-Var:
 #export NL_CHECK_MAX_IV=.false.
+export NL_ANALYSIS_TYPE=QC-OBS
+export NL_WRITE_FILTERED_OBS=.true.                 # It is "false" in AFWA's namelist.
+#export DA_BACK_ERRORS=/rap/datc/data/t46/be        # There are two be.dat files, be careful!
 
 #export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 #export MACHINE=bluevista
