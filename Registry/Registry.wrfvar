@@ -54,8 +54,7 @@ dimspec    w      -     namelist=spec_bdy_width   c          spec_bdy_width
 dimspec    e      3     namelist=ensdim           z          ensemble dimension
 dimspec    z      -     namelist=max_obs          c          max_obs
 dimspec    h      -     namelist=nobs_err_flds    c          nobs_err_flds
-dimspec    n      -     namelist=nobs_ndg_vars    c          nobs_ndg_vars
-dimspec    r      4     namelist=ensdim_alpha     c          alpha ensemble dimension
+dimspec    r      -     namelist=nobs_ndg_vars    c          nobs_ndg_vars
 dimspec    g      2     namelist=num_metgrid_levels  z          num_metgrid_levels
 dimspec    m      2     constant=12                  z          months_per_year
 dimspec    a      -     namelist=cam_abs_dim1     c          cam_abs_dim1
@@ -63,6 +62,7 @@ dimspec    c      -     namelist=cam_abs_dim2     z          cam_abs_dim2
 dimspec    q      2     namelist=levsiz           z          levsiz
 dimspec    d      2     namelist=paerlev          z          paerlev
 dimspec    v      -     constant=1                z          one
+dimspec    9      4     namelist=ensdim_alpha     c          alpha ensemble dimension
 
 
 ################################################################################
@@ -1140,7 +1140,7 @@ rconfig   integer maxiens                 namelist,physics	1             1      
 rconfig   integer maxens                  namelist,physics	1             3       irh    "maxens"                    ""      ""
 rconfig   integer maxens2                 namelist,physics	1             3       irh    "maxens2"                    ""      ""
 rconfig   integer maxens3                 namelist,physics	1            16       irh    "maxens3"                    ""      ""
-rconfig   integer ensdim                  namelist,physics	1            144        irh    "ensdim"                    ""      ""
+rconfig   integer ensdim                  namelist,physics	1            144      irh    "ensdim"                    ""      ""
 rconfig   integer     chem_opt            namelist,physics	max_domains    0       rh       "chem_opt"              ""      ""
 rconfig   integer num_land_cat            namelist,physics	1            24       -      "num_land_cat"                  ""      ""
 rconfig   integer num_soil_cat            namelist,physics	1            16       -      "num_soil_cat"                  ""      ""
@@ -1214,14 +1214,14 @@ rconfig   integer diff_opt                namelist,dynamics	1             1     
 rconfig   integer km_opt                  namelist,dynamics	1             4       irh    "km_opt"                ""      ""
 rconfig   integer damp_opt                namelist,dynamics	1             0       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
-rconfig   real    dampcoef                namelist,dynamics     max_domains    0.0     h    "dampcoef"              ""      ""
+rconfig   real    dampcoef                namelist,dynamics     max_domains    0.      h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
 rconfig   real    diff_6th_factor         namelist,dynamics     max_domains    0.12    h    "diff_6th_factor" "factor that controls rate of 6th-order numerical diffusion"
 rconfig   integer diff_6th_opt            namelist,dynamics     max_domains    0      irh   "diff_6th_opt" "switch for 6th-order numerical diffusion"
 rconfig   real    smdiv                   namelist,dynamics	max_domains    0.1     h    "smdiv"         ""      ""
 rconfig   real    emdiv                   namelist,dynamics	max_domains    0.01    h    "emdiv"         ""      ""
-rconfig   real    epssm                   namelist,dynamics	max_domains    0.1     h    "epssm"         ""      ""
+rconfig   real    epssm                   namelist,dynamics	max_domains    .1      h    "epssm"         ""      ""
 rconfig   logical non_hydrostatic         namelist,dynamics	max_domains  .true.   irh  "non_hydrostatic"    ""   ""
 rconfig   integer time_step_sound         namelist,dynamics	max_domains    0       h     "time_step_sound"               ""      ""
 rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    5       rh       "h_mom_adv_order"               ""      ""
@@ -1321,11 +1321,16 @@ package   ncepcloud3    mp_physics==98               -             moist:qv,qc,q
 package   ncepcloud5    mp_physics==99               -             moist:qv,qc,qr,qi,qs;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs
 package   thompson       mp_physics==8               -             moist:qv,qc,qr,qi,qs,qg;a_moist:a_qv,a_qc,a_qr,a_qi,a_qs,a_qg;g_moist:g_qv,g_qc,g_qr,g_qi,g_qs,g_qg;scalar:qni
 
+package   noprogn       progn==0                     -             -
+#package   progndrop     progn==1                     -             scalar:qndrop
+
 package   rrtmscheme    ra_lw_physics==1             -             -
-package   gfdllwscheme  ra_lw_physics==99            -             moist:qv,qc,qr,qi;a_moist:a_qv,a_qc,a_qr,a_qi;g_moist:g_qv,g_qc,g_qr,g_qi
+#package   camlwscheme   ra_lw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
+package   gfdllwscheme  ra_lw_physics==99            -             -
 
 package   swradscheme   ra_sw_physics==1             -             -
 package   gsfcswscheme  ra_sw_physics==2             -             -
+#package   camswscheme   ra_sw_physics==3             -             ozmixm:mth01,mth02,mth03,mth04,mth05,mth06,mth07,mth08,mth09,mth10,mth11,mth12;aerosolc:sul,sslt,dust1,dust2,dust3,dust4,ocpho,bcpho,ocphi,bcphi,bg,volc
 package   gfdlswscheme  ra_sw_physics==99            -             -
 
 package   sfclayscheme   sf_sfclay_physics==1        -             -
@@ -1344,6 +1349,8 @@ package   bmjscheme      cu_physics==2               -             -
 package   gdscheme       cu_physics==3               -             -
 package   sasscheme      cu_physics==4               -             -
 package   kfscheme       cu_physics==99              -             -
+
+#package   psufddagd      grid_fdda==1                -             fdda3d:u_ndg_old,v_ndg_old,t_ndg_old,q_ndg_old,ph_ndg_old,u_ndg_new,v_ndg_new,t_ndg_new,q_ndg_new,ph_ndg_new;fdda2d:mu_ndg_old,mu_ndg_new
 
 # only need to specify these once; not for every io_form* variable
 package   io_intio    io_form_restart==1                     -             -
@@ -1472,17 +1479,17 @@ typedef vp_type real    v2                      ijk      -         1        -   
 typedef vp_type real    v3                      ijk      -         1        -       -
 typedef vp_type real    v4                      ijk      -         1        -       -
 typedef vp_type real    v5                      ijk      -         1        -       -
-typedef vp_type real    alpha                   ijr      -         1        -       -
+typedef vp_type real    alpha                   ij9      -         1        -       -
 # END VP_TYPE DEFINITION
 
 # BEGIN EP_TYPE DEFINITION:
 #      <Table>  <Type>  <Sym>                <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
 typedef ep_type integer ne
-typedef ep_type real    v1                      ijkr     -         1        -       -
-typedef ep_type real    v2                      ijkr     -         1        -       -
-typedef ep_type real    v3                      ijkr     -         1        -       -
-typedef ep_type real    v4                      ijkr     -         1        -       -
-typedef ep_type real    v5                      ijkr     -         1        -       -
+typedef ep_type real    v1                      ijk9     -         1        -       -
+typedef ep_type real    v2                      ijk9     -         1        -       -
+typedef ep_type real    v3                      ijk9     -         1        -       -
+typedef ep_type real    v4                      ijk9     -         1        -       -
+typedef ep_type real    v5                      ijk9     -         1        -       -
 # END EP_TYPE DEFINITION
 
 # BEGIN XB_TYPE DEFINITION:
@@ -1777,22 +1784,22 @@ typedef fdob_type integer SN_MAXCG     # coarse domain grid dimension in south-n
 typedef fdob_type integer WE_MAXCG     # coarse domain grid dimension in west-east coordinate
 typedef fdob_type integer SN_END       # ending north-south grid index
 typedef fdob_type integer LEVIDN(max_domains)   # level of nest
-typedef fdob_type real    DS_CG        # coarse domain grid size
-typedef fdob_type real    WINDOW       # time window half-period for nudging (in minutes)
+typedef fdob_type real    DS_CG        # coarse domain grid size 
+typedef fdob_type real    WINDOW       # time window half-period for nudging (in minutes) 
 typedef fdob_type real    RTLAST       # time in hours of last obs used in current model step
 typedef fdob_type real    DATEND       # time in minutes after which data are asuumed to have ended
 typedef fdob_type real    RINFMN       # minimum radius of influence
 typedef fdob_type real    RINFMX       # maximum radius of influence
 typedef fdob_type real    PFREE        # pressure level (cb) where terrain effect becomes small
 typedef fdob_type real    DCON         # 1/DPSMX
-typedef fdob_type real    DPSMX        # max pres change (cb) allowed within infl range of surf obs
+typedef fdob_type real    DPSMX        # max pres change (cb) allowed within infl range of surf obs 
 typedef fdob_type real    TFACI        # scale factor used for ramp-down in dynamic initialization
 typedef fdob_type real    XN           # cone factor for Lambert projection
 
 # table entries are of the form
 #      <Table>  <Type>  <Sym>                <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
 #Grid variables
-typedef fdob_type real    varobs               nz       -         1        -       -       "varobs"          "observational values in each variable"
+typedef fdob_type real    varobs               rz       -         1        -       -       "varobs"          "observational values in each variable"
 typedef fdob_type real    errf                 hz       -         1        -       -       "errf"            "errors between model and obs values"
 typedef fdob_type real    timeob               z        -         1        -       -       "timeob"          "model times for each observation"          "hours"
 typedef fdob_type real    nlevs_ob             z        -         1        -       -       "nlevs_ob"        "numbers of levels in sounding obs"
@@ -1805,3 +1812,4 @@ typedef fdob_type real    rko                  z        -         1        -    
 
 state fdob_type fdob - -
 ##
+
