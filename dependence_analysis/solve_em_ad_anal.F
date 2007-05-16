@@ -86,6 +86,7 @@ BENCH_END(exch3)
   rk_step_is_ong: if (rk_step .eq. 1) then
 BENCH_START(comp4)
 ! TBH:  OVERWRITE ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call init_zero_tendency( ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend,num_3d_m,num_3d_c,rk_step,&
 &ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp4)
@@ -121,7 +122,7 @@ BENCH_END(exch5)
 
 BENCH_START(comp6)
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
-! TBH:  OVERWRITE xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,tke_2,moist_2
+! TBH:  OVERWRITE xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,tke_2
         call calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,xkmv,xkhh,xkhv,bn2,khdif,kvdif,div,defor11,&
 &defor22,defor33,defor12,defor13,defor23,tke_2(ims,kms,jms),p8w,t8w,th_phy,t_phy,p_phy,moist_2,dn,dnw,dx,dy,rdz,rdzw,&
 &mix_cr_len,num_3d_m,cf1,cf2,cf3,warm_rain,kh_tke_upper_bound,kv_tke_upper_bound,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
@@ -143,9 +144,35 @@ lineno = __LINE__
 BENCH_END(exch6)
 
 BENCH_START(comp7)
-! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend,t_tend,ph_tend,RTHFTEN,u_save,v_save,w_save,ph_save,t_save,ru_tendf,rv_tendf,rw_tendf,t_tendf,ph_tendf,cqw,mu_tend,mu_save
-$$$here...  tracing dependencies in rk_tendency, see rk_tendency_anal.F
-$$$here...  then, finish tracing dependencies on p
+! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend,t_tend,ph_tend,RTHFTEN,u_save,v_save,w_save,ph_save,t_save,ru_tendf,rv_tendf,rw_tendf,t_tendf,cqw,mu_tend,mu_save
+! TBH:  HORIZONTAL DEPENDENCE:  al     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  alt    ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  cosa   ( [i-1,i    ], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  e      ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  f      ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msft   ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu   ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv   ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2   ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mut    ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  muu    ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  muv    ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  pb     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  phb    ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  ph_2   ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  php    ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  p      ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  ru     ( [i-1,i,i+1], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv     ( [i-1,i    ], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  rw     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  sina   ( [    i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  t_2    ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  t_init ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  u_2    ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2    ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  w_2    ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  ww     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd  ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_tendency( config_flags,rk_step,ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,&
 &mu_tend,u_save,v_save,w_save,ph_save,t_save,mu_save,rthften,ru,rv,rw,ww,u_2,v_2,w_2,t_2,ph_2,u_1,v_1,w_1,t_1,ph_1,h_diabatic,&
 &phb,t_init,mu_2,mut,muu,muv,mub,al,alt,p,pb,php,cqu,cqv,cqw,u_base,v_base,t_base,qv_base,z_base,msfu,msfv,msft,f,e,sina,cosa,&
