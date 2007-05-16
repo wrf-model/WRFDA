@@ -122,7 +122,10 @@ BENCH_END(exch5)
 
 BENCH_START(comp6)
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
-! TBH:  OVERWRITE xkmv,xkmh,xkmhd,xkhv,xkhh,BN2,tke_2
+! TBH:  OVERWRITE xkmv,xkmh,xkmhd,xkhv,xkhh,BN2
+! TBH:  HORIZONTAL DEPENDENCE:  defor12  ( [    i,i+1], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor13  ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor23  ( [    i    ], [    j,j+1] )
         call calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,xkmv,xkhh,xkhv,bn2,khdif,kvdif,div,defor11,&
 &defor22,defor33,defor12,defor13,defor23,tke_2(ims,kms,jms),p8w,t8w,th_phy,t_phy,p_phy,moist_2,dn,dnw,dx,dy,rdz,rdzw,&
 &mix_cr_len,num_3d_m,cf1,cf2,cf3,warm_rain,kh_tke_upper_bound,kv_tke_upper_bound,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
@@ -180,16 +183,25 @@ BENCH_START(comp7)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
 ! TBH:  OVERWRITE u_save,v_save,ph_save,t_save,w_save,mu_tend
+! TBH:  HORIZONTAL DEPENDENCE:  ru     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  ph_2   ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  t_2    ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  w_2    ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2   ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mut    ( [i-1,i,i+1], [j-1,j,j+1] )
       call relax_bdy_dry( config_flags,u_save,v_save,ph_save,t_save,w_save,mu_tend,ru,rv,ph_2,t_2,w_2,mu_2,mut,u_b,v_b,ph_b,t_b,&
 &w_b,mu_b,u_bt,v_bt,ph_bt,t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,relax_zone,dtbc,fcx,gcx,ijds,ijde,ids,ide,jds,jde,kds,kde,&
 &ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
 ! TBH:  OVERWRITE ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
     call rk_addtend_dry( ru_tend,rv_tend,rw_tend,ph_tend,t_tend,ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,u_save,v_save,w_save,&
 &ph_save,t_save,rk_step,h_diabatic,mut,msft,msfu,msfv,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,&
 &grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     if (config_flags%specified .or. config_flags%nested) then
 ! TBH:  OVERWRITE ru_tend,rv_tend,ph_tend,t_tend,rw_tend,mu_tend
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call spec_bdy_dry( config_flags,ru_tend,rv_tend,ph_tend,t_tend,rw_tend,mu_tend,u_b,v_b,ph_b,t_b,w_b,mu_b,u_bt,v_bt,ph_bt,&
 &t_bt,w_bt,mu_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,&
 &grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -207,6 +219,7 @@ BENCH_START(comp7)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     if (non_hydrostatic) then
 ! TBH:  OVERWRITE a,alpha,gamma
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call calc_coef_w( a,alpha,gamma,mut,cqw,rdn,rdnw,c2a,dts,g,epssm,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
     endif
@@ -301,6 +314,7 @@ BENCH_START(comp10)
       endif
 
 ! TBH:  OVERWRITE ru_m,rv_m,ww_m
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call sumflux( u_2,v_2,ww,u_save,v_save,ww1,muu,muv,ru_m,rv_m,ww_m,epssm,msfu,msfv,iteration,number_of_small_timesteps,ids,&
 &ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
       if (non_hydrostatic) then
@@ -320,6 +334,7 @@ BENCH_START(comp10)
 &ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           if (config_flags%specified) then
 ! TBH:  OVERWRITE w_2
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call zero_grad_bdy( w_2,'w',config_flags,spec_zone,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,&
 &kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else
@@ -386,6 +401,12 @@ BENCH_START(comp12)
   moist_scalar_advancg: if (num_3d_m .ge. param_first_scalar) then
     moist_variable_loor: do im = param_first_scalar, num_3d_m
 ! TBH:  OVERWRITE moist_tend(:,:,:,im),rqvften
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2 ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  ru_m    ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv_m    ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu    ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv    ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  xkmhd   ( [i-1,i,i+1], [j-1,j,j+1] )
         call rk_scalar_tend( im,im,config_flags,rk_step,dt_rk,ru_m,rv_m,ww_m,mut,alt,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,&
 &im),moist_tend(ims,kms,jms,im),advect_tend,rqvften,qv_base, .true. ,fnm,fnp,msfu,msfv,msft,rdx,rdy,rdn,rdnw,khdif,kvdif,&
 &xkmhd,leapfrog,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%&
@@ -393,6 +414,7 @@ BENCH_START(comp12)
         if ((config_flags%specified .or. config_flags%nested) .and. rk_step .eq. 1) then
           if (im .eq. p_qv) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qv)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqv_b,rqv_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
@@ -400,27 +422,33 @@ BENCH_START(comp12)
         if (config_flags%nested .and. rk_step .eq. 1) then
           if (im .eq. p_qc) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qc)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqc_b,rqc_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qr) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qr)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqr_b,rqr_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qi) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qi)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqi_b,rqi_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qs) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qs)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqs_b,rqs_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           else if (im .eq. p_qg) then
 ! TBH:  OVERWRITE moist_tend(:,:,:,p_qg)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
             call spec_bdy_scalar( moist_tend(ims,kms,jms,im),rqg_b,rqg_bt,spec_bdy_width,spec_zone,ijds,ijde,ids,ide,jds,jde,kds,&
 &kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe,kps,kpe,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
           endif
         endif
 ! TBH:  OVERWRITE moist_1(:,:,:,im),moist_2(:,:,:,im)
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
         call rk_update_scalar( im,im,moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),moist_tend(ims,kms,jms,im),advect_tend,msft,&
 &mu_1,mu_2,mub,rk_step,dt_rk,spec_zone,epsts,leapfrog,config_flags,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%&
 &i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
