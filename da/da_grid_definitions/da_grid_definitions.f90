@@ -6,7 +6,7 @@ module da_grid_definitions
    
    use da_control, only : gravity, convert_fd2uv, gas_constant, convert_uv2fd, &
       pi, cone_factor, map_projection, phic,psi1,earth_radius,c2,pole, &
-      ycntr,truelat1_3dv,xlonc,ptop,ts0,ps0,tlp,tis0
+      ycntr,truelat1_3dv,xlonc,ptop,t0,base_pres,base_lapse,base_temp
    use da_reporting, only : da_error,message
    
    implicit none

@@ -1,4 +1,4 @@
-subroutine da_radial_velocity(rv,p,u,v,w,qrn,ps0,x,y,z)
+subroutine da_radial_velocity(rv,p,u,v,w,qrn,ps,x,y,z)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,13 +7,13 @@ subroutine da_radial_velocity(rv,p,u,v,w,qrn,ps0,x,y,z)
    implicit none
 
    real, intent(in)  :: x, y, z
-   real, intent(in)  :: p, u, v, w, qrn, ps0
+   real, intent(in)  :: p, u, v, w, qrn, ps
    real, intent(out) :: rv
 
    real              :: r, alpha, vt
 
    r=sqrt(x*x+y*y+z*z)
-   alpha=(ps0/p)**0.4
+   alpha=(ps/p)**0.4
 
    if (qrn <= 0.0) vt=0.
    if (qrn >  0.0) vt=5.4*alpha*qrn**0.125

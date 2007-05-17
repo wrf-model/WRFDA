@@ -88,7 +88,7 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
    do k=ks,ke
       do j=js,je
          do i=is,ie
-            grid%em_g_t_2(i,j,k)=(ts0+grid%em_t_2(i,j,k))* &
+            grid%em_g_t_2(i,j,k)=(t0+grid%em_t_2(i,j,k))* &
                (grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
                         -kappa*grid%xa%p(i,j,k)/grid%xb%p(i,j,k))
          end do

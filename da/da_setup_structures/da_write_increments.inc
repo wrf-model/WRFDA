@@ -164,7 +164,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
       write (unit=anl_inc_unit) &
          coarse_ds, start_x, start_y, &
          phic, xlonc, cone_factor, truelat1_3dv, truelat2_3dv, pole, dsm,   &
-         psi1, c2, ptop, ps0, ts0, tlp, tis0
+         psi1, c2, ptop, base_pres, t0, base_lapse, base_temp
 
       ! 1d constant fields:
 

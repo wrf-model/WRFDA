@@ -75,13 +75,8 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 
    ! Fix ptop as 0.4 hPa.
    ptop = 40.0     
-   ps0  = 100000.0
-   tis0 = 0.0
-   tlp  = 0.0
 
    grid%xb % ptop = ptop
-   grid%xb % ps0  = ps0
-   grid%xb % tlp  = tlp
       
    !---------------------------------------------------------------------------
    ! Convert KMA fields to xb:

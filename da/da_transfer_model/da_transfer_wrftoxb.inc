@@ -66,11 +66,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    ptop = grid%p_top
 
-   ptop = grid%p_top
-   ps0 = grid%base_pres  
-   tis0 = grid%base_temp  ! MSLP reference temperature
-   tlp  = grid%base_lapse  
-
    grid%xb%sigmaf(ke+1) = grid%em_znw(ke+1)
 
    grid%xb%znw(ke+1) = grid%em_znw(ke+1)
@@ -87,9 +82,6 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    end do
 
    grid%xb % ptop = ptop
-   grid%xb % ps0  = ps0
-   grid%xb % ts0  = ts0
-   grid%xb % tlp  = tlp
       
    !---------------------------------------------------------------------------
    ! Convert WRF fields to xb:
@@ -315,15 +307,15 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          do i=is,ie
             ! The base specific volume (from real.init.code)
             ppb  = grid%em_znu(k) * grid%em_mub(i,j) + ptop
-            ttb  = (tis0 + tlp*log(ppb/ps0)) * (ps0/ppb)**kappa
-            albn = (gas_constant/ps0) * ttb * (ppb/ps0)**cvpm
+            ttb  = (base_temp + base_lapse*log(ppb/base_pres)) * (base_pres/ppb)**kappa
+            albn = (gas_constant/base_pres) * ttb * (ppb/base_pres)**cvpm
 
             qvf1 = 1. + grid%moist(i,j,k,P_QV) / rd_over_rv
             aln  = -1. / (grid%em_mub(i,j)+grid%em_mu_2(i,j)) * (albn*grid%em_mu_2(i,j) &
                 + grid%em_rdnw(k) *(grid%em_ph_2(i,j,k+1) - grid%em_ph_2(i,j,k)))
             ! total pressure:
-            grid%xb%p(i,j,k) = ps0 * ((gas_constant*(ts0+grid%em_t_2(i,j,k))*qvf1) / &
-                            (ps0*(aln+albn)))**cpovcv
+            grid%xb%p(i,j,k) = base_pres * ((gas_constant*(t0+grid%em_t_2(i,j,k))*qvf1) / &
+                            (base_pres*(aln+albn)))**cpovcv
             ! total density
             grid%xb%rho(i,j,k)= 1.0 / (albn+aln)
             ! pressure purtubation:
@@ -348,8 +340,8 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
             grid%xb%q(i,j,k) = grid%moist(i,j,k,P_QV)
 
-            theta = ts0 + grid%em_t_2(i,j,k)
-            grid%xb%t(i,j,k) = theta*(grid%xb%p(i,j,k)/ps0)**kappa
+            theta = t0 + grid%em_t_2(i,j,k)
+            grid%xb%t(i,j,k) = theta*(grid%xb%p(i,j,k)/base_pres)**kappa
 
             ! Convert to specific humidity from mixing ratio of water vapor:
             grid%xb%q(i,j,k)=grid%xb%q(i,j,k)/(1.0+grid%xb%q(i,j,k))

@@ -10,8 +10,8 @@ module da_setup_structures
       ob_type,da_allocate_background_errors,da_allocate_observations
    use da_control, only : trace_use,vert_evalue,stdout,rootproc, &
       analysis_date,coarse_ix,coarse_ds,map_projection,coarse_jy, c2,dsm,phic, &
-      pole, cone_factor, start_x,ps0,ptop,psi1,start_y, tlp,tis0,truelat2_3dv, &
-      truelat1_3dv,xlonc,ts0,num_fft_factors,pi,print_detail_spectral, global, &
+      pole, cone_factor, start_x,base_pres,ptop,psi1,start_y, base_lapse,base_temp,truelat2_3dv, &
+      truelat1_3dv,xlonc,t0,num_fft_factors,pi,print_detail_spectral, global, &
       da_find_fft_factors,da_find_fft_trig_funcs, use_radar_rf, &
       max_fgat_time, num_fgat_time, max_airep_input, max_bogus_input, &
       max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &

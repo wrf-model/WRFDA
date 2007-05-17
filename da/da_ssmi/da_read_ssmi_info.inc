@@ -21,7 +21,7 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    integer,  dimension(10)      :: nestix, nestjx, numnc, nesti, nestj
    real                         :: phic   , xlonc  , &
                                    truelat1_3dv, truelat2_3dv, &
-                                   ts0    , ps0    , tlp     , ptop
+                                   local_ts0    , local_ps0    , local_tlp     , ptop
    real   ,  dimension(10)      :: dis
 
    logical                      :: CHECK_WRONG, CHECK_SUBdoMAin
@@ -109,13 +109,13 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
          case ('true2') ; 
              read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) truelat2_3dv
          case ('TS0  ') ; 
-             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) ts0
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) local_ts0
          case ('TLP  ') ; 
-             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) tlp
+             read (char_ned (I+8:I+14),'(F7.2)', iostat = iost) local_tlp
          case ('PTOP ') ; 
              read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ptop
          case ('PS0  ') ; 
-             read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) ps0
+             read (char_ned (I+8:I+14),'(F7.0)', iostat = iost) local_ps0
          case ('IXC  ') ; 
              read (char_ned (I+8:I+14),'(I7)', iostat = iost) ixc
          case ('JXC  ') ; 

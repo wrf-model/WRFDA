@@ -1,5 +1,5 @@
 subroutine da_count_filtered_obs(&
-                    ts0, tlp, ptop, ps0, map, ds, &   
+                    ptop, map, ds, &   
                     phic, xlonc, truelat1, truelat2, &
                     coarse_ix, coarse_jy, start_x, start_y)
 
@@ -10,7 +10,7 @@ subroutine da_count_filtered_obs(&
 
    implicit none
 
-   real,              intent(in) :: ts0, tlp, ptop, ps0, ds
+   real,              intent(in) :: ptop, ds
    real,              intent(in) :: phic, xlonc, truelat1, truelat2
    integer,           intent(in) :: coarse_ix, coarse_jy
    real,              intent(in) :: start_x, start_y
@@ -296,8 +296,8 @@ subroutine da_count_filtered_obs(&
       "PHIC  =", phic,", XLONC =", xlonc,", TRUE1 =", truelat1,&
       ", TRUE2 =",truelat2, ", XIM11 =", start_y, ", XJM11 =", start_x, ","
    write (unit = filtered_obs_unit, fmt = '(2(A,F7.2),A,F7.0,A,F7.0,A)') &
-      "TS0   =",  ts0, ", TLP   =", tlp, &
-      ", PTOP  =",  ptop,", PS0   =",  ps0,"," 
+      "TS0   =",  base_temp, ", TLP   =", base_lapse, &
+      ", PTOP  =",  ptop,", PS0   =",  base_pres,"," 
 
    ! write domain info 
 

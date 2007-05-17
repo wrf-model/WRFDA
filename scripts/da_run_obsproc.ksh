@@ -57,10 +57,11 @@ cd $WORK_DIR
 
    export NL_DX_KM=`expr $NL_DX \/ 1000`
 
-   # MM5 variables (not in WRF):
-   export PS0=${PS0:-100000.0}
-   export TS0=${TS0:-273.0}
-   export TLP=${TLP:-50.0}
+   export NL_BASE_PRES=${NL_BASE_PRES:-100000.0}
+   export NL_BASE_TEMP=${NL_BASE_TEMP:-300.0}
+   export NL_BASE_LAPSE=${NL_BASE_LAPSE:-50.0}
+   export NL_BASE_TROPO_PRES=${NL_BASE_TROPO_PRES:-20000.0}
+   export NL_BASE_START_TEMP=${NL_BASE_START_TEMP:-215.0}
 
    if test $MAP_PROJ = lambert; then
       export PROJ=1
@@ -143,9 +144,11 @@ cd $WORK_DIR
 
 &record6
  ptop =  ${PTOP_PA},
- ps0  =  ${PS0},
- ts0  =  ${TS0},
- tlp  =  ${TLP},
+ base_pres       = ${NL_BASE_PRES},
+ base_temp       = ${NL_BASE_TEMP},
+ base_lapse      = ${NL_BASE_LAPSE},
+ base_start_temp = ${NL_BASE_START_TEMP},
+ base_tropo_pres = ${NL_BASE_TROPO_PRES}
 /
 
 &record7

@@ -16,10 +16,10 @@ module da_control
    !---------------------------------------------------------------------------
 
    ! Fundamental constants:
-   real, parameter    :: pi = 3.1415926          ! Value used in WRF.
-   real, parameter    :: gas_constant = 287.     ! Value used in WRF.
-   real, parameter    :: gas_constant_v = 461.6  ! Value used in WRF.
-   real, parameter    :: cp = 7.*gas_constant/2. ! Value used in WRF.
+   real, parameter    :: pi = 3.1415926           ! Value used in WRF.
+   real, parameter    :: gas_constant = 287.0     ! Value used in WRF.
+   real, parameter    :: gas_constant_v = 461.6   ! Value used in WRF.
+   real, parameter    :: cp = 7.0*gas_constant/2.0 ! Value used in WRF.
    real, parameter    :: t_kelvin = 273.15
    real, parameter    :: t_triple = 273.16 ! triple point of water
    ! The imported code for ssmi and radiance uses 273.0 in a way that suggests 
@@ -27,7 +27,6 @@ module da_control
    ! value separate for the moment
    real, parameter    :: t_roughem = 273.0
    real, parameter    :: t_landem = 273.0
-   real, parameter    :: ps0_inv = 1.0 / 100000.0  ! Base pressure.
 
    real, parameter    :: kappa = gas_constant / cp
    real, parameter    :: rd_over_rv = gas_constant / gas_constant_v
@@ -53,10 +52,10 @@ module da_control
    ! Explicit moist constants:
    real, parameter    :: SVP1=0.6112, SVP2=17.67, SVP3=29.65
    real, parameter    :: SVPT0=t_kelvin, TO=t_kelvin
-   real, parameter    :: N0R=8.E6, N0S=2.E7, RHOS=0.1
-   real, parameter    :: AVT=841.99667, BVT=0.8, BVT2=2.5+.5*BVT, BVT3=3.+BVT
-   real, parameter    :: PPI=1./(pi*N0R), PPIS=1./(pi*N0S*RHOS)
-   real, parameter    :: XLV1=2370., XLF0=.3337E6, XLV0=3.15E6
+   real, parameter    :: N0R=8.0E6, N0S=2.0E7, RHOS=0.1
+   real, parameter    :: AVT=841.99667, BVT=0.8, BVT2=2.5+0.5*BVT, BVT3=3.0+BVT
+   real, parameter    :: PPI=1.0/(pi*N0R), PPIS=1.0/(pi*N0S*RHOS)
+   real, parameter    :: XLV1=2370.0, XLF0=0.3337E6, XLV0=3.15E6
    real, parameter    :: XLS=XLV0-XLV1*t_triple+XLF0
 
    ! Planetary boundary physics constants
@@ -80,8 +79,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    ! Missing values and the index number of the quality contro
 
    integer, parameter ::  missing       = -888888
-   real   , parameter ::  missing_r     = -888888.
-   real   , parameter ::  Max_StHeight_Diff = 100.
+   real   , parameter ::  missing_r     = -888888.0
+   real   , parameter ::  Max_StHeight_Diff = 100.0
 
    logical :: anal_type_verify=.false.
    logical :: anal_type_randomcv=.false.
@@ -122,7 +121,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real, parameter    :: FTOL = 1.0E-4
    real, parameter    :: GTOL = 0.9
    real, parameter    :: XTOL = 1.0E-17
-   real, parameter    :: STPMin = 1.0E-20
+   real, parameter    :: STPMIN = 1.0E-20
    real, parameter    :: STPMAX = 1.0E+20
 
    ! Background errors:
@@ -224,8 +223,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    integer            :: map_projection       ! 1=LamConf/2=PolarSte/3=Mercator
    real               :: ycntr
-   integer            :: coarse_ix            ! COARSE DOMAin DIM in I DIRECTION.
-   integer            :: coarse_jy            ! COARSE DOMAin DIM in Y DIRECTION.
+   integer            :: coarse_ix            ! coarse domain dim in i direction.
+   integer            :: coarse_jy            ! coarse domain dim in y direction.
    real               :: coarse_ds            ! Coarse domain gridlength (km)
    real               :: start_x              ! i posn. of (1,1) in coarse domain.
    real               :: start_y              ! j posn. of (1,1) in coarse domain.
@@ -234,8 +233,8 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real               :: delt_lat             ! Latitude increments for global grids
    real               :: delt_lon             ! Longitude increments for global grids
 
-   real               :: phic                 ! COARSE DOMAin CENTRAL LAT(DEGREE)
-   real               :: xlonc                ! COARSE DOMAin CENTRAL LON(DEGREE)
+   real               :: phic                 ! coarse domain central lat(degree)
+   real               :: xlonc                ! coarse domain central lon(degree)
    real               :: cone_factor          ! Cone Factor
    real               :: truelat1_3dv         ! True latitude 1 (degrees)
    real               :: truelat2_3dv         ! True latitude 2 (degrees)
@@ -245,11 +244,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real               :: c2                   ! earth_radius * COS(psi1)
 
    real               :: ptop
-   real               :: ps0
-   real               :: ts0 = 300.0          ! Base potential temperture
-                                              ! mm5 code may try to change value
-   real               :: tlp
-   real               :: tis0
+   real, parameter    :: t0 = 300.0
 
    !------------------------------------------------------------------------------
    ! 4.0 vertical interpolation options
@@ -306,18 +301,13 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! other
 
-   character*80  cheadl1
-   character*80  cheadl2
-   character*160 cheadl3
-
-
    integer, parameter :: jperr = 6
 
    ! NCEP errors (U in m/s, V in m/s, T in K, H in %, P in Pa)
    ! rh has been divided by 2
 
    real, parameter :: err_k(0:jperr+1) = &
-                      (/200000., 100100.,70000.,50000.,30000.,10000.,5000., 1./)
+                      (/200000.0, 100100.0,70000.0,50000.0,30000.0,10000.0,5000.0, 1.0/)
    real, parameter :: err_u(0:jperr+1) = &
                       (/ 1.4, 1.4,   2.4,   2.8,   3.4,   2.5,  2.7,  2.7/)
    real, parameter :: err_v(0:jperr+1) = &
@@ -331,21 +321,21 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
 
    ! Maximum error check factors:  inV > (Obs_error*factor) --> fails_error_max
 
-   real, parameter :: max_error_t              = 5, &
-                      max_error_uv             = 5, &
-                      max_error_pw             = 5, &
-                      max_error_ref            = 5, &
-                      max_error_rh             = 5, &
-                      max_error_q              = 5, &
-                      max_error_p              = 5, &
-                      max_error_tb             = 5, &
-                      max_error_thickness      = 5, &
-                      max_error_rv             = 5, &
-                      max_error_rf             = 5, &
-                      max_error_buv            = 500, &
-                      max_error_bt             = 500, &
-                      max_error_bq             = 500, &
-                      max_error_slp            = 500
+   real, parameter :: max_error_t              = 5.0, &
+                      max_error_uv             = 5.0, &
+                      max_error_pw             = 5.0, &
+                      max_error_ref            = 5.0, &
+                      max_error_rh             = 5.0, &
+                      max_error_q              = 5.0, &
+                      max_error_p              = 5.0, &
+                      max_error_tb             = 5.0, &
+                      max_error_thickness      = 5.0, &
+                      max_error_rv             = 5.0, &
+                      max_error_rf             = 5.0, &
+                      max_error_buv            = 500.0, &
+                      max_error_bt             = 500.0, &
+                      max_error_bq             = 500.0, &
+                      max_error_slp            = 500.0
 
    ! Define various ways for bad data to be flagged.  
 
@@ -411,11 +401,9 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: rtm_option_rttov = 1
    integer, parameter :: rtm_option_crtm = 2
 
-   ! RTM_inIT setup parameter
+   ! rtm_init setup parameter
 
    integer, parameter            :: maxsensor = 30
-
-   ! type( rttov_coef ), pointer :: coefs(:)         ! RTTOV coefficients
 
    ! Tracing
 
@@ -493,8 +481,6 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: report_zk  = 9
 
    logical :: obs_use(num_ob_indexes) = .false.
-
-
 
    ! Special cases
 

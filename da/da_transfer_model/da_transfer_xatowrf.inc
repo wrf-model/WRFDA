@@ -195,7 +195,7 @@ subroutine da_transfer_xatowrf(grid)
             rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
 
             ! To compute the theta increment with the full fields:
-            grid%em_t_2(i,j,k) = t_full*(ps0/p_full)**kappa - ts0
+            grid%em_t_2(i,j,k) = t_full*(base_pres/p_full)**kappa - t0
 
             ! The full field of analysis ph:
             ph_full  = ph_full  &

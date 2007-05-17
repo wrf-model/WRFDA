@@ -187,9 +187,6 @@ export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
-export PS0=${PS0:-100000.0}
-export TS0=${TS0:-300.0}
-export TLP=${TLP:-50.0}
 
 #From WRF-Var:
 export NL_VAR4D=${NL_VAR4D:-false}

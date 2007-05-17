@@ -17,10 +17,10 @@ module da_transfer_model
       map_projection,earth_omega,mix,pi,phic,mkz,start_lon,start_lat, &
       start_x,xlonc,start_y,mjy, global, deg_to_rad, earth_radius, &
       var4d,analysis_date,coarse_ds,analysis_accu,dsm,pole, fg_format_kma_global, &
-      print_detail_map,stdout,truelat1_3dv, fg_format_wrf, fg_format, ps0, &
+      print_detail_map,stdout,truelat1_3dv, fg_format_wrf, fg_format, base_pres, &
       truelat2_3dv, periodic_x,write_increments,max_ext_its, gravity, &
-      kappa, print_detail_xa,rd_over_rv,ts0, print_detail_xa, check_rh, &
-      print_detail_xb,testing_dm_exact,tlp,tis0,vertical_ip,ptop, &
+      kappa, print_detail_xa,rd_over_rv,t0, print_detail_xa, check_rh, &
+      print_detail_xb,testing_dm_exact,base_lapse,base_temp,vertical_ip,ptop, &
       use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs
    use da_define_structures, only : xbx_type
    use da_grid_definitions, only : da_set_map_para

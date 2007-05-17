@@ -14,19 +14,19 @@ subroutine da_ref_height(pres, ref_height)
 
    real, parameter   :: rovg = gas_constant/gravity
 
-   aa = 0.5 * rovg * tlp
-   bb = rovg * ts0
+   aa = 0.5 * rovg * base_lapse
+   bb = rovg * t0
 
-   cc = log(pres/ps0)
+   cc = log(pres/base_pres)
    ref_height = -(bb + aa * cc) * cc
 
-   if (tis0 > 0.0) then
-      p0iso=ps0*exp((tis0-ts0)/tlp)
-      cc=log(p0iso/ps0)
+   if (base_temp > 0.0) then
+      p0iso=base_pres*exp((base_temp-t0)/base_lapse)
+      cc=log(p0iso/base_pres)
       ziso=-(aa*cc+bb)*cc
 
       if (ref_height > ziso) then
-         ref_height=ziso+rovg*tis0*log(p0iso/pres)
+         ref_height=ziso+rovg*base_temp*log(p0iso/pres)
       end if
    end if
 

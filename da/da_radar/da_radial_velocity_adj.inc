@@ -1,4 +1,4 @@
-subroutine da_radial_velocity_adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
+subroutine da_radial_velocity_adj(rv,p,u,v,w,qrn,ps,x,y,z,qrn9)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,14 +9,14 @@ subroutine da_radial_velocity_adj(rv,p,u,v,w,qrn,ps0,x,y,z,qrn9)
    real, intent(in)  :: x, y, z
    real, intent(in)  :: p
    real, intent(in)  :: qrn9
-   real, intent(in)  :: ps0
+   real, intent(in)  :: ps
    real, intent(inout) :: rv
    real, intent(inout) :: u, v, w, qrn
 
    real    :: r, alpha, vt
 
    r=sqrt(x*x+y*y+z*z)
-   alpha=(ps0/p)**0.4
+   alpha=(ps/p)**0.4
 
    rv = rv/r
    u = u + rv*x

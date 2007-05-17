@@ -1334,7 +1334,7 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
       if (iost /= 0) &
          call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
       call da_count_filtered_obs(&
-         xb%ts0, xb%tlp, xb%ptop, xb%ps0, xb%map, xb%ds,  &
+         xb%ptop, xb%map, xb%ds,  &
          phic, xlonc, truelat1, truelat2,                 &
          coarse_ix, coarse_jy, start_x, start_y)
       call da_final_write_filtered_obs

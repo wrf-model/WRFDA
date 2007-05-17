@@ -13,7 +13,7 @@ module da_obs_io
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &
       max_radar, print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
       use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity, &
-      filename_len
+      filename_len,base_pres,base_lapse, t0
    use da_define_structures, only : ob_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type

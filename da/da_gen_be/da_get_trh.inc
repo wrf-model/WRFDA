@@ -43,9 +43,9 @@ subroutine da_get_trh( input_file, dim1, dim2, dim3, k, temp, rh )
       do i = 1, dim1
 
          ! Convert p', theta' to T:
-         theta = ts0 + thetap(i,j)                 ! Theta = Theta0 + Thetap
+         theta = t0 + thetap(i,j)                 ! Theta = Theta0 + Thetap
          p = pb(i,j) + pp(i,j)                     ! p = base p + pert p.
-         temp(i,j) = theta *( p * ps0_inv)**kappa ! Theta to T.
+         temp(i,j) = theta *( p/base_pres)**kappa ! Theta to T.
 
          ! Convert to specific humidity.
          q = x(i,j) /( 1.0 + x(i,j))

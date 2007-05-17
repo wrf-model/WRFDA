@@ -15,20 +15,20 @@ subroutine da_ref_pres(height, ref_pres)
 
    call da_ref_height(ptop, htop)
 
-   bb = rovg * ts0
-   aa = rovg * tlp * 0.5
+   bb = rovg * t0
+   aa = rovg * base_lapse * 0.5
 
    hh = min(htop, height)
    cc = (-bb + sqrt(bb * bb - 4.0 * aa * hh))/(2.0*aa)
-   ref_pres = ps0 * exp(cc)
+   ref_pres = base_pres * exp(cc)
 
-   if (tis0 > 0.0) then
-      p0iso=ps0*exp((tis0-ts0)/tlp)
-      cc=log(p0iso/ps0)
+   if (base_temp > 0.0) then
+      p0iso=base_pres*exp((base_temp-t0)/base_lapse)
+      cc=log(p0iso/base_pres)
       ziso=-(aa*cc+bb)*cc
 
       if (height > ziso) then
-         ref_pres = p0iso/exp((height-ziso)/(rovg*tis0))
+         ref_pres = p0iso/exp((height-ziso)/(rovg*base_temp))
       end if
    end if
 
