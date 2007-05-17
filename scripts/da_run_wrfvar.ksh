@@ -252,7 +252,7 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $OBS_TUNING_DIR/* .
    fi
 
-   ln -fs $WRFVAR_DIR/run wrfvar_run
+   ln -fs $WRFVAR_DIR/run/radiance_info .
 
    if test $NL_NUM_FGAT -gt 1; then
       if $NL_VAR4D; then

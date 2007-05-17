@@ -154,7 +154,7 @@ subroutine da_crtm_init(iv,ob)
    end if
 
    call da_get_unit(iunit)
-   filename='wrfvar_run/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
+   filename='radiance_info/'//adjustl(trim(iv%instid(n)%rttovid_string))//'.info'
    open(unit=iunit,file=filename, form='formatted',iostat = iost, status='old')
    if (iost /= 0) then
       message(1)="Cannot open radiance info file "//adjustl(filename)
@@ -285,7 +285,7 @@ subroutine da_crtm_init(iv,ob)
     end do
 
     call da_get_unit(unit_factor_rad)
-    open(unit_factor_rad, file='wrfvar_run/radiance_error.factor', &
+    open(unit_factor_rad, file='radiance_error.factor', &
          form='formatted',iostat = iost, status='old')
 
     if (iost /= 0) then

@@ -150,7 +150,7 @@ subroutine da_rttov_init(iv,ob)
       allocate (ob%instid(i)%ichan(1:nchan(i)))
 
       call da_get_unit(iunit)
-      filename='wrfvar_run/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.info'
+      filename='radiance_info/'//adjustl(trim(iv%instid(i)%rttovid_string))//'.info'
       open(unit=iunit,file=filename, &
          form='formatted',iostat = iost, status='old')
 
@@ -354,7 +354,7 @@ subroutine da_rttov_init(iv,ob)
       end do
 
       call da_get_unit(unit_factor_rad)
-      filename='wrfvar_run/radiance_error.factor'
+      filename='radiance_error.factor'
       open(unit_factor_rad, file=filename, &
            form='formatted',iostat = iost, status='old')    
 
