@@ -133,6 +133,7 @@ gen_namelist_script ( char * dirname )
   sym_forget() ;
 
   fprintf(fp,"# Machine generated, do not edit\n\n") ;
+  fprintf(fp,"FILE=${1:-namelist.input}\n\n");
 
   for ( p = Domain.fields ; p != NULL ; p = p-> next )
   {
@@ -148,7 +149,7 @@ gen_namelist_script ( char * dirname )
           continue ;
         }
 	if (sym_get( p2 ) == NULL) { /* not in table yet */
-          fprintf(fp,"echo \\&%s >> namelist.input\n",p2) ;
+          fprintf(fp,"echo \\&%s >> $FILE\n",p2) ;
           for ( q = Domain.fields ; q != NULL ; q = q-> next ) {
             if ( q->node_kind & RCONFIG) {
               strcpy(howset2,q->howset) ;
@@ -177,20 +178,22 @@ gen_namelist_script ( char * dirname )
                   fprintf(fp,"},\"") ;
                 }
 
-                fprintf(fp," >> namelist.input;fi\n") ;
+                fprintf(fp," >> $FILE;fi\n") ;
               }
 
             }
           }
-          fprintf(fp,"echo / >> namelist.input\n") ;
+          fprintf(fp,"echo / >> $FILE\n") ;
 	  sym_add(p2) ;
 	}
       }
     }
   }
   
-  fprintf(fp,"echo \\&namelist_quilt >> namelist.input\n");
-  fprintf(fp,"echo / >> namelist.input\n");
+  fprintf(fp,"echo \\&namelist_quilt >> $FILE\n");
+  fprintf(fp,"if test ! -z \"$NL_NIO_TASKS_PER_GROUP\"; then echo \"nio_tasks_per_group=${NL_NIO_TASKS_PER_GROUP},\" >> $FILE;fi\n");
+  fprintf(fp,"if test ! -z \"$NL_NIO_GROUPS\"; then echo \"nio_groups=${NL_NIO_GROUPS},\" >> $FILE;fi\n");
+  fprintf(fp,"echo / >> $FILE\n");
 
   fclose( fp ) ;
   return(0) ;

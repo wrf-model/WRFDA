@@ -4,17 +4,13 @@
 # can couple the models through memory rather than files
 #
 # When called the first time, wrfvar_output does not exist, so use the
-# existng wrfvar_input as the initial file
+# existing wrfvar_input as the initial file
 #
-# Not sure why the auxhistfiles are commented out
-#
-# The namelist hard wires the case as 3 hours from 200-01-25-00,
-# so the T+0 input to VAR is wrfinput_d${DOMAIN} described above.
+# The T+0 input to VAR is wrfinput_d${DOMAIN} described above.
 #
 # The other input files for VAR are the T+1,T+2,T+3 dumps
 
 arg1=$1
-arg2=$2
 
 cd $WORK_DIR/nl
 
@@ -24,10 +20,11 @@ if test $NUM_PROCS = 1; then
    ./wrf.exe > wrf_nl.out 2>wrf_nl.error
 else
    if test $arg1 = pre; then
-      cp -f namelist.input ../.
+      mv ../namelist.output ../namelist_wrfvar.output
+      cp namelist.input ..
    fi
    if test $arg1 = post; then
-      cp -f ../namelist.wrfvar ../namelist.input
+      mv ../namelist.output .
    fi
 fi
 

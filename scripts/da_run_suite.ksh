@@ -140,7 +140,7 @@ export FG_TYPE=${FG_TYPE:-GFS}
 
 #From WRF (namelist.input):
 export WRF_DIR=${WRF_DIR:-$REL_DIR/WRFV2}
-export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl} 
+export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl} 
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}

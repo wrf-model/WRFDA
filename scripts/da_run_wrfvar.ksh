@@ -21,7 +21,7 @@ export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
 #Default directories/files:
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 
@@ -102,7 +102,7 @@ date
 echo 'REL_DIR               <A HREF="file:'$REL_DIR'">'$REL_DIR'</a>'
 echo 'WRFVAR_DIR            <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 if $NL_VAR4D; then
-   echo 'WRF_DIR               <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
+   echo 'WRFNL_DIR             <A HREF="file:'$WRFNL_DIR'">'$WRFNL_DIR'</a>' $WRFNL_VN
    echo 'WRFPLUS_DIR           <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
    echo "DA_BOUNDARIES         $DA_BOUNDARIES"
 fi
@@ -401,13 +401,13 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_OPEN_YE=false
       export NL_NESTED=false
       export NL_REAL_DATA_INIT_TYPE=1
-      . $WRF_DIR/inc/namelist_script.inc
+      . $WRFNL_DIR/inc/namelist_script.inc 
+      mv namelist.input nl
       export NL_DEBUG_LEVEL=0
       unset NL_AUXHIST2_OUTNAME
       unset NL_AUXHIST2_INTERVAL
       unset NL_FRAMES_PER_AUXHIST2
       unset NL_MP_ZERO_OUT_THRESH
-      mv namelist.input nl
       ln -fs $WORK_DIR/*.TBL nl
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
@@ -417,7 +417,7 @@ echo "WINDOW_END            $WINDOW_END"
       # else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
       # fi
-      ln -fs $WRF_DIR/main/wrf.exe nl
+      ln -fs $WRFNL_DIR/main/wrf.exe nl
 
       # Outputs
       for I in 02 03 04 05 06 07; do
@@ -529,13 +529,21 @@ echo "WINDOW_END            $WINDOW_END"
 
    fi
 
-   . $WRFVAR_DIR/build/inc/namelist_script.inc
+   . $WRFVAR_DIR/build/inc/namelist_script.inc 
 
-   if test -f namelist.input; then
-     cp namelist.input $RUN_DIR
+   if $NL_VAR4D; then
+      cp namelist.input $RUN_DIR/namelist_wrfvar.input
+      cp nl/namelist.input $RUN_DIR/namelist_nl.input
+      cp tl/namelist.input $RUN_DIR/namelist_tl.input
+      cp ad/namelist.input $RUN_DIR/namelist_ad.input
+      echo '<A HREF="namelist_wrfvar.input">WRFVAR namelist.input</a>'
+      echo '<A HREF="namelist_nl.input">NL namelist.input</a>'
+      echo '<A HREF="namelist_tl.input">TL namelist.input</a>'
+      echo '<A HREF="namelist_ad.input">AD namelist.input</a>'
+   else
+      cp namelist.input $RUN_DIR
+      echo '<A HREF="namelist.input">Namelist.input</a>'
    fi
-
-   echo '<A HREF="namelist.input">Namelist input</a>'
 
    #-------------------------------------------------------------------
    #Run WRF-Var:
@@ -589,11 +597,6 @@ echo "WINDOW_END            $WINDOW_END"
          RC=$?
       fi
 
-      if test -f fort.9; then
-        mv fort.9 namelist.output
-        cp namelist.output $RUN_DIR
-      fi
-
       if test -f statistics; then
          cp statistics $RUN_DIR
       fi
@@ -644,7 +647,20 @@ echo "WINDOW_END            $WINDOW_END"
       done
       cd $RUN_DIR
 
-      echo '<A HREF="namelist.output">Namelist output</a>'
+      if $NL_VAR4D; then
+         cp $WORK_DIR/namelist_wrfvar.output namelist_wrfvar.output
+         cp $WORK_DIR/nl/namelist.output     namelist_nl.output
+         cp $WORK_DIR/tl/namelist.output     namelist_tl.output
+         cp $WORK_DIR/ad/namelist.output     namelist_ad.output
+         echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
+         echo '<A HREF="namelist_nl.output">NL namelist.output</a>'
+         echo '<A HREF="namelist_tl.output">TL namelist.output</a>'
+         echo '<A HREF="namelist_ad.output">AD namelist.output</a>'
+      else
+         cp $WORK_DIR/namelist.output .
+         echo '<A HREF="namelist.output">Namelist.output</a>'
+      fi
+
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'

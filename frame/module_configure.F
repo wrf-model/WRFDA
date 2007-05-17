@@ -97,6 +97,16 @@ CONTAINS
         CALL WRF_ERROR_FATAL ( 'ERROR OPENING namelist.input' )
       ENDIF
 
+      OPEN ( UNIT   = nml_write_unit    ,      &
+             FILE   = "namelist.output" ,      &
+             FORM   = "FORMATTED"      ,      &
+             STATUS = "REPLACE"        ,      &
+             IOSTAT = io_status         )
+
+      IF ( io_status .NE. 0 ) THEN
+        CALL WRF_ERROR_FATAL ( 'ERROR OPENING namelist.output' )
+      ENDIF
+
 ! Statements that set the namelist vars to default vals
 #  include <namelist_defaults.inc>
 
@@ -129,6 +139,12 @@ CONTAINS
 
       IF ( io_status .NE. 0 ) THEN
         CALL WRF_ERROR_FATAL ( 'ERROR CLOSING namelist.input' )
+      ENDIF
+
+      CLOSE ( UNIT = nml_write_unit , IOSTAT = io_status )
+
+      IF ( io_status .NE. 0 ) THEN
+        CALL WRF_ERROR_FATAL ( 'ERROR CLOSING namelist.output' )
       ENDIF
 
       RETURN

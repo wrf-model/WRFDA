@@ -9,8 +9,9 @@
 # 2000-01-25 by the namelist file, renamed to tl01 to tl03 for
 # use by VAR
 
+# Preserve wrfvar namelist.input
+
 arg1=$1
-arg2=$2
 
 cd $WORK_DIR/tl
 
@@ -18,11 +19,11 @@ if test $NUM_PROCS = 1; then
    ./wrfplus.exe > wrf_tl.out 2>wrf_tl.error
 else
    if test $arg1 = pre; then
-      cp -f namelist.input ../.
+      cp namelist.input ..
       ln -fs $WORK_DIR/tl01 $WORK_DIR/wrfinput_d${DOMAIN}
    fi
    if test $arg1 = post; then
-      cp -f ../namelist.wrfvar ../namelist.input
+      mv ../namelist.output .
       ln -fs $DA_FIRST_GUESS $WORK_DIR/wrfinput_d${DOMAIN}
    fi
 fi

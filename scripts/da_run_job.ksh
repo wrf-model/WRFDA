@@ -2,6 +2,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
 export REGION=${REGION:-con200}
@@ -139,6 +140,9 @@ fi
 if $CHECK_SVNVERSION; then
    if test -d $WRF_DIR; then
       export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
+   fi
+   if test -d $WRFNL_DIR; then
+      export WRFNL_VN=`svnversion -n \$WRFNL_DIR 2>/dev/null`
    fi
    if test -d $WRFVAR_DIR; then
       export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`

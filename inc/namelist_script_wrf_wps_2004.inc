@@ -488,4 +488,6 @@ if test ! -z "$NL_PRODUCTION_STATUS"; then echo "production_status=${NL_PRODUCTI
 if test ! -z "$NL_COMPRESSION"; then echo "compression=${NL_COMPRESSION}," >> namelist.input;fi
 echo / >> namelist.input
 echo \&namelist_quilt >> namelist.input
+if test ! -z "$NL_NIO_TASKS_PER_GROUP"; then echo "nio_tasks_per_group=${NL_NIO_TASKS_PER_GROUP}," >> namelist.input;fi
+if test ! -z "$NL_NIO_GROUPS"; then echo "nio_groups=${NL_NIO_GROUPS}," >> namelist.input;fi
 echo / >> namelist.input
