@@ -8,10 +8,10 @@ export EXPT=${EXPT:-${ID}_suite_${NUM_PROCS}}
 
 export REL_DIR=$HOME/code/$ID
 
-export WRFVAR_DIR=$REL_DIR/wrfvar
-export WRF_DIR=$REL_DIR/wrf
-export WPS_DIR=$REL_DIR/wps
-export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
+export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
+export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}
 
 export CLEAN=${CLEAN:-false}
 
@@ -24,7 +24,7 @@ export RUN_WRFVAR=${RUN_WRFVAR:-true}
 export RUN_UPDATE_BC=${RUN_UPDATE_BC:-true}
 export RUN_WRF=${RUN_WRF:-true}
 
-export CYCLING=${CYCLING:-false}
+export CYCLING=${CYCLING:-true}
 export DUMMY=${DUMMY:-false}
 
 export LONG_FCST_TIME_1=00

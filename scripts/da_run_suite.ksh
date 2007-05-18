@@ -144,12 +144,7 @@ export WRFNL_DIR=${WRFNL_DIR:-$REL_DIR/wrfnl}
 #&time_control:
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.}
-export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
-#export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
-export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
-export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
-export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.}
 #&domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
@@ -358,7 +353,7 @@ while test $DATE -le $FINAL_DATE; do
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       if $CYCLING; then
          if ! $FIRST; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
       export DA_ANALYSIS=$FC_DIR/$DATE/analysis
@@ -375,7 +370,7 @@ while test $DATE -le $FINAL_DATE; do
    else     
       if $CYCLING; then
          if ! $FIRST; then
-            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
+            export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
    fi

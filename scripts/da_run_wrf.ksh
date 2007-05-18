@@ -54,14 +54,8 @@ if  $NL_VAR4D ; then
 fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
 export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.true.} 
+export NL_WRITE_INPUT=${NL_WRITE_INPUT:-.false.} 
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
-export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
-# WHY
-# export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same freq. as output.
-export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
-export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
-export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
 # &domains:
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_E_VERT=${NL_E_VERT:-28}                   #
@@ -172,10 +166,6 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       $RUN_CMD ./wrf.exe
       RC=$?
 
-      if test -f fort.9; then
-        cp fort.9 $RUN_DIR/namelist.output
-      fi
-
       rm -rf $RUN_DIR/rsl
       mkdir -p $RUN_DIR/rsl
       mv rsl* $RUN_DIR/rsl > /dev/null 2>&1
@@ -188,6 +178,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
          rm $FILE
       done
       cd $WORK_DIR
+      cp namelist.output $RUN_DIR
 
       echo '<A HREF="namelist.output">Namelist output</a>'
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
@@ -196,7 +187,6 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo `date +'%D %T'` "Ended $RC"
    fi
    mv wrfout* $FC_DIR/$DATE
-   mv wrf_3dvar* $FC_DIR/$DATE
 # else
 #    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
 # fi

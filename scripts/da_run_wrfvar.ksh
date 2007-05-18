@@ -67,7 +67,7 @@ if $CYCLING; then
       if $NL_VAR4D; then
          export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       fi
-      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE}
+      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
    fi
 fi
 
@@ -298,7 +298,7 @@ echo "WINDOW_END            $WINDOW_END"
                FMONTH=`echo ${FGAT_DATE} | cut -c5-6`
                FDAY=`echo ${FGAT_DATE} | cut -c7-8`
                FHOUR=`echo ${FGAT_DATE} | cut -c9-10`
-               ln -fs ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+               ln -fs ${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
             fi
             FGAT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ`
          done
