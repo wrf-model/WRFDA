@@ -87,20 +87,20 @@ state    real  LU_MASK          ij      misc        1         -     i3h1     "LU
 #
 # Variables from WPS
 #
-state    real   u_gc           igj      dyn_em      1        X     i1  "UU"     "x-wind component"    "m s-1"
-state    real   v_gc           igj      dyn_em      1        Y     i1  "VV"     "y-wind component"    "m s-1"
-state    real   t_gc           igj      dyn_em      1        -     i1  "TT"     "temperature"         "K"
-state    real   rh_gc          igj      dyn_em      1        -     i1  "RH"    "relative humidity"   "%"
-state    real   ght_gc         igj      dyn_em      1        -     i1  "GHT"   "geopotential height" "m"
-state    real   p_gc           igj      dyn_em      1        -     i1  "P"     "pressure"            "Pa"
-state    real   xlat_gc        ij       dyn_em      1        -     i1  "XLAT_M" "latitude, positive north" "degrees"
-state    real   xlong_gc       ij       dyn_em      1        -     i1  "XLONG_M" "longitude, positive east" "degrees"
-state    real   ht_gc          ij       dyn_em      1        -     i1  "HGT_M" "topography elevation" "m"
-state    real   tsk_gc         ij       dyn_em      1        -     i1  "SKINTEMP"  "skin temperature"  "K"
-state    real   tmn_gc         ij       dyn_em      1        -     i1  "SOILTEMP"  "annual mean deep soil temperature"  "K"
-state    real   pslv_gc        ij       dyn_em      1        -     i1  "PMSL"  "sea level pressure"  "Pa"
-state    real   greenfrac      imj      dyn_em      1        -     i1  "GREENFRAC" "monthly greenness fraction" "0 - 1 fraction"
-state    real   albedo12m      imj      dyn_em      1        -     i1  "ALBEDO12M" "background albedo" "0 - 1 fraction"
+#state    real   u_gc           igj      dyn_em      1        X     i1  "UU"     "x-wind component"    "m s-1"
+#state    real   v_gc           igj      dyn_em      1        Y     i1  "VV"     "y-wind component"    "m s-1"
+#state    real   t_gc           igj      dyn_em      1        -     i1  "TT"     "temperature"         "K"
+#state    real   rh_gc          igj      dyn_em      1        -     i1  "RH"    "relative humidity"   "%"
+#state    real   ght_gc         igj      dyn_em      1        -     i1  "GHT"   "geopotential height" "m"
+#state    real   p_gc           igj      dyn_em      1        -     i1  "P"     "pressure"            "Pa"
+#state    real   xlat_gc        ij       dyn_em      1        -     i1  "XLAT_M" "latitude, positive north" "degrees"
+#state    real   xlong_gc       ij       dyn_em      1        -     i1  "XLONG_M" "longitude, positive east" "degrees"
+#state    real   ht_gc          ij       dyn_em      1        -     i1  "HGT_M" "topography elevation" "m"
+#state    real   tsk_gc         ij       dyn_em      1        -     i1  "SKINTEMP"  "skin temperature"  "K"
+#state    real   tmn_gc         ij       dyn_em      1        -     i1  "SOILTEMP"  "annual mean deep soil temperature"  "K"
+#state    real   pslv_gc        ij       dyn_em      1        -     i1  "PMSL"  "sea level pressure"  "Pa"
+#state    real   greenfrac      imj      dyn_em      1        -     i1  "GREENFRAC" "monthly greenness fraction" "0 - 1 fraction"
+#state    real   albedo12m      imj      dyn_em      1        -     i1  "ALBEDO12M" "background albedo" "0 - 1 fraction"
 #state    real   pd_gc          igj      dyn_em      1        -     -   "PD"    "dry pressure"        "Pa"
 state    real   qv_gc          igj      dyn_em      1        -     i1   "QV"     "mixing ratio"        "kg kg-1"
 #state    real   intq_gc        ij       dyn_em      1        -     -   "INTQ"  "integrated mixing ratio" "Pa"
@@ -183,6 +183,7 @@ state    real   g_w            ijkb    dyn_em      2         Z     irh03usdf=(bd
 # Geopotential
 state    real   ph             ijkb     dyn_em      2         Z     \
        irh0usdf=(bdy_interp:dt)   "ph"   "perturbation geopotential"  "m2 s-2"
+#needed
 state    real   a_ph           ijkb     dyn_em      2         Z     \
        irh03usdf=(bdy_interp:dt)   "a_ph"   "perturbation geopotential"  "m2 s-2"
 state    real   g_ph           ijkb     dyn_em      2         Z     \
