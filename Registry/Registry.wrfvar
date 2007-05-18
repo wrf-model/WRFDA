@@ -157,9 +157,9 @@ state    real   g_v            ijkb    dyn_em      2         Y     i01rh03usdf=(
 state    real   w              ijkb    dyn_em      2         Z     irh0usdf=(bdy_interp:dt)  "w"                          "z-wind component"   "m s-1"
 state    real   a_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "a_w"                        "z-wind component"   "m s-1"
 state    real   g_w            ijkb    dyn_em      2         Z     irh03usdf=(bdy_interp:dt)  "g_w"                        "z-wind component"   "m s-1"
-state    real   ww             ijk     dyn_em      1         Z      r         "ww"   "mu-coupled eta-dot"    "Pa s-1"
-state    real   a_ww           ijk     dyn_em      1         Z      r         "a_ww"   "mu-coupled eta-dot"    "Pa s-1"
-state    real   g_ww           ijk     dyn_em      1         Z      r         "g_ww"   "mu-coupled eta-dot"    "Pa s-1"
+#state    real   ww             ijk     dyn_em      1         Z      r         "ww"   "mu-coupled eta-dot"    "Pa s-1"
+#state    real   a_ww           ijk     dyn_em      1         Z      r         "a_ww"   "mu-coupled eta-dot"    "Pa s-1"
+#state    real   g_ww           ijk     dyn_em      1         Z      r         "g_ww"   "mu-coupled eta-dot"    "Pa s-1"
 #state    real   rw             ijk     dyn_em      1         Z      -         "rw"   "mu-coupled w"          "Pa m s-1"
 #state    real   a_rw           ijk     dyn_em      1         Z      -         "a_rw"   "mu-coupled w"          "Pa m s-1"
 #state    real   g_rw           ijk     dyn_em      1         Z      -         "g_rw"   "mu-coupled w"          "Pa m s-1"
@@ -307,19 +307,19 @@ state    real   p              ijk     dyn_em      1         -      rh0       "p
 #                                               
 # Other dyn                                             
 #                                               
-i1       real   advect_tend    ijk     dyn_em      1         -                                          
+#i1       real   advect_tend    ijk     dyn_em      1         -                                          
 #i1       real   a_advect_tend  ijk     dyn_em      1         -                                          
 #i1       real   g_advect_tend  ijk     dyn_em      1         -                                          
-i1       real   alpha          ijk     dyn_em      1         -                                                  
+#i1       real   alpha          ijk     dyn_em      1         -                                                  
 #i1       real   a_alpha        ijk     dyn_em      1         -                                                  
 #i1       real   g_alpha        ijk     dyn_em      1         -                                                  
-i1       real   a              ijk     dyn_em      1         -                                                  
+#i1       real   a              ijk     dyn_em      1         -                                                  
 #i1       real   a_a            ijk     dyn_em      1         -                                                  
 #i1       real   g_a            ijk     dyn_em      1         -                                                  
-i1       real   gamma          ijk     dyn_em      1         -                                                  
+#i1       real   gamma          ijk     dyn_em      1         -                                                  
 #i1       real   a_gamma        ijk     dyn_em      1         -                                                  
 #i1       real   g_gamma        ijk     dyn_em      1         -                                                  
-i1       real   c2a            ijk     dyn_em      1         -     -
+#i1       real   c2a            ijk     dyn_em      1         -     -
 #i1       real   a_c2a          ijk     dyn_em      1         -     -
 #i1       real   g_c2a          ijk     dyn_em      1         -     -
 i1       real   rho            ijk     dyn_em      1         -     -
@@ -1213,7 +1213,6 @@ rconfig   integer rk_ord                  namelist,dynamics	1             3     
 rconfig   integer w_damping               namelist,dynamics	1             1       irh    "w_damping"             ""      ""
 # diff_opt 1=old diffusion, 2=new
 rconfig   integer diff_opt                namelist,dynamics	1             1       irh    "diff_opt"              ""      ""
-# km_opt   1=old coefs, 2=tke, 3=Smagorinksy
 rconfig   integer km_opt                  namelist,dynamics	1             4       irh    "km_opt"                ""      ""
 rconfig   integer damp_opt                namelist,dynamics	1             0       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
@@ -1389,7 +1388,7 @@ package   io_pnetcdf  io_form_restart==11                     -             -
 
 halo      HALO_EM_INIT_1 dyn_em 48:u_1,u_2,v_1,v_2,w_1,w_2,ph_1,ph_2
 #halo      HALO_EM_INIT_2 dyn_em 48:t_1,t_2,mu_1,mu_2,tke_1,tke_2,ww,phb
-halo      HALO_EM_INIT_2 dyn_em 48:t_1,t_2,mu_1,mu_2,ww,phb
+halo      HALO_EM_INIT_2 dyn_em 48:t_1,t_2,mu_1,mu_2,phb
 #halo      HALO_EM_INIT_3 dyn_em 48:ph0,php,t_init,mub,mu0,p,al,alt,alb
 halo      HALO_EM_INIT_3 dyn_em 48:t_init,mub,mu0,p
 #halo      HALO_EM_INIT_4 dyn_em 48:pb,h_diabatic,msft,msfu,msfv,f,e,sina,cosa,ht
@@ -1397,7 +1396,7 @@ halo      HALO_EM_INIT_4 dyn_em 48:h_diabatic,msft,msfu,msfv,f,e,sina,cosa,ht
 halo      HALO_EM_INIT_5 dyn_em 48:moist,scalar
 #halo      HALO_EM_VINTERP_UV_1 dyn_em 8:pd_gc,pb
 #halo      HALO_EM_A dyn_em  8:ru,rv,rw,ww,php,alt,al,p,muu,muv,mut
-halo      HALO_EM_A dyn_em  8:ww,p
+halo      HALO_EM_A dyn_em  8:p
 halo      HALO_EM_PHYS_A  dyn_em 4:u_2,v_2
 #halo      HALO_EM_PHYS_PBL dyn_em        4:rublten,rvblten
 #halo      HALO_EM_PHYS_DIFFUSION dyn_em  4:xkmv,xkmh,xkmhd,xkhv,xkhh,tke_1,tke_2
@@ -1454,7 +1453,7 @@ period    PERIOD_BDY_EM_INIT dyn_em 3:u_1,u_2,v_1,v_2,w_1,w_2,t_1,t_2,ph_1,ph_2,
 period    PERIOD_BDY_EM_MOIST dyn_em 3:moist
 period    PERIOD_BDY_EM_SCALAR dyn_em 3:scalar
 #period    PERIOD_BDY_EM_A dyn_em 2:ru,rv,rw,ww,php,alt,p,muu,muv,mut,ph_2
-period    PERIOD_BDY_EM_A dyn_em 2:ww,p,ph_2
+period    PERIOD_BDY_EM_A dyn_em 2:p,ph_2
 #period    PERIOD_BDY_EM_A1  dyn_em 3:rdzw,rdz,z,zx,zy
 #period    PERIOD_BDY_EM_PHY_BC dyn_em 2:rublten,rvblten,xkmh,xkmhd,xkmv,xkhh,xkhv,tke_2
 #period    PERIOD_BDY_EM_B dyn_em 2:ru_tend,rv_tend,ph_2,al,p,t_1,t_save,u_save,v_save,mu_1,mu_2,mudf,php,alt,pb
