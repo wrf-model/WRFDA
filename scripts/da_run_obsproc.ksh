@@ -61,7 +61,7 @@ cd $WORK_DIR
    export NL_BASE_TEMP=${NL_BASE_TEMP:-300.0}
    export NL_BASE_LAPSE=${NL_BASE_LAPSE:-50.0}
    export NL_BASE_TROPO_PRES=${NL_BASE_TROPO_PRES:-20000.0}
-   export NL_BASE_START_TEMP=${NL_BASE_START_TEMP:-215.0}
+   export NL_BASE_STRAT_TEMP=${NL_BASE_STRAT_TEMP:-215.0}
 
    if test $MAP_PROJ = lambert; then
       export PROJ=1
@@ -147,7 +147,7 @@ cd $WORK_DIR
  base_pres       = ${NL_BASE_PRES},
  base_temp       = ${NL_BASE_TEMP},
  base_lapse      = ${NL_BASE_LAPSE},
- base_start_temp = ${NL_BASE_START_TEMP},
+ base_strat_temp = ${NL_BASE_STRAT_TEMP},
  base_tropo_pres = ${NL_BASE_TROPO_PRES}
 /
 
