@@ -76,7 +76,11 @@ export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 # &dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
-export NL_KM_OPT=${NL_KM_OPT:-1}               # 
+
+# The recommended value for real data cases for the eddy coefficient
+# option is 4, but Registry.EM has value 1, so modify for WRFVAR
+export NL_KM_OPT=${NL_KM_OPT:-4}               # 
+
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    # 
 # &bdy_control:
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #

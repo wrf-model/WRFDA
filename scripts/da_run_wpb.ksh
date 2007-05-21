@@ -96,7 +96,6 @@ export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}           #(1=, 2=,3=).
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
-export NL_KM_OPT=${NL_KM_OPT:-1}               #
 export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}               #
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #

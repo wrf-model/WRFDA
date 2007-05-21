@@ -144,7 +144,6 @@ export NL_CUDT=${NL_CUDT:-5}                              #Interval in minutes t
 export NL_DYN_OPT=${NL_DYN_OPT:-2}                        # Eulerian-mass
 export NL_W_DAMPING=${NL_W_DAMPING:-0}                    # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}                      # Diffusion co-efficient
-export NL_KM_OPT=${NL_KM_OPT:-1}                          # Momentum  exchange 
 export NL_DAMPCOEF=${NL_DAMPCOEF:-0.01}                   # Damping co-efficient
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-4}        # Short time step for sound-wave
 #------------------------------------------------------------------------

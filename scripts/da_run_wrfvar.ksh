@@ -452,7 +452,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_ICLOUD=0
       export NL_W_DAMPING=0
       export NL_DIFF_OPT=0
-      export NL_KM_OPT=1
       export NL_DAMPCOEF=0.01
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input tl
