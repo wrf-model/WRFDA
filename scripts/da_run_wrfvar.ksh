@@ -359,7 +359,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DIFF_OPT=1
       export NL_KM_OPT=4
       export NL_DAMP_OPT=0
-      export NL_BASE_TEMP=290.0
       export NL_DAMPCOEF=0.0
       export NL_SMDIV=0.1
       export NL_EMDIV=0.01
