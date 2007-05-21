@@ -361,12 +361,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_SURFACE_INPUT_SOURCE=1
       export NL_MP_ZERO_OUT=2
       export NL_MP_ZERO_OUT_THRESH=1.e-8
-      export NL_MAXIENS=1
-      export NL_MAXENS=3
-      export NL_MAXENS2=3
-      export NL_MAXENS3=16
-      export NL_ENSDIM=144
-      export NL_RK_ORD=3
       export NL_W_DAMPING=1
       export NL_DIFF_OPT=1
       export NL_KM_OPT=4
@@ -381,10 +375,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_EPSSM=0.1
       export NL_NON_HYDROSTATIC=true
       export NL_TIME_STEP_SOUND=4
-      export NL_H_MOM_ADV_ORDER=5
-      export NL_V_MOM_ADV_ORDER=3
-      export NL_H_SCA_ADV_ORDER=5
-      export NL_V_SCA_ADV_ORDER=3
       export NL_SPECIFIED=true
       export NL_SPEC_BDY_WIDTH=5
       export NL_SPEC_ZONE=1
