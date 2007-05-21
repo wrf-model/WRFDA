@@ -354,25 +354,17 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_CUDT=5
       export NL_ISFFLX=1
       export NL_ICLOUD=1
-      export NL_SURFACE_INPUT_SOURCE=1
       export NL_MP_ZERO_OUT=2
-      export NL_MP_ZERO_OUT_THRESH=1.e-8
       export NL_W_DAMPING=1
       export NL_DIFF_OPT=1
       export NL_KM_OPT=4
       export NL_DAMP_OPT=0
       export NL_BASE_TEMP=290.0
-      export NL_ZDAMP=5000.0
       export NL_DAMPCOEF=0.0
-      export NL_KHDIF=0
-      export NL_KVDIF=0
       export NL_SMDIV=0.1
       export NL_EMDIV=0.01
-      export NL_EPSSM=0.1
-      export NL_NON_HYDROSTATIC=true
       export NL_TIME_STEP_SOUND=4
       export NL_SPECIFIED=true
-      export NL_SPEC_BDY_WIDTH=5
       export NL_NESTED=false
       export NL_REAL_DATA_INIT_TYPE=1
       . $WRFNL_DIR/inc/namelist_script.inc 
@@ -381,7 +373,6 @@ echo "WINDOW_END            $WINDOW_END"
       unset NL_AUXHIST2_OUTNAME
       unset NL_AUXHIST2_INTERVAL
       unset NL_FRAMES_PER_AUXHIST2
-      unset NL_MP_ZERO_OUT_THRESH
       ln -fs $WORK_DIR/*.TBL nl
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
