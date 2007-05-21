@@ -69,6 +69,7 @@ export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
 export NL_RADT=${NL_RADT:-30}                # 
 export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
 export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
+export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
 export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1}
 export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
 export NL_CUDT=${NL_CUDT:-5}
