@@ -341,9 +341,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_WRITE_INPUT=true
       export NL_DEBUG_LEVEL=0
 
-      export NL_TIME_STEP_FRACT_NUM=0
-      export NL_TIME_STEP_FRACT_DEN=1
-      export NL_FEEDBACK=1
       export NL_SMOOTH_OPTION=0
       export NL_MP_PHYSICS=3
       export NL_RA_LW_PHYSICS=1
@@ -356,7 +353,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_CU_PHYSICS=1
       export NL_CUDT=5
       export NL_ISFFLX=1
-      export NL_IFSNOW=0
       export NL_ICLOUD=1
       export NL_SURFACE_INPUT_SOURCE=1
       export NL_MP_ZERO_OUT=2
@@ -377,18 +373,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_TIME_STEP_SOUND=4
       export NL_SPECIFIED=true
       export NL_SPEC_BDY_WIDTH=5
-      export NL_SPEC_ZONE=1
-      export NL_RELAX_ZONE=4
-      export NL_PERIODIC_X=false
-      export NL_SYMMETRIC_XS=false
-      export NL_SYMMETRIC_XE=false
-      export NL_OPEN_XS=false
-      export NL_OPEN_XE=false
-      export NL_PERIODIC_Y=false
-      export NL_SYMMETRIC_YS=false
-      export NL_SYMMETRIC_YE=false
-      export NL_OPEN_YS=false
-      export NL_OPEN_YE=false
       export NL_NESTED=false
       export NL_REAL_DATA_INIT_TYPE=1
       . $WRFNL_DIR/inc/namelist_script.inc 
@@ -438,7 +422,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_CU_PHYSICS=0
       export NL_CUDT=0
       export NL_ISFFLX=0
-      export NL_IFSNOW=0
       export NL_ICLOUD=0
       export NL_W_DAMPING=0
       export NL_DIFF_OPT=0
@@ -513,7 +496,6 @@ echo "WINDOW_END            $WINDOW_END"
       unset NL_CU_PHYSICS
       unset NL_CUDT
       unset NL_ISFFLX
-      unset NL_IFSNOW
       unset NL_ICLOUD
 
    fi
