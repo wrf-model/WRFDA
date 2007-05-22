@@ -87,7 +87,7 @@ export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
 export NL_E_VERT=${NL_E_VERT:-28}                   #
 export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
 export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
-export NL_RADT=${NL_RADT:-30}                #
+export NL_RADT=${NL_RADT:-$NL_DX}                #
 export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
 export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
 export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}

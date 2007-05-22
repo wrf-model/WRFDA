@@ -345,9 +345,8 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_MP_PHYSICS=3
       export NL_RA_LW_PHYSICS=1
       export NL_RA_SW_PHYSICS=1
-      export NL_RADT=15
+      export NL_RADT=${NL_RADT:-$NL_DX}
       export NL_SF_SFCLAY_PHYSICS=1
-      export NL_SF_SURFACE_PHYSICS=2
       export NL_BL_PBL_PHYSICS=1
       export NL_BLDT=0
       export NL_CU_PHYSICS=1
@@ -404,9 +403,11 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_MP_PHYSICS=0
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
-      export NL_RADT=00
+      export NL_RADT_OLD=$NL_RADT
+      export NL_RADT=0
       export NL_SF_SFCLAY_PHYSICS=0
-      export NL_SF_SURFACE_PHYSICS=0
+      export NL_SF_SURFACE_PHYSICS_OLD=$NL_SF_SURFACE_PHYSICS
+      export NL_SF_SURFACE_PHYSICS=0 # Just for tl/ad
       export NL_BL_PBL_PHYSICS=0
       export NL_BLDT=0
       export NL_CU_PHYSICS=0
@@ -478,15 +479,16 @@ echo "WINDOW_END            $WINDOW_END"
       unset NL_MP_PHYSICS
       unset NL_RA_LW_PHYSICS
       unset NL_RA_SW_PHYSICS
-      unset NL_RADT
       unset NL_SF_SFCLAY_PHYSICS
-      unset NL_SF_SURFACE_PHYSICS
       unset NL_BL_PBL_PHYSICS
       unset NL_BLDT
       unset NL_CU_PHYSICS
       unset NL_CUDT
       unset NL_ISFFLX
       unset NL_ICLOUD
+      # Restore values
+      export NL_SF_SURFACE_PHYSICS=$NL_SF_SURFACE_PHYSICS_OLD
+      export NL_RADT=$NL_RADT_OLD
 
    fi
 
