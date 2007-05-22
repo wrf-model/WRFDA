@@ -118,6 +118,7 @@ export NL_W_DAMPING=1
 export NL_DIFF_OPT=1
 export NL_KM_OPT=4
 export NL_DAMPCOEF=0.01
+export NL_RADT=30
 export NL_TIME_STEP_SOUND=0  # Registry.EM default is set to 0, whereas Registry.wrefvar is set to 4.
 export NL_FEEDBACK=0 
 #dampcoef  = 0.01,  # It is set to 0 in Registry.EM and Registry.wrfvar
