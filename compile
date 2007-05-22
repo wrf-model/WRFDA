@@ -27,8 +27,6 @@ foreach a ( $argv )
 
     if ( "$a" == "wrf" ) then
       set compare_wrf = 1
-    else if ( "$a" == "wrfplus" ) then
-      set compare_wrf = 1
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1
     else if ( "$a" == "wrfvar" || "$a" == "convertor" || "$a" == "be" \
@@ -42,7 +40,6 @@ end
 if( $compare_wrf != 1 ) then
   echo "You need to compile corresponding to your configure option."
 #  echo "Type <compile wrf> to compile WRF model"
-#  echo "Type <compile wrfplus> to compile 4D-VAR WRF model"
 #  echo "Type <compile em_real> to compile WRF model and real"
   echo "Type <compile wrfvar> to compile wrfvar (and WRF framework)"
   echo "Type <compile be> to compile be"

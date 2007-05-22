@@ -32,10 +32,6 @@ elif [ "$option" = "wrf_nmm" ] ; then
     EM_CORE=0
     DA_CORE=0
     REGISTRY=Registry.NMM
-elif [ "$option" = "wrfplus" ] ; then
-    REGISTRY=Registry.EM_4DVAR
-    EM_CORE=1
-    export compileflags="$compileflags!-DWRF_PLUS"
 fi
 
 # lifted from the configure file for mpich; 00/03/10 jm

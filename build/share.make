@@ -10,10 +10,6 @@ SHARE_MODULES =                       \
 	module_compute_geop.o           \
 	module_soil_pre.o
 
-SHARE_MODULES_WRFPLUS =                       \
-        module_bc_ad.o                  \
-        module_bc_tl.o
-
 SHARE_OBJS    = 		\
 	mediation_integrate.o		\
 	mediation_interp_domain.o	\
@@ -85,8 +81,6 @@ SHARE_OBJS    = 		\
         wrf_histin.o            	\
         wrf_restartin.o                 \
         couple_or_uncouple_em.o
-
-SHARE_OBJS_WRFPLUS =
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
