@@ -35,11 +35,15 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    real             :: xhat_jb(1:cv_size_jb)        ! Jb control variable.
    real             :: cv_je(1:cv_size_je)          ! Je control variable.
    real             :: xhat_je(1:cv_size_je)        ! Je control variable.
+   real, allocatable, dimension(:) :: cv_xhat_jb, cv_xhat_je
    integer          :: ndynopt
 
    integer          :: cg_jcdf
 
    if (trace_use) call da_trace_entry("da_calculate_j")
+
+   allocate(cv_xhat_jb(cv_size_jb))
+   allocate(cv_xhat_je(cv_size_je))
 
    cg_jcdf = 0
 
@@ -104,8 +108,10 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    cv_jb(1:cv_size_jb) = cv (1:cv_size_jb)
    xhat_jb(1:cv_size_jb) = xhat (1:cv_size_jb)
 
+   cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
+
    j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
-       cv_jb + xhat_jb, cv_jb + xhat_jb, grid%xp, &
+       cv_xhat_jb, cv_xhat_jb, grid%xp, &
        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    j % jb = jb_factor * j % jb
@@ -118,8 +124,9 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    if (be % ne > 0) then
       cv_je(1:cv_size_je) = cv(je_start:je_end)
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
+      cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
       j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
-          cv_je + xhat_je, cv_je + xhat_je, grid%xp, &
+          cv_xhat_je, cv_xhat_je, grid%xp, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
    end if
    j % je = je_factor * j % je
@@ -186,11 +193,13 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
                                 (cv(je_start:je_end) + xhat(je_start:je_end)) + &
                                 j_grad(je_start:je_end)
    end if
+   cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
    gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
-                         cv_jb + xhat_jb , cv_jb + xhat_jb, grid%xp, &
+                         cv_xhat_jb, cv_xhat_jb, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+   cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
    gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
-                         cv_je + xhat_je , cv_je + xhat_je, grid%xp, &
+                         cv_xhat_je, cv_xhat_je, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
    if (print_detail_grad) then
@@ -220,6 +229,9 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       write(grad_unit,fmt='(2x,i2,1x,e10.3,2x,i4,5(1x,f10.3))') & 
          it, eps(it), iter, gnorm_j, gnorm_jb, gnorm_jo, gnorm_je
    end if
+
+   deallocate(cv_xhat_jb)
+   deallocate(cv_xhat_je)
 
    if (trace_use) call da_trace_exit("da_calculate_j")
 
