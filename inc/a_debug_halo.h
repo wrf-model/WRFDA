@@ -329,4 +329,24 @@ CALL write_field_global3d ( a_z_at_wh, &
                           ids, ide, jds, jde, kds, kde, &
                           ims, ime, jms, jme, kms, kme, &
                           ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( z, &
+                          'z', filecount, min_filecount, max_filecount, 'w', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_z, &
+                          'a_z', filecount, min_filecount, max_filecount, 'w', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( z_at_w, &
+                          'z_at_w', filecount, min_filecount, max_filecount, 'w', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
+CALL write_field_global3d ( a_z_at_w, &
+                          'a_z_at_w', filecount, min_filecount, max_filecount, 'w', &
+                          ids, ide, jds, jde, kds, kde, &
+                          ims, ime, jms, jme, kms, kme, &
+                          ips, ipe, jps, jpe, kps, kpe )
 
