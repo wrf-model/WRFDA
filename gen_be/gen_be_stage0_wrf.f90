@@ -18,7 +18,8 @@ program gen_be_stage0_wrf
 #endif
 
    use da_control, only : num_fft_factors, pi, stdout, stderr, trace_use, &
-      da_find_fft_factors,da_find_fft_trig_funcs,filename_len
+      da_find_fft_factors,da_find_fft_trig_funcs,filename_len, base_pres, &
+      base_temp, base_lapse
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
    use da_tools1
@@ -100,6 +101,10 @@ program gen_be_stage0_wrf
 
    stderr = 0
    stdout = 6
+
+   base_pres=100000.0
+   base_temp=290.0
+   base_lapse=50.0
 
    write(6,'(/a)')' [1] Initialize information.'
 
