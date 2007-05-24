@@ -27,7 +27,7 @@ CPP     = /lib/cpp
 MAX_DOMAINS = 1
 MAX_PROC    = 1024
 
-# Substituted by Config_new.pl
+# Substituted by Config.pl
 
 DEVTOP        = CONFIGURE_DEVTOP
 PERL          = CONFIGURE_PERL_PATH
