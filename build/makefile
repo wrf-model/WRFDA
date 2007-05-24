@@ -8,7 +8,9 @@ parallel : wrfvar
 
 setup : depend
 
+# preserve this makefile from overwriting
 links : 
+	@ cp makefile makefile.old
 	@ $(LN) $(CHEM)/* .
 	@ $(LN) $(DYN_NMM)/* .
 	@ $(LN) $(DYNAMICS)/* .
@@ -35,6 +37,7 @@ links :
 	@ $(LN) $(CONVERTOR)/wave2grid_kma/* .
 	@ $(LN) $(CONVERTOR)/kma_netcdf/* .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
+	@ mv makefile.old makefile
 	@ touch links
 
 
