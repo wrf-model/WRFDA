@@ -88,8 +88,34 @@ export NL_SEED_ARRAY2=$DATE
 
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
+
+# Change defaults from Registry.wrfvar which is required to be
+# consistent with WRF's Registry.EM
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
+export NL_INTERVAL_SECONDS=${NL_INTERVAL_SECONDS:-21600}
+export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
+export NL_TIME_STEP=${NL_TIME_STEP:-180}
+export NL_INTERP_TYPE=${NL_INTERP_TYPE:-1}
+export NL_T_EXTRAP_TYPE=${NL_T_EXTRAP_TYPE:-1}
+export NL_I_PARENT_START=${NL_I_PARENT_START:-0}
+export NL_J_PARENT_START=${NL_J_PARENT_START:-0}
+export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-0}
+export NL_NPROC_X=${NL_NPROC_X:-1}
 export NL_JCDFI_USE=${NL_JCDFI_USE:-false}
+export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}
+export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
+export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
+export NL_RADT=${NL_RADT:-15}
+export NL_SF_SFCLCAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
+export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1}
+export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-2}
+export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}
+export NL_CUDT=${NL_CUDT:-5}
+export NL_CO2TF=${NL_CO2TF:-0}
+export NL_KM_OPT=${NL_KM_OPT:-4}
+export NL_W_DAMPING=${NL_W_DAMPING:-1}
+export NL_W_SPECIFIED=${NL_W_SPECIFIED:-true}
+export NL_REAL_DATA_INIT_TYPE=${NL_REAL_DATA_INIT_TYPE:-3}
 
 #=======================================================
 
@@ -345,7 +371,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_MP_PHYSICS=3
       export NL_RA_LW_PHYSICS=1
       export NL_RA_SW_PHYSICS=1
-      export NL_RADT=${NL_RADT:-$NL_DX}
       export NL_SF_SFCLAY_PHYSICS=1
       export NL_BL_PBL_PHYSICS=1
       export NL_BLDT=0
