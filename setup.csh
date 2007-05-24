@@ -19,8 +19,7 @@ if ($status == 0) then
       setenv LSF_PTILE 8
    endif
    setenv SUBMIT_OPTIONS1 '#BSUB -x' # exclusivity
-   setenv SUBMIT_OPTIONS2 '#BSUB -a mpich_gm'
-   setenv SUBMIT_OPTIONS3 "#BSUB -R span[ptile=$LSF_PTILE]"
+   setenv SUBMIT_OPTIONS2 "#BSUB -R span[ptile=$LSF_PTILE]"
 else
    llq >& /dev/null
    if ($status == 0) then

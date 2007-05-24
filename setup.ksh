@@ -16,8 +16,7 @@ if test $? = 0 ; then
    export SUBMIT=LSF
    export LSF_PTILE=${LSF_PTILE:-8}
    export SUBMIT_OPTIONS1='#BSUB -x' # exclusivity
-   export SUBMIT_OPTIONS2='#BSUB -a mpich_gm'
-   export SUBMIT_OPTIONS3="#BSUB -R span[ptile=$LSF_PTILE]"
+   export SUBMIT_OPTIONS2="#BSUB -R span[ptile=$LSF_PTILE]"
 else
    llq > /dev/null 2>&1
    if test $? = 0 ; then
