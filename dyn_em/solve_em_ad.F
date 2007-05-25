@@ -5172,18 +5172,18 @@ BENCH_START(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
   IF (rk_step == 1 ) then
 #ifndef NO_HALO_FIX
-WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  its,ite = ', &
-  grid%i_start(ij),',',grid%i_end(ij)
-CALL wrf_message( TRIM(msg) )
-WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  jts,jte = ', &
-  grid%j_start(ij),',',grid%j_end(ij)
-CALL wrf_message( TRIM(msg) )
-do j = grid%j_end(ij)-1, grid%j_start(ij), -1
-  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
-    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGA_a_muv_',i,j,' = ',a_muv(i,j)
-    CALL wrf_message( TRIM(msg) )
-  end do
-end do
+!WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  its,ite = ', &
+!  grid%i_start(ij),',',grid%i_end(ij)
+!CALL wrf_message( TRIM(msg) )
+!WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  jts,jte = ', &
+!  grid%j_start(ij),',',grid%j_end(ij)
+!CALL wrf_message( TRIM(msg) )
+!do j = grid%j_end(ij)-1, grid%j_start(ij), -1
+!  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
+!    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGA_a_muv_',i,j,' = ',a_muv(i,j)
+!    CALL wrf_message( TRIM(msg) )
+!  end do
+!end do
 #endif
 
  call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u_2, a_u_2, v_2, a_v_2, xland, muu, a_muu, muv, a_muv, z, &
@@ -5194,12 +5194,12 @@ end do
   grid%j_start(ij), grid%j_end(ij),                &
   k_start, k_end                                  )
 #ifndef NO_HALO_FIX
-do j = grid%j_end(ij)-1, grid%j_start(ij), -1
-  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
-    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGZ_a_muv_',i,j,' = ',a_muv(i,j)
-    CALL wrf_message( TRIM(msg) )
-  end do
-end do
+!do j = grid%j_end(ij)-1, grid%j_start(ij), -1
+!  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
+!    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGZ_a_muv_',i,j,' = ',a_muv(i,j)
+!    CALL wrf_message( TRIM(msg) )
+!  end do
+!end do
 #endif
   ENDIF
 BENCH_END(comp_a_surface_drag)
