@@ -24,12 +24,10 @@ $(TARGET) : $(OBJS)
 	$(RANLIB) $(TARGET)
 
 .F90.o :
-	$(CPP) -C -P -DESMF_COUPLING $*.F90 > $*.f
+	$(CPP) -I../ioapi_share -C -P -DESMF_COUPLING $*.F90 > $*.f
 	$(FC) -c -g -I../ioapi_share $*.f
 
-clean :
-
-superclean: clean
+superclean: 
 	/bin/rm -f *.f *.o $(TARGET) *.mod
 
 # DEPENDENCIES : only dependencies after this line 

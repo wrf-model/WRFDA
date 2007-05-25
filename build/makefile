@@ -97,7 +97,6 @@ clean : arch_clean
           Registry_tmp* module_state_description.f90 bufrlib.prm \
           ../external/*.o ../external/*.a ../external/*/*.o ../external/*/*.a \
           inc/dm_comm_cpp_flags
-	@ ( cd ../external; make clean )
 
 superclean : clean arch_superclean
 	@ ( cd ../external; make superclean )

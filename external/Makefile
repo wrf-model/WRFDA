@@ -1,16 +1,4 @@
-clean :
-	@ ( cd esmf_time_f90 ;  make clean )
-	@ ( cd io_netcdf ;  make clean )
-	@ ( cd io_int ; make clean )
-	@ ( cd io_mcel ;  make clean )
-	@ ( cd io_phdf5 ; make -i clean )
-	@ ( cd io_grib1 ; make clean )
-	@ ( cd io_grib_share ; make clean )
-	@ ( cd io_grib2 ; make clean )
-	@ ( cd io_esmf ;  make clean )
-	@ ( cd ioapi_share ;  make clean )
-	@ ( cd RSL/RSL ; make clean )
-	@ ( cd RSL_LITE ; make clean )
+
 
 superclean :
 	( cd esmf_time_f90 ;  make superclean )
