@@ -116,10 +116,10 @@ scp $namelist hender@loquat.mmm.ucar.edu:${targetdir} || \
 if [[ $testtype = "parallel" ]] ; then
   scp $jobscript hender@loquat.mmm.ucar.edu:${targetdir} || \
     ErrorNoExit "failed to scp file ${jobscript}"
-  scp rsl.out.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
-    ErrorNoExit "failed to scp file rsl.out.0000"
-  scp rsl.error.0000 hender@loquat.mmm.ucar.edu:${targetdir} || \
-    ErrorNoExit "failed to scp file rsl.error.0000"
+  for rslfile in $( ls -1 rsl.* ) ; do
+    scp $rslfile hender@loquat.mmm.ucar.edu:${targetdir} || \
+      ErrorNoExit "failed to scp file ${rslfile}"
+  done
   for fieldfile in $( ls -1 field.* ) ; do
     scp $fieldfile hender@loquat.mmm.ucar.edu:${targetdir} || \
       ErrorNoExit "failed to scp file ${fieldfile}"
