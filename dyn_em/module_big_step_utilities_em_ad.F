@@ -5965,9 +5965,15 @@ end subroutine a_zero_tend
 
 !Zhang Xiaoyan 11/02/2006
 
+! TBH:  take this hack out...
+#define ASD_DEBUG
+
 !*************************************************************
 subroutine a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u, a_u, v, a_v, xland, muu, a_muu, muv, a_muv, z, &
-&a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&a_z, z_at_w, a_z_at_w, &
+             ids, ide, jds, jde, kds, kde, &
+             ims, ime, jms, jme, kms, kme, &
+             its, ite, jts, jte, kts, kte )
 
 !USE module_big_step_utilities_em
 implicit none
@@ -5990,12 +5996,16 @@ real, intent(inout) :: a_v(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_z(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_z_at_w(ims:ime,kms:kme,jms:jme)
 !real epsilon
+integer, intent(in) :: ids
 integer, intent(in) :: ide
 integer, intent(in) :: ite 
 integer, intent(in) :: its
+integer, intent(in) :: jds
 integer, intent(in) :: jde
 integer, intent(in) :: jte
 integer, intent(in) :: jts
+integer, intent(in) :: kde
+integer, intent(in) :: kds
 integer, intent(in) :: kte
 integer, intent(in) :: kts
 real, intent(in) :: muu(ims:ime,jms:jme)
@@ -6038,6 +6048,12 @@ real v0_v
 real zu
 real zv
 real zwt
+#ifdef ASD_DEBUG
+   INTEGER           :: filecount
+   INTEGER,PARAMETER :: min_filecount=10000
+   INTEGER,PARAMETER :: max_filecount=99999
+   CHARACTER*256     :: msg
+#endif
 
 REAL, PARAMETER :: epsilon = 1.e-10
     write(6,*)'ADJ',epsilon !zzma
@@ -6053,6 +6069,12 @@ a_zu = 0.
 a_zv = 0.
 a_zwt = 0.
 
+! TBH:  turn this off once halo debugging is finished
+#ifdef ASD_DEBUG
+  filecount = 20000 + 3000 + 100
+#include <a_surface_drag_halo.h>
+#endif
+
 !----------------------------------------------
 ! ROUTINE BODY
 ! ROUTINE BODY
@@ -6066,6 +6088,24 @@ i_endu = ite
 j_start = jts
 j_end = min(jte,jde-1)
 j_endv = jte
+#ifdef ASD_DEBUG
+WRITE(msg,'(A,I3,A,I3)') 'DEBUGa_ikj:  its,ite = ',its,',',ite
+CALL wrf_message( TRIM(msg) )
+WRITE(msg,'(A,I3,A,I3,A,I3)') 'DEBUGa_ikj:  i_start,i_end,i_endu = ', &
+  i_start,',',i_end,',',i_endu
+CALL wrf_message( TRIM(msg) )
+WRITE(msg,'(A,I3,A,I3)') 'DEBUGa_ikj:  jts,jte = ',jts,',',jte
+CALL wrf_message( TRIM(msg) )
+WRITE(msg,'(A,I3,A,I3,A,I3)') 'DEBUGa_ikj:  j_start,j_end,j_endv = ', &
+  j_start,',',j_end,',',j_endv
+CALL wrf_message( TRIM(msg) )
+do j = j_end, j_start, -1
+  do i = i_end, i_start, -1
+    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGa_a_muv_',i,j,' = ',a_muv(i,j)
+    CALL wrf_message( TRIM(msg) )
+  end do
+end do
+#endif
 do j = j_start, j_end
   do i = i_start, i_endu
     v0_u = sqrt(u(i,kts,j)**2+((v(i,kts,j)+v(i,kts,j+1)+v(i-1,kts,j)+v(i-1,kts,j+1))/4)**2)+epsilon
@@ -6115,6 +6155,12 @@ do j = j_start, j_endv
   end do
 end do
 
+! TBH:  turn this off once halo debugging is finished
+#ifdef ASD_DEBUG
+  filecount = 20000 + 3000 + 110
+#include <a_surface_drag_halo.h>
+#endif
+
 !----------------------------------------------
 ! ADJOINT COMPUTATIONS
 !----------------------------------------------
@@ -6127,6 +6173,28 @@ end do
 do j = j_endv, j_start, -1
   do i = i_end, i_start, -1
     v0_v = sqrt(v(i,kts,j)**2+((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/4)**2)+epsilon
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  WRITE(msg,'(A,I3,A,I3,A)') 'DEBUGa:  (i,j) = (',i,',',j,')'
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  v0_v = ',v0_v
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  v(',i,',kts,',j,') = ',v(i,kts,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  u(',i,',kts,',j,') = ',u(i,kts,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  u(',i,',kts,',j-1,') = ',u(i,kts,j-1)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  u(',i+1,',kts,',j,') = ',u(i+1,kts,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  u(',i+1,',kts,',j-1,') = ',u(i+1,kts,j-1)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  xland(',i,',',j,') = ',xland(i,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  xland(',i,',',j-1,') = ',xland(i,j-1)
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
 ! recompute : v0_v
 ! recompute : v0_v
     if (xland(i,j) .eq. xland(i,j-1)) then
@@ -6143,12 +6211,40 @@ do j = j_endv, j_start, -1
 ! recompute : cd
 ! recompute : cd
     tao_yz = cd*v0_v*v(i,kts,j)
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  WRITE(msg,'(A,I3,A,I3,A)') 'DEBUGa:  (i,j) = (',i,',',j,')'
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  tao_yz = ',tao_yz
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  cd = ',cd
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
 ! recompute : tao_yz
 ! recompute : tao_yz
     do k = kts, kte
       a_zv = 0.
       a_zwt = 0.
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  WRITE(msg,'(A,I3,A,I3,A,I3,A,G24.18)') 'DEBUGa:  z(',i,',',k,',',j,') = ',z(i,k,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,I3,A,G24.18)') 'DEBUGa:  z(',i,',',k,',',j-1,') = ',z(i,k,j-1)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,I3,A,G24.18)') 'DEBUGa:  z_at_w(',i,',',kts,',',j,') = ',z(i,kts,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,I3,A,G24.18)') 'DEBUGa:  z_at_w(',i,',',kts,',',j-1,') = ',z(i,kts,j-1)
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
       zv = 0.5*(z(i,k,j)+z(i,k,j-1)-z_at_w(i,kts,j)-z_at_w(i,kts,j-1))
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  zv = ',zv
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
 ! recompute : zv
 ! recompute : zv
       if (zv .lt. 1000.) then
@@ -6160,7 +6256,26 @@ do j = j_endv, j_start, -1
         a_zwt = a_zwt-a_rv_tendf(i,k,j)*(0.5*muv(i,j)*tao_yz/1000.)
         a_zv = a_zv-0.002*a_zwt
         a_zwt = 0.
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  CALL wrf_message( 'zv .lt. 1000.' )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  zwt = ',zwt
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
       endif
+#ifdef ASD_DEBUG
+IF ( ( i == 2 ) .AND. ( j == 7 ) ) THEN
+  WRITE(msg,'(A,I3,A,I3,A,G24.18)') 'DEBUGa:  a_muv(',i,',',j,') = ',a_muv(i,j)
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  a_zv = ',a_zv
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,G24.18)') 'DEBUGa:  a_tao_yz = ',a_tao_yz
+  CALL wrf_message( TRIM(msg) )
+  WRITE(msg,'(A,I3,A,I3,A,I3,A,G24.18)') 'DEBUGa:  a_rv_tendf(',i,',',k,',',j,') = ',a_rv_tendf(i,k,j)
+  CALL wrf_message( TRIM(msg) )
+ENDIF
+#endif
       a_z(i,k,j-1) = a_z(i,k,j-1)+0.5*a_zv
       a_z(i,k,j) = a_z(i,k,j)+0.5*a_zv
       a_z_at_w(i,kts,j-1) = a_z_at_w(i,kts,j-1)-0.5*a_zv
@@ -6203,6 +6318,11 @@ do j = j_endv, j_start, -1
     a_v0_v = 0.
   end do
 end do
+! TBH:  turn this off once halo debugging is finished
+#ifdef ASD_DEBUG
+  filecount = 20000 + 3000 + 120
+#include <a_surface_drag_halo.h>
+#endif
 do j = j_end, j_start, -1
   do i = i_endu, i_start, -1
     v0_u = sqrt(u(i,kts,j)**2+((v(i,kts,j)+v(i,kts,j+1)+v(i-1,kts,j)+v(i-1,kts,j+1))/4)**2)+epsilon
@@ -6283,9 +6403,25 @@ do j = j_end, j_start, -1
   end do
 end do
 
+#ifdef ASD_DEBUG
+do j = j_end, j_start, -1
+  do i = i_end, i_start, -1
+    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGz_a_muv_',i,j,' = ',a_muv(i,j)
+    CALL wrf_message( TRIM(msg) )
+  end do
+end do
+#endif
+
+! TBH:  turn this off once halo debugging is finished
+#ifdef ASD_DEBUG
+  filecount = 20000 + 3000 + 130
+#include <a_surface_drag_halo.h>
+#endif
 
 end subroutine a_surface_drag
 
+! TBH:  take this hack out...
+#undef ASD_DEBUG
 
 
 

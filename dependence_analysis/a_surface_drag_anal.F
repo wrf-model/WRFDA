@@ -1,6 +1,14 @@
 !Zhang Xiaoyan 11/02/2006
 
 !*************************************************************
+! TBH:  OVERWRITE a_muu, a_muv, a_z, a_z_at_w, a_u, a_v
+! TBH:  HORIZONTAL DEPENDENCE:  z         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  z_at_w    ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_z       ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_z_at_w  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xland     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  u         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  v         ( [i-1,i,i+1], [j-1,j,j+1] )
 subroutine a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u, a_u, v, a_v, xland, muu, a_muu, muv, a_muv, z, &
 &a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 

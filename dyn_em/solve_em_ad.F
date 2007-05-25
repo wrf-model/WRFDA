@@ -114,8 +114,9 @@ SUBROUTINE solve_em_ad ( grid , config_flags , &
    INTEGER                         :: filecount
 !   INTEGER,PARAMETER               :: min_filecount=0
 !   INTEGER,PARAMETER               :: max_filecount=1026
-   INTEGER,PARAMETER               :: min_filecount=7000
+   INTEGER,PARAMETER               :: min_filecount=19000
    INTEGER,PARAMETER               :: max_filecount=99999
+   CHARACTER*256     :: msg
 #endif
 
 ! storage for tendencies and decoupled state (generated from Registry)
@@ -4934,7 +4935,7 @@ BENCH_END(comp106)
 
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
-  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 106
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 101
 #include <all_debug_halo.h>
 #endif
 
@@ -5044,6 +5045,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch102)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 102
+#include <all_debug_halo.h>
+#endif
+
 BENCH_START(comp108)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
@@ -5061,6 +5068,12 @@ lineno = __LINE__
 #endif
 BENCH_END(exch103)
 
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 103
+#include <all_debug_halo.h>
+#endif
+
 ! recompute : alt,cqu,cqv,cqw,mut,muu,muv,php,ru,rv,rw,ww
   rk_step_is_onzr: if (rk_step .eq. 1) then
 
@@ -5075,6 +5088,12 @@ lineno = __LINE__
 
 #endif
 BENCH_END(exch104)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 104
+#include <all_debug_halo.h>
+#endif
 
 BENCH_START(comp110)
       call phy_prep( config_flags,mut,u_2,v_2,p,pb,alt,ph_2,phb,t_2,tsk,moist_2,num_3d_m,mu_3d,rho,th_phy,p_phy,pi_phy,u_phy,v_phy,&
@@ -5092,6 +5111,12 @@ lineno = __LINE__
 
 #endif
 BENCH_END(exch105)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 105
+#include <all_debug_halo.h>
+#endif
 
 BENCH_START(comp111)
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
@@ -5119,22 +5144,63 @@ lineno = __LINE__
 BENCH_START(exch106)
 #ifdef DM_PARALLEL
 lineno = __LINE__
+! TBH:  Note that exchange of z,z_at_w,a_z,a_z_at_w here only 
+! TBH:  needs to be done when rk_step==1 .  Also, some of these halo 
+! TBH:  thicknesses are HUGE!  Reduce if possible.  
+! TBH:  Also, it appears that only the MAXIMUM halo size is used!!  What is 
+! TBH:  up with that?  Registry appears to roll out maximum size halo for 
+! TBH:  all arrays in an RSL_LITE halo update.  We should be able to improve 
+! TBH:  on that!!  Also, RSL_LITE packs/unpacks TWICE -- once for "X" and 
+! TBH:  once again for "Y".  Another opportunity for speedup.  Recall that 
+! TBH:  this kind of optimization allowed SMS to beat hand-coded MPI for Eta 
+! TBH:  which has many more halo updates than ARW, but not nearly as many as 
+! TBH:  solve_em_ad()...  
 #    include "HALO_3784.inc"
 
 #endif
 BENCH_END(exch106)
+
+! TBH:  turn this off once halo debugging is finished
+#ifndef NO_HALO_FIX
+  filecount = 10000 + ((rk_order-rk_step+1)*1000) + 106
+#include <all_debug_halo.h>
+#endif
 
 BENCH_START(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
 !Zhang Xiaoyan add the AD of surface_drag on 12/05/2006
 !---------------------------------------------------------------------------------------------
   IF (rk_step == 1 ) then
+#ifndef NO_HALO_FIX
+WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  its,ite = ', &
+  grid%i_start(ij),',',grid%i_end(ij)
+CALL wrf_message( TRIM(msg) )
+WRITE(msg,'(A,I3,A,I3)') 'DEBUGA_ikj:  jts,jte = ', &
+  grid%j_start(ij),',',grid%j_end(ij)
+CALL wrf_message( TRIM(msg) )
+do j = grid%j_end(ij)-1, grid%j_start(ij), -1
+  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
+    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGA_a_muv_',i,j,' = ',a_muv(i,j)
+    CALL wrf_message( TRIM(msg) )
+  end do
+end do
+#endif
 
  call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u_2, a_u_2, v_2, a_v_2, xland, muu, a_muu, muv, a_muv, z, &
-&a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme,&
+&a_z, z_at_w, a_z_at_w, &
+        ids, ide, jds, jde, kds, kde, &
+        ims, ime, jms, jme, kms, kme, &
   grid%i_start(ij), grid%i_end(ij),                &
   grid%j_start(ij), grid%j_end(ij),                &
   k_start, k_end                                  )
+#ifndef NO_HALO_FIX
+do j = grid%j_end(ij)-1, grid%j_start(ij), -1
+  do i = grid%i_end(ij)-1, grid%i_start(ij), -1
+    WRITE(msg,'(A,I0.2,I0.2,A,G24.18)') 'DEBUGZ_a_muv_',i,j,' = ',a_muv(i,j)
+    CALL wrf_message( TRIM(msg) )
+  end do
+end do
+#endif
   ENDIF
 BENCH_END(comp_a_surface_drag)
 

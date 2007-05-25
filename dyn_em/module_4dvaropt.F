@@ -337,7 +337,7 @@
             ELSE
               WRITE(FileName,FMT="(A,I5.5)") 'field.all.',filecount
             ENDIF
-PRINT *,'DEBUG:  FileName = ',TRIM(FileName)
+!PRINT *,'DEBUG:  FileName = ',TRIM(FileName)
             INQUIRE ( UNIT=fileunit , OPENED = fileinuse )
             IF ( fileinuse ) THEN
               CALL wrf_error_fatal ( "write_field_global3d:  file unit in use" )
@@ -354,27 +354,32 @@ PRINT *,'DEBUG:  FileName = ',TRIM(FileName)
                     ACCESS = 'SEQUENTIAL',   &
                     POSITION = 'APPEND',     &
                     IOSTAT =  ierr )
-PRINT *,'DEBUG:  OPEN ',TRIM(FileName)," IOSTAT = ",ierr
-PRINT *,'DEBUG:  WRITE ',TRIM(arrname),' to ',TRIM(FileName)
+!PRINT *,'DEBUG:  OPEN ',TRIM(FileName)," IOSTAT = ",ierr
+!PRINT *,'DEBUG:  WRITE ',TRIM(arrname),' to ',TRIM(FileName)
               IF ( kds == kdeL ) THEN
                 DO j = jds, jdeL
                   DO i = ids, ideL
-                    WRITE ( fileunit,* ) TRIM(arrname), &
-                      '(',i,',',j,') = ', arr3d_global(i,kds,j)
+! TODO:  fix format to work with any size integers by creating format string 
+! TODO:  on-the-fly based on ideL and jdeL
+                    WRITE ( fileunit,'(A,A,I0.2,A,I0.2,A,G24.18)' ) &
+                      TRIM(arrname),'(',i,',',j,') = ',arr3d_global(i,kds,j)
                   ENDDO
                 ENDDO
               ELSE
                 DO j = jds, jdeL
                   DO k = kds, kdeL
                     DO i = ids, ideL
-                      WRITE ( fileunit,* ) TRIM(arrname), &
-                        '(',i,',',k,',',j,') = ', arr3d_global(i,k,j)
+! TODO:  fix format to work with any size integers by creating format string 
+! TODO:  on-the-fly based on ideL, kdeL, and jdeL
+                      WRITE ( fileunit,'(A,A,I0.2,A,I0.2,A,I0.2,A,G24.18)' ) &
+                        TRIM(arrname),'(',i,',',k,',',j,') = ', &
+                        arr3d_global(i,k,j)
                     ENDDO
                   ENDDO
                 ENDDO
               ENDIF
             ENDIF
-PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
+!PRINT *,'DEBUG:  CLOSE ',TRIM(FileName)
             CLOSE ( fileunit )
           ENDIF
 
