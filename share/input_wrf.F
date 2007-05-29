@@ -502,7 +502,8 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
             CALL wrf_atotime( current_date(1:19), time )
             CALL domain_clock_get( grid, current_time=currtime, &
                                          current_timestr=currtimestr )
-! JRB don't perform the check  for WRFVAR, as we're not passing the right dates around
+! Don't perform the check for WRFVAR, as we're not passing the right dates 
+! around
 #ifndef DA_CORE
             CALL domain_clockprint(150, grid, &
                    'DEBUG input_wrf():  get CurrTime from clock,')
