@@ -48,7 +48,6 @@ SUBROUTINE solve_em ( grid , config_flags  &
 
    !  Definitions of dummy arguments to this routine (generated from Registry).
 #include "em_dummy_new_decl.inc"
-#include "namelist_defines2.inc"
 
    !  Structure that contains run-time configuration (namelist) data for domain
    TYPE (grid_config_rec_type) , INTENT(IN)          :: config_flags
@@ -59,6 +58,11 @@ SUBROUTINE solve_em ( grid , config_flags  &
    INTEGER                         :: ids , ide , jds , jde , kds , kde , &
                                       ims , ime , jms , jme , kms , kme , &
                                       ips , ipe , jps , jpe , kps , kpe
+
+   INTEGER                         :: sids , side , sjds , sjde , skds , skde , &
+                                      sims , sime , sjms , sjme , skms , skme , &
+                                      sips , sipe , sjps , sjpe , skps , skpe
+
 
    INTEGER ::              imsx, imex, jmsx, jmex, kmsx, kmex,    &
                            ipsx, ipex, jpsx, jpex, kpsx, kpex,    &
@@ -156,6 +160,11 @@ SUBROUTINE solve_em ( grid , config_flags  &
                            ipsx, ipex, jpsx, jpex, kpsx, kpex,    &
                            imsy, imey, jmsy, jmey, kmsy, kmey,    &
                            ipsy, ipey, jpsy, jpey, kpsy, kpey )
+
+  CALL get_ijk_from_subgrid (  grid ,                   &
+                            sids, side, sjds, sjde, skds, skde,    &
+                            sims, sime, sjms, sjme, skms, skme,    &
+                            sips, sipe, sjps, sjpe, skps, skpe    )
 
   k_start         = kps
   k_end           = kpe
@@ -949,7 +958,6 @@ BENCH_START(calc_tke_tim)
 
        DO ij = 1 , grid%num_tiles
 
-
           CALL wrf_debug ( 200 , ' call calculate_km_kh' )
           CALL calculate_km_kh( config_flags,grid%dt,grid%dampcoef,grid%zdamp,config_flags%damp_opt,     &
                                 grid%xkmh,grid%xkmhd,grid%xkmv,grid%xkhh,grid%xkhv,grid%bn2,               &
@@ -1275,8 +1283,6 @@ BENCH_START(rk_tend_tim)
                          grid%i_start(ij), grid%i_end(ij),                &
                          grid%j_start(ij), grid%j_end(ij),                &
                          k_start, k_end                                  )
-
-
    END DO
    !$OMP END PARALLEL DO
 BENCH_END(rk_tend_tim)
@@ -1287,8 +1293,6 @@ BENCH_START(relax_bdy_dry_tim)
    DO ij = 1 , grid%num_tiles
 
      IF( (config_flags%specified .or. config_flags%nested) .and. rk_step == 1 ) THEN 
-
-
 
        CALL relax_bdy_dry ( config_flags,                                &
                             grid%em_u_save, grid%em_v_save, ph_save, grid%em_t_save,             &
@@ -1318,7 +1322,6 @@ BENCH_START(relax_bdy_dry_tim)
 
 
      ENDIF
-
 
      CALL rk_addtend_dry( grid%em_ru_tend,  grid%em_rv_tend,  rw_tend,  ph_tend,  t_tend,  &
                           ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &
@@ -1733,8 +1736,8 @@ BENCH_END(spec_bdy_uv_tim)
 !       * + *      * + *        +
 !         *                     *
 !
-!  grid%em_u_2       x
-!  grid%em_v_2                  x
+!  grid%em_u_2               x
+!  grid%em_v_2                          x
 !
 #     include "HALO_EM_C.inc"
 #endif
@@ -1821,7 +1824,6 @@ BENCH_END(spec_bdy_t_tim)
          ! in the scalar advection (flux divergence).  Using
          ! time averaged values gives us exact scalar conservation.
 
-
 BENCH_START(sumflux_tim)
          CALL sumflux ( grid%em_u_2, grid%em_v_2, grid%em_ww,                         &
                         grid%em_u_save, grid%em_v_save, ww1,                  &
@@ -1842,7 +1844,6 @@ BENCH_END(sumflux_tim)
 
 BENCH_START(advance_w_tim)
         IF ( config_flags%non_hydrostatic ) THEN
-
           CALL advance_w( grid%em_w_2, rw_tend, grid%em_ww, grid%em_u_2, grid%em_v_2,       &
                           grid%em_mu_2, grid%em_mut, muave, grid%em_muts,           &
                           t_2save, grid%em_t_2, grid%em_t_save,             &
@@ -1865,7 +1866,6 @@ BENCH_END(advance_w_tim)
 
 BENCH_START(spec_bdynhyd_tim)
            IF (config_flags%non_hydrostatic)  THEN
-
              CALL spec_bdyupdate_ph( ph_save, grid%em_ph_2, ph_tend, mu_tend, grid%em_muts, dts_rk, &
                                      'h'         , config_flags, &
                                      grid%spec_zone,                  &
@@ -2008,9 +2008,6 @@ BENCH_END(phys_bc_tim)
       ! full perturbation variables.
       ! first get updated mu at u and v points
 
-
-
-
 BENCH_START(calc_mu_uv_tim)
       CALL calc_mu_uv_1 ( config_flags,                     &
                           grid%em_muts, muus, muvs,                 &
@@ -2020,7 +2017,6 @@ BENCH_START(calc_mu_uv_tim)
                           grid%j_start(ij), grid%j_end(ij), &
                           k_start    , k_end               )
 BENCH_END(calc_mu_uv_tim)
-
 BENCH_START(small_step_finish_tim)
       CALL small_step_finish( grid%em_u_2, grid%em_u_1, grid%em_v_2, grid%em_v_1, grid%em_w_2, grid%em_w_1,     &
                               grid%em_t_2, grid%em_t_1, grid%em_ph_2, grid%em_ph_1, grid%em_ww, ww1,    &
@@ -2379,8 +2375,6 @@ BENCH_END(small_step_finish_tim)
 
        CALL wrf_debug ( 200 , ' call rk_scalar_tend' )
 
-
-
 BENCH_START(rk_scalar_tend_tim)
 
        CALL rk_scalar_tend (  im, im, config_flags,                                      &
@@ -2447,7 +2441,6 @@ BENCH_END(rlx_bdy_scalar_tim)
    moist_tile_loop_2: DO ij = 1 , grid%num_tiles
 
        CALL wrf_debug ( 200 , ' call rk_update_scalar' )
-
 
 BENCH_START(update_scal_tim)
        CALL rk_update_scalar( im, im,                           &
@@ -2687,10 +2680,12 @@ BENCH_START(chem_adv_tim)
 !!$                                grid%j_start(ij), grid%j_end(ij),  &
 !!$                                k_start, k_end                    )
 !#else
-           CALL flow_dep_bdy_chem( chem(ims,kms,jms,ic),            &
-                                chem_bxs(jms,kms,1,ic),chem_bxe(jms,kms,1,ic),chem_bys(ims,kms,1,ic),chem_bye(ims,kms,1,ic), &
-                                chem_btxs(jms,kms,1,ic),chem_btxe(jms,kms,1,ic),chem_btys(ims,kms,1,ic),chem_btye(ims,kms,1,ic), &
-                                dt_rk, &
+           CALL flow_dep_bdy_chem( chem(ims,kms,jms,ic),                          &
+                                chem_bxs(jms,kms,1,ic), chem_btxs(jms,kms,1,ic),  &
+                                chem_bxe(jms,kms,1,ic), chem_btxe(jms,kms,1,ic),  &
+                                chem_bys(ims,kms,1,ic), chem_btys(ims,kms,1,ic),  &
+                                chem_bye(ims,kms,1,ic), chem_btye(ims,kms,1,ic),  &
+                                dt_rk+grid%dtbc,                                  &
                                 config_flags%spec_bdy_width,grid%em_z,      &
                                 grid%have_bcs_chem,      &
                                 grid%em_ru_m, grid%em_rv_m, config_flags,grid%em_alt,       &
@@ -2831,8 +2826,6 @@ BENCH_END(chem_adv_tim)
    !$OMP PRIVATE ( ij )
    DO ij = 1 , grid%num_tiles
 
-
-
 BENCH_START(calc_p_rho_tim)
 
      CALL calc_p_rho_phi( moist, num_3d_m,                &
@@ -2922,7 +2915,6 @@ BENCH_START(bc_end_tim)
 
 BENCH_START(diag_w_tim)
      IF (.not. config_flags%non_hydrostatic) THEN
-
      CALL diagnose_w( ph_tend, grid%em_ph_2, grid%em_ph_1, grid%em_w_2, grid%em_muts, dt_rk,  &
                       grid%em_u_2, grid%em_v_2, grid%ht,                           &
                       grid%cf1, grid%cf2, grid%cf3, grid%rdx, grid%rdy, grid%msft,          &
