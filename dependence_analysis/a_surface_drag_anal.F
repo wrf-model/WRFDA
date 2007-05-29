@@ -175,6 +175,7 @@ end do
 ! TBH:  HORIZONTAL DEPENDENCE:  xland     ( [    i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  u         ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  v         ( [i-1,i,i+1], [j-1,j,j+1] )
+!TBH:  BUG:  need redundant computations for non-owner computes
 do j = j_endv, j_start, -1
   do i = i_end, i_start, -1
     v0_v = sqrt(v(i,kts,j)**2+((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/4)**2)+epsilon
@@ -262,6 +263,7 @@ end do
 ! TBH:  HORIZONTAL DEPENDENCE:  xland     ( [i-1,i    ], [    j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  u         ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  v         ( [i-1,i,i+1], [j-1,j,j+1] )
+!TBH:  BUG:  need redundant computations for non-owner computes
 do j = j_end, j_start, -1
   do i = i_endu, i_start, -1
     v0_u = sqrt(u(i,kts,j)**2+((v(i,kts,j)+v(i,kts,j+1)+v(i-1,kts,j)+v(i-1,kts,j+1))/4)**2)+epsilon

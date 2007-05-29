@@ -282,9 +282,10 @@
           LOGICAL :: fileinuse
           LOGICAL, EXTERNAL :: wrf_dm_on_monitor
           LOGICAL, PARAMETER :: binary_output = .FALSE.
+          INTEGER ierr
 #ifdef DM_PARALLEL
           INCLUDE 'mpif.h'
-          INTEGER ierr, mpi_comm_local
+          INTEGER mpi_comm_local
 #endif
         IF ( ( min_filecount <= filecount ) .AND. &
              ( filecount <= max_filecount ) ) THEN
