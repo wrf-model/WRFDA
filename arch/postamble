@@ -40,7 +40,7 @@ module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
 module_start.o module_initialize.o module_initialize_b_wave.o  \
 module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
 module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
-module_configure.o mediation_interp_domain.o                   \
+module_configure.o mediation_interp_domain.o solve_em.o        \
 mediation_force_domain.o mediation_feedback_domain.o           \
 module_initialize_real.o module_dm.o start_domain.o \
 nest_init_utils.o couple_or_uncouple_em.o solve_interface.o :

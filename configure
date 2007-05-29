@@ -1,7 +1,7 @@
 #!/bin/ksh
 
-export DA_CORE=1
-export EM_CORE=1
+export DA_CORE=0
+export EM_CORE=0
 export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
@@ -17,21 +17,23 @@ option=$1
 
 if [ "$option" = "wrf" ] ; then
     REGISTRY=Registry.EM
-    DA_CORE=0
+    EM_CORE=1
 elif [ "$option" = "wrf_em" ] ; then
     REGISTRY=Registry.EM
-    DA_CORE=0
+    EM_CORE=1
 elif [ "$option" = "wrf_em_nl" ] ; then
     REGISTRY=Registry.EM_NL
-    DA_CORE=0
+    EM_CORE=1
 elif [ "$option" = "wrf_em_chem" ] ; then
-    REGISTRY=Registry.NMM
-    DA_CORE=0
+    REGISTRY=Registry.EM_CHEM
+    EM_CORE=1
 elif [ "$option" = "wrf_nmm" ] ; then
     NMM_CORE=1
-    EM_CORE=0
-    DA_CORE=0
     REGISTRY=Registry.NMM
+else
+    DA_CORE=1
+    EM_CORE=1
+    REGISTRY=Registry.wrfvar
 fi
 
 # lifted from the configure file for mpich; 00/03/10 jm

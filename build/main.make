@@ -70,7 +70,6 @@ convert_nmm.o: \
 	module_configure.o \
 	module_timing.o \
 	module_dm.o \
-	module_wrf_esmf_super.o \
 	module_bc.o \
 	module_io_domain.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
@@ -82,7 +81,6 @@ ideal.o: \
 	module_configure.o \
 	module_timing.o \
 	module_dm.o \
-	module_wrf_esmf_super.o \
 	module_io_domain.o \
 	$(CASE_MODULE) \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
@@ -94,7 +92,6 @@ ndown_em.o: \
 	module_configure.o \
 	module_timing.o \
 	module_dm.o \
-	module_wrf_esmf_super.o \
 	module_wrf_error.o \
 	wrf_debug.o \
 	module_integrate.o \
@@ -116,7 +113,6 @@ wrf.o: \
 	module_wrf_error.o \
 	wrf_debug.o \
 	module_dm.o \
-	module_wrf_esmf_super.o \
         module_wrf_top.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 

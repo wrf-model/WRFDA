@@ -1196,6 +1196,52 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for AIX, xlf, optimised                       (RSL_LITE, IBM-MPI, RSL IO)
+#
+M4              = m4 -B24000
+FC              = mpxlf90_r
+FFC             = xlf_r
+SFC             = xlf90_r
+CC              = mpcc_r
+CC_TOOLS        = cc_r
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 8
+
+TRADFLAG        =
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = -I$(RSL)/RSL
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+
+FCOPTIM         = -O2 -qarch=auto
+FCDEBUG         = 
+FCTYPE          = -qrealsize=8
+FCFREE          = -qfree=f90
+FCENDIAN        =
+FCBASE          = -w -qspill=20000 -qmaxmem=32767
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+CCFLAGS_RSL     =
+
+LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
+
+LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
+MPI_LIB         = -L$(RSL_LITE) -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+	( cd $(RSL_LITE); make clean )
+
+arch_superclean :
+	( cd $(RSL_LITE); make superclean )
+
+###########################################################
 #ARCH Settings for crayx1 UNICOS/mp CRAY X1, serial          (Single-threaded) 
 
 SED_FTN         = sed -f ../arch/cray_csd.sed

@@ -30,6 +30,7 @@ links :
 	@ $(LN) $(IO_GRIB2)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
+	@ $(LN) $(RSL_LITE)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(ARCH)/*.sed .
 	@ $(LN) $(CONVERTOR)/da_module_convert_tool/* .
@@ -59,6 +60,7 @@ include io_grib.make
 include ioapi_share.make
 include main.make
 include RSL.make
+include RSL_LITE.make
 
 # makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
 # which is wrong, try to encourage it to use the correct one, but note that brain
@@ -70,7 +72,7 @@ real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
               module_driver_constants.o module_io_domain.o module_initialize_real.o \
               module_domain.o module_machine.o 
 
-depend : arch links registry module_state_description.F md_calls.inc \
+depend : links arch registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	makedepf90 -free $(FPPFLAGS) \
            *.F *.f90 *.F90 2>/dev/null > depend.txt
