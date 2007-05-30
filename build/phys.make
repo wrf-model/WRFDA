@@ -48,7 +48,8 @@ PHYS_MODULES = \
         module_fddagd_driver.o \
 	module_fddaobs_driver.o \
 	module_fddaobs_rtfdda.o \
-	module_diagnostics.o
+	module_diagnostics.o \
+        module_mixactivate.o
 
   
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)

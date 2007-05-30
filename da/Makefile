@@ -87,7 +87,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_control.o			  \
                         da_par_util1.o                    \
 			da_alloc_and_copy_be_arrays.inc   \
-			da_be_local_copy.inc              \
 			da_copy_dims.inc                  \
 			da_copy_tile_dims.inc             \
 			da_cv_to_vv.inc                   \
@@ -99,7 +98,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_proc_sum_int.inc               \
 			da_proc_sum_ints.inc              \
 			da_proc_sum_real.inc              \
-			da_transpose.inc                  \
 			da_unpack_count_obs.inc           \
 			da_vv_to_cv.inc                   \
 			da_wrf_dm_interface.inc           \
@@ -165,8 +163,6 @@ da_minimisation.o:	da_minimisation.f90 \
 			da_get_innov_vector.inc \
 			da_dot.inc \
 			da_dot_cv.inc \
-			da_minimisation_warning.inc \
-			da_sum_reals.inc \
 			da_write_diagnostics.inc \
 			da_calculate_grady.inc   \
 			da_minimise_cg.inc
@@ -185,12 +181,9 @@ da_setup_structures.o:	da_setup_structures.f90 \
 	                da_spectral.o \
 			da_radiance.o \
                         da_wrfvar_io.o \
-			da_add_increments.inc \
-			da_add_pbl_and_sfc_info.inc \
 			da_chgvres.inc \
 			da_get_vertical_truncation.inc \
 			da_interpolate_regcoeff.inc \
-			da_interpolate_stats.inc \
 			da_rescale_background_errors.inc \
 			da_setup_background_errors.inc \
 			da_setup_be_global.inc \
@@ -303,8 +296,7 @@ da_obs.o:		da_obs.f90 \
 			da_use_obs_errfac.inc \
 			da_write_obs.inc \
 			da_write_filtered_obs.inc \
-			da_write_y.inc \
-                        da_deallocate_obs.inc
+			da_write_y.inc
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_obs.f90 > da_obs.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_obs.f
@@ -319,8 +311,6 @@ da_pseudo.o:		da_pseudo.f90 \
 			da_jo_and_grady_pseudo.inc \
 			da_residual_pseudo.inc \
 			da_get_innov_vector_pseudo.inc \
-			da_oa_stats_pseudo.inc \
-			da_ob_stats_pseudo.inc \
 			da_print_stats_pseudo.inc \
 			da_transform_xtoy_pseudo.inc \
 			da_transform_xtoy_pseudo_adj.inc
@@ -657,7 +647,6 @@ da_ssmi.o:		da_ssmi.f90 \
 			da_transform_xtozrhoq.inc \
 			da_transform_xtozrhoq_lin.inc \
 			da_transform_xtozrhoq_adj.inc \
-			da_sigma_v.inc \
 			da_jo_and_grady_ssmt1.inc \
 			da_jo_and_grady_ssmt2.inc \
 			da_residual_ssmt1.inc \
@@ -692,8 +681,6 @@ da_qscat.o:		da_qscat.f90 \
 			da_residual_qscat.inc \
 			da_check_max_iv_qscat.inc \
 			da_get_innov_vector_qscat.inc \
-			da_oa_stats_qscat.inc \
-			da_ob_stats_qscat.inc \
 			da_print_stats_qscat.inc \
 			da_transform_xtoy_qscat.inc \
 			da_transform_xtoy_qscat_adj.inc
@@ -805,7 +792,6 @@ da_physics.o:		da_physics.f90 \
 			da_tpq_to_slp.inc \
 			da_tpq_to_slp_lin.inc \
 			da_tpq_to_slp_adj.inc \
-			da_tpq_to_thickness.inc \
 			da_tprh_to_q_adj.inc \
 			da_tprh_to_q_lin.inc \
 			da_tp_to_qs.inc \
@@ -823,7 +809,6 @@ da_physics.o:		da_physics.f90 \
 			da_transform_xtogpsref_lin.inc \
 	                da_check_rh.inc \
 	                da_check_rh_simple.inc \
-	                da_e_qv_from_rh.inc \
 	                da_get_q_error.inc \
 			da_roughness_from_lanu.inc \
 			da_sfc_wtq.inc \
@@ -847,9 +832,6 @@ da_ffts.o:		\
 			da_define_structures.o \
 			da_par_util.o \
 			da_ffts.f90 \
-			da_fast_cosine_transform.inc \
-			da_fast_sine_transform.inc \
-			da_qpassm.inc \
 			da_solve_poissoneqn_fct.inc \
 			da_solve_poissoneqn_fct_adj.inc \
 			da_solve_poissoneqn_fst.inc \
@@ -863,7 +845,6 @@ da_tools.o:		\
 			da_define_structures.o \
 			da_tools.f90 \
 			da_map_utils_defines.inc \
-			da_map_utils.inc \
 			da_1d_eigendecomposition.inc \
 			da_diff_seconds.inc \
 			da_obs_sfc_correction.inc \
@@ -1087,9 +1068,7 @@ da_spectral.o:		da_spectral.f90             \
 			da_setlegpol.inc            \
 			da_setlegpol_test.inc       \
 			da_test_spectral.inc        \
-			da_v_to_vv_spectral.inc     \
 			da_vv_to_v_spectral.inc     \
-			da_v_to_vv_spectral_adj.inc \
 			da_legtra_inv_adj.inc       \
 			da_apply_power.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_spectral.f90 > da_spectral.f
@@ -1103,9 +1082,7 @@ da_wrfvar_io.o : da_wrfvar_io.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_io.f
 
 da_wrfvar_top.o : da_wrfvar_top.f90 \
-                             da_wrfvar_init.inc \
                              da_wrfvar_run.inc \
-                             da_wrfvar_finalize.inc \
                              da_wrfvar_interface.inc \
                   da_wrfvar_io.o \
                       da_tracing.o
@@ -1138,8 +1115,6 @@ da_tracing.o:           da_tracing.f90           \
 
 da_reporting.o:         da_reporting.f90       \
                         da_error.inc           \
-                        da_messages.inc        \
-                        da_messages2.inc       \
                         da_warning.inc
 			$(CPP) $(CPPFLAGS) -I../inc da_reporting.f90 > da_reporting.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_reporting.f
@@ -1169,23 +1144,12 @@ da_radiance.o:		da_radiance.f90 \
 			da_statistics.o \
 			da_tools.o		\
 			da_par_util.o		\
-			rttov_const.o	\
-			rttov_types.o  \
 			gsi_kinds.o		\
 			gsi_constants.o	\
-			da_rtm_init.inc   \
-			da_rtm_direct.inc \
-			da_rtm_tl.inc \
-			da_rtm_ad.inc \
 			da_calculate_grady_rad.inc \
 			da_jo_and_grady_rad.inc \
 			da_residual_rad.inc \
-			da_transform_xtoy_rad.inc \
-			da_transform_xtoy_rad_adj.inc \
-			da_get_innov_vector_rad.inc \
-			da_biascorr_rad.inc \
 			da_biasprep.inc \
-			da_biaspredictor.inc \
 			da_qc_rad.inc \
 			da_qc_amsua.inc \
 			da_qc_amsub.inc \
@@ -1194,8 +1158,6 @@ da_radiance.o:		da_radiance.f90 \
 			da_read_bufrssmis.inc \
 			da_read_kma1dvar.inc \
 			da_setup_bufrtovs_structures.inc \
-			da_oma_stats_rad.inc  \
-			da_omb_stats_rad.inc  \
 			da_print_stats_rad.inc \
 			da_detsurtyp.inc \
 			gsi_emiss.inc \
@@ -1207,25 +1169,6 @@ da_radiance.o:		da_radiance.f90 \
 			$(RM) $@
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance.f90 > da_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance.f
-
-rttov_const.o:		rttov_const.f90 \
-                        parkind1.o
-			$(RM) $@
-			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_const.f90 > rttov_const.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_const.f
-
-rttov_global.o:		rttov_global.f90 \
-                        parkind1.o	\
-			rttov_const.o
-			$(RM) $@
-			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_global.f90 > rttov_global.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_global.f
-
-rttov_types.o:		rttov_types.f90 \
-                        parkind1.o	\
-			rttov_const.o
-			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc rttov_types.f90 > rttov_types.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) rttov_types.f
 
 parkind1.o:		parkind1.f90
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc parkind1.f90 > parkind1.f
