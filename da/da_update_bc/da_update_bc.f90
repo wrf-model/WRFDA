@@ -691,6 +691,8 @@ program da_update_bc
          write(unit=stdout,fmt=*) 'only lateral boundary updated.'
       end if
    end if
+   
+   write (unit=stdout,fmt=*) "*** Update_bc completed successfully ***"
 
 end program da_update_bc
 
