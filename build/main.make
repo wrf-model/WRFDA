@@ -13,12 +13,27 @@ $(SOLVER)_wrf_ESMFApp : setup $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ES
 	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o $(WRF_LIB)
 	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o $(WRF_LIB)
 
-$(SOLVER)_ideal : setup $(WRF_LIBS) module_initialize ideal.o
-	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
+$(SOLVER)_real : setup $(WRF_LIBS) module_initialize_real.o real_$(SOLVER).o ndown_$(SOLVER).o
+	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_real.o $(WRF_LIB)
+	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_real.o $(WRF_LIB)
 
-$(SOLVER)_real : setup $(WRF_LIBS) module_initialize real_$(SOLVER).o ndown_$(SOLVER).o
-	$(LD) -o real.exe $(LDFLAGS) real_$(SOLVER).o module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
-	$(LD) -o ndown.exe $(LDFLAGS) ndown_$(SOLVER).o  module_initialize_$(IDEAL_CASE).o $(WRF_LIB)
+em_quarter_ss : setup $(WRF_LIBS) module_initialize_quarter_ss.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_quarter_ss.o $(WRF_LIB)
+
+em_squall2d_x : setup $(WRF_LIBS) module_initialize_squall2d_x.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_squall2d_x.o $(WRF_LIB)
+
+em_squall2d_y : setup $(WRF_LIBS) module_initialize_squall2d_y.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_squall2d_y.o $(WRF_LIB)
+
+em_b_wave : setup $(WRF_LIBS) module_initialize_b_wave.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_b_wave.o $(WRF_LIB)
+
+em_hill2d_x : setup $(WRF_LIBS) module_initialize_hill2d_x.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_hill2d_x.o $(WRF_LIB)
+
+em_grav2d_x : setup $(WRF_LIBS) module_initialize_grav2d_x.o ideal.o
+	$(LD) -o ideal.exe $(LDFLAGS) ideal.o module_initialize_grav2d_x.o $(WRF_LIB)
 
 convert_bioemiss : setup $(WRF_LIBS) convert_bioemiss.o
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o libwrf.a $(WRF_LIB)
@@ -47,9 +62,6 @@ real_nmm : $(WRF_LIBS) real_nmm.o module_initialize_real.o \
 
 convert_nmm : $(WRF_LIBS) convert_nmm.o
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o $(WRF_LIB)
-
-module_initialize : module_initialize_$(IDEAL_CASE).o
-
 
 diffwrf : diffwrf_netcdf.exe diffwrf_int.exe
 
@@ -82,7 +94,6 @@ ideal.o: \
 	module_timing.o \
 	module_dm.o \
 	module_io_domain.o \
-	$(CASE_MODULE) \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
 ndown_em.o: \

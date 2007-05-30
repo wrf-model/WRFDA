@@ -12,13 +12,7 @@ DYN_MODULES =                 		\
         module_TIMERS.o                 \
         module_ZEROX.o                  \
         module_si_io_nmm.o              \
-        module_initialize_real.o        \
-	$(CASE_MODULE)
-
-#        module_INDX.o                   \
-
-# possible CASE_MODULE settings
-#	module_initialize_nmm.o        
+        module_initialize_real.o
 
 DYN_OBJS    = 		          	\
 	read_nmm.o			\

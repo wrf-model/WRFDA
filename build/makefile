@@ -63,19 +63,16 @@ include RSL.make
 include RSL_LITE.make
 
 # makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
-# which is wrong, try to encourage it to use the correct one, but note that brain
-# dead Aix still goes with the rule in depend.txt
+# which is wrong, try to encourage it to use the correct one by manually defining
+# the test cases in main.make
 
-real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
-              module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
-              module_dm.o module_utility.o module_timing.o module_configure.o \
-              module_driver_constants.o module_io_domain.o module_initialize_real.o \
-              module_domain.o module_machine.o 
+IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|convert_emiss|convert_bioemiss|ideal"
 
 depend : links arch registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
 	makedepf90 -free $(FPPFLAGS) \
-           *.F *.f90 *.F90 2>/dev/null > depend.txt
+           *.F *.f90 *.F90 2>/dev/null \
+           | grep -vEe $(IGNORE) > depend.txt
 	touch depend
 	
 include depend.txt

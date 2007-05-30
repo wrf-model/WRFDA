@@ -8,18 +8,7 @@ DYN_MODULES =                 		\
         module_em.o         		\
         module_solvedebug_em.o    	\
         module_bc_em.o                  \
-        module_init_utilities.o         \
-	$(CASE_MODULE)
-
-# possible CASE_MODULE settings
-#	module_initialize_b_wave.o      \
-#	module_initialize_grav2d_x.o   \
-#	module_initialize_hill2d_x.o    \
-#	module_initialize_quarter_ss.o  \
-#	module_initialize_real.o        \
-#	module_initialize_lsm_x.o  \
-#	module_initialize_squall2d_x.o  \
-#	module_initialize_squall2d_y.o 
+        module_init_utilities.o
 
 DYN_OBJS    = 		        \
 	init_modules_em.o       \
