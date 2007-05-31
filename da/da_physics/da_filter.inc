@@ -1,10 +1,12 @@
-subroutine da_filter(var, xp)
+subroutine da_filter(grid, var, xp)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
    
    type (xpose_type), intent(inout) :: xp      ! Transpose variables.
 
@@ -24,7 +26,7 @@ subroutine da_filter(var, xp)
 
    ! Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x (xp)
+   call da_transpose_z2x (grid)
 
    ! Perform x-direction filter:
 
@@ -47,7 +49,7 @@ subroutine da_filter(var, xp)
 
    ! Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y (xp)
+   call da_transpose_x2y (grid)
 
    ! Perform y-direction filter:
 
@@ -69,7 +71,7 @@ subroutine da_filter(var, xp)
 
    ! Apply (i',j,k' -> i',j',k) transpose (v1y -> v1z).
 
-   call da_transpose_y2z (xp)
+   call da_transpose_y2z (grid)
 
    var(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
       xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)

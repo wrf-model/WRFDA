@@ -1,4 +1,4 @@
-subroutine da_uv_to_divergence_adj(xp, xb, u, v, div)
+subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of the subroutine da_uv_to_divergence
@@ -8,6 +8,8 @@ subroutine da_uv_to_divergence_adj(xp, xb, u, v, div)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)      :: grid
 
    type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 
@@ -110,7 +112,7 @@ subroutine da_uv_to_divergence_adj(xp, xb, u, v, div)
 
          if (.not. Testing_WRFVAR) then
             xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
-            call wrf_dm_halo(xp%domdesc,xp%comms,HALO_2D_WORK)
+#include "HALO_2D_WORK.inc"
 
             div(is, js:je, k) = xp%vxy(is, js:je)
             div(ie, js:je, k) = xp%vxy(ie, js:je)

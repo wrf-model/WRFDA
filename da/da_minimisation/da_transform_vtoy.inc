@@ -33,7 +33,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
    call da_trace_entry("da_transform_vtoy")
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
+   call da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')

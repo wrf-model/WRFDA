@@ -1,10 +1,12 @@
-subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v)
+subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_balance_equation
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    type (xb_type), intent(in) :: xb               ! First guess structure.
    type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
@@ -55,7 +57,7 @@ subroutine da_balance_equation_adj( xb, xbx, xp, phi_b, u, v)
    ! [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !---------------------------------------------------------------------------
 
-   call da_solve_poissoneqn_fst_adj(xbx, xp, phi_b, &
+   call da_solve_poissoneqn_fst_adj(grid,xbx, xp, phi_b, &
                                  del2phi_b)
 
    !---------------------------------------------------------------------------

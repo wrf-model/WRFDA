@@ -1,4 +1,4 @@
-subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
+subroutine da_check_xtoy_adjoint(grid, xb, xa, iv, xp, y)
    
    !--------------------------------------------------------------------------
    ! Purpose: Test observation operator transform and adjoint for compatibility.
@@ -7,6 +7,8 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    !---------------------------------------------------------------------------
    
    implicit none
+
+   type (domain)                    :: grid
    
    type (xb_type),    intent(in)    :: xb    ! first guess (local).
    type (x_type),     intent(inout) :: xa    ! analysis increments (local).
@@ -38,7 +40,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    !----------------------------------------------------------------------
 
    ! Exchange XA (u, v, t, p, q, psfc) halo region.
-   call wrf_dm_halo (xp%domdesc,xp%comms,HALO_XA)
+#include "HALO_XA.inc"
 
    !  xa%u(ims:ime, jms:jme, kms:kme) = 0.0
    !  xa%v(ims:ime, jms:jme, kms:kme) = 0.0
@@ -66,7 +68,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
    if (sfc_assi_options == 2) then
       call da_transform_xtowtq (xp, xb, xa)
       ! Exchange XA (surface variable: u10, v10, t2, q2) halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
+#include "HALO_SFC_XA.inc"
    end if
 
    if (use_ssmt1obs .or. use_ssmt2obs .or. use_GpspwObs .or. &
@@ -93,7 +95,7 @@ subroutine da_check_xtoy_adjoint(xb, xa, iv, xp, y)
       if (use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
       ! Exchange XA halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SSMI_XA)
+#include "HALO_SSMI_XA.inc"
    end if
 
    !----------------------------------------------------------------------

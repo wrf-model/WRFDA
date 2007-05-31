@@ -1,4 +1,4 @@
-subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
+subroutine da_solve_poissoneqn_fct(grid, xbx, del2b, b, xp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Solve Del**2 B = A for B with zero gradient boundary conditions.
@@ -10,6 +10,8 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
    !--------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
    
    type (xbx_type),   intent(in)    :: xbx     ! Header & non-gridded vars.
    type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
@@ -62,7 +64,7 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
 
    ! [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x (xp)
+   call da_transpose_z2x (grid)
 
    ! [2.2] Set up FFT parameters:
 
@@ -120,8 +122,8 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
 
    ! [3.1] Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y (xp)
-   call da_transpose_x2y_v2 (xp)
+   call da_transpose_x2y (grid)
+   call da_transpose_x2y_v2 (grid)
 
    ! [3.2] Set up FFT parameters:
 
@@ -210,8 +212,8 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
 
    ! Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
-   call da_transpose_y2x (xp)
-   call da_transpose_y2x_v2 (xp)
+   call da_transpose_y2x (grid)
+   call da_transpose_y2x_v2 (grid)
 
    ! Set up FFT parameters:
 
@@ -258,7 +260,7 @@ subroutine da_solve_poissoneqn_fct(xbx, del2b, b, xp)
 
    ! Apply (i,j',k') -> i',j',k) transpose to restore v1z.
 
-   call da_transpose_x2z (xp)
+   call da_transpose_x2z (grid)
 
    ! Remove mean b (set arbitrary constant to zero):
 

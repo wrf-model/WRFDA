@@ -1,4 +1,4 @@
-subroutine da_setup_testfield(xb, xa, xp)
+subroutine da_setup_testfield(grid,xb, xa, xp)
 
    !----------------------------------------------------------------------------
    ! Purpose: produce test increment field based on xb field.
@@ -7,6 +7,8 @@ subroutine da_setup_testfield(xb, xa, xp)
    !----------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)                  :: grid
 
    type (xb_type),    intent(in)  :: xb  ! first guess (local).
    type (x_type) ,    intent(inout) :: xa  ! gridded analy. incs. (local)
@@ -61,11 +63,11 @@ subroutine da_setup_testfield(xb, xa, xp)
    end if
 
    ! Exchange XA halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_XA)
+#include "HALO_XA.inc"
 
    if (sfc_assi_options == 2) then
       ! Exchange XA (surface variable) halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
+#include "HALO_SFC_XA.inc"
    end if
 
    if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -84,7 +86,7 @@ subroutine da_setup_testfield(xb, xa, xp)
       end if
 
       ! Exchange XA halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SSMI_XA)
+#include "HALO_SSMI_XA.inc"
    end if
 
    write(unit=stdout, fmt='(/a/)') &

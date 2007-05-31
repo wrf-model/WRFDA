@@ -241,7 +241,7 @@ subroutine da_transfer_xatowrf(grid)
 
    ! Fill the halo region for u and v.
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_PSICHI_UV_ADJ)
+#include "HALO_PSICHI_UV_ADJ.inc"
 
    ! Fill the boundary
 

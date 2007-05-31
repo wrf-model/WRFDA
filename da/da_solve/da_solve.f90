@@ -19,9 +19,15 @@ subroutine da_solve ( grid , config_flags)
    use module_tiles, only : set_tiles
 
 #ifdef DM_PARALLEL
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, local_communicator_x, &
+      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
+      ntasks, data_order_xy
+#else
    use module_dm, only : invalid_message_value, glen,setup_xpose_rsl, &
       add_msg_24pt_real,reset_msgs_24pt,stencil_24pt,setup_halo_rsl, &
       reset_msgs_xpose, add_msg_xpose_real, define_xpose, add_msg_24pt_integer
+#endif
 #endif
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
@@ -31,7 +37,8 @@ subroutine da_solve ( grid , config_flags)
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
-      rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef
+      rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef, ims, ime, &
+      kps, kpe, jms, jme, kms, kme
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -218,7 +225,7 @@ subroutine da_solve ( grid , config_flags)
       call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
       if (test_transforms) then
-         call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+         call da_check(grid, cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, y)
          call wrfu_finalize
          call wrf_shutdown
@@ -226,7 +233,7 @@ subroutine da_solve ( grid , config_flags)
       end if
 
       if (testing_wrfvar) then
-         call da_check( cv_size, grid%xb, xbx, be, grid%ep, iv, &
+         call da_check(grid, cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, y)
          call wrfu_finalize
          call wrf_shutdown
@@ -260,7 +267,7 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.5] Update latest analysis solution:
 
-      call da_transform_vtox( cv_size, grid%xb, xbx, be, grid%ep, xhat, &
+      call da_transform_vtox(grid, cv_size, grid%xb, xbx, be, grid%ep, xhat, &
          grid%vv, grid%vp, grid%xp, grid%xa)
 
       ! [8.6] Only when use_RadarObs = .false. and calc_w_increment =.true.,
@@ -269,7 +276,7 @@ subroutine da_solve ( grid , config_flags)
       if (calc_w_increment .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
 
-         call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_RADAR_XA_W)
+#include "HALO_RADAR_XA_W.inc"
       end if
 
       ! [8.7] Write out diagnostics

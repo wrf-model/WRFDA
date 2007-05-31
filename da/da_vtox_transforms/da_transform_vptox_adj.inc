@@ -1,10 +1,12 @@
-subroutine da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
+subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    !--------------------------------------------------------------------------
    ! Purpose: Adjoint for Physical transform of variables 
    !--------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)                        :: grid
 
    type (xb_type), intent(in)           :: xb  ! First guess structure.
    type (x_type), intent(inout)         :: xa  ! Grad_x(Jo)
@@ -47,7 +49,7 @@ subroutine da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
 
    endif
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV_ADJ)
+#include "HALO_PSICHI_UV_ADJ.inc"
 
    ! Transform psi and chi to u and v:
    call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &

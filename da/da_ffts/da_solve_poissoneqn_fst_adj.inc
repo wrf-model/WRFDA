@@ -1,4 +1,4 @@
-subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
+subroutine da_solve_poissoneqn_fst_adj(grid, xbx, xp, b, del2b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Solve Del**2 B = A for B with zero field boundary conditions.
@@ -11,6 +11,8 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
    
    type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
    type (xpose_type),intent(inout)  :: xp      ! Dimensions and xpose buffers. 
@@ -51,7 +53,7 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
 
    ! [2.1] Apply (i',j',k -> i,j',k') transpose (v1z -> v1x).
 
-   call da_transpose_z2x (xp)
+   call da_transpose_z2x (grid)
 
    ! [2.2] Set up FFT parameters:
    
@@ -108,8 +110,8 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
 
    ! [3.1] Apply (i,j',k' -> i',j,k') transpose (v1x -> v1y).
 
-   call da_transpose_x2y (xp)
-   call da_transpose_x2y_v2 (xp)
+   call da_transpose_x2y (grid)
+   call da_transpose_x2y_v2 (grid)
 
    ! [3.2] Set up FFT parameters:
 
@@ -194,8 +196,8 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
 
    ! Apply (i',j,k' -> i,j',k') transpose (v1y -> v1x).
 
-   call da_transpose_y2x (xp)
-   call da_transpose_y2x_v2 (xp)
+   call da_transpose_y2x (grid)
+   call da_transpose_y2x_v2 (grid)
 
    ! Set up FFT parameters:
 
@@ -244,9 +246,9 @@ subroutine da_solve_poissoneqn_fst_adj(xbx, xp, b, del2b)
 
    ! Apply (i,j',k') -> i',j',k) transpose to restore v1z.
    
-   call da_transpose_x2z (xp)
+   call da_transpose_x2z (grid)
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_BAL_EQN_ADJ)
+#include "HALO_BAL_EQN_ADJ.inc"
 
    ! [2.5] Write data array into del2b:
 

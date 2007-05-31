@@ -8,7 +8,14 @@ module da_par_util
 
    use module_domain, only : domain, xpose_type
 #ifdef DM_PARALLEL
-   use module_dm, only : io2d_ij_internal, io3d_ijk_internal 
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, local_communicator_x, &
+      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz
+#else
+   use module_dm, only : io2d_ij_internal, io3d_ijk_internal, &
+      invalid_message_value, setup_xpose_rsl, define_xpose,reset_msgs_xpose, &
+      add_msg_xpose_real
+#endif
    use mpi, only : mpi_2double_precision, mpi_status_size, &
       mpi_integer, mpi_maxloc, mpi_status_size, &
       mpi_minloc, mpi_sum
@@ -17,8 +24,11 @@ module da_par_util
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
       y_type, count_obs_number_type, count_obs_type, maxmin_field_type
 #ifdef DM_PARALLEL
-   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real, &
-      true_mpi_real, true_mpi_complex, true_rsl_real
+#ifndef RSL_LITE
+   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real
+#else
+   use da_par_util1, only : true_mpi_real, true_mpi_complex
+#endif
 #endif
    use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &
       rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &

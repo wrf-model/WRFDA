@@ -1,10 +1,12 @@
-subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
+subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform x' = Uv. 
    !--------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    integer, intent(in)                  :: cv_size ! Size of cv array.
    type (xb_type), intent(in)           :: xb   ! first guess.
@@ -34,7 +36,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    if (global) then
       call da_transform_vtovv_global(cv_size, xbx, be, cv, vv) 
    else
-      call da_transform_vtovv(cv_size, xb, be, cv, vv, xp)
+      call da_transform_vtovv(grid, cv_size, xb, be, cv, vv, xp)
    end if
 
    !----------------------------------------------------------------------
@@ -63,7 +65,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    ! [3.0]: Perform x = u_p vp transform::
    !----------------------------------------------------------------------
 
-   call da_transform_vptox(xb, vp, xp, xa, be, ep)
+   call da_transform_vptox(grid, xb, vp, xp, xa, be, ep)
 
    !----------------------------------------------------------------------
    ! [4.0]: Move the following:
@@ -117,12 +119,12 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (.not.testing_wrfvar) then
       ! Exchange XA halo region.
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_XA)
+#include "HALO_XA.inc"
 
       if (sfc_assi_options == 2) then
          call da_transform_xtowtq (xp, xb, xa)
          ! Exchange XA (surface variable) halo region.
-         call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
+#include "HALO_SFC_XA.inc"
       end if
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -146,7 +148,7 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          if (Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
          ! Exchange XA halo region.
-         call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SSMI_XA)
+#include "HALO_SSMI_XA.inc"
       end if
    end if
 
@@ -163,12 +165,12 @@ subroutine da_transform_vtox(cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          end do
       end do
 
-      call wrf_dm_halo(xp%domdesc,xp%comms,HALO_RADAR_XA_W)
+#include "HALO_RADAR_XA_W.inc"
  
       if (use_radarobs .and. Use_Radar_rf) then
          ! Partition of hydrometeor increments via warm rain process
 
-         call da_moist_phys_lin( xb, xa, xp)
+         call da_moist_phys_lin(grid, xb, xa, xp)
 
       endif
    end if

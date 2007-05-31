@@ -1,4 +1,4 @@
-subroutine da_uvprho_to_w_adj(xb, xa, xp)
+subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculates vertical velocity increments from Richardson's Eq.
@@ -8,6 +8,8 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)                    :: grid
 
    type (xb_type), intent(in)       :: xb           ! First guess structure.
    type (x_type), intent(inout)     :: xa           ! increment structure.
@@ -84,7 +86,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid,xp, xb, URHO,VRHO, DIV)
 
    ! Computation to check for edge of domain:
    if (Testing_WRFVAR) then
@@ -125,7 +127,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid,xp, xb, URHO,VRHO, DIV)
 
    do K=kts,kte
       do J=js,je
@@ -161,7 +163,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
       end do
    end do
 
-   call da_uv_to_divergence_adj(xp, xb, xa%u,xa%v, DIV)
+   call da_uv_to_divergence_adj(grid,xp, xb, xa%u,xa%v, DIV)
 
    ! Computation to check for edge of domain:
    is = its
@@ -234,7 +236,7 @@ subroutine da_uvprho_to_w_adj(xb, xa, xp)
 
    xp%v1z(its:ite, jts:jte, kts:kte) = wz(its:ite, jts:jte, kts:kte)
 
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_BAL_EQN_ADJ)
+#include "HALO_BAL_EQN_ADJ.inc"
 
    if (its == ids) then
       is = ids+1

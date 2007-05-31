@@ -196,6 +196,49 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL_LITE, MPI, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc -DMPI2_SUPPORT
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+                    
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+
+FCOPTIM         = -O2 -fast
+FCDEBUG         =
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
+MPI_LIB         = -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+	
+###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95, serial      (Single-threaded)
 #
 FC              = g95
@@ -1213,7 +1256,7 @@ FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
                     
 DM_CPPFLAGS     = -I$(RSL_LITE)
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2 -qarch=auto
 FCDEBUG         = 
@@ -1231,16 +1274,14 @@ LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
                       -L/usr/X11R6/lib -lX11
-MPI_LIB         = -L$(RSL_LITE) -lrsl_lite
+MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
 	@ touch arch
 
 arch_clean :
-	( cd $(RSL_LITE); make clean )
 
 arch_superclean :
-	( cd $(RSL_LITE); make superclean )
 
 ###########################################################
 #ARCH Settings for crayx1 UNICOS/mp CRAY X1, serial          (Single-threaded) 

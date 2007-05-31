@@ -6,10 +6,19 @@ module da_vtox_transforms
    !---------------------------------------------------------------------------
   
    use module_dm, only : wrf_dm_sum_real,wrf_dm_sum_reals
-   use module_domain, only : ep_type, vp_type, x_type, xb_type, xpose_type
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, & 
+      ntasks_y, data_order_xy, data_order_xyz
+#endif
+#ifdef RSL
+   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
+      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
+#endif
+   use module_domain, only : ep_type, vp_type, x_type, xb_type, xpose_type, &
+      domain
 
    use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
-      its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
+      ips,ipe,jps,jpe,kps,kpe, its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
       vertical_ip,alphacv_method,use_radarobs,use_radar_rf,Use_SsmiTbObs, &
       Use_SsmiRetrievalObs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
       use_gpsrefobs,sfc_assi_options, testing_wrfvar, vert_corr, fg_format, &

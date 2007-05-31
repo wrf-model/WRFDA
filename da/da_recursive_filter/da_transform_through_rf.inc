@@ -1,4 +1,4 @@
-subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
+subroutine da_transform_through_rf(grid,mz, grid_box_area, rf_alpha, val,&
                                     xp, field)
 
    !---------------------------------------------------------------------------
@@ -12,6 +12,8 @@ subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
    integer, intent(in) :: mz                ! Vertical truncation.
@@ -51,7 +53,7 @@ subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
    ! [2.1] Apply (i',j',k -> i,j',k') (xp % v1z -> xp % v1x)
    ! convert from vertical column to x-stripe
 
-   call da_transpose_z2x (xp)
+   call da_transpose_z2x (grid)
 
    ! [2.2] Apply 1D filter in x direction:
 
@@ -72,7 +74,7 @@ subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
    ! [3.1] Apply (i, j' ,k' -> i', j ,k') (xp % v1x -> xp % v1y)
    ! convert from vertical column to y-stripe
 
-   call da_transpose_x2y (xp)
+   call da_transpose_x2y (grid)
 
    ! [3.2] Apply 1D filter in y direction:
 
@@ -95,7 +97,7 @@ subroutine da_transform_through_rf(mz, grid_box_area, rf_alpha, val,&
    ! [4.1] Apply (i',j,k' -> i',j',k) (xp % v1y -> xp % v1z)
    ! convert from y-stripe to vertical column.
    
-   call da_transpose_y2z (xp)
+   call da_transpose_y2z (grid)
 
    ! [4.2] Transform filtered field to dimensional space:
 

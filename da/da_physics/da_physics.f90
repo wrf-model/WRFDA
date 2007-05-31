@@ -4,14 +4,23 @@ module da_physics
    !  Purpose: Contains routines to calculate physical quantities.
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xb_type, xpose_type, x_type
+   use module_domain, only : domain,xb_type, xpose_type, x_type
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, &
+      ntasks_y, data_order_xyz
+#endif
+#ifdef RSL
+   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
+      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
+#endif
    use da_define_structures, only : synop_type, residual_synop_type
    use da_control, only : gas_constant, gravity,kts,kte, svp3,svpt0, &
       gas_constant_v, svp1, to, xls, svp2,its,ite,jts,jte,kts,kte, &
       ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, testing_wrfvar, &
       trace_use, missing_r, maximum_rh, minimum_rh,cv_options_hum,coeff,l_over_rv, &
       es_gammakelvin, es_gammabeta, rd_over_rv1,t_kelvin, es_alpha, es_gamma, &
-      es_beta, rd_over_rv, trace_use_frequent,gamma, stdout
+      es_beta, rd_over_rv, trace_use_frequent,gamma, stdout, ips, ipe, jps, &
+      jpe, kps, kpe
    use da_par_util, only : da_transpose_z2y, da_transpose_y2x, &
       da_transpose_x2z, da_transpose_z2x, da_transpose_x2y, da_transpose_y2z
    use da_tracing, only : da_trace_entry, da_trace_exit

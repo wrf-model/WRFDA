@@ -15,6 +15,10 @@ subroutine da_local_to_global(xp, x, xg, dim)
 
    integer                      :: glen(3) ! Global grid dimensions
    integer                      :: llen(3) ! Local grid dimensions
+   
+#ifdef RSL_LITE
+   call da_error(__FILE__,__LINE__,(/"Cannot run with RSL_LITE"/))
+#endif   
 
    ! Set global and local index extent arrays.
    glen(1) = xp%ide-xp%ids+1
@@ -24,11 +28,15 @@ subroutine da_local_to_global(xp, x, xg, dim)
    if (dim .eq. 2) then
       glen(3) = 1
       llen(3) = 1
+#ifndef RSL_LITE
       call rsl_write(xg,IO2D_IJ_INTERNAL,x,0,true_RSL_real,glen,llen)
+#endif
    elseif (dim.eq.3) then
       glen(3) = xp%kde-xp%kds+1
       llen(3) = xp%kme-xp%kms+1
-      call rsl_write(xg,IO3D_IJK_inTERNAL,x,0,true_RSL_real,glen,llen)
+#ifndef RSL_LITE
+      call rsl_write(xg,IO3D_IJK_INTERNAL,x,0,true_RSL_real,glen,llen)
+#endif
    else
       write(unit=message(1),fmt='(A,I5,A)') &
          "dim=",dim,"must be 2 or 3"

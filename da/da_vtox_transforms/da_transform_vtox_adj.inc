@@ -1,10 +1,12 @@
-subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
+subroutine da_transform_vtox_adj(grid, cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform Adjoint
    !--------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type), intent(in)       :: xb   ! first guess.
@@ -65,13 +67,13 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
          end do
       end do
 
-     call da_uvprho_to_w_adj(xb, xa, xp)
+     call da_uvprho_to_w_adj(grid, xb, xa, xp)
  
      if (use_radarobs .and. Use_Radar_rf) then
 
       ! Partition of hydrometeor increments via warm rain process
 
-         call da_moist_phys_adj( xb, xa, xp)
+         call da_moist_phys_adj(grid, xb, xa, xp)
 
       endif
 
@@ -167,7 +169,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
    !-------------------------------------------------------------------------
 
    call da_zero_vp_type (vp)
-   call da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
+   call da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [2.0]: Perform vp = u_v vv transform:
@@ -200,7 +202,7 @@ subroutine da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv)
    if (global) then
       call da_transform_vtovv_global_adj(cv_size, xbx, be, cv, vv)
    else
-      call da_transform_vtovv_adj(cv_size, xb, be, cv, vv, xp)
+      call da_transform_vtovv_adj(grid, cv_size, xb, be, cv, vv, xp)
    end if
 
    if (trace_use) call da_trace_exit("da_transform_vtox_adj")

@@ -1,4 +1,4 @@
-subroutine da_moist_phys_lin(xb, xa, xp)
+subroutine da_moist_phys_lin(grid, xb, xa, xp)
 
    !---------------------------------------------------------------------------
    !  Purpose: Partition of the hydrometeors via the moist explicit scheme.
@@ -12,6 +12,8 @@ subroutine da_moist_phys_lin(xb, xa, xp)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    type (xb_type), intent(in)    :: xb           ! First guess structure.
    type (x_type), intent(inout)  :: xa           ! increment structure.
@@ -210,10 +212,10 @@ subroutine da_moist_phys_lin(xb, xa, xp)
       end do
    end do
 
-   call da_filter(t_new, xp)
-   call da_filter(q_new, xp)
-   call da_filter(qcw_new, xp)
-   call da_filter(qrn_new, xp)
+   call da_filter(grid, t_new, xp)
+   call da_filter(grid, q_new, xp)
+   call da_filter(grid, qcw_new, xp)
+   call da_filter(grid, qrn_new, xp)
 
    do k=kds,kde
       do j=jts,jte

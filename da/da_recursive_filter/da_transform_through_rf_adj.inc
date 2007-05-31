@@ -1,4 +1,4 @@
-subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
+subroutine da_transform_through_rf_adj(grid, mz, grid_box_area, rf_alpha, val,&
                                         xp, field)
 
    !---------------------------------------------------------------------------
@@ -12,6 +12,8 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)       :: grid
 
    integer, intent(in) :: mz                ! Vertical truncation.
 
@@ -67,7 +69,7 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    ! [4.1] Apply (i',j',k -> i',j,k') (xp % v1z -> xp % v1y)
    ! convert vertical column to y-stripe
 
-   call da_transpose_z2y (xp)
+   call da_transpose_z2y (grid)
 
    !-------------------------------------------------------------------------
    ! [3.0]: Perform 1D recursive filter in y-direction:
@@ -90,7 +92,7 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    ! [3.1] Apply (i',j,k' -> i,j',k') (xp % v1y -> xp % v1x)
    ! convert from y-stripe to x-stripe
 
-   call da_transpose_y2x (xp)
+   call da_transpose_y2x (grid)
 
    !-------------------------------------------------------------------------
    ! [2.0]: Perform 1D recursive filter in x-direction:
@@ -112,7 +114,7 @@ subroutine da_transform_through_rf_adj(mz, grid_box_area, rf_alpha, val,&
    ! [2.1] Apply (i,j',k' -> i',j',k) (xp % v1x -> xp % v1z)
    ! convert from x-stripe to vertical column
 
-   call da_transpose_x2z (xp)
+   call da_transpose_x2z (grid)
 
    !-------------------------------------------------------------------------
    ! [1.0]: Initialise:

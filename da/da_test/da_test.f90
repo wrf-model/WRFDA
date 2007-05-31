@@ -6,6 +6,15 @@ module da_test
 
    use module_configure, only : grid_config_rec_type
    use module_dm, only : wrf_dm_sum_real
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, local_communicator_x, &
+      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
+      ntasks, data_order_xy
+#endif
+#ifdef RSL
+   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
+      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
+#endif
    use module_domain, only : xpose_type, vp_type, xb_type, x_type, ep_type, &
       domain
 
@@ -29,7 +38,8 @@ module da_test
       use_rad,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
-      balance_geocyc
+      balance_geocyc, ips, ipe, jps, jpe, kps, kpe, ids, ide, jds, jde, kds, &
+      kde
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &
       da_deallocate_y,be_type, xbx_type, ob_type, y_type
    use da_dynamics, only : da_uv_to_divergence,da_uv_to_vorticity, &

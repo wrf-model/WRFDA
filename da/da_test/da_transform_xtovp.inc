@@ -1,10 +1,12 @@
-subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
+subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
 
    !---------------------------------------------------------------------------
    ! Purpose: Transforms analysis to control variables (Vp-type)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    type (xb_type), intent(in)           :: xb         ! First guess structure.
    type (xbx_type),intent(in)           :: xbx        ! Header/non-gridded vars.
@@ -29,7 +31,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    ! [2.2] Transform u, v to streamfunction via vorticity:
 
    ! Communicate halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV_ADJ)
+#include "HALO_PSICHI_UV_ADJ.inc"
 
    call da_uv_to_vorticity(xb, xa % u, xa % v, vor)
 
@@ -51,7 +53,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
 
    ! Calculate psi:
    write (unit=stdout,fmt=*) ' calling Solve_PoissonEquation for Psi'
-   call da_solve_poissoneqn_fct(xbx, vor, vp%v1, xp)
+   call da_solve_poissoneqn_fct(grid,xbx, vor, vp%v1, xp)
 
    ! [2.3] Transform u, v to velocity potential via divergence:
 
@@ -75,7 +77,7 @@ subroutine da_transform_xtovp(xb, xbx, xa, xp, vp, be)
    ! Calculate chi:
 
    call da_message((/' calling Solve_PoissonEquation for Chi'/))
-   call da_solve_poissoneqn_fct(xbx, div, vp%v2, xp)
+   call da_solve_poissoneqn_fct(grid,xbx, div, vp%v2, xp)
 
    ! [2.4] Transform chi to chi_u:
    call da_message((/' calculating chi_u'/))

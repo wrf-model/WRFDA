@@ -120,7 +120,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    ptmp=grid%xa%psfc
    grid%xa%u=grid%em_g_u_2
    grid%xa%v=grid%em_g_v_2
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_PSICHI_UV_ADJ)
+#include "HALO_PSICHI_UV_ADJ.inc"
    grid%em_g_u_2=grid%xa%u
    grid%em_g_v_2=grid%xa%v
    grid%xa%u=utmp
@@ -183,7 +183,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    end if
 #endif
 
-   call wrf_dm_halo(grid%xp%domdesc,grid%xp%comms,HALO_XA)
+#include "HALO_XA.inc"
 
    if (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 

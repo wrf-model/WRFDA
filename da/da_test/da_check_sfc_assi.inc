@@ -1,10 +1,12 @@
-subroutine da_check_sfc_assi(xb, xa, iv, xp, y)
+subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
    !-----------------------------------------------------------------------
    
    implicit none
+
+   type (domain)                    :: grid
   
    type (xb_type),    intent(in)    :: xb    ! first guess (local).
    type (x_type),     intent(inout) :: xa    ! analysis increments (local).
@@ -53,7 +55,7 @@ subroutine da_check_sfc_assi(xb, xa, iv, xp, y)
    call da_transform_xtowtq (xp, xb, xa)
 
    ! Exchange XA(SURFACE) halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_SFC_XA)
+#include "HALO_SFC_XA.inc"
 
 
    partial_lhs = 0.0

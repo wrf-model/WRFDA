@@ -1,5 +1,5 @@
-subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
-                                  xa)
+subroutine da_check_vtox_adjoint(grid, cv_size, xb, xbx, be, ep, cv1, vv, vp, &
+   xp, xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test V to X routine and adjoint for compatibility.
@@ -8,6 +8,8 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    integer, intent(in)             :: cv_size
    type (xb_type), intent(in)      :: xb     ! first guess (local).
@@ -43,7 +45,7 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
 
    call da_zero_x (xa)
 
-   call da_transform_vtox(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa)
+   call da_transform_vtox(grid,cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, xa)
 
    !----------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation: 
@@ -112,7 +114,8 @@ subroutine da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cv1, vv, vp, xp, &
    ! [5.0] Perform adjoint operation:
    !-------------------------------------------------------------------------
 
-   call da_transform_vtox_adj(cv_size, xb, xbx, be, ep, xa, xp, vp, vv, cv2)
+   call da_transform_vtox_adj(grid, cv_size, xb, xbx, be, ep, xa, xp, vp, vv, &
+      cv2)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

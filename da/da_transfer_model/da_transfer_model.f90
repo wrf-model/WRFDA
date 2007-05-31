@@ -11,6 +11,15 @@ module da_transfer_model
    use module_state_description, only : dyn_em_ad, dyn_em, p_qv,dyn_em_tl, &
       p_qr, p_qi,p_qs,p_qg,p_qc,num_moist, p_a_qv, p_g_qv
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals
+#ifdef RSL_LITE
+   use module_dm, only : local_communicator, local_communicator_x, &
+      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
+      ntasks, data_order_xy
+#endif
+#ifdef RSL
+   use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
+      stencil_24pt,reset_msgs_24pt,add_msg_24pt_real,add_msg_24pt_integer
+#endif
 
    use da_control, only : cos_xls, sin_xls, cos_xle, sin_xle, trace_use, &
       coarse_jy, coarse_ix, cone_factor, delt_lon, delt_lat, gas_constant, &
@@ -21,7 +30,8 @@ module da_transfer_model
       truelat2_3dv, periodic_x,write_increments,max_ext_its, gravity, &
       kappa, print_detail_xa,rd_over_rv,t0, print_detail_xa, check_rh, &
       print_detail_xb,testing_dm_exact,base_lapse,base_temp,vertical_ip,ptop, &
-      use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs
+      use_ssmitbobs, dt_cloud_model, cp, use_ssmiretrievalobs, ips, ipe, jps, &
+      jpe, kps, kpe, ims,ime, jms,jme, kms, kme, ids, ide, jds, jde, kds, kde
    use da_define_structures, only : xbx_type
    use da_grid_definitions, only : da_set_map_para
    use da_par_util, only : da_wv_patch_to_global

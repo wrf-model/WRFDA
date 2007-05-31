@@ -1,4 +1,4 @@
-subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
+subroutine da_check(grid, cv_size, xb, xbx, be, ep, iv, &
                      xa, vv, vp, xp, y)
 
    !-----------------------------------------------------------------------
@@ -6,6 +6,8 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    !-----------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type),    intent(in)    :: xb    ! first guess (local).
@@ -44,7 +46,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
 
    ! v_to_vv adjoint test:
 
-   call da_check_cvtovv_adjoint(cv_size, xb, xbx,xp, be, cvtest, vv)
+   call da_check_cvtovv_adjoint(grid, cv_size, xb, xbx,xp, be, cvtest, vv)
 
    !-------------------------------------------------------------------------
    ! vv_to_vp adjoint test:
@@ -56,14 +58,14 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    ! vptox adjoint test:
    !-------------------------------------------------------------------------
 
-   call da_check_vptox_adjoint(be % ne, xb, be, ep, xp, vp, xa)
+   call da_check_vptox_adjoint(grid,be % ne, xb, be, ep, xp, vp, xa)
 
    !-------------------------------------------------------------------------
    ! vtox adjoint test: <x,x> = <v_adj,v>
    !-------------------------------------------------------------------------
 
-   call da_check_vtox_adjoint(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, &
-                               xa)
+   call da_check_vtox_adjoint(grid, cv_size, xb, xbx, be, ep, cvtest, vv, vp, &
+      xp, xa)
 
    !----------------------------------------------------------------------------
    ! [2] Perform xtoy adjoint tests:
@@ -74,7 +76,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
    call da_allocate_y(iv, y)
    call da_zero_x(xa)
 
-   call da_setup_testfield(xb, xa, xp)
+   call da_setup_testfield(grid, xb, xa, xp)
 
    ! WHY
    ! Make cv_array random.
@@ -84,7 +86,7 @@ subroutine da_check(cv_size, xb, xbx, be, ep, iv, &
 
    ! call da_transform_vtox(cv_size, xb, xbx, be, ep, cvtest, vv, vp, xp, xa)
 
-   call da_check_xtoy_adjoint(xb, xa, iv, xp, y)
+   call da_check_xtoy_adjoint(grid,xb, xa, iv, xp, y)
 
    call da_deallocate_y(y)
 

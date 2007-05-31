@@ -1,4 +1,4 @@
-subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
+subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test Vp to X routine and adjoint for compatibility.
@@ -7,6 +7,8 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type (domain)                    :: grid
 
    integer, intent(in)              :: ne   ! Ensemble size.
    type (xb_type), intent(in)       :: xb   ! first guess.
@@ -92,7 +94,7 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
    ! [2.0] Perform x = U vp transform:
    !-------------------------------------------------------------------------
 
-   call da_transform_vptox(xb, vp, xp, xa, be, ep)
+   call da_transform_vptox(grid,xb, vp, xp, xa, be, ep)
 
    !-------------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation:
@@ -181,7 +183,7 @@ subroutine da_check_vptox_adjoint(ne, xb, be, ep, xp, vp, xa)
 
    call da_zero_vp_type (vp)
 
-   call da_transform_vptox_adj(xb, xa, vp, be, ep, xp)
+   call da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

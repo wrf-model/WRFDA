@@ -1,4 +1,4 @@
-subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b)
+subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculates balanced mass increment phi_b from wind increments.
@@ -10,6 +10,8 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b)
    !---------------------------------------------------------------------------
 
    implicit none
+
+   type(domain), intent(inout)               :: grid
 
    type (xb_type), intent(in) :: xb               ! First guess structure.
    type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
@@ -109,7 +111,7 @@ subroutine da_balance_equation_lin( xb, xbx, xp, u, v, phi_b)
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !------------------------------------------------------------------------------
 
-   call da_solve_poissoneqn_fst( xbx, xp, del2phi_b, phi_b) 
+   call da_solve_poissoneqn_fst(grid, xbx, xp, del2phi_b, phi_b) 
 
 end subroutine da_balance_equation_lin
 

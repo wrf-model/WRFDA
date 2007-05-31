@@ -1,10 +1,12 @@
-subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
+subroutine da_transform_vptox(grid, xb, vp, xp, xa, be, ep)
 
    !-----------------------------------------------------------------------
    ! Purpose: Physical transform of analysis increment variables.
    !-----------------------------------------------------------------------
 
    implicit none
+
+   type (domain)                        :: grid
    
    type (xb_type), intent(in)           :: xb  ! First guess structure.
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
@@ -63,7 +65,7 @@ subroutine da_transform_vptox(xb, vp, xp, xa, be, ep)
    !--------------------------------------------------------------------------
 
    ! Communicate halo region.
-   call wrf_dm_halo(xp%domdesc,xp%comms,HALO_PSICHI_UV)
+#include "HALO_PSICHI_UV.inc"
 
    ! Psi and chi to u and v:
 
