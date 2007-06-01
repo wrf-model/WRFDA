@@ -276,7 +276,9 @@ subroutine da_solve ( grid , config_flags)
       if (calc_w_increment .and. .not. use_RadarObs) then
          call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
 
+#ifdef DM_PARALLEL
 #include "HALO_RADAR_XA_W.inc"
+#endif
       end if
 
       ! [8.7] Write out diagnostics

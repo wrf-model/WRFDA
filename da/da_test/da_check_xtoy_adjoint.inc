@@ -39,8 +39,9 @@ subroutine da_check_xtoy_adjoint(grid, xb, xa, iv, xp, y)
    ! [1.0] Initialise:
    !----------------------------------------------------------------------
 
-   ! Exchange XA (u, v, t, p, q, psfc) halo region.
+#ifdef DM_PARALLEL
 #include "HALO_XA.inc"
+#endif
 
    !  xa%u(ims:ime, jms:jme, kms:kme) = 0.0
    !  xa%v(ims:ime, jms:jme, kms:kme) = 0.0
@@ -67,8 +68,9 @@ subroutine da_check_xtoy_adjoint(grid, xb, xa, iv, xp, y)
 
    if (sfc_assi_options == 2) then
       call da_transform_xtowtq (xp, xb, xa)
-      ! Exchange XA (surface variable: u10, v10, t2, q2) halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
+#endif
    end if
 
    if (use_ssmt1obs .or. use_ssmt2obs .or. use_GpspwObs .or. &
@@ -94,8 +96,9 @@ subroutine da_check_xtoy_adjoint(grid, xb, xa, iv, xp, y)
 
       if (use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
-      ! Exchange XA halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
+#endif
    end if
 
    !----------------------------------------------------------------------

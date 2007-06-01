@@ -43,7 +43,9 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! [6.0] ALL THE SIMPLE ONES
    !---------------------------------------------------------------------------
 
+#ifdef DM_PARALLEL
 #include "HALO_XA.inc"
+#endif
 
    do k=ks,ke+1
       do j=js,je

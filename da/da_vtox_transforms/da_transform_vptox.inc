@@ -64,8 +64,9 @@ subroutine da_transform_vptox(grid, xb, vp, xp, xa, be, ep)
    ! [3] Transform to model variable space:
    !--------------------------------------------------------------------------
 
-   ! Communicate halo region.
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV.inc"
+#endif
 
    ! Psi and chi to u and v:
 

@@ -239,9 +239,9 @@ subroutine da_transfer_xatowrf(grid)
    !TBH:  too thick, 9-point should suffice.  Apparently, grid%xp%halo_id3 is used 
    !TBH:  in many places!  This needs to be fixed.  
 
-   ! Fill the halo region for u and v.
-
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
 
    ! Fill the boundary
 

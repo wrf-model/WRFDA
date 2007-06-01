@@ -78,7 +78,9 @@ subroutine da_setup_firstguess(xbx, grid)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
+#ifdef DM_PARALLEL
 #include "HALO_INIT.inc"
+#endif
    periodic_x = grid%periodic_x
 
    if (global) then     

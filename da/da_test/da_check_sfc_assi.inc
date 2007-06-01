@@ -54,8 +54,9 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
 
    call da_transform_xtowtq (xp, xb, xa)
 
-   ! Exchange XA(SURFACE) halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
+#endif
 
 
    partial_lhs = 0.0

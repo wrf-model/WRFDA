@@ -273,8 +273,9 @@ subroutine da_solve_poissoneqn_fct_adj(grid, xbx, b, del2b, xp)
 
    call da_transpose_x2z (grid)
 
-
+#ifdef DM_PARALLEL
 #include "HALO_BAL_EQN_ADJ.inc"
+#endif
 
    ! [2.5] Write data array into del2b:
 

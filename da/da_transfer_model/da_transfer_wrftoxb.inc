@@ -212,7 +212,9 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    ! Fill the halo region for u and v.
 
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
 
 
    if (print_detail_xb) then

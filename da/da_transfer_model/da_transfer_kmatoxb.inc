@@ -85,8 +85,10 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    grid%xb%lat(is:ie,js:je) =  grid%xlat(is:ie,js:je)
    grid%xb%lon(is:ie,js:je) = grid%xlong(is:ie,js:je)
 
-   ! Fill halo region for u and v.
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
+
    tmpvar  = 1.0/real(grid%xp%ide-grid%xp%ids+1)
 
    !---------------------------------------------------------------

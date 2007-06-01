@@ -236,7 +236,9 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
 
    xp%v1z(its:ite, jts:jte, kts:kte) = wz(its:ite, jts:jte, kts:kte)
 
+#ifdef DM_PARALLEL
 #include "HALO_BAL_EQN_ADJ.inc"
+#endif
 
    if (its == ids) then
       is = ids+1

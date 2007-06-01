@@ -119,12 +119,16 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (.not.testing_wrfvar) then
       ! Exchange XA halo region.
+#ifdef DM_PARALLEL
 #include "HALO_XA.inc"
+#endif
 
       if (sfc_assi_options == 2) then
          call da_transform_xtowtq (xp, xb, xa)
          ! Exchange XA (surface variable) halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
+#endif
       end if
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -148,7 +152,9 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          if (Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
 
          ! Exchange XA halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
+#endif
       end if
    end if
 
@@ -165,7 +171,9 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
          end do
       end do
 
+#ifdef DM_PARALLEL
 #include "HALO_RADAR_XA_W.inc"
+#endif
  
       if (use_radarobs .and. Use_Radar_rf) then
          ! Partition of hydrometeor increments via warm rain process

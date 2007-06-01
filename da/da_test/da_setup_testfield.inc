@@ -62,12 +62,14 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
       end do
    end if
 
-   ! Exchange XA halo region.
+#ifdef DM_PARALLEL
 #include "HALO_XA.inc"
+#endif
 
    if (sfc_assi_options == 2) then
-      ! Exchange XA (surface variable) halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
+#endif
    end if
 
    if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
@@ -85,8 +87,9 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
          call da_transform_xtoseasfcwind_lin(xa, xb)
       end if
 
-      ! Exchange XA halo region.
+#ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
+#endif
    end if
 
    write(unit=stdout, fmt='(/a/)') &

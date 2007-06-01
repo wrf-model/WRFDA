@@ -112,7 +112,9 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
 
          if (.not. Testing_WRFVAR) then
             xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
+#ifdef DM_PARALLEL
 #include "HALO_2D_WORK.inc"
+#endif
 
             div(is, js:je, k) = xp%vxy(is, js:je)
             div(ie, js:je, k) = xp%vxy(ie, js:je)

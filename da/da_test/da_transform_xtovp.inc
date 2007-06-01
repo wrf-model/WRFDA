@@ -30,8 +30,9 @@ subroutine da_transform_xtovp(grid, xb, xbx, xa, xp, vp, be)
 
    ! [2.2] Transform u, v to streamfunction via vorticity:
 
-   ! Communicate halo region.
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
 
    call da_uv_to_vorticity(xb, xa % u, xa % v, vor)
 

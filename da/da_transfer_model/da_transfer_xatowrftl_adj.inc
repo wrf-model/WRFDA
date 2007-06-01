@@ -106,7 +106,9 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    vtmp=grid%xa%v
    grid%xa%u=grid%em_a_u_2
    grid%xa%v=grid%em_a_v_2
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
    grid%em_a_u_2=grid%xa%u
    grid%em_a_v_2=grid%xa%v
    grid%xa%u=utmp

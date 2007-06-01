@@ -49,7 +49,9 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    endif
 
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
 
    ! Transform psi and chi to u and v:
    call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &

@@ -120,7 +120,9 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    ptmp=grid%xa%psfc
    grid%xa%u=grid%em_g_u_2
    grid%xa%v=grid%em_g_v_2
+#ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
+#endif
    grid%em_g_u_2=grid%xa%u
    grid%em_g_v_2=grid%xa%v
    grid%xa%u=utmp
@@ -183,7 +185,9 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
    end if
 #endif
 
+#ifdef DM_PARALLEL
 #include "HALO_XA.inc"
+#endif
 
    if (trace_use) call da_trace_exit("da_transfer_wrftltoxa")
 
