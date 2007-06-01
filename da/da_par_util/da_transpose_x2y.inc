@@ -7,7 +7,7 @@ subroutine da_transpose_x2y (grid)
    if (trace_use) call da_trace_entry("da_transpose_x2y")
 
 #ifdef DM_PARALLEL
-#include "grid%xpOSE_V1_x2y.inc"
+#include "XPOSE_V1_x2y.inc"
 #else
    grid%xp % v1y(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde,grid%xp%kds:grid%xp%kde) = &
    grid%xp % v1x(grid%xp%ids:grid%xp%ide,grid%xp%jds:grid%xp%jde,grid%xp%kds:grid%xp%kde)
