@@ -654,11 +654,6 @@ rconfig   integer   seed_array2             namelist,wrfvar11  1  0        - "se
 rconfig   integer   sfc_assi_options        namelist,wrfvar11  1  1        - "sfc_assi_options"        ""  ""  
 rconfig   logical   calculate_cg_cost_fn    namelist,wrfvar11  1  .false.  - "calculate_cg_cost_fn"    ""  ""  
 rconfig   logical   lat_stats_option        namelist,wrfvar11  1  .true.   - "lat_stats_option"        ""  ""  
-rconfig   real      as1                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as1"            ""  ""  
-rconfig   real      as2                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as2"            ""  ""  
-rconfig   real      as3                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as3"            ""  ""  
-rconfig   real      as4                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as4"            ""  ""  
-rconfig   real      as5                     namelist,wrfvar11  3  (/0.25,0.5,1.5/) -  "as5"            ""  ""  
 
 rconfig   integer   balance_type            namelist,wrfvar12  1  1        - "balance_type"            ""  ""  
                                                                                           
