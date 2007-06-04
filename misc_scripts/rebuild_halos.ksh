@@ -8,7 +8,10 @@ set -ux
 
 /bin/rm -f main/libwrflib.a
 
-tools/registry -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DSTAND_ALONE -DWRFVAR Registry/Registry
+/bin/rm -f Registry/Registry
+/bin/cp -f Registry/Registry.EM Registry/Registry
+
+tools/registry -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DBENCH -DSTAND_ALONE -DWRFVAR Registry/Registry
 
 cd frame
 ar ru ../main/libwrflib.a module_driver_constants.o module_domain.o \
@@ -58,10 +61,10 @@ ranlib ../main/libwrflib.a
 
 cd ../dyn_em
 
-rm -f solve_em_ad.o
+/bin/rm -f solve_em_ad.o solve_em_ad.f
 sed -f ../arch/standard.sed solve_em_ad.F > solve_em_ad.b 
-/lib/cpp -I../inc -I. -C -P -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DSTAND_ALONE -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` -DEM_CORE=1  -DNMM_CORE=0 -DNMM_MAX_DIM=1250  -DCOAMPS_CORE=0  -DEXP_CORE=0  -DWRFVAR  -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=8192 -DMAX_DOMAINS_F=5 solve_em_ad.b  > solve_em_ad.f
-rm -f solve_em_ad.b
+/lib/cpp -I../inc -I. -C -P -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DBENCH -DSTAND_ALONE -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` -DEM_CORE=1  -DNMM_CORE=0 -DNMM_MAX_DIM=1250  -DCOAMPS_CORE=0  -DEXP_CORE=0  -DWRFVAR  -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=8192 -DMAX_DOMAINS_F=5 solve_em_ad.b  > solve_em_ad.f
+/bin/rm -f solve_em_ad.b
 mpxlf90_r -c -qrealsize=8 -qintsize=4 -w -qspill=20000  -qmaxmem=32767 -qinitauto=00  -I../dyn_em          -I../dyn_nmm                        -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90  -I../frame -I../share -I../phys -I../chem -I../inc -qnoopt solve_em_ad.f
 
 ar ru ../main/libwrflib.a module_advect_em.o module_advect_em_ad.o \
@@ -81,13 +84,14 @@ make -i -r MODULE_DIRS="-I../dyn_em -I../dyn_nmm -I../external/io_netcdf -I../ex
 
 cd main
 
-rm -f wrf.o
+/bin/rm -f wrf.o
 sed -f ../arch/standard.sed wrf.F > wrf.b
-/lib/cpp -I../inc -I. -C -P -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DSTAND_ALONE -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` -DEM_CORE=1  -DNMM_CORE=0 -DNMM_MAX_DIM=1250  -DCOAMPS_CORE=0  -DEXP_CORE=0  -DWRFVAR  -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=8192 -DMAX_DOMAINS_F=5 wrf.b  > wrf.f
-rm -f wrf.b
+/lib/cpp -I../inc -I. -C -P -DRSL_LITE -DDM_PARALLEL -DIWORDSIZE=4 -DDWORDSIZE=8 -DRWORDSIZE=8  -DLWORDSIZE=4 -DNETCDF -DTRIEDNTRUE   -DYYY -DINTIO  -DLIMIT_ARGS -DNO_NAMELIST_PRINT -DNATIVE_MASSV -DBENCH -DSTAND_ALONE -I../external/RSL_LITE `cat ../inc/dm_comm_cpp_flags` -DEM_CORE=1  -DNMM_CORE=0 -DNMM_MAX_DIM=1250  -DCOAMPS_CORE=0  -DEXP_CORE=0  -DWRFVAR  -DNONSTANDARD_SYSTEM -DF90_STANDALONE -DCONFIG_BUF_LEN=8192 -DMAX_DOMAINS_F=5 wrf.b  > wrf.f
+/bin/rm -f wrf.b
 mpxlf90_r -c -O2 -qarch=auto -w -qspill=20000  -qmaxmem=32767 -qinitauto=00  -I../dyn_em          -I../dyn_nmm                        -I../external/io_netcdf -I../external/io_int  -I../external/esmf_time_f90  -I../frame -I../share -I../phys -I../chem -I../inc -qrealsize=8 -qintsize=4 -I.. wrf.f
 
 ranlib libwrflib.a
 mpxlf90_r -o wrfplus.exe  wrf.o libwrflib.a -L../external/io_netcdf -lwrfio_nf -L/home/blueice/wrfhelp/external/netcdf/netcdf-3.6.1/xlf_powerpc/lib -lnetcdf -L../external/RSL_LITE -lrsl_lite -lmass -lmassv  -L../external/io_int -lwrfio_int   -L../external/io_grib1 -lio_grib1  ../frame/module_internal_header_util.o ../frame/pack_utils.o -L../external/esmf_time_f90 -lesmf_time 
 
+/bin/rm -f da_*.mod da_*.o da_*.f
 
