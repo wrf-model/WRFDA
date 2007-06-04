@@ -28,9 +28,10 @@ $(SOLVER) : $(SOLVER).o
 	$(RANLIB) libwrflib.a
 	$(LD) -o $(SOLVER).exe $(LDFLAGS) $(SOLVER).o libwrflib.a $(LIB)
 
-$(SOLVER)_wrf : wrf.o
+$(SOLVER)_wrf : wrf.o nupdown.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
+	$(LD) -o nupdown.exe $(LDFLAGS) nupdown.o $(LIB)
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
@@ -145,4 +146,10 @@ da_3dvar.o: \
 	../share/module_wrf_esmf_super.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
 
+nupdown.o: 
+	$(RM) $@
+	$(SED_FTN) $*.F > $*.b
+	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
+	$(RM) $*.b
+	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. -I$(NETCDFPATH)/include $*.F
 # DO NOT DELETE
