@@ -43,32 +43,46 @@ class CountFieldDiffs
     @allzeros = {}
     @lines1 = IO.readlines(@filename1)
     @lines2 = IO.readlines(@filename2)
+    regexp = /\s*(\w+)\s*\((.*)\)\s*=\s*/
     @lines1.each_with_index do |line, indx|
-      if (line =~ /\s*(\w+)\s*\(/) then
+      if (line =~ regexp) then
         varname = $1.dup
+        indices = $2.dup.strip
+        value = Float($'.dup.strip)
         @allzeros[varname] = true unless (@allzeros.has_key?(varname))
         @allvarnames[varname] = nil
-        if ( line == @lines2[indx] ) then
-          # if lines match, check for zero value
-          if (line =~ /\)\s*=\s*/) then
-            begin
-              value = Float($'.dup.strip)
-            rescue
-              raise "failed to parse value in line \"#{line}\""
+        line2 = @lines2[indx]
+        if ( line2 =~ regexp ) then
+          varname2 = $1.dup
+          indices2 = $2.dup.strip
+          value2 = Float($'.dup.strip)
+$$$ #here...  match varnames and indices (via CSV)
+$$$ #here...  if they match, compare values
+          if ( $$$foo ) then
+            # if lines match, check for zero value
+            if (line =~ /\)\s*=\s*/) then
+              begin
+                value = Float($'.dup.strip)
+              rescue
+                raise "failed to parse value in line \"#{line}\""
+              end
+              @allzeros[varname] = false if (value != 0.0)
+            else
+              raise "bad value in line \"#{line}\""
             end
-            @allzeros[varname] = false if (value != 0.0)
           else
-            raise "bad value in line \"#{line}\""
+$$$here...  fixing this logic
+            @allzeros[varname] = false
+            @diffcounts[varname] = 0 unless (@diffcounts.has_key?(varname))
+            @diffcounts[varname] += 1
+            @diffindxs[varname] = [] unless (@diffindxs.has_key?(varname))
+            @diffindxs[varname] << indx
           end
         else
-          @allzeros[varname] = false
-          @diffcounts[varname] = 0 unless (@diffcounts.has_key?(varname))
-          @diffcounts[varname] += 1
-          @diffindxs[varname] = [] unless (@diffindxs.has_key?(varname))
-          @diffindxs[varname] << indx
+          raise "could not parse line \"#{line2}\""
         end
       else
-        raise "bad variable name in line \"#{line}\""
+        raise "could not parse line \"#{line}\""
       end
     end
   end

@@ -327,6 +327,7 @@ INTEGER, PARAMETER :: BUF_RK_LOOR = 1
 INTEGER, PARAMETER :: BUF_SMALL_STEP = 2
 INTEGER, PARAMETER :: BUF_RKTEND_THRU_SS = 3
 INTEGER, PARAMETER :: BUF_RKTEND = 4
+INTEGER, PARAMETER :: BUF_RK_STEP_PREP = 5
 
 real ru_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
 real rv_mz(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)
@@ -785,6 +786,18 @@ BENCH_END(exch3)
   filecount = (rk_step*100) + 3
 #include <no_a_debug_halo.h>
 #endif
+
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Save fields re-computed later by calls to rk_step_prep.  
+ store_rk_step_prep: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(compstore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  store_rk_step_prep:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "store_rk_step_prep.h"
+BENCH_END(compstore_rk_step_prep_tim)
+ endif store_rk_step_prep
 
   rk_step_is_ong: if (rk_step .eq. 1) then
 BENCH_START(comp4)
@@ -1879,11 +1892,25 @@ lineno = __LINE__
 #endif
 BENCH_END(exch23)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepzq: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepzq:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepzq
+
 BENCH_START(comp28)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp28)
+
+ endif restore_rk_step_prepzq
 
 BENCH_START(exch24)
 #ifdef DM_PARALLEL
@@ -2386,11 +2413,26 @@ lineno = __LINE__
 #endif
 BENCH_END(exch34)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepzw: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepzw:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepzw
+
 BENCH_START(comp39)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp39)
+
+ endif restore_rk_step_prepzw
+
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_1757.inc"
@@ -3072,11 +3114,26 @@ lineno = __LINE__
 #endif
 BENCH_END(exch48)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepzz: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepzz:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepzz
+
 BENCH_START(comp53)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp53)
+
+ endif restore_rk_step_prepzz
+
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2258.inc"
@@ -3524,11 +3581,26 @@ lineno = __LINE__
 #endif
 BENCH_END(exch60)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepzr: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepzr:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepzr
+
 BENCH_START(comp66)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp66)
+
+ endif restore_rk_step_prepzr
+
 BENCH_START(exch61)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -4336,11 +4408,26 @@ lineno = __LINE__
 #endif
 BENCH_END(exch83)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepb4acc: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4acc:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepb4acc
+
 BENCH_START(comp89)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp89)
+
+ endif restore_rk_step_prepb4acc
+
 BENCH_START(exch84)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -4413,15 +4500,15 @@ BENCH_END(exch87)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
- restore_rktendacc: if ( config_flags%remove_rktend ) then
+ restore_rktendb4acc: if ( config_flags%remove_rktend ) then
 BENCH_START(comprestore_rktend_tim)
-   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendacc:  rk_step, rk_order = ',rk_step,rk_order
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendb4acc:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND)
 #include "restore_rktend.h"
 BENCH_END(comprestore_rktend_tim)
- else  ! restore_rktendacc
+ else  ! restore_rktendb4acc
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_calc_coef_w, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -4433,7 +4520,7 @@ BENCH_START(comp7777)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp7777)
 
- endif restore_rktendacc
+ endif restore_rktendb4acc
 
 BENCH_START(comp93)
 !  recompute : cqw,mu_tend,ph_save,ph_tend,ru_tend,ru_tendf,rv_tend,rv_t
@@ -4774,11 +4861,26 @@ lineno = __LINE__
 #endif
 BENCH_END(exch93)
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepb4asbd: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4asbd:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepb4asbd
+
 BENCH_START(comp99)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp99)
+
+ endif restore_rk_step_prepb4asbd
+
 BENCH_START(exch94)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -4851,15 +4953,15 @@ BENCH_END(exch97)
 
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_tendency.  
- restore_rktendasbd: if ( config_flags%remove_rktend ) then
+ restore_rktendb4asbd: if ( config_flags%remove_rktend ) then
 BENCH_START(comprestore_rktend_tim)
-   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendasbd:  rk_step, rk_order = ',rk_step,rk_order
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rktendb4asbd:  rk_step, rk_order = ',rk_step,rk_order
    CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
    ! store fields
    CALL select_frame(rk_step, BUF_RKTEND)
 #include "restore_rktend.h"
 BENCH_END(comprestore_rktend_tim)
- else  ! restore_rktendasbd
+ else  ! restore_rktendb4asbd
 
 WRITE(wrf_err_message,*) 'DEBUG:  calling rk_tendency before_a_spec_bdy_dry, rk_step = ',rk_step
 CALL wrf_debug( 10, TRIM(wrf_err_message) )
@@ -4871,7 +4973,7 @@ BENCH_START(comp103)
 &ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp103)
 
- endif restore_rktendasbd
+ endif restore_rktendb4asbd
 
 !------------------------------
 !------------------------------
@@ -5054,11 +5156,26 @@ BENCH_END(exch102)
 #include <all_debug_halo.h>
 #endif
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepb4asd: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4asd:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepb4asd
+
 BENCH_START(comp108)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp108)
+
+ endif restore_rk_step_prepb4asd
+
 BENCH_START(exch103)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -5347,11 +5464,26 @@ BENCH_END(exch108)
 
 ! recompute : dt_rk,dts_rk,number_of_small_timesteps
 
+! TBH:  Trade redundant computation for memory.  
+! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
+ restore_rk_step_prepb4ackk: if ( config_flags%remove_rk_step_prep ) then
+BENCH_START(comprestore_rk_step_prep_tim)
+   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4ackk:  rk_step, rk_order = ',rk_step,rk_order
+   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+   ! store fields
+   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+#include "restore_rk_step_prep.h"
+BENCH_END(comprestore_rk_step_prep_tim)
+ else  ! restore_rk_step_prepb4ackk
+
 BENCH_START(comp114)
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp114)
+
+ endif restore_rk_step_prepb4ackk
+
 BENCH_START(exch109)
 #ifdef DM_PARALLEL
 lineno = __LINE__

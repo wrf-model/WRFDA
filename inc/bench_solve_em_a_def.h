@@ -285,6 +285,8 @@ BENCH_DECL(compstore_rktend_thru_ss_tim)
 BENCH_DECL(comprestore_rktend_thru_ss_tim)
 BENCH_DECL(compstore_rktend_tim)
 BENCH_DECL(comprestore_rktend_tim)
+BENCH_DECL(compstore_rk_step_prep_tim)
+BENCH_DECL(comprestore_rk_step_prep_tim)
 #else
 #define SOLVE_START
 #define SOLVE_END

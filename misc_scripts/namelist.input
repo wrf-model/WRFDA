@@ -27,6 +27,7 @@ remove_runge_kutta_loor=true,
 remove_small_step=true,
 remove_rktend_thru_ss=true,
 remove_rktend=true,
+remove_rk_step_prep=true,
 /
 &domains
 time_step=600,

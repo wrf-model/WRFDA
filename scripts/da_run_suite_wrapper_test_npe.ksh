@@ -134,7 +134,11 @@ export NL_TEST_TRANSFORMS=false
 #WRF-plus adjoint optimization:
 # TBH:  Hacking in new namelist settings here.
 # TBH:  "REMOVE_*" namelist variables are .FALSE. by default
-#export NL_REMOVE_RUNGE_KUTTA_LOOR=false
+#export NL_REMOVE_RUNGE_KUTTA_LOOR=true
+#export NL_REMOVE_SMALL_STEP=true
+#export NL_REMOVE_RKTEND_THRU_SS=true
+#export NL_REMOVE_RKTEND=true
+#export NL_REMOVE_RK_STEP_PREP=true
 
 #JCDF Option & Obs
 export NL_JCDFI_USE=false

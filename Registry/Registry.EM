@@ -1035,6 +1035,7 @@ rconfig   logical remove_runge_kutta_loor namelist,time_control	        1      .
 rconfig   logical remove_small_step       namelist,time_control	        1      .false. rh    "remove_small_step"       ""    ""
 rconfig   logical remove_rktend_thru_ss   namelist,time_control	        1      .false. rh    "remove_rktend_thru_ss"   ""    ""
 rconfig   logical remove_rktend           namelist,time_control	        1      .false. rh    "remove_rktend"           ""    ""
+rconfig   logical remove_rk_step_prep     namelist,time_control	        1      .false. rh    "remove_rk_step_prep"     ""    ""
 
 
 # Domains
