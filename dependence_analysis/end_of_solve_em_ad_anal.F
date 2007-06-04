@@ -489,6 +489,7 @@ BENCH_START(exch111)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3935.inc"
+! TBH CHANGE:  Move update of a_mu_2 and a_moist_2 to HALO_3982
 ! HALO_3935 dyn_em 48:a_alt,a_moist_2,a_moist_tend,a_mu_2,a_p,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_2,a_t_tendf,a_u_2,a_v_2,a_w_2,a_ww,al,alt,muu,muv,p,php,ru,rv,rw,ww
 
 
@@ -518,6 +519,8 @@ BENCH_START(exch112)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3963.inc"
+! TBH CHANGE:  Move update of a_mu_2 and msft to HALO_3982
+! TBH ???:  Does msft ever need update?  
 ! HALO_3963 dyn_em 48:a_alt,a_moist_tend,a_mu_1,a_mu_2,a_p,a_ph_1,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_1,a_t_2,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,msft
 
 
@@ -556,6 +559,13 @@ BENCH_START(exch113)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 # include "HALO_3982.inc"
+! TBH CHANGE:  Remove moist_2, mu_2, u_2, v_2, w_2 due to restore above
+! TBH CHANGE:  Remove a_cqu, a_cqv, a_cqw, a_mut, a_ru, a_rv, a_w_2, since 
+! TBH CHANGE   they have no dependence below
+! TBH CHANGE:  Reduce extent to 8-point for ALL FIELDS
+! TBH ???:  Does mub ever need update?  
+! TBH ???:  Does msfu ever need update?  
+! TBH ???:  Does msfv ever need update?  
 ! HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
 
 #endif
@@ -591,6 +601,7 @@ BENCH_START(exch114)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3997.inc"
+! TBH CHANGE:  Look at removing these last...  
 ! HALO_3997 dyn_em 48:a_al,a_alt,a_moist_2,a_mu_2,a_ph_2,a_ph_tendf,a_php,a_t_2,a_u_2,a_v_2,a_w_2,a_ww 
 #endif
 BENCH_END(exch114)
