@@ -97,7 +97,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -150,7 +150,7 @@ arch_superclean :
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -196,12 +196,12 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL_LITE, MPI, RSL IO)
 #
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -211,7 +211,50 @@ TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
                     
-DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_CPPFLAGS     = 
+DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+
+FCOPTIM         =
+FCDEBUG         = -g -C
+FCTYPE          = -r8
+FCFREE          = -Mfree
+FCENDIAN        = -byteswapio
+FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
+                     -I$(CRTM_INC) -I$(RTTOV_INC)
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = 
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -lg2c
+MPI_LIB         = -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL_LITE, MPI, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = pgf90
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+                    
+DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2 -fast
@@ -223,7 +266,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS2        = 
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -297,9 +340,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,112,136,155,158,159 \
-                     -fno-second-underscore -ftrace=full -finteger=-9999 \
-                     -freal=nan
+FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -379,6 +420,50 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL_LITE, MPI, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = 
+DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         =
+FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
+FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
+                     -Wunused-types -Wimplicit-none
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCOPTIM         =
+CCFLAGS2        =
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
+MPI_LIB         = -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL_LITE, MPI, RSL IO)
 #
 FC              = mpif90
@@ -393,7 +478,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = -O2
@@ -405,13 +490,13 @@ FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
-CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS2        =
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
                      -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
-MPI_LIB         = -L$(RSL_LITE) -lrsl_lite
+MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
 	@ touch arch
@@ -1281,6 +1366,53 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for AIX, xlf, debug                           (RSL_LITE, IBM-MPI, RSL IO)
+#
+M4              = m4 -B24000
+FC              = mpxlf90_r
+FFC             = xlf_r
+SFC             = xlf90_r
+CC              = mpcc_r
+CC_TOOLS        = cc_r
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 8
+
+TRADFLAG        =
+FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+                    
+DM_CPPFLAGS     = 
+DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+
+FCOPTIM         = 
+FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
+                  -qsuppress=1514-008 -qflttrap=zerodivide:invalid:nanq:enable \
+                  -qsigtrap=xl__trce
+FCTYPE          = -qrealsize=8
+FCFREE          = -qfree=f90
+FCENDIAN        =
+FCBASE          = -w -qspill=20000 -qmaxmem=32767
+FCFLAGS_RSL     = $(FCENDIAN)
+
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
+CCFLAGS_RSL     =
+
+LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
+
+LOCAL_LIB       = -lmass -lmassv
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
+                      -L/usr/X11R6/lib -lX11
+MPI_LIB         = -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
 #ARCH Settings for AIX, xlf, optimised                       (RSL_LITE, IBM-MPI, RSL IO)
 #
 M4              = m4 -B24000
@@ -1297,7 +1429,7 @@ TRADFLAG        =
 FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
                     
-DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2 -qarch=auto
@@ -1308,7 +1440,7 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL_LITE)
+CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
 CCFLAGS_RSL     =
 
 LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1661,7 +1793,7 @@ M4              = m4 -B12000
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
@@ -1714,7 +1846,7 @@ M4              = m4 -B12000
 FC              = mpif90
 FFC             = $(FC)
 SFC             = pgf90
-CC              = mpicc -DMPI2_SUPPORT
+CC              = mpicc
 CC_TOOLS        = gcc
 LD              = $(FC)
 
