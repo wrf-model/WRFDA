@@ -140,10 +140,17 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
    if (rootproc) then 
       map_factor_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
+
+   ! temporary increase to dimensions for cori
+   xp%ide=xp%ide+1
+   xp%jde=xp%jde+1
    call da_local_to_global(xp, xb%cori, gbuf_2dd, 2) 
-   if (rootproc) then 
+   if (rootproc) then
       cori_global(1:ix+1,1:jy+1) = gbuf_2dd(1:ix+1,1:jy+1) 
    end if
+   xp%ide=xp%ide-1
+   xp%jde=xp%jde-1
+
    call da_local_to_global(xp, xb%landmask, gbuf_2d, 2) 
    if (rootproc) then 
       landmask_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
@@ -153,7 +160,7 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
 
    if (rootproc) then
       call da_get_unit(anl_inc_unit)
-      open(unit=anl_inc_unit, file='analysis_increment', form='unformatted')
+      open(unit=anl_inc_unit, file='analysis_increments', form='unformatted')
 
       write (unit=anl_inc_unit) ANALYSIS_DATE
 
