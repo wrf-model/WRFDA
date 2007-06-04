@@ -24,7 +24,7 @@ subroutine da_set_tst_trnsf_fld(xp, va, vb, typical_rms)
 
    size3d = (xp%ide-xp%ids+1)*(xp%jde-xp%jds+1)*(xp%kde-xp%kds+1)
 
-   call da_local_to_global(xp, vb, gbuf, 3)
+   call da_patch_to_global(xp, vb, gbuf)
    call wrf_dm_bcast_real(gbuf, size3d)
 
    xy_dim_inv  = 1.0 / real((xp%ide-xp%ids+1)*(xp%jde-xp%jds+1))

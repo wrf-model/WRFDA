@@ -41,7 +41,7 @@ module da_setup_structures
       da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &
       da_scan_radar,da_scan_obs,da_read_obs
-   use da_par_util, only : da_local_to_global
+   use da_par_util, only : da_patch_to_global
    use da_radiance, only : da_setup_bufrtovs_structures
    use da_reporting, only : da_error,message, da_warning, da_message
    use da_recursive_filter, only : da_calculate_rf_factors

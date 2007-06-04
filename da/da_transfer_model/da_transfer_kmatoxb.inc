@@ -470,10 +470,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! testing.  This will always be .false. for a serial or 1-process MPI run.  
    if (testing_dm_exact) then
       allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
-      call da_wv_patch_to_global(grid%xb%lat, arrayglobal, grid%xp%domdesc, &
-         grid%xp%ids, grid%xp%ide, grid%xp%jds, grid%xp%jde,  &
-         grid%xp%ims, grid%xp%ime, grid%xp%jms, grid%xp%jme,  &
-         grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte)
+      call da_patch_to_global(grid%xp, grid%xb%lat, arrayglobal)
       do j=grid%xp%jds,grid%xp%jde
          loc_latc_mean(j) = tmpvar*sum(arrayglobal(grid%xp%ids:grid%xp%ide, j))
       end do

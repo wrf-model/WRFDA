@@ -53,44 +53,46 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
    allocate (  ph_global (1:ix+1,1:jy+1,1:kz+1))
    allocate (psfc_global (1:ix+1,1:jy+1))
    allocate (  mu_global (1:ix+1,1:jy+1))
-   call da_local_to_global(xp, xa % p, gbuf, 3) 
+   call da_patch_to_global(xp, xa % p, gbuf) 
    if (rootproc) then 
       p_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global(xp, xa % t, gbuf, 3) 
+   call da_patch_to_global(xp, xa % t, gbuf) 
    if (rootproc) then 
       t_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global(xp, q_cgrid, gbuf, 3) 
+   call da_patch_to_global(xp, q_cgrid, gbuf) 
    if (rootproc) then 
       q_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global(xp, xa % u, gbuf, 3) 
+   call da_patch_to_global(xp, xa % u, gbuf) 
    if (rootproc) then 
       u_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
-   call da_local_to_global(xp, xa % v, gbuf, 3) 
+   call da_patch_to_global(xp, xa % v, gbuf) 
    if (rootproc) then 
       v_global(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if
 
    ! One more level for w and ph:
-   xp%kde = xp%kde+1
-   call da_local_to_global(xp, xa % w, wgbuf, 3) 
+   xp%kde=xp%kde+1
+   kde=kde+1
+   call da_patch_to_global(xp, xa % w, wgbuf) 
    if (rootproc) then 
       w_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
    end if 
-   call da_local_to_global(xp, ph_cgrid, wgbuf, 3) 
+   call da_patch_to_global(xp, ph_cgrid, wgbuf) 
    if (rootproc) then 
       ph_global(1:ix,1:jy,1:kz+1) = wgbuf(1:ix,1:jy,1:kz+1) 
    end if 
-   xp%kde = xp%kde-1
+   kde=kde-1
+   xp%kde=xp%kde-1
  
-   call da_local_to_global(xp, xa % psfc, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xa % psfc, gbuf_2d) 
    if (rootproc) then 
       psfc_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
-   call da_local_to_global(xp, mu_cgrid, gbuf_2d, 2) 
+   call da_patch_to_global(xp, mu_cgrid, gbuf_2d) 
    if (rootproc) then 
       mu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
@@ -108,50 +110,54 @@ subroutine da_write_increments (xp, xb, xa, q_cgrid, mu_cgrid, ph_cgrid)
    allocate (      cori_global (1:ix+1,1:jy+1))
    allocate (  landmask_global (1:ix+1,1:jy+1))
 
-   call da_local_to_global(xp, xb%psac, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%psac, gbuf_2d) 
    if (rootproc) then 
       psac_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%tgrn, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%tgrn, gbuf_2d) 
    if (rootproc) then 
       tgrn_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%terr, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%terr, gbuf_2d) 
    if (rootproc) then 
       terr_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%snow, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%snow, gbuf_2d) 
    if (rootproc) then 
       snow_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%lat , gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%lat , gbuf_2d) 
    if (rootproc) then 
       lat_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%lon , gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%lon , gbuf_2d) 
    if (rootproc) then 
       lon_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%lanu, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%lanu, gbuf_2d) 
    if (rootproc) then 
       lanu_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
-   call da_local_to_global(xp, xb%map_factor, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%map_factor, gbuf_2d) 
    if (rootproc) then 
       map_factor_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if
 
    ! temporary increase to dimensions for cori
+   ide=ide+1
+   jde=jde+1
    xp%ide=xp%ide+1
    xp%jde=xp%jde+1
-   call da_local_to_global(xp, xb%cori, gbuf_2dd, 2) 
+   call da_patch_to_global(xp, xb%cori, gbuf_2dd) 
    if (rootproc) then
       cori_global(1:ix+1,1:jy+1) = gbuf_2dd(1:ix+1,1:jy+1) 
    end if
+   ide=ide-1
+   jde=jde-1
    xp%ide=xp%ide-1
    xp%jde=xp%jde-1
 
-   call da_local_to_global(xp, xb%landmask, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xb%landmask, gbuf_2d)
    if (rootproc) then 
       landmask_global(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if

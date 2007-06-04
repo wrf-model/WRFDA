@@ -76,7 +76,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    ! [2.0] WRF-Var parameter constants:
    !---------------------------------------------------------------------------
 
-   ! Missing values and the index number of the quality contro
+   ! Missing values and the index number of the quality control
 
    integer, parameter ::  missing       = -888888
    real   , parameter ::  missing_r     = -888888.0
@@ -216,6 +216,10 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    integer, parameter :: unit_end = 500
    logical :: unit_used(unit_start:unit_end) = .false.
 
+   ! grid properties
+
+   character(len=3), parameter :: grid_ordering = "xyz"
+   character(len=3), parameter :: grid_stagger  = "xyz"
 
    !---------------------------------------------------------------------------
    ! [3.0] Variables used in MM5 part of code:

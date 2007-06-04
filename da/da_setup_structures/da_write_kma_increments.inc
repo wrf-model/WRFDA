@@ -41,32 +41,32 @@ subroutine da_write_kma_increments(xp, xb, xa)
    allocate (   q_g (1:ix,1:jy,1:kz))
    allocate (   p_g (1:ix,1:jy,1:kz))
 
-   call da_local_to_global(xp, xa % psfc, gbuf_2d, 2) 
+   call da_patch_to_global(xp, xa % psfc, gbuf_2d) 
    if (rootproc) then 
       psfc_g(1:ix,1:jy) = gbuf_2d(1:ix,1:jy) 
    end if 
 
-   call da_local_to_global(xp, xa % u, gbuf, 3) 
+   call da_patch_to_global(xp, xa % u, gbuf) 
    if (rootproc) then 
       u_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global(xp, xa % v, gbuf, 3) 
+   call da_patch_to_global(xp, xa % v, gbuf) 
    if (rootproc) then 
       v_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global(xp, xa % t, gbuf, 3) 
+   call da_patch_to_global(xp, xa % t, gbuf) 
    if (rootproc) then 
       t_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global(xp, xa % q, gbuf, 3) 
+   call da_patch_to_global(xp, xa % q, gbuf) 
    if (rootproc) then 
       q_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 
 
-   call da_local_to_global(xp, xa % p, gbuf, 3) 
+   call da_patch_to_global(xp, xa % p, gbuf) 
    if (rootproc) then 
       p_g(1:ix,1:jy,1:kz) = gbuf(1:ix,1:jy,1:kz) 
    end if 

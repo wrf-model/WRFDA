@@ -71,36 +71,12 @@ subroutine da_cv_to_global(cv_size, cv_size_global, x, xp, mzs, xg)
    ! gather to global data structures
    ! it is possible to gather straight into a globally-sized cv-array
    ! TOdo:  add this optimization later
-   call da_wv_patch_to_global(vv_x%v1, vv_xg%v1,       &
-                            xp%domdesc, mzs(1),    &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
-   call da_wv_patch_to_global(vv_x%v2, vv_xg%v2,       &
-                            xp%domdesc, mzs(2),    &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
-   call da_wv_patch_to_global(vv_x%v3, vv_xg%v3,       &
-                            xp%domdesc, mzs(3),    &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
-   call da_wv_patch_to_global(vv_x%v4, vv_xg%v4,       &
-                            xp%domdesc, mzs(4),    &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
-   call da_wv_patch_to_global(vv_x%v5, vv_xg%v5,       &
-                            xp%domdesc, mzs(5), &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
-   call da_wv_patch_to_global(vv_x%alpha, vv_xg%alpha,       &
-                            xp%domdesc, mzs(6),    &
-                            ids, ide, jds, jde, kds, &
-                            ims, ime, jms, jme, kms, &
-                            ips, ipe, jps, jpe, kps)
+   call da_patch_to_global(xp, vv_x%v1,    vv_xg%v1,    mzs(1))
+   call da_patch_to_global(xp, vv_x%v2,    vv_xg%v2,    mzs(2))
+   call da_patch_to_global(xp, vv_x%v3,    vv_xg%v3,    mzs(3))
+   call da_patch_to_global(xp, vv_x%v4,    vv_xg%v4,    mzs(4))
+   call da_patch_to_global(xp, vv_x%v5,    vv_xg%v5,    mzs(5))
+   call da_patch_to_global(xp, vv_x%alpha, vv_xg%alpha, mzs(6))
 
    ! deallocate vv_x
    deallocate (vv_x%v1, vv_x%v2, vv_x%v3, vv_x%v4, vv_x%v5)

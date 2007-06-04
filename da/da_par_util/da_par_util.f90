@@ -33,7 +33,7 @@ module da_par_util
    use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &
       rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &
       kts,kte,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe, &
-      kps, kpe
+      kps, kpe, grid_stagger, grid_ordering
    use da_tools, only : message
    use da_reporting, only : da_error
    use da_tracing, only : da_trace_entry, da_trace_exit
@@ -45,9 +45,9 @@ module da_par_util
 
 #include "da_generic_typedefs.inc"
 
-   interface da_wv_patch_to_global
-      module procedure da_wv_patch_to_global_2d
-      module procedure da_wv_patch_to_global_3d
+   interface da_patch_to_global
+      module procedure da_patch_to_global_2d
+      module procedure da_patch_to_global_3d
    end interface
 
    contains
@@ -69,8 +69,8 @@ module da_par_util
 #include "da_transpose_y2x_v2.inc"
 
 #include "da_cv_to_global.inc"
-#include "da_wv_patch_to_global_2d.inc"
-#include "da_wv_patch_to_global_3d.inc"
+#include "da_patch_to_global_2d.inc"
+#include "da_patch_to_global_3d.inc"
 #include "da_generic_methods.inc"
 #include "da_deallocate_global_sonde_sfc.inc"
 #include "da_deallocate_global_sound.inc"
@@ -81,7 +81,6 @@ module da_par_util
 
 #ifdef DM_PARALLEL
 
-#include "da_local_to_global.inc"
 #include "da_proc_sum_count_obs.inc"
 #include "da_proc_stats_combine.inc"
 #include "da_proc_maxmin_combine.inc"

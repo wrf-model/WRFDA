@@ -47,7 +47,7 @@ module da_test
    use da_ffts, only : da_solve_poissoneqn_fct
    use da_minimisation, only : da_transform_vtoy_adj,da_transform_vtoy
    use da_obs, only : da_transform_xtoy,da_transform_xtoy_adj
-   use da_par_util, only : da_local_to_global
+   use da_par_util, only : da_patch_to_global
 #ifdef DM_PARALLEL
    use da_par_util1, only : true_mpi_real
 #endif

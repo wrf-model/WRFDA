@@ -379,6 +379,48 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
+#ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL_LITE, MPI, RSL IO)
+#
+FC              = mpif90
+FFC             = $(FC)
+SFC             = g95
+CC              = mpicc
+CC_TOOLS        = gcc
+LD              = $(FC)
+
+NATIVE_RWORDSIZE	= 4
+
+TRADFLAG        = -traditional
+FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+                    
+DM_CPPFLAGS     = -I$(RSL_LITE)
+DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
+
+FCOPTIM         = -O2
+FCDEBUG         = 
+FCFREE          = -ffree-form  -ffree-line-length-huge
+FCENDIAN        =
+FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+FCTYPE          = -r8
+FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+
+CCOPTIM         = -O2
+CCFLAGS2        = -I$(RSL_LITE)
+CCFLAGS_RSL     = -DMPI2_SUPPORT
+
+LOCAL_LIB       = -L/usr/local/lib
+NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
+                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
+MPI_LIB         = -L$(RSL_LITE) -lrsl_lite
+
+arch : librsl_lite.a
+	@ touch arch
+
+arch_clean :
+
+arch_superclean :
+
+###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, ifort, serial, untested    (Single-threaded)
 #
 
