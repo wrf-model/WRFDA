@@ -6,20 +6,28 @@ librsl_lite.a:          $(RSL_LITE_OBJS)
 			$(AR) librsl_lite.a $(RSL_LITE_OBJS)
 			
 c_code.o : c_code.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 buf_for_proc.o : buf_for_proc.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 rsl_malloc.o : rsl_malloc.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
-rsl_base.o : rsl_bcast.c
+rsl_bcast.o : rsl_bcast.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 task_for_point.o : task_for_point.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 period.o : period.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 swap.o : swap.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 cycle.o : cycle.c
+	$(CC) -c $(CCFLAGS) $(CCFLAGS_RSL) $*.c
 
 f_pack.o : f_pack.F90
 

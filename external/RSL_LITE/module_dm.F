@@ -23,11 +23,19 @@ MODULE module_dm
    LOGICAL :: dm_debug_flag = .FALSE.
 
    INTERFACE wrf_dm_maxval
+#ifdef PROMOTE_FLOAT
+     MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer
+#else
      MODULE PROCEDURE wrf_dm_maxval_real , wrf_dm_maxval_integer, wrf_dm_maxval_doubleprecision
+#endif
    END INTERFACE
 
    INTERFACE wrf_dm_minval                       ! gopal's doing
+#ifdef PROMOTE_FLOAT
+     MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer
+#else
      MODULE PROCEDURE wrf_dm_minval_real , wrf_dm_minval_integer, wrf_dm_minval_doubleprecision
+#endif
    END INTERFACE
 
 CONTAINS
@@ -857,6 +865,7 @@ write(0,*)'reordering mesh'
       ENDDO
    END SUBROUTINE wrf_dm_maxval_real
 
+#ifndef PROMOTE_FLOAT
    SUBROUTINE wrf_dm_maxval_doubleprecision ( val, idex, jdex )
       IMPLICIT NONE
       INCLUDE 'mpif.h'
@@ -879,6 +888,7 @@ write(0,*)'reordering mesh'
         ENDIF
       ENDDO
    END SUBROUTINE wrf_dm_maxval_doubleprecision
+#endif
 
    SUBROUTINE wrf_dm_maxval_integer ( val, idex, jdex )
       IMPLICIT NONE
@@ -936,6 +946,7 @@ write(0,*)'reordering mesh'
 #endif
    END SUBROUTINE wrf_dm_minval_real
 
+#ifndef PROMOTE_FLOAT
    SUBROUTINE wrf_dm_minval_doubleprecision ( val, idex, jdex )
       IMPLICIT NONE
       DOUBLE PRECISION val, val_all( ntasks )
@@ -966,6 +977,7 @@ write(0,*)'reordering mesh'
       ENDDO
 #endif
    END SUBROUTINE wrf_dm_minval_doubleprecision
+#endif
 
    SUBROUTINE wrf_dm_minval_integer ( val, idex, jdex )
       IMPLICIT NONE
