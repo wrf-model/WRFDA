@@ -31,7 +31,7 @@ $(SOLVER) : $(SOLVER).o
 $(SOLVER)_wrf : wrf.o nupdown.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
-	$(LD) -o nupdown.exe $(LDFLAGS) nupdown.o $(LIB)
+	$(SFC) -o nupdown.exe $(LDFLAGS) nupdown.o $(LIB)
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
