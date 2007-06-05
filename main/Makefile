@@ -151,5 +151,5 @@ nupdown.o:
 	$(SED_FTN) $*.F > $*.b
 	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
 	$(RM) $*.b
-	$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. -I$(NETCDFPATH)/include $*.F
+	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. -I$(NETCDFPATH)/include $*.F
 # DO NOT DELETE
