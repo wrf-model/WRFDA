@@ -44,7 +44,7 @@ class OverwriteReader
   end
 
   def print_report
-    all_report = "All variables set = \n#{@varlist.join("\n")}\n"
+    all_report = "! TBH:  OVERWRITE #{@varlist.join(",")}\n"
     File.open("#{@report_file}", "w") { |aFile| aFile.puts(all_report) }
   end
 
