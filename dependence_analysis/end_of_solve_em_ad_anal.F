@@ -125,6 +125,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4asd
 
 BENCH_START(comp108)
+! TBH:  OVERWRITE ru,rv,rw,ww,alt,muu,muv,mut,php,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -271,6 +277,8 @@ BENCH_END(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
 
 BENCH_START(comp_a_rk_tendency1)
+! TBH:  OVERWRITE a_ru_tend, a_rv_tend, a_rw_tend, a_ph_tend, a_t_tend, a_ru_tendf, a_rv_tendf, a_rw_tendf, a_t_tendf, a_mu_tend, a_u_save, a_v_save, a_w_save, a_ph_save, a_t_save, a_ru, a_rv, a_rw, a_ww, a_u_2, a_v_2, a_w_2, a_t_2, a_ph_2, a_u_1, a_v_1, a_w_1, a_t_1, a_ph_1, a_mu_2, a_mut, a_muu, a_muv, a_al, a_alt, a_p, a_php, a_cqu, a_cqv, a_cqw, a_xkmhd
+! TBH:  HORIZONTAL DEPENDENCE:  ????     ( [i-1,i,i+1], [j-1,j,j+1] )
     call a_rk_tendency1( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf,&
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&
@@ -437,6 +445,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4ackk
 
 BENCH_START(comp114)
+! TBH:  OVERWRITE ru,rv,rw,ww,alt,muu,muv,mut,php,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -563,10 +577,10 @@ lineno = __LINE__
 ! TBH CHANGE:  Remove a_cqu, a_cqv, a_cqw, a_mut, a_ru, a_rv, a_w_2, since 
 ! TBH CHANGE   they have no dependence below
 ! TBH CHANGE:  Reduce extent to 8-point for ALL FIELDS
-! TBH ???:  Does mub ever need update?  
-! TBH ???:  Does msfu ever need update?  
-! TBH ???:  Does msfv ever need update?  
-! HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
+! TBH CHANGE:  Remove msfu, msfv, mub since they are not overwritten above 
+! TBH CHANGE:  since their most recent halo update.  
+! OLD: HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
+! NEW: HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww
 
 #endif
 BENCH_END(exch113)
