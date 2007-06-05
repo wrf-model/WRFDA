@@ -339,19 +339,18 @@ endif
 if ( $?RUN_GEN_BE_DIAGS ) then
    ln -sf ${BUILD_DIR}/gen_be_diags.exe .
 
-cat >! gen_be_diags_nl.nl << EOF
-  &gen_be_diags_nl
-    uh_method = '${UH_METHOD}',
-    n_smth_sl = ${N_SMTH_SL}, /
+   cat >! gen_be_diags_nl.nl << EOF
+&gen_be_diags_nl
+   uh_method = '${UH_METHOD}',
+   n_smth_sl = ${N_SMTH_SL}, /
 EOF
 
-      ./gen_be_diags.exe >& gen_be_diags.log
-      set RC = $status
-      if ( $RC != 0 ) then
-        echo "BE diags failed with error" $RC
-        exit 1
-      endif
-
+   ./gen_be_diags.exe >& gen_be_diags.log
+   set RC = $status
+   if ( $RC != 0 ) then
+      echo "BE diags failed with error" $RC
+      exit 1
+   endif
 endif
 
 #------------------------------------------------------------------------
@@ -360,9 +359,9 @@ endif
 
 if ( $?RUN_GEN_BE_DIAGS_READ ) then
 
-cat >! gen_be_diags_nl.nl << EOF
-  &gen_be_diags_nl
-    uh_method = '${UH_METHOD}' /
+   cat >! gen_be_diags_nl.nl << EOF
+&gen_be_diags_nl
+   uh_method = '${UH_METHOD}' /
 EOF
 
    ln -sf ${BUILD_DIR}/gen_be_diags_read.exe .
@@ -381,7 +380,7 @@ endif
 
 if ( $?RUN_GEN_BE_MULTICOV ) then
 
-#  Calculate chi diagnostics:
+   # Calculate chi diagnostics:
    setenv VARIABLE1 chi_u
    setenv VARIABLE2 chi
 
@@ -389,11 +388,11 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
 
    set RC = $status
    if ( $RC != 0 ) then
-     echo "gen_be_cov3d (chi) failed with error" $RC
-     exit 1
+      echo "gen_be_cov3d (chi) failed with error" $RC
+      exit 1
    endif
 
-#  Calculate T diagnostics:
+   # Calculate T diagnostics:
    setenv VARIABLE1 t_u
    setenv VARIABLE2 t
 
@@ -401,11 +400,11 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
 
    set RC = $status
    if ( $RC != 0 ) then
-     echo "gen_be_cov3d (T) failed with error" $RC
-     exit 1
+      echo "gen_be_cov3d (T) failed with error" $RC
+      exit 1
    endif
 
-#  Calculate ps diagnostics:
+   # Calculate ps diagnostics:
    setenv VARIABLE1 ps_u
    setenv VARIABLE2 ps
 
@@ -413,10 +412,12 @@ if ( $?RUN_GEN_BE_MULTICOV ) then
 
    set RC = $status
    if ( $RC != 0 ) then
-     echo "gen_be_cov2d failed with error" $RC
-     exit 1
+      echo "gen_be_cov2d failed with error" $RC
+      exit 1
    endif
 
 endif
+
+echo `date +'%D %T'` "Ended 0"
 
 exit(0)
