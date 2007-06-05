@@ -15,7 +15,7 @@ fi
 export DATE=${DATE:-2003010112}              # Analysis date.
 export WINDOW_START=${WINDOW_START:--3}
 export WINDOW_END=${WINDOW_END:-3}
-export NL_NUM_FGAT=${NL_NUM_FGAT_TIME:-1}
+export NL_NUM_FGAT_TIME=${NL_NUM_FGAT_TIME:-1}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
 
 #Default directories/files:
@@ -280,7 +280,7 @@ echo "WINDOW_END            $WINDOW_END"
 
    ln -fs $WRFVAR_DIR/run/radiance_info .
 
-   if test $NL_NUM_FGAT -gt 1; then
+   if test $NL_NUM_FGAT_TIME -gt 1; then
       if $NL_VAR4D; then
          # More than one observation file of each type
          ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
