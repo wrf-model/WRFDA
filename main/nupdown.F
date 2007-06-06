@@ -543,7 +543,7 @@
                    data2(dims_out(1),1,:,:) = ( 2.0*data2(dims_out(1)-1,1,:,:) - data2(dims_out(1)-2,1,:,:)  )
                    data2(1,dims_out(2),:,:) = ( 2.0*data2(1,dims_out(2)-1,:,:) - data2(1,dims_out(2)-2,:,:)  )
                    data2(dims_out(1),dims_out(2),:,:) = ( 2.0*data2(dims_out(1)-1,dims_out(2),:,:) - data2(dims_out(1)-2,dims_out(2),:,:)  )
-                   if ( trim(cval) .eq. 'QVAPOR' .or. trim(cval) .eq. 'PHB' .or. trim(cval) .eq. 'SNOALB') where ( data2 .lt. 0.0 ) data2 = 0.0
+                   if ( trim(cval) .eq. 'PHB' .or. trim(cval) .eq. 'SNOALB') where ( data2 .lt. 0.0 ) data2 = 0.0
                    if ( trim(cval) .eq. 'SMOIS' .or. trim(cval) .eq. 'SH2O') then 
                         where ( data2 .lt. 0.0 ) data2 = 0.0
                         where ( data2 .gt. 1.0 ) data2 = 1.0

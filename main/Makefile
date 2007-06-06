@@ -31,7 +31,7 @@ $(SOLVER) : $(SOLVER).o
 $(SOLVER)_wrf : wrf.o nupdown.o
 	$(RANLIB) libwrflib.a
 	$(LD) -o wrfplus.exe $(LDFLAGS) wrf.o libwrflib.a $(LIB)
-	$(SFC) -o nupdown.exe $(LDFLAGS) nupdown.o $(LIB)
+	$(SFC) -o nupdown.exe nupdown.o  -L$(NETCDFPATH)/lib -lnetcdf -lm
 
 $(SOLVER)_ideal : module_initialize ideal.o
 	$(RANLIB) libwrflib.a
@@ -148,8 +148,5 @@ da_3dvar.o: \
 
 nupdown.o: 
 	$(RM) $@
-	$(SED_FTN) $*.F > $*.b
-	$(CPP) -I../inc $(CPPFLAGS) $*.b  > $*.f
-	$(RM) $*.b
-	$(SFC) -c $(FCFLAGS) $(MODULE_DIRS) $(PROMOTION) -I.. -I$(NETCDFPATH)/include $*.F
+	$(SFC) -c $(FCFLAGS) -I$(NETCDFPATH)/include $*.F
 # DO NOT DELETE
