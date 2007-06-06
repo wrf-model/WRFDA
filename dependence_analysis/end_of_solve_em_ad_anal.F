@@ -368,6 +368,24 @@ lineno = __LINE__
 BENCH_END(exch107)
 
 BENCH_START(comp_a_rk_tendency2)
+! TBH:  OVERWRITE a_mu_tend,a_mut,a_ph_save,a_ph_tend,a_ru,a_ru_tend,a_rv,a_rv_tend,a_rw_tend,a_t_2,a_t_save,a_t_tend,a_u_2,a_u_save,a_v_2,a_v_save,a_w_2,a_w_save,a_ww
+! TBH:  HORIZONTAL DEPENDENCE:  a_ru_tend  ( [i-3,i,i+4], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_rv_tend  ( [i-3,i,i+3], [j-3,j,j+4] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tend  ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_t        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_t_tend   ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_w        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  msft       ( [i-3,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfu       ( [i-4,i,i+3], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  msfv       ( [i-3,i,i+3], [j-4,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  ru         ( [i-3,i,i+3], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  rv         ( [i-1,i    ], [j-3,j,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  t          ( [i-3,i,i+3], [j-3,i,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  u          ( [i-3,i,i+4], [j-3,i,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  v          ( [i-3,i,i+3], [j-3,i,j+4] )
+! TBH:  HORIZONTAL DEPENDENCE:  w          ( [i-3,i,i+3], [j-3,i,j+3] )
     call a_rk_tendency2( config_flags,rk_step,a_ru_tend,a_rv_tend,a_rw_tend,a_ph_tend,a_t_tend,a_ru_tendf,a_rv_tendf,a_rw_tendf,&
 &a_t_tendf,a_mu_tend,a_u_save,a_v_save,a_w_save,a_ph_save,a_t_save,ru,a_ru,rv,a_rv,rw,a_rw,ww,a_ww,u_2,a_u_2,v_2,a_v_2,w_2,&
 &a_w_2,t_2,a_t_2,ph_2,a_ph_2,u_1,a_u_1,v_1,a_v_1,w_1,a_w_1,t_1,a_t_1,ph_1,a_ph_1,phb,t_init,mu_2,a_mu_2,mut,a_mut,muu,a_muu,&
