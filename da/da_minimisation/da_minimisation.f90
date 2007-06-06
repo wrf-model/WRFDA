@@ -28,7 +28,7 @@ module da_minimisation
       da_jo_and_grady_buoy
    use da_control, only : trace_use,var4d_coupling_disk_simul, &
       var4d, rootproc,jcdfi_use,var4d_coupling,ierr,comm,num_fgat_time, &
-      stdout, eps, stats_unit, testing_dm_exact, global, &
+      stdout, eps, stats_unit, test_dm_exact, global, &
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
       rtm_option,rtm_option_rttov, rtm_option_crtm, &

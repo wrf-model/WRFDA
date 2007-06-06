@@ -46,7 +46,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
    je = xb%jte
    ke = xb%kte
 
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

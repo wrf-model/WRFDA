@@ -130,7 +130,7 @@ subroutine da_check_vvtovp_adjoint(ne, xb, be, vv, vp)
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
    adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
 
-   write(unit=stdout,fmt='(A,2F10.2)') &
+   write(unit=stdout,fmt='(A,2F15.2)') &
       'TEST_COVERAGE_da_check_vvtovp_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 

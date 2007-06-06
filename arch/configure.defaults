@@ -15,7 +15,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -28,7 +28,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 
 # Libraries
@@ -66,7 +66,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -104,7 +104,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -118,7 +118,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -126,7 +126,7 @@ NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6
                      -lX11 -lg2c
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
-LDFLAGS2        = -V
+EXTRA_LDFLAGS   = -V
 
 
 arch : 
@@ -157,7 +157,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -171,7 +171,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -208,8 +208,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -D
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -223,7 +223,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = 
+EXTRA_CCFLAGS   = 
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -251,8 +251,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -266,7 +266,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = 
+EXTRA_CCFLAGS   = 
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -294,7 +294,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         = 
@@ -328,7 +329,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -344,10 +346,8 @@ FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LDFLAGS2        =
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -382,7 +382,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -396,7 +397,7 @@ FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -432,7 +433,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
@@ -448,7 +450,7 @@ FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         =
-CCFLAGS2        =
+EXTRA_CCFLAGS   =
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -476,7 +478,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
@@ -490,7 +493,7 @@ FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
-CCFLAGS2        =
+EXTRA_CCFLAGS   =
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -520,7 +523,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -553,7 +557,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -566,7 +570,7 @@ FCBASE          =
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -601,7 +605,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -614,7 +618,7 @@ FCBASE          =
 FCTYPE          = -r8
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -649,7 +653,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -685,7 +689,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -699,10 +703,10 @@ FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 
-LDFLAGS2        = -V
+EXTRA_LDFLAGS   = -V
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -735,7 +739,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -749,7 +753,7 @@ FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = 
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -783,7 +787,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -818,7 +822,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -831,10 +835,8 @@ FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
-
-LDFLAGS2        =
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -867,7 +869,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -880,7 +882,7 @@ FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -915,7 +917,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -925,8 +928,6 @@ FCENDIAN        = -convert big_endian
 FCBASE          = 
 
 CCFLAGS_RSL     =
-
-LDFLAGS         = $(FCBASE) $(FCOPTIM) $(FCENDIAN)
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -952,7 +953,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -966,7 +967,7 @@ FCENDIAN        = -convert big_endian
 FCBASE          = 
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -1001,7 +1002,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-FPPFLAGS2       = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1014,7 +1015,7 @@ FCENDIAN        = -convert big_endian
 FCBASE          = 
 FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS2        = -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -I$(RSL)/RSL
 CCFLAGS_RSL     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -1052,7 +1053,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = -O2
 FCDEBUG         = # -g
@@ -1062,7 +1063,7 @@ FCENDIAN        =
 FCBASE          = -64 -mips4
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 -DUNDERSCORE -DIRIX
+EXTRA_CCFLAGS   = -w -64 -mips4 -DUNDERSCORE -DIRIX
 CCFLAGS_RSL     = 
 
 LOCAL_LIB       = 
@@ -1090,7 +1091,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1102,7 +1103,7 @@ FCENDIAN        =
 FCBASE          = -64 -mips4 -w
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -64 -mips4 -DIRIX -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -w -64 -mips4 -DIRIX -I$(RSL)/RSL
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = 
@@ -1148,7 +1149,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1161,7 +1162,7 @@ FCBASE          = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias 
                      -align all -IPF_fp_relaxed
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -w -O3 -ip -tpp2 -c -ftz -no-gcc -I$(RSL)/RSL 
+EXTRA_CCFLAGS   = -w -O3 -ip -tpp2 -c -ftz -no-gcc -I$(RSL)/RSL 
 CCFLAGS_RSL     =
 
 LOCAL_LIB       = 
@@ -1200,7 +1201,8 @@ NATIVE_RWORDSIZE	= 8
 MAX_PROC        = 256
 
 TRADFLAG        =
-FPPFLAGS2       = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 FCOPTIM         =
 FCDEBUG         =
@@ -1233,7 +1235,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         = 
@@ -1243,9 +1246,9 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
                     -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
 
-LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
@@ -1273,7 +1276,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1288,10 +1292,10 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
 CCFLAGS_RSL     =
 
-LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
@@ -1327,7 +1331,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1340,10 +1345,10 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
 CCFLAGS_RSL     =
 
-LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_FLAGS     = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
@@ -1379,8 +1384,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -1395,10 +1400,10 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
 CCFLAGS_RSL     =
 
-LDFLAGS2        = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
@@ -1426,8 +1431,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-FPPFLAGS2       = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -DNEW_BDYS
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -1440,10 +1445,10 @@ FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
 CCFLAGS_RSL     =
 
-LDFLAGS2         = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
@@ -1474,7 +1479,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 FCOPTIM         =
 FCDEBUG         =
@@ -1484,7 +1490,7 @@ FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC) -p$(CRTM_INC)
 
-CCFLAGS2        = -UCRAY -Dcrayx1
+EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
 # Cray linker very fussy about availablity of modules, so give it a very wide scope
 LOCAL_LIB       = 
 
@@ -1513,7 +1519,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1527,10 +1533,10 @@ FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC)  -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
-LDFLAGS2        = -V
+EXTRA_LDFLAGS   = -V
 
 LOCAL_LIB       = 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1567,7 +1573,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-FPPFLAGS2       = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1581,7 +1587,7 @@ FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                     -p$(RTTOV_INC) -p$(CRTM_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
 CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
 
 LOCAL_LIB       = 
@@ -1617,7 +1623,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -1626,7 +1633,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 
-CCFLAGS2        = -DLANDREAD_STUB -DMACOS
+EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -1655,7 +1662,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1671,10 +1679,8 @@ FCBASE          = -cpp -fno-second-underscore \
                      -Wno=101,112,136,155,158,159
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
+EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
-
-LDFLAGS2        =
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -1711,7 +1717,8 @@ CC_TOOLS        = gcc
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1724,7 +1731,7 @@ FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
-CCFLAGS2        = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
+EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 CCOPTIM         = -O2
 
@@ -1763,7 +1770,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) `cat inc/dm_comm_cpp_flags`
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 
 FCOPTIM         =
 FCDEBUG         =
@@ -1773,7 +1781,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 
-CCFLAGS2        = -DLANDREAD_STUB -DMACOS
+EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -1800,7 +1808,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = 
-FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1814,13 +1823,13 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL -DMACOS
+EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
-LDFLAGS2        = -V
+EXTRA_LDFLAGS   = -V
 
 
 arch : 
@@ -1853,7 +1862,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-FPPFLAGS2       = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
+                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1867,7 +1877,7 @@ FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FF
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 FCFLAGS_RSL     = $(FCENDIAN)
 
-CCFLAGS2        = -I$(RSL)/RSL -DMACOS
+EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
 CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib

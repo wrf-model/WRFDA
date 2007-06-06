@@ -26,7 +26,7 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte      
 
-   if ( Testing_WRFVAR ) then
+   if ( test_wrfvar ) then
       is = xb%its-1
       js = xb%jts-1
 

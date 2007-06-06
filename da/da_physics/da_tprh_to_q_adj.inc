@@ -24,7 +24,7 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte   
 
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

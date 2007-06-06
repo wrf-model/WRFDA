@@ -31,7 +31,7 @@ subroutine da_prho_to_t_adj(xb, xp, xa)
    ks = xp%kts
    ke = xp%kte
    
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

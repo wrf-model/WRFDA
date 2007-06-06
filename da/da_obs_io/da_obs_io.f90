@@ -7,7 +7,7 @@ module da_obs_io
       obs_qc_pointer, rootproc, omb_unit,omb_add_noise,use_airepobs, &
       use_airepobs,use_bogusobs,use_gpspwobs,use_gpsrefobs,use_geoamvobs, &
       use_metarobs,use_profilerobs,use_pilotobs,use_buoyobs,use_shipsobs, &
-      use_synopobs,use_soundobs,use_qscatobs,testing_wrfvar, report_start, &
+      use_synopobs,use_soundobs,use_qscatobs,test_wrfvar, report_start, &
       report_end, global, print_detail_obs, stdout, t_kelvin, stderr, &
       max_ob_levels, missing_data, max_bogus_input, myproc,convert_uv2fd, &
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &

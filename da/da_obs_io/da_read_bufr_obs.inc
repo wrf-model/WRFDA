@@ -882,7 +882,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          end select
 
          if (global .and. n < 2) then
-           if (Testing_WRFVAR) exit dup_loop
+           if (test_wrfvar) exit dup_loop
            if (platform%loc % i >= xp % ide) then
                platform%loc%i = platform%loc % i - xp % ide
             else if (platform%loc % i < xp % ids) then

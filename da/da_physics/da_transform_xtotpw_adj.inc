@@ -21,7 +21,7 @@ subroutine da_transform_xtotpw_adj(xa, xb)
    ie = xb%ite
    je = xb%jte
 
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

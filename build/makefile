@@ -24,7 +24,9 @@ links :
 	@ $(LN) $(TOOLS)/*.h .
 	@ $(LN) $(DA)/*/* .
 	@ $(LN) $(IO_INT)/* .
+	@ mv diffwrf.F diffwrf_int.F
 	@ $(LN) $(IO_NETCDF)/* .
+	@ mv diffwrf.F90 diffwrf_netcdf.F
 	@ $(LN) $(IO_GRIB_SHARE)/* .
 	@ $(LN) $(IO_GRIB1)/* .
 	@ $(LN) $(IO_GRIB2)/* .
@@ -66,7 +68,7 @@ include RSL_LITE.make
 # which is wrong, try to encourage it to use the correct one by manually defining
 # the test cases in main.make
 
-IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|convert_emiss|convert_bioemiss|ideal"
+IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
 
 depend : links arch registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc

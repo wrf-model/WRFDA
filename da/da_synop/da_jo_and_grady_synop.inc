@@ -23,7 +23,7 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
    jo % synop_p = 0.0
    jo % synop_q = 0.0
 
-   if (testing_dm_exact) then
+   if (test_dm_exact) then
       if (iv%num_synop_glo == 0) return
    else
       if (iv%num_synop < 1) return
@@ -46,7 +46,7 @@ subroutine da_jo_and_grady_synop(iv, re, jo, jo_grad_y)
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not
    ! testing.  This will always be .false. for a serial run.
-   if (testing_dm_exact) then
+   if (test_dm_exact) then
       ! collect all obs in serial order and allocate global objects
       call da_to_global_synop(iv,      re,      jo_grad_y, &
                            iv_glob, re_glob, jo_grad_y_glob)

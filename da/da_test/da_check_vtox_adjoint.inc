@@ -134,7 +134,7 @@ subroutine da_check_vtox_adjoint(grid, cv_size, xb, xbx, be, ep, cv1, vv, vp, &
    else
       adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
    end if
-   write (unit=stdout,fmt='(A,2F10.2)') &
+   write (unit=stdout,fmt='(A,2F15.2)') &
       'TEST_COVERAGE_da_check_vtox_adjoint:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 

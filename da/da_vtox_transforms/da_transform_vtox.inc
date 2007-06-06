@@ -115,9 +115,9 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    call da_pt_to_rho_lin(xb, xa, xp)
  
-   ! If Testing_wrfvar = .true., not "XToY" transform needed to do here:
+   ! If test_wrfvar = .true., not "XToY" transform needed to do here:
 
-   if (.not.testing_wrfvar) then
+   if (.not.test_wrfvar) then
       ! Exchange XA halo region.
 #ifdef DM_PARALLEL
 #include "HALO_XA.inc"

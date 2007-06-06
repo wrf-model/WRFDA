@@ -24,7 +24,7 @@ subroutine da_transform_xtogpsref_adj(xa, xb, xp)
    js = xp%jts; je = xp%jte
    ks = xp%kts; ke = xp%kte      
 
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

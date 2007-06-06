@@ -215,7 +215,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       if (global .and. &
          (platform%loc%i < xp%ids .or. platform%loc%i >= xp%ide)) ndup= 2
 
-      if (Testing_WRFVAR) ndup = 1
+      if (test_wrfvar) ndup = 1
 
       do n = 1, ndup
 

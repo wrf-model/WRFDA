@@ -89,7 +89,7 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    call da_uv_to_divergence_adj(grid,xp, xb, URHO,VRHO, DIV)
 
    ! Computation to check for edge of domain:
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = its-1; ie = ite+1; js = jts-1; je = jte+1
       if (its == ids) is = ids; if (ite == ide) ie = ide
       if (jts == jds) js = jds; if (jte == jde) je = jde

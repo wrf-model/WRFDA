@@ -64,7 +64,7 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
    adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
-   write(unit=stdout,fmt='(A,2F10.2)') &
+   write(unit=stdout,fmt='(A,2F15.2)') &
       'TEST_COVERAGE_da_check_vptox_adjoint A:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 
@@ -210,7 +210,7 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    adj_sum_lhs = wrf_dm_sum_real(adj_par_lhs)
    adj_sum_rhs = wrf_dm_sum_real(adj_par_rhs)
-   write (unit=stdout,fmt='(A,2F10.2)') &
+   write (unit=stdout,fmt='(A,2E22.14)') &
       'TEST_COVERAGE_da_check_vptox_adjoint B:  adj_sum_lhs,adj_sum_rhs = ', &
       adj_sum_lhs,adj_sum_rhs
 

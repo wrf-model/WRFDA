@@ -39,17 +39,17 @@ subroutine da_setup_obs_structures( grid, ob, iv)
       use_rad = .false.
    end if
 
-   ! testing_dm_exact can be set to .true. to force DM_PARALLEL runs 
+   ! test_dm_exact can be set to .true. to force DM_PARALLEL runs 
    ! to produce results that are bitwise-identical regardless of the number of 
    ! MPI tasks used.  This is useful for validating that multi-processor runs 
    ! are not a source of bugs.  Runtime will be much longer.  This option is 
    ! automatically overridden to .false. for serial or 1-MPI-task runs.  
 
-   if (testing_dm_exact) then
+   if (test_dm_exact) then
       if (num_procs == 1) then
-         testing_dm_exact = .false.
+         test_dm_exact = .false.
          write(unit=stdout,fmt='(A)') &
-            ' testing_dm_exact overridden to .false. for serial or 1-MPI-task run'
+            ' test_dm_exact overridden to .false. for serial or 1-MPI-task run'
       end if
       ! only implmenented for Sound and Synop, so switch other types off
       Use_ShipsObs         = .false.

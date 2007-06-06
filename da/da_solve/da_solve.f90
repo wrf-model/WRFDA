@@ -31,7 +31,7 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
-      ips,ipe, jps,jpe, vert_corr, sin_xle, testing_wrfvar, use_rad, &
+      ips,ipe, jps,jpe, vert_corr, sin_xle, test_wrfvar, use_rad, &
       calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
@@ -232,7 +232,7 @@ subroutine da_solve ( grid , config_flags)
          stop
       end if
 
-      if (testing_wrfvar) then
+      if (test_wrfvar) then
          call da_check(grid, cv_size, grid%xb, xbx, be, grid%ep, iv, &
                         grid%xa, grid%vv, grid%vp, grid%xp, y)
          call wrfu_finalize

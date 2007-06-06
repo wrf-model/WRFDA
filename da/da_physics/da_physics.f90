@@ -16,7 +16,7 @@ module da_physics
    use da_define_structures, only : synop_type, residual_synop_type
    use da_control, only : gas_constant, gravity,kts,kte, svp3,svpt0, &
       gas_constant_v, svp1, to, xls, svp2,its,ite,jts,jte,kts,kte, &
-      ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, testing_wrfvar, &
+      ims,ime,jms,jme,kms,kme,xlv1,cp,ids,ide,jds,jde,kds,kde, test_wrfvar, &
       trace_use, missing_r, maximum_rh, minimum_rh,cv_options_hum,coeff,l_over_rv, &
       es_gammakelvin, es_gammabeta, rd_over_rv1,t_kelvin, es_alpha, es_gamma, &
       es_beta, rd_over_rv, trace_use_frequent,gamma, stdout, ips, ipe, jps, &

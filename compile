@@ -33,7 +33,7 @@ foreach a ( $argv )
 
     set arglist = ( $arglist $a )
 
-    if ( "$a" == "wrf" ) then
+    if ( "$a" == "wrf" || "$a" == "all_em" || "$a" == "all_wrf" || "$a" == "chem" ) then
       set compare_wrf = 1
     else if ( "$a" == "em_real" ) then
       set compare_wrf = 1

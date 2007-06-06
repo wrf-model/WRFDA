@@ -80,9 +80,9 @@ subroutine da_transform_vtox_adj(grid, cv_size, xb, xbx, be, ep, xa, xp, vp, vv,
    end if
 
    !-------------------------------------------------------------------------
-   ! If Testing_wrfvar = .true., not "XToY" transform needed to do here (YRG):
+   ! If test_wrfvar = .true., not "XToY" transform needed to do here (YRG):
 
-   if (.not.testing_wrfvar) then
+   if (.not.test_wrfvar) then
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. use_GpsrefObs) then

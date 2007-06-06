@@ -23,7 +23,7 @@ subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
    ie = xb%ite
    je = xb%jte
 
-   if (Testing_WRFVAR) then
+   if (test_wrfvar) then
       is = xb%its-1
       js = xb%jts-1
 

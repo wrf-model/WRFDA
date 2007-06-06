@@ -468,7 +468,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .false. for a serial or 1-process MPI run.  
-   if (testing_dm_exact) then
+   if (test_dm_exact) then
       allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
       call da_patch_to_global(grid%xp, grid%xb%lat, arrayglobal)
       do j=grid%xp%jds,grid%xp%jde

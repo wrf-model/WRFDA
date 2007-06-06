@@ -30,7 +30,7 @@ real function da_dot_cv(cv_size, cv_size_domain, x, y, xp, mzs)
    ! testing.  This will always be .false. for a serial run or 
    ! one-processor DM_PARALLEL run.
 
-   if (testing_dm_exact) then
+   if (test_dm_exact) then
 
       ! Collect local cv arrays x and y to globally-sized serially-ordered 
       ! arrays xg and yg.  Note that xg and yg will only exist on the 
