@@ -1,0 +1,4 @@
+  FORCE_VALUE ::: config_flags%h_sca_adv_order    :::  5
+  FORCE_VALUE ::: config_flags%v_sca_adv_order    :::  3
+  FORCE_VALUE ::: config_flags%h_mom_adv_order    :::  5
+  FORCE_VALUE ::: config_flags%v_mom_adv_order    :::  3

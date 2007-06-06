@@ -1,0 +1,6 @@
+
+This directory contains various files used during horizontal dependence 
+analysis.  They probably don't really need to be saved, but here they are 
+just in case.  Do not put any of this stuff back onto the main branch at 
+https://svn-wrf-var.cgd.ucar.edu/branches/BR_2005workshop !!  
+
