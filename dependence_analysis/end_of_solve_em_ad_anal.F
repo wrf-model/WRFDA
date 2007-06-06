@@ -605,7 +605,8 @@ BENCH_START(exch111)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3935.inc"
-! TBH CHANGE:  Move update of a_mu_2 and a_moist_2 to HALO_3982
+! TBH CHANGE:  Remove update of a_mu_2
+! TBH CHANGE:  Move update of a_moist_2 to HALO_3982 ???  
 ! HALO_3935 dyn_em 48:a_alt,a_moist_2,a_moist_tend,a_mu_2,a_p,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_2,a_t_tendf,a_u_2,a_v_2,a_w_2,a_ww,al,alt,muu,muv,p,php,ru,rv,rw,ww
 
 
@@ -638,10 +639,12 @@ BENCH_END(comp116)
 BENCH_START(exch112)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_3963.inc"
-! TBH CHANGE:  Move update of a_mu_2 and msft to HALO_3982
-! TBH ???:  Does msft ever need update?  
-! HALO_3963 dyn_em 48:a_alt,a_moist_tend,a_mu_1,a_mu_2,a_p,a_ph_1,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_1,a_t_2,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,msft
+! TBH:  removed #    include "HALO_3963.inc"
+! TBH CHANGE:  Reduce extent to 8-point for ALL FIELDS
+! TBH CHANGE:  Moved a_mu_2 to HALO_3982
+! TBH CHANGE:  Remove all other fields.  
+! OLD:  HALO_3963 dyn_em 48:a_alt,a_moist_tend,a_mu_1,a_mu_2,a_p,a_ph_1,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_1,a_t_2,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,msft
+! NEW:  HALO_3963 REMOVED
 
 
 
@@ -685,8 +688,8 @@ lineno = __LINE__
 ! TBH CHANGE:  Reduce extent to 8-point for ALL FIELDS
 ! TBH CHANGE:  Remove msfu, msfv, mub since they are not overwritten above 
 ! TBH CHANGE:  since their most recent halo update.  
-! OLD: HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
-! NEW: HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww
+! OLD:  HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
+! NEW:  HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww,a_mu_2
 
 #endif
 BENCH_END(exch113)

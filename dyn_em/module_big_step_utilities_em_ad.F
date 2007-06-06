@@ -5953,9 +5953,11 @@ integer k
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
-do j = jts, jte
-  do k = kts, kte
-    do i = its, ite
+! TBH:  Fill in halos since we know what they must be to avoid 
+! TBH:  halo updates.  
+do j = jms, jme
+  do k = kms, kme
+    do i = ims, ime
       a_tendency(i,k,j) = 0.
     end do
   end do

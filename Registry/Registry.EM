@@ -1775,6 +1775,5 @@ halo HALO_3886 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_3898 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_3903 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_3935 dyn_em 48:a_alt,a_moist_2,a_moist_tend,a_mu_2,a_p,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_2,a_t_tendf,a_u_2,a_v_2,a_w_2,a_ww,al,alt,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3963 dyn_em 8:a_mu_1,a_p,a_ph_2,a_t_2
-halo HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww
+halo HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww,a_mu_2
 halo HALO_3997 dyn_em 48:a_al,a_alt,a_moist_2,a_mu_2,a_ph_2,a_ph_tendf,a_php,a_t_2,a_u_2,a_v_2,a_w_2,a_ww
