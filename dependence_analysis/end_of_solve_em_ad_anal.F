@@ -162,6 +162,8 @@ BENCH_END(exch103)
   rk_step_is_onzr: if (rk_step .eq. 1) then
 
 BENCH_START(comp109)
+! TBH:  OVERWRITE ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call init_zero_tendency( ru_tendf,rv_tendf,rw_tendf,ph_tendf,t_tendf,tke_tend,moist_tend,chem_tend,num_3d_m,num_3d_c,rk_step,&
 &ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp109)
@@ -180,6 +182,9 @@ BENCH_END(exch104)
 #endif
 
 BENCH_START(comp110)
+! TBH:  OVERWRITE mu_3d,rho,th_phy,p_phy,pi_phy,u_phy,v_phy,p8w,t_phy,t8w,z,z_at_w,dz8w,rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,rqiblten,rthcuten,rqvcuten,rqccuten,rqrcuten,rqicuten,rqscuten,rthften,rqvften
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
       call phy_prep( config_flags,mut,u_2,v_2,p,pb,alt,ph_2,phb,t_2,tsk,moist_2,num_3d_m,mu_3d,rho,th_phy,p_phy,pi_phy,u_phy,v_phy,&
 &p8w,t_phy,t8w,z,z_at_w,dz8w,fnm,fnp,rthraten,rthblten,rublten,rvblten,rqvblten,rqcblten,rqiblten,rthcuten,rqvcuten,rqccuten,&
 &rqrcuten,rqicuten,rqscuten,rthften,rqvften,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),&
@@ -205,6 +210,11 @@ BENCH_END(exch105)
 BENCH_START(comp111)
     if (diff_opt .eq. 2 .or. diff_opt .eq. 1) then
 
+! TBH:  (not called with current namelist settings)
+! TBH:  OVERWRITE xkmv,xkmh,xkmhd,xkhv,xkhh,BN2
+! TBH:  HORIZONTAL DEPENDENCE:  defor12  ( [    i,i+1], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor13  ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor23  ( [    i    ], [    j,j+1] )
         call calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,xkmv,xkhh,xkhv,bn2,khdif,kvdif,div,defor11,&
 &defor22,defor33,defor12,defor13,defor23,tke_2(ims,kms,jms),p8w,t8w,th_phy,t_phy,p_phy,moist_2,dn,dnw,dx,dy,rdz,rdzw,&
 &mix_cr_len,num_3d_m,cf1,cf2,cf3,warm_rain,kh_tke_upper_bound,kv_tke_upper_bound,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,&
@@ -256,6 +266,14 @@ BENCH_START(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
   IF (rk_step == 1 ) then
 
+! TBH:  OVERWRITE a_muu, a_muv, a_z, a_z_at_w, a_u_2, a_v_2
+! TBH:  HORIZONTAL DEPENDENCE:  z         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  z_at_w    ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_z       ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_z_at_w  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  xland     ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  u_2       ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2       ( [i-1,i,i+1], [j-1,j,j+1] )
  call a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u_2, a_u_2, v_2, a_v_2, xland, muu, a_muu, muv, a_muv, z, &
 &a_z, z_at_w, a_z_at_w, &
         ids, ide, jds, jde, kds, kde, &
@@ -376,7 +394,7 @@ BENCH_START(comp_a_rk_tendency2)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_t_tend   ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_u        ( [i-3,i,i+2], [j-3,j,j+2] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_v        ( [i-3,i,i+2], [j-3,j,j+2] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_w        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_w_2      ( [i-3,i,i+2], [j-3,j,j+2] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msft       ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfu       ( [i-4,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfv       ( [i-3,i,i+3], [j-4,j,j+3] )
@@ -566,6 +584,11 @@ lineno = __LINE__
 BENCH_END(exch110)
 
 BENCH_START(comp115)
+! TBH:  (not called with current namelist settings)
+! TBH:  OVERWRITE a_bn2h,a_moist_2,a_p_phy,a_p8w,a_t_phy,a_t8w,a_th_phy,a_xkmhd,bn2
+! TBH:  HORIZONTAL DEPENDENCE:  defor12  ( [    i,i+1], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor13  ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  defor23  ( [    i    ], [    j,j+1] )
         call a_calculate_km_kh( config_flags,dt,dampcoef,zdamp,damp_opt,xkmh,xkmhd,a_xkmhd,xkmv,xkhh,xkhv,bn2,a_bn2h,khdif,div,&
 &defor11,defor22,defor33,defor12,defor13,defor23,tke_2(ims,kms,jms),p8w,a_p8w,t8w,a_t8w,th_phy,a_th_phy,t_phy,a_t_phy,&
 &p_phy,a_p_phy,moist_2,a_moist_2,dn,dnw,dx,dy,rdz,rdzw,num_3d_m,cf1,cf2,cf3,kh_tke_upper_bound,ids,ide,jds,jde,kde,ims,ime,&
@@ -591,6 +614,8 @@ lineno = __LINE__
 BENCH_END(exch111)
 
 BENCH_START(comp116)
+! TBH:  OVERWRITE a_p,a_p8w,a_p_phy,a_ph_2,a_pi_phyh,a_t_2,a_t8w,a_t_phy,a_th_phy,a_z,a_z_at_wh,p_phy,pi_phy,t_phy,th_phy,z,z_at_w
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call a_phy_prep( p,a_p,pb,ph_2,a_ph_2,phb,t_2,a_t_2,th_phy,a_th_phy,p_phy,a_p_phy,pi_phy,a_pi_phyh,a_p8w,t_phy,a_t_phy,a_t8w,&
 &z,a_z,z_at_w,a_z_at_wh,fnm,fnp,ide,jde,kde,ims,ime,jms,jme,kms,kme,&
         max(grid%i_start(ij)-1,ids),  &
@@ -598,6 +623,8 @@ BENCH_START(comp116)
         max(grid%j_start(ij)-1,jds),  &
         min(grid%j_end(ij)+1,jde),k_start,k_end )
 
+! TBH:  OVERWRITE a_ru_tendf,a_rv_tendf,a_rw_tendf,a_ph_tendf,a_t_tendf,a_moist_tend
+! TBH:  HORIZONTAL DEPENDENCE:  NONE
       call a_init_zero_tendency( a_ru_tendf,a_rv_tendf,a_rw_tendf,a_ph_tendf,a_t_tendf,a_moist_tend,num_3d_m,ims,ime,jms,jme,kms,&
 &kme,&
         max(grid%i_start(ij)-1,ids),  &
@@ -665,7 +692,7 @@ lineno = __LINE__
 BENCH_END(exch113)
 
 BENCH_START(comp118)
-! TBH:  OVERWRITE muu,muv,mut,a_al,a_alt,a_cqu,a_cqv,a_cqw,a_moist_2,a_mu,a_mut,a_muu,a_muv,a_ph,a_php,a_ru,a_rv,a_rw,a_u_2,a_v,a_w,a_ww
+! TBH:  OVERWRITE muu,muv,mut,a_al,a_alt,a_cqu,a_cqv,a_cqw,a_moist_2,a_mu_2,a_mut,a_muu,a_muv,a_ph_2,a_php,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww
 ! TBH:  HORIZONTAL DEPENDENCE:  moist_2    ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_moist_2  ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  mu_2       ( [i-1,i,i+1], [j-1,j,j+1] )
