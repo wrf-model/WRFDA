@@ -5521,8 +5521,6 @@ BENCH_START(comp115)
         min(grid%j_end(ij)+1,jde),k_start,k_end )
 BENCH_END(comp115)
 
-    endif
-
 BENCH_START(exch111)
 #ifdef DM_PARALLEL
 lineno = __LINE__
@@ -5533,6 +5531,8 @@ lineno = __LINE__
 
 #endif
 BENCH_END(exch111)
+
+    endif
 
 BENCH_START(comp116)
       call a_phy_prep( p,a_p,pb,ph_2,a_ph_2,phb,t_2,a_t_2,th_phy,a_th_phy,p_phy,a_p_phy,pi_phy,a_pi_phyh,a_p8w,t_phy,a_t_phy,a_t8w,&
