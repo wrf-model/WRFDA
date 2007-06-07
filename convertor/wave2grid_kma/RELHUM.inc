@@ -41,7 +41,7 @@ C : ハーフレベル気圧(HPA)計算
           PU  = A(K+1) + B(K+1)*GPS(I,J)
           PD  = A(K  ) + B(K  )*GPS(I,J)
 C : フルレベル気圧(HPA)計算
-! JRB
+! WRFVAR compiles at double precision by default, so DLOG is overkill
 !          PFULL(I,K) = DEXP(( PD*DLOG(PD)-PU*DLOG(PU) )/(PD-PU) -1.D0)
           PFULL(I,K) = EXP(( PD*LOG(PD)-PU*LOG(PU) )/(PD-PU) -1.D0)
  1100 CONTINUE

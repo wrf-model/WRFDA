@@ -279,7 +279,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
       end do
 
-      ! WHY
+      ! WHY?
       ! Adapted the code from "real.init.code" by Y.-R. Guo 05/13/2004:
 
       ! do i=is,ie
@@ -535,7 +535,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    call da_wrf_tpq_2_slp (grid%xb)
 
-   ! WHY
+   ! WHY?
    ! do j = js,je
    !    do i = is,ie
    !       call da_tpq_to_slp(grid%xb%t(i,j,:), grid%xb%q(i,j,:), grid%xb%p(i,j,:), &

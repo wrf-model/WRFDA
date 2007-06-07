@@ -74,7 +74,7 @@ subroutine da_get_y_lhs_value( iv, y, &
    if (use_bogusobs)  &
       call da_check_xtoy_adjoint_bogus( iv, y, partial_lhs, pertile_lhs) 
 
-   ! JRB consider using dm_sum_real
+   ! FIX? consider using dm_sum_real
 #ifdef DM_PARALLEL
    call mpi_allreduce( partial_lhs, adj_ttl_lhs, 1, true_mpi_real, mpi_sum, &
                        comm, ierr) 

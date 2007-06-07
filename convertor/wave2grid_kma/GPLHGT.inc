@@ -5,7 +5,8 @@
 C***********************************************************************
 C                CALCULATION OF GEOPOTENTIAL HEIGHT                     
 C***********************************************************************
-!JRB
+! WRFVAR compiles at double precision by default, so DOUBLE PRECISION is 
+! overkill
 !      IMPLICIT DOUBLE PRECISION (A-H,O-Z)                             
 C                                                                       
       REAL*8    RGAS,G                                                  

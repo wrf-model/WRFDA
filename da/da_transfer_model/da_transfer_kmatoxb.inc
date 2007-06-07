@@ -485,7 +485,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
       call wrf_dm_sum_reals (loc_latc_mean, xbx % latc_mean)
    end if
 
-   ! WHY
+   ! WHY?
    !  do j=js,je
    !    do i=is,ie
    !       write(unit=stdout,fmt='(2i4,3f12.2,e12.4,2f12.2)') &

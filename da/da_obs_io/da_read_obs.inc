@@ -176,7 +176,7 @@ subroutine da_read_obs (ob, xp, filename)
                    platform%info%id
 
       if (iost /= 0) then
-         ! JRB This is expected, but its unclear how we handle failure
+         ! FIX? This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
          exit reports
@@ -1040,7 +1040,7 @@ subroutine da_read_obs (ob, xp, filename)
    ob%num_bogus = num_bogus
    ob%num_airsr = num_airsr
 
-   ! WHY
+   ! WHY?
    ! ob%num_ssmt1 = num_ssmt1
    ! ob%num_ssmt2 = num_ssmt2
    ! ob%num_ssmi_tb        = num_ssmi_tb
@@ -1162,7 +1162,7 @@ subroutine da_read_obs (ob, xp, filename)
       call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
    end if
 
-   ! WHY
+   ! WHY?
    ! if ((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
    !     (ob%ob_numb(ob%current_ob_time)%ssmi_retrieval /= ob%num_ssmi_retrieval)) then
    !    write(unit=message(1), fmt='(a, i6, 2x, a, i6)') &

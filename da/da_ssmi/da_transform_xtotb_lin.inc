@@ -20,7 +20,7 @@ subroutine da_transform_xtotb_lin(xa, xb)
    ks = xb%kts
    ke = xb%kte
 
-   ! WHY
+   ! WHY?
    ! call da_transform_xtotpw(xa, xb)
 
    do j=xb%jts,xb%jte
@@ -84,7 +84,7 @@ subroutine da_transform_xtotb_lin(xa, xb)
                xa%q(i,j,k)*xb%rho(i,j,k)) + TGL_zrhom
       end do
 
-      ! WHY
+      ! WHY?
       ! call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
       ! call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
 

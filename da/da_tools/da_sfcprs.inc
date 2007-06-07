@@ -106,7 +106,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    end if
 
    !  Compute virtual temperatures for k850, k700, and k500 layers.  Now
-   !  you see why we wanted Q on pressure levels, it all is beginning   
+   !  you see WHY? we wanted Q on pressure levels, it all is beginning   
    !  to make sense.
 
    t850 = t(k850) * (1.0 + 0.608 * q(k850))

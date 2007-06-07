@@ -11,7 +11,7 @@ subroutine da_store_obs_grid_info (xp, loc)
 
    loc%proc_domain = .false.
    
-   ! JRB hack
+   ! FIX?
    if (loc%i >= xp%its .and. loc%i <= xp%ite .and. &
       loc%j >= xp%jts .and. loc%j <= xp%jte) then
       loc%proc_domain = .true.

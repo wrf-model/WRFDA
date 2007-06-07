@@ -320,7 +320,7 @@ subroutine da_setup_be_global (be)
 100 write (unit=message(1),fmt='(a, i5)')' Read error on BE-unit = ',be_unit
    call da_error(__FILE__,__LINE__,message(1:1))
 
-   ! JRB daft having these here
+   ! FIX? daft having these here
 
    deallocate(power)
    deallocate(power2d)

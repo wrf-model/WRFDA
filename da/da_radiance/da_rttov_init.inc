@@ -299,9 +299,9 @@ subroutine da_rttov_init(iv,ob)
           'nfrequencies = ', nfrequencies, &
           'nchannels    = ', nchannels, &
           'nbtout       = ', nbtout
-! JRB problems with PGI
-!      write (unit=message(3),fmt=*) '  lprofiles    = ', lprofiles
-!      write (unit=message(4),fmt=*) '  channels     = ', channels
+      ! FIX? problems with PGI
+      ! write (unit=message(3),fmt=*) '  lprofiles    = ', lprofiles
+      ! write (unit=message(4),fmt=*) '  channels     = ', channels
 
       call da_message(message(1:2))
 

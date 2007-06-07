@@ -78,7 +78,7 @@ subroutine da_ll_to_xy (info, loc, xp, &
       return
    end if
 
-   ! JRB hack
+   ! FIX? hack
    if ((loc%i < xp%its-1) .or. (loc%i > xp%ite) .or. &
       (loc%j < xp%jts-1) .or. (loc%j > xp%jte)) then
    ! if ((loc%i < xp%its-1) .or. (loc%i >= xp%ite) .or. &

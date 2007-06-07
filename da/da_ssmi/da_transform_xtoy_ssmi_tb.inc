@@ -170,7 +170,7 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
       ! end if
    end do
     
-   ! WHY
+   ! WHY?
    !          y%ssmi_tb(n)%tb19v = hor_interp(dxm,dx,dym,dy, &
    !              TGL_tb19v(i,j ),TGL_tb19v(i+1,j ), &
    !              TGL_tb19v(i,j+1),TGL_tb19v(i+1,j+1) )

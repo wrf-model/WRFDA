@@ -19,7 +19,7 @@ subroutine da_transform_xtoy_geoamv (xa, iv, xp, y)
    if (iv%num_geoamv > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%geoamv+1, iv%ob_numb(iv%current_ob_time)%geoamv
 
-         ! WHY
+         ! WHY?
          !xyh         y%geoamv(n)%u(:) = 0.0
          !xyh         y%geoamv(n)%v(:) = 0.0
 

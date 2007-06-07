@@ -61,7 +61,8 @@ C     -------------------------------------------------------------
       RETURN                                                                    
       END SUBROUTINE CVDATE 
 C
-! JRB
+! WRFVAR compiles at double precision by default, so DOUBLE PRECISION is 
+! overkill
 C      SUBROUTINE DATECK (ISTAT, IDATE, IBDATE, NDATE)                           
 C     IMPLICIT DOUBLE PRECISION (A-H,O-Z,\)                                     
 C                                                                               

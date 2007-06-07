@@ -118,7 +118,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    etnthmu2=0.0
    quartmu=0.0
 
-   ! WHY
+   ! WHY?
    ! ADJ_ho=0.0
    ! ADJ_hv=0.0
    ! ADJ_sigo=0.0
@@ -480,7 +480,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_sigo   = ADJ_sigov*sigv    + ADJ_sigo
    ADJ_sigv   = sigo*ADJ_sigov    + ADJ_sigv
 
-   ! WHY
+   ! WHY?
    !  ADJ_chiv   =         ADJ_chiv 
    ! ADJ_chio   =         ADJ_chio 
 

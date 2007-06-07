@@ -1442,7 +1442,6 @@ BENCH_START(small_step_prep_tim)
                             k_start    , k_end               )
       END IF
 #endif
-
       CALL small_step_prep( grid%em_u_1,grid%em_u_2,grid%em_v_1,grid%em_v_2,grid%em_w_1,grid%em_w_2, &
                             grid%em_t_1,grid%em_t_2,grid%em_ph_1,grid%em_ph_2,                &
                             grid%em_mub, grid%em_mu_1, grid%em_mu_2,                  &

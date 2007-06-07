@@ -22,7 +22,7 @@ function da_mo_correction (ho, po, to, qo, &
 
    real :: thm , tho, tvm, tvo, thvm, thvo, rcp
    real :: za, Vc2, Va2, V2 
-   ! JRB real :: hdif, rib, rll, hll, zint
+   ! FIX? real :: hdif, rib, rll, hll, zint
    real :: hdif, rib, hll, zint
 
    ! Height difference (in m) above wich correction is applied
@@ -138,7 +138,7 @@ function da_mo_correction (ho, po, to, qo, &
 
       hll = rib * LOG (za/zint)
 
-   ! JRB is this right?
+   ! FIX? is this right?
    ! rll = za / hll
 
    ! 5.4 Ratio PBL height/Monin Obukov length: za/rll

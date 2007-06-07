@@ -69,7 +69,7 @@ subroutine da_test_vtoy_transform(grid, config_flags, vp, vv, &
    !-------------------------------------------------------------------------
    ! Print output:
    !-------------------------------------------------------------------------
-   ! JRB fix with wrf_dm_sum_real
+   ! FIX? with wrf_dm_sum_real
 
 #ifdef DM_PARALLEL
   if( global ) then

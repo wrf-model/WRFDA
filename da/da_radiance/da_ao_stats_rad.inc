@@ -55,7 +55,7 @@ subroutine da_ao_stats_rad ( stats_unit, iv, re )
 
    do i = 1, iv%num_inst                          !! loop for sensors
       do k=1, iv%instid(i)%nchan               !! loop for channels
-         ! JRB generate 1D array to allow a da_proc_sum_ints call here
+         ! FIX? generate 1D array to allow a da_proc_sum_ints call here
          ! Do inter-processor communication to gather statistics.
          call da_proc_sum_int ( rad(i)%ichan(k)%num )
          call da_proc_stats_combine(rad(i)%ichan(k)%ave, rad(i)%ichan(k)%rms, &

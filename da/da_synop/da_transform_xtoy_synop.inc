@@ -19,7 +19,7 @@ subroutine da_transform_xtoy_synop (xa, xb, iv, xp, y)
 
    if (iv%num_synop > 0) then
 
-      ! WHY
+      ! WHY?
       ! xyh
       ! y%synop(:)%u = 0.0
       ! y%synop(:)%v = 0.0

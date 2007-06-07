@@ -54,8 +54,8 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 #endif
 !---------------------------------------------------------
 
-   ! WHY use argument it
-   if (it==0) then; write(unit=stdout,fmt='(A)') "why have argument it to"//__FILE__; end if
+   ! WHY? use argument it
+   if (it==0) then; write(unit=stdout,fmt='(A)') "WHY? have argument it to"//__FILE__; end if
 
    alloc_status (:) = 0
 

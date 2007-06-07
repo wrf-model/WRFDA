@@ -78,7 +78,7 @@ subroutine da_check(grid, cv_size, xb, xbx, be, ep, iv, &
 
    call da_setup_testfield(grid, xb, xa, xp)
 
-   ! WHY
+   ! WHY?
    ! Make cv_array random.
 
    ! call random_number(cvtest(1:cv_size))

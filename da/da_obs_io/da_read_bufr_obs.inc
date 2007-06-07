@@ -193,7 +193,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          if (t29 .eq. 562) kx = 180
       end if
 
-      ! WHY
+      ! WHY?
       ! if ((kx >= 160) .and. (kx <= 179)) then    ! bypass satellite data
       ! if (t29 .eq. 61 .or. t29 .eq. 63 .or. t29 .ge. 571) then
       !    cycle reports
@@ -222,7 +222,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          ! end if
       end if
 
-      ! WHY
+      ! WHY?
       ! no need for balloon drift
       ! select case(kx)
       !    case (120, 132, 220:221, 232) ;       ! read drift
@@ -335,7 +335,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
          if (wqm < qflag) then
             woe=oes(5,k)
-            ! WHY
+            ! WHY?
             ! if (wqm==0) woe=woe*0.9
             ! if (wqm==3) woe=woe*1.2
             platform % each (k) % u % inv =obs(5,k)
@@ -624,7 +624,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             ob % ships (num_ships) % u = platform % each(1) % u
             ob % ships (num_ships) % v = platform % each(1) % v
             ob % ships (num_ships) % t = platform % each(1) % t
-            ! WHY
+            ! WHY?
             ! ob % ships (num_ships) % p = platform % loc     % slp
             ob % ships (num_ships) % p = platform % each(1) % p
             ob % ships (num_ships) % q = platform % each(1) % q
@@ -673,7 +673,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             ob % synop (num_synop) % u = platform % each(1) % u
             ob % synop (num_synop) % v = platform % each(1) % v
             ob % synop (num_synop) % t = platform % each(1) % t
-            ! WHY
+            ! WHY?
             ! ob % synop (num_synop) % p = platform % loc     % slp
             ob % synop (num_synop) % p = platform % each(1) % p
             ob % synop (num_synop) % q = platform % each(1) % q
@@ -746,7 +746,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
             ob%qscat(num_qscat)%info = platform%info
             ob%qscat(num_qscat)%loc  = platform%loc
-            ! WHY
+            ! WHY?
             ! ob%qscat(num_qscat)%h = platform%each(1)%height
             ! prepbufr uses pressure not height, so hardwire height to 
             ! 0 (sea-level)
@@ -913,7 +913,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
    ob%num_profiler = num_profiler
    ob%num_bogus = num_bogus
 
-   ! WHY
+   ! WHY?
    ! ob%num_ssmt1 = num_ssmt1
    ! ob%num_ssmt2 = num_ssmt2
    ! ob%num_ssmi_tb        = num_ssmi_tb

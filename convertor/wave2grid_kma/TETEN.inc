@@ -32,7 +32,7 @@ CX    CLBYCPI = HICE/CP
       IF(ICE.EQ.0) THEN                                                         
       DO 10 I = 1,25000                                                         
       X = 123.2D0 + 0.01D0*I                                                    
-! JRB
+! WRFVAR compiles at double precision by default, so DEXP is overkill
 !      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                         
       TABLE(I) = 0.622*EXP(B-C/(X-TSAT))                                     
       DTABLE(I) = TABLE(I)*C/(X-TSAT)**2                                        
@@ -43,7 +43,6 @@ CX    CLBYCPI = HICE/CP
       DO 20 I = 1,25000                                                         
       X = 123.2D0 + 0.01D0*I                                                    
       IF(X.GE.TEMP0) THEN                                                       
-! JRB
 !      TABLE(I) = 0.622*DEXP(B-C/(X-TSAT))                                        
       TABLE(I) = 0.622*EXP(B-C/(X-TSAT))                                       
       DTABLE(I) = TABLE(I)*C/(X-TSAT)**2                                        
@@ -58,11 +57,9 @@ CX    CLBYCPI = HICE/CP
       ELSE                                                                      
       RR = (TEMP0-X)/DTEMP                                                      
       CTABLE(I) = HL*(1.0-RR) + HICE*RR                                         
-! JRB
 !      TBL1 = 0.622*DEXP(B-C/(X-TSAT))                                             
       TBL1 = 0.622*EXP(B-C/(X-TSAT))                                         
       DTBL1 = TBL1*C/(X-TSAT)**2     
-! JRB                                           
 !      TBL2 = 0.622*DEXP(BI-CI/(X-TSATI))                                          
       TBL2 = 0.622*EXP(BI-CI/(X-TSATI))                                      
       DTBL2 = TBL2*CI/(X-TSATI)**2                                              

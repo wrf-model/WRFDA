@@ -12,14 +12,14 @@ function da_residual(n, k, yy, ox, n_bad) result (rr)
    type (bad_info_type)  , intent(inout) :: n_bad
    real                             :: rr
 
-   ! WHY
+   ! WHY?
    if (k ==0 .OR. n==0) then
    end if
 
    rr = 0.0
 
    if (ox % qc >= obs_qc_pointer) then
-      ! WHY
+      ! WHY?
       ! n_bad % num % use = n_bad % num % use + 1
       rr = ox % inv - yy
       ! else

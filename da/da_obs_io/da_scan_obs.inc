@@ -69,7 +69,7 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
-   ! WHY
+   ! WHY?
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
@@ -165,7 +165,7 @@ subroutine da_scan_obs (ob, xp, filename)
                    platform%info%id
 
       if (iost /= 0) then
-         ! JRB This is expected, but its unclear how we handle failure
+         ! FIX? This is expected, but its unclear how we handle failure
          ! here without assuming the fortran2003 convention on
          ! error statuses
          exit reports
@@ -184,7 +184,7 @@ subroutine da_scan_obs (ob, xp, filename)
       end if
 
       if (platform%info%lon == 180.0) platform%info%lon =-180.000
-      ! WHY
+      ! WHY?
       ! Fix funny wind direction at South Poles
       ! if (platform%info%lat < -89.9999 .or. platform%info%lat > 89.9999) then
       !    platform%info%lon = 0.0
@@ -408,7 +408,7 @@ subroutine da_scan_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
    ob%ob_numb(ob%current_ob_time)%airsr = ob%num_airsr
 
-   ! WHY
+   ! WHY?
    ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
    ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
@@ -438,7 +438,7 @@ subroutine da_scan_obs (ob, xp, filename)
            'Scan:  ', num_ssmt2, ' SSMT2 reports.', &
            'Scan:  ', num_airsr, ' AIRS retrieval reports'
 
-      ! WHY
+      ! WHY?
       ! write(unit=stdout, fmt='(5x,a,i6,a)') &
       !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
       !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'

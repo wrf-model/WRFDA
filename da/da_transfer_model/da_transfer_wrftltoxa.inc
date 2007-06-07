@@ -107,7 +107,7 @@ subroutine da_transfer_wrftltoxa(grid, config_flags, filnam )
       end do
    end do
 
-   ! FIX. In the inverse, g_ph information is lost. This should be investigated 
+   ! FIX? In the inverse, g_ph information is lost. This should be investigated 
    ! later.
 
    !-------------------------------------------------------------------------

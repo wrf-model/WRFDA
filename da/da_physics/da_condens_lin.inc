@@ -56,7 +56,7 @@ subroutine da_condens_lin(DT,SCR31,SCR42,SCR71,DUM31,PRD,  &
                      (SCR71(K)*SCR71(K))*TMP(K))*PRC59(K)  &
                  -TMP(K)*TMP(K)*(SCR42(K)-PRC5(K))*PRC5(K)/  &
                      (SCR71(K)*SCR71(K))*DUM2129(K)  &
-         ! WHY
+         ! WHY?
          !error      -TMP(K)*TMP(K)*2.*DUM212(K)*PRC5(K)  &
          !error      *(SCR42(K)-PRC5(K))/(SCR71(K)*SCR71(K))*SCR719(K)
                  +TMP(K)*TMP(K)*2.*DUM212(K)*PRC5(K)  &
