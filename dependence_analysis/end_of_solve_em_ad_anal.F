@@ -522,8 +522,8 @@ BENCH_END(comp113)
 BENCH_START(exch108)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_3886.inc"
-! HALO_3886 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+! #    include "HALO_3886.inc"
+! TBH CHANGE:  Removed
 #endif
 BENCH_END(exch108)
 
@@ -532,13 +532,13 @@ BENCH_END(exch108)
 ! TBH:  Trade redundant computation for memory.  
 ! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
  restore_rk_step_prepb4ackk: if ( config_flags%remove_rk_step_prep ) then
-BENCH_START(comprestore_rk_step_prep_tim)
-   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4ackk:  rk_step, rk_order = ',rk_step,rk_order
-   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-   ! store fields
-   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
-#include "restore_rk_step_prep.h"
-BENCH_END(comprestore_rk_step_prep_tim)
+!BENCH_START(comprestore_rk_step_prep_tim)
+!   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4ackk:  rk_step, rk_order = ',rk_step,rk_order
+!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+!   ! store fields
+!   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+!#include "restore_rk_step_prep.h"
+!BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4ackk
 
 BENCH_START(comp114)
@@ -548,10 +548,12 @@ BENCH_START(comp114)
 ! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
-    call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
-&cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
-&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
-BENCH_END(comp114)
+
+! TBH:  removed this call
+!    call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
+!&cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
+!&i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
+!BENCH_END(comp114)
 
  endif restore_rk_step_prepb4ackk
 

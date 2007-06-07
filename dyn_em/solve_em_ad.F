@@ -5455,11 +5455,8 @@ BENCH_START(comp113)
   endif
 BENCH_END(comp113)
 
+! TBH: TODO:  remove unused BENCH timers
 BENCH_START(exch108)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_3886.inc"
-#endif
 BENCH_END(exch108)
 
 ! recompute : dt_rk,dts_rk,number_of_small_timesteps
