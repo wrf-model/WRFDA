@@ -70,7 +70,7 @@ module da_control
    real, parameter :: da_zero = 0.0
 #endif
 
-complex, parameter :: da_zero_complex = (da_zero,da_zero)
+   complex, parameter :: da_zero_complex = (da_zero,da_zero)
    
    !---------------------------------------------------------------------------
    ! [2.0] WRF-Var parameter constants:
@@ -178,8 +178,7 @@ complex, parameter :: da_zero_complex = (da_zero,da_zero)
    real, parameter    :: inv_typ_vp5_sumsq = 0.00001 ! 1/sum(?**2)
    real, parameter    :: inv_typ_vpalpha_sumsq = 1.0 ! 1/sum(?**2)
 
-   character(len=*),parameter :: wrfvar_version = "WRFVAR V2.2"
-   character(len=*),parameter :: wrf_version    = "WRF V2.2"
+#include "version_decl"
 
    integer, parameter :: fg_format_wrf = 1
    integer, parameter :: fg_format_kma_global = 3

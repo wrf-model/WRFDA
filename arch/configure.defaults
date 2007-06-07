@@ -26,10 +26,10 @@ FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
+RSL_CCFLAGS     = 
 
 # Libraries
 
@@ -42,7 +42,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -75,9 +75,9 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -116,10 +116,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -133,7 +133,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -169,10 +169,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -184,7 +184,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -221,10 +221,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -264,10 +264,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -344,10 +344,10 @@ FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -358,7 +358,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -394,11 +394,11 @@ FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -409,7 +409,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -447,11 +447,11 @@ FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         =
 EXTRA_CCFLAGS   =
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -490,11 +490,11 @@ FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
 EXTRA_CCFLAGS   =
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -568,10 +568,10 @@ FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          =
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -580,7 +580,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -616,10 +616,10 @@ FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          =
 FCTYPE          = -r8
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -628,7 +628,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -663,7 +663,7 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
 
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -701,10 +701,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
+RSL_CCFLAGS     = 
 
 EXTRA_LDFLAGS   = -V
 
@@ -715,7 +715,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -751,10 +751,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = 
+RSL_CCFLAGS     = 
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -763,7 +763,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -795,9 +795,9 @@ FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
 
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -833,10 +833,10 @@ FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -845,7 +845,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -880,10 +880,10 @@ FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 FCBASE          = -fno-second-underscore
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -892,7 +892,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -927,7 +927,7 @@ FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
 
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -965,10 +965,10 @@ FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -977,7 +977,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -1013,10 +1013,10 @@ FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 FCBASE          = 
-FCFLAGS_RSL     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
-CCFLAGS_RSL     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1025,7 +1025,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
           LEARN_BCAST=-DLEARN_BCAST linux )
 	@ touch arch
@@ -1061,10 +1061,10 @@ FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        =
 FCBASE          = -64 -mips4
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -w -64 -mips4 -DUNDERSCORE -DIRIX
-CCFLAGS_RSL     = 
+RSL_CCFLAGS     = 
 
 LOCAL_LIB       = 
 
@@ -1101,10 +1101,10 @@ FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        =
 FCBASE          = -64 -mips4 -w
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -w -64 -mips4 -DIRIX -I$(RSL)/RSL
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = 
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
@@ -1113,7 +1113,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST o2k )
 	@ touch arch
@@ -1160,10 +1160,10 @@ FCFREE          = -freeform
 FCENDIAN        =
 FCBASE          = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
                      -align all -IPF_fp_relaxed
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -w -O3 -ip -tpp2 -c -ftz -no-gcc -I$(RSL)/RSL 
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 LOCAL_LIB       = 
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
@@ -1172,7 +1172,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST o2k )
 	@ touch arch
@@ -1290,10 +1290,10 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1306,7 +1306,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
+          $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST sp2 )
 	@ touch arch
@@ -1343,10 +1343,10 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 EXTRA_FLAGS     = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1359,7 +1359,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="mpcc $(CCFLAGS_RSL)" FC="mpxlf $(FCFLAGS_RSL)" \
+          $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST sp2 )
 	@ touch arch
@@ -1398,10 +1398,10 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1443,10 +1443,10 @@ FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
 FCBASE          = -w -qspill=20000 -qmaxmem=32767
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
-CCFLAGS_RSL     =
+RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1531,10 +1531,10 @@ FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                      -p$(RTTOV_INC)  -p$(CRTM_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
-CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
+RSL_CCFLAGS     = -Dcrayx1 -DMPI2_SUPPORT
 
 EXTRA_LDFLAGS   = -V
 
@@ -1545,7 +1545,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST crayx1 )
 	@ touch arch
@@ -1585,10 +1585,10 @@ FCFREE          = -f free -N 255
 FCENDIAN        =
 FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                     -p$(RTTOV_INC) -p$(CRTM_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
-CCFLAGS_RSL     = -Dcrayx1 -DMPI2_SUPPORT
+RSL_CCFLAGS     = -Dcrayx1 -DMPI2_SUPPORT
 
 LOCAL_LIB       = 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1597,7 +1597,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
              LEARN_BCAST=-DLEARN_BCAST crayx1 )
 	@ touch arch
@@ -1677,10 +1677,10 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore \
                      -Wno=101,112,136,155,158,159
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
@@ -1691,7 +1691,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
@@ -1729,10 +1729,10 @@ FCTYPE          = -r8
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
 FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
-FCFLAGS_RSL     = $(FCENDIAN) -ffixed-form -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1744,7 +1744,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
@@ -1821,10 +1821,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1836,7 +1836,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch
@@ -1875,10 +1875,10 @@ FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
                      -I$(CRTM_INC) -I$(RTTOV_INC)
-FCFLAGS_RSL     = $(FCENDIAN)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
-CCFLAGS_RSL     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1888,7 +1888,7 @@ arch :
 	$(LN) $(RSL)/*.c .
 	$(LN) $(RSL)/*.F .
 	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(CCFLAGS_RSL)" FC="$(FC) $(FCFLAGS_RSL)" \
+          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
             LEARN_BCAST=-DLEARN_BCAST darwin )
 	@ touch arch

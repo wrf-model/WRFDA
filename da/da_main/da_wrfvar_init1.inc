@@ -21,7 +21,7 @@ subroutine da_wrfvar_init1(no_init1)
    !
    !</DESCRIPTION>
 
-   program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
+   program_name = "WRFVAR "//release_version
 
    ! Initialize WRF modules:  
    ! Phase 1 returns after mpi_init() (if it is called)

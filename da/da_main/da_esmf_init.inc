@@ -29,7 +29,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    type(ESMF_Clock),    intent(inout) :: clock
    integer,             intent(out)   :: rc
 
-   program_name = wrfvar_version//" (COMPATIBLE WITH "//wrf_version//") MODEL"
+   program_name = //"WRFVAR "//release_version
 
    !  Get the NAMELIST data for input.
 
@@ -186,7 +186,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    !  The forecast integration for the most coarse grid is now started.  The
    !  integration is from the first step (1) to the last step of the simulation.
 
-   ! JRB
+   ! FIX?
    call da_warning(__FILE__,__LINE__,(/"Fix me"/))
    !   head_grid%start_subtime = head_grid%start_time
    !   head_grid%stop_subtime = head_grid%stop_time

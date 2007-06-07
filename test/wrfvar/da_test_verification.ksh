@@ -8,8 +8,8 @@ export WRFVAR_DIR=$HOME/code/$ID/wrfvar
 export REG_DIR=$PWD
 
 export NUM_EXPT=2
-export EXP_NAMES="${MACHINE}_${FC}_debug_suite_${NUM_PROCS} ${MACHINE}_${FC}_opt_suite_${NUM_PROCS}"
-export EXP_LEGENDS='(/"debug","opt"/)'
+export EXP_NAMES="${MACHINE}_${FC}_stable_suite_${NUM_PROCS} ${MACHINE}_${FC}_opt_suite_${NUM_PROCS}"
+export EXP_LEGENDS='(/"stable","opt"/)'
 
 export INTERVAL=12
 export PLOT_WKS=pdf

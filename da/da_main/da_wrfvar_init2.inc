@@ -130,7 +130,7 @@ subroutine da_wrfvar_init2
       call da_med_initialdata_input(head_grid , config_flags,'fg01')
    end if
 
-   ! JRB
+   ! FIX?
    ! call da_warning(__FILE__,__LINE__,(/"Fix me"/))
    ! head_grid%start_subtime = head_grid%start_time
    ! head_grid%stop_subtime = head_grid%stop_time

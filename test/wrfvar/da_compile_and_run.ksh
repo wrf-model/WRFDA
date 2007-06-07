@@ -10,7 +10,7 @@ export CLEAN=${CLEAN:-true}
 # Need a cleaner mapping between compiler and configure options
 # Assuming option 2 is pgi mpi is a hack
 
-export TYPE=${TYPE:-simple}
+export TYPE=${TYPE:-opt}
 export REGIONS=${REGIONS:-con200}
 export PROCS=${PROCS:-1}
 export COMPILERS=${COMPILERS:-g95}
