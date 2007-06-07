@@ -380,8 +380,8 @@ BENCH_START(exch107)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3803.inc"
-! HALO_3803 dyn_em 80:a_alt,a_cqu,a_cqv,a_cqw,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,cqu,cqv,cqw,mu_2,muu,muv,p,ph_1,ph_2,php,ru,rv,rw,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww
-
+! ??? remove a_t_1, a_u_1, a_v_1, a_w_1
+! HALO_3803 dyn_em 80:a_ru_tend,a_rv_tend,a_rw_tend,a_t_1,a_u_1,a_v_1,a_w_1,a_w_2
 #endif
 BENCH_END(exch107)
 
