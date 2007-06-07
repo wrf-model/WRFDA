@@ -56,9 +56,11 @@ class CountFieldDiffs
           varname2 = $1.dup
           indices2 = $2.dup.strip
           value2 = Float($'.dup.strip)
+$$$ #here...  revert to r2609 if needed
 $$$ #here...  match varnames and indices (via CSV)
 $$$ #here...  if they match, compare values
-          if ( $$$foo ) then
+          if ( varname2 == varname ) then
+
             # if lines match, check for zero value
             if (line =~ /\)\s*=\s*/) then
               begin

@@ -5468,12 +5468,12 @@ BENCH_END(exch108)
 ! TBH:  Restore fields computed earlier by calls to rk_step_prep.  
  restore_rk_step_prepb4ackk: if ( config_flags%remove_rk_step_prep ) then
 BENCH_START(comprestore_rk_step_prep_tim)
-   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4ackk:  rk_step, rk_order = ',rk_step,rk_order
-   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
-   ! store fields
-   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
-#include "restore_rk_step_prep.h"
-BENCH_END(comprestore_rk_step_prep_tim)
+!   WRITE(wrf_err_message,*)'DEBUG:  restore_rk_step_prepb4ackk:  rk_step, rk_order = ',rk_step,rk_order
+!   CALL wrf_debug ( 10 , TRIM(wrf_err_message) )
+!   ! store fields
+!   CALL select_frame(rk_step, BUF_RK_STEP_PREP)
+!#include "restore_rk_step_prep.h"
+!BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4ackk
 
 BENCH_START(comp114)
@@ -5484,16 +5484,8 @@ BENCH_END(comp114)
 
  endif restore_rk_step_prepb4ackk
 
+! TBH: TODO:  remove unused BENCH timers
 BENCH_START(exch109)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_3898.inc"
-#endif
-
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_3903.inc"
-#endif
 BENCH_END(exch109)
 
 ! recompute : alt,cqu,cqv,cqw,mut,muu,muv,php,ru,rv,rw,ww
@@ -5552,17 +5544,8 @@ BENCH_END(comp116)
 
   endif a_rk_step_is_one
 
+! TBH: TODO:  remove unused BENCH timers
 BENCH_START(exch112)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-! TBH:  removed #    include "HALO_3963.inc"
-
-
-
-
-
-
-#endif
 BENCH_END(exch112)
 
 ! TBH:  turn this off once halo debugging is finished

@@ -558,14 +558,14 @@ BENCH_END(comp114)
 BENCH_START(exch109)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_3898.inc"
-! HALO_3898 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww 
+! #    include "HALO_3898.inc"
+! TBH CHANGE:  Removed
 #endif
 
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_3903.inc"
-! HALO_3903 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+! #    include "HALO_3903.inc"
+! TBH CHANGE:  Removed
 #endif
 BENCH_END(exch109)
 
