@@ -5,10 +5,6 @@ TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
       gen_args.o gen_config.o sym.o symtab_gen.o gen_wrf_io.o \
       gen_model_data_ord.o gen_interp.o gen_comms.o gen_scalar_derefs.o
 
-$(TOOLS_OBJ) :
-	$(RM) $@
-	$(CC_TOOLS) -c $*.c
-
 registry : $(TOOLS_OBJ)
 	$(CC_TOOLS) -o registry $(TOOLS_OBJ)
 

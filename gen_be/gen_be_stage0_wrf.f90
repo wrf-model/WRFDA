@@ -1156,7 +1156,7 @@ end subroutine da_test_inverse2
         mi = iter
          chimx = 0.0
 
-! JRB Crayx1 compiler does not like these, so comment out 
+! FIX? Crayx1 compiler does not like these, so comment out 
 ! for the present
 !!$OMP PARALLEL DO DEFAULT ( SHARED ) PRIVATE ( i , j )
 !!csd$ parallel do private(i,j)

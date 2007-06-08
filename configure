@@ -15,7 +15,7 @@ option=$1
 # Change default options if not configuring a wrfvar target
 # (wrfvar, be, all)
 
-if [ "$option" = "wrf" ] ; then
+if [ "$option" = "wrf" -o "$option" = "em_real" ] ; then
     REGISTRY=Registry.EM
     EM_CORE=1
 elif [ "$option" = "wrf_em" ] ; then

@@ -437,11 +437,11 @@ gen_wrf_io2 ( FILE * fp , char * fname, char * structname , char * fourdname, no
       {
 fprintf(fp,"DO itrace = PARAM_FIRST_SCALAR , num_%s\n",p->name ) ;
 fprintf(fp,"  IF (BTEST(%s_stream_table(grid%%id, itrace ) , switch )) THEN\n",p->name) ;
-/* MGD Begin */
+#if DA_CORE==1
 fprintf(fp,"    IF (.not. ((%s_dname_table( grid%%id, itrace )(1:2) == 'A_' .and. grid%%dyn_opt == DYN_EM_TL) .or. &\n",p->name);
 fprintf(fp,"               (%s_dname_table( grid%%id, itrace )(1:2) == 'A_' .and. grid%%dyn_opt == DYN_EM)    .or. &\n",p->name);
 fprintf(fp,"               (%s_dname_table( grid%%id, itrace )(1:2) == 'G_' .and. grid%%dyn_opt == DYN_EM))) THEN\n"   ,p->name);
-/* MGD End */
+#endif
 fprintf(fp,"    CALL wrf_ext_%s_field (  &\n", (sw_io == GEN_INPUT)?"read":"write" ) ;
 fprintf(fp,"          fid                             , &  ! DataHandle\n") ;
 fprintf(fp,"          current_date(1:19)              , &  ! DateStr\n") ; 
@@ -451,8 +451,11 @@ fprintf(fp,"          TRIM(%s_dname_table( grid%%id, itrace )), & !data name\n",
         if ( ok_to_collect_distribute ) {
 fprintf(fp,"                       globbuf_%s               , &  ! Field \n",p->members->type->name ) ;
         } else {
-/* Needed for WRFVAR */
+#if DA_CORE==1
 fprintf(fp,"          grid%%%s%s(ims,jms,kms,itrace)  , &  ! Field\n",p->name,tl) ;
+#else
+fprintf(fp,"          grid%%%s%s(ims,kms,jms,itrace)  , &  ! Field\n",p->name,tl) ;
+#endif
         }
         if (!strncmp(p->members->type->name,"real",4)) {
           fprintf(fp,"                       WRF_FLOAT             , &  ! FieldType \n") ;
@@ -467,8 +470,11 @@ fprintf(fp,"          grid%%bdy_mask       , &  ! bdy_mask\n") ;
 fprintf(fp,"          dryrun             , &  ! flag\n") ;
         }
         set_mem_order( p->members, memord , NAMELEN) ;
-/* needed for WRFVAR */
+#if DA_CORE==1
 fprintf(fp,"          '%s'               , &  ! MemoryOrder\n",memord) ;
+#else
+fprintf(fp,"          'XZY'               , &  ! MemoryOrder\n") ;
+#endif
         strcpy(stagstr, "") ;
         if ( p->members->stag_x ) strcat(stagstr, "X") ;
         if ( p->members->stag_y ) strcat(stagstr, "Y") ;
@@ -509,8 +515,11 @@ fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimna
 fprintf(fp,"          %s_desc_table( grid%%id, itrace  ), & ! Desc\n",p->name) ;
 fprintf(fp,"          %s_units_table( grid%%id, itrace  ), & ! Units\n",p->name) ;
         }
-/* Needed for WRFVAR */
+#if DA_CORE==1
 fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder %s' , & ! Debug message\n", fname, p->name, memord ) ;
+#else
+fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder XZY' , & ! Debug message\n", fname, p->name ) ;
+#endif
         /* global dimensions */
         for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",ddim[i][0], ddim[i][1]) ; }
         fprintf(fp," & \n") ;
@@ -521,9 +530,9 @@ fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' m
         for ( i = 0 ; i < 3 ; i++ ) { fprintf(fp,"%s , %s , ",pdim[i][0], pdim[i][1]) ; }
         fprintf(fp," & \n") ;
 fprintf(fp,"                         ierr )\n" ) ;
-/* MGD Begin */
+#if DA_CORE==1
 fprintf(fp, "     ENDIF\n" ) ;
-/* MGD End */
+#endif
 fprintf(fp, "  ENDIF\n" ) ;
 fprintf(fp, "ENDDO\n") ;
       } 
@@ -561,11 +570,11 @@ fprintf(fp, "ENDDO\n") ;
           for ( pass = 0 ; pass < 2 ; pass++ ) {
 fprintf(fp,"DO itrace = PARAM_FIRST_SCALAR , num_%s\n",p->name ) ;
 fprintf(fp,"  IF (BTEST(%s_stream_table(grid%%id, itrace ) , switch )) THEN\n",p->name) ;
-/* MGD Begin */
+#if DA_CORE==1
 fprintf(fp,"    IF (.not. ((%s_dname_table( grid%%id, itrace )(1:2) == 'A_' .and. grid%%dyn_opt == DYN_EM_TL) .or. &\n",p->name);
 fprintf(fp,"               (%s_dname_table( grid%%id, itrace )(1:2) == 'A_' .and. grid%%dyn_opt == DYN_EM)    .or. &\n",p->name);
 fprintf(fp,"               (%s_dname_table( grid%%id, itrace )(1:2) == 'G_' .and. grid%%dyn_opt == DYN_EM))) THEN\n"   ,p->name);
-/* MGD End */
+#endif
           for ( ibdy = 1 ; ibdy <= 4 ; ibdy++ )
           {
             if        ( pass == 0 && ibdy == 1 ) { bdytag = "_BXS" ;      /* west bdy   */
@@ -672,16 +681,19 @@ fprintf(fp,"                       '%s'               , &  ! Dimname 3 \n",dimna
 fprintf(fp,"          %s_desc_table( grid%%id, itrace  ), & ! Desc\n",p->name) ;
 fprintf(fp,"          %s_units_table( grid%%id, itrace  ), & ! Units\n",p->name) ;
             }
-/* needed for WRFVAR */
+#if DA_CORE==1
 fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder %s' , & ! Debug message\n", fname, p->name, memord ) ;
+#else
+fprintf(fp,"'%s ext_write_field '//TRIM(%s_dname_table( grid%%id, itrace ))//' memorder XZY' , & ! Debug message\n", fname, p->name ) ;
+#endif
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ds1,de1,ds2,de2,ds3,de3 ) ;
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ms1,me1,ms2,me2,ms3,me3 ) ;
 fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ps1,pe1,ps2,pe2,ps3,pe3 ) ;
 fprintf(fp,"                         ierr )\n" ) ;
           }
-/* MGD Begin */
+#if DA_CORE==1
 fprintf(fp, "     ENDIF\n" ) ;
-/* MGD End */
+#endif
 fprintf(fp, "  ENDIF\n" ) ;
 fprintf(fp, "ENDDO\n") ;
         }
@@ -816,15 +828,17 @@ fprintf(fp, "ENDDO\n") ;
 	  if ( sw_io == GEN_INPUT )
 	  {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+#if DA_CORE==1
   	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-/* Xin Begin */
             if ( !strncmp(dname, "A_", 2) ) {
                fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_TL .or. grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
-/* Xin End */
+#else
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+#endif
             if ( ok_to_collect_distribute )
 	      fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             fprintf(fp,"CALL wrf_ext_read_field (  &\n") ;
@@ -872,14 +886,14 @@ fprintf(fp, "ENDDO\n") ;
 	      fprintf(fp,"CALL wrf_dm_bcast_%s ( %s%s%s ( 1, 1 , 1 , %d ) , &\n",p->type->name, structname , core , p->name, ibdy) ;
               fprintf(fp," ((%s)-(%s)+1)*((%s)-(%s)+1)*((%s)-(%s)+1)  )\n",me1,ms1,me2,ms2,me3,ms3)  ;
             }
-/* Xin Begin */
+#if DA_CORE==1
             if ( !strncmp(dname, "A_", 2) ) {
                fprintf(fp,"END IF\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
                fprintf(fp,"END IF\n") ;
             }
-/* Xin End */
+#endif
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
 	      fprintf(fp,"END IF\n" ) ;
 	  }
@@ -888,15 +902,17 @@ fprintf(fp, "ENDDO\n") ;
             if ( ok_to_collect_distribute )
               fprintf(fp,"IF ( wrf_dm_on_monitor() ) THEN\n") ;
             if ( !strncmp( p->use, "dyn_", 4 ) )
-              fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-/* MGD Begin */
+#if DA_CORE==1
+  	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
             if ( !strncmp(dname, "A_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_TL .or. grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
-/* MGD End */
+#else
+              fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+#endif
             fprintf(fp,"CALL wrf_ext_write_field (  &\n") ;
             fprintf(fp,"                       fid                , &  ! DataHandle \n" ) ;
             fprintf(fp,"                       current_date(1:19) , &  ! DateStr \n" ) ;
@@ -942,14 +958,14 @@ fprintf(fp, "ENDDO\n") ;
             fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ms1,me1,ms2,me2,ms3,me3 ) ;
             fprintf(fp,"%s, %s, %s, %s, %s, %s, &\n",ps1,pe1,ps2,pe2,ps3,pe3 ) ;
             fprintf(fp,"                       ierr )\n") ;
-/* MGD Begin */
+#if DA_CORE==1
             if ( !strncmp(dname, "A_", 2) ) {
   	       fprintf(fp,"END IF\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"END IF\n") ;
             }
-/* MGD End */
+#endif
             if ( !strncmp( p->use, "dyn_", 4 ) )
               fprintf(fp,"END IF\n" ) ;
             if ( ok_to_collect_distribute )
@@ -1140,15 +1156,17 @@ if ( pass == 0 )
           if ( p->io_mask & io_mask && sw_io == GEN_INPUT )
           {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+#if DA_CORE==1
 	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-/* Xin Begin */
             if ( !strncmp(dname, "A_", 2) ) {
                fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_TL .or. grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
-/* Xin End */
+#else
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+#endif
 	    if ( p->scalar_array_member )
 	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
             if ( ok_to_collect_distribute )
@@ -1293,29 +1311,31 @@ if ( pass == 0 )
 	      fprintf(fp,"END IF\n" ) ;
 	    }
 
-/* Xin Begin */
+#if DA_CORE==1
             if ( !strncmp(dname, "A_", 2) ) {
                fprintf(fp,"END IF\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
                fprintf(fp,"END IF\n") ;
             }
-/* Xin End */
+#endif
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
 	      fprintf(fp,"END IF\n" ) ;
           }
           else if ( sw_io == GEN_OUTPUT )
 	  {
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
+#if DA_CORE==1
 	      fprintf(fp,"IF ( mod(grid%%dyn_opt,100) .EQ. %s ) THEN\n",p->use) ;
-/* MGD Begin */
             if ( !strncmp(dname, "A_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"IF ( grid%%dyn_opt == DYN_EM_TL .or. grid%%dyn_opt == DYN_EM_AD ) THEN\n") ;
             }
-/* MGD End */
+#else
+	      fprintf(fp,"IF ( grid%%dyn_opt .EQ. %s ) THEN\n",p->use) ;
+#endif
 	    if ( p->scalar_array_member )
 	      fprintf(fp,"IF ( P_%s .GE. PARAM_FIRST_SCALAR ) THEN\n",p->name) ;
 
@@ -1484,14 +1504,14 @@ if ( pass == 0 )
 	    if ( p->scalar_array_member )
 	      fprintf(fp,"END IF\n" ) ;
 */
-/* MGD Begin */
+#if DA_CORE==1
             if ( !strncmp(dname, "A_", 2) ) {
   	       fprintf(fp,"END IF\n") ;
             }
             else if ( !strncmp(dname, "G_", 2) ) {
   	       fprintf(fp,"END IF\n") ;
             }
-/* MGD End */
+#endif
 	    if ( !strncmp( p->use, "dyn_", 4 ) ) 
 	      fprintf(fp,"END IF\n" ) ;
 
