@@ -178,8 +178,12 @@ a_forward_step: if (rk_step .eq. 1) then
 &ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
       endif a_pbl_test
 ! TBH:  OVERWRITE a_t,a_t_tendf,a_mut,a_xkmhd
+! TBH:  NOTE:  "(R)" indicates that a dependence only exists due to 
+! TBH:  NOTE:  computation in the halo regions.  This must be accounted 
+! TBH:  NOTE:  for at some previous time, but no actual dependence on 
+! TBH:  NOTE:  horizontally adjacent values exists here.  
 ! TBH:  HORIZONTAL DEPENDENCE:  t           ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_t         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_t         ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_t_tendf   ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  mut         ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  t_init      ( [i-1,i,i+1], [j-1,j,j+1] )
@@ -192,7 +196,7 @@ a_forward_step: if (rk_step .eq. 1) then
 &jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 ! TBH:  OVERWRITE a_w,a_rw_tendf,a_mut,a_xkmhd
 ! TBH:  HORIZONTAL DEPENDENCE:  w           ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_w         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_w         ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tendf  ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  mut         ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfu        ( [i-1,i,i+1], [    j    ] )
@@ -204,7 +208,7 @@ a_forward_step: if (rk_step .eq. 1) then
 &jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 ! TBH:  OVERWRITE a_v,a_rv_tendf,a_mut,a_xkmhd
 ! TBH:  HORIZONTAL DEPENDENCE:  v           ( [i-1,i,i+1], [j-1,j,j+2] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rv_tendf  ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  mut         ( [i-1,i,i+1], [j-2,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_mut       ( [    i    ], [j-1,j,j+1] )
@@ -216,7 +220,7 @@ a_forward_step: if (rk_step .eq. 1) then
 &jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 ! TBH:  OVERWRITE a_u,a_ru_tendf,a_mut,a_xkmhd
 ! TBH:  HORIZONTAL DEPENDENCE:  u           ( [i-1,i,i+2], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru_tendf  ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  mut         ( [i-2,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_mut       ( [i-1,i,i+1], [    j    ] )
@@ -312,7 +316,7 @@ a_forward_step: if (rk_step .eq. 1) then
   endif a_diff_opt1
 endif a_forward_step
 
-! TBH:  OVERWRITE a_ru,a_rv,a_rw,a_u,a_v,a_ru_tend,a_rv_tend,a_rw_tend
+! TBH:  OVERWRITE a_ru,a_rv,a_rw,a_u,a_v
 ! TBH:  HORIZONTAL DEPENDENCE:  ru          ( [i-1,i,i+1], [j-2,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru        ( [    i,i+1], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  rv          ( [i-2,i,i+1], [j-1,j,j+1] )
@@ -320,9 +324,9 @@ endif a_forward_step
 ! TBH:  HORIZONTAL DEPENDENCE:  rw          ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw        ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  u           ( [i-1,i,i+2], [    j    ] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [    i,i+1], [    j    ] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  v           ( [i-1,i    ], [j-1,j,j+2] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [    i    ], [    j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru_tend   ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rv_tend   ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tend   ( [i-1,i    ], [j-1,j    ] )
@@ -332,7 +336,7 @@ call a_curvature( ru,a_ru,rv,a_rv,rw,a_rw,u,a_u,v,a_v,a_ru_tend,a_rv_tend,a_rw_t
 &jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 
 if (config_flags%pert_coriolis) then
-! TBH:  OVERWRITE a_ru,a_rv,a_rw,a_ru_tend,a_rv_tend,a_rw_tend,a_muu,a_muv,a_ph
+! TBH:  OVERWRITE a_ru,a_rv,a_rw,a_muu,a_muv,a_ph
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru        ( [    i,i+1], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rv        ( [i-1,i    ], [    j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw        ( [i-1,i    ], [j-1,j    ] )
@@ -351,7 +355,7 @@ if (config_flags%pert_coriolis) then
   call a_perturbation_coriolis( a_ru,a_rv,a_rw,a_ru_tend,a_rv_tend,a_rw_tend,config_flags,u_base,v_base,z_base,muu,a_muu,muv,a_muv,&
 &phb,ph,a_ph,f,e,sina,cosa,fnm,fnp,ids,ide,jds,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte )
 else
-! TBH:  OVERWRITE a_ru,a_rv,a_rw,a_ru_tend,a_rv_tend,a_rw_tend
+! TBH:  OVERWRITE a_ru,a_rv,a_rw
 ! TBH:  HORIZONTAL DEPENDENCE:  A SUBSET OF a_perturbation_coriolis
   call a_coriolis( a_ru,a_rv,a_rw,a_ru_tend,a_rv_tend,a_rw_tend,config_flags,f,e,sina,cosa,fnm,fnp,ids,ide,jds,jde,kde,ims,ime,jms,&
 &jme,kms,kme,its,ite,jts,jte,kts,kte )
@@ -366,7 +370,7 @@ if (non_hydrostatic) then
 ! TBH:  HORIZONTAL DEPENDENCE:  NONE
   call a_pg_buoy_w( a_rw_tend,p,a_p,cqw,a_cqw,a_mu,mub,rdnw,rdn,g,msft,ide,jde,kde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte )
 endif
-! TBH:  OVERWRITE a_ru_tend,a_rv_tend,a_ph,a_alt,a_p,a_al,a_php,a_cqu,a_cqv,a_muu,a_muv,a_mu
+! TBH:  OVERWRITE a_ph,a_alt,a_p,a_al,a_php,a_cqu,a_cqv,a_muu,a_muv,a_mu
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru_tend   ( [    i,i+1], [    j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rv_tend   ( [    i    ], [    j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  ph          ( [i-1,i,i+1], [j-1,j,j+1] )
@@ -392,9 +396,9 @@ call a_horizontal_pressure_gradient( a_ru_tend,a_rv_tend,ph,a_ph,alt,a_alt,p,a_p
 ! TBH:  OVERWRITE a_ph_tend,a_u,a_v,a_ww,a_ph,a_ph,a_w,a_mut,a_muu,a_muv
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ph_tend   ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  u           ( [i-4,i,i+4], [    j    ] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [i-1,i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u         ( [i-1,i,i+1], [    j    ] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  v           ( [    i    ], [j-4,j,j+4] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [    i    ], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v         ( [    i    ], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  ph          ( [i-4,i,i+4], [j-4,j,j+4] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ph        ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  phb         ( [i-4,i,i+4], [j-4,j,j+4] )

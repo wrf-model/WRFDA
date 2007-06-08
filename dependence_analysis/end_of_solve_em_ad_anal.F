@@ -295,7 +295,11 @@ BENCH_END(comp_a_surface_drag)
 !---------------------------------------------------------------------------------------------
 
 BENCH_START(comp_a_rk_tendency1)
-! TBH:  OVERWRITE a_al,a_alt,a_cqu,a_cqv,a_cqw,a_mu_2,a_mut,a_muu,a_muv,a_p,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_2,a_t_1,a_t_tendf,a_u_2,a_u_1,a_v_2,a_v_1,a_w_2,a_w_1,a_ww,a_xkmhd
+! TBH:  OVERWRITE a_al,a_alt,a_cqu,a_cqv,a_cqw,a_mu_2,a_mut,a_muu,a_muv,a_p,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tendf,a_rv,a_rv_tendf,a_rw,a_rw_tendf,a_t_2,a_t_1,a_t_tendf,a_u_2,a_u_1,a_v_2,a_v_1,a_w_2,a_w_1,a_ww,a_xkmhd
+! TBH:  NOTE:  "(R)" indicates that a dependence only exists due to
+! TBH:  NOTE:  computation in the halo regions.  This must be accounted
+! TBH:  NOTE:  for at some previous time, but no actual dependence on
+! TBH:  NOTE:  horizontally adjacent values exists here.
 ! TBH:  HORIZONTAL DEPENDENCE:  a_al        ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_alt       ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  al          ( [i-1,i    ], [j-1,j    ] )
@@ -317,14 +321,14 @@ BENCH_START(comp_a_rk_tendency1)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw        ( [i-1,i    ], [j-1,j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tendf  ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tend   ( [i-1,i    ], [j-1,j    ] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_t_2       ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_t_2       ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_t_1       ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_t_tendf   ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_u_2       ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u_2       ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_u_1       ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_v_2       ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v_2       ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_v_1       ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_w_2       ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_w_2       ( [i-1,i,i+1], [j-1,j,j+1] ) (R)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_w_1       ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_xkmhd     ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  cosa        ( [i-1,i,i+1], [    j    ] )
@@ -379,9 +383,8 @@ BENCH_END(comp_a_rk_tendency1)
 BENCH_START(exch107)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_3803.inc"
-! ??? remove a_t_1, a_u_1, a_v_1, a_w_1
-! HALO_3803 dyn_em 80:a_ru_tend,a_rv_tend,a_rw_tend,a_t_1,a_u_1,a_v_1,a_w_1,a_w_2
+! #    include "HALO_3803.inc"
+! TBH CHANGE:  Removed
 #endif
 BENCH_END(exch107)
 
@@ -390,10 +393,10 @@ BENCH_START(comp_a_rk_tendency2)
 ! TBH:  HORIZONTAL DEPENDENCE:  a_ru_tend  ( [i-3,i,i+4], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rv_tend  ( [i-3,i,i+3], [j-3,j,j+4] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_rw_tend  ( [i-3,i,i+3], [j-3,j,j+3] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_t        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_t_2      ( [i-3,i,i+2], [j-3,j,j+2] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_t_tend   ( [i-3,i,i+3], [j-3,j,j+3] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_u        ( [i-3,i,i+2], [j-3,j,j+2] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_v        ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_u_2      ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_v_2      ( [i-3,i,i+2], [j-3,j,j+2] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_w_2      ( [i-3,i,i+2], [j-3,j,j+2] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msft       ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfu       ( [i-4,i,i+3], [j-3,j,j+3] )

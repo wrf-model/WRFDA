@@ -5331,12 +5331,8 @@ BENCH_END(comp_a_rk_tendency1)
 #include <all_debug_halo.h>
 #endif
 
+! TBH: TODO:  remove unused BENCH timers
 BENCH_START(exch107)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_3803.inc"
-
-#endif
 BENCH_END(exch107)
 
 BENCH_START(comp_a_rk_tendency2)
