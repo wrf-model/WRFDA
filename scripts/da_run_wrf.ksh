@@ -70,7 +70,7 @@ ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 
 export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
 
-cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2234.inc $WRF_DIR/inc/namelist_script.inc
+cp $WRFVAR_DIR/inc/namelist_script_wrf_2234.inc $WRF_DIR/inc/namelist_script.inc
 if test $WRF_NAMELIST'.' != '.'; then
    ln -fs $WRF_NAMELIST namelist.input
 elif test -f $WRF_DIR/inc/namelist_script.inc; then

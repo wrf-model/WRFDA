@@ -13,6 +13,9 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 . ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
 
+. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh
+export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
+
 #-----------------------------------------------------------------------
 # [2] Setup run:
 #-----------------------------------------------------------------------
@@ -31,10 +34,6 @@ echo "END_DATE      $END_DATE"
 echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
 echo 'RUN_DIR       <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
 echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
-
-#Create WPS namelist:
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh
-${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
 
 #-----------------------------------------------------------------------
 # [3.0] Run WPS:
@@ -55,6 +54,7 @@ ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
       if $RUN_GEOGRID; then # Run geogrid:
          export WORK_DIR=$RUN_DIR/working.geogrid
          rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
+         ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
 
 	 ln -fs $WPS_DIR/geogrid.exe .
 	 ${RUN_CMD} ./geogrid.exe
@@ -74,6 +74,8 @@ ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
       fi
 
       # Run ungrib:
+      export WORK_DIR=$RUN_DIR/working
+      rm -rf $WORK_DIR; mkdir -p $WORK_DIR
 
       if $RUN_UNGRIB_AFWA; then # Uses AGRMET, NAVYSST, and 1/2 degree GFS GRIB data.
          export WORK_DIR=$RUN_DIR/working.run_ungrib_afwa
@@ -86,8 +88,9 @@ ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
             exit 1
          fi
       else
-         export WORK_DIR=$RUN_DIR/working.ungrib
-         rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
+         cd $WORK_DIR
+         ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
+         cp namelist.wps ${RUN_DIR}/namelist.wps.ungrib
 
          ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
          LOCAL_DATE=$DATE
@@ -113,8 +116,9 @@ ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
       fi
 
       # Run metgrid:
-      export WORK_DIR=$RUN_DIR/working.metgrid
-      rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
+      cd $WORK_DIR
+      ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
+      cp namelist.wps ${RUN_DIR}/namelist.wps.metgrid
 
       ln -fs $WPS_DIR/metgrid.exe .
       ${RUN_CMD} ./metgrid.exe

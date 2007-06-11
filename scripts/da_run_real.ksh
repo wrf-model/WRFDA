@@ -48,7 +48,7 @@ export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
 
 if test ! -f $WRF_DIR/inc/namelist_script.inc; then
    # No namelist_script logic introduced during build, so add manually
-   cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2234.inc $WRF_DIR/inc/namelist_script.inc
+   cp $WRFVAR_DIR/inc/namelist_script_wrf_2234.inc $WRF_DIR/inc/namelist_script.inc
 fi
 
 if test $WRF_NAMELIST'.' != '.' ; then

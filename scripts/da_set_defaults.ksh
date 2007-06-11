@@ -59,7 +59,7 @@ fi
 
 #Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}# Observation preprocessor dir.
+export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessor dir.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
@@ -78,19 +78,17 @@ export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/wps} # Run dir (typically overwritten).
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
 
 #Time info:
-export DATE=${DATE:-2003010100}                   # Date (can be overwritten).
+export DATE=${DATE:-2003010100}                   # Current date.
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}   # Start date of test period
 export FINAL_DATE=${FINAL_DATE:-2003012800}       # Final date of test period.
 export LBC_FREQ=${LBC_FREQ:-06}
 let LBC_FREQ_SS=$LBC_FREQ*3600
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
-export FCST_RANGE=${FCST_RANGE:-6}                     # Forecast range (can be overwritten).
-export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 export OBS_FREQ=${OBS_FREQ:-12}
 export WINDOW_START=${WINDOW_START:-0}                 # Start ob window difference (hrs).
 export WINDOW_END=${WINDOW_END:-0}                     # End ob window difference (hrs).
@@ -165,7 +163,7 @@ export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
 export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
-export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
+export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$CYCLE_PERIOD}       # Output input format end.
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
@@ -205,6 +203,4 @@ export NSTARTACCUM2=${NSTARTACCUM2:-1}                 # ETKF parameter.
 export CYCLE_NUMBER=${CYCLE_NUMBER:-0}                 # ETKF parameter.
 export TAINFLATINPUT=${TAINFLATINPUT:-1.0}             # ETKF parameter.
 export RHOINPUT=${RHOINPUT:-1.0}                       # ETKF parameter.
-
-exit 0
 
