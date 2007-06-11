@@ -6,23 +6,14 @@
 #
 #-----------------------------------------------------------------------
 
-#--------------------------------------------
-# 0) Set up various environment variables:
-#--------------------------------------------
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-export DATE=${DATE:-2003010100}
-export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
-export OBS_FREQ=${OBS_FREQ:-$CYCLE_PERIOD}
-export WINDOW_START=${WINDOW_START:-0}        # Start ob window difference (hrs).
-export WINDOW_END=${WINDOW_END:-0}             # End ob window difference (hrs).
-export DUMMY=${DUMMY:-false}
-
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
-export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs} 
+
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
 
 if test ! -d $DAT_DIR; then mkdir $DAT_DIR; fi
 if test ! -d $RTOBS_DIR; then mkdir $RTOBS_DIR; fi

@@ -180,7 +180,6 @@ export NL_TIME_STEP_SOUND=0    # number of sound steps per time-step
 
    # 6.3 namelist for OBS_PROC:
    #----------------------------
-export PTOP_PA=$NL_P_TOP_REQUESTED
 
    # 6.3 namelist for WRF-Var:
    #----------------------------

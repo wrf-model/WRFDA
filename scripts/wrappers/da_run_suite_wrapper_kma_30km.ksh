@@ -148,7 +148,9 @@ export NL_SPECIFIED=.TRUE.
 #------------------------------------------------------------------------
 #    Here are Namelist options for OBS_PROC
 #------------------------------------------------------------------------
-export PTOP_PA=${PTOP_PA:-1000}     # The TOP pressure levels values in hPa 
+
+export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
+
 #------------------------------------------------------------------------
 #    Here are options for WRF_VAR control
 #------------------------------------------------------------------------

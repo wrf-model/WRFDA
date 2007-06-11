@@ -11,27 +11,11 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-#Experiment details:
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}                            # Domain name.
-export EXPT=${EXPT:-test}                              # Experiment name.
-export CLEAN=${CLEAN:-true}
-export CYCLING=${CYCLING:-false}
-
-#Time info:
-export DATE=${DATE:-2003010100}
-
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar/build}
-export DAT_DIR=${DAT_DIR:-$HOME/data} # Data directory.
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION} # Data directory for region.
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/update_bc}
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export WORK_DIR=$RUN_DIR/working
 
 echo "<HTML><HEAD><TITLE>$EXPT update_bc</TITLE></HEAD><BODY>"
@@ -87,7 +71,7 @@ cat > parame.in << EOF
 &control_param
  wrfvar_output_file = 'wrfvar_output'
  wrf_bdy_file       = 'wrfbdy_d${DOMAIN}'
- wrf_input          = 'real_output'
+ wrf_input_from_si  = 'real_output'
 
  cycling = .${CYCLING}.
  debug   = .true.
@@ -99,8 +83,10 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
 
-   ln -fs $WRF_BC_DIR/da_update_bc.exe .
-   ./da_update_bc.exe
+#   ln -fs $WRF_BC_DIR/da_update_bc.exe .
+#   ./da_update_bc.exe
+   ln -fs $WRF_BC_DIR/update_wrf_bc.exe .
+   ./update_wrf_bc.exe
 
    RC=$?
    if test $RC != 0; then

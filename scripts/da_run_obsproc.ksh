@@ -5,42 +5,19 @@
 # Purpose: Creates observation file for input to WRFVAR (ob_format_2).
 #-----------------------------------------------------------------------
 
-#--------------------------------------------
-# [1] Set up various environment variables:
-#--------------------------------------------
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-export EXPT=${EXPT:-test}
-export DATE=${DATE:-2004051300}
-export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
-
-export DOMAIN=${DOMAIN:-01}
-export REGION=${REGION:-con200}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/$DATE/obsproc}
-export WORK_DIR=$RUN_DIR/working
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
-export DUMMY=${DUMMY:-false}
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
+export WORK_DIR=$RUN_DIR/working
 mkdir -p $RUN_DIR $OB_DIR/$DATE
 
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessing
-
-# Namelist variables used in obs. preprocessor:
-
-export NL_E_WE=${NL_E_WE:-110}
-export NL_E_SN=${NL_E_SN:-145}
-export MAP_PROJ=${MAP_PROJ:-polar}
-export REF_LAT=${REF_LAT:--87.396970}
-export REF_LON=${REF_LON:-180.0}
-export TRUELAT1=${TRUELAT1:--90.0}
-export TRUELAT2=${TRUELAT2:--90.0}
-export STAND_LON=${STAND_LON:-180.0}
-export NL_DX=${NL_DX:-90000}
-export PTOP_PA=${PTOP_PA:-5000.0}
-
 echo "<HTML><HEAD><TITLE>$EXPT obsproc</TITLE></HEAD><BODY><H1>$EXPT obsproc</H1><PRE>"
 
 date
@@ -56,11 +33,6 @@ mkdir -p $WORK_DIR
 cd $WORK_DIR
 
    export NL_DX_KM=`expr $NL_DX \/ 1000`
-
-   # MM5 variables (not in WRF):
-   export PS0=${PS0:-100000.0}
-   export TS0=${TS0:-273.0}
-   export TLP=${TLP:-50.0}
 
    if test $MAP_PROJ = lambert; then
       export PROJ=1
@@ -142,7 +114,7 @@ cd $WORK_DIR
 /
 
 &record6
- ptop =  ${PTOP_PA},
+ ptop =  ${NL_P_TOP_REQUESTED},
  ps0  =  ${PS0},
  ts0  =  ${TS0},
  tlp  =  ${TLP},

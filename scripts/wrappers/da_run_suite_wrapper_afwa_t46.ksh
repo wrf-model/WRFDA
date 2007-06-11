@@ -28,8 +28,8 @@
 #export RUN_RESTORE_DATA_NCEP=false
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
-#export RUN_WPS=true
-export RUN_REAL=true
+export RUN_WPS=true
+#export RUN_REAL=true
 #export RUN_OBSPROC=true
 #export RUN_WRFVAR=true
 #export RUN_UPDATE_BC=true
@@ -42,7 +42,7 @@ export EXPT=noda  # domain check option is set to false!
 export CLEAN=false
 export CYCLE_PERIOD=6
 #export CYCLING=true
-export FIRST=false # the dafult is true!
+#export FIRST=false # the dafult is true!
 
 # LSF settings...
 export JOBSUBMIT_TOOL=lsf

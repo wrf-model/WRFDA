@@ -10,69 +10,16 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export LBC_FREQ=${LBC_FREQ:-06}
-export DUMMY=${DUMMY:-false}
-export REGION=${REGION:-con200}
-export DOMAIN=${DOMAIN:-01}
-export EXPT=${EXPT:-test}
-export SOLVER=${SOLVER:-em}
-export NUM_PROCS=${NUM_PROCS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
-export CLEAN=${CLEAN:-false}
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-# Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RC_DIR=${RC_DIR:-$REG_DIR/rc}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/$DATE/real}
+
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export WORK_DIR=$RUN_DIR/working
-
-#From WPS:
-export NL_E_WE=${NL_E_WE:-45}                          #
-export NL_E_SN=${NL_E_SN:-45}                          #
-export NL_DX=${NL_DX:-200000}                # Resolution (m).
-export NL_DY=${NL_DY:-200000}                # Resolution (m).
-
-#First seen in real:
-export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
-export NL_P_TOP_REQUESTED=${NL_P_TOP_REQUESTED:-5000}
-export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
-export NL_FRAMES_PER_OUTFILE=${NL_FRAMES_PER_OUTFILE:-1}
-export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
-export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
-export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.990, 0.978, 0.964, 0.946, "\
-                                        " 0.922, 0.894, 0.860, 0.817, 0.766, "\
-                                        " 0.707, 0.644, 0.576, 0.507, 0.444, 0.380,"\
-                                        " 0.324, 0.273, 0.228, 0.188, 0.152,"\
-                                        " 0.121, 0.093, 0.069, 0.048, 0.029, 0.014, 0.000"}
-export NL_E_VERT=${NL_E_VERT:-28}                   #
-export NL_SMOOTH_OPTION=${NL_SMOOTH_OPTION:-1}           # ?
-export NL_MP_PHYSICS=${NL_MP_PHYSICS:-3}           #
-export NL_RADT=${NL_RADT:-30}                #
-export NL_SF_SFCLAY_PHYSICS=${NL_SF_SFCLAY_PHYSICS:-1}
-export NL_SF_SURFACE_PHYSICS=${NL_SF_SURFACE_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
-export NL_NUM_SOIL_LAYERS=${NL_NUM_SOIL_LAYERS:-5}
-export NL_BL_PBL_PHYSICS=${NL_BL_PBL_PHYSICS:-1} #(1=Thermal diffusion, 2=Noah LSM).
-export NL_CU_PHYSICS=${NL_CU_PHYSICS:-1}           #(1=, 2=,3=).
-export NL_CUDT=${NL_CUDT:-5}           #(1=, 2=,3=).
-export NL_W_DAMPING=${NL_W_DAMPING:-0}            #
-export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             #
-export NL_KM_OPT=${NL_KM_OPT:-1}               #
-export NL_BASE_TEMP=${NL_BASE_TEMP:-290.0}               #
-export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
-export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
-export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
 if test ! -d $RC_DIR; then mkdir $RC_DIR; fi
 rm -rf $WORK_DIR
@@ -98,6 +45,11 @@ echo "END_DATE   $END_DATE"
 let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
+
+if test ! -f $WRF_DIR/inc/namelist_script.inc; then
+   # No namelist_script logic introduced during build, so add manually
+   cp $WRFVAR_DIR/inc/namelist_script_wrf_wps_2234.inc $WRF_DIR/inc/namelist_script.inc
+fi
 
 if test $WRF_NAMELIST'.' != '.' ; then
    ln -fs $WRF_NAMELIST namelist.input

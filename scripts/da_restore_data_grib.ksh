@@ -6,21 +6,15 @@
 #
 #-----------------------------------------------------------------------
 
-#--------------------------------------------
-# 0) Set up various environment variables:
-#--------------------------------------------
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-export DUMMY=${DUMMY:-false}
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export LBC_FREQ=${LBC_FREQ:-6}
-
-# Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export MSS_GRIB_DIR=${MSS_GRIB_DIR:-mss:/DSS/DS083.2/data} # Default is fnl. 
-export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}     
+
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 if test ! -d $GRIB_DIR; then mkdir $GRIB_DIR; fi
 
 echo "<HTML><HEAD><TITLE>$EXPT restore_data_grib</TITLE></HEAD><BODY>"

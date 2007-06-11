@@ -1,26 +1,15 @@
 #!/bin/ksh
+
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
+
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
-export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus}
-export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
-export REGION=${REGION:-con200}
-export EXPT=${EXPT:-test}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}
+
+. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+
 export WORK_DIR=$RUN_DIR/working
-export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
-export POE=false
-export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
-
-export SUBMIT=${SUBMIT:-LSF}
-export NUM_PROCS=${NUM_PROCS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-
-export QUEUE=${QUEUE:-regular}
-export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 
 mkdir -p $RUN_DIR
 cd $RUN_DIR
