@@ -17,8 +17,8 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_CPPFLAGS     =
+DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = # O2
 FCDEBUG         = # -g -C
@@ -28,30 +28,22 @@ FCENDIAN        = -byteswapio
 FCBASE          = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -I$(RSL)/RSL
+EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = 
 
 # Libraries
 
 LOCAL_LIB       = -L/usr/local/lib
-MPI_LIB         = -L$(RSL)/RSL -lrsl
+MPI_LIB         = -lrsl_lite
 
 # Architecture
 
-arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
-	( cd $(RSL)/RSL ; \
-          $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
-            MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
-            LEARN_BCAST=-DLEARN_BCAST linux )
+arch : rsl_lite.a
 	@ touch arch
 
 arch_clean :
-	( cd $(RSL)/RSL; make clean )
 
 arch_superclean :
-	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
 #ARCH Settings for PC Linux i486 i586 i686, PGI, serial      (Single-threaded)
@@ -80,8 +72,6 @@ RSL_FCFLAGS     = $(FCENDIAN)
 RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -92,7 +82,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -122,8 +112,6 @@ EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 EXTRA_LDFLAGS   = -V
@@ -145,7 +133,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -175,8 +163,6 @@ EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 
@@ -196,7 +182,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, debug       (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -227,8 +213,6 @@ EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -239,7 +223,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, PGI, optimised   (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -270,8 +254,6 @@ EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -lg2c
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -305,8 +287,6 @@ FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -317,7 +297,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -350,8 +330,6 @@ EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -370,7 +348,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -401,8 +379,6 @@ EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -421,7 +397,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, debug       (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -454,8 +430,6 @@ EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -466,7 +440,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL_LITE, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, g95, optimised   (RSL_LITE, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -497,8 +471,6 @@ EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = -DMPI2_SUPPORT
 
 LOCAL_LIB       = -L/usr/local/lib
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11 -L/usr/lib/gcc/i386-redhat-linux/3.4.3 -lg2c
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -544,7 +516,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, debug, untested     (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, debug, untested     (RSL, MPI)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -592,7 +564,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux i486 i586 i686, ifort, optimised, untested (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux i486 i586 i686, ifort, optimised, untested (RSL, MPI)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -677,7 +649,7 @@ arch_superclean :
 
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, PGI, debug               (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, PGI, debug               (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -727,7 +699,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, PGI, optimised           (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, PGI, optimised           (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -810,7 +782,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, debug, untested    (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, debug, untested    (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -857,7 +829,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, Pathscale, optimised, untested (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, Pathscale, optimised, untested (RSL, MPI)
 #
 FC              = mpif90
 FFC             = $(FC)
@@ -940,7 +912,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, debug, untested      (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, debug, untested      (RSL, MPI)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -989,7 +961,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for PC Linux x86_64, ifort, optimised, untested (RSL, MPI, RSL IO)
+#ARCH Settings for PC Linux x86_64, ifort, optimised, untested (RSL, MPI)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1077,7 +1049,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for SGI O2K DM IRIX64, optimised, untested    (RSL, SGI-MPI, RSL IO)
+#ARCH Settings for SGI O2K DM IRIX64, optimised, untested    (RSL, SGI-MPI)
 #
 M4              = m4 -B12000
 FC              = mpif90
@@ -1125,7 +1097,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, ifort, optimised, untested (RSL, SGI-MPI, RSL IO)
+#ARCH Settings for SGI Altix, Intel Itanium2 ia64 Linux, ifort, optimised, untested (RSL, SGI-MPI)
 #
 # Process pinning should be used -- set the environment
 #  variable MPI_DSM_DISTRIBUTE on a dedicated system, when
@@ -1251,8 +1223,6 @@ EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1263,7 +1233,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf, debug                           (RSL, IBM-MPI, RSL IO)
+#ARCH Settings for AIX, xlf, debug                           (RSL, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1298,8 +1268,6 @@ RSL_CCFLAGS     =
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1318,7 +1286,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for AIX, xlf, optimised                       (RSL, IBM-MPI, RSL IO)
+#ARCH Settings for AIX, xlf, optimised                       (RSL, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1351,8 +1319,6 @@ RSL_CCFLAGS     =
 EXTRA_FLAGS     = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
@@ -1371,7 +1337,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for AIX, xlf, debug                           (RSL_LITE, IBM-MPI, RSL IO)
+#ARCH Settings for AIX, xlf, debug                           (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1406,8 +1372,6 @@ RSL_CCFLAGS     =
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -1418,7 +1382,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for AIX, xlf, optimised                       (RSL_LITE, IBM-MPI, RSL IO)
+#ARCH Settings for AIX, xlf, optimised                       (RSL_LITE, IBM-MPI)
 #
 M4              = m4 -B24000
 FC              = mpxlf90_r
@@ -1451,8 +1415,6 @@ RSL_CCFLAGS     =
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-                      -L/usr/X11R6/lib -lX11
 MPI_LIB         = -lrsl_lite
 
 arch : librsl_lite.a
@@ -1503,7 +1465,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI, RSL IO)
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1559,7 +1521,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, optimised       (RSL, Cray MPI, RSL IO)
+#ARCH Settings for crayx1 UNICOS/mp CRAY X1, optimised       (RSL, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1638,8 +1600,6 @@ FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
 EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
 LOCAL_LIB       = -lSystemStubs
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11
 
 arch : 
 		$(LN) $(RSL_STUBS)/* .
@@ -1650,7 +1610,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, g95, debug                  (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, debug                  (RSL, MPI)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1685,8 +1645,6 @@ EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
 RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1705,7 +1663,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, g95, optimised              (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, g95, optimised              (RSL, MPI)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1738,8 +1696,6 @@ RSL_CCFLAGS     = -DMACOS -I/usr/include/sys -DMPI2_SUPPORT
 CCOPTIM         = -O2
 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
-NCARG_LIB       = -L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c -L/usr/X11R6/lib \
-                     -lX11
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
@@ -1796,7 +1752,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for Darwin, PGI, debug                  (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, PGI, debug                  (RSL, MPI)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
@@ -1850,7 +1806,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for Darwin, PGI, optimised              (RSL, MPI, RSL IO)
+#ARCH Settings for Darwin, PGI, optimised              (RSL, MPI)
 #
 CPP             = /usr/bin/cpp
 M4              = m4 -B12000
