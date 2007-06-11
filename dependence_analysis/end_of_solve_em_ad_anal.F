@@ -250,7 +250,16 @@ lineno = __LINE__
 ! TBH:  which has many more halo updates than ARW, but not nearly as many as 
 ! TBH:  solve_em_ad()...  
 #    include "HALO_3784.inc"
-! HALO_3784 dyn_em 80:a_advect_tend,a_alt,a_cqu,a_cqv,a_cqw,a_moist_tend,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,alt,cosa,cqu,cqv,cqw,e,f,msft,msfu,msfv,mu_2,mub,mut,muu,muv,p,pb,ph_1,ph_2,phb,php,ru,rv,rw,t_1,t_2,t_init,u_1,u_2,v_1,v_2,w_1,w_2,ww,z,z_at_w,a_z,a_z_at_w,xland
+$$$ add HALO_3783
+! ??? check fields in HALO_3783 and HALO_3784 for (R)
+! ??? remove halo update of muu,muv above?
+! ??? remove mub,pb,phb here?  
+! ??? only exchange z,z_at_w,a_z,a_z_at_w here only when rk_step .eq. 1?
+$$$ BUG BELOW HERE
+! HALO_3783 dyn_em 8:a_alt,a_mu_2,a_mut,a_muu,a_muv,a_p,a_php,a_ru,a_ru_tendf,a_rv,a_rv_tendf,a_rw,a_rw_tendf,a_t_1,a_t_tendf,a_u_1,a_v_1,a_w_1,cqu,cqv,cqw,mub,pb,php,rw,t_init,z,z_at_w,a_z,a_z_at_w,xland
+! HALO_3784 dyn_em 80:a_ph_2,a_ph_tend,a_ru_tend,a_rv_tend,a_rw_tend,a_t_2,a_t_tend,a_u_2,a_v_2,a_w_2,muu,muv,phb,ru,rv
+$$$ BUG ABOVE HERE
+! OLD: HALO_3784 dyn_em 80:a_advect_tend,a_alt,a_moist_tend,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,alt,cosa,cqu,cqv,cqw,e,f,msft,msfu,msfv,mu_2,mub,mut,muu,muv,p,pb,ph_1,ph_2,phb,php,ru,rv,rw,t_1,t_2,t_init,u_1,u_2,v_1,v_2,w_1,w_2,ww,z,z_at_w,a_z,a_z_at_w,xland
 #endif
 BENCH_END(exch106)
 
@@ -439,6 +448,7 @@ BENCH_START(comp113)
   u_1(:,:,:) = u_1h(:,:,:)
   t_tendf(:,:,:) = t_tendfh(:,:,:)
   t_2(:,:,:) = t_2h(:,:,:)
+! TBH:  remove t_1?
   t_1(:,:,:) = t_1h(:,:,:)
   rw_tendf(:,:,:) = rw_tendfh(:,:,:)
   rv_tendf(:,:,:) = rv_tendfh(:,:,:)
@@ -446,7 +456,9 @@ BENCH_START(comp113)
   pm1(:,:,:) = pm1h(:,:,:)
   ph_tendf(:,:,:) = ph_tendfh(:,:,:)
   ph_2(:,:,:) = ph_2h(:,:,:)
+! TBH:  remove ph_1?
   ph_1(:,:,:) = ph_1h(:,:,:)
+! TBH:  remove p?
   p(:,:,:) = ph(:,:,:)
   mu_2(:,:) = mu_2h(:,:)
   mu_1(:,:) = mu_1h(:,:)
@@ -667,6 +679,7 @@ BENCH_START(comp117)
 #ifndef FAST_CPY
   dnw(:) = dnwh(:)
   moist_2(:,:,:,:) = moist_2h(:,:,:,:)
+! ??? TBH:  avoid resotring mu_2 here?  
   mu_2(:,:) = mu_2h(:,:)
   u_2(:,:,:) = u_2h(:,:,:)
   v_2(:,:,:) = v_2h(:,:,:)

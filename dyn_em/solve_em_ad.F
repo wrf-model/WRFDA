@@ -5275,6 +5275,7 @@ lineno = __LINE__
 ! TBH:  this kind of optimization allowed SMS to beat hand-coded MPI for Eta 
 ! TBH:  which has many more halo updates than ARW, but not nearly as many as 
 ! TBH:  solve_em_ad()...  
+#    include "HALO_3783.inc"
 #    include "HALO_3784.inc"
 
 #endif
