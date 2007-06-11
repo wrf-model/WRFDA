@@ -1525,7 +1525,9 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
-FCDEBUG         = -g 
+FCDEBUG         = -g
+# -Ra causes a segfault with da_par_utils
+FCWARN          = -Rbcs
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
