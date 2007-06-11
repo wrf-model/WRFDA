@@ -659,7 +659,7 @@ BENCH_START(exch26)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_1419.inc"
-
+! HALO_1419 dyn_em 8:z
 
 
 #endif
@@ -683,7 +683,7 @@ BENCH_START(exch27)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_1441.inc"
-
+! HALO_1441 dyn_em 8:moist_2
 
 
 #endif
@@ -763,7 +763,7 @@ BENCH_START(exch28)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_1487.inc"
-
+! HALO_1487 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,muus,muvs,p,ph_2,php,t_1,t_save,u_save,v_save 
 #endif
 BENCH_END(exch28)
 
@@ -799,6 +799,7 @@ BENCH_START(exch29)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_1507.inc"
+! HALO_1507 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch29)
 
@@ -812,7 +813,7 @@ BENCH_START(exch30)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #include "HALO_1518.inc"
-
+! HALO_1518 dyn_em 48:al,alt,moist_2,mu_1,mu_2,p,pb,ph_2,php,t_1,t_2,u_2,v_2,w_2,ww 
 
 
 
@@ -856,6 +857,7 @@ BENCH_START(exch31)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_1560.inc"
+! HALO_1560 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,muus,muvs,p,pb,ph_2,php,t_1,t_save,u_save,v_save
 
 #endif
 BENCH_END(exch31)
@@ -901,6 +903,7 @@ BENCH_START(exch32)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_1592.inc"
+! HALO_1592 dyn_em 8:ru_m,rv_m
 #endif
 BENCH_END(exch32)
 
@@ -971,6 +974,7 @@ BENCH_START(exch33)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_1654.inc"
+! HALO_1654 dyn_em 48:a_al,a_moist_2,a_mu_2,a_p,a_ph_2,a_t_2,a_u_2,a_v_2,a_w_2,al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 
 
 
@@ -981,6 +985,7 @@ lineno = __LINE__
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_1664.inc"
+! HALO_1664 dyn_em 48:al,moist_2,mu_2,ph_2,t_2,u_2,v_2,w_2
 #endif
 BENCH_END(exch33)
 
@@ -1114,6 +1119,7 @@ BENCH_START(exch34)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #   include "HALO_1748.inc"
+! HALO_1748 dyn_em 48:al,p,ww
 #endif
 BENCH_END(exch34)
 
@@ -1140,12 +1146,14 @@ BENCH_END(comp39)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_1757.inc"
+! HALO_1757 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 
 BENCH_START(exch35)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_1763.inc"
+! HALO_1763 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 BENCH_END(exch35)
 
@@ -1198,6 +1206,7 @@ BENCH_START(exch38)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_1809.inc"
+! HALO_1809 dyn_em 8:moist_2
 
 
 
@@ -1279,6 +1288,7 @@ BENCH_START(exch39)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_1857.inc"
+! HALO_1857 dyn_em 8:al,alt,mu_2,mudf,muts,p,ph_2,php
 
 #endif
 BENCH_END(exch39)
@@ -1318,6 +1328,7 @@ BENCH_START(exch40)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_1880.inc"
+! HALO_1880 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch40)
 BENCH_START(comp444)
@@ -1329,6 +1340,7 @@ BENCH_START(exch41)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #include "HALO_1889.inc"
+! HALO_1889 dyn_em 48:al,alt,moist_2,mu_1,mu_2,p,pb,ph_2,php,t_1,t_2,u_2,v_2,w_2,ww
 
 
 
@@ -1372,6 +1384,7 @@ BENCH_START(exch42)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #   include "HALO_1930.inc"
+! HALO_1930 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,p,pb,ph_2,php,t_1
 
 #endif
 BENCH_END(exch42)
@@ -1429,6 +1442,7 @@ BENCH_START(exch44)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_1974.inc"
+! HALO_1974 dyn_em 48:al,mu_1,mu_2,p,ph_2,ru_m,rv_m,t_1,t_2,u_2,v_2,w_2
 #endif
 BENCH_END(exch44)
 BENCH_START(comp47)
@@ -1545,6 +1559,7 @@ BENCH_START(exch45)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #   include "HALO_2036.inc"
+! HALO_2036 dyn_em 8:ru_m,rv_m;48:a_mu_2,a_mudf,a_muts,a_ph_2,a_t_2,al,alt,cqu,cqv,mu_2,muts,muus,muvs,p,pb,ph_2,php,t_2,t_save,u_2,u_save,v_2,v_save,w_2,w_save
 
 #endif
 BENCH_END(exch45)
@@ -1623,6 +1638,7 @@ BENCH_START(exch46)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #   include "HALO_2112.inc"
+! HALO_2112 dyn_em 48:a_muts,muts,muus,muvs
 #endif
 BENCH_END(exch46)
 
@@ -1667,6 +1683,7 @@ BENCH_START(exch47)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 # include "HALO_2154.inc"
+! HALO_2154 dyn_em 80:a_advect_tend,a_alt,a_moist_1,a_moist_2,a_moist_tend,alt,moist_1,moist_2,msft,msfu,msfv,mut,ru_m,rv_m,ww_m
 #endif
 BENCH_END(exch47)
 
@@ -1815,6 +1832,7 @@ BENCH_START(exch48)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_2249.inc"
+! HALO_2249 dyn_em 48:al,alt,mut,p,ww
 #endif
 BENCH_END(exch48)
 
@@ -1841,12 +1859,14 @@ BENCH_END(comp53)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2258.inc"
+! HALO_2258 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 
 BENCH_START(exch49)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2264.inc"
+! HALO_2264 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 BENCH_END(exch49)
 
@@ -1898,6 +1918,7 @@ BENCH_START(exch52)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2309.inc"
+! HALO_2309 dyn_em 8:moist_2
 
 
 
@@ -1980,6 +2001,7 @@ BENCH_START(exch53)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2358.inc"
+! HALO_2358 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,muus,muvs,p,pb,ph_2,php,t_1,t_save,u_save,v_save
 
 #endif
 BENCH_END(exch53)
@@ -2024,6 +2046,7 @@ BENCH_START(exch54)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2386.inc"
+! HALO_2386 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch54)
 
@@ -2037,6 +2060,7 @@ BENCH_START(exch55)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #include "HALO_2397.inc"
+! HALO_2397 dyn_em 48:al,alt,moist_1,moist_2,msft,msfu,msfv,mu_1,mu_2,p,pb,ph_2,php,t_1,t_2,u_2,v_2,w_2,ww
 
 
 
@@ -2083,6 +2107,7 @@ BENCH_START(exch56)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2441.inc"
+! HALO_2441 dyn_em 8:mu_1,mudf,ru_m,rv_m,t_1;48:a_mu_2,al,cqu,cqv,mu_2,muts,muus,muvs,p,pb,ph_2,php,t_2,t_save,u_2,u_save,v_2,v_save,w_2,w_save
 
 #endif
 BENCH_END(exch56)
@@ -2124,6 +2149,7 @@ BENCH_START(exch58)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_2474.inc"
+! HALO_2474 dyn_em 48:a_muts,a_muus,a_muvs
 #endif
 BENCH_END(exch58)
 
@@ -2226,6 +2252,7 @@ BENCH_START(exch59)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2527.inc"
+! HALO_2527 dyn_em 48:a_moist_1,a_moist_2,a_moist_tend,a_mu_1,a_mu_2,a_ph_2,a_t_2,a_u_2,a_v_2,a_w_2,al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 
 
 
@@ -2309,11 +2336,13 @@ BENCH_START(exch61)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2588.inc"
+! HALO_2588 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2593.inc"
+! HALO_2593 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 BENCH_END(exch61)
 
@@ -2328,6 +2357,7 @@ BENCH_START(exch62)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2605.inc"
+! HALO_2605 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch62)
 
@@ -2363,6 +2393,7 @@ BENCH_START(exch64)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2636.inc"
+! HALO_2636 dyn_em 8:moist_2
 
 
 
@@ -2433,6 +2464,7 @@ BENCH_START(exch65)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2676.inc"
+! HALO_2676 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,muus,muvs,p,pb,ph_2,php,t_1,t_save,u_save,v_save
 
 #endif
 BENCH_END(exch65)
@@ -2457,6 +2489,7 @@ BENCH_START(exch66)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2696.inc"
+! HALO_2696 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch66)
 
@@ -2478,6 +2511,7 @@ BENCH_START(exch67)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #include "HALO_2715.inc"
+! HALO_2715 dyn_em 48:al,alt,moist_1,moist_2,mu_1,mu_2,p,pb,ph_1,ph_2,php,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww
 
 
 
@@ -2527,6 +2561,7 @@ BENCH_START(exch68)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2762.inc"
+! HALO_2762 dyn_em 8:al,alt,mu_1,mu_2,mudf,muts,muus,muvs,p,pb,ph_2,php,t_1
 
 #endif
 BENCH_END(exch68)
@@ -2538,6 +2573,7 @@ BENCH_START(exch69)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2773.inc"
+! HALO_2773 dyn_em 48:al,mu_2,p,ph_2
 #endif
 BENCH_END(exch69)
 BENCH_START(comp74)
@@ -2558,6 +2594,7 @@ BENCH_START(exch70)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_2784.inc"
+! HALO_2784 dyn_em 8:al,mu_2,mudf,p,ph_2
 #endif
 BENCH_END(exch70)
 
@@ -2578,6 +2615,7 @@ BENCH_START(exch71)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #       include "HALO_2802.inc"
+! HALO_2802 dyn_em 48:u_2,v_2,ww
 #endif
 BENCH_END(exch71)
 BENCH_START(comp76)
@@ -2596,6 +2634,7 @@ BENCH_START(exch71b)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_2810.inc"
+! HALO_2810 dyn_em 8:u_2,v_2
 #endif
 BENCH_END(exch71b)
 
@@ -2609,6 +2648,7 @@ BENCH_START(exch72)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2821.inc"
+! HALO_2821 dyn_em 48:al,alt,moist_2,mu_1,mu_2,p,pb,ph_2,php,t_1,t_2,u_2,v_2,w_2,ww
 
 
 
@@ -2634,6 +2674,7 @@ BENCH_START(exch73)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #       include "HALO_2844.inc"
+! HALO_2844 dyn_em 48:a,mu_2,ph_2,t_2,t_2save,u_2,v_2,w_2,ww
 #endif
 BENCH_END(exch73)
 !----------------------------------------
@@ -2685,6 +2726,7 @@ BENCH_START(exch74)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2881.inc"
+! HALO_2881 dyn_em 48:a_moist_2,a_mu_1,a_t_2,a_u_2,a_v_2,a_w_2,al
 
 
 
@@ -2709,6 +2751,7 @@ BENCH_START(exch75)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_2903.inc"
+! HALO_2903 dyn_em 48:al
 
 
 
@@ -2775,6 +2818,7 @@ BENCH_START(exch76)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_2955.inc"
+! HALO_2955 dyn_em 48:a_mut,a_muts,a_t_save,al,alpha,t_save,u_2,u_save,v_2,v_save,ww1
 
 
 
@@ -2793,6 +2837,7 @@ BENCH_START(exch77)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_2973.inc"
+! HALO_2973 dyn_em 48:a,a_mut,a_muts,a_ph_save,a_t_save,alpha,c2a,cqw,gamma,mu_2,muave,muts,ph_2,ph_save,ph_tend,rw_tend,t_2,t_2save,w_2
 #endif
 BENCH_END(exch77)
 
@@ -2813,6 +2858,7 @@ BENCH_START(exch78)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 # include "HALO_2991.inc"
+! HALO_2991 dyn_em 48:a_alt,a_mu_2,a_ph_2,a_t_2,a_w_2,a_ww
 
 
 
@@ -2837,6 +2883,7 @@ BENCH_START(exch79)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3013.inc"
+! HALO_3013 dyn_em 48:a_alt,a_mu_2,a_ph_2,a_t_2,a_u_2,a_v_2,a_w_2,a_ww
 
 
 
@@ -2874,6 +2921,7 @@ BENCH_START(exch80)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3042.inc"
+! HALO_3042 dyn_em 48:a_a,a_alpha,a_c2a,a_cqw,a_gamma,a_muave,a_mut,a_muts,a_ph_tend,a_rw_tend,a_t_2save,a_t_save,a_u_2,a_v_2,a_ww,ww,ww1
 
 
 
@@ -2915,6 +2963,7 @@ BENCH_START(exch81)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3072.inc"
+! HALO_3072 dyn_em 48:a_mu_2,a_t_2,a_u_2,a_v_2,a_ww,al,ww
 
 
 
@@ -2965,6 +3014,7 @@ BENCH_START(exch82)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #include "HALO_3120.inc"
+! HALO_3120 dyn_em 48:a_mu_2,a_mu_save,a_mut,a_muts,a_muu,a_muus,a_muv,a_muvs,a_ph_save,a_t_2,a_t_save,a_u_2,a_u_save,a_v_2,a_v_save,a_w_save,a_ww,cqu,cqv,mu_2,muts,muus,muvs,ru_m,rv_m,w_save,ww
 #endif
 
 BENCH_END(exch82)
@@ -3109,6 +3159,7 @@ BENCH_START(exch83)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3212.inc"
+! HALO_3212 dyn_em 48:al,p,ww
 #endif
 BENCH_END(exch83)
 
@@ -3136,11 +3187,13 @@ BENCH_START(exch84)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3222.inc"
+! HALO_3222 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3227.inc"
+! HALO_3227 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 BENCH_END(exch84)
 
@@ -3193,6 +3246,7 @@ BENCH_START(exch87)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #     include "HALO_3273.inc"
+! HALO_3273 dyn_em 8:moist_2
 
 
 
@@ -3259,6 +3313,7 @@ BENCH_START(exch88)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_3313.inc"
+! HALO_3313 dyn_em 48:mu_2,t_2,u_2,v_2,w_2
 #endif
 BENCH_END(exch88)
 BENCH_START(comp94)
@@ -3297,12 +3352,14 @@ BENCH_START(exch89)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_3335.inc"
+! HALO_3335 dyn_em 8:al,alt,mu_1,mu_2,mudf,p,pb,ph_2,php,t_1,t_save,u_save,v_save
 #endif
 
 !----------------------------------------
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #      include "HALO_3341.inc"
+! HALO_3341 dyn_em 48:al,mu_2,p,ph_2,t_2
 #endif
 BENCH_END(exch89)
 BENCH_START(comp95)
@@ -3329,6 +3386,7 @@ BENCH_START(exch90)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3356.inc"
+! HALO_3356 dyn_em 8:mu_2,ph_2,u_2,v_2;48:a_alt,a_mu_2,a_p,a_ph_2,a_php,a_t_2,a_u_2,a_v_2,a_w_2,a_ww,al,alt,p,php,ww
 
 
 
@@ -3375,6 +3433,7 @@ BENCH_START(exch91)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3386.inc"
+! HALO_3386 dyn_em 48:a_alt,a_mu_2,a_p,a_ph_2,a_php,al,p
 
 
 
@@ -3430,10 +3489,12 @@ BENCH_START(exch92)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3419.inc"
+! HALO_3419 dyn_em 48:a_alt,a_c2a,a_mu_2,a_mu_save,a_mudf,a_mut,a_muts,a_muu,a_muv,a_p,a_ph_2,a_ph_save,a_t_2,a_t_save,a_u_save,a_v_save,a_w_save,a_ww1,mu_1,mu_2,muts,muus,muvs,pb,t_1,t_2,u_2,v_2
 #endif
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3423.inc"
+! HALO_3423 dyn_em 48:a_alt,a_mu_2,a_ph_2,a_t_2,al
 
 
 
@@ -3562,6 +3623,7 @@ BENCH_START(exch93)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3510.inc"
+! HALO_3510 dyn_em 48:al
 #endif
 BENCH_END(exch93)
 
@@ -3589,11 +3651,13 @@ BENCH_START(exch94)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3520.inc"
+! HALO_3520 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3525.inc"
+! HALO_3525 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 #endif
 BENCH_END(exch94)
 
@@ -3686,6 +3750,7 @@ BENCH_START(exch98)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #    include "HALO_3593.inc"
+! HALO_3593 dyn_em 48:a_alt,a_mu_1,a_mu_2,a_p,a_ph_1,a_ph_2,a_t_1,a_t_2,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww
 
 
 
@@ -3699,6 +3764,7 @@ BENCH_START(exch99)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3606.inc"
+! HALO_3606 dyn_em 48:a_mu_tend,a_p,a_ph_2,a_ph_tend,a_ru_tend,a_rv_tend,a_rw_tend,a_t_tend,a_u_2,a_v_2,ph_2
 #endif
 BENCH_END(exch99)
 BENCH_START(comp104)
@@ -3714,6 +3780,7 @@ BENCH_START(exch100)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3619.inc"
+! HALO_3619 dyn_em 48:a_mut,a_ph_save,a_ru_tend,a_rv_tend,a_t_save,a_t_tend,a_u_save,a_v_save,a_w_save
 #endif
 BENCH_END(exch100)
 BENCH_START(comp105)
@@ -3729,6 +3796,7 @@ BENCH_START(exch101)
 #ifdef DM_PARALLEL
 lineno = __LINE__
 #  include "HALO_3632.inc"
+! HALO_3632 dyn_em 48:a_mu_2,a_mu_tend,a_mut,a_ph_2,a_ph_save,a_ru,a_rv,a_t_2,a_t_save,a_u_save,a_v_save,a_w_2,a_w_save,mut,ph_2,t_2,w_2
 #endif
 BENCH_END(exch101)
 BENCH_START(comp106)
