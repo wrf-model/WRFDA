@@ -2316,7 +2316,6 @@ SUBROUTINE wrf_write_field ( DataHandle , DateStr , VarName , Field , FieldType 
   ENDIF
 END SUBROUTINE wrf_write_field
 
-
 SUBROUTINE wrf_write_field1 ( DataHandle , DateStr , VarName , Field , FieldType ,         &
                              Comm       , IOComm  ,                                       &
                              DomainDesc , bdy_mask, MemoryOrder , Stagger , DimNames ,              &
@@ -2669,7 +2668,9 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
   INTEGER                       ,INTENT(OUT)   :: Status
   LOGICAL donotcollect
   INTEGER ndims, nproc
+#ifdef DA_CORE==1
   REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
+#endif
 
   CALL dim_from_memorder( MemoryOrder , ndims)
   CALL wrf_get_nproc( nproc )
@@ -2720,6 +2721,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                PatchStart , PatchEnd ,                                      &
                Status )
 
+#if (DA_CORE == 1)
   ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
      CALL collect_real_and_call_pkg ( fcn,                                        &
@@ -2729,7 +2731,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
                MemoryStart , MemoryEnd ,                                    &
                PatchStart , PatchEnd ,                                      &
                Status )
-
+#endif
   ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
      CALL collect_int_and_call_pkg ( fcn,                                        &
@@ -2927,7 +2929,6 @@ SUBROUTINE collect_double_and_call_pkg (   fcn,                                 
                                      MemoryStart , MemoryEnd ,                                    &
                                      PatchStart , PatchEnd ,                                      &
                                      Status )
-
   DEALLOCATE ( globbuf )
   RETURN
 
@@ -3046,8 +3047,9 @@ include "mpif.h"
   LOGICAL     distributed_field
   INTEGER i,j,k,idx,lx,idx2,lx2
   INTEGER collective_root
+#if (DA_CORE == 1)
   REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
-
+#endif
   CALL wrf_get_nproc( nproc )
   CALL wrf_get_dm_communicator ( communicator )
 
@@ -3103,11 +3105,13 @@ include "mpif.h"
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
+#if (DA_CORE == 1)
       ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
         CALL wrf_patch_to_global_real ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
            MemoryStart(1), MemoryEnd(1), MemoryStart(2), MemoryEnd(2), MemoryStart(3), MemoryEnd(3), &
            PatchStart(1) , PatchEnd(1) , PatchStart(2) , PatchEnd(2) , PatchStart(3) , PatchEnd(3) )
+#endif
       ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
         CALL wrf_patch_to_global_integer ( Field  , globbuf , DomainDesc, Stagger, MemOrd ,             &
            DomainStart(1), DomainEnd(1), DomainStart(2), DomainEnd(2), DomainStart(3), DomainEnd(3), &
@@ -3169,6 +3173,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
+#if (DA_CORE == 1)
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
@@ -3179,7 +3184,7 @@ include "mpif.h"
                              collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
-
+#endif
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
@@ -3240,6 +3245,7 @@ include "mpif.h"
                              communicator                   , &    ! communicator
                              ierr )
 
+#if (DA_CORE == 1)
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real ( Field, PatchStart(1)+idx , &
@@ -3250,7 +3256,7 @@ include "mpif.h"
                              collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
-
+#endif
            ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN
 
              CALL wrf_gatherv_integer ( Field, PatchStart(1)-MemoryStart(1)+1+idx , &
@@ -3305,6 +3311,7 @@ include "mpif.h"
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
+#if (DA_CORE == 1)
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
@@ -3313,7 +3320,7 @@ include "mpif.h"
                              collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
-
+#endif
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
@@ -3377,6 +3384,7 @@ include "mpif.h"
 
            ELSE IF ( FieldType .EQ. WRF_FLOAT ) THEN
 
+#if (DA_CORE == 1)
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf
                              my_count                       , &    ! sendcount
                              globbuf, 1+idx2                , &    ! recvbuf
@@ -3385,7 +3393,7 @@ include "mpif.h"
                              collective_root                , &    ! root
                              communicator                   , &    ! communicator
                              ierr )
-
+#endif
            ELSE IF ( FieldType .EQ. WRF_REAL ) THEN
 
              CALL wrf_gatherv_real( Field, PatchStart(1)+idx ,      &    ! sendbuf

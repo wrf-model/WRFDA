@@ -4328,28 +4328,6 @@
      ENDDO
    !$OMP END PARALLEL DO
 #endif
-
-#ifdef DUMBCOPY
-!write(0,'("cims:cime, ckms:ckme, cjms:cjme ",6i4)')cims,cime, ckms,ckme, cjms,cjme
-!write(0,'("nims:nime, nkms:nkme, njms:njme ",6i4)')nims,nime, nkms,nkme, njms,njme
-!write(0,'("cits:cite, ckts:ckte, cjts:cjte ",6i4)')cits,cite, ckts,ckte, cjts,cjte
-!write(0,'("nits:nite, nkts:nkte, njts:njte ",6i4)')nits,nite, nkts,nkte, njts,njte
-
-     DO nj = njts, njte
-        cj = jpos + (nj-1) / nrj     ! j coord of CD point 
-        jp = mod ( nj , nrj )  ! coord of ND w/i CD point
-        DO nk = nkts, nkte
-           ck = nk
-           DO ni = nits, nite
-              ci = ipos + (ni-1) / nri      ! j coord of CD point 
-              ip = mod ( ni , nri )  ! coord of ND w/i CD point
-              ! This is a trivial implementation of the interp_fcn; just copies
-              ! the values from the CD into the ND
-              nfld( ni, nk, nj ) = cfld( ci , ck , cj )
-           ENDDO
-        ENDDO
-     ENDDO
-#endif
 #endif
 
      RETURN

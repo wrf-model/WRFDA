@@ -1405,6 +1405,7 @@ SUBROUTINE med_auxinput3_in ( grid , config_flags )
    RETURN
 END SUBROUTINE med_auxinput3_in
 
+#if (DA_CORE == 1)
 SUBROUTINE med_auxinput3dfi_in ( grid , config_flags )
    USE module_domain
    USE module_configure
@@ -1415,6 +1416,7 @@ SUBROUTINE med_auxinput3dfi_in ( grid , config_flags )
    CALL med_auxinputdfi_in( grid , 3 , config_flags )
    RETURN
 END SUBROUTINE med_auxinput3dfi_in
+#endif
 
 SUBROUTINE med_auxinput4_in ( grid , config_flags )
    USE module_domain
@@ -1436,6 +1438,7 @@ SUBROUTINE med_auxinput5_in ( grid , config_flags )
    RETURN
 END SUBROUTINE med_auxinput5_in
 
+#if (DA_CORE == 1)
 SUBROUTINE med_auxinputdfi_in ( grid , stream, config_flags )
   ! Driver layer
    USE module_domain
@@ -1585,6 +1588,7 @@ SUBROUTINE med_auxinputdfi_in ( grid , stream, config_flags )
 
    RETURN
 END SUBROUTINE med_auxinputdfi_in
+#endif
 
 SUBROUTINE med_auxinput6_in ( grid , config_flags )
    USE module_domain
