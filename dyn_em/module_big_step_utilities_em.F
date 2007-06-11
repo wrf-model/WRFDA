@@ -1069,7 +1069,7 @@ SUBROUTINE calc_p_rho_phi ( moist, n_moist,                &
 ! use vector version from libmassv or from compat lib in frame/libmassv.F
 DO i=its,itf
    IF (temp(i) < 0) THEN
-      ! write (0,*) "FIX? temp < 0 in calc_p_rho_phi, resetting to 0.1"
+      write (0,*) "FIX? temp < 0 in calc_p_rho_phi, resetting to 0.1"
       temp(i) = 0.1
    END IF 
 END DO
