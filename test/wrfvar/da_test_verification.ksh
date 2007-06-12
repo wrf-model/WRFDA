@@ -3,7 +3,7 @@
 . ./region.ksh
 
 export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
-export WRFVAR_DIR=$HOME/code/$ID/wrfvar
+export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/$ID/wrfvar}
 
 export REG_DIR=$PWD
 

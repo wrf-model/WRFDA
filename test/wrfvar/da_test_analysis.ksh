@@ -6,9 +6,9 @@ export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
 
 export EXPT=${EXPT:-${ID}_${NUM_PROCS}}
 
-export REL_DIR=$HOME/code/$ID
+export REL_DIR=${REL_DIR:-$HOME/code/$ID}
 
-export WRFVAR_DIR=$REL_DIR/wrfvar
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export CLEAN=${CLEAN:-false}
 
 export REG_DIR=$PWD

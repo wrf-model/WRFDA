@@ -8,7 +8,7 @@ TUNING_DIR=${MACHINE}_tuning
 rm -rf $TUNING_DIR; mkdir -p $TUNING_DIR; cd $TUNING_DIR
 
 export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
-export WRFVAR_DIR=~/code/${ID}/wrfvar
+export WRFVAR_DIR=${WRFVAR_DIR:-~/code/${ID}/wrfvar}
 
 export UNPERT_ID=${MACHINE}_${FC}_opt
 export PERT_ID=${MACHINE}_${FC}_debug
