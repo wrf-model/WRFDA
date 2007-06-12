@@ -3689,6 +3689,10 @@ lineno = __LINE__
 BENCH_START(exch106)
 #ifdef DM_PARALLEL
 lineno = __LINE__
+! TBH:  check fields in HALO_3783 and HALO_3784 for (R)
+! TBH:  remove halo update of muu,muv above?
+! TBH:  remove mub,pb,phb here?  
+! TBH:  only exchange z,z_at_w,a_z,a_z_at_w here only when rk_step .eq. 1?
 ! TBH:  Note that exchange of z,z_at_w,a_z,a_z_at_w here only 
 ! TBH:  needs to be done when rk_step==1 .  Also, some of these halo 
 ! TBH:  thicknesses are HUGE!  Reduce if possible.  
@@ -3700,17 +3704,10 @@ lineno = __LINE__
 ! TBH:  this kind of optimization allowed SMS to beat hand-coded MPI for Eta 
 ! TBH:  which has many more halo updates than ARW, but not nearly as many as 
 ! TBH:  solve_em_ad()...  
+#    include "HALO_3783.inc"
 #    include "HALO_3784.inc"
-$$$ add HALO_3783
-! ??? check fields in HALO_3783 and HALO_3784 for (R)
-! ??? remove halo update of muu,muv above?
-! ??? remove mub,pb,phb here?  
-! ??? only exchange z,z_at_w,a_z,a_z_at_w here only when rk_step .eq. 1?
-$$$ BUG BELOW HERE
-! HALO_3783 dyn_em 8:a_alt,a_mu_2,a_mut,a_muu,a_muv,a_p,a_php,a_ru,a_ru_tendf,a_rv,a_rv_tendf,a_rw,a_rw_tendf,a_t_1,a_t_tendf,a_u_1,a_v_1,a_w_1,cqu,cqv,cqw,mub,pb,php,rw,t_init,z,z_at_w,a_z,a_z_at_w,xland
-! HALO_3784 dyn_em 80:a_ph_2,a_ph_tend,a_ru_tend,a_rv_tend,a_rw_tend,a_t_2,a_t_tend,a_u_2,a_v_2,a_w_2,muu,muv,phb,ru,rv
-$$$ BUG ABOVE HERE
-! OLD: HALO_3784 dyn_em 80:a_advect_tend,a_alt,a_cqu,a_cqv,a_cqw,a_moist_tend,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,alt,cosa,cqu,cqv,cqw,e,f,msft,msfu,msfv,mu_2,mub,mut,muu,muv,p,pb,ph_1,ph_2,phb,php,ru,rv,rw,t_1,t_2,t_init,u_1,u_2,v_1,v_2,w_1,w_2,ww,z,z_at_w,a_z,a_z_at_w,xland
+! CHANGED TO:  HALO_3783 dyn_em 8:a_alt,a_mu_2,a_mut,a_muu,a_muv,a_p,a_php,a_ru,a_ru_tendf,a_rv,a_rv_tendf,a_rw,a_rw_tendf,a_t_1,a_t_tendf,a_u_1,a_v_1,a_w_1,cqu,cqv,cqw,mub,pb,php,rw,t_init,z,z_at_w,a_z,a_z_at_w,xland
+! CHANGED TO:  HALO_3784 dyn_em 80:a_ph_2,a_ph_tend,a_ru_tend,a_rv_tend,a_rw_tend,a_t_2,a_t_tend,a_u_2,a_v_2,a_w_2,al,muu,muv,p,ph_2,phb,ru,rv,u_2,v_2,w_2
 #endif
 BENCH_END(exch106)
 
