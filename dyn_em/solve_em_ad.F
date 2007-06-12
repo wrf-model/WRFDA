@@ -1738,6 +1738,13 @@ BENCH_END(exch25)
   CALL wrf_debug ( 10 , 'DEBUG:  end runge_kutta_loor' )
   end do runge_kutta_loor
 
+BENCH_START(exch26)
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#    include "HALO_1290.inc"
+#endif
+BENCH_END(exch26)
+
  else ! restore_runge_kutta_loor
 BENCH_START(comprestore_runge_kutta_loor_tim)
    if (rk_step > 1) then
@@ -1751,13 +1758,6 @@ BENCH_START(comprestore_runge_kutta_loor_tim)
    endif
 BENCH_END(comprestore_runge_kutta_loor_tim)
  endif restore_runge_kutta_loor
-
-BENCH_START(exch26)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_1290.inc"
-#endif
-BENCH_END(exch26)
 
 ! TBH:  turn this off once halo debugging is finished
 #ifndef NO_HALO_FIX
