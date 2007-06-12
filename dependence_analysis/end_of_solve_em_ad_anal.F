@@ -1630,19 +1630,19 @@ lineno = __LINE__
 BENCH_END(exch47)
 
 BENCH_START(comp51)
-! TBH:  OVERWRITE a_alt,a_mut,a_ru_m,a_rv_m,a_moist_2,a_moist_1, $$$ a_scalar_tends,a_ww,a_xkmhd
+! TBH:  OVERWRITE a_alt,a_mut,a_ru_m,a_rv_m,a_moist_2,a_moist_1, a_moist_tend,a_ww_m,a_xkmhd
 ! TBH:  HORIZONTAL DEPENDENCE:  a_advect_tend  ( [i-3,i,i+3], [j-3,j,j+3] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_scalar       ( [i-3,i,i+2], [j-3,j,j+2] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_scalar_old   ( [i-1,i,i+1], [j-1,j,j+1] )
-! TBH:  HORIZONTAL DEPENDENCE:  a_scalar_tends ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_moist_2      ( [i-3,i,i+2], [j-3,j,j+2] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_moist_1      ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  a_moist_tend   ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  a_xkmhd        ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msft           ( [i-3,i,i+3], [j-3,j,j+3] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfu           ( [    i,i+1], [    j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  msfv           ( [    i    ], [    j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  ru_m           ( [i-2,i,i+3], [    j    ] )
 ! TBH:  HORIZONTAL DEPENDENCE:  rv_m           ( [    i    ], [j-2,j,j+3] )
-! TBH:  HORIZONTAL DEPENDENCE:  scalar         ( [i-3,i,i+3], [j-3,i,j+3] )
-! TBH:  HORIZONTAL DEPENDENCE:  scalar_old     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2        ( [i-3,i,i+3], [j-3,i,j+3] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_1        ( [i-1,i,i+1], [j-1,j,j+1] )
 ! TBH:  HORIZONTAL DEPENDENCE:  xkmhd          ( [i-1,i,i+1], [j-1,j,j+1] )
         call a_rk_scalar_tend( im,im,config_flags,rk_step,ru_m,a_ru_m,rv_m,a_rv_m,ww_m,a_ww_m,mut,a_mut,alt,a_alt,moist_1(ims,kms,&
 &jms,im),a_moist_1(ims,kms,jms,im),moist_2(ims,kms,jms,im),a_moist_2(ims,kms,jms,im),a_moist_tend(ims,kms,jms,im),&
