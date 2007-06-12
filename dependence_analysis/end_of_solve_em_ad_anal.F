@@ -237,24 +237,40 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepzq
 
 BENCH_START(comp28)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp28)
+
+BENCH_START(exch24)
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#    include "HALO_1389.inc"
+! TBH:  remove "al" and "p" ??
+! HALO_1389 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+#endif
+
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#     include "HALO_1394.inc"
+! HALO_1394 dyn_em 8:u_2,v_2
+#endif
+BENCH_END(exch24)
 
  endif restore_rk_step_prepzq
 
 BENCH_START(exch24)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_1384.inc"
-! HALO_1384 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-#endif
-
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_1389.inc"
-! HALO_1389 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+#    include "HALO_1390.inc"
+! TBH:  remove "al" and "p" ??
+! HALO_1390 dyn_em 48:al,p
 #endif
 
 #ifdef DM_PARALLEL
@@ -768,6 +784,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepzw
 
 BENCH_START(comp39)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1481,6 +1503,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepzz
 
 BENCH_START(comp53)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1957,6 +1985,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepzr
 
 BENCH_START(comp66)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -2808,6 +2842,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4acc
 
 BENCH_START(comp89)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -3272,6 +3312,12 @@ BENCH_END(comprestore_rk_step_prep_tim)
  else  ! restore_rk_step_prepb4asbd
 
 BENCH_START(comp99)
+! TBH:  OVERWRITE ru,rv,rw,ww,php,alt,muu,muv,mut,cqu,cqv,cqw
+! TBH:  HORIZONTAL DEPENDENCE:  u_2      ( [    i,i+1], [    j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  v_2      ( [    i    ], [    j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  mu_2     ( [i-1,i,i+1], [j-1,j,j+1] )
+! TBH:  HORIZONTAL DEPENDENCE:  moist_2  ( [i-1,i    ], [j-1,j    ] )
+! TBH:  HORIZONTAL DEPENDENCE:  mub      ( [i-1,i,i+1], [j-1,j,j+1] )
     call rk_step_prep( config_flags,rk_step,u_2,v_2,w_2,t_2,ph_2,mu_2,moist_2,ru,rv,rw,ww,php,alt,muu,muv,mub,mut,phb,pb,p,al,alb,&
 &cqu,cqv,cqw,msfu,msfv,msft,fnm,fnp,dnw,rdx,rdy,num_3d_m,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%&
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -3689,6 +3735,7 @@ lineno = __LINE__
 BENCH_START(exch106)
 #ifdef DM_PARALLEL
 lineno = __LINE__
+! TBH:  TODO
 ! TBH:  check fields in HALO_3783 and HALO_3784 for (R)
 ! TBH:  remove halo update of muu,muv above?
 ! TBH:  remove mub,pb,phb here?  

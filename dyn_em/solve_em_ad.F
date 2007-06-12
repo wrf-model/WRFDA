@@ -1709,13 +1709,6 @@ BENCH_START(comp25)
     endif moist_scalar_advancj
 BENCH_END(comp25)
 
-BENCH_START(exch24)
-#ifdef DM_PARALLEL
-lineno = __LINE__
-
-#endif
-BENCH_END(exch24)
-
 BENCH_START(comp26)
       call calc_p_rho_phi( moist_2,num_3d_m,al,alb,mu_2,muts,ph_2,p,pb,t_2,p0,t0,znu,dnw,rdnw,rdn,non_hydrostatic,ids,ide,jds,jde,&
 &kds,kde,ims,ime,jms,jme,kms,kme,grid%i_start(ij),grid%i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
@@ -1910,17 +1903,24 @@ BENCH_START(comp28)
 &i_end(ij),grid%j_start(ij),grid%j_end(ij),k_start,k_end )
 BENCH_END(comp28)
 
+BENCH_START(exch24)
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#    include "HALO_1389.inc"
+#endif
+
+#ifdef DM_PARALLEL
+lineno = __LINE__
+#     include "HALO_1394.inc"
+#endif
+BENCH_END(exch24)
+
  endif restore_rk_step_prepzq
 
 BENCH_START(exch24)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-#    include "HALO_1384.inc"
-#endif
-
-#ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_1389.inc"
+#    include "HALO_1390.inc"
 #endif
 
 #ifdef DM_PARALLEL
@@ -5264,17 +5264,6 @@ lineno = __LINE__
 BENCH_START(exch106)
 #ifdef DM_PARALLEL
 lineno = __LINE__
-! TBH:  Note that exchange of z,z_at_w,a_z,a_z_at_w here only 
-! TBH:  needs to be done when rk_step==1 .  Also, some of these halo 
-! TBH:  thicknesses are HUGE!  Reduce if possible.  
-! TBH:  Also, it appears that only the MAXIMUM halo size is used!!  What is 
-! TBH:  up with that?  Registry appears to roll out maximum size halo for 
-! TBH:  all arrays in an RSL_LITE halo update.  We should be able to improve 
-! TBH:  on that!!  Also, RSL_LITE packs/unpacks TWICE -- once for "X" and 
-! TBH:  once again for "Y".  Another opportunity for speedup.  Recall that 
-! TBH:  this kind of optimization allowed SMS to beat hand-coded MPI for Eta 
-! TBH:  which has many more halo updates than ARW, but not nearly as many as 
-! TBH:  solve_em_ad()...  
 #    include "HALO_3783.inc"
 #    include "HALO_3784.inc"
 
