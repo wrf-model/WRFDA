@@ -68,6 +68,13 @@ class DBENCHTiming
     puts "Sum of all \"exch\" times = #{total_exchtime}"
     puts "Sum of all \"comp\" and \"exch\" times = #{total_time}"
     puts "Sum of all \"solve_tim\" times = #{@solve_tim}"
+    # print times in the same order
+    %w{ comp exch }.each do |ttype|
+      puts "\n\nDetails of all \"#{ttype}\" times:"
+      @compexch_timing_results.each do |key,val|
+        puts "Summed times for #{key} = #{val}" if (key =~ /#{ttype}/)
+      end
+    end
   end
 
 end  # class DBENCHTiming
