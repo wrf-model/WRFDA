@@ -34,62 +34,7 @@
 !*
 !*----------------------------------------------------------------------------
 
-module wrf_data
-
-  integer                , parameter      :: FATAL            = 1
-  integer                , parameter      :: WARN             = 1
-  integer                , parameter      :: WrfDataHandleMax = 99
-  integer                , parameter      :: MaxDims          = 2000 ! = NF_MAX_VARS
-  integer                , parameter      :: MaxVars          = 2000
-  integer                , parameter      :: MaxTimes         = 9000
-  integer                , parameter      :: DateStrLen       = 19
-  integer                , parameter      :: VarNameLen       = 31
-  integer                , parameter      :: NO_DIM           = 0
-  integer                , parameter      :: NVarDims         = 4
-  integer                , parameter      :: NMDVarDims       = 2
-  character (8)          , parameter      :: NO_NAME          = 'NULL'
-  character (DateStrLen) , parameter      :: ZeroDate = '0000-00-00-00:00:00'
-
-# include "wrf_io_flags.h"
-
-  character (256)                         :: msg
-  logical                                 :: WrfIOnotInitialized = .true.
-
-  type :: wrf_data_handle
-    character (255)                       :: FileName
-    integer                               :: FileStatus
-    integer                               :: Comm
-    integer                               :: NCID
-    logical                               :: Free
-    logical                               :: Write
-    character (5)                         :: TimesName
-    integer                               :: TimeIndex
-    integer                               :: CurrentTime  !Only used for read
-    integer                               :: NumberTimes  !Only used for read
-    character (DateStrLen), pointer       :: Times(:)
-    integer                               :: TimesVarID
-    integer               , pointer       :: DimLengths(:)
-    integer               , pointer       :: DimIDs(:)
-    character (31)        , pointer       :: DimNames(:)
-    integer                               :: DimUnlimID
-    character (9)                         :: DimUnlimName
-    integer       , dimension(NVarDims)   :: DimID
-    integer       , dimension(NVarDims)   :: Dimension
-    integer               , pointer       :: MDVarIDs(:)
-    integer               , pointer       :: MDVarDimLens(:)
-    character (80)        , pointer       :: MDVarNames(:)
-    integer               , pointer       :: VarIDs(:)
-    integer               , pointer       :: VarDimLens(:,:)
-    character (VarNameLen), pointer       :: VarNames(:)
-    integer                               :: CurrentVariable  !Only used for read
-    integer                               :: NumVars
-! first_operation is set to .TRUE. when a new handle is allocated 
-! or when open-for-write or open-for-read are committed.  It is set 
-! to .FALSE. when the first field is read or written.  
-    logical                               :: first_operation
-  end type wrf_data_handle
-  type(wrf_data_handle),target            :: WrfDataHandles(WrfDataHandleMax)
-end module wrf_data
+! Remove wrf_data module as its duplicated from wrf_io.F
 
 module ext_pnc_support_routines
 
@@ -696,6 +641,8 @@ subroutine Transpose(IO,MemoryOrder,di, Field,l1,l2,m1,m2,n1,n2 &
   call LowerCase(MemoryOrder,MemOrd)
   select case (MemOrd)
 
+! FIX? Need some definition of XDEX for the code to compile. This one is wrong!
+#define XDEX(A,B,C) 0
 !#define XDEX(A,B,C) A-A ## 1+1+(A ## 2-A ## 1+1)*((B-B ## 1)+(C-C ## 1)*(B ## 2-B ## 1+1))
 ! define(`XDEX',($1-``$1''1+1+(``$1''2-``$1''1+1)*(($2-``$2''1)+($3-``$3''1)*(``$2''2-``$2''1+1))))
 
@@ -1523,7 +1470,8 @@ subroutine ext_pnc_inquiry (Inquiry, Result, Status)
   CASE ("MEDIUM")
         Result ='FILE'
   CASE DEFAULT
-      Result = 'No Result for that inquiry!'
+      ! single quotes confuse preprocessor
+      Result = "No Result for that inquiry!"
   END SELECT
   Status=WRF_NO_ERR
   return
@@ -2449,7 +2397,8 @@ subroutine ext_pnc_write_field(DataHandle,DateStr,Var,Field,FieldType,Comm, &
     do j=1,NDim
       if(Length_global(j) /= DH%VarDimLens(j,NVar) .AND. DH%FileStatus /= WRF_FILE_OPENED_FOR_UPDATE ) then
         Status = WRF_WARN_WRTLEN_NE_DRRUNLEN
-        write(msg,*) 'Warning LENGTH != DRY RUN LENGTH for |',   &
+        ! single quotes confuse preprocessor
+        write(msg,*) "Warning LENGTH != DRY RUN LENGTH for |",   &
                      VarName,'| dim ',j,' in ',__FILE__,', line', __LINE__ 
         call wrf_debug ( WARN , TRIM(msg))
         write(msg,*) '   LENGTH ',Length_global(j),' DRY RUN LENGTH ',DH%VarDimLens(j,NVar)

@@ -65,10 +65,9 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-
 EXTRA_FCFLAGS   = -Ktrap=fp
-
 RSL_FCFLAGS     = $(FCENDIAN)
+
 RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -104,7 +103,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-EXTRA_FCFLAGS  = -Ktrap=fp
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL

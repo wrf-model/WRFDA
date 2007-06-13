@@ -27,6 +27,11 @@ links :
 	@ mv diffwrf.F diffwrf_int.F
 	@ $(LN) $(IO_NETCDF)/* .
 	@ mv diffwrf.F90 diffwrf_netcdf.F
+	@ $(LN) $(IO_PNETCDF)/field_routines.F90 field_routines_pnc.F90
+	@ $(LN) $(IO_PNETCDF)/module_wrfsi_static.F90 module_wrfsi_static_pnc.F90 
+	@ $(LN) $(IO_PNETCDF)/wrf_io.F90 wrf_io_pnc.F90 
+	@ $(LN) $(IO_PNETCDF)/transpose.code transpose_pnc.code 
+	@ $(LN) $(IO_PNETCDF)/ext* .
 	@ $(LN) $(IO_GRIB_SHARE)/* .
 	@ $(LN) $(IO_GRIB1)/* .
 	@ $(LN) $(IO_GRIB2)/* .
@@ -59,6 +64,7 @@ include tools.make
 include esmf_time_f90.make
 include io_int.make
 include io_netcdf.make
+include io_pnetcdf.make
 include io_phdf5.make
 include io_grib.make
 include ioapi_share.make

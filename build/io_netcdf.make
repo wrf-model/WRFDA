@@ -6,7 +6,6 @@ IO_NETCDF_CODE    = ext_ncd_get_dom_ti.code ext_ncd_get_var_td.code \
                     ext_ncd_put_var_td.code ext_ncd_put_var_ti.code transpose.code 
 IO_NETCDF_CPPFLAGS = -I$(NETCDF_INC)
 IO_NETCDF_FCFLAGS = -I$(NETCDF_INC)
-IO_NETCDF_LIBS    = -L$(NETCDF_PATH)/lib -lnetcdf
 IO_NETCDF_M4FLAGS = -Uinclude -Uindex -Ulen
 
 libwrfio_nf.a:		$(IO_NETCDF_OBJS) $(IO_NETCDF_CODE)

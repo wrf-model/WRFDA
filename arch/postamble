@@ -5,7 +5,7 @@ CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS)
 REGFLAGS        = $(DEFAULT_FPPFLAGS) $(EXTRA_FPPFLAGS) $(DM_FPPFLAGS) $(COREDEFS)
  
 CCFLAGS        = $(DEFAULT_CCFLAGS) $(EXTRA_CCFLAGS) $(COREDEFS) $(CCOPTIM)
-LDFLAGS         = $(FCOPTIM) $(FCENDIAN) -L$(NETCDF_LIB_PATH) $(EXTRA_LDFLAGS)
+LDFLAGS         = -L. $(FCOPTIM) $(FCENDIAN) -L$(NETCDF_LIB_PATH) $(EXTRA_LDFLAGS)
 
 FCFLAGS         = $(FCTYPE) $(FCFREE) $(FCENDIAN) $(INCS) $(FCDEBUG) $(FCOPTIM) $(FCWARN) $(EXTRA_FCFLAGS)
 FCFLAGS_NOWARN  = $(FCTYPE) $(FCFREE) $(FCENDIAN) $(INCS) $(FCDEBUG) $(FCOPTIM) $(EXTRA_FCFLAGS)
@@ -13,22 +13,22 @@ FCFLAGS_SIMPLE  = $(FCTYPE) $(FCFREE) $(FCENDIAN) $(INCS) $(EXTRA_FCFLAGS)
 FIXEDFLAGS        = $(FCOPTIM) $(FCTYPE) $(EXTRA_FCFLAGS)
 FIXEDFLAGS_ENDIAN = $(FCTYPE) $(EXTRA_FCFLAGS)
 
-WRFVAR_LIBS  = libwrfio_nf.a libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
-                 $(IO_GRIB1)/libio_grib1.a \
+WRFVAR_LIBS  = $(NETCDF_LIBS) libesmf_time.a $(IO_GRIB_SHARE)/libio_grib_share.a \
+                 $(IO_GRIB1)/libio_grib1.a $(PNETCDF_LIBS) \
                  libwrfvar.a $(MPI_LIBS)
 
-WRF_LIBS     = libwrflib.a libwrfio_nf.a libesmf_time.a \
+WRF_LIBS     = libwrflib.a $(NETCDF_LIBS) libesmf_time.a \
                   $(IO_GRIB_SHARE)/libio_grib_share.a \
-                  $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS)
+                  $(IO_GRIB1)/libio_grib1.a $(MPI_LIBS) $(PNETCDF_LIBS)
 
-WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB)  \
+WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB) $(PNETCDF_LIB)  \
                $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(ESMF_TIME_LIB) \
                 $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK_LIB) \
                $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB)
 
 WRF_LIB     = -L. -lwrflib \
               $(GRIB1_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) $(NETCDF_LIB) \
-                 $(MPI_LIB)
+                 $(MPI_LIB) $(PNETCDF_LIB)
 
 GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
               $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)

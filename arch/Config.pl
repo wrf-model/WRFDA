@@ -11,6 +11,7 @@ $sw_coamps_core = "" ;
 $sw_exp_core = "" ;
 $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
+$sw_pnetcdf_path = "" ;
 $sw_phdf5_path=""; 
 $sw_hdf_path=""; 
 $sw_hdfeos_path=""; 
@@ -56,6 +57,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 7 ) eq "netcdf=" ) {
     $sw_netcdf_path = substr( $ARGV[0], 8 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 8 ) eq "pnetcdf=" ) {
+    $sw_pnetcdf_path = substr( $ARGV[0], 9 ) ;
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" ) {
     $sw_phdf5_path = substr( $ARGV[0], 7 ) ;
@@ -207,12 +211,32 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_NETCDF_PATH:$sw_netcdf_path:g ;
     $_ =~ s:CONFIGURE_WRFIO_NF:wrfio_nf:g ;
     $_ =~ s:CONFIGURE_NETCDF_FLAG:-DNETCDF: ;
-    $_ =~ s:CONFIGURE_NETCDF_LIB:-lnetcdf: ;
+    $_ =~ s:CONFIGURE_NETCDF_LIBS:libwrfio_nf.a: ;
+    $_ =~ s:CONFIGURE_NETCDF_LIB:-lwrfio_nf -L$sw_netcdf_path/lib -lnetcdf: ;
+    $_ =~ s:CONFIGURE_NETCDF_INC:$sw_netcdf_path/include:g ;
   } else { 
     $_ =~ s:CONFIGURE_NETCDF_PATH::g ;
     $_ =~ s:CONFIGURE_WRFIO_NF::g ;
     $_ =~ s:CONFIGURE_NETCDF_FLAG::g ;
+    $_ =~ s:CONFIGURE_NETCDF_LIBS::g ;
     $_ =~ s:CONFIGURE_NETCDF_LIB::g ;
+    $_ =~ s:CONFIGURE_NETCDF_INC:.:g ;
+  }
+
+  if ( $sw_pnetcdf_path ) { 
+     $_ =~ s:CONFIGURE_PNETCDF_PATH:$sw_pnetcdf_path:g ;
+     $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
+     $_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF: ;
+     $_ =~ s:CONFIGURE_PNETCDF_LIBS:libwrfio_pnf.a: ;
+     $_ =~ s:CONFIGURE_PNETCDF_LIB:-lwrfio_pnf -L$sw_pnetcdf_path/src/lib -lpnetcdf: ;
+     $_ =~ s:CONFIGURE_PNETCDF_INC:$sw_pnetcdf_path/src/libf: ;
+  } else { 
+     $_ =~ s:CONFIGURE_PNETCDF_PATH::g ;
+     $_ =~ s/CONFIGURE_WRFIO_PNF//g ;
+     $_ =~ s:CONFIGURE_PNETCDF_FLAG::g ;
+     $_ =~ s:CONFIGURE_PNETCDF_LIBS::g ;
+     $_ =~ s:CONFIGURE_PNETCDF_LIB::g ;
+     $_ =~ s:CONFIGURE_PNETCDF_INC:.:g ;
   }
 
   if ( $sw_phdf5_path ) { 
