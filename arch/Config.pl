@@ -219,18 +219,22 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_PHDF5_PATH:$sw_phdf5_path: ;
     $_ =~ s:CONFIGURE_WRFIO_PHDF5:wrfio_phdf5:g ;
     $_ =~ s:CONFIGURE_PHDF5_FLAG:-DPHDF5: ;
+    $_ =~ s:CONFIGURE_PHDF5_LIB:-lwrfio_phdf5 -L$sw_phdf5_path/lib -lhdf5_fortran -lhdf5 -lm -lz -lsz: ;
+    $_ =~ s:CONFIGURE_PHDF5_INC:$sw_phdf5_path/include:g ;
   } else { 
     $_ =~ s:CONFIGURE_PHDF5_PATH::g ;
     $_ =~ s:CONFIGURE_WRFIO_PHDF5::g ;
     $_ =~ s:CONFIGURE_PHDF5_FLAG::g ;
+    $_ =~ s:CONFIGURE_PHDF5_LIB::g ;
+    $_ =~ s:CONFIGURE_PHDF5_INC:.:g ;
   }
 
   if ( $sw_hdf_path ) { 
-    $_ =~ s:CONFIGURE_HDF_LIB:$sw_hdf_path/NewHDF/lib: ;
-    $_ =~ s:CONFIGURE_HDF_INC:$sw_hdf_path/NewHDF/include: ;
+    $_ =~ s:CONFIGURE_HDF_LIB:$sw_hdf_path/lib: ;
+    $_ =~ s:CONFIGURE_HDF_INC:$sw_hdf_path/include: ;
   } else { 
     $_ =~ s:CONFIGURE_HDF_LIB::g ;
-    $_ =~ s:CONFIGURE_HDF_INC::g ;
+    $_ =~ s:CONFIGURE_HDF_INC:.:g ;
   }
 
   if ( $sw_hdfeos_path ) { 
@@ -238,21 +242,20 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_HDFEOS_INC:$sw_hdfeos_path/include: ;
   } else { 
     $_ =~ s:CONFIGURE_HDFEOS_LIB::g ;
-    $_ =~ s:CONFIGURE_HDFEOS_INC::g ;
+    $_ =~ s:CONFIGURE_HDFEOS_INC:.:g ;
   }
 
-  if ( $sw_jasperlib_path && $sw_jasperinc_path ) 
-    { $_ =~ s:CONFIGURE_WRFIO_GRIB2:wrfio_grib2:g ;
-      $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
-      $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
-      $_ =~ s:CONFIGURE_GRIB2_LIB:-L../external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
-    } else { $_ =~ s:CONFIGURE_WRFIO_GRIB2::g ;
-      $_ =~ s:CONFIGURE_GRIB2_FLAG::g ;
-      $_ =~ s:CONFIGURE_GRIB2_INC::g ;
-      $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
-    }
+  if ( $sw_jasperlib_path && $sw_jasperinc_path ) {
+    $_ =~ s:CONFIGURE_WRFIO_GRIB2:wrfio_grib2:g ;
+    $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
+    $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
+    $_ =~ s:CONFIGURE_GRIB2_LIB:-L../external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
+  } else { $_ =~ s:CONFIGURE_WRFIO_GRIB2::g ;
+    $_ =~ s:CONFIGURE_GRIB2_FLAG::g ;
+    $_ =~ s:CONFIGURE_GRIB2_INC:.:g ;
+    $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
+  }
 
-  # ESMF substitutions in configure.defaults
   if ( $sw_esmflib_path && $sw_esmfinc_path ) {
     $_ =~ s:CONFIGURE_ESMF_IO_LIB:-L$sw_esmflib_path -lesmf -L../external/io_esmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;
     $_ =~ s:CONFIGURE_ESMF_IO_EXT_LIB:-L$sw_esmflib_path -lesmf -lwrfio_esmf \$\(ESMF_LIB_FLAGS\):g ;

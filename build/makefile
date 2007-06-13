@@ -34,6 +34,7 @@ links :
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(RSL_LITE)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
+	@ $(LN) $(IO_PHDF5)/* .
 	@ $(LN) $(ARCH)/*.sed .
 	@ $(LN) $(CONVERTOR)/da_module_convert_tool/* .
 	@ $(LN) $(CONVERTOR)/kma_wave2grid/* .
@@ -58,6 +59,7 @@ include tools.make
 include esmf_time_f90.make
 include io_int.make
 include io_netcdf.make
+include io_phdf5.make
 include io_grib.make
 include ioapi_share.make
 include main.make

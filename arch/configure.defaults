@@ -25,9 +25,9 @@ FCDEBUG         = # -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
+EXTRA_FCFLAGS   = -Ktrap=fp
 EXTRA_CCFLAGS   =
 RSL_CCFLAGS     = 
 
@@ -65,10 +65,10 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
-RSL_FCFLAGS     = $(FCENDIAN)
 
+EXTRA_FCFLAGS   = -Ktrap=fp
+
+RSL_FCFLAGS     = $(FCENDIAN)
 RSL_CCFLAGS     =
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -104,8 +104,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS  = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -155,8 +154,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -205,8 +203,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
@@ -246,8 +243,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
@@ -283,7 +279,7 @@ FCOPTIM         =
 FCDEBUG         = 
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -322,7 +318,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -370,7 +366,7 @@ FCOPTIM         = -O2
 FCDEBUG         = 
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -421,7 +417,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wimplicit-none
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -462,7 +458,7 @@ FCOPTIM         = -O2
 FCDEBUG         = 
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -502,7 +498,6 @@ FCOPTIM         =
 FCDEBUG         =
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          = 
 FCTYPE          = -r8
 
 LOCAL_LIB       = -L/usr/local/lib
@@ -538,7 +533,6 @@ FCOPTIM         =
 FCDEBUG         = -g -C
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          =
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN)
 
@@ -586,7 +580,6 @@ FCOPTIM         = -O3 -xW
 FCDEBUG         =
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          =
 FCTYPE          = -r8
 RSL_FCFLAGS     = $(FCENDIAN)
 
@@ -632,8 +625,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 
 RSL_CCFLAGS     =
 
@@ -671,8 +663,6 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -721,8 +711,6 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          =  -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -766,8 +754,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
-FCBASE          = -fno-second-underscore
-RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
+EXTRA_FCFLAGS   = -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) $(EXTRA_FCFLAGS)
 
 RSL_CCFLAGS     =
 
@@ -804,8 +792,8 @@ FCDEBUG         = -g
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
-FCBASE          = -fno-second-underscore
-RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
+EXTRA_FCFLAGS   = -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) $(EXTRA_FCFLAGS)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
@@ -851,8 +839,8 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
-FCBASE          = -fno-second-underscore
-RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
+EXTRA_FCFLAGS   = -fno-second-underscore
+RSL_FCFLAGS     = $(FCENDIAN) $(EXTRA_FCFLAGS)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
@@ -897,7 +885,6 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          = 
 
 RSL_CCFLAGS     =
 
@@ -936,8 +923,7 @@ FCDEBUG         = #-g -C
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          = 
-RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
@@ -984,8 +970,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCBASE          = 
-RSL_FCFLAGS     = $(FCENDIAN) $(FCBASE)
+RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
 RSL_CCFLAGS     = -DMPI2_SUPPORT
@@ -1031,8 +1016,7 @@ FCOPTIM         = -O2
 FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -freeform
-FCENDIAN        =
-FCBASE          = -64 -mips4
+FCENDIAN        = -64 -mips4
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -w -64 -mips4 -DUNDERSCORE -DIRIX
@@ -1071,8 +1055,8 @@ FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
 FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -freeform
-FCENDIAN        =
-FCBASE          = -64 -mips4 -w
+FCENDIAN        = -64 -mips4
+EXTRA_FCFLAGS   = -w
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -w -64 -mips4 -DIRIX -I$(RSL)/RSL
@@ -1130,7 +1114,7 @@ FCDEBUG         = # -g
 FCTYPE          = -r8
 FCFREE          = -freeform
 FCENDIAN        =
-FCBASE          = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
+EXTRA_FCFLAGS   = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
                      -align all -IPF_fp_relaxed
 RSL_FCFLAGS     = $(FCENDIAN)
 
@@ -1181,7 +1165,7 @@ FCDEBUG         =
 FCTYPE          =
 FCFREE          = -f4
 FCENDIAN        =
-FCBASE          = -C hopt \
+EXTRA_FCFLAGS   = -C hopt \
 		  -Wf"-init stack=zero heap=zero -pvctl loopcnt=100000000 noassume -O nooverlap" \
                   -pi -ew -eb -float0 -Wf"-L fmtlist"
 
@@ -1215,7 +1199,7 @@ FCDEBUG         =
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767 \
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 \
                     -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
@@ -1259,7 +1243,7 @@ FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
@@ -1310,13 +1294,13 @@ FCDEBUG         =
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
 RSL_CCFLAGS     =
 
-EXTRA_FLAGS     = -bmaxstack:256000000 -bmaxdata:2048000000
+EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
 LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -L$(RSL)/RSL -lrsl
@@ -1363,7 +1347,7 @@ FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
@@ -1406,7 +1390,7 @@ FCDEBUG         =
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
 FCENDIAN        =
-FCBASE          = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
@@ -1449,8 +1433,9 @@ FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC) -p$(CRTM_INC)
+EXTRA_FCFLAGS  = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
+                     -p$(RTTOV_INC) -p$(CRTM_INC) -p$(PNETCDF_INC) -p$(HDF_INC) \
+                     -p$(PHDF5_INC)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1
 # Cray linker very fussy about availablity of modules, so give it a very wide scope
@@ -1493,8 +1478,9 @@ FCWARN          = -Rbcs
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC)  -p$(CRTM_INC)
+EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
+                     -p$(RTTOV_INC)  -p$(CRTM_INC) -P$(PNETCDF_INC) \
+                     -p$(HDF_INC) -p$(PHDF5_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
@@ -1547,8 +1533,9 @@ FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
-FCBASE          = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                    -p$(RTTOV_INC) -p$(CRTM_INC)
+EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
+                    -p$(RTTOV_INC) -p$(CRTM_INC) -p$(PNETCDF_INC) \
+                    -p$(HDF_INC) -p$(PHDF5_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
@@ -1595,7 +1582,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 
 EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
@@ -1637,7 +1624,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
 FCTYPE          = -r8
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore \
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore \
                      -Wno=101,112,136,155,158,159
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -1688,7 +1675,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -ffree-form  -ffree-line-length-huge
 FCENDIAN        =
-FCBASE          = -cpp -fno-second-underscore -Wno=101,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
@@ -1736,8 +1723,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 
 EXTRA_CCFLAGS   = -DLANDREAD_STUB -DMACOS
 
@@ -1777,8 +1763,7 @@ FCDEBUG         = -g -C
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
@@ -1831,8 +1816,7 @@ FCDEBUG         =
 FCTYPE          = -r8
 FCFREE          = -Mfree
 FCENDIAN        = -byteswapio
-FCBASE          = -Ktrap=fp -I$(NETCDF_INC) -I$(BLAS_INC) -I$(LAPACK_INC) -I$(FFTPACK_INC) \
-                     -I$(CRTM_INC) -I$(RTTOV_INC)
+EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DMACOS
