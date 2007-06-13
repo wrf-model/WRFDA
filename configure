@@ -5,8 +5,10 @@ export EM_CORE=0
 export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
-export HDF=${HDF:-}
+export HDF4=${HDF4:-}
 export HDFEOS=${HDFEOS:-}  
+export ZLIB=${ZLIB:-}  
+export JPEG=${JPEG:-}  
 export compileflags=""
 export REGISTRY=Registry.wrfvar
 
@@ -307,11 +309,11 @@ else
   echo "PHDF5 not set in environment. Will configure for use without."
 fi
 
-if [ -n "$HDF" ] ; then
-  echo "Will use HDF in dir:     $HDF"
+if [ -n "$HDF4" ] ; then
+  echo "Will use HDF4 in dir:    $HDF4"
 #else
   # No-one cares
-  # echo "HDF not set in environment. Will configure for use without."
+  # echo "HDF4 not set in environment. Will configure for use without."
 fi
 
 if [ -n "$HDFEOS" ] ; then
@@ -319,6 +321,20 @@ if [ -n "$HDFEOS" ] ; then
 #else
   # No-one cares
   # echo "HDFEOS not set in environment. Will configure for use without."
+fi
+
+if [ -n "$ZLIB" ] ; then
+  echo "Will use ZLIB in dir:    $ZLIB"
+#else
+  # No-one cares
+  # echo "ZLIB not set in environment. Will configure for use without."
+fi
+
+if [ -n "$JPEG" ] ; then
+  echo "Will use JPEG in dir:    $JPEG"
+#else
+  # No-one cares
+  # echo "JPEG not set in environment. Will configure for use without."
 fi
 
 if [ -n "$RTTOV" ] ; then
@@ -415,9 +431,9 @@ fi
 
 # Found perl, so proceed with configuration
 if test -n "$PERL" ; then
-  $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf=$HDF \
+  $PERL arch/Config.pl -perl=$PERL -netcdf=$NETCDF -phdf5=$PHDF5 -hdf4=$HDF4 \
      -hdfeos=$HDFEOS -rttov=$RTTOV -crtm=$CRTM -os=$os -mach=$mach \
-     -ldflags=$ldflags -pnetcdf=$PNETCDF \
+     -ldflags=$ldflags -pnetcdf=$PNETCDF -zlib=$ZLIB -jpeg=$JPEG \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE \

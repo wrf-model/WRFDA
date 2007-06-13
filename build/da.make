@@ -168,8 +168,6 @@ WRFVAR_OBJS = da_par_util.o \
 # Aliases
 var : wrfvar
 var_esmf : wrfvar_esmf
-utils : da_utils
-biascorr : da_biascorr
 
 wrfvar : setup da_wrfvar.exe da_advance_cymdh.exe da_update_bc.exe
 
@@ -197,7 +195,12 @@ da_utils : setup \
            da_tune_obs_desroziers.exe \
            da_update_bc.exe \
            da_advance_cymdh.exe \
-           da_verif.exe
+           da_verif.exe \
+           da_bias_airmass.exe \
+           da_bias_sele.exe \
+           da_bias_scan.exe \
+           da_bias_scan.exe \
+           da_bias_verif.exe
 
 da_verif.exe : da_verif.o da_verif_control.o da_verif_init.o
 	$(SFC) -o $@ da_verif.o da_verif_control.o da_verif_init.o
@@ -220,8 +223,6 @@ da_update_bc.exe : da_update_bc.o
 
 da_update_bc.o : da_update_bc.f90 da_module_couple_uv.o da_netcdf_interface.o
 	$(SFC) -c $(FCFLAGS) -I$(NETCDF_INC) da_update_bc.f90
-
-da_biascorr : da_bias_airmass.exe da_bias_sele.exe da_bias_scan.exe da_bias_scan.exe da_bias_verif.exe
 
 da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
 	$(FFC) -o  da_bias_airmass.exe da_bias_airmass.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o

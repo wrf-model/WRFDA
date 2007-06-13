@@ -13,8 +13,10 @@ $sw_perl_path = perl ;
 $sw_netcdf_path = "" ;
 $sw_pnetcdf_path = "" ;
 $sw_phdf5_path=""; 
-$sw_hdf_path=""; 
+$sw_hdf4_path=""; 
 $sw_hdfeos_path=""; 
+$sw_jpeg_path=""; 
+$sw_zlib_path=""; 
 $sw_jasperlib_path=""; 
 $sw_jasperinc_path=""; 
 $sw_esmflib_path="";
@@ -64,11 +66,17 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   if ( substr( $ARGV[0], 1, 6 ) eq "phdf5=" ) {
     $sw_phdf5_path = substr( $ARGV[0], 7 ) ;
   }
-  if ( substr( $ARGV[0], 1, 4 ) eq "hdf=" ) {
-    $sw_hdf_path = substr( $ARGV[0], 5 ) ;
+  if ( substr( $ARGV[0], 1, 5 ) eq "hdf4=" ) {
+    $sw_hdf4_path = substr( $ARGV[0], 6 ) ;
   }
   if ( substr( $ARGV[0], 1, 7 ) eq "hdfeos=" ) {
     $sw_hdfeos_path = substr( $ARGV[0], 8 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 5 ) eq "zlib=" ) {
+    $sw_zlib_path = substr( $ARGV[0], 6 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 5 ) eq "jpeg=" ) {
+    $sw_jpeg_path = substr( $ARGV[0], 6 ) ;
   }
   if ( substr( $ARGV[0], 1, 6 ) eq "rttov=" ) {
     $sw_rttov_path = substr( $ARGV[0], 7 ) ;
@@ -253,20 +261,32 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_PHDF5_INC:.:g ;
   }
 
-  if ( $sw_hdf_path ) { 
-    $_ =~ s:CONFIGURE_HDF_LIB:$sw_hdf_path/lib: ;
-    $_ =~ s:CONFIGURE_HDF_INC:$sw_hdf_path/include: ;
+  if ( $sw_hdf4_path ) { 
+    $_ =~ s:CONFIGURE_HDF4_LIB:-L$sw_hdf4_path/lib -ldf -lmfhdf: ;
+    $_ =~ s:CONFIGURE_HDF4_INC:$sw_hdf4_path/include: ;
   } else { 
-    $_ =~ s:CONFIGURE_HDF_LIB::g ;
-    $_ =~ s:CONFIGURE_HDF_INC:.:g ;
+    $_ =~ s:CONFIGURE_HDF4_LIB::g ;
+    $_ =~ s:CONFIGURE_HDF4_INC:.:g ;
   }
 
   if ( $sw_hdfeos_path ) { 
-    $_ =~ s:CONFIGURE_HDFEOS_LIB:$sw_hdfeos_path/lib: ;
+    $_ =~ s:CONFIGURE_HDFEOS_LIB:-L$sw_hdfeos_path/lib -lhdfeos -lGctp: ;
     $_ =~ s:CONFIGURE_HDFEOS_INC:$sw_hdfeos_path/include: ;
   } else { 
     $_ =~ s:CONFIGURE_HDFEOS_LIB::g ;
     $_ =~ s:CONFIGURE_HDFEOS_INC:.:g ;
+  }
+
+  if ( $sw_zlib_path ) { 
+    $_ =~ s:CONFIGURE_ZLIB_LIB:-L$sw_zlib_path/lib -lz: ;
+  } else { 
+    $_ =~ s:CONFIGURE_ZLIB_LIB::g ;
+  }
+
+  if ( $sw_jpeg_path ) { 
+    $_ =~ s:CONFIGURE_JPEG_LIB:-L$sw_jpeg_path/lib -ljpeg: ;
+  } else { 
+    $_ =~ s:CONFIGURE_JPEG_LIB::g ;
   }
 
   if ( $sw_jasperlib_path && $sw_jasperinc_path ) {

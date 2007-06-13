@@ -1,9 +1,9 @@
 include configure.wrfvar
 
-all: serial parallel
+all_wrfvar: serial parallel
 # Do not add convertor to serial target, as it does
 # not compile with pgi and g95 compilers
-serial: wrfvar be utils biascorr
+serial: wrfvar be da_utils
 parallel : wrfvar
 
 setup : depend
