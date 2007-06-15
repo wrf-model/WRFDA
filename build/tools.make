@@ -7,7 +7,7 @@ TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
 
 $(TOOLS_OBJ) :
 	$(RM) $@
-	$(CC_TOOLS) -c $*.c
+	$(CC_TOOLS) -c $(CCFLAGS) $*.c
 
 registry : $(TOOLS_OBJ)
 	$(CC_TOOLS) -o registry $(TOOLS_OBJ)
