@@ -5,7 +5,7 @@ set echo
 #Decide which stages to run (run if true):
 export RUN_WPS=true
 export RUN_REAL=true
-export RUN_WRF=true
+#export RUN_WRF=true
 
 #Experiment details:
 export REGION=t46
@@ -15,35 +15,46 @@ export CYCLE_PERIOD=6
 #export FIRST=false
 
 #Scheduling:
-export RUN_CMD=" "
+export PROJECT_ID=48500053       # JNT GAUs (1200/month).
+#export PROJECT_ID=48503001       # DATC GAUs.
+export QUEUE=premium
+export NUM_PROCS=1
+export RUN_CMD=mpirin.lsf
+export LSF_MAX_RUNTIME=10
 export LSF_EXCLUSIVE=" "
-#export LL_PTILE=16
+export LL_PTILE=16
 
 #Time info:
 export INITIAL_DATE=2006100100
 export FINAL_DATE=2006100100
-#export LONG_FCST_TIME_1=00
-#export LONG_FCST_RANGE_1=72
-#export LONG_FCST_TIME_2=12
-#export LONG_FCST_RANGE_2=72
-export LBC_FREQ=6    # Actual: 3
+export LONG_FCST_TIME_1=00
+export LONG_FCST_RANGE_1=72
+export LONG_FCST_TIME_2=12
+export LONG_FCST_RANGE_2=72
+export LBC_FREQ=3
 
 #Directories:
-###smoke:
-export REL_DIR=/smoke/dmbarker/code/trunk
+#export MACHINE=smoke
+#export REL_DIR=/smoke/dmbarker/code/trunk        # smoke
+#export DAT_DIR=/smoke/dmbarker/data              # smoke
+#export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG            # smoke
+export MACHINE=bluevista
+export REL_DIR=/mmm/users/dmbarker/code/trunk     # bluevista
+export DAT_DIR=/mmm/users/dmbarker/data           # bluevista
+export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista 
+
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
 export WRFVAR_DIR=$REL_DIR/wrfvar_afwa_2.2        # r2522.
 export WPS_DIR=$REL_DIR/wps_r237                  # r237 AFWA release.
 export WRF_BC_DIR=$REL_DIR/WRF_BC                 # Which version?
 export WRF_DIR=$REL_DIR/wrf_r2234                 # 
-export DAT_DIR=/smoke/dmbarker/data
 export REG_DIR=$DAT_DIR/$REGION
 export EXP_DIR=$REG_DIR/$EXPT
 export OB_DIR=$REG_DIR/ob
-export WPS_GEOG_DIR=~wrfhelp/WPS_GEOG
 
 #WPS (namelist.wps):
-#export RUN_GEOGRID=false
+export RUN_UNGRIB_AFWA=true
+export RUN_GEOGRID=false
 export DEBUG_LEVEL_UNGRIB=20
 export NL_E_WE=162
 export NL_E_SN=212
@@ -104,12 +115,10 @@ export NL_FORCE_SFC_IN_VINTERP=6  # AFWA'S original is 6,     (recommend switch 
 #export NL_USE_AIRSRETOBS=.false.
 
 #Continuous job 
-export CONTJOB=n
+#export CONTJOB=n
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-export MACHINE=smoke
-
-#$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
-$SCRIPT
+export MACHINE=bluevista
+$WRFVAR_DIR/scripts/da_run_job.${MACHINE}.ksh
 
 exit 0
 

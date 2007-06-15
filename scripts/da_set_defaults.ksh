@@ -43,7 +43,6 @@ export PROJECT_ID=${PROJECT_ID:-48500053}
 export QUEUE=${QUEUE:-regular}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
-export SUBMIT=${SUBMIT:-LSF}
 export LSF_EXCLUSIVE=${LSF_EXCLUSIVE:--x}
 export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
 export LL_PTILE=${LL_PTILE:-1} # minutes

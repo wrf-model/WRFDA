@@ -31,7 +31,7 @@ cat > job.ksh <<EOF
 #BSUB -P $PROJECT_ID
 #BSUB -W $LSF_MAX_RUNTIME
 #BSUB -R "span[ptile=$LL_PTILE]"
-#BSUB -w \"done(${PREV_JOBID})\"
+############BSUB -w \"done(${PREV_JOBID})\"
 
 export RUN_CMD="mpirun.lsf"
 . $SCRIPT > $EXP_DIR/index.html 2>&1
