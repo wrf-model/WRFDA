@@ -4,9 +4,12 @@
 # loquat.  Directory must already exist.  
 #
 # Usage for serial test:  
-#   test_and_scp.ksh target_directory_on_loquat
+#   test_and_scp.ksh optimization target_directory_on_loquat
 # Usage for parallel test:  
-#   test_and_scp.ksh target_directory_on_loquat num_tasks
+#   test_and_scp.ksh optimization target_directory_on_loquat num_tasks
+# Allowed values for optimization are:  
+#   "o3"       Use executable built with "O3" optimzation.  
+#   "default"  Use executable built with default optimization.  
 #
 
 #set -xu 
@@ -27,16 +30,29 @@ function ErrorNoExit {
 # parse command line
 numArgs=$#
 num_tasks=1   # default for serial run
-if (( $numArgs == 2 )) ; then
+if (( $numArgs == 3 )) ; then
+  optimization=$1 ; shift
   targetdir=$1 ; shift
   num_tasks=$1 ; shift
   testtype="parallel"
-elif (( $numArgs == 1 )) ; then
+elif (( $numArgs == 2 )) ; then
+  optimization=$1 ; shift
   targetdir=$1 ; shift
   testtype="serial"
 else
-  ErrorExit "requires one or two arguments, you provided ${numArgs}"
+  ErrorExit "requires two or three arguments, you provided ${numArgs}"
 fi
+
+# link to executable with specified optimization
+if [[ $optimization = "o3" ]] ; then
+  print "Using executable built with -O3 -qhot ..."
+elif [[ $optimization = "default" ]] ; then
+  print "Using executable built with default compiler optimization ..."
+else
+  ErrorExit "valid values of optimization are \"o3\" and \"default\", you provided \"${optimization}\""
+fi
+rm -f wrfplus.exe
+ln -s wrfplus.${optimization}_opt.exe wrfplus.exe
 
 initdir=$( pwd )
 

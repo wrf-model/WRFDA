@@ -9,7 +9,10 @@
 #  16-task with memory vs. re-computation optimization
 #
 #  Usage:  
-#    run4tests.ksh parallel_HALO_3903_OPT B
+#    run4tests.ksh compiler_optimization parallel_HALO_3903_OPT B
+# Allowed values for compiler_optimization are:  
+#   "o3"       Use executable built with "O3" compiler optimzation.  
+#   "default"  Use executable built with default compiler optimization.  
 #
 
 #set -xu 
@@ -24,14 +27,24 @@ function ErrorExit {
 
 # parse command line
 numArgs=$#
-if (( $numArgs == 2 )) ; then
+if (( $numArgs == 3 )) ; then
+  compiler_optimization=$1 ; shift
   test_name=$1 ; shift
   test_version=$1 ; shift
 else
-  ErrorExit "requires two arguments, you provided ${numArgs}"
+  ErrorExit "requires three arguments, you provided ${numArgs}"
 fi
 
-targetdir="/loquat2/hender/Tasks/4DVAR_Optimization/TEST_RESULTS/${test_name}"
+# remove duplication with test_and_scp.ksh
+if [[ $compiler_optimization = "o3" ]] ; then
+  print "Using executable built with -O3 -qhot ..."
+elif [[ $compiler_optimization = "default" ]] ; then
+  print "Using executable built with default compiler optimization ..."
+else
+  ErrorExit "valid values of compiler_optimization are \"o3\" and \"default\", you provided \"${compiler_optimization}\""
+fi
+
+targetdir="/loquat2/hender/Tasks/4DVAR_Optimization/TEST_RESULTS/${test_name}/${compiler_optimization}_opt"
 
 opt16dir="${targetdir}/16task_12345${test_version}"
 opt1dir="${targetdir}/1task_12345${test_version}"
@@ -48,14 +61,14 @@ print
 # optimized
 /usr/bin/cp -f namelist.input.OPT namelist.input
 # 16-task
-test_and_scp.ksh $opt16dir 16
+test_and_scp.ksh $compiler_optimization $opt16dir 16
 # 1-task
-test_and_scp.ksh $opt1dir 1
+test_and_scp.ksh $compiler_optimization $opt1dir 1
 
 # unoptimized
 /usr/bin/cp -f namelist.input.NO_OPT namelist.input
 # 16-task
-test_and_scp.ksh $noopt16dir 16
+test_and_scp.ksh $compiler_optimization $noopt16dir 16
 # 1-task
-test_and_scp.ksh $noopt1dir 1
+test_and_scp.ksh $compiler_optimization $noopt1dir 1
 
