@@ -8,8 +8,11 @@
 # Usage for parallel test:  
 #   test_and_scp.ksh optimization target_directory_on_loquat num_tasks
 # Allowed values for optimization are:  
-#   "o3"       Use executable built with "O3" optimzation.  
-#   "default"  Use executable built with default optimization.  
+#   "o3"             Use executable built with "O3" optimzation.  
+#   "default"        Use executable built with default optimization.  
+#   "nobench"        Use executable built with default optimization and 
+#                    benchmark timers turned off.  
+#   "r2539_default"  Use r2539 executable built with default optimization.  
 #
 
 #set -xu 
@@ -48,8 +51,12 @@ if [[ $optimization = "o3" ]] ; then
   print "Using executable built with -O3 -qhot ..."
 elif [[ $optimization = "default" ]] ; then
   print "Using executable built with default compiler optimization ..."
+elif [[ $optimization = "nobench" ]] ; then
+  print "Using executable built with default compiler optimization and benchmark timers turned off..."
+elif [[ $optimization = "r2539_default" ]] ; then
+  print "Using r2539 executable built with default compiler optimization ..."
 else
-  ErrorExit "valid values of optimization are \"o3\" and \"default\", you provided \"${optimization}\""
+  ErrorExit "valid values of optimization are \"o3\", \"default\", \"r2539_default\" and \"nobench\" you provided \"${optimization}\""
 fi
 rm -f wrfplus.exe
 ln -s wrfplus.${optimization}_opt.exe wrfplus.exe

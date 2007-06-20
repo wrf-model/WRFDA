@@ -50,6 +50,9 @@ class WRFTiming
   # TODO:  improve formatting
   def print_report
     @timings.each { |key,val| puts "Sum of times for \"#{key}\" = #{val}" }
+    non_main_time = 0
+    @timings.each { |key,val| non_main_time += val unless (key == "main") }
+    puts "Total non-main time = #{non_main_time}"
   end
 
 end  # class WRFTiming

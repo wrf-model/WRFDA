@@ -13,6 +13,8 @@
 # Allowed values for compiler_optimization are:  
 #   "o3"       Use executable built with "O3" compiler optimzation.  
 #   "default"  Use executable built with default compiler optimization.  
+#   "nobench"  Use executable built with default optimization and 
+#              benchmark timers turned off.  
 #
 
 #set -xu 
@@ -40,8 +42,10 @@ if [[ $compiler_optimization = "o3" ]] ; then
   print "Using executable built with -O3 -qhot ..."
 elif [[ $compiler_optimization = "default" ]] ; then
   print "Using executable built with default compiler optimization ..."
+elif [[ $compiler_optimization = "nobench" ]] ; then
+  print "Using executable built with default compiler optimization and benchmark timers turned off..."
 else
-  ErrorExit "valid values of compiler_optimization are \"o3\" and \"default\", you provided \"${compiler_optimization}\""
+  ErrorExit "valid values of compiler_optimization are \"o3\", \"default\", and \"nobench\" you provided \"${compiler_optimization}\""
 fi
 
 targetdir="/loquat2/hender/Tasks/4DVAR_Optimization/TEST_RESULTS/${test_name}/${compiler_optimization}_opt"
