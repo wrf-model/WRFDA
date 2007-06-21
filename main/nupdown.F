@@ -324,7 +324,7 @@
             if (idm .ge. 3) then
               IF (debug) write(6,*) '   Grid is nestdowned with a ratio of ',int(ratio)
                    idata2(2:dims_out(1):3,2:dims_out(2):3,:,:) = idata
-                   do jj = 3 , dims_out(2) , 3
+                   do jj = 3 , dims_out(2)-1 , 3
                       idata2(2:dims_out(1):3,jj,:,:) = ( idata2(2:dims_out(1):3,jj-1,:,:) &
                               * 2.0 + idata2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0
                    enddo
@@ -332,7 +332,7 @@
                       idata2(2:dims_out(1):3,jj,:,:) = ( idata2(2:dims_out(1):3,jj+1,:,:) &
                               * 2.0 + idata2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0
                    enddo
-                   do ii = 3 , dims_out(1) , 3
+                   do ii = 3 , dims_out(1)-1 , 3
                       idata2(ii,2:dims_out(2):3,:,:) = ( idata2(ii-1,2:dims_out(2):3,:,:) &
                               * 2.0 + idata2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0
                    enddo
@@ -422,7 +422,7 @@
               if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &
                    trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then
                    data2(1:dims_out(1):3,2:dims_out(2):3,:,:) = data
-                   do ii = 2 , dims_out(1) , 3
+                   do ii = 2 , dims_out(1)-1 , 3
                       data2(ii,2:dims_out(2):3,:,:) = ( data2(ii-1,2:dims_out(2):3,:,:) &
                               * 2.0 + data2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0
                    enddo
@@ -430,7 +430,7 @@
                       data2(ii,2:dims_out(2):3,:,:) = ( data2(ii+1,2:dims_out(2):3,:,:) &
                               * 2.0 + data2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0
                    enddo
-                   do jj = 3 , dims_out(2) , 3
+                   do jj = 3 , dims_out(2)-1 , 3
                       data2(1:dims_out(1):3,jj,:,:) = ( data2(1:dims_out(1):3,jj-1,:,:) &
                               * 2.0 + data2(1:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0
                    enddo
@@ -631,7 +631,7 @@
               if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &
                    trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then
                    ddata2(1:dims_out(1):3,2:dims_out(2):3,:,:) = ddata
-                   do ii = 2 , dims_out(1) , 3
+                   do ii = 2 , dims_out(1)-1 , 3
                       ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii-1,2:dims_out(2):3,:,:) &
                               * 2.0 + ddata2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0
                    enddo
@@ -639,7 +639,7 @@
                       ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii+1,2:dims_out(2):3,:,:) &
                               * 2.0 + ddata2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0
                    enddo
-                   do jj = 3 , dims_out(2) , 3
+                   do jj = 3 , dims_out(2)-1 , 3
                       ddata2(1:dims_out(1):3,jj,:,:) = ( ddata2(1:dims_out(1):3,jj-1,:,:) &
                               * 2.0 + ddata2(1:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0
                    enddo
