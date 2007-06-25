@@ -2668,7 +2668,7 @@ SUBROUTINE collect_fld_and_call_pkg (    fcn, donotcollect_arg,                 
   INTEGER                       ,INTENT(OUT)   :: Status
   LOGICAL donotcollect
   INTEGER ndims, nproc
-#ifdef DA_CORE==1
+#if DA_CORE==1
   REAL (KIND=4), ALLOCATABLE, DIMENSION(:) :: rcast
 #endif
 

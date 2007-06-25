@@ -6,9 +6,11 @@ export NMM_CORE=0
 export COAMPS_CORE=0
 export EXP_CORE=0
 export HDF4=${HDF4:-}
+export HDF5=${HDF5:-}
 export HDFEOS=${HDFEOS:-}  
 export ZLIB=${ZLIB:-}  
 export JPEG=${JPEG:-}  
+export JASPER=${JASPER:-}  
 export compileflags=""
 export REGISTRY=Registry.wrfvar
 
@@ -337,6 +339,13 @@ if [ -n "$JPEG" ] ; then
   # echo "JPEG not set in environment. Will configure for use without."
 fi
 
+if [ -n "$JASPER" ] ; then
+  echo "Will use JASPER in dir:    $JASPER"
+#else
+  # No-one cares
+  # echo "JASPER not set in environment. Will configure for use without."
+fi
+
 if [ -n "$RTTOV" ] ; then
   echo "Will use RTTOV in dir:   $RTTOV"
 else
@@ -426,6 +435,24 @@ if [ -n "$WRF_CHEM" ] ; then
   if [ $WRF_CHEM = 1 ] ; then
     echo building WRF with chemistry option
     compileflags="${compileflags}!-DWRF_CHEM"
+  fi
+fi
+if [ -n "$WRF_PNETCDF" ] ; then
+  if [ $WRF_PNETCDF = 1 ] ; then
+    echo building WRF with parallel netcdf option
+    compileflags="${compileflags}!-DPNETCDF"
+  fi
+fi
+if [ -n "$WRF_PHDF5" ] ; then
+  if [ $WRF_PHDF5 = 1 ] ; then
+    echo building WRF with parallel hdf5 option
+    compileflags="${compileflags}!-DPHDF5"
+  fi
+fi
+if [ -n "$WRF_GRIB2" ] ; then
+  if [ $WRF_GRIB2 = 1 ] ; then
+    echo building WRF with GRIB2 option
+    compileflags="${compileflags}!-DGRIB2"
   fi
 fi
 

@@ -17,8 +17,7 @@ $sw_hdf4_path="";
 $sw_hdfeos_path=""; 
 $sw_jpeg_path=""; 
 $sw_zlib_path=""; 
-$sw_jasperlib_path=""; 
-$sw_jasperinc_path=""; 
+$sw_jasper_path=""; 
 $sw_esmflib_path="";
 $sw_esmfinc_path="";
 $sw_rttov_path=""; 
@@ -30,6 +29,9 @@ $sw_bufr_path="";
 $sw_ldflags=""; 
 $sw_compileflags=""; 
 $WRFCHEM = 0 ;
+$phdf5 = 0 ;
+$pnetcdf = 0 ;
+$grib2 = 0 ;
 $sw_os = "ARCH" ;           # ARCH will match any
 $sw_mach = "ARCH" ;         # ARCH will match any
 
@@ -118,24 +120,33 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
     } else {
       $WRFCHEM = 1 ;
     } 
+    $where_index = index ( $sw_compileflags , "-DPHDF5" ) ;
+    if ( $where_index ne -1 ) {
+      $phdf5 = 1 ;
+    } 
+    $where_index = index ( $sw_compileflags , "-DPNETCDF" ) ;
+    if ( $where_index ne -1 ) {
+      $pnetcdf = 1 ;
+    } 
+    $where_index = index ( $sw_compileflags , "-DGRIB2" ) ;
+    if ( $where_index ne -1 ) {
+      $grib2 = 1 ;
+    } 
   }
   shift @ARGV ;
 }
 
 # The jasper library is required to build Grib2 I/O.  User must set 
-# environment variables JASPER_LIB and JASPER_INC to paths to library and 
-# include files to enable this feature prior to running configure.  
- if ( $ENV{JASPER_LIB} && $ENV{JASPER_INC} )
+# environment variable JASPER to point to it prior to running configure.  
+ if ( $ENV{JASPER} )
    {
    printf "Configuring to use jasper library to build Grib2 I/O...\n" ;
-   printf("  \$JASPER_LIB = %s\n",$ENV{JASPER_LIB});
-   printf("  \$JASPER_INC = %s\n",$ENV{JASPER_INC});
-   $sw_jasperlib_path = $ENV{JASPER_LIB}; 
-   $sw_jasperinc_path = $ENV{JASPER_INC}; 
+   printf("  \$JASPER = %s\n",$ENV{JASPER});
+   $sw_jasper_path = $ENV{JASPER}; 
    }
  else
    {
-   printf "\$JASPER_LIB or \$JASPER_INC not found in environment, configuring to build without grib2 I/O...\n" ;
+   printf "\$JASPER not found in environment, configuring to build without grib2 I/O...\n" ;
    }
 
 # A separately-installed ESMF library is required to build the ESMF 
@@ -231,10 +242,10 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_NETCDF_INC:.:g ;
   }
 
-  if ( $sw_pnetcdf_path ) { 
+  if ( $pnetcdf == 1 && $sw_pnetcdf_path ) { 
      $_ =~ s:CONFIGURE_PNETCDF_PATH:$sw_pnetcdf_path:g ;
      $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
-     $_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF: ;
+     $_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF:g ;
      $_ =~ s:CONFIGURE_PNETCDF_LIBS:libwrfio_pnf.a: ;
      $_ =~ s:CONFIGURE_PNETCDF_LIB:-lwrfio_pnf -L$sw_pnetcdf_path/src/lib -lpnetcdf: ;
      $_ =~ s:CONFIGURE_PNETCDF_INC:$sw_pnetcdf_path/src/libf: ;
@@ -247,7 +258,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
      $_ =~ s:CONFIGURE_PNETCDF_INC:.:g ;
   }
 
-  if ( $sw_phdf5_path ) { 
+  if ( $phdf5 == 1 && $sw_phdf5_path ) { 
     $_ =~ s:CONFIGURE_PHDF5_PATH:$sw_phdf5_path: ;
     $_ =~ s:CONFIGURE_WRFIO_PHDF5:wrfio_phdf5:g ;
     $_ =~ s:CONFIGURE_PHDF5_FLAG:-DPHDF5: ;
@@ -262,7 +273,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   }
 
   if ( $sw_hdf4_path ) { 
-    $_ =~ s:CONFIGURE_HDF4_LIB:-L$sw_hdf4_path/lib -ldf -lmfhdf: ;
+    $_ =~ s:CONFIGURE_HDF4_LIB:-L$sw_hdf4_path/lib -lmfhdf -ldf: ;
     $_ =~ s:CONFIGURE_HDF4_INC:$sw_hdf4_path/include: ;
   } else { 
     $_ =~ s:CONFIGURE_HDF4_LIB::g ;
@@ -289,14 +300,17 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_JPEG_LIB::g ;
   }
 
-  if ( $sw_jasperlib_path && $sw_jasperinc_path ) {
+  if ( $grib2 == 1 && $sw_jasper_path ) {
     $_ =~ s:CONFIGURE_WRFIO_GRIB2:wrfio_grib2:g ;
     $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
-    $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
-    $_ =~ s:CONFIGURE_GRIB2_LIB:-L../external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
-  } else { $_ =~ s:CONFIGURE_WRFIO_GRIB2::g ;
+    $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasper_path/include:g ;
+    $_ =~ s:CONFIGURE_GRIB2_LIBS:\$(IO_GRIB2)/libio_grib2.a: ;
+    $_ =~ s:CONFIGURE_GRIB2_LIB:-L\$(IO_GRIB2) -lio_grib2 -L$sw_jasper_path/lib -ljasper:g ;
+  } else { 
+    $_ =~ s:CONFIGURE_WRFIO_GRIB2::g ;
     $_ =~ s:CONFIGURE_GRIB2_FLAG::g ;
     $_ =~ s:CONFIGURE_GRIB2_INC:.:g ;
+    $_ =~ s:CONFIGURE_GRIB2_LIBS:: ;
     $_ =~ s:CONFIGURE_GRIB2_LIB::g ;
   }
 

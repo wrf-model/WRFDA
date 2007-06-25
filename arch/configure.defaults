@@ -364,6 +364,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         = -O2
 FCDEBUG         = 
 FCFREE          = -ffree-form  -ffree-line-length-huge
+FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
 FCTYPE          = -r8

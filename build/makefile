@@ -32,9 +32,6 @@ links :
 	@ $(LN) $(IO_PNETCDF)/wrf_io.F90 wrf_io_pnc.F90 
 	@ $(LN) $(IO_PNETCDF)/transpose.code transpose_pnc.code 
 	@ $(LN) $(IO_PNETCDF)/ext* .
-	@ $(LN) $(IO_GRIB_SHARE)/* .
-	@ $(LN) $(IO_GRIB1)/* .
-	@ $(LN) $(IO_GRIB2)/* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
 	@ $(LN) $(RSL_LITE)/* .
@@ -48,6 +45,40 @@ links :
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
 	@ mv makefile.old makefile
 	@ touch links
+
+GRIB1_LIBS      = $(IO_GRIB1)/libio_grib1.a
+GRIB_SHARE_LIBS = $(IO_GRIB_SHARE)/libio_grib_share.a
+
+GRIB1_LIB       = -L$(IO_GRIB1) -lio_grib1
+GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
+
+WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
+  $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
+  module_wrf_top.o $(FRAME_SPECIAL_OBJS)
+
+WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
+
+WRFVAR_LIBS = $(NETCDF_LIBS) libesmf_time.a \
+                 $(PNETCDF_LIBS) $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) \
+                 libwrfvar.a $(MPI_LIBS)
+
+WRF_LIBS    = libwrflib.a $(NETCDF_LIBS) libesmf_time.a \
+                 $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) \
+                 $(MPI_LIBS) $(PNETCDF_LIBS)
+
+WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB) $(PNETCDF_LIB)  \
+                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+                 $(ESMF_TIME_LIB) \
+                 $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK_LIB) \
+                 $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB)
+
+WRF_LIB     = -L. -lwrflib \
+                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+                 $(NETCDF_LIB) \
+                 $(MPI_LIB) $(PNETCDF_LIB)
+
+GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
+              $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
 
 
 # Manual rules specified first take precedence
@@ -86,12 +117,6 @@ depend : links arch registry module_state_description.F md_calls.inc \
 	touch depend
 	
 include depend.txt
-
-WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
-  $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
-  module_wrf_top.o $(FRAME_SPECIAL_OBJS)
-
-WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
 
 libwrflib.a : $(WRF_OBJS) $(WRF_MODULES)
 	$(AR) libwrflib.a $(WRF_OBJS) $(WRF_MODULES)
