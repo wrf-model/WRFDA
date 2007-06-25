@@ -47,6 +47,8 @@ export CLEAN=${CLEAN:-false}
 
 export DUMMY=${DUMMY:-false}
 export CYCLING=${CYCLING:-false}
+export NL_GLOBAL=${NL_GLOBAL:-false}
+export NL_VAR4D=${NL_VAR4D:-false}
 
 export YEAR=`echo $DATE | cut -c1-4`
 export MONTH=`echo $DATE | cut -c5-6`
@@ -86,8 +88,6 @@ export NL_SEED_ARRAY1=$DATE
 export NL_SEED_ARRAY2=$DATE
 
 
-export NL_GLOBAL=${NL_GLOBAL:-false}
-export NL_VAR4D=${NL_VAR4D:-false}
 
 # Change defaults from Registry.wrfvar which is required to be
 # consistent with WRF's Registry.EM

@@ -870,7 +870,7 @@ state   real  mu_2m            ij       misc        1         -     -         "m
 
 # Time Control
 rconfig   integer run_days                namelist,time_control		1             0       irh   "run_days"              "NUMBER OF DAYS TO RUN"
-rconfig   integer run_hours               namelist,time_control		1             0       irh   "run_hours"             "NUMBER OF HOURS TO RUN"
+rconfig   integer run_hours               namelist,time_control		0             0       irh   "run_hours"             "NUMBER OF HOURS TO RUN"
 rconfig   integer run_minutes             namelist,time_control		1             0       irh   "run_minutes"           "NUMBER OF MINUTES TO RUN"
 rconfig   integer run_seconds             namelist,time_control		1             0       irh   "run_seconds"           "NUMBER OF SECONDS TO RUN"
 rconfig   integer start_year              namelist,time_control 	max_domains    1993    irh   "start_year"            "4 DIGIT YEAR OF START OF MODEL" "YEARS"
@@ -1140,12 +1140,6 @@ rconfig   integer isice                   derived                  max_domains  
 rconfig   integer isurban                 derived                  max_domains    0       -        "isurban"              "land use index for 'urban and built-up"     "index category"
 rconfig   integer isoilwater              derived                  max_domains    0       -        "isoilwater"           "land use index of water for soil"        "index category"
 rconfig   integer map_proj                derived                  max_domains    0       -        "map_proj"             "domain map projection"      "0=none, 1=Lambert, 2=polar, 3=Mercator"
-rconfig   integer simulation_start_year   derived                  1              0       -        "simulation_start_year" "start of simulation through restarts" "4-digit year"
-rconfig   integer simulation_start_month  derived                  1              0       -        "simulation_start_month" "start of simulation through restarts" "2-digit month"
-rconfig   integer simulation_start_day    derived                  1              0       -        "simulation_start_day" "start of simulation through restarts" "2-digit day"
-rconfig   integer simulation_start_hour   derived                  1              0       -        "simulation_start_hour" "start of simulation through restarts" "2-digit hour"
-rconfig   integer simulation_start_minute derived                  1              0       -        "simulation_start_minute" "start of simulation through restarts" "2-digit minute"
-rconfig   integer simulation_start_second derived                  1              0       -        "simulation_start_second" "start of simulation through restarts" "2-digit second"
 
 #
 # Single dummy declaration to define a nodyn dyn option

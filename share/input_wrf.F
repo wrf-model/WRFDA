@@ -57,6 +57,7 @@
             simulation_start_hour   , &
             simulation_start_minute , &
             simulation_start_second
+    LOGICAL reset_simulation_start
     REAL dx_compare , dy_compare , dum
 
 !<DESCRIPTION>
@@ -82,7 +83,8 @@
     IF ( ( switch .EQ.     model_input_only  ) .OR. &
          ( switch .EQ.          restart_only ) ) THEN
       CALL wrf_get_dom_ti_char ( fid , 'SIMULATION_START_DATE' , simulation_start_date , ierr )
-      IF ( ierr .EQ. 0 ) THEN
+      CALL nl_get_reset_simulation_start ( 1, reset_simulation_start )
+      IF ( ( ierr .EQ. 0 ) .AND. ( .NOT. reset_simulation_start ) ) THEN
         ! Overwrite simulation start date with metadata.  
         READ ( simulation_start_date , fmt = '(I4,1x,I2,1x,I2,1x,I2,1x,I2,1x,I2)' ) &
                simulation_start_year,   simulation_start_month,                     &
@@ -116,8 +118,13 @@
         CALL nl_set_simulation_start_hour   ( 1 , simulation_start_hour   )
         CALL nl_set_simulation_start_minute ( 1 , simulation_start_minute )
         CALL nl_set_simulation_start_second ( 1 , simulation_start_second )
-        CALL wrf_message('input_wrf: SIMULATION_START_DATE not available in input')
-        CALL wrf_message('will use head_grid start time from namelist') 
+        IF ( reset_simulation_start ) THEN
+          CALL wrf_message('input_wrf: forcing SIMULATION_START_DATE = head_grid start time')
+          CALL wrf_message('           due to namelist variable reset_simulation_start') 
+        ELSE
+          CALL wrf_message('input_wrf: SIMULATION_START_DATE not available in input')
+          CALL wrf_message('will use head_grid start time from namelist') 
+        ENDIF
       ENDIF
       ! Initialize derived time quantity in grid%xtime.  
       ! Note that this call is also made in setup_timekeeping().  
@@ -499,6 +506,12 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
       SELECT CASE ( switch )
         CASE ( model_input_only, aux_model_input1_only, aux_model_input2_only,       &
                aux_model_input3_only, aux_model_input4_only, aux_model_input5_only )
+#ifdef WRF_CHEM
+           IF( (config_flags%io_style_emissions .eq. 1) .and.                       &
+              ((switch.eq.aux_model_input4_only) .or. (switch.eq.aux_model_input5_only)) )then
+               CALL wrf_message( "**WARNING** Time in input file not being checked **WARNING**" )
+           ELSE
+#endif
             CALL wrf_atotime( current_date(1:19), time )
             CALL domain_clock_get( grid, current_time=currtime, &
                                          current_timestr=currtimestr )
@@ -516,6 +529,9 @@ print *,'dx_compare,dy_compare = ',dx_compare,dy_compare
                 WRITE(wrf_err_message,*) "**WARNING** Trying next time in file ",TRIM(fname)," ..."
                 CALL wrf_message( TRIM(wrf_err_message) )
                 GOTO 3003
+            ENDIF
+#endif
+#ifdef WRF_CHEM
             ENDIF
 #endif
         CASE DEFAULT
