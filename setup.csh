@@ -116,6 +116,27 @@ endif
 if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}) then
    setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}
 endif
+if (-d ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}) then
+   setenv ZLIB ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}) then
+   setenv JPEG ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}) then
+   setenv HDF4 ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}) then
+   setenv HDF5 ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}) then
+   setenv HDFEOS ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}) then
+   setenv JASPER ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}
+endif
+if (-d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}) then
+   setenv PNETCDF ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}
+endif
 
 if (-d /usr/lpp/ppe.poe) then
    setenv MPIHOME /usr/lpp/ppe.poe
@@ -182,6 +203,27 @@ if ($?BUFR) then
 endif
 if ($?MAKEDEPF90) then
    echo "MAKEDEPF90      " $MAKEDEPF90
+endif
+if ($?ZLIB) then
+   echo "ZLIB            " $ZLIB
+endif
+if ($?JPEG) then
+   echo "JPEG            " $JPEG
+endif
+if ($?HDF4) then
+   echo "HDF4            " $HDF4
+endif
+if ($?HDF5) then
+   echo "HDF5            " $HDF5
+endif
+if ($?HDFEOS) then
+   echo "HDFEOS          " $HDFEOS
+endif
+if ($?JASPER) then
+   echo "JASPER          " $JASPER
+endif
+if ($?PNETCDF) then
+   echo "PNETCDF         " $PNETCDF
 endif
 if ($?SUBMIT) then
    echo "SUBMIT          " $SUBMIT

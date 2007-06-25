@@ -91,6 +91,27 @@ fi
 if test -d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}; then
    export MAKEDEPF90=${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}
 fi
+if test -d ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}; then
+   export ZLIB=${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}; then
+   export JPEG=${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}; then
+   export HDF4=${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}; then
+   export HDF5=${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}; then
+   export HDFEOS=${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}; then
+   export JASPER=${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}
+fi
+if test -d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}; then
+   export PNETCDF=${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}
+fi
 
 if test -d /usr/lpp/ppe.poe; then
    export MPIHOME=/usr/lpp/ppe.poe
@@ -127,6 +148,13 @@ echo "LAPACK          " $LAPACK
 echo "FFTPACK         " $FFTPACK
 echo "BUFR            " $BUFR
 echo "MAKEDEPF90      " $MAKEDEPF90
+echo "ZLIB            " $ZLIB        
+echo "JPEG            " $JPEG        
+echo "HDF4            " $HDF4        
+echo "HDF5            " $HDF5        
+echo "HDFEOS          " $HDFEOS
+echo "JASPER          " $JASPER      
+echo "PNETCDF         " $PNETCDF     
 echo "SUBMIT          " $SUBMIT
 if test "$SUBMIT_OPTIONS1." != '.'; then
    echo "SUBMIT_OPTIONS1  $SUBMIT_OPTIONS1"
