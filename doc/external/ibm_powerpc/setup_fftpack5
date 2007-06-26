@@ -1,0 +1,4 @@
+export FFCFLAGS="-O2 -qmaxmem=32767 -qrealsize=8"
+export FFC=xlf_r
+make clean
+make
