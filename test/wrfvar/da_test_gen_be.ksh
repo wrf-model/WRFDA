@@ -2,7 +2,7 @@
 
 . ./region.ksh
 
-export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
+export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export NUM_PROCS=1
 

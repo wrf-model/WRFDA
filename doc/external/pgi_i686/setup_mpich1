@@ -4,8 +4,8 @@ export RSHCOMMAND=ssh
 export FC=pgf90
 export F90=pgf90
 export F77=pgf77
-export CC=gcc
-export CXX=g++
+export CC=pgcc
+export CXX=pgcc
 export LOADER=pgf90
 
 export FFLAGS=-O2

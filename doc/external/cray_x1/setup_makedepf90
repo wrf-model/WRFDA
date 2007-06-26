@@ -1,5 +1,5 @@
 #!/bin/ksh
-export CC=pgcc
+export CC=gcc
 ./configure
 make clean
 make

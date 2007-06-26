@@ -32,14 +32,14 @@ echo "TARGET    $TARGET"
 
 let COUNT=1
 
-for FC in $COMPILERS; do
-   export ID=${MACHINE}_${FC}_${TYPE}
+for COMPILER in $COMPILERS; do
+   export ID=${MACHINE}_${COMPILER}_${TYPE}
    export WRFVAR_DIR=$HOME/code/$ID/wrfvar
    if $COMPILE; then
       OPTION=${OPTIONS[$COUNT]}
       echo "Compiling $WRFVAR_DIR $TARGET with option $OPTION"
       cd $WRFVAR_DIR
-      . ./setup.ksh $FC >/dev/null
+      . ./setup.ksh $COMPILER >/dev/null
       svn update #>/dev/null 2>&1
       svn status
       if $FULL; then ./clean -a >/dev/null 2>&1; fi
@@ -55,7 +55,7 @@ for FC in $COMPILERS; do
          for NUM_PROCS in $PROCS; do
             export NUM_PROCS
             cd $DAT_DIR/$REGION
-            . $WRFVAR_DIR/setup.ksh $FC >/dev/null
+            . $WRFVAR_DIR/setup.ksh $COMPILER >/dev/null
             echo "Testing $WRFVAR_DIR on $REGION"
             ./test.ksh
          done

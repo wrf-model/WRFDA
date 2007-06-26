@@ -2,7 +2,7 @@
 
 . ./region.ksh
 
-export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
+export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export EXPT=${EXPT:-${ID}_suite_${NUM_PROCS}}
 
@@ -41,7 +41,7 @@ export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
 export RUN_DIR=$EXP_DIR
 rm -rf $RUN_DIR
 
-. $WRFVAR_DIR/setup.ksh $FC > /dev/null
+. $WRFVAR_DIR/setup.ksh $COMPILER > /dev/null
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh

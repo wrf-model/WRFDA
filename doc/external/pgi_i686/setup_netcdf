@@ -1,6 +1,6 @@
 #!/bin/ksh
 cd src
-export CC='gcc'
+export CC='pgcc'
 export CXX='g++'
 export CPPFLAGS='-DNDEBUG -DpgiFortran'
 export CFLAGS='-O2'

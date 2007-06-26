@@ -6,8 +6,10 @@ if ! test -d $EXT_DIR; then
    echo "No directory EXT_DIR=$EXT_DIR"
 fi
 
-FC=${1:-g95}
-CC=${2:-gcc}
+COMPILER=${1:-gnu}
+
+if test $COMPILER = g95; then COMPILER=gnu; fi
+if test $COMPILER = xlf; then COMPILER=ibm; fi
 
 # Search for queuing systems.
 # Don't use which, as it always returns 0 on BSD
@@ -57,60 +59,60 @@ if test "$PROCESSOR" = "Power Macintosh"; then
    export PROCESSOR=powerpc
 fi
 
-if test $FC = g95; then
+if test $COMPILER = gnu; then
    export G95_ENDIAN=BIG
 fi
 
-if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}; then
-  export NETCDF=${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}; then
+  export NETCDF=${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}; then
-   export RTTOV=${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}; then
+   export RTTOV=${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}; then
-   export CRTM=${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}; then
+   export CRTM=${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}; then
-   export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}; then
+   export MPIHOME=${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}; then
-   export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}; then
+   export MPIHOME=${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}; then
-   export BLAS=${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}; then
+   export BLAS=${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}; then
-   export LAPACK=${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}; then
+   export LAPACK=${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}; then
-   export FFTPACK=${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}; then
+   export FFTPACK=${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}; then
-   export BUFR=${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}; then
+   export BUFR=${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}; then
-   export MAKEDEPF90=${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}
+if test -d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}; then
+   export MAKEDEPF90=${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}; then
-   export ZLIB=${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}
+if test -d ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}; then
+   export ZLIB=${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}; then
-   export JPEG=${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}
+if test -d ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}; then
+   export JPEG=${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}; then
-   export HDF4=${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}; then
+   export HDF4=${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}; then
-   export HDF5=${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}; then
+   export HDF5=${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}; then
-   export HDFEOS=${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}; then
+   export HDFEOS=${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}; then
-   export JASPER=${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}
+if test -d ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}; then
+   export JASPER=${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}
 fi
-if test -d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}; then
-   export PNETCDF=${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}
+if test -d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}; then
+   export PNETCDF=${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}
 fi
 
 if test -d /usr/lpp/ppe.poe; then
@@ -120,13 +122,13 @@ fi
 # Lightning
 
 if test $MACHINE = "lightning"; then 
-   if test $FC = pathscale; then
+   if test $COMPILER = pathscale; then
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    fi
-   if test $FC = pgi; then
+   if test $COMPILER = pgi; then
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-pgi-6.2-64
    fi
-   if test $FC = ifort; then
+   if test $COMPILER = intel; then
       . /contrib/2.6/intel/9.1.036-64/bin/ifortvars.sh
       export MPIHOME=/contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    fi
@@ -137,8 +139,7 @@ export PATH=$MPIHOME/bin:$MAKEDEPF90:$PATH
 export MANPATH=$MPIHOME/man:$MANPATH
 
 echo "PROCESSOR       " $PROCESSOR
-echo "FC              " $FC
-echo "CC              " $CC
+echo "COMPILER        " $COMPILER
 echo "MPIHOME         " $MPIHOME
 echo "RTTOV           " $RTTOV
 echo "CRTM            " $CRTM

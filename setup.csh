@@ -63,79 +63,80 @@ endif
 
 if ( `uname` == "AIX" ) then
    # Brain dead Aix /bin/csh cannot handle arguments to 
-   # sourced scripts, so force use of xlf, gcc
-   setenv FC xlf
-   setenv CC gcc
+   # sourced scripts, so force use of ibm
+   setenv COMPILER ibm
 else
    if ("$1" != "") then
-      setenv FC $1
+      setenv COMPILER $1
    else
-      setenv FC g95
-   endif
-
-   if ("$2" != "") then
-      setenv CC $2
-   else
-      setenv CC gcc
+      setenv COMPILER gnu
    endif
 endif
 
-if ($FC == g95) then
+if ($COMPILER == g95) then
+   setenv COMPILER gnu
+endif
+
+if ($COMPILER == xlf) then
+   setenv COMPILER ibm
+endif
+
+if ($COMPILER == gnu) then
    setenv G95_ENDIAN BIG
 endif
 
 # List options in order of increasing preference
 
-if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}) then
-   setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}) then
+   setenv NETCDF ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}) then
-   setenv RTTOV ${EXT_DIR}/rttov/rttov87/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}) then
+   setenv RTTOV ${EXT_DIR}/rttov/rttov87/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}) then
-   setenv CRTM ${EXT_DIR}/crtm/CRTM_04_13_07/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}) then
+   setenv CRTM ${EXT_DIR}/crtm/CRTM_04_13_07/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}) then
-   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}) then
+   setenv MPIHOME ${EXT_DIR}/mpi/mpich-1.2.7p1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}) then
-   setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.5p4/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}) then
+   setenv MPIHOME ${EXT_DIR}/mpi/mpich2-1.0.5p4/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}) then
-   setenv BLAS ${EXT_DIR}/blas/blas/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}) then
+   setenv BLAS ${EXT_DIR}/blas/blas/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}) then
-   setenv LAPACK ${EXT_DIR}/lapack/lapack-3.1.1/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}) then
+   setenv LAPACK ${EXT_DIR}/lapack/lapack-3.1.1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}) then
-   setenv FFTPACK ${EXT_DIR}/fftpack/fftpack5/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}) then
+   setenv FFTPACK ${EXT_DIR}/fftpack/fftpack5/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}) then
-   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}) then
+   setenv BUFR ${EXT_DIR}/bufr/bufr_ncep_nco/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}) then
-   setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}) then
+   setenv MAKEDEPF90 ${EXT_DIR}/makedepf90/makedepf90-2.8.8/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}) then
-   setenv ZLIB ${EXT_DIR}/zlib/zlib-1.2.3/${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}) then
+   setenv ZLIB ${EXT_DIR}/zlib/zlib-1.2.3/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}) then
-   setenv JPEG ${EXT_DIR}/jpeg/jpeg-6b/${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}) then
+   setenv JPEG ${EXT_DIR}/jpeg/jpeg-6b/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}) then
-   setenv HDF4 ${EXT_DIR}/hdf/hdf4.2r1/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}) then
+   setenv HDF4 ${EXT_DIR}/hdf/hdf4.2r1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}) then
-   setenv HDF5 ${EXT_DIR}/hdf/hdf5-1.6.5/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}) then
+   setenv HDF5 ${EXT_DIR}/hdf/hdf5-1.6.5/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}) then
-   setenv HDFEOS ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}) then
+   setenv HDFEOS ${EXT_DIR}/hdf/HDF-EOS2.14v1.00/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}) then
-   setenv JASPER ${EXT_DIR}/jasper/jasper-1.900.1/${CC}_${PROCESSOR}
+if (-d ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}) then
+   setenv JASPER ${EXT_DIR}/jasper/jasper-1.900.1/${COMPILER}_${PROCESSOR}
 endif
-if (-d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}) then
-   setenv PNETCDF ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${FC}_${PROCESSOR}
+if (-d ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}) then
+   setenv PNETCDF ${EXT_DIR}/netcdf/pnetcdf-1.0.1/${COMPILER}_${PROCESSOR}
 endif
 
 if (-d /usr/lpp/ppe.poe) then
@@ -145,13 +146,13 @@ endif
 # Lightning
 
 if ( $MACHINE == "lightning" ) then 
-   if ( $FC == "pathscale" ) then
+   if ( $COMPILER == "pathscale" ) then
       setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pathscale-2.4-64
    endif
-   if ( $FC == "pgi" ) then
+   if ( $COMPILER == "pgi" ) then
       setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-pgi-6.2-64
    endif
-   if ( $FC == "ifort" ) then
+   if ( $COMPILER == "intel" ) then
       source /contrib/2.6/intel/9.1.036-64/bin/ifortvars.csh
       setenv MPIHOME /contrib/2.6/mpich-gm/1.2.6..14a-intel-9.1.042-64
    endif
@@ -168,11 +169,8 @@ echo
 if ($?PROCESSOR) then
    echo "PROCESSOR       " $PROCESSOR
 endif
-if ($?FC) then
-   echo "FC              " $FC       
-endif
-if ($?CC) then
-   echo "CC              " $CC       
+if ($?COMPILER) then
+   echo "COMPILER        " $COMPILER       
 endif
 if ($?RUN_CMD) then
    echo "RUN_CMD         " $RUN_CMD

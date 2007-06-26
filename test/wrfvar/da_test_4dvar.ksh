@@ -31,7 +31,7 @@ export NL_JCDFI_ERROR_T=1.0
 export NL_JCDFI_ERROR_Q=0.001
 export NL_JCDFI_ERROR_MU=1000.0
 
-export ID=${ID:-${MACHINE}_${FC}_${TYPE}}
+export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export EXPT=${EXPT:-${ID}_${NUM_PROCS}}
 
