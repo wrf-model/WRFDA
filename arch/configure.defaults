@@ -1211,11 +1211,12 @@ FCOPTIM         =
 FCDEBUG         = 
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 \
                     -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1255,11 +1256,12 @@ FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
                   -qsigtrap=xl__trce
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1306,11 +1308,12 @@ FCOPTIM         = -O2 -qarch=auto
 FCDEBUG         = 
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1359,11 +1362,12 @@ FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
                   -qsigtrap=xl__trce
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1402,11 +1406,12 @@ FCOPTIM         = -O2 -qarch=auto
 FCDEBUG         = 
 FCTYPE          = -qrealsize=8
 FCFREE          = -qfree=f90
+FCFIXED         = -qfixed
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000

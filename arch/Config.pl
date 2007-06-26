@@ -303,7 +303,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   if ( $grib2 == 1 && $sw_jasper_path ) {
     $_ =~ s:CONFIGURE_WRFIO_GRIB2:wrfio_grib2:g ;
     $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
-    $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasper_path/include:g ;
+    $_ =~ s:CONFIGURE_GRIB2_INC:$sw_jasper_path/include:g ;
     $_ =~ s:CONFIGURE_GRIB2_LIBS:\$(IO_GRIB2)/libio_grib2.a: ;
     $_ =~ s:CONFIGURE_GRIB2_LIB:-L\$(IO_GRIB2) -lio_grib2 -L$sw_jasper_path/lib -ljasper:g ;
   } else { 
