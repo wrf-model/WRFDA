@@ -9,18 +9,18 @@ wgrib :
 $(GRIB1_LIBS):
 	( cd $(IO_GRIB1) ; \
           make CC="$(CC)" CFLAGS="$(CCFLAGS)" FC="$(FFC) $(FCTYPE) $(FCDEBUG) \
-            -w" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
+            -w $(EXTRA_FCFLAGS)" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
 	$(RANLIB) $(IO_GRIB1)/libio_grib1.a
 
 $(GRIB2_LIBS) :
 	( cd $(IO_GRIB2) ; \
           make CC="$(CC) -I$(GRIB2_INC)" CFLAGS="$(CCFLAGS)" FC="$(FFC) $(FCTYPE) $(FCDEBUG) \
-            -w" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
+            -w $(EXTRA_FCFLAGS)" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
 	$(RANLIB) $(IO_GRIB2)/libio_grib2.a
 
 $(GRIB_SHARE_LIBS) : 
 	( cd $(IO_GRIB_SHARE); \
           make CC="$(CC)" CFLAGS="$(CCFLAGS)" FC="$(FFC) $(FCTYPE) $(FCDEBUG) \
-            -w" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
+            -w $(EXTRA_FCFLAGS)" RM="$(RM)" CPP="$(CPP) $(CPPFLAGS)" FIXED="$(FCFIXED)" archive)
 	$(RANLIB) $(IO_GRIB_SHARE)/libio_grib_share.a
 
