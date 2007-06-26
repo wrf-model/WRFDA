@@ -247,8 +247,8 @@ while ( <CONFIGURE_PREAMBLE> ) {
      $_ =~ s/CONFIGURE_WRFIO_PNF/wrfio_pnf/g ;
      $_ =~ s:CONFIGURE_PNETCDF_FLAG:-DPNETCDF:g ;
      $_ =~ s:CONFIGURE_PNETCDF_LIBS:libwrfio_pnf.a: ;
-     $_ =~ s:CONFIGURE_PNETCDF_LIB:-lwrfio_pnf -L$sw_pnetcdf_path/src/lib -lpnetcdf: ;
-     $_ =~ s:CONFIGURE_PNETCDF_INC:$sw_pnetcdf_path/src/libf: ;
+     $_ =~ s:CONFIGURE_PNETCDF_LIB:-lwrfio_pnf -L$sw_pnetcdf_path/lib -lpnetcdf: ;
+     $_ =~ s:CONFIGURE_PNETCDF_INC:$sw_pnetcdf_path/include: ;
   } else { 
      $_ =~ s:CONFIGURE_PNETCDF_PATH::g ;
      $_ =~ s/CONFIGURE_WRFIO_PNF//g ;
