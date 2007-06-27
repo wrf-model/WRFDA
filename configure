@@ -340,7 +340,7 @@ if [ -n "$JPEG" ] ; then
 fi
 
 if [ -n "$JASPER" ] ; then
-  echo "Will use JASPER in dir:    $JASPER"
+  echo "Will use JASPER in dir:  $JASPER"
 #else
   # No-one cares
   # echo "JASPER not set in environment. Will configure for use without."
