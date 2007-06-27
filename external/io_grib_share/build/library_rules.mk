@@ -20,7 +20,7 @@
 #  There have been problems using the C-shell under Linux.
 #
 SHELL=/bin/sh
-MAKE=make
+MAKE=make -j1
 
 #
 #  RULES that can be passed through to subdirectories. 
