@@ -1427,7 +1427,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, serial          (Single-threaded) 
+#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, serial          (Single-threaded) 
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1468,7 +1468,7 @@ arch_clean :
 arch_superclean :
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI)
+#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, debug           (RSL, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000
@@ -1525,7 +1525,7 @@ arch_superclean :
 	( cd $(RSL)/RSL; make superclean )
 
 ###########################################################
-#ARCH Settings for crayx1 UNICOS/mp CRAY X1, optimised       (RSL, Cray MPI)
+#ARCH Settings for cray_x1 UNICOS/mp CRAY X1, optimised       (RSL, Cray MPI)
 
 SED_FTN         = sed -f ../arch/cray_csd.sed
 M4              = m4 -B12000

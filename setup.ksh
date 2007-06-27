@@ -8,8 +8,8 @@ fi
 
 COMPILER=${1:-gnu}
 
-if test $COMPILER = g95; then COMPILER=gnu; fi
-if test $COMPILER = xlf; then COMPILER=ibm; fi
+if test $COMPILER = g95; then export COMPILER=gnu; fi
+if test $COMPILER = xlf; then export COMPILER=ibm; fi
 
 # Search for queuing systems.
 # Don't use which, as it always returns 0 on BSD
@@ -61,6 +61,10 @@ fi
 
 if test $COMPILER = gnu; then
    export G95_ENDIAN=BIG
+fi
+
+if test $COMPILER = cray; then
+   export PROCESSOR=x1
 fi
 
 if test -d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}; then

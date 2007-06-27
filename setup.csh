@@ -85,6 +85,11 @@ if ($COMPILER == gnu) then
    setenv G95_ENDIAN BIG
 endif
 
+if ($COMPILER == cray) then
+   setenv PROCESSOR x1
+endif
+
+
 # List options in order of increasing preference
 
 if (-d ${EXT_DIR}/netcdf/netcdf-3.6.1/${COMPILER}_${PROCESSOR}) then
