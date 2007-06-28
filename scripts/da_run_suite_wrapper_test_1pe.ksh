@@ -128,6 +128,15 @@ export NL_CHECK_MAX_IV=true
 #export NL_TESTING_WRFVAR=true
 #export NL_TEST_TRANSFORMS=true
 
+#WRF-plus adjoint optimization:
+# TBH:  Hacking in new namelist settings here.
+# TBH:  "REMOVE_*" namelist variables are .TRUE. by default
+#export NL_REMOVE_RUNGE_KUTTA_LOOR=true
+#export NL_REMOVE_SMALL_STEP=true
+#export NL_REMOVE_RKTEND_THRU_SS=true
+#export NL_REMOVE_RKTEND=true
+#export NL_REMOVE_RK_STEP_PREP=true
+
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
 export NL_JCDFI_TAUC=`expr $WINDOW_END \* 3600`

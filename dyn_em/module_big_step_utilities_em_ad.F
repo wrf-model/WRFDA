@@ -5953,9 +5953,11 @@ integer k
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
-do j = jts, jte
-  do k = kts, kte
-    do i = its, ite
+! TBH:  Fill in halos since we know what they must be to avoid 
+! TBH:  halo updates.  
+do j = jms, jme
+  do k = kms, kme
+    do i = ims, ime
       a_tendency(i,k,j) = 0.
     end do
   end do
@@ -5967,7 +5969,10 @@ end subroutine a_zero_tend
 
 !*************************************************************
 subroutine a_surface_drag(ru_tendf, a_ru_tendf, rv_tendf, a_rv_tendf, u, a_u, v, a_v, xland, muu, a_muu, muv, a_muv, z, &
-&a_z, z_at_w, a_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&a_z, z_at_w, a_z_at_w, &
+             ids, ide, jds, jde, kds, kde, &
+             ims, ime, jms, jme, kms, kme, &
+             its, ite, jts, jte, kts, kte )
 
 !USE module_big_step_utilities_em
 implicit none
@@ -5990,12 +5995,16 @@ real, intent(inout) :: a_v(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_z(ims:ime,kms:kme,jms:jme)
 real, intent(inout) :: a_z_at_w(ims:ime,kms:kme,jms:jme)
 !real epsilon
+integer, intent(in) :: ids
 integer, intent(in) :: ide
 integer, intent(in) :: ite 
 integer, intent(in) :: its
+integer, intent(in) :: jds
 integer, intent(in) :: jde
 integer, intent(in) :: jte
 integer, intent(in) :: jts
+integer, intent(in) :: kde
+integer, intent(in) :: kds
 integer, intent(in) :: kte
 integer, intent(in) :: kts
 real, intent(in) :: muu(ims:ime,jms:jme)
@@ -6066,6 +6075,7 @@ i_endu = ite
 j_start = jts
 j_end = min(jte,jde-1)
 j_endv = jte
+#if 0
 do j = j_start, j_end
   do i = i_start, i_endu
     v0_u = sqrt(u(i,kts,j)**2+((v(i,kts,j)+v(i,kts,j+1)+v(i-1,kts,j)+v(i-1,kts,j+1))/4)**2)+epsilon
@@ -6114,6 +6124,7 @@ do j = j_start, j_endv
     end do
   end do
 end do
+#endif
 
 !----------------------------------------------
 ! ADJOINT COMPUTATIONS
@@ -6124,8 +6135,10 @@ end do
 ! recompute : j_start
 ! recompute : j_end
 ! recompute : j_endv
-do j = j_endv, j_start, -1
-  do i = i_end, i_start, -1
+! TBH:  Redundant computation into halo region for X(i,j-1) = X(i,j-1) + ...
+do j = min(j_endv+1,jde), j_start, -1
+  ! TBH:  Redundant computation into halo region for X(i+1,j) = X(i+1,j) + ...
+  do i = i_end, max(i_start-1,ids), -1
     v0_v = sqrt(v(i,kts,j)**2+((u(i,kts,j)+u(i,kts,j-1)+u(i+1,kts,j)+u(i+1,kts,j-1))/4)**2)+epsilon
 ! recompute : v0_v
 ! recompute : v0_v
@@ -6203,8 +6216,10 @@ do j = j_endv, j_start, -1
     a_v0_v = 0.
   end do
 end do
-do j = j_end, j_start, -1
-  do i = i_endu, i_start, -1
+! TBH:  Redundant computation into halo region for X(i,j+1) = X(i,j+1) + ...
+do j = j_end, max(j_start-1,jds), -1
+  ! TBH:  Redundant computation into halo region for X(i-1,j) = X(i-1,j) + ...
+  do i = min(i_endu+1,ide), i_start, -1
     v0_u = sqrt(u(i,kts,j)**2+((v(i,kts,j)+v(i,kts,j+1)+v(i-1,kts,j)+v(i-1,kts,j+1))/4)**2)+epsilon
 ! recompute : v0_u
 ! recompute : v0_u

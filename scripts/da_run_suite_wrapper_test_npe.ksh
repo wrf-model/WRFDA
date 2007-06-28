@@ -130,6 +130,15 @@ export NL_CHECK_MAX_IV=true
 export NL_TESTING_WRFVAR=false
 export NL_TEST_TRANSFORMS=false
 
+#WRF-plus adjoint optimization:
+# TBH:  Hacking in new namelist settings here.
+# TBH:  "REMOVE_*" namelist variables are .TRUE. by default
+#export NL_REMOVE_RUNGE_KUTTA_LOOR=true
+#export NL_REMOVE_SMALL_STEP=true
+#export NL_REMOVE_RKTEND_THRU_SS=true
+#export NL_REMOVE_RKTEND=true
+#export NL_REMOVE_RK_STEP_PREP=true
+
 #JCDF Option & Obs
 export NL_JCDFI_USE=false
 export NL_JCDFI_TAUC=`expr $WINDOW_END \* 3600`
@@ -161,7 +170,11 @@ export NL_LEN_SCALING3=0.5
 export NL_LEN_SCALING4=0.5
 export NL_LEN_SCALING5=0.5
 
-
+if test $SUBMIT = "LSF"; then
+  export SUBMIT_OPTIONS1="#BSUB -a poe"
+  export SUBMIT_OPTIONS2="#BSUB -I"
+  export SUBMIT_OPTIONS3="#BSUB -R \"span[ptile=$LL_PTILE]\""
+fi
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
 

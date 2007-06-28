@@ -1029,6 +1029,13 @@ rconfig   character  rst_inname        namelist,time_control		1  "wrfrst_d<domai
 rconfig   character  rst_outname       namelist,time_control		1  "wrfrst_d<domain>_<date>"     -     "name of restrt outfile"   ""      ""
 rconfig   logical write_input             namelist,time_control		1             .false. -    "write input data for 3dvar etc."              ""      ""
 rconfig   logical write_restart_at_0h     namelist,time_control		1             .false. h    "write_restart_at_0h"              ""      ""
+# TBH:  Controls to trade off recomputation for memory in the adjoint.  
+# TBH:  Put this in a new namelist later...  
+rconfig   logical remove_runge_kutta_loor namelist,time_control	        1             .true. rh    "remove_runge_kutta_loor" ""    ""
+rconfig   logical remove_small_step       namelist,time_control	        1             .true. rh    "remove_small_step"       ""    ""
+rconfig   logical remove_rktend_thru_ss   namelist,time_control	        1             .true. rh    "remove_rktend_thru_ss"   ""    ""
+rconfig   logical remove_rktend           namelist,time_control	        1             .true. rh    "remove_rktend"           ""    ""
+rconfig   logical remove_rk_step_prep     namelist,time_control	        1             .true. rh    "remove_rk_step_prep"     ""    ""
 
 
 # Domains
@@ -1661,11 +1668,11 @@ halo HALO_0376 dyn_em 48:a_al,a_moist_2,a_mu_2,a_p,a_ph_2,a_t_2,a_u_2,a_v_2,a_w_
 halo HALO_0394 dyn_em 48:a,alpha,gamma,moist_2,mu_2,ph_2,t_2,u_2,v_2,w_2
 halo HALO_0616 dyn_em 48:mut,muu,muv,ru,rv,rw
 halo HALO_0626 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_0637 dyn_em 8:mut,muu,muv,php,ru,rv,rw,ww
+halo HALO_0637 dyn_em 48:alt,mut,muu,muv,php,ru,rv,rw,ww,cqu,cqv,cqw
 halo HALO_0648 dyn_em 8:u_2,v_2
 halo HALO_0660 dyn_em 8:z
 halo HALO_0679 dyn_em 8:moist_2
-halo HALO_0718 dyn_em 8:al,mu_1,mu_2,p,pb,ph_2,php,t_1,t_save,u_save,v_save
+halo HALO_0718 dyn_em 8:al,mu_1,mu_2,p,pb,ph_2,php,t_1,t_save,u_save,v_save;4:mudf,alt
 halo HALO_0736 dyn_em 8:u_2,v_2
 halo HALO_0747 dyn_em 48:al,alt,moist_2,mu_1,mu_2,p,pb,ph_1,ph_2,php,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww
 halo HALO_0790 dyn_em 8:al,mu_2,mudf,muts,muus,muvs,p,ph_2
@@ -1686,6 +1693,7 @@ halo HALO_1290 dyn_em 48:a,al,alpha,gamma,moist_1,moist_2,mu_1,mu_2,mudf,p,ph_1,
 halo HALO_1373 dyn_em 48:alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_1384 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_1389 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
+halo HALO_1390 dyn_em 48:al,p
 halo HALO_1394 dyn_em 8:u_2,v_2
 halo HALO_1407 dyn_em 8:u_2,v_2
 halo HALO_1419 dyn_em 8:z
@@ -1762,12 +1770,8 @@ halo HALO_3619 dyn_em 48:a_mut,a_ph_save,a_ru_tend,a_rv_tend,a_t_save,a_t_tend,a
 halo HALO_3632 dyn_em 48:a_mu_2,a_mu_tend,a_mut,a_ph_2,a_ph_save,a_ru,a_rv,a_t_2,a_t_save,a_u_save,a_v_save,a_w_2,a_w_save,mut,ph_2,t_2,w_2
 halo HALO_3723 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
 halo HALO_3728 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3784 dyn_em 80:a_advect_tend,a_alt,a_cqu,a_cqv,a_cqw,a_moist_tend,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,alt,cosa,cqu,cqv,cqw,e,f,msft,msfu,msfv,mu_2,mub,mut,muu,muv,p,pb,ph_1,ph_2,phb,php,ru,rv,rw,t_1,t_2,t_init,u_1,u_2,v_1,v_2,w_1,w_2,ww
-halo HALO_3803 dyn_em 80:a_alt,a_cqu,a_cqv,a_cqw,a_mu_2,a_mu_tend,a_mut,a_muu,a_muv,a_p,a_ph_1,a_ph_2,a_ph_tend,a_php,a_ru,a_ru_tend,a_ru_tendf,a_rv,a_rv_tend,a_rv_tendf,a_rw,a_rw_tend,a_rw_tendf,a_t_1,a_t_2,a_t_tend,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,al,cqu,cqv,cqw,mu_2,muu,muv,p,ph_1,ph_2,php,ru,rv,rw,t_1,t_2,u_1,u_2,v_1,v_2,w_1,w_2,ww
-halo HALO_3886 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3898 dyn_em 8:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3903 dyn_em 48:al,alt,mut,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3935 dyn_em 48:a_alt,a_moist_2,a_moist_tend,a_mu_2,a_p,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_2,a_t_tendf,a_u_2,a_v_2,a_w_2,a_ww,al,alt,muu,muv,p,php,ru,rv,rw,ww
-halo HALO_3963 dyn_em 48:a_alt,a_moist_tend,a_mu_1,a_mu_2,a_p,a_ph_1,a_ph_2,a_ph_tendf,a_php,a_ru_tendf,a_rv_tendf,a_rw_tendf,a_t_1,a_t_2,a_t_tendf,a_u_1,a_u_2,a_v_1,a_v_2,a_w_1,a_w_2,a_ww,msft
-halo HALO_3982 dyn_em 48:a_cqu,a_cqv,a_cqw,a_mut,a_muu,a_muv,a_ru,a_rv,a_rw,a_u_2,a_v_2,a_w_2,a_ww,moist_2,msfu,msfv,mu_2,mub,u_2,v_2,w_2
+halo HALO_3783 dyn_em 8:a_alt,a_mu_2,a_mut,a_muu,a_muv,a_p,a_php,a_ru,a_ru_tendf,a_rv,a_rv_tendf,a_rw,a_rw_tendf,a_t_1,a_t_tendf,a_u_1,a_v_1,a_w_1,cqu,cqv,cqw,mub,pb,php,rw,t_init,z,z_at_w,a_z,a_z_at_w,xland
+halo HALO_3784 dyn_em 80:a_ph_2,a_ph_tend,a_ru_tend,a_rv_tend,a_rw_tend,a_t_2,a_t_tend,a_u_2,a_v_2,a_w_2,al,muu,muv,p,ph_2,phb,ru,rv,u_2,v_2,w_2
+halo HALO_3935 dyn_em 8:a_moist_2
+halo HALO_3982 dyn_em 8:a_muu,a_muv,a_rw,a_u_2,a_v_2,a_ww,a_mu_2
 halo HALO_3997 dyn_em 48:a_al,a_alt,a_moist_2,a_mu_2,a_ph_2,a_ph_tendf,a_php,a_t_2,a_u_2,a_v_2,a_w_2,a_ww

@@ -305,6 +305,11 @@ if test ! -z "$NL_RST_INNAME"; then echo "rst_inname=\"${NL_RST_INNAME}\"," >> $
 if test ! -z "$NL_RST_OUTNAME"; then echo "rst_outname=\"${NL_RST_OUTNAME}\"," >> $FILE;fi
 if test ! -z "$NL_WRITE_INPUT"; then echo "write_input=${NL_WRITE_INPUT}," >> $FILE;fi
 if test ! -z "$NL_WRITE_RESTART_AT_0H"; then echo "write_restart_at_0h=${NL_WRITE_RESTART_AT_0H}," >> $FILE;fi
+if test ! -z "$NL_REMOVE_RUNGE_KUTTA_LOOR"; then echo "remove_runge_kutta_loor=${NL_REMOVE_RUNGE_KUTTA_LOOR}," >> $FILE;fi
+if test ! -z "$NL_REMOVE_SMALL_STEP"; then echo "remove_small_step=${NL_REMOVE_SMALL_STEP}," >> $FILE;fi
+if test ! -z "$NL_REMOVE_RKTEND_THRU_SS"; then echo "remove_rktend_thru_ss=${NL_REMOVE_RKTEND_THRU_SS}," >> $FILE;fi
+if test ! -z "$NL_REMOVE_RKTEND"; then echo "remove_rktend=${NL_REMOVE_RKTEND}," >> $FILE;fi
+if test ! -z "$NL_REMOVE_RK_STEP_PREP"; then echo "remove_rk_step_prep=${NL_REMOVE_RK_STEP_PREP}," >> $FILE;fi
 echo / >> $FILE
 echo \&domains >> $FILE
 if test ! -z "$NL_TIME_STEP"; then echo "time_step=${NL_TIME_STEP}," >> $FILE;fi

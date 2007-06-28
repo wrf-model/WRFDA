@@ -302,10 +302,12 @@ integer k
 integer k2
 real qs1
 real qvh(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))
-real qvi(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))
 real r1
 real thh(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))
+#ifdef ADJOINT_NO_OPTIMIZE
+real qvi(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))
 real thi(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))
+#endif
 real ttemp
 
 !----------------------------------------------
@@ -327,6 +329,7 @@ a_ttemp = 0.
 !----------------------------------------------
 ! ROUTINE BODY
 !----------------------------------------------
+#ifdef ADJOINT_NO_OPTIMIZE
 !----------------------------------------------
 ! FUNCTION AND TAPE COMPUTATIONS
 !----------------------------------------------
@@ -357,6 +360,7 @@ qvi(:,:,:) = qv(:,:,:)
 !----------------------------------------------
 qv(:,:,:) = qvh(:,:,:)
 th(:,:,:) = thh(:,:,:)
+#endif
 do j = jts, jte
   a_cond = 0.
   a_dqv = 0.
@@ -365,6 +369,7 @@ do j = jts, jte
   a_r1 = 0.
   a_ttemp = 0.
   do k = kte, 1, -1
+#ifdef ADJOINT_NO_OPTIMIZE
     qv(:,:,:) = qvh(:,:,:)
     th(:,:,:) = thh(:,:,:)
     do k2 = 1, k-1
@@ -382,6 +387,7 @@ do j = jts, jte
         endif
       end do
     end do
+#endif
     do i = its, ite
       a_cond = 0.
       a_dqv = 0.
@@ -409,6 +415,9 @@ do j = jts, jte
 ! recompute : cond
 ! recompute : cond
         ttemp = ttemp+xlv/cp*cond
+#ifndef ADJOINT_NO_OPTIMIZE
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)
+#endif
 ! recompute : ttemp
 ! recompute : ttemp
         a_cond = a_cond+a_rainnc(i,j)*rho(i,k,j)*dz8w(i,k,j)
@@ -457,8 +466,13 @@ end do
 !----------------------------------------------
 ! GET DEPENDEND VARIABLES
 !----------------------------------------------
+#ifdef ADJOINT_NO_OPTIMIZE
 qv(:,:,:) = qvi(:,:,:)
 th(:,:,:) = thi(:,:,:)
+#else
+qv(:,:,:) = qvh(:,:,:)
+th(:,:,:) = thh(:,:,:)
+#endif
 
 
 !----------------------------------------------
