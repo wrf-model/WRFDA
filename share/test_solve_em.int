@@ -16,28 +16,8 @@ SUBROUTINE test_solve_em ( grid , config_flags , &
 ! Mediation layer modules
 ! Model layer modules
    USE module_model_constants
-   USE module_small_step_em
-   USE module_em
-   USE module_big_step_utilities_em
-   USE module_bc
-   USE module_bc_em
-   USE module_solvedebug_em
-   USE module_physics_addtendc
-   USE module_diffusion_em
 ! Registry generated module
    USE module_state_description
-   USE module_radiation_driver
-   USE module_surface_driver
-   USE module_cumulus_driver
-   USE module_microphysics_driver
-   USE module_pbl_driver
-
-   USE g_module_small_step_em
-   USE g_module_em
-   USE g_module_big_step_utilities_em
-   USE g_module_bc
-   USE g_module_bc_em
-   USE g_module_diffusion_em
 
    IMPLICIT NONE
 
