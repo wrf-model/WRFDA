@@ -142,5 +142,5 @@ superclean : clean arch_superclean
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
           da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
           landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \
-          depend depend.txt
+          depend depend.txt ../main/*exe ../inc/namelist_script.inc
     
