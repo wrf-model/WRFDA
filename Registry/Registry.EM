@@ -1031,11 +1031,11 @@ rconfig   logical write_input             namelist,time_control		1             .
 rconfig   logical write_restart_at_0h     namelist,time_control		1             .false. h    "write_restart_at_0h"              ""      ""
 # TBH:  Controls to trade off recomputation for memory in the adjoint.  
 # TBH:  Put this in a new namelist later...  
-rconfig   logical remove_runge_kutta_loor namelist,time_control	        1      .false. rh    "remove_runge_kutta_loor" ""    ""
-rconfig   logical remove_small_step       namelist,time_control	        1      .false. rh    "remove_small_step"       ""    ""
-rconfig   logical remove_rktend_thru_ss   namelist,time_control	        1      .false. rh    "remove_rktend_thru_ss"   ""    ""
-rconfig   logical remove_rktend           namelist,time_control	        1      .false. rh    "remove_rktend"           ""    ""
-rconfig   logical remove_rk_step_prep     namelist,time_control	        1      .false. rh    "remove_rk_step_prep"     ""    ""
+rconfig   logical remove_runge_kutta_loor namelist,time_control	        1             .true. rh    "remove_runge_kutta_loor" ""    ""
+rconfig   logical remove_small_step       namelist,time_control	        1             .true. rh    "remove_small_step"       ""    ""
+rconfig   logical remove_rktend_thru_ss   namelist,time_control	        1             .true. rh    "remove_rktend_thru_ss"   ""    ""
+rconfig   logical remove_rktend           namelist,time_control	        1             .true. rh    "remove_rktend"           ""    ""
+rconfig   logical remove_rk_step_prep     namelist,time_control	        1             .true. rh    "remove_rk_step_prep"     ""    ""
 
 
 # Domains
@@ -1146,18 +1146,18 @@ rconfig   integer w_damping               namelist,dynamics	1             0     
 # diff_opt 1=old diffusion, 2=new
 rconfig   integer diff_opt                namelist,dynamics	1             1       irh    "diff_opt"              ""      ""
 # km_opt   1=old coefs, 2=tke, 3=Smagorinksy
-rconfig   integer km_opt                  namelist,dynamics	1             1       irh    "km_opt"                ""      ""
+rconfig   integer km_opt                  namelist,dynamics	1             4       irh    "km_opt"                ""      ""
 rconfig   integer damp_opt                namelist,dynamics	1             1       irh    "damp_opt"              ""      ""
 rconfig   real    zdamp                   namelist,dynamics	max_domains    5000.   h    "zdamp"         ""      ""
 rconfig   real    dampcoef                namelist,dynamics     max_domains    0.2     h    "dampcoef"              ""      ""
 rconfig   real    khdif                   namelist,dynamics	max_domains    0       h    "khdif"         ""      ""
 rconfig   real    kvdif                   namelist,dynamics	max_domains    0       h    "kvdif"         ""      ""
-rconfig   real    smdiv                   namelist,dynamics	max_domains    0.      h    "smdiv"         ""      ""
-rconfig   real    emdiv                   namelist,dynamics	max_domains    0.      h    "emdiv"         ""      ""
+rconfig   real    smdiv                   namelist,dynamics	max_domains    0.1     h    "smdiv"         ""      ""
+rconfig   real    emdiv                   namelist,dynamics	max_domains    0.01    h    "emdiv"         ""      ""
 rconfig   real    epssm                   namelist,dynamics	max_domains    .1      h    "epssm"         ""      ""
 rconfig   logical non_hydrostatic         namelist,dynamics	max_domains  .true.   irh  "non_hydrostatic"    ""   ""
 rconfig   integer time_step_sound         namelist,dynamics	max_domains    0       h     "time_step_sound"               ""      ""
-rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    3       rh       "h_mom_adv_order"               ""      ""
+rconfig   integer     h_mom_adv_order     namelist,dynamics	max_domains    5       rh       "h_mom_adv_order"               ""      ""
 rconfig   integer     v_mom_adv_order     namelist,dynamics	max_domains    3       rh       "v_mom_adv_order"               ""      ""
 rconfig   integer     h_sca_adv_order     namelist,dynamics	max_domains    3       rh       "h_sca_adv_order"               ""      ""
 rconfig   integer     v_sca_adv_order     namelist,dynamics	max_domains    3       rh       "v_sca_adv_order"               ""      ""

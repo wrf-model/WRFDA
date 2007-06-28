@@ -28,8 +28,6 @@ MODULE module_configure
 
    CHARACTER (LEN=4) :: mminlu = '    '         ! character string for landuse table
 
-   PRIVATE read_namelist_data
-
 CONTAINS
 
 
@@ -77,8 +75,11 @@ CONTAINS
 !</DESCRIPTION>
       IMPLICIT NONE
 
-      INTEGER              :: io_status, nml_unit
+      INTEGER              :: io_status
       INTEGER              :: i
+
+      INTEGER, PARAMETER :: nml_write_unit= 9
+      INTEGER, PARAMETER :: nml_read_unit = 10
 
 ! define as temporaries
 #include <namelist_defines.inc>
@@ -86,7 +87,7 @@ CONTAINS
 ! Statements that specify the namelists
 #include <namelist_statements.inc>
 
-      OPEN ( UNIT   = 10               ,      &
+      OPEN ( UNIT   = nml_read_unit    ,      &
              FILE   = "namelist.input" ,      &
              FORM   = "FORMATTED"      ,      &
              STATUS = "OLD"            ,      &
@@ -96,13 +97,20 @@ CONTAINS
         CALL WRF_ERROR_FATAL ( 'ERROR OPENING namelist.input' )
       ENDIF
 
-      nml_unit = 10
+      OPEN ( UNIT   = nml_write_unit    ,      &
+             FILE   = "namelist.output" ,      &
+             FORM   = "FORMATTED"      ,      &
+             STATUS = "REPLACE"        ,      &
+             IOSTAT = io_status         )
+
+      IF ( io_status .NE. 0 ) THEN
+        CALL WRF_ERROR_FATAL ( 'ERROR OPENING namelist.output' )
+      ENDIF
 
 ! Statements that set the namelist vars to default vals
 #  include <namelist_defaults.inc>
 
 ! Statements that read the namelist are in this file
-#  define NAMELIST_READ_ERROR_LABEL 9200
 #  include <config_reads.inc>
 
 ! 2004/04/28  JM (with consensus by the group of developers)
@@ -127,15 +135,19 @@ CONTAINS
 #define SOURCE_REC_DEX
 #include <config_assigns.inc>
 
-      CLOSE ( UNIT = 10 , IOSTAT = io_status )
+      CLOSE ( UNIT = nml_read_unit , IOSTAT = io_status )
 
       IF ( io_status .NE. 0 ) THEN
         CALL WRF_ERROR_FATAL ( 'ERROR CLOSING namelist.input' )
       ENDIF
 
+      CLOSE ( UNIT = nml_write_unit , IOSTAT = io_status )
+
+      IF ( io_status .NE. 0 ) THEN
+        CALL WRF_ERROR_FATAL ( 'ERROR CLOSING namelist.output' )
+      ENDIF
+
       RETURN
-9200  CONTINUE
-      CALL wrf_error_fatal( 'module_configure: initial_config: error reading namelist' )
 
    END SUBROUTINE initial_config
 

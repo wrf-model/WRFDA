@@ -146,7 +146,7 @@
           buffer_position = buffer_position + numwords
 #ifdef ASSERT_4DVAR_OPT
           IF ( buffer_position-1 > MAX_NUM_WORDS ) THEN
-            CALL wrf_error_fatal( "Ran out of memory in store_field_lint" )
+            CALL wrf_error_fatal( "Ran out of memory in store_field_lint, increase MAX_NUM_WORDS in module_4dvaropt.F" )
           ENDIF
 #endif
           CALL fast_copy_lint ( buffer(newstart), inbuf, numwords )
