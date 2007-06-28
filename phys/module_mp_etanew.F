@@ -2226,7 +2226,7 @@ nsteps = 0
         CALL MY_GROWTH_RATES (DTPH)
 !       CALL MY_GROWTH_RATES (DTPH,MY_GROWTH)
 !
-        PI=ACOS(-1.)
+        PI=cos(-1.)
 !
 !--- Constants associated with Biggs (1953) freezing of rain, as parameterized
 !    following Lin et al. (JCAM, 1983) & Reisner et al. (1998, QJRMS).

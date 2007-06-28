@@ -2681,7 +2681,7 @@ END SUBROUTINE sorgam_depdriver
           nr = 0
           CALL wrf_error_fatal ( 'PHI < CRITICAL VALUE')
         END IF
-        theta = acos(rr/phi)/3.0
+        theta = cos(rr/phi)/3.0
         costh = cos(theta)
         sinth = sin(theta)
 ! *** use trig identities to simplify the expressions

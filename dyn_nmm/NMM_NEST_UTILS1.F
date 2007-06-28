@@ -365,7 +365,7 @@ SUBROUTINE EARTH_LATLON ( HLAT,HLON,VLAT,VLON,     & !Earth lat,lon at H and V p
 !-------------------------------------------------------------------------
 
 !
-      PI_2 = ACOS(0.)
+      PI_2 = cos(0.)
       DTR  = PI_2/90.
       WB   = WBD1 * DTR                 ! WB:   western boundary in radians
       SB   = SBD1 * DTR                 ! SB:   southern boundary in radians
@@ -409,7 +409,7 @@ SUBROUTINE EARTH_LATLON ( HLAT,HLON,VLAT,VLON,     & !Earth lat,lon at H and V p
            IF(CLMH .LT. -1.) CLMH = -1.0
            FACTH = 1.
            IF(TLMH .GT. 0.) FACTH = -1.
-           GLONH(I,J) = -CENTRAL_LON*DTR + FACTH*ACOS(CLMH)
+           GLONH(I,J) = -CENTRAL_LON*DTR + FACTH*cos(CLMH)
 
          ENDDO                                    
 
@@ -423,7 +423,7 @@ SUBROUTINE EARTH_LATLON ( HLAT,HLON,VLAT,VLON,     & !Earth lat,lon at H and V p
            IF(CLMV .LT. -1.) CLMV = -1.
            FACTV = 1.
            IF(TLMV .GT. 0.) FACTV = -1.
-           GLONV(I,J) = -CENTRAL_LON*DTR + FACTV*ACOS(CLMV)
+           GLONV(I,J) = -CENTRAL_LON*DTR + FACTV*cos(CLMV)
 
          ENDDO
 
@@ -501,7 +501,7 @@ END SUBROUTINE EARTH_LATLON
 
   IMT=2*P_IDE-2             ! parent i dIMEnsions 
   JMT=P_JDE/2               ! parent j dIMEnsions 
-  PI_2=ACOS(0.)
+  PI_2=cos(0.)
   D2R=PI_2/90.
   R2D=1./D2R
   DPH=DPHD1*D2R
@@ -565,12 +565,12 @@ END SUBROUTINE EARTH_LATLON
            TLON2=TLON1+DLM                                 
            DLM1=TLON-TLON1                                 
            DLM2=TLON-TLON2
-!           D1=ACOS(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-!           D2=ACOS(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
+!           D1=cos(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
+!           D2=cos(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-           D1=ACOS(DTEMP)
+           D1=cos(DTEMP)
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
-           D2=ACOS(DTEMP)
+           D2=cos(DTEMP)
             IF(D1.GT.D2)THEN
              NROW=NROW+1                    ! FIND THE NEAREST H ROW
              NCOL=NCOL+1                    ! FIND THE NEAREST H COLUMN
@@ -595,12 +595,12 @@ END SUBROUTINE EARTH_LATLON
            TLON2=TLON1+DLM
            DLM1=TLON-TLON1
            DLM2=TLON-TLON2
-!           D1=ACOS(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-!           D2=ACOS(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
+!           D1=cos(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
+!           D2=cos(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-           D1=ACOS(DTEMP)
+           D1=cos(DTEMP)
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
-           D2=ACOS(DTEMP)
+           D2=cos(DTEMP)
              IF(D1.LT.D2)THEN
               NROW=NROW+1                    ! FIND THE NEAREST H ROW
              ELSE
@@ -719,28 +719,28 @@ END SUBROUTINE EARTH_LATLON
        TLONO=TLONHX(I,J)
        DLM1=TLON-TLONO
        DLA1=TLAT-TLATO                                               ! Q
-!      DL1=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL1=cos(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL1=SQRT(DLM1*DLM1+DLA1*DLA1)                                 ! Q 
 !
        TLATO=TLATHX(I,J)
        TLONO=TLONHX(I,J)+2.*DLM
        DLM2=TLON-TLONO
        DLA2=TLAT-TLATO                                               ! Q
-!      DL2=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL2=cos(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL2=SQRT(DLM2*DLM2+DLA2*DLA2)                                 ! Q
 ! 
        TLATO=TLATHX(I,J)-DPH
        TLONO=TLONHX(I,J)+DLM
        DLM3=TLON-TLONO
        DLA3=TLAT-TLATO                                               ! Q
-!      DL3=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL3=cos(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL3=SQRT(DLM3*DLM3+DLA3*DLA3)                                 ! Q
  
        TLATO=TLATHX(I,J)+DPH
        TLONO=TLONHX(I,J)+DLM
        DLM4=TLON-TLONO
        DLA4=TLAT-TLATO                                               ! Q
-!      DL4=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL4=cos(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL4=SQRT(DLM4*DLM4+DLA4*DLA4)                                 ! Q
 
 
@@ -855,28 +855,28 @@ END SUBROUTINE EARTH_LATLON
       TLONO=TLONHX(I,J)
       DLM1=TLON-TLONO
       DLA1=TLAT-TLATO                                               ! Q
-!     DL1=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL1=cos(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL1=SQRT(DLM1*DLM1+DLA1*DLA1)                                 ! Q
 !
       TLATO=TLATHX(I,J)                                             ! redundant computations
       TLONO=TLONHX(I,J)+2.*DLM
       DLM2=TLON-TLONO
       DLA2=TLAT-TLATO                                               ! Q
-!     DL2=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL2=cos(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL2=SQRT(DLM2*DLM2+DLA2*DLA2)                                 ! Q
 !
       TLATO=TLATHX(I,J)-DPH
       TLONO=TLONHX(I,J)+DLM
       DLM3=TLON-TLONO
       DLA3=TLAT-TLATO                                               ! Q
-!     DL3=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL3=cos(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL3=SQRT(DLM3*DLM3+DLA3*DLA3)                                 ! Q
 !
       TLATO=TLATHX(I,J)+DPH
       TLONO=TLONHX(I,J)+DLM
       DLM4=TLON-TLONO
       DLA4=TLAT-TLATO                                               ! Q
-!     DL4=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL4=cos(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL4=SQRT(DLM4*DLM4+DLA4*DLA4)                                 ! Q
 
 !     THE BILINEAR WEIGHTS
@@ -972,7 +972,7 @@ END SUBROUTINE EARTH_LATLON
 
   IMT=2*P_IDE-2             ! parent i dIMEnsions
   JMT=P_JDE/2               ! parent j dIMEnsions
-  PI_2=ACOS(0.)
+  PI_2=cos(0.)
   D2R=PI_2/90.
   R2D=1./D2R
   DPH=DPHD1*D2R
@@ -1036,12 +1036,12 @@ END SUBROUTINE EARTH_LATLON
            TLON2=TLON1+DLM
            DLM1=TLON-TLON1
            DLM2=TLON-TLON2
-!           D1=ACOS(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-!           D2=ACOS(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
+!           D1=cos(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
+!           D2=cos(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-           D1=ACOS(DTEMP)
+           D1=cos(DTEMP)
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
-           D2=ACOS(DTEMP)
+           D2=cos(DTEMP)
             IF(D1.GT.D2)THEN
              NROW=NROW+1                    ! FIND THE NEAREST V ROW
              NCOL=NCOL+1                    ! FIND THE NEAREST V COLUMN
@@ -1066,12 +1066,12 @@ END SUBROUTINE EARTH_LATLON
            TLON2=TLON1+DLM
            DLM1=TLON-TLON1
            DLM2=TLON-TLON2
-!           D1=ACOS(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-!           D2=ACOS(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
+!           D1=cos(COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
+!           D2=cos(COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT1)*COS(DLM1)+SIN(TLAT)*SIN(TLAT1))
-           D1=ACOS(DTEMP)
+           D1=cos(DTEMP)
            DTEMP=MIN(1.0_KNUM,COS(TLAT)*COS(TLAT2)*COS(DLM2)+SIN(TLAT)*SIN(TLAT2))
-           D2=ACOS(DTEMP)
+           D2=cos(DTEMP)
              IF(D1.LT.D2)THEN
               NROW=NROW+1                    ! FIND THE NEAREST H ROW
              ELSE
@@ -1191,28 +1191,28 @@ END SUBROUTINE EARTH_LATLON
        TLONO=TLONVX(I,J)
        DLM1=TLON-TLONO
        DLA1=TLAT-TLATO                                               ! Q
-!      DL1=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL1=cos(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL1=SQRT(DLM1*DLM1+DLA1*DLA1)                                 ! Q
 !
        TLATO=TLATVX(I,J)
        TLONO=TLONVX(I,J)+2.*DLM
        DLM2=TLON-TLONO
        DLA2=TLAT-TLATO                                               ! Q
-!      DL2=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL2=cos(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL2=SQRT(DLM2*DLM2+DLA2*DLA2)                                 ! Q
 
        TLATO=TLATVX(I,J)-DPH
        TLONO=TLONVX(I,J)+DLM
        DLM3=TLON-TLONO
        DLA3=TLAT-TLATO                                               ! Q
-!      DL3=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL3=cos(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL3=SQRT(DLM3*DLM3+DLA3*DLA3)                                 ! Q
 
        TLATO=TLATVX(I,J)+DPH
        TLONO=TLONVX(I,J)+DLM
        DLM4=TLON-TLONO
        DLA4=TLAT-TLATO                                               ! Q
-!      DL4=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
+!      DL4=cos(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
        DL4=SQRT(DLM4*DLM4+DLA4*DLA4)                                 ! Q
                  
 !      THE BILINEAR WEIGHTS
@@ -1323,28 +1323,28 @@ END SUBROUTINE EARTH_LATLON
       TLONO=TLONVX(I,J)
       DLM1=TLON-TLONO
       DLA1=TLAT-TLATO                                               ! Q
-!     DL1=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL1=cos(COS(TLAT)*COS(TLATO)*COS(DLM1)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL1=SQRT(DLM1*DLM1+DLA1*DLA1)                                 ! Q
 !
       TLATO=TLATVX(I,J)
       TLONO=TLONVX(I,J)+2.*DLM
       DLM2=TLON-TLONO
       DLA2=TLAT-TLATO                                               ! Q
-!     DL2=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL2=cos(COS(TLAT)*COS(TLATO)*COS(DLM2)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL2=SQRT(DLM2*DLM2+DLA2*DLA2)                                 ! Q
 !
       TLATO=TLATVX(I,J)-DPH
       TLONO=TLONVX(I,J)+DLM
       DLM3=TLON-TLONO
       DLA3=TLAT-TLATO                                               ! Q
-!     DL3=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL3=cos(COS(TLAT)*COS(TLATO)*COS(DLM3)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL3=SQRT(DLM3*DLM3+DLA3*DLA3)                                 ! Q
 !
       TLATO=TLATVX(I,J)+DPH
       TLONO=TLONVX(I,J)+DLM
       DLM4=TLON-TLONO
       DLA4=TLAT-TLATO                                               ! Q
-!     DL4=ACOS(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
+!     DL4=cos(COS(TLAT)*COS(TLATO)*COS(DLM4)+SIN(TLAT)*SIN(TLATO)) ! Q
       DL4=SQRT(DLM4*DLM4+DLA4*DLA4)                                 ! Q
  
 !     THE BILINEAR WEIGHTS

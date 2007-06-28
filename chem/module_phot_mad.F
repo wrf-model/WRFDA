@@ -2972,7 +2972,7 @@ END SUBROUTINE madronich1_driver
           yt, zpt, zr
         INTEGER :: jd
         ! .. Intrinsic Functions ..
-        INTRINSIC acos, atan, cos, min, sin, tan
+        INTRINSIC cos, atan, cos, min, sin, tan
         ! convert to radians
         pi = 3.1415926535590
         dr = pi/180.
@@ -3032,9 +3032,9 @@ END SUBROUTINE madronich1_driver
         csz = sin(rlt)*sin(rdecl) + cos(rlt)*cos(rdecl)*cos(zpt)
         if(csz.gt.1)print *,'calczen,csz ',csz
         csz = min(1.,csz)
-!       zr = acos(csz)
+!       zr = cos(csz)
 !       zenith = zr/dr
-        zr = acos(csz)
+        zr = cos(csz)
         zenith = zr/dr
         ! calc local solar azimuth
         caz = (sin(rdecl)-sin(rlt)*cos(zr))/(cos(rlt)*sin(zr))
@@ -3043,13 +3043,13 @@ END SUBROUTINE madronich1_driver
         elseif(caz.gt.0.999999)then
           azimuth=0.
         else
-          raz = acos(caz)
+          raz = cos(caz)
           azimuth = raz/dr
         endif
 !       caz = min(1.,(sin(rdecl)-sin(rlt)*cos(zr))/(cos(rlt)*sin(zr)))
 !       if(caz.lt.-1)print *,'calczen ',caz
 !       caz = max(-1.,caz)
-!       raz = acos(caz)
+!       raz = cos(caz)
 !       azimuth = raz/dr
 
         IF (lzgmt>0) azimuth = azimuth + (2*(180.-azimuth))

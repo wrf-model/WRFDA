@@ -135,7 +135,7 @@ C   >>>   GENERATE GAUSSIAN LATITUDES                             <<<
 C   =================================================================           
       CALL GAUSS(GAUL,GAUW,JMAX)                                                
       DO 800 J=1,JMAX                                                           
-      COLRAD(J)=ACOS(GAUL(J))                                                   
+      COLRAD(J)=cos(GAUL(J))                                                   
   800 CONTINUE                                                                  
       DO J=1,JMAXHF
 *vdir nodep
