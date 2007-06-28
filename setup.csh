@@ -16,7 +16,8 @@ bjobs >& /dev/null
 if ($status == 0) then
    setenv SUBMIT LSF
    if (! $?LSF_PTILE) then
-      setenv LSF_PTILE 8
+      # Use SMT on a 8 processor node
+      setenv LSF_PTILE 16
    endif
    setenv SUBMIT_OPTIONS1 "#BSUB -R span[ptile=$LSF_PTILE]"
 else

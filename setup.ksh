@@ -16,7 +16,8 @@ if test $COMPILER = xlf; then export COMPILER=ibm; fi
 bjobs > /dev/null 2>&1
 if test $? = 0 ; then
    export SUBMIT=LSF
-   export LSF_PTILE=${LSF_PTILE:-8}
+   # Use SMT on an 8 processor node
+   export LSF_PTILE=${LSF_PTILE:-16}
    export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
 else
    llq > /dev/null 2>&1

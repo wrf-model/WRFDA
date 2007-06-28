@@ -9,7 +9,8 @@ if test ! -z $DIR; then
    shift 2
    typeset REST="$@"
    if test -d $DIR; then
-      echo `date +'%D %T'` "<A HREF=\"$DIR/index.html\">$NAME</a> $REST"
+      # Make the link a relative directory within the experiment
+      echo `date +'%D %T'` "<A HREF=\"${DIR##${EXP_DIR}/}/index.html\">$NAME</a> $REST"
    else
       echo `date +'%D %T'` "$NAME"
    fi
