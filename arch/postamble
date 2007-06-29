@@ -1,4 +1,5 @@
 #
+
 FPPFLAGS        = $(DEFAULT_FPPFLAGS) $(COREDEFS) $(ENVCOMPDEFS) \
                      $(DM_FPPFLAGS) $(EXTRA_FPPFLAGS)
 CPPFLAGS        = -C -P $(TRADFLAG) $(INCS) $(DM_CPPFLAGS)
@@ -16,14 +17,23 @@ FIXEDFLAGS_ENDIAN = $(FCTYPE) $(EXTRA_FCFLAGS)
 
 # compile these simply (no debug or optimisation) to speed compile
 
-module_io_mm5.o module_si_io.o module_io_wrf.o module_domain.o \
-module_start.o module_initialize.o module_initialize_b_wave.o  \
-module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
-module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
-module_configure.o mediation_interp_domain.o solve_em.o        \
-mediation_force_domain.o mediation_feedback_domain.o           \
-module_initialize_real.o module_dm.o start_domain.o \
-nest_init_utils.o couple_or_uncouple_em.o solve_interface.o :
+wrf_bdyout.o wrf_bdyin.o \
+   wrf_restartout.o wrf_restartin.o wrf_inputin.o wrf_inputout.o \
+   wrf_histin.o wrf_histout.o \
+   module_si_io.o module_io_wrf.o module_domain.o \
+   module_start.o module_initialize.o module_initialize_b_wave.o  \
+   module_initialize_hill2d_x.o module_initialize_quarter_ss.o    \
+   module_initialize_squall2d_x.o module_initialize_squall2d_y.o  \
+   module_initialize_real.o module_dm.o start_domain.o \
+   mediation_force_domain.o \
+   mediation_integrate.o \
+   mediation_interp_domain.o \
+   mediation_feedback_domain.o \
+   solve_interface.o                                              \
+   shift_domain_em.o                                              \
+   solve_em.o                                              \
+   solve_nmm.o                                                     \
+   convert_nmm.o    :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b 
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
@@ -32,7 +42,7 @@ nest_init_utils.o couple_or_uncouple_em.o solve_interface.o :
 
 # compile these without warnings, as they generate too many
 
-interp_fcn.o init_modules.o mediation_integrate.o \
+interp_fcn.o init_modules.o \
    mediation_wrfmain.o module_bc.o set_timekeeping.o \
    wrf_fddaobs_in.o module_get_file_names.o module_io_quilt \
    module_integrate.o module_nesting.o module_machine.o \
@@ -55,10 +65,9 @@ interp_fcn.o init_modules.o mediation_integrate.o \
    wrf_auxinput1out.o wrf_auxinput2out.o wrf_auxinput3out.o \
    wrf_auxinput4out.o wrf_auxinput5out.o wrf_auxinput6out.o \
    wrf_auxinput7out.o wrf_auxinput8out.o wrf_auxinput9out.o \
-   wrf_auxinput10out.o wrf_auxinput11out.o wrf_restartin.o \
-   wrf_histin.o output_wrf.o wrf_restartout.o \
-   wrf_ext_read_field.o wrf_ext_write_field.o \
-   wrf_bdyout.o wrf_bdyin.o :
+   wrf_auxinput10out.o wrf_auxinput11out.o \
+   output_wrf.o \
+   wrf_ext_read_field.o wrf_ext_write_field.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.F > $*.b 
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f

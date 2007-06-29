@@ -22,7 +22,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = # O2
 FCDEBUG         = # -g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -63,7 +63,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORD
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -102,7 +102,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -153,7 +153,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -203,7 +203,7 @@ DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         =
 FCDEBUG         = -g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -244,7 +244,7 @@ DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -286,7 +286,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -326,7 +326,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -375,7 +375,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
@@ -427,7 +427,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         =
@@ -469,7 +469,7 @@ FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
 EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,155,158,159
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
@@ -508,7 +508,7 @@ FCOPTIM         =
 FCDEBUG         =
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 
 LOCAL_LIB       = -L/usr/local/lib
 
@@ -543,7 +543,7 @@ FCOPTIM         =
 FCDEBUG         = -g -C
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -590,7 +590,7 @@ FCOPTIM         = -O3 -xW
 FCDEBUG         =
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL
@@ -632,7 +632,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORD
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -671,7 +671,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -720,7 +720,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2 -fastsse
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -764,7 +764,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORD
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 EXTRA_FCFLAGS   = -fno-second-underscore
@@ -802,7 +802,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 EXTRA_FCFLAGS   = -fno-second-underscore
@@ -849,7 +849,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        = -convert big_endian
 EXTRA_FCFLAGS   = -fno-second-underscore
@@ -895,7 +895,7 @@ EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE \
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 
@@ -933,7 +933,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         =
 # Switch off debug options to stop running out of memory
 FCDEBUG         = #-g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 RSL_FCFLAGS     = $(FCENDIAN)
@@ -980,7 +980,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2 -xW
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -FR -cm -w
 FCENDIAN        = -convert big_endian
 RSL_FCFLAGS     = $(FCENDIAN)
@@ -1027,7 +1027,7 @@ EXTRA_FPPFLAGS  = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(N
 
 FCOPTIM         = -O2
 FCDEBUG         = # -g
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        = -64 -mips4
 RSL_FCFLAGS     = $(FCENDIAN)
@@ -1066,7 +1066,7 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
 FCDEBUG         = # -g
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        = -64 -mips4
 EXTRA_FCFLAGS   = -w
@@ -1124,7 +1124,7 @@ DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 FCOPTIM         = -O3
 FCDEBUG         = # -g
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -freeform
 FCENDIAN        =
 EXTRA_FCFLAGS   = -w -ip -tpp2 -ftz -convert big_endian -fno-alias -fno-fnalias \
@@ -1201,7 +1201,7 @@ CC              = cc_r
 CC_TOOLS        = $(CC)
 LD              = $(FC)
 
-NATIVE_RWORDSIZE	= 8
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
@@ -1209,11 +1209,11 @@ EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
 
 FCOPTIM         =
 FCDEBUG         = 
-FCTYPE          = -qrealsize=8
+FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 \
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto \
                     -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
@@ -1241,7 +1241,7 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
-NATIVE_RWORDSIZE	= 8
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
@@ -1254,11 +1254,11 @@ FCOPTIM         =
 FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
                   -qsuppress=1514-008 -qflttrap=zerodivide:invalid:nanq:enable \
                   -qsigtrap=xl__trce
-FCTYPE          = -qrealsize=8
+FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
@@ -1295,7 +1295,7 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
-NATIVE_RWORDSIZE	= 8
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
@@ -1304,13 +1304,13 @@ EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
-FCOPTIM         = -O2 -qarch=auto
+FCOPTIM         = -O2
 FCDEBUG         = 
-FCTYPE          = -qrealsize=8
+FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
@@ -1347,7 +1347,7 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
-NATIVE_RWORDSIZE	= 8
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
@@ -1360,11 +1360,11 @@ FCOPTIM         =
 FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
                   -qsuppress=1514-008 -qflttrap=zerodivide:invalid:nanq:enable \
                   -qsigtrap=xl__trce
-FCTYPE          = -qrealsize=8
+FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
@@ -1393,7 +1393,7 @@ CC              = mpcc_r
 CC_TOOLS        = cc_r
 LD              = $(FC)
 
-NATIVE_RWORDSIZE	= 8
+NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
@@ -1402,13 +1402,13 @@ EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
-FCOPTIM         = -O2 -qarch=auto
+FCOPTIM         = -O2
 FCDEBUG         = 
-FCTYPE          = -qrealsize=8
+FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
@@ -1597,7 +1597,7 @@ EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
 
 FCOPTIM         = 
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
@@ -1640,7 +1640,7 @@ FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
 FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
                      -Wunused-types -Wunused-parameter
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
@@ -1692,7 +1692,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
@@ -1741,7 +1741,7 @@ EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
 
 FCOPTIM         =
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -1782,7 +1782,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio
@@ -1836,7 +1836,7 @@ DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =
-FCTYPE          = -r8
+FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -Mfree
 FCFIXED         = -Mfixed
 FCENDIAN        = -byteswapio

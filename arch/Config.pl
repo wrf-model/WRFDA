@@ -28,6 +28,9 @@ $sw_fftpack_path="";
 $sw_bufr_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
+$sw_max_domains="1"; 
+$sw_rwordsize="8"; 
+$sw_promote_float=""; 
 $WRFCHEM = 0 ;
 $phdf5 = 0 ;
 $pnetcdf = 0 ;
@@ -103,6 +106,15 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 5 ) eq "mach=" ) {
     $sw_mach = substr( $ARGV[0], 6 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 12 ) eq "max_domains=" ) {
+    $sw_max_domains = substr( $ARGV[0], 13 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 10 ) eq "rwordsize=" ) {
+    $sw_rwordsize = substr( $ARGV[0], 11 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 14 ) eq "promote_float=" ) {
+    $sw_promote_float = substr( $ARGV[0], 15 ) ;
   }
   if ( substr( $ARGV[0], 1, 8 ) eq "ldflags=" ) {
     $sw_ldflags = substr( $ARGV[0], 9 ) ;
@@ -225,6 +237,9 @@ while ( <CONFIGURE_PREAMBLE> ) {
   $_ =~ s/CONFIGURE_NMM_CORE/$sw_nmm_core/g ;
   $_ =~ s/CONFIGURE_COAMPS_CORE/$sw_coamps_core/g ;
   $_ =~ s/CONFIGURE_EXP_CORE/$sw_exp_core/g ;
+  $_ =~ s/CONFIGURE_MAX_DOMAINS/$sw_max_domains/g ;
+  $_ =~ s/CONFIGURE_RWORDSIZE/$sw_rwordsize/g ;
+  $_ =~ s/CONFIGURE_PROMOTE_FLOAT/$sw_promote_float/g ;
   
   if ( $sw_netcdf_path ) { 
     $_ =~ s:CONFIGURE_NETCDF_PATH:$sw_netcdf_path:g ;

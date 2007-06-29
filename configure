@@ -12,7 +12,8 @@ export ZLIB=${ZLIB:-}
 export JPEG=${JPEG:-}  
 export JASPER=${JASPER:-}  
 export compileflags=""
-export REGISTRY=Registry.wrfvar
+export MAX_DOMAINS=1
+export RWORDSIZE='$(NATIVE_RWORDSIZE)'
 
 option=$1
 
@@ -22,6 +23,7 @@ option=$1
 if [ "$option" = "wrf" -o "$option" = "em_real" ] ; then
     REGISTRY=Registry.EM
     EM_CORE=1
+    MAX_DOMAINS=21
 elif [ "$option" = "wrf_em" ] ; then
     REGISTRY=Registry.EM
     EM_CORE=1
@@ -38,6 +40,8 @@ else
     DA_CORE=1
     EM_CORE=1
     REGISTRY=Registry.wrfvar
+    export RWORDSIZE="8"
+    export PROMOTE_FLOAT="-DPROMOTE_FLOAT"
 fi
 
 # lifted from the configure file for mpich; 00/03/10 jm
@@ -462,9 +466,10 @@ if test -n "$PERL" ; then
      -hdfeos=$HDFEOS -rttov=$RTTOV -crtm=$CRTM -os=$os -mach=$mach \
      -ldflags=$ldflags -pnetcdf=$PNETCDF -zlib=$ZLIB -jpeg=$JPEG \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
-     -em_core=$EM_CORE -nmm_core=$NMM_CORE \
+     -em_core=$EM_CORE -nmm_core=$NMM_CORE -max_domains=$MAX_DOMAINS \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE \
-     -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR
+     -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR \
+     -rwordsize=$RWORDSIZE -promote_float="$PROMOTE_FLOAT"
 fi
 
 export CONFIG=configure.wrfvar
