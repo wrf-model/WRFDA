@@ -30,7 +30,7 @@ RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_FCFLAGS   = -Ktrap=fp
 EXTRA_CCFLAGS   =
-RSL_CCFLAGS     = 
+RSL_CCFLAGS     = -DLEARN_BCAST
 
 # Libraries
 
@@ -211,7 +211,7 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
-RSL_CCFLAGS     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT -DLEARN_BCAST
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
@@ -252,7 +252,7 @@ EXTRA_FCFLAGS   = -Ktrap=fp
 RSL_FCFLAGS     = $(FCENDIAN)
 
 EXTRA_CCFLAGS   = 
-RSL_CCFLAGS     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT -DLEARN_BCAST
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
@@ -432,7 +432,7 @@ RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         =
 EXTRA_CCFLAGS   =
-RSL_CCFLAGS     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT -DLEARN_BCAST
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
@@ -474,7 +474,7 @@ RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 CCOPTIM         = -O2
 EXTRA_CCFLAGS   =
-RSL_CCFLAGS     = -DMPI2_SUPPORT
+RSL_CCFLAGS     = -DMPI2_SUPPORT -DLEARN_BCAST
 
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -lrsl_lite
@@ -1216,7 +1216,7 @@ FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto \
                     -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -qcpluscmt
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1261,7 +1261,7 @@ FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -I$(RSL)/RSL -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1313,7 +1313,7 @@ FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -I$(RSL)/RSL -qcpluscmt
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -I$(RSL)/RSL -qcpluscmt
 RSL_CCFLAGS     =
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
@@ -1367,8 +1367,8 @@ FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
-RSL_CCFLAGS     =
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -qcpluscmt
+RSL_CCFLAGS     = -DLEARN_BCAST -DMPI2_SUPPORT
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
@@ -1411,8 +1411,8 @@ FCENDIAN        =
 EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -qcpluscmt
-RSL_CCFLAGS     =
+EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -qcpluscmt
+RSL_CCFLAGS     = -DLEARN_BCAST -DMPI2_SUPPORT
 
 EXTRA_LDFLAGS   = -bmaxstack:256000000 -bmaxdata:2048000000
 
