@@ -34,6 +34,7 @@ $sw_promote_float="";
 $WRFCHEM = 0 ;
 $phdf5 = 0 ;
 $pnetcdf = 0 ;
+$grib1 = 0 ;
 $grib2 = 0 ;
 $sw_os = "ARCH" ;           # ARCH will match any
 $sw_mach = "ARCH" ;         # ARCH will match any
@@ -139,6 +140,10 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
     $where_index = index ( $sw_compileflags , "-DPNETCDF" ) ;
     if ( $where_index ne -1 ) {
       $pnetcdf = 1 ;
+    } 
+    $where_index = index ( $sw_compileflags , "-DGRIB1" ) ;
+    if ( $where_index ne -1 ) {
+      $grib1 = 1 ;
     } 
     $where_index = index ( $sw_compileflags , "-DGRIB2" ) ;
     if ( $where_index ne -1 ) {
@@ -313,6 +318,20 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_JPEG_LIB:-L$sw_jpeg_path/lib -ljpeg: ;
   } else { 
     $_ =~ s:CONFIGURE_JPEG_LIB::g ;
+  }
+
+  if ( $grib1 == 1 ) {
+    $_ =~ s:CONFIGURE_WRFIO_GRIB1:wrfio_grib1:g ;
+    $_ =~ s:CONFIGURE_GRIB1_FLAG:-DGRIB1:g ;
+    $_ =~ s:CONFIGURE_GRIB1_INC:\$(IO_GRIB1):g ;
+    $_ =~ s:CONFIGURE_GRIB1_LIBS:\$(IO_GRIB1)/libio_grib1.a: ;
+    $_ =~ s:CONFIGURE_GRIB1_LIB:-L\$(IO_GRIB1) -lio_grib1:g ;
+  } else { 
+    $_ =~ s:CONFIGURE_WRFIO_GRIB1::g ;
+    $_ =~ s:CONFIGURE_GRIB1_FLAG::g ;
+    $_ =~ s:CONFIGURE_GRIB1_INC:.:g ;
+    $_ =~ s:CONFIGURE_GRIB1_LIBS:: ;
+    $_ =~ s:CONFIGURE_GRIB1_LIB::g ;
   }
 
   if ( $grib2 == 1 && $sw_jasper_path ) {

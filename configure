@@ -437,25 +437,31 @@ fi
 # the "!" is removed by Config.pl
 if [ -n "$WRF_CHEM" ] ; then
   if [ $WRF_CHEM = 1 ] ; then
-    echo building WRF with chemistry option
+    echo building with chemistry option
     compileflags="${compileflags}!-DWRF_CHEM"
   fi
 fi
 if [ -n "$WRF_PNETCDF" ] ; then
   if [ $WRF_PNETCDF = 1 ] ; then
-    echo building WRF with parallel netcdf option
+    echo building with parallel netcdf option
     compileflags="${compileflags}!-DPNETCDF"
   fi
 fi
 if [ -n "$WRF_PHDF5" ] ; then
   if [ $WRF_PHDF5 = 1 ] ; then
-    echo building WRF with parallel hdf5 option
+    echo building with parallel hdf5 option
     compileflags="${compileflags}!-DPHDF5"
+  fi
+fi
+if [ -n "$WRF_GRIB1" ] ; then
+  if [ $WRF_GRIB1 = 1 ] ; then
+    echo building with GRIB1 option
+    compileflags="${compileflags}!-DGRIB1"
   fi
 fi
 if [ -n "$WRF_GRIB2" ] ; then
   if [ $WRF_GRIB2 = 1 ] ; then
-    echo building WRF with GRIB2 option
+    echo building with GRIB2 option
     compileflags="${compileflags}!-DGRIB2"
   fi
 fi
