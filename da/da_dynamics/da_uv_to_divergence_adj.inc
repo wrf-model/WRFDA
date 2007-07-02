@@ -9,7 +9,7 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
 
    implicit none
 
-   type (domain)      :: grid
+   type (domain), intent(inout) :: grid
 
    type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
 

@@ -17,7 +17,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    real                ,  intent (in) :: tb(nchanl,nprofiles)
 
    ! local variables
-   integer             :: n, nc, ios
+   integer             :: n, nc
    Integer             :: alloc_status(140)
 
    ! RTTOV input parameters

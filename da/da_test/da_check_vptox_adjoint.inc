@@ -8,7 +8,7 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    implicit none
 
-   type (domain)                    :: grid
+   type (domain), intent(inout)     :: grid
 
    integer, intent(in)              :: ne   ! Ensemble size.
    type (xb_type), intent(in)       :: xb   ! first guess.

@@ -9,7 +9,7 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
 
    implicit none
 
-   type (domain)                    :: grid
+   type (domain), intent(inout)     :: grid
 
    type (xb_type), intent(in)       :: xb           ! First guess structure.
    type (x_type), intent(inout)     :: xa           ! increment structure.

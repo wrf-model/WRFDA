@@ -6,7 +6,7 @@ subroutine da_transform_vtovv_adj(grid, cv_size, xb, be, cv, vv, xp)
 
    implicit none
 
-   type(domain)                     :: grid
+   type(domain), intent(inout)      :: grid
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xb_type), intent(in)       :: xb   ! First guess structure.

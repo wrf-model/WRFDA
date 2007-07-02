@@ -17,12 +17,13 @@ program gen_be_stage0_wrf
 #define iargc ipxfargc
 #endif
 
-   use da_control, only : num_fft_factors, pi, stdout, stderr, trace_use, &
+   use da_control, only : num_fft_factors, pi, stdout, stderr, &
       da_find_fft_factors,da_find_fft_trig_funcs,filename_len, base_pres, &
       base_temp, base_lapse
    use da_gen_be, only : da_get_field, da_get_height, da_get_trh, &
       da_stage0_initialize
-   use da_tools1
+   use da_tools1, only : da_get_unit, da_free_unit
+   use module_ffts, only : fft551, fft661
 
    implicit none
 
@@ -1037,6 +1038,8 @@ end subroutine da_test_inverse
 
 !---------------------------------------------------------------------------------------------
 
+#if 0
+! routine never used
 subroutine da_test_inverse2( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
                             u1, v1, psi, chi )
 
@@ -1101,6 +1104,7 @@ subroutine da_test_inverse2( dim1, dim2, ds, mapfac_m, mapfac_u, mapfac_v, &
                          sqrt(sum( ( v3(:,:) -  v2(:,:) )**2 ) / sum( v2(:,:)**2 ))
 
 end subroutine da_test_inverse2
+#endif
 
 !----------------------------------------------------------------------------------------
 
@@ -1220,6 +1224,8 @@ end subroutine da_test_inverse2
 
    END SUBROUTINE da_sor
 
+#if 0
+! routine never used
    SUBROUTINE da_relax (psi, vor, residual, ids, ide, jds, jde, ds)
 
       IMPLICIT NONE
@@ -1332,6 +1338,7 @@ end subroutine da_test_inverse2
       residual(:,:) = rd(:,:)
 
    END SUBROUTINE da_relax
+#endif
 
 #ifdef crayx1
 
@@ -1344,10 +1351,6 @@ end subroutine da_test_inverse2
      return
    end subroutine getarg
 #endif
-
-#include "fft551.inc"
-#include "fft661.inc"
-#include "qpassm.inc"
 
 end program gen_be_stage0_wrf
 

@@ -21,8 +21,7 @@ subroutine da_rttov_init(iv,ob)
 
    !  local arguments
    !------------------- 
-   integer   :: i, k,j,bunit, iscan,ichan,npos,unit_factor_rad
-   real      :: ave
+   integer   :: i, j,ichan,unit_factor_rad
 
    !
    !  input parameters of RTTOV_SETUP

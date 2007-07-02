@@ -13,7 +13,7 @@ subroutine da_transform_through_rf_adj(grid, mz, grid_box_area, rf_alpha, val,&
 
    implicit none
 
-   type (domain)       :: grid
+   type (domain), intent(inout) :: grid
 
    integer, intent(in) :: mz                ! Vertical truncation.
 

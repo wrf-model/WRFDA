@@ -8,7 +8,7 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
 
    implicit none
 
-   type (domain)                  :: grid
+   type (domain), intent(inout)   :: grid
 
    type (xb_type),    intent(in)  :: xb  ! first guess (local).
    type (x_type) ,    intent(inout) :: xa  ! gridded analy. incs. (local)

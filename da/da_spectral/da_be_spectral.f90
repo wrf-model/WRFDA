@@ -1,6 +1,6 @@
 module da_be_spectral
 
-   use da_control, only : trace_use, trace_use_frequent,da_zero_complex,ierr, &
+   use da_control, only : da_zero_complex,ierr, &
       pi,gaussian_lats
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit

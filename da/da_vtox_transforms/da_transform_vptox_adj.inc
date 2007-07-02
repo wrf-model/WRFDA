@@ -6,7 +6,7 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    implicit none
 
-   type (domain)                        :: grid
+   type (domain), intent(inout)         :: grid
 
    type (xb_type), intent(in)           :: xb  ! First guess structure.
    type (x_type), intent(inout)         :: xa  ! Grad_x(Jo)

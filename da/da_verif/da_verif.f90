@@ -9,18 +9,27 @@ program da_verif
    !  Author:   Syed RH Rizvi     NCAR/MMM         05/25/2006
    !---------------------------------------------------------------------------
    
-   use da_verif_control
-   use da_verif_init      
+   use da_verif_control, only : surface_type, upr_type, gpspw_type, &
+      gpsref_type, record1, record2, record3, record4, record5, stats_value, &
+      exp_dirs, out_dirs, nstd, num_miss, rmiss, diag_unit_out, nml_unit, &
+      diag_unit_in, info_unit, exp_num, end_date, file_path_string, &
+      if_plot_bias, if_plot_airsret, if_plot_airep,if_plot_abias, &
+      if_plot_buoy, if_plot_gpspw, if_plot_gpsref, if_plot_pilot, &
+      if_plot_profiler, if_plot_polaramv, if_plot_qscat, if_plot_rmse, &
+      if_plot_sound, if_plot_sonde_sfc, if_plot_synop, if_plot_surface, &
+      if_plot_upr, if_plot_ships, if_plot_metar, interval, stdp, start_date, &
+      if_plot_geoamv
+   use da_verif_init, only : initialize_surface_type, initialize_upr_type, &
+      initialize_gpspw_type, initialize_gpsref_type, da_advance_cymdh
   
    implicit none
                                           ! Typically 12 hours
    integer      :: num_obs 
    character*20 :: obs_type, dummy_c
-   character*80 :: head               
    
    character*5  :: stn_id               
-   integer      :: i,n, k, kk, l, levels, dummy_i
-   real         :: lat, lon, press, miss , dummy           
+   integer      :: n, k, kk, l, levels, dummy_i
+   real         :: lat, lon, press, dummy           
    real         :: u_obs, u_inv, u_error, u_inc, & 
                    v_obs, v_inv, v_error, v_inc, &
                    t_obs, t_inv, t_error, t_inc, &
@@ -610,7 +619,6 @@ subroutine write_diag_single_level(out_dir,ounit,ldate,obs_type,omb,oma)
  
    character*512                  :: filename         
    integer                        :: ounit1, ounit2
-   logical                        :: is_file
 
    ounit1 = ounit
    ounit2 = ounit + 1

@@ -1,6 +1,8 @@
   PROGRAM da_bias_verif
 
-  USE RAD_BIAS
+  USE RAD_BIAS, only : bias, long, jpchan, jpscan,jband, jpnx, &
+     da_read_biasprep, read_biascoef, get_scorr, qc_amsua, qc_amsub, mask, &
+     write_biascoef, jpny
 
 ! PURPOSE.
 ! --------
@@ -17,23 +19,9 @@
   REAL(KIND=LONG) :: vmean_dep1(JPCHAN), vmean_abs1(JPCHAN)
   REAL(KIND=LONG) :: vstd_dep1(JPCHAN), vstd_abs1(JPCHAN)
 
-  REAL(KIND=LONG) :: vmn(JPCHAN), vstd(JPCHAN), airbias(JPCHAN)
+  REAL(KIND=LONG) :: airbias(JPCHAN)
 
-  REAL :: pred(JPNX)
-
-  REAL(KIND=LONG) :: xbar(JPNY,JPNX), ybar(JPNY)
-  REAL(KIND=LONG) :: xcov(JPNY,JPNX,JPNX), ycov(JPNY), xycov(JPNY,JPNX)
-
-  REAL(KIND=LONG) :: coef(JPNY,JPNX), coef0(JPNY)
-  REAL(KIND=LONG) :: reserr(JPNY), rescov(JPNY,JPNY)
-  REAL(KIND=LONG) :: xvec(JPNY,JPNX,JPNX)
-  REAL(KIND=LONG) :: xreser(JPCHAN), xcoef0(JPCHAN), xcoef(JPCHAN,JPNX)
-
-  REAL(KIND=LONG) :: vmnbd(JPNY,6), vstdbd(JPNY,6)
-  REAL(KIND=LONG) :: vmnbdl(JPNY,6,0:1), vstdbdl(JPNY,6,0:1)
-  REAL(KIND=LONG) :: vmnb0(JPNY,6), vstdb0(JPNY,6)
-  REAL(KIND=LONG) :: vmnbl0(JPNY,6,0:1), vstdbl0(JPNY,6,0:1)
-  REAL(KIND=LONG) :: dvmnbd(JPNY,6), dvstdb(JPNY,6)
+  REAL(KIND=LONG) :: xcoef0(JPCHAN), xcoef(JPCHAN,JPNX)
 
   REAL(KIND=LONG) :: vmnrl(JPCHAN,JPSCAN) = 0.0
   REAL(KIND=LONG) :: vmnrlb(JPCHAN,JPSCAN,JBAND) = 0.0
@@ -42,17 +30,13 @@
 
   INTEGER :: nsel(10)
   INTEGER :: nobs(JPCHAN),nobs1(JPCHAN)
-  INTEGER :: nobsy(JPNY),lchan
 
   LOGICAL :: LMASK
 
   LOGICAL :: lscan = .FALSE.
 
-  INTEGER :: IR, ibin, I, iband, II, IV, ib, ierr
-  INTEGER :: JS, J, JJ, JCOUNT, JBOX, JMINI, JSCAN, jv, IIV, JJV, sband
-
-  REAL(KIND=LONG) :: xcorr(JPCHAN)
-  REAL(KIND=LONG) :: coef_year, coef_month, coef_day, coef_time
+  INTEGER :: I, iband, ierr
+  INTEGER :: J, JSCAN, jv
 
   INTEGER :: kscanx=90, jbandx
   LOGICAL :: check_limb=.false., check_mask=.false., global
@@ -92,8 +76,6 @@
   vmean_abs1(:) = 0.0
   vstd_dep1(:)  = 0.0
   vstd_abs1(:)  = 0.0
-
-  200  CONTINUE
 
   READ(UNIT=10,END=300)  tovs%nchan, tovs%npred    ! Read in data
   REWIND(UNIT=10)
@@ -208,8 +190,6 @@ loop2:&
     end if
 
   ENDDO loop2
-
-  365 CONTINUE
 
 ! Calculate means, standard deviations and covariances
 

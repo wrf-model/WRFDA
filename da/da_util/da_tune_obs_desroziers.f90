@@ -35,7 +35,7 @@ program da_tune_obs_desroziers
        &    'vissr   ', 'mvisr   ', 'cris    ', 'cmis    ', 'viirs   ',  &
        &    'windsat ', 'gifts   ', 'xxxxxxxx', 'xxxxxxxx', 'xxxxxxxx'   /)
 
-   integer                       :: n,k,ipixel
+   integer                       :: n,ipixel
 
    ! radiance namelist variables
 
@@ -592,7 +592,7 @@ subroutine da_read_y( y_unit, ob )
    integer, intent(in)               :: y_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20 :: ob_name, dummy
+   character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs   
    integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
                    iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
@@ -925,7 +925,7 @@ subroutine da_read_yp( yp_unit, ob )
    integer, intent(in)               :: yp_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20 :: ob_name, dummy
+   character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs   
    integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
                    iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
@@ -1210,7 +1210,7 @@ subroutine da_read_obs_rand( rand_unit, ob )
    integer, intent(in)               :: rand_unit
    type (ob_type), intent(inout)     :: ob
 
-   character*20 :: ob_name, dummy
+   character*20 :: ob_name
    integer      :: n, ndum, k, kdum, num_obs, num_levs
    integer      :: isynop, imetar, iships, ipolaramv, igeoamv, igpspw, isound, &
                    iairep, ipilot, issmir, isatem, issmt1, issmt2, iairsr, &
@@ -1555,7 +1555,6 @@ subroutine da_calc_jo_expected( ob )
    integer              :: n, k
    integer              :: count1, count2, count3, count4, count5
    real                 :: trace1, trace2, trace3, trace4, trace5
-   real                 :: factor
    
    ob % trace_total = 0
    
@@ -2584,7 +2583,6 @@ subroutine da_calc_new_factors1( ob_name, ob_num, ob_num_tot, &
    real, intent(in)               :: j1e, j2e, j3e, j4e, j5e
    real, intent(in)               :: j1a, j2a, j3a, j4a, j5a
 
-   real                           :: j1, j2, j3, j4, j5   
    real                           :: f1, f2, f3, f4, f5
          
    f1 = 1.0; f2 = 1.0; f3 = 1.0; f4 = 1.0; f5 = 1.0

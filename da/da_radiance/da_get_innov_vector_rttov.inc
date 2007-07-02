@@ -19,7 +19,7 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    type (y_type),  intent(inout)  :: ob       ! Observation structure.
    type (ob_type), intent(inout)  :: iv       ! O-B structure.
 
-   integer                        :: n,i        ! Loop counter.
+   integer                        :: n        ! Loop counter.
    integer                        :: k  ! Index dimension.
    integer                        :: nlevels ! Number of obs levels.
 

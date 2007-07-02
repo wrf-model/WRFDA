@@ -27,8 +27,8 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
 
    ! local variables
    integer             :: nfrequencies, nchannels, nbtout
-   integer             :: n, nc, ios, ich, i, ichannel, pol_id
-   Integer             :: alloc_status(40), emis_scheme
+   integer             :: n, nc, i, ichannel, pol_id
+   Integer             :: alloc_status(40)
 
    ! RTTOV input parameters
    ! integer             :: nfrequencies, nchannels, nbtout

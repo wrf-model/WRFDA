@@ -6,7 +6,7 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
    
    implicit none
 
-   type (domain)                    :: grid
+   type (domain), intent(inout)     :: grid
   
    type (xb_type),    intent(in)    :: xb    ! first guess (local).
    type (x_type),     intent(inout) :: xa    ! analysis increments (local).

@@ -24,7 +24,6 @@ program gen_be_stage4_regional
    real                :: count                      ! Counter for times/members.
    integer, allocatable:: nr(:)                      ! Number of points in each bin.
    real, allocatable   :: field(:,:)                 ! Input 2D field.
-   real, allocatable   :: r(:)                       ! Radius of each bin.
    real, allocatable   :: cov(:)                     ! Covariance as a function of distance.
 
    namelist / gen_be_stage4_regional_nl / start_date, end_date, interval, variable, &
@@ -94,7 +93,6 @@ program gen_be_stage4_regional
             nn = ni * ni + nj * nj  ! Maximum radius across grid (squared).
             allocate(field(1:ni,1:nj))
             allocate(nr(0:nn))
-            allocate(r(0:nn))
             allocate(cov(0:nn))
             cov(0:nn) = 0.0
 
@@ -130,10 +128,9 @@ program gen_be_stage4_regional
    close(unit=ounit, status='keep')
 
    deallocate (field) 
-   deallocate (r)
    deallocate (cov)
 
-end program gen_be_stage4_regional
+contains
 
 subroutine get_grid_info( ni, nj, nn, stride, nr )
 
@@ -336,3 +333,5 @@ subroutine make_scale_length( variable, ck, ounit, nn, nr, cov )
 
 end subroutine make_scale_length
 
+
+end program gen_be_stage4_regional

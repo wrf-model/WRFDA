@@ -18,7 +18,7 @@ module da_vtox_transforms
       domain
 
    use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
-      ips,ipe,jps,jpe,kps,kpe, its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
+      its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
       vertical_ip,alphacv_method,use_radarobs,use_radar_rf,Use_SsmiTbObs, &
       Use_SsmiRetrievalObs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
       use_gpsrefobs,sfc_assi_options, test_wrfvar, vert_corr, fg_format, &
