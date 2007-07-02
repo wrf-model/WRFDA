@@ -12282,7 +12282,7 @@ END SUBROUTINE t_spec_bdyupdate
    rv_tendf=S_rv_tendf
 
    call a_surface_drag(ru_tendf, P_ru_tendf, rv_tendf, P_rv_tendf, u, P_u, v, P_v, xland, muu, P_muu, muv, P_muv, z, &
-&P_z, z_at_w, P_z_at_w, ide, jde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
+&P_z, z_at_w, P_z_at_w, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )
 
     VAL_A=0.0
     VAL_A= sum(P_ru_tendf*B_ru_tendf) +sum(P_rv_tendf*B_rv_tendf) &
