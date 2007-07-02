@@ -121,6 +121,7 @@ cat > nml_verif << EOF
  &INPUTS
   global=.false.,
   lscan = .true.,
+  kscanx= ${NSCAN},
   check_limb = .false.,
   check_mask = .false.,
   FAC=2,

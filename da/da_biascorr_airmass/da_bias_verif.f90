@@ -54,13 +54,13 @@
   REAL(KIND=LONG) :: xcorr(JPCHAN)
   REAL(KIND=LONG) :: coef_year, coef_month, coef_day, coef_time
 
-  INTEGER :: kscanx, jbandx
+  INTEGER :: kscanx=90, jbandx
   LOGICAL :: check_limb=.false., check_mask=.false., global
   REAL    :: FAC = 3.0      ! Number of SD' for QC
 
   INTEGER :: nchan,nscan,nband,npred
 
-  NAMELIST /INPUTS/ global,lscan, check_limb, check_mask, FAC
+  NAMELIST /INPUTS/ global,lscan, kscanx, check_limb, check_mask, FAC
 
 !------------------------------------------------------------------------------
 !        1.   SETUP.
