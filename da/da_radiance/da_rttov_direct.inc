@@ -37,9 +37,9 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
    type(rttov_coef)    :: coef
    type(profile_type)  :: profiles(nprofiles) 
    logical             :: addcloud
-   real ,    pointer   :: surfem(:)
+   real, allocatable    :: surfem(:)
    integer , pointer   :: channels (:), polarisations(:,:)
-   logical , pointer   :: calcemis (:)
+   logical, allocatable :: calcemis (:)
 
    ! RTTOV out parameters
    integer             :: errorstatus(nprofiles)

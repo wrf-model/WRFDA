@@ -62,6 +62,7 @@ module da_test
    use da_tracing, only : da_trace_entry,da_trace_exit
    ! Don't use, as we pass a 3D array into a 1D one
    ! use da_wrf_interfaces, only : wrf_dm_bcast_real
+   use da_wrf_interfaces, only : wrf_debug, wrf_shutdown
    use da_vtox_transforms, only : da_transform_xtotb_lin, &
       da_transform_xtotb_adj, da_vertical_transform, da_transform_vptox, &
       da_transform_xtogpsref_adj,da_transform_vptox_adj,da_transform_vtox, &

@@ -27,6 +27,7 @@ module da_physics
    use da_dynamics, only : da_w_adjustment_adj, da_uv_to_divergence_adj, &
       da_w_adjustment_lin, da_uv_to_divergence
    use da_reporting, only : da_error, message
+   use da_wrf_interfaces, only : wrf_debug
 
    implicit none
 

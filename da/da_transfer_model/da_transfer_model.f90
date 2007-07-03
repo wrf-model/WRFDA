@@ -50,6 +50,7 @@ module da_transfer_model
    ! Do not use line below, because it shows that we are passing a scalar to 
    ! an array
    ! use da_wrf_interfaces, only : wrf_dm_bcast_real
+   use da_wrf_interfaces, only : wrf_debug
 
    implicit none
 

@@ -38,7 +38,8 @@
   INTEGER :: I, iband, ierr
   INTEGER :: J, JSCAN, jv
 
-  INTEGER :: kscanx=90, jbandx
+  INTEGER :: kscanx=90
+  ! INTEGER :: jbandx
   LOGICAL :: check_limb=.false., check_mask=.false., global
   REAL    :: FAC = 3.0      ! Number of SD' for QC
 

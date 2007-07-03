@@ -39,6 +39,7 @@ module da_vtox_transforms
       da_transform_xtoseasfcwind_adj, da_transform_xtotb_lin
    use da_tools, only : da_set_boundary_xa
    use da_tracing, only : da_trace_entry, da_trace_exit
+   use da_wrf_interfaces, only : wrf_debug
 
    implicit none
 

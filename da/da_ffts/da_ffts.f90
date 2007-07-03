@@ -12,6 +12,7 @@ module da_ffts
    use da_par_util, only : da_transpose_x2z, da_transpose_y2x, &
       da_transpose_y2x_v2, da_transpose_z2x, da_transpose_x2y, &
       da_transpose_x2y_v2
+   use da_wrf_interfaces, only : wrf_debug
    use module_dm, only : wrf_dm_sum_reals
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, local_communicator_x, &

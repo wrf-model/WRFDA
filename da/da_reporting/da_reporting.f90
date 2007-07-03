@@ -8,6 +8,17 @@ module da_reporting
 
    implicit none
 
+   interface
+      subroutine wrf_message(str)
+         character(len=*), intent(in) :: str
+      end subroutine wrf_message
+   end interface
+
+   interface
+      subroutine wrf_abort
+      end subroutine wrf_abort
+   end interface 
+
    character(len=10000) :: message(50)
 
 contains
