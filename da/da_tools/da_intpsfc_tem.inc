@@ -69,7 +69,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
    if ((k_100mb .LE. kts) .OR. (k_200mb .LE. kts) .OR. &
         (k_200mb .LT. k_100mb)) then
-      write (unit=message(1),fmt='(A)') ' CANNOT FinD SFC + 200hPA AND SFC + 100hPA' 
+      write (unit=message(1),fmt='(A)') ' Cannot find sfc + 200hPa and sfc + 100hPa' 
       write (unit=message(2),fmt='(A,I2,A,F10.3)') ' P (',k_200mb,') = ',prs_mb (k_200mb) 
       write (unit=message(3),fmt='(A,I2,A,F10.3)') ' P (',k_100mb,') = ',prs_mb (k_100mb) 
       write (unit=message(4),fmt='(A,F10.3)')      ' P_SFC  = ',         prs_mb (kts) 

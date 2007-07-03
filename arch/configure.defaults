@@ -17,8 +17,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     =
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
+DM_FLAGS       = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = # O2
 FCDEBUG         = # -g -C
@@ -97,8 +96,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS       = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
@@ -148,8 +146,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS       = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =
@@ -198,8 +195,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -D
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+DM_FLAGS       = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         =
 FCDEBUG         = -g -C
@@ -239,8 +235,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+DM_FLAGS       = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =
@@ -314,8 +309,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags`-I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
@@ -366,8 +360,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         = 
@@ -416,8 +409,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
+DM_FLAGS        = -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
@@ -460,8 +452,7 @@ TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
+DM_FLAGS        = -DRSL_LITE -DDM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         = 
@@ -536,8 +527,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = 
 FCDEBUG         = -g -C
@@ -583,8 +573,7 @@ NATIVE_RWORDSIZE	= 4
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O3 -xW
 FCDEBUG         =
@@ -666,8 +655,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
@@ -715,8 +703,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2 -fastsse
 FCDEBUG         =
@@ -797,8 +784,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g
@@ -844,8 +830,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         =
@@ -927,8 +912,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 # Switch off debug options to stop running out of memory
@@ -975,8 +959,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional
 EXTRA_FPPFLAGS  = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
 		     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2 -xW
 FCDEBUG         =
@@ -1062,8 +1045,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 FCOPTIM         = -O3 -OPT:roundoff=3:IEEE_arithmetic=3
 FCDEBUG         = # -g
 FCTYPE          = -r$(RWORDSIZE)
@@ -1120,8 +1102,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        =
 EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 FCOPTIM         = -O3
 FCDEBUG         = # -g
 FCTYPE          = -r$(RWORDSIZE)
@@ -1247,8 +1228,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = 
 FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
@@ -1301,8 +1281,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         = 
@@ -1353,8 +1332,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+DM_FLAGS        = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = 
 FCDEBUG         = -g -qfullpath -C -qinitauto -qflag=I:I -qtbtable=full \
@@ -1399,8 +1377,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = 
-DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
+DM_FLAGS        = -DDM_PARALLEL -DRSL_LITE
 
 FCOPTIM         = -O2
 FCDEBUG         = 
@@ -1486,8 +1463,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional-cpp
 EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g
@@ -1543,8 +1519,7 @@ NATIVE_RWORDSIZE	= 8
 TRADFLAG        = -traditional-cpp
 EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -Ofp3 -O3
 FCDEBUG         = 
@@ -1633,8 +1608,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -ftrace=full -finteger=-9999 -freal=nan -C
@@ -1687,8 +1661,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                      
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2
 FCDEBUG         =
@@ -1777,8 +1750,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         =
 FCDEBUG         = -g -C
@@ -1831,8 +1803,7 @@ TRADFLAG        =
 EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
                      -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
                     
-DM_CPPFLAGS     = -I$(RSL)/RSL
-DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
+DM_FLAGS        = `cat inc/dm_comm_cpp_flags` -I$(RSL)/RSL -DRSL -DM_PARALLEL
 
 FCOPTIM         = -O2 -fast
 FCDEBUG         =

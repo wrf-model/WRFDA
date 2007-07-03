@@ -8,6 +8,7 @@ module da_physics
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, mytask, ntasks, ntasks_x, &
       ntasks_y, data_order_xyz
+   use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
 #ifdef RSL
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
