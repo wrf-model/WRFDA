@@ -34,7 +34,7 @@ module da_par_util
       rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &
       kts,kte,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe, &
       kps, kpe, grid_stagger, grid_ordering
-   use da_reporting, only : da_error
+   use da_reporting, only : da_error,message
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_wrf_interfaces, only : &
       wrf_dm_xpose_z2x,wrf_dm_xpose_x2y, wrf_dm_xpose_y2x, wrf_dm_xpose_x2z, &
