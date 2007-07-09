@@ -19,7 +19,7 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
    ! distributed-memory parallelism occur here if DM_PARALLEL is specified
    ! in the compile: setting up I/O quilt processes to act as I/O servers
    ! and dividing up MPI communicators among those as well as initializing
-   ! external communication packages such as RSL or RSL_LITE.
+   ! external communication packages.
    !-----------------------------------------------------------------------
 
    implicit none
@@ -81,21 +81,9 @@ subroutine da_esmf_init( gcomp, importState, exportState, clock, rc )
 
    nullify( null_domain )
 
-   !<DESCRIPTION>
-   ! RSL is required for WRFVAR nesting options.
-   ! The non-MPI build that allows nesting is only supported on machines
-   ! with the -DSTUBMPI option.  Check to see if the WRFVAR model is being asked 
-   ! for a for a multi-domain run (max_dom > 1, from the namelist).  If so,
-   ! then we check to make sure that we are under the parallel
-   ! run option or we are on an acceptable machine.
-   !</DESCRIPTION>
-
    call nl_get_max_dom( 1, max_dom )
    if ( max_dom > 1 ) then
-#if ( ! defined(DM_PARALLEL)  &&   ! defined(STUBMPI) )
-      call da_error(__FILE__,__LINE__, &
-         'nesting requires either an MPI build or use of the -DSTUBMPI option' ) 
-#endif
+      call da_error(__FILE__,__LINE__, (/'nesting not available for wrfvar'/))
    end if
 
    !<DESCRIPTION>

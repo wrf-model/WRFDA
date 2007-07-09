@@ -46,20 +46,9 @@ subroutine da_wrfvar_init2
 
    nullify(null_domain)
 
-   !<DESCRIPTION>
-   ! RSL is required for WRF nesting options.
-   ! The non-MPI build that allows nesting is only supported on machines
-   ! with the -DSTUBMPI option.  Check to see if the WRF model is being asked 
-   ! for a for a multi-domain run (max_dom > 1, from the namelist).  If so,
-   ! then we check to make sure that we are under the parallel
-   ! run option or we are on an acceptable machine.
-   !</DESCRIPTION>
 
    if (max_dom > 1) then
-#if (! defined(DM_PARALLEL) && ! defined(STUBMPI))
-      call da_error(__FILE__,__LINE__, &
-         (/'nesting requires either an MPI build or use of the -DSTUBMPI option'/)) 
-#endif
+      call da_error(__FILE__,__LINE__, (/'nesting not available for wrfvar'/))
    end if
 
    !<DESCRIPTION>

@@ -48,28 +48,8 @@ subroutine da_solve_init(grid &
    sm33y            = grid%sm33y
 
 #ifdef DM_PARALLEL
-   if (trace_use) call da_trace("da_solve_init", &
-      Message="Setup register xpose arrays")
-#ifndef RSL_LITE
-   ! Register xpose arrays and build messages for processor communication.
 #define REGISTER_I1
 #include "em_data_calls.inc"
-   ! XPOSE_V1
-   if (grid%comms(XPOSE_V1) == invalid_message_value) then
-      call setup_xpose_rsl(grid)
-      call reset_msgs_xpose
-      call true_MSG_XPOSE (grid%xp%v1z, grid%xp%v1x, grid%xp%v1y, 3)
-      call define_xpose (grid%domdesc , grid%comms (XPOSE_V1))
-   end if
-
-   ! XPOSE_V2
-   if (grid%comms(XPOSE_V2) == invalid_message_value) then
-      call setup_xpose_rsl(grid)
-      call reset_msgs_xpose
-      call true_MSG_XPOSE (grid%xp%v2z, grid%xp%v2x, grid%xp%v2y, 3)
-      call define_xpose (grid%domdesc , grid%comms (XPOSE_V2))
-   end if
-#endif
 
    if (trace_use) call da_trace("da_solve_init", &
       Message="Setup halo region communication")

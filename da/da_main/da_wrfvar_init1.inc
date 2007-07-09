@@ -17,7 +17,7 @@ subroutine da_wrfvar_init1(no_init1)
    ! distributed-memory parallelism occur here if DM_PARALLEL is specified
    ! in the compile: setting up I/O quilt processes to act as I/O servers
    ! and dividing up MPI communicators among those as well as initializing
-   ! external communication packages such as RSL or RSL_LITE.
+   ! external communication packages.
    !
    !</DESCRIPTION>
 
