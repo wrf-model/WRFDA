@@ -20,6 +20,8 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
    integer :: local_kme
    integer :: local_kpe
 
+#ifdef DM_PARALLEL
+
    if (present(mz)) then
       local_kde = kds + mz - 1
       local_kme = local_kde
@@ -37,6 +39,9 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
          ims, ime, jms, jme, kms, local_kme,  &
          ips, ipe, jps, jpe, kps, local_kpe)
    end if
+#else
+   vglobal(:,:,:) = vlocal(:,:,:)
+#endif
 
 end subroutine da_patch_to_global_3d
 
