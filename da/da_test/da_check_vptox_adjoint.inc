@@ -1,4 +1,4 @@
-subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
+subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test Vp to X routine and adjoint for compatibility.
@@ -11,12 +11,9 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
    type (domain), intent(inout)     :: grid
 
    integer, intent(in)              :: ne   ! Ensemble size.
-   type (xb_type), intent(in)       :: xb   ! first guess.
    type (be_type), intent(in)       :: be   ! background errors.
    type (ep_type), intent(in)       :: ep   ! Ensemble perturbation type.
-   type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
    type (vp_type),intent(inout)     :: vp   ! grdipt/level cv (local).
-   type (x_type), intent(inout)     :: xa   ! grad_x(jo)
 
    real                             :: adj_par_lhs ! < x, x >
    real                             :: adj_par_rhs ! < v_adj, v >
@@ -37,26 +34,26 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    write(unit=stdout, fmt='(/a/)') 'da_check_vptox_adjoint: Test Results:'
 
-   call da_zero_x(xa)
+   call da_zero_x(grid%xa)
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
 
-   call da_psichi_to_uv(vp % v1, vp % v2, xb % coefx, &
-                        xb % coefy , xa % u, xa % v)
+   call da_psichi_to_uv(vp % v1, vp % v2, grid%xb % coefx, &
+                        grid%xb % coefy , grid%xa % u, grid%xa % v)
 
-   adj_par_lhs = sum(xa % u(its:ite,jts:jte,:)**2) / typical_u_rms**2
-   adj_par_lhs = sum(xa % v(its:ite,jts:jte,:)**2) / typical_v_rms**2 + &
+   adj_par_lhs = sum(grid%xa % u(its:ite,jts:jte,:)**2) / typical_u_rms**2
+   adj_par_lhs = sum(grid%xa % v(its:ite,jts:jte,:)**2) / typical_v_rms**2 + &
       adj_par_lhs
 
-   xa % u(:,:,:) = xa % u(:,:,:) / typical_u_rms**2
-   xa % v(:,:,:) = xa % v(:,:,:) / typical_v_rms**2
+   grid%xa % u(:,:,:) = grid%xa % u(:,:,:) / typical_u_rms**2
+   grid%xa % v(:,:,:) = grid%xa % v(:,:,:) / typical_v_rms**2
 
    vp%v1(:,:,:)=0.
    vp%v2(:,:,:)=0.
 
-   call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
-                             xb % coefy, vp % v1, vp % v2)
+   call da_psichi_to_uv_adj(grid%xa % u, grid%xa % v, grid%xb % coefx,   &
+                             grid%xb % coefy, vp % v1, vp % v2)
 
    adj_par_rhs = sum(vp % v1(its:ite,jts:jte,:) * vp2_v1(its:ite,jts:jte,:))
    adj_par_rhs = sum(vp % v2(its:ite,jts:jte,:) * vp2_v2(its:ite,jts:jte,:)) + &
@@ -81,7 +78,7 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
    vp%v1(:,:,:) = vp2_v1(:,:,:)
    vp%v2(:,:,:) = vp2_v2(:,:,:)
 
-   call da_zero_x(xa)
+   call da_zero_x(grid%xa)
 
    vp2_v1(:,:,:) = vp % v1(:,:,:)
    vp2_v2(:,:,:) = vp % v2(:,:,:)
@@ -94,56 +91,56 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
    ! [2.0] Perform x = U vp transform:
    !-------------------------------------------------------------------------
 
-   call da_transform_vptox(grid,xb, vp, xp, xa, be, ep)
+   call da_transform_vptox(grid, vp, be, ep)
 
    !-------------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation:
    !-------------------------------------------------------------------------
 
-   !  xa % u(:,:,:) = 0.0
-   !  xa % v(:,:,:) = 0.0
-   !  xa % t(:,:,:) = 0.0
-   !  xa % q(:,:,:) = 0.0
-   !  xa%psfc(:,:) = 0.0
+   !  grid%xa % u(:,:,:) = 0.0
+   !  grid%xa % v(:,:,:) = 0.0
+   !  grid%xa % t(:,:,:) = 0.0
+   !  grid%xa % q(:,:,:) = 0.0
+   !  grid%xa%psfc(:,:) = 0.0
 
-   !  xa % p(:,:,:) = 0.0
-   !  xa % rho(:,:,:) = 0.0
-   !  xa % w(:,:,:) = 0.0
-   !  xa % wh(:,:,:) = 0.0
-   !  xa % rh(:,:,:) = 0.0
-   !  xa % qt(:,:,:) = 0.0
-   !  xa % qcw(:,:,:) = 0.0
-   !  xa % qrn(:,:,:) = 0.0
+   !  grid%xa % p(:,:,:) = 0.0
+   !  grid%xa % rho(:,:,:) = 0.0
+   !  grid%xa % w(:,:,:) = 0.0
+   !  grid%xa % wh(:,:,:) = 0.0
+   !  grid%xa % rh(:,:,:) = 0.0
+   !  grid%xa % qt(:,:,:) = 0.0
+   !  grid%xa % qcw(:,:,:) = 0.0
+   !  grid%xa % qrn(:,:,:) = 0.0
 
-   adj_par_lhs = sum(xa%u(its:ite,jts:jte,:)**2)/typical_u_rms**2
-   adj_par_lhs = sum(xa%v(its:ite,jts:jte,:)**2)/typical_v_rms**2 + adj_par_lhs
-   adj_par_lhs = sum(xa%t(its:ite,jts:jte,:)**2)/typical_t_rms**2 + adj_par_lhs
-   adj_par_lhs = sum(xa%q(its:ite,jts:jte,:)**2)/typical_q_rms**2 + adj_par_lhs
-   adj_par_lhs = sum(xa%psfc(its:ite,jts:jte)**2)/typical_p_rms**2 + adj_par_lhs
+   adj_par_lhs = sum(grid%xa%u(its:ite,jts:jte,:)**2)/typical_u_rms**2
+   adj_par_lhs = sum(grid%xa%v(its:ite,jts:jte,:)**2)/typical_v_rms**2 + adj_par_lhs
+   adj_par_lhs = sum(grid%xa%t(its:ite,jts:jte,:)**2)/typical_t_rms**2 + adj_par_lhs
+   adj_par_lhs = sum(grid%xa%q(its:ite,jts:jte,:)**2)/typical_q_rms**2 + adj_par_lhs
+   adj_par_lhs = sum(grid%xa%psfc(its:ite,jts:jte)**2)/typical_p_rms**2 + adj_par_lhs
 
-   adj_par_lhs = sum(xa%p(its:ite,jts:jte,:)**2)/typical_p_rms**2 + adj_par_lhs
-   adj_par_lhs = sum(xa%rho(its:ite,jts:jte,:)**2)/typical_rho_rms**2 + &
+   adj_par_lhs = sum(grid%xa%p(its:ite,jts:jte,:)**2)/typical_p_rms**2 + adj_par_lhs
+   adj_par_lhs = sum(grid%xa%rho(its:ite,jts:jte,:)**2)/typical_rho_rms**2 + &
       adj_par_lhs
 
    if (Use_RadarObs) then
       adj_par_lhs = adj_par_lhs &
-                + sum(xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+                + sum(grid%xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
       adj_par_lhs = adj_par_lhs &
-                + sum(xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
+                + sum(grid%xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    end if
 
    if (cv_options_hum == 2) then
-      adj_par_lhs = sum(xa % rh(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(grid%xa % rh(its:ite,jts:jte,:)**2) / &
          typical_rh_rms**2 + adj_par_lhs
    end if
 
    if (cv_options_hum == 3) then
-      adj_par_lhs = sum(xa % qcw(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(grid%xa % qcw(its:ite,jts:jte,:)**2) / &
          typical_qcw_rms**2 + adj_par_lhs
-      adj_par_lhs = sum(xa % qrn(its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(grid%xa % qrn(its:ite,jts:jte,:)**2) / &
          typical_qrn_rms**2 + adj_par_lhs
-      adj_par_lhs = sum(xa % qt (its:ite,jts:jte,:)**2) / &
+      adj_par_lhs = sum(grid%xa % qt (its:ite,jts:jte,:)**2) / &
          typical_q_rms**2 + adj_par_lhs
    end if
 
@@ -151,30 +148,30 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
    ! [4.0] Rescale input to adjoint routine:
    !-------------------------------------------------------------------------
       
-   xa % u(:,:,:) = xa % u(:,:,:) / typical_u_rms**2
-   xa % v(:,:,:) = xa % v(:,:,:) / typical_v_rms**2
-   xa % t(:,:,:) = xa % t(:,:,:) / typical_t_rms**2
-   xa % q(:,:,:) = xa % q(:,:,:) / typical_q_rms**2
-   xa%psfc(:,:) = xa%psfc(:,:) / typical_p_rms**2
+   grid%xa % u(:,:,:) = grid%xa % u(:,:,:) / typical_u_rms**2
+   grid%xa % v(:,:,:) = grid%xa % v(:,:,:) / typical_v_rms**2
+   grid%xa % t(:,:,:) = grid%xa % t(:,:,:) / typical_t_rms**2
+   grid%xa % q(:,:,:) = grid%xa % q(:,:,:) / typical_q_rms**2
+   grid%xa%psfc(:,:) = grid%xa%psfc(:,:) / typical_p_rms**2
 
-   xa % p(:,:,:) = xa % p(:,:,:) / typical_p_rms**2
-   xa % rho(:,:,:) = xa % rho(:,:,:) / typical_rho_rms**2
+   grid%xa % p(:,:,:) = grid%xa % p(:,:,:) / typical_p_rms**2
+   grid%xa % rho(:,:,:) = grid%xa % rho(:,:,:) / typical_rho_rms**2
 
    if (Use_RadarObs) then
-      xa %wh(:,:,:) = xa %wh(:,:,:) / typical_w_rms**2
-      xa % w(:,:,:) = 0.0
+      grid%xa %wh(:,:,:) = grid%xa %wh(:,:,:) / typical_w_rms**2
+      grid%xa % w(:,:,:) = 0.0
    else
-      xa %w (:,:,:) = xa %w (:,:,:) / typical_w_rms**2
+      grid%xa %w (:,:,:) = grid%xa %w (:,:,:) / typical_w_rms**2
    end if
 
    if (cv_options_hum == 2) then
-      xa % rh(:,:,:) = xa % rh(:,:,:) / typical_rh_rms**2
+      grid%xa % rh(:,:,:) = grid%xa % rh(:,:,:) / typical_rh_rms**2
    end if
 
    if (cv_options_hum == 3) then
-      xa % qcw(:,:,:) = xa % qcw(:,:,:) / typical_qcw_rms**2
-      xa % qrn(:,:,:) = xa % qrn(:,:,:) / typical_qrn_rms**2
-      xa % qt (:,:,:) = xa % qt (:,:,:) / typical_q_rms**2
+      grid%xa % qcw(:,:,:) = grid%xa % qcw(:,:,:) / typical_qcw_rms**2
+      grid%xa % qrn(:,:,:) = grid%xa % qrn(:,:,:) / typical_qrn_rms**2
+      grid%xa % qt (:,:,:) = grid%xa % qt (:,:,:) / typical_q_rms**2
    end if
    
    !-------------------------------------------------------------------------
@@ -183,7 +180,7 @@ subroutine da_check_vptox_adjoint(grid,ne, xb, be, ep, xp, vp, xa)
 
    call da_zero_vp_type (vp)
 
-   call da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
+   call da_transform_vptox_adj(grid, vp, be, ep)
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjoint test equation:

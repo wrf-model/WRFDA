@@ -1,4 +1,4 @@
-subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
+subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    !--------------------------------------------------------------------------
    ! Purpose: Control variable transform x' = Uv. 
@@ -9,25 +9,22 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    type(domain), intent(inout)               :: grid
 
    integer, intent(in)                  :: cv_size ! Size of cv array.
-   type (xb_type), intent(in)           :: xb   ! first guess.
    type (xbx_type),intent(in)           :: xbx  ! For header & non-grid arrays.
    type (be_type), intent(in)           :: be   ! background errors.
    type (ep_type), intent(in)           :: ep   ! Ensemble perturbations.
    real, intent(in)                     :: cv(1:cv_size)   ! control variables.
    type (vp_type),intent(out)           :: vv   ! grdipt/eof cv (local).
    type (vp_type),intent(inout)         :: vp   ! grdipt/level cv (local).
-   type (xpose_type), intent(inout)     :: xp   ! Dimensions and xpose buffers. 
-   type (x_type), intent(out)           :: xa   ! model space analysis (local).
 
    integer                              :: i, j, k
 
    real :: sdmd, s1md, mu
-   real, dimension(xb%kms:xb%kme) :: p, mr_a, mr_b
+   real, dimension(kms:kme) :: p, mr_a, mr_b
    real    :: PU, PD, coeff
 
    if (trace_use) call da_trace_entry("da_transform_vtox")
 
-   call da_zero_x (xa)
+   call da_zero_x (grid%xa)
 
    !----------------------------------------------------------------------
    ! [1.0]: Perform vv = u_h cv transform:
@@ -36,7 +33,7 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    if (global) then
       call da_transform_vtovv_global(cv_size, xbx, be, cv, vv) 
    else
-      call da_transform_vtovv(grid, cv_size, xb, be, cv, vv, xp)
+      call da_transform_vtovv(grid, cv_size, be, cv, vv)
    end if
 
    !----------------------------------------------------------------------
@@ -45,7 +42,7 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
 
    if (vert_corr == 2) then      
       call da_vertical_transform('u', be, &
-                                  xb % vertical_inner_product, &
+                                  grid%xb % vertical_inner_product, &
                                   vv, vp)
 
    else
@@ -65,67 +62,67 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    ! [3.0]: Perform x = u_p vp transform::
    !----------------------------------------------------------------------
 
-   call da_transform_vptox(grid, xb, vp, xp, xa, be, ep)
+   call da_transform_vptox(grid, vp, be, ep)
 
    !----------------------------------------------------------------------
    ! [4.0]: Move the following:
    !----------------------------------------------------------------------
 
-   do j=xb%jts,xb%jte
-      do i=xb%its,xb%ite
+   do j=jts,jte
+      do i=its,ite
          if (fg_format == fg_format_wrf) then
             sdmd=0.0
             s1md=0.0
-            do k=xb%kts,xb%kte
-               mr_a(k) = xa%q(i,j,k)/(1.0 - xb%q(i,j,k))**2
-               mr_b(k) = xb%q(i,j,k)/(1.0 - xb%q(i,j,k))
+            do k=kts,kte
+               mr_a(k) = grid%xa%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
+               mr_b(k) = grid%xb%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))
 
-               sdmd=sdmd+mr_a(k)*xb%dnw(k)
-               s1md=s1md+(1.0+mr_b(k))*xb%dnw(k)
+               sdmd=sdmd+mr_a(k)*grid%xb%dnw(k)
+               s1md=s1md+(1.0+mr_b(k))*grid%xb%dnw(k)
             end do
 
-            mu=-(xa%psfc(i,j)+xb%psac(i,j)*sdmd)/s1md
+            mu=-(grid%xa%psfc(i,j)+grid%xb%psac(i,j)*sdmd)/s1md
 
-            p(xb%kte+1)=0.0
+            p(kte+1)=0.0
 
-            do k=xb%kte,xb%kts,-1
+            do k=kte,kts,-1
                p(k)=p(k+1)-(mu*(1.0+mr_b(k)) &
-                       + xb%psac(i,j)*mr_a(k))*xb%dnw(k)
+                       + grid%xb%psac(i,j)*mr_a(k))*grid%xb%dnw(k)
 
-               xa%p(i,j,k)=0.5*(p(k)+p(k+1))
+               grid%xa%p(i,j,k)=0.5*(p(k)+p(k+1))
             end do
          else if (fg_format == fg_format_kma_global) then
-            do k=xb%kts,xb%kte
-               if (k == xb%kte) then
-                  coeff=xb%KMA_B(K)/(xb%KMA_A(K)+xb%KMA_B(K)*xb%psfc(I,J)/100.0)
+            do k=kts,kte
+               if (k == kte) then
+                  coeff=grid%xb%KMA_B(K)/(grid%xb%KMA_A(K)+grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0)
                else
-                  PU = xb%KMA_A(K+1) + xb%KMA_B(K+1)*xb%psfc(I,J)/100.0
-                  PD = xb%KMA_A(K ) + xb%KMA_B(K )*xb%psfc(I,J)/100.0
-                  coeff=xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU)) &
+                  PU = grid%xb%KMA_A(K+1) + grid%xb%KMA_B(K+1)*grid%xb%psfc(I,J)/100.0
+                  PD = grid%xb%KMA_A(K ) + grid%xb%KMA_B(K )*grid%xb%psfc(I,J)/100.0
+                  coeff=grid%xb%KMA_B(K)  *1.0/(PD-PU)**2*(-PU*(LOG(PD)-LOG(PU)) &
                     + PD-PU)&
-                    + xb%KMA_B(K+1)*1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
+                    + grid%xb%KMA_B(K+1)*1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
                end if
-               ! Here since xa%psfc holds value in Pa. dlnp -> dp
-               xa%p(i,j,k) =  xb%p(i,j,k) * xa%psfc(I,J)/100. * coeff
+               ! Here since grid%xa%psfc holds value in Pa. dlnp -> dp
+               grid%xa%p(i,j,k) =  grid%xb%p(i,j,k) * grid%xa%psfc(I,J)/100. * coeff
 
             end do
          end if
       end do
    end do
 
-   call da_pt_to_rho_lin(xb, xa, xp)
+   call da_pt_to_rho_lin(grid)
  
    ! If test_wrfvar = .true., not "XToY" transform needed to do here:
 
    if (.not.test_wrfvar) then
-      ! Exchange XA halo region.
+      ! Exchange grid%xa halo region.
 #ifdef DM_PARALLEL
 #include "HALO_XA.inc"
 #endif
 
       if (sfc_assi_options == 2) then
-         call da_transform_xtowtq (xp, xb, xa)
-         ! Exchange XA (surface variable) halo region.
+         call da_transform_xtowtq (grid)
+         ! Exchange grid%xa (surface variable) halo region.
 #ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
 #endif
@@ -135,23 +132,23 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
 
          ! Now do something for PW
-         call da_transform_xtotpw(xa, xb)
+         call da_transform_xtotpw(grid%xa, grid%xb)
 
          ! GPS Refractivity:
          if (use_GpsrefObs) &
-            call da_transform_xtogpsref_lin(xa, xb, xp)
+            call da_transform_xtogpsref_lin(grid)
 
          if (use_ssmt1obs .or. use_ssmt2obs .or. &
               Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
             if (global) then
                call da_error(__FILE__,__LINE__, &
-                  (/"xb%speed is not available, see da_transfer_kmatoxb.inc"/))
+                  (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
             end if
-            call da_transform_xtoseasfcwind_lin(xa, xb)
+            call da_transform_xtoseasfcwind_lin(grid%xa, grid%xb)
          end if
-         if (Use_SsmiTbObs) call da_transform_xtotb_lin (xa, xb)
+         if (Use_SsmiTbObs) call da_transform_xtotb_lin (grid%xa, grid%xb)
 
-         ! Exchange XA halo region.
+         ! Exchange grid%xa halo region.
 #ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
 #endif
@@ -161,12 +158,12 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    ! Compute w increments using Richardson's eqn.
 
    if (Use_RadarObs) then
-      call da_uvprho_to_w_lin(xb, xa, xp)
+      call da_uvprho_to_w_lin(grid)
 
-      do k=xp%kts,xp%kte
-         do j=xp%jts,xp%jte
-            do i=xp%its,xp%ite
-               xa%wh(i,j,k)=0.5*(xa%w(i,j,k)+xa%w(i,j,k+1))
+      do k=kts,kte
+         do j=jts,jte
+            do i=its,ite
+               grid%xa%wh(i,j,k)=0.5*(grid%xa%w(i,j,k)+grid%xa%w(i,j,k+1))
             end do
          end do
       end do
@@ -178,7 +175,7 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
       if (use_radarobs .and. Use_Radar_rf) then
          ! Partition of hydrometeor increments via warm rain process
 
-         call da_moist_phys_lin(grid, xb, xa, xp)
+         call da_moist_phys_lin(grid)
 
       endif
    end if
@@ -188,27 +185,27 @@ subroutine da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
    !---------------------------------------------------------------
 
    if (global)  then   
-      call da_get_vpoles(xa%u,xa%v, &
+      call da_get_vpoles(grid%xa%u,grid%xa%v, &
             ids, ide, jds, jde, &
             ims, ime, jms, jme, kms, kme, &
             its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%t,             &
+      call da_get_spoles(grid%xa%t,             &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%p,             &
+      call da_get_spoles(grid%xa%p,             &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%q,             &
+      call da_get_spoles(grid%xa%q,             &
             ids, ide, jds, jde,  &
             ims, ime, jms, jme, kms, kme,  &
             its, ite, jts, jte, kts, kte  )
-      call da_get_spoles(xa%psfc,          &
+      call da_get_spoles(grid%xa%psfc,          &
             ids, ide, jds, jde,   &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1  )
-       call da_set_boundary_xa(xa, xb)
+       call da_set_boundary_xa(grid%xa, grid%xb)
    end if   
 
    if (trace_use) call da_trace_exit("da_transform_vtox")

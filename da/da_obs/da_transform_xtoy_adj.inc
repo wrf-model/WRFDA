@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,9 +6,8 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    
    implicit none
    
-   type (xb_type), intent(in)        :: xb          ! first guess state.
+   type (domain), intent(inout)      :: grid
    type (ob_type), intent(in)        :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in)     :: xp          ! Domain decomposition vars.
    type (y_type), intent(inout)      :: jo_grad_y   ! grad_y(jo)
    type (x_type), intent(inout)      :: jo_grad_x   ! grad_x(jo)
 
@@ -18,120 +17,120 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    ! [1.0] Radiosonde observation operator y = H(x):
    !--------------------------------------------------------------------------
 
-   call da_transform_xtoy_sound_adj (iv, xp, jo_grad_y, jo_grad_x)
-   call da_transform_xtoy_sonde_sfc_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_sound_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_sonde_sfc_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [2.0] Surface observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_synop_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_synop_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [3.0] Cloud track wind observation operator y = H(x):
    !---------------------------------------------------------------------------
 
    ! Geostationary Satellite
-   call da_transform_xtoy_geoamv_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_geoamv_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    ! Polar orbitting Satellite
-   call da_transform_xtoy_polaramv_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_polaramv_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [4.0] Aircraft observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_airep_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_airep_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [5.0] Metar observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_metar_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_metar_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [6.0] Ship observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_ships_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_ships_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [7.0] GPS TPW/ZTD observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_gpspw_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_gpspw_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [8.0] SSMI observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_ssmi_adj (xb, iv, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_ssmi_adj (grid%xb, iv, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [9.0] Pilot observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_pilot_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_pilot_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [10.0] Pseudo obs observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_pseudo_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_pseudo_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [11.0] Satem observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_satem_adj (iv, xp, jo_grad_y, jo_grad_x, xb)
+   call da_transform_xtoy_satem_adj (iv, grid%xp, jo_grad_y, jo_grad_x, grid%xb)
 
    !---------------------------------------------------------------------------
    ! [12.0] SSM/T1 observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_ssmt1_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_ssmt1_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [13.0] SSM/T2 observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_ssmt2_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_ssmt2_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [14.0] Scatterometer observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_qscat_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_qscat_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [15.0] Scatterometer observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_profiler_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_profiler_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [16.0] Scatterometer observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_buoy_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_buoy_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [17.0] GPS Refractivity observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_gpsref_adj(iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_gpsref_adj(iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [18.0] Radar observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_radar_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_radar_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [19.0] TC bogus observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_bogus_adj (xb, iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_bogus_adj (grid%xb, iv, grid%xp, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
    ! [20.0] Radiance observation operator y = H(x):
@@ -139,15 +138,15 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    if (use_rad) then
       if (rtm_option == rtm_option_rttov) then
-         call da_transform_xtoy_rttov_adj (iv, xp, jo_grad_y, jo_grad_x)
+         call da_transform_xtoy_rttov_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
       elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
          !if (use_crtm_kmatrix) then
-         !   call da_transform_xtoy_crtmk_adj (iv, xp, jo_grad_y, jo_grad_x)
+         !   call da_transform_xtoy_crtmk_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
          !else if (use_crtm_kmatrix_fast) then
-         !   call da_transform_xtoy_crtmk_f_adj (iv, xp, jo_grad_y, jo_grad_x)
+         !   call da_transform_xtoy_crtmk_f_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
          !else
-            call da_transform_xtoy_crtm_adj (iv, xp, jo_grad_y, jo_grad_x)
+            call da_transform_xtoy_crtm_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
          !end if
 #endif
       else
@@ -159,7 +158,7 @@ subroutine da_transform_xtoy_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
    ! [21.0]  AIRS retrievals adjoint observation operator y = H(x):
    !---------------------------------------------------------------------------
 
-   call da_transform_xtoy_airsr_adj (iv, xp, jo_grad_y, jo_grad_x)
+   call da_transform_xtoy_airsr_adj (iv, grid%xp, jo_grad_y, jo_grad_x)
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_adj")
 

@@ -1,4 +1,4 @@
-subroutine da_transform_through_rf(grid,mz, grid_box_area, rf_alpha, val,&
+subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
                                     xp, field)
 
    !---------------------------------------------------------------------------
@@ -18,7 +18,6 @@ subroutine da_transform_through_rf(grid,mz, grid_box_area, rf_alpha, val,&
    type (xpose_type), intent(inout) :: xp   ! Dimensions and xpose buffers.
    integer, intent(in) :: mz                ! Vertical truncation.
 
-   real, intent(in)    :: grid_box_area(ims:ime,jms:jme) ! From first guess. 
    real, intent(in)    :: rf_alpha(mz)      ! RF scale parameter. 
    real, intent(in)    :: val(jds:jde,mz)   ! Error standard deviation.
    real, intent(inout) :: field(ims:ime,jms:jme,kms:kme) ! Field to be transformed. 
@@ -37,7 +36,7 @@ subroutine da_transform_through_rf(grid,mz, grid_box_area, rf_alpha, val,&
    rf_passes_over_two = rf_passes / 2
    
    ! [1.1] Define inner product (square root of grid box area):
-   p_x(its:ite,jts:jte) = sqrt(grid_box_area(its:ite,jts:jte))
+   p_x(its:ite,jts:jte) = sqrt(grid%xb%grid_box_area(its:ite,jts:jte))
 
    xp%v1z(:,:,:) = 0.0
 

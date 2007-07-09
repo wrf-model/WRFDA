@@ -103,13 +103,13 @@ subroutine da_minimise_cg(grid, config_flags,            &
       cg_jcdf = 1
 
       call da_transform_vtoy(cv_size, be, grid%ep, fhat, iv, grid%vp, &
-         grid%vv, grid%xa, grid%xb, xbx, grid%xp, y,         &
+         grid%vv, xbx, y,         &
          grid, config_flags                               )
 
       call da_calculate_grady(iv, y , jo_grad_y)
 
       call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, fhat, iv, &
-         grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
+         grid%vp, grid%vv, xbx, jo_grad_y, &
          grid, config_flags, cg_jcdf)
 
       je_start = be % cv % size_jb + 1

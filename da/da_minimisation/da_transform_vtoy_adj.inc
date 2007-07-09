@@ -1,5 +1,5 @@
-subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
-                                  xbx, xp, y, &
+subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
+                                  xbx, y, &
                                   grid, config_flags, cg_jcdf)
 
    !-------------------------------------------------------------------------
@@ -16,10 +16,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    type (ob_type), intent(inout)    :: iv     ! innovation vector (o-b).
    type (vp_type), intent(inout)    :: vp     ! Grdipt/level CV.
    type (vp_type), intent(inout)    :: vv     ! Grdipt/EOF CV.
-   type (x_type) , intent(inout)    :: xa     ! gridded analy. incs. (local)
-   type (xb_type), intent(in)       :: xb     ! first guess (local).
    type (xbx_type),intent(in)       :: xbx    ! For header & non-grid arrays.
-   type (xpose_type), intent(inout) :: xp     ! Domain decomposition vars.
    type (y_type) , intent(inout)    :: y      ! y = H(x_inc).
 
    type(domain), intent(inout) :: grid
@@ -38,8 +35,8 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
    if (var4d) then
       do nobwin=num_fgat_time,1,-1
          iv%current_ob_time = nobwin
-         call da_zero_x(xa)
-         call da_transform_xtoy_adj(xb, iv, xp, y, xa)
+         call da_zero_x(grid%xa)
+         call da_transform_xtoy_adj(grid, iv, y, grid%xa)
          write(unit=filnam,fmt='(a2,i2.2)') 'af',nobwin
 
          call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
@@ -97,12 +94,12 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, xa, xb, &
 
       call da_transfer_xatowrftl_adj(grid, config_flags, 'gr01')
    else  ! var4d
-      call da_zero_x(xa)
-      call da_transform_xtoy_adj(xb, iv, xp, y, xa)
+      call da_zero_x(grid%xa)
+      call da_transform_xtoy_adj(grid, iv, y,grid%xa)
    end if ! var4d
 
    cv = 0.0
-   call da_transform_vtox_adj(grid, cv_size, xb, xbx, be, ep, xa, xp, vp, vv, &
+   call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, &
       cv)
 
    call da_trace_exit("da_transform_vtoy_adj")

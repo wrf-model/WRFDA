@@ -1,4 +1,4 @@
-subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
+subroutine da_uvprho_to_w_adj(grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Calculates vertical velocity increments from Richardson's Eq.
@@ -10,10 +10,6 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    implicit none
 
    type (domain), intent(inout)     :: grid
-
-   type (xb_type), intent(in)       :: xb           ! First guess structure.
-   type (x_type), intent(inout)     :: xa           ! increment structure.
-   type (xpose_type), intent(inout) :: xp           ! domain decomposition vars.
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -39,22 +35,22 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do J=jts,jte
       do I=its,ite
          do K=kts,kte
-            xa%w(I,J,K+1)=xa%w(I,J,K+1)+xa%w(I,J,K)
-            WZ(I,J,K)=xa%w(I,J,K)*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
-            xa%w(I,J,K)=0.0
+            grid%xa%w(I,J,K+1)=grid%xa%w(I,J,K+1)+grid%xa%w(I,J,K)
+            WZ(I,J,K)=grid%xa%w(I,J,K)*(grid%xb%hf(I,J,K)-grid%xb%hf(I,J,K+1))
+            grid%xa%w(I,J,K)=0.0
          end do
-         xa%w(I,J,kte+1)=0.0
+         grid%xa%w(I,J,kte+1)=0.0
       end do
    end do
 
-   call da_w_adjustment_adj(xb,WZ)
+   call da_w_adjustment_adj(grid%xb,WZ)
 
    ! Divide by constant
 
    do K=kts,kte
       do J=jts,jte
          do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*xb%p(I,J,K))
+            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*grid%xb%p(I,J,K))
          end do
       end do
    end do
@@ -64,9 +60,9 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do J=jts,jte
       do I=its,ite
          do K=kte,kts,-1
-            xa%p(I,J,K)=xa%p(I,J,K)-WZ(I,J,K)*GAMMA*  &
-                     (xb%w(I,J,K+1)-xb%w(I,J,K))/  &
-                     (xb%hf(I,J,K+1)-xb%hf(I,J,K))
+            grid%xa%p(I,J,K)=grid%xa%p(I,J,K)-WZ(I,J,K)*GAMMA*  &
+                     (grid%xb%w(I,J,K+1)-grid%xb%w(I,J,K))/  &
+                     (grid%xb%hf(I,J,K+1)-grid%xb%hf(I,J,K))
          end do
       end do
    end do
@@ -78,15 +74,15 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
          do K=kts,kte-1
             TERM3=TERM3+WZ(I,J,K)
             DIV(I,J,K+1)=DIV(I,J,K+1)+  &
-                      TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
+                      TERM3*GRAVITY*0.5*(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             DIV(I,J,K)  =DIV(I,J,K)+  &
-                      TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
+                      TERM3*GRAVITY*0.5*(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
          end do
         TERM3=0.0
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,xp, xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, URHO,VRHO, DIV)
 
    ! Computation to check for edge of domain:
    if (test_wrfvar) then
@@ -103,8 +99,8 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            xa%rho(I,J,K)=xa%rho(I,J,K)+VRHO(I,J,K)*xb%v(I,J,K)
-            xa%rho(I,J,K)=xa%rho(I,J,K)+URHO(I,J,K)*xb%u(I,J,K)
+            grid%xa%rho(I,J,K)=grid%xa%rho(I,J,K)+VRHO(I,J,K)*grid%xb%v(I,J,K)
+            grid%xa%rho(I,J,K)=grid%xa%rho(I,J,K)+URHO(I,J,K)*grid%xb%u(I,J,K)
          end do
       end do
    end do
@@ -119,21 +115,21 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
          do K=kts,kte-1
             TERM3=TERM3+WZ(I,J,K)
             DIV(I,J,K+1)=DIV(I,J,K+1)+  &
-                      TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
+                      TERM3*GRAVITY*0.5*(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             DIV(I,J,K)  =DIV(I,J,K)+  &
-                      TERM3*GRAVITY*0.5*(xb%h(I,J,K+1)-xb%h(I,J,K))
+                      TERM3*GRAVITY*0.5*(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
          end do
          TERM3=0.0
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,xp, xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, URHO,VRHO, DIV)
 
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            xa%v(I,J,K)=xa%v(I,J,K)+VRHO(I,J,K)*xb%rho(I,J,K)
-            xa%u(I,J,K)=xa%u(I,J,K)+URHO(I,J,K)*xb%rho(I,J,K)
+            grid%xa%v(I,J,K)=grid%xa%v(I,J,K)+VRHO(I,J,K)*grid%xb%rho(I,J,K)
+            grid%xa%u(I,J,K)=grid%xa%u(I,J,K)+URHO(I,J,K)*grid%xb%rho(I,J,K)
          end do
       end do
    end do
@@ -143,12 +139,12 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
 
    ! Term 2.2: Divergence term from basic wind
 
-   call da_uv_to_divergence(xb, xb%u,xb%v, DIV)
+   call da_uv_to_divergence(grid%xb, grid%xb%u,grid%xb%v, DIV)
 
    do K=kts,kte
       do J=jts,jte
          do I=its,ite
-           xa%p(I,J,K)=xa%p(I,J,K)-WZ(I,J,K)*GAMMA*DIV(I,J,K)
+           grid%xa%p(I,J,K)=grid%xa%p(I,J,K)-WZ(I,J,K)*GAMMA*DIV(I,J,K)
          end do
       end do
    end do
@@ -158,12 +154,12 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do K=kts,kte   
       do J=jts,jte
          do I=its,ite
-            DIV(I,J,K)=-WZ(I,J,K)*GAMMA*xb%p(I,J,K)  ! DIV redefined
+            DIV(I,J,K)=-WZ(I,J,K)*GAMMA*grid%xb%p(I,J,K)  ! DIV redefined
          end do
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,xp, xb, xa%u,xa%v, DIV)
+   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, grid%xa%u,grid%xa%v, DIV)
 
    ! Computation to check for edge of domain:
    is = its
@@ -216,10 +212,10 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            xa%v(I,J,K)=xa%v(I,J,K)-WZ(I,J,K)*  &
-                     (xb%p(I,J+1,K)-xb%p(I,J-1,K))*xb%coefy(I,J)
-            xa%u(I,J,K)=xa%u(I,J,K)-WZ(I,J,K)*  &
-                     (xb%p(I+1,J,K)-xb%p(I-1,J,K))*xb%coefx(I,J)
+            grid%xa%v(I,J,K)=grid%xa%v(I,J,K)-WZ(I,J,K)*  &
+                     (grid%xb%p(I,J+1,K)-grid%xb%p(I,J-1,K))*grid%xb%coefy(I,J)
+            grid%xa%u(I,J,K)=grid%xa%u(I,J,K)-WZ(I,J,K)*  &
+                     (grid%xb%p(I+1,J,K)-grid%xb%p(I-1,J,K))*grid%xb%coefx(I,J)
          end do
       end do
    end do
@@ -234,7 +230,7 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    js = jts - 1
    je = jte + 1
 
-   xp%v1z(its:ite, jts:jte, kts:kte) = wz(its:ite, jts:jte, kts:kte)
+   grid%xp%v1z(its:ite, jts:jte, kts:kte) = wz(its:ite, jts:jte, kts:kte)
 
 #ifdef DM_PARALLEL
 #include "HALO_BAL_EQN_ADJ.inc"
@@ -243,25 +239,25 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    if (its == ids) then
       is = ids+1
    else
-      wz(is, js:je, kts:kte) = xp%v1z(is, js:je, kts:kte)
+      wz(is, js:je, kts:kte) = grid%xp%v1z(is, js:je, kts:kte)
    end if
 
    if (ite == ide) then
       ie = ide-1
    else
-      wz(ie, js:je, kts:kte) = xp%v1z(ie, js:je, kts:kte)
+      wz(ie, js:je, kts:kte) = grid%xp%v1z(ie, js:je, kts:kte)
    end if
 
    if (jts == jds) then
       js = jds+1
    else
-      wz(is:ie, js, kts:kte) = xp%v1z(is:ie, js, kts:kte)
+      wz(is:ie, js, kts:kte) = grid%xp%v1z(is:ie, js, kts:kte)
    end if
 
    if (jte == jde) then
       je = jde-1
    else
-      wz(is:ie, je, kts:kte) = xp%v1z(is:ie, je, kts:kte)
+      wz(is:ie, je, kts:kte) = grid%xp%v1z(is:ie, je, kts:kte)
    end if
 
    ! Term 1.1: Perturbed pressure advection along the basic wind
@@ -269,10 +265,10 @@ subroutine da_uvprho_to_w_adj(grid,xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            xa%p(I,J+1,K)=xa%p(I,J+1,K)-WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
-            xa%p(I,J-1,K)=xa%p(I,J-1,K)+WZ(I,J,K)*xb%v(I,J,K)*xb%coefy(I,J)
-            xa%p(I+1,J,K)=xa%p(I+1,J,K)-WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
-            xa%p(I-1,J,K)=xa%p(I-1,J,K)+WZ(I,J,K)*xb%u(I,J,K)*xb%coefx(I,J)
+            grid%xa%p(I,J+1,K)=grid%xa%p(I,J+1,K)-WZ(I,J,K)*grid%xb%v(I,J,K)*grid%xb%coefy(I,J)
+            grid%xa%p(I,J-1,K)=grid%xa%p(I,J-1,K)+WZ(I,J,K)*grid%xb%v(I,J,K)*grid%xb%coefy(I,J)
+            grid%xa%p(I+1,J,K)=grid%xa%p(I+1,J,K)-WZ(I,J,K)*grid%xb%u(I,J,K)*grid%xb%coefx(I,J)
+            grid%xa%p(I-1,J,K)=grid%xa%p(I-1,J,K)+WZ(I,J,K)*grid%xb%u(I,J,K)*grid%xb%coefx(I,J)
          end do
       end do
    end do

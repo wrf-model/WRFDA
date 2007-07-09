@@ -1,7 +1,7 @@
-subroutine da_setup_testfield(grid,xb, xa, xp)
+subroutine da_setup_testfield(grid)
 
    !----------------------------------------------------------------------------
-   ! Purpose: produce test increment field based on xb field.
+   ! Purpose: produce test increment field based on grid%xb field.
    !
    ! Method:  pass through x=uv transfom to ensure satisfies boundary conditions
    !----------------------------------------------------------------------------
@@ -9,10 +9,6 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
    implicit none
 
    type (domain), intent(inout)   :: grid
-
-   type (xb_type),    intent(in)  :: xb  ! first guess (local).
-   type (x_type) ,    intent(inout) :: xa  ! gridded analy. incs. (local)
-   type (xpose_type), intent(in)  :: xp  ! Transpose variables.
 
    integer :: i, j
 
@@ -29,34 +25,34 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
 
    ! [2.1] test wind, temperature, pressure, and humidity.
 
-   call da_set_tst_trnsf_fld(xp, xa%u, xb%u, typical_u_rms)
-   call da_set_tst_trnsf_fld(xp, xa%v, xb%v, typical_v_rms)
-   call da_set_tst_trnsf_fld(xp, xa%w, xb%w, typical_w_rms)
-   call da_set_tst_trnsf_fld(xp, xa%t, xb%t, typical_t_rms)
-   call da_set_tst_trnsf_fld(xp, xa%p, xb%p, typical_p_rms)
-   call da_set_tst_trnsf_fld(xp, xa%q, xb%q, typical_q_rms)
-   call da_set_tst_trnsf_fld(xp, xa%qcw, xb%qcw, typical_qcw_rms)
-   call da_set_tst_trnsf_fld(xp, xa%qrn, xb%qrn, typical_qrn_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%u, grid%xb%u, typical_u_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%v, grid%xb%v, typical_v_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%w, grid%xb%w, typical_w_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%t, grid%xb%t, typical_t_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%p, grid%xb%p, typical_p_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%q, grid%xb%q, typical_q_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%qcw, grid%xb%qcw, typical_qcw_rms)
+   call da_set_tst_trnsf_fld(grid%xp, grid%xa%qrn, grid%xb%qrn, typical_qrn_rms)
 
    ! [2.5] get test density increment from linearised ideal gas law:
 
-   call da_pt_to_rho_lin(xb, xa, xp)
+   call da_pt_to_rho_lin(grid)
 
-   xa%psfc(xp%its:xp%ite, xp%jts:xp%jte) = &
-   xa%p   (xp%its:xp%ite, xp%jts:xp%jte, xp%kts)
+   grid%xa%psfc(grid%xp%its:grid%xp%ite, grid%xp%jts:grid%xp%jte) = &
+   grid%xa%p   (grid%xp%its:grid%xp%ite, grid%xp%jts:grid%xp%jte, grid%xp%kts)
 
    if (print_detail_testing) then
       write(unit=stdout, fmt='(2a,4x,a,i8)') &
          'file:', __FILE__, 'line:', __LINE__
 
-      write(unit=stdout, fmt=*) 'xp%its, xp%ite, xp%jts, xp%jte) =', &
-         xp%its, xp%ite, xp%jts, xp%jte
+      write(unit=stdout, fmt=*) 'grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte) =', &
+         grid%xp%its, grid%xp%ite, grid%xp%jts, grid%xp%jte
    
-      do j=xp%jts, xp%jte
-         do i=xp%its, xp%ite
+      do j=grid%xp%jts, grid%xp%jte
+         do i=grid%xp%its, grid%xp%ite
             if (i == j) then
                write(unit=stdout, fmt='(2(a,i4),a,f14.6)') &
-                  'xa%psfc(', i, ',', j, ') =', xa%psfc(i, j)
+                  'grid%xa%psfc(', i, ',', j, ') =', grid%xa%psfc(i, j)
             end if
          end do
       end do
@@ -76,15 +72,15 @@ subroutine da_setup_testfield(grid,xb, xa, xp)
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
 
       ! Now do something for PW
-      call da_transform_xtotpw(xa, xb)
+      call da_transform_xtotpw(grid%xa, grid%xb)
 
       ! GPS Refractivity:
       if (use_GpsrefObs) &
-         call da_transform_xtogpsref_lin(xa, xb, xp)
+         call da_transform_xtogpsref_lin(grid)
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
-         call da_transform_xtoseasfcwind_lin(xa, xb)
+         call da_transform_xtoseasfcwind_lin(grid%xa, grid%xb)
       end if
 
 #ifdef DM_PARALLEL

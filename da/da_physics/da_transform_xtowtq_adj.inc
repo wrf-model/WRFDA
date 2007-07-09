@@ -1,4 +1,4 @@
-subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
+subroutine da_transform_xtowtq_adj (grid)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,35 +6,31 @@ subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp          ! domain decomposition vars.
-   type (xb_type),    intent(in)    :: xb          ! first guess state.
-   type (x_type),     intent(inout) :: jo_grad_x   ! grad_x(jo)
+   type (domain), intent(inout)    :: grid
 
-   integer :: i, j, kz, is, js, ie, je
+   integer :: i, j, is, js, ie, je
    real    :: height
 
    if (trace_use) call da_trace_entry("da_transform_xtowtq_adj")
 
-   kz = xp%kts
+   is = grid%xb%its
+   js = grid%xb%jts
 
-   is = xb%its
-   js = xb%jts
-
-   ie = xb%ite
-   je = xb%jte
+   ie = grid%xb%ite
+   je = grid%xb%jte
 
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < xb%ids) is = xb%ids
-      if (js < xb%jds) js = xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > xb%ide) ie = xb%ide
-      if (je > xb%jde) je = xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    ! Adjoint from Gridded 10-m wind and 2-m moisture and temperature
@@ -42,27 +38,27 @@ subroutine da_transform_xtowtq_adj (xp, xb, jo_grad_x)
 
    do j=js, je
       do i=is, ie
-         jo_grad_x%tgrn(i,j)=0.0
+         grid%xa%tgrn(i,j)=0.0
 
-         height = xb%h(i,j,kz) - xb%terr(i,j)                 
+         height = grid%xb%h(i,j,kts) - grid%xb%terr(i,j)                 
          if (height <= 0.0) then
             message(1) = "Negative height found"
             write(unit=message(2),FMT='(2I6,A,F10.2,A,F10.2)') &
-               i,j,' ht = ',xb%h(i,j,kz) ,' terr =  ',xb%terr(i,j)
+               i,j,' ht = ',grid%xb%h(i,j,kts) ,' terr =  ',grid%xb%terr(i,j)
             call da_error(__FILE__,__LINE__,message(1:2))
          endif
-         call da_sfc_wtq_adj(xb%psfc(i,j), xb%tgrn(i,j), &
-            xb%p(i,j,kz), xb%t(i,j,kz), xb%q(i,j,kz), &
-            xb%u(i,j,kz), xb%v(i,j,kz), &
-            xb%regime(i,j),  &
-            jo_grad_x%psfc(i,j), jo_grad_x%tgrn(i,j), &
-            jo_grad_x%p(i,j,kz), jo_grad_x%t(i,j,kz), jo_grad_x%q(i,j,kz), &
-            jo_grad_x%u(i,j,kz), jo_grad_x%v(i,j,kz), &
-            height      , xb%rough(i,j), xb%xland(i,j), &
-            jo_grad_x%u10(i,j),jo_grad_x%v10(i,j), &
-            jo_grad_x%t2 (i,j),jo_grad_x%q2 (i,j))
+         call da_sfc_wtq_adj(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
+            grid%xb%p(i,j,kts), grid%xb%t(i,j,kts), grid%xb%q(i,j,kts), &
+            grid%xb%u(i,j,kts), grid%xb%v(i,j,kts), &
+            grid%xb%regime(i,j),  &
+            grid%xa%psfc(i,j), grid%xa%tgrn(i,j), &
+            grid%xa%p(i,j,kts), grid%xa%t(i,j,kts), grid%xa%q(i,j,kts), &
+            grid%xa%u(i,j,kts), grid%xa%v(i,j,kts), &
+            height      , grid%xb%rough(i,j), grid%xb%xland(i,j), &
+            grid%xa%u10(i,j),grid%xa%v10(i,j), &
+            grid%xa%t2 (i,j),grid%xa%q2 (i,j))
 
-         jo_grad_x%tgrn(i,j)=0.0
+         grid%xa%tgrn(i,j)=0.0
       end do
    end do
 

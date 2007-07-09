@@ -544,6 +544,8 @@ module da_control
    integer :: ims,ime,jms,jme,kms,kme
    integer :: its,ite,jts,jte,kts,kte
    integer :: ips,ipe,jps,jpe,kps,kpe
+   integer :: itsy,itey,jtsy,jtey,ktsy,ktey
+   integer :: itsx,itex,jtsx,jtex,ktsx,ktex
 
 contains
 

@@ -225,16 +225,14 @@ subroutine da_solve ( grid , config_flags)
       call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
       if (test_transforms) then
-         call da_check(grid, cv_size, grid%xb, xbx, be, grid%ep, iv, &
-                        grid%xa, grid%vv, grid%vp, grid%xp, y)
+         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
          call wrfu_finalize
          call wrf_shutdown
          stop
       end if
 
       if (test_wrfvar) then
-         call da_check(grid, cv_size, grid%xb, xbx, be, grid%ep, iv, &
-                        grid%xa, grid%vv, grid%vp, grid%xp, y)
+         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
          call wrfu_finalize
          call wrf_shutdown
          stop
@@ -267,14 +265,13 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.5] Update latest analysis solution:
 
-      call da_transform_vtox(grid, cv_size, grid%xb, xbx, be, grid%ep, xhat, &
-         grid%vv, grid%vp, grid%xp, grid%xa)
+      call da_transform_vtox(grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
 
       ! [8.6] Only when use_RadarObs = .false. and calc_w_increment =.true.,
       !       the w_increment need to be diagnosed:
 
       if (calc_w_increment .and. .not. use_RadarObs) then
-         call da_uvprho_to_w_lin( grid%xb, grid%xa, grid%xp)
+         call da_uvprho_to_w_lin(grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_RADAR_XA_W.inc"

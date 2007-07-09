@@ -1,4 +1,4 @@
-subroutine da_uvprho_to_w_lin(xb, xa, xp)
+subroutine da_uvprho_to_w_lin(grid)
 
    !------------------------------------------------------------------------------
    !  Purpose: Calculates vertical velocity increments from Richardson's Eq.
@@ -9,9 +9,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
 
    implicit none
 
-   type (xb_type), intent(in)       :: xb        ! First guess structure.
-   type (x_type), intent(inout)     :: xa        ! increment structure.
-   type (xpose_type), intent(inout) :: xp        ! domain decomposition vars.
+   type (domain), intent(inout)     :: grid
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -38,10 +36,10 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            WZ(I,J,K)=WZ(I,J,K)-xb%u(I,J,K)*(xa%p(I+1,J,K)-xa%p(I-1,J,K))* &
-               xb%coefx(I,J)
-            WZ(I,J,K)=WZ(I,J,K)-xb%v(I,J,K)*(xa%p(I,J+1,K)-xa%p(I,J-1,K))* &
-               xb%coefy(I,J)
+            WZ(I,J,K)=WZ(I,J,K)-grid%xb%u(I,J,K)*(grid%xa%p(I+1,J,K)-grid%xa%p(I-1,J,K))* &
+               grid%xb%coefx(I,J)
+            WZ(I,J,K)=WZ(I,J,K)-grid%xb%v(I,J,K)*(grid%xa%p(I,J+1,K)-grid%xa%p(I,J-1,K))* &
+               grid%xb%coefy(I,J)
          end do
       end do
    end do
@@ -51,10 +49,10 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            WZ(I,J,K)=WZ(I,J,K)-xa%u(I,J,K)*(xb%p(I+1,J,K)-xb%p(I-1,J,K))* &
-               xb%coefx(I,J)
-            WZ(I,J,K)=WZ(I,J,K)-xa%v(I,J,K)*(xb%p(I,J+1,K)-xb%p(I,J-1,K))* &
-               xb%coefy(I,J)
+            WZ(I,J,K)=WZ(I,J,K)-grid%xa%u(I,J,K)*(grid%xb%p(I+1,J,K)-grid%xb%p(I-1,J,K))* &
+               grid%xb%coefx(I,J)
+            WZ(I,J,K)=WZ(I,J,K)-grid%xa%v(I,J,K)*(grid%xb%p(I,J+1,K)-grid%xb%p(I,J-1,K))* &
+               grid%xb%coefy(I,J)
          end do
       end do
    end do
@@ -100,24 +98,24 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
 
    ! Term 2.1: Divergence term from perturbed wind
 
-   call da_uv_to_divergence(xb, xa%u, xa%v, DIV)
+   call da_uv_to_divergence(grid%xb, grid%xa%u, grid%xa%v, DIV)
 
    do K=kts,kte  
       do J=jts,jte
          do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)-GAMMA*xb%p(I,J,K)*DIV(I,J,K)
+            WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xb%p(I,J,K)*DIV(I,J,K)
          end do
       end do
    end do
 
    ! Term 2.2: Divergence term from basic wind
 
-   call da_uv_to_divergence(xb, xb%u, xb%v, DIV)
+   call da_uv_to_divergence(grid%xb, grid%xb%u, grid%xb%v, DIV)
 
    do K=kts,kte
       do J=jts,jte
          do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)-GAMMA*xa%p(I,J,K)*DIV(I,J,K)
+            WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xa%p(I,J,K)*DIV(I,J,K)
       end do
    end do
    end do
@@ -132,13 +130,13 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            URHO(I,J,K)=xb%rho(I,J,K)*xa%u(I,J,K)
-            VRHO(I,J,K)=xb%rho(I,J,K)*xa%v(I,J,K)
+            URHO(I,J,K)=grid%xb%rho(I,J,K)*grid%xa%u(I,J,K)
+            VRHO(I,J,K)=grid%xb%rho(I,J,K)*grid%xa%v(I,J,K)
          end do
       end do
    end do
 
-   call da_uv_to_divergence(xb, URHO, VRHO, DIV)
+   call da_uv_to_divergence(grid%xb, URHO, VRHO, DIV)
 
    do J=jts,jte
       do I=its,ite
@@ -146,7 +144,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
 
          do K=kte-1,kts,-1
             TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &
-                *(xb%h(I,J,K+1)-xb%h(I,J,K))
+                *(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             WZ(I,J,K)=WZ(I,J,K)+TERM3
          end do
       end do
@@ -157,13 +155,13 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do K=kts,kte
       do J=js,je
          do I=is,ie
-            URHO(I,J,K)=xa%rho(I,J,K)*xb%u(I,J,K)
-            VRHO(I,J,K)=xa%rho(I,J,K)*xb%v(I,J,K)
+            URHO(I,J,K)=grid%xa%rho(I,J,K)*grid%xb%u(I,J,K)
+            VRHO(I,J,K)=grid%xa%rho(I,J,K)*grid%xb%v(I,J,K)
          end do
       end do
    end do
 
-   call da_uv_to_divergence(xb, URHO, VRHO, DIV)
+   call da_uv_to_divergence(grid%xb, URHO, VRHO, DIV)
 
    do J=jts,jte
       do I=its,ite
@@ -171,7 +169,7 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
 
          do K=kte-1,kts,-1
             TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &
-               *(xb%h(I,J,K+1)-xb%h(I,J,K))
+               *(grid%xb%h(I,J,K+1)-grid%xb%h(I,J,K))
             WZ(I,J,K)=WZ(I,J,K)+TERM3
          end do
       end do
@@ -182,8 +180,8 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do J=jts,jte
       do I=its,ite
          do K=kts,kte
-            WZ(I,J,K)=WZ(I,J,K)-GAMMA*xa%p(I,J,K)*(xb%w(I,J,K+1)-xb%w(I,J,K))/  &
-                      (xb%hf(I,J,K+1)-xb%hf(I,J,K))
+            WZ(I,J,K)=WZ(I,J,K)-GAMMA*grid%xa%p(I,J,K)*(grid%xb%w(I,J,K+1)-grid%xb%w(I,J,K))/  &
+                      (grid%xb%hf(I,J,K+1)-grid%xb%hf(I,J,K))
          end do
       end do
    end do
@@ -193,21 +191,21 @@ subroutine da_uvprho_to_w_lin(xb, xa, xp)
    do K=kts,kte
       do J=jts,jte
          do I=its,ite
-            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*xb%p(I,J,K))
+            WZ(I,J,K)=WZ(I,J,K)/(GAMMA*grid%xb%p(I,J,K))
          end do
       end do
    end do
 
    ! integration to calculate the vertical velocity 
 
-   call da_w_adjustment_lin(xb,xa%w,WZ)
+   call da_w_adjustment_lin(grid%xb,grid%xa%w,WZ)
 
    do J=jts,jte
       do I=its,ite
-         xa%w(I,J,kte+1)=0.0
+         grid%xa%w(I,J,kte+1)=0.0
          do K=kte,kts,-1
-            xa%w(I,J,K)=xa%w(I,J,K+1)+   &
-                     WZ(I,J,K)*(xb%hf(I,J,K)-xb%hf(I,J,K+1))
+            grid%xa%w(I,J,K)=grid%xa%w(I,J,K+1)+   &
+                     WZ(I,J,K)*(grid%xb%hf(I,J,K)-grid%xb%hf(I,J,K+1))
          end do
       end do
    end do

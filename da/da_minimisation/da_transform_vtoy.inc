@@ -1,5 +1,5 @@
-subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
-                              xp, y, &
+subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
+                              y, &
                               grid, config_flags)
 
    !----------------------------------------------------------------------
@@ -15,10 +15,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
    type (ob_type), intent(inout)      :: iv     ! innovation vector (o-b).
    type (vp_type), intent(inout)      :: vp     ! Grdipt/level CV.
    type (vp_type), intent(inout)      :: vv     ! Grdipt/EOF CV.
-   type (x_type) , intent(inout)      :: xa     ! gridded analy. incs. (local)
-   type (xb_type), intent(in)         :: xb     ! first guess (local).
    type (xbx_type),intent(in)         :: xbx    ! For header & non-grid arrays.
-   type (xpose_type), intent(inout)   :: xp     ! Domain decomposition vars.
    type (y_type) , intent(inout)      :: y      ! y = H(x_inc).
 
    type(domain), intent(inout)           :: grid
@@ -33,7 +30,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
 
    call da_trace_entry("da_transform_vtoy")
 
-   call da_transform_vtox(grid, cv_size, xb, xbx, be, ep, cv, vv, vp, xp, xa)
+   call da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    if (var4d) then
       call da_transfer_xatowrftl(grid, config_flags, 'tl01')
@@ -70,10 +67,10 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
          iv%current_ob_time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
-         call da_transform_xtoy(xb, iv, xa, xp, y)
+         call da_transform_xtoy(grid, iv, y)
       end do
    else  ! not var4d
-      call da_transform_xtoy(xb, iv, xa, xp, y)
+      call da_transform_xtoy(grid, iv, y)
    end if ! var4d
 
    call da_trace_exit("da_transform_vtoy")

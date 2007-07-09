@@ -1,5 +1,4 @@
-subroutine da_test_vxtransform( xb, xbx, xp, be, &
-                                xa, vv, vp)
+subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
 
    !---------------------------------------------------------------------------
    ! Purpose: Perform inverse/adjoint tests on control variable transform.
@@ -12,11 +11,9 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
    implicit none
 
-   type (xb_type), intent(in)        :: xb    ! first guess (local).
+   type (domain), intent(inout)        :: grid
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
-   type (xpose_type), intent(inout)  :: xp    ! Dimensions and xpose buffers.
    type (be_type), intent(in)        :: be    ! background error structure.
-   type (x_type), intent(out)        :: xa    ! analysis increments (local).
 
    type (vp_type), intent(out)       :: vp          ! Test CV structure.
    type (vp_type), intent(out)       :: vv          ! Test CV structure.
@@ -59,7 +56,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 
    call random_number(cv(:))
    cv(:) = cv(:) - 0.5
-   call da_zero_x(xa)
+   call da_zero_x(grid%xa)
    
    if ( global ) then
       write(unit=stdout, fmt='(/a/)') &
@@ -73,26 +70,25 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
 #else
    write(unit=stdout, fmt='(/a/)') &
          ' Inverse tests follows:'
-   call da_transform_vtox( xb, xbx, be, cv, &
-                           vv, vp, xp, xa)
+   call da_transform_vtox( grid, xbx, be, cv, vv, vp)
 
-   ! Store xa, Vv & Vp for inverse test
+   ! Store grid%xa, Vv & Vp for inverse test
 
-   xa2_u(ims:ime,jms:jme,:) = xa % u(ims:ime,jms:jme,:)
-   xa2_v(ims:ime,jms:jme,:) = xa % v(ims:ime,jms:jme,:)
-   xa2_w(ims:ime,jms:jme,:) = xa % w(ims:ime,jms:jme,:)
-   xa2_t(ims:ime,jms:jme,:) = xa % t(ims:ime,jms:jme,:)
-   xa2_p(ims:ime,jms:jme,:) = xa % p(ims:ime,jms:jme,:)
-   xa2_q(ims:ime,jms:jme,:) = xa % q(ims:ime,jms:jme,:)
-   xa2_rho(ims:ime,jms:jme,:) = xa % rho(ims:ime,jms:jme,:)
+   xa2_u(ims:ime,jms:jme,:) = grid%xa % u(ims:ime,jms:jme,:)
+   xa2_v(ims:ime,jms:jme,:) = grid%xa % v(ims:ime,jms:jme,:)
+   xa2_w(ims:ime,jms:jme,:) = grid%xa % w(ims:ime,jms:jme,:)
+   xa2_t(ims:ime,jms:jme,:) = grid%xa % t(ims:ime,jms:jme,:)
+   xa2_p(ims:ime,jms:jme,:) = grid%xa % p(ims:ime,jms:jme,:)
+   xa2_q(ims:ime,jms:jme,:) = grid%xa % q(ims:ime,jms:jme,:)
+   xa2_rho(ims:ime,jms:jme,:) = grid%xa % rho(ims:ime,jms:jme,:)
 
    if ( cv_options_hum == 2 ) then
-      xa2_rh(ims:ime,jms:jme,:) = xa % rh(ims:ime,jms:jme,:)
+      xa2_rh(ims:ime,jms:jme,:) = grid%xa % rh(ims:ime,jms:jme,:)
    end if
    if ( cv_options_hum == 3 ) then
-      xa2_qt (ims:ime,jms:jme,:) = xa % qt (ims:ime,jms:jme,:)
-      xa2_qcw(ims:ime,jms:jme,:) = xa % qcw(ims:ime,jms:jme,:)
-      xa2_qrn(ims:ime,jms:jme,:) = xa % qrn(ims:ime,jms:jme,:)
+      xa2_qt (ims:ime,jms:jme,:) = grid%xa % qt (ims:ime,jms:jme,:)
+      xa2_qcw(ims:ime,jms:jme,:) = grid%xa % qcw(ims:ime,jms:jme,:)
+      xa2_qrn(ims:ime,jms:jme,:) = grid%xa % qrn(ims:ime,jms:jme,:)
    end if
 
    vv1 % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
@@ -110,12 +106,12 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    !----------------------------------------------------------------------
    ! [1.0]: Perform VvToVpToVv test:                        
    !----------------------------------------------------------------------
-   ! call da_transform_xtovp( xb, xbx, xa, xp, vp, be)
+   ! call da_transform_xtovp( grid, xbx, vp, be)
 
    if ( vert_corr == 2 ) then
       ! perform vv = u_v^{-1} vp transform:
       call da_vertical_transform( 'u_inv', be, &
-                            xb % vertical_inner_product, &
+                            grid%xb % vertical_inner_product, &
                             vv, vp)
    else
       vv % v1(its:ite,jts:jte,1:kz_vv(1)) = vp % v1(its:ite,jts:jte,1:kz_vp(1))
@@ -137,7 +133,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    if ( vert_corr == 2 ) then
       ! perform vp = u_v (vv) transform:
       call da_vertical_transform( 'u', be, &
-                            xb % vertical_inner_product, &
+                            grid%xb % vertical_inner_product, &
                             vv, vp)
    else
 
@@ -159,7 +155,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    !----------------------------------------------------------------------
    ! [3.0] Check_CvToVv_Adjoint:
    !----------------------------------------------------------------------
-   call da_check_cvtovv_adjoint( xb, xbx, xp, be, cv, vv)
+   call da_check_cvtovv_adjoint( grid%xb, xbx, xp, be, cv, vv)
   
    !----------------------------------------------------------------------
    ! [4.0] Test inverse physical variable transform:
@@ -167,20 +163,20 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    !----------------------------------------------------------------------
 
    if( .not. global ) then
-      call da_zero_x(xa)
-      call da_transform_vptox( xb, vp, xp, xa, be
+      call da_zero_x(grid%xa)
+      call da_transform_vptox( grid%xb, vp, xp, grid%xa, be
       ! [4.1] Test XToVpToX differences:
 
       write(unit=stdout, fmt='(/a/)') &
          'da_check_xtovptox_errors'
    
-      call da_check_xtovptox_errors( xa, xa2_u, xa2_v, xa2_w, xa2_t, &
+      call da_check_xtovptox_errors( grid%xa, xa2_u, xa2_v, xa2_w, xa2_t, &
                                  xa2_p, xa2_q,  xa2_rho, &
                                  xa2_qt, xa2_qcw, xa2_qrn)
 
       ! [4.2] Perform v_{p} = U_{p}^{-1} x transform (again):
 
-      call da_transform_xtovp( xb, xbx, xa, xp, vv, be)
+      call da_transform_xtovp( grid, xbx, vv, be)
       
       ! [2.4] Check inverse errors:
 
@@ -194,13 +190,13 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    ! [5.0] Perform Vv -> Vp adjoint test: 
    !----------------------------------------------------------------------
 
-   call da_check_vvtovp_adjoint( xb, xp, be, vp, vv)
+   call da_check_vvtovp_adjoint( grid%xb, xp, be, vp, vv)
 
    !----------------------------------------------------------------------
    ! [6.0] Perform Vp -> X  adjoint tests: 
    !----------------------------------------------------------------------
 
-   call da_check_vptox_adjoint( xb, be, xa, xp, vp)
+   call da_check_vptox_adjoint( grid%xb, be, grid%xa, xp, vp)
 
 #endif
 1111 continue
@@ -209,7 +205,7 @@ subroutine da_test_vxtransform( xb, xbx, xp, be, &
    ! [7.0]: Perform adjoint test on complete transform: <x,x> = <v_adj,v>
    !----------------------------------------------------------------------
 
-   call da_check_vtox_adjoint( xb, xbx, be, cv, vv, vp, xp, xa)
+   call da_check_vtox_adjoint( grid, xbx, be, cv, vv, vp)
 
    !----------------------------------------------------------------------
    ! [8.0]: Perform Spectral transform tests for Global                    

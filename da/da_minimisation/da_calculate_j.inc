@@ -60,7 +60,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    if (iter > 0) &
       call da_transform_vtoy(cv_size, be, grid%ep, xhat, iv, grid%vp, grid%vv,&
-                              grid%xa, grid%xb, xbx, grid%xp, y, &
+                              xbx, y, &
                               grid, config_flags                      )
 
    ! [1.2] compute residual (o-a) = (o-b) - h x~
@@ -158,7 +158,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    !-------------------------------------------------------------------------
 
    call da_transform_vtoy_adj(iter, cv_size, be, grid%ep, j_grad, iv, &
-      grid%vp, grid%vv, grid%xa, grid%xb, xbx, grid%xp, jo_grad_y, &
+      grid%vp, grid%vv, xbx, jo_grad_y, &
       grid, config_flags, cg_jcdf)
 
    call da_deallocate_y(jo_grad_y)

@@ -1,5 +1,4 @@
-subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
-                                  xb, xbx, xp, be, ep, xa, iv, y)
+subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep, iv, y)
 
    !---------------------------------------------------------------------------
    !  Purpose: Perform V To Y Adjoint transform test                             
@@ -15,13 +14,10 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    type (vp_type),    intent(inout) :: vv    ! Grdipt/EOF CV.
    type (vp_type),    intent(inout) :: vp    ! Grdipt/level CV.
-   type (xb_type),    intent(in)    :: xb    ! first guess (local).
    type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.
-   type (xpose_type), intent(inout) :: xp    ! Dimensions and xpose buffers.
    type (be_type),    intent(in)    :: be    ! background error structure.
    type (ep_type),    intent(in)    :: ep     ! ensemble perturbation structure.
 
-   type (x_type),     intent(out)   :: xa    ! analysis increments (local).
    type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
    type (y_type),     intent(inout) :: y     ! y = h (xa)
 
@@ -45,12 +41,11 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
 
    cv_2(1:cv_size) = cv(1:cv_size)
 
-   call da_zero_x(xa)
+   call da_zero_x(grid%xa)
    call da_zero_vp_type(vp)
    call da_zero_vp_type(vv)
 
-   call da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, xp, y, &
-                             grid, config_flags)
+   call da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, y, grid, config_flags)
 
    !-------------------------------------------------------------------------
    ! [3.0] Calculate LHS of adjoint test equation and
@@ -63,13 +58,13 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, &
    cv = 0.
    cg_jcdf = 1
 
+   ! WHY?
    ! call da_zero_vp_type(vp)
    ! call da_zero_vp_type(vv)
-   ! call da_zero_x(xa)      
+   ! call da_zero_x(grid%xa)      
 
-   call da_transform_vtoy_adj(0,cv_size, be, ep, cv, iv, vp, vv, xa, xb, xbx, &
-                                 xp, y, &
-                                 grid, config_flags, cg_jcdf)
+   call da_transform_vtoy_adj(0,cv_size, be, ep, cv, iv, vp, vv, xbx, y, grid, &
+      config_flags, cg_jcdf)
 
    adj_rhs = sum(cv(1:cv_size) * cv_2(1:cv_size))
 

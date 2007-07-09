@@ -1,4 +1,4 @@
-subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
+subroutine da_transform_vptox_adj(grid, vp, be, ep)
 
    !--------------------------------------------------------------------------
    ! Purpose: Adjoint for Physical transform of variables 
@@ -8,23 +8,20 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 
    type (domain), intent(inout)         :: grid
 
-   type (xb_type), intent(in)           :: xb  ! First guess structure.
-   type (x_type), intent(inout)         :: xa  ! Grad_x(Jo)
    type (vp_type), intent(inout)        :: vp  ! CV on grid structure.
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbation.
    type (be_type), intent(in), optional :: be  ! Background errors.
-   type (xpose_type), intent(inout)     :: xp  ! Transpose variables.
 
    integer         :: k, j, k1              ! Loop counters.
 
    if (trace_use) call da_trace_entry("da_transform_vptox_adj")
 
    !---------------------------------------------------------------------------
-   !  [4] Add flow-dependent increments in model space (xa):
+   !  [4] Add flow-dependent increments in model space (grid%xa):
    !---------------------------------------------------------------------------
       
    if (be % ne > 0 .and. alphacv_method == 2) then
-      call da_add_flow_dependence_xa_adj(be % ne, ep, xa, vp)
+      call da_add_flow_dependence_xa_adj(be % ne, ep, grid%xa, vp)
    end if
 
    !--------------------------------------------------------------------------
@@ -36,16 +33,16 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
       ! Pseudo RH --> Total water mixing ratio:
 
       vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
-                                        xa%qt(its:ite,jts:jte,kts:kte) * &
-                                        xb%qs(its:ite,jts:jte,kts:kte)
+                                        grid%xa%qt(its:ite,jts:jte,kts:kte) * &
+                                        grid%xb%qs(its:ite,jts:jte,kts:kte)
 
    else 
 
    ! Pseudo RH --> Water vapor mixing ratio:
 
       vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
-                                        xa%q (its:ite,jts:jte,kts:kte) * &
-                                        xb%qs(its:ite,jts:jte,kts:kte)
+                                        grid%xa%q (its:ite,jts:jte,kts:kte) * &
+                                        grid%xb%qs(its:ite,jts:jte,kts:kte)
 
    endif
 
@@ -54,8 +51,8 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
 #endif
 
    ! Transform psi and chi to u and v:
-   call da_psichi_to_uv_adj(xa % u, xa % v, xb % coefx,   &
-                             xb % coefy, vp % v1, vp % v2)
+   call da_psichi_to_uv_adj(grid%xa % u, grid%xa % v, grid%xb % coefx,   &
+                             grid%xb % coefy, vp % v1, vp % v2)
 
    !--------------------------------------------------------------------------
    ! [2] Impose statistical balance constraints:
@@ -65,21 +62,21 @@ subroutine da_transform_vptox_adj(grid, xb, xa, vp, be, ep, xp)
    do k=kts,kte
       do j=jts,jte
          vp%v1(its:ite,j,k) = vp%v1(its:ite,j,k) + &
-                              be%reg_ps(j,k)*xa%psfc(its:ite,j)
+                              be%reg_ps(j,k)*grid%xa%psfc(its:ite,j)
       end do
    end do
-   vp%v5(its:ite,jts:jte,1) = xa%psfc(its:ite,jts:jte) 
+   vp%v5(its:ite,jts:jte,1) = grid%xa%psfc(its:ite,jts:jte) 
 
    ! Temperature
    do k1 = kts,kte
       do k = kts,kte
          do j = jts,jte
             vp%v1(its:ite,j,k1) = vp%v1(its:ite,j,k1) + &
-                                  be%reg_t(j,k,k1)*xa%t(its:ite,j,k)
+                                  be%reg_t(j,k,k1)*grid%xa%t(its:ite,j,k)
          end do
       end do
    end do
-   vp%v3(its:ite,jts:jte,kts:kte) = xa%t(its:ite,jts:jte,kts:kte)
+   vp%v3(its:ite,jts:jte,kts:kte) = grid%xa%t(its:ite,jts:jte,kts:kte)
 
    ! Chi
    do k = kts,kte

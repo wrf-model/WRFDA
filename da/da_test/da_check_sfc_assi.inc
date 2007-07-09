@@ -1,4 +1,4 @@
-subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
+subroutine da_check_sfc_assi(grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,11 +8,8 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
 
    type (domain), intent(inout)     :: grid
   
-   type (xb_type),    intent(in)    :: xb    ! first guess (local).
-   type (x_type),     intent(inout) :: xa    ! analysis increments (local).
    type (ob_type),    intent(inout) :: iv    ! ob. increment vector.
-   type (xpose_type), intent(inout) :: xp    ! Dimensions and xpose buffers(be).
-   type (y_type),     intent(inout) :: y     ! y = h (xa)
+   type (y_type),     intent(inout) :: y     ! y = h (grid%xa)
 
    real                           :: adj_ttl_lhs   ! < y, y >
    real                           :: adj_ttl_rhs   ! < x, x_adj >
@@ -36,23 +33,23 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
   
    call da_message((/"check_sfc_assi: Adjoint Test Results:"/))
     
-   xa2_u(ims:ime, jms:jme, kms:kme) = xa%u(ims:ime, jms:jme, kms:kme)
-   xa2_v(ims:ime, jms:jme, kms:kme) = xa%v(ims:ime, jms:jme, kms:kme)
-   xa2_t(ims:ime, jms:jme, kms:kme) = xa%t(ims:ime, jms:jme, kms:kme)
-   xa2_p(ims:ime, jms:jme, kms:kme) = xa%p(ims:ime, jms:jme, kms:kme)
-   xa2_q(ims:ime, jms:jme, kms:kme) = xa%q(ims:ime, jms:jme, kms:kme)
+   xa2_u(ims:ime, jms:jme, kms:kme) = grid%xa%u(ims:ime, jms:jme, kms:kme)
+   xa2_v(ims:ime, jms:jme, kms:kme) = grid%xa%v(ims:ime, jms:jme, kms:kme)
+   xa2_t(ims:ime, jms:jme, kms:kme) = grid%xa%t(ims:ime, jms:jme, kms:kme)
+   xa2_p(ims:ime, jms:jme, kms:kme) = grid%xa%p(ims:ime, jms:jme, kms:kme)
+   xa2_q(ims:ime, jms:jme, kms:kme) = grid%xa%q(ims:ime, jms:jme, kms:kme)
 
-   xa2_psfc(ims:ime, jms:jme) = xa%psfc(ims:ime, jms:jme)
-   xa2_tgrn(ims:ime, jms:jme) = xa%tgrn(ims:ime, jms:jme)
-   xa2_u10 (ims:ime, jms:jme) = xa%u10 (ims:ime, jms:jme)
-   xa2_v10 (ims:ime, jms:jme) = xa%v10 (ims:ime, jms:jme)
-   xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
-   xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
+   xa2_psfc(ims:ime, jms:jme) = grid%xa%psfc(ims:ime, jms:jme)
+   xa2_tgrn(ims:ime, jms:jme) = grid%xa%tgrn(ims:ime, jms:jme)
+   xa2_u10 (ims:ime, jms:jme) = grid%xa%u10 (ims:ime, jms:jme)
+   xa2_v10 (ims:ime, jms:jme) = grid%xa%v10 (ims:ime, jms:jme)
+   xa2_t2  (ims:ime, jms:jme) = grid%xa%t2  (ims:ime, jms:jme)
+   xa2_q2  (ims:ime, jms:jme) = grid%xa%q2  (ims:ime, jms:jme)
 
    ! WHY?
-   ! call check_psfc(xb, xa, iv, xp, y)
+   ! call check_psfc(grid, iv, y)
 
-   call da_transform_xtowtq (xp, xb, xa)
+   call da_transform_xtowtq (grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_SFC_XA.inc"
@@ -63,7 +60,7 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
-      call da_transform_xtopsfc(xb, xa, xp, iv%synop(n), y%synop(n))
+      call da_transform_xtopsfc(grid%xb, grid%xa, grid%xp, iv%synop(n), y%synop(n))
 
 
       pertile_lhs = pertile_lhs &
@@ -87,37 +84,37 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
    ! [5.0] Perform adjoint operation:
    !----------------------------------------------------------------------
 
-   call da_zero_x(xa)
+   call da_zero_x(grid%xa)
 
    do n=1, iv%num_synop
-      call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
+      call da_transform_xtopsfc_adj(grid%xb,grid%xp,iv%synop(n),y%synop(n),grid%xa)
    end do
 
-   call da_transform_xtowtq_adj (xp, xb, xa)
+   call da_transform_xtowtq_adj (grid)
    
-   pertile_rhs = sum(xa%u(ims:ime, jms:jme, kms:kme) * &
+   pertile_rhs = sum(grid%xa%u(ims:ime, jms:jme, kms:kme) * &
       xa2_u(ims:ime, jms:jme, kms:kme)) + &
-                 sum(xa%v(ims:ime, jms:jme, kms:kme) * &
+                 sum(grid%xa%v(ims:ime, jms:jme, kms:kme) * &
       xa2_v(ims:ime, jms:jme, kms:kme)) + &
-                 sum(xa%t(ims:ime, jms:jme, kms:kme) * &
+                 sum(grid%xa%t(ims:ime, jms:jme, kms:kme) * &
       xa2_t(ims:ime, jms:jme, kms:kme)) + &
-                 sum(xa%p(ims:ime, jms:jme, kms:kme) * &
+                 sum(grid%xa%p(ims:ime, jms:jme, kms:kme) * &
       xa2_p(ims:ime, jms:jme, kms:kme)) + &
-                 sum(xa%q(ims:ime, jms:jme, kms:kme) * &
+                 sum(grid%xa%q(ims:ime, jms:jme, kms:kme) * &
       xa2_q(ims:ime, jms:jme, kms:kme)) + &
-                 sum(xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
+                 sum(grid%xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
 
    !-------------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjivnt test equation:
    !-------------------------------------------------------------------------
    
    partial_rhs = &
-      sum(xa%u(its:ite, jts:jte, kts:kte) * xa2_u(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%v(its:ite, jts:jte, kts:kte) * xa2_v(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%t(its:ite, jts:jte, kts:kte) * xa2_t(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%p(its:ite, jts:jte, kts:kte) * xa2_p(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%q(its:ite, jts:jte, kts:kte) * xa2_q(its:ite,jts:jte,kts:kte)) + &
-      sum(xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
+      sum(grid%xa%u(its:ite, jts:jte, kts:kte) * xa2_u(its:ite,jts:jte,kts:kte)) + &
+      sum(grid%xa%v(its:ite, jts:jte, kts:kte) * xa2_v(its:ite,jts:jte,kts:kte)) + &
+      sum(grid%xa%t(its:ite, jts:jte, kts:kte) * xa2_t(its:ite,jts:jte,kts:kte)) + &
+      sum(grid%xa%p(its:ite, jts:jte, kts:kte) * xa2_p(its:ite,jts:jte,kts:kte)) + &
+      sum(grid%xa%q(its:ite, jts:jte, kts:kte) * xa2_q(its:ite,jts:jte,kts:kte)) + &
+      sum(grid%xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
    
    !-------------------------------------------------------------------------
    ! [7.0] Print output:
@@ -139,19 +136,19 @@ subroutine da_check_sfc_assi(grid,xb, xa, iv, xp, y)
          ' Whole Domain < x, x_adj > = ', adj_ttl_rhs
    end if
 
-   ! recover xa
-   xa%u(ims:ime, jms:jme, kms:kme) = xa2_u(ims:ime, jms:jme, kms:kme)
-   xa%v(ims:ime, jms:jme, kms:kme) = xa2_v(ims:ime, jms:jme, kms:kme)
-   xa%t(ims:ime, jms:jme, kms:kme) = xa2_t(ims:ime, jms:jme, kms:kme)
-   xa%p(ims:ime, jms:jme, kms:kme) = xa2_p(ims:ime, jms:jme, kms:kme)
-   xa%q(ims:ime, jms:jme, kms:kme) = xa2_q(ims:ime, jms:jme, kms:kme)
+   ! recover grid%xa
+   grid%xa%u(ims:ime, jms:jme, kms:kme) = xa2_u(ims:ime, jms:jme, kms:kme)
+   grid%xa%v(ims:ime, jms:jme, kms:kme) = xa2_v(ims:ime, jms:jme, kms:kme)
+   grid%xa%t(ims:ime, jms:jme, kms:kme) = xa2_t(ims:ime, jms:jme, kms:kme)
+   grid%xa%p(ims:ime, jms:jme, kms:kme) = xa2_p(ims:ime, jms:jme, kms:kme)
+   grid%xa%q(ims:ime, jms:jme, kms:kme) = xa2_q(ims:ime, jms:jme, kms:kme)
 
-   xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
-   xa%tgrn(ims:ime, jms:jme) = xa2_tgrn(ims:ime, jms:jme)
-   xa%u10 (ims:ime, jms:jme) = xa2_u10 (ims:ime, jms:jme)
-   xa%v10 (ims:ime, jms:jme) = xa2_v10 (ims:ime, jms:jme)
-   xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
-   xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
+   grid%xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
+   grid%xa%tgrn(ims:ime, jms:jme) = xa2_tgrn(ims:ime, jms:jme)
+   grid%xa%u10 (ims:ime, jms:jme) = xa2_u10 (ims:ime, jms:jme)
+   grid%xa%v10 (ims:ime, jms:jme) = xa2_v10 (ims:ime, jms:jme)
+   grid%xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
+   grid%xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
    call wrf_shutdown
 

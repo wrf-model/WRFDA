@@ -1,4 +1,4 @@
-subroutine da_check_cvtovv_adjoint(grid, cv_size, xb, xbx, xp, be, cv, vv)
+subroutine da_check_cvtovv_adjoint(grid, cv_size, xbx, be, cv, vv)
 
    !---------------------------------------------------------------------------
    ! Purpose: Test vtovv routine and adjoint for compatibility.
@@ -10,10 +10,8 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xb, xbx, xp, be, cv, vv)
 
    type(domain), intent(inout)               :: grid
 
-   integer, intent(in)               :: cv_size ! Size of cv array.      
-   type (xb_type), intent(in)        :: xb    ! first guess (local).
+   integer, intent(in)               :: cv_size ! Size of cv array.  
    type (xbx_type),intent(in)        :: xbx   ! Header & non-gridded vars.
-   type (xpose_type), intent(inout)  :: xp    ! Dimensions and xpose buffers.
    type (be_type), intent(in)        :: be    ! background error structure.
    real, intent(in)                  :: cv(1:cv_size) ! control variable.
    type (vp_type), intent(inout)     :: vv    ! CV(i,j,m).
@@ -39,7 +37,7 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xb, xbx, xp, be, cv, vv)
    if (global) then
       call da_transform_vtovv_global(cv_size, xbx, be, cv, vv)
    else
-      call da_transform_vtovv(grid, cv_size, xb, be, cv, vv, xp)
+      call da_transform_vtovv(grid, cv_size, be, cv, vv)
    end if
 
    !----------------------------------------------------------------------
@@ -63,7 +61,7 @@ subroutine da_check_cvtovv_adjoint(grid, cv_size, xb, xbx, xp, be, cv, vv)
    if (global) then
       call da_transform_vtovv_global_adj(cv_size, xbx, be, cv2, vv)
    else
-      call da_transform_vtovv_adj(grid, cv_size, xb, be, cv2, vv, xp)
+      call da_transform_vtovv_adj(grid, cv_size, be, cv2, vv)
    end if
 
    adj_par_rhs = sum(cv(1:cv_size) * cv2(1:cv_size))
