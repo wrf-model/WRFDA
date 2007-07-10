@@ -37,23 +37,23 @@ export RUN_WPS=false
 export RUN_REAL=false
 export RUN_OBSPROC=false
 export RUN_WRFVAR=true
-export RUN_UPDATE_BC=false
-export RUN_WRF=false
+export RUN_UPDATE_BC=true
+export RUN_WRF=true
 export CHECK_SVNVERSION=false
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=cwb
-export EXPT=4dvar_high1
+export EXPT=4dvar_minc_npe
 export CLEAN=${CLEAN:-false}
-export CYCLING=${CYCLING:-true}
+export CYCLING=${CYCLING:-false}
 export NL_INPUTOUT_BEGIN_H=0
-export NL_NTMAX=100
+export NL_NTMAX=1
 export NL_VAR4D=true
 export NL_VAR4D_MULTI_INC=1
+export NL_VAR4D_COUPLING=1 # disk linear
 #export NL_TRACE_UNIT=0
 export NL_DEBUG_LEVEL=0
-export NL_VAR4D_COUPLING=1 # disk linear
 export WINDOW_START=0
 export WINDOW_END=6
 export NL_RUN_HOURS=6
@@ -64,14 +64,23 @@ else
 fi
 #export FIRST=false
 
-export LSF_EXCLUSIVE=" "
-export NUM_PROCS=1
-export QUEUE=premium
+export NUM_PROCS=32
+export NUM_PROCS_VAR=8
+export NUM_PROCS_WRF=8
+export QUEUE=debug
 export PROJECT=64000420
-export WALLCLOCK=180
-export LL_PTILE=16
-export SUBMIT="none" 
-export RUN_CMD=" "
+export WALLCLOCK=30
+export LL_PTILE=32
+if test $NUM_PROCS -gt 1 ; then
+   export NL_VAR4D_COUPLING=2 # disk linear
+   export LSF_EXCLUSIVE=-I
+   export SUBMIT="LSF"
+   export RUN_CMD=mpirun.lsf
+else
+   export LSF_EXCLUSIVE=" "
+   export SUBMIT="none"
+   export RUN_CMD=" "
+fi
 
 #Time info:
 export INITIAL_DATE=2005071421
@@ -92,13 +101,14 @@ export LONG_FCST_RANGE_4=51
 export REL_DIR=$HOME/compare
 export DAT_DIR=$REL_DIR/../case_data
 export EXP_DIR=/ptmp/$USER/$REGION/$EXPT
-export WRFVAR_DIR=$REL_DIR/wrfvar
+export WRFVAR_DIR=$REL_DIR/wrfvar4d
 export WRFPLUS_DIR=$REL_DIR/wrfplus
 export WRF_DIR=$REL_DIR/wrf
-export WRF_BC_DIR=$WRFVAR_DIR/build
+export WRF_BC_DIR=$WRFVAR_DIR
 export REG_DIR=$DAT_DIR/$REGION
 export OB_DIR=$REG_DIR/45km/ob
 export RC_DIR=$REG_DIR/45km/rc
+export RC_HIGH_DIR=$REG_DIR/45km/rc
 export BE_DIR=$REG_DIR/45km/be
 
 #From WPS (namelist.wps):
@@ -110,6 +120,7 @@ export NL_DY=45000
 
 #WRF:
 export NL_TIME_STEP=240
+export NL_NPROC_X=0
 export NL_E_VERT=17
 export NL_SMOOTH_OPTION=0
 export NL_MP_PHYSICS=4
@@ -128,7 +139,7 @@ export NL_CHECK_MAX_IV=true
 if [[ $NL_VAR4D_MULTI_INC = 1 ]]; then
    export NL_SFC_ASSI_OPTIONS=2
 fi
-#export NL_TESTING_WRFVAR=true
+#export NL_TEST_WRFVAR=true
 #export NL_TEST_TRANSFORMS=true
 
 #JCDF Option & Obs
@@ -162,43 +173,26 @@ export NL_LEN_SCALING3=0.5
 export NL_LEN_SCALING4=0.5
 export NL_LEN_SCALING5=0.5
 
-export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
-$WRFVAR_DIR/scripts/da_run_job.ksh
-
-if test $NL_VAR4D_MULTI_INC = 0 ; then
-   exit 0
-else
-   if test $NL_VAR4D_MULTI_INC = 1 ; then
-      export NL_VAR4D_MULTI_INC=2
-   else
-      echo ' NL_VAR4D_MULTI_INC mubt be 0 or 1 '
-      exit 0
-   fi
-fi
-
-
 ##################################################
 #                                                #
 # Stage 2:  Low resolution model                 #
 #                                                # 
 ##################################################
 
-#Decide which stages to run (run if true):
-export OB_DIR=$REG_DIR/135km/ob
-export RC_DIR=$REG_DIR/135km/rc
-export BE_DIR=$REG_DIR/135km/be
+export OB_DIR_LOW=$REG_DIR/135km/ob
+export RC_DIR_LOW=$REG_DIR/135km/rc
+export BE_DIR_LOW=$REG_DIR/135km/be
 
 #From WPS (namelist.wps):
-export NL_E_WE=31
-export NL_E_SN=25
-export NL_DX=135000
-export NL_DY=135000
+export NL_E_WE_LOW=31
+export NL_E_SN_LOW=25
+export NL_DX_LOW=135000
+export NL_DY_LOW=135000
 
 #WRF:
-export NL_TIME_STEP=720
+export NL_TIME_STEP_LOW=720
 
 export SCRIPT=$WRFVAR_DIR/scripts/da_run_suite.ksh
 $WRFVAR_DIR/scripts/da_run_job.ksh
 
 exit 0
-

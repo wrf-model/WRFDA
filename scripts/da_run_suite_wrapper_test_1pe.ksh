@@ -38,7 +38,7 @@ export CHECK_SVNVERSION=false
 #Experiment details:
 export DUMMY=${DUMMY:-false}
 export REGION=cwb
-export EXPT=4dvar
+export EXPT=4dvar_high
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-true}
 export NL_INPUTOUT_BEGIN_H=0
@@ -67,8 +67,8 @@ export SUBMIT="none"
 export RUN_CMD=" "
 
 #Time info:
-export INITIAL_DATE=2005071600
-export FINAL_DATE=2005071600
+export INITIAL_DATE=2005071421
+export FINAL_DATE=2005071421
 #Uncomment for actual runs: export LBC_FREQ=03
 export CYCLE_PERIOD=6
 export LONG_FCST_TIME_1=00

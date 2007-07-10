@@ -1,49 +1,52 @@
-README 
+README
 WRF-Var (4D) version 2.2
 
-Xin Zhang 
+Xin Zhang
 Hans Huang
 
-04/18/07
+07/09/07
 
-From Version 2.2, WRF 4DVAR system begin to use wrfvar trunk , wrf trunk and wrfplus. 
+From Version 2.2, WRF 4DVAR system begin to use wrfvar branch , wrf trunk and wrfplus. 
 
- To setup the system  :
+ To setup the system (on bluevista and blueice) :
 
  (The version numbers are the last tested version.)
 
-1, Check out wrfvar trunk (version 2472)
-   svn co https://svn-wrf-var.cgd.ucar.edu/trunk wrfvar
+1, Check out wrfvar branch (version 2806)
+   svn co https://svn-wrf-var.cgd.ucar.edu/branches/WRF-Var4D wrfvar
 
-2, Check out wrfplus (version 2461)
+2, Check out wrfplus  (HEAD)
    svn co https://svn-wrf-var.cgd.ucar.edu/branches/BR_2005workshop wrfplus
 
-3, Check out wrf trunk (version 2292)
-   svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrf
+3, Check out wrf trunk (version 2348)
+   svn co https://svn-wrf-model.cgd.ucar.edu/trunk wrfnl
 
-4, cp wrfplus/Docs/parallel/wrf/Registry/Registry.EM.r2285 wrf/Registry/Registry.EM
+4, cp wrfplus/Docs/parallel/wrf/Registry/Registry.EM.r2348 wrfnl/Registry/Registry.EM 
+   cp wrfplus/Docs/parallel/wrf/external/RSL/module_dm.F wrfnl/external/RSL/module_dm.F 
+   cp wrfplus/Docs/parallel/wrf/external/RSL_LITE/module_dm.F wrfnl/external/RSL_LITE/module_dm.F 
+   cp wrfplus/Docs/parallel/wrf/main/wrf.F wrfnl/main/wrf.F 
 
 5, Compile wrfvar trunk 
    cd  wrfvar
-   source setup.csh g95/xlf
-   ./configure wrfvar (select 1, if you like, you can change the optimization level to O2)
+   source setup.csh xlf
+   ./configure wrfvar (select 1/2/3)
    ./compile wrfvar
 
 6, Compile wrf trunk (use xlf)
    cd wrf
-   ./configure (select 1)
-   edit configure.wrf, add -lSystemStubs at the end of LIB
+   ./configure (select 1/3)
    ./compile wrf
-   cp wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
+   cp ../wrfvar/inc/namelist_script_wrf_wps_2004.inc inc/namelist_script.inc
 
 7, Compile wrfplus (use xlf)
    cd wrfplus
-   ./configure wrfplus (select 1)
-   ./compile wrf (2 times)
-   (note: make sure the namelist_script.inc is existed in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
+   ./configure wrfplus (select 1/3)
+   ./compile wrf 
+   (note: make sure the namelist_script.inc exists in inc/ diretory, if deleted by "clean -a", use "svn revert inc/namelist_script.inc to restore)
    
 8, Run the testdata 
-   the test script locate in wrfplus/scripts/da_run_suite_wrapper_test_1pe.ksh
+   the test script locate in wrfplus/scripts/da_run_suite_wrapper_test_npe.ksh
+   if run multi-incremental 4dvar , please use da_run_multi_increment_wrapper.ksh
 
 Note: The WRF 4DVAR home directory is REL_DIR  
       the input dataset directory is DAT_DIR
