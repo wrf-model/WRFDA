@@ -70,6 +70,10 @@ if $CYCLING; then
          export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       fi
       export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+      if test $NL_VAR4D_MULTI_INC = 2; then
+         export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
+         export DA_BOUNDARIES=${RC_DIR}/$DATE/wrfbdy_d${DOMAIN}
+      fi
    fi
 fi
 
@@ -334,7 +338,11 @@ echo "WINDOW_END            $WINDOW_END"
          done
       fi
    else
-      ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
+      if test -e $OB_DIR/${DATE}/ob_6h.ascii; then
+         ln -fs $OB_DIR/${DATE}/ob_6h.ascii  ob01.ascii
+      else
+         ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
+      fi
       if test -e $OB_DIR/${DATE}/ssmi.dat; then
          ln -fs $OB_DIR/${DATE}/ssmi.dat ssmi01.dat
       fi
@@ -380,6 +388,7 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_RA_LW_PHYSICS=1
       export NL_RA_SW_PHYSICS=1
       export NL_SF_SFCLAY_PHYSICS=1
+      export NL_SF_SURFACE_PHYSICS=1
       export NL_BL_PBL_PHYSICS=1
       export NL_BLDT=0
       export NL_CU_PHYSICS=1
@@ -407,17 +416,21 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/*.TBL nl
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
-      ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
+      ln -fs $DA_FIRST_GUESS nl/wrfinput_d${DOMAIN}
       # if test -e $WORK_DIR/wrfvar_output; then
       #    ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
       # else
-         ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
+      #    ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
       # fi
       ln -fs $WRFNL_DIR/main/wrf.exe nl
 
       # Outputs
       for I in 02 03 04 05 06 07; do
-         ln -fs nl/nl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+         if test $NL_VAR4D_MULTI_INC = 2; then
+            ln -fs nl/nl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+         else
+            ln -fs nl/nl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 fg$I
+         fi
       done
 
       # tl
@@ -426,10 +439,18 @@ echo "WINDOW_END            $WINDOW_END"
 
       export NL_DYN_OPT=202
       export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      if test $NL_VAR4D_MULTI_INC = 2 ; then
+         export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      else
+         export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      fi
       if test $NUM_PROCS -gt 1; then
          export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         if test $NL_VAR4D_MULTI_INC = 2 ; then
+            export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         else
+            export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         fi
       fi
       export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_INTERVAL_SECONDS=`expr $CYCLE_PERIOD \* 3600`
@@ -474,10 +495,18 @@ echo "WINDOW_END            $WINDOW_END"
       # Inputs
       export NL_DYN_OPT=302
       export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
-      export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      if test $NL_VAR4D_MULTI_INC = 2 ; then
+         export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      else
+         export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
+      fi
       if test $NUM_PROCS -gt 1; then
          export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
-         export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         if test $NL_VAR4D_MULTI_INC = 2 ; then
+            export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         else
+            export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
+         fi
       fi
       export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
@@ -494,7 +523,7 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/*.TBL ad
       ln -fs $WORK_DIR/RRTM_DATA ad
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN ad
-      ln -fs $WORK_DIR/fg01 ad/wrfinput_d${DOMAIN}
+      ln -fs $DA_FIRST_GUESS ad/wrfinput_d${DOMAIN}
       for I in 01 02 03 04 05 06 07; do
          ln -fs $WORK_DIR/af$I ad/auxinput3_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00
       done
@@ -542,6 +571,23 @@ echo "WINDOW_END            $WINDOW_END"
    fi
 
    #-------------------------------------------------------------------
+   #Prepare the multi-incremnet files:
+   #-------------------------------------------------------------------
+
+   if test $NL_VAR4D_MULTI_INC = 2 ; then
+
+      mv -f $RUN_DIR/gts_omb.*  .
+
+      mv -f $RUN_DIR/auxhist2*-thin $WORK_DIR/nl
+      mv -f $RUN_DIR/nl_*-thin $WORK_DIR/nl
+      mv -f $RUN_DIR/wrfinput_d01-thin $WORK_DIR
+
+#     ln -fs wrfinput_d01-thin wrfinput_d01
+#     ln -fs wrfinput_d01-thin fg01
+
+   fi
+
+   #-------------------------------------------------------------------
    #Run WRF-Var:
    #-------------------------------------------------------------------
    mkdir trace
@@ -563,17 +609,30 @@ echo "WINDOW_END            $WINDOW_END"
             export NUM_PROCS_VAR=${NUM_PROCS_VAR:-2}
             export NUM_PROCS_WRF=${NUM_PROCS_WRF:-2}
             let NUM_PROCS_WRFPLUS=$NUM_PROCS-$NUM_PROCS_VAR-$NUM_PROCS_WRF
+            export NUM_PROCS_WRFPLUS_PART=`expr $NUM_PROCS_WRFPLUS \/ 2`
             echo "NUM_PROCS_VAR                $NUM_PROCS_VAR"
             echo "NUM_PROCS_WRF                $NUM_PROCS_WRF"
             echo "NUM_PROCS_WRFPLUS            $NUM_PROCS_WRFPLUS"
+            echo "NUM_PROCS_WRFPLUS_PART       $NUM_PROCS_WRFPLUS_PART"
 
             rm -f $MP_CMDFILE
             let I=0
-            while test $I -lt $NUM_PROCS_VAR; do
-               echo "da_wrfvar.exe" >> $MP_CMDFILE
+            if test $NL_VAR4D_MULTI_INC = 1 ; then
+               while test $I -lt 1; do
+                  echo "da_wrfvar.exe" >> $MP_CMDFILE
+                  let I=$I+1
+               done
+            else
+               while test $I -lt $NUM_PROCS_VAR; do
+                  echo "da_wrfvar.exe" >> $MP_CMDFILE
+                  let I=$I+1
+               done
+            fi
+            while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRFPLUS_PART; do
+               echo "./ad/wrfplus.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF; do
+            while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRFPLUS_PART+$NUM_PROCS_WRF; do
                echo "./nl/wrf.exe" >> $MP_CMDFILE
                let I=$I+1
             done
@@ -581,7 +640,7 @@ echo "WINDOW_END            $WINDOW_END"
                echo "./ad/wrfplus.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            mpirun.lsf -cmdfile poe.cmdfile
+            mpirun.lsf -cmdfile  $MP_CMDFILE
             RC=$?
          else
             $RUN_CMD ./da_wrfvar.exe
@@ -591,6 +650,30 @@ echo "WINDOW_END            $WINDOW_END"
          # 3DVAR
          $RUN_CMD ./da_wrfvar.exe
          RC=$?
+      fi
+
+      # temporarily store the high resolution reults in RUN_DIR
+      if test $NL_VAR4D_MULTI_INC = 1 ; then
+
+        mv -f gts_omb.*  $RUN_DIR
+
+        cd nl
+        ln -fs $WRFPLUS_DIR/main/nupdown.exe .
+        ls -l auxhist2* | awk '{print $9}' | sed -e 's/auxhist2/nupdown.exe auxhist2/' -e 's/:00$/:00 -thin 3/' > thin.csh
+        ls -la nl_d01* | awk '{print $9}' |sed -e 's/nl/nupdown.exe nl/' -e 's/:00$/:00 -thin 3/' >> thin.csh
+        sh thin.csh
+        cd ..
+
+        $WRFPLUS_DIR/main/nupdown.exe wrfinput_d01 -thin 3
+
+        mv -f $WORK_DIR/nl/*-thin $RUN_DIR
+        mv -f wrfinput_d01-thin $RUN_DIR
+
+        exit $RC
+      fi
+
+      if test -f fort.9; then
+        cp fort.9 $RUN_DIR/namelist.output
       fi
 
       if test -f statistics; then
@@ -603,6 +686,11 @@ echo "WINDOW_END            $WINDOW_END"
 
       if test -f grad_fn; then
          cp grad_fn $RUN_DIR
+      fi
+
+
+      if test -f check_max_iv; then
+         cp check_max_iv $RUN_DIR
       fi
 
       # remove intermediate output files
@@ -621,6 +709,27 @@ echo "WINDOW_END            $WINDOW_END"
          if test $DA_ANALYSIS != wrfvar_output; then 
             mv wrfvar_output $DA_ANALYSIS
          fi
+      fi
+
+      if test $NL_VAR4D_MULTI_INC = 2 ; then
+
+        ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0,QCLOUD,QRAIN" ${FC_DIR}/${DATE}/analysis $DA_FIRST_GUESS low_res_increment
+
+        ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
+
+        
+        cp -f ${RC_HIGH_DIR}/${DATE}/wrfinput_d${DOMAIN} ${FC_DIR}/${DATE}/analysis_update
+        if $CYCLING; then
+          if ! $FIRST; then
+             cp -f ${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d${DOMAIN}_${ANALYSIS_DATE} ${FC_DIR}/${DATE}/analysis_update
+          fi
+        fi
+
+        ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0,QCLOUD,QRAIN" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
+
+#       rm low_res_increment low_res_increment-down
+        cp -f ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis
+
       fi
 
       if test -d trace; then

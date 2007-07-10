@@ -295,6 +295,8 @@ da_obs.o:		da_obs.f90 \
 			da_store_obs_grid_info.inc \
 			da_use_obs_errfac.inc \
 			da_write_obs.inc \
+			da_write_inv_for_multi_inc.inc \
+			da_read_inv_for_multi_inc.inc \
 			da_write_filtered_obs.inc \
 			da_write_y.inc
 			$(RM) $@

@@ -32,7 +32,7 @@ subroutine da_solve ( grid , config_flags)
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
       ips,ipe, jps,jpe, vert_corr, sin_xle, test_wrfvar, use_rad, &
-      calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, &
+      calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, var4d_multi_inc, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
@@ -189,7 +189,8 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.1] Calculate nonlinear model trajectory 
 
-      if (var4d) then
+!     if (var4d .and. var4d_multi_inc /= 2 ) then
+      if (var4d)  then
          call da_trace ("da_solve","Starting da_run_wrf_nl.ksh")
 #ifdef DM_PARALLEL
          if (var4d_coupling == var4d_coupling_disk_simul) then
@@ -219,20 +220,27 @@ subroutine da_solve ( grid , config_flags)
 #endif
          call da_trace("da_solve","Finished da_run_wrf_nl.ksh")
       end if
+      if (var4d_multi_inc == 2 ) call da_system("touch wrfnl_stop_now")
 
       ! [8.2] Calculate innovation vector (O-B):
 
       call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
       if (test_transforms) then
-         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         if (var4d) then
+            call da_system("touch wrf_stop_now")
+         end if
          call wrfu_finalize
          call wrf_shutdown
          stop
       end if
 
       if (test_wrfvar) then
-         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         if (var4d) then
+            call da_system("touch wrf_stop_now")
+         end if
          call wrfu_finalize
          call wrf_shutdown
          stop

@@ -22,6 +22,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
    type(domain), intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
    integer, intent(in) :: cg_jcdf
+   type (xbx_type)                  :: xbx_tmp
 
    integer :: nobwin,ndynopt
 #ifdef DM_PARALLEL
@@ -34,6 +35,11 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
    if (var4d) then
       do nobwin=num_fgat_time,1,-1
+         write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
+         call da_med_initialdata_input( grid , config_flags, &
+            filnam)
+         call da_setup_firstguess( xbx_tmp, grid)
+
          iv%current_ob_time = nobwin
          call da_zero_x(grid%xa)
          call da_transform_xtoy_adj(grid, iv, y, grid%xa)

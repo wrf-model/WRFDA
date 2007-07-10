@@ -1,4 +1,4 @@
-subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
+subroutine da_check(grid, config_flags, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -20,6 +20,8 @@ subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
    integer :: sizec
    real    :: cvtest(1:cv_size)    ! background error structure.
    real    :: field(its:ite,jts:jte) ! Field for spectral transform test.
+   type(domain), intent(inout):: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
    call da_trace_entry("da_check")
 
@@ -81,7 +83,7 @@ subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    ! call da_transform_vtox(grid, cv_size, xbx, be, ep, cvtest, vv, vp)
 
-   call da_check_xtoy_adjoint(grid, iv, y)
+   call da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
    call da_deallocate_y(y)
 

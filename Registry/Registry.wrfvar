@@ -490,6 +490,7 @@ state  logical moved            -       misc        1         -     -
 
 rconfig   logical   write_increments        namelist,wrfvar1  1  .false.  -  "write_increments"        ""  ""
 rconfig   logical   var4d                   namelist,wrfvar1  1  .false.  -  "var4d"                   ""  ""
+rconfig   integer   var4d_multi_inc         namelist,wrfvar1  1  0        -  "var4d_multi_inc"         ""  ""
 rconfig   integer   var4d_coupling          namelist,wrfvar1  1  2        -  "var4d_coupling"          ""  ""
 rconfig   logical   global                  namelist,wrfvar1  1  .false.  -  "global"                  ""  ""
 rconfig   logical   oi_use                  namelist,wrfvar1  1  .true.   -  "oi_use"                  ""  ""

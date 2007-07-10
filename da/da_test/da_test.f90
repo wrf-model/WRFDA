@@ -4,7 +4,7 @@ module da_test
    ! Purpose: Collection of routines associated with minimisation.
    !---------------------------------------------------------------------------
 
-   use module_configure, only : grid_config_rec_type
+   use module_configure, only : grid_config_rec_type,nl_set_dyn_opt
    use module_dm, only : wrf_dm_sum_real
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, local_communicator_x, &
@@ -39,7 +39,7 @@ module da_test
       use_rad,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
-      balance_geocyc
+      balance_geocyc,num_fgat_time,var4d
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &
       da_deallocate_y,be_type, xbx_type, ob_type, y_type
    use da_dynamics, only : da_uv_to_divergence,da_uv_to_vorticity, &
@@ -47,7 +47,7 @@ module da_test
    use da_ffts, only : da_solve_poissoneqn_fct
    use da_minimisation, only : da_transform_vtoy_adj,da_transform_vtoy
    use da_obs, only : da_transform_xtoy,da_transform_xtoy_adj
-   use da_par_util, only : da_patch_to_global
+   use da_par_util, only : da_system, da_patch_to_global
 #ifdef DM_PARALLEL
    use da_par_util1, only : true_mpi_real
 #endif
@@ -69,6 +69,12 @@ module da_test
       da_transform_xtogpsref_adj,da_transform_vptox_adj,da_transform_vtox, &
       da_transform_vtox_adj,da_transform_vtovv,da_transform_vtovv_global, &
       da_transform_vtovv_global_adj, da_transform_vtovv_adj
+   use da_transfer_model, only : da_transfer_wrftltoxa,da_transfer_xatowrftl, &
+      da_transfer_xatowrftl_adj,da_setup_firstguess,da_transfer_wrftltoxa_adj
+   use da_wrf_interfaces, only : wrf_shutdown
+   use module_state_description, only : dyn_em,dyn_em_tl,dyn_em_ad,p_a_qv
+   use da_tools1, only : da_get_unit,da_free_unit
+   use da_wrfvar_io, only : da_med_initialdata_output,da_med_initialdata_input
 
    implicit none
 

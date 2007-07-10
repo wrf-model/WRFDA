@@ -20,6 +20,7 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
 
    type(domain), intent(inout)           :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
+   type (xbx_type)                    :: xbx_tmp
 
    integer :: nobwin
 #ifdef DM_PARALLEL
@@ -64,11 +65,18 @@ subroutine da_transform_vtoy(cv_size, be, ep, cv, iv, vp, vv, xbx, &
       call da_trace("da_transform_vtoy","Finished da_run_wrfplus_tl.ksh")
 
       do nobwin=1, num_fgat_time
+         write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
+         call da_med_initialdata_input( grid , config_flags, &
+            filnam)
+         call da_setup_firstguess( xbx_tmp, grid)
+
          iv%current_ob_time = nobwin
          write(filnam,'(a2,i2.2)') 'tl',nobwin
          call da_transfer_wrftltoxa(grid, config_flags, filnam)
          call da_transform_xtoy(grid, iv, y)
       end do
+      call da_med_initialdata_input( grid , config_flags, 'fg01')
+      call da_setup_firstguess( xbx_tmp, grid)
    else  ! not var4d
       call da_transform_xtoy(grid, iv, y)
    end if ! var4d
