@@ -160,7 +160,7 @@ CONTAINS
 !---  Calculate the area under the Gaussian curve at the start of the
 !---  model run and build the look up table AXSD
 !
-      PI=cos(-1.)
+      PI=ACOS(-1.)
       SQR2PI=SQRT(2.*PI)
       RSQR=1./SQR2PI
       DO I=1,NXSD
@@ -1694,7 +1694,7 @@ CONTAINS
 !***  DECLINATION AND RIGHT ASCENSION
 ! 
       DEC=ASIN(SIN(SLON)*SIN(OBLIQ))
-      RA=cos(COS(SLON)/COS(DEC))
+      RA=ACOS(COS(SLON)/COS(DEC))
       IF(SLON.GT.PI)RA=PI2-RA
 !***
 !***  FIND THE GREENWICH SIDEREAL TIME THEN THE LOCAL SOLAR
@@ -6329,7 +6329,7 @@ CONTAINS
       IQ=INT(TWENTY*HP537+ONE)
       DO 105 I=MYIS,MYIE
          IF(COSZEN(I).GT.0.0 .AND. SLMSK(I+IBEG-1).GT.0.5) THEN
-           ZEN=DEGRAD1*cos(MAX(COSZEN(I),0.0))
+           ZEN=DEGRAD1*ACOS(MAX(COSZEN(I),0.0))
            IF(ZEN.GE.H74E1) JX=INT(HAF*(HNINETY-ZEN)+ONE)
            IF(ZEN.LT.H74E1.AND.ZEN.GE.FIFTY) &
               JX=INT(QUARTR*(H74E1-ZEN)+HNINE)
@@ -6388,7 +6388,7 @@ CONTAINS
 !        ..FUNCTION OF COSINE SOLAR ZENITH ANGLE..
         IF (SLMSK(I+IBEG-1).LT.0.5) THEN
          IF (SFCALB(I).LE.0.5) THEN
-          ALBD0 = -18.0 * (0.5 - cos(COSZEN(I))/PI)
+          ALBD0 = -18.0 * (0.5 - ACOS(COSZEN(I))/PI)
           ALBD0 = EXP (ALBD0)
           ALVD1 = (ALVD(I) - 0.054313) / 0.945687
           ALND1 = (ALND(I) - 0.054313) / 0.945687

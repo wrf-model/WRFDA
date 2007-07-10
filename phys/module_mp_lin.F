@@ -478,9 +478,9 @@ CONTAINS
 
    dtb=dt
    odtb=1./dtb
-   pi=cos(-1.)
-   pio4=cos(-1.)/4.
-   pio6=cos(-1.)/6.
+   pi=acos(-1.)
+   pio4=acos(-1.)/4.
+   pio6=acos(-1.)/6.
    ocp=1./cp
    oxLf=1./xLf
    xLvocp=xLv/cp

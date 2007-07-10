@@ -382,7 +382,7 @@ MODULE module_bioemi_beis311
         INTEGER :: jd
         CHARACTER*256   ::   mesg
         ! .. Intrinsic Functions ..
-        INTRINSIC cos, atan, cos, min, sin, tan
+        INTRINSIC acos, atan, cos, min, sin, tan
         ! convert to radians
         pi = 3.1415926535590
         dr = pi/180.
@@ -441,7 +441,7 @@ MODULE module_bioemi_beis311
            call wrf_debug(15,mesg)
         endif
         csz = min(1.,csz)
-        zr = cos(csz)
+        zr = acos(csz)
 !       zenith = zr/dr
 ! keep zenith angle in radians for later use (GJF 6/2004)
         zenith = zr 
