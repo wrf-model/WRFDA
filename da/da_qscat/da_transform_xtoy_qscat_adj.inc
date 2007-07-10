@@ -7,7 +7,6 @@ subroutine da_transform_xtoy_qscat_adj(iv, jo_grad_y, jo_grad_x)
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
