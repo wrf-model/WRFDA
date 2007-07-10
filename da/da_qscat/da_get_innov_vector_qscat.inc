@@ -24,7 +24,7 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
 
    real                         :: zk       ! Interpolation vertical coordinator.
 
-   real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. location.
 
    integer                      :: itu, itvv, ituf, itvvf
 
@@ -45,7 +45,7 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
       dxm = iv%qscat(n)%loc%dxm
       dym = iv%qscat(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
       end do
@@ -74,9 +74,9 @@ subroutine da_get_innov_vector_qscat( it, xb, xp, ob, iv)
       else
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
                                  model_u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
                                  model_v, iv%qscat(n)%zk)
 
          !------------------------------------------------------------------------

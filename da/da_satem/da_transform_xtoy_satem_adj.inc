@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
+subroutine da_transform_xtoy_satem_adj(iv, jo_grad_y, jo_grad_x, grid)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,10 +7,9 @@ subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
-   type (xb_type),  intent(in)   :: xb          ! first guess state.
+   type (domain),  intent(in)    :: grid
 
    integer                       :: n        ! Loop counter.
    integer                       :: i, j     ! Index dimension.
@@ -19,11 +18,11 @@ subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
    integer                       :: num_levs ! obs vertical levels
 
    integer                        :: k
-   real, dimension(xp%kts-1:xp%kte+1)       :: pre_ma,tv_ma
+   real, dimension(kts-1:kte+1)       :: pre_ma,tv_ma
    integer                        :: layer1,layer2,ks,ke
    real                           :: tv1,tv2,pres2
 
-   real, dimension(xp%kts-1:xp%kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
+   real, dimension(kts-1:kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
    real                           :: ADJ_tv1,ADJ_tv2
 
    ADJ_pre_ma(:) = 0.
@@ -38,17 +37,17 @@ subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
 
          ! [1.0] Get horizontal interpolation weights:
 
-         i = iv%satem(n)%loc%i
-         dy = iv%satem(n)%loc%dy
+         i   = iv%satem(n)%loc%i
+         dy  = iv%satem(n)%loc%dy
          dym = iv%satem(n)%loc%dym
-         j = iv%satem(n)%loc%j
-         dx = iv%satem(n)%loc%dx
+         j   = iv%satem(n)%loc%j
+         dx  = iv%satem(n)%loc%dx
          dxm = iv%satem(n)%loc%dxm
-         ks = xp%kts; ke = xp%kte
+         ks  = kts; ke = kte
 
          ! [2.0] Virtual temperature at obs pt.
 
-         call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
+         call da_tv_profile(grid,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
 
          ! [3.0] Find model vertical position of pressure and do interp.
 
@@ -82,7 +81,7 @@ subroutine da_transform_xtoy_satem_adj(iv, xp, jo_grad_y, jo_grad_x, xb)
 
          ! [6.0] Adjoint of horizontal interpolation
 
-         call da_tv_profile_adj(xp,jo_grad_x,xb,i,j,dx,dxm,dy,dym,         &
+         call da_tv_profile_adj(grid,jo_grad_x,i,j,dx,dxm,dy,dym,         &
               pre_ma,tv_ma,ADJ_pre_ma,ADJ_tv_ma)
       end do
    end if

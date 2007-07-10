@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,9 +6,8 @@ subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
 
    implicit none
 
-   integer, intent(in)             :: it       ! External iteration.
-   type(xb_type), intent(in)      :: xb       ! first guess state.
-   type(xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
+   type(domain), intent(in)       :: grid
+   integer, intent(in)            :: it       ! External iteration.
    type(y_type),  intent(in)      :: ob       ! Observation structure.
    type(ob_type), intent(inout)   :: iv       ! O-B structure.
 
@@ -20,7 +19,7 @@ subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
    real, dimension(1:max_ob_levels) :: model_thickness !Model thickness at ob loc
    integer           :: ithickness,ithicknessf
 
-   real, dimension(xp%kts-1:xp%kte+1)   :: pre_ma,tv_ma
+   real, dimension(kts-1:kte+1)   :: pre_ma,tv_ma
    integer                         :: layer1,layer2,ks,ke
    real                            :: tv1,tv2,pres2
 
@@ -45,13 +44,13 @@ subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
       j = iv%satem(n)%loc%j
       dx = iv%satem(n)%loc%dx
       dxm = iv%satem(n)%loc%dxm
-      ks = xp%kts; ke=xp%kte
+      ks = kts; ke=kte
 
       !------------------------------------------------------------------------
 
       ! [2.0] Calculate vertical profile of virtual temperature at obs pt.
 
-      call da_tv_profile(xp,xb,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
+      call da_tv_profile(grid,i,j,dx,dxm,dy,dym,pre_ma,tv_ma)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
@@ -94,8 +93,8 @@ subroutine da_get_innov_vector_satem( it, xb, xp, ob, iv)
       ! [6.0] Perform land/ocean check
       !------------------------------------------------------------------------
 
-      if (xb%landmask(i,j ) /= 0. .or. xb%landmask(i+1,j ) /= 0. .or.  &
-          xb%landmask(i,j+1) /= 0. .or. xb%landmask(i+1,j+1) /= 0.) then
+      if (grid%xb%landmask(i,j ) /= 0. .or. grid%xb%landmask(i+1,j ) /= 0. .or.  &
+          grid%xb%landmask(i,j+1) /= 0. .or. grid%xb%landmask(i+1,j+1) /= 0.) then
          iv % satem(n) % thickness(1) % inv = 0.
          ithicknessf = ithicknessf + 1
       end if

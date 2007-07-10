@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_gpsref_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_gpsref_adj(iv, jo_grad_y, jo_grad_x)
 
    !-------------------------------------------------------------------------
    ! Purpose: TBD
@@ -31,7 +31,7 @@ subroutine da_transform_xtoy_gpsref_adj(iv, xp, jo_grad_y, jo_grad_x)
       dxm = iv%gpsref(n)%loc%dxm
       dym = iv%gpsref(n)%loc%dym
 
-      call da_interp_lin_3d_adj(jo_grad_x %ref, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d_adj(jo_grad_x %ref, i, j, dx, dy, dxm, dym, &
                              jo_grad_y%gpsref(n)%ref, num_levs, &
                              iv%gpsref(n)%zk, num_levs)
    end do

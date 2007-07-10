@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
+subroutine da_transform_xtoy_rttov (grid, iv, y )
 
    !---------------------------------------------------------------------------
    !  Purpose: transform from analysis increment to 
@@ -14,10 +14,9 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
 
    !#include "rttov_q2v.interface"
 
-   type (x_type), intent(in)      :: xa       ! delta_x
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)  :: y        ! H' delta_x
-   type (ob_type), intent(in)     :: iv       ! O-B structure.
+   type (domain),     intent(in)     :: grid
+   type (y_type),     intent(inout)  :: y        ! H' delta_x
+   type (ob_type),    intent(in)     :: iv       ! O-B structure.
 
    integer                        :: i,j,k,c  ! Index dimension.
    integer                        :: nlevels  ! Number of obs levels.
@@ -79,7 +78,7 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
          model_mr(:,:)=0.0
          model_psfc(:)=0.0
 
-         call da_interp_lin_3d_new( xa%t, xp, &
+         call da_interp_lin_3d_new( grid%xa%t, &
            iv%instid(i)%loc_i, &
            iv%instid(i)%loc_j, &
            iv%instid(i)%loc_k, &
@@ -91,7 +90,7 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
            iv%instid(i)%loc_dzm, &
            model_t, nlevels, num_rad)
 
-         call da_interp_lin_3d_new (xa%q, xp, &
+         call da_interp_lin_3d_new (grid%xa%q, &
            iv%instid(i)%loc_i, &
            iv%instid(i)%loc_j, &
            iv%instid(i)%loc_k, &
@@ -103,7 +102,7 @@ subroutine da_transform_xtoy_rttov ( xa, iv, xp, y )
            iv%instid(i)%loc_dzm, &
            model_q, nlevels, num_rad)
 
-         call da_interp_lin_2d_new (xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new (grid%xa % psfc, ims, ime, jms, jme, &
             iv%instid(i)%loc_i, iv%instid(i)%loc_j, &
             iv%instid(i)%loc_dx, iv%instid(i)%loc_dy, &
             iv%instid(i)%loc_dxm, iv%instid(i)%loc_dym, &

@@ -1,4 +1,4 @@
-subroutine da_pt_to_rho_adj(xb, xa) 
+subroutine da_pt_to_rho_adj(grid) 
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of da_pt_to_rho.
@@ -8,8 +8,7 @@ subroutine da_pt_to_rho_adj(xb, xa)
 
    implicit none
    
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (x_type),  intent(inout) :: xa           ! increment structure.
+   type (domain), intent(inout)  :: grid
 
    integer                       :: i,j,k        ! Loop counter.
 
@@ -19,24 +18,24 @@ subroutine da_pt_to_rho_adj(xb, xa)
 
    if (trace_use) call da_trace_entry("da_pt_to_rho_adj")
    
-   is = xb%its
-   js = xb%jts
+   is = its
+   js = jts
 
-   ie = xb%ite
-   je = xb%jte
+   ie = ite
+   je = jte
 
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < xb%ids) is = xb%ids
-      if (js < xb%jds) js = xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > xb%ide) ie = xb%ide
-      if (je > xb%jde) je = xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    !---------------------------------------------------------------------------
@@ -44,15 +43,15 @@ subroutine da_pt_to_rho_adj(xb, xa)
    !---------------------------------------------------------------------------
 
    do j=js, je
-      do k=xb%kts, xb%kte
+      do k=kts, kte
          do i=is, ie
-            temp = xa%rho(i,j,k) * xb%rho(i,j,k)
+            temp = grid%xa%rho(i,j,k) * grid%xb%rho(i,j,k)
 
-            xa%p(i,j,k) = xa%p(i,j,k) + temp/xb%p(i,j,k)
+            grid%xa%p(i,j,k) = grid%xa%p(i,j,k) + temp/grid%xb%p(i,j,k)
                            
-            xa%t(i,j,k) = xa%t(i,j,k) - temp/xb%t(i,j,k)
+            grid%xa%t(i,j,k) = grid%xa%t(i,j,k) - temp/grid%xb%t(i,j,k)
 
-            xa%rho(i,j,k) = 0.0
+            grid%xa%rho(i,j,k) = 0.0
          end do        
       end do        
    end do        

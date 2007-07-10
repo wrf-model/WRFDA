@@ -1,6 +1,6 @@
 module da_radar
 
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, trace_use, &
@@ -10,7 +10,7 @@ module da_radar
       max_error_bt, max_error_buv, num_radar_tot,fails_error_max, &
       use_Radar_rv, use_Radar_rf,below_model_surface,mkz,above_model_lid,&
       fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
-      far_below_model_surface
+      far_below_model_surface,kms,kme,kts,kte
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       radar_type, info_type, field_type

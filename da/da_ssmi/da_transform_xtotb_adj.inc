@@ -1,4 +1,4 @@
-subroutine da_transform_xtotb_adj (xa, xb)
+subroutine da_transform_xtotb_adj (grid)
 
    !----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,8 +6,7 @@ subroutine da_transform_xtotb_adj (xa, xb)
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb          ! first guess state.
-   type (x_type) , intent(inout) :: xa          ! grad_x(jo)
+   type (domain), intent(inout)    :: grid
 
    integer                       :: i,j,k
    integer                       :: is, js, ie, je, ks, ke
@@ -38,26 +37,26 @@ subroutine da_transform_xtotb_adj (xa, xb)
    zrhom=0.0
    ADJ_zrhom=0.0
 
-   is = xb%its
-   js = xb%jts
-   ks = xb%kts
+   is = grid%xb%its
+   js = grid%xb%jts
+   ks = grid%xb%kts
 
-   ie = xb%ite
-   je = xb%jte
-   ke = xb%kte
+   ie = grid%xb%ite
+   je = grid%xb%jte
+   ke = grid%xb%kte
 
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = grid%xb%its-1
+      js = grid%xb%jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = grid%xb%ite+1
+      je = grid%xb%jte+1
 
-      if (is < xb%ids) is = xb%ids
-      if (js < xb%jds) js = xb%jds
+      if (is < grid%xb%ids) is = grid%xb%ids
+      if (js < grid%xb%jds) js = grid%xb%jds
 
-      if (ie > xb%ide) ie = xb%ide
-      if (je > xb%jde) je = xb%jde
+      if (ie > grid%xb%ide) ie = grid%xb%ide
+      if (je > grid%xb%jde) je = grid%xb%jde
    end if
 
    ! Mean fields
@@ -65,32 +64,32 @@ subroutine da_transform_xtotb_adj (xa, xb)
    do j=js, je
       do i=is, ie
 
-         psfc  = 0.01*xb%psfc(i,j)
-         ! sst   = xb%tgrn(i,j)
-         ta    = xb%tgrn(i,j) + &
-                 (xb%t(i,j,ks)-xb%tgrn(i,j))*log(2./0.0001)/ &
-                 log((xb%h(i,j,ks)- xb%terr(i,j))/0.0001)
+         psfc  = 0.01*grid%xb%psfc(i,j)
+         ! sst   = grid%xb%tgrn(i,j)
+         ta    = grid%xb%tgrn(i,j) + &
+                 (grid%xb%t(i,j,ks)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
+                 log((grid%xb%h(i,j,ks)- grid%xb%terr(i,j))/0.0001)
 
-         gamma = (ta-270)*0.023 + 5.03  ! effective lapse rate   (km) (4.0-6.5)
+         gamma = (ta-270.0)*0.023 + 5.03  ! effective lapse rate   (km) (4.0-6.5)
          zcld  = 1                      ! effective cloud height (km)
 
-         tpw   = xb%tpw(i,j)*10.
-         ! speed = xb%speed(i,j)
+         tpw   = grid%xb%tpw(i,j)*10.0
+         ! speed = grid%xb%speed(i,j)
 
-         alw   = 0.
+         alw   = 0.0
 
          zrhom = 0.0
          do k=ks,ke
-            zrhom=zrhom+(xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)*xb%q(i,j,k)* &
-               xb%rho(i,j,k)
+            zrhom=zrhom+(grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)*grid%xb%q(i,j,k)* &
+               grid%xb%rho(i,j,k)
          end do
 
-         ! call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
+         ! call da_transform_xtozrhoq(grid%xb, i, j, zh, zf, zrhom)
 
-         htpw    = zrhom/tpw/1000.
+         htpw    = zrhom/tpw/1000.0
 
-         dum1=0.
-         dum2=0.
+         dum1=0.0
+         dum2=0.0
 
          ADJ_gamma    = 0.0
          ADJ_speed    = 0.0
@@ -101,63 +100,65 @@ subroutine da_transform_xtotb_adj (xa, xb)
          ADJ_alw      = 0.0
          ADJ_tpw      = 0.0
          ADJ_ta       = 0.0
-         ADJ_zrhom    = 0.
+         ADJ_zrhom    = 0.0
 
-         call da_tb_adj(1,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
-                     htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb19v(i,j),xb%tb19h(i,j),               &
-                     ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
-                     ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb19v(i,j),xa%tb19h(i,j)    )
+         call da_tb_adj(1,53.0,psfc,ta,gamma,grid%xb%tgrn(i,j),tpw,      &
+            htpw,grid%xb%speed(i,j),alw,zcld,               &
+            ! grid%xb%tb19v(i,j),grid%xb%tb19h(i,j),               &
+            ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
+            ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
+            ADJ_zcld,grid%xa%tb19v(i,j),grid%xa%tb19h(i,j)    )
 
-         call da_tb_adj(2,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
-                     htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb22v(i,j),dum1,                        &
-                     ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
-                     ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb22v(i,j),dum2              )
+         call da_tb_adj(2,53.0,psfc,ta,gamma,grid%xb%tgrn(i,j),tpw,      &
+            htpw,grid%xb%speed(i,j),alw,zcld,               &
+            ! grid%xb%tb22v(i,j),dum1,                        &
+            ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
+            ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
+            ADJ_zcld,grid%xa%tb22v(i,j),dum2              )
 
-         call da_tb_adj(3,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
-                     htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb37v(i,j),xb%tb37h(i,j),               &
-                     ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
-                     ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb37v(i,j),xa%tb37h(i,j)    )
+         call da_tb_adj(3,53.0,psfc,ta,gamma,grid%xb%tgrn(i,j),tpw,      &
+            htpw,grid%xb%speed(i,j),alw,zcld,               &
+            ! grid%xb%tb37v(i,j),grid%xb%tb37h(i,j),               &
+            ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
+            ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
+            ADJ_zcld,grid%xa%tb37v(i,j),grid%xa%tb37h(i,j)    )
 
-         call da_tb_adj(4,53.,psfc,ta,gamma,xb%tgrn(i,j),tpw,      &
-                     htpw,xb%speed(i,j),alw,zcld,               &
-!                     xb%tb85v(i,j),xb%tb85h(i,j),               &
-                     ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
-                     ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
-                     ADJ_zcld,xa%tb85v(i,j),xa%tb85h(i,j)    )
+         call da_tb_adj(4,53.0,psfc,ta,gamma,grid%xb%tgrn(i,j),tpw,      &
+            htpw,grid%xb%speed(i,j),alw,zcld,               &
+            ! grid%xb%tb85v(i,j),grid%xb%tb85h(i,j),               &
+            ADJ_psfc,ADJ_ta,ADJ_gamma,ADJ_sst,         &
+            ADJ_tpw,ADJ_htpw,ADJ_speed,ADJ_alw,        &
+            ADJ_zcld,grid%xa%tb85v(i,j),grid%xa%tb85h(i,j)    )
 
-         ADJ_zrhom    = ADJ_htpw/tpw/1000.
+         ADJ_zrhom    = ADJ_htpw/tpw/1000.0
          ADJ_tpw      = ADJ_tpw - ADJ_htpw/tpw*htpw
 
          do k = ks,ke
-            xa%rho(i,j,k) = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
-               xb%q(i,j,k)*ADJ_zrhom + xa%rho(i,j,k)
-            xa%q(i,j,k)   = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*xb%h(i,j,k)* &
-               ADJ_zrhom*xb%rho(i,j,k) + xa%q(i,j,k)
+            grid%xa%rho(i,j,k) = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)* &
+               grid%xb%q(i,j,k)*ADJ_zrhom + grid%xa%rho(i,j,k)
+            grid%xa%q(i,j,k)   = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)* &
+               ADJ_zrhom*grid%xb%rho(i,j,k) + grid%xa%q(i,j,k)
          end do
 
-         ! call da_transform_xtozrhoq_adj(xb,xa,i,j,zh,zf,ADJ_zrhom)
+         ! call da_transform_xtozrhoq_adj(grid%xb,grid%xa,i,j,zh,zf,ADJ_zrhom)
 
-         ADJ_alw = 0.
+         ADJ_alw = 0.0
 
-         xa%speed(i,j)=xa%speed(i,j) + ADJ_speed
+         grid%xa%speed(i,j)=grid%xa%speed(i,j) + ADJ_speed
 
-         xa%tpw(i,j) = xa%tpw(i,j) + ADJ_tpw*10.
+         grid%xa%tpw(i,j) = grid%xa%tpw(i,j) + ADJ_tpw*10.0
 
          ADJ_zcld= 0
          ADJ_ta  = ADJ_ta + ADJ_gamma*0.023
 
-         xa%t(i,j,ks) = xa%t(i,j,ks) + ADJ_ta* &
-                   log(2./0.0001)/log((xb%h(i,j,ks)-xb%terr(i,j))/0.0001)
+         grid%xa%t(i,j,ks) = grid%xa%t(i,j,ks) + ADJ_ta* &
+                   log(2.0/0.0001)/log((grid%xb%h(i,j,ks)-grid%xb%terr(i,j))/0.0001)
          ADJ_sst = 0.
 
-         xa%psfc(i,j) = xa%psfc(i,j) + ADJ_psfc*0.01 
+         grid%xa%psfc(i,j) = grid%xa%psfc(i,j) + ADJ_psfc*0.01 
       end do
    end do
 
 end subroutine da_transform_xtotb_adj
+
+

@@ -28,7 +28,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
    real, dimension(max_ob_levels) :: model_rv ! Model value rv at ob location.
    real, dimension(max_ob_levels) :: model_rf ! Model value rf at ob location.
 
-   real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. location.
 
    real                           :: model_ps
 
@@ -65,7 +65,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
       dxm = iv%Radar(n)%loc%dxm
       dym = iv%Radar(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
       end do
@@ -83,22 +83,22 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
       ! [2.0] Interpolate horizontally to ob points:
 
-      call da_interp_lin_3d(xb % p, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % p, i, j, dx, dy, dxm, dym, &
                          model_p, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % u, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % u, i, j, dx, dy, dxm, dym, &
                          model_u, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % v, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % v, i, j, dx, dy, dxm, dym, &
                          model_v, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % wh, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % wh, i, j, dx, dy, dxm, dym, &
                          model_w, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % rho, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % rho, i, j, dx, dy, dxm, dym, &
                          model_rho, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % qrn, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(xb % qrn, i, j, dx, dy, dxm, dym, &
                          model_qrn, max_ob_levels, iv%Radar(n)%zk, num_levs)
 
       ! Test 5.E-5 as critical value. It can not be smaller.

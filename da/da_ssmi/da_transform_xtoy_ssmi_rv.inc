@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_rv(xb, oi, xa, y)
+subroutine da_transform_xtoy_ssmi_rv(grid, oi, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_ssmi_rv(xb, oi, xa, y)
 
    implicit none
 
-   type (xb_type), intent(in)   :: xb       ! first guess state.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
-   type (y_type), intent(inout) :: y        ! y = h (xa)
+   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! loop counter.
    integer                      :: i, j
@@ -27,9 +26,9 @@ subroutine da_transform_xtoy_ssmi_rv(xb, oi, xa, y)
 
       ! Interpolating from 4 grid points to obs location
 
-      call da_interp_lin_2d(xa%tpw, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tpw, ims, ime, jms, jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%tpw)
-      call da_interp_lin_2d(xa%speed, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%speed, ims, ime, jms, jme, &
                             i, j, dx, dy, dxm, dym, y%ssmi_retrieval(n)%speed)      
    end do
 

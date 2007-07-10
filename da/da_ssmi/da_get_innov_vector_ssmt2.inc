@@ -21,8 +21,8 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
 
    real                            :: zk       ! Interpolation vertical coordinator.
 
-   real, dimension(xp%kms:xp%kme)  :: v_h      ! Model value h at ob hor. location.
-   real, dimension(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
+   real, dimension(kms:kme)  :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme)  :: v_p      ! Model value p at ob hor. location.
 
    integer                         :: irh, irhf
    
@@ -47,7 +47,7 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
       dxm = iv%ssmt2(n)%loc%dxm
       dym = iv%ssmt2(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
          v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
@@ -81,7 +81,7 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb % rh, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % rh, i, j, dx, dy, dxm, dym, &
                           model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 
       !--------------------------------------------------------------------

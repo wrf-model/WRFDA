@@ -1,4 +1,4 @@
-subroutine da_interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
+subroutine da_interp_obs_lin_2d_adj(fm2d, i, j, dx, dy, dxm, dym, fo2d, z)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,18 +6,16 @@ subroutine da_interp_obs_lin_2d_adj(fm2d, xp, i, j, dx, dy, dxm, dym, fo2d, z)
 
    implicit none
 
-   type (xpose_type),     intent(in)    :: xp    ! Dimensions and xpose buffers.
-   integer,               intent(in)    :: i, j
-   real,                  intent(in)    :: dx, dxm, dy, dym, z, fo2d
+   integer, intent(in)    :: i, j
+   real,    intent(in)    :: dx, dxm, dy, dym, z, fo2d
 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                          intent(inout) :: fm2d    ! Input variable
+   real,    intent(inout) :: fm2d(ims:ime,jms:jme,kms:kme)    ! Input variable
 
    integer                              :: k, kk
    real                                 :: dz, dzm
-   real, dimension(xp%kms:xp%kme)       :: fmz
+   real, dimension(kms:kme)       :: fmz
 
-   call da_togrid(z, xp%kts, xp%kte, k, dz, dzm)
+   call da_togrid(z, kts, kte, k, dz, dzm)
 
    fmz(k)   = dzm*fo2d
    fmz(k+1) = dz *fo2d

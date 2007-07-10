@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmt1_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_ssmt1_adj(iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,6 @@ subroutine da_transform_xtoy_ssmt1_adj(iv, xp, jo_grad_y, jo_grad_x)
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -32,7 +31,7 @@ subroutine da_transform_xtoy_ssmt1_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%ssmt1(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % t, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
       end do  
    end if

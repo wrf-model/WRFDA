@@ -22,7 +22,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
    real                            :: dx, dxm  ! Interpolation weights.
    real                            :: dy, dym  ! Interpolation weights.
    real, dimension(1:max_ob_levels) :: model_ref !Model gpsref at ob loc
-   real, dimension(xp%kms:xp%kme)   :: v_h     ! Model value h at ob
+   real, dimension(kms:kme)   :: v_h     ! Model value h at ob
                                                ! hor. location.
    integer           :: pref, fref
 
@@ -134,7 +134,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
 
          ! Get the gpsref%zk from gpsref%h:
 
-         do k=xp%kts,xp%kte
+         do k=kts,kte
             v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                    + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
          end do
@@ -150,7 +150,7 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
          iv % gpsref(1)%zk(1) = pseudo_z
       end if
 
-      call da_interp_lin_3d( xb%ref, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb%ref, i, j, dx, dy, dxm, dym, &
          model_ref, max_ob_levels, iv%gpsref(n)%zk, num_levs)
 
       if (.not.(pseudo_var(1:3) == 'ref' .and. num_pseudo > 0)) then

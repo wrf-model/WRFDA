@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
    ! Purpose: transform gradient from obs space to model grid space.
@@ -14,7 +14,6 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
 !#include "rttov_v2q.interface"
 
    type (x_type), intent(inout)   :: jo_grad_x !
-   type (xpose_type), intent(in)  :: xp        ! Domain decomposition vars.
    type (y_type),  intent(in)     :: jo_grad_y ! H' delta_x
    type (ob_type), intent(in)     :: iv        ! O-B structure.
 
@@ -400,7 +399,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_t(:,n) = con_vars_ad(n)% t(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%t, xp, &
+         call da_interp_lin_3d_adj_new( jo_grad_x%t, &
             iv%instid(i)%loc_i, &
             iv%instid(i)%loc_j, &
             iv%instid(i)%loc_k, &
@@ -417,7 +416,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_q(:,n) = con_vars_ad(n)% q(:)
          end do
-         call da_interp_lin_3d_adj_new( jo_grad_x%q, xp, &
+         call da_interp_lin_3d_adj_new( jo_grad_x%q, &
             iv%instid(i)%loc_i, &
             iv%instid(i)%loc_j, &
             iv%instid(i)%loc_k, &
@@ -434,8 +433,8 @@ subroutine da_transform_xtoy_rttov_adj ( iv, xp, jo_grad_y, jo_grad_x )
          do n=1,num_rad
             temp_ps(n) = con_vars_ad(n)% ps
          end do
-         call da_interp_lin_2d_adj_new(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
-            xp%jme, &
+         call da_interp_lin_2d_adj_new(jo_grad_x% psfc, ims, ime, jms, &
+            jme, &
             iv%instid(i)%loc_i, &
             iv%instid(i)%loc_j, &
             iv%instid(i)%loc_dx, &

@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_qscat(xa, iv, xp, y)
+subroutine da_transform_xtoy_qscat(grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_qscat(xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
-   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: iv       ! Innovation vector (O-B).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j     ! Index dimension.
@@ -31,9 +30,9 @@ subroutine da_transform_xtoy_qscat(xa, iv, xp, y)
          dxm = iv%qscat(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d(grid%xa % u, i, j, dx, dy, dxm, dym, &
                                 y%qscat(n)%u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d(grid%xa % v, i, j, dx, dy, dxm, dym, &
                                 y%qscat(n)%v, iv%qscat(n)%zk)
       end do
    end if

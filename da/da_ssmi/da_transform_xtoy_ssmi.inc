@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi (xb, oi, xa, y)
+subroutine da_transform_xtoy_ssmi (grid, oi, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,15 +6,14 @@ subroutine da_transform_xtoy_ssmi (xb, oi, xa, y)
 
    implicit none
 
-   type (xb_type), intent(in)   :: xb       ! first guess state.
-   type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
-   type (x_type),  intent(inout):: xa       ! gridded analysis increment.
-   type (y_type), intent(inout) :: y        ! y = h (xa)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: oi       ! obs. increment vector (o-b).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%xa)
 
    if (oi%num_ssmi_tb > 0) then
-      call da_transform_xtoy_ssmi_tb (xb, oi, xa, y)
+      call da_transform_xtoy_ssmi_tb (grid, oi, y)
    else if (oi%num_ssmi_retrieval > 0) then
-      call da_transform_xtoy_ssmi_rv (xb, oi, xa, y)
+      call da_transform_xtoy_ssmi_rv (grid, oi, y)
    end if
 
 end subroutine da_transform_xtoy_ssmi

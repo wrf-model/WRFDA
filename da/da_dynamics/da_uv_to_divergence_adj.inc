@@ -1,4 +1,4 @@
-subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
+subroutine da_uv_to_divergence_adj(grid, u, v, div)
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of the subroutine da_uv_to_divergence
@@ -11,9 +11,6 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
 
    type (domain), intent(inout) :: grid
 
-   type (xpose_type), intent(inout) :: xp      ! Dimensions and xpose buffers.
-
-   type (xb_type), intent(in)           :: xb         ! First guess structure.
    real, intent(out)  :: u(ims:ime,jms:jme,kms:kme)   ! u wind comp.
    real, intent(out)  :: v(ims:ime,jms:jme,kms:kme)   ! v wind comp.
    real, intent(inout):: div(ims:ime,jms:jme,kms:kme) ! Divergence.
@@ -34,7 +31,7 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
    if (.not. global) then
       um(ims:ime,jms:jme) = 0.
       vm(ims:ime,jms:jme) = 0.
-      inv_2ds = 0.5 / xb%ds
+      inv_2ds = 0.5 / grid%xb%ds
    end if
 
    one_third = 1.0 / 3.0
@@ -111,20 +108,20 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
          ! to get the contribution.
 
          if (.not. test_wrfvar) then
-            xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
+            grid%xp%vxy(its:ite, jts:jte) = div(its:ite, jts:jte, k)
 #ifdef DM_PARALLEL
 #include "HALO_2D_WORK.inc"
 #endif
 
-            div(is, js:je, k) = xp%vxy(is, js:je)
-            div(ie, js:je, k) = xp%vxy(ie, js:je)
-            div(is:ie, js, k) = xp%vxy(is:ie, js)
-            div(is:ie, je, k) = xp%vxy(is:ie, je)
+            div(is, js:je, k) = grid%xp%vxy(is, js:je)
+            div(ie, js:je, k) = grid%xp%vxy(ie, js:je)
+            div(is:ie, js, k) = grid%xp%vxy(is:ie, js)
+            div(is:ie, je, k) = grid%xp%vxy(is:ie, je)
          end if
 
          do j = js, je
             do i = is, ie
-              coeff = xb%map_factor(i,j) * xb%map_factor(i,j) * inv_2ds
+              coeff = grid%xb%map_factor(i,j) * grid%xb%map_factor(i,j) * inv_2ds
               um(i+1,j)=um(i+1,j)+div(i,j,k)*coeff
               um(i-1,j)=um(i-1,j)-div(i,j,k)*coeff
               vm(i,j+1)=vm(i,j+1)+div(i,j,k)*coeff
@@ -133,9 +130,9 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
          end do
 
          u(is-1:ie+1,js-1:je+1,k) = u(is-1:ie+1,js-1:je+1,k) &
-            +um(is-1:ie+1,js-1:je+1) / xb%map_factor(is-1:ie+1,js-1:je+1)
+            +um(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
          v(is-1:ie+1,js-1:je+1,k) = v(is-1:ie+1,js-1:je+1,k) &
-            +vm(is-1:ie+1,js-1:je+1) / xb%map_factor(is-1:ie+1,js-1:je+1)
+            +vm(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
 
          um(:,:)=0.
          vm(:,:)=0.
@@ -148,10 +145,10 @@ subroutine da_uv_to_divergence_adj(grid, xp, xb, u, v, div)
 
          do j = je, js, -1
             do i = ie, is, -1  
-               u(i+1,j,k) = u(i+1,j,k) + xb%coefx(i,j) * div(i,j,k) 
-               u(i-1,j,k) = u(i-1,j,k) - xb%coefx(i,j) * div(i,j,k) 
-               v(i,j+1,k) = v(i,j+1,k) + xb%coefy(i,j) * div(i,j,k) 
-               v(i,j-1,k) = v(i,j-1,k) - xb%coefy(i,j) * div(i,j,k) 
+               u(i+1,j,k) = u(i+1,j,k) + grid%xb%coefx(i,j) * div(i,j,k) 
+               u(i-1,j,k) = u(i-1,j,k) - grid%xb%coefx(i,j) * div(i,j,k) 
+               v(i,j+1,k) = v(i,j+1,k) + grid%xb%coefy(i,j) * div(i,j,k) 
+               v(i,j-1,k) = v(i,j-1,k) - grid%xb%coefy(i,j) * div(i,j,k) 
             end do
          end do
       end if

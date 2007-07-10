@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_geoamv_adj (iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_geoamv_adj (iv, jo_grad_y, jo_grad_x)
 
    !-------------------------------------------------------------------------
    ! Purpose: X to Y Transpose operator for Geo. AMVs
@@ -30,9 +30,9 @@ subroutine da_transform_xtoy_geoamv_adj (iv, xp, jo_grad_y, jo_grad_x)
          dx = iv%geoamv(n)%loc%dx
          dxm = iv%geoamv(n)%loc%dxm
 
-         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, i, j, dx, dy, dxm, dym, &
                                    jo_grad_y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
-         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, i, j, dx, dy, dxm, dym, &
                                    jo_grad_y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
       end do
    end if

@@ -6,7 +6,7 @@ use da_reporting, only : da_warning
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
    use module_radiance, only : satinfo, coefs_scatt_instname, &
       time_slots, i_kind,r_kind, r_double, &
        one, zero, three,deg2rad, n_scatt_coef,q2ppmv, gsi_emiss
@@ -26,12 +26,12 @@ use da_reporting, only : da_warning
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, rtminit_platform,rtminit_satid, &
       rtminit_nsensor,rtminit_sensor,filename_len,read_biascoef,analysis_date, &
-      time_window_max,time_window_min, &
+      time_window_max,time_window_min, kts,kte,kms,kme, &
       rtm_option_rttov,rtm_option_crtm, &
       print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
-      qc_good, qc_bad,myproc,biascorr, global
+      qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme
    use da_define_structures, only : ob_type, y_type, x_type
    use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_new, &
       da_interp_lin_3d_new,da_interp_lin_2d,da_interp_lin_3d_adj_new, &

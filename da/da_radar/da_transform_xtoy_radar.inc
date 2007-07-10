@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
+subroutine da_transform_xtoy_radar (grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: calculate the Doppler radial velocity and 
@@ -8,11 +8,9 @@ subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
  
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
-   type (xb_type), intent(in)   :: xb          ! first guess state.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
+   type (y_type), intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -52,25 +50,25 @@ subroutine da_transform_xtoy_radar (xa, xb, iv, xp, y)
          model_ps   = iv%Radar(n)%model_ps
 
          ! [1.4] Interpolate horizontally from dot points:
-         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &
                             model_u, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % v, i, j, dx, dy, dxm, dym, &
                             model_v, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call da_interp_lin_3d(xa % qrn, xp, &
+         call da_interp_lin_3d(grid%xa % qrn, &
                             i, j, dx, dy, dxm, dym, &
                             model_qrn, num_levs, iv%Radar(n)%zk, &
                             num_levs)
-         call da_interp_lin_3d(xa%wh, xp,   &
+         call da_interp_lin_3d(grid%xa%wh,   &
                             i, j, dx, dy, dxm, dym, &
                             model_w, num_levs, iv%Radar(n)%zk, &
                             num_levs)
 
          ! [1.7] Calculate rv and rf at OBS location
 
-         xr = xb%ds * (iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
-         yr = xb%ds * (iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
+         xr = grid%xb%ds * (iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
+         yr = grid%xb%ds * (iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
 
          do k = 1, num_levs
 

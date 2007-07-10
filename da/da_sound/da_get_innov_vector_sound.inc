@@ -27,8 +27,8 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
    real, dimension(1:max_ob_levels) :: model_q  ! Model value q at ob location.
    ! real, dimension(1:max_ob_levels) :: model_h  ! Model value h at ob location.
 
-   real, dimension(xp%kms:xp%kme)   :: v_h      ! Model value h at ob hor. location.
-   real, dimension(xp%kms:xp%kme)   :: v_p      ! Model value p at ob hor. location.
+   real, dimension(kms:kme)   :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme)   :: v_p      ! Model value p at ob hor. location.
 
    integer           :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf
 
@@ -62,7 +62,7 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
       dxm = iv%sound(n)%loc%dxm
       dym = iv%sound(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
          v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
@@ -90,16 +90,16 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d( xb%u, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb%u, i, j, dx, dy, dxm, dym, &
                            model_u, max_ob_levels, iv%sound(n)%zk, num_levs)
-      call da_interp_lin_3d( xb%v, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb%v, i, j, dx, dy, dxm, dym, &
                            model_v, max_ob_levels, iv%sound(n)%zk, num_levs)
-      call da_interp_lin_3d( xb%t, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb%t, i, j, dx, dy, dxm, dym, &
                            model_t, max_ob_levels, iv%sound(n)%zk, num_levs)
-      call da_interp_lin_3d( xb%q, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb%q, i, j, dx, dy, dxm, dym, &
                            model_q, max_ob_levels, iv%sound(n)%zk, num_levs)
 
-      ! call da_interp_lin_3d( xb%h, xp, i, j, dx, dy, dxm, dym, &
+      ! call da_interp_lin_3d( xb%h, i, j, dx, dy, dxm, dym, &
       !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs)
 
       !----------------------------------------------------------------------

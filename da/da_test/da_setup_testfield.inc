@@ -72,7 +72,7 @@ subroutine da_setup_testfield(grid)
         Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
 
       ! Now do something for PW
-      call da_transform_xtotpw(grid%xa, grid%xb)
+      call da_transform_xtotpw(grid)
 
       ! GPS Refractivity:
       if (use_GpsrefObs) &
@@ -80,7 +80,7 @@ subroutine da_setup_testfield(grid)
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. &
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
-         call da_transform_xtoseasfcwind_lin(grid%xa, grid%xb)
+         call da_transform_xtoseasfcwind_lin(grid)
       end if
 
 #ifdef DM_PARALLEL

@@ -1,4 +1,4 @@
-subroutine da_check_psfc(xb, xa, iv, xp, y)
+subroutine da_check_psfc(grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,8 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
      
    implicit none
    
-   type (xb_type), intent(in)        :: xb  ! first guess (local).
-   type (x_type),  intent(inout)     :: xa  ! analysis increments (local).
+   type (domain),  intent(inout)     :: grid
    type (ob_type), intent(inout)     :: iv  ! ob. increment vector.
-   type (xpose_type), intent(inout)  :: xp  ! Dimensions and xpose buffers(be).
    type (y_type),  intent(inout)     :: y   ! residual
 
    real                           :: adj_ttl_lhs   ! < y, y >
@@ -34,11 +32,11 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
 
    ! save input
 
-   xa2_psfc(ims:ime, jms:jme) = xa%p   (ims:ime, jms:jme, kts)
-   xa2_u10 (ims:ime, jms:jme) = xa%u10 (ims:ime, jms:jme)
-   xa2_v10 (ims:ime, jms:jme) = xa%v10 (ims:ime, jms:jme)
-   xa2_t2  (ims:ime, jms:jme) = xa%t2  (ims:ime, jms:jme)
-   xa2_q2  (ims:ime, jms:jme) = xa%q2  (ims:ime, jms:jme)
+   xa2_psfc(ims:ime, jms:jme) = grid%xa%p   (ims:ime, jms:jme, kts)
+   xa2_u10 (ims:ime, jms:jme) = grid%xa%u10 (ims:ime, jms:jme)
+   xa2_v10 (ims:ime, jms:jme) = grid%xa%v10 (ims:ime, jms:jme)
+   xa2_t2  (ims:ime, jms:jme) = grid%xa%t2  (ims:ime, jms:jme)
+   xa2_q2  (ims:ime, jms:jme) = grid%xa%q2  (ims:ime, jms:jme)
 
    !----------------------------------------------------------------------
 
@@ -46,7 +44,7 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
    pertile_lhs = 0.0
 
    do n=1, iv%num_synop
-      call da_transform_xtopsfc(xb, xa, xp, iv%synop(n), y%synop(n))
+      call da_transform_xtopsfc(grid, iv%synop(n), y%synop(n))
       pertile_lhs = pertile_lhs &
                   + y%synop(n)%u * y%synop(n)%u &
                   + y%synop(n)%v * y%synop(n)%v &
@@ -68,28 +66,28 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
    ! [5.0] Perform adjivnt operation:
    !-------------------------------------------------------------------------
 
-   xa%psfc(ims:ime, jms:jme) = 0.0
-   xa%tgrn(ims:ime, jms:jme) = 0.0
-   xa%u10 (ims:ime, jms:jme) = 0.0
-   xa%v10 (ims:ime, jms:jme) = 0.0
-   xa%t2  (ims:ime, jms:jme) = 0.0
-   xa%q2  (ims:ime, jms:jme) = 0.0
+   grid%xa%psfc(ims:ime, jms:jme) = 0.0
+   grid%xa%tgrn(ims:ime, jms:jme) = 0.0
+   grid%xa%u10 (ims:ime, jms:jme) = 0.0
+   grid%xa%v10 (ims:ime, jms:jme) = 0.0
+   grid%xa%t2  (ims:ime, jms:jme) = 0.0
+   grid%xa%q2  (ims:ime, jms:jme) = 0.0
    
    do n=1, iv%num_synop
-      call da_transform_xtopsfc_adj(xb,xp,iv%synop(n),y%synop(n),xa)
+      call da_transform_xtopsfc_adj(grid,iv%synop(n),y%synop(n),grid%xa)
    end do
 
-   pertile_rhs = sum(xa%u10 (ims:ime, jms:jme) * xa2_u10 (ims:ime, jms:jme)) &
-               + sum(xa%v10 (ims:ime, jms:jme) * xa2_v10 (ims:ime, jms:jme)) &
-               + sum(xa%t2  (ims:ime, jms:jme) * xa2_t2  (ims:ime, jms:jme)) &
-               + sum(xa%q2  (ims:ime, jms:jme) * xa2_q2  (ims:ime, jms:jme)) &
-               + sum(xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
+   pertile_rhs = sum(grid%xa%u10 (ims:ime, jms:jme) * xa2_u10 (ims:ime, jms:jme)) &
+               + sum(grid%xa%v10 (ims:ime, jms:jme) * xa2_v10 (ims:ime, jms:jme)) &
+               + sum(grid%xa%t2  (ims:ime, jms:jme) * xa2_t2  (ims:ime, jms:jme)) &
+               + sum(grid%xa%q2  (ims:ime, jms:jme) * xa2_q2  (ims:ime, jms:jme)) &
+               + sum(grid%xa%psfc(ims:ime, jms:jme) * xa2_psfc(ims:ime, jms:jme))
 
-   partial_rhs = sum(xa%u10 (its:ite, jts:jte) * xa2_u10 (its:ite, jts:jte)) &
-               + sum(xa%v10 (its:ite, jts:jte) * xa2_v10 (its:ite, jts:jte)) &
-               + sum(xa%t2  (its:ite, jts:jte) * xa2_t2  (its:ite, jts:jte)) &
-               + sum(xa%q2  (its:ite, jts:jte) * xa2_q2  (its:ite, jts:jte)) &
-               + sum(xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
+   partial_rhs = sum(grid%xa%u10 (its:ite, jts:jte) * xa2_u10 (its:ite, jts:jte)) &
+               + sum(grid%xa%v10 (its:ite, jts:jte) * xa2_v10 (its:ite, jts:jte)) &
+               + sum(grid%xa%t2  (its:ite, jts:jte) * xa2_t2  (its:ite, jts:jte)) &
+               + sum(grid%xa%q2  (its:ite, jts:jte) * xa2_q2  (its:ite, jts:jte)) &
+               + sum(grid%xa%psfc(its:ite, jts:jte) * xa2_psfc(its:ite, jts:jte))
    
    !----------------------------------------------------------------------
    ! [6.0] Calculate RHS of adjivnt test equation:
@@ -116,11 +114,11 @@ subroutine da_check_psfc(xb, xa, iv, xp, y)
    end if
 
    ! recover
-   xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
-   xa%u10 (ims:ime, jms:jme) = xa2_u10 (ims:ime, jms:jme)
-   xa%v10 (ims:ime, jms:jme) = xa2_v10 (ims:ime, jms:jme)
-   xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
-   xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
+   grid%xa%psfc(ims:ime, jms:jme) = xa2_psfc(ims:ime, jms:jme)
+   grid%xa%u10 (ims:ime, jms:jme) = xa2_u10 (ims:ime, jms:jme)
+   grid%xa%v10 (ims:ime, jms:jme) = xa2_v10 (ims:ime, jms:jme)
+   grid%xa%t2  (ims:ime, jms:jme) = xa2_t2  (ims:ime, jms:jme)
+   grid%xa%q2  (ims:ime, jms:jme) = xa2_q2  (ims:ime, jms:jme)
 
    if (trace_use) call da_trace_exit("da_check_psfc")
 

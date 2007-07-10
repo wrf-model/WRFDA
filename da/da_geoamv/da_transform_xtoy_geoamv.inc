@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_geoamv (xa, iv, xp, y)
+subroutine da_transform_xtoy_geoamv (grid, iv, y)
 
    !-------------------------------------------------------------------------
    ! Purpose: X to Y Transform operator for Geo. AMVs
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_geoamv (xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa)
+   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j , k ! Index dimension.
@@ -35,9 +34,9 @@ subroutine da_transform_xtoy_geoamv (xa, iv, xp, y)
 
          ! Interpolate horizontally:
 
-         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &
                             y%geoamv(n)%u, k, iv%geoamv(n)%zk, k)
-         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % v, i, j, dx, dy, dxm, dym, &
                         y%geoamv(n)%v, k, iv%geoamv(n)%zk, k)
       end do
    end if

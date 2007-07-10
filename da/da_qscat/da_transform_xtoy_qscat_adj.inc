@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_qscat_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_qscat_adj(iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -30,9 +30,9 @@ subroutine da_transform_xtoy_qscat_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%qscat(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % u, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%u, iv%qscat(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % v, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%qscat(n)%v, iv%qscat(n)%zk)
       end do
    end if

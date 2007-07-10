@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_airsr_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_airsr_adj(iv, jo_grad_y, jo_grad_x)
 
    !----------------------------------------------------------------------
    ! Purpose: Does adjoint computation at AIRS retrieval locations
@@ -7,7 +7,6 @@ subroutine da_transform_xtoy_airsr_adj(iv, xp, jo_grad_y, jo_grad_x)
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -33,9 +32,9 @@ subroutine da_transform_xtoy_airsr_adj(iv, xp, jo_grad_y, jo_grad_x)
          if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % t, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%airsr(n)%t, k, iv%airsr(n)%zk, k)
-         call da_interp_lin_3d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % q, i, j, dx, dy, dxm, dym, &
                                 jo_grad_y%airsr(n)%q, k, iv%airsr(n)%zk, k)
       end do
    end if

@@ -4,7 +4,7 @@ module da_crtm
    ! Purpose: module for CRTM radiance data assimilation. 
    !---------------------------------------------------------------------------
 
-   use module_domain, only : xpose_type, x_type, xb_type
+   use module_domain, only : xpose_type, x_type, xb_type, domain
 #ifdef CRTM
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &
       CRTM_Atmosphere_type, CRTM_Surface_type,CRTM_GeometryInfo_type, &
@@ -23,7 +23,7 @@ module da_crtm
       biasprep, qc_rad,missing_r,rtminit_sensor,rtminit_nsensor, filename_len, &
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
       time_window_min,num_fgat_time,rtminit_platform, &
-      rtminit_satid, global
+      rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte
    use da_define_structures, only : y_type, ob_type
    use da_interpolation, only : da_interp_lin_2d_new, &
       da_interp_lin_2d,da_interp_lin_2d_adj

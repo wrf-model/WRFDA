@@ -25,8 +25,8 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
    real, dimension(1:max_ob_levels) :: model_t  ! Model value t at ob location.
 
 
-   real, dimension(xp%kms:xp%kme)  :: v_h      ! Model value h at ob hor. location.
-   real, dimension(xp%kms:xp%kme)  :: v_p      ! Model value p at ob hor. location.
+   real, dimension(kms:kme)  :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme)  :: v_p      ! Model value p at ob hor. location.
 
    integer           :: itu,ituf,itvv,itvvf,itt,ittf
 
@@ -54,7 +54,7 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
       dxm = iv%airep(n)%loc%dxm
       dym = iv%airep(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                  + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
          v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
@@ -82,13 +82,13 @@ subroutine da_get_innov_vector_airep( it, xb, xp, ob, iv)
       num_levs = iv % airep(n) % info % levels
 
       ! [1.2] Interpolate horizontally:
-      call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % u, i, j, dx, dy, dxm, dym, &
          model_u, max_ob_levels, iv%airep(n)%zk, num_levs)
 
-      call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % v, i, j, dx, dy, dxm, dym, &
          model_v, max_ob_levels, iv%airep(n)%zk, num_levs)
 
-      call da_interp_lin_3d( xb % t, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % t, i, j, dx, dy, dxm, dym, &
           model_t, max_ob_levels, iv%airep(n)%zk, num_levs)
 
       !-------------------------------------------------------------------

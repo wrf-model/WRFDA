@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_sonde_sfc_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_sonde_sfc_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,9 +6,8 @@ subroutine da_transform_xtoy_sonde_sfc_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb          ! first guess state.
+   type (domain),  intent(in)    :: grid
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -31,24 +30,24 @@ subroutine da_transform_xtoy_sonde_sfc_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
             dym = iv%sonde_sfc(n)%loc%dym
 
             ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % u, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%u, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % v, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%v, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % t, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%t, iv%sonde_sfc(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % q, i, j, dx, dy, &
                dxm, dym, jo_grad_y%sonde_sfc(n)%q, iv%sonde_sfc(n)%zk)
 
-            call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
-               xp%jms, xp%jme, i, j, dx, dy, dxm, dym, &
+            call da_interp_lin_2d_adj(jo_grad_x % psfc, ims, ime, &
+               jms, jme, i, j, dx, dy, dxm, dym, &
                jo_grad_y%sonde_sfc(n)%p)
          end do
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, &
             iv%ob_numb(iv%current_ob_time)%sound
-            call da_transform_xtopsfc_adj(xb,xp,iv%sonde_sfc(n), &
-                                          jo_grad_y%sonde_sfc(n),jo_grad_x)
+            call da_transform_xtopsfc_adj(grid,iv%sonde_sfc(n), &
+               jo_grad_y%sonde_sfc(n),jo_grad_x)
          end do
       end if
    end if

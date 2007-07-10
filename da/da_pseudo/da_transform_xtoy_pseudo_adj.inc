@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_pseudo_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_pseudo_adj(iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -31,15 +31,15 @@ subroutine da_transform_xtoy_pseudo_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%pseudo(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % u, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%u, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % v, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%v, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % q, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%q, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % p, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % p, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%p, iv%pseudo(n)%zk)
-         call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_obs_lin_2d_adj(jo_grad_x % t, i, j, dx, dy, dxm, dym, &
                                     jo_grad_y%pseudo(n)%t, iv%pseudo(n)%zk)
       end do
    end if

@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -10,9 +10,8 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb          ! first guess state.
+   type (domain),  intent(in)    :: grid
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -57,8 +56,8 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
          ! [1.7] Calculate rv and rf at OBS location
 
-         xr = xb%ds * (iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
-         yr = xb%ds * (iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
+         xr = grid%xb%ds * (iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
+         yr = grid%xb%ds * (iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
 
          do k = 1, num_levs
 
@@ -93,17 +92,17 @@ subroutine da_transform_xtoy_radar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
          ! [1.6] Interpolate horizontally from crs points:
 
-         call da_interp_lin_3d_adj(jo_grad_x % wh, xp,   &
+         call da_interp_lin_3d_adj(jo_grad_x % wh,   &
                              i, j, dx, dy, dxm, dym, &
                              model_w, num_levs, iv%Radar(n)%zk, &
                              num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % qrn, xp, &
+         call da_interp_lin_3d_adj(jo_grad_x % qrn, &
                              i, j, dx, dy, dxm, dym, &
                              model_qrn, num_levs, iv%Radar(n)%zk, &
                              num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, i, j, dx, dy, &
             dxm, dym, model_v, num_levs, iv%Radar(n)%zk, num_levs)
-         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, i, j, dx, dy, &
             dxm, dym, model_u, num_levs, iv%Radar(n)%zk, num_levs)
       end do
    end if

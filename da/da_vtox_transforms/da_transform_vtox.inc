@@ -132,7 +132,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
            Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
 
          ! Now do something for PW
-         call da_transform_xtotpw(grid%xa, grid%xb)
+         call da_transform_xtotpw(grid)
 
          ! GPS Refractivity:
          if (use_GpsrefObs) &
@@ -144,9 +144,9 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
                call da_error(__FILE__,__LINE__, &
                   (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
             end if
-            call da_transform_xtoseasfcwind_lin(grid%xa, grid%xb)
+            call da_transform_xtoseasfcwind_lin(grid)
          end if
-         if (Use_SsmiTbObs) call da_transform_xtotb_lin (grid%xa, grid%xb)
+         if (Use_SsmiTbObs) call da_transform_xtotb_lin (grid)
 
          ! Exchange grid%xa halo region.
 #ifdef DM_PARALLEL

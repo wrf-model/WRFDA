@@ -75,7 +75,7 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
        use_SsmiTbObs .or. use_SsmiRetrievalObs) then
 
       ! Now do something for PW
-      call da_transform_xtotpw(grid%xa, grid%xb)
+      call da_transform_xtotpw(grid)
 
       ! GPS Refractivity:
       if (use_gpsrefobs) then
@@ -86,12 +86,12 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
           use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
          if (global) then
            call da_error(__FILE__,__LINE__, &
-             (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
+             (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
          end if
-         call da_transform_xtoseasfcwind_lin(grid%xa, grid%xb)
+         call da_transform_xtoseasfcwind_lin(grid)
       end if
 
-      if (use_SsmiTbObs) call da_transform_xtotb_lin (grid%xa, grid%xb)
+      if (use_SsmiTbObs) call da_transform_xtotb_lin (grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
@@ -187,10 +187,10 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
        use_GpsrefObs .or.                                    &
        use_SsmiTbObs .or. use_SsmiRetrievalObs) then
 
-      if (Use_SsmiTbObs) call da_transform_xtotb_adj (grid%xa, grid%xb)
+      if (Use_SsmiTbObs) call da_transform_xtotb_adj (grid)
 
       ! for PW
-      call da_transform_xtotpw_adj (grid%xa, grid%xb)
+      call da_transform_xtotpw_adj (grid)
 
       ! GPS Refractivity:
       if (use_GpsrefObs) call da_transform_xtogpsref_adj (grid)
@@ -201,7 +201,7 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
             call da_error(__FILE__,__LINE__, &
                (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
          end if
-         call da_transform_xtoseasfcwind_adj (grid%xa, grid%xb)
+         call da_transform_xtoseasfcwind_adj (grid)
       end if
    end if
 
@@ -210,7 +210,7 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
       call da_transform_xtowtq_adj (grid)
    end if
 
-   call da_pt_to_rho_adj (grid%xb, grid%xa)
+   call da_pt_to_rho_adj (grid)
 
    pertile_rhs = sum (grid%xa%u(ims:ime, jms:jme, kms:kme) * xa2_u(ims:ime, jms:jme, kms:kme)) &
                + sum (grid%xa%v(ims:ime, jms:jme, kms:kme) * xa2_v(ims:ime, jms:jme, kms:kme)) &
