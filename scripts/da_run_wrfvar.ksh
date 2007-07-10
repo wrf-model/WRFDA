@@ -713,7 +713,7 @@ echo "WINDOW_END            $WINDOW_END"
 
       if test $NL_VAR4D_MULTI_INC = 2 ; then
 
-        ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0,QCLOUD,QRAIN" ${FC_DIR}/${DATE}/analysis $DA_FIRST_GUESS low_res_increment
+        ncdiff -O -v "U,V,W,PH,T,QVAPOR,MU,MU0" ${FC_DIR}/${DATE}/analysis $DA_FIRST_GUESS low_res_increment
 
         ${WRFPLUS_DIR}/main/nupdown.exe -down 3 low_res_increment
 
@@ -725,7 +725,7 @@ echo "WINDOW_END            $WINDOW_END"
           fi
         fi
 
-        ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0,QCLOUD,QRAIN" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
+        ncflint -A -v "U,V,W,PH,T,QVAPOR,MU,MU0" -w 1,1 low_res_increment-down ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis_update
 
 #       rm low_res_increment low_res_increment-down
         cp -f ${FC_DIR}/${DATE}/analysis_update ${FC_DIR}/${DATE}/analysis
