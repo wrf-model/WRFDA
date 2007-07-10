@@ -321,6 +321,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
             timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
             terrain = 0.01_r_kind*abs(bfr1bhdr(13))
             crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+            iobs=0 ! argument is inout
             call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
             if (.not. iuse) then
                num_tovs_thinned=num_tovs_thinned+1
