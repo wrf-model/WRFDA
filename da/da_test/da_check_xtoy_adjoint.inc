@@ -27,7 +27,6 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_w
    real, dimension(ims:ime, jms:jme)          :: xa2_psfc
    real, dimension(ims:ime, jms:jme, kms:kme) :: xa2_qcw, xa2_qrn
-   type(domain), intent(inout):: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
    integer :: nobwin, ndynopt
    character(len=4) :: filnam
