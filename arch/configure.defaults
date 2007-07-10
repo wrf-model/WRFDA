@@ -325,7 +325,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165 -fno-second-underscore
 FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -426,7 +426,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165 -fno-second-underscore
 FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -1644,8 +1644,7 @@ FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -fno-second-underscore \
-                     -Wno=101,112,136,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,112,136,155,158,159,165
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS

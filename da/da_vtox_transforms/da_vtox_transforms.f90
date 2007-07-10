@@ -15,8 +15,7 @@ module da_vtox_transforms
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
       stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
 #endif
-   use module_domain, only : ep_type, vp_type, x_type, xb_type, xpose_type, &
-      domain
+   use module_domain, only : ep_type, vp_type, x_type, domain
 
    use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
       its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
