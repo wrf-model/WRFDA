@@ -1,4 +1,4 @@
-subroutine da_filter_adj(grid, var, xp)
+subroutine da_filter_adj(grid, var)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,11 +7,8 @@ subroutine da_filter_adj(grid, var, xp)
    implicit none
 
    type(domain), intent(inout)               :: grid
-   
-   type (xpose_type), intent(inout) :: xp      ! Transpose variables.
 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                      intent(inout) :: var
+   real, dimension(ims:ime,jms:jme,kms:kme), intent(inout) :: var
 
    integer :: i, j, k
 
@@ -21,8 +18,7 @@ subroutine da_filter_adj(grid, var, xp)
 
    ! Copy var for transpose.
 
-   xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
-      var(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   grid%xp%v1z(its:ite,jts:jte,kts:kte) = var(its:ite,jts:jte,kts:kte)
 
 
    ! Apply (i',j',k -> i',j,k') transpose (v1z -> v1y).
@@ -32,20 +28,20 @@ subroutine da_filter_adj(grid, var, xp)
 
    ! Perform y-direction filter:
 
-   do k=xp%ktsy, xp%ktey
-      do i=xp%itey, xp%itsy, -1
+   do k=grid%xp%ktsy, grid%xp%ktey
+      do i=grid%xp%itey, grid%xp%itsy, -1
          ! Backward
-         do j=xp%jds+1, xp%jde-1
-            xp%v1y(i,j-1,k) = xp%v1y(i,j-1,k) + w(1)*xp%v1y(i,j,k)
-            xp%v1y(i,j+1,k) = xp%v1y(i,j+1,k) + w(3)*xp%v1y(i,j,k)
-            xp%v1y(i,j  ,k) = w(2)*xp%v1y(i,j,k)
+         do j=jds+1, jde-1
+            grid%xp%v1y(i,j-1,k) = grid%xp%v1y(i,j-1,k) + w(1)*grid%xp%v1y(i,j,k)
+            grid%xp%v1y(i,j+1,k) = grid%xp%v1y(i,j+1,k) + w(3)*grid%xp%v1y(i,j,k)
+            grid%xp%v1y(i,j  ,k) = w(2)*grid%xp%v1y(i,j,k)
          end do
 
          ! Forward
-         do j=xp%jde-1,xp%jds+1,-1
-            xp%v1y(i,j-1,k) = xp%v1y(i,j-1,k) + w(1)*xp%v1y(i,j,k)
-            xp%v1y(i,j+1,k) = xp%v1y(i,j+1,k) + w(3)*xp%v1y(i,j,k)
-            xp%v1y(i,j  ,k) = w(2)*xp%v1y(i,j,k)
+         do j=jde-1,jds+1,-1
+            grid%xp%v1y(i,j-1,k) = grid%xp%v1y(i,j-1,k) + w(1)*grid%xp%v1y(i,j,k)
+            grid%xp%v1y(i,j+1,k) = grid%xp%v1y(i,j+1,k) + w(3)*grid%xp%v1y(i,j,k)
+            grid%xp%v1y(i,j  ,k) = w(2)*grid%xp%v1y(i,j,k)
          end do
       end do
    end do
@@ -56,20 +52,20 @@ subroutine da_filter_adj(grid, var, xp)
 
    ! Perform x-direction filter:
 
-   do k=xp%ktsx, xp%ktex
-      do j=xp%jtex, xp%jtsx, -1
+   do k=grid%xp%ktsx, grid%xp%ktex
+      do j=grid%xp%jtex, grid%xp%jtsx, -1
          ! Backward
-         do i=xp%ids+1, xp%ide-1
-            xp%v1x(i-1,j,k) = xp%v1x(i-1,j,k) + w(1)*xp%v1x(i,j,k)
-            xp%v1x(i+1,j,k) = xp%v1x(i+1,j,k) + w(3)*xp%v1x(i,j,k)
-            xp%v1x(i,j  ,k) = w(2)*xp%v1x(i,j,k)
+         do i=ids+1, ide-1
+            grid%xp%v1x(i-1,j,k) = grid%xp%v1x(i-1,j,k) + w(1)*grid%xp%v1x(i,j,k)
+            grid%xp%v1x(i+1,j,k) = grid%xp%v1x(i+1,j,k) + w(3)*grid%xp%v1x(i,j,k)
+            grid%xp%v1x(i,j  ,k) = w(2)*grid%xp%v1x(i,j,k)
          end do
 
          ! Forward 
-         do i=xp%ide-1,xp%ids+1,-1
-            xp%v1x(i-1,j,k) = xp%v1x(i-1,j,k) + w(1)*xp%v1x(i,j,k)
-            xp%v1x(i+1,j,k) = xp%v1x(i+1,j,k) + w(3)*xp%v1x(i,j,k)
-            xp%v1x(i,j  ,k) = w(2)*xp%v1x(i,j,k)
+         do i=ide-1,ids+1,-1
+            grid%xp%v1x(i-1,j,k) = grid%xp%v1x(i-1,j,k) + w(1)*grid%xp%v1x(i,j,k)
+            grid%xp%v1x(i+1,j,k) = grid%xp%v1x(i+1,j,k) + w(3)*grid%xp%v1x(i,j,k)
+            grid%xp%v1x(i,j  ,k) = w(2)*grid%xp%v1x(i,j,k)
          end do
       end do
    end do
@@ -78,8 +74,7 @@ subroutine da_filter_adj(grid, var, xp)
 
    call da_transpose_x2z (grid)
 
-   var(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) = &
-      xp%v1z(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   var(its:ite,jts:jte,kts:kte) = grid%xp%v1z(its:ite,jts:jte,kts:kte)
 
 end subroutine da_filter_adj
 

@@ -1,4 +1,4 @@
-subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
+subroutine da_solve_poissoneqn_fst(grid, xbx, del2b, b)
 
    !--------------------------------------------------------------------------
    !  Purpose: Solve Del**2 B = A for B with zero field boundary conditions.
@@ -15,7 +15,6 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
    type(domain), intent(inout)               :: grid
 
    type (xbx_type),intent(in) :: xbx           ! Header & non-gridded vars.
-   type (xpose_type),intent(inout)  :: xp      ! Dimensions and xpose buffers. 
    real, intent(in)           :: del2b(ims:ime,jms:jme,kms:kme)  ! Del**2 B.
    real, intent(out)          :: b(ims:ime,jms:jme,kms:kme)  ! B.
    
@@ -37,18 +36,18 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    ! Calculate work space needed.
 
-   n = max(xbx%fft_ix*(xp%jtex-xp%jtsx+1), &
-           xbx%fft_jy*(xp%itey-xp%itsy+1+xbx%pad_num))
+   n = max(xbx%fft_ix*(grid%xp%jtex-grid%xp%jtsx+1), &
+           xbx%fft_jy*(grid%xp%itey-grid%xp%itsy+1+xbx%pad_num))
 
    ! Allocate work arrays.
    allocate(work_1d(1:n))
 
    ! Copy del2b for transpose.
 
-   xp%v1z(its:ite,jts:jte,kts:kte) = del2b(its:ite,jts:jte,kts:kte)
+   grid%xp%v1z(its:ite,jts:jte,kts:kte) = del2b(its:ite,jts:jte,kts:kte)
 
-   if (ite == ide) xp%v1z(ite,jts:jte,kts:kte) = 0.0
-   if (jte == jde) xp%v1z(its:ite,jte,kts:kte) = 0.0
+   if (ite == ide) grid%xp%v1z(ite,jts:jte,kts:kte) = 0.0
+   if (jte == jde) grid%xp%v1z(its:ite,jte,kts:kte) = 0.0
 
    !---------------------------------------------------------------------------
    ! [2.0] Perform forward FFT in x direction:
@@ -61,7 +60,7 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
    ! [2.2] Set up FFT parameters:
    
    idim = xbx%fft_ix
-   jdim = xp%jtex-xp%jtsx+1
+   jdim = grid%xp%jtex-grid%xp%jtsx+1
 
    vector_inc  = 1
    vector_jump = idim
@@ -73,12 +72,12 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    ! [2.3] Perform forward FFT:
 
-   do k = xp%ktsx, xp%ktex
+   do k = grid%xp%ktsx, grid%xp%ktex
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=ids, ide
             ij=ij+1
-            work_1d(ij) = xp%v1x(i,j,k)
+            work_1d(ij) = grid%xp%v1x(i,j,k)
          end do
 
          do i=1, xbx%fft_pad_i
@@ -88,20 +87,20 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
       end do
 
       call fft661(Forward_FFT, vector_inc, vector_jump, &
-                                   num_vectors, vector_size, &
-                                   xbx % fft_factors_x, xbx % trig_functs_x, &
-                                   work_1d(1), work_area)
+         num_vectors, vector_size, &
+         xbx % fft_factors_x, xbx % trig_functs_x, &
+         work_1d(1), work_area)
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=ids, ide
             ij=ij+1
-            xp%v1x(i,j,k) = work_1d(ij)
+            grid%xp%v1x(i,j,k) = work_1d(ij)
          end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc + 1
             ij=ij+1
-            xp%v2x(i,j,k) = work_1d(ij)
+            grid%xp%v2x(i,j,k) = work_1d(ij)
          end do
       end do
    end do
@@ -118,7 +117,7 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    ! [3.2] Set up FFT parameters:
 
-   idim = xp%itey - xp%itsy + 1 + xbx%pad_num
+   idim = grid%xp%itey - grid%xp%itsy + 1 + xbx%pad_num
    jdim = xbx%fft_jy
 
    vector_inc  = idim
@@ -130,40 +129,40 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    ! [2.3] Perform forward FFT in j:
 
-   do k = xp%ktsy, xp%ktey
+   do k = grid%xp%ktsy, grid%xp%ktey
       ij = 0
-      do j=xp%jds, xp%jde
-         do i=xp%itsy, xp%itey
+      do j=jds,jde
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
-            work_1d(ij) = xp%v1y(i,j,k)
+            work_1d(ij) = grid%xp%v1y(i,j,k)
          end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
-            work_1d(ij) = xp%v2y(i,j,k)
+            work_1d(ij) = grid%xp%v2y(i,j,k)
          end do
       end do
 
       do j=1, xbx%fft_pad_j
-         do i=xp%itsy, xp%itey+xbx%pad_num
+         do i=grid%xp%itsy, grid%xp%itey+xbx%pad_num
             ij=ij+1
             work_1d(ij) = 0.0
          end do
       end do
 
       call fft661(Forward_FFT, vector_inc, vector_jump, &
-                                   num_vectors, vector_size, &
-                                   xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area)
+         num_vectors, vector_size, &
+         xbx % fft_factors_y, xbx % trig_functs_y, &
+         work_1d(1), work_area)
 
       !------------------------------------------------------------------------
       ! [4.0] Solve spectral Poisson equation:
       !------------------------------------------------------------------------
 
       ij = 0
-      do j=xp%jds, xbx%fft_jy
-         do i=xp%itsy, xp%itey
+      do j=jds, xbx%fft_jy
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
             work_1d(ij) = xbx%fft_coeffs(i,j)*work_1d(ij)
          end do
@@ -177,21 +176,21 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
       ! [2.3] Reform gridpt. b using inverse double FST in i.
 
       call fft661(Inverse_FFT, vector_inc, vector_jump, &
-                                   num_vectors, vector_size, &
-                                   xbx % fft_factors_y, xbx % trig_functs_y, &
-                                   work_1d(1), work_area)
+         num_vectors, vector_size, &
+         xbx % fft_factors_y, xbx % trig_functs_y, &
+         work_1d(1), work_area)
                           
       ij = 0
-      do j=xp%jds, xp%jde
-         do i=xp%itsy, xp%itey
+      do j=jds, jde
+         do i=grid%xp%itsy, grid%xp%itey
             ij=ij+1
-            xp%v1y(i,j,k) = work_1d(ij)
+            grid%xp%v1y(i,j,k) = work_1d(ij)
          end do
 
          do n=1, xbx%pad_num
             i=xbx%pad_loc(n)
             ij=ij+1
-            xp%v2y(i,j,k) = work_1d(ij)
+            grid%xp%v2y(i,j,k) = work_1d(ij)
          end do
       end do
    end do
@@ -208,7 +207,7 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
    ! Set up FFT parameters:
    
    idim = xbx%fft_ix
-   jdim = xp%jtex-xp%jtsx+1
+   jdim = grid%xp%jtex-grid%xp%jtsx+1
 
    vector_inc  = 1
    vector_jump = idim
@@ -218,30 +217,30 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    work_area   = (vector_size+1)*num_vectors
 
-   do k = xp%ktsx, xp%ktex
+   do k = grid%xp%ktsx, grid%xp%ktex
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=grid%xp%ids, grid%xp%ide
             ij=ij+1
-            work_1d(ij) = xp%v1x(i,j,k)
+            work_1d(ij) = grid%xp%v1x(i,j,k)
          end do
 
          do n=1, xbx%fft_pad_i
             i=(n-1)*xbx%pad_inc + 1
             ij=ij+1
-            work_1d(ij) = xp%v2x(i,j,k)
+            work_1d(ij) = grid%xp%v2x(i,j,k)
          end do
       end do
 
       call fft661(Inverse_FFT, vector_inc, vector_jump, &
-                                   num_vectors, vector_size, &
-                                   xbx % fft_factors_x, xbx % trig_functs_x, &
-                                   work_1d(1), work_area)
+         num_vectors, vector_size, &
+         xbx % fft_factors_x, xbx % trig_functs_x, &
+         work_1d(1), work_area)
       ij = 0
-      do j=xp%jtsx, xp%jtex
-         do i=xp%ids, xp%ide
+      do j=grid%xp%jtsx, grid%xp%jtex
+         do i=ids, ide
             ij=ij+1
-            xp%v1x(i,j,k) = work_1d(ij)
+            grid%xp%v1x(i,j,k) = work_1d(ij)
          end do
 
          ij=ij+xbx%fft_pad_i
@@ -260,7 +259,7 @@ subroutine da_solve_poissoneqn_fst(grid, xbx, xp, del2b, b)
 
    ! [2.5] Write data array into b:
 
-   b(its:ite,jts:jte,kts:kte) = xp%v1z(its:ite,jts:jte,kts:kte)
+   b(its:ite,jts:jte,kts:kte) = grid%xp%v1z(its:ite,jts:jte,kts:kte)
 
 end subroutine da_solve_poissoneqn_fst
 

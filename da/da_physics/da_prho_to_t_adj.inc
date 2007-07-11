@@ -1,4 +1,4 @@
-subroutine da_prho_to_t_adj(xb, xp, xa) 
+subroutine da_prho_to_t_adj(grid) 
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of da_prho_to_t.
@@ -10,53 +10,48 @@ subroutine da_prho_to_t_adj(xb, xp, xa)
 
    implicit none
    
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! increment structure.
+   type (domain), intent(inout)  :: grid
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
    integer                       :: k            ! Loop counter.
-   real                  :: temp(xp%its:xp%ite,xp%jts:xp%jte) ! Temporary array.
+   real                  :: temp(its:ite,jts:jte) ! Temporary array.
 
    !---------------------------------------------------------------------------
    !  [1.0] initialise:
    !---------------------------------------------------------------------------
 
-   is = xp%its
-   ie = xp%ite
-   js = xp%jts
-   je = xp%jte
-   ks = xp%kts
-   ke = xp%kte
+   is = its
+   ie = ite
+   js = jts
+   je = jte
    
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < xb%ids) is = xb%ids
-      if (js < xb%jds) js = xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > xb%ide) ie = xb%ide
-      if (je > xb%jde) je = xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate temperature increments:
    !---------------------------------------------------------------------------
 
-   do k = ks, ke
-      temp(is:ie,js:je) = xa % t(is:ie,js:je,k) * xb % t(is:ie,js:je,k)
+   do k = kts, kte
+      temp(is:ie,js:je) = grid%xa % t(is:ie,js:je,k) * grid%xb % t(is:ie,js:je,k)
 
-      xa % p(is:ie,js:je,k) = xa % p(is:ie,js:je,k) + &
-                            temp(is:ie,js:je) / xb % p(is:ie,js:je,k)
+      grid%xa % p(is:ie,js:je,k) = grid%xa % p(is:ie,js:je,k) + &
+                            temp(is:ie,js:je) / grid%xb % p(is:ie,js:je,k)
                          
-      xa % rho(is:ie,js:je,k) = xa % rho(is:ie,js:je,k) - &
-                              temp(is:ie,js:je) / xb % rho(is:ie,js:je,k)
+      grid%xa % rho(is:ie,js:je,k) = grid%xa % rho(is:ie,js:je,k) - &
+                              temp(is:ie,js:je) / grid%xb % rho(is:ie,js:je,k)
    end do  
                              
 end subroutine da_prho_to_t_adj

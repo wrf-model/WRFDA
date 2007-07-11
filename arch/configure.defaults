@@ -119,8 +119,7 @@ EXTRA_LDFLAGS   = -V
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -168,8 +167,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -336,8 +334,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -386,8 +383,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -553,8 +549,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -600,8 +595,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -686,8 +680,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -733,8 +726,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -815,8 +807,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -862,8 +853,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -945,8 +935,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -992,8 +981,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1079,8 +1067,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1138,8 +1125,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1270,8 +1256,7 @@ LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1322,8 +1307,7 @@ LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1510,8 +1494,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1563,8 +1546,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1654,8 +1636,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1706,8 +1687,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1798,8 +1778,7 @@ EXTRA_LDFLAGS   = -V
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1850,8 +1829,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \

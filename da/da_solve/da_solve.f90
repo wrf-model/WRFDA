@@ -38,7 +38,7 @@ subroutine da_solve ( grid , config_flags)
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
       rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef, ims, ime, &
-      kps, kpe, jms, jme, kms, kme
+      kps, kpe, jms, jme, kms, kme, jts,jte
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -271,7 +271,7 @@ subroutine da_solve ( grid , config_flags)
       !       the w_increment need to be diagnosed:
 
       if (calc_w_increment .and. .not. use_RadarObs) then
-         call da_uvprho_to_w_lin(grid)
+         call da_uvprho_to_w_lin (grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_RADAR_XA_W.inc"
@@ -280,7 +280,7 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.7] Write out diagnostics
 
-      call da_write_diagnostics( ob, iv, re, y, grid%xp, grid%xa, j )
+      call da_write_diagnostics (grid, ob, iv, re, y, j)
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 
@@ -437,12 +437,12 @@ subroutine da_solve ( grid , config_flags)
       deallocate (xbx%int_wgts)
       deallocate (xbx%alp)
       deallocate (xbx%wsave)
-      if (grid%xb%jts == grid%xb%jds) then
+      if (jts == jds) then
          deallocate(cos_xls)
          deallocate(sin_xls)
       end if
                                                                                 
-      if (grid%xb%jte == grid%xb%jde) then
+      if (jte == jde) then
          deallocate(cos_xle)
          deallocate(sin_xle)
       end if

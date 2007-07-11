@@ -69,7 +69,7 @@ subroutine da_transform_xtoy_bogus (grid, iv, y)
          call da_tpq_to_slp_lin (model_t, model_q, model_p_c,    &
                                 terr_loc, psfc_loc,   &
                                 model_t9, model_q9,  &
-                                model_p_c9, psfc_loc9, y%bogus(n)%slp, grid%xp) 
+                                model_p_c9, psfc_loc9, y%bogus(n)%slp) 
 
          ! [1.4] Interpolate horizontally from dot points:
          call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &

@@ -1,4 +1,4 @@
-subroutine da_analysis_stats  (stats_unit, xp, xa)
+subroutine da_analysis_stats  (grid, stats_unit)
    
    !------------------------------------------------------------------------
    ! Purpose: Calculate min, max, mean and RMS of input 1d field.
@@ -6,40 +6,30 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
 
    implicit none
 
-   integer,           intent (in) :: stats_unit ! Output unit for stats.
-   type (xpose_type), intent (in) :: xp         ! Dimensions and xpose buffers.
-   type (x_type),     intent (in) :: xa         ! gridded analysis increments.
+   type (domain), intent (in) :: grid
+   integer,       intent (in) :: stats_unit ! Output unit for stats.
    
    integer :: i, j, k
    integer :: ij_g, ijk_g   ! ij, ijk for global domain. 
-   integer :: is, ie        ! i range of processor subdomain.
-   integer :: js, je        ! j range of processor subdomain.
-   integer :: ks, ke, kdim  ! k range 
+   integer :: kdim  ! k range 
 
    real    :: um, vm, tm, pm, qm ! On local domain.
    real    :: rij_g, rijk_g      ! On global domain.
 
-   type (maxmin_field_type) :: max_u(xp%kts:xp%kte), max_v(xp%kts:xp%kte), &
-                               max_t(xp%kts:xp%kte), max_p(xp%kts:xp%kte), &
-                               max_q(xp%kts:xp%kte), &
-                               min_u(xp%kts:xp%kte), min_v(xp%kts:xp%kte), &
-                               min_t(xp%kts:xp%kte), min_p(xp%kts:xp%kte), &
-                               min_q(xp%kts:xp%kte)
+   type (maxmin_field_type) :: max_u(kts:kte), max_v(kts:kte), &
+                               max_t(kts:kte), max_p(kts:kte), &
+                               max_q(kts:kte), &
+                               min_u(kts:kte), min_v(kts:kte), &
+                               min_t(kts:kte), min_p(kts:kte), &
+                               min_q(kts:kte)
  
-   real                        uv(xp%kts:xp%kte), vv(xp%kts:xp%kte), &
-                               tv(xp%kts:xp%kte), pv(xp%kts:xp%kte), &
-                               qv(xp%kts:xp%kte)
+   real                        uv(kts:kte), vv(kts:kte), &
+                               tv(kts:kte), pv(kts:kte), &
+                               qv(kts:kte)
 
    call da_trace_entry("da_analysis_stats")
 
-   is = xp%its
-   ie = xp%ite
-   js = xp%jts
-   je = xp%jte
-   ks = xp%kts
-   ke = xp%kte
-
-   kdim = ke-ks+1
+   kdim = kte-kts+1
 
    ij_g = mix * mjy
    ijk_g = ij_g * mkz
@@ -49,7 +39,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
   
    if (rootproc) then
       write(unit=stats_unit, fmt='(/a/)') &
-         ' Minimum of gridded analysis increments'
+         ' Minimum of gridded analysits increments'
 
       write(unit=stats_unit, fmt='(6a/)') &
          ' Lvl         ', &
@@ -60,15 +50,15 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
          'q     i    j          '
    end if
 
-   call da_maxmin_in_field(xa%u(is:ie,js:je,ks:ke), max_u, min_u)
+   call da_maxmin_in_field(grid%xa%u(its:ite,jts:jte,kts:kte), max_u, min_u)
    call da_proc_maxmin_combine(kdim, max_u, min_u)
-   call da_maxmin_in_field(xa%v(is:ie,js:je,ks:ke), max_v, min_v)
+   call da_maxmin_in_field(grid%xa%v(its:ite,jts:jte,kts:kte), max_v, min_v)
    call da_proc_maxmin_combine(kdim, max_v, min_v)
-   call da_maxmin_in_field(xa%t(is:ie,js:je,ks:ke), max_t, min_t)
+   call da_maxmin_in_field(grid%xa%t(its:ite,jts:jte,kts:kte), max_t, min_t)
    call da_proc_maxmin_combine(kdim, max_t, min_t)
-   call da_maxmin_in_field(xa%p(is:ie,js:je,ks:ke), max_p, min_p)
+   call da_maxmin_in_field(grid%xa%p(its:ite,jts:jte,kts:kte), max_p, min_p)
    call da_proc_maxmin_combine(kdim, max_p, min_p)
-   call da_maxmin_in_field(xa%q(is:ie,js:je,ks:ke), max_q, min_q)
+   call da_maxmin_in_field(grid%xa%q(its:ite,jts:jte,kts:kte), max_q, min_q)
    call da_proc_maxmin_combine(kdim, max_q, min_q)
 
    um = 999999.0
@@ -77,7 +67,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    pm = 999999.0
    qm = 999999.0
 
-   do k = ks, ke   
+   do k = kts, kte   
       if (rootproc) then
          write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
             min_u(k), min_v(k), min_t(k), min_p(k), min_q(k)
@@ -96,7 +86,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    
   
       write(unit=stats_unit, fmt='(/a/)') &
-         ' Maximum of gridded analysis increments'
+         ' Maximum of gridded analysits increments'
 
       write(unit=stats_unit, fmt='(6a/)') &
          ' Lvl         ', &
@@ -107,7 +97,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
          'q     i    j          '
    end if
 
-   do k = ks, ke
+   do k = kts, kte
       if (rootproc) then
          write(unit=stats_unit, fmt='(i4,4(f12.4,2i5),e12.4,2i5)') k, &
             max_u(k), max_v(k), max_t(k), max_p(k), max_q(k)
@@ -124,7 +114,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
       write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
          um, vm, tm, pm, qm
    
-      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysits increments'
 
       write(unit=stats_unit, fmt='(a/)') &
          ' Lvl        u           v           t           p           q'
@@ -136,12 +126,12 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    pm = 0.0
    qm = 0.0
 
-   do k = ks, ke
-      uv(k) = sum(xa%u(is:ie,js:je,k))
-      vv(k) = sum(xa%v(is:ie,js:je,k))
-      tv(k) = sum(xa%t(is:ie,js:je,k))
-      pv(k) = sum(xa%p(is:ie,js:je,k))
-      qv(k) = sum(xa%q(is:ie,js:je,k))
+   do k = kts, kte
+      uv(k) = sum(grid%xa%u(its:ite,jts:jte,k))
+      vv(k) = sum(grid%xa%v(its:ite,jts:jte,k))
+      tv(k) = sum(grid%xa%t(its:ite,jts:jte,k))
+      pv(k) = sum(grid%xa%p(its:ite,jts:jte,k))
+      qv(k) = sum(grid%xa%q(its:ite,jts:jte,k))
    end do
 
    call da_proc_sum_real  (uv)
@@ -151,7 +141,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    call da_proc_sum_real  (qv)
 
    if (rootproc) then
-      do k = ks, ke
+      do k = kts, kte
          write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             uv(k)*rij_g, vv(k)*rij_g, tv(k)*rij_g, &
             pv(k)*rij_g, qv(k)*rij_g
@@ -168,7 +158,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
       write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
          um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
 
-      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
+      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysits increments'
 
       write(unit=stats_unit, fmt='(a/)') &
          ' Lvl        u           v           t           p           q'
@@ -185,14 +175,14 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    pv = 0.0
    qv = 0.0
 
-   do k = ks, ke
-      do j=js,je
-         do i=is,ie
-            uv(k) = uv(k) + xa%u(i,j,k) * xa%u(i,j,k)
-            vv(k) = vv(k) + xa%v(i,j,k) * xa%v(i,j,k)
-            tv(k) = tv(k) + xa%t(i,j,k) * xa%t(i,j,k)
-            pv(k) = pv(k) + xa%p(i,j,k) * xa%p(i,j,k)
-            qv(k) = qv(k) + xa%q(i,j,k) * xa%q(i,j,k)
+   do k = kts, kte
+      do j=jts,jte
+         do i=its,ite
+            uv(k) = uv(k) + grid%xa%u(i,j,k) * grid%xa%u(i,j,k)
+            vv(k) = vv(k) + grid%xa%v(i,j,k) * grid%xa%v(i,j,k)
+            tv(k) = tv(k) + grid%xa%t(i,j,k) * grid%xa%t(i,j,k)
+            pv(k) = pv(k) + grid%xa%p(i,j,k) * grid%xa%p(i,j,k)
+            qv(k) = qv(k) + grid%xa%q(i,j,k) * grid%xa%q(i,j,k)
          end do
       end do
    end do
@@ -204,7 +194,7 @@ subroutine da_analysis_stats  (stats_unit, xp, xa)
    call da_proc_sum_real  (qv)
 
    if (rootproc) then
-      do k = ks, ke
+      do k = kts, kte
          write(unit=stats_unit, fmt='(i4,4f12.4,4e12.4)') k, &
             sqrt(uv(k)*rij_g), &
             sqrt(vv(k)*rij_g), &

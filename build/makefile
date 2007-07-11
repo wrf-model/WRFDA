@@ -34,7 +34,6 @@ links :
 	@ $(LN) $(IO_PNETCDF)/ext* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
-	@ $(LN) $(RSL_LITE)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(IO_PHDF5)/* .
 	@ $(LN) $(ARCH)/*.sed .

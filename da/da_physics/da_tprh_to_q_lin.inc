@@ -1,4 +1,4 @@
-subroutine da_tprh_to_q_lin( xb, xp, xa )
+subroutine da_tprh_to_q_lin(grid)
 
    !---------------------------------------------------------------------------
    ! Purpose: Convert T/pressure/rh to specific humidity increments.
@@ -8,37 +8,24 @@ subroutine da_tprh_to_q_lin( xb, xp, xa )
 
    implicit none
    
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! increment structure.
+   type (domain), intent(inout) :: grid
    
-   integer                       :: is, ie       ! 1st dim. end points.
-   integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
-   real :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) ! qs~/qs.
-
-   !---------------------------------------------------------------------------
-   !  [1.0] initialise:
-   !---------------------------------------------------------------------------
-
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte   
+   real :: qs_prime_over_qs(its:ite,jts:jte,kts:kte) ! qs~/qs.
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
    !---------------------------------------------------------------------------
 
-   call da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
+   call da_tp_to_qs_lin( grid, qs_prime_over_qs )
    
    !---------------------------------------------------------------------------
    ! [2.0] Calculate specific humidity increment:
    !---------------------------------------------------------------------------
 
-   xa % q(is:ie,js:je,ks:ke) = xb % q(is:ie,js:je,ks:ke) * &
-                               ( xa % rh(is:ie,js:je,ks:ke) / &
-                                 xb % rh(is:ie,js:je,ks:ke) + &
-                                 qs_prime_over_qs(is:ie,js:je,ks:ke) )
+   grid%xa % q(its:ite,jts:jte,kts:kte) = grid%xb % q(its:ite,jts:jte,kts:kte) * &
+                               ( grid%xa % rh(its:ite,jts:jte,kts:kte) / &
+                                 grid%xb % rh(its:ite,jts:jte,kts:kte) + &
+                                 qs_prime_over_qs(its:ite,jts:jte,kts:kte) )
 
 end subroutine da_tprh_to_q_lin
 

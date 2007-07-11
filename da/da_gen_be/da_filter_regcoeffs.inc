@@ -1,5 +1,5 @@
-subroutine da_filter_regcoeffs(ni, nj, nk, num_bins, num_bins2d, num_passes, rf_scale, bin, &
-                                regcoeff1, regcoeff2, regcoeff3)
+subroutine da_filter_regcoeffs(ni, nj, nk, num_bins, num_bins2d, num_passes, &
+   rf_scale, bin, regcoeff1, regcoeff2, regcoeff3)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
