@@ -15,7 +15,7 @@ module da_ssmi
       num_ssmt2_tot,num_ssmt1_tot,max_error_rh,max_error_tb, max_error_pw, &
       trace_use,test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
       num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot, global, print_detail_obs, &
-      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme
+      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme,ids,ide,jds,jde
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_retrieval_type, &

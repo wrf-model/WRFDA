@@ -9,7 +9,7 @@ subroutine da_transform_xtotb_adj (grid)
    type (domain), intent(inout)    :: grid
 
    integer                       :: i,j,k
-   integer                       :: is, js, ie, je, ks, ke
+   integer                       :: is, js, ie, je
 
    real                          :: dx, dy, dxm, dym, zhmkz
    real                          :: dum1, dum2, zrhom, ADJ_zrhom
@@ -37,26 +37,24 @@ subroutine da_transform_xtotb_adj (grid)
    zrhom=0.0
    ADJ_zrhom=0.0
 
-   is = grid%xb%its
-   js = grid%xb%jts
-   ks = grid%xb%kts
+   is = its
+   js = jts
 
-   ie = grid%xb%ite
-   je = grid%xb%jte
-   ke = grid%xb%kte
+   ie = ite
+   je = jte
 
    if (test_wrfvar) then
-      is = grid%xb%its-1
-      js = grid%xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = grid%xb%ite+1
-      je = grid%xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < grid%xb%ids) is = grid%xb%ids
-      if (js < grid%xb%jds) js = grid%xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > grid%xb%ide) ie = grid%xb%ide
-      if (je > grid%xb%jde) je = grid%xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    ! Mean fields
@@ -67,8 +65,8 @@ subroutine da_transform_xtotb_adj (grid)
          psfc  = 0.01*grid%xb%psfc(i,j)
          ! sst   = grid%xb%tgrn(i,j)
          ta    = grid%xb%tgrn(i,j) + &
-                 (grid%xb%t(i,j,ks)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
-                 log((grid%xb%h(i,j,ks)- grid%xb%terr(i,j))/0.0001)
+                 (grid%xb%t(i,j,kts)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
+                 log((grid%xb%h(i,j,kts)- grid%xb%terr(i,j))/0.0001)
 
          gamma = (ta-270.0)*0.023 + 5.03  ! effective lapse rate   (km) (4.0-6.5)
          zcld  = 1                      ! effective cloud height (km)
@@ -79,7 +77,7 @@ subroutine da_transform_xtotb_adj (grid)
          alw   = 0.0
 
          zrhom = 0.0
-         do k=ks,ke
+         do k=kts,kte
             zrhom=zrhom+(grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)*grid%xb%q(i,j,k)* &
                grid%xb%rho(i,j,k)
          end do
@@ -133,7 +131,7 @@ subroutine da_transform_xtotb_adj (grid)
          ADJ_zrhom    = ADJ_htpw/tpw/1000.0
          ADJ_tpw      = ADJ_tpw - ADJ_htpw/tpw*htpw
 
-         do k = ks,ke
+         do k = kts,kte
             grid%xa%rho(i,j,k) = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)* &
                grid%xb%q(i,j,k)*ADJ_zrhom + grid%xa%rho(i,j,k)
             grid%xa%q(i,j,k)   = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*grid%xb%h(i,j,k)* &
@@ -151,8 +149,8 @@ subroutine da_transform_xtotb_adj (grid)
          ADJ_zcld= 0
          ADJ_ta  = ADJ_ta + ADJ_gamma*0.023
 
-         grid%xa%t(i,j,ks) = grid%xa%t(i,j,ks) + ADJ_ta* &
-                   log(2.0/0.0001)/log((grid%xb%h(i,j,ks)-grid%xb%terr(i,j))/0.0001)
+         grid%xa%t(i,j,kts) = grid%xa%t(i,j,kts) + ADJ_ta* &
+                   log(2.0/0.0001)/log((grid%xb%h(i,j,kts)-grid%xb%terr(i,j))/0.0001)
          ADJ_sst = 0.
 
          grid%xa%psfc(i,j) = grid%xa%psfc(i,j) + ADJ_psfc*0.01 

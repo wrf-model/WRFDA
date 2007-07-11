@@ -85,7 +85,7 @@ subroutine da_setup_firstguess(xbx, grid)
 
    if (global) then     
       ! Set East-West boundary for Xb-array 
-      call da_set_boundary_xb(grid%xb)
+      call da_set_boundary_xb(grid)
    end if
 
    !---------------------------------------------------------------------------      
@@ -94,7 +94,7 @@ subroutine da_setup_firstguess(xbx, grid)
 
    ! [2.1] Set up fast Fourier & Legendre transform constants:
 
-   call da_setup_runconstants(grid%xp, grid%xb, xbx)
+   call da_setup_runconstants(grid, xbx)
 
    if (trace_use) call da_trace_exit("da_setup_firstguess")
 

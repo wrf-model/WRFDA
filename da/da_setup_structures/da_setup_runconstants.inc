@@ -1,4 +1,4 @@
-subroutine da_setup_runconstants(xp, xb, xbx)
+subroutine da_setup_runconstants(grid, xbx)
 
    !---------------------------------------------------------------------------
    !  Purpose: Define constants used.
@@ -6,9 +6,8 @@ subroutine da_setup_runconstants(xp, xb, xbx)
 
    implicit none
 
-   type (xpose_type), intent(in)    :: xp       ! Dimensions and xpose buffers.
-   type (xb_type),    intent(inout) :: xb       ! xb-array                     
-   type (xbx_type),   intent(inout) :: xbx      ! Header & non-gridded vars.
+   type (domain),   intent(inout) :: grid                
+   type (xbx_type), intent(inout) :: xbx      ! Header & non-gridded vars.
 
    integer, parameter       :: nrange = 50 ! Range to search for efficient FFT.
    integer                  :: n           ! Loop counter.
@@ -35,7 +34,7 @@ subroutine da_setup_runconstants(xp, xb, xbx)
 
    ! [1.1] In x direction:
 
-   nx = xp%ide - xp%ids
+   nx = ide - ids
 
    allocate(xbx % fft_factors_x(num_fft_factors))
 
@@ -62,7 +61,7 @@ subroutine da_setup_runconstants(xp, xb, xbx)
 
    ! [1.2] In y direction:
 
-   ny = xp%jde - xp%jds
+   ny = jde - jds
 
    allocate(xbx % fft_factors_y(num_fft_factors))
 
@@ -90,11 +89,11 @@ subroutine da_setup_runconstants(xp, xb, xbx)
    !-----Multiplicative coefficent for solution of spectral Poission eqn:
 
    !mslee.Bgrid
-   ! const = -0.5 * xb%ds * xb%ds
-   const = -2.0 * xb%ds * xb%ds
+   ! const = -0.5 * grid%xb%ds * grid%xb%ds
+   const = -2.0 * grid%xb%ds * grid%xb%ds
 
-   nx = xp%ide - xp%ids + xbx%fft_pad_i
-   ny = xp%jde - xp%jds + xbx%fft_pad_j
+   nx = ide - ids + xbx%fft_pad_i
+   ny = jde - jds + xbx%fft_pad_j
    ! YRG: A-grid:
    coeff_nx = 2.0 * pi / real(nx)
    coeff_ny = 2.0 * pi / real(ny)
@@ -139,15 +138,15 @@ subroutine da_setup_runconstants(xp, xb, xbx)
    need_pad = .true.
    if (xbx%fft_pad_i <= 0) then
       need_pad = .false.
-   else if (xbx%fft_pad_i > (xp%ide-xp%ids+1)) then
+   else if (xbx%fft_pad_i > (ide-ids+1)) then
       write(unit=message(1), fmt='(a)') &
        'FFT xbx%fft_pad_i is too large!'
       write(unit=message(2), fmt='(2x,a,i4)') &
-         '(xp%ide-xp%ids+1) = ', (xp%ide-xp%ids+1), &
+         '(ide-ids+1) = ', (ide-ids+1), &
          'xbx%fft_pad_i = ', xbx%fft_pad_i
       call da_error (__FILE__,__LINE__,message(1:2))
    else
-      xbx%pad_inc = (xp%ide-xp%ids+1)/xbx%fft_pad_i
+      xbx%pad_inc = (ide-ids+1)/xbx%fft_pad_i
    end if
 
    ! Calculate number of pad vectors in x to be done on this processor.
@@ -157,7 +156,7 @@ subroutine da_setup_runconstants(xp, xb, xbx)
    if (need_pad) then
       do n=1, xbx%fft_pad_i
          i = (n-1)*xbx%pad_inc + 1
-         if ((i >= xp%itsy) .and. (i <= xp%itey)) then
+         if ((i >= grid%xp%itsy) .and. (i <= grid%xp%itey)) then
             xbx%pad_num = xbx%pad_num + 1
          end if
       end do
@@ -170,10 +169,10 @@ subroutine da_setup_runconstants(xp, xb, xbx)
       xbx%pad_num = 0
       do n=1, xbx%fft_pad_i
          i = (n-1)*xbx%pad_inc + 1
-         if ((i >= xp%itsy) .and. (i <= xp%itey)) then
+         if ((i >= grid%xp%itsy) .and. (i <= grid%xp%itey)) then
             xbx%pad_num = xbx%pad_num + 1
             xbx%pad_loc(xbx%pad_num) = i
-            xbx%pad_pos(xbx%pad_num) = xp%ide + n
+            xbx%pad_pos(xbx%pad_num) = grid%xp%ide + n
          end if
       end do
    end if
@@ -183,8 +182,8 @@ subroutine da_setup_runconstants(xp, xb, xbx)
    if (global) then
       ! Set up Spectral transform constants:
       xbx%inc    = 1
-      xbx%ni     = xp%ide-xp%ids+1
-      xbx%nj     = xp%jde-xp%jds+1
+      xbx%ni     = ide-ids+1
+      xbx%nj     = jde-jds+1
       xbx%lenr   = xbx%inc * (xbx%ni - 1) + 1
       xbx%lensav = xbx%ni + int(log(real(xbx%ni))) + 4
       xbx%lenwrk = xbx%ni
@@ -215,8 +214,8 @@ subroutine da_setup_runconstants(xp, xb, xbx)
 
       call da_initialize_h(xbx%ni, xbx%nj, xbx%max_wavenumber, &
                            xbx%lensav, xbx%alp_size,           &
-                           xbx%wsave, xb%lon, xbx%sinlon,      &
-                           xbx%coslon, xb%lat, xbx%sinlat,     &
+                           xbx%wsave, grid%xb%lon, xbx%sinlon,      &
+                           xbx%coslon, grid%xb%lat, xbx%sinlat,     &
                            xbx%coslat, xbx%int_wgts, xbx%alp)
 
 

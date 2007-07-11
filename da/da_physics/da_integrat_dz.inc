@@ -1,4 +1,4 @@
-subroutine da_integrat_dz(xb)
+subroutine da_integrat_dz(grid)
 
    !---------------------------------------------------------------------------
    ! Non-linear PW forward operator.
@@ -19,23 +19,23 @@ subroutine da_integrat_dz(xb)
 
    implicit none
 
-   type (xb_type), intent(inout) :: xb    ! first guess (local).
+   type (domain), intent(inout) :: grid
 
    integer :: i, j, K 
 
    real    :: pw
 
-   ! WEIGHTED sum OF VERTICAL COLUMN 
+   ! weighted sum of vertical column 
 
-   do j=xb%jts, xb%jte
-      do i=xb%its, xb%ite
+   do j=jts, jte
+      do i=its, ite
          pw = 0.0
-         do k=xb%kts, xb%kte
-            pw = pw + (xb%hf(i,j,k+1)-xb%hf(i,j,k)) &
-                 *  xb%q(i,j,k)*xb%rho(i,j,k)
+         do k=kts, kte
+            pw = pw + (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k)) &
+                 *  grid%xb%q(i,j,k)*grid%xb%rho(i,j,k)
          end do
 
-         xb%tpw(i,j) = 0.1*pw
+         grid%xb%tpw(i,j) = 0.1*pw
       end do
    end do
 

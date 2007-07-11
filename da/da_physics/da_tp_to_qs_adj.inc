@@ -1,4 +1,4 @@
-subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
+subroutine da_tp_to_qs_adj (grid, qs_prime_over_qs )
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_tp_to_qs_lin
@@ -6,10 +6,8 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! increment structure.
-   real, intent(in) :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte)
+   type (domain), intent(inout)  :: grid
+   real, intent(in) :: qs_prime_over_qs(its:ite,jts:jte,kts:kte)
 
    integer                       :: is, ie       ! 1st dim. end points.
    integer                       :: js, je       ! 2nd dim. end points.
@@ -22,22 +20,22 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
    ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte      
+   is = its; ie = ite
+   js = jts; je = jte
+   ks = kts; ke = kte      
 
    if ( test_wrfvar ) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if ( is < ids ) is = ids
+      if ( js < jds ) js = jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if ( ie > ide ) ie = ide
+      if ( je > jde ) je = jde
    end if
 
    !---------------------------------------------------------------------------
@@ -49,19 +47,19 @@ subroutine da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
          do i = is, ie
 
             temp = qs_prime_over_qs(i,j,k) / &
-                   ( xb % p(i,j,k) - rd_over_rv1 * xb % es(i,j,k) )
+                   ( grid%xb % p(i,j,k) - rd_over_rv1 * grid%xb % es(i,j,k) )
    
-            es_prime_over_es = temp * xb % p(i,j,k)
+            es_prime_over_es = temp * grid%xb % p(i,j,k)
 
-            xa % p(i,j,k) = xa % p(i,j,k) - temp
+            grid%xa % p(i,j,k) = grid%xa % p(i,j,k) - temp
    
    !---------------------------------------------------------------------------
    ! [2.0] Calculate saturation vapour pressure increment:
    !---------------------------------------------------------------------------
 
-            temp = xb % t(i,j,k) + es_gammakelvin
+            temp = grid%xb % t(i,j,k) + es_gammakelvin
 
-            xa % t(i,j,k) = xa % t(i,j,k) + es_gammabeta * es_prime_over_es / &
+            grid%xa % t(i,j,k) = grid%xa % t(i,j,k) + es_gammabeta * es_prime_over_es / &
                             ( temp * temp )
          end do
       end do

@@ -40,19 +40,12 @@ subroutine da_transform_through_rf(grid,mz, rf_alpha, val,&
 
    xp%v1z(:,:,:) = 0.0
 
-write (0,*) __FILE__,__LINE__,"sum(field),sum(p_x)",sum(field),sum(p_x)
-write (0,*) __FILE__,__LINE__,"sum(xp%v1z)",sum(xp%v1z)
-
    ! [1.2] Transform to nondimensional v_hat space:
 
    do m = 1, mz
       xp % v1z(its:ite,jts:jte,m) = field(its:ite,jts:jte,m) / &
                                     p_x(its:ite,jts:jte)
    end do
-
-write (0,*) __FILE__,__LINE__,"sum(xp%v1z(its:ite,jts:jte,1:mz))", &
-   sum(xp%v1z(its:ite,jts:jte,1:mz))
-write (0,*) __FILE__,__LINE__,"sum(xp%v1z)",sum(xp%v1z)
 
    !-------------------------------------------------------------------------
    ! [2.0]: Perform 1D recursive filter in x-direction:

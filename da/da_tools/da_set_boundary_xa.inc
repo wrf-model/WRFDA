@@ -1,51 +1,50 @@
-subroutine da_set_boundary_xa(xa, xb)
+subroutine da_set_boundary_xa(grid)
 
    !------------------------------------------------------------------------
    !  Purpose: 
    !
-   !  Merge East-West boundary values for the desired Xa-type variables
+   !  Merge East-West boundary values for the desired grid%xa-type variables
    !------------------------------------------------------------------------
 
    implicit none
 
-   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
-   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (domain),  intent(inout) :: grid
 
    integer :: n, j, k
 
-   if ((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
+   if ((its /= ids) .or. (ite /= ide)) return
 
    ! 2d
 
-   k = xb%kte + 1
-   do j=xb%jms, xb%jme
+   k = kte + 1
+   do j=jms, jme
       do n=1,bdyzone
-         xa%psfc(xb%ids-n,j) = xa%psfc(xb%ide+1-n,j)
-         xa%w(xb%ids-n,j,k) = xa%w(xb%ide+1-n,j,k)
+         grid%xa%psfc(ids-n,j) = grid%xa%psfc(ide+1-n,j)
+         grid%xa%w(ids-n,j,k) = grid%xa%w(ide+1-n,j,k)
 
-         xa%psfc(xb%ide+n,j) = xa%psfc(xb%ids-1+n,j)
-         xa%w(xb%ide+n,j,k) = xa%w(xb%ids-1+n,j,k)
+         grid%xa%psfc(ide+n,j) = grid%xa%psfc(ids-1+n,j)
+         grid%xa%w(ide+n,j,k) = grid%xa%w(ids-1+n,j,k)
       end do
    end do
 
    ! 3d
 
-   do k=xb%kts, xb%kte
-      do j=xb%jms, xb%jme
+   do k=kts, kte
+      do j=jms, jme
          do n=1,bdyzone
-            xa%u(xb%ids-n,j,k) = xa%u(xb%ide+1-n,j,k)
-            xa%v(xb%ids-n,j,k) = xa%v(xb%ide+1-n,j,k)
-            xa%t(xb%ids-n,j,k) = xa%t(xb%ide+1-n,j,k)
-            xa%p(xb%ids-n,j,k) = xa%p(xb%ide+1-n,j,k)
-            xa%q(xb%ids-n,j,k) = xa%q(xb%ide+1-n,j,k)
-            xa%w(xb%ids-n,j,k) = xa%w(xb%ide+1-n,j,k)
+            grid%xa%u(ids-n,j,k) = grid%xa%u(ide+1-n,j,k)
+            grid%xa%v(ids-n,j,k) = grid%xa%v(ide+1-n,j,k)
+            grid%xa%t(ids-n,j,k) = grid%xa%t(ide+1-n,j,k)
+            grid%xa%p(ids-n,j,k) = grid%xa%p(ide+1-n,j,k)
+            grid%xa%q(ids-n,j,k) = grid%xa%q(ide+1-n,j,k)
+            grid%xa%w(ids-n,j,k) = grid%xa%w(ide+1-n,j,k)
 
-            xa%u(xb%ide+n,j,k) = xa%u(xb%ids-1+n,j,k)
-            xa%v(xb%ide+n,j,k) = xa%v(xb%ids-1+n,j,k)
-            xa%t(xb%ide+n,j,k) = xa%t(xb%ids-1+n,j,k)
-            xa%p(xb%ide+n,j,k) = xa%p(xb%ids-1+n,j,k)
-            xa%q(xb%ide+n,j,k) = xa%q(xb%ids-1+n,j,k)
-            xa%w(xb%ide+n,j,k) = xa%w(xb%ids-1+n,j,k)
+            grid%xa%u(ide+n,j,k) = grid%xa%u(ids-1+n,j,k)
+            grid%xa%v(ide+n,j,k) = grid%xa%v(ids-1+n,j,k)
+            grid%xa%t(ide+n,j,k) = grid%xa%t(ids-1+n,j,k)
+            grid%xa%p(ide+n,j,k) = grid%xa%p(ids-1+n,j,k)
+            grid%xa%q(ide+n,j,k) = grid%xa%q(ids-1+n,j,k)
+            grid%xa%w(ide+n,j,k) = grid%xa%w(ids-1+n,j,k)
          end do
       end do
    end do

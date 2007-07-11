@@ -205,7 +205,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
             ids, ide, jds, jde,   &
             ims, ime, jms, jme,   1,   1,  &
             its, ite, jts, jte,   1,   1  )
-       call da_set_boundary_xa(grid%xa, grid%xb)
+       call da_set_boundary_xa(grid)
    end if   
 
    if (trace_use) call da_trace_exit("da_transform_vtox")

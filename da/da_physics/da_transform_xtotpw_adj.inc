@@ -14,31 +14,31 @@ subroutine da_transform_xtotpw_adj(grid)
 
    if (trace_use) call da_trace_entry("da_transform_xtotpw_adj")
 
-   is = grid%xb%its
-   js = grid%xb%jts
+   is = its
+   js = jts
 
-   ie = grid%xb%ite
-   je = grid%xb%jte
+   ie = ite
+   je = jte
 
    if (test_wrfvar) then
-      is = grid%xb%its-1
-      js = grid%xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = grid%xb%ite+1
-      je = grid%xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < grid%xb%ids) is = grid%xb%ids
-      if (js < grid%xb%jds) js = grid%xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > grid%xb%ide) ie = grid%xb%ide
-      if (je > grid%xb%jde) je = grid%xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    do j=js, je
       do i=is, ie
          pw = 0.1*grid%xa%tpw(i,j)
 
-         do k=grid%xb%kts, grid%xb%kte
+         do k=kts, kte
             dzpw = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*pw
 
             grid%xa%  q(i,j,k)=grid%xa%  q(i,j,k)+dzpw*grid%xb%rho(i,j,k)

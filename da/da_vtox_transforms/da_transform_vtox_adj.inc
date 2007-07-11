@@ -158,7 +158,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end do
 
    if (global) then     
-      call da_set_boundary_xa(grid%xa, grid%xb)
+      call da_set_boundary_xa(grid)
     end if
 
    !-------------------------------------------------------------------------

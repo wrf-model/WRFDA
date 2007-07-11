@@ -1,4 +1,4 @@
-subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
+subroutine da_check(grid, config_flags, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,7 +6,8 @@ subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),               intent(inout) :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.
@@ -81,7 +82,7 @@ subroutine da_check(grid, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    ! call da_transform_vtox(grid, cv_size, xbx, be, ep, cvtest, vv, vp)
 
-   call da_check_xtoy_adjoint(grid, iv, y)
+   call da_check_xtoy_adjoint(grid, config_flags, iv, y)
 
    call da_deallocate_y(y)
 

@@ -224,28 +224,22 @@ subroutine da_solve ( grid , config_flags)
 
       call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
-      if (test_transforms) then
-         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
-         call wrfu_finalize
-         call wrf_shutdown
-         stop
-      end if
-
-      if (test_wrfvar) then
-         call da_check(grid, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
-         call wrfu_finalize
+      if (test_transforms .or. test_wrfvar) then
+         call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         if (var4d) then
+            call da_system("touch wrf_stop_now")
+         end if
+         ! No point continuing, as data corrupted
          call wrf_shutdown
          stop
       end if
 
       ! Write "clean" QCed observations if requested:
       if (anal_type_qcobs) then
-        if (it == 1) then
-        call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
-                          grid%moad_cen_lat, grid%stand_lon,&
-                          grid%truelat1, grid%truelat2,     &
-                          coarse_ix, coarse_jy, start_x, start_y)
-         end if     
+         if (it == 1) then
+            call da_write_filtered_obs(grid, ob, iv, &
+               coarse_ix, coarse_jy, start_x, start_y)
+          end if     
       end if
 
       ! [8.3] Interpolate x_g to low resolution grid

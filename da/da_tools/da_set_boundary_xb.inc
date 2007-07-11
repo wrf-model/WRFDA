@@ -1,97 +1,97 @@
-subroutine da_set_boundary_xb(xb)
+subroutine da_set_boundary_xb(grid)
 
    !------------------------------------------------------------------------
    ! Purpose:  
    !
-   ! Merge East-West boundary values for the desired Xb-type variables 
+   ! Merge East-West boundary values for the desired grid%xb-type variables 
    !------------------------------------------------------------------------
 
    implicit none
 
-   type (xb_type), intent(inout) :: xb       ! first guess state.
+   type (domain), intent(inout) :: grid       ! first guess state.
 
    integer :: n, j, k
 
-   if ((xb%its /= xb%ids) .or. (xb%ite /= xb%ide)) return
+   if ((its /= ids) .or. (ite /= ide)) return
 
    ! 2d
-   k = xb%kte + 1
-   do j=xb%jms, xb%jme
+   k = kte + 1
+   do j=jms, jme
       do n=1,bdyzone
-         xb%lat(xb%ids-n,j)        = xb%lat(xb%ide+1-n,j)
-         xb%lon(xb%ids-n,j)        = xb%lon(xb%ide+1-n,j)
-         xb%cori(xb%ids-n,j)       = xb%cori(xb%ide+1-n,j)
-         xb%terr(xb%ids-n,j)       = xb%terr(xb%ide+1-n,j)
-         xb%psfc(xb%ids-n,j)       = xb%psfc(xb%ide+1-n,j)
-         xb%map_factor(xb%ids-n,j) = xb%map_factor(xb%ide+1-n,j)
-         xb%coefx(xb%ids-n,j)      = xb%coefx(xb%ide+1-n,j)
-         xb%coefy(xb%ids-n,j)      = xb%coefy(xb%ide+1-n,j)
-         xb%w(xb%ids-n,j,k)        = xb%w(xb%ide+1-n,j,k)
-         ! xb%h(xb%ids-n,j,k)        = xb%h(xb%ide+1-n,j,k)
+         grid%xb%lat(ids-n,j)        = grid%xb%lat(ide+1-n,j)
+         grid%xb%lon(ids-n,j)        = grid%xb%lon(ide+1-n,j)
+         grid%xb%cori(ids-n,j)       = grid%xb%cori(ide+1-n,j)
+         grid%xb%terr(ids-n,j)       = grid%xb%terr(ide+1-n,j)
+         grid%xb%psfc(ids-n,j)       = grid%xb%psfc(ide+1-n,j)
+         grid%xb%map_factor(ids-n,j) = grid%xb%map_factor(ide+1-n,j)
+         grid%xb%coefx(ids-n,j)      = grid%xb%coefx(ide+1-n,j)
+         grid%xb%coefy(ids-n,j)      = grid%xb%coefy(ide+1-n,j)
+         grid%xb%w(ids-n,j,k)        = grid%xb%w(ide+1-n,j,k)
+         ! grid%xb%h(ids-n,j,k)        = grid%xb%h(ide+1-n,j,k)
 
-         xb%lat(xb%ide+n,j)        = xb%lat(xb%ids-1+n,j)
-         xb%lon(xb%ide+n,j)        = xb%lon(xb%ids-1+n,j)
-         xb%cori(xb%ide+n,j)       = xb%cori(xb%ids-1+n,j)
-         xb%terr(xb%ide+n,j)       = xb%terr(xb%ids-1+n,j)
-         xb%psfc(xb%ide+n,j)       = xb%psfc(xb%ids-1+n,j)
-         xb%map_factor(xb%ide+n,j) = xb%map_factor(xb%ids-1+n,j)
-         xb%coefx(xb%ide+n,j)      = xb%coefx(xb%ids-1+n,j)
-         xb%coefy(xb%ide+n,j)      = xb%coefy(xb%ids-1+n,j)
-         xb%w(xb%ide+n,j,k)        = xb%w(xb%ids-1+n,j,k)
-         ! xb%h(xb%ide+n,j,k)        = xb%h(xb%ids-1+n,j,k)
+         grid%xb%lat(ide+n,j)        = grid%xb%lat(ids-1+n,j)
+         grid%xb%lon(ide+n,j)        = grid%xb%lon(ids-1+n,j)
+         grid%xb%cori(ide+n,j)       = grid%xb%cori(ids-1+n,j)
+         grid%xb%terr(ide+n,j)       = grid%xb%terr(ids-1+n,j)
+         grid%xb%psfc(ide+n,j)       = grid%xb%psfc(ids-1+n,j)
+         grid%xb%map_factor(ide+n,j) = grid%xb%map_factor(ids-1+n,j)
+         grid%xb%coefx(ide+n,j)      = grid%xb%coefx(ids-1+n,j)
+         grid%xb%coefy(ide+n,j)      = grid%xb%coefy(ids-1+n,j)
+         grid%xb%w(ide+n,j,k)        = grid%xb%w(ids-1+n,j,k)
+         ! grid%xb%h(ide+n,j,k)        = grid%xb%h(ids-1+n,j,k)
 
          ! Zhiquan Liu add some RTTOV variables
          !--------------------------------------
-         xb%t2(xb%ide+n,j) = xb%t2(xb%ids-1+n,j)
-         xb%q2(xb%ide+n,j) = xb%q2(xb%ids-1+n,j)
-         xb%u10(xb%ide+n,j) = xb%u10(xb%ids-1+n,j)
-         xb%v10(xb%ide+n,j) = xb%v10(xb%ids-1+n,j)
-         xb%tsk(xb%ide+n,j) = xb%tsk(xb%ids-1+n,j)
-         xb%tgrn(xb%ide+n,j) = xb%tgrn(xb%ids-1+n,j)
-         xb%landmask(xb%ide+n,j) = xb%landmask(xb%ids-1+n,j)
-         xb%snow(xb%ide+n,j) = xb%snow(xb%ids-1+n,j)
-         xb%xland(xb%ide+n,j) = xb%xland(xb%ids-1+n,j)
+         grid%xb%t2(ide+n,j) = grid%xb%t2(ids-1+n,j)
+         grid%xb%q2(ide+n,j) = grid%xb%q2(ids-1+n,j)
+         grid%xb%u10(ide+n,j) = grid%xb%u10(ids-1+n,j)
+         grid%xb%v10(ide+n,j) = grid%xb%v10(ids-1+n,j)
+         grid%xb%tsk(ide+n,j) = grid%xb%tsk(ids-1+n,j)
+         grid%xb%tgrn(ide+n,j) = grid%xb%tgrn(ids-1+n,j)
+         grid%xb%landmask(ide+n,j) = grid%xb%landmask(ids-1+n,j)
+         grid%xb%snow(ide+n,j) = grid%xb%snow(ids-1+n,j)
+         grid%xb%xland(ide+n,j) = grid%xb%xland(ids-1+n,j)
 
-         xb%smois(xb%ide+n,j) = xb%smois(xb%ids-1+n,j)
-         xb%tslb(xb%ide+n,j) = xb%tslb(xb%ids-1+n,j)
-         xb%xice(xb%ide+n,j) = xb%xice(xb%ids-1+n,j)
-         xb%ivgtyp(xb%ide+n,j) = xb%ivgtyp(xb%ids-1+n,j)
-         xb%isltyp(xb%ide+n,j) = xb%isltyp(xb%ids-1+n,j)
-         xb%vegfra(xb%ide+n,j) = xb%vegfra(xb%ids-1+n,j)
-         xb%snowh(xb%ide+n,j) = xb%snowh(xb%ids-1+n,j)
+         grid%xb%smois(ide+n,j) = grid%xb%smois(ids-1+n,j)
+         grid%xb%tslb(ide+n,j) = grid%xb%tslb(ids-1+n,j)
+         grid%xb%xice(ide+n,j) = grid%xb%xice(ids-1+n,j)
+         grid%xb%ivgtyp(ide+n,j) = grid%xb%ivgtyp(ids-1+n,j)
+         grid%xb%isltyp(ide+n,j) = grid%xb%isltyp(ids-1+n,j)
+         grid%xb%vegfra(ide+n,j) = grid%xb%vegfra(ids-1+n,j)
+         grid%xb%snowh(ide+n,j) = grid%xb%snowh(ids-1+n,j)
 
       end do
    end do
 
    ! 3d
-   do k=xb%kts, xb%kte
-      do j=xb%jms, xb%jme
+   do k=kts, kte
+      do j=jms, jme
          do n=1,bdyzone
-            xb%h(xb%ids-n,j,k) = xb%h(xb%ide+1-n,j,k)
-            xb%u(xb%ids-n,j,k) = xb%u(xb%ide+1-n,j,k)
-            xb%v(xb%ids-n,j,k) = xb%v(xb%ide+1-n,j,k)
-            xb%w(xb%ids-n,j,k) = xb%w(xb%ide+1-n,j,k)
-            xb%t(xb%ids-n,j,k) = xb%t(xb%ide+1-n,j,k)
-            xb%p(xb%ids-n,j,k) = xb%p(xb%ide+1-n,j,k)
-            xb%q(xb%ids-n,j,k) = xb%q(xb%ide+1-n,j,k)
-            xb%qs(xb%ids-n,j,k) = xb%qs(xb%ide+1-n,j,k)
-            xb%es(xb%ids-n,j,k) = xb%es(xb%ide+1-n,j,k)
-            xb%rh(xb%ids-n,j,k) = xb%rh(xb%ide+1-n,j,k)
-            xb%td(xb%ids-n,j,k) = xb%td(xb%ide+1-n,j,k)
-            xb%rho(xb%ids-n,j,k)= xb%rho(xb%ide+1-n,j,k)
+            grid%xb%h(ids-n,j,k) = grid%xb%h(ide+1-n,j,k)
+            grid%xb%u(ids-n,j,k) = grid%xb%u(ide+1-n,j,k)
+            grid%xb%v(ids-n,j,k) = grid%xb%v(ide+1-n,j,k)
+            grid%xb%w(ids-n,j,k) = grid%xb%w(ide+1-n,j,k)
+            grid%xb%t(ids-n,j,k) = grid%xb%t(ide+1-n,j,k)
+            grid%xb%p(ids-n,j,k) = grid%xb%p(ide+1-n,j,k)
+            grid%xb%q(ids-n,j,k) = grid%xb%q(ide+1-n,j,k)
+            grid%xb%qs(ids-n,j,k) = grid%xb%qs(ide+1-n,j,k)
+            grid%xb%es(ids-n,j,k) = grid%xb%es(ide+1-n,j,k)
+            grid%xb%rh(ids-n,j,k) = grid%xb%rh(ide+1-n,j,k)
+            grid%xb%td(ids-n,j,k) = grid%xb%td(ide+1-n,j,k)
+            grid%xb%rho(ids-n,j,k)= grid%xb%rho(ide+1-n,j,k)
 
-            xb%h(xb%ide+n,j,k) = xb%h(xb%ids-1+n,j,k)
-            xb%u(xb%ide+n,j,k) = xb%u(xb%ids-1+n,j,k)
-            xb%v(xb%ide+n,j,k) = xb%v(xb%ids-1+n,j,k)
-            xb%w(xb%ide+n,j,k) = xb%w(xb%ids-1+n,j,k)
-            xb%t(xb%ide+n,j,k) = xb%t(xb%ids-1+n,j,k)
-            xb%p(xb%ide+n,j,k) = xb%p(xb%ids-1+n,j,k)
-            xb%q(xb%ide+n,j,k) = xb%q(xb%ids-1+n,j,k)
-            xb%qs(xb%ide+n,j,k) = xb%qs(xb%ids-1+n,j,k)
-            xb%es(xb%ide+n,j,k) = xb%es(xb%ids-1+n,j,k)
-            xb%rh(xb%ide+n,j,k) = xb%rh(xb%ids-1+n,j,k)
-            xb%td(xb%ide+n,j,k) = xb%td(xb%ids-1+n,j,k)
-            xb%rho(xb%ide+n,j,k) = xb%rho(xb%ids-1+n,j,k)
+            grid%xb%h(ide+n,j,k) = grid%xb%h(ids-1+n,j,k)
+            grid%xb%u(ide+n,j,k) = grid%xb%u(ids-1+n,j,k)
+            grid%xb%v(ide+n,j,k) = grid%xb%v(ids-1+n,j,k)
+            grid%xb%w(ide+n,j,k) = grid%xb%w(ids-1+n,j,k)
+            grid%xb%t(ide+n,j,k) = grid%xb%t(ids-1+n,j,k)
+            grid%xb%p(ide+n,j,k) = grid%xb%p(ids-1+n,j,k)
+            grid%xb%q(ide+n,j,k) = grid%xb%q(ids-1+n,j,k)
+            grid%xb%qs(ide+n,j,k) = grid%xb%qs(ids-1+n,j,k)
+            grid%xb%es(ide+n,j,k) = grid%xb%es(ids-1+n,j,k)
+            grid%xb%rh(ide+n,j,k) = grid%xb%rh(ids-1+n,j,k)
+            grid%xb%td(ide+n,j,k) = grid%xb%td(ids-1+n,j,k)
+            grid%xb%rho(ide+n,j,k) = grid%xb%rho(ids-1+n,j,k)
          end do
       end do
    end do
