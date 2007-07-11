@@ -78,7 +78,7 @@ subroutine da_transform_xtoy(grid, iv, y)
    call da_transform_xtoy_pseudo (grid, iv, y)
 
    !---------------------------------------------------------------------------
-   ! [11.0] Satem observation operator y = H(x):
+   ! [11.0] satem observation operator y = H(x):
    !---------------------------------------------------------------------------
    
    call da_transform_xtoy_satem (grid, iv, y)
@@ -120,7 +120,7 @@ subroutine da_transform_xtoy(grid, iv, y)
    call da_transform_xtoy_gpsref (grid, iv, y)
 
    !---------------------------------------------------------------------------
-   ! [18.0] Radar observation operator y = H(x):
+   ! [18.0] radar observation operator y = H(x):
    !------------------------------------------------------------------------------
 
    call da_transform_xtoy_radar (grid, iv, y)

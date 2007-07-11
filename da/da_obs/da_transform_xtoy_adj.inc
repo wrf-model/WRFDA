@@ -79,7 +79,7 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    call da_transform_xtoy_pseudo_adj (iv, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
-   ! [11.0] Satem observation operator y = H(x):
+   ! [11.0] satem observation operator y = H(x):
    !---------------------------------------------------------------------------
 
    call da_transform_xtoy_satem_adj (iv, jo_grad_y, jo_grad_x, grid)
@@ -121,7 +121,7 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
    call da_transform_xtoy_gpsref_adj(iv, jo_grad_y, jo_grad_x)
 
    !---------------------------------------------------------------------------
-   ! [18.0] Radar observation operator y = H(x):
+   ! [18.0] radar observation operator y = H(x):
    !---------------------------------------------------------------------------
 
    call da_transform_xtoy_radar_adj (grid, iv, jo_grad_y, jo_grad_x)

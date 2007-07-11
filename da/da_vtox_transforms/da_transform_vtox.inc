@@ -128,25 +128,25 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 #endif
       end if
 
-      if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
-           Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. Use_GpsrefObs) then
+      if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
+           use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
 
          ! Now do something for PW
          call da_transform_xtotpw(grid)
 
          ! GPS Refractivity:
-         if (use_GpsrefObs) &
+         if (use_gpsrefobs) &
             call da_transform_xtogpsref_lin(grid)
 
          if (use_ssmt1obs .or. use_ssmt2obs .or. &
-              Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
+              use_ssmitbobs .or. use_ssmiretrievalobs) then
             if (global) then
                call da_error(__FILE__,__LINE__, &
                   (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
             end if
             call da_transform_xtoseasfcwind_lin(grid)
          end if
-         if (Use_SsmiTbObs) call da_transform_xtotb_lin (grid)
+         if (use_ssmitbobs) call da_transform_xtotb_lin (grid)
 
          ! Exchange grid%xa halo region.
 #ifdef DM_PARALLEL
@@ -157,7 +157,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
    ! Compute w increments using Richardson's eqn.
 
-   if (Use_RadarObs) then
+   if (use_radarobs) then
       call da_uvprho_to_w_lin(grid)
 
       do k=kts,kte
@@ -172,7 +172,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 #include "HALO_RADAR_XA_W.inc"
 #endif
  
-      if (use_radarobs .and. Use_Radar_rf) then
+      if (use_radarobs .and. use_radar_rf) then
          ! Partition of hydrometeor increments via warm rain process
 
          call da_moist_phys_lin(grid)

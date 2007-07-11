@@ -18,14 +18,14 @@ subroutine da_residual_satem(oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if (oi%num_Satem > 0) then
+   if (oi%num_satem > 0) then
       n_obs_bad % thickness % num = number_type(0, 0, 0)
 
-      do n=1, oi%num_Satem
+      do n=1, oi%num_satem
           do k=1, oi%satem(n)%info%levels
              np_available = np_available + 1
-             re%Satem(n)%thickness(k) = da_residual(n, k, y%Satem(n)%thickness(k), &
-                              oi%Satem(n)%thickness(k), n_obs_bad % thickness)
+             re%satem(n)%thickness(k) = da_residual(n, k, y%satem(n)%thickness(k), &
+                              oi%satem(n)%thickness(k), n_obs_bad % thickness)
           end do
       end do
 

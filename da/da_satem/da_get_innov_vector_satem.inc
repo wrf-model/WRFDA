@@ -102,7 +102,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Satem follows:'
+         ', Total Rejections for satem follows:'
       write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed thicknesses observations:     ',&
                    ithicknessf, ' on ',ithickness

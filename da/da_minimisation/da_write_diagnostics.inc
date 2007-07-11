@@ -92,7 +92,7 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    call da_oi_stats_buoy (stats_unit, iv)
 
-   ! [1.18] Radar: 
+   ! [1.18] radar: 
 
    call da_oi_stats_radar (stats_unit, iv)
 
@@ -185,7 +185,7 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    call da_ao_stats_buoy (stats_unit, iv, re)
 
-   !  [2.18] Radar:
+   !  [2.18] radar:
 
    call da_ao_stats_radar (stats_unit, iv, re)
 

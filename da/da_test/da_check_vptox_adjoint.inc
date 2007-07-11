@@ -122,7 +122,7 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    adj_par_lhs = sum(grid%xa%rho(its:ite,jts:jte,:)**2)/typical_rho_rms**2 + &
       adj_par_lhs
 
-   if (Use_RadarObs) then
+   if (use_radarobs) then
       adj_par_lhs = adj_par_lhs &
                 + sum(grid%xa % wh (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    else
@@ -157,7 +157,7 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    grid%xa % p(:,:,:) = grid%xa % p(:,:,:) / typical_p_rms**2
    grid%xa % rho(:,:,:) = grid%xa % rho(:,:,:) / typical_rho_rms**2
 
-   if (Use_RadarObs) then
+   if (use_radarobs) then
       grid%xa %wh(:,:,:) = grid%xa %wh(:,:,:) / typical_w_rms**2
       grid%xa % w(:,:,:) = 0.0
    else

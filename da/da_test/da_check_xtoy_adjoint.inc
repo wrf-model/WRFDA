@@ -70,9 +70,9 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
 #endif
    end if
 
-   if (use_ssmt1obs .or. use_ssmt2obs .or. use_GpspwObs .or. &
-       use_GpsrefObs .or.                                    &
-       use_SsmiTbObs .or. use_SsmiRetrievalObs) then
+   if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
+       use_gpsrefobs .or.                                    &
+       use_ssmitbobs .or. use_SsmiRetrievalObs) then
 
       ! Now do something for PW
       call da_transform_xtotpw(grid)
@@ -83,7 +83,7 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
       end if
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. &
-          use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
+          use_ssmitbobs .or. use_ssmiretrievalobs) then
          if (global) then
            call da_error(__FILE__,__LINE__, &
              (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
@@ -91,7 +91,7 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
          call da_transform_xtoseasfcwind_lin(grid)
       end if
 
-      if (use_SsmiTbObs) call da_transform_xtotb_lin (grid)
+      if (use_ssmitbobs) call da_transform_xtotb_lin (grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_SSMI_XA.inc"
@@ -112,45 +112,45 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
    partial_lhs = 0.0
    pertile_lhs = 0.0
 
-   if (use_SoundObs) then
+   if (use_soundobs) then
       call da_check_xtoy_adjoint_sound(iv, y, partial_lhs, pertile_lhs)
       call da_check_xtoy_adjoint_sonde_sfc(iv, y, partial_lhs, pertile_lhs)
    end if
 
-   if (use_SynopObs) &
+   if (use_synopobs) &
       call da_check_xtoy_adjoint_synop(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_GeoAMVObs) &
+   if (use_geoamvobs) &
       call da_check_xtoy_adjoint_geoamv(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_PolarAMVObs) &
+   if (use_polaramvobs) &
       call da_check_xtoy_adjoint_polaramv(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_AirepObs) &
+   if (use_airepobs) &
       call da_check_xtoy_adjoint_airep(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_PilotObs) &
+   if (use_pilotobs) &
       call da_check_xtoy_adjoint_pilot(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_RadarObs) &
+   if (use_radarobs) &
       call da_check_xtoy_adjoint_radar(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_SatemObs) &
+   if (use_satemobs) &
       call da_check_xtoy_adjoint_satem(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_MetarObs) &
+   if (use_metarobs) &
       call da_check_xtoy_adjoint_metar(iv, y, partial_lhs, pertile_lhs)
  
-   if (use_ShipsObs) &
+   if (use_shipsobs) &
       call da_check_xtoy_adjoint_ships(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_GpspwObs) &
+   if (use_gpspwobs) &
       call da_check_xtoy_adjoint_gpspw(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_GpsrefObs) &
+   if (use_gpsrefobs) &
       call da_check_xtoy_adjoint_gpsref(iv, y, partial_lhs, pertile_lhs)
    
-   if (use_SsmiTbObs .or. Use_SsmiRetrievalObs) &
+   if (use_ssmitbobs .or. use_ssmiretrievalobs) &
       call da_check_xtoy_adjoint_ssmi (iv, y, partial_lhs, pertile_lhs)
 
    if (use_ssmt1obs) &
@@ -162,13 +162,13 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
    if (use_qscatobs) &
       call da_check_xtoy_adjoint_qscat(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_ProfilerObs) &
+   if (use_profilerobs) &
    call da_check_xtoy_adjoint_profiler(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_BuoyObs) &
+   if (use_buoyobs) &
       call da_check_xtoy_adjoint_buoy(iv, y, partial_lhs, pertile_lhs)
 
-   if (use_BogusObs) &
+   if (use_bogusobs) &
       call da_check_xtoy_adjoint_bogus(iv, y, partial_lhs, pertile_lhs)
 
    if (use_rad) &
@@ -183,20 +183,20 @@ subroutine da_check_xtoy_adjoint(grid, iv, y)
    call da_transform_xtoy_adj (grid, iv, y, grid%xa)
 
 
-   if (use_ssmt1obs .or. use_ssmt2obs .or. use_GpspwObs .or. &
-       use_GpsrefObs .or.                                    &
-       use_SsmiTbObs .or. use_SsmiRetrievalObs) then
+   if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
+       use_gpsrefobs .or.                                    &
+       use_ssmitbobs .or. use_SsmiRetrievalObs) then
 
-      if (Use_SsmiTbObs) call da_transform_xtotb_adj (grid)
+      if (use_ssmitbobs) call da_transform_xtotb_adj (grid)
 
       ! for PW
       call da_transform_xtotpw_adj (grid)
 
       ! GPS Refractivity:
-      if (use_GpsrefObs) call da_transform_xtogpsref_adj (grid)
+      if (use_gpsrefobs) call da_transform_xtogpsref_adj (grid)
 
       if (use_ssmt1obs .or. use_ssmt2obs .or. &
-          use_SsmiTbObs .or. use_SsmiRetrievalObs) then
+          use_ssmitbobs .or. use_SsmiRetrievalObs) then
          if (global) then
             call da_error(__FILE__,__LINE__, &
                (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))

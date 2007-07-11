@@ -164,7 +164,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
 
       select case(fm)
       case (125) ;
-         if (.not. Use_SsmiRetrievalObs) cycle reports
+         if (.not. use_ssmiretrievalobs) cycle reports
 
          ! Check if at least one field is present
          if ((tpw % qc == missing) .AND. (speed % qc == missing)) then
@@ -174,7 +174,7 @@ subroutine da_scan_ssmi (ob, xp, filename)
          ob % num_ssmi_retrieval = ob % num_ssmi_retrieval + 1
 
       case (126) ;
-         if (.not. Use_SsmiTbObs) cycle reports
+         if (.not. use_ssmitbobs) cycle reports
 
          ! Check if at least one field is present
 

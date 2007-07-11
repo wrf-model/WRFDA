@@ -387,7 +387,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_SynopObs) cycle reports
+            if (.not.use_synopobs) cycle reports
 
             num_synop = num_synop + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -411,7 +411,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_ShipsObs) cycle reports
+            if (.not.use_shipsobs) cycle reports
 
             num_ships  = num_ships  + 1
 
@@ -436,7 +436,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_MetarObs) cycle reports
+            if (.not.use_metarobs) cycle reports
 
             num_metar = num_metar + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -460,7 +460,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_PilotObs) cycle reports
+            if (.not.use_pilotobs) cycle reports
 
             num_pilot = num_pilot + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -488,7 +488,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_SoundObs) cycle reports
+            if (.not.use_soundobs) cycle reports
 
             num_sound = num_sound + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -572,9 +572,9 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_SatemObs) cycle reports
+            if (.not.use_satemobs) cycle reports
 
-            ! Reject cloudy Satem obs.
+            ! Reject cloudy satem obs.
 
             if (platform%loc%pw%inv > 10.) then
                cycle reports
@@ -588,7 +588,7 @@ subroutine da_read_obs (ob, xp, filename)
             ob%satem(num_satem)%info = platform%info
             ob%satem(num_satem)%loc  = platform%loc
 
-            ! The Satem ref_p is put in the SLP position in OBSPROC data stream.
+            ! The satem ref_p is put in the SLP position in OBSPROC data stream.
 
             ob%satem(num_satem)%ref_p= platform%loc%slp%inv
 
@@ -605,7 +605,7 @@ subroutine da_read_obs (ob, xp, filename)
                end do 
             end if
 
-            ! Splitting the reported Satem data into smaller layers.
+            ! Splitting the reported satem data into smaller layers.
 
             do i = 2, nlevels
                ob%satem(num_satem)%p(i) = platform%each(i)%p%inv
@@ -644,7 +644,7 @@ subroutine da_read_obs (ob, xp, filename)
                   cycle reports
                end if
 
-               if (.not.use_polaramvObs) cycle reports
+               if (.not.use_polaramvobs) cycle reports
 
                num_polaramv = num_polaramv + 1
                ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -670,7 +670,7 @@ subroutine da_read_obs (ob, xp, filename)
                   cycle reports
                end if
 
-               if (.not.use_geoamvObs) cycle reports
+               if (.not.use_geoamvobs) cycle reports
 
                num_geoamv = num_geoamv + 1
                ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -699,7 +699,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_AirepObs) cycle reports
+            if (.not.use_airepobs) cycle reports
 
             num_airep = num_airep + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -731,7 +731,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_GpspwObs) cycle reports
+            if (.not.use_gpspwobs) cycle reports
 
             num_gpspw = num_gpspw + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -749,7 +749,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_GpsrefObs) cycle reports
+            if (.not.use_gpsrefobs) cycle reports
 
             num_gpsref = num_gpsref + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -868,7 +868,7 @@ subroutine da_read_obs (ob, xp, filename)
             cycle reports
          end if
 
-         if (.not.use_ProfilerObs) cycle reports
+         if (.not.use_profilerobs) cycle reports
 
          num_profiler = num_profiler + 1
          ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -896,7 +896,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_BogusObs) cycle reports
+            if (.not.use_bogusobs) cycle reports
 
             num_bogus = num_bogus + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -953,7 +953,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_BuoyObs) cycle reports
+            if (.not.use_buoyobs) cycle reports
 
             num_buoy  = num_buoy  + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit 
@@ -977,7 +977,7 @@ subroutine da_read_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_AIRSRETObs) cycle reports
+            if (.not.use_airsretobs) cycle reports
 
             num_airsr = num_airsr + 1
 

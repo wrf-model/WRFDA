@@ -23,7 +23,7 @@ module da_satem
    ! The "stats_satem_type" is ONLY used locally in da_satem:
 
    type residual_satem1_type
-      real          :: thickness                ! Satem thickness
+      real          :: thickness                ! satem thickness
    end type residual_satem1_type
 
    type maxmin_satem_stats_type

@@ -62,8 +62,8 @@ subroutine da_setup_obs_interp_wts (xp, iv)
       call da_store_obs_grid_info (xp, iv%pilot(n)%loc)
    end do
 
-   do n=1, iv % num_Radar
-      call da_store_obs_grid_info (xp, iv%Radar(n)%loc)
+   do n=1, iv % num_radar
+      call da_store_obs_grid_info (xp, iv%radar(n)%loc)
    end do
 
    do n=1, iv % num_pseudo

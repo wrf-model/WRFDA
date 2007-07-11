@@ -264,29 +264,29 @@ subroutine da_scan_obs (ob, xp, filename)
          select case(fm)
 
          case (12) ;
-            if (.not.use_SynopObs) cycle reports
+            if (.not.use_synopobs) cycle reports
             num_synop = num_synop + 1
 
          case (13, 17) ;                  ! ships          
-            if (.not.use_ShipsObs) cycle reports
+            if (.not.use_shipsobs) cycle reports
             num_ships  = num_ships  + 1
 
          case (15:16) ;
-            if (.not.use_MetarObs) cycle reports
+            if (.not.use_metarobs) cycle reports
             num_metar = num_metar + 1
 
          case (32:34) ;
-            if (.not.use_PilotObs) cycle reports
+            if (.not.use_pilotobs) cycle reports
             num_pilot = num_pilot + 1
 
          case (35:38) ;
-            if (.not.use_SoundObs) cycle reports
+            if (.not.use_soundobs) cycle reports
             num_sound = num_sound + 1
 
          case (86) ;
-            if (.not.use_SatemObs) cycle reports
+            if (.not.use_satemobs) cycle reports
 
-            ! Reject cloudy Satem obs.
+            ! Reject cloudy satem obs.
             if (platform%loc%pw%inv > 10.) then
                cycle reports
             end if
@@ -297,23 +297,23 @@ subroutine da_scan_obs (ob, xp, filename)
             ! Geostationary or Polar orbitting Satellite AMVs:
             if (index(platform%info%name, 'MODIS') > 0 .or. &
                 index(platform%info%name, 'modis') > 0)  then
-               if (.not.use_PolarAMVObs) cycle reports
+               if (.not.use_polaramvobs) cycle reports
                num_polaramv = num_polaramv + 1
             else
-               if (.not.use_GeoAMVObs) cycle reports 
+               if (.not.use_geoamvobs) cycle reports 
                num_geoamv = num_geoamv + 1
             end if
 
          case (42,96:97) ;
-            if (.not.use_AirepObs) cycle reports
+            if (.not.use_airepobs) cycle reports
             num_airep = num_airep + 1
 
          case (111) ;       
-            if (.not.use_GpspwObs) cycle reports
+            if (.not.use_gpspwobs) cycle reports
             num_gpspw = num_gpspw + 1
 
          case (116) ;
-         if (.not.use_GpsrefObs) cycle reports
+         if (.not.use_gpsrefobs) cycle reports
          num_gpsref = num_gpsref + 1
 
           case (121) ;
@@ -332,19 +332,19 @@ subroutine da_scan_obs (ob, xp, filename)
             num_qscat  = num_qscat  + 1
 
          case (132) ;
-            if (.not.use_ProfilerObs) cycle reports
+            if (.not.use_profilerobs) cycle reports
             num_profiler = num_profiler + 1
 
          case (135) ;
-            if (.not.use_BogusObs) cycle reports
+            if (.not.use_bogusobs) cycle reports
             num_bogus = num_bogus + 1
 
          case (18,19) ;             ! buoy
-            if (.not.use_BuoyObs) cycle reports
+            if (.not.use_buoyobs) cycle reports
             num_buoy  = num_buoy  + 1
 
          case (133) ;               ! AIRS retrievals
-            if (.not.use_AIRSRETObs) cycle reports
+            if (.not.use_airsretobs) cycle reports
             num_airsr = num_airsr + 1
 
          case default;

@@ -1,4 +1,4 @@
-subroutine da_print_stats_satem(stats_unit, nthickness, Satem)
+subroutine da_print_stats_satem(stats_unit, nthickness, satem)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,7 +8,7 @@ subroutine da_print_stats_satem(stats_unit, nthickness, Satem)
 
    integer,                 intent(in)    :: stats_unit
    integer,                 intent(inout) :: nthickness
-   type (stats_satem_type), intent(in)    :: Satem
+   type (stats_satem_type), intent(in)    :: satem
 
    write(unit=stats_unit, fmt='(a/)') &
       '   var           thickness(m)  n    k'  
@@ -19,11 +19,11 @@ subroutine da_print_stats_satem(stats_unit, nthickness, Satem)
    if (nthickness < 1) nthickness = 1
 
    write(unit=stats_unit, fmt='((a,f12.4,2i5))') &
-      ' Minimum(n,k): ', Satem%minimum%thickness,    &
-      ' Maximum(n,k): ', Satem%maximum%thickness
+      ' Minimum(n,k): ', satem%minimum%thickness,    &
+      ' Maximum(n,k): ', satem%maximum%thickness
    write(unit=stats_unit, fmt='((a,f12.4,10x))') &
-      ' Average     : ', Satem%average%thickness/real(nthickness),    &
-      '    RMSE     : ', sqrt(Satem%rms_err%thickness/real(nthickness))
+      ' Average     : ', satem%average%thickness/real(nthickness),    &
+      '    RMSE     : ', sqrt(satem%rms_err%thickness/real(nthickness))
 
 end subroutine da_print_stats_satem
 

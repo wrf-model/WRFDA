@@ -286,7 +286,7 @@ module da_control
                              num_ships_tot, &
                              num_sound_tot, num_airep_tot, num_qscat_tot, &
                              num_profiler_tot, num_buoy_tot, num_gpsref_tot, &
-                             num_Radar_tot, num_bogus_tot,num_airsr_tot, &
+                             num_radar_tot, num_bogus_tot,num_airsr_tot, &
                              num_radiance_tot
 
    logical       :: gaussian_lats  
@@ -391,7 +391,7 @@ module da_control
 
    ! Observations:
 
-   integer, parameter     :: max_Radar = 10000    ! Maximum Number of Radar obs.
+   integer, parameter     :: max_radar = 10000    ! Maximum Number of radar obs.
 
    integer                :: num_procs            ! Number of total processors.
    integer                :: myproc               ! My processor ID.
@@ -459,7 +459,7 @@ module da_control
       "Buoy          ", &
       "Bogus         ", &
       "Pseudo        ", &
-      "Radar         ", &
+      "radar         ", &
       "Radiance      ", &
       "AIRS retrieval"  &
    /)

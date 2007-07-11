@@ -9,7 +9,7 @@ module da_gpspw
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, num_gpspw_tot,max_error_thickness, &
-      pseudo_var, num_pseudo, Use_GpspwObs, max_error_pw, &
+      pseudo_var, num_pseudo, use_gpspwobs, max_error_pw, &
       fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
       pseudo_z,pseudo_val,max_error_ref
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &

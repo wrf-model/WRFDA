@@ -464,7 +464,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                   cycle reports
                end if
 
-               if (.not.Use_SoundObs) cycle reports
+               if (.not.use_soundobs) cycle reports
 
                platform  % info % platform ='FM-35 TEMP'
                num_sound = num_sound + 1
@@ -545,7 +545,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                   cycle reports
                end if
 
-               if (.not.Use_PilotObs) cycle reports
+               if (.not.use_pilotobs) cycle reports
                   num_pilot = num_pilot + 1
                   ! Track serial obs index for reassembly of obs during 
                   ! bit-for-bit tests with different numbers of MPI tasks.
@@ -573,7 +573,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.Use_AirepObs) cycle reports
+            if (.not.use_airepobs) cycle reports
 
             platform  % info % platform ='FM-97 AIREP'
             num_airep = num_airep + 1
@@ -609,7 +609,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.Use_ShipsObs) cycle reports
+            if (.not.use_shipsobs) cycle reports
 
             platform  % info % platform ='FM-13 SHIP '
             num_ships  = num_ships  + 1
@@ -636,7 +636,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_BuoyObs) cycle reports
+            if (.not.use_buoyobs) cycle reports
             platform  % info % platform ='FM-18 BUOY '
             num_buoy  = num_buoy  + 1
             platform%loc%obs_global_index = ob%num_buoy_glo
@@ -659,7 +659,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.Use_SynopObs) cycle reports
+            if (.not.use_synopobs) cycle reports
 
             platform  % info % platform ='FM-12 SYNOP'
 
@@ -690,7 +690,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.Use_MetarObs) cycle reports
+            if (.not.use_metarobs) cycle reports
 
             platform  % info % platform ='FM-15 METAR'
             num_metar  = num_metar  + 1
@@ -714,7 +714,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.Use_geoamvObs) cycle reports
+            if (.not.use_geoamvobs) cycle reports
             platform  % info % platform ='FM-88 SATOB'
             num_geoamv = num_geoamv + 1  
             platform%loc%obs_global_index = ob%num_geoamv_glo
@@ -762,7 +762,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_GpspwObs) cycle reports
+            if (.not.use_gpspwobs) cycle reports
             platform  % info % platform ='FM-111 GPSPW'
             num_gpspw  = num_gpspw + 1
             platform%loc%obs_global_index = ob%num_gpspw_glo
@@ -777,7 +777,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_GpsrefObs) cycle reports
+            if (.not.use_gpsrefobs) cycle reports
             platform  % info % platform ='FM-116 GPSRF'
             num_gpsref  = num_gpsref + 1
             platform%loc%obs_global_index = ob%num_gpsref_glo
@@ -809,7 +809,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not.use_ProfilerObs) cycle reports
+            if (.not.use_profilerobs) cycle reports
             platform  % info % platform ='FM-132 PRFLR'
             num_profiler = num_profiler + 1
             ! Track serial obs index for reassembly of obs during bit-for-bit
@@ -839,7 +839,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
                   cycle reports
                end if
 
-               if (.not.use_BogusObs) cycle reports
+               if (.not.use_bogusobs) cycle reports
                platform  % info % platform ='FM-135 TCBOG'
                num_bogus = num_bogus + 1
                ! Track serial obs index for reassembly of obs during bit-for-bit

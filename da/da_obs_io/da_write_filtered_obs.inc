@@ -939,8 +939,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    end if
 
    !--------------------------------------------------------------------------
-   ! Write Satem:          
-   ! Note: The Satem ref_p is put in the SLP position in OBSPROC data stream.
+   ! Write satem:          
+   ! Note: The satem ref_p is put in the SLP position in OBSPROC data stream.
    !--------------------------------------------------------------------------
 
    if (iv % num_satem > 0) then

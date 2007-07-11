@@ -144,12 +144,12 @@ module da_define_structures
    end type info_type
 
    type stn_loc_type
-      real                    :: lon                  ! Radar site loc
-      real                    :: lat                  ! Radar site loc
-      real                    :: elv                  ! Radar site loc
-      real                    :: x                    ! Radar site loc
-      real                    :: y                    ! Radar site loc
-      real                    :: zk                   ! Radar site loc
+      real                    :: lon                  ! radar site loc
+      real                    :: lat                  ! radar site loc
+      real                    :: elv                  ! radar site loc
+      real                    :: x                    ! radar site loc
+      real                    :: y                    ! radar site loc
+      real                    :: zk                   ! radar site loc
    end type stn_loc_type
  
    type radar_type
@@ -180,7 +180,7 @@ module da_define_structures
       character (len = 5)    :: platform      ! Data type
       character (len = 12)   :: name          ! Station name
       character (len = 19)   :: date_char     ! CCYY-MM-DD_HH:MM:SS date
-      integer                :: numObs        ! number of Obs
+      integer                :: numobs        ! number of Obs
       integer                :: levels        ! number of levels
       real                   :: lat           ! Latitude in degree
       real                   :: lon           ! Longitude in degree
@@ -522,7 +522,7 @@ module da_define_structures
                  qscat, &
                  profiler, &
                  buoy, &
-                 Radar, &
+                 radar, &
                  radiance(maxsensor), &
                  airsr
    end type ob_numb_type
@@ -540,7 +540,7 @@ module da_define_structures
                  num_ssmi_tb, num_ssmi_retrieval, &
                  num_ssmt1, num_ssmt2, num_pseudo, &
                  num_qscat, num_profiler, num_buoy, &
-                 num_Radar, num_gpsref, num_bogus, &
+                 num_radar, num_gpsref, num_bogus, &
                  num_inst, total_rad_pixel, total_rad_channel
 
       integer :: num_synop_glo, num_airsr_glo, &
@@ -551,7 +551,7 @@ module da_define_structures
                  num_ssmi_tb_glo, num_ssmi_retrieval_glo, &
                  num_ssmt1_glo, num_ssmt2_glo, num_pseudo_glo, &
                  num_qscat_glo, num_profiler_glo, num_buoy_glo, &
-                 num_Radar_glo, num_gpsref_glo, num_bogus_glo, &
+                 num_radar_glo, num_gpsref_glo, num_bogus_glo, &
                  num_inst_glo
 
       real    :: synop_ef_u, synop_ef_v, synop_ef_t, synop_ef_p, synop_ef_q
@@ -569,7 +569,7 @@ module da_define_structures
       real    :: qscat_ef_u, qscat_ef_v
       real    :: profiler_ef_u, profiler_ef_v
       real    :: buoy_ef_u, buoy_ef_v, buoy_ef_t, buoy_ef_p, buoy_ef_q
-      real    :: Radar_ef_rv, Radar_ef_rf
+      real    :: radar_ef_rv, radar_ef_rf
       real    :: bogus_ef_u, bogus_ef_v, bogus_ef_t, bogus_ef_p, bogus_ef_q, bogus_ef_slp
       real    :: airsr_ef_t,  airsr_ef_q
 
@@ -595,7 +595,7 @@ module da_define_structures
       type (synop_type)         , pointer :: buoy(:)
       type (pilot_type)         , pointer :: profiler(:)
       type (bogus_type)         , pointer :: bogus(:)
-      type (Radar_type)         , pointer :: Radar(:)
+      type (radar_type)         , pointer :: radar(:)
       type (instid_type)        , pointer :: instid(:)
 
       real :: missing
@@ -655,7 +655,7 @@ module da_define_structures
                                          num_qscat, &
                                          num_profiler, &
                                          num_buoy, &
-                                         num_Radar, num_bogus, &
+                                         num_radar, num_bogus, &
                                          num_other  
 
    end type count_obs_type
@@ -764,10 +764,10 @@ module da_define_structures
       real :: q                                   ! specific humidity.
    end type residual_pseudo_type
 
-   type residual_Radar_type
+   type residual_radar_type
       real, pointer :: rv(:)                    ! rv
       real, pointer :: rf(:)                    ! rf
-   end type residual_Radar_type
+   end type residual_radar_type
 
    type residual_instid_type
      integer                          :: num_rad
@@ -787,7 +787,7 @@ module da_define_structures
                  num_ssmi_tb, num_ssmi_retrieval, &
                  num_ssmt1, num_ssmt2, num_pseudo, &
                  num_qscat, num_profiler, num_buoy, &
-                 num_Radar, num_gpsref, num_bogus, &
+                 num_radar, num_gpsref, num_bogus, &
                  num_inst
 
       type (residual_synop_type), pointer :: synop(:)
@@ -812,7 +812,7 @@ module da_define_structures
       type (residual_qscat_type), pointer :: qscat(:)
       type (residual_synop_type),  pointer :: buoy(:) ! Same as synop type
       type (residual_pilot_type), pointer :: profiler(:) ! Same as pilot type
-      type (residual_Radar_type), pointer :: Radar(:)
+      type (residual_radar_type), pointer :: radar(:)
       type (residual_instid_type), pointer :: instid(:)
    end type y_type
 
@@ -857,7 +857,7 @@ module da_define_structures
       real                :: qscat_u, qscat_v
       real                :: profiler_u, profiler_v
       real                :: buoy_u, buoy_v, buoy_t, buoy_p, buoy_q
-      real                :: Radar_rv, Radar_rf
+      real                :: radar_rv, radar_rf
       real                :: bogus_u, bogus_v, bogus_t, bogus_q, bogus_slp
       real                :: airsr_t, airsr_q
       type(jo_type_rad), pointer       :: rad(:)

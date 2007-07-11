@@ -54,7 +54,7 @@ subroutine da_transform_xtoy_satem_adj(iv, jo_grad_y, jo_grad_x, grid)
          call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
          pres2 = iv%satem(n)%ref_p
 
-         ! [4.0] Adjoint calculation of Satem thickness
+         ! [4.0] Adjoint calculation of satem thickness
 
          do k=1, num_levs
             if (ABS(iv % satem(n) %p (k) - missing_r) > 1.) then

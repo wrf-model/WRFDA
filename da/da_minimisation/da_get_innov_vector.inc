@@ -97,7 +97,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
       call da_get_innov_vector_satem(grid, it,  ob, iv)
 
-      ! Radar obs:
+      ! radar obs:
 
       call da_get_innov_vector_radar( it, grid%xb, grid%xp, ob, iv)
 

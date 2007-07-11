@@ -19,8 +19,8 @@ module da_vtox_transforms
 
    use da_control, only : trace_use, ims,ime,jms,jme,kms,kme,jds,jde,kds,kde, &
       its,ite,jts,jte,kts,kte, cos_xls, cos_xle, sin_xle, sin_xls, pi, global, &
-      vertical_ip,alphacv_method,use_radarobs,use_radar_rf,Use_SsmiTbObs, &
-      Use_SsmiRetrievalObs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
+      vertical_ip,alphacv_method,use_radarobs,use_radar_rf,use_ssmitbobs, &
+      use_ssmiretrievalobs, use_ssmt2obs, use_ssmt1obs, use_gpspwobs, &
       use_gpsrefobs,sfc_assi_options, test_wrfvar, vert_corr, fg_format, &
       fg_format_kma_global, fg_format_wrf, ids,ide, stdout
    use da_define_structures, only : be_type, xbx_type,da_zero_vp_type,da_zero_x

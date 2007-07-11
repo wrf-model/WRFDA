@@ -1,7 +1,7 @@
 subroutine da_scan_radar (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Scan the Radar observation file
+   ! Purpose: Scan the radar observation file
    !---------------------------------------------------------------------------
 
    implicit none
@@ -11,13 +11,13 @@ subroutine da_scan_radar (ob, xp, filename)
 
    character(len=*), intent(in)   :: filename
 
-   integer                       :: i, j, n, iost, nlevels, num_Radar, fm
-   integer                       :: total_Radar
+   integer                       :: i, j, n, iost, nlevels, num_radar, fm
+   integer                       :: total_radar
    integer                       :: iunit
 
-   type (Radar_multi_level_type) :: platform
+   type (radar_multi_level_type) :: platform
 
-   character (LEN = 120)         :: char_total_Radar
+   character (LEN = 120)         :: char_total_radar
    character (LEN = 120)         :: char_ned
 
    logical                       :: outside
@@ -26,7 +26,7 @@ subroutine da_scan_radar (ob, xp, filename)
    if (trace_use) call da_trace_entry("da_scan_radar")
 
    ! default value.
-   ob%ob_numb(ob%current_ob_time)%Radar = ob%num_Radar
+   ob%ob_numb(ob%current_ob_time)%radar = ob%num_radar
 
    ! 1. open file
    ! ============
@@ -48,7 +48,7 @@ subroutine da_scan_radar (ob, xp, filename)
       return
    end if
 
-   num_Radar = 0
+   num_radar = 0
 
    ! 2. read total radar
    ! ===================
@@ -56,7 +56,7 @@ subroutine da_scan_radar (ob, xp, filename)
    ! 2.1 read first line
    !     ---------------
 
-   read (unit=iunit, fmt = '(A)', iostat = iost) char_total_Radar
+   read (unit=iunit, fmt = '(A)', iostat = iost) char_total_radar
    if (iost /= 0) then
       ! Does matter if present and unreadable
       call da_error(__FILE__,__LINE__, &
@@ -65,7 +65,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
    ! 2.3 total radar number
 
-   read (unit=char_total_Radar (15:17),fmt='(I3)', iostat = iost) total_Radar
+   read (unit=char_total_radar (15:17),fmt='(I3)', iostat = iost) total_radar
 
    ! 2.4 skip one lines
 
@@ -73,7 +73,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
    ! 3. read radar data
 
-   do n = 1, total_Radar
+   do n = 1, total_radar
 
       ! 3.1 skip one blank line
 
@@ -85,7 +85,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
       ! 3.3 read header information
 
-      read (unit=char_ned (69:74), fmt='(I6)', iostat = iost) platform % stn % numObs
+      read (unit=char_ned (69:74), fmt='(I6)', iostat = iost) platform % stn % numobs
 
       ! 3.4 skip two lines
 
@@ -94,7 +94,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
       ! 3.5 loop over records
 
-      reports: do j = 1, platform % stn % numObs
+      reports: do j = 1, platform % stn % numobs
 
          ! 3.5.1 read station general info
 
@@ -115,7 +115,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
          do i = 1, platform % info % levels
             ! height
-            platform%each (i) = Radar_each_level_type(missing_r, missing, -1.0,&
+            platform%each (i) = radar_each_level_type(missing_r, missing, -1.0,&
                field_type(missing_r, missing, missing_r), & ! rv
                field_type(missing_r, missing, missing_r))   ! rf
 
@@ -139,7 +139,7 @@ subroutine da_scan_radar (ob, xp, filename)
 
          if (nlevels > max_ob_levels) then
              write(unit=message(1),fmt='(A,2I8)') &
-                ' Radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
+                ' radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
              call da_warning(__FILE__,__LINE__,message(1:1))
 
              nlevels = max_ob_levels
@@ -157,11 +157,11 @@ subroutine da_scan_radar (ob, xp, filename)
             select case (fm)
 
             case (128)
-               num_Radar = num_Radar + 1
+               num_radar = num_radar + 1
 
-               if (num_Radar > max_Radar) then
+               if (num_radar > max_radar) then
                   write(unit=message(1),fmt='(A,I6,A,I6)') &
-                     ' Radar #= ',ob % num_Radar, ' > max_Radar = ', max_Radar
+                     ' radar #= ',ob % num_radar, ' > max_radar = ', max_radar
                   call da_error(__FILE__,__LINE__,message(1:1))
                end if
 
@@ -182,11 +182,11 @@ subroutine da_scan_radar (ob, xp, filename)
    call da_free_unit(iunit)
  
    if (print_detail_radar) write(unit=stdout, fmt='(/5x,a,i6,a)') &
-      ' Read:  ', num_Radar, ' Radar reports '
+      ' Read:  ', num_radar, ' radar reports '
 
-   ob%num_Radar = ob%num_Radar + num_Radar
+   ob%num_radar = ob%num_radar + num_radar
 
-   ob%ob_numb(ob%current_ob_time)%Radar = ob%num_Radar
+   ob%ob_numb(ob%current_ob_time)%radar = ob%num_radar
 
    if (trace_use) call da_trace_exit("da_scan_radar")
 

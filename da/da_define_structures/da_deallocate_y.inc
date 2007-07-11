@@ -56,12 +56,12 @@ subroutine da_deallocate_y(y)
       deallocate (y % bogus)
    end if
 
-    if (y % num_Radar > 0) then
-       do n = 1, y % num_Radar
-          deallocate (y % Radar(n)%rv)
-          deallocate (y % Radar(n)%rf)
+    if (y % num_radar > 0) then
+       do n = 1, y % num_radar
+          deallocate (y % radar(n)%rv)
+          deallocate (y % radar(n)%rf)
        end do
-       deallocate (y % Radar)
+       deallocate (y % radar)
     end if
 
 

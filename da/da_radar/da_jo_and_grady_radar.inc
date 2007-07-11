@@ -13,43 +13,43 @@ subroutine da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
 
    integer                      :: n, k
 
-   jo % Radar_rv = 0.0
-   jo % Radar_rf = 0.0
+   jo % radar_rv = 0.0
+   jo % radar_rf = 0.0
 
-   if (iv%num_Radar < 0) return
+   if (iv%num_radar < 0) return
    
-   do n=1, iv%num_Radar
-      do k=1, iv%Radar(n)%info%levels
-         if (use_Radar_rv) then
-            jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                    (iv%Radar(n)%rv(k)%error * &
-                                      iv%Radar(n)%rv(k)%error)
+   do n=1, iv%num_radar
+      do k=1, iv%radar(n)%info%levels
+         if (use_radar_rv) then
+            jo_grad_y%radar(n)%rv(k) = -re%radar(n)%rv(k) / &
+                                    (iv%radar(n)%rv(k)%error * &
+                                      iv%radar(n)%rv(k)%error)
          end if
 
-         if (use_Radar_rf) then
-            jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                    (iv%Radar(n)%rf(k)%error * &
-                                      iv%Radar(n)%rf(k)%error)
+         if (use_radar_rf) then
+            jo_grad_y%radar(n)%rf(k) = -re%radar(n)%rf(k) / &
+                                    (iv%radar(n)%rf(k)%error * &
+                                      iv%radar(n)%rf(k)%error)
          end if
       end do
 
-      if (iv%Radar(n)%loc%proc_domain) then
-         do k=1, iv%Radar(n)%info%levels
-            if (use_Radar_rv) then
-               jo % Radar_rv = jo % Radar_rv - &
-                         re%Radar(n)%rv(k) * jo_grad_y%Radar(n)%rv(k)
+      if (iv%radar(n)%loc%proc_domain) then
+         do k=1, iv%radar(n)%info%levels
+            if (use_radar_rv) then
+               jo % radar_rv = jo % radar_rv - &
+                         re%radar(n)%rv(k) * jo_grad_y%radar(n)%rv(k)
             end if
 
-            if (use_Radar_rf) then
-               jo % Radar_rf = jo % Radar_rf - &
-                         re%Radar(n)%rf(k) * jo_grad_y%Radar(n)%rf(k)
+            if (use_radar_rf) then
+               jo % radar_rf = jo % radar_rf - &
+                         re%radar(n)%rf(k) * jo_grad_y%radar(n)%rf(k)
             end if
          end do
       end if
    end do
       
-   jo % Radar_rv = 0.5 * jo % Radar_rv
-   jo % Radar_rf = 0.5 * jo % Radar_rf
+   jo % radar_rv = 0.5 * jo % radar_rv
+   jo % radar_rf = 0.5 * jo % radar_rf
 
 end subroutine da_jo_and_grady_radar
 

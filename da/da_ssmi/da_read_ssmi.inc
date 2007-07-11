@@ -211,7 +211,7 @@ subroutine da_read_ssmi (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not. Use_SsmiRetrievalObs) cycle reports
+            if (.not. use_ssmiretrievalobs) cycle reports
 
             ! Check if at least one field is present
             if ((tpw % qc == missing_data) .AND. (speed % qc == missing_data)) then
@@ -250,7 +250,7 @@ subroutine da_read_ssmi (ob, xp, filename)
                cycle reports
             end if
 
-            if (.not. Use_SsmiTbObs) cycle reports
+            if (.not. use_ssmitbobs) cycle reports
 
             ! Check if at least one field is present
 

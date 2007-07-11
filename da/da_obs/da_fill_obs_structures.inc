@@ -84,8 +84,8 @@ subroutine da_fill_obs_structures(xp, iv, ob)
    iv % buoy_ef_p = 1.0
    iv % buoy_ef_q = 1.0
 
-   iv % Radar_ef_rv = 1.0
-   iv % Radar_ef_rf = 1.0
+   iv % radar_ef_rv = 1.0
+   iv % radar_ef_rf = 1.0
 
    iv % bogus_ef_u = 1.0
    iv % bogus_ef_v = 1.0
@@ -397,14 +397,14 @@ subroutine da_fill_obs_structures(xp, iv, ob)
       end do
    end if
 
-   ! [2.18] Transfer Radar obs:
+   ! [2.18] Transfer radar obs:
 
-   if (iv % num_Radar > 0) then
-      do n = 1, iv % num_Radar
-         do k = 1, iv % Radar(n) % info % levels
+   if (iv % num_radar > 0) then
+      do n = 1, iv % num_radar
+         do k = 1, iv % radar(n) % info % levels
             ! Copy observation variables:
-            ob % Radar(n) % rv(k) = iv % Radar(n) % rv(k) % inv
-           ob % Radar(n) % rf(k) = iv % Radar(n) % rf(k) % inv
+            ob % radar(n) % rv(k) = iv % radar(n) % rv(k) % inv
+           ob % radar(n) % rf(k) = iv % radar(n) % rf(k) % inv
          end do
       end do
    end if

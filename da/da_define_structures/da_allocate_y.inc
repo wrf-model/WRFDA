@@ -25,7 +25,7 @@ subroutine da_allocate_y (iv, y)
    y % num_sound = iv % num_sound
    y % num_pilot = iv % num_pilot
    y % num_bogus = iv % num_bogus
-   y % num_Radar = iv % num_Radar
+   y % num_radar = iv % num_radar
    y % num_airep = iv % num_airep
    y % num_satem = iv % num_satem
    y % num_geoamv = iv % num_geoamv
@@ -174,17 +174,17 @@ subroutine da_allocate_y (iv, y)
       end do
    end if
 
-   ! Initialize Radar:
+   ! Initialize radar:
 
-   if (y % num_Radar > 0) then
-      allocate (y % Radar(1:y % num_Radar))
-      do n = 1, y % num_Radar
-         nlevels = iv % Radar(n) % info % levels
-         allocate (y % Radar(n)%rv(1:nlevels))
-         allocate (y % Radar(n)%rf(1:nlevels))
+   if (y % num_radar > 0) then
+      allocate (y % radar(1:y % num_radar))
+      do n = 1, y % num_radar
+         nlevels = iv % radar(n) % info % levels
+         allocate (y % radar(n)%rv(1:nlevels))
+         allocate (y % radar(n)%rf(1:nlevels))
 
-         y % Radar(n) % rv(1:nlevels) = 0.0
-         y % Radar(n) % rf(1:nlevels) = 0.0
+         y % radar(n) % rv(1:nlevels) = 0.0
+         y % radar(n) % rf(1:nlevels) = 0.0
       end do
    end if
 

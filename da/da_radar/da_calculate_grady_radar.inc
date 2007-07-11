@@ -12,26 +12,26 @@ subroutine da_calculate_grady_radar(iv, re, jo_grad_y)
 
    integer                      :: n, k
 
-   if (iv%num_Radar > 0) then 
-      do n=1, iv%num_Radar
-         do k=1, iv%Radar(n)%info%levels
-            if (use_Radar_rv) then
-               if (iv%Radar(n)%rv(k)%qc < obs_qc_pointer) then
-                  re%Radar(n)%rv(k) = 0.0
+   if (iv%num_radar > 0) then 
+      do n=1, iv%num_radar
+         do k=1, iv%radar(n)%info%levels
+            if (use_radar_rv) then
+               if (iv%radar(n)%rv(k)%qc < obs_qc_pointer) then
+                  re%radar(n)%rv(k) = 0.0
                end if
 
-               jo_grad_y%Radar(n)%rv(k) = -re%Radar(n)%rv(k) / &
-                                      (iv%Radar(n)%rv(k)%error * &
-                                        iv%Radar(n)%rv(k)%error)
+               jo_grad_y%radar(n)%rv(k) = -re%radar(n)%rv(k) / &
+                                      (iv%radar(n)%rv(k)%error * &
+                                        iv%radar(n)%rv(k)%error)
             end if
 
-            if (use_Radar_rf) then
-               if (iv%Radar(n)%rf(k)%qc < obs_qc_pointer) then
-                  re%Radar(n)%rf(k) = 0.0
+            if (use_radar_rf) then
+               if (iv%radar(n)%rf(k)%qc < obs_qc_pointer) then
+                  re%radar(n)%rf(k) = 0.0
                end if
-               jo_grad_y%Radar(n)%rf(k) = -re%Radar(n)%rf(k) / &
-                                      (iv%Radar(n)%rf(k)%error * &
-                                        iv%Radar(n)%rf(k)%error)
+               jo_grad_y%radar(n)%rf(k) = -re%radar(n)%rf(k) / &
+                                      (iv%radar(n)%rf(k)%error * &
+                                        iv%radar(n)%rf(k)%error)
             end if
          end do
       end do
