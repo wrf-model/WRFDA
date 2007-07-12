@@ -64,10 +64,10 @@ WRF_LIBS    = libwrflib.a $(NETCDF_LIBS) libesmf_time.a \
                  $(MPI_LIBS) $(PNETCDF_LIBS)
 
 WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB) $(PNETCDF_LIB)  \
-                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
                  $(ESMF_TIME_LIB) \
                  $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK_LIB) \
-                 $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB)
+                 $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB) $(LOCAL_LIB)
 
 WRF_LIB     = -L. -lwrflib \
                  $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
