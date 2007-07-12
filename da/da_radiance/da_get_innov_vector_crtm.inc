@@ -41,7 +41,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    INTEGER            :: inst, nchanl
 
    ! variables for computing clwp
-   REAL, dimension(xp%kms:xp%kme)     :: vtm, clw, dlnpf
+   REAL, dimension(xp%kms:xp%kme)     :: clw, dpf
    REAL                               :: clwp
 
 #if defined(CRTM)
@@ -290,23 +290,14 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          ! model_snowh = model_snowh*100.0   ! convert from m to mm
          model_vegfra = 0.01*model_vegfra  ! convert range to 0~1
 
-         do k=xp%kts,xp%kte
-         ! ADD for computing cloud liquid water path
-          vtm (k) = (1.+0.608*0.001*atmosphere%absorber(k,1))*atmosphere%temperature(k)  ! virtual T
-         ! convert kg/kg to g/m3
-            ! clw (k) = model_qcw(k)*v_p(k)*100.*0.0289644/8.31451/model_tm(k)
-          clw (k) = 0.34836*model_qcw(k)*atmosphere%pressure(k)/atmosphere%temperature(k)
-          if ( atmosphere%pressure(k)<100. ) clw (k) = 0.
-         enddo
-
          ! ADD for computing cloud liquid water path (mm) from guess
          clwp = 0.
          do k = xp%kts,xp%kte ! from top to bottom
-            dlnpf(k) = log(atmosphere%level_pressure(k)) - log(atmosphere%level_pressure(k-1))
-            clw  (k) = 29.27095*clw(k)*vtm(k)*dlnpf(k)
+            dpf(k) = 100.*(atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
+            clw  (k) = model_qcw(k)*dpf(k)/gravity ! kg/m2 or mm
+            if ( atmosphere%pressure(k)<100. ) clw (k) = 0.
             clwp  = clwp + clw(k)
          end do
-         clwp = 0.001*clwp   ! kg/m2 = mm
 
   ! CRTM GeometryInfo Structure
         GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
