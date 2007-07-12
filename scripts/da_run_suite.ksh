@@ -177,7 +177,7 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
 #From OBSPROC:
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}   
+export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/wrfvar/obsproc}   
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 
