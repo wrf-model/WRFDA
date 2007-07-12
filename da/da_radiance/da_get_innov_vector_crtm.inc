@@ -293,7 +293,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          ! ADD for computing cloud liquid water path (mm) from guess
          clwp = 0.
          do k = kts,kte ! from top to bottom
-            dpf(k) = 100.*atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
+            dpf(k) = 100.*(atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
             clw  (k) = model_qcw(k)*dpf(k)/gravity ! kg/m2 or mm
             if ( atmosphere%pressure(k)<100. ) clw (k) = 0.
             clwp  = clwp + clw(k)
