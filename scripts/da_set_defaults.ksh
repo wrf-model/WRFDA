@@ -49,8 +49,6 @@ export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
 export LL_PTILE=${LL_PTILE:-1} # minutes
 export PREV_JOBID=${PREV_JOBID:-test}
 export POE=${POE:-false}
-#cmd export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
-export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 export HOSTS=${HOSTS:-${HOME}/hosts}
 if test -f $HOSTS; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
@@ -82,6 +80,7 @@ export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
+export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 
 #Time info:
 export DATE=${DATE:-2003010100}                   # Current date.
