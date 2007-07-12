@@ -13,7 +13,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 if test ! -d $DAT_DIR; then mkdir $DAT_DIR; fi
 if test ! -d $RTOBS_DIR; then mkdir $RTOBS_DIR; fi

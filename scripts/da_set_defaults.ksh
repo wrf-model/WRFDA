@@ -37,6 +37,7 @@ export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
 export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
+export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
 
 #Scheduling:
 export PROJECT_ID=${PROJECT_ID:-48500053}
@@ -48,7 +49,8 @@ export LSF_MAX_RUNTIME=${LSF_MAX_RUNTIME:-10} # minutes
 export LL_PTILE=${LL_PTILE:-1} # minutes
 export PREV_JOBID=${PREV_JOBID:-test}
 export POE=${POE:-false}
-export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
+#cmd export SCRIPT=${SCRIPT:-$WRFVAR_DIR/scripts/da_run_wrfvar.ksh}
+export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 export HOSTS=${HOSTS:-${HOME}/hosts}
 if test -f $HOSTS; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
@@ -79,6 +81,7 @@ export RC_DIR=${RC_DIR:-$REG_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
 export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
 
 #Time info:
 export DATE=${DATE:-2003010100}                   # Current date.
@@ -87,7 +90,6 @@ export FINAL_DATE=${FINAL_DATE:-2003012800}       # Final date of test period.
 export LBC_FREQ=${LBC_FREQ:-06}
 let LBC_FREQ_SS=$LBC_FREQ*3600
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}                # Assimilation frequency.
-export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 export OBS_FREQ=${OBS_FREQ:-12}
 export WINDOW_START=${WINDOW_START:-0}                 # Start ob window difference (hrs).
 export WINDOW_END=${WINDOW_END:-0}                     # End ob window difference (hrs).
@@ -107,11 +109,12 @@ export END='</FONT>'
 
 #WPS:
 export RUN_GEOGRID=${RUN_GEOGRID:-true}                 # Run GEOGRID, or not.
-export RUN_UNGRIB_AFWA=${RUN_UNGRIB_AFWA:-false}
+export RUN_UNGRIB_METGRID_AFWA=${RUN_UNGRIB_METGRID_AFWA:-false}
 export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
-export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
+#export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG} 
+export WPS_GEOG_DIR=${WPS_GEOG_DIR:-/mmm/users/wrfhelp/WPS_GEOG} 
 export NL_E_WE=${NL_E_WE:-45}
 export NL_E_SN=${NL_E_SN:-45}
 export MAP_PROJ=${MAP_PROJ:-lambert}
@@ -126,6 +129,7 @@ export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export FG_TYPE=${FG_TYPE:-GFS}
 export CONSTANTS1=${CONSTANTS1:-}
 export CONSTANTS2=${CONSTANTS2:-}
+export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
 
 #WRF real (not already covered above):
 export NL_NUM_METGRID_LEVELS=${NL_NUM_METGRID_LEVELS:-27}
@@ -162,7 +166,7 @@ export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-.true.}
 export NL_INPUT_OUTNAME=${NL_INPUT_OUTNAME:-'wrf_3dvar_input_d<domain>_<date>'}
 export NL_INPUTOUT_INTERVAL=${NL_INPUTOUT_INTERVAL:-360}
 export NL_INPUTOUT_BEGIN_H=${NL_INPUTOUT_BEGIN_H:-$CYCLE_PERIOD} # Output input format start.
-export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$CYCLE_PERIOD}       # Output input format end.
+export NL_INPUTOUT_END_H=${NL_INPUTOUT_END_H:-$FCST_RANGE}       # Output input format end.
 export NL_TIME_STEP=${NL_TIME_STEP:-360}                # Timestep (s) (dt=4-6*dx(km) recommended).
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
@@ -170,6 +174,10 @@ export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 
 #OBSPROC (not covered above):
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
+export MAX_NUMBER_OF_OBS=${MAX_NUMBER_OF_OBS:-70000}
+export THINING_SATOB=${THINING_SATOB:-.FALSE.}
+export THINING_SSMI=${THINING_SSMI:-.FALSE.}
+export THINING_QSCAT=${THINING_QSCAT:-.FALSE.}
 export PS0=${PS0:-100000.0}
 export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}

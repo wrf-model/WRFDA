@@ -14,7 +14,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export WORK_DIR=$RUN_DIR/working
 
@@ -63,15 +63,20 @@ echo "DA_ANALYSIS    $DA_ANALYSIS"
 echo "BDYOUT         $BDYOUT"
 echo 'WORK_DIR       <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 
-cp -f $DA_REAL_OUTPUT real_output 
-cp -f $BDYIN wrfbdy_d$DOMAIN
-cp -f $DA_ANALYSIS wrfvar_output
+# To save some disk space, link is used:
+
+ln -sf $DA_REAL_OUTPUT real_output
+cp     $BDYIN wrfbdy_d$DOMAIN
+ln -sf $DA_ANALYSIS wrfvar_output
+
+# Note that for the old WRF_BC, "wrf_3dvar_output_file" should be used.
+# the new WRFVAR/da_update_bc, "wrfvar_output_file" is used in the "parame.in".
 
 cat > parame.in << EOF
 &control_param
- wrfvar_output_file = 'wrfvar_output'
- wrf_bdy_file       = 'wrfbdy_d${DOMAIN}'
- wrf_input_from_si  = 'real_output'
+ wrf_3dvar_output_file = 'wrfvar_output'
+ wrf_bdy_file          = 'wrfbdy_d${DOMAIN}'
+ wrf_input_from_si     = 'real_output'
 
  cycling = .${CYCLING}.
  debug   = .true.
@@ -83,9 +88,7 @@ if $DUMMY; then
    echo Dummy update_bc > wrfbdy_d$DOMAIN
 else
 
-#   ln -fs $WRF_BC_DIR/da_update_bc.exe .
-#   ./da_update_bc.exe
-   ln -fs $WRF_BC_DIR/update_wrf_bc.exe .
+   ln -sf  $WRF_BC_DIR/update_wrf_bc.exe .
    ./update_wrf_bc.exe
 
    RC=$?
@@ -93,9 +96,18 @@ else
       echo "Update_bc failed with error $RC"
       exit 1
      else
-      cp wrfbdy_d${DOMAIN} $BDYOUT
+      cp wrfbdy_d${DOMAIN} $BDYOUT  
+      
+# To save some disk space, the wrfbdy_d${DOMAIN} file is removed from the working directory after a sucessful run.
+
+	if test -e $BDYOUT; then
+  	   rm wrfbdy_d${DOMAIN} 
+#	   rm wrfvar_output  
+	fi   
    fi
 fi
+
+
 
 if $CLEAN; then
    rm -rf ${WORK_DIR}

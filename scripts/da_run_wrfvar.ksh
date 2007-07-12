@@ -219,7 +219,7 @@ echo "WINDOW_END            $WINDOW_END"
    ln -fs $WRFVAR_DIR/run/RRTM_DATA_DBL RRTM_DATA
    ln -fs $WRFVAR_DIR/run/gmao_airs_bufr.tbl .
    ln -fs $WRFVAR_DIR/build/da_wrfvar.exe .
-   export PATH=$WRFVAR_DIR/scripts:$PATH
+   export PATH=${SCRIPTS_DIR}:$PATH
 
    ln -fs $DA_BOUNDARIES 	 wrfbdy_d$DOMAIN
    ln -fs $DA_FIRST_GUESS	 fg01

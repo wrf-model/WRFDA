@@ -27,7 +27,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export RUN_DIR=$EXP_DIR/run/$DATE/wpb}
 
@@ -61,7 +61,7 @@ while test $DATE -le $END_DATE; do
    mkdir -p $RUN_DIR
 
 #   $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR >&! /dev/null
-   ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
+   ${SCRIPTS_DIR}/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
    RC=$?
    if test $RC != 0; then
       echo `date` "${ERR}Failed with error $RC$END"
@@ -74,7 +74,7 @@ while test $DATE -le $END_DATE; do
    mkdir -p $RUN_DIR
 
 #   $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR >&! /dev/null
-   ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
+   ${SCRIPTS_DIR}/da_run_real.ksh > $RUN_DIR/index.html 2>&1
    RC=$?
    if test $RC != 0; then
       echo `date` "${ERR}Failed with error $RC$END"
@@ -101,7 +101,7 @@ export JOB=1
 
 while test $MEM -le $NUM_MEMBERS; do 
    echo "Producing perturbed wrfbdy files for ensemble member $MEM"
-   ${WRFVAR_DIR}/scripts/da_perturb_wrf_bc.ksh > ${RUN_DIR}/da_perturb_wrf_bc.${MEM}.out 2>&1 &
+   ${SCRIPTS_DIR}/da_perturb_wrf_bc.ksh > ${RUN_DIR}/da_perturb_wrf_bc.${MEM}.out 2>&1 &
 
    export MEM=`expr $MEM + 1`
    export JOB=`expr $JOB + 1`

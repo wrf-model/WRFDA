@@ -12,7 +12,7 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export WORK_DIR=$RUN_DIR/working
 mkdir -p $RUN_DIR $OB_DIR/$DATE
@@ -47,24 +47,27 @@ cd $WORK_DIR
 
    export FCST_RANGE_SAVE=$FCST_RANGE
    export FCST_RANGE=-$MAX_OB_RANGE
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
+   . ${SCRIPTS_DIR}/da_get_date_range.ksh
    export TIME_WINDOW_MIN=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
    export FCST_RANGE=$MAX_OB_RANGE
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
+   . ${SCRIPTS_DIR}/da_get_date_range.ksh
    export TIME_WINDOW_MAX=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
    export FCST_RANGE=0
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
+   . ${SCRIPTS_DIR}/da_get_date_range.ksh
    export TIME_ANALYSIS=${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00
    export FCST_RANGE=$FCST_RANGE_SAVE
 
    export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
-   #ln -fs $OB_DIR/$DATE/$OB_FILE .
+   #ln -fs $OB_DIR/$DATE/$OB_FILE . 
 
    if test -f $RTOBS_DIR/$DATE/${OB_FILE}.gz; then
       # If compressed, unpack
       cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
       gunzip -f ${OB_FILE}.gz
+     else 
+      #cmd   
+      cp $RTOBS_DIR/$DATE/$OB_FILE .
    fi
 
    #Namelist notes:
@@ -85,9 +88,10 @@ cd $WORK_DIR
 /
 
 &record3
- max_number_of_obs        = 70000,
+ max_number_of_obs        = ${MAX_NUMBER_OF_OBS},
  fatal_if_exceed_max_obs  = .TRUE.,
 /
+ max_number_of_obs        = 70000,
 
 &record4
  qc_test_vert_consistency = .TRUE.,
@@ -95,9 +99,9 @@ cd $WORK_DIR
  qc_test_above_lid        = .TRUE.,
  remove_above_lid         = .TRUE.,
  domain_check_h           = .true.,
- Thining_SATOB            = .FALSE.,
- Thining_SSMI             = .FALSE.,
- Thining_QSCAT            = .FALSE.,
+ Thining_SATOB            = ${THINING_SATOB},
+ Thining_SSMI             = ${THINING_SSMI},
+ Thining_QSCAT            = ${THINING_QSCAT},
 /
 
 &record5
@@ -115,9 +119,9 @@ cd $WORK_DIR
 
 &record6
  ptop =  ${NL_P_TOP_REQUESTED},
- ps0  =  ${PS0},
- ts0  =  ${TS0},
- tlp  =  ${TLP},
+ base_pres  =  100000.,
+ base_temp  =  ${NL_BASE_TEMP},
+ base_lapse  =  50.,
 /
 
 &record7

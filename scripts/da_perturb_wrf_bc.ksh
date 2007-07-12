@@ -24,8 +24,9 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export DATE_SAVE=$DATE
 export RC_DIR_SAVE=$RC_DIR
@@ -63,7 +64,7 @@ while test $DATE -le $END_DATE; do
    export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
    export DA_ANALYSIS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}.${CMEM}
 #   $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfvar $RUN_DIR >&! /dev/null
-   ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
+   ${SCRIPTS_DIR}/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
 
    RC=$?
    if test $RC != 0; then

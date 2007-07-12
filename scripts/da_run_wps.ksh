@@ -10,11 +10,12 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh
-export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
+. ${SCRIPTS_DIR}/da_get_date_range.ksh
+#cmd export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $FCST_RANGE 2>/dev/null`
 
 #-----------------------------------------------------------------------
 # [2] Setup run:
@@ -54,7 +55,7 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
       if $RUN_GEOGRID; then # Run geogrid:
          export WORK_DIR=$RUN_DIR/working.geogrid
          rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
-         ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
+         ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 
 	 ln -fs $WPS_DIR/geogrid.exe .
 	 ${RUN_CMD} ./geogrid.exe
@@ -77,19 +78,23 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
       export WORK_DIR=$RUN_DIR/working
       rm -rf $WORK_DIR; mkdir -p $WORK_DIR
 
-      if $RUN_UNGRIB_AFWA; then # Uses AGRMET, NAVYSST, and 1/2 degree GFS GRIB data.
-         export WORK_DIR=$RUN_DIR/working.run_ungrib_afwa
+      if $RUN_UNGRIB_METGRID_AFWA; then # Uses AGRMET, NAVYSST, and 1/2 degree GFS GRIB data.
+         export WORK_DIR=$RUN_DIR/working.run_ungrib_metgrid_afwa
          rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
-
-         ${WRFVAR_DIR}/scripts/da_run_ungrib_afwa.ksh > run_ungrib_afwa.log 2>&1
+	 	
+	# Note that "da_run_ungrib__metgrid_afwa.ksh" runs ungrib and metgrid for AFWA experiments.
+         ${SCRIPTS_DIR}/da_run_ungrib_metgrid_afwa.ksh > run_ungrib_metgrid_afwa.log 2>&1
          RC=$?
          if test $RC != 0; then
             echo `date` "${ERR}Failed with error $RC$END"
             exit 1
+	   else
+	   echo `date` "ungrib and metgrid runs are done."
+	    exit 0 
          fi
       else
          cd $WORK_DIR
-         ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
+         ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
          cp namelist.wps ${RUN_DIR}/namelist.wps.ungrib
 
          ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
@@ -117,7 +122,7 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
 
       # Run metgrid:
       cd $WORK_DIR
-      ${WRFVAR_DIR}/scripts/da_create_wps_namelist.ksh
+      ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
       cp namelist.wps ${RUN_DIR}/namelist.wps.metgrid
 
       ln -fs $WPS_DIR/metgrid.exe .

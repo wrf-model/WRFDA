@@ -11,13 +11,13 @@
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 #-----------------------------------------------------------------------
 # [2] Get date range: 
 #-----------------------------------------------------------------------
 
-. ${WRFVAR_DIR}/scripts/da_get_date_range.ksh
+. ${SCRIPTS_DIR}/da_get_date_range.ksh
 
 cat >namelist.wps <<EOF
 &share
@@ -34,7 +34,7 @@ cat >namelist.wps <<EOF
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
  opt_output_from_geogrid_path = '$RC_DIR',
- debug_level = 0
+ debug_level = $DEBUG_LEVEL
 /
 
 &geogrid

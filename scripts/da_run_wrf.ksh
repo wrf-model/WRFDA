@@ -16,8 +16,9 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 
-. ${WRFVAR_DIR}/scripts/da_set_defaults.ksh
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
 export WORK_DIR=$RUN_DIR/working
 
