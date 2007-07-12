@@ -27,7 +27,7 @@ use da_reporting, only : da_warning
       max_error_bt, max_error_buv, rtminit_platform,rtminit_satid, &
       rtminit_nsensor,rtminit_sensor,filename_len,read_biascoef,analysis_date, &
       time_window_max,time_window_min, kts,kte,kms,kme, &
-      rtm_option_rttov,rtm_option_crtm, &
+      rtm_option_rttov,rtm_option_crtm, gravity, &
       print_detail_rad,stderr, mw_emis_sea, &
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &

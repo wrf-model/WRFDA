@@ -71,7 +71,6 @@ interp_fcn.o \
    module_io.o \
    module_io_domain.o \
    module_tiles.o \
-   module_io_quilt.o \
    wrf_debug.o \
    wrf_shutdown.o \
    input_wrf.o \
