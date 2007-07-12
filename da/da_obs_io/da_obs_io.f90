@@ -1,6 +1,6 @@
 module da_obs_io
 
-   use module_domain, only : xpose_type, xb_type, domain
+   use module_domain, only : xpose_type, domain
 
    use da_control, only : missing_r, fmt_each, fmt_info, trace_use, &
       fmt_srfc, filtered_obs_unit, num_procs,missing, ierr,comm, rand_unit, &
