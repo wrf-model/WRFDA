@@ -270,8 +270,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid%xb%ivgtyp(i,j) = grid%ivgtyp(i,j)
          grid%xb%isltyp(i,j) = grid%isltyp(i,j)
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
-         ! convert snow water equivalent kg/m2 to snow depth mm
-         grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
+         grid%xb%snowh(i,j) = grid%snowh(i,j)*1000. ! meter to mm    
       end do
 
       ! WHY?

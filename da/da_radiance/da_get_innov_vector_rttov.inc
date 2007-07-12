@@ -43,7 +43,7 @@ real,allocatable :: temp(:)
    type(aux_vars_type),  allocatable :: aux_vars(:)
 
    ! variables for computing clwp
-   real, allocatable :: vtm(:,:), dlnpf(:,:), clw(:,:), pf(:,:)
+   real, allocatable :: dpf(:,:), clw(:,:), pf(:,:)
 
    if ( iv%num_inst < 1 ) return
 
@@ -100,9 +100,8 @@ real,allocatable :: temp(:)
 
       allocate(v_p(kms:kme,n1:n2))
       v_p(:,:)=0.0
-      allocate(vtm(kms:kme,n1:n2))
       allocate(clw(kms:kme,n1:n2))
-      allocate(dlnpf(kms:kme,n1:n2))
+      allocate(dpf(kms:kme,n1:n2))
       allocate(pf(kms:kme+1,n1:n2))
 
       ! horizontal interpolate xb pressure to ob position for every xb levels
@@ -365,15 +364,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qgr(k,n1:n2),n1n2)
 
-         iv%instid(inst)%pm(:,n1:n2)  = v_p(:,n1:n2)
-
-         ! ADD for computing cloud liquid water path
-         ! virtual T
-         vtm (k,n1:n2) = (1.+0.608*iv%instid(inst)%qm(k,n1:n2))*iv%instid(inst)%tm(k,n1:n2)
-         ! convert kg/kg to g/m3
-         ! clw (k,n1:n2) = iv%instid(inst)%qcw(k,n1:n2)*v_p(k,n1:n2)*100.*0.0289644/8.31451/iv%instid(inst)%tm(k,n1:n2)
-         clw(k,n1:n2) = 0.34836*iv%instid(inst)%qcw(k,n1:n2)*v_p(k,n1:n2)/iv%instid(inst)%tm(k,n1:n2)
-         where (v_p(k,n1:n2)<100.0) clw (k,n1:n2) = 0.0
+         iv%instid(inst)%pm(k,n1:n2)  = v_p(k,n1:n2)
 
       end do
 
@@ -385,20 +376,17 @@ real,allocatable :: temp(:)
 
       pf(kts,n1:n2) = 100.0*iv%instid(inst)%ps(n1:n2)
       do k = 2,kte
-         ! pf(k,n1:n2) = 100.0*(v_p(k-1,n1:n2)+v_p(k,n1:n2))*0.5  ! full level pressure
          pf(k,n1:n2) = 50.0*(v_p(k-1,n1:n2)+v_p(k,n1:n2))
       end do
-      ! pf(kte+1,n1:n2)= 100.0*v_p(kte,n1:n2)*0.5
       pf(kte+1,n1:n2)= 50.0*v_p(kte,n1:n2)
 
       iv%instid(inst)%clwp(n1:n2) = 0.0
       do k = kts,kte
-         dlnpf(k,n1:n2) = log(pf(k,n1:n2)) - log(pf(k+1,n1:n2))
-         ! clw  (k,n1:n2) = clw(k,n1:n2)*vtm(k,n1:n2)*gas_constant/gravity*dlnpf(k,n1:n2)
-         clw(k,n1:n2) = 29.27095*clw(k,n1:n2)*vtm(k,n1:n2)*dlnpf(k,n1:n2)
+         dpf(k,n1:n2) = pf(k,n1:n2) - pf(k+1,n1:n2)
+         clw(k,n1:n2) = iv%instid(inst)%qcw(k,n1:n2)*dpf(k,n1:n2)/gravity
+         where (v_p(k,n1:n2)<100.0) clw (k,n1:n2) = 0.0
          iv%instid(inst)%clwp(n1:n2)  =iv%instid(inst)%clwp(n1:n2) + clw(k,n1:n2)
       end do
-      ! iv%instid(inst)%clwp = 0.001*iv%instid(inst)%clwp   ! kg/m2 = mm
 
       ! call rttov_q2v (&
       !    gas_unit_specconc,  &! in
@@ -537,9 +525,8 @@ end do
 !end do
 
       deallocate (v_p)
-      deallocate (vtm)
       deallocate (clw)
-      deallocate (dlnpf)
+      deallocate (dpf)
       deallocate (pf)
       deallocate (pres)
       deallocate (con_vars)
