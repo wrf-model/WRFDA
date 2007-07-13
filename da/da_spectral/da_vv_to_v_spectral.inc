@@ -29,11 +29,14 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
    integer             :: index_r, index_c       ! Array index for complex v_fou
    integer             :: index_start, index_end ! Position markers in cv.
    real                :: r_fou(1:lenr)          ! FFT array.
-   real                :: work(1:lenwrk)         ! FFT work array. 
    logical             :: odd_longitudes
    complex             :: v_fou(1:nj,0:max_wavenumber)! Intermediate Fourier state.
    complex             :: r_leg(1:nj)                 ! Intermediate Fourier state.
    complex, allocatable:: ccv(:)                      ! Spectral modes.
+
+#ifdef FFTPACK
+   real                :: work(1:lenwrk)         ! FFT work array. 
+#endif
 
    sizec = INT(0.5 * r_cvsize)
    allocate (ccv(1:sizec))

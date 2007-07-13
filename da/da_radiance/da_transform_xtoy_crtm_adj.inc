@@ -18,6 +18,8 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    TYPE (y_type),  INTENT(IN)     :: jo_grad_y ! H' delta_x
    TYPE (ob_type), INTENT(IN)     :: iv        ! O-B structure.
 
+#ifdef CRTM
+
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_rad  ! Number of radiance obs
    REAL                           :: dx, dxm  ! Interpolation weights.
@@ -25,7 +27,6 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    INTEGER                        :: inst, nchanl, n
    REAL                           :: q_ad
 
-#if defined(CRTM)
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_AD(:)
@@ -33,13 +34,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
    TYPE( CRTM_Surface_type )      :: Surface, Surface_AD
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
    !TYPE( CRTM_Options_type )      :: Options
-#endif
+
 !---------------------------------------------------------
 
-#if !defined(CRTM)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $CRTM option for radiances"/))
-#else
    IF ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_crtm_adj")
@@ -345,6 +342,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
     endif
        
    if (trace_use) call da_trace_exit("da_transform_xtoy_crtm_adj")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $CRTM option for radiances"/))
 #endif
  
 end subroutine da_transform_xtoy_crtm_adj

@@ -17,6 +17,8 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
    type (y_type),  intent(in)     :: jo_grad_y ! H' delta_x
    type (ob_type), intent(in)     :: iv        ! O-B structure.
 
+#ifdef RTTOV
+
    integer                        :: i, j, k,c  ! Index dimension.
    integer                        :: nlevels ! Number of obs levels.
    integer                        :: num_rad  ! Number of radiance obs
@@ -41,10 +43,6 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
    real, allocatable :: temp_tb(:,:)
    integer, allocatable :: itemp(:,:)
 
-#if !defined(RTTOV)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $RTTOV option for radiances"/))
-#else
    if (iv%num_inst < 1) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_rttov_adj")
@@ -461,6 +459,9 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
    end do        ! end loop for sensor
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rttov_adj")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $RTTOV option for radiances"/))
 #endif
  
 end subroutine da_transform_xtoy_rttov_adj

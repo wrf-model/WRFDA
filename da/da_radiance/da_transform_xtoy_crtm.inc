@@ -19,6 +19,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
    type (y_type),  intent(inout)  :: y        ! H' delta_x
    type (ob_type), intent(in)     :: iv       ! O-B structure.
 
+#ifdef CRTM
    integer                        :: k  ! Index dimension.
 
    integer            :: inst, num_rad, nchanl, n
@@ -26,21 +27,14 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
    real, allocatable :: absorber(:,:)
    real, allocatable :: psfc(:)
 
-#if defined(CRTM)
-   ! CRTM local varaibles and types
+   ! CRTM local variables and types
    INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
    TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
    !TYPE( CRTM_Options_type )      :: Options
-#endif
 !---------------------------------------------------------
-
-#if !defined(CRTM)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $CRTM option for radiances"/))
-#else
 
    IF ( iv%num_inst < 1 ) return
 
@@ -344,6 +338,9 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
     endif
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_crtm")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $CRTM option for radiances"/))
 #endif
 
 end subroutine da_transform_xtoy_crtm

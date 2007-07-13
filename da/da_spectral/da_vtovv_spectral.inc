@@ -25,12 +25,15 @@ subroutine da_vtovv_spectral(max_wave, sizec, lenr, lenwrk, lensav, inc, &
    integer :: index_r, index_c         ! Array index for complex v_fou.
 
    real    :: r_fou(1:lenr)            ! FFT array.
-   real    :: work(1:lenwrk)           ! FFT work array. 
    complex :: v_fou(its:ite,0:max_wave)! Intermediate Fourier state.
    complex :: ccv(1:sizec)             ! Spectral modes.  
    integer              :: index_m, index_j
    integer              :: jc, js, je, iequator
    complex              :: sum_legtra          ! Summation scalars.
+
+#ifdef FFTPACK
+   real    :: work(1:lenwrk)           ! FFT work array. 
+#endif
 
 
    if (trace_use) call da_trace_entry("da_vtovv_spectral")

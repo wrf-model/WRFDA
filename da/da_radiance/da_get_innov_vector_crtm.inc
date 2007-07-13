@@ -19,6 +19,8 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
    TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
 
+#ifdef CRTM
+
    INTEGER                        :: n, icld  ! Loop counter.
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_levs ! Number of obs levels.
@@ -44,14 +46,13 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    REAL, dimension(kms:kme)     :: clw, dpf
    REAL                         :: clwp
 
-#if defined(CRTM)
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id,Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:)
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere
    TYPE( CRTM_Surface_type )      :: Surface
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
-#endif
+
 !---------------------------------------------------------
 
    ! WHY? use argument it
@@ -60,11 +61,6 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    alloc_status (:) = 0
 
    IF ( iv%num_inst < 1 ) return
-
-#if !defined(CRTM)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $CRTM option for radiances"/))
-#else
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_crtm")
 
@@ -479,6 +475,9 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
     endif   
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_crtm")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $CRTM option for radiances"/))
 #endif
  
 end subroutine da_get_innov_vector_crtm

@@ -11,6 +11,7 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    type (ob_type),    intent(in)  :: iv       ! O-B structure.
    type (y_type),     intent(in)  :: re       ! O-A structure.
 
+#ifdef RTTOV
    integer                        :: n        ! Loop counter.
    integer                        :: i, k     ! Index dimension.
    integer                        :: nlevelss ! Number of obs levels.
@@ -19,7 +20,6 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
    character(len=filename_len)  :: filename
    integer            :: ndomain
 
-#ifdef RTTOV
    if (trace_use) call da_trace_entry("da_write_oa_rad_ascii")
 
    do i = 1, iv%num_inst

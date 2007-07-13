@@ -18,6 +18,8 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
    type (y_type),     intent(inout)  :: y        ! H' delta_x
    type (ob_type),    intent(in)     :: iv       ! O-B structure.
 
+#ifdef RTTOV
+
    integer                        :: i,j,k,c  ! Index dimension.
    integer                        :: nlevels  ! Number of obs levels.
 
@@ -45,11 +47,6 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
 #ifdef DM_PARALLEL
    integer :: status(mpi_status_size) ! MPI status.
 #endif
-
-#if !defined(RTTOV)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $RTTOV option for radiances"/))
-#else
 
    if (iv%num_inst < 1) return
 
@@ -456,6 +453,9 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
    end do        ! end loop for sensor
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_rttov")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $RTTOV option for radiances"/))
 #endif
 
 end subroutine da_transform_xtoy_rttov

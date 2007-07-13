@@ -1,20 +1,21 @@
 module da_rttov
 
-use da_reporting, only : da_warning
 
    !---------------------------------------------------------------------------
    ! Purpose: module for radiance data assimilation. 
    !---------------------------------------------------------------------------
 
+   use da_define_structures, only : ob_type, y_type, x_type
    use module_domain, only : xpose_type, xb_type, domain
+   use da_reporting, only : da_error
+
+#ifdef RTTOV
    use module_radiance, only : satinfo, coefs_scatt_instname, &
       time_slots, i_kind,r_kind, r_double, &
        one, zero, three,deg2rad, n_scatt_coef,q2ppmv, gsi_emiss
-#ifdef RTTOV
    use module_radiance, only : coefs,coefs_scatt,profile_type,radiance_type, &
       rttov_coef,platform_name,inst_name,transmission_type, &
       errorstatus_success,gas_id_watervapour,errorstatus_fatal
-#endif
 
 #ifdef DM_PARALLEL
    use mpi, only : mpi_integer, mpi_status_size
@@ -32,7 +33,6 @@ use da_reporting, only : da_warning
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, &
       num_fgat_time,stdout,trace_use, use_error_factor_rad, &
       qc_good, qc_bad,myproc,biascorr, global,ims,ime,jms,jme
-   use da_define_structures, only : ob_type, y_type, x_type
    use da_interpolation, only : da_to_zk_new,da_interp_lin_2d_new, &
       da_interp_lin_3d_new,da_interp_lin_2d,da_interp_lin_3d_adj_new, &
       da_interp_lin_2d_adj_new
@@ -45,10 +45,12 @@ use da_reporting, only : da_warning
       tovs_recv_start,con_vars_type,aux_vars_type, &
       da_biascorr, da_detsurtyp,da_biasprep,da_get_time_slots, &
       da_qc_rad, da_read_biascoef
-   use da_reporting, only : da_message, message, da_error, da_warning
+   use da_reporting, only : da_message, message, da_warning
    use da_tools, only : da_togrid_new
    use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
    use da_wrf_interfaces, only : wrf_dm_bcast_integer
+   use da_reporting, only : da_warning
+#endif
 
    implicit none
 

@@ -17,14 +17,19 @@ module da_obs_io
    use da_define_structures, only : ob_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type
-   use da_grid_definitions, only : da_earth_2_model_wind,da_ffdduv
+   use da_grid_definitions, only : da_ffdduv
    use da_obs, only : da_count_filtered_obs,da_check_missing,da_obs_proc_station
    use da_par_util1, only : da_proc_sum_int
    use da_physics, only : da_tp_to_qs
-   use da_reporting, only : da_warning, message, da_error, da_message
+   use da_reporting, only : da_warning, message, da_error
    use da_tools, only : da_ll_to_xy
    use da_tools1, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
+
+#ifdef BUFR
+   use da_grid_definitions, only : da_earth_2_model_wind
+   use da_reporting, only : da_message
+#endif
 
    implicit none
 

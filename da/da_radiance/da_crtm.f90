@@ -5,6 +5,8 @@ module da_crtm
    !---------------------------------------------------------------------------
 
    use module_domain, only : xpose_type, x_type, xb_type, domain
+   use da_define_structures, only : y_type, ob_type
+
 #ifdef CRTM
    use module_radiance, only : CRTM_RTSolution_type,CRTM_ChannelInfo_type, &
       CRTM_Atmosphere_type, CRTM_Surface_type,CRTM_GeometryInfo_type, &
@@ -17,27 +19,22 @@ module da_crtm
       crtm_assign_surface,crtm_zero_surface,CRTM_Zero_Atmosphere, satinfo, &
       time_slots,crtm_platform_name, crtm_init, &
       rttov_inst_name,rttov_platform_name
-#endif
 
    use da_control, only : trace_use, crtm_cloud, gravity,stdout, biascorr, &
       biasprep, qc_rad,missing_r,rtminit_sensor,rtminit_nsensor, filename_len, &
       use_error_factor_rad,read_biascoef, analysis_date,time_window_max, &
       time_window_min,num_fgat_time,rtminit_platform, &
       rtminit_satid, global,kms,kme,ims,ime,jms,jme,kts,kte
-   use da_define_structures, only : y_type, ob_type
    use da_interpolation, only : da_interp_lin_2d_new, &
       da_interp_lin_2d,da_interp_lin_2d_adj
    use da_radiance1, only : da_biasprep,da_detsurtyp,da_biascorr, &
       da_get_time_slots,da_biasprep,da_read_biascoef
-#ifdef CRTM
    use da_radiance1, only : da_qc_crtm
-#endif
 
    use da_reporting, only : da_error,message
    use da_tools1, only : da_free_unit, da_get_unit
    use da_tracing, only : da_trace_entry, da_trace_exit
 
-#ifdef CRTM
     TYPE (CRTM_ChannelInfo_type),save :: ChannelInfo
 #endif
 

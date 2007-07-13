@@ -19,6 +19,8 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    type (y_type),  intent(inout)  :: ob       ! Observation structure.
    type (ob_type), intent(inout)  :: iv       ! O-B structure.
 
+#if defined(RTTOV)
+
    integer                        :: n        ! Loop counter.
    integer                        :: k  ! Index dimension.
    integer                        :: nlevels ! Number of obs levels.
@@ -37,6 +39,7 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
    real   , allocatable :: zasat(:), zlsat(:)
 
+! FIX?
 real,allocatable :: temp(:)
 
    type(con_vars_type),  allocatable :: con_vars(:)
@@ -46,11 +49,6 @@ real,allocatable :: temp(:)
    real, allocatable :: dpf(:,:), clw(:,:), pf(:,:)
 
    if ( iv%num_inst < 1 ) return
-
-#if !defined(RTTOV)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $RTTOV option for radiances"/))
-#else
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_rttov")
 
@@ -578,6 +576,9 @@ end do
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $RTTOV option for radiances"/))
 #endif
  
 end subroutine da_get_innov_vector_rttov
