@@ -3,7 +3,7 @@
 set echo 
 
 #Decide which stages to run (run if true):
-#export RUN_WPS=true
+export RUN_WPS=true
 #export RUN_REAL=true
 #export RUN_WRF=true
 #export RUN_OBSPROC=true
@@ -12,7 +12,7 @@ set echo
 
 #Experiment details:
 export REGION=t46
-export EXPT=noda.stest
+export EXPT=noda.july
 export CYCLE_PERIOD=6
 #export CYCLING=true
 export FIRST=false
@@ -35,7 +35,7 @@ export LL_PTILE=16
 # 1 min for WRF-VAR: 4 min is required per day 4 runs. 
 # 5 sec or less  for UPDATE_BC: 20 sec is required per day 4 runs. 
 
-# if NUM_PROCS=16 used with share queue:
+# if NUM_PROCS=16 used with share and debug queues:
 #wrfvar: 1min
 #update_bc 10sec or so.
 #wrf: 8 min per output file.
@@ -43,8 +43,8 @@ export LL_PTILE=16
 #Consider 20min for share queue for 06 and 18 test runs which only 12hrs runs.
 
 #Time info:
-export INITIAL_DATE=2006100100
-export FINAL_DATE=2006100100
+export INITIAL_DATE=2007070300
+export FINAL_DATE=2007070300
 export LONG_FCST_TIME_1=00
 export LONG_FCST_RANGE_1=06  #24 #6
 export LONG_FCST_TIME_2=06
@@ -69,10 +69,10 @@ export DAT_DIR=/ptmp/demirtas/data                # bluevista
 
 export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista 
 
-export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
+export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version? New trunk version.
 export WRFVAR_DIR=$REL_DIR/wrfvar_r2522           # r2522.       
 export WPS_DIR=$REL_DIR/wps_r237                  # r237 AFWA release.
-export WRF_BC_DIR=$REL_DIR/WRF_BC                 # Which version?
+export WRF_BC_DIR=$REL_DIR/WRF_BC                 # Which version? Web-release version.
 export WRF_DIR=$REL_DIR/wrf_r2234                 # r2234 AFWA release.
 export REG_DIR=$DAT_DIR/$REGION
 export EXP_DIR=$REG_DIR/$EXPT
@@ -138,18 +138,18 @@ export NL_PD_MOIST=.true.  # Check with Dale
 #export NL_HISTORY_INTERVAL=720   # Every 12 hours to save disk space # Check with Dale
 
 #OBSPROC (not covered above):
-export TS0=265.   # (AFWA's original is 290.)
+#export TS0=265.   # (AFWA's original is 290.) Since OBSPROC is updated to use base_temp.
 
 #WRF-Var:
-#export NL_WRITE_FILTERED_OBS=.true.# ("false" in AFWA's and Registry.wrfvar.)
+#export NL_WRITE_FILTERED_OBS=.true.   # ("false" in AFWA's and Registry.wrfvar.)
 #export NL_WRITE_INCREMENTS=.false.
 #export NL_USE_SSMIRETRIEVALOBS=.false.
-#export NL_VAR_SCALING4=0.01  # Meral how about "NL_VAR_SCALING4=1.0 for V2.2 BEs."?
+#export NL_VAR_SCALING4=0.01           # How about "NL_VAR_SCALING4=1.0 for V2.2 BEs."?
 #export NL_CALCULATE_CG_COST_FN=.true.
 #export NL_USE_GPSREFOBS=.true.
 #export NL_USE_AIRSRETOBS=.false.
 
-## Meral added the following to macth DATC setting with AFWA's t46 settings:
+## Meral added the following to macth DATC's settings with AFWA's t46 settings:
 
 #export NL_USE_PROFILEROBS=false   # (AFWA's original)
 #export NL_USE_QSCATOBS=false      # (AFWA's original)
