@@ -103,7 +103,13 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
    	if test $FCST_HOUR -lt 10; then export FCST_HOUR=0$FCST_HOUR; fi
 	
 	#Link relevant GFS grib files:
-   	ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/MT.avn_CY.${HOUR}_fh.00${FCST_HOUR}_tl.press_gr.0p5deg tmp/.
+   	#ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/MT.avn_CY.${HOUR}_fh.00${FCST_HOUR}_tl.press_gr.0p5deg tmp/.
+	#The new GFS file name convention is: gfs.t00z.pgrb2f00	
+	#ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/gfs.t${HOUR}z.pgrb2f${FCST_HOUR}  tmp/.
+	
+        # Use a very basic input file name that is prepared before the run.
+	ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/t${FCST_HOUR}  tmp/.
+	
 	$WPS_DIR/link_grib.csh tmp/*
 	
 	${RUN_CMD} ./ungrib.exe
