@@ -26,7 +26,7 @@
         INTEGER, PARAMETER :: MAX_NUM_FIELDS=200
 
         ! total size of all stored fields in INTEGER*8 words
-        INTEGER, PARAMETER :: MAX_NUM_WORDS=7000000
+        INTEGER, PARAMETER :: MAX_NUM_WORDS=70000000
 
         ! start index of each stored field
         ! NOTE:  field_starts(0,:,:) is only used for initialization.  

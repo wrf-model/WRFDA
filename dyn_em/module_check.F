@@ -1094,8 +1094,8 @@ SUBROUTINE t_rk_tendency ( config_flags, rk_step,                         &
 &kts, kte )
 
 #ifdef DM_PARALLEL
-lineno = __LINE__
-#    include "HALO_3803.inc"
+!lineno = __LINE__
+!#    include "HALO_3803.inc"
 
 #endif
 

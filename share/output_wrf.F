@@ -34,6 +34,7 @@
             mp_physics, ra_lw_physics, ra_sw_physics, sf_sfclay_physics, &
             sf_surface_physics, bl_pbl_physics, cu_physics
     REAL    khdif, kvdif
+    CHARACTER (len=19) simulation_start_date
     INTEGER rc
 
     CHARACTER*256 message
@@ -108,6 +109,9 @@
       WRITE ( start_date , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2)' ) &
               start_year,start_month,start_day,start_hour,start_minute,start_second
       CALL wrf_put_dom_ti_char ( fid , 'START_DATE', TRIM(start_date) , ierr )
+      IF ( switch .EQ. model_input_only) THEN
+         CALL wrf_put_dom_ti_char ( fid , 'SIMULATION_START_DATE', TRIM(start_date) , ierr )
+      END IF
 
 #ifdef D3VAR_IRY_KLUDGE
       ibuf(1) = config_flags%e_sn - config_flags%s_sn + 1
