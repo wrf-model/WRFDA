@@ -13,11 +13,11 @@ subroutine da_transform_xtowtq_adj (grid)
 
    if (trace_use) call da_trace_entry("da_transform_xtowtq_adj")
 
-   is = grid%xb%its
-   js = grid%xb%jts
+   is = its
+   js = jts
 
-   ie = grid%xb%ite
-   je = grid%xb%jte
+   ie = ite
+   je = jte
 
    if (test_wrfvar) then
       is = its-1

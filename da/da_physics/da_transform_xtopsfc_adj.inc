@@ -1,4 +1,4 @@
-subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x) 
+subroutine da_transform_xtopsfc_adj(grid, synop, j_synop_y, jo_grad_x) 
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,8 +6,7 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x)
 
    implicit none
 
-   type (xb_type),    intent(in) :: xb       ! first guess state.
-   type (xpose_type), intent(in) :: xp       ! domain decomposition vars.
+   type (domain),              intent(in)    :: grid
 
    type (synop_type),          intent(in)    :: synop
    type (residual_synop_type), intent(inout) :: j_synop_y   ! grad_y(jo)
@@ -41,14 +40,14 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x)
 
       ! 2.1 Terrain height at the observed site (xj, yi):
 
-      call da_interp_lin_2d(xb%terr, xp%ims, xp%ime, xp%jms, xp%jme, &
-                         i, j, dx, dy, dxm, dym, hsm)
-      call da_interp_lin_2d(xb%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
-                         i, j, dx, dy, dxm, dym, tsm)
-      call da_interp_lin_2d(xb%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
-                         i, j, dx, dy, dxm, dym, qsm)
-      call da_interp_lin_2d(xb%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                         i, j, dx, dy, dxm, dym, psm)
+      call da_interp_lin_2d(grid%xb%terr, ims, ime, jms, jme, &
+         i, j, dx, dy, dxm, dym, hsm)
+      call da_interp_lin_2d(grid%xb%t2, ims, ime, jms, jme, &
+         i, j, dx, dy, dxm, dym, tsm)
+      call da_interp_lin_2d(grid%xb%q2, ims, ime, jms, jme, &
+         i, j, dx, dy, dxm, dym, qsm)
+      call da_interp_lin_2d(grid%xb%psfc, ims, ime, jms, jme, &
+         i, j, dx, dy, dxm, dym, psm)
 
       to = -888888.0
       qo = -888888.0
@@ -82,16 +81,16 @@ subroutine da_transform_xtopsfc_adj(xb, xp, synop, j_synop_y, jo_grad_x)
    end if
 
    ! 2.2 convert the jo_grad_y to the model grids (t2, q2, u10, v10, and psfc)
-   call da_interp_lin_2d_adj(jo_grad_x%t2, xp%ims, xp%ime, xp%jms, xp%jme, &
-                          i, j, dx, dy, dxm, dym, j_synop_y%t)
-   call da_interp_lin_2d_adj(jo_grad_x%q2, xp%ims, xp%ime, xp%jms, xp%jme, &
-                          i, j, dx, dy, dxm, dym, j_synop_y%q)
-   call da_interp_lin_2d_adj(jo_grad_x%u10, xp%ims, xp%ime, xp%jms, xp%jme, &
-                          i, j, dx, dy, dxm, dym, j_synop_y%u)
-   call da_interp_lin_2d_adj(jo_grad_x%v10, xp%ims, xp%ime, xp%jms, xp%jme, &
-                          i, j, dx, dy, dxm, dym, j_synop_y%v)
-   call da_interp_lin_2d_adj(jo_grad_x%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                          i, j, dx, dy, dxm, dym, psm_prime)
+   call da_interp_lin_2d_adj(jo_grad_x%t2, ims, ime, jms, jme, &
+      i, j, dx, dy, dxm, dym, j_synop_y%t)
+   call da_interp_lin_2d_adj(jo_grad_x%q2, ims, ime, jms, jme, &
+      i, j, dx, dy, dxm, dym, j_synop_y%q)
+   call da_interp_lin_2d_adj(jo_grad_x%u10, ims, ime, jms, jme, &
+      i, j, dx, dy, dxm, dym, j_synop_y%u)
+   call da_interp_lin_2d_adj(jo_grad_x%v10, ims, ime, jms, jme, &
+      i, j, dx, dy, dxm, dym, j_synop_y%v)
+   call da_interp_lin_2d_adj(jo_grad_x%psfc, ims, ime, jms, jme, &
+      i, j, dx, dy, dxm, dym, psm_prime)
 
 end subroutine da_transform_xtopsfc_adj
 

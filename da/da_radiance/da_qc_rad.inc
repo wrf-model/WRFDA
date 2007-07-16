@@ -11,6 +11,7 @@ subroutine da_qc_rad (ob, iv)
    type (y_type),  intent(in)      :: ob         ! Observation structure.
    type (ob_type), intent(inout)   :: iv         ! O-B structure.
 
+#ifdef RTTOV
    integer :: i, nchan,p,j
    logical   :: amsua, amsub, hirs, msu,airs,hsb
 
@@ -22,7 +23,6 @@ subroutine da_qc_rad (ob, iv)
    logical :: copy_found
    integer :: temp(num_procs)
 
-#ifdef RTTOV
    if (trace_use) call da_trace_entry("da_qc_rad")
 
    allocate (num_tovs_before(iv%num_inst,num_procs))

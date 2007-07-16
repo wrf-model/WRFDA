@@ -1,4 +1,4 @@
-subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
+subroutine da_roughness_from_lanu(ltbl, mminlu, date, lanu, rough)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -9,9 +9,8 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
    integer             ,   intent(in)    :: ltbl
    character (len=4)   ,   intent(in)    :: mminlu
    character (len=19)  ,   intent(in)    :: date
-   type (xpose_type),      intent(in)    :: xp  ! domain decomposition vars.
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(in)    :: lanu 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme),   intent(out)   :: rough 
+   real, dimension(ims:ime,jms:jme),   intent(in)    :: lanu 
+   real, dimension(ims:ime,jms:jme),   intent(out)   :: rough 
 
    integer                               :: LS, LC, LI, LUCATS, LuseAS, &
                                            LUMATCH, year, month, day,  &
@@ -74,10 +73,10 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, xp, lanu, rough)
       (/"landuse in input file does not match lutable"/))
    end if   
 
-   m1 = xp % its
-   m2 = xp % ite
-   n1 = xp % jts
-   n2 = xp % jte
+   m1 = its
+   m2 = ite
+   n1 = jts
+   n2 = jte
 
    do lc = m1,m2
       do ls = n1,n2

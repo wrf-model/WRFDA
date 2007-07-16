@@ -155,7 +155,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    !----------------------------------------------------------------------
    ! [3.0] Check_CvToVv_Adjoint:
    !----------------------------------------------------------------------
-   call da_check_cvtovv_adjoint( grid%xb, xbx, xp, be, cv, vv)
+   call da_check_cvtovv_adjoint( grid, xbx, be, cv, vv)
   
    !----------------------------------------------------------------------
    ! [4.0] Test inverse physical variable transform:
@@ -164,7 +164,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
 
    if( .not. global ) then
       call da_zero_x(grid%xa)
-      call da_transform_vptox( grid%xb, vp, xp, grid%xa, be
+      call da_transform_vptox( grid, vp, be)
       ! [4.1] Test XToVpToX differences:
 
       write(unit=stdout, fmt='(/a/)') &
@@ -190,13 +190,13 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    ! [5.0] Perform Vv -> Vp adjoint test: 
    !----------------------------------------------------------------------
 
-   call da_check_vvtovp_adjoint( grid%xb, xp, be, vp, vv)
+   call da_check_vvtovp_adjoint( grid, be, vp, vv)
 
    !----------------------------------------------------------------------
    ! [6.0] Perform Vp -> X  adjoint tests: 
    !----------------------------------------------------------------------
 
-   call da_check_vptox_adjoint( grid%xb, be, grid%xa, xp, vp)
+   call da_check_vptox_adjoint( grid, be, vp)
 
 #endif
 1111 continue

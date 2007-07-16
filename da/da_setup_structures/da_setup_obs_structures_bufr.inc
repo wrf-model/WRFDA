@@ -81,12 +81,12 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
          write(filename(1:10), fmt='(a, i2.2,a)') 'ob', n,'.bufr'
 
-         ! scan PREPBUFR OBSERVATION FILE
+         ! scan prepbufr observation file
          call da_scan_bufr_obs (iv, xp, filename)
 
 
-         ! if (Use_RadarObs) then
-         !    ! scan Radar OBSERVATION FILE
+         ! if (use_radarobs) then
+         !    ! scan radar observation file
          !    write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'.dat'
          !    call da_scan_bufr_radar(iv, xp, filename)
          ! end if
@@ -96,8 +96,8 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
       filename="ob.bufr"
       call da_scan_bufr_obs(iv, xp, filename)
 
-      ! scan MAin BODY OF Radar OBSERVATION FILE
-      ! if (Use_RadarObs) &
+      ! scan main body of radar observation file
+      ! if (use_radarobs) &
       ! call da_scan_bufr_radar(iv, xp,'radar.dat')
    end if
 
@@ -182,11 +182,11 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
 
          write(filename(1:10), fmt='(a, i2.2)') 'ob.', n
 
-         ! Read PREPBUFR OBSERVATION FILE
+         ! read prepbufr observation file
          call da_read_bufr_obs (iv, xp, filename)
 
-         ! if (Use_RadarObs) then
-         !    ! Read Radar OBSERVATION FILE
+         ! if (use_radarobs) then
+         !    ! read radar observation file
          !    write(filename(1:10), fmt='(a, i2.2)') 'radarob.', n
          !    call da_read_bufr_radar(iv, xp, filename)
          ! end if
@@ -198,8 +198,8 @@ subroutine da_setup_obs_structures_bufr(xp, ob, iv)
       filename="ob.bufr"
       call da_read_bufr_obs(iv, xp,filename)
 
-      ! if (Use_RadarObs) then
-      !    !Read Radar OBSERVATION FILE
+      ! if (use_radarobs) then
+      !    !read radar observation file
       !    call da_read_bufr_radar(iv, xp)
       ! end if
    end if

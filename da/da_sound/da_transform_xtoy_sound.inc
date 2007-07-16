@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_sound (xa, iv, xp, y)
+subroutine da_transform_xtoy_sound (grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_sound (xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),     intent(in)    :: xa       ! gridded analysis increment.
+   type (domain),     intent(in)    :: grid
    type (ob_type),    intent(in)    :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
-   type (y_type),     intent(inout) :: y        ! y = h (xa) (linear)
+   type (y_type),     intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -39,13 +38,13 @@ subroutine da_transform_xtoy_sound (xa, iv, xp, y)
          if (k < 1) cycle
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%u, k, iv%sound(n)%zk, k)
-         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % v, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%v, k, iv%sound(n)%zk, k)
-         call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % t, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%t, k, iv%sound(n)%zk, k)
-         call da_interp_lin_3d(xa % q, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % q, i, j, dx, dy, dxm, dym, &
                             y%sound(n)%q, k, iv%sound(n)%zk, k)
       end do
    end if

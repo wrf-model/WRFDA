@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_metar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_metar_adj(grid, iv, jo_grad_y, jo_grad_x)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,9 +6,8 @@ subroutine da_transform_xtoy_metar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   type (xb_type),    intent(in) :: xb          ! first guess state.
-   type (ob_type),    intent(in) :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
+   type (domain),  intent(in)    :: grid          ! first guess state.
+   type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
    type (y_type) , intent(inout) :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -34,22 +33,22 @@ subroutine da_transform_xtoy_metar_adj(xb, iv, xp, jo_grad_y, jo_grad_x)
             dxm = iv%metar(n)%loc%dxm
 
             ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d_adj(jo_grad_x % u, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % u, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%u, iv%metar(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % v, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % v, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%v, iv%metar(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % t, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % t, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%t, iv%metar(n)%zk)
-            call da_interp_obs_lin_2d_adj(jo_grad_x % q, xp, i, j, dx, dy, &
+            call da_interp_obs_lin_2d_adj(jo_grad_x % q, i, j, dx, dy, &
                dxm, dym, jo_grad_y%metar(n)%q, iv%metar(n)%zk)
 
-            call da_interp_lin_2d_adj(jo_grad_x % psfc, xp%ims, xp%ime, &
-               xp%jms, xp%jme, i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
+            call da_interp_lin_2d_adj(jo_grad_x % psfc, ims, ime, &
+               jms, jme, i, j, dx, dy, dxm, dym, jo_grad_y%metar(n)%p)
          end do
       else if (sfc_assi_options == 2) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, &
             iv%ob_numb(iv%current_ob_time)%metar
-            call da_transform_xtopsfc_adj(xb,xp,iv%metar(n), &
+            call da_transform_xtopsfc_adj(grid,iv%metar(n), &
                                             jo_grad_y%metar(n),jo_grad_x)
          end do
       end if

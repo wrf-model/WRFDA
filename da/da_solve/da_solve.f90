@@ -38,7 +38,7 @@ subroutine da_solve ( grid , config_flags)
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
       rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef, ims, ime, &
-      kps, kpe, jms, jme, kms, kme
+      kps, kpe, jms, jme, kms, kme, jts,jte
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -226,34 +226,22 @@ subroutine da_solve ( grid , config_flags)
 
       call da_get_innov_vector( it, ob, iv, grid , config_flags)
 
-      if (test_transforms) then
+      if (test_transforms .or. test_wrfvar) then
          call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
          if (var4d) then
             call da_system("touch wrf_stop_now")
          end if
-         call wrfu_finalize
-         call wrf_shutdown
-         stop
-      end if
-
-      if (test_wrfvar) then
-         call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
-         if (var4d) then
-            call da_system("touch wrf_stop_now")
-         end if
-         call wrfu_finalize
+         ! No point continuing, as data corrupted
          call wrf_shutdown
          stop
       end if
 
       ! Write "clean" QCed observations if requested:
       if (anal_type_qcobs) then
-        if (it == 1) then
-        call da_write_filtered_obs(ob, iv, grid%xb, grid%xp, &
-                          grid%moad_cen_lat, grid%stand_lon,&
-                          grid%truelat1, grid%truelat2,     &
-                          coarse_ix, coarse_jy, start_x, start_y)
-         end if     
+         if (it == 1) then
+            call da_write_filtered_obs(grid, ob, iv, &
+               coarse_ix, coarse_jy, start_x, start_y)
+          end if     
       end if
 
       ! [8.3] Interpolate x_g to low resolution grid
@@ -275,11 +263,11 @@ subroutine da_solve ( grid , config_flags)
 
       call da_transform_vtox(grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
 
-      ! [8.6] Only when use_RadarObs = .false. and calc_w_increment =.true.,
+      ! [8.6] Only when use_radarobs = .false. and calc_w_increment =.true.,
       !       the w_increment need to be diagnosed:
 
-      if (calc_w_increment .and. .not. use_RadarObs) then
-         call da_uvprho_to_w_lin(grid)
+      if (calc_w_increment .and. .not. use_radarobs) then
+         call da_uvprho_to_w_lin (grid)
 
 #ifdef DM_PARALLEL
 #include "HALO_RADAR_XA_W.inc"
@@ -288,7 +276,7 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.7] Write out diagnostics
 
-      call da_write_diagnostics( ob, iv, re, y, grid%xp, grid%xa, j )
+      call da_write_diagnostics (grid, ob, iv, re, y, j)
 
       ! [8.8] Write Ascii radiance OMB and OMA file
 
@@ -445,12 +433,12 @@ subroutine da_solve ( grid , config_flags)
       deallocate (xbx%int_wgts)
       deallocate (xbx%alp)
       deallocate (xbx%wsave)
-      if (grid%xb%jts == grid%xb%jds) then
+      if (jts == jds) then
          deallocate(cos_xls)
          deallocate(sin_xls)
       end if
                                                                                 
-      if (grid%xb%jte == grid%xb%jde) then
+      if (jte == jde) then
          deallocate(cos_xle)
          deallocate(sin_xle)
       end if

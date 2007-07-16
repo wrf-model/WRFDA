@@ -1,5 +1,4 @@
-subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, &
-                              T9, Q9, P9, PSFC9, SLP9, xp )
+subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
 
    !-----------------------------------------------------------------------
    ! Purpose: computes sea level pressure from the rule                
@@ -16,11 +15,9 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, &
 
    implicit none
               
-
-   type (xpose_type), intent(in)                 :: xp
    real,                intent(in)               :: TERR, PSFC, PSFC9
-   real, dimension(xp%kms:xp%kme), intent(in)    :: T, Q, P
-   real, dimension(xp%kms:xp%kme), intent(in)    :: T9, Q9, P9
+   real, dimension(kms:kme), intent(in)    :: T, Q, P
+   real, dimension(kms:kme), intent(in)    :: T9, Q9, P9
    ! real                                          :: SLP
    real, intent(out)                             :: SLP9
 
@@ -52,7 +49,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, &
 
    ! FinD 2 LEVELS ON SIGMA SURFACES SURROUNDinG PL AT EACH I,J    
 
-   k_loop: do k=xp%kts, xp%kte-1
+   k_loop: do k=kts, kte-1
       if ((p(k) >= pl) .and. (p(k+1) < pl)) then
          khi = k+1
          klo = k

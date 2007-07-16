@@ -6,7 +6,7 @@ module da_tools
    
    use module_bc, only : bdyzone
    use module_dm, only : wrf_dm_sum_real
-   use module_domain, only : xb_type, xpose_type
+   use module_domain, only : xb_type, xpose_type, domain
 
    use da_control, only : pi, gravity, gas_constant, ims, ime, jms,jme, &
       kms,kme,its,ite,jts,jte,kts,kte,ids,ide,stdout, var4d_multi_inc, &

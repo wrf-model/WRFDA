@@ -1,4 +1,4 @@
-subroutine da_transform_xtotpw_adj(xa, xb)
+subroutine da_transform_xtotpw_adj(grid)
 
    !---------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,8 +6,7 @@ subroutine da_transform_xtotpw_adj(xa, xb)
 
    implicit none
 
-   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
-   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (domain),  intent(inout) :: grid
 
    integer :: i, j, k, is, js, ie, je
 
@@ -15,35 +14,35 @@ subroutine da_transform_xtotpw_adj(xa, xb)
 
    if (trace_use) call da_trace_entry("da_transform_xtotpw_adj")
 
-   is = xb%its
-   js = xb%jts
+   is = its
+   js = jts
 
-   ie = xb%ite
-   je = xb%jte
+   ie = ite
+   je = jte
 
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if (is < xb%ids) is = xb%ids
-      if (js < xb%jds) js = xb%jds
+      if (is < ids) is = ids
+      if (js < jds) js = jds
 
-      if (ie > xb%ide) ie = xb%ide
-      if (je > xb%jde) je = xb%jde
+      if (ie > ide) ie = ide
+      if (je > jde) je = jde
    end if
 
    do j=js, je
       do i=is, ie
-         pw = 0.1*xa%tpw(i,j)
+         pw = 0.1*grid%xa%tpw(i,j)
 
-         do k=xb%kts, xb%kte
-            dzpw = (xb%hf(i,j,k+1)-xb%hf(i,j,k))*pw
+         do k=kts, kte
+            dzpw = (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k))*pw
 
-            xa%  q(i,j,k)=xa%  q(i,j,k)+dzpw*xb%rho(i,j,k)
-            xa%rho(i,j,k)=xa%rho(i,j,k)+dzpw*xb%  q(i,j,k)
+            grid%xa%  q(i,j,k)=grid%xa%  q(i,j,k)+dzpw*grid%xb%rho(i,j,k)
+            grid%xa%rho(i,j,k)=grid%xa%rho(i,j,k)+dzpw*grid%xb%  q(i,j,k)
          end do
       end do
    end do

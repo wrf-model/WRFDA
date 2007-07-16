@@ -1,15 +1,15 @@
 module da_gpspw
 
    use module_dm, only : wrf_dm_sum_real
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
-      v_interp_p, v_interp_h, check_max_iv_print, &
+      v_interp_p, v_interp_h, check_max_iv_print,kts,kte, &
       missing, max_error_uv, max_error_t, rootproc, &
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, num_gpspw_tot,max_error_thickness, &
-      pseudo_var, num_pseudo, Use_GpspwObs, max_error_pw, &
+      pseudo_var, num_pseudo, use_gpspwobs, max_error_pw, &
       fails_error_max,pseudo_err,pseudo_x, pseudo_y, stdout, &
       pseudo_z,pseudo_val,max_error_ref
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &

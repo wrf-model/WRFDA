@@ -24,9 +24,9 @@ subroutine da_get_innov_vector_gpspw( it, xb, xp, ob, iv)
    real                   :: dpw, ddpw    ! adjustment pw [mm]
    real                   :: obs_terr     ! real terrain height at GPS site [m]
    real                   :: model_terr   ! model terrain height at GPS site[m]
-   real,dimension(xp%kts:xp%kte):: model_q ! model q at GPS site [kg/kg]
-   real,dimension(xp%kts:xp%kte):: model_z ! model z at GPS site [m]
-   real,dimension(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
+   real,dimension(kts:kte):: model_q ! model q at GPS site [kg/kg]
+   real,dimension(kts:kte):: model_z ! model z at GPS site [m]
+   real,dimension(kts:kte):: model_rho ! model rho at GPS site [kg/m^3]
 
    ! unit_gps = myproc + 140
    !---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ subroutine da_get_innov_vector_gpspw( it, xb, xp, ob, iv)
          deallocate(ob % gpspw)
       end if
 
-      Use_GpspwObs = .true.
+      use_gpspwobs = .true.
 
       ! Allocate:
       iv % num_gpspw  = num_pseudo
@@ -149,7 +149,7 @@ subroutine da_get_innov_vector_gpspw( it, xb, xp, ob, iv)
                else
                   model_z(1) = dym*(dxm*xb%hf(i,j,1)   + dx*xb%hf(i+1,j,1)) + &
                             dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
-                  do k = xp%kts, xp%kte
+                  do k = kts, kte
                      if (model_z(k) >= obs_terr) exit
 
                      model_z(k+1) = dym*(dxm*xb%hf(i,j,k+1)   + dx*xb%hf(i+1,j,k+1)) + &

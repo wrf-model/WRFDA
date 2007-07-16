@@ -1,7 +1,7 @@
 subroutine da_transfer_xatowrf(grid)
 
    !---------------------------------------------------------------------------
-   !  Purpose: Convert analysis increments into WRF increments
+   !  Purpose: Convert analysits increments into WRF increments
    !---------------------------------------------------------------------------
 
    implicit none
@@ -10,51 +10,38 @@ subroutine da_transfer_xatowrf(grid)
 
    integer :: i, j, k
 
-   integer :: is, ie, js, je, ks, ke
-
    real    :: sdmd, s1md
 
    ! arrays to hold wrf increments on the c-grid 
 
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme, &
-      grid%xp%kms:grid%xp%kme) :: &
+   real, dimension(ims:ime,jms:jme, &
+      kms:kme) :: &
       u_cgrid, v_cgrid, q_cgrid, ph_cgrid
 
-   real, dimension(grid%xp%ims:grid%xp%ime,grid%xp%jms:grid%xp%jme) :: mu_cgrid
+   real, dimension(ims:ime,jms:jme) :: mu_cgrid
 
    real    :: t_full  , p_full, rho_full, q_full, ph_full , ph_xb_hd, &
               qvf1, qvf2, qvf1_b, qvf2_b
 
    if (trace_use) call da_trace_entry("da_transfer_xatowrf")
 
-   !------------------------------------------------------------------------
-   ! set array range indices for processor subdomain.et array range indices for processor subdomain.
-   !------------------------------------------------------------------------
+   ! To kteep the background PH perturbation:
 
-   is = grid%xp % its
-   ie = grid%xp % ite
-   js = grid%xp % jts
-   je = grid%xp % jte
-   ks = grid%xp % kts
-   ke = grid%xp % kte
-
-   ! To keep the background PH perturbation:
-
-   do j=js,je
-      do i=is,ie
-         do k=ks, ke+1
+   do j=jts,jte
+      do i=its,ite
+         do k=kts, kte+1
             ph_cgrid(i,j,k) = grid%em_ph_2(i,j,k)
          end do
       end do
    end do
 
    !---------------------------------------------------------------------------
-   ! [1.0] Get the mixing ratio of moisture first, as it is easy.
+   ! [1.0] Get the mixing ratio of moisture first, as it its easy.
    !---------------------------------------------------------------------------
 
-   do k=ks,ke
-      do j=js,je
-         do i=is,ie
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
             if ((grid%xb%q(i,j,k)+grid%xa%q(i,j,k)) < 0.0) then
                q_cgrid(i,j,k) =-grid%xb%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
             else
@@ -68,11 +55,11 @@ subroutine da_transfer_xatowrf(grid)
    ! [2.0] compute increments of dry-column air mass per unit area
    !---------------------------------------------------------------------------
 
-   do j=js,je
-      do i=is,ie
+   do j=jts,jte
+      do i=its,ite
          sdmd=0.0
          s1md=0.0
-         do k=ks,ke
+         do k=kts,kte
             sdmd=sdmd+q_cgrid(i,j,k)*grid%em_dnw(k)
             s1md=s1md+(1.0+grid%moist(i,j,k,P_QV))*grid%em_dnw(k)
          end do
@@ -88,9 +75,9 @@ subroutine da_transfer_xatowrf(grid)
    ! Tangent linear code for grid%xa%p (based on WRF "real.init.code") 
    ! developed by Y.-R. Guo 05/13/2004:
 
-   do j=js,je
-      do i=is,ie
-         k = ke
+   do j=jts,jte
+      do i=its,ite
+         k = kte
          qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k))
          qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k,P_QV))
          qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
@@ -101,7 +88,7 @@ subroutine da_transfer_xatowrf(grid)
                     ((mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
                      -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b))
 
-         do k = ke-1,1,-1
+         do k = kte-1,1,-1
             qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
             qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
             qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
@@ -116,19 +103,19 @@ subroutine da_transfer_xatowrf(grid)
       end do
    end do
 
-   ! Adjust grid%xa%q to make grid%xb%q + grid%xa%q > 0.0
+   ! Adjust grid%xa%q to makte grid%xb%q + grid%xa%q > 0.0
 
    if (check_rh == 2) then
       ! Shu-Hua~s TPW conservation:
-      call da_check_rh(grid%xb, grid%xa, grid%xp)
+      call da_check_rh(grid)
    else if (check_rh == 1) then
       ! Simple resetting to max/min values:
-      call da_check_rh_simple(grid%xb, grid%xa, grid%xp)
+      call da_check_rh_simple(grid)
    end if
 
-   do k=ks,ke
-      do j=js,je
-         do i=is,ie
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
             q_cgrid(i,j,k) = grid%xa%q(i,j,k)/(1.0 - grid%xb%q(i,j,k))**2
          end do
       end do
@@ -141,63 +128,63 @@ subroutine da_transfer_xatowrf(grid)
 
    if (print_detail_xa) then
       write(unit=stdout, fmt='(a, e24.12)') &
-         'sum(abs(grid%xa%t(is:ie,js:je,ks:ke)))=', &
-         sum(abs(grid%xa%t(is:ie,js:je,ks:ke))), &
-         'sum(abs(grid%xa%p(is:ie,js:je,ks:ke)))=', &
-         sum(abs(grid%xa%p(is:ie,js:je,ks:ke))), &
-         'sum(abs(grid%xb%t(is:ie,js:je,ks:ke)))=', &
-         sum(abs(grid%xb%t(is:ie,js:je,ks:ke))), &
-         'sum(abs(grid%xb%p(is:ie,js:je,ks:ke)))=', &
-         sum(abs(grid%xb%p(is:ie,js:je,ks:ke))), &
-         'sum(abs(grid%em_t_2 (is:ie,js:je,ks:ke)))=', &
-         sum(abs(grid%em_t_2 (is:ie,js:je,ks:ke)))
+         'sum(abs(grid%xa%t(its:ite,jts:jte,kts:kte)))=', &
+         sum(abs(grid%xa%t(its:ite,jts:jte,kts:kte))), &
+         'sum(abs(grid%xa%p(its:ite,jts:jte,kts:kte)))=', &
+         sum(abs(grid%xa%p(its:ite,jts:jte,kts:kte))), &
+         'sum(abs(grid%xb%t(its:ite,jts:jte,kts:kte)))=', &
+         sum(abs(grid%xb%t(its:ite,jts:jte,kts:kte))), &
+         'sum(abs(grid%xb%p(its:ite,jts:jte,kts:kte)))=', &
+         sum(abs(grid%xb%p(its:ite,jts:jte,kts:kte))), &
+         'sum(abs(grid%em_t_2 (its:ite,jts:jte,kts:kte)))=', &
+         sum(abs(grid%em_t_2 (its:ite,jts:jte,kts:kte)))
 
        write(unit=stdout, fmt='(2(2x, a, e20.12))') &
-          'maxval(grid%xa%u(is:ie,js:je,ks:ke))=', &
-          maxval(grid%xa%u(is:ie,js:je,ks:ke)), &
-          'minval(grid%xa%u(is:ie,js:je,ks:ke))=', & 
-          minval(grid%xa%u(is:ie,js:je,ks:ke)), &
-          'maxval(grid%xa%v(is:ie,js:je,ks:ke))=', &
-          maxval(grid%xa%v(is:ie,js:je,ks:ke)), &
-          'minval(grid%xa%v(is:ie,js:je,ks:ke))=', &
-          minval(grid%xa%v(is:ie,js:je,ks:ke)), &
-          'maxval(grid%xa%t(is:ie,js:je,ks:ke))=', &
-          maxval(grid%xa%t(is:ie,js:je,ks:ke)), &
-          'minval(grid%xa%t(is:ie,js:je,ks:ke))=', &
-          minval(grid%xa%t(is:ie,js:je,ks:ke)), &
-          'maxval(grid%xa%q(is:ie,js:je,ks:ke))=', &
-          maxval(grid%xa%q(is:ie,js:je,ks:ke)), &
-          'minval(grid%xa%q(is:ie,js:je,ks:ke))=', &
-          minval(grid%xa%q(is:ie,js:je,ks:ke)), &
-          'maxval(grid%xa%p(is:ie,js:je,ks:ke))=', &
-          maxval(grid%xa%p(is:ie,js:je,ks:ke)), &
-          'minval(grid%xa%p(is:ie,js:je,ks:ke))=', &
-          minval(grid%xa%p(is:ie,js:je,ks:ke)), &
-          'maxval(grid%xa%psfc(is:ie,js:je))   =', &
-          maxval(grid%xa%psfc(is:ie,js:je)), &
-          'minval(grid%xa%psfc(is:ie,js:je))   =', &
-          minval(grid%xa%psfc(is:ie,js:je))
+          'maxval(grid%xa%u(its:ite,jts:jte,kts:kte))=', &
+          maxval(grid%xa%u(its:ite,jts:jte,kts:kte)), &
+          'minval(grid%xa%u(its:ite,jts:jte,kts:kte))=', & 
+          minval(grid%xa%u(its:ite,jts:jte,kts:kte)), &
+          'maxval(grid%xa%v(its:ite,jts:jte,kts:kte))=', &
+          maxval(grid%xa%v(its:ite,jts:jte,kts:kte)), &
+          'minval(grid%xa%v(its:ite,jts:jte,kts:kte))=', &
+          minval(grid%xa%v(its:ite,jts:jte,kts:kte)), &
+          'maxval(grid%xa%t(its:ite,jts:jte,kts:kte))=', &
+          maxval(grid%xa%t(its:ite,jts:jte,kts:kte)), &
+          'minval(grid%xa%t(its:ite,jts:jte,kts:kte))=', &
+          minval(grid%xa%t(its:ite,jts:jte,kts:kte)), &
+          'maxval(grid%xa%q(its:ite,jts:jte,kts:kte))=', &
+          maxval(grid%xa%q(its:ite,jts:jte,kts:kte)), &
+          'minval(grid%xa%q(its:ite,jts:jte,kts:kte))=', &
+          minval(grid%xa%q(its:ite,jts:jte,kts:kte)), &
+          'maxval(grid%xa%p(its:ite,jts:jte,kts:kte))=', &
+          maxval(grid%xa%p(its:ite,jts:jte,kts:kte)), &
+          'minval(grid%xa%p(its:ite,jts:jte,kts:kte))=', &
+          minval(grid%xa%p(its:ite,jts:jte,kts:kte)), &
+          'maxval(grid%xa%psfc(its:ite,jts:jte))   =', &
+          maxval(grid%xa%psfc(its:ite,jts:jte)), &
+          'minval(grid%xa%psfc(its:ite,jts:jte))   =', &
+          minval(grid%xa%psfc(its:ite,jts:jte))
    end if
 
-   do j=js,je
-      do i=is,ie
+   do j=jts,jte
+      do i=its,ite
 
          ph_full  = grid%ht(i,j) * gravity
          ph_xb_hd = grid%ht(i,j) * gravity
-         do k = ks, ke
-            ! To obtain all of the full fields: t, p, q(mixing ratio), rho
+         do k = kts, kte
+            ! To obtain all of the full fitelds: t, p, q(mixing ratio), rho
             t_full   = grid%xa%t(i,j,k) + grid%xb%t(i,j,k)
             p_full   = grid%xa%p(i,j,k) + grid%xb%p(i,j,k)
             q_full   = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
 
-            ! Note: According to WRF, this is the dry air density used to
+            ! Note: According to WRF, thits its the dry air density used to
             !       compute the geopotential height: 
             rho_full = p_full / (gas_constant*t_full*(1.0+q_full/rd_over_rv))
 
-            ! To compute the theta increment with the full fields:
+            ! To compute the theta increment with the full fitelds:
             grid%em_t_2(i,j,k) = t_full*(base_pres/p_full)**kappa - t0
 
-            ! The full field of analysis ph:
+            ! The full fiteld of analysits ph:
             ph_full  = ph_full  &
                        - grid%xb%dnw(k) * (grid%xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
 
@@ -205,7 +192,7 @@ subroutine da_transfer_xatowrf(grid)
             ph_xb_hd  = ph_xb_hd  &
                        - grid%xb%dnw(k) * grid%xb%psac(i,j) / grid%xb%rho(i,j,k)
 
-            ! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
+            ! The analysits perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
             grid%em_ph_2(i,j,k+1) = ph_full - grid%em_phb(i,j,k+1) &
                             + (grid%xb%hf(i,j,k+1)*gravity - ph_xb_hd)
          end do
@@ -214,9 +201,9 @@ subroutine da_transfer_xatowrf(grid)
 
    ! To compute the geopotential height increment:
 
-   do k=ks, ke+1
-     do j=js,je
-        do i=is,ie
+   do k=kts, kte+1
+     do j=jts,jte
+        do i=its,ite
            ph_cgrid(i,j,k) = grid%em_ph_2(i,j,k) - ph_cgrid(i,j,k)
         end do
      end do
@@ -228,16 +215,16 @@ subroutine da_transfer_xatowrf(grid)
 
    if (write_increments) then
       write(unit=stdout,fmt='(/"Write out increment for plotting......")')
-      call da_write_increments (grid%xp, grid%xb, grid%xa, q_cgrid, mu_cgrid, ph_cgrid)
+      call da_write_increments (grid, q_cgrid, mu_cgrid, ph_cgrid)
    end if
 
    ! CONVERT FROM A-GRID TO C-GRID
 
-   !TBH:  NOTE that grid%xp%halo_id3 = HALO_PSICHI_UV_ADJ which is currently defined 
-   !TBH:  in the Registry as "dyn_em 24:grid%xa%u,grid%xa%v,grid%xa%psfc".  Clearly it is not 
-   !TBH:  necessary to update halos in grid%xa%psfc here!  Also, 24-point stencil is 
-   !TBH:  too thick, 9-point should suffice.  Apparently, grid%xp%halo_id3 is used 
-   !TBH:  in many places!  This needs to be fixed.  
+   !TBH:  NOTE that grid%xp%halo_id3 = HALO_PSICHI_UV_ADJ which its currently defined 
+   !TBH:  in the Regitstry as "dyn_em 24:grid%xa%u,grid%xa%v,grid%xa%psfc".  Clearly it its not 
+   !TBH:  necessary to update halos in grid%xa%psfc here!  Also, 24-point stencil its 
+   !TBH:  too thick, 9-point should suffice.  Apparently, grid%xp%halo_id3 its used 
+   !TBH:  in many places!  Thits needs to be fixed.  
 
 #ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"
@@ -246,32 +233,32 @@ subroutine da_transfer_xatowrf(grid)
    ! Fill the boundary
 
    ! The southern boundary
-   if (js == grid%xp%jds) then
-      grid%xa%v(is:ie,js-1,ks:ke)=2.0*grid%xa%v(is:ie,js  ,ks:ke) &
-                            -    grid%xa%v(is:ie,js+1,ks:ke)
+   if (jts == jds) then
+      grid%xa%v(its:ite,jts-1,kts:kte)=2.0*grid%xa%v(its:ite,jts  ,kts:kte) &
+                            -    grid%xa%v(its:ite,jts+1,kts:kte)
    end if
 
    ! The northern boundary
-   if (je == grid%xp%jde) then
-      grid%xa%v(is:ie,je+1,ks:ke)=2.0*grid%xa%v(is:ie,je  ,ks:ke) &
-                            -    grid%xa%v(is:ie,je-1,ks:ke)
+   if (jte == jde) then
+      grid%xa%v(its:ite,jte+1,kts:kte)=2.0*grid%xa%v(its:ite,jte  ,kts:kte) &
+                            -    grid%xa%v(its:ite,jte-1,kts:kte)
    end if
 
    ! The western boundary
-   if (is == grid%xp%ids) then
-      grid%xa%u(is-1,js:je,ks:ke)=2.0*grid%xa%u(is  ,js:je,ks:ke) &
-                            -    grid%xa%u(is+1,js:je,ks:ke)
+   if (its == ids) then
+      grid%xa%u(its-1,jts:jte,kts:kte)=2.0*grid%xa%u(its  ,jts:jte,kts:kte) &
+                            -    grid%xa%u(its+1,jts:jte,kts:kte)
    end if
 
    ! The eastern boundary
-   if (ie == grid%xp%ide) then
-      grid%xa%u(ie+1,js:je,ks:ke)=2.0*grid%xa%u(ie  ,js:je,ks:ke) &
-                            -    grid%xa%u(ie-1,js:je,ks:ke)
+   if (ite == ide) then
+      grid%xa%u(ite+1,jts:jte,kts:kte)=2.0*grid%xa%u(ite  ,jts:jte,kts:kte) &
+                            -    grid%xa%u(ite-1,jts:jte,kts:kte)
    end if
 
-   do k=ks,ke
-      do j=js,je+1
-         do i=is,ie+1
+   do k=kts,kte
+      do j=jts,jte+1
+         do i=its,ite+1
             u_cgrid(i,j,k)=0.5*(grid%xa%u(i-1,j  ,k)+grid%xa%u(i,j,k))
             v_cgrid(i,j,k)=0.5*(grid%xa%v(i  ,j-1,k)+grid%xa%v(i,j,k))
          end do
@@ -283,33 +270,33 @@ subroutine da_transfer_xatowrf(grid)
    !------------------------------------------------------------------------
 
    ! The northern boundary
-   if (je == grid%xp%jde) then
-      u_cgrid(is:ie+1,je+1,ks:ke)=0.0
+   if (jte == jde) then
+      u_cgrid(its:ite+1,jte+1,kts:kte)=0.0
    end if
 
    ! The eastern boundary
-   if (ie == grid%xp%ide) then
-      v_cgrid(ie+1,js:je+1,ks:ke)=0.0
+   if (ite == ide) then
+      v_cgrid(ite+1,jts:jte+1,kts:kte)=0.0
    end if
 
    !---------------------------------------------------------------------------
    ! [5.0] add increment to the original guess and update "grid"
    !---------------------------------------------------------------------------
 
-   do j=js,je
-      do i=is,ie
+   do j=jts,jte
+      do i=its,ite
          grid%em_mu_2(i,j) = grid%em_mu_2(i,j) + mu_cgrid(i,j)
          grid%em_mu0(i,j) = grid%em_mub(i,j) + grid%em_mu_2(i,j)
-         grid%em_w_2(i,j,ke+1)=  grid%em_w_2(i,j,ke+1) + grid%xa%w(i,j,ke+1)
+         grid%em_w_2(i,j,kte+1)=  grid%em_w_2(i,j,kte+1) + grid%xa%w(i,j,kte+1)
       end do
 
-      do k=ks,ke
-         do i=is,ie
+      do k=kts,kte
+         do i=its,ite
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + u_cgrid(i,j,k)
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + v_cgrid(i,j,k)
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)
             grid%moist(i,j,k,P_QV) = grid%moist(i,j,k,P_QV) + q_cgrid(i,j,k)
-            ! make sure qv is positive.
+            ! makte sure qv its positive.
             if (grid%moist(i,j,k,P_QV) < 1.0e-6) grid%moist(i,j,k,P_QV) = 1.0e-6
 
             if (size(grid%moist,dim=4) >= 4) then
@@ -335,20 +322,20 @@ subroutine da_transfer_xatowrf(grid)
    end do
 
    ! The northern boundary
-   if (je == grid%xp%jde) then
-      j=je+1
-      do k=ks,ke
-         do i=is,ie
+   if (jte == jde) then
+      j=jte+1
+      do k=kts,kte
+         do i=its,ite
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + v_cgrid(i,j,k)
          end do
       end do
    end if
 
    ! The eastern boundary
-   if (ie == grid%xp%ide) then
-      i=ie+1
-      do k=ks,ke
-         do j=js,je
+   if (ite == ide) then
+      i=ite+1
+      do k=kts,kte
+         do j=jts,jte
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + u_cgrid(i,j,k)
          end do
       end do
@@ -357,60 +344,60 @@ subroutine da_transfer_xatowrf(grid)
    if (print_detail_xa) then
       write(unit=stdout, fmt=*) 'simple variables:'
 
-      if (ie == grid%xp%ide) then
+      if (ite == ide) then
          write (unit=stdout,fmt=*)  ' '
 
-         do k=ks+5,ke,10
-            do j=js,je,10
+         do k=kts+5,kte,10
+            do j=jts,jte,10
                write(unit=stdout, fmt=*) &
-                    '  grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
-                       grid%em_u_2(grid%xp%ide+1,j,k)
+                    '  grid%em_u_2(', ide+1, ',', j, ',', k, ')=', &
+                       grid%em_u_2(ide+1,j,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
       end if
 
-      if (je == grid%xp%jde) then
+      if (jte == jde) then
          write(unit=stdout, fmt=*) ' '
 
-         do k=ks+5,ke,10
-            do i=is,ie,10
+         do k=kts+5,kte,10
+            do i=its,ite,10
                write(unit=stdout, fmt=*) &
-                    '  grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                       grid%em_v_2(i, grid%xp%jde+1,k)
+                    '  grid%em_v_2(', i, ',', jde+1, ',', k, ')=', &
+                       grid%em_v_2(i, jde+1,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
       end if
 
       write(unit=stdout, fmt='(2(2x, a, e20.12))') &
-         'maxval(mu_cgrid(is:ie,js:je))       =', &
-         maxval(mu_cgrid(is:ie,js:je)), &
-         'minval(mu_cgrid(is:ie,js:je))       =', &
-         minval(mu_cgrid(is:ie,js:je)), &
-         'maxval(u_cgrid(is:ie,js:je,ks:ke))  =', &
-         maxval(u_cgrid(is:ie,js:je,ks:ke)), &
-         'minval(u_cgrid(is:ie,js:je,ks:ke))  =', &
-         minval(u_cgrid(is:ie,js:je,ks:ke)), &
-         'maxval(v_cgrid(is:ie,js:je,ks:ke))  =', &
-         maxval(v_cgrid(is:ie,js:je,ks:ke)), &
-         'minval(v_cgrid(is:ie,js:je,ks:ke))  =', &
-         minval(v_cgrid(is:ie,js:je,ks:ke)), &
-         'maxval(q_cgrid(is:ie,js:je,ks:ke))  =', &
-         maxval(q_cgrid(is:ie,js:je,ks:ke)), &
-         'minval(q_cgrid(is:ie,js:je,ks:ke))  =', &
-         minval(q_cgrid(is:ie,js:je,ks:ke))
+         'maxval(mu_cgrid(its:ite,jts:jte))       =', &
+         maxval(mu_cgrid(its:ite,jts:jte)), &
+         'minval(mu_cgrid(its:ite,jts:jte))       =', &
+         minval(mu_cgrid(its:ite,jts:jte)), &
+         'maxval(u_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         maxval(u_cgrid(its:ite,jts:jte,kts:kte)), &
+         'minval(u_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         minval(u_cgrid(its:ite,jts:jte,kts:kte)), &
+         'maxval(v_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         maxval(v_cgrid(its:ite,jts:jte,kts:kte)), &
+         'minval(v_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         minval(v_cgrid(its:ite,jts:jte,kts:kte)), &
+         'maxval(q_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         maxval(q_cgrid(its:ite,jts:jte,kts:kte)), &
+         'minval(q_cgrid(its:ite,jts:jte,kts:kte))  =', &
+         minval(q_cgrid(its:ite,jts:jte,kts:kte))
 
-      do k=ks,ke
+      do k=kts,kte
          write(unit=stdout, fmt='(a, i3)') 'k=', k
 
          write(unit=stdout, fmt='(2(2x, a, e20.12))') &
-            'maxval(u_cgrid(is:ie,js:je,k))  =', maxval(u_cgrid(is:ie,js:je,k)), &
-            'minval(u_cgrid(is:ie,js:je,k))  =', minval(u_cgrid(is:ie,js:je,k)), &
-            'maxval(v_cgrid(is:ie,js:je,k))  =', maxval(v_cgrid(is:ie,js:je,k)), &
-            'minval(v_cgrid(is:ie,js:je,k))  =', minval(v_cgrid(is:ie,js:je,k)), &
-            'maxval(q_cgrid(is:ie,js:je,k))  =', maxval(q_cgrid(is:ie,js:je,k)), &
-            'minval(q_cgrid(is:ie,js:je,k))  =', minval(q_cgrid(is:ie,js:je,k))
+            'maxval(u_cgrid(its:ite,jts:jte,k))  =', maxval(u_cgrid(its:ite,jts:jte,k)), &
+            'minval(u_cgrid(its:ite,jts:jte,k))  =', minval(u_cgrid(its:ite,jts:jte,k)), &
+            'maxval(v_cgrid(its:ite,jts:jte,k))  =', maxval(v_cgrid(its:ite,jts:jte,k)), &
+            'minval(v_cgrid(its:ite,jts:jte,k))  =', minval(v_cgrid(its:ite,jts:jte,k)), &
+            'maxval(q_cgrid(its:ite,jts:jte,k))  =', maxval(q_cgrid(its:ite,jts:jte,k)), &
+            'minval(q_cgrid(its:ite,jts:jte,k))  =', minval(q_cgrid(its:ite,jts:jte,k))
       end do
    end if
 

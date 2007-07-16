@@ -44,7 +44,7 @@ subroutine da_calculate_grady(iv, re, jo_grad_y)
    ! Profiler
    call da_calculate_grady_profiler(iv, re,  jo_grad_y)
 
-   ! Satem
+   ! satem
 
    call da_calculate_grady_satem(iv, re,  jo_grad_y)
 
@@ -92,7 +92,7 @@ subroutine da_calculate_grady(iv, re, jo_grad_y)
 
    call da_calculate_grady_qscat(iv, re, jo_grad_y)
 
-   ! Radar:               
+   ! radar:               
 
    call da_calculate_grady_radar(iv, re, jo_grad_y)
 

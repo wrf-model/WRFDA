@@ -10,6 +10,8 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
    type (y_type),     intent(in)  :: ob       ! Observation structure.
    type (ob_type),    intent(in)  :: iv       ! O-B structure.
 
+#ifdef RTTOV
+
    integer                        :: n        ! Loop counter.
    integer                        :: i, k     ! Index dimension.
    integer                        :: nlevelss ! Number of obs levels.
@@ -19,7 +21,6 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
    integer            :: ndomain
    logical            :: ssmis
 
-#ifdef RTTOV
    if (trace_use) call da_trace_entry("da_write_iv_rad_ascii")
 
    do i = 1, iv%num_inst

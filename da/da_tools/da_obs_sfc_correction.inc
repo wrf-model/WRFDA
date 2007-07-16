@@ -26,7 +26,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
    integer                               :: i, j, k
 
-   real, dimension(xb%kts:xb%kte)        :: t_mdl, q_mdl, u_mdl, v_mdl, &
+   real, dimension(kts:kte)        :: t_mdl, q_mdl, u_mdl, v_mdl, &
                                             height, pressure
 
 
@@ -48,7 +48,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    roughness = dym*(dxm*xb%rough(i,j)   + dx*xb%rough(i+1,j)) &
              + dy *(dxm*xb%rough(i,j+1) + dx*xb%rough(i+1,j+1))
 
-   do k = xb%kts, xb%kte
+   do k = kts, kte
 
       pressure(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                   + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
@@ -85,10 +85,10 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       psfc = missing_r
       if (abs(ho - missing_r) > 1.) then
          if (abs(to - missing_r) > 1.) then
-            call da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, &
                          height, psfc, mslp, ho, to)
          else
-            call da_sfcprs (xb%kts, xb%kte, pressure, t_mdl, q_mdl, &
+            call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, &
                          height, psfc, mslp, ho)
          end if
       end if
@@ -125,17 +125,17 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    ! 4.  Bring surface observation below model levels with good height quality
    ! ================================================
 
-   if (sfc_obs % h < height(xb%kts)) then
+   if (sfc_obs % h < height(kts)) then
 
       ! 2.3 Make use of local variables for model  
       !     -------------------------------------
 
-      um = u_mdl(xb%kts)
-      vm = v_mdl(xb%kts)
-      tm = t_mdl(xb%kts)
-      pm = pressure (xb%kts)
-      qm = q_mdl(xb%kts)
-      hm = height(xb%kts)
+      um = u_mdl(kts)
+      vm = v_mdl(kts)
+      tm = t_mdl(kts)
+      pm = pressure (kts)
+      qm = q_mdl(kts)
+      hm = height(kts)
 
       ! 3.2 Correction wind based on similarity laws
       !     -------------------------------------------
@@ -198,7 +198,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
          !  Correct data
 
          call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, &
-            xb%kts, xb%kte)
+            kts, kte)
 
          sfc_obs % t % inv = val
 
@@ -210,7 +210,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.6 Assign model lowest level height + 1m to observation
       !      ----------------------------------------------------- 
 
-      ! sfc_obs % h = height(xb%kts) + 1.
+      ! sfc_obs % h = height(kts) + 1.
 
       ! 3.7 Height QC
       !     ---------

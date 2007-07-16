@@ -479,7 +479,9 @@ subroutine da_obs_operator( nv, ni, nj, nkk, xstart, ob, x, h )
    integer, intent(in)              :: nkk(1:nv)
    integer, intent(in)              :: xstart(1:nv)
    type (ob_type), intent(in)       :: ob
-   real, intent(in), target         :: x(:)
+   ! WHY? was this a target?
+   ! real, intent(in), target         :: x(:)
+   real, intent(in)                 :: x(:)
    real, intent(out)                :: h
 
    integer                          :: v, nk

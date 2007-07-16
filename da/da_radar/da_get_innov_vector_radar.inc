@@ -28,7 +28,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
    real, dimension(max_ob_levels) :: model_rv ! Model value rv at ob location.
    real, dimension(max_ob_levels) :: model_rf ! Model value rf at ob location.
 
-   real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. location.
+   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. location.
 
    real                           :: model_ps
 
@@ -37,7 +37,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
    integer                        :: irf, irff
 
 
-   if (iv % num_Radar < 1) return
+   if (iv % num_radar < 1) return
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_radar")
 
@@ -45,7 +45,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
    do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, iv%ob_numb(iv%current_ob_time)%radar
 
-      num_levs = iv % Radar(n) % info % levels
+      num_levs = iv % radar(n) % info % levels
 
       if (num_levs < 1) cycle
 
@@ -58,48 +58,48 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
       ! [1.0] Get horizontal interpolation weights:
 
-      i = iv%Radar(n)%loc%i
-      j = iv%Radar(n)%loc%j
-      dx = iv%Radar(n)%loc%dx
-      dy = iv%Radar(n)%loc%dy
-      dxm = iv%Radar(n)%loc%dxm
-      dym = iv%Radar(n)%loc%dym
+      i = iv%radar(n)%loc%i
+      j = iv%radar(n)%loc%j
+      dx = iv%radar(n)%loc%dx
+      dy = iv%radar(n)%loc%dy
+      dxm = iv%radar(n)%loc%dxm
+      dym = iv%radar(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                 + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
       end do
 
       do k=1, num_levs
-         call da_to_zk(iv%Radar(n)%height(k), v_h, xp, v_interp_h, iv%Radar(n)%zk(k))
+         call da_to_zk(iv%radar(n)%height(k), v_h, xp, v_interp_h, iv%radar(n)%zk(k))
 
-         if (iv%Radar(n)%zk(k) < 1.0) then
-            iv%Radar(n)%height_qc(k) = below_model_surface
-         else if (iv%Radar(n)%zk(k) > mkz) then
-            iv%Radar(n)%height_qc(k) = above_model_lid
+         if (iv%radar(n)%zk(k) < 1.0) then
+            iv%radar(n)%height_qc(k) = below_model_surface
+         else if (iv%radar(n)%zk(k) > mkz) then
+            iv%radar(n)%height_qc(k) = above_model_lid
          end if
       end do
 
 
       ! [2.0] Interpolate horizontally to ob points:
 
-      call da_interp_lin_3d(xb % p, xp, i, j, dx, dy, dxm, dym, &
-                         model_p, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % p, i, j, dx, dy, dxm, dym, &
+                         model_p, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % u, xp, i, j, dx, dy, dxm, dym, &
-                         model_u, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % u, i, j, dx, dy, dxm, dym, &
+                         model_u, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % v, xp, i, j, dx, dy, dxm, dym, &
-                         model_v, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % v, i, j, dx, dy, dxm, dym, &
+                         model_v, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % wh, xp, i, j, dx, dy, dxm, dym, &
-                         model_w, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % wh, i, j, dx, dy, dxm, dym, &
+                         model_w, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % rho, xp, i, j, dx, dy, dxm, dym, &
-                         model_rho, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % rho, i, j, dx, dy, dxm, dym, &
+                         model_rho, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      call da_interp_lin_3d(xb % qrn, xp, i, j, dx, dy, dxm, dym, &
-                         model_qrn, max_ob_levels, iv%Radar(n)%zk, num_levs)
+      call da_interp_lin_3d(xb % qrn, i, j, dx, dy, dxm, dym, &
+                         model_qrn, max_ob_levels, iv%radar(n)%zk, num_levs)
 
       ! Test 5.E-5 as critical value. It can not be smaller.
 
@@ -111,61 +111,61 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
                  dx  *(dym * xb % psac(i,j+1) + dy * xb%psac(i+1,j+1)) + &
                  xb % ptop
 
-      iv%Radar(n)%model_p(1:num_levs) = model_p(1:num_levs)
-      iv%Radar(n)%model_rho(1:num_levs) = model_rho(1:num_levs)
-      iv%Radar(n)%model_qrn(1:num_levs) = model_qrn(1:num_levs)
-      iv%Radar(n)%model_ps = model_ps
+      iv%radar(n)%model_p(1:num_levs) = model_p(1:num_levs)
+      iv%radar(n)%model_rho(1:num_levs) = model_rho(1:num_levs)
+      iv%radar(n)%model_qrn(1:num_levs) = model_qrn(1:num_levs)
+      iv%radar(n)%model_ps = model_ps
 
       ! [3.0] Calculate rv, rf at OBS location and initialise components of &
       ! innovation vector:
 
       if (fg_format == fg_format_wrf) then
          call da_latlon_to_ij(map_info, &
-                           iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
-                           iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y)
+                           iv%radar(n)%stn_loc%lat, iv%radar(n)%stn_loc%lon, &
+                           iv%radar(n)%stn_loc%x,   iv%radar(n)%stn_loc%y)
       else
-         call da_llxy( iv%Radar(n)%stn_loc%lat, iv%Radar(n)%stn_loc%lon, &
-                     iv%Radar(n)%stn_loc%x,   iv%Radar(n)%stn_loc%y)
+         call da_llxy( iv%radar(n)%stn_loc%lat, iv%radar(n)%stn_loc%lon, &
+                     iv%radar(n)%stn_loc%x,   iv%radar(n)%stn_loc%y)
       end if
 
-      xr = xb%ds *(iv%Radar(n)%loc%x - iv%Radar(n)%stn_loc%x)
-      yr = xb%ds *(iv%Radar(n)%loc%y - iv%Radar(n)%stn_loc%y)
+      xr = xb%ds *(iv%radar(n)%loc%x - iv%radar(n)%stn_loc%x)
+      yr = xb%ds *(iv%radar(n)%loc%y - iv%radar(n)%stn_loc%y)
 
       model_rv(:) = 0.0
       model_rf(:) = 0.0
 
       do k=1, num_levs
-         iv % Radar(n) % rv(k) % inv = 0.0
-         iv % Radar(n) % rf(k) % inv = 0.0
+         iv % radar(n) % rv(k) % inv = 0.0
+         iv % radar(n) % rf(k) % inv = 0.0
 
-         if (iv % Radar(n) % height_qc(k) /= below_model_surface .and.  &
-              iv % Radar(n) % height_qc(k) /= above_model_lid) then
+         if (iv % radar(n) % height_qc(k) /= below_model_surface .and.  &
+              iv % radar(n) % height_qc(k) /= above_model_lid) then
 
-            if (use_Radar_rv) then
-               if (ABS(iv % Radar(n) % rv(k) % qc - missing_data) > 1) then
-                  if (ABS(ob % Radar(n) % rv(k) - missing_r) > 1. .AND. &
-                       iv % Radar(n) % rv(k) % qc >= obs_qc_pointer) then
+            if (use_radar_rv) then
+               if (ABS(iv % radar(n) % rv(k) % qc - missing_data) > 1) then
+                  if (ABS(ob % radar(n) % rv(k) - missing_r) > 1. .AND. &
+                       iv % radar(n) % rv(k) % qc >= obs_qc_pointer) then
 
-                     zr=iv%Radar(n)%height(k) - iv%Radar(n)%stn_loc%elv
+                     zr=iv%radar(n)%height(k) - iv%radar(n)%stn_loc%elv
 
                      call da_radial_velocity(model_rv(k), model_p(k),  &
                         model_u(k), model_v(k), model_w(k),          &
                         model_qrn(k), model_ps, xr, yr, zr)
 
-                     iv % Radar(n) % rv(k) % inv = ob % Radar(n) % rv(k) - &
+                     iv % radar(n) % rv(k) % inv = ob % radar(n) % rv(k) - &
                                               model_rv(k)
                   end if
                end if
             end if
 
-            if (use_Radar_rf) then
-               if (ABS(iv % Radar(n) % rf(k) % qc - missing_data) > 1) then
-                  if (ABS(ob % Radar(n) % rf(k) - missing_r) > 1. .AND. &
-                     iv % Radar(n) % rf(k) % qc >= obs_qc_pointer) then
+            if (use_radar_rf) then
+               if (ABS(iv % radar(n) % rf(k) % qc - missing_data) > 1) then
+                  if (ABS(ob % radar(n) % rf(k) - missing_r) > 1. .AND. &
+                     iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
                      call da_reflectivity( model_rf(k), model_rho(k), &
                         model_qrn(k))
 
-                     iv % Radar(n) % rf(k) % inv = ob % Radar(n) % rf(k) - &
+                     iv % radar(n) % rf(k) % inv = ob % radar(n) % rf(k) - &
                                               model_rf(k)
                   end if
                end if
@@ -178,20 +178,20 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
       !------------------------------------------------------------------------
 
       if (check_max_iv)  then
-         call da_check_max_iv_radar(it, iv % Radar(n), irv, irf, irvf, irff)
+         call da_check_max_iv_radar(it, iv % radar(n), irv, irf, irvf, irff)
       end if
    end do
 
    if (rootproc .and. check_max_iv_print) then
       write(unit = check_max_iv_unit, fmt ='(/,A,i5,A)')   &
-         'For outer iteration ', it, ', Total Rejections for Radar follows:'
+         'For outer iteration ', it, ', Total Rejections for radar follows:'
 
-      if (use_Radar_rv) then
+      if (use_radar_rv) then
           write( unit = check_max_iv_unit, fmt = '(/,2(A,I6))') &
             'Number of failed rv observations:     ',irvf, ' on ',irv
       end if
 
-      if (use_Radar_rf) then
+      if (use_radar_rf) then
          write( unit = check_max_iv_unit, fmt = '(/,2(A,I6))') &
             'Number of failed rf observations:     ',irff, ' on ',irf
       end if

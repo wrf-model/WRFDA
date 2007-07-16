@@ -1504,7 +1504,7 @@
 !
       loct = (((tau_fastj+timej)*15.d0)-180.d0)*pi180 + xgrd(nslon)
       cosz = cosdec*coslat*cos(loct) + sindec*sinlat
-      sza  = cos(cosz)/pi180
+      sza  = acos(cosz)/pi180
       U0 = cos(SZA*pi180)
 !
       return

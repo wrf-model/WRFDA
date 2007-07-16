@@ -106,16 +106,16 @@ subroutine da_deallocate_observations (ob)
       deallocate (ob % bogus)
    end if
 
-   if (ob % num_Radar > 0) then
-      do n = 1, ob % num_Radar
-         deallocate (ob % Radar (n) % height  )
-         deallocate (ob % Radar (n) % height_qc)
-         deallocate (ob % Radar (n) % zk      )
-         deallocate (ob % Radar (n) % rv      )
-         deallocate (ob % Radar (n) % rf      )
+   if (ob % num_radar > 0) then
+      do n = 1, ob % num_radar
+         deallocate (ob % radar (n) % height  )
+         deallocate (ob % radar (n) % height_qc)
+         deallocate (ob % radar (n) % zk      )
+         deallocate (ob % radar (n) % rv      )
+         deallocate (ob % radar (n) % rf      )
       end do
 
-      deallocate (ob % Radar)
+      deallocate (ob % radar)
    end if
 
    if (ob % num_gpspw > 0) deallocate (ob % gpspw)

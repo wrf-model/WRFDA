@@ -1,4 +1,4 @@
-subroutine da_tprh_to_q_adj( xb, xp, xa )
+subroutine da_tprh_to_q_adj (grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Adjoint of da_tprh_to_q_adj.
@@ -6,36 +6,34 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb       ! First guess structure.
-   type (xpose_type), intent(in) :: xp       ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa       ! increment structure
+   type (domain), intent(inout)  :: grid
 
    integer                       :: is, ie   ! 1st dim. end points.
    integer                       :: js, je   ! 2nd dim. end points.
    integer                       :: ks, ke   ! 3rd dim. end points.
    integer                       :: i, j, k  ! Loop counter.
-   real :: qs_prime_over_qs(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) ! Temp.
+   real :: qs_prime_over_qs(its:ite,jts:jte,kts:kte) ! Temp.
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
    !---------------------------------------------------------------------------
 
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte   
+   is = its; ie = ite
+   js = jts; je = jte
+   ks = kts; ke = kte   
 
    if (test_wrfvar) then
-      is = xb%its-1
-      js = xb%jts-1
+      is = its-1
+      js = jts-1
 
-      ie = xb%ite+1
-      je = xb%jte+1
+      ie = ite+1
+      je = jte+1
 
-      if ( is < xb%ids ) is = xb%ids
-      if ( js < xb%jds ) js = xb%jds
+      if ( is < ids ) is = ids
+      if ( js < jds ) js = jds
 
-      if ( ie > xb%ide ) ie = xb%ide
-      if ( je > xb%jde ) je = xb%jde
+      if ( ie > ide ) ie = ide
+      if ( je > jde ) je = jde
    end if
 
    !---------------------------------------------------------------------------
@@ -45,10 +43,10 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
    do k = ks, ke
       do j = js, je
          do i = is, ie
-            qs_prime_over_qs(i,j,k) = xb % q(i,j,k) * xa % q(i,j,k)
+            qs_prime_over_qs(i,j,k) = grid%xb % q(i,j,k) * grid%xa % q(i,j,k)
 
-            xa % rh(i,j,k) = xa % rh(i,j,k) + qs_prime_over_qs(i,j,k) / &
-                             xb % rh(i,j,k)
+            grid%xa % rh(i,j,k) = grid%xa % rh(i,j,k) + qs_prime_over_qs(i,j,k) / &
+                             grid%xb % rh(i,j,k)
          end do
       end do
    end do
@@ -57,7 +55,7 @@ subroutine da_tprh_to_q_adj( xb, xp, xa )
    ! [2.0] Calculate saturation specific humidity ratio qs~/qs:
    !---------------------------------------------------------------------------
 
-   call da_tp_to_qs_adj( xb, xp, xa, qs_prime_over_qs )
+   call da_tp_to_qs_adj (grid, qs_prime_over_qs )
 
 end subroutine da_tprh_to_q_adj
 

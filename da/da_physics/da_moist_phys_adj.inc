@@ -59,10 +59,10 @@ subroutine da_moist_phys_adj(grid)
       end do
    end do
 
-   call da_filter_adj(grid,t_new, grid%xp)
-   call da_filter_adj(grid,q_new, grid%xp)
-   call da_filter_adj(grid,qcw_new, grid%xp)
-   call da_filter_adj(grid,qrn_new, grid%xp)
+   call da_filter_adj(grid,t_new)
+   call da_filter_adj(grid,q_new)
+   call da_filter_adj(grid,qcw_new)
+   call da_filter_adj(grid,qrn_new)
 
    do k=kts,kte
       do j=jts,jte

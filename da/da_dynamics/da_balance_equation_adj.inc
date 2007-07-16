@@ -1,4 +1,4 @@
-subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
+subroutine da_balance_equation_adj(grid, xbx, phi_b, u, v)
 
    !---------------------------------------------------------------------------
    ! Purpose: Adjoint of da_balance_equation
@@ -8,9 +8,7 @@ subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
 
    type(domain), intent(inout)               :: grid
 
-   type (xb_type), intent(in) :: xb               ! First guess structure.
    type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
-   type (xpose_type),intent(inout)  :: xp         ! Dimensions and xpose buffers. 
    real, intent(in)    :: phi_b(ims:ime,jms:jme,kms:kme) ! Balanced mass increment.
    real, intent(inout) :: u(ims:ime,jms:jme,kms:kme) ! u wind comp. (dot pts)
    real, intent(inout) :: v(ims:ime,jms:jme,kms:kme) ! v wind comp. (dot pts)
@@ -39,10 +37,10 @@ subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
    if (jte == jde ) je = jde-1
 
    if( fg_format == fg_format_kma_global) then
-      coefx(is:ie,js:je) = xb%coefx(is:ie,js:je)
-      coefy(is:ie,js:je) = xb%coefy(is:ie,js:je)
+      coefx(is:ie,js:je) = grid%xb%coefx(is:ie,js:je)
+      coefy(is:ie,js:je) = grid%xb%coefy(is:ie,js:je)
    else if( fg_format == fg_format_wrf) then
-      coefx(is:ie,js:je) = xb%coefz(is:ie,js:je)
+      coefx(is:ie,js:je) = grid%xb%coefz(is:ie,js:je)
       coefy(is:ie,js:je) = coefx(is:ie,js:je)
    else
       write (unit=message(1),fmt='(A,I3)') ' Wrong FG_FORMAT = ',fg_format
@@ -57,8 +55,7 @@ subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
    ! [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !---------------------------------------------------------------------------
 
-   call da_solve_poissoneqn_fst_adj(grid,xbx, xp, phi_b, &
-                                 del2phi_b)
+   call da_solve_poissoneqn_fst_adj(grid,xbx, phi_b, del2phi_b)
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate RHS of balance equation in gridpt space:
@@ -88,9 +85,9 @@ subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
 
       if (balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) then
-         call da_balance_cycloterm_adj( xb % rho(:,:,k),xb % u(:,:,k),&
-                                        xb % v(:,:,k), u(:,:,k), v(:,:,k),&
-                                        xb % coefx(:,:), xb % coefy(:,:),&
+         call da_balance_cycloterm_adj( grid%xb % rho(:,:,k),grid%xb % u(:,:,k),&
+                                        grid%xb % v(:,:,k), u(:,:,k), v(:,:,k),&
+                                        grid%xb % coefx(:,:), grid%xb % coefy(:,:),&
                                         term_x(:,:), term_y(:,:))
       end if
 
@@ -99,7 +96,7 @@ subroutine da_balance_equation_adj(grid, xb, xbx, xp, phi_b, u, v)
  
       if (balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) then
-         call da_balance_geoterm_adj( xb % cori, xb % rho(:,:,k), &
+         call da_balance_geoterm_adj( grid%xb % cori, grid%xb % rho(:,:,k), &
                                       term_x, term_y, &
                                       u(:,:,k), v(:,:,k))
       end if

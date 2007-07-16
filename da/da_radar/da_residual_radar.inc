@@ -18,28 +18,28 @@ subroutine da_residual_radar(oi, y, re,                        &
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if (oi%num_Radar > 0) then
+   if (oi%num_radar > 0) then
 
       n_obs_bad % rv % num = number_type(0, 0, 0)
       n_obs_bad % rf % num = number_type(0, 0, 0)
 
-      do n=1, oi%num_Radar
+      do n=1, oi%num_radar
 
-         do k=1, oi%Radar(n)%info%levels
+         do k=1, oi%radar(n)%info%levels
 
-           if (use_Radar_rv) then
+           if (use_radar_rv) then
 
              np_available = np_available + 1
 
-             re%Radar(n)%rv(k) = da_residual(n, k, y%Radar(n)%rv(k), &
-                                           oi%Radar(n)%rv(k), n_obs_bad % rv)
+             re%radar(n)%rv(k) = da_residual(n, k, y%radar(n)%rv(k), &
+                                           oi%radar(n)%rv(k), n_obs_bad % rv)
            end if
 
-           if (use_Radar_rf) then
+           if (use_radar_rf) then
              np_available = np_available + 1
 
-             re%Radar(n)%rf(k) = da_residual(n, k, y%Radar(n)%rf(k), &
-                                           oi%Radar(n)%rf(k), n_obs_bad % rf)
+             re%radar(n)%rf(k) = da_residual(n, k, y%radar(n)%rf(k), &
+                                           oi%radar(n)%rf(k), n_obs_bad % rf)
            end if
          end do
       end do

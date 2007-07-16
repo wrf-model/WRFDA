@@ -1,4 +1,4 @@
-subroutine da_tp_to_qs1( xb, xp, es, qs)
+subroutine da_tp_to_qs1 (grid, es, qs)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert T/p to saturation specific humidity.
@@ -12,34 +12,27 @@ subroutine da_tp_to_qs1( xb, xp, es, qs)
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   real, dimension(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte), intent(out):: &
+   type (domain), intent(in)    :: grid
+   real, dimension(its:ite,jts:jte,kts:kte), intent(out):: &
                                     es, qs
 
-   integer                       :: is, ie       ! 1st dim. end points.
-   integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
    integer                       :: i, j, k      ! Loop counters.
    real                          :: t_c          ! Working variable.
 
    !---------------------------------------------------------------------------
    ! [1.0] initialise:
    !---------------------------------------------------------------------------
+    
 
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte      
-
-   do k = ks, ke
-      do j = js, je
-         do i = is, ie
+   do k = kts, kte
+      do j = jts, jte
+         do i = its, ite
 
             !------------------------------------------------------------------
             ! [1.0] initialise:
             !------------------------------------------------------------------
 
-            t_c = xb % t(i,j,k) - t_kelvin
+            t_c = grid%xb % t(i,j,k) - t_kelvin
    
             !------------------------------------------------------------------
             ! [2.0] Calculate saturation vapour pressure:
@@ -52,7 +45,7 @@ subroutine da_tp_to_qs1( xb, xp, es, qs)
             !------------------------------------------------------------------
 
             qs(i,j,k) = rd_over_rv * es(i,j,k) / &
-                     (xb % p(i,j,k) - rd_over_rv1 * es(i,j,k))
+                     (grid%xb % p(i,j,k) - rd_over_rv1 * es(i,j,k))
 
          end do
       end do

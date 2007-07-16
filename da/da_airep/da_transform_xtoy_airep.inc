@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_airep (xa, iv, xp, y)
+subroutine da_transform_xtoy_airep (grid, iv, y)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_airep (xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
+   type (y_type), intent(inout) :: y        ! y = h (grid%grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -35,14 +34,14 @@ subroutine da_transform_xtoy_airep (xa, iv, xp, y)
          dxm = iv%airep(n)%loc%dxm
 
          ![1.2] Interpolate horizontally:
-         call da_interp_lin_3d(xa % u, xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%u, k, iv%airep(n)%zk, k)
+         call da_interp_lin_3d(grid%xa % u, i, j, dx, dy, dxm, dym, &
+            y%airep(n)%u, k, iv%airep(n)%zk, k)
 
-         call da_interp_lin_3d(xa % v, xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%v, k, iv%airep(n)%zk, k)
+         call da_interp_lin_3d(grid%xa % v, i, j, dx, dy, dxm, dym, &
+            y%airep(n)%v, k, iv%airep(n)%zk, k)
 
-         call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
-                           y%airep(n)%t, k, iv%airep(n)%zk, k)
+         call da_interp_lin_3d(grid%xa % t, i, j, dx, dy, dxm, dym, &
+            y%airep(n)%t, k, iv%airep(n)%zk, k)
       end do
    end if
 

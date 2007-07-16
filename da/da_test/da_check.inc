@@ -6,7 +6,8 @@ subroutine da_check(grid, config_flags, cv_size, xbx, be, ep, iv, vv, vp, y)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain),               intent(inout) :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xbx_type),   intent(in)    :: xbx   ! Header & non-gridded vars.

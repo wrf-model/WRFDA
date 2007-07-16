@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
+subroutine da_transform_xtoy_crtm (grid, iv, y )
 
    !---------------------------------------------------------------------------
    !  PURPOSE: transform from analysis increment to 
@@ -13,35 +13,28 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
    !
    !---------------------------------------------------------------------------
 
-   IMPLICIT NONE
+   implicit none
 
-   TYPE (x_type), INTENT(IN)      :: xa       ! delta_x
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)  :: y        ! H' delta_x
-   TYPE (ob_type), INTENT(IN)     :: iv       ! O-B structure.
+   type (domain),  intent(in)      :: grid
+   type (y_type),  intent(inout)  :: y        ! H' delta_x
+   type (ob_type), intent(in)     :: iv       ! O-B structure.
 
-   INTEGER                        :: k  ! Index dimension.
+#ifdef CRTM
+   integer                        :: k  ! Index dimension.
 
-   INTEGER            :: inst, num_rad, nchanl, n
+   integer            :: inst, num_rad, nchanl, n
    real, allocatable :: temperature(:,:)
    real, allocatable :: absorber(:,:)
    real, allocatable :: psfc(:)
 
-#if defined(CRTM)
-   ! CRTM local varaibles and types
+   ! CRTM local variables and types
    INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
    TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
    TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
    !TYPE( CRTM_Options_type )      :: Options
-#endif
 !---------------------------------------------------------
-
-#if !defined(CRTM)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $CRTM option for radiances"/))
-#else
 
    IF ( iv%num_inst < 1 ) return
 
@@ -51,7 +44,7 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
 ! CRTM allocation
 !
 ! Atmosphere structure
-    Atmosphere%n_Layers=(xp%kte-xp%kts)+1   ! number of vertical levels
+    Atmosphere%n_Layers=(kte-kts)+1   ! number of vertical levels
     Atmosphere%n_Absorbers=2
     Atmosphere%n_Clouds=0
     Atmosphere%n_Aerosols=0
@@ -135,24 +128,24 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
       allocate (absorber(atmosphere%n_layers, num_rad))
       allocate (psfc(num_rad))
 
-      do k=xp%kts,xp%kte ! from bottem to top
-         call da_interp_lin_2d_new( xa%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+      do k=kts,kte ! from bottem to top
+         call da_interp_lin_2d_new( grid%xa%t(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
             iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-            temperature(xp%kte-k+1,:), num_rad)
+            temperature(kte-k+1,:), num_rad)
 
-         call da_interp_lin_2d_new( xa%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( grid%xa%q(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
             iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
             iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
-            absorber(xp%kte-k+1,:), num_rad)
+            absorber(kte-k+1,:), num_rad)
 
-         where (iv%instid(inst)%pm(xp%kte-k+1,:) < 75.0) &
-            absorber(xp%kte-k+1,:) = 0.0
+         where (iv%instid(inst)%pm(kte-k+1,:) < 75.0) &
+            absorber(kte-k+1,:) = 0.0
       end do
 
-      call da_interp_lin_2d_new( xa%psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new( grid%xa%psfc, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i, iv%instid(inst)%loc_j, &
          iv%instid(inst)%loc_dx, iv%instid(inst)%loc_dy, &
          iv%instid(inst)%loc_dxm, iv%instid(inst)%loc_dym, &
@@ -220,11 +213,11 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
        !Surface%Snow_Grain_Size=2.0            ! mm
      endif
      if (Surface%Ice_Coverage > 0.) then
-       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
+       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single egrid%xample is FRESH_ICE
        Surface%Ice_Temperature=iv%instid(inst)%ts(n)       ! K
        Surface%Ice_Thickness=10.              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
-       !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
+       !Surface%Ice_Roughness=0.               ! NO Table offered, single egrid%xample is ZERO
      endif
      Surface%SensorData%n_channels = nchanl
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
@@ -252,8 +245,8 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
     CALL CRTM_Zero_Atmosphere( Atmosphere_TL )
     CALL CRTM_Zero_Surface( Surface_TL )
        
-    Atmosphere_TL%Temperature(xp%kts:xp%kte)             = temperature(xp%kts:xp%kte,n)
-    Atmosphere_TL%Absorber(xp%kts:xp%kte,1)              = absorber(xp%kts:xp%kte,n)
+    Atmosphere_TL%Temperature(kts:kte)             = temperature(kts:kte,n)
+    Atmosphere_TL%Absorber(kts:kte,1)              = absorber(kts:kte,n)
     Atmosphere_TL%Level_Pressure(Atmosphere_TL%n_Layers) = psfc(n)
 
               Atmosphere_TL%Level_Pressure(Atmosphere%n_Layers)= &
@@ -345,6 +338,9 @@ subroutine da_transform_xtoy_crtm ( xa, iv, xp, y )
     endif
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_crtm")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $CRTM option for radiances"/))
 #endif
 
 end subroutine da_transform_xtoy_crtm

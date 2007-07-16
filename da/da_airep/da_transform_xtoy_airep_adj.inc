@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_airep_adj(iv, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_airep_adj(iv, jo_grad_y, jo_grad_x)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,7 +7,6 @@ subroutine da_transform_xtoy_airep_adj(iv, xp, jo_grad_y, jo_grad_x)
    implicit none
 
    type (ob_type), intent(in)    :: iv          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -31,11 +30,11 @@ subroutine da_transform_xtoy_airep_adj(iv, xp, jo_grad_y, jo_grad_x)
          dxm = iv%airep(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d_adj(jo_grad_x % u, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % u, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%u, k, iv%airep(n)%zk, k)
-         call da_interp_lin_3d_adj(jo_grad_x % v, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % v, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%v, k, iv%airep(n)%zk, k)
-         call da_interp_lin_3d_adj(jo_grad_x % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d_adj(jo_grad_x % t, i, j, dx, dy, dxm, dym, &
                                jo_grad_y%airep(n)%t, k, iv%airep(n)%zk, k)
       end do
    end if

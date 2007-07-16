@@ -67,8 +67,8 @@ subroutine da_allocate_observations  (ob)
    if (ob%num_buoy     > 0) &
       allocate(ob%buoy(1:ob%num_buoy))
 
-   if (ob%num_Radar     > 0) &
-      allocate(ob%Radar(1:ob%num_Radar))
+   if (ob%num_radar     > 0) &
+      allocate(ob%radar(1:ob%num_radar))
 
    if (ob%num_Bogus     > 0) &
       allocate(ob%Bogus(1:ob%num_Bogus))

@@ -1,6 +1,6 @@
 module da_radar
 
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
 
    use da_control, only : obs_qc_pointer,max_ob_levels,missing_r, &
       v_interp_p, v_interp_h, check_max_iv_print, trace_use, &
@@ -8,9 +8,9 @@ module da_radar
       max_error_p,max_error_q, check_max_iv_unit,check_max_iv,  &
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, num_radar_tot,fails_error_max, &
-      use_Radar_rv, use_Radar_rf,below_model_surface,mkz,above_model_lid,&
+      use_radar_rv, use_radar_rf,below_model_surface,mkz,above_model_lid,&
       fg_format,fg_format_wrf,fg_format_kma_global,max_error_rv,max_error_rf, &
-      far_below_model_surface
+      far_below_model_surface,kms,kme,kts,kte
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       radar_type, info_type, field_type
@@ -23,20 +23,20 @@ module da_radar
 
    ! The "stats_radar_type" is ONLY used locally in da_radar:
 
-   type residual_Radar1_type
+   type residual_radar1_type
       real                    :: rv
       real                    :: rf
-   end type residual_Radar1_type
+   end type residual_radar1_type
 
-   type maxmin_Radar_stats_type
+   type maxmin_radar_stats_type
       type (maxmin_type)         :: rv       ! Radial velocity
       type (maxmin_type)         :: rf       ! Reflectivity
-   end type maxmin_Radar_stats_type
+   end type maxmin_radar_stats_type
 
-   type stats_Radar_type
-      type (maxmin_Radar_stats_type)  :: maximum, minimum
-      type (residual_Radar1_type)     :: average, rms_err
-   end type stats_Radar_type
+   type stats_radar_type
+      type (maxmin_radar_stats_type)  :: maximum, minimum
+      type (residual_radar1_type)     :: average, rms_err
+   end type stats_radar_type
 
 contains
 

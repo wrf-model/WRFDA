@@ -1,17 +1,15 @@
-subroutine da_add_flow_dependence_xa (ne, ep, vp, xa, &
-                                      its,ite, jts,jte, kts,kte)
+subroutine da_add_flow_dependence_xa (grid, ne, ep, vp)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Add flow-dependent increments in model space (xa).
+   ! Purpose: Add flow-dependent increments in model space (grid%xa).
    !-----------------------------------------------------------------------
                                       
    implicit none
    
+   type (domain), intent(inout)         :: grid
    integer, intent(in)                  :: ne  ! Ensemble size.
    type (ep_type), intent(in)           :: ep  ! Ensemble perturbations.
    type (vp_type), intent(in)           :: vp  ! CV on grid structure.
-   type (x_type), intent(inout)         :: xa  ! Analysis increments.
-   integer, intent(in)                  :: its, ite, jts, jte, kts, kte
    
    integer                              :: n, k! Loop counters.
 
@@ -19,25 +17,25 @@ subroutine da_add_flow_dependence_xa (ne, ep, vp, xa, &
       do k = kts, kte
 
          ! u:
-         xa % u(its:ite,jts:jte,k) = xa % u(its:ite,jts:jte,k) + &
+         grid%xa % u(its:ite,jts:jte,k) = grid%xa % u(its:ite,jts:jte,k) + &
                                      vp % alpha(its:ite,jts:jte,n) * &
                                      ep % v1(its:ite,jts:jte,k,n) ! v1 = u
          ! v:
-         xa % v(its:ite,jts:jte,k) = xa % v(its:ite,jts:jte,k) + &
+         grid%xa % v(its:ite,jts:jte,k) = grid%xa % v(its:ite,jts:jte,k) + &
                                      vp % alpha(its:ite,jts:jte,n) * &
                                      ep % v2(its:ite,jts:jte,k,n) ! v2 = v
          ! t:
-         xa % t(its:ite,jts:jte,k) = xa % t(its:ite,jts:jte,k) + &
+         grid%xa % t(its:ite,jts:jte,k) = grid%xa % t(its:ite,jts:jte,k) + &
                                      vp % alpha(its:ite,jts:jte,n) * &
                                      ep % v3(its:ite,jts:jte,k,n) ! v3 = t
          ! q:
-         xa % q(its:ite,jts:jte,k) = xa % q(its:ite,jts:jte,k) + &
+         grid%xa % q(its:ite,jts:jte,k) = grid%xa % q(its:ite,jts:jte,k) + &
                                      vp % alpha(its:ite,jts:jte,n) * &
                                      ep % v4(its:ite,jts:jte,k,n) ! v4 = q
       end do
 
       ! ps:
-      xa % psfc(its:ite,jts:jte) = xa % psfc(its:ite,jts:jte) + &
+      grid%xa % psfc(its:ite,jts:jte) = grid%xa % psfc(its:ite,jts:jte) + &
                                   vp % alpha(its:ite,jts:jte,n) * &
                                   ep % v5(its:ite,jts:jte,1,n) ! v5 = ps
    end do

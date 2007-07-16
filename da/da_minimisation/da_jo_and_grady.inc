@@ -16,7 +16,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
                                    jo_metar, jo_ships, jo_gpspw, &
                                    jo_ssmi , jo_ssmt1, jo_ssmt2, &
                                    jo_pseudo, jo_qscat, jo_buoy, &
-                                   jo_profiler, jo_Radar, jo_gpsref, jo_bogus, &
+                                   jo_profiler, jo_radar, jo_gpsref, jo_bogus, &
                                    jo_radiance, jo_airsr
    integer                      :: i,k
 
@@ -104,7 +104,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    call da_jo_and_grady_pilot(iv, re, jo, jo_grad_y)
    jo_pilot = jo % pilot_u + jo % pilot_v
 
-   ! Satem
+   ! satem
 
    call da_jo_and_grady_satem(iv, re, jo, jo_grad_y)
    jo_satem = jo % satem_thickness
@@ -145,10 +145,10 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
    call da_jo_and_grady_ssmt2(iv, re, jo, jo_grad_y)  
    jo_ssmt2 = jo % ssmt2_rh
 
-   ! Radar obs:
+   ! radar obs:
 
    call da_jo_and_grady_radar(iv, re, jo, jo_grad_y)
-   jo_Radar = jo % Radar_rv + jo % Radar_rf
+   jo_radar = jo % radar_rv + jo % radar_rf
 
    ! Pseudo obs:
 
@@ -219,7 +219,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
                 jo_pilot + jo_airep + jo_metar + jo_ships + &
                 jo_gpspw + jo_ssmi + jo_ssmt1 + jo_ssmt2 + &
                 jo_pseudo + jo_qscat + jo_profiler + jo_buoy + &
-                jo_Radar + jo_gpsref + jo_bogus + jo_radiance + jo_airsr
+                jo_radar + jo_gpsref + jo_bogus + jo_radiance + jo_airsr
 
    jot = jo % total
 

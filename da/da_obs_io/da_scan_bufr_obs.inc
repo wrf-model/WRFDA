@@ -224,45 +224,45 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
          case (11, 12, 13, 22, 23, 31)
             select case(kx)
             case (120, 122, 132, 220, 222, 232) ;         ! Sound
-               if (.not.use_SoundObs) cycle reports
+               if (.not.use_soundobs) cycle reports
                num_sound = num_sound + 1
 
             case (221) ;                   ! Pilot 
-               if (.not.Use_PilotObs) cycle reports
+               if (.not.use_pilotobs) cycle reports
                num_pilot = num_pilot + 1
             end select
 
          case (41)
          ! case (130:131, 133, 230:231, 233) ;  ! Airep
-            if (.not.use_AirepObs) cycle reports
+            if (.not.use_airepobs) cycle reports
             num_airep = num_airep + 1
 
          ! case (180, 182, 280, 282) ;          ! Ships and buoys
          case (522, 523) ;
-            if (.not.use_ShipsObs) cycle reports
+            if (.not.use_shipsobs) cycle reports
             num_ships = num_ships + 1
 
          case (531, 561, 562) ;                ! Buoy
-            if (.not.use_BuoyObs) cycle reports
+            if (.not.use_buoyobs) cycle reports
             num_buoy  = num_buoy  + 1
 
          case (511)
          ! case (181, 281) ;            ! Synop
-            if (.not.use_SynopObs) cycle reports
+            if (.not.use_synopobs) cycle reports
             num_synop = num_synop + 1
 
          case (512)
          ! case (187 , 287) ;                   ! Metar
-            if (.not.use_MetarObs) cycle reports
+            if (.not.use_metarobs) cycle reports
             num_metar = num_metar + 1
 
          case (63)
          ! case (242:246, 252:253, 255);  ! Geo. CMVs
-            if (.not.use_GeoAMVObs) cycle reports
+            if (.not.use_geoamvobs) cycle reports
             num_geoamv = num_geoamv + 1
 
          case (71, 72)        ;         !  Profiler & VADWND - NEXRAD winds
-            if (.not.use_ProfilerObs) cycle reports
+            if (.not.use_profilerobs) cycle reports
             num_profiler = num_profiler + 1
 
          case (582)    ;                 !  Quikscat
@@ -270,18 +270,18 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
             num_qscat  = num_qscat  + 1
 
          case (583)    ;                 !  GPS IPW
-            if (.not.use_GpspwObs) cycle reports
+            if (.not.use_gpspwobs) cycle reports
             num_gpspw  = num_gpspw + 1
 
          case (584)    ;                 !  GPS REF
-            if (.not.use_GpsrefObs) cycle reports
+            if (.not.use_gpsrefobs) cycle reports
             num_gpsref  = num_gpsref + 1
 
          case default ;
             select case (kx)
             case (111 , 210)    ;           !  Tropical Cyclone Bogus
                !  Note Tropical cyclone Bougus is given type 135 in Obs-ascii
-               if (.not.use_BogusObs) cycle reports
+               if (.not.use_bogusobs) cycle reports
             num_bogus = num_bogus + 1
 
             case default 

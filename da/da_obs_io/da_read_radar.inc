@@ -1,7 +1,7 @@
 subroutine da_read_radar (ob, xp, filename)
 
    !-----------------------------------------------------------------------
-   ! Purpose: Read the Radar observation file
+   ! Purpose: Read the radar observation file
    !----------------------------------------------------------------------------------------!
 
    implicit none
@@ -112,7 +112,7 @@ subroutine da_read_radar (ob, xp, filename)
                            'The observation time for this data is ',     &
                            platform % stn % date_char
 
-      read (unit=char_ned (69:74),fmt='(I6)', iostat = iost) platform % stn % numObs
+      read (unit=char_ned (69:74),fmt='(I6)', iostat = iost) platform % stn % numobs
 
       if (print_detail_radar) write (unit=stdout,fmt='(A,I6)')   &
                            'Total number of Super-observations is ', &
@@ -152,7 +152,7 @@ subroutine da_read_radar (ob, xp, filename)
 
          do i = 1, platform % info % levels
             ! height
-            platform%each(i) = Radar_each_level_type(missing_r, missing, -1.0,       &
+            platform%each(i) = radar_each_level_type(missing_r, missing, -1.0,       &
                field_type(missing_r, missing, missing_r), & ! rv
                field_type(missing_r, missing, missing_r))   ! rf
 
@@ -194,7 +194,7 @@ subroutine da_read_radar (ob, xp, filename)
 
          if (nlevels > max_ob_levels) then
             write(unit=message(1),fmt='(A,2I8)') &
-               ' Radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
+               ' radar=> nlevels > max_ob_levels:',nlevels, max_ob_levels
             call da_warning(__FILE__,__LINE__,message(1:1)) 
             nlevels = max_ob_levels
              platform%info%levels = nlevels
@@ -217,7 +217,7 @@ subroutine da_read_radar (ob, xp, filename)
 
                if (num_radar > max_radar) then
                  write(unit=message(1),fmt='(A,I6,A,I6)') &
-                   "Radar #= ",ob % num_radar, " > max_radar = ", max_radar
+                   "radar #= ",ob % num_radar, " > max_radar = ", max_radar
                  call da_error(__FILE__,__LINE__,message(1:1))
                end if
                platform % loc%obs_global_index = ob%num_radar_glo
@@ -272,12 +272,12 @@ subroutine da_read_radar (ob, xp, filename)
    if (print_detail_radar) then
       write(unit=stdout, fmt='(a)')  ' '
       write(unit=stdout, fmt='(5x,a,i6,a)') &
-         ' Read:  ', ob % num_radar, ' Radar reports '
+         ' Read:  ', ob % num_radar, ' radar reports '
    end if
 
    if (ob%ob_numb(ob%current_ob_time)%radar /= ob%num_radar) then
       write(unit=message(1),fmt='(a, i6, 2x, a, i6)') &
-         'Radar obs mismatch ob%ob_numb(ob%current_ob_time)%radar=', &
+         'radar obs mismatch ob%ob_numb(ob%current_ob_time)%radar=', &
          ob%ob_numb(ob%current_ob_time)%radar, &
          'ob%num_radar=', ob%num_radar
       call da_error(__FILE__,__LINE__,message(1:1))

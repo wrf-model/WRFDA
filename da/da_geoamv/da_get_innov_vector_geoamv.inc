@@ -25,7 +25,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
    real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
    real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
 
-   real, dimension(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. location.
+   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. location.
 
    integer           :: itu,ituf,itvv,itvvf
 
@@ -55,7 +55,7 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
       dxm = iv%geoamv(n)%loc%dxm
       dym = iv%geoamv(n)%loc%dym
 
-      do k=xp%kts,xp%kte
+      do k=kts,kte
          v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                 + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
       end do
@@ -73,9 +73,9 @@ subroutine da_get_innov_vector_geoamv( it, xb, xp, ob, iv)
          end if
       end do
 
-      call da_interp_lin_3d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % u, i, j, dx, dy, dxm, dym, &
                           model_u, max_ob_levels,iv%geoamv(n)%zk,num_levs)
-      call da_interp_lin_3d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d( xb % v, i, j, dx, dy, dxm, dym, &
                           model_v, max_ob_levels,iv%geoamv(n)%zk,num_levs)
 
       do k = 1, iv % geoamv(n) % info % levels

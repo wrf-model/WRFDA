@@ -1,4 +1,4 @@
-subroutine da_transform_xtotpw(xa, xb)
+subroutine da_transform_xtotpw(grid)
 
    !---------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,25 +6,24 @@ subroutine da_transform_xtotpw(xa, xb)
 
    implicit none
    
-   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
-   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (domain),  intent(inout) :: grid
 
    integer :: i, j, K
 
    real    :: pw
 
    ! WEIGHTED SUM OF VERTICAL COLUMN
-   do j=xb%jts, xb%jte
-      do i=xb%its, xb%ite
+   do j=jts, jte
+      do i=its, ite
          pw = 0.0
-         do k=xb%kts, xb%kte
-            pw = pw + (xb%hf(i,j,k+1)-xb%hf(i,j,k)) &
-                    * (xa%q(i,j,k)*xb%rho(i,j,k) &
-                    +  xb%q(i,j,k)*xa%rho(i,j,k))
+         do k=kts, kte
+            pw = pw + (grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k)) &
+                    * (grid%xa%q(i,j,k)*grid%xb%rho(i,j,k) &
+                    +  grid%xb%q(i,j,k)*grid%xa%rho(i,j,k))
          end do
  
          ! To convert the unit of PW to cm:
-         xa%tpw(i,j) = 0.1*pw
+         grid%xa%tpw(i,j) = 0.1*pw
       end do
    end do
  

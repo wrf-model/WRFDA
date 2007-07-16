@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_buoy (xa, xb, iv, xp, y)
+subroutine da_transform_xtoy_buoy (grid, iv, y)
 
    !--------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,11 +6,9 @@ subroutine da_transform_xtoy_buoy (xa, xb, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(inout) :: xa       ! gridded analysis increment.
-   type (xb_type), intent(in)    :: xb       ! first guess state.
+   type (domain),  intent(inout) :: grid
    type (ob_type), intent(in)    :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in) :: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout)  :: y        ! y = h (xa) (linear)
+   type (y_type), intent(inout)  :: y        ! y = h (grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j     ! Index dimension.
@@ -40,23 +38,22 @@ subroutine da_transform_xtoy_buoy (xa, xb, iv, xp, y)
             dxm = iv%buoy(n)%loc%dxm
 
             ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d(xa % u, xp, i, j, dx, dy, dxm, dym, &
-                                  y%buoy(n)%u, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % v, xp, i, j, dx, dy, dxm, dym, &
-                                  y%buoy(n)%v, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % t, xp, i, j, dx, dy, dxm, dym, &
-                                  y%buoy(n)%t, iv%buoy(n)%zk)
-            call da_interp_obs_lin_2d(xa % q, xp, i, j, dx, dy, dxm, dym, &
-                                  y%buoy(n)%q, iv%buoy(n)%zk)
+            call da_interp_obs_lin_2d(grid%xa % u, i, j, dx, dy, dxm, dym, &
+               y%buoy(n)%u, iv%buoy(n)%zk)
+            call da_interp_obs_lin_2d(grid%xa % v, i, j, dx, dy, dxm, dym, &
+               y%buoy(n)%v, iv%buoy(n)%zk)
+            call da_interp_obs_lin_2d(grid%xa % t, i, j, dx, dy, dxm, dym, &
+               y%buoy(n)%t, iv%buoy(n)%zk)
+            call da_interp_obs_lin_2d(grid%xa % q, i, j, dx, dy, dxm, dym, &
+               y%buoy(n)%q, iv%buoy(n)%zk)
 
-            call da_interp_lin_2d(xa % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
-                              i, j, dx, dy, dxm, dym, &
-                              y%buoy(n)%p)
+            call da_interp_lin_2d(grid%xa % psfc, ims, ime, jms, jme, &
+               i, j, dx, dy, dxm, dym, y%buoy(n)%p)
          end do
       else if (sfc_assi_options == 2) then
          ! [2.0] Surface assimilation approach 2
          do n=iv%ob_numb(iv%current_ob_time-1)%buoy + 1, iv%ob_numb(iv%current_ob_time)%buoy
-            call da_transform_xtopsfc(xb,xa,xp,iv%buoy(n),y%buoy(n))
+            call da_transform_xtopsfc(grid,iv%buoy(n),y%buoy(n))
          end do
       end if
    end if

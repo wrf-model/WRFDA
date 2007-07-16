@@ -22,13 +22,13 @@ subroutine da_uvprho_to_w_adj(grid)
 
    if (trace_use) call da_trace_entry("da_uvprho_to_w_adj")
 
-   !initialize to zero for some variables because of the adjoint requirements.
+   ! initialize to zero for some variables because of the adjoint requirements.
 
-   WZ(:,:,:)=0.
-   URHO(:,:,:)=0.0
-   VRHO(:,:,:)=0.0
-   DIV(:,:,:)=0.0
-   TERM3=0.0
+   WZ(:,:,:)   = 0.0
+   URHO(:,:,:) = 0.0
+   VRHO(:,:,:) = 0.0
+   DIV(:,:,:)  = 0.0
+   TERM3       = 0.0
 
    ! integration to calculate the vertical velocity
 
@@ -82,7 +82,7 @@ subroutine da_uvprho_to_w_adj(grid)
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid, URHO,VRHO, DIV)
 
    ! Computation to check for edge of domain:
    if (test_wrfvar) then
@@ -123,7 +123,7 @@ subroutine da_uvprho_to_w_adj(grid)
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, URHO,VRHO, DIV)
+   call da_uv_to_divergence_adj(grid, URHO,VRHO, DIV)
 
    do K=kts,kte
       do J=js,je
@@ -159,7 +159,7 @@ subroutine da_uvprho_to_w_adj(grid)
       end do
    end do
 
-   call da_uv_to_divergence_adj(grid,grid%xp, grid%xb, grid%xa%u,grid%xa%v, DIV)
+   call da_uv_to_divergence_adj(grid, grid%xa%u,grid%xa%v, DIV)
 
    ! Computation to check for edge of domain:
    is = its
@@ -213,9 +213,9 @@ subroutine da_uvprho_to_w_adj(grid)
       do J=js,je
          do I=is,ie
             grid%xa%v(I,J,K)=grid%xa%v(I,J,K)-WZ(I,J,K)*  &
-                     (grid%xb%p(I,J+1,K)-grid%xb%p(I,J-1,K))*grid%xb%coefy(I,J)
+               (grid%xb%p(I,J+1,K)-grid%xb%p(I,J-1,K))*grid%xb%coefy(I,J)
             grid%xa%u(I,J,K)=grid%xa%u(I,J,K)-WZ(I,J,K)*  &
-                     (grid%xb%p(I+1,J,K)-grid%xb%p(I-1,J,K))*grid%xb%coefx(I,J)
+               (grid%xb%p(I+1,J,K)-grid%xb%p(I-1,J,K))*grid%xb%coefx(I,J)
          end do
       end do
    end do

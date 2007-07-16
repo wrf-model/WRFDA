@@ -14,16 +14,16 @@ subroutine da_calculate_grady_satem(iv, re, jo_grad_y)
 
    integer                      :: n, k
 
-   if (iv%num_Satem > 0) then
-      do n=1, iv%num_Satem
+   if (iv%num_satem > 0) then
+      do n=1, iv%num_satem
             do k=1, iv%satem(n)%info%levels
-               if (iv%Satem(n)%thickness(k)%qc < obs_qc_pointer) then
-                  re%Satem(n)%thickness(k) = 0.0
+               if (iv%satem(n)%thickness(k)%qc < obs_qc_pointer) then
+                  re%satem(n)%thickness(k) = 0.0
                end if
 
-               jo_grad_y%Satem(n)%thickness(k) = -re%Satem(n)%thickness(k) / &
-                                         (iv%Satem(n)%thickness(k)%error * &
-                                           iv%Satem(n)%thickness(k)%error)
+               jo_grad_y%satem(n)%thickness(k) = -re%satem(n)%thickness(k) / &
+                                         (iv%satem(n)%thickness(k)%error * &
+                                           iv%satem(n)%thickness(k)%error)
             end do
       end do
    end if

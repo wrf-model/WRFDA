@@ -40,8 +40,8 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
            STATUS = 'OLD')
 
       if (iost /= 0) then
-         Use_SsmiRetrievalObs = .false.
-         Use_SsmiTbObs  = .false.
+         use_ssmiretrievalobs = .false.
+         use_ssmitbobs  = .false.
          use_ssmt1obs   = .false.
          use_ssmt2obs   = .false.
 
@@ -66,8 +66,8 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
    !     -------------
 
    if (iost /= 0) then
-      Use_SsmiRetrievalObs = .false.
-      Use_SsmiTbObs  = .false.
+      use_ssmiretrievalobs = .false.
+      use_ssmitbobs  = .false.
       use_ssmt1obs   = .false.
       use_ssmt2obs   = .false.
       call da_warning(__FILE__,__LINE__, &
@@ -87,10 +87,10 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
          select case (char_ned (I+1:I+5))
          ! Number of observations
          case ('SSMI ') ; 
-            if (Use_SsmiRetrievalObs) &
+            if (use_ssmiretrievalobs) &
                read (char_ned (I+9:I+14),'(I6)', iostat = iost) &
                   ob%num_ssmi_retrieval
-            if (Use_SsmiTbObs) then
+            if (use_ssmitbobs) then
                read (char_ned (I+9:I+14),'(I6)', iostat = iost) ob%num_ssmi_tb
             end if
          case ('OTHER') ; 
@@ -133,8 +133,8 @@ subroutine da_read_ssmi_info (iunit, ob, xb, xbx)
       read (unit = iunit, fmt = '(A)', iostat = iost) char_ned
 
       if (iost /= 0) then
-         Use_SsmiRetrievalObs = .false.
-         Use_SsmiTbObs  = .false.
+         use_ssmiretrievalobs = .false.
+         use_ssmitbobs  = .false.
          use_ssmt1obs   = .false.
          use_ssmt2obs   = .false.
          call da_warning(__FILE__,__LINE__, &

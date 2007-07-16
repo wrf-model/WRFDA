@@ -1,4 +1,4 @@
-subroutine da_transform_xtogpsref(xb, xp)
+subroutine da_transform_xtogpsref(grid)
 
    !-------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,38 +6,33 @@ subroutine da_transform_xtogpsref(xb, xp)
 
    implicit none
 
-   ! input : xb%q, xb%p, xb%t, and xp
-   ! output: xb%ref
+   ! input : grid%xb%q, grid%xb%p, grid%xb%t, and xp
+   ! output: grid%xb%ref
 
-   type (xb_type), intent(inout) :: xb      ! First guess structure.
-   type(xpose_type), intent(in)  :: xp      ! domain decomposition vars.
+   type (domain), intent(inout) :: grid
    
-   integer :: i, j, k, is, ie, js, je, ks, ke
+   integer :: i, j, k
    real    :: partone, parttwo, dividnd
 
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte      
-
-   do k = ks, ke
-      do j = js, je
-         do i = is, ie
+   do k = kts, kte
+      do j = jts, jte
+         do i = its, ite
 
             ! calculate refractivity
 
             !  1, Hydrostatic part of refractivity:
             !     Note: p in Pascal.
 
-            partone  = 0.776*xb%p(i,j,k)/xb%t(i,j,k)
+            partone  = 0.776*grid%xb%p(i,j,k)/grid%xb%t(i,j,k)
 
             !  2, (Wet part) / (hydrostatic part):
-            !     Note: xb%q is the specific humidity --- an analysis variable
+            !     Note: grid%xb%q its the specific humidity --- an analysis variable
 
-            dividnd  = xb%t(i,j,k)*(0.622+0.378*xb%q(i,j,k))
-            parttwo  = 1.0+coeff*xb%q(i,j,k)/dividnd
+            dividnd  = grid%xb%t(i,j,k)*(0.622+0.378*grid%xb%q(i,j,k))
+            parttwo  = 1.0+coeff*grid%xb%q(i,j,k)/dividnd
 
             !  3, Refractivity:
-            xb%ref(i,j,k)= partone * parttwo
+            grid%xb%ref(i,j,k)= partone * parttwo
          end do
       end do
    end do

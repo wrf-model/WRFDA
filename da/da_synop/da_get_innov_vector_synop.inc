@@ -25,8 +25,8 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
    real                         :: model_p  ! Model value p at oblocation.
    real                         :: model_q  ! Model value q at oblocation.
 
-   real, dimension(xp%kms:xp%kme) :: v_h      ! Model value h at ob hor. loc
-   real, dimension(xp%kms:xp%kme) :: v_p      ! Model value p at ob hor. loc
+   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. loc
+   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. loc
 
    real :: hd, psfcm
 
@@ -64,15 +64,15 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
          iv%synop(n)%zk=missing_r
 
          if (iv % synop(n) % h > missing_r) then
-            do k=xp%kts,xp%kte
+            do k=kts,kte
                v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
                        + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
             end do
 
-            hd = v_h(xp%kts) - iv % synop(n) % h
+            hd = v_h(kts) - iv % synop(n) % h
             if (abs(hd) <= Max_StHeight_Diff .or.  anal_type_verify ) then
 
-               if (iv % synop(n) % h < v_h(xp%kts)) then
+               if (iv % synop(n) % h < v_h(kts)) then
                   iv%synop(n)%zk = 1.0+1.0e-6
                   call da_obs_sfc_correction(iv%synop(n), xb)
 
@@ -91,7 +91,7 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
               iv%synop(n)%zk = missing_r
             end if
          else if (ob % synop(n) % p > 1.0) then
-            do k=xp%kts,xp%kte
+            do k=kts,kte
               v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
                        + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
             end do
@@ -118,15 +118,15 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
             iv % synop(n) % p % qc = missing
          else
             ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d( xb % u, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
                                      model_u, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % v, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
                                      model_v, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % t, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_obs_lin_2d( xb % t, i, j, dx, dy, dxm, dym, &
                                       model_t, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % q, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_obs_lin_2d( xb % q, i, j, dx, dy, dxm, dym, &
                                      model_q, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % p, xp, i, j, dx, dy, dxm, dym, &
+            call da_interp_obs_lin_2d( xb % p, i, j, dx, dy, dxm, dym, &
                                      model_p, iv%synop(n)%zk)
          end if
       else if (sfc_assi_options == 2) then
@@ -135,27 +135,27 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
          ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
-         call da_interp_lin_2d( xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_u)
-         call da_interp_lin_2d( xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_v)
-         call da_interp_lin_2d( xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % t2, ims, ime, jms, jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_t)
-         call da_interp_lin_2d( xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % q2, ims, ime, jms, jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_q)
-         call da_interp_lin_2d( xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
                              i, j, dx, dy, dxm, dym, &
                              model_p)
 
          if (iv%synop(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
-            call da_interp_lin_2d( xb % terr, xp%ims, xp%ime, xp%jms, &
-               xp%jme, i, j, dx, dy, dxm, dym, hsm)
+            call da_interp_lin_2d( xb % terr, ims, ime, jms, &
+               jme, i, j, dx, dy, dxm, dym, hsm)
 
             ho = iv%synop(n)%h
             to = -888888.0

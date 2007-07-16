@@ -1,5 +1,4 @@
-subroutine da_write_filtered_obs(ob, iv, xb, xp, & 
-   phic, xlonc, truelat1, truelat2,              &
+subroutine da_write_filtered_obs(grid, ob, iv, &
    coarse_ix, coarse_jy, start_x, start_y)
 
    !------------------------------------------------------------------------
@@ -40,11 +39,9 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
 
    implicit none
 
+   type (domain),     intent(in)  :: grid
    type (y_type),     intent(in)  :: ob      ! Observation structure.
    type (ob_type),    intent(inout) :: iv      ! O-B structure.
-   type (xpose_type), intent(in)  :: xp      ! Domain decomposition vars.
-   type (xb_type),    intent(in)  :: xb      ! First guess structure.
-   real, intent(in)               :: phic, xlonc, truelat1, truelat2
    integer, intent(in)            :: coarse_ix, coarse_jy
    real, intent(in)               :: start_x, start_y
 
@@ -939,8 +936,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
    end if
 
    !--------------------------------------------------------------------------
-   ! Write Satem:          
-   ! Note: The Satem ref_p is put in the SLP position in OBSPROC data stream.
+   ! Write satem:          
+   ! Note: The satem ref_p is put in the SLP position in OBSPROC data stream.
    !--------------------------------------------------------------------------
 
    if (iv % num_satem > 0) then
@@ -1334,8 +1331,8 @@ subroutine da_write_filtered_obs(ob, iv, xb, xp, &
       if (iost /= 0) &
          call da_error(__FILE__,__LINE__, (/"Cannot open filtered_obs "/))
       call da_count_filtered_obs(&
-         xb%ptop, xb%map, xb%ds,  &
-         phic, xlonc, truelat1, truelat2,                 &
+         grid%xb%ptop, grid%xb%map, grid%xb%ds,  &
+         grid%moad_cen_lat, grid%stand_lon, grid%truelat1, grid%truelat2,                 &
          coarse_ix, coarse_jy, start_x, start_y)
       call da_final_write_filtered_obs
       close (filtered_obs_unit)

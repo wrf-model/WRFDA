@@ -110,27 +110,27 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
       write(unit=stdout, fmt=*) 'simple variables:'
 
-      if (jte == grid%xp%jde) then
+      if (jte == jde) then
          write(unit=stdout, fmt=*) ' '
 
          do k=kts+5,kte,10
             do i=its,ite,10
                write(unit=stdout, fmt=*) &
-                    '  grid%em_v_2(', i, ',', grid%xp%jde+1, ',', k, ')=', &
-                       grid%em_v_2(i, grid%xp%jde+1,k)
+                    '  grid%em_v_2(', i, ',', jde+1, ',', k, ')=', &
+                       grid%em_v_2(i, jde+1,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
       end if
 
-      if (ite == grid%xp%ide) then
+      if (ite == ide) then
          write(unit=stdout, fmt=*) ' '
 
          do k=kts+5,kte,10
             do j=jts,jte,10
                write(unit=stdout, fmt=*) &
-                  '  grid%em_u_2(', grid%xp%ide+1, ',', j, ',', k, ')=', &
-                  grid%em_u_2(grid%xp%ide+1,j,k)
+                  '  grid%em_u_2(', ide+1, ',', j, ',', k, ')=', &
+                  grid%em_u_2(ide+1,j,k)
             end do
             write(unit=stdout, fmt=*) ' '
          end do
@@ -270,8 +270,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid%xb%ivgtyp(i,j) = grid%ivgtyp(i,j)
          grid%xb%isltyp(i,j) = grid%isltyp(i,j)
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
-         ! convert snow water equivalent kg/m2 to snow depth mm
-         grid%xb%snowh(i,j) = grid%snow(i,j)*10.     
+         grid%xb%snowh(i,j) = grid%snowh(i,j)*1000. ! meter to mm    
       end do
 
       ! WHY?
@@ -457,7 +456,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    xbx % mminlu = 'USGS'
 
-   call da_roughness_from_lanu(19, xbx % mminlu, current_date, grid%xp, &
+   call da_roughness_from_lanu(19, xbx % mminlu, current_date, &
       grid%xb % lanu, grid%xb % rough)
 
    !---------------------------------------------------------------------------
@@ -537,7 +536,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! Sea level pressure and total precipitable water
    !---------------------------------------------------------------------------
 
-   call da_wrf_tpq_2_slp (grid%xb)
+   call da_wrf_tpq_2_slp (grid)
 
    ! WHY?
    ! do j = jts,jte
@@ -548,7 +547,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    !    end do
    ! end do
 
-   call da_integrat_dz(grid%xb)
+   call da_integrat_dz(grid)
 
    !---------------------------------------------------------------------------
    ! Surface wind speed
@@ -572,13 +571,13 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    !---------------------------------------------------------------------------
 
    if (use_ssmitbobs)   &
-      call da_transform_xtotb(grid%xb)
+      call da_transform_xtotb(grid)
 
    !---------------------------------------------------------------------------
    ! GPS Refractivity linked by Y.-R. Guo 05/28/2004
    !---------------------------------------------------------------------------
 
-   call da_transform_xtogpsref(grid%xb, grid%xp)
+   call da_transform_xtogpsref(grid)
 
    !---------------------------------------------------------------------------
    ! Ground-based GPS ZTD must follow the GPS Refractivity calculation.
@@ -593,12 +592,12 @@ subroutine da_transfer_wrftoxb(xbx, grid)
 
    ! WHY?
    ! if (.not. associated(xbx % latc_mean)) then
-   allocate (xbx % latc_mean(grid%xp%jds:grid%xp%jde))
+   allocate (xbx % latc_mean(jds:jde))
    if (trace_use) call da_trace("da_transfer_wrftoxb",&
       message="allocated xbx%latc_mean")
    ! end if
 
-   size2d = (grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1)
+   size2d = (ide-ids+1)*(jde-jds+1)
 
    tmpvar = 1.0/real(size2d)
 
@@ -606,7 +605,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! testing, at the cost of much-increased run-time.  Turn it off when not
    ! testing.  Thits will always be .false. for a serial or 1-process MPI run.
    if (test_dm_exact) then
-      allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
+      allocate(arrayglobal(ids:ide, jds:jde))
       call da_patch_to_global(grid%xp,grid%xb%psac, arrayglobal)
       loc_psac_mean = tmpvar*sum(arrayglobal(ids:ide,jds:jde))
       deallocate(arrayglobal)
@@ -614,7 +613,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
       loc_psac_mean = tmpvar*sum(grid%xb % psac(its:ite,jts:jte))
    end if
 
-   tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
+   tmpvar = 1.0/real(ide-ids+1)
 
    if (test_dm_exact) then
       allocate(arrayglobal(ids:ide, jds:jde))

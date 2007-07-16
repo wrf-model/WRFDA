@@ -19,6 +19,8 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    type (y_type),  intent(inout)  :: ob       ! Observation structure.
    type (ob_type), intent(inout)  :: iv       ! O-B structure.
 
+#if defined(RTTOV)
+
    integer                        :: n        ! Loop counter.
    integer                        :: k  ! Index dimension.
    integer                        :: nlevels ! Number of obs levels.
@@ -37,20 +39,16 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
    real   , allocatable :: zasat(:), zlsat(:)
 
+! FIX?
 real,allocatable :: temp(:)
 
    type(con_vars_type),  allocatable :: con_vars(:)
    type(aux_vars_type),  allocatable :: aux_vars(:)
 
    ! variables for computing clwp
-   real, allocatable :: vtm(:,:), dlnpf(:,:), clw(:,:), pf(:,:)
+   real, allocatable :: dpf(:,:), clw(:,:), pf(:,:)
 
    if ( iv%num_inst < 1 ) return
-
-#if !defined(RTTOV)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $RTTOV option for radiances"/))
-#else
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_rttov")
 
@@ -98,16 +96,15 @@ real,allocatable :: temp(:)
 
       pres(1:nlevels) = coefs(inst) % ref_prfl_p(1:nlevels)
 
-      allocate(v_p(xp%kms:xp%kme,n1:n2))
+      allocate(v_p(kms:kme,n1:n2))
       v_p(:,:)=0.0
-      allocate(vtm(xp%kms:xp%kme,n1:n2))
-      allocate(clw(xp%kms:xp%kme,n1:n2))
-      allocate(dlnpf(xp%kms:xp%kme,n1:n2))
-      allocate(pf(xp%kms:xp%kme+1,n1:n2))
+      allocate(clw(kms:kme,n1:n2))
+      allocate(dpf(kms:kme,n1:n2))
+      allocate(pf(kms:kme+1,n1:n2))
 
       ! horizontal interpolate xb pressure to ob position for every xb levels
       do n=n1,n2
-         do k=xp%kts,xp%kte
+         do k=kts,kte
             ! convert to mb
             v_p(k,n) = 0.01*(iv%instid(inst)%loc_dym(n)*( &
                iv%instid(inst)%loc_dxm(n)*xb%p(iv%instid(inst)%loc_i(n),  iv%instid(inst)%loc_j(n),k) + &
@@ -121,13 +118,13 @@ real,allocatable :: temp(:)
       call da_to_zk_new(pres, v_p(:,n1:n2), xp, v_interp_p, &
          iv%instid(inst)%zk(:,n1:n2), n1n2,nlevels )
 
-      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
+      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), kts, kte,  &
          iv%instid(inst)%loc_k(:,n1:n2), &
          iv%instid(inst)%loc_dz(:,n1:n2), &
          iv%instid(inst)%loc_dzm(:,n1:n2))
       ! [1.2] Interpolate horizontally to ob:
 
-      call da_interp_lin_3d_new( xb%t, xp, &
+      call da_interp_lin_3d_new( xb%t, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_k(:,n1:n2), &
@@ -139,7 +136,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dzm(:,n1:n2), &
          iv%instid(inst)%t(:,n1:n2), nlevels, n1n2 )
 
-      call da_interp_lin_3d_new( xb%q, xp, &
+      call da_interp_lin_3d_new( xb%q, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_k(:,n1:n2), &
@@ -172,7 +169,7 @@ real,allocatable :: temp(:)
          !-----------------------------------------
          call da_detsurtyp( xb%snow, xb%xice, xb%landmask,  &
             xb%ivgtyp, xb%isltyp, &
-            xp%ims, xp%ime, xp%jms, xp%jme, &
+            ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n), iv%instid(inst)%loc_j(n), &
             iv%instid(inst)%loc_dx(n), iv%instid(inst)%loc_dy(n), &
             iv%instid(inst)%loc_dxm(n), iv%instid(inst)%loc_dym(n), &
@@ -180,7 +177,7 @@ real,allocatable :: temp(:)
             seap, icep, lndp, snop )
       end do
 
-      call da_interp_lin_2d_new (xb % u10, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new (xb % u10, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -189,7 +186,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%u10(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new (xb % v10, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new (xb % v10, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -198,7 +195,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%v10(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new (xb % t2, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new (xb % t2, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -207,7 +204,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%t2m(n1:n2) ,n1n2)
 
-      call da_interp_lin_2d_new (xb % q2, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new (xb % q2, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -216,7 +213,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%q2m(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new(xb % psfc, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new(xb % psfc, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -228,7 +225,7 @@ real,allocatable :: temp(:)
       do n=n1,n2
          if (iv%instid(inst)%isflg(n) == 0) then   ! over sea using SST
             call da_interp_lin_2d( xb % tgrn, &
-               xp%ims, xp%ime, xp%jms, xp%jme, &
+               ims, ime, jms, jme, &
                iv%instid(inst)%loc_i(n), &
                iv%instid(inst)%loc_j(n), &
                iv%instid(inst)%loc_dx(n), &
@@ -238,7 +235,7 @@ real,allocatable :: temp(:)
                iv%instid(inst)%ts(n))
          else
             call da_interp_lin_2d( xb % tsk, &
-               xp%ims, xp%ime, xp%jms, xp%jme, &
+               ims, ime, jms, jme, &
                iv%instid(inst)%loc_i(n), &
                iv%instid(inst)%loc_j(n), &
                iv%instid(inst)%loc_dx(n), &
@@ -250,7 +247,7 @@ real,allocatable :: temp(:)
 
       end do
       call da_interp_lin_2d_new(xb % terr, &
-         xp%ims, xp%ime, xp%jms, xp%jme, &
+         ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -261,7 +258,7 @@ real,allocatable :: temp(:)
 
       ! variables for emissivity calculations
       !---------------------------------------- 
-      call da_interp_lin_2d_new( xb % smois, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new( xb % smois, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -270,7 +267,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%smois(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new( xb % tslb, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new( xb % tslb, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -279,7 +276,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%tslb(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new( xb % snowh, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new( xb % snowh, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -288,7 +285,7 @@ real,allocatable :: temp(:)
          iv%instid(inst)%loc_dym(n1:n2), &
          iv%instid(inst)%snowh(n1:n2),n1n2)
 
-      call da_interp_lin_2d_new( xb % vegfra, xp%ims, xp%ime, xp%jms, xp%jme, &
+      call da_interp_lin_2d_new( xb % vegfra, ims, ime, jms, jme, &
          iv%instid(inst)%loc_i(n1:n2), &
          iv%instid(inst)%loc_j(n1:n2), &
          iv%instid(inst)%loc_dx(n1:n2), &
@@ -302,8 +299,8 @@ real,allocatable :: temp(:)
 
       ! variables for calculation of cloud affected radiance
       !-------------------------------------------------------
-      do k=xp%kts,xp%kte
-         call da_interp_lin_2d_new( xb%t(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+      do k=kts,kte
+         call da_interp_lin_2d_new( xb%t(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -312,7 +309,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%tm(k,n1:n2),n1n2)
 
-         call da_interp_lin_2d_new( xb%q(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%q(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -321,7 +318,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qm(k,n1:n2),n1n2)
 
-         call da_interp_lin_2d_new( xb%qrn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%qrn(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -330,7 +327,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qrn(k,n1:n2),n1n2)
 
-         call da_interp_lin_2d_new( xb%qcw(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%qcw(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -339,7 +336,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qcw(k,n1:n2),n1n2)
 
-         call da_interp_lin_2d_new( xb%qci(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%qci(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -347,7 +344,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dxm(n1:n2), &
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qci(k,n1:n2),n1n2)
-         call da_interp_lin_2d_new( xb%qsn(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%qsn(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -356,7 +353,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qsn(k,n1:n2),n1n2)
 
-         call da_interp_lin_2d_new( xb%qgr(:,:,k), xp%ims, xp%ime, xp%jms, xp%jme, &
+         call da_interp_lin_2d_new( xb%qgr(:,:,k), ims, ime, jms, jme, &
             iv%instid(inst)%loc_i(n1:n2), &
             iv%instid(inst)%loc_j(n1:n2), &
             iv%instid(inst)%loc_dx(n1:n2), &
@@ -365,15 +362,7 @@ real,allocatable :: temp(:)
             iv%instid(inst)%loc_dym(n1:n2), &
             iv%instid(inst)%qgr(k,n1:n2),n1n2)
 
-         iv%instid(inst)%pm(:,n1:n2)  = v_p(:,n1:n2)
-
-         ! ADD for computing cloud liquid water path
-         ! virtual T
-         vtm (k,n1:n2) = (1.+0.608*iv%instid(inst)%qm(k,n1:n2))*iv%instid(inst)%tm(k,n1:n2)
-         ! convert kg/kg to g/m3
-         ! clw (k,n1:n2) = iv%instid(inst)%qcw(k,n1:n2)*v_p(k,n1:n2)*100.*0.0289644/8.31451/iv%instid(inst)%tm(k,n1:n2)
-         clw(k,n1:n2) = 0.34836*iv%instid(inst)%qcw(k,n1:n2)*v_p(k,n1:n2)/iv%instid(inst)%tm(k,n1:n2)
-         where (v_p(k,n1:n2)<100.0) clw (k,n1:n2) = 0.0
+         iv%instid(inst)%pm(k,n1:n2)  = v_p(k,n1:n2)
 
       end do
 
@@ -383,22 +372,19 @@ real,allocatable :: temp(:)
 
       ! ADD for computing cloud liquid water path (mm) from guess
 
-      pf(xp%kts,n1:n2) = 100.0*iv%instid(inst)%ps(n1:n2)
-      do k = 2,xp%kte
-         ! pf(k,n1:n2) = 100.0*(v_p(k-1,n1:n2)+v_p(k,n1:n2))*0.5  ! full level pressure
+      pf(kts,n1:n2) = 100.0*iv%instid(inst)%ps(n1:n2)
+      do k = 2,kte
          pf(k,n1:n2) = 50.0*(v_p(k-1,n1:n2)+v_p(k,n1:n2))
       end do
-      ! pf(xp%kte+1,n1:n2)= 100.0*v_p(xp%kte,n1:n2)*0.5
-      pf(xp%kte+1,n1:n2)= 50.0*v_p(xp%kte,n1:n2)
+      pf(kte+1,n1:n2)= 50.0*v_p(kte,n1:n2)
 
       iv%instid(inst)%clwp(n1:n2) = 0.0
-      do k = xp%kts,xp%kte
-         dlnpf(k,n1:n2) = log(pf(k,n1:n2)) - log(pf(k+1,n1:n2))
-         ! clw  (k,n1:n2) = clw(k,n1:n2)*vtm(k,n1:n2)*gas_constant/gravity*dlnpf(k,n1:n2)
-         clw(k,n1:n2) = 29.27095*clw(k,n1:n2)*vtm(k,n1:n2)*dlnpf(k,n1:n2)
+      do k = kts,kte
+         dpf(k,n1:n2) = pf(k,n1:n2) - pf(k+1,n1:n2)
+         clw(k,n1:n2) = iv%instid(inst)%qcw(k,n1:n2)*dpf(k,n1:n2)/gravity
+         where (v_p(k,n1:n2)<100.0) clw (k,n1:n2) = 0.0
          iv%instid(inst)%clwp(n1:n2)  =iv%instid(inst)%clwp(n1:n2) + clw(k,n1:n2)
       end do
-      ! iv%instid(inst)%clwp = 0.001*iv%instid(inst)%clwp   ! kg/m2 = mm
 
       ! call rttov_q2v (&
       !    gas_unit_specconc,  &! in
@@ -537,9 +523,8 @@ end do
 !end do
 
       deallocate (v_p)
-      deallocate (vtm)
       deallocate (clw)
-      deallocate (dlnpf)
+      deallocate (dpf)
       deallocate (pf)
       deallocate (pres)
       deallocate (con_vars)
@@ -566,7 +551,7 @@ end do
          call da_biascorr(inst,ob,iv)
       end if
 
-      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), xp%kts, xp%kte,  &
+      call da_togrid_new (iv%instid(inst)%zk(:,n1:n2), kts, kte,  &
          iv%instid(inst)%loc_k(:,n1:n2), &
          iv%instid(inst)%loc_dz(:,n1:n2), &
          iv%instid(inst)%loc_dzm(:,n1:n2))
@@ -591,6 +576,9 @@ end do
    end if
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_rttov")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $RTTOV option for radiances"/))
 #endif
  
 end subroutine da_get_innov_vector_rttov

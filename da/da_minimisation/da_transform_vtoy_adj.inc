@@ -105,8 +105,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
    end if ! var4d
 
    cv = 0.0
-   call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, &
-      cv)
+   call da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    call da_trace_exit("da_transform_vtoy_adj")
 

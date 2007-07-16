@@ -34,7 +34,6 @@ links :
 	@ $(LN) $(IO_PNETCDF)/ext* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
-	@ $(LN) $(RSL_LITE)/* .
 	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(IO_PHDF5)/* .
 	@ $(LN) $(ARCH)/*.sed .
@@ -46,10 +45,8 @@ links :
 	@ mv makefile.old makefile
 	@ touch links
 
-GRIB1_LIBS      = $(IO_GRIB1)/libio_grib1.a
 GRIB_SHARE_LIBS = $(IO_GRIB_SHARE)/libio_grib_share.a
 
-GRIB1_LIB       = -L$(IO_GRIB1) -lio_grib1
 GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \

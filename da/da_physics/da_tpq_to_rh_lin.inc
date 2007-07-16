@@ -1,11 +1,11 @@
-subroutine da_tpq_to_rh_lin( xb, xp, xa )
+subroutine da_tpq_to_rh_lin(grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert T/pressure/q to relative humidity increments.
    !
    !  Method: r~ = r (q~/q - qs~/qs).
    !
-   ! When q approaching to zero, the above formula is undefined. The
+   ! When q approaching to zero, the above formula its undefined. The
    ! general formula below must be used:
    ! 
    !  Method: r~ = 100 * (q~/qs - q*(qs~/qs)/qs))
@@ -16,45 +16,31 @@ subroutine da_tpq_to_rh_lin( xb, xp, xa )
 
    implicit none
    
-   type (xb_type), intent(in)    :: xb           ! First guess structure.
-   type (xpose_type), intent(in) :: xp           ! Dimensions and xpose buffers.
-   type (x_type), intent(inout)  :: xa           ! increment structure.
+   type (domain),  intent(inout) ::grid
    
-   integer                       :: is, ie       ! 1st dim. end points.
-   integer                       :: js, je       ! 2nd dim. end points.
-   integer                       :: ks, ke       ! 3rd dim. end points.
-   real, dimension(xp%its:xp%ite,xp%jts:xp%jte,xp%kts:xp%kte) :: qs, es, &
-                                                       qs_prime_over_qs
-
-   !---------------------------------------------------------------------------
-   ! [1.0] initialise:
-   !---------------------------------------------------------------------------
-
-   is = xp%its; ie = xp%ite
-   js = xp%jts; je = xp%jte
-   ks = xp%kts; ke = xp%kte   
+   real, dimension(its:ite,jts:jte,kts:kte) :: qs, es, qs_prime_over_qs
 
    !---------------------------------------------------------------------------
    ! [1.0] Calculate saturation specific humidity ratio qs~/qs:
    !---------------------------------------------------------------------------
  
-   call da_tp_to_qs_lin( xb, xp, xa, qs_prime_over_qs )
+   call da_tp_to_qs_lin(grid, qs_prime_over_qs )
 
    !--------------------------------------------------------------------------
    ! [2.0] Culcalete background saturation specific humidity qs:
    !--------------------------------------------------------------------------
 
-   call da_tp_to_qs1( xb, xp, es, qs) 
+   call da_tp_to_qs1(grid, es, qs) 
    
    !---------------------------------------------------------------------------
    ! [3.0] Calculate relative humidity increment:
    !---------------------------------------------------------------------------
 
-   xa % rh(is:ie,js:je,ks:ke) = 100. * &
-                                ( xa % q(is:ie,js:je,ks:ke) / &
-                                      qs(is:ie,js:je,ks:ke) ) - &
-                                  xb % rh(is:ie,js:je,ks:ke) * &
-                                  qs_prime_over_qs(is:ie,js:je,ks:ke)
+   grid%xa % rh(its:ite,jts:jte,kts:kte) = 100. * &
+                                ( grid%xa % q(its:ite,jts:jte,kts:kte) / &
+                                      qs(its:ite,jts:jte,kts:kte) ) - &
+                                  grid%xb % rh(its:ite,jts:jte,kts:kte) * &
+                                  qs_prime_over_qs(its:ite,jts:jte,kts:kte)
 
 end subroutine da_tpq_to_rh_lin
 

@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmt1 (xa, iv, xp, y)
+subroutine da_transform_xtoy_ssmt1 (grid, iv, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_ssmt1 (xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
-   type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa) (linear)
+   type (domain),  intent(in)    :: grid
+   type (ob_type), intent(in)    :: iv       ! Innovation vector (O-B).
+   type (y_type),  intent(inout) :: y        ! y = h (grid%xa) (linear)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j, k  ! Index dimension.
@@ -33,7 +32,7 @@ subroutine da_transform_xtoy_ssmt1 (xa, iv, xp, y)
          dxm = iv%ssmt1(n)%loc%dxm
 
          ! [1.2] Interpolate horizontally:
-         call da_interp_lin_3d(xa % t, xp, i, j, dx, dy, dxm, dym, &
+         call da_interp_lin_3d(grid%xa % t, i, j, dx, dy, dxm, dym, &
                             y%ssmt1(n)%t, k, iv%ssmt1(n)%zk, k)
       end do
    end if

@@ -1,4 +1,4 @@
-subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
+subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
 
    !---------------------------------------------------------------------------
    ! Purpose: Output data assimilation diagnostics
@@ -6,12 +6,11 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
 
    implicit none
 
+   type (domain), intent(in)    :: grid
    type (y_type), intent(in)    :: ob      ! Observation structure.
    type (ob_type), intent(inout):: iv      ! innovation vector.
    type (y_type), intent(inout) :: re      ! residual vector.
    type (y_type), intent(in)    :: y       ! y = H(x_inc) structure.
-   type (xpose_type), intent(in):: xp     ! Dimensions and xpose buffers.
-   type (x_type), intent(in)    :: xa      ! gridded analysis increments.
    type (j_type), intent(inout) :: j       ! Cost function.
 
    if (trace_use) call da_trace_entry("da_write_diagnostics")
@@ -93,7 +92,7 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
 
    call da_oi_stats_buoy (stats_unit, iv)
 
-   ! [1.18] Radar: 
+   ! [1.18] radar: 
 
    call da_oi_stats_radar (stats_unit, iv)
 
@@ -186,7 +185,7 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
 
    call da_ao_stats_buoy (stats_unit, iv, re)
 
-   !  [2.18] Radar:
+   !  [2.18] radar:
 
    call da_ao_stats_radar (stats_unit, iv, re)
 
@@ -206,7 +205,7 @@ subroutine da_write_diagnostics(ob, iv, re, y, xp, xa, j)
    ! [3.0] Calculate analysis increment (A-B) statistics:
    !---------------------------------------------------------------------------
 
-   call da_analysis_stats (stats_unit, xp, xa)
+   call da_analysis_stats (grid, stats_unit)
 
    !---------------------------------------------------------------------------
    ! [4.0] Write VAR diagnostic :

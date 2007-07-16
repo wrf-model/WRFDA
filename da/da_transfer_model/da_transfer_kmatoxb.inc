@@ -24,7 +24,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 
    real :: pu, pd, coef, delp, hydro, rgasg, shgt
 
-   real, dimension(grid%xp%jds:grid%xp%jde) :: loc_latc_mean
+   real, dimension(jds:jde) :: loc_latc_mean
 
    real, allocatable :: arrayglobal(:,:) 
 
@@ -89,7 +89,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
 #include "HALO_PSICHI_UV_ADJ.inc"
 #endif
 
-   tmpvar  = 1.0/real(grid%xp%ide-grid%xp%ids+1)
+   tmpvar  = 1.0/real(ide-ids+1)
 
    !---------------------------------------------------------------
    ! transfer u,v,t & q(specific humidity in g/g)
@@ -111,7 +111,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    !---------------------------------------------------------------------------
 
     call da_get_vpoles(grid%xb%u,grid%xb%v,          &
-       grid%xp%ids,grid%xp%ide,grid%xp%jds,grid%xp%jde, &
+       ids,ide,jds,jde, &
        grid%xp%ims,grid%xp%ime,grid%xp%jms,grid%xp%jme,grid%xp%kms,grid%xp%kme, &
        grid%xp%its,grid%xp%ite,grid%xp%jts,grid%xp%jte,grid%xp%kts,grid%xp%kte )
 
@@ -122,8 +122,8 @@ subroutine da_transfer_kmatoxb(xbx, grid)
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%ims, grid%xp%ime=', grid%xp%ims, grid%xp%ime
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jms, grid%xp%jme=', grid%xp%jms, grid%xp%jme
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%kms, grid%xp%kme=', grid%xp%kms, grid%xp%kme
-      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%ids, grid%xp%ide=', grid%xp%ids, grid%xp%ide
-      write(unit=stdout,fmt='(A,2I5)') 'grid%xp%jds, grid%xp%jde=', grid%xp%jds, grid%xp%jde
+      write(unit=stdout,fmt='(A,2I5)') 'ids, ide=', ids, ide
+      write(unit=stdout,fmt='(A,2I5)') 'jds, jde=', jds, jde
       write(unit=stdout,fmt='(A,2I5)') 'grid%xp%kds, grid%xp%kde=', grid%xp%kds, grid%xp%kde
 
       write(unit=stdout,fmt='(A,I5)') 'size(grid%xb%u, dim=1)=', size(grid%xb%u, dim=1)
@@ -260,12 +260,12 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    !                    and level wise pressure
    !---------------------------------------------------------------------------
 
-   tmp_ps = sum(grid%xb%psfc(is:ie,js:je)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
+   tmp_ps = sum(grid%xb%psfc(is:ie,js:je)) /real((ide-ids+1)*(jde-jds+1))
 
    tmpps = wrf_dm_sum_real(tmp_ps)
 
    do k=ks,ke
-      tmp_p = sum(grid%xb%p(is:ie,js:je,k)) /real((grid%xp%ide-grid%xp%ids+1)*(grid%xp%jde-grid%xp%jds+1))
+      tmp_p = sum(grid%xb%p(is:ie,js:je,k)) /real((ide-ids+1)*(jde-jds+1))
       tmpp = wrf_dm_sum_real(tmp_p)
 
       ! 0.01 is added to see that sigmah should not become negative
@@ -423,9 +423,9 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! for calculating roughness length if sea level pressure is desired
    !---------------------------------------------------------------------------
 
-   ! call da_wrf_tpq_2_slp (grid%xb)
+   ! call da_wrf_tpq_2_slp (grid)
 
-   call da_integrat_dz(grid%xb)
+   call da_integrat_dz(grid)
    !---------------------------------------------------------------------------
    ! Following code for calculating roughness length needs to be activated  
    ! for surface wind speed for SFC_ASSIM_OPTIONS = 2 
@@ -460,23 +460,23 @@ subroutine da_transfer_kmatoxb(xbx, grid)
    ! Calculate means for later use in setting up background errors.
    !---------------------------------------------------------------------------
 
-   allocate (xbx % latc_mean(grid%xp%jds:grid%xp%jde))
+   allocate (xbx % latc_mean(jds:jde))
 
-   tmpvar = 1.0/real(grid%xp%ide-grid%xp%ids+1)
+   tmpvar = 1.0/real(ide-ids+1)
    loc_latc_mean(:) = 0.0
 
    ! Bitwise-exact reduction preserves operation order of serial code for
    ! testing, at the cost of much-increased run-time.  Turn it off when not     
    ! testing.  This will always be .false. for a serial or 1-process MPI run.  
    if (test_dm_exact) then
-      allocate(arrayglobal(grid%xp%ids:grid%xp%ide, grid%xp%jds:grid%xp%jde))
+      allocate(arrayglobal(ids:ide, jds:jde))
       call da_patch_to_global(grid%xp, grid%xb%lat, arrayglobal)
-      do j=grid%xp%jds,grid%xp%jde
-         loc_latc_mean(j) = tmpvar*sum(arrayglobal(grid%xp%ids:grid%xp%ide, j))
+      do j=jds,jde
+         loc_latc_mean(j) = tmpvar*sum(arrayglobal(ids:ide, j))
       end do
       deallocate(arrayglobal)
       ! Broadcast result from monitor to other tasks.
-      call wrf_dm_bcast_real(loc_latc_mean, (grid%xp%jde-grid%xp%jds+1))
+      call wrf_dm_bcast_real(loc_latc_mean, (jde-jds+1))
       xbx % latc_mean = loc_latc_mean
    else
       do j=js,je

@@ -14,21 +14,30 @@ module da_radiance1
 #endif
 
    use da_control, only : trace_use,missing_r, rootproc, num_radiance_tot, &
-      stdout,write_profile,myproc,qc_good,num_fgat_time,qc_bad, &
+      stdout,myproc,qc_good,num_fgat_time,qc_bad, &
       use_error_factor_rad,biasprep_unit,obs_qc_pointer, filename_len, &
-      num_procs,print_detail_rad,tovs_min_transfer, rtm_option, &
-      rtminit_sensor,rtm_option_rttov,rtm_option_crtm, &
+      print_detail_rad, rtm_option, &
+      rtm_option_rttov,rtm_option_crtm, &
       global, gas_constant, gravity
    use da_define_structures, only : info_type,model_loc_type,maxmin_type, &
       ob_type, y_type, jo_type,bad_data_type,bad_data_type,number_type
    use da_par_util, only : da_proc_stats_combine
    use da_par_util1, only : da_proc_sum_int,da_proc_sum_ints
-   use da_reporting, only : da_error, message, da_warning, da_message
+   use da_reporting, only : da_error, message
    use da_statistics, only : da_stats_calculate
    use da_tools, only : da_residual_new
    use da_tools1, only : da_free_unit, da_get_unit
-   use da_tracing, only : da_trace_entry, da_trace_exit, da_trace, &
-      da_trace_int_sort
+   use da_tracing, only : da_trace_entry, da_trace_exit, da_trace_int_sort
+
+#if defined(RTTOV) || defined(CRTM)
+   use da_control, only : rtminit_sensor
+   use da_reporting, only : da_warning
+#endif
+#ifdef RTTOV
+   use da_control, only : write_profile,num_procs,tovs_min_transfer
+   use da_tracing, only : da_trace
+   use da_reporting, only : da_message
+#endif
 
    implicit none
    

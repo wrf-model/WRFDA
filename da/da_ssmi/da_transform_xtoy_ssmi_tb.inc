@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
+subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    implicit none
 
-   type (xb_type), intent(in)   :: xb       ! first guess state.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: oi       ! obs. increment vector (o-b).
-   type (x_type),  intent(inout):: xa       ! gridded analysis increment.
-   type (y_type), intent(inout) :: y        ! y = h (xa)
+   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! loop counter.
    integer                      :: i,j
@@ -40,38 +39,38 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    ! total precipitable water in cm
 
-   ! call da_transform_xtotpw(xa, xb)
+   ! call da_transform_xtotpw(grid%xa, grid%xb)
 
    ! do j=1,mjy-1
    !    do i=1,mix-1
-   !       zf(1) = xb%ztop
+   !       zf(1) = grid%xb%ztop
    !       do k=1,mkz
-   !          zh(k)=xb%h(i,j,k)
-   !          zf(k+1)=xb%hf(i,j,k)
+   !          zh(k)=grid%xb%h(i,j,k)
+   !          zf(k+1)=grid%xb%hf(i,j,k)
    !       end do
 
    !       ! surface pressure (mb) (940 -1030)
 
-   !       psfc(i,j)     = (xb%p(i,j,mkz)+xb%Psac(i,j)*(1.0-xb % sigmah(mkz)))*0.01
-   !       TGL_psfc(i,j) =  xa%p  (i,j,mkz)*0.01
+   !       psfc(i,j)     = (grid%xb%p(i,j,mkz)+grid%xb%Psac(i,j)*(1.0-grid%xb % sigmah(mkz)))*0.01
+   !       TGL_psfc(i,j) =  grid%xa%p  (i,j,mkz)*0.01
 
    !       ! sea surface temperature (k) (273 - 303) (doesnot change) 
 
-   !       sst(i,j)      = xb%tgrn(i,j)
-   !       TGL_sst(i,j)  = xa%tgrn(1,1)
+   !       sst(i,j)      = grid%xb%tgrn(i,j)
+   !       TGL_sst(i,j)  = grid%xa%tgrn(1,1)
    !       TGL_sst(i,j)  = 0.
 
    !       ! effective surface air temperature (263 - 303)
 
-   !       ta(i,j)     = xb%tgrn(i,j) + &
-   !                   (xb%t(i,j,mkz)-xb%tgrn(i,j))*log(2./0.0001)/ &
+   !       ta(i,j)     = grid%xb%tgrn(i,j) + &
+   !                   (grid%xb%t(i,j,mkz)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
-   !       TGL_ta(i,j) = xa%tgrn(1,1) + &
-   !                   (xa%t(i,j,mkz)-xa%tgrn(1,1))*log(2./0.0001)/ &
+   !       TGL_ta(i,j) = grid%xa%tgrn(1,1) + &
+   !                   (grid%xa%t(i,j,mkz)-grid%xa%tgrn(1,1))*log(2./0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
-   !       TGL_ta(i,j) = (xa%t(i,j,mkz)-0.)*log(2./0.0001)/ &
+   !       TGL_ta(i,j) = (grid%xa%t(i,j,mkz)-0.)*log(2./0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
    !       ! gamma is an emperical formula and zcld is given for now
@@ -84,8 +83,8 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    !       ! total precipitable water in (kg/m**2) (0 - 70)
 
-   !       tpw(i,j)     = xb%tpw(i,j)*10.
-   !       TGL_tpw(i,j) = xa%tpw(i,j)*10.
+   !       tpw(i,j)     = grid%xb%tpw(i,j)*10.
+   !       TGL_tpw(i,j) = grid%xa%tpw(i,j)*10.
 
    !       ! Column liquid water (kg/m**2)   (0 - 0.5) (no data now. So, do it later.)
 
@@ -94,8 +93,8 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    !       ! Column height weighted moisture density on the grid locally 
 
-   !       call da_transform_xtozrhoq(xb, i, j, zh, zf, zrhom)
-   !       call da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, TGL_zrhom)
+   !       call da_transform_xtozrhoq(grid%xb, i, j, zh, zf, zrhom)
+   !       call da_transform_xtozrhoq_lin(grid%xb, grid%xa, i, j, zh, zf, TGL_zrhom)
 
    !       ! Column moisture density on the grid locally
 
@@ -111,28 +110,28 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
    !       call tgl_tb(1,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !          htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
-   !          xb%tb19v(i,j),xb%tb19h(i,j),                           &
+   !          grid%xb%tb19v(i,j),grid%xb%tb19h(i,j),                           &
    !          TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !          TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
    !          TGL_zcld(i,j),TGL_tb19v(i,j),TGL_tb19h(i,j)           )
 
    !       call TGL_tb(2,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !          htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
-   !          xb%tb22v(i,j),dum1,                                    &
+   !          grid%xb%tb22v(i,j),dum1,                                    &
    !          TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !          TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
    !          TGL_zcld(i,j),TGL_tb22v(i,j),dum2                     )
 
    !       call TGL_tb(3,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !          htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
-   !          xb%tb37v(i,j),xb%tb37h(i,j),                           &
+   !          grid%xb%tb37v(i,j),grid%xb%tb37h(i,j),                           &
    !          TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !          TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
    !          TGL_zcld(i,j),TGL_tb37v(i,j),TGL_tb37h(i,j)           )
 
    !       call TGL_tb(4,53.,psfc(i,j),ta(i,j),gamma(i,j),sst(i,j),tpw(i,j),  &
    !          htpw(i,j),speed(i,j),alw(i,j),zcld(i,j),               &
-   !          xb%tb85v(i,j),xb%tb85h(i,j),                           &
+   !          grid%xb%tb85v(i,j),grid%xb%tb85h(i,j),                           &
    !          TGL_psfc(i,j),TGL_ta(i,j),TGL_gamma(i,j),TGL_sst(i,j), &
    !          TGL_tpw(i,j),TGL_htpw(i,j),TGL_speed(i,j),TGL_alw(i,j),&
    !          TGL_zcld(i,j),TGL_tb85v(i,j),TGL_tb85h(i,j)           )
@@ -149,23 +148,23 @@ subroutine da_transform_xtoy_ssmi_tb(xb, oi, xa, y)
 
       ! Interpolating from 4 grid points to obs location
 
-      ! if (xb%landmask(i,j ) .eq. 0 .and. xb%landmask(i+1,j ) .eq. 0 .and. &
-      !     xb%landmask(i,j+1) .eq. 0 .and. xb%landmask(i+1,j+1) .eq. 0) then       
+      ! if (grid%xb%landmask(i,j ) .eq. 0 .and. grid%xb%landmask(i+1,j ) .eq. 0 .and. &
+      !     grid%xb%landmask(i,j+1) .eq. 0 .and. grid%xb%landmask(i+1,j+1) .eq. 0) then       
       !    ! only calculate over water
 
-      call da_interp_lin_2d(xa%tb19v, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb19v, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19v)
-      call da_interp_lin_2d(xa%tb19h, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb19h, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb19h)
-      call da_interp_lin_2d(xa%tb22v, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb22v, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb22v)
-      call da_interp_lin_2d(xa%tb37v, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb37v, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37v)
-      call da_interp_lin_2d(xa%tb37h, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb37h, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb37h)
-      call da_interp_lin_2d(xa%tb85v, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb85v, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85v)
-      call da_interp_lin_2d(xa%tb85h, xb%ims, xb%ime, xb%jms, xb%jme, &
+      call da_interp_lin_2d(grid%xa%tb85h, ims, ime, jms, jme, &
                          i, j, dx, dy, dxm, dym, y%ssmi_tb(n)%tb85h)
       ! end if
    end do

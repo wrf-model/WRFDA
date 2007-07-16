@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
+subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
    !---------------------------------------------------------------------------
    ! PURPOSE: transform gradient from obs space to model grid space.
@@ -15,9 +15,10 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
    IMPLICIT NONE
 
    TYPE (x_type), INTENT(INOUT)   :: jo_grad_x ! 
-   TYPE (xpose_type), INTENT(IN)  :: xp        ! Domain decomposition vars.
    TYPE (y_type),  INTENT(IN)     :: jo_grad_y ! H' delta_x
    TYPE (ob_type), INTENT(IN)     :: iv        ! O-B structure.
+
+#ifdef CRTM
 
    INTEGER                        :: i, j, k  ! Index dimension.
    INTEGER                        :: num_rad  ! Number of radiance obs
@@ -26,7 +27,6 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
    INTEGER                        :: inst, nchanl, n
    REAL                           :: q_ad
 
-#if defined(CRTM)
    ! CRTM local varaibles and types
    INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
    TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_AD(:)
@@ -34,13 +34,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
    TYPE( CRTM_Surface_type )      :: Surface, Surface_AD
    TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
    !TYPE( CRTM_Options_type )      :: Options
-#endif
+
 !---------------------------------------------------------
 
-#if !defined(CRTM)
-    call da_error(__FILE__,__LINE__, &
-       (/"Must compile with $CRTM option for radiances"/))
-#else
    IF ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_crtm_adj")
@@ -49,7 +45,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
 ! CRTM allocation
 !
 ! Atmosphere structure
-    Atmosphere%n_Layers=(xp%kte-xp%kts)+1   ! number of vertical levels
+    Atmosphere%n_Layers=(kte-kts)+1   ! number of vertical levels
     Atmosphere%n_Absorbers=2
     Atmosphere%n_Clouds=0
     Atmosphere%n_Aerosols=0
@@ -188,11 +184,11 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
        !Surface%Snow_Grain_Size=2.0            ! mm
      endif
      if (Surface%Ice_Coverage > 0.) then
-       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
+       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single egrid%xample is FRESH_ICE
        Surface%Ice_Temperature=iv%instid(inst)%ts(n)       ! K
        Surface%Ice_Thickness=10.              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
-       !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
+       !Surface%Ice_Roughness=0.               ! NO Table offered, single egrid%xample is ZERO
      endif
      Surface%SensorData%n_channels = nchanl
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
@@ -281,26 +277,26 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
 
             ! [1.7] Adjoint of Interpolate horizontally from ob to grid:
 
-            do k=xp%kts,xp%kte ! from bottem to top
-               q_ad = Atmosphere_AD%Absorber(xp%kte-k+1,1)
-               if (atmosphere%pressure(xp%kte-k+1) < 75.) q_ad = 0.
-               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), xp%ims, xp%ime, xp%jms, &
-                                          xp%jme, i, j, dx, dy, dxm, dym, &
-                                          Atmosphere_AD%Temperature(xp%kte-k+1))
+            do k=kts,kte ! from bottem to top
+               q_ad = Atmosphere_AD%Absorber(kte-k+1,1)
+               if (atmosphere%pressure(kte-k+1) < 75.) q_ad = 0.
+               call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), ims, ime, jms, &
+                                          jme, i, j, dx, dy, dxm, dym, &
+                                          Atmosphere_AD%Temperature(kte-k+1))
 
-               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), xp%ims, xp%ime, xp%jms, & 
-                                           xp%jme, i, j, dx, dy, dxm, dym, &
+               call da_interp_lin_2d_adj( jo_grad_x%q(:,:,k), ims, ime, jms, & 
+                                           jme, i, j, dx, dy, dxm, dym, &
                                            q_ad )
             enddo
 
-               call da_interp_lin_2d_adj(jo_grad_x% psfc, xp%ims, xp%ime, xp%jms, &
-                                         xp%jme, i, j, dx, dy, dxm, dym,  &
+               call da_interp_lin_2d_adj(jo_grad_x% psfc, ims, ime, jms, &
+                                         jme, i, j, dx, dy, dxm, dym,  &
                                          Atmosphere_AD%Level_Pressure(atmosphere%n_layers) )
 
                !if (n <=10 ) then
                !   write(6,'(15f8.2)') rtsolution(:)%brightness_temperature
                !   write(6,'(e15.5)') jo_grad_x% psfc(i,j)
-               !  do k=xp%kts,xp%kte
+               !  do k=kts,kte
                !   write(6,'(2e15.5)') jo_grad_x%t(i,j,k), jo_grad_x%q(i,j,k)
                !  enddo
                !endif
@@ -346,6 +342,9 @@ subroutine da_transform_xtoy_crtm_adj ( iv, xp, jo_grad_y, jo_grad_x )
     endif
        
    if (trace_use) call da_trace_exit("da_transform_xtoy_crtm_adj")
+#else
+    call da_error(__FILE__,__LINE__, &
+       (/"Must compile with $CRTM option for radiances"/))
 #endif
  
 end subroutine da_transform_xtoy_crtm_adj

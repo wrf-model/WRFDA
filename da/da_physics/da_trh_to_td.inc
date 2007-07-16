@@ -1,45 +1,45 @@
-subroutine da_trh_to_td (RH, T, TD, xp)
+subroutine da_trh_to_td (rh, t, td, xp)
 
    !---------------------------------------------------------------------
    !
-   !                       function F_TD_FROM_RH
+   !                       function f_td_from_rh
    !                     **************************
    !
-   !  Purpose:
+   !  purpose:
    !  -------
-   !     COMPUTE DEW POinT FROM TEMPERATURE AND RELATIVE HUMIDITY
+   !     compute dew point from temperature and relative humidity
    !
-   !   Method:
+   !   method:
    !   ------
-   !     inVERT THE RELATION
+   !     invert the relation
    !
-   !     RH = 100. * EXP (L_over_Rv * (1./T - 1./TD))
+   !     rh = 100. * exp (l_over_rv * (1./t - 1./td))
    !
-   !   inPUT:
+   !   input:
    !   -----
-   !      T_K:   TEMPERATURE       in K
-   !      RH:    RELAITVE HUMIDITY in %
+   !      t_k:   temperature       in k
+   !      rh:    relative humidity in %
    !
-   !   outPUT:
+   !   output:
    !   ------
-   !      TD:    DEW POinT in K
+   !      td:    dew point in k
    !
-   !   REFERENCES:
+   !   references:
    !   -----------
-   !    R. R. ROGERS AND M. K. YAU, 1989: A SHORT COURSE in CLOUD PHYSICS,
-   !                                   3ND EDITION, PERGAMON PRESS, PAGE 14-19.
+   !    R. R. Rogers and M. K. Yau, 1989: a short course in cloud physics,
+   !                                   3nd edition, pergamon press, page 14-19.
    !
-   !   VERifICATION SET:
+   !   verification set:
    !   -----------------
-   !    T_K  = 268.15 K,  
-   !    TD_K = 262.55 K
-   !    RH   = 65 %, 
-   !    P_PA = 80000  Pa, 
-   !    QV   = 2.11E-03 kg/kg,
+   !    t_k  = 268.15 k,  
+   !    td_k = 262.55 k
+   !    rh   = 65 %, 
+   !    p_pa = 80000  pa, 
+   !    qv   = 2.11e-03 kg/kg,
    !
-   !  MODifICATIONS:
+   !  modifications:
    !   ------------
-   !    parallel implementation. -Al Bourgeois
+   !    parallel implementation. -al bourgeoits
    ! 
    !-------------------------------------------------------------------------
 
@@ -47,45 +47,36 @@ subroutine da_trh_to_td (RH, T, TD, xp)
 
    type (xpose_type), intent(in)      :: xp    ! domain decomposition vars.
 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-      intent(inout) :: rh ! Relative Humidity.
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-      intent(in)    ::  t ! Temperature.
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-      intent(out)   :: td ! Dew Point in K.
+   real, dimension(ims:ime,jms:jme,kms:kme), &
+      intent(inout) :: rh ! relative humidity.
+   real, dimension(ims:ime,jms:jme,kms:kme), &
+      intent(in)    ::  t ! temperature.
+   real, dimension(ims:ime,jms:jme,kms:kme), &
+      intent(out)   :: td ! dew point in k.
 
-   integer :: I, J, K
+   integer :: i, j, k
 
-   real    :: inVDifFTD, inVTD
-
-   integer :: is,ie,js,je,ks,ke
+   real    :: invdifftd, invtd
 
    if (trace_use) call da_trace_entry("da_trh_to_td")
 
-   is = xp%its
-   ie = xp%ite
-   js = xp%jts
-   je = xp%jte
-   ks = xp%kts
-   ke = xp%kte
-
-   do j=js,je
-      do k=ks,ke
-         do i=is,ie
-            if (RH(i,j,k) < 10.0) then
-               RH(i,j,k) = 10.0
-            else if (RH(i,j,k) > 105.0) then
-               RH(i,j,k) = 105.0
+   do j=jts,jte
+      do k=kts,kte
+         do i=its,ite
+            if (rh(i,j,k) < 10.0) then
+               rh(i,j,k) = 10.0
+            else if (rh(i,j,k) > 105.0) then
+               rh(i,j,k) = 105.0
             end if
 
-            inVDifFTD = LOG (RH(i,j,k)/100.) / L_over_Rv
+            invdifftd = log (rh(i,j,k)/100.) / l_over_rv
 
-            inVTD = 1/T(i,j,k)  - inVDifFTD
+            invtd = 1/t(i,j,k)  - invdifftd
 
-            TD(i,j,k)  = 1. / inVTD
+            td(i,j,k)  = 1. / invtd
 
-            if (TD(i,j,k) > T(i,j,k)) &
-               TD(i,j,k) = T(i,j,k)
+            if (td(i,j,k) > t(i,j,k)) &
+               td(i,j,k) = t(i,j,k)
          end do
       end do
    end do

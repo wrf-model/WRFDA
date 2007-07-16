@@ -17,22 +17,22 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    ! Adjust obs switches
 
 
-   if (Use_SynopObs .OR. Use_ShipsObs .OR. Use_MetarObs .OR. Use_PilotObs .OR. &
-      Use_ProfilerObs .OR. Use_BuoyObs .OR. Use_SoundObs .OR. Use_BogusObs .OR. &
-      Use_RadarObs .OR. Use_Radar_rv .OR. Use_Radar_rf .OR. Use_SatemObs .OR. &
-      Use_GeoAMVObs .OR. Use_PolarAMVObs .OR. Use_AirepObs .OR. &
-      Use_GpspwObs .OR. Use_GpsrefObs .OR. Use_SsmiRetrievalObs .OR. &
-      Use_SsmiTbObs .OR. Use_SSMT1Obs .OR. Use_SSMT2Obs .OR. use_qscatobs .or. &
-      Use_AIRSRETObs ) then
+   if (use_synopobs .OR. use_shipsobs .OR. use_metarobs .OR. use_pilotobs .OR. &
+      use_profilerobs .OR. use_buoyobs .OR. use_soundobs .OR. use_bogusobs .OR. &
+      use_radarobs .OR. use_radar_rv .OR. use_radar_rf .OR. use_satemobs .OR. &
+      use_geoamvobs .OR. use_polaramvobs .OR. use_airepobs .OR. &
+      use_gpspwobs .OR. use_gpsrefobs .OR. use_ssmiretrievalobs .OR. &
+      use_ssmitbobs .OR. use_ssmt1obs .OR. use_ssmt2obs .OR. use_qscatobs .or. &
+      use_airsretobs ) then
  
       use_obsgts = .true.
    else
       use_obsgts = .false.
    end if
 
-   if (use_Hirs2Obs .OR. use_Hirs3Obs .OR. use_MsuObs .OR. use_AmsuaObs .OR. &
-      use_AmsubObs .OR. use_AirsObs .OR. use_Eos_AmsuaObs .OR. &
-      use_Eos_RadObs .OR. use_HsbObs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
+   if (use_hirs2obs .OR. use_hirs3obs .OR. use_msuobs .OR. use_amsuaobs .OR. &
+      use_amsubobs .OR. use_airsobs .OR. use_eos_amsuaobs .OR. &
+      use_eos_radobs .OR. use_hsbobs .OR. use_kma1dvar .OR. use_filtered_rad .or. &
       use_ssmisobs .or. use_hirs4obs .or. use_mhsobs) then
       use_rad = .true.
    else
@@ -52,37 +52,37 @@ subroutine da_setup_obs_structures( grid, ob, iv)
             ' test_dm_exact overridden to .false. for serial or 1-MPI-task run'
       end if
       ! only implmenented for Sound and Synop, so switch other types off
-      Use_ShipsObs         = .false.
-      Use_MetarObs         = .false.
-      Use_BogusObs         = .false.
-      Use_PilotObs         = .false.
-      Use_AirepObs         = .false.
-      Use_GeoAMVObs        = .false.
-      Use_PolarAMVObs      = .false.
-      Use_BuoyObs          = .false.
-      Use_ProfilerObs      = .false.
-      Use_SatemObs         = .false.
-      Use_GpspwObs         = .false.
-      Use_GpsrefObs        = .false.
-      Use_SsmiRetrievalObs = .false.
-      Use_SsmiTbObs        = .false.
+      use_shipsobs         = .false.
+      use_metarobs         = .false.
+      use_bogusobs         = .false.
+      use_pilotobs         = .false.
+      use_airepobs         = .false.
+      use_geoamvobs        = .false.
+      use_polaramvobs      = .false.
+      use_buoyobs          = .false.
+      use_profilerobs      = .false.
+      use_satemobs         = .false.
+      use_gpspwobs         = .false.
+      use_gpsrefobs        = .false.
+      use_ssmiretrievalobs = .false.
+      use_ssmitbobs        = .false.
       use_ssmt1obs         = .false.
       use_ssmt2obs         = .false.
       use_qscatobs         = .false.
-      use_Hirs2Obs         = .false.
-      use_Hirs3Obs         = .false.
+      use_hirs2obs         = .false.
+      use_hirs3obs         = .false.
       use_hirs4obs         = .false.
       use_mhsobs           = .false.
-      use_MsuObs           = .false.
-      use_AmsuaObs         = .false.
-      use_AmsubObs         = .false.
-      use_AirsObs          = .false.
-      use_Eos_AmsuaObs     = .false.
-      use_Eos_radObs       = .false.
-      use_HsbObs           = .false.
-      Use_Obsgts           = .false.
+      use_msuobs           = .false.
+      use_amsuaobs         = .false.
+      use_amsubobs         = .false.
+      use_airsobs          = .false.
+      use_eos_amsuaobs     = .false.
+      use_eos_radobs       = .false.
+      use_hsbobs           = .false.
+      use_obsgts           = .false.
       use_rad         = .false.
-      Use_AIRSRETObs       = .false.
+      use_airsretobs       = .false.
    end if
     
    if (num_pseudo > 0) then
@@ -181,7 +181,7 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%num_ssmi_retrieval_glo=0
    iv%num_buoy_glo=0
    iv%num_profiler_glo=0
-   iv%num_Radar_glo=0
+   iv%num_radar_glo=0
    iv%num_bogus_glo=0
    iv%num_airsr_glo=0
    iv%num_pseudo_glo=0             

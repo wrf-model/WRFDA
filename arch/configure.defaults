@@ -15,7 +15,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     =
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL_LITE -DDM_PARALLEL
@@ -59,7 +59,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
 
 FCOPTIM         =
 FCDEBUG         =
@@ -95,7 +95,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -115,12 +115,8 @@ RSL_CCFLAGS     = -DMPI2_SUPPORT
 LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
-EXTRA_LDFLAGS   = -V
-
-
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -146,7 +142,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -168,8 +164,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -195,8 +190,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE) -D
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -236,8 +230,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -277,8 +270,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 
 
 FCOPTIM         = 
 FCDEBUG         = 
@@ -311,8 +303,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -325,7 +316,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165 -fno-second-underscore
 FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -336,8 +327,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -363,8 +353,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -386,8 +375,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -413,9 +401,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95
+
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
 
@@ -426,7 +413,7 @@ FCWARN          = -Wall -Wextra -Wunused-module-procs -Wunused-module-vars \
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159 -fno-second-underscore
+EXTRA_FCFLAGS   = -cpp -Wno=101,112,136,155,158,159,165 -fno-second-underscore
 FCTYPE          = -r$(RWORDSIZE)
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
@@ -457,8 +444,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DG95 
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DRSL_LITE -DDM_PARALLEL
@@ -501,8 +487,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -534,7 +519,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -553,8 +538,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -581,7 +565,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -600,8 +584,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -628,7 +611,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
 
 FCOPTIM         =
 FCDEBUG         =
@@ -664,7 +647,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -686,8 +669,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -713,7 +695,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -733,8 +715,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -760,7 +741,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
 
 FCOPTIM         =
 FCDEBUG         =
@@ -795,7 +776,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -815,8 +796,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -842,7 +822,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM 
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -862,8 +842,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -890,8 +869,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
 
 FCOPTIM         =
 FCDEBUG         =
@@ -925,7 +903,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -945,8 +923,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -973,7 +950,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional
-EXTRA_FPPFLAGS  = -DIO_DEREF_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DLINUX -DNONSTANDARD_SYSTEM -DIFORT_KLUDGE 
 		     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -992,8 +969,7 @@ LOCAL_LIB       = -L/usr/local/lib
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
           MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1023,7 +999,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -DIRIX -DNONSTANDARD_SYSTEM 
 
 FCOPTIM         = -O2
 FCDEBUG         = # -g
@@ -1060,7 +1036,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1079,8 +1055,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1118,7 +1093,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DIRIX -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1138,8 +1113,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl -lmpi
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1170,9 +1144,8 @@ NATIVE_RWORDSIZE	= 8
 MAX_PROC        = 256
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DMPI -I$(MPIINCDIR) -DNEC -DNONSTANDARD_SYSTEM
+
 FCOPTIM         =
 FCDEBUG         =
 FCTYPE          =
@@ -1204,17 +1177,14 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
 FCOPTIM         =
 FCDEBUG         = 
 FCTYPE          = -qrealsize=$(RWORDSIZE)
 FCFREE          = -qfree=f90
 FCFIXED         = -qfixed
 FCENDIAN        =
-EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto \
-                    -qflttrap=zerodivide:invalid:nanq:enable -qsigtrap=xl__trce
+EXTRA_FCFLAGS   = -w -qspill=20000 -qmaxmem=32767 -qarch=auto
 
 EXTRA_CCFLAGS   = -DNOUNDERSCORE -DNCARIBM_NOC99 -DFSEEKO64_OK -qcpluscmt
 
@@ -1244,9 +1214,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
@@ -1270,8 +1239,7 @@ LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1298,8 +1266,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1322,8 +1289,7 @@ LOCAL_LIB       = -lmass -lmassv
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="mpcc $(RSL_CCFLAGS)" FC="mpxlf $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1350,8 +1316,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
                     
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
@@ -1396,9 +1361,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DNATIVE_MASSV -DNORESHAPE -DNONSTANDARD_SYSTEM
+
 DM_CPPFLAGS     = 
 DM_FPPFLAGS     = -DDM_PARALLEL -DRSL_LITE
 
@@ -1443,9 +1407,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM 
+
 FCOPTIM         =
 FCDEBUG         =
 FCTYPE          = -sreal64 -dp -em -eh
@@ -1484,7 +1447,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1497,11 +1460,11 @@ FCTYPE          = -sreal64 -dp -em -eh
 FCFREE          = -f free -N 255
 FCENDIAN        =
 EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
-                     -p$(RTTOV_INC)  -p$(CRTM_INC) -P$(PNETCDF_INC) \
+                     -p$(RTTOV_INC)  -p$(CRTM_INC) -p$(PNETCDF_INC) \
                      -p$(HDF_INC) -p$(PHDF5_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL
 RSL_CCFLAGS     = -Dcrayx1 -DMPI2_SUPPORT
 
 EXTRA_LDFLAGS   = -V
@@ -1510,8 +1473,7 @@ LOCAL_LIB       =
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1541,7 +1503,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 8
 
 TRADFLAG        = -traditional-cpp
-EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DNORESHAPE -Dcrayx1 -DNONSTANDARD_SYSTEM 
                     
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1556,15 +1518,14 @@ EXTRA_FCFLAGS   = -p$(BLAS_INC) -p$(LAPACK_INC) -p$(FFTPACK_INC) \
                     -p$(HDF_INC) -p$(PHDF5_INC)
 RSL_FCFLAGS     = $(FCENDIAN)
 
-EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL -h gen_private_callee
+EXTRA_CCFLAGS   = -UCRAY -Dcrayx1 -I$(RSL)/RSL
 RSL_CCFLAGS     = -Dcrayx1 -DMPI2_SUPPORT
 
 LOCAL_LIB       = 
 MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
              MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1592,8 +1553,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95
 
 FCOPTIM         = 
 FCDEBUG         =
@@ -1630,8 +1590,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1644,8 +1603,7 @@ FCTYPE          = -r$(RWORDSIZE)
 FCFREE          = -ffree-form -ffree-line-length-huge
 FCFIXED         = -ffixed-form
 FCENDIAN        =
-EXTRA_FCFLAGS   = -cpp -fno-second-underscore \
-                     -Wno=101,112,136,155,158,159
+EXTRA_FCFLAGS   = -cpp -fno-second-underscore -Wno=101,112,136,155,158,159,165
 RSL_FCFLAGS     = $(FCENDIAN) -ffixed-form -fno-second-underscore
 
 EXTRA_CCFLAGS   = -I$(RSL)/RSL -DLANDREAD_STUB -DMACOS
@@ -1655,8 +1613,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1684,8 +1641,7 @@ CC_TOOLS        = gcc
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95 \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DNONSTANDARD_SYSTEM -DMAC_KLUDGE -DG95
                      
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
@@ -1707,8 +1663,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 LOCAL_LIB       = -lSystemStubs
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1736,8 +1691,7 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM 
 
 FCOPTIM         =
 FCDEBUG         =
@@ -1774,9 +1728,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        = 
-EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
@@ -1799,8 +1752,7 @@ EXTRA_LDFLAGS   = -V
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \
@@ -1828,9 +1780,8 @@ LD              = $(FC)
 NATIVE_RWORDSIZE	= 4
 
 TRADFLAG        =
-EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM \
-                     -DNATIVE_RWORDSIZE=$(NATIVE_RWORDSIZE)
-                    
+EXTRA_FPPFLAGS  = -DMACOS -DMAC_KLUDGE -DLINUX -DNONSTANDARD_SYSTEM
+
 DM_CPPFLAGS     = -I$(RSL)/RSL
 DM_FPPFLAGS     = `cat inc/dm_comm_cpp_flags` -DRSL -DDM_PARALLEL
 
@@ -1851,8 +1802,7 @@ MPI_LIB         = -L$(RSL)/RSL -lrsl
 
 
 arch : 
-	$(LN) $(RSL)/*.c .
-	$(LN) $(RSL)/*.F .
+	$(LN) $(RSL)/*.c $(RSL)/*.F $(RSL)/RSL/*.h $(RSL)/RSL/*.inc .
 	( cd $(RSL)/RSL ; \
           $(MAKE) CC="$(CC) $(RSL_CCFLAGS)" FC="$(FC) $(RSL_FCFLAGS)" \
             MAX_DOMAINS=$(MAX_DOMAINS) MAX_PROC=$(MAX_PROC) \

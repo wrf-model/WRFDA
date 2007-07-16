@@ -1,4 +1,4 @@
-subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y ) 
+subroutine da_balance_geoterm_nl (domain, k, u, v, term_x, term_y ) 
  
    !---------------------------------------------------------------------------
    ! Purpose: calculates nonlinear geostrophic term in balance equation.
@@ -8,7 +8,7 @@ subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y )
 
    implicit none
 
-   type (xb_type), intent(in) :: xb           ! First guess structure.
+   type (domain), intent(in)  :: grid
    integer, intent(in)        :: k            ! Model level.
    real, intent(in)           :: u(:,:)       ! u wind comp. (dot pts)
    real, intent(in)           :: v(:,:)       ! v wind comp. (dot pts)
@@ -26,17 +26,17 @@ subroutine da_balance_geoterm_nl( xb, k, u, v, term_x, term_y )
    !  [2.0] Calculate term_x = -f rho v~:
    !---------------------------------------------------------------------------
 
-   term_x(xb%its:xb%ite, xb%jts:xb%jte) = -xb%rho(xb%its:xb%ite, xb%jts:xb%jte, k) &
-                                          *xb%  v(xb%its:xb%ite, xb%jts:xb%jte, k) &
-                                          *xb%cori(xb%its:xb%ite, xb%jts:xb%jte)
+   term_x(its:ite, jts:jte) = -grid%xb%rho(its:ite, jts:jte, k) &
+                                          *grid%xb%  v(its:ite, jts:jte, k) &
+                                          *grid%xb%cori(its:ite, jts:jte)
 
    !---------------------------------------------------------------------------
    !  [3.0] Calculate term_y = f rho u~:
    !---------------------------------------------------------------------------
 
-   term_y(xb%its:xb%ite, xb%jts:xb%jte) =  xb%rho(xb%its:xb%ite, xb%jts:xb%jte, k) &
-                                          *xb%  u(xb%its:xb%ite, xb%jts:xb%jte, k) &
-                                          *xb%cori(xb%its:xb%ite, xb%jts:xb%jte)
+   term_y(its:ite, jts:jte) =  grid%xb%rho(its:ite, jts:jte, k) &
+                                          *grid%xb%  u(its:ite, jts:jte, k) &
+                                          *grid%xb%cori(its:ite, jts:jte)
 
 end subroutine da_balance_geoterm_nl
 

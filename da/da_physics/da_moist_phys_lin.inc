@@ -208,10 +208,10 @@ subroutine da_moist_phys_lin(grid)
       end do
    end do
 
-   call da_filter(grid, t_new, grid%xp)
-   call da_filter(grid, q_new, grid%xp)
-   call da_filter(grid, qcw_new, grid%xp)
-   call da_filter(grid, qrn_new, grid%xp)
+   call da_filter(grid, t_new)
+   call da_filter(grid, q_new)
+   call da_filter(grid, qcw_new)
+   call da_filter(grid, qrn_new)
 
    do k=kds,kde
       do j=jts,jte

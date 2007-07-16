@@ -1,4 +1,4 @@
-subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
+subroutine da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,             &
            pre_ma,tv_ma,TGL_pre_ma,TGL_tv_ma)
 
    !--------------------------------------------------------------------------
@@ -7,37 +7,32 @@ subroutine da_tv_profile_tl(xp,xa,xb,i,j,dx,dxm,dy,dym,             &
 
    implicit none
 
-   type (x_type),  intent(in)     :: xa       ! gridded analysis increment.
-   type (xb_type),  intent(in)    :: xb       ! first guess state.
-   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
+   type (domain),  intent(in)     :: grid
    integer, intent(in)            :: i, j     ! OBS location
    real, intent(in)               :: dx, dxm  ! interpolation weights.
    real, intent(in)               :: dy, dym  ! interpolation weights.
-   real, dimension(xp%kts-1:xp%kte+1),intent(out)      :: TGL_pre_ma,TGL_tv_ma
-   real, dimension(xp%kts-1:xp%kte+1),intent(out)      :: pre_ma,tv_ma
+   real, dimension(kts-1:kte+1),intent(out)      :: TGL_pre_ma,TGL_tv_ma
+   real, dimension(kts-1:kte+1),intent(out)      :: pre_ma,tv_ma
 
-   integer                        :: ii,jj,ks,ke
-   real, dimension(2,2,xp%kts:xp%kte)       :: tv_m,TGL_tv_m
-
-   ks = xp%kts
-   ke = xp%kte
+   integer                        :: ii,jj
+   real, dimension(2,2,kts:kte)       :: tv_m,TGL_tv_m
 
    do ii=i,i+1
       do jj=j,j+1
-         TGL_tv_m(ii-i+1,jj-j+1,ks:ke) = xa%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke)) +  &
-                                      0.61*xb%t(ii,jj,ks:ke)*xa%q(ii,jj,ks:ke)
-         tv_m(ii-i+1,jj-j+1,ks:ke)     = xb%t(ii,jj,ks:ke)*(1.+0.61*xb%q(ii,jj,ks:ke))
+         TGL_tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xa%t(ii,jj,kts:kte)*(1.+0.61*grid%xb%q(ii,jj,kts:kte)) +  &
+                                      0.61*grid%xb%t(ii,jj,kts:kte)*grid%xa%q(ii,jj,kts:kte)
+         tv_m(ii-i+1,jj-j+1,kts:kte)     = grid%xb%t(ii,jj,kts:kte)*(1.+0.61*grid%xb%q(ii,jj,kts:kte))
       end do
    end do
  
-   TGL_pre_ma(ks:ke) = dym* ( dxm * xa%p(i,j,ks:ke) + dx * xa%p(i+1,j,ks:ke) ) + &
-                       dy * ( dxm * xa%p(i,j+1,ks:ke) + dx * xa%p(i+1,j+1,ks:ke) )
-   TGL_tv_ma (ks:ke) = dym* ( dxm * TGL_tv_m(1,1,ks:ke) + dx * TGL_tv_m(2,1,ks:ke) ) + &
-                       dy * ( dxm * TGL_tv_m(1,2,ks:ke) + dx * TGL_tv_m(2,2,ks:ke) )
-   pre_ma(ks:ke) = dym* ( dxm * xb%p(i,j,ks:ke) + dx * xb%p(i+1,j,ks:ke) ) + &
-                   dy * ( dxm * xb%p(i,j+1,ks:ke) + dx * xb%p(i+1,j+1,ks:ke) )
-   tv_ma (ks:ke) = dym* ( dxm * tv_m (1,1,ks:ke) + dx * tv_m (2,1,ks:ke) ) + &
-                   dy * ( dxm * tv_m (1,2,ks:ke) + dx * tv_m (2,2,ks:ke) )
+   TGL_pre_ma(kts:kte) = dym* ( dxm * grid%xa%p(i,j,kts:kte) + dx * grid%xa%p(i+1,j,kts:kte) ) + &
+                       dy * ( dxm * grid%xa%p(i,j+1,kts:kte) + dx * grid%xa%p(i+1,j+1,kts:kte) )
+   TGL_tv_ma (kts:kte) = dym* ( dxm * TGL_tv_m(1,1,kts:kte) + dx * TGL_tv_m(2,1,kts:kte) ) + &
+                       dy * ( dxm * TGL_tv_m(1,2,kts:kte) + dx * TGL_tv_m(2,2,kts:kte) )
+   pre_ma(kts:kte) = dym* ( dxm * grid%xb%p(i,j,kts:kte) + dx * grid%xb%p(i+1,j,kts:kte) ) + &
+                   dy * ( dxm * grid%xb%p(i,j+1,kts:kte) + dx * grid%xb%p(i+1,j+1,kts:kte) )
+   tv_ma (kts:kte) = dym* ( dxm * tv_m (1,1,kts:kte) + dx * tv_m (2,1,kts:kte) ) + &
+                   dy * ( dxm * tv_m (1,2,kts:kte) + dx * tv_m (2,2,kts:kte) )
  
 end subroutine da_tv_profile_tl
 

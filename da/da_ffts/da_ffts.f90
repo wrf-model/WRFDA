@@ -6,7 +6,7 @@ module da_ffts
 
    use module_domain, only :domain, xpose_type
    use da_control, only : ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte, &
-      Inverse_FFT,  Forward_FFT, &
+      Inverse_FFT,  Forward_FFT, ids,jds, &
       ide,jde, stdout
    use da_define_structures, only : xbx_type
    use da_par_util, only : da_transpose_x2z, da_transpose_y2x, &

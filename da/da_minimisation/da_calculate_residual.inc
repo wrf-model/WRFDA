@@ -95,7 +95,7 @@ subroutine da_calculate_residual(iv, y, re)
    call da_residual_bogus(iv, y, re, np_missing, np_bad_data, &
                                      np_obs_used, np_available)
 
-   ! for Satem
+   ! for satem
 
    call da_residual_satem(iv, y, re, np_missing, np_bad_data, &
                                      np_obs_used, np_available)
@@ -111,7 +111,7 @@ subroutine da_calculate_residual(iv, y, re)
                                      np_missing, np_bad_data, &
                                      np_obs_used, np_available)
 
-   ! for Radar
+   ! for radar
 
    call da_residual_radar(iv, y, re, &
                                      np_missing, np_bad_data, &

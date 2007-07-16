@@ -11,7 +11,7 @@ export REL_DIR=$HOME/code/$ID
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 export WRF_DIR=${WRF_DIR:-$REL_DIR/wrf}
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC}
+export OBSPROC_DIR=${OBSPROC_DIR:-$WRFVAR_DIR/obsproc}
 
 export CLEAN=${CLEAN:-false}
 

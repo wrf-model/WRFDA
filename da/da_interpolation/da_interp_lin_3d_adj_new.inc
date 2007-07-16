@@ -1,6 +1,5 @@
-subroutine da_interp_lin_3d_adj_new(fm3d, xp, &
-                             i, j, k, dx, dy, dz, dxm, dym, dzm, &
-                             fo3d, nl,num)
+subroutine da_interp_lin_3d_adj_new(fm3d, i, j, k, dx, dy, dz, dxm, dym, dzm, &
+   fo3d, nl,num)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,18 +7,16 @@ subroutine da_interp_lin_3d_adj_new(fm3d, xp, &
 
    implicit none
 
-   type (xpose_type),      intent(in)    :: xp  ! Dimensions and xpose buffers.
-   integer,                intent(in)    :: nl,num
-   integer,                intent(in)    :: i(num), j(num), k(nl,num)
-   real,                   intent(in)    :: dx(num), dxm(num)
-   real,                   intent(in)    :: dy(num), dym(num)
-   real,                   intent(in)    :: dz(nl,num), dzm(nl,num)
-   real,                   intent(in)    :: fo3d(nl,num) 
-   real, dimension(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme), &
-                           intent(inout) :: fm3d    ! Input/Output variable
+   integer, intent(in)    :: nl,num
+   integer, intent(in)    :: i(num), j(num), k(nl,num)
+   real,    intent(in)    :: dx(num), dxm(num)
+   real,    intent(in)    :: dy(num), dym(num)
+   real,    intent(in)    :: dz(nl,num), dzm(nl,num)
+   real,    intent(in)    :: fo3d(nl,num) 
+   real,    intent(inout) :: fm3d(ims:ime,jms:jme,kms:kme)
 
    integer                :: point,kk
-   real                   :: fmz(xp%kms:xp%kme)
+   real                   :: fmz(kms:kme)
 
    if (trace_use) call da_trace_entry("da_interp_lin_3d_adj_new")
 
@@ -32,14 +29,14 @@ subroutine da_interp_lin_3d_adj_new(fm3d, xp, &
          end if
       end do
 
-      fm3d(i(point)  ,j(point)  ,xp%kts:xp%kte) = dym(point)*dxm(point)*fmz(xp%kts:xp%kte) &
-                                  + fm3d(i(point)  ,j(point)  ,xp%kts:xp%kte)
-      fm3d(i(point)+1,j(point)  ,xp%kts:xp%kte) = dym(point)*dx(point) *fmz(xp%kts:xp%kte) &
-                                  + fm3d(i(point)+1,j(point)  ,xp%kts:xp%kte)
-      fm3d(i(point)  ,j(point)+1,xp%kts:xp%kte) = dy(point) *dxm(point)*fmz(xp%kts:xp%kte) &
-                                  + fm3d(i(point)  ,j(point)+1,xp%kts:xp%kte)
-      fm3d(i(point)+1,j(point)+1,xp%kts:xp%kte) = dy(point) *dx(point) *fmz(xp%kts:xp%kte) &
-                                  + fm3d(i(point)+1,j(point)+1,xp%kts:xp%kte)
+      fm3d(i(point)  ,j(point)  ,kts:kte) = dym(point)*dxm(point)*fmz(kts:kte) &
+                                  + fm3d(i(point)  ,j(point)  ,kts:kte)
+      fm3d(i(point)+1,j(point)  ,kts:kte) = dym(point)*dx(point) *fmz(kts:kte) &
+                                  + fm3d(i(point)+1,j(point)  ,kts:kte)
+      fm3d(i(point)  ,j(point)+1,kts:kte) = dy(point) *dxm(point)*fmz(kts:kte) &
+                                  + fm3d(i(point)  ,j(point)+1,kts:kte)
+      fm3d(i(point)+1,j(point)+1,kts:kte) = dy(point) *dx(point) *fmz(kts:kte) &
+                                  + fm3d(i(point)+1,j(point)+1,kts:kte)
    end do
 
    if (trace_use) call da_trace_exit("da_interp_lin_3d_adj_new")

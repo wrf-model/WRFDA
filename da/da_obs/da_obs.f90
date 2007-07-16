@@ -2,7 +2,7 @@ module da_obs
 
    use da_define_structures, only : multi_level_type, y_type, ob_type, &
       model_loc_type, field_type, each_level_type,da_allocate_y
-   use module_domain, only : domain, xb_type, x_type, xpose_type
+   use module_domain, only : domain, x_type, xpose_type
 
    use da_airep, only : da_transform_xtoy_airep,da_transform_xtoy_airep_adj 
    use da_airsr, only : da_transform_xtoy_airsr,da_transform_xtoy_airsr_adj 
@@ -11,7 +11,7 @@ module da_obs
    use da_control, only : var4d_multi_inc, use_shipsobs, use_synopobs, use_ssmt2obs, &
       use_soundobs,use_satemobs, use_profilerobs, use_pilotobs, &
       use_qscatobs,use_metarobs, use_polaramvobs, use_geoamvobs, &
-      use_bogusobs,use_buoyobs, use_AIRSRETObs, trace_use, num_procs, &
+      use_bogusobs,use_buoyobs, use_airsretobs, trace_use, num_procs, &
       missing_r, missing, use_airepobs,use_gpspwobs,use_gpsrefobs, &
       use_ssmt1obs,filtered_obs_unit,fmt_each,fmt_info,fmt_srfc, ide, jde, &
       pseudo_x, fg_format, fg_format_kma_global, fg_format_wrf, missing_data, &

@@ -9,38 +9,38 @@ subroutine da_oi_stats_radar (stats_unit, oi)
    integer,        intent (in)      :: stats_unit    ! Output unit for stats.
    type (ob_type), intent (in)      :: oi            ! OI
 
-   type (stats_Radar_type)          :: Radar
+   type (stats_radar_type)          :: radar
    integer                          :: nrv, nrf
    integer                          :: n, k
 
    nrv = 0
    nrf = 0
       
-   Radar%maximum%rv = maxmin_type(missing_r, 0, 0)
-   Radar%minimum%rv = maxmin_type(-missing_r, 0, 0)
-   Radar%maximum%rf = maxmin_type(missing_r, 0, 0)
-   Radar%minimum%rf = maxmin_type(-missing_r, 0, 0)
-   Radar%average = residual_Radar1_type(0.0, 0.0)
-   Radar%rms_err = Radar%average
+   radar%maximum%rv = maxmin_type(missing_r, 0, 0)
+   radar%minimum%rv = maxmin_type(-missing_r, 0, 0)
+   radar%maximum%rf = maxmin_type(missing_r, 0, 0)
+   radar%minimum%rf = maxmin_type(-missing_r, 0, 0)
+   radar%average = residual_radar1_type(0.0, 0.0)
+   radar%rms_err = radar%average
 
-   if (oi%num_Radar > 0) then
-      do n=1, oi%num_Radar
-         if (oi%Radar(n)%loc%proc_domain) then
-            do k=1, oi%Radar(n)%info%levels
-               if (use_Radar_rv) then
-                  call da_stats_calculate(oi%Radar(n)%loc%obs_global_index, &
-                                     k, oi%Radar(n)%rv(k)%qc, &
-                                     oi%Radar(n)%rv(k)%inv, nrv, &
-                                     Radar%minimum%rv, Radar%maximum%rv, &
-                                     Radar%average%rv, Radar%rms_err%rv)
+   if (oi%num_radar > 0) then
+      do n=1, oi%num_radar
+         if (oi%radar(n)%loc%proc_domain) then
+            do k=1, oi%radar(n)%info%levels
+               if (use_radar_rv) then
+                  call da_stats_calculate(oi%radar(n)%loc%obs_global_index, &
+                                     k, oi%radar(n)%rv(k)%qc, &
+                                     oi%radar(n)%rv(k)%inv, nrv, &
+                                     radar%minimum%rv, radar%maximum%rv, &
+                                     radar%average%rv, radar%rms_err%rv)
                end if
 
-               if (use_Radar_rf) then
-                  call da_stats_calculate(oi%Radar(n)%loc%obs_global_index, &
-                                     k, oi%Radar(n)%rf(k)%qc, &
-                                     oi%Radar(n)%rf(k)%inv, nrf, &
-                                     Radar%minimum%rf, Radar%maximum%rf, &
-                                     Radar%average%rf, Radar%rms_err%rf)
+               if (use_radar_rf) then
+                  call da_stats_calculate(oi%radar(n)%loc%obs_global_index, &
+                                     k, oi%radar(n)%rf(k)%qc, &
+                                     oi%radar(n)%rf(k)%inv, nrf, &
+                                     radar%minimum%rf, radar%maximum%rf, &
+                                     radar%average%rf, radar%rms_err%rf)
                end if
             end do
          end if
@@ -49,26 +49,26 @@ subroutine da_oi_stats_radar (stats_unit, oi)
 
    ! Do inter-processor communication to gather statistics.
 
-   if (use_Radar_rv) then
+   if (use_radar_rv) then
       call da_proc_sum_int(nrv)
-      call da_proc_stats_combine(Radar%average%rv, Radar%rms_err%rv, &
-                             Radar%minimum%rv%value, Radar%maximum%rv%value, &
-                             Radar%minimum%rv%n, Radar%maximum%rv%n, &
-                             Radar%minimum%rv%l, Radar%maximum%rv%l)
+      call da_proc_stats_combine(radar%average%rv, radar%rms_err%rv, &
+                             radar%minimum%rv%value, radar%maximum%rv%value, &
+                             radar%minimum%rv%n, radar%maximum%rv%n, &
+                             radar%minimum%rv%l, radar%maximum%rv%l)
    end if
    
-   if (use_Radar_rf) then
+   if (use_radar_rf) then
       call da_proc_sum_int(nrf)
-      call da_proc_stats_combine(Radar%average%rf, Radar%rms_err%rf, &
-                             Radar%minimum%rf%value, Radar%maximum%rf%value, &
-                             Radar%minimum%rf%n, Radar%maximum%rf%n, &
-                             Radar%minimum%rf%l, Radar%maximum%rf%l)
+      call da_proc_stats_combine(radar%average%rf, radar%rms_err%rf, &
+                             radar%minimum%rf%value, radar%maximum%rf%value, &
+                             radar%minimum%rf%n, radar%maximum%rf%n, &
+                             radar%minimum%rf%l, radar%maximum%rf%l)
    end if
 
    if (rootproc) then
       if (nrv /= 0 .or. nrf /= 0) then
          write(unit=stats_unit, fmt='(/a/)') ' Diagnostics of OI for radar'
-         call da_print_stats_radar(stats_unit, nrv, nrf, Radar)
+         call da_print_stats_radar(stats_unit, nrv, nrf, radar)
       end if
    end if
 

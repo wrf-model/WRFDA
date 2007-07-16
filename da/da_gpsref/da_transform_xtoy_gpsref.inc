@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_gpsref (xa, iv, xp, y)
+subroutine da_transform_xtoy_gpsref (grid, iv, y)
 
    !-------------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,10 +6,9 @@ subroutine da_transform_xtoy_gpsref (xa, iv, xp, y)
 
    implicit none
 
-   type (x_type),  intent(in)   :: xa       ! gridded analysis increment.
+   type (domain),  intent(in)   :: grid
    type (ob_type), intent(in)   :: iv       ! Innovation vector (O-B).
-   type (xpose_type), intent(in):: xp       ! Domain decomposition vars.
-   type (y_type), intent(inout) :: y        ! y = h (xa)
+   type (y_type), intent(inout) :: y        ! y = h (grid%xa)
 
    integer                      :: n        ! Loop counter.
    integer                      :: i, j     ! Index dimension.
@@ -32,7 +31,7 @@ subroutine da_transform_xtoy_gpsref (xa, iv, xp, y)
       dxm = iv%gpsref(n)%loc%dxm
       dym = iv%gpsref(n)%loc%dym
 
-      call da_interp_lin_3d(xa%ref, xp, i, j, dx, dy, dxm, dym, &
+      call da_interp_lin_3d(grid%xa%ref, i, j, dx, dy, dxm, dym, &
          y%gpsref(n)%ref, num_levs, iv%gpsref(n)%zk, num_levs)
    end do
 

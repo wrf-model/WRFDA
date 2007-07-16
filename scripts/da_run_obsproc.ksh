@@ -26,7 +26,7 @@ export DUMMY=${DUMMY:-false}
 
 mkdir -p $RUN_DIR $OB_DIR/$DATE
 
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessing
+export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/wrfvar/obsproc} # Observation preprocessing
 
 # Namelist variables used in obs. preprocessor:
 

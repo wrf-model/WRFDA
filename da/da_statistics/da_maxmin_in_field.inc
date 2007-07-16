@@ -6,16 +6,16 @@ subroutine da_maxmin_in_field(field, max, min)
 
    implicit none
 
-   real, intent(in)         :: field(is:ie,js:je,ks:ke)
+   real, intent(in)         :: field(its:ite,jts:jte,kts:kte)
 
-   type (maxmin_field_type), intent(out) :: max(xp%kts:xp%kte)
-   type (maxmin_field_type), intent(out) :: min(xp%kts:xp%kte)
+   type (maxmin_field_type), intent(out) :: max(kts:kte)
+   type (maxmin_field_type), intent(out) :: min(kts:kte)
 
-   do k = ks, ke
+   do k = kts, kte
       max(k)%value = -1.E20
       min(k)%value =  1.E20
-      do j = js, je
-         do i = is, ie
+      do j = jts, jte
+         do i = its, ite
             if (field(i,j,k) > max(k)%value) then
                max(k)%value = field(i,j,k)
                max(k)%i     = i

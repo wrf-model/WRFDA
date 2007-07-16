@@ -14,7 +14,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
 
    integer              :: k, j, k1            ! Loop counters.
 
-   IF (trace_use) call da_trace_entry("da_transform_vptox") 
+   if (trace_use) call da_trace_entry("da_transform_vptox") 
 
    !---------------------------------------------------------------------------
    !  [1] Add flow-dependent increments in control variable space (vp):
@@ -68,21 +68,16 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    ! Psi and chi to u and v:
 
    call da_psichi_to_uv(vp % v1, vp % v2, grid%xb % coefx, &
-                         grid%xb % coefy , grid%xa % u, grid%xa % v)
+      grid%xb % coefy , grid%xa % u, grid%xa % v)
 
    if (use_radarobs .and. use_radar_rf) then
-
-   ! Pseudo RH --> Total water mixing ratio:
-
+      ! Pseudo RH --> Total water mixing ratio:
       grid%xa % qt(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
-                                         grid%xb%qs(its:ite,jts:jte,kts:kte)
-
+         grid%xb%qs(its:ite,jts:jte,kts:kte)
    else
-
-   ! Pseudo RH --> Water vapor mixing ratio:
-
+      ! Pseudo RH --> Water vapor mixing ratio:
       grid%xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
-                                        grid%xb%qs(its:ite,jts:jte,kts:kte)
+         grid%xb%qs(its:ite,jts:jte,kts:kte)
    endif
 
    !---------------------------------------------------------------------------
@@ -90,8 +85,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
    !---------------------------------------------------------------------------
 
    if (be % ne > 0 .and. alphacv_method == 2) then
-      call da_add_flow_dependence_xa(be % ne, ep, vp, grid%xa, &
-                                      its,ite, jts,jte, kts,kte)
+      call da_add_flow_dependence_xa(grid, be % ne, ep, vp)
    end if
 
    IF (trace_use) call da_trace_exit("da_transform_vptox") 

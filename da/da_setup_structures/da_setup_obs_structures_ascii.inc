@@ -86,13 +86,13 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          ! scan main body of gts observation file
          call da_scan_obs (iv, xp, filename)
 
-         if (Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
+         if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! scan SSMI observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'ssmi', n,'.dat'
             call da_scan_ssmi (iv, xp, filename)
          end if
 
-         if (Use_RadarObs) then
+         if (use_radarobs) then
             ! scan radar observation file
             write(filename(1:10), fmt='(a, i2.2,a)') 'radar', n,'dat'
             call da_scan_radar(iv, xp, filename)
@@ -106,12 +106,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
       !-----------------------------------------------------------------------
       ! read header of ssmi observation file
       !-----------------------------------------------------------------------
-      if (Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
+      if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          call da_scan_ssmi(iv, xp,'ssmi01.dat')
       end if
 
       ! scan main body of radar observation file
-      if (Use_RadarObs) then
+      if (use_radarobs) then
          call da_scan_radar(iv, xp,'radar01.dat')
       end if
    end if
@@ -212,7 +212,7 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
    iv%num_qscat_glo=0
    iv%num_profiler_glo=0
    iv%num_buoy_glo=0
-   iv%num_Radar_glo=0
+   iv%num_radar_glo=0
    iv%num_bogus_glo=0
    iv%num_airsr_glo=0
 
@@ -225,13 +225,13 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
          ! Read gts observation file
          call da_read_obs (iv, xp, filename)
 
-         if (Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
+         if (use_ssmiretrievalobs .or. use_ssmitbobs) then
             ! read ssmi observation file
             write(filename(1:10), fmt='(a, i2.2)') 'ssmi', n,'.dat'
             call da_read_ssmi (iv, xp, filename)
          end if
 
-         if (Use_RadarObs) then
+         if (use_radarobs) then
             ! read radar observation file
             write(filename(1:11), fmt='(a, i2.2)') 'radar', n,'.dat'
             call da_read_radar(iv, xp, filename)
@@ -242,12 +242,12 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
 
       call da_read_obs(iv, xp, 'ob01.ascii')
 
-      if (Use_SsmiRetrievalObs .or. Use_SsmiTbObs) then
+      if (use_ssmiretrievalobs .or. use_ssmitbobs) then
          ! read ssmi observation file
          call da_read_ssmi (iv, xp,'ssmi01.dat')
       end if
 
-      if (Use_RadarObs) then
+      if (use_radarobs) then
          ! read radar observation file
          call da_read_radar(iv, xp,'radar01.dat')
       end if
@@ -265,9 +265,9 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
             end do
         end do
 
-        do n = 1, iv % num_Radar
-           do i=int(iv%Radar(n)%loc%i), int(iv%Radar(n)%loc%i)+1
-              do j=int(iv%Radar(n)%loc%j), int(iv%Radar(n)%loc%j)+1
+        do n = 1, iv % num_radar
+           do i=int(iv%radar(n)%loc%i), int(iv%radar(n)%loc%i)+1
+              do j=int(iv%radar(n)%loc%j), int(iv%radar(n)%loc%j)+1
                  do k=xp%kts, xp%kte
                     xb%delt(i,j,k) = 1800.0
                     xb%qrn(i,j,k) = amax1(5.E-5, xb%qrn(i,j,k))
@@ -276,8 +276,8 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
                   ! do k=xp%kts, xp%kte
                   !    v_h(k)=xb%h(i,j  ,k)
                   ! end do
-                  ! do k = 1, iv % Radar(n) % info % levels
-                  !    call zk(iv%Radar(n)%height(k), v_h, xp, zkk)
+                  ! do k = 1, iv % radar(n) % info % levels
+                  !    call zk(iv%radar(n)%height(k), v_h, xp, zkk)
                   !    xb%delt(i,j,int(zkk))=1800.
                   !    xb%delt(i,j,int(zkk)+1)=1800.
                   ! end do

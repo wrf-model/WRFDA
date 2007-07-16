@@ -52,7 +52,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end if     
 
    ! Compute w increments using Richardson's eqn.
-   if (Use_RadarObs) then
+   if (use_radarobs) then
 
       do k=kts,kte
          do j=jts,jte
@@ -66,7 +66,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
      call da_uvprho_to_w_adj(grid)
  
-     if (use_radarobs .and. Use_Radar_rf) then
+     if (use_radarobs .and. use_radar_rf) then
 
       ! Partition of hydrometeor increments via warm rain process
 
@@ -81,26 +81,26 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    if (.not.test_wrfvar) then
 
-      if (use_ssmt1obs .or. use_ssmt2obs .or. Use_GpspwObs .or. &
-           Use_SsmiTbObs .or. Use_SsmiRetrievalObs .or. use_GpsrefObs) then
+      if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
+           use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
 
-         if (use_ssmiTbobs) call da_transform_xtotb_adj(grid%xa, grid%xb)
+         if (use_ssmiTbobs) call da_transform_xtotb_adj(grid)
 
          if (use_ssmt1obs .or. use_ssmt2obs .or. &
-              Use_SsmiTbObs .or. Use_SsmiRetrievalObs) then
+              use_ssmitbobs .or. use_ssmiretrievalobs) then
          if (global) then
             call da_error(__FILE__,__LINE__, &
-               (/"grid%xb%speed is not available, see da_transfer_kmatogrid%xb.inc"/))
+               (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
          end if
-            call da_transform_xtoseasfcwind_adj(grid%xa, grid%xb)
+            call da_transform_xtoseasfcwind_adj(grid)
          end if
 
          ! GPS Refractivity:
-         if (use_GpsrefObs) &
+         if (use_gpsrefobs) &
             call da_transform_xtogpsref_adj(grid)
 
          ! Now for PW.
-         call da_transform_xtotpw_adj(grid%xa, grid%xb)
+         call da_transform_xtotpw_adj(grid)
 
       end if
 
@@ -109,7 +109,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end if
    !-------------------------------------------------------------------------
  
-   call da_pt_to_rho_adj(grid%xb, grid%xa)
+   call da_pt_to_rho_adj(grid)
    do j=jts,jte
       do i=its,ite
          if (fg_format == fg_format_wrf) then
@@ -158,7 +158,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    end do
 
    if (global) then     
-      call da_set_boundary_xa(grid%xa, grid%xb)
+      call da_set_boundary_xa(grid)
     end if
 
    !-------------------------------------------------------------------------
@@ -182,8 +182,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    if (vert_corr == 2) then      
       call da_vertical_transform('u_adj', be, &
-                                  grid%xb % vertical_inner_product, &
-                                  vv, vp)
+         grid%xb % vertical_inner_product, vv, vp)
    else
       vv % v1(its:ite,jts:jte,kts:kte) = vp % v1(its:ite,jts:jte,kts:kte)
       vv % v2(its:ite,jts:jte,kts:kte) = vp % v2(its:ite,jts:jte,kts:kte)

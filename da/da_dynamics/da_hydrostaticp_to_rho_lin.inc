@@ -1,7 +1,7 @@
-subroutine da_hydrostaticp_to_rho_lin( xb, xp, p, rho ) 
+subroutine da_hydrostaticp_to_rho_lin(grid, p, rho ) 
 
    !---------------------------------------------------------------------------
-   !  Purpose: Calculates density increment from pressure increment field.
+   !  Purpose: Calculates density increment from pressure increment fiteld.
    !
    !  Method:  Hydrostatic eqn => rho~ = -dP~/dz / g.
    !
@@ -12,53 +12,36 @@ subroutine da_hydrostaticp_to_rho_lin( xb, xp, p, rho )
 
    implicit none
    
-   type (xb_type), intent(in)     :: xb       ! First guess structure.
-   type (xpose_type), intent(in)  :: xp       ! Dimensions and xpose buffers.
-   real, intent(in)  :: p(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme)   
-                                                    ! Pressure inc. (cross pts)
-   real, intent(out) :: rho(xp%ims:xp%ime,xp%jms:xp%jme,xp%kms:xp%kme) 
-                                                    ! Density inc. (cross pts)
+   type (domain), intent(in)     :: grid
+   real, intent(in)  :: p(ims:ime,jms:jme,kms:kme)   ! Pressure inc. (cross pts)
+   real, intent(out) :: rho(ims:ime,jms:jme,kms:kme) ! Density inc. (cross pts)
 
-   integer                    :: is, ie       ! 1st dim. end points.
-   integer                    :: js, je       ! 2nd dim. end points.
-   integer                    :: ks, ke       ! 3rd dim. end points.
    integer                    :: i, j, k      ! Loop counters.
    real                       :: delta1       ! Height difference.
    real                       :: delta2       ! Height difference.
-   real                       :: dPdz         ! Vertical pressure gradient.
-
-   !---------------------------------------------------------------------------
-   ! [1.0] Initialise:
-   !---------------------------------------------------------------------------
-
-   is = xp%its
-   ie = xp%ite
-   js = xp%jts
-   je = xp%jte
-   ks = xp%kts
-   ke = xp%kte
+   real                       :: dPdz         ! Vertical pressure graditent.
 
    !---------------------------------------------------------------------------
    ! [2.0] Calculate density increments at all levels except top/bottom:
    !---------------------------------------------------------------------------
 
-   do k = ks+1, ke-1 
-      rho(is:ie,js:je,k) =  -( p(is:ie,js:je,k+1) - p(is:ie,js:je,k-1) ) / &
-                             ( ( xb % h(is:ie,js:je,k+1) - &
-                             xb % h(is:ie,js:je,k-1) ) * gravity )
+   do k = kts+1, kte-1 
+      rho(its:ite,jts:jte,k) =  -( p(its:ite,jts:jte,k+1) - p(its:ite,jts:jte,k-1) ) / &
+                             ( ( grid%xb % h(its:ite,jts:jte,k+1) - &
+                             grid%xb % h(its:ite,jts:jte,k-1) ) * gravity )
    end do                                  
 
    !---------------------------------------------------------------------------
    ! [3.0] Calculate density increment on bottom level:
    !---------------------------------------------------------------------------
 
-   k = ks
-   do j = js, je
-      do i = is, ie
-         ! dP~/dz by backwards one-sided 2nd order finie differences:
+   k = kts
+   do j = jts, jte
+      do i = its, ite
+         ! dP~/dz by backwards one-sided 2nd order finite differences:
          
-         delta1 = xb % h(i,j,k+1) - xb % h(i,j,k)
-         delta2 = xb % h(i,j,k+2) - xb % h(i,j,k)
+         delta1 = grid%xb % h(i,j,k+1) - grid%xb % h(i,j,k)
+         delta2 = grid%xb % h(i,j,k+2) - grid%xb % h(i,j,k)
          dPdz = -( delta1 + delta2 ) * p(i,j,k)  / ( delta1 * delta2 ) + &
                  ( delta2 / delta1 ) * p(i,j,k+1)/ ( delta2 - delta1 ) - &
                  ( delta1 / delta2 ) * p(i,j,k+2)/ ( delta2 - delta1 )
@@ -72,13 +55,13 @@ subroutine da_hydrostaticp_to_rho_lin( xb, xp, p, rho )
    ! [4.0] Calculate density increment on top level:
    !---------------------------------------------------------------------------
 
-   k = ke
-   do j = js, je
-      do i = is, ie
+   k = kte
+   do j = jts, jte
+      do i = its, ite
          ! dP~/dz by forwards one-sided 2nd order finite differences:
          
-         delta1 = xb % h(i,j,k) - xb % h(i,j,k-1)
-         delta2 = xb % h(i,j,k) - xb % h(i,j,k-2)
+         delta1 = grid%xb % h(i,j,k) - grid%xb % h(i,j,k-1)
+         delta2 = grid%xb % h(i,j,k) - grid%xb % h(i,j,k-2)
          
          dPdz = ( delta1 + delta2 ) * p(i,j,k)   / ( delta1 * delta2 ) - &
                 ( delta2 / delta1 ) * p(i,j,k-1) / ( delta2 - delta1 ) + &

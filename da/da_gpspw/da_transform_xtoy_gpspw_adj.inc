@@ -1,4 +1,4 @@
-subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
+subroutine da_transform_xtoy_gpspw_adj(grid, oi, jo_grad_y, jo_grad_x)
 
    !----------------------------------------------------------------
    ! Purpose: Calculate the difference in the elevation between model surface and GPS site
@@ -6,9 +6,8 @@ subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
 
    implicit none
 
-   type (xb_type), intent(in)    :: xb          ! first guess state.
+   type (domain),  intent(in)    :: grid
    type (ob_type), intent(in)    :: oi          ! obs. inc vector (o-b).
-   type (xpose_type), intent(in) :: xp          ! Domain decomposition vars.
    type (y_type) , intent(in)    :: jo_grad_y   ! grad_y(jo)
    type (x_type) , intent(inout) :: jo_grad_x   ! grad_x(jo)
 
@@ -21,11 +20,11 @@ subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
    real                   :: dpw,ddpw     ! adjustment pw [mm]
    real                   :: obs_terr     ! real terrain height at GPS site [m]
    real                   :: model_terr   ! model terrain height at GPS site[m]
-   real,dimension(xp%kts:xp%kte):: model_q   ! model q at GPS site [kg/kg]
-   real,dimension(xp%kts:xp%kte):: model_z   ! model z at GPS site [m]
-   real,dimension(xp%kts:xp%kte):: model_rho ! model rho at GPS site [kg/m^3]
-   real,dimension(xp%kts:xp%kte):: model_dq   ! model dq at GPS site [kg/kg]
-   real,dimension(xp%kts:xp%kte):: model_drho ! model drho at GPS site [kg/m^3]
+   real,dimension(kts:kte):: model_q   ! model q at GPS site [kg/kg]
+   real,dimension(kts:kte):: model_z   ! model z at GPS site [m]
+   real,dimension(kts:kte):: model_rho ! model rho at GPS site [kg/m^3]
+   real,dimension(kts:kte):: model_dq   ! model dq at GPS site [kg/kg]
+   real,dimension(kts:kte):: model_drho ! model drho at GPS site [kg/m^3]
 
    if (oi%num_Gpspw > 0) then
       do n=oi%ob_numb(oi%current_ob_time-1)%gpspw + 1, oi%ob_numb(oi%current_ob_time)%gpspw
@@ -44,8 +43,8 @@ subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
          model_drho(:) = 0.
 
          obs_terr   = oi%gpspw(n)%info%elv
-         model_terr = dym*(dxm*xb%terr(i,j)   + dx*xb%terr(i+1,j)) + &
-                      dy *(dxm*xb%terr(i,j+1) + dx*xb%terr(i+1,j+1))
+         model_terr = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + &
+                      dy *(dxm*grid%xb%terr(i,j+1) + dx*grid%xb%terr(i+1,j+1))
 
          dpw =       0.1 *jo_grad_y%gpspw(n)%tpw
 
@@ -59,10 +58,10 @@ subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
                                 + dx *dy *jo_grad_y%gpspw(n)%tpw
 
          if (obs_terr <= model_terr) then 
-           model_q(1)   = dym*(dxm*xb%q(i,j,1)   + dx*xb%q(i+1,j,1)) + &
-                          dy *(dxm*xb%q(i,j+1,1) + dx*xb%q(i+1,j+1,1))
-           model_rho(1) = dym*(dxm*xb%rho(i,j,1)   + dx*xb%rho(i+1,j,1)) + &
-                          dy *(dxm*xb%rho(i,j+1,1) + dx*xb%rho(i+1,j+1,1))
+           model_q(1)   = dym*(dxm*grid%xb%q(i,j,1)   + dx*grid%xb%q(i+1,j,1)) + &
+                          dy *(dxm*grid%xb%q(i,j+1,1) + dx*grid%xb%q(i+1,j+1,1))
+           model_rho(1) = dym*(dxm*grid%xb%rho(i,j,1)   + dx*grid%xb%rho(i+1,j,1)) + &
+                          dy *(dxm*grid%xb%rho(i,j+1,1) + dx*grid%xb%rho(i+1,j+1,1))
 
            model_dq(1)   =  model_rho(1)*(obs_terr - model_terr)*dpw
            model_drho(1) =  model_q(1)  *(obs_terr - model_terr)*dpw
@@ -77,18 +76,18 @@ subroutine da_transform_xtoy_gpspw_adj(xb, oi, xp, jo_grad_y, jo_grad_x)
            jo_grad_x%rho(i,j+1,1)   = jo_grad_x%rho(i,j+1,1)   + dy*dxm*model_drho(1)
            jo_grad_x%rho(i+1,j+1,1) = jo_grad_x%rho(i+1,j+1,1) + dy*dx*model_drho(1)
          else 
-           model_z(1) = dym*(dxm*xb%hf(i,j,1)   + dx*xb%hf(i+1,j,1)) + &
-                        dy *(dxm*xb%hf(i,j+1,1) + dx*xb%hf(i+1,j+1,1))
+           model_z(1) = dym*(dxm*grid%xb%hf(i,j,1)   + dx*grid%xb%hf(i+1,j,1)) + &
+                        dy *(dxm*grid%xb%hf(i,j+1,1) + dx*grid%xb%hf(i+1,j+1,1))
 
-           do k = xp%kts, xp%kte
+           do k = kts, kte
              if (model_z(k) >= obs_terr) exit
 
-             model_z(k+1) = dym*(dxm*xb%hf(i,j,k+1)   + dx*xb%hf(i+1,j,k+1)) + &
-                            dy *(dxm*xb%hf(i,j+1,k+1) + dx*xb%hf(i+1,j+1,k+1))
-             model_q(k) = dym*(dxm*xb%q(i,j,k)   + dx*xb%q(i+1,j,k)) + &
-                          dy *(dxm*xb%q(i,j+1,k) + dx*xb%q(i+1,j+1,k))
-             model_rho(k) = dym*(dxm*xb%rho(i,j,k)   + dx*xb%rho(i+1,j,k)) + &
-                            dy *(dxm*xb%rho(i,j+1,k) + dx*xb%rho(i+1,j+1,k))
+             model_z(k+1) = dym*(dxm*grid%xb%hf(i,j,k+1)   + dx*grid%xb%hf(i+1,j,k+1)) + &
+                            dy *(dxm*grid%xb%hf(i,j+1,k+1) + dx*grid%xb%hf(i+1,j+1,k+1))
+             model_q(k) = dym*(dxm*grid%xb%q(i,j,k)   + dx*grid%xb%q(i+1,j,k)) + &
+                          dy *(dxm*grid%xb%q(i,j+1,k) + dx*grid%xb%q(i+1,j+1,k))
+             model_rho(k) = dym*(dxm*grid%xb%rho(i,j,k)   + dx*grid%xb%rho(i+1,j,k)) + &
+                            dy *(dxm*grid%xb%rho(i,j+1,k) + dx*grid%xb%rho(i+1,j+1,k))
 
              ddpw = dpw
 

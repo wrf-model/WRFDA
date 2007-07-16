@@ -1,7 +1,7 @@
 subroutine da_transfer_xatokma(grid)
 
    !---------------------------------------------------------------------------
-   !  Purpose: Convert analysis increments into KMA increments 
+   !  Purpose: Convert analysits increments into KMA increments 
    !---------------------------------------------------------------------------
 
    implicit none
@@ -9,40 +9,28 @@ subroutine da_transfer_xatokma(grid)
    type(domain),    intent(inout) :: grid
 
    integer :: i, j, k
-   integer :: is, ie, js, je, ks, ke
    real    :: PU, PD, coeff
 
    if (trace_use) call da_trace_entry("da_transfer_xatokma")
-
-   !------------------------------------------------------------------------
-   ! Set array range indices for processor subdomain.
-   !------------------------------------------------------------------------
-
-   is = grid%xp % its
-   ie = grid%xp % ite
-   js = grid%xp % jts
-   je = grid%xp % jte
-   ks = grid%xp % kts
-   ke = grid%xp % kte
 
    !---------------------------------------------------------------------------
    ! Add increment to the original guess and update xb and "grid"
    !---------------------------------------------------------------------------
 
-   do j=js,je
-      do i=is,ie
-         grid%xb%w(i,j,ke+1)=  grid%xb%w(i,j,ke+1) + grid%xa%w(i,j,ke+1)
+   do j=jts,jte
+      do i=its,ite
+         grid%xb%w(i,j,kte+1)=  grid%xb%w(i,j,kte+1) + grid%xa%w(i,j,kte+1)
       end do
-      do i=is,ie
-         do k = ks, ke
+      do i=its,ite
+         do k = kts, kte
             grid%xb%u(i,j,k)   = grid%xa%u(i,j,k) + grid%xb%u(i,j,k)
             grid%xb%v(i,j,k)   = grid%xa%v(i,j,k) + grid%xb%v(i,j,k)
             grid%xb%t(i,j,k)   = grid%xa%t(i,j,k) + grid%xb%t(i,j,k)
             grid%xb%w(i,j,k)   = grid%xa%w(i,j,k) + grid%xb%w(i,j,k)
             grid%xb%q(i,j,k)   = grid%xa%q(i,j,k) + grid%xb%q(i,j,k)
             ! compute pressure increments at KMA full levels
-            ! Note: Psfc is in hPa in  P = A + B * Psfc 
-            if (k == ke) then
+            ! Note: Psfc its in hPa in  P = A + B * Psfc 
+            if (k == kte) then
                coeff = grid%xb%KMA_B(K)/ &
                   (grid%xb%KMA_A(K)+grid%xb%KMA_B(K)*grid%xb%psfc(I,J)/100.0)
             else
@@ -63,18 +51,18 @@ subroutine da_transfer_xatokma(grid)
       end do
    end do
 
-   if (write_increments) call da_write_kma_increments(grid%xp, grid%xb, grid%xa)
+   if (write_increments) call da_write_kma_increments(grid)
 
-   do j=js,je
-      do i=is,ie
-        grid%em_w_2(i,j,ke+1)=  grid%em_w_2(i,j,ke+1) + grid%xa%w(i,j,ke+1)
+   do j=jts,jte
+      do i=its,ite
+        grid%em_w_2(i,j,kte+1)=  grid%em_w_2(i,j,kte+1) + grid%xa%w(i,j,kte+1)
         grid%psfc(i,j) = grid%psfc(i,j) + grid%xa%psfc(i,j)
       end do
    end do
 
-   do k=ks,ke
-      do j=js,je
-         do i=is,ie
+   do k=kts,kte
+      do j=jts,jte
+         do i=its,ite
             grid%em_u_2(i,j,k) = grid%em_u_2(i,j,k) + grid%xa%u(i,j,k)
             grid%em_v_2(i,j,k) = grid%em_v_2(i,j,k) + grid%xa%v(i,j,k)
             grid%em_w_2(i,j,k) = grid%em_w_2(i,j,k) + grid%xa%w(i,j,k)

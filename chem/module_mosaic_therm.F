@@ -48,7 +48,7 @@
 !                   that it does not exceed the max possible value for a given bin
 !   14-apr-05 raz - fixed asteem_flux_wet_case3 and asteem_flux_dry_case3c
 !   11-jan-05 raz - major updates to many subroutines
-!   18-nov-04 rce - make sure that cos argument is between +/-1.0
+!   18-nov-04 rce - make sure that acos argument is between +/-1.0
 !   28-jan-04 rce - added subr aerchem_boxtest_output;
 !	eliminated some unnecessary 'include v33com-'
 !   01-dec-03 rce - added 'implicit none' to many routines;
@@ -12319,12 +12319,12 @@
         thesign = 1.
       endif
 
-! rce 18-nov-2004 -- make sure that cos argument is between +/-1.0
-!     phi = cos(thesign*sqrt( (b*b/4.d0)/(-a*a*a/27.d0) ))	! radians
+! rce 18-nov-2004 -- make sure that acos argument is between +/-1.0
+!     phi = acos(thesign*sqrt( (b*b/4.d0)/(-a*a*a/27.d0) ))	! radians
       duma = thesign*sqrt( (b*b/4.d0)/(-a*a*a/27.d0) )
       duma = min( duma, +1.0D0 )
       duma = max( duma, -1.0D0 )
-      phi  = cos( duma )	! radians
+      phi  = acos( duma )	! radians
 
 
       cubic = 0.

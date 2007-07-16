@@ -1,4 +1,4 @@
-subroutine da_wrf_tpq_2_slp (xb)
+subroutine da_wrf_tpq_2_slp (grid)
 
    !---------------------------------------------------------------------
    ! Purpose: computes sea level pressure from the rule                
@@ -16,7 +16,7 @@ subroutine da_wrf_tpq_2_slp (xb)
    implicit none   
               
 
-   type (xb_type), intent(inout) :: xb    ! first guess (local).
+   type (domain), intent(inout) :: grid
 
    integer              :: I, J, K, KLO, KHI
    real                 :: PL, T0, TS, XTERM,    &
@@ -37,20 +37,20 @@ subroutine da_wrf_tpq_2_slp (xb)
    ! compute pressure at pconst mb above surface (pl)              
                                                                           
 
-   j_loop: do j=xb%jts, xb%jte
-      i_loop: do i=xb%its, xb%ite
-         if (xb%terr(i,j) <= 0.) then
-            xb%slp(i,j) = xb%psfc(i,j)
+   j_loop: do j=jts, jte
+      i_loop: do i=its, ite
+         if (grid%xb%terr(i,j) <= 0.) then
+            grid%xb%slp(i,j) = grid%xb%psfc(i,j)
             cycle i_loop
          end if
 
-         PL  = xb%psfc(i,j) - PCONST                                        
+         PL  = grid%xb%psfc(i,j) - PCONST                                        
          klo = 0
 
          ! FinD 2 LEVELS ON SIGMA SURFACES SURROUNDinG PL AT EACH I,J    
 
-         k_loop: do k=xb%kts, xb%kte-1
-            if ((xb%p(i,j,k) >= pl) .and. (xb%p(i,j,k+1) < pl)) then
+         k_loop: do k=kts, kte-1
+            if ((grid%xb%p(i,j,k) >= pl) .and. (grid%xb%p(i,j,k+1) < pl)) then
                khi = k+1
                klo = k
                exit k_loop
@@ -61,19 +61,19 @@ subroutine da_wrf_tpq_2_slp (xb)
             write(unit=message(1),fmt='(A,F11.3,A)') &
                'Cannot find pressure levelL ',PCONST,' mb above the surface'
             write(unit=message(2),fmt='(A,F11.3,2X,A,F11.3)') &
-               'PL=',PL,'  PSFC=',xb%psfc(i,j)
+               'PL=',PL,'  PSFC=',grid%xb%psfc(i,j)
             call da_error(__FILE__,__LINE__,message(1:2))                                               
          end if                                                         
 
          ! get temperature at pl (tl), extrapolate t at surface (ts)     
          ! and t at sea level (t0) with 6.5 k/km lapse rate              
 
-         tlo=xb%t(i,j,klo) * (eps+xb%q(i,j,klo))/(eps*(1.+xb%q(i,j,klo)))
-         thi=xb%t(i,j,khi) * (eps+xb%q(i,j,khi))/(eps*(1.+xb%q(i,j,khi)))
-         tl=thi-(thi-tlo)*log(pl/xb%p(i,j,khi)) &
-                      /log(xb%p(i,j,klo)/xb%p(i,j,khi))               
-         ts=tl*(xb%psfc(i,j)/pl)**xterm                           
-         t0=ts +gamma*xb%terr(i,j)
+         tlo=grid%xb%t(i,j,klo) * (eps+grid%xb%q(i,j,klo))/(eps*(1.+grid%xb%q(i,j,klo)))
+         thi=grid%xb%t(i,j,khi) * (eps+grid%xb%q(i,j,khi))/(eps*(1.+grid%xb%q(i,j,khi)))
+         tl=thi-(thi-tlo)*log(pl/grid%xb%p(i,j,khi)) &
+                      /log(grid%xb%p(i,j,klo)/grid%xb%p(i,j,khi))               
+         ts=tl*(grid%xb%psfc(i,j)/pl)**xterm                           
+         t0=ts +gamma*grid%xb%terr(i,j)
 
          ! correct sea level temperature if too hot                      
 
@@ -87,7 +87,7 @@ subroutine da_wrf_tpq_2_slp (xb)
 
          ! compute sea level pressure                                    
 
-         xb%slp(i,j)=xb%psfc(i,j)*EXP(2.*gravity*xb%terr(i,j)/ &
+         grid%xb%slp(i,j)=grid%xb%psfc(i,j)*EXP(2.*gravity*grid%xb%terr(i,j)/ &
             (gas_constant*(TS+T0)))
       end do i_loop
    end do j_loop

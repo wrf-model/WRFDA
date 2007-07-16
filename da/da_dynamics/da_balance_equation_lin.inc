@@ -1,4 +1,4 @@
-subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
+subroutine da_balance_equation_lin(grid, xbx, u, v, phi_b)
 
    !---------------------------------------------------------------------------
    !  Purpose: Calculates balanced mass increment phi_b from wind increments.
@@ -13,9 +13,7 @@ subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
 
    type(domain), intent(inout)               :: grid
 
-   type (xb_type), intent(in) :: xb               ! First guess structure.
-   type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars.
-   type (xpose_type),intent(inout)  :: xp         ! Dimensions and xpose buffers. 
+   type (xbx_type),intent(in) :: xbx              ! Header & non-gridded vars. 
 
    real, intent(in)  :: u(ims:ime,jms:jme,kms:kme) ! u wind comp.
    real, intent(in)  :: v(ims:ime,jms:jme,kms:kme) ! v wind comp.
@@ -44,10 +42,10 @@ subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
    if (jts == jds ) js = jds+1; if (jte == jde ) je = jde-1
 
    if( fg_format == fg_format_kma_global) then
-      coefx = xb%coefx
-      coefy = xb%coefy
+      coefx = grid%xb%coefx
+      coefy = grid%xb%coefy
    else if( fg_format == fg_format_wrf) then
-      coefx = xb%coefz
+      coefx = grid%xb%coefz
       coefy = coefx   
    else
       write(unit=message(1),fmt='(A,I3)') 'Wrong FG_FORMAT = ',fg_format
@@ -69,7 +67,7 @@ subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
 
       if (balance_type == balance_geo .OR. &
            balance_type == balance_geocyc ) then
-         call da_balance_geoterm_lin( xb % cori, xb % rho(:,:,k), &
+         call da_balance_geoterm_lin( grid%xb % cori, grid%xb % rho(:,:,k), &
                                       u(:,:,k), v(:,:,k), &
                                       term_x, term_y)
       end if
@@ -78,9 +76,9 @@ subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
 
       if (balance_type == balance_cyc .OR. &
            balance_type == balance_geocyc ) then
-         call da_balance_cycloterm_lin( xb % rho(:,:,k), xb % u(:,:,k),   &
-                                        xb % v(:,:,k), u(:,:,k), v(:,:,k),&
-                                        xb % coefx(:,:), xb % coefy(:,:), &
+         call da_balance_cycloterm_lin( grid%xb % rho(:,:,k), grid%xb % u(:,:,k),   &
+                                        grid%xb % v(:,:,k), u(:,:,k), v(:,:,k),&
+                                        grid%xb % coefx(:,:), grid%xb % coefy(:,:), &
                                         term_x(:,:), term_y(:,:))
       end if
       
@@ -111,7 +109,7 @@ subroutine da_balance_equation_lin(grid, xb, xbx, xp, u, v, phi_b)
    !  [3.0] Solve Del**2 phi_b = RHS for phi_b:
    !------------------------------------------------------------------------------
 
-   call da_solve_poissoneqn_fst(grid, xbx, xp, del2phi_b, phi_b) 
+   call da_solve_poissoneqn_fst(grid, xbx, del2phi_b, phi_b) 
 
 end subroutine da_balance_equation_lin
 

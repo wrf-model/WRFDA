@@ -2,7 +2,7 @@ module da_ssmi
 
 
    use module_dm, only : wrf_dm_sum_integer
-   use module_domain, only : xpose_type, xb_type
+   use module_domain, only : xpose_type, xb_type, domain
    use module_ssmi, only : cal_sigma_v,tb,effht,epsalt,spemiss,tbatmos,&
       roughem,effang,tbatmos,filter
 
@@ -13,8 +13,9 @@ module da_ssmi
       max_stheight_diff,missing_data,max_error_bq,max_error_slp, &
       max_error_bt, max_error_buv, max_error_thickness, mkz, &
       num_ssmt2_tot,num_ssmt1_tot,max_error_rh,max_error_tb, max_error_pw, &
-      trace_use,test_wrfvar,stdout, Use_SsmiRetrievalObs, Use_SsmiTbObs, &
-      num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot, global, print_detail_obs
+      trace_use,test_wrfvar,stdout, use_ssmiretrievalobs, use_ssmitbobs, &
+      num_ssmi_tb_tot,num_ssmi_rv_tot,num_ssmi_tot, global, print_detail_obs, &
+      its,ite,jts,jte,kts,kte,ims,ime,jms,jme,kms,kme,ids,ide,jds,jde
    use da_define_structures, only : maxmin_type, ob_type, y_type, jo_type, &
       bad_data_type, x_type, number_type, bad_data_type, &
       maxmin_type,residual_ssmi_retrieval_type, &
