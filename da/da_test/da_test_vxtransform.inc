@@ -85,11 +85,6 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    if ( cv_options_hum == 2 ) then
       xa2_rh(ims:ime,jms:jme,:) = grid%xa % rh(ims:ime,jms:jme,:)
    end if
-   if ( cv_options_hum == 3 ) then
-      xa2_qt (ims:ime,jms:jme,:) = grid%xa % qt (ims:ime,jms:jme,:)
-      xa2_qcw(ims:ime,jms:jme,:) = grid%xa % qcw(ims:ime,jms:jme,:)
-      xa2_qrn(ims:ime,jms:jme,:) = grid%xa % qrn(ims:ime,jms:jme,:)
-   end if
 
    vv1 % v1(its:ite,jts:jte,1:kz_vv(1)) = vv % v1(its:ite,jts:jte,1:kz_vv(1))
    vv1 % v2(its:ite,jts:jte,1:kz_vv(2)) = vv % v2(its:ite,jts:jte,1:kz_vv(2))
