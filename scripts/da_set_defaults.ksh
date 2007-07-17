@@ -126,8 +126,8 @@ export NL_DX=${NL_DX:-200000}
 export NL_DY=${NL_DY:-200000}
 export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export FG_TYPE=${FG_TYPE:-GFS}
-export CONSTANTS1=${CONSTANTS1:-}
-export CONSTANTS2=${CONSTANTS2:-}
+export CONSTANTS1=${CONSTANTS1:-*}
+export CONSTANTS2=${CONSTANTS2:-*}
 export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
 
 #WRF real (not already covered above):
