@@ -56,7 +56,6 @@ export RUN_CMD="$DEBUGGER " # Space important
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
 elif test $SUBMIT = "LSF"; then 
-
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -69,7 +68,6 @@ elif test $SUBMIT = "LSF"; then
 #BSUB -e job.error   
 #BSUB -W $WALLCLOCK       
 #BSUB -P $PROJECT        
-#BSUB -R "span[ptile=$LL_PTILE]"
 $SUBMIT_OPTIONS1
 $SUBMIT_OPTIONS2
 $SUBMIT_OPTIONS3
