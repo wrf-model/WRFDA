@@ -34,9 +34,9 @@ echo "END_DATE      = $END_DATE"
   
 export DATE=$START_DATE
 
-while test $DATE -le $END_DATE; do
+while [[ $DATE -le $END_DATE ]]; do
    cat ${EXP_DIR}/run/${DATE}/wrfvar/working/gts_omb_oma >> hollingsworth1.in
-   export DATE=`${WRFVAR_DIR}/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD`
+   export DATE=$(${WRFVAR_DIR}/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD)
 done
 
 echo '*end*' >> hollingsworth1.in
@@ -46,12 +46,12 @@ ${WRFVAR_DIR}/build/da_tune_obs_hollingsworth1.exe > hollingsworth1.log 2>&1
 rm hollingsworth1.in
 
 for FILE1 in *.dat; do
-   FILE2=`basename $FILE1`
+   FILE2=$(basename $FILE1)
    FILE2=${FILE2%%.dat}
    ln -fs $FILE1 fort.35
 
    ${WRFVAR_DIR}/build/da_tune_obs_hollingsworth2.exe > hollingsworth2_$FILE2.log 2>&1
-   if test -f fort.30; then 
+   if [[ -f fort.30 ]]; then 
       mv fort.30     $FILE2.sigma_o_b
    fi
    mv hollingsworth2.out $FILE2.out

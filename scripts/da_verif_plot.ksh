@@ -80,11 +80,11 @@ EOF
 
 ln -sf ${WRFVAR_DIR}/build/da_verif.exe .
 
-nfile=`ls *${DIAG_VAR}.diag 2>/dev/null | wc -l`
-if test $nfile -eq "0"; then
+nfile=$(ls *${DIAG_VAR}.diag 2>/dev/null | wc -l)
+if [[ $nfile -eq 0 ]]; then
    ./da_verif.exe > da_verif.out 2>&1
    RC=$?
-   if test $RC != 0; then
+   if [[ $RC != 0 ]]; then
       echo "da_verif.exe failed with error $RC"
       exit 1
    fi
@@ -101,14 +101,14 @@ echo "$DIAG_VAR" >> header_main
 
 iexp=0
 echo "${NUM_EXPT}" >> header_main
-while test $iexp -lt $NUM_EXPT; do
+while [[ $iexp -lt $NUM_EXPT ]]; do
    echo ${pdat_dirs[$iexp]} >> header_main
    iexp=$((iexp + 1))
 done
 
 rm -f tmp_upr tmp_sfc
-num_sfc=`ls ${pdat_dirs[0]}/surface*${DIAG_VAR}.diag |wc -l`
-num_upr=`ls ${pdat_dirs[0]}/upr*${DIAG_VAR}.diag |wc -l`
+num_sfc=$(ls ${pdat_dirs[0]}/surface*${DIAG_VAR}.diag |wc -l)
+num_upr=$(ls ${pdat_dirs[0]}/upr*${DIAG_VAR}.diag |wc -l)
 
 cd ${pdat_dirs[0]}
 for vn in u v t q p; do
@@ -128,22 +128,22 @@ else
    echo "All surface files generated successfully.."
    echo "fnames_sfc" >> header_main
 
-   anyfile=`head -1 "tmp_sfc"`
-   ncol=`head -1 ${pdat_dirs[0]}/$anyfile |wc -w`
-   nrow=`cat ${pdat_dirs[0]}/$anyfile |wc -l`
+   anyfile=$(head -1 "tmp_sfc")
+   ncol=$(head -1 ${pdat_dirs[0]}/$anyfile |wc -w)
+   nrow=$(cat ${pdat_dirs[0]}/$anyfile |wc -l)
    echo $nrow > fnames_sfc
    echo $ncol >> fnames_sfc
    while read ob_fname
    do
-      if [ "$ob_fname" = "surface_p_omb.diag" ]; then
+      if [[ "$ob_fname" == "surface_p_omb.diag" ]]; then
          ob_unit='"hPa"'
-      elif [ "$ob_fname" = "surface_t_omb.diag" ]; then
+      elif [[ "$ob_fname" == "surface_t_omb.diag" ]]; then
          ob_unit='T (~S~o~N~C)'
-      elif [ "$ob_fname" = "surface_u_omb.diag" ]; then
+      elif [[ "$ob_fname" == "surface_u_omb.diag" ]]; then
          ob_unit='U (ms~S~-1~N~)' 
-      elif [ "$ob_fname" = "surface_v_omb.diag" ]; then
+      elif [[ "$ob_fname" == "surface_v_omb.diag" ]]; then
          ob_unit='V (ms~S~-1~N~)' 
-      elif [ "$ob_fname" = "surface_q_omb.diag" ]; then
+      elif [[ "$ob_fname" == "surface_q_omb.diag" ]]; then
          ob_unit='Q (gmKg~S~-1~N~)' 
       else
          echo "Unknown surface variable:-Don't know what to do??"
@@ -153,27 +153,26 @@ else
    done < tmp_sfc
 fi
 
-if [ "$num_upr" -lt 4 ]; then
+if [[ "$num_upr" -lt 4 ]]; then
    echo "All upper-air files are not generated"
    echo "Check your data and selected observation types"
 else
    echo "All upper-air files generated successfully.."
    echo "fnames_upr" >> header_main    
 
-   anyfile=`head -1 "tmp_upr"`
-   ncol=`head -1 ${pdat_dirs[0]}/$anyfile |wc -w`
-   nrow=`cat ${pdat_dirs[0]}/$anyfile |wc -l`
+   anyfile=$(head -1 "tmp_upr")
+   ncol=$(head -1 ${pdat_dirs[0]}/$anyfile |wc -w)
+   nrow=$(cat ${pdat_dirs[0]}/$anyfile |wc -l)
    echo $nrow > fnames_upr     
    echo $ncol >> fnames_upr     
-   while read ob_fname
-   do
-      if [ "$ob_fname" = "upr_t_omb.diag" ]; then
+   while read ob_fname; do
+      if [[ "$ob_fname" == "upr_t_omb.diag" ]]; then
          ob_unit='T (~S~o~N~C)'
-      elif [ "$ob_fname" = "upr_u_omb.diag" ]; then
+      elif [[ "$ob_fname" == "upr_u_omb.diag" ]]; then
          ob_unit='U (ms~S~-1~N~)' 
-      elif [ "$ob_fname" = "upr_v_omb.diag" ]; then
+      elif [[ "$ob_fname" == "upr_v_omb.diag" ]]; then
          ob_unit='V (ms~S~-1~N~)' 
-      elif [ "$ob_fname" = "upr_q_omb.diag" ]; then
+      elif [[ "$ob_fname" == "upr_q_omb.diag" ]]; then
          ob_unit='Q (gmKg~S~-1~N~)' 
       else
          echo "Unknown upper-air variable:-Don't know what to do??"
@@ -206,14 +205,14 @@ chmod +x run3
 echo "<HTML><HEAD><TITLE>Verification Plots for $EXP_NAMES<TITLE></HEAD>" > index.html
 echo "<BODY><H1>Verification Plots for $EXP_NAMES</H1><UL>" >> index.html
 for FILE in *.pdf *.log; do
-   if test -f $FILE; then
+   if [[ -f $FILE ]]; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi
 done
 
 echo "</UL>Output logs<UL>" >> index.html
 for FILE in *.log; do
-   if test -f $FILE; then
+   if [[ -f $FILE ]]; then
       echo '<LI><A HREF="'$FILE'">'$FILE'</a>' >> index.html
    fi
 done

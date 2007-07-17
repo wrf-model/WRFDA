@@ -33,7 +33,7 @@ export NUM_PROCS=${NUM_PROCS:-1}
 export NUM_MEMBERS=${NUM_MEMBERS:-1}
 export NUM_JOBS=${NUM_JOBS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -128,19 +128,19 @@ export NL_ANALYSIS_TYPE_SAVE=$NL_ANALYSIS_TYPE
 export RUN_DIR_SAVE=$RUN_DIR
 
 #These are the local values:
-export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+export END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
 export FCST_RANGE=0
 export NL_RUN_HOURS=0
 export RC_DIR=$RUN_DIR_SAVE/rc
 export NL_ANALYSIS_TYPE="randomcv"
 mkdir -p $RC_DIR
 
-if test -f ${RC_DIR_SAVE}/geo_em.d01.nc; then
+if [[ -f ${RC_DIR_SAVE}/geo_em.d01.nc ]]; then
    cp ${RC_DIR_SAVE}/geo_em.d01.nc ${RC_DIR}
    export RUN_GEOGRID=false
 fi
 
-while test $DATE -le $END_DATE; do 
+while [[ $DATE -le $END_DATE ]]; do 
    echo "Producing wrfinput files for $DATE"
 
 #  Run WPS:
@@ -150,8 +150,8 @@ while test $DATE -le $END_DATE; do
 #   $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR >&! /dev/null
    ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
    RC=$?
-   if test $RC != 0; then
-      echo `date` "${ERR}Failed with error $RC$END"
+   if [[ $RC != 0 ]]; then
+      echo $(date) "${ERR}Failed with error $RC$END"
       exit 1
    fi
    export RUN_GEOGRID=false # Only need to run it once.
@@ -163,12 +163,12 @@ while test $DATE -le $END_DATE; do
 #   $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR >&! /dev/null
    ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
    RC=$?
-   if test $RC != 0; then
-      echo `date` "${ERR}Failed with error $RC$END"
+   if [[ $RC != 0 ]]; then
+      echo $(date) "${ERR}Failed with error $RC$END"
       exit 1
    fi
 
-   export NEXT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
    export DATE=$NEXT_DATE
 
 done
@@ -183,17 +183,17 @@ export DATE=$DATE_SAVE
 export RC_DIR=$RC_DIR_SAVE
 export RUN_DIR=$RUN_DIR_SAVE
 
-export MEM=1
-export JOB=1
+let MEM=1
+let JOB=1
 
-while test $MEM -le $NUM_MEMBERS; do 
+while [[ $MEM -le $NUM_MEMBERS ]]; do 
    echo "Producing perturbed wrfbdy files for ensemble member $MEM"
    ${WRFVAR_DIR}/scripts/da_perturb_wrf_bc.ksh > ${RUN_DIR}/da_perturb_wrf_bc.${MEM}.out 2>&1 &
 
-   export MEM=`expr $MEM + 1`
-   export JOB=`expr $JOB + 1`
+   let MEM=$MEM+1
+   let JOB=$JOB+1
 
-   if test $JOB -gt $NUM_JOBS || test $MEM -gt $NUM_MEMBERS; then
+   if [[ $JOB -gt $NUM_JOBS || $MEM -gt $NUM_MEMBERS ]]; then
       export JOB=1
       wait # Wait for current jobs to finish
    fi

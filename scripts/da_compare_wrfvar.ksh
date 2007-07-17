@@ -2,7 +2,7 @@
 
 # Purpose: Compare files between wrfvar runs
 
-if test $# != 2; then
+if [[ $# != 2 ]]; then
    echo "Arguments dir1 dir2"
    exit 1
 fi
@@ -10,23 +10,23 @@ fi
 DIR1=$1
 DIR2=$2
 
-if test ! -d $DIR1; then
+if [[ ! -d $DIR1 ]]; then
    echo "Directory $DIR1 does not exist"
    exit 1
 fi
 
-if test ! -d $DIR2; then
+if [[ ! -d $DIR2 ]]; then
    echo "Directory $DIR2 does not exist"
    exit 1
 fi
 
-if test -d $DIR1/wrf-var; then
+if [[ -d $DIR1/wrf-var ]]; then
    TYPE1_OLD=true
 else
    TYPE1_OLD=false
 fi
 
-if test -d $DIR2/wrf-var; then
+if [[ -d $DIR2/wrf-var ]]; then
    TYPE2_OLD=true
 else
    TYPE2_OLD=false
@@ -58,7 +58,7 @@ NEW_FILE[9]=working/rand_obs_error
 
 COUNT=1
 
-while test $COUNT -le ${#NEW_FILE[@]}; do
+while [[ $COUNT -le ${#NEW_FILE[@]} ]]; do
    if $TYPE1_OLD; then
       FILE1=${OLD_FILE[$COUNT]}
    else
@@ -70,9 +70,9 @@ while test $COUNT -le ${#NEW_FILE[@]}; do
       FILE2=${NEW_FILE[$COUNT]}
    fi
 
-   if test -f $DIR1/$FILE1 && test -f $DIR2/$FILE2; then
+   if [[ -f $DIR1/$FILE1 && -f $DIR2/$FILE2 ]]; then
       diff -q $DIR1/$FILE1 $DIR2/$FILE2
-      if test $? != 0 && $FULL; then
+      if [[ $? != 0 ]] && $FULL; then
          diff $DIR1/$FILE1 $DIR2/$FILE2
       fi
    fi 
@@ -87,7 +87,7 @@ NEW_BINARY_FILE[1]=working/analysis
 
 COUNT=1
 
-while test $COUNT -le ${#NEW_BINARY_FILE[@]}; do
+while [[ $COUNT -le ${#NEW_BINARY_FILE[@]} ]]; do
    if $TYPE1_OLD; then
       FILE1=${OLD_BINARY_FILE[$COUNT]}
    else
@@ -98,9 +98,9 @@ while test $COUNT -le ${#NEW_BINARY_FILE[@]}; do
    else
       FILE2=${NEW_BINARY_FILE[$COUNT]}
    fi
-   if test -f $FILE1 && -f $FILE2; then
+   if [[ -f $FILE1 && -f $FILE2 ]]; then
       cmp $DIR1/$FILE1 $DIR2/$FILE2
-      if test $? != 0 && $FULL; then
+      if [[ $? != 0 ]] && $FULL; then
         ncdump $DIR1/$FILE1 > tmp1
         ncdump $DIR2/$FILE2 > tmp2
         sdiff tmp1 tmp2

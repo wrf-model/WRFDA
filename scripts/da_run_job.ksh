@@ -26,7 +26,7 @@ export MP_SHARED_MEMORY=${MP_SHARED_MEMORY:-yes}
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-if test $SUBMIT = "LoadLeveller"; then 
+if [[ $SUBMIT == "LoadLeveller" ]]; then 
    # Rather simplistic node calculation 
    let TEMP=$NUM_PROCS-1
    let NODES=$TEMP/8+1
@@ -55,7 +55,7 @@ $SUBMIT_OPTIONS10
 export RUN_CMD="$DEBUGGER " # Space important
 $SCRIPT > $EXP_DIR/index.html 2>&1
 EOF
-elif test $SUBMIT = "LSF"; then 
+elif [[ $SUBMIT == "LSF" ]]; then 
    cat > job.ksh <<EOF
 #!/bin/ksh
 #
@@ -85,10 +85,10 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
-elif test $SUBMIT = "PBS"; then 
+elif [[ $SUBMIT == "PBS" ]]; then 
    # Rather simplistic node calculation
    export TEMP=$NUM_PROCS
-   if test $TEMP -gt 4; then
+   if [[ $TEMP -gt 4 ]]; then
       TEMP=4
    fi
    typeset -L15 JOBNAME=${REGION}_${EXPT}
@@ -122,8 +122,8 @@ export RUN_CMD="${RUN_CMD:-\$RUN_CMD_DEFAULT}"
 $SCRIPT > $EXP_DIR/index.html 2>&1
 
 EOF
-elif test $SUBMIT = none; then
-   if test -f $HOSTS; then
+elif [[ $SUBMIT == none ]]; then
+   if [[ -f $HOSTS ]]; then
       export RUN_CMD_DEFAULT="mpirun -machinefile $HOSTS -np $NUM_PROCS"
    else
       export RUN_CMD_DEFAULT="mpirun -np $NUM_PROCS"
@@ -138,36 +138,36 @@ EOF
 fi
 
 if $CHECK_SVNVERSION; then
-   if test -d $WRF_DIR; then
-      export WRF_VN=`svnversion -n \$WRF_DIR 2>/dev/null`
+   if [[ -d $WRF_DIR ]]; then
+      export WRF_VN=$(svnversion -n \$WRF_DIR 2>/dev/null)
    fi
-   if test -d $WRFNL_DIR; then
-      export WRFNL_VN=`svnversion -n \$WRFNL_DIR 2>/dev/null`
+   if [[ -d $WRFNL_DIR ]]; then
+      export WRFNL_VN=$(svnversion -n \$WRFNL_DIR 2>/dev/null)
    fi
-   if test -d $WRFVAR_DIR; then
-      export WRFVAR_VN=`svnversion -n \$WRFVAR_DIR 2>/dev/null`
+   if [[ -d $WRFVAR_DIR ]]; then
+      export WRFVAR_VN=$(svnversion -n \$WRFVAR_DIR 2>/dev/null)
    fi
-   if test -d $WRFPLUS_DIR; then
-      export WRFPLUS_VN=`svnversion -n \$WRFPLUS_DIR 2>/dev/null`
+   if [[ -d $WRFPLUS_DIR ]]; then
+      export WRFPLUS_VN=$(svnversion -n \$WRFPLUS_DIR 2>/dev/null)
    fi
-   if test -d $WPS_DIR; then
-      export WPS_VN=`svnversion -n \$WPS_DIR 2>/dev/null`
+   if [[ -d $WPS_DIR ]]; then
+      export WPS_VN=$(svnversion -n \$WPS_DIR 2>/dev/null)
    fi
 fi
 
 cat >> job.ksh <<EOF
 RC=\$?
-echo `date +'%D %T'` "Ended $RC"
+echo $(date +'%D %T') "Ended $RC"
 EOF
 
 chmod +x job.ksh
 
 echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
-if test $SUBMIT = "LoadLeveller"; then 
+if [[ $SUBMIT == "LoadLeveller" ]]; then 
    llsubmit job.ksh
-elif test $SUBMIT = "LSF"; then 
+elif [[ $SUBMIT == "LSF" ]]; then 
    bsub < $PWD/job.ksh
-elif test $SUBMIT = "PBS"; then 
+elif [[ $SUBMIT == "PBS" ]]; then 
    qsub $PWD/job.ksh
 else
    ./job.ksh

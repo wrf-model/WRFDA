@@ -21,7 +21,7 @@ export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export HOSTS=${HOSTS:-${HOME}/hosts}
 export NL_VAR4D=${NL_VAR4D:-false}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -49,7 +49,7 @@ export NL_DY=${NL_DY:-200000}                # Resolution (m).
 # From WRF (namelist.input):
 # &time_control:
 export NL_RUN_HOURS=${NL_RUN_HOURS:-$FCST_RANGE}
-if  $NL_VAR4D ; then
+if $NL_VAR4D; then
     export NL_RUN_HOURS=$FCST_RANGE
 fi
 export NL_HISTORY_INTERVAL=${NL_HISTORY_INTERVAL:-360}          # (minutes)
@@ -90,7 +90,7 @@ export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 export WRF_INPUT=${WRF_INPUT:-$RC_DIR/$DATE/wrfinput_d${DOMAIN}}
 export WRF_BDY=${WRF_BDY:-$RC_DIR/$DATE/wrfbdy_d${DOMAIN}}
 
-if test ! -d $FC_DIR/$DATE; then mkdir -p $FC_DIR/$DATE; fi
+if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
 rm -rf $WORK_DIR
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
@@ -130,17 +130,17 @@ ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 # WHY
 # cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
-export NL_INTERVAL_SECONDS=`expr $LBC_FREQ \* 3600`
+export NL_INTERVAL_SECONDS=$(expr $LBC_FREQ \* 3600)
 
 
-if test ! -f $WRF_DIR/inc/namelist_script.inc; then
+if [[ ! -f $WRF_DIR/inc/namelist_script.inc ]]; then
    # No namelist_script logic introduced during build, so add manually
    ln -fs $WRFVAR_DIR/inc/namelist_script_wrf_2234.inc $WRF_DIR/inc/namelist_script.inc
 fi
 
-if test $WRF_NAMELIST'.' != '.'; then
+if [[ $WRF_NAMELIST'.' != '.' ]]; then
    ln -fs $WRF_NAMELIST namelist.input
-elif test -f $WRF_DIR/inc/namelist_script.inc; then
+elif [[ -f $WRF_DIR/inc/namelist_script.inc ]]; then
    . $WRF_DIR/inc/namelist_script.inc
 else
    ln -fs $WRF_DIR/test/em_real/namelist.input .
@@ -151,21 +151,21 @@ cp namelist.input $RUN_DIR
 echo '<A HREF="namelist.input">Namelist input</a>'
 
 # WHY
-# if test ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00; then
+# if [[ ! -f $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 ]]; then
 
    if $DUMMY; then
       echo Dummy wrf
       LOCAL_DATE=$DATE
-      while test $LOCAL_DATE -le $END_DATE; do
-         export L_YEAR=`echo $LOCAL_DATE | cut -c1-4`
-         export L_MONTH=`echo $LOCAL_DATE | cut -c5-6`
-         export L_DAY=`echo $LOCAL_DATE | cut -c7-8`
-         export L_HOUR=`echo $LOCAL_DATE | cut -c9-10`
+      while [[ $LOCAL_DATE -le $END_DATE ]]; do
+         export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
+         export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
+         export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
+         export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
          echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
-         LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $LOCAL_DATE $NL_HISTORY_INTERVAL`
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
       done
    else
-      if  $NL_VAR4D && test $NUM_PROCS -gt 1; then
+      if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then
          touch wrfnl_go_ahead
       fi
       $RUN_CMD ./wrf.exe
@@ -189,7 +189,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="rsl/rsl.out.0000.html">rsl.out.0000</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
-      echo `date +'%D %T'` "Ended $RC"
+      echo $(date +'%D %T') "Ended $RC"
    fi
    mv wrfout* $FC_DIR/$DATE
 # else

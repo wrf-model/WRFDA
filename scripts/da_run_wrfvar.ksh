@@ -1,8 +1,8 @@
 #!/bin/ksh
-DIR=`dirname $0`
+DIR=$(dirname $0)
 export NUM_PROCS=${NUM_PROCS:-1}               # Number of processors to run on.
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS -machinefile $HOSTS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -50,11 +50,11 @@ export CYCLING=${CYCLING:-false}
 export NL_GLOBAL=${NL_GLOBAL:-false}
 export NL_VAR4D=${NL_VAR4D:-false}
 
-export YEAR=`echo $DATE | cut -c1-4`
-export MONTH=`echo $DATE | cut -c5-6`
-export DAY=`echo $DATE | cut -c7-8`
-export HOUR=`echo $DATE | cut -c9-10`
-export PREV_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
+export YEAR=$(echo $DATE | cut -c1-4)
+export MONTH=$(echo $DATE | cut -c5-6)
+export DAY=$(echo $DATE | cut -c7-8)
+export HOUR=$(echo $DATE | cut -c9-10)
+export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
 export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
@@ -134,16 +134,16 @@ if $NL_VAR4D; then
 fi
 echo "DA_FIRST_GUESS        $DA_FIRST_GUESS"
 echo "DA_BACK_ERRORS        $DA_BACK_ERRORS"
-if test -d $DA_RTTOV_COEFFS; then
+if [[ -d $DA_RTTOV_COEFFS ]]; then
    echo "DA_RTTOV_COEFFS       $DA_RTTOV_COEFFS"
 fi
-if test -d $DA_CRTM_COEFFS; then
+if [[ -d $DA_CRTM_COEFFS ]]; then
    echo "DA_CRTM_COEFFS        $DA_CRTM_COEFFS"
 fi
-if test -d $BIASCORR_DIR; then
+if [[ -d $BIASCORR_DIR ]]; then
    echo "BIASCORR_DIR          $BIASCORR_DIR"
 fi
-if test -d $OBS_TUNING_DIR; then
+if [[ -d $OBS_TUNING_DIR ]] ; then
    echo "OBS_TUNING_DIR        $OBS_TUNING_DIR"
 fi
 echo 'OB_DIR                <A HREF="file:'$OB_DIR'">'$OB_DIR'</a>'
@@ -154,22 +154,22 @@ echo "DATE                  $DATE"
 echo "WINDOW_START          $WINDOW_START"
 echo "WINDOW_END            $WINDOW_END"
 
-# if test ! -f $DA_ANALYSIS; then
+# if [[ ! -f $DA_ANALYSIS ]] ; then
 
    rm -rf ${WORK_DIR}
    mkdir -p ${WORK_DIR}
    cd $WORK_DIR
 
-   START_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_START`
-   END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_END`
+   START_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_START)
+   END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_END)
 
    for INDEX in 01 02 03 04 05 06 07; do
       let H=$INDEX-1+$WINDOW_START
-      D_DATE[$INDEX]=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $H`
-      export D_YEAR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c1-4`
-      export D_MONTH[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c5-6`
-      export D_DAY[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c7-8`
-      export D_HOUR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
+      D_DATE[$INDEX]=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $H)
+      export D_YEAR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c1-4)
+      export D_MONTH[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c5-6)
+      export D_DAY[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c7-8)
+      export D_HOUR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c9-10)
    done
 
    export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
@@ -177,10 +177,10 @@ echo "WINDOW_END            $WINDOW_END"
       export NPROC_X=1
    fi
 
-   export YEAR=`echo $DATE | cut -c1-4`
-   export MONTH=`echo $DATE | cut -c5-6`
-   export DAY=`echo $DATE | cut -c7-8`
-   export HOUR=`echo $DATE | cut -c9-10`
+   export YEAR=$(echo $DATE | cut -c1-4)
+   export MONTH=$(echo $DATE | cut -c5-6)
+   export DAY=$(echo $DATE | cut -c7-8)
+   export HOUR=$(echo $DATE | cut -c9-10)
 
    export NL_START_YEAR=$YEAR
    export NL_START_MONTH=$MONTH
@@ -192,30 +192,30 @@ echo "WINDOW_END            $WINDOW_END"
    export NL_END_DAY=$DAY
    export NL_END_HOUR=$HOUR
 
-   export START_YEAR=`echo $START_DATE | cut -c1-4`
-   export START_MONTH=`echo $START_DATE | cut -c5-6`
-   export START_DAY=`echo $START_DATE | cut -c7-8`
-   export START_HOUR=`echo $START_DATE | cut -c9-10`
+   export START_YEAR=$(echo $START_DATE | cut -c1-4)
+   export START_MONTH=$(echo $START_DATE | cut -c5-6)
+   export START_DAY=$(echo $START_DATE | cut -c7-8)
+   export START_HOUR=$(echo $START_DATE | cut -c9-10)
 
-   export END_YEAR=`echo $END_DATE | cut -c1-4`
-   export END_MONTH=`echo $END_DATE | cut -c5-6`
-   export END_DAY=`echo $END_DATE | cut -c7-8`
-   export END_HOUR=`echo $END_DATE | cut -c9-10`
+   export END_YEAR=$(echo $END_DATE | cut -c1-4)
+   export END_MONTH=$(echo $END_DATE | cut -c5-6)
+   export END_DAY=$(echo $END_DATE | cut -c7-8)
+   export END_HOUR=$(echo $END_DATE | cut -c9-10)
 
    export NL_TIME_WINDOW_MIN=${NL_TIME_WINDOW_MIN:-${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00.0000}
    export NL_TIME_WINDOW_MAX=${NL_TIME_WINDOW_MAX:-${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00.0000}
    
    if $NL_VAR4D; then
 
-      export NL_START_YEAR=`echo $START_DATE | cut -c1-4`
-      export NL_START_MONTH=`echo $START_DATE | cut -c5-6`
-      export NL_START_DAY=`echo $START_DATE | cut -c7-8`
-      export NL_START_HOUR=`echo $START_DATE | cut -c9-10`
+      export NL_START_YEAR=$(echo $START_DATE | cut -c1-4)
+      export NL_START_MONTH=$(echo $START_DATE | cut -c5-6)
+      export NL_START_DAY=$(echo $START_DATE | cut -c7-8)
+      export NL_START_HOUR=$(echo $START_DATE | cut -c9-10)
 
-      export NL_END_YEAR=`echo $END_DATE | cut -c1-4`
-      export NL_END_MONTH=`echo $END_DATE | cut -c5-6`
-      export NL_END_DAY=`echo $END_DATE | cut -c7-8`
-      export NL_END_HOUR=`echo $END_DATE | cut -c9-10`
+      export NL_END_YEAR=$(echo $END_DATE | cut -c1-4)
+      export NL_END_MONTH=$(echo $END_DATE | cut -c5-6)
+      export NL_END_DAY=$(echo $END_DATE | cut -c7-8)
+      export NL_END_HOUR=$(echo $END_DATE | cut -c9-10)
 
    fi
 
@@ -223,17 +223,17 @@ echo "WINDOW_END            $WINDOW_END"
    # [2.0] Perform sanity checks:
    #-----------------------------------------------------------------------
 
-   if test ! -r $DA_FIRST_GUESS; then
+   if [[ ! -r $DA_FIRST_GUESS ]]; then
       echo "${ERR}First Guess file >$DA_FIRST_GUESS< does not exist:$END"
       exit 1
    fi
 
-   if test ! -d $OB_DIR; then
+   if [[ ! -d $OB_DIR ]]; then
       echo "${ERR}Observation directory >$OB_DIR< does not exist:$END"
       exit 1
    fi
 
-   if test ! -r $DA_BACK_ERRORS; then
+   if [[ ! -r $DA_BACK_ERRORS ]]; then
       echo "${ERR}Background Error file >$DA_BACK_ERRORS< does not exist:$END"
       exit 1
    fi
@@ -242,11 +242,11 @@ echo "WINDOW_END            $WINDOW_END"
    # [3.0] Prepare for assimilation:
    #-----------------------------------------------------------------------
 
-   if test -d $DA_RTTOV_COEFFS; then
+   if [[ -d $DA_RTTOV_COEFFS ]]; then
       ln -fs $DA_RTTOV_COEFFS/* .
    fi
  
-   if test -d $DA_CRTM_COEFFS; then
+   if [[ -d $DA_CRTM_COEFFS ]]; then
       ln -fs $DA_CRTM_COEFFS/* .
    fi
 
@@ -265,22 +265,22 @@ echo "WINDOW_END            $WINDOW_END"
    ln -fs $DA_BACK_ERRORS be.dat
 
    for FILE in $DAT_DIR/*.inv; do
-      if test -f $FILE; then
+      if [[ -f $FILE ]]; then
          ln -fs $FILE .
       fi
    done
 
-   if test -d $BIASCORR_DIR; then
+   if [[ -d $BIASCORR_DIR ]]; then
       ln -fs $BIASCORR_DIR biascorr
    fi
 
-   if test -d $OBS_TUNING_DIR; then
+   if [[ -d $OBS_TUNING_DIR ]]; then
       ln -fs $OBS_TUNING_DIR/* .
    fi
 
    ln -fs $WRFVAR_DIR/run/radiance_info .
 
-   if test $NL_NUM_FGAT_TIME -gt 1; then
+   if [[ $NL_NUM_FGAT_TIME -gt 1 ]]; then
       if $NL_VAR4D; then
          # More than one observation file of each type
          ln -fs $OB_DIR/${D_DATE[01]}/ob.ascii+ ob01.ascii
@@ -289,7 +289,7 @@ echo "WINDOW_END            $WINDOW_END"
          done
          ln -fs $OB_DIR/${D_DATE[07]}/ob.ascii- ob07.ascii
 
-         if test -e $OB_DIR/${D_DATE[01]}/ssmi.dat+; then
+         if [[ -e $OB_DIR/${D_DATE[01]}/ssmi.dat+ ]]; then
             ln -fs $OB_DIR/${D_DATE[01]}/ssmi.dat+ ssmi01.dat
             for I in 02 03 04 05 06; do
                ln -fs $OB_DIR/${D_DATE[$I]}/ssmi.dat ssmi${I}.dat
@@ -297,7 +297,7 @@ echo "WINDOW_END            $WINDOW_END"
             ln -fs $OB_DIR/${D_DATE[07]}/ssmi.dat- ssmi07.dat
          fi
 
-         if test -e $OB_DIR/${D_DATE[01]}/radar.dat+; then
+         if [[ -e $OB_DIR/${D_DATE[01]}/radar.dat+ ]]; then
             ln -fs $OB_DIR/${D_DATE[01]}/radar.dat+ radar01.dat
             for I in 02 03 04 05 06; do
                ln -fs $OB_DIR/${D_DATE[$I]}/radar.dat radar${I}.dat
@@ -305,7 +305,7 @@ echo "WINDOW_END            $WINDOW_END"
             ln -fs $OB_DIR/${D_DATE[07]}/radar.dat- radar07.dat
          fi
       else
-         if [[ $DATE = $START_DATE ]]; then
+         if [[ $DATE -eq $START_DATE ]]; then
             ln -fs $OB_DIR/$DATE/ob.ascii+ ob01.ascii
          else
             ln -fs $OB_DIR/$DATE/ob.ascii  ob01.ascii
@@ -313,38 +313,38 @@ echo "WINDOW_END            $WINDOW_END"
          typeset -i N
          let N=1
          FGAT_DATE=$START_DATE
-         # while [[ $FGAT_DATE < $END_DATE ]] || [[ $FGAT_DATE = $END_DATE ]] ; do
+         # while [[ $FGAT_DATE < $END_DATE || $FGAT_DATE -eq $END_DATE ]] ; do
          until [[ $FGAT_DATE > $END_DATE ]]; do
-            if [[ $FGAT_DATE != $DATE ]]; then
+            if [[ $FGAT_DATE -ne $DATE ]]; then
                let N=$N+1
-               if [[ $FGAT_DATE = $START_DATE ]]; then
+               if [[ $FGAT_DATE -eq $START_DATE ]]; then
                   ln -fs $OB_DIR/$FGAT_DATE/ob.ascii+ ob0${N}.ascii
-               elif [[ $FGAT_DATE = $END_DATE ]]; then
+               elif [[ $FGAT_DATE -eq $END_DATE ]]; then
                   ln -fs $OB_DIR/$FGAT_DATE/ob.ascii- ob0${N}.ascii
                else
                   ln -fs $OB_DIR/$FGAT_DATE/ob.ascii ob0${N}.ascii
                fi
-               FYEAR=`echo ${FGAT_DATE} | cut -c1-4`
-               FMONTH=`echo ${FGAT_DATE} | cut -c5-6`
-               FDAY=`echo ${FGAT_DATE} | cut -c7-8`
-               FHOUR=`echo ${FGAT_DATE} | cut -c9-10`
+               FYEAR=$(echo ${FGAT_DATE} | cut -c1-4)
+               FMONTH=$(echo ${FGAT_DATE} | cut -c5-6)
+               FDAY=$(echo ${FGAT_DATE} | cut -c7-8)
+               FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
                ln -fs ${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
             fi
-            FGAT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ`
+            FGAT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ)
          done
       fi
    else
       ln -fs $OB_DIR/${DATE}/ob.ascii  ob01.ascii
-      if test -e $OB_DIR/${DATE}/ssmi.dat; then
+      if [[ -e $OB_DIR/${DATE}/ssmi.dat ]]; then
          ln -fs $OB_DIR/${DATE}/ssmi.dat ssmi01.dat
       fi
-      if test -e $OB_DIR/${DATE}/radar.dat; then
+      if [[ -e $OB_DIR/${DATE}/radar.dat ]]; then
          ln -fs $OB_DIR/${DATE}/radar.dat radar01.dat
       fi
    fi
 
    for FILE in $OB_DIR/$DATE/*.bufr; do
-      if test -f $FILE; then
+      if [[ -f $FILE ]]; then
          ln -fs $FILE .
       fi
    done
@@ -357,16 +357,16 @@ echo "WINDOW_END            $WINDOW_END"
 
       # Inputs
       export NL_AUXHIST2_OUTNAME='auxhist2_d<domain>_<date>'
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          export NL_AUXHIST2_OUTNAME='./nl/auxhist2_d<domain>_<date>'
       fi
       export NL_DYN_OPT=2
       export NL_INPUT_OUTNAME='nl_d<domain>_<date>'
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          export NL_INPUT_OUTNAME='./nl/nl_d<domain>_<date>'
       fi
       export NL_INPUTOUT_INTERVAL=60
-      export NL_AUXHIST2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
+      export NL_AUXHIST2_INTERVAL=$(expr $NL_TIME_STEP \/ 60)
       export NL_FRAMES_PER_AUXHIST2=1
       export NL_HISTORY_INTERVAL=9999
       export NL_RESTART=false
@@ -408,7 +408,7 @@ echo "WINDOW_END            $WINDOW_END"
       ln -fs $WORK_DIR/RRTM_DATA nl
       ln -fs $WORK_DIR/wrfbdy_d$DOMAIN nl
       ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
-      # if test -e $WORK_DIR/wrfvar_output; then
+      # if [[ -e $WORK_DIR/wrfvar_output ]]; then
       #    ln -fs $WORK_DIR/wrfvar_output nl/wrfinput_d$DOMAIN
       # else
          ln -fs $WORK_DIR/fg01 nl/wrfinput_d${DOMAIN}
@@ -427,12 +427,12 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DYN_OPT=202
       export NL_INPUT_OUTNAME='tl_d<domain>_<date>'
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          export NL_INPUT_OUTNAME='./tl/tl_d<domain>_<date>'
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
       fi
-      export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
-      export NL_INTERVAL_SECONDS=`expr $CYCLE_PERIOD \* 3600`
+      export NL_AUXINPUT2_INTERVAL=$(expr $NL_TIME_STEP \/ 60)
+      export NL_INTERVAL_SECONDS=$(expr $CYCLE_PERIOD \* 3600)
       export NL_MP_PHYSICS=0
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
@@ -463,7 +463,7 @@ echo "WINDOW_END            $WINDOW_END"
       for I in 02 03 04 05 06 07; do
          ln -fs tl/tl_d${DOMAIN}_${D_YEAR[$I]}-${D_MONTH[$I]}-${D_DAY[$I]}_${D_HOUR[$I]}:00:00 tl$I
       done
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          ln -fs auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
       else
          ln -fs tl/auxhist3_d${DOMAIN}_${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00 tldf
@@ -475,20 +475,20 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_DYN_OPT=302
       export NL_INPUT_OUTNAME='ad_d<domain>_<date>'
       export NL_AUXINPUT2_INNAME='../nl/auxhist2_d<domain>_<date>'
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          export NL_INPUT_OUTNAME='./ad/ad_d<domain>_<date>'
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
       fi
-      export NL_AUXINPUT2_INTERVAL=`expr $NL_TIME_STEP \/ 60`
+      export NL_AUXINPUT2_INTERVAL=$(expr $NL_TIME_STEP \/ 60)
       export NL_AUXINPUT3_INNAME='auxinput3_d<domain>_<date>'
-      if test $NUM_PROCS -gt 1; then
+      if [[ $NUM_PROCS -gt 1 ]]; then
          export NL_AUXINPUT3_INNAME='./ad/auxinput3_d<domain>_<date>'
       fi
       export NL_AUXINPUT3_INTERVAL=60
       export NL_HISTORY_INTERVAL=9999
       export NL_AUXHIST3_INTERVAL=60
       export NL_INPUTOUT_INTERVAL=60
-      export NL_INTERVAL_SECONDS=`expr $CYCLE_PERIOD \* 3600`
+      export NL_INTERVAL_SECONDS=$(expr $CYCLE_PERIOD \* 3600)
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input ad
       ln -fs $WORK_DIR/*.TBL ad
@@ -552,11 +552,11 @@ echo "WINDOW_END            $WINDOW_END"
       RC=0
    else
       if $NL_VAR4D; then
-         if test $NUM_PROCS -gt 1; then
+         if [[ $NUM_PROCS -gt 1 ]]; then
             # JRB kludge until we work out what we are doing here
             export MP_PGMMODEL=mpmd
             export MP_CMDFILE=poe.cmdfile
-            if test $NUM_PROCS -lt 3; then
+            if [[ $NUM_PROCS -lt 3 ]]; then
                echo "Need at least 3 processors for 4dvar"
                exit 1
             fi
@@ -569,15 +569,15 @@ echo "WINDOW_END            $WINDOW_END"
 
             rm -f $MP_CMDFILE
             let I=0
-            while test $I -lt $NUM_PROCS_VAR; do
+            while [[ $I -lt $NUM_PROCS_VAR ]]; do
                echo "da_wrfvar.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while test $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF; do
+            while [[ $I -lt $NUM_PROCS_VAR+$NUM_PROCS_WRF ]]; do
                echo "./nl/wrf.exe" >> $MP_CMDFILE
                let I=$I+1
             done
-            while test $I -lt $NUM_PROCS; do
+            while [[ $I -lt $NUM_PROCS ]]; do
                echo "./ad/wrfplus.exe" >> $MP_CMDFILE
                let I=$I+1
             done
@@ -593,15 +593,15 @@ echo "WINDOW_END            $WINDOW_END"
          RC=$?
       fi
 
-      if test -f statistics; then
+      if [[ -f statistics ]]; then
          cp statistics $RUN_DIR
       fi
 
-      if test -f cost_fn; then 
+      if [[ -f cost_fn ]]; then 
          cp cost_fn $RUN_DIR
       fi
 
-      if test -f grad_fn; then
+      if [[ -f grad_fn ]]; then
          cp grad_fn $RUN_DIR
       fi
 
@@ -617,13 +617,13 @@ echo "WINDOW_END            $WINDOW_END"
       # rm -f oma_*.*
       # rm -f filtered_*.*
 
-      if test -f wrfvar_output; then
-         if test $DA_ANALYSIS != wrfvar_output; then 
+      if [[ -f wrfvar_output ]]; then
+         if [[ $DA_ANALYSIS != wrfvar_output ]]; then 
             mv wrfvar_output $DA_ANALYSIS
          fi
       fi
 
-      if test -d trace; then
+      if [[ -d trace ]]; then
          mkdir -p $RUN_DIR/trace
          mv trace/* $RUN_DIR/trace
       fi
@@ -632,8 +632,8 @@ echo "WINDOW_END            $WINDOW_END"
       mkdir -p $RUN_DIR/rsl
       cd $RUN_DIR/rsl
       for FILE in $WORK_DIR/rsl*; do
-         if test -f $FILE; then
-            FILE1=`basename $FILE`
+         if [[ -f $FILE ]]; then
+            FILE1=$(basename $FILE)
             echo "<HTML><HEAD><TITLE>$FILE1</TITLE></HEAD>" > $FILE1.html
             echo "<H1>$FILE1</H1><PRE>" >> $FILE1.html
             cat $FILE >> $FILE1.html
@@ -668,13 +668,13 @@ echo "WINDOW_END            $WINDOW_END"
 
       cat $RUN_DIR/cost_fn
 
-      echo `date +'%D %T'` "Ended $RC"
+      echo $(date +'%D %T') "Ended $RC"
    fi
 
    # We never look at core files
 
    for DIR in $WORK_DIR/coredir.*; do
-      if test -d $DIR; then
+      if [[ -d $DIR ]]; then
          rm -rf $DIR
       fi
    done

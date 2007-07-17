@@ -55,52 +55,52 @@ echo 'WORK_DIR     <A HREF="'$WORK_DIR'">'$WORK_DIR'</a>'
 mkdir -p $WORK_DIR
 cd $WORK_DIR
 
-   export NL_DX_KM=`expr $NL_DX \/ 1000`
+export NL_DX_KM=$(expr $NL_DX \/ 1000)
 
-   export NL_BASE_PRES=${NL_BASE_PRES:-100000.0}
-   export NL_BASE_TEMP=${NL_BASE_TEMP:-300.0}
-   export NL_BASE_LAPSE=${NL_BASE_LAPSE:-50.0}
-   export NL_BASE_TROPO_PRES=${NL_BASE_TROPO_PRES:-20000.0}
-   export NL_BASE_STRAT_TEMP=${NL_BASE_STRAT_TEMP:-215.0}
+export NL_BASE_PRES=${NL_BASE_PRES:-100000.0}
+export NL_BASE_TEMP=${NL_BASE_TEMP:-300.0}
+export NL_BASE_LAPSE=${NL_BASE_LAPSE:-50.0}
+export NL_BASE_TROPO_PRES=${NL_BASE_TROPO_PRES:-20000.0}
+export NL_BASE_STRAT_TEMP=${NL_BASE_STRAT_TEMP:-215.0}
 
-   if test $MAP_PROJ = lambert; then
-      export PROJ=1
-   elif test $MAP_PROJ = polar;  then
-      export PROJ=2
-   elif test $MAP_PROJ = mercator; then
-      export PROJ=3
-   else
-      echo "   Unknown MAP_PROJ = $MAP_PROJ."
-      exit 1
-   fi
+if [[ $MAP_PROJ == lambert ]]; then
+   export PROJ=1
+elif [[ $MAP_PROJ == polar ]];  then
+   export PROJ=2
+elif [[ $MAP_PROJ == mercator ]]; then
+   export PROJ=3
+else
+   echo "   Unknown MAP_PROJ = $MAP_PROJ."
+   exit 1
+fi
 
-   export FCST_RANGE_SAVE=$FCST_RANGE
-   export FCST_RANGE=-$MAX_OB_RANGE
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-   export TIME_WINDOW_MIN=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
-   export FCST_RANGE=$MAX_OB_RANGE
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-   export TIME_WINDOW_MAX=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
-   export FCST_RANGE=0
-   . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-   export TIME_ANALYSIS=${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00
-   export FCST_RANGE=$FCST_RANGE_SAVE
+export FCST_RANGE_SAVE=$FCST_RANGE
+export FCST_RANGE=-$MAX_OB_RANGE
+. $WRFVAR_DIR/scripts/da_get_date_range.ksh
+export TIME_WINDOW_MIN=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
+export FCST_RANGE=$MAX_OB_RANGE
+. $WRFVAR_DIR/scripts/da_get_date_range.ksh
+export TIME_WINDOW_MAX=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
+export FCST_RANGE=0
+. $WRFVAR_DIR/scripts/da_get_date_range.ksh
+export TIME_ANALYSIS=${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00
+export FCST_RANGE=$FCST_RANGE_SAVE
 
-   export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
+export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
 
-   #ln -fs $OB_DIR/$DATE/$OB_FILE .
+#ln -fs $OB_DIR/$DATE/$OB_FILE .
 
-   if test -f $RTOBS_DIR/$DATE/${OB_FILE}.gz; then
-      # If compressed, unpack
-      cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
-      gunzip -f ${OB_FILE}.gz
-   fi
+if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
+   # If compressed, unpack
+   cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
+   gunzip -f ${OB_FILE}.gz
+fi
 
-   #Namelist notes:
-   #1. x,y reversed in namelist as MM5 i=y.
-   #2. Modified namelist 2 in fortran code to be lime -DBKG.
+#Namelist notes:
+#1. x,y reversed in namelist as MM5 i=y.
+#2. Modified namelist 2 in fortran code to be lime -DBKG.
 
-   cat > namelist.3dvar_obs << EOF
+cat > namelist.3dvar_obs << EOF
 &record1
  obs_gts_filename = '$OB_FILE',
  fg_format        = 'WRF',
@@ -180,22 +180,22 @@ cd $WORK_DIR
 
 EOF
 
-   cp namelist.3dvar_obs $RUN_DIR
+cp namelist.3dvar_obs $RUN_DIR
 
-   echo "Converting $WORK_DIR/$OB_FILE to"
-   echo "$OB_DIR/$DATE/ob.ascii"
-   echo '<A HREF="namelist.3dvar_obs">Namelist input</a>'
-   if $DUMMY; then
-      echo "Dummy obsproc"
-      echo "Dummy obsproc" > obs_gts.3dvar
-   else
-      ln -fs $WRFVAR_DIR/obsproc/obserr.txt .
-      ln -fs $WRFVAR_DIR/obsproc/prepbufr_table_filename .
-      $WRFVAR_DIR/obsproc/3dvar_obs.exe
-      RC=$?
-      echo "Ended %$RC"
-   fi
-   mv obs_gts.3dvar $OB_DIR/$DATE/ob.ascii
+echo "Converting $WORK_DIR/$OB_FILE to"
+echo "$OB_DIR/$DATE/ob.ascii"
+echo '<A HREF="namelist.3dvar_obs">Namelist input</a>'
+if $DUMMY; then
+   echo "Dummy obsproc"
+   echo "Dummy obsproc" > obs_gts.3dvar
+else
+   ln -fs $WRFVAR_DIR/obsproc/obserr.txt .
+   ln -fs $WRFVAR_DIR/obsproc/prepbufr_table_filename .
+   $WRFVAR_DIR/obsproc/3dvar_obs.exe
+   RC=$?
+   echo "Ended %$RC"
+fi
+mv obs_gts.3dvar $OB_DIR/$DATE/ob.ascii
 
 date
 

@@ -29,7 +29,7 @@ export EXPT=${EXPT:-test}                              # Experiment name.
 export NUM_PROCS=${NUM_PROCS:-1}
 export MEM=${MEM:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -105,7 +105,7 @@ export CYCLING_SAVE=$CYCLING
 export RUN_DIR_SAVE=$RUN_DIR
  
 #These are the local values:
-export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+export END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
 export RC_DIR=$RUN_DIR_SAVE/rc
 mkdir -p $RC_DIR
 
@@ -114,20 +114,20 @@ export NL_PUT_RAND_SEED=.TRUE.
 export CYCLING=false
 
 export CMEM=e$MEM
-if test $MEM -lt 100; then export CMEM=e0$MEM; fi
-if test $MEM -lt 10; then export CMEM=e00$MEM; fi
+if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
 
-while test $DATE -le $END_DATE; do 
+while [[ $DATE -le $END_DATE ]]; do 
    export RUN_DIR=$RUN_DIR_SAVE/run/$DATE_SAVE/wrfvar/${DATE}.${CMEM}
    mkdir -p $RUN_DIR
 
-   export YEAR=`echo $DATE | cut -c1-4`
-   export MONTH=`echo $DATE | cut -c5-6`
-   export DAY=`echo $DATE | cut -c7-8`
-   export HOUR=`echo $DATE | cut -c9-10`
+   export YEAR=$(echo $DATE | cut -c1-4)
+   export MONTH=$(echo $DATE | cut -c5-6)
+   export DAY=$(echo $DATE | cut -c7-8)
+   export HOUR=$(echo $DATE | cut -c9-10)
    export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
    export NL_SEED_ARRAY1=$DATE_SAVE
-   export NL_SEED_ARRAY2=`expr $DATE + $MEM`
+   export NL_SEED_ARRAY2=$(expr $DATE + $MEM)
 
    echo "   Run WRF-Var in randomcv mode for date $DATE"
    export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
@@ -136,12 +136,12 @@ while test $DATE -le $END_DATE; do
    ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
 
    RC=$?
-   if test $RC != 0; then
-      echo `date` "${ERR}Failed with error $RC$END"
+   if [[ $RC != 0 ]]; then
+      echo $(date) "${ERR}Failed with error $RC$END"
       exit 1
    fi
 
-   export NEXT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null`
+   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
    export DATE=$NEXT_DATE
 done
 

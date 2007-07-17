@@ -20,7 +20,7 @@ export EXPT=${EXPT:-test}
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -72,7 +72,7 @@ export NL_DAMPCOEF=${NL_DAMPCOEF:-0.2}
 export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
-if test ! -d $RC_DIR; then mkdir $RC_DIR; fi
+if [[ ! -d $RC_DIR ]]; then mkdir $RC_DIR; fi
 rm -rf $WORK_DIR
 mkdir -p $RUN_DIR $WORK_DIR
 cd $WORK_DIR
@@ -97,9 +97,9 @@ let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 export NL_AUXINPUT1_INNAME="met_em.d<domain>.<date>"
 
-if test $WRF_NAMELIST'.' != '.' ; then
+if [[ $WRF_NAMELIST'.' != '.' ]]; then
    ln -fs $WRF_NAMELIST namelist.input
-elif test -f $WRF_DIR/inc/namelist_script.inc; then
+elif [[ -f $WRF_DIR/inc/namelist_script.inc ]]; then
    . $WRF_DIR/inc/namelist_script.inc
 else
    ln -fs $WRF_DIR/test/em_real/namelist.input .
@@ -120,7 +120,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       $RUN_CMD ./real.exe
       RC=$?
 
-      if test -f fort.9; then
+      if [[ -f fort.9 ]]; then
         cp fort.9 $RUN_DIR/namelist.output
       fi
 
@@ -142,7 +142,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
       echo '<A HREF="rsl/rsl.error.0000.html">rsl.error.0000</a>'
       echo '<A HREF="rsl">Other RSL output</a>'
 
-      echo `date +'%D %T'` "Ended $RC"
+      echo $(date +'%D %T') "Ended $RC"
    fi
 
    mv $WORK_DIR/wrfinput_d${DOMAIN} $RC_DIR/$DATE

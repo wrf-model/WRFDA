@@ -16,7 +16,7 @@ export REGION=${REGION:-con200}
 export DOMAIN=${DOMAIN:-01}
 export EXPT=${EXPT:-test}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -56,10 +56,10 @@ export FG_TYPE=${FG_TYPE:-GFS}
 
 let LBC_FREQ_SS=$LBC_FREQ*3600
 
-if test ! -d $REG_DIR; then mkdir $REG_DIR; fi 
-if test ! -d $RUN_DIR; then mkdir -p $RUN_DIR; fi 
-if test ! -d $RC_DIR/$DATE; then mkdir -p $RC_DIR/$DATE; fi 
-if test ! -d $WORK_DIR; then mkdir $WORK_DIR; fi 
+if [[ ! -d $REG_DIR ]]; then mkdir $REG_DIR; fi 
+if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi 
+if [[ ! -d $RC_DIR/$DATE ]]; then mkdir -p $RC_DIR/$DATE; fi 
+if [[ ! -d $WORK_DIR ]]; then mkdir $WORK_DIR; fi 
 
 cd $WORK_DIR
 
@@ -141,13 +141,13 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
    if $DUMMY; then
       echo "Dummy wps"
       LOCAL_DATE=$DATE
-      while test $LOCAL_DATE -le $END_DATE; do
-         export L_YEAR=`echo $LOCAL_DATE | cut -c1-4`
-         export L_MONTH=`echo $LOCAL_DATE | cut -c5-6`
-         export L_DAY=`echo $LOCAL_DATE | cut -c7-8`
-         export L_HOUR=`echo $LOCAL_DATE | cut -c9-10`
+      while [[ $LOCAL_DATE -le $END_DATE ]]; do
+         export L_YEAR=$(echo $LOCAL_DATE | cut -c1-4)
+         export L_MONTH=$(echo $LOCAL_DATE | cut -c5-6)
+         export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
+         export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
          echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
-         LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null)
       done
    else
       if $RUN_GEOGRID; then
@@ -157,13 +157,13 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
 
 	 RC=$?
 	 mv geogrid.log* $RUN_DIR
-	 if test -f $RUN_DIR/geogrid.log.0000; then
+	 if [[ -f $RUN_DIR/geogrid.log.0000 ]]; then
             echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
 	 else
             echo '<A HREF="geogrid.log">geogrid.log</a>'
 	 fi
 
-	 if test $RC != 0; then
+	 if [[ $RC != 0 ]]; then
             echo geogrid failed with error $RC
             exit $RC
 	 fi
@@ -173,9 +173,9 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
       LOCAL_DATE=$DATE
       FILES=''
-      while test $LOCAL_DATE -le $END_DATE; do
+      while [[ $LOCAL_DATE -le $END_DATE ]]; do
          FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-         LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
       done
       $WPS_DIR/link_grib.csh $FILES
 
@@ -187,7 +187,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       mv ungrib.log $RUN_DIR
       echo '<A HREF="ungrib.log">ungrib.log</a>'
 
-      if test $RC != 0; then
+      if [[ $RC != 0 ]]; then
          echo ungrib failed with error $RC
          exit $RC
       fi
@@ -199,13 +199,13 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       RC=$?
       
       mv metgrid.log* $RUN_DIR
-      if test -f $RUN_DIR/metgrid.log.0000; then
+      if [[ -f $RUN_DIR/metgrid.log.0000 ]]; then
          echo '<A HREF="metgrid.log.0000">metgrid.log.0000</a>'
       else
          echo '<A HREF="metgrid.log">metgrid.log</a>'
       fi
       
-      if test $RC != 0; then
+      if [[ $RC != 0 ]]; then
          echo metgrid failed with error $RC
          exit $RC
       fi

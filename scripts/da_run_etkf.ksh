@@ -25,7 +25,7 @@ export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}                              # Experiment name.
 export NUM_MEMBERS=${NUM_MEMBERS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -79,32 +79,32 @@ mkdir -p $ETKF_DIR
 mkdir -p $RUN_DIR
 export RUN_DIR_SAVE=$RUN_DIR
 
-export PREV_DATE=`${BUILD_DIR}/da_advance_cymdh.exe $DATE -$FCST_RANGE`
-export YYYY=`echo $DATE | cut -c1-4`
-export MM=`echo $DATE | cut -c5-6`
-export DD=`echo $DATE | cut -c7-8`
-export HH=`echo $DATE | cut -c9-10`
+export PREV_DATE=$(${BUILD_DIR}/da_advance_cymdh.exe $DATE -$FCST_RANGE)
+export YYYY=$(echo $DATE | cut -c1-4)
+export MM=$(echo $DATE | cut -c5-6)
+export DD=$(echo $DATE | cut -c7-8)
+export HH=$(echo $DATE | cut -c9-10)
 export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
 export DA_FILE=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${FILE_DATE}
 
-export MEM=1
-export JOB=1
-while test $MEM -le $NUM_MEMBERS; do
+let MEM=1
+let JOB=1
+while [[ $MEM -le $NUM_MEMBERS ]]; do
    echo "   Producing observation file (yo, H(xb), sigma_o) for member $MEM"
 
    export CMEM=e$MEM
-   if test $MEM -lt 100; then export CMEM=e0$MEM; fi
-   if test $MEM -lt 10; then export CMEM=e00$MEM; fi
+   if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+   if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
    export DA_FIRST_GUESS=${DA_FILE}.${CMEM}
 
    export RUN_DIR=${RUN_DIR_SAVE}/wrfvar.${CMEM}
    mkdir -p $RUN_DIR; cd $RUN_DIR
    ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > da_run_wrfvar.${CMEM}.out 2>&1 &
 
-   export MEM=`expr $MEM + 1`
-   export JOB=`expr $JOB + 1`
+   let MEM=$MEM+1
+   let JOB=$JOB+1
 
-   if test $JOB -gt $NUM_JOBS || test $MEM -gt $NUM_MEMBERS; then
+   if [[ $JOB -gt $NUM_JOBS || $MEM -gt $NUM_MEMBERS ]]; then
       export JOB=1
       wait # Wait for current jobs to finish
    fi
@@ -116,11 +116,11 @@ export RUN_DIR=$RUN_DIR_SAVE
 cd $RUN_DIR
 cp ${DA_FILE} wrfinput_d01 # Prior ensemble mean.
 
-export MEM=1
-while test $MEM -le $NUM_MEMBERS; do
+let MEM=1
+while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
-   if test $MEM -lt 100; then export CMEM=e0$MEM; fi
-   if test $MEM -lt 10; then export CMEM=e00$MEM; fi
+   if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+   if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
 
    cp ${DA_FILE}.${CMEM} wrfinput_d01.${CMEM} # ETKF input.
    cp ${DA_FILE}.${CMEM} analysis.${CMEM} # ETKF input.
@@ -129,7 +129,7 @@ while test $MEM -le $NUM_MEMBERS; do
    wc -l wrfvar.${CMEM}/working/ob.etkf.000 > ob.etkf.${CMEM}
    cat wrfvar.${CMEM}/working/ob.etkf.000 >> ob.etkf.${CMEM}
 
-   export MEM=`expr $MEM + 1`
+   let MEM=$MEM+1
 done
 
 #Run Ensemble Transform Kalman Filter:
@@ -156,13 +156,13 @@ ln -fs ${BUILD_DIR}/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
 #Move ensemble of analyses:
-export MEM=1
-while test $MEM -le $NUM_MEMBERS; do
+let MEM=1
+while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
-   if test $MEM -lt 100; then export CMEM=e0$MEM; fi
-   if test $MEM -lt 10; then export CMEM=e00$MEM; fi
+   if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+   if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
    mv analysis.${CMEM} ${FC_DIR}/$DATE/wrfinput_d01.${CMEM}
-   export MEM=`expr $MEM + 1`
+   let MEM=$MEM+1
 done
 
 exit 0

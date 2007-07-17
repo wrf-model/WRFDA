@@ -28,7 +28,7 @@ export REGION=${REGION:-con200}
 export EXPT=${EXPT:-test}                              # Experiment name.
 export NUM_MEMBERS=${NUM_MEMBERS:-1}
 export HOSTS=${HOSTS:-$HOME/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -55,11 +55,11 @@ export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
 mkdir -p $RUN_DIR
 cd $RUN_DIR
 
-export NEXT_DATE=`${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE`
-export YYYY=`echo $NEXT_DATE | cut -c1-4`
-export MM=`echo $NEXT_DATE | cut -c5-6`
-export DD=`echo $NEXT_DATE | cut -c7-8`
-export HH=`echo $NEXT_DATE | cut -c9-10`
+export NEXT_DATE=$(${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE)
+export YYYY=$(echo $NEXT_DATE | cut -c1-4)
+export MM=$(echo $NEXT_DATE | cut -c5-6)
+export DD=$(echo $NEXT_DATE | cut -c7-8)
+export HH=$(echo $NEXT_DATE | cut -c9-10)
 export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
 export DA_FILE=${FC_DIR}/${DATE}/${FILE_TYPE}_d01_${FILE_DATE}
 

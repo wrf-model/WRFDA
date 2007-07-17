@@ -37,7 +37,7 @@ mkdir -p $EXP_DIR
 cd $EXP_DIR
 
 echo "<HTML><BODY><PRE>" > index.html
-$WRFVAR_DIR/scripts/gen_be/gen_be.csh >> index.html 2>&1
+$WRFVAR_DIR/scripts/gen_be/gen_be.ksh >> index.html 2>&1
 # Preserve the interesting log files
 cp $RUN_DIR/*log $EXP_DIR
 cp $RUN_DIR/stage0/*log $EXP_DIR

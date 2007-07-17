@@ -27,8 +27,7 @@
 # Mass Store).
 # 4) Overwrite default directories, filenames, namelist parameters,
 # etc in script da_run_wrf_wrapper.ksh. This is done via environment
-# variables. (TO DO: Automate vertical levels ENV variable - currently hardwired
-# in da_run_wrfsi.ksh).
+# variables. (TO DO: Automate vertical levels ENV variable)
 #
 # NOTE: The idea is that you overwrite defaults in da_run_suite_wrapper.ksh, 
 # NOT da_run_suite.ksh itself. We want to maintain a clean script interface
@@ -65,7 +64,7 @@ export EXPT=${EXPT:-test}                              # Experiment name.
 export SOLVER=${SOLVER:-em}
 export NUM_PROCS=${NUM_PROCS:-1}                       # Number of processors for WRF-Var/WRF.
 export HOSTS=${HOSTS:-${HOME}/hosts}
-if test -f $HOSTS; then
+if [[ -f $HOSTS ]]; then
    export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
 else
    export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
@@ -110,10 +109,10 @@ export OK='<FONT COLOR="green">'
 export ERR='<FONT COLOR="red">'
 export END='</FONT>'
 
-if test ! -d $DAT_DIR; then mkdir $DAT_DIR; fi
-if test ! -d $REG_DIR; then mkdir $REG_DIR; fi
-if test ! -d $EXP_DIR; then mkdir $EXP_DIR; fi
-if test ! -d $EXP_DIR/run; then mkdir $EXP_DIR/run; fi
+if [[ ! -d $DAT_DIR ]]; then mkdir $DAT_DIR; fi
+if [[ ! -d $REG_DIR ]]; then mkdir $REG_DIR; fi
+if [[ ! -d $EXP_DIR ]]; then mkdir $EXP_DIR; fi
+if [[ ! -d $EXP_DIR/run ]]; then mkdir $EXP_DIR/run; fi
 
 #From WPS (namelist.wps):
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}                
@@ -218,11 +217,11 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
 
-while test $DATE -le $FINAL_DATE; do 
-   export PREV_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null`
-   export HOUR=`echo $DATE | cut -c9-10`
+while [[ $DATE -le $FINAL_DATE ]]; do 
+   export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+   export HOUR=$(echo $DATE | cut -c9-10)
 
-   if test ! -d $FC_DIR/$DATE; then mkdir -p $FC_DIR/$DATE; fi
+   if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
 
    echo "=========="
    echo $DATE
@@ -230,20 +229,20 @@ while test $DATE -le $FINAL_DATE; do
 
    # Decide on length of forecast to run
    export FCST_RANGE=$CYCLE_PERIOD
-   if test $HOUR = $LONG_FCST_TIME_1; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
-   if test $HOUR = $LONG_FCST_TIME_2; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
-   if test $HOUR = $LONG_FCST_TIME_3; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
-   if test $HOUR = $LONG_FCST_TIME_4; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
+   if [[ $HOUR -eq $LONG_FCST_TIME_1 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_1; fi
+   if [[ $HOUR -eq $LONG_FCST_TIME_2 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_2; fi
+   if [[ $HOUR -eq $LONG_FCST_TIME_3 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_3; fi
+   if [[ $HOUR -eq $LONG_FCST_TIME_4 ]]; then export FCST_RANGE=$LONG_FCST_RANGE_4; fi
 
    if $RUN_RESTORE_DATA_GRIB; then
       export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_grib
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_grib $RUN_DIR
+      $WRFVAR_DIR/scripts/da_trace.ksh da_restore_data_grib $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_grib.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error$RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error$RC$END"
          exit 1
       fi
    fi
@@ -252,11 +251,11 @@ while test $DATE -le $FINAL_DATE; do
       export RUN_DIR=$EXP_DIR/run/$DATE/restore_data_rtobs
       mkdir -p $RUN_DIR
 
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_restore_data_rtobs $RUN_DIR
+      $WRFVAR_DIR/scripts/da_trace.ksh da_restore_data_rtobs $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_restore_data_rtobs.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error$RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error$RC$END"
          exit 1
       fi
    fi
@@ -268,8 +267,8 @@ while test $DATE -le $FINAL_DATE; do
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wps $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_wps.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
       export RUN_GEOGRID=false # Only need to run it once.
@@ -282,8 +281,8 @@ while test $DATE -le $FINAL_DATE; do
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
@@ -295,8 +294,8 @@ while test $DATE -le $FINAL_DATE; do
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_obsproc $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_obsproc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
@@ -314,8 +313,8 @@ while test $DATE -le $FINAL_DATE; do
            $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
            $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
            RC=$?
-           if test $? != 0; then
-              echo `date` "${ERR}Failed with error $RC$END"
+           if [[ $? != 0 ]]; then
+              echo $(date) "${ERR}Failed with error $RC$END"
               exit 1
            fi
            export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
@@ -342,8 +341,8 @@ while test $DATE -le $FINAL_DATE; do
       ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > $RUN_DIR/index.html 2>&1
 
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
       export WRF_INPUT=$DA_ANALYSIS
@@ -363,8 +362,8 @@ while test $DATE -le $FINAL_DATE; do
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_update_bc $RUN_DIR
       $WRFVAR_DIR/scripts/da_run_update_bc.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $? != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $? != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
       export WRF_BDY=$FC_DIR/$DATE/wrfbdy_d${DOMAIN}
@@ -380,20 +379,20 @@ while test $DATE -le $FINAL_DATE; do
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrf $RUN_DIR
       $WRFVAR_DIR/scripts/da_run_wrf.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
          exit 1
       fi
    fi
 
-   export NEXT_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null`
+   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
    export FIRST=false
 
 done
 
 echo
-echo `date` "Suite finished"
+echo $(date) "Suite finished"
 
 echo "</PRE></BODY></HTML>"
 

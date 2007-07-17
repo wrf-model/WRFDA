@@ -63,46 +63,46 @@ export DATE=$START_DATE
 
 echo "Output to $WORK_DIR"
 
-while test $DATE -le $END_DATE; do
+while [[ $DATE -le $END_DATE ]]; do
 
    echo "   Processing $DATE"
 
-   if test -f $YP_DIR/run/${DATE}/wrfvar/working/rand_obs_error; then
+   if [[ -f $YP_DIR/run/${DATE}/wrfvar/working/rand_obs_error ]]; then
       cat $YP_DIR/run/${DATE}/wrfvar/working/rand_obs_error  >> $FILE_PERT        
    else
       echo " Please check file rand_obs_error in " $YP_DIR/run/${DATE}/wrfvar/working
       exit 1             
    fi
 
-   if test -f $YP_DIR/run/${DATE}/wrfvar/working/pert_obs; then                  
+   if [[ -f $YP_DIR/run/${DATE}/wrfvar/working/pert_obs ]]; then                  
       cat $YP_DIR/run/${DATE}/wrfvar/working/pert_obs       >> $FILE_YP        
    else
       echo " Please check file pert_obs in " $YP_DIR/run/${DATE}/wrfvar/working
       exit 2         
    fi
 
-   if test -f $Y_DIR/run/${DATE}/wrfvar/working/unpert_obs; then
+   if [[ -f $Y_DIR/run/${DATE}/wrfvar/working/unpert_obs ]]; then
       cat $Y_DIR/run/${DATE}/wrfvar/working/unpert_obs      >> $FILE_Y        
    else
       echo " Please check file unpert_obs in " $Y_DIR/run/${DATE}/wrfvar/working
       exit 3          
    fi
 
-   if test -f $Y_DIR/run/${DATE}/wrfvar/working/jo; then
+   if [[ -f $Y_DIR/run/${DATE}/wrfvar/working/jo ]]; then
       cat $Y_DIR/run/${DATE}/wrfvar/working/jo                >> $FILE_JO       
    else
       echo " Please check file jo in " $Y_DIR/run/${DATE}/wrfvar/working
       exit 4          
    fi
 
-   if test -f $Y_DIR/run/${DATE}/wrfvar/rsl/rsl.out.0000.html; then
+   if [[ -f $Y_DIR/run/${DATE}/wrfvar/rsl/rsl.out.0000.html ]]; then
       cat  $Y_DIR/run/${DATE}/wrfvar/rsl/rsl.out.0000.html      >> ${FILE_RSLOUT}
    else
       echo " Please check file rsl.out.0000.html in " $Y_DIR/run/${DATE}/wrfvar
       exit 5       
    fi
 
-   export DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD`
+   export DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD)
 done
 
 # append ***** to file end

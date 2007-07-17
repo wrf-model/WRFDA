@@ -24,16 +24,16 @@ export DAT_DIR=${DAT_DIR:-$HOME/data}
 export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
 export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs} 
 
-if test ! -d $DAT_DIR; then mkdir $DAT_DIR; fi
-if test ! -d $RTOBS_DIR; then mkdir $RTOBS_DIR; fi
+if [[ ! -d $DAT_DIR ]]; then mkdir $DAT_DIR; fi
+if [[ ! -d $RTOBS_DIR ]]; then mkdir $RTOBS_DIR; fi
 
 echo "<HTML><HEAD><TITLE>$EXPT restore_data_rtobs</TITLE></HEAD><BODY>"
 echo "<H1>$EXPT restore_data_rtobs</H1><PRE>"
 
 date
 
-export START_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null`
-export END_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null`
+export START_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${DATE} $WINDOW_START 2>/dev/null)
+export END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${DATE} $WINDOW_END 2>/dev/null)
 
 echo "DATE       $DATE"
 echo "START_DATE $START_DATE"
@@ -44,19 +44,19 @@ echo 'RTOBS_DIR  <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 LOCAL_DATE=$START_DATE
 
-while test $LOCAL_DATE -le $END_DATE; do
+while [[ $LOCAL_DATE -le $END_DATE ]]; do
 
-   YEAR=`echo $LOCAL_DATE | cut -c1-4`
-   MONTH=`echo $LOCAL_DATE | cut -c5-6`
-   DAY=`echo $LOCAL_DATE | cut -c7-8`
-   HOUR=`echo $LOCAL_DATE | cut -c9-10`
+   YEAR=$(echo $LOCAL_DATE | cut -c1-4)
+   MONTH=$(echo $LOCAL_DATE | cut -c5-6)
+   DAY=$(echo $LOCAL_DATE | cut -c7-8)
+   HOUR=$(echo $LOCAL_DATE | cut -c9-10)
 
    DIR=${RTOBS_DIR}/${LOCAL_DATE}
    mkdir -p ${DIR}
    
    export FILE=obs.$LOCAL_DATE.gz
 
-   if test ! -f ${DIR}/$FILE; then
+   if [[ ! -f ${DIR}/$FILE ]]; then
       echo Retrieving ${MSS_RTOBS_DIR}/${YEAR}${MONTH}/$FILE to $DIR
       if $DUMMY; then
          echo Dummy restore_data > ${DIR}/${FILE}
@@ -67,7 +67,7 @@ while test $LOCAL_DATE -le $END_DATE; do
       echo "File ${DIR}/$FILE exists, skipping"
    fi
 
-   LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${OBS_FREQ} 2>/dev/null`
+   LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${OBS_FREQ} 2>/dev/null)
 done
 
 date
