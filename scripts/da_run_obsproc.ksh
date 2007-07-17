@@ -26,7 +26,7 @@ export DUMMY=${DUMMY:-false}
 
 mkdir -p $RUN_DIR $OB_DIR/$DATE
 
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/wrfvar/obsproc} # Observation preprocessing
+export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 # Namelist variables used in obs. preprocessor:
 
@@ -46,7 +46,7 @@ echo "<HTML><HEAD><TITLE>$EXPT obsproc</TITLE></HEAD><BODY><H1>$EXPT obsproc</H1
 date
 
 echo 'REL_DIR      <A HREF="'$REL_DIR'">'$REL_DIR'</a>'
-echo 'OBSPROC_DIR  <A HREF="'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
+echo 'WRFVAR_DIR   <A HREF="'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>'
 echo 'RTOBS_DIR    <A HREF="'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 echo 'OB_DIR       <A HREF="'$OB_DIR'">'$OB_DIR'</a>'
 echo 'RUN_DIR      <A HREF="'$RUN_DIR'">'$RUN_DIR'</a>'
@@ -189,9 +189,9 @@ EOF
       echo "Dummy obsproc"
       echo "Dummy obsproc" > obs_gts.3dvar
    else
-      ln -fs $OBSPROC_DIR/obserr.txt .
-      ln -fs $OBSPROC_DIR/prepbufr_table_filename .
-      $OBSPROC_DIR/3dvar_obs.exe
+      ln -fs $WRFVAR_DIR/obsproc/obserr.txt .
+      ln -fs $WRFVAR_DIR/obsproc/prepbufr_table_filename .
+      $WRFVAR_DIR/obsproc/3dvar_obs.exe
       RC=$?
       echo "Ended %$RC"
    fi

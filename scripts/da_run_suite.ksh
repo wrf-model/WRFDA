@@ -8,7 +8,7 @@
 # The da_run_suite.ksh script is designed for end-to-end real data 
 # testing of the following components of the WRF system:
 #
-# WRFSI, WRF real, 3DVAR_OBSPROC, WRFVAR, UPDATE_BC, and WRF.
+# WRF real, OBSPROC, WRFVAR, UPDATE_BC, and WRF.
 #
 # Any stage can be switched on/off via environment variables as
 # described below. The da_run_suite.ksh script can also cycle the
@@ -51,7 +51,6 @@
 export RUN_RESTORE_DATA_GRIB=${RUN_RESTORE_DATA_GRIB:-false}
 export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}
 export RUN_WPS=${RUN_WPS:-false}
-export RUN_WRFSI=${RUN_WRFSI:-false}
 export RUN_REAL=${RUN_REAL:-false}
 export RUN_OBSPROC=${RUN_OBSPROC:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
@@ -105,7 +104,6 @@ export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT} #Run directory.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}     # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}     # Forecast directory
 
-export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}                
 export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/wrfvar}                
 
 export OK='<FONT COLOR="green">'
@@ -177,7 +175,6 @@ export NL_TIME_STEP_SOUND=${NL_TIME_STEP_SOUND:-6}    #
 export NL_SPECIFIED=${NL_SPECIFIED:-.true.}          #
 
 #From OBSPROC:
-export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/wrfvar/obsproc}   
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 
@@ -200,8 +197,6 @@ echo 'WRF_DIR      <A HREF="file:'$WRF_DIR'">'$WRF_DIR'</a>' $WRF_VN
 echo 'WRFVAR_DIR   <A HREF="file:'$WRFVAR_DIR'">'$WRFVAR_DIR'</a>' $WRFVAR_VN
 echo 'WRFPLUS_DIR  <A HREF="file:'$WRFPLUS_DIR'">'$WRFPLUS_DIR'</a>' $WRFPLUS_VN
 echo 'WPS_DIR      <A HREF="file:'$WPS_DIR'">'$WPS_DIR'</a>' $WPS_VN
-echo 'WRFSI_DIR    <A HREF="file:'$WRFSI_DIR'">'$WRFSI_DIR'</a>'
-echo 'OBSPROC_DIR  <A HREF="file:'$OBSPROC_DIR'">'$OBSPROC_DIR'</a>'
 
 echo "CYCLING      $CYCLING"
 echo "DUMMY        $DUMMY"
@@ -266,19 +261,6 @@ while test $DATE -le $FINAL_DATE; do
       fi
    fi
   
-   if $RUN_WRFSI; then
-      export RUN_DIR=$EXP_DIR/run/$DATE/wrfsi
-      mkdir -p $RUN_DIR
-
-      $WRFVAR_DIR/scripts/da_trace.ksh da_run_wrfsi $RUN_DIR
-      ${WRFVAR_DIR}/scripts/da_run_wrfsi.ksh > $RUN_DIR/index.html 2>&1
-      RC=$?
-      if test $RC != 0; then
-         echo `date` "${ERR}Failed with error $RC$END"
-         exit 1
-      fi
-   fi
-
    if $RUN_WPS; then
       export RUN_DIR=$EXP_DIR/run/$DATE/wps
       mkdir -p $RUN_DIR
