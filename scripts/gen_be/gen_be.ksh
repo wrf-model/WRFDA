@@ -1,4 +1,4 @@
-#! /bin/ksh -f
+#!/bin/ksh
 #-----------------------------------------------------------------------
 # Purpose : Create BE statistics from input perturbation files.
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
@@ -26,16 +26,16 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 
 . ${WRFVAR_DIR}/scripts/gen_be/gen_be_set_defaults.ksh
 
-if test ! -d $RUN_DIR; then mkdir $RUN_DIR; fi
-if test ! -d $STAGE0_DIR; then mkdir $STAGE0_DIR; fi
+if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
+if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
 
 #List of control variables:
 for SV in fullflds psi chi t rh ps; do
-   if test ! -d ${RUN_DIR}/$SV; then mkdir ${RUN_DIR}/$SV; fi
+   if [[ ! -d ${RUN_DIR}/$SV ]]; then mkdir ${RUN_DIR}/$SV; fi
 done
 
 for CV in $CONTROL_VARIABLES; do
-   if test ! -d ${RUN_DIR}/$CV; then mkdir ${RUN_DIR}/$CV; fi
+   if [[ ! -d ${RUN_DIR}/$CV ]]; then mkdir ${RUN_DIR}/$CV; fi
 done
 
 cd $RUN_DIR
@@ -44,7 +44,7 @@ cd $RUN_DIR
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
 #------------------------------------------------------------------------
 
-echo "WRFVAR_DIR is" $WRFVAR_DIR `svnversion $WRFVAR_DIR`
+echo "WRFVAR_DIR is" $WRFVAR_DIR $(svnversion $WRFVAR_DIR)
 
 if $RUN_GEN_BE_STAGE0; then
 
@@ -52,17 +52,17 @@ if $RUN_GEN_BE_STAGE0; then
    echo "Run Stage 0: Calculate ensemble perturbations from model forecasts."
    echo "---------------------------------------------------------------"
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    $WRFVAR_DIR/scripts/gen_be/gen_be_stage0_wrf.ksh
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage 0 for WRF failed with error" $RC
       exit 1
    fi
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
 
@@ -76,13 +76,13 @@ if $RUN_GEN_BE_STAGE1; then
    echo "Run Stage 1: Read "standard fields", and remove time/ensemble/area mean."
    echo "---------------------------------------------------------------"
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage1.exe .
 
-cat > gen_be_stage1_nl.nl << EOF
-  &gen_be_stage1_nl
+   cat > gen_be_stage1_nl.nl << EOF
+&gen_be_stage1_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}',
     interval = ${INTERVAL},
@@ -100,12 +100,12 @@ EOF
 
    ./gen_be_stage1.exe > gen_be_stage1.log 2>&1
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage 1 failed with error" $RC
       exit 1
    fi
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
 
@@ -119,13 +119,13 @@ if $RUN_GEN_BE_STAGE2; then
    echo "Run Stage 2: Calculate regression coefficients."
    echo "---------------------------------------------------------------"
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage2.exe .
 
-cat > gen_be_stage2_nl.nl << EOF
-  &gen_be_stage2_nl
+   cat > gen_be_stage2_nl.nl << EOF
+&gen_be_stage2_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
@@ -135,12 +135,12 @@ EOF
 
    ./gen_be_stage2.exe > gen_be_stage2.log 2>&1
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage 2 failed with error" $RC
       exit 1
    fi
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
 
@@ -154,13 +154,13 @@ if $RUN_GEN_BE_STAGE2A; then
    echo "Run Stage 2a: Calculate control variable fields."
    echo "---------------------------------------------------------------"
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage2a.exe .
 
-cat > gen_be_stage2a_nl.nl << EOF
-  &gen_be_stage2a_nl
+   cat > gen_be_stage2a_nl.nl << EOF
+&gen_be_stage2a_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
@@ -172,13 +172,13 @@ EOF
    ./gen_be_stage2a.exe > gen_be_stage2a.log 2>&1
 
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage 2a failed with error" $RC
       exit 1
    fi
 
    rm -rf ${DELETE_DIRS} 2> /dev/null
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
 
@@ -192,15 +192,15 @@ if $RUN_GEN_BE_STAGE3; then
    echo "Run Stage 3: Read 3D control variable fields, and calculate vertical covariances."
    echo "---------------------------------------------------------------"
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage3.exe .
 
    for CV in $CONTROL_VARIABLES; do
 
-cat > gen_be_stage3_nl.nl << EOF
-  &gen_be_stage3_nl
+      cat > gen_be_stage3_nl.nl << EOF
+&gen_be_stage3_nl
     start_date = '${START_DATE}',
     end_date = '${END_DATE}', 
     interval = ${INTERVAL},
@@ -221,13 +221,13 @@ EOF
       ./gen_be_stage3.exe > gen_be_stage3.${CV}.log 2>&1
 
       RC=$?
-      if test $? != 0; then
+      if [[ $RC != 0 ]]; then
          echo "Stage 3 for $CV failed with error" $RC
          exit 1
       fi
    done
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 
 fi
@@ -238,7 +238,7 @@ fi
 
 if $RUN_GEN_BE_STAGE4; then
 
-   export BEGIN_CPU=`date`
+   export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    if $GLOBAL; then    
@@ -257,14 +257,14 @@ if $RUN_GEN_BE_STAGE4; then
 
       ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
       RC=$?
-      if test $? != 0; then
+      if [[ $RC != 0 ]]; then
          echo "Stage 4 failed with error" $RC
          exit 1
       fi
 
    fi 
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 
 fi
@@ -284,12 +284,12 @@ EOF
 
    ./gen_be_diags.exe > gen_be_diags.log 2>&1
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage gen_be_diags failed with error" $RC
       exit 1
    fi
 
-   export END_CPU=`date`
+   export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
 
@@ -308,7 +308,7 @@ EOF
    ./gen_be_diags_read.exe > gen_be_diags_read.log 2>&1
 
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "Stage gen_be_diags_read failed with error" $RC
       exit 1
    fi
@@ -327,7 +327,7 @@ if $RUN_GEN_BE_MULTICOV; then
    $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.ksh
 
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "gen_be_cov3d (chi) failed with error" $RC
       exit 1
    fi
@@ -339,7 +339,7 @@ if $RUN_GEN_BE_MULTICOV; then
    $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.ksh
 
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "gen_be_cov3d (T) failed with error" $RC
       exit 1
    fi
@@ -351,14 +351,14 @@ if $RUN_GEN_BE_MULTICOV; then
    $WRFVAR_DIR/scripts/gen_be/gen_be_cov2d.ksh
 
    RC=$?
-   if test $? != 0; then
+   if [[ $RC != 0 ]]; then
       echo "gen_be_cov2d failed with error" $RC
       exit 1
    fi
 
 fi
 
-export END_CPU=`date`
+export END_CPU=$(date)
 echo "Ending CPU time: ${END_CPU}"
 
 exit 0
