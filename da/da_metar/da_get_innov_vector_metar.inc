@@ -61,7 +61,7 @@ subroutine da_get_innov_vector_metar( it, xb, xp, ob, iv)
       iv%metar(n)%u%inv = ob%metar(n)%u
       iv%metar(n)%v%inv = ob%metar(n)%v
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          iv%metar(n)%zk=missing_r
 
          if (iv % metar(n) % h > missing_r) then

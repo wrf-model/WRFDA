@@ -103,7 +103,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    !----------------------------------------------------------------------
    ! call da_transform_xtovp( grid, xbx, vp, be)
 
-   if ( vert_corr == 2 ) then
+   if ( vert_corr == vert_corr_2 ) then
       ! perform vv = u_v^{-1} vp transform:
       call da_vertical_transform( 'u_inv', be, &
                             grid%xb % vertical_inner_product, &
@@ -125,7 +125,7 @@ subroutine da_test_vxtransform( grid, xbx, be, vv, vp)
    !----------------------------------------------------------------------
    ! [2.0]: Perform VpToVvToVp test:                        
    !----------------------------------------------------------------------
-   if ( vert_corr == 2 ) then
+   if ( vert_corr == vert_corr_2 ) then
       ! perform vp = u_v (vv) transform:
       call da_vertical_transform( 'u', be, &
                             grid%xb % vertical_inner_product, &

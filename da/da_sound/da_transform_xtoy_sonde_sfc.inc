@@ -23,7 +23,7 @@ subroutine da_transform_xtoy_sonde_sfc (grid, iv, y)
       ! y%sonde_sfc(:)%p = 0.0
       ! y%sonde_sfc(:)%q = 0.0
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
 
             ! [1.1] Get horizontal interpolation weights:

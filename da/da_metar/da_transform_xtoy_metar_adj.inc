@@ -19,7 +19,7 @@ subroutine da_transform_xtoy_metar_adj(grid, iv, jo_grad_y, jo_grad_x)
    if (trace_use) call da_trace_entry("da_transform_xtoy_metar_adj")
 
    if (iv%num_metar > 0) then
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, &
             iv%ob_numb(iv%current_ob_time)%metar
 

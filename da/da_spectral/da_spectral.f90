@@ -8,7 +8,8 @@ module da_spectral
       da_zero_complex, jds,jde,comm,ierr,test_transforms, stdout, pi, &
       gaussian_lats, earth_radius, alpha_corr_type, alpha_corr_scale, &
       alpha_corr_unit1, alpha_corr_unit2, filename_len, num_alpha_corr_types, &
-      earth_radius
+      earth_radius, alpha_corr_type_exp, alpha_corr_type_soar, &
+      alpha_corr_type_gaussian
 #ifdef FFTPACK
    use da_control, only : ide
 #endif

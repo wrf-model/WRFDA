@@ -345,13 +345,13 @@ subroutine da_transfer_kmatoxb(xbx, grid)
          ! vertical transform:
          grid%xb % grid_box_area(i,j) = earth_radius_sq * cos(grid%xlat(i,j)*conv)
 
-         if (vertical_ip == 1) then
+         if (vertical_ip == vertical_ip_sqrt_delta_p) then
             ! Vertical inner product is sqrt(Delta p):
             do k=1,grid%xb%mkz
                grid%xb % vertical_inner_product(i,j,k) = &
                   sqrt(grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1))
             end do
-         else if (vertical_ip == 2) then
+         else if (vertical_ip == vertical_ip_delta_p) then
             ! Vertical inner product is Delta p:
             do k=1,grid%xb%mkz
             grid%xb % vertical_inner_product(i,j,k) = grid%xb%p(i,j,k)-grid%xb%p(i,j,k+1)

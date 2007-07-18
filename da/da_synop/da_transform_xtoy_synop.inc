@@ -25,7 +25,7 @@ subroutine da_transform_xtoy_synop (grid, iv, y)
       ! y%synop(:)%p = 0.0
       ! y%synop(:)%q = 0.0
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%synop + 1, iv%ob_numb(iv%current_ob_time)%synop
 
             ! [1.1] Get horizontal interpolation weights:

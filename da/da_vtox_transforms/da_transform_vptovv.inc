@@ -29,10 +29,10 @@ subroutine da_transform_vptovv(evec, eval, vertical_wgt, &
    ! Do not add trace, as routine used by gen_be
    
    !-------------------------------------------------------------------
-   ! [1.0] Apply inner-product weighting if vertical_ip > 0:
+   ! [1.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0
    !------------------------------------------------------------------- 
 
-   if (vertical_ip /= 0) then
+   if (vertical_ip /= vertical_ip_0) then
       vp(its:ite,jts:jte,kts:kte) = vp(its:ite,jts:jte,kts:kte) * &
                                     vertical_wgt(its:ite,jts:jte,kts:kte)
    end if

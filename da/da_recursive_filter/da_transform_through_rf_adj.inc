@@ -47,14 +47,14 @@ subroutine da_transform_through_rf_adj(grid, mz,rf_alpha, val,&
    ! [4.3] Optionally scale by background error:
 
    ! be_s % val = Gridpoint standard deviation - only required for
-   ! vert_corr = 1 as scaling is performed in vertical transform
-   ! for vert_corr = 2:
+   ! vert_corr = vert_corr_1 as scaling is performed in vertical transform
+   ! for vert_corr = vert_corr_2:
 
-   if (vert_corr == 1) then
+   if (vert_corr == vert_corr_1) then
       do m = 1, mz
-      do i = its, ite
-         field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
-      end do
+         do i = its, ite
+            field(i,jts:jte,m) = field(i,jts:jte,m) * val(jts:jte,m)
+         end do
       end do
    end if
 

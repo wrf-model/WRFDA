@@ -7,7 +7,7 @@ module da_gen_be
 
    use da_control, only : stdout,vertical_ip, t0,es_beta,es_alpha, &
       es_gamma,kappa,base_pres,rd_over_rv,rd_over_rv1,t_kelvin, gravity, &
-      da_array_print, filename_len
+      da_array_print, filename_len,vertical_ip_0
    use da_reporting, only : da_error, message
    use da_tools1, only : da_get_unit, da_free_unit
 

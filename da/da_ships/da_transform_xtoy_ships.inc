@@ -22,7 +22,7 @@ subroutine da_transform_xtoy_ships (grid, iv, y)
       !xyh y%ships(:)%p = 0.0
       !xyh y%ships(:)%q = 0.0
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%ships + 1, iv%ob_numb(iv%current_ob_time)%ships
             ! [1.1] Get horizontal interpolation weights:
 

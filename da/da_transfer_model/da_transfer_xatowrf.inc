@@ -105,10 +105,10 @@ subroutine da_transfer_xatowrf(grid)
 
    ! Adjust grid%xa%q to makte grid%xb%q + grid%xa%q > 0.0
 
-   if (check_rh == 2) then
+   if (check_rh == check_rh_tpw) then
       ! Shu-Hua~s TPW conservation:
       call da_check_rh(grid)
-   else if (check_rh == 1) then
+   else if (check_rh == check_rh_simple) then
       ! Simple resetting to max/min values:
       call da_check_rh_simple(grid)
    end if

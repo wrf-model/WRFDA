@@ -25,7 +25,7 @@ subroutine da_transform_xtoy_metar (grid, iv, y)
       !xyh      y%metar(:)%p = 0.0
       !xyh      y%metar(:)%q = 0.0
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          do n=iv%ob_numb(iv%current_ob_time-1)%metar + 1, iv%ob_numb(iv%current_ob_time)%metar
 
             ! [1.1] Get horizontal interpolation weights:

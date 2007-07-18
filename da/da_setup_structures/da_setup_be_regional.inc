@@ -195,7 +195,7 @@ subroutine da_setup_be_regional(xb, be)
    allocate (be4_eval_loc (1:jy,1:kz))
    allocate (be5_eval_loc (1:jy,1:1))
 
-   if (vert_corr == 2) then
+   if (vert_corr == vert_corr_2) then
 
       allocate (be1_eval_glo(1:kz))
       allocate (be2_eval_glo(1:kz))
@@ -330,7 +330,7 @@ subroutine da_setup_be_regional(xb, be)
    ! 3.0 Check and get the truncated number of the vertical modes
    ! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-   if (vert_corr == 2) then
+   if (vert_corr == vert_corr_2) then
 
       ! 3.1 Perform checks on eigenvectors:
 
@@ -471,7 +471,7 @@ subroutine da_setup_be_regional(xb, be)
    deallocate (be4_eval_loc)
    deallocate (be5_eval_loc)
 
-   if (vert_corr == 2) then
+   if (vert_corr == vert_corr_2) then
       deallocate (be1_eval_glo)
       deallocate (be2_eval_glo)
       deallocate (be3_eval_glo)

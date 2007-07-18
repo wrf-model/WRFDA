@@ -72,12 +72,12 @@ subroutine da_calc_power_spectrum(max_wave, power)
       ! d(j) = 0.5 * glats(j) * corr_scale_inv
       d(j) = glats(j) * corr_scale_inv
 
-      if (alpha_corr_type == 1) then ! Exponential.
+      if (alpha_corr_type == alpha_corr_type_exp) then ! Exponential.
          corr(j) = exp(-d(j))
-      else if (alpha_corr_type == 2) then ! SOAR
+      else if (alpha_corr_type == alpha_corr_type_soar) then ! SOAR
          d(j) = 2.0 * d(j)
          corr(j) = (1.0 + d(j)) * exp(-d(j))
-      else if (alpha_corr_type == 3) then ! Gaussian
+      else if (alpha_corr_type == alpha_corr_type_gaussian) then ! Gaussian
          corr(j) = exp(-d(j) * d(j))
       end if
    end do

@@ -37,7 +37,8 @@ module da_setup_structures
       var_scaling5,vert_corr,max_vert_var5,power_truncation,alpha_truncation, &
       print_detail_regression,gas_constant,da_array_print , use_airsretobs, &
       filename_len, use_ssmisobs, gravity, t_triple, use_hirs4obs, use_mhsobs, &
-      ims,ime,jms,jme,kms,kme,kds
+      ims,ime,jms,jme,kms,kme,kds, vert_corr_2, alphacv_method_xa, vert_evalue_global, &
+      vert_evalue_local
    use da_obs, only : da_store_obs_grid_info,da_fill_obs_structures, &
       da_store_obs_grid_info_new
    use da_obs_io, only : da_scan_bufr_obs,da_read_bufr_obs,da_read_radar, &

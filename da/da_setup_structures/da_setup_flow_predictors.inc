@@ -36,7 +36,7 @@ subroutine da_setup_flow_predictors(ix, jy, kz, ne, ep)
    if (ne > 1) ens_scaling_inv = 1.0 / sqrt(real(ne-1))
 
    ! Decide which space we are introducing flow-dependence:
-   if (alphacv_method == 2) then    ! xa space
+   if (alphacv_method == alphacv_method_xa) then    ! xa space
       var(1) = 'u'
       var(2) = 'v'
       var(3) = 't'

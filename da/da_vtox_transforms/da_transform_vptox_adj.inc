@@ -38,7 +38,7 @@ subroutine da_transform_vptox_adj(grid, vp, be, ep)
 
    else 
 
-   ! Pseudo RH --> Water vapor mixing ratio:
+      ! Pseudo RH --> Water vapor mixing ratio:
 
       vp%v4(its:ite,jts:jte,kts:kte)  = vp%v4(its:ite,jts:jte,kts:kte) + &
                                         grid%xa%q (its:ite,jts:jte,kts:kte) * &
@@ -52,7 +52,7 @@ subroutine da_transform_vptox_adj(grid, vp, be, ep)
 
    ! Transform psi and chi to u and v:
    call da_psichi_to_uv_adj(grid%xa % u, grid%xa % v, grid%xb % coefx,   &
-                             grid%xb % coefy, vp % v1, vp % v2)
+      grid%xb % coefy, vp % v1, vp % v2)
 
    !--------------------------------------------------------------------------
    ! [2] Impose statistical balance constraints:
@@ -91,7 +91,7 @@ subroutine da_transform_vptox_adj(grid, vp, be, ep)
    !  [1] Add flow-dependent increments in control variable space (vp):
    !---------------------------------------------------------------------------
    
-   if (be % ne > 0 .and. alphacv_method == 1) then
+   if (be % ne > 0 .and. alphacv_method == alphacv_method_vp) then
       call da_add_flow_dependence_vp_adj(be % ne, ep, vp)
    end if
 

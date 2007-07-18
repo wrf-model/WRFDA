@@ -31,14 +31,15 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
-      ips,ipe, jps,jpe, vert_corr, sin_xle, test_wrfvar, use_rad, &
+      ips,ipe, jps,jpe, vert_corr, vert_corr_2, sin_xle, test_wrfvar, use_rad, &
       calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
       max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
       rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef, ims, ime, &
-      kps, kpe, jms, jme, kms, kme, jts,jte
+      kps, kpe, jms, jme, kms, kme, jts,jte, cv_options_hum_specific_humidity, &
+      cv_options_hum_relative_humidity, vertical_ip_0, vertical_ip_delta_p
    use da_define_structures, only : y_type, j_type, ob_type, be_type, &
       xbx_type,da_deallocate_background_errors,da_initialize_cv, &
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
@@ -49,7 +50,7 @@ subroutine da_solve ( grid , config_flags)
    use da_obs_io, only : da_write_filtered_obs
    use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
    use da_physics, only : da_uvprho_to_w_lin
-   use da_reporting, only : message, da_warning
+   use da_reporting, only : message, da_warning, da_error
    use da_setup_structures, only : da_setup_obs_structures, &
       da_setup_background_errors,da_setup_flow_predictors
    use da_test, only : da_check
@@ -83,6 +84,7 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
    if (trace_use) call da_trace_entry("da_solve")
+write (0,*) __FILE__,__LINE__
 
 #ifdef DM_PARALLEL
    call mpi_barrier(comm,ierr)
@@ -97,31 +99,32 @@ subroutine da_solve ( grid , config_flags)
       ntmax=0
    end if
 
-   if (cv_options_hum < 1 .or. cv_options_hum > 3) then
+   if (cv_options_hum /= cv_options_hum_specific_humidity .and. &
+       cv_options_hum /= cv_options_hum_relative_humidity) then
       write(unit=message(1),fmt='(A,I3)') &
          'Invalid cv_options_hum = ', cv_options_hum
-      call wrf_error_fatal(message(1:1))
+      call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
-   if (vert_corr == 2) then
-      if (vertical_ip < 0 .or. vertical_ip > 2) then
+   if (vert_corr == vert_corr_2) then
+      if (vertical_ip < vertical_ip_0 .or. vertical_ip > vertical_ip_delta_p) then
          write (unit=message(1),fmt='(A,I3)') &
-           'Invalid vertical_ip = ', &
-           vertical_ip
-         call da_warning(__FILE__,__LINE__,message(1:1))
+           'Invalid vertical_ip = ', vertical_ip
+         call da_error(__FILE__,__LINE__,message(1:1))
       end if
    end if
 
    if (0.5 * real(rf_passes) /= real(rf_passes / 2)) then
-      write(unit=stdout,fmt='(A,I4,A)')'rf_passes = ', &
-                         rf_passes, ' .Should be even.'
+      write(unit=stdout,fmt='(A,I4,A)') &
+         'rf_passes = ', rf_passes, ' .Should be even.'
       rf_passes = int(real(rf_passes / 2))
       write(unit=stdout,fmt='(A,I4)') 'Resetting rf_passes = ', rf_passes
    end if
 
    if (anal_type_randomcv) then
       ntmax = 0
-      write(unit=stdout,fmt='(a)')' Resetting ntmax = 0 for analysis_type = randomcv' 
+      write(unit=stdout,fmt='(a)') &
+         ' Resetting ntmax = 0 for analysis_type = randomcv' 
    end if
 
    !---------------------------------------------------------------------------
@@ -136,13 +139,13 @@ subroutine da_solve ( grid , config_flags)
    ! [3.0] Set up first guess field (grid%xb):
    !---------------------------------------------------------------------------
 
-   call da_setup_firstguess( xbx, grid)
+   call da_setup_firstguess(xbx, grid)
 
    !---------------------------------------------------------------------------
    ! [4.0] Set up observations (ob):
    !---------------------------------------------------------------------------
 
-   call da_setup_obs_structures( grid, ob, iv)
+   call da_setup_obs_structures (grid, ob, iv)
 
    if (use_rad) then
       allocate (j % jo % rad(1:iv%num_inst))
@@ -156,7 +159,7 @@ subroutine da_solve ( grid , config_flags)
    ! [5.0] Set up background errors (be):
    !---------------------------------------------------------------------------
 
-   call da_setup_background_errors( grid%xb, be)
+   call da_setup_background_errors (grid%xb, be)
    cv_size = be % cv % size
 
    !---------------------------------------------------------------------------
@@ -165,7 +168,7 @@ subroutine da_solve ( grid , config_flags)
 
    grid%ep % ne = be % ne
    if (be % ne > 0) then
-      call da_setup_flow_predictors( ide, jde, kde, be % ne, grid%ep )
+      call da_setup_flow_predictors (ide, jde, kde, be % ne, grid%ep )
    end if
 
    !---------------------------------------------------------------------------
@@ -196,38 +199,39 @@ subroutine da_solve ( grid , config_flags)
             call da_system ("da_run_wrf_nl.ksh pre")
             ! call da_system("./wrf.exe -rmpool 1")
             if (rootproc) then
-               call da_system("rm -rf wrfnl_done")
-               call da_system("touch wrfnl_go_ahead")
-               call da_get_unit(wrf_done_unit)
+               call da_system ("rm -rf wrfnl_done")
+               call da_system ("touch wrfnl_go_ahead")
+               call da_get_unit (wrf_done_unit)
                do while ( .true. )
                   open(wrf_done_unit,file="wrfnl_done",status="old",err=303)
                   close(wrf_done_unit)
                   exit
 303                  continue
-                  call da_system("sync")
-                  call da_system("sleep 1")
+                  call da_system ("sync")
+                  call da_system ("sleep 1")
                end do
-               call da_free_unit(wrf_done_unit)
+               call da_free_unit (wrf_done_unit)
             end if
             ! Wait until PE thinks NL model has finished
-            call mpi_barrier( comm, ierr )
-            call da_system("da_run_wrf_nl.ksh post")
-            call da_system("touch wrfnl_stop_now")
+            call mpi_barrier (comm, ierr)
+            call da_system ("da_run_wrf_nl.ksh post")
+            call da_system ("touch wrfnl_stop_now")
          end if
 #else
-         call da_system("da_run_wrf_nl.ksh")
+         call da_system ("da_run_wrf_nl.ksh")
 #endif
-         call da_trace("da_solve","Finished da_run_wrf_nl.ksh")
+         call da_trace ("da_solve","Finished da_run_wrf_nl.ksh")
       end if
 
       ! [8.2] Calculate innovation vector (O-B):
 
-      call da_get_innov_vector( it, ob, iv, grid , config_flags)
+      call da_get_innov_vector (it, ob, iv, grid , config_flags)
 
       if (test_transforms .or. test_wrfvar) then
-         call da_check(grid, config_flags, cv_size, xbx, be, grid%ep, iv, grid%vv, grid%vp, y)
+         call da_check (grid, config_flags, cv_size, xbx, be, grid%ep, iv, &
+            grid%vv, grid%vp, y)
          if (var4d) then
-            call da_system("touch wrf_stop_now")
+            call da_system ("touch wrf_stop_now")
          end if
          ! No point continuing, as data corrupted
          call wrf_shutdown
@@ -237,7 +241,7 @@ subroutine da_solve ( grid , config_flags)
       ! Write "clean" QCed observations if requested:
       if (anal_type_qcobs) then
          if (it == 1) then
-            call da_write_filtered_obs(grid, ob, iv, &
+            call da_write_filtered_obs (grid, ob, iv, &
                coarse_ix, coarse_jy, start_x, start_y)
           end if     
       end if
@@ -246,20 +250,17 @@ subroutine da_solve ( grid , config_flags)
 
       ! [8.4] Minimize cost function:
 
-      call da_allocate_y( iv, re )
-      call da_allocate_y( iv, y )
+      call da_allocate_y (iv, re)
+      call da_allocate_y (iv, y)
 
-      call da_minimise_cg( grid, config_flags,                  &
-                           it, be % cv % size, & 
-                           xbx, be, iv, &
-                           j_grad_norm_target, xhat, cvt, &
-                           re, y, j)
+      call da_minimise_cg( grid, config_flags, it, be % cv % size, & 
+         xbx, be, iv, j_grad_norm_target, xhat, cvt, re, y, j)
 
       !------------------------------------------------------------------------
 
       ! [8.5] Update latest analysis solution:
 
-      call da_transform_vtox(grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
+      call da_transform_vtox (grid,cv_size,xbx,be,grid%ep,xhat,grid%vv,grid%vp)
 
       ! [8.6] Only when use_radarobs = .false. and calc_w_increment =.true.,
       !       the w_increment need to be diagnosed:
@@ -288,7 +289,7 @@ subroutine da_solve ( grid , config_flags)
       ! [8.0] Output WRFVAR analysis and analysis increments:
       !------------------------------------------------------------------------
 
-      call da_transfer_xatoanalysis( it, xbx, grid, config_flags)
+      call da_transfer_xatoanalysis (it, xbx, grid, config_flags)
    end do
 
    !---------------------------------------------------------------------------
@@ -296,7 +297,7 @@ subroutine da_solve ( grid , config_flags)
    !---------------------------------------------------------------------------
 
    if (var4d) then
-      call da_system("touch wrf_stop_now")
+      call da_system ("touch wrf_stop_now")
    end if
 
    deallocate (cvt)
@@ -406,15 +407,15 @@ subroutine da_solve ( grid , config_flags)
 #endif
    end if
 
-   call da_deallocate_observations(iv)
+   call da_deallocate_observations (iv)
    call da_deallocate_y (re)
    call da_deallocate_y (y)
    call da_deallocate_y (ob)
    call da_deallocate_background_errors (be)
 
    if (xbx%pad_num > 0) then
-      deallocate(xbx%pad_loc)
-      deallocate(xbx%pad_pos)
+      deallocate (xbx%pad_loc)
+      deallocate (xbx%pad_pos)
    end if
 
    deallocate (xbx % fft_factors_x)
@@ -432,23 +433,23 @@ subroutine da_solve ( grid , config_flags)
       deallocate (xbx%alp)
       deallocate (xbx%wsave)
       if (jts == jds) then
-         deallocate(cos_xls)
-         deallocate(sin_xls)
+         deallocate (cos_xls)
+         deallocate (sin_xls)
       end if
                                                                                 
       if (jte == jde) then
-         deallocate(cos_xle)
-         deallocate(sin_xle)
+         deallocate (cos_xle)
+         deallocate (sin_xle)
       end if
    end if
 
    deallocate (xbx % latc_mean)
 
 #ifdef DM_PARALLEL
-   call mpi_barrier(comm,ierr)
+   call mpi_barrier (comm,ierr)
 #endif
 
-   if (trace_use) call da_trace_exit("da_solve")
+   if (trace_use) call da_trace_exit ("da_solve")
 
 contains
 

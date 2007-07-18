@@ -82,6 +82,29 @@ module da_control
    real   , parameter ::  missing_r     = -888888.0
    real   , parameter ::  Max_StHeight_Diff = 100.0
 
+   integer, parameter :: cv_options_hum_specific_humidity = 1
+   integer, parameter :: cv_options_hum_relative_humidity = 2
+
+   ! No-one explains what these options means anywhere
+   integer, parameter :: vert_corr_1 = 1
+   integer, parameter :: vert_corr_2 = 2
+
+   integer, parameter :: vertical_ip_0            = 0
+   integer, parameter :: vertical_ip_sqrt_delta_p = 1
+   integer, parameter :: vertical_ip_delta_p      = 2
+
+   integer, parameter :: vert_evalue_global = 1
+   integer, parameter :: vert_evalue_local  = 2
+
+   integer, parameter :: alphacv_method_vp = 1
+   integer, parameter :: alphacv_method_xa = 2
+
+   integer, parameter :: sfc_assi_options_1 = 1
+   integer, parameter :: sfc_assi_options_2 = 2
+
+   integer, parameter :: check_rh_simple = 1
+   integer, parameter :: check_rh_tpw    = 2
+
    logical :: anal_type_verify=.false.
    logical :: anal_type_randomcv=.false.
    logical :: anal_type_qcobs=.false.
@@ -205,6 +228,10 @@ module da_control
    integer,parameter :: filename_len = 200
 
    integer, parameter :: num_alpha_corr_types = 3
+
+   integer, parameter :: alpha_corr_type_exp      = 1
+   integer, parameter :: alpha_corr_type_soar     = 2
+   integer, parameter :: alpha_corr_type_gaussian = 3
 
    integer :: alpha_corr_unit1(num_alpha_corr_types)
    integer :: alpha_corr_unit2(num_alpha_corr_types)

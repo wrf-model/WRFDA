@@ -40,7 +40,8 @@ module da_test
       use_rad,cv_options_hum,inv_typ_vp5_sumsq,inv_typ_vp1_sumsq, &
       inv_typ_vp3_sumsq,inv_typ_vp2_sumsq,inv_typ_vpalpha_sumsq, &
       inv_typ_vp4_sumsq,typical_rho_rms,balance_geo,balance_cyc,balance_type, &
-      balance_geocyc, var4d, num_fgat_time
+      balance_geocyc, var4d, num_fgat_time,cv_options_hum_specific_humidity, &
+      cv_options_hum_relative_humidity
    use da_define_structures, only : da_zero_x,da_zero_vp_type,da_allocate_y, &
       da_deallocate_y,be_type, xbx_type, ob_type, y_type
    use da_dynamics, only : da_uv_to_divergence,da_uv_to_vorticity, &

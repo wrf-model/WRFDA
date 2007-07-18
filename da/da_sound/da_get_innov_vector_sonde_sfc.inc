@@ -61,7 +61,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
       iv%sonde_sfc(n)%u%inv = ob%sonde_sfc(n)%u
       iv%sonde_sfc(n)%v%inv = ob%sonde_sfc(n)%v
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          iv%sonde_sfc(n)%zk=missing_r
 
          if (iv % sonde_sfc(n) % h > missing_r) then

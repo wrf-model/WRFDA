@@ -62,7 +62,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
       iv%buoy(n)%u%inv = ob%buoy(n)%u
       iv%buoy(n)%v%inv = ob%buoy(n)%v
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          iv%buoy(n)%zk=missing_r
 
          if (iv % buoy(n) % h > missing_r) then

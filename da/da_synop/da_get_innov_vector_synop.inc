@@ -60,7 +60,7 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
       iv%synop(n)%u%inv = ob%synop(n)%u
       iv%synop(n)%v%inv = ob%synop(n)%v
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          iv%synop(n)%zk=missing_r
 
          if (iv % synop(n) % h > missing_r) then

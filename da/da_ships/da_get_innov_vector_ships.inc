@@ -67,7 +67,7 @@ subroutine da_get_innov_vector_ships( it, xb, xp, ob, iv)
       iv%ships(n)%u%inv = ob%ships(n)%u
       iv%ships(n)%v%inv = ob%ships(n)%v
 
-      if (sfc_assi_options == 1) then
+      if (sfc_assi_options == sfc_assi_options_1) then
          iv%ships(n)%zk=missing_r
 
          if (iv % ships(n) % h > missing_r) then

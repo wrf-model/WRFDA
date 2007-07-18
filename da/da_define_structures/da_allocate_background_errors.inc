@@ -33,13 +33,13 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
    if (mz > 0) then
       allocate  (be_sub % val(1:jy,1:mz))
       
-      if (vert_corr == 2) then
+      if (vert_corr == vert_corr_2) then
 
          !--------------------------------------------------------------------
          ! [3.0] Allocate eigenvalues of vertical error covariance matrix:
          !--------------------------------------------------------------------
 
-         if (vert_evalue == 1) then
+         if (vert_evalue == vert_evalue_global) then
             ! use global eigenvalues:
             do m = 1, mz
                be_sub % val(1:jy,m) = sqrt (l(m))
@@ -69,7 +69,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
 
          allocate  (be_sub % evec(1:jy,1:kz,1:mz))
          
-         if (vert_evalue == 1) then
+         if (vert_evalue == vert_evalue_global) then
             ! use global eigenvectors:
             do j = 1, jy
                be_sub % evec(j,1:kz,1:mz) = e(1:kz,1:mz)
@@ -92,7 +92,7 @@ subroutine da_allocate_background_errors  (jy, kz, l, e, be_eval_loc, &
   
          be_sub % val_g(1:mz) = l(1:mz)
          be_sub % evec_g(1:kz,1:mz) = e(1:kz,1:mz)
-      else if (vert_corr == 1) then
+      else if (vert_corr == vert_corr_1) then
          if (print_detail_be) then
            write(unit=stdout,fmt='(A)') &
               'Change be std dev to variance in NMC code'

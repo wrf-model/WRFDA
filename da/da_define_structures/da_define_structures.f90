@@ -4,7 +4,8 @@ module da_define_structures
 
     use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
        vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
-       max_ob_levels,da_array_print, trace_use
+       max_ob_levels,da_array_print, trace_use, vert_corr_1, vert_corr_2, &
+       vert_evalue_global
 
     use da_tracing, only : da_trace_entry, da_trace_exit
 

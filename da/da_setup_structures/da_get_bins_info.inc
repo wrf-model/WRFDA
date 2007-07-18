@@ -29,7 +29,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
 
    allocate(e_vec_loc(1:nj,1:nk,1:nk))
    allocate(e_val_loc(1:nj,1:nk))
-   if (vert_evalue == 1) then              ! use global eigen vectors
+   if (vert_evalue == vert_evalue_global) then       ! use global eigen vectors
       do k = 1, nk
          e_val_loc(1:nj,k)     = eval_g(k)
          do i =1,nk
@@ -37,7 +37,7 @@ subroutine da_get_bins_info(nj, nk, bin2d, evec_g, eval_g,&
          end do  
       end do  
   
-   else if (vert_evalue == 2) then          ! use local  eigen vectors
+   else if (vert_evalue == vert_evalue_local) then  ! use local  eigen vectors
       do j = 1, nj
          b = bin2d(1,j)         
          do k=1,nk

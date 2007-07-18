@@ -130,7 +130,7 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
                 + sum(grid%xa % w  (its:ite, jts:jte, kts:kte)**2)/typical_w_rms**2
    end if
 
-   if (cv_options_hum == 2) then
+   if (cv_options_hum == cv_options_hum_relative_humidity) then
       adj_par_lhs = sum(grid%xa % rh(its:ite,jts:jte,:)**2) / &
          typical_rh_rms**2 + adj_par_lhs
    end if
@@ -155,7 +155,7 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
       grid%xa %w (:,:,:) = grid%xa %w (:,:,:) / typical_w_rms**2
    end if
 
-   if (cv_options_hum == 2) then
+   if (cv_options_hum == cv_options_hum_relative_humidity) then
       grid%xa % rh(:,:,:) = grid%xa % rh(:,:,:) / typical_rh_rms**2
    end if
    

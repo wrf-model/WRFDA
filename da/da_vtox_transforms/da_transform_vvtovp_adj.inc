@@ -22,10 +22,10 @@ subroutine da_transform_vvtovp_adj(evec, eval, vertical_wgt, &
    if (trace_use) call da_trace_entry("da_transform_vvtovp_adj")
 
    !-------------------------------------------------------------------
-   ! [1.0] Apply inner-product weighting if vertical_ip > 0:
+   ! [1.0] Apply inner-product weighting if vertical_ip /= vertical_ip_0:
    !------------------------------------------------------------------- 
 
-   if (vertical_ip /= 0) then
+   if (vertical_ip /= vertical_ip_0) then
       vp(its:ite,jts:jte,kts:levels) = vp(its:ite,jts:jte,kts:levels) / &
                                     vertical_wgt(its:ite,jts:jte,kts:levels)
    end if
