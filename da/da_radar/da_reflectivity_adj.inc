@@ -14,11 +14,11 @@ subroutine da_reflectivity_adj(rf, qrn, qrn9)
    real, parameter   :: leh1=43.1
    real, parameter   :: leh2=17.5
 
-   ! temp = leh2 / (rho9*qrn9*alog(10.))
+   ! temp = leh2 / (rho9*qrn9*alog(10.0))
 
    ! rho = rho + temp * qrn9 * rf
    ! qrn = qrn + temp * rho9 * rf
-   qrn = qrn + leh2/(qrn9*alog(10.)) * rf
+   qrn = qrn + leh2/(qrn9*alog(10.0)) * rf
 
 end subroutine da_reflectivity_adj
 

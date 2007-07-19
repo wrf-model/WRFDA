@@ -50,17 +50,17 @@ subroutine da_tb_adj(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
    ! 'foam' emissivity
    data fem /1.0/
 
-   f=0.;costhet=0.;gx2=0.;tbup=0.;tbdn=0.;tauatm=0.
-   sigma=0.;remv=0.;remh=0.;effangv=0.;effangh=0.
-   tbdnv=0.;foam=0.;foam_save=0.;emissv=0.;emissh=0.
-   dum=0.;refv=0.;refh=0.;semv=0.;semh=0.;scatv=0.
-   scath=0.;tbdnh=0.;ADJ_gx2=0.;ADJ_tbup=0.;ADJ_tbdn=0.
-   ADJ_tauatm=0.;ADJ_sigma=0.;ADJ_tremv=0.;ADJ_remh=0.
-   ADJ_effangv=0.;ADJ_effangh=0.;ADJ_tbdnh=0.;ADJ_dum=0.
-   ADJ_foam=0.;ADJ_emissv=0.;ADJ_emissh=0.;ADJ_refv=0.
-   ADJ_refh=0.;ADJ_semv=0.;ADJ_semh=0.;ADJ_scatv=0.
-   ADJ_scath=0.;ADJ_remv=0.;ADJ_tbdnv=0.
-   ADJ_theta =0.
+   f=0.0;costhet=0.0;gx2=0.0;tbup=0.0;tbdn=0.0;tauatm=0.0
+   sigma=0.0;remv=0.0;remh=0.0;effangv=0.0;effangh=0.0
+   tbdnv=0.0;foam=0.0;foam_save=0.0;emissv=0.0;emissh=0.0
+   dum=0.0;refv=0.0;refh=0.0;semv=0.0;semh=0.0;scatv=0.0
+   scath=0.0;tbdnh=0.0;ADJ_gx2=0.0;ADJ_tbup=0.0;ADJ_tbdn=0.0
+   ADJ_tauatm=0.0;ADJ_sigma=0.0;ADJ_tremv=0.0;ADJ_remh=0.0
+   ADJ_effangv=0.0;ADJ_effangh=0.0;ADJ_tbdnh=0.0;ADJ_dum=0.0
+   ADJ_foam=0.0;ADJ_emissv=0.0;ADJ_emissh=0.0;ADJ_refv=0.0
+   ADJ_refh=0.0;ADJ_semv=0.0;ADJ_semh=0.0;ADJ_scatv=0.0
+   ADJ_scath=0.0;ADJ_remv=0.0;ADJ_tbdnv=0.0
+   ADJ_theta =0.0
 
 
    ! write (unit=stdout,fmt=*) 'ifreq',ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,          &

@@ -54,13 +54,13 @@ real function da_gaus_noise(KDUM)
    if (niset.eq.0) then
 
 1000  continue
-      zv1   = 2.*da_unifva(kdum) - 1.
-      zv2   = 2.*da_unifva(kdum) - 1.
+      zv1   = 2.0*da_unifva(kdum) - 1.0
+      zv2   = 2.0*da_unifva(kdum) - 1.0
       zrsq  = zv1**2 + zv2**2
           
-      if ((zrsq.ge.1.).or.(zrsq.eq.0.)) goto 1000
+      if ((zrsq>=1.0).or.(zrsq==0.0)) goto 1000
 
-      zfac  = sqrt(-2.*log(zrsq)/zrsq)
+      zfac  = sqrt(-2.0*log(zrsq)/zrsq)
       gset  = zv1*zfac
       da_gaus_noise = zv2*zfac
       niset = 1

@@ -34,11 +34,11 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
       TGL_alpha = coef1 * TGL_pre_ma(ks) + coef2 * TGL_pre_ma(ks+1)
       alpha = log(pre_ma(ks)/pre)/log(pre_ma(ks)/pre_ma(ks+1))
 
-      TGL_tv = (1.-alpha)*TGL_tv_ma(ks) +               &
+      TGL_tv = (1.0-alpha)*TGL_tv_ma(ks) +               &
                (tv_ma(ks+1)-tv_ma(ks))*TGL_alpha +     &
                alpha*TGL_tv_ma(ks+1)
-      TGL_pre_ma(ks-1) = 0.
-      tv = tv_ma(ks) * (1.-alpha) + tv_ma(ks+1) * alpha
+      TGL_pre_ma(ks-1) = 0.0
+      tv = tv_ma(ks) * (1.0-alpha) + tv_ma(ks+1) * alpha
       pre_ma(ks-1) = pre
 
    else if (pre <= pre_ma(ke)) then
@@ -52,11 +52,11 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
       TGL_alpha = coef1 * TGL_pre_ma(ke-1) + coef2 * TGL_pre_ma(ke)
       alpha = log(pre_ma(ke-1)/pre)/log(pre_ma(ke-1)/pre_ma(ke))
 
-      TGL_tv = (1.-alpha)*TGL_tv_ma(ke-1) +                 &
+      TGL_tv = (1.0-alpha)*TGL_tv_ma(ke-1) +                 &
                (tv_ma(ke)-tv_ma(ke-1))*TGL_alpha +           &
                alpha*TGL_tv_ma(ke)
-      TGL_pre_ma(ke+1) = 0.
-      tv = tv_ma(ke-1) * (1.-alpha) + tv_ma(ke) * alpha
+      TGL_pre_ma(ke+1) = 0.0
+      tv = tv_ma(ke-1) * (1.0-alpha) + tv_ma(ke) * alpha
       pre_ma(ke+1) = pre
 
    else
@@ -71,10 +71,10 @@ subroutine da_find_layer_tl(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                   (log(pre_ma(k)/pre_ma(k+1)))**2)
             TGL_alpha = coef1 * TGL_pre_ma(k) + coef2 * TGL_pre_ma(k+1)
             alpha = log(pre_ma(k)/pre)/log(pre_ma(k)/pre_ma(k+1))
-            TGL_tv = (1.-alpha)*TGL_tv_ma(k) +                 &
+            TGL_tv = (1.0-alpha)*TGL_tv_ma(k) +                 &
                      (tv_ma(k+1)-tv_ma(k))*TGL_alpha +         &
                       alpha*TGL_tv_ma(k+1)
-            tv = tv_ma(k) * (1.-alpha) + tv_ma(k+1) * alpha
+            tv = tv_ma(k) * (1.0-alpha) + tv_ma(k+1) * alpha
             exit
          end if
       end do

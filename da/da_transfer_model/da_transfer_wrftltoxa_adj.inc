@@ -32,11 +32,11 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ks=grid%xp%kts
    ke=grid%xp%kte
 
-   grid%em_g_u_2 = 0.0
-   grid%em_g_v_2 = 0.0
-   grid%em_g_w_2 = 0.0
-   grid%em_g_t_2 = 0.0
-   grid%g_moist = 0.0
+   grid%em_g_u_2  = 0.0
+   grid%em_g_v_2  = 0.0
+   grid%em_g_w_2  = 0.0
+   grid%em_g_t_2  = 0.0
+   grid%g_moist   = 0.0
    grid%em_g_mu_2 = 0.0
    grid%em_g_ph_2 = 0.0
    !---------------------------------------------------------------------------
@@ -101,10 +101,10 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    vtmp=grid%xa%v
 
    ! The western boundary
-   if (is == grid%xp%ids) utmp(is-1,js:je,ks:ke)=0.
+   if (is == grid%xp%ids) utmp(is-1,js:je,ks:ke)=0.0
 
    ! The southern boundary
-   if (js == grid%xp%jds) vtmp(is:ie,js-1,ks:ke)=0.
+   if (js == grid%xp%jds) vtmp(is:ie,js-1,ks:ke)=0.0
 
    do k=ks,ke
       do j=js,je
@@ -117,11 +117,11 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
 
    ! The eastern boundary
    if (ie == grid%xp%ide)  &
-       grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.
+       grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.0
 
    ! The northern boundary
    if (je == grid%xp%jde)  &
-       grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.
+       grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.0
 
 #else
 
@@ -139,16 +139,16 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    end do
 
    ! The western boundary
-   grid%em_g_u_2(is,js:je,ks:ke)=grid%em_g_u_2(is,js:je,ks:ke)+grid%xa%u(is,js:je,ks:ke)/2.
+   grid%em_g_u_2(is,js:je,ks:ke)=grid%em_g_u_2(is,js:je,ks:ke)+grid%xa%u(is,js:je,ks:ke)/2.0
 
    ! The eastern boundary
-   grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.
+   grid%em_g_u_2(ie+1,js:je,ks:ke)=grid%em_g_u_2(ie+1,js:je,ks:ke)+grid%xa%u(ie,js:je,ks:ke)/2.0
 
    ! The southern boundary
-   grid%em_g_v_2(is:ie,js,ks:ke)=grid%em_g_v_2(is:ie,js,ks:ke)+grid%xa%v(is:ie,js,ks:ke)/2.
+   grid%em_g_v_2(is:ie,js,ks:ke)=grid%em_g_v_2(is:ie,js,ks:ke)+grid%xa%v(is:ie,js,ks:ke)/2.0
 
    ! The northern boundary
-   grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.
+   grid%em_g_v_2(is:ie,je+1,ks:ke)=grid%em_g_v_2(is:ie,je+1,ks:ke)+grid%xa%v(is:ie,je,ks:ke)/2.0
 
 
 #endif
@@ -160,10 +160,10 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    !---------------------------------------------------------------------------
 
    ! In the inverse, g_ph information is lost. This should be investigated later!!!
-   ! However, in this adjoint problem, a_ph should be set to 0. Otherwise, a_ph 
+   ! However, in this adjoint problem, a_ph should be set to 0.0 Otherwise, a_ph 
    ! will be initialized randomly!
 
-   grid%em_g_ph_2=0.
+   grid%em_g_ph_2=0.0
 
    do k=ks,ke
       do j=js,je
@@ -179,7 +179,7 @@ subroutine da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
    ! [3.0] COMPUTE pressure increments 
    !---------------------------------------------------------------------------
 
-   g_press(is:ie,js:je,ks:ke+1)=0.
+   g_press(is:ie,js:je,ks:ke+1)=0.0
    do k=ks,ke
       do j=js,je
          do i=is,ie

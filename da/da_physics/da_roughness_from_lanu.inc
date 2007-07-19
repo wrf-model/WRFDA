@@ -81,7 +81,7 @@ subroutine da_roughness_from_lanu(ltbl, mminlu, date, lanu, rough)
    do lc = m1,m2
       do ls = n1,n2
          Li = int(lanu(lc,ls)+0.001)
-         rough(lc,ls) =  sfz0(Li,Isn)/100.
+         rough(lc,ls) =  sfz0(Li,Isn)/100.0
       end do
    end do
 

@@ -285,7 +285,7 @@ subroutine da_rttov_init(iv,ob)
       allocate (polarisations(nchannels, 3))
       allocate (emissivity( nchannels))
       allocate (surfem ( nchannels))
-      surfem(:) = 0.
+      surfem(:) = 0.0
 
       call rttov_setupindex(nchan(i), nprofiles, nfrequencies, &    ! in
                      nchannels, nbtout, coefs(i), surfem,  &    ! in
@@ -322,11 +322,11 @@ subroutine da_rttov_init(iv,ob)
          allocate ( satinfo(i) % bcoef0    (nchan(i)) )
          allocate ( satinfo(i) % error_std (nchan(i)) )
 
-         satinfo(i) % error_std(:) = 500.
-         satinfo(i) % scanbias(:,:) = 0.
-         satinfo(i) % scanbias_b(:,:,:) = 0.
-         satinfo(i) % bcoef(:,:) = 0.
-         satinfo(i) % bcoef0(:) = 0.
+         satinfo(i) % error_std(:) = 500.0
+         satinfo(i) % scanbias(:,:) = 0.0
+         satinfo(i) % scanbias_b(:,:,:) = 0.0
+         satinfo(i) % bcoef(:,:) = 0.0
+         satinfo(i) % bcoef0(:) = 0.0
 
          if ( index(iv%instid(i)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented 
          if ( index(iv%instid(i)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented

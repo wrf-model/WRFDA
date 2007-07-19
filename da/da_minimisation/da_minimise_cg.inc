@@ -127,7 +127,7 @@ subroutine da_minimise_cg(grid, config_flags,            &
       ghat = ghat + step * fhat
       xhat = xhat + step * phat
       if (calculate_cg_cost_fn) then
-         j_grad = 0.
+         j_grad = 0.0
          call da_calculate_j(it, iter, cv_size, be % cv % size_jb, &
             be % cv % size_je, &
             xbx, be, iv, xhat, cv, &

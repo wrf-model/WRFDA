@@ -27,7 +27,7 @@ function da_mo_correction (ho, po, to, qo, &
 
    ! Height difference (in m) above wich correction is applied
 
-   real, parameter :: hmax = 10., hs_max = 40.   
+   real, parameter :: hmax = 10.0, hs_max = 40.0  
 
    ! Default Roughness length im m (for land, set to 0 if on sea)
 
@@ -35,13 +35,13 @@ function da_mo_correction (ho, po, to, qo, &
 
    rcp = gas_constant/cp
 
-   ! 0.  inITIALIZE CORRECTION FACTOR TO 1
+   ! 0.0  initialize correction factor to 1
    ! =====================================
 
    correc = 1.0
    winfac = 1.0
 
-   ! 1.  HEIGHT DifFERENCE AND ROUGHNESS LENGTH
+   ! 1.  height difference and roughness length
    ! ==========================================
 
    ! 1.1 Height difference
@@ -72,12 +72,12 @@ function da_mo_correction (ho, po, to, qo, &
    ! 2.1 potential temperature on model surface
    !     --------------------------------------
 
-   thm  = tm * (1000. / (pm/100.)) ** rcp
+   thm  = tm * (1000.0 / (pm/100.0)) ** rcp
 
    ! 2.2 potential temperature at observation location
    !     ---------------------------------------------
 
-   tho  = to * (1000. / (po/100.)) ** rcp
+   tho  = to * (1000.0 / (po/100.0)) ** rcp
 
    ! 3.  virtual temperature at model surface and observation location
    ! ===================================================================
@@ -85,12 +85,12 @@ function da_mo_correction (ho, po, to, qo, &
    ! 3.1 Virtual temperature on model surface
    !     -------------------------------------
 
-   tvm  = tm * (1. + 0.608 * qm)
+   tvm  = tm * (1.0 + 0.608 * qm)
 
    ! 3.2 Virtual temperature at observation location
    !     -------------------------------------------
 
-      tvo  = to * (1. + 0.608 * qo)
+      tvo  = to * (1.0 + 0.608 * qo)
 
    ! 4.  potential virtual temperature at model surface and observation location 
    ! ===========================================================================
@@ -98,12 +98,12 @@ function da_mo_correction (ho, po, to, qo, &
    ! 4.1 potential virtual temperature on model surface
    !     ----------------------------------------------
 
-   thvm = tvm * (1000. / (pm/100.)) ** rcp
+   thvm = tvm * (1000.0 / (pm/100.0)) ** rcp
 
    ! 4.2 potential virtual temperature at observation location
    !     -----------------------------------------------------
 
-   thvo = tvo * (1000. / (po/100.)) ** rcp
+   thvo = tvo * (1000.0 / (po/100.0)) ** rcp
 
 
    ! 5.  bulk richardson number and moni-obukov length
@@ -115,7 +115,7 @@ function da_mo_correction (ho, po, to, qo, &
    za  = hm - ho
 
    ! Because the following formula is derived based on
-   ! the surface layer height is hs_max=40.m. Under
+   ! the surface layer height is hs_max=40m. Under
    ! free convection, we assume that atmospheric state
    ! above the surface layer is fully mixed, and the
    ! wind at the lowest sigma half level is same as the
@@ -124,7 +124,7 @@ function da_mo_correction (ho, po, to, qo, &
    if (za > hs_max) za = hs_max
       
    Va2 =   um*um + vm*vm
-   Vc2 = 4. * MAX ((tho - thm), 0.)
+   Vc2 = 4.0 * MAX ((tho - thm), 0.0)
 
    V2  = Va2 + Vc2
 
@@ -176,14 +176,14 @@ function da_mo_correction (ho, po, to, qo, &
       if (hll > 1.5) then
          if (zint < 0.2) then
             correc = 1.000 + 0.320 * zint ** 0.200
-         else if (zint < 0.) then
+         else if (zint < 0.0) then
             correc = 1.169 + 0.315 * zint
          end if
 
          ! 6.4.1 The factor depended on Za (MM5, param.F)
       
-         winfac = 0.5*(log(za/0.05)/log(40./0.05) &
-                       + log(za)/log(40.))
+         winfac = 0.5*(log(za/0.05)/log(40.0/0.05) &
+                       + log(za)/log(40.0))
 
          correc =  correc * winfac
       end if

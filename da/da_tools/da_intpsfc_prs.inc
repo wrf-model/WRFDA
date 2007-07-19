@@ -33,9 +33,9 @@ subroutine da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
    ! 1.  model and observation virtual temperature
    ! ---------------------------------------------
 
-   tvm = tm  * (1. + 0.608 * qm)
+   tvm = tm  * (1.0 + 0.608 * qm)
    if (present(to) .and. present(qo)) then
-      tvo = to  * (1. + 0.608 * qo)
+      tvo = to  * (1.0 + 0.608 * qo)
    else if (present(to) .and. .not.present(qo)) then
       tvo = to
    else

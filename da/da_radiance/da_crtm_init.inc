@@ -250,11 +250,11 @@ subroutine da_crtm_init(iv,ob)
    allocate ( satinfo(n) % bcoef0    (nchanl(n)) )
    allocate ( satinfo(n) % error_std (nchanl(n)) )
 
-   satinfo(n) % error_std(:) = 500.
-   satinfo(n) % scanbias(:,:) = 0.
-   satinfo(n) % scanbias_b(:,:,:) = 0.
-   satinfo(n) % bcoef(:,:) = 0.
-   satinfo(n) % bcoef0(:) = 0.
+   satinfo(n) % error_std(:) = 500.0
+   satinfo(n) % scanbias(:,:) = 0.0
+   satinfo(n) % scanbias_b(:,:,:) = 0.0
+   satinfo(n) % bcoef(:,:) = 0.0
+   satinfo(n) % bcoef0(:) = 0.0
 
    if ( index(iv%instid(n)%rttovid_string,'eos')  > 0 ) cycle   ! not implemented
    if ( index(iv%instid(n)%rttovid_string,'hirs') > 0 ) cycle   ! not implemented

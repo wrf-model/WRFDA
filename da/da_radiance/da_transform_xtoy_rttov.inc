@@ -112,7 +112,7 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
          aux_vars_tl(:) % q2m = 0.0
          aux_vars_tl(:) % u10 = 0.0
          aux_vars_tl(:) % v10 = 0.0
-         ! aux_vars(:) % fastem(:) = 0.
+         ! aux_vars(:) % fastem(:) = 0.0
          aux_vars_tl(:) % surft   = 0.0
          ! aux_vars_tl(:) % fastem(:) = 0.0
 
@@ -200,7 +200,7 @@ subroutine da_transform_xtoy_rttov (grid, iv, y )
             d_con_vars(n) % q(:)    = con_vars(n) % q(:)
             d_con_vars_tl(n) % t(:) = con_vars_tl(n) % t(:) 
             d_con_vars_tl(n) % q(:) = con_vars_tl(n) % q(:)
-            ! d_aux_vars(n) % fastem(:) = 0.
+            ! d_aux_vars(n) % fastem(:) = 0.0
          end do
 
          d_con_vars(1:l_num_rad) % ps     = con_vars(1:l_num_rad) % ps

@@ -39,19 +39,19 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
 
    if (gx2 .le. 0.0 .or. sigma .le. 0.0) then
          effangv = theta
-     TGL_effangv = 0.
+     TGL_effangv = 0.0
          effangh = theta
-     TGL_effangh = 0.
+     TGL_effangh = 0.0
      return
    end if
    alnsig = alog(sigma)
-   if (abs(sigma) .gt. 0.) then
+   if (abs(sigma) .gt. 0.0) then
       TGL_alnsig = TGL_sigma/sigma
    else
-      TGL_alnsig = 0.
+      TGL_alnsig = 0.0
    end if
        gg  = gx2*gx2
-   TGL_gg  = 2.*gx2*TGL_gx2
+   TGL_gg  = 2.0*gx2*TGL_gx2
        ggg = gg*gx2
    TGL_ggg = TGL_gg*gx2 + gg*TGL_gx2
 
@@ -60,7 +60,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c19v
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg
@@ -82,7 +82,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c19h
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg
@@ -107,7 +107,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c22v
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg 
           z2 =  xd*ggg
@@ -130,7 +130,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c22h
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg
@@ -153,7 +153,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c37v
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg
@@ -176,7 +176,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c37h
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg +  xx*TGL_ggg
           z2 =  xd*ggg
@@ -199,7 +199,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c85v
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd 
+      TGL_xx =  2.0*xd*TGL_xd 
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg
@@ -222,7 +222,7 @@ subroutine da_effang_tl(ifreq,theta,gx2,sigma,effangv,effangh,     &
           xd =      alnsig - c85h
       TGL_xd =  TGL_alnsig
           xx =  xd*xd
-      TGL_xx =  2.*xd*TGL_xd
+      TGL_xx =  2.0*xd*TGL_xd
           z1 =  xx*ggg
       TGL_z1 =  TGL_xx*ggg + xx*TGL_ggg
           z2 =  xd*ggg

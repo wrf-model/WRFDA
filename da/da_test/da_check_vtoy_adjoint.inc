@@ -55,7 +55,7 @@ subroutine da_check_vtoy_adjoint(cv_size,grid, config_flags, vp, vv, xbx, be, ep
    call da_get_y_lhs_value(iv, y, partial_lhs, pertile_lhs, adj_sum_lhs)
 
 
-   cv = 0.
+   cv = 0.0
    cg_jcdf = 1
 
    ! WHY?

@@ -13,13 +13,13 @@ subroutine da_jo_and_grady_ssmi_tb(oi, re, jo, jo_grad_y)
 
    integer                      :: n
 
-   jo % ssmi_tb19v = 0.
-   jo % ssmi_tb19h = 0.
-   jo % ssmi_tb22v = 0.
-   jo % ssmi_tb37v = 0.
-   jo % ssmi_tb37h = 0.
-   jo % ssmi_tb85v = 0.
-   jo % ssmi_tb85h = 0.
+   jo % ssmi_tb19v = 0.0
+   jo % ssmi_tb19h = 0.0
+   jo % ssmi_tb22v = 0.0
+   jo % ssmi_tb37v = 0.0
+   jo % ssmi_tb37h = 0.0
+   jo % ssmi_tb85v = 0.0
+   jo % ssmi_tb85h = 0.0
 
    do n=1, oi%num_ssmi_tb
 

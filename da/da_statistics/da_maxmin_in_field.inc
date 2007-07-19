@@ -12,8 +12,8 @@ subroutine da_maxmin_in_field(field, max, min)
    type (maxmin_field_type), intent(out) :: min(kts:kte)
 
    do k = kts, kte
-      max(k)%value = -1.E20
-      min(k)%value =  1.E20
+      max(k)%value = -1.0e20
+      min(k)%value =  1.0e20
       do j = jts, jte
          do i = its, ite
             if (field(i,j,k) > max(k)%value) then

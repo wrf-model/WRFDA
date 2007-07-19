@@ -174,41 +174,41 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
              call da_interp_lin_2d( xb%q(:,:,k), ims, ime, jms, jme, &
                                     i, j, dx, dy, dxm, dym, &  ! mixture ratio (in kg/kg)
                                     Atmosphere%Absorber(kte-k+1,1) ) 
-             Atmosphere%Absorber(kte-k+1,1) = 1000.*Atmosphere%Absorber(kte-k+1,1) ! in g/kg
+             Atmosphere%Absorber(kte-k+1,1) = 1000.0*Atmosphere%Absorber(kte-k+1,1) ! in g/kg
            ! NOTE: WRF high-level q values seems too big, replaced by constants
-             if ( v_p(k) < 75. ) Atmosphere%Absorber(kte-k+1,1) = 0.001
+             if ( v_p(k) < 75.0) Atmosphere%Absorber(kte-k+1,1) = 0.001
 
             call da_interp_lin_2d( xb%qcw(:,:,k), ims, ime, jms, jme, &
                                 i, j, dx, dy, dxm, dym, &   ! cloud water
                                 model_qcw(kte-k+1) )
             
            if (crtm_cloud) then
-            Atmosphere%Cloud(1)%Effective_Radius(kte-k+1)=10.
+            Atmosphere%Cloud(1)%Effective_Radius(kte-k+1)=10.0
             Atmosphere%Cloud(1)%Water_Content(kte-k+1) = &
                   model_qcw(kte-k+1)
 
-            Atmosphere%Cloud(2)%Effective_Radius(kte-k+1)=200.
+            Atmosphere%Cloud(2)%Effective_Radius(kte-k+1)=200.0
             call da_interp_lin_2d( xb%qci(:,:,k), ims, ime, jms, jme, &
                                 i, j, dx, dy, dxm, dym, &  ! cloud ice
                                 Atmosphere%Cloud(2)%Water_Content(kte-k+1) )
 
-            Atmosphere%Cloud(3)%Effective_Radius(kte-k+1)=200.
+            Atmosphere%Cloud(3)%Effective_Radius(kte-k+1)=200.0
             call da_interp_lin_2d( xb%qrn(:,:,k), ims, ime, jms, jme, &
                                 i, j, dx, dy, dxm, dym, &  ! rain
                                 Atmosphere%Cloud(3)%Water_Content(kte-k+1) )
 
-            Atmosphere%Cloud(4)%Effective_Radius(kte-k+1)=200.
+            Atmosphere%Cloud(4)%Effective_Radius(kte-k+1)=200.0
             call da_interp_lin_2d( xb%qsn(:,:,k), ims, ime, jms, jme, &
                                 i, j, dx, dy, dxm, dym, &  ! snow
                                 Atmosphere%Cloud(4)%Water_Content(kte-k+1) )
 
-            Atmosphere%Cloud(5)%Effective_Radius(kte-k+1)=200.
+            Atmosphere%Cloud(5)%Effective_Radius(kte-k+1)=200.0
             call da_interp_lin_2d( xb%qgr(:,:,k), ims, ime, jms, jme, &
                                 i, j, dx, dy, dxm, dym, &  ! grauple
                                 Atmosphere%Cloud(5)%Water_Content(kte-k+1) )
  
-            Atmosphere%Cloud(6)%Effective_Radius(kte-k+1)=200.
-            Atmosphere%Cloud(6)%Water_Content(kte-k+1) = 0.
+            Atmosphere%Cloud(6)%Effective_Radius(kte-k+1)=200.0
+            Atmosphere%Cloud(6)%Water_Content(kte-k+1) = 0.0
 
             end if
          enddo
@@ -249,7 +249,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
           do k=kts,kte
           do icld=1,Atmosphere%n_Clouds
             Atmosphere%Cloud(icld)%Water_Content(k)= Atmosphere%Cloud(icld)%Water_Content(k)* &
-            (Atmosphere%Level_Pressure(k)- Atmosphere%Level_Pressure(k-1))*100./gravity 
+            (Atmosphere%Level_Pressure(k)- Atmosphere%Level_Pressure(k-1))*100.0/gravity 
           enddo
           enddo
          end if
@@ -287,18 +287,18 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          model_vegfra = 0.01*model_vegfra  ! convert range to 0~1
 
          ! ADD for computing cloud liquid water path (mm) from guess
-         clwp = 0.
+         clwp = 0.0
          do k = kts,kte ! from top to bottom
-            dpf(k) = 100.*(atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
+            dpf(k) = 100.0*(atmosphere%level_pressure(k) - atmosphere%level_pressure(k-1))
             clw  (k) = model_qcw(k)*dpf(k)/gravity ! kg/m2 or mm
-            if ( atmosphere%pressure(k)<100. ) clw (k) = 0.
+            if ( atmosphere%pressure(k)<100.0 ) clw (k) = 0.0
             clwp  = clwp + clw(k)
          end do
 
   ! CRTM GeometryInfo Structure
         GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
         GeometryInfo%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
-!     GeometryInfo%Satellite_Height=830.
+!     GeometryInfo%Satellite_Height=830.0
 !     GeometryInfo%Sensor_Scan_Angle=
 !     GeometryInfo%Sensor_Zenith_Angle=
 !     GeometryInfo%Sensor_Scan_Angle=
@@ -306,7 +306,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
   ! CRTM Surface parameter data
 
-     if (Surface%Land_Coverage > 0.) then
+     if (Surface%Land_Coverage > 0.0) then
        Surface%Land_Type=GRASS_SOIL           ! land type (User guide appendix 3)
        Surface%Land_Temperature=model_ts      ! K
        Surface%Soil_Moisture_Content= model_smois !0.05    ! volumetric water content (g/cm**3)
@@ -314,26 +314,26 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
        Surface%Vegetation_Fraction=model_vegfra
        Surface%Soil_Temperature=model_tslb
      endif
-     if (Surface%Water_Coverage > 0.) then
+     if (Surface%Water_Coverage > 0.0) then
        !Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
        Surface%Water_Temperature=model_ts     ! K
        Surface%Wind_Speed=sqrt(model_u10**2+model_v10**2)  ! m/sec
        !surface%Wind_Direction=0.0            ! NOT used
        Surface%Salinity=33.                   ! ppmv
      endif
-     if (Surface%Snow_Coverage > 0.) then
+     if (Surface%Snow_Coverage > 0.0) then
        Surface%Snow_Type=NEW_SNOW             ! User guide appendix 3
        Surface%Snow_Temperature=model_ts      ! K
        Surface%Snow_Depth=model_snowh         ! mm
        !Surface%Snow_Density=0.2               ! g/cm**3
        !Surface%Snow_Grain_Size=2.0            ! mm
      endif
-     if (Surface%Ice_Coverage > 0.) then
+     if (Surface%Ice_Coverage > 0.0) then
        !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
        Surface%Ice_Temperature=model_ts       ! K
-       Surface%Ice_Thickness=10.              ! mm
+       Surface%Ice_Thickness=10.0              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
-       !Surface%Ice_Roughness=0.               ! NO Table offered, single example is ZERO
+       !Surface%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO
      endif
      if (nchanl > 0) then
        Surface%SensorData%n_channels = nchanl

@@ -270,16 +270,16 @@ subroutine da_setup_obs_structures_ascii( xp, ob, iv, xb )
               do j=int(iv%radar(n)%loc%j), int(iv%radar(n)%loc%j)+1
                  do k=xp%kts, xp%kte
                     xb%delt(i,j,k) = 1800.0
-                    xb%qrn(i,j,k) = amax1(5.E-5, xb%qrn(i,j,k))
-                    xb%qcw(i,j,k) = amax1(5.E-12, xb%qcw(i,j,k))
+                    xb%qrn(i,j,k) = amax1(5.0E-5, xb%qrn(i,j,k))
+                    xb%qcw(i,j,k) = amax1(5.0E-12, xb%qcw(i,j,k))
                   end do
                   ! do k=xp%kts, xp%kte
                   !    v_h(k)=xb%h(i,j  ,k)
                   ! end do
                   ! do k = 1, iv % radar(n) % info % levels
                   !    call zk(iv%radar(n)%height(k), v_h, xp, zkk)
-                  !    xb%delt(i,j,int(zkk))=1800.
-                  !    xb%delt(i,j,int(zkk)+1)=1800.
+                  !    xb%delt(i,j,int(zkk))=1800.0
+                  !    xb%delt(i,j,int(zkk)+1)=1800.0
                   ! end do
                end do
             end do

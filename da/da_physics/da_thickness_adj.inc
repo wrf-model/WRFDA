@@ -22,7 +22,7 @@ subroutine da_thickness_adj(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2, 
 
    ! p_tmp and ADJ_p_tmp are temporary (local) variables
 
-   ADJ_p_tmp(:)=0.
+   ADJ_p_tmp(:)=0.0
 
    p_tmp(layer1) = pre1
    p_tmp(layer2-1) = pre2

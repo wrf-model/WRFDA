@@ -57,14 +57,14 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
         m=1
         m1=2
         lsig(k)=1
-        coef1(k)=1.
-           coef2(k)=0.
+        coef1(k)=1.0
+           coef2(k)=0.0
       else if (rsig(k).lt.rsigo(nsig)) then
          m=nsig-1
          m1=nsig
          lsig(k)=nsig-1
-         coef1(k)=0.
-         coef2(k)=1.
+         coef1(k)=0.0
+         coef2(k)=1.0
       else
          do m=1,nsig
             m1=m+1
@@ -76,11 +76,11 @@ subroutine da_chgvres(nlath,nsig,kz,sigmah,sigma_avn,&
          end do
 2345     continue
          coef1(k)=(rsigo(m1)-rsig(k))/(rsigo(m1)-rsigo(m))
-         coef2(k)=1.-coef1(k)
+         coef2(k)=1.0-coef1(k)
          if (lsig(k)==nsig) then
             lsig(k)=nsig-1
-            coef2(k)=1.
-            coef1(k)=0.
+            coef2(k)=1.0
+            coef1(k)=0.0
          end if
       end if
    end do

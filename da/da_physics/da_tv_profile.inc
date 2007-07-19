@@ -23,7 +23,7 @@ subroutine da_tv_profile(grid, i, j, dx, dxm, dy, dym, pre_ma, tv_ma)
    do ii=i,i+1
       do jj=j,j+1
          tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xb%t(ii,jj,kts:kte) * &
-            (1. + 0.61*grid%xb%q(ii,jj,kts:kte))
+            (1.0 + 0.61*grid%xb%q(ii,jj,kts:kte))
       end do
    end do
 

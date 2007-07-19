@@ -61,7 +61,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    ! h2  is the height of 2m where the temperature and 
    !        moisture observed.
 
-   real, parameter :: h10 = 10., h2 = 2.
+   real, parameter :: h10 = 10.0, h2 = 2.0
    !
    ! Default roughness over the land
 
@@ -139,7 +139,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    vc2_prime = 0.0
 
    !  +++++++++++++++++++++++++++++++++ 
-   ! A.  Calculate Basic state
+   ! A.0  Calculate Basic state
    !  +++++++++++++++++++++++++++++++++ 
    rcp = gas_constant/cp
 
@@ -172,26 +172,26 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    gz2oz0 = log(h2/z0)
 
 
-   ! 2. Calculate the virtual temperature
+   ! 2.0 Calculate the virtual temperature
    ! =====================================
 
    ! 2.1 Compute Virtual temperature on the lowest half sigma level
    !     ---------------------------------------------------------
 
-   tvs  = ts * (1. + 0.608 * qs)
+   tvs  = ts * (1.0 + 0.608 * qs)
 
    ! 2.2 Convert ground virtual temperature assuming it's saturated
    !     ----------------------------------------------------------
    call da_tp_to_qs(tg, psfc, eg, qg)
-   tvg  = tg * (1. + 0.608 * qg)
+   tvg  = tg * (1.0 + 0.608 * qg)
 
-   ! 3.  Compute the potential temperature and virtual potential temperature
+   ! 3.0  Compute the potential temperature and virtual potential temperature
    ! =======================================================================
 
    ! 3.1 Potential temperature on the lowest half sigma level
    !     ----------------------------------------------------
 
-   Pi = (100000. / ps) ** rcp
+   Pi = (100000.0 / ps) ** rcp
    ths  = ts * Pi
 
    ! 3.2 Virtual potential temperature on the lowest half sigma level
@@ -202,7 +202,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    ! 3.3 Potential temperature at the ground
    !     -----------------------------------
 
-   Pi =  (100000. / psfc) ** rcp
+   Pi =  (100000.0 / psfc) ** rcp
    thg  = tg * Pi
 
    ! 3.4 Virtual potential temperature at ground
@@ -211,7 +211,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    thvg = tvg * Pi
 
 
-   ! 4.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
+   ! 4.0  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
    ! =================================================
 
    ! 4.1 Velocity
@@ -224,9 +224,9 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    !     Convective velocity:
 
    if (thvg >= thvs) then
-      Vc2 = 4. * (thvg - thvs)
+      Vc2 = 4.0 * (thvg - thvs)
    else
-      Vc2 = 0.
+      Vc2 = 0.0
    end if
    
    V2  = Va2 + Vc2
@@ -235,7 +235,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    !     ----------------------
 
    rib = (gravity * hs / ths) * (thvs - thvg) / V2
-   ! 5.  CALCULATE PSI BASED UPON REGIME
+   ! 5.0  CALCULATE PSI BASED UPON REGIME
    ! =======================================
 
    iregime = int(regime)
@@ -246,17 +246,17 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
    case (1);
 
-      psim = -10.*gzsoz0
-      psimz = -10.*gz10oz0
-      psim2 = -10.*gz2oz0
+      psim = -10.0*gzsoz0
+      psimz = -10.0*gz10oz0
+      psim2 = -10.0*gz2oz0
 
       psim_s  = psim
       psimz_s = psimz
       psim2_s = psim2
 
-      psim  = max(psim,-10.)
-      psimz = max(psimz,-10.)
-      psim2 = max(psim2,-10.)
+      psim  = max(psim,-10.0)
+      psimz = max(psimz,-10.0)
+      psim2 = max(psim2,-10.0)
 
       psih = psim
       psihz = psimz
@@ -266,27 +266,27 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    !     ------------------------------------------
 
    case (2);
-      Pi =  (-5. * rib) / (1.1 - 5.*rib)
+      Pi =  (-5.0 * rib) / (1.1 - 5.0*rib)
       psim  = gzsoz0  * Pi
       psimz = gz10oz0 * Pi
       psim2 = gz2oz0  * Pi
       psim_s  = psim
       psimz_s = psimz
       psim2_s = psim2
-      if (psim >= -10.) then
+      if (psim >= -10.0) then
           psim = psim
       else
-         psim = -10.
+         psim = -10.0
       end if
-      if (psimz >= -10.) then
+      if (psimz >= -10.0) then
          psimz = psimz
       else
-         psimz = -10.
+         psimz = -10.0
       end if
-      if (psim2 >= -10.) then
+      if (psim2 >= -10.0) then
          psim2 = psim2
       else
-         psim2 = -10.
+         psim2 = -10.0
       end if
 
       psih = psim
@@ -298,9 +298,9 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
    case (3);
 
-      psim = 0.
-      psimz = 0.
-      psim2 = 0.
+      psim = 0.0
+      psimz = 0.0
+      psim2 = 0.0
       psih = psim
       psihz = psimz
       psih2 = psim2
@@ -313,9 +313,9 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
       ! Calculate psi m and pshi h using iteration method
 
-      psim = 0.
-      psih = 0.
-      cc = 2. * atan(1.0)
+      psim = 0.0
+      psih = 0.0
+      cc = 2.0 * atan(1.0)
       !
       !        do k = 1 , k_iteration
 
@@ -346,61 +346,61 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
       hol_s = hol
 
-      if (hol >= 0.) then
-         hol = 0.
+      if (hol >= 0.0) then
+         hol = 0.0
       else
          hol = hol
       end if
-      if (hol >= -10.) then
+      if (hol >= -10.0) then
          hol = hol
       else
-         hol = -10.
+         hol = -10.0
       end if
 
       holz = (h10 / hs) * hol
-      if (holz >= 0.) then
-         holz = 0.
+      if (holz >= 0.0) then
+         holz = 0.0
       else
          holz = holz
       end if
-      if (holz >= -10.) then
+      if (holz >= -10.0) then
          holz = holz
       else
-         holz = -10.
+         holz = -10.0
       end if
 
       hol2 = (h2 / hs) * hol
-      if (hol2 >= 0.) then
-         hol2 = 0.
+      if (hol2 >= 0.0) then
+         hol2 = 0.0
       else
          hol2 = hol2
       end if
-      if (hol2 >= -10.) then
+      if (hol2 >= -10.0) then
          hol2 = hol2
       else
-         hol2 = -10.
+         hol2 = -10.0
       end if
 
       ! 5.4.3 Calculate Psim & psih
       !        --------------------------
 
       ! Using the continuous function:
-      xx = (1. - 16. * hol) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psim = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih = 2. * yy
+      xx = (1.0 - 16.0 * hol) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psim = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih = 2.0 * yy
 
       ! Using the continuous function:
-      xx = (1. - 16. * holz) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psimz = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psihz = 2. * yy
+      xx = (1.0 - 16.0 * holz) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psimz = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psihz = 2.0 * yy
 
       ! Using the continuous function:
-      xx = (1. - 16. * hol2) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih2 = 2. * yy
+      xx = (1.0 - 16.0 * hol2) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psim2 = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih2 = 2.0 * yy
 
       ! end do 
 
@@ -454,7 +454,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
    end select
    
-   ! 6.  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
+   ! 6.0  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
    ! =======================================
 
    psiw = gzsoz0 - psim
@@ -465,38 +465,38 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    psiq  = log(k_kar*ust*hs/ka + hs / zq0) - psih
    psiq2 = log(k_kar*ust*h2/ka + h2 / zq0) - psih2
    !  +++++++++++++++++++++++++++++++++ 
-   !  B.  Calculate adjoint solution
+   !  B.0  Calculate adjoint solution
    !  +++++++++++++++++++++++++++++++++ 
 
-   ! 7.  CALCULATE 10M WinD, 2M TEMPERATURE AND MOISTURE
+   ! 7.0  CALCULATE 10M WinD, 2M TEMPERATURE AND MOISTURE
    ! =======================================
 
    qg_prime    = (1.0 - psiq2/psiq) * q2_prime
    qs_prime    = qs_prime + psiq2/psiq * q2_prime
    psiq2_prime =  (qs -qg)/psiq * q2_prime
    psiq_prime  = -(qs -qg)*psiq2/(psiq*psiq) * q2_prime
-   ! q2_prime = 0.
+   ! q2_prime = 0.0
    
-   Pi = (psfc/100000.)**rcp
+   Pi = (psfc/100000.0)**rcp
    thg_prime   = (1.0 - psit2/psit) * Pi * t2_prime
    ths_prime   = (psit2/psit) * Pi * t2_prime
    psit2_prime =   (ths - thg)/psit * Pi * t2_prime
    psit_prime  = - (ths - thg)*psit2/(psit*psit) * Pi * t2_prime
    psfc_prime  = psfc_prime + Pi * rcp*(thg + (ths - thg)*psit2/psit)/psfc * t2_prime 
-   ! t2_prime = 0.
+   ! t2_prime = 0.0
    
    Pi = psiz / psiw
    vs_prime   = vs_prime + Pi * v10_prime
    psiz_prime =   vs / psiz * Pi * v10_prime
    psiw_prime = - vs / psiw * Pi * v10_prime
-   ! v10_prime = 0. 
+   ! v10_prime = 0.0 
    
    us_prime   = us_prime + Pi * u10_prime
    psiz_prime =  psiz_prime + us / psiz * Pi * u10_prime
    psiw_prime =  psiw_prime - us / psiw * Pi * u10_prime
-   ! u10_prime = 0.
+   ! u10_prime = 0.0
    
-   ! 6.  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
+   ! 6.0  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
    ! =======================================
    
    ! moisture part:
@@ -517,7 +517,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    psimz_prime = psimz_prime - psiz_prime
    psim_prime  = psim_prime  - psiw_prime
 
-   ! 5.  CALCULATE PSI BASED UPON REGIME
+   ! 5.0  CALCULATE PSI BASED UPON REGIME
    ! =======================================
    select case (iregime) 
 
@@ -529,9 +529,9 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       psim2_prime = psim2_prime + psih2_prime
       psimz_prime = psimz_prime + psihz_prime
       psim_prime  = psim_prime  + psih_prime
-      psim_prime  = 0.
-      psimz_prime = 0.
-      psim2_prime = 0.
+      psim_prime  = 0.0
+      psimz_prime = 0.0
+      psim2_prime = 0.0
 
    ! 5.2 Mechanically driven turbulence (REGIME 2)
    !      ------------------------------------------
@@ -546,23 +546,23 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
      psimz = psimz_s
      psim2 = psim2_S
 
-     if (psim2 >= -10.) then
+     if (psim2 >= -10.0) then
         psim2_prime = psim2_prime
      else
-        psim2_prime = 0.
+        psim2_prime = 0.0
      end if
-     if (psimz >= -10.) then
+     if (psimz >= -10.0) then
         psimz_prime = psimz_prime
      else
-        psimz_prime = 0.
+        psimz_prime = 0.0
      end if
-     if (psim >= -10.) then
+     if (psim >= -10.0) then
         psim_prime = psim_prime
      else
-        psim_prime = 0.
+        psim_prime = 0.0
      end if
 
-     Pi = -1.0 / ((1.1 - 5.*rib)*(1.1 - 5.*rib))
+     Pi = -1.0 / ((1.1 - 5.*rib)*(1.1 - 5.0*rib))
      rib_prime =             5.5 * gz2oz0  * psim2_prime * Pi
      rib_prime = rib_prime + 5.5 * gz10oz0 * psimz_prime * Pi
      rib_prime = rib_prime + 5.5 * gzsoz0  * psim_prime  * Pi
@@ -575,9 +575,10 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       psim2_prime = psih2_prime
       psimz_prime = psihz_prime
       psim_prime  = psih_prime
-      psim2_prime = 0.
-      psimz_prime = 0.
-      psim_prime = 0.
+
+      psim2_prime = 0.0
+      psimz_prime = 0.0
+      psim_prime  = 0.0
 
    ! 5.4 Free convection (REGIME 4)
    !     --------------------------
@@ -599,32 +600,32 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       if (psih2 <= 0.9*gz2oz0) then
          psih2_prime = psih2_prime
       else
-         psih2_prime = 0.
+         psih2_prime = 0.0
       end if
       if (psihz <= 0.9*gz10oz0) then
          psihz_prime = psihz_prime
       else
-         psihz_prime = 0.
+         psihz_prime = 0.0
       end if
       if (psih <= 0.9*gzsoz0) then
          psih_prime = psih_prime
       else
-         psih_prime = 0.
+         psih_prime = 0.0
       end if
       if (psim2 <= 0.9*gz2oz0) then
          psim2_prime = psim2_prime
       else
-         psim2_prime = 0.
+         psim2_prime = 0.0
       end if
       if (psimz <= 0.9*gz10oz0) then
          psimz_prime = psimz_prime
       else
-         psimz_prime = 0.
+         psimz_prime = 0.0
       end if
       if (psim <= 0.9*gzsoz0) then
          psim_prime = psim_prime
       else
-         psim_prime = 0.
+         psim_prime = 0.0
       end if
 
       ! 5.4.3 Calculate Psim & psih
@@ -632,50 +633,50 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
       ! Recover ust:
       ust = ust_s
-      psim = 0.
-      psih = 0.
+      psim = 0.0
+      psih = 0.0
 
-      xx = (1. - 16. * hol2) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      yy_prime = 2. * psih2_prime
-      psih2_prime = 0.
+      xx = (1.0 - 16.0 * hol2) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      yy_prime = 2.0 * psih2_prime
+      psih2_prime = 0.0
    
-      xx_prime = 2.*(1.0/(1.+xx)-1.0/(1+xx*xx)) * psim2_prime
+      xx_prime = 2.0*(1.0/(1.0+xx)-1.0/(1+xx*xx)) * psim2_prime
       yy_prime = yy_prime + psim2_prime
-      psim2_prime = 0.
+      psim2_prime = 0.0
   
-      xx_prime = xx_prime + 2.* xx/(1.+xx*xx) * yy_prime
-      yy_prime = 0.
-      hol2_prime = -4./((1. - 16. * hol2) ** 0.75) * xx_prime
-      xx_prime = 0.
+      xx_prime = xx_prime + 2.0* xx/(1.0+xx*xx) * yy_prime
+      yy_prime = 0.0
+      hol2_prime = -4.0/((1.0 - 16.0 * hol2) ** 0.75) * xx_prime
+      xx_prime = 0.0
 
-      xx = (1. - 16. * holz) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      yy_prime = 2. * psihz_prime
-      psihz_prime = 0.
+      xx = (1.0 - 16.0 * holz) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      yy_prime = 2.0 * psihz_prime
+      psihz_prime = 0.0
       
-      xx_prime = 2.*(1.0/(1.+xx)-1.0/(1+xx*xx)) * psimz_prime
+      xx_prime = 2.0*(1.0/(1.0+xx)-1.0/(1+xx*xx)) * psimz_prime
       yy_prime = yy_prime + psimz_prime
-      psimz_prime = 0.
+      psimz_prime = 0.0
       
-      xx_prime = xx_prime + 2.* xx/(1.+xx*xx) * yy_prime
-      yy_prime = 0.
-      holz_prime = -4./((1. - 16. * holz) ** 0.75) * xx_prime
-      xx_prime = 0.
+      xx_prime = xx_prime + 2.0* xx/(1.0+xx*xx) * yy_prime
+      yy_prime = 0.0
+      holz_prime = -4.0/((1.0 - 16.0 * holz) ** 0.75) * xx_prime
+      xx_prime = 0.0
 
-      xx = (1. - 16. * hol) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      yy_prime = 2. * psih_prime
-      psih_prime = 0.
+      xx = (1.0 - 16.0 * hol) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      yy_prime = 2.0 * psih_prime
+      psih_prime = 0.0
       
-      xx_prime = 2.*(1.0/(1.+xx)-1.0/(1+xx*xx)) * psim_prime
+      xx_prime = 2.0*(1.0/(1.0+xx)-1.0/(1+xx*xx)) * psim_prime
       yy_prime = yy_prime + psim_prime
-      psim_prime = 0.
+      psim_prime = 0.0
       
-      xx_prime = xx_prime + 2.* xx/(1.+xx*xx)*yy_prime
-      yy_prime = 0.
-      hol_prime = -4./((1. - 16. * hol) ** 0.75)*xx_prime
-      xx_prime = 0.
+      xx_prime = xx_prime + 2.0* xx/(1.0+xx*xx)*yy_prime
+      yy_prime = 0.0
+      hol_prime = -4.0/((1.0 - 16.0 * hol) ** 0.75)*xx_prime
+      xx_prime = 0.0
 
       ! 5.4.2  Calculate n, nz, R, Rz
       !        --------------------------
@@ -685,42 +686,42 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       hol = hol_s
 
       hol2 = (h2 / hs) * hol
-      if (hol2 >= -10.) then
+      if (hol2 >= -10.0) then
          hol2_prime = hol2_prime
       else
-         hol2_prime = 0.
+         hol2_prime = 0.0
       end if
-      if (hol2 >= 0.) then       
-         hol2_prime = 0.
+      if (hol2 >= 0.0) then       
+         hol2_prime = 0.0
       else
          hol2_prime = hol2_prime
       end if
       
       hol_prime = hol_prime + (h2 / hs) * hol2_prime
-      hol2_prime = 0.
+      hol2_prime = 0.0
       
       holz = (h10 / hs) * hol
-      if (holz >= -10.) then
+      if (holz >= -10.0) then
          holz_prime = holz_prime
       else
-         holz_prime = 0.
+         holz_prime = 0.0
       end if
-      if (holz >= 0.) then
-         holz_prime = 0.
+      if (holz >= 0.0) then
+         holz_prime = 0.0
       else
          holz_prime = holz_prime
       end if
       
       hol_prime = hol_prime + (h10 / hs) * holz_prime
-      holz_prime = 0.
+      holz_prime = 0.0
       
-      if (hol >= -10.) then
+      if (hol >= -10.0) then
          hol_prime = hol_prime
       else
-         hol_prime = 0.
+         hol_prime = 0.0
       end if
-      if (hol >= 0.) then
-         hol_prime = 0.
+      if (hol >= 0.0) then
+         hol_prime = 0.0
       else
          hol_prime = hol_prime
       end if
@@ -731,30 +732,30 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
       !       Ratio of PBL height to Monin-Obukhov length
       if (ust .LT. 0.01) then
          rib_prime = hol_prime * gzsoz0
-         hol_prime = 0.
+         hol_prime = 0.0
       else
          mol_prime =        hol / mol * hol_prime
          ths_prime = ths_prime - hol / ths * hol_prime
          ust_prime = - 2.0 * hol / ust * hol_prime
-         hol_prime = 0.
+         hol_prime = 0.0
       end if
 
       ! Heat flux factor
       ths_prime  = ths_prime + mol/(ths - thg) * mol_prime
       thg_prime  = thg_prime - mol/(ths - thg) * mol_prime
       psih_prime = psih_prime + mol/(gzsoz0 - psih) * mol_prime
-      mol_prime = 0.
+      mol_prime = 0.0
 
       ! Friction speed
 
       v2_prime   = V2_prime + 0.5 * ust/V2 * ust_prime 
       psim_prime = psim_prime + ust/(gzsoz0 - psim) * ust_prime 
-      ust_prime = 0.
+      ust_prime = 0.0
 
       ! Calculate psi m and pshi h using iteration method
 
-      psim_prime = 0.
-      psih_prime = 0.
+      psim_prime = 0.0
+      psih_prime = 0.0
 
    case default;
       write(unit=message(1),fmt='(A,I2,A)') &
@@ -763,7 +764,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
    end select
 
-   ! 4.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
+   ! 4.0  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
    ! =================================================
 
    ! 4.2 Bulk richardson number
@@ -774,7 +775,7 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    V2_prime  = V2_prime  - Pi * (thvs-thvg)/V2 * rib_prime
    thvs_prime = thvs_prime + Pi * rib_prime
    thvg_prime = thvg_prime - Pi * rib_prime
-   rib_prime = 0.
+   rib_prime = 0.0
    
    ! 4.1 Velocity
    !     --------
@@ -783,64 +784,64 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
 
    Va2_prime = V2_prime
    Vc2_prime = V2_prime
-   V2_prime = 0.
+   V2_prime = 0.0
 
    if (thvg >= thvs) then
-     thvg_prime = thvg_prime + 4. * Vc2_prime
-     thvs_prime = thvs_prime - 4. * Vc2_prime
-     Vc2_prime = 0.
+     thvg_prime = thvg_prime + 4.0 * Vc2_prime
+     thvs_prime = thvs_prime - 4.0 * Vc2_prime
+     Vc2_prime = 0.0
     else
-     Vc2_prime = 0.
+     Vc2_prime = 0.0
    end if
 
    ! Wind speed:
 
-   us_prime = us_prime + 2. *us * Va2_prime
-   vs_prime = vs_prime + 2. *vs * Va2_prime
-   Va2_prime = 0.
+   us_prime = us_prime + 2.0 *us * Va2_prime
+   vs_prime = vs_prime + 2.0 *vs * Va2_prime
+   Va2_prime = 0.0
 
-   ! 3. Virtual potential temperature
+   ! 3.0 Virtual potential temperature
    ! ==================================
 
    ! 3.4 Virtual potential temperature at ground
    !     ---------------------------------------
 
-   Pi = (100000. / psfc) ** rcp
+   Pi = (100000.0 / psfc) ** rcp
    tvg_prime = tvg_prime +  Pi * thvg_prime
    psfc_prime = psfc_prime - thvg_prime * rcp * tvg/psfc * Pi
-   thvg_prime = 0.
+   thvg_prime = 0.0
 
    ! 3.3 Potential temperature at the ground
    !     -----------------------------------
 
    tg_prime = tg_prime + Pi * thg_prime 
    psfc_prime = psfc_prime - thg_prime *rcp * tg/psfc * Pi
-   thg_prime = 0.
+   thg_prime = 0.0
 
    ! 3.2 Virtual potential temperature on the lowest half sigma level
    !     ------------------------------------------------------------
 
-   Pi = (100000. / ps) ** rcp
+   Pi = (100000.0 / ps) ** rcp
    tvs_prime = tvs_prime + PI * thvs_prime
    ps_prime = ps_prime - thvs_prime *rcp * tvs/ps * Pi
-   thvs_prime = 0.
+   thvs_prime = 0.0
 
    ! 3.1 Potential temperature on the lowest half sigma level
    !     ----------------------------------------------------
    ts_prime = ts_prime + Pi * ths_prime
    ps_prime = ps_prime - ths_prime *  rcp * ts/ps * Pi
-   ths_prime = 0.
+   ths_prime = 0.0
 
-   ! 2. Calculate the virtual temperature
+   ! 2.0 Calculate the virtual temperature
    ! =====================================
 
    ! 2.2 Compute the ground saturated mixing ratio and the ground virtual 
    !     temperature
    !     ----------------------------------------------------------------
 
-   tg_prime = tg_prime + tvg_prime * (1. + 0.608 * qg)
+   tg_prime = tg_prime + tvg_prime * (1.0 + 0.608 * qg)
    qg_prime = qg_prime + tvg_prime * 0.608 * tg
-   tvg_prime = 0.
+   tvg_prime = 0.0
 
    qg_prime = qg_prime * qg
    call da_tp_to_qs_adj1(tg, psfc, eg, tg_prime, psfc_prime, qg_prime)
@@ -848,9 +849,9 @@ subroutine da_sfc_wtq_adj (psfc, tg, ps, ts, qs, us, vs, regime,&
    ! 2.1 Compute Virtual temperature on the lowest half sigma level
    !     ---------------------------------------------------------
 
-   ts_prime = ts_prime + tvs_prime  * (1. + 0.608 * qs)
+   ts_prime = ts_prime + tvs_prime  * (1.0 + 0.608 * qs)
    qs_prime = qs_prime + tvs_prime *  0.608 * ts
-   tvs_prime = 0.
+   tvs_prime = 0.0
 
 end subroutine da_sfc_wtq_adj
 

@@ -61,7 +61,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! h2  is the height of 2m where the temperature and 
    !        moisture observed.
 
-   real, parameter :: h10 = 10., h2 = 2.
+   real, parameter :: h10 = 10.0, h2 = 2.0
    !
    ! Default roughness over the land
 
@@ -135,8 +135,8 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 2.1 Compute Virtual temperature on the lowest half sigma level
    !     ---------------------------------------------------------
 
-   tvs_prime  = ts_prime * (1. + 0.608 * qs) + 0.608 * ts * qs_prime
-   tvs  = ts * (1. + 0.608 * qs)
+   tvs_prime  = ts_prime * (1.0 + 0.608 * qs) + 0.608 * ts * qs_prime
+   tvs  = ts * (1.0 + 0.608 * qs)
 
    ! 2.2 Compute the ground saturated mixing ratio and the ground virtual 
    !     temperature
@@ -147,8 +147,8 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    qg_prime = qg_prime * qg
 
-   tvg_prime  = tg_prime * (1. + 0.608 * qg) + 0.608 * tg * qg_prime
-   tvg  = tg * (1. + 0.608 * qg)
+   tvg_prime  = tg_prime * (1.0 + 0.608 * qg) + 0.608 * tg * qg_prime
+   tvg  = tg * (1.0 + 0.608 * qg)
 
    ! 3.  Compute the potential temperature and virtual potential temperature
    ! =======================================================================
@@ -156,7 +156,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 3.1 Potential temperature on the lowest half sigma level
    !     ----------------------------------------------------
 
-   Pi = (100000. / ps) ** rcp
+   Pi = (100000.0 / ps) ** rcp
    ths_prime  = (ts_prime - ps_prime * rcp * ts/ps) * Pi 
    ths  = ts * Pi
 
@@ -169,7 +169,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    ! 3.3 Potential temperature at the ground
    !     -----------------------------------
 
-   Pi = (100000. / psfc) ** rcp
+   Pi = (100000.0 / psfc) ** rcp
    thg_prime  = (tg_prime - psfc_prime * rcp * tg/psfc) * Pi 
    thg  = tg * Pi
 
@@ -187,17 +187,17 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
    
    ! Wind speed:
 
-   Va2_prime =  2.*us*us_prime + 2.*vs*vs_prime
+   Va2_prime =  2.0*us*us_prime + 2.0*vs*vs_prime
    Va2 =   us*us + vs*vs
     
    ! Convective velocity:
 
    if (thvg >= thvs) then
-      Vc2_prime = 4. * (thvg_prime - thvs_prime)
-      Vc2 = 4. * (thvg - thvs)
+      Vc2_prime = 4.0 * (thvg_prime - thvs_prime)
+      Vc2 = 4.0 * (thvg - thvs)
    else
-      Vc2_prime = 0.
-      Vc2 = 0.
+      Vc2_prime = 0.0
+      Vc2 = 0.0
    end if
    
    V2_prime  = Va2_prime+ Vc2_prime
@@ -224,15 +224,15 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    case (1);
 
-      psim_prime  = 0.
-      psimz_prime = 0.
-      psim2_prime = 0.
-      psim  = -10.*gzsoz0
-      psimz = -10.*gz10oz0
-      psim2 = -10.*gz2oz0
-      psim  = max(psim,-10.)
-      psimz = max(psimz,-10.)
-      psim2 = max(psim2,-10.)
+      psim_prime  = 0.0
+      psimz_prime = 0.0
+      psim2_prime = 0.0
+      psim  = -10.0*gzsoz0
+      psimz = -10.0*gz10oz0
+      psim2 = -10.0*gz2oz0
+      psim  = max(psim,-10.0)
+      psimz = max(psimz,-10.0)
+      psim2 = max(psim2,-10.0)
 
       psih_prime  = psim_prime
       psihz_prime = psimz_prime
@@ -246,36 +246,36 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    case (2);
 
-      Pi =  - 1.0 / ((1.1 - 5.*rib)*(1.1 - 5.*rib))
+      Pi =  - 1.0 / ((1.1 - 5.0*rib)*(1.1 - 5.0*rib))
       psim_prime  = 5.5 * gzsoz0  * rib_prime * Pi 
       psimz_prime = 5.5 * gz10oz0 * rib_prime * Pi
       psim2_prime = 5.5 * gz2oz0  * rib_prime * Pi
 
-      Pi =  (-5. * rib) / (1.1 - 5.*rib)
+      Pi =  (-5.0 * rib) / (1.1 - 5.0*rib)
       psim  = gzsoz0  * Pi
       psimz = gz10oz0 * Pi
       psim2 = gz2oz0  * Pi
 
-      if (psim >= -10.) then
+      if (psim >= -10.0) then
          psim = psim
          psim_prime = psim_prime
       else
-         psim = -10.
-         psim_prime = 0.
+         psim = -10.0
+         psim_prime = 0.0
       end if
-      if (psimz >= -10.) then
+      if (psimz >= -10.0) then
          psimz = psimz
          psimz_prime = psimz_prime
       else
-         psimz = -10.
-         psimz_prime = 0.
+         psimz = -10.0
+         psimz_prime = 0.0
       end if
-      if (psim2 >= -10.) then
+      if (psim2 >= -10.0) then
          psim2 = psim2
          psim2_prime = psim2_prime
       else
-         psim2 = -10.
-         psim2_prime = 0.
+         psim2 = -10.0
+         psim2_prime = 0.0
       end if
 
       psih_prime  = psim_prime
@@ -290,18 +290,19 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
    case (3);
 
-      psim_prime = 0.
-      psimz_prime = 0.
-      psim2_prime = 0.
+      psim_prime  = 0.0
+      psimz_prime = 0.0
+      psim2_prime = 0.0
 
-      psim = 0.
-      psimz = 0.
-      psim2 = 0.
+      psim  = 0.0
+      psimz = 0.0
+      psim2 = 0.0
 
-      psih_prime = psim_prime
+      psih_prime  = psim_prime
       psihz_prime = psimz_prime
       psih2_prime = psim2_prime
-      psih = psim
+
+      psih  = psim
       psihz = psimz
       psih2 = psim2
 
@@ -313,11 +314,11 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
 
       ! Calculate psi m and pshi h using iteration method
 
-      psim_prime = 0.
-      psih_prime = 0.
-      psim = 0.
-      psih = 0.
-      cc = 2. * atan(1.0)
+      psim_prime = 0.0
+      psih_prime = 0.0
+      psim = 0.0
+      psih = 0.0
+      cc = 2.0 * atan(1.0)
 
       ! do k = 1 , k_iteration
 
@@ -343,93 +344,93 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
       else
          hol = k_kar * gravity * hs * mol / (ths * ust * ust)
          hol_prime = (mol_prime / mol - ths_prime / ths &
-                        - 2.* ust_prime / ust) * hol
+                        - 2.0* ust_prime / ust) * hol
       end if
 
       ! 5.4.2  Calculate n, nz, R, Rz
       !        --------------------------
 
-      if (hol >= 0.) then
-         hol_prime = 0.
-         hol = 0.
+      if (hol >= 0.0) then
+         hol_prime = 0.0
+         hol = 0.0
       else
          hol_prime = hol_prime
          hol = hol
       end if
-      if (hol >= -10.) then
+      if (hol >= -10.0) then
          hol_prime = hol_prime
          hol = hol
       else
-         hol_prime = 0.
-         hol = -10.
+         hol_prime = 0.0
+         hol = -10.0
       end if
 
       holz_prime = (h10 / hs) * hol_prime
       holz = (h10 / hs) * hol
-      if (holz >= 0.) then
-         holz_prime = 0.
-         holz = 0.
+      if (holz >= 0.0) then
+         holz_prime = 0.0
+         holz = 0.0
       else
          holz_prime = holz_prime
          holz = holz
       end if
-      if (holz >= -10.) then
+      if (holz >= -10.0) then
          holz_prime = holz_prime
          holz = holz
       else
-         holz_prime = 0.
-         holz = -10.
+         holz_prime = 0.0
+         holz = -10.0
       end if
 
       hol2_prime = (h2 / hs) * hol_prime
       hol2 = (h2 / hs) * hol
-      if (hol2 >= 0.) then
-         hol2_prime = 0.
-         hol2 = 0.
+      if (hol2 >= 0.0) then
+         hol2_prime = 0.0
+         hol2 = 0.0
       else
          hol2_prime = hol2_prime
          hol2 = hol2
       end if
-      if (hol2 >= -10.) then
+      if (hol2 >= -10.0) then
          hol2_prime = hol2_prime
          hol2 = hol2
       else
-         hol2_prime = 0.
-         hol2 = -10.
+         hol2_prime = 0.0
+         hol2 = -10.0
       end if
 
       ! 5.4.3 Calculate Psim & psih
       !        --------------------------
 
       ! Using the continuous function:
-      xx_prime = -4.* hol_prime /((1. - 16. * hol) ** 0.75)
-      xx = (1. - 16. * hol) ** 0.25
-      yy_prime = 2.* xx * xx_prime /(1.+xx*xx)
-      yy = log((1.+xx*xx)/2.)
-      psim_prime = 2 * xx_prime *(1.0/(1.+xx)-1.0/(1+xx*xx)) + yy_prime 
-      psim = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih_prime = 2. * yy_prime
-      psih = 2. * yy
+      xx_prime = -4.0* hol_prime /((1.0 - 16.0 * hol) ** 0.75)
+      xx = (1.0 - 16.0 * hol) ** 0.25
+      yy_prime = 2.0* xx * xx_prime /(1.0+xx*xx)
+      yy = log((1.0+xx*xx)/2.0)
+      psim_prime = 2 * xx_prime *(1.0/(1.0+xx)-1.0/(1+xx*xx)) + yy_prime 
+      psim = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih_prime = 2.0 * yy_prime
+      psih = 2.0 * yy
 
       ! Using the continuous function:
-      xx_prime = -4.* holz_prime /((1. - 16. * holz) ** 0.75)
-      xx = (1. - 16. * holz) ** 0.25
-      yy_prime = 2.* xx * xx_prime /(1.+xx*xx)
-      yy = log((1.+xx*xx)/2.)
-      psimz_prime = 2.* xx_prime *(1.0/(1.+xx)-1.0/(1+xx*xx)) + yy_prime
-      psimz = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psihz_prime = 2. * yy_prime
-      psihz = 2. * yy
+      xx_prime = -4.0* holz_prime /((1.0 - 16.0 * holz) ** 0.75)
+      xx = (1.0 - 16.0 * holz) ** 0.25
+      yy_prime = 2.0* xx * xx_prime /(1.0+xx*xx)
+      yy = log((1.0+xx*xx)/2.0)
+      psimz_prime = 2.0* xx_prime *(1.0/(1.0+xx)-1.0/(1+xx*xx)) + yy_prime
+      psimz = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psihz_prime = 2.0 * yy_prime
+      psihz = 2.0 * yy
 
       ! Using the continuous function:
-      xx_prime = -4.* hol2_prime /((1. - 16. * hol2) ** 0.75)
-      xx = (1. - 16. * hol2) ** 0.25
-      yy_prime = 2.* xx * xx_prime /(1.+xx*xx)
-      yy = log((1.+xx*xx)/2.)
-      psim2_prime = 2.* xx_prime *(1.0/(1.+xx)-1.0/(1+xx*xx)) + yy_prime
-      psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih2_prime = 2. * yy_prime
-      psih2 = 2. * yy
+      xx_prime = -4.0* hol2_prime /((1.0 - 16.0 * hol2) ** 0.75)
+      xx = (1.0 - 16.0 * hol2) ** 0.25
+      yy_prime = 2.0* xx * xx_prime /(1.0+xx*xx)
+      yy = log((1.0+xx*xx)/2.0)
+      psim2_prime = 2.0* xx_prime *(1.0/(1.0+xx)-1.0/(1+xx*xx)) + yy_prime
+      psim2 = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih2_prime = 2.0 * yy_prime
+      psih2 = 2.0 * yy
 
       ! end do 
 
@@ -441,41 +442,41 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
          psim = psim
       else
          psim = 0.9*gzsoz0
-         psim_prime = 0.
+         psim_prime = 0.0
       end if
       if (psimz <= 0.9*gz10oz0) then
          psimz_prime = psimz_prime
          psimz = psimz
       else
-         psimz_prime = 0.
+         psimz_prime = 0.0
          psimz = 0.9*gz10oz0
       end if
       if (psim2 <= 0.9*gz2oz0) then
          psim2_prime = psim2_prime
          psim2 = psim2
       else
-         psim2_prime = 0.
+         psim2_prime = 0.0
          psim2 = 0.9*gz2oz0
       end if
       if (psih <= 0.9*gzsoz0) then
          psih_prime = psih_prime
          psih = psih
       else
-         psih_prime = 0.
+         psih_prime = 0.0
          psih = 0.9*gzsoz0
       end if
       if (psihz <= 0.9*gz10oz0) then
          psihz_prime = psihz_prime
          psihz = psihz
       else
-         psihz_prime = 0.
+         psihz_prime = 0.0
          psihz = 0.9*gz10oz0
       end if
       if (psih2 <= 0.9*gz2oz0) then
          psih2_prime = psih2_prime
          psih2 = psih2
       else
-         psih2_prime = 0.
+         psih2_prime = 0.0
          psih2 = 0.9*gz2oz0
        end if
 
@@ -519,7 +520,7 @@ subroutine da_sfc_wtq_lin(psfc, tg, ps, ts, qs, us, vs, regime,           &
                            (ths - thg)/psit2 * psit2_prime - &
                            (ths - thg)/psit  * psit_prime) * psit2/psit &
              + rcp*(thg + (ths - thg)*psit2/psit)/psfc * psfc_prime) &
-             * (psfc/100000.)**rcp
+             * (psfc/100000.0)**rcp
 
    q2_prime = (1.0-psiq2/psiq) * qg_prime + psiq2/psiq * qs_prime + &
               (qs -qg)*(psiq2/psiq) * (psiq2_prime/psiq2 - psiq_prime/psiq)

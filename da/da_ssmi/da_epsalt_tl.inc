@@ -31,7 +31,7 @@ subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
    ssw2       = ssw*ssw
    ssw3       = ssw2*ssw
        t2     = t*t
-   TGL_t2     = 2.*t*TGL_t
+   TGL_t2     = 2.0*t*TGL_t
        t3     = t2*t
    TGL_t3     = TGL_t2*t + t2*TGL_t
        es     = 87.134 - 1.949e-1*t     - 1.276e-2*t2     + 2.491e-4*t3
@@ -56,7 +56,7 @@ subroutine da_epsalt_tl(f,t,ssw,epsr,epsi,                                    &
        delt   = 25.0 - t
    TGL_delt   =      - TGL_t
        delt2  = delt*delt
-   TGL_delt2  = 2.*delt*TGL_delt
+   TGL_delt2  = 2.0*delt*TGL_delt
        beta   =   2.033e-2 + 1.266e-4*delt      + 2.464e-6*delt2       &
                 - ssw*(1.849e-5 - 2.551e-7*delt + 2.551e-8*delt2)
    TGL_beta   =              1.266e-4*TGL_delt  + 2.464e-6*TGL_delt2   &

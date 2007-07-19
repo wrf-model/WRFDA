@@ -80,8 +80,8 @@ subroutine da_transfer_xatowrf(grid)
          k = kte
          qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k))
          qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k,P_QV))
-         qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
-         qvf2_b = 1./(1.+qvf1)
+         qvf2   = - qvf1 / ((1.0+qvf1_b)*(1.0+qvf1_b))
+         qvf2_b = 1.0/(1.0+qvf1)
          qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
          qvf1_b = qvf1_b*qvf2_b
          grid%xa%p(i,j,k) = (-0.5/grid%em_rdnw(k)) * &
@@ -91,12 +91,12 @@ subroutine da_transfer_xatowrf(grid)
          do k = kte-1,1,-1
             qvf1   = 0.5*(q_cgrid(i,j,k)+q_cgrid(i,j,k+1))
             qvf1_b = 0.5*(grid%moist(i,j,k,P_QV)+grid%moist(i,j,k+1,P_QV))
-            qvf2   = - qvf1 / ((1.+qvf1_b)*(1.+qvf1_b))
-            qvf2_b = 1./(1.+qvf1_b)
+            qvf2   = - qvf1 / ((1.0+qvf1_b)*(1.0+qvf1_b))
+            qvf2_b = 1.0/(1.0+qvf1_b)
             qvf1   = qvf1*qvf2_b + qvf1_b*qvf2
             qvf1_b = qvf1_b*qvf2_b
             grid%xa%p(i,j,k) = grid%xa%p(i,j,k+1)  &
-                       - (1./grid%em_rdn(k+1)) * &
+                       - (1.0/grid%em_rdn(k+1)) * &
                        ((mu_cgrid(i,j)+qvf1*grid%em_mub(i,j)) / qvf2_b &
                         -(grid%em_mu_2(i,j)+qvf1_b*grid%em_mub(i,j))*qvf2/(qvf2_b*qvf2_b))
          end do

@@ -318,9 +318,9 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
             if (dlon_earth>=r360) dlon_earth = dlon_earth-r360
             dlat_earth = dlat_earth*deg2rad
             dlon_earth = dlon_earth*deg2rad           
-            timedif = 0. !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
+            timedif = 0.0 !2.0_r_kind*abs(tdiff)        ! range:  0 to 6
             terrain = 0.01_r_kind*abs(bfr1bhdr(13))
-            crit = 1. !0.01_r_kind+terrain + timedif !+ 10._r_kind*float(iskip)
+            crit = 1.0 !0.01_r_kind+terrain + timedif !+ 10.0_r_kind*float(iskip)
             iobs=0 ! argument is inout
             call map2grids(inst,dlat_earth,dlon_earth,crit,iobs,itx,1,itt,iout,iuse)
             if (.not. iuse) then
@@ -539,7 +539,7 @@ subroutine da_read_bufrtovs (obstype,iv, xp,infile)
       iv%instid(i)%tb_xb(:,nread(i))      = 0
       iv%instid(i)%tb_inv(:,nread(i))     = p%tb_inv(:) 
       iv%instid(i)%tb_qc(:,nread(i))      = 0
-      iv%instid(i)%tb_error(:,nread(i))   = 500.
+      iv%instid(i)%tb_error(:,nread(i))   = 500.0
       iv%instid(i)%emiss(:,nread(i))      = 0.0
       iv%instid(i)%scanpos(nread(i))      = p%scanpos 
       ! iv%instid(i)%scanline(nread(i)    = p%scanline

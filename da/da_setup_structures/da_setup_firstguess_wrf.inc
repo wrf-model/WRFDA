@@ -116,7 +116,7 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
    end if
 
    call da_map_set(map_util_project,grid%cen_lat,grid%cen_lon,   &
-                real(grid%xp%ide-grid%xp%ids+2)/2., real(grid%xp%jde-grid%xp%jds+2)/2., &
+                real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0, &
                 grid%dx,grid%stand_lon,grid%truelat1,grid%truelat2,map_info)
 
    ! Need to set map projection in WRF world.
@@ -136,10 +136,10 @@ subroutine da_setup_firstguess_wrf(xbx, grid)
       call  da_latlon_to_ij(map_info, grid%cen_lat, grid%cen_lon, start_x, start_y)
       write(unit=message(2),fmt='("Center: latc,lonc,x,y, Xc, Yc:",6f10.3)') &
                   grid%cen_lat, grid%cen_lon, start_x, start_y, &
-                  real(grid%xp%ide-grid%xp%ids+2)/2., real(grid%xp%jde-grid%xp%jds+2)/2.
+                  real(grid%xp%ide-grid%xp%ids+2)/2.0, real(grid%xp%jde-grid%xp%jds+2)/2.0
 
-      start_x = real(grid%xp%ide-grid%xp%ids+2)/2
-      start_y = real(grid%xp%jde-grid%xp%jds+2)/2
+      start_x = real(grid%xp%ide-grid%xp%ids+2)/2.0
+      start_y = real(grid%xp%jde-grid%xp%jds+2)/2.0
       lat_cen = -999.9
       lon_cen = -999.9
       call  da_ij_to_latlon(map_info, start_x, start_y, lat_cen, lon_cen)

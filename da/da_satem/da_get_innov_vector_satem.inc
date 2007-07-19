@@ -65,7 +65,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
          call da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
            iv%satem(n)%p(k),pres2,model_thickness(k))
 
-         if (ABS(ob % satem(n) % thickness(k) - missing_r) > 1. .and. &
+         if (ABS(ob % satem(n) % thickness(k) - missing_r) > 1.0 .and. &
               iv % satem(n) % thickness(k)%qc /= missing_data) then
            iv % satem(n) % thickness(k) % inv =     &
                   ob % satem(n) % thickness(k) - model_thickness(k)
@@ -93,9 +93,9 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
       ! [6.0] Perform land/ocean check
       !------------------------------------------------------------------------
 
-      if (grid%xb%landmask(i,j ) /= 0. .or. grid%xb%landmask(i+1,j ) /= 0. .or.  &
-          grid%xb%landmask(i,j+1) /= 0. .or. grid%xb%landmask(i+1,j+1) /= 0.) then
-         iv % satem(n) % thickness(1) % inv = 0.
+      if (grid%xb%landmask(i,j ) /= 0.0 .or. grid%xb%landmask(i+1,j ) /= 0. .or.  &
+          grid%xb%landmask(i,j+1) /= 0.0 .or. grid%xb%landmask(i+1,j+1) /= 0.0) then
+         iv % satem(n) % thickness(1) % inv = 0.0
          ithicknessf = ithicknessf + 1
       end if
    end do

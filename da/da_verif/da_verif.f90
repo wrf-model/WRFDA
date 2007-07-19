@@ -647,7 +647,7 @@ subroutine write_diag_single_level(out_dir,ounit,ldate,obs_type,omb,oma)
       ! write(ounit2,'(5x,a10,4(2x,a9))') trim(obs_type),' Number','BIAS','ABIAS','RMSE'
       if (index(obs_type, '_q') > 0 ) then
          write(ounit2,'(1x,a10,1x,i5,3(1x,f6.3))') &
-            ldate,oma%num, 1000.*oma%bias, 1000.*oma%abias, 1000.*sqrt(oma%rmse)
+            ldate,oma%num, 1000.0*oma%bias, 1000.0*oma%abias, 1000.0*sqrt(oma%rmse)
       else if (index(obs_type,'_p') > 0 ) then
          write(ounit2,'(1x,a10,1x,i5,3(1x,f6.2))') &
             ldate,oma%num, oma%bias/100.0, oma%abias/100.0, sqrt(oma%rmse)/100.0

@@ -42,7 +42,7 @@ subroutine da_check_rh(grid)
             dz(k)=grid%xb%hf(i,j,k+1)-grid%xb%hf(i,j,k)
 
             imod(k)           = 0
-            x_qs(k)           = 0.
+            x_qs(k)           = 0.0
             rhtol(k)          = grid%xb%rh(i,j,k)+grid%xa%rh(i,j,k)
          end do
 

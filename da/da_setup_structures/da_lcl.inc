@@ -11,18 +11,18 @@ subroutine da_lcl(P0, Z0, T0, Q0, PLCL, ZLCL, TLCL, QLCL)
 
    real   :: DP, QS, EPS
 
-   DP=5.
-   PLCL=300.
+   DP=5.0
+   PLCL=300.0
 
    do
       TLCL=T0*((PLCL/P0)**0.286)
 
-      call da_qfrmrh(PLCL, TLCL, 100., QS)
+      call da_qfrmrh(PLCL, TLCL, 100.0, QS)
 
       EPS=QS-Q0
 
-      if (EPS >= 0.) then
-         ZLCL=(1004./gravity)*(T0-TLCL)+Z0
+      if (EPS >= 0.0) then
+         ZLCL=(1004.0/gravity)*(T0-TLCL)+Z0
          QLCL=QS
          return
       else

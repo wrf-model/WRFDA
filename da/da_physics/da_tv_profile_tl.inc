@@ -19,9 +19,9 @@ subroutine da_tv_profile_tl(grid,i,j,dx,dxm,dy,dym,             &
 
    do ii=i,i+1
       do jj=j,j+1
-         TGL_tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xa%t(ii,jj,kts:kte)*(1.+0.61*grid%xb%q(ii,jj,kts:kte)) +  &
+         TGL_tv_m(ii-i+1,jj-j+1,kts:kte) = grid%xa%t(ii,jj,kts:kte)*(1.0+0.61*grid%xb%q(ii,jj,kts:kte)) +  &
                                       0.61*grid%xb%t(ii,jj,kts:kte)*grid%xa%q(ii,jj,kts:kte)
-         tv_m(ii-i+1,jj-j+1,kts:kte)     = grid%xb%t(ii,jj,kts:kte)*(1.+0.61*grid%xb%q(ii,jj,kts:kte))
+         tv_m(ii-i+1,jj-j+1,kts:kte)     = grid%xb%t(ii,jj,kts:kte)*(1.0+0.61*grid%xb%q(ii,jj,kts:kte))
       end do
    end do
  

@@ -56,7 +56,7 @@ subroutine da_transform_xtoy_satem (grid, iv, y)
          ! [4.0] Thickness calculation
 
          do k=1, num_levs
-            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.) then
+            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.0) then
 
                call da_find_layer_tl(layer1,tv1,iv%satem(n)%p(k),            &
                   pre_ma,tv_ma,ks,ke,TGL_tv1,TGL_pre_ma,TGL_tv_ma)

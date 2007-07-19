@@ -36,7 +36,7 @@ subroutine da_max_error_qc (it, info, field, max_error, ix, ixf, iunit, var, &
       failed = .true.
 
       if (print .and. failed) then
-         if (err_max .LE. 0.) then
+         if (err_max .LE. 0.0) then
             write (unit=iunit , fmt = '(A,3(F10.1,1X),A,A,A,A5,A,A,3f10.2)')   &
                    "Err_max < 0 ==> ",err,err_max,max_error, " for ", var, &
                    " OBS ID: ", info % id, info % platform,     &

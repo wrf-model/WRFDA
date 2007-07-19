@@ -134,7 +134,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             !   should be warmer than freezing temperature of the sea  
             !-----------------------------------------------------------
             !
-            if(ob%instid(i)%tb(129,n) < 271.) then
+            if(ob%instid(i)%tb(129,n) < 271.0) then
                iv%instid(i)%tb_qc(:,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_windowchlong = nrej_windowchlong + 1
@@ -144,7 +144,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
             !-----------------------------------------------------------
             !
             SST_airs=ob%instid(i)%tb(272,n)   !! short wave window channel #2328 - 3.882 nm (2616.38 cm^-1)
-            if(SST_airs > 307.) then
+            if(SST_airs > 307.0) then
                iv%instid(i)%tb_qc(257:281,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_windowchshort = nrej_windowchshort + 1
@@ -158,7 +158,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 !
             SST_model=iv%instid(i)%ts(n)       !! SST in the model
             diffSST=abs(SST_model-SST_airs)
-            if(SST_airs < 307 .and. diffSST > 2.) then
+            if(SST_airs < 307 .and. diffSST > 2.0) then
                iv%instid(i)%tb_qc(:,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_sst = nrej_sst + 1
@@ -173,7 +173,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
          ! else 
          ! end if
 
-         !if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 850.)) then
+         !if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 850.0)) then
          !   iv%instid(i)%tb_qc(5,n)  = qc_bad
          !   if (iv%instid(i)%proc_domain(n)) &
          !      nrej_topo = nrej_topo + 1
@@ -192,7 +192,7 @@ subroutine da_qc_airs (i, nchan, ob, iv)
 
          !  1. check absolute value of innovation
          !------------------------------------------------
-            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.) then
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1

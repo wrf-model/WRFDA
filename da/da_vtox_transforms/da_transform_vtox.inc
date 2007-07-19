@@ -103,7 +103,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
                     + grid%xb%KMA_B(K+1)*1.0/(PD-PU)**2*(PD*(LOG(PD)-LOG(PU))-PD+PU)
                end if
                ! Here since grid%xa%psfc holds value in Pa. dlnp -> dp
-               grid%xa%p(i,j,k) =  grid%xb%p(i,j,k) * grid%xa%psfc(I,J)/100. * coeff
+               grid%xa%p(i,j,k) =  grid%xb%p(i,j,k) * grid%xa%psfc(I,J)/100.0 * coeff
 
             end do
          end if

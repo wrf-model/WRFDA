@@ -20,7 +20,7 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
 
    real :: XLONRT, ANG
 
-   ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
+   ! for mercator projection, the winds are as in earth coordinates
 
    if (map_projection == 3) then
       mu = eu
@@ -28,14 +28,14 @@ subroutine da_earth_2_model_wind(eu,ev,mu,mv,lon)
       return
    end if
 
-   ! FOR CONVERSION TO GRID COORDinATES,
-   ! SEE program DATAMAP, SUBR VECT, AND
+   ! for conversion to grid coordinates,
+   ! see program datamap, subr vect, and
    ! ANTHES METEO. 597 NOTES, EQUA. 2.23, 2.25, 2.28.
 
    XLONRT = XLONC-LON
 
-   if (XLONRT > 180.) XLONRT=XLONRT-360.
-   if (XLONRT <-180.) XLONRT=XLONRT+360.
+   if (XLONRT > 180.0) XLONRT=XLONRT-360.0
+   if (XLONRT <-180.0) XLONRT=XLONRT+360.0
 
    ANG=XLONRT*CONE_FACTOR*pi/180.0
 

@@ -32,8 +32,8 @@ subroutine da_llij_lc(lat, lon, proj, i, j)
    
    ! Radius to desired point
    rm = proj%rebydx * ctl1r/proj%cone * &
-       (TAN((90.*proj%hemi-lat)*rad_per_deg/2.) / &
-        TAN((90.*proj%hemi-proj%truelat1)*rad_per_deg/2.))**proj%cone
+       (TAN((90.0*proj%hemi-lat)*rad_per_deg/2.0) / &
+        TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
    arg = proj%cone*(deltalon*rad_per_deg)
    i = proj%polei + proj%hemi * rm * Sin(arg)

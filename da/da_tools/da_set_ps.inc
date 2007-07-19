@@ -20,11 +20,11 @@ subroutine da_set_ps(proj)
    reflon = proj%stdlon + 90.0
 
    ! Compute numerator term of map scale factor
-   scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
+   scale_top = 1.0 + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
    ! Compute radius to lower-left (SW) corner
    ala1 = proj%lat1 * rad_per_deg
-   proj%rsw = proj%rebydx*COS(ala1)*scale_top/(1.+proj%hemi*Sin(ala1))
+   proj%rsw = proj%rebydx*COS(ala1)*scale_top/(1.0+proj%hemi*Sin(ala1))
 
    ! Find the pole point
    alo1 = (proj%lon1 - reflon) * rad_per_deg

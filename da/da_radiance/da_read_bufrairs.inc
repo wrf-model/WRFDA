@@ -121,12 +121,12 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
 ! Set standard parameters
   real(r_kind)     :: POinT001 =   0.001_r_kind
   real(r_kind)     :: POinT01  =   0.01_r_kind
-  real(r_kind)     :: TEN      =  10._r_kind
-  real(r_kind)     :: R45      =  45._r_kind
-  real(r_kind)     :: R60      =  60._r_kind
-  real(r_kind)     :: R90      =  90._r_kind
-  real(r_kind)     :: R180     = 180._r_kind
-  real(r_kind)     :: R360     = 360._r_kind
+  real(r_kind)     :: TEN      =  10.0_r_kind
+  real(r_kind)     :: R45      =  45.0_r_kind
+  real(r_kind)     :: R60      =  60.0_r_kind
+  real(r_kind)     :: R90      =  90.0_r_kind
+  real(r_kind)     :: R180     = 180.0_r_kind
+  real(r_kind)     :: R360     = 360.0_r_kind
 
   logical           :: airs, eos_amsua, hsb, airstab
   type(info_type)            :: info
@@ -343,13 +343,13 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
          idate5(1), '-', idate5(2), '-', idate5(3), '_', idate5(4), &
          ':', idate5(5), ':', idate5(6)
 
-       info%elv = 0.  !aquaspot%selv
+       info%elv = 0.0  !aquaspot%selv
 
 !  4.2  Check observational info
 !-------------------------------------------------------
-     if( airsspot%fovn <    0._r_kind .or. airsspot%fovn > 100._r_kind .or. &
-          airsspot%saza < -360._r_kind .or. airsspot%saza > 360._r_kind .or. &
-          aquaspot%soza < -180._r_kind .or. aquaspot%soza > 180._r_kind )then
+     if( airsspot%fovn <    0.0_r_kind .or. airsspot%fovn > 100.0_r_kind .or. &
+          airsspot%saza < -360.0_r_kind .or. airsspot%saza > 360.0_r_kind .or. &
+          aquaspot%soza < -180.0_r_kind .or. aquaspot%soza > 180.0_r_kind )then
          write(unit=message(1),fmt=*) &
             'Cannot read ', channame, ' bufr data:', &
             ' strange obs info(fov,saza,soza):', &
@@ -377,7 +377,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
   
      do l=1,nchan
         airdata(l+nreal) = airschan(l)%tmbrst	         ! brightness temerature
-        if( airdata(l+nreal) > 0._r_kind .and. airdata(l+nreal) < 500._r_kind )then
+        if( airdata(l+nreal) > 0.0_r_kind .and. airdata(l+nreal) < 500.0_r_kind )then
            iflag = .true.
         else
            airdata(l+nreal) = missing_r
@@ -567,7 +567,7 @@ subroutine da_read_bufrairs(obstype,iv,xp,infile)
       iv%instid(inst)%tb_xb(:,n)      = 0
       iv%instid(inst)%tb_inv(:,n)     = p%tb_inv(:)
       iv%instid(inst)%tb_qc(:,n)      = 0
-      iv%instid(inst)%tb_error(:,n)   = 500.
+      iv%instid(inst)%tb_error(:,n)   = 500.0
       iv%instid(inst)%emiss(:,n)      = 0.0
       iv%instid(inst)%scanpos(n)      = p%scanpos
       ! iv%instid(inst)%scanline(n)    = p%scanline

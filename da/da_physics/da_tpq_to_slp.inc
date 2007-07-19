@@ -25,7 +25,7 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
                                                
    real, parameter      :: gamma = 6.5e-3,  &
                            tc=t_kelvin+17.5,  &
-                           pconst=10000. ,  &
+                           pconst=10000.0 ,  &
                            eps   = 0.622
                                                                        
    ! sea level pressure                                            
@@ -34,7 +34,7 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
                                                                        
    ! compute pressure at pconst mb above surface (pl)              
                                                                         
-   if (terr <= 0.) then
+   if (terr <= 0.0) then
       slp = psfc
       return
    end if
@@ -62,8 +62,8 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
    ! get temperature at pl (tl), extrapolate t at surface (ts)     
    ! and t at sea level (t0) with 6.5 k/km lapse rate              
 
-   tlo=t(klo) * (eps+q(klo))/(eps*(1.+q(klo)))
-   thi=t(khi) * (eps+q(khi))/(eps*(1.+q(khi)))
+   tlo=t(klo) * (eps+q(klo))/(eps*(1.0+q(klo)))
+   thi=t(khi) * (eps+q(khi))/(eps*(1.0+q(khi)))
    tl=thi-(thi-tlo)*log(pl/p(khi)) &
                       /log(p(klo)/p(khi))               
    ts=tl*(psfc/pl)**xterm                           
@@ -81,7 +81,7 @@ subroutine da_tpq_to_slp ( t, q, p, terr, psfc, slp)
 
    ! compute sea level pressure                                    
 
-   slp=psfc*exp(2.*gravity*terr/(gas_constant*(ts+t0)))
+   slp=psfc*exp(2.0*gravity*terr/(gas_constant*(ts+t0)))
 
 end subroutine da_tpq_to_slp
 

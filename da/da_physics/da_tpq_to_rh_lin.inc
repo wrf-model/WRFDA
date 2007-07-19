@@ -36,7 +36,7 @@ subroutine da_tpq_to_rh_lin(grid)
    ! [3.0] Calculate relative humidity increment:
    !---------------------------------------------------------------------------
 
-   grid%xa % rh(its:ite,jts:jte,kts:kte) = 100. * &
+   grid%xa % rh(its:ite,jts:jte,kts:kte) = 100.0 * &
                                 ( grid%xa % q(its:ite,jts:jte,kts:kte) / &
                                       qs(its:ite,jts:jte,kts:kte) ) - &
                                   grid%xb % rh(its:ite,jts:jte,kts:kte) * &

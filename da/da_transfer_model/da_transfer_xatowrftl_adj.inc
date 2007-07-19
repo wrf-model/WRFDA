@@ -166,7 +166,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
    !       EVALUATE ALSO THE inCREMENTS OF (1/rho) AND GEOPOTENTIAL
    !---------------------------------------------------------------------------
 
-   a_press(is:ie,js:je,ks:ke+1)=0.
+   a_press(is:ie,js:je,ks:ke+1)=0.0
    do k=ke,ks,-1
       do j=js,je
          do i=is,ie
@@ -174,7 +174,7 @@ subroutine da_transfer_xatowrftl_adj(grid, config_flags, filnam)
             a_press(i,j,k )=a_press(i,j,k )+grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
             a_press(i,j,k+1)=a_press(i,j,k+1)-grid%em_a_ph_2(i,j,k+1)/grid%xb%rho(i,j,k)
             grid%em_a_ph_2(i,j,k ) =grid%em_a_ph_2(i,j,k)   +grid%em_a_ph_2(i,j,k+1)
-            grid%xa%q(i,j,k)=grid%xa%q(i,j,k)-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.+0.61*grid%xb%q(i,j,k))
+            grid%xa%q(i,j,k)=grid%xa%q(i,j,k)-grid%xb%rho(i,j,k)*0.61*rho_cgrid/(1.0+0.61*grid%xb%q(i,j,k))
             grid%xa%t(i,j,k)=grid%xa%t(i,j,k)-grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%t(i,j,k)
             grid%xa%p(i,j,k)= grid%xa%p(i,j,k)+grid%xb%rho(i,j,k)*rho_cgrid/grid%xb%p(i,j,k)
          end do

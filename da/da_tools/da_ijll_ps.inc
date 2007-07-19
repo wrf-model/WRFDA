@@ -21,10 +21,10 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
 
    ! Compute the reference longitude by rotating 90 degrees to the east
    ! to find the longitude line parallel to the positive x-axis.
-   reflon = proj%stdlon + 90.
+   reflon = proj%stdlon + 90.0
    
    ! Compute numerator term of map scale factor
-   scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
+   scale_top = 1.0 + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
    ! Compute radius to point of interest
    xx = i - proj%polei
@@ -32,11 +32,11 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    r2 = xx**2 + yy**2
 
    ! Now the magic code
-   if (r2 == 0.) then 
-      lat = proj%hemi * 90.
+   if (r2 == 0.0) then 
+      lat = proj%hemi * 90.0
       lon = reflon
    else
-      gi2 = (proj%rebydx * scale_top)**2.
+      gi2 = (proj%rebydx * scale_top)**2.0
       lat = deg_per_rad * proj%hemi * ASin((gi2-r2)/(gi2+r2))
       arccos = ACOS(xx/sqrt(r2))
       if (yy > 0) then
@@ -47,8 +47,8 @@ subroutine da_ijll_ps(i, j, proj, lat, lon)
    end if
   
    ! Convert to a -180 -> 180 East convention
-   if (lon > 180.) lon = lon - 360.
-   if (lon < -180.) lon = lon + 360.
+   if (lon > 180.0) lon = lon - 360.0
+   if (lon < -180.0) lon = lon + 360.0
    
   
 end subroutine da_ijll_ps

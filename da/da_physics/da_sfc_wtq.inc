@@ -62,7 +62,7 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    ! h2  is the height of 2m where the temperature and 
    !        moisture observed.
 
-   real, parameter :: h10 = 10., h2 = 2.
+   real, parameter :: h10 = 10.0, h2 = 2.0
    
    ! Default roughness over the land
 
@@ -117,40 +117,40 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
    ! 2.1 Compute Virtual temperature on the lowest half sigma level
 
-   tvs  = ts * (1. + 0.608 * qs)
+   tvs  = ts * (1.0 + 0.608 * qs)
 
    ! 2.2 Compute Virtual temperature on the second lowest half sigma level
 
-   tvs2  = ts2 * (1. + 0.608 * qs2)
+   tvs2  = ts2 * (1.0 + 0.608 * qs2)
 
    ! 2.3 Convert ground virtual temperature assuming it's saturated
 
    call da_tp_to_qs(tg, psfc, eg, qg)
-   tvg  = tg * (1. + 0.608 * qg)
+   tvg  = tg * (1.0 + 0.608 * qg)
 
    ! 3.  Compute the potential temperature
 
    ! 3.1 Potential temperature on the lowest half sigma level
 
-   ths  = ts * (1000. / (ps/100.)) ** rcp
+   ths  = ts * (1000.0 / (ps/100.0)) ** rcp
 
    ! 3.2 Potential temperature at the ground
 
-   thg  = tg * (1000. / (psfc/100.)) ** rcp
+   thg  = tg * (1000.0 / (psfc/100.0)) ** rcp
 
    ! 4. Virtual potential temperature
 
    ! 4.1 Virtual potential temperature on the lowest half sigma level
 
-   thvs = tvs * (1000. / (ps/100.)) ** rcp
+   thvs = tvs * (1000.0 / (ps/100.0)) ** rcp
 
    ! 4.2 Virtual potential temperature on the second lowest half sigma level
 
-   thvs2 = tvs2 * (1000. / (ps2/100.)) ** rcp
+   thvs2 = tvs2 * (1000.0 / (ps2/100.0)) ** rcp
 
    ! 4.3 Virtual potential temperature at ground
 
-   thvg = tvg * (1000. / (psfc/100.)) ** rcp
+   thvg = tvg * (1000.0 / (psfc/100.0)) ** rcp
 
 
    ! 5.  BULK RICHARDSON NUMBER AND MONI-OBUKOV LENGTH
@@ -164,9 +164,9 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    !     Convective velocity:
 
    if (thvg >= thvs) then
-      Vc2 = 4. * (thvg - thvs)
+      Vc2 = 4.0 * (thvg - thvs)
    else
-      Vc2 = 0.
+      Vc2 = 0.0
    end if
    
    V2  = Va2 + Vc2
@@ -182,38 +182,38 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       ! 6.1 Stable conditions (REGIME 1)
       !     ---------------------------
       regime = 1.1
-      psim = -10.*gzsoz0
-      psimz = -10.*gz10oz0
-      psim2 = -10.*gz2oz0
-      psim = max(psim,-10.)
-      psimz = max(psimz,-10.)
-      psim2 = max(psim2,-10.)
+      psim = -10.0*gzsoz0
+      psimz = -10.0*gz10oz0
+      psim2 = -10.0*gz2oz0
+      psim = max(psim,-10.0)
+      psimz = max(psimz,-10.0)
+      psim2 = max(psim2,-10.0)
       psih = psim
       psihz = psimz
       psih2 = psim2
 
-   else if ((rib .LT. 0.2) .AND. (rib .GT. 0.)) then
+   else if ((rib .LT. 0.2) .AND. (rib .GT. 0.0)) then
       ! 6.2 Mechanically driven turbulence (REGIME 2)
 
       regime = 2.1
-      psim = (-5. * rib) * gzsoz0 / (1.1 - 5.*rib)
-      psimz = (-5. * rib) * gz10oz0 / (1.1 - 5.*rib)
-      psim2 = (-5. * rib) * gz2oz0 / (1.1 - 5.*rib)
+      psim = (-5.0 * rib) * gzsoz0 / (1.1 - 5.0*rib)
+      psimz = (-5.0 * rib) * gz10oz0 / (1.1 - 5.0*rib)
+      psim2 = (-5.0 * rib) * gz2oz0 / (1.1 - 5.0*rib)
 
-      psim = max(psim,-10.)
-      psimz = max(psimz,-10.)
-      psim2 = max(psim2,-10.)
+      psim = max(psim,-10.0)
+      psimz = max(psimz,-10.0)
+      psim2 = max(psim2,-10.0)
       psih = psim
       psihz = psimz
       psih2 = psim2
 
-   else if ((rib .EQ. 0.) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) then
+   else if ((rib .EQ. 0.0) .or. (rib.LT.0.0 .and. thvs2.GT.thvs)) then
       ! 6.3 Unstable Forced convection (REGIME 3)
 
       regime = 3.1
-      psim = 0.
-      psimz = 0.
-      psim2 = 0.
+      psim = 0.0
+      psimz = 0.0
+      psim2 = 0.0
       psih = psim
       psihz = psimz
       psih2 = psim2
@@ -224,9 +224,9 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
       ! Calculate psi m and pshi h using iteration method
 
-      psim = 0.
-      psih = 0.
-      cc = 2. * atan(1.0)
+      psim = 0.0
+      psih = 0.0
+      cc = 2.0 * atan(1.0)
 
       ! do k = 1 , k_iteration
 
@@ -250,51 +250,51 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
 
       ! 6.4.2  Calculate n, nz, R, Rz
 
-      hol = min(hol,0.)
-      hol = max(hol,-10.)
+      hol = min(hol,0.0)
+      hol = max(hol,-10.0)
 
       holz = (h10 / hs) * hol
-      holz = min(holz,0.)
-      holz = max(holz,-10.)
+      holz = min(holz,0.0)
+      holz = max(holz,-10.0)
 
       hol2 = (h2 / hs) * hol
-      hol2 = min(hol2,0.)
-      hol2 = max(hol2,-10.)
+      hol2 = min(hol2,0.0)
+      hol2 = max(hol2,-10.0)
 
       ! 6.4.3 Calculate Psim & psih
 
       !       Using the look-up table:
-      !          nn = int(-100. * hol)
-      !          rr = (-100. * hol) - nn
+      !          nn = int(-100.0 * hol)
+      !          rr = (-100.0 * hol) - nn
       !          psim = psimtb(nn) + rr * (psimtb(nn+1) - psimtb(nn))
       !          psih = psihtb(nn) + rr * (psihtb(nn+1) - psihtb(nn))
       !       Using the continuous function:
-      xx = (1. - 16. * hol) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psim = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih = 2. * yy
+      xx = (1.0 - 16.0 * hol) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psim = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih = 2.0 * yy
 
       !       Using the look-up table:
-      !          nz = int(-100. * holz)
-      !          rz = (-100. * holz) - nz
+      !          nz = int(-100.0 * holz)
+      !          rz = (-100.0 * holz) - nz
       !          psimz = psimtb(nz) + rz * (psimtb(nz+1) - psimtb(nz))
       !          psihz = psihtb(nz) + rz * (psihtb(nz+1) - psihtb(nz))
       !       Using the continuous function:
-      xx = (1. - 16. * holz) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psimz = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psihz = 2. * yy
+      xx = (1.0 - 16.0 * holz) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psimz = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psihz = 2.0 * yy
 
       !       Using the look-up table:
-      !          n2 = int(-100. * hol2)
-      !          r2 = (-100. * hol2) - n2
+      !          n2 = int(-100.0 * hol2)
+      !          r2 = (-100.0 * hol2) - n2
       !          psim2 = psimtb(n2) + r2 * (psimtb(n2+1) - psimtb(n2))
       !          psih2 = psihtb(n2) + r2 * (psihtb(n2+1) - psihtb(n2))
       !       Using the continuous function:
-      xx = (1. - 16. * hol2) ** 0.25
-      yy = log((1.+xx*xx)/2.)
-      psim2 = 2. * log((1.+xx)/2.) + yy - 2. * atan(xx) + cc
-      psih2 = 2. * yy
+      xx = (1.0 - 16.0 * hol2) ** 0.25
+      yy = log((1.0+xx*xx)/2.0)
+      psim2 = 2.0 * log((1.0+xx)/2.0) + yy - 2.0 * atan(xx) + cc
+      psih2 = 2.0 * yy
 
       ! end do 
 
@@ -308,7 +308,7 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
       psih2 = min(psih2,0.9*gz2oz0)
    end if  ! Regime
 
-   ! 7.  CALCULATE PSI FOR WinD, TEMPERATURE AND MOISTURE
+   ! 7.  Calculate psi for wind, temperature and moisture
 
    psiw = gzsoz0 - psim
    psiz = gz10oz0 - psimz
@@ -321,11 +321,11 @@ subroutine da_sfc_wtq (psfc, tg, ps, ts, qs, us, vs, ps2, ts2, qs2, &
    psiq  = log(k_kar*ust*hs/ka + hs / zq0) - psih
    psiq2 = log(k_kar*ust*h2/ka + h2 / zq0) - psih2
 
-   ! 8.  CALCULATE 10M WinD, 2M TEMPERATURE AND MOISTURE
+   ! 8.  Calculate 10m wind, 2m temperature and moisture
 
    u10 = us * psiz / psiw
    v10 = vs * psiz / psiw
-   t2 = (thg + (ths - thg)*psit2/psit)*((psfc/100.)/1000.)**rcp
+   t2 = (thg + (ths - thg)*psit2/psit)*((psfc/100.0)/1000.0)**rcp
    q2 = qg + (qs - qg)*psiq2/psiq 
 
 end subroutine da_sfc_wtq

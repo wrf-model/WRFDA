@@ -24,7 +24,7 @@ subroutine da_wrf_tpq_2_slp (grid)
 
    real, parameter      :: GAMMA = 6.5E-3,  &
                           TC=t_kelvin+17.5,  &
-                          PCONST=10000. ,  &
+                          PCONST=10000.0 ,  &
                           EPS   = 0.622
 
    if (trace_use) call da_trace_entry("da_wrf_tpq_2_slp")
@@ -39,7 +39,7 @@ subroutine da_wrf_tpq_2_slp (grid)
 
    j_loop: do j=jts, jte
       i_loop: do i=its, ite
-         if (grid%xb%terr(i,j) <= 0.) then
+         if (grid%xb%terr(i,j) <= 0.0) then
             grid%xb%slp(i,j) = grid%xb%psfc(i,j)
             cycle i_loop
          end if
@@ -68,8 +68,8 @@ subroutine da_wrf_tpq_2_slp (grid)
          ! get temperature at pl (tl), extrapolate t at surface (ts)     
          ! and t at sea level (t0) with 6.5 k/km lapse rate              
 
-         tlo=grid%xb%t(i,j,klo) * (eps+grid%xb%q(i,j,klo))/(eps*(1.+grid%xb%q(i,j,klo)))
-         thi=grid%xb%t(i,j,khi) * (eps+grid%xb%q(i,j,khi))/(eps*(1.+grid%xb%q(i,j,khi)))
+         tlo=grid%xb%t(i,j,klo) * (eps+grid%xb%q(i,j,klo))/(eps*(1.0+grid%xb%q(i,j,klo)))
+         thi=grid%xb%t(i,j,khi) * (eps+grid%xb%q(i,j,khi))/(eps*(1.0+grid%xb%q(i,j,khi)))
          tl=thi-(thi-tlo)*log(pl/grid%xb%p(i,j,khi)) &
                       /log(grid%xb%p(i,j,klo)/grid%xb%p(i,j,khi))               
          ts=tl*(grid%xb%psfc(i,j)/pl)**xterm                           
@@ -87,7 +87,7 @@ subroutine da_wrf_tpq_2_slp (grid)
 
          ! compute sea level pressure                                    
 
-         grid%xb%slp(i,j)=grid%xb%psfc(i,j)*EXP(2.*gravity*grid%xb%terr(i,j)/ &
+         grid%xb%slp(i,j)=grid%xb%psfc(i,j)*EXP(2.0*gravity*grid%xb%terr(i,j)/ &
             (gas_constant*(TS+T0)))
       end do i_loop
    end do j_loop

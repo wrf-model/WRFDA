@@ -10,15 +10,14 @@ subroutine da_transform_xtozrhoq_lin(xb, xa, i, j, zh, zf, tgl_zrhom)
    type (xb_type), intent(in)      :: xb         ! first guess state.
    type (x_type) , intent(in)      :: xa         ! increment
    real,           intent(out)     :: TGL_zrhom  ! gridded height weighted moisture
-   real,           intent(in),  &
-                   dimension(mkz)  :: zh
-   real,           intent(in),  &
-                   dimension(mkz+1):: zf
+   real,           intent(in)      :: zh(mkz)
+   real,           intent(in)      :: zf(mkz+1)
+
    integer                         :: k
 
    if (trace_use) call da_trace_entry("da_transform_xtozrhoq_lin")
 
-   TGL_zrhom = 0.
+   TGL_zrhom = 0.0
 
    do k = 1,mkz
       TGL_zrhom = (zf(k)-zf(k+1))*zh(k)*(xb%q(i,j,k)*xa%rho(i,j,k) + &

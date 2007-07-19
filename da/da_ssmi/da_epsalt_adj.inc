@@ -85,7 +85,7 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
 
    cdum3  = 4.9 + (esnew-4.9)/(1.0 + cdum1) - cdum2
 
-   ADJ_cdum3  = ADJ_epsr + ADJ_epsi *(0.,1.)
+   ADJ_cdum3  = ADJ_epsr + ADJ_epsi *(0.0,1.0)
    ADJ_esnew  =   REAL(ADJ_cdum3/((1.0,0.0) + cdum1))
    ADJ_cdum1  = - ADJ_cdum3*(esnew-4.9)/((1.0 + cdum1)*(1.0 + cdum1))
    ADJ_cdum2  = - ADJ_cdum3
@@ -103,7 +103,7 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
    ADJ_delt   =   ssw*2.551e-7*ADJ_beta + ADJ_delt
    ADJ_delt2  = - ssw*2.551e-8*ADJ_beta + ADJ_delt2
 
-   ADJ_delt   = 2.*delt*ADJ_delt2 + ADJ_delt
+   ADJ_delt   = 2.0*delt*ADJ_delt2 + ADJ_delt
 
    ADJ_t      =  - ADJ_delt + ADJ_t
 
@@ -125,7 +125,7 @@ subroutine da_epsalt_adj(f,t,ssw,                                    &
 
    ADJ_t2     = ADJ_t3*t     + ADJ_t2
    ADJ_t      = t2*ADJ_t3    + ADJ_t
-   ADJ_t      = 2.*t*ADJ_t2  + ADJ_t
+   ADJ_t      = 2.0*t*ADJ_t2  + ADJ_t
 
 end subroutine da_epsalt_adj
 

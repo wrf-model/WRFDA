@@ -75,7 +75,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
 
       profiles(n) % skin % surftype   = aux_vars (n) % surftype
       profiles(n) % skin % t          = aux_vars (n) % surft    
-      profiles(n) % skin % fastem (:) = 0.  ! aux_vars (n) % fastem (:)
+      profiles(n) % skin % fastem (:) = 0.0  ! aux_vars (n) % fastem (:)
 
       profiles(n) % s2m  % t    = aux_vars (n) % t2m
       profiles(n) % s2m  % q    = aux_vars (n) % q2m
@@ -107,21 +107,21 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       profiles_ad(n) % co2_Data   = .False.  ! no meaning
       profiles_ad(n) % clw_Data   = .False.  ! no meaning
       profiles_ad(n) % zenangle   = -1       ! no meaning
-      profiles_ad(n) % p(:)   = 0. ! no AD on pressure levels
-      profiles_ad(n) % t(:)   = 0. ! temperarure
-      profiles_ad(n) % o3(:)  = 0. ! O3 ppmv
-      profiles_ad(n) % clw(:) = 0. ! clw
-      profiles_ad(n) % q(:)   = 0. ! WV
-      profiles_ad(n) % s2m % t = 0. ! temperarure
+      profiles_ad(n) % p(:)   = 0.0 ! no AD on pressure levels
+      profiles_ad(n) % t(:)   = 0.0 ! temperarure
+      profiles_ad(n) % o3(:)  = 0.0 ! O3 ppmv
+      profiles_ad(n) % clw(:) = 0.0 ! clw
+      profiles_ad(n) % q(:)   = 0.0 ! WV
+      profiles_ad(n) % s2m % t = 0.0 ! temperarure
       profiles_ad(n) % s2m % q = 0      ! WV
-      profiles_ad(n) % s2m % p = 0. ! pressure
-      profiles_ad(n) % s2m % u = 0. ! wind components
-      profiles_ad(n) % s2m % v = 0. ! wind components
+      profiles_ad(n) % s2m % p = 0.0 ! pressure
+      profiles_ad(n) % s2m % u = 0.0 ! wind components
+      profiles_ad(n) % s2m % v = 0.0 ! wind components
       profiles_ad(n) % skin % surftype = -1  ! no meaning
-      profiles_ad(n) % skin % t        = 0.  ! on temperarure
-      profiles_ad(n) % skin % fastem   = 0.  ! Fastem
-      profiles_ad(n) % ctp       = 0.  ! cloud top pressure
-      profiles_ad(n) % cfraction = 0.  ! cloud fraction
+      profiles_ad(n) % skin % t        = 0.0  ! on temperarure
+      profiles_ad(n) % skin % fastem   = 0.0  ! Fastem
+      profiles_ad(n) % ctp       = 0.0  ! cloud top pressure
+      profiles_ad(n) % cfraction = 0.0  ! cloud fraction
 
    end do
 

@@ -576,7 +576,7 @@ subroutine da_read_obs (ob, xp, filename)
 
             ! Reject cloudy satem obs.
 
-            if (platform%loc%pw%inv > 10.) then
+            if (platform%loc%pw%inv > 10.0) then
                cycle reports
             end if
 

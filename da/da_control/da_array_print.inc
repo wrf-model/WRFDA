@@ -45,10 +45,10 @@ subroutine da_array_print(direction, a, ch)
       jump = -1
    end if
 
-   if (amax.ne.0.)then
+   if (amax.ne.0.0)then
       do j=jstart,jend,jump
          write(unit=stdout,fmt='(1x,i5,288i3)') &
-            j, (inT(a(j,i)/amax*99.),i=1,len2)
+            j, (inT(a(j,i)/amax*99.0),i=1,len2)
       end do
    end if
 

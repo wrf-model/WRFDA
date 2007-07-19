@@ -91,25 +91,25 @@ subroutine da_transform_xtotb_lin(grid)
 
          dum1 = 0.0
 
-         call da_tb_tl(1,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+         call da_tb_tl(1,53.0,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
             ! grid%xb%tb19v(i,j),grid%xb%tb19h(i,j),                      &
             TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
             TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
             TGL_zcld,grid%xa%tb19v(i,j),grid%xa%tb19h(i,j)             )
 
-         call da_tb_tl(2,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+         call da_tb_tl(2,53.0,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
             ! grid%xb%tb22v(i,j),dum1,                               &
             TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
             TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
             TGL_zcld,grid%xa%tb22v(i,j),dum2                      )
 
-         call da_tb_tl(3,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+         call da_tb_tl(3,53.0,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
             ! grid%xb%tb37v(i,j),grid%xb%tb37h(i,j),                      &
             TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
             TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &
             TGL_zcld,grid%xa%tb37v(i,j),grid%xa%tb37h(i,j)             )
 
-         call da_tb_tl(4,53.,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
+         call da_tb_tl(4,53.0,psfc,ta,gamma,sst,tpw,htpw,speed,alw,zcld,  &
             ! grid%xb%tb85v(i,j),grid%xb%tb85h(i,j),                      &
             TGL_psfc,TGL_ta,TGL_gamma,TGL_sst,                &
             TGL_tpw,TGL_htpw,TGL_speed,TGL_alw,               &

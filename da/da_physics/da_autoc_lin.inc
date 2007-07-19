@@ -18,14 +18,14 @@ subroutine da_autoc_lin(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
 
    do k = kts, kte
 
-      if ( DT(k) <= 0. ) cycle
+      if ( DT(k) <= 0.0 ) cycle
 
       if ( SCR2(k) >= QCTH ) then
          PRC9(K) = alpha * SCR29(K)
          PRC(k) = alpha * ( SCR2(k) - QCTH )
       else
-         PRC9(K) = 0.
-         PRC(k) = 0.
+         PRC9(K) = 0.0
+         PRC(k) = 0.0
       end if
    end do
 

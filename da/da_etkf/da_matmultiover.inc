@@ -14,7 +14,7 @@ subroutine da_matmultiover(mata,matb,ni,nj)
    real                :: tmp(1:nj)
 
    do i=1,ni
-      tmp = 0.
+      tmp = 0.0
       do j=1,nj 
          do k=1,nj
             tmp(j) = tmp(j) + mata(i,k)*matb(k,j)

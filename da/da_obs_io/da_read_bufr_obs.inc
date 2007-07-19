@@ -228,13 +228,13 @@ subroutine da_read_bufr_obs (ob, xp, filename)
       !    case (120, 132, 220:221, 232) ;       ! read drift
       !       call ufbint(iunit,drf,9,255,iret,drift)
       !       do k=1,nlevels
-      !          if (drf(1,k) .ge. 360.)drf(1,k)=drf(1,k)-360.
-      !          if (drf(1,k) .lt. 0.)drf(1,k)=drf(1,k)+360.
-      !          if (abs(drf(2,k)) .gt. 1000. .or. abs(drf(1,k)) .gt. 1000.) then
+      !          if (drf(1,k) .ge. 360.0)drf(1,k)=drf(1,k)-360.
+      !          if (drf(1,k) .lt. 0.0)drf(1,k)=drf(1,k)+360.
+      !          if (abs(drf(2,k)) .gt. 1000.0 .or. abs(drf(1,k)) .gt. 1000.0) then
       !             drf(2,k)=hdr(3)
       !             drf(1,k)=hdr(2)
       !          end if
-      !          if (abs(drf(3,k)) .gt. 3.)then
+      !          if (abs(drf(3,k)) .gt. 3.0)then
       !             drf(3,k)=time
       !          end if
       !       end do
@@ -246,10 +246,10 @@ subroutine da_read_bufr_obs (ob, xp, filename)
 
       platform % loc % slp %inv  = missing_r     
       platform % loc % slp %qc   = missing_data
-      platform % loc % slp %error=200.           
+      platform % loc % slp %error=200.0           
       platform % loc % pw %inv  = missing_r     
       platform % loc % pw %qc   = missing_data
-      platform % loc % pw %error=.2             
+      platform % loc % pw %error=0.2             
 
       do i=1,max_ob_levels
          platform % each (i) % height  = missing_r
@@ -259,34 +259,34 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             
          platform % each (i) % u % inv = missing_r
          platform % each (i) % u % qc  = missing_data
-         platform % each (i) % u % error =10.       
+         platform % each (i) % u % error =10.0       
 
          platform % each (i) % v = platform % each (i) % u
 
          platform % each (i) % t % inv = missing_r
          platform % each (i) % t % qc  = missing_data
-         platform % each (i) % t % error =5.       
+         platform % each (i) % t % error =5.0       
 
          platform % each (i) % p % inv = missing_r      
          platform % each (i) % p % qc  = missing_data
-         platform % each (i) % p % error =200.    
+         platform % each (i) % p % error =200.0  
 
          platform % each (i) % q % inv = missing_r
          platform % each (i) % q % qc  = missing_data
-         platform % each (i) % q % error =.1      
+         platform % each (i) % q % error =0.1      
       end do 
 
       do k = 1, platform % info % levels
          pob=obs(1,k)
          ! scale q and compute t from tv and set units to Kelvin, if they aren't missing
 
-         if (obs(2,k) .gt. 0. .and. obs(2,k) .lt. 1e9) then   
+         if (obs(2,k) .gt. 0.0 .and. obs(2,k) .lt. 1e9) then   
             obs(2,k) = obs(2,k)*1e-6
-            if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300.) then
-               obs(3,k) = (obs(3,k)+t_kelvin) / (1. + 0.608 * obs(2,k))
+            if (obs(3,k) .gt. -200.0 .and. obs(3,k) .lt. 300.0) then
+               obs(3,k) = (obs(3,k)+t_kelvin) / (1.0 + 0.608 * obs(2,k))
             end if
          else
-            if (obs(3,k) .gt. -200. .and. obs(3,k) .lt. 300.) then
+            if (obs(3,k) .gt. -200.0 .and. obs(3,k) .lt. 300.0) then
                obs(3,k) = obs(3,k) + t_kelvin
            end if
          end if
@@ -313,7 +313,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          cat=nint(obs(9,k))
 
          if (pmq < qflag) then
-            platform % loc % slp % inv =pmo(1,1)*100.
+            platform % loc % slp % inv =pmo(1,1)*100.0
             platform % loc % slp % qc  =pmq
             platform % loc % slp % error = 200.0
          end if
@@ -379,7 +379,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
          end if
 
          if (pqm<qflag)then
-            platform % each (k) % p % inv =obs(1,k)*100.
+            platform % each (k) % p % inv =obs(1,k)*100.0
             platform % each (k) % p % qc  =pqm
             platform % each (k) % p % error =poe
          end if
@@ -421,7 +421,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
       ! This is basically converting  rh to q i
       ! Method : 
       !  if rh, temp and pr all available computes Qs otherwise sets Qs= missing
-      !  if rh > 100 sets q = qs otherwise q = rh*Qs/100. 
+      !  if rh > 100 sets q = qs otherwise q = rh*Qs/100.0 
       ! Note: Currently da_obs_proc_station is active only for ob_format_ascii
       !      call da_obs_proc_station(platform)
       !---------------------------------------------------------------------------
@@ -750,7 +750,7 @@ subroutine da_read_bufr_obs (ob, xp, filename)
             ! ob%qscat(num_qscat)%h = platform%each(1)%height
             ! prepbufr uses pressure not height, so hardwire height to 
             ! 0 (sea-level)
-            ob%qscat(num_qscat)%h = 0.
+            ob%qscat(num_qscat)%h = 0.0
             ob%qscat(num_qscat)%u = platform%each(1)%u
             ob%qscat(num_qscat)%v = platform%each(1)%v
             ob%qscat(num_qscat)%u%error = max(platform%each(1)%u%error,1.0)

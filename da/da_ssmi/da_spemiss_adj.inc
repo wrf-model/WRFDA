@@ -79,15 +79,15 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
    tmp2i   = -aimag(cterm3h)
    ! eh   =  1.0 - (tmp2r*tmp2r+tmp2i*tmp2i)
 
-   ADJ_tmp2r   = - 2.*tmp2r*ADJ_eh
-   ADJ_tmp2i   = - 2.*tmp2i*ADJ_eh
+   ADJ_tmp2r   = - 2.0*tmp2r*ADJ_eh
+   ADJ_tmp2i   = - 2.0*tmp2i*ADJ_eh
 
-   ADJ_cterm3h =  ADJ_tmp2r + ADJ_tmp2i*(0.,1.)
+   ADJ_cterm3h =  ADJ_tmp2r + ADJ_tmp2i*(0.0,1.0)
 
-   ADJ_tmp1r   = - 2.*tmp1r*ADJ_ev
-   ADJ_tmp1i   = - 2.*tmp1i*ADJ_ev
+   ADJ_tmp1r   = - 2.0*tmp1r*ADJ_ev
+   ADJ_tmp1i   = - 2.0*tmp1i*ADJ_ev
 
-   ADJ_cterm3v =  ADJ_tmp1r + ADJ_tmp1i*(0.,1.)
+   ADJ_cterm3v =  ADJ_tmp1r + ADJ_tmp1i*(0.0,1.0)
 
    ADJ_cterm2  = - ADJ_cterm3h/(cterm1h + cterm2)
    ADJ_cterm2  = - cterm3h*ADJ_cterm3h/(cterm1h + cterm2) + ADJ_cterm2
@@ -97,10 +97,10 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
    ADJ_cterm1v = - cterm3v*ADJ_cterm3v/(cterm1v + cterm2) + ADJ_cterm1v
    ADJ_cterm2  = - cterm3v*ADJ_cterm3v/(cterm1v + cterm2) + ADJ_cterm2
 
-   if (cabs(epsnew) .gt. 0.) then
+   if (cabs(epsnew) .gt. 0.0) then
       ADJ_epsnew  = ADJ_cterm2*0.5/cterm2
    else
-      ADJ_epsnew  =  0.
+      ADJ_epsnew  =  0.0
    end if
 
    ADJ_eps     =  ADJ_epsnew
@@ -111,7 +111,7 @@ subroutine da_spemiss_adj(f,tk,theta,ssw,ev,eh,                               &
 
    ADJ_epsr    =  real(ADJ_eps)
    ADJ_epsi    =  -aimag(ADJ_eps) 
-   ADJ_tc      =  0.
+   ADJ_tc      =  0.0
    call da_epsalt_adj(f,tc,ssw,ADJ_tc, ADJ_epsr, ADJ_epsi)
 
    ADJ_tk      =  ADJ_tc + ADJ_tk

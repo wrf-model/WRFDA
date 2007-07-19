@@ -14,7 +14,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
 
    real,          parameter :: G = gravity
    real,          parameter :: R =  gas_constant
-   real,          parameter :: ROV2 = R / 2.
+   real,          parameter :: ROV2 = R / 2.0
    real,          parameter :: gamma  = 6.5E-3, &   ! temperature Lapse rate
                       gammarg= gamma*gas_constant/g
 
@@ -41,7 +41,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    real                        :: TSLV, TSFC  
 
    TC   = t_kelvin + 17.5
-   PLMB = (/85000., 70000., 50000./)
+   PLMB = (/85000.0, 70000.0, 50000.0/)
 
    !  Find the locations of the 850, 700 and 500 mb levels.
 
@@ -72,9 +72,9 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
       ! message(kx+3)="not enough levels"
       ! message(kx+4)="Change the pressure levels by -25mb"
       ! call da_error(__FILE__,__LINE__,message(1:kx+4))
-      PLMB(1) = PLMB(1) - 2500.
-      PLMB(2) = PLMB(2) - 2500.
-      PLMB(3) = PLMB(3) - 2500.
+      PLMB(1) = PLMB(1) - 2500.0
+      PLMB(2) = PLMB(2) - 2500.0
+      PLMB(3) = PLMB(3) - 2500.0
       goto 101
    end if
 
@@ -97,10 +97,10 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    !  P1 is the top of the level that we will use for our lapse rate
    !  computations.
 
-   if      ((PSFC - p(k850) - 10000.) >= 0.) then
+   if      ((PSFC - p(k850) - 10000.0) >= 0.0) then
       P1 = p(k850)
-   else if ((PSFC - p(k700)) >= 0.) then
-      P1 = PSFC - 10000.
+   else if ((PSFC - p(k700)) >= 0.0) then
+      P1 = PSFC - 10000.0
    else
       P1 = p(k500)
    end if
@@ -119,7 +119,7 @@ subroutine da_sfcprs (kts, kte, p, t, q, height, psfc, pslv, h_obs, t_obs)
    gamma78 = LOG(t850 / t700)  / LOG (p(k850) / p(k700))
    gamma57 = LOG(t700 / t500)  / LOG (p(k700) / p(k500))
 
-   if ((psfc - p(k850) - 10000.) >= 0.0) then
+   if ((psfc - p(k850) - 10000.0) >= 0.0) then
       t1 = t850
    else if ((psfc - p(k850)) >= 0.0) then
       t1 = t700 * (p1 / p(k700)) ** gamma78

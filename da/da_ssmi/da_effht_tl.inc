@@ -69,7 +69,7 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    TGL_alpha = TGL_sigo + TGL_sigv
 
        alph2 = alpha*alpha
-   TGL_alph2 = 2.*alpha*TGL_alpha
+   TGL_alph2 = 2.0*alpha*TGL_alpha
 
        alph3 = alpha*alph2
    TGL_alph3 = TGL_alpha*alph2+alpha*TGL_alph2
@@ -78,13 +78,13 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
     TGL_beta = TGL_ezho + TGL_ezhv
 
        beta2 = beta*beta
-   TGL_beta2 = 2.*beta*TGL_beta
+   TGL_beta2 = 2.0*beta*TGL_beta
 
        beta3 = beta*beta2
    TGL_beta3 = TGL_beta*beta2+beta*TGL_beta2
 
        mu2        = mu*mu
-   TGL_mu2        = 2.*mu*TGL_mu
+   TGL_mu2        = 2.0*mu*TGL_mu
        halfmu     = 0.5d0*    mu
    TGL_halfmu     = 0.5d0*TGL_mu
        sixthmu2   =     mu2/6.0d0
@@ -161,10 +161,10 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    TGL_sigov  = TGL_sigo*sigv + sigo*TGL_sigv
 
        sigoo  = sigo*sigo
-   TGL_sigoo  = 2.*sigo*TGL_sigo
+   TGL_sigoo  = 2.0*sigo*TGL_sigo
 
        sigvv  = sigv*sigv
-   TGL_sigvv  = 2.*sigv*TGL_sigv
+   TGL_sigvv  = 2.0*sigv*TGL_sigv
 
        sigooo = sigoo*sigo
    TGL_sigooo = TGL_sigoo*sigo + sigoo*TGL_sigo
@@ -179,13 +179,13 @@ subroutine da_effht_tl(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    TGL_sigvvv = TGL_sigvv*sigv + sigvv*TGL_sigv
 
        ezhoo  = ezho*ezho
-   TGL_ezhoo  = 2.*ezho*TGL_ezho
+   TGL_ezhoo  = 2.0*ezho*TGL_ezho
 
        ezhov  = ezho*ezhv
    TGL_ezhov  = TGL_ezho*ezhv + ezho*TGL_ezhv
 
        ezhvv  = ezhv*ezhv
-   TGL_ezhvv  = 2.*ezhv*TGL_ezhv
+   TGL_ezhvv  = 2.0*ezhv*TGL_ezhv
 
        ezhovv = ezho*ezhvv
    TGL_ezhovv = TGL_ezho*ezhvv + ezho*TGL_ezhvv

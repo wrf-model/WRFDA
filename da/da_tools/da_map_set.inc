@@ -22,23 +22,23 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
    type(proj_info), intent(out)      :: proj
 
    ! First, check for validity of mandatory variables in proj
-   if (ABS(lat1) > 90.) then
+   if (ABS(lat1) > 90.0) then
       call da_error(__FILE__,__LINE__, &
-         (/"Latitude of origin corner required as follows: -90N <= lat1 < = 90.N"/))
+         (/"Latitude of origin corner required as follows: -90N <= lat1 < = 90N"/))
    end if
-   if (ABS(lon1) > 180.) then
+   if (ABS(lon1) > 180.0) then
       call da_error(__FILE__,__LINE__, &
          (/"Longitude of origin required as follows: -180E <= lon1 <= 180W"/))
    end if
-   if ((dx .LE. 0.).AND.(proj_code .NE. PROJ_LATLON)) then
+   if ((dx .LE. 0.0).AND.(proj_code .NE. PROJ_LATLON)) then
       call da_error(__FILE__,__LINE__, &
          (/"Require grid spacing (dx) in meters be positive!"/))
    end if
-   if ((ABS(stdlon) > 180.).AND.(proj_code .NE. PROJ_MERC)) then
+   if ((ABS(stdlon) > 180.0).AND.(proj_code .NE. PROJ_MERC)) then
       call da_error(__FILE__,__LINE__, &
          (/"Need orientation longitude (stdlon) as: -180E <= lon1 <= 180W"/)) 
    end if
-   if (ABS(truelat1)>90.) then
+   if (ABS(truelat1)>90.0) then
       call da_error(__FILE__,__LINE__, &
          (/"Set true latitude 1 for all projections!"/))
    end if
@@ -55,7 +55,7 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
    proj%truelat2 = truelat2
    if (proj%code .NE. PROJ_LATLON) then
       proj%dx = dx
-      if (truelat1 < 0.) then
+      if (truelat1 < 0.0) then
          proj%hemi = -1.0 
       else
          proj%hemi = 1.0
@@ -74,7 +74,7 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
          if (print_detail_map) then
             write(unit=stdout,fmt='(A)') 'Setting up LAMBERT CONFORMAL map...'
          end if
-         if (ABS(proj%truelat2) > 90.) then
+         if (ABS(proj%truelat2) > 90.0) then
             if (print_detail_map) then
                write(unit=stdout,fmt='(A)') 'Second true latitude not set, assuming a tangent'
                write(unit=stdout,fmt='(A,F10.3)') 'projection at truelat1: ', proj%truelat1
@@ -94,7 +94,7 @@ subroutine da_map_set(proj_code,lat1,lon1,knowni,knownj,dx,stdlon,truelat1,truel
             write(unit=stdout,fmt='(A)') 'Setting up CYLinDRICAL EQUIDISTANT LATLON map...'
          end if
          ! Convert lon1 to 0->360 notation
-         if (proj%lon1 < 0.) proj%lon1 = proj%lon1 + 360.
+         if (proj%lon1 < 0.0) proj%lon1 = proj%lon1 + 360.0
    
       case default
          write(unit=message(1),fmt='(A,I2)') 'Unknown projection code: ', proj%code

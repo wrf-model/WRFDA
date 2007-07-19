@@ -22,8 +22,8 @@ subroutine da_set_lc(proj)
    ! Compute longitude differences and ensure we stay out of the
    ! forbidden "cut zone"
    deltalon1 = proj%lon1 - proj%stdlon
-   if (deltalon1 > +180.) deltalon1 = deltalon1 - 360.
-   if (deltalon1 < -180.) deltalon1 = deltalon1 + 360.
+   if (deltalon1 .gt. +180.0) deltalon1 = deltalon1 - 360.0
+   if (deltalon1 .lt. -180.0) deltalon1 = deltalon1 + 360.0
 
    ! Convert truelat1 to radian and compute COS for later use
    tl1r = proj%truelat1 * rad_per_deg
@@ -31,13 +31,13 @@ subroutine da_set_lc(proj)
 
    ! Compute the radius to our known lower-left (SW) corner
    proj%rsw = proj%rebydx * ctl1r/proj%cone * &
-           (TAN((90.*proj%hemi-proj%lat1)*rad_per_deg/2.) / &
-            TAN((90.*proj%hemi-proj%truelat1)*rad_per_deg/2.))**proj%cone
+           (TAN((90.0*proj%hemi-proj%lat1)*rad_per_deg/2.0) / &
+            TAN((90.0*proj%hemi-proj%truelat1)*rad_per_deg/2.0))**proj%cone
 
    ! Find pole point
    arg = proj%cone*(deltalon1*rad_per_deg)
-   proj%polei = 1. - proj%hemi * proj%rsw * Sin(arg)
-   proj%polej = 1. + proj%rsw * COS(arg)  
+   proj%polei = 1.0 + proj%hemi * proj%rsw * Sin(arg)
+   proj%polej = 1.0 + proj%rsw * COS(arg)  
    if (print_detail_map) then
       write(unit=stdout,fmt='(A,2F10.3)') 'Computed pole i/j = ', proj%polei, proj%polej
    end if

@@ -28,7 +28,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
 
    real, parameter      :: GAMMA = 6.5E-3,  &
                        TC=t_kelvin+17.5,  &
-                       PCONST=10000. ,  &
+                       PCONST=10000.0 ,  &
                        EPS   = 0.622
                                                                           
    !     ... SEA LEVEL PRESSURE                                            
@@ -37,7 +37,7 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
                                                                           
    ! COMPUTE PRESSURE AT PCONST MB ABOVE SURFACE (PL)                                                                                     
 
-   if (terr <= 0.) then
+   if (terr <= 0.0) then
       slp9 = psfc9
       ! slp = psfc
       return
@@ -67,17 +67,17 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
    ! GET TEMPERATURE AT PL (TL), EXTRAPOLATE T AT SURFACE (TS)     
    ! AND T AT SEA LEVEL (T0) WITH 6.5 K/KM LAPSE RATE              
 
-   TLO9=t9(KLO) * (EPS+q(KLO))/(EPS*(1.+q(KLO))) + &
-        q9(KLO)*t(KLO)*(1.0-EPS)/(EPS*(1.+q(KLO))**2)
-   TLO=t(KLO) * (EPS+q(KLO))/(EPS*(1.+q(KLO)))
-   THI9=t9(KHI) * (EPS+q(KHI))/(EPS*(1.+q(KHI)))+   &
-        q9(KHI)*t(KHI)*(1.0-EPS)/(EPS*(1.+q(KHI))**2)
-   THI=t(KHI) * (EPS+q(KHI))/(EPS*(1.+q(KHI)))
+   TLO9=t9(KLO) * (EPS+q(KLO))/(EPS*(1.0+q(KLO))) + &
+        q9(KLO)*t(KLO)*(1.0-EPS)/(EPS*(1.0+q(KLO))**2)
+   TLO=t(KLO) * (EPS+q(KLO))/(EPS*(1.0+q(KLO)))
+   THI9=t9(KHI) * (EPS+q(KHI))/(EPS*(1.0+q(KHI)))+   &
+        q9(KHI)*t(KHI)*(1.0-EPS)/(EPS*(1.0+q(KHI))**2)
+   THI=t(KHI) * (EPS+q(KHI))/(EPS*(1.0+q(KHI)))
    COEF1=ALOG(PL/p(KHI))
    COEF2=ALOG(p(KLO)/p(KHI))
    TL9=(1.0-COEF1/COEF2)*THI9+COEF1/COEF2*TLO9       &
        -(THI-TLO)/(COEF2*PL)*PL9                 &
-       +((THI-TLO)/(COEF2*p(KHI))*(1.-COEF1/COEF2))*p9(KHI)   &
+       +((THI-TLO)/(COEF2*p(KHI))*(1.0-COEF1/COEF2))*p9(KHI)   &
        +(THI-TLO)*COEF1/(COEF2*COEF2*p(KLO))*p9(KLO)
    TL=THI-(THI-TLO)*COEF1/COEF2
    TS9=TL9*(psfc/PL)**XTERM+psfc9*XTERM*(TL/PL)*(psfc/PL)**  &
@@ -100,10 +100,10 @@ subroutine da_tpq_to_slp_lin ( T, Q, P, TERR, PSFC, T9, Q9, P9, PSFC9, SLP9)
 
    ! COMPUTE SEA LEVEL PRESSURE                                    
 
-   slp9=psfc9*EXP(2.*gravity*TERR/(gas_constant*(TS+T0)))  &
-          -psfc*EXP(2.*gravity*TERR/(gas_constant*(TS+T0)))*  &
-          2.*gravity*TERR/(gas_constant*(TS+T0)**2)*(TS9+T09)
-   ! slp=psfc*EXP(2.*gravity*terr/(gas_constant*(TS+T0)))
+   slp9=psfc9*EXP(2.0*gravity*TERR/(gas_constant*(TS+T0)))  &
+          -psfc*EXP(2.0*gravity*TERR/(gas_constant*(TS+T0)))*  &
+          2.0*gravity*TERR/(gas_constant*(TS+T0)**2)*(TS9+T09)
+   ! slp=psfc*EXP(2.0*gravity*terr/(gas_constant*(TS+T0)))
 
 end subroutine da_tpq_to_slp_lin
 

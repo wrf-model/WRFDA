@@ -39,13 +39,13 @@ subroutine da_sfc_pre_lin (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    ! 1.  MODEL AND OBSERVATION VIRTUAL TEMPERATURE
    ! ---------------------------------------------
 
-   tvsm_prime = tsm_prime * (1. + 0.608 * qsm) &
+   tvsm_prime = tsm_prime * (1.0 + 0.608 * qsm) &
               + qsm_prime * tsm * 0.608
-   tvsm = tsm  * (1. + 0.608 * qsm)
+   tvsm = tsm  * (1.0 + 0.608 * qsm)
 
    if (present(to) .and. present(qvo)) then
       tvo_prime = 0.0
-      tvo = to  * (1. + 0.608 * qvo)
+      tvo = to  * (1.0 + 0.608 * qvo)
    else if (present(to) .and. .not.present(qvo)) then
       tvo_prime = 0.0
       tvo = to

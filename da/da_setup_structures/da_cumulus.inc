@@ -19,8 +19,8 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
    real      :: TLL, QLL, PLL, ZLL, TBAR, PBAR, QBAR
    real      :: DP, DZ, DDT, DT
 
-   CP=1004.
-   R=2000./7.
+   CP=1004.0
+   R=2000.0/7.0
    HL=2.49E06
    DT=0.1
    IA=1000
@@ -63,16 +63,16 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
 
          T(L)=TLL-(K*DT)
 
-         call da_qfrmrh(P, T(L), 100., Q(L))
+         call da_qfrmrh(P, T(L), 100.0, Q(L))
 
          TBAR=0.5*(T(L)+TLL)
          QBAR=0.5*(Q(L)+QLL)
          PBAR=0.5*(P+PLL)
          DP=PLL-P
-         DZ=(R*TBAR*(1.+0.61*QBAR)*DP)/(gravity*PBAR)
+         DZ=(R*TBAR*(1.0+0.61*QBAR)*DP)/(gravity*PBAR)
          Z(L)=ZLL+DZ
          ET=gravity*Z(L)+CP*T(L)+HL*Q(L)
-         if ((ET-EM) <= 0.) exit
+         if ((ET-EM) <= 0.0) exit
       end do
    end do
 
@@ -81,7 +81,7 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
    do K=kte,NCB+1,-1
       DDT=T(K)-TE(K)
 
-      if (DDT >= 0.) then
+      if (DDT >= 0.0) then
          LCT=K
          exit
       end if
@@ -91,7 +91,7 @@ subroutine da_cumulus (ZCB, TCB, QCB, PCB, PK, TE,                &
 
    do K=NCB,kte
       DDT=T(K)-TE(K)
-      if (DDT >= 0.) then
+      if (DDT >= 0.0) then
          LCB=K
          exit
       end if

@@ -13,7 +13,7 @@ subroutine da_transform_xtospeed_lin(TGL_speed,U,V,TGL_u,TGL_v)
 
    if (trace_use) call da_trace_entry("da_transform_xtospeed_lin")
 
-   speed = sqrt(U*U + V*V + 1.E-6)
+   speed = sqrt(U*U + V*V + 1.0e-6)
 
    TGL_speed = (U*TGL_u + V*TGL_v)/speed
 

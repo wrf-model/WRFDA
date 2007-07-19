@@ -16,13 +16,13 @@ subroutine da_ao_stats_radar (stats_unit, oi, re)
 
    nrv = 0
    nrf = 0
-   num_radar_tot = 0.
+   num_radar_tot = 0.0
 
    radar%maximum%rv = maxmin_type (missing_r, 0, 0)
    radar%maximum%rf = maxmin_type (missing_r, 0, 0)
    radar%minimum%rv = maxmin_type(-missing_r, 0, 0)
    radar%minimum%rf = maxmin_type(-missing_r, 0, 0)
-   radar%average = residual_radar1_type(0.0, 0.0)
+   radar%average = residual_radar1_type(0, 0.0)
    radar%rms_err = radar%average
 
    if (oi%num_radar > 0) then

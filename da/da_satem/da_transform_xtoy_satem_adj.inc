@@ -25,10 +25,10 @@ subroutine da_transform_xtoy_satem_adj(iv, jo_grad_y, jo_grad_x, grid)
    real, dimension(kts-1:kte+1)       :: ADJ_pre_ma,ADJ_tv_ma
    real                           :: ADJ_tv1,ADJ_tv2
 
-   ADJ_pre_ma(:) = 0.
-   ADJ_tv_ma(:)  = 0.
-   ADJ_tv1 = 0.
-   ADJ_tv2 = 0.
+   ADJ_pre_ma(:) = 0.0
+   ADJ_tv_ma(:)  = 0.0
+   ADJ_tv1 = 0.0
+   ADJ_tv2 = 0.0
 
    if (iv%num_satem > 0) then
       do n=iv%ob_numb(iv%current_ob_time-1)%satem + 1, &
@@ -57,7 +57,7 @@ subroutine da_transform_xtoy_satem_adj(iv, jo_grad_y, jo_grad_x, grid)
          ! [4.0] Adjoint calculation of satem thickness
 
          do k=1, num_levs
-            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.) then
+            if (ABS(iv % satem(n) %p (k) - missing_r) > 1.0) then
                call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma, &
                  ks,ke)
 

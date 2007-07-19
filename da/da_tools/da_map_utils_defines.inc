@@ -90,7 +90,7 @@
    !       1. Any arguments that are a latitude value are expressed in 
    !          degrees north with a valid range of -90 -> 90
    !       2. Any arguments that are a longitude value are expressed in
-   !          degrees east with a valid range of -180 -> 180.
+   !          degrees east with a valid range of -180 -> 180
    !       3. Distances are in meters and are always positive.
    !       4. The standard longitude (stdlon) is defined as the longitude
    !          line which is parallel to the grid's y-axis (j-direction), along
@@ -174,7 +174,7 @@
 
    ! Mean Earth Radius in m.  The value below is consistent
    ! with NCEP's routines and grids.
-   ! real, public , parameter    :: earth_radius_m = 6371200. ! from Brent
+   ! real, public , parameter    :: earth_radius_m = 6371200.0 ! from Brent
    real, public , parameter    :: earth_radius_m = 6370000.0
    real, public , parameter    :: radians_per_degree = pi / 180.0
 

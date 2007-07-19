@@ -49,8 +49,8 @@ subroutine da_check_vptox_adjoint(grid,ne, be, ep, vp)
    grid%xa % u(:,:,:) = grid%xa % u(:,:,:) / typical_u_rms**2
    grid%xa % v(:,:,:) = grid%xa % v(:,:,:) / typical_v_rms**2
 
-   vp%v1(:,:,:)=0.
-   vp%v2(:,:,:)=0.
+   vp%v1(:,:,:)=0.0
+   vp%v2(:,:,:)=0.0
 
    call da_psichi_to_uv_adj(grid%xa % u, grid%xa % v, grid%xb % coefx,   &
                              grid%xb % coefy, vp % v1, vp % v2)

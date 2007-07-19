@@ -134,7 +134,7 @@ subroutine da_transform_xtoy_rttov_adj ( iv, jo_grad_y, jo_grad_x )
             do n = 1, l_num_rad
                d_con_vars(n) % t(:) = con_vars(n) % t(:) 
                d_con_vars(n) % q(:) = con_vars(n) % q(:)
-               ! d_aux_vars(n) % fastem(:) = 0.
+               ! d_aux_vars(n) % fastem(:) = 0.0
             end do
             d_con_vars(1:l_num_rad) % nlevels  = con_vars(1:l_num_rad) % nlevels
             d_con_vars(1:l_num_rad) % ps       = con_vars(1:l_num_rad) % ps

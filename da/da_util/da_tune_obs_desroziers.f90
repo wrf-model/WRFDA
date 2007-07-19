@@ -2200,7 +2200,7 @@ subroutine da_read_jo_actual( ob )
    if ( rtminit_nsensor > 0 ) then   
       do n = 1,rtminit_nsensor
          ob%rad(n)%num_rad_tot(:) = 0
-         ob%rad(n)%joa_rad(:) = 0.
+         ob%rad(n)%joa_rad(:) = 0.0
       end do
    end if
 

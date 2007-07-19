@@ -27,7 +27,7 @@ subroutine da_transform_xtotb(grid)
          ! effective surface air temperature (263 - 303)
 
          ta          = grid%xb%tgrn(i,j) + &
-                       (grid%xb%t(i,j,kts)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
+                       (grid%xb%t(i,j,kts)-grid%xb%tgrn(i,j))*log(2.0/0.0001)/ &
                        log((grid%xb%h(i,j,kts) - grid%xb%terr(i,j))/0.0001)
 
          ! gamma is an emperical formula and zcld is given for now
@@ -39,12 +39,12 @@ subroutine da_transform_xtotb(grid)
          ! total precipitable water in cm
          ! total precipitable water in (kg/m**2) (0 - 70)
 
-         tpw          = grid%xb%tpw(i,j)*10.
+         tpw          = grid%xb%tpw(i,j)*10.0
          speed        = grid%xb%speed(i,j)
 
          ! Column liquid water (kg/m**2)  (0-0.5) (no data now. So do it later)
 
-         alw          = 0.
+         alw          = 0.0
 
          ! Column height weighted moisture density on the grid locally 
 
@@ -56,17 +56,16 @@ subroutine da_transform_xtotb(grid)
 
          ! Column moisture density on the grid locally
 
-         htpw          = zrhom/tpw/1000.
+         htpw          = zrhom/tpw/1000.0
 
-         call tb(1,53.,psfc,ta,gamma,sst,tpw,htpw, &
-                 speed,alw,zcld,grid%xb%tb19v(i,j),grid%xb%tb19h(i,j))
-         call tb(2,53.,psfc,ta,gamma,sst,tpw,htpw, &
-                 speed,alw,zcld,grid%xb%tb22v(i,j),dum1)
-         call tb(3,53.,psfc,ta,gamma,sst,tpw,htpw, &
-                 speed,alw,zcld,grid%xb%tb37v(i,j),grid%xb%tb37h(i,j))
-         call tb(4,53.,psfc,ta,gamma,sst,tpw,htpw, &
-                 speed,alw,zcld,grid%xb%tb85v(i,j),grid%xb%tb85h(i,j))
-
+         call tb(1,53.0,psfc,ta,gamma,sst,tpw,htpw, &
+            speed,alw,zcld,grid%xb%tb19v(i,j),grid%xb%tb19h(i,j))
+         call tb(2,53.0,psfc,ta,gamma,sst,tpw,htpw, &
+            speed,alw,zcld,grid%xb%tb22v(i,j),dum1)
+         call tb(3,53.0,psfc,ta,gamma,sst,tpw,htpw, &
+            speed,alw,zcld,grid%xb%tb37v(i,j),grid%xb%tb37h(i,j))
+         call tb(4,53.0,psfc,ta,gamma,sst,tpw,htpw, &
+            speed,alw,zcld,grid%xb%tb85v(i,j),grid%xb%tb85h(i,j))
       end do
    end do
 

@@ -29,8 +29,8 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
    !---------------------------------------------------------------------------
 
    if (.not. global) then
-      um(ims:ime,jms:jme) = 0.
-      vm(ims:ime,jms:jme) = 0.
+      um(ims:ime,jms:jme) = 0.0
+      vm(ims:ime,jms:jme) = 0.0
       inv_2ds = 0.5 / grid%xb%ds
    end if
 
@@ -65,7 +65,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
             do i = its, ite    ! This is different to original
                div(i,j-1,k)=div(i,j-1,k)+div(i,j,k)*one_third*4.0
                div(i,j-2,k)=div(i,j-2,k)-div(i,j,k)*one_third
-               div(i,j,k)=0.
+               div(i,j,k)=0.0
             end do
          end if
 
@@ -76,7 +76,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
             do i = its, ite    ! This is different to original
                div(i,j+1,k)=div(i,j+1,k)+div(i,j,k)*one_third*4.0
                div(i,j+2,k)=div(i,j+2,k)-div(i,j,k)*one_third
-               div(i,j,k)=0.
+               div(i,j,k)=0.0
             end do
          end if
 
@@ -87,7 +87,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
             do j = jts, jte
                div(i-1,j,k)=div(i-1,j,k)+div(i,j,k)*one_third*4.0
                div(i-2,j,k)=div(i-2,j,k)-div(i,j,k)*one_third
-               div(i,j,k)=0.
+               div(i,j,k)=0.0
             end do
          end if
 
@@ -98,7 +98,7 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
             do j = jts, jte
                div(i+1,j,k)=div(i+1,j,k)+div(i,j,k)*one_third*4.0
                div(i+2,j,k)=div(i+2,j,k)-div(i,j,k)*one_third
-               div(i,j,k)=0.
+               div(i,j,k)=0.0
             end do
          end if
 
@@ -134,8 +134,8 @@ subroutine da_uv_to_divergence_adj(grid, u, v, div)
          v(is-1:ie+1,js-1:je+1,k) = v(is-1:ie+1,js-1:je+1,k) &
             +vm(is-1:ie+1,js-1:je+1) / grid%xb%map_factor(is-1:ie+1,js-1:je+1)
 
-         um(:,:)=0.
-         vm(:,:)=0.
+         um(:,:)=0.0
+         vm(:,:)=0.0
 
       else
 

@@ -12,8 +12,8 @@ subroutine da_ijll_merc(i, j, proj, lat, lon)
    real, intent(out)             :: lat
    real, intent(out)             :: lon 
 
-   lat = 2.0*ATAN(EXP(proj%dlon*(proj%rsw + j-1.)))*deg_per_rad - 90.0
-   lon = (i-1.)*proj%dlon*deg_per_rad + proj%lon1
+   lat = 2.0*ATAN(EXP(proj%dlon*(proj%rsw + j-1.0)))*deg_per_rad - 90.0
+   lon = (i-1.0)*proj%dlon*deg_per_rad + proj%lon1
    if (lon > 180.0) lon = lon - 360.0
    if (lon < -180.0) lon = lon + 360.0
 

@@ -129,7 +129,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_gint=0.0
    ADJ_zgint=0.0
    ADJ_hint=0.0
-   ADJ_zhint=0.
+   ADJ_zhint=0.0
    ADJ_ginf=0.0
    ADJ_zginf=0.0
    ADJ_hinf=0.0
@@ -145,7 +145,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_chio=0.0
    ADJ_chiv=0.0
    ADJ_ezho=0.0
-   ADJ_ezhv=0.
+   ADJ_ezhv=0.0
    ADJ_alpha=0.0
    ADJ_alph2=0.0
    ADJ_alph3=0.0
@@ -190,7 +190,7 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_uprim=0.0
    ADJ_term1=0.0
    ADJ_term2=0.0
-   ADJ_term3=0.
+   ADJ_term3=0.0
 
    ! base fields
 
@@ -463,10 +463,10 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_ezhv   = ezhoo*ADJ_ezhoov  + ADJ_ezhv
    ADJ_ezho   = ADJ_ezhovv*ezhvv  + ADJ_ezho
    ADJ_ezhvv  = ezho*ADJ_ezhovv   + ADJ_ezhvv
-   ADJ_ezhv   = 2.*ezhv*ADJ_ezhvv + ADJ_ezhv
+   ADJ_ezhv   = 2.0*ezhv*ADJ_ezhvv + ADJ_ezhv
    ADJ_ezho   = ADJ_ezhov*ezhv    + ADJ_ezho
    ADJ_ezhv   = ezho*ADJ_ezhov    + ADJ_ezhv
-   ADJ_ezho   = 2.*ezho*ADJ_ezhoo + ADJ_ezho
+   ADJ_ezho   = 2.0*ezho*ADJ_ezhoo + ADJ_ezho
    ADJ_sigvv  = ADJ_sigvvv*sigv   + ADJ_sigvv
    ADJ_sigv   = sigvv*ADJ_sigvvv  + ADJ_sigv
    ADJ_sigo   = ADJ_sigovv*sigvv  + ADJ_sigo
@@ -475,8 +475,8 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_sigv   = sigoo*ADJ_sigoov  + ADJ_sigv
    ADJ_sigoo  = ADJ_sigooo*sigo   + ADJ_sigoo
    ADJ_sigo   = sigoo*ADJ_sigooo  + ADJ_sigo
-   ADJ_sigv   = 2.*sigv*ADJ_sigvv + ADJ_sigv
-   ADJ_sigo   = 2.*sigo*ADJ_sigoo + ADJ_sigo
+   ADJ_sigv   = 2.0*sigv*ADJ_sigvv + ADJ_sigv
+   ADJ_sigo   = 2.0*sigo*ADJ_sigoo + ADJ_sigo
    ADJ_sigo   = ADJ_sigov*sigv    + ADJ_sigo
    ADJ_sigv   = sigo*ADJ_sigov    + ADJ_sigv
 
@@ -542,16 +542,16 @@ subroutine da_effht_adj(ho,hv,sigo,sigv,mu,zcld,hdn,hup,hdninf,hupinf, &
    ADJ_mu2  = ADJ_etnthmu2/18.0d0 + ADJ_mu2
    ADJ_mu2  = ADJ_sixthmu2/6.0d0  + ADJ_mu2
    ADJ_mu   = 0.5d0*ADJ_halfmu    + ADJ_mu
-   ADJ_mu   = 2.*mu*ADJ_mu2       + ADJ_mu
+   ADJ_mu   = 2.0*mu*ADJ_mu2       + ADJ_mu
 
    ADJ_beta = ADJ_beta3*beta2               + ADJ_beta
    ADJ_beta2 = beta*ADJ_beta3               + ADJ_beta2
-   ADJ_beta = 2.*beta*ADJ_beta2             + ADJ_beta
+   ADJ_beta = 2.0*beta*ADJ_beta2             + ADJ_beta
    ADJ_ezho = ADJ_beta                      + ADJ_ezho
    ADJ_ezhv = ADJ_beta                      + ADJ_ezhv
    ADJ_alpha = ADJ_alph3*alph2              + ADJ_alpha
    ADJ_alph2 = alpha*ADJ_alph3              + ADJ_alph2
-   ADJ_alpha = 2.*alpha*ADJ_alph2           + ADJ_alpha
+   ADJ_alpha = 2.0*alpha*ADJ_alph2           + ADJ_alpha
    ADJ_sigo = ADJ_alpha                     + ADJ_sigo
    ADJ_sigv = ADJ_alpha                     + ADJ_sigv
    ADJ_sigv =  ADJ_ezhv*exp(-chiv)          + ADJ_sigv

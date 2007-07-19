@@ -96,12 +96,12 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
    end do
    do j=js,je
       do i=is,ie
-         grid%em_g_ph_2(i,j,ks)=0.
+         grid%em_g_ph_2(i,j,ks)=0.0
          do k=ks,ke
             rho_cgrid=grid%xb%rho(i,j,k) &
                       *(grid%xa%p(i,j,k)/grid%xb%p(i,j,k) &
                       -grid%xa%t(i,j,k)/grid%xb%t(i,j,k) &
-                      -0.61*grid%xa%q(i,j,k)/(1.+0.61*grid%xb%q(i,j,k)))
+                      -0.61*grid%xa%q(i,j,k)/(1.0+0.61*grid%xb%q(i,j,k)))
             grid%em_g_ph_2(i,j,k+1)=grid%em_g_ph_2(i,j,k) &
                -(g_press(i,j,k+1)-g_press(i,j,k) &
                +(grid%em_ph_2(i,j,k+1)-grid%em_ph_2(i,j,k))*rho_cgrid) &
@@ -177,19 +177,19 @@ subroutine da_transfer_xatowrftl(grid, config_flags, filnam)
    ! and on C-Grid, this will lead to C(N+1)=(A(N)+A(N+1))/2=(3A(N)-A(N-1))/2
 
    ! The eastern boundary
-   grid%em_g_u_2(ie+1,js:je,ks:ke)=(3.0*grid%xa%u(ie,js:je,ks:ke)-grid%xa%u(ie-1,js:je,ks:ke))/2.
+   grid%em_g_u_2(ie+1,js:je,ks:ke)=(3.0*grid%xa%u(ie,js:je,ks:ke)-grid%xa%u(ie-1,js:je,ks:ke))/2.0
 
    ! The northern boundary
-   grid%em_g_v_2(is:ie,je+1,ks:ke)=(3.0*grid%xa%v(is:ie,je,ks:ke)-grid%xa%v(is:ie,je-1,ks:ke))/2.
+   grid%em_g_v_2(is:ie,je+1,ks:ke)=(3.0*grid%xa%v(is:ie,je,ks:ke)-grid%xa%v(is:ie,je-1,ks:ke))/2.0
 
    ! To keep the gradient, A(0) = 2A(1)-A(2)
    ! and on C-Grid, this will lead to C(1)=(A(0)+A(1))/2=(3A(1)-A(2))/2
 
    ! The western boundary
-   grid%em_g_u_2(is,js:je,ks:ke)=(3.0*grid%xa%u(is,js:je,ks:ke)-grid%xa%u(is+1,js:je,ks:ke))/2.
+   grid%em_g_u_2(is,js:je,ks:ke)=(3.0*grid%xa%u(is,js:je,ks:ke)-grid%xa%u(is+1,js:je,ks:ke))/2.0
 
    ! The southern boundary
-   grid%em_g_v_2(is:ie,js,ks:ke)=(3.0*grid%xa%v(is:ie,js,ks:ke)-grid%xa%v(is:ie,js+1,ks:ke))/2.
+   grid%em_g_v_2(is:ie,js,ks:ke)=(3.0*grid%xa%v(is:ie,js,ks:ke)-grid%xa%v(is:ie,js+1,ks:ke))/2.0
 
 #endif
 

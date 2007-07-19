@@ -105,7 +105,7 @@ subroutine da_sfc_pre_adj (psfcm_prime, psm_prime, tsm_prime, qsm_prime, &
    ! 2.5 tvsm_prime ==>  tsm_prime, qsm_prime
    ! ----------------------------------------
 
-   tsm_prime = tvsm_prime * (1. + 0.608 * qsm) + tsm_prime
+   tsm_prime = tvsm_prime * (1.0 + 0.608 * qsm) + tsm_prime
    qsm_prime = tvsm_prime * tsm * 0.608 + qsm_prime
 
 end subroutine da_sfc_pre_adj

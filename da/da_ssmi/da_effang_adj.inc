@@ -39,13 +39,13 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
    data s85v /.116E+2,.263E+2,-.101E+2,-.358E+1,.270E+0,.175E+1/
    data s85h /.736E+1,.568E+2,-.254E+2,-.248E+1,.196E+0,.387E+1/
 
-   alnsig=0.;gg=0.;ggg=0.;xd=0.;xx=0.;xd_save=0.;xx_save=0.
-   z1=0.;z2=0.;z3=0.;z4=0.;z5=0.;z6=0.;y=0.;dth=0.;angh=0.
-   angv=0.;alnthv=0.;alnthh=0.;alnthv_save=0.;alnthh_save=0.
-   ADJ_alnsig=0.;ADJ_gg=0.;ADJ_ggg=0.;ADJ_xd=0.
-   ADJ_z1=0.;ADJ_z2=0.;ADJ_z3=0.;ADJ_z4=0.;ADJ_z5=0.
-   ADJ_z6=0.;ADJ_alnthv=0.;ADJ_y=0.;ADJ_dth=0.;ADJ_angh=0.
-   ADJ_angv=0.;ADJ_xx=0.;ADJ_alnthh=0.
+   alnsig=0.0;gg=0.0;ggg=0.0;xd=0.0;xx=0.0;xd_save=0.0;xx_save=0.0
+   z1=0.0;z2=0.0;z3=0.0;z4=0.0;z5=0.0;z6=0.0;y=0.0;dth=0.0;angh=0.0
+   angv=0.0;alnthv=0.0;alnthh=0.0;alnthv_save=0.0;alnthh_save=0.0
+   ADJ_alnsig=0.0;ADJ_gg=0.0;ADJ_ggg=0.0;ADJ_xd=0.0
+   ADJ_z1=0.0;ADJ_z2=0.0;ADJ_z3=0.0;ADJ_z4=0.0;ADJ_z5=0.0
+   ADJ_z6=0.0;ADJ_alnthv=0.0;ADJ_y=0.0;ADJ_dth=0.0;ADJ_angh=0.0
+   ADJ_angv=0.0;ADJ_xx=0.0;ADJ_alnthh=0.0
 
 
    if (gx2 .le. 0.0 .or. sigma .le. 0.0) then
@@ -245,7 +245,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
 
-      ADJ_xd  = 2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd
 
       ! vertical
@@ -274,7 +274,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
 
-      ADJ_xd  = 2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx + ADJ_xd
 
       ADJ_alnsig = ADJ_xd + ADJ_alnsig
 
@@ -300,7 +300,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx 
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
 
-      ADJ_xd  =  2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  =  2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd
 
       ! vertical
@@ -328,7 +328,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_ggg = xd*ADJ_z2  + ADJ_ggg
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
-      ADJ_xd  =  2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  =  2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd     + ADJ_alnsig
 
    else if (ifreq .eq. 3) then 
@@ -352,7 +352,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_ggg = xd*ADJ_z2  + ADJ_ggg
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
-      ADJ_xd  = 2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd
 
       ! vertical
@@ -380,7 +380,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_ggg = xd*ADJ_z2  + ADJ_ggg
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
-      ADJ_xd  = 2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd  + ADJ_alnsig
 
    else if (ifreq .eq. 4) then 
@@ -404,7 +404,7 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_ggg = xd*ADJ_z2  + ADJ_ggg
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
-      ADJ_xd  = 2.*xd*ADJ_xx + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx + ADJ_xd
       ADJ_alnsig = ADJ_xd
 
       ! vertical
@@ -432,18 +432,18 @@ subroutine da_effang_adj(ifreq,theta,gx2,sigma,effangv,effangh,     &
       ADJ_ggg = xd*ADJ_z2  + ADJ_ggg
       ADJ_xx  = ADJ_z1*ggg + ADJ_xx
       ADJ_ggg = xx*ADJ_z1  + ADJ_ggg
-      ADJ_xd  = 2.*xd*ADJ_xx  + ADJ_xd
+      ADJ_xd  = 2.0*xd*ADJ_xx  + ADJ_xd
       ADJ_alnsig = ADJ_xd  + ADJ_alnsig
    end if
 
    ADJ_gg  = ADJ_ggg*gx2   + ADJ_gg
    ADJ_gx2 = gg*ADJ_ggg    + ADJ_gx2
-   ADJ_gx2 = 2.*gx2*ADJ_gg + ADJ_gx2
+   ADJ_gx2 = 2.0*gx2*ADJ_gg + ADJ_gx2
 
-   if (abs(sigma) .gt. 0.) then
+   if (abs(sigma) .gt. 0.0) then
       ADJ_sigma = ADJ_alnsig/sigma + ADJ_sigma
    ! else
-   !    ADJ_sigma = 0.
+   !    ADJ_sigma = 0.0
    end if
 
 end subroutine da_effang_adj

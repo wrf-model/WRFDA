@@ -12,7 +12,7 @@ subroutine da_matmulti(mata,matb,matc,ni,nj,nab)
 
    integer             :: i, j, k            ! Loop counters
 
-   matc = 0.
+   matc = 0.0
 
    do i=1,ni
       do j=1,nj 

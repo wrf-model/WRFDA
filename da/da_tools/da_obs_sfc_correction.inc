@@ -81,10 +81,10 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    ! 3.1 Compute the surface OBS pressure from mean sea level pressure
 
    mslp = sfc_obs % loc % slp % inv
-   if (abs(mslp - missing_r) > 1.) then
+   if (abs(mslp - missing_r) > 1.0) then
       psfc = missing_r
-      if (abs(ho - missing_r) > 1.) then
-         if (abs(to - missing_r) > 1.) then
+      if (abs(ho - missing_r) > 1.0) then
+         if (abs(to - missing_r) > 1.0) then
             call da_sfcprs (kts, kte, pressure, t_mdl, q_mdl, &
                          height, psfc, mslp, ho, to)
          else
@@ -106,8 +106,8 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
    ! 3.2 Check that obs pressure and height are present
    !     ----------------------------------------------
 
-   if (abs(po - missing_r) < 1.  .OR. &
-       abs(ho - missing_r) < 1.) then
+   if (abs(po - missing_r) < 1.0  .OR. &
+       abs(ho - missing_r) < 1.0) then
 
       return
 
@@ -140,8 +140,8 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.2 Correction wind based on similarity laws
       !     -------------------------------------------
 
-      if ((abs(sfc_obs % u % inv - missing_r) > 1.).AND.&
-          (abs(sfc_obs % v % inv - missing_r) > 1.))then
+      if ((abs(sfc_obs % u % inv - missing_r) > 1.0).AND.&
+          (abs(sfc_obs % v % inv - missing_r) > 1.0))then
 
          ! 3.2.1 Correction factor
 
@@ -176,10 +176,10 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
 
          !  Correct data
 
-         if (abs(to  - missing_r) > 1. .and. &
-            abs(qo - missing_r) > 1.) then
+         if (abs(to  - missing_r) > 1.0 .and. &
+            abs(qo - missing_r) > 1.0) then
             call da_intpsfc_prs (val, ho, po, hm, tm, qm, to, qo)
-         else if (abs(to  - missing_r) > 1.) then
+         else if (abs(to  - missing_r) > 1.0) then
             call da_intpsfc_prs (val, ho, po, hm, tm, qm, to)
          else
             call da_intpsfc_prs (val, ho, po, hm, tm, qm)
@@ -194,7 +194,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.5 Correct temperature
       !     -------------------
 
-      if (abs(sfc_obs % t % inv - missing_r) > 1.) then
+      if (abs(sfc_obs % t % inv - missing_r) > 1.0) then
          !  Correct data
 
          call da_intpsfc_tem (val, ho, po, to, height, pressure, t_mdl, &
@@ -210,7 +210,7 @@ subroutine da_obs_sfc_correction(sfc_obs, xb)
       ! 3.6 Assign model lowest level height + 1m to observation
       !      ----------------------------------------------------- 
 
-      ! sfc_obs % h = height(kts) + 1.
+      ! sfc_obs % h = height(kts) + 1.0
 
       ! 3.7 Height QC
       !     ---------

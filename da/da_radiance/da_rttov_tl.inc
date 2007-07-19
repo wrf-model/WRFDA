@@ -74,7 +74,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
       profiles(n) % skin % surftype   = aux_vars (n) % surftype
       profiles(n) % skin % t          = aux_vars (n) % surft    
-      profiles(n) % skin % fastem (:) = 0.  ! aux_vars (n) % fastem (:)
+      profiles(n) % skin % fastem (:) = 0.0  ! aux_vars (n) % fastem (:)
 
       profiles(n) % s2m  % t    = aux_vars (n) % t2m
       profiles(n) % s2m  % q    = aux_vars (n) % q2m
@@ -86,8 +86,8 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       profiles(n) % zenangle    = aux_vars (n) % satzen
       profiles(n) % azangle     = aux_vars (n) % satazi
 
-      profiles(n) % ctp         = 500.
-      profiles(n) % cfraction   = 0.
+      profiles(n) % ctp         = 500.0
+      profiles(n) % cfraction   = 0.0
 
       profiles_tl(n) % nlevels    = con_vars_tl(n) % nlevels
       allocate ( profiles_tl(n)%p(profiles_tl(n) % nlevels), stat=alloc_status(1) )
@@ -106,7 +106,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       profiles_tl(n) % co2_data   = .false.
       profiles_tl(n) % clw_data   = .false.
 
-      profiles_tl(n) % p(:)       = 0.
+      profiles_tl(n) % p(:)       = 0.0
       profiles_tl(n) % t(:)       = con_vars_tl(n)%t(:)
       profiles_tl(n) % q(:)       = con_vars_tl(n)%q(:)
       profiles_tl(n) % o3(:)      = 0.0 !con_vars(n)%o3(:)
@@ -114,21 +114,21 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       profiles_tl(n) % clw(:)     = 0.0 !con_vars(n)%clw(:)
 
       profiles_tl(n) % skin % surftype   = -1
-      profiles_tl(n) % skin % t          = 0.  !aux_vars_tl (n) % surft
-      profiles_tl(n) % skin % fastem (:) = 0.  ! aux_vars (n) % fastem (:)
+      profiles_tl(n) % skin % t          = 0.0  !aux_vars_tl (n) % surft
+      profiles_tl(n) % skin % fastem (:) = 0.0  ! aux_vars (n) % fastem (:)
 
-      profiles_tl(n) % s2m  % t    = 0. !aux_vars_tl (n) % t2m
-      profiles_tl(n) % s2m  % q    = 0. !aux_vars_tl (n) % q2m
-      profiles_tl(n) % s2m  % o    = 0. !aux_vars_tl (n) % o3
+      profiles_tl(n) % s2m  % t    = 0.0 !aux_vars_tl (n) % t2m
+      profiles_tl(n) % s2m  % q    = 0.0 !aux_vars_tl (n) % q2m
+      profiles_tl(n) % s2m  % o    = 0.0 !aux_vars_tl (n) % o3
       profiles_tl(n) % s2m  % p    = con_vars_tl (n) % ps
-      profiles_tl(n) % s2m  % u    = 0. !aux_vars_tl (n) % u10
-      profiles_tl(n) % s2m  % v    = 0. !aux_vars_tl (n) % v10
+      profiles_tl(n) % s2m  % u    = 0.0 !aux_vars_tl (n) % u10
+      profiles_tl(n) % s2m  % v    = 0.0 !aux_vars_tl (n) % v10
 
       profiles_tl(n) % zenangle    = -1
       profiles_tl(n) % azangle     = -1
 
-      profiles_tl(n) % ctp         = 0. !500.
-      profiles_tl(n) % cfraction   = 0.
+      profiles_tl(n) % ctp         = 0.0 !500.
+      profiles_tl(n) % cfraction   = 0.0
 
    end do
 
@@ -199,7 +199,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
          (/"mem allocation error prior to rttov_tl"/))
    End If
 
-   surfem (:) = 0.
+   surfem (:) = 0.0
 #ifdef RTTOV
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
@@ -211,18 +211,18 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
    if (coef%id_sensor == 1)  then        ! infrared sensor 
       calcemis (1:nchannels)   = .true.
-      emissivity (1:nchannels) = 0.
-      emissivity_tl (1:nchannels) = 0.
+      emissivity (1:nchannels) = 0.0
+      emissivity_tl (1:nchannels) = 0.0
    else if (coef%id_sensor == 2)  then   ! microwave sensor
       do n = 1, nprofiles
          if ( profiles(n) % skin % surftype == 1) then  ! sea  
             calcemis ((n-1)*nc+1:n*nc) = .true.
-            emissivity ((n-1)*nc+1:n*nc) = 0.
-            emissivity_tl ((n-1)*nc+1:n*nc) = 0.
+            emissivity ((n-1)*nc+1:n*nc) = 0.0
+            emissivity_tl ((n-1)*nc+1:n*nc) = 0.0
          else                                       ! 0:land ; 2:sea-ice
             calcemis ((n-1)*nc+1:n*nc) = .false.
             emissivity ((n-1)*nc+1:n*nc) = 0.9
-            emissivity_tl ((n-1)*nc+1:n*nc) = 0.
+            emissivity_tl ((n-1)*nc+1:n*nc) = 0.0
          end if
       end do
    end if

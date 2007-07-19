@@ -161,7 +161,7 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       platform  % info % name(1:8) = subset
       platform  % info % id        = hdstr(1:5)
 
-      if (hdr(2) > 180.) hdr(2)=hdr(2)-360.
+      if (hdr(2) > 180.0) hdr(2)=hdr(2)-360.0
 
       ! Put a check on Lat 
       hdr(3) = MAX(hdr(3), -89.95)     

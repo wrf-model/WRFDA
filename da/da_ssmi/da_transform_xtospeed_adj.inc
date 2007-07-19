@@ -13,7 +13,7 @@ subroutine da_transform_xtospeed_adj(ADJ_speed,U,V,ADJ_u,ADJ_v)
 
    if (trace_use) call da_trace_entry("da_transform_xtospeed_adj")
 
-   speed = sqrt(U*U+V*V+ 1.E-6)
+   speed = sqrt(U*U+V*V+ 1.0e-6)
 
    ADJ_u = U*ADJ_speed/speed + ADJ_u
    ADJ_v = V*ADJ_speed/speed + ADJ_v

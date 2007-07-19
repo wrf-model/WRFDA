@@ -39,15 +39,15 @@ subroutine da_obs_proc_station(obs)
       rho  = obs % each(i) % rh  % inv
 
       if (ob_format == ob_format_ascii) then ! Calculate q if possible:
-         if (abs(po -  missing_r) > 1. .and. abs(to -  missing_r) > 1. .and. &
-             abs(rho-  missing_r) > 1.) then
+         if (abs(po -  missing_r) > 1.0 .and. abs(to -  missing_r) > 1.0 .and. &
+             abs(rho-  missing_r) > 1.0) then
 
             call da_tp_to_qs(to, po, es, qs)
 
-            if (rho > 100.) then
+            if (rho > 100.0) then
                qvo = qs
             else
-               qvo  = rho * qs / 100.
+               qvo  = rho * qs / 100.0
             end if
          else
             qvo       = missing_r

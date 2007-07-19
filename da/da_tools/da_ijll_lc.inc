@@ -21,8 +21,8 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
    real                          :: xx
    real                          :: yy
 
-   chi1 = (90. - proj%hemi*proj%truelat1)*rad_per_deg
-   chi2 = (90. - proj%hemi*proj%truelat2)*rad_per_deg
+   chi1 = (90.0 - proj%hemi*proj%truelat1)*rad_per_deg
+   chi2 = (90.0 - proj%hemi*proj%truelat2)*rad_per_deg
 
    ! See if we are in the southern hemispere and flip the indices
    ! if we are. 
@@ -48,7 +48,7 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
        
       ! Longitude
       lon = proj%stdlon + deg_per_rad * ATAN2(proj%hemi*xx,yy)/proj%cone
-      lon = MOD(lon+360., 360.)
+      lon = MOD(lon+360.0, 360.0)
 
       ! Latitude.  Latitude determined by solving an equation adapted 
       ! from:
@@ -56,15 +56,15 @@ subroutine da_ijll_lc(i, j, proj, lat, lon)
       ! Equations #20 in Appendix I.  
         
       if (chi1 == chi2) then
-         chi = 2.0*ATAN((r/TAN(chi1))**(1./proj%cone) * TAN(chi1*0.5))
+         chi = 2.0*ATAN((r/TAN(chi1))**(1.0/proj%cone) * TAN(chi1*0.5))
       else
-         chi = 2.0*ATAN((r*proj%cone/Sin(chi1))**(1./proj%cone) * TAN(chi1*0.5)) 
+         chi = 2.0*ATAN((r*proj%cone/Sin(chi1))**(1.0/proj%cone) * TAN(chi1*0.5)) 
       end if
       lat = (90.0-chi*deg_per_rad)*proj%hemi
    end if
 
-   if (lon > +180.) lon = lon - 360.
-   if (lon < -180.) lon = lon + 360.
+   if (lon > +180.0) lon = lon - 360.0
+   if (lon < -180.0) lon = lon + 360.0
 
 end subroutine da_ijll_lc
 

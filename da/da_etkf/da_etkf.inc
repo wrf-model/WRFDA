@@ -166,7 +166,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
 
       if (nout.ge.nstartaccum1) then
          write (unit=stdout,fmt=*) "OK"
-         squareinnosum = 0.
+         squareinnosum = 0.0
          do nt = nout-naccumt1+1, nout 
             read(99,rec=nt) squareinnosum1
             write (unit=stdout,fmt=*) "squareinnosum1=", squareinnosum1
@@ -211,7 +211,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
 
       do i = 1, nanals 
          do j = 1, nanals-1
-            cgamma(i,j) = C(i,j)*sqrt(1./eignv(j)) 
+            cgamma(i,j) = C(i,j)*sqrt(1.0/eignv(j)) 
          end do
       end do
 
@@ -270,7 +270,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
 
      write(109, rec=(nout-1)*3+3) rho
 
-   else if (naccumt2 .lt. 0.) then
+   else if (naccumt2 .lt. 0.0) then
       ! this is for the old formulation of ETKF in Wang and Bishop 2003
       rho = 1.0
    else
@@ -285,7 +285,7 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
    ! TR = C*(rho*gamma+I)^(-1/2)*C^T
    do i = 1, nanals
       do j = 1, nanals-1
-         T(i,j) = C(i,j)*sqrt(1./(rho*eignv(j)+1.)) 
+         T(i,j) = C(i,j)*sqrt(1.0/(rho*eignv(j)+1.0)) 
      end do
    end do
  
@@ -303,12 +303,12 @@ subroutine da_etkf(ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1, &
    write (unit=stdout,fmt=*) maxval(ens)
    write (unit=stdout,fmt=*) minval(ens)
    write (unit=stdout,fmt=*) "eigen/(eigen*rho+1)"
-   write (unit=stdout,fmt=*) eignv/(eignv*rho+1.)
-   sum_eignv = 0.
-   aftersum_eignv = 0.
+   write (unit=stdout,fmt=*) eignv/(eignv*rho+1.0)
+   sum_eignv = 0.0
+   aftersum_eignv = 0.0
    do i = 1, nanals
       sum_eignv = sum_eignv + eignv(i)
-      aftersum_eignv = aftersum_eignv + eignv(i)/(eignv(i)*rho+1.)
+      aftersum_eignv = aftersum_eignv + eignv(i)/(eignv(i)*rho+1.0)
    end do
    write (unit=stdout,fmt=*) "sum_eignv=", sum_eignv
    write (unit=stdout,fmt=*) "sum_aftereignv=", aftersum_eignv

@@ -36,11 +36,11 @@ subroutine da_transform_xtoy_gpspw_adj(grid, oi, jo_grad_y, jo_grad_x)
          dxm = oi%gpspw(n)%loc%dxm
 
          !  Initialise the varibles
-         dpw           = 0.
-         model_q(:)    = 0.
-         model_dq(:)   = 0.
-         model_rho(:)  = 0.
-         model_drho(:) = 0.
+         dpw           = 0.0
+         model_q(:)    = 0.0
+         model_dq(:)   = 0.0
+         model_rho(:)  = 0.0
+         model_drho(:) = 0.0
 
          obs_terr   = oi%gpspw(n)%info%elv
          model_terr = dym*(dxm*grid%xb%terr(i,j)   + dx*grid%xb%terr(i+1,j)) + &

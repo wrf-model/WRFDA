@@ -27,8 +27,8 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
             (log(pre_ma(ks)/pre_ma(ks+1)))**2)
       alpha = log(pre_ma(ks)/pre)/log(pre_ma(ks)/pre_ma(ks+1))
 
-      ADJ_pre_ma(ks-1)= 0.
-      ADJ_tv_ma(ks)   = ADJ_tv_ma(ks) + (1.-alpha)*ADJ_tv
+      ADJ_pre_ma(ks-1)= 0.0
+      ADJ_tv_ma(ks)   = ADJ_tv_ma(ks) + (1.0-alpha)*ADJ_tv
       ADJ_alpha        = (tv_ma(ks+1)-tv_ma(ks))*ADJ_tv
       ADJ_tv_ma(ks+1) = ADJ_tv_ma(ks+1) + alpha*ADJ_tv
 
@@ -44,8 +44,8 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
             (log(pre_ma(ke-1)/pre_ma(ke)))**2)
       alpha = log(pre_ma(ke-1)/pre)/log(pre_ma(ke-1)/pre_ma(ke))
 
-      ADJ_pre_ma(ke+1)    = 0.
-      ADJ_tv_ma(ke-1)     = ADJ_tv_ma(ke-1) + (1.-alpha)*ADJ_tv
+      ADJ_pre_ma(ke+1)    = 0.0
+      ADJ_tv_ma(ke-1)     = ADJ_tv_ma(ke-1) + (1.0-alpha)*ADJ_tv
       ADJ_alpha        = (tv_ma(ke)-tv_ma(ke-1))*ADJ_tv
       ADJ_tv_ma(ke)     = ADJ_tv_ma(ke) + alpha*ADJ_tv
 
@@ -63,7 +63,7 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
                   (log(pre_ma(k)/pre_ma(k+1)))**2)
             alpha = log(pre_ma(k)/pre)/log(pre_ma(k)/pre_ma(k+1))
 
-            ADJ_tv_ma(k)     = ADJ_tv_ma(k) + (1.-alpha)*ADJ_tv
+            ADJ_tv_ma(k)     = ADJ_tv_ma(k) + (1.0-alpha)*ADJ_tv
             ADJ_alpha        = (tv_ma(k+1)-tv_ma(k))*ADJ_tv
             ADJ_tv_ma(k+1)   = ADJ_tv_ma(k+1) + alpha * ADJ_tv
 
@@ -74,7 +74,7 @@ subroutine da_find_layer_adj(layer,tv,pre,pre_ma,tv_ma,ks,ke,     &
       end do
 
    end if
-   ADJ_tv           = 0.
+   ADJ_tv           = 0.0
  
 end subroutine da_find_layer_adj
 

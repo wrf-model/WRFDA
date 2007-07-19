@@ -18,7 +18,7 @@ subroutine da_autoc_adj(DT,SCR2,PRC,SCR29,PRC9,kts,kte,kms,kme)
    alpha = 0.001
 
    do k = kts, kte
-      if ( DT(k) <= 0. ) cycle
+      if ( DT(k) <= 0.0 ) cycle
 
       if ( SCR2(k) >= QCTH ) then
          SCR29(K) = SCR29(K) + alpha * PRC9(K)

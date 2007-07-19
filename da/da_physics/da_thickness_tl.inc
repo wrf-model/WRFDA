@@ -26,9 +26,9 @@ subroutine da_thickness_tl(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,pre1,pre2,  
              TGL_pre_ma(layer2)*tv2/pre_ma(layer2)
    TGL_thk = 0.5 * gas_constant/gravity * TGL_thk
 
-   TGL_p_tmp(layer1) = 0.
+   TGL_p_tmp(layer1) = 0.0
    p_tmp(layer1) = pre1
-   TGL_p_tmp(layer2-1) = 0.
+   TGL_p_tmp(layer2-1) = 0.0
    p_tmp(layer2-1) = pre2
 
    do k=layer2,layer1-1

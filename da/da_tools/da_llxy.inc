@@ -44,8 +44,8 @@ subroutine da_llxy (xlati,xloni,x,y)
    xlat = min (xlat, +89.95)
    
    dxlon = xlon - xlonc
-   if (dxlon >  180) dxlon = dxlon - 360.
-   if (dxlon < -180) dxlon = dxlon + 360.
+   if (dxlon >  180) dxlon = dxlon - 360.0
+   if (dxlon < -180) dxlon = dxlon + 360.0
    
    if (map_projection == 3) then
       xc = 0.0

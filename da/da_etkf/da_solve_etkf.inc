@@ -161,7 +161,7 @@ subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,no
 
    do i = 1, nanals
       do j = 1, nanals-1
-         T(i,j) = C(i,j)*sqrt(1./(eignv(j)+1.)) 
+         T(i,j) = C(i,j)*sqrt(1.0/(eignv(j)+1.0)) 
       end do
    end do
  

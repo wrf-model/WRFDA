@@ -54,25 +54,25 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    data kw2/ .448e-4, .557e-4, .975e-4,-.535e-4/
    data kw3/-.464e-6,-.558e-6,-.724e-6, .115e-5/
 
-   mu=0.;hdn=0.;hup=0.;hdninf=0.;hupinf=0.;ADJ_mu=0.
-   tcld=0.;tc=0.;em=0.;em1=0.
-   sigv=0.;sigo=0.;sig=0.;sig1=0.;sigcld=0.
-   teff1dn=0.;teff1up=0.;teffdn=0.;teffup=0.
-   tbcld=0.;tbclrdn=0.;tbclrup=0.;tb1dn=0.;tb1up=0.;tb2dn=0.;tb2up=0.
-   otbar=0.;tc2=0.;tc3=0.;hv=0.;ho=0.;alph=0.
-   ADJ_sigv=0.;ADJ_otbar=0.;ADJ_sigo=0.;ADJ_tcld=0.;
-   ADJ_tc=0.;ADJ_tc2=0.;ADJ_tc3=0.
-   ADJ_sigcld=0.;ADJ_taucld=0.;ADJ_tbcld=0.;ADJ_hv=0.;ADJ_ho=0.
-   ADJ_hdn=0.;ADJ_hup=0.;ADJ_hdninf=0.;ADJ_sig=0.;ADJ_sig1=0.
-   ADJ_tau=0.;ADJ_tau1=0.
-   ADJ_tau2=0.;ADJ_em1=0.;ADJ_teff1dn=0.;ADJ_hupinf=0.;ADJ_em=0.
-   ADJ_teff1up=0.;ADJ_teffdn=0;ADJ_teffup=0.;ADJ_tbclrdn=0.
-   ADJ_tbclrup=0.;ADJ_tb1dn=0.;ADJ_tb1up=0.
-   ADJ_tb2dn=0.;ADJ_tb2up=0.;ADJ_alph=0.
-   tau=0.;tau1=0.;tau2=0.;taucld=0.
-   tcld=0.;tc=0.;em=0.;em1=0.
-   sigv=0.;sigo=0.;sig=0.;sig1=0.;sigcld=0.
-   teff1dn=0.;teff1up=0.;teffdn=0.;teffup=0.
+   mu=0.0;hdn=0.0;hup=0.0;hdninf=0.0;hupinf=0.0;ADJ_mu=0.0
+   tcld=0.0;tc=0.0;em=0.0;em1=0.0
+   sigv=0.0;sigo=0.0;sig=0.0;sig1=0.0;sigcld=0.0
+   teff1dn=0.0;teff1up=0.0;teffdn=0.0;teffup=0.0
+   tbcld=0.0;tbclrdn=0.0;tbclrup=0.0;tb1dn=0.0;tb1up=0.0;tb2dn=0.0;tb2up=0.0
+   otbar=0.0;tc2=0.0;tc3=0.0;hv=0.0;ho=0.0;alph=0.0
+   ADJ_sigv=0.0;ADJ_otbar=0.0;ADJ_sigo=0.0;ADJ_tcld=0.0;
+   ADJ_tc=0.0;ADJ_tc2=0.0;ADJ_tc3=0.0
+   ADJ_sigcld=0.0;ADJ_taucld=0.0;ADJ_tbcld=0.0;ADJ_hv=0.0;ADJ_ho=0.0
+   ADJ_hdn=0.0;ADJ_hup=0.0;ADJ_hdninf=0.0;ADJ_sig=0.0;ADJ_sig1=0.0
+   ADJ_tau=0.0;ADJ_tau1=0.0
+   ADJ_tau2=0.0;ADJ_em1=0.0;ADJ_teff1dn=0.0;ADJ_hupinf=0.0;ADJ_em=0.0
+   ADJ_teff1up=0.0;ADJ_teffdn=0;ADJ_teffup=0.0;ADJ_tbclrdn=0.0
+   ADJ_tbclrup=0.0;ADJ_tb1dn=0.0;ADJ_tb1up=0.0
+   ADJ_tb2dn=0.0;ADJ_tb2up=0.0;ADJ_alph=0.0
+   tau=0.0;tau1=0.0;tau2=0.0;taucld=0.0
+   tcld=0.0;tc=0.0;em=0.0;em1=0.0
+   sigv=0.0;sigo=0.0;sig=0.0;sig1=0.0;sigcld=0.0
+   teff1dn=0.0;teff1up=0.0;teffdn=0.0;teffup=0.0
 
 
    ! mu = secant(theta)
@@ -165,12 +165,12 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    ADJ_ta   = em*alph*ADJ_tbdn + ADJ_ta
    ADJ_tbdn = (1.0-alph)*ADJ_tbdn 
 
-   if (abs(sig) .gt. 0.) then
-      ADJ_mu  = 2.*0.636619*0.636619*ADJ_alph*sig*atan(mu*sig)/(1.+mu*mu*sig*sig)
-      ADJ_sig = 2.*0.636619*0.636619*mu*ADJ_alph*atan(mu*sig)/(1.+mu*mu*sig*sig)
+   if (abs(sig) .gt. 0.0) then
+      ADJ_mu  = 2.0*0.636619*0.636619*ADJ_alph*sig*atan(mu*sig)/(1.0+mu*mu*sig*sig)
+      ADJ_sig = 2.0*0.636619*0.636619*mu*ADJ_alph*atan(mu*sig)/(1.0+mu*mu*sig*sig)
    else
-      ADJ_mu  = 0.
-      ADJ_sig = 0.
+      ADJ_mu  = 0.0
+      ADJ_sig = 0.0
    end if
 
    ADJ_tau    = ADJ_tauatm*taucld
@@ -269,7 +269,7 @@ subroutine da_tbatmos_adj(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
 
    ADJ_tc2  = ADJ_tc3*tc + ADJ_tc2
    ADJ_tc   = tc2*ADJ_tc3 + ADJ_tc
-   ADJ_tc   = 2.*tc*ADJ_tc2 + ADJ_tc
+   ADJ_tc   = 2.0*tc*ADJ_tc2 + ADJ_tc
 
    ADJ_tcld = ADJ_tc + ADJ_tcld
 

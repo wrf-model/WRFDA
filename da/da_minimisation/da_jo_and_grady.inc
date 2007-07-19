@@ -182,7 +182,7 @@ subroutine da_jo_and_grady(iv, re, jot, jo, jo_grad_y)
 
    call da_jo_and_grady_rad (iv, re, jo, jo_grad_y)
 
-   jo_radiance = 0. 
+   jo_radiance = 0.0 
    if (use_rad) then
       do i=1,iv%num_inst
          do k=1,iv%instid(i)%nchan

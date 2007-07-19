@@ -176,7 +176,7 @@ subroutine da_transfer_kmatoxb(xbx, grid)
          grid%xb%isltyp(i,j) = grid%isltyp(i,j)
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
          ! convert snow water equivalent kg/m2 to snow depth(mm)
-         grid%xb%snowh(i,j) = grid%snow(i,j)*10. 
+         grid%xb%snowh(i,j) = grid%snow(i,j)*10.0 
 
          !---------------------------------------------------------------------
          !  Syed RH Rizvi

@@ -42,7 +42,7 @@ subroutine da_get_innov_vector_ssmi_rv( it, xb, ob, iv)
 
 
       iv % ssmi_retrieval(n) % tpw % inv  = 0.0
-      if (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.  .and.  &  
+      if (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.0  .and.  &  
             iv % ssmi_retrieval(n) % tpw % qc >= obs_qc_pointer) then
          model_tpw = dym*(dxm*xb%tpw(i,j)   + dx*xb%tpw(i+1,j)) + &
                         dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
@@ -54,7 +54,7 @@ subroutine da_get_innov_vector_ssmi_rv( it, xb, ob, iv)
       ! SURFACE WinD SPEED
 
       iv % ssmi_retrieval(n) % speed % inv  = 0.0
-      if (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1. .and.     &
+      if (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1.0 .and.     &
              iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer) then
 
          model_speed = dym*(dxm*xb%speed(i,j ) + dx*xb%speed(i+1,j )) &

@@ -287,7 +287,7 @@ subroutine da_scan_obs (ob, xp, filename)
             if (.not.use_satemobs) cycle reports
 
             ! Reject cloudy satem obs.
-            if (platform%loc%pw%inv > 10.) then
+            if (platform%loc%pw%inv > 10.0) then
                cycle reports
             end if
 

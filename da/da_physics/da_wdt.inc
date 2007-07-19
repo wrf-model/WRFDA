@@ -17,7 +17,7 @@ subroutine da_wdt(H,W,TERR,DT)
       if (w(k) >= 0.1) then
          dt(k)=(h(k)-h(k-1))/w(k)
       else
-         dt(k)=0.
+         dt(k)=0.0
       end if
    end do
 

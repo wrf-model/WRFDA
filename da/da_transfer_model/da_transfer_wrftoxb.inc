@@ -270,7 +270,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
          grid%xb%ivgtyp(i,j) = grid%ivgtyp(i,j)
          grid%xb%isltyp(i,j) = grid%isltyp(i,j)
          grid%xb%vegfra(i,j) = grid%vegfra(i,j)
-         grid%xb%snowh(i,j) = grid%snowh(i,j)*1000. ! meter to mm    
+         grid%xb%snowh(i,j) = grid%snowh(i,j)*1000.0 ! meter to mm    
       end do
 
       ! WHY?
@@ -553,7 +553,7 @@ subroutine da_transfer_wrftoxb(xbx, grid)
    ! Surface wind speed
    !---------------------------------------------------------------------------
 
-   tmpvar = log(10./0.0001)
+   tmpvar = log(10.0/0.0001)
 
    do j=jts,jte
       do i=its,ite

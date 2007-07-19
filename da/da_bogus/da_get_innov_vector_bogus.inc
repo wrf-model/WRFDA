@@ -96,7 +96,7 @@ subroutine da_get_innov_vector_bogus( it, xb, xp, ob, iv)
 
       iv % bogus(n) % slp % inv = 0.0
 
-      if (ABS(ob % bogus(n) % slp - missing_r) > 1. .AND. &
+      if (ABS(ob % bogus(n) % slp - missing_r) > 1.0 .AND. &
            iv % bogus(n) % slp % qc >= obs_qc_pointer) then
         iv % bogus(n) % slp % inv = ob % bogus(n) % slp - model_slp
       end if

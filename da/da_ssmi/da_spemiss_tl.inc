@@ -57,10 +57,10 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
 
    ! calculate TGL_cterm2
 
-   if (cabs(epsnew) .gt. 0.) then
+   if (cabs(epsnew) .gt. 0.0) then
       TGL_cterm2      =  TGL_epsnew*0.5/cterm2
    else
-      TGL_cterm2      =  0.
+      TGL_cterm2      =  0.0
    end if
 
    ! Wei's Comment
@@ -73,8 +73,8 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    !           TGL_tmp0i   = -aimag(TGL_epsnew)
    !               rnorm   =  sqrt(tmp0r*tmp0r+tmp0i*tmp0i)
    !               uniti   =  (0,1)
-   !           if (rnorm .gt. 0.) then
-   !             if (abs(tmp0i) .gt. 0.) then
+   !           if (rnorm .gt. 0.0) then
+   !             if (abs(tmp0i) .gt. 0.0) then
    !                TGL_rnorm =  (tmp0r*TGL_tmp0r + tmp0i*TGL_tmp0i)/rnorm
    !                TGL_cterm2=  cterm2*0.5*(TGL_rnorm/rnorm  &
    !                                      -uniti*(TGL_tmp0r*rnorm-TGL_rnorm*tmp0r)/(rnorm*tmp0i))
@@ -83,8 +83,8 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    !                TGL_cterm2=  TGL_tmp0r*0.5/sqrt(tmp0r)
    !             end if
    !           else 
-   !             TGL_rnorm =  0.
-   !             TGL_cterm2=  0.
+   !             TGL_rnorm =  0.0
+   !             TGL_cterm2=  0.0
    !           end if
    !     end if
 
@@ -102,7 +102,7 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    TGL_tmp1i   = -aimag(TGL_cterm3v)
    ! ev      =  1.0 - cabs(cterm3v)**2
        ev      =  1.0 - (tmp1r*tmp1r+tmp1i*tmp1i)
-   TGL_ev      = -2.*tmp1r*TGL_tmp1r - 2.*tmp1i*TGL_tmp1i
+   TGL_ev      = -2.0*tmp1r*TGL_tmp1r - 2.0*tmp1i*TGL_tmp1i
 
        tmp2r   =  real(cterm3h)
    TGL_tmp2r   =  real(TGL_cterm3h)
@@ -110,7 +110,7 @@ subroutine da_spemiss_tl(f,tk,theta,ssw,ev,eh,                               &
    TGL_tmp2i   = -aimag(TGL_cterm3h)
    ! eh      =  1.0 - cabs(cterm3h)**2
        eh      =  1.0 - (tmp2r*tmp2r+tmp2i*tmp2i)
-   TGL_eh      = -2.*tmp2r*TGL_tmp2r - 2.*tmp2i*TGL_tmp2i
+   TGL_eh      = -2.0*tmp2r*TGL_tmp2r - 2.0*tmp2i*TGL_tmp2i
 
 end subroutine da_spemiss_tl
 

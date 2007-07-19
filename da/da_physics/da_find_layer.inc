@@ -25,14 +25,14 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
       ! Below model bottom
       layer = ks
       alpha = log(pre_ma(ks)/pre)/log(pre_ma(ks)/pre_ma(ks+1))
-      tv = tv_ma(ks) * (1.-alpha) + tv_ma(ks+1) * alpha
+      tv = tv_ma(ks) * (1.0-alpha) + tv_ma(ks+1) * alpha
       pre_ma(ks-1)=pre
    else if (pre <= pre_ma(ke)) then
 
       ! Above model top
       layer = ke+1
       alpha = log(pre_ma(ke-1)/pre)/log(pre_ma(ke-1)/pre_ma(ke))
-      tv = tv_ma(ke-1) * (1.-alpha) + tv_ma(ke) * alpha
+      tv = tv_ma(ke-1) * (1.0-alpha) + tv_ma(ke) * alpha
       pre_ma(ke+1) = pre
    else
 
@@ -41,7 +41,7 @@ subroutine da_find_layer(layer,tv,pre,pre_ma,tv_ma,ks,ke)
          if (pre>=pre_ma(k+1) .and. pre<pre_ma(k)) then
             layer = k+1
             alpha = log(pre_ma(k)/pre)/log(pre_ma(k)/pre_ma(k+1))
-            tv = tv_ma(k) * (1.-alpha) + tv_ma(k+1) * alpha
+            tv = tv_ma(k) * (1.0-alpha) + tv_ma(k+1) * alpha
             exit
          end if
       end do

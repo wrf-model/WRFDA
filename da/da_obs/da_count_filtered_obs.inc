@@ -172,7 +172,7 @@ subroutine da_count_filtered_obs(&
 
             ! Reject cloudy satem obs.
  
-            if (platform%loc%pw%inv > 10.) then
+            if (platform%loc%pw%inv > 10.0) then
                cycle reports
             end if
 
@@ -318,7 +318,7 @@ subroutine da_count_filtered_obs(&
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
       "NUMC  =",(numc ,", ", i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,F7.2,A))')&
-      "DIS   =",(ds/1000.,", ",i = 1, maxnes)
+      "DIS   =",(ds/1000.0,", ",i = 1, maxnes)
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &
       "NESTI=", 1, ", ", int(start_y), ", "
    write (unit = filtered_obs_unit, fmt = '(A,10(:,I7,A))')  &

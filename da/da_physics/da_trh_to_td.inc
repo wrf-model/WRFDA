@@ -13,7 +13,7 @@ subroutine da_trh_to_td (rh, t, td, xp)
    !   ------
    !     invert the relation
    !
-   !     rh = 100. * exp (l_over_rv * (1./t - 1./td))
+   !     rh = 100.0 * exp (l_over_rv * (1.0/t - 1.0/td))
    !
    !   input:
    !   -----
@@ -69,11 +69,11 @@ subroutine da_trh_to_td (rh, t, td, xp)
                rh(i,j,k) = 105.0
             end if
 
-            invdifftd = log (rh(i,j,k)/100.) / l_over_rv
+            invdifftd = log (rh(i,j,k)/100.0) / l_over_rv
 
             invtd = 1/t(i,j,k)  - invdifftd
 
-            td(i,j,k)  = 1. / invtd
+            td(i,j,k)  = 1.0 / invtd
 
             if (td(i,j,k) > t(i,j,k)) &
                td(i,j,k) = t(i,j,k)

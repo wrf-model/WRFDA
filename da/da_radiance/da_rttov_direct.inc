@@ -84,7 +84,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
 
       if (isflg == 0 .or. isflg == 4) then  ! sea
          profiles(n) % skin % surftype   = 1 ! aux_vars (n) % surftype
-         ! profiles(n) % skin % fastem (:) = 0.
+         ! profiles(n) % skin % fastem (:) = 0.0
       else if (isflg == 1 .or. isflg == 5) then  ! sea-ice with snow
          profiles(n) % skin % surftype   = 2
          ! profiles(n) % skin % fastem (1) = 2.2
@@ -102,7 +102,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       end if
       !    profiles(n) % skin % surftype   = aux_vars (n) % surftype   
       profiles(n) % skin % t          = aux_vars (n) % surft    
-      profiles(n) % skin % fastem (:) = 0. ! aux_vars (n) % fastem (:)
+      profiles(n) % skin % fastem (:) = 0.0 ! aux_vars (n) % fastem (:)
 
       profiles(n) % s2m  % t    = aux_vars (n) % t2m
       profiles(n) % s2m  % q    = aux_vars (n) % q2m
@@ -114,8 +114,8 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       profiles(n) % zenangle    = aux_vars (n) % satzen
       profiles(n) % azangle     = aux_vars (n) % satazi
 
-      profiles(n) % ctp         = 500.
-      profiles(n) % cfraction   = 0.
+      profiles(n) % ctp         = 500.0
+      profiles(n) % cfraction   = 0.0
    end do
 
 #ifdef RTTOV
@@ -180,7 +180,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
          (/"mem allocation error prior to rttov_direct"/))
    End If
 
-   surfem (:) = 0.
+   surfem (:) = 0.0
 #ifdef RTTOV
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
@@ -196,7 +196,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
    if (coef%id_sensor == 1 .or. coef%id_sensor == 3)  then 
       if (profiles(1) % skin % surftype == 1) then  
          calcemis (1:nchannels)   = .true.           ! using ISSEM over sea
-         emissivity (1:nchannels) = 0.               
+         emissivity (1:nchannels) = 0.0             
       else if (profiles(1) % skin % surftype == 2) then
          calcemis (1:nchannels)   = .false.          
          emissivity (1:nchannels) = 0.98             ! over sea-ice
@@ -221,7 +221,7 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
       if ( profiles(1) % skin % surftype == 1) then 
          if (mw_emis_sea == 0) then
             calcemis  (1:nchannels) = .true.
-            emissivity(1:nchannels) = -1.   ! RTTOV fastem-2
+            emissivity(1:nchannels) = -1.0   ! RTTOV fastem-2
          else                              ! Weng's model
             calcemis  (1:nchannels) = .false.
             do i = 1, nchanl   !  loop for channels
@@ -233,8 +233,8 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
                else if (polarisations(i,3) == 4) then
                   emissivity(ichannel)   = emisv(i)
                   emissivity(ichannel+1) = emish(i)
-                  emissivity(ichannel+2) = 0.
-                  emissivity(ichannel+3) = 0.
+                  emissivity(ichannel+2) = 0.0
+                  emissivity(ichannel+3) = 0.0
                else   ! == 1 V or H polar
                   if (pol_id == 4) emissivity(ichannel)   = emisv(i)
                   if (pol_id == 5) emissivity(ichannel)   = emish(i)
@@ -254,8 +254,8 @@ subroutine da_rttov_direct( inst, isflg, nchanl, nprofiles, &
             else if (polarisations(i,3) == 4) then
                emissivity(ichannel)   = emisv(i)
                emissivity(ichannel+1) = emish(i)
-               emissivity(ichannel+2) = 0.
-               emissivity(ichannel+3) = 0.
+               emissivity(ichannel+2) = 0.0
+               emissivity(ichannel+3) = 0.0
             else   ! == 1 V or H polar
                if (pol_id == 4) emissivity(ichannel)   = emisv(i)
                if (pol_id == 5) emissivity(ichannel)   = emish(i)

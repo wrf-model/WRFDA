@@ -22,15 +22,15 @@ subroutine da_llij_ps(lat,lon,proj,i,j)
    real                           :: alo
    real                           :: rm
 
-   reflon = proj%stdlon + 90.
+   reflon = proj%stdlon + 90.0
    
    ! Compute numerator term of map scale factor
 
-   scale_top = 1. + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
+   scale_top = 1.0 + proj%hemi * Sin(proj%truelat1 * rad_per_deg)
 
    ! Find radius to desired point
    ala = lat * rad_per_deg
-   rm = proj%rebydx * COS(ala) * scale_top/(1. + proj%hemi *Sin(ala))
+   rm = proj%rebydx * COS(ala) * scale_top/(1.0 + proj%hemi *Sin(ala))
    alo = (lon - reflon) * rad_per_deg
    i = proj%polei + rm * COS(alo)
    j = proj%polej + proj%hemi * rm * Sin(alo)

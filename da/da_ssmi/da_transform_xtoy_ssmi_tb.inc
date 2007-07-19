@@ -51,26 +51,26 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
 
    !       ! surface pressure (mb) (940 -1030)
 
-   !       psfc(i,j)     = (grid%xb%p(i,j,mkz)+grid%xb%Psac(i,j)*(1.0-grid%xb % sigmah(mkz)))*0.01
+   !       psfc(i,j)     = (grid%xb%p(i,j,mkz)+grid%xb%Psac(i,j)*(1.0-grid%xb % sigmah(mkz)))*0.001
    !       TGL_psfc(i,j) =  grid%xa%p  (i,j,mkz)*0.01
 
    !       ! sea surface temperature (k) (273 - 303) (doesnot change) 
 
    !       sst(i,j)      = grid%xb%tgrn(i,j)
    !       TGL_sst(i,j)  = grid%xa%tgrn(1,1)
-   !       TGL_sst(i,j)  = 0.
+   !       TGL_sst(i,j)  = 0.0
 
    !       ! effective surface air temperature (263 - 303)
 
    !       ta(i,j)     = grid%xb%tgrn(i,j) + &
-   !                   (grid%xb%t(i,j,mkz)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
+   !                   (grid%xb%t(i,j,mkz)-grid%xb%tgrn(i,j))*log(2.0/0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
    !       TGL_ta(i,j) = grid%xa%tgrn(1,1) + &
-   !                   (grid%xa%t(i,j,mkz)-grid%xa%tgrn(1,1))*log(2./0.0001)/ &
+   !                   (grid%xa%t(i,j,mkz)-grid%xa%tgrn(1,1))*log(2.0/0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
-   !       TGL_ta(i,j) = (grid%xa%t(i,j,mkz)-0.)*log(2./0.0001)/ &
+   !       TGL_ta(i,j) = (grid%xa%t(i,j,mkz)-0.)*log(2.0/0.0001)/ &
    !                   log(zh(mkz)/0.0001)
 
    !       ! gamma is an emperical formula and zcld is given for now
@@ -79,17 +79,17 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
    !       zcld(i,j)  = 1                           ! effective cloud height (km)
                                                      ! = 1 if no cloud infomation
    !       TGL_gamma(i,j) = TGL_ta(i,j)*0.023
-   !       TGL_zcld(i,j)  = 0.
+   !       TGL_zcld(i,j)  = 0.0
 
    !       ! total precipitable water in (kg/m**2) (0 - 70)
 
-   !       tpw(i,j)     = grid%xb%tpw(i,j)*10.
-   !       TGL_tpw(i,j) = grid%xa%tpw(i,j)*10.
+   !       tpw(i,j)     = grid%xb%tpw(i,j)*10.0
+   !       TGL_tpw(i,j) = grid%xa%tpw(i,j)*10.0
 
    !       ! Column liquid water (kg/m**2)   (0 - 0.5) (no data now. So, do it later.)
 
-   !       alw(i,j)     = 0.
-   !       TGL_alw(i,j) = 0.
+   !       alw(i,j)     = 0.0
+   !       TGL_alw(i,j) = 0.0
 
    !       ! Column height weighted moisture density on the grid locally 
 
@@ -98,8 +98,8 @@ subroutine da_transform_xtoy_ssmi_tb(grid, oi, y)
 
    !       ! Column moisture density on the grid locally
 
-   !       htpw(i,j)     = zrhom/tpw(i,j)/1000.
-   !       TGL_htpw(i,j) = TGL_zrhom/tpw(i,j)/1000. &
+   !       htpw(i,j)     = zrhom/tpw(i,j)/1000.0
+   !       TGL_htpw(i,j) = TGL_zrhom/tpw(i,j)/1000.0 &
    !                   - TGL_tpw(i,j)/tpw(i,j)*htpw(i,j)
 
    !    end do

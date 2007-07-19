@@ -139,13 +139,13 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
             atmosphere%cloud(3)%water_content(k)=iv%instid(inst)%qrn(k,n)
             atmosphere%cloud(4)%water_content(k)=iv%instid(inst)%qsn(k,n)
             atmosphere%cloud(5)%water_content(k)=iv%instid(inst)%qgr(k,n)
-            atmosphere%cloud(6)%water_content(k)=0.
-            atmosphere%cloud(1)%effective_radius(k)=10.
-            atmosphere%cloud(2)%effective_radius(k)=200.
-            atmosphere%cloud(3)%effective_radius(k)=200.
-            atmosphere%cloud(4)%effective_radius(k)=200.
-            atmosphere%cloud(5)%effective_radius(k)=200.
-            atmosphere%cloud(6)%effective_radius(k)=200.
+            atmosphere%cloud(6)%water_content(k)=0.0
+            atmosphere%cloud(1)%effective_radius(k)=10.0
+            atmosphere%cloud(2)%effective_radius(k)=200.0
+            atmosphere%cloud(3)%effective_radius(k)=200.0
+            atmosphere%cloud(4)%effective_radius(k)=200.0
+            atmosphere%cloud(5)%effective_radius(k)=200.0
+            atmosphere%cloud(6)%effective_radius(k)=200.0
            end if
            enddo
 
@@ -160,7 +160,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
      Surface%Snow_Coverage=iv%instid(inst)%snow_coverage(n)
      Surface%Ice_Coverage=iv%instid(inst)%ice_coverage(n)
 
-     if (Surface%Land_Coverage > 0.) then
+     if (Surface%Land_Coverage > 0.0) then
        Surface%Land_Type=GRASS_SOIL           ! land type (User guide appendix 3)
        Surface%Land_Temperature=iv%instid(inst)%ts(n)      ! K
        Surface%Soil_Moisture_Content=iv%instid(inst)%smois(n)  !0.05    ! volumetric water content (g/cm**3)
@@ -168,7 +168,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
        Surface%Vegetation_Fraction=iv%instid(inst)%vegtyp(n)
        Surface%Soil_Temperature=iv%instid(inst)%tslb(n)
      endif
-     if (Surface%Water_Coverage > 0.) then
+     if (Surface%Water_Coverage > 0.0) then
        !Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
        Surface%Water_Temperature=iv%instid(inst)%ts(n)     ! K
        Surface%Wind_Speed=sqrt((iv%instid(inst)%u10(n))**2+ &
@@ -176,19 +176,19 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
        !surface%Wind_Direction=0.0            ! NOT used
        Surface%Salinity=33.                   ! ppmv
      endif
-     if (Surface%Snow_Coverage > 0.) then
+     if (Surface%Snow_Coverage > 0.0) then
        Surface%Snow_Type=NEW_SNOW             ! User guide appendix 3
        Surface%Snow_Temperature=iv%instid(inst)%ts(n)      ! K
        Surface%Snow_Depth=iv%instid(inst)%snowh(n)         ! mm
        !Surface%Snow_Density=0.2               ! g/cm**3
        !Surface%Snow_Grain_Size=2.0            ! mm
      endif
-     if (Surface%Ice_Coverage > 0.) then
-       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single egrid%xample is FRESH_ICE
+     if (Surface%Ice_Coverage > 0.0) then
+       !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
        Surface%Ice_Temperature=iv%instid(inst)%ts(n)       ! K
-       Surface%Ice_Thickness=10.              ! mm
+       Surface%Ice_Thickness=10.0              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
-       !Surface%Ice_Roughness=0.               ! NO Table offered, single egrid%xample is ZERO
+       !Surface%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO
      endif
      Surface%SensorData%n_channels = nchanl
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
@@ -219,7 +219,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
       ! [1.2] CRTM GeometryInfo Structure
         GeometryInfo%Sensor_Zenith_Angle=iv%instid(inst)%satzen(n)
         GeometryInfo%Source_Zenith_Angle=iv%instid(inst)%solzen(n)
-   !     GeometryInfo%Satellite_Height=830.
+   !     GeometryInfo%Satellite_Height=830.0
    !     GeometryInfo%Sensor_Scan_Angle=
    !     GeometryInfo%Sensor_Zenith_Angle=
    !     GeometryInfo%Sensor_Scan_Angle=
@@ -229,7 +229,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
       ! [1.3] assign tb = R^-1 Re :
 
          RTSolution_AD(:)%brightness_temperature = jo_grad_y%instid(inst)%tb(:,n)
-         RTSolution_AD(:)%radiance = 0. ! must assign zero, since each call of AD model will return non-zero value
+         RTSolution_AD(:)%radiance = 0.0 ! must assign zero, since each call of AD model will return non-zero value
        !if (n <= 10) write(6,'(15f8.3)') RTSolution_AD(:)%brightness_temperature
 
       ! [1.4] Call CRTM_AD model
@@ -262,7 +262,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
          Atmosphere_AD%Level_Pressure(atmosphere%n_layers) = &
                  Atmosphere_AD%Level_Pressure(atmosphere%n_layers)*0.01 
-         Atmosphere_AD%Absorber(:,1) = 1000.*Atmosphere_AD%Absorber(:,1) ! in g/kg
+         Atmosphere_AD%Absorber(:,1) = 1000.0*Atmosphere_AD%Absorber(:,1) ! in g/kg
 
             !-----------------------------------------------------
             ! [1.6] Get horizontal interpolation weights:
@@ -279,7 +279,7 @@ subroutine da_transform_xtoy_crtm_adj ( iv, jo_grad_y, jo_grad_x )
 
             do k=kts,kte ! from bottem to top
                q_ad = Atmosphere_AD%Absorber(kte-k+1,1)
-               if (atmosphere%pressure(kte-k+1) < 75.) q_ad = 0.
+               if (atmosphere%pressure(kte-k+1) < 75.0) q_ad = 0.0
                call da_interp_lin_2d_adj( jo_grad_x%t(:,:,k), ims, ime, jms, &
                                           jme, i, j, dx, dy, dxm, dym, &
                                           Atmosphere_AD%Temperature(kte-k+1))

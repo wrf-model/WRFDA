@@ -14,13 +14,13 @@ subroutine da_set_map_para
    ! define psi1:
    if (map_projection.eq.1 .or. map_projection.eq.2) then
       if (phic.lt.0) then 
-         psi1 = 90.+truelat1_3dv
+         psi1 = 90.0+truelat1_3dv
          psi1 = -psi1
       else
-        psi1 = 90.-truelat1_3dv
+        psi1 = 90.0-truelat1_3dv
       end if          
    else
-      psi1 = 0.
+      psi1 = 0.0
    end if 
 
    psi1 = psi1/conv
@@ -30,11 +30,11 @@ subroutine da_set_map_para
       psx = (pole-phic)/conv
       if (map_projection.eq.1) then
          cell  = earth_radius*sin(psi1)/cone_factor  
-         cell2 = (tan(psx/2.))/(tan(psi1/2.))
+         cell2 = (tan(psx/2.0))/(tan(psi1/2.0))
       end if 
       if (map_projection.eq.2) then
          cell  = earth_radius*sin(psx)/cone_factor   
-         cell2 = (1. + cos(psi1))/(1. + cos(psx)) 
+         cell2 = (1.0 + cos(psi1))/(1.0 + cos(psx)) 
       end if  
       r = cell*(cell2)**cone_factor 
       ycntr = -r

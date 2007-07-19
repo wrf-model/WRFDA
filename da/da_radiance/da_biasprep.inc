@@ -85,7 +85,7 @@ subroutine da_biasprep(inst,ob,iv)
          radbias%nchan        = nchan 
          radbias%tb(1:nchan)  = ob%instid(inst)%tb(1:nchan,n)
          radbias%omb(1:nchan) = iv%instid(inst)%tb_inv(1:nchan,n)
-         radbias%bias(1:nchan) = 0.
+         radbias%bias(1:nchan) = 0.0
 
          radbias%npred         = npred
          radbias%pred(1:npred) = pred(1:npred)
@@ -95,7 +95,7 @@ subroutine da_biasprep(inst,ob,iv)
 
          ! set missing data and bad data to missing
          do jx=1,nchan   
-            if (radbias%tb(jx) < 150. .or. radbias%tb(jx) > 400. ) then
+            if (radbias%tb(jx) < 150.0 .or. radbias%tb(jx) > 400.0 ) then
                radbias%tb(jx)   = missing_r
                radbias%omb(jx)  = missing_r 
             end if

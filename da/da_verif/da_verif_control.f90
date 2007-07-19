@@ -9,55 +9,53 @@ MODULE da_verif_control
 !
 !  Author:   Syed RH Rizvi     NCAR/MMM         05/25/2006
 !----------------------------------------------------------------------------   
-   IMPLICIT NONE
-!
-  INTEGER, parameter       :: maxnum = 10, nstd = 16
-  INTEGER, parameter       :: num_verif_var =5        
+   implicit none
+
+  integer, parameter       :: maxnum = 10, nstd = 16
+  integer, parameter       :: num_verif_var =5        
   real,    dimension(nstd) :: stdp
   real                     :: rmiss = -99.99
   integer                  :: num_miss = -99
-!
-  data stdp/1000., 925., 850., 700., 500., 400., 300., &
-             250., 200., 150., 100.,  70.,  50. ,30., 20. ,10./ 
-!
+
+  data stdp/1000.0, 925.0, 850.0, 700.0, 500.0, 400.0, 300.0, &
+             250.0, 200.0, 150.0, 100.0,  70.0,  50.0 ,30.0, 20.0 ,10.0/ 
+
   character (len=1)   :: verif_var(num_verif_var)
   character (len= 2)  :: verif_type(2)
   data verif_var/'U','V','T','Q','P'/
   data verif_type/'OI','AO'/
 
-!
-  TYPE stats_value
-    INTEGER     :: num
-    REAL        :: abias
-    REAL        :: bias
-    REAL        :: rmse
-  END TYPE stats_value
+  type stats_value
+    integer     :: num
+    real        :: abias
+    real        :: bias
+    real        :: rmse
+  end type stats_value
 
-  TYPE surface_type
-    TYPE (stats_value) :: uomb, uoma
-    TYPE (stats_value) :: vomb, voma
-    TYPE (stats_value) :: tomb, toma
-    TYPE (stats_value) :: pomb, poma
-    TYPE (stats_value) :: qomb, qoma
-  END TYPE surface_type
+  type surface_type
+    type (stats_value) :: uomb, uoma
+    type (stats_value) :: vomb, voma
+    type (stats_value) :: tomb, toma
+    type (stats_value) :: pomb, poma
+    type (stats_value) :: qomb, qoma
+  end type surface_type
 
-  TYPE upr_type
-    TYPE (stats_value) :: uomb(nstd), uoma(nstd)
-    TYPE (stats_value) :: vomb(nstd), voma(nstd)
-    TYPE (stats_value) :: tomb(nstd), toma(nstd)
-    TYPE (stats_value) :: qomb(nstd), qoma(nstd)
-  END TYPE upr_type
+  type upr_type
+    type (stats_value) :: uomb(nstd), uoma(nstd)
+    type (stats_value) :: vomb(nstd), voma(nstd)
+    type (stats_value) :: tomb(nstd), toma(nstd)
+    type (stats_value) :: qomb(nstd), qoma(nstd)
+  end type upr_type
 
-  TYPE gpspw_type
-    TYPE (stats_value)          :: tpwomb, tpwoma         
-  END TYPE gpspw_type
+  type gpspw_type
+    type (stats_value)          :: tpwomb, tpwoma         
+  end type gpspw_type
 
-  TYPE gpsref_type
-    TYPE (stats_value)          :: refomb, refoma         
-  END TYPE gpsref_type
+  type gpsref_type
+    type (stats_value)          :: refomb, refoma         
+  end type gpsref_type
 
 ! namelist.varstats variables
-!
 
 ! record1
   INTEGER                               :: exp_num   ! number of experiments

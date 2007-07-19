@@ -81,10 +81,10 @@ subroutine da_detsurtyp (snow,ice,landsea, vegtyp, soiltyp, &
    !
    !--------------------------------------------------------
 
-   seap = 0.
-   icep = 0.
-   snop = 0.
-   lndp = 0.
+   seap = 0.0
+   icep = 0.0
+   snop = 0.0
+   lndp = 0.0
    w(1) = dym*dxm   ! weight for point (i,j)
    w(2) = dym*dx    ! weight for point (i+1,j)
    w(3) = dy *dxm   ! weight for point (i,j+1)

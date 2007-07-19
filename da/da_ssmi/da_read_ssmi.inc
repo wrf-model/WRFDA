@@ -143,13 +143,13 @@ subroutine da_read_ssmi (ob, xp, filename)
             read (unit=iunit, fmt = fmt_loc) &
                tb19v, tb19h, tb22v, tb37v, tb37h, tb85v, tb85h
 
-               tb19v % error = tb19v % error + 2.
-               tb19h % error = tb19h % error + 2.
-               tb22v % error = tb22v % error + 2.
-               tb37h % error = tb37h % error + 2.
-               tb37v % error = tb37v % error + 2.
-               tb85h % error = tb85h % error + 2.
-               tb85v % error = tb85v % error + 2.
+               tb19v % error = tb19v % error + 2.0
+               tb19h % error = tb19h % error + 2.0
+               tb22v % error = tb22v % error + 2.0
+               tb37h % error = tb37h % error + 2.0
+               tb37v % error = tb37v % error + 2.0
+               tb85h % error = tb85h % error + 2.0
+               tb85v % error = tb85v % error + 2.0
 
          case default;
             write(unit=message(1), fmt='(a, i6)') 'unsaved ssmi obs found, fm=', fm
@@ -274,13 +274,13 @@ subroutine da_read_ssmi (ob, xp, filename)
                           tb37h%inv, tb85v%inv, tb85h%inv, ipass, iprecip, &
                           info%lat)
                if (iprecip .eq. 1) then
-                  tb19v % qc    = -88.
-                  tb19h % qc    = -88.
-                  tb22v % qc    = -88.
-                  tb37h % qc    = -88.
-                  tb37v % qc    = -88.
-                  tb85h % qc    = -88.
-                  tb85v % qc    = -88.
+                  tb19v % qc    = -88.0
+                  tb19h % qc    = -88.0
+                  tb22v % qc    = -88.0
+                  tb37h % qc    = -88.0
+                  tb37v % qc    = -88.0
+                  tb85h % qc    = -88.0
+                  tb85v % qc    = -88.0
                   irain = irain + 1
                   cycle reports
                end if

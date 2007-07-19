@@ -79,7 +79,7 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
          tc   =     tcld - t_kelvin
      TGL_tc   = TGL_tcld
         tc2   = tc*tc
-    TGL_tc2   = 2.*tc*TGL_tc
+    TGL_tc2   = 2.0*tc*TGL_tc
         tc3   = tc2*tc
     TGL_tc3   = TGL_tc2*tc + tc2*TGL_tc
        sigcld =  (kw0(ifreq) + tc*kw1(ifreq) + tc2*kw2(ifreq) +  &
@@ -173,11 +173,11 @@ subroutine da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,lw,zcld,   &
    !  (downwelling brightness temperatures only)
 
    alph = (0.636619*atan(mu*sig))**2
-   if (abs(sig) .gt. 0.) then
-      TGL_alph = 2.*0.636619*0.636619* &
-                 (TGL_mu*sig + mu*TGL_sig)*atan(mu*sig)/(1.+mu*mu*sig*sig)
+   if (abs(sig) .gt. 0.0) then
+      TGL_alph = 2.0*0.636619*0.636619* &
+                 (TGL_mu*sig + mu*TGL_sig)*atan(mu*sig)/(1.0+mu*mu*sig*sig)
    else
-      TGL_alph = 0.
+      TGL_alph = 0.0
    end if
    TGL_tbdn = - TGL_alph*tbdn + (1.0-alph)*TGL_tbdn &
               + TGL_em*alph*ta + em*TGL_alph*ta + em*alph*TGL_ta 

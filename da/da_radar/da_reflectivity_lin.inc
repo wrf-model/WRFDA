@@ -13,7 +13,7 @@ subroutine da_reflectivity_lin(rf, qrn, qrn9)
    real, parameter   :: leh1=43.1
    real, parameter   :: leh2=17.5
 
-   rf = leh2 * qrn /(qrn9*alog(10.)) 
+   rf = leh2 * qrn /(qrn9*alog(10.0)) 
 
 end subroutine da_reflectivity_lin
 

@@ -26,8 +26,8 @@ subroutine da_ijll_latlon(i, j, proj, lat, lon)
 
    ! Compute deltalat and deltalon 
 
-   deltalat = (j-1.)*latinc
-   deltalon = (i-1.)*loninc
+   deltalat = (j-1.0)*latinc
+   deltalon = (i-1.0)*loninc
    lat = proj%lat1 + deltalat
    lon = proj%lon1 + deltalon
 

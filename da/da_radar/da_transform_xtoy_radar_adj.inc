@@ -37,10 +37,10 @@ subroutine da_transform_xtoy_radar_adj(grid, iv, jo_grad_y, jo_grad_x)
       do n=iv%ob_numb(iv%current_ob_time-1)%radar + 1, &
          iv%ob_numb(iv%current_ob_time)%radar
          do k = 1, max_ob_levels
-            model_u(k) = 0.
-            model_v(k) = 0.
-            model_w(k) = 0.
-            model_qrn(k) = 0.
+            model_u(k) = 0.0
+            model_v(k) = 0.0
+            model_w(k) = 0.0
+            model_qrn(k) = 0.0
          end do
 
          num_levs = iv % radar(n) % info % levels

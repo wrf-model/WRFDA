@@ -30,8 +30,8 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
       return
    end if
 
-   CNTRI = real(coarse_ix+1)/2.
-   CNTRJ = real(coarse_jy+1)/2. 
+   CNTRI = real(coarse_ix+1)/2.0
+   CNTRJ = real(coarse_jy+1)/2.0
 
    xcntr = 0.0
 
@@ -45,7 +45,7 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
    ! NOW CALCULATE LAT AND LON OF THIS POinT
 
    if (map_projection.NE.3) then
-      if(Y.EQ.0.) then      
+      if(Y.EQ.0.0) then      
          if (X.GE.0.0) FLP =  90.0/CONV 
          if (X.LT.0.0) FLP = -90.0/CONV
       else
@@ -56,8 +56,8 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
          end if
       end if 
       FLPP = (FLP/cone_factor)*CONV+XLONC  
-      if (FLPP.LT.-180.) FLPP = FLPP + 360    
-      if (FLPP.GT.180.)  FLPP = FLPP - 360.  
+      if (FLPP.LT.-180.0) FLPP = FLPP + 360.0    
+      if (FLPP.GT.180.0)  FLPP = FLPP - 360.0  
       XLON = FLPP 
       ! NOW SOLVE FOR LATITUDE
       R = sqrt(X*X+Y*Y)  
@@ -65,23 +65,23 @@ subroutine da_xyll(XX,YY,XLAT,XLON)
       if (map_projection.EQ.1) then   
          CELL = (R*cone_factor)/(earth_radius*Sin(PSI1))    
          Rcone_factor  = 1.0/cone_factor   
-         CEL1 = TAN(PSI1/2.)*(CELL)**Rcone_factor    
+         CEL1 = TAN(PSI1/2.0)*(CELL)**Rcone_factor    
       end if 
       if (map_projection.EQ.2) then
          CELL = R/earth_radius        
          CEL1 = CELL/(1.0+COS(PSI1))  
       end if 
       CEL2 = ATAN(CEL1)    
-      PSX  = 2.*CEL2*CONV
+      PSX  = 2.0*CEL2*CONV
       XLAT = POLE-PSX 
    end if   
    ! CALCULATIONS FOR MERCATOR LAT,LON    
    if (map_projection.EQ.3) then   
       XLON = XLONC + ((X-XCNTR)/C2)*CONV 
-      if (XLON.LT.-180.) XLON = XLON + 360
-      if (XLON.GT.180.)  XLON = XLON - 360.
+      if (XLON.LT.-180.0) XLON = XLON + 360.0
+      if (XLON.GT.180.0)  XLON = XLON - 360.0
       CELL = EXP(Y/C2)  
-      XLAT = 2.*(CONV*ATAN(CELL))-90.0 
+      XLAT = 2.0*(CONV*ATAN(CELL))-90.0 
    end if  
 
 end subroutine da_xyll

@@ -90,7 +90,7 @@ subroutine da_moist_phys_adj(grid)
 
          do K=kts,kte
 
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
             if( grid%xb%t(I,J,K) > TO )then
                EES(K)=SVP1*EXP(SVP2*(grid%xb%t(I,J,K)-SVPT0)/(grid%xb%t(I,J,K)-SVP3))
@@ -98,7 +98,7 @@ subroutine da_moist_phys_adj(grid)
                EES(K)=.611*EXP(22.514-6.15E3/grid%xb%t(I,J,K))
             end if
 
-            QVSS(K)=622.*EES(K)/(grid%xb%p(I,J,K)-EES(K))
+            QVSS(K)=622.0*EES(K)/(grid%xb%p(I,J,K)-EES(K))
 
             SCR4(K)=grid%xb%q(I,J,K)/QVSS(K)
 
@@ -106,17 +106,17 @@ subroutine da_moist_phys_adj(grid)
 
          do K=kts,kte
 
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
-            if(grid%xb%qcw(I,J,K) > 0.) then
+            if(grid%xb%qcw(I,J,K) > 0.0) then
                SCR2(K)=grid%xb%qcw(I,J,K)
             else
-               SCR2(K)=0.
+               SCR2(K)=0.0
             end if
-            if(grid%xb%qrn(I,J,K) > 1.E-25) then
+            if(grid%xb%qrn(I,J,K) > 1.0e-25) then
                SCR3(K)=grid%xb%qrn(I,J,K)
             else
-               SCR3(K)=1.E-25
+               SCR3(K)=1.0e-25
             end if
             SCR5(K)=grid%xb%q(I,J,K)/SCR4(K)
 
@@ -142,7 +142,7 @@ subroutine da_moist_phys_adj(grid)
 
          do K=kts, kte
 
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
             !  Readjust
 
@@ -159,20 +159,20 @@ subroutine da_moist_phys_adj(grid)
             else
                DUM411(K)=XLS
             end if
-            PRD(K)=cp*(1.+0.887*grid%xb%q(I,J,K))
+            PRD(K)=cp*(1.0+0.887*grid%xb%q(I,J,K))
             TTT(K)=-DUM411(K)*QVT(K)/PRD(K)
 
             DUM113(K)=grid%xb%q(I,J,K)+DT(K)*QVT(K)
-            if(DUM113(K) > 1.E-12 ) then
+            if(DUM113(K) > 1.0E-12 ) then
                SCR42(K)=DUM113(K)
             else
-               SCR42(K)=1.E-12
+               SCR42(K)=1.0E-12
             end if
             DUM211(K)=grid%xb%qcw(I,J,K)+QCT(K)*DT(k)
-            if(DUM211(K) > 0.) then
+            if(DUM211(K) > 0.0) then
                SCR31(K)=DUM211(K)
             else
-               SCR31(K)=0.
+               SCR31(K)=0.0
             end if
             SCR71(K)=grid%xb%t(I,J,K)+TTT(K)*DT(k)
          end do
@@ -187,20 +187,20 @@ subroutine da_moist_phys_adj(grid)
                              grid%xa%qcw(I,J,:),grid%xa%qrn(I,J,:),kts,kte)
 
          do K=kts, kte
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
             !  Readjust
 
             grid%xa%t(I,J,K)=grid%xa%t(I,J,K)+SCR719(K)
             TTT9(K)=TTT9(K)+DT(k)*SCR719(K)
-            DUM2119(K)=0.
-            if(DUM211(K) > 0.) then
+            DUM2119(K)=0.0
+            if(DUM211(K) > 0.0) then
                DUM2119(K)=SCR319(K)
             end if
             grid%xa%qcw(I,J,K)=grid%xa%qcw(I,J,K)+DUM2119(K)
             QCT9(K)=QCT9(K)+DT(K)*DUM2119(K)
-            DUM1139(K)=0.
-            if(DUM113(K) > 1.E-12 ) then
+            DUM1139(K)=0.0
+            if(DUM113(K) > 1.0e-12 ) then
                DUM1139(K)=SCR429(K)
             end if
             grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+DUM1139(K)
@@ -220,8 +220,8 @@ subroutine da_moist_phys_adj(grid)
             PRA9(K)=PRA9(K)-QCT9(K)
             PRE9(K)=PRE9(K)-QVT9(K)
 
-            SCR29(K)=0.
-            DUM1129(K)=0.
+            SCR29(K)=0.0
+            DUM1129(K)=0.0
             if (DUM112(K) > SCR2(k)) then
                DUM1129(K)=-SCR2(K)*PRA2(K)/(DUM112(K)*DUM112(K))*PRA9(K)
                SCR29(K)=PRA2(K)/DUM112(K)*PRA9(K)
@@ -247,7 +247,7 @@ subroutine da_moist_phys_adj(grid)
 
          do K=kts,kte
 
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
             grid%xa%t(I,J,K)=grid%xa%t(I,J,K)-XLV1*DUM319(K)
 
@@ -257,10 +257,10 @@ subroutine da_moist_phys_adj(grid)
             grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+SCR59(K)/SCR4(K)
             SCR49(K)=-grid%xb%q(I,J,K)/SCR4(K)**2*SCR59(K)
 
-            if(grid%xb%qrn(I,J,K) > 1.E-25) then
+            if(grid%xb%qrn(I,J,K) > 1.0e-25) then
                grid%xa%qrn(I,J,K)=grid%xa%qrn(I,J,K)+SCR39(K)
             end if
-            if(grid%xb%qcw(I,J,K) > 0.) then
+            if(grid%xb%qcw(I,J,K) > 0.0) then
                grid%xa%qcw(I,J,K)=grid%xa%qcw(I,J,K)+SCR29(K)
             end if
 
@@ -268,11 +268,11 @@ subroutine da_moist_phys_adj(grid)
 
          do K=kts,kte
 
-            if (DT(k) <= 0.) cycle
+            if (DT(k) <= 0.0) cycle
 
             grid%xa%q(I,J,K)=grid%xa%q(I,J,K)+SCR49(K)/QVSS(K)
             QVSS9(K)=-grid%xb%q(I,J,K)/QVSS(K)**2*SCR49(K)
-            TMP(K)=622./((grid%xb%p(I,J,K)-EES(K))**2)
+            TMP(K)=622.0/((grid%xb%p(I,J,K)-EES(K))**2)
             EES9(K)=TMP(K)*grid%xb%p(I,J,K)*QVSS9(K)
             grid%xa%p(I,J,K)=grid%xa%p(I,J,K)-TMP(K)*EES(K)*QVSS9(K)
             if( grid%xb%t(I,J,K) > TO )then

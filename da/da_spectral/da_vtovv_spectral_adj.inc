@@ -48,7 +48,7 @@ subroutine da_vtovv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, in
    ! [1] Perform Adjoint of inverse Fourier decomposition in E-W direction:
    !----------------------------------------------------------------------
 
-   v_fou = 0.
+   v_fou = 0.0
    do j = jts, jte
       r_fou(its:ite) = field(its:ite,j) 
 #ifdef FFTPACK
@@ -60,12 +60,12 @@ subroutine da_vtovv_spectral_adj(max_wavenumber, sizec, lenr, lenwrk, lensav, in
       !----------------------------------------------------------------------
       ! Adjust the output for adjoint test
       !----------------------------------------------------------------------
-      r_fou      =  real(ite)/2. * r_fou
+      r_fou      =  real(ite)/2.0 * r_fou
       r_fou(its) =  r_fou(its)   * 2.0       
 
       ! if(.not. odd_longitudes) r_fou(ite) = 2.0*r_fou(ite)   
       ! make r_fou(ide) zero as there is no power computed for this wavenumber
-      r_fou(ite) = 0.
+      r_fou(ite) = 0.0
 
       v_fou(j,0) = CMPLX(r_fou(its), r_fou(ite))
 

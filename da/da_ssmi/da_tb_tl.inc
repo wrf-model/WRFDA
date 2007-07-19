@@ -59,7 +59,7 @@ subroutine da_tb_tl(ifreq,theta,p0,ta,gamma,sst,wv,hwv,u,alw,zcld,            &
 
    ! get upwelling atmospheric brightness temperature
 
-   TGL_theta=0.
+   TGL_theta=0.0
    call da_tbatmos_tl(ifreq,theta,p0,wv,hwv,ta,gamma,alw,zcld, &
                        tbup,tbdn,tauatm,                        &
                        TGL_theta,TGL_p0,TGL_wv,TGL_hwv,TGL_ta,TGL_gamma,  &

@@ -34,11 +34,11 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
       ' Test invertibility of spectral (Fourier, Legendre) transforms:'
 
    ! Gridpoint to spectral:
-   rcv = 0. 
+   rcv = 0.0
    call da_vv_to_v_spectral( xbx%ni, xbx%nj, max_wave, xbx%inc, xbx%lenr, xbx%lensav, xbx%lenwrk, &
                              xbx%alp_size, 2*sizec, xbx%alp, xbx%wsave, xbx%int_wgts, rcv, field)
 
-   field_out = 0.
+   field_out = 0.0
    ! Spectral to gridpoint:
    call da_vtovv_spectral( max_wave, sizec, &
                              xbx % lenr, xbx % lenwrk, xbx % lensav, &
@@ -49,7 +49,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
       'Domain-Averaged (Grid->Spectral->Grid) Error = ', &
               sqrt( sum( ( field_out(1:xbx%ni,1:xbx%nj) - field(1:xbx%ni,1:xbx%nj) )**2 ) / &
                     sum( field(1:xbx%ni,1:xbx%nj)**2 ) )
-   rcv_out = 0.
+   rcv_out = 0.0
    
    ! Gridpoint to spectral (again):
    call da_vv_to_v_spectral( xbx%ni, xbx%nj, max_wave, xbx%inc, xbx%lenr, xbx%lensav, xbx%lenwrk, &
@@ -94,7 +94,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
       call da_legtra_inv( jds, jde, jts, jte, max_wave, xbx%alp_size, m, xbx%alp, &
                           ccv(index_start:index_end), r_leg )
 
-      ccv1(index_start:index_end) = 0.
+      ccv1(index_start:index_end) = 0.0
       call da_legtra ( xbx%nj, max_wave, xbx%alp_size, m, xbx%int_wgts, xbx%alp, r_leg, &
                        ccv1(index_start:index_end) )
       ccv1(index_start:index_end) = ccv1(index_start:index_end) - &
@@ -110,7 +110,7 @@ subroutine da_test_spectral( max_wave, sizec, xbx, field)
                aimag(r_leg(1:xbx%nj))*aimag(r_leg(1:xbx%nj)) )
       write(unit=stdout,fmt='(a,i5,a,e30.20)') 'For Wave = ',m,' LX.LX    = ',xx
 
-      ccv1(index_start:index_end) = 0.
+      ccv1(index_start:index_end) = 0.0
       call da_legtra_inv_adj( jds, jde, jts, jte, max_wave, xbx%alp_size, m, xbx%alp, &
                               ccv1(index_start:index_end), r_leg )
       xx = sum( real(ccv(index_start:index_end))*     &

@@ -100,7 +100,7 @@ subroutine da_qc_hirs (i, nchan, ob, iv)
          ! else 
          ! end if
 
-         !if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 850.)) then
+         !if ((isflg .ne. 0) .and. (iv%instid(i)%ps(n) < 850.0)) then
          !   iv%instid(i)%tb_qc(5,n)  = qc_bad
          !   if (iv%instid(i)%proc_domain(n)) &
          !      nrej_topo = nrej_topo + 1
@@ -119,7 +119,7 @@ subroutine da_qc_hirs (i, nchan, ob, iv)
 
          !  1. check absolute value of innovation
          !------------------------------------------------
-            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.) then
+            if (abs(iv%instid(i)%tb_inv(k,n)) > 15.0) then
                iv%instid(i)%tb_qc(k,n)  = qc_bad
                if (iv%instid(i)%proc_domain(n)) &
                   nrej_omb_abs(k) = nrej_omb_abs(k) + 1

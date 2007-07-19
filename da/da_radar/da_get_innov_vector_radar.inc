@@ -101,10 +101,10 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
       call da_interp_lin_3d(xb % qrn, i, j, dx, dy, dxm, dym, &
                          model_qrn, max_ob_levels, iv%radar(n)%zk, num_levs)
 
-      ! Test 5.E-5 as critical value. It can not be smaller.
+      ! Test 5.0E-5 as critical value. It can not be smaller.
 
       do k=1,num_levs
-         model_qrn(k)=amax1(5.E-5,model_qrn(k))
+         model_qrn(k)=amax1(5.0E-5,model_qrn(k))
       end do
 
       model_ps = dxm *(dym * xb % psac(i,  j) + dy * xb%psac(i+1,  j)) + &
@@ -143,7 +143,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
             if (use_radar_rv) then
                if (ABS(iv % radar(n) % rv(k) % qc - missing_data) > 1) then
-                  if (ABS(ob % radar(n) % rv(k) - missing_r) > 1. .AND. &
+                  if (ABS(ob % radar(n) % rv(k) - missing_r) > 1.0 .AND. &
                        iv % radar(n) % rv(k) % qc >= obs_qc_pointer) then
 
                      zr=iv%radar(n)%height(k) - iv%radar(n)%stn_loc%elv
@@ -160,7 +160,7 @@ subroutine da_get_innov_vector_radar( it, xb, xp, ob, iv)
 
             if (use_radar_rf) then
                if (ABS(iv % radar(n) % rf(k) % qc - missing_data) > 1) then
-                  if (ABS(ob % radar(n) % rf(k) - missing_r) > 1. .AND. &
+                  if (ABS(ob % radar(n) % rf(k) - missing_r) > 1.0 .AND. &
                      iv % radar(n) % rf(k) % qc >= obs_qc_pointer) then
                      call da_reflectivity( model_rf(k), model_rho(k), &
                         model_qrn(k))

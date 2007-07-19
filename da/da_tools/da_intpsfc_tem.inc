@@ -37,7 +37,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
    ! 1.1 Convert model pressure profile from Pa to hPa  
 
-   prs_mb = pressure / 100.
+   prs_mb = pressure / 100.0
 
    ! 1.2  Find levels surface + 100hPA
 
@@ -83,15 +83,15 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
    ! 2.1 Potential temperature at 100hPa above model surface
 
-   th_100mb = temp (k_100mb) * (1000. / prs_mb (k_100mb))**rcp
+   th_100mb = temp (k_100mb) * (1000.0 / prs_mb (k_100mb))**rcp
 
    ! 2.2 Potential temperature at 200hPa above model surface
 
-   th_200mb = temp (K_200mb) * (1000. / prs_mb (k_200mb))**rcp
+   th_200mb = temp (K_200mb) * (1000.0 / prs_mb (k_200mb))**rcp
 
    ! 2.3 Potential temperature at observation location
 
-   th_obs   = to * (1000. / (po/100.)) ** rcp
+   th_obs   = to * (1000.0 / (po/100.0)) ** rcp
 
 
    ! 3.  LAPSE RATE BETWEEN SURFACE+200hPA AND SURFACE+100hPa
@@ -137,7 +137,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
 
    ! 4.3 Corresponding Temperature
 
-   val  = th_sfc * (prs_mb (kts) / 1000.)**rcp
+   val  = th_sfc * (prs_mb (kts) / 1000.0)**rcp
 
 end subroutine da_intpsfc_tem
 

@@ -31,7 +31,7 @@ subroutine da_llij_latlon(lat, lon, proj, i, j)
    deltalat = lat - proj%lat1
 
    ! To account for issues around the dateline, convert the incoming
-   ! longitudes to be 0->360.
+   ! longitudes to be 0->360.0
    if (lon < 0) then 
       lon360 = lon + 360.0 
    else 
@@ -40,8 +40,8 @@ subroutine da_llij_latlon(lat, lon, proj, i, j)
    deltalon = lon360 - proj%lon1      
     
    ! Compute i/j
-   i = deltalon/loninc + 1.
-   j = deltalat/latinc + 1.
+   i = deltalon/loninc + 1.0
+   j = deltalat/latinc + 1.0
 
 end subroutine da_llij_latlon
 

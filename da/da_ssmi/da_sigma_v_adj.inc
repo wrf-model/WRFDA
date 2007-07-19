@@ -114,7 +114,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
    ADJ_term23=0.0
    ADJ_term33=0.0
    ADJ_term43=0.0
-   ADJ_term53=0.
+   ADJ_term53=0.0
    ADJ_term63=0.0
 
    voh4=0.0
@@ -209,7 +209,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
 
         ADJ_pbar1  = a41*ADJ_term41*otbar1
         ADJ_otbar1 = a41*pbar1*ADJ_term41 + ADJ_otbar1
-        ADJ_otbar1 = 2.*a61*otbar1*ADJ_term61 + ADJ_otbar1
+        ADJ_otbar1 = 2.0*a61*otbar1*ADJ_term61 + ADJ_otbar1
 
         ADJ_otbar1 = a31*ADJ_term31 + ADJ_otbar1
 
@@ -233,7 +233,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
           ADJ_term52 = ADJ_sigv
           ADJ_term62 = ADJ_sigv
 
-        ADJ_otbar2 = 2.*a62*otbar2*ADJ_term62
+        ADJ_otbar2 = 2.0*a62*otbar2*ADJ_term62
 
         ADJ_otbar2 = a42*ADJ_term42 + ADJ_otbar2
 
@@ -246,7 +246,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
           ADJ_wv   = ADJ_voh2/hwv + ADJ_wv
           ADJ_hwv  = -voh2*ADJ_voh2/hwv + ADJ_hwv
 
-        ADJ_pbar2  = 2.*a52*pbar2*ADJ_term52
+        ADJ_pbar2  = 2.0*a52*pbar2*ADJ_term52
 
         ADJ_pbar2  = a22*ADJ_term22 + ADJ_pbar2
 
@@ -278,7 +278,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
           ADJ_wv   = ADJ_voh3/hwv  + ADJ_wv
           ADJ_hwv  =-voh3*ADJ_voh3/hwv + ADJ_hwv
 
-         ADJ_pbar3 = 2.*a43*pbar3*ADJ_term43 + ADJ_pbar3
+         ADJ_pbar3 = 2.0*a43*pbar3*ADJ_term43 + ADJ_pbar3
 
          ADJ_p0    = ADJ_pbar3/(1.0 + hwv/h3) + ADJ_p0
          ADJ_hwv   = -pbar3*ADJ_pbar3/h3/(1.0 + hwv/h3) + ADJ_hwv
@@ -308,7 +308,7 @@ subroutine da_sigma_v_adj(ifreq,p0,wv,hwv,ta,gamma,sigv,                   &
           ADJ_wv   = ADJ_voh4/hwv + ADJ_wv
           ADJ_hwv  = -voh4*ADJ_voh4/hwv + ADJ_hwv
 
-        ADJ_pbar4  = 2.*a44*pbar4*ADJ_term44 + ADJ_pbar4
+        ADJ_pbar4  = 2.0*a44*pbar4*ADJ_term44 + ADJ_pbar4
 
          ADJ_p0    = ADJ_pbar4/(1.0 + hwv/h4) + ADJ_p0
          ADJ_hwv   = -pbar4*ADJ_pbar4/h4/(1.0 + hwv/h4) + ADJ_hwv

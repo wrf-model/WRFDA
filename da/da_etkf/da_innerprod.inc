@@ -12,7 +12,7 @@ subroutine da_innerprod(mata,matc,ni,nj)
 
    integer             :: i1, i2, k       ! Loop counters.
 
-   matc = 0.
+   matc = 0.0
 
    do i1=1,nj
       do i2=1,nj

@@ -79,7 +79,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       term31     = a31*otbar1
       TGL_term31 = a31*TGL_otbar1
       term61     = a61*otbar1*otbar1
-      TGL_term61 = 2.*a61*otbar1*TGL_otbar1
+      TGL_term61 = 2.0*a61*otbar1*TGL_otbar1
       term41     = a41*pbar1*otbar1
       TGL_term41 = a41*(TGL_pbar1*otbar1+pbar1*TGL_otbar1)
       term51     = a51*voh1*otbar1
@@ -93,7 +93,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       term22     = a22*pbar2
       TGL_term22 = a22*TGL_pbar2
       term52     = a52*pbar2*pbar2
-      TGL_term52 = 2.*a52*pbar2*TGL_pbar2
+      TGL_term52 = 2.0*a52*pbar2*TGL_pbar2
       voh2       = wv/hwv
       TGL_voh2   = TGL_wv/hwv-voh2*TGL_hwv/hwv
       term32     = a32*voh2
@@ -104,7 +104,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       term42     = a42*otbar2
       TGL_term42 = a42*TGL_otbar2
       term62     = a62*otbar2*otbar2
-      TGL_term62 = 2.*a62*otbar2*TGL_otbar2
+      TGL_term62 = 2.0*a62*otbar2*TGL_otbar2
       sigv       = a12 + term22 + term32 + term42 + term52 + term62
       TGL_sigv   = TGL_term22 + TGL_term32 + TGL_term42 + TGL_term52 + TGL_term62
 
@@ -112,7 +112,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
       pbar3      = p0/(1.0 + hwv/h3)
       TGL_pbar3  = TGL_p0/(1.0 + hwv/h3)-pbar3*TGL_hwv/h3/(1.0 + hwv/h3)
       term43     = a43*pbar3*pbar3
-      TGL_term43 = 2.*a43*pbar3*TGL_pbar3
+      TGL_term43 = 2.0*a43*pbar3*TGL_pbar3
       voh3       = wv/hwv
       TGL_voh3   = TGL_wv/hwv-voh3*TGL_hwv/hwv
       term23     = a23*voh3
@@ -134,7 +134,7 @@ subroutine da_sigma_v_tl(ifreq,p0,wv,hwv,ta,gamma,sigma_v,                &
              pbar4 = p0/(1.0 + hwv/h4)
          TGL_pbar4 = TGL_p0/(1.0 + hwv/h4)-pbar4*TGL_hwv/h4/(1.0 + hwv/h4)
             term44 = a44*pbar4*pbar4
-        TGL_term44 = 2.*a44*pbar4*TGL_pbar4
+        TGL_term44 = 2.0*a44*pbar4*TGL_pbar4
               voh4 = wv/hwv
           TGL_voh4 = TGL_wv/hwv-voh4*TGL_hwv/hwv
             term24 = a24*voh4

@@ -115,7 +115,7 @@ subroutine da_wz_base(xb,WZ_b)
 
    do J=jts,jte
       do I=its,ite
-         TERM3=0.
+         TERM3=0.0
 
          do K=kte-1,kts,-1
             TERM3=TERM3+GRAVITY*(DIV(I,J,K+1)+DIV(I,J,K))*0.5  &

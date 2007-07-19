@@ -30,8 +30,8 @@ subroutine da_get_vpoles(u,v,        &
    do k = kts,kte
       tmp_u =0.0
       tmp_v =0.0
-      tmpu = 0.
-      tmpv = 0.
+      tmpu = 0.0
+      tmpv = 0.0
 
       if (jts == jds) then 
          tmp_u = tmpvar*sum(-u(its:ite,jts+1,k)*cos_xls(its:ite)& 
@@ -50,8 +50,8 @@ subroutine da_get_vpoles(u,v,        &
  
       tmp_u =0.0
       tmp_v =0.0
-      tmpu = 0.
-      tmpv = 0.
+      tmpu = 0.0
+      tmpv = 0.0
 
       if (jte == jde) then 
          tmp_u = tmpvar*sum(-u(its:ite,jte-1,k)*cos_xle(its:ite)& 

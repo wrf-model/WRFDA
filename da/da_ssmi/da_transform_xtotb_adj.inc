@@ -65,7 +65,7 @@ subroutine da_transform_xtotb_adj (grid)
          psfc  = 0.01*grid%xb%psfc(i,j)
          ! sst   = grid%xb%tgrn(i,j)
          ta    = grid%xb%tgrn(i,j) + &
-                 (grid%xb%t(i,j,kts)-grid%xb%tgrn(i,j))*log(2./0.0001)/ &
+                 (grid%xb%t(i,j,kts)-grid%xb%tgrn(i,j))*log(2.0/0.0001)/ &
                  log((grid%xb%h(i,j,kts)- grid%xb%terr(i,j))/0.0001)
 
          gamma = (ta-270.0)*0.023 + 5.03  ! effective lapse rate   (km) (4.0-6.5)
@@ -151,7 +151,7 @@ subroutine da_transform_xtotb_adj (grid)
 
          grid%xa%t(i,j,kts) = grid%xa%t(i,j,kts) + ADJ_ta* &
                    log(2.0/0.0001)/log((grid%xb%h(i,j,kts)-grid%xb%terr(i,j))/0.0001)
-         ADJ_sst = 0.
+         ADJ_sst = 0.0
 
          grid%xa%psfc(i,j) = grid%xa%psfc(i,j) + ADJ_psfc*0.01 
       end do

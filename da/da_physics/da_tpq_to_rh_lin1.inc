@@ -42,7 +42,7 @@ subroutine da_tpq_to_rh_lin1( t, p, es, rh, &
    ! [3.0] Calculate relative humidity increment:
    !---------------------------------------------------------------------------
 
-   rh_prime = 100. * (q_prime / qs) - rh * qs_prime_over_qs
+   rh_prime = 100.0 * (q_prime / qs) - rh * qs_prime_over_qs
 
 end subroutine da_tpq_to_rh_lin1
 

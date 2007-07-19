@@ -36,32 +36,32 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
       case (convert_fd2uv);
 
-         ! CONVERT WinD module/DIRECTION inTO U/V WinD COMPONENTS ON EARTH,
-         ! then CONVERT U/V WinD COMPONENTS ON EARTH inTO LAMBERT CONFORMAL OR
-         ! POLAR STEREOGRAPHIC PROJECTION U/V WinD COMPONENTS.
+         ! convert wind module/direction into u/v wind components on earth,
+         ! then convert u/v wind components on earth into lambert conformal or
+         ! polar stereographic projection u/v wind components.
 
-         ! PROJECTIONS CHANGE REQUIRES ONLY A CHANGE OF THE CONE CONSTANT, XN
-         ! EQUATIONS REMAin THE SAME.
+         ! projections change requires only a change of the cone constant, xn
+         ! equations remain the same.
 
          AEARTH = D/CONV
 
          UEARTH = -F*Sin(AEARTH)
          VEARTH = -F*COS(AEARTH)
 
-         ! FOR CONVERSION TO GRID COORDinATES,
-         ! SEE program DATAMAP, SUBR VECT, AND
+         ! for conversion to grid coordinates,
+         ! see program datamap, subr vect, and
          ! ANTHES METEO. 597 NOTES, EQUA. 2.23, 2.25, 2.28.
 
          XLONRT = XLONC-YLON
 
-         if (XLONRT .GT. 180.) XLONRT=XLONRT-360.
-         if (XLONRT .LT.-180.) XLONRT=XLONRT+360.
+         if (XLONRT .GT. 180.0) XLONRT=XLONRT-360.0
+         if (XLONRT .LT.-180.0) XLONRT=XLONRT+360.0
 
          ANG=XLONRT*CONE_FACTOR/CONV
 
-         ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
+         ! for mercator projection, the winds are as in earth coordinates
 
-         if (map_projection.EQ.3) ANG=0.
+         if (map_projection.EQ.3) ANG=0.0
 
          if (PHIC.LT.0.0) ANG=-ANG
 
@@ -79,15 +79,15 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
 
          XLONRT = XLONC-YLON
 
-         if (XLONRT .GT. 180.) XLONRT=XLONRT-360.
-         if (XLONRT .LT.-180.) XLONRT=XLONRT+360.
+         if (XLONRT .GT. 180.0) XLONRT=XLONRT-360.0
+         if (XLONRT .LT.-180.0) XLONRT=XLONRT+360.0
 
          ANG=XLONRT*CONE_FACTOR/CONV
 
          ! FOR MERCATOR PROJECTION, THE WinDS ARE AS in EARTH COORDinATES
 
-         if (map_projection .EQ.  3) ANG = 0.
-         if (PHIC  .LT. 0.) ANG = -ANG
+         if (map_projection .EQ.  3) ANG = 0.0
+         if (PHIC  .LT. 0.0) ANG = -ANG
 
          UEARTH = U*COS(ANG) - V*Sin(ANG)
          VEARTH = U*Sin(ANG) + V*COS(ANG)
@@ -95,13 +95,13 @@ subroutine da_ffdduv (F,D,U,V,YLON,ID)
          F = sqrt(UEARTH*UEARTH + VEARTH*VEARTH)
 
          if (F .EQ. 0.0) then
-            D = 0.
+            D = 0.0
             return
          end if
 
-         if (VEARTH .EQ. 0.) then
-            if (UEARTH .GT. 0.) D = 270.
-            if (UEARTH .LT. 0.) D =  90.
+         if (VEARTH .EQ. 0.0) then
+            if (UEARTH .GT. 0.0) D = 270.0
+            if (UEARTH .LT. 0.0) D =  90.0
          else
             AEARTH = ATAN (UEARTH/VEARTH)*CONV
 
