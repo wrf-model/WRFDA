@@ -84,7 +84,6 @@ subroutine da_solve ( grid , config_flags)
 #endif
 
    if (trace_use) call da_trace_entry("da_solve")
-write (0,*) __FILE__,__LINE__
 
 #ifdef DM_PARALLEL
    call mpi_barrier(comm,ierr)

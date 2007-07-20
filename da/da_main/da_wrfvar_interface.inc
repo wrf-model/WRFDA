@@ -6,33 +6,6 @@ subroutine da_wrfvar_interface (grid, config_flags)
 
    implicit none
 
-   interface
-      subroutine da_solve (grid , config_flags)
-
-      ! Driver layer modules
-      use module_domain
-      use module_configure
-      use module_machine
-      use module_tiles
-      use module_dm
-      ! Mediation layer modules
-      ! Model layer modules
-      use module_model_constants
-
-      use da_control
-      use da_define_structures
-      use da_setup_structures
-      use da_test
-      use da_minimisation
-
-      ! Input data.
-
-      type(domain),                intent(inout) :: grid
-      type (grid_config_rec_type), intent(inout) :: config_flags
-
-      end subroutine da_solve
-   end interface
-
    type(domain),                intent(inout) :: grid
    type (grid_config_rec_type), intent(inout) :: config_flags
    integer :: idum1, idum2

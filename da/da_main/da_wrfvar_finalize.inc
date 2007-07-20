@@ -15,7 +15,6 @@ subroutine da_wrfvar_finalize
       tovs_send_start
    use da_wrfvar_io, only : da_med_initialdata_output
    use da_tracing, only : da_trace_entry, da_trace_exit
-   use da_wrfvar_top, only : config_flags
    use da_tools1, only : da_free_unit
    use da_wrf_interfaces, only : wrf_error_fatal,med_shutdown_io
    use da_reporting, only : da_message

@@ -54,5 +54,7 @@ contains
 #include "da_wrfvar_init2.inc"
 #include "da_wrfvar_run.inc"
 #include "da_wrfvar_interface.inc"
+#include "da_wrfvar_finalize.inc"
+#include "da_solve.inc"
 
 end module da_wrfvar_top

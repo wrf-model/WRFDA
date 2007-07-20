@@ -15,14 +15,10 @@ program da_wrfvar_main
    use da_tracing, only : da_trace_init, da_trace_report, da_trace_entry, &
       da_trace_exit
    use da_wrf_interfaces, only : wrf_shutdown, wrf_message, disable_quilting
-   use da_wrfvar_top, only : da_wrfvar_init1,da_wrfvar_init2,da_wrfvar_run
+   use da_wrfvar_top, only : da_wrfvar_init1,da_wrfvar_init2,da_wrfvar_run, &
+      da_wrfvar_finalize
 
    implicit none
-
-   interface
-      subroutine da_wrfvar_finalize
-      end subroutine da_wrfvar_finalize
-   end interface
 
    ! Split initialisation into 2 parts so we can start and stop trace here
 
