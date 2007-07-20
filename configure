@@ -12,19 +12,16 @@ export ZLIB=${ZLIB:-}
 export JPEG=${JPEG:-}  
 export JASPER=${JASPER:-}  
 export compileflags=""
-export MAX_DOMAINS=1
+export MAX_DOMAINS=21
 export RWORDSIZE='$(NATIVE_RWORDSIZE)'
+export COREFLAGS="-DNEW_BDYS"
 
 option=$1
 
 # Change default options if not configuring a wrfvar target
-# (wrfvar, be, all)
+# (wrfvar, be, all_wrfvar)
 
-if [ "$option" = "wrf" -o "$option" = "em_real" ] ; then
-    REGISTRY=Registry.EM
-    EM_CORE=1
-    MAX_DOMAINS=21
-elif [ "$option" = "wrf_em" ] ; then
+if [ "$option" = "wrf" -o "$option" = "wrf_em" -o "$option" = "em_real" ] ; then
     REGISTRY=Registry.EM
     EM_CORE=1
 elif [ "$option" = "wrf_em_nl" ] ; then
@@ -33,9 +30,12 @@ elif [ "$option" = "wrf_em_nl" ] ; then
 elif [ "$option" = "wrf_em_chem" ] ; then
     REGISTRY=Registry.EM_CHEM
     EM_CORE=1
+    WRF_CHEM=1
 elif [ "$option" = "wrf_nmm" ] ; then
     NMM_CORE=1
-    REGISTRY=Registry.NMM
+    REGISTRY=Registry.NMM  
+    export NMM_MAX_DIM=2600
+    export COREFLAGS="-DNMM_MAX_DIM=$NMM_MAX_DIM"
 else
     DA_CORE=1
     EM_CORE=1
@@ -473,7 +473,7 @@ if test -n "$PERL" ; then
      -ldflags=$ldflags -pnetcdf=$PNETCDF -zlib=$ZLIB -jpeg=$JPEG \
      -compileflags=$compileflags -registry=$REGISTRY -da_core=$DA_CORE \
      -em_core=$EM_CORE -nmm_core=$NMM_CORE -max_domains=$MAX_DOMAINS \
-     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE \
+     -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -coreflags=$COREFLAGS \
      -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR \
      -rwordsize=$RWORDSIZE -promote_float="$PROMOTE_FLOAT"
 fi
@@ -502,19 +502,18 @@ touch -t01010101 build/depend.txt
 #fi
 
 if test $NMM_CORE = 1; then
-  grep -q DM_PARALLEL $CONFIG
-  if test $status = 1; then
-    echo NMM_CORE must be configured for DM parallel
-    echo Please rerun the configure script and chose a DM parallel option
-    exit 3
-  fi
+#  grep -q DM_PARALLEL $CONFIG
+#  if test $status = 1; then
+#    echo NMM_CORE must be configured for DM parallel
+#    echo Please rerun the configure script and chose a DM parallel option
+#    exit 3
+#  fi
   # integrity check for a kludge where a hard coded value in the 
   # registry must match the same value in arch/preamble
-  set registryvalue=`grep 'dimspec.* q ' Registry/$REGISTRY | sed -e 's/..*constant=//' -e 's/ ..*$//'`
-  set preamblevalue=`grep 'DNMM_MAX_DIM=.*' arch/preamble | sed -e 's/..*-DNMM_MAX_DIM=//' -e 's/ ..*$//'`
-  if ( $registryvalue != $preamblevalue ) then
+  registryvalue=`grep 'dimspec.* q ' Registry/Registry.NMM | sed -e 's/..*constant=//' -e 's/ ..*$//'`
+  if test $registryvalue -ne $NMM_MAX_DIM; then
     echo "Harded coded value of dimspec q in Registry ($registryvalue) does not"
-    echo "equal the hard coded value of NMM_MAX_DIM in arch/preamble ($preamblevalue)"
+    echo "equal the hard coded value of NMM_MAX_DIM in configure ($NMM_MAX_DIM)"
     echo "Please fix and try again."
     exit 2
   fi

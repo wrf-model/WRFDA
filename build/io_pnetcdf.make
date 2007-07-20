@@ -1,4 +1,4 @@
-# IO_PNETCDF
+# io_pnetcdf
 
 IO_PNETCDF_OBJS    = wrf_io_pnc.o field_routines_pnc.o
 IO_PNETCDF_CODE    = ext_pnc_get_dom_ti.code ext_pnc_get_var_td.code \

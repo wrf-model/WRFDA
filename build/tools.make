@@ -1,4 +1,4 @@
-# TOOLS
+# tools
 
 TOOLS_OBJ = registry.o my_strtok.o reg_parse.o data.o type.o misc.o \
       gen_defs.o gen_allocs.o gen_mod_state_descr.o gen_scalar_indices.o \

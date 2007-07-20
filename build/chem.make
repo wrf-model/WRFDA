@@ -1,32 +1,29 @@
 # CHEM
 
-CHEM_MODULES =                 \
-  module_chem_utilities.o           \
-  module_data_radm2.o           \
-  module_data_racm.o           \
-  module_data_sorgam.o           \
-  module_radm.o           \
-  module_racm.o           \
-  module_phot_mad.o           \
-  module_dep_simple.o           \
-  module_bioemi_simple.o     \
-  module_bioemi_beis311.o     \
-  module_vertmx_wrf.o        \
-  module_aerosols_sorgam.o           \
-  module_input_chem_data.o        \
-  module_input_chem_bioemiss.o        \
-  module_ctrans_grell.o           \
-  module_emissions_anthropogenics.o
-
-
-CHEM_OBJS    =         \
-        chemics_init.o \
-        chem_driver.o \
-        photolysis_driver.o \
-        mechanism_driver.o \
-        emissions_driver.o \
-        dry_dep_driver.o \
-        aerosol_driver.o
+CHEM_OBJS = \
+	module_chem_utilities.o \
+	module_data_radm2.o \
+	module_data_racm.o \
+	module_data_sorgam.o \
+	module_radm.o \
+	module_racm.o \
+	module_phot_mad.o \
+	module_dep_simple.o \
+	module_bioemi_simple.o \
+	module_bioemi_beis311.o \
+	module_vertmx_wrf.o \
+	module_aerosols_sorgam.o \
+	module_input_chem_data.o \
+	module_input_chem_bioemiss.o \
+	module_ctrans_grell.o \
+	module_emissions_anthropogenics.o \
+	chemics_init.o \
+	chem_driver.o \
+	photolysis_driver.o \
+	mechanism_driver.o \
+	emissions_driver.o \
+	dry_dep_driver.o \
+	aerosol_driver.o
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 

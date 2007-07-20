@@ -1,4 +1,4 @@
-# IO_GRIB
+# io_grib (for grib_share, grib1, grib2)
 
 GRIB_SHARE_OBJS = io_grib_share.o get_region_center.o gridnav.o open_file.o
 

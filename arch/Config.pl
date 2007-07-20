@@ -28,10 +28,11 @@ $sw_fftpack_path="";
 $sw_bufr_path=""; 
 $sw_ldflags=""; 
 $sw_compileflags=""; 
+$sw_coreflags=""; 
 $sw_max_domains="1"; 
 $sw_rwordsize="8"; 
 $sw_promote_float=""; 
-$WRFCHEM = 0 ;
+$chem = 0 ;
 $phdf5 = 0 ;
 $pnetcdf = 0 ;
 $grib1 = 0 ;
@@ -117,6 +118,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   if ( substr( $ARGV[0], 1, 14 ) eq "promote_float=" ) {
     $sw_promote_float = substr( $ARGV[0], 15 ) ;
   }
+  if ( substr( $ARGV[0], 1, 10 ) eq "coreflags=" ) {
+    $sw_coreflags = substr( $ARGV[0], 11 ) ;
+  }
   if ( substr( $ARGV[0], 1, 8 ) eq "ldflags=" ) {
     $sw_ldflags = substr( $ARGV[0], 9 ) ;
     # multiple options separated by spaces are passed in from sh script
@@ -129,9 +133,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
     # look for each known option
     $where_index = index ( $sw_compileflags , "-DWRF_CHEM" ) ;
     if ( $where_index eq -1 ) {
-      $WRFCHEM = 0 ;
+      $chem = 0 ;
     } else {
-      $WRFCHEM = 1 ;
+      $chem = 1 ;
     } 
     $where_index = index ( $sw_compileflags , "-DPHDF5" ) ;
     if ( $where_index ne -1 ) {
@@ -235,7 +239,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   $_ =~ s/CONFIGURE_DEVTOP/$sw_devtop/g ;
   $_ =~ s/CONFIGURE_PERL_PATH/$sw_perl_path/g ;
   $_ =~ s/CONFIGURE_LDFLAGS/$sw_ldflags/g ;
-  $_ =~ s/CONFIGURE_COMPILEFLAGS/$sw_compileflags/g ;
+  $_ =~ s/CONFIGURE_COREFLAGS/$sw_coreflags/g ;
   $_ =~ s/CONFIGURE_REGISTRY/$sw_registry/g ;
   $_ =~ s/CONFIGURE_DA_CORE/$sw_da_core/g ;
   $_ =~ s/CONFIGURE_EM_CORE/$sw_em_core/g ;
@@ -318,6 +322,14 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_JPEG_LIB:-L$sw_jpeg_path/lib -ljpeg: ;
   } else { 
     $_ =~ s:CONFIGURE_JPEG_LIB::g ;
+  }
+
+  if ( $grib1 == 1 || $grib2 == 1) {
+    $_ =~ s:CONFIGURE_GRIB_SHARE_LIBS:\$(IO_GRIB_SHARE)/libio_grib1.a: ;
+    $_ =~ s:CONFIGURE_GRIB_SHARE_LIB:-L$(IO_GRIB_SHARE) -lio_grib_share:g ;
+  } else { 
+    $_ =~ s:CONFIGURE_GRIB_SHARE_LIBS::g ;
+    $_ =~ s:CONFIGURE_GRIB_SHARE_LIB::g ;
   }
 
   if ( $grib1 == 1 ) {
@@ -440,11 +452,13 @@ while ( <CONFIGURE_PREAMBLE> ) {
     $_ =~ s:CONFIGURE_LAPACK_INC:.:g ;
   }
 
-  @machopts1 = ( @machopts1, $_ ) ;
-  if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )
-  {
-    @machopts1 = ( @machopts1, "WRF_CHEM\t=\t$WRFCHEM \n" ) ;
+  if ( $chem ) {
+    $_ =~ s:CONFIGURE_CHEM_FLAG:-DWRF_CHEM: ;
+  } else {
+    $_ =~ s:CONFIGURE_CHEM_FLAG::g ;
   }
+
+  @machopts1 = ( @machopts1, $_ ) ;
 }
 close CONFIGURE_PREAMBLE ;
 

@@ -55,7 +55,6 @@ WRFVAR_OBJS = da_par_util.o \
    da_wrfvar_io.o \
    da_airsr.o \
    da_wrfvar_top.o \
-   da_wrfvar_finalize.o \
    da_reporting.o \
    module_wrf_error.o \
    module_configure.o \
@@ -91,7 +90,6 @@ WRFVAR_OBJS = da_par_util.o \
    wrf_io.o \
    io_int.o \
    da_memory.o \
-   da_solve.o \
    wrf_debug.o \
    set_timekeeping.o \
    wrf_shutdown.o \
@@ -173,11 +171,10 @@ wrfvar : setup da_wrfvar.exe da_advance_cymdh.exe da_update_bc.exe
 
 wrfvar_esmf : setup da_wrfvar_esmf.exe da_advance_cymdh.exe da_update_bc.exe
 
-da_wrfvar.exe : $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_main.o
+da_wrfvar.exe : $(WRFVAR_LIBS) da_wrfvar_main.o
 	$(LD) -o da_wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
 
-da_wrfvar_esmf.exe : $(WRFVAR_LIBS) $(WRFVAR_OBJS) da_wrfvar_esmf.o \
-          da_wrfvar_esmf_super.o
+da_wrfvar_esmf.exe : $(WRFVAR_LIBS) da_wrfvar_esmf.o da_wrfvar_esmf_super.o
 	$(LD) -o da_wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o
 
@@ -240,7 +237,7 @@ da_bias_verif.exe : da_bias_verif.o rad_bias.o
 # Special cases, either needing special include files or too big to 
 # optimise/debug
 
-da_wrfvar_finalise.o da_solve.o da_wrfvar_top.o da_wrfvar_io.o :
+da_wrfvar_top.o da_wrfvar_io.o :
 	@ $(RM) $@
 	@ $(SED_FTN) $*.f90 > $*.b
 	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f

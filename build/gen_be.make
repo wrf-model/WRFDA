@@ -1,28 +1,37 @@
-GEN_BE_OBJS = da_etkf.o da_gen_be.o da_control.o da_be_spectral.o \
-   module_wrf_error.o module_driver_constants.o da_memory.o da_reporting.o \
-   da_tools1.o module_ffts.o
+# gen_be
 
-be :		setup                   	\
-                $(GEN_BE_OBJS)          	\
-                gen_be_stage0_wrf.exe		\
-                gen_be_ep1.exe			\
-                gen_be_ep2.exe			\
-		gen_be_stage1.exe	        \
-		gen_be_stage1_1dvar.exe		\
-		gen_be_stage2.exe	        \
-		gen_be_stage2_1dvar.exe		\
-		gen_be_stage2a.exe	        \
-		gen_be_stage3.exe	        \
-		gen_be_stage4_global.exe	\
-		gen_be_stage4_regional.exe	\
-		gen_be_cov2d.exe		\
-		gen_be_cov3d.exe		\
-		gen_be_diags.exe	    	\
-		gen_be_diags_read.exe       	\
-		gen_be_ensrf.exe            	\
-		gen_be_etkf.exe             	\
-		gen_be_ensmean.exe          	\
-                da_advance_cymdh.exe
+GEN_BE_OBJS = da_etkf.o \
+	da_gen_be.o \
+	da_control.o \
+	da_be_spectral.o \
+	module_wrf_error.o \
+	module_driver_constants.o \
+	da_memory.o \
+	da_reporting.o \
+	da_tools1.o \
+	module_ffts.o
+
+be : setup \
+	$(GEN_BE_OBJS) \
+	gen_be_stage0_wrf.exe \
+	gen_be_ep1.exe \
+	gen_be_ep2.exe \
+	gen_be_stage1.exe \
+	gen_be_stage1_1dvar.exe	\
+	gen_be_stage2.exe \
+	gen_be_stage2_1dvar.exe \
+	gen_be_stage2a.exe \
+	gen_be_stage3.exe \
+	gen_be_stage4_global.exe \
+	gen_be_stage4_regional.exe \
+	gen_be_cov2d.exe \
+	gen_be_cov3d.exe \
+	gen_be_diags.exe \
+	gen_be_diags_read.exe \
+	gen_be_ensrf.exe \
+	gen_be_etkf.exe \
+	gen_be_ensmean.exe \
+	da_advance_cymdh.exe
 
 gen_be_stage0_wrf.exe : gen_be_stage0_wrf.o $(GEN_BE_OBJS)
 	$(SFC) -o gen_be_stage0_wrf.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_stage0_wrf.o $(GEN_BE_LIB)
@@ -77,6 +86,3 @@ gen_be_ensrf.exe : gen_be_ensrf.o $(GEN_BE_OBJS)
 
 gen_be_ensmean.exe : gen_be_ensmean.o $(GEN_BE_OBJS)
 	$(SFC) -o gen_be_ensmean.exe $(LDFLAGS) $(GEN_BE_OBJS) gen_be_ensmean.o $(GEN_BE_LIB)
-
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-

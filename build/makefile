@@ -42,46 +42,57 @@ links :
 	@ $(LN) $(CONVERTOR)/wave2grid_kma/* .
 	@ $(LN) $(CONVERTOR)/kma_netcdf/* .
 	@ $(LN) $(CONVERTOR)/decode_l2_airs/* .
+	@ $(LN) $(RSL_LITE)/* .
 	@ mv makefile.old makefile
 	@ touch links
 
-GRIB_SHARE_LIBS = $(IO_GRIB_SHARE)/libio_grib_share.a
-
-GRIB_SHARE_LIB  = -L$(IO_GRIB_SHARE) -lio_grib_share
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
   module_wrf_top.o $(FRAME_SPECIAL_OBJS)
 
-WRF_MODULES=$(SHARE_MODULES) $(FRAME_MODULES) $(PHYS_MODULES) $(DYN_MODULES)
+WRF_EM_OBJS=$(SHARE_EM_OBJS) $(DYN_EM_OBJS) $(PHYS_EM_OBJS)
 
-WRFVAR_LIBS = $(NETCDF_LIBS) libesmf_time.a \
-                 $(PNETCDF_LIBS) $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) \
-                 libwrfvar.a $(MPI_LIBS)
+WRF_NMM_OBJS=$(SHARE_NMM_OBJS) $(DYN_NMM_OBJS) $(PHYS_NMM_OBJS)
 
-WRF_LIBS    = libwrflib.a $(NETCDF_LIBS) libesmf_time.a \
-                 $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) \
-                 $(MPI_LIBS) $(PNETCDF_LIBS)
+WRFVAR_LIBS = libwrfvar.a $(ESMF_TIME_LIBS) $(NETCDF_LIBS) $(PNETCDF_LIBS) \
+        $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) $(MPI_LIBS)
 
-WRFVAR_LIB  = -L. $(LAPACK_LIB) -lwrfvar $(NETCDF_LIB) $(PNETCDF_LIB)  \
-                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
-                 $(ESMF_TIME_LIB) \
-                 $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK_LIB) \
-                 $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB) $(LOCAL_LIB)
+WRF_LIBS = libwrf.a $(ESMF_TIME_LIBS) $(NETCDF_LIBS) $(GRIB1_LIBS) $(GRIB2_LIBS) \
+        $(GRIB_SHARE_LIBS) $(MPI_LIBS) $(PNETCDF_LIBS)
 
-WRF_LIB     = -L. -lwrflib \
-                 $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
-                 $(NETCDF_LIB) \
-                 $(MPI_LIB) $(PNETCDF_LIB)
+WRFVAR_LIB = -L. -lwrfvar $(LAPACK_LIB) $(NETCDF_LIB) $(PNETCDF_LIB) \
+        $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) \
+        $(ESMF_TIME_LIB) \
+        $(LAPACK_LIB) $(BLAS_LIB) $(BUFR_LIB) $(FFTPACK_LIB) \
+        $(RTTOV_LIB) $(CRTM_LIB) $(MPI_LIB) $(LOCAL_LIB)
 
-GEN_BE_LIB =  $(NETCDF_LIB) -L. $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
-              $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
+WRF_LIB = -L. -lwrf $(GRIB1_LIB) $(GRIB2_LIB) $(GRIB_SHARE_LIB) $(LOCAL_LIB) \
+        $(NETCDF_LIB) $(MPI_LIB) $(PNETCDF_LIB)
 
+GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
+        $(LOCAL_GEN_BE_LIB) $(LOCAL_LIB)
+
+# makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
+# which is wrong, try to encourage it to use the correct one by manually defining
+# the test cases in main.make
+
+IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
+
+depend : links arch registry module_state_description.F md_calls.inc \
+                      inc/da_generic_boilerplate.inc
+	makedepf90 -free $(FPPFLAGS) \
+           *.F *.f90 *.F90 2>/dev/null \
+           | grep -vEe $(IGNORE) > depend.txt
+	touch depend
+	
+include depend.txt
 
 # Manual rules specified first take precedence
 
 include da.make
 include dyn_em.make
+include dyn_nmm.make
 include share.make
 include frame.make
 include phys.make
@@ -100,24 +111,17 @@ include main.make
 include RSL.make
 include RSL_LITE.make
 
-# makedepf90 finds lots of module_initialise versions, and picks the squall_2d one
-# which is wrong, try to encourage it to use the correct one by manually defining
-# the test cases in main.make
+libwrf.a : $(WRF_OBJS)
+	$(AR) libwrf.a $(WRF_OBJS)
+	$(RANLIB) libwrf.a
 
-IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
+libem.a : $(WRF_EM_OBJS)
+	$(AR) libem.a $(WRF_EM_OBJS)
+	$(RANLIB) libem.a
 
-depend : links arch registry module_state_description.F md_calls.inc \
-                      inc/da_generic_boilerplate.inc
-	makedepf90 -free $(FPPFLAGS) \
-           *.F *.f90 *.F90 2>/dev/null \
-           | grep -vEe $(IGNORE) > depend.txt
-	touch depend
-	
-include depend.txt
-
-libwrflib.a : $(WRF_OBJS) $(WRF_MODULES)
-	$(AR) libwrflib.a $(WRF_OBJS) $(WRF_MODULES)
-	$(RANLIB) libwrflib.a
+libnmm.a : $(WRF_NMM_OBJS)
+	$(AR) libnmm.a $(WRF_NMM_OBJS)
+	$(RANLIB) libnmm.a
 
 libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)

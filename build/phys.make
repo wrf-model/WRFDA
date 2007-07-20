@@ -1,6 +1,6 @@
-# PHYS
+# phys
 
-PHYS_MODULES = \
+PHYS_OBJS = \
 	module_bl_ysu.o \
 	module_bl_mrf.o \
 	module_bl_gfs.o \
@@ -51,7 +51,5 @@ PHYS_MODULES = \
 	module_diagnostics.o \
         module_mixactivate.o
 
-  
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
-# DO NOT DELETE
+PHYS_NMM_OBJS = \
+	module_sf_lsm_nmm.o

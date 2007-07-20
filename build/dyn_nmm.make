@@ -1,31 +1,35 @@
-DYN_MODULES =                 		\
-        module_ADVECTION.o         	\
-        module_BC_NMM.o         	\
-        module_BNDRY_COND.o         	\
-        module_CTLBLK.o         	\
-        module_DIFFUSION_NMM.o         	\
-        module_IGWAVE_ADJUST.o         	\
-        module_NONHY_DYNAM.o         	\
-        module_PHYSICS_CALLS.o       	\
-        module_MPP.o                    \
-        module_MPPINIT.o        	\
-        module_TIMERS.o                 \
-        module_ZEROX.o                  \
-        module_si_io_nmm.o              \
-        module_initialize_real.o
+# dyn)nmm
 
-DYN_OBJS    = 		          	\
-	read_nmm.o			\
-	init_modules_nmm.o  		\
-	start_domain_nmm.o  		\
-	solve_nmm.o         		\
-	RDTEMP.o    			\
-	BUCKETS.o 			\
-	CLTEND.o
+DYN_NMM_OBJS = \
+	module_ADVECTION.o \
+	module_BC_NMM.o \
+	module_BNDRY_COND.o \
+	module_CTLBLK.o \
+	module_DIFFUSION_NMM.o \
+	module_IGWAVE_ADJUST.o \
+	module_NONHY_DYNAM.o \
+	module_PHYSICS_CALLS.o \
+	module_PRECIP_ADJUST.o \
+	module_MPP.o \
+	module_MPPINIT.o \
+	module_TIMERS.o \
+	module_ZEROX.o \
+	module_si_io_nmm.o \
+	read_nmm.o \
+	init_modules_nmm.o \
+	start_domain_nmm.o \
+	solve_nmm.o \
+	DSTRB.o \
+	RDTEMP.o \
+	BUCKETS.o \
+	CLTEND.o \
+	init_modules_nmm.o \
+	solve_nmm.o \
+	start_domain_nmm.o
 
 # DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
-solve_nmm.o:   module_BC_NMM.o \
+solve_nmm.o : module_BC_NMM.o \
                module_IGWAVE_ADJUST.o module_ADVECTION.o  \
                module_NONHY_DYNAM.o module_DIFFUSION_NMM.o    \
                module_BNDRY_COND.o module_PHYSICS_CALLS.o \
