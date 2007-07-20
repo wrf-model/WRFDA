@@ -82,7 +82,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
 
    j % jc = 0.0
 
-   if (var4d .AND. jcdfi_use .AND. iter > 0) then
+   if (var4d .AND. iter > 0 ) then
 
       ndynopt      = grid%dyn_opt
       grid%dyn_opt = DYN_EM_TL
@@ -97,7 +97,7 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
       j % jc = j % jc + 0.5*da_dot(size(grid%em_g_v_2), grid%em_g_v_2 , grid%em_g_v_2)
       j % jc = j % jc + 0.5*da_dot(size(grid%em_g_t_2), grid%em_g_t_2 , grid%em_g_t_2)
       j % jc = j % jc + 0.5*da_dot(size(grid%em_g_mu_2),grid%em_g_mu_2, grid%em_g_mu_2)
-      j % jc = j % jc + 0.5*da_dot(size(grid%g_moist),  grid%g_moist,   grid%g_moist)
+!     j % jc = j % jc + 0.5*da_dot(size(grid%g_moist),  grid%g_moist,   grid%g_moist)
 
    end if
 
@@ -108,11 +108,16 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    cv_jb(1:cv_size_jb) = cv (1:cv_size_jb)
    xhat_jb(1:cv_size_jb) = xhat (1:cv_size_jb)
 
-   cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
-
-   j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
+   if (minimisation_option == 1) then
+      cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
+      j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
        cv_xhat_jb, cv_xhat_jb, grid%xp, &
        (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+   elseif (minimisation_option == 2) then
+      j % jb = 0.5 * da_dot_cv(cv_size_jb, cv_size_domain_jb, &
+       cv_jb, cv_jb, grid%xp, &
+       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+   endif
 
    j % jb = jb_factor * j % jb
 
@@ -124,10 +129,16 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    if (be % ne > 0) then
       cv_je(1:cv_size_je) = cv(je_start:je_end)
       xhat_je(1:cv_size_je) = xhat(je_start:je_end)
-      cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
-      j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
+      if (minimisation_option == 1) then
+         cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
+         j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
           cv_xhat_je, cv_xhat_je, grid%xp, &
           (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+      elseif (minimisation_option == 2) then
+         j % je = 0.5 * da_dot_cv(cv_size_je, cv_size_domain_je, &
+          cv_je, cv_je, grid%xp, &
+          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+      endif
    end if
    j % je = je_factor * j % je
 
@@ -182,25 +193,45 @@ subroutine da_calculate_j(it, iter, cv_size, cv_size_jb, cv_size_je, &
    gnorm_jo = da_dot_cv(cv_size, cv_size_domain, j_grad, j_grad, grid%xp, &
       (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
 
+   if (minimisation_option == 1) then
    ! Add Del_v (Jb)
-   j_grad(1:cv_size_jb) =  jb_factor * &
+      j_grad(1:cv_size_jb) =  jb_factor * &
                            (cv(1:cv_size_jb) + xhat(1:cv_size_jb)) + &
                            j_grad(1:cv_size_jb)
 
    ! Add Del_v (Je)
-   if (cv_size_je > 0) then
-      j_grad(je_start:je_end) = je_factor * &
+      if (cv_size_je > 0) then
+         j_grad(je_start:je_end) = je_factor * &
                                 (cv(je_start:je_end) + xhat(je_start:je_end)) + &
                                 j_grad(je_start:je_end)
-   end if
-   cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
-   gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
+      end if
+      cv_xhat_jb(1:cv_size_jb) = cv_jb(1:cv_size_jb) + xhat_jb(1:cv_size_jb)
+      gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
                          cv_xhat_jb, cv_xhat_jb, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
-   cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
-   gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
+      cv_xhat_je(1:cv_size_je) = cv_je(1:cv_size_je) + xhat_je(1:cv_size_je)
+      gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
                          cv_xhat_je, cv_xhat_je, grid%xp, &
                          (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+   elseif (minimisation_option == 2) then
+   ! Add Del_v (Jb)
+      j_grad(1:cv_size_jb) =  jb_factor * &
+                           (cv(1:cv_size_jb) ) + &
+                           j_grad(1:cv_size_jb)
+
+   ! Add Del_v (Je)
+      if (cv_size_je > 0) then
+         j_grad(je_start:je_end) = je_factor * &
+                                (cv(je_start:je_end) ) + &
+                                j_grad(je_start:je_end)
+      end if
+      gnorm_jb = da_dot_cv(cv_size_jb, cv_size_domain_jb, &
+                         cv_jb  , cv_jb , grid%xp, &
+                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+      gnorm_je = da_dot_cv(cv_size_je, cv_size_domain_je, &
+                         cv_je  , cv_je , grid%xp, &
+                         (/ be%v1%mz, be%v2%mz, be%v3%mz, be%v4%mz, be%v5%mz, be%alpha%mz /))
+   endif
 
    if (print_detail_grad) then
       write(unit=stdout, fmt='(a,i6)') 'Calculate grad_v(j) iter=', iter

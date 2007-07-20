@@ -30,7 +30,7 @@ module da_minimisation
       stdout, eps, stats_unit, test_dm_exact, global, var4d_multi_inc, &
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
-      rtm_option,rtm_option_rttov, rtm_option_crtm, &
+      rtm_option,rtm_option_rttov, rtm_option_crtm, minimisation_option, &
       write_filtered_rad,omb_set_rand, num_airsr_tot,jo_unit,num_airep_tot, &
       num_buoy_tot,num_geoamv_tot,num_gpsref_tot,num_pilot_tot, &
       num_polaramv_tot,num_radiance_tot,num_qscat_tot,num_profiler_tot, &
@@ -38,7 +38,8 @@ module da_minimisation
       num_ships_tot,num_ssmt2_tot,use_rad,var_scaling2,var_scaling1, &
       num_synop_tot,var_scaling4,var_scaling5,var_scaling3,num_ssmt1_tot, &
       num_satem_tot,print_detail_grad,omb_set_rand,grad_unit,cost_unit, &
-      cv_size_domain_je,cv_size_domain_jb
+      cv_size_domain_je,cv_size_domain_jb,nsave,ftol,gtol,xtol,maxfev, &
+      stpmin,stpmax,lp,mp
 #ifdef CRTM
    use da_crtm, only : da_get_innov_vector_crtm
                        !da_get_innov_vector_crtmk
@@ -129,10 +130,16 @@ contains
 #include "da_calculate_residual.inc"
 #include "da_get_var_diagnostics.inc"
 #include "da_get_innov_vector.inc"
+#include "da_lmdir.inc"
+#include "da_minimisation_warning.inc"
+#include "da_va15bd.inc"
+#include "da_vd05ad.inc"
+#include "da_vd05bd.inc"
 #include "da_dot.inc"
 #include "da_dot_cv.inc"
 #include "da_write_diagnostics.inc"
 #include "da_minimise_cg.inc"
+#include "da_minimise_qn.inc"
 #include "da_calculate_grady.inc"
 #include "da_transform_vtoy.inc"
 #include "da_transform_vtoy_adj.inc"

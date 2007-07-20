@@ -32,7 +32,8 @@ subroutine da_solve ( grid , config_flags)
 
    use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
       ips,ipe, jps,jpe, vert_corr, sin_xle, test_wrfvar, use_rad, &
-      calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, var4d_multi_inc, &
+      calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, &
+      var4d_multi_inc, minimisation_option, &
       write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
       sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
       cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
@@ -44,7 +45,7 @@ subroutine da_solve ( grid , config_flags)
       da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
       da_deallocate_y
    use da_minimisation, only : da_get_innov_vector,da_minimise_cg, &
-      da_write_diagnostics
+      da_write_diagnostics,da_minimise_qn
    use da_radiance1, only : da_write_oa_rad_ascii
    use da_obs_io, only : da_write_filtered_obs
    use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
@@ -251,11 +252,24 @@ subroutine da_solve ( grid , config_flags)
       call da_allocate_y( iv, re )
       call da_allocate_y( iv, y )
 
-      call da_minimise_cg( grid, config_flags,                  &
+      
+      if(minimisation_option == 1) then
+         call da_minimise_cg( grid, config_flags,                  &
                            it, be % cv % size, & 
                            xbx, be, iv, &
                            j_grad_norm_target, xhat, cvt, &
                            re, y, j)
+      else if(minimisation_option == 2) then
+         call da_minimise_qn( grid, config_flags,                  &
+                           it, be % cv % size, &
+                           xbx, be, iv, &
+                           j_grad_norm_target, xhat, cvt, &
+                           re, y, j)
+      else
+         write(unit=message(1),fmt='(A,I3)') &
+           'Invalid minimisation_option =', minimisation_option
+         call wrf_error_fatal(message(1:1))
+      endif
 
       !------------------------------------------------------------------------
 
