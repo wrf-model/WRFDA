@@ -10,8 +10,6 @@ subroutine da_read_bufrssmis (obstype,iv,xp,infile)
    !               and deallocate sequential data structure
    !---------------------------------------------------------------------------
 
-   use da_control
-
    implicit none
 
    character(5) ,     intent (in)    :: obstype    ! ssmis

@@ -4,62 +4,6 @@ subroutine da_solve ( grid , config_flags)
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
-   use module_configure, only : grid_config_rec_type
-   use module_domain, only : domain
-   use module_driver_constants, only : max_comms
-   use module_symbols_util, only : wrfu_finalize
-
-   use module_radiance, only : satinfo, time_slots
-#ifdef RTTOV
-   use module_radiance, only : coefs, sensor_descriptor
-#endif
-
-   use module_state_description, only : num_moist, num_a_moist, num_g_moist, &
-      num_scalar, num_a_scalar, num_g_scalar
-   use module_tiles, only : set_tiles
-
-#ifdef DM_PARALLEL
-#ifdef RSL_LITE
-   use module_dm, only : local_communicator, local_communicator_x, &
-      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
-      ntasks, data_order_xy
-#else
-   use module_dm, only : invalid_message_value, glen,setup_xpose_rsl, &
-      add_msg_24pt_real,reset_msgs_24pt,stencil_24pt,setup_halo_rsl, &
-      reset_msgs_xpose, add_msg_xpose_real, define_xpose, add_msg_24pt_integer
-#endif
-#endif
-
-   use da_control, only : trace_use, comm, ierr, ids,ide,jds,jde,kds,kde, &
-      ips,ipe, jps,jpe, vert_corr, vert_corr_2, sin_xle, test_wrfvar, use_rad, &
-      calc_w_increment, var4d_coupling_disk_simul, var4d_coupling, &
-      write_oa_rad_ascii, var4d, cos_xls, vertical_ip, use_radarobs, stdout, &
-      sin_xls, rf_passes, ntmax, rootproc,test_transforms,global, &
-      cos_xle,anal_type_qcobs,check_max_iv,anal_type_randomcv,cv_options_hum, &
-      max_ext_its,anal_type_verify, start_x, start_y,coarse_ix, coarse_jy, &
-      rtm_option, rtm_option_crtm, rtm_option_rttov,read_biascoef, ims, ime, &
-      kps, kpe, jms, jme, kms, kme, jts,jte, cv_options_hum_specific_humidity, &
-      cv_options_hum_relative_humidity, vertical_ip_0, vertical_ip_delta_p
-   use da_define_structures, only : y_type, j_type, ob_type, be_type, &
-      xbx_type,da_deallocate_background_errors,da_initialize_cv, &
-      da_zero_vp_type,da_allocate_y,da_deallocate_observations, &
-      da_deallocate_y
-   use da_minimisation, only : da_get_innov_vector,da_minimise_cg, &
-      da_write_diagnostics
-   use da_radiance1, only : da_write_oa_rad_ascii
-   use da_obs_io, only : da_write_filtered_obs
-   use da_par_util, only : da_system,da_copy_tile_dims,da_copy_dims
-   use da_physics, only : da_uvprho_to_w_lin
-   use da_reporting, only : message, da_warning, da_error
-   use da_setup_structures, only : da_setup_obs_structures, &
-      da_setup_background_errors,da_setup_flow_predictors
-   use da_test, only : da_check
-   use da_tools1, only : da_get_unit, da_free_unit
-   use da_tracing, only : da_trace_entry, da_trace_exit, da_trace
-   use da_transfer_model, only : da_transfer_xatoanalysis,da_setup_firstguess
-   use da_vtox_transforms, only : da_transform_vtox
-   use da_wrf_interfaces, only : wrf_error_fatal3
-
    implicit none
 
    type (domain),               intent(inout) :: grid

@@ -39,7 +39,11 @@ module da_radiance
       rtminit_print, rttov_scatt,comm,ierr,biasprep, qc_rad, num_procs, &
       tovs_min_transfer,use_error_factor_rad,num_fgat_time,stdout,trace_use, &
       qc_good, qc_bad,myproc,biascorr,thinning,thinning_mesh,                &
-      use_hirs4obs, use_mhsobs
+      use_hirs4obs, use_mhsobs,bufr_year, bufr_month,bufr_day,bufr_hour, &
+      bufr_minute, bufr_second,bufr_solzen, bufr_station_height, &
+      bufr_landsea_mask,tovs_end, max_tovs_input, bufr_satzen, nchan_mhs, &
+      nchan_msu, nchan_amsua,nchan_hirs2, nchan_hirs3, nchan_hirs4, bufr_lon, &
+      bufr_satellite_id, bufr_ifov,nchan_amsub, tovs_start, bufr_lat
 #ifdef CRTM
    use da_crtm, only : da_crtm_init
 #endif

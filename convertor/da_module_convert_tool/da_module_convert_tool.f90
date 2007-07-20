@@ -1,12 +1,10 @@
-MODULE da_module_convert_tool
+module da_module_convert_tool
 
-  use da_control
+   implicit none
 
-  implicit none
-
-CONTAINS
+contains
 
 #include "da_convertor_v_interp.inc"
 
-END MODULE da_module_convert_tool
+end module da_module_convert_tool
 
