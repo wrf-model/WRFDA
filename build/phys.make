@@ -51,5 +51,5 @@ PHYS_OBJS = \
 	module_diagnostics.o \
         module_mixactivate.o
 
-PHYS_NMM_OBJS = \
+PHYS_nmm_OBJS = \
 	module_sf_lsm_nmm.o

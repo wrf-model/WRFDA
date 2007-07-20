@@ -2,7 +2,7 @@
 
 DYN_OBJS = module_init_utilities.o
 
-DYN_EM_OBJS = \
+DYN_em_OBJS = \
 	module_advect_em.o \
 	module_diffusion_em.o \
 	module_small_step_em.o \

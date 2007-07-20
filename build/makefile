@@ -12,8 +12,11 @@ setup : depend
 links : 
 	@ cp makefile makefile.old
 	@ $(LN) $(CHEM)/* .
+	@ $(LN) $(DYN_EM)/* .
+	@ mv module_initialize_real.F module_initialize_real_em.F
 	@ $(LN) $(DYN_NMM)/* .
-	@ $(LN) $(DYNAMICS)/* .
+	@ mv module_initialize_real.F module_initialize_real_nmm.F
+	@ $(LN) $(DYN_EXP)/* .
 	@ $(LN) $(GEN_BE)/* .
 	@ $(LN) $(INC)/* .
 	@ $(LN) $(SHARE)/* .
@@ -49,11 +52,8 @@ links :
 
 WRF_OBJS=$(SHARE_OBJS) $(FRAME_OBJS) $(PHYS_OBJS) $(DYN_OBJS) \
   $(ESMF_TIME_F90_OBJS) $(IO_INT_OBJS) $(IO_NETCDF_OBJS) \
-  module_wrf_top.o $(FRAME_SPECIAL_OBJS)
-
-WRF_EM_OBJS=$(SHARE_EM_OBJS) $(DYN_EM_OBJS) $(PHYS_EM_OBJS)
-
-WRF_NMM_OBJS=$(SHARE_NMM_OBJS) $(DYN_NMM_OBJS) $(PHYS_NMM_OBJS)
+  module_wrf_top.o $(FRAME_SPECIAL_OBJS) $(SHARE_$(SOLVER)_OBJS) \
+  $(DYN_$(SOLVER)_OBJS) $(PHYS_$(SOLVER)_OBJS)
 
 WRFVAR_LIBS = libwrfvar.a $(ESMF_TIME_LIBS) $(NETCDF_LIBS) $(PNETCDF_LIBS) \
         $(GRIB1_LIBS) $(GRIB2_LIBS) $(GRIB_SHARE_LIBS) $(MPI_LIBS)
@@ -114,15 +114,7 @@ include RSL_LITE.make
 libwrf.a : $(WRF_OBJS)
 	$(AR) libwrf.a $(WRF_OBJS)
 	$(RANLIB) libwrf.a
-
-libem.a : $(WRF_EM_OBJS)
-	$(AR) libem.a $(WRF_EM_OBJS)
-	$(RANLIB) libem.a
-
-libnmm.a : $(WRF_NMM_OBJS)
-	$(AR) libnmm.a $(WRF_NMM_OBJS)
-	$(RANLIB) libnmm.a
-
+        
 libwrfvar.a : $(WRFVAR_OBJS)
 	$(AR) libwrfvar.a $(WRFVAR_OBJS)
 	$(RANLIB) libwrfvar.a

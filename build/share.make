@@ -81,6 +81,6 @@ SHARE_OBJS = \
         wrf_histin.o \
         wrf_restartin.o
 
-SHARE_EM_OBJS = couple_or_uncouple_em.o
+SHARE_em_OBJS = couple_or_uncouple_em.o
 
-SHARE_NMM_OBJS = 
+SHARE_nmm_OBJS = 

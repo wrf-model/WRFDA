@@ -57,7 +57,7 @@ if( $valid_arg != 1 ) then
   echo "Type <compile all_wrfvar>  Compile wrfvar be and da_utils"
   echo "Type <compile convertor>   Convertors for converting KMA data to and from NetCDF data format"
   echo "Type <compile decode_airs> AIRS decoding"
-  echo "Type <compile wrf>         wrf_eml"
+  echo "Type <compile wrf>         wrf_em"
   echo "Type <compile wrf_em>      WRF (EM) model"
   echo "Type <compile wrf_nmm>     WRF (NMM) model"
   echo "Type <compile all_em>      wrf_em and EM test routines"

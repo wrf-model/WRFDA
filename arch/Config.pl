@@ -32,6 +32,7 @@ $sw_coreflags="";
 $sw_max_domains="1"; 
 $sw_rwordsize="8"; 
 $sw_promote_float=""; 
+$sw_solver=""; 
 $chem = 0 ;
 $phdf5 = 0 ;
 $pnetcdf = 0 ;
@@ -117,6 +118,9 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" ) {
   }
   if ( substr( $ARGV[0], 1, 14 ) eq "promote_float=" ) {
     $sw_promote_float = substr( $ARGV[0], 15 ) ;
+  }
+  if ( substr( $ARGV[0], 1, 7 ) eq "solver=" ) {
+    $sw_solver = substr( $ARGV[0], 8 ) ;
   }
   if ( substr( $ARGV[0], 1, 10 ) eq "coreflags=" ) {
     $sw_coreflags = substr( $ARGV[0], 11 ) ;
@@ -249,6 +253,7 @@ while ( <CONFIGURE_PREAMBLE> ) {
   $_ =~ s/CONFIGURE_MAX_DOMAINS/$sw_max_domains/g ;
   $_ =~ s/CONFIGURE_RWORDSIZE/$sw_rwordsize/g ;
   $_ =~ s/CONFIGURE_PROMOTE_FLOAT/$sw_promote_float/g ;
+  $_ =~ s/CONFIGURE_SOLVER/$sw_solver/g ;
   
   if ( $sw_netcdf_path ) { 
     $_ =~ s:CONFIGURE_NETCDF_PATH:$sw_netcdf_path:g ;

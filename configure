@@ -22,21 +22,27 @@ option=$1
 # (wrfvar, be, all_wrfvar)
 
 if [ "$option" = "wrf" -o "$option" = "wrf_em" -o "$option" = "em_real" ] ; then
+    SOLVER=em
     REGISTRY=Registry.EM
     EM_CORE=1
+    SOLVER=em
 elif [ "$option" = "wrf_em_nl" ] ; then
+    SOLVER=em
     REGISTRY=Registry.EM_NL
     EM_CORE=1
 elif [ "$option" = "wrf_em_chem" ] ; then
+    SOLVER=em
     REGISTRY=Registry.EM_CHEM
     EM_CORE=1
     WRF_CHEM=1
 elif [ "$option" = "wrf_nmm" ] ; then
+    SOLVER=nmm
     NMM_CORE=1
     REGISTRY=Registry.NMM  
     export NMM_MAX_DIM=2600
     export COREFLAGS="-DNMM_MAX_DIM=$NMM_MAX_DIM"
 else
+    SOLVER=em
     DA_CORE=1
     EM_CORE=1
     REGISTRY=Registry.wrfvar
@@ -475,7 +481,7 @@ if test -n "$PERL" ; then
      -em_core=$EM_CORE -nmm_core=$NMM_CORE -max_domains=$MAX_DOMAINS \
      -coamps_core=$COAMPS_CORE -exp_core=$EXP_CORE -coreflags=$COREFLAGS \
      -lapack=$LAPACK -blas=$BLAS -fftpack=$FFTPACK -bufr=$BUFR \
-     -rwordsize=$RWORDSIZE -promote_float="$PROMOTE_FLOAT"
+     -rwordsize=$RWORDSIZE -solver=$SOLVER -promote_float="$PROMOTE_FLOAT"
 fi
 
 export CONFIG=configure.wrfvar

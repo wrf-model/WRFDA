@@ -1,6 +1,6 @@
-# dyn)nmm
+# dyn_nmm
 
-DYN_NMM_OBJS = \
+DYN_nmm_OBJS = \
 	module_ADVECTION.o \
 	module_BC_NMM.o \
 	module_BNDRY_COND.o \
@@ -10,6 +10,7 @@ DYN_NMM_OBJS = \
 	module_NONHY_DYNAM.o \
 	module_PHYSICS_CALLS.o \
 	module_PRECIP_ADJUST.o \
+	module_NEST_UTIL.o \
 	module_MPP.o \
 	module_MPPINIT.o \
 	module_TIMERS.o \
