@@ -218,9 +218,6 @@ da_update_bc.exe : da_update_bc.o
            da_netcdf_interface.o \
            da_module_couple_uv.o $(NETCDF_LIB) $(LOCAL_LIB)
 
-da_update_bc.o : da_update_bc.f90 da_module_couple_uv.o da_netcdf_interface.o
-	$(SFC) -c $(FCFLAGS) -I$(NETCDF_INC) da_update_bc.f90
-
 da_bias_airmass.exe : da_bias_airmass.o  rad_bias.o pythag.o tqli.o tred2.o regress_one.o
 	$(FFC) -o  da_bias_airmass.exe da_bias_airmass.o rad_bias.o pythag.o tqli.o tred2.o regress_one.o
 

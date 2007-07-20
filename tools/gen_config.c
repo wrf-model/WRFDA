@@ -264,14 +264,9 @@ gen_get_nl_config ( char * dirname )
               fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
               fprintf(fp,"  ENDIF\n" ) ; 
 	    } else {
-#if DA_CORE==1
-/* WRFVAR wants generic multi-elements
+/* JRB I can't see we can't have generic multi-elements
 	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
 */
-#else
-	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains or max_moves\n") ;
-#endif
-
 	    }
           }
           fprintf(fp,"  %s = model_config_rec%%%s(id_id)\n",p->name,p->name) ;
@@ -309,14 +304,10 @@ gen_get_nl_config ( char * dirname )
               fprintf(fp,"    CALL wrf_error_fatal(emess)\n") ;
               fprintf(fp,"  ENDIF\n" ) ;
 	    } else {
-#if DA_CORE==1
-/* WRFVAR wants multi-element ones
+/* JRB I cannot see why we cannot have multi-element ones
+
 	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, or max_eta \n") ;
-*/
-#else
-	      fprintf(stderr,"Registry WARNING: multi element rconfig entry must be either max_domains, max_moves, or max_eta \n") ;
-#endif
-	    }
+*/	    }
           }
           fprintf(fp,"  model_config_rec%%%s(id_id) = %s\n",p->name,p->name) ;
         }
@@ -414,6 +405,13 @@ gen_config_reads ( char * dirname )
 	if (sym_get( p2 ) == NULL)  /* not in table yet */
 	{
           fprintf(fp," READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , IOSTAT=io_status )\n",p2) ;
+          fprintf(fp," IF (io_status /= 0) THEN\n") ;
+          fprintf(fp,"    REWIND  ( UNIT = NAMELIST_READ_UNIT )\n") ;
+          fprintf(fp,"    READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , IOSTAT=io_status )\n",p2) ;
+          fprintf(fp,"    IF (io_status /= 0) THEN\n") ;
+          fprintf(fp,"       CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
+          fprintf(fp,"    END IF\n") ;
+          fprintf(fp," END IF\n") ;
           fprintf(fp," IF (io_status /= 0) THEN\n") ;
           fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
           fprintf(fp," END IF\n") ;

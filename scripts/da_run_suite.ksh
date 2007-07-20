@@ -51,6 +51,7 @@ export RUN_RESTORE_DATA_GRIB=${RUN_RESTORE_DATA_GRIB:-false}
 export RUN_RESTORE_DATA_RTOBS=${RUN_RESTORE_DATA_RTOBS:-false}
 export RUN_WPS=${RUN_WPS:-false}
 export RUN_REAL=${RUN_REAL:-false}
+export RUN_IDEAL=${RUN_IDEAL:-false}
 export RUN_OBSPROC=${RUN_OBSPROC:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
 export RUN_UPDATE_BC=${RUN_UPDATE_BC:-false}
@@ -280,6 +281,19 @@ while [[ $DATE -le $FINAL_DATE ]]; do
 
       $WRFVAR_DIR/scripts/da_trace.ksh da_run_real $RUN_DIR
       ${WRFVAR_DIR}/scripts/da_run_real.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
+         exit 1
+      fi
+   fi
+
+   if $RUN_IDEAL; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/ideal
+      mkdir -p $RUN_DIR
+
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_ideal $RUN_DIR
+      ${WRFVAR_DIR}/scripts/da_run_ideal.ksh > $RUN_DIR/index.html 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
          echo $(date) "${ERR}Failed with error $RC$END"
