@@ -109,7 +109,7 @@
       WRITE ( start_date , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2)' ) &
               start_year,start_month,start_day,start_hour,start_minute,start_second
       CALL wrf_put_dom_ti_char ( fid , 'START_DATE', TRIM(start_date) , ierr )
-      IF ( switch .EQ. model_input_only) THEN
+      IF ( switch .EQ. model_input_only .or. switch .EQ. aux_hist3_only ) THEN
          CALL wrf_put_dom_ti_char ( fid , 'SIMULATION_START_DATE', TRIM(start_date) , ierr )
       END IF
 
