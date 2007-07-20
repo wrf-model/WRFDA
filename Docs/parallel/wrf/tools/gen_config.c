@@ -406,6 +406,13 @@ gen_config_reads ( char * dirname )
 	{
           fprintf(fp," READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , IOSTAT=io_status )\n",p2) ;
           fprintf(fp," IF (io_status /= 0) THEN\n") ;
+          fprintf(fp,"    REWIND  ( UNIT = NAMELIST_READ_UNIT )\n") ;
+          fprintf(fp,"    READ  ( UNIT = NAMELIST_READ_UNIT , NML = %s , IOSTAT=io_status )\n",p2) ;
+          fprintf(fp,"    IF (io_status /= 0) THEN\n") ;
+          fprintf(fp,"       CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
+          fprintf(fp,"    END IF\n") ;
+          fprintf(fp," END IF\n") ;
+          fprintf(fp," IF (io_status /= 0) THEN\n") ;
           fprintf(fp,"   CALL wrf_error_fatal(\"Cannot read namelist %s\")\n",p2) ;
           fprintf(fp," END IF\n") ;
           fprintf(fp,"#ifndef NO_NAMELIST_PRINT\n") ;
