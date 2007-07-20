@@ -77,7 +77,8 @@ GEN_BE_LIB = -L. $(NETCDF_LIB) $(LAPACK_LIB) $(BLAS_LIB) $(FFTPACK_LIB) \
 # which is wrong, try to encourage it to use the correct one by manually defining
 # the test cases in main.make
 
-IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
+#IGNORE="real_$(SOLVER)|nup_$(SOLVER)|ndown_$(SOLVER)|ideal"
+IGNORE="ideal"
 
 depend : links arch registry module_state_description.F md_calls.inc \
                       inc/da_generic_boilerplate.inc
