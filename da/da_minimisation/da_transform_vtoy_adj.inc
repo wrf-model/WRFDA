@@ -1,6 +1,6 @@
 subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
                                   xbx, y, &
-                                  grid, config_flags, cg_jcdf)
+                                  grid, config_flags)
 
    !-------------------------------------------------------------------------
    ! Purpose:  Does Adjoint of control variable (V) transform to Obs-space(Y)
@@ -21,7 +21,6 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
    type(domain), intent(inout) :: grid
    type(grid_config_rec_type), intent(inout) :: config_flags
-   integer, intent(in) :: cg_jcdf
    type (xbx_type)                  :: xbx_tmp
 
    integer :: nobwin,ndynopt
@@ -34,6 +33,27 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
    call da_trace_entry("da_transform_vtoy_adj")
 
    if (var4d) then
+      ndynopt      = grid%dyn_opt
+      grid%dyn_opt = DYN_EM_TL
+      call nl_set_dyn_opt (1 , DYN_EM_TL)
+
+      if (jcdfi_use .AND. iter > 0) then
+         call da_med_initialdata_input(grid , config_flags, 'tldf')
+      else
+         grid%em_g_u_2 = 0.0
+         grid%em_g_v_2 = 0.0
+         grid%em_g_w_2 = 0.0
+         grid%em_g_t_2 = 0.0
+         grid%em_g_ph_2 = 0.0
+         grid%em_g_mu_2 = 0.0
+         grid%g_moist = 0.0
+      end if
+
+      call med_hist_out(grid , 3 , config_flags)
+
+      grid%dyn_opt = ndynopt
+      call nl_set_dyn_opt (1 , DYN_EM)
+
       do nobwin=num_fgat_time,1,-1
          write(unit=filnam, fmt='(a, i2.2)') 'fg', nobwin
          call da_med_initialdata_input( grid , config_flags, &
@@ -47,24 +67,6 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
          call da_transfer_wrftltoxa_adj(grid, config_flags, filnam)
       end do
-
-      ndynopt      = grid%dyn_opt
-      grid%dyn_opt = DYN_EM_TL
-      call nl_set_dyn_opt (1 , DYN_EM_TL)
-
-      if (jcdfi_use .AND. iter > 0) then
-         call da_med_initialdata_input(grid , config_flags, 'tldf')
-      else
-         grid%em_g_u_2 = 0.0
-         grid%em_g_v_2 = 0.0
-         grid%em_g_t_2 = 0.0
-         grid%em_g_mu_2 = 0.0
-      end if
-
-      call med_hist_out(grid , 3 , config_flags)
-
-      grid%dyn_opt = ndynopt
-      call nl_set_dyn_opt (1 , DYN_EM)
 
       call da_trace("da_transform_vtoy_adj","Starting da_run_wrfplus_ad.ksh")
 
