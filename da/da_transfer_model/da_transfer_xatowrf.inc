@@ -2,6 +2,17 @@ subroutine da_transfer_xatowrf(grid)
 
    !---------------------------------------------------------------------------
    !  Purpose: Convert analysits increments into WRF increments
+   !
+   !  The following WRF fields are modified:  
+   !    grid%em_u_2
+   !    grid%em_v_2
+   !    grid%em_w_2
+   !    grid%em_mu_2
+   !    grid%em_mu0    (NOTE:  not clear that this is needed.)  
+   !    grid%em_ph_2
+   !    grid%em_t_2
+   !    grid%moist
+   !
    !---------------------------------------------------------------------------
 
    implicit none
