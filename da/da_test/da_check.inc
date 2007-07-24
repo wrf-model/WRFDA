@@ -21,7 +21,6 @@ subroutine da_check(grid, config_flags, cv_size, xbx, be, ep, iv, vv, vp, y)
    integer :: sizec
    real    :: cvtest(1:cv_size)    ! background error structure.
    real    :: field(its:ite,jts:jte) ! Field for spectral transform test.
-   type(grid_config_rec_type), intent(inout) :: config_flags
 
    call da_trace_entry("da_check")
 
