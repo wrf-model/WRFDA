@@ -881,7 +881,7 @@ rconfig   integer start_minute            namelist,time_control		max_domains    
 rconfig   integer start_second            namelist,time_control		max_domains      00    irh   "start_second"          "2 DIGIT SECOND OF THE MINUTE OF START OF MODEL, 0-59" "SECONDS"
 rconfig   integer end_year                namelist,time_control		max_domains    1993    irh   "end_year"              "4 DIGIT YEAR OF END OF MODEL" "YEARS"
 rconfig   integer end_month               namelist,time_control		max_domains      03    irh   "end_month"             "2 DIGIT MONTH OF THE YEAR OF END OF MODEL, 1-12" "MONTHS"
-rconfig   integer end_day                 namelist,time_control		max_domains      14    irh   "end_day"               "2 DIGIT DAY OF THE MONTH OF END OF MODEL, 1-31" "DAYS"
+rconfig   integer end_day                 namelist,time_control		max_domains      13    irh   "end_day"               "2 DIGIT DAY OF THE MONTH OF END OF MODEL, 1-31" "DAYS"
 rconfig   integer end_hour                namelist,time_control		max_domains      12    irh   "end_hour"              "2 DIGIT HOUR OF THE DAY OF END OF MODEL, 0-23" "HOURS"
 rconfig   integer end_minute              namelist,time_control		max_domains      00    irh   "end_minute"            "2 DIGIT MINUTE OF THE HOUR OF END OF MODEL, 0-59" "MINUTES"
 rconfig   integer end_second              namelist,time_control		max_domains      00    irh   "end_second"            "2 DIGIT SECOND OF THE MINUTE OF END OF MODEL, 0-59" "SECONDS"

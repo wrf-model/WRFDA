@@ -29,6 +29,7 @@ wrf_num_bytes_between.o :
 module_state_description.F : registry ../Registry/$(REGISTRY)
 	./registry $(REGFLAGS) ../Registry/$(REGISTRY)
 	$(LN) frame/module_state_description.F .
+	( cd $(INC); $(LN) $(BUILD)/inc/namelist_script.inc . )
 
 md_calls.inc : md_calls.m4
 	$(M4) md_calls.m4 > md_calls.inc

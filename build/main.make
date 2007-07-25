@@ -26,34 +26,34 @@ $(SOLVER)_real : setup $(WRF_LIBS) module_initialize_real_$(SOLVER).o real_$(SOL
 	(cd ../main; $(LN) ../build/real.exe .)
 
 em_quarter_ss : setup $(WRF_LIBS) module_initialize_quarter_ss.o ideal.o
-	$(LD) -o em_quarter_ss.exe $(LDFLAGS) ideal.o module_initialize_quarter_ss.o $(WRF_LIB)
-	cp em_quarter_ss.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_quarter_ss.exe .)
+	$(LD) -o ideal_em_quarter_ss.exe $(LDFLAGS) ideal.o module_initialize_quarter_ss.o $(WRF_LIB)
+	cp ideal_em_quarter_ss.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_quarter_ss.exe .)
 
 em_squall2d_x : setup $(WRF_LIBS) module_initialize_squall2d_x.o ideal.o
-	$(LD) -o em_squall2d_x.exe $(LDFLAGS) ideal.o module_initialize_squall2d_x.o $(WRF_LIB)
-	cp em_squall2d_x.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_squall2d_x.exe .)
+	$(LD) -o ideal_em_squall2d_x.exe $(LDFLAGS) ideal.o module_initialize_squall2d_x.o $(WRF_LIB)
+	cp ideal_em_squall2d_x.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_squall2d_x.exe .)
 
 em_squall2d_y : setup $(WRF_LIBS) module_initialize_squall2d_y.o ideal.o
-	$(LD) -o em_squall2d_y.exe $(LDFLAGS) ideal.o module_initialize_squall2d_y.o $(WRF_LIB)
-	cp em_squall2d_y.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_squall2d_y.exe .)
+	$(LD) -o ideal_em_squall2d_y.exe $(LDFLAGS) ideal.o module_initialize_squall2d_y.o $(WRF_LIB)
+	cp ideal_em_squall2d_y.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_squall2d_y.exe .)
 
 em_b_wave : setup $(WRF_LIBS) module_initialize_b_wave.o ideal.o
-	$(LD) -o em_b_wave.exe $(LDFLAGS) ideal.o module_initialize_b_wave.o $(WRF_LIB)
-	cp em_b_wave.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_b_wave.exe .)
+	$(LD) -o ideal_em_b_wave.exe $(LDFLAGS) ideal.o module_initialize_b_wave.o $(WRF_LIB)
+	cp ideal_em_b_wave.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_b_wave.exe .)
 
 em_hill2d_x : setup $(WRF_LIBS) module_initialize_hill2d_x.o ideal.o
-	$(LD) -o em_hill2d_x.exe $(LDFLAGS) ideal.o module_initialize_hill2d_x.o $(WRF_LIB)
-	cp em_hill2d_x.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_hill2d_x.exe .)
+	$(LD) -o ideal_em_hill2d_x.exe $(LDFLAGS) ideal.o module_initialize_hill2d_x.o $(WRF_LIB)
+	cp ideal_em_hill2d_x.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_hill2d_x.exe .)
 
 em_grav2d_x : setup $(WRF_LIBS) module_initialize_grav2d_x.o ideal.o
-	$(LD) -o em_grav2d_x.exe $(LDFLAGS) ideal.o module_initialize_grav2d_x.o $(WRF_LIB)
-	cp em_grav2d_x.exe ideal.exe
-	(cd ../main; $(LN) ../build/em_grav2d_x.exe .)
+	$(LD) -o ideal_em_grav2d_x.exe $(LDFLAGS) ideal.o module_initialize_grav2d_x.o $(WRF_LIB)
+	cp ideal_em_grav2d_x.exe ideal.exe
+	(cd ../main; $(LN) ../build/ideal_em_grav2d_x.exe .)
 
 convert_bioemiss : setup $(WRF_LIBS) convert_bioemiss.o module_input_chem_bioemiss.o
 	$(FC) -o convert_bioemiss.exe $(LDFLAGS) convert_bioemiss.o \
