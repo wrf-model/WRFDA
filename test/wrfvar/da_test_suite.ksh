@@ -1,7 +1,5 @@
 # Define for your run
 
-. ./region.ksh
-
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export EXPT=${EXPT:-${ID}_suite_${NUM_PROCS}}

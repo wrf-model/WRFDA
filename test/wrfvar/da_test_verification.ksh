@@ -1,7 +1,5 @@
 #!/bin/ksh
 
-. ./region.ksh
-
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 export WRFVAR_DIR=${WRFVAR_DIR:-$HOME/code/$ID/wrfvar}
 

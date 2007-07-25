@@ -1,7 +1,5 @@
 #!/bin/ksh
 
-. ./region.ksh
-
 export WINDOW_START=0
 export WINDOW_END=6
 export NL_RUN_HOURS=6

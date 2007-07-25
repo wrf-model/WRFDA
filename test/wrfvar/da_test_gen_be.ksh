@@ -1,7 +1,5 @@
 #!/bin/ksh
 
-. ./region.ksh
-
 export ID=${ID:-${MACHINE}_${COMPILER}_${TYPE}}
 
 export NUM_PROCS=1

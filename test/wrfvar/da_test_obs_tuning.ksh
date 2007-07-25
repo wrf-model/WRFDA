@@ -1,7 +1,5 @@
 #!/bin/ksh
 
-. ./region.ksh
-
 export REG_DIR=$PWD
 
 TUNING_DIR=${MACHINE}_tuning
