@@ -8,7 +8,7 @@
 # The da_run_suite.ksh script is designed for end-to-end real data 
 # testing of the following components of the WRF system:
 #
-# WRF real, OBSPROC, WRFVAR, UPDATE_BC, and WRF.
+# WRF real, OBSPROC, WRFVAR, UPDATE_BC, NDOWN, NUP and WRF.
 #
 # Any stage can be switched on/off via environment variables as
 # described below. The da_run_suite.ksh script can also cycle the
@@ -56,6 +56,8 @@ export RUN_OBSPROC=${RUN_OBSPROC:-false}
 export RUN_WRFVAR=${RUN_WRFVAR:-false}
 export RUN_UPDATE_BC=${RUN_UPDATE_BC:-false}
 export RUN_WRF=${RUN_WRF:-false}
+export RUN_NDOWN=${RUN_NDOWN:-false}
+export RUN_NUP=${RUN_NUP:-false}
 
 #Experiment details:
 export DUMMY=${DUMMY:-false}
@@ -218,7 +220,13 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
 
-while [[ $DATE -le $FINAL_DATE ]]; do 
+if [[ $INITIAL_DATE -eq $FINAL_DATE ]]; then
+   ONETRIP=true
+else
+   ONETRIP=false
+fi
+
+while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; do 
    export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
 
@@ -384,6 +392,32 @@ while [[ $DATE -le $FINAL_DATE ]]; do
 #DALE remove
    else
       export WRF_BDY=$RC_DIR/$DATE/wrfbdy_d${DOMAIN}
+   fi
+
+   if $RUN_NDOWN; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/ndown
+      mkdir -p $RUN_DIR
+
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_ndown $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_ndown.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
+         exit 1
+      fi
+   fi
+
+   if $RUN_NUP; then
+      export RUN_DIR=$EXP_DIR/run/$DATE/nup
+      mkdir -p $RUN_DIR
+
+      $WRFVAR_DIR/scripts/da_trace.ksh da_run_nup $RUN_DIR
+      $WRFVAR_DIR/scripts/da_run_nup.ksh > $RUN_DIR/index.html 2>&1
+      RC=$?
+      if [[ $RC != 0 ]]; then
+         echo $(date) "${ERR}Failed with error $RC$END"
+         exit 1
+      fi
    fi
 
    if $RUN_WRF; then
