@@ -39,6 +39,15 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
 
       if (jcdfi_use .AND. iter > 0) then
          call da_med_initialdata_input(grid , config_flags, 'tldf')
+         if (minimisation_option == 1) then
+            grid%em_g_u_2 = - grid%em_g_u_2
+            grid%em_g_v_2 = - grid%em_g_v_2
+            grid%em_g_w_2 = - grid%em_g_w_2
+            grid%em_g_t_2 = - grid%em_g_t_2
+            grid%em_g_ph_2 = - grid%em_g_ph_2
+            grid%em_g_mu_2 = - grid%em_g_mu_2
+            grid%g_moist = - grid%g_moist
+         endif
       else
          grid%em_g_u_2 = 0.0
          grid%em_g_v_2 = 0.0

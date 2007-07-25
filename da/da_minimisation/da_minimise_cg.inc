@@ -149,11 +149,11 @@ subroutine da_minimise_cg(grid, config_flags,            &
 
       rrmold=rrmnew
       if (calculate_cg_cost_fn) then
-         write(unit=stdout,fmt=12)iter, j%total, ob_grad, step
+         write(unit=stdout,fmt=12)iter, j%total, j%jc, ob_grad, step
       else
          write(unit=stdout,fmt=14)iter, rrmnew_norm , step
       end if
-12    format(i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
+12    format(i3,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8,5x,1PD15.8)
 14    format(i3,5x,1PD15.8,5x,1PD15.8)
    end do
 

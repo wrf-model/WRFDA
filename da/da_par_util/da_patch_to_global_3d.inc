@@ -12,8 +12,8 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
    implicit none
 
    type (xpose_type), intent(in)  :: xp
-   real,              intent(in)  :: vlocal(:,:,:)
-   real,              intent(out) :: vglobal(:,:,:)
+   real,              intent(in)  :: vlocal(ims:ime,jms:jme,kms:kme)
+   real,              intent(out) :: vglobal(ids:ide,jds:jde,kds:kde)
    integer, optional, intent(in)  :: mz
 
    integer :: local_kde
@@ -40,7 +40,7 @@ subroutine da_patch_to_global_3d(xp, vlocal, vglobal, mz)
          ips, ipe, jps, jpe, kps, local_kpe)
    end if
 #else
-   vglobal(:,:,:) = vlocal(:,:,:)
+   vglobal(ids:ide,jds:jde,kds:kde) = vlocal(ids:ide,jds:jde,kds:kde)
 #endif
 
 end subroutine da_patch_to_global_3d
