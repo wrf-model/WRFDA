@@ -38,6 +38,7 @@ export WORK_DIR=$RUN_DIR/working
 
 #WPS:
 export WPS_INPUT_DIR=${WPS_INPUT_DIR:-$GRIB_DIR}
+export WPS_OUTPUT_DIR=${WPS_OUTPUT_DIR:-$RC_DIR}
 export OPT_GEOGRID_TBL_PATH=${OPT_GEOGRID_TBL_PATH:-$WPS_DIR/geogrid}
 export OPT_METGRID_TBL_PATH=${OPT_METGRID_TBL_PATH:-$WPS_DIR/metgrid}
 export WPS_GEOG_DIR=${WPS_GEOG_DIR:-~wrfhelp/WPS_GEOG}
@@ -58,7 +59,7 @@ let LBC_FREQ_SS=$LBC_FREQ*3600
 
 if [[ ! -d $REG_DIR ]]; then mkdir $REG_DIR; fi 
 if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi 
-if [[ ! -d $RC_DIR/$DATE ]]; then mkdir -p $RC_DIR/$DATE; fi 
+if [[ ! -d $WPS_OUTPUT_DIR/$DATE ]]; then mkdir -p $WPS_OUTPUT_DIR/$DATE; fi 
 if [[ ! -d $WORK_DIR ]]; then mkdir $WORK_DIR; fi 
 
 cd $WORK_DIR
@@ -69,13 +70,13 @@ echo "<HTML><HEAD><TITLE>$EXPT wps</TITLE></HEAD><BODY><H1>$EXPT wps</H1><PRE>"
 
 date
 
-echo 'WPS_DIR       <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
-echo "DATE          $DATE"
-echo "END_DATE      $END_DATE"
-echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
-echo 'RUN_DIR       <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
-echo 'WORK_DIR      <A HREF="file:'$WORK_DIR'"</a>'$WORK_DIR'</a>'
-echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
+echo 'WPS_DIR        <A HREF="'$WPS_DIR'"</a>'$WPS_DIR'</a>'
+echo "DATE           $DATE"
+echo "END_DATE       $END_DATE"
+echo 'WPS_INPUT_DIR  <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
+echo 'WPS_OUTPUT_DIR <A HREF="file:'$WPS_OUTPUT_DIR'"</a>'$WPS_OUTPUT_DIR'</a>'
+echo 'RUN_DIR        <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
+echo 'WORK_DIR       <A HREF="file:'$WORK_DIR'"</a>'$WORK_DIR'</a>'
 
 cat >namelist.wps <<EOF
 &share
@@ -91,7 +92,7 @@ cat >namelist.wps <<EOF
  end_hour = $NL_END_HOUR,
  interval_seconds = $LBC_FREQ_SS,
  io_form_geogrid = 2,
- opt_output_from_geogrid_path = '$RC_DIR',
+ opt_output_from_geogrid_path = '$WPS_OUTPUT_DIR',
  debug_level = 0
 /
 
@@ -124,7 +125,7 @@ cat >namelist.wps <<EOF
 &metgrid
  fg_name = './FILE'
  io_form_metgrid = 2, 
- opt_output_from_metgrid_path = '$WORK_DIR',
+ opt_output_from_metgrid_path = '$WPS_OUTPUT_DIR/$DATE',
  opt_metgrid_tbl_path         = '$WPS_DIR/metgrid',
  opt_ignore_dom_center        = .false.
 /
@@ -211,7 +212,6 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       fi
       
    fi
-   mv met_em.d${DOMAIN}* $RC_DIR/$DATE
 
 cd $OLDPWD
 

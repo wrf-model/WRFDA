@@ -164,11 +164,11 @@ chmod +x job.ksh
 
 echo "Running with $NUM_PROCS processors, output to $EXP_DIR"
 if [[ $SUBMIT == "LoadLeveller" ]]; then 
-   llsubmit job.ksh
+   llsubmit $SUBMIT_FLAGS job.ksh
 elif [[ $SUBMIT == "LSF" ]]; then 
-   bsub < $PWD/job.ksh
+   bsub $SUBMIT_FLAGS < $PWD/job.ksh
 elif [[ $SUBMIT == "PBS" ]]; then 
-   qsub $PWD/job.ksh
+   qsub $SUBMIT_FLAGS $PWD/job.ksh
 else
    ./job.ksh
 fi
