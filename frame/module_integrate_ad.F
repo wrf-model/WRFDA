@@ -276,7 +276,7 @@ call end_timing('med_auxinput3_in 1 ')
          ad_date_index = ad_date_index + 1
       endif
       dfi_counter = 0
-      CALL jcdfi_add_forcing ( grid , dfi_counter )
+
 !-----end check adjoint input
 
       CALL ESMF_TimeIntervalPrint(grid%domain_clock%TimeStep, 'DEBUG:  integrate_ad.', rc)
@@ -318,6 +318,9 @@ call end_timing('med_auxinput3_in 2 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
+         CALL jcdfi_add_forcing ( grid , dfi_counter )
+         dfi_counter = dfi_counter + 1
+
 !--------end check adjoint input
 
          CALL med_setup_step ( grid , config_flags )
@@ -387,8 +390,6 @@ call end_timing('med_auxinput3_in 2 ')
            WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id
            CALL end_timing ( TRIM(message) )
 !         END IF
-         dfi_counter = dfi_counter + 1
-         CALL jcdfi_add_forcing ( grid , dfi_counter )
       END DO
       CALL jcdfi_finalize
       ! Avoid double writes on nests if this is not really the last time;
@@ -416,6 +417,7 @@ call end_timing('med_auxinput3_in 3 ')
             CALL add_forcing_to_ad(grid)
             ad_date_index = ad_date_index + 1
          endif
+         CALL jcdfi_add_forcing ( grid , dfi_counter )
 !--------end check adjoint input
 !          CALL med_last_solve_ad_io ( grid , config_flags )
          call med_filter_out ( grid , config_flags )
