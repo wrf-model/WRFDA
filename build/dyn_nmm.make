@@ -28,8 +28,6 @@ DYN_nmm_OBJS = \
 	solve_nmm.o \
 	start_domain_nmm.o
 
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
 solve_nmm.o : module_BC_NMM.o \
                module_IGWAVE_ADJUST.o module_ADVECTION.o  \
                module_NONHY_DYNAM.o module_DIFFUSION_NMM.o    \
@@ -60,5 +58,3 @@ module_PHYSICS_CALLS.o: \
 		module_cumulus_driver.o  \
 		module_mp_etanew.o  \
 		module_microphysics_driver.o
-
-# DO NOT DELETE

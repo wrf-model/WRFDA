@@ -25,8 +25,6 @@ CHEM_OBJS = \
 	dry_dep_driver.o \
 	aerosol_driver.o
 
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
-
 module_data_radm2.o: 
 
 module_data_racm.o: 

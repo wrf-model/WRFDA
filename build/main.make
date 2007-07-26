@@ -13,10 +13,6 @@ wrf : setup $(WRF_LIBS) libwrf.a wrf.o
 	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
 	(cd ../main; $(LN) ../build/wrf.exe .)
 
-#$(SOLVER)_wrf : setup $(WRF_LIBS) wrf.o
-#	$(LD) -o wrf.exe $(LDFLAGS) wrf.o $(WRF_LIB)
-#	(cd ../main; $(LN) ../build/wrf.exe .)
-
 $(SOLVER)_wrf_ESMFApp : setup $(WRF_LIBS) wrf_ESMFMod.o wrf_ESMFApp.o wrf_SST_ESMF.o
 	$(LD) -o wrf_ESMFApp.exe $(LDFLAGS) wrf_ESMFApp.o wrf_ESMFMod.o $(WRF_LIB)
 	$(LD) -o wrf_SST_ESMF.exe $(LDFLAGS) wrf_SST_ESMF.o wrf_ESMFMod.o $(WRF_LIB)
@@ -64,36 +60,11 @@ convert_emiss : setup $(WRF_LIBS) convert_emiss.o
 	$(FC) -o convert_emiss.exe $(LDFLAGS) convert_emiss.o libwrf.a $(WRF_LIB)
 	(cd ../main; $(LN) ../build/convert_emiss.exe .)
 
-#real_em : setup $(WRF_LIBS) real_em.o
-#	$(FC) -o real.exe $(LDFLAGS) real_em.o module_bc.o \
-#            module_big_step_utilities_em.o \
-#            module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
-#            module_dm.o module_utility.o module_timing.o module_configure.o \
-#            module_driver_constants.o module_io_domain.o module_initialize_real.o \
-#            module_domain.o module_machine.o $(WRF_LIB)
-#	(cd ../main; $(LN) ../build/real.exe .)
-
-#real_em.o : real_em.F version_decl module_bc.o module_big_step_utilities_em.o \
-#              module_date_time.o module_optional_si_input.o module_bc_time_utilities.o \
-#              module_dm.o module_utility.o module_timing.o module_configure.o \
-#              module_driver_constants.o module_io_domain.o module_initialize_real.o \
-#              module_domain.o module_machine.o 
-
-#real_nmm : $(WRF_LIBS) real_nmm.o module_initialize_real.o \
-#          module_optional_si_input.o input_wrf.o module_io_domain.o
-#	$(FC) -o real_nmm.exe $(LDFLAGS) real_nmm.o module_initialize_real.o \
-#          module_optional_si_input.o input_wrf.o module_io_domain.o $(WRF_LIB)
-#	(cd ../main; $(LN) ../build/real_nmm.exe .)
-
 convert_nmm : $(WRF_LIBS) convert_nmm.o
 	$(FC) -o convert_nmm.exe $(LDFLAGS) convert_nmm.o $(WRF_LIB)
 	(cd ../main; $(LN) ../build/convert_nmm.exe .)
 
 diffwrf : diffwrf_netcdf.exe diffwrf_int.exe
-
-#############################################################################################################################
-
-# DEPENDENCIES : only dependencies after this line (don't remove the word DEPENDENCIES)
 
 convert_nmm.o: \
 	module_machine.o \
@@ -146,5 +117,3 @@ wrf.o: \
 	module_dm.o \
         module_wrf_top.o \
 	$(ESMF_MOD_DEPENDENCE) $(EXTRAMODULES)
-
-# DO NOT DELETE

@@ -16,10 +16,6 @@ advance_cymdh.exe : advance_cymdh.o
 	$(RM) $@
 	$(SFC) $(LDFLAGS) -o advance_cymdh.exe advance_cymdh.o
 
-# regenerate this list with "makedepend -Y *.c"
-
-# DO NOT DELETE THIS LINE -- make depend depends on it.
-
 data.o: registry.h protos.h data.h
 gen_allocs.o: protos.h registry.h data.h
 gen_args.o: protos.h registry.h data.h
