@@ -26,6 +26,7 @@ wrf_bdyout.o wrf_bdyin.o \
    wrf_histout.o \
    module_si_io.o \
    module_io_wrf.o \
+   module_configure.o \
    module_domain.o \
    module_start.o \
    module_initialize.o \
@@ -75,7 +76,6 @@ interp_fcn.o \
    wrf_shutdown.o \
    input_wrf.o \
    output_wrf.o \
-   module_configure.o \
    module_bc_time_utilities.o \
    module_quilt_outbuf_ops.o \
    module_internal_header_util.o \
