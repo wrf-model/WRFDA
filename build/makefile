@@ -28,8 +28,9 @@ links :
 	@ $(LN) $(DA)/*/* .
 	@ $(LN) $(IO_INT)/* .
 	@ mv diffwrf.F diffwrf_int.F
-	@ $(LN) $(IO_NETCDF)/* .
+	@ $(LN) $(IO_NETCDF)/*.F90 .
 	@ mv diffwrf.F90 diffwrf_netcdf.F
+	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(IO_PNETCDF)/field_routines.F90 field_routines_pnc.F90
 	@ $(LN) $(IO_PNETCDF)/module_wrfsi_static.F90 module_wrfsi_static_pnc.F90 
 	@ $(LN) $(IO_PNETCDF)/wrf_io.F90 wrf_io_pnc.F90 
@@ -37,7 +38,6 @@ links :
 	@ $(LN) $(IO_PNETCDF)/ext* .
 	@ $(LN) $(IOAPI_SHARE)/* .
 	@ $(LN) $(ESMF_TIME_F90)/* .
-	@ $(LN) $(IO_NETCDF)/*.code .
 	@ $(LN) $(IO_PHDF5)/* .
 	@ $(LN) $(ARCH)/*.sed .
 	@ $(LN) $(CONVERTOR)/da_module_convert_tool/* .
@@ -136,5 +136,6 @@ superclean : clean arch_superclean
           decode_l2_airs.README time_window.nl WRFIO.doc Test1.out.correct \
           da_macros_utl links arch README* TEST_RESULTS g2lib grib1_util \
           landread.c.dist WGRIB test.grb diffwrf build MEL_grib1 bacio-1.3 \
-          depend depend.txt ../main/*exe ../inc/namelist_script.inc
+          depend depend.txt ../main/*exe ../inc/namelist_script.inc \
+          wrf-phdf5attr.F90btg KPP Makefile INSTALL.htm
     

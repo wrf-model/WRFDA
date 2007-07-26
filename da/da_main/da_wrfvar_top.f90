@@ -26,7 +26,7 @@ module da_wrfvar_top
 #ifdef RSL_LITE
    use module_dm, only : local_communicator, local_communicator_x, &
       local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
-      ntasks, data_order_xy
+      ntasks, data_order_xy,wrf_dm_initialize
 #else
    use module_dm, only : invalid_message_value, glen,setup_xpose_rsl, &
       add_msg_24pt_real,reset_msgs_24pt,stencil_24pt,setup_halo_rsl, &
@@ -87,7 +87,7 @@ module da_wrfvar_top
    integer                 :: configbuf( configbuflen )
 #endif
 
-   character (LEN=80)      :: rstname
+   character (len=80)      :: rstname
 
 contains
 

@@ -15,6 +15,7 @@ module da_transfer_model
    use module_dm, only : local_communicator, local_communicator_x, &
       local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
+   use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif
 #ifdef RSL
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
