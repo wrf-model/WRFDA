@@ -357,7 +357,7 @@
 
     write (iunit,'(4i6)') nchan,nscan,nband,npred
     do i=1, nchan
-      write (iunit,'(i5,i7,4F8.2)') i,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
+      write (iunit,'(i5,i10,4F8.2)') i,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
     end do
 
     do i=1, nchan
@@ -435,7 +435,7 @@
     !read (iunit,'(4i6)') nchan,nscan,nband,npred
     read (iunit,'(4i6)')
     do i=1, nchan
-      read (iunit,'(i5,i7,4F8.2)') ii,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
+      read (iunit,'(i5,i10,4F8.2)') ii,nobs(i),vmean_abs(i),vstd_abs(i),vmean_dep(i),vstd_dep(i)
     end do
 
     do i=1, nchan
