@@ -68,7 +68,7 @@ program da_advance_cymdh
       call change_date ( ccyy, mm, dd, 1 )
    end do
 
-   write(ccyymmddhh(1:10), fmt='(i4, 3i2.2)')  ccyy, mm, dd, hh
+   write(ccyymmddhh(1:10), fmt='(i4.4, 3i2.2)')  ccyy, mm, dd, hh
    write(unit=stdout, fmt='(a)') ccyymmddhh
 
 contains

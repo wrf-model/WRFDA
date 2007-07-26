@@ -20,7 +20,7 @@ if ($status == 0) then
       setenv LSF_PTILE 16
    endif
    setenv SUBMIT_OPTIONS1 "#BSUB -R span[ptile=$LSF_PTILE]"
-   setenv WAIT_OPTION "-K"
+   setenv SUBMIT_WAIT_FLAG "-K"
 else
    llq >& /dev/null
    if ($status == 0) then
@@ -262,6 +262,6 @@ endif
 if ($?SUBMIT_OPTIONS10) then
    echo "SUBMIT_OPTIONS10 $SUBMIT_OPTIONS10"
 endif
-if ($?WAIT_OPTION) then
-   echo "WAIT_OPTION      $WAIT_OPTION"
+if ($?SUBMIT_WAIT_FLAG) then
+   echo "SUBMIT_WAIT_FLAG $SUBMIT_WAIT_FLAG"
 endif

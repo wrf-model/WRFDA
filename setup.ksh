@@ -19,7 +19,7 @@ if test $? = 0 ; then
    # Use SMT on an 8 processor node
    export LSF_PTILE=${LSF_PTILE:-16}
    export SUBMIT_OPTIONS1="#BSUB -R span[ptile=$LSF_PTILE]"
-   export WAIT_OPTION="-K"
+   export SUBMIT_WAIT_FLAG="-K"
 else
    llq > /dev/null 2>&1
    if test $? = 0 ; then
@@ -192,6 +192,6 @@ fi
 if test "$SUBMIT_OPTIONS10." != '.'; then
    echo "SUBMIT_OPTIONS10 $SUBMIT_OPTIONS10"
 fi
-if test "$WAIT_OPTION." != '.'; then
-   echo "WAIT_OPTION      $WAIT_OPTION"
+if test "$SUBMIT_WAIT_FLAG." != '.'; then
+   echo "SUBMIT_WAIT_FLAG $SUBMIT_WAIT_FLAG"
 fi
