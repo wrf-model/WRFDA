@@ -23,13 +23,13 @@ subroutine da_crtm_init(iv,ob)
 !
 ! CRTM local ---------------------------------------------------
 !
-  INTEGER :: Error_Status
-  CHARACTER( 256 ) :: SpcCoeff_File
-  CHARACTER( 256 ) :: TauCoeff_File
-  CHARACTER( 256 ) :: AerosolCoeff_File
-  CHARACTER( 256 ) :: CloudCoeff_File
-  CHARACTER( 256 ) :: EmisCoeff_File 
-!  CHARACTER( 80 ), pointer :: Sensor_Descriptor(:)
+  integer :: Error_Status
+  character( 256 ) :: SpcCoeff_File
+  character( 256 ) :: TauCoeff_File
+  character( 256 ) :: AerosolCoeff_File
+  character( 256 ) :: CloudCoeff_File
+  character( 256 ) :: EmisCoeff_File 
+!  character( 80 ), pointer :: Sensor_Descriptor(:)
 !
 ! end of CRTM local
 !----------------------------------------------------------------
@@ -193,7 +193,7 @@ subroutine da_crtm_init(iv,ob)
 !-----------------------------------------------------------
 ! 3.1 call CRTM_Init to load coefficients and fill ChannelInfo structure
 !-----------------------------------------------------------
-  ! INPUT: 
+  ! input: 
      SpcCoeff_File     = 'CRTM_SpcCoeff.bin'
      TauCoeff_File     = 'CRTM_TauCoeff.bin'
      !SpcCoeff_File     = 'CRTM_amsua_n15-n16.SpcCoeff.bin'
@@ -202,7 +202,7 @@ subroutine da_crtm_init(iv,ob)
      CloudCoeff_File   = 'CRTM_CldCoeff.bin'
      EmisCoeff_File    = 'CRTM_EmisCoeff.bin'
   !   File_Path         - path to coefficient files (if not specified current directory is used)
-  ! WARNING: Coefficient file names specified in the source code for test only
+  ! Warning: Coefficient file names specified in the source code for test only
   !          Must be replaced with dynamic assign of file names 
   !----------------------------------------------------------------
   ! ChannelInfo structure contains on output: 
@@ -226,7 +226,7 @@ subroutine da_crtm_init(iv,ob)
 
 !   Error_Status = CRTM_Set_ChannelInfo(Sensor_Descriptor(1),ChannelInfo)
 
-     IF ( Error_Status /= 0 ) THEN 
+     if ( Error_Status /= 0 ) then 
        call da_error(__FILE__,__LINE__, &
          (/"Error in initializing CRTM"/))
      END IF

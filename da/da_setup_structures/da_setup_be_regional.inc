@@ -74,7 +74,7 @@ subroutine da_setup_be_regional(xb, be)
 !clq
    if(use_radarobs .and. use_radar_rf) then
    be % v4 % name = 'qt   '
-   endif
+   end if
 !clq end
 
    write (unit=message(2),fmt='(3x,A,7A)') 'WRF-Var dry control variables are:', &

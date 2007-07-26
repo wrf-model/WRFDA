@@ -29,7 +29,8 @@ subroutine da_warning(file_str, line, warnings)
       if (line > 0) then
          if (use_html) then
             call wrf_message('WARNING FROM FILE: <A HREF="'// &
-               trim(documentation_url)//'/'//trim(html_file)//'">'//trim(file_str)// &
+               trim(documentation_url)//'/'//trim(html_file)//'">'// &
+               trim(file_str)// &
                   '</a>  LINE:  '//trim(line_str))
          else
             call wrf_message('WARNING FROM FILE:  '//trim(file_str)// &

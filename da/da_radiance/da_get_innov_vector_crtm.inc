@@ -13,45 +13,45 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
    IMPLICIT NONE
    
-   INTEGER, INTENT(IN)            :: it       ! External iteration.
-   TYPE (xb_type), INTENT(IN)     :: xb       ! first guess state.
-   TYPE (xpose_type), INTENT(IN)  :: xp       ! Domain decomposition vars.
-   TYPE (y_type),  INTENT(INOUT)  :: ob       ! Observation structure.
-   TYPE (ob_type), INTENT(INOUT)  :: iv       ! O-B structure.
+   integer,           intent(in)    :: it       ! External iteration.
+   type (xb_type),    intent(in)    :: xb       ! first guess state.
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: ob       ! Observation structure.
+   type (ob_type),    intent(inout) :: iv       ! O-B structure.
 
 #ifdef CRTM
 
-   INTEGER                        :: n, icld  ! Loop counter.
-   INTEGER                        :: i, j, k  ! Index dimension.
-   INTEGER                        :: num_levs ! Number of obs levels.
-   REAL                           :: dx, dxm  ! Interpolation weights.
-   REAL                           :: dy, dym  ! Interpolation weights.
-   INTEGER                        :: alloc_status(40)
+   integer                        :: n, icld  ! Loop counter.
+   integer                        :: i, j, k  ! Index dimension.
+   integer                        :: num_levs ! Number of obs levels.
+   real                           :: dx, dxm  ! Interpolation weights.
+   real                           :: dy, dym  ! Interpolation weights.
+   integer                        :: alloc_status(40)
 
-   REAL                             :: model_u10, model_v10
-   REAL                             :: model_psfc, model_ptop
-   REAL                             :: model_ts, model_elv
-   REAL                             :: model_smois, model_tslb, model_snowh
-   REAL                             :: model_isltyp, model_ivgtyp, model_vegfra
-   INTEGER                          :: model_isflg
+   real                             :: model_u10, model_v10
+   real                             :: model_psfc, model_ptop
+   real                             :: model_ts, model_elv
+   real                             :: model_smois, model_tslb, model_snowh
+   real                             :: model_isltyp, model_ivgtyp, model_vegfra
+   integer                          :: model_isflg
 
-   REAL, DIMENSION(kms:kme)   :: v_p, &     ! Model value p at ob hor. location.
+   real, dimension(kms:kme)   :: v_p, &     ! Model value p at ob hor. location.
                                  model_qcw
 
-   ! REAL, DIMENSION(kms:kme)   :: model_tm
+   ! real, dimension(kms:kme)   :: model_tm
 
-   INTEGER            :: inst, nchanl
+   integer            :: inst, nchanl
 
    ! variables for computing clwp
-   REAL, dimension(kms:kme)     :: clw, dpf
-   REAL                         :: clwp
+   real, dimension(kms:kme)     :: clw, dpf
+   real                         :: clwp
 
    ! CRTM local varaibles and types
-   INTEGER :: wmo_sensor_id,Error_Status, Allocate_Status
-   TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:)
-   TYPE( CRTM_Atmosphere_type )   :: Atmosphere
-   TYPE( CRTM_Surface_type )      :: Surface
-   TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
+   integer :: wmo_sensor_id,Error_Status, Allocate_Status
+   type (CRTM_RTSolution_type), allocatable :: RTSolution(:)
+   type (CRTM_Atmosphere_type)   :: Atmosphere
+   type (CRTM_Surface_type)      :: Surface
+   type (CRTM_GeometryInfo_type) :: GeometryInfo
 
 !---------------------------------------------------------
 
@@ -60,7 +60,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
 
    alloc_status (:) = 0
 
-   IF ( iv%num_inst < 1 ) return
+   if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_crtm")
 
@@ -79,10 +79,10 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
                                              Atmosphere%n_Clouds, &
                                              Atmosphere%n_Aerosols, &
                                              Atmosphere)
-    if ( Error_Status /= 0 ) THEN 
+    if ( Error_Status /= 0 ) then 
        call da_error(__FILE__,__LINE__, &
          (/"Error in allocatting CRTM Atmosphere Structure"/))
-    endif
+    end if
 
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
@@ -110,13 +110,13 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
       if ( Error_Status /= 0) then
          call da_error(__FILE__,__LINE__, &
           (/"Error in calling CRTM_Set_ChannelInfo"/))
-      endif
+      end if
       nchanl    = ChannelInfo%n_channels
 
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
+      allocate( RTSolution( ChannelInfo%n_Channels ), &
                STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
+      if ( Allocate_Status /= 0 ) then
          call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting RTSolution"/))
       END IF
@@ -132,14 +132,14 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          wmo_sensor_id=WMO_SSMI
       else
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
-      endif
+      end if
 
       Error_Status = CRTM_Allocate_Surface( nchanl,     &  ! Input
                                    Surface)  ! Output
-      if ( Error_Status /= 0 ) THEN
+      if ( Error_Status /= 0 ) then
         call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting CRTM Surface Structure Structure"/))
-      endif
+      end if
       ! do n= 1, iv%instid(inst)%num_rad           ! loop for pixel
       do n= iv%ob_numb(iv%current_ob_time-1)%radiance(inst)+1, &
          iv%ob_numb(iv%current_ob_time)%radiance(inst)
@@ -164,7 +164,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
                 + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
             v_p(k) = 0.01*v_p(k)  ! convert Pa to hPa
             Atmosphere%Pressure(kte-k+1)=v_p(k) ! from top to bottom
-         enddo
+         end do
 
          ! [1.2] Interpolate horizontally to ob:
          do k=kts,kte ! from bottem to top
@@ -211,7 +211,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             Atmosphere%Cloud(6)%Water_Content(kte-k+1) = 0.0
 
             end if
-         enddo
+         end do
 
          ! determine surface type of obs location
          !-----------------------------------------
@@ -242,7 +242,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          do k=kts+1,kte
             Atmosphere%Level_Pressure(kte-k+1)= &
               xb%sigmaf(k)*(model_psfc-model_ptop)+model_ptop
-         enddo
+         end do
  
          ! convert cloud content unit from kg/kg to kg/m^2        
          if (crtm_cloud) then
@@ -250,8 +250,8 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
           do icld=1,Atmosphere%n_Clouds
             Atmosphere%Cloud(icld)%Water_Content(k)= Atmosphere%Cloud(icld)%Water_Content(k)* &
             (Atmosphere%Level_Pressure(k)- Atmosphere%Level_Pressure(k-1))*100.0/gravity 
-          enddo
-          enddo
+          end do
+          end do
          end if
 
          if ( model_isflg == 0 ) then   ! over sea using SST
@@ -313,28 +313,28 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
        !Surface%Canopy_Water_Content=0.05      ! gravimetric water content
        Surface%Vegetation_Fraction=model_vegfra
        Surface%Soil_Temperature=model_tslb
-     endif
+     end if
      if (Surface%Water_Coverage > 0.0) then
        !Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
        Surface%Water_Temperature=model_ts     ! K
        Surface%Wind_Speed=sqrt(model_u10**2+model_v10**2)  ! m/sec
        !surface%Wind_Direction=0.0            ! NOT used
        Surface%Salinity=33.                   ! ppmv
-     endif
+     end if
      if (Surface%Snow_Coverage > 0.0) then
        Surface%Snow_Type=NEW_SNOW             ! User guide appendix 3
        Surface%Snow_Temperature=model_ts      ! K
        Surface%Snow_Depth=model_snowh         ! mm
        !Surface%Snow_Density=0.2               ! g/cm**3
        !Surface%Snow_Grain_Size=2.0            ! mm
-     endif
+     end if
      if (Surface%Ice_Coverage > 0.0) then
        !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single example is FRESH_ICE
        Surface%Ice_Temperature=model_ts       ! K
        Surface%Ice_Thickness=10.0              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
        !Surface%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO
-     endif
+     end if
      if (nchanl > 0) then
        Surface%SensorData%n_channels = nchanl
        Surface%SensorData%Sensor_ID  = wmo_sensor_id 
@@ -363,7 +363,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
          !  write(6,'(15f8.3)') RTSolution(1:nchanl)%surface_emissivity
          !end if
 
-         !if ( Error_Status /= 0 ) THEN
+         !if ( Error_Status /= 0 ) then
          !     call da_error(__FILE__,__LINE__, &
          !        (/"Error in calling CRTM_Forward"/))
          !endif
@@ -400,7 +400,7 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
             iv%instid(inst)%qsn(k,n) = atmosphere%cloud(4)%water_content(k)
             iv%instid(inst)%qgr(k,n) = atmosphere%cloud(5)%water_content(k)
           end if
-         enddo
+         end do
          iv%instid(inst)%u10(n)  = model_u10
          iv%instid(inst)%v10(n)  = model_v10
          iv%instid(inst)%t2m(n)  = 0.01*missing_r !model_t2m
@@ -424,16 +424,16 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
       end do       !  end loop for pixels
 
       deallocate( rtsolution, STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
+      if ( Allocate_Status /= 0 ) then
          call da_error(__FILE__,__LINE__, &
           (/"Error in deallocatting RTSolution"/))
       END IF
 
       Error_Status = CRTM_Destroy_Surface(Surface)
-      if ( Error_Status /= 0 ) THEN
+      if ( Error_Status /= 0 ) then
         call da_error(__FILE__,__LINE__, &
           (/"Error in deallocatting CRTM Surface Structure"/))
-      endif
+      end if
    end do        ! end loop for sensor
 
    !------------------------------------------
@@ -469,10 +469,10 @@ subroutine da_get_innov_vector_crtm ( it, xb, xp, ob, iv )
    end if
 
     Error_Status = CRTM_Destroy_Atmosphere( Atmosphere )
-    if ( Error_Status /= 0 ) THEN
+    if ( Error_Status /= 0 ) then
        call da_error(__FILE__,__LINE__, &
          (/"Error in deallocatting CRTM Atmosphere Structure"/))
-    endif   
+    end if   
 
    if (trace_use) call da_trace_exit("da_get_innov_vector_crtm")
 #else

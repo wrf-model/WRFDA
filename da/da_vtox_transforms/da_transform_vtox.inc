@@ -177,7 +177,7 @@ subroutine da_transform_vtox(grid, cv_size, xbx, be, ep, cv, vv, vp)
 
          call da_moist_phys_lin(grid)
 
-      endif
+      end if
    end if
 
    !---------------------------------------------------------------

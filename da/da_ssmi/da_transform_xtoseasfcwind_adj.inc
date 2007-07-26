@@ -44,7 +44,7 @@ subroutine da_transform_xtoseasfcwind_adj(grid)
             write(unit=message(2),FMT='(2I6,A,F10.2,A,F10.2)') &
                i,j,' ht = ',grid%xb%h(i,j,kts) ,' terr =  ',grid%xb%terr(i,j)
             call da_error(__FILE__,__LINE__,message(1:2))
-         endif
+         end if
 
          rgh_fac = const/log(height/0.0001) ! roughness = 0.0001
 

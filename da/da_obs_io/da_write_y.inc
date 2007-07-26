@@ -37,7 +37,7 @@ subroutine da_write_y (iv, y)
    call da_get_unit(ounit)
    open (unit=ounit,file=trim(filename),form='formatted', &
          status='replace', iostat=ios )
-   if (ios /= 0) Then
+   if (ios /= 0) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open (un)perturbed observation file"//filename/))
    end if
@@ -78,7 +78,7 @@ subroutine da_write_y (iv, y)
       if (num_obs > 0) then
          write(ounit,'(a20,i8)')'metar', num_obs
          num_obs = 0
-         DO n = 1, iv % num_metar
+         do n = 1, iv % num_metar
             if (iv%metar(n)%loc%proc_domain) then
                num_obs = num_obs + 1
                write(ounit,'(i8)')  1                         

@@ -19,7 +19,7 @@ subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
      else
         write(crtm_sat, '(a,i2.2)')  &
              trim( crtm_platform_name(platform_id) ),satellite_id
-     endif
+     end if
 
      if ( trim(crtm_sensor_name(sensor_id)) == 'airs' ) then
         crtm_sensor='airs281SUBSET'
@@ -33,11 +33,11 @@ subroutine da_crtm_sensor_descriptor(nsensor,sensor_descriptor)
         if (satellite_id == 18) crtm_sensor='avhrr4'
      else
         crtm_sensor=crtm_sensor_name(sensor_id)
-     endif
+     end if
 
      sensor_descriptor(i)=trim(crtm_sensor)//'_'//trim(crtm_sat)
 
-  enddo
+  end do
      write(6,*) sensor_descriptor
 
 end subroutine da_crtm_sensor_descriptor

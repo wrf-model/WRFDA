@@ -1,6 +1,6 @@
 #ifdef RTTOV
-subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
-                      con_vars_tl, aux_vars_tl, tb )
+subroutine da_rttov_tl(inst, nchanl, nprofiles, con_vars, aux_vars, &
+                      con_vars_tl, aux_vars_tl, tb)
 
    !---------------------------------------------------------------------------
    !  PURPOSE: interface to the tangent linear subroutine of RTTOV
@@ -49,17 +49,17 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
    do n = 1, nprofiles
       profiles(n) % nlevels    = con_vars(n) % nlevels
-      allocate ( profiles(n)%p(profiles(n) % nlevels), stat=alloc_status(1) )
-      allocate ( profiles(n)%t(profiles(n) % nlevels), stat=alloc_status(2) )
-      allocate ( profiles(n)%q(profiles(n) % nlevels), stat=alloc_status(3) )
-      allocate ( profiles(n)%o3(profiles(n) % nlevels), stat=alloc_status(4) )
-      allocate ( profiles(n)%co2(profiles(n) % nlevels), stat=alloc_status(5) )
-      allocate ( profiles(n)%clw(profiles(n) % nlevels), stat=alloc_status(6) )
-      If ( Any(alloc_status /= 0) ) Then
+      allocate (profiles(n)%p(profiles(n) % nlevels), stat=alloc_status(1))
+      allocate (profiles(n)%t(profiles(n) % nlevels), stat=alloc_status(2))
+      allocate (profiles(n)%q(profiles(n) % nlevels), stat=alloc_status(3))
+      allocate (profiles(n)%o3(profiles(n) % nlevels), stat=alloc_status(4))
+      allocate (profiles(n)%co2(profiles(n) % nlevels), stat=alloc_status(5))
+      allocate (profiles(n)%clw(profiles(n) % nlevels), stat=alloc_status(6))
+      if (any(alloc_status /= 0)) then
          WRITE(UNIT=message(1),FMT='(A,I5)') &
             "mem allocation error to for profiles",n
          call da_error(__FILE__,__LINE__,message(1:1))
-      End If
+      end if
 
       profiles(n) % ozone_data = .false.
       profiles(n) % co2_data   = .false.
@@ -90,17 +90,17 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       profiles(n) % cfraction   = 0.0
 
       profiles_tl(n) % nlevels    = con_vars_tl(n) % nlevels
-      allocate ( profiles_tl(n)%p(profiles_tl(n) % nlevels), stat=alloc_status(1) )
-      allocate ( profiles_tl(n)%t(profiles_tl(n) % nlevels), stat=alloc_status(2) )
-      allocate ( profiles_tl(n)%q(profiles_tl(n) % nlevels), stat=alloc_status(3) )
-      allocate ( profiles_tl(n)%o3(profiles_tl(n) % nlevels), stat=alloc_status(4) )
-      allocate ( profiles_tl(n)%co2(profiles_tl(n) % nlevels), stat=alloc_status(5) )
-      allocate ( profiles_tl(n)%clw(profiles_tl(n) % nlevels), stat=alloc_status(6) )
-      If (Any(alloc_status /= 0)) Then
+      allocate (profiles_tl(n)%p(profiles_tl(n) % nlevels), stat=alloc_status(1))
+      allocate (profiles_tl(n)%t(profiles_tl(n) % nlevels), stat=alloc_status(2))
+      allocate (profiles_tl(n)%q(profiles_tl(n) % nlevels), stat=alloc_status(3))
+      allocate (profiles_tl(n)%o3(profiles_tl(n) % nlevels), stat=alloc_status(4))
+      allocate (profiles_tl(n)%co2(profiles_tl(n) % nlevels), stat=alloc_status(5))
+      allocate (profiles_tl(n)%clw(profiles_tl(n) % nlevels), stat=alloc_status(6))
+      if (any(alloc_status /= 0)) then
          WRITE(UNIT=message(1),FMT='(A,I5)') &
             "mem allocation error to for profiles_tl",n
          call da_error(__FILE__,__LINE__,message(1:1))
-      End If
+      end if
 
       profiles_tl(n) % ozone_data = .false.
       profiles_tl(n) % co2_data   = .false.
@@ -134,88 +134,88 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
 
 #ifdef RTTOV
    call rttov_setupchan(nprofiles, nchan, coef, &             ! in
-                     nfrequencies, nchannels, nbtout )       ! out
+                     nfrequencies, nchannels, nbtout)       ! out
 #endif
 
 
-   Allocate ( lprofiles(nfrequencies), stat = alloc_status(31) )
-   Allocate ( channels (nfrequencies), stat = alloc_status(32) )
-   Allocate ( polarisations(nchannels, 3), stat = alloc_status(33) )
-   Allocate ( emissivity( nchannels ), stat = alloc_status(34) )
-   Allocate ( emissivity_tl( nchannels ), stat = alloc_status(134) )
-   Allocate ( calcemis( nchannels ), stat = alloc_status(35) )
-   Allocate ( surfem ( nchannels ), stat = alloc_status(36) )
+   allocate (lprofiles(nfrequencies), stat = alloc_status(31))
+   allocate (channels (nfrequencies), stat = alloc_status(32))
+   allocate (polarisations(nchannels, 3), stat = alloc_status(33))
+   allocate (emissivity(nchannels), stat = alloc_status(34))
+   allocate (emissivity_tl(nchannels), stat = alloc_status(134))
+   allocate (calcemis(nchannels), stat = alloc_status(35))
+   allocate (surfem (nchannels), stat = alloc_status(36))
 
    ! allocate transmittance structure
-   Allocate( transmission % tau_surf      ( nchannels )                 ,stat= alloc_status(8))
-   Allocate( transmission % tau_layer     ( coef % nlevels, nchannels ) ,stat= alloc_status(9))
-   Allocate( transmission % od_singlelayer( coef % nlevels, nchannels  ),stat= alloc_status(10))
+   allocate (transmission % tau_surf      (nchannels)                 ,stat= alloc_status(8))
+   allocate (transmission % tau_layer     (coef % nlevels, nchannels) ,stat= alloc_status(9))
+   allocate (transmission % od_singlelayer(coef % nlevels, nchannels ),stat= alloc_status(10))
 
-   Allocate( transmission_tl % tau_surf      ( nchannels )                 ,stat= alloc_status(108))
-   Allocate( transmission_tl % tau_layer     ( coef % nlevels, nchannels ) ,stat= alloc_status(109))
-   Allocate( transmission_tl % od_singlelayer( coef % nlevels, nchannels  ),stat= alloc_status(110))
+   allocate (transmission_tl % tau_surf      (nchannels)                 ,stat= alloc_status(108))
+   allocate (transmission_tl % tau_layer     (coef % nlevels, nchannels) ,stat= alloc_status(109))
+   allocate (transmission_tl % od_singlelayer(coef % nlevels, nchannels ),stat= alloc_status(110))
 
-
-   ! allocate radiance results arrays with number of channels
-   Allocate( radiance % clear    ( nchannels ) ,stat= alloc_status(11))
-   Allocate( radiance % cloudy   ( nchannels ) ,stat= alloc_status(12))
-   Allocate( radiance % total    ( nchannels ) ,stat= alloc_status(13))
-   Allocate( radiance % bt       ( nchannels ) ,stat= alloc_status(14))
-   Allocate( radiance % bt_clear ( nchannels ) ,stat= alloc_status(15))
-   Allocate( radiance % upclear  ( nchannels ) ,stat= alloc_status(16))
-   Allocate( radiance % dnclear  ( nchannels ) ,stat= alloc_status(17))
-   Allocate( radiance % reflclear( nchannels ) ,stat= alloc_status(18))
-   Allocate( radiance % overcast ( coef % nlevels, nchannels ) ,stat= alloc_status(19))
-   ! allocate the cloudy radiances with full size even
-   ! if not used
-   Allocate( radiance % downcld  ( coef % nlevels, nchannels ) ,stat= alloc_status(20))
-
-   Allocate( radiance % out      ( nbtout ) ,stat= alloc_status(121))
-   Allocate( radiance % out_clear( nbtout ) ,stat= alloc_status(122))
-   Allocate( radiance % total_out( nbtout ) ,stat= alloc_status(123))
-   Allocate( radiance % clear_out( nbtout ) ,stat= alloc_status(124))
 
    ! allocate radiance results arrays with number of channels
-   Allocate( radiance_tl % clear    ( nchannels ) ,stat= alloc_status(111))
-   Allocate( radiance_tl % cloudy   ( nchannels ) ,stat= alloc_status(112))
-   Allocate( radiance_tl % total    ( nchannels ) ,stat= alloc_status(113))
-   Allocate( radiance_tl % bt       ( nchannels ) ,stat= alloc_status(114))
-   Allocate( radiance_tl % bt_clear ( nchannels ) ,stat= alloc_status(115))
-   Allocate( radiance_tl % upclear  ( nchannels ) ,stat= alloc_status(116))
-   Allocate( radiance_tl % dnclear  ( nchannels ) ,stat= alloc_status(117))
-   Allocate( radiance_tl % reflclear( nchannels ) ,stat= alloc_status(118))
-   Allocate( radiance_tl % overcast ( coef % nlevels, nchannels ) ,stat= alloc_status(119))
+   allocate (radiance % clear    (nchannels) ,stat= alloc_status(11))
+   allocate (radiance % cloudy   (nchannels) ,stat= alloc_status(12))
+   allocate (radiance % total    (nchannels) ,stat= alloc_status(13))
+   allocate (radiance % bt       (nchannels) ,stat= alloc_status(14))
+   allocate (radiance % bt_clear (nchannels) ,stat= alloc_status(15))
+   allocate (radiance % upclear  (nchannels) ,stat= alloc_status(16))
+   allocate (radiance % dnclear  (nchannels) ,stat= alloc_status(17))
+   allocate (radiance % reflclear(nchannels) ,stat= alloc_status(18))
+   allocate (radiance % overcast (coef % nlevels, nchannels) ,stat= alloc_status(19))
    ! allocate the cloudy radiances with full size even
    ! if not used
-   Allocate( radiance_tl % downcld  ( coef % nlevels, nchannels ) ,stat= alloc_status(120))
+   allocate (radiance % downcld  (coef % nlevels, nchannels) ,stat= alloc_status(20))
 
-   Allocate( radiance_tl % out      ( nbtout ) ,stat= alloc_status(121))
-   Allocate( radiance_tl % out_clear( nbtout ) ,stat= alloc_status(122))
-   Allocate( radiance_tl % total_out( nbtout ) ,stat= alloc_status(123))
-   Allocate( radiance_tl % clear_out( nbtout ) ,stat= alloc_status(124))
+   allocate (radiance % out      (nbtout) ,stat= alloc_status(121))
+   allocate (radiance % out_clear(nbtout) ,stat= alloc_status(122))
+   allocate (radiance % total_out(nbtout) ,stat= alloc_status(123))
+   allocate (radiance % clear_out(nbtout) ,stat= alloc_status(124))
 
-   If (Any(alloc_status /= 0) ) Then
+   ! allocate radiance results arrays with number of channels
+   allocate (radiance_tl % clear    (nchannels) ,stat= alloc_status(111))
+   allocate (radiance_tl % cloudy   (nchannels) ,stat= alloc_status(112))
+   allocate (radiance_tl % total    (nchannels) ,stat= alloc_status(113))
+   allocate (radiance_tl % bt       (nchannels) ,stat= alloc_status(114))
+   allocate (radiance_tl % bt_clear (nchannels) ,stat= alloc_status(115))
+   allocate (radiance_tl % upclear  (nchannels) ,stat= alloc_status(116))
+   allocate (radiance_tl % dnclear  (nchannels) ,stat= alloc_status(117))
+   allocate (radiance_tl % reflclear(nchannels) ,stat= alloc_status(118))
+   allocate (radiance_tl % overcast (coef % nlevels, nchannels) ,stat= alloc_status(119))
+   ! allocate the cloudy radiances with full size even
+   ! if not used
+   allocate (radiance_tl % downcld  (coef % nlevels, nchannels) ,stat= alloc_status(120))
+
+   allocate (radiance_tl % out      (nbtout) ,stat= alloc_status(121))
+   allocate (radiance_tl % out_clear(nbtout) ,stat= alloc_status(122))
+   allocate (radiance_tl % total_out(nbtout) ,stat= alloc_status(123))
+   allocate (radiance_tl % clear_out(nbtout) ,stat= alloc_status(124))
+
+   if (any(alloc_status /= 0)) then
       call da_error(__FILE__,__LINE__, &
          (/"mem allocation error prior to rttov_tl"/))
-   End If
+   end if
 
    surfem (:) = 0.0
 #ifdef RTTOV
    call rttov_setupindex(nchan, nprofiles, nfrequencies, &    ! in
                 nchannels, nbtout, coef, surfem,  &          ! in
                 lprofiles, channels, polarisations,     &    ! out
-                emissivity  )                                ! out                       
+                emissivity )                                ! out                       
 #endif
 
    nc = nchannels/nprofiles
 
-   if (coef%id_sensor == 1)  then        ! infrared sensor 
+   if (coef%id_sensor == 1) then        ! infrared sensor 
       calcemis (1:nchannels)   = .true.
       emissivity (1:nchannels) = 0.0
       emissivity_tl (1:nchannels) = 0.0
-   else if (coef%id_sensor == 2)  then   ! microwave sensor
+   else if (coef%id_sensor == 2) then   ! microwave sensor
       do n = 1, nprofiles
-         if ( profiles(n) % skin % surftype == 1) then  ! sea  
+         if (profiles(n) % skin % surftype == 1) then  ! sea  
             calcemis ((n-1)*nc+1:n*nc) = .true.
             emissivity ((n-1)*nc+1:n*nc) = 0.0
             emissivity_tl ((n-1)*nc+1:n*nc) = 0.0
@@ -228,7 +228,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
    end if
 
 #ifdef RTTOV
-   call rttov_tl( & 
+   call rttov_tl(& 
       & errorstatus,   &! out
       & nfrequencies,  &! in
       & nchannels,     &! in
@@ -247,7 +247,7 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
       & transmission,    &! inout
       & transmission_tl, &! inout
       & radiance,    &! inout
-      & radiance_tl ) ! inout
+      & radiance_tl) ! inout
 #endif
 
    ! rttov87 generates warnings we want to ignore
@@ -281,82 +281,82 @@ subroutine da_rttov_tl( inst, nchanl, nprofiles, con_vars, aux_vars, &
        write (message(27),*) 'emissivity_tl           = ', emissivity_tl    
        write (message(28),*) 'radiance_tl             = ', radiance_tl%out_clear
        call da_warning(__FILE__,__LINE__,message(1:28)) 
-   endif
+   end if
 
    nc = nbtout / nprofiles
    do n = 1, nprofiles
       tb(1:nc,n) = radiance_tl % out_clear((n-1)*nc+1:n*nc)
    end do
 
-   deallocate ( lprofiles )
-   deallocate ( channels )
-   deallocate ( polarisations )
-   deallocate ( emissivity )
-   deallocate ( emissivity_tl )
-   deallocate ( calcemis )
-   deallocate ( surfem )
+   deallocate (lprofiles)
+   deallocate (channels)
+   deallocate (polarisations)
+   deallocate (emissivity)
+   deallocate (emissivity_tl)
+   deallocate (calcemis)
+   deallocate (surfem)
    do n = 1, nprofiles 
-      deallocate ( profiles(n)%p )
-      deallocate ( profiles(n)%t )
-      deallocate ( profiles(n)%q )
-      deallocate ( profiles(n)%o3 )
-      deallocate ( profiles(n)%co2 )
-      deallocate ( profiles(n)%clw )
+      deallocate (profiles(n)%p)
+      deallocate (profiles(n)%t)
+      deallocate (profiles(n)%q)
+      deallocate (profiles(n)%o3)
+      deallocate (profiles(n)%co2)
+      deallocate (profiles(n)%clw)
 
-      deallocate ( profiles_tl(n)%p )
-      deallocate ( profiles_tl(n)%t )
-      deallocate ( profiles_tl(n)%q )
-      deallocate ( profiles_tl(n)%o3 )
-      deallocate ( profiles_tl(n)%co2 )
-      deallocate ( profiles_tl(n)%clw )
+      deallocate (profiles_tl(n)%p)
+      deallocate (profiles_tl(n)%t)
+      deallocate (profiles_tl(n)%q)
+      deallocate (profiles_tl(n)%o3)
+      deallocate (profiles_tl(n)%co2)
+      deallocate (profiles_tl(n)%clw)
    end do
 
    ! deallocate transmittance structure
-   Deallocate( transmission % tau_surf      ,stat= alloc_status(6))
-   Deallocate( transmission % tau_layer     ,stat= alloc_status(7))
-   Deallocate( transmission % od_singlelayer,stat= alloc_status(8))
+   deallocate (transmission % tau_surf      ,stat= alloc_status(6))
+   deallocate (transmission % tau_layer     ,stat= alloc_status(7))
+   deallocate (transmission % od_singlelayer,stat= alloc_status(8))
 
    ! deallocate transmittance structure
-   Deallocate( transmission_tl % tau_surf      ,stat= alloc_status(106))
-   Deallocate( transmission_tl % tau_layer     ,stat= alloc_status(107))
-   Deallocate( transmission_tl % od_singlelayer,stat= alloc_status(108))
+   deallocate (transmission_tl % tau_surf      ,stat= alloc_status(106))
+   deallocate (transmission_tl % tau_layer     ,stat= alloc_status(107))
+   deallocate (transmission_tl % od_singlelayer,stat= alloc_status(108))
 
    ! deallocate radiance results arrays with number of channels
-   Deallocate( radiance % clear    ,stat=alloc_status(9))
-   Deallocate( radiance % cloudy   ,stat=alloc_status(10))
-   Deallocate( radiance % total    ,stat=alloc_status(11))
-   Deallocate( radiance % bt       ,stat=alloc_status(12))
-   Deallocate( radiance % bt_clear ,stat=alloc_status(13))
-   Deallocate( radiance % upclear  ,stat=alloc_status(14))
-   Deallocate( radiance % dnclear  ,stat=alloc_status(15))
-   Deallocate( radiance % reflclear,stat=alloc_status(16))
-   Deallocate( radiance % overcast ,stat=alloc_status(17))
-   Deallocate( radiance % downcld  ,stat=alloc_status(18))
-   Deallocate( radiance % out       ,stat= alloc_status(19))
-   Deallocate( radiance % out_clear ,stat= alloc_status(20))
-   Deallocate( radiance % total_out ,stat= alloc_status(21))
-   Deallocate( radiance % clear_out ,stat= alloc_status(22))
+   deallocate (radiance % clear    ,stat=alloc_status(9))
+   deallocate (radiance % cloudy   ,stat=alloc_status(10))
+   deallocate (radiance % total    ,stat=alloc_status(11))
+   deallocate (radiance % bt       ,stat=alloc_status(12))
+   deallocate (radiance % bt_clear ,stat=alloc_status(13))
+   deallocate (radiance % upclear  ,stat=alloc_status(14))
+   deallocate (radiance % dnclear  ,stat=alloc_status(15))
+   deallocate (radiance % reflclear,stat=alloc_status(16))
+   deallocate (radiance % overcast ,stat=alloc_status(17))
+   deallocate (radiance % downcld  ,stat=alloc_status(18))
+   deallocate (radiance % out       ,stat= alloc_status(19))
+   deallocate (radiance % out_clear ,stat= alloc_status(20))
+   deallocate (radiance % total_out ,stat= alloc_status(21))
+   deallocate (radiance % clear_out ,stat= alloc_status(22))
 
-   Deallocate( radiance_tl % clear    ,stat=alloc_status(109))
-   Deallocate( radiance_tl % cloudy   ,stat=alloc_status(110))
-   Deallocate( radiance_tl % total    ,stat=alloc_status(111))
-   Deallocate( radiance_tl % bt       ,stat=alloc_status(112))
-   Deallocate( radiance_tl % bt_clear ,stat=alloc_status(113))
-   Deallocate( radiance_tl % upclear  ,stat=alloc_status(114))
-   Deallocate( radiance_tl % dnclear  ,stat=alloc_status(115))
-   Deallocate( radiance_tl % reflclear,stat=alloc_status(116))
-   Deallocate( radiance_tl % overcast ,stat=alloc_status(117))
-   Deallocate( radiance_tl % downcld  ,stat=alloc_status(118))
-   Deallocate( radiance_tl % out       ,stat= alloc_status(119))
-   Deallocate( radiance_tl % out_clear ,stat= alloc_status(120))
-   Deallocate( radiance_tl % total_out ,stat= alloc_status(121))
-   Deallocate( radiance_tl % clear_out ,stat= alloc_status(122))
+   deallocate (radiance_tl % clear    ,stat=alloc_status(109))
+   deallocate (radiance_tl % cloudy   ,stat=alloc_status(110))
+   deallocate (radiance_tl % total    ,stat=alloc_status(111))
+   deallocate (radiance_tl % bt       ,stat=alloc_status(112))
+   deallocate (radiance_tl % bt_clear ,stat=alloc_status(113))
+   deallocate (radiance_tl % upclear  ,stat=alloc_status(114))
+   deallocate (radiance_tl % dnclear  ,stat=alloc_status(115))
+   deallocate (radiance_tl % reflclear,stat=alloc_status(116))
+   deallocate (radiance_tl % overcast ,stat=alloc_status(117))
+   deallocate (radiance_tl % downcld  ,stat=alloc_status(118))
+   deallocate (radiance_tl % out       ,stat= alloc_status(119))
+   deallocate (radiance_tl % out_clear ,stat= alloc_status(120))
+   deallocate (radiance_tl % total_out ,stat= alloc_status(121))
+   deallocate (radiance_tl % clear_out ,stat= alloc_status(122))
 
 
-   If( Any(alloc_status /= 0) ) Then
+   if (any(alloc_status /= 0)) then
      call da_error(__FILE__,__LINE__, &
        (/"mem deallocation error"/))
-   End If
+   end if
 
    call da_trace_exit("da_rttov_tl")
 

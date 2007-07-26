@@ -78,7 +78,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
       ! Pseudo RH --> Water vapor mixing ratio:
       grid%xa % q(its:ite,jts:jte,kts:kte) = vp%v4(its:ite,jts:jte,kts:kte) * &
          grid%xb%qs(its:ite,jts:jte,kts:kte)
-   endif
+   end if
 
    !---------------------------------------------------------------------------
    !  [4] Add flow-dependent increments in model space (grid%xa):
@@ -88,7 +88,7 @@ subroutine da_transform_vptox(grid, vp, be, ep)
       call da_add_flow_dependence_xa(grid, be % ne, ep, vp)
    end if
 
-   IF (trace_use) call da_trace_exit("da_transform_vptox") 
+   if (trace_use) call da_trace_exit("da_transform_vptox") 
  
 end subroutine da_transform_vptox
 

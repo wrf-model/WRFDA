@@ -151,7 +151,7 @@ subroutine da_transform_xtoy_adj(grid, iv, jo_grad_y, jo_grad_x)
 #endif
       else
          call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))
-      endif
+      end if
    end if
 
    !---------------------------------------------------------------------------

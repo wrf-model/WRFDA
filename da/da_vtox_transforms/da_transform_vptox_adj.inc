@@ -44,7 +44,7 @@ subroutine da_transform_vptox_adj(grid, vp, be, ep)
                                         grid%xa%q (its:ite,jts:jte,kts:kte) * &
                                         grid%xb%qs(its:ite,jts:jte,kts:kte)
 
-   endif
+   end if
 
 #ifdef DM_PARALLEL
 #include "HALO_PSICHI_UV_ADJ.inc"

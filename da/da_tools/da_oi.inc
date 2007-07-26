@@ -53,7 +53,7 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
       do i=1,ob1%num_inst
          if (associated(ob1%instid(i)%tb_xb)) then
             sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_xb(:,:)) 
-         endif
+         end if
 
          if (associated(ob1%instid(i)%tb_inv)) then
             sum_ob1=sum_ob1+sum(ob1%instid(i)%tb_inv(:,:)) 
@@ -126,7 +126,7 @@ subroutine da_oi( str,line,y1,y2,ob1,ob2)
       do i=1,ob2%num_inst
          if (associated(ob2%instid(i)%tb_xb)) then
             sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_xb(:,:)) 
-         endif
+         end if
 
          if (associated(ob2%instid(i)%tb_inv)) then
             sum_ob2=sum_ob2+sum(ob2%instid(i)%tb_inv(:,:)) 

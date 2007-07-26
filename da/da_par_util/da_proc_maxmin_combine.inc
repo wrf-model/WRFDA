@@ -36,7 +36,7 @@ subroutine da_proc_maxmin_combine(n, max, min)
    if (rootproc) then
       do i = 1, n
          min(i)%value = out(2*i-1)
-         proc_id(i) = INT(out(2*i))
+         proc_id(i) = int(out(2*i))
       end do
    end if
 
@@ -70,7 +70,7 @@ subroutine da_proc_maxmin_combine(n, max, min)
    if (rootproc) then
       do i = 1, n
          max(i)%value = out(2*i-1)
-         proc_id(i) = INT(out(2*i))
+         proc_id(i) = int(out(2*i))
       end do
    end if
 

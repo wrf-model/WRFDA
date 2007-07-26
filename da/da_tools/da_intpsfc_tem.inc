@@ -120,7 +120,7 @@ subroutine da_intpsfc_tem (val, ho, po, to, height, pressure, temp, kts, kte)
    th_obs_int = th_100mb + (dth_21/dhe_12) * dhe_obs1 
 
 
-   ! 4.  BRING TEMPERATURE ONTO MODEL SURFACE
+   ! 4.  Bring temperature onto model surface
    ! ========================================
 
    ! 4.1 Difference at observation locations

@@ -156,7 +156,7 @@ subroutine da_transform_xtoy(grid, iv, y)
 #endif
        else
           call da_warning(__FILE__,__LINE__,(/"Unknown radiative transfer model"/))
-       endif
+       end if
    end if
 
    if (trace_use) call da_trace_exit("da_transform_xtoy")

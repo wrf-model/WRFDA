@@ -43,7 +43,7 @@ subroutine da_write_iv_rad_ascii ( xp, ob, iv )
 
       call da_get_unit(innov_rad_unit)
       open(unit=innov_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0 ) Then
+      if (ios /= 0 ) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open innovation radiance file"//filename/))
       Endif

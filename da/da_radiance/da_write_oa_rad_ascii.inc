@@ -41,10 +41,10 @@ subroutine da_write_oa_rad_ascii ( xp, ob, iv, re )
 #endif
       call da_get_unit(oma_rad_unit)
       open(unit=oma_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0) Then
+      if (ios /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open oma radiance file"//filename/))
-      endif
+      end if
       write(unit=oma_rad_unit,fmt='(a,a,i7,a,i5,a)') trim(iv%instid(i)%rttovid_string), &
                            ' number-of-pixels : ', ndomain, &
                            ' channel-number-of-each-pixel : ', iv%instid(i)%nchan, &

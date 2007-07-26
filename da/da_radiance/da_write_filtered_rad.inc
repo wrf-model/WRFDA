@@ -33,7 +33,7 @@ subroutine da_write_filtered_rad(ob, iv)
       call da_get_unit(filtered_rad_unit)
       open(unit=filtered_rad_unit,file=trim(filename), &
          form='unformatted',iostat=ios)
-      if (ios /= 0) Then
+      if (ios /= 0) then
          call da_error(__FILE__,__LINE__, &
             (/"Cannot open filtered radiance file"//filename/))
       Endif

@@ -1,97 +1,97 @@
-  PROGRAM da_bias_airmass
+program da_bias_airmass
 
-  USE RAD_BIAS
+   use rad_bias
 
-! PURPOSE.
-! --------
-! To calculate spatially varying bias correction COEFFICIENTS
-! for TOVS using model bias predictors.
+  ! PURPOSE.
+  ! --------
+  ! To calculate spatially varying bias correction COEFFICIENTS
+  ! for TOVS using model bias predictors.
 
-! EXTERNALS.
-! ----------
-! REGRESS_ONE
+  ! EXTERNALS.
+  ! ----------
+  ! REGRESS_ONE
 
-! REFERENCE.
-! ----------
-! Harris and Kelly 1998.
+  ! REFERENCE.
+  ! ----------
+  ! Harris and Kelly 1998.
 
-  IMPLICIT NONE
+  implicit none
 
-  TYPE(BIAS) :: tovs
+  type (bias) :: tovs
 
-  REAL(KIND=LONG) :: vmean_dep(JPCHAN), vmean_abs(JPCHAN)
-  REAL(KIND=LONG) :: vec_dep(JPCHAN), vec_abs(JPCHAN)
-  REAL(KIND=LONG) :: vstd_dep(JPCHAN), vstd_abs(JPCHAN)
-  REAL(KIND=LONG) :: vmn(JPCHAN), vstd(JPCHAN)
+  real (kind=long) :: vmean_dep(JPCHAN), vmean_abs(JPCHAN)
+  real (kind=long) :: vec_dep(JPCHAN), vec_abs(JPCHAN)
+  real (kind=long) :: vstd_dep(JPCHAN), vstd_abs(JPCHAN)
+  real (kind=long) :: vmn(JPCHAN), vstd(JPCHAN)
 
-  REAL :: pred(JPNX)
+  real :: pred(JPNX)
 
-  REAL(KIND=LONG) :: xbar(JPNY,JPNX), ybar(JPNY)
-  REAL(KIND=LONG) :: xcov(JPNY,JPNX,JPNX), ycov(JPNY), xycov(JPNY,JPNX)
+  real (kind=long) :: xbar(JPNY,JPNX), ybar(JPNY)
+  real (kind=long) :: xcov(JPNY,JPNX,JPNX), ycov(JPNY), xycov(JPNY,JPNX)
 
-  REAL(KIND=LONG) :: coef(JPNY,JPNX), coef0(JPNY)
-  REAL(KIND=LONG) :: reserr(JPNY), rescov(JPNY,JPNY)
-  REAL(KIND=LONG) :: xvec(JPNY,JPNX,JPNX)
-  REAL(KIND=LONG) :: xreser(JPCHAN), xcoef0(JPCHAN), xcoef(JPCHAN,JPNX)
+  real (kind=long) :: coef(JPNY,JPNX), coef0(JPNY)
+  real (kind=long) :: reserr(JPNY), rescov(JPNY,JPNY)
+  real (kind=long) :: xvec(JPNY,JPNX,JPNX)
+  real (kind=long) :: xreser(JPCHAN), xcoef0(JPCHAN), xcoef(JPCHAN,JPNX)
 
-  REAL(KIND=LONG) :: vmnbd(JPNY,6), vstdbd(JPNY,6)
-  REAL(KIND=LONG) :: vmnbdl(JPNY,6,0:1), vstdbdl(JPNY,6,0:1)
-  REAL(KIND=LONG) :: vmnb0(JPNY,6), vstdb0(JPNY,6)
-  REAL(KIND=LONG) :: vmnbl0(JPNY,6,0:1), vstdbl0(JPNY,6,0:1)
-  REAL(KIND=LONG) :: dvmnbd(JPNY,6), dvstdb(JPNY,6)
+  real (kind=long) :: vmnbd(JPNY,6), vstdbd(JPNY,6)
+  real (kind=long) :: vmnbdl(JPNY,6,0:1), vstdbdl(JPNY,6,0:1)
+  real (kind=long) :: vmnb0(JPNY,6), vstdb0(JPNY,6)
+  real (kind=long) :: vmnbl0(JPNY,6,0:1), vstdbl0(JPNY,6,0:1)
+  real (kind=long) :: dvmnbd(JPNY,6), dvstdb(JPNY,6)
 
-  REAL(KIND=LONG) :: vmnrl(JPCHAN,JPSCAN) = 0.0
-  REAL(KIND=LONG) :: vmnrlb(JPCHAN,JPSCAN,JBAND) = 0.0
+  real (kind=long) :: vmnrl(JPCHAN,JPSCAN) = 0.0
+  real (kind=long) :: vmnrlb(JPCHAN,JPSCAN,JBAND) = 0.0
 
-  REAL(KIND=LONG) :: SCORR(JPCHAN)
+  real (kind=long) :: SCORR(JPCHAN)
 
-  INTEGER :: nsel(10)
-  INTEGER :: nobs(JPCHAN)
-  INTEGER :: nobsy(JPNY),lchan
+  integer :: nsel(10)
+  integer :: nobs(JPCHAN)
+  integer :: nobsy(JPNY),lchan
 
-  INTEGER :: nband(6), nbandl(6,0:1), n_band_ch(6,JPNY,0:1) = 0
-  INTEGER :: nband0(JPNY,6), nbandd(JPNY,6)
-  INTEGER :: nbandl0(JPNY,6,0:1), nbanddl(JPNY,6,0:1)
+  integer :: nband(6), nbandl(6,0:1), n_band_ch(6,JPNY,0:1) = 0
+  integer :: nband0(JPNY,6), nbandd(JPNY,6)
+  integer :: nbandl0(JPNY,6,0:1), nbanddl(JPNY,6,0:1)
 
-  LOGICAL :: LMASK
+  logical :: LMASK
 
-  LOGICAL :: lscan = .FALSE., global = .FALSE.
+  logical :: lscan = .FALSE., global = .FALSE.
 
-  INTEGER :: IR, ibin, I, iband, II, IV, ib, ierr
-  INTEGER :: JS, J, JJ, JCOUNT, JBOX, JMINI, JSCAN, jv, IIV, JJV, sband
+  integer :: IR, ibin, I, iband, II, IV, ib, ierr
+  integer :: JS, J, JJ, JCOUNT, JBOX, JMINI, JSCAN, jv, IIV, JJV, sband
 
-  REAL(KIND=LONG) :: xcorr(JPCHAN)
-  REAL(KIND=LONG) :: coef_sat, coef_year, coef_month, coef_day, coef_time
-  INTEGER :: CDATE = 1998010105                           ! Current Date
+  real (kind=long) :: xcorr(JPCHAN)
+  real (kind=long) :: coef_sat, coef_year, coef_month, coef_day, coef_time
+  integer :: CDATE = 1998010105                           ! Current Date
 
-  INTEGER :: icount = 0
-  INTEGER :: KSCAN = JPSCAN
-  LOGICAL :: check_limb=.false., check_mask=.false.
-  REAL    :: FAC = 3.0      ! Number of SD' for QC
+  integer :: icount = 0
+  integer :: KSCAN = JPSCAN
+  logical :: check_limb=.false., check_mask=.false.
+  real    :: FAC = 3.0      ! Number of SD' for QC
 
 
-  NAMELIST /INPUTS/ global, lscan, kscan, check_limb, check_mask, &
+  namelist /INPUTS/ global, lscan, kscan, check_limb, check_mask, &
                     FAC,CDATE
 
 !------------------------------------------------------------------------------
 !        1.   SETUP.
 !             -----
 
-  READ(5,INPUTS,END=100)
-  100 CONTINUE
-  WRITE(6,INPUTS)
+  read (5,INPUTS,end=100)
+  100 continue
+  write (6,INPUTS)
 
-  IF (lscan) OPEN(12,FORM='UNFORMATTED')  ! Scan Biases with lat bands
-  OPEN(UNIT=10,FORM='UNFORMATTED')        ! Input data from SELECT
+  if (lscan) OPEN(12,FORM='UNformatTED')  ! Scan Biases with lat bands
+  OPEN(unit=10,FORM='UNformatTED')        ! Input data from SELECT
 
 ! Read scan biases
 
-  IF (lscan) THEN 
-     WRITE (6,112) (JS,JS=1,KSCAN)
-     112 FORMAT(/1X,'SCAN DEPENDENT BIASES APPLIED'/1X,3X,18I7/(4X,18I7))
+  if (lscan) then 
+     write (6,112) (JS,JS=1,KSCAN)
+     112 format(/1X,'SCAN DEPendENT BIASES APPLIED'/1X,3X,18I7/(4X,18I7))
   ELSE
-     WRITE (6,*) 'NO SCAN CORRECTION APPLIED'
-  ENDIF
+     write (6,*) 'NO SCAN CORRECTION APPLIED'
+  end if
 
 !----------------------------------------------------------------------
 !        2.   READ IN DATA, Q.C., CALC MEANS AND VARIANCES.
@@ -104,10 +104,10 @@
   vstd_dep(:)  = 0.0
   vstd_abs(:)  = 0.0
 
-  200  CONTINUE
+  200  continue
 
-  READ(UNIT=10,END=265)  tovs%nchan, tovs%npred    ! Read in data
-  REWIND(UNIT=10)
+  read (unit=10,end=265)  tovs%nchan, tovs%npred    ! Read in data
+  rewind(unit=10)
 
   allocate(tovs%tb(tovs%nchan))
   allocate(tovs%omb(tovs%nchan))
@@ -116,22 +116,22 @@
   allocate(tovs%cloud_flag(tovs%nchan))
   allocate(tovs%pred(tovs%npred))
 
-  IF (lscan) THEN
+  if (lscan) then
    if (global) then
-    DO J=1, tovs%nchan   ! get scan biases (latitude bands)
-    DO sband=1,JBAND
-        READ(12) JJ, vmnrlb(J,1:KSCAN,sband)
-    ENDDO
-    ENDDO
+    do J=1, tovs%nchan   ! get scan biases (latitude bands)
+    do sband=1,JBAND
+        read (12) JJ, vmnrlb(J,1:KSCAN,sband)
+    end do
+    end do
    else
-    DO J=1, tovs%nchan   ! get scan biases (no band dependence)
-        READ(12) JJ, vmnrl(J,1:KSCAN)
-    ENDDO
+    do J=1, tovs%nchan   ! get scan biases (no band dependence)
+        read (12) JJ, vmnrl(J,1:KSCAN)
+    end do
    end if
-  ENDIF
+  end if
 
 loop1:&
-  DO
+  do
     icount=icount+1
 
     call da_read_biasprep(tovs,10,ierr)
@@ -141,21 +141,21 @@ loop1:&
          exit
     else                     ! error
          stop 'read error in da_airmass_bias'
-    endif
+    end if
 
 ! select lat band and get scan bias
       iband = INT(tovs%lat/30.000001) + 3
-      IF (lscan) THEN
+      if (lscan) then
         JSCAN = tovs%scanpos
        if (global) then
-        CALL GET_SCORR(JPCHAN,SCORR(1:JPCHAN),tovs%lat,vmnrlb,JSCAN)
+        call GET_SCORR(JPCHAN,SCORR(1:JPCHAN),tovs%lat,vmnrlb,JSCAN)
        else
         SCORR(1:tovs%nchan) = vmnrl(1:tovs%nchan,JSCAN)
        end if
       ELSE
         JSCAN = KSCAN/2
         SCORR(1:JPCHAN) = 0.0
-      ENDIF
+      end if
 
 ! apply scan bias to the departure (from FG or analysis) and the TB
       vec_dep(1:tovs%nchan) = tovs%omb(1:tovs%nchan) - SCORR(1:tovs%nchan)
@@ -168,33 +168,33 @@ loop1:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
-      endif
+      end if
 
 !-------------------------
 ! 2.3 limb sounding check
 !-------------------------
   if (check_limb) then
-    IF ((tovs%scanpos <= 2) .OR. (tovs%scanpos >= (KSCAN-1))) THEN  ! Reject edge of scan
+    if ((tovs%scanpos <= 2) .OR. (tovs%scanpos >= (KSCAN-1))) then  ! Reject edge of scan
       nsel(2) = nsel(2) + 1
       CYCLE loop1
-    ENDIF
+    end if
   end if
 
 !-----------------------------------------
 ! 2.4 Reject data outside radiosonde mask
 !-----------------------------------------
-    IF (check_mask) THEN     
-      CALL MASK(tovs%lat,tovs%lon,LMASK) 
-      IF (.NOT. LMASK) THEN
+    if (check_mask) then     
+      call MASK(tovs%lat,tovs%lon,LMASK) 
+      if (.NOT. LMASK) then
         nsel(8) = nsel(8) + 1
         CYCLE loop1
-      ENDIF
-    ENDIF
+      end if
+    end if
 
 ! Good data : count and use in the statistics
 
-    DO j=1, tovs%nchan
-      IF ( tovs%qc_flag(j) == 1 ) THEN
+    do j=1, tovs%nchan
+      if ( tovs%qc_flag(j) == 1 ) then
 !  statistics for channel
 !--------------------------
         nobs(j) = nobs(j) + 1
@@ -202,47 +202,47 @@ loop1:&
          vstd_dep(j) = vstd_dep(j) + vec_dep(j)*vec_dep(j)
         vmean_abs(j) = vmean_abs(j) + vec_abs(j)
          vstd_abs(j) = vstd_abs(j) + vec_abs(j)*vec_abs(j)
-      ENDIF
-    ENDDO
+      end if
+    end do
 
-  ENDDO loop1
+  end do loop1
 
-  265 CONTINUE
+  265 continue
 
 !---------------------------------
 !  2.8 mean and std for channels
 !---------------------------------
-  WHERE (nobs(:) /= 0)
+  where (nobs(:) /= 0)
     vmean_dep(:) = vmean_dep(:)/nobs(:)
     vstd_dep(:)  = vstd_dep(:)/nobs(:) - vmean_dep(:)**2
     vstd_dep(:)  = SQRT(MAX(0.0,vstd_dep(:)))
     vmean_abs(:) = vmean_abs(:)/nobs(:)
     vstd_abs(:)  = vstd_abs(:)/nobs(:) - vmean_abs(:)**2
     vstd_abs(:)  = SQRT(MAX(0.0,vstd_abs(:)))
-  END WHERE
+  end where
 
-  WRITE (6,270) icount,nobs(1:tovs%nchan)
-  270 FORMAT (/1X,'NUMBER OF DATA Total/ACCEPTED'/1X,i10/1X,15I10)
+  write (6,270) icount,nobs(1:tovs%nchan)
+  270 format (/1X,'NUMBER OF DATA Total/ACCEPTED'/1X,i10/1X,15I10)
 
-  WRITE (6,288)
-  288 FORMAT (/1X,'FIRST PASS: MEANS AND STANDARD DEVIATIONS')
+  write (6,288)
+  288 format (/1X,'FIRST PASS: MEANS AND STANDARD DEVIATIONS')
 
-  DO j=1, tovs%nchan
+  do j=1, tovs%nchan
     jv = j
-    WRITE (6,289) jv, nobs(j), vmean_abs(j), vstd_abs(j), vmean_dep(j), vstd_dep(j)
-    289 FORMAT (1X,I5,I10,4F15.2)
-  ENDDO 
+    write (6,289) jv, nobs(j), vmean_abs(j), vstd_abs(j), vmean_dep(j), vstd_dep(j)
+    289 format (1X,I5,I10,4F15.2)
+  end do 
 
 !-----------------------------------------------------------------------------
 !     3.   SECOND PASS THROUGH DATA, EXTRA Q.C. (sigma-elimination)
 !          ------ ---- ------- ----- ----- ----
 
-  300 CONTINUE
+  300 continue
 
   vmn(:) = vmean_dep(:)
   vstd(:)= vstd_dep(:)
 
-  REWIND(UNIT=10)
+  rewind(unit=10)
 
   vmean_dep(:) = 0.0                                    ! Clear matrices
   vmean_abs(:) = 0.0                                    ! Clear matrices
@@ -260,7 +260,7 @@ loop1:&
 
   icount = 0
 loop2:&
-  DO
+  do
     icount = icount + 1
 
     call da_read_biasprep(tovs,10,ierr)
@@ -270,21 +270,21 @@ loop2:&
          exit
     else                     ! error
          stop 'read error in da_airmass_bias'
-    endif
+    end if
 
 ! latitude band
     iband = INT(tovs%lat/30.000001) + 3
-    IF (lscan) THEN
+    if (lscan) then
        JSCAN = tovs%scanpos
        if (global) then
-        CALL GET_SCORR(JPCHAN,SCORR(1:JPCHAN),tovs%lat,vmnrlb,JSCAN)
+        call GET_SCORR(JPCHAN,SCORR(1:JPCHAN),tovs%lat,vmnrlb,JSCAN)
        else
         SCORR(1:tovs%nchan) = vmnrl(1:tovs%nchan,JSCAN)
        end if
     ELSE
        JSCAN = KSCAN/2
        SCORR(1:JPCHAN) = 0.0
-    ENDIF
+    end if
 
     vec_dep(1:JPCHAN) = tovs%omb(1:JPCHAN) - SCORR(1:JPCHAN)
     vec_abs(1:JPCHAN) = tovs%tb(1:JPCHAN) - SCORR(1:JPCHAN)
@@ -294,197 +294,197 @@ loop2:&
            call qc_amsua(tovs)
       elseif(tovs%sensor_id == 4) then
            call qc_amsub(tovs)
-      endif
+      end if
 
 ! 3.3 limb scan check
 !---------------------
    if (check_limb) then
-    IF ((tovs%scanpos <= 2) .OR. (tovs%scanpos >= (KSCAN-1))) THEN
+    if ((tovs%scanpos <= 2) .OR. (tovs%scanpos >= (KSCAN-1))) then
       nsel(2) = nsel(2) + 1
       CYCLE loop2
-    ENDIF
+    end if
    end if
 
 ! 3.4 Reject data outside radiosonde mask
 !------------------------------------------
-    IF (check_mask) THEN
-      CALL MASK(tovs%lat,tovs%lon,LMASK)
-      IF (.NOT. LMASK) THEN
+    if (check_mask) then
+      call MASK(tovs%lat,tovs%lon,LMASK)
+      if (.NOT. LMASK) then
         nsel(8) = nsel(8) + 1
         CYCLE loop2
-      ENDIF
-    ENDIF
+      end if
+    end if
 
 ! 3.5 Reject outliers : facx*sigma, sigma calculated in first pass : loop1
 !--------------------------------------------------------------------------
-    DO j=1, tovs%nchan
-      IF ( (ABS(vec_dep(j)-vmn(j)) > (vstd(j)*FAC)) ) THEN
+    do j=1, tovs%nchan
+      if ( (abs(vec_dep(j)-vmn(j)) > (vstd(j)*FAC)) ) then
         tovs%qc_flag(j) = -1
-      ENDIF
-    ENDDO
+      end if
+    end do
 
 ! mean/std statistics for relative scan-bias corrected values
-    DO j=1, tovs%nchan           
-      IF ( tovs%qc_flag(j) == 1 ) THEN
+    do j=1, tovs%nchan           
+      if ( tovs%qc_flag(j) == 1 ) then
         jv = j
         nobs(j) = nobs(j) + 1
         vmean_dep(j) = vmean_dep(j) + vec_dep(j)
          vstd_dep(j) = vstd_dep(j) + vec_dep(j)*vec_dep(j)
         vmean_abs(j) = vmean_abs(j) + vec_abs(j)
          vstd_abs(j) = vstd_abs(j) + vec_abs(j)*vec_abs(j)
-      ENDIF
-    ENDDO
+      end if
+    end do
 
       PRED(1:tovs%npred) = tovs%pred(1:tovs%npred)
 
 ! compute regression variables mean/var/cov: y:departure; x:predictors
-    DO j=1, tovs%nchan
-     IF ( tovs%qc_flag(j) == 1 ) THEN 
+    do j=1, tovs%nchan
+     if ( tovs%qc_flag(j) == 1 ) then 
         jv = j
 
         ybar(j) = ybar(j) + vec_dep(j)             ! mean of y
         ycov(j) = ycov(j) + vec_dep(j)*vec_dep(j)  ! variance of y
 
-        DO i=1, tovs%npred                         ! Covariances for regression
+        do i=1, tovs%npred                         ! Covariances for regression
            xbar(j,i) = xbar(j,i) + pred(i)         ! mean of x
           xycov(j,i) = xycov(j,i) + vec_dep(j)*pred(i) ! cov of x and y
-          DO ii=1, tovs%npred
+          do ii=1, tovs%npred
             xcov(j,i,ii) = xcov(j,i,ii) + pred(i)*pred(ii) ! cov of x and x
-          ENDDO
-        ENDDO
+          end do
+        end do
 
-     ENDIF
-    ENDDO
+     end if
+    end do
 
-  ENDDO loop2
+  end do loop2
 
-  365 CONTINUE
+  365 continue
 
 ! Calculate means, standard deviations and covariances
 
-  WHERE (nobs(:) /= 0)
+  where (nobs(:) /= 0)
     vmean_dep(:) = vmean_dep(:)/nobs(:)
     vstd_dep(:)  = vstd_dep(:)/nobs(:) - vmean_dep(:)**2
     vstd_dep(:)  = SQRT(MAX(0.0,vstd_dep(:)))
     vmean_abs(:) = vmean_abs(:)/nobs(:)
     vstd_abs(:)  = vstd_abs(:)/nobs(:) - vmean_abs(:)**2
     vstd_abs(:)  = SQRT(MAX(0.0,vstd_abs(:)))
-  ENDWHERE
+  end where
 
-  DO j=1, tovs%nchan
-    IF (nobs(j) /= 0) THEN
+  do j=1, tovs%nchan
+    if (nobs(j) /= 0) then
       ybar(j) = ybar(j)/nobs(j)
       ycov(j) = ycov(j)/nobs(j) - ybar(j)*ybar(j)
-      DO i=1, tovs%npred
+      do i=1, tovs%npred
          xbar(j,i) = xbar(j,i)/nobs(j)
         xycov(j,i) = xycov(j,i)/nobs(j) - xbar(j,i)*ybar(j)
-      ENDDO
-      DO i=1, tovs%npred
+      end do
+      do i=1, tovs%npred
         xcov(j,i,1:tovs%npred) = xcov(j,i,1:tovs%npred)/nobs(j) - xbar(j,i)*xbar(j,1:tovs%npred)
-      ENDDO
-    ENDIF
-  ENDDO
+      end do
+    end if
+  end do
 
-  WRITE (6,270) icount,nobs(1:tovs%nchan)
+  write (6,270) icount,nobs(1:tovs%nchan)
 
-  WRITE (6,388)
-  388 FORMAT (/1X,'SECOND PASS: MEANS AND STANDARD DEVIATIONS')
+  write (6,388)
+  388 format (/1X,'SECOND PASS: MEANS AND STANDARD DEVIATIONS')
 
-  DO j=1, tovs%nchan
+  do j=1, tovs%nchan
      jv = j
-    WRITE (6,289) jv, nobs(j), vmean_abs(j), vstd_abs(j), vmean_dep(j), vstd_dep(j)
-  ENDDO
+    write (6,289) jv, nobs(j), vmean_abs(j), vstd_abs(j), vmean_dep(j), vstd_dep(j)
+  end do
 
-  PRINT *, ' '
-  PRINT *, 'PREDICTOR MEANS AND STANDARD DEVIATIONS'
-  DO j=1, tovs%nchan
+  print *, ' '
+  print *, 'PREDICTOR MEANS AND STANDARD DEVIATIONS'
+  do j=1, tovs%nchan
      jv = j
-    PRINT *, ' '
-    PRINT *, 'CHANNEL ', jv, ' NOBS = ', nobs(j)
-    DO i=1, tovs%npred
-      WRITE (6,390) i, xbar(j,i), SQRT(xcov(j,i,i))
-    ENDDO
-  ENDDO
-  390 FORMAT (1X,I5,4F15.2)
+    print *, ' '
+    print *, 'CHANNEL ', jv, ' NOBS = ', nobs(j)
+    do i=1, tovs%npred
+      write (6,390) i, xbar(j,i), SQRT(xcov(j,i,i))
+    end do
+  end do
+  390 format (1X,I5,4F15.2)
 
 !----------------------------------------------------------------------------
 !       4.   CALCULATE REGRESSION COEFFICIENTS.
 !            --------- ---------- ------------
 
-    DO j=1, tovs%nchan
+    do j=1, tovs%nchan
        jv = j
       if ( nobs(j) >= 10 ) then
-       PRINT *, 'REGRESSION : CHANNEL ', jv
-       CALL REGRESS_ONE(tovs%npred,xbar(j,1:tovs%npred),ybar(j), &
+       print *, 'REGRESSION : CHANNEL ', jv
+       call REGRESS_ONE(tovs%npred,xbar(j,1:tovs%npred),ybar(j), &
                         xcov(j,1:tovs%npred,1:tovs%npred), &
                         ycov(j),xycov(j,1:tovs%npred), &
                         tovs%npred,coef(j,1:tovs%npred),coef0(j),reserr(j),&
                         rescov(j,j),xvec(j,1:tovs%npred,1:tovs%npred))
       else
-       PRINT *, 'nobs < 10: ignoring REGRESSION : CHANNEL ', jv
+       print *, 'nobs < 10: ignoring REGRESSION : CHANNEL ', jv
       end if
-    ENDDO
+    end do
 
-    PRINT *, 'PREDICTOR EIGENVECTORS'
-    DO j=1, tovs%nchan
+    print *, 'PREDICTOR EIGENVECTORS'
+    do j=1, tovs%nchan
        jv = j
-      PRINT *, ' '
-      PRINT *,  'CHANNEL ', jv
-      DO i=1, tovs%npred
-        PRINT 888, xvec(j,1:tovs%npred,i)
-      ENDDO
-    ENDDO
-    888 FORMAT(1X,6F12.4)
+      print *, ' '
+      print *,  'CHANNEL ', jv
+      do i=1, tovs%npred
+        print 888, xvec(j,1:tovs%npred,i)
+      end do
+    end do
+    888 format(1X,6F12.4)
 
     xcoef0 = 0.0
     xreser = 0.0
     xcoef = 0.0
 
-    DO JJ=1,tovs%nchan
+    do JJ=1,tovs%nchan
       J = JJ
       xcoef0(J) = coef0(JJ)
       xreser(J) = reserr(JJ)
-      DO I=1, tovs%npred
+      do I=1, tovs%npred
         xcoef(J,I) = coef(JJ,I)
-      ENDDO
-    ENDDO
+      end do
+    end do
 
 !        5.   OUTPUT RESULTS.
 !             ------ -------
 
-    coef_year  = REAL(CDATE/1000000)
-    coef_month = REAL(MOD(CDATE,1000000)/10000)
-    coef_day   = REAL(MOD(CDATE,10000)/100)                  ! Set date
-    coef_time  = REAL(MOD(CDATE,100))
+    coef_year  = real(CDATE/1000000)
+    coef_month = real(MOD(CDATE,1000000)/10000)
+    coef_day   = real(MOD(CDATE,10000)/100)                  ! Set date
+    coef_time  = real(MOD(CDATE,100))
 
-    WRITE (6,*)
-    WRITE (6,502) &
+    write (6,*)
+    write (6,502) &
                   coef_year, coef_month, coef_day,coef_time
-    502  FORMAT (/1X, '   YEAR',F5.0,'   MONTH',F5.0,'   DAY',F5.0,' TIME',F6.0,//&
+    502  format (/1X, '   YEAR',F5.0,'   MONTH',F5.0,'   DAY',F5.0,' TIME',F6.0,//&
                   1X,3X,' CH    MEAN  STDDEV  RES.SD  COEFFICIENTS')
 
-    DO I=1, tovs%nchan
-      WRITE (6,505) I,vmean_dep(I),vstd_dep(I),xreser(I),(xcoef(I,J),J=1,tovs%npred),xcoef0(I)
-      505 FORMAT (1X,I3,3F8.2,8F12.5)
-    ENDDO
+    do I=1, tovs%nchan
+      write (6,505) I,vmean_dep(I),vstd_dep(I),xreser(I),(xcoef(I,J),J=1,tovs%npred),xcoef0(I)
+      505 format (1X,I3,3F8.2,8F12.5)
+    end do
 
-    WRITE (6,508) (I,I=1,tovs%nchan)
-    508 FORMAT (/1X,'RESIDUAL ERROR COVARIANCE'/1X,21I6)
+    write (6,508) (I,I=1,tovs%nchan)
+    508 format (/1X,'RESIDUAL ERROR COVARIANCE'/1X,21I6)
  
-    DO J=1, tovs%nchan
-      WRITE (6,510) (rescov(I,J),I=1,tovs%nchan)
-    ENDDO
-    510 FORMAT (1X,21F6.2)
+    do J=1, tovs%nchan
+      write (6,510) (rescov(I,J),I=1,tovs%nchan)
+    end do
+    510 format (1X,21F6.2)
 
-    WRITE (6,511) (I,I=1,tovs%nchan)
-    511 FORMAT (/1X,'RESIDUAL ERROR CORRELATION'/1X,21I6)
+    write (6,511) (I,I=1,tovs%nchan)
+    511 format (/1X,'RESIDUAL ERROR CORRELATION'/1X,21I6)
 
-    DO J=1, tovs%nchan
-      DO I=1, tovs%nchan
+    do J=1, tovs%nchan
+      do I=1, tovs%nchan
         rescov(I,J) = rescov(I,J)/(reserr(I)*reserr(J))
-      ENDDO
-      WRITE (6,510) (rescov(I,J),I=1,tovs%nchan)
-    ENDDO
+      end do
+      write (6,510) (rescov(I,J),I=1,tovs%nchan)
+    end do
 
 !----------------------------------------------------------------------------
 
@@ -494,8 +494,8 @@ loop2:&
    deallocate(tovs%cloud_flag)
    deallocate(tovs%pred)
 
-  CLOSE(UNIT=10)
-  IF (lscan) CLOSE(UNIT=12)
+  close(unit=10)
+  if (lscan) close(unit=12)
 
 ! out coefs to ASCII file bcor.asc
   call write_biascoef(tovs%nchan,kscan,jband,tovs%npred,global, &
@@ -505,4 +505,4 @@ loop2:&
                       vstd_abs(1:tovs%nchan),vmean_dep(1:tovs%nchan), &
                       vstd_dep(1:tovs%nchan) )
 
-  END PROGRAM da_bias_airmass
+  end program da_bias_airmass

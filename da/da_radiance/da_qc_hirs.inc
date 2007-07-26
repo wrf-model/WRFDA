@@ -177,7 +177,7 @@ subroutine da_qc_hirs (i, nchan, ob, iv)
 
       call da_get_unit(fgat_rad_unit)
       open(fgat_rad_unit,file=trim(filename),form='formatted',iostat=ios)
-      if (ios /= 0) Then
+      if (ios /= 0) then
          write(unit=message(1),fmt='(A,A)') 'error opening the output file ', filename
          call da_error(__FILE__,__LINE__,message(1:1))
       end if

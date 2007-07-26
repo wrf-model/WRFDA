@@ -92,7 +92,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
 #else
       call da_system("da_run_wrfplus_tl.ksh")
 #endif
-   endif
+   end if
 
    do nobwin=1, num_fgat_time
 
@@ -237,7 +237,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
             if (global) then
                call da_error(__FILE__,__LINE__, &
                   (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
-            endif
+            end if
             call da_transform_xtoseasfcwind_adj (grid)
          end if
       end if
@@ -299,7 +299,7 @@ subroutine da_check_xtoy_adjoint(grid, config_flags, iv, y)
          grid%a_moist = 0.0
 #endif
          !!!!!!
-      endif
+      end if
    end do
 
    if (var4d) then

@@ -26,7 +26,7 @@ subroutine da_check_max_iv_radar(it, radar, irv, irf, irvf, irff)
       write (unit = check_max_iv_unit, fmt = '(/,9(A,F3.0,/))')  &
            'Error max test ratio for radar_rv   = ',max_error_rv, &
            'Error max test ratio for radar_rf   = ',max_error_rf
-   endif
+   end if
 
    !------------------------------------------------------------------------
    ! [2.0] Perform maximum innovation vector check:
@@ -44,14 +44,14 @@ subroutine da_check_max_iv_radar(it, radar, irv, irf, irvf, irff)
             call da_max_error_qc_radar(it, radar % info, radar % rv(k), &
                                     max_error_rv, irv, irvf, check_max_iv_unit, 'rv   ', &
                                     failed, check_max_iv_print)
-         endif
+         end if
 
          ! rf
          if (use_radar_rf) then
             call da_max_error_qc_radar(it, radar % info, radar % rf(k),&
                                     max_error_rf, irf, irff, check_max_iv_unit, 'rf   ', &
                                     failed, check_max_iv_print)
-         endif
+         end if
       end if
    end do
 

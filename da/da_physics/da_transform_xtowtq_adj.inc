@@ -46,7 +46,7 @@ subroutine da_transform_xtowtq_adj (grid)
             write(unit=message(2),FMT='(2I6,A,F10.2,A,F10.2)') &
                i,j,' ht = ',grid%xb%h(i,j,kts) ,' terr =  ',grid%xb%terr(i,j)
             call da_error(__FILE__,__LINE__,message(1:2))
-         endif
+         end if
          call da_sfc_wtq_adj(grid%xb%psfc(i,j), grid%xb%tgrn(i,j), &
             grid%xb%p(i,j,kts), grid%xb%t(i,j,kts), grid%xb%q(i,j,kts), &
             grid%xb%u(i,j,kts), grid%xb%v(i,j,kts), &

@@ -20,7 +20,7 @@ subroutine da_read_rand_unit(filename, unit_in,num,obs_type_in, nc)
    integer      :: n, k, n1,n2, levels, ios
 
    open(unit=unit_in,   file=trim(filename), status='old',iostat=ios)
-   if (ios /= 0) Then
+   if (ios /= 0) then
       call da_error(__FILE__,__LINE__, &
          (/"Cannot open file"//trim(filename)/))
    end if

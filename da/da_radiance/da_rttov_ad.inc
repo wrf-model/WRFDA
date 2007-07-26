@@ -56,11 +56,11 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       allocate ( profiles(n)%o3(profiles(n) % nlevels), stat=alloc_status(4) )
       allocate ( profiles(n)%co2(profiles(n) % nlevels), stat=alloc_status(5) )
       allocate ( profiles(n)%clw(profiles(n) % nlevels), stat=alloc_status(6) )
-      If ( Any(alloc_status /= 0) ) Then
+      if ( Any(alloc_status /= 0) ) then
          WRITE(UNIT=message(1),FMT='(A,I5)') &
             "ad mem allocation error to profile",n
          call da_error(__FILE__,__LINE__,message(1:1))
-      End If
+      End if
 
       profiles(n) % ozone_data = .false.
       profiles(n) % co2_data   = .false.
@@ -97,11 +97,11 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
       allocate ( profiles_ad(n)%o3(profiles_ad(n) % nlevels), stat=alloc_status(4) )
       allocate ( profiles_ad(n)%co2(profiles_ad(n) % nlevels), stat=alloc_status(5) )
       allocate ( profiles_ad(n)%clw(profiles_ad(n) % nlevels), stat=alloc_status(6) )
-      If (Any(alloc_status /= 0) ) Then
+      if (Any(alloc_status /= 0) ) then
          WRITE(UNIT=message(1),FMT='(A,I5)') &
             "mem allocation error to profiles_ad",n
          call da_error(__FILE__,__LINE__,message(1:1))
-      End If
+      End if
 
       profiles_ad(n) % ozone_Data = .False.  ! no meaning
       profiles_ad(n) % co2_Data   = .False.  ! no meaning
@@ -186,10 +186,10 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    allocate (radiance_ad % total_out( nbtout ) ,stat= alloc_status(123))
    allocate (radiance_ad % clear_out( nbtout ) ,stat= alloc_status(124))
 
-   If ( Any(alloc_status /= 0) ) Then
+   if ( Any(alloc_status /= 0) ) then
       call da_error(__FILE__,__LINE__, &
          (/"mem allocation error prior to rttov_ad"/))
-   End If
+   End if
 
    ! initialise all radiance increments to 0
    radiance_ad % clear(:)      = 0.0
@@ -305,7 +305,7 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
        write (message(34),*) 'emissivity_ad          = ', emissivity_ad
        write (message(35),*) 'radiance_ad            = ', radiance_ad%out_clear
        call da_warning(__FILE__,__LINE__,message(1:35))
-   endif
+   end if
 
    do n = 1, nprofiles
       con_vars_ad(n)%t(:)         = profiles_ad(n) % t(:)
@@ -378,10 +378,10 @@ subroutine da_rttov_ad( inst, nchanl, nprofiles, con_vars, &
    deallocate (radiance_ad % total_out ,stat= alloc_status(121))
    deallocate (radiance_ad % clear_out ,stat= alloc_status(122))
 
-   If (Any(alloc_status /= 0) ) Then
+   if (Any(alloc_status /= 0) ) then
      call da_error(__FILE__,__LINE__, &
        (/"mem deallocation error"/))
-   End If
+   End if
 
    call da_trace_exit("da_rttov_ad")
 

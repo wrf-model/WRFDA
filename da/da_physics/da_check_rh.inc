@@ -30,7 +30,7 @@ subroutine da_check_rh(grid)
       write(unit=stdout,fmt='(a,i2,a)') &
          'cv_options_hum=',cv_options_hum,' to get grid%xa%rh..'
       call da_tpq_to_rh_lin (grid)
-   endif
+   end if
 
    do i=its,ite
       do j=jts,jte

@@ -28,15 +28,15 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
    real, allocatable :: psfc(:)
 
    ! CRTM local variables and types
-   INTEGER :: wmo_sensor_id, Error_Status, Allocate_Status
-   TYPE( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
-   TYPE( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
-   TYPE( CRTM_Surface_type )      :: Surface, Surface_TL
-   TYPE( CRTM_GeometryInfo_type ) :: GeometryInfo
-   !TYPE( CRTM_Options_type )      :: Options
+   integer :: wmo_sensor_id, Error_Status, Allocate_Status
+   type( CRTM_RTSolution_type ), ALLOCATABLE :: RTSolution(:),RTSolution_TL(:)
+   type( CRTM_Atmosphere_type )   :: Atmosphere, Atmosphere_TL
+   type( CRTM_Surface_type )      :: Surface, Surface_TL
+   type( CRTM_GeometryInfo_type ) :: GeometryInfo
+   !type( CRTM_Options_type )      :: Options
 !---------------------------------------------------------
 
-   IF ( iv%num_inst < 1 ) return
+   if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_transform_xtoy_crtm")
 
@@ -55,10 +55,10 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
                                              Atmosphere%n_Clouds, &
                                              Atmosphere%n_Aerosols, &
                                              Atmosphere)
-    if ( Error_Status /= 0 ) THEN
+    if ( Error_Status /= 0 ) then
        call da_error(__FILE__,__LINE__, &
          (/"Error in allocatting CRTM Atmosphere Structure"/))
-    endif
+    end if
 
     Atmosphere%Absorber_ID(1)=H2O_ID
     Atmosphere%Absorber_ID(2)=O3_ID
@@ -83,14 +83,14 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       if ( Error_Status /= 0) then
          call da_error(__FILE__,__LINE__, &
           (/"Error in calling CRTM_Set_ChannelInfo"/))
-      endif
+      end if
       nchanl    = ChannelInfo%n_channels
                                         
   ! Allocate forward model solution RTSolution array to number of channels
-      ALLOCATE( RTSolution( ChannelInfo%n_Channels ), &
+      allocate( RTSolution( ChannelInfo%n_Channels ), &
                 RTSolution_TL( ChannelInfo%n_Channels ), &
                STAT = Allocate_Status )
-      IF ( Allocate_Status /= 0 ) THEN
+      if ( Allocate_Status /= 0 ) then
          call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting RTSolution"/))
       END IF
@@ -106,20 +106,20 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
          wmo_sensor_id=WMO_SSMI
       else
          wmo_sensor_id=INVALID_WMO_SENSOR_ID
-      endif
+      end if
 
       Error_Status = CRTM_Allocate_Surface( nchanl,     &  ! Input
                                    Surface)  ! Output
-      if ( Error_Status /= 0 ) THEN
+      if ( Error_Status /= 0 ) then
         call da_error(__FILE__,__LINE__, &
           (/"Error in allocatting CRTM Surface Structure"/))
-      endif
+      end if
 
   ! CRTM Options structure
       !Options%n_channels = nchanl
       !Error_Status = CRTM_Allocate_Options( nchanl,     &  ! Input
       !                             Options)  ! Output
-      !if ( Error_Status /= 0 ) THEN
+      !if ( Error_Status /= 0 ) then
       !  call da_error(__FILE__,__LINE__, &
       !    (/"Error in allocatting CRTM Options Structure"/))
       !endif
@@ -176,7 +176,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
             atmosphere%cloud(5)%effective_radius(k)=200.0
             atmosphere%cloud(6)%effective_radius(k)=200.0
            end if
-           enddo
+           end do
 
       ! [1.4] User-supplied emissivity
            !Options%emissivity_switch = 1
@@ -196,7 +196,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
        !Surface%Canopy_Water_Content=0.05      ! gravimetric water content
        Surface%Vegetation_Fraction=iv%instid(inst)%vegtyp(n)
        Surface%Soil_Temperature=iv%instid(inst)%tslb(n)
-     endif
+     end if
      if (Surface%Water_Coverage > 0.0) then
        !Surface%Water_Type=SEA_WATER          ! (Currently NOT used)
        Surface%Water_Temperature=iv%instid(inst)%ts(n)     ! K
@@ -204,21 +204,21 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
                                (iv%instid(inst)%v10(n))**2)  ! m/sec
        !surface%Wind_Direction=0.0            ! NOT used
        Surface%Salinity=33.                   ! ppmv
-     endif
+     end if
      if (Surface%Snow_Coverage > 0.0) then
        Surface%Snow_Type=NEW_SNOW             ! User guide appendix 3
        Surface%Snow_Temperature=iv%instid(inst)%ts(n)      ! K
        Surface%Snow_Depth=iv%instid(inst)%snowh(n)         ! mm
        !Surface%Snow_Density=0.2               ! g/cm**3
        !Surface%Snow_Grain_Size=2.0            ! mm
-     endif
+     end if
      if (Surface%Ice_Coverage > 0.0) then
        !Surface%Ice_Type=FRESH_ICE             ! NO Table offered, single egrid%xample is FRESH_ICE
        Surface%Ice_Temperature=iv%instid(inst)%ts(n)       ! K
        Surface%Ice_Thickness=10.0              ! mm
        !Surface%Ice_Density=0.9                ! g/cm**3
        !Surface%Ice_Roughness=0.0               ! NO Table offered, single egrid%xample is ZERO
-     endif
+     end if
      Surface%SensorData%n_channels = nchanl
      Surface%SensorData%Sensor_ID  = wmo_sensor_id
      Surface%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &
@@ -227,7 +227,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       ! -- Copy the TL atmosphere structure
       Error_Status = CRTM_Assign_Atmosphere( Atmosphere, Atmosphere_TL )
 
-      IF ( Error_Status /= 0 ) THEN
+      if ( Error_Status /= 0 ) then
         call da_error(__FILE__,__LINE__, &
           (/"Error copying Atmosphere_TL structure"/))
       END IF
@@ -235,15 +235,15 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       ! -- Copy the TL surface structure
       Error_Status = CRTM_Assign_Surface( Surface, Surface_TL )
 
-      IF ( Error_Status /= 0 ) THEN
+      if ( Error_Status /= 0 ) then
         call da_error(__FILE__,__LINE__, &
           (/"Error copying Surface_TL structure"/))
       END IF
 
     ! -- Zero the TL outputs
     ! Important: adjoint variables must be initialized
-    CALL CRTM_Zero_Atmosphere( Atmosphere_TL )
-    CALL CRTM_Zero_Surface( Surface_TL )
+    call CRTM_Zero_Atmosphere( Atmosphere_TL )
+    call CRTM_Zero_Surface( Surface_TL )
        
     Atmosphere_TL%Temperature(kts:kte)             = temperature(kts:kte,n)
     Atmosphere_TL%Absorber(kts:kte,1)              = absorber(kts:kte,n)
@@ -282,7 +282,7 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
          !                   RTSolution,   &
          !                   RTSolution_TL)  !,&
          !                   !Options = Options)
-         !if ( Error_Status /= 0 ) THEN
+         !if ( Error_Status /= 0 ) then
          !     call da_error(__FILE__,__LINE__, &
          !        (/"Error in calling CRTM_Tangent_Linear"/))
          !endif
@@ -294,16 +294,16 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
          !if (n <= 10 ) write(6,'(15f8.3)') RTSolution_TL(:)%brightness_temperature
 
          Error_Status = CRTM_Destroy_Atmosphere( Atmosphere_TL )
-         if ( Error_Status /= 0 ) THEN
+         if ( Error_Status /= 0 ) then
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Atmosphere_TL Structure"/))
-         endif
+         end if
 
          Error_Status = CRTM_Destroy_Surface(Surface_TL)
-         if ( Error_Status /= 0 ) THEN
+         if ( Error_Status /= 0 ) then
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Surface_TL Structure"/))
-         endif
+         end if
 
       end do  ! end loop for pixels 
 
@@ -315,16 +315,16 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       ! [2.0] Deallocating CRTM structures
       !-------------------------------------------------------------------
          deallocate( rtsolution, rtsolution_tl, STAT = Allocate_Status )
-         IF ( Allocate_Status /= 0 ) THEN
+         if ( Allocate_Status /= 0 ) then
             call da_error(__FILE__,__LINE__, &
               (/"Error in deallocatting RTSolution"/))
          END IF
              
          Error_Status = CRTM_Destroy_Surface(Surface)
-         if ( Error_Status /= 0 ) THEN
+         if ( Error_Status /= 0 ) then
             call da_error(__FILE__,__LINE__, &
                (/"Error in deallocatting CRTM Surface Structure"/))
-         endif
+         end if
 
    end do     ! end loop for sensor
 
@@ -332,10 +332,10 @@ subroutine da_transform_xtoy_crtm (grid, iv, y )
       ! [3.0] Deallocating CRTM Atmosphere structures
       !-------------------------------------------------------------------
     Error_Status = CRTM_Destroy_Atmosphere( Atmosphere )
-    if ( Error_Status /= 0 ) THEN
+    if ( Error_Status /= 0 ) then
        call da_error(__FILE__,__LINE__, &
          (/"Error in deallocatting CRTM Atmosphere Structure"/))
-    endif
+    end if
 
    if (trace_use) call da_trace_exit("da_transform_xtoy_crtm")
 #else

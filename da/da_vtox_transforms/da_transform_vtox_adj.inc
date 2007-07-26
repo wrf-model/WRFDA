@@ -72,7 +72,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
          call da_moist_phys_adj(grid)
 
-      endif
+      end if
 
    end if
 

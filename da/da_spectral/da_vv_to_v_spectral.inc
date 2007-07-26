@@ -38,7 +38,7 @@ subroutine da_vv_to_v_spectral(ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk
    real                :: work(1:lenwrk)         ! FFT work array. 
 #endif
 
-   sizec = INT(0.5 * r_cvsize)
+   sizec = int(0.5 * r_cvsize)
    allocate (ccv(1:sizec))
 
    if ((ni+1) / 2 == ni/2 + 1) then  ! Odd number of longitudes:

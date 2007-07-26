@@ -307,7 +307,7 @@ subroutine da_count_filtered_obs(&
       idd = 2
    else
       idd = 1
-   endif
+   end if
    write (unit = filtered_obs_unit, fmt = '(5(A,I7),A)') &
       "IXC   =", coarse_jy   ,", JXC   =", coarse_ix   ,", IPROJ =", map,&
       ", IDD   =", idd,", MAXNES=",maxnes,","

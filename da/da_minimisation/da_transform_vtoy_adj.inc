@@ -83,7 +83,7 @@ subroutine da_transform_vtoy_adj(iter,cv_size, be, ep, cv, iv, vp, vv, &
             call da_free_unit(wrf_done_unit)
          end if
          ! Wait until PE 0 agrees that AD finished
-         CALL wrf_get_dm_communicator ( comm )
+         call wrf_get_dm_communicator ( comm )
          call mpi_barrier(comm, ierr)
          call da_system("da_run_wrfplus_ad.ksh post")
       end if

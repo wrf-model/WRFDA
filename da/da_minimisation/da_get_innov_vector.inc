@@ -127,7 +127,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 #endif
       else
          call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
-      endif
+      end if
 
       ! Pseudo obs:
 
