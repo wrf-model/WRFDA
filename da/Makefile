@@ -295,6 +295,7 @@ da_obs.o:		da_obs.f90 \
 			da_store_obs_grid_info.inc \
 			da_use_obs_errfac.inc \
 			da_write_obs.inc \
+			da_write_obs_etkf.inc \
 			da_write_filtered_obs.inc \
 			da_write_y.inc
 			$(RM) $@
@@ -856,7 +857,6 @@ da_tools.o:		\
 			da_eof_decomposition_test.inc  \
 			da_max_error_qc.inc \
 			da_random_omb.inc \
-			da_random_seed.inc \
 			da_gaus_noise.inc \
 			da_llxy.inc \
 			da_openfile.inc \
@@ -935,6 +935,7 @@ da_define_structures.o:	da_define_structures.f90 \
 			da_allocate_background_errors.inc \
 			da_allocate_observations.inc \
 			da_allocate_y.inc \
+			da_random_seed.inc \
 			da_deallocate_background_errors.inc \
 			da_deallocate_observations.inc \
 			da_deallocate_y.inc \

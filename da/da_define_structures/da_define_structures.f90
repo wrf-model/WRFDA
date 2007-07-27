@@ -4,8 +4,9 @@ module da_define_structures
 
     use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
        vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
-       max_ob_levels,da_array_print, trace_use, vert_corr_1, vert_corr_2, &
-       vert_evalue_global
+       max_ob_levels,da_array_print, trace_use, &
+       vert_corr_1, vert_corr_2, vert_evalue_global, &
+       put_rand_seed, seed_array1, seed_array2
 
     use da_tracing, only : da_trace_entry, da_trace_exit
 
@@ -948,6 +949,7 @@ contains
 #include "da_zero_x.inc"
 #include "da_zero_vp_type.inc"
 #include "da_initialize_cv.inc"
+#include "da_random_seed.inc"
 #include "da_gauss_noise.inc"
 
 end module da_define_structures

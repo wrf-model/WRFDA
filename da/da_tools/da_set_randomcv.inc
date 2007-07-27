@@ -17,7 +17,10 @@ subroutine da_set_randomcv(cv_size, rcv)
 
    ! [1] Initialize random number generator and scalars:
 
-   call da_random_seed
+write(stdout,'(a)')'calling da_random_seed'
+write(stdout,*)put_rand_seed
+    call da_random_seed
+write(stdout,'(a)')'called da_random_seed'
 
    sum_cv = 0.0
    sum_cv2 = 0.0

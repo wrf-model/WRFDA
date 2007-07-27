@@ -23,7 +23,7 @@ subroutine da_initialize_cv(cv_size, cv)
    
       ! [2.1] Initialize random number generator and scalars:
 
-      call random_seed
+      call da_random_seed
       
       sum_cv = 0.0
       sum_cv2 = 0.0
