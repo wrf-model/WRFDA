@@ -6,9 +6,10 @@ module da_test
 
    use module_configure, only : grid_config_rec_type,nl_set_dyn_opt
    use module_dm, only : wrf_dm_sum_real
+
 #ifdef RSL_LITE
-   use module_dm, only : local_communicator, local_communicator_x, &
-      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
+   use module_dm, only : local_communicator, &
+      ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
    use da_control, only : ids,ide,ips,ipe,jds,jde,jps,jpe,kds,kde,kps,kpe
 #endif
@@ -16,6 +17,7 @@ module da_test
    use module_dm, only : invalid_message_value, glen, setup_halo_rsl, &
       stencil_24pt,reset_msgs_24pt,add_msg_24pt_real
 #endif
+
    use module_domain, only : xpose_type, vp_type, xb_type, x_type, ep_type, &
       domain
    use module_state_description, only : dyn_em,dyn_em_tl,dyn_em_ad,p_a_qv

@@ -7,34 +7,34 @@ module da_par_util
    !---------------------------------------------------------------------------
 
    use module_domain, only : domain, xpose_type
+
 #ifdef DM_PARALLEL
 #ifdef RSL_LITE
-   use module_dm, only : local_communicator, local_communicator_x, &
+   use module_dm, only : local_communicator_x, &
       local_communicator_y, ntasks_x, ntasks_y, data_order_xyz
+   use da_par_util1, only : true_mpi_real, true_mpi_complex
 #else
    use module_dm, only : io2d_ij_internal, io3d_ijk_internal, &
       invalid_message_value, setup_xpose_rsl, define_xpose,reset_msgs_xpose, &
       add_msg_xpose_real
+   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real
 #endif
    use mpi, only : mpi_2double_precision, mpi_status_size, &
       mpi_integer, mpi_maxloc, mpi_status_size, &
       mpi_minloc, mpi_sum
+#else
+   use da_reporting, only : message
 #endif
+
    use da_define_structures, only : be_subtype, &
       x_type, vp_type, residual_synop_type, residual_sound_type, ob_type, &
       y_type, count_obs_number_type, count_obs_type, maxmin_field_type
-#ifdef DM_PARALLEL
-#ifndef RSL_LITE
-   use da_par_util1, only : true_mpi_real, true_mpi_complex, true_rsl_real
-#else
-   use da_par_util1, only : true_mpi_real, true_mpi_complex
-#endif
-#endif
+
    use da_control, only : trace_use,num_ob_indexes, myproc, root, comm, ierr, &
       rootproc, num_procs, stdout, print_detail_parallel, its,ite, jts, jte, &
       kts,kte,ids,ide,jds,jde,kds,kde,ims,ime,jms,jme,kms,kme,ips,ipe,jps,jpe, &
       kps, kpe, grid_stagger, grid_ordering
-   use da_reporting, only : da_error,message
+   use da_reporting, only : da_error
    use da_tracing, only : da_trace_entry, da_trace_exit
    use da_wrf_interfaces, only : &
       wrf_dm_xpose_z2x,wrf_dm_xpose_x2y, wrf_dm_xpose_y2x, wrf_dm_xpose_x2z, &
@@ -79,15 +79,11 @@ module da_par_util
 #include "da_system.inc"
 
 #ifdef DM_PARALLEL
-
 #include "da_proc_sum_count_obs.inc"
 #include "da_proc_stats_combine.inc"
 #include "da_proc_maxmin_combine.inc"
-
 #else
-
 #include "da_wrf_dm_interface.inc"
-
 #endif
 
 end module da_par_util

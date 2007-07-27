@@ -10,10 +10,10 @@ module da_dynamics
       balance_type, balance_cyc, gravity, convert_fd2uv, trace_use
    use module_domain, only : domain,xb_type,xpose_type
 #ifdef RSL_LITE
-   use module_dm, only : local_communicator, local_communicator_x, &
-      local_communicator_y, ntasks_x, ntasks_y, data_order_xy, mytask, &
+   use module_dm, only : local_communicator, &
+      ntasks_x, ntasks_y, data_order_xy, mytask, &
       ntasks
-   use da_control, only : ips,ipe,jps,jpe,kps,kpe
+   use da_control, only : ips,ipe,jps,jpe,kps
 #endif
 #ifdef RSL
    use module_dm, only : invalid_message_value, setup_halo_rsl, &

@@ -12,8 +12,8 @@ module da_transfer_model
       p_qr, p_qi,p_qs,p_qg,p_qc,num_moist, p_a_qv, p_g_qv
    use module_dm, only : wrf_dm_sum_real, wrf_dm_sum_reals
 #ifdef RSL_LITE
-   use module_dm, only : local_communicator, local_communicator_x, &
-      local_communicator_y, ntasks_x, ntasks_y, data_order_xyz, mytask, &
+   use module_dm, only : local_communicator, &
+      ntasks_x, ntasks_y, data_order_xyz, mytask, &
       ntasks, data_order_xy
    use da_control, only : ips,ipe,jps,jpe,kps,kpe
 #endif

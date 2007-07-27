@@ -54,6 +54,21 @@ wrf_bdyout.o wrf_bdyin.o \
 
 # compile these without warnings, as they generate too many
 
+gamma1.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.f90 > $*.b 
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOWARN) $*.f
+
+f_pack.o \
+   f_xpose.o :
+	@ $(RM) $@
+	@ $(SED_FTN) $*.F90 > $*.b 
+	@ $(CPP) $(CPPFLAGS) $(FPPFLAGS) $*.b  > $*.f
+	@ $(RM) $*.b
+	  $(FC) -c $(FCFLAGS_NOWARN) $*.f
+
 interp_fcn.o \
    init_modules.o \
    mediation_wrfmain.o \
