@@ -32,7 +32,7 @@
 #BSUB -J reg.test                       # job name
 #BSUB -q premium                        # queue
 #BSUB -W 6:00                           # wallclock time
-#BSUB -P 64000400
+#BSUB -P $PROJECT
 
 # QSUB -q ded_4             # submit to 4 proc
 # QSUB -l mpp_p=4           # request 4 processors
@@ -1961,15 +1961,19 @@ banner 12
 					#	(3 coarse grid timesteps), you could use 20 and 3 (20 coarse grid time steps).
 	
 					if      ( $NESTED == TRUE ) then
-						@ run_seconds = $time_step * 3
+						@ seconds = $time_step * 3
 						@ history_interval = $time_step / 20
+                                                # convert to minutes to keep numbers in range
+						@ run_minutes = $seconds / 60
 					else if ( $NESTED != TRUE ) then
-						@ run_seconds = $time_step * 10
+						@ seconds = $time_step * 10
 						@ history_interval = $time_step / 6
+                                                # convert to minutes to keep numbers in range
+						@ run_minutes = $seconds / 60
 					endif
 					rm ed_in namelist.input.temp
 					cat >! ed_in << EOF
-g/run_seconds/s/[0-9]/$run_seconds
+g/run_minutes/s/[0-9]/$run_minutes
 g/history_interval/s/[0-9][0-9][0-9]/$history_interval
 w namelist.input.temp
 q
@@ -1983,9 +1987,6 @@ EOF
 					    -e '/^ time_step /,/^ smooth_option/d' -e '/^ &domains/r ./dom_real' \
 					    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format' \
 					    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 200/g' \
-					    -e 's/ run_days *= [0-9][0-9]*/ run_days = 0/g' \
-					    -e 's/ run_hours *= [0-9][0-9]*/ run_hours = 0/g' \
-					    -e 's/ run_minutes *= [0-9][0-9]*/ run_minutes = 0/g' \
 					    -e '/^ &fdda/r fdda_opt' \
 					    -e '/^ debug_level/r fdda_time' \
 					namelist.input.temp >! namelist.input
@@ -2052,8 +2053,10 @@ banner 14
 							setenv XLSMPOPTS "parthds=1"
 						endif
 						$SERIALRUNCOMMAND ../../main/real_${core}.exe.1 >! print.out.real_${core}_Phys=${phys_option}_Parallel=${compopt}
+						cp namelist.output namelist.output.real_${core}_Phys=${phys_option}_Parallel=${compopt}
 					else if ( $NESTED != TRUE ) then
 						../../main/real_${core}.exe.1 >! print.out.real_${core}_Phys=${phys_option}_Parallel=${compopt}
+						cp namelist.output namelist.output.real_${core}_Phys=${phys_option}_Parallel=${compopt}
 					endif
 #DAVE###################################################
 echo finished real
@@ -2268,6 +2271,7 @@ banner 19b
 			rm wrfbdy_d01   >& /dev/null
 
 			$RUNCOMMAND ../../main/real_${core}.exe.$COMPOPTS[3] >! print.out.real_${core}_Phys=${phys_option}_Parallel=$COMPOPTS[3]
+			mv namelist.output namelist.output.real_${core}_Phys=${phys_option}_Parallel=$COMPOPTS[3]
 #DAVE###################################################
 echo finished real
 banner 19c
@@ -2275,6 +2279,7 @@ banner 19c
 #DAVE###################################################
 
 			mv rsl.out.0000 print.out.real_${core}_Phys=${phys_option}_Parallel=${compopt}
+			mv namelist.output namelist.output.real_${core}_Phys=${phys_option}_Parallel=${compopt}
 			grep "SUCCESS COMPLETE" print.out.real_${core}_Phys=${phys_option}_Parallel=${compopt} >& /dev/null
 			set success = $status
 
@@ -2358,6 +2363,7 @@ banner 22
 					@ tries = $tries + 1
 					$RUNCOMMAND ../../main/wrf_${core}.exe.$compopt $MPIRUNCOMMANDPOST
 					mv rsl.error.0000 print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
+					mv namelist.output namelist.output.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
 					grep "SUCCESS COMPLETE" print.out.wrf_${core}_Phys=${phys_option}_Parallel=${compopt}.exe_${n}p
 					set success = $status
 					set ok = $status
@@ -2508,9 +2514,9 @@ banner 25
 						    ./namelist.input.template >! namelist.input
 					else if ( $core == em_b_wave     ) then
 						sed -e 's/ run_days *= *[0-9][0-9]*/ run_days = 00/g'                              		\
-						    -e 's/ run_minutes *= *[0-9][0-9]*/ run_minutes = 100/g'                       		\
-						    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 100/g'                   	\
-						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'               	\
+						    -e 's/ run_minutes *= *[0-9][0-9]*/ run_minutes = 100/g'                          		\
+						    -e 's/ history_interval *= [0-9][0-9]*/ history_interval = 100/g'            	       	\
+						    -e 's/ frames_per_outfile *= [0-9][0-9]*/ frames_per_outfile = 100/g'	               	\
 						    -e '/^ diff_opt/d' -e '/^ km_opt/d' -e '/^ damp_opt/d' -e '/^ rk_ord/r ./phys_tke' 		\
  		                                    -e '/^ io_form_history /,/^ io_form_boundary/d' -e '/^ restart_interval/r ./io_format'	\
 						    -e '/^ mp_physics/d' -e '/^ &physics/r ./phys_mp' 						\
@@ -2551,15 +2557,17 @@ banner 26
 					rm wrfinput_d01 >& /dev/null
 					rm wrfbdy_d01   >& /dev/null
 
-					../../main/ideal_${core}.exe.1 >! print.out.ideal_${core}_Parallel=${compopt}
+					../../main/ideal_${core}.exe.1 >! print.out.ideal_${core}_Phys=${phys_option}_Parallel=${compopt}
+					mv namelist.output namelist.output.ideal_${core}_Phys=${phys_option}_Parallel=${compopt}
+
 #DAVE###################################################
 echo ran ideal
-ls -ls wrfiput*
+ls -ls wrfinput*
 banner 27
 #set ans = "$<"
 #DAVE###################################################
 
-					grep "SUCCESS COMPLETE" print.out.ideal_${core}_Parallel=${compopt} >& /dev/null
+					grep "SUCCESS COMPLETE" print.out.ideal_${core}_Phys=${phys_option}_Parallel=${compopt} >& /dev/null
 					set success = $status
 
 					#	Did making the IC BC files work?
@@ -2605,6 +2613,7 @@ banner 27
 					endif
 					$MPIRUNCOMMAND ../../main/wrf_${core}.exe.$compopt $MPIRUNCOMMANDPOST
 					mv rsl.error.0000 print.out.wrf_${core}_Parallel=${compopt}.exe
+					mv namelist.output namelist.output.wrf_${core}_Parallel=${compopt}.exe
 				endif
 #DAVE###################################################
 echo ran ideal fcst
