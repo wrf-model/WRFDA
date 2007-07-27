@@ -1,7 +1,7 @@
 module da_obs
 
    use da_define_structures, only : multi_level_type, y_type, ob_type, &
-      model_loc_type, field_type, each_level_type,da_allocate_y
+      model_loc_type, field_type, each_level_type,da_allocate_y, da_random_seed
    use module_domain, only : domain, x_type, xpose_type
 
    use da_airep, only : da_transform_xtoy_airep,da_transform_xtoy_airep_adj 
@@ -50,8 +50,7 @@ module da_obs
       da_transform_xtoy_ssmt2_adj, da_transform_xtoy_ssmi_adj
    use da_synop, only : da_transform_xtoy_synop,da_transform_xtoy_synop_adj
    use da_tools1, only : da_free_unit, da_get_unit
-   use da_tools, only : da_add_noise, da_add_noise_new,da_random_omb, &
-      da_random_seed
+   use da_tools, only : da_add_noise, da_add_noise_new,da_random_omb
    use da_tracing, only : da_trace_entry, da_trace_exit 
 
    implicit none

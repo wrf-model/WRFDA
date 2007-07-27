@@ -11,15 +11,15 @@ begin
 
  works = "pdf"
 
- region = "india_30km"
- nrow = 50
- resolution = 30.0
+ region = "t46_45km"
+ nrow = 41
+ resolution = 45.0
 
 ; region = "con200"
 ; nrow = 27
 ; resolution = 200.0
 
- dir =  "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
+ dir =  "/smoke/dmbarker/data/"+region+"/noda/fc/gen_be/"
  ncol = 2
 
  var1="psi"

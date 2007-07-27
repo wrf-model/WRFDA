@@ -11,17 +11,17 @@ begin
 
  works = "pdf"
 
- region = "india_30km"
- ni = 150
- nj = 150
- nk = 50
+ region = "t46_45km"
+ ni = 53
+ nj = 70
+ nk = 41
 
 ; region = "con200"
 ; ni = 44
 ; nj = 44
 ; nk = 27
 
- dir =  "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
+ dir =  "/smoke/dmbarker/data/"+region+"/noda/fc/gen_be/"
  nij = ni * nj
  var1 = "chi"
  var2 = "t"

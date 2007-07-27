@@ -11,12 +11,12 @@ begin
 
  works = "pdf"
 
- region = "india_30km"
- nrow = 50
+ region = "t46_45km"
+ nrow = 41
 ; region = "con200"
 ; nrow = 27
 
- dir =  "/smoke/dmbarker/data/"+region+"/noobs/gen_be/"
+ dir =  "/smoke/dmbarker/data/"+region+"/noda/fc/gen_be/"
  ncol = 2
 
  y1 = new((/nrow/),float)

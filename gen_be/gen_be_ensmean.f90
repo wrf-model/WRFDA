@@ -34,7 +34,9 @@ program gen_be_ensmean
    integer               :: v, member, i              ! Loop counters.
    integer               :: length                    ! Filename length.
    integer               :: rcode                     ! NETCDF return code.
-   integer               :: cdfid_mean, cdfid         ! NETCDF file IDs.
+   integer               :: cdfid                     ! NETCDF file IDs.
+   integer               :: cdfid_mean                ! NETCDF file IDs.
+   integer               :: cdfid_vari                ! NETCDF file IDs.
    integer               :: id_var                    ! NETCDF variable ID.
    integer               :: ivtype                    ! 4=integer, 5=real, 6=d.p.
    integer               :: ndims                     ! Number of field dimensions.
@@ -49,6 +51,7 @@ program gen_be_ensmean
 
    real (kind=4), allocatable     :: data_r(:,:,:)             ! Data array.
    real (kind=4), allocatable     :: data_r_mean(:,:,:)        ! Data array mean.
+   real (kind=4), allocatable     :: data_r_vari(:,:,:)        ! Data array variance.
  
    namelist / gen_be_ensmean_nl / filestub, num_members, nv, cv
 
@@ -80,6 +83,16 @@ program gen_be_ensmean
    if ( rcode /= 0) then
       write(UNIT=message(1),FMT='(A,A)') &
          ' Error opening netcdf file ', filestub(1:length)
+      call da_error(__FILE__,__LINE__,message(1:1))
+   end if
+
+!  Open template ensemble variance with write access:
+   input_file = trim(filestub)//'.vari'
+   length = len_trim(input_file)
+   rcode = nf_open(input_file(1:length), NF_WRITE, cdfid_vari )
+   if ( rcode /= 0) then
+      write(UNIT=message(1),FMT='(A,A)') &
+         ' Error opening netcdf file ', input_file(1:length)
       call da_error(__FILE__,__LINE__,message(1:1))
    end if
 
@@ -127,7 +140,9 @@ program gen_be_ensmean
              if ( ivtype == 5 ) then
                 allocate( data_r(iend(1),iend(2),iend(3)))
                 allocate( data_r_mean(iend(1),iend(2),iend(3)))
+                allocate( data_r_vari(iend(1),iend(2),iend(3)))
                 data_r_mean = 0.0
+                data_r_vari = 0.0
              else
                 write(UNIT=message(1),FMT='(A,A)') &
                    var, ' variable is not real type'
@@ -136,22 +151,26 @@ program gen_be_ensmean
 
          end if
 
-!        Calculate accumulating mean:
+!        Calculate accumulating mean and variance:
          member_inv = 1.0 / real(member)   
          call ncvgt( cdfid, id_var, istart, iend, data_r, rcode)
          data_r_mean = ( real( member-1 ) * data_r_mean + data_r ) * member_inv
+         data_r_vari = ( real( member-1 ) * data_r_vari + data_r * data_r ) * member_inv
 
          rcode = nf_close( cdfid )
 
       end do ! member
 
       call ncvpt( cdfid_mean, id_var, istart, iend, data_r_mean, rcode)
+      call ncvpt( cdfid_vari, id_var, istart, iend, data_r_vari, rcode)
       deallocate( data_r )
       deallocate( data_r_mean )
+      deallocate( data_r_vari )
 
    end do ! variable
 
    rcode = nf_close( cdfid_mean )
+   rcode = nf_close( cdfid_vari )
 
 end program gen_be_ensmean
 

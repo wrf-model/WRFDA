@@ -27,30 +27,30 @@
 #export RUN_RESTORE_DATA_GRIB=true
 #export RUN_RESTORE_DATA_RTOBS=true
 #export RUN_WRFSI=true
-#export RUN_WPS=true
+export RUN_WPS=true
 #export RUN_REAL=true
 #export RUN_WPB=true
 #export RUN_OBSPROC=true
-export RUN_WRFVAR=true
-export RUN_ETKF=true
-export RUN_UPDATE_BC=true
-export RUN_WRF=true
-export RUN_ENSMEAN=true
+#export RUN_WRFVAR=true
+#export RUN_ETKF=true
+#export RUN_UPDATE_BC=true
+#export RUN_WRF=true
+#export RUN_ENSMEAN=true
 #export FILE_TYPE=wrfout
 
 #Experiment details:
-export NUM_JOBS=4
-export NUM_MEMBERS=30
-export LBC_FREQ=12
-export NL_HISTORY_INTERVAL=720
-export CYCLE_NUMBER=8
-export INITIAL_DATE=2003010500
-export FINAL_DATE=2003012800
-export EXPT=exp05
-export CYCLING=true
+#export NUM_JOBS=4
+#export NUM_MEMBERS=30
+#export LBC_FREQ=12
+#export NL_HISTORY_INTERVAL=720
+#export CYCLE_NUMBER=8
+export INITIAL_DATE=2006100100
+export FINAL_DATE=2006100100
+#export EXPT=exp05
+#export CYCLING=true
 
 #ETKF:
-export NACCUMT1=5
+#export NACCUMT1=5
 #export NSTARTACCUM1=14
 
 #Directories (smoke):
