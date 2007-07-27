@@ -3,12 +3,13 @@
 set echo 
 
 #Decide which stages to run (run if true):
-export RUN_WPS=true
-export RUN_REAL=true
-#export RUN_WRF=true
+#export RUN_WPS=true
+#export RUN_REAL=true
+export RUN_WRF=true
 
 #Experiment details:
 export REGION=kma_10km
+export RUN_UNGRIB_METGRID_KMA=true
 export FG_TYPE=GDAPS
 export EXPT=noda
 #export CYCLE_PERIOD=6
@@ -16,15 +17,16 @@ export EXPT=noda
 #export FIRST=false
 
 #Scheduling:
-export PROJECT_ID=48500053       # JNT GAUs (1200/month).
+export PROJECT_ID=25000026        # JNT GAUs (1200/month).
+#export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 #export PROJECT_ID=48503001       # DATC GAUs.
 export QUEUE=premium
-export QUEUE=share
-export NUM_PROCS=1
+#export QUEUE=share
+export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
-export LSF_MAX_RUNTIME=10
+export LSF_MAX_RUNTIME=60
 export LSF_EXCLUSIVE=" "
-#export LL_PTILE=16
+export LL_PTILE=16
 
 #Time info:
 export INITIAL_DATE=2007070300
@@ -45,7 +47,8 @@ export WPS_GEOG_DIR=/mmm/users/wrfhelp/WPS_GEOG   # bluevista
 export OBSPROC_DIR=$REL_DIR/3DVAR_OBSPROC         # Which version?
 #export WRFVAR_DIR=$REL_DIR/wrfvar_r2522           # r2522.
 export WRFVAR_DIR=/mmm/users/dmbarker/code/trunk/wrfvar_afwa_2.2 # AFWA branch.
-export WPS_DIR=$REL_DIR/wps_r237                  # r237 AFWA release.
+#export WPS_DIR=$REL_DIR/wps_r237                  # r237 AFWA release.
+export WPS_DIR=/mmm/users/dmbarker/code/trunk/wps_r237                  # r237 AFWA release.
 export WRF_BC_DIR=$REL_DIR/WRF_BC                 # Which version?
 export WRF_DIR=$REL_DIR/wrf_r2234                 # 
 export REG_DIR=$DAT_DIR/$REGION
@@ -53,7 +56,7 @@ export EXP_DIR=$REG_DIR/$EXPT
 export OB_DIR=$REG_DIR/ob
 
 #WPS (namelist.wps):
-#export RUN_GEOGRID=false
+export RUN_GEOGRID=false
 export NL_E_WE=574
 export NL_E_SN=514
 export REF_LAT=38.00
@@ -63,7 +66,7 @@ export NL_DX=10000
 export NL_DY=$NL_DX
 
 #WRF real (not already covered above):
-export NL_HISTORY_INTERVAL=180
+export NL_HISTORY_INTERVAL=60
 export NL_TIME_STEP=60
 export NL_ETA_LEVELS=${NL_ETA_LEVELS:-" 1.000, 0.993, 0.980, 0.966, 0.950, "\
                                       " 0.933, 0.913, 0.892, 0.869, 0.844, "\
