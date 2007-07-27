@@ -109,6 +109,7 @@ export NL_INPUTOUT_INTERVAL=$NL_HISTORY_INTERVAL # Write wrfinput files at same 
 export NL_RA_LW_PHYSICS=${NL_RA_LW_PHYSICS:-1}
 export NL_RA_SW_PHYSICS=${NL_RA_SW_PHYSICS:-1}
 export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
+export NL_PD_MOIST=${NL_PD_MOIST:-.false.}
 
 #From WRF-Var:
 export NL_VAR4D=${NL_VAR4D:-false}
