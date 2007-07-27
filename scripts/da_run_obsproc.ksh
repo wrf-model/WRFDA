@@ -13,7 +13,6 @@ export EXPT=${EXPT:-test}
 export DATE=${DATE:-2004051300}
 export MAX_OB_RANGE=${MAX_OB_RANGE:-2}             # Maximum difference O, B (hours)
 
-export DOMAIN=${DOMAIN:-01}
 export REGION=${REGION:-con200}
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export DAT_DIR=${DAT_DIR:-$HOME/data}
@@ -77,23 +76,27 @@ fi
 export FCST_RANGE_SAVE=$FCST_RANGE
 export FCST_RANGE=-$MAX_OB_RANGE
 . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-export TIME_WINDOW_MIN=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
+export TIME_WINDOW_MIN=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
 export FCST_RANGE=$MAX_OB_RANGE
 . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-export TIME_WINDOW_MAX=${NL_END_YEAR}-${NL_END_MONTH}-${NL_END_DAY}_${NL_END_HOUR}:00:00
+export TIME_WINDOW_MAX=${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00
 export FCST_RANGE=0
 . $WRFVAR_DIR/scripts/da_get_date_range.ksh
-export TIME_ANALYSIS=${NL_START_YEAR}-${NL_START_MONTH}-${NL_START_DAY}_${NL_START_HOUR}:00:00
+export TIME_ANALYSIS=${START_YEAR}-${START_MONTH}-${START_DAY}_${START_HOUR}:00:00
 export FCST_RANGE=$FCST_RANGE_SAVE
 
-export OB_FILE=obs.${NL_START_YEAR}${NL_START_MONTH}${NL_START_DAY}${NL_START_HOUR}
+export OB_FILE=obs.${START_YEAR}${START_MONTH}${START_DAY}${START_HOUR}
 
 #ln -fs $OB_DIR/$DATE/$OB_FILE .
 
 if [[ -f $RTOBS_DIR/$DATE/${OB_FILE}.gz ]]; then
    # If compressed, unpack
-   cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
-   gunzip -f ${OB_FILE}.gz
+   if $DUMMY; then
+      touch ${OB_FILE}
+   else
+      cp $RTOBS_DIR/$DATE/$OB_FILE.gz .
+      gunzip -f ${OB_FILE}.gz
+   fi
 fi
 
 #Namelist notes:
