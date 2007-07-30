@@ -9,8 +9,6 @@
 # from these using FCST_RANGE.  
 #-----------------------------------------------------------------------
 
-#set echo
-
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
@@ -21,7 +19,7 @@ export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
 . ${WRFVAR_DIR}/scripts/gen_be/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
-if  ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
+if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
 
 #Derive times of initial/final FCST_RANGE forecasts:
 export START_DATE_STAGE0=$(${BUILD_DIR}/da_advance_cymdh.exe $START_DATE -$FCST_RANGE1)

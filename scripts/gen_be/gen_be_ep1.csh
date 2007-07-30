@@ -16,7 +16,6 @@
 #
 #-----------------------------------------------------------------------
 
-#set echo
 #Define job via environment variables:
 
  setenv DATE 2003010212

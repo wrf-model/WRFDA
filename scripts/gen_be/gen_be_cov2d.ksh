@@ -1,7 +1,5 @@
-#! /bin/ksh
+#!/bin/ksh
 #-----------------------------------------------------------------------
-
-#set echo
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}

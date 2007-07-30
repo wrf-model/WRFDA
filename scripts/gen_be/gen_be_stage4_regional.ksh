@@ -6,8 +6,6 @@
 #
 #-----------------------------------------------------------------------
 
-#set echo
-
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
@@ -90,7 +88,7 @@ EOF
    let VINDEX=1
    cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${RUN_DIR}/${VARIABLE}/sl_print.${VARIABLE}
 
-   if [[$MAX_VINDEX -gt 1 ]]; then
+   if [[ $MAX_VINDEX -gt 1 ]]; then
       let VINDEX=2
       while [[ $VINDEX -le $MAX_VINDEX ]]; do
          cat ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* >> ${RUN_DIR}/${VARIABLE}/sl_print.${VARIABLE}

@@ -5,8 +5,6 @@
 # Purpose: Calculates background error statistics for WRF-Var.
 #-----------------------------------------------------------------------
 
-#set echo
-
 #[1] Define job by overriding default environment variables:
 
 #export RUN_GEN_BE_STAGE0=true

@@ -15,8 +15,6 @@
 
 #Define job by overriding default environment variables:
 
-#set echo
-
 setenv RELEASE latest
 setenv REL_DIR /smoke/dmbarker/code/${RELEASE}
 setenv HOSTS $HOME/hosts/smoke.hosts 

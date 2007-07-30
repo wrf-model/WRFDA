@@ -6,8 +6,6 @@
 #
 #-----------------------------------------------------------------------
 
-#set echo
-
 #-----------------------------------------------------------------------------------
 # Don't change anything below this line.
 #-----------------------------------------------------------------------------------
@@ -38,7 +36,7 @@ for CV in $CONTROL_VARIABLES; do
 
    if [[ $CV == "ps" ]]; then
       let MAX_VINDEX=1
-   else if [[ $CV == "ps_u" ]]; then
+   elif [[ $CV == "ps_u" ]]; then
       let MAX_VINDEX=1
    else
       let MAX_VINDEX=$NUM_LEVELS
