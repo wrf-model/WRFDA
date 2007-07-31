@@ -36,10 +36,6 @@ echo 'WPS_INPUT_DIR <A HREF="file:'$WPS_INPUT_DIR'"</a>'$WPS_INPUT_DIR'</a>'
 echo 'RUN_DIR       <A HREF="file:'$RUN_DIR'"</a>'$RUN_DIR'</a>'
 echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
 
-#-----------------------------------------------------------------------
-# [3.0] Run WPS:
-#-----------------------------------------------------------------------
-
    if $DUMMY; then
       echo "Dummy wps"
       LOCAL_DATE=$DATE
@@ -52,37 +48,42 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
          LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null`
       done
    else
+
+#-----------------------------------------------------------------------
+# [1.0] Run Geogrid:
+#-----------------------------------------------------------------------
+
       if $RUN_GEOGRID; then # Run geogrid:
          export WORK_DIR=$RUN_DIR/working.geogrid
          rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
          ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 
-	 ln -fs $WPS_DIR/geogrid.exe .
-	 ${RUN_CMD} ./geogrid.exe
+         ln -fs $WPS_DIR/geogrid.exe .
+         ${RUN_CMD} ./geogrid.exe
 
-	 RC=$?
-	 mv geogrid.log* $RUN_DIR
-	 if test -f $RUN_DIR/geogrid.log.0000; then
+         RC=$?
+         mv geogrid.log* $RUN_DIR
+         if test -f $RUN_DIR/geogrid.log.0000; then
             echo '<A HREF="geogrid.log.0000">geogrid.log.0000</a>'
-	 else
+         else
             echo '<A HREF="geogrid.log">geogrid.log</a>'
-	 fi
+         fi
 
-	 if test $RC != 0; then
+         if test $RC != 0; then
             echo geogrid failed with error $RC
-            exit $RC
-	 fi
+           exit $RC
+         fi
       fi
 
-      # Run ungrib:
-      export WORK_DIR=$RUN_DIR/working
-      rm -rf $WORK_DIR; mkdir -p $WORK_DIR
+#-----------------------------------------------------------------------
+#    [2.0] Run application-specific ungrib/metgrid:
+#-----------------------------------------------------------------------
 
-      if $RUN_UNGRIB_METGRID_AFWA; then # Uses AGRMET, NAVYSST, and 1/2 degree GFS GRIB data.
+#     AFWA application uses AGRMET, NAVYSST, and 1/2 degree GFS GRIB data:
+      if $RUN_UNGRIB_METGRID_AFWA; then
          export WORK_DIR=$RUN_DIR/working.run_ungrib_metgrid_afwa
          rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
 	 	
-	# Note that "da_run_ungrib__metgrid_afwa.ksh" runs ungrib and metgrid for AFWA experiments.
          ${SCRIPTS_DIR}/da_run_ungrib_metgrid_afwa.ksh > run_ungrib_metgrid_afwa.log 2>&1
          RC=$?
          if test $RC != 0; then
@@ -92,35 +93,60 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
 	   echo `date` "ungrib and metgrid runs are done."
 	    exit 0 
          fi
-      else
-         cd $WORK_DIR
-         ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
-         cp namelist.wps ${RUN_DIR}/namelist.wps.ungrib
+      fi
 
-         ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$FG_TYPE Vtable
-         LOCAL_DATE=$DATE
-         FILES=''
-         while test $LOCAL_DATE -le $END_DATE; do
-            FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-            LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
-         done
-         $WPS_DIR/link_grib.csh $FILES
-
-         ln -fs $WPS_DIR/ungrib.exe .
-
-         ./ungrib.exe > ungrib.log 2>&1
-
+#    KMA application uses KMA's GDAPS data with GFS surface data:
+     if $RUN_UNGRIB_METGRID_KMA; then
+         export WORK_DIR=$RUN_DIR/working.run_ungrib_metgrid_kma
+         rm -rf $WORK_DIR; mkdir -p $WORK_DIR; cd $WORK_DIR
+	 	
+         ${SCRIPTS_DIR}/da_run_ungrib_metgrid_kma.ksh > run_ungrib_metgrid_kma.log 2>&1
          RC=$?
-         mv ungrib.log $RUN_DIR
-         echo '<A HREF="ungrib.log">ungrib.log</a>'
-
          if test $RC != 0; then
-            echo ungrib failed with error $RC
-            exit $RC
+            echo `date` "${ERR}Failed with error $RC$END"
+            exit 1
+	   else
+	   echo `date` "ungrib and metgrid runs are done."
+	    exit 0 
          fi
       fi
 
-      # Run metgrid:
+#-----------------------------------------------------------------------
+#    [3.0] Run ungrib in standard mode:
+#-----------------------------------------------------------------------
+
+      export WORK_DIR=$RUN_DIR/working
+      rm -rf $WORK_DIR; mkdir -p $WORK_DIR
+      cd $WORK_DIR
+      ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
+      cp namelist.wps ${RUN_DIR}/namelist.wps.ungrib
+
+      ln -fs $WPS_DIR/ungrib/Variable_Tables/Vtable.$VTABLE_TYPE Vtable
+      LOCAL_DATE=$DATE
+      FILES=''
+      while test $LOCAL_DATE -le $END_DATE; do
+         FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
+         LOCAL_DATE=`$WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null`
+      done
+      $WPS_DIR/link_grib.csh $FILES
+
+      ln -fs $WPS_DIR/ungrib.exe .
+
+      ./ungrib.exe > ungrib.log 2>&1
+
+      RC=$?
+      mv ungrib.log $RUN_DIR
+      echo '<A HREF="ungrib.log">ungrib.log</a>'
+
+      if test $RC != 0; then
+         echo ungrib failed with error $RC
+         exit $RC
+      fi
+
+#-----------------------------------------------------------------------
+#    [4.0] Run metgrid in standard mode:
+#-----------------------------------------------------------------------
+
       cd $WORK_DIR
       ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
       cp namelist.wps ${RUN_DIR}/namelist.wps.metgrid
@@ -142,9 +168,8 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
          exit $RC
       fi
       mv met_em.d${DOMAIN}* $RC_DIR/$DATE
-      
    fi
-
+ 
 cd $OLDPWD
 
 if $CLEAN; then rm -rf $RUN_DIR/working.*; fi

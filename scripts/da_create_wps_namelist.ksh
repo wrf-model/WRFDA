@@ -52,6 +52,8 @@ cat >namelist.wps <<EOF
  map_proj = '$MAP_PROJ',
  ref_lat   = $REF_LAT,
  ref_lon   = $REF_LON,
+ ref_x     = $REF_X,
+ ref_y     = $REF_Y,
  truelat1  = $TRUELAT1,
  truelat2  = $TRUELAT2,
  stand_lon = $STAND_LON,

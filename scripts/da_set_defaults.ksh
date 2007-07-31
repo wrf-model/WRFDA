@@ -38,6 +38,7 @@ export CYCLING=${CYCLING:-false}                       # Cold start (false), cyc
 export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
 export CHECK_SVNVERSION=${CHECK_SVNVERSION:-true}
 export UPDATE_CYCLING=${UPDATE_CYCLING:-false}  # Combination of cold start and cycling runs for AFWa Projects: cold start (for 00,12) cycling (for 06,18)
+export FG_TYPE=${FG_TYPE:-fnl}
 
 #Scheduling:
 export PROJECT_ID=${PROJECT_ID:-48500053}
@@ -60,6 +61,8 @@ fi
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessor dir.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
+export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
+#export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
 export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC}  # Update_bc dir.
@@ -69,17 +72,17 @@ export WRF_NL_DIR=${WRF_NL_DIR:-$REL_DIR/wrf_nl}  # WRF namelist directory?
 export WRFPLUS_DIR=${WRFPLUS_DIR:-$REL_DIR/wrfplus} # WRF TL/ADJ directory.
 export DAT_DIR=${DAT_DIR:-$HOME/data}             # Top-level data directory.
 export MSS_GRIB_DIR=${MSS_GRIB_DIR:-mss:/DSS/DS083.2/data}
-export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/fnl}         # GRIB input data dir.
+export GRIB_DIR=${GRIB_DIR:-$DAT_DIR/${FG_TYPE}}         # GRIB input data dir.
 export MSS_RTOBS_DIR=${MSS_RTOBS_DIR:-mss:/BRESCH/RT/DATA}
 export RTOBS_DIR=${RTOBS_DIR:-$DAT_DIR/rtobs}     # Real-time observation directory.
 export OB_DIR=${OB_DIR:-$REG_DIR/ob}              # Observation data dir.
 export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
 export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/run}           # Run dir.
+export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
-export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
-export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
 export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 
 #Time info:
@@ -120,13 +123,15 @@ export NL_E_SN=${NL_E_SN:-45}
 export MAP_PROJ=${MAP_PROJ:-lambert}
 export REF_LAT=${REF_LAT:-40.0}
 export REF_LON=${REF_LON:--98.0}
+export REF_X=${REF_X:-NAN}
+export REF_Y=${REF_Y:-NAN}
 export TRUELAT1=${TRUELAT1:-30.0}
 export TRUELAT2=${TRUELAT2:-60.0}
 export STAND_LON=${STAND_LON:--98.0}
 export NL_DX=${NL_DX:-200000}
 export NL_DY=${NL_DY:-200000}
 export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
-export FG_TYPE=${FG_TYPE:-GFS}
+export VTABLE_TYPE=${VTABLE_TYPE:-GFS}
 export CONSTANTS1=${CONSTANTS1:-*}
 export CONSTANTS2=${CONSTANTS2:-*}
 export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
@@ -183,15 +188,18 @@ export TS0=${TS0:-300.0}
 export TLP=${TLP:-50.0}
 
 #WRF-Var (not covered above):
+export NL_ANALYSIS_TYPE=${NL_ANALYSIS_TYPE:-"3D-VAR"}  # Analysis type.
 export NL_VAR4D=${NL_VAR4D:-false}
-export BE_DIR=${BE_DIR:-$REG_DIR/be}     # Background error covariance directory.
-export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
+export BE_DIR=${BE_DIR:-$REG_DIR/be}                   # Background error covariance directory.
+export OB_DIR=${OB_DIR:-$REG_DIR/ob}                   # Observation directory.
+export DA_DIR=${DA_DIR:-$EXP_DIR/da}                   # Forecast directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # background errors.
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2}   # Observation format: 1=BUFR, 2=ASCII "little_r"
 export NL_LATS_STATS_OPTION_FALSE=${NL_LATS_STATS_OPTION_FALSE:-false}
-export NL_CV_OPTIONS_HUM=${NL_CV_OPTIONS_HUM:-1}
-export NL_CHECK_MAX_IV=${NL_CHECK_MAX_IV:-true}
-
+export NL_CV_OPTIONS_HUM=${NL_CV_OPTIONS_HUM:-1} # Humidity control variable.
+export NL_CHECK_MAX_IV=${NL_CHECK_MAX_IV:-true} # QC on O-B differences.
+export NL_NTMAX=${NL_NTMAX:-100}         # Maximum number of inner loop iterations.
+export NL_CHECK_RH=${NL_CHECK_RH:-2}     # RH bounds check.
 #From Update_BC:
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
 

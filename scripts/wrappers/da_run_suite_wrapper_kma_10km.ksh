@@ -1,11 +1,10 @@
 #!/bin/ksh
 #########################################################################
-set echo 
 
 #Decide which stages to run (run if true):
-#export RUN_WPS=true
+export RUN_WPS=true
 #export RUN_REAL=true
-export RUN_WRF=true
+#export RUN_WRF=true
 
 #Experiment details:
 export REGION=kma_10km
