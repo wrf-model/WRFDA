@@ -3,8 +3,8 @@
 
 #Decide which stages to run (run if true):
 export RUN_WPS=true
-#export RUN_REAL=true
-#export RUN_WRF=true
+export RUN_REAL=true
+export RUN_WRF=true
 
 #Experiment details:
 export REGION=kma_10km
@@ -14,27 +14,33 @@ export EXPT=noda
 #export CYCLE_PERIOD=6
 #export CYCLING=true
 #export FIRST=false
+export CLEAN=true
 
 #Scheduling:
-export PROJECT_ID=25000026        # JNT GAUs (1200/month).
+export PROJECT_ID=25000026
 #export PROJECT_ID=48500053       # JNT GAUs (1200/month).
 #export PROJECT_ID=48503001       # DATC GAUs.
 export QUEUE=premium
 #export QUEUE=share
 export NUM_PROCS=64
 export RUN_CMD=mpirun.lsf
-export LSF_MAX_RUNTIME=60
+export LSF_MAX_RUNTIME=180
 export LSF_EXCLUSIVE=" "
 export LL_PTILE=16
 
 #Time info:
-export INITIAL_DATE=2007070300
-export FINAL_DATE=2007070300
-#export LONG_FCST_TIME_1=00
-#export LONG_FCST_RANGE_1=72
-#export LONG_FCST_TIME_2=12
-#export LONG_FCST_RANGE_2=72
-#export LBC_FREQ=3
+export INITIAL_DATE=2007070112
+export FINAL_DATE=2007070500
+export LONG_FCST_TIME_1=00
+export LONG_FCST_RANGE_1=24
+export LONG_FCST_TIME_2=06
+export LONG_FCST_RANGE_2=6
+export LONG_FCST_TIME_3=12
+export LONG_FCST_RANGE_3=24
+export LONG_FCST_TIME_4=18
+export LONG_FCST_RANGE_4=6
+export LBC_FREQ=12 # For 00/12Z KMA runs
+#export LBC_FREQ=6  # For 06/18Z KMA runs
 
 #Directories:
 export MACHINE=bluevista

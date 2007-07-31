@@ -75,7 +75,7 @@ while test $FCST_HOUR -le $FCST_RANGE_SAVE; do
    ln -fs $WPS_DIR/ungrib/Variable_Tables/$VTABLE Vtable
 
    rm -rf tmp > /dev/null 2>&1; mkdir tmp
-   ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/t${FCST_HOUR}  tmp/.
+   ln -sf $DAT_DIR/$FG_TYPE/$DATE_SAVE/kwrf_lc10_prep_gdps_grib.${DATE_SAVE}  tmp/.
 
    $WPS_DIR/link_grib.csh tmp/*
 
