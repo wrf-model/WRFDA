@@ -6,9 +6,9 @@
 #
 #-----------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Don't change anything below this line.
-#-----------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 echo "---------------------------------------------------------------------"
 echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
@@ -57,7 +57,7 @@ for CV in $CONTROL_VARIABLES; do
     k = ${VINDEX} /
 EOF
 
-      ./gen_be_stage4_global.exe > gen_be_stage4_global.log 2>&1
+      ./gen_be_stage4_global.exe > gen_be_stage4_global_${VARIABLE}_${VINDEX}.out 2>&1
 
       let VINDEX=$VINDEX+1
    done # Loop over levels

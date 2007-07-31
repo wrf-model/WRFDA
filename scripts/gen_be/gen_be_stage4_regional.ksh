@@ -64,12 +64,12 @@ EOF
  
       if $LOCAL; then
          echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on local machine"
-         # (./gen_be_stage4_regional.exe > gen_be_stage4_regional.out 2>&1) &
-         ./gen_be_stage4_regional.exe > gen_be_stage4_regional.out 2>&1 &
+         # (./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1) &
+         ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &
       else
          export MACHINE=${MACHINES[$JOB]}
          echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on $MACHINE"
-         (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional.out 2>&1") &
+         (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1") &
 
          sleep 2 # Create small gap between submissions to avoid overwriting output.
       fi

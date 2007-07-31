@@ -45,7 +45,6 @@ cd $RUN_DIR
 echo "WRFVAR_DIR is" $WRFVAR_DIR $(svnversion $WRFVAR_DIR)
 
 if $RUN_GEN_BE_STAGE0; then
-
    echo "---------------------------------------------------------------"
    echo "Run Stage 0: Calculate ensemble perturbations from model forecasts."
    echo "---------------------------------------------------------------"
@@ -69,7 +68,6 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_STAGE1; then
-
    echo "---------------------------------------------------------------"
    echo "Run Stage 1: Read "standard fields", and remove time/ensemble/area mean."
    echo "---------------------------------------------------------------"
@@ -112,7 +110,6 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_STAGE2; then
-
    echo "---------------------------------------------------------------"
    echo "Run Stage 2: Calculate regression coefficients."
    echo "---------------------------------------------------------------"
@@ -147,7 +144,6 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_STAGE2A; then
-
    echo "---------------------------------------------------------------"
    echo "Run Stage 2a: Calculate control variable fields."
    echo "---------------------------------------------------------------"
@@ -196,7 +192,6 @@ if $RUN_GEN_BE_STAGE3; then
    ln -sf ${BUILD_DIR}/gen_be_stage3.exe .
 
    for CV in $CONTROL_VARIABLES; do
-
       cat > gen_be_stage3_nl.nl << EOF
 &gen_be_stage3_nl
     start_date = '${START_DATE}',
@@ -235,12 +230,10 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_STAGE4; then
-
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    if $GLOBAL; then    
-
       echo "---------------------------------------------------------------"
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
@@ -248,7 +241,6 @@ if $RUN_GEN_BE_STAGE4; then
       ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_global.ksh > gen_be_stage4_global.log 2>&1
 
    else
-
       echo "---------------------------------------------------------------"
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
@@ -259,12 +251,10 @@ if $RUN_GEN_BE_STAGE4; then
          echo "Stage 4 failed with error" $RC
          exit 1
       fi
-
    fi 
 
    export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
-
 fi
 
 #------------------------------------------------------------------------
@@ -296,7 +286,6 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_DIAGS_READ; then
-
    cat > gen_be_diags_nl.nl << EOF
 &gen_be_diags_nl
    uh_method = '${UH_METHOD}' /
@@ -317,7 +306,6 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_MULTICOV; then
-
    # Calculate chi diagnostics:
    export VARIABLE1=chi_u
    export VARIABLE2=chi
@@ -353,7 +341,6 @@ if $RUN_GEN_BE_MULTICOV; then
       echo "gen_be_cov2d failed with error" $RC
       exit 1
    fi
-
 fi
 
 export END_CPU=$(date)

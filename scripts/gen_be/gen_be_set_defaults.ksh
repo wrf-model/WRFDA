@@ -15,7 +15,7 @@
 # [1] Set defaults for required environment variables:
 #-----------------------------------------------------------------------
 
-#Decide which stages to run (run if true):
+# Decide which stages to run (run if true):
 
 export RUN_GEN_BE_STAGE0=${RUN_GEN_BE_STAGE0:-false} # Run stage 0 (create perturbation files).
 export RUN_GEN_BE_STAGE1=${RUN_GEN_BE_STAGE1:-false} # Run stage 1 (Remove mean, split variables).
@@ -54,7 +54,6 @@ export GLOBAL=${GLOBAL:-false}                       # Global or regional models
 export NUM_LEVELS=${NUM_LEVELS:-27}                  # Hard-wired for now....
 export N_SMTH_SL=${N_SMTH_SL:-0}                     # Amount of lengthscale smoothing (0=none).
 export STRIDE=${STRIDE:-1}                           # Calculate correlation evert STRIDE point (stage4 regional).
-export RESOLUTION_KM=${RESOLUTION_KM:-200}           # Hard-wired for now (only used for regional)
 export TESTING_SPECTRAL=${TESTING_SPECTRAL:-.false.} # True if performing spectral tests.
 export LOCAL=${LOCAL:-true}                          # True if local machine.
 export NUM_JOBS=${NUM_JOBS:-1}                       # Number of jobs to run (stage4 regional)).
@@ -67,7 +66,7 @@ export ID1=${ID1:-${BE_METHOD}.bin_type${BIN_TYPE}}
 export VARIABLE1=${VARIABLE1:-chi_u}              # For cov3d
 export VARIABLE2=${VARIABLE2:-chi}                # For cov3d
 
-#Directories:
+# Directories:
 export DATA_DISK=${DATA_DISK:-/smoke}             # Directory containing codes.
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
@@ -76,10 +75,10 @@ export DAT_DIR=${DAT_DIR:-${DATA_DISK}/${USER}/data/${REGION}/noda/fc}  # Top-le
 export RUN_DIR=${RUN_DIR:-$DAT_DIR/$ID}           # Run directory.
 export STAGE0_DIR=${STAGE0_DIR:-$DAT_DIR/stage0}  # Output for stage0.
 
-if $GLOBAL == true; then
-  export UH_METHOD=power
+if $GLOBAL; then
+   export UH_METHOD=power
 else
-  export UH_METHOD=scale
+   export UH_METHOD=scale
 fi
 
 export CONTROL_VARIABLES=${CONTROL_VARIABLES:-" psi chi_u t_u rh ps_u "}

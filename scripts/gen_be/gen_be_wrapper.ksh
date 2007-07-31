@@ -24,7 +24,6 @@ export WRFVAR_DIR=/smoke/dmbarker/code/trunk/wrfvar_be
 export START_DATE=2006100200
 export END_DATE=2006102812
 export NUM_LEVELS=41
-export RESOLUTION_KM=45
 export REGION=t46_45km
 export EXPT=noda
 
