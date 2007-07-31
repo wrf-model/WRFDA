@@ -103,10 +103,10 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
       end do
 
       ! Remove spikes in lengthscales (extrapolate if spike detected):
-      do k = 3, nk
-         mean_scale = 0.5 * (scale_length(k-1) + scale_length(k-2))
-         if (abs(scale_length(k)-mean_scale) > abs(spike_tolerance * mean_scale)) then
-            scale_length(k) = 2.0 * scale_length(k-1) - scale_length(k-2)
+      do k = 2, nk-1
+         mean_scale = 0.5 * ( scale_length(k-1) + scale_length(k+1) )
+         if ( scale_length(k) > spike_tolerance * mean_scale ) then
+            scale_length(k) = mean_scale
          end if
       end do
 
