@@ -23,6 +23,7 @@ program gen_be_diags_read
    real                :: binwidth_hgt      ! Used if bin_type = 2 (m). !!!DALE ADD..
    real                :: hgt_min, hgt_max  ! Used if bin_type = 2 (m).
    real                :: scale_length_ps_u ! Scale length for scalar ps_u.
+   logical             :: dummy
 
    integer, allocatable:: bin(:,:,:)        ! Bin assigned to each 3D point.
    integer, allocatable:: bin2d(:,:)        ! Bin assigned to each 2D point.
@@ -59,18 +60,18 @@ program gen_be_diags_read
    print '("*** Unit=",i3,3X,"filename=",a40)',iunit, filename
    open (iunit, file = filename, form='unformatted')
 
-!----------------------------------------------------------------------------
-!   [1] Gather regression coefficients.
-!----------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [1] Gather regression coefficients.
+   !----------------------------------------------------------------------------
 
-!  Read the dimensions:
+   ! Read the dimensions:
    read(iunit)ni, nj, nk
    nk_3d = nk
 
    allocate( bin(1:ni,1:nj,1:nk) )
    allocate( bin2d(1:ni,1:nj) )
 
-!  Read bin info:
+   ! Read bin info:
 
    read(iunit)bin_type
    read(iunit)lat_min, lat_max, binwidth_lat
@@ -79,7 +80,7 @@ program gen_be_diags_read
    read(iunit)bin(1:ni,1:nj,1:nk)
    read(iunit)bin2d(1:ni,1:nj)
 
-!  Read the regression coefficients:
+   ! Read the regression coefficients:
    allocate( regcoeff1(1:num_bins) )
    allocate( regcoeff2(1:nk,1:num_bins2d) )
    allocate( regcoeff3(1:nk,1:nk,1:num_bins2d) )
@@ -92,9 +93,9 @@ program gen_be_diags_read
    call da_print_be_stats_p( outunit, ni, nj, nk, num_bins, num_bins2d, &
                              bin, bin2d, regcoeff1, regcoeff2, regcoeff3 )
 
-!----------------------------------------------------------------------------
-!   [2] Gather vertical error eigenvectors, eigenvalues.
-!----------------------------------------------------------------------------
+   !----------------------------------------------------------------------------
+   ! [2] Gather vertical error eigenvectors, eigenvalues.
+   !----------------------------------------------------------------------------
 
    read(iunit)variable
    read(iunit)nk, num_bins2d
@@ -143,94 +144,97 @@ program gen_be_diags_read
    deallocate( e_val_loc )
 
    if (uh_method /= 'power') then
-! 2d fields: ps_u, ps:
+      ! 2d fields: ps_u, ps:
 
-   read(iunit)variable
-   read(iunit)nk, num_bins2d
+      read(iunit)variable
+      read(iunit)nk, num_bins2d
 
-   allocate( e_vec(1:nk,1:nk) )
-   allocate( e_val(1:nk) )
-   allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )
-   allocate( e_val_loc(1:nk,1:num_bins2d) )
+      allocate( e_vec(1:nk,1:nk) )
+      allocate( e_val(1:nk) )
+      allocate( e_vec_loc(1:nk,1:nk,1:num_bins2d) )
+      allocate( e_val_loc(1:nk,1:num_bins2d) )
 
-   read(iunit)e_vec
-   read(iunit)e_val
-   read(iunit)e_vec_loc
-   read(iunit)e_val_loc
-   call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
-                             e_vec, e_val, e_vec_loc, e_val_loc )
-   deallocate( e_vec )
-   deallocate( e_val )
-   deallocate( e_vec_loc )
-   deallocate( e_val_loc )
+      read(iunit)e_vec
+      read(iunit)e_val
+      read(iunit)e_vec_loc
+      read(iunit)e_val_loc
+      call da_print_be_stats_v( outunit, variable, nk, num_bins2d, &
+                                e_vec, e_val, e_vec_loc, e_val_loc )
+      deallocate( e_vec )
+      deallocate( e_val )
+      deallocate( e_vec_loc )
+      deallocate( e_val_loc )
    end if
-! To assign the dimension nk for 3d fields:
+   ! To assign the dimension nk for 3d fields:
    nk = nk_3d
 
-!----------------------------------------------------------------------------
    if (uh_method == 'power') then
-!     write(6,'(/a)') '[3] Gather horizontal error power spectra.'
-!----------------------------------------------------------------------------
+       write(6,'(/a)') '[3] Gather horizontal error power spectra.'
 
-   do k = 1, nk
+      do k = 1, nk
+         read(iunit)variable
+         read(iunit)max_wavenumber, kdum
+         if ( k == 1 ) allocate( total_power(0:max_wavenumber) )
+         read(iunit) dummy ! to preserve namelist format
+         read(iunit)total_power(:)
+         call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
+      end do
+
+      do k = 1, nk
+         read(iunit)variable
+         read(iunit)max_wavenumber, kdum
+         read(iunit) dummy ! to preserve namelist format
+         read(iunit)total_power(:)
+         call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
+      end do
+
+      do k = 1, nk
+         read(iunit)variable
+         read(iunit)max_wavenumber, kdum
+         read(iunit) dummy ! to preserve namelist format
+         read(iunit)total_power(:)
+         call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
+      end do
+
+      do k = 1, nk
+         read(iunit)variable
+         read(iunit)max_wavenumber, kdum
+         read(iunit) dummy ! to preserve namelist format
+         read(iunit)total_power(:)
+         call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
+      end do
+
       read(iunit)variable
       read(iunit)max_wavenumber, kdum
-      if ( k == 1 ) allocate( total_power(0:max_wavenumber) )
+      read(iunit) dummy ! to preserve namelist format
       read(iunit)total_power(:)
       call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
-   end do
-
-   do k = 1, nk
-      read(iunit)variable
-      read(iunit)max_wavenumber, kdum
-      read(iunit)total_power(:)
-      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
-   end do
-
-   do k = 1, nk
-      read(iunit)variable
-      read(iunit)max_wavenumber, kdum
-      read(iunit)total_power(:)
-      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
-   end do
-
-   do k = 1, nk
-      read(iunit)variable
-      read(iunit)max_wavenumber, kdum
-      read(iunit)total_power(:)
-      call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
-   end do
-
-   read(iunit)variable
-   read(iunit)max_wavenumber, kdum
-   read(iunit)total_power(:)
-   call da_print_be_stats_h_global( outunit, variable, k, max_wavenumber, total_power )
 
    else if (uh_method == 'scale   ') then
 
       allocate (scale_length(1:nk))
 
-!     psi:
+      ! psi:
       read(iunit) variable
       read(iunit) scale_length
       call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
-!     chi_u:
+      ! chi_u:
       read(iunit) variable
       read(iunit) scale_length
       call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
-!     t_u:
+      ! t_u:
       read(iunit) variable
       read(iunit) scale_length
       call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
-!     rh:
+      ! rh:
       read(iunit) variable
       read(iunit) scale_length
       call da_print_be_stats_h_regional( outunit, variable, nk, scale_length )
 
-!     ps_u:
+      ! ps_u:
       read(iunit) variable
       read(iunit) scale_length_ps_u
       write(6,'(3a,i5)')' Scale length for variable ', trim(variable), ' in unit ', outunit

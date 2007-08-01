@@ -622,7 +622,11 @@ subroutine da_uv_to_div_c( dim1, dim2, ds, &
 
    do j = 1, dim2+1
       do i = 1, dim1
-         vm(i,j) = v(i,j) / mapfac_v(i,j)
+         if (mapfac_v(i,j) > 0.000001) then
+            vm(i,j) = v(i,j) / mapfac_v(i,j)
+         else
+            vm(i,j)=0.0
+         end if
       end do
    end do
 
@@ -688,6 +692,7 @@ subroutine da_uv_to_vor_c( dim1, dim2, ds, &
 !  [2] Calculate vorticity field:
 !------------------------------------------------------------------------------
 
+write (0,*) __FILE__,__LINE__,"dim2",dim2
    do j = 1, dim2  
       do i = 1, dim1+1
          um(i,j) = u(i,j) / mapfac_u(i,j)
@@ -696,9 +701,14 @@ subroutine da_uv_to_vor_c( dim1, dim2, ds, &
 
    do j = 1, dim2+1
       do i = 1, dim1  
-         vm(i,j) = v(i,j) / mapfac_v(i,j)
+         if (mapfac_v(i,j) > 0.000001) then
+            vm(i,j) = v(i,j) / mapfac_v(i,j)
+         else
+            vm(i,j) = 0.0
+         end if
       end do
    end do
+write (0,*) __FILE__,__LINE__
 
    do j = 2, dim2
       do i = 2, dim1

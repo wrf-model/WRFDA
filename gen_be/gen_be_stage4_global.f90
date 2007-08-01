@@ -64,9 +64,7 @@ program gen_be_stage4_global
 
    pi_over_180 = pi / 180.0
 
-!---------------------------------------------------------------------------------------------
-!   write(6,(a/)) [1] Read in 2D perturbation fields for variable , variable
-!---------------------------------------------------------------------------------------------
+   write(unit=6,fmt='(a/)') "[1] Read in 2D perturbation fields for variable , variable"
 
    start_date = '2004030312'
    end_date = '2004033112'
@@ -86,10 +84,10 @@ program gen_be_stage4_global
 
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
-!   write(6,(4a)) Computing horizontal power spectra for period , start_date,  to , end_date
-!   write(6,(a,i8,a)) Interval between dates = , interval, hours.
-!   write(6,(a,i8)) Number of ensemble members at each time = , ne
-!   write(6,(3a,i4)) Variable , variable,  at level , k
+   write(unit=6,fmt='(4a)') 'Computing horizontal power spectra for period' , start_date, 'to' , end_date
+   write(unit=6,fmt='(a,i8,a)') 'Interval between dates =' , interval,' hours'
+   write(unit=6,fmt='(a,i8)') 'Number of ensemble members at each time =', ne
+   write(unit=6,fmt='(3a,i4)') 'Variable' , variable,' at level' , k
 
    date = start_date
    cdate = sdate
@@ -100,12 +98,10 @@ program gen_be_stage4_global
       do member = 1, ne
          write(ce,'(i3.3)')member
 
-!         write(6,(5a,i4))    Calculate spectra for date , date, , variable , trim(variable), &
-!                            and member , member
+         ! write(6,(5a,i4))    Calculate spectra for date , date, , variable , trim(variable), &
+         !    and member , member
 
-!---------------------------------------------------------------------------------------------
-!        Read in data for given variable/level/time/member:
-!---------------------------------------------------------------------------------------------
+         ! Read in data for given variable/level/time/member:
 
          filename = trim(variable)//'/'//date(1:10)//'.'//trim(variable)
          filename = trim(filename)//'.e'//ce//'.'//ck
@@ -121,9 +117,7 @@ program gen_be_stage4_global
 
          if ( first_time ) then
 
-!---------------------------------------------------------------------------------------------
-!           write(6,(a)) Initialize spectral transforms.
-!---------------------------------------------------------------------------------------------
+            write(unit=6,fmt='(a)') "Initialize spectral transforms"
 
             inc = 1
             lenr = inc * (ni - 1 ) + 1
@@ -154,24 +148,20 @@ program gen_be_stage4_global
             r_cvsize = ( max_wavenumber + 1 ) * ( max_wavenumber + 2 )
             allocate( rcv( 1:r_cvsize) )
 
-!           Test horizontal transforms:
-!           if ( testing_spectral ) then
-!              call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
-!                                     alp_size, r_cvsize, alp, wsave, int_wgts, field )
-!           end if
+            ! Test horizontal transforms:
+            ! if ( testing_spectral ) then
+            !    call da_test_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
+            !       alp_size, r_cvsize, alp, wsave, int_wgts, field )
+            ! end if
             first_time = .false.
          end if
 
-!---------------------------------------------------------------------------------------------
-!         write(6,(a)) Perform gridpoint to spectral decomposition.
-!---------------------------------------------------------------------------------------------
+         write(unit=6,fmt='(a)') "Perform gridpoint to spectral decomposition"
 
          call da_vv_to_v_spectral( ni, nj, max_wavenumber, inc, lenr, lensav, lenwrk, &
                                    alp_size, r_cvsize, alp, wsave, int_wgts, rcv, field )
 
-!---------------------------------------------------------------------------------------------
-!         write(6,(a)) Calculate power spectra.
-!---------------------------------------------------------------------------------------------
+         write(unit=6,fmt='(a)') "Calculate power spectra"
 
          call da_calc_power( max_wavenumber, r_cvsize, rcv, power )
 
@@ -180,13 +170,13 @@ program gen_be_stage4_global
 
          do n = 0, max_wavenumber
             total_power(n) = total_power(n) * coeffb + power(n) * coeffa
-!            write(6,(2i4,2f18.6))num_states, n, power(n), total_power(n)
+            ! write(6,(2i4,2f18.6))num_states, n, power(n), total_power(n)
          end do
 
          num_states = num_states + 1
       end do  ! End loop over ensemble members.
 
-!     Calculate next date:
+      ! Calculate next date:
       call da_advance_cymdh( date, interval, new_date )
       date = new_date
       read(date(1:10), fmt='(i10)')cdate

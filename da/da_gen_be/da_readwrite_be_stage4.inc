@@ -22,9 +22,8 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
    integer                  :: max_wavenumber             ! Smallest scale required (ni/2 - 1).
    real                     :: ml                         ! Gradient (read from file but not used).
    real                     :: mean_scale                 ! Average scale between points.
-   logical                  :: first_time                 ! True if first time through loop.
-   logical                  :: use_global_eofs            ! True if projected data uses global EOFs.
-   logical                  :: data_on_levels             ! True if field in on model levels.
+   logical                  :: first_time                 ! True if first time through loop
+
    real, allocatable        :: total_power(:)             ! Total Power spectrum.
    real, allocatable        :: scale_length(:)
    real, allocatable        :: sl_smth(:)
@@ -55,18 +54,7 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
              (/"Inconsistent vertical label"/))
          end if
 
-         read(iunit)data_on_levels, use_global_eofs
-
          if (first_time) then
-            if (.not. data_on_levels) then
-               if (use_global_eofs) then
-                  write(unit=stdout,fmt='(a)') &
-                     ' Power spectra calculated for 2D field projected onto global EOFs.'
-               else
-                  write(unit=stdout,fmt='(a)') &
-                     ' Power spectra calculated for 2D field projected onto local EOFs.'
-               end if
-            end if
             allocate(total_power(0:max_wavenumber))
          end if
 
@@ -76,7 +64,7 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
 
          write(outunit)variable
          write(outunit)max_wavenumber, k
-         write(outunit)use_global_eofs
+         write(outunit) .false. ! preserve file format
          write(outunit)total_power(:)
 
          first_time = .false.

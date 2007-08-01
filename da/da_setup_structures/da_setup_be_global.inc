@@ -17,7 +17,7 @@ subroutine da_setup_be_global (be)
    integer             :: bin_type        ! Type of bin to average over.
    integer             :: num_bins        ! Number of bins (3D fields).
    integer             :: num_bins2d      ! Number of bins (3D fields).
-   logical             :: use_global_eofs ! True if projected data uses global EOFs
+   logical             :: dummy
 
    real                :: binwidth_lat       ! Used if bin_type = 2 (degrees) 
    real                :: binwidth_hgt       ! Used if bin_type = 2 (m)
@@ -168,7 +168,7 @@ subroutine da_setup_be_global (be)
    do k = 1, nk
       read (be_unit) variable
       read (be_unit) max_wave_in, nrec
-      read (be_unit) use_global_eofs    
+      read (be_unit) dummy ! use to preserve file format 
       if (k == 1) then
           allocate (power(0:max_wave_in))                      ! Temporary.
           allocate (power2d(0:max_wave_in,1:nk))               ! Temporary.
@@ -191,7 +191,7 @@ subroutine da_setup_be_global (be)
    do k = 1, nk
       read (be_unit) variable
       read (be_unit) max_wave_in, nrec
-      read (be_unit) use_global_eofs    
+      read (be_unit) dummy ! use to preserve file format    
       read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
@@ -210,7 +210,7 @@ subroutine da_setup_be_global (be)
    do k = 1, nk
       read (be_unit) variable
       read (be_unit) max_wave_in, nrec
-      read (be_unit) use_global_eofs    
+      read (be_unit) dummy ! use to preserve file format    
       read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
@@ -229,7 +229,7 @@ subroutine da_setup_be_global (be)
    do k = 1, nk
       read (be_unit) variable
       read (be_unit) max_wave_in, nrec
-      read (be_unit) use_global_eofs    
+      read (be_unit) dummy ! use to preserve file format
       read (be_unit) power(0:max_wave_in) 
       power2d(:,k) = power(:) 
 
@@ -251,7 +251,7 @@ subroutine da_setup_be_global (be)
    be % v5 % mz = 1
    if (max_vert_var5 <=  0.0) be % v5 % mz = 0                         
    read (be_unit) max_wave_in, nrec
-   read (be_unit) use_global_eofs    
+   read (be_unit) dummy ! use to preserve file format
    read (be_unit) power(0:max_wave_in) 
 
    ! Truncate power spectra:
