@@ -10,6 +10,9 @@ module da_control
 
 #include "namelist_defines.inc"
 
+   ! switches set from other namelist options
+   logical :: use_obsgts
+   logical :: use_rad
 
    !---------------------------------------------------------------------------
    ! [1.0] Physical parameter constants (all NIST standard values):

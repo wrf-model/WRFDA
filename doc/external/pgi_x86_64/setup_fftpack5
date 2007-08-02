@@ -1,6 +1,0 @@
-export FFCFLAGS="-O2 -r8 -Mfixed"
-export FFC=pgf90
-export CPPFLAGS="-C -P -traditional"
-rm *.a
-make clean
-make
