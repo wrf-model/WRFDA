@@ -494,7 +494,6 @@ subroutine da_read_obs (ob, xp, filename)
             ! Track serial obs index for reassembly of obs during bit-for-bit 
             ! tests with different numbers of MPI tasks.  
             platform%loc%obs_global_index  = ob%num_sound_glo
-            platform%loc%obs_global_report = report
 
             ob%sonde_sfc(num_sound)%info = platform%info
             ob%sonde_sfc(num_sound)%loc  = platform%loc

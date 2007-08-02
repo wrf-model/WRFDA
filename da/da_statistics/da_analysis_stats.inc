@@ -39,7 +39,7 @@ subroutine da_analysis_stats  (grid, stats_unit)
   
    if (rootproc) then
       write(unit=stats_unit, fmt='(/a/)') &
-         ' Minimum of gridded analysits increments'
+         ' Minimum of gridded analysis increments'
 
       write(unit=stats_unit, fmt='(6a/)') &
          ' Lvl         ', &
@@ -86,7 +86,7 @@ subroutine da_analysis_stats  (grid, stats_unit)
    
   
       write(unit=stats_unit, fmt='(/a/)') &
-         ' Maximum of gridded analysits increments'
+         ' Maximum of gridded analysis increments'
 
       write(unit=stats_unit, fmt='(6a/)') &
          ' Lvl         ', &
@@ -114,7 +114,7 @@ subroutine da_analysis_stats  (grid, stats_unit)
       write(unit=stats_unit, fmt='(a,4(f12.4,10x),e12.4)') ' ALL', &
          um, vm, tm, pm, qm
    
-      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysits increments'
+      write(unit=stats_unit, fmt='(/a/)') ' Mean of gridded analysis increments'
 
       write(unit=stats_unit, fmt='(a/)') &
          ' Lvl        u           v           t           p           q'
@@ -158,7 +158,7 @@ subroutine da_analysis_stats  (grid, stats_unit)
       write(unit=stats_unit, fmt='(a,4f12.4,4e12.4)') ' ALL', &
          um*rijk_g, vm*rijk_g, tm*rijk_g, pm*rijk_g, qm*rijk_g
 
-      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysits increments'
+      write(unit=stats_unit, fmt='(/a/)') ' RMSE of gridded analysis increments'
 
       write(unit=stats_unit, fmt='(a/)') &
          ' Lvl        u           v           t           p           q'

@@ -1,20 +1,20 @@
 module da_define_structures
 
-    use module_domain, only: vp_type, x_type
-
-    use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
-       vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
-       max_ob_levels,da_array_print, trace_use, &
-       vert_corr_1, vert_corr_2, vert_evalue_global, &
-       put_rand_seed, seed_array1, seed_array2
-
-    use da_tracing, only : da_trace_entry, da_trace_exit
-
-    use da_reporting, only : da_error, message
-
    !---------------------------------------------------------------------------
    ! Purpose: Collection of routines to define and allocate structures.
    !---------------------------------------------------------------------------
+
+   use module_domain, only: vp_type, x_type
+
+   use da_control, only : anal_type_randomcv, stdout, max_fgat_time, &
+      vert_corr, global, num_pseudo, vert_evalue,print_detail_be, maxsensor, &
+      max_ob_levels,da_array_print, trace_use, &
+      vert_corr_1, vert_corr_2, vert_evalue_global, &
+      put_rand_seed, seed_array1, seed_array2
+
+   use da_tracing, only : da_trace_entry, da_trace_exit
+
+   use da_reporting, only : da_error, message
 
    implicit none
    
@@ -23,7 +23,6 @@ module da_define_structures
    !--------------------------------------------------------------------------
 
    type xbx_type
-
       character (len=4):: mminlu
 
       integer          :: fft_pad_i          ! Padding to get 2**p 3**q 5**r. (p>=1)
@@ -101,14 +100,11 @@ module da_define_structures
       ! code.  It is used to reassemble obs in serial-code-order to replicate 
       ! summation order for bitwise-exact testing of distributed-memory 
       ! parallel configurations.  
-      ! obs_global_report is the index in the input data file
       integer                 :: obs_global_index
-      integer                 :: obs_global_report
 
       integer                 :: v_interp_optn  ! 0, not specified
                                                 ! 1, vertical interpolate in pressure
                                                 ! 2, vertical interpolate in height
-
    end type model_loc_type
 
    type each_level_type
@@ -497,7 +493,6 @@ module da_define_structures
       real,    pointer     :: ice_coverage(:)
       real,    pointer     :: snow_coverage(:)
 
-
       type (info_type), pointer   :: info(:)
       type (model_loc_type), pointer   :: loc(:)
    end type instid_type
@@ -602,7 +597,6 @@ module da_define_structures
 
       real :: missing
       real :: ptop
-
    end type ob_type
 
    ! [3.3] Where are these used:?
@@ -617,9 +611,9 @@ module da_define_structures
       type (number_type)         :: num
       integer                    :: nn(100000)
       integer                    :: kk(100000)
-   END type bad_info_type
+   end type bad_info_type
 
-   type  bad_data_type
+   type bad_data_type
       type (bad_info_type)       :: u
       type (bad_info_type)       :: v
       type (bad_info_type)       :: t
@@ -637,29 +631,27 @@ module da_define_structures
    end type bad_data_type
 
    type count_obs_number_type
-        integer                                 :: num_used
-        integer                                 :: num_outside_iyjx
-        integer                                 :: num_max_err_chk
-        integer                                 :: num_missing
+      integer                                 :: num_used
+      integer                                 :: num_outside_iyjx
+      integer                                 :: num_max_err_chk
+      integer                                 :: num_missing
    end type count_obs_number_type
  
    type count_obs_type
-
-        type (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
-                                         num_sound, num_geoamv, num_polaramv,&
-                                         num_pilot, num_satem, &
-                                         num_airep, num_metar, &
-                                         num_ships, num_gpspw, &
-                                         num_gpsref, &
-                                         num_ssmi_retrieval,   &
-                                         num_ssmi_tb, &
-                                         num_ssmt1, num_ssmt2, &
-                                         num_qscat, &
-                                         num_profiler, &
-                                         num_buoy, &
-                                         num_radar, num_bogus, &
-                                         num_other  
-
+      type (count_obs_number_type)  :: total_obs, num_synop, num_airsr_obs,&
+         num_sound, num_geoamv, num_polaramv,&
+         num_pilot, num_satem, &
+         num_airep, num_metar, &
+         num_ships, num_gpspw, &
+         num_gpsref, &
+         num_ssmi_retrieval,   &
+         num_ssmi_tb, &
+         num_ssmt1, num_ssmt2, &
+         num_qscat, &
+         num_profiler, &
+         num_buoy, &
+         num_radar, num_bogus, &
+         num_other  
    end type count_obs_type
 
    !--------------------------------------------------------------------------
@@ -736,18 +728,18 @@ module da_define_structures
    end type residual_gpsref_type
 
    type residual_ssmi_retrieval_type
-        real                    :: tpw      ! Toatl precipitable water cm
-        real                    :: Speed    ! Wind speed m/s
+      real                    :: tpw      ! Toatl precipitable water cm
+      real                    :: Speed    ! Wind speed m/s
    end type residual_ssmi_retrieval_type
 
    type residual_ssmi_tb_type
-        real                    :: tb19v          ! Brightness T (k) 19V
-        real                    :: tb19h          ! Brightness T (k) 19H
-        real                    :: tb22v          ! Brightness T (k) 22V
-        real                    :: tb37v          ! Brightness T (k) 37V
-        real                    :: tb37h          ! Brightness T (k) 37H
-        real                    :: tb85v          ! Brightness T (k) 85V
-        real                    :: tb85h          ! Brightness T (k) 85H
+      real                    :: tb19v          ! Brightness T (k) 19V
+      real                    :: tb19h          ! Brightness T (k) 19H
+      real                    :: tb22v          ! Brightness T (k) 22V
+      real                    :: tb37v          ! Brightness T (k) 37V
+      real                    :: tb37h          ! Brightness T (k) 37H
+      real                    :: tb85v          ! Brightness T (k) 85V
+      real                    :: tb85h          ! Brightness T (k) 85H
    end type residual_ssmi_tb_type
    
    type residual_ssmt1_type
@@ -772,25 +764,25 @@ module da_define_structures
    end type residual_radar_type
 
    type residual_instid_type
-     integer                          :: num_rad
-     integer                          :: nchan
-     integer ,  pointer               :: ichan (:)
-     real, pointer                    :: tb(:,:)
+      integer                          :: num_rad
+      integer                          :: nchan
+      integer, pointer                 :: ichan (:)
+      real, pointer                    :: tb(:,:)
    end type residual_instid_type
 
    type y_type
       type(ob_numb_type) :: ob_numb
 
       integer :: total_obs, num_synop, num_airsr, &
-                 num_sound, num_geoamv, num_polaramv, &
-                 num_pilot, num_satem, &
-                 num_airep, num_metar, &
-                 num_ships, num_gpspw, &
-                 num_ssmi_tb, num_ssmi_retrieval, &
-                 num_ssmt1, num_ssmt2, num_pseudo, &
-                 num_qscat, num_profiler, num_buoy, &
-                 num_radar, num_gpsref, num_bogus, &
-                 num_inst
+         num_sound, num_geoamv, num_polaramv, &
+         num_pilot, num_satem, &
+         num_airep, num_metar, &
+         num_ships, num_gpspw, &
+         num_ssmi_tb, num_ssmi_retrieval, &
+         num_ssmt1, num_ssmt2, num_pseudo, &
+         num_qscat, num_profiler, num_buoy, &
+         num_radar, num_gpsref, num_bogus, &
+         num_inst
 
       type (residual_synop_type), pointer :: synop(:)
       type (residual_synop_type), pointer :: metar(:) ! Same as synop type
@@ -825,8 +817,8 @@ module da_define_structures
    ! Max/Min type:
 
    type maxmin_type
-        real                       :: value
-        integer                    :: n, l
+      real                       :: value
+      integer                    :: n, l
    end type maxmin_type
 
    !--------------------------------------------------------------------------
@@ -929,7 +921,6 @@ module da_define_structures
       real                         :: value
       integer                      :: i, j
    end type maxmin_field_type
-
 
    ! vp_type is defined in the Registry
    ! x_type  is defined in the Registry

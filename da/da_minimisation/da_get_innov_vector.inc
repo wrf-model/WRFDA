@@ -6,11 +6,11 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    implicit none
 
-   integer,        intent(in)    :: it
-   type(y_type),  intent(inout) :: ob           ! Observations.
-   type(ob_type), intent(inout) :: iv           ! Innovation vector(O-B).
-   type(domain) ,  intent(inout) :: grid
-   type(grid_config_rec_type), intent(inout)   :: config_flags
+   integer,                    intent(in)    :: it
+   type(y_type),               intent(inout) :: ob ! Observations.
+   type(ob_type),              intent(inout) :: iv ! Innovation vector(O-B).
+   type(domain),               intent(inout) :: grid
+   type(grid_config_rec_type), intent(inout) :: config_flags
 
    type(xbx_type)     :: xbx          ! Header & non-gridded vars.
 
@@ -22,7 +22,7 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
    call da_message((/"Calculate innovation vector(iv)"/))
 
-   iv%ptop    = grid%xb%ptop
+   iv%ptop = grid%xb%ptop
 
    filename = ' '
    
@@ -31,111 +31,53 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
 
       if (num_fgat_time > 1) then
          write(unit=filename(1:10), fmt='(a, i2.2)') 'fg', n
-         call da_med_initialdata_input( grid , config_flags, &
-            filename)
-         call da_setup_firstguess( xbx, grid)
+         call da_med_initialdata_input (grid , config_flags, filename)
+         call da_setup_firstguess (xbx, grid)
       end if
 
-      ! Radiosonde:
+      if (use_soundobs) then
+         call da_get_innov_vector_sound (it, grid%xb, grid%xp, ob, iv)
+         call da_get_innov_vector_sonde_sfc (it, grid%xb, grid%xp, ob, iv)
+      end if
 
-      call da_get_innov_vector_sound( it, grid%xb, grid%xp, ob, iv)
-      call da_get_innov_vector_sonde_sfc( it, grid%xb, grid%xp, ob, iv)
+      if (use_synopobs) call da_get_innov_vector_synop (it, grid%xb, grid%xp, ob, iv)
+      if (use_geoamvobs) call da_get_innov_vector_geoamv (it, grid%xb, grid%xp, ob, iv)
+      if (use_polaramvobs) call da_get_innov_vector_polaramv (it, grid%xb, grid%xp, ob, iv)
+      if (use_airepobs) call da_get_innov_vector_airep (it, grid%xb, grid%xp, ob, iv)
+      if (use_pilotobs) call da_get_innov_vector_pilot (it, grid%xb, grid%xp, ob, iv)
+      if (use_bogusobs) call da_get_innov_vector_bogus (it, grid%xb, grid%xp, ob, iv)
+      if (use_metarobs) call da_get_innov_vector_metar (it, grid%xb, grid%xp, ob, iv)
+      if (use_shipsobs) call da_get_innov_vector_ships (it, grid%xb, grid%xp, ob, iv)
+      if (use_gpspwobs) call da_get_innov_vector_gpspw (it, grid%xb, grid%xp, ob, iv)
+      if (use_gpsrefobs) call da_get_innov_vector_gpsref (it, grid%xb, grid%xp, ob, iv) 
+      if (use_ssmiretrievalobs .or. use_ssmitbobs) &
+         call da_get_innov_vector_ssmi (it, grid%xb, ob, iv)
+      if (use_ssmt1obs) call da_get_innov_vector_ssmt1 (it, grid%xb, grid%xp, ob, iv)
+      if (use_ssmt2obs) call da_get_innov_vector_ssmt2 (it, grid%xb, grid%xp, ob, iv)
+      if (use_satemobs) call da_get_innov_vector_satem (grid, it,  ob, iv)
+      if (use_radarobs) call da_get_innov_vector_radar (it, grid%xb, grid%xp, ob, iv)
+      if (use_qscatobs) call da_get_innov_vector_qscat (it, grid%xb, grid%xp, ob, iv)
+      if (use_profilerobs) call da_get_innov_vector_profiler (it, grid%xb, grid%xp, ob, iv)
+      if (use_buoyobs) call da_get_innov_vector_buoy (it, grid%xb, grid%xp, ob, iv)
 
-      ! Surface
-
-      call da_get_innov_vector_synop( it, grid%xb, grid%xp, ob, iv)
-
-      ! Geostationary Satellite AMVs:
-
-      call da_get_innov_vector_geoamv( it, grid%xb, grid%xp, ob, iv)
-
-      ! Polar orbitting Satellite AMVs:
-
-      call da_get_innov_vector_polaramv( it, grid%xb, grid%xp, ob, iv)
-
-      ! Aireps:
-
-      call da_get_innov_vector_airep( it, grid%xb, grid%xp, ob, iv)
-
-      ! Pilot:
-
-      call da_get_innov_vector_pilot( it, grid%xb, grid%xp, ob, iv)
-
-      ! TC bogus
-
-      call da_get_innov_vector_bogus( it, grid%xb, grid%xp, ob, iv)
-
-      ! Metar:
-
-      call da_get_innov_vector_metar( it, grid%xb, grid%xp, ob, iv)
-
-      ! Ships:
-
-      call da_get_innov_vector_ships( it, grid%xb, grid%xp, ob, iv)
-
-      ! GPSPW:
-
-      call da_get_innov_vector_gpspw( it, grid%xb, grid%xp, ob, iv)
-
-      ! GPSRF: 
- 
-      call da_get_innov_vector_gpsref( it, grid%xb, grid%xp, ob, iv) 
-
-      ! SSMI:
-
-      call da_get_innov_vector_ssmi( it, grid%xb, ob, iv)
-
-      ! SSMT1:
-
-      call da_get_innov_vector_ssmt1( it, grid%xb, grid%xp, ob, iv)
-
-      ! SSMT2:
-
-      call da_get_innov_vector_ssmt2( it, grid%xb, grid%xp, ob, iv)
-
-      ! SATEM:
-
-      call da_get_innov_vector_satem(grid, it,  ob, iv)
-
-      ! radar obs:
-
-      call da_get_innov_vector_radar( it, grid%xb, grid%xp, ob, iv)
-
-      ! Scatterometer:
-
-      call da_get_innov_vector_qscat( it, grid%xb, grid%xp, ob, iv)
-
-      ! Profiler:
-
-      call da_get_innov_vector_profiler( it, grid%xb, grid%xp, ob, iv)
-
-      ! Buoy:
-
-      call da_get_innov_vector_buoy( it, grid%xb, grid%xp, ob, iv)
-
-      ! Radiance:
-
-      if (rtm_option == rtm_option_rttov) then
-         call da_get_innov_vector_rttov( it, grid%xb, grid%xp, ob, iv )
-      elseif (rtm_option == rtm_option_crtm) then
+      if (use_rad) then
+         if (rtm_option == rtm_option_rttov) then
+            call da_get_innov_vector_rttov( it, grid%xb, grid%xp, ob, iv )
+         elseif (rtm_option == rtm_option_crtm) then
 #ifdef CRTM
-        !if (use_crtm_kmatrix_fast) then
-        ! call da_get_innov_vector_crtmk( it, grid%xb, grid%xp, ob, iv )
-        !else
-         call da_get_innov_vector_crtm( it, grid%xb, grid%xp, ob, iv )
-        !end if
+           !if (use_crtm_kmatrix_fast) then
+           !   call da_get_innov_vector_crtmk( it, grid%xb, grid%xp, ob, iv )
+           !else
+            call da_get_innov_vector_crtm (it, grid%xb, grid%xp, ob, iv )
+           !end if
 #endif
-      else
-         call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
+         else
+            call da_warning(__FILE__,__LINE__,(/"Unknown Radiative Transfer Model"/))
+         end if
       end if
 
-      ! Pseudo obs:
-
-      call da_get_innov_vector_pseudo( grid%xb, grid%xp, ob, iv)
-
-      ! AIRS retrievals
-
-      call da_get_innov_vector_airsr( it, grid%xb, grid%xp, ob, iv)
+      if (num_pseudo > 0) call da_get_innov_vector_pseudo (grid%xb, grid%xp, ob, iv)
+      if (use_airsretobs) call da_get_innov_vector_airsr (it, grid%xb, grid%xp, ob, iv)
    end do
 
    iv%current_ob_time = 1
@@ -179,8 +121,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
    !----------------------------------------------------------
 
    if (write_filtered_rad) then
-     write(unit=stdout,fmt='(A)') 'Writing filtered radiance'
-     call da_write_filtered_rad(ob,iv)
+      write(unit=stdout,fmt='(A)') 'Writing filtered radiance'
+      call da_write_filtered_rad(ob,iv)
    end if
 
    if (num_fgat_time > 1) then
