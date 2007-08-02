@@ -2,8 +2,7 @@
 
 include ../configure.wrf
 
-OBJS_FOR_ALL =		da_solve.o		\
-                        da_memory.o             \
+OBJS_FOR_ALL =		da_memory.o             \
                         da_tracing.o            \
 			da_par_util.o           \
 			da_par_util1.o          \
@@ -42,6 +41,9 @@ OBJS_FOR_ALL =		da_solve.o		\
 			da_control.o		\
 			da_spectral.o           \
 			da_radiance.o		\
+			da_radiance.o		\
+			da_radiance1.o		\
+			da_crtm.o		\
 			gsi_kinds.o		\
 			gsi_constants.o		\
                         da_wrfvar_top.o         \
@@ -51,15 +53,8 @@ OBJS_FOR_ALL =		da_solve.o		\
 
 TARGETDIR    =  ../..
 
-wrfvar_src :	links $(OBJS_FOR_ALL)
+all_wrfvar :	links $(OBJS_FOR_ALL)
 		$(AR) ../main/libwrflib.a $(OBJS_FOR_ALL)
-
-
-wrfvar_interface : links da_wrfvar_top.o
-		$(AR) ../main/libwrflib.a da_wrfvar_top.o
-
-wrfvar_io :	links da_wrfvar_io.o
-		$(AR) ../main/libwrflib.a da_wrfvar_io.o
 
 links :
 	@ $(LN) */*.inc .
@@ -67,11 +62,13 @@ links :
 	@ $(LN) */*.c .
 	@ $(LN) */*.m4 .
 
+MODULE_DIRS=-I../frame -I../share
+
 
 ##########################################################################
 
 clean:
-	@ $(RM) *.o *.mod *.f *.stb *.out core *~ mpif.h da_generic_boilerplate.inc
+	@ $(RM) *.o *.mod *.f *.c *.m4 *.stb *.out core *~ mpif.h da_generic_boilerplate.inc
 
 superclean : clean
 	@ $(RM) mpif.h
@@ -83,6 +80,7 @@ da_generic_boilerplate.inc:	da_generic_boilerplate.m4
 			$(M4) da_generic_boilerplate.m4 > da_generic_boilerplate.inc
 
 da_par_util.o:		da_par_util.f90                   \
+                        da_wrf_interfaces.o		  \
                         da_define_structures.o		  \
 			da_control.o			  \
                         da_par_util1.o                    \
@@ -90,7 +88,6 @@ da_par_util.o:		da_par_util.f90                   \
 			da_copy_dims.inc                  \
 			da_copy_tile_dims.inc             \
 			da_cv_to_vv.inc                   \
-			da_local_to_global.inc            \
 			da_pack_count_obs.inc             \
 			da_proc_maxmin_combine.inc        \
 			da_proc_stats_combine.inc         \
@@ -117,20 +114,8 @@ da_par_util1.o:		da_proc_sum_int.inc               \
 			$(CPP) $(CPPFLAGS) -I../inc da_par_util1.f90 > da_par_util1.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_par_util1.f
 
-da_solve.o:		da_control.o			\
-			da_define_structures.o		\
-			da_setup_structures.o		\
-			da_test.o			\
-			da_tools.o			\
-			da_minimisation.o		\
-			da_par_util.o			\
-			da_solve_init.inc \
-			da_solve.f90
-			$(RM) $@
-			$(CPP) $(CPPFLAGS) -I../inc da_solve.f90 > da_solve.f
-			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_solve.f
-
 da_minimisation.o:	da_minimisation.f90 \
+			da_transfer_model.o \
 			da_wrfvar_io.o \
 			da_control.o \
 			da_define_structures.o \
@@ -170,7 +155,13 @@ da_minimisation.o:	da_minimisation.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_minimisation.f90 > da_minimisation.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_minimisation.f
 
+da_transfer_model.o:	da_transfer_model.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc da_transfer_model.f90 > da_transfer_model.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_transfer_model.f
+
 da_setup_structures.o:	da_setup_structures.f90 \
+			da_obs_io.o \
 			da_define_structures.o \
 			da_control.o \
 			da_grid_definitions.o \
@@ -219,6 +210,7 @@ da_memory.o:		da_memory.c
 
 da_vtox_transforms.o:	da_vtox_transforms.f90 \
 			da_par_util.o \
+			da_wrf_interfaces.o \
 			da_define_structures.o \
 			da_tools.o \
 			da_recursive_filter.o \
@@ -318,6 +310,11 @@ da_pseudo.o:		da_pseudo.f90 \
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_pseudo.f90 > da_pseudo.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_pseudo.f
+
+da_obs_io.o:		da_obs_io.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc da_obs_io.f90 > da_obs_io.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_obs_io.f
 
 da_metar.o:		da_metar.f90 \
 			da_control.o \
@@ -608,6 +605,8 @@ da_gpsref.o:		da_gpsref.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_gpsref.f
 
 da_ssmi.o:		da_ssmi.f90 \
+		        module_ssmi.o \
+			da_tools1.o \
 			da_control.o \
 			da_par_util.o \
 			da_define_structures.o \
@@ -830,6 +829,7 @@ da_physics.o:		da_physics.f90 \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_physics.f
 
 da_ffts.o:		\
+			module_ffts.o \
 			da_define_structures.o \
 			da_par_util.o \
 			da_ffts.f90 \
@@ -840,6 +840,16 @@ da_ffts.o:		\
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_ffts.f90 > da_ffts.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_ffts.f
+
+module_ffts.o:		module_ffts.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc module_ffts.f90 > module_ffts.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) module_ffts.f
+
+module_ssmi.o:		module_ssmi.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc module_ssmi.f90 > module_ssmi.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) module_ssmi.f
 
 da_tools.o:		\
 			da_control.o \
@@ -872,6 +882,16 @@ da_tools.o:		\
 			$(RM) $@
 			$(CPP) $(CPPFLAGS) -I../inc da_tools.f90 > da_tools.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools.f
+
+da_tools1.o:		da_tools1.f90   
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc da_tools1.f90 > da_tools1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tools1.f
+
+module_radiance.o:	module_radiance.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc module_radiance.f90 > module_radiance.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) module_radiance.f
 
 da_recursive_filter.o:	\
 			da_control.o \
@@ -1082,7 +1102,7 @@ da_wrfvar_io.o : da_wrfvar_io.f90 \
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_io.f90 > da_wrfvar_io.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_io.f
 
-da_wrfvar_top.o : da_wrfvar_top.f90 \
+da_wrfvar_top.o : esmf_time wrfio_esmf da_wrfvar_top.f90 \
                              da_wrfvar_run.inc \
                              da_wrfvar_interface.inc \
                   da_wrfvar_io.o \
@@ -1139,7 +1159,11 @@ be_spectral.o:		da_be_spectral.f90          \
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_be_spectral.f
 
 da_radiance.o:		da_radiance.f90 \
-                        da_control.o          \
+                        module_radiance.o          \
+                        da_radiance1.o          \
+                        da_rttov.o          \
+                        gsi_thinning.o          \
+                        da_rttov.o          \
 			da_define_structures.o  \
 			da_interpolation.o \
 			da_statistics.o \
@@ -1171,6 +1195,26 @@ da_radiance.o:		da_radiance.f90 \
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance.f90 > da_radiance.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance.f
 
+da_rttov.o:		da_rttov.f90
+			$(RM) $@
+			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_rttov.f90 > da_rttov.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_rttov.f
+
+da_radiance1.o:		da_radiance1.f90
+			$(RM) $@
+			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_radiance1.f90 > da_radiance1.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_radiance1.f
+
+da_crtm.o:		da_crtm.f90
+			$(RM) $@
+			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc da_crtm.f90 > da_crtm.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_crtm.f
+
+da_wrf_interfaces.o:	da_wrf_interfaces.f90
+			$(RM) $@
+			$(CPP) $(CPPFLAGS) -I../inc da_wrf_interfaces.f90 > da_wrf_interfaces.f
+			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrf_interfaces.f
+
 parkind1.o:		parkind1.f90
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc parkind1.f90 > parkind1.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) parkind1.f
@@ -1183,6 +1227,42 @@ gsi_constants.o:	gsi_constants.f90 \
                         gsi_kinds.o
 			$(CPP) -I$(RTTOV)/src $(CPPFLAGS) -I../inc gsi_constants.f90 > gsi_constants.f
 			$(FC) -c $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) gsi_constants.f
+
+da_wrfvar.exe:	        da_wrfvar.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_main.f90 > da_wrfvar_main.f
+			$(FC) -o da_wrfvar.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_main.f
+
+da_advance_cymdh.exe:   da_advance_cymdh.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_advance_cymdh.f90 > da_advance_cymdh.f
+			$(FC) -o da_advance_cymdh.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_advance_cymdh.f
+
+da_bias_airmass.exe:	da_bias_airmass.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_bias_airmass.f90 > da_bias_airmass.f
+			$(FC) -o da_bias_airmass.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_airmass.f
+
+da_bias_verif.exe:	da_bias_verif.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_bias_verif.f90 > da_bias_verif.f
+			$(FC) -o da_bias_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_verif.f
+
+da_bias_sele.exe:	da_bias_sele.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_bias_sele.f90 > da_bias_sele.f
+			$(FC) -o da_bias_sele.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_bias_sele.f
+
+da_verif.exe:	        da_verif.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_verif.f90 > da_verif.f
+			$(FC) -o da_verif.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_verif.f
+
+da_tune_obs_desroziers.exe: da_tune_obs_desroziers.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_desroziers.f90 > da_tune_obs_desroziers.f
+			$(FC) -o da_tune_obs_desroziers.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_desroziers.f
+
+da_tune_obs_hollingsworth1.exe: da_tune_obs_hollingsworth1.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth1.f90 > da_tune_obs_hollingsworth1.f
+			$(FC) -o da_tune_obs_hollingsworth1.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_hollingsworth1.f
+
+da_tune_obs_hollingsworth2.exe: da_tune_obs_hollingsworth2.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_tune_obs_hollingsworth2.f90 > da_tune_obs_hollingsworth2.f
+			$(FC) -o da_tune_obs_hollingsworth2.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_tune_obs_hollingsworth2.f
 
 ##############################################################################
 

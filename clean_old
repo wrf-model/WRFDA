@@ -10,6 +10,8 @@ foreach dir ( frame chem share dyn_em dyn_exp dyn_nmm phys main tools )
 end
 
 
+( cd da ; make clean )
+
 ( cd tools/CodeBase ; make clean )
 
 ( cd inc ; /bin/rm -f *.inc namelist.default )
