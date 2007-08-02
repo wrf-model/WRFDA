@@ -77,6 +77,7 @@ export NL_MP_ZERO_OUT=${NL_MP_ZERO_OUT:-2}
 # &dynamics:
 export NL_W_DAMPING=${NL_W_DAMPING:-0}            # 
 export NL_DIFF_OPT=${NL_DIFF_OPT:-0}             # 
+export NL_PD_MOIST=${NL_PD_MOIST:-.false.}             # 
 
 # The recommended value for real data cases for the eddy coefficient
 # option is 4, but Registry.EM has value 1, so modify for WRFVAR
@@ -195,11 +196,6 @@ echo '<A HREF="namelist.input">Namelist input</a>'
 # else
 #    echo "$FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 already exists, skipping"
 # fi
-
-# WHY
-# mkdir -p $FC_DIR/$END_DATE
-# ln -fs $FC_DIR/$DATE/wrfout_d${DOMAIN}_${END_YEAR}-${END_MONTH}-${END_DAY}_${END_HOUR}:00:00 \
-#   $FC_DIR/$END_DATE/wrfinput_d${DOMAIN}
 
 if $CLEAN; then
    rm -rf $WORK_DIR

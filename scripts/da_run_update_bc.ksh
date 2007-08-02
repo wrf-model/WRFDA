@@ -41,11 +41,11 @@ date
 
 mkdir -p ${RUN_DIR}
 
-export DA_REAL_OUTPUT=$RC_DIR/$DATE/wrfinput_d$DOMAIN      # Input (needed only if cycling).
+export DA_REAL_OUTPUT=${DA_REAL_OUTPUT:-$RC_DIR/$DATE/wrfinput_d$DOMAIN} # Input (needed only if cycling).
 export BDYIN=${BDYIN:-$RC_DIR/$DATE/wrfbdy_d$DOMAIN}       # Input bdy.
 if $NL_VAR4D ; then
   if $CYCLING; then
-    if ! $FIRST; then
+    if test $CYCLE_NUMBER -gt 0; then
       if $PHASE; then
         export YEAR=$(echo $DATE | cut -c1-4)
         export MONTH=$(echo $DATE | cut -c5-6)

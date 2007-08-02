@@ -65,11 +65,11 @@ if $NL_VAR4D; then
    #DALE: Boundaries look wrong to me.
 fi
 if $CYCLING; then
-   if ! $FIRST; then
+   if test $CYCLE_NUMBER -gt 0; then
       if $NL_VAR4D; then
          export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       fi
-      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+      export DA_FIRST_GUESS=${DA_FIRST_GUESS:-${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}}
    fi
 fi
 

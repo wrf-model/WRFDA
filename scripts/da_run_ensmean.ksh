@@ -65,6 +65,7 @@ export DA_FILE=${FC_DIR}/${DATE}/${FILE_TYPE}_d01_${FILE_DATE}
 
 #Copy first member as template for mean:
 cp ${DA_FILE}.e001 ${DA_FILE}
+cp ${DA_FILE}.e001 ${DA_FILE}.vari
 
 cat > gen_be_ensmean_nl.nl << EOF
   &gen_be_ensmean_nl

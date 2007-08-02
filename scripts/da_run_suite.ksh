@@ -74,7 +74,7 @@ else
 fi
 export CLEAN=${CLEAN:-false}
 export CYCLING=${CYCLING:-false}                       # Cold start (false), cycle (true).
-export FIRST=${FIRST:-true}                            # Cold start (false), cycle (true).
+export CYCLE_NUMBER=${CYCLE_NUMBER:-0}              # Number of assimilation cycles run so far. 
 
 #Time info:
 export INITIAL_DATE=${INITIAL_DATE:-2003010100}        # Start date of test period
@@ -220,13 +220,7 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 
 export DATE=$INITIAL_DATE
 
-if [[ $INITIAL_DATE -eq $FINAL_DATE ]]; then
-   ONETRIP=true
-else
-   ONETRIP=false
-fi
-
-while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; do 
+while ( $DATE -le $FINAL_DATE ) ; do 
    export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
 
@@ -326,7 +320,7 @@ while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; 
 
    if $NL_VAR4D; then
      if $CYCLING; then
-       if ! $FIRST; then
+       if test $CYCLE_NUMBER -gt 0; then
          if $RUN_UPDATE_BC; then
            export RUN_DIR=$EXP_DIR/run/$DATE/update_bc_4dvar
            export PHASE=true
@@ -353,7 +347,7 @@ while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; 
 
       export DA_FIRST_GUESS=${RC_DIR}/$DATE/wrfinput_d${DOMAIN}
       if $CYCLING; then
-         if ! $FIRST; then
+         if test $CYCLE_NUMBER -gt 0; then
             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
@@ -370,7 +364,7 @@ while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; 
       export WRF_INPUT=$DA_ANALYSIS
    else     
       if $CYCLING; then
-         if ! $FIRST; then
+         if test $CYCLE_NUMBER -gt 0; then
             export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
          fi
       fi
@@ -435,7 +429,7 @@ while ( ! $ONETRIP && [[ $DATE -le $FINAL_DATE ]] ) || ( $ONETRIP && $FIRST ) ; 
 
    export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
-   export FIRST=false
+   export CYCLE_NUMBER=`expr $CYCLE_NUMBER + 1`
 
 done
 
