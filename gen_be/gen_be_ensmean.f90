@@ -1,8 +1,8 @@
 program gen_be_ensmean
 !
 !---------------------------------------------------------------------- 
-!  Purpose: Calculate NETCDF wrfinput format ensemble mean file from 
-!  input ensemble members.
+!  Purpose: Calculate ensemble mean file from input WRF NETCDF input
+!  ensemble members.
 !
 !  Owner: Dale Barker (NCAR/MMM) - WRF wrappper. Thanks to Cindy Bruyere.
 !  Please acknowledge author/institute in work that uses this code.
@@ -97,7 +97,7 @@ program gen_be_ensmean
    end if
 
 !---------------------------------------------------------------------------------------------
-   write(6,'(/a)')' [4] Extract necessary fields from WRF ensemble forecasts.'
+   write(6,'(/a)')' [2] Extract necessary fields from WRF ensemble forecasts.'
 !---------------------------------------------------------------------------------------------
 
    do v = 1, nv ! Loop over variables to average:

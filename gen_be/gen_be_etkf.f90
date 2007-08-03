@@ -26,8 +26,6 @@ program gen_be_etkf
    integer, parameter    :: max_num_dims = 20         ! Maximum number of dimensions.
    integer, parameter    :: unit = 100                ! Unit number.
 
-   character (len=filename_len)   :: directory                 ! Experiment directory.
-   character (len=filename_len)   :: filestub                  ! General filename stub.
    character (len=filename_len)   :: input_file                ! Input file. 
    character (len=filename_len)   :: output_file               ! Output file. 
    character (len=3)     :: ce                        ! Member index -> character.
@@ -73,7 +71,7 @@ program gen_be_etkf
    real, pointer         :: sigma_o2(:)               ! Ob error variance.
    real, pointer         :: yo(:)                     ! Observation.
  
-   namelist / gen_be_etkf_nl / directory, filestub, num_members, nv, cv, &
+   namelist / gen_be_etkf_nl / num_members, nv, cv, &
                                naccumt1, naccumt2, nstartaccum1, nstartaccum2, &
                                nout, tainflatinput, rhoinput
 
@@ -81,8 +79,6 @@ program gen_be_etkf
    write(stdout,'(/a)')' [1] Initialize information.'
 !-----------------------------------------------------------------------------------------
 
-   directory = '.'
-   filestub = 'test'
    num_members = 56
    nv = 1
    cv = "U"
@@ -100,8 +96,6 @@ program gen_be_etkf
    read(unit, gen_be_etkf_nl)
    close(unit)
 
-   write(stdout,'(a,a)')'   Experiment directory = ', trim(directory)
-   write(stdout,'(a,a)')'   Filestub = ', trim(filestub)
    write(stdout,'(a,i4)')'   Number of ensemble members = ', num_members
    write(stdout,'(a,i4)')'   Number of prognostic variables = ', nv
    write(stdout,'(50a)')'   List of prognostic variables = ', cv(1:nv)
@@ -147,7 +141,7 @@ program gen_be_etkf
 !-----------------------------------------------------------------------------------------
 
 !  Open mean:
-   input_file = trim(filestub)
+   input_file = 'etkf_input'
    length = len_trim(input_file)
    rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
 
@@ -215,7 +209,7 @@ program gen_be_etkf
       write(UNIT=ce,FMT='(i3.3)')member
 
 !     Open file:
-      input_file = trim(filestub)//'.e'//ce
+      input_file = 'etkf_input.e'//ce
       length = len_trim(input_file)
       rcode = nf_open( input_file(1:length), NF_NOWRITE, cdfid )
 
@@ -257,7 +251,7 @@ program gen_be_etkf
    write(stdout,'(/a)')' [5] Call ETKF:'
 !-----------------------------------------------------------------------------------------
 
-   call da_solve_etkf( directory, nijkv, num_members, num_obs, xf, y, sigma_o2, yo, nout, &
+   call da_solve_etkf( nijkv, num_members, num_obs, xf, y, sigma_o2, yo, nout, &
                        naccumt1, naccumt2, nstartaccum1, nstartaccum2, tainflatinput, &
                        rhoinput )
 
@@ -275,14 +269,14 @@ program gen_be_etkf
    end do
 
 !-----------------------------------------------------------------------------------------
-   write(stdout,'(/a)')' [7] Output ETKF analysis ensemble:'
+   write(stdout,'(/a)')' [6] Output ETKF analysis ensemble:'
 !-----------------------------------------------------------------------------------------
 
    do member = 1, num_members
       write(UNIT=ce,FMT='(i3.3)')member
 
 !     Open file:
-      input_file = 'analysis.e'//ce
+      input_file = 'etkf_output.e'//ce
       length = len_trim(input_file)
       rcode = nf_open( input_file(1:length), NF_WRITE, cdfid )
       if ( rcode /= 0 ) then

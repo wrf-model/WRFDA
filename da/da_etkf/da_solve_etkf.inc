@@ -1,8 +1,10 @@
-subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
+subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1,naccumt2,nstartaccum1,nstartaccum2,tainflatinput,rhoinput)
 
    !-----------------------------------------------------------------------
    ! Purpose: ETKF perturbation updates 
    ! Xuguang Wang, Jan. 2006
+   ! Dale Barker. January 2007. Implicit none, Convert to f90, and enclose within gen_be_etkf.f90 driver within WRF.
+   ! Dale Barker. Also modify inflation factor method (nstartaccum1,nstartaccum2 redundant).
    !
    ! references:
    ! Bishop et al 2001 MWR, 
@@ -28,7 +30,6 @@ subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,no
 
    implicit none
 
-   character (len=*), intent(in) :: directory
    integer, intent(in) :: nanals,ndim,nobs
    real, intent(inout), dimension(ndim,nanals) :: ens
    real, intent(inout), dimension(nobs,nanals) :: ens_ob
@@ -75,7 +76,7 @@ subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,no
  ! real :: squareinnosum, squareinnosum1
  real :: squareinno
 
-   filename_factor = trim(directory)//"/inflation_factor.dat"
+   filename_factor = "inflation_factor.dat"
    open(109,form="unformatted",file=filename_factor,access="direct",recl=8)
  
 !------------------------------------------------------------------------------
@@ -177,7 +178,7 @@ subroutine da_solve_etkf( directory, ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,no
    tr = sqrt(ainflat_mean) * tr
   
 !------------------------------------------------------------------------------
-!  [4] Calculate the ETKF initial perturbations
+!  [4] Calculate the rescaled ETKF perturbations
 !------------------------------------------------------------------------------
 
    call da_matmultiover(ens, tr, ndim, nanals)

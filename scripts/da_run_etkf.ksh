@@ -18,64 +18,25 @@
 # think it necessary then please email wrfhelp@ucar.edu with details.
 #########################################################################
 
-#Experiment details:
-export DATE=${DATE:-2003010100}
-export FCST_RANGE=${FCST_RANGE:-6}
-export REGION=${REGION:-con200}
-export EXPT=${EXPT:-test}                              # Experiment name.
-export NUM_MEMBERS=${NUM_MEMBERS:-1}
-export HOSTS=${HOSTS:-$HOME/hosts}
-if [[ -f $HOSTS ]]; then
-   export RUN_CMD=${RUN_CMD:-mpirun -machinefile $HOSTS -np $NUM_PROCS}
-else
-   export RUN_CMD=${RUN_CMD:-mpirun -np $NUM_PROCS}
-fi
+#-----------------------------------------------------------------------
+# [1] Set defaults for required environment variables:
+#-----------------------------------------------------------------------
 
-#Directories:
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
-export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}
-export DAT_DIR=${DAT_DIR:-$HOME/data}
-export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}
-export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}
-export FC_DIR=${FC_DIR:-$EXP_DIR/fc}
-export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
-export RUN_DIR=${RUN_DIR:-$EXP_DIR/run/${DATE}/run_etkf}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
+export FCST_RANGE=${FCST_RANGE:-$CYCLE_PERIOD}
 
-#Ensemble mean parameters:
-export NV=${NV:-15}                               # Number of variables to average.
-export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
-                "'QCLOUD'", "'QRAIN'", "'QVAPOR'", "'U10'", "'V10'", "'T2'", "'Q2'"} # Variable names
+. ${SCRIPTS_DIR}/da_set_defaults.ksh
 
-#WRF-Var parameters:
-export BE_DIR=${BE_DIR:-$REG_DIR/be}
-export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat}
-export OB_DIR=${OB_DIR:-$REG_DIR/ob}
-export WINDOW_START=${WINDOW_START:-0}
-export WINDOW_END=${WINDOW_END:-0}
-export NL_E_WE=${NL_E_WE:-45}
-export NL_E_SN=${NL_E_SN:-45}
-export NL_E_VERT=${NL_E_VERT:-28}
-export NL_DX=${NL_DX:-200000}
-export NL_DY=${NL_DX:-200000}
-#export NL_NTMAX=0
-export NL_CHECK_RH=0
 export NL_CHECK_MAX_IV=.false.
 export NL_ANALYSIS_TYPE="VERIFY"
 export DA_ANALYSIS=analysis_not_used
 
-#ETKF parameters:
-export NACCUMT1=${NACCUMT1:-1}
-export NACCUMT2=${NACCUMT2:--1}
-export NSTARTACCUM1=${NSTARTACCUM1:-1}
-export NSTARTACCUM2=${NSTARTACCUM2:-1}
-export CYCLE_NUMBER=${CYCLE_NUMBER:-0}
-export TAINFLATINPUT=${TAINFLATINPUT:-1.0}
-export RHOINPUT=${RHOINPUT:-1.0}
+#-----------------------------------------------------------------------
+# [2] Set up configuration:
+#-----------------------------------------------------------------------
 
-#------------------------------------------------------------------------------------------
-
-mkdir -p $ETKF_DIR
 mkdir -p $RUN_DIR
 export RUN_DIR_SAVE=$RUN_DIR
 
@@ -85,7 +46,11 @@ export MM=$(echo $DATE | cut -c5-6)
 export DD=$(echo $DATE | cut -c7-8)
 export HH=$(echo $DATE | cut -c9-10)
 export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
-export DA_FILE=${FC_DIR}/${PREV_DATE}/wrf_3dvar_input_d01_${FILE_DATE}
+export DA_FILE=${FC_DIR}/${PREV_DATE}/${FILE_TYPE}_${FILE_DATE} #JEFS test uses wrfout
+
+#-----------------------------------------------------------------------
+# [3] Create observation files for ETKF:
+#-----------------------------------------------------------------------
 
 let MEM=1
 let JOB=1
@@ -99,7 +64,7 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
 
    export RUN_DIR=${RUN_DIR_SAVE}/wrfvar.${CMEM}
    mkdir -p $RUN_DIR; cd $RUN_DIR
-   ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > da_run_wrfvar.${CMEM}.out 2>&1 &
+   ${WRFVAR_DIR}/scripts/da_run_wrfvar.ksh > da_run_wrfvar.${CMEM}.out 2>&1
 
    let MEM=$MEM+1
    let JOB=$JOB+1
@@ -110,36 +75,64 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    fi
 done
 
-#Prepare ETKF input files:
+rm ${RUN_DIR_SAVE}/ob.etkf.*
+let MEM=1
+while [[ $MEM -le $NUM_MEMBERS ]]; do
+
+   export CMEM=e$MEM
+   if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
+   if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
+   export RUN_DIR=${RUN_DIR_SAVE}/wrfvar.${CMEM}
+
+   wc -l ${RUN_DIR}/ob.etkf.000 > ${RUN_DIR_SAVE}/ob.etkf.${CMEM}
+   cat ${RUN_DIR}/ob.etkf.000 >> ${RUN_DIR_SAVE}/ob.etkf.${CMEM}
+
+   let MEM=$MEM+1
+done
 
 export RUN_DIR=$RUN_DIR_SAVE
 cd $RUN_DIR
-cp ${DA_FILE} wrfinput_d01 # Prior ensemble mean.
 
+#-----------------------------------------------------------------------
+# [4] Calculate ensemble mean:
+#-----------------------------------------------------------------------
+
+cp ${DA_FILE}.e001 ${DA_FILE} # Initialise ensemble mean with first member.
+cp ${DA_FILE}.e001 ${DA_FILE}.vari # Initialise ensemble variance with first member.
+
+cat > gen_be_ensmean_nl.nl << EOF
+  &gen_be_ensmean_nl
+    filestub = '${DA_FILE}'
+    num_members = ${NUM_MEMBERS},
+    nv = ${NV},
+    cv = ${CV} /
+EOF
+
+ln -fs ${BUILD_DIR}/gen_be_ensmean.exe .
+./gen_be_ensmean.exe > gen_be_ensmean.out 2>&1
+
+#-----------------------------------------------------------------------
+# [5] Run Ensemble Transform Kalman Filter:
+#-----------------------------------------------------------------------
+
+#Prepare ETKF input/output files:
+
+ln -sf ${DA_FILE} etkf_input                     # ETKF input mean (unchanged)
 let MEM=1
 while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
 
-   cp ${DA_FILE}.${CMEM} wrfinput_d01.${CMEM} # ETKF input.
-   cp ${DA_FILE}.${CMEM} analysis.${CMEM} # ETKF input.
-###   cp ${FC_DIR}/${DATE}/analysis analysis.${CMEM}     # ETKF output (overwrite).
-
-   wc -l wrfvar.${CMEM}/working/ob.etkf.000 > ob.etkf.${CMEM}
-   cat wrfvar.${CMEM}/working/ob.etkf.000 >> ob.etkf.${CMEM}
-
+   ln -sf ${DA_FILE}.${CMEM} etkf_input.${CMEM}  # ETKF input (unchanged).
+   cp ${DA_FILE}.${CMEM} etkf_output.${CMEM}     # ETKF output (overwritten).
    let MEM=$MEM+1
 done
 
-#Run Ensemble Transform Kalman Filter:
-
-export DA_FILE=wrfinput_d01
+#Create namelist and run ETKF:
 
 cat > gen_be_etkf_nl.nl << EOF
   &gen_be_etkf_nl
-    directory = '${ETKF_DIR}',
-    filestub = '${DA_FILE}',
     num_members = ${NUM_MEMBERS},
     nv = ${NV},
     cv = ${CV},
@@ -156,12 +149,14 @@ ln -fs ${BUILD_DIR}/gen_be_etkf.exe .
 ./gen_be_etkf.exe > gen_be_etkf.out 2>&1
 
 #Move ensemble of analyses:
+
+mkdir -p ${FC_DIR}/$DATE
 let MEM=1
 while [[ $MEM -le $NUM_MEMBERS ]]; do
    export CMEM=e$MEM
    if [[ $MEM -lt 100 ]]; then export CMEM=e0$MEM; fi
    if [[ $MEM -lt 10 ]]; then export CMEM=e00$MEM; fi
-   mv analysis.${CMEM} ${FC_DIR}/$DATE/wrfinput_d01.${CMEM}
+   mv etkf_output.${CMEM} ${FC_DIR}/$DATE/${FILE_TYPE}_${FILE_DATE}.${CMEM}
    let MEM=$MEM+1
 done
 
