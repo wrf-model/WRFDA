@@ -6,24 +6,23 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
    implicit none
 
-   type(domain), intent(in)       :: grid
-   integer, intent(in)            :: it       ! External iteration.
-   type(y_type),  intent(in)      :: ob       ! Observation structure.
-   type(ob_type), intent(inout)   :: iv       ! O-B structure.
+   type(domain),  intent(in)    :: grid
+   integer,       intent(in)    :: it       ! External iteration.
+   type(y_type),  intent(in)    :: ob       ! Observation structure.
+   type(ob_type), intent(inout) :: iv       ! O-B structure.
 
-   integer                         :: n        ! Loop counter.
-   integer                         :: i, j, k  ! Index dimension.
-   integer                         :: num_levs ! Number of obs levels.
-   real                            :: dx, dxm  ! Interpolation weights.
-   real                            :: dy, dym  ! Interpolation weights.
-   real, dimension(1:max_ob_levels) :: model_thickness !Model thickness at ob loc
-   integer           :: ithickness,ithicknessf
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_thickness(1:max_ob_levels) !Model thickness at ob loc
+   integer :: ithickness,ithicknessf
 
-   real, dimension(kts-1:kte+1)   :: pre_ma,tv_ma
-   integer                         :: layer1,layer2,ks,ke
-   real                            :: tv1,tv2,pres2
-
-   if (iv % num_satem < 1) return
+   real    :: pre_ma(kts-1:kte+1)
+   real    :: tv_ma(kts-1:kte+1)
+   integer :: layer1,layer2
+   real    :: tv1,tv2,pres2
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_satem")
 
@@ -38,13 +37,12 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
       ! [1.0] Get cross pt. horizontal interpolation weights:
 
-      i = iv%satem(n)%loc%i
-      dy = iv%satem(n)%loc%dy
+      i   = iv%satem(n)%loc%i
+      dy  = iv%satem(n)%loc%dy
       dym = iv%satem(n)%loc%dym
-      j = iv%satem(n)%loc%j
-      dx = iv%satem(n)%loc%dx
+      j   = iv%satem(n)%loc%j
+      dx  = iv%satem(n)%loc%dx
       dxm = iv%satem(n)%loc%dxm
-      ks = kts; ke=kte
 
       !------------------------------------------------------------------------
 
@@ -54,26 +52,25 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
 
       ! [3.0] Find model vertical position of pressure and do interp.
 
-      call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,ks,ke)
+      call da_find_layer(layer2,tv2,iv%satem(n)%ref_p,pre_ma,tv_ma,kts,kte)
       pres2 = iv%satem(n)%ref_p
 
       ! [4.0] Thickness innovations calculation
 
       do k = 1, num_levs
          iv % satem(n) % thickness(k) % inv = 0.0
-         call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma,ks,ke)
-         call da_thickness(pre_ma,tv_ma,ks,ke,tv1,tv2,layer1,layer2,   &
-           iv%satem(n)%p(k),pres2,model_thickness(k))
+         call da_find_layer(layer1,tv1,iv%satem(n)%p(k),pre_ma,tv_ma,kts,kte)
+         call da_thickness(pre_ma,tv_ma,kts,kte,tv1,tv2,layer1,layer2,   &
+            iv%satem(n)%p(k),pres2,model_thickness(k))
 
          if (ABS(ob % satem(n) % thickness(k) - missing_r) > 1.0 .and. &
               iv % satem(n) % thickness(k)%qc /= missing_data) then
-           iv % satem(n) % thickness(k) % inv =     &
-                  ob % satem(n) % thickness(k) - model_thickness(k)
-           ! write(unit=stdout,fmt="(A, 2F10.3,F10.0,A,F5.0,A)") &
-           !   "observed, model_thickness, layer = ", &
-           !   ob%satem(n)%thickness(k), &
-           ! model_thickness(k), 0.01*pres2, " -", &
-           ! iv%satem(n)%p(k)*0.01,'hPa'
+            iv % satem(n) % thickness(k) % inv = ob % satem(n) % thickness(k) - model_thickness(k)
+            ! write(unit=stdout,fmt="(A, 2F10.3,F10.0,A,F5.0,A)") &
+            !    "observed, model_thickness, layer = ", &
+            !    ob%satem(n)%thickness(k), &
+            ! model_thickness(k), 0.01*pres2, " -", &
+            ! iv%satem(n)%p(k)*0.01,'hPa'
          end if
 
          pres2 = iv%satem(n)%p(k)
@@ -86,7 +83,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
       !------------------------------------------------------------------------
 
       if (check_max_iv) then
-        call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf)
+         call da_check_max_iv_satem(it, iv % satem(n), ithickness,ithicknessf)
       end if
 
       !------------------------------------------------------------------------
@@ -105,7 +102,7 @@ subroutine da_get_innov_vector_satem(grid, it, ob, iv)
          ', Total Rejections for satem follows:'
       write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed thicknesses observations:     ',&
-                   ithicknessf, ' on ',ithickness
+         ithicknessf, ' on ',ithickness
    end if
    
    if (trace_use) call da_trace_exit("da_get_innov_vector_satem")

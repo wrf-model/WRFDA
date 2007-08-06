@@ -13,28 +13,28 @@ subroutine da_get_innov_vector_rttov (it, xb, xp, ob, iv)
    
 !#include "rttov_q2v.interface"
 
-   integer, intent(in)            :: it       ! External iteration.
-   type (xb_type), intent(in)     :: xb       ! first guess state.
-   type (xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type (y_type),  intent(inout)  :: ob       ! Observation structure.
-   type (ob_type), intent(inout)  :: iv       ! O-B structure.
+   integer,           intent(in)    :: it       ! External iteration.
+   type (xb_type),    intent(in)    :: xb       ! first guess state.
+   type (xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type (y_type),     intent(inout) :: ob       ! Observation structure.
+   type (ob_type),    intent(inout) :: iv       ! O-B structure.
 
 #if defined(RTTOV)
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: k  ! Index dimension.
-   integer                        :: nlevels ! Number of obs levels.
+   integer  :: n        ! Loop counter.
+   integer  :: k  ! Index dimension.
+   integer  :: nlevels ! Number of obs levels.
 
    real                             :: seap, icep, lndp, snop
    real, allocatable :: v_p(:,:)
 
-   integer            :: inst, nchan
+   integer :: inst, nchan
    real,    allocatable   :: polar(:)
    real,    allocatable   :: pres(:)
-   logical            :: amsua, amsub, ssmi
-   ! logical            :: mhs
+   logical :: amsua, amsub, ssmi
+   ! logical :: mhs
 
-   integer            :: kn,knchpf,sensor_type,n1,n2,n1n2
+   integer :: kn,knchpf,sensor_type,n1,n2,n1n2
    integer, allocatable :: kprof(:), kchan(:),kochan(:),knchan(:),indexn(:,:)
    real   , allocatable :: pemsv(:), pemsh(:), pems5(:)
    real   , allocatable :: zasat(:), zlsat(:)
@@ -47,8 +47,6 @@ real,allocatable :: temp(:)
 
    ! variables for computing clwp
    real, allocatable :: dpf(:,:), clw(:,:), pf(:,:)
-
-   if ( iv%num_inst < 1 ) return
 
    if (trace_use) call da_trace_entry("da_get_innov_vector_rttov")
 
@@ -399,15 +397,15 @@ real,allocatable :: temp(:)
       zasat(n1:n2) = iv%instid(inst)%satzen(n1:n2) * deg2rad
       zlsat(n1:n2) = iv%instid(inst)%satazi(n1:n2) * deg2rad
 
-!      do i = n1,n2
-!         knchan(i) = nchan
-!         do kn=1,nchan 
-!            kprof((i-1)*nchan+kn)  = i
-!            kchan((i-1)*nchan+kn)  = kn
-!            kochan((i-1)*nchan+kn) = kn
-!            indexn(kn,i) = (-1)*nchan+kn 
-!         end do
-!      end do
+      ! do i = n1,n2
+      !    knchan(i) = nchan
+      !    do kn=1,nchan 
+      !       kprof((i-1)*nchan+kn)  = i
+      !       kchan((i-1)*nchan+kn)  = kn
+      !       kochan((i-1)*nchan+kn) = kn
+      !       indexn(kn,i) = (-1)*nchan+kn 
+      !    end do
+      ! end do
 
       pemsv(:)    = 0.0
       pemsh(:)    = 0.0
@@ -477,16 +475,11 @@ real,allocatable :: temp(:)
 allocate(temp(nchan))
       call da_rttov_direct (inst, iv%instid(inst)%isflg(n), nchan, 1, &
          con_vars(n:n), aux_vars(n:n), &
-!         iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
+         ! iv%instid(inst)%tb_xb(:,n), pemsv, pemsh, &
          temp(:), pemsv((n-1)*nchan+1:n*nchan), pemsh((n-1)*nchan+1:n*nchan), &
          iv%instid(inst)%emiss(:,n))
 iv%instid(inst)%tb_xb(:,n)=temp(:)
 deallocate(temp)
-   do k=1,nchan
-!      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
-!         write (0,*) "n,k,tb,xb",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n)
-!      end if
-   end do
 end do
 
       if (iv%instid(inst)%nchannels > nchan) then
@@ -514,13 +507,13 @@ end do
       elsewhere
          iv%instid(inst)%tb_inv(1:nchan,n1:n2)   = missing_r
       endwhere
-!do n=n1,n2
-!   do k=1,nchan
-!      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
-!         write (0,*) "n,k,tb,xb,inv",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n),iv%instid(inst)%tb_inv(k,n)
-!      end if
-!   end do
-!end do
+      !do n=n1,n2
+      !   do k=1,nchan
+      !      if (iv%instid(inst)%tb_inv(k,n) > 15.0) then
+      !         write (0,*) "n,k,tb,xb,inv",n,k, ob%instid(inst)%tb(k,n),iv%instid(inst)%tb_xb(k,n),iv%instid(inst)%tb_inv(k,n)
+      !      end if
+      !   end do
+      !end do
 
       deallocate (v_p)
       deallocate (clw)

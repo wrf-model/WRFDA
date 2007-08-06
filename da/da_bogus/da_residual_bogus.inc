@@ -1,6 +1,4 @@
-subroutine da_residual_bogus(oi, y, re,                        &
-                                        np_missing, np_bad_data,          &
-                                        np_obs_used, np_available)
+subroutine da_residual_bogus(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,53 +6,46 @@ subroutine da_residual_bogus(oi, y, re,                        &
 
    implicit none
 
-   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(inout)     :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                        np_missing  , np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if (oi%num_Bogus > 0) then
-      n_obs_bad % u % num = number_type(0, 0, 0)
-      n_obs_bad % v % num = number_type(0, 0, 0)
-      n_obs_bad % t % num = number_type(0, 0, 0)
-      n_obs_bad % q % num = number_type(0, 0, 0)
-      n_obs_bad % slp % num = number_type(0, 0, 0)
+   n_obs_bad % u % num = number_type(0, 0, 0)
+   n_obs_bad % v % num = number_type(0, 0, 0)
+   n_obs_bad % t % num = number_type(0, 0, 0)
+   n_obs_bad % q % num = number_type(0, 0, 0)
+   n_obs_bad % slp % num = number_type(0, 0, 0)
 
-      do n=1, oi%num_Bogus
-         do k=1, oi%bogus(n)%info%levels
-            np_available = np_available + 4
-            re%Bogus(n)%u(k) = da_residual(n, k, y%Bogus(n)%u(k), &
-                                     oi%Bogus(n)%u(k), n_obs_bad % u)
-            re%Bogus(n)%v(k) = da_residual(n, k, y%Bogus(n)%v(k), &
-                                     oi%Bogus(n)%v(k), n_obs_bad % v)
-            re%Bogus(n)%t(k) = da_residual(n, k, y%Bogus(n)%t(k), &
-                                     oi%Bogus(n)%t(k), n_obs_bad % t)
-            re%Bogus(n)%q(k) = da_residual(n, k, y%Bogus(n)%q(k), &
-                                     oi%Bogus(n)%q(k), n_obs_bad % q)
-         end do
-
-         np_available = np_available + 1
-
-         re%Bogus(n)%slp = da_residual(n, 0, y%Bogus(n)%slp,  &
-                                 oi%Bogus(n)%slp, n_obs_bad % slp) 
+   do n=1, iv%num_bogus
+      do k=1, iv%bogus(n)%info%levels
+         np_available = np_available + 4
+         re%bogus(n)%u(k) = da_residual(n, k, y%bogus(n)%u(k), iv%bogus(n)%u(k), n_obs_bad % u)
+         re%bogus(n)%v(k) = da_residual(n, k, y%bogus(n)%v(k), iv%bogus(n)%v(k), n_obs_bad % v)
+         re%bogus(n)%t(k) = da_residual(n, k, y%bogus(n)%t(k), iv%bogus(n)%t(k), n_obs_bad % t)
+         re%bogus(n)%q(k) = da_residual(n, k, y%bogus(n)%q(k), iv%bogus(n)%q(k), n_obs_bad % q)
       end do
 
-      np_missing = np_missing + n_obs_bad % u % num % miss + &
-                  n_obs_bad % v % num % miss + n_obs_bad % slp % num % miss + &
-                  n_obs_bad % t % num % miss + n_obs_bad % q % num % miss
-      np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-                   n_obs_bad % v % num % bad + n_obs_bad % slp % num % bad  + &
-                   n_obs_bad % t % num % bad + n_obs_bad % q % num % bad
-     np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-                   n_obs_bad % v % num % use + n_obs_bad % slp % num % use  + &
-                   n_obs_bad % t % num % use + n_obs_bad % q % num % use
+      np_available = np_available + 1
+      re%bogus(n)%slp = da_residual(n, 0, y%bogus(n)%slp, iv%bogus(n)%slp, n_obs_bad % slp) 
+   end do
 
-   end if
+   np_missing = np_missing + n_obs_bad % u % num % miss + &
+      n_obs_bad % v % num % miss + n_obs_bad % slp % num % miss + &
+      n_obs_bad % t % num % miss + n_obs_bad % q % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
+      n_obs_bad % v % num % bad + n_obs_bad % slp % num % bad  + &
+      n_obs_bad % t % num % bad + n_obs_bad % q % num % bad
+   np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
+      n_obs_bad % v % num % use + n_obs_bad % slp % num % use  + &
+      n_obs_bad % t % num % use + n_obs_bad % q % num % use
 
 end subroutine da_residual_bogus
 

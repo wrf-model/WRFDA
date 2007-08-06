@@ -95,9 +95,13 @@ module gsi_kinds
 
 ! Default values
 ! **** CHANGE THE FOLLOWING TO CHANGE THE DEFAULT REAL TYPE KIND ***
-  integer, parameter, private :: default_real = 2  ! 1=single, 
-                                                   ! 2=double, 
-                                                   ! 3=quad
+! 1=single, 2=double, 3=quad
+#if ( RWORDSIZE == 4 )
+  integer, parameter, private :: default_real = 1
+#else
+  integer, parameter, private :: default_real = 2
+#endif
+
   integer, parameter, public  :: r_kind = real_kinds( default_real )
   integer, parameter, public  :: num_bytes_for_r_kind = &
        real_byte_sizes( default_real )

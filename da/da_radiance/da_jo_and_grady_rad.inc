@@ -16,8 +16,6 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
 
    integer                       :: n, k, i
 
-   if (iv%num_inst < 1) return
-
    if (trace_use) call da_trace_entry("da_jo_and_grady_rad")
 
    do i =1, iv%num_inst
@@ -30,8 +28,7 @@ subroutine da_jo_and_grady_rad(iv, re, jo, jo_grad_y)
       do n=1, iv%instid(i)%num_rad
          do k=1, iv%instid(i)%nchan
             jo_grad_y%instid(i)%tb(k,n) = -re%instid(i)%tb(k,n) / &
-                                    (iv%instid(i)%tb_error(k,n) * &
-                                      iv%instid(i)%tb_error(k,n))
+               (iv%instid(i)%tb_error(k,n) * iv%instid(i)%tb_error(k,n))
          end do
          if (iv%instid(i)%proc_domain(n)) then
             do k=1, iv%instid(i)%nchan

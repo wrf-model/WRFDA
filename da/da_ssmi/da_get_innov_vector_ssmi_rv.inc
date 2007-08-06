@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_ssmi_rv( it, xb, ob, iv)
+subroutine da_get_innov_vector_ssmi_rv (it, xb, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,20 +6,18 @@ subroutine da_get_innov_vector_ssmi_rv( it, xb, ob, iv)
 
    implicit none
 
-   integer, intent(in)           :: it         ! External iteration.
+   integer,       intent(in)    :: it         ! External iteration.
    type(xb_type), intent(in)    :: xb         ! first guess state.
    type(y_type),  intent(in)    :: ob         ! Observation structure.
    type(ob_type), intent(inout) :: iv         ! O-B structure.
 
-   integer                      :: n           ! Loop counter.
-   integer                      :: i, j        ! Index dimension.
-   real                         :: dx, dxm     ! Interpolation weights.
-   real                         :: dy, dym     ! Interpolation weights.
-   real                         :: model_tpw   ! Model value tpw   at oblocation
-   real                         :: model_speed ! Model value speed at oblocation
-   integer                      :: itpw, itpwf, ispeed, ispeedf  
-                  
-   if (iv % num_ssmi_retrieval < 1) return
+   integer :: n           ! Loop counter.
+   integer :: i, j        ! Index dimension.
+   real    :: dx, dxm     ! Interpolation weights.
+   real    :: dy, dym     ! Interpolation weights.
+   real    :: model_tpw   ! Model value tpw   at oblocation
+   real    :: model_speed ! Model value speed at oblocation
+   integer :: itpw, itpwf, ispeed, ispeedf 
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_ssmi_rv")
 
@@ -40,25 +38,23 @@ subroutine da_get_innov_vector_ssmi_rv( it, xb, ob, iv)
       dxm = iv%ssmi_retrieval(n)%loc%dxm
       dym = iv%ssmi_retrieval(n)%loc%dym
 
-
       iv % ssmi_retrieval(n) % tpw % inv  = 0.0
       if (abs(ob % ssmi_retrieval(n) % tpw - missing_r) > 1.0  .and.  &  
             iv % ssmi_retrieval(n) % tpw % qc >= obs_qc_pointer) then
-         model_tpw = dym*(dxm*xb%tpw(i,j)   + dx*xb%tpw(i+1,j)) + &
-                        dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
+         model_tpw = dym*(dxm*xb%tpw(i,j) + dx*xb%tpw(i+1,j)) + &
+            dy *(dxm*xb%tpw(i,j+1) + dx*xb%tpw(i+1,j+1))
 
-         iv % ssmi_retrieval(n) % tpw % inv = &
-            ob % ssmi_retrieval(n) % tpw - model_tpw
+         iv % ssmi_retrieval(n) % tpw % inv = ob % ssmi_retrieval(n) % tpw - model_tpw
       end if
 
       ! SURFACE WinD SPEED
 
       iv % ssmi_retrieval(n) % speed % inv  = 0.0
       if (abs(ob % ssmi_retrieval(n) % speed - missing_r) > 1.0 .and.     &
-             iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer) then
+          iv % ssmi_retrieval(n) % speed % qc >= obs_qc_pointer) then
 
          model_speed = dym*(dxm*xb%speed(i,j ) + dx*xb%speed(i+1,j )) &
-                     + dy *(dxm*xb%speed(i,j+1) + dx*xb%speed(i+1,j+1))
+            + dy *(dxm*xb%speed(i,j+1) + dx*xb%speed(i+1,j+1))
          iv % ssmi_retrieval(n) % speed % inv =  &
             ob % ssmi_retrieval(n) % speed - model_speed
       end if

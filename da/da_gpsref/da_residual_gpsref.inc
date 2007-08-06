@@ -1,6 +1,4 @@
-subroutine da_residual_gpsref(oi, y, re,               &
-                                        np_missing, np_bad_data,  &
-                                        np_obs_used, np_available)
+subroutine da_residual_gpsref(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: Calculate residiual for gpsref obs
@@ -8,25 +6,25 @@ subroutine da_residual_gpsref(oi, y, re,               &
 
    implicit none
 
-   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(inout)     :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer       , intent(inout)     :: np_available, np_obs_used, &
-                                        np_missing  , np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if (oi%num_GPSRef < 1) return
-
    n_obs_bad % gpsref % num = number_type(0, 0, 0)
 
-   do n=1, oi%num_GPSRef
-      do k=1, oi%gpsref(n)%info%levels
+   do n=1, iv%num_gpsref
+      do k=1, iv%gpsref(n)%info%levels
          np_available = np_available + 1
-         re%GPSRef(n)%ref(k) = da_residual(n, k, y%GPSRef(n)%ref(k), &
-                                  oi%GPSRef(n)%ref(k), n_obs_bad%gpsref)
+         re%gpsref(n)%ref(k) = &
+            da_residual(n, k, y%gpsref(n)%ref(k), iv%gpsref(n)%ref(k), n_obs_bad%gpsref)
       end do
    end do
 

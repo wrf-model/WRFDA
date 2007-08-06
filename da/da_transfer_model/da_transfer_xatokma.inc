@@ -1,7 +1,7 @@
 subroutine da_transfer_xatokma(grid)
 
    !---------------------------------------------------------------------------
-   !  Purpose: Convert analysits increments into KMA increments 
+   !  Purpose: Convert analysis increments into KMA increments 
    !---------------------------------------------------------------------------
 
    implicit none

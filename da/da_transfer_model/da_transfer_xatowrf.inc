@@ -1,7 +1,7 @@
 subroutine da_transfer_xatowrf(grid)
 
    !---------------------------------------------------------------------------
-   !  Purpose: Convert analysits increments into WRF increments
+   !  Purpose: Convert analysis increments into WRF increments
    !
    !  The following WRF fields are modified:  
    !    grid%em_u_2
@@ -195,7 +195,7 @@ subroutine da_transfer_xatowrf(grid)
             ! To compute the theta increment with the full fitelds:
             grid%em_t_2(i,j,k) = t_full*(base_pres/p_full)**kappa - t0
 
-            ! The full fiteld of analysits ph:
+            ! The full fiteld of analysis ph:
             ph_full  = ph_full  &
                        - grid%xb%dnw(k) * (grid%xb%psac(i,j)+mu_cgrid(i,j)) / rho_full
 
@@ -203,7 +203,7 @@ subroutine da_transfer_xatowrf(grid)
             ph_xb_hd  = ph_xb_hd  &
                        - grid%xb%dnw(k) * grid%xb%psac(i,j) / grid%xb%rho(i,j,k)
 
-            ! The analysits perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
+            ! The analysis perturbation = Hydro_ph - base_ph + nonhydro_xb_ph:
             grid%em_ph_2(i,j,k+1) = ph_full - grid%em_phb(i,j,k+1) &
                             + (grid%xb%hf(i,j,k+1)*gravity - ph_xb_hd)
          end do

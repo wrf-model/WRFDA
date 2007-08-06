@@ -1,6 +1,4 @@
-subroutine da_residual_ssmi_rv(oi, y, re, &
-                                                  np_missing, np_bad_data, &
-                                                  np_obs_used, np_available)
+subroutine da_residual_ssmi_rv(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -8,12 +6,14 @@ subroutine da_residual_ssmi_rv(oi, y, re, &
 
    implicit none
 
-   type (ob_type), intent(in)        :: oi     ! Obs increment vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(inout)     :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Obs increment vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual structure.
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                        np_missing  , np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n
@@ -21,13 +21,13 @@ subroutine da_residual_ssmi_rv(oi, y, re, &
    n_obs_bad % Speed % num = number_type(0, 0, 0)
    n_obs_bad % q % num     = number_type(0, 0, 0)
 
-   do n=1, oi%num_ssmi_retrieval
+   do n=1, iv%num_ssmi_retrieval
       np_available = np_available + 2
 
       re%ssmi_retrieval(n)%Speed = da_residual(n, 0, y%ssmi_retrieval(n)%Speed, &
-                               oi%ssmi_retrieval(n)%Speed, n_obs_bad % Speed)
+                               iv%ssmi_retrieval(n)%Speed, n_obs_bad % Speed)
       re%ssmi_retrieval(n)%tpw   = da_residual(n, 0, y%ssmi_retrieval(n)%tpw,   &
-                               oi%ssmi_retrieval(n)%tpw, n_obs_bad % q      )
+                               iv%ssmi_retrieval(n)%tpw, n_obs_bad % q      )
    end do
 
    np_missing  = np_missing + n_obs_bad % Speed % num % miss    &

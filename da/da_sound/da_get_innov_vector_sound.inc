@@ -1,48 +1,40 @@
-subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_sound (it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"       
+   ! Purpose: TBD  
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,           intent(in)    :: it       ! External iteration.
+   integer,          intent(in)    :: it       ! External iteration.
    type(xb_type),    intent(in)    :: xb       ! first guess state.
    type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
    type(y_type),     intent(inout) :: ob       ! Observation structure.
    type(ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
-   integer                        :: num_levs ! Number of obs levels.
-   real                           :: dx, dxm  ! Interpolation weights.
-   real                           :: dy, dym  ! Interpolation weights.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
 
-   real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
-   real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
-   real, dimension(1:max_ob_levels) :: model_t  ! Model value t at ob location.
-   real, dimension(1:max_ob_levels) :: model_q  ! Model value q at ob location.
-   ! real, dimension(1:max_ob_levels) :: model_h  ! Model value h at ob location.
+   real    :: model_u(1:max_ob_levels)  ! Model value u at ob location.
+   real    :: model_v(1:max_ob_levels)  ! Model value v at ob location.
+   real    :: model_t(1:max_ob_levels)  ! Model value t at ob location.
+   real    :: model_q(1:max_ob_levels)  ! Model value q at ob location.
+   ! real    :: model_h(1:max_ob_levels)  ! Model value h at ob location.
 
-   real, dimension(kms:kme)   :: v_h      ! Model value h at ob hor. location.
-   real, dimension(kms:kme)   :: v_p      ! Model value p at ob hor. location.
+   real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
-   integer           :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf
-
-
-
-   if (iv%num_sound < 1) return
+   integer :: itu,ituf,itvv,itvvf,itt,ittf,itqv,itqvf
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_sound")
 
    itu   = 0; itvv    = 0;  itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0;  ittf = 0; itqvf = 0;
 
-   do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, &
-      iv%ob_numb(iv%current_ob_time)%sound
+   do n=iv%ob_numb(iv%current_ob_time-1)%sound + 1, iv%ob_numb(iv%current_ob_time)%sound
       num_levs = iv%sound(n)%info%levels
 
       if (num_levs < 1) cycle
@@ -55,10 +47,10 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
 
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%sound(n)%loc%i
-      j = iv%sound(n)%loc%j
-      dx = iv%sound(n)%loc%dx
-      dy = iv%sound(n)%loc%dy
+      i   = iv%sound(n)%loc%i
+      j   = iv%sound(n)%loc%j
+      dx  = iv%sound(n)%loc%dx
+      dy  = iv%sound(n)%loc%dy
       dxm = iv%sound(n)%loc%dxm
       dym = iv%sound(n)%loc%dym
 
@@ -73,14 +65,12 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
          iv%sound(n)%zk(k)=missing_r
 
          if (iv%sound(n)%p(k) > 1.0) then
-            call da_to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, &
-               iv%sound(n)%zk(k))
+            call da_to_zk(iv%sound(n)%p(k), v_p, xp, v_interp_p, iv%sound(n)%zk(k))
          else if (iv%sound(n)%h(k) > 0.0) then
-            call da_to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, &
-               iv%sound(n)%zk(k))
+            call da_to_zk(iv%sound(n)%h(k), v_h, xp, v_interp_h, iv%sound(n)%zk(k))
          end if
 
-         if (iv%sound(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
+         if (iv%sound(n)%zk(k) < 0.0 .and. .not. anal_type_verify) then
             iv%sound(n)%u(k)%qc = missing
             iv%sound(n)%v(k)%qc = missing
             iv%sound(n)%t(k)%qc = missing
@@ -91,16 +81,16 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
       ! [1.2] Interpolate horizontally to ob:
 
       call da_interp_lin_3d( xb%u, i, j, dx, dy, dxm, dym, &
-                           model_u, max_ob_levels, iv%sound(n)%zk, num_levs)
+         model_u, max_ob_levels, iv%sound(n)%zk, num_levs)
       call da_interp_lin_3d( xb%v, i, j, dx, dy, dxm, dym, &
-                           model_v, max_ob_levels, iv%sound(n)%zk, num_levs)
+         model_v, max_ob_levels, iv%sound(n)%zk, num_levs)
       call da_interp_lin_3d( xb%t, i, j, dx, dy, dxm, dym, &
-                           model_t, max_ob_levels, iv%sound(n)%zk, num_levs)
+         model_t, max_ob_levels, iv%sound(n)%zk, num_levs)
       call da_interp_lin_3d( xb%q, i, j, dx, dy, dxm, dym, &
-                           model_q, max_ob_levels, iv%sound(n)%zk, num_levs)
+         model_q, max_ob_levels, iv%sound(n)%zk, num_levs)
 
       ! call da_interp_lin_3d( xb%h, i, j, dx, dy, dxm, dym, &
-      !   model_h, max_ob_levels, iv%sound(n)%zk, num_levs)
+      !    model_h, max_ob_levels, iv%sound(n)%zk, num_levs)
 
       !----------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:
@@ -116,24 +106,20 @@ subroutine da_get_innov_vector_sound( it, xb, xp, ob, iv)
          ! [3.0] Interpolation:
          !-------------------------------------------------------------------
 
-         if (ob%sound(n)%u(k) > missing_r .AND. &
-              iv%sound(n)%u(k)%qc >= obs_qc_pointer) then
+         if (ob%sound(n)%u(k) > missing_r .AND. iv%sound(n)%u(k)%qc >= obs_qc_pointer) then
             iv%sound(n)%u(k)%inv = ob%sound(n)%u(k) - model_u(k)
          end if
 
-         if (ob%sound(n)%v(k) > missing_r .AND. &
-              iv%sound(n)%v(k)%qc >= obs_qc_pointer) then
+         if (ob%sound(n)%v(k) > missing_r .AND. iv%sound(n)%v(k)%qc >= obs_qc_pointer) then
             iv%sound(n)%v(k)%inv = ob%sound(n)%v(k) - model_v(k)
          end if
 
 
-         if (ob%sound(n)%t(k) > missing_r .AND. &
-              iv%sound(n)%t(k)%qc >= obs_qc_pointer) then
+         if (ob%sound(n)%t(k) > missing_r .AND. iv%sound(n)%t(k)%qc >= obs_qc_pointer) then
             iv%sound(n)%t(k)%inv = ob%sound(n)%t(k) - model_t(k)
          end if
 
-         if (ob%sound(n)%q(k) > missing_r .AND. &
-              iv%sound(n)%q(k)%qc >= obs_qc_pointer) then
+         if (ob%sound(n)%q(k) > missing_r .AND. iv%sound(n)%q(k)%qc >= obs_qc_pointer) then
             iv%sound(n)%q(k)%inv = ob%sound(n)%q(k) - model_q(k)
          end if
       end do

@@ -6,7 +6,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    implicit none
 
-   type(domain), intent(inout)               :: grid
+   type(domain), intent(inout)      :: grid
 
    integer, intent(in)              :: cv_size ! Size of cv array.
    type (xbx_type),intent(in)       :: xbx  ! For header & non-grid arrays.
@@ -16,12 +16,12 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
    type (vp_type),intent(out)       :: vv   ! grdipt/eof cv (local).
    real, intent(inout)              :: cv(1:cv_size) ! control variables.
 
-   integer                          :: i, j, k
-   real :: sdmd, s1md, mu
-   real, dimension(kms:kme) :: p, mr_a, mr_b
+   integer :: i, j, k
+   real    :: sdmd, s1md, mu
+   real    :: p(kms:kme), mr_a(kms:kme), mr_b(kms:kme)
    real    :: PU, PD, coeff
 
-  if (trace_use) call da_trace_entry("da_transform_vtox_adj")
+   if (trace_use) call da_trace_entry("da_transform_vtox_adj")
 
    !-------------------------------------------------------------------------
    ! Polar treatment for Global
@@ -29,31 +29,20 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    if (global) then     
       ! Poles treatment for global WRFVAR
-      call da_get_avpoles(grid%xa%u,grid%xa%v,&
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(grid%xa%t,            &
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(grid%xa%p,            &
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(grid%xa%q,            &
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme, kms, kme,  &
-            its, ite, jts, jte, kts, kte  )
-      call da_get_aspoles(grid%xa%psfc,         &
-            ids, ide, jds, jde,  &
-            ims, ime, jms, jme,   1,   1,  &
-            its, ite, jts, jte,   1,   1  )
+      call da_get_avpoles(grid%xa%u,grid%xa%v, &
+         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
+      call da_get_aspoles(grid%xa%t, &
+         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
+      call da_get_aspoles(grid%xa%p, &
+         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
+      call da_get_aspoles(grid%xa%q, &
+         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
+      call da_get_aspoles(grid%xa%psfc, &
+         ids,ide,jds,jde,ims,ime,jms,jme,kms,kme,its,ite,jts,jte,kts,kte)
    end if     
 
    ! Compute w increments using Richardson's eqn.
    if (use_radarobs) then
-
       do k=kts,kte
          do j=jts,jte
             do i=its,ite
@@ -64,50 +53,39 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
          end do
       end do
 
-     call da_uvprho_to_w_adj(grid)
+      call da_uvprho_to_w_adj(grid)
  
-     if (use_radarobs .and. use_radar_rf) then
-
-      ! Partition of hydrometeor increments via warm rain process
-
+      if (use_radarobs .and. use_radar_rf) then
+         ! Partition of hydrometeor increments via warm rain process
          call da_moist_phys_adj(grid)
-
       end if
-
    end if
 
    !-------------------------------------------------------------------------
    ! If test_wrfvar = .true., not "XToY" transform needed to do here (YRG):
 
    if (.not.test_wrfvar) then
-
       if (use_ssmt1obs .or. use_ssmt2obs .or. use_gpspwobs .or. &
-           use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
-
-         if (use_ssmiTbobs) call da_transform_xtotb_adj(grid)
-
+          use_ssmitbobs .or. use_ssmiretrievalobs .or. use_gpsrefobs) then
+         if (use_ssmitbobs) call da_transform_xtotb_adj(grid)
          if (use_ssmt1obs .or. use_ssmt2obs .or. &
-              use_ssmitbobs .or. use_ssmiretrievalobs) then
-         if (global) then
-            call da_error(__FILE__,__LINE__, &
-               (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
-         end if
+             use_ssmitbobs .or. use_ssmiretrievalobs) then
+            if (global) then
+               call da_error(__FILE__,__LINE__, &
+                  (/"grid%xb%speed is not available, see da_transfer_kmatoxb.inc"/))
+            end if
             call da_transform_xtoseasfcwind_adj(grid)
          end if
 
          ! GPS Refractivity:
-         if (use_gpsrefobs) &
-            call da_transform_xtogpsref_adj(grid)
+         if (use_gpsrefobs) call da_transform_xtogpsref_adj(grid)
 
          ! Now for PW.
          call da_transform_xtotpw_adj(grid)
-
       end if
 
       if (sfc_assi_options == 2) call da_transform_xtowtq_adj(grid)
-
    end if
-   !-------------------------------------------------------------------------
  
    call da_pt_to_rho_adj(grid)
    do j=jts,jte
@@ -151,7 +129,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
                end if
       
                grid%xa%psfc(i,j) = grid%xa % psfc(i,j) + &
-                 grid%xb%p(i,j,k) * grid%xa % p(i,j,k)/100.0 * coeff 
+                  grid%xb%p(i,j,k) * grid%xa % p(i,j,k)/100.0 * coeff 
             end do
          end if
       end do
@@ -159,7 +137,7 @@ subroutine da_transform_vtox_adj(grid, cv_size, xbx, be, ep, vp, vv, cv)
 
    if (global) then     
       call da_set_boundary_xa(grid)
-    end if
+   end if
 
    !-------------------------------------------------------------------------
    ! [3.0]: Perform x = u_p vp transform::

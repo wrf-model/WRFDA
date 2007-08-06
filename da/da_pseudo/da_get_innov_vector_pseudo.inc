@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
+subroutine da_get_innov_vector_pseudo(xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,22 +6,20 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
 
    implicit none
    
-   type(xb_type), intent(in)   :: xb          ! Background structure 
-   type(xpose_type), intent(in):: xp          ! Domain decomposition vars.
-   type( y_type), intent(inout):: ob          ! Observation structure.
-   type(ob_type), intent(inout):: iv          ! O-B structure.
+   type(xb_type),    intent(in)    :: xb          ! Background structure 
+   type(xpose_type), intent(in)    :: xp          ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob          ! Observation structure.
+   type(ob_type),    intent(inout) :: iv          ! O-B structure.
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j     ! Index dimension.
-   real                         :: dx, dxm  ! Interpolation weights.
-   real                         :: dy, dym  ! Interpolation weights.
-   real                         :: model_u  ! Model value u at oblocation.
-   real                         :: model_v  ! Model value v at oblocation.
-   real                         :: model_t  ! Model value t at oblocation.
-   real                         :: model_p  ! Model value p at oblocation.
-   real                         :: model_q  ! Model value q at oblocation.
-
-   if (iv % num_pseudo < 1) return
+   integer :: n        ! Loop counter.
+   integer :: i, j     ! Index dimension.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_u  ! Model value u at oblocation.
+   real    :: model_v  ! Model value v at oblocation.
+   real    :: model_t  ! Model value t at oblocation.
+   real    :: model_p  ! Model value p at oblocation.
+   real    :: model_q  ! Model value q at oblocation.
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_pseudo")
 
@@ -36,20 +34,19 @@ subroutine da_get_innov_vector_pseudo( xb, xp, ob, iv)
       dxm = iv%pseudo(n)%loc%dxm
 
       write(unit=stdout, fmt='(/a,2i5/a,4f15.5/)') &
-           'pseudo: i,j=', i,j, &
-           'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
+         'pseudo: i,j=', i,j, 'pseudo: dy, dym, dx, dxm=', dy, dym, dx, dxm
 
       ! [1.2] Interpolate horizontally:
       call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
-                              model_u, iv%pseudo(n)%zk)
+         model_u, iv%pseudo(n)%zk)
       call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
-                              model_v, iv%pseudo(n)%zk)
+         model_v, iv%pseudo(n)%zk)
       call da_interp_obs_lin_2d( xb % t, i, j, dx, dy, dxm, dym, &
-                              model_t, iv%pseudo(n)%zk)
+         model_t, iv%pseudo(n)%zk)
       call da_interp_obs_lin_2d( xb % p, i, j, dx, dy, dxm, dym, &
-                              model_p, iv%pseudo(n)%zk)
+         model_p, iv%pseudo(n)%zk)
       call da_interp_obs_lin_2d( xb % q, i, j, dx, dy, dxm, dym, &
-                              model_q, iv%pseudo(n)%zk)
+         model_q, iv%pseudo(n)%zk)
 
       !---------------------------------------------------------------
       ! [3.0] Calculate observation O = B +(O-B):

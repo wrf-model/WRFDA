@@ -1,40 +1,33 @@
 subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"       
+   ! Purpose: TBD    
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,           intent(in)    :: it      ! External iteration.
+   integer,          intent(in)    :: it      ! External iteration.
    type(xb_type),    intent(in)    :: xb      ! first guess state.
    type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
    type(y_type),     intent(inout) :: ob      ! Observation structure.
    type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j, k  ! Index dimension.
-   real                         :: dx, dxm  ! Interpolation weights.
-   real                         :: dy, dym  ! Interpolation weights.
-   real                         :: model_u  ! Model value u at oblocation.
-   real                         :: model_v  ! Model value v at oblocation.
-   real                         :: model_t  ! Model value t at oblocation.
-   real                         :: model_p  ! Model value p at oblocation.
-   real                         :: model_q  ! Model value q at oblocation.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_u  ! Model value u at oblocation.
+   real    :: model_v  ! Model value v at oblocation.
+   real    :: model_t  ! Model value t at oblocation.
+   real    :: model_p  ! Model value p at oblocation.
+   real    :: model_q  ! Model value q at oblocation.
 
-   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. location.
-   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. location.
+   real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
-   real :: hd, psfcm
-
-   real :: hsm , ho, to, qo
-
+   real    :: hd, psfcm
+   real    :: hsm , ho, to, qo
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
-
-   if (iv % num_sound < 1) return
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_sonde_sfc")
 
@@ -46,14 +39,14 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
       ! [1.1] Get horizontal interpolation weights:
 
-      i = iv%sonde_sfc(n)%loc%i
-      j = iv%sonde_sfc(n)%loc%j
-      dx = iv%sonde_sfc(n)%loc%dx
-      dy = iv%sonde_sfc(n)%loc%dy
+      i   = iv%sonde_sfc(n)%loc%i
+      j   = iv%sonde_sfc(n)%loc%j
+      dx  = iv%sonde_sfc(n)%loc%dx
+      dy  = iv%sonde_sfc(n)%loc%dy
       dxm = iv%sonde_sfc(n)%loc%dxm
       dym = iv%sonde_sfc(n)%loc%dym
 
-      !-----------------Surface correction
+      ! Surface correction
 
       iv%sonde_sfc(n)%p%inv = ob%sonde_sfc(n)%p
       iv%sonde_sfc(n)%t%inv = ob%sonde_sfc(n)%t
@@ -66,8 +59,8 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
          if (iv % sonde_sfc(n) % h > missing_r) then
             do k=kts,kte
-              v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
-                       + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
+               v_h(k) = dym*(dxm*xb%h(i,j  ,k) + dx*xb%h(i+1,j  ,k)) &
+                  + dy *(dxm*xb%h(i,j+1,k) + dx*xb%h(i+1,j+1,k))
             end do
 
             hd = v_h(kts) - iv % sonde_sfc(n) % h
@@ -86,8 +79,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
                   ! ob%sonde_sfc(n)%u = iv%sonde_sfc(n)%u%inv
                   ! ob%sonde_sfc(n)%v = iv%sonde_sfc(n)%v%inv
                else
-                  call da_to_zk(iv % sonde_sfc(n) % h, v_h, xp, v_interp_h, &
-                     iv%sonde_sfc(n)%zk)
+                  call da_to_zk(iv % sonde_sfc(n) % h, v_h, xp, v_interp_h, iv%sonde_sfc(n)%zk)
                end if
             else
                iv%sonde_sfc(n)%zk = missing_r
@@ -100,10 +92,10 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
             call da_to_zk(ob % sonde_sfc(n) % p, v_p, xp, v_interp_p, iv%sonde_sfc(n)%zk)
 
-            if (iv%sonde_sfc(n)%zk < 0.0 .and. .not.anal_type_verify ) then
-              iv % sonde_sfc(n) % p % inv = missing_r
-              iv % sonde_sfc(n) % p % qc  = missing
-              iv%sonde_sfc(n)%zk = 1.0+1.0e-6
+            if (iv%sonde_sfc(n)%zk < 0.0 .and. .not. anal_type_verify) then
+               iv % sonde_sfc(n) % p % inv = missing_r
+               iv % sonde_sfc(n) % p % qc  = missing
+               iv%sonde_sfc(n)%zk = 1.0+1.0e-6
             end if
          end if
 
@@ -118,7 +110,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
             iv % sonde_sfc(n) % q % qc = missing
             iv % sonde_sfc(n) % p % qc = missing
          else
-            !------------[1.2] Interpolate horizontally:
+            ! [1.2] Interpolate horizontally:
             call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
                                     model_u, iv%sonde_sfc(n)%zk)
             call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
@@ -131,55 +123,42 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
                                     model_p, iv%sonde_sfc(n)%zk)
          end if
       else if (sfc_assi_options == 2) then
-
-         !------- Surface data assimilation approca 2
-         !-------------------------------------------
-
          ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
          call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_u)
+            i, j, dx, dy, dxm, dym, model_u)
          call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_v)
+            i, j, dx, dy, dxm, dym, model_v)
          call da_interp_lin_2d( xb % t2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_t)
+            i, j, dx, dy, dxm, dym, model_t)
          call da_interp_lin_2d( xb % q2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_q)
+            i, j, dx, dy, dxm, dym, model_q)
          call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_p)
+            i, j, dx, dy, dxm, dym, model_p)
 
          if (iv%sonde_sfc(n)%p%qc >= 0) then
 
-            !.......... model surface p, t, q, h at observed site:
+            ! model surface p, t, q, h at observed site:
 
             call da_interp_lin_2d( xb % terr, ims, ime, jms, jme, &
-                              i, j, dx, dy, dxm, dym, &
-                              hsm)
+               i, j, dx, dy, dxm, dym, hsm)
 
             ho = iv%sonde_sfc(n)%h
             to = -888888.0
             qo = -888888.0
 
-            if (iv%sonde_sfc(n)%t%qc >= 0 .and. &
-                iv%sonde_sfc(n)%q%qc >= 0) then
+            if (iv%sonde_sfc(n)%t%qc >= 0 .and. iv%sonde_sfc(n)%q%qc >= 0) then
                to = ob%sonde_sfc(n)%t
                qo = ob%sonde_sfc(n)%q
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
-                                hsm, ho, to, qo)
-            else if (iv%sonde_sfc(n)%t%qc >= 0 .and. &
-                     iv%sonde_sfc(n)%q%qc < 0) then
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho, to, qo)
+            else if (iv%sonde_sfc(n)%t%qc >= 0 .and. iv%sonde_sfc(n)%q%qc < 0) then
                to = ob%sonde_sfc(n)%t
                call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho,to)
             else
                call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho)
             end if
 
-            !.......... Pressure at the observed height:
+            ! Pressure at the observed height:
             model_p = psfcm
          end if
       end if
@@ -188,36 +167,31 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
       ! [3.0] Fast interpolation:
       !-----------------------------------------------------------------------
 
-      if (ob % sonde_sfc(n) % u > missing_r .AND. &
-          iv % sonde_sfc(n) % u % qc >= obs_qc_pointer) then
+      if (ob % sonde_sfc(n) % u > missing_r .AND. iv % sonde_sfc(n) % u % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % u % inv = iv%sonde_sfc(n)%u%inv - model_u
       else
          iv % sonde_sfc(n) % u % inv = 0.0
       end if
 
-      if (ob % sonde_sfc(n) % v > missing_r .AND. &
-          iv % sonde_sfc(n) % v % qc >= obs_qc_pointer) then
+      if (ob % sonde_sfc(n) % v > missing_r .AND. iv % sonde_sfc(n) % v % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % v % inv = iv%sonde_sfc(n)%v%inv - model_v
       else
          iv % sonde_sfc(n) % v % inv = 0.0
       end if
 
-      if (ob % sonde_sfc(n) % p > 0.0 .AND. &
-          iv % sonde_sfc(n) % p % qc >= obs_qc_pointer) then
+      if (ob % sonde_sfc(n) % p > 0.0 .AND. iv % sonde_sfc(n) % p % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % p % inv = iv%sonde_sfc(n)%p%inv - model_p
       else
          iv % sonde_sfc(n) % p % inv = 0.0
       end if
 
-      if (ob % sonde_sfc(n) % t > 0.0 .AND. &
-          iv % sonde_sfc(n) % t % qc >= obs_qc_pointer) then
+      if (ob % sonde_sfc(n) % t > 0.0 .AND. iv % sonde_sfc(n) % t % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % t % inv = iv%sonde_sfc(n)%t%inv - model_t
       else
          iv % sonde_sfc(n) % t % inv = 0.0
       end if
 
-      if (ob % sonde_sfc(n) % q > 0.0 .AND. &
-          iv % sonde_sfc(n) % q % qc >= obs_qc_pointer) then
+      if (ob % sonde_sfc(n) % q > 0.0 .AND. iv % sonde_sfc(n) % q % qc >= obs_qc_pointer) then
          iv % sonde_sfc(n) % q % inv = iv%sonde_sfc(n)%q%inv - model_q
       else
          iv % sonde_sfc(n) % q % inv = 0.0
@@ -229,7 +203,7 @@ subroutine da_get_innov_vector_sonde_sfc( it, xb, xp, ob, iv)
 
       if (check_max_iv) then
          call da_check_max_iv_sonde_sfc(it, iv % sonde_sfc(n), &
-                       itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+            itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
       end if
    end do
 

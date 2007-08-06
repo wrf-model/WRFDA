@@ -1,38 +1,32 @@
 subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"       
+   ! Purpose: TBD    
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)            :: it       ! External iteration.
-   type(xb_type), intent(in)     :: xb       ! first guess state.
-   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type(y_type),  intent(inout)  :: ob       ! Observation structure.
-   type(ob_type), intent(inout)  :: iv       ! O-B structure.
+   integer,          intent(in)    :: it       ! External iteration.
+   type(xb_type),    intent(in)    :: xb       ! first guess state.
+   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob       ! Observation structure.
+   type(ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
-   integer                        :: num_levs ! Number of obs levels.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
 
-   real                           :: dx, dxm  ! Interpolation weights.
-   real                           :: dy, dym  ! Interpolation weights.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
 
-   real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
-   real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
+   real    :: model_u(1:max_ob_levels)  ! Model value u at ob location.
+   real    :: model_v(1:max_ob_levels)  ! Model value v at ob location.
 
-   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. location.
-   integer           :: itu,ituf,itvv,itvvf
-
-   if (iv % num_profiler < 1) return
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
+   integer :: itu,ituf,itvv,itvvf
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_profiler")
    
-
    itu   = 0; itvv    = 0;
    ituf  = 0; itvvf   = 0;
 
@@ -56,8 +50,7 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
       dym = iv%profiler(n)%loc%dym
 
       do k=kts,kte
-         v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-                + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+         v_p(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
       end do
 
       do k=1, iv % profiler(n) % info % levels
@@ -92,17 +85,13 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
          !----------------------------------------------------------------
 
          if (ob % profiler(n) % u(k) > missing_r .AND. &
-              iv % profiler(n) % u(k) % qc >= obs_qc_pointer) then
-
-            iv % profiler(n) % u(k) % inv = ob % profiler(n) % u(k) - &
-                                           model_u(k)
+             iv % profiler(n) % u(k) % qc >= obs_qc_pointer) then
+            iv % profiler(n) % u(k) % inv = ob % profiler(n) % u(k) - model_u(k)
          end if
 
          if (ob % profiler(n) % v(k) > missing_r .AND. &
-              iv % profiler(n) % v(k) % qc >= obs_qc_pointer) then
-
-            iv % profiler(n) % v(k) % inv = ob % profiler(n) % v(k) - &
-                                           model_v(k)
+             iv % profiler(n) % v(k) % qc >= obs_qc_pointer) then
+            iv % profiler(n) % v(k) % inv = ob % profiler(n) % v(k) - model_v(k)
          end if
       end do
 
@@ -111,8 +100,7 @@ subroutine da_get_innov_vector_profiler( it, xb, xp, ob, iv)
       !------------------------------------------------------------------
 
       if (check_max_iv) then  
-         call da_check_max_iv_profiler(it, iv % profiler(n), &
-            itu,ituf,itvv,itvvf)
+         call da_check_max_iv_profiler(it, iv % profiler(n), itu,ituf,itvv,itvvf)
       end if
    end do
 

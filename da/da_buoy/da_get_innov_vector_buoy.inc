@@ -1,44 +1,37 @@
 subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"       
+   ! Purpose: TBD    
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)           :: it      ! External iteration.
-   type(xb_type), intent(in)    :: xb      ! first guess state.
-   type(xpose_type), intent(in) :: xp      ! Domain decomposition vars.
-   type(y_type),  intent(inout) :: ob      ! Observation structure.
-   type(ob_type), intent(inout) :: iv      ! O-B structure.
+   integer,          intent(in)    :: it      ! External iteration.
+   type(xb_type),    intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob      ! Observation structure.
+   type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j, k  ! Index dimension.
-   real                         :: dx, dxm  ! Interpolation weights.
-   real                         :: dy, dym  ! Interpolation weights.
-   real                         :: model_u  ! Model value u at oblocation.
-   real                         :: model_v  ! Model value v at oblocation.
-   real                         :: model_t  ! Model value t at oblocation.
-   real                         :: model_p  ! Model value p at oblocation.
-   real                         :: model_q  ! Model value q at oblocation.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_u  ! Model value u at oblocation.
+   real    :: model_v  ! Model value v at oblocation.
+   real    :: model_t  ! Model value t at oblocation.
+   real    :: model_p  ! Model value p at oblocation.
+   real    :: model_q  ! Model value q at oblocation.
 
-   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. location.
-   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. location.
+   real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
-   real :: hd, psfcm
+   real    :: hd, psfcm
 
-   real :: hsm , ho, to, qo
+   real    :: hsm , ho, to, qo
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
-
-
-   if (iv % num_buoy < 1) return
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_buoy")
-
 
    itu   = 0; itvv    = 0; itp  = 0; itt  = 0; itqv  = 0;
    ituf  = 0; itvvf   = 0; itpf = 0; ittf = 0; itqvf = 0;
@@ -87,8 +80,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
                   ! ob%buoy(n)%u = iv%buoy(n)%u%inv
                   ! ob%buoy(n)%v = iv%buoy(n)%v%inv
                else
-                  call da_to_zk(iv % buoy(n) % h, v_h, xp, v_interp_h, &
-                     iv%buoy(n)%zk)
+                  call da_to_zk(iv % buoy(n) % h, v_h, xp, v_interp_h, iv%buoy(n)%zk)
                end if
             else
                iv%buoy(n)%zk = missing_r
@@ -99,13 +91,11 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
                        + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
             end do
 
-            call da_to_zk(ob % buoy(n) % p, v_p, xp, v_interp_p, &
-               iv%buoy(n)%zk)
+            call da_to_zk(ob % buoy(n) % p, v_p, xp, v_interp_p, iv%buoy(n)%zk)
 
             if (iv%buoy(n)%zk < 0.0 .and.  .not.anal_type_verify) then
                iv % buoy(n) % p % inv = missing_r
                iv % buoy(n) % p % qc  = missing
-
                iv%buoy(n)%zk = 1.0+1.0e-6
             end if
          end if
@@ -123,15 +113,15 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
          else
             ! [1.2] Interpolate horizontally:
             call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
-                                      model_u, iv%buoy(n)%zk)
+               model_u, iv%buoy(n)%zk)
             call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
-                                      model_v, iv%buoy(n)%zk)
+               model_v, iv%buoy(n)%zk)
             call da_interp_obs_lin_2d( xb % t, i, j, dx, dy, dxm, dym, &
-                                      model_t, iv%buoy(n)%zk)
+               model_t, iv%buoy(n)%zk)
             call da_interp_obs_lin_2d( xb % q, i, j, dx, dy, dxm, dym, &
-                                      model_q, iv%buoy(n)%zk)
+               model_q, iv%buoy(n)%zk)
             call da_interp_obs_lin_2d( xb % p, i, j, dx, dy, dxm, dym, &
-                                      model_p, iv%buoy(n)%zk)
+               model_p, iv%buoy(n)%zk)
          end if
       else if (sfc_assi_options == 2) then
 
@@ -142,27 +132,21 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
          ! and sfc_p)
 
          call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_u)
+            i, j, dx, dy, dxm, dym, model_u)
          call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_v)
+            i, j, dx, dy, dxm, dym, model_v)
          call da_interp_lin_2d( xb % t2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_t)
+            i, j, dx, dy, dxm, dym, model_t)
          call da_interp_lin_2d( xb % q2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_q)
+            i, j, dx, dy, dxm, dym, model_q)
          call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_p)
+            i, j, dx, dy, dxm, dym, model_p)
 
          if (iv%buoy(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
             call da_interp_lin_2d( xb % terr, ims, ime, jms,jme,&
-                              i, j, dx, dy, dxm, dym, &
-                              hsm)
+               i, j, dx, dy, dxm, dym, hsm)
 
             ho = iv%buoy(n)%h
             to = -888888.0
@@ -171,8 +155,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
             if (iv%buoy(n)%t%qc >= 0 .and. iv%buoy(n)%q%qc >= 0) then
                to = ob%buoy(n)%t
                qo = ob%buoy(n)%q
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
-                  hsm, ho, to, qo)
+               call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho, to, qo)
             else if (iv%buoy(n)%t%qc >= 0 .and. iv%buoy(n)%q%qc < 0) then
                to = ob%buoy(n)%t
                call da_sfc_pre(psfcm, model_p, model_t, model_q, hsm, ho, to)
@@ -189,36 +172,31 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
       ! [3.0] Fast interpolation: 
       !-----------------------------------------------------------------------
 
-      if (ob % buoy(n) % u > missing_r .AND. &
-          iv % buoy(n) % u % qc >= obs_qc_pointer) then
+      if (ob % buoy(n) % u > missing_r .AND. iv % buoy(n) % u % qc >= obs_qc_pointer) then
          iv % buoy(n) % u % inv = iv%buoy(n)%u%inv - model_u
       else
          iv % buoy(n) % u % inv = 0.0
       end if
 
-      if (ob % buoy(n) % v > missing_r .AND. &
-          iv % buoy(n) % v % qc >= obs_qc_pointer) then
+      if (ob % buoy(n) % v > missing_r .AND. iv % buoy(n) % v % qc >= obs_qc_pointer) then
          iv % buoy(n) % v % inv = iv%buoy(n)%v%inv - model_v
       else
          iv % buoy(n) % v % inv = 0.0
       end if
 
-      if (ob % buoy(n) % p > 0.0 .AND. &
-          iv % buoy(n) % p % qc >= obs_qc_pointer) then
+      if (ob % buoy(n) % p > 0.0 .AND. iv % buoy(n) % p % qc >= obs_qc_pointer) then
          iv % buoy(n) % p % inv = iv%buoy(n)%p%inv - model_p
       else
          iv % buoy(n) % p % inv = 0.0
       end if
 
-      if (ob % buoy(n) % t > 0.0 .AND. &
-          iv % buoy(n) % t % qc >= obs_qc_pointer) then
+      if (ob % buoy(n) % t > 0.0 .AND. iv % buoy(n) % t % qc >= obs_qc_pointer) then
          iv % buoy(n) % t % inv = iv%buoy(n)%t%inv - model_t
       else
          iv % buoy(n) % t % inv = 0.0
       end if
 
-      if (ob % buoy(n) % q > 0.0 .AND. &
-          iv % buoy(n) % q % qc >= obs_qc_pointer) then
+      if (ob % buoy(n) % q > 0.0 .AND. iv % buoy(n) % q % qc >= obs_qc_pointer) then
          iv % buoy(n) % q % inv = iv%buoy(n)%q%inv - model_q
       else
          iv % buoy(n) % q % inv = 0.0
@@ -236,7 +214,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
 
    if (rootproc .and. check_max_iv_print) then
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-         ', Total Rejections for Buoy follows:'
+         ', Total rejections for buoy follows:'
 
       write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
          'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
@@ -244,7 +222,7 @@ subroutine da_get_innov_vector_buoy( it, xb, xp, ob, iv)
          'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
          'Number of failed temperature observations:',ittf, ' on ',itt,   &
          'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-         'Finally Total Buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+         'Finally total buoy rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
                                             itu +itvv +itp +itt +itqv
    end if
    

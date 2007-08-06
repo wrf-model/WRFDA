@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_gpspw( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_gpspw (it, xb, xp, ob, iv)
 
    !----------------------------------------------------------------
    ! Purpose: TBD
@@ -6,39 +6,36 @@ subroutine da_get_innov_vector_gpspw( it, xb, xp, ob, iv)
 
    implicit none
 
-   integer, intent(in)           :: it      ! External iteration.
-   type(xb_type), intent(in)    :: xb      ! first guess state.
-   type(xpose_type), intent(in) :: xp      ! Domain decomposition vars.
-   type(y_type),  intent(inout) :: ob      ! Observation structure.
-   type(ob_type), intent(inout) :: iv      ! O-B structure.
+   integer,          intent(in)    :: it      ! External iteration.
+   type(xb_type),    intent(in)    :: xb      ! first guess state.
+   type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob      ! Observation structure.
+   type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j     ! Index dimension.
-   real                         :: dx, dxm  ! Interpolation weights.
-   real                         :: dy, dym  ! Interpolation weights.
-   real                         :: model_tpw! Model value u at oblocation.
-   integer           :: ittpw,ittpwf
+   integer :: n        ! Loop counter.
+   integer :: i, j     ! Index dimension.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_tpw! Model value u at oblocation.
+   integer :: ittpw,ittpwf
 
    !--------------------------------------------------------------------------
-   integer                :: k            ! Index dimension
-   real                   :: dpw, ddpw    ! adjustment pw [mm]
-   real                   :: obs_terr     ! real terrain height at GPS site [m]
-   real                   :: model_terr   ! model terrain height at GPS site[m]
-   real,dimension(kts:kte):: model_q ! model q at GPS site [kg/kg]
-   real,dimension(kts:kte):: model_z ! model z at GPS site [m]
-   real,dimension(kts:kte):: model_rho ! model rho at GPS site [kg/m^3]
+   integer :: k            ! Index dimension
+   real    :: dpw, ddpw    ! adjustment pw [mm]
+   real    :: obs_terr     ! real terrain height at GPS site [m]
+   real    :: model_terr   ! model terrain height at GPS site[m]
+   real    :: model_q(kts:kte) ! model q at GPS site [kg/kg]
+   real    :: model_z(kts:kte) ! model z at GPS site [m]
+   real    :: model_rho(kts:kte) ! model rho at GPS site [kg/m^3]
 
    ! unit_gps = myproc + 140
    !---------------------------------------------------------------------------
 
-   !
    ! GPS TPW Pseudo OBS test:
-   !
    if (pseudo_var(1:3) == 'tpw' .and. num_pseudo > 0) then
       ! Deallocate:
       if (iv%num_gpspw > 0) then
-         write(unit=stdout, fmt='(a,i4)') &
-            'iv%num_gpspw =', iv%num_gpspw
+         write(unit=stdout, fmt='(a,i4)') 'iv%num_gpspw =', iv%num_gpspw
          deallocate(iv % gpspw)
          deallocate(ob % gpspw)
       end if

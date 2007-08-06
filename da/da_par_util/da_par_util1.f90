@@ -3,11 +3,23 @@ module da_par_util1
    use da_control, only : rootproc, ierr, comm, root
 
 #ifdef DM_PARALLEL
+
+#if ( DWORDSIZE != RWORDSIZE )
+   use mpi, only : mpi_sum, mpi_integer, mpi_complex, mpi_real
+
+#ifndef RSL_LITE
+   use module_dm, only : rsl_real
+#endif
+
+#else
+   use mpi, only : mpi_sum, mpi_integer, mpi_double_complex, mpi_real8
+
 #ifndef RSL_LITE
    use module_dm, only : rsl_double
 #endif
-   use mpi, only : mpi_double_complex, mpi_real8, mpi_sum, &
-      mpi_integer
+
+#endif
+
 #endif
 
    !---------------------------------------------------------------------------

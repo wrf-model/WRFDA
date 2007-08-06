@@ -1,5 +1,4 @@
-subroutine da_residual_ssmi(oi, y, re, np_missing, np_bad_data, np_obs_used, &
-   np_available)
+subroutine da_residual_ssmi(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -7,16 +6,19 @@ subroutine da_residual_ssmi(oi, y, re, np_missing, np_bad_data, np_obs_used, &
 
    implicit none
 
-   type (ob_type), intent(in)        :: oi     ! Obs increment vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(out)       :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Obs increment vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(out)   :: re     ! Residual structure.
 
-   integer       , intent(inout)     :: np_available,np_obs_used,np_missing,np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
-   if (oi%num_ssmi_tb > 0) then
-      call da_residual_ssmi_tb (oi, y, re, np_missing, np_bad_data, np_obs_used, np_available)
-   else if (oi%num_ssmi_retrieval > 0) then
-      call da_residual_ssmi_rv (oi, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+   if (iv%num_ssmi_tb > 0) then
+      call da_residual_ssmi_tb (iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
+   else if (iv%num_ssmi_retrieval > 0) then
+      call da_residual_ssmi_rv (iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
    end if
 
 end subroutine da_residual_ssmi

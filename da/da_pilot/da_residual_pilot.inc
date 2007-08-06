@@ -1,6 +1,4 @@
-subroutine da_residual_pilot(oi, y, re,                        &
-                                        np_missing, np_bad_data,          &
-                                        np_obs_used, np_available)
+subroutine da_residual_pilot(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
    !-----------------------------------------------------------------------
    ! Purpose: Calculate residuals for pilots
@@ -8,37 +6,32 @@ subroutine da_residual_pilot(oi, y, re,                        &
 
    implicit none
 
-   type (ob_type), intent(in)        :: oi     ! Innovation vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(inout)     :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                       np_missing  , np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
    integer                           :: n, k
 
-   if (oi%num_Pilot > 0) then
-      n_obs_bad % u % num = number_type(0, 0, 0)
-      n_obs_bad % v % num = number_type(0, 0, 0)
+   n_obs_bad % u % num = number_type(0, 0, 0)
+   n_obs_bad % v % num = number_type(0, 0, 0)
 
-      do n=1, oi%num_Pilot
-         do k=1, oi%Pilot(n)%info%levels
-            np_available = np_available + 2
-            re%Pilot(n)%u(k) = da_residual(n, k, y%Pilot(n)%u(k), &
-                                  oi%Pilot(n)%u(k), n_obs_bad % u)
-            re%Pilot(n)%v(k) = da_residual(n, k, y%Pilot(n)%v(k), &
-                                  oi%Pilot(n)%v(k), n_obs_bad % v)
-         end do
+   do n=1, iv%num_pilot
+      do k=1, iv%pilot(n)%info%levels
+         np_available = np_available + 2
+         re%pilot(n)%u(k) = da_residual(n, k, y%pilot(n)%u(k), iv%pilot(n)%u(k), n_obs_bad % u)
+         re%pilot(n)%v(k) = da_residual(n, k, y%pilot(n)%v(k), iv%pilot(n)%v(k), n_obs_bad % v)
       end do
+   end do
 
-      np_missing = np_missing + n_obs_bad % u % num % miss + &
-                  n_obs_bad % v % num % miss
-      np_bad_data = np_bad_data + n_obs_bad % u % num % bad + &
-                   n_obs_bad % v % num % bad 
-      np_obs_used = np_obs_used + n_obs_bad % u % num % use + &
-                   n_obs_bad % v % num % use
-   end if
+   np_missing = np_missing + n_obs_bad % u % num % miss + n_obs_bad % v % num % miss
+   np_bad_data = np_bad_data + n_obs_bad % u % num % bad + n_obs_bad % v % num % bad 
+   np_obs_used = np_obs_used + n_obs_bad % u % num % use + n_obs_bad % v % num % use
 
 end subroutine da_residual_pilot
 

@@ -4,27 +4,23 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
    ! Purpose: TBD
    !-----------------------------------------------------------------------
 
-   ! ------------------------------------------------------------------------
-   ! Called by da_obs/da_get_innov_vector.inc
-   ! ------------------------------------------------------------------------
-
    implicit none
 
-   integer, intent(in)             :: it       ! External iteration.
-   type(xb_type), intent(in)      :: xb       ! first guess state.
-   type(xpose_type), intent(in)   :: xp       ! Domain decomposition vars.
-   type(y_type),  intent(inout)   :: ob       ! Observation structure.
-   type(ob_type), intent(inout)   :: iv       ! O-B structure.
+   integer,          intent(in)    :: it       ! External iteration.
+   type(xb_type),    intent(in)    :: xb       ! first guess state.
+   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob       ! Observation structure.
+   type(ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   integer                         :: n        ! Loop counter.
-   integer                         :: i, j, k  ! Index dimension.
-   integer                         :: num_levs ! Number of obs levels.
-   real                            :: dx, dxm  ! Interpolation weights.
-   real                            :: dy, dym  ! Interpolation weights.
-   real, dimension(1:max_ob_levels) :: model_ref !Model gpsref at ob loc
-   real, dimension(kms:kme)   :: v_h     ! Model value h at ob
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_ref(1:max_ob_levels) !Model gpsref at ob loc
+   real    :: v_h(kms:kme)     ! Model value h at ob
                                                ! hor. location.
-   integer           :: pref, fref
+   integer :: pref, fref
 
    ! For quality control
 
@@ -37,9 +33,8 @@ subroutine da_get_innov_vector_gpsref( it, xb, xp, ob, iv)
 
    integer :: nn, n1, ntotal, nqc0, nqc1, nqc2, nqc3
    real    :: percnt
-   character(len=40), dimension(5000) :: name_qc
-   real              , dimension(5000) :: height_below
-
+   real    :: height_below(5000)
+   character(len=40) :: name_qc(5000)
 
    ! GPS REF Pseudo OBS test:
 

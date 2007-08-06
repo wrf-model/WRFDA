@@ -1,4 +1,4 @@
-subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
+subroutine da_get_innov_vector_ssmt2 (it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -6,27 +6,25 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
 
    implicit none
 
-   integer, intent(in)            :: it       ! External iteration.
-   type(xb_type), intent(in)     :: xb       ! first guess state.
-   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type(y_type),  intent(inout)  :: ob       ! Observation structure.
-   type(ob_type), intent(inout)  :: iv       ! O-B structure.
+   integer,          intent(in)    :: it       ! External iteration.
+   type(xb_type),    intent(in)    :: xb       ! first guess state.
+   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob       ! Observation structure.
+   type(ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
-   integer                        :: num_levs ! Number of obs levels.
-   real                           :: dx, dxm  ! Interpolation weights.
-   real                           :: dy, dym  ! Interpolation weights.
-   real, dimension(1:max_ob_levels):: model_rh ! Model value rh at ob location.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_rh(1:max_ob_levels) ! Model value rh at ob location.
 
-   real                            :: zk       ! Interpolation vertical coordinator.
+   real    :: zk       ! Interpolation vertical coordinator.
 
-   real, dimension(kms:kme)  :: v_h      ! Model value h at ob hor. location.
-   real, dimension(kms:kme)  :: v_p      ! Model value p at ob hor. location.
+   real    :: v_h(kms:kme)      ! Model value h at ob hor. location.
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
-   integer                         :: irh, irhf
-   
-   if (iv % num_ssmt2 < 1) return
+   integer :: irh, irhf
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_ssmt2")
    
@@ -82,14 +80,13 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
       ! [1.2] Interpolate horizontally to ob:
 
       call da_interp_lin_3d( xb % rh, i, j, dx, dy, dxm, dym, &
-                          model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
+         model_rh, max_ob_levels, iv%ssmt2(n)%zk, num_levs)
 
       !--------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:
       !--------------------------------------------------------------------
 
       do k = 1, iv % ssmt2(n) % info % levels
-
          iv % ssmt2(n) % rh(k) % inv = 0.0
 
          !-----------------------------------------------------------------
@@ -97,10 +94,8 @@ subroutine da_get_innov_vector_ssmt2( it, xb, xp, ob, iv)
          !-----------------------------------------------------------------
 
          if (ob % ssmt2(n) % rh(k) > missing_r .AND. &
-            iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer) then
-
-            iv % ssmt2(n) % rh(k) % inv = ob % ssmt2(n) % rh(k) - &
-                                         model_rh(k)
+             iv % ssmt2(n) % rh(k) % qc >= obs_qc_pointer) then
+            iv % ssmt2(n) % rh(k) % inv = ob % ssmt2(n) % rh(k) - model_rh(k)
          end if
 
          ! write(122,'(2i4,i8,5f15.5)')n, k, iv%ssmt2(n)%height_qc(k), &

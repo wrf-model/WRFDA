@@ -2,39 +2,34 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer,           intent(in)    :: it      ! External iteration.
+   integer,          intent(in)    :: it      ! External iteration.
    type(xb_type),    intent(in)    :: xb      ! first guess state.
    type(xpose_type), intent(in)    :: xp      ! Domain decomposition vars.
    type(y_type),     intent(inout) :: ob      ! Observation structure.
    type(ob_type),    intent(inout) :: iv      ! O-B structure.
 
-   integer                      :: n        ! Loop counter.
-   integer                      :: i, j, k  ! Index dimension.
-   real                         :: dx, dxm  ! Interpolation weights.
-   real                         :: dy, dym  ! Interpolation weights.
-   real                         :: model_u  ! Model value u at oblocation.
-   real                         :: model_v  ! Model value v at oblocation.
-   real                         :: model_t  ! Model value t at oblocation.
-   real                         :: model_p  ! Model value p at oblocation.
-   real                         :: model_q  ! Model value q at oblocation.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
+   real    :: model_u  ! Model value u at oblocation.
+   real    :: model_v  ! Model value v at oblocation.
+   real    :: model_t  ! Model value t at oblocation.
+   real    :: model_p  ! Model value p at oblocation.
+   real    :: model_q  ! Model value q at oblocation.
 
-   real, dimension(kms:kme) :: v_h      ! Model value h at ob hor. loc
-   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. loc
+   real    :: v_h(kms:kme)      ! Model value h at ob hor. loc
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. loc
 
-   real :: hd, psfcm
+   real    :: hd, psfcm
 
-   real :: hsm , ho, to, qo
+   real    :: hsm , ho, to, qo
 
    integer :: itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf
-
-   if (iv % num_synop < 1) return
     
    if (trace_use) call da_trace_entry("da_get_innov_vector_synop")
 
@@ -52,7 +47,7 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
       dxm = iv%synop(n)%loc%dxm
       dym = iv%synop(n)%loc%dym
 
-      !-----------------Surface correction
+      ! Surface correction
 
       iv%synop(n)%p%inv = ob%synop(n)%p
       iv%synop(n)%t%inv = ob%synop(n)%t
@@ -71,7 +66,6 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
             hd = v_h(kts) - iv % synop(n) % h
             if (abs(hd) <= Max_StHeight_Diff .or.  anal_type_verify ) then
-
                if (iv % synop(n) % h < v_h(kts)) then
                   iv%synop(n)%zk = 1.0+1.0e-6
                   call da_obs_sfc_correction(iv%synop(n), xb)
@@ -118,16 +112,11 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
             iv % synop(n) % p % qc = missing
          else
             ! [1.2] Interpolate horizontally:
-            call da_interp_obs_lin_2d( xb % u, i, j, dx, dy, dxm, dym, &
-                                     model_u, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % v, i, j, dx, dy, dxm, dym, &
-                                     model_v, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % t, i, j, dx, dy, dxm, dym, &
-                                      model_t, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % q, i, j, dx, dy, dxm, dym, &
-                                     model_q, iv%synop(n)%zk)
-            call da_interp_obs_lin_2d( xb % p, i, j, dx, dy, dxm, dym, &
-                                     model_p, iv%synop(n)%zk)
+            call da_interp_obs_lin_2d (xb % u, i, j, dx, dy, dxm, dym, model_u, iv%synop(n)%zk)
+            call da_interp_obs_lin_2d (xb % v, i, j, dx, dy, dxm, dym, model_v, iv%synop(n)%zk)
+            call da_interp_obs_lin_2d (xb % t, i, j, dx, dy, dxm, dym, model_t, iv%synop(n)%zk)
+            call da_interp_obs_lin_2d (xb % q, i, j, dx, dy, dxm, dym, model_q, iv%synop(n)%zk)
+            call da_interp_obs_lin_2d (xb % p, i, j, dx, dy, dxm, dym, model_p, iv%synop(n)%zk)
          end if
       else if (sfc_assi_options == 2) then
          ! Surface data assimilation approca 2
@@ -135,27 +124,16 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
 
          ! 1.2.1 Surface assimilation approach 2(10-m u, v, 2-m t, q, and sfc_p)
 
-         call da_interp_lin_2d( xb % u10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_u)
-         call da_interp_lin_2d( xb % v10, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_v)
-         call da_interp_lin_2d( xb % t2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_t)
-         call da_interp_lin_2d( xb % q2, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_q)
-         call da_interp_lin_2d( xb % psfc, ims, ime, jms, jme, &
-                             i, j, dx, dy, dxm, dym, &
-                             model_p)
+         call da_interp_lin_2d (xb % u10,  ims, ime, jms, jme, i, j, dx, dy, dxm, dym, model_u)
+         call da_interp_lin_2d (xb % v10,  ims, ime, jms, jme, i, j, dx, dy, dxm, dym, model_v)
+         call da_interp_lin_2d (xb % t2,   ims, ime, jms, jme, i, j, dx, dy, dxm, dym, model_t)
+         call da_interp_lin_2d (xb % q2,   ims, ime, jms, jme, i, j, dx, dy, dxm, dym, model_q)
+         call da_interp_lin_2d (xb % psfc, ims, ime, jms, jme, i, j, dx, dy, dxm, dym, model_p)
 
          if (iv%synop(n)%p%qc >= 0) then
             ! model surface p, t, q, h at observed site:
 
-            call da_interp_lin_2d( xb % terr, ims, ime, jms, &
-               jme, i, j, dx, dy, dxm, dym, hsm)
+            call da_interp_lin_2d (xb % terr, ims, ime, jms, jme, i, j, dx, dy, dxm, dym, hsm)
 
             ho = iv%synop(n)%h
             to = -888888.0
@@ -164,15 +142,12 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
             if (iv%synop(n)%t%qc >= 0 .and. iv%synop(n)%q%qc >= 0) then
                to = ob%synop(n)%t
                qo = ob%synop(n)%q
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
-                                 hsm, ho, to, qo)
+               call da_sfc_pre (psfcm, model_p, model_t, model_q, hsm, ho, to, qo)
             else if (iv%synop(n)%t%qc >= 0 .and. iv%synop(n)%q%qc < 0) then
                to = ob%synop(n)%t
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
-                                 hsm, ho, to)
+               call da_sfc_pre (psfcm, model_p, model_t, model_q, hsm, ho, to)
             else
-               call da_sfc_pre(psfcm, model_p, model_t, model_q, &
-                                 hsm, ho)
+               call da_sfc_pre (psfcm, model_p, model_t, model_q, hsm, ho)
             end if
 
             ! Pressure at the observed height:
@@ -184,63 +159,58 @@ subroutine da_get_innov_vector_synop( it, xb, xp, ob, iv)
       !     [3.0] Fast interpolation:
       !--------------------------------------------------------------------
 
-      if (ob % synop(n) % u > missing_r .AND. &
-          iv % synop(n) % u % qc >= obs_qc_pointer) then
+      if (ob % synop(n) % u > missing_r .AND. iv % synop(n) % u % qc >= obs_qc_pointer) then
          iv % synop(n) % u % inv = iv%synop(n)%u%inv - model_u
       else
          iv % synop(n) % u % inv = 0.0
       end if
 
-      if (ob % synop(n) % v > missing_r .AND. &
-          iv % synop(n) % v % qc >= obs_qc_pointer) then
+      if (ob % synop(n) % v > missing_r .AND. iv % synop(n) % v % qc >= obs_qc_pointer) then
          iv % synop(n) % v % inv = iv%synop(n)%v%inv - model_v
       else
          iv % synop(n) % v % inv = 0.0
       end if
 
-      if (ob % synop(n) % p > 0.0 .AND. &
-          iv % synop(n) % p % qc >= obs_qc_pointer) then
+      if (ob % synop(n) % p > 0.0 .AND. iv % synop(n) % p % qc >= obs_qc_pointer) then
          iv % synop(n) % p % inv = iv%synop(n)%p%inv - model_p
       else
          iv % synop(n) % p % inv = 0.0
       end if
 
-      if (ob % synop(n) % t > 0.0 .AND. &
-         iv % synop(n) % t % qc >= obs_qc_pointer) then
+      if (ob % synop(n) % t > 0.0 .AND. iv % synop(n) % t % qc >= obs_qc_pointer) then
          iv % synop(n) % t % inv = iv%synop(n)%t%inv - model_t
       else
          iv % synop(n) % t % inv = 0.0
       end if
 
-      if (ob % synop(n) % q > 0.0 .AND. &
-         iv % synop(n) % q % qc >= obs_qc_pointer) then
+      if (ob % synop(n) % q > 0.0 .AND. iv % synop(n) % q % qc >= obs_qc_pointer) then
          iv % synop(n) % q % inv = iv%synop(n)%q%inv - model_q
       else
          iv % synop(n) % q % inv = 0.0
       end if
 
       !--------------------------------------------------------------------
-      !     [5.0] Perform optional maximum error check:
+      ! [5.0] Perform optional maximum error check:
       !--------------------------------------------------------------------
 
       if (check_max_iv) then
          call da_check_max_iv_synop(it, iv % synop(n), &
-                      itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
+            itu,ituf,itvv,itvvf,itp,itpf,itt,ittf,itqv,itqvf)
       end if
    end do
 
    if (rootproc .and. check_max_iv_print) then
       write(unit= check_max_iv_unit, fmt ='(A,i5,A)')'For outer iteration ',it, &
-        ', Total Rejections for Synop follows:'
+         ', Total Rejections for Synop follows:'
 
       write(unit = check_max_iv_unit, fmt = '(/,10(2(A,I6),/))') &
-        'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
-        'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
-        'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
-        'Number of failed temperature observations:',ittf, ' on ',itt,   &
-        'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
-        'Finally Total Synop rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
-                                          itu +itvv +itp +itt +itqv
+         'Number of failed u-wind observations:     ',ituf, ' on ',itu,   &
+         'Number of failed v-wind observations:     ',itvvf,' on ',itvv,   &
+         'Number of failed pressure observations:   ',itpf, ' on ',itp,   &
+         'Number of failed temperature observations:',ittf, ' on ',itt,   &
+         'Number of failed mixing ratio observations:',itqvf,' on ',itqv, &
+         'Finally Total Synop rejections ',ituf+itvvf+itpf+ittf+itqvf,' on ',&
+         itu +itvv +itp +itt +itqv
    end if
     
    if (trace_use) call da_trace_exit("da_get_innov_vector_synop")

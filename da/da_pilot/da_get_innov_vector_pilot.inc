@@ -1,35 +1,30 @@
 subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
 
    !-----------------------------------------------------------------------
-   ! Purpose: TBD
-   ! Update :
-   !     01/24/2007    Syed RH Rizvi
-   !     Updated for "VERIFY"       
+   ! Purpose: TBD     
    !-----------------------------------------------------------------------
 
    implicit none
 
-   integer, intent(in)            :: it       ! External iteration.
-   type(xb_type), intent(in)     :: xb       ! first guess state.
-   type(xpose_type), intent(in)  :: xp       ! Domain decomposition vars.
-   type(y_type),  intent(inout)  :: ob       ! Observation structure.
-   type(ob_type), intent(inout)  :: iv       ! O-B structure.
+   integer,          intent(in)    :: it       ! External iteration.
+   type(xb_type),    intent(in)    :: xb       ! first guess state.
+   type(xpose_type), intent(in)    :: xp       ! Domain decomposition vars.
+   type(y_type),     intent(inout) :: ob       ! Observation structure.
+   type(ob_type),    intent(inout) :: iv       ! O-B structure.
 
-   integer                        :: n        ! Loop counter.
-   integer                        :: i, j, k  ! Index dimension.
-   integer                        :: num_levs ! Number of obs levels.
+   integer :: n        ! Loop counter.
+   integer :: i, j, k  ! Index dimension.
+   integer :: num_levs ! Number of obs levels.
 
-   real                           :: dx, dxm  ! Interpolation weights.
-   real                           :: dy, dym  ! Interpolation weights.
+   real    :: dx, dxm  ! Interpolation weights.
+   real    :: dy, dym  ! Interpolation weights.
 
-   real, dimension(1:max_ob_levels) :: model_u  ! Model value u at ob location.
-   real, dimension(1:max_ob_levels) :: model_v  ! Model value v at ob location.
+   real    :: model_u(1:max_ob_levels)  ! Model value u at ob location.
+   real    :: model_v(1:max_ob_levels)  ! Model value v at ob location.
 
-   real, dimension(kms:kme) :: v_p      ! Model value p at ob hor. location.
+   real    :: v_p(kms:kme)      ! Model value p at ob hor. location.
 
-   integer           :: itu,ituf,itvv,itvvf
-
-   if (iv % num_pilot < 1) return
+   integer :: itu,ituf,itvv,itvvf
    
    if (trace_use) call da_trace_entry("da_get_innov_vector_pilot")
 
@@ -57,50 +52,47 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
       dym = iv%pilot(n)%loc%dym
 
       do k=kts,kte
-        v_p(k) = dym*(dxm*xb%p(i,j  ,k) + dx*xb%p(i+1,j  ,k)) &
-               + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
+         v_p(k) = dym*(dxm*xb%p(i,j,k) + dx*xb%p(i+1,j,k)) + dy *(dxm*xb%p(i,j+1,k) + dx*xb%p(i+1,j+1,k))
       end do
 
       do k=1, iv % pilot(n) % info % levels
-        iv%pilot(n)%zk(k)=missing_r
+         iv%pilot(n)%zk(k)=missing_r
 
-        if (iv % pilot(n) % p(k) > 1.0) then
-          call da_to_zk(iv % pilot(n) % p(k), v_p, xp, v_interp_p, iv%pilot(n)%zk(k))
-        end if
+         if (iv % pilot(n) % p(k) > 1.0) then
+            call da_to_zk(iv % pilot(n) % p(k), v_p, xp, v_interp_p, iv%pilot(n)%zk(k))
+         end if
 
-        if (iv%pilot(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
-          iv % pilot(n) % u(k) % qc = missing
-          iv % pilot(n) % v(k) % qc = missing
-        end if
+         if (iv%pilot(n)%zk(k) < 0.0 .and.  .not.anal_type_verify) then
+            iv % pilot(n) % u(k) % qc = missing
+            iv % pilot(n) % v(k) % qc = missing
+         end if
       end do
 
       ! [1.4] Interpolate horizontally:
       call da_interp_lin_3d( xb % u, i, j, dx, dy, dxm, dym, &
-                         model_u, max_ob_levels, iv%pilot(n)%zk, num_levs)
+          model_u, max_ob_levels, iv%pilot(n)%zk, num_levs)
       call da_interp_lin_3d( xb % v, i, j, dx, dy, dxm, dym, &
-                         model_v, max_ob_levels, iv%pilot(n)%zk, num_levs)
+         model_v, max_ob_levels, iv%pilot(n)%zk, num_levs)
 
       !------------------------------------------------------------------------
       ! [2.0] Initialise components of innovation vector:
       !------------------------------------------------------------------------
 
       do k = 1, iv % pilot(n) % info % levels
-        iv % pilot(n) % u(k) % inv = 0.0
-        iv % pilot(n) % v(k) % inv = 0.0
+         iv % pilot(n) % u(k) % inv = 0.0
+         iv % pilot(n) % v(k) % inv = 0.0
 
-        !------------------------------------------------------------------------
-        ! [4.0] Fast interpolation:
-        !------------------------------------------------------------------------
+         !------------------------------------------------------------------------
+         ! [4.0] Fast interpolation:
+         !------------------------------------------------------------------------
 
-        if (ob % pilot(n) % u(k) > missing_r .AND. &
-             iv % pilot(n) % u(k) % qc >= obs_qc_pointer) then
-          iv % pilot(n) % u(k) % inv = ob % pilot(n) % u(k) - model_u(k)
-        end if
+         if (ob % pilot(n) % u(k) > missing_r .AND. iv % pilot(n) % u(k) % qc >= obs_qc_pointer) then
+            iv % pilot(n) % u(k) % inv = ob % pilot(n) % u(k) - model_u(k)
+         end if
 
-        if (ob % pilot(n) % v(k) > missing_r .AND. &
-             iv % pilot(n) % v(k) % qc >= obs_qc_pointer) then
-          iv % pilot(n) % v(k) % inv = ob % pilot(n) % v(k) - model_v(k)
-        end if
+         if (ob % pilot(n) % v(k) > missing_r .AND. iv % pilot(n) % v(k) % qc >= obs_qc_pointer) then
+            iv % pilot(n) % v(k) % inv = ob % pilot(n) % v(k) - model_v(k)
+         end if
       end do
 
       !------------------------------------------------------------------------
@@ -108,7 +100,7 @@ subroutine da_get_innov_vector_pilot( it, xb, xp, ob, iv)
       !------------------------------------------------------------------------
 
       if (check_max_iv) then
-        call da_check_max_iv_pilot(it, iv % pilot(n), itu,ituf,itvv,itvvf)
+         call da_check_max_iv_pilot(it, iv % pilot(n), itu,ituf,itvv,itvvf)
       end if
    end do
 

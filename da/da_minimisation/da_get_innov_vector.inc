@@ -35,32 +35,31 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          call da_setup_firstguess (xbx, grid)
       end if
 
-      if (use_soundobs) then
-         call da_get_innov_vector_sound (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_sound > 0) then
+         call da_get_innov_vector_sound     (it, grid%xb, grid%xp, ob, iv)
          call da_get_innov_vector_sonde_sfc (it, grid%xb, grid%xp, ob, iv)
       end if
 
-      if (use_synopobs) call da_get_innov_vector_synop (it, grid%xb, grid%xp, ob, iv)
-      if (use_geoamvobs) call da_get_innov_vector_geoamv (it, grid%xb, grid%xp, ob, iv)
-      if (use_polaramvobs) call da_get_innov_vector_polaramv (it, grid%xb, grid%xp, ob, iv)
-      if (use_airepobs) call da_get_innov_vector_airep (it, grid%xb, grid%xp, ob, iv)
-      if (use_pilotobs) call da_get_innov_vector_pilot (it, grid%xb, grid%xp, ob, iv)
-      if (use_bogusobs) call da_get_innov_vector_bogus (it, grid%xb, grid%xp, ob, iv)
-      if (use_metarobs) call da_get_innov_vector_metar (it, grid%xb, grid%xp, ob, iv)
-      if (use_shipsobs) call da_get_innov_vector_ships (it, grid%xb, grid%xp, ob, iv)
-      if (use_gpspwobs) call da_get_innov_vector_gpspw (it, grid%xb, grid%xp, ob, iv)
-      if (use_gpsrefobs) call da_get_innov_vector_gpsref (it, grid%xb, grid%xp, ob, iv) 
-      if (use_ssmiretrievalobs .or. use_ssmitbobs) &
-         call da_get_innov_vector_ssmi (it, grid%xb, ob, iv)
-      if (use_ssmt1obs) call da_get_innov_vector_ssmt1 (it, grid%xb, grid%xp, ob, iv)
-      if (use_ssmt2obs) call da_get_innov_vector_ssmt2 (it, grid%xb, grid%xp, ob, iv)
-      if (use_satemobs) call da_get_innov_vector_satem (grid, it,  ob, iv)
-      if (use_radarobs) call da_get_innov_vector_radar (it, grid%xb, grid%xp, ob, iv)
-      if (use_qscatobs) call da_get_innov_vector_qscat (it, grid%xb, grid%xp, ob, iv)
-      if (use_profilerobs) call da_get_innov_vector_profiler (it, grid%xb, grid%xp, ob, iv)
-      if (use_buoyobs) call da_get_innov_vector_buoy (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_synop    > 0) call da_get_innov_vector_synop    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_geoamv   > 0) call da_get_innov_vector_geoamv   (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_polaramv > 0) call da_get_innov_vector_polaramv (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_airep    > 0) call da_get_innov_vector_airep    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_pilot    > 0) call da_get_innov_vector_pilot    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_bogus    > 0) call da_get_innov_vector_bogus    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_metar    > 0) call da_get_innov_vector_metar    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_ships    > 0) call da_get_innov_vector_ships    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_gpspw    > 0) call da_get_innov_vector_gpspw    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_gpsref   > 0) call da_get_innov_vector_gpsref   (it, grid%xb, grid%xp, ob, iv) 
+      call da_get_innov_vector_ssmi (it, grid%xb, ob, iv)
+      if (iv%num_ssmt1    > 0) call da_get_innov_vector_ssmt1    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_ssmt2    > 0) call da_get_innov_vector_ssmt2    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_satem    > 0) call da_get_innov_vector_satem    (grid, it,  ob, iv)
+      if (iv%num_radar    > 0) call da_get_innov_vector_radar    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_qscat    > 0) call da_get_innov_vector_qscat    (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_profiler > 0) call da_get_innov_vector_profiler (it, grid%xb, grid%xp, ob, iv)
+      if (iv%num_buoy     > 0) call da_get_innov_vector_buoy     (it, grid%xb, grid%xp, ob, iv)
 
-      if (use_rad) then
+      if (iv%num_inst > 0) then
          if (rtm_option == rtm_option_rttov) then
             call da_get_innov_vector_rttov( it, grid%xb, grid%xp, ob, iv )
          elseif (rtm_option == rtm_option_crtm) then
@@ -76,8 +75,8 @@ subroutine da_get_innov_vector (it, ob, iv, grid, config_flags)
          end if
       end if
 
-      if (num_pseudo > 0) call da_get_innov_vector_pseudo (grid%xb, grid%xp, ob, iv)
-      if (use_airsretobs) call da_get_innov_vector_airsr (it, grid%xb, grid%xp, ob, iv)
+      if (num_pseudo   > 0) call da_get_innov_vector_pseudo (grid%xb, grid%xp, ob, iv)
+      if (iv%num_airsr > 0) call da_get_innov_vector_airsr  (it, grid%xb, grid%xp, ob, iv)
    end do
 
    iv%current_ob_time = 1

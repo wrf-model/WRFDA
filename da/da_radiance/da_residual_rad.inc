@@ -1,26 +1,24 @@
-subroutine da_residual_rad(iv, y, re,                 &
-                                        np_missing, np_bad_data, &
-                                        np_obs_used, np_available)
+subroutine da_residual_rad(iv, y, re, np_missing, np_bad_data, np_obs_used, np_available)
 
-  !---------------------------------------------------------------------------
-  ! Purpose: Calculate Obs Residual and counting obs number.
-  !
-  ! Method:  re = (d - H delta_x)
-  !---------------------------------------------------------------------------
+   !---------------------------------------------------------------------------
+   ! Purpose: Calculate Obs Residual and counting obs number.
+   !
+   ! Method:  re = (d - H delta_x)
+   !---------------------------------------------------------------------------
 
    implicit none
 
-   type (ob_type), intent(in)        :: iv     ! Innovation vector (O-B).
-   type (y_type) , intent(in)        :: y      ! y = H (xa)
-   type (y_type) , intent(inout)     :: re     ! Residual structure.
+   type (ob_type), intent(in)    :: iv     ! Innovation vector (O-B).
+   type (y_type) , intent(in)    :: y      ! y = H (xa)
+   type (y_type) , intent(inout) :: re     ! Residual vector (O-A).
 
-   integer       , intent(inout)     :: np_available, np_obs_used,          &
-                                        np_missing  , np_bad_data
+   integer       , intent(inout) :: np_available
+   integer       , intent(inout) :: np_obs_used
+   integer       , intent(inout) :: np_missing
+   integer       , intent(inout) :: np_bad_data
 
    type (bad_data_type)              :: n_obs_bad
    integer                           :: i
-
-   if (iv%num_inst < 1) return
 
    if (trace_use) call da_trace_entry("da_residual_rad")
 
