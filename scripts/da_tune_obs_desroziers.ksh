@@ -102,7 +102,7 @@ while [[ $DATE -le $END_DATE ]]; do
       exit 5       
    fi
 
-   export DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD)
+   export DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD)
 done
 
 # append ***** to file end

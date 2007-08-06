@@ -163,7 +163,7 @@ echo '<A HREF="namelist.input">Namelist input</a>'
          export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
          export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
          echo Dummy wrf > wrfout_d${DOMAIN}_${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $LOCAL_DATE $NL_HISTORY_INTERVAL)
       done
    else
       if $NL_VAR4D && [[ $NUM_PROCS -gt 1 ]]; then

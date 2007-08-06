@@ -169,9 +169,9 @@ WRFVAR_OBJS = da_par_util.o \
 var : wrfvar
 var_esmf : wrfvar_esmf
 
-wrfvar : setup da_wrfvar.exe da_advance_cymdh.exe da_update_bc.exe
+wrfvar : setup da_wrfvar.exe da_advance_time.exe da_update_bc.exe
 
-wrfvar_esmf : setup da_wrfvar_esmf.exe da_advance_cymdh.exe da_update_bc.exe
+wrfvar_esmf : setup da_wrfvar_esmf.exe da_advance_time.exe da_update_bc.exe
 
 da_wrfvar.exe : $(WRFVAR_LIBS) da_wrfvar_main.o
 	$(LD) -o da_wrfvar.exe $(LDFLAGS) da_wrfvar_main.o $(WRFVAR_LIB)
@@ -180,9 +180,9 @@ da_wrfvar_esmf.exe : $(WRFVAR_LIBS) da_wrfvar_esmf.o da_wrfvar_esmf_super.o
 	$(LD) -o da_wrfvar_esmf.exe $(LDFLAGS) da_wrfvar_esmf.o $(WRFVAR_LIB) \
           da_wrfvar_esmf_super.o
 
-da_advance_cymdh.exe : da_advance_cymdh.o
+da_advance_time.exe : da_advance_time.o
 	$(RM) $@
-	$(SFC) $(LDFLAGS) -o $@ da_advance_cymdh.o
+	$(SFC) $(LDFLAGS) -o $@ da_advance_time.o
 
 inc/da_generic_boilerplate.inc: da_generic_boilerplate.m4
 	@ $(RM) inc/da_generic_boilerplate.inc
@@ -193,7 +193,7 @@ da_utils : setup \
            da_tune_obs_hollingsworth2.exe \
            da_tune_obs_desroziers.exe \
            da_update_bc.exe \
-           da_advance_cymdh.exe \
+           da_advance_time.exe \
            da_verif.exe \
            da_bias_airmass.exe \
            da_bias_sele.exe \

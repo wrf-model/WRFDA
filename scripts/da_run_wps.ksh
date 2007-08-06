@@ -148,7 +148,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
          export L_DAY=$(echo $LOCAL_DATE | cut -c7-8)
          export L_HOUR=$(echo $LOCAL_DATE | cut -c9-10)
          echo Dummy wps > met_em.d${DOMAIN}.${L_YEAR}-${L_MONTH}-${L_DAY}_${L_HOUR}:00:00.nc
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} 1 2>/dev/null)
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} 1 2>/dev/null)
       done
    else
       if $RUN_GEOGRID; then
@@ -176,7 +176,7 @@ echo '<A HREF="namelist.wps">namelist.wps</a>'
       FILES=''
       while [[ $LOCAL_DATE -le $END_DATE ]]; do
          FILES="$FILES $WPS_INPUT_DIR/$LOCAL_DATE/*"
-         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
+         LOCAL_DATE=$($WRFVAR_DIR/build/da_advance_time.exe ${LOCAL_DATE} ${LBC_FREQ} 3>/dev/null)
       done
       $WPS_DIR/link_grib.csh $FILES
 

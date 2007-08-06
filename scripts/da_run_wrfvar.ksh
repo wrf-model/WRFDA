@@ -57,7 +57,7 @@ export YEAR=$(echo $DATE | cut -c1-4)
 export MONTH=$(echo $DATE | cut -c5-6)
 export DAY=$(echo $DATE | cut -c7-8)
 export HOUR=$(echo $DATE | cut -c9-10)
-export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
 export ANALYSIS_DATE=${YEAR}-${MONTH}-${DAY}_${HOUR}:00:00
 export NL_ANALYSIS_DATE=${ANALYSIS_DATE}.0000
 
@@ -162,12 +162,12 @@ echo "WINDOW_END            $WINDOW_END"
    mkdir -p ${WORK_DIR}
    cd $WORK_DIR
 
-   START_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_START)
-   END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $WINDOW_END)
+   START_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $WINDOW_START)
+   END_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $WINDOW_END)
 
    for INDEX in 01 02 03 04 05 06 07; do
       let H=$INDEX-1+$WINDOW_START
-      D_DATE[$INDEX]=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $H)
+      D_DATE[$INDEX]=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $H)
       export D_YEAR[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c1-4)
       export D_MONTH[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c5-6)
       export D_DAY[$INDEX]=$(echo ${D_DATE[$INDEX]} | cut -c7-8)
@@ -332,7 +332,7 @@ echo "WINDOW_END            $WINDOW_END"
                FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
                ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
             fi
-            FGAT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ)
+            FGAT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $FGAT_DATE $OBS_FREQ)
          done
       fi
    else

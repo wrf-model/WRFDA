@@ -105,7 +105,7 @@ export CYCLING_SAVE=$CYCLING
 export RUN_DIR_SAVE=$RUN_DIR
  
 #These are the local values:
-export END_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
+export END_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $LBC_FREQ 2>/dev/null)
 export RC_DIR=$RUN_DIR_SAVE/rc
 mkdir -p $RC_DIR
 
@@ -141,7 +141,7 @@ while [[ $DATE -le $END_DATE ]]; do
       exit 1
    fi
 
-   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $LBC_FREQ 2>/dev/null)
+   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $LBC_FREQ 2>/dev/null)
    export DATE=$NEXT_DATE
 done
 

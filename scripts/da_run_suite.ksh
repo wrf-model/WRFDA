@@ -221,7 +221,7 @@ echo 'RTOBS_DIR    <A HREF="file:'$RTOBS_DIR'">'$RTOBS_DIR'</a>'
 export DATE=$INITIAL_DATE
 
 while ( $DATE -le $FINAL_DATE ) ; do 
-   export PREV_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
+   export PREV_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE -$CYCLE_PERIOD 2>/dev/null)
    export HOUR=$(echo $DATE | cut -c9-10)
 
    if [[ ! -d $FC_DIR/$DATE ]]; then mkdir -p $FC_DIR/$DATE; fi
@@ -427,7 +427,7 @@ while ( $DATE -le $FINAL_DATE ) ; do
       fi
    fi
 
-   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD 2>/dev/null)
+   export NEXT_DATE=$($WRFVAR_DIR/build/da_advance_time.exe $DATE $CYCLE_PERIOD 2>/dev/null)
    export DATE=$NEXT_DATE
    export CYCLE_NUMBER=`expr $CYCLE_NUMBER + 1`
 

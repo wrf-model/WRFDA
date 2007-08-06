@@ -970,7 +970,7 @@ da_define_structures.o:	da_define_structures.f90 \
 
 da_control.o:		da_control.f90 \
 			da_array_print.inc \
-			da_advance_cymdh.inc \
+			da_advance_time.inc \
 			da_change_date.inc \
 			da_find_fft_factors.inc \
 			da_find_fft_trig_funcs.inc \
@@ -1232,9 +1232,9 @@ da_wrfvar.exe:	        da_wrfvar.f90
 			$(CPP) $(CPPFLAGS) -I../inc da_wrfvar_main.f90 > da_wrfvar_main.f
 			$(FC) -o da_wrfvar.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_wrfvar_main.f
 
-da_advance_cymdh.exe:   da_advance_cymdh.f90
-			$(CPP) $(CPPFLAGS) -I../inc da_advance_cymdh.f90 > da_advance_cymdh.f
-			$(FC) -o da_advance_cymdh.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_advance_cymdh.f
+da_advance_time.exe:   da_advance_time.f90
+			$(CPP) $(CPPFLAGS) -I../inc da_advance_time.f90 > da_advance_time.f
+			$(FC) -o da_advance_time.exe $(FCFLAGS) $(MODULE_DIRS) $(WRFVAR_INC) $(PROMOTION) da_advance_time.f
 
 da_bias_airmass.exe:	da_bias_airmass.f90
 			$(CPP) $(CPPFLAGS) -I../inc da_bias_airmass.f90 > da_bias_airmass.f

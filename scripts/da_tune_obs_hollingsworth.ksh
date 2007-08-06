@@ -36,7 +36,7 @@ export DATE=$START_DATE
 
 while [[ $DATE -le $END_DATE ]]; do
    cat ${EXP_DIR}/run/${DATE}/wrfvar/working/gts_omb_oma >> hollingsworth1.in
-   export DATE=$(${WRFVAR_DIR}/build/da_advance_cymdh.exe $DATE $CYCLE_PERIOD)
+   export DATE=$(${WRFVAR_DIR}/build/da_advance_time.exe $DATE $CYCLE_PERIOD)
 done
 
 echo '*end*' >> hollingsworth1.in

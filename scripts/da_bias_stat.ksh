@@ -37,7 +37,7 @@ export NSCAN=$4      # 30, 90
  while [[ $CDATE -le $END_DATE ]]; do
    echo $CDATE
    cat ${DATA_DIR}/${CDATE}/wrfvar/working/biasprep_${PLATFORM}-${SATELLITE}-${SENSOR}.* >> biasprep_${sensor}
-   CDATE=$(${BUILD_DIR}/da_advance_cymdh.exe ${CDATE} ${CYCLE_PERIOD})
+   CDATE=$(${BUILD_DIR}/da_advance_time.exe ${CDATE} ${CYCLE_PERIOD})
  done
 
 #--------------------------------------------------

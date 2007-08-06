@@ -22,8 +22,8 @@ if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
 if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
 
 #Derive times of initial/final FCST_RANGE forecasts:
-export START_DATE_STAGE0=$(${BUILD_DIR}/da_advance_cymdh.exe $START_DATE -$FCST_RANGE1)
-export END_DATE_STAGE0=$(${BUILD_DIR}/da_advance_cymdh.exe $END_DATE   -$FCST_RANGE1)
+export START_DATE_STAGE0=$(${BUILD_DIR}/da_advance_time.exe $START_DATE -$FCST_RANGE1)
+export END_DATE_STAGE0=$(${BUILD_DIR}/da_advance_time.exe $END_DATE   -$FCST_RANGE1)
 export DATE=$START_DATE_STAGE0
 
 while test $DATE -le $END_DATE_STAGE0; do
@@ -38,7 +38,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    done
 
    #  Create file dates:
-   export FCST_TIME=$(${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE1)
+   export FCST_TIME=$(${BUILD_DIR}/da_advance_time.exe $DATE $FCST_RANGE1)
    echo "gen_be_stage0_wrf: Calculating standard perturbation fields valid at time " $FCST_TIME
 
    export YYYY=$(echo $FCST_TIME | cut -c1-4)
@@ -50,7 +50,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    export FILE1=wrfout_d01_${FILE_DATE}
    export FILE2=wrfout_d01_${FILE_DATE}.e001
    export FILE3=wrfout_d01_${FILE_DATE}.e002
-   export NEXT_DATE=$(${BUILD_DIR}/da_advance_cymdh.exe $DATE $FCST_RANGE2)
+   export NEXT_DATE=$(${BUILD_DIR}/da_advance_time.exe $DATE $FCST_RANGE2)
    if [[ $BE_METHOD == NMC ]]; then
      ln -sf $FILE $FILE1
      ln -sf $FILE $FILE2
@@ -67,7 +67,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    rm -rf $TMP_DIR 2> /dev/null
 
    echo $DATE $FILE ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
-   export DATE=$(${BUILD_DIR}/da_advance_cymdh.exe $DATE $INTERVAL)
+   export DATE=$(${BUILD_DIR}/da_advance_time.exe $DATE $INTERVAL)
 
 done     # End loop over dates.
 
