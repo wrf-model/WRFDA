@@ -188,6 +188,7 @@ export DA_DIR=${DA_DIR:-$EXP_DIR/da}     # Forecast directory
 export DA_BACK_ERRORS=${DA_BACK_ERRORS:-$BE_DIR/be.dat} # background errors.
 
 export NL_OB_FORMAT=${NL_OB_FORMAT:-2} # Observation format: 1=BUFR, 2=ASCII "little_r"
+export NL_VAR4D_MULTI_INC=${NL_VAR4D_MULTI_INC:0} # Multi_incremental options: 0=off. 1=on
 
 #From Update_BC:
 export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
