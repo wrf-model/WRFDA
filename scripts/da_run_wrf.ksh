@@ -131,7 +131,7 @@ ln -fs ${WRF_BDY} wrfbdy_d${DOMAIN}
 # WHY
 # cp ${RC_DIR}/$DATE/wrflowinp_d${DOMAIN} wrflowinp_d${DOMAIN}
 
-export NL_INTERVAL_SECONDS=$(expr $LBC_FREQ \* 3600)
+let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 
 if [[ ! -f $WRF_DIR/inc/namelist_script.inc ]]; then

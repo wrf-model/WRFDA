@@ -17,6 +17,9 @@ export WINDOW_START=${WINDOW_START:--3}
 export WINDOW_END=${WINDOW_END:-3}
 export NL_NUM_FGAT_TIME=${NL_NUM_FGAT_TIME:-1}
 export CYCLE_PERIOD=${CYCLE_PERIOD:-12}
+export LBC_FREQ=${LBC_FREQ:-06}
+
+let NL_INTERVAL_SECONDS=$LBC_FREQ*3600
 
 #Default directories/files:
 
@@ -69,7 +72,7 @@ if $CYCLING; then
       if $NL_VAR4D; then
          export DA_BOUNDARIES=$FC_DIR/$DATE/wrfbdy_d$DOMAIN    # wrfvar boundaries input.
       fi
-      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${ANALYSIS_DATE}
+      export DA_FIRST_GUESS=${FC_DIR}/${PREV_DATE}/wrfinput_d${DOMAIN}_${ANALYSIS_DATE}
    fi
 fi
 
@@ -92,7 +95,6 @@ export NL_SEED_ARRAY2=$DATE
 # Change defaults from Registry.wrfvar which is required to be
 # consistent with WRF's Registry.EM
 export NL_RUN_HOURS=${NL_RUN_HOURS:-6}
-export NL_INTERVAL_SECONDS=${NL_INTERVAL_SECONDS:-21600}
 export NL_INPUT_FROM_FILE=${NL_INPUT_FROM_FILE:-true}
 export NL_TIME_STEP=${NL_TIME_STEP:-180}
 export NL_INTERP_TYPE=${NL_INTERP_TYPE:-1}
@@ -328,7 +330,7 @@ echo "WINDOW_END            $WINDOW_END"
                FMONTH=$(echo ${FGAT_DATE} | cut -c5-6)
                FDAY=$(echo ${FGAT_DATE} | cut -c7-8)
                FHOUR=$(echo ${FGAT_DATE} | cut -c9-10)
-               ln -fs ${FC_DIR}/${PREV_DATE}/wrfout_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
+               ln -fs ${FC_DIR}/${PREV_DATE}/wrfinput_d${DOMAIN}_${FYEAR}-${FMONTH}-${FDAY}_${FHOUR}:00:00 fg0${N}
             fi
             FGAT_DATE=$($WRFVAR_DIR/build/da_advance_cymdh.exe $FGAT_DATE $OBS_FREQ)
          done
@@ -432,7 +434,6 @@ echo "WINDOW_END            $WINDOW_END"
          export NL_AUXINPUT2_INNAME='./nl/auxhist2_d<domain>_<date>'
       fi
       export NL_AUXINPUT2_INTERVAL=$(expr $NL_TIME_STEP \/ 60)
-      export NL_INTERVAL_SECONDS=$(expr $CYCLE_PERIOD \* 3600)
       export NL_MP_PHYSICS=0
       export NL_RA_LW_PHYSICS=0
       export NL_RA_SW_PHYSICS=0
@@ -488,7 +489,6 @@ echo "WINDOW_END            $WINDOW_END"
       export NL_HISTORY_INTERVAL=9999
       export NL_AUXHIST3_INTERVAL=60
       export NL_INPUTOUT_INTERVAL=60
-      export NL_INTERVAL_SECONDS=$(expr $CYCLE_PERIOD \* 3600)
       . $WRFPLUS_DIR/inc/namelist_script.inc
       mv namelist.input ad
       ln -fs $WORK_DIR/*.TBL ad
