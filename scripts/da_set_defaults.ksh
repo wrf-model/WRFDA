@@ -62,7 +62,6 @@ export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export OBSPROC_DIR=${OBSPROC_DIR:-$REL_DIR/3DVAR_OBSPROC} # Observation preprocessor dir.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var executable location.
-#export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts} 
 export WPS_DIR=${WPS_DIR:-$REL_DIR/wps}           # WPS directory.
 export WRFSI_DIR=${WRFSI_DIR:-$REL_DIR/wrfsi}     # WRF SI directory.
 export WRF_BC_DIR=${WRF_BC_DIR:-$REL_DIR/WRF_BC}  # Update_bc dir.
@@ -83,6 +82,7 @@ export WORK_DIR=${WORK_DIR:-$RUN_DIR/working}     # Temporary working dir.
 export RC_DIR=${RC_DIR:-$REG_DIR/rc}              # Reconfiguration directory
 export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
 export ETKF_DIR=${ETKF_DIR:-$FC_DIR/etkf}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 export SCRIPT=${SCRIPT:-$SCRIPTS_DIR/da_run_wrfvar.ksh}
 
 #Time info:
@@ -132,6 +132,7 @@ export NL_DX=${NL_DX:-200000}
 export NL_DY=${NL_DY:-200000}
 export GEOG_DATA_RES=${GEOG_DATA_RES:-30s}
 export VTABLE_TYPE=${VTABLE_TYPE:-GFS}
+export METGRID_TABLE_TYPE=${METGRID_TABLE_TYPE:-ARW}
 export CONSTANTS1=${CONSTANTS1:-*}
 export CONSTANTS2=${CONSTANTS2:-*}
 export DEBUG_LEVEL=${DEBUG_LEVEL:-0}
@@ -207,7 +208,7 @@ export PHASE=${PHASE:-false}     # Indicate which phase update_bc is.
 export NUM_JOBS=${NUM_JOBS:-1}                         # Number of parallel jobs to run.
 export NUM_MEMBERS=${NUM_MEMBERS:-1}                   # Number of ensemble members.
 export MEM=${MEM:-1}                                   # Ensemble member.
-export FILE_TYPE=${FILE_TYPE:-wrf_3dvar_input}         # ETKF input file-type.
+export FILE_TYPE=${FILE_TYPE:-wrf_3dvar_input_d01}     # ETKF input file-type.
 export NV=${NV:-15}                                    # Number of ETKF variables.
 export CV=${CV:-"'U'", "'V'", "'W'", "'PH'", "'T'", "'MU'", "'TSLB'", "'TSK'", \
                 "'QCLOUD'", "'QRAIN'", "'QVAPOR'", "'U10'", "'V10'", "'T2'", "'Q2'"} # ETKF variable names

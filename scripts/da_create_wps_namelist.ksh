@@ -70,7 +70,7 @@ cat >namelist.wps <<EOF
  constants_name = '$CONSTANTS1', '$CONSTANTS2'
  io_form_metgrid = 2, 
  opt_output_from_metgrid_path = '$WORK_DIR',
- opt_metgrid_tbl_path         = '$WPS_DIR/metgrid',
+ opt_metgrid_tbl_path         = './',
  opt_ignore_dom_center        = .false.
 /
 EOF

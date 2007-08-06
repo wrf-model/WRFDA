@@ -153,7 +153,7 @@ export FCST_RANGE=$FCST_RANGE_SAVE  # Restore true range.
 
 ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
 
-ln -fs $WPS_DIR/metgrid/METGRID.TBL.AFWA METGRID.TBL
+ln -fs $WPS_DIR/metgrid/METGRID.TBL.${METGRID_TABLE_TYPE} METGRID.TBL
 
 ln -fs $WPS_DIR/metgrid.exe .
 ${RUN_CMD} ./metgrid.exe

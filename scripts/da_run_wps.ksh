@@ -150,6 +150,7 @@ echo 'RC_DIR        <A HREF="file:'$RC_DIR'"</a>'$RC_DIR'</a>'
       cd $WORK_DIR
       ${SCRIPTS_DIR}/da_create_wps_namelist.ksh
       cp namelist.wps ${RUN_DIR}/namelist.wps.metgrid
+      ln -fs $WPS_DIR/metgrid/METGRID.TBL.${METGRID_TABLE_TYPE} METGRID.TBL
 
       ln -fs $WPS_DIR/metgrid.exe .
       ${RUN_CMD} ./metgrid.exe
