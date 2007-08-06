@@ -15,27 +15,11 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
 
    type (multi_level_type)      :: platform
    logical                      :: outside
-   integer                      :: total_obs, &
-                                   num_sound, &
-                                   num_synop, &
-                                   num_pilot, &
-                                   num_geoamv, &
-                                   num_polaramv, &
-                                   num_satem, &
-                                   num_airep, &
-                                   num_metar, &
-                                   num_ships, &
-                                   num_gpspw, &
-                                   num_gpsref, &
-                                   num_ssmi_retrieval, &
-                                   num_ssmi_tb      , &
-                                   num_ssmt1, &
-                                   num_ssmt2, &
-                                   num_pseudo, num_qscat, &
-                                   num_profiler, num_buoy, num_bogus
+   logical                      :: outside_all
+
    character(len=40) :: hdstr
    character(len=10) :: date
-   character(len=8) :: subset
+   character(len=8)  :: subset
    real,dimension(7) :: hdr
 
    integer           :: iost, ndup, n, report
@@ -84,28 +68,6 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    !--------------------------------------------------------------------------
    ! Initialise the obs-counter
    !--------------------------------------------------------------------------
-
-   total_obs = 0
-   num_sound = 0
-   num_synop = 0
-   num_pilot = 0
-   num_geoamv = 0
-   num_polaramv = 0
-   num_satem = 0
-   num_airep = 0
-   num_metar = 0
-   num_ships = 0
-   num_gpspw = 0
-   num_gpsref = 0
-   num_ssmi_retrieval = 0
-   num_ssmi_tb       = 0
-   num_ssmt1 = 0
-   num_ssmt2 = 0
-   num_pseudo = 0
-   num_qscat = 0
-   num_profiler = 0
-   num_buoy = 0
-   num_bogus = 0
 
    hdstr='SID XOB YOB DHR TYP ELV T29     '
    nrecs = 0
@@ -185,12 +147,11 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
          exit
       end if
 
-      call da_ll_to_xy (platform%info, platform%loc, &
-                       xp, outside)
+      call da_ll_to_xy (platform%info, platform%loc, xp, outside, outside_all)
 
-      if (outside) cycle reports
+      if (outside_all) cycle reports
 
-      total_obs = total_obs + 1
+      ob%total_obs = ob%total_obs + 1
 
       t29 = int(0.1 + hdr(7))
       kx=int(0.1+hdr(5))
@@ -224,65 +185,104 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
          case (11, 12, 13, 22, 23, 31)
             select case(kx)
             case (120, 122, 132, 220, 222, 232) ;         ! Sound
-               if (.not.use_soundobs) cycle reports
-               num_sound = num_sound + 1
+               if (.not.use_soundobs .or. ob%num_sound_glo == max_sound_input) cycle reports
+               if (n==1) ob%num_sound_glo = ob%num_sound_glo + 1
+               if (outside) cycle reports
+               ob%num_sound = ob%num_sound + 1
+               platform%loc%obs_global_index  = ob%num_sound_glo
 
             case (221) ;                   ! Pilot 
-               if (.not.use_pilotobs) cycle reports
-               num_pilot = num_pilot + 1
+               if (.not.use_pilotobs .or. ob%num_pilot_glo == max_pilot_input) cycle reports
+               if (n==1) ob%num_pilot_glo = ob%num_pilot_glo + 1
+               if (outside) cycle reports
+               ob%num_pilot = ob%num_pilot + 1
+               platform%loc%obs_global_index = ob%num_pilot_glo
             end select
 
          case (41)
          ! case (130:131, 133, 230:231, 233) ;  ! Airep
-            if (.not.use_airepobs) cycle reports
-            num_airep = num_airep + 1
+            if (.not.use_airepobs .or. ob%num_airep_glo == max_airep_input) cycle reports
+            if (n==1) ob%num_airep_glo = ob%num_airep_glo + 1
+            if (outside) cycle reports
+            ob%num_airep = ob%num_airep + 1
+            platform%loc%obs_global_index = ob%num_airep_glo
 
-         ! case (180, 182, 280, 282) ;          ! Ships and buoys
-         case (522, 523) ;
-            if (.not.use_shipsobs) cycle reports
-            num_ships = num_ships + 1
+         ! case (180, 182, 280, 282) ;          ! Ships
+         case (522, 523) ;      
+            if (.not.use_shipsobs .or. ob%num_ships_glo == max_ships_input) cycle reports
+            if (n==1) ob%num_ships_glo = ob%num_ships_glo + 1
+            if (outside) cycle reports
+            ob%num_ships  = ob%num_ships  + 1
+            platform%loc%obs_global_index = ob%num_ships_glo
 
          case (531, 561, 562) ;                ! Buoy
-            if (.not.use_buoyobs) cycle reports
-            num_buoy  = num_buoy  + 1
+            if (.not.use_buoyobs .or. ob%num_buoy_glo == max_buoy_input) cycle reports
+            if (n==1) ob%num_buoy_glo = ob%num_buoy_glo + 1
+            if (outside) cycle reports
+            ob%num_buoy  = ob%num_buoy  + 1
+            platform%loc%obs_global_index = ob%num_buoy_glo
 
          case (511)
          ! case (181, 281) ;            ! Synop
+            if (.not.use_synopobs .or. ob%num_synop_glo == max_synop_input) cycle reports
+            if (n==1) ob%num_synop_glo = ob%num_synop_glo + 1
+            if (outside) cycle reports
+            ob%num_synop = ob%num_synop + 1
+            ! Track serial obs index for reassembly of obs during bit-for-bit 
+            ! tests with different numbers of MPI tasks.  
+            platform%loc%obs_global_index = ob%num_synop_glo
             if (.not.use_synopobs) cycle reports
-            num_synop = num_synop + 1
+            ob%num_synop = ob%num_synop + 1
 
          case (512)
          ! case (187 , 287) ;                   ! Metar
-            if (.not.use_metarobs) cycle reports
-            num_metar = num_metar + 1
+            if (.not.use_metarobs .or. ob%num_metar_glo == max_metar_input) cycle reports
+            if (n==1) ob%num_metar_glo = ob%num_metar_glo + 1
+            if (outside) cycle reports
+            ob%num_metar = ob%num_metar + 1
+            platform%loc%obs_global_index = ob%num_metar_glo
 
          case (63)
-         ! case (242:246, 252:253, 255);  ! Geo. CMVs
-            if (.not.use_geoamvobs) cycle reports
-            num_geoamv = num_geoamv + 1
+         ! case (242:246, 252:253, 255);  ! Geo. AMVs
+            if (.not.use_geoamvobs .or. ob%num_geoamv_glo == max_geoamv_input) cycle reports
+            if (n==1) ob%num_geoamv_glo = ob%num_geoamv_glo + 1
+            if (outside) cycle reports 
+            ob%num_geoamv = ob%num_geoamv + 1
 
          case (71, 72)        ;         !  Profiler & VADWND - NEXRAD winds
-            if (.not.use_profilerobs) cycle reports
-            num_profiler = num_profiler + 1
+            if (.not.use_profilerobs .or. ob%num_profiler_glo == max_profiler_input) cycle reports
+            if (n==1) ob%num_profiler_glo = ob%num_profiler_glo + 1
+            if (outside) cycle reports
+            ob%num_profiler = ob%num_profiler + 1
+            platform%loc%obs_global_index = ob%num_profiler_glo
 
          case (582)    ;                 !  Quikscat
-            if (.not.use_qscatobs) cycle reports
-            num_qscat  = num_qscat  + 1
+            if (.not.use_qscatobs .or. ob%num_qscat_glo == max_qscat_input) cycle reports
+            if (n==1) ob%num_qscat_glo = ob%num_qscat_glo + 1
+            if (outside) cycle reports
+            ob%num_qscat  = ob%num_qscat  + 1
+            platform%loc%obs_global_index = ob%num_qscat_glo
 
-         case (583)    ;                 !  GPS IPW
-            if (.not.use_gpspwobs) cycle reports
-            num_gpspw  = num_gpspw + 1
+         case (583)    ;                 !  GPS IPW      
+            if (.not.use_gpspwobs .or. ob%num_gpspw_glo == max_gpspw_input) cycle reports
+            if (n==1) ob%num_gpspw_glo = ob%num_gpspw_glo + 1
+            if (outside) cycle reports
+            ob%num_gpspw = ob%num_gpspw + 1
+            platform%loc%obs_global_index = ob%num_gpspw_glo
 
          case (584)    ;                 !  GPS REF
-            if (.not.use_gpsrefobs) cycle reports
-            num_gpsref  = num_gpsref + 1
+            if (.not.use_gpsrefobs .or. ob%num_gpsref_glo == max_gpsref_input) cycle reports
+            if (n==1) ob%num_gpsref_glo = ob%num_gpsref_glo + 1
+            if (outside) cycle reports
+            ob%num_gpsref = ob%num_gpsref + 1
+            platform%loc%obs_global_index = ob%num_gpsref_glo
 
          case default ;
             select case (kx)
             case (111 , 210)    ;           !  Tropical Cyclone Bogus
                !  Note Tropical cyclone Bougus is given type 135 in Obs-ascii
                if (.not.use_bogusobs) cycle reports
-            num_bogus = num_bogus + 1
+            ob%num_bogus = ob%num_bogus + 1
 
             case default 
                miscd = miscd + 1
@@ -295,39 +295,10 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
       end do        !  loop over duplicate
    end do reports
 
-   rewind iunit
-   ! close(iunit)
-
    write (unit=message(1),fmt=*) 'total bufr records =',nrecs
-   write (unit=message(2),fmt=*) 'number in domain   =',total_obs
+   write (unit=message(2),fmt=*) 'number in domain   =',ob%total_obs
    write (unit=message(3),fmt=*) 'number Unhandled   =',miscd 
    call da_message(message(1:3))
-
-   !------------------------------------------------------------------------
-   ! Check the numbers again, make sure we have the right number.
-   !------------------------------------------------------------------------
-
-   ob%num_sound = ob%num_sound + num_sound
-   ob%num_synop = ob%num_synop + num_synop
-   ob%num_pilot = ob%num_pilot + num_pilot
-   ob%num_satem = ob%num_satem + num_satem
-   ob%num_geoamv = ob%num_geoamv + num_geoamv
-   ob%num_polaramv = ob%num_polaramv + num_polaramv
-   ob%num_airep = ob%num_airep + num_airep
-   ob%num_gpspw = ob%num_gpspw + num_gpspw
-   ob%num_gpsref = ob%num_gpsref + num_gpsref
-   ob%num_metar = ob%num_metar + num_metar
-   ob%num_ships = ob%num_ships + num_ships
-   ob%num_qscat = ob%num_qscat + num_qscat
-   ob%num_buoy  = ob%num_buoy  + num_buoy
-   ob%num_profiler = ob%num_profiler + num_profiler
-   ob%num_bogus = ob%num_bogus + num_bogus
-
-   ob%num_ssmt1 = ob%num_ssmt1 + num_ssmt1
-   ob%num_ssmt2 = ob%num_ssmt2 + num_ssmt2
-
-   ! ob%num_ssmi_tb        = ob%num_ssmi_tb + num_ssmi_tb
-   ! ob%num_ssmi_retrieval = ob%num_ssmi_retrieval + num_ssmi_retrieval
 
    ob%ob_numb(ob%current_ob_time)%sound = ob%num_sound
    ob%ob_numb(ob%current_ob_time)%synop = ob%num_synop
@@ -344,47 +315,34 @@ subroutine da_scan_bufr_obs (ob, xp, filename)
    ob%ob_numb(ob%current_ob_time)%buoy  = ob%num_buoy
    ob%ob_numb(ob%current_ob_time)%profiler = ob%num_profiler
    ob%ob_numb(ob%current_ob_time)%bogus = ob%num_bogus
-
    ob%ob_numb(ob%current_ob_time)%ssmt1 = ob%num_ssmt1
    ob%ob_numb(ob%current_ob_time)%ssmt2 = ob%num_ssmt2
-
-   ! ob%ob_numb(ob%current_ob_time)%ssmi_tb        = ob%num_ssmi_tb
-   ! ob%ob_numb(ob%current_ob_time)%ssmi_retrieval = ob%num_ssmi_retrieval
 
    ! print out
    ! =============
 
-   if (print_detail_obs) then
-      write(unit=stdout, fmt='(a)')  ' '
-
-      write(unit=stdout, fmt='(5x,a,i6,a)') &
-         'Scan:  ', ob%current_ob_time, ' ob time:', &
-         'Scan:  ', total_obs,    ' Total reports.', &
-         'Scan:  ', num_sound,    ' SOUND      reports,', &
-         'Scan:  ', num_synop,    ' SYNOP      reports,', &
-         'Scan:  ', num_pilot,    ' PILOT      reports,', &
-         'Scan:  ', num_satem,    ' SATEM      reports,', &
-         'Scan:  ', num_geoamv,   ' Geo. AMVs  reports,', &
-         'Scan:  ', num_polaramv, ' Polar AMVs reports,', &
-         'Scan:  ', num_airep,    ' AIREP      reports,', &
-         'Scan:  ', num_gpspw,    ' GPSPW      reports,', &
-         'Scan:  ', num_gpsref,   ' GPSRF      reports,', &
-         'Scan:  ', num_metar,    ' METAR      reports,', &
-         'Scan:  ', num_ships,    ' SHIP       reports,', &
-         'Scan:  ', num_qscat,    ' QSCAT      reports,', &
-         'Scan:  ', num_profiler, ' Profiler   reports,', &
-         'Scan:  ', num_buoy,     ' Buoy       reports,', &
-         'Scan:  ', num_bogus,    ' TCBGS      reports,', & 
-         'Scan:  ', num_ssmt1,    ' SSMT1      reports,', & 
-         'Scan:  ', num_ssmt2,    ' SSMT2      reports.'    
-      write(unit=stdout,fmt=*) ' '
-
-      ! WHY?
-      ! write(unit=stdout, fmt='(5x,a,i6,a)') &
-      !    'Scan:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-      !    'Scan:  ', num_ssmi_tb        , ' SSMI_TB        reports.'
-
-   end if
+   write(unit=stdout, fmt='(a)') ' '
+   write(unit=stdout, fmt='(5x,a,i6)') 'ob time ', ob%current_ob_time
+   write(unit=stdout, fmt='(5x,a,i6,a,i6,a)') &
+      'sound   ', ob%num_sound_glo,    ' global,',ob%num_sound,   ' local', &
+      'synop   ', ob%num_synop_glo,    ' global,',ob%num_synop,   ' local', &
+      'pilot   ', ob%num_pilot_glo,    ' global,',ob%num_pilot,   ' local', &
+      'satem   ', ob%num_satem_glo,    ' global,',ob%num_satem,   ' local', &
+      'geoamv  ', ob%num_geoamv_glo,   ' global,',ob%num_geoamv,  ' local', &
+      'polaramv', ob%num_polaramv_glo, ' global,',ob%num_polaramv,' local', &
+      'airep   ', ob%num_airep_glo,    ' global,',ob%num_airep,   ' local', &
+      'gpspw   ', ob%num_gpspw_glo,    ' global,',ob%num_gpspw,   ' local', &
+      'gpsref  ', ob%num_gpsref_glo,   ' global,',ob%num_gpsref,  ' local', &
+      'metar   ', ob%num_metar_glo,    ' global,',ob%num_metar,   ' local', &
+      'ships   ', ob%num_ships_glo,    ' global,',ob%num_ships,   ' local', &
+      'qscat   ', ob%num_qscat_glo,    ' global,',ob%num_qscat,   ' local', &
+      'profiler', ob%num_profiler_glo, ' global,',ob%num_profiler,' local', &
+      'buoy    ', ob%num_buoy_glo,     ' global,',ob%num_buoy,    ' local', &
+      'bogus   ', ob%num_bogus_glo,    ' global,',ob%num_bogus,   ' local', &
+      'ssmt1   ', ob%num_ssmt1_glo,    ' global,',ob%num_ssmt1,   ' local', &
+      'ssmt2   ', ob%num_ssmt2_glo,    ' global,',ob%num_ssmt2,   ' local', &
+      'airsr   ', ob%num_airsr_glo,    ' global,',ob%num_airsr,   ' local'
+   write(unit=stdout, fmt='(5x,a,i6)') 'total:', ob%total_obs
 
    close(iunit)
    call da_free_unit(iunit)

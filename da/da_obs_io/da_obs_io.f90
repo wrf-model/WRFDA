@@ -13,7 +13,13 @@ module da_obs_io
       fails_error_max,standard_atmosphere,zero_t_td,print_detail_f_obs, &
       max_radar, print_detail_radar,use_satemobs,use_polaramvobs,use_ssmt1obs, &
       use_ssmt2obs, use_airsretobs,convert_fd2uv,anal_type_qcobs,gravity, &
-      filename_len, t0
+      filename_len, t0, max_airep_input, max_bogus_input, &
+      max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &
+      max_airsret_input, max_polaramv_input, max_radar_input, &
+      max_profiler_input,max_ssmi_ret_input, max_sound_input, max_ships_input, &
+      max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
+      max_synop_input,max_ssmt2_input, max_ssmi_tb_input, max_qscat_input, &
+      max_airsret_input
    use da_define_structures, only : ob_type, multi_level_type, &
       radar_multi_level_type, y_type, field_type, each_level_type, &
       radar_each_level_type

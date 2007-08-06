@@ -1,7 +1,7 @@
 subroutine da_read_obs (ob, xp, filename)
 
    !---------------------------------------------------------------------------
-   ! Purpose: Read the header of a GTS observation file
+   ! Purpose: Read a GTS observation file
    !
    ! Modifications:      10/26/2004            Syed RH Rizvi
    !
@@ -71,27 +71,28 @@ subroutine da_read_obs (ob, xp, filename)
 
    if (trace_use) call da_trace_entry("da_read_obs")
 
-   total_obs = ob%total_obs
-   num_sound = ob%num_sound
-   num_synop = ob%num_synop
-   num_pilot = ob%num_pilot
-   num_geoamv = ob%num_geoamv
-   num_polaramv = ob%num_polaramv
-   num_satem = ob%num_satem
-   num_airep = ob%num_airep
-   num_metar = ob%num_metar
-   num_ships = ob%num_ships
-   num_gpspw = ob%num_gpspw
-   num_gpsref = ob%num_gpsref
-   num_ssmi_retrieval = ob%num_ssmi_retrieval
-   num_ssmi_tb       = ob%num_ssmi_tb
-   num_ssmt1 = ob%num_ssmt1
-   num_ssmt2 = ob%num_ssmt2
-   num_qscat = ob%num_qscat
-   num_profiler = ob%num_profiler
-   num_buoy = ob%num_buoy
-   num_bogus= ob%num_bogus
-   num_airsr= ob%num_airsr
+   ! Local counts of obs, to be matched with scan counts later
+   total_obs          = 0
+   num_sound          = 0
+   num_synop          = 0
+   num_pilot          = 0
+   num_geoamv         = 0
+   num_polaramv       = 0
+   num_satem          = 0
+   num_airep          = 0
+   num_metar          = 0
+   num_ships          = 0
+   num_gpspw          = 0
+   num_gpsref         = 0
+   num_ssmi_retrieval = 0
+   num_ssmi_tb        = 0
+   num_ssmt1          = 0
+   num_ssmt2          = 0
+   num_qscat          = 0
+   num_profiler       = 0
+   num_buoy           = 0
+   num_bogus          = 0
+   num_airsr          = 0
 
    ! open file
    ! =========
@@ -296,8 +297,7 @@ subroutine da_read_obs (ob, xp, filename)
          exit
       end if
 
-      call da_ll_to_xy (platform%info, platform%loc,   &
-                        xp, outside, outside_all)
+      call da_ll_to_xy (platform%info, platform%loc, xp, outside, outside_all)
 
       if (outside_all) then
          cycle reports
@@ -381,18 +381,10 @@ subroutine da_read_obs (ob, xp, filename)
          select case(fm)
 
          case (12) ;
-
-            if (n==1) ob%num_synop_glo = ob%num_synop_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_synopobs) cycle reports
+            if (outside .or. .not. use_synopobs) cycle reports
 
             num_synop = num_synop + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_synop_glo
+            if (num_synop > ob%num_synop) cycle reports
 
             ob%synop(num_synop)%info = platform%info
             ob%synop(num_synop)%loc  = platform%loc
@@ -404,20 +396,11 @@ subroutine da_read_obs (ob, xp, filename)
             ob%synop(num_synop)%q = platform%each(1)%q
             ob%synop(num_synop)%p = platform%each(1)%p
 
-         case (13, 17) ;                  ! ships   
-
-            if (n == 1) ob%num_ships_glo = ob%num_ships_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_shipsobs) cycle reports
+         case (13, 17) ;                  ! ships  
+            if (outside .or. .not. use_shipsobs) cycle reports
 
             num_ships  = num_ships  + 1
-
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_ships_glo
+            if (num_ships > ob%num_ships) cycle reports
 
             ob%ships(num_ships)%info = platform%info
             ob%ships(num_ships)%loc  = platform%loc
@@ -430,18 +413,10 @@ subroutine da_read_obs (ob, xp, filename)
             ob%ships(num_ships)%q = platform%each(1)%q
 
          case (15:16) ;
-
-            if (n==1) ob%num_metar_glo = ob%num_metar_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_metarobs) cycle reports
+            if (outside .or. .not. use_metarobs) cycle reports
 
             num_metar = num_metar + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_metar_glo
+            if (num_metar > ob%num_metar) cycle reports
 
             ob%metar(num_metar)%info = platform%info
             ob%metar(num_metar)%loc  = platform%loc
@@ -454,18 +429,10 @@ subroutine da_read_obs (ob, xp, filename)
             ob%metar(num_metar)%q = platform%each(1)%q
 
          case (32:34) ;
-
-            if (n==1) ob%num_pilot_glo = ob%num_pilot_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_pilotobs) cycle reports
+            if (outside .or. .not. use_pilotobs) cycle reports
 
             num_pilot = num_pilot + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_pilot_glo
+            if (num_pilot > ob%num_pilot) cycle reports
 
             ob%pilot(num_pilot)%info = platform%info
             ob%pilot(num_pilot)%loc  = platform%loc
@@ -482,18 +449,10 @@ subroutine da_read_obs (ob, xp, filename)
             end do
 
          case (35:38) ;
-
-            if (n==1) ob%num_sound_glo = ob%num_sound_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_soundobs) cycle reports
+            if (outside .or. .not. use_soundobs) cycle reports
 
             num_sound = num_sound + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index  = ob%num_sound_glo
+            if (num_sound > ob%num_sound) cycle reports
 
             ob%sonde_sfc(num_sound)%info = platform%info
             ob%sonde_sfc(num_sound)%loc  = platform%loc
@@ -565,24 +524,11 @@ subroutine da_read_obs (ob, xp, filename)
             ob%sound(num_sound)%info%levels = nlevels
 
          case (86)    ;
-
-            if (n==1) ob%num_satem_glo = ob%num_satem_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_satemobs) cycle reports
-
             ! Reject cloudy satem obs.
-
-            if (platform%loc%pw%inv > 10.0) then
-               cycle reports
-            end if
+            if (outside .or. .not. use_satemobs .or. platform%loc%pw%inv > 10.0) cycle reports
 
             num_satem = num_satem + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_satem_glo
+            if (num_satem > ob%num_satem) cycle reports
 
             ob%satem(num_satem)%info = platform%info
             ob%satem(num_satem)%loc  = platform%loc
@@ -631,24 +577,15 @@ subroutine da_read_obs (ob, xp, filename)
                            sqrt(ob%satem(num_satem)%thickness(1)%error ** 2 + &
                            platform%loc%pw%error ** 2) / gravity
 
-            ! Geostatinary ot Polar orbitting Satellite AMVs:
+            ! Geostationary ot Polar orbitting Satellite AMVs:
 
          case (88)    ;
-
             if (index(platform%info%name, 'MODIS') > 0 .or. &
                index(platform%info%name, 'modis') > 0)  then
-
-               if (n==1) ob%num_polaramv_glo = ob%num_polaramv_glo + 1
-               if (outside) then
-                  cycle reports
-               end if
-
-               if (.not.use_polaramvobs) cycle reports
+               if (outside .or. .not. use_polaramvobs) cycle reports
 
                num_polaramv = num_polaramv + 1
-               ! Track serial obs index for reassembly of obs during bit-for-bit 
-               ! tests with different numbers of MPI tasks.  
-               platform%loc%obs_global_index = ob%num_polaramv_glo
+               if (num_polaramv > ob%num_polaramv) cycle reports
 
                ob%polaramv(num_polaramv)%info = platform%info
                ob%polaramv(num_polaramv)%loc  = platform%loc
@@ -664,17 +601,10 @@ subroutine da_read_obs (ob, xp, filename)
                   ob%polaramv(num_polaramv)%v(i) = platform%each(i)%v
                end do
             else
-               if (n==1) ob%num_geoamv_glo = ob%num_geoamv_glo + 1
-               if (outside) then
-                  cycle reports
-               end if
-
-               if (.not.use_geoamvobs) cycle reports
+               if (outside .or. .not. use_geoamvobs) cycle reports
 
                num_geoamv = num_geoamv + 1
-               ! Track serial obs index for reassembly of obs during bit-for-bit 
-               ! tests with different numbers of MPI tasks.  
-               platform%loc%obs_global_index = ob%num_geoamv_glo
+               if (num_geoamv > ob%num_geoamv) cycle reports
 
                ob%geoamv(num_geoamv)%info = platform%info
                ob%geoamv(num_geoamv)%loc  = platform%loc
@@ -692,18 +622,10 @@ subroutine da_read_obs (ob, xp, filename)
             end if
 
          case (42,96:97) ;
-
-            if (n==1) ob%num_airep_glo = ob%num_airep_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_airepobs) cycle reports
+            if (outside .or. .not. use_airepobs) cycle reports
 
             num_airep = num_airep + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_airep_glo
+            if (num_airep > ob%num_airep) cycle reports
 
             ob%airep(num_airep)%info = platform%info
             ob%airep(num_airep)%loc  = platform%loc
@@ -724,36 +646,20 @@ subroutine da_read_obs (ob, xp, filename)
             end do
 
          case (111, 114) ;
-
-            if (n==1) ob%num_gpspw_glo = ob%num_gpspw_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_gpspwobs) cycle reports
+            if (outside .or. .not. use_gpspwobs) cycle reports
 
             num_gpspw = num_gpspw + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_gpspw_glo
+            if (num_gpspw > ob%num_gpspw) cycle reports
 
             ob%gpspw(num_gpspw)%info = platform%info
             ob%gpspw(num_gpspw)%loc  = platform%loc
             ob%gpspw(num_gpspw)%tpw  = platform%loc%pw
 
          case (116) ;
-
-            if (n==1) ob%num_gpsref_glo = ob%num_gpsref_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_gpsrefobs) cycle reports
+            if (outside .or. .not. use_gpsrefobs) cycle reports
 
             num_gpsref = num_gpsref + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_gpsref_glo
+            if (num_gpsref > ob%num_gpsref) cycle reports
 
             ob%gpsref(num_gpsref)%info = platform%info
             ob%gpsref(num_gpsref)%loc  = platform%loc
@@ -777,19 +683,10 @@ subroutine da_read_obs (ob, xp, filename)
             end do
 
          case (121) ;
-            ! SSM/T1 temperatures:
-
-            if (n==1) ob%num_ssmt1_glo = ob%num_ssmt1_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_ssmt1obs) cycle reports
+            if (outside .or. .not. use_ssmt1obs) cycle reports
 
             num_ssmt1 = num_ssmt1 + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_ssmt1_glo
+            if (num_ssmt1 > ob%num_ssmt1) cycle reports
 
             ob%ssmt1(num_ssmt1)%info = platform%info
             ob%ssmt1(num_ssmt1)%loc  = platform%loc
@@ -806,19 +703,10 @@ subroutine da_read_obs (ob, xp, filename)
             end do
          
          case (122) ;
-            ! SSM/T2 relative humidities:
-
-            if (n==1) ob%num_ssmt2_glo = ob%num_ssmt2_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_ssmt2obs) cycle reports
+            if (outside .or. .not. use_ssmt2obs) cycle reports
 
             num_ssmt2 = num_ssmt2 + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_ssmt2_glo
+            if (num_ssmt2 > ob%num_ssmt2) cycle reports
 
             ob%ssmt2(num_ssmt2)%info = platform%info
             ob%ssmt2(num_ssmt2)%loc  = platform%loc
@@ -835,19 +723,10 @@ subroutine da_read_obs (ob, xp, filename)
             end do
 
          case (281)    ;
-            ! Scatterometer:
-
-            if (n==1) ob%num_qscat_glo = ob%num_qscat_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_qscatobs) cycle reports
+            if (outside .or. .not. use_qscatobs) cycle reports
 
             num_qscat  = num_qscat  + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_qscat_glo
+            if (num_qscat > ob%num_qscat) cycle reports
 
             ob%qscat(num_qscat)%info = platform%info
             ob%qscat(num_qscat)%loc  = platform%loc
@@ -861,46 +740,30 @@ subroutine da_read_obs (ob, xp, filename)
             ob%qscat(num_qscat)%v%error = max(platform%each(1)%v%error,1.0)
 
          case (132) ; ! profiler
+            if (outside .or. .not. use_profilerobs) cycle reports
 
-         if (n==1) ob%num_profiler_glo = ob%num_profiler_glo + 1
-         if (outside) then
-            cycle reports
-         end if
+            num_profiler = num_profiler + 1
+            if (num_profiler > ob%num_profiler) cycle reports
 
-         if (.not.use_profilerobs) cycle reports
+            ob%profiler(num_profiler)%info = platform%info
+            ob%profiler(num_profiler)%loc  = platform%loc
 
-         num_profiler = num_profiler + 1
-         ! Track serial obs index for reassembly of obs during bit-for-bit 
-         ! tests with different numbers of MPI tasks.  
-         platform%loc%obs_global_index = ob%num_profiler_glo
+            allocate (ob%profiler(num_profiler)%p (1:nlevels))
+            allocate (ob%profiler(num_profiler)%zk(1:nlevels))
+            allocate (ob%profiler(num_profiler)%u (1:nlevels))
+            allocate (ob%profiler(num_profiler)%v (1:nlevels))
 
-         ob%profiler(num_profiler)%info = platform%info
-         ob%profiler(num_profiler)%loc  = platform%loc
-
-         allocate (ob%profiler(num_profiler)%p (1:nlevels))
-         allocate (ob%profiler(num_profiler)%zk(1:nlevels))
-         allocate (ob%profiler(num_profiler)%u (1:nlevels))
-         allocate (ob%profiler(num_profiler)%v (1:nlevels))
-
-         do i = 1, nlevels
-            ob%profiler(num_profiler)%p(i) = platform%each(i)%p%inv
-            ob%profiler(num_profiler)%u(i) = platform%each(i)%u
-            ob%profiler(num_profiler)%v(i) = platform%each(i)%v
-         end do
+            do i = 1, nlevels
+               ob%profiler(num_profiler)%p(i) = platform%each(i)%p%inv
+               ob%profiler(num_profiler)%u(i) = platform%each(i)%u
+               ob%profiler(num_profiler)%v(i) = platform%each(i)%v
+            end do
 
          case (135) ; ! Bogus
-
-            if (n==1) ob%num_bogus_glo = ob%num_bogus_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_bogusobs) cycle reports
+            if (outside .or. .not. use_bogusobs) cycle reports
 
             num_bogus = num_bogus + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_bogus_glo
+            if (num_bogus > ob%num_bogus) cycle reports
 
             if (num_bogus > max_bogus_input) then
                write(unit=message(1),fmt='(A,I6,A,I6)') &
@@ -935,29 +798,21 @@ subroutine da_read_obs (ob, xp, filename)
               write(unit=stdout,fmt=*) 'ob % num_bogus,slp', num_bogus,  &
                        ob % bogus (num_bogus) % slp
                do i=1,nlevels
-                  write(unit=stdout,fmt=*) 'ob % num_bogus, i ', num_bogus,i
-                  write(unit=stdout,fmt=*) 'ob%bogus(ob%num_bogus)%u,v=',  &
+                  write(unit=stdout,fmt=*) 'num_bogus, i ', num_bogus,i
+                  write(unit=stdout,fmt=*) 'ob%bogus(num_bogus)%u,v=',  &
                           ob%bogus(num_bogus)%u(i),ob%bogus(num_bogus)%v(i)
-                  write(unit=stdout,fmt=*) 'ob%bogus(ob%num_bogus)%t,q=',  &
+                  write(unit=stdout,fmt=*) 'ob%bogus(num_bogus)%t,q=',  &
                           ob%bogus(num_bogus)%t(i),ob%bogus(num_bogus)%q(i)
                end do
-               write(unit=stdout,fmt='(2(a,i4))') 'ob%num_bogus=',num_bogus, &
+               write(unit=stdout,fmt='(2(a,i4))') 'num_bogus=',num_bogus, &
                                         'nlevels=',nlevels
             end if
 
          case (18,19) ;             ! buoy
-
-            if (n==1) ob%num_buoy_glo = ob%num_buoy_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_buoyobs) cycle reports
+            if (outside .or. .not. use_buoyobs) cycle reports
 
             num_buoy  = num_buoy  + 1
-            ! Track serial obs index for reassembly of obs during bit-for-bit 
-            ! tests with different numbers of MPI tasks.  
-            platform%loc%obs_global_index = ob%num_buoy_glo
+            if (num_buoy > ob%num_buoy) cycle reports
 
             ob%buoy(num_buoy)%info = platform%info
             ob%buoy(num_buoy)%loc  = platform%loc
@@ -970,17 +825,10 @@ subroutine da_read_obs (ob, xp, filename)
             ob%buoy(num_buoy)%q = platform%each(1)%q
    
          case (133)    ;         ! AIRS retrievals  
-
-            if (n==1) ob%num_airsr_glo = ob%num_airsr_glo + 1
-            if (outside) then
-               cycle reports
-            end if
-
-            if (.not.use_airsretobs) cycle reports
+            if (outside .or. .not. use_airsretobs) cycle reports
 
             num_airsr = num_airsr + 1
-
-            platform%loc%obs_global_index = ob%num_airsr_glo
+            if (num_airsr > ob%num_airsr) cycle reports
 
             ob%airsr(num_airsr)%info = platform%info
             ob%airsr(num_airsr)%loc  = platform%loc
@@ -1022,136 +870,75 @@ subroutine da_read_obs (ob, xp, filename)
       end do dup_loop
    end do reports
 
-   ob%num_sound = num_sound
-   ob%num_synop = num_synop
-   ob%num_pilot = num_pilot
-   ob%num_satem = num_satem
-   ob%num_geoamv = num_geoamv
-   ob%num_polaramv = num_polaramv
-   ob%num_airep = num_airep
-   ob%num_gpspw = num_gpspw
-   ob%num_gpsref = num_gpsref
-   ob%num_metar = num_metar
-   ob%num_ships = num_ships
-   ob%num_qscat = num_qscat
-   ob%num_buoy  = num_buoy
-   ob%num_profiler = num_profiler
-   ob%num_bogus = num_bogus
-   ob%num_airsr = num_airsr
-
-   ! WHY?
-   ! ob%num_ssmt1 = num_ssmt1
-   ! ob%num_ssmt2 = num_ssmt2
-   ! ob%num_ssmi_tb        = num_ssmi_tb
-   ! ob%num_ssmi_retrieval = num_ssmi_retrieval
-
-   if (print_detail_obs) then
-      write(unit=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
-
-      write(unit=stdout, fmt='(5x,a,i6,a)') &
-           'Read:  ', num_sound,           ' SOUND          reports,', &
-           'Read:  ', num_synop,           ' SYNOP          reports,', &
-           'Read:  ', num_pilot,           ' PILOT          reports,', &
-           'Read:  ', num_satem,           ' SATEM          reports,', &
-           'Read:  ', num_geoamv,          ' Geo AMV        reports,', & 
-           'Read:  ', num_polaramv,        ' Polar AMV      reports,', & 
-           'Read:  ', num_airep,           ' AIREP          reports,', &
-           'Read:  ', num_gpspw ,          ' GPSPW/GPSZD    reports,', &
-           'Read:  ', num_gpsref,          ' GPSRF          reports,', &
-           'Read:  ', num_metar,           ' METAR          reports,', &
-           'Read:  ', num_ships ,          ' SHIP           reports,', &
-           'Read:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-           'Read:  ', num_ssmi_tb,         ' SSMI_TB        reports,', &
-           'Read:  ', num_ssmt1,           ' SSMT1          reports,', &
-           'Read:  ', num_ssmt2,           ' SSMT2          reports,', &
-           'Read:  ', num_qscat,           ' QSCAT          reports,', &
-           'Read:  ', num_profiler,        ' Profiler       reports,', &
-           'Read:  ', num_buoy,            ' Buoy           reports,', &
-           'Read:  ', num_bogus,           ' Bogus          reports,', &
-           'Read:  ', num_airsr,           ' AIRSRET        reports,', &
-           'Read:  ', total_obs,           ' Total reports.', &
-           'There are ', total_obs - num_sound - num_synop &
-                                   - num_pilot - num_satem &
-                                   - num_geoamv - num_polaramv - num_airep &
-                                   - num_metar - num_ships &
-                                   - num_ssmi_retrieval  &
-                                   - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
-                                   - num_gpspw - num_gpsref - num_qscat  &
-                                   - num_profiler - num_buoy &
-                                   - num_bogus - num_airsr , &
-                                   '  reports unsaved.'
-      write(unit=stdout,fmt=*) ' '
-   end if
-
-   if ((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
-      (ob%ob_numb(ob%current_ob_time)%synop /= ob%num_synop) .or. &
-      (ob%ob_numb(ob%current_ob_time)%pilot /= ob%num_pilot) .or. &
-      (ob%ob_numb(ob%current_ob_time)%satem /= ob%num_satem) .or. &
-      (ob%ob_numb(ob%current_ob_time)%geoamv /= ob%num_geoamv) .or. &
+   if ((ob%ob_numb(ob%current_ob_time)%sound   /= ob%num_sound) .or. &
+      (ob%ob_numb(ob%current_ob_time)%synop    /= ob%num_synop) .or. &
+      (ob%ob_numb(ob%current_ob_time)%pilot    /= ob%num_pilot) .or. &
+      (ob%ob_numb(ob%current_ob_time)%satem    /= ob%num_satem) .or. &
+      (ob%ob_numb(ob%current_ob_time)%geoamv   /= ob%num_geoamv) .or. &
       (ob%ob_numb(ob%current_ob_time)%polaramv /= ob%num_polaramv) .or. &
-      (ob%ob_numb(ob%current_ob_time)%airep /= ob%num_airep) .or. &
-      (ob%ob_numb(ob%current_ob_time)%gpspw /= ob%num_gpspw) .or. &
-      (ob%ob_numb(ob%current_ob_time)%gpsref /= ob%num_gpsref) .or. &
-      (ob%ob_numb(ob%current_ob_time)%metar /= ob%num_metar) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ships /= ob%num_ships) .or. &
-      (ob%ob_numb(ob%current_ob_time)%qscat /= ob%num_qscat) .or. &
-      (ob%ob_numb(ob%current_ob_time)%buoy  /= ob%num_buoy) .or. &
-      (ob%ob_numb(ob%current_ob_time)%bogus /= ob%num_bogus) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt1) .or. &
-      (ob%ob_numb(ob%current_ob_time)%ssmt2 /= ob%num_ssmt2) .or. &
-      (ob%ob_numb(ob%current_ob_time)%airsr /= ob%num_airsr) .or. &
+      (ob%ob_numb(ob%current_ob_time)%airep    /= ob%num_airep) .or. &
+      (ob%ob_numb(ob%current_ob_time)%gpspw    /= ob%num_gpspw) .or. &
+      (ob%ob_numb(ob%current_ob_time)%gpsref   /= ob%num_gpsref) .or. &
+      (ob%ob_numb(ob%current_ob_time)%metar    /= ob%num_metar) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ships    /= ob%num_ships) .or. &
+      (ob%ob_numb(ob%current_ob_time)%qscat    /= ob%num_qscat) .or. &
+      (ob%ob_numb(ob%current_ob_time)%buoy     /= ob%num_buoy) .or. &
+      (ob%ob_numb(ob%current_ob_time)%bogus    /= ob%num_bogus) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ssmt2    /= ob%num_ssmt1) .or. &
+      (ob%ob_numb(ob%current_ob_time)%ssmt2    /= ob%num_ssmt2) .or. &
+      (ob%ob_numb(ob%current_ob_time)%airsr    /= ob%num_airsr) .or. &
       (ob%ob_numb(ob%current_ob_time)%profiler /= ob%num_profiler)) then
 
       write(unit=stderr, fmt='(a, i6, 2x, a, i6)') &
-         'ob%ob_numb(ob%current_ob_time)%sound=', &
+         'ob%ob_numb(ob%current_ob_time)%sound=   ', &
          ob%ob_numb(ob%current_ob_time)%sound, &
          'ob%num_sound=', ob%num_sound, &
-         'ob%ob_numb(ob%current_ob_time)%synop=', &
+         'ob%ob_numb(ob%current_ob_time)%synop=   ', &
          ob%ob_numb(ob%current_ob_time)%synop, &
          'ob%num_synop=', ob%num_synop, &
-         'ob%ob_numb(ob%current_ob_time)%pilot=', &
+         'ob%ob_numb(ob%current_ob_time)%pilot=   ', &
          ob%ob_numb(ob%current_ob_time)%pilot, &
          'ob%num_pilot=', ob%num_pilot, &
-         'ob%ob_numb(ob%current_ob_time)%satem=', &
+         'ob%ob_numb(ob%current_ob_time)%satem=   ', &
          ob%ob_numb(ob%current_ob_time)%satem, &
          'ob%num_satem=', ob%num_satem, &
-         'ob%ob_numb(ob%current_ob_time)%geoamv=', &
+         'ob%ob_numb(ob%current_ob_time)%geoamv=  ', &
          ob%ob_numb(ob%current_ob_time)%geoamv, &
          'ob%num_geoamv=', ob%num_geoamv, &
          'ob%ob_numb(ob%current_ob_time)%polaramv=', &
          ob%ob_numb(ob%current_ob_time)%polaramv, &
          'ob%num_polaramv=', ob%num_polaramv, &
-         'ob%ob_numb(ob%current_ob_time)%airep=', &
+         'ob%ob_numb(ob%current_ob_time)%airep=   ', &
          ob%ob_numb(ob%current_ob_time)%airep, &
          'ob%num_airep=', ob%num_airep, &
-         'ob%ob_numb(ob%current_ob_time)%gpspw=', &
+         'ob%ob_numb(ob%current_ob_time)%gpspw=   ', &
          ob%ob_numb(ob%current_ob_time)%gpspw, &
          'ob%num_gpspw=', ob%num_gpspw, &
-         'ob%ob_numb(ob%current_ob_time)%gpsref=', &
+         'ob%ob_numb(ob%current_ob_time)%gpsref=  ', &
          ob%ob_numb(ob%current_ob_time)%gpsref,&
          'ob%num_gpsref=', ob%num_gpsref, &
-         'ob%ob_numb(ob%current_ob_time)%metar=', &
+         'ob%ob_numb(ob%current_ob_time)%metar=   ', &
          ob%ob_numb(ob%current_ob_time)%metar, &
          'ob%num_metar=', ob%num_metar, &
-         'ob%ob_numb(ob%current_ob_time)%ships=', &
+         'ob%ob_numb(ob%current_ob_time)%ships=   ', &
          ob%ob_numb(ob%current_ob_time)%ships, &
          'ob%num_ships=', ob%num_ships, &
-         'ob%ob_numb(ob%current_ob_time)%qscat=', &
+         'ob%ob_numb(ob%current_ob_time)%qscat=   ', &
          ob%ob_numb(ob%current_ob_time)%qscat, &
          'ob%num_qscat=', ob%num_qscat, &
-         'ob%ob_numb(ob%current_ob_time)%buoy =', &
+         'ob%ob_numb(ob%current_ob_time)%buoy =   ', &
          ob%ob_numb(ob%current_ob_time)%buoy , &
          'ob%num_buoy =', ob%num_buoy , &
-         'ob%ob_numb(ob%current_ob_time)%bogus=', &
+         'ob%ob_numb(ob%current_ob_time)%bogus=   ', &
          ob%ob_numb(ob%current_ob_time)%bogus, &
          'ob%num_bogus=', ob%num_bogus, &
-         'ob%ob_numb(ob%current_ob_time)%ssmt1=', &
+         'ob%ob_numb(ob%current_ob_time)%ssmt1=   ', &
          ob%ob_numb(ob%current_ob_time)%ssmt1, &
          'ob%num_ssmt1=', ob%num_ssmt1, &
-         'ob%ob_numb(ob%current_ob_time)%ssmt2=', &
+         'ob%ob_numb(ob%current_ob_time)%ssmt2=   ', &
          ob%ob_numb(ob%current_ob_time)%ssmt2, &
          'ob%num_ssmt2=', ob%num_ssmt2, &
-         'ob%ob_numb(ob%current_ob_time)%airsr=', &
+         'ob%ob_numb(ob%current_ob_time)%airsr=   ', &
          ob%ob_numb(ob%current_ob_time)%airsr, &
          'ob%num_airsr=', ob%num_airsr, &
          'ob%ob_numb(ob%current_ob_time)%profiler=', &
@@ -1160,17 +947,6 @@ subroutine da_read_obs (ob, xp, filename)
 
       call da_error(__FILE__,__LINE__,(/"Obs mismatch"/))
    end if
-
-   ! WHY?
-   ! if ((ob%ob_numb(ob%current_ob_time)%ssmi_tb        /= ob%num_ssmi_tb) .or. &
-   !     (ob%ob_numb(ob%current_ob_time)%ssmi_retrieval /= ob%num_ssmi_retrieval)) then
-   !    write(unit=message(1), fmt='(a, i6, 2x, a, i6)') &
-   !       'ob%ob_numb(ob%current_ob_time)%ssmi_tb       =', ob%ob_numb(ob%current_ob_time)%ssmi_tb, &
-   !       'ob%num_ssmi_tb       =', ob%num_ssmi_tb, &
-   !       'ob%ob_numb(ob%current_ob_time)%ssmi_retrieval=', ob%ob_numb(ob%current_ob_time)%ssmi_retrieval, &
-   !       'ob%num_ssmi_retrieval=', ob%num_ssmi_retrieval
-   !    call da_error(__FILE__,__LINE,message(1:1))
-   ! end if
 
    close(iunit)
    call da_free_unit(iunit)

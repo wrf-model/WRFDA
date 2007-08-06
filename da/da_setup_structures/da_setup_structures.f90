@@ -13,12 +13,7 @@ module da_setup_structures
       pole, cone_factor, start_x,base_pres,ptop,psi1,start_y, base_lapse,base_temp,truelat2_3dv, &
       truelat1_3dv,xlonc,t0,num_fft_factors,pi,print_detail_spectral, global, &
       da_find_fft_factors,da_find_fft_trig_funcs, use_radar_rf, &
-      max_fgat_time, num_fgat_time, max_airep_input, max_bogus_input, &
-      max_buoy_input, max_gpsref_input, max_gpspw_input, max_geoamv_input, &
-      max_airsret_input, max_polaramv_input, max_radar_input, &
-      max_profiler_input,max_ssmi_ret_input, max_sound_input, max_ships_input, &
-      max_satem_input,max_pilot_input, max_metar_input, max_ssmt1_input, &
-      max_synop_input,max_ssmt2_input, max_ssmi_tb_input,dt_cloud_model, &
+      max_fgat_time, num_fgat_time, dt_cloud_model, &
       use_ssmiretrievalobs,use_radarobs,use_ssmitbobs,use_qscatobs, num_procs, &
       num_pseudo, missing, ob_format, ob_format_bufr,ob_format_ascii, &
       use_airepobs, test_dm_exact, use_amsuaobs, use_amsubobs, &
@@ -55,7 +50,7 @@ module da_setup_structures
 
    implicit none
 
-   contains
+contains
 
 #include "da_get_vertical_truncation.inc"
 #include "da_interpolate_regcoeff.inc"

@@ -50,27 +50,27 @@ subroutine da_read_bufr_obs (ob, xp, filename)
    integer, parameter    :: qflag=4         ! Flag for retaining data
    equivalence     (hdr(1), c8id)
 
-   total_obs = ob%total_obs
-   num_sound = ob%num_sound
-   num_synop = ob%num_synop
-   num_pilot = ob%num_pilot
-   num_geoamv = ob%num_geoamv
-   num_polaramv = ob%num_polaramv
-   num_satem = ob%num_satem
-   num_airep = ob%num_airep
-   num_metar = ob%num_metar
-   num_ships = ob%num_ships
-   num_gpspw = ob%num_gpspw
-   num_gpsref = ob%num_gpsref
-   num_ssmi_retrieval = ob%num_ssmi_retrieval
-   num_ssmi_tb       = ob%num_ssmi_tb
-   num_ssmt1 = ob%num_ssmt1
-   num_ssmt2 = ob%num_ssmt2
-   num_qscat = ob%num_qscat
-   num_profiler = ob%num_profiler
-   num_buoy = ob%num_buoy
-   num_bogus= ob%num_bogus
-   num_pseudo = 0
+   total_obs          = 0 
+   num_sound          = 0
+   num_synop          = 0
+   num_pilot          = 0
+   num_geoamv         = 0
+   num_polaramv       = 0
+   num_satem          = 0
+   num_airep          = 0
+   num_metar          = 0
+   num_ships          = 0
+   num_gpspw          = 0
+   num_gpsref         = 0
+   num_ssmi_retrieval = 0
+   num_ssmi_tb        = 0
+   num_ssmt1          = 0
+   num_ssmt2          = 0
+   num_qscat          = 0
+   num_profiler       = 0
+   num_buoy           = 0
+   num_bogus          = 0
+   num_pseudo         = 0
 
    ! open file
    !  ---------
@@ -896,65 +896,6 @@ subroutine da_read_bufr_obs (ob, xp, filename)
    call closbf(iunit)
    close(iunit)
    call da_free_unit(iunit)
-
-   ob%num_sound = num_sound
-   ob%num_synop = num_synop
-   ob%num_pilot = num_pilot
-   ob%num_satem = num_satem
-   ob%num_geoamv = num_geoamv
-   ob%num_polaramv = num_polaramv
-   ob%num_airep = num_airep
-   ob%num_gpspw = num_gpspw
-   ob%num_gpsref = num_gpsref
-   ob%num_metar = num_metar
-   ob%num_ships = num_ships
-   ob%num_qscat = num_qscat
-   ob%num_buoy  = num_buoy
-   ob%num_profiler = num_profiler
-   ob%num_bogus = num_bogus
-
-   ! WHY?
-   ! ob%num_ssmt1 = num_ssmt1
-   ! ob%num_ssmt2 = num_ssmt2
-   ! ob%num_ssmi_tb        = num_ssmi_tb
-   ! ob%num_ssmi_retrieval = num_ssmi_retrieval
-
-   if (print_detail_obs) then
-      write(unit=stdout, fmt='(/a,i6/)') 'ob%current_ob_time=', ob%current_ob_time
-
-      write(unit=stdout, fmt='(5x,a,i6,a)') &
-           'Read:  ', num_sound,           ' SOUND          reports,', &
-           'Read:  ', num_synop,           ' SYNOP          reports,', &
-           'Read:  ', num_pilot,           ' PILOT          reports,', &
-           'Read:  ', num_satem,           ' SATEM          reports,', &
-           'Read:  ', num_geoamv,          ' Geo AMV        reports,', &
-           'Read:  ', num_polaramv,        ' Polar AMV      reports,', &
-           'Read:  ', num_airep,           ' AIREP          reports,', &
-           'Read:  ', num_gpspw ,          ' GPSPW/GPSZD    reports,', &
-           'Read:  ', num_gpsref,          ' GPSRF          reports,', &
-           'Read:  ', num_metar,           ' METAR          reports,', &
-           'Read:  ', num_ships ,          ' SHIP           reports,', &
-           'Read:  ', num_ssmi_retrieval , ' SSMI_RETRIEVAL reports,', &
-           'Read:  ', num_ssmi_tb,         ' SSMI_TB        reports,', &
-           'Read:  ', num_ssmt1,           ' SSMT1          reports,', &
-           'Read:  ', num_ssmt2,           ' SSMT2          reports,', &
-           'Read:  ', num_qscat,           ' QSCAT          reports,', &
-           'Read:  ', num_profiler,        ' Profiler       reports,', &
-           'Read:  ', num_buoy,            ' Buoy           reports,', &
-           'Read:  ', num_bogus,           ' Bogus          reports,', &
-           'Read:  ', total_obs,           ' Total reports.', &
-           'There are ', total_obs - num_sound - num_synop &
-                                   - num_pilot - num_satem &
-                                   - num_geoamv - num_polaramv - num_airep &
-                                   - num_metar - num_ships &
-                                   - num_ssmi_retrieval  &
-                                   - num_ssmi_tb - num_ssmt1 - num_ssmt2 &
-                                   - num_gpspw - num_gpsref - num_qscat  &
-                                   - num_profiler - num_buoy, &
-                                   - num_bogus - num_bogus, &
-                                   '  reports unsaved.'
-      write(unit=stdout, fmt=*) ' '
-   end if
 
    if ((ob%ob_numb(ob%current_ob_time)%sound /= ob%num_sound) .or. &
       (ob%ob_numb(ob%current_ob_time)%synop /= ob%num_synop) .or. &

@@ -10,6 +10,8 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    type (y_type),     intent(out)   :: ob  ! Observation structure.
    type (ob_type),    intent(out)   :: iv  ! O-B structure.
 
+   integer :: n
+
    if (trace_use) call da_trace_entry("da_setup_obs_structures")
 
    call da_message((/'Set up observations (ob)'/))
@@ -138,78 +140,104 @@ subroutine da_setup_obs_structures( grid, ob, iv)
    iv%total_obs         = 0
    iv%total_rad_pixel   = 0
    iv%total_rad_channel = 0
-   
-   iv%num_sound=0
-   iv%num_synop=0
-   iv%num_geoamv=0
-   iv%num_polaramv=0
-   iv%num_airep=0
-   iv%num_metar=0
-   iv%num_ships=0
-   iv%num_pilot=0
-   iv%num_satem=0
-   iv%num_gpspw=0
-   iv%num_gpsref=0
-   iv%num_qscat=0
-   iv%num_ssmt1=0
-   iv%num_ssmt2=0
-   iv%num_ssmi_tb=0
-   iv%num_ssmi_retrieval=0
-   iv%num_buoy=0
-   iv%num_profiler=0
-   iv%num_radar=0
-   iv%num_bogus=0
-   iv%num_airsr=0
-   iv%num_inst=0
-   iv%num_pseudo=0          
 
-   iv%num_sound_glo=0
-   iv%num_synop_glo=0
-   iv%num_geoamv_glo=0
-   iv%num_polaramv_glo=0
-   iv%num_airep_glo=0
-   iv%num_metar_glo=0
-   iv%num_ships_glo=0
-   iv%num_pilot_glo=0
-   iv%num_satem_glo=0
-   iv%num_gpspw_glo=0
-   iv%num_gpsref_glo=0
-   iv%num_qscat_glo=0
-   iv%num_ssmt1_glo=0
-   iv%num_ssmt2_glo=0
-   iv%num_ssmi_tb_glo=0
-   iv%num_ssmi_retrieval_glo=0
-   iv%num_buoy_glo=0
-   iv%num_profiler_glo=0
-   iv%num_radar_glo=0
-   iv%num_bogus_glo=0
-   iv%num_airsr_glo=0
-   iv%num_pseudo_glo=0             
+   iv%num_sound          = 0
+   iv%num_synop          = 0
+   iv%num_pilot          = 0
+   iv%num_geoamv         = 0
+   iv%num_polaramv       = 0
+   iv%num_satem          = 0
+   iv%num_airep          = 0
+   iv%num_metar          = 0
+   iv%num_ships          = 0
+   iv%num_gpspw          = 0
+   iv%num_gpsref         = 0
+   iv%num_ssmi_retrieval = 0
+   iv%num_ssmi_tb        = 0
+   iv%num_ssmt1          = 0  
+   iv%num_ssmt2          = 0  
+   iv%num_pseudo         = 0  
+   iv%num_qscat          = 0  
+   iv%num_profiler       = 0  
+   iv%num_buoy           = 0  
+   iv%num_radar          = 0  
+   iv%num_bogus          = 0  
+   iv%num_airsr          = 0  
+   iv%num_qscat          = 0
+   iv%num_inst           = 0        
 
+   iv%num_sound_glo         = 0
+   iv%num_synop_glo         = 0
+   iv%num_geoamv_glo        = 0
+   iv%num_polaramv_glo      = 0
+   iv%num_airep_glo         = 0
+   iv%num_metar_glo         = 0
+   iv%num_ships_glo         = 0
+   iv%num_pilot_glo         = 0
+   iv%num_satem_glo         = 0
+   iv%num_gpspw_glo         = 0
+   iv%num_gpsref_glo        = 0
+   iv%num_qscat_glo         = 0
+   iv%num_ssmt1_glo         = 0
+   iv%num_ssmt2_glo         = 0
+   iv%num_ssmi_tb_glo       = 0
+   iv%num_ssmi_retrieval_glo= 0
+   iv%num_buoy_glo          = 0
+   iv%num_profiler_glo      = 0
+   iv%num_radar_glo         = 0
+   iv%num_bogus_glo         = 0
+   iv%num_airsr_glo         = 0
+   iv%num_pseudo_glo        = 0      
 
-   ob%num_sound=0
-   ob%num_synop=0
-   ob%num_geoamv=0
-   ob%num_polaramv=0
-   ob%num_airep=0
-   ob%num_metar=0
-   ob%num_ships=0
-   ob%num_pilot=0
-   ob%num_satem=0
-   ob%num_gpspw=0
-   ob%num_gpsref=0
-   ob%num_qscat=0
-   ob%num_ssmt1=0
-   ob%num_ssmt2=0
-   ob%num_ssmi_tb=0
-   ob%num_ssmi_retrieval=0
-   ob%num_buoy=0
-   ob%num_profiler=0
-   ob%num_radar=0
-   ob%num_bogus=0
-   ob%num_airsr=0
-   ob%num_inst=0
-   ob%num_pseudo=0          
+   ob%num_sound          = 0
+   ob%num_synop          = 0
+   ob%num_geoamv         = 0
+   ob%num_polaramv       = 0
+   ob%num_airep          = 0
+   ob%num_metar          = 0
+   ob%num_ships          = 0
+   ob%num_pilot          = 0
+   ob%num_satem          = 0
+   ob%num_gpspw          = 0
+   ob%num_gpsref         = 0
+   ob%num_qscat          = 0
+   ob%num_ssmt1          = 0
+   ob%num_ssmt2          = 0
+   ob%num_ssmi_tb        = 0
+   ob%num_ssmi_retrieval = 0
+   ob%num_buoy           = 0
+   ob%num_profiler       = 0
+   ob%num_radar          = 0
+   ob%num_bogus          = 0
+   ob%num_airsr          = 0
+   ob%num_qscat          = 0
+   ob%num_inst           = 0  
+
+   do n=0, max_fgat_time
+      iv%ob_numb(n)%total          = 0
+      iv%ob_numb(n)%sound          = 0
+      iv%ob_numb(n)%synop          = 0
+      iv%ob_numb(n)%pilot          = 0
+      iv%ob_numb(n)%geoamv         = 0
+      iv%ob_numb(n)%polaramv       = 0
+      iv%ob_numb(n)%satem          = 0
+      iv%ob_numb(n)%airep          = 0
+      iv%ob_numb(n)%metar          = 0
+      iv%ob_numb(n)%ships          = 0
+      iv%ob_numb(n)%gpspw          = 0
+      iv%ob_numb(n)%gpsref         = 0
+      iv%ob_numb(n)%ssmi_retrieval = 0
+      iv%ob_numb(n)%ssmi_tb        = 0
+      iv%ob_numb(n)%ssmt1          = 0
+      iv%ob_numb(n)%ssmt2          = 0
+      iv%ob_numb(n)%pseudo         = 0
+      iv%ob_numb(n)%qscat          = 0
+      iv%ob_numb(n)%profiler       = 0
+      iv%ob_numb(n)%buoy           = 0
+      iv%ob_numb(n)%radar          = 0
+      iv%ob_numb(n)%bogus          = 0
+      iv%ob_numb(n)%airsr          = 0
+   end do
 
    if (use_obsgts) then
       ! Conventional obs can be in BUFR or ascii format
