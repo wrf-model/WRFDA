@@ -110,7 +110,7 @@ while test $DATE -le $FINAL_DATE; do
    
    # Check if it is "update_cycling" run:
    
-   if test $UPDATE_CYCLING; then
+   if $UPDATE_CYCLING; then
         if [[ $HOUR = $LONG_FCST_TIME_1 || $HOUR = $LONG_FCST_TIME_3 ]] then
               export CYCLING=false  # cold start
 	      export FIRST=false
