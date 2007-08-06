@@ -30,7 +30,7 @@ module da_minimisation
       stdout, eps, stats_unit, test_dm_exact, global, &
       calculate_cg_cost_fn,anal_type_randomcv,cv_size_domain,je_factor, &
       jb_factor,ntmax,omb_add_noise,write_iv_rad_ascii,use_obs_errfac, &
-      rtm_option,rtm_option_rttov, rtm_option_crtm, &
+      rtm_option,rtm_option_rttov, rtm_option_crtm, anal_type_verify, &
       write_filtered_rad,omb_set_rand, num_airsr_tot,jo_unit,num_airep_tot, &
       num_buoy_tot,num_geoamv_tot,num_gpsref_tot,num_pilot_tot, &
       num_polaramv_tot,num_radiance_tot,num_qscat_tot,num_profiler_tot, &

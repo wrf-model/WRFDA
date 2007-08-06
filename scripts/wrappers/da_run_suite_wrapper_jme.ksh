@@ -3,7 +3,7 @@
 
 #Experiment details:
 export REGION=jme
-export EXPT=etkf
+export EXPT=test
 export CYCLE_NUMBER=1
 #export CYCLING=true
 #export FIRST=false
@@ -14,6 +14,7 @@ export QUEUE=share
 export RUN_CMD=mpirun.lsf
 export LSF_MAX_RUNTIME=60
 export LSF_EXCLUSIVE=" "
+#export FCST_RANGE=0
 
 #Time info:
 export DATE=2006100312
@@ -26,6 +27,7 @@ export WRFVAR_DIR=$REL_DIR/wrfvar
 export REG_DIR=$DAT_DIR/$REGION
 export EXP_DIR=$REG_DIR/$EXPT
 export OB_DIR=$REG_DIR/ob
+export RUN_DIR=$EXP_DIR/run/$DATE/etkf
 
 #WPS (namelist.wps):
 #export RUN_GEOGRID=false

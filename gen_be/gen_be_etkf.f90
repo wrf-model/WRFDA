@@ -70,7 +70,10 @@ program gen_be_etkf
    real, pointer         :: y(:,:)                    ! H(xf).
    real, pointer         :: sigma_o2(:)               ! Ob error variance.
    real, pointer         :: yo(:)                     ! Observation.
- 
+   real, pointer         :: ens_mean(:)               ! Variable ensemble mean.
+   real, pointer         :: ens_stdv_pert_prior(:)    ! Variable prior perturbation std. dev.
+   real, pointer         :: ens_stdv_pert_poste(:)    ! Variable posterior perturbation std. dev.
+
    namelist / gen_be_etkf_nl / num_members, nv, cv, &
                                naccumt1, naccumt2, nstartaccum1, nstartaccum2, &
                                nout, tainflatinput, rhoinput
@@ -108,6 +111,10 @@ program gen_be_etkf
    write(stdout,'(a,f15.5)')'   rhoinput = ', rhoinput
 
    num_members_inv = 1.0 / real(num_members)
+
+   allocate( ens_mean(1:nv) )
+   allocate( ens_stdv_pert_prior(1:nv) )
+   allocate( ens_stdv_pert_poste(1:nv) )
 
 !-----------------------------------------------------------------------------------------
    write(stdout,'(/a)')' [2] Read observation information.'
@@ -242,9 +249,9 @@ program gen_be_etkf
 !  Print prior mean, ensemble standard deviation:
    do v = 1, nv
       iend = istart(v) + product(dims(v,1:ndims(v)-1)) - 1
-      write(stdout,'(i4,1x,a10,2f15.5)')v, cv(v), &
-      sum(xf_mean(istart(v):iend)) / real(iend - istart(v) + 1), &
-      sqrt(sum(xf_vari(istart(v):iend)) / real(iend - istart(v) + 1))
+      ens_mean(v) = sum(xf_mean(istart(v):iend)) / real(iend - istart(v) + 1)
+      ens_stdv_pert_prior(v) =sqrt( sum(xf_vari(istart(v):iend)) / &
+                                    real(iend - istart(v) + 1) )
    end do
 
 !-----------------------------------------------------------------------------------------
@@ -261,11 +268,15 @@ program gen_be_etkf
    end do
 
 !  Print posterior mean, ensemble standard deviation:
+   write(stdout,'(5a)')'   v', ' Variable  ', '    Ensemble Mean', &
+                       '  Prior Pert StDv', ' Post. Pert. StDv'
    do v = 1, nv
       iend = istart(v) + product(dims(v,1:ndims(v)-1)) - 1
-      write(stdout,'(i4,1x,a10,2f15.5)')v, cv(v), &
-      sum(xf_mean(istart(v):iend)) / real(iend - istart(v) + 1), &
-      sqrt(sum(xf_vari(istart(v):iend)) / real(iend - istart(v) + 1))
+      ens_stdv_pert_poste(v) =sqrt( sum(xf_vari(istart(v):iend)) / &
+                                    real(iend - istart(v) + 1) )
+
+      write(stdout,'(i4,1x,a10,3f17.7)')v, cv(v), &
+      ens_mean(v), ens_stdv_pert_prior(v), ens_stdv_pert_poste(v)
    end do
 
 !-----------------------------------------------------------------------------------------
@@ -303,6 +314,10 @@ program gen_be_etkf
       end do ! v
       rcode = nf_close( cdfid )
    end do !member
+
+   deallocate( ens_mean )
+   deallocate( ens_stdv_pert_prior )
+   deallocate( ens_stdv_pert_poste )
 
 end program gen_be_etkf
 

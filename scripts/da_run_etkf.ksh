@@ -160,5 +160,9 @@ while [[ $MEM -le $NUM_MEMBERS ]]; do
    let MEM=$MEM+1
 done
 
+if $CLEAN; then
+   rm -rf wrfvar.* ob.etkf.* etkf_input* *.exe
+fi
+
 exit 0
 

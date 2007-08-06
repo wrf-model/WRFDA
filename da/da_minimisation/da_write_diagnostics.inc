@@ -218,7 +218,10 @@ subroutine da_write_diagnostics(grid, ob, iv, re, y, j)
    !------------------------------------------------------------------------------
    call da_write_obs(ob, iv, re)
 
-   call da_write_obs_etkf(ob, iv, re)
+!  Write ETKF observation files if required (note - 1PE only at present):
+   if (anal_type_verify) then
+      call da_write_obs_etkf(ob, iv, re)
+   end if
 
    call da_final_write_obs(iv)
 

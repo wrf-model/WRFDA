@@ -12,20 +12,18 @@ begin
 
  works = "pdf"
 
- date = "2006100100"
+ date = "2006100300"
  year = "2006"
  month = "10"
- day = "01"
+ day = "03"
  hour = "12"
- fcst_range = "T+00"
- expt = "test"
+ fcst_range = "T+12"
+ expt = "etkf"
  file_type = "wrfout_d01_"
- file_type = "wrf_3dvar_input_d01_"
- file_type = "wrfinput_d01"
-; dir  = "/smoke/dmbarker/data/t46/" + expt + "/fc/" + date + "/"
- dir  = "/smoke/dmbarker/data/t46_45km_hybrid/" + "/rc/" + date + "/"
-; filename  = file_type + year + "-" + month + "-" + day + "_" + hour + ":00:00"
- filename  = file_type
+; file_type = "wrf_3dvar_input_d01_"
+; file_type = "wrfinput_d01"
+ dir  = "/rap/datc/data/jme/" + expt + "/fc/" + date + "/"
+ filename  = file_type + year + "-" + month + "-" + day + "_" + hour + ":00:00"
  filename1 = filename + ".e001"
  filename2 = filename + ".e002"
  filename3 = filename + ".e003"
@@ -64,7 +62,7 @@ begin
 
  var = "U"
  units = " (m/s)"
- kl = 20
+ kl = 30
  f  = file0->U
  f1 = file1->U
  f2 = file2->U

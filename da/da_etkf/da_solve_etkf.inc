@@ -149,8 +149,8 @@ subroutine da_solve_etkf( ndim,nanals,nobs,ens,ens_ob,oberrvar,obs,nout,naccumt1
          ainflat_mean = ainflat_mean + ainflat
       end do
       ainflat_mean = ainflat_mean / real( nout - nmin + 1 )
-      write (unit=stdout,fmt='(a,i6,2f15.5)')  "nout, ainflat, ainflat_mean = ", &
-                                            nout, ainflat, ainflat_mean
+      write (unit=stdout,fmt='(/a,f15.5)')  " Current Inflation factor = ", ainflat
+      write (unit=stdout,fmt='(a,f15.5)')  " Rolling mean inflation factor = ", ainflat_mean
     else
 !      This is for pre-specified inflation factor
        ainflat = tainflatinput
