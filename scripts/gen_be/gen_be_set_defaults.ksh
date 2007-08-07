@@ -52,7 +52,7 @@ export USE_GLOBAL_EOFS=${USE_GLOBAL_EOFS:-.true.}    # Use domain-averaged EOFS 
 export DATA_ON_LEVELS=${DATA_ON_LEVELS:-.false.}     # False if fields projected onto modes.
 export GLOBAL=${GLOBAL:-false}                       # Global or regional models
 export NUM_LEVELS=${NUM_LEVELS:-27}                  # Hard-wired for now....
-export N_SMTH_SL=${N_SMTH_SL:-0}                     # Amount of lengthscale smoothing (0=none).
+export N_SMTH_SL=${N_SMTH_SL:-2}                     # Amount of lengthscale smoothing (0=none).
 export STRIDE=${STRIDE:-1}                           # Calculate correlation evert STRIDE point (stage4 regional).
 export TESTING_SPECTRAL=${TESTING_SPECTRAL:-.false.} # True if performing spectral tests.
 export LOCAL=${LOCAL:-true}                          # True if local machine.
