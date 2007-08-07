@@ -15,8 +15,9 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 
-. ${WRFVAR_DIR}/scripts/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
 if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
@@ -46,7 +47,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    export DD=$(echo $FCST_TIME | cut -c7-8)
    export HH=$(echo $FCST_TIME | cut -c9-10)
    export FILE_DATE=${YYYY}-${MM}-${DD}_${HH}:00:00
-   export FILE=${DAT_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
+   export FILE=${FC_DIR}/${DATE}/wrfout_d01_${FILE_DATE}
    export FILE1=wrfout_d01_${FILE_DATE}
    export FILE2=wrfout_d01_${FILE_DATE}.e001
    export FILE3=wrfout_d01_${FILE_DATE}.e002
@@ -54,7 +55,7 @@ while test $DATE -le $END_DATE_STAGE0; do
    if [[ $BE_METHOD == NMC ]]; then
      ln -sf $FILE $FILE1
      ln -sf $FILE $FILE2
-     ln -sf ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} $FILE3
+     ln -sf ${FC_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE} $FILE3
    fi
 
    ln -fs ${BUILD_DIR}/gen_be_stage0_wrf.exe .
@@ -64,9 +65,9 @@ while test $DATE -le $END_DATE_STAGE0; do
    mv pert.${FCST_TIME}* ${STAGE0_DIR}
    # mv mean.${FCST_TIME}* ${STAGE0_DIR}
    mv gen_be_stage0_wrf.${FCST_TIME}.log ${STAGE0_DIR}
-   rm -rf $TMP_DIR 2> /dev/null
+#   rm -rf $TMP_DIR 2> /dev/null
 
-   echo $DATE $FILE ${DAT_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
+   echo $DATE $FILE ${FC_DIR}/${NEXT_DATE}/wrfout_d01_${FILE_DATE}
    export DATE=$(${BUILD_DIR}/da_advance_time.exe $DATE $INTERVAL)
 
 done     # End loop over dates.

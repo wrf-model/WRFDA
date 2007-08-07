@@ -21,8 +21,9 @@
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}
+export SCRIPTS_DIR=${SCRIPTS_DIR:-$WRFVAR_DIR/scripts}
 
-. ${WRFVAR_DIR}/scripts/gen_be/gen_be_set_defaults.ksh
+. ${SCRIPTS_DIR}/gen_be/gen_be_set_defaults.ksh
 
 if [[ ! -d $RUN_DIR ]]; then mkdir $RUN_DIR; fi
 if [[ ! -d $STAGE0_DIR ]]; then mkdir $STAGE0_DIR; fi
@@ -52,7 +53,7 @@ if $RUN_GEN_BE_STAGE0; then
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   $WRFVAR_DIR/scripts/gen_be/gen_be_stage0_wrf.ksh
+   $SCRIPTS_DIR/gen_be/gen_be_stage0_wrf.ksh
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 0 for WRF failed with error" $RC
@@ -238,14 +239,14 @@ if $RUN_GEN_BE_STAGE4; then
       echo "Run Stage 4: Calculate horizontal covariances (global power spectra)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_global.ksh > gen_be_stage4_global.log 2>&1
+      ${SCRIPTS_DIR}/gen_be/gen_be_stage4_global.ksh > gen_be_stage4_global.log 2>&1
 
    else
       echo "---------------------------------------------------------------"
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${WRFVAR_DIR}/scripts/gen_be/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
+      ${SCRIPTS_DIR}/gen_be/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 4 failed with error" $RC
@@ -310,7 +311,7 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=chi_u
    export VARIABLE2=chi
 
-   $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.ksh
+   $SCRIPTS_DIR/gen_be/gen_be_cov3d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -322,7 +323,7 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=t_u
    export VARIABLE2=t
 
-   $WRFVAR_DIR/scripts/gen_be/gen_be_cov3d.ksh
+   $SCRIPTS_DIR/gen_be/gen_be_cov3d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -334,7 +335,7 @@ if $RUN_GEN_BE_MULTICOV; then
    export VARIABLE1=ps_u
    export VARIABLE2=ps
 
-   $WRFVAR_DIR/scripts/gen_be/gen_be_cov2d.ksh
+   $SCRIPTS_DIR/gen_be/gen_be_cov2d.ksh
 
    RC=$?
    if [[ $RC != 0 ]]; then

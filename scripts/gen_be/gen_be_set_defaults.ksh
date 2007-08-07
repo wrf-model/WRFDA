@@ -71,9 +71,12 @@ export DATA_DISK=${DATA_DISK:-/smoke}             # Directory containing codes.
 export REL_DIR=${REL_DIR:-$HOME/trunk}            # Directory containing codes.
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/wrfvar}  # WRF-Var code directory.
 export BUILD_DIR=${BUILD_DIR:-$WRFVAR_DIR/build}  # WRF-Var code build directory.
-export DAT_DIR=${DAT_DIR:-${DATA_DISK}/${USER}/data/${REGION}/noda/fc}  # Top-level data directory.
-export RUN_DIR=${RUN_DIR:-$DAT_DIR/$ID}           # Run directory.
-export STAGE0_DIR=${STAGE0_DIR:-$DAT_DIR/stage0}  # Output for stage0.
+export DAT_DIR=${DAT_DIR:-${HOME}/data}           # Top-level data directory.
+export REG_DIR=${REG_DIR:-$DAT_DIR/$REGION}       # Region-specific data dir.
+export EXP_DIR=${EXP_DIR:-$REG_DIR/$EXPT}         # Experiment-specific data dir.
+export FC_DIR=${FC_DIR:-$EXP_DIR/fc}              # Forecast directory
+export RUN_DIR=${RUN_DIR:-$EXP_DIR/gen_be}        # Run dir.
+export STAGE0_DIR=${STAGE0_DIR:-$RUN_DIR/stage0}  # Output for stage0.
 
 if $GLOBAL; then
    export UH_METHOD=power
