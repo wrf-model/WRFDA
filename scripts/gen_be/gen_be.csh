@@ -51,7 +51,7 @@ if ( ! $?USE_GLOBAL_EOFS ) setenv USE_GLOBAL_EOFS .true. # Use domain-averaged E
 if ( ! $?DATA_ON_LEVELS )  setenv DATA_ON_LEVELS .false. # False if fields projected onto modes.
 if ( ! $?GLOBAL )        setenv GLOBAL false             # Global or regional models
 if ( ! $?NUM_LEVELS )    setenv NUM_LEVELS    27         # Hard-wired for now....
-if ( ! $?N_SMTH_SL )     setenv N_SMTH_SL     0          # Amount of lengthscale smoothing (0=none).
+if ( ! $?N_SMTH_SL )     setenv N_SMTH_SL     2          # Amount of lengthscale smoothing (0=none).
 if ( ! $?STRIDE )        setenv STRIDE 1                 # Calculate correlation evert STRIDE point (stage4 regional).
 if ( ! $?NUM_JOBS )      setenv NUM_JOBS 8               # Number of jobs to run (stage4 regional)).
 if ( ! $?RESOLUTION_KM ) setenv RESOLUTION_KM 200        # Hard-wired for now (only used for regional)
