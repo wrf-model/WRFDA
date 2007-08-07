@@ -136,9 +136,8 @@ echo "WINDOW_END            $WINDOW_END"
       export D_HOUR[$INDEX]=`echo ${D_DATE[$INDEX]} | cut -c9-10`
    done
 
-   export NPROC_X=${NPROC_X:-0} # Regional, always set NPROC_X to 0, Global, always 1
    if $NL_GLOBAL; then
-      export NPROC_X=1
+      export NL_NPROC_X=1
    fi
 
    export YEAR=`echo $DATE | cut -c1-4`
