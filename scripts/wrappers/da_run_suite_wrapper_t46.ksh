@@ -1,4 +1,4 @@
-#!/bin/ksh -aex
+#!/bin/ksh 
 #########################################################################
 set echo 
 
@@ -28,9 +28,9 @@ export LSF_MAX_RUNTIME=10
 export LSF_EXCLUSIVE=" "
 export LL_PTILE=16 
 
-# if NUM_PROCS=64 used with exclusive queues:
 # ungrib needs 2 min, metgrid needs less than 1 min: at least 128 min for WPS per day 4 runs. 
 # real needs 2 min per file: 8 min is required per day 4 runs.
+# if NUM_PROCS=64 used with exclusive queues:
 # 2 min per wrf_out: at least 48 min is required per day 4 runs.
 # 1 min for WRF-VAR: 4 min is required per day 4 runs. 
 # 5 sec or less  for UPDATE_BC: 20 sec is required per day 4 runs. 
@@ -80,6 +80,7 @@ export OB_DIR=$REG_DIR/ob
 
 #WPS (namelist.wps):
 export RUN_UNGRIB_METGRID_AFWA=true
+export METGRID_TABLE_TYPE=AFWA    # Note that it should be in upper cases.
 export RUN_GEOGRID=false
 export DEBUG_LEVEL=20
 export NL_E_WE=162
